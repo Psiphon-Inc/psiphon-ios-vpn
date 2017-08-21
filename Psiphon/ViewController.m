@@ -91,7 +91,7 @@
         // TODO: should we do error checking here, or on call to startVPN only?
         if ([managers count] == 1) {
             self.targetManager = managers[0];
-            [startStopToggle setOn:![self isVPNDisconnectedOrInvalid]];
+            [startStopToggle setOn:[self isVPNActive]];
         }
     }];
     
@@ -129,7 +129,7 @@
 }
 
 - (void)onSwitch:(UISwitch *)sender {
-    if ([self isVPNDisconnectedOrInvalid]) {
+    if (![self isVPNActive]) {
         [self startVPN];
     } else {
         NSLog(@"call targetManager.connection.stopVPNTunnel()");
@@ -234,7 +234,6 @@
 # pragma mark - Property getters/setters
 
 - (void)setTargetManager:(NEVPNManager *)targetManager {
-    NSLog(@"setting targetmanager");
     _targetManager = targetManager;
     statusLabel.text = [self getVPNStatusDescription];
     
@@ -243,7 +242,7 @@
         
         NSLog(@"received NEVPNStatusDidChangeNotification %@", [self getVPNStatusDescription]);
         statusLabel.text = [self getVPNStatusDescription];
-        [startStopToggle setOn:![self isVPNDisconnectedOrInvalid]];
+        [startStopToggle setOn:[self isVPNActive]];
     }];
 }
 
@@ -265,11 +264,13 @@
 }
 
 /*!
- @brief Returns true if NEVPNConnectionStatus is Disconnected or Invalid.
+ @brief Returns true if NEVPNConnectionStatus is Connected, Connecting or Reasserting.
  */
-- (BOOL)isVPNDisconnectedOrInvalid {
+- (BOOL) isVPNActive{
     NEVPNStatus status = self.targetManager.connection.status;
-    return (status == NEVPNStatusDisconnected || status == NEVPNStatusInvalid);
+    return (status == NEVPNStatusConnecting
+      || status == NEVPNStatusConnected
+      || status == NEVPNStatusReasserting);
 }
 
 - (void)addLogViewController {
@@ -341,6 +342,7 @@
 
 - (void)addStartAndStopToggle {
     startStopToggle = [[UISwitch alloc] init];
+    startStopToggle.transform = CGAffineTransformMakeScale(1.5, 1.5);
     startStopToggle.translatesAutoresizingMaskIntoConstraints = NO;
     [startStopToggle addTarget:self action:@selector(onSwitch:) forControlEvents:UIControlEventValueChanged];
 
@@ -353,7 +355,7 @@
                                                              toItem:toggleLabel
                                                           attribute:NSLayoutAttributeRight
                                                          multiplier:1.0
-                                                           constant:15.0]];
+                                                           constant:30.0]];
     
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:startStopToggle
                                                           attribute:NSLayoutAttributeCenterY
