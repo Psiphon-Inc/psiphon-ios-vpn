@@ -198,10 +198,10 @@
 
 - (void)listenForNEMessages {
 
-    [notifier listenForNotification:@"onConnected" listener:^{
+    [notifier listenForNotification:@"NE.newHomepages" listener:^{
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
             NSLog(@"Notifier onConntected");
-            
+
             NSArray<Homepage *> *homepages = [sharedDB getAllHomepages];
             if ([homepages count] > 0) {
                 NSUInteger randIndex = arc4random() % [homepages count];
@@ -215,7 +215,10 @@
         });
     }];
 
-    [notifier listenForNotification:@"onDiagnosticMessage" listener:^{
+    [notifier listenForNotification:@"NE.onConnected" listener:^{
+    }];
+
+    [notifier listenForNotification:@"NE.onDiagnosticMessage" listener:^{
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
             NSArray<DiagnosticEntry *> *logs = [sharedDB getNewLogs];
             [psiphonData addDiagnosticEntries:logs];
