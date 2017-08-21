@@ -46,6 +46,9 @@
     UISwitch *startStopToggle;
     UILabel *toggleLabel;
     UILabel *statusLabel;
+
+    // App state variables
+    BOOL shownHomepage;
 }
 
 @synthesize targetManager = _targetManager;
@@ -59,8 +62,17 @@
 
         // Notifier
         notifier = [[Notifier alloc] initWithAppGroupIdentifier:APP_GROUP_IDENTIFIER];
+
+        [self resetAppState];
+
     }
     return self;
+}
+
+// Initializes/resets variables that track application state
+// since when toggle switch was turned on.
+- (void)resetAppState {
+    shownHomepage = FALSE;
 }
 
 - (void)viewDidLoad {
@@ -139,7 +151,9 @@
 
 - (void)startVPN {
     NSLog(@"startVPN: call loadAllFromPreferencesWithCompletionHandler");
-    
+
+    [self resetAppState];
+
     [NETunnelProviderManager loadAllFromPreferencesWithCompletionHandler:^(NSArray<NETunnelProviderManager *> * _Nullable allManagers, NSError * _Nullable error) {
         
         if (allManagers == nil) {
@@ -200,15 +214,18 @@
 
     [notifier listenForNotification:@"NE.newHomepages" listener:^{
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-            NSArray<Homepage *> *homepages = [sharedDB getAllHomepages];
-            if ([homepages count] > 0) {
-                NSUInteger randIndex = arc4random() % [homepages count];
-                Homepage *homepage = homepages[randIndex];
+            if (!shownHomepage) {
+                NSArray<Homepage *> *homepages = [sharedDB getAllHomepages];
+                if ([homepages count] > 0) {
+                    NSUInteger randIndex = arc4random() % [homepages count];
+                    Homepage *homepage = homepages[randIndex];
 
-                [[UIApplication sharedApplication] openURL:homepage.url options:@{}
-                                         completionHandler:^(BOOL success) {
-                                         }];
+                    [[UIApplication sharedApplication] openURL:homepage.url options:@{}
+                                             completionHandler:^(BOOL success) {
+                                                 shownHomepage = success;
+                                             }];
 
+                }
             }
         });
     }];
