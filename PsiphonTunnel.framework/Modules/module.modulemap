@@ -1,0 +1,6 @@
+framework module PsiphonTunnel {
+  umbrella header "PsiphonTunnel.h"
+
+  export *
+  module * { export * }
+}
