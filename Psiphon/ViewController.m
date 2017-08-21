@@ -124,8 +124,8 @@
 
 - (void)applicationWillResignActive {
     // Stop listening for diagnostic messages (we don't want to hold the shared db lock while backgrounded)
-    [notifier stopListening:@"onDiagnosticMessage"];
-    [notifier stopListening:@"onHomepage"];
+    // TODO: best place to stop listening for NE messages?
+    [notifier stopListeningForAllNotifications];
 }
 
 - (void)onSwitch:(UISwitch *)sender {
@@ -200,8 +200,6 @@
 
     [notifier listenForNotification:@"NE.newHomepages" listener:^{
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-            NSLog(@"Notifier onConntected");
-
             NSArray<Homepage *> *homepages = [sharedDB getAllHomepages];
             if ([homepages count] > 0) {
                 NSUInteger randIndex = arc4random() % [homepages count];
