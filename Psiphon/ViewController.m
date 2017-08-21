@@ -238,9 +238,18 @@
     statusLabel.text = [self getVPNStatusDescription];
     
     // Listening for NEVPNStatusDidChangeNotification
-    [[NSNotificationCenter defaultCenter] addObserverForName:NEVPNStatusDidChangeNotification object:_targetManager.connection queue:NSOperationQueue.mainQueue usingBlock:^(NSNotification * _Nonnull note) {
+    [[NSNotificationCenter defaultCenter] addObserverForName:NEVPNStatusDidChangeNotification
+      object:_targetManager.connection
+      queue:NSOperationQueue.mainQueue usingBlock:^(NSNotification * _Nonnull note) {
         
         NSLog(@"received NEVPNStatusDidChangeNotification %@", [self getVPNStatusDescription]);
+
+        if (self.targetManager.connection.status == NEVPNStatusConnecting
+          || self.targetManager.connection.status == NEVPNStatusDisconnecting) {
+            startStopToggle.enabled = FALSE;
+        } else {
+            startStopToggle.enabled = TRUE;
+        }
         statusLabel.text = [self getVPNStatusDescription];
         [startStopToggle setOn:[self isVPNActive]];
     }];
