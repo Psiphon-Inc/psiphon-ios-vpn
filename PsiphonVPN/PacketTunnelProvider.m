@@ -32,7 +32,7 @@ static const double kDefaultLogTruncationInterval = 12 * 60 * 60; // 12 hours
 @implementation PacketTunnelProvider {
 
     // pointer to startTunnelWithOptions completion handler.
-    void (^vpnStartCompletionHandler)(NSError *__nullable error);
+    __weak void (^vpnStartCompletionHandler)(NSError *__nullable error);
 
         PsiphonTunnel *psiphonTunnel;
     PsiphonDataSharedDB *sharedDB;
@@ -62,7 +62,7 @@ static const double kDefaultLogTruncationInterval = 12 * 60 * 60; // 12 hours
     return self;
 }
 
-- (void)startTunnelWithOptions:(nullable NSDictionary<NSString *, NSObject *> *)options completionHandler:(void (^)(NSError *__nullable error))completionHandler {
+- (void)startTunnelWithOptions:(nullable NSDictionary<NSString *, NSObject *> *)options completionHandler:(void (^)(NSError *__nullable error))startTunnelCompletionHandler {
 
     // TODO: This method wouldn't work with "boot to VPN"
     if (options[EXTENSION_OPTION_START_FROM_CONTAINER]) {
@@ -78,7 +78,7 @@ static const double kDefaultLogTruncationInterval = 12 * 60 * 60; // 12 hours
 
             if (error != nil) {
                 NSLog(@"setTunnelNetworkSettings failed: %@", error);
-                completionHandler([[NSError alloc] initWithDomain:PSIPHON_TUNNEL_ERROR_DOMAIN code:PSIPHON_TUNNEL_ERROR_BAD_CONFIGURATION userInfo:nil]);
+                startTunnelCompletionHandler([[NSError alloc] initWithDomain:PSIPHON_TUNNEL_ERROR_DOMAIN code:PSIPHON_TUNNEL_ERROR_BAD_CONFIGURATION userInfo:nil]);
                 return;
             }
 
@@ -87,12 +87,12 @@ static const double kDefaultLogTruncationInterval = 12 * 60 * 60; // 12 hours
             BOOL success = [weakPsiphonTunnel start:FALSE];
             if (!success) {
                 NSLog(@"psiphonTunnel.start failed");
-                completionHandler([[NSError alloc] initWithDomain:PSIPHON_TUNNEL_ERROR_DOMAIN code:PSIPHON_TUNNEL_ERROR_INTERAL_ERROR userInfo:nil]);
+                startTunnelCompletionHandler([[NSError alloc] initWithDomain:PSIPHON_TUNNEL_ERROR_DOMAIN code:PSIPHON_TUNNEL_ERROR_INTERAL_ERROR userInfo:nil]);
                 return;
             }
 
             // Completion handler should be called after tunnel is connected.
-            vpnStartCompletionHandler = completionHandler;
+            vpnStartCompletionHandler = startTunnelCompletionHandler;
 
         }];
     } else {
@@ -103,7 +103,7 @@ static const double kDefaultLogTruncationInterval = 12 * 60 * 60; // 12 hours
 //               TODO: error handling?
           }];
 
-        completionHandler([NSError
+        startTunnelCompletionHandler([NSError
           errorWithDomain:PSIPHON_TUNNEL_ERROR_DOMAIN code:PSIPHON_TUNNEL_ERROR_BAD_START userInfo:nil]);
     }
     
@@ -112,6 +112,11 @@ static const double kDefaultLogTruncationInterval = 12 * 60 * 60; // 12 hours
 - (void)stopTunnelWithReason:(NEProviderStopReason)reason completionHandler:(void (^)(void)) completionHandler {
     
     // TODO: assumes stopTunnelWithReason called exactly once only after startTunnelWithOptions.completionHandler(nil)
+
+    if (vpnStartCompletionHandler) {
+        vpnStartCompletionHandler(nil);
+        vpnStartCompletionHandler = nil;
+    }
 
     [psiphonTunnel stop];
     completionHandler();
