@@ -19,6 +19,8 @@
 
 #import "Notifier.h"
 
+#define TAG @"Notifier: "
+
 @implementation Notifier {
     NSMutableDictionary *listeners;
     NSString *appGroupIdentifier;
@@ -28,7 +30,7 @@ void cfNotificationCallback(CFNotificationCenterRef center, void *observer, CFSt
   void const *object, CFDictionaryRef userInfo) {
 
     NSString *key = (__bridge NSString *) name;
-    Notifier *selfPtr = (__bridge Notifier *)observer;
+    Notifier *selfPtr = (__bridge Notifier *) observer;
     [selfPtr notificationCallback:key];
 }
 
@@ -48,11 +50,6 @@ void cfNotificationCallback(CFNotificationCenterRef center, void *observer, CFSt
 
 # pragma mark - Public
 
-/*!
- *
- * @param key Unique notification key
- * @return TRUE if notification is posted successfully.
- */
 - (void)post:(NSString *)key {
     CFNotificationCenterRef center = CFNotificationCenterGetDarwinNotifyCenter();
     if (center) {
@@ -61,10 +58,12 @@ void cfNotificationCallback(CFNotificationCenterRef center, void *observer, CFSt
 }
 
 - (void)listenForNotification:(nonnull NSString *)key listener:(nonnull void(^)(void))listener {
-    NSLog(@"Notifier: Listening for %@", key);
-    // TODO: make sure 'self' is not double listening!
-    // TODO: we only have one listener per key
-    [listeners setValue:listener forKey:key];
+    if (listeners[key]) {
+        NSLog(TAG "Aborting. Listener already registered for key: %@", key);
+        abort();
+    }
+
+    listeners[key] = listener;
 
     // Add self to Darwin notify center for the given key.
     CFNotificationCenterRef center = CFNotificationCenterGetDarwinNotifyCenter();
@@ -79,16 +78,23 @@ void cfNotificationCallback(CFNotificationCenterRef center, void *observer, CFSt
 }
 
 - (void)stopListening:(nonnull NSString *)key {
-    NSLog(@"Notifier: stop listening for %@", key);
     [listeners removeObjectForKey:key];
 
     // Remove self from Darwin notify center for the given key.
     CFNotificationCenterRef center = CFNotificationCenterGetDarwinNotifyCenter();
     if (center) {
         CFNotificationCenterRemoveObserver(center,
-          (__bridge const void *)self,
-          (__bridge CFStringRef)key,
+          (__bridge const void *) self,
+          (__bridge CFStringRef) key,
            NULL);
+    }
+}
+
+- (void)stopListeningForAllNotifications {
+    CFNotificationCenterRef center = CFNotificationCenterGetDarwinNotifyCenter();
+    if (center) {
+        [listeners removeAllObjects];
+        CFNotificationCenterRemoveEveryObserver(center, (__bridge const void *) self);
     }
 }
 

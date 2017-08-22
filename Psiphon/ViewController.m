@@ -46,6 +46,9 @@
     UISwitch *startStopToggle;
     UILabel *toggleLabel;
     UILabel *statusLabel;
+
+    // App state variables
+    BOOL shownHomepage;
 }
 
 @synthesize targetManager = _targetManager;
@@ -59,8 +62,17 @@
 
         // Notifier
         notifier = [[Notifier alloc] initWithAppGroupIdentifier:APP_GROUP_IDENTIFIER];
+
+        [self resetAppState];
+
     }
     return self;
+}
+
+// Initializes/resets variables that track application state
+// since when toggle switch was turned on.
+- (void)resetAppState {
+    shownHomepage = FALSE;
 }
 
 - (void)viewDidLoad {
@@ -91,7 +103,7 @@
         // TODO: should we do error checking here, or on call to startVPN only?
         if ([managers count] == 1) {
             self.targetManager = managers[0];
-            [startStopToggle setOn:![self isVPNDisconnectedOrInvalid]];
+            [startStopToggle setOn:[self isVPNActive]];
         }
     }];
     
@@ -124,12 +136,12 @@
 
 - (void)applicationWillResignActive {
     // Stop listening for diagnostic messages (we don't want to hold the shared db lock while backgrounded)
-    [notifier stopListening:@"onDiagnosticMessage"];
-    [notifier stopListening:@"onHomepage"];
+    // TODO: best place to stop listening for NE messages?
+    [notifier stopListeningForAllNotifications];
 }
 
 - (void)onSwitch:(UISwitch *)sender {
-    if ([self isVPNDisconnectedOrInvalid]) {
+    if (![self isVPNActive]) {
         [self startVPN];
     } else {
         NSLog(@"call targetManager.connection.stopVPNTunnel()");
@@ -139,7 +151,9 @@
 
 - (void)startVPN {
     NSLog(@"startVPN: call loadAllFromPreferencesWithCompletionHandler");
-    
+
+    [self resetAppState];
+
     [NETunnelProviderManager loadAllFromPreferencesWithCompletionHandler:^(NSArray<NETunnelProviderManager *> * _Nullable allManagers, NSError * _Nullable error) {
         
         if (allManagers == nil) {
@@ -198,24 +212,28 @@
 
 - (void)listenForNEMessages {
 
-    [notifier listenForNotification:@"onConnected" listener:^{
+    [notifier listenForNotification:@"NE.newHomepages" listener:^{
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-            NSLog(@"Notifier onConntected");
-            
-            NSArray<Homepage *> *homepages = [sharedDB getAllHomepages];
-            if ([homepages count] > 0) {
-                NSUInteger randIndex = arc4random() % [homepages count];
-                Homepage *homepage = homepages[randIndex];
+            if (!shownHomepage) {
+                NSArray<Homepage *> *homepages = [sharedDB getAllHomepages];
+                if ([homepages count] > 0) {
+                    NSUInteger randIndex = arc4random() % [homepages count];
+                    Homepage *homepage = homepages[randIndex];
 
-                [[UIApplication sharedApplication] openURL:homepage.url options:@{}
-                                         completionHandler:^(BOOL success) {
-                                         }];
+                    [[UIApplication sharedApplication] openURL:homepage.url options:@{}
+                                             completionHandler:^(BOOL success) {
+                                                 shownHomepage = success;
+                                             }];
 
+                }
             }
         });
     }];
 
-    [notifier listenForNotification:@"onDiagnosticMessage" listener:^{
+    [notifier listenForNotification:@"NE.onConnected" listener:^{
+    }];
+
+    [notifier listenForNotification:@"NE.onDiagnosticMessage" listener:^{
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
             NSArray<DiagnosticEntry *> *logs = [sharedDB getNewLogs];
             [psiphonData addDiagnosticEntries:logs];
@@ -233,7 +251,6 @@
 # pragma mark - Property getters/setters
 
 - (void)setTargetManager:(NEVPNManager *)targetManager {
-    NSLog(@"setting targetmanager");
     _targetManager = targetManager;
     statusLabel.text = [self getVPNStatusDescription];
     
@@ -242,7 +259,7 @@
         
         NSLog(@"received NEVPNStatusDidChangeNotification %@", [self getVPNStatusDescription]);
         statusLabel.text = [self getVPNStatusDescription];
-        [startStopToggle setOn:![self isVPNDisconnectedOrInvalid]];
+        [startStopToggle setOn:[self isVPNActive]];
     }];
 }
 
@@ -264,11 +281,13 @@
 }
 
 /*!
- @brief Returns true if NEVPNConnectionStatus is Disconnected or Invalid.
+ @brief Returns true if NEVPNConnectionStatus is Connected, Connecting or Reasserting.
  */
-- (BOOL)isVPNDisconnectedOrInvalid {
+- (BOOL) isVPNActive{
     NEVPNStatus status = self.targetManager.connection.status;
-    return (status == NEVPNStatusDisconnected || status == NEVPNStatusInvalid);
+    return (status == NEVPNStatusConnecting
+      || status == NEVPNStatusConnected
+      || status == NEVPNStatusReasserting);
 }
 
 - (void)addLogViewController {
@@ -340,6 +359,7 @@
 
 - (void)addStartAndStopToggle {
     startStopToggle = [[UISwitch alloc] init];
+    startStopToggle.transform = CGAffineTransformMakeScale(1.5, 1.5);
     startStopToggle.translatesAutoresizingMaskIntoConstraints = NO;
     [startStopToggle addTarget:self action:@selector(onSwitch:) forControlEvents:UIControlEventValueChanged];
 
@@ -352,7 +372,7 @@
                                                              toItem:toggleLabel
                                                           attribute:NSLayoutAttributeRight
                                                          multiplier:1.0
-                                                           constant:15.0]];
+                                                           constant:30.0]];
     
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:startStopToggle
                                                           attribute:NSLayoutAttributeCenterY

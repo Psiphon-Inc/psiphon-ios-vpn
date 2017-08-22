@@ -25,10 +25,31 @@
 
 - (instancetype)initWithAppGroupIdentifier:(nonnull NSString *)identifier;
 
+/*!
+ * @brief Sends Darwin notification with given key.
+ * @param key Unique notification key.
+ * @return TRUE if notification is posted successfully.
+ */
 - (void)post:(nonnull NSString *)key;
 
+/*!
+ * @brief Registers provided listener with Darwin notifications
+ *        for the given key.
+ * @param key Unique notification key.
+ * @param listener Listener to be called when a notification with given key is sent.
+ */
 - (void)listenForNotification:(nonnull NSString *)key listener:(nonnull void(^)(void))listener;
 
+/*!
+ * @brief Unregisters listener associated with the given notification key.
+ * @param key Unique notification key.
+ */
 - (void)stopListening:(nonnull NSString *)key;
+
+/*!
+ * @brief All listeners registered with this Notifier
+ * will be unregistered.
+ */
+- (void)stopListeningForAllNotifications;
 
 @end

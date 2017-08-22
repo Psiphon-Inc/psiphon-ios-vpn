@@ -30,7 +30,11 @@
 static const double kDefaultLogTruncationInterval = 12 * 60 * 60; // 12 hours
 
 @implementation PacketTunnelProvider {
-    PsiphonTunnel *psiphonTunnel;
+
+    // pointer to startTunnelWithOptions completion handler.
+    void (^vpnStartCompletionHandler)(NSError *__nullable error);
+
+        PsiphonTunnel *psiphonTunnel;
     PsiphonDataSharedDB *sharedDB;
 
     // Notifier
@@ -87,7 +91,9 @@ static const double kDefaultLogTruncationInterval = 12 * 60 * 60; // 12 hours
                 return;
             }
 
-            completionHandler(nil);
+            // Completion handler should be called after tunnel is connected.
+            vpnStartCompletionHandler = completionHandler;
+
         }];
     } else {
         // TODO: localize the following string
@@ -205,7 +211,7 @@ static const double kDefaultLogTruncationInterval = 12 * 60 * 60; // 12 hours
 - (void)onDiagnosticMessage:(NSString * _Nonnull)message {
     [sharedDB insertDiagnosticMessage:message];
     // notify container that there is new data in shared sqlite database
-    [notifier post:@"onDiagnosticMessage"];
+    [notifier post:@"NE.onDiagnosticMessage"];
 }
 
 - (void)onConnecting {
@@ -220,6 +226,11 @@ static const double kDefaultLogTruncationInterval = 12 * 60 * 60; // 12 hours
 - (void)onConnected {
     NSLog(@"onConnected");
 
+    if (vpnStartCompletionHandler) {
+        vpnStartCompletionHandler(nil);
+        vpnStartCompletionHandler = nil;
+    }
+
     self.reasserting = FALSE;
     
     // Logic that should run only on the first call to onConnected
@@ -230,13 +241,14 @@ static const double kDefaultLogTruncationInterval = 12 * 60 * 60; // 12 hours
         if ([handshakeHomepages count] > 0) {
             BOOL success = [sharedDB insertNewHomepages:handshakeHomepages];
             if (success) {
+                [notifier post:@"NE.newHomepages"];
                 [handshakeHomepages removeAllObjects];
             }
         }
     }
 
     // Notify container
-    [notifier post:@"onConnected"];
+    [notifier post:@"NE.onConnected"];
 }
 
 - (void)onHomepage:(NSString * _Nonnull)url {
