@@ -114,7 +114,8 @@ static const double kDefaultLogTruncationInterval = 12 * 60 * 60; // 12 hours
     // TODO: assumes stopTunnelWithReason called exactly once only after startTunnelWithOptions.completionHandler(nil)
 
     if (vpnStartCompletionHandler) {
-        vpnStartCompletionHandler(nil);
+        vpnStartCompletionHandler([NSError
+          errorWithDomain:PSIPHON_TUNNEL_ERROR_DOMAIN code:PSIPHON_TUNNEL_ERROR_STOPPED_BEFORE_CONNECTED userInfo:nil]);
         vpnStartCompletionHandler = nil;
     }
 
