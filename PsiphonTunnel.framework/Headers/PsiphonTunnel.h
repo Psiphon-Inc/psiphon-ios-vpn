@@ -124,7 +124,8 @@ typedef NS_ENUM(NSInteger, PsiphonConnectionState)
 - (NSString * _Nullable)getEmbeddedServerEntries;
 
 /*!
-TODO: provide doc
+  Called when the tunnel is starting to get the initial server entries (typically embedded in the app) that will be used to bootstrap the Psiphon tunnel connection. This value is in a particular format and will be supplied by Psiphon Inc. 
+  @return File path where embedded server entries file is located. This file should be accessible by the Network Extension.
  */
 - (NSString * _Nullable)getEmbeddedServerEntriesPath;
 
