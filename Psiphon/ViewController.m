@@ -184,6 +184,8 @@
 
         [self.targetManager saveToPreferencesWithCompletionHandler:^(NSError * _Nullable error) {
             if (error != nil) {
+                // User denied permission to add VPN Configuration.
+                [startStopToggle setOn:FALSE];
                 NSLog(@"startVPN: failed to save the configuration: %@", error);
                 return;
             }
