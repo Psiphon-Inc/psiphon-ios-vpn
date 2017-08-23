@@ -172,7 +172,14 @@ static const double kDefaultLogTruncationInterval = 12 * 60 * 60; // 12 hours
 @implementation PacketTunnelProvider (AppDelegateExtension)
 
 - (NSString * _Nullable)getEmbeddedServerEntries {
-    return @"";
+    return nil;
+}
+
+- (NSString * _Nullable)getEmbeddedServerEntriesPath {
+    NSString *serverEntriesPath = [[[NSBundle mainBundle]
+      resourcePath] stringByAppendingPathComponent:@"embedded_server_entries"];
+
+    return serverEntriesPath;
 }
 
 - (NSString * _Nullable)getPsiphonConfig {

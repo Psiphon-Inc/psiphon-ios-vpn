@@ -22,6 +22,7 @@
 		9BFEC3CD51F31841B4F8CD2B /* psiphon_config in Resources */ = {isa = PBXBuildFile; fileRef = 9BFECFCFB0546F18A7E57ADF /* psiphon_config */; };
 		9BFEC4F02A47FF8265635803 /* Notifier.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC91ED4A1C511520E9948 /* Notifier.m */; };
 		9BFECD1880B51B0E2EAEFF1F /* Notifier.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC91ED4A1C511520E9948 /* Notifier.m */; };
+		9BFECED023FC902444EB74C4 /* embedded_server_entries in Resources */ = {isa = PBXBuildFile; fileRef = 9BFEC1C6E19CD9DF09AB5F51 /* embedded_server_entries */; };
 		CE26FC951BBDC7B800B83375 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = CE26FC941BBDC7B800B83375 /* Assets.xcassets */; };
 		CE26FC981BBDC7B800B83375 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = CE26FC961BBDC7B800B83375 /* LaunchScreen.storyboard */; };
 		CE26FCAC1BBDC85900B83375 /* PsiphonVPN.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = CE26FCA31BBDC85900B83375 /* PsiphonVPN.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
@@ -78,6 +79,7 @@
 		50622D8B7002EA8ED09C076A /* Pods-Psiphon.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Psiphon.release.xcconfig"; path = "Pods/Target Support Files/Pods-Psiphon/Pods-Psiphon.release.xcconfig"; sourceTree = "<group>"; };
 		66094F781E8067520069EC4E /* PsiphonTunnel.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = PsiphonTunnel.framework; sourceTree = "<group>"; };
 		668AF9BE1E92CBD3008CAAAA /* NetworkExtension.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = NetworkExtension.framework; path = System/Library/Frameworks/NetworkExtension.framework; sourceTree = SDKROOT; };
+		9BFEC1C6E19CD9DF09AB5F51 /* embedded_server_entries */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = embedded_server_entries; sourceTree = "<group>"; };
 		9BFEC3165745A5D14C8C3C08 /* Notifier.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Notifier.h; sourceTree = "<group>"; };
 		9BFEC4205423A6F55DA7DAB0 /* psiphon_config.stub */ = {isa = PBXFileReference; lastKnownFileType = file.stub; path = psiphon_config.stub; sourceTree = "<group>"; };
 		9BFEC91ED4A1C511520E9948 /* Notifier.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Notifier.m; sourceTree = "<group>"; };
@@ -211,6 +213,7 @@
 				EF652CD91F352271002AFB48 /* PacketTunnelProvider.m */,
 				9BFEC4205423A6F55DA7DAB0 /* psiphon_config.stub */,
 				9BFECFCFB0546F18A7E57ADF /* psiphon_config */,
+				9BFEC1C6E19CD9DF09AB5F51 /* embedded_server_entries */,
 			);
 			path = PsiphonVPN;
 			sourceTree = "<group>";
@@ -348,6 +351,7 @@
 				CE4E9BC21BBEECFC0060FF8B /* PsiphonVPN.entitlements in Resources */,
 				9BFEC23DBD7EFDD326FF6C14 /* psiphon_config.stub in Resources */,
 				9BFEC3CD51F31841B4F8CD2B /* psiphon_config in Resources */,
+				9BFECED023FC902444EB74C4 /* embedded_server_entries in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
