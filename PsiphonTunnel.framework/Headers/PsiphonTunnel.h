@@ -126,7 +126,7 @@ typedef NS_ENUM(NSInteger, PsiphonConnectionState)
 /*!
 TODO: provide doc
  */
-- (NSString * _Nullable)getEmbeddedServerEntriesFileName;
+- (NSString * _Nullable)getEmbeddedServerEntriesPath;
 
 //
 // Optional delegate methods. Note that some of these are probably necessary for
