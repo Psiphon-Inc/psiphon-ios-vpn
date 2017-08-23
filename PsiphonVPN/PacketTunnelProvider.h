@@ -24,6 +24,7 @@
 #define PSIPHON_TUNNEL_ERROR_BAD_CONFIGURATION  1
 #define PSIPHON_TUNNEL_ERROR_INTERAL_ERROR      2
 #define PSIPHON_TUNNEL_ERROR_BAD_START          3  // Error code for when the user tries to start the VPN anywhere butthe container app.
+#define PSIPHON_TUNNEL_ERROR_STOPPED_BEFORE_CONNECTED 4
 
 @interface PacketTunnelProvider : NEPacketTunnelProvider
 
