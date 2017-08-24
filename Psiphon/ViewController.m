@@ -24,6 +24,7 @@
 #import "SharedConstants.h"
 #import "LogViewController.h"
 #import "Notifier.h"
+#import "PsiphonConfigUserDefaults.h"
 
 @import NetworkExtension;
 @import FMDB;
@@ -46,9 +47,13 @@
     UISwitch *startStopToggle;
     UILabel *toggleLabel;
     UILabel *statusLabel;
+    UIButton *regionButton;
 
     // App state variables
     BOOL shownHomepage;
+
+    // VPN Config user defaults
+    PsiphonConfigUserDefaults *psiphonConfigUserDefaults;
 }
 
 @synthesize targetManager = _targetManager;
@@ -62,6 +67,9 @@
 
         // Notifier
         notifier = [[Notifier alloc] initWithAppGroupIdentifier:APP_GROUP_IDENTIFIER];
+
+        // VPN Config user defaults
+        psiphonConfigUserDefaults = [[PsiphonConfigUserDefaults alloc] initWithSuiteName:APP_GROUP_IDENTIFIER];
 
         [self resetAppState];
 
@@ -92,6 +100,7 @@
     [self addToggleLabel];
     [self addStartAndStopToggle];
     [self addStatusLabel];
+    [self addRegionButton];
     [self addLogViewController];
     
     // Load previous NETunnelProviderManager, if any.
@@ -147,6 +156,13 @@
         NSLog(@"call targetManager.connection.stopVPNTunnel()");
         [self.targetManager.connection stopVPNTunnel];
     }
+}
+
+- (void)onRegionClick:(UIButton *)sender {
+    if ([psiphonConfigUserDefaults setEgressRegion:@""]) {
+    }
+    [notifier post:@"egressRegionChanged"];
+
 }
 
 - (void)startVPN {
@@ -249,6 +265,8 @@
     }];
 }
 
+#pragma mark - VPN Settings
+
 
 # pragma mark - Property getters/setters
 
@@ -320,7 +338,7 @@
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:controller.view
                                                           attribute:NSLayoutAttributeTop
                                                           relatedBy:NSLayoutRelationEqual
-                                                             toItem:statusLabel
+                                                             toItem:regionButton
                                                           attribute:NSLayoutAttributeBottom
                                                          multiplier:1.0
                                                            constant:15.0]];
@@ -410,6 +428,39 @@
                                                            constant:0.0]];
     
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:statusLabel
+                                                          attribute:NSLayoutAttributeRight
+                                                          relatedBy:NSLayoutRelationEqual
+                                                             toItem:self.view
+                                                          attribute:NSLayoutAttributeRight
+                                                         multiplier:1.0
+                                                           constant:-15.0]];
+}
+
+- (void)addRegionButton {
+    regionButton = [UIButton buttonWithType:UIButtonTypeSystem];
+    regionButton.translatesAutoresizingMaskIntoConstraints = NO;
+    [regionButton setTitle:@"Set Region" forState:UIControlStateNormal];
+    [regionButton addTarget:self action:@selector(onRegionClick:) forControlEvents:UIControlEventTouchUpInside];
+    [self.view addSubview:regionButton];
+
+    // Setup autolayout
+    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:regionButton
+                                                          attribute:NSLayoutAttributeTop
+                                                          relatedBy:NSLayoutRelationEqual
+                                                             toItem:statusLabel
+                                                          attribute:NSLayoutAttributeBottom
+                                                         multiplier:1.0
+                                                           constant:15.0]];
+
+    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:regionButton
+                                                          attribute:NSLayoutAttributeLeft
+                                                          relatedBy:NSLayoutRelationEqual
+                                                             toItem:toggleLabel
+                                                          attribute:NSLayoutAttributeLeft
+                                                         multiplier:1.0
+                                                           constant:0.0]];
+
+    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:regionButton
                                                           attribute:NSLayoutAttributeRight
                                                           relatedBy:NSLayoutRelationEqual
                                                              toItem:self.view

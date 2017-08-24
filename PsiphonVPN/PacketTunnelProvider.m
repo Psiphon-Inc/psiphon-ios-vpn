@@ -26,6 +26,7 @@
 #import "PsiphonDataSharedDB.h"
 #import "SharedConstants.h"
 #import "Notifier.h"
+#import "PsiphonConfigUserDefaults.h"
 
 static const double kDefaultLogTruncationInterval = 12 * 60 * 60; // 12 hours
 
@@ -39,6 +40,9 @@ static const double kDefaultLogTruncationInterval = 12 * 60 * 60; // 12 hours
 
     // Notifier
     Notifier *notifier;
+
+    // Psiphon Config
+    PsiphonConfigUserDefaults *psiphonConfigUserDefaults;
 
     // Tracking state of the extension
     NSMutableArray<NSString *> *handshakeHomepages;
@@ -54,9 +58,14 @@ static const double kDefaultLogTruncationInterval = 12 * 60 * 60; // 12 hours
         // Notifier
         notifier = [[Notifier alloc] initWithAppGroupIdentifier:APP_GROUP_IDENTIFIER];
 
-        //
+        psiphonConfigUserDefaults = [[PsiphonConfigUserDefaults alloc] initWithSuiteName:APP_GROUP_IDENTIFIER];
+
         handshakeHomepages = [[NSMutableArray alloc] init];
         firstOnConnected = TRUE;
+
+
+        // Create our tunnel instance
+        psiphonTunnel = [PsiphonTunnel newPsiphonTunnel:(id <TunneledAppDelegate>) self];
     }
     
     return self;
@@ -67,11 +76,12 @@ static const double kDefaultLogTruncationInterval = 12 * 60 * 60; // 12 hours
     // TODO: This method wouldn't work with "boot to VPN"
     if (options[EXTENSION_OPTION_START_FROM_CONTAINER]) {
 
+        // Listen for messages from container
+        [self listenForAppMessages];
+
         // Truncate logs every 12 hours
         [sharedDB truncateLogsOnInterval:(NSTimeInterval) kDefaultLogTruncationInterval];
 
-        // Create our tunnel instance
-        psiphonTunnel = [PsiphonTunnel newPsiphonTunnel:(id <TunneledAppDelegate>) self];
         __weak PsiphonTunnel *weakPsiphonTunnel = psiphonTunnel;
 
         [self setTunnelNetworkSettings:[self getTunnelSettings] completionHandler:^(NSError *_Nullable error) {
@@ -162,7 +172,26 @@ static const double kDefaultLogTruncationInterval = 12 * 60 * 60; // 12 hours
     return newSettings;
 }
 
+- (void)listenForAppMessages {
+
+    [notifier listenForNotification:@"egressRegionChanged" listener:^{
+        [self startPsiphon];
+    }];
+}
+
+#pragma mark - PsiphonTunnel helper functions
+
+- (void)startPsiphon {
+//    dispatch_async(dispatch_get_main_queue(), ^{
+        if (![psiphonTunnel start:FALSE]) {
+            NSLog(@"startPsiphon failed");
+            // TODO: error handling
+        }
+//    });
+}
+
 @end
+
 
 #pragma mark - TunneledAppDelegate
 
@@ -183,6 +212,7 @@ static const double kDefaultLogTruncationInterval = 12 * 60 * 60; // 12 hours
 }
 
 - (NSString * _Nullable)getPsiphonConfig {
+
     NSFileManager *fileManager = [NSFileManager defaultManager];
 
     NSString *bundledConfigPath = [[[NSBundle mainBundle] resourcePath]
@@ -207,6 +237,10 @@ static const double kDefaultLogTruncationInterval = 12 * 60 * 60; // 12 hours
 
     // TODO: apply mutations to config here
     NSNumber *fd = (NSNumber*)[[self packetFlow] valueForKeyPath:@"socket.fileDescriptor"];
+
+    // In case of duplicate keys, value from psiphonConfigUserDefaults
+    // will replace mutableConfigCopy value.
+    [mutableConfigCopy addEntriesFromDictionary:[psiphonConfigUserDefaults dictionaryRepresentation]];
 
     mutableConfigCopy[@"PacketTunnelTunFileDescriptor"] = fd;
 
