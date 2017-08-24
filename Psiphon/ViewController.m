@@ -51,6 +51,7 @@
 
     // App state variables
     BOOL shownHomepage;
+    BOOL restartRequired;
 
     // VPN Config user defaults
     PsiphonConfigUserDefaults *psiphonConfigUserDefaults;
@@ -160,10 +161,12 @@
 
 - (void)onRegionClick:(UIButton *)sender {
     if ([psiphonConfigUserDefaults setEgressRegion:@""]) {
+        
     }
-    [notifier post:@"egressRegionChanged"];
-
+    [self restartVPN];
 }
+
+# pragma mark - Network Extension
 
 - (void)startVPN {
     NSLog(@"startVPN: call loadAllFromPreferencesWithCompletionHandler");
@@ -228,6 +231,13 @@
     }];
 }
 
+- (void)restartVPN {
+    if (self.targetManager.connection) {
+        restartRequired = TRUE;
+        [self.targetManager.connection stopVPNTunnel];
+    }
+}
+
 - (void)listenForNEMessages {
 
     [notifier listenForNotification:@"NE.newHomepages" listener:^{
@@ -265,9 +275,6 @@
     }];
 }
 
-#pragma mark - VPN Settings
-
-
 # pragma mark - Property getters/setters
 
 - (void)setTargetManager:(NEVPNManager *)targetManager {
@@ -275,11 +282,20 @@
     statusLabel.text = [self getVPNStatusDescription];
     
     // Listening for NEVPNStatusDidChangeNotification
-    [[NSNotificationCenter defaultCenter] addObserverForName:NEVPNStatusDidChangeNotification object:_targetManager.connection queue:NSOperationQueue.mainQueue usingBlock:^(NSNotification * _Nonnull note) {
-        
-        NSLog(@"received NEVPNStatusDidChangeNotification %@", [self getVPNStatusDescription]);
-        statusLabel.text = [self getVPNStatusDescription];
-        [startStopToggle setOn:[self isVPNActive]];
+    [[NSNotificationCenter defaultCenter] addObserverForName:NEVPNStatusDidChangeNotification
+      object:_targetManager.connection queue:NSOperationQueue.mainQueue
+      usingBlock:^(NSNotification * _Nonnull note) {
+
+          if (restartRequired && _targetManager.connection.status == NEVPNStatusDisconnected) {
+              restartRequired = FALSE;
+              dispatch_async(dispatch_get_main_queue(), ^{
+                  [self startVPN];
+              });
+          }
+
+          NSLog(@"received NEVPNStatusDidChangeNotification %@", [self getVPNStatusDescription]);
+          statusLabel.text = [self getVPNStatusDescription];
+          [startStopToggle setOn:[self isVPNActive]];
     }];
 }
 
