@@ -34,7 +34,7 @@ static const double kDefaultLogTruncationInterval = 12 * 60 * 60; // 12 hours
     // pointer to startTunnelWithOptions completion handler.
     __weak void (^vpnStartCompletionHandler)(NSError *__nullable error);
 
-        PsiphonTunnel *psiphonTunnel;
+    PsiphonTunnel *psiphonTunnel;
     PsiphonDataSharedDB *sharedDB;
 
     // Notifier
