@@ -182,16 +182,13 @@ static const double kDefaultLogTruncationInterval = 12 * 60 * 60; // 12 hours
 #pragma mark - PsiphonTunnel helper functions
 
 - (void)startPsiphon {
-//    dispatch_async(dispatch_get_main_queue(), ^{
-        if (![psiphonTunnel start:FALSE]) {
-            NSLog(@"startPsiphon failed");
-            // TODO: error handling
-        }
-//    });
+    if (![psiphonTunnel start:FALSE]) {
+        NSLog(@"startPsiphon failed");
+        // TODO: error handling
+    }
 }
 
 @end
-
 
 #pragma mark - TunneledAppDelegate
 
