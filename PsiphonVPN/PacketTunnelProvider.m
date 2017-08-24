@@ -41,9 +41,6 @@ static const double kDefaultLogTruncationInterval = 12 * 60 * 60; // 12 hours
     // Notifier
     Notifier *notifier;
 
-    // Psiphon Config
-    PsiphonConfigUserDefaults *psiphonConfigUserDefaults;
-
     // Tracking state of the extension
     NSMutableArray<NSString *> *handshakeHomepages;
     BOOL firstOnConnected;
@@ -57,8 +54,6 @@ static const double kDefaultLogTruncationInterval = 12 * 60 * 60; // 12 hours
 
         // Notifier
         notifier = [[Notifier alloc] initWithAppGroupIdentifier:APP_GROUP_IDENTIFIER];
-
-        psiphonConfigUserDefaults = [[PsiphonConfigUserDefaults alloc] initWithSuiteName:APP_GROUP_IDENTIFIER];
 
         handshakeHomepages = [[NSMutableArray alloc] init];
         firstOnConnected = TRUE;
@@ -75,9 +70,6 @@ static const double kDefaultLogTruncationInterval = 12 * 60 * 60; // 12 hours
 
     // TODO: This method wouldn't work with "boot to VPN"
     if (options[EXTENSION_OPTION_START_FROM_CONTAINER]) {
-
-        // Listen for messages from container
-        [self listenForAppMessages];
 
         // Truncate logs every 12 hours
         [sharedDB truncateLogsOnInterval:(NSTimeInterval) kDefaultLogTruncationInterval];
@@ -172,22 +164,6 @@ static const double kDefaultLogTruncationInterval = 12 * 60 * 60; // 12 hours
     return newSettings;
 }
 
-- (void)listenForAppMessages {
-
-    [notifier listenForNotification:@"egressRegionChanged" listener:^{
-        [self startPsiphon];
-    }];
-}
-
-#pragma mark - PsiphonTunnel helper functions
-
-- (void)startPsiphon {
-    if (![psiphonTunnel start:FALSE]) {
-        NSLog(@"startPsiphon failed");
-        // TODO: error handling
-    }
-}
-
 @end
 
 #pragma mark - TunneledAppDelegate
@@ -237,6 +213,8 @@ static const double kDefaultLogTruncationInterval = 12 * 60 * 60; // 12 hours
 
     // In case of duplicate keys, value from psiphonConfigUserDefaults
     // will replace mutableConfigCopy value.
+    PsiphonConfigUserDefaults *psiphonConfigUserDefaults = [[PsiphonConfigUserDefaults alloc]
+      initWithSuiteName:APP_GROUP_IDENTIFIER];
     [mutableConfigCopy addEntriesFromDictionary:[psiphonConfigUserDefaults dictionaryRepresentation]];
 
     mutableConfigCopy[@"PacketTunnelTunFileDescriptor"] = fd;
