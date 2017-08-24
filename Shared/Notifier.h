@@ -23,7 +23,7 @@
 
 @interface Notifier : NSObject
 
-- (instancetype)initWithAppGroupIdentifier:(nonnull NSString *)identifier;
+- (nullable instancetype)initWithAppGroupIdentifier:(nonnull NSString *)identifier;
 
 /*!
  * @brief Sends Darwin notification with given key.
