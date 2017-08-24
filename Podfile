@@ -6,7 +6,7 @@ target 'Psiphon' do
   use_frameworks!
 
   # Pods for Psiphon
-  pod 'FMDB'
+  pod 'FMDB', '2.7.2'
 end
 
 target 'PsiphonVPN' do
@@ -14,5 +14,5 @@ target 'PsiphonVPN' do
   use_frameworks!
 
   # Pods for PsiphonVPN
-  pod 'FMDB'
+  pod 'FMDB', '2.7.2'
 end
