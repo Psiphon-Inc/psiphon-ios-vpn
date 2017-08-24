@@ -17,7 +17,22 @@
  *
  */
 
-#define APP_GROUP_IDENTIFIER @"group.ca.psiphon.Psiphon"
+#import <Foundation/Foundation.h>
 
-#define EXTENSION_OPTION_START_FROM_CONTAINER @"startFromContainer"
+// Psiphon config keys
+#define PSIPHON_CONFIG_EGRESS_REGION @"EgressRegion"
 
+@interface PsiphonConfigUserDefaults : NSObject
+
+- (instancetype)initWithSuiteName:(NSString *)suiteName;
+
+- (BOOL)setEgressRegion:(NSString *)newRegion;
+
+/*!
+ *
+ * @return Returns dictionary of saved user values for psiphon config,
+ *         if no configs are saved, returns an empty dictionary.
+ */
+- (NSDictionary *)dictionaryRepresentation;
+
+@end
