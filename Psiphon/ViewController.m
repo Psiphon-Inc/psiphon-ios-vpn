@@ -190,7 +190,7 @@
             newManager.protocolConfiguration.serverAddress = @"localhost";
             self.targetManager = newManager;
         } else if ([allManagers count] > 1) {
-            NSLog(@"startVPN: %lu VPN configurations found, only expected 1. Aborting", [allManagers count]);
+            NSLog(@"startVPN: %lu VPN configurations found, only expected 1. Aborting", (unsigned long)[allManagers count]);
             return;
         }
         

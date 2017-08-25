@@ -21,7 +21,6 @@
 #define PsiphonData_h
 
 #define MAX_LOG_LINES 250
-#define MAX_VPN_STATES 1000
 
 #import <Foundation/Foundation.h>
 
