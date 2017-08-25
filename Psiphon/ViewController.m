@@ -118,10 +118,7 @@
         if ([managers count] == 1) {
             self.targetManager = managers[0];
             [startStopToggle setOn:[self isVPNActive]];
-            
-            if (![self isVPNActive]) {
-                [self loadUntunneledInterstitial];
-            }
+            [self initializeAds];
         }
     }];
     
@@ -297,6 +294,9 @@
     [[NSNotificationCenter defaultCenter] addObserverForName:NEVPNStatusDidChangeNotification
       object:_targetManager.connection queue:NSOperationQueue.mainQueue
       usingBlock:^(NSNotification * _Nonnull note) {
+
+          // initializeAds checks restartRequired so call it before resetting restartRequired
+          [self initializeAds];
 
           if (restartRequired && _targetManager.connection.status == NEVPNStatusDisconnected) {
               restartRequired = FALSE;
@@ -533,6 +533,15 @@
 
 # pragma mark - Ads
 
+- (void)initializeAds {
+    NSLog(@"initializeAds");
+    if ([self isVPNActive]) {
+        [adButton setEnabled:false];
+    } else if (self.targetManager.connection.status == NEVPNStatusDisconnected && !restartRequired) {
+        [self loadUntunneledInterstitial];
+    }
+}
+
 - (void)loadUntunneledInterstitial {
     NSLog(@"loadUntunneledInterstitial");
     self.untunneledInterstitial = [MPInterstitialAdController
@@ -553,10 +562,19 @@
     [adButton setEnabled:true];
 }
 
+- (void)interstitialDidFailToLoadAd:(MPInterstitialAdController *)interstitial {
+    NSLog(@"Interstitial failed to load");
+    // Don't retry.
+}
+
 - (void)interstitialDidExpire:(MPInterstitialAdController *)interstitial {
     NSLog(@"Interstitial expired");
     [adButton setEnabled:false];
     [interstitial loadAd];
+}
+
+- (void)interstitialDidDisappear:(MPInterstitialAdController *)interstitial {
+    // TODO: start the tunnel? or set a flag indicating that the tunnel should be started when returning to the UI?
 }
 
 @end
