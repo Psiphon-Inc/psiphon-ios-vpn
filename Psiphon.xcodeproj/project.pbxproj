@@ -19,6 +19,7 @@
 		668AF9C01E92CBE0008CAAAA /* NetworkExtension.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 668AF9BE1E92CBD3008CAAAA /* NetworkExtension.framework */; };
 		92247B92EF8C1D4AB60B3973 /* Pods_PsiphonVPN.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A74D6D32BC9F38910AA66284 /* Pods_PsiphonVPN.framework */; };
 		9BFEC23DBD7EFDD326FF6C14 /* psiphon_config.stub in Resources */ = {isa = PBXBuildFile; fileRef = 9BFEC4205423A6F55DA7DAB0 /* psiphon_config.stub */; };
+		9BFEC2B354194F760B8BB3DC /* LogViewControllerFullScreen.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC80D1CB7E42FB18F3D16 /* LogViewControllerFullScreen.m */; };
 		9BFEC3CD51F31841B4F8CD2B /* psiphon_config in Resources */ = {isa = PBXBuildFile; fileRef = 9BFECFCFB0546F18A7E57ADF /* psiphon_config */; };
 		9BFEC4F02A47FF8265635803 /* Notifier.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC91ED4A1C511520E9948 /* Notifier.m */; };
 		9BFECD1880B51B0E2EAEFF1F /* Notifier.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC91ED4A1C511520E9948 /* Notifier.m */; };
@@ -86,6 +87,8 @@
 		9BFEC3165745A5D14C8C3C08 /* Notifier.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Notifier.h; sourceTree = "<group>"; };
 		9BFEC4205423A6F55DA7DAB0 /* psiphon_config.stub */ = {isa = PBXFileReference; lastKnownFileType = file.stub; path = psiphon_config.stub; sourceTree = "<group>"; };
 		9BFEC584519C408D9D6D3FF1 /* PsiphonConfigUserDefaults.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PsiphonConfigUserDefaults.m; sourceTree = "<group>"; };
+		9BFEC602B421B56FCF4B69F6 /* LogViewControllerFullScreen.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LogViewControllerFullScreen.h; sourceTree = "<group>"; };
+		9BFEC80D1CB7E42FB18F3D16 /* LogViewControllerFullScreen.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LogViewControllerFullScreen.m; sourceTree = "<group>"; };
 		9BFEC91ED4A1C511520E9948 /* Notifier.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Notifier.m; sourceTree = "<group>"; };
 		9BFECFCFB0546F18A7E57ADF /* psiphon_config */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = psiphon_config; sourceTree = "<group>"; };
 		9C9EB22BA6430653CD5FDE04 /* Pods_Psiphon.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Psiphon.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -206,6 +209,8 @@
 				EF652CD31F35224C002AFB48 /* AppDelegate.m */,
 				EF652CD41F35224C002AFB48 /* ViewController.h */,
 				EF652CD51F35224C002AFB48 /* ViewController.m */,
+				9BFEC80D1CB7E42FB18F3D16 /* LogViewControllerFullScreen.m */,
+				9BFEC602B421B56FCF4B69F6 /* LogViewControllerFullScreen.h */,
 			);
 			path = Psiphon;
 			sourceTree = "<group>";
@@ -467,6 +472,7 @@
 				EF652CD61F35224C002AFB48 /* AppDelegate.m in Sources */,
 				9BFEC4F02A47FF8265635803 /* Notifier.m in Sources */,
 				9BFECFEB3BC9F10542C1A416 /* PsiphonConfigUserDefaults.m in Sources */,
+				9BFEC2B354194F760B8BB3DC /* LogViewControllerFullScreen.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
