@@ -19,15 +19,13 @@
 
 #import <Foundation/Foundation.h>
 #import "ViewController.h"
-#import "PsiphonData.h"
 #import "PsiphonDataSharedDB.h"
 #import "SharedConstants.h"
-#import "LogViewController.h"
 #import "Notifier.h"
 #import "PsiphonConfigUserDefaults.h"
+#import "LogViewControllerFullScreen.h"
 
 @import NetworkExtension;
-@import FMDB;
 
 
 @interface ViewController ()
@@ -37,7 +35,7 @@
 @end
 
 @implementation ViewController {
-    PsiphonData *psiphonData;
+
     PsiphonDataSharedDB *sharedDB;
 
     // Notifier
@@ -48,6 +46,7 @@
     UILabel *toggleLabel;
     UILabel *statusLabel;
     UIButton *regionButton;
+    UILabel *versionLabel;
 
     // App state variables
     BOOL shownHomepage;
@@ -63,8 +62,6 @@
     self = [super init];
     if (self) {
         self.targetManager = [NEVPNManager sharedManager];
-        psiphonData = [PsiphonData sharedInstance];
-        sharedDB = [[PsiphonDataSharedDB alloc] initForAppGroupIdentifier:APP_GROUP_IDENTIFIER];
 
         // Notifier
         notifier = [[Notifier alloc] initWithAppGroupIdentifier:APP_GROUP_IDENTIFIER];
@@ -84,10 +81,11 @@
     shownHomepage = FALSE;
 }
 
+#pragma mark - Lifecycle methods
+
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    // TODO: should be abstracted into the PsiphonData singleton?
     // TODO: check if database exists first
     BOOL success = [sharedDB createDatabase];
     if (!success) {
@@ -102,8 +100,8 @@
     [self addStartAndStopToggle];
     [self addStatusLabel];
     [self addRegionButton];
-    [self addLogViewController];
-    
+    [self addVersionLabel];
+
     // Load previous NETunnelProviderManager, if any.
     [NETunnelProviderManager loadAllFromPreferencesWithCompletionHandler:^(NSArray<NETunnelProviderManager *> * _Nullable managers, NSError * _Nullable error) {
         if (managers == nil) {
@@ -133,15 +131,8 @@
 }
 
 - (void)applicationDidBecomeActive {
-    // Listen for messages from PacketTunnelProvider (PsiphonVPN)
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        // Get latest persisted logs
-        // TODO: truncate logs if extension isn't running
-        NSArray<DiagnosticEntry*> *logs = [sharedDB getNewLogs];
-        [psiphonData addDiagnosticEntries:logs];
-
-        [self listenForNEMessages];
-    });
+    // Listen for messages from Network Extension
+    [self listenForNEMessages];
 }
 
 - (void)applicationWillResignActive {
@@ -149,6 +140,8 @@
     // TODO: best place to stop listening for NE messages?
     [notifier stopListeningForAllNotifications];
 }
+
+#pragma mark - UI callbacks
 
 - (void)onSwitch:(UISwitch *)sender {
     if (![self isVPNActive]) {
@@ -159,11 +152,22 @@
     }
 }
 
-- (void)onRegionClick:(UIButton *)sender {
+- (void)onRegionTap:(UIButton *)sender {
     if ([psiphonConfigUserDefaults setEgressRegion:@""]) {
         
     }
     [self restartVPN];
+}
+
+- (void)onVersionLabelTap:(UILabel *)sender {
+    // TODO: logController should load data when it is loaded.
+    LogViewControllerFullScreen *log = [[LogViewControllerFullScreen alloc] init];
+
+    UINavigationController *nav = [[UINavigationController alloc] initWithRootViewController:log];
+    nav.modalPresentationStyle = UIModalPresentationFullScreen;
+    nav.modalTransitionStyle = UIModalTransitionStyleCoverVertical;
+
+    [self presentViewController:nav animated:YES completion:nil];
 }
 
 # pragma mark - Network Extension
@@ -261,18 +265,6 @@
     [notifier listenForNotification:@"NE.onConnected" listener:^{
     }];
 
-    [notifier listenForNotification:@"NE.onDiagnosticMessage" listener:^{
-        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-            NSArray<DiagnosticEntry *> *logs = [sharedDB getNewLogs];
-            [psiphonData addDiagnosticEntries:logs];
-
-            #if DEBUG
-            for (DiagnosticEntry *log in logs) {
-                NSLog(@"%@ %@", [log getTimestampForDisplay], [log message]);
-            }
-            #endif
-        });
-    }];
 }
 
 # pragma mark - Property getters/setters
@@ -314,6 +306,7 @@
         case NEVPNStatusDisconnecting: return @"Disconnecting";
         case NEVPNStatusReasserting: return @"Reconnecting";
     }
+    return nil;
 }
 
 /*!
@@ -326,47 +319,48 @@
       || status == NEVPNStatusReasserting);
 }
 
-- (void)addLogViewController {
-    // Add LogViewController to UIViewController
-    LogViewController *controller = [[LogViewController alloc] init];
-    controller.view.translatesAutoresizingMaskIntoConstraints = NO;
-    [self addChildViewController:controller];
-    [self.view addSubview:controller.view];
-    [controller didMoveToParentViewController:self];
-    
-    // Add layout constraints
-    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:controller.view
-                                                          attribute:NSLayoutAttributeLeft
-                                                          relatedBy:NSLayoutRelationEqual
-                                                          toItem:self.view
-                                                          attribute:NSLayoutAttributeLeft
-                                                          multiplier:1.0
-                                                           constant:0.0]];
-    
-    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:controller.view
-                                                          attribute:NSLayoutAttributeRight
-                                                          relatedBy:NSLayoutRelationEqual
-                                                             toItem:self.view
-                                                          attribute:NSLayoutAttributeRight
-                                                         multiplier:1.0
-                                                           constant:0.0]];
-    
-    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:controller.view
-                                                          attribute:NSLayoutAttributeTop
-                                                          relatedBy:NSLayoutRelationEqual
-                                                             toItem:regionButton
-                                                          attribute:NSLayoutAttributeBottom
-                                                         multiplier:1.0
-                                                           constant:15.0]];
-    
-    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:controller.view
-                                                          attribute:NSLayoutAttributeBottom
-                                                          relatedBy:NSLayoutRelationEqual
-                                                             toItem:self.view
-                                                          attribute:NSLayoutAttributeBottom
-                                                         multiplier:1.0
-                                                           constant:0.0]];
-}
+
+//- (void)addLogViewController {
+//    // Add LogViewController to UIViewController
+//    LogViewController *controller = [[LogViewController alloc] init];
+//    controller.view.translatesAutoresizingMaskIntoConstraints = NO;
+//    [self addChildViewController:controller];
+//    [self.view addSubview:controller.view];
+//    [controller didMoveToParentViewController:self];
+//
+//    // Add layout constraints
+//    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:controller.view
+//                                                          attribute:NSLayoutAttributeLeft
+//                                                          relatedBy:NSLayoutRelationEqual
+//                                                          toItem:self.view
+//                                                          attribute:NSLayoutAttributeLeft
+//                                                          multiplier:1.0
+//                                                           constant:0.0]];
+//
+//    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:controller.view
+//                                                          attribute:NSLayoutAttributeRight
+//                                                          relatedBy:NSLayoutRelationEqual
+//                                                             toItem:self.view
+//                                                          attribute:NSLayoutAttributeRight
+//                                                         multiplier:1.0
+//                                                           constant:0.0]];
+//
+//    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:controller.view
+//                                                          attribute:NSLayoutAttributeTop
+//                                                          relatedBy:NSLayoutRelationEqual
+//                                                             toItem:regionButton
+//                                                          attribute:NSLayoutAttributeBottom
+//                                                         multiplier:1.0
+//                                                           constant:15.0]];
+//
+//    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:controller.view
+//                                                          attribute:NSLayoutAttributeBottom
+//                                                          relatedBy:NSLayoutRelationEqual
+//                                                             toItem:self.view
+//                                                          attribute:NSLayoutAttributeBottom
+//                                                         multiplier:1.0
+//                                                           constant:0.0]];
+//}
 
 - (void)addToggleLabel {
     toggleLabel = [[UILabel alloc] init];
@@ -390,7 +384,7 @@
                                                              toItem:self.view
                                                           attribute:NSLayoutAttributeTop
                                                          multiplier:1.0
-                                                           constant:40.0]];
+                                                           constant:200.0]];
 }
 
 - (void)addStartAndStopToggle {
@@ -456,7 +450,8 @@
     regionButton = [UIButton buttonWithType:UIButtonTypeSystem];
     regionButton.translatesAutoresizingMaskIntoConstraints = NO;
     [regionButton setTitle:@"Set Region" forState:UIControlStateNormal];
-    [regionButton addTarget:self action:@selector(onRegionClick:) forControlEvents:UIControlEventTouchUpInside];
+    [regionButton addTarget:self action:@selector(onRegionTap:) forControlEvents:UIControlEventTouchUpInside];
+
     [self.view addSubview:regionButton];
 
     // Setup autolayout
@@ -483,6 +478,39 @@
                                                           attribute:NSLayoutAttributeRight
                                                          multiplier:1.0
                                                            constant:-15.0]];
+}
+
+- (void)addVersionLabel {
+    versionLabel = [[UILabel alloc] init];
+    versionLabel.translatesAutoresizingMaskIntoConstraints = NO;
+    versionLabel.adjustsFontSizeToFitWidth = YES;
+    versionLabel.text = @"version#";
+    versionLabel.userInteractionEnabled = YES;
+
+    UITapGestureRecognizer *tapRecognizer = [[UITapGestureRecognizer alloc]
+      initWithTarget:self action:@selector(onVersionLabelTap:)];
+    tapRecognizer.numberOfTapsRequired = 1;
+    [versionLabel addGestureRecognizer:tapRecognizer];
+
+
+    [self.view addSubview:versionLabel];
+
+    // Setup autolayout
+    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:versionLabel
+                                                          attribute:NSLayoutAttributeRight
+                                                          relatedBy:NSLayoutRelationEqual
+                                                             toItem:self.view
+                                                          attribute:NSLayoutAttributeRight
+                                                         multiplier:1.0
+                                                           constant:-30.0]];
+
+    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:versionLabel
+                                                          attribute:NSLayoutAttributeBottom
+                                                          relatedBy:NSLayoutRelationEqual
+                                                             toItem:self.view
+                                                          attribute:NSLayoutAttributeBottom
+                                                         multiplier:1.0
+                                                           constant:-30.0]];
 }
 
 @end
