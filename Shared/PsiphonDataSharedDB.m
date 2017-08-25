@@ -19,7 +19,7 @@
 
 #import "PsiphonData.h"
 #import "PsiphonDataSharedDB.h"
-@import FMDB;
+#import "FMDB.h"
 
 #define SHARED_DATABASE_NAME @"psiphon_data_archive.db"
 
