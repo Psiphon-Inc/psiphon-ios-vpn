@@ -3,15 +3,17 @@
 
 target 'Psiphon' do
   # Comment the next line if you're not using Swift and don't want to use dynamic frameworks
-  use_frameworks!
+  #use_frameworks!
 
   # Pods for Psiphon
   pod 'FMDB', '2.7.2'
+
+  pod 'mopub-ios-sdk', '4.16.0'
 end
 
 target 'PsiphonVPN' do
   # Comment the next line if you're not using Swift and don't want to use dynamic frameworks
-  use_frameworks!
+  #use_frameworks!
 
   # Pods for PsiphonVPN
   pod 'FMDB', '2.7.2'

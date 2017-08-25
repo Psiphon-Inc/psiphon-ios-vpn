@@ -25,14 +25,16 @@
 #import "LogViewController.h"
 #import "Notifier.h"
 #import "PsiphonConfigUserDefaults.h"
+#import "FMDB.h"
 
 @import NetworkExtension;
-@import FMDB;
 
 
 @interface ViewController ()
 
 @property (nonatomic) NEVPNManager *targetManager;
+@property (nonatomic, retain) MPInterstitialAdController *untunneledInterstitial;
+
 
 @end
 
@@ -48,6 +50,7 @@
     UILabel *toggleLabel;
     UILabel *statusLabel;
     UIButton *regionButton;
+    UIButton *adButton;
 
     // App state variables
     BOOL shownHomepage;
@@ -102,6 +105,7 @@
     [self addStartAndStopToggle];
     [self addStatusLabel];
     [self addRegionButton];
+    [self addAdButton];
     [self addLogViewController];
     
     // Load previous NETunnelProviderManager, if any.
@@ -114,6 +118,10 @@
         if ([managers count] == 1) {
             self.targetManager = managers[0];
             [startStopToggle setOn:[self isVPNActive]];
+            
+            if (![self isVPNActive]) {
+                [self loadUntunneledInterstitial];
+            }
         }
     }];
     
@@ -164,6 +172,10 @@
         
     }
     [self restartVPN];
+}
+
+- (void)onAdClick:(UIButton *)sender {
+    [self showUntunneledInterstitial];
 }
 
 # pragma mark - Network Extension
@@ -354,7 +366,7 @@
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:controller.view
                                                           attribute:NSLayoutAttributeTop
                                                           relatedBy:NSLayoutRelationEqual
-                                                             toItem:regionButton
+                                                             toItem:adButton
                                                           attribute:NSLayoutAttributeBottom
                                                          multiplier:1.0
                                                            constant:15.0]];
@@ -483,6 +495,68 @@
                                                           attribute:NSLayoutAttributeRight
                                                          multiplier:1.0
                                                            constant:-15.0]];
+}
+
+- (void)addAdButton {
+    adButton = [UIButton buttonWithType:UIButtonTypeSystem];
+    adButton.translatesAutoresizingMaskIntoConstraints = NO;
+    [adButton setTitle:@"Play Ad" forState:UIControlStateNormal];
+    [adButton addTarget:self action:@selector(onAdClick:) forControlEvents:UIControlEventTouchUpInside];
+    [self.view addSubview:adButton];
+    [adButton setEnabled:false];
+    
+    // Setup autolayout
+    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:adButton
+                                                          attribute:NSLayoutAttributeTop
+                                                          relatedBy:NSLayoutRelationEqual
+                                                             toItem:regionButton
+                                                          attribute:NSLayoutAttributeBottom
+                                                         multiplier:1.0
+                                                           constant:15.0]];
+    
+    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:adButton
+                                                          attribute:NSLayoutAttributeLeft
+                                                          relatedBy:NSLayoutRelationEqual
+                                                             toItem:toggleLabel
+                                                          attribute:NSLayoutAttributeLeft
+                                                         multiplier:1.0
+                                                           constant:0.0]];
+    
+    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:adButton
+                                                          attribute:NSLayoutAttributeRight
+                                                          relatedBy:NSLayoutRelationEqual
+                                                             toItem:self.view
+                                                          attribute:NSLayoutAttributeRight
+                                                         multiplier:1.0
+                                                           constant:-15.0]];
+}
+
+# pragma mark - Ads
+
+- (void)loadUntunneledInterstitial {
+    NSLog(@"loadUntunneledInterstitial");
+    self.untunneledInterstitial = [MPInterstitialAdController
+                                   interstitialAdControllerForAdUnitId:@"4250ebf7b28043e08ddbe04d444d79e4"];
+    self.untunneledInterstitial.delegate = self;
+    [self.untunneledInterstitial loadAd];
+}
+
+- (void)showUntunneledInterstitial {
+    NSLog(@"showUntunneledInterstitial");
+    if (self.untunneledInterstitial.ready) {
+        [self.untunneledInterstitial showFromViewController:self];
+    }
+}
+
+- (void)interstitialDidLoadAd:(MPInterstitialAdController *)interstitial {
+    NSLog(@"Interstitial loaded");
+    [adButton setEnabled:true];
+}
+
+- (void)interstitialDidExpire:(MPInterstitialAdController *)interstitial {
+    NSLog(@"Interstitial expired");
+    [adButton setEnabled:false];
+    [interstitial loadAd];
 }
 
 @end
