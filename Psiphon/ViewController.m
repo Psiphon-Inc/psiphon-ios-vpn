@@ -1,3 +1,4 @@
+
 /*
  * Copyright (c) 2017, Psiphon Inc.
  * All rights reserved.
@@ -33,7 +34,6 @@
 @property (nonatomic) NEVPNManager *targetManager;
 @property (nonatomic, retain) MPInterstitialAdController *untunneledInterstitial;
 
-
 @end
 
 @implementation ViewController {
@@ -66,6 +66,8 @@
     if (self) {
         self.targetManager = [NEVPNManager sharedManager];
 
+        sharedDB = [[PsiphonDataSharedDB alloc] initForAppGroupIdentifier:APP_GROUP_IDENTIFIER];
+        
         // Notifier
         notifier = [[Notifier alloc] initWithAppGroupIdentifier:APP_GROUP_IDENTIFIER];
 
