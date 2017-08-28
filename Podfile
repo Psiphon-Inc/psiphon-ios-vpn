@@ -9,6 +9,8 @@ target 'Psiphon' do
   pod 'FMDB', '2.7.2'
 
   pod 'mopub-ios-sdk', '4.16.0'
+
+  pod 'Google-Mobile-Ads-SDK', '7.22.0'
 end
 
 target 'PsiphonVPN' do

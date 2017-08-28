@@ -28,6 +28,7 @@
 #import "FMDB.h"
 
 @import NetworkExtension;
+@import GoogleMobileAds;
 
 
 @interface ViewController ()
@@ -538,6 +539,7 @@
     if ([self isVPNActive]) {
         [adButton setEnabled:false];
     } else if (self.targetManager.connection.status == NEVPNStatusDisconnected && !restartRequired) {
+        [GADMobileAds configureWithApplicationID:@"ca-app-pub-1072041961750291~2085686375"];
         [self loadUntunneledInterstitial];
     }
 }
@@ -574,6 +576,7 @@
 }
 
 - (void)interstitialDidDisappear:(MPInterstitialAdController *)interstitial {
+    NSLog(@"Interstitial dismissed");
     // TODO: start the tunnel? or set a flag indicating that the tunnel should be started when returning to the UI?
 }
 
