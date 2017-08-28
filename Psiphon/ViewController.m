@@ -319,49 +319,6 @@
       || status == NEVPNStatusReasserting);
 }
 
-
-//- (void)addLogViewController {
-//    // Add LogViewController to UIViewController
-//    LogViewController *controller = [[LogViewController alloc] init];
-//    controller.view.translatesAutoresizingMaskIntoConstraints = NO;
-//    [self addChildViewController:controller];
-//    [self.view addSubview:controller.view];
-//    [controller didMoveToParentViewController:self];
-//
-//    // Add layout constraints
-//    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:controller.view
-//                                                          attribute:NSLayoutAttributeLeft
-//                                                          relatedBy:NSLayoutRelationEqual
-//                                                          toItem:self.view
-//                                                          attribute:NSLayoutAttributeLeft
-//                                                          multiplier:1.0
-//                                                           constant:0.0]];
-//
-//    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:controller.view
-//                                                          attribute:NSLayoutAttributeRight
-//                                                          relatedBy:NSLayoutRelationEqual
-//                                                             toItem:self.view
-//                                                          attribute:NSLayoutAttributeRight
-//                                                         multiplier:1.0
-//                                                           constant:0.0]];
-//
-//    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:controller.view
-//                                                          attribute:NSLayoutAttributeTop
-//                                                          relatedBy:NSLayoutRelationEqual
-//                                                             toItem:regionButton
-//                                                          attribute:NSLayoutAttributeBottom
-//                                                         multiplier:1.0
-//                                                           constant:15.0]];
-//
-//    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:controller.view
-//                                                          attribute:NSLayoutAttributeBottom
-//                                                          relatedBy:NSLayoutRelationEqual
-//                                                             toItem:self.view
-//                                                          attribute:NSLayoutAttributeBottom
-//                                                         multiplier:1.0
-//                                                           constant:0.0]];
-//}
-
 - (void)addToggleLabel {
     toggleLabel = [[UILabel alloc] init];
     toggleLabel.text = NSLocalizedString(@"Run Psiphon VPN", @"Label beside toggle button which starts the Psiphon Tunnel");
