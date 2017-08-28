@@ -35,6 +35,6 @@ embedded_server_entries
 
 # Cocoapods
 Pods
-Podfile.lock
 
+# Intellij IDE
 .idea
