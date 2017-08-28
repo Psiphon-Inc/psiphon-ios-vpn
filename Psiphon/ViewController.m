@@ -76,9 +76,9 @@
 }
 
 // Initializes/resets variables that track application state
-// since when toggle switch was turned on.
 - (void)resetAppState {
     shownHomepage = FALSE;
+    restartRequired = FALSE;
 }
 
 #pragma mark - Lifecycle methods
