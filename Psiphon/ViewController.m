@@ -500,7 +500,7 @@
                                                              toItem:self.view
                                                           attribute:NSLayoutAttributeTop
                                                          multiplier:1.0
-                                                           constant:15.0]];
+                                                           constant:35.0]];
 
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:adButton
                                                           attribute:NSLayoutAttributeLeft
@@ -517,14 +517,6 @@
                                                           attribute:NSLayoutAttributeRight
                                                          multiplier:1.0
                                                            constant:-15.0]];
-    
-    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:adButton
-                                                          attribute:NSLayoutAttributeHeight
-                                                          relatedBy:NSLayoutRelationEqual
-                                                             toItem:self.view
-                                                          attribute:NSLayoutAttributeHeight
-                                                         multiplier:.2f
-                                                           constant:0]];
 }
 
 # pragma mark - Ads
