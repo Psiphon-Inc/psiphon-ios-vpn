@@ -101,11 +101,11 @@
     [self.view setBackgroundColor:[UIColor whiteColor]];
     //  TODO: wrap this in a function which always
     //  calls them in the right order
-    [self addToggleLabel];
-    [self addStartAndStopToggle];
-    [self addStatusLabel];
-    [self addRegionButton];
     [self addAdButton];
+    [self addStatusLabel];
+//    [self addToggleLabel];
+    [self addStartAndStopToggle];
+    [self addRegionButton];
     [self addVersionLabel];
 
     // Load previous NETunnelProviderManager, if any.
@@ -332,30 +332,30 @@
       || status == NEVPNStatusReasserting);
 }
 
-- (void)addToggleLabel {
-    toggleLabel = [[UILabel alloc] init];
-    toggleLabel.text = NSLocalizedString(@"Run Psiphon VPN", @"Label beside toggle button which starts the Psiphon Tunnel");
-    toggleLabel.translatesAutoresizingMaskIntoConstraints = NO;
-
-    [self.view addSubview:toggleLabel];
-    
-    // Setup autolayout
-    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:toggleLabel
-                                                          attribute:NSLayoutAttributeLeft
-                                                          relatedBy:NSLayoutRelationEqual
-                                                             toItem:self.view
-                                                          attribute:NSLayoutAttributeLeft
-                                                         multiplier:1.0
-                                                           constant:15.0]];
-    
-    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:toggleLabel
-                                                          attribute:NSLayoutAttributeTop
-                                                          relatedBy:NSLayoutRelationEqual
-                                                             toItem:self.view
-                                                          attribute:NSLayoutAttributeTop
-                                                         multiplier:1.0
-                                                           constant:200.0]];
-}
+//- (void)addToggleLabel {
+//    toggleLabel = [[UILabel alloc] init];
+//    toggleLabel.text = NSLocalizedString(@"Run Psiphon VPN", @"Label beside toggle button which starts the Psiphon Tunnel");
+//    toggleLabel.translatesAutoresizingMaskIntoConstraints = NO;
+//
+//    [self.view addSubview:toggleLabel];
+//
+//    // Setup autolayout
+//    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:toggleLabel
+//                                                          attribute:NSLayoutAttributeLeft
+//                                                          relatedBy:NSLayoutRelationEqual
+//                                                             toItem:statusLabel
+//                                                          attribute:NSLayoutAttributeLeft
+//                                                         multiplier:1.0
+//                                                           constant:15.0]];
+//
+//    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:toggleLabel
+//                                                          attribute:NSLayoutAttributeTop
+//                                                          relatedBy:NSLayoutRelationEqual
+//                                                             toItem:statusLabel
+//                                                          attribute:NSLayoutAttributeBottom
+//                                                         multiplier:1.0
+//                                                           constant:15.0]];
+//}
 
 - (void)addStartAndStopToggle {
     startStopToggle = [[UISwitch alloc] init];
@@ -367,34 +367,36 @@
     
     // Setup autolayout
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:startStopToggle
+                                                          attribute:NSLayoutAttributeTop
+                                                          relatedBy:NSLayoutRelationEqual
+                                                             toItem:statusLabel
+                                                          attribute:NSLayoutAttributeBottom
+                                                         multiplier:1.0
+                                                           constant:15.0]];
+
+    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:startStopToggle
                                                           attribute:NSLayoutAttributeLeft
                                                           relatedBy:NSLayoutRelationEqual
-                                                             toItem:toggleLabel
-                                                          attribute:NSLayoutAttributeRight
+                                                             toItem:statusLabel
+                                                          attribute:NSLayoutAttributeLeft
                                                          multiplier:1.0
-                                                           constant:30.0]];
-    
-    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:startStopToggle
-                                                          attribute:NSLayoutAttributeCenterY
-                                                          relatedBy:NSLayoutRelationEqual
-                                                             toItem:toggleLabel
-                                                          attribute:NSLayoutAttributeCenterY
-                                                         multiplier:1.0
-                                                           constant:0.0]];
+                                                           constant:15.0]];
 }
+
 
 - (void)addStatusLabel {
     statusLabel = [[UILabel alloc] init];
     statusLabel.translatesAutoresizingMaskIntoConstraints = NO;
     statusLabel.adjustsFontSizeToFitWidth = YES;
     statusLabel.text = @"...";
+    statusLabel.textAlignment = NSTextAlignmentCenter;
     [self.view addSubview:statusLabel];
     
     // Setup autolayout
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:statusLabel
                                                           attribute:NSLayoutAttributeTop
                                                           relatedBy:NSLayoutRelationEqual
-                                                             toItem:toggleLabel
+                                                             toItem:adButton
                                                           attribute:NSLayoutAttributeBottom
                                                          multiplier:1.0
                                                            constant:15.0]];
@@ -402,10 +404,10 @@
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:statusLabel
                                                           attribute:NSLayoutAttributeLeft
                                                           relatedBy:NSLayoutRelationEqual
-                                                             toItem:toggleLabel
+                                                             toItem:self.view
                                                           attribute:NSLayoutAttributeLeft
                                                          multiplier:1.0
-                                                           constant:0.0]];
+                                                           constant:15.0]];
     
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:statusLabel
                                                           attribute:NSLayoutAttributeRight
@@ -428,7 +430,7 @@
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:regionButton
                                                           attribute:NSLayoutAttributeTop
                                                           relatedBy:NSLayoutRelationEqual
-                                                             toItem:statusLabel
+                                                             toItem:startStopToggle
                                                           attribute:NSLayoutAttributeBottom
                                                          multiplier:1.0
                                                            constant:15.0]];
@@ -436,10 +438,10 @@
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:regionButton
                                                           attribute:NSLayoutAttributeLeft
                                                           relatedBy:NSLayoutRelationEqual
-                                                             toItem:toggleLabel
+                                                             toItem:self.view
                                                           attribute:NSLayoutAttributeLeft
                                                          multiplier:1.0
-                                                           constant:0.0]];
+                                                           constant:15.0]];
 
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:regionButton
                                                           attribute:NSLayoutAttributeRight
@@ -495,18 +497,18 @@
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:adButton
                                                           attribute:NSLayoutAttributeTop
                                                           relatedBy:NSLayoutRelationEqual
-                                                             toItem:regionButton
-                                                          attribute:NSLayoutAttributeBottom
+                                                             toItem:self.view
+                                                          attribute:NSLayoutAttributeTop
                                                          multiplier:1.0
                                                            constant:15.0]];
 
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:adButton
                                                           attribute:NSLayoutAttributeLeft
                                                           relatedBy:NSLayoutRelationEqual
-                                                             toItem:toggleLabel
+                                                             toItem:self.view
                                                           attribute:NSLayoutAttributeLeft
                                                          multiplier:1.0
-                                                           constant:0.0]];
+                                                           constant:15.0]];
 
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:adButton
                                                           attribute:NSLayoutAttributeRight
@@ -515,6 +517,14 @@
                                                           attribute:NSLayoutAttributeRight
                                                          multiplier:1.0
                                                            constant:-15.0]];
+    
+    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:adButton
+                                                          attribute:NSLayoutAttributeHeight
+                                                          relatedBy:NSLayoutRelationEqual
+                                                             toItem:self.view
+                                                          attribute:NSLayoutAttributeHeight
+                                                         multiplier:.2f
+                                                           constant:0]];
 }
 
 # pragma mark - Ads
