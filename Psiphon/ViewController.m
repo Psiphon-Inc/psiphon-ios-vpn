@@ -167,7 +167,6 @@
 }
 
 - (void)onVersionLabelTap:(UILabel *)sender {
-    // TODO: logController should load data when it is loaded.
     LogViewControllerFullScreen *log = [[LogViewControllerFullScreen alloc] init];
 
     UINavigationController *nav = [[UINavigationController alloc] initWithRootViewController:log];
@@ -455,12 +454,13 @@
     versionLabel = [[UILabel alloc] init];
     versionLabel.translatesAutoresizingMaskIntoConstraints = NO;
     versionLabel.adjustsFontSizeToFitWidth = YES;
-    versionLabel.text = @"version#";
+    versionLabel.text = [NSString stringWithFormat:@"Version %@",[[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"]];
+    ;
     versionLabel.userInteractionEnabled = YES;
 
     UITapGestureRecognizer *tapRecognizer = [[UITapGestureRecognizer alloc]
       initWithTarget:self action:@selector(onVersionLabelTap:)];
-    tapRecognizer.numberOfTapsRequired = 1;
+    tapRecognizer.numberOfTapsRequired = 2;
     [versionLabel addGestureRecognizer:tapRecognizer];
 
     [self.view addSubview:versionLabel];
