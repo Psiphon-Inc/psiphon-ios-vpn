@@ -14,7 +14,6 @@
 		4ED1BFD81F1D3292001D6F2A /* PsiphonData.m in Sources */ = {isa = PBXBuildFile; fileRef = 4ED1BFD11F1D2C21001D6F2A /* PsiphonData.m */; };
 		4ED1BFD91F1D3292001D6F2A /* LogViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4ED1BFD51F1D2EE1001D6F2A /* LogViewController.m */; };
 		66094F7A1E8067520069EC4E /* PsiphonTunnel.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 66094F781E8067520069EC4E /* PsiphonTunnel.framework */; };
-		660EAE4E1E994F4100244C9E /* PsiphonTunnel.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 66094F781E8067520069EC4E /* PsiphonTunnel.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		668AF9BF1E92CBD3008CAAAA /* NetworkExtension.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 668AF9BE1E92CBD3008CAAAA /* NetworkExtension.framework */; };
 		668AF9C01E92CBE0008CAAAA /* NetworkExtension.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 668AF9BE1E92CBD3008CAAAA /* NetworkExtension.framework */; };
 		6EFFCABC727E889CCD1BF200 /* libPods-Psiphon.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E4850095AA8BA13C0BCC7659 /* libPods-Psiphon.a */; };
@@ -31,6 +30,7 @@
 		CE26FCAC1BBDC85900B83375 /* PsiphonVPN.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = CE26FCA31BBDC85900B83375 /* PsiphonVPN.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		CE4E9BC01BBEECF30060FF8B /* Psiphon.entitlements in Resources */ = {isa = PBXBuildFile; fileRef = CE4E9BBF1BBEECF30060FF8B /* Psiphon.entitlements */; };
 		CE4E9BC21BBEECFC0060FF8B /* PsiphonVPN.entitlements in Resources */ = {isa = PBXBuildFile; fileRef = CE4E9BC11BBEECFC0060FF8B /* PsiphonVPN.entitlements */; };
+		CE7B76431F54881F00EA44BD /* PsiphonTunnel.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 66094F781E8067520069EC4E /* PsiphonTunnel.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		EF652CD11F352212002AFB48 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = EF652CD01F352212002AFB48 /* main.m */; };
 		EF652CD61F35224C002AFB48 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = EF652CD31F35224C002AFB48 /* AppDelegate.m */; };
 		EF652CD71F35224C002AFB48 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = EF652CD51F35224C002AFB48 /* ViewController.m */; };
@@ -48,16 +48,6 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		660EAE4D1E994F3200244C9E /* CopyFiles */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "";
-			dstSubfolderSpec = 10;
-			files = (
-				660EAE4E1E994F4100244C9E /* PsiphonTunnel.framework in CopyFiles */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		CE26FCB01BBDC85900B83375 /* Embed App Extensions */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -67,6 +57,16 @@
 				CE26FCAC1BBDC85900B83375 /* PsiphonVPN.appex in Embed App Extensions */,
 			);
 			name = "Embed App Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CE7B76421F54881600EA44BD /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				CE7B76431F54881F00EA44BD /* PsiphonTunnel.framework in CopyFiles */,
+			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXCopyFilesBuildPhase section */
@@ -250,6 +250,8 @@
 				CE26FCB01BBDC85900B83375 /* Embed App Extensions */,
 				49CC29B3D75B76555F0E71E8 /* [CP] Embed Pods Frameworks */,
 				2D83B985A561818BCED0B126 /* [CP] Copy Pods Resources */,
+				CE7B76421F54881600EA44BD /* CopyFiles */,
+				CE7B76441F54882300EA44BD /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -269,8 +271,6 @@
 				CE26FC9F1BBDC85900B83375 /* Sources */,
 				CE26FCA01BBDC85900B83375 /* Frameworks */,
 				CE26FCA11BBDC85900B83375 /* Resources */,
-				660EAE4D1E994F3200244C9E /* CopyFiles */,
-				660EAE4F1E994F5300244C9E /* ShellScript */,
 				97C816C97C17CC0C78E8F2F3 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
@@ -457,19 +457,6 @@
 			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-Psiphon/Pods-Psiphon-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		660EAE4F1E994F5300244C9E /* ShellScript */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "bash \"${BUILT_PRODUCTS_DIR}/${FRAMEWORKS_FOLDER_PATH}/PsiphonTunnel.framework/strip-frameworks.sh\"";
-		};
 		97C816C97C17CC0C78E8F2F3 /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -484,6 +471,19 @@
 			shellPath = /bin/sh;
 			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-PsiphonVPN/Pods-PsiphonVPN-resources.sh\"\n";
 			showEnvVarsInLog = 0;
+		};
+		CE7B76441F54882300EA44BD /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "bash \"${BUILT_PRODUCTS_DIR}/${FRAMEWORKS_FOLDER_PATH}/PsiphonTunnel.framework/strip-frameworks.sh\"";
 		};
 /* End PBXShellScriptBuildPhase section */
 
