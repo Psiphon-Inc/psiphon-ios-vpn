@@ -31,6 +31,8 @@
 @interface ViewController ()
 
 @property (nonatomic) NEVPNManager *targetManager;
+@property (nonatomic, retain) MPInterstitialAdController *untunneledInterstitial;
+
 
 @end
 
@@ -47,6 +49,7 @@
     UILabel *statusLabel;
     UIButton *regionButton;
     UILabel *versionLabel;
+    UIButton *adButton;
 
     // App state variables
     BOOL shownHomepage;
@@ -100,6 +103,7 @@
     [self addStartAndStopToggle];
     [self addStatusLabel];
     [self addRegionButton];
+    [self addAdButton];
     [self addVersionLabel];
 
     // Load previous NETunnelProviderManager, if any.
@@ -112,6 +116,7 @@
         if ([managers count] == 1) {
             self.targetManager = managers[0];
             [startStopToggle setOn:[self isVPNActive]];
+            [self initializeAds];
         }
     }];
     
@@ -170,6 +175,10 @@
     [self presentViewController:nav animated:YES completion:nil];
 }
 
+- (void)onAdClick:(UIButton *)sender {
+    [self showUntunneledInterstitial];
+}
+
 # pragma mark - Network Extension
 
 - (void)startVPN {
@@ -194,7 +203,7 @@
             newManager.protocolConfiguration.serverAddress = @"localhost";
             self.targetManager = newManager;
         } else if ([allManagers count] > 1) {
-            NSLog(@"startVPN: %lu VPN configurations found, only expected 1. Aborting", [allManagers count]);
+            NSLog(@"startVPN: %lu VPN configurations found, only expected 1. Aborting", (unsigned long)[allManagers count]);
             return;
         }
         
@@ -277,6 +286,9 @@
     [[NSNotificationCenter defaultCenter] addObserverForName:NEVPNStatusDidChangeNotification
       object:_targetManager.connection queue:NSOperationQueue.mainQueue
       usingBlock:^(NSNotification * _Nonnull note) {
+
+          // initializeAds checks restartRequired so call it before resetting restartRequired
+          [self initializeAds];
 
           if (restartRequired && _targetManager.connection.status == NEVPNStatusDisconnected) {
               restartRequired = FALSE;
@@ -449,7 +461,6 @@
     tapRecognizer.numberOfTapsRequired = 1;
     [versionLabel addGestureRecognizer:tapRecognizer];
 
-
     [self.view addSubview:versionLabel];
 
     // Setup autolayout
@@ -459,7 +470,7 @@
                                                              toItem:self.view
                                                           attribute:NSLayoutAttributeRight
                                                          multiplier:1.0
-                                                           constant:-30.0]];
+                                                          constant:-30.0]];
 
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:versionLabel
                                                           attribute:NSLayoutAttributeBottom
@@ -468,6 +479,86 @@
                                                           attribute:NSLayoutAttributeBottom
                                                          multiplier:1.0
                                                            constant:-30.0]];
+}
+
+- (void)addAdButton {
+    adButton = [UIButton buttonWithType:UIButtonTypeSystem];
+    adButton.translatesAutoresizingMaskIntoConstraints = NO;
+    [adButton setTitle:@"Play Ad" forState:UIControlStateNormal];
+    [adButton addTarget:self action:@selector(onAdClick:) forControlEvents:UIControlEventTouchUpInside];
+    [self.view addSubview:adButton];
+    [adButton setEnabled:false];
+
+    // Setup autolayout
+    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:adButton
+                                                          attribute:NSLayoutAttributeTop
+                                                          relatedBy:NSLayoutRelationEqual
+                                                             toItem:regionButton
+                                                          attribute:NSLayoutAttributeBottom
+                                                         multiplier:1.0
+                                                           constant:15.0]];
+
+    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:adButton
+                                                          attribute:NSLayoutAttributeLeft
+                                                          relatedBy:NSLayoutRelationEqual
+                                                             toItem:toggleLabel
+                                                          attribute:NSLayoutAttributeLeft
+                                                         multiplier:1.0
+                                                           constant:0.0]];
+
+    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:adButton
+                                                          attribute:NSLayoutAttributeRight
+                                                          relatedBy:NSLayoutRelationEqual
+                                                             toItem:self.view
+                                                          attribute:NSLayoutAttributeRight
+                                                         multiplier:1.0
+                                                           constant:-15.0]];
+}
+
+# pragma mark - Ads
+
+- (void)initializeAds {
+    NSLog(@"initializeAds");
+    if ([self isVPNActive]) {
+        [adButton setEnabled:false];
+    } else if (self.targetManager.connection.status == NEVPNStatusDisconnected && !restartRequired) {
+        [self loadUntunneledInterstitial];
+    }
+}
+
+- (void)loadUntunneledInterstitial {
+    NSLog(@"loadUntunneledInterstitial");
+    self.untunneledInterstitial = [MPInterstitialAdController
+                                   interstitialAdControllerForAdUnitId:@"4250ebf7b28043e08ddbe04d444d79e4"];
+    self.untunneledInterstitial.delegate = self;
+    [self.untunneledInterstitial loadAd];
+}
+
+- (void)showUntunneledInterstitial {
+    NSLog(@"showUntunneledInterstitial");
+    if (self.untunneledInterstitial.ready) {
+        [self.untunneledInterstitial showFromViewController:self];
+    }
+}
+
+- (void)interstitialDidLoadAd:(MPInterstitialAdController *)interstitial {
+    NSLog(@"Interstitial loaded");
+    [adButton setEnabled:true];
+}
+
+- (void)interstitialDidFailToLoadAd:(MPInterstitialAdController *)interstitial {
+    NSLog(@"Interstitial failed to load");
+    // Don't retry.
+}
+
+- (void)interstitialDidExpire:(MPInterstitialAdController *)interstitial {
+    NSLog(@"Interstitial expired");
+    [adButton setEnabled:false];
+    [interstitial loadAd];
+}
+
+- (void)interstitialDidDisappear:(MPInterstitialAdController *)interstitial {
+    // TODO: start the tunnel? or set a flag indicating that the tunnel should be started when returning to the UI?
 }
 
 @end

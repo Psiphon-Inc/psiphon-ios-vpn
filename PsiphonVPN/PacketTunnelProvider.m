@@ -201,12 +201,12 @@ static const double kDefaultLogTruncationInterval = 12 * 60 * 60; // 12 hours
     NSError *err = nil;
     NSDictionary *readOnly = [NSJSONSerialization JSONObjectWithData:jsonData options:kNilOptions error:&err];
 
-    NSMutableDictionary *mutableConfigCopy = [readOnly mutableCopy];
-
     if (err) {
-        NSLog(@"Failed to parse config JSON. Aborting now.");
+        [self onDiagnosticMessage:[NSString stringWithFormat:@"Aborting. Failed to parse config JSON: %@", err.description]];
         abort();
     }
+         
+    NSMutableDictionary *mutableConfigCopy = [readOnly mutableCopy];
 
     // TODO: apply mutations to config here
     NSNumber *fd = (NSNumber*)[[self packetFlow] valueForKeyPath:@"socket.fileDescriptor"];
@@ -223,7 +223,7 @@ static const double kDefaultLogTruncationInterval = 12 * 60 * 60; // 12 hours
       options:0 error:&err];
 
     if (err) {
-        NSLog(@"Failed to create JSON data from config object. Aborting now.");
+        [self onDiagnosticMessage:[NSString stringWithFormat:@"Aborting. Failed to create JSON data from config object: %@", err.description]];
         abort();
     }
 

@@ -18,7 +18,8 @@
  */
 
 #import <UIKit/UIKit.h>
+#import "MPInterstitialAdController.h"
 
-@interface ViewController : UIViewController
+@interface ViewController : UIViewController <MPInterstitialAdControllerDelegate>
 
 @end
