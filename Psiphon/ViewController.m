@@ -46,6 +46,7 @@
 
     // UI elements
     UISwitch *startStopToggle;
+    UIButton *startStopButton;
     UILabel *toggleLabel;
     UILabel *statusLabel;
     UIButton *regionButton;
@@ -105,7 +106,8 @@
     [self addAdButton];
     [self addStatusLabel];
 //    [self addToggleLabel];
-    [self addStartAndStopToggle];
+//    [self addStartAndStopToggle];
+    [self addStartAndStopButton];
     [self addRegionButton];
     [self addVersionLabel];
 
@@ -158,6 +160,10 @@
         NSLog(@"call targetManager.connection.stopVPNTunnel()");
         [self.targetManager.connection stopVPNTunnel];
     }
+}
+
+- (void)onStartStopTap:(UIButton *)sender {
+    [self startVPN];
 }
 
 - (void)onRegionTap:(UIButton *)sender {
@@ -384,6 +390,39 @@
                                                            constant:15.0]];
 }
 
+- (void)addStartAndStopButton {
+    startStopButton = [[UIButton alloc] init];
+    startStopButton.translatesAutoresizingMaskIntoConstraints = NO;
+    [startStopButton setTitle:@"Start / Stop" forState:UIControlStateNormal];
+    [startStopButton addTarget:self action:@selector(onStartStopTap:) forControlEvents:UIControlEventTouchUpInside];
+    [startStopButton setBackgroundColor:[UIColor blackColor]];
+    [self.view addSubview:startStopButton];
+    
+    // Setup autolayout
+    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:startStopButton
+                                                          attribute:NSLayoutAttributeTop
+                                                          relatedBy:NSLayoutRelationEqual
+                                                             toItem:statusLabel
+                                                          attribute:NSLayoutAttributeBottom
+                                                         multiplier:1.0
+                                                           constant:15.0]];
+    
+    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:startStopButton
+                                                          attribute:NSLayoutAttributeLeft
+                                                          relatedBy:NSLayoutRelationEqual
+                                                             toItem:self.view
+                                                          attribute:NSLayoutAttributeLeft
+                                                         multiplier:1.0
+                                                           constant:15.0]];
+    
+    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:startStopButton
+                                                          attribute:NSLayoutAttributeRight
+                                                          relatedBy:NSLayoutRelationEqual
+                                                             toItem:self.view
+                                                          attribute:NSLayoutAttributeRight
+                                                         multiplier:1.0
+                                                           constant:-15.0]];
+}
 
 - (void)addStatusLabel {
     statusLabel = [[UILabel alloc] init];
@@ -431,7 +470,7 @@
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:regionButton
                                                           attribute:NSLayoutAttributeTop
                                                           relatedBy:NSLayoutRelationEqual
-                                                             toItem:startStopToggle
+                                                             toItem:startStopButton
                                                           attribute:NSLayoutAttributeBottom
                                                          multiplier:1.0
                                                            constant:15.0]];
