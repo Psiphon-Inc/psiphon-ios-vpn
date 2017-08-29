@@ -111,8 +111,6 @@
     //  calls them in the right order
     [self addStartAndStopButton];
     [self addStatusLabel];
-//    [self addToggleLabel];
-//    [self addStartAndStopToggle];
     [self addRegionButton];
     [self addAdLabel];
     [self addVersionLabel];
@@ -184,15 +182,6 @@
 }
 
 #pragma mark - UI callbacks
-
-//- (void)onSwitch:(UISwitch *)sender {
-//    if (![self isVPNActive]) {
-//        [self startVPN];
-//    } else {
-//        NSLog(@"call targetManager.connection.stopVPNTunnel()");
-//        [self.targetManager.connection stopVPNTunnel];
-//    }
-//}
 
 - (void)onStartStopTap:(UIButton *)sender {
     if (![self isVPNActive]) {
@@ -386,57 +375,6 @@
       || status == NEVPNStatusReasserting);
 }
 
-//- (void)addToggleLabel {
-//    toggleLabel = [[UILabel alloc] init];
-//    toggleLabel.text = NSLocalizedString(@"Run Psiphon VPN", @"Label beside toggle button which starts the Psiphon Tunnel");
-//    toggleLabel.translatesAutoresizingMaskIntoConstraints = NO;
-//
-//    [self.view addSubview:toggleLabel];
-//
-//    // Setup autolayout
-//    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:toggleLabel
-//                                                          attribute:NSLayoutAttributeLeft
-//                                                          relatedBy:NSLayoutRelationEqual
-//                                                             toItem:statusLabel
-//                                                          attribute:NSLayoutAttributeLeft
-//                                                         multiplier:1.0
-//                                                           constant:15.0]];
-//
-//    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:toggleLabel
-//                                                          attribute:NSLayoutAttributeTop
-//                                                          relatedBy:NSLayoutRelationEqual
-//                                                             toItem:statusLabel
-//                                                          attribute:NSLayoutAttributeBottom
-//                                                         multiplier:1.0
-//                                                           constant:15.0]];
-//}
-
-//- (void)addStartAndStopToggle {
-//    startStopToggle = [[UISwitch alloc] init];
-//    startStopToggle.transform = CGAffineTransformMakeScale(1.5, 1.5);
-//    startStopToggle.translatesAutoresizingMaskIntoConstraints = NO;
-//    [startStopToggle addTarget:self action:@selector(onSwitch:) forControlEvents:UIControlEventValueChanged];
-//
-//    [self.view addSubview:startStopToggle];
-//
-//    // Setup autolayout
-//    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:startStopToggle
-//                                                          attribute:NSLayoutAttributeTop
-//                                                          relatedBy:NSLayoutRelationEqual
-//                                                             toItem:statusLabel
-//                                                          attribute:NSLayoutAttributeBottom
-//                                                         multiplier:1.0
-//                                                           constant:15.0]];
-//
-//    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:startStopToggle
-//                                                          attribute:NSLayoutAttributeLeft
-//                                                          relatedBy:NSLayoutRelationEqual
-//                                                             toItem:statusLabel
-//                                                          attribute:NSLayoutAttributeLeft
-//                                                         multiplier:1.0
-//                                                           constant:15.0]];
-//}
-
 - (void)addStartAndStopButton {
     UIImage *stopButtonImage = [UIImage imageNamed:@"StopButton"];
     UIImage *startButtonImage = [UIImage imageNamed:@"StartButton"];
@@ -449,9 +387,7 @@
     [startStopButton setImage:startButtonImage forState:UIControlStateNormal];
     [startStopButton setImage:stopButtonImage forState:UIControlStateSelected];
     
-//    [startStopButton setTitle:@"Start / Stop" forState:UIControlStateNormal];
     [startStopButton addTarget:self action:@selector(onStartStopTap:) forControlEvents:UIControlEventTouchUpInside];
-//    [startStopButton setBackgroundColor:[UIColor blackColor]];
     [self.view addSubview:startStopButton];
     
     // Setup autolayout
