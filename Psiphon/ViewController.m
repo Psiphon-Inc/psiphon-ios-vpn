@@ -524,10 +524,14 @@
     NSLog(@"initializeAds");
     if ([self isVPNActive]) {
         [adButton setEnabled:false];
-    } else if (self.targetManager.connection.status == NEVPNStatusDisconnected && !restartRequired) {
+    } else if ([self shouldShowUntunneledAds]) {
         [GADMobileAds configureWithApplicationID:@"ca-app-pub-1072041961750291~2085686375"];
         [self loadUntunneledInterstitial];
     }
+}
+
+- (bool)shouldShowUntunneledAds {
+    return self.targetManager.connection.status == NEVPNStatusDisconnected && !restartRequired;
 }
 
 - (void)loadUntunneledInterstitial {
@@ -547,7 +551,9 @@
 
 - (void)interstitialDidLoadAd:(MPInterstitialAdController *)interstitial {
     NSLog(@"Interstitial loaded");
-    [adButton setEnabled:true];
+    if ([self shouldShowUntunneledAds]) {
+        [adButton setEnabled:true];
+    }
 }
 
 - (void)interstitialDidFailToLoadAd:(MPInterstitialAdController *)interstitial {
