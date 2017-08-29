@@ -38,12 +38,45 @@
     table = [[UITableView alloc] init];
     table.dataSource = self;
     table.delegate = self;
-    table.autoresizingMask = UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleWidth;
-    table.frame = CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height);
+//    table.autoresizingMask = UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleWidth;
+//    table.frame = CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height);
     table.estimatedRowHeight = 60;
     table.rowHeight = UITableViewAutomaticDimension;
 
     [self.view addSubview:table];
+
+    // setup autolayout
+    table.translatesAutoresizingMaskIntoConstraints = NO;
+
+    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:table
+                                                          attribute:NSLayoutAttributeLeft
+                                                          relatedBy:NSLayoutRelationEqual
+                                                             toItem:self.view
+                                                          attribute:NSLayoutAttributeLeft
+                                                         multiplier:1.f
+                                                           constant:0]];
+    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:table
+                                                          attribute:NSLayoutAttributeRight
+                                                          relatedBy:NSLayoutRelationEqual
+                                                             toItem:self.view
+                                                          attribute:NSLayoutAttributeRight
+                                                         multiplier:1.f
+                                                           constant:0]];
+    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:table
+                                                          attribute:NSLayoutAttributeTop
+                                                          relatedBy:NSLayoutRelationEqual
+                                                             toItem:self.view
+                                                          attribute:NSLayoutAttributeTop
+                                                         multiplier:1.f
+                                                           constant:0]];
+    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:table
+                                                          attribute:NSLayoutAttributeBottom
+                                                          relatedBy:NSLayoutRelationEqual
+                                                             toItem:self.view
+                                                          attribute:NSLayoutAttributeBottom
+                                                         multiplier:1.f
+                                                           constant:0]];
+
     [self scheduleReload];
 }
 
