@@ -51,7 +51,7 @@
     UILabel *statusLabel;
     UIButton *regionButton;
     UILabel *versionLabel;
-    UIButton *adButton;
+    UILabel *adLabel;
 
     // App state variables
     BOOL shownHomepage;
@@ -302,14 +302,19 @@
       object:_targetManager.connection queue:NSOperationQueue.mainQueue
       usingBlock:^(NSNotification * _Nonnull note) {
 
-          // initializeAds checks restartRequired so call it before resetting restartRequired
-          [self initializeAds];
-
-          if (restartRequired && _targetManager.connection.status == NEVPNStatusDisconnected) {
-              restartRequired = FALSE;
-              dispatch_async(dispatch_get_main_queue(), ^{
-                  [self startVPN];
-              });
+          if (_targetManager.connection.status == NEVPNStatusDisconnected) {
+              if (restartRequired) {
+                  restartRequired = FALSE;
+                  dispatch_async(dispatch_get_main_queue(), ^{
+                      [self startVPN];
+                  });
+              } else {
+                  // Start a timer and call initialized ads when timer expired. (asyncronzed sleep(5)) then init ads
+                  // else init ads
+                  [self initializeAds];
+              }
+          } else {
+              [self initializeAds];
           }
 
           NSLog(@"received NEVPNStatusDidChangeNotification %@", [self getVPNStatusDescription]);
@@ -450,7 +455,7 @@
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:statusLabel
                                                           attribute:NSLayoutAttributeTop
                                                           relatedBy:NSLayoutRelationEqual
-                                                             toItem:adButton
+                                                             toItem:adLabel
                                                           attribute:NSLayoutAttributeBottom
                                                          multiplier:1.0
                                                            constant:15.0]];
@@ -540,15 +545,15 @@
 }
 
 - (void)addAdButton {
-    adButton = [UIButton buttonWithType:UIButtonTypeSystem];
-    adButton.translatesAutoresizingMaskIntoConstraints = NO;
-    [adButton setTitle:@"Play Ad" forState:UIControlStateNormal];
-    [adButton addTarget:self action:@selector(onAdClick:) forControlEvents:UIControlEventTouchUpInside];
-    [self.view addSubview:adButton];
-    [adButton setEnabled:false];
+    adLabel = [[UILabel alloc] init];
+    adLabel.translatesAutoresizingMaskIntoConstraints = NO;
+    adLabel.text = @"Ad Loaded";
+    adLabel.textAlignment = NSTextAlignmentCenter;
+    [self.view addSubview:adLabel];
+    adLabel.hidden = true;
 
     // Setup autolayout
-    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:adButton
+    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:adLabel
                                                           attribute:NSLayoutAttributeTop
                                                           relatedBy:NSLayoutRelationEqual
                                                              toItem:self.view
@@ -556,7 +561,7 @@
                                                          multiplier:1.0
                                                            constant:35.0]];
 
-    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:adButton
+    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:adLabel
                                                           attribute:NSLayoutAttributeLeft
                                                           relatedBy:NSLayoutRelationEqual
                                                              toItem:self.view
@@ -564,7 +569,7 @@
                                                          multiplier:1.0
                                                            constant:15.0]];
 
-    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:adButton
+    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:adLabel
                                                           attribute:NSLayoutAttributeRight
                                                           relatedBy:NSLayoutRelationEqual
                                                              toItem:self.view
@@ -578,7 +583,7 @@
 - (void)initializeAds {
     NSLog(@"initializeAds");
     if ([self isVPNActive]) {
-        [adButton setEnabled:false];
+        adLabel.hidden = true;
     } else if (self.targetManager.connection.status == NEVPNStatusDisconnected && !restartRequired) {
         [GADMobileAds configureWithApplicationID:@"ca-app-pub-1072041961750291~2085686375"];
         [self loadUntunneledInterstitial];
@@ -604,7 +609,7 @@
 
 - (void)interstitialDidLoadAd:(MPInterstitialAdController *)interstitial {
     NSLog(@"Interstitial loaded");
-    [adButton setEnabled:true];
+    adLabel.hidden = false;
 }
 
 - (void)interstitialDidFailToLoadAd:(MPInterstitialAdController *)interstitial {
@@ -614,13 +619,14 @@
 
 - (void)interstitialDidExpire:(MPInterstitialAdController *)interstitial {
     NSLog(@"Interstitial expired");
-    [adButton setEnabled:false];
+    adLabel.hidden = true;
     [interstitial loadAd];
 }
 
 - (void)interstitialDidDisappear:(MPInterstitialAdController *)interstitial {
     NSLog(@"Interstitial dismissed");
     // TODO: start the tunnel? or set a flag indicating that the tunnel should be started when returning to the UI?
+    adLabel.hidden = true;
     [self startVPN];
 }
 
