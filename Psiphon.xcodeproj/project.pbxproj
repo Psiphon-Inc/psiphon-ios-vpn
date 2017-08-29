@@ -8,6 +8,10 @@
 
 /* Begin PBXBuildFile section */
 		19059EA31F50923400C04739 /* libFMDB.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 19059EA21F50923400C04739 /* libFMDB.a */; };
+		197DABEB1F54BEED00DD5C3B /* VungleInterstitialCustomEvent.m in Sources */ = {isa = PBXBuildFile; fileRef = 197DABEA1F54BEED00DD5C3B /* VungleInterstitialCustomEvent.m */; };
+		197DABEE1F54C09E00DD5C3B /* MPVungleRouter.m in Sources */ = {isa = PBXBuildFile; fileRef = 197DABED1F54C09E00DD5C3B /* MPVungleRouter.m */; };
+		197DABF11F54C0CA00DD5C3B /* MPInstanceProvider+Vungle.m in Sources */ = {isa = PBXBuildFile; fileRef = 197DABF01F54C0CA00DD5C3B /* MPInstanceProvider+Vungle.m */; };
+		197DABF51F54C15400DD5C3B /* VungleInstanceMediationSettings.m in Sources */ = {isa = PBXBuildFile; fileRef = 197DABF41F54C15400DD5C3B /* VungleInstanceMediationSettings.m */; };
 		19CB75071F54ADB300F78219 /* MPGoogleAdMobBannerCustomEvent.m in Sources */ = {isa = PBXBuildFile; fileRef = 19CB75041F54ADB300F78219 /* MPGoogleAdMobBannerCustomEvent.m */; };
 		19CB75081F54ADB300F78219 /* MPGoogleAdMobInterstitialCustomEvent.m in Sources */ = {isa = PBXBuildFile; fileRef = 19CB75061F54ADB300F78219 /* MPGoogleAdMobInterstitialCustomEvent.m */; };
 		4E0DCB1A1F28481E00495781 /* PsiphonDataSharedDB.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E0DCB191F28481E00495781 /* PsiphonDataSharedDB.m */; };
@@ -75,6 +79,14 @@
 
 /* Begin PBXFileReference section */
 		19059EA21F50923400C04739 /* libFMDB.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libFMDB.a; path = "Pods/../build/Debug-iphoneos/FMDB/libFMDB.a"; sourceTree = "<group>"; };
+		197DABE91F54BEED00DD5C3B /* VungleInterstitialCustomEvent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VungleInterstitialCustomEvent.h; sourceTree = "<group>"; };
+		197DABEA1F54BEED00DD5C3B /* VungleInterstitialCustomEvent.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VungleInterstitialCustomEvent.m; sourceTree = "<group>"; };
+		197DABEC1F54C09E00DD5C3B /* MPVungleRouter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MPVungleRouter.h; sourceTree = "<group>"; };
+		197DABED1F54C09E00DD5C3B /* MPVungleRouter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MPVungleRouter.m; sourceTree = "<group>"; };
+		197DABEF1F54C0CA00DD5C3B /* MPInstanceProvider+Vungle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "MPInstanceProvider+Vungle.h"; sourceTree = "<group>"; };
+		197DABF01F54C0CA00DD5C3B /* MPInstanceProvider+Vungle.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "MPInstanceProvider+Vungle.m"; sourceTree = "<group>"; };
+		197DABF31F54C15400DD5C3B /* VungleInstanceMediationSettings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VungleInstanceMediationSettings.h; sourceTree = "<group>"; };
+		197DABF41F54C15400DD5C3B /* VungleInstanceMediationSettings.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VungleInstanceMediationSettings.m; sourceTree = "<group>"; };
 		19CB75031F54ADB300F78219 /* MPGoogleAdMobBannerCustomEvent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MPGoogleAdMobBannerCustomEvent.h; sourceTree = "<group>"; };
 		19CB75041F54ADB300F78219 /* MPGoogleAdMobBannerCustomEvent.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MPGoogleAdMobBannerCustomEvent.m; sourceTree = "<group>"; };
 		19CB75051F54ADB300F78219 /* MPGoogleAdMobInterstitialCustomEvent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MPGoogleAdMobInterstitialCustomEvent.h; sourceTree = "<group>"; };
@@ -142,6 +154,25 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		197DABF21F54C0EA00DD5C3B /* 3rd Party Adapters */ = {
+			isa = PBXGroup;
+			children = (
+				19CB75031F54ADB300F78219 /* MPGoogleAdMobBannerCustomEvent.h */,
+				19CB75041F54ADB300F78219 /* MPGoogleAdMobBannerCustomEvent.m */,
+				19CB75051F54ADB300F78219 /* MPGoogleAdMobInterstitialCustomEvent.h */,
+				19CB75061F54ADB300F78219 /* MPGoogleAdMobInterstitialCustomEvent.m */,
+				197DABEF1F54C0CA00DD5C3B /* MPInstanceProvider+Vungle.h */,
+				197DABF01F54C0CA00DD5C3B /* MPInstanceProvider+Vungle.m */,
+				197DABEC1F54C09E00DD5C3B /* MPVungleRouter.h */,
+				197DABED1F54C09E00DD5C3B /* MPVungleRouter.m */,
+				197DABF31F54C15400DD5C3B /* VungleInstanceMediationSettings.h */,
+				197DABF41F54C15400DD5C3B /* VungleInstanceMediationSettings.m */,
+				197DABE91F54BEED00DD5C3B /* VungleInterstitialCustomEvent.h */,
+				197DABEA1F54BEED00DD5C3B /* VungleInterstitialCustomEvent.m */,
+			);
+			name = "3rd Party Adapters";
+			sourceTree = "<group>";
+		};
 		4E0DCB101F28458100495781 /* Shared */ = {
 			isa = PBXGroup;
 			children = (
@@ -203,10 +234,6 @@
 		CE26FC8C1BBDC7B800B83375 /* Psiphon */ = {
 			isa = PBXGroup;
 			children = (
-				19CB75031F54ADB300F78219 /* MPGoogleAdMobBannerCustomEvent.h */,
-				19CB75041F54ADB300F78219 /* MPGoogleAdMobBannerCustomEvent.m */,
-				19CB75051F54ADB300F78219 /* MPGoogleAdMobInterstitialCustomEvent.h */,
-				19CB75061F54ADB300F78219 /* MPGoogleAdMobInterstitialCustomEvent.m */,
 				EF652CCF1F3521F8002AFB48 /* Supporting Files */,
 				CE4E9BBF1BBEECF30060FF8B /* Psiphon.entitlements */,
 				4ED1BFD21F1D2C21001D6F2A /* PsiphonData.h */,
@@ -220,6 +247,7 @@
 				EF652CD31F35224C002AFB48 /* AppDelegate.m */,
 				EF652CD41F35224C002AFB48 /* ViewController.h */,
 				EF652CD51F35224C002AFB48 /* ViewController.m */,
+				197DABF21F54C0EA00DD5C3B /* 3rd Party Adapters */,
 			);
 			path = Psiphon;
 			sourceTree = "<group>";
@@ -504,13 +532,17 @@
 			files = (
 				EF652CD71F35224C002AFB48 /* ViewController.m in Sources */,
 				19CB75081F54ADB300F78219 /* MPGoogleAdMobInterstitialCustomEvent.m in Sources */,
+				197DABEB1F54BEED00DD5C3B /* VungleInterstitialCustomEvent.m in Sources */,
+				197DABF51F54C15400DD5C3B /* VungleInstanceMediationSettings.m in Sources */,
 				4E0DCB1A1F28481E00495781 /* PsiphonDataSharedDB.m in Sources */,
 				4ED1BFD81F1D3292001D6F2A /* PsiphonData.m in Sources */,
 				4ED1BFD91F1D3292001D6F2A /* LogViewController.m in Sources */,
+				197DABF11F54C0CA00DD5C3B /* MPInstanceProvider+Vungle.m in Sources */,
 				EF652CD11F352212002AFB48 /* main.m in Sources */,
 				EF652CD61F35224C002AFB48 /* AppDelegate.m in Sources */,
 				9BFEC4F02A47FF8265635803 /* Notifier.m in Sources */,
 				9BFECFEB3BC9F10542C1A416 /* PsiphonConfigUserDefaults.m in Sources */,
+				197DABEE1F54C09E00DD5C3B /* MPVungleRouter.m in Sources */,
 				19CB75071F54ADB300F78219 /* MPGoogleAdMobBannerCustomEvent.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
