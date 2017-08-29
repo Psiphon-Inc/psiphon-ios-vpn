@@ -41,6 +41,7 @@
 		EF652CD61F35224C002AFB48 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = EF652CD31F35224C002AFB48 /* AppDelegate.m */; };
 		EF652CD71F35224C002AFB48 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = EF652CD51F35224C002AFB48 /* ViewController.m */; };
 		EF652CDA1F352271002AFB48 /* PacketTunnelProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = EF652CD91F352271002AFB48 /* PacketTunnelProvider.m */; };
+		EFED7EBC1F55C8550078980F /* LogViewControllerFullScreen.m in Sources */ = {isa = PBXBuildFile; fileRef = EFED7EBB1F55C8550078980F /* LogViewControllerFullScreen.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -127,6 +128,8 @@
 		EF652CD81F352271002AFB48 /* PacketTunnelProvider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PacketTunnelProvider.h; sourceTree = "<group>"; };
 		EF652CD91F352271002AFB48 /* PacketTunnelProvider.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PacketTunnelProvider.m; sourceTree = "<group>"; };
 		EF652CDB1F365B8C002AFB48 /* SharedConstants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SharedConstants.h; sourceTree = "<group>"; };
+		EFED7EBA1F55C8550078980F /* LogViewControllerFullScreen.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LogViewControllerFullScreen.h; sourceTree = "<group>"; };
+		EFED7EBB1F55C8550078980F /* LogViewControllerFullScreen.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LogViewControllerFullScreen.m; sourceTree = "<group>"; };
 		FC740CF0EC6D727A949699FF /* Pods-PsiphonVPN.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PsiphonVPN.release.xcconfig"; path = "Pods/Target Support Files/Pods-PsiphonVPN/Pods-PsiphonVPN.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -234,6 +237,8 @@
 		CE26FC8C1BBDC7B800B83375 /* Psiphon */ = {
 			isa = PBXGroup;
 			children = (
+				EFED7EBA1F55C8550078980F /* LogViewControllerFullScreen.h */,
+				EFED7EBB1F55C8550078980F /* LogViewControllerFullScreen.m */,
 				EF652CCF1F3521F8002AFB48 /* Supporting Files */,
 				CE4E9BBF1BBEECF30060FF8B /* Psiphon.entitlements */,
 				4ED1BFD21F1D2C21001D6F2A /* PsiphonData.h */,
@@ -536,6 +541,7 @@
 				197DABF51F54C15400DD5C3B /* VungleInstanceMediationSettings.m in Sources */,
 				4E0DCB1A1F28481E00495781 /* PsiphonDataSharedDB.m in Sources */,
 				4ED1BFD81F1D3292001D6F2A /* PsiphonData.m in Sources */,
+				EFED7EBC1F55C8550078980F /* LogViewControllerFullScreen.m in Sources */,
 				4ED1BFD91F1D3292001D6F2A /* LogViewController.m in Sources */,
 				197DABF11F54C0CA00DD5C3B /* MPInstanceProvider+Vungle.m in Sources */,
 				EF652CD11F352212002AFB48 /* main.m in Sources */,
