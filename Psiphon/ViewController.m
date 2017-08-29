@@ -104,7 +104,7 @@
     [self.view setBackgroundColor:[UIColor whiteColor]];
     //  TODO: wrap this in a function which always
     //  calls them in the right order
-    [self addAdButton];
+    [self addAdLabel];
     [self addStatusLabel];
 //    [self addToggleLabel];
 //    [self addStartAndStopToggle];
@@ -121,7 +121,11 @@
         // TODO: should we do error checking here, or on call to startVPN only?
         if ([managers count] == 1) {
             self.targetManager = managers[0];
-            [startStopButton setSelected:[self isVPNActive]];
+            if ([self isVPNActive]){
+                startStopButton.selected = YES;
+            } else {
+                startStopButton.selected = NO;
+            }
             [self initializeAds];
         }
     }];
@@ -232,7 +236,7 @@
         [self.targetManager saveToPreferencesWithCompletionHandler:^(NSError * _Nullable error) {
             if (error != nil) {
                 // User denied permission to add VPN Configuration.
-                [startStopButton setSelected:FALSE];
+                startStopButton.selected = NO;
                 NSLog(@"startVPN: failed to save the configuration: %@", error);
                 return;
             }
@@ -319,7 +323,11 @@
 
           NSLog(@"received NEVPNStatusDidChangeNotification %@", [self getVPNStatusDescription]);
           statusLabel.text = [self getVPNStatusDescription];
-          [startStopButton setSelected:[self isVPNActive]];
+          if ([self isVPNActive]){
+              startStopButton.selected = YES;
+          } else {
+              startStopButton.selected = NO;
+          }
     }];
 }
 
@@ -406,7 +414,7 @@
     UIImage *stopButtonImage = [UIImage imageNamed:@"StopButton"];
     UIImage *startButtonImage = [UIImage imageNamed:@"StartButton"];
     
-    startStopButton = [[UIButton alloc] init];
+    startStopButton = [UIButton buttonWithType:UIButtonTypeCustom];
     startStopButton.translatesAutoresizingMaskIntoConstraints = NO;
     
     [startStopButton setImage:startButtonImage forState:UIControlStateNormal];
@@ -544,7 +552,7 @@
                                                            constant:-30.0]];
 }
 
-- (void)addAdButton {
+- (void)addAdLabel {
     adLabel = [[UILabel alloc] init];
     adLabel.translatesAutoresizingMaskIntoConstraints = NO;
     adLabel.text = @"Ad Loaded";
