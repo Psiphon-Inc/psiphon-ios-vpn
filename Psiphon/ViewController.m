@@ -57,6 +57,11 @@
     BOOL shownHomepage;
     BOOL restartRequired;
     BOOL canStartTunnel;
+    
+    // UI Constraint
+    NSLayoutConstraint *startButtonScreenWidth;
+    NSLayoutConstraint *startButtonScreenHeight;
+    NSLayoutConstraint *startButtonWidth;
 
     // VPN Config user defaults
     PsiphonConfigUserDefaults *psiphonConfigUserDefaults;
@@ -105,13 +110,13 @@
     //  TODO: wrap this in a function which always
     //  calls them in the right order
     [self addStartAndStopButton];
-    [self addAdLabel];
     [self addStatusLabel];
 //    [self addToggleLabel];
 //    [self addStartAndStopToggle];
     [self addRegionButton];
+    [self addAdLabel];
     [self addVersionLabel];
-
+    
     // Load previous NETunnelProviderManager, if any.
     [NETunnelProviderManager loadAllFromPreferencesWithCompletionHandler:^(NSArray<NETunnelProviderManager *> * _Nullable managers, NSError * _Nullable error) {
         if (managers == nil) {
@@ -154,6 +159,28 @@
     // Stop listening for diagnostic messages (we don't want to hold the shared db lock while backgrounded)
     // TODO: best place to stop listening for NE messages?
     [notifier stopListeningForAllNotifications];
+}
+
+// Reload when rotate
+- (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator
+{
+    [coordinator animateAlongsideTransition:nil completion:^(id<UIViewControllerTransitionCoordinatorContext> context)
+     {
+         [self.view removeConstraint:startButtonWidth];
+         CGSize viewSize = self.view.bounds.size;
+         
+         if (viewSize.width > viewSize.height) {
+             [self.view removeConstraint:startButtonScreenWidth];
+             [self.view addConstraint:startButtonScreenHeight];
+         } else {
+             [self.view removeConstraint:startButtonScreenHeight];
+             [self.view addConstraint:startButtonScreenWidth];
+         }
+         
+         [self.view addConstraint:startButtonWidth];
+     }];
+    
+    [super viewWillTransitionToSize:size withTransitionCoordinator:coordinator];
 }
 
 #pragma mark - UI callbacks
@@ -410,7 +437,7 @@
 //                                                           constant:15.0]];
 //}
 
-- (void)addStartAndStopButton {    
+- (void)addStartAndStopButton {
     UIImage *stopButtonImage = [UIImage imageNamed:@"StopButton"];
     UIImage *startButtonImage = [UIImage imageNamed:@"StartButton"];
     
@@ -443,6 +470,40 @@
                                                           attribute:NSLayoutAttributeCenterX
                                                          multiplier:1.0
                                                            constant:0]];
+    
+    startButtonScreenHeight = [NSLayoutConstraint constraintWithItem:startStopButton
+                                                     attribute:NSLayoutAttributeHeight
+                                                     relatedBy:NSLayoutRelationEqual
+                                                        toItem:self.view
+                                                     attribute:NSLayoutAttributeHeight
+                                                    multiplier:0.5f
+                                                      constant:0];
+    
+    startButtonScreenWidth = [NSLayoutConstraint constraintWithItem:startStopButton
+                                                          attribute:NSLayoutAttributeWidth
+                                                          relatedBy:NSLayoutRelationEqual
+                                                             toItem:self.view
+                                                          attribute:NSLayoutAttributeWidth
+                                                         multiplier:0.5f
+                                                           constant:0];
+    
+    startButtonWidth = [NSLayoutConstraint constraintWithItem:startStopButton
+                                                    attribute:NSLayoutAttributeHeight
+                                                    relatedBy:NSLayoutRelationEqual
+                                                       toItem:startStopButton
+                                                    attribute:NSLayoutAttributeWidth
+                                                   multiplier:1.0
+                                                     constant:0];
+    
+    CGSize viewSize = self.view.bounds.size;
+    
+    if (viewSize.width > viewSize.height) {
+        [self.view addConstraint:startButtonScreenHeight];
+    } else {
+        [self.view addConstraint:startButtonScreenWidth];
+    }
+    
+    [self.view addConstraint:startButtonWidth];
 }
 
 - (void)addStatusLabel {
@@ -556,12 +617,12 @@
 
     // Setup autolayout
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:adLabel
-                                                          attribute:NSLayoutAttributeTop
+                                                          attribute:NSLayoutAttributeBottom
                                                           relatedBy:NSLayoutRelationEqual
-                                                             toItem:self.view
+                                                             toItem:statusLabel
                                                           attribute:NSLayoutAttributeTop
                                                          multiplier:1.0
-                                                           constant:35.0]];
+                                                           constant:-20.0]];
 
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:adLabel
                                                           attribute:NSLayoutAttributeLeft
