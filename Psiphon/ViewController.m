@@ -56,6 +56,7 @@
     // App state variables
     BOOL shownHomepage;
     BOOL restartRequired;
+    BOOL canStartTunnel;
 
     // VPN Config user defaults
     PsiphonConfigUserDefaults *psiphonConfigUserDefaults;
@@ -120,7 +121,7 @@
         // TODO: should we do error checking here, or on call to startVPN only?
         if ([managers count] == 1) {
             self.targetManager = managers[0];
-            [startStopToggle setOn:[self isVPNActive]];
+            [startStopButton setSelected:[self isVPNActive]];
             [self initializeAds];
         }
     }];
@@ -153,17 +154,23 @@
 
 #pragma mark - UI callbacks
 
-- (void)onSwitch:(UISwitch *)sender {
+//- (void)onSwitch:(UISwitch *)sender {
+//    if (![self isVPNActive]) {
+//        [self startVPN];
+//    } else {
+//        NSLog(@"call targetManager.connection.stopVPNTunnel()");
+//        [self.targetManager.connection stopVPNTunnel];
+//    }
+//}
+
+- (void)onStartStopTap:(UIButton *)sender {
     if (![self isVPNActive]) {
-        [self startVPN];
+        [self showUntunneledInterstitial];
+        // Then Start VPN
     } else {
         NSLog(@"call targetManager.connection.stopVPNTunnel()");
         [self.targetManager.connection stopVPNTunnel];
     }
-}
-
-- (void)onStartStopTap:(UIButton *)sender {
-    [self startVPN];
 }
 
 - (void)onRegionTap:(UIButton *)sender {
@@ -225,7 +232,7 @@
         [self.targetManager saveToPreferencesWithCompletionHandler:^(NSError * _Nullable error) {
             if (error != nil) {
                 // User denied permission to add VPN Configuration.
-                [startStopToggle setOn:FALSE];
+                [startStopButton setSelected:FALSE];
                 NSLog(@"startVPN: failed to save the configuration: %@", error);
                 return;
             }
@@ -307,7 +314,7 @@
 
           NSLog(@"received NEVPNStatusDidChangeNotification %@", [self getVPNStatusDescription]);
           statusLabel.text = [self getVPNStatusDescription];
-          [startStopToggle setOn:[self isVPNActive]];
+          [startStopButton setSelected:[self isVPNActive]];
     }];
 }
 
@@ -391,8 +398,8 @@
 //}
 
 - (void)addStartAndStopButton {
-    UIImage *stopButtonImage = [UIImage imageNamed:@"stop_button"];
-    UIImage *startButtonImage = [UIImage imageNamed:@"start_button"];
+    UIImage *stopButtonImage = [UIImage imageNamed:@"StopButton"];
+    UIImage *startButtonImage = [UIImage imageNamed:@"StartButton"];
     
     startStopButton = [[UIButton alloc] init];
     startStopButton.translatesAutoresizingMaskIntoConstraints = NO;
@@ -400,9 +407,9 @@
     [startStopButton setImage:startButtonImage forState:UIControlStateNormal];
     [startStopButton setImage:stopButtonImage forState:UIControlStateSelected];
     
-    [startStopButton setTitle:@"Start / Stop" forState:UIControlStateNormal];
+//    [startStopButton setTitle:@"Start / Stop" forState:UIControlStateNormal];
     [startStopButton addTarget:self action:@selector(onStartStopTap:) forControlEvents:UIControlEventTouchUpInside];
-    [startStopButton setBackgroundColor:[UIColor blackColor]];
+//    [startStopButton setBackgroundColor:[UIColor blackColor]];
     [self.view addSubview:startStopButton];
     
     // Setup autolayout
@@ -590,6 +597,8 @@
     NSLog(@"showUntunneledInterstitial");
     if (self.untunneledInterstitial.ready) {
         [self.untunneledInterstitial showFromViewController:self];
+    }else{
+        [self startVPN];
     }
 }
 
@@ -612,6 +621,7 @@
 - (void)interstitialDidDisappear:(MPInterstitialAdController *)interstitial {
     NSLog(@"Interstitial dismissed");
     // TODO: start the tunnel? or set a flag indicating that the tunnel should be started when returning to the UI?
+    [self startVPN];
 }
 
 @end
