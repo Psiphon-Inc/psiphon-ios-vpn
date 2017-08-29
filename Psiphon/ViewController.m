@@ -364,35 +364,42 @@
 //                                                           constant:15.0]];
 //}
 
-- (void)addStartAndStopToggle {
-    startStopToggle = [[UISwitch alloc] init];
-    startStopToggle.transform = CGAffineTransformMakeScale(1.5, 1.5);
-    startStopToggle.translatesAutoresizingMaskIntoConstraints = NO;
-    [startStopToggle addTarget:self action:@selector(onSwitch:) forControlEvents:UIControlEventValueChanged];
-
-    [self.view addSubview:startStopToggle];
-    
-    // Setup autolayout
-    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:startStopToggle
-                                                          attribute:NSLayoutAttributeTop
-                                                          relatedBy:NSLayoutRelationEqual
-                                                             toItem:statusLabel
-                                                          attribute:NSLayoutAttributeBottom
-                                                         multiplier:1.0
-                                                           constant:15.0]];
-
-    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:startStopToggle
-                                                          attribute:NSLayoutAttributeLeft
-                                                          relatedBy:NSLayoutRelationEqual
-                                                             toItem:statusLabel
-                                                          attribute:NSLayoutAttributeLeft
-                                                         multiplier:1.0
-                                                           constant:15.0]];
-}
+//- (void)addStartAndStopToggle {
+//    startStopToggle = [[UISwitch alloc] init];
+//    startStopToggle.transform = CGAffineTransformMakeScale(1.5, 1.5);
+//    startStopToggle.translatesAutoresizingMaskIntoConstraints = NO;
+//    [startStopToggle addTarget:self action:@selector(onSwitch:) forControlEvents:UIControlEventValueChanged];
+//
+//    [self.view addSubview:startStopToggle];
+//
+//    // Setup autolayout
+//    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:startStopToggle
+//                                                          attribute:NSLayoutAttributeTop
+//                                                          relatedBy:NSLayoutRelationEqual
+//                                                             toItem:statusLabel
+//                                                          attribute:NSLayoutAttributeBottom
+//                                                         multiplier:1.0
+//                                                           constant:15.0]];
+//
+//    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:startStopToggle
+//                                                          attribute:NSLayoutAttributeLeft
+//                                                          relatedBy:NSLayoutRelationEqual
+//                                                             toItem:statusLabel
+//                                                          attribute:NSLayoutAttributeLeft
+//                                                         multiplier:1.0
+//                                                           constant:15.0]];
+//}
 
 - (void)addStartAndStopButton {
+    UIImage *stopButtonImage = [UIImage imageNamed:@"stop_button"];
+    UIImage *startButtonImage = [UIImage imageNamed:@"start_button"];
+    
     startStopButton = [[UIButton alloc] init];
     startStopButton.translatesAutoresizingMaskIntoConstraints = NO;
+    
+    [startStopButton setImage:startButtonImage forState:UIControlStateNormal];
+    [startStopButton setImage:stopButtonImage forState:UIControlStateSelected];
+    
     [startStopButton setTitle:@"Start / Stop" forState:UIControlStateNormal];
     [startStopButton addTarget:self action:@selector(onStartStopTap:) forControlEvents:UIControlEventTouchUpInside];
     [startStopButton setBackgroundColor:[UIColor blackColor]];
