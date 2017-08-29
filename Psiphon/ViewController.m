@@ -104,11 +104,11 @@
     [self.view setBackgroundColor:[UIColor whiteColor]];
     //  TODO: wrap this in a function which always
     //  calls them in the right order
+    [self addStartAndStopButton];
     [self addAdLabel];
     [self addStatusLabel];
 //    [self addToggleLabel];
 //    [self addStartAndStopToggle];
-    [self addStartAndStopButton];
     [self addRegionButton];
     [self addVersionLabel];
 
@@ -410,12 +410,14 @@
 //                                                           constant:15.0]];
 //}
 
-- (void)addStartAndStopButton {
+- (void)addStartAndStopButton {    
     UIImage *stopButtonImage = [UIImage imageNamed:@"StopButton"];
     UIImage *startButtonImage = [UIImage imageNamed:@"StartButton"];
     
     startStopButton = [UIButton buttonWithType:UIButtonTypeCustom];
     startStopButton.translatesAutoresizingMaskIntoConstraints = NO;
+    startStopButton.contentHorizontalAlignment = UIControlContentHorizontalAlignmentFill;
+    startStopButton.contentVerticalAlignment = UIControlContentVerticalAlignmentFill;
     
     [startStopButton setImage:startButtonImage forState:UIControlStateNormal];
     [startStopButton setImage:stopButtonImage forState:UIControlStateSelected];
@@ -427,28 +429,20 @@
     
     // Setup autolayout
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:startStopButton
-                                                          attribute:NSLayoutAttributeTop
-                                                          relatedBy:NSLayoutRelationEqual
-                                                             toItem:statusLabel
-                                                          attribute:NSLayoutAttributeBottom
-                                                         multiplier:1.0
-                                                           constant:15.0]];
-    
-    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:startStopButton
-                                                          attribute:NSLayoutAttributeLeft
+                                                          attribute:NSLayoutAttributeCenterY
                                                           relatedBy:NSLayoutRelationEqual
                                                              toItem:self.view
-                                                          attribute:NSLayoutAttributeLeft
+                                                          attribute:NSLayoutAttributeCenterY
                                                          multiplier:1.0
-                                                           constant:15.0]];
+                                                           constant:0]];
     
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:startStopButton
-                                                          attribute:NSLayoutAttributeRight
+                                                          attribute:NSLayoutAttributeCenterX
                                                           relatedBy:NSLayoutRelationEqual
                                                              toItem:self.view
-                                                          attribute:NSLayoutAttributeRight
+                                                          attribute:NSLayoutAttributeCenterX
                                                          multiplier:1.0
-                                                           constant:-15.0]];
+                                                           constant:0]];
 }
 
 - (void)addStatusLabel {
@@ -461,12 +455,12 @@
     
     // Setup autolayout
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:statusLabel
-                                                          attribute:NSLayoutAttributeTop
-                                                          relatedBy:NSLayoutRelationEqual
-                                                             toItem:adLabel
                                                           attribute:NSLayoutAttributeBottom
+                                                          relatedBy:NSLayoutRelationEqual
+                                                             toItem:startStopButton
+                                                          attribute:NSLayoutAttributeTop
                                                          multiplier:1.0
-                                                           constant:15.0]];
+                                                           constant:-30.0]];
     
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:statusLabel
                                                           attribute:NSLayoutAttributeLeft
@@ -500,7 +494,7 @@
                                                              toItem:startStopButton
                                                           attribute:NSLayoutAttributeBottom
                                                          multiplier:1.0
-                                                           constant:15.0]];
+                                                           constant:30.0]];
 
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:regionButton
                                                           attribute:NSLayoutAttributeLeft
