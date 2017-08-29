@@ -87,6 +87,8 @@
         COLUMN_HOMEPAGE_URL " TEXT NOT NULL, "
         COLUMN_HOMEPAGE_TIMESTAMP " TIMESTAMP DEFAULT CURRENT_TIMESTAMP);";
 
+    NSLog(TAG @"Create DATABASE");
+    
     __block BOOL success = FALSE;
     [q inDatabase:^(FMDatabase *db) {
         success = [db executeStatements:CREATE_TABLE_STATEMENTS];
