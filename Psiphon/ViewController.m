@@ -589,6 +589,10 @@
     }
 }
 
+- (bool)shouldShowUntunneledAds {
+    return self.targetManager.connection.status == NEVPNStatusDisconnected && !restartRequired;
+}
+
 - (void)loadUntunneledInterstitial {
     NSLog(@"loadUntunneledInterstitial");
     self.untunneledInterstitial = [MPInterstitialAdController
