@@ -1,0 +1,9 @@
+/* Done button in navigation bar */
+"Done" = "<fr>Done";
+
+/* Label beside toggle button which starts the Psiphon Tunnel */
+"Run Psiphon VPN" = "<fr>Run Psiphon VPN";
+
+/* Alert message informing user they have to open the app */
+"To connect, use the Psiphon application." = "<fr>To connect, use the Psiphon application.";
+
