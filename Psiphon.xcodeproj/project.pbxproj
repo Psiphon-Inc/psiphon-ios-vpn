@@ -42,6 +42,8 @@
 		EF652CD71F35224C002AFB48 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = EF652CD51F35224C002AFB48 /* ViewController.m */; };
 		EF652CDA1F352271002AFB48 /* PacketTunnelProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = EF652CD91F352271002AFB48 /* PacketTunnelProvider.m */; };
 		EFED7EBC1F55C8550078980F /* LogViewControllerFullScreen.m in Sources */ = {isa = PBXBuildFile; fileRef = EFED7EBB1F55C8550078980F /* LogViewControllerFullScreen.m */; };
+		F132D7E01F5739A800AF7F91 /* LaunchScreenViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = F132D7DF1F5739A800AF7F91 /* LaunchScreenViewController.m */; };
+		F132D7E41F574B6600AF7F91 /* loading.mov in Resources */ = {isa = PBXBuildFile; fileRef = F132D7E31F574B6600AF7F91 /* loading.mov */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -130,6 +132,9 @@
 		EF652CDB1F365B8C002AFB48 /* SharedConstants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SharedConstants.h; sourceTree = "<group>"; };
 		EFED7EBA1F55C8550078980F /* LogViewControllerFullScreen.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LogViewControllerFullScreen.h; sourceTree = "<group>"; };
 		EFED7EBB1F55C8550078980F /* LogViewControllerFullScreen.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LogViewControllerFullScreen.m; sourceTree = "<group>"; };
+		F132D7DE1F5739A800AF7F91 /* LaunchScreenViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LaunchScreenViewController.h; sourceTree = "<group>"; };
+		F132D7DF1F5739A800AF7F91 /* LaunchScreenViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LaunchScreenViewController.m; sourceTree = "<group>"; };
+		F132D7E31F574B6600AF7F91 /* loading.mov */ = {isa = PBXFileReference; lastKnownFileType = video.quicktime; name = loading.mov; path = Resource/loading.mov; sourceTree = "<group>"; };
 		FC740CF0EC6D727A949699FF /* Pods-PsiphonVPN.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PsiphonVPN.release.xcconfig"; path = "Pods/Target Support Files/Pods-PsiphonVPN/Pods-PsiphonVPN.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -237,6 +242,9 @@
 		CE26FC8C1BBDC7B800B83375 /* Psiphon */ = {
 			isa = PBXGroup;
 			children = (
+				F132D7E31F574B6600AF7F91 /* loading.mov */,
+				F132D7DE1F5739A800AF7F91 /* LaunchScreenViewController.h */,
+				F132D7DF1F5739A800AF7F91 /* LaunchScreenViewController.m */,
 				EFED7EBA1F55C8550078980F /* LogViewControllerFullScreen.h */,
 				EFED7EBB1F55C8550078980F /* LogViewControllerFullScreen.m */,
 				EF652CCF1F3521F8002AFB48 /* Supporting Files */,
@@ -392,6 +400,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				CE26FC981BBDC7B800B83375 /* LaunchScreen.storyboard in Resources */,
+				F132D7E41F574B6600AF7F91 /* loading.mov in Resources */,
 				CE26FC951BBDC7B800B83375 /* Assets.xcassets in Resources */,
 				CE4E9BC01BBEECF30060FF8B /* Psiphon.entitlements in Resources */,
 			);
@@ -536,6 +545,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				EF652CD71F35224C002AFB48 /* ViewController.m in Sources */,
+				F132D7E01F5739A800AF7F91 /* LaunchScreenViewController.m in Sources */,
 				19CB75081F54ADB300F78219 /* MPGoogleAdMobInterstitialCustomEvent.m in Sources */,
 				197DABEB1F54BEED00DD5C3B /* VungleInterstitialCustomEvent.m in Sources */,
 				197DABF51F54C15400DD5C3B /* VungleInstanceMediationSettings.m in Sources */,
