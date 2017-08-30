@@ -23,4 +23,8 @@
 
 @property (strong, nonatomic) UIWindow *window;
 
++ (AppDelegate *)sharedAppDelegate;
+
+- (void) switchToMainViewController;
+
 @end

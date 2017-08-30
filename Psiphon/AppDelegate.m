@@ -31,8 +31,6 @@
     self.window = [[UIWindow alloc] initWithFrame:UIScreen.mainScreen.bounds];
     self.window.rootViewController = [[LaunchScreenViewController alloc] init];
     [self.window makeKeyAndVisible];
-    // TODO: After a timer (10s) switch to Main View Contorller
-//    [self switchToMainViewController];
     return YES;
 }
 
@@ -66,6 +64,10 @@
     } completion:^(BOOL finished) {
         [snapShot removeFromSuperview];
     }];
+}
+
++ (AppDelegate *)sharedAppDelegate{
+    return (AppDelegate *)[UIApplication sharedApplication].delegate;
 }
 
 - (void)applicationWillResignActive:(UIApplication *)application {
