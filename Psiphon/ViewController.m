@@ -335,7 +335,7 @@
 
 - (void)addToggleLabel {
     toggleLabel = [[UILabel alloc] init];
-    toggleLabel.text = NSLocalizedString(@"Run Psiphon VPN", @"Label beside toggle button which starts the Psiphon Tunnel");
+    toggleLabel.text = NSLocalizedStringWithDefaultValue(@"RUN_VPN", nil, [NSBundle mainBundle], @"Run Psiphon VPN", @"Label beside toggle button which starts the Psiphon Tunnel");
     toggleLabel.translatesAutoresizingMaskIntoConstraints = NO;
 
     [self.view addSubview:toggleLabel];

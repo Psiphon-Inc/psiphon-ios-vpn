@@ -44,7 +44,7 @@
     // UIBar
     [self setTitle:@"Logs"];
     UIBarButtonItem *doneButton = [[UIBarButtonItem alloc]
-      initWithTitle:NSLocalizedString(@"Done", @"Done button in navigation bar")
+      initWithTitle:NSLocalizedStringWithDefaultValue(@"DONE_ACTION", nil, [NSBundle mainBundle], @"Done", @"Done button in navigation bar")
       style:UIBarButtonItemStyleDone target:self action:@selector(onNavigationDoneTap)];
 
     [self.navigationItem setRightBarButtonItem:doneButton];
