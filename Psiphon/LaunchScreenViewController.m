@@ -21,6 +21,7 @@
 #import <Foundation/Foundation.h>
 #import <AVFoundation/AVFoundation.h>
 #import "LaunchScreenViewController.h"
+#import "AppDelegate.h"
 
 @import GoogleMobileAds;
 
@@ -38,6 +39,10 @@ static const NSString *ItemStatusContext;
 @implementation LaunchScreenViewController {
     // Ads
     BOOL adsLoaded;
+    
+    // Loading Timer
+    NSTimer *_loadingTimer;
+    NSTimer *_lastActiveTickTime;
     
 }
 
@@ -90,6 +95,8 @@ static const NSString *ItemStatusContext;
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
     [self.loadingVideo play];
+    // TODO: After a timer (10s) switch to Main View Contorller
+    [self startLaunchingScreenTimer];
 }
 
 - (void)playerItemDidReachEnd:(NSNotification *)notification {
@@ -114,6 +121,23 @@ static const NSString *ItemStatusContext;
     if ((self.loadingVideo.currentItem != nil) &&
         ([self.loadingVideo.currentItem status] == AVPlayerItemStatusReadyToPlay)) {
             [self.loadingVideo play];
+    }
+}
+
+- (void) switchViewControllerWhenExpire:(NSTimer*)timer {
+    if (self.viedoFile != nil) {
+        [self.viedoFile removeObserver:self forKeyPath:@"status"];
+    }
+    [[AppDelegate sharedAppDelegate] switchToMainViewController];
+}
+
+- (void) startLaunchingScreenTimer {
+    if (!_loadingTimer || ![_loadingTimer isValid]) {
+        _loadingTimer = [NSTimer scheduledTimerWithTimeInterval:10.0
+                                                           target:self
+                                                         selector:@selector(switchViewControllerWhenExpire:)
+                                                         userInfo:nil
+                                                          repeats:NO];
     }
 }
 
