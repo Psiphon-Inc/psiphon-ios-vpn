@@ -18,12 +18,18 @@
  */
 
 #import "AppDelegate.h"
+#import "PsiphonClientCommonLibraryHelpers.h"
 #import "ViewController.h"
 
 @interface AppDelegate ()
 @end
 
 @implementation AppDelegate
+
+- (BOOL)application:(UIApplication *)application willFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+	[self initializeDefaults];
+	return YES;
+}
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // Override point for customization after application launch.
@@ -53,6 +59,11 @@
 
 - (void)applicationWillTerminate:(UIApplication *)application {
     // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
+}
+
+- (void)initializeDefaults {
+	[PsiphonClientCommonLibraryHelpers initializeDefaultsFor:@"Root.inApp.plist"];
+	[PsiphonClientCommonLibraryHelpers initializeDefaultsFor:@"Feedback.plist"];
 }
 
 @end
