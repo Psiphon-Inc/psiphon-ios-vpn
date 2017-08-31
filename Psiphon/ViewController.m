@@ -19,12 +19,24 @@
  */
 
 #import <Foundation/Foundation.h>
-#import "ViewController.h"
+#import <PsiphonTunnel/PsiphonTunnel.h>
+#import "FeedbackUpload.h"
+#import "LogViewControllerFullScreen.h"
+#import "PsiphonConfigUserDefaults.h"
+#import "PsiphonClientCommonLibraryConstants.h"
+#import "PsiphonClientCommonLibraryHelpers.h"
 #import "PsiphonDataSharedDB.h"
+#import "RegionAdapter.h"
+#import "RegionSelectionViewController.h"
 #import "SharedConstants.h"
 #import "Notifier.h"
-#import "PsiphonConfigUserDefaults.h"
-#import "LogViewControllerFullScreen.h"
+#import "UIImage+CountryFlag.h"
+#import "UpstreamProxySettings.h"
+#import "ViewController.h"
+
+static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSString *b) {
+    return (([a length] == 0) && ([b length] == 0)) || ([a isEqualToString:b]);
+};
 
 @import NetworkExtension;
 @import GoogleMobileAds;
@@ -50,6 +62,7 @@
     UILabel *toggleLabel;
     UILabel *statusLabel;
     UIButton *regionButton;
+    UILabel *regionLabel;
     UILabel *versionLabel;
     UILabel *adLabel;
 
@@ -65,6 +78,13 @@
 
     // VPN Config user defaults
     PsiphonConfigUserDefaults *psiphonConfigUserDefaults;
+
+    // Settings
+    PsiphonSettingsViewController *appSettingsViewController;
+
+    // Region Selection
+    UINavigationController *regionSelectionNavController;
+    NSString *selectedRegionSnapShot;
 }
 
 @synthesize targetManager = _targetManager;
@@ -80,10 +100,10 @@
         notifier = [[Notifier alloc] initWithAppGroupIdentifier:APP_GROUP_IDENTIFIER];
 
         // VPN Config user defaults
-        psiphonConfigUserDefaults = [[PsiphonConfigUserDefaults alloc] initWithSuiteName:APP_GROUP_IDENTIFIER];
+        psiphonConfigUserDefaults = [PsiphonConfigUserDefaults sharedInstance];
+        [self persistSettingsToSharedUserDefaults];
 
         [self resetAppState];
-
     }
     return self;
 }
@@ -105,13 +125,18 @@
         // TODO : do some error handling
     }
 
+    // Add any available regions from shared db to region adapter
+    [self updateAvailableRegions];
+
     // Setting up the UI
     [self.view setBackgroundColor:[UIColor whiteColor]];
     //  TODO: wrap this in a function which always
     //  calls them in the right order
+    [self addSettingsButton];
     [self addStartAndStopButton];
     [self addStatusLabel];
     [self addRegionButton];
+    [self addRegionLabel];
     [self addAdLabel];
     [self addVersionLabel];
     
@@ -141,6 +166,14 @@
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidBecomeActive) name:UIApplicationDidBecomeActiveNotification object:nil];
 }
 
+- (void)viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];
+    // Available regions may have changed in the background
+    [self updateAvailableRegions];
+    [self updateRegionButton];
+    [self updateRegionLabel];
+}
+
 - (void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
     
@@ -161,20 +194,19 @@
 
 // Reload when rotate
 - (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator {
+    [self.view removeConstraint:startButtonWidth];
+
+    if (size.width > size.height) {
+        [self.view removeConstraint:startButtonScreenWidth];
+        [self.view addConstraint:startButtonScreenHeight];
+    } else {
+        [self.view removeConstraint:startButtonScreenHeight];
+        [self.view addConstraint:startButtonScreenWidth];
+    }
+
+    [self.view addConstraint:startButtonWidth];
     [coordinator animateAlongsideTransition:nil completion:^(id<UIViewControllerTransitionCoordinatorContext> context) {
-         [self.view removeConstraint:startButtonWidth];
-         CGSize viewSize = self.view.bounds.size;
-         
-         if (viewSize.width > viewSize.height) {
-             [self.view removeConstraint:startButtonScreenWidth];
-             [self.view addConstraint:startButtonScreenHeight];
-         } else {
-             [self.view removeConstraint:startButtonScreenHeight];
-             [self.view addConstraint:startButtonScreenWidth];
-         }
-         
-         [self.view addConstraint:startButtonWidth];
-     }];
+    }];
     
     [super viewWillTransitionToSize:size withTransitionCoordinator:coordinator];
 }
@@ -191,11 +223,12 @@
     }
 }
 
-- (void)onRegionTap:(UIButton *)sender {
-    if ([psiphonConfigUserDefaults setEgressRegion:@""]) {
-        
-    }
-    [self restartVPN];
+- (void)onSettingsButtonTap:(UIButton *)sender {
+    [self openSettingsMenu];
+}
+
+- (void)onRegionButtonTap:(UIButton *)sender {
+    [self openRegionSelection];
 }
 
 - (void)onVersionLabelTap:(UILabel *)sender {
@@ -285,7 +318,6 @@
 }
 
 - (void)listenForNEMessages {
-
     [notifier listenForNotification:@"NE.newHomepages" listener:^{
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
             if (!shownHomepage) {
@@ -307,6 +339,9 @@
     [notifier listenForNotification:@"NE.onConnected" listener:^{
     }];
 
+    [notifier listenForNotification:@"NE.onAvailableEgressRegions" listener:^{ // TODO should be put in a constants file
+        [self updateAvailableRegions];
+    }];
 }
 
 # pragma mark - Property getters/setters
@@ -370,11 +405,53 @@
 /*!
  @brief Returns true if NEVPNConnectionStatus is Connected, Connecting or Reasserting.
  */
-- (BOOL) isVPNActive{
+- (BOOL)isVPNActive {
     NEVPNStatus status = self.targetManager.connection.status;
     return (status == NEVPNStatusConnecting
       || status == NEVPNStatusConnected
       || status == NEVPNStatusReasserting);
+}
+
+- (void)addSettingsButton {
+    UIButton *settingsButton = [[UIButton alloc] init];
+    settingsButton.translatesAutoresizingMaskIntoConstraints = NO;
+    [settingsButton setImage:[UIImage imageNamed:@"settings"] forState:UIControlStateNormal];
+    [self.view addSubview:settingsButton];
+
+    // Setup autolayout
+    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:settingsButton
+                                                          attribute:NSLayoutAttributeTop
+                                                          relatedBy:NSLayoutRelationEqual
+                                                             toItem:self.topLayoutGuide
+                                                          attribute:NSLayoutAttributeBottom
+                                                         multiplier:1.0
+                                                           constant:-5]];
+
+    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:settingsButton
+                                                          attribute:NSLayoutAttributeRight
+                                                          relatedBy:NSLayoutRelationEqual
+                                                             toItem:self.view
+                                                          attribute:NSLayoutAttributeRight
+                                                         multiplier:1.0
+                                                           constant:-5]];
+
+    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:settingsButton
+                                                          attribute:NSLayoutAttributeWidth
+                                                          relatedBy:NSLayoutRelationEqual
+                                                             toItem:nil
+                                                          attribute:NSLayoutAttributeNotAnAttribute
+                                                         multiplier:1.0
+                                                           constant:40]];
+
+    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:settingsButton
+                                                          attribute:NSLayoutAttributeHeight
+                                                          relatedBy:NSLayoutRelationEqual
+                                                             toItem:settingsButton
+                                                          attribute:NSLayoutAttributeWidth
+                                                         multiplier:1.0
+                                                           constant:0.f]];
+
+    [settingsButton addTarget:self action:@selector(onSettingsButtonTap:) forControlEvents:UIControlEventTouchUpInside];
 }
 
 - (void)addStartAndStopButton {
@@ -385,7 +462,7 @@
     startStopButton.translatesAutoresizingMaskIntoConstraints = NO;
     startStopButton.contentHorizontalAlignment = UIControlContentHorizontalAlignmentFill;
     startStopButton.contentVerticalAlignment = UIControlContentVerticalAlignmentFill;
-    
+
     [startStopButton setImage:startButtonImage forState:UIControlStateNormal];
     [startStopButton setImage:stopButtonImage forState:UIControlStateSelected];
     
@@ -410,12 +487,12 @@
                                                            constant:0]];
     
     startButtonScreenHeight = [NSLayoutConstraint constraintWithItem:startStopButton
-                                                     attribute:NSLayoutAttributeHeight
-                                                     relatedBy:NSLayoutRelationEqual
-                                                        toItem:self.view
-                                                     attribute:NSLayoutAttributeHeight
-                                                    multiplier:0.5f
-                                                      constant:0];
+                                                           attribute:NSLayoutAttributeHeight
+                                                           relatedBy:NSLayoutRelationEqual
+                                                              toItem:self.view
+                                                           attribute:NSLayoutAttributeHeight
+                                                          multiplier:0.5f
+                                                            constant:0];
     
     startButtonScreenWidth = [NSLayoutConstraint constraintWithItem:startStopButton
                                                           attribute:NSLayoutAttributeWidth
@@ -455,7 +532,7 @@
     // Setup autolayout
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:statusLabel
                                                           attribute:NSLayoutAttributeBottom
-                                                          relatedBy:NSLayoutRelationEqual
+                                                          relatedBy:NSLayoutRelationGreaterThanOrEqual
                                                              toItem:startStopButton
                                                           attribute:NSLayoutAttributeTop
                                                          multiplier:1.0
@@ -479,37 +556,83 @@
 }
 
 - (void)addRegionButton {
-    regionButton = [UIButton buttonWithType:UIButtonTypeSystem];
+    regionButton = [[UIButton alloc] init];
     regionButton.translatesAutoresizingMaskIntoConstraints = NO;
-    [regionButton setTitle:@"Set Region" forState:UIControlStateNormal];
-    [regionButton addTarget:self action:@selector(onRegionTap:) forControlEvents:UIControlEventTouchUpInside];
+    [regionButton addTarget:self action:@selector(onRegionButtonTap:) forControlEvents:UIControlEventTouchUpInside];
 
     [self.view addSubview:regionButton];
+
+    [self updateRegionButton];
 
     // Setup autolayout
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:regionButton
                                                           attribute:NSLayoutAttributeTop
-                                                          relatedBy:NSLayoutRelationEqual
+                                                          relatedBy:NSLayoutRelationLessThanOrEqual
                                                              toItem:startStopButton
                                                           attribute:NSLayoutAttributeBottom
                                                          multiplier:1.0
                                                            constant:30.0]];
 
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:regionButton
-                                                          attribute:NSLayoutAttributeLeft
+                                                          attribute:NSLayoutAttributeCenterX
                                                           relatedBy:NSLayoutRelationEqual
                                                              toItem:self.view
-                                                          attribute:NSLayoutAttributeLeft
+                                                          attribute:NSLayoutAttributeCenterX
                                                          multiplier:1.0
-                                                           constant:15.0]];
+                                                           constant:0]];
 
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:regionButton
-                                                          attribute:NSLayoutAttributeRight
+                                                          attribute:NSLayoutAttributeWidth
                                                           relatedBy:NSLayoutRelationEqual
                                                              toItem:self.view
-                                                          attribute:NSLayoutAttributeRight
+                                                          attribute:NSLayoutAttributeWidth
                                                          multiplier:1.0
-                                                           constant:-15.0]];
+                                                           constant:.2]];
+}
+
+- (void)addRegionLabel {
+    regionLabel = [[UILabel alloc] init];
+    regionLabel.translatesAutoresizingMaskIntoConstraints = NO;
+    regionLabel.adjustsFontSizeToFitWidth = YES;
+    regionLabel.numberOfLines = 0;
+    regionLabel.textAlignment = NSTextAlignmentCenter;
+    regionLabel.font = [UIFont systemFontOfSize:15.f];
+    [self.view addSubview:regionLabel];
+
+    [self updateRegionLabel];
+
+    // Setup autolayout
+    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:regionLabel
+                                                          attribute:NSLayoutAttributeTop
+                                                          relatedBy:NSLayoutRelationEqual
+                                                             toItem:regionButton
+                                                          attribute:NSLayoutAttributeBottom
+                                                         multiplier:1.0
+                                                           constant:5.0]];
+
+    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:regionLabel
+                                                          attribute:NSLayoutAttributeBottom
+                                                          relatedBy:NSLayoutRelationLessThanOrEqual
+                                                             toItem:self.view
+                                                          attribute:NSLayoutAttributeBottom
+                                                         multiplier:1.0
+                                                           constant:0.0]];
+
+    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:regionLabel
+                                                          attribute:NSLayoutAttributeCenterX
+                                                          relatedBy:NSLayoutRelationEqual
+                                                             toItem:regionButton
+                                                          attribute:NSLayoutAttributeCenterX
+                                                         multiplier:1.0
+                                                           constant:0]];
+
+    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:regionLabel
+                                                          attribute:NSLayoutAttributeWidth
+                                                          relatedBy:NSLayoutRelationEqual
+                                                             toItem:self.view
+                                                          attribute:NSLayoutAttributeWidth
+                                                         multiplier:1.0
+                                                           constant:.1]];
 }
 
 - (void)addVersionLabel {
@@ -554,6 +677,14 @@
     adLabel.hidden = true;
 
     // Setup autolayout
+    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:adLabel
+                                                          attribute:NSLayoutAttributeTop
+                                                          relatedBy:NSLayoutRelationGreaterThanOrEqual
+                                                             toItem:self.topLayoutGuide
+                                                          attribute:NSLayoutAttributeBottom
+                                                         multiplier:1.0
+                                                           constant:0]];
+
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:adLabel
                                                           attribute:NSLayoutAttributeBottom
                                                           relatedBy:NSLayoutRelationEqual
@@ -633,6 +764,173 @@
     // TODO: start the tunnel? or set a flag indicating that the tunnel should be started when returning to the UI?
     adLabel.hidden = true;
     [self startVPN];
+}
+
+#pragma mark - FeedbackViewControllerDelegate methods and helpers
+
+- (NSString *)getPsiphonConfig {
+    return [PsiphonClientCommonLibraryHelpers getPsiphonConfigForFeedbackUpload];
+}
+
+- (void)userSubmittedFeedback:(NSUInteger)selectedThumbIndex comments:(NSString *)comments email:(NSString *)email uploadDiagnostics:(BOOL)uploadDiagnostics {
+    // Ensure psiphon data is populated with latest logs
+    // TODO: should this be a delegate method of Psiphon Data in shared library/
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        NSArray<DiagnosticEntry *> *logs = [sharedDB getNewLogs];
+        [[PsiphonData sharedInstance] addDiagnosticEntries:logs];
+    });
+
+    __weak ViewController *weakSelf = self;
+    SendFeedbackHandler sendFeedbackHandler = ^(NSString *jsonString, NSString *pubKey, NSString *uploadServer, NSString *uploadServerHeaders){
+        PsiphonTunnel *inactiveTunnel = [PsiphonTunnel newPsiphonTunnel:self]; // TODO: we need to update PsiphonTunnel framework not require this and fix this warning
+        [inactiveTunnel sendFeedback:jsonString publicKey:pubKey uploadServer:uploadServer uploadServerHeaders:uploadServerHeaders];
+    };
+
+    [FeedbackUpload generateAndSendFeedback:selectedThumbIndex
+                                   comments:comments
+                                      email:email
+                         sendDiagnosticInfo:uploadDiagnostics
+                          withPsiphonConfig:[self getPsiphonConfig]
+                         withConnectionType:[self getConnectionType]
+                               isJailbroken:[JailbreakCheck isDeviceJailbroken]
+                        sendFeedbackHandler:sendFeedbackHandler];
+}
+
+- (void)userPressedURL:(NSURL *)URL {
+    [[UIApplication sharedApplication] openURL:URL options:@{} completionHandler:nil];
+}
+
+// Get connection type for feedback
+- (NSString*)getConnectionType {
+
+    Reachability *reachability = [Reachability reachabilityForInternetConnection];
+
+    NetworkStatus status = [reachability currentReachabilityStatus];
+
+    if(status == NotReachable)
+    {
+        return @"none";
+    }
+    else if (status == ReachableViaWiFi)
+    {
+        return @"WIFI";
+    }
+    else if (status == ReachableViaWWAN)
+    {
+        return @"mobile";
+    }
+
+    return @"error";
+}
+
+#pragma mark - PsiphonSettingsViewControllerDelegate methods and helpers
+
+- (void)notifyPsiphonConnectionState {
+    // Unused
+}
+
+- (void)reloadAndOpenSettings {
+    if (appSettingsViewController != nil) {
+        __weak ViewController *weakSelf = self;
+        [appSettingsViewController dismissViewControllerAnimated:NO completion:^{
+            [[RegionAdapter sharedInstance] reloadTitlesForNewLocalization];
+            [weakSelf openSettingsMenu];
+        }];
+    }
+}
+
+- (void)settingsWillDismissWithForceReconnect:(BOOL)forceReconnect {
+    if (forceReconnect) {
+        [self persistSettingsToSharedUserDefaults];
+        [self restartVPN];
+    }
+}
+
+- (void)persistSettingsToSharedUserDefaults {
+    [self persistDisableTimeouts];
+    [self persistSelectedRegion];
+    [self persistUpstreamProxySettings];
+}
+
+- (void)persistDisableTimeouts {
+    NSUserDefaults *containerUserDefaults = [NSUserDefaults standardUserDefaults];
+    NSUserDefaults *sharedUserDefaults = [[NSUserDefaults alloc] initWithSuiteName:APP_GROUP_IDENTIFIER];
+    [sharedUserDefaults setObject:@([containerUserDefaults boolForKey:kDisableTimeouts]) forKey:kDisableTimeouts];
+}
+
+- (void)persistSelectedRegion {
+    [[PsiphonConfigUserDefaults sharedInstance] setEgressRegion:[RegionAdapter.sharedInstance getSelectedRegion].code];
+}
+
+- (void)persistUpstreamProxySettings {
+    NSString *upstreamProxyUrl = [[UpstreamProxySettings sharedInstance] getUpstreamProxyUrl];
+    NSUserDefaults *userDefaults = [[NSUserDefaults alloc] initWithSuiteName:APP_GROUP_IDENTIFIER];
+    [userDefaults setObject:upstreamProxyUrl forKey:PSIPHON_CONFIG_UPSTREAM_PROXY_URL];
+}
+
+- (BOOL)shouldEnableSettingsLinks {
+    return YES;
+}
+
+#pragma mark - Psiphon Settings
+
+- (void)openSettingsMenu {
+    appSettingsViewController = [[PsiphonSettingsViewController alloc] init];
+    appSettingsViewController.delegate = appSettingsViewController;
+    appSettingsViewController.showCreditsFooter = NO;
+    appSettingsViewController.showDoneButton = YES;
+    appSettingsViewController.neverShowPrivacySettings = YES;
+    appSettingsViewController.settingsDelegate = self;
+    appSettingsViewController.preferencesSnapshot = [[[NSUserDefaults standardUserDefaults] dictionaryRepresentation] copy];
+
+    UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:appSettingsViewController];
+    [self presentViewController:navController animated:YES completion:nil];
+}
+
+#pragma mark - Region Selection
+
+- (void)openRegionSelection {
+    selectedRegionSnapShot = [[RegionAdapter sharedInstance] getSelectedRegion].code;
+    RegionSelectionViewController *regionSelectionViewController = [[RegionSelectionViewController alloc] init];
+    regionSelectionNavController = [[UINavigationController alloc] initWithRootViewController:regionSelectionViewController];
+    UIBarButtonItem *doneButton = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Done", @"Title of the button that dismisses region selection dialog")
+                                                                   style:UIBarButtonItemStyleDone target:self
+                                                                  action:@selector(regionSelectionDidEnd)];
+    regionSelectionViewController.navigationItem.rightBarButtonItem = doneButton;
+
+    [self presentViewController:regionSelectionNavController animated:YES completion:nil];
+}
+
+- (void)regionSelectionDidEnd {
+    NSString *selectedRegion = [[RegionAdapter sharedInstance] getSelectedRegion].code;//[[[NSUserDefaults alloc] initWithSuiteName:APP_GROUP_IDENTIFIER] stringForKey:kRegionSelectionSpecifierKey];
+    if (!safeStringsEqual(selectedRegion, selectedRegionSnapShot)) {
+        [self persistSelectedRegion];
+        [self updateRegionButton];
+        [self updateRegionLabel];
+        [self restartVPN];
+    }
+    [regionSelectionNavController dismissViewControllerAnimated:YES completion:nil];
+    regionSelectionNavController = nil;
+}
+
+- (void)updateAvailableRegions {
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        NSArray<NSString *> *regions = [sharedDB getAllEgressRegions];
+        [[RegionAdapter sharedInstance] onAvailableEgressRegions:regions];
+    });
+}
+
+- (void)updateRegionButton {
+    Region *selectedRegion = [[RegionAdapter sharedInstance] getSelectedRegion];
+    UIImage *flag = [[PsiphonClientCommonLibraryHelpers imageFromCommonLibraryNamed:selectedRegion.flagResourceId] countryFlag];
+    [regionButton setImage:flag forState:UIControlStateNormal];
+}
+
+- (void)updateRegionLabel {
+    Region *selectedRegion = [[RegionAdapter sharedInstance] getSelectedRegion];
+    NSString *serverRegionText = NSLocalizedString(@"Server region", @"Title which is displayed beside the flag of the country which the user has chosen to connect to.");
+    NSString *regionText = [[RegionAdapter sharedInstance] getLocalizedRegionTitle:selectedRegion.code];
+    regionLabel.text = [serverRegionText stringByAppendingString:[NSString stringWithFormat:@":\n%@", regionText]];
 }
 
 @end

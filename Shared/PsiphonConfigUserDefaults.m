@@ -17,7 +17,11 @@
  *
  */
 
+
 #import "PsiphonConfigUserDefaults.h"
+#import "PsiphonSettingsViewController.h"
+#import "UpstreamProxySettings.h"
+#import "SharedConstants.h"
 
 
 @implementation PsiphonConfigUserDefaults {
@@ -25,6 +29,15 @@
 }
 
 #pragma mark - Public methods
+
++ (instancetype)sharedInstance {
+	static dispatch_once_t once;
+	static id sharedInstance;
+	dispatch_once(&once, ^{
+		sharedInstance = [[self alloc] initWithSuiteName:APP_GROUP_IDENTIFIER];
+	});
+	return sharedInstance;
+}
 
 - (instancetype)initWithSuiteName:(NSString *)suiteName {
     self = [super init];
@@ -43,11 +56,31 @@
 }
 
 - (NSDictionary *)dictionaryRepresentation {
+    NSArray *disableTimeoutsKeys = @[@"TunnelConnectTimeoutSeconds",
+                                     @"TunnelPortForwardDialTimeoutSeconds",
+                                     @"TunnelSshKeepAliveProbeTimeoutSeconds",
+                                     @"TunnelSshKeepAlivePeriodicTimeoutSeconds",
+                                     @"FetchRemoteServerListTimeoutSeconds",
+                                     @"PsiphonApiServerTimeoutSeconds",
+                                     @"FetchRoutesTimeoutSeconds",
+                                     @"HttpProxyOriginServerTimeoutSeconds"];
+
     NSMutableDictionary *userConfigs = [[NSMutableDictionary alloc] init];
 
     NSString *egressRegion = [userDefaults stringForKey:PSIPHON_CONFIG_EGRESS_REGION];
     if (egressRegion) {
-        [userConfigs setValue:egressRegion forKey:PSIPHON_CONFIG_EGRESS_REGION];
+        [userConfigs setObject:egressRegion forKey:PSIPHON_CONFIG_EGRESS_REGION];
+    }
+
+    if ([userDefaults boolForKey:kDisableTimeouts]) {
+        for (NSString *key in disableTimeoutsKeys) {
+            [userConfigs setObject:@(0) forKey:key];
+        }
+    }
+
+    NSString *upstreamProxyUrl = [userDefaults stringForKey:PSIPHON_CONFIG_UPSTREAM_PROXY_URL];
+    if (upstreamProxyUrl) {
+        [userConfigs setObject:upstreamProxyUrl forKey:PSIPHON_CONFIG_UPSTREAM_PROXY_URL];
     }
 
     return userConfigs;

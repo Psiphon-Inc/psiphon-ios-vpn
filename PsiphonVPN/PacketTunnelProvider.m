@@ -23,10 +23,10 @@
 #import <NetworkExtension/NEDNSSettings.h>
 #import <NetworkExtension/NEPacketTunnelFlow.h>
 #import "PacketTunnelProvider.h"
+#import "PsiphonConfigUserDefaults.h"
 #import "PsiphonDataSharedDB.h"
 #import "SharedConstants.h"
 #import "Notifier.h"
-#import "PsiphonConfigUserDefaults.h"
 
 static const double kDefaultLogTruncationInterval = 12 * 60 * 60; // 12 hours
 
@@ -280,6 +280,13 @@ static const double kDefaultLogTruncationInterval = 12 * 60 * 60; // 12 hours
         }
     }
     [handshakeHomepages addObject:url];
+}
+
+- (void)onAvailableEgressRegions:(NSArray *)regions {
+	[sharedDB insertNewEgressRegions:regions];
+
+	// Notify container
+	[notifier post:@"NE.onAvailableEgressRegions"];
 }
 
 @end

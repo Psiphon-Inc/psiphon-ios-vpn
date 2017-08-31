@@ -17,10 +17,10 @@
  *
  */
 
-#import "PsiphonData.h"
 #import "PsiphonDataSharedDB.h"
 #import "FMDB.h"
 
+#define MAX_LOG_LINES 250
 #define SHARED_DATABASE_NAME @"psiphon_data_archive.db"
 
 // Log Table
@@ -35,6 +35,12 @@
 #define COLUMN_HOMEPAGE_ID @"_ID"
 #define COLUMN_HOMEPAGE_URL @"url"
 #define COLUMN_HOMEPAGE_TIMESTAMP @"timestamp"
+
+// Egress Regions Table
+#define TABLE_NAME_EGRESS_REGIONS @"egress_regions"
+#define COLUMN_EGRESS_REGIONS_ID @"_ID"
+#define COLUMN_EGRESS_REGIONS_REGION_NAME @"url"
+#define COLUMN_EGRESS_REGIONS_TIMESTAMP @"timestamp"
 
 @implementation Homepage
 @end
@@ -60,8 +66,7 @@
     self = [super init];
     if (self) {
         appGroupIdentifier = identifier;
-        databasePath = [[[NSFileManager defaultManager]
-          containerURLForSecurityApplicationGroupIdentifier:appGroupIdentifier] path];
+        databasePath = [[[NSFileManager defaultManager] containerURLForSecurityApplicationGroupIdentifier:appGroupIdentifier] path];
 
         lastLogRowId = -1;
         lastLogRowIdLock = [[NSLock alloc] init];
@@ -82,10 +87,15 @@
         COLUMN_LOG_IS_DIAGNOSTIC " BOOLEAN DEFAULT 0, "
         COLUMN_LOG_TIMESTAMP " TIMESTAMP DEFAULT CURRENT_TIMESTAMP);"
 
-       "CREATE TABLE IF NOT EXISTS " TABLE_NAME_HOMEPAGE " ("
+        "CREATE TABLE IF NOT EXISTS " TABLE_NAME_HOMEPAGE " ("
         COLUMN_HOMEPAGE_ID " INTEGER PRIMARY KEY AUTOINCREMENT, "
         COLUMN_HOMEPAGE_URL " TEXT NOT NULL, "
-        COLUMN_HOMEPAGE_TIMESTAMP " TIMESTAMP DEFAULT CURRENT_TIMESTAMP);";
+        COLUMN_HOMEPAGE_TIMESTAMP " TIMESTAMP DEFAULT CURRENT_TIMESTAMP);"
+
+        "CREATE TABLE IF NOT EXISTS " TABLE_NAME_EGRESS_REGIONS " ("
+        COLUMN_EGRESS_REGIONS_ID " INTEGER PRIMARY KEY AUTOINCREMENT, "
+        COLUMN_EGRESS_REGIONS_REGION_NAME " TEXT NOT NULL, "
+        COLUMN_EGRESS_REGIONS_TIMESTAMP " TIMESTAMP DEFAULT CURRENT_TIMESTAMP);";
 
     NSLog(TAG @"Create DATABASE");
     
@@ -173,6 +183,57 @@
     return homepages;
 }
 
+#pragma mark - Egress Regions Table methods
+
+/*!
+ * @brief Deletes previous set of regions, then inserts new set of regions.
+ * @param regions
+ * @return TRUE on success.
+ */
+// TODO: is timestamp needed? Maybe we can use this to detect staleness later
+- (BOOL)insertNewEgressRegions:(NSArray<NSString *> *)regions {
+    __block BOOL success = FALSE;
+    [q inTransaction:^(FMDatabase *db, BOOL *rollback) {
+        success = [db executeUpdate:@"DELETE FROM " TABLE_NAME_EGRESS_REGIONS " ;"];
+
+        for (NSString *region in regions) {
+            success |= [db executeUpdate:
+                        @"INSERT INTO " TABLE_NAME_EGRESS_REGIONS " (" COLUMN_EGRESS_REGIONS_REGION_NAME ") VALUES (?)", region, nil];
+        }
+
+        if (!success) {
+            NSLog(TAG @"insertNewEgressRegions: rolling back, error %@", [db lastError]);
+            *rollback = TRUE;
+            return;
+        }
+    }];
+
+    return success;
+}
+
+/*!
+ * @return NSArray of region codes.
+ */
+- (NSArray<NSString *> *)getAllEgressRegions {
+    NSMutableArray<NSString *> *regions = [[NSMutableArray alloc] init];
+
+    [q inDatabase:^(FMDatabase *db) {
+        FMResultSet *rs = [db executeQuery:@"SELECT * FROM " TABLE_NAME_EGRESS_REGIONS];
+
+        if (rs == nil) {
+            NSLog(TAG @"getAllEgressRegions: error %@", [db lastError]);
+            return;
+        }
+
+        while ([rs next]) {
+            NSString *region = [rs stringForColumn:COLUMN_EGRESS_REGIONS_REGION_NAME];
+            [regions addObject:region];
+        }
+    }];
+
+    return regions;
+}
+
 #pragma mark - Log Table methods
 
 - (BOOL)insertDiagnosticMessage:(NSString*)message {
@@ -198,10 +259,10 @@
         [logTruncateTimer invalidate];
     }
     logTruncateTimer = [NSTimer scheduledTimerWithTimeInterval:interval
-                                     target:self
-                                   selector:@selector(truncateLogs)
-                                   userInfo:nil
-                                    repeats:YES];
+                                                        target:self
+                                                      selector:@selector(truncateLogs)
+                                                      userInfo:nil
+                                                       repeats:YES];
 
     // trigger timer to truncate logs immediately
     [logTruncateTimer fire];
@@ -214,10 +275,10 @@
     [q inDatabase:^(FMDatabase *db) {
         NSError *err;
         success = [db executeUpdate:
-          @"DELETE FROM " TABLE_NAME_LOG
-          " WHERE " COLUMN_LOG_ID " NOT IN "
-          "(SELECT " COLUMN_LOG_ID " FROM " TABLE_NAME_LOG " ORDER BY " COLUMN_LOG_ID " DESC LIMIT (?));"
-          withErrorAndBindings:&err, @MAX_LOG_LINES, nil];
+                   @"DELETE FROM " TABLE_NAME_LOG
+                   " WHERE " COLUMN_LOG_ID " NOT IN "
+                   "(SELECT " COLUMN_LOG_ID " FROM " TABLE_NAME_LOG " ORDER BY " COLUMN_LOG_ID " DESC LIMIT (?));"
+               withErrorAndBindings:&err, @MAX_LOG_LINES, nil];
 
         if (!success) {
             NSLog(TAG @"truncateLogs: error %@", err);
@@ -228,6 +289,7 @@
     return success;
 }
 
+#ifndef TARGET_IS_EXTENSION
 - (NSArray<DiagnosticEntry*>*)getAllLogs {
     return [self getLogsNewerThanId:-1];
 }
@@ -245,8 +307,7 @@
         return nil;
     }
     [q inDatabase:^(FMDatabase *db) {
-        FMResultSet *rs = [db executeQuery:
-          @"SELECT * FROM log WHERE _ID > (?);", @(lastId), nil];
+        FMResultSet *rs = [db executeQuery:@"SELECT * FROM log WHERE _ID > (?);", @(lastId), nil];
 
         if (rs == nil) {
             NSLog(TAG @"getLogsNewerThanId: error %@", [db lastError]);
@@ -258,7 +319,7 @@
             
             NSString *timestamp = [rs stringForColumn:COLUMN_LOG_TIMESTAMP];
             NSString *json = [rs stringForColumn:COLUMN_LOG_LOGJSON];
-//          BOOL isDiagnostic = [rs boolForColumn:COLUMN_LOG_IS_DIAGNOSTIC]; // TODO
+            //BOOL isDiagnostic = [rs boolForColumn:COLUMN_LOG_IS_DIAGNOSTIC]; // TODO
 
             DiagnosticEntry *d = [[DiagnosticEntry alloc] init:json andTimestamp:timestamp];
             [logs addObject:d];
@@ -268,5 +329,6 @@
     
     return logs;
 }
+#endif
 
 @end

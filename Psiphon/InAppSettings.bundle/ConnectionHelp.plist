@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>StringsTable</key>
+	<string>Root</string>
+	<key>PreferenceSpecifiers</key>
+	<array>
+		<dict>
+			<key>Type</key>
+			<string>PSGroupSpecifier</string>
+			<key>FooterText</key>
+			<string>Changing your region to Best Performance increases your chances of getting connected.</string>
+		</dict>
+		<dict>
+			<key>Title</key>
+			<string>Change Region</string>
+			<key>Key</key>
+			<string>regionSelection</string>
+			<key>Type</key>
+			<string>IASKCustomViewSpecifier</string>
+			<key>DefaultValue</key>
+			<string></string>
+		</dict>
+		<dict>
+			<key>Type</key>
+			<string>PSGroupSpecifier</string>
+			<key>FooterText</key>
+			<string>Disabling timeouts may help you stay connected on slower networks.</string>
+		</dict>
+		<dict>
+			<key>DefaultValue</key>
+			<false/>
+			<key>Key</key>
+			<string>disableTimeouts</string>
+			<key>Title</key>
+			<string>Disable Timeouts</string>
+			<key>Type</key>
+			<string>PSToggleSwitchSpecifier</string>
+		</dict>
+		<dict>
+			<key>Type</key>
+			<string>PSGroupSpecifier</string>
+			<key>FooterText</key>
+			<string>Reconnecting to the Psiphon server may help if your current connection is slow or non-responsive.</string>
+		</dict>
+		<dict>
+			<key>Key</key>
+			<string>forceReconnect</string>
+			<key>Title</key>
+			<string>Reconnect to the Psiphon server</string>
+			<key>Type</key>
+			<string>IASKButtonSpecifier</string>
+		</dict>
+	</array>
+</dict>
+</plist>
