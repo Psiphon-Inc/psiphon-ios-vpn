@@ -100,7 +100,7 @@ static const double kDefaultLogTruncationInterval = 12 * 60 * 60; // 12 hours
     } else {
         // TODO: localize the following string
         [self displayMessage:
-            NSLocalizedString(@"To connect, use the Psiphon application.", @"Alert message informing user they have to open the app")
+            NSLocalizedStringWithDefaultValue(@"USE_PSIPHON_APP", nil, [NSBundle mainBundle], @"To connect, use the Psiphon application.", @"Alert message informing user they have to open the app")
           completionHandler:^(BOOL success) {
 //               TODO: error handling?
           }];

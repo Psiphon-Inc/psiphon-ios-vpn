@@ -70,7 +70,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     BOOL shownHomepage;
     BOOL restartRequired;
     BOOL canStartTunnel;
-    
+
     // UI Constraint
     NSLayoutConstraint *startButtonScreenWidth;
     NSLayoutConstraint *startButtonScreenHeight;
@@ -95,7 +95,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
         self.targetManager = [NEVPNManager sharedManager];
 
         sharedDB = [[PsiphonDataSharedDB alloc] initForAppGroupIdentifier:APP_GROUP_IDENTIFIER];
-        
+
         // Notifier
         notifier = [[Notifier alloc] initWithAppGroupIdentifier:APP_GROUP_IDENTIFIER];
 
@@ -118,7 +118,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    
+
     // TODO: check if database exists first
     BOOL success = [sharedDB createDatabase];
     if (!success) {
@@ -139,13 +139,13 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     [self addRegionLabel];
     [self addAdLabel];
     [self addVersionLabel];
-    
+
     // Load previous NETunnelProviderManager, if any.
     [NETunnelProviderManager loadAllFromPreferencesWithCompletionHandler:^(NSArray<NETunnelProviderManager *> * _Nullable managers, NSError * _Nullable error) {
         if (managers == nil) {
             return;
         }
-        
+
         // TODO: should we do error checking here, or on call to startVPN only?
         if ([managers count] == 1) {
             self.targetManager = managers[0];
@@ -157,12 +157,12 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
             [self initializeAds];
         }
     }];
-    
+
     // TODO: load/save config here to have the user immediately complete the permission prompt
-    
+
     // TODO: perhaps this should be done through the AppDelegate
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationWillResignActive) name:UIApplicationWillResignActiveNotification object:nil];
-    
+
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidBecomeActive) name:UIApplicationDidBecomeActiveNotification object:nil];
 }
 
@@ -176,7 +176,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 
 - (void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
-    
+
     // Stop watching for status change notifications.
     [[NSNotificationCenter defaultCenter] removeObserver:self name:NEVPNStatusDidChangeNotification object:self.targetManager.connection];
 }
@@ -207,7 +207,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     [self.view addConstraint:startButtonWidth];
     [coordinator animateAlongsideTransition:nil completion:^(id<UIViewControllerTransitionCoordinatorContext> context) {
     }];
-    
+
     [super viewWillTransitionToSize:size withTransitionCoordinator:coordinator];
 }
 
@@ -253,11 +253,11 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     [self resetAppState];
 
     [NETunnelProviderManager loadAllFromPreferencesWithCompletionHandler:^(NSArray<NETunnelProviderManager *> * _Nullable allManagers, NSError * _Nullable error) {
-        
+
         if (allManagers == nil) {
             return;
         }
-        
+
         // If there are no configurations, create one
         // if there is more than one, abort!
         if ([allManagers count] == 0) {
@@ -272,12 +272,12 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
             NSLog(@"startVPN: %lu VPN configurations found, only expected 1. Aborting", (unsigned long)[allManagers count]);
             return;
         }
-        
+
         // setEnabled becomes false if the user changes the
         // enabled VPN Configuration from the prefrences.
         [self.targetManager setEnabled:TRUE];
-        
-        
+
+
         NSLog(@"startVPN: call saveToPreferencesWithCompletionHandler");
 
         [self.targetManager saveToPreferencesWithCompletionHandler:^(NSError * _Nullable error) {
@@ -287,7 +287,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                 NSLog(@"startVPN: failed to save the configuration: %@", error);
                 return;
             }
-            
+
             [self.targetManager loadFromPreferencesWithCompletionHandler:^(NSError * _Nullable error) {
                 if (error != nil) {
                     NSLog(@"startVPN: second loadFromPreferences failed");
@@ -303,7 +303,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                 if (!vpnStartSuccess) {
                     NSLog(@"startVPN: startVPNTunnel failed: %@", vpnStartError);
                 }
-                
+
                 NSLog(@"startVPN: startVPNTunnel success");
             }];
         }];
@@ -349,7 +349,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 - (void)setTargetManager:(NEVPNManager *)targetManager {
     _targetManager = targetManager;
     statusLabel.text = [self getVPNStatusDescription];
-    
+
     // Listening for NEVPNStatusDidChangeNotification
     [[NSNotificationCenter defaultCenter] addObserverForName:NEVPNStatusDidChangeNotification
       object:_targetManager.connection queue:NSOperationQueue.mainQueue
@@ -392,12 +392,12 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
  */
 - (NSString *)getVPNStatusDescription {
     switch(self.targetManager.connection.status) {
-        case NEVPNStatusDisconnected: return @"Disconnected";
-        case NEVPNStatusInvalid: return @"Invalid";
-        case NEVPNStatusConnected: return @"Connected";
-        case NEVPNStatusConnecting: return @"Connecting";
-        case NEVPNStatusDisconnecting: return @"Disconnecting";
-        case NEVPNStatusReasserting: return @"Reconnecting";
+        case NEVPNStatusDisconnected: return NSLocalizedStringWithDefaultValue(@"VPN_STATUS_DISCONNECTED", nil, [NSBundle mainBundle], @"Disconnected", @"Status when the VPN is not connected to a Psiphon server, not trying to connect, and not in an error state");
+        case NEVPNStatusInvalid: return NSLocalizedStringWithDefaultValue(@"VPN_STATUS_INVALID", nil, [NSBundle mainBundle], @"Invalid", @"Status when the VPN is in an invalid state. For example, if the user doesn't give permission for the VPN configuration to be installed, and therefore the Psiphon VPN can't even try to connect.");
+        case NEVPNStatusConnected: return NSLocalizedStringWithDefaultValue(@"VPN_STATUS_CONNECTED", nil, [NSBundle mainBundle], @"Connected", @"Status when the VPN is connected to a Psiphon server");
+        case NEVPNStatusConnecting: return NSLocalizedStringWithDefaultValue(@"VPN_STATUS_CONNECTING", nil, [NSBundle mainBundle], @"Connecting", @"Status when the VPN is connecting; that is, trying to connect to a Psiphon server");
+        case NEVPNStatusDisconnecting: return NSLocalizedStringWithDefaultValue(@"VPN_STATUS_DISCONNECTING", nil, [NSBundle mainBundle], @"Disconnecting", @"Status when the VPN is disconnecting. Sometimes going from connected to disconnected can take some time, and this is that state.");
+        case NEVPNStatusReasserting: return NSLocalizedStringWithDefaultValue(@"VPN_STATUS_RECONNECTING", nil, [NSBundle mainBundle], @"Reconnecting", @"Status when the VPN was connected to a Psiphon server, got disconnected unexpectedly, and is currently trying to reconnect");
     }
     return nil;
 }
@@ -457,7 +457,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 - (void)addStartAndStopButton {
     UIImage *stopButtonImage = [UIImage imageNamed:@"StopButton"];
     UIImage *startButtonImage = [UIImage imageNamed:@"StartButton"];
-    
+
     startStopButton = [UIButton buttonWithType:UIButtonTypeCustom];
     startStopButton.translatesAutoresizingMaskIntoConstraints = NO;
     startStopButton.contentHorizontalAlignment = UIControlContentHorizontalAlignmentFill;
@@ -465,10 +465,10 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 
     [startStopButton setImage:startButtonImage forState:UIControlStateNormal];
     [startStopButton setImage:stopButtonImage forState:UIControlStateSelected];
-    
+
     [startStopButton addTarget:self action:@selector(onStartStopTap:) forControlEvents:UIControlEventTouchUpInside];
     [self.view addSubview:startStopButton];
-    
+
     // Setup autolayout
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:startStopButton
                                                           attribute:NSLayoutAttributeCenterY
@@ -477,7 +477,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                                                           attribute:NSLayoutAttributeCenterY
                                                          multiplier:1.0
                                                            constant:0]];
-    
+
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:startStopButton
                                                           attribute:NSLayoutAttributeCenterX
                                                           relatedBy:NSLayoutRelationEqual
@@ -485,7 +485,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                                                           attribute:NSLayoutAttributeCenterX
                                                          multiplier:1.0
                                                            constant:0]];
-    
+
     startButtonScreenHeight = [NSLayoutConstraint constraintWithItem:startStopButton
                                                            attribute:NSLayoutAttributeHeight
                                                            relatedBy:NSLayoutRelationEqual
@@ -493,7 +493,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                                                            attribute:NSLayoutAttributeHeight
                                                           multiplier:0.5f
                                                             constant:0];
-    
+
     startButtonScreenWidth = [NSLayoutConstraint constraintWithItem:startStopButton
                                                           attribute:NSLayoutAttributeWidth
                                                           relatedBy:NSLayoutRelationEqual
@@ -501,7 +501,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                                                           attribute:NSLayoutAttributeWidth
                                                          multiplier:0.5f
                                                            constant:0];
-    
+
     startButtonWidth = [NSLayoutConstraint constraintWithItem:startStopButton
                                                     attribute:NSLayoutAttributeHeight
                                                     relatedBy:NSLayoutRelationEqual
@@ -509,15 +509,15 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                                                     attribute:NSLayoutAttributeWidth
                                                    multiplier:1.0
                                                      constant:0];
-    
+
     CGSize viewSize = self.view.bounds.size;
-    
+
     if (viewSize.width > viewSize.height) {
         [self.view addConstraint:startButtonScreenHeight];
     } else {
         [self.view addConstraint:startButtonScreenWidth];
     }
-    
+
     [self.view addConstraint:startButtonWidth];
 }
 
@@ -528,7 +528,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     statusLabel.text = @"...";
     statusLabel.textAlignment = NSTextAlignmentCenter;
     [self.view addSubview:statusLabel];
-    
+
     // Setup autolayout
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:statusLabel
                                                           attribute:NSLayoutAttributeBottom
@@ -537,7 +537,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                                                           attribute:NSLayoutAttributeTop
                                                          multiplier:1.0
                                                            constant:-30.0]];
-    
+
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:statusLabel
                                                           attribute:NSLayoutAttributeLeft
                                                           relatedBy:NSLayoutRelationEqual
@@ -545,7 +545,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                                                           attribute:NSLayoutAttributeLeft
                                                          multiplier:1.0
                                                            constant:15.0]];
-    
+
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:statusLabel
                                                           attribute:NSLayoutAttributeRight
                                                           relatedBy:NSLayoutRelationEqual
@@ -639,7 +639,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     versionLabel = [[UILabel alloc] init];
     versionLabel.translatesAutoresizingMaskIntoConstraints = NO;
     versionLabel.adjustsFontSizeToFitWidth = YES;
-    versionLabel.text = [NSString stringWithFormat:@"Version %@",[[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"]];
+    versionLabel.text = [NSString stringWithFormat:NSLocalizedStringWithDefaultValue(@"APP_VERSION", nil, [NSBundle mainBundle], @"Version %@", @"Text showing the app version. The '%@' placeholder is the version number. So it will look like 'Version 2'."),[[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"]];
     ;
     versionLabel.userInteractionEnabled = YES;
 
@@ -671,7 +671,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 - (void)addAdLabel {
     adLabel = [[UILabel alloc] init];
     adLabel.translatesAutoresizingMaskIntoConstraints = NO;
-    adLabel.text = @"Ad Loaded";
+    adLabel.text = NSLocalizedStringWithDefaultValue(@"AD_LOADED", nil, [NSBundle mainBundle], @"Ad Loaded", @"Text for button that plays the main screen ad");
     adLabel.textAlignment = NSTextAlignmentCenter;
     [self.view addSubview:adLabel];
     adLabel.hidden = true;
@@ -893,7 +893,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     selectedRegionSnapShot = [[RegionAdapter sharedInstance] getSelectedRegion].code;
     RegionSelectionViewController *regionSelectionViewController = [[RegionSelectionViewController alloc] init];
     regionSelectionNavController = [[UINavigationController alloc] initWithRootViewController:regionSelectionViewController];
-    UIBarButtonItem *doneButton = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Done", @"Title of the button that dismisses region selection dialog")
+    UIBarButtonItem *doneButton = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedStringWithDefaultValue(@"DONE_ACTION", nil, [NSBundle mainBundle], @"Done", @"Title of the button that dismisses region selection dialog")
                                                                    style:UIBarButtonItemStyleDone target:self
                                                                   action:@selector(regionSelectionDidEnd)];
     regionSelectionViewController.navigationItem.rightBarButtonItem = doneButton;
@@ -928,7 +928,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 
 - (void)updateRegionLabel {
     Region *selectedRegion = [[RegionAdapter sharedInstance] getSelectedRegion];
-    NSString *serverRegionText = NSLocalizedString(@"Server region", @"Title which is displayed beside the flag of the country which the user has chosen to connect to.");
+    NSString *serverRegionText = NSLocalizedStringWithDefaultValue(@"SERVER_REGION", nil, [NSBundle mainBundle], @"Server region", @"Title which is displayed beside the flag of the country which the user has chosen to connect to.");
     NSString *regionText = [[RegionAdapter sharedInstance] getLocalizedRegionTitle:selectedRegion.code];
     regionLabel.text = [serverRegionText stringByAppendingString:[NSString stringWithFormat:@":\n%@", regionText]];
 }
