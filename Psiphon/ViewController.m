@@ -893,7 +893,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     selectedRegionSnapShot = [[RegionAdapter sharedInstance] getSelectedRegion].code;
     RegionSelectionViewController *regionSelectionViewController = [[RegionSelectionViewController alloc] init];
     regionSelectionNavController = [[UINavigationController alloc] initWithRootViewController:regionSelectionViewController];
-    UIBarButtonItem *doneButton = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Done", @"Title of the button that dismisses region selection dialog")
+    UIBarButtonItem *doneButton = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedStringWithDefaultValue(@"DONE_ACTION", nil, [NSBundle mainBundle], @"Done", @"Title of the button that dismisses region selection dialog")
                                                                    style:UIBarButtonItemStyleDone target:self
                                                                   action:@selector(regionSelectionDidEnd)];
     regionSelectionViewController.navigationItem.rightBarButtonItem = doneButton;
@@ -928,7 +928,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 
 - (void)updateRegionLabel {
     Region *selectedRegion = [[RegionAdapter sharedInstance] getSelectedRegion];
-    NSString *serverRegionText = NSLocalizedString(@"Server region", @"Title which is displayed beside the flag of the country which the user has chosen to connect to.");
+    NSString *serverRegionText = NSLocalizedStringWithDefaultValue(@"SERVER_REGION", nil, [NSBundle mainBundle], @"Server region", @"Title which is displayed beside the flag of the country which the user has chosen to connect to.");
     NSString *regionText = [[RegionAdapter sharedInstance] getLocalizedRegionTitle:selectedRegion.code];
     regionLabel.text = [serverRegionText stringByAppendingString:[NSString stringWithFormat:@":\n%@", regionText]];
 }
