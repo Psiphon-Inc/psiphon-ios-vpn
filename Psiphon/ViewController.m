@@ -68,7 +68,7 @@
         self.targetManager = [NEVPNManager sharedManager];
 
         sharedDB = [[PsiphonDataSharedDB alloc] initForAppGroupIdentifier:APP_GROUP_IDENTIFIER];
-        
+
         // Notifier
         notifier = [[Notifier alloc] initWithAppGroupIdentifier:APP_GROUP_IDENTIFIER];
 
@@ -91,7 +91,7 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    
+
     // TODO: check if database exists first
     BOOL success = [sharedDB createDatabase];
     if (!success) {
@@ -114,7 +114,7 @@
         if (managers == nil) {
             return;
         }
-        
+
         // TODO: should we do error checking here, or on call to startVPN only?
         if ([managers count] == 1) {
             self.targetManager = managers[0];
@@ -122,18 +122,18 @@
             [self initializeAds];
         }
     }];
-    
+
     // TODO: load/save config here to have the user immediately complete the permission prompt
-    
+
     // TODO: perhaps this should be done through the AppDelegate
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationWillResignActive) name:UIApplicationWillResignActiveNotification object:nil];
-    
+
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidBecomeActive) name:UIApplicationDidBecomeActiveNotification object:nil];
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
-    
+
     // Stop watching for status change notifications.
     [[NSNotificationCenter defaultCenter] removeObserver:self name:NEVPNStatusDidChangeNotification object:self.targetManager.connection];
 }
@@ -162,7 +162,7 @@
 
 - (void)onRegionTap:(UIButton *)sender {
     if ([psiphonConfigUserDefaults setEgressRegion:@""]) {
-        
+
     }
     [self restartVPN];
 }
@@ -189,11 +189,11 @@
     [self resetAppState];
 
     [NETunnelProviderManager loadAllFromPreferencesWithCompletionHandler:^(NSArray<NETunnelProviderManager *> * _Nullable allManagers, NSError * _Nullable error) {
-        
+
         if (allManagers == nil) {
             return;
         }
-        
+
         // If there are no configurations, create one
         // if there is more than one, abort!
         if ([allManagers count] == 0) {
@@ -208,12 +208,12 @@
             NSLog(@"startVPN: %lu VPN configurations found, only expected 1. Aborting", (unsigned long)[allManagers count]);
             return;
         }
-        
+
         // setEnabled becomes false if the user changes the
         // enabled VPN Configuration from the prefrences.
         [self.targetManager setEnabled:TRUE];
-        
-        
+
+
         NSLog(@"startVPN: call saveToPreferencesWithCompletionHandler");
 
         [self.targetManager saveToPreferencesWithCompletionHandler:^(NSError * _Nullable error) {
@@ -223,7 +223,7 @@
                 NSLog(@"startVPN: failed to save the configuration: %@", error);
                 return;
             }
-            
+
             [self.targetManager loadFromPreferencesWithCompletionHandler:^(NSError * _Nullable error) {
                 if (error != nil) {
                     NSLog(@"startVPN: second loadFromPreferences failed");
@@ -239,7 +239,7 @@
                 if (!vpnStartSuccess) {
                     NSLog(@"startVPN: startVPNTunnel failed: %@", vpnStartError);
                 }
-                
+
                 NSLog(@"startVPN: startVPNTunnel success");
             }];
         }];
@@ -283,7 +283,7 @@
 - (void)setTargetManager:(NEVPNManager *)targetManager {
     _targetManager = targetManager;
     statusLabel.text = [self getVPNStatusDescription];
-    
+
     // Listening for NEVPNStatusDidChangeNotification
     [[NSNotificationCenter defaultCenter] addObserverForName:NEVPNStatusDidChangeNotification
       object:_targetManager.connection queue:NSOperationQueue.mainQueue
@@ -313,12 +313,12 @@
  */
 - (NSString *)getVPNStatusDescription {
     switch(self.targetManager.connection.status) {
-        case NEVPNStatusDisconnected: return @"Disconnected";
-        case NEVPNStatusInvalid: return @"Invalid";
-        case NEVPNStatusConnected: return @"Connected";
-        case NEVPNStatusConnecting: return @"Connecting";
-        case NEVPNStatusDisconnecting: return @"Disconnecting";
-        case NEVPNStatusReasserting: return @"Reconnecting";
+        case NEVPNStatusDisconnected: return NSLocalizedStringWithDefaultValue(@"VPN_STATUS_DISCONNECTED", nil, [NSBundle mainBundle], @"Disconnected", @"Status when the VPN is not connected to a Psiphon server, not trying to connect, and not in an error state");
+        case NEVPNStatusInvalid: return NSLocalizedStringWithDefaultValue(@"VPN_STATUS_INVALID", nil, [NSBundle mainBundle], @"Invalid", @"Status when the VPN is in an invalid state. For example, if the user doesn't give permission for the VPN configuration to be installed, and therefore the Psiphon VPN can't even try to connect.");
+        case NEVPNStatusConnected: return NSLocalizedStringWithDefaultValue(@"VPN_STATUS_CONNECTED", nil, [NSBundle mainBundle], @"Connected", @"Status when the VPN is connected to a Psiphon server");
+        case NEVPNStatusConnecting: return NSLocalizedStringWithDefaultValue(@"VPN_STATUS_CONNECTING", nil, [NSBundle mainBundle], @"Connecting", @"Status when the VPN is connecting; that is, trying to connect to a Psiphon server");
+        case NEVPNStatusDisconnecting: return NSLocalizedStringWithDefaultValue(@"VPN_STATUS_DISCONNECTING", nil, [NSBundle mainBundle], @"Disconnecting", @"Status when the VPN is disconnecting. Sometimes going from connected to disconnected can take some time, and this is that state.");
+        case NEVPNStatusReasserting: return NSLocalizedStringWithDefaultValue(@"VPN_STATUS_RECONNECTING", nil, [NSBundle mainBundle], @"Reconnecting", @"Status when the VPN was connected to a Psiphon server, got disconnected unexpectedly, and is currently trying to reconnect");
     }
     return nil;
 }
@@ -339,7 +339,7 @@
     toggleLabel.translatesAutoresizingMaskIntoConstraints = NO;
 
     [self.view addSubview:toggleLabel];
-    
+
     // Setup autolayout
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:toggleLabel
                                                           attribute:NSLayoutAttributeLeft
@@ -348,7 +348,7 @@
                                                           attribute:NSLayoutAttributeLeft
                                                          multiplier:1.0
                                                            constant:15.0]];
-    
+
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:toggleLabel
                                                           attribute:NSLayoutAttributeTop
                                                           relatedBy:NSLayoutRelationEqual
@@ -365,7 +365,7 @@
     [startStopToggle addTarget:self action:@selector(onSwitch:) forControlEvents:UIControlEventValueChanged];
 
     [self.view addSubview:startStopToggle];
-    
+
     // Setup autolayout
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:startStopToggle
                                                           attribute:NSLayoutAttributeLeft
@@ -374,7 +374,7 @@
                                                           attribute:NSLayoutAttributeRight
                                                          multiplier:1.0
                                                            constant:30.0]];
-    
+
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:startStopToggle
                                                           attribute:NSLayoutAttributeCenterY
                                                           relatedBy:NSLayoutRelationEqual
@@ -390,7 +390,7 @@
     statusLabel.adjustsFontSizeToFitWidth = YES;
     statusLabel.text = @"...";
     [self.view addSubview:statusLabel];
-    
+
     // Setup autolayout
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:statusLabel
                                                           attribute:NSLayoutAttributeTop
@@ -399,7 +399,7 @@
                                                           attribute:NSLayoutAttributeBottom
                                                          multiplier:1.0
                                                            constant:15.0]];
-    
+
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:statusLabel
                                                           attribute:NSLayoutAttributeLeft
                                                           relatedBy:NSLayoutRelationEqual
@@ -407,7 +407,7 @@
                                                           attribute:NSLayoutAttributeLeft
                                                          multiplier:1.0
                                                            constant:0.0]];
-    
+
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:statusLabel
                                                           attribute:NSLayoutAttributeRight
                                                           relatedBy:NSLayoutRelationEqual
@@ -420,7 +420,7 @@
 - (void)addRegionButton {
     regionButton = [UIButton buttonWithType:UIButtonTypeSystem];
     regionButton.translatesAutoresizingMaskIntoConstraints = NO;
-    [regionButton setTitle:@"Set Region" forState:UIControlStateNormal];
+    [regionButton setTitle:NSLocalizedStringWithDefaultValue(@"SET_REGION_LABEL", nil, [NSBundle mainBundle], @"Set Region", @"Label for the button that changes the server egress region") forState:UIControlStateNormal];
     [regionButton addTarget:self action:@selector(onRegionTap:) forControlEvents:UIControlEventTouchUpInside];
 
     [self.view addSubview:regionButton];
@@ -455,7 +455,7 @@
     versionLabel = [[UILabel alloc] init];
     versionLabel.translatesAutoresizingMaskIntoConstraints = NO;
     versionLabel.adjustsFontSizeToFitWidth = YES;
-    versionLabel.text = [NSString stringWithFormat:@"Version %@",[[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"]];
+    versionLabel.text = [NSString stringWithFormat:NSLocalizedStringWithDefaultValue(@"APP_VERSION", nil, [NSBundle mainBundle], @"Version %@", @"Text showing the app version. The '%@' placeholder is the version number. So it will look like 'Version 2'."),[[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"]];
     ;
     versionLabel.userInteractionEnabled = YES;
 
@@ -487,7 +487,7 @@
 - (void)addAdButton {
     adButton = [UIButton buttonWithType:UIButtonTypeSystem];
     adButton.translatesAutoresizingMaskIntoConstraints = NO;
-    [adButton setTitle:@"Play Ad" forState:UIControlStateNormal];
+    [adButton setTitle:NSLocalizedStringWithDefaultValue(@"PLAY_AD", nil, [NSBundle mainBundle], @"Ad Loaded", @"Text for button that plays the main screen ad") forState:UIControlStateNormal];
     [adButton addTarget:self action:@selector(onAdClick:) forControlEvents:UIControlEventTouchUpInside];
     [self.view addSubview:adButton];
     [adButton setEnabled:false];

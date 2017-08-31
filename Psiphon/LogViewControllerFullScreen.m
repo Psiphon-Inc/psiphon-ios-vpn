@@ -42,7 +42,7 @@
     [super viewDidLoad];
 
     // UIBar
-    [self setTitle:@"Logs"];
+    [self setTitle:NSLocalizedStringWithDefaultValue(@"LOGS_TITLE", nil, [NSBundle mainBundle], @"Logs", @"Log view title bar text")];
     UIBarButtonItem *doneButton = [[UIBarButtonItem alloc]
       initWithTitle:NSLocalizedStringWithDefaultValue(@"DONE_ACTION", nil, [NSBundle mainBundle], @"Done", @"Done button in navigation bar")
       style:UIBarButtonItemStyleDone target:self action:@selector(onNavigationDoneTap)];
