@@ -46,15 +46,22 @@
 
     // UI elements
     UISwitch *startStopToggle;
+    UIButton *startStopButton;
     UILabel *toggleLabel;
     UILabel *statusLabel;
     UIButton *regionButton;
     UILabel *versionLabel;
-    UIButton *adButton;
+    UILabel *adLabel;
 
     // App state variables
     BOOL shownHomepage;
     BOOL restartRequired;
+    BOOL canStartTunnel;
+
+    // UI Constraint
+    NSLayoutConstraint *startButtonScreenWidth;
+    NSLayoutConstraint *startButtonScreenHeight;
+    NSLayoutConstraint *startButtonWidth;
 
     // VPN Config user defaults
     PsiphonConfigUserDefaults *psiphonConfigUserDefaults;
@@ -102,11 +109,10 @@
     [self.view setBackgroundColor:[UIColor whiteColor]];
     //  TODO: wrap this in a function which always
     //  calls them in the right order
-    [self addToggleLabel];
-    [self addStartAndStopToggle];
+    [self addStartAndStopButton];
     [self addStatusLabel];
     [self addRegionButton];
-    [self addAdButton];
+    [self addAdLabel];
     [self addVersionLabel];
 
     // Load previous NETunnelProviderManager, if any.
@@ -118,7 +124,11 @@
         // TODO: should we do error checking here, or on call to startVPN only?
         if ([managers count] == 1) {
             self.targetManager = managers[0];
-            [startStopToggle setOn:[self isVPNActive]];
+            if ([self isVPNActive]){
+                startStopButton.selected = YES;
+            } else {
+                startStopButton.selected = NO;
+            }
             [self initializeAds];
         }
     }];
@@ -149,11 +159,32 @@
     [notifier stopListeningForAllNotifications];
 }
 
+// Reload when rotate
+- (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator {
+    [coordinator animateAlongsideTransition:nil completion:^(id<UIViewControllerTransitionCoordinatorContext> context) {
+         [self.view removeConstraint:startButtonWidth];
+         CGSize viewSize = self.view.bounds.size;
+
+         if (viewSize.width > viewSize.height) {
+             [self.view removeConstraint:startButtonScreenWidth];
+             [self.view addConstraint:startButtonScreenHeight];
+         } else {
+             [self.view removeConstraint:startButtonScreenHeight];
+             [self.view addConstraint:startButtonScreenWidth];
+         }
+
+         [self.view addConstraint:startButtonWidth];
+     }];
+
+    [super viewWillTransitionToSize:size withTransitionCoordinator:coordinator];
+}
+
 #pragma mark - UI callbacks
 
-- (void)onSwitch:(UISwitch *)sender {
+- (void)onStartStopTap:(UIButton *)sender {
     if (![self isVPNActive]) {
-        [self startVPN];
+        [self showUntunneledInterstitial];
+        // Then Start VPN
     } else {
         NSLog(@"call targetManager.connection.stopVPNTunnel()");
         [self.targetManager.connection stopVPNTunnel];
@@ -219,7 +250,7 @@
         [self.targetManager saveToPreferencesWithCompletionHandler:^(NSError * _Nullable error) {
             if (error != nil) {
                 // User denied permission to add VPN Configuration.
-                [startStopToggle setOn:FALSE];
+                startStopButton.selected = NO;
                 NSLog(@"startVPN: failed to save the configuration: %@", error);
                 return;
             }
@@ -289,19 +320,32 @@
       object:_targetManager.connection queue:NSOperationQueue.mainQueue
       usingBlock:^(NSNotification * _Nonnull note) {
 
-          // initializeAds checks restartRequired so call it before resetting restartRequired
-          [self initializeAds];
-
-          if (restartRequired && _targetManager.connection.status == NEVPNStatusDisconnected) {
-              restartRequired = FALSE;
-              dispatch_async(dispatch_get_main_queue(), ^{
-                  [self startVPN];
-              });
+          if (_targetManager.connection.status == NEVPNStatusDisconnected) {
+              if (restartRequired) {
+                  restartRequired = FALSE;
+                  dispatch_async(dispatch_get_main_queue(), ^{
+                      [self startVPN];
+                  });
+              } else {
+                  // The VPN is stopped. Initialize ads after a delay:
+                  //    - to ensure regular untunneled networking is ready
+                  //    - because it's likely the user will be leaving the app, so we don't want to request
+                  //      another ad right away
+                  dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 5 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
+                      [self initializeAds];
+                  });
+              }
+          } else {
+              [self initializeAds];
           }
 
           NSLog(@"received NEVPNStatusDidChangeNotification %@", [self getVPNStatusDescription]);
           statusLabel.text = [self getVPNStatusDescription];
-          [startStopToggle setOn:[self isVPNActive]];
+          if ([self isVPNActive]){
+              startStopButton.selected = YES;
+          } else {
+              startStopButton.selected = NO;
+          }
     }];
 }
 
@@ -333,55 +377,71 @@
       || status == NEVPNStatusReasserting);
 }
 
-- (void)addToggleLabel {
-    toggleLabel = [[UILabel alloc] init];
-    toggleLabel.text = NSLocalizedStringWithDefaultValue(@"RUN_VPN", nil, [NSBundle mainBundle], @"Run Psiphon VPN", @"Label beside toggle button which starts the Psiphon Tunnel");
-    toggleLabel.translatesAutoresizingMaskIntoConstraints = NO;
+- (void)addStartAndStopButton {
+    UIImage *stopButtonImage = [UIImage imageNamed:@"StopButton"];
+    UIImage *startButtonImage = [UIImage imageNamed:@"StartButton"];
 
-    [self.view addSubview:toggleLabel];
+    startStopButton = [UIButton buttonWithType:UIButtonTypeCustom];
+    startStopButton.translatesAutoresizingMaskIntoConstraints = NO;
+    startStopButton.contentHorizontalAlignment = UIControlContentHorizontalAlignmentFill;
+    startStopButton.contentVerticalAlignment = UIControlContentVerticalAlignmentFill;
 
-    // Setup autolayout
-    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:toggleLabel
-                                                          attribute:NSLayoutAttributeLeft
-                                                          relatedBy:NSLayoutRelationEqual
-                                                             toItem:self.view
-                                                          attribute:NSLayoutAttributeLeft
-                                                         multiplier:1.0
-                                                           constant:15.0]];
+    [startStopButton setImage:startButtonImage forState:UIControlStateNormal];
+    [startStopButton setImage:stopButtonImage forState:UIControlStateSelected];
 
-    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:toggleLabel
-                                                          attribute:NSLayoutAttributeTop
-                                                          relatedBy:NSLayoutRelationEqual
-                                                             toItem:self.view
-                                                          attribute:NSLayoutAttributeTop
-                                                         multiplier:1.0
-                                                           constant:200.0]];
-}
-
-- (void)addStartAndStopToggle {
-    startStopToggle = [[UISwitch alloc] init];
-    startStopToggle.transform = CGAffineTransformMakeScale(1.5, 1.5);
-    startStopToggle.translatesAutoresizingMaskIntoConstraints = NO;
-    [startStopToggle addTarget:self action:@selector(onSwitch:) forControlEvents:UIControlEventValueChanged];
-
-    [self.view addSubview:startStopToggle];
+    [startStopButton addTarget:self action:@selector(onStartStopTap:) forControlEvents:UIControlEventTouchUpInside];
+    [self.view addSubview:startStopButton];
 
     // Setup autolayout
-    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:startStopToggle
-                                                          attribute:NSLayoutAttributeLeft
+    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:startStopButton
+                                                          attribute:NSLayoutAttributeCenterY
                                                           relatedBy:NSLayoutRelationEqual
-                                                             toItem:toggleLabel
-                                                          attribute:NSLayoutAttributeRight
+                                                             toItem:self.view
+                                                          attribute:NSLayoutAttributeCenterY
                                                          multiplier:1.0
-                                                           constant:30.0]];
+                                                           constant:0]];
 
-    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:startStopToggle
-                                                          attribute:NSLayoutAttributeCenterY
+    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:startStopButton
+                                                          attribute:NSLayoutAttributeCenterX
                                                           relatedBy:NSLayoutRelationEqual
-                                                             toItem:toggleLabel
-                                                          attribute:NSLayoutAttributeCenterY
+                                                             toItem:self.view
+                                                          attribute:NSLayoutAttributeCenterX
                                                          multiplier:1.0
-                                                           constant:0.0]];
+                                                           constant:0]];
+
+    startButtonScreenHeight = [NSLayoutConstraint constraintWithItem:startStopButton
+                                                     attribute:NSLayoutAttributeHeight
+                                                     relatedBy:NSLayoutRelationEqual
+                                                        toItem:self.view
+                                                     attribute:NSLayoutAttributeHeight
+                                                    multiplier:0.5f
+                                                      constant:0];
+
+    startButtonScreenWidth = [NSLayoutConstraint constraintWithItem:startStopButton
+                                                          attribute:NSLayoutAttributeWidth
+                                                          relatedBy:NSLayoutRelationEqual
+                                                             toItem:self.view
+                                                          attribute:NSLayoutAttributeWidth
+                                                         multiplier:0.5f
+                                                           constant:0];
+
+    startButtonWidth = [NSLayoutConstraint constraintWithItem:startStopButton
+                                                    attribute:NSLayoutAttributeHeight
+                                                    relatedBy:NSLayoutRelationEqual
+                                                       toItem:startStopButton
+                                                    attribute:NSLayoutAttributeWidth
+                                                   multiplier:1.0
+                                                     constant:0];
+
+    CGSize viewSize = self.view.bounds.size;
+
+    if (viewSize.width > viewSize.height) {
+        [self.view addConstraint:startButtonScreenHeight];
+    } else {
+        [self.view addConstraint:startButtonScreenWidth];
+    }
+
+    [self.view addConstraint:startButtonWidth];
 }
 
 - (void)addStatusLabel {
@@ -389,24 +449,25 @@
     statusLabel.translatesAutoresizingMaskIntoConstraints = NO;
     statusLabel.adjustsFontSizeToFitWidth = YES;
     statusLabel.text = @"...";
+    statusLabel.textAlignment = NSTextAlignmentCenter;
     [self.view addSubview:statusLabel];
 
     // Setup autolayout
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:statusLabel
-                                                          attribute:NSLayoutAttributeTop
-                                                          relatedBy:NSLayoutRelationEqual
-                                                             toItem:toggleLabel
                                                           attribute:NSLayoutAttributeBottom
+                                                          relatedBy:NSLayoutRelationEqual
+                                                             toItem:startStopButton
+                                                          attribute:NSLayoutAttributeTop
                                                          multiplier:1.0
-                                                           constant:15.0]];
+                                                           constant:-30.0]];
 
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:statusLabel
                                                           attribute:NSLayoutAttributeLeft
                                                           relatedBy:NSLayoutRelationEqual
-                                                             toItem:toggleLabel
+                                                             toItem:self.view
                                                           attribute:NSLayoutAttributeLeft
                                                          multiplier:1.0
-                                                           constant:0.0]];
+                                                           constant:15.0]];
 
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:statusLabel
                                                           attribute:NSLayoutAttributeRight
@@ -429,18 +490,18 @@
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:regionButton
                                                           attribute:NSLayoutAttributeTop
                                                           relatedBy:NSLayoutRelationEqual
-                                                             toItem:statusLabel
+                                                             toItem:startStopButton
                                                           attribute:NSLayoutAttributeBottom
                                                          multiplier:1.0
-                                                           constant:15.0]];
+                                                           constant:30.0]];
 
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:regionButton
                                                           attribute:NSLayoutAttributeLeft
                                                           relatedBy:NSLayoutRelationEqual
-                                                             toItem:toggleLabel
+                                                             toItem:self.view
                                                           attribute:NSLayoutAttributeLeft
                                                          multiplier:1.0
-                                                           constant:0.0]];
+                                                           constant:15.0]];
 
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:regionButton
                                                           attribute:NSLayoutAttributeRight
@@ -484,32 +545,32 @@
                                                            constant:-30.0]];
 }
 
-- (void)addAdButton {
-    adButton = [UIButton buttonWithType:UIButtonTypeSystem];
-    adButton.translatesAutoresizingMaskIntoConstraints = NO;
-    [adButton setTitle:NSLocalizedStringWithDefaultValue(@"PLAY_AD", nil, [NSBundle mainBundle], @"Ad Loaded", @"Text for button that plays the main screen ad") forState:UIControlStateNormal];
-    [adButton addTarget:self action:@selector(onAdClick:) forControlEvents:UIControlEventTouchUpInside];
-    [self.view addSubview:adButton];
-    [adButton setEnabled:false];
+- (void)addAdLabel {
+    adLabel = [[UILabel alloc] init];
+    adLabel.translatesAutoresizingMaskIntoConstraints = NO;
+    adLabel.text = NSLocalizedStringWithDefaultValue(@"AD_LOADED", nil, [NSBundle mainBundle], @"Ad Loaded", @"Text for button that plays the main screen ad");
+    adLabel.textAlignment = NSTextAlignmentCenter;
+    [self.view addSubview:adLabel];
+    adLabel.hidden = true;
 
     // Setup autolayout
-    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:adButton
-                                                          attribute:NSLayoutAttributeTop
-                                                          relatedBy:NSLayoutRelationEqual
-                                                             toItem:regionButton
+    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:adLabel
                                                           attribute:NSLayoutAttributeBottom
+                                                          relatedBy:NSLayoutRelationEqual
+                                                             toItem:statusLabel
+                                                          attribute:NSLayoutAttributeTop
+                                                         multiplier:1.0
+                                                           constant:-20.0]];
+
+    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:adLabel
+                                                          attribute:NSLayoutAttributeLeft
+                                                          relatedBy:NSLayoutRelationEqual
+                                                             toItem:self.view
+                                                          attribute:NSLayoutAttributeLeft
                                                          multiplier:1.0
                                                            constant:15.0]];
 
-    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:adButton
-                                                          attribute:NSLayoutAttributeLeft
-                                                          relatedBy:NSLayoutRelationEqual
-                                                             toItem:toggleLabel
-                                                          attribute:NSLayoutAttributeLeft
-                                                         multiplier:1.0
-                                                           constant:0.0]];
-
-    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:adButton
+    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:adLabel
                                                           attribute:NSLayoutAttributeRight
                                                           relatedBy:NSLayoutRelationEqual
                                                              toItem:self.view
@@ -523,8 +584,8 @@
 - (void)initializeAds {
     NSLog(@"initializeAds");
     if ([self isVPNActive]) {
-        [adButton setEnabled:false];
-    } else if ([self shouldShowUntunneledAds]) {
+        adLabel.hidden = true;
+    } else if (self.targetManager.connection.status == NEVPNStatusDisconnected && !restartRequired) {
         [GADMobileAds configureWithApplicationID:@"ca-app-pub-1072041961750291~2085686375"];
         [self loadUntunneledInterstitial];
     }
@@ -546,14 +607,14 @@
     NSLog(@"showUntunneledInterstitial");
     if (self.untunneledInterstitial.ready) {
         [self.untunneledInterstitial showFromViewController:self];
+    }else{
+        [self startVPN];
     }
 }
 
 - (void)interstitialDidLoadAd:(MPInterstitialAdController *)interstitial {
     NSLog(@"Interstitial loaded");
-    if ([self shouldShowUntunneledAds]) {
-        [adButton setEnabled:true];
-    }
+    adLabel.hidden = false;
 }
 
 - (void)interstitialDidFailToLoadAd:(MPInterstitialAdController *)interstitial {
@@ -563,13 +624,15 @@
 
 - (void)interstitialDidExpire:(MPInterstitialAdController *)interstitial {
     NSLog(@"Interstitial expired");
-    [adButton setEnabled:false];
+    adLabel.hidden = true;
     [interstitial loadAd];
 }
 
 - (void)interstitialDidDisappear:(MPInterstitialAdController *)interstitial {
     NSLog(@"Interstitial dismissed");
     // TODO: start the tunnel? or set a flag indicating that the tunnel should be started when returning to the UI?
+    adLabel.hidden = true;
+    [self startVPN];
 }
 
 @end
