@@ -25,6 +25,7 @@
 #import "Notifier.h"
 #import "PsiphonConfigUserDefaults.h"
 #import "LogViewControllerFullScreen.h"
+#import "LaunchScreenViewController.h"
 
 @import NetworkExtension;
 @import GoogleMobileAds;
@@ -33,7 +34,6 @@
 @interface ViewController ()
 
 @property (nonatomic) NEVPNManager *targetManager;
-@property (nonatomic, retain) MPInterstitialAdController *untunneledInterstitial;
 
 @end
 
@@ -45,9 +45,7 @@
     Notifier *notifier;
 
     // UI elements
-    UISwitch *startStopToggle;
     UIButton *startStopButton;
-    UILabel *toggleLabel;
     UILabel *statusLabel;
     UIButton *regionButton;
     UILabel *versionLabel;
@@ -56,8 +54,7 @@
     // App state variables
     BOOL shownHomepage;
     BOOL restartRequired;
-    BOOL canStartTunnel;
-    
+
     // UI Constraint
     NSLayoutConstraint *startButtonScreenWidth;
     NSLayoutConstraint *startButtonScreenHeight;
@@ -83,7 +80,6 @@
         psiphonConfigUserDefaults = [[PsiphonConfigUserDefaults alloc] initWithSuiteName:APP_GROUP_IDENTIFIER];
 
         [self resetAppState];
-
     }
     return self;
 }
@@ -129,10 +125,10 @@
             } else {
                 startStopButton.selected = NO;
             }
-            [self initializeAds];
+//            [self initializeAds];
         }
     }];
-    
+
     // TODO: load/save config here to have the user immediately complete the permission prompt
     
     // TODO: perhaps this should be done through the AppDelegate
@@ -208,10 +204,6 @@
     nav.modalTransitionStyle = UIModalTransitionStyleCoverVertical;
 
     [self presentViewController:nav animated:YES completion:nil];
-}
-
-- (void)onAdClick:(UIButton *)sender {
-    [self showUntunneledInterstitial];
 }
 
 # pragma mark - Network Extension
@@ -331,10 +323,10 @@
               } else {
                   // Start a timer and call initialized ads when timer expired. (asyncronzed sleep(5)) then init ads
                   // else init ads
-                  [self initializeAds];
+//                  [self initializeAds];
               }
           } else {
-              [self initializeAds];
+//              [self initializeAds];
           }
 
           NSLog(@"received NEVPNStatusDidChangeNotification %@", [self getVPNStatusDescription]);
@@ -579,27 +571,9 @@
 
 # pragma mark - Ads
 
-- (void)initializeAds {
-    NSLog(@"initializeAds");
-    if ([self isVPNActive]) {
-        adLabel.hidden = true;
-    } else if (self.targetManager.connection.status == NEVPNStatusDisconnected && !restartRequired) {
-        [GADMobileAds configureWithApplicationID:@"ca-app-pub-1072041961750291~2085686375"];
-        [self loadUntunneledInterstitial];
-    }
-}
-
-- (void)loadUntunneledInterstitial {
-    NSLog(@"loadUntunneledInterstitial");
-    self.untunneledInterstitial = [MPInterstitialAdController
-                                   interstitialAdControllerForAdUnitId:@"4250ebf7b28043e08ddbe04d444d79e4"];
-    self.untunneledInterstitial.delegate = self;
-    [self.untunneledInterstitial loadAd];
-}
-
 - (void)showUntunneledInterstitial {
-    NSLog(@"showUntunneledInterstitial");
     if (self.untunneledInterstitial.ready) {
+        NSLog(@"showUntunneledInterstitial");
         [self.untunneledInterstitial showFromViewController:self];
     }else{
         [self startVPN];

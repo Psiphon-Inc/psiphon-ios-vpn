@@ -34,10 +34,10 @@
     return YES;
 }
 
-- (void)switchToMainViewController {
-    ViewController *mainViewController = [[ViewController alloc] init];
+- (void)switchToMainViewController:(MPInterstitialAdController *)ads :(ViewController *)vc {
+    vc.untunneledInterstitial = ads;
     
-    [self changeRootViewController:mainViewController];
+    [self changeRootViewController:vc];
 }
 
 - (void)changeRootViewController:(UIViewController*)viewController {
