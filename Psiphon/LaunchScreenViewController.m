@@ -22,15 +22,17 @@
 #import <AVFoundation/AVFoundation.h>
 #import "LaunchScreenViewController.h"
 #import "AppDelegate.h"
+#import "ViewController.h"
 
+@import NetworkExtension;
 @import GoogleMobileAds;
 
 @interface LaunchScreenViewController ()
 
+@property (nonatomic) NEVPNManager *targetManager;
+
 @property (strong, nonatomic) AVPlayer *loadingVideo;
 @property (nonatomic) AVPlayerItem *viedoFile;
-
-@property (nonatomic, retain) MPInterstitialAdController *mopubAds;
 
 @end
 
@@ -42,8 +44,9 @@ static const NSString *ItemStatusContext;
     
     // Loading Timer
     NSTimer *_loadingTimer;
-    NSTimer *_lastActiveTickTime;
-    
+
+    // Main View Controller
+    ViewController *mainViewController;
 }
 
 - (id)init {
@@ -71,7 +74,7 @@ static const NSString *ItemStatusContext;
                  playerLayer.frame = self.view.bounds;
                  playerLayer.videoGravity = AVLayerVideoGravityResizeAspect;
                  playerLayer.needsDisplayOnBoundsChange = YES;
-                 
+                 NSLog(@"Loading Video");
                  [self.view.layer addSublayer:playerLayer];
                  self.view.layer.needsDisplayOnBoundsChange = YES;
              }
@@ -90,12 +93,14 @@ static const NSString *ItemStatusContext;
     // TODO: Add something to handle the syncUI when screen rotate
     [self.view setBackgroundColor:[UIColor whiteColor]];
     [self syncUI];
+    mainViewController =  [[ViewController alloc] init];
 }
 
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
     [self.loadingVideo play];
-    // TODO: After a timer (10s) switch to Main View Contorller
+    NSLog(@"Play Video");
+    [self initializeAds];
     [self startLaunchingScreenTimer];
 }
 
@@ -128,7 +133,7 @@ static const NSString *ItemStatusContext;
     if (self.viedoFile != nil) {
         [self.viedoFile removeObserver:self forKeyPath:@"status"];
     }
-    [[AppDelegate sharedAppDelegate] switchToMainViewController];
+    [[AppDelegate sharedAppDelegate] switchToMainViewController:_untunneledInterstitial:mainViewController];
 }
 
 - (void) startLaunchingScreenTimer {
@@ -141,6 +146,34 @@ static const NSString *ItemStatusContext;
     }
 }
 
+/*!
+ @brief Returns true if NEVPNConnectionStatus is Connected, Connecting or Reasserting.
+ */
+- (BOOL) isVPNActive{
+    NEVPNStatus status = self.targetManager.connection.status;
+    return (status == NEVPNStatusConnecting
+            || status == NEVPNStatusConnected
+            || status == NEVPNStatusReasserting);
+}
+
+# pragma mark - Ads
+
+- (void)initializeAds {
+    NSLog(@"initializeAds");
+    if (![self isVPNActive]) {
+        [GADMobileAds configureWithApplicationID:@"ca-app-pub-1072041961750291~2085686375"];
+        [self loadUntunneledInterstitial];
+    }
+}
+
+- (void)loadUntunneledInterstitial {
+    NSLog(@"loadUntunneledInterstitial");
+    self.untunneledInterstitial = [MPInterstitialAdController
+        interstitialAdControllerForAdUnitId:@"4250ebf7b28043e08ddbe04d444d79e4"];
+
+    self.untunneledInterstitial.delegate = mainViewController;
+
+    [self.untunneledInterstitial loadAd];
+}
+
 @end
-
-

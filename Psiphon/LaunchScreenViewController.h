@@ -21,6 +21,10 @@
 #import <UIKit/UIKit.h>
 #import "MPInterstitialAdController.h"
 
+@import GoogleMobileAds;
+
 @interface LaunchScreenViewController : UIViewController <MPInterstitialAdControllerDelegate>
+
+@property (nonatomic, retain) MPInterstitialAdController *untunneledInterstitial;
 
 @end
