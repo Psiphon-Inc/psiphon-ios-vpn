@@ -1,8 +1,0 @@
-{
-  "PropagationChannelId": "...",
-  "SponsorId": "...",
-  "RemoteServerListSignaturePublicKey": "...",
-  "RemoteServerListURLs": "[...]",
-  "ObfuscatedServerListRootURLs": "[...]",
-  "feedbackConfig": {...}
-}
