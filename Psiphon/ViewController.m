@@ -191,20 +191,19 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 
 // Reload when rotate
 - (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator {
+    [self.view removeConstraint:startButtonWidth];
+
+    if (size.width > size.height) {
+        [self.view removeConstraint:startButtonScreenWidth];
+        [self.view addConstraint:startButtonScreenHeight];
+    } else {
+        [self.view removeConstraint:startButtonScreenHeight];
+        [self.view addConstraint:startButtonScreenWidth];
+    }
+
+    [self.view addConstraint:startButtonWidth];
     [coordinator animateAlongsideTransition:nil completion:^(id<UIViewControllerTransitionCoordinatorContext> context) {
-         [self.view removeConstraint:startButtonWidth];
-         CGSize viewSize = self.view.bounds.size;
-         
-         if (viewSize.width > viewSize.height) {
-             [self.view removeConstraint:startButtonScreenWidth];
-             [self.view addConstraint:startButtonScreenHeight];
-         } else {
-             [self.view removeConstraint:startButtonScreenHeight];
-             [self.view addConstraint:startButtonScreenWidth];
-         }
-         
-         [self.view addConstraint:startButtonWidth];
-     }];
+    }];
     
     [super viewWillTransitionToSize:size withTransitionCoordinator:coordinator];
 }
@@ -423,7 +422,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                                                              toItem:self.topLayoutGuide
                                                           attribute:NSLayoutAttributeBottom
                                                          multiplier:1.0
-                                                           constant:0]];
+                                                           constant:-5]];
 
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:settingsButton
                                                           attribute:NSLayoutAttributeRight
@@ -431,7 +430,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                                                              toItem:self.view
                                                           attribute:NSLayoutAttributeRight
                                                          multiplier:1.0
-                                                           constant:0]];
+                                                           constant:-5]];
 
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:settingsButton
                                                           attribute:NSLayoutAttributeWidth
@@ -439,7 +438,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                                                              toItem:nil
                                                           attribute:NSLayoutAttributeNotAnAttribute
                                                          multiplier:1.0
-                                                           constant:60]];
+                                                           constant:40]];
 
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:settingsButton
                                                           attribute:NSLayoutAttributeHeight
@@ -460,7 +459,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     startStopButton.translatesAutoresizingMaskIntoConstraints = NO;
     startStopButton.contentHorizontalAlignment = UIControlContentHorizontalAlignmentFill;
     startStopButton.contentVerticalAlignment = UIControlContentVerticalAlignmentFill;
-    
+
     [startStopButton setImage:startButtonImage forState:UIControlStateNormal];
     [startStopButton setImage:stopButtonImage forState:UIControlStateSelected];
     
@@ -485,10 +484,10 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                                                            constant:0]];
     
     startButtonScreenHeight = [NSLayoutConstraint constraintWithItem:startStopButton
-                                                     attribute:NSLayoutAttributeHeight
-                                                     relatedBy:NSLayoutRelationEqual
-                                                        toItem:self.view
-                                                     attribute:NSLayoutAttributeHeight
+                                                           attribute:NSLayoutAttributeHeight
+                                                           relatedBy:NSLayoutRelationEqual
+                                                              toItem:self.view
+                                                           attribute:NSLayoutAttributeHeight
                                                     multiplier:0.5f
                                                       constant:0];
     
@@ -530,7 +529,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     // Setup autolayout
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:statusLabel
                                                           attribute:NSLayoutAttributeBottom
-                                                          relatedBy:NSLayoutRelationEqual
+                                                          relatedBy:NSLayoutRelationGreaterThanOrEqual
                                                              toItem:startStopButton
                                                           attribute:NSLayoutAttributeTop
                                                          multiplier:1.0
@@ -577,7 +576,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                                                              toItem:self.view
                                                           attribute:NSLayoutAttributeCenterX
                                                          multiplier:1.0
-                                                           constant:15.0]];
+                                                           constant:0]];
 
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:regionButton
                                                           attribute:NSLayoutAttributeWidth
@@ -630,6 +629,14 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     adLabel.hidden = true;
 
     // Setup autolayout
+    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:adLabel
+                                                          attribute:NSLayoutAttributeTop
+                                                          relatedBy:NSLayoutRelationGreaterThanOrEqual
+                                                             toItem:self.topLayoutGuide
+                                                          attribute:NSLayoutAttributeBottom
+                                                         multiplier:1.0
+                                                           constant:0]];
+
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:adLabel
                                                           attribute:NSLayoutAttributeBottom
                                                           relatedBy:NSLayoutRelationEqual
