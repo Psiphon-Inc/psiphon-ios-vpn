@@ -1,3 +1,6 @@
+/* Text for button that plays the main screen ad */
+"AD_LOADED" = "<fr>Ad Loaded";
+
 /* Text showing the app version. The '%@' placeholder is the version number. So it will look like 'Version 2'. */
 "APP_VERSION" = "<fr>Version %@";
 
@@ -6,12 +9,6 @@
 
 /* Log view title bar text */
 "LOGS_TITLE" = "<fr>Logs";
-
-/* Text for button that plays the main screen ad */
-"PLAY_AD" = "<fr>Ad Loaded";
-
-/* Label beside toggle button which starts the Psiphon Tunnel */
-"RUN_VPN" = "<fr>Run Psiphon VPN";
 
 /* Label for the button that changes the server egress region */
 "SET_REGION_LABEL" = "<fr>Set Region";
