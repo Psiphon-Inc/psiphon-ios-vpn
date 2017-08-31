@@ -62,6 +62,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     UILabel *toggleLabel;
     UILabel *statusLabel;
     UIButton *regionButton;
+    UILabel *regionLabel;
     UILabel *versionLabel;
     UILabel *adLabel;
 
@@ -135,6 +136,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     [self addStartAndStopButton];
     [self addStatusLabel];
     [self addRegionButton];
+    [self addRegionLabel];
     [self addAdLabel];
     [self addVersionLabel];
     
@@ -169,6 +171,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     // Available regions may have changed in the background
     [self updateAvailableRegions];
     [self updateRegionButton];
+    [self updateRegionLabel];
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
@@ -564,7 +567,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     // Setup autolayout
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:regionButton
                                                           attribute:NSLayoutAttributeTop
-                                                          relatedBy:NSLayoutRelationEqual
+                                                          relatedBy:NSLayoutRelationLessThanOrEqual
                                                              toItem:startStopButton
                                                           attribute:NSLayoutAttributeBottom
                                                          multiplier:1.0
@@ -585,6 +588,51 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                                                           attribute:NSLayoutAttributeWidth
                                                          multiplier:1.0
                                                            constant:.2]];
+}
+
+- (void)addRegionLabel {
+    regionLabel = [[UILabel alloc] init];
+    regionLabel.translatesAutoresizingMaskIntoConstraints = NO;
+    regionLabel.adjustsFontSizeToFitWidth = YES;
+    regionLabel.numberOfLines = 0;
+    regionLabel.textAlignment = NSTextAlignmentCenter;
+    regionLabel.font = [UIFont systemFontOfSize:15.f];
+    [self.view addSubview:regionLabel];
+
+    [self updateRegionLabel];
+
+    // Setup autolayout
+    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:regionLabel
+                                                          attribute:NSLayoutAttributeTop
+                                                          relatedBy:NSLayoutRelationEqual
+                                                             toItem:regionButton
+                                                          attribute:NSLayoutAttributeBottom
+                                                         multiplier:1.0
+                                                           constant:5.0]];
+
+    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:regionLabel
+                                                          attribute:NSLayoutAttributeBottom
+                                                          relatedBy:NSLayoutRelationLessThanOrEqual
+                                                             toItem:self.view
+                                                          attribute:NSLayoutAttributeBottom
+                                                         multiplier:1.0
+                                                           constant:0.0]];
+
+    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:regionLabel
+                                                          attribute:NSLayoutAttributeCenterX
+                                                          relatedBy:NSLayoutRelationEqual
+                                                             toItem:regionButton
+                                                          attribute:NSLayoutAttributeCenterX
+                                                         multiplier:1.0
+                                                           constant:0]];
+
+    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:regionLabel
+                                                          attribute:NSLayoutAttributeWidth
+                                                          relatedBy:NSLayoutRelationEqual
+                                                             toItem:self.view
+                                                          attribute:NSLayoutAttributeWidth
+                                                         multiplier:1.0
+                                                           constant:.1]];
 }
 
 - (void)addVersionLabel {
@@ -858,6 +906,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     if (!safeStringsEqual(selectedRegion, selectedRegionSnapShot)) {
         [self persistSelectedRegion];
         [self updateRegionButton];
+        [self updateRegionLabel];
         [self restartVPN];
     }
     [regionSelectionNavController dismissViewControllerAnimated:YES completion:nil];
@@ -875,6 +924,13 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     Region *selectedRegion = [[RegionAdapter sharedInstance] getSelectedRegion];
     UIImage *flag = [[PsiphonClientCommonLibraryHelpers imageFromCommonLibraryNamed:selectedRegion.flagResourceId] countryFlag];
     [regionButton setImage:flag forState:UIControlStateNormal];
+}
+
+- (void)updateRegionLabel {
+    Region *selectedRegion = [[RegionAdapter sharedInstance] getSelectedRegion];
+    NSString *serverRegionText = NSLocalizedString(@"Server region", @"Title which is displayed beside the flag of the country which the user has chosen to connect to.");
+    NSString *regionText = [[RegionAdapter sharedInstance] getLocalizedRegionTitle:selectedRegion.code];
+    regionLabel.text = [serverRegionText stringByAppendingString:[NSString stringWithFormat:@":\n%@", regionText]];
 }
 
 @end
