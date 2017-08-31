@@ -327,9 +327,13 @@
                       [self startVPN];
                   });
               } else {
-                  // Start a timer and call initialized ads when timer expired. (asyncronzed sleep(5)) then init ads
-                  // else init ads
-                  [self initializeAds];
+                  // The VPN is stopped. Initialize ads after a delay:
+                  //    - to ensure regular untunneled networking is ready
+                  //    - because it's likely the user will be leaving the app, so we don't want to request
+                  //      another ad right away
+                  dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 5 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
+                      [self initializeAds];
+                  });
               }
           } else {
               [self initializeAds];
