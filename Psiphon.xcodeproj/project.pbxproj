@@ -181,6 +181,7 @@
 				9BFEC0419AD3808370915E01 /* PsiphonConfigUserDefaults.h */,
 				9BFEC584519C408D9D6D3FF1 /* PsiphonConfigUserDefaults.m */,
 				9BFECFCFB0546F18A7E57ADF /* psiphon_config */,
+				9BFEC1C6E19CD9DF09AB5F51 /* embedded_server_entries */,
 			);
 			path = Shared;
 			sourceTree = "<group>";
@@ -256,7 +257,6 @@
 				CE26FCA91BBDC85900B83375 /* Info.plist */,
 				EF652CD81F352271002AFB48 /* PacketTunnelProvider.h */,
 				EF652CD91F352271002AFB48 /* PacketTunnelProvider.m */,
-				9BFEC1C6E19CD9DF09AB5F51 /* embedded_server_entries */,
 			);
 			path = PsiphonVPN;
 			sourceTree = "<group>";
