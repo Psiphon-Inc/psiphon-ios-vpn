@@ -23,7 +23,6 @@
 		668AF9C01E92CBE0008CAAAA /* NetworkExtension.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 668AF9BE1E92CBD3008CAAAA /* NetworkExtension.framework */; };
 		7019A4F2212DF77FFDBF4BCD /* libPods-PsiphonVPN.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3AC2D17A296A45F6725361B6 /* libPods-PsiphonVPN.a */; };
 		97F42598BD87593B1A7245F7 /* libPods-Psiphon.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 90F81388C5D4174E187EDFF6 /* libPods-Psiphon.a */; };
-		9BFEC23DBD7EFDD326FF6C14 /* psiphon_config.stub in Resources */ = {isa = PBXBuildFile; fileRef = 9BFEC4205423A6F55DA7DAB0 /* psiphon_config.stub */; };
 		9BFEC3CD51F31841B4F8CD2B /* psiphon_config in Resources */ = {isa = PBXBuildFile; fileRef = 9BFECFCFB0546F18A7E57ADF /* psiphon_config */; };
 		9BFEC4F02A47FF8265635803 /* Notifier.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC91ED4A1C511520E9948 /* Notifier.m */; };
 		9BFECD1880B51B0E2EAEFF1F /* Notifier.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC91ED4A1C511520E9948 /* Notifier.m */; };
@@ -105,7 +104,6 @@
 		9BFEC0419AD3808370915E01 /* PsiphonConfigUserDefaults.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PsiphonConfigUserDefaults.h; sourceTree = "<group>"; };
 		9BFEC1C6E19CD9DF09AB5F51 /* embedded_server_entries */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = embedded_server_entries; sourceTree = "<group>"; };
 		9BFEC3165745A5D14C8C3C08 /* Notifier.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Notifier.h; sourceTree = "<group>"; };
-		9BFEC4205423A6F55DA7DAB0 /* psiphon_config.stub */ = {isa = PBXFileReference; lastKnownFileType = file.stub; path = psiphon_config.stub; sourceTree = "<group>"; };
 		9BFEC584519C408D9D6D3FF1 /* PsiphonConfigUserDefaults.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PsiphonConfigUserDefaults.m; sourceTree = "<group>"; };
 		9BFEC91ED4A1C511520E9948 /* Notifier.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Notifier.m; sourceTree = "<group>"; };
 		9BFECFCFB0546F18A7E57ADF /* psiphon_config */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = psiphon_config; sourceTree = "<group>"; };
@@ -258,7 +256,6 @@
 				CE26FCA91BBDC85900B83375 /* Info.plist */,
 				EF652CD81F352271002AFB48 /* PacketTunnelProvider.h */,
 				EF652CD91F352271002AFB48 /* PacketTunnelProvider.m */,
-				9BFEC4205423A6F55DA7DAB0 /* psiphon_config.stub */,
 				9BFEC1C6E19CD9DF09AB5F51 /* embedded_server_entries */,
 			);
 			path = PsiphonVPN;
@@ -397,7 +394,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				CE4E9BC21BBEECFC0060FF8B /* PsiphonVPN.entitlements in Resources */,
-				9BFEC23DBD7EFDD326FF6C14 /* psiphon_config.stub in Resources */,
 				9BFEC3CD51F31841B4F8CD2B /* psiphon_config in Resources */,
 				9BFECED023FC902444EB74C4 /* embedded_server_entries in Resources */,
 			);
@@ -461,8 +457,8 @@
 			);
 			inputPaths = (
 				"${SRCROOT}/Pods/Target Support Files/Pods-Psiphon/Pods-Psiphon-resources.sh",
-				"$PODS_CONFIGURATION_BUILD_DIR/InAppSettingsKit/InAppSettingsKit.bundle",
-				"$PODS_CONFIGURATION_BUILD_DIR/PsiphonClientCommonLibrary/PsiphonClientCommonLibrary.bundle",
+				$PODS_CONFIGURATION_BUILD_DIR/InAppSettingsKit/InAppSettingsKit.bundle,
+				$PODS_CONFIGURATION_BUILD_DIR/PsiphonClientCommonLibrary/PsiphonClientCommonLibrary.bundle,
 				"${PODS_ROOT}/mopub-ios-sdk/MoPubSDK/Internal/Common/MPAdBrowserController.xib",
 				"${PODS_ROOT}/mopub-ios-sdk/MoPubSDK/Resources/MPCloseBtn.png",
 				"${PODS_ROOT}/mopub-ios-sdk/MoPubSDK/Resources/MPCloseBtn@2x.png",
