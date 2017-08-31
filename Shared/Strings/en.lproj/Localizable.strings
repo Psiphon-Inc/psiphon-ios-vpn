@@ -4,14 +4,15 @@
 /* Text showing the app version. The '%@' placeholder is the version number. So it will look like 'Version 2'. */
 "APP_VERSION" = "Version %@";
 
-/* Done button in navigation bar */
+/* Done button in navigation bar
+   Title of the button that dismisses region selection dialog */
 "DONE_ACTION" = "Done";
 
 /* Log view title bar text */
 "LOGS_TITLE" = "Logs";
 
-/* Label for the button that changes the server egress region */
-"SET_REGION_LABEL" = "Set Region";
+/* Title which is displayed beside the flag of the country which the user has chosen to connect to. */
+"SERVER_REGION" = "Server region";
 
 /* Alert message informing user they have to open the app */
 "USE_PSIPHON_APP" = "To connect, use the Psiphon application.";
