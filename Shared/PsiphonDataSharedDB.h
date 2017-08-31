@@ -19,9 +19,10 @@
 
 #define TAG @"PsiphonDataSharedDB: "
 
-// TODO: shared code should be put into a framework to reduce the size of the IPA
 #import <Foundation/Foundation.h>
+#ifndef TARGET_IS_EXTENSION
 #import "PsiphonData.h"
+#endif
 
 @interface Homepage : NSObject
 // TODO: readonly necessary?!
@@ -35,6 +36,9 @@
 - (BOOL)createDatabase;
 - (BOOL)clearDatabase;
 
+- (BOOL)insertNewEgressRegions:(NSArray<NSString *> *)regions;
+- (NSArray<NSString *> *)getAllEgressRegions;
+
 - (BOOL)insertNewHomepages:(NSArray<NSString *> *)homepageUrls;
 - (NSArray<Homepage *> *)getAllHomepages;
 
@@ -43,7 +47,9 @@
 #endif
 - (BOOL)truncateLogs;
 - (BOOL)insertDiagnosticMessage:(NSString*)message;
+#ifndef TARGET_IS_EXTENSION
 - (NSArray<DiagnosticEntry*>*)getNewLogs;
+#endif
 @end
 
 

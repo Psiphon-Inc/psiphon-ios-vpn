@@ -18,8 +18,8 @@
  */
 
 #import <UIKit/UIKit.h>
+#import "PsiphonSettingsViewController.h"
 #import "MPInterstitialAdController.h"
 
-@interface ViewController : UIViewController <MPInterstitialAdControllerDelegate>
-
+@interface ViewController : UIViewController <MPInterstitialAdControllerDelegate, PsiphonSettingsViewControllerDelegate>
 @end

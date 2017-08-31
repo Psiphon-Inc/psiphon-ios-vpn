@@ -21,9 +21,11 @@
 
 // Psiphon config keys
 #define PSIPHON_CONFIG_EGRESS_REGION @"EgressRegion"
+#define PSIPHON_CONFIG_UPSTREAM_PROXY_URL @"UpstreamProxyUrl"
 
 @interface PsiphonConfigUserDefaults : NSObject
 
++ (instancetype)sharedInstance;
 - (instancetype)initWithSuiteName:(NSString *)suiteName;
 
 - (BOOL)setEgressRegion:(NSString *)newRegion;
@@ -36,3 +38,4 @@
 - (NSDictionary *)dictionaryRepresentation;
 
 @end
+
