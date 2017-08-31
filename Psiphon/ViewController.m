@@ -488,8 +488,8 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                                                            relatedBy:NSLayoutRelationEqual
                                                               toItem:self.view
                                                            attribute:NSLayoutAttributeHeight
-                                                    multiplier:0.5f
-                                                      constant:0];
+                                                          multiplier:0.5f
+                                                            constant:0];
     
     startButtonScreenWidth = [NSLayoutConstraint constraintWithItem:startStopButton
                                                           attribute:NSLayoutAttributeWidth
