@@ -18,7 +18,7 @@
 
 set -e
 
-STRINGS_DIR="Shared/en.lproj"
+STRINGS_DIR="Shared/Strings/en.lproj"
 TEMP_DIR="${STRINGS_DIR}.temp"
 
 mkdir -p "${STRINGS_DIR}"
