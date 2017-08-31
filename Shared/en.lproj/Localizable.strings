@@ -1,9 +1,39 @@
+/* Text showing the app version. The '%@' placeholder is the version number. So it will look like 'Version 2'. */
+"APP_VERSION" = "Version %@";
+
 /* Done button in navigation bar */
 "DONE_ACTION" = "Done";
+
+/* Log view title bar text */
+"LOGS_TITLE" = "Logs";
+
+/* Text for button that plays the main screen ad */
+"PLAY_AD" = "Ad Loaded";
 
 /* Label beside toggle button which starts the Psiphon Tunnel */
 "RUN_VPN" = "Run Psiphon VPN";
 
+/* Label for the button that changes the server egress region */
+"SET_REGION_LABEL" = "Set Region";
+
 /* Alert message informing user they have to open the app */
 "USE_PSIPHON_APP" = "To connect, use the Psiphon application.";
+
+/* Status when the VPN is connected to a Psiphon server */
+"VPN_STATUS_CONNECTED" = "Connected";
+
+/* Status when the VPN is connecting; that is, trying to connect to a Psiphon server */
+"VPN_STATUS_CONNECTING" = "Connecting";
+
+/* Status when the VPN is not connected to a Psiphon server, not trying to connect, and not in an error state */
+"VPN_STATUS_DISCONNECTED" = "Disconnected";
+
+/* Status when the VPN is disconnecting. Sometimes going from connected to disconnected can take some time, and this is that state. */
+"VPN_STATUS_DISCONNECTING" = "Disconnecting";
+
+/* Status when the VPN is in an invalid state. For example, if the user doesn't give permission for the VPN configuration to be installed, and therefore the Psiphon VPN can't even try to connect. */
+"VPN_STATUS_INVALID" = "Invalid";
+
+/* Status when the VPN was connected to a Psiphon server, got disconnected unexpectedly, and is currently trying to reconnect */
+"VPN_STATUS_RECONNECTING" = "Reconnecting";
 
