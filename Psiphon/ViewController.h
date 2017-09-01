@@ -22,6 +22,8 @@
 #import "MPInterstitialAdController.h"
 #import "LaunchScreenViewController.h"
 
+#define adsDidLoad "MPAdsDidLoad"
+
 @interface ViewController : UIViewController <MPInterstitialAdControllerDelegate, PsiphonSettingsViewControllerDelegate>
 @property (nonatomic, retain) MPInterstitialAdController *untunneledInterstitial;
 

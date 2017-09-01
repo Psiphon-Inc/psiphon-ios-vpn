@@ -102,6 +102,8 @@ static const NSString *ItemStatusContext;
     NSLog(@"Play Video");
     [self initializeAds];
     [self startLaunchingScreenTimer];
+    [[NSNotificationCenter defaultCenter]
+            addObserver:self selector:@selector(switchViewControllerWhenExpire:) name:@adsDidLoad object:mainViewController];
 }
 
 - (void)playerItemDidReachEnd:(NSNotification *)notification {
