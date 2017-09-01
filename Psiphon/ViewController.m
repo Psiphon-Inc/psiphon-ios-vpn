@@ -170,6 +170,16 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     [self listenForNEMessages];
 
     [sharedDB updateAppForegroundState:YES];
+
+    // If the extension has been waiting for the app to come into foreground,
+    // send the VPNManager startVPN message again.
+    dispatch_async(dispatch_get_main_queue(), ^{
+        // If the tunnel is in Connected state, and we're now showing ads
+        // send startVPN message.
+        if (!adWillShow && [sharedDB getTunnelConnectedState]) {
+            [vpnManager startVPN];
+        }
+    });
 }
 
 - (void)applicationWillResignActive {
