@@ -740,6 +740,8 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 - (void)interstitialDidLoadAd:(MPInterstitialAdController *)interstitial {
     NSLog(@"Interstitial loaded");
     adLabel.hidden = false;
+    [[NSNotificationCenter defaultCenter]
+            postNotificationName:@adsDidLoad object:self];
 }
 
 - (void)interstitialDidFailToLoadAd:(MPInterstitialAdController *)interstitial {
