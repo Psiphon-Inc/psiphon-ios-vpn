@@ -1,3 +1,4 @@
+
 /*
  * Copyright (c) 2017, Psiphon Inc.
  * All rights reserved.
@@ -67,7 +68,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 
     // App state variables
     BOOL shownHomepage;
-    BOOL adWillShow;
+    BOOL adWillShow;     // Ad will show soon.
 
     // UI Constraint
     NSLayoutConstraint *startButtonScreenWidth;
@@ -202,8 +203,21 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 #pragma mark - UI callbacks
 
 - (void)vpnStatusDidChange {
+    // Update UI
     startStopButton.selected = [vpnManager isVPNActive];
     statusLabel.text = [self getVPNStatusDescription:[vpnManager getVPNStatus]];
+
+    if ([vpnManager getVPNStatus] == VPNStatusDisconnected) {
+        // The VPN is stopped. Initialize ads after a delay:
+        //    - to ensure regular untunneled networking is ready
+        //    - because it's likely the user will be leaving the app, so we don't want to request
+        //      another ad right away
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 5 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
+            [self initializeAds];
+        });
+    } else {
+        [self initializeAds];
+    }
 }
 
 - (void)onStartStopTap:(UIButton *)sender {
@@ -261,7 +275,8 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     [notifier listenForNotification:@"NE.tunnelConnected" listener:^{
         // If we haven't had a chance to load an Ad, and the
         // tunnel is already connected, give up on the Ad and
-        // start the VPN.
+        // start the VPN. Otherwise the startVPN message will be
+        // sent after the Ad has disappeared.
         if (!adWillShow) {
             [vpnManager startVPN];
         }
@@ -617,10 +632,9 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     }
 
     // Start the tunnel in parallel with showing ads.
-    // VPN won't start until "C.startVPN" message is sent
-    // to the extension.
+    // VPN won't start until [vpnManager startVPN] message is sent.
     [vpnManager startTunnelWithCompletionHandler:^(BOOL success) {
-        [self resetAppState];
+        // TODO:
     }];
 }
 
