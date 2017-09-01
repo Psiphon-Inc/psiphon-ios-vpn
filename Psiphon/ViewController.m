@@ -674,7 +674,9 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     adLabel.text = NSLocalizedStringWithDefaultValue(@"AD_LOADED", nil, [NSBundle mainBundle], @"Ad Loaded", @"Text for button that plays the main screen ad");
     adLabel.textAlignment = NSTextAlignmentCenter;
     [self.view addSubview:adLabel];
-    adLabel.hidden = true;
+    if (!self.untunneledInterstitial.ready){
+        adLabel.hidden = true;
+    }
 
     // Setup autolayout
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:adLabel
