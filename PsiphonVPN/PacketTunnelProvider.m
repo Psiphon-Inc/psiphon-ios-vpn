@@ -123,9 +123,10 @@ static const double kDefaultLogTruncationInterval = 12 * 60 * 60; // 12 hours
 }
 
 - (void)stopTunnelWithReason:(NEProviderStopReason)reason completionHandler:(void (^)(void)) completionHandler {
-    
-    // TODO: assumes stopTunnelWithReason called exactly once only after startTunnelWithOptions.completionHandler(nil)
 
+    [sharedDB updateTunnelConnectedState:NO];
+    
+    // Assumes stopTunnelWithReason called exactly once only after startTunnelWithOptions.completionHandler(nil)
     if (vpnStartCompletionHandler) {
         vpnStartCompletionHandler([NSError
           errorWithDomain:PSIPHON_TUNNEL_ERROR_DOMAIN code:PSIPHON_TUNNEL_ERROR_STOPPED_BEFORE_CONNECTED userInfo:nil]);
@@ -133,6 +134,8 @@ static const double kDefaultLogTruncationInterval = 12 * 60 * 60; // 12 hours
     }
 
     [psiphonTunnel stop];
+    
+
     completionHandler();
     
     return;
@@ -329,6 +332,11 @@ static const double kDefaultLogTruncationInterval = 12 * 60 * 60; // 12 hours
         [self tryStartVPN];
     }
 }
+
+- (void)onExiting {
+    [sharedDB updateTunnelConnectedState:NO];
+}
+
 
 - (void)onHomepage:(NSString * _Nonnull)url {
     for (NSString *p in handshakeHomepages) {

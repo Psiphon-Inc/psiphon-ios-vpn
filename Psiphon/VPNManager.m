@@ -164,10 +164,10 @@
 
 - (void)startVPN {
     NEVPNStatus s = self.targetManager.connection.status;
-    if (s == NEVPNStatusConnecting || s == NEVPNStatusConnected) {
+    if (s == NEVPNStatusConnecting) {
         [notifier post:@"M.startVPN"];
     } else {
-        NSLog(TAG @"startVPN: Network extension is not in connecting/connected state.");
+        NSLog(TAG @"startVPN: Network extension is not in connecting state.");
     }
 }
 
