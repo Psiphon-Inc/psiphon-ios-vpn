@@ -135,6 +135,7 @@ static const NSString *ItemStatusContext;
     if (self.viedoFile != nil) {
         [self.viedoFile removeObserver:self forKeyPath:@"status"];
     }
+    [_loadingTimer invalidate];
     [[AppDelegate sharedAppDelegate] switchToMainViewController:_untunneledInterstitial:mainViewController];
 }
 
