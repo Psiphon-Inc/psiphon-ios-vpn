@@ -614,11 +614,11 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 
 - (void)initializeAds {
     NSLog(@"initializeAds");
-    if ([vpnManager isVPNActive]) {
-        adLabel.hidden = true;
-    } else if ([vpnManager getVPNStatus] == VPNStatusDisconnected) {
+    if ([self shouldShowUntunneledAds]) {
         [GADMobileAds configureWithApplicationID:@"ca-app-pub-1072041961750291~2085686375"];
         [self loadUntunneledInterstitial];
+    } else {
+        adLabel.hidden = true;
     }
 }
 
