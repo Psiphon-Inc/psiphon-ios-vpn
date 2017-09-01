@@ -246,6 +246,12 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 
     [self resetAppState];
 
+    // TODO: Need a better way to stop ads loading when VPN started (If it's not already loaded
+    if (self.untunneledInterstitial != nil) {
+        NSLog(@"Nil untunneledintersitial ads reference when VPN started");
+        self.untunneledInterstitial = nil;
+    }
+
     [NETunnelProviderManager loadAllFromPreferencesWithCompletionHandler:^(NSArray<NETunnelProviderManager *> * _Nullable allManagers, NSError * _Nullable error) {
 
         if (allManagers == nil) {
