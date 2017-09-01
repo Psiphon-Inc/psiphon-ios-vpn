@@ -39,9 +39,9 @@
 static const NSString *ItemStatusContext;
 
 @implementation LaunchScreenViewController {
-    // Ads
-    BOOL adsLoaded;
-    
+    // videoPlayer
+    AVPlayerLayer* playerLayer;
+
     // Loading Timer
     NSTimer *_loadingTimer;
 
@@ -70,10 +70,11 @@ static const NSString *ItemStatusContext;
                  [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(playerItemDidReachEnd:) name:AVPlayerItemDidPlayToEndTimeNotification object:self.viedoFile];
                  self.loadingVideo = [AVPlayer playerWithPlayerItem:self.viedoFile];
                  
-                 AVPlayerLayer* playerLayer = [AVPlayerLayer playerLayerWithPlayer:self.loadingVideo];
+                 playerLayer = [AVPlayerLayer playerLayerWithPlayer:self.loadingVideo];
                  playerLayer.frame = self.view.bounds;
                  playerLayer.videoGravity = AVLayerVideoGravityResizeAspect;
                  playerLayer.needsDisplayOnBoundsChange = YES;
+
                  NSLog(@"Loading Video");
                  [self.view.layer addSublayer:playerLayer];
                  self.view.layer.needsDisplayOnBoundsChange = YES;
@@ -86,6 +87,21 @@ static const NSString *ItemStatusContext;
      }];
     
     return self;
+}
+
+- (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator {
+
+    if (size.width > size.height) {
+        // Landscape
+        playerLayer.frame = CGRectMake(0, 0, size.width, size.height);
+    } else {
+        playerLayer.frame = CGRectMake(0, 0, size.width, size.height);
+    }
+
+    [coordinator animateAlongsideTransition:nil completion:^(id<UIViewControllerTransitionCoordinatorContext> context) {
+    }];
+
+    [super viewWillTransitionToSize:size withTransitionCoordinator:coordinator];
 }
 
 - (void)viewDidLoad {
