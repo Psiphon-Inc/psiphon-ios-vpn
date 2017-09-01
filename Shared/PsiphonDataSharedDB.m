@@ -388,8 +388,8 @@
         }
 
         if (![rs next]) {
-            NSLog(TAG @"getTunnelConnectedState: failed to retrieve row successfully. Aborting.");
-            abort();
+            NSLog(TAG @"getTunnelConnectedState: No previous data recorded.");
+            return;
         }
 
         connected = [rs boolForColumn:COL_TUN_STATE_CONNECTED];
