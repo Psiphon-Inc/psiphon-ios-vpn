@@ -30,10 +30,13 @@
 
 static const double kDefaultLogTruncationInterval = 12 * 60 * 60; // 12 hours
 
+//TODO: shareDB calls are blocking, should they be done in a background thread?
+
 @implementation PacketTunnelProvider {
 
     // pointer to startTunnelWithOptions completion handler.
-    __weak void (^vpnStartCompletionHandler)(NSError *__nullable error);
+    // NOTE: value is expected to be nil after completion handler has been called.
+    void (^vpnStartCompletionHandler)(NSError *__nullable error);
 
     PsiphonTunnel *psiphonTunnel;
     PsiphonDataSharedDB *sharedDB;
@@ -41,26 +44,31 @@ static const double kDefaultLogTruncationInterval = 12 * 60 * 60; // 12 hours
     // Notifier
     Notifier *notifier;
 
-    // Tracking state of the extension
     NSMutableArray<NSString *> *handshakeHomepages;
+
+    // State variables
     BOOL firstOnConnected;
+    BOOL shouldStartVPN;  // Start vpn decision made by the container.
+
 }
 
 - (id)init {
     self = [super init];
 
     if (self) {
+        // Create our tunnel instance
+        psiphonTunnel = [PsiphonTunnel newPsiphonTunnel:(id <TunneledAppDelegate>) self];
+
         sharedDB = [[PsiphonDataSharedDB alloc] initForAppGroupIdentifier:APP_GROUP_IDENTIFIER];
+
+        handshakeHomepages = [[NSMutableArray alloc] init];
 
         // Notifier
         notifier = [[Notifier alloc] initWithAppGroupIdentifier:APP_GROUP_IDENTIFIER];
 
-        handshakeHomepages = [[NSMutableArray alloc] init];
+        // state variables
         firstOnConnected = TRUE;
-
-
-        // Create our tunnel instance
-        psiphonTunnel = [PsiphonTunnel newPsiphonTunnel:(id <TunneledAppDelegate>) self];
+        shouldStartVPN = NO;
     }
     
     return self;
@@ -71,6 +79,9 @@ static const double kDefaultLogTruncationInterval = 12 * 60 * 60; // 12 hours
     // TODO: This method wouldn't work with "boot to VPN"
     if (options[EXTENSION_OPTION_START_FROM_CONTAINER]) {
 
+        // Listen for messages from the container
+        [self listenForContainerMessages];
+        
         // Truncate logs every 12 hours
         [sharedDB truncateLogsOnInterval:(NSTimeInterval) kDefaultLogTruncationInterval];
 
@@ -159,9 +170,59 @@ static const double kDefaultLogTruncationInterval = 12 * 60 * 60; // 12 hours
     
     newSettings.DNSSettings.searchDomains = @[@""];
     
-    newSettings.MTU = [NSNumber numberWithLong: [psiphonTunnel getPacketTunnelMTU]];
+    newSettings.MTU = @([psiphonTunnel getPacketTunnelMTU]);
     
     return newSettings;
+}
+
+/*!
+ * @brief Calls startTunnelWithOptions completion handler
+ * to start the tunnel, if the connection state is Connected.
+ * @return TRUE if completion handler called, FALSE otherwise.
+ */
+- (BOOL)tryStartVPN {
+
+    // Checks if the container has made the decision
+    // for the VPN to be setup.
+    if (!shouldStartVPN) {
+        return NO;
+    }
+
+    BOOL tunnelConnected = [psiphonTunnel getConnectionState] == PsiphonConnectionStateConnected;
+    if (vpnStartCompletionHandler && tunnelConnected) {
+        vpnStartCompletionHandler(nil);
+        vpnStartCompletionHandler = nil;
+
+        self.reasserting = NO;
+
+        // Logic that should run only on the first call to onConnected
+        // from the when the user starts the VPN from the container.
+        if (firstOnConnected) {
+            firstOnConnected = NO;
+
+            if ([handshakeHomepages count] > 0) {
+                BOOL success = [sharedDB updateHomepages:handshakeHomepages];
+                if (success) {
+                    [notifier post:@"NE.newHomepages"];
+                    [handshakeHomepages removeAllObjects];
+                }
+            }
+        }
+
+        // Notify container
+        [notifier post:@"NE.onConnected"];
+        return YES;
+    }
+    return NO;
+}
+
+- (void)listenForContainerMessages {
+    [notifier listenForNotification:@"M.startVPN" listener:^{
+        // If the tunnel is connected, starts the VPN.
+        // Otherwise, should establish the VPN after onConnected has been called.
+        shouldStartVPN = YES; // This should be set before calling tryStartVPN.
+        [self tryStartVPN];
+    }];
 }
 
 @end
@@ -248,29 +309,25 @@ static const double kDefaultLogTruncationInterval = 12 * 60 * 60; // 12 hours
 - (void)onConnected {
     NSLog(@"onConnected");
 
-    if (vpnStartCompletionHandler) {
-        vpnStartCompletionHandler(nil);
-        vpnStartCompletionHandler = nil;
+    // Write state to the database
+    [sharedDB updateTunnelConnectedState:YES];
+
+    // TODO: possible race condition. Should we use handleAppMessage?
+    // If the container is in the background, notifies the user that the app
+    // should be opened. Otherwise, send notification to the container
+    // that the tunnel has been connected.
+    if (![sharedDB getAppForegroundState]) {
+        // TODO: add actionable notification, and use displayMessage as fallback.
+        [self displayMessage:
+          NSLocalizedStringWithDefaultValue(@"open container app", nil, [NSBundle mainBundle], @"Please open Psiphon app to finish connecting.", @"Alert message informing the user they should open the app to finish connecting to the VPN.")
+          completionHandler:^(BOOL success) {
+              // TODO: error handling?
+        }];
+    } else {
+        // Container is in the foreground.
+        [notifier post:@"NE.tunnelConnected"];
+        [self tryStartVPN];
     }
-
-    self.reasserting = FALSE;
-    
-    // Logic that should run only on the first call to onConnected
-    // from the when the user starts the VPN from the container.
-    if (firstOnConnected) {
-        firstOnConnected = FALSE;
-
-        if ([handshakeHomepages count] > 0) {
-            BOOL success = [sharedDB insertNewHomepages:handshakeHomepages];
-            if (success) {
-                [notifier post:@"NE.newHomepages"];
-                [handshakeHomepages removeAllObjects];
-            }
-        }
-    }
-
-    // Notify container
-    [notifier post:@"NE.onConnected"];
 }
 
 - (void)onHomepage:(NSString * _Nonnull)url {
