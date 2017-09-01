@@ -20,6 +20,7 @@
 #import "AppDelegate.h"
 #import "PsiphonClientCommonLibraryHelpers.h"
 #import "ViewController.h"
+#import "LaunchScreenViewController.h"
 
 @interface AppDelegate ()
 @end
@@ -34,9 +35,45 @@
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // Override point for customization after application launch.
     self.window = [[UIWindow alloc] initWithFrame:UIScreen.mainScreen.bounds];
-    self.window.rootViewController = [[ViewController alloc] init];
+    self.window.rootViewController = [[LaunchScreenViewController alloc] init];
     [self.window makeKeyAndVisible];
     return YES;
+}
+
+- (void)switchToMainViewController:(MPInterstitialAdController *)ads :(ViewController *)vc {
+    vc.untunneledInterstitial = ads;
+    
+    [self changeRootViewController:vc];
+}
+
+- (void)changeRootViewController:(UIViewController*)viewController {
+    if (!self.window.rootViewController) {
+        self.window.rootViewController = viewController;
+        return;
+    }
+    
+    UIViewController *prevViewController = self.window.rootViewController;
+    
+    UIView *snapShot = [self.window snapshotViewAfterScreenUpdates:YES];
+    [viewController.view addSubview:snapShot];
+    
+    self.window.rootViewController = viewController;
+    
+    [prevViewController dismissViewControllerAnimated:NO completion:^{
+        // Remove the root view in case it is still showing
+        [prevViewController.view removeFromSuperview];
+    }];
+    
+    [UIView animateWithDuration:.3 animations:^{
+        snapShot.layer.opacity = 0;
+        snapShot.layer.transform = CATransform3DMakeScale(1.5, 1.5, 1.5);
+    } completion:^(BOOL finished) {
+        [snapShot removeFromSuperview];
+    }];
+}
+
++ (AppDelegate *)sharedAppDelegate{
+    return (AppDelegate *)[UIApplication sharedApplication].delegate;
 }
 
 - (void)applicationWillResignActive:(UIApplication *)application {
