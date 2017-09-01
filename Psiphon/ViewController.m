@@ -1,4 +1,3 @@
-
 /*
  * Copyright (c) 2017, Psiphon Inc.
  * All rights reserved.
@@ -25,19 +24,21 @@
 #import "Notifier.h"
 #import "PsiphonConfigUserDefaults.h"
 #import "LogViewControllerFullScreen.h"
+#import "VPNManager.h"
 
 @import NetworkExtension;
 @import GoogleMobileAds;
 
-
 @interface ViewController ()
 
-@property (nonatomic) NEVPNManager *targetManager;
 @property (nonatomic, retain) MPInterstitialAdController *untunneledInterstitial;
 
 @end
 
 @implementation ViewController {
+
+    // VPN Manager
+    VPNManager *vpnManager;
 
     PsiphonDataSharedDB *sharedDB;
 
@@ -45,9 +46,7 @@
     Notifier *notifier;
 
     // UI elements
-    UISwitch *startStopToggle;
     UIButton *startStopButton;
-    UILabel *toggleLabel;
     UILabel *statusLabel;
     UIButton *regionButton;
     UILabel *versionLabel;
@@ -55,19 +54,18 @@
 
     // App state variables
     BOOL shownHomepage;
-    BOOL restartRequired;
-    BOOL canStartTunnel;
+//    BOOL restartRequired;
+    BOOL adWillShow;
 
     // VPN Config user defaults
     PsiphonConfigUserDefaults *psiphonConfigUserDefaults;
-}
 
-@synthesize targetManager = _targetManager;
+}
 
 - (id)init {
     self = [super init];
     if (self) {
-        self.targetManager = [NEVPNManager sharedManager];
+        vpnManager = [[VPNManager alloc] init];
 
         sharedDB = [[PsiphonDataSharedDB alloc] initForAppGroupIdentifier:APP_GROUP_IDENTIFIER];
         
@@ -77,8 +75,9 @@
         // VPN Config user defaults
         psiphonConfigUserDefaults = [[PsiphonConfigUserDefaults alloc] initWithSuiteName:APP_GROUP_IDENTIFIER];
 
+        // State variables
         [self resetAppState];
-
+        adWillShow = FALSE;
     }
     return self;
 }
@@ -86,7 +85,7 @@
 // Initializes/resets variables that track application state
 - (void)resetAppState {
     shownHomepage = FALSE;
-    restartRequired = FALSE;
+//    restartRequired = FALSE;
 }
 
 #pragma mark - Lifecycle methods
@@ -106,25 +105,23 @@
     //  calls them in the right order
     [self addAdButton];
     [self addStatusLabel];
-//    [self addToggleLabel];
-//    [self addStartAndStopToggle];
     [self addStartAndStopButton];
     [self addRegionButton];
     [self addVersionLabel];
 
-    // Load previous NETunnelProviderManager, if any.
-    [NETunnelProviderManager loadAllFromPreferencesWithCompletionHandler:^(NSArray<NETunnelProviderManager *> * _Nullable managers, NSError * _Nullable error) {
-        if (managers == nil) {
-            return;
-        }
-        
-        // TODO: should we do error checking here, or on call to startVPN only?
-        if ([managers count] == 1) {
-            self.targetManager = managers[0];
-            [startStopButton setSelected:[self isVPNActive]];
-            [self initializeAds];
-        }
-    }];
+//    // Load previous NETunnelProviderManager, if any.
+//    [NETunnelProviderManager loadAllFromPreferencesWithCompletionHandler:^(NSArray<NETunnelProviderManager *> * _Nullable managers, NSError * _Nullable error) {
+//        if (managers == nil) {
+//            return;
+//        }
+//
+//        // TODO: should we do error checking here, or on call to startTunnel only?
+//        if ([managers count] == 1) {
+//            self.targetManager = managers[0];
+//            [startStopButton setSelected:[self isVPNActive]];
+//            [self initializeAds];
+//        }
+//    }];
     
     // TODO: load/save config here to have the user immediately complete the permission prompt
     
@@ -134,19 +131,33 @@
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidBecomeActive) name:UIApplicationDidBecomeActiveNotification object:nil];
 }
 
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+
+    [[NSNotificationCenter defaultCenter]
+      addObserver:self selector:@selector(vpnStatusDidChange) name:@kVPNStatusChange object:vpnManager];
+}
+
+
 - (void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
     
     // Stop watching for status change notifications.
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:NEVPNStatusDidChangeNotification object:self.targetManager.connection];
+//    [[NSNotificationCenter defaultCenter] removeObserver:self
+//       name:NEVPNStatusDidChangeNotification object:self.targetManager.connection];
 }
 
 - (void)applicationDidBecomeActive {
     // Listen for messages from Network Extension
     [self listenForNEMessages];
+
+    [sharedDB updateAppForegroundState:YES];
 }
 
 - (void)applicationWillResignActive {
+
+    [sharedDB updateAppForegroundState:NO];
+
     // Stop listening for diagnostic messages (we don't want to hold the shared db lock while backgrounded)
     // TODO: best place to stop listening for NE messages?
     [notifier stopListeningForAllNotifications];
@@ -154,22 +165,17 @@
 
 #pragma mark - UI callbacks
 
-//- (void)onSwitch:(UISwitch *)sender {
-//    if (![self isVPNActive]) {
-//        [self startVPN];
-//    } else {
-//        NSLog(@"call targetManager.connection.stopVPNTunnel()");
-//        [self.targetManager.connection stopVPNTunnel];
-//    }
-//}
+- (void)vpnStatusDidChange {
+    startStopButton.selected = [vpnManager isVPNActive];
+    statusLabel.text = [self getVPNStatusDescription:[vpnManager getVPNStatus]];
+}
 
 - (void)onStartStopTap:(UIButton *)sender {
-    if (![self isVPNActive]) {
+    if (![vpnManager isVPNActive]) {
         [self showUntunneledInterstitial];
-        // Then Start VPN
     } else {
         NSLog(@"call targetManager.connection.stopVPNTunnel()");
-        [self.targetManager.connection stopVPNTunnel];
+        [vpnManager stopVPN];
     }
 }
 
@@ -177,7 +183,7 @@
     if ([psiphonConfigUserDefaults setEgressRegion:@""]) {
         
     }
-    [self restartVPN];
+    [vpnManager restartVPN];
 }
 
 - (void)onVersionLabelTap:(UILabel *)sender {
@@ -196,75 +202,12 @@
 
 # pragma mark - Network Extension
 
-- (void)startVPN {
-    NSLog(@"startVPN: call loadAllFromPreferencesWithCompletionHandler");
-
-    [self resetAppState];
-
-    [NETunnelProviderManager loadAllFromPreferencesWithCompletionHandler:^(NSArray<NETunnelProviderManager *> * _Nullable allManagers, NSError * _Nullable error) {
-        
-        if (allManagers == nil) {
-            return;
-        }
-        
-        // If there are no configurations, create one
-        // if there is more than one, abort!
-        if ([allManagers count] == 0) {
-            NSLog(@"startVPN: np VPN configurations found");
-            NETunnelProviderManager *newManager = [[NETunnelProviderManager alloc] init];
-            NETunnelProviderProtocol *providerProtocol = [[NETunnelProviderProtocol alloc] init];
-            providerProtocol.providerBundleIdentifier = @"ca.psiphon.Psiphon.PsiphonVPN";
-            newManager.protocolConfiguration = providerProtocol;
-            newManager.protocolConfiguration.serverAddress = @"localhost";
-            self.targetManager = newManager;
-        } else if ([allManagers count] > 1) {
-            NSLog(@"startVPN: %lu VPN configurations found, only expected 1. Aborting", (unsigned long)[allManagers count]);
-            return;
-        }
-        
-        // setEnabled becomes false if the user changes the
-        // enabled VPN Configuration from the prefrences.
-        [self.targetManager setEnabled:TRUE];
-        
-        
-        NSLog(@"startVPN: call saveToPreferencesWithCompletionHandler");
-
-        [self.targetManager saveToPreferencesWithCompletionHandler:^(NSError * _Nullable error) {
-            if (error != nil) {
-                // User denied permission to add VPN Configuration.
-                [startStopButton setSelected:FALSE];
-                NSLog(@"startVPN: failed to save the configuration: %@", error);
-                return;
-            }
-            
-            [self.targetManager loadFromPreferencesWithCompletionHandler:^(NSError * _Nullable error) {
-                if (error != nil) {
-                    NSLog(@"startVPN: second loadFromPreferences failed");
-                    return;
-                }
-
-                NSLog(@"startVPN: call targetManager.connection.startVPNTunnel()");
-                NSError *vpnStartError;
-                NSDictionary *extensionOptions = @{EXTENSION_OPTION_START_FROM_CONTAINER : @YES};
-
-                BOOL vpnStartSuccess = [self.targetManager.connection startVPNTunnelWithOptions:extensionOptions
-                  andReturnError:&vpnStartError];
-                if (!vpnStartSuccess) {
-                    NSLog(@"startVPN: startVPNTunnel failed: %@", vpnStartError);
-                }
-                
-                NSLog(@"startVPN: startVPNTunnel success");
-            }];
-        }];
-    }];
-}
-
-- (void)restartVPN {
-    if (self.targetManager.connection) {
-        restartRequired = TRUE;
-        [self.targetManager.connection stopVPNTunnel];
-    }
-}
+//- (void)restartVPN {
+//    if (self.targetManager.connection) {
+//        restartRequired = TRUE;
+//        [self.targetManager.connection stopVPNTunnel];
+//    }
+//}
 
 - (void)listenForNEMessages {
 
@@ -286,120 +229,43 @@
         });
     }];
 
-    [notifier listenForNotification:@"NE.onConnected" listener:^{
+    [notifier listenForNotification:@"NE.tunnelConnected" listener:^{
+        // If we haven't had a chance to load an Ad, and the
+        // tunnel is already connected, give up on the Ad and
+        // start the VPN.
+        if (!adWillShow) {
+            [vpnManager startVPN];
+        }
     }];
 
 }
-
-# pragma mark - Property getters/setters
-
-- (void)setTargetManager:(NEVPNManager *)targetManager {
-    _targetManager = targetManager;
-    statusLabel.text = [self getVPNStatusDescription];
-    
-    // Listening for NEVPNStatusDidChangeNotification
-    [[NSNotificationCenter defaultCenter] addObserverForName:NEVPNStatusDidChangeNotification
-      object:_targetManager.connection queue:NSOperationQueue.mainQueue
-      usingBlock:^(NSNotification * _Nonnull note) {
-
-          if (_targetManager.connection.status == NEVPNStatusDisconnected) {
-              if (restartRequired) {
-                  restartRequired = FALSE;
-                  dispatch_async(dispatch_get_main_queue(), ^{
-                      [self startVPN];
-                  });
-              } else {
-                  // Start a timer and call initialized ads when timer expired. (asyncronzed sleep(5)) then init ads
-                  // else init ads
-                  [self initializeAds];
-              }
-          } else {
-              [self initializeAds];
-          }
-
-          NSLog(@"received NEVPNStatusDidChangeNotification %@", [self getVPNStatusDescription]);
-          statusLabel.text = [self getVPNStatusDescription];
-          [startStopButton setSelected:[self isVPNActive]];
-    }];
-}
-
 
 # pragma mark - UI helper functions
 
 /*!
  @brief Returns targetManager current connection status description.
  */
-- (NSString *)getVPNStatusDescription {
-    switch(self.targetManager.connection.status) {
-        case NEVPNStatusDisconnected: return @"Disconnected";
-        case NEVPNStatusInvalid: return @"Invalid";
-        case NEVPNStatusConnected: return @"Connected";
-        case NEVPNStatusConnecting: return @"Connecting";
-        case NEVPNStatusDisconnecting: return @"Disconnecting";
-        case NEVPNStatusReasserting: return @"Reconnecting";
+- (NSString *)getVPNStatusDescription:(VPNStatus) status {
+    switch(status) {
+        case VPNStatusDisconnected: return @"Disconnected";
+        case VPNStatusInvalid: return @"Invalid";
+        case VPNStatusConnected: return @"Connected";
+        case VPNStatusConnecting: return @"Connecting";
+        case VPNStatusDisconnecting: return @"Disconnecting";
+        case VPNStatusReasserting: return @"Reconnecting";
+        case VPNStatusRestarting: return @"Restarting";
+        default: return @"Invalid";
     }
-    return nil;
 }
 
-/*!
- @brief Returns true if NEVPNConnectionStatus is Connected, Connecting or Reasserting.
- */
-- (BOOL) isVPNActive{
-    NEVPNStatus status = self.targetManager.connection.status;
-    return (status == NEVPNStatusConnecting
-      || status == NEVPNStatusConnected
-      || status == NEVPNStatusReasserting);
-}
-
-//- (void)addToggleLabel {
-//    toggleLabel = [[UILabel alloc] init];
-//    toggleLabel.text = NSLocalizedString(@"Run Psiphon VPN", @"Label beside toggle button which starts the Psiphon Tunnel");
-//    toggleLabel.translatesAutoresizingMaskIntoConstraints = NO;
-//
-//    [self.view addSubview:toggleLabel];
-//
-//    // Setup autolayout
-//    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:toggleLabel
-//                                                          attribute:NSLayoutAttributeLeft
-//                                                          relatedBy:NSLayoutRelationEqual
-//                                                             toItem:statusLabel
-//                                                          attribute:NSLayoutAttributeLeft
-//                                                         multiplier:1.0
-//                                                           constant:15.0]];
-//
-//    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:toggleLabel
-//                                                          attribute:NSLayoutAttributeTop
-//                                                          relatedBy:NSLayoutRelationEqual
-//                                                             toItem:statusLabel
-//                                                          attribute:NSLayoutAttributeBottom
-//                                                         multiplier:1.0
-//                                                           constant:15.0]];
-//}
-
-//- (void)addStartAndStopToggle {
-//    startStopToggle = [[UISwitch alloc] init];
-//    startStopToggle.transform = CGAffineTransformMakeScale(1.5, 1.5);
-//    startStopToggle.translatesAutoresizingMaskIntoConstraints = NO;
-//    [startStopToggle addTarget:self action:@selector(onSwitch:) forControlEvents:UIControlEventValueChanged];
-//
-//    [self.view addSubview:startStopToggle];
-//
-//    // Setup autolayout
-//    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:startStopToggle
-//                                                          attribute:NSLayoutAttributeTop
-//                                                          relatedBy:NSLayoutRelationEqual
-//                                                             toItem:statusLabel
-//                                                          attribute:NSLayoutAttributeBottom
-//                                                         multiplier:1.0
-//                                                           constant:15.0]];
-//
-//    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:startStopToggle
-//                                                          attribute:NSLayoutAttributeLeft
-//                                                          relatedBy:NSLayoutRelationEqual
-//                                                             toItem:statusLabel
-//                                                          attribute:NSLayoutAttributeLeft
-//                                                         multiplier:1.0
-//                                                           constant:15.0]];
+///*!
+// @brief Returns true if NEVPNConnectionStatus is Connected, Connecting or Reasserting.
+// */
+//- (BOOL) isVPNActive{
+//    NEVPNStatus status = self.targetManager.connection.status;
+//    return (status == NEVPNStatusConnecting
+//      || status == NEVPNStatusConnected
+//      || status == NEVPNStatusReasserting);
 //}
 
 - (void)addStartAndStopButton {
@@ -582,9 +448,9 @@
 
 - (void)initializeAds {
     NSLog(@"initializeAds");
-    if ([self isVPNActive]) {
+    if ([vpnManager isVPNActive]) {
         adLabel.hidden = true;
-    } else if (self.targetManager.connection.status == NEVPNStatusDisconnected && !restartRequired) {
+    } else if ([vpnManager getVPNStatus] == VPNStatusDisconnected) {
         [GADMobileAds configureWithApplicationID:@"ca-app-pub-1072041961750291~2085686375"];
         [self loadUntunneledInterstitial];
     }
@@ -593,7 +459,7 @@
 - (void)loadUntunneledInterstitial {
     NSLog(@"loadUntunneledInterstitial");
     self.untunneledInterstitial = [MPInterstitialAdController
-                                   interstitialAdControllerForAdUnitId:@"4250ebf7b28043e08ddbe04d444d79e4"];
+      interstitialAdControllerForAdUnitId:@"4250ebf7b28043e08ddbe04d444d79e4"];
     self.untunneledInterstitial.delegate = self;
     [self.untunneledInterstitial loadAd];
 }
@@ -601,10 +467,16 @@
 - (void)showUntunneledInterstitial {
     NSLog(@"showUntunneledInterstitial");
     if (self.untunneledInterstitial.ready) {
+        adWillShow = YES;
         [self.untunneledInterstitial showFromViewController:self];
-    }else{
-        [self startVPN];
     }
+
+    // Start the tunnel in parallel with showing ads.
+    // VPN won't start until "C.startVPN" message is sent
+    // to the extension.
+    [vpnManager startTunnelWithCompletionHandler:^(BOOL success) {
+        // TODO:
+    }];
 }
 
 - (void)interstitialDidLoadAd:(MPInterstitialAdController *)interstitial {
@@ -627,7 +499,12 @@
     NSLog(@"Interstitial dismissed");
     // TODO: start the tunnel? or set a flag indicating that the tunnel should be started when returning to the UI?
     adLabel.hidden = true;
-    [self startVPN];
+
+    adWillShow = NO;
+
+    // Post message to the extension to start the VPN
+    // when the tunnel is established.
+    [vpnManager startVPN];
 }
 
 @end

@@ -25,6 +25,7 @@
 		6EFFCABC727E889CCD1BF200 /* libPods-Psiphon.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E4850095AA8BA13C0BCC7659 /* libPods-Psiphon.a */; };
 		9BFEC23DBD7EFDD326FF6C14 /* psiphon_config.stub in Resources */ = {isa = PBXBuildFile; fileRef = 9BFEC4205423A6F55DA7DAB0 /* psiphon_config.stub */; };
 		9BFEC3CD51F31841B4F8CD2B /* psiphon_config in Resources */ = {isa = PBXBuildFile; fileRef = 9BFECFCFB0546F18A7E57ADF /* psiphon_config */; };
+		9BFEC4475166B2EEAF192D37 /* VPNManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC04426D8558CB89D3798 /* VPNManager.m */; };
 		9BFEC4F02A47FF8265635803 /* Notifier.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC91ED4A1C511520E9948 /* Notifier.m */; };
 		9BFECD1880B51B0E2EAEFF1F /* Notifier.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC91ED4A1C511520E9948 /* Notifier.m */; };
 		9BFECED023FC902444EB74C4 /* embedded_server_entries in Resources */ = {isa = PBXBuildFile; fileRef = 9BFEC1C6E19CD9DF09AB5F51 /* embedded_server_entries */; };
@@ -103,10 +104,12 @@
 		66094F781E8067520069EC4E /* PsiphonTunnel.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = PsiphonTunnel.framework; sourceTree = "<group>"; };
 		668AF9BE1E92CBD3008CAAAA /* NetworkExtension.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = NetworkExtension.framework; path = System/Library/Frameworks/NetworkExtension.framework; sourceTree = SDKROOT; };
 		9BFEC0419AD3808370915E01 /* PsiphonConfigUserDefaults.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PsiphonConfigUserDefaults.h; sourceTree = "<group>"; };
+		9BFEC04426D8558CB89D3798 /* VPNManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VPNManager.m; sourceTree = "<group>"; };
 		9BFEC1C6E19CD9DF09AB5F51 /* embedded_server_entries */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = embedded_server_entries; sourceTree = "<group>"; };
 		9BFEC3165745A5D14C8C3C08 /* Notifier.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Notifier.h; sourceTree = "<group>"; };
 		9BFEC4205423A6F55DA7DAB0 /* psiphon_config.stub */ = {isa = PBXFileReference; lastKnownFileType = file.stub; path = psiphon_config.stub; sourceTree = "<group>"; };
 		9BFEC584519C408D9D6D3FF1 /* PsiphonConfigUserDefaults.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PsiphonConfigUserDefaults.m; sourceTree = "<group>"; };
+		9BFEC74F24453B8E4B1AFC39 /* VPNManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VPNManager.h; sourceTree = "<group>"; };
 		9BFEC91ED4A1C511520E9948 /* Notifier.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Notifier.m; sourceTree = "<group>"; };
 		9BFECFCFB0546F18A7E57ADF /* psiphon_config */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = psiphon_config; sourceTree = "<group>"; };
 		B791899EB4BA7F290D89DE8D /* Pods-PsiphonVPN.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PsiphonVPN.debug.xcconfig"; path = "Pods/Target Support Files/Pods-PsiphonVPN/Pods-PsiphonVPN.debug.xcconfig"; sourceTree = "<group>"; };
@@ -253,6 +256,8 @@
 				EF652CD41F35224C002AFB48 /* ViewController.h */,
 				EF652CD51F35224C002AFB48 /* ViewController.m */,
 				197DABF21F54C0EA00DD5C3B /* 3rd Party Adapters */,
+				9BFEC04426D8558CB89D3798 /* VPNManager.m */,
+				9BFEC74F24453B8E4B1AFC39 /* VPNManager.h */,
 			);
 			path = Psiphon;
 			sourceTree = "<group>";
@@ -550,6 +555,7 @@
 				9BFECFEB3BC9F10542C1A416 /* PsiphonConfigUserDefaults.m in Sources */,
 				197DABEE1F54C09E00DD5C3B /* MPVungleRouter.m in Sources */,
 				19CB75071F54ADB300F78219 /* MPGoogleAdMobBannerCustomEvent.m in Sources */,
+				9BFEC4475166B2EEAF192D37 /* VPNManager.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
