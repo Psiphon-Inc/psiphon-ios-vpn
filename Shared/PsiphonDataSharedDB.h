@@ -35,15 +35,26 @@
 - (BOOL)createDatabase;
 - (BOOL)clearDatabase;
 
-- (BOOL)insertNewHomepages:(NSArray<NSString *> *)homepageUrls;
+// Home page table
+- (BOOL)updateHomepages:(NSArray<NSString *> *)homepageUrls;
 - (NSArray<Homepage *> *)getAllHomepages;
 
+// Logs table
 #ifdef TARGET_IS_EXTENSION
 - (void)truncateLogsOnInterval:(NSTimeInterval)interval; // should only be called by the app extension
 #endif
 - (BOOL)truncateLogs;
 - (BOOL)insertDiagnosticMessage:(NSString*)message;
 - (NSArray<DiagnosticEntry*>*)getNewLogs;
+
+// Tunnel state table
+- (BOOL)updateTunnelConnectedState:(BOOL)connected;
+- (BOOL)getTunnelConnectedState;
+
+// App state table
+- (BOOL)updateAppForegroundState:(BOOL)foreground;
+- (BOOL)getAppForegroundState;
+
 @end
 
 
