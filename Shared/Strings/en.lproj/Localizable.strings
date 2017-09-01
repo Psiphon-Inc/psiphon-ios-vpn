@@ -11,6 +11,9 @@
 /* Log view title bar text */
 "LOGS_TITLE" = "Logs";
 
+/* Alert message informing the user they should open the app to finish connecting to the VPN. */
+"open container app" = "Please open Psiphon app to finish connecting.";
+
 /* Title which is displayed beside the flag of the country which the user has chosen to connect to. */
 "SERVER_REGION" = "Server region";
 
@@ -34,4 +37,7 @@
 
 /* Status when the VPN was connected to a Psiphon server, got disconnected unexpectedly, and is currently trying to reconnect */
 "VPN_STATUS_RECONNECTING" = "Reconnecting";
+
+/* Status when the VPN is restarting. */
+"VPN_STATUS_RESTARTING" = "Restarting";
 
