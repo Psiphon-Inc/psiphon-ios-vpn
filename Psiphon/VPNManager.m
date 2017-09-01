@@ -55,7 +55,6 @@
           ^(NSArray<NETunnelProviderManager *> *managers, NSError *error) {
               if ([managers count] == 1) {
                   self.targetManager = managers[0];
-                  //TODO: startStopButton setSelected = Connecting | Connected | Reasserting
               }
         }];
     }
@@ -194,17 +193,21 @@
 #pragma mark - Private methods
 
 - (void)setTargetManager:(NEVPNManager *)targetManager {
-    _targetManager = targetManager;
 
+    _targetManager = targetManager;
     [self postStatusChangeNotification];
 
-    // To restart the VPN, should wait till NEVPNStatusDisconnected is received.
-    // We can then start a new tunnel.
+    // Listening to NEVPNManager status change notifications.
     localVPNStatusObserver = [[NSNotificationCenter defaultCenter]
       addObserverForName:NEVPNStatusDidChangeNotification
       object:_targetManager.connection queue:NSOperationQueue.mainQueue
       usingBlock:^(NSNotification * _Nonnull note) {
 
+          // Observers of kVPNStatusChange will be notified at the same time.
+          [self postStatusChangeNotification];
+
+          // To restart the VPN, should wait till NEVPNStatusDisconnected is received.
+          // We can then start a new tunnel.
           // If restartRequired then start  a new network extension process if the previous
           // one has already been disconnected.
           if (_targetManager.connection.status == NEVPNStatusDisconnected && restartRequired) {
@@ -212,8 +215,6 @@
                   [self startTunnelWithCompletionHandler:nil];
               });
           }
-
-          [self postStatusChangeNotification];
 
       }];
 }
