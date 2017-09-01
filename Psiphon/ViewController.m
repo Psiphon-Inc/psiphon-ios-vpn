@@ -30,6 +30,7 @@
 #import "RegionSelectionViewController.h"
 #import "SharedConstants.h"
 #import "Notifier.h"
+#import "LaunchScreenViewController.h"
 #import "UIImage+CountryFlag.h"
 #import "UpstreamProxySettings.h"
 #import "ViewController.h"
@@ -44,7 +45,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 
 @interface ViewController ()
 
-@property (nonatomic, retain) MPInterstitialAdController *untunneledInterstitial;
+@property (nonatomic) NEVPNManager *targetManager;
 
 @end
 
@@ -223,10 +224,10 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
         //    - because it's likely the user will be leaving the app, so we don't want to request
         //      another ad right away
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 5 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
-            [self initializeAds];
+//            [self initializeAds];
         });
     } else {
-        [self initializeAds];
+//        [self initializeAds];
     }
 }
 
@@ -255,10 +256,6 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     nav.modalTransitionStyle = UIModalTransitionStyleCoverVertical;
 
     [self presentViewController:nav animated:YES completion:nil];
-}
-
-- (void)onAdClick:(UIButton *)sender {
-    [self showUntunneledInterstitial];
 }
 
 # pragma mark - Network Extension
@@ -574,7 +571,9 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     adLabel.text = NSLocalizedStringWithDefaultValue(@"AD_LOADED", nil, [NSBundle mainBundle], @"Ad Loaded", @"Text for button that plays the main screen ad");
     adLabel.textAlignment = NSTextAlignmentCenter;
     [self.view addSubview:adLabel];
-    adLabel.hidden = true;
+    if (!self.untunneledInterstitial.ready){
+        adLabel.hidden = true;
+    }
 
     // Setup autolayout
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:adLabel
@@ -651,6 +650,8 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 - (void)interstitialDidLoadAd:(MPInterstitialAdController *)interstitial {
     NSLog(@"Interstitial loaded");
     adLabel.hidden = false;
+    [[NSNotificationCenter defaultCenter]
+            postNotificationName:@adsDidLoad object:self];
 }
 
 - (void)interstitialDidFailToLoadAd:(MPInterstitialAdController *)interstitial {

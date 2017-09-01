@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, Psiphon Inc.
+ * Copyright (c) 2017, Psiphon Inc. Created by Draven Johnson on 2017-08-30.
  * All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,16 +17,14 @@
  *
  */
 
+#import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
 #import "MPInterstitialAdController.h"
-#import "ViewController.h"
 
-@interface AppDelegate : UIResponder <UIApplicationDelegate>
+@import GoogleMobileAds;
 
-@property (strong, nonatomic) UIWindow *window;
+@interface LaunchScreenViewController : UIViewController <MPInterstitialAdControllerDelegate>
 
-+ (AppDelegate *)sharedAppDelegate;
-
-- (void) switchToMainViewController:(MPInterstitialAdController *)ads :(ViewController *)vc;
+@property (nonatomic, retain) MPInterstitialAdController *untunneledInterstitial;
 
 @end
