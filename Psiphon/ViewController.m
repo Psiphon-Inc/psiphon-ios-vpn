@@ -40,13 +40,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     return (([a length] == 0) && ([b length] == 0)) || ([a isEqualToString:b]);
 };
 
-@import NetworkExtension;
-@import GoogleMobileAds;
-
 @interface ViewController ()
-
-@property (nonatomic) NEVPNManager *targetManager;
-
 @end
 
 @implementation ViewController {
@@ -140,11 +134,6 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     [self addVersionLabel];
 
     // TODO: load/save config here to have the user immediately complete the permission prompt
-
-    // TODO: perhaps this should be done through the AppDelegate
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationWillResignActive) name:UIApplicationWillResignActiveNotification object:nil];
-
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidBecomeActive) name:UIApplicationDidBecomeActiveNotification object:nil];
 }
 
 - (void)viewDidAppear:(BOOL)animated {
@@ -158,19 +147,12 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
 
+    // Listen for VPN status changes from VPNManager.
     [[NSNotificationCenter defaultCenter]
       addObserver:self selector:@selector(vpnStatusDidChange) name:@kVPNStatusChange object:vpnManager];
-}
 
-- (void)viewWillDisappear:(BOOL)animated {
-    [super viewWillDisappear:animated];
-}
-
-- (void)applicationDidBecomeActive {
-    // Listen for messages from Network Extension
+    // Listen for messages from Network Extension.
     [self listenForNEMessages];
-
-    [sharedDB updateAppForegroundState:YES];
 
     // If the extension has been waiting for the app to come into foreground,
     // send the VPNManager startVPN message again.
@@ -183,12 +165,9 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     });
 }
 
-- (void)applicationWillResignActive {
-
-    [sharedDB updateAppForegroundState:NO];
-
+- (void)viewWillDisappear:(BOOL)animated {
+    [super viewWillDisappear:animated];
     // Stop listening for diagnostic messages (we don't want to hold the shared db lock while backgrounded)
-    // TODO: best place to stop listening for NE messages?
     [notifier stopListeningForAllNotifications];
 }
 
@@ -280,6 +259,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     }];
 
     [notifier listenForNotification:@"NE.tunnelConnected" listener:^{
+        NSLog(@"received NE.tunnelConnected");
         // If we haven't had a chance to load an Ad, and the
         // tunnel is already connected, give up on the Ad and
         // start the VPN. Otherwise the startVPN message will be
