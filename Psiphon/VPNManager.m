@@ -40,10 +40,7 @@
 
 @synthesize targetManager = _targetManager;
 
-#pragma mark - Public methods
-
 - (instancetype)init {
-    // TODO: should probably make this a singleton
     self = [super init];
     if (self) {
         notifier = [[Notifier alloc] initWithAppGroupIdentifier:APP_GROUP_IDENTIFIER];
@@ -56,14 +53,21 @@
               if ([managers count] == 1) {
                   self.targetManager = managers[0];
               }
-        }];
+          }];
     }
     return self;
 }
 
-//- (void)addObserverForStatusDidChangeNotification:(void (^)(VPNStatus))block{
-//    statusDidChangeNotificationBlock = block;
-//}
+#pragma mark - Public methods
+
++ (instancetype)sharedInstance {
+    static dispatch_once_t once;
+    static id sharedInstance;
+    dispatch_once(&once, ^{
+        sharedInstance = [[self alloc] init];
+    });
+    return sharedInstance;
+}
 
 - (VPNStatus)getVPNStatus {
     if (restartRequired) {

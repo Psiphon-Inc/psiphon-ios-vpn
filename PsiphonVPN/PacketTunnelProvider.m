@@ -322,7 +322,7 @@ static const double kDefaultLogTruncationInterval = 12 * 60 * 60; // 12 hours
     if (![sharedDB getAppForegroundState]) {
         // TODO: add actionable notification, and use displayMessage as fallback.
         [self displayMessage:
-          NSLocalizedStringWithDefaultValue(@"open container app", nil, [NSBundle mainBundle], @"Please open Psiphon app to finish connecting.", @"Alert message informing the user they should open the app to finish connecting to the VPN.")
+          NSLocalizedStringWithDefaultValue(@"OPEN_PSIPHON_APP", nil, [NSBundle mainBundle], @"Please open Psiphon app to finish connecting.", @"Alert message informing the user they should open the app to finish connecting to the VPN.")
           completionHandler:^(BOOL success) {
               // TODO: error handling?
         }];

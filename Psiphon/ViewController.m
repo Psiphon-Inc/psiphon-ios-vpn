@@ -1,4 +1,3 @@
-
 /*
  * Copyright (c) 2017, Psiphon Inc.
  * All rights reserved.
@@ -23,7 +22,6 @@
 #import "FeedbackUpload.h"
 #import "LogViewControllerFullScreen.h"
 #import "PsiphonConfigUserDefaults.h"
-#import "PsiphonClientCommonLibraryConstants.h"
 #import "PsiphonClientCommonLibraryHelpers.h"
 #import "PsiphonDataSharedDB.h"
 #import "RegionAdapter.h"
@@ -35,6 +33,7 @@
 #import "UpstreamProxySettings.h"
 #import "ViewController.h"
 #import "VPNManager.h"
+#import "AdManager.h"
 
 static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSString *b) {
     return (([a length] == 0) && ([b length] == 0)) || ([a isEqualToString:b]);
@@ -48,6 +47,8 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     // VPN Manager
     VPNManager *vpnManager;
 
+    AdManager *adManager;
+
     PsiphonDataSharedDB *sharedDB;
 
     // Notifier
@@ -60,10 +61,6 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     UILabel *regionLabel;
     UILabel *versionLabel;
     UILabel *adLabel;
-
-    // App state variables
-    BOOL shownHomepage;
-    BOOL adWillShow;     // Ad will show soon.
 
     // UI Constraint
     NSLayoutConstraint *startButtonScreenWidth;
@@ -84,7 +81,9 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 - (id)init {
     self = [super init];
     if (self) {
-        vpnManager = [[VPNManager alloc] init];
+        vpnManager = [VPNManager sharedInstance];
+
+        adManager = [AdManager sharedInstance];
 
         sharedDB = [[PsiphonDataSharedDB alloc] initForAppGroupIdentifier:APP_GROUP_IDENTIFIER];
 
@@ -94,22 +93,14 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
         // VPN Config user defaults
         psiphonConfigUserDefaults = [PsiphonConfigUserDefaults sharedInstance];
         [self persistSettingsToSharedUserDefaults];
-
-        // State variables
-        [self resetAppState];
     }
     return self;
-}
-
-// Initializes/resets variables that track application state
-- (void)resetAppState {
-    shownHomepage = FALSE;
-    adWillShow = FALSE;
 }
 
 #pragma mark - Lifecycle methods
 
 - (void)viewDidLoad {
+    NSLog(@"ViewController: viewDidLoad");
     [super viewDidLoad];
 
     // TODO: check if database exists first
@@ -137,6 +128,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 }
 
 - (void)viewDidAppear:(BOOL)animated {
+    NSLog(@"ViewController: viewDidAppear");
     [super viewDidAppear:animated];
     // Available regions may have changed in the background
     [self updateAvailableRegions];
@@ -145,31 +137,30 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 }
 
 - (void)viewWillAppear:(BOOL)animated {
+    NSLog(@"ViewController: viewWillAppear");
     [super viewWillAppear:animated];
 
     // Listen for VPN status changes from VPNManager.
     [[NSNotificationCenter defaultCenter]
       addObserver:self selector:@selector(vpnStatusDidChange) name:@kVPNStatusChange object:vpnManager];
 
-    // Listen for messages from Network Extension.
-    [self listenForNEMessages];
+//    // Listen for messages from Network Extension.
+//    [self listenForNEMessages];
 
-    // If the extension has been waiting for the app to come into foreground,
-    // send the VPNManager startVPN message again.
-    dispatch_async(dispatch_get_main_queue(), ^{
-        // If the tunnel is in Connected state, and we're now showing ads
-        // send startVPN message.
-        if (!adWillShow && [sharedDB getTunnelConnectedState]) {
-            [vpnManager startVPN];
-        }
-    });
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
+    NSLog(@"ViewController: viewWillDisappear");
     [super viewWillDisappear:animated];
     // Stop listening for diagnostic messages (we don't want to hold the shared db lock while backgrounded)
     [notifier stopListeningForAllNotifications];
 }
+
+- (void)viewDidDisappear:(BOOL)animated {
+    NSLog(@"ViewController: viewDidDisappear");
+    [super viewDidDisappear:animated];
+}
+
 
 // Reload when rotate
 - (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator {
@@ -235,43 +226,6 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     nav.modalTransitionStyle = UIModalTransitionStyleCoverVertical;
 
     [self presentViewController:nav animated:YES completion:nil];
-}
-
-# pragma mark - Network Extension
-
-- (void)listenForNEMessages {
-    [notifier listenForNotification:@"NE.newHomepages" listener:^{
-        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-            if (!shownHomepage) {
-                NSArray<Homepage *> *homepages = [sharedDB getAllHomepages];
-                if ([homepages count] > 0) {
-                    NSUInteger randIndex = arc4random() % [homepages count];
-                    Homepage *homepage = homepages[randIndex];
-
-                    [[UIApplication sharedApplication] openURL:homepage.url options:@{}
-                                             completionHandler:^(BOOL success) {
-                                                 shownHomepage = success;
-                                             }];
-
-                }
-            }
-        });
-    }];
-
-    [notifier listenForNotification:@"NE.tunnelConnected" listener:^{
-        NSLog(@"received NE.tunnelConnected");
-        // If we haven't had a chance to load an Ad, and the
-        // tunnel is already connected, give up on the Ad and
-        // start the VPN. Otherwise the startVPN message will be
-        // sent after the Ad has disappeared.
-        if (!adWillShow) {
-            [vpnManager startVPN];
-        }
-    }];
-
-    [notifier listenForNotification:@"NE.onAvailableEgressRegions" listener:^{ // TODO should be put in a constants file
-        [self updateAvailableRegions];
-    }];
 }
 
 # pragma mark - UI helper functions
@@ -616,7 +570,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 - (void)showUntunneledInterstitial {
     NSLog(@"showUntunneledInterstitial");
     if (self.untunneledInterstitial.ready) {
-        adWillShow = YES;
+        adManager.adWillShow = YES;
         [self.untunneledInterstitial showFromViewController:self];
     }
 
@@ -650,7 +604,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     // TODO: start the tunnel? or set a flag indicating that the tunnel should be started when returning to the UI?
     adLabel.hidden = true;
 
-    adWillShow = NO;
+    adManager.adWillShow = NO;
 
     // Post message to the extension to start the VPN
     // when the tunnel is established.

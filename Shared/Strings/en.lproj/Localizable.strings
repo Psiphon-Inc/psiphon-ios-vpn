@@ -12,7 +12,7 @@
 "LOGS_TITLE" = "Logs";
 
 /* Alert message informing the user they should open the app to finish connecting to the VPN. */
-"open container app" = "Please open Psiphon app to finish connecting.";
+"OPEN_PSIPHON_APP" = "Please open Psiphon app to finish connecting.";
 
 /* Title which is displayed beside the flag of the country which the user has chosen to connect to. */
 "SERVER_REGION" = "Server region";
