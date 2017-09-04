@@ -19,7 +19,16 @@
 
 #import <Foundation/Foundation.h>
 
-#define kVPNStatusChange "VPNStatusChange"
+// NSNotification name for VPN status change notifications.
+#define kVPNStatusChangeNotificationName "VPNStatusChange"
+
+#define kVPNManagerErrorDomain @"VPNManagerErrorDomain"
+typedef NS_ENUM(NSInteger, VPNManagerErrorCode) {
+    VPNManagerErrorLoadConfigsFailed = 1,
+    VPNManagerErrorTooManyConfigsFounds = 2,
+    VPNManagerErrorUserDeniedConfigInstall = 3,
+    VPNManagerErrorNEStartFailed = 4,
+};
 
 typedef NS_ENUM(NSInteger, VPNStatus) {
     VPNStatusInvalid = 0,
@@ -44,10 +53,9 @@ typedef NS_ENUM(NSInteger, VPNStatus) {
 /**
  * Starts the network extension process and also the tunnel.
  * VPN will not start until startVPN is called.
- * @param completionHandler Called with success set to TRUE if the extension was created
- *        successfully, FALSE otherwise.
+ * @param completionHandler If no errors occurred, then error is set to nil.
  */
-- (void)startTunnelWithCompletionHandler:(nullable void (^)(BOOL success))completionHandler;
+- (void)startTunnelWithCompletionHandler:(nullable void (^)(NSError * _Nullable error))completionHandler;
 
 /**
  * Signals the network extension to start the VPN.

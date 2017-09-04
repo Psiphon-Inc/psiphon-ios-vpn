@@ -142,7 +142,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 
     // Listen for VPN status changes from VPNManager.
     [[NSNotificationCenter defaultCenter]
-      addObserver:self selector:@selector(vpnStatusDidChange) name:@kVPNStatusChange object:vpnManager];
+      addObserver:self selector:@selector(vpnStatusDidChange) name:@kVPNStatusChangeNotificationName object:vpnManager];
 
 //    // Listen for messages from Network Extension.
 //    [self listenForNEMessages];
@@ -569,15 +569,21 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 
 - (void)showUntunneledInterstitial {
     NSLog(@"showUntunneledInterstitial");
-    if (self.untunneledInterstitial.ready) {
-        adManager.adWillShow = YES;
-        [self.untunneledInterstitial showFromViewController:self];
-    }
-
     // Start the tunnel in parallel with showing ads.
     // VPN won't start until [vpnManager startVPN] message is sent.
-    [vpnManager startTunnelWithCompletionHandler:^(BOOL success) {
-        // TODO:
+    [vpnManager startTunnelWithCompletionHandler:^(NSError *error) {
+
+        // Don't show ads if failed to start the network extension.
+        if (!error) {
+            if (self.untunneledInterstitial.ready) {
+                adManager.adWillShow = YES;
+                [self.untunneledInterstitial showFromViewController:self];
+            }
+        }
+
+        if (error.code == VPNManagerErrorUserDeniedConfigInstall) {
+            // TODO: notify user that we need their permission to work.
+        }
     }];
 }
 

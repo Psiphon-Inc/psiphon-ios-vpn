@@ -85,16 +85,18 @@
     return nil;
 }
 
-- (void)startTunnelWithCompletionHandler:(nullable void (^)(BOOL success))completionHandler {
+- (void)startTunnelWithCompletionHandler:(nullable void (^)(NSError * _Nullable error))completionHandler {
 
     // Reset restartRequired flag
     restartRequired = FALSE;
 
-    [NETunnelProviderManager loadAllFromPreferencesWithCompletionHandler:^(NSArray<NETunnelProviderManager *> * _Nullable allManagers, NSError * _Nullable error) {
+    [NETunnelProviderManager loadAllFromPreferencesWithCompletionHandler:
+      ^(NSArray<NETunnelProviderManager *> * _Nullable allManagers, NSError * _Nullable error) {
 
-        if (allManagers == nil) {
+        if (error) {
             if (completionHandler) {
-                completionHandler(FALSE);
+                NSLog(@"%@", error);
+                completionHandler([VPNManager errorWithCode:VPNManagerErrorLoadConfigsFailed]);
             }
             return;
         }
@@ -112,7 +114,7 @@
         } else if ([allManagers count] > 1) {
             NSLog(@"startTunnel: %lu VPN configurations found, only expected 1. Aborting", (unsigned long)[allManagers count]);
             if (completionHandler) {
-                completionHandler(FALSE);
+                completionHandler([VPNManager errorWithCode:VPNManagerErrorTooManyConfigsFounds]);
             }
             return;
         }
@@ -129,7 +131,7 @@
                 // User denied permission to add VPN Configuration.
                 NSLog(@"startTunnel: failed to save the configuration: %@", error);
                 if (completionHandler) {
-                    completionHandler(FALSE);
+                    completionHandler([VPNManager errorWithCode:VPNManagerErrorUserDeniedConfigInstall]);
                 }
                 return;
             }
@@ -138,7 +140,7 @@
                 if (error != nil) {
                     NSLog(@"startTunnel: second loadFromPreferences failed");
                     if (completionHandler) {
-                        completionHandler(FALSE);
+                        completionHandler([VPNManager errorWithCode:VPNManagerErrorLoadConfigsFailed]);
                     }
                     return;
                 }
@@ -152,14 +154,14 @@
                 if (!vpnStartSuccess) {
                     NSLog(@"startTunnel: startVPNTunnel failed: %@", vpnStartError);
                     if (completionHandler) {
-                        completionHandler(FALSE);
+                        completionHandler([VPNManager errorWithCode:VPNManagerErrorNEStartFailed]);
                     }
                     return;
                 }
 
                 NSLog(@"startTunnel: startVPNTunnel success");
                 if (completionHandler) {
-                    completionHandler(TRUE);
+                    completionHandler(nil);
                 }
             }];
         }];
@@ -207,7 +209,7 @@
       object:_targetManager.connection queue:NSOperationQueue.mainQueue
       usingBlock:^(NSNotification * _Nonnull note) {
 
-          // Observers of kVPNStatusChange will be notified at the same time.
+          // Observers of kVPNStatusChangeNotificationName will be notified at the same time.
           [self postStatusChangeNotification];
 
           // To restart the VPN, should wait till NEVPNStatusDisconnected is received.
@@ -225,11 +227,15 @@
 
 - (void)postStatusChangeNotification {
     [[NSNotificationCenter defaultCenter]
-      postNotificationName:@kVPNStatusChange object:self];
+      postNotificationName:@kVPNStatusChangeNotificationName object:self];
 }
 
 - (void)dealloc {
     [[NSNotificationCenter defaultCenter] removeObserver:localVPNStatusObserver];
+}
+
++ (NSError *)errorWithCode:(VPNManagerErrorCode)code {
+    return [[NSError alloc] initWithDomain:kVPNManagerErrorDomain code:code userInfo:nil];
 }
 
 @end
