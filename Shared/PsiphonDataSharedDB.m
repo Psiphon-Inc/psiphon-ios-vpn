@@ -374,6 +374,7 @@
 
 /**
  * @brief Returns previously written tunnel state from the database.
+ *        This state is invalid if the network extension is not running.
  * @return YES if tunnel is connected, NO otherwise.
  */
 - (BOOL)getTunnelConnectedState {

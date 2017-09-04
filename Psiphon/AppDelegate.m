@@ -101,7 +101,7 @@
     dispatch_async(dispatch_get_main_queue(), ^{
         // If the tunnel is in Connected state, and we're now showing ads
         // send startVPN message.
-        if (!adManager.adWillShow && [sharedDB getTunnelConnectedState]) {
+        if (!adManager.adWillShow && [vpnManager isTunnelConnected]) {
             [vpnManager startVPN];
         }
     });

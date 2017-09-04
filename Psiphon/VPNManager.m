@@ -33,7 +33,7 @@
 
 @implementation VPNManager {
     Notifier *notifier;
-//    void (^statusDidChangeNotificationBlock)(VPNStatus);
+    PsiphonDataSharedDB *sharedDB;
     id localVPNStatusObserver;
     BOOL restartRequired;
 }
@@ -44,6 +44,7 @@
     self = [super init];
     if (self) {
         notifier = [[Notifier alloc] initWithAppGroupIdentifier:APP_GROUP_IDENTIFIER];
+        sharedDB = [[PsiphonDataSharedDB alloc] initForAppGroupIdentifier:APP_GROUP_IDENTIFIER];
 
         self.targetManager = [NEVPNManager sharedManager];
 
@@ -194,6 +195,10 @@
 - (BOOL)isVPNActive {
     NEVPNStatus s = self.targetManager.connection.status;
     return (s == NEVPNStatusConnecting || s == NEVPNStatusConnected || s == NEVPNStatusReasserting);
+}
+
+- (BOOL)isTunnelConnected {
+    return [self isVPNActive] && [sharedDB getTunnelConnectedState];
 }
 
 #pragma mark - Private methods

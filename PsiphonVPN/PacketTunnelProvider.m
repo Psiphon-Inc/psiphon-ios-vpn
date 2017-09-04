@@ -85,6 +85,9 @@ static const double kDefaultLogTruncationInterval = 12 * 60 * 60; // 12 hours
         // Truncate logs every 12 hours
         [sharedDB truncateLogsOnInterval:(NSTimeInterval) kDefaultLogTruncationInterval];
 
+        // Reset tunnel connected state.
+        [sharedDB updateTunnelConnectedState:NO];
+
         __weak PsiphonTunnel *weakPsiphonTunnel = psiphonTunnel;
 
         [self setTunnelNetworkSettings:[self getTunnelSettings] completionHandler:^(NSError *_Nullable error) {
@@ -95,7 +98,6 @@ static const double kDefaultLogTruncationInterval = 12 * 60 * 60; // 12 hours
                 return;
             }
 
-            // TODO: don't start VPN until Psiphon is connected?
 
             BOOL success = [weakPsiphonTunnel start:FALSE];
             if (!success) {
@@ -134,7 +136,6 @@ static const double kDefaultLogTruncationInterval = 12 * 60 * 60; // 12 hours
     }
 
     [psiphonTunnel stop];
-    
 
     completionHandler();
     
