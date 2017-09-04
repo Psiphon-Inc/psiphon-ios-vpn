@@ -185,6 +185,7 @@
 
     [notifier listenForNotification:@"NE.onAvailableEgressRegions" listener:^{ // TODO should be put in a constants file
         // Update available regions
+        // TODO: this code is duplicated in ViewController updateAvailableRegions
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
             NSArray<NSString *> *regions = [sharedDB getAllEgressRegions];
             [[RegionAdapter sharedInstance] onAvailableEgressRegions:regions];
