@@ -77,7 +77,12 @@ static const NSString *ItemStatusContext;
                  self.loadingVideo = [AVPlayer playerWithPlayerItem:self.viedoFile];
                  
                  playerLayer = [AVPlayerLayer playerLayerWithPlayer:self.loadingVideo];
-                 playerLayer.frame = self.view.bounds;
+                 if (self.view.bounds.size.width > self.view.bounds.size.height) {
+                     // Landscape
+                     playerLayer.frame = CGRectMake((self.view.bounds.size.width - self.view.bounds.size.width / 1.5) / 2, 0, self.view.bounds.size.width / 1.5, self.view.bounds.size.height / 1.5);
+                 } else {
+                     playerLayer.frame = CGRectMake(0, 0, self.view.bounds.size.width, self.view.bounds.size.height);
+                 }
                  playerLayer.videoGravity = AVLayerVideoGravityResizeAspect;
                  playerLayer.needsDisplayOnBoundsChange = YES;
 
@@ -99,7 +104,7 @@ static const NSString *ItemStatusContext;
 
     if (size.width > size.height) {
         // Landscape
-        playerLayer.frame = CGRectMake(0, 0, size.width, size.height);
+        playerLayer.frame = CGRectMake(( size.width - size.width / 1.5 ) / 2, 0, size.width / 1.5, size.height / 1.5);
     } else {
         playerLayer.frame = CGRectMake(0, 0, size.width, size.height);
     }
