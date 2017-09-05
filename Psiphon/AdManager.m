@@ -18,8 +18,10 @@
  */
 
 #import "AdManager.h"
-#import "GADMobileAds.h"
 #import "VPNManager.h"
+#import "AppDelegate.h"
+
+@import GoogleMobileAds;
 
 @interface AdManager ()
 
@@ -110,7 +112,7 @@
         if (!error) {
             if ([self adIsReady]) {
                 self.adIsShowing = YES;
-                [self.untunneledInterstitial showFromViewController:self];
+                [self.untunneledInterstitial showFromViewController:[[AppDelegate sharedAppDelegate] getMainViewController]];
             }
         }
     }];
