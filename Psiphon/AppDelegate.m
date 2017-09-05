@@ -39,6 +39,10 @@
     NSTimer *loadingTimer;
 
     BOOL shownHomepage;
+    
+    // ViewController
+    MainViewController *mainViewController;
+    LaunchScreenViewController *launchScreenViewController;
 }
 
 - (instancetype)init {
@@ -48,12 +52,19 @@
         adManager = [AdManager sharedInstance];
         sharedDB = [[PsiphonDataSharedDB alloc] initForAppGroupIdentifier:APP_GROUP_IDENTIFIER];
         notifier = [[Notifier alloc] initWithAppGroupIdentifier:APP_GROUP_IDENTIFIER];
+        
+        mainViewController = [[MainViewController alloc] init];
+        launchScreenViewController = [[LaunchScreenViewController alloc] init];
     }
     return self;
 }
 
 + (AppDelegate *)sharedAppDelegate{
     return (AppDelegate *)[UIApplication sharedApplication].delegate;
+}
+
+- (MainViewController *)getMainViewController {
+    return mainViewController;
 }
 
 # pragma mark - Lifecycle methods
@@ -76,10 +87,10 @@
     self.window = [[UIWindow alloc] initWithFrame:UIScreen.mainScreen.bounds];
 
     // TODO: if VPN disconnected, launch with animation, else launch with MainViewController.
-    if ([vpnManager getVPNStatus] == VPNStatusDisconnected) {
-        self.window.rootViewController = [[LaunchScreenViewController alloc] init];
+    if ([vpnManager getVPNStatus] == VPNStatusDisconnected || [vpnManager getVPNStatus] == VPNStatusInvalid) {
+        self.window.rootViewController = launchScreenViewController;
     } else {
-        self.window.rootViewController = [[MainViewController alloc] init];
+        self.window.rootViewController = mainViewController;
     }
 
     [self.window makeKeyAndVisible];
@@ -140,9 +151,9 @@
 #pragma mark - View controller switch
 
 - (void) switchViewControllerWhenExpire:(NSTimer*)timer {
-    if (self.videoFile != nil) {
-        [self.videoFile removeObserver:self forKeyPath:@"status"];
-    }
+//    if (self.videoFile != nil) {
+//        [self.videoFile removeObserver:self forKeyPath:@"status"];
+//    }
     [loadingTimer invalidate];
 //    [[AppDelegate sharedAppDelegate] switchToMainViewController:_untunneledInterstitial:mainViewController];
     [self changeRootViewController:mainViewController];

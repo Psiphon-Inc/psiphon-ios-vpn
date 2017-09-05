@@ -26,7 +26,6 @@
 @property (strong, nonatomic) UIWindow *window;
 
 + (AppDelegate *)sharedAppDelegate;
-
-- (void) switchToMainViewController:(MPInterstitialAdController *)ads :(MainViewController *)vc;
+- (MainViewController *)getMainViewController;
 
 @end
