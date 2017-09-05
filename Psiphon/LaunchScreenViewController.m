@@ -191,8 +191,9 @@ static const NSString *ItemStatusContext;
     loadingLabel = [[UILabel alloc] init];
     loadingLabel.translatesAutoresizingMaskIntoConstraints = NO;
     loadingLabel.adjustsFontSizeToFitWidth = YES;
-    loadingLabel.text = @"Loading ..";
+    loadingLabel.text = @"Loading...";
     loadingLabel.textAlignment = NSTextAlignmentCenter;
+    
     [self.view addSubview:loadingLabel];
     
     // Setup autolayout
@@ -211,6 +212,14 @@ static const NSString *ItemStatusContext;
                                                           attribute:NSLayoutAttributeRight
                                                          multiplier:1.0
                                                            constant:-30.0]];
+    
+    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:loadingLabel
+                                                          attribute:NSLayoutAttributeLeft
+                                                          relatedBy:NSLayoutRelationEqual
+                                                             toItem:self.view
+                                                          attribute:NSLayoutAttributeLeft
+                                                         multiplier:1.0
+                                                           constant:30]];
 }
 
 - (void)addProgressView {
@@ -248,6 +257,7 @@ static const NSString *ItemStatusContext;
     secondLabel = [[UILabel alloc] init];
     secondLabel.translatesAutoresizingMaskIntoConstraints = NO;
     secondLabel.adjustsFontSizeToFitWidth = YES;
+    secondLabel.text = [NSString stringWithFormat:@"%ld", (long)timerCount];
     secondLabel.textAlignment = NSTextAlignmentCenter;
     [self.view addSubview:secondLabel];
     
@@ -266,7 +276,7 @@ static const NSString *ItemStatusContext;
                                                              toItem:loadingLabel
                                                           attribute:NSLayoutAttributeRight
                                                          multiplier:1.0
-                                                           constant:15.0]];
+                                                           constant:-30.0]];
 }
 
 /*!
