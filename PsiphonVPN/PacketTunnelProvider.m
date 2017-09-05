@@ -47,7 +47,6 @@ static const double kDefaultLogTruncationInterval = 12 * 60 * 60; // 12 hours
     NSMutableArray<NSString *> *handshakeHomepages;
 
     // State variables
-    BOOL firstOnConnected;
     BOOL shouldStartVPN;  // Start vpn decision made by the container.
 
 }
@@ -67,7 +66,6 @@ static const double kDefaultLogTruncationInterval = 12 * 60 * 60; // 12 hours
         notifier = [[Notifier alloc] initWithAppGroupIdentifier:APP_GROUP_IDENTIFIER];
 
         // state variables
-        firstOnConnected = TRUE;
         shouldStartVPN = NO;
     }
     
@@ -187,22 +185,18 @@ static const double kDefaultLogTruncationInterval = 12 * 60 * 60; // 12 hours
 - (BOOL)tryStartVPN {
 
     // Checks if the container has made the decision
-    // for the VPN to be setup.
+    // for the VPN to be started.
     if (!shouldStartVPN) {
         return NO;
     }
 
-    BOOL tunnelConnected = [psiphonTunnel getConnectionState] == PsiphonConnectionStateConnected;
-    if (vpnStartCompletionHandler && tunnelConnected) {
-        vpnStartCompletionHandler(nil);
-        vpnStartCompletionHandler = nil;
+    if ([sharedDB getAppForegroundState]) {
 
-        self.reasserting = NO;
+        if (vpnStartCompletionHandler &&
+          [psiphonTunnel getConnectionState] == PsiphonConnectionStateConnected) {
 
-        // Logic that should run only on the first call to onConnected
-        // from the when the user starts the VPN from the container.
-        if (firstOnConnected) {
-            firstOnConnected = NO;
+            vpnStartCompletionHandler(nil);
+            vpnStartCompletionHandler = nil;
 
             if ([handshakeHomepages count] > 0) {
                 BOOL success = [sharedDB updateHomepages:handshakeHomepages];
@@ -211,12 +205,11 @@ static const double kDefaultLogTruncationInterval = 12 * 60 * 60; // 12 hours
                     [handshakeHomepages removeAllObjects];
                 }
             }
-        }
 
-        // Notify container
-        [notifier post:@"NE.onConnected"];
-        return YES;
+            return YES;
+        }
     }
+
     return NO;
 }
 
@@ -336,12 +329,10 @@ static const double kDefaultLogTruncationInterval = 12 * 60 * 60; // 12 hours
     // Write state to the database
     [sharedDB updateTunnelConnectedState:YES];
 
-    // Try to start the VPN only if the container is in the foreground.
-    if ([sharedDB getAppForegroundState]) {
-        // Container is in the foreground.
-        [notifier post:@"NE.tunnelConnected"];
-        [self tryStartVPN];
-    }
+    self.reasserting = NO;
+
+    [notifier post:@"NE.tunnelConnected"];
+    [self tryStartVPN];
 }
 
 - (void)onExiting {
