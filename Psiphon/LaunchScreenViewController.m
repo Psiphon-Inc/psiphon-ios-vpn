@@ -45,6 +45,12 @@ static const NSString *ItemStatusContext;
     // Loading Timer
     NSTimer *_loadingTimer;
 
+    UIProgressView *progressView;
+    NSInteger timerCount;
+    
+    UILabel *secondLabel;
+    UILabel *loadingLabel;
+    
     // Main View Controller
     ViewController *mainViewController;
 }
@@ -108,6 +114,9 @@ static const NSString *ItemStatusContext;
     [super viewDidLoad];
     // TODO: Add something to handle the syncUI when screen rotate
     [self.view setBackgroundColor:[UIColor whiteColor]];
+    [self addLoadingLabel];
+    [self addProgressView];
+    [self addSecondLabel];
     [self syncUI];
     mainViewController =  [[ViewController alloc] init];
 }
@@ -148,21 +157,111 @@ static const NSString *ItemStatusContext;
 }
 
 - (void) switchViewControllerWhenExpire:(NSTimer*)timer {
-    if (self.viedoFile != nil) {
-        [self.viedoFile removeObserver:self forKeyPath:@"status"];
+    if (timerCount == 0) {
+        if (self.viedoFile != nil) {
+            [self.viedoFile removeObserver:self forKeyPath:@"status"];
+        }
+    
+        [_loadingTimer invalidate];
+        [[AppDelegate sharedAppDelegate] switchToMainViewController:_untunneledInterstitial:mainViewController];
     }
-    [_loadingTimer invalidate];
-    [[AppDelegate sharedAppDelegate] switchToMainViewController:_untunneledInterstitial:mainViewController];
+    timerCount -= 1;
+    secondLabel.text = [NSString stringWithFormat:@"%ld", (long)timerCount];
+    progressView.progress = (10 - timerCount)/10.0f;
 }
 
 - (void) startLaunchingScreenTimer {
+    timerCount = 10;
     if (!_loadingTimer || ![_loadingTimer isValid]) {
-        _loadingTimer = [NSTimer scheduledTimerWithTimeInterval:10.0
+        _loadingTimer = [NSTimer scheduledTimerWithTimeInterval:1.0
                                                            target:self
                                                          selector:@selector(switchViewControllerWhenExpire:)
                                                          userInfo:nil
-                                                          repeats:NO];
+                                                        repeats:YES];
     }
+}
+
+
+- (void)addLoadingLabel {
+    loadingLabel = [[UILabel alloc] init];
+    loadingLabel.translatesAutoresizingMaskIntoConstraints = NO;
+    loadingLabel.adjustsFontSizeToFitWidth = YES;
+    loadingLabel.text = @"Loading ..";
+    loadingLabel.textAlignment = NSTextAlignmentCenter;
+    [self.view addSubview:loadingLabel];
+    
+    // Setup autolayout
+    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:loadingLabel
+                                                          attribute:NSLayoutAttributeBottom
+                                                          relatedBy:NSLayoutRelationGreaterThanOrEqual
+                                                             toItem:self.view
+                                                          attribute:NSLayoutAttributeBottom
+                                                         multiplier:1.0
+                                                           constant:-30.0]];
+    
+    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:loadingLabel
+                                                          attribute:NSLayoutAttributeRight
+                                                          relatedBy:NSLayoutRelationEqual
+                                                             toItem:self.view
+                                                          attribute:NSLayoutAttributeRight
+                                                         multiplier:1.0
+                                                           constant:-30.0]];
+}
+
+- (void)addProgressView {
+    progressView = [[UIProgressView alloc] init];
+    progressView.translatesAutoresizingMaskIntoConstraints = NO;
+    [self.view addSubview:progressView];
+    
+    // Setup autolayout
+    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:progressView
+                                                          attribute:NSLayoutAttributeBottom
+                                                          relatedBy:NSLayoutRelationGreaterThanOrEqual
+                                                             toItem:loadingLabel
+                                                          attribute:NSLayoutAttributeTop
+                                                         multiplier:1.0
+                                                           constant:-15.0]];
+    
+    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:progressView
+                                                          attribute:NSLayoutAttributeLeft
+                                                          relatedBy:NSLayoutRelationEqual
+                                                             toItem:self.view
+                                                          attribute:NSLayoutAttributeLeft
+                                                         multiplier:1.0
+                                                           constant:15.0]];
+    
+    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:progressView
+                                                          attribute:NSLayoutAttributeRight
+                                                          relatedBy:NSLayoutRelationEqual
+                                                             toItem:self.view
+                                                          attribute:NSLayoutAttributeRight
+                                                         multiplier:1.0
+                                                           constant:-15.0]];
+}
+
+- (void)addSecondLabel {
+    secondLabel = [[UILabel alloc] init];
+    secondLabel.translatesAutoresizingMaskIntoConstraints = NO;
+    secondLabel.adjustsFontSizeToFitWidth = YES;
+    secondLabel.textAlignment = NSTextAlignmentCenter;
+    [self.view addSubview:secondLabel];
+    
+    // Setup autolayout
+    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:secondLabel
+                                                          attribute:NSLayoutAttributeBottom
+                                                          relatedBy:NSLayoutRelationGreaterThanOrEqual
+                                                             toItem:self.view
+                                                          attribute:NSLayoutAttributeBottom
+                                                         multiplier:1.0
+                                                           constant:-30.0]];
+    
+    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:secondLabel
+                                                          attribute:NSLayoutAttributeRight
+                                                          relatedBy:NSLayoutRelationEqual
+                                                             toItem:loadingLabel
+                                                          attribute:NSLayoutAttributeRight
+                                                         multiplier:1.0
+                                                           constant:15.0]];
 }
 
 /*!
