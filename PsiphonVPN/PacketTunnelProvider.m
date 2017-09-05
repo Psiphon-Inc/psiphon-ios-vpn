@@ -227,6 +227,26 @@ static const double kDefaultLogTruncationInterval = 12 * 60 * 60; // 12 hours
         shouldStartVPN = YES; // This should be set before calling tryStartVPN.
         [self tryStartVPN];
     }];
+
+    [notifier listenForNotification:@"D.appWillResignActive" listener:^{
+        // If the VPN start message has not been received by the container,
+        // and the container goes to the background alert user to open the app.
+        // Note: We expect the value of shouldStartVPN to be set to YES on the
+        //       first call to startVPN, and not be modified after that.
+        if (!shouldStartVPN) {
+            [self displayOpenAppMessage];
+        }
+    }];
+}
+
+#pragma mark - Helper methods
+
+- (void)displayOpenAppMessage {
+    [self displayMessage:
+        NSLocalizedStringWithDefaultValue(@"OPEN_PSIPHON_APP", nil, [NSBundle mainBundle], @"Please open Psiphon app to finish connecting.", @"Alert message informing the user they should open the app to finish connecting to the VPN.")
+       completionHandler:^(BOOL success) {
+           // TODO: error handling?
+       }];
 }
 
 @end
@@ -316,18 +336,8 @@ static const double kDefaultLogTruncationInterval = 12 * 60 * 60; // 12 hours
     // Write state to the database
     [sharedDB updateTunnelConnectedState:YES];
 
-    // TODO: possible race condition. Should we use handleAppMessage?
-    // If the container is in the background, notifies the user that the app
-    // should be opened. Otherwise, send notification to the container
-    // that the tunnel has been connected.
-    if (![sharedDB getAppForegroundState]) {
-        // TODO: add actionable notification, and use displayMessage as fallback.
-        [self displayMessage:
-          NSLocalizedStringWithDefaultValue(@"OPEN_PSIPHON_APP", nil, [NSBundle mainBundle], @"Please open Psiphon app to finish connecting.", @"Alert message informing the user they should open the app to finish connecting to the VPN.")
-          completionHandler:^(BOOL success) {
-              // TODO: error handling?
-        }];
-    } else {
+    // Try to start the VPN only if the container is in the foreground.
+    if ([sharedDB getAppForegroundState]) {
         // Container is in the foreground.
         [notifier post:@"NE.tunnelConnected"];
         [self tryStartVPN];

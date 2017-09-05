@@ -611,7 +611,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     adLabel.hidden = true;
 
     adManager.adWillShow = NO;
-
+    
     // Post message to the extension to start the VPN
     // when the tunnel is established.
     [vpnManager startVPN];
