@@ -187,7 +187,7 @@ static const double kDefaultLogTruncationInterval = 12 * 60 * 60; // 12 hours
 - (BOOL)tryStartVPN {
 
     // Checks if the container has made the decision
-    // for the VPN to be setup.
+    // for the VPN to be started.
     if (!shouldStartVPN) {
         return NO;
     }
@@ -347,7 +347,6 @@ static const double kDefaultLogTruncationInterval = 12 * 60 * 60; // 12 hours
 - (void)onExiting {
     [sharedDB updateTunnelConnectedState:NO];
 }
-
 
 - (void)onHomepage:(NSString * _Nonnull)url {
     for (NSString *p in handshakeHomepages) {
