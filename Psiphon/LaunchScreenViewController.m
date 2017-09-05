@@ -1,4 +1,3 @@
-
 /*
  * Copyright (c) 2017, Psiphon Inc.
  * All rights reserved.
@@ -21,18 +20,11 @@
 #import <Foundation/Foundation.h>
 #import <AVFoundation/AVFoundation.h>
 #import "LaunchScreenViewController.h"
-#import "AppDelegate.h"
-#import "ViewController.h"
-
-@import NetworkExtension;
-@import GoogleMobileAds;
 
 @interface LaunchScreenViewController ()
 
-@property (nonatomic) NEVPNManager *targetManager;
-
 @property (strong, nonatomic) AVPlayer *loadingVideo;
-@property (nonatomic) AVPlayerItem *viedoFile;
+@property (nonatomic) AVPlayerItem *videoFile;
 
 @end
 
@@ -41,12 +33,6 @@ static const NSString *ItemStatusContext;
 @implementation LaunchScreenViewController {
     // videoPlayer
     AVPlayerLayer* playerLayer;
-
-    // Loading Timer
-    NSTimer *_loadingTimer;
-
-    // Main View Controller
-    ViewController *mainViewController;
 }
 
 - (id)init {
@@ -64,11 +50,11 @@ static const NSString *ItemStatusContext;
             NSError *error;
             AVKeyValueStatus status = [asset statusOfValueForKey:tracksKey error:&error];
              if (status == AVKeyValueStatusLoaded) {
-                 self.viedoFile = [AVPlayerItem playerItemWithAsset:asset];
+                 self.videoFile = [AVPlayerItem playerItemWithAsset:asset];
                  // ensure that this is done before the playerItem is associated with the player
-                 [self.viedoFile addObserver:self forKeyPath:@"status" options:NSKeyValueObservingOptionInitial context:&ItemStatusContext];
-                 [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(playerItemDidReachEnd:) name:AVPlayerItemDidPlayToEndTimeNotification object:self.viedoFile];
-                 self.loadingVideo = [AVPlayer playerWithPlayerItem:self.viedoFile];
+                 [self.videoFile addObserver:self forKeyPath:@"status" options:NSKeyValueObservingOptionInitial context:&ItemStatusContext];
+                 [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(playerItemDidReachEnd:) name:AVPlayerItemDidPlayToEndTimeNotification object:self.videoFile];
+                 self.loadingVideo = [AVPlayer playerWithPlayerItem:self.videoFile];
                  
                  playerLayer = [AVPlayerLayer playerLayerWithPlayer:self.loadingVideo];
                  playerLayer.frame = self.view.bounds;
@@ -109,17 +95,12 @@ static const NSString *ItemStatusContext;
     // TODO: Add something to handle the syncUI when screen rotate
     [self.view setBackgroundColor:[UIColor whiteColor]];
     [self syncUI];
-    mainViewController =  [[ViewController alloc] init];
 }
 
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
     [self.loadingVideo play];
     NSLog(@"Play Video");
-    [self initializeAds];
-    [self startLaunchingScreenTimer];
-    [[NSNotificationCenter defaultCenter]
-            addObserver:self selector:@selector(switchViewControllerWhenExpire:) name:@adsDidLoad object:mainViewController];
 }
 
 - (void)playerItemDidReachEnd:(NSNotification *)notification {
@@ -145,54 +126,6 @@ static const NSString *ItemStatusContext;
         ([self.loadingVideo.currentItem status] == AVPlayerItemStatusReadyToPlay)) {
             [self.loadingVideo play];
     }
-}
-
-- (void) switchViewControllerWhenExpire:(NSTimer*)timer {
-    if (self.viedoFile != nil) {
-        [self.viedoFile removeObserver:self forKeyPath:@"status"];
-    }
-    [_loadingTimer invalidate];
-    [[AppDelegate sharedAppDelegate] switchToMainViewController:_untunneledInterstitial:mainViewController];
-}
-
-- (void) startLaunchingScreenTimer {
-    if (!_loadingTimer || ![_loadingTimer isValid]) {
-        _loadingTimer = [NSTimer scheduledTimerWithTimeInterval:10.0
-                                                           target:self
-                                                         selector:@selector(switchViewControllerWhenExpire:)
-                                                         userInfo:nil
-                                                          repeats:NO];
-    }
-}
-
-/*!
- @brief Returns true if NEVPNConnectionStatus is Connected, Connecting or Reasserting.
- */
-- (BOOL) isVPNActive{
-    NEVPNStatus status = self.targetManager.connection.status;
-    return (status == NEVPNStatusConnecting
-            || status == NEVPNStatusConnected
-            || status == NEVPNStatusReasserting);
-}
-
-# pragma mark - Ads
-
-- (void)initializeAds {
-    NSLog(@"initializeAds");
-    if (![self isVPNActive]) {
-        [GADMobileAds configureWithApplicationID:@"ca-app-pub-1072041961750291~2085686375"];
-        [self loadUntunneledInterstitial];
-    }
-}
-
-- (void)loadUntunneledInterstitial {
-    NSLog(@"loadUntunneledInterstitial");
-    self.untunneledInterstitial = [MPInterstitialAdController
-        interstitialAdControllerForAdUnitId:@"4250ebf7b28043e08ddbe04d444d79e4"];
-
-    self.untunneledInterstitial.delegate = mainViewController;
-
-    [self.untunneledInterstitial loadAd];
 }
 
 @end

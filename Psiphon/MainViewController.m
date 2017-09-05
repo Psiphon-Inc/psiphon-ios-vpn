@@ -28,10 +28,9 @@
 #import "RegionSelectionViewController.h"
 #import "SharedConstants.h"
 #import "Notifier.h"
-#import "LaunchScreenViewController.h"
 #import "UIImage+CountryFlag.h"
 #import "UpstreamProxySettings.h"
-#import "ViewController.h"
+#import "MainViewController.h"
 #import "VPNManager.h"
 #import "AdManager.h"
 
@@ -39,10 +38,10 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     return (([a length] == 0) && ([b length] == 0)) || ([a isEqualToString:b]);
 };
 
-@interface ViewController ()
+@interface MainViewController ()
 @end
 
-@implementation ViewController {
+@implementation MainViewController {
 
     // VPN Manager
     VPNManager *vpnManager;
@@ -100,7 +99,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 #pragma mark - Lifecycle methods
 
 - (void)viewDidLoad {
-    NSLog(@"ViewController: viewDidLoad");
+    NSLog(@"MainViewController: viewDidLoad");
     [super viewDidLoad];
 
     // TODO: check if database exists first
@@ -128,16 +127,27 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 }
 
 - (void)viewDidAppear:(BOOL)animated {
-    NSLog(@"ViewController: viewDidAppear");
+    NSLog(@"MainViewController: viewDidAppear");
     [super viewDidAppear:animated];
     // Available regions may have changed in the background
     [self updateAvailableRegions];
     [self updateRegionButton];
     [self updateRegionLabel];
+
+    [[NSNotificationCenter defaultCenter]
+      addObserver:self selector:@selector(adStatusDidChange) name:@kAdsDidLoad object:adManager];
+}
+
+//TODO: move this
+- (void)adStatusDidChange{
+
+    // TODO: cast from NSObject to BOOL
+    adLabel.hidden = [adManager adIsReady];
+
 }
 
 - (void)viewWillAppear:(BOOL)animated {
-    NSLog(@"ViewController: viewWillAppear");
+    NSLog(@"MainViewController: viewWillAppear");
     [super viewWillAppear:animated];
 
     // Listen for VPN status changes from VPNManager.
@@ -150,14 +160,14 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
-    NSLog(@"ViewController: viewWillDisappear");
+    NSLog(@"MainViewController: viewWillDisappear");
     [super viewWillDisappear:animated];
     // Stop listening for diagnostic messages (we don't want to hold the shared db lock while backgrounded)
     [notifier stopListeningForAllNotifications];
 }
 
 - (void)viewDidDisappear:(BOOL)animated {
-    NSLog(@"ViewController: viewDidDisappear");
+    NSLog(@"MainViewController: viewDidDisappear");
     [super viewDidDisappear:animated];
 }
 
@@ -188,22 +198,11 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     startStopButton.selected = [vpnManager isVPNActive];
     statusLabel.text = [self getVPNStatusDescription:[vpnManager getVPNStatus]];
 
-    if ([vpnManager getVPNStatus] == VPNStatusDisconnected) {
-        // The VPN is stopped. Initialize ads after a delay:
-        //    - to ensure regular untunneled networking is ready
-        //    - because it's likely the user will be leaving the app, so we don't want to request
-        //      another ad right away
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 5 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
-//            [self initializeAds];
-        });
-    } else {
-//        [self initializeAds];
-    }
 }
 
 - (void)onStartStopTap:(UIButton *)sender {
     if (![vpnManager isVPNActive]) {
-        [self showUntunneledInterstitial];
+        [adManager showUntunneledInterstitial];
     } else {
         NSLog(@"call targetManager.connection.stopVPNTunnel()");
         [vpnManager stopVPN];
@@ -505,7 +504,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     adLabel.text = NSLocalizedStringWithDefaultValue(@"AD_LOADED", nil, [NSBundle mainBundle], @"Ad Loaded", @"Text for button that plays the main screen ad");
     adLabel.textAlignment = NSTextAlignmentCenter;
     [self.view addSubview:adLabel];
-    if (!self.untunneledInterstitial.ready){
+    if (![adManager adIsReady]){
         adLabel.hidden = true;
     }
 
@@ -543,80 +542,6 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                                                            constant:-15.0]];
 }
 
-# pragma mark - Ads
-
-- (void)initializeAds {
-    NSLog(@"initializeAds");
-    if ([self shouldShowUntunneledAds]) {
-        [GADMobileAds configureWithApplicationID:@"ca-app-pub-1072041961750291~2085686375"];
-        [self loadUntunneledInterstitial];
-    } else {
-        adLabel.hidden = true;
-    }
-}
-
-- (bool)shouldShowUntunneledAds {
-    return [vpnManager getVPNStatus] == VPNStatusDisconnected;
-}
-
-- (void)loadUntunneledInterstitial {
-    NSLog(@"loadUntunneledInterstitial");
-    self.untunneledInterstitial = [MPInterstitialAdController
-      interstitialAdControllerForAdUnitId:@"4250ebf7b28043e08ddbe04d444d79e4"];
-    self.untunneledInterstitial.delegate = self;
-    [self.untunneledInterstitial loadAd];
-}
-
-- (void)showUntunneledInterstitial {
-    NSLog(@"showUntunneledInterstitial");
-    // Start the tunnel in parallel with showing ads.
-    // VPN won't start until [vpnManager startVPN] message is sent.
-    [vpnManager startTunnelWithCompletionHandler:^(NSError *error) {
-
-        // Don't show ads if failed to start the network extension.
-        if (!error) {
-            if (self.untunneledInterstitial.ready) {
-                adManager.adWillShow = YES;
-                [self.untunneledInterstitial showFromViewController:self];
-            }
-        }
-
-        if (error.code == VPNManagerErrorUserDeniedConfigInstall) {
-            // TODO: notify user that we need their permission to work.
-        }
-    }];
-}
-
-- (void)interstitialDidLoadAd:(MPInterstitialAdController *)interstitial {
-    NSLog(@"Interstitial loaded");
-    adLabel.hidden = false;
-    [[NSNotificationCenter defaultCenter]
-            postNotificationName:@adsDidLoad object:self];
-}
-
-- (void)interstitialDidFailToLoadAd:(MPInterstitialAdController *)interstitial {
-    NSLog(@"Interstitial failed to load");
-    // Don't retry.
-}
-
-- (void)interstitialDidExpire:(MPInterstitialAdController *)interstitial {
-    NSLog(@"Interstitial expired");
-    adLabel.hidden = true;
-    [interstitial loadAd];
-}
-
-- (void)interstitialDidDisappear:(MPInterstitialAdController *)interstitial {
-    NSLog(@"Interstitial dismissed");
-    // TODO: start the tunnel? or set a flag indicating that the tunnel should be started when returning to the UI?
-    adLabel.hidden = true;
-
-    adManager.adWillShow = NO;
-    
-    // Post message to the extension to start the VPN
-    // when the tunnel is established.
-    [vpnManager startVPN];
-}
-
 #pragma mark - FeedbackViewControllerDelegate methods and helpers
 
 - (NSString *)getPsiphonConfig {
@@ -631,7 +556,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
         [[PsiphonData sharedInstance] addDiagnosticEntries:logs];
     });
 
-    __weak ViewController *weakSelf = self;
+    __weak MainViewController *weakSelf = self;
     SendFeedbackHandler sendFeedbackHandler = ^(NSString *jsonString, NSString *pubKey, NSString *uploadServer, NSString *uploadServerHeaders){
         PsiphonTunnel *inactiveTunnel = [PsiphonTunnel newPsiphonTunnel:self]; // TODO: we need to update PsiphonTunnel framework not require this and fix this warning
         [inactiveTunnel sendFeedback:jsonString publicKey:pubKey uploadServer:uploadServer uploadServerHeaders:uploadServerHeaders];
@@ -682,7 +607,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 
 - (void)reloadAndOpenSettings {
     if (appSettingsViewController != nil) {
-        __weak ViewController *weakSelf = self;
+        __weak MainViewController *weakSelf = self;
         [appSettingsViewController dismissViewControllerAnimated:NO completion:^{
             [[RegionAdapter sharedInstance] reloadTitlesForNewLocalization];
             [weakSelf openSettingsMenu];

@@ -19,12 +19,9 @@
 
 #import <UIKit/UIKit.h>
 #import "PsiphonSettingsViewController.h"
-#import "MPInterstitialAdController.h"
 #import "LaunchScreenViewController.h"
 
-#define adsDidLoad "MPAdsDidLoad"
 
-@interface ViewController : UIViewController <MPInterstitialAdControllerDelegate, PsiphonSettingsViewControllerDelegate>
-@property (nonatomic, retain) MPInterstitialAdController *untunneledInterstitial;
+@interface MainViewController : UIViewController <PsiphonSettingsViewControllerDelegate>
 
 @end

@@ -35,6 +35,9 @@
     PsiphonDataSharedDB *sharedDB;
     Notifier *notifier;
 
+    // Loading Timer
+    NSTimer *loadingTimer;
+
     BOOL shownHomepage;
 }
 
@@ -57,6 +60,13 @@
 
 - (BOOL)application:(UIApplication *)application willFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
 	[self initializeDefaults];
+
+    //
+    [adManager initializeAds];
+
+    [[NSNotificationCenter defaultCenter]
+      addObserver:self selector:@selector(switchViewControllerWhenExpire:) name:@kAdsDidLoad object:adManager];
+
 	return YES;
 }
 
@@ -64,7 +74,14 @@
     NSLog(@"AppDelegate: application:didFinishLaunchingWithOptions:");
     // Override point for customization after application launch.
     self.window = [[UIWindow alloc] initWithFrame:UIScreen.mainScreen.bounds];
-    self.window.rootViewController = [[LaunchScreenViewController alloc] init];
+
+    // TODO: if VPN disconnected, launch with animation, else launch with MainViewController.
+    if ([vpnManager getVPNStatus] == VPNStatusDisconnected) {
+        self.window.rootViewController = [[LaunchScreenViewController alloc] init];
+    } else {
+        self.window.rootViewController = [[MainViewController alloc] init];
+    }
+
     [self.window makeKeyAndVisible];
 
     shownHomepage = FALSE;
@@ -90,6 +107,8 @@
 - (void)applicationWillEnterForeground:(UIApplication *)application {
     NSLog(@"AppDelegate: applicationWillEnterForeground");
     // Called as part of the transition from the background to the active state; here you can undo many of the changes made on entering the background.
+    [self startLaunchingScreenTimer];
+    // TODO: init MainViewController.
 }
 
 - (void)applicationDidBecomeActive:(UIApplication *)application {
@@ -102,7 +121,7 @@
     dispatch_async(dispatch_get_main_queue(), ^{
         // If the tunnel is in Connected state, and we're now showing ads
         // send startVPN message.
-        if (!adManager.adWillShow && [vpnManager isTunnelConnected]) {
+        if (!adManager.adIsShowing && [vpnManager isTunnelConnected]) {
             [vpnManager startVPN];
         }
     });
@@ -120,10 +139,23 @@
 
 #pragma mark - View controller switch
 
-- (void)switchToMainViewController:(MPInterstitialAdController *)ads :(ViewController *)vc {
-    vc.untunneledInterstitial = ads;
+- (void) switchViewControllerWhenExpire:(NSTimer*)timer {
+    if (self.videoFile != nil) {
+        [self.videoFile removeObserver:self forKeyPath:@"status"];
+    }
+    [loadingTimer invalidate];
+//    [[AppDelegate sharedAppDelegate] switchToMainViewController:_untunneledInterstitial:mainViewController];
+    [self changeRootViewController:mainViewController];
+}
 
-    [self changeRootViewController:vc];
+- (void) startLaunchingScreenTimer {
+    if (!loadingTimer || ![loadingTimer isValid]) {
+        loadingTimer = [NSTimer scheduledTimerWithTimeInterval:10.0
+                                                         target:self
+                                                       selector:@selector(switchViewControllerWhenExpire:)
+                                                       userInfo:nil
+                                                        repeats:NO];
+    }
 }
 
 - (void)changeRootViewController:(UIViewController*)viewController {
@@ -179,14 +211,14 @@
         // tunnel is already connected, give up on the Ad and
         // start the VPN. Otherwise the startVPN message will be
         // sent after the Ad has disappeared.
-        if (!adManager.adWillShow) {
+        if (!adManager.adIsShowing) {
             [vpnManager startVPN];
         }
     }];
 
     [notifier listenForNotification:@"NE.onAvailableEgressRegions" listener:^{ // TODO should be put in a constants file
         // Update available regions
-        // TODO: this code is duplicated in ViewController updateAvailableRegions
+        // TODO: this code is duplicated in MainViewController updateAvailableRegions
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
             NSArray<NSString *> *regions = [sharedDB getAllEgressRegions];
             [[RegionAdapter sharedInstance] onAvailableEgressRegions:regions];

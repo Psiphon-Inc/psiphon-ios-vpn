@@ -38,7 +38,7 @@
 		CE7B76431F54881F00EA44BD /* PsiphonTunnel.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 66094F781E8067520069EC4E /* PsiphonTunnel.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		EF652CD11F352212002AFB48 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = EF652CD01F352212002AFB48 /* main.m */; };
 		EF652CD61F35224C002AFB48 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = EF652CD31F35224C002AFB48 /* AppDelegate.m */; };
-		EF652CD71F35224C002AFB48 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = EF652CD51F35224C002AFB48 /* ViewController.m */; };
+		EF652CD71F35224C002AFB48 /* MainViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = EF652CD51F35224C002AFB48 /* MainViewController.m */; };
 		EF652CDA1F352271002AFB48 /* PacketTunnelProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = EF652CD91F352271002AFB48 /* PacketTunnelProvider.m */; };
 		EF6C1F521F59E46500709554 /* embedded_server_entries in Resources */ = {isa = PBXBuildFile; fileRef = EF6C1F501F59E46500709554 /* embedded_server_entries */; };
 		EF6C1F531F59E46500709554 /* embedded_server_entries in Resources */ = {isa = PBXBuildFile; fileRef = EF6C1F501F59E46500709554 /* embedded_server_entries */; };
@@ -133,8 +133,8 @@
 		EF652CD01F352212002AFB48 /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		EF652CD21F35224C002AFB48 /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		EF652CD31F35224C002AFB48 /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
-		EF652CD41F35224C002AFB48 /* ViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
-		EF652CD51F35224C002AFB48 /* ViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
+		EF652CD41F35224C002AFB48 /* MainViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MainViewController.h; sourceTree = "<group>"; };
+		EF652CD51F35224C002AFB48 /* MainViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MainViewController.m; sourceTree = "<group>"; };
 		EF652CD81F352271002AFB48 /* PacketTunnelProvider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PacketTunnelProvider.h; sourceTree = "<group>"; };
 		EF652CD91F352271002AFB48 /* PacketTunnelProvider.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PacketTunnelProvider.m; sourceTree = "<group>"; };
 		EF652CDB1F365B8C002AFB48 /* SharedConstants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SharedConstants.h; sourceTree = "<group>"; };
@@ -275,8 +275,8 @@
 				CE26FC991BBDC7B800B83375 /* Info.plist */,
 				EF652CD21F35224C002AFB48 /* AppDelegate.h */,
 				EF652CD31F35224C002AFB48 /* AppDelegate.m */,
-				EF652CD41F35224C002AFB48 /* ViewController.h */,
-				EF652CD51F35224C002AFB48 /* ViewController.m */,
+				EF652CD41F35224C002AFB48 /* MainViewController.h */,
+				EF652CD51F35224C002AFB48 /* MainViewController.m */,
 				4E0774951F566ADA0097BC8C /* InAppSettings.bundle */,
 				197DABF21F54C0EA00DD5C3B /* 3rd Party Adapters */,
 				9BFEC04426D8558CB89D3798 /* VPNManager.m */,
@@ -569,7 +569,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				EF652CD71F35224C002AFB48 /* ViewController.m in Sources */,
+				EF652CD71F35224C002AFB48 /* MainViewController.m in Sources */,
 				F132D7E01F5739A800AF7F91 /* LaunchScreenViewController.m in Sources */,
 				19CB75081F54ADB300F78219 /* MPGoogleAdMobInterstitialCustomEvent.m in Sources */,
 				197DABEB1F54BEED00DD5C3B /* VungleInterstitialCustomEvent.m in Sources */,
@@ -750,6 +750,7 @@
 				PROVISIONING_PROFILE = "";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				STRIP_BITCODE_FROM_COPIED_FILES = NO;
+				USER_HEADER_SEARCH_PATHS = "\"${PROJECT_DIR}/Pods\"/**";
 			};
 			name = Debug;
 		};
@@ -775,6 +776,7 @@
 				PROVISIONING_PROFILE = "";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				STRIP_BITCODE_FROM_COPIED_FILES = NO;
+				USER_HEADER_SEARCH_PATHS = "\"${PROJECT_DIR}/Pods\"/**";
 			};
 			name = Release;
 		};
