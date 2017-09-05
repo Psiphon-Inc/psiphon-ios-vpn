@@ -66,7 +66,7 @@ static const double kDefaultLogTruncationInterval = 12 * 60 * 60; // 12 hours
         notifier = [[Notifier alloc] initWithAppGroupIdentifier:APP_GROUP_IDENTIFIER];
 
         // state variables
-        shouldStartVPN = NO;
+        shouldStartVPN = FALSE;
     }
     
     return self;
@@ -84,7 +84,7 @@ static const double kDefaultLogTruncationInterval = 12 * 60 * 60; // 12 hours
         [sharedDB truncateLogsOnInterval:(NSTimeInterval) kDefaultLogTruncationInterval];
 
         // Reset tunnel connected state.
-        [sharedDB updateTunnelConnectedState:NO];
+        [sharedDB updateTunnelConnectedState:FALSE];
 
         __weak PsiphonTunnel *weakPsiphonTunnel = psiphonTunnel;
 
@@ -124,7 +124,7 @@ static const double kDefaultLogTruncationInterval = 12 * 60 * 60; // 12 hours
 
 - (void)stopTunnelWithReason:(NEProviderStopReason)reason completionHandler:(void (^)(void)) completionHandler {
 
-    [sharedDB updateTunnelConnectedState:NO];
+    [sharedDB updateTunnelConnectedState:FALSE];
     
     // Assumes stopTunnelWithReason called exactly once only after startTunnelWithOptions.completionHandler(nil)
     if (vpnStartCompletionHandler) {
@@ -187,12 +187,13 @@ static const double kDefaultLogTruncationInterval = 12 * 60 * 60; // 12 hours
     // Checks if the container has made the decision
     // for the VPN to be started.
     if (!shouldStartVPN) {
-        return NO;
+        return FALSE;
     }
 
     if ([sharedDB getAppForegroundState]) {
 
         if (vpnStartCompletionHandler &&
+          !self.reasserting &&
           [psiphonTunnel getConnectionState] == PsiphonConnectionStateConnected) {
 
             vpnStartCompletionHandler(nil);
@@ -206,25 +207,25 @@ static const double kDefaultLogTruncationInterval = 12 * 60 * 60; // 12 hours
                 }
             }
 
-            return YES;
+            return TRUE;
         }
     }
 
-    return NO;
+    return FALSE;
 }
 
 - (void)listenForContainerMessages {
     [notifier listenForNotification:@"M.startVPN" listener:^{
         // If the tunnel is connected, starts the VPN.
         // Otherwise, should establish the VPN after onConnected has been called.
-        shouldStartVPN = YES; // This should be set before calling tryStartVPN.
+        shouldStartVPN = TRUE; // This should be set before calling tryStartVPN.
         [self tryStartVPN];
     }];
 
     [notifier listenForNotification:@"D.appWillResignActive" listener:^{
         // If the VPN start message has not been received by the container,
         // and the container goes to the background alert user to open the app.
-        // Note: We expect the value of shouldStartVPN to be set to YES on the
+        // Note: We expect the value of shouldStartVPN to be set to TRUE on the
         //       first call to startVPN, and not be modified after that.
         if (!shouldStartVPN) {
             [self displayOpenAppMessage];
@@ -327,16 +328,18 @@ static const double kDefaultLogTruncationInterval = 12 * 60 * 60; // 12 hours
     NSLog(@"onConnected");
 
     // Write state to the database
-    [sharedDB updateTunnelConnectedState:YES];
+    [sharedDB updateTunnelConnectedState:TRUE];
 
-    self.reasserting = NO;
+    self.reasserting = FALSE;
 
     [notifier post:@"NE.tunnelConnected"];
+    
+    // Note: self.reasserting should be false before calling tryStartVPN.
     [self tryStartVPN];
 }
 
 - (void)onExiting {
-    [sharedDB updateTunnelConnectedState:NO];
+    [sharedDB updateTunnelConnectedState:FALSE];
 }
 
 
