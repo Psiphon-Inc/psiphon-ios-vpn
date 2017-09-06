@@ -105,7 +105,7 @@ static const NSString *ItemStatusContext;
     [self.view setBackgroundColor:[UIColor whiteColor]];
     [self addLoadingLabel];
     [self addProgressView];
-    [self addSecondLabel];
+//    [self addSecondLabel];
     [self syncUI];
 }
 

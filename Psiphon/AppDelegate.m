@@ -166,10 +166,6 @@
 
 - (void) switchViewControllerWhenExpire:(NSTimer*)timer {
     if (timerCount == 0) {
-        // TODO: Test if videoFile observer been removed before switch view controller, if not, need to remove that.
-        //    if (self.videoFile != nil) {
-        //        [self.videoFile removeObserver:self forKeyPath:@"status"];
-        //    }
         [loadingTimer invalidate];
         [self changeRootViewController:mainViewController];
     }
