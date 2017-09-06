@@ -113,13 +113,13 @@
         COL_ID " INTEGER PRIMARY KEY AUTOINCREMENT, "
         COL_APP_STATE_FOREGROUND " INTEGER NOT NULL);";
 
-    NSLog(TAG @"Create DATABASE");
+    NSLog(TAG_PSIPHON_DATA_SHARED_DB @"Create DATABASE");
 
     __block BOOL success = FALSE;
     [q inDatabase:^(FMDatabase *db) {
         success = [db executeStatements:CREATE_TABLE_STATEMENTS];
         if (!success) {
-            NSLog(TAG @"createDatabase: error %@", [db lastError]);
+            NSLog(TAG_PSIPHON_DATA_SHARED_DB @"createDatabase: error %@", [db lastError]);
         }
     }];
 
@@ -139,7 +139,7 @@
     [q inDatabase:^(FMDatabase *db) {
         success = [db executeStatements:CLEAR_TABLES];
         if (!success) {
-            NSLog(TAG @"clearDatabase error: %@", [db lastError]);
+            NSLog(TAG_PSIPHON_DATA_SHARED_DB @"clearDatabase error: %@", [db lastError]);
         }
     }];
 
@@ -164,7 +164,7 @@
         }
 
         if (!success) {
-            NSLog(TAG @"updateHomepages: rolling back, error %@", [db lastError]);
+            NSLog(TAG_PSIPHON_DATA_SHARED_DB @"updateHomepages: rolling back, error %@", [db lastError]);
             *rollback = TRUE;
             return;
         }
@@ -183,7 +183,7 @@
         FMResultSet *rs = [db executeQuery:@"SELECT * FROM " TABLE_HOMEPAGE];
 
         if (rs == nil) {
-            NSLog(TAG @"getAllHomepages: error %@", [db lastError]);
+            NSLog(TAG_PSIPHON_DATA_SHARED_DB @"getAllHomepages: error %@", [db lastError]);
             return;
         }
 
@@ -218,7 +218,7 @@
         }
 
         if (!success) {
-            NSLog(TAG @"insertNewEgressRegions: rolling back, error %@", [db lastError]);
+            NSLog(TAG_PSIPHON_DATA_SHARED_DB @"insertNewEgressRegions: rolling back, error %@", [db lastError]);
             *rollback = TRUE;
             return;
         }
@@ -237,7 +237,7 @@
         FMResultSet *rs = [db executeQuery:@"SELECT * FROM " TABLE_EGRESS_REGIONS];
 
         if (rs == nil) {
-            NSLog(TAG @"getAllEgressRegions: error %@", [db lastError]);
+            NSLog(TAG_PSIPHON_DATA_SHARED_DB @"getAllEgressRegions: error %@", [db lastError]);
             return;
         }
 
@@ -263,7 +263,7 @@
           withErrorAndBindings:&err, message, @YES, nil /* TODO */];
 
         if (!success) {
-            NSLog(TAG @"insertDiagnosticMessage: error %@", err);
+            NSLog(TAG_PSIPHON_DATA_SHARED_DB @"insertDiagnosticMessage: error %@", err);
             // TODO: error handling/logging
         }
     }];
@@ -297,7 +297,7 @@
           withErrorAndBindings:&err, @MAX_LOG_LINES, nil];
 
         if (!success) {
-            NSLog(TAG @"truncateLogs: error %@", err);
+            NSLog(TAG_PSIPHON_DATA_SHARED_DB @"truncateLogs: error %@", err);
             // TODO: error handling/logging
         }
     }];
@@ -326,14 +326,14 @@
         FMResultSet *rs = [db executeQuery:@"SELECT * FROM log WHERE _ID > (?);", @(lastId), nil];
 
         if (rs == nil) {
-            NSLog(TAG @"getLogsNewerThanId: error %@", [db lastError]);
+            NSLog(TAG_PSIPHON_DATA_SHARED_DB @"getLogsNewerThanId: error %@", [db lastError]);
             return;
         }
 
         while ([rs next]) {
             lastLogRowId = [rs intForColumn:COL_ID];
 
-            NSString *timestamp = [rs stringForColumn:COL_LOG_TIMESTAMP];
+            NSDate *timestamp = [rs dateForColumn:COL_LOG_TIMESTAMP];
             NSString *json = [rs stringForColumn:COL_LOG_LOGJSON];
 //          BOOL isDiagnostic = [rs boolForColumn:COL_LOG_IS_DIAGNOSTIC]; // TODO
 
@@ -363,7 +363,7 @@
           @"INSERT INTO " TABLE_TUN_STATE " (" COL_TUN_STATE_CONNECTED ") VALUES (?)", @(connected), nil];
 
         if (!success) {
-            NSLog(TAG @"updateTunnelConnectedState: rolling back, error %@", [db lastError]);
+            NSLog(TAG_PSIPHON_DATA_SHARED_DB @"updateTunnelConnectedState: rolling back, error %@", [db lastError]);
             *rollback = YES;
             return;
         }
@@ -384,12 +384,12 @@
         FMResultSet *rs = [db executeQuery:@"SELECT * FROM " TABLE_TUN_STATE];
 
         if (rs == nil) {
-            NSLog(TAG @"getTunnelConnectedState: error %@", [db lastError]);
+            NSLog(TAG_PSIPHON_DATA_SHARED_DB @"getTunnelConnectedState: error %@", [db lastError]);
             return;
         }
 
         if (![rs next]) {
-            NSLog(TAG @"getTunnelConnectedState: No previous data recorded.");
+            NSLog(TAG_PSIPHON_DATA_SHARED_DB @"getTunnelConnectedState: No previous data recorded.");
             return;
         }
 
@@ -416,7 +416,7 @@
           @(foreground), nil];
 
         if (!success) {
-            NSLog(TAG @"updateAppForegroundState: rolling back, error %@", [db lastError]);
+            NSLog(TAG_PSIPHON_DATA_SHARED_DB @"updateAppForegroundState: rolling back, error %@", [db lastError]);
             *rollback = YES;
             return;
         }
@@ -436,12 +436,12 @@
         FMResultSet *rs = [db executeQuery:@"SELECT * FROM " TABLE_APP_STATE];
 
         if (rs == nil) {
-            NSLog(TAG @"getAppForegroundState: error %@", [db lastError]);
+            NSLog(TAG_PSIPHON_DATA_SHARED_DB @"getAppForegroundState: error %@", [db lastError]);
             return;
         }
 
         if (![rs next]) {
-            NSLog(TAG @"getAppForegroundState: failed to retrieve row successfully. Aborting.");
+            NSLog(TAG_PSIPHON_DATA_SHARED_DB @"getAppForegroundState: failed to retrieve row successfully. Aborting.");
             abort();
         }
 
@@ -450,4 +450,5 @@
 
     return foreground;
 }
+
 @end
