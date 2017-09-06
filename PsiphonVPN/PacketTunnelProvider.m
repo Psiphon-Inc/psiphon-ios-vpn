@@ -193,7 +193,6 @@ static const double kDefaultLogTruncationInterval = 12 * 60 * 60; // 12 hours
     if ([sharedDB getAppForegroundState]) {
 
         if (vpnStartCompletionHandler &&
-          !self.reasserting &&
           [psiphonTunnel getConnectionState] == PsiphonConnectionStateConnected) {
 
             vpnStartCompletionHandler(nil);
@@ -330,11 +329,12 @@ static const double kDefaultLogTruncationInterval = 12 * 60 * 60; // 12 hours
     // Write state to the database
     [sharedDB updateTunnelConnectedState:TRUE];
 
-    self.reasserting = FALSE;
+    if (!vpnStartCompletionHandler) {
+        self.reasserting = FALSE;
+    }
 
     [notifier post:@"NE.tunnelConnected"];
     
-    // Note: self.reasserting should be false before calling tryStartVPN.
     [self tryStartVPN];
 }
 
