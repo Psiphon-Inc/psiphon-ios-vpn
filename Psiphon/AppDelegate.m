@@ -165,6 +165,10 @@
         ![adManager adIsReady]) {
         [adManager initializeAds];
         self.window.rootViewController = launchScreenViewController;
+        if (timerCount == 0) {
+            // Reset timer to 10 if it's 0 and need load ads again.
+            timerCount = 10;
+        }
         [self startLaunchingScreenTimer];
     } else {
         self.window.rootViewController = mainViewController;
@@ -173,6 +177,7 @@
 
 - (void) switchViewControllerWhenAdsLoaded {
     [loadingTimer invalidate];
+    timerCount = 0;
     [self changeRootViewController:mainViewController];
 }
 
