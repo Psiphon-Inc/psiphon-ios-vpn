@@ -333,11 +333,13 @@
         while ([rs next]) {
             lastLogRowId = [rs intForColumn:COL_ID];
 
-            NSDate *timestamp = [rs dateForColumn:COL_LOG_TIMESTAMP];
+            NSString *timestampString = [rs stringForColumn:COL_LOG_TIMESTAMP];
             NSString *json = [rs stringForColumn:COL_LOG_LOGJSON];
 //          BOOL isDiagnostic = [rs boolForColumn:COL_LOG_IS_DIAGNOSTIC]; // TODO
 
-            DiagnosticEntry *d = [[DiagnosticEntry alloc] init:json andTimestamp:timestamp];
+            NSDate *timestampDate = [PsiphonDataSharedDB dateFromTimestamp:timestampString];
+
+            DiagnosticEntry *d = [[DiagnosticEntry alloc] init:json andTimestamp:timestampDate];
             [logs addObject:d];
         }
     }];
@@ -449,6 +451,16 @@
     }];
 
     return foreground;
+}
+
+#pragma mark - Helper methods
+
++ (NSDate *)dateFromTimestamp:(NSString *)timestamp {
+    NSDateFormatter * formatter = [[NSDateFormatter alloc] init];
+    [formatter setDateFormat:@"yyyy-MM-dd HH:mm:ss"];
+    formatter.timeZone = [NSTimeZone timeZoneWithName:@"UTC"];
+    formatter.locale = [[NSLocale alloc] initWithLocaleIdentifier:@"en_US_POSIX"];
+    return [formatter dateFromString:timestamp];
 }
 
 @end
