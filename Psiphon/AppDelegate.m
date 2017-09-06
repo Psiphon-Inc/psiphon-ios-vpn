@@ -70,6 +70,13 @@
     return mainViewController;
 }
 
+- (void) vpnStatusDidChange {
+    if ([vpnManager getVPNStatus] == VPNStatusDisconnected
+      || [vpnManager getVPNStatus] == VPNStatusRestarting) {
+        shownHomepage = FALSE;
+    }
+}
+
 # pragma mark - Lifecycle methods
 
 - (BOOL)application:(UIApplication *)application willFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
@@ -91,6 +98,11 @@
     [self.window makeKeyAndVisible];
 
     shownHomepage = FALSE;
+    // Listen for VPN status changes from VPNManager.
+    [[NSNotificationCenter defaultCenter]
+      addObserver:self selector:@selector(vpnStatusDidChange) name:@kVPNStatusChangeNotificationName object:vpnManager];
+
+    // Listen for the network extension messages.
     [self listenForNEMessages];
 
     return YES;
