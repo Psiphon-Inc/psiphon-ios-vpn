@@ -55,7 +55,7 @@
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 5 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
             [self initializeAds];
         });
-    } else {
+    } else if ([vpnManager getVPNStatus] == VPNStatusConnected) {
         [self initializeAds];
     }
 }
@@ -78,9 +78,12 @@
 
     NSLog(@"initializeAds");
     if ([self shouldShowUntunneledAds]) {
-        // Init code.
-        [GADMobileAds configureWithApplicationID:@"ca-app-pub-1072041961750291~2085686375"];
-        [self loadUntunneledInterstitial];
+        if (!self.untunneledInterstitial) {
+            // Init code.
+            [GADMobileAds configureWithApplicationID:@"ca-app-pub-1072041961750291~2085686375"];
+            [self loadUntunneledInterstitial];
+            
+        }
     } else {
         // De-init code.
         [MPInterstitialAdController removeSharedInterstitialAdController:self.untunneledInterstitial];
@@ -91,7 +94,8 @@
 }
 
 - (bool)shouldShowUntunneledAds {
-    return [vpnManager getVPNStatus] == VPNStatusDisconnected;
+    VPNStatus vpnStatus = [vpnManager getVPNStatus];
+    return vpnStatus == VPNStatusInvalid || vpnStatus == VPNStatusDisconnected;
 }
 
 - (void)loadUntunneledInterstitial {
@@ -111,7 +115,6 @@
         // Don't show ads if failed to start the network extension.
         if (!error) {
             if ([self adIsReady]) {
-                self.adIsShowing = YES;
                 [self.untunneledInterstitial showFromViewController:[[AppDelegate sharedAppDelegate] getMainViewController]];
             }
         }
@@ -164,7 +167,7 @@
 
     [self postAdsLoadStateDidChangeNotification];
 
-    self.adIsShowing = NO;
+    self.adIsShowing = FALSE;
 
     // Post message to the extension to start the VPN
     // when the tunnel is established.
