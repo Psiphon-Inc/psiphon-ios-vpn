@@ -158,10 +158,8 @@
 }
 
 - (void) switchViewControllerWhenAdsLoaded {
-    if (self.window.rootViewController != mainViewController) {
-        [loadingTimer invalidate];
-        [self changeRootViewController:mainViewController];
-    }
+    [loadingTimer invalidate];
+    [self changeRootViewController:mainViewController];
 }
 
 - (void) switchViewControllerWhenExpire:(NSTimer*)timer {
