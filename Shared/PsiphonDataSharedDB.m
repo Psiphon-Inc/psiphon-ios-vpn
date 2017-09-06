@@ -333,7 +333,7 @@
         while ([rs next]) {
             lastLogRowId = [rs intForColumn:COL_ID];
 
-            NSString *timestamp = [rs stringForColumn:COL_LOG_TIMESTAMP];
+            NSDate *timestamp = [rs dateForColumn:COL_LOG_TIMESTAMP];
             NSString *json = [rs stringForColumn:COL_LOG_LOGJSON];
 //          BOOL isDiagnostic = [rs boolForColumn:COL_LOG_IS_DIAGNOSTIC]; // TODO
 
@@ -450,4 +450,5 @@
 
     return foreground;
 }
+
 @end
