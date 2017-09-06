@@ -165,20 +165,17 @@
 }
 
 - (void) switchViewControllerWhenExpire:(NSTimer*)timer {
-    if (self.window.rootViewController != mainViewController) {
-        if (timerCount == 0) {
-            // TODO: Test if videoFile observer been removed before switch view controller, if not, need to remove that.
-            //    if (self.videoFile != nil) {
-            //        [self.videoFile removeObserver:self forKeyPath:@"status"];
-            //    }
-            [loadingTimer invalidate];
-            [self changeRootViewController:mainViewController];
-        }
-        timerCount -=1;
-        launchScreenViewController.secondLabel.text = [NSString stringWithFormat:@"%ld", (long)timerCount];
-        launchScreenViewController.progressView.progress = (10 - timerCount)/10.0f;
-        
+    if (timerCount == 0) {
+        // TODO: Test if videoFile observer been removed before switch view controller, if not, need to remove that.
+        //    if (self.videoFile != nil) {
+        //        [self.videoFile removeObserver:self forKeyPath:@"status"];
+        //    }
+        [loadingTimer invalidate];
+        [self changeRootViewController:mainViewController];
     }
+    timerCount -=1;
+    launchScreenViewController.secondLabel.text = [NSString stringWithFormat:@"%ld", (long)timerCount];
+    launchScreenViewController.progressView.progress = (10 - timerCount)/10.0f;
 }
 
 - (void) startLaunchingScreenTimer {
@@ -195,6 +192,10 @@
 - (void)changeRootViewController:(UIViewController*)viewController {
     if (!self.window.rootViewController) {
         self.window.rootViewController = viewController;
+        return;
+    }
+    
+    if (self.window.rootViewController == viewController) {
         return;
     }
 
