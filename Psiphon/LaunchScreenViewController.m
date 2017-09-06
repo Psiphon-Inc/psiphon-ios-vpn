@@ -105,7 +105,6 @@ static const NSString *ItemStatusContext;
     [self.view setBackgroundColor:[UIColor whiteColor]];
     [self addLoadingLabel];
     [self addProgressView];
-//    [self addSecondLabel];
     [self syncUI];
 }
 
@@ -203,32 +202,6 @@ static const NSString *ItemStatusContext;
                                                           attribute:NSLayoutAttributeRight
                                                          multiplier:1.0
                                                            constant:-15.0]];
-}
-
-- (void)addSecondLabel {
-    self.secondLabel = [[UILabel alloc] init];
-    self.secondLabel.translatesAutoresizingMaskIntoConstraints = NO;
-    self.secondLabel.adjustsFontSizeToFitWidth = YES;
-    self.secondLabel.text = @"10";
-    self.secondLabel.textAlignment = NSTextAlignmentCenter;
-    [self.view addSubview:self.secondLabel];
-    
-    // Setup autolayout
-    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:self.secondLabel
-                                                          attribute:NSLayoutAttributeBottom
-                                                          relatedBy:NSLayoutRelationGreaterThanOrEqual
-                                                             toItem:self.view
-                                                          attribute:NSLayoutAttributeBottom
-                                                         multiplier:1.0
-                                                           constant:-30.0]];
-    
-    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:self.secondLabel
-                                                          attribute:NSLayoutAttributeRight
-                                                          relatedBy:NSLayoutRelationEqual
-                                                             toItem:loadingLabel
-                                                          attribute:NSLayoutAttributeRight
-                                                         multiplier:1.0
-                                                           constant:-30.0]];
 }
 
 @end
