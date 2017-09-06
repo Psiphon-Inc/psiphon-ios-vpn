@@ -73,7 +73,7 @@
 - (BOOL)application:(UIApplication *)application willFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
 	[self initializeDefaults];
     [[NSNotificationCenter defaultCenter]
-      addObserver:self selector:@selector(switchViewControllerWhenExpire:) name:@kAdsDidLoad object:adManager];
+      addObserver:self selector:@selector(switchViewControllerWhenAdsLoaded) name:@kAdsDidLoad object:adManager];
 
 	return YES;
 }
@@ -155,6 +155,11 @@
     } else {
         self.window.rootViewController = mainViewController;
     }
+}
+
+- (void) switchViewControllerWhenAdsLoaded {
+    [loadingTimer invalidate];
+    [self changeRootViewController:mainViewController];
 }
 
 - (void) switchViewControllerWhenExpire:(NSTimer*)timer {
