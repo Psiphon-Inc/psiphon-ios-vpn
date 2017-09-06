@@ -20,6 +20,7 @@
 #import "AdManager.h"
 #import "VPNManager.h"
 #import "AppDelegate.h"
+#import "Logging.h"
 
 @import GoogleMobileAds;
 
@@ -76,7 +77,7 @@
 - (void)initializeAds {
     // TODO: decide if to init or deinit, based on VPN disconnected state.
 
-    NSLog(@"initializeAds");
+    DEBUG();
     if ([self shouldShowUntunneledAds]) {
         if (!self.untunneledInterstitial) {
             // Init code.
@@ -99,7 +100,7 @@
 }
 
 - (void)loadUntunneledInterstitial {
-    NSLog(@"loadUntunneledInterstitial");
+    DEBUG();
     self.untunneledInterstitial = [MPInterstitialAdController
       interstitialAdControllerForAdUnitId:@"4250ebf7b28043e08ddbe04d444d79e4"];
     self.untunneledInterstitial.delegate = self;
@@ -107,7 +108,7 @@
 }
 
 - (void)showUntunneledInterstitial {
-    NSLog(@"showUntunneledInterstitial");
+    DEBUG();
     // Start the tunnel in parallel with showing ads.
     // VPN won't start until [vpnManager startVPN] message is sent.
     [vpnManager startTunnelWithCompletionHandler:^(NSError *error) {
@@ -138,7 +139,7 @@
 #pragma mark - Interestitial callbacks
 
 - (void)interstitialDidLoadAd:(MPInterstitialAdController *)interstitial {
-    NSLog(@"Interstitial loaded");
+    DEBUG();
 
     [self postAdsLoadStateDidChangeNotification];
 
@@ -149,13 +150,13 @@
 }
 
 - (void)interstitialDidFailToLoadAd:(MPInterstitialAdController *)interstitial {
-    NSLog(@"Interstitial failed to load");
+    DEBUG();
     // Don't retry.
     [self postAdsLoadStateDidChangeNotification];
 }
 
 - (void)interstitialDidExpire:(MPInterstitialAdController *)interstitial {
-    NSLog(@"Interstitial expired");
+    DEBUG();
 
     [self postAdsLoadStateDidChangeNotification];
 
@@ -163,7 +164,7 @@
 }
 
 - (void)interstitialDidDisappear:(MPInterstitialAdController *)interstitial {
-    NSLog(@"Interstitial dismissed");
+    DEBUG();
 
     [self postAdsLoadStateDidChangeNotification];
 

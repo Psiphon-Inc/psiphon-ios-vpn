@@ -25,6 +25,7 @@
 #import "RegionAdapter.h"
 #import "VPNManager.h"
 #import "AdManager.h"
+#import "Logging.h"
 
 @interface AppDelegate ()
 @end
@@ -88,7 +89,8 @@
 }
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-    NSLog(@"AppDelegate: application:didFinishLaunchingWithOptions:");
+    DEBUG();
+
     // Override point for customization after application launch.
     self.window = [[UIWindow alloc] initWithFrame:UIScreen.mainScreen.bounds];
 
@@ -109,7 +111,7 @@
 }
 
 - (void)applicationWillResignActive:(UIApplication *)application {
-    NSLog(@"AppDelegate: applicationWillResignActive");
+    DEBUG();
     // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
     // Use this method to pause ongoing tasks, disable timers, and invalidate graphics rendering callbacks. Games should use this method to pause the game.
     [sharedDB updateAppForegroundState:NO];
@@ -117,22 +119,22 @@
 }
 
 - (void)applicationDidEnterBackground:(UIApplication *)application {
-    NSLog(@"AppDelegate: applicationDidEnterBackground");
+    DEBUG();
     // Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later.
     // If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
 }
 
 - (void)applicationWillEnterForeground:(UIApplication *)application {
-    NSLog(@"AppDelegate: applicationWillEnterForeground");
+    DEBUG();
     // Called as part of the transition from the background to the active state; here you can undo many of the changes made on entering the background.
-    
+
     [self setRootViewController];
-    
+
     // TODO: init MainViewController.
 }
 
 - (void)applicationDidBecomeActive:(UIApplication *)application {
-    NSLog(@"AppDelegate: applicationDidBecomeActive");
+    DEBUG();
     // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
     [sharedDB updateAppForegroundState:YES];
 
@@ -148,7 +150,7 @@
 }
 
 - (void)applicationWillTerminate:(UIApplication *)application {
-    NSLog(@"AppDelegate: applicationWillTerminate");
+    DEBUG();
     // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
 }
 
@@ -252,7 +254,7 @@
     }];
 
     [notifier listenForNotification:@"NE.tunnelConnected" listener:^{
-        NSLog(@"received NE.tunnelConnected");
+        DEBUG(@"received NE.tunnelConnected");
         // If we haven't had a chance to load an Ad, and the
         // tunnel is already connected, give up on the Ad and
         // start the VPN. Otherwise the startVPN message will be
