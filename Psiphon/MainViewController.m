@@ -152,11 +152,10 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 
     // Listen for VPN status changes from VPNManager.
     [[NSNotificationCenter defaultCenter]
-      addObserver:self selector:@selector(vpnStatusDidChange) name:@kVPNStatusChangeNotificationName object:vpnManager];
+      addObserver:self selector:@selector(onVPNStatusDidChange) name:@kVPNStatusChangeNotificationName object:vpnManager];
 
-//    // Listen for messages from Network Extension.
-//    [self listenForNEMessages];
-
+    // Sync UI with the VPN state
+    [self onVPNStatusDidChange];
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
@@ -193,11 +192,10 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 
 #pragma mark - UI callbacks
 
-- (void)vpnStatusDidChange {
+- (void)onVPNStatusDidChange {
     // Update UI
     startStopButton.selected = [vpnManager isVPNActive];
     statusLabel.text = [self getVPNStatusDescription:[vpnManager getVPNStatus]];
-
 }
 
 - (void)onStartStopTap:(UIButton *)sender {
