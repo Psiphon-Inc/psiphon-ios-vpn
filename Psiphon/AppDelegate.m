@@ -56,6 +56,8 @@
         
         mainViewController = [[MainViewController alloc] init];
         launchScreenViewController = [[LaunchScreenViewController alloc] init];
+
+        timerCount = 10;
     }
     return self;
 }
@@ -163,6 +165,10 @@
         ![adManager adIsReady]) {
         [adManager initializeAds];
         self.window.rootViewController = launchScreenViewController;
+        if (timerCount == 0) {
+            // Reset timer to 10 if it's 0 and need load ads again.
+            timerCount = 10;
+        }
         [self startLaunchingScreenTimer];
     } else {
         self.window.rootViewController = mainViewController;
@@ -171,25 +177,20 @@
 
 - (void) switchViewControllerWhenAdsLoaded {
     [loadingTimer invalidate];
+    timerCount = 0;
     [self changeRootViewController:mainViewController];
 }
 
 - (void) switchViewControllerWhenExpire:(NSTimer*)timer {
     if (timerCount == 0) {
-        // TODO: Test if videoFile observer been removed before switch view controller, if not, need to remove that.
-        //    if (self.videoFile != nil) {
-        //        [self.videoFile removeObserver:self forKeyPath:@"status"];
-        //    }
         [loadingTimer invalidate];
         [self changeRootViewController:mainViewController];
     }
     timerCount -=1;
-    launchScreenViewController.secondLabel.text = [NSString stringWithFormat:@"%ld", (long)timerCount];
     launchScreenViewController.progressView.progress = (10 - timerCount)/10.0f;
 }
 
 - (void) startLaunchingScreenTimer {
-    timerCount = 10;
     if (!loadingTimer || ![loadingTimer isValid]) {
         loadingTimer = [NSTimer scheduledTimerWithTimeInterval:1.0
                                                          target:self
