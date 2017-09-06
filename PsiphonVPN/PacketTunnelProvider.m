@@ -358,4 +358,8 @@ static const double kDefaultLogTruncationInterval = 12 * 60 * 60; // 12 hours
 	[notifier post:@"NE.onAvailableEgressRegions"];
 }
 
+- (void)onInternetReachabilityChanged:(Reachability* _Nonnull)reachability {
+	NSString *strReachabilityFlags = [reachability currentReachabilityFlagsToString];
+	[self onDiagnosticMessage:[NSString stringWithFormat:@"onInternetReachabilityChanged: %@", strReachabilityFlags]];
+}
 @end
