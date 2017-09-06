@@ -23,7 +23,7 @@
 #import "SharedConstants.h"
 #import "Notifier.h"
 
-#define TAG @"VPNManager"
+#define TAG_VPN_MANAGER @"VPNManager"
 
 @interface VPNManager ()
 
@@ -174,7 +174,7 @@
     if (s == NEVPNStatusConnecting) {
         [notifier post:@"M.startVPN"];
     } else {
-        NSLog(TAG @"startVPN: Network extension is not in connecting state.");
+        NSLog(TAG_VPN_MANAGER @"startVPN: Network extension is not in connecting state.");
     }
 }
 
