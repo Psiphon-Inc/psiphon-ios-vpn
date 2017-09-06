@@ -83,7 +83,6 @@
             case NEVPNStatusDisconnecting: return VPNStatusDisconnecting;
         }
     }
-    return nil;
 }
 
 - (void)startTunnelWithCompletionHandler:(nullable void (^)(NSError * _Nullable error))completionHandler {
