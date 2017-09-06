@@ -40,7 +40,7 @@ CHECKOUT OPTIONS:
     :commit: e0dfb73924359ca42f1551220a55117d91d0ab6f
     :git: https://github.com/Psiphon-Inc/InAppSettingsKit.git
   PsiphonClientCommonLibrary:
-    :commit: 97d4fd611d5fba9aa82acb164969ad65bad71976
+    :commit: 411520195f64b3e0f1751740a80efb92847691b1
     :git: https://github.com/Psiphon-Inc/psiphon-ios-client-common-library.git
 
 SPEC CHECKSUMS:
