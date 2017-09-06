@@ -142,7 +142,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 - (void)adStatusDidChange{
 
     // TODO: cast from NSObject to BOOL
-    adLabel.hidden = [adManager adIsReady];
+    adLabel.hidden = ![adManager adIsReady];
 
 }
 
