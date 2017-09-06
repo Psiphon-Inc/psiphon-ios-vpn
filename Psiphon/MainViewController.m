@@ -297,6 +297,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     [startStopButton setImage:stopButtonImage forState:UIControlStateSelected];
 
     [startStopButton addTarget:self action:@selector(onStartStopTap:) forControlEvents:UIControlEventTouchUpInside];
+    startStopButton.selected = [vpnManager isVPNActive];
     [self.view addSubview:startStopButton];
 
     // Setup autolayout
@@ -355,7 +356,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     statusLabel = [[UILabel alloc] init];
     statusLabel.translatesAutoresizingMaskIntoConstraints = NO;
     statusLabel.adjustsFontSizeToFitWidth = YES;
-    statusLabel.text = @"...";
+    statusLabel.text = [self getVPNStatusDescription:[vpnManager getVPNStatus]];
     statusLabel.textAlignment = NSTextAlignmentCenter;
     [self.view addSubview:statusLabel];
 
