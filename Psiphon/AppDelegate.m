@@ -71,10 +71,6 @@
 
 - (BOOL)application:(UIApplication *)application willFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
 	[self initializeDefaults];
-
-    //
-    [adManager initializeAds];
-
     [[NSNotificationCenter defaultCenter]
       addObserver:self selector:@selector(switchViewControllerWhenExpire:) name:@kAdsDidLoad object:adManager];
 
@@ -87,11 +83,7 @@
     self.window = [[UIWindow alloc] initWithFrame:UIScreen.mainScreen.bounds];
 
     // TODO: if VPN disconnected, launch with animation, else launch with MainViewController.
-    if ([vpnManager getVPNStatus] == VPNStatusDisconnected || [vpnManager getVPNStatus] == VPNStatusInvalid) {
-        self.window.rootViewController = launchScreenViewController;
-    } else {
-        self.window.rootViewController = mainViewController;
-    }
+    [self setRootViewController];
 
     [self.window makeKeyAndVisible];
 
@@ -118,7 +110,9 @@
 - (void)applicationWillEnterForeground:(UIApplication *)application {
     NSLog(@"AppDelegate: applicationWillEnterForeground");
     // Called as part of the transition from the background to the active state; here you can undo many of the changes made on entering the background.
-    [self startLaunchingScreenTimer];
+    
+    [self setRootViewController];
+    
     // TODO: init MainViewController.
 }
 
@@ -150,13 +144,27 @@
 
 #pragma mark - View controller switch
 
+- (void) setRootViewController {
+    // TODO: if VPN disconnected, launch with animation, else launch with MainViewController.
+    if (([vpnManager getVPNStatus] == VPNStatusDisconnected || [vpnManager getVPNStatus] == VPNStatusInvalid) &&
+        ![adManager adIsReady]) {
+        [adManager initializeAds];
+        self.window.rootViewController = launchScreenViewController;
+        [self startLaunchingScreenTimer];
+    } else {
+        self.window.rootViewController = mainViewController;
+    }
+}
+
 - (void) switchViewControllerWhenExpire:(NSTimer*)timer {
-//    if (self.videoFile != nil) {
-//        [self.videoFile removeObserver:self forKeyPath:@"status"];
-//    }
-    [loadingTimer invalidate];
-//    [[AppDelegate sharedAppDelegate] switchToMainViewController:_untunneledInterstitial:mainViewController];
-    [self changeRootViewController:mainViewController];
+    if (self.window.rootViewController != mainViewController) {
+        // TODO: Test if videoFile observer been removed before switch view controller, if not, need to remove that.
+        //    if (self.videoFile != nil) {
+        //        [self.videoFile removeObserver:self forKeyPath:@"status"];
+        //    }
+        [loadingTimer invalidate];
+        [self changeRootViewController:mainViewController];
+    }
 }
 
 - (void) startLaunchingScreenTimer {
