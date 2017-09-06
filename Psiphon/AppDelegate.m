@@ -37,6 +37,7 @@
 
     // Loading Timer
     NSTimer *loadingTimer;
+    NSInteger timerCount;
 
     BOOL shownHomepage;
     
@@ -59,7 +60,7 @@
     return self;
 }
 
-+ (AppDelegate *)sharedAppDelegate{
++ (AppDelegate *)sharedAppDelegate {
     return (AppDelegate *)[UIApplication sharedApplication].delegate;
 }
 
@@ -158,22 +159,29 @@
 
 - (void) switchViewControllerWhenExpire:(NSTimer*)timer {
     if (self.window.rootViewController != mainViewController) {
-        // TODO: Test if videoFile observer been removed before switch view controller, if not, need to remove that.
-        //    if (self.videoFile != nil) {
-        //        [self.videoFile removeObserver:self forKeyPath:@"status"];
-        //    }
-        [loadingTimer invalidate];
-        [self changeRootViewController:mainViewController];
+        if (timerCount == 0) {
+            // TODO: Test if videoFile observer been removed before switch view controller, if not, need to remove that.
+            //    if (self.videoFile != nil) {
+            //        [self.videoFile removeObserver:self forKeyPath:@"status"];
+            //    }
+            [loadingTimer invalidate];
+            [self changeRootViewController:mainViewController];
+        }
+        timerCount -=1;
+        launchScreenViewController.secondLabel.text = [NSString stringWithFormat:@"%ld", (long)timerCount];
+        launchScreenViewController.progressView.progress = (10 - timerCount)/10.0f;
+        
     }
 }
 
 - (void) startLaunchingScreenTimer {
+    timerCount = 10;
     if (!loadingTimer || ![loadingTimer isValid]) {
-        loadingTimer = [NSTimer scheduledTimerWithTimeInterval:10.0
+        loadingTimer = [NSTimer scheduledTimerWithTimeInterval:1.0
                                                          target:self
                                                        selector:@selector(switchViewControllerWhenExpire:)
                                                        userInfo:nil
-                                                        repeats:NO];
+                                                        repeats:YES];
     }
 }
 

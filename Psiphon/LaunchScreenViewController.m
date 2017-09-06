@@ -20,6 +20,7 @@
 #import <Foundation/Foundation.h>
 #import <AVFoundation/AVFoundation.h>
 #import "LaunchScreenViewController.h"
+#import "AppDelegate.h"
 
 @interface LaunchScreenViewController ()
 
@@ -34,13 +35,7 @@ static const NSString *ItemStatusContext;
     // videoPlayer
     AVPlayerLayer* playerLayer;
 
-    // Loading Timer
-    NSTimer *_loadingTimer;
-
-    UIProgressView *progressView;
-    NSInteger timerCount;
-    
-    UILabel *secondLabel;
+    // Loading Text
     UILabel *loadingLabel;
 }
 
@@ -117,7 +112,6 @@ static const NSString *ItemStatusContext;
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
     [self.loadingVideo play];
-    NSLog(@"Play Video");
 }
 
 - (void)playerItemDidReachEnd:(NSNotification *)notification {
@@ -181,12 +175,12 @@ static const NSString *ItemStatusContext;
 }
 
 - (void)addProgressView {
-    progressView = [[UIProgressView alloc] init];
-    progressView.translatesAutoresizingMaskIntoConstraints = NO;
-    [self.view addSubview:progressView];
+    self.progressView = [[UIProgressView alloc] init];
+    self.progressView.translatesAutoresizingMaskIntoConstraints = NO;
+    [self.view addSubview:self.progressView];
     
     // Setup autolayout
-    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:progressView
+    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:self.progressView
                                                           attribute:NSLayoutAttributeBottom
                                                           relatedBy:NSLayoutRelationGreaterThanOrEqual
                                                              toItem:loadingLabel
@@ -194,7 +188,7 @@ static const NSString *ItemStatusContext;
                                                          multiplier:1.0
                                                            constant:-15.0]];
     
-    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:progressView
+    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:self.progressView
                                                           attribute:NSLayoutAttributeLeft
                                                           relatedBy:NSLayoutRelationEqual
                                                              toItem:self.view
@@ -202,7 +196,7 @@ static const NSString *ItemStatusContext;
                                                          multiplier:1.0
                                                            constant:15.0]];
     
-    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:progressView
+    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:self.progressView
                                                           attribute:NSLayoutAttributeRight
                                                           relatedBy:NSLayoutRelationEqual
                                                              toItem:self.view
@@ -212,15 +206,15 @@ static const NSString *ItemStatusContext;
 }
 
 - (void)addSecondLabel {
-    secondLabel = [[UILabel alloc] init];
-    secondLabel.translatesAutoresizingMaskIntoConstraints = NO;
-    secondLabel.adjustsFontSizeToFitWidth = YES;
-    secondLabel.text = [NSString stringWithFormat:@"%ld", (long)timerCount];
-    secondLabel.textAlignment = NSTextAlignmentCenter;
-    [self.view addSubview:secondLabel];
+    self.secondLabel = [[UILabel alloc] init];
+    self.secondLabel.translatesAutoresizingMaskIntoConstraints = NO;
+    self.secondLabel.adjustsFontSizeToFitWidth = YES;
+    self.secondLabel.text = @"10";
+    self.secondLabel.textAlignment = NSTextAlignmentCenter;
+    [self.view addSubview:self.secondLabel];
     
     // Setup autolayout
-    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:secondLabel
+    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:self.secondLabel
                                                           attribute:NSLayoutAttributeBottom
                                                           relatedBy:NSLayoutRelationGreaterThanOrEqual
                                                              toItem:self.view
@@ -228,7 +222,7 @@ static const NSString *ItemStatusContext;
                                                          multiplier:1.0
                                                            constant:-30.0]];
     
-    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:secondLabel
+    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:self.secondLabel
                                                           attribute:NSLayoutAttributeRight
                                                           relatedBy:NSLayoutRelationEqual
                                                              toItem:loadingLabel
