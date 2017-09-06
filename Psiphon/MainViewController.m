@@ -154,6 +154,8 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     [[NSNotificationCenter defaultCenter]
       addObserver:self selector:@selector(vpnStatusDidChange) name:@kVPNStatusChangeNotificationName object:vpnManager];
 
+    startStopButton.selected = [vpnManager isVPNActive];
+
 //    // Listen for messages from Network Extension.
 //    [self listenForNEMessages];
 
@@ -355,7 +357,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     statusLabel = [[UILabel alloc] init];
     statusLabel.translatesAutoresizingMaskIntoConstraints = NO;
     statusLabel.adjustsFontSizeToFitWidth = YES;
-    statusLabel.text = @"...";
+    statusLabel.text = [self getVPNStatusDescription:[vpnManager getVPNStatus]];
     statusLabel.textAlignment = NSTextAlignmentCenter;
     [self.view addSubview:statusLabel];
 
