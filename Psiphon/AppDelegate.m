@@ -170,7 +170,6 @@
         [self changeRootViewController:mainViewController];
     }
     timerCount -=1;
-    launchScreenViewController.secondLabel.text = [NSString stringWithFormat:@"%ld", (long)timerCount];
     launchScreenViewController.progressView.progress = (10 - timerCount)/10.0f;
 }
 
