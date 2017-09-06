@@ -154,8 +154,6 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     [[NSNotificationCenter defaultCenter]
       addObserver:self selector:@selector(vpnStatusDidChange) name:@kVPNStatusChangeNotificationName object:vpnManager];
 
-    startStopButton.selected = [vpnManager isVPNActive];
-
 //    // Listen for messages from Network Extension.
 //    [self listenForNEMessages];
 
@@ -299,6 +297,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     [startStopButton setImage:stopButtonImage forState:UIControlStateSelected];
 
     [startStopButton addTarget:self action:@selector(onStartStopTap:) forControlEvents:UIControlEventTouchUpInside];
+    startStopButton.selected = [vpnManager isVPNActive];
     [self.view addSubview:startStopButton];
 
     // Setup autolayout
