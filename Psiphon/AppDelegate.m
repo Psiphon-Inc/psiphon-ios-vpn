@@ -56,6 +56,8 @@
         
         mainViewController = [[MainViewController alloc] init];
         launchScreenViewController = [[LaunchScreenViewController alloc] init];
+
+        timerCount = 10;
     }
     return self;
 }
@@ -177,7 +179,6 @@
 }
 
 - (void) startLaunchingScreenTimer {
-    timerCount = 10;
     if (!loadingTimer || ![loadingTimer isValid]) {
         loadingTimer = [NSTimer scheduledTimerWithTimeInterval:1.0
                                                          target:self
