@@ -563,6 +563,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     };
 
     [FeedbackUpload generateAndSendFeedback:selectedThumbIndex
+                                  buildInfo:[PsiphonTunnel getBuildInfo]
                                    comments:comments
                                       email:email
                          sendDiagnosticInfo:uploadDiagnostics
