@@ -494,7 +494,16 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                                                              toItem:self.view
                                                           attribute:NSLayoutAttributeBottom
                                                          multiplier:1.0
-                                                           constant:-30.0]];
+                                                           constant:-20.0]];
+    
+    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:versionLabel
+                                                          attribute:NSLayoutAttributeHeight
+                                                          relatedBy:NSLayoutRelationEqual
+                                                             toItem:nil
+                                                          attribute:NSLayoutAttributeNotAnAttribute
+                                                         multiplier:1.0
+                                                           constant:50.0]];
+
 }
 
 - (void)addAdLabel {
