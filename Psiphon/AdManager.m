@@ -109,17 +109,12 @@
 
 - (void)showUntunneledInterstitial {
     NSLog(@"showUntunneledInterstitial");
-    // Start the tunnel in parallel with showing ads.
-    // VPN won't start until [vpnManager startVPN] message is sent.
-    [vpnManager startTunnelWithCompletionHandler:^(NSError *error) {
-
-        // Don't show ads if failed to start the network extension.
-        if (!error) {
-            if ([self adIsReady]) {
-                [self.untunneledInterstitial showFromViewController:[[AppDelegate sharedAppDelegate] getMainViewController]];
-            }
-        }
-    }];
+    if ([self adIsReady]) {
+        [self.untunneledInterstitial showFromViewController:[[AppDelegate sharedAppDelegate] getMainViewController]];
+    } else {
+        // Start the tunnel
+        [vpnManager startTunnelWithCompletionHandler:^(NSError *error) {}];
+    }
 }
 
 - (BOOL)adIsReady {
@@ -173,10 +168,8 @@
     
     [self postAdsLoadStateDidChangeNotification];
 
-    // Post message to the extension to start the VPN
-    // when the tunnel is established.
-    // NOTE: if the tunnel is not connected yet, this is NO-OP.
-    [vpnManager startVPN];
+    // Start the tunnel
+    [vpnManager startTunnelWithCompletionHandler:^(NSError *error) {}];
 }
 
 @end
