@@ -60,7 +60,6 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     UIButton *regionButton;
     UILabel *regionLabel;
     UILabel *versionLabel;
-    UILabel *adLabel;
 
     // UI Constraint
     NSLayoutConstraint *startButtonScreenWidth;
@@ -121,7 +120,6 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     [self addStatusLabel];
     [self addRegionButton];
     [self addRegionLabel];
-    [self addAdLabel];
     [self addVersionLabel];
 
     // TODO: load/save config here to have the user immediately complete the permission prompt
@@ -136,15 +134,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     [self updateRegionLabel];
 
     [[NSNotificationCenter defaultCenter]
-      addObserver:self selector:@selector(adStatusDidChange) name:@kAdsDidLoad object:adManager];
-}
-
-//TODO: move this
-- (void)adStatusDidChange{
-
-    // TODO: cast from NSObject to BOOL
-    adLabel.hidden = ![adManager adIsReady];
-
+      addObserver:self selector:@selector(onAdStatusDidChange) name:@kAdsDidLoad object:adManager];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -189,6 +179,12 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     }];
 
     [super viewWillTransitionToSize:size withTransitionCoordinator:coordinator];
+}
+
+#pragma mark - Callbacks
+
+// Called when kAdsDidLoad
+- (void)onAdStatusDidChange{
 }
 
 #pragma mark - UI callbacks
@@ -496,50 +492,6 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                                                           attribute:NSLayoutAttributeBottom
                                                          multiplier:1.0
                                                            constant:-30.0]];
-}
-
-- (void)addAdLabel {
-    adLabel = [[UILabel alloc] init];
-    adLabel.translatesAutoresizingMaskIntoConstraints = NO;
-    adLabel.text = NSLocalizedStringWithDefaultValue(@"AD_LOADED", nil, [NSBundle mainBundle], @"Ad Loaded", @"Text for button that plays the main screen ad");
-    adLabel.textAlignment = NSTextAlignmentCenter;
-    [self.view addSubview:adLabel];
-    if (![adManager adIsReady]){
-        adLabel.hidden = true;
-    }
-
-    // Setup autolayout
-    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:adLabel
-                                                          attribute:NSLayoutAttributeTop
-                                                          relatedBy:NSLayoutRelationGreaterThanOrEqual
-                                                             toItem:self.topLayoutGuide
-                                                          attribute:NSLayoutAttributeBottom
-                                                         multiplier:1.0
-                                                           constant:0]];
-
-    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:adLabel
-                                                          attribute:NSLayoutAttributeBottom
-                                                          relatedBy:NSLayoutRelationEqual
-                                                             toItem:statusLabel
-                                                          attribute:NSLayoutAttributeTop
-                                                         multiplier:1.0
-                                                           constant:-20.0]];
-
-    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:adLabel
-                                                          attribute:NSLayoutAttributeLeft
-                                                          relatedBy:NSLayoutRelationEqual
-                                                             toItem:self.view
-                                                          attribute:NSLayoutAttributeLeft
-                                                         multiplier:1.0
-                                                           constant:15.0]];
-
-    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:adLabel
-                                                          attribute:NSLayoutAttributeRight
-                                                          relatedBy:NSLayoutRelationEqual
-                                                             toItem:self.view
-                                                          attribute:NSLayoutAttributeRight
-                                                         multiplier:1.0
-                                                           constant:-15.0]];
 }
 
 #pragma mark - FeedbackViewControllerDelegate methods and helpers
