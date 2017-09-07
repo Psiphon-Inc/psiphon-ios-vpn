@@ -227,6 +227,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     [self openRegionSelection];
 }
 
+#if DEBUG
 - (void)onVersionLabelTap:(UILabel *)sender {
     LogViewControllerFullScreen *log = [[LogViewControllerFullScreen alloc] init];
 
@@ -236,6 +237,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 
     [self presentViewController:nav animated:YES completion:nil];
 }
+#endif
 
 # pragma mark - UI helper functions
 
@@ -510,10 +512,12 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     versionLabel.userInteractionEnabled = YES;
     versionLabel.textColor = [UIColor whiteColor];
 
+#if DEBUG
     UITapGestureRecognizer *tapRecognizer = [[UITapGestureRecognizer alloc]
       initWithTarget:self action:@selector(onVersionLabelTap:)];
-    tapRecognizer.numberOfTapsRequired = 2;
+    tapRecognizer.numberOfTapsRequired = 1;
     [versionLabel addGestureRecognizer:tapRecognizer];
+#endif
 
     [self.view addSubview:versionLabel];
 
