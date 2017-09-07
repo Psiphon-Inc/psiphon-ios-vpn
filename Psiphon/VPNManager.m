@@ -193,8 +193,8 @@
 }
 
 - (BOOL)isVPNActive {
-    NEVPNStatus s = self.targetManager.connection.status;
-    return (s == NEVPNStatusConnecting || s == NEVPNStatusConnected || s == NEVPNStatusReasserting || restartRequired);
+    NEVPNStatus s = [self getVPNStatus];
+    return (s == VPNStatusConnecting || s == VPNStatusConnected || s == NEVPNStatusReasserting || s == VPNStatusRestarting);
 }
 
 - (BOOL)isTunnelConnected {
