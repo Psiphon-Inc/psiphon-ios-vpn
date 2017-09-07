@@ -141,7 +141,7 @@
     dispatch_async(dispatch_get_main_queue(), ^{
         // If the tunnel is in Connected state, and we're now showing ads
         // send startVPN message.
-        if (!adManager.adIsShowing && [vpnManager isTunnelConnected]) {
+        if (![adManager untunneledInterstitialIsShowing] && [vpnManager isTunnelConnected]) {
             [vpnManager startVPN];
         }
     });
@@ -160,12 +160,12 @@
 #pragma mark - View controller switch
 
 - (void) setRootViewController {
-    // TODO: if VPN disconnected, launch with animation, else launch with MainViewController.
+    // If VPN disconnected, launch with animation, else launch with MainViewController.
     if (([vpnManager getVPNStatus] == VPNStatusDisconnected || [vpnManager getVPNStatus] == VPNStatusInvalid) &&
-        ![adManager adIsReady]) {
+        ![adManager untunneledInterstitialIsReady] && ![adManager untunneledInterstitialHasShown]) {
         [adManager initializeAds];
         self.window.rootViewController = launchScreenViewController;
-        if (timerCount == 0) {
+        if (timerCount <= 0) {
             // Reset timer to 10 if it's 0 and need load ads again.
             timerCount = 10;
         }
@@ -182,9 +182,10 @@
 }
 
 - (void) switchViewControllerWhenExpire:(NSTimer*)timer {
-    if (timerCount == 0) {
+    if (timerCount <= 0) {
         [loadingTimer invalidate];
         [self changeRootViewController:mainViewController];
+        return;
     }
     timerCount -=1;
     launchScreenViewController.progressView.progress = (10 - timerCount)/10.0f;
@@ -257,7 +258,7 @@
         // tunnel is already connected, give up on the Ad and
         // start the VPN. Otherwise the startVPN message will be
         // sent after the Ad has disappeared.
-        if (!adManager.adIsShowing) {
+        if (![adManager untunneledInterstitialIsShowing]) {
             [vpnManager startVPN];
         }
     }];
