@@ -182,7 +182,7 @@
 }
 
 - (void)restartVPN {
-    if (self.targetManager.connection) {
+    if (self.targetManager.connection && [self isVPNActive]) {
         restartRequired = YES;
         [self.targetManager.connection stopVPNTunnel];
     }
@@ -196,8 +196,8 @@
 }
 
 - (BOOL)isVPNActive {
-    NEVPNStatus s = self.targetManager.connection.status;
-    return (s == NEVPNStatusConnecting || s == NEVPNStatusConnected || s == NEVPNStatusReasserting);
+    NEVPNStatus s = [self getVPNStatus];
+    return (s == VPNStatusConnecting || s == VPNStatusConnected || s == NEVPNStatusReasserting || s == VPNStatusRestarting);
 }
 
 - (BOOL)isTunnelConnected {

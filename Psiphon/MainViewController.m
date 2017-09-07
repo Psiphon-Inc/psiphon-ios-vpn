@@ -66,6 +66,9 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     NSLayoutConstraint *startButtonScreenHeight;
     NSLayoutConstraint *startButtonWidth;
 
+    // UI Layer
+    CAGradientLayer *backgroundGradient;
+
     // VPN Config user defaults
     PsiphonConfigUserDefaults *psiphonConfigUserDefaults;
 
@@ -112,17 +115,17 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     [self updateAvailableRegions];
 
     // Setting up the UI
-    [self.view setBackgroundColor:[UIColor whiteColor]];
+    [self setBackgroundGradient];
     //  TODO: wrap this in a function which always
     //  calls them in the right order
     [self addSettingsButton];
     [self addStartAndStopButton];
+    [self addAdLabel];
     [self addStatusLabel];
     [self addRegionButton];
     [self addRegionLabel];
-    [self addAdLabel];
     [self addVersionLabel];
-
+    
     // TODO: load/save config here to have the user immediately complete the permission prompt
 }
 
@@ -136,6 +139,11 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 
     [[NSNotificationCenter defaultCenter]
       addObserver:self selector:@selector(adStatusDidChange) name:@kAdsDidLoad object:adManager];
+}
+
+- (void)viewDidLayoutSubviews {
+    [super viewDidLayoutSubviews];
+    backgroundGradient.frame = self.view.bounds;
 }
 
 //TODO: move this
@@ -240,6 +248,14 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     return nil;
 }
 
+- (void)setBackgroundGradient {
+    backgroundGradient = [CAGradientLayer layer];
+    
+    backgroundGradient.colors = @[(id)[UIColor colorWithRed:0.28 green:0.36 blue:0.46 alpha:1.0].CGColor, (id)[UIColor colorWithRed:0.17 green:0.17 blue:0.28 alpha:1.0].CGColor];
+
+    [self.view.layer insertSublayer:backgroundGradient atIndex:0];
+}
+
 - (void)addSettingsButton {
     UIButton *settingsButton = [[UIButton alloc] init];
     settingsButton.translatesAutoresizingMaskIntoConstraints = NO;
@@ -296,6 +312,13 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 
     [startStopButton addTarget:self action:@selector(onStartStopTap:) forControlEvents:UIControlEventTouchUpInside];
     startStopButton.selected = [vpnManager isVPNActive];
+
+    // Shadow and Radius
+    startStopButton.layer.shadowOffset = CGSizeMake(0, 6.0f);
+    startStopButton.layer.shadowOpacity = 0.18f;
+    startStopButton.layer.shadowRadius = 0.0f;
+    startStopButton.layer.masksToBounds = NO;
+
     [self.view addSubview:startStopButton];
 
     // Setup autolayout
@@ -356,16 +379,25 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     statusLabel.adjustsFontSizeToFitWidth = YES;
     statusLabel.text = [self getVPNStatusDescription:[vpnManager getVPNStatus]];
     statusLabel.textAlignment = NSTextAlignmentCenter;
+    statusLabel.textColor = [UIColor whiteColor];
     [self.view addSubview:statusLabel];
 
     // Setup autolayout
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:statusLabel
+                                                          attribute:NSLayoutAttributeTop
+                                                          relatedBy:NSLayoutRelationGreaterThanOrEqual
+                                                             toItem:self.topLayoutGuide
+                                                          attribute:NSLayoutAttributeBottom
+                                                         multiplier:1.0
+                                                           constant:0]];
+    
+    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:statusLabel
                                                           attribute:NSLayoutAttributeBottom
                                                           relatedBy:NSLayoutRelationGreaterThanOrEqual
-                                                             toItem:startStopButton
+                                                             toItem:adLabel
                                                           attribute:NSLayoutAttributeTop
                                                          multiplier:1.0
-                                                           constant:-30.0]];
+                                                           constant:-20.0]];
 
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:statusLabel
                                                           attribute:NSLayoutAttributeLeft
@@ -426,6 +458,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     regionLabel.numberOfLines = 0;
     regionLabel.textAlignment = NSTextAlignmentCenter;
     regionLabel.font = [UIFont systemFontOfSize:15.f];
+    regionLabel.textColor = [UIColor whiteColor];
     [self.view addSubview:regionLabel];
 
     [self updateRegionLabel];
@@ -471,6 +504,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     versionLabel.text = [NSString stringWithFormat:NSLocalizedStringWithDefaultValue(@"APP_VERSION", nil, [NSBundle mainBundle], @"Version %@", @"Text showing the app version. The '%@' placeholder is the version number. So it will look like 'Version 2'."),[[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"]];
     ;
     versionLabel.userInteractionEnabled = YES;
+    versionLabel.textColor = [UIColor whiteColor];
 
     UITapGestureRecognizer *tapRecognizer = [[UITapGestureRecognizer alloc]
       initWithTarget:self action:@selector(onVersionLabelTap:)];
@@ -509,8 +543,9 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 - (void)addAdLabel {
     adLabel = [[UILabel alloc] init];
     adLabel.translatesAutoresizingMaskIntoConstraints = NO;
-    adLabel.text = NSLocalizedStringWithDefaultValue(@"AD_LOADED", nil, [NSBundle mainBundle], @"Ad Loaded", @"Text for button that plays the main screen ad");
+    adLabel.text = NSLocalizedStringWithDefaultValue(@"AD_LOADED", nil, [NSBundle mainBundle], @"Please watch a short video before we connect you to a Psiphon server", @"Text for button that tell users there will by a short video ad.");
     adLabel.textAlignment = NSTextAlignmentCenter;
+    adLabel.textColor = [UIColor whiteColor];
     [self.view addSubview:adLabel];
     if (![adManager untunneledInterstitialIsReady]){
         adLabel.hidden = true;
@@ -518,17 +553,9 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 
     // Setup autolayout
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:adLabel
-                                                          attribute:NSLayoutAttributeTop
-                                                          relatedBy:NSLayoutRelationGreaterThanOrEqual
-                                                             toItem:self.topLayoutGuide
-                                                          attribute:NSLayoutAttributeBottom
-                                                         multiplier:1.0
-                                                           constant:0]];
-
-    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:adLabel
                                                           attribute:NSLayoutAttributeBottom
                                                           relatedBy:NSLayoutRelationEqual
-                                                             toItem:statusLabel
+                                                             toItem:startStopButton
                                                           attribute:NSLayoutAttributeTop
                                                          multiplier:1.0
                                                            constant:-20.0]];

@@ -44,7 +44,7 @@ static const NSString *ItemStatusContext;
     
     NSString *tracksKey = @"tracks";
     
-    NSURL *fileURL = [[NSBundle mainBundle] URLForResource:@"loading" withExtension:@"mov"];
+    NSURL *fileURL = [[NSBundle mainBundle] URLForResource:@"launch" withExtension:@"m4v"];
     
     AVURLAsset *asset = [AVURLAsset URLAssetWithURL:fileURL options:nil];
     
@@ -63,7 +63,7 @@ static const NSString *ItemStatusContext;
                  playerLayer = [AVPlayerLayer playerLayerWithPlayer:self.loadingVideo];
                  if (self.view.bounds.size.width > self.view.bounds.size.height) {
                      // Landscape
-                     playerLayer.frame = CGRectMake((self.view.bounds.size.width - self.view.bounds.size.width / 1.5) / 2, 0, self.view.bounds.size.width / 1.5, self.view.bounds.size.height / 1.5);
+                     playerLayer.frame = CGRectMake((self.view.bounds.size.width - self.view.bounds.size.width / 1.5) / 2, 30, self.view.bounds.size.width / 1.5, self.view.bounds.size.height / 1.5);
                  } else {
                      playerLayer.frame = CGRectMake(0, 0, self.view.bounds.size.width, self.view.bounds.size.height);
                  }
@@ -88,7 +88,7 @@ static const NSString *ItemStatusContext;
 
     if (size.width > size.height) {
         // Landscape
-        playerLayer.frame = CGRectMake(( size.width - size.width / 1.5 ) / 2, 0, size.width / 1.5, size.height / 1.5);
+        playerLayer.frame = CGRectMake(( size.width - size.width / 1.5 ) / 2, 30, size.width / 1.5, size.height / 1.5);
     } else {
         playerLayer.frame = CGRectMake(0, 0, size.width, size.height);
     }
@@ -102,7 +102,7 @@ static const NSString *ItemStatusContext;
 - (void)viewDidLoad {
     [super viewDidLoad];
     // TODO: Add something to handle the syncUI when screen rotate
-    [self.view setBackgroundColor:[UIColor whiteColor]];
+    [self.view setBackgroundColor:[UIColor blackColor]];
     [self addLoadingLabel];
     [self addProgressView];
     [self syncUI];
@@ -144,7 +144,7 @@ static const NSString *ItemStatusContext;
     loadingLabel.adjustsFontSizeToFitWidth = YES;
     loadingLabel.text = @"Loading...";
     loadingLabel.textAlignment = NSTextAlignmentCenter;
-    
+    loadingLabel.textColor = [UIColor whiteColor];
     [self.view addSubview:loadingLabel];
     
     // Setup autolayout
