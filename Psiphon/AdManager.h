@@ -24,14 +24,15 @@
 
 @interface AdManager : NSObject <MPInterstitialAdControllerDelegate>
 
-@property BOOL adIsShowing;
+@property BOOL untunneledInterstitialIsShowing;
+@property BOOL untunneledInterstitialHasShown;
 
 + (instancetype)sharedInstance;
 
 - (void)initializeAds;
 
-- (void)showUntunneledInterstitial;
+- (BOOL)untunneledInterstitialIsReady;
 
-- (BOOL)adIsReady;
+- (void)showUntunneledInterstitial;
 
 @end

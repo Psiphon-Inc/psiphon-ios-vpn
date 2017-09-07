@@ -151,7 +151,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 - (void)adStatusDidChange{
 
     // TODO: cast from NSObject to BOOL
-    adLabel.hidden = ![adManager adIsReady];
+    adLabel.hidden = ![adManager untunneledInterstitialIsReady];
 
 }
 
@@ -532,7 +532,16 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                                                              toItem:self.view
                                                           attribute:NSLayoutAttributeBottom
                                                          multiplier:1.0
-                                                           constant:-30.0]];
+                                                           constant:-20.0]];
+    
+    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:versionLabel
+                                                          attribute:NSLayoutAttributeHeight
+                                                          relatedBy:NSLayoutRelationEqual
+                                                             toItem:nil
+                                                          attribute:NSLayoutAttributeNotAnAttribute
+                                                         multiplier:1.0
+                                                           constant:50.0]];
+
 }
 
 - (void)addAdLabel {
@@ -542,7 +551,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     adLabel.textAlignment = NSTextAlignmentCenter;
     adLabel.textColor = [UIColor whiteColor];
     [self.view addSubview:adLabel];
-    if (![adManager adIsReady]){
+    if (![adManager untunneledInterstitialIsReady]){
         adLabel.hidden = true;
     }
 
