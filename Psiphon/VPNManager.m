@@ -179,7 +179,7 @@
 }
 
 - (void)restartVPN {
-    if (self.targetManager.connection) {
+    if (self.targetManager.connection && self.targetManager.connection.status != NEVPNStatusDisconnected) {
         restartRequired = YES;
         [self.targetManager.connection stopVPNTunnel];
     }
