@@ -84,7 +84,7 @@
             [self loadUntunneledInterstitial];
             
         }
-    } else {
+    } else if (!self.adIsShowing) {
         // De-init code.
         [MPInterstitialAdController removeSharedInterstitialAdController:self.untunneledInterstitial];
         self.untunneledInterstitial = nil;
@@ -142,6 +142,10 @@
 
     [self postAdsLoadStateDidChangeNotification];
 
+}
+
+- (void)interstitialWillAppear:(MPInterstitialAdController *)interstitial {
+    self.adIsShowing = TRUE;
 }
 
 - (void)interstitialDidAppear:(MPInterstitialAdController *)interstitial {
