@@ -72,6 +72,10 @@
 
 - (VPNStatus)getVPNStatus {
     if (restartRequired) {
+        // If extension is restarting due to a call to restartVPN, then
+        // we don't want to show the Disconnecting and Disconnected states
+        // to the observers, and instead simply notify them that the
+        // extension is restarting.
         return VPNStatusRestarting;
     } else {
         switch (self.targetManager.connection.status) {
