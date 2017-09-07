@@ -63,7 +63,7 @@ static const NSString *ItemStatusContext;
                  playerLayer = [AVPlayerLayer playerLayerWithPlayer:self.loadingVideo];
                  if (self.view.bounds.size.width > self.view.bounds.size.height) {
                      // Landscape
-                     playerLayer.frame = CGRectMake((self.view.bounds.size.width - self.view.bounds.size.width / 1.5) / 2, 0, self.view.bounds.size.width / 1.5, self.view.bounds.size.height / 1.5);
+                     playerLayer.frame = CGRectMake((self.view.bounds.size.width - self.view.bounds.size.width / 1.5) / 2, 20, self.view.bounds.size.width / 1.5, self.view.bounds.size.height / 1.5);
                  } else {
                      playerLayer.frame = CGRectMake(0, 0, self.view.bounds.size.width, self.view.bounds.size.height);
                  }
@@ -88,7 +88,7 @@ static const NSString *ItemStatusContext;
 
     if (size.width > size.height) {
         // Landscape
-        playerLayer.frame = CGRectMake(( size.width - size.width / 1.5 ) / 2, 0, size.width / 1.5, size.height / 1.5);
+        playerLayer.frame = CGRectMake(( size.width - size.width / 1.5 ) / 2, 20, size.width / 1.5, size.height / 1.5);
     } else {
         playerLayer.frame = CGRectMake(0, 0, size.width, size.height);
     }
