@@ -105,6 +105,7 @@ static const NSString *ItemStatusContext;
     [self.view setBackgroundColor:[UIColor blackColor]];
     [self addLoadingLabel];
     [self addProgressView];
+    [self setNeedsStatusBarAppearanceUpdate];
     [self syncUI];
 }
 
@@ -115,6 +116,10 @@ static const NSString *ItemStatusContext;
 
 - (void)playerItemDidReachEnd:(NSNotification *)notification {
     [self.loadingVideo seekToTime:kCMTimeZero];
+}
+
+- (UIStatusBarStyle)preferredStatusBarStyle {
+    return UIStatusBarStyleLightContent;
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
