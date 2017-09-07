@@ -74,17 +74,18 @@
 // TODO: deinit when in tunnel.
 
 - (void)initializeAds {
-    // TODO: decide if to init or deinit, based on VPN disconnected state.
-
     NSLog(@"initializeAds");
+    
     if ([self shouldShowUntunneledAds]) {
         if (!self.untunneledInterstitial) {
+            NSLog(@"initializeAds: Initializing");
             // Init code.
             [GADMobileAds configureWithApplicationID:@"ca-app-pub-1072041961750291~2085686375"];
             [self loadUntunneledInterstitial];
             
         }
-    } else {
+    } else if (!self.adIsShowing) {
+        NSLog(@"initializeAds: Deinitializing");
         // De-init code.
         [MPInterstitialAdController removeSharedInterstitialAdController:self.untunneledInterstitial];
         self.untunneledInterstitial = nil;
@@ -141,7 +142,6 @@
     NSLog(@"Interstitial loaded");
 
     [self postAdsLoadStateDidChangeNotification];
-
 }
 
 - (void)interstitialWillAppear:(MPInterstitialAdController *)interstitial {
@@ -169,9 +169,9 @@
 - (void)interstitialDidDisappear:(MPInterstitialAdController *)interstitial {
     NSLog(@"Interstitial dismissed");
 
-    [self postAdsLoadStateDidChangeNotification];
-
     self.adIsShowing = FALSE;
+    
+    [self postAdsLoadStateDidChangeNotification];
 
     // Post message to the extension to start the VPN
     // when the tunnel is established.
