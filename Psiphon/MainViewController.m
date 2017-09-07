@@ -116,6 +116,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 
     // Setting up the UI
     [self setBackgroundGradient];
+    [self setNeedsStatusBarAppearanceUpdate];
     //  TODO: wrap this in a function which always
     //  calls them in the right order
     [self addSettingsButton];
@@ -178,6 +179,9 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     [super viewDidDisappear:animated];
 }
 
+- (UIStatusBarStyle)preferredStatusBarStyle {
+    return UIStatusBarStyleLightContent;
+}
 
 // Reload when rotate
 - (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator {
