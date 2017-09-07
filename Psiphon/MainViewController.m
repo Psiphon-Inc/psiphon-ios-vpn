@@ -120,10 +120,10 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     //  calls them in the right order
     [self addSettingsButton];
     [self addStartAndStopButton];
+    [self addAdLabel];
     [self addStatusLabel];
     [self addRegionButton];
     [self addRegionLabel];
-    [self addAdLabel];
     [self addVersionLabel];
 
     // TODO: load/save config here to have the user immediately complete the permission prompt
@@ -378,7 +378,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:statusLabel
                                                           attribute:NSLayoutAttributeBottom
                                                           relatedBy:NSLayoutRelationGreaterThanOrEqual
-                                                             toItem:startStopButton
+                                                             toItem:adLabel
                                                           attribute:NSLayoutAttributeTop
                                                          multiplier:1.0
                                                            constant:-30.0]];
@@ -533,12 +533,12 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                                                            constant:0]];
 
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:adLabel
-                                                          attribute:NSLayoutAttributeTop
-                                                          relatedBy:NSLayoutRelationEqual
-                                                             toItem:statusLabel
                                                           attribute:NSLayoutAttributeBottom
+                                                          relatedBy:NSLayoutRelationEqual
+                                                             toItem:startStopButton
+                                                          attribute:NSLayoutAttributeTop
                                                          multiplier:1.0
-                                                           constant:20.0]];
+                                                           constant:-30.0]];
 
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:adLabel
                                                           attribute:NSLayoutAttributeLeft
