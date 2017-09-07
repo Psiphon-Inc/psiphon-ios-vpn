@@ -48,7 +48,7 @@ typedef NS_ENUM(NSInteger, VPNStatus) {
 
 @interface VPNManager : NSObject
 
-+ (instancetype)sharedInstance;
++ (instancetype _Nullable )sharedInstance;
 
 /**
  * Starts the network extension process and also the tunnel.
