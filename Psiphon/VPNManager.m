@@ -194,7 +194,7 @@
 
 - (BOOL)isVPNActive {
     NEVPNStatus s = self.targetManager.connection.status;
-    return (s == NEVPNStatusConnecting || s == NEVPNStatusConnected || s == NEVPNStatusReasserting);
+    return (s == NEVPNStatusConnecting || s == NEVPNStatusConnected || s == NEVPNStatusReasserting || restartRequired);
 }
 
 - (BOOL)isTunnelConnected {
