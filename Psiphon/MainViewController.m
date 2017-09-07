@@ -66,6 +66,9 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     NSLayoutConstraint *startButtonScreenHeight;
     NSLayoutConstraint *startButtonWidth;
 
+    // UI Layer
+    CAGradientLayer *backgroundGradient;
+
     // VPN Config user defaults
     PsiphonConfigUserDefaults *psiphonConfigUserDefaults;
 
@@ -112,7 +115,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     [self updateAvailableRegions];
 
     // Setting up the UI
-    [self.view setBackgroundColor:[UIColor whiteColor]];
+    [self setBackgroundGradient];
     //  TODO: wrap this in a function which always
     //  calls them in the right order
     [self addSettingsButton];
@@ -136,6 +139,11 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 
     [[NSNotificationCenter defaultCenter]
       addObserver:self selector:@selector(adStatusDidChange) name:@kAdsDidLoad object:adManager];
+}
+
+- (void)viewDidLayoutSubviews {
+    [super viewDidLayoutSubviews];
+    backgroundGradient.frame = self.view.bounds;
 }
 
 //TODO: move this
@@ -238,6 +246,14 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
         case VPNStatusRestarting: return NSLocalizedStringWithDefaultValue(@"VPN_STATUS_RESTARTING", nil, [NSBundle mainBundle], @"Restarting", @"Status when the VPN is restarting.");
     }
     return nil;
+}
+
+- (void)setBackgroundGradient {
+    backgroundGradient = [CAGradientLayer layer];
+    
+    backgroundGradient.colors = @[(id)[UIColor colorWithRed:0.28 green:0.36 blue:0.46 alpha:1.0].CGColor, (id)[UIColor colorWithRed:0.17 green:0.17 blue:0.28 alpha:1.0].CGColor];
+
+    [self.view.layer insertSublayer:backgroundGradient atIndex:0];
 }
 
 - (void)addSettingsButton {
