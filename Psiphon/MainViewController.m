@@ -33,6 +33,7 @@
 #import "MainViewController.h"
 #import "VPNManager.h"
 #import "AdManager.h"
+#import "Logging.h"
 
 static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSString *b) {
     return (([a length] == 0) && ([b length] == 0)) || ([a isEqualToString:b]);
@@ -59,7 +60,6 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     UIButton *regionButton;
     UILabel *regionLabel;
     UILabel *versionLabel;
-    UILabel *adLabel;
 
     // UI Constraint
     NSLayoutConstraint *startButtonScreenWidth;
@@ -99,7 +99,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 #pragma mark - Lifecycle methods
 
 - (void)viewDidLoad {
-    NSLog(@"MainViewController: viewDidLoad");
+    DEBUG();
     [super viewDidLoad];
 
     // TODO: check if database exists first
@@ -120,14 +120,13 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     [self addStatusLabel];
     [self addRegionButton];
     [self addRegionLabel];
-    [self addAdLabel];
     [self addVersionLabel];
 
     // TODO: load/save config here to have the user immediately complete the permission prompt
 }
 
 - (void)viewDidAppear:(BOOL)animated {
-    NSLog(@"MainViewController: viewDidAppear");
+    DEBUG();
     [super viewDidAppear:animated];
     // Available regions may have changed in the background
     [self updateAvailableRegions];
@@ -135,19 +134,11 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     [self updateRegionLabel];
 
     [[NSNotificationCenter defaultCenter]
-      addObserver:self selector:@selector(adStatusDidChange) name:@kAdsDidLoad object:adManager];
-}
-
-//TODO: move this
-- (void)adStatusDidChange{
-
-    // TODO: cast from NSObject to BOOL
-    adLabel.hidden = ![adManager adIsReady];
-
+      addObserver:self selector:@selector(onAdStatusDidChange) name:@kAdsDidLoad object:adManager];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
-    NSLog(@"MainViewController: viewWillAppear");
+    DEBUG();
     [super viewWillAppear:animated];
 
     // Listen for VPN status changes from VPNManager.
@@ -159,14 +150,14 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
-    NSLog(@"MainViewController: viewWillDisappear");
+    DEBUG();
     [super viewWillDisappear:animated];
     // Stop listening for diagnostic messages (we don't want to hold the shared db lock while backgrounded)
     [notifier stopListeningForAllNotifications];
 }
 
 - (void)viewDidDisappear:(BOOL)animated {
-    NSLog(@"MainViewController: viewDidDisappear");
+    DEBUG();
     [super viewDidDisappear:animated];
 }
 
@@ -190,6 +181,12 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     [super viewWillTransitionToSize:size withTransitionCoordinator:coordinator];
 }
 
+#pragma mark - Callbacks
+
+// Called when kAdsDidLoad
+- (void)onAdStatusDidChange{
+}
+
 #pragma mark - UI callbacks
 
 - (void)onVPNStatusDidChange {
@@ -202,7 +199,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     if (![vpnManager isVPNActive]) {
         [adManager showUntunneledInterstitial];
     } else {
-        NSLog(@"call targetManager.connection.stopVPNTunnel()");
+        DEBUG(@"call targetManager.connection.stopVPNTunnel()");
         [vpnManager stopVPN];
     }
 }
@@ -230,7 +227,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 - (NSString *)getVPNStatusDescription:(VPNStatus) status {
     switch(status) {
         case VPNStatusDisconnected: return NSLocalizedStringWithDefaultValue(@"VPN_STATUS_DISCONNECTED", nil, [NSBundle mainBundle], @"Disconnected", @"Status when the VPN is not connected to a Psiphon server, not trying to connect, and not in an error state");
-        case VPNStatusInvalid: return NSLocalizedStringWithDefaultValue(@"VPN_STATUS_INVALID", nil, [NSBundle mainBundle], @"Invalid", @"Status when the VPN is in an invalid state. For example, if the user doesn't give permission for the VPN configuration to be installed, and therefore the Psiphon VPN can't even try to connect.");
+        case VPNStatusInvalid: return @"";
         case VPNStatusConnected: return NSLocalizedStringWithDefaultValue(@"VPN_STATUS_CONNECTED", nil, [NSBundle mainBundle], @"Connected", @"Status when the VPN is connected to a Psiphon server");
         case VPNStatusConnecting: return NSLocalizedStringWithDefaultValue(@"VPN_STATUS_CONNECTING", nil, [NSBundle mainBundle], @"Connecting", @"Status when the VPN is connecting; that is, trying to connect to a Psiphon server");
         case VPNStatusDisconnecting: return NSLocalizedStringWithDefaultValue(@"VPN_STATUS_DISCONNECTING", nil, [NSBundle mainBundle], @"Disconnecting", @"Status when the VPN is disconnecting. Sometimes going from connected to disconnected can take some time, and this is that state.");
@@ -495,50 +492,6 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                                                           attribute:NSLayoutAttributeBottom
                                                          multiplier:1.0
                                                            constant:-30.0]];
-}
-
-- (void)addAdLabel {
-    adLabel = [[UILabel alloc] init];
-    adLabel.translatesAutoresizingMaskIntoConstraints = NO;
-    adLabel.text = NSLocalizedStringWithDefaultValue(@"AD_LOADED", nil, [NSBundle mainBundle], @"Ad Loaded", @"Text for button that plays the main screen ad");
-    adLabel.textAlignment = NSTextAlignmentCenter;
-    [self.view addSubview:adLabel];
-    if (![adManager adIsReady]){
-        adLabel.hidden = true;
-    }
-
-    // Setup autolayout
-    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:adLabel
-                                                          attribute:NSLayoutAttributeTop
-                                                          relatedBy:NSLayoutRelationGreaterThanOrEqual
-                                                             toItem:self.topLayoutGuide
-                                                          attribute:NSLayoutAttributeBottom
-                                                         multiplier:1.0
-                                                           constant:0]];
-
-    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:adLabel
-                                                          attribute:NSLayoutAttributeBottom
-                                                          relatedBy:NSLayoutRelationEqual
-                                                             toItem:statusLabel
-                                                          attribute:NSLayoutAttributeTop
-                                                         multiplier:1.0
-                                                           constant:-20.0]];
-
-    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:adLabel
-                                                          attribute:NSLayoutAttributeLeft
-                                                          relatedBy:NSLayoutRelationEqual
-                                                             toItem:self.view
-                                                          attribute:NSLayoutAttributeLeft
-                                                         multiplier:1.0
-                                                           constant:15.0]];
-
-    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:adLabel
-                                                          attribute:NSLayoutAttributeRight
-                                                          relatedBy:NSLayoutRelationEqual
-                                                             toItem:self.view
-                                                          attribute:NSLayoutAttributeRight
-                                                         multiplier:1.0
-                                                           constant:-15.0]];
 }
 
 #pragma mark - FeedbackViewControllerDelegate methods and helpers
