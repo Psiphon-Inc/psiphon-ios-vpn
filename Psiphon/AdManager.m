@@ -36,7 +36,8 @@
 - (instancetype)init {
     self = [super init];
     if (self) {
-        self.adIsShowing = FALSE;
+        self.untunneledInterstitialIsShowing = FALSE;
+        self.untunneledInterstitialHasShown = FALSE;
         vpnManager = [VPNManager sharedInstance];
 
         [[NSNotificationCenter defaultCenter]
@@ -71,8 +72,6 @@
     return sharedInstance;
 }
 
-// TODO: deinit when in tunnel.
-
 - (void)initializeAds {
     NSLog(@"initializeAds");
     
@@ -82,13 +81,13 @@
             // Init code.
             [GADMobileAds configureWithApplicationID:@"ca-app-pub-1072041961750291~2085686375"];
             [self loadUntunneledInterstitial];
-            
         }
-    } else if (!self.adIsShowing) {
+    } else if (!self.untunneledInterstitialIsShowing) {
         NSLog(@"initializeAds: Deinitializing");
         // De-init code.
         [MPInterstitialAdController removeSharedInterstitialAdController:self.untunneledInterstitial];
         self.untunneledInterstitial = nil;
+        self.untunneledInterstitialHasShown = FALSE;
 
         [self postAdsLoadStateDidChangeNotification];
     }
@@ -109,7 +108,7 @@
 
 - (void)showUntunneledInterstitial {
     NSLog(@"showUntunneledInterstitial");
-    if ([self adIsReady]) {
+    if ([self untunneledInterstitialIsReady]) {
         [self.untunneledInterstitial showFromViewController:[[AppDelegate sharedAppDelegate] getMainViewController]];
     } else {
         // Start the tunnel
@@ -117,7 +116,7 @@
     }
 }
 
-- (BOOL)adIsReady {
+- (BOOL)untunneledInterstitialIsReady {
     if (self.untunneledInterstitial) {
         return self.untunneledInterstitial.ready;
     }
@@ -140,15 +139,15 @@
 }
 
 - (void)interstitialWillAppear:(MPInterstitialAdController *)interstitial {
-    self.adIsShowing = TRUE;
-}
-
-- (void)interstitialDidAppear:(MPInterstitialAdController *)interstitial {
-    self.adIsShowing = TRUE;
+    NSLog(@"Interstitial will appear");
+    
+    self.untunneledInterstitialIsShowing = TRUE;
+    self.untunneledInterstitialHasShown = TRUE;
 }
 
 - (void)interstitialDidFailToLoadAd:(MPInterstitialAdController *)interstitial {
     NSLog(@"Interstitial failed to load");
+    
     // Don't retry.
     [self postAdsLoadStateDidChangeNotification];
 }
@@ -164,7 +163,7 @@
 - (void)interstitialDidDisappear:(MPInterstitialAdController *)interstitial {
     NSLog(@"Interstitial dismissed");
 
-    self.adIsShowing = FALSE;
+    self.untunneledInterstitialIsShowing = FALSE;
     
     [self postAdsLoadStateDidChangeNotification];
 

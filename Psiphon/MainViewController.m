@@ -142,7 +142,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 - (void)adStatusDidChange{
 
     // TODO: cast from NSObject to BOOL
-    adLabel.hidden = ![adManager adIsReady];
+    adLabel.hidden = ![adManager untunneledInterstitialIsReady];
 
 }
 
@@ -503,7 +503,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     adLabel.text = NSLocalizedStringWithDefaultValue(@"AD_LOADED", nil, [NSBundle mainBundle], @"Ad Loaded", @"Text for button that plays the main screen ad");
     adLabel.textAlignment = NSTextAlignmentCenter;
     [self.view addSubview:adLabel];
-    if (![adManager adIsReady]){
+    if (![adManager untunneledInterstitialIsReady]){
         adLabel.hidden = true;
     }
 
