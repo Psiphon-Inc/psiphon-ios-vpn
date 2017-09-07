@@ -378,12 +378,20 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 
     // Setup autolayout
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:statusLabel
+                                                          attribute:NSLayoutAttributeTop
+                                                          relatedBy:NSLayoutRelationGreaterThanOrEqual
+                                                             toItem:self.topLayoutGuide
+                                                          attribute:NSLayoutAttributeBottom
+                                                         multiplier:1.0
+                                                           constant:0]];
+    
+    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:statusLabel
                                                           attribute:NSLayoutAttributeBottom
                                                           relatedBy:NSLayoutRelationGreaterThanOrEqual
                                                              toItem:adLabel
                                                           attribute:NSLayoutAttributeTop
                                                          multiplier:1.0
-                                                           constant:-30.0]];
+                                                           constant:-20.0]];
 
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:statusLabel
                                                           attribute:NSLayoutAttributeLeft
@@ -518,7 +526,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 - (void)addAdLabel {
     adLabel = [[UILabel alloc] init];
     adLabel.translatesAutoresizingMaskIntoConstraints = NO;
-    adLabel.text = NSLocalizedStringWithDefaultValue(@"AD_LOADED", nil, [NSBundle mainBundle], @"Watch a short video while we connect you to a Psiphon server", @"Text for button that tell users there will by a short video ad.");
+    adLabel.text = NSLocalizedStringWithDefaultValue(@"AD_LOADED", nil, [NSBundle mainBundle], @"Please watch a short video before we connect you to a Psiphon server", @"Text for button that tell users there will by a short video ad.");
     adLabel.textAlignment = NSTextAlignmentCenter;
     [self.view addSubview:adLabel];
     if (![adManager adIsReady]){
@@ -527,20 +535,12 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 
     // Setup autolayout
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:adLabel
-                                                          attribute:NSLayoutAttributeTop
-                                                          relatedBy:NSLayoutRelationGreaterThanOrEqual
-                                                             toItem:self.topLayoutGuide
-                                                          attribute:NSLayoutAttributeBottom
-                                                         multiplier:1.0
-                                                           constant:0]];
-
-    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:adLabel
                                                           attribute:NSLayoutAttributeBottom
                                                           relatedBy:NSLayoutRelationEqual
                                                              toItem:startStopButton
                                                           attribute:NSLayoutAttributeTop
                                                          multiplier:1.0
-                                                           constant:-30.0]];
+                                                           constant:-20.0]];
 
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:adLabel
                                                           attribute:NSLayoutAttributeLeft
