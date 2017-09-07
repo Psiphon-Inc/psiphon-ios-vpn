@@ -70,7 +70,7 @@
     return mainViewController;
 }
 
-- (void) vpnStatusDidChange {
+- (void)onVPNStatusDidChange {
     if ([vpnManager getVPNStatus] == VPNStatusDisconnected
       || [vpnManager getVPNStatus] == VPNStatusRestarting) {
         shownHomepage = FALSE;
@@ -100,7 +100,7 @@
     shownHomepage = FALSE;
     // Listen for VPN status changes from VPNManager.
     [[NSNotificationCenter defaultCenter]
-      addObserver:self selector:@selector(vpnStatusDidChange) name:@kVPNStatusChangeNotificationName object:vpnManager];
+      addObserver:self selector:@selector(onVPNStatusDidChange) name:@kVPNStatusChangeNotificationName object:vpnManager];
 
     // Listen for the network extension messages.
     [self listenForNEMessages];
