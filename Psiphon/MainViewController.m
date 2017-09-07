@@ -125,8 +125,6 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     [self addRegionButton];
     [self addRegionLabel];
     [self addVersionLabel];
-
-    [[UILabel appearance] setTextColor:[UIColor whiteColor]];
     
     // TODO: load/save config here to have the user immediately complete the permission prompt
 }
@@ -314,6 +312,13 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 
     [startStopButton addTarget:self action:@selector(onStartStopTap:) forControlEvents:UIControlEventTouchUpInside];
     startStopButton.selected = [vpnManager isVPNActive];
+
+    // Shadow and Radius
+    startStopButton.layer.shadowOffset = CGSizeMake(0, 6.0f);
+    startStopButton.layer.shadowOpacity = 0.18f;
+    startStopButton.layer.shadowRadius = 0.0f;
+    startStopButton.layer.masksToBounds = NO;
+
     [self.view addSubview:startStopButton];
 
     // Setup autolayout
@@ -374,6 +379,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     statusLabel.adjustsFontSizeToFitWidth = YES;
     statusLabel.text = [self getVPNStatusDescription:[vpnManager getVPNStatus]];
     statusLabel.textAlignment = NSTextAlignmentCenter;
+    statusLabel.textColor = [UIColor whiteColor];
     [self.view addSubview:statusLabel];
 
     // Setup autolayout
@@ -452,6 +458,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     regionLabel.numberOfLines = 0;
     regionLabel.textAlignment = NSTextAlignmentCenter;
     regionLabel.font = [UIFont systemFontOfSize:15.f];
+    regionLabel.textColor = [UIColor whiteColor];
     [self.view addSubview:regionLabel];
 
     [self updateRegionLabel];
@@ -497,6 +504,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     versionLabel.text = [NSString stringWithFormat:NSLocalizedStringWithDefaultValue(@"APP_VERSION", nil, [NSBundle mainBundle], @"Version %@", @"Text showing the app version. The '%@' placeholder is the version number. So it will look like 'Version 2'."),[[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"]];
     ;
     versionLabel.userInteractionEnabled = YES;
+    versionLabel.textColor = [UIColor whiteColor];
 
     UITapGestureRecognizer *tapRecognizer = [[UITapGestureRecognizer alloc]
       initWithTarget:self action:@selector(onVersionLabelTap:)];
@@ -528,6 +536,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     adLabel.translatesAutoresizingMaskIntoConstraints = NO;
     adLabel.text = NSLocalizedStringWithDefaultValue(@"AD_LOADED", nil, [NSBundle mainBundle], @"Please watch a short video before we connect you to a Psiphon server", @"Text for button that tell users there will by a short video ad.");
     adLabel.textAlignment = NSTextAlignmentCenter;
+    adLabel.textColor = [UIColor whiteColor];
     [self.view addSubview:adLabel];
     if (![adManager adIsReady]){
         adLabel.hidden = true;

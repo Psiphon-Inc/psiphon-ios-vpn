@@ -44,7 +44,7 @@ static const NSString *ItemStatusContext;
     
     NSString *tracksKey = @"tracks";
     
-    NSURL *fileURL = [[NSBundle mainBundle] URLForResource:@"loading" withExtension:@"mov"];
+    NSURL *fileURL = [[NSBundle mainBundle] URLForResource:@"launch" withExtension:@"m4v"];
     
     AVURLAsset *asset = [AVURLAsset URLAssetWithURL:fileURL options:nil];
     
@@ -102,7 +102,7 @@ static const NSString *ItemStatusContext;
 - (void)viewDidLoad {
     [super viewDidLoad];
     // TODO: Add something to handle the syncUI when screen rotate
-    [self.view setBackgroundColor:[UIColor whiteColor]];
+    [self.view setBackgroundColor:[UIColor blackColor]];
     [self addLoadingLabel];
     [self addProgressView];
     [self syncUI];
@@ -144,7 +144,7 @@ static const NSString *ItemStatusContext;
     loadingLabel.adjustsFontSizeToFitWidth = YES;
     loadingLabel.text = @"Loading...";
     loadingLabel.textAlignment = NSTextAlignmentCenter;
-    
+    loadingLabel.textColor = [UIColor whiteColor];
     [self.view addSubview:loadingLabel];
     
     // Setup autolayout
