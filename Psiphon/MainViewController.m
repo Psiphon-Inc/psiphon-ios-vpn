@@ -139,20 +139,12 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     [self updateRegionLabel];
 
     [[NSNotificationCenter defaultCenter]
-      addObserver:self selector:@selector(adStatusDidChange) name:@kAdsDidLoad object:adManager];
+      addObserver:self selector:@selector(onAdStatusDidChange) name:@kAdsDidLoad object:adManager];
 }
 
 - (void)viewDidLayoutSubviews {
     [super viewDidLayoutSubviews];
     backgroundGradient.frame = self.view.bounds;
-}
-
-//TODO: move this
-- (void)adStatusDidChange{
-
-    // TODO: cast from NSObject to BOOL
-    adLabel.hidden = ![adManager untunneledInterstitialIsReady];
-
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -200,6 +192,15 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     }];
 
     [super viewWillTransitionToSize:size withTransitionCoordinator:coordinator];
+}
+
+#pragma mark - Callbacks
+
+- (void)onAdStatusDidChange{
+
+    // TODO: cast from NSObject to BOOL
+    adLabel.hidden = ![adManager untunneledInterstitialIsReady];
+
 }
 
 #pragma mark - UI callbacks
