@@ -160,12 +160,12 @@
 #pragma mark - View controller switch
 
 - (void) setRootViewController {
-    // TODO: if VPN disconnected, launch with animation, else launch with MainViewController.
+    // If VPN disconnected, launch with animation, else launch with MainViewController.
     if (([vpnManager getVPNStatus] == VPNStatusDisconnected || [vpnManager getVPNStatus] == VPNStatusInvalid) &&
         ![adManager adIsReady]) {
         [adManager initializeAds];
         self.window.rootViewController = launchScreenViewController;
-        if (timerCount == 0) {
+        if (timerCount <= 0) {
             // Reset timer to 10 if it's 0 and need load ads again.
             timerCount = 10;
         }
@@ -182,7 +182,7 @@
 }
 
 - (void) switchViewControllerWhenExpire:(NSTimer*)timer {
-    if (timerCount == 0) {
+    if (timerCount <= 0) {
         [loadingTimer invalidate];
         [self changeRootViewController:mainViewController];
     }
