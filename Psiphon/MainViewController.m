@@ -126,6 +126,8 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     [self addRegionLabel];
     [self addVersionLabel];
 
+    [[UILabel appearance] setTextColor:[UIColor whiteColor]];
+    
     // TODO: load/save config here to have the user immediately complete the permission prompt
 }
 
