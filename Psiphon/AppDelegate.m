@@ -165,7 +165,7 @@
 
 #pragma mark - View controller switch
 
-- (void) setRootViewController {
+- (void)setRootViewController {
     // If VPN disconnected, launch with animation, else launch with MainViewController.
     if (([vpnManager getVPNStatus] == VPNStatusDisconnected || [vpnManager getVPNStatus] == VPNStatusInvalid) &&
         ![adManager untunneledInterstitialIsReady] && ![adManager untunneledInterstitialHasShown]) {
@@ -181,13 +181,13 @@
     }
 }
 
-- (void) switchViewControllerWhenAdsLoaded {
+- (void)switchViewControllerWhenAdsLoaded {
     [loadingTimer invalidate];
     timerCount = 0;
     [self changeRootViewController:mainViewController];
 }
 
-- (void) switchViewControllerWhenExpire:(NSTimer*)timer {
+- (void)switchViewControllerWhenExpire:(NSTimer*)timer {
     if (timerCount <= 0) {
         [loadingTimer invalidate];
         [self changeRootViewController:mainViewController];
@@ -197,7 +197,7 @@
     launchScreenViewController.progressView.progress = (10 - timerCount)/10.0f;
 }
 
-- (void) startLaunchingScreenTimer {
+- (void)startLaunchingScreenTimer {
     if (!loadingTimer || ![loadingTimer isValid]) {
         loadingTimer = [NSTimer scheduledTimerWithTimeInterval:1.0
                                                          target:self
