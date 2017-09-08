@@ -122,6 +122,20 @@ static const NSString *ItemStatusContext;
     return UIStatusBarStyleLightContent;
 }
 
+- (BOOL)shouldAutorotate {
+    if ([[UIDevice currentDevice].model hasPrefix:@"iPhone"]) {
+        return NO;
+    }
+    return YES;
+}
+
+- (UIInterfaceOrientationMask)supportedInterfaceOrientations {
+    if ([[UIDevice currentDevice].model hasPrefix:@"iPhone"]) {
+        return UIInterfaceOrientationMaskPortrait + UIInterfaceOrientationMaskPortraitUpsideDown;
+    }
+    return YES;
+}
+
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
     
     if (context == &ItemStatusContext) {
