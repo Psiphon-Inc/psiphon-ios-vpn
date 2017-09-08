@@ -33,6 +33,7 @@
 #import "MainViewController.h"
 #import "VPNManager.h"
 #import "AdManager.h"
+#import "PulsingHaloLayer.h"
 
 static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSString *b) {
     return (([a length] == 0) && ([b length] == 0)) || ([a isEqualToString:b]);
@@ -60,6 +61,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     UILabel *regionLabel;
     UILabel *versionLabel;
     UILabel *adLabel;
+    PulsingHaloLayer *startStopButtonHalo;
 
     // UI Constraint
     NSLayoutConstraint *startButtonScreenWidth;
@@ -139,20 +141,12 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     [self updateRegionLabel];
 
     [[NSNotificationCenter defaultCenter]
-      addObserver:self selector:@selector(adStatusDidChange) name:@kAdsDidLoad object:adManager];
+      addObserver:self selector:@selector(onAdStatusDidChange) name:@kAdsDidLoad object:adManager];
 }
 
 - (void)viewDidLayoutSubviews {
     [super viewDidLayoutSubviews];
     backgroundGradient.frame = self.view.bounds;
-}
-
-//TODO: move this
-- (void)adStatusDidChange{
-
-    // TODO: cast from NSObject to BOOL
-    adLabel.hidden = ![adManager untunneledInterstitialIsReady];
-
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -202,12 +196,28 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     [super viewWillTransitionToSize:size withTransitionCoordinator:coordinator];
 }
 
+#pragma mark - Callbacks
+
+- (void)onAdStatusDidChange{
+
+    // TODO: cast from NSObject to BOOL
+    adLabel.hidden = ![adManager untunneledInterstitialIsReady];
+
+}
+
 #pragma mark - UI callbacks
 
 - (void)onVPNStatusDidChange {
     // Update UI
+    VPNStatus s = [vpnManager getVPNStatus];
     startStopButton.selected = [vpnManager isVPNActive];
-    statusLabel.text = [self getVPNStatusDescription:[vpnManager getVPNStatus]];
+    statusLabel.text = [self getVPNStatusDescription:s];
+
+    if (s == VPNStatusConnecting || s == VPNStatusRestarting) {
+        [self addPulsingHaloLayer];
+    } else {
+        [self removePulsingHaloLayer];
+    }
 }
 
 - (void)onStartStopTap:(UIButton *)sender {
@@ -216,6 +226,8 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     } else {
         NSLog(@"call targetManager.connection.stopVPNTunnel()");
         [vpnManager stopVPN];
+
+        [self removePulsingHaloLayer];
     }
 }
 
@@ -227,6 +239,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     [self openRegionSelection];
 }
 
+#if DEBUG
 - (void)onVersionLabelTap:(UILabel *)sender {
     LogViewControllerFullScreen *log = [[LogViewControllerFullScreen alloc] init];
 
@@ -236,6 +249,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 
     [self presentViewController:nav animated:YES completion:nil];
 }
+#endif
 
 # pragma mark - UI helper functions
 
@@ -258,6 +272,25 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     backgroundGradient.colors = @[(id)[UIColor colorWithRed:0.17 green:0.17 blue:0.28 alpha:1.0].CGColor, (id)[UIColor colorWithRed:0.28 green:0.36 blue:0.46 alpha:1.0].CGColor];
 
     [self.view.layer insertSublayer:backgroundGradient atIndex:0];
+}
+
+- (void)addPulsingHaloLayer {
+    CGFloat radius = (CGFloat) (MIN(self.view.frame.size.width, self.view.frame.size.height) / 2.5);
+
+    startStopButtonHalo = [PulsingHaloLayer layer];
+    startStopButtonHalo.position = self.view.center;
+    startStopButtonHalo.radius = radius;
+    startStopButtonHalo.backgroundColor =
+      [UIColor colorWithRed:0.44 green:0.51 blue:0.58 alpha:1.0].CGColor;
+    startStopButtonHalo.haloLayerNumber = 3;
+
+    [self.view.layer insertSublayer:startStopButtonHalo below:startStopButton.layer];
+
+    [startStopButtonHalo start];
+}
+
+- (void)removePulsingHaloLayer {
+    [startStopButtonHalo stop];
 }
 
 - (void)addSettingsButton {
@@ -305,6 +338,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 }
 
 - (void)addStartAndStopButton {
+
     UIImage *stopButtonImage = [UIImage imageNamed:@"StopButton"];
     UIImage *startButtonImage = [UIImage imageNamed:@"StartButton"];
 
@@ -504,10 +538,12 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     versionLabel.userInteractionEnabled = YES;
     versionLabel.textColor = [UIColor whiteColor];
 
+#if DEBUG
     UITapGestureRecognizer *tapRecognizer = [[UITapGestureRecognizer alloc]
       initWithTarget:self action:@selector(onVersionLabelTap:)];
-    tapRecognizer.numberOfTapsRequired = 2;
+    tapRecognizer.numberOfTapsRequired = 1;
     [versionLabel addGestureRecognizer:tapRecognizer];
+#endif
 
     [self.view addSubview:versionLabel];
 

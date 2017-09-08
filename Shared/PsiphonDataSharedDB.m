@@ -194,6 +194,8 @@
 
             [homepages addObject:homepage];
         }
+
+        [rs close];
     }];
 
     return homepages;
@@ -245,6 +247,8 @@
             NSString *region = [rs stringForColumn:COL_EGRESS_REGIONS_REGION_NAME];
             [regions addObject:region];
         }
+
+        [rs close];
     }];
 
     return regions;
@@ -342,6 +346,8 @@
             DiagnosticEntry *d = [[DiagnosticEntry alloc] init:json andTimestamp:timestampDate];
             [logs addObject:d];
         }
+
+        [rs close];
     }];
     [lastLogRowIdLock unlock];
 
@@ -396,6 +402,8 @@
         }
 
         connected = [rs boolForColumn:COL_TUN_STATE_CONNECTED];
+
+        [rs close];
     }];
 
     return connected;
@@ -448,6 +456,8 @@
         }
 
         foreground = [rs boolForColumn:COL_APP_STATE_FOREGROUND];
+
+        [rs close];
     }];
 
     return foreground;
