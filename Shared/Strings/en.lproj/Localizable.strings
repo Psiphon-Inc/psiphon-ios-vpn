@@ -1,5 +1,5 @@
 /* Text for button that tell users there will by a short video ad. */
-"AD_LOADED" = "Please watch a short video before we connect you to a Psiphon server";
+"AD_LOADED" = "Watch a short video while we get ready to connect you";
 
 /* Text showing the app version. The '%@' placeholder is the version number. So it will look like 'Version 2'. */
 "APP_VERSION" = "Version %@";
@@ -33,7 +33,7 @@
 "VPN_STATUS_DISCONNECTING" = "Disconnecting";
 
 /* Status when the VPN is in an invalid state. For example, if the user doesn't give permission for the VPN configuration to be installed, and therefore the Psiphon VPN can't even try to connect. */
-"VPN_STATUS_INVALID" = "Invalid";
+"VPN_STATUS_INVALID" = "Disconnected";
 
 /* Status when the VPN was connected to a Psiphon server, got disconnected unexpectedly, and is currently trying to reconnect */
 "VPN_STATUS_RECONNECTING" = "Reconnecting";
