@@ -59,7 +59,6 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     UIButton *startStopButton;
     UILabel *statusLabel;
     UIButton *regionButton;
-    UILabel *regionLabel;
     UILabel *versionLabel;
     UILabel *adLabel;
     PulsingHaloLayer *startStopButtonHalo;
