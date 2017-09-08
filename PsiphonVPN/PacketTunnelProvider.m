@@ -221,7 +221,7 @@ static const double kDefaultLogTruncationInterval = 12 * 60 * 60; // 12 hours
         [self tryStartVPN];
     }];
 
-    [notifier listenForNotification:@"D.appWillResignActive" listener:^{
+    [notifier listenForNotification:@"D.applicationDidEnterBackground" listener:^{
         // If the VPN start message has not been received by the container,
         // and the container goes to the background alert user to open the app.
         // Note: We expect the value of shouldStartVPN to be set to TRUE on the
