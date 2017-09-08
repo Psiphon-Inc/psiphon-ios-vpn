@@ -222,7 +222,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     startStopButton.selected = [vpnManager isVPNActive];
     statusLabel.text = [self getVPNStatusDescription:s];
 
-    if (s == VPNStatusConnecting || s == VPNStatusRestarting) {
+    if (s == VPNStatusConnecting || s == VPNStatusRestarting || s == VPNStatusReasserting) {
         [self addPulsingHaloLayer];
     } else {
         [self removePulsingHaloLayer];
