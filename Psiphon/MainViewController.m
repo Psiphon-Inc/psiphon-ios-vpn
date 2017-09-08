@@ -611,6 +611,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                                       email:email
                          sendDiagnosticInfo:uploadDiagnostics
                           withPsiphonConfig:[self getPsiphonConfig]
+                         withClientPlatform:@"ios-vpn"
                          withConnectionType:[self getConnectionType]
                                isJailbroken:[JailbreakCheck isDeviceJailbroken]
                         sendFeedbackHandler:sendFeedbackHandler];
