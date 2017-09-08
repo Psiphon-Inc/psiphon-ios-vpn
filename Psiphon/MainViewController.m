@@ -262,26 +262,28 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 
 - (void)addSettingsButton {
     UIButton *settingsButton = [[UIButton alloc] init];
+    UIImage *gearTemplate = [[UIImage imageNamed:@"settings"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
     settingsButton.translatesAutoresizingMaskIntoConstraints = NO;
-    [settingsButton setImage:[UIImage imageNamed:@"settings"] forState:UIControlStateNormal];
+    [settingsButton setImage:gearTemplate forState:UIControlStateNormal];
+    [settingsButton setTintColor:[UIColor whiteColor]];
     [self.view addSubview:settingsButton];
 
     // Setup autolayout
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:settingsButton
-                                                          attribute:NSLayoutAttributeTop
+                                                          attribute:NSLayoutAttributeCenterY
                                                           relatedBy:NSLayoutRelationEqual
                                                              toItem:self.topLayoutGuide
                                                           attribute:NSLayoutAttributeBottom
                                                          multiplier:1.0
-                                                           constant:-5]];
+                                                           constant:gearTemplate.size.height/2 + 8.f]];
 
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:settingsButton
-                                                          attribute:NSLayoutAttributeRight
+                                                          attribute:NSLayoutAttributeCenterX
                                                           relatedBy:NSLayoutRelationEqual
                                                              toItem:self.view
-                                                          attribute:NSLayoutAttributeRight
+                                                          attribute:NSLayoutAttributeLeft
                                                          multiplier:1.0
-                                                           constant:-5]];
+                                                           constant:gearTemplate.size.width/2 + 13.f]];
 
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:settingsButton
                                                           attribute:NSLayoutAttributeWidth
@@ -289,7 +291,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                                                              toItem:nil
                                                           attribute:NSLayoutAttributeNotAnAttribute
                                                          multiplier:1.0
-                                                           constant:40]];
+                                                           constant:80]];
 
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:settingsButton
                                                           attribute:NSLayoutAttributeHeight
