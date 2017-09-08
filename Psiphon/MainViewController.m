@@ -33,6 +33,7 @@
 #import "MainViewController.h"
 #import "VPNManager.h"
 #import "AdManager.h"
+#import "PulsingHaloLayer.h"
 
 static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSString *b) {
     return (([a length] == 0) && ([b length] == 0)) || ([a isEqualToString:b]);
@@ -60,6 +61,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     UILabel *regionLabel;
     UILabel *versionLabel;
     UILabel *adLabel;
+    PulsingHaloLayer *startStopButtonHalo;
 
     // UI Constraint
     NSLayoutConstraint *startButtonScreenWidth;
@@ -207,8 +209,15 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 
 - (void)onVPNStatusDidChange {
     // Update UI
+    VPNStatus s = [vpnManager getVPNStatus];
     startStopButton.selected = [vpnManager isVPNActive];
-    statusLabel.text = [self getVPNStatusDescription:[vpnManager getVPNStatus]];
+    statusLabel.text = [self getVPNStatusDescription:s];
+
+    if (s == VPNStatusConnecting || s == VPNStatusRestarting) {
+        [self addPulsingHaloLayer];
+    } else {
+        [self removePulsingHaloLayer];
+    }
 }
 
 - (void)onStartStopTap:(UIButton *)sender {
@@ -217,6 +226,8 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     } else {
         NSLog(@"call targetManager.connection.stopVPNTunnel()");
         [vpnManager stopVPN];
+
+        [self removePulsingHaloLayer];
     }
 }
 
@@ -263,6 +274,24 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     [self.view.layer insertSublayer:backgroundGradient atIndex:0];
 }
 
+- (void)addPulsingHaloLayer {
+    startStopButtonHalo = [PulsingHaloLayer layer];
+    startStopButtonHalo.position = self.view.center;
+    startStopButtonHalo.radius = 200.0;
+    startStopButtonHalo.backgroundColor =
+      [UIColor colorWithRed:0.44 green:0.51 blue:0.58 alpha:1.0].CGColor;
+    startStopButtonHalo.haloLayerNumber = 5;
+    startStopButtonHalo.shouldResume = TRUE;
+
+    [self.view.layer insertSublayer:startStopButtonHalo below:startStopButton.layer];
+
+    [startStopButtonHalo start];
+}
+
+- (void)removePulsingHaloLayer {
+    [startStopButtonHalo stop];
+}
+
 - (void)addSettingsButton {
     UIButton *settingsButton = [[UIButton alloc] init];
     settingsButton.translatesAutoresizingMaskIntoConstraints = NO;
@@ -306,6 +335,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 }
 
 - (void)addStartAndStopButton {
+
     UIImage *stopButtonImage = [UIImage imageNamed:@"StopButton"];
     UIImage *startButtonImage = [UIImage imageNamed:@"StartButton"];
 
