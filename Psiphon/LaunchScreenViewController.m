@@ -123,17 +123,18 @@ static const NSString *ItemStatusContext;
 }
 
 - (BOOL)shouldAutorotate {
-    if ([[UIDevice currentDevice].model hasPrefix:@"iPhone"]) {
+    if ([[UIDevice currentDevice].model hasPrefix:@"iPhone"] || [[UIDevice currentDevice].model hasPrefix:@"iPod"]) {
         return NO;
     }
     return YES;
 }
 
 - (UIInterfaceOrientationMask)supportedInterfaceOrientations {
-    if ([[UIDevice currentDevice].model hasPrefix:@"iPhone"]) {
+    if ([[UIDevice currentDevice].model hasPrefix:@"iPhone"] || [[UIDevice currentDevice].model hasPrefix:@"iPod"])) {
         return UIInterfaceOrientationMaskPortrait + UIInterfaceOrientationMaskPortraitUpsideDown;
+    } else {
+        return UIInterfaceOrientationMaskAll;
     }
-    return YES;
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {

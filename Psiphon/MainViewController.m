@@ -132,7 +132,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     [self addVersionLabel];
     [self addLogoImage];
 
-    if ([[UIDevice currentDevice].model hasPrefix:@"iPhone"] && (self.view.bounds.size.width > self.view.bounds.size.height)) {
+    if (([[UIDevice currentDevice].model hasPrefix:@"iPhone"] || [[UIDevice currentDevice].model hasPrefix:@"iPod"]) && (self.view.bounds.size.width > self.view.bounds.size.height)) {
         logoView.hidden = YES;
     }
 
@@ -185,17 +185,18 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 }
 
 - (BOOL)shouldAutorotate {
-    if ([[UIDevice currentDevice].model hasPrefix:@"iPhone"]) {
+    if ([[UIDevice currentDevice].model hasPrefix:@"iPhone"] || [[UIDevice currentDevice].model hasPrefix:@"iPod"]) {
         return NO;
     }
     return YES;
 }
 
 - (UIInterfaceOrientationMask)supportedInterfaceOrientations {
-    if ([[UIDevice currentDevice].model hasPrefix:@"iPhone"]) {
+    if ([[UIDevice currentDevice].model hasPrefix:@"iPhone"] || [[UIDevice currentDevice].model hasPrefix:@"iPod"])) {
         return UIInterfaceOrientationMaskPortrait + UIInterfaceOrientationMaskPortraitUpsideDown;
+    } else {
+        return UIInterfaceOrientationMaskAll;
     }
-    return YES;
 }
 
 // Reload when rotate
