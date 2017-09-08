@@ -248,8 +248,17 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 }
 
 - (void)onStartStopTap:(UIButton *)sender {
+
     if (![vpnManager isVPNActive]) {
-        [adManager showUntunneledInterstitial];
+
+        // Alerts the user if there is no internet connection.
+        Reachability *reachability = [Reachability reachabilityForInternetConnection];
+        if ([reachability currentReachabilityStatus] == NotReachable) {
+            [self displayAlertNoInternet];
+        } else {
+            [adManager showUntunneledInterstitial];
+        }
+
     } else {
         NSLog(@"call targetManager.connection.stopVPNTunnel()");
         [vpnManager stopVPN];
@@ -279,6 +288,23 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 #endif
 
 # pragma mark - UI helper functions
+
+- (void)displayAlertNoInternet {
+    UIAlertController *alert = [UIAlertController
+      alertControllerWithTitle:NSLocalizedStringWithDefaultValue(@"NO_INTERNET", nil, [NSBundle mainBundle], @"No Internet Connection", @"Alert title informing user there is no internet connection")
+                       message:NSLocalizedStringWithDefaultValue(@"TURN_ON_DATE", nil, [NSBundle mainBundle], @"Turn on cellular data or use Wi-Fi to access data.", @"Alert message informing user to turn on their cellular data or wifi to connect to the internet")
+                preferredStyle:UIAlertControllerStyleAlert];
+
+    UIAlertAction *defaultAction = [UIAlertAction
+      actionWithTitle:NSLocalizedStringWithDefaultValue(@"OK_BUTTON", nil, [NSBundle mainBundle], @"OK", @"Alert OK Button")
+                style:UIAlertActionStyleDefault
+              handler:^(UIAlertAction *action) {
+              }];
+
+    [alert addAction:defaultAction];
+
+    [self presentViewController:alert animated:TRUE completion:nil];
+}
 
 - (NSString *)getVPNStatusDescription:(VPNStatus) status {
     switch(status) {
