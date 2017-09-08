@@ -84,11 +84,10 @@
 }
 
 - (void)stop {
-    if ([self.effect.animationKeys count]) {
-        [self.effect removeAllAnimations];
-    }
+    [self.effect removeAllAnimations];
     [self.effect removeFromSuperlayer];
     [self removeFromSuperlayer];
+    self.animationGroup = nil;
 }
 
 - (void)setFrame:(CGRect)frame {

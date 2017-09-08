@@ -276,14 +276,13 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 
 - (void)addPulsingHaloLayer {
     CGFloat radius = (CGFloat) (MIN(self.view.frame.size.width, self.view.frame.size.height) / 2.5);
-    
+
     startStopButtonHalo = [PulsingHaloLayer layer];
     startStopButtonHalo.position = self.view.center;
     startStopButtonHalo.radius = radius;
     startStopButtonHalo.backgroundColor =
       [UIColor colorWithRed:0.44 green:0.51 blue:0.58 alpha:1.0].CGColor;
     startStopButtonHalo.haloLayerNumber = 3;
-    startStopButtonHalo.shouldResume = TRUE;
 
     [self.view.layer insertSublayer:startStopButtonHalo below:startStopButton.layer];
 
