@@ -7,7 +7,7 @@ target 'Psiphon' do
 
   # Pods for Psiphon
   pod 'FMDB', '2.7.2'
-  pod 'PsiphonClientCommonLibrary', :git => 'https://github.com/Psiphon-Inc/psiphon-ios-client-common-library.git', :commit => '5cd6741'
+  pod 'PsiphonClientCommonLibrary', :git => 'https://github.com/Psiphon-Inc/psiphon-ios-client-common-library.git', :commit => 'fe2897f'
   pod "InAppSettingsKit", :git => "https://github.com/Psiphon-Inc/InAppSettingsKit.git"
 
   pod 'mopub-ios-sdk', '4.16.0'
