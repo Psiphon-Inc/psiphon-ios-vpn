@@ -77,9 +77,11 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 
     // Settings
     PsiphonSettingsViewController *appSettingsViewController;
+    UIButton *settingsButton;
 
     // Region Selection
     UINavigationController *regionSelectionNavController;
+    UIView *bottomBar;
     NSString *selectedRegionSnapShot;
 }
 
@@ -126,8 +128,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     [self addStartAndStopButton];
     [self addAdLabel];
     [self addStatusLabel];
-    [self addRegionButton];
-    [self addRegionLabel];
+    [self addRegionSelectionBar];
     [self addVersionLabel];
     
     // TODO: load/save config here to have the user immediately complete the permission prompt
@@ -139,7 +140,6 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     // Available regions may have changed in the background
     [self updateAvailableRegions];
     [self updateRegionButton];
-    [self updateRegionLabel];
 
     [[NSNotificationCenter defaultCenter]
       addObserver:self selector:@selector(onAdStatusDidChange) name:@kAdsDidLoad object:adManager];
@@ -303,7 +303,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 }
 
 - (void)addSettingsButton {
-    UIButton *settingsButton = [[UIButton alloc] init];
+    settingsButton = [[UIButton alloc] init];
     UIImage *gearTemplate = [[UIImage imageNamed:@"settings"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
     settingsButton.translatesAutoresizingMaskIntoConstraints = NO;
     [settingsButton setImage:gearTemplate forState:UIControlStateNormal];
@@ -457,85 +457,142 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                                                            constant:-15.0]];
 }
 
-- (void)addRegionButton {
-    regionButton = [[UIButton alloc] init];
-    regionButton.translatesAutoresizingMaskIntoConstraints = NO;
-    [regionButton addTarget:self action:@selector(onRegionButtonTap:) forControlEvents:UIControlEventTouchUpInside];
+- (void)addRegionSelectionBar {
+    [self addBottomBar];
+    [self addRegionButton];
+}
 
-    [self.view addSubview:regionButton];
+- (void)addBottomBar {
+    bottomBar = [[UIView alloc] init];
+    bottomBar.translatesAutoresizingMaskIntoConstraints = NO;
+    bottomBar.backgroundColor = [UIColor whiteColor];
 
-    [self updateRegionButton];
+    [self.view addSubview:bottomBar];
 
     // Setup autolayout
-    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:regionButton
-                                                          attribute:NSLayoutAttributeTop
-                                                          relatedBy:NSLayoutRelationLessThanOrEqual
-                                                             toItem:statusLabel
+    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:bottomBar
                                                           attribute:NSLayoutAttributeBottom
-                                                         multiplier:1.0
-                                                           constant:20.0]];
-
-    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:regionButton
-                                                          attribute:NSLayoutAttributeCenterX
                                                           relatedBy:NSLayoutRelationEqual
                                                              toItem:self.view
-                                                          attribute:NSLayoutAttributeCenterX
+                                                          attribute:NSLayoutAttributeBottom
                                                          multiplier:1.0
                                                            constant:0]];
 
-    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:regionButton
-                                                          attribute:NSLayoutAttributeWidth
+    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:bottomBar
+                                                          attribute:NSLayoutAttributeLeft
                                                           relatedBy:NSLayoutRelationEqual
                                                              toItem:self.view
-                                                          attribute:NSLayoutAttributeWidth
-                                                         multiplier:1.0
-                                                           constant:.2]];
-}
-
-- (void)addRegionLabel {
-    regionLabel = [[UILabel alloc] init];
-    regionLabel.translatesAutoresizingMaskIntoConstraints = NO;
-    regionLabel.adjustsFontSizeToFitWidth = YES;
-    regionLabel.numberOfLines = 0;
-    regionLabel.textAlignment = NSTextAlignmentCenter;
-    regionLabel.font = [UIFont systemFontOfSize:15.f];
-    regionLabel.textColor = [UIColor whiteColor];
-    [self.view addSubview:regionLabel];
-
-    [self updateRegionLabel];
-
-    // Setup autolayout
-    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:regionLabel
-                                                          attribute:NSLayoutAttributeTop
-                                                          relatedBy:NSLayoutRelationEqual
-                                                             toItem:regionButton
-                                                          attribute:NSLayoutAttributeBottom
-                                                         multiplier:1.0
-                                                           constant:5.0]];
-
-    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:regionLabel
-                                                          attribute:NSLayoutAttributeBottom
-                                                          relatedBy:NSLayoutRelationLessThanOrEqual
-                                                             toItem:self.view
-                                                          attribute:NSLayoutAttributeBottom
+                                                          attribute:NSLayoutAttributeLeft
                                                          multiplier:1.0
                                                            constant:0.0]];
 
-    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:regionLabel
+    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:bottomBar
+                                                          attribute:NSLayoutAttributeRight
+                                                          relatedBy:NSLayoutRelationEqual
+                                                             toItem:self.view
+                                                          attribute:NSLayoutAttributeRight
+                                                         multiplier:1.0
+                                                           constant:0]];
+
+    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:bottomBar
+                                                          attribute:NSLayoutAttributeHeight
+                                                          relatedBy:NSLayoutRelationEqual
+                                                             toItem:nil
+                                                          attribute:NSLayoutAttributeNotAnAttribute
+                                                         multiplier:1.0
+                                                           constant:120]];
+}
+
+- (void)addRegionButton {
+    regionButton = [[UIButton alloc] init];
+    regionButton.translatesAutoresizingMaskIntoConstraints = NO;
+
+    CGFloat buttonHeight = 45;
+    regionButton.layer.borderColor = [UIColor lightGrayColor].CGColor;
+    regionButton.layer.borderWidth = 1.f;
+    regionButton.layer.cornerRadius = buttonHeight / 2;
+    [regionButton setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
+    [regionButton setTitleColor:[UIColor lightGrayColor] forState:UIControlStateHighlighted];
+    regionButton.titleLabel.font = [UIFont systemFontOfSize:regionButton.titleLabel.font.pointSize weight:UIFontWeightLight];
+    regionButton.titleLabel.adjustsFontSizeToFitWidth = YES;
+
+    CGFloat spacing = 10; // the amount of spacing to appear between image and title
+    regionButton.imageEdgeInsets = UIEdgeInsetsMake(0, 0, 0, spacing);
+    regionButton.titleEdgeInsets = UIEdgeInsetsMake(0, spacing, 0, 0);
+
+    [regionButton addTarget:self action:@selector(onRegionButtonTap:) forControlEvents:UIControlEventTouchUpInside];
+    [bottomBar addSubview:regionButton];
+    [self updateRegionButton];
+
+    // Setup autolayout
+    [bottomBar addConstraint:[NSLayoutConstraint constraintWithItem:regionButton
+                                                          attribute:NSLayoutAttributeCenterY
+                                                          relatedBy:NSLayoutRelationEqual
+                                                             toItem:bottomBar
+                                                          attribute:NSLayoutAttributeCenterY
+                                                         multiplier:1.0
+                                                           constant:10]];
+
+    [bottomBar addConstraint:[NSLayoutConstraint constraintWithItem:regionButton
                                                           attribute:NSLayoutAttributeCenterX
                                                           relatedBy:NSLayoutRelationEqual
-                                                             toItem:regionButton
+                                                             toItem:bottomBar
                                                           attribute:NSLayoutAttributeCenterX
                                                          multiplier:1.0
                                                            constant:0]];
 
-    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:regionLabel
+    NSLayoutConstraint *widthConstraint = [NSLayoutConstraint constraintWithItem:regionButton
+                                                                       attribute:NSLayoutAttributeWidth
+                                                                       relatedBy:NSLayoutRelationEqual
+                                                                          toItem:bottomBar
+                                                                       attribute:NSLayoutAttributeWidth
+                                                                      multiplier:.8
+                                                                        constant:0];
+    widthConstraint.priority = 999; // allow constraint to be broken to enforce max width
+    [bottomBar addConstraint:widthConstraint];
+
+    [bottomBar addConstraint:[NSLayoutConstraint constraintWithItem:regionButton
                                                           attribute:NSLayoutAttributeWidth
-                                                          relatedBy:NSLayoutRelationEqual
-                                                             toItem:self.view
-                                                          attribute:NSLayoutAttributeWidth
+                                                          relatedBy:NSLayoutRelationLessThanOrEqual
+                                                             toItem:nil
+                                                          attribute:NSLayoutAttributeNotAnAttribute
                                                          multiplier:1.0
-                                                           constant:.1]];
+                                                           constant:300]];
+
+    [bottomBar addConstraint:[NSLayoutConstraint constraintWithItem:regionButton
+                                                          attribute:NSLayoutAttributeHeight
+                                                          relatedBy:NSLayoutRelationEqual
+                                                             toItem:nil
+                                                          attribute:NSLayoutAttributeNotAnAttribute
+                                                         multiplier:1.0
+                                                           constant:buttonHeight]];
+
+    // Add text above region button
+    UILabel *regionButtonHeader = [[UILabel alloc] init];
+    regionButtonHeader.translatesAutoresizingMaskIntoConstraints = NO;
+
+    regionButtonHeader.text = NSLocalizedStringWithDefaultValue(@"CHANGE_REGION", nil, [NSBundle mainBundle], @"Change Region", @"Text above change region button that allows user to select their desired server region");
+    regionButtonHeader.adjustsFontSizeToFitWidth = NO;
+    regionButtonHeader.font = [UIFont systemFontOfSize:regionButton.titleLabel.font.pointSize - 3.f];
+
+    [bottomBar addSubview:regionButtonHeader];
+
+    // Setup autolayout
+    [bottomBar addConstraint:[NSLayoutConstraint constraintWithItem:regionButtonHeader
+                                                          attribute:NSLayoutAttributeBottom
+                                                          relatedBy:NSLayoutRelationEqual
+                                                             toItem:regionButton
+                                                          attribute:NSLayoutAttributeTop
+                                                         multiplier:1.0
+                                                           constant:-10]];
+
+    [bottomBar addConstraint:[NSLayoutConstraint constraintWithItem:regionButtonHeader
+                                                          attribute:NSLayoutAttributeCenterX
+                                                          relatedBy:NSLayoutRelationEqual
+                                                             toItem:bottomBar
+                                                          attribute:NSLayoutAttributeCenterX
+                                                         multiplier:1.0
+                                                           constant:0]];
 }
 
 - (void)addVersionLabel {
@@ -563,16 +620,16 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                                                              toItem:self.view
                                                           attribute:NSLayoutAttributeRight
                                                          multiplier:1.0
-                                                          constant:-30.0]];
+                                                          constant:-10]];
 
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:versionLabel
-                                                          attribute:NSLayoutAttributeBottom
+                                                          attribute:NSLayoutAttributeCenterY
                                                           relatedBy:NSLayoutRelationEqual
-                                                             toItem:self.view
-                                                          attribute:NSLayoutAttributeBottom
+                                                             toItem:settingsButton
+                                                          attribute:NSLayoutAttributeCenterY
                                                          multiplier:1.0
-                                                           constant:-20.0]];
-    
+                                                           constant:0]];
+
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:versionLabel
                                                           attribute:NSLayoutAttributeHeight
                                                           relatedBy:NSLayoutRelationEqual
@@ -580,7 +637,6 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                                                           attribute:NSLayoutAttributeNotAnAttribute
                                                          multiplier:1.0
                                                            constant:50.0]];
-
 }
 
 - (void)addAdLabel {
@@ -772,7 +828,6 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     if (!safeStringsEqual(selectedRegion, selectedRegionSnapShot)) {
         [self persistSelectedRegion];
         [self updateRegionButton];
-        [self updateRegionLabel];
         [vpnManager restartVPN];
     }
     [regionSelectionNavController dismissViewControllerAnimated:YES completion:nil];
@@ -790,13 +845,9 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     Region *selectedRegion = [[RegionAdapter sharedInstance] getSelectedRegion];
     UIImage *flag = [[PsiphonClientCommonLibraryHelpers imageFromCommonLibraryNamed:selectedRegion.flagResourceId] countryFlag];
     [regionButton setImage:flag forState:UIControlStateNormal];
-}
 
-- (void)updateRegionLabel {
-    Region *selectedRegion = [[RegionAdapter sharedInstance] getSelectedRegion];
-    NSString *serverRegionText = NSLocalizedStringWithDefaultValue(@"SERVER_REGION", nil, [NSBundle mainBundle], @"Server region", @"Title which is displayed beside the flag of the country which the user has chosen to connect to.");
     NSString *regionText = [[RegionAdapter sharedInstance] getLocalizedRegionTitle:selectedRegion.code];
-    regionLabel.text = [serverRegionText stringByAppendingString:[NSString stringWithFormat:@":\n%@", regionText]];
+    [regionButton setTitle:regionText forState:UIControlStateNormal];
 }
 
 @end
