@@ -339,7 +339,6 @@ static const double kDefaultLogTruncationInterval = 12 * 60 * 60; // 12 hours
 }
 
 - (void)onExiting {
-    [sharedDB updateTunnelConnectedState:FALSE];
 }
 
 - (void)onHomepage:(NSString * _Nonnull)url {
