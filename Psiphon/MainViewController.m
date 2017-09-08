@@ -55,6 +55,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     Notifier *notifier;
 
     // UI elements
+    UIImageView *logoView;
     UIButton *startStopButton;
     UILabel *statusLabel;
     UIButton *regionButton;
@@ -129,8 +130,9 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     [self addRegionButton];
     [self addRegionLabel];
     [self addVersionLabel];
-    
-    // TODO: load/save config here to have the user immediately complete the permission prompt
+    [self addLogoImage];
+
+        // TODO: load/save config here to have the user immediately complete the permission prompt
 }
 
 - (void)viewDidAppear:(BOOL)animated {
@@ -185,9 +187,15 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     if (size.width > size.height) {
         [self.view removeConstraint:startButtonScreenWidth];
         [self.view addConstraint:startButtonScreenHeight];
+        if ([[UIDevice currentDevice].model hasPrefix:@"iPhone"]) {
+            logoView.hidden = YES;
+        }
     } else {
         [self.view removeConstraint:startButtonScreenHeight];
         [self.view addConstraint:startButtonScreenWidth];
+        if ([[UIDevice currentDevice].model hasPrefix:@"iPhone"]) {
+            logoView.hidden = NO;
+        }
     }
 
     [self.view addConstraint:startButtonWidth];
@@ -300,6 +308,31 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     [startStopButtonHalo stop];
     
     isStartStopButtonHaloOn = FALSE;
+}
+
+- (void)addLogoImage {
+    logoView = [[UIImageView alloc] init];
+    [logoView setImage:[UIImage imageNamed:@"Logo"]];
+    [logoView setTranslatesAutoresizingMaskIntoConstraints:NO];
+
+    [self.view addSubview:logoView];
+
+    // Setup autolayout
+    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:logoView
+                                                          attribute:NSLayoutAttributeTop
+                                                          relatedBy:NSLayoutRelationGreaterThanOrEqual
+                                                             toItem:self.topLayoutGuide
+                                                          attribute:NSLayoutAttributeBottom
+                                                         multiplier:1.0
+                                                           constant:30]];
+
+    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:logoView
+                                                          attribute:NSLayoutAttributeCenterX
+                                                          relatedBy:NSLayoutRelationEqual
+                                                             toItem:self.view
+                                                          attribute:NSLayoutAttributeCenterX
+                                                         multiplier:1.0
+                                                           constant:0]];
 }
 
 - (void)addSettingsButton {
