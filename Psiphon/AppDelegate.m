@@ -26,6 +26,12 @@
 #import "VPNManager.h"
 #import "AdManager.h"
 
+#if DEBUG
+#define kLaunchScreenTimerCount 1
+#else
+#define kLaunchScreenTimerCount 10
+#endif
+
 @interface AppDelegate ()
 @end
 
@@ -57,7 +63,7 @@
         mainViewController = [[MainViewController alloc] init];
         launchScreenViewController = [[LaunchScreenViewController alloc] init];
 
-        timerCount = 10;
+        timerCount = kLaunchScreenTimerCount;
     }
     return self;
 }
