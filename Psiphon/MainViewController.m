@@ -642,23 +642,24 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         NSArray<DiagnosticEntry *> *logs = [sharedDB getNewLogs];
         [[PsiphonData sharedInstance] addDiagnosticEntries:logs];
+
+        __weak MainViewController *weakSelf = self;
+        SendFeedbackHandler sendFeedbackHandler = ^(NSString *jsonString, NSString *pubKey, NSString *uploadServer, NSString *uploadServerHeaders){
+            PsiphonTunnel *inactiveTunnel = [PsiphonTunnel newPsiphonTunnel:weakSelf]; // TODO: we need to update PsiphonTunnel framework not require this and fix this warning
+            [inactiveTunnel sendFeedback:jsonString publicKey:pubKey uploadServer:uploadServer uploadServerHeaders:uploadServerHeaders];
+        };
+
+        [FeedbackUpload generateAndSendFeedback:selectedThumbIndex
+                                      buildInfo:[PsiphonTunnel getBuildInfo]
+                                       comments:comments
+                                          email:email
+                             sendDiagnosticInfo:uploadDiagnostics
+                              withPsiphonConfig:[self getPsiphonConfig]
+                             withClientPlatform:@"ios-vpn"
+                             withConnectionType:[self getConnectionType]
+                                   isJailbroken:[JailbreakCheck isDeviceJailbroken]
+                            sendFeedbackHandler:sendFeedbackHandler];
     });
-
-    __weak MainViewController *weakSelf = self;
-    SendFeedbackHandler sendFeedbackHandler = ^(NSString *jsonString, NSString *pubKey, NSString *uploadServer, NSString *uploadServerHeaders){
-        PsiphonTunnel *inactiveTunnel = [PsiphonTunnel newPsiphonTunnel:self]; // TODO: we need to update PsiphonTunnel framework not require this and fix this warning
-        [inactiveTunnel sendFeedback:jsonString publicKey:pubKey uploadServer:uploadServer uploadServerHeaders:uploadServerHeaders];
-    };
-
-    [FeedbackUpload generateAndSendFeedback:selectedThumbIndex
-                                  buildInfo:[PsiphonTunnel getBuildInfo]
-                                   comments:comments
-                                      email:email
-                         sendDiagnosticInfo:uploadDiagnostics
-                          withPsiphonConfig:[self getPsiphonConfig]
-                         withConnectionType:[self getConnectionType]
-                               isJailbroken:[JailbreakCheck isDeviceJailbroken]
-                        sendFeedbackHandler:sendFeedbackHandler];
 }
 
 - (void)userPressedURL:(NSURL *)URL {
