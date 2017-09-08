@@ -31,7 +31,6 @@
 		9BFECF8895D5FE1940A6F700 /* PsiphonConfigUserDefaults.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC584519C408D9D6D3FF1 /* PsiphonConfigUserDefaults.m */; };
 		9BFECFEB3BC9F10542C1A416 /* PsiphonConfigUserDefaults.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC584519C408D9D6D3FF1 /* PsiphonConfigUserDefaults.m */; };
 		CE26FC951BBDC7B800B83375 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = CE26FC941BBDC7B800B83375 /* Assets.xcassets */; };
-		CE26FC981BBDC7B800B83375 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = CE26FC961BBDC7B800B83375 /* LaunchScreen.storyboard */; };
 		CE26FCAC1BBDC85900B83375 /* PsiphonVPN.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = CE26FCA31BBDC85900B83375 /* PsiphonVPN.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		CE4E9BC01BBEECF30060FF8B /* Psiphon.entitlements in Resources */ = {isa = PBXBuildFile; fileRef = CE4E9BBF1BBEECF30060FF8B /* Psiphon.entitlements */; };
 		CE4E9BC21BBEECFC0060FF8B /* PsiphonVPN.entitlements in Resources */ = {isa = PBXBuildFile; fileRef = CE4E9BC11BBEECFC0060FF8B /* PsiphonVPN.entitlements */; };
@@ -49,6 +48,7 @@
 		F132D7E01F5739A800AF7F91 /* LaunchScreenViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = F132D7DF1F5739A800AF7F91 /* LaunchScreenViewController.m */; };
 		F136C2911F61F7FB000D3EAB /* launch.m4v in Resources */ = {isa = PBXBuildFile; fileRef = F136C2901F61F7FA000D3EAB /* launch.m4v */; };
 		F136C2931F61FB5F000D3EAB /* connecting.m4v in Resources */ = {isa = PBXBuildFile; fileRef = F136C2921F61FB5E000D3EAB /* connecting.m4v */; };
+		F136C2951F62E3E1000D3EAB /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = F136C2941F62E3E1000D3EAB /* LaunchScreen.xib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -108,7 +108,6 @@
 		66094F781E8067520069EC4E /* PsiphonTunnel.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = PsiphonTunnel.framework; sourceTree = "<group>"; };
 		6615A5E91F58A95500026C98 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = Strings/en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		6615A5EC1F58A95E00026C98 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = Strings/fr.lproj/Localizable.strings; sourceTree = "<group>"; };
-		66241C0F1F5742E400491942 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = en; path = en.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		668AF9BE1E92CBD3008CAAAA /* NetworkExtension.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = NetworkExtension.framework; path = System/Library/Frameworks/NetworkExtension.framework; sourceTree = SDKROOT; };
 		6761FA3A500B5ECFCD4F8E55 /* Pods-PsiphonVPN.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PsiphonVPN.release.xcconfig"; path = "Pods/Target Support Files/Pods-PsiphonVPN/Pods-PsiphonVPN.release.xcconfig"; sourceTree = "<group>"; };
 		6791216DF61005DA565E9DEE /* Pods-Psiphon.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Psiphon.release.xcconfig"; path = "Pods/Target Support Files/Pods-Psiphon/Pods-Psiphon.release.xcconfig"; sourceTree = "<group>"; };
@@ -126,8 +125,8 @@
 		CE26FC991BBDC7B800B83375 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		CE26FCA31BBDC85900B83375 /* PsiphonVPN.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = PsiphonVPN.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		CE26FCA91BBDC85900B83375 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		CE4E9BBF1BBEECF30060FF8B /* Psiphon.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = Psiphon.entitlements; sourceTree = "<group>"; };
-		CE4E9BC11BBEECFC0060FF8B /* PsiphonVPN.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = PsiphonVPN.entitlements; sourceTree = "<group>"; };
+		CE4E9BBF1BBEECF30060FF8B /* Psiphon.entitlements */ = {isa = PBXFileReference; fileEncoding = 1; lastKnownFileType = text.xml; path = Psiphon.entitlements; sourceTree = "<group>"; };
+		CE4E9BC11BBEECFC0060FF8B /* PsiphonVPN.entitlements */ = {isa = PBXFileReference; fileEncoding = 1; lastKnownFileType = text.xml; path = PsiphonVPN.entitlements; sourceTree = "<group>"; };
 		EF652CD01F352212002AFB48 /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		EF652CD21F35224C002AFB48 /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		EF652CD31F35224C002AFB48 /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -147,6 +146,7 @@
 		F132D7DF1F5739A800AF7F91 /* LaunchScreenViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LaunchScreenViewController.m; sourceTree = "<group>"; };
 		F136C2901F61F7FA000D3EAB /* launch.m4v */ = {isa = PBXFileReference; lastKnownFileType = file; name = launch.m4v; path = Resource/launch.m4v; sourceTree = "<group>"; };
 		F136C2921F61FB5E000D3EAB /* connecting.m4v */ = {isa = PBXFileReference; lastKnownFileType = file; name = connecting.m4v; path = Resource/connecting.m4v; sourceTree = "<group>"; };
+		F136C2941F62E3E1000D3EAB /* LaunchScreen.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = LaunchScreen.xib; path = Resource/LaunchScreen.xib; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -264,6 +264,7 @@
 		CE26FC8C1BBDC7B800B83375 /* Psiphon */ = {
 			isa = PBXGroup;
 			children = (
+				F136C2941F62E3E1000D3EAB /* LaunchScreen.xib */,
 				EFB3E6281F621100004AAE8C /* External */,
 				F136C2921F61FB5E000D3EAB /* connecting.m4v */,
 				F136C2901F61F7FA000D3EAB /* launch.m4v */,
@@ -274,7 +275,6 @@
 				EF652CCF1F3521F8002AFB48 /* Supporting Files */,
 				CE4E9BBF1BBEECF30060FF8B /* Psiphon.entitlements */,
 				CE26FC941BBDC7B800B83375 /* Assets.xcassets */,
-				CE26FC961BBDC7B800B83375 /* LaunchScreen.storyboard */,
 				CE26FC991BBDC7B800B83375 /* Info.plist */,
 				EF652CD21F35224C002AFB48 /* AppDelegate.h */,
 				EF652CD31F35224C002AFB48 /* AppDelegate.m */,
@@ -431,7 +431,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				CE26FC981BBDC7B800B83375 /* LaunchScreen.storyboard in Resources */,
 				6615A5EA1F58A95500026C98 /* Localizable.strings in Resources */,
 				EF6C1F521F59E46500709554 /* embedded_server_entries in Resources */,
 				EF6C1F541F59E46500709554 /* psiphon_config in Resources */,
@@ -439,6 +438,7 @@
 				F136C2911F61F7FB000D3EAB /* launch.m4v in Resources */,
 				4E0774961F566B040097BC8C /* InAppSettings.bundle in Resources */,
 				CE26FC951BBDC7B800B83375 /* Assets.xcassets in Resources */,
+				F136C2951F62E3E1000D3EAB /* LaunchScreen.xib in Resources */,
 				CE4E9BC01BBEECF30060FF8B /* Psiphon.entitlements in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -632,14 +632,6 @@
 				6615A5EC1F58A95E00026C98 /* fr */,
 			);
 			name = Localizable.strings;
-			sourceTree = "<group>";
-		};
-		CE26FC961BBDC7B800B83375 /* LaunchScreen.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				66241C0F1F5742E400491942 /* en */,
-			);
-			name = LaunchScreen.storyboard;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */
