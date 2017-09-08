@@ -62,6 +62,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     UILabel *versionLabel;
     UILabel *adLabel;
     PulsingHaloLayer *startStopButtonHalo;
+    BOOL isStartStopButtonHaloOn;
 
     // UI Constraint
     NSLayoutConstraint *startButtonScreenWidth;
@@ -275,6 +276,12 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 }
 
 - (void)addPulsingHaloLayer {
+    // Don't add multiple layers
+    if (isStartStopButtonHaloOn) {
+        return;
+    }
+    isStartStopButtonHaloOn = TRUE;
+    
     CGFloat radius = (CGFloat) (MIN(self.view.frame.size.width, self.view.frame.size.height) / 2.5);
 
     startStopButtonHalo = [PulsingHaloLayer layer];
@@ -291,6 +298,8 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 
 - (void)removePulsingHaloLayer {
     [startStopButtonHalo stop];
+    
+    isStartStopButtonHaloOn = FALSE;
 }
 
 - (void)addSettingsButton {
