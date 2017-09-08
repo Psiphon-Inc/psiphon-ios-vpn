@@ -17,6 +17,9 @@
    Title of the button that dismisses region selection dialog */
 "DONE_ACTION" = "Done";
 
+/* Text displayed while app loads */
+"LOADING" = "Loading...";
+
 /* Log view title bar text */
 "LOGS_TITLE" = "Logs";
 
