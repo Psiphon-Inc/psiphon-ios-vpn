@@ -434,11 +434,21 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     // Setup autolayout
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:statusLabel
                                                           attribute:NSLayoutAttributeTop
-                                                          relatedBy:NSLayoutRelationLessThanOrEqual
+                                                          relatedBy:NSLayoutRelationGreaterThanOrEqual
                                                              toItem:startStopButton
                                                           attribute:NSLayoutAttributeBottom
                                                          multiplier:1.0
-                                                           constant:30.0]];
+                                                           constant:0.0]];
+
+    NSLayoutConstraint *spaceToStartStopButton = [NSLayoutConstraint constraintWithItem:statusLabel
+                                                                             attribute:NSLayoutAttributeTop
+                                                                             relatedBy:NSLayoutRelationEqual
+                                                                                toItem:startStopButton
+                                                                             attribute:NSLayoutAttributeBottom
+                                                                            multiplier:1.0
+                                                                              constant:30.0];
+    spaceToStartStopButton.priority = 999;
+    [self.view addConstraint:spaceToStartStopButton];
 
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:statusLabel
                                                           attribute:NSLayoutAttributeLeft
@@ -455,6 +465,14 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                                                           attribute:NSLayoutAttributeRight
                                                          multiplier:1.0
                                                            constant:-15.0]];
+
+    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:statusLabel
+                                                          attribute:NSLayoutAttributeHeight
+                                                          relatedBy:NSLayoutRelationEqual
+                                                             toItem:nil
+                                                          attribute:NSLayoutAttributeNotAnAttribute
+                                                         multiplier:1.0
+                                                           constant:30.0]];
 }
 
 - (void)addRegionSelectionBar {
@@ -494,13 +512,23 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                                                          multiplier:1.0
                                                            constant:0]];
 
+    NSLayoutConstraint *heightConstraint = [NSLayoutConstraint constraintWithItem:bottomBar
+                                                              attribute:NSLayoutAttributeHeight
+                                                              relatedBy:NSLayoutRelationEqual
+                                                                 toItem:nil
+                                                              attribute:NSLayoutAttributeNotAnAttribute
+                                                             multiplier:1.0
+                                                               constant:120];
+    heightConstraint.priority = 999;
+    [self.view addConstraint:heightConstraint];
+
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:bottomBar
-                                                          attribute:NSLayoutAttributeHeight
-                                                          relatedBy:NSLayoutRelationEqual
-                                                             toItem:nil
-                                                          attribute:NSLayoutAttributeNotAnAttribute
+                                                          attribute:NSLayoutAttributeTop
+                                                          relatedBy:NSLayoutRelationGreaterThanOrEqual
+                                                             toItem:statusLabel
+                                                          attribute:NSLayoutAttributeBottom
                                                          multiplier:1.0
-                                                           constant:120]];
+                                                           constant:0]];
 }
 
 - (void)addRegionButton {
@@ -517,21 +545,25 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     regionButton.titleLabel.adjustsFontSizeToFitWidth = YES;
 
     CGFloat spacing = 10; // the amount of spacing to appear between image and title
+    CGFloat spacingFromSides = 10.f;
     regionButton.imageEdgeInsets = UIEdgeInsetsMake(0, 0, 0, spacing);
     regionButton.titleEdgeInsets = UIEdgeInsetsMake(0, spacing, 0, 0);
+    regionButton.contentEdgeInsets = UIEdgeInsetsMake(0, spacing + spacingFromSides, 0, spacing + spacingFromSides);
 
     [regionButton addTarget:self action:@selector(onRegionButtonTap:) forControlEvents:UIControlEventTouchUpInside];
     [bottomBar addSubview:regionButton];
     [self updateRegionButton];
 
     // Setup autolayout
-    [bottomBar addConstraint:[NSLayoutConstraint constraintWithItem:regionButton
-                                                          attribute:NSLayoutAttributeCenterY
-                                                          relatedBy:NSLayoutRelationEqual
-                                                             toItem:bottomBar
-                                                          attribute:NSLayoutAttributeCenterY
-                                                         multiplier:1.0
-                                                           constant:10]];
+    NSLayoutConstraint *centerInBottomBar = [NSLayoutConstraint constraintWithItem:regionButton
+                                                                         attribute:NSLayoutAttributeCenterY
+                                                                         relatedBy:NSLayoutRelationEqual
+                                                                            toItem:bottomBar
+                                                                         attribute:NSLayoutAttributeCenterY
+                                                                        multiplier:1.0
+                                                                          constant:10];
+    centerInBottomBar.priority = 999;
+    [bottomBar addConstraint:centerInBottomBar];
 
     [bottomBar addConstraint:[NSLayoutConstraint constraintWithItem:regionButton
                                                           attribute:NSLayoutAttributeCenterX
@@ -546,7 +578,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                                                                        relatedBy:NSLayoutRelationEqual
                                                                           toItem:bottomBar
                                                                        attribute:NSLayoutAttributeWidth
-                                                                      multiplier:.8
+                                                                      multiplier:.7
                                                                         constant:0];
     widthConstraint.priority = 999; // allow constraint to be broken to enforce max width
     [bottomBar addConstraint:widthConstraint];
@@ -557,7 +589,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                                                              toItem:nil
                                                           attribute:NSLayoutAttributeNotAnAttribute
                                                          multiplier:1.0
-                                                           constant:300]];
+                                                           constant:220]];
 
     [bottomBar addConstraint:[NSLayoutConstraint constraintWithItem:regionButton
                                                           attribute:NSLayoutAttributeHeight
@@ -584,7 +616,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                                                              toItem:regionButton
                                                           attribute:NSLayoutAttributeTop
                                                          multiplier:1.0
-                                                           constant:-10]];
+                                                           constant:-7.5f]];
 
     [bottomBar addConstraint:[NSLayoutConstraint constraintWithItem:regionButtonHeader
                                                           attribute:NSLayoutAttributeCenterX
@@ -593,6 +625,22 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                                                           attribute:NSLayoutAttributeCenterX
                                                          multiplier:1.0
                                                            constant:0]];
+
+    [bottomBar addConstraint:[NSLayoutConstraint constraintWithItem:regionButtonHeader
+                                                          attribute:NSLayoutAttributeTop
+                                                          relatedBy:NSLayoutRelationGreaterThanOrEqual
+                                                             toItem:bottomBar
+                                                          attribute:NSLayoutAttributeTop
+                                                         multiplier:1.0
+                                                           constant:0]];
+
+    [bottomBar addConstraint:[NSLayoutConstraint constraintWithItem:regionButtonHeader
+                                                          attribute:NSLayoutAttributeHeight
+                                                          relatedBy:NSLayoutRelationEqual
+                                                             toItem:nil
+                                                          attribute:NSLayoutAttributeNotAnAttribute
+                                                         multiplier:1.0
+                                                           constant:20]];
 }
 
 - (void)addVersionLabel {
