@@ -242,7 +242,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 - (NSString *)getVPNStatusDescription:(VPNStatus) status {
     switch(status) {
         case VPNStatusDisconnected: return NSLocalizedStringWithDefaultValue(@"VPN_STATUS_DISCONNECTED", nil, [NSBundle mainBundle], @"Disconnected", @"Status when the VPN is not connected to a Psiphon server, not trying to connect, and not in an error state");
-        case VPNStatusInvalid: return NSLocalizedStringWithDefaultValue(@"VPN_STATUS_INVALID", nil, [NSBundle mainBundle], @"Invalid", @"Status when the VPN is in an invalid state. For example, if the user doesn't give permission for the VPN configuration to be installed, and therefore the Psiphon VPN can't even try to connect.");
+        case VPNStatusInvalid: return NSLocalizedStringWithDefaultValue(@"VPN_STATUS_INVALID", nil, [NSBundle mainBundle], @"Disconnected", @"Status when the VPN is in an invalid state. For example, if the user doesn't give permission for the VPN configuration to be installed, and therefore the Psiphon VPN can't even try to connect.");
         case VPNStatusConnected: return NSLocalizedStringWithDefaultValue(@"VPN_STATUS_CONNECTED", nil, [NSBundle mainBundle], @"Connected", @"Status when the VPN is connected to a Psiphon server");
         case VPNStatusConnecting: return NSLocalizedStringWithDefaultValue(@"VPN_STATUS_CONNECTING", nil, [NSBundle mainBundle], @"Connecting", @"Status when the VPN is connecting; that is, trying to connect to a Psiphon server");
         case VPNStatusDisconnecting: return NSLocalizedStringWithDefaultValue(@"VPN_STATUS_DISCONNECTING", nil, [NSBundle mainBundle], @"Disconnecting", @"Status when the VPN is disconnecting. Sometimes going from connected to disconnected can take some time, and this is that state.");
@@ -255,7 +255,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 - (void)setBackgroundGradient {
     backgroundGradient = [CAGradientLayer layer];
     
-    backgroundGradient.colors = @[(id)[UIColor colorWithRed:0.28 green:0.36 blue:0.46 alpha:1.0].CGColor, (id)[UIColor colorWithRed:0.17 green:0.17 blue:0.28 alpha:1.0].CGColor];
+    backgroundGradient.colors = @[(id)[UIColor colorWithRed:0.17 green:0.17 blue:0.28 alpha:1.0].CGColor, (id)[UIColor colorWithRed:0.28 green:0.36 blue:0.46 alpha:1.0].CGColor];
 
     [self.view.layer insertSublayer:backgroundGradient atIndex:0];
 }
@@ -347,7 +347,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                                                            relatedBy:NSLayoutRelationEqual
                                                               toItem:self.view
                                                            attribute:NSLayoutAttributeHeight
-                                                          multiplier:0.5f
+                                                          multiplier:0.33f
                                                             constant:0];
 
     startButtonScreenWidth = [NSLayoutConstraint constraintWithItem:startStopButton
@@ -355,7 +355,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                                                           relatedBy:NSLayoutRelationEqual
                                                              toItem:self.view
                                                           attribute:NSLayoutAttributeWidth
-                                                         multiplier:0.5f
+                                                         multiplier:0.33f
                                                            constant:0];
 
     startButtonWidth = [NSLayoutConstraint constraintWithItem:startStopButton
@@ -389,19 +389,11 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     // Setup autolayout
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:statusLabel
                                                           attribute:NSLayoutAttributeTop
-                                                          relatedBy:NSLayoutRelationGreaterThanOrEqual
-                                                             toItem:self.topLayoutGuide
+                                                          relatedBy:NSLayoutRelationLessThanOrEqual
+                                                             toItem:startStopButton
                                                           attribute:NSLayoutAttributeBottom
                                                          multiplier:1.0
-                                                           constant:0]];
-    
-    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:statusLabel
-                                                          attribute:NSLayoutAttributeBottom
-                                                          relatedBy:NSLayoutRelationGreaterThanOrEqual
-                                                             toItem:adLabel
-                                                          attribute:NSLayoutAttributeTop
-                                                         multiplier:1.0
-                                                           constant:-20.0]];
+                                                           constant:30.0]];
 
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:statusLabel
                                                           attribute:NSLayoutAttributeLeft
@@ -433,10 +425,10 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:regionButton
                                                           attribute:NSLayoutAttributeTop
                                                           relatedBy:NSLayoutRelationLessThanOrEqual
-                                                             toItem:startStopButton
+                                                             toItem:statusLabel
                                                           attribute:NSLayoutAttributeBottom
                                                          multiplier:1.0
-                                                           constant:30.0]];
+                                                           constant:20.0]];
 
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:regionButton
                                                           attribute:NSLayoutAttributeCenterX
@@ -547,9 +539,11 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 - (void)addAdLabel {
     adLabel = [[UILabel alloc] init];
     adLabel.translatesAutoresizingMaskIntoConstraints = NO;
-    adLabel.text = NSLocalizedStringWithDefaultValue(@"AD_LOADED", nil, [NSBundle mainBundle], @"Please watch a short video before we connect you to a Psiphon server", @"Text for button that tell users there will by a short video ad.");
+    adLabel.text = NSLocalizedStringWithDefaultValue(@"AD_LOADED", nil, [NSBundle mainBundle], @"Please watch a short video while we get ready to connect you to a Psiphon server", @"Text for button that tell users there will by a short video ad.");
     adLabel.textAlignment = NSTextAlignmentCenter;
     adLabel.textColor = [UIColor whiteColor];
+    adLabel.lineBreakMode = NSLineBreakByWordWrapping;
+    adLabel.numberOfLines = 0;
     [self.view addSubview:adLabel];
     if (![adManager untunneledInterstitialIsReady]){
         adLabel.hidden = true;
@@ -557,12 +551,20 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 
     // Setup autolayout
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:adLabel
+                                                          attribute:NSLayoutAttributeTop
+                                                          relatedBy:NSLayoutRelationGreaterThanOrEqual
+                                                             toItem:self.topLayoutGuide
                                                           attribute:NSLayoutAttributeBottom
-                                                          relatedBy:NSLayoutRelationEqual
+                                                         multiplier:1.0
+                                                           constant:0]];
+    
+    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:adLabel
+                                                          attribute:NSLayoutAttributeBottom
+                                                          relatedBy:NSLayoutRelationGreaterThanOrEqual
                                                              toItem:startStopButton
                                                           attribute:NSLayoutAttributeTop
                                                          multiplier:1.0
-                                                           constant:-20.0]];
+                                                           constant:-30.0]];
 
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:adLabel
                                                           attribute:NSLayoutAttributeLeft
