@@ -144,9 +144,9 @@
 		EFED7EBB1F55C8550078980F /* LogViewControllerFullScreen.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LogViewControllerFullScreen.m; sourceTree = "<group>"; };
 		F132D7DE1F5739A800AF7F91 /* LaunchScreenViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LaunchScreenViewController.h; sourceTree = "<group>"; };
 		F132D7DF1F5739A800AF7F91 /* LaunchScreenViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LaunchScreenViewController.m; sourceTree = "<group>"; };
-		F136C2901F61F7FA000D3EAB /* launch.m4v */ = {isa = PBXFileReference; lastKnownFileType = file; name = launch.m4v; path = Resource/launch.m4v; sourceTree = "<group>"; };
-		F136C2921F61FB5E000D3EAB /* connecting.m4v */ = {isa = PBXFileReference; lastKnownFileType = file; name = connecting.m4v; path = Resource/connecting.m4v; sourceTree = "<group>"; };
-		F136C2941F62E3E1000D3EAB /* LaunchScreen.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = LaunchScreen.xib; path = Resource/LaunchScreen.xib; sourceTree = "<group>"; };
+		F136C2901F61F7FA000D3EAB /* launch.m4v */ = {isa = PBXFileReference; lastKnownFileType = file; path = launch.m4v; sourceTree = "<group>"; };
+		F136C2921F61FB5E000D3EAB /* connecting.m4v */ = {isa = PBXFileReference; lastKnownFileType = file; path = connecting.m4v; sourceTree = "<group>"; };
+		F136C2941F62E3E1000D3EAB /* LaunchScreen.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = LaunchScreen.xib; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -264,17 +264,14 @@
 		CE26FC8C1BBDC7B800B83375 /* Psiphon */ = {
 			isa = PBXGroup;
 			children = (
-				F136C2941F62E3E1000D3EAB /* LaunchScreen.xib */,
+				F136C2981F62E81F000D3EAB /* Resource */,
 				EFB3E6281F621100004AAE8C /* External */,
-				F136C2921F61FB5E000D3EAB /* connecting.m4v */,
-				F136C2901F61F7FA000D3EAB /* launch.m4v */,
 				F132D7DE1F5739A800AF7F91 /* LaunchScreenViewController.h */,
 				F132D7DF1F5739A800AF7F91 /* LaunchScreenViewController.m */,
 				EFED7EBA1F55C8550078980F /* LogViewControllerFullScreen.h */,
 				EFED7EBB1F55C8550078980F /* LogViewControllerFullScreen.m */,
 				EF652CCF1F3521F8002AFB48 /* Supporting Files */,
 				CE4E9BBF1BBEECF30060FF8B /* Psiphon.entitlements */,
-				CE26FC941BBDC7B800B83375 /* Assets.xcassets */,
 				CE26FC991BBDC7B800B83375 /* Info.plist */,
 				EF652CD21F35224C002AFB48 /* AppDelegate.h */,
 				EF652CD31F35224C002AFB48 /* AppDelegate.m */,
@@ -317,6 +314,17 @@
 				EFB3E62B1F621111004AAE8C /* PulsingHalo.h */,
 			);
 			name = External;
+			sourceTree = "<group>";
+		};
+		F136C2981F62E81F000D3EAB /* Resource */ = {
+			isa = PBXGroup;
+			children = (
+				CE26FC941BBDC7B800B83375 /* Assets.xcassets */,
+				F136C2941F62E3E1000D3EAB /* LaunchScreen.xib */,
+				F136C2921F61FB5E000D3EAB /* connecting.m4v */,
+				F136C2901F61F7FA000D3EAB /* launch.m4v */,
+			);
+			name = Resource;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
