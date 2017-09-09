@@ -56,6 +56,8 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 
     // UI elements
     UIImageView *logoView;
+    UILabel *appTitleLabel;
+    UILabel *appSubTitleLabel;
     UIButton *startStopButton;
     UILabel *statusLabel;
     UIButton *regionButton;
@@ -131,9 +133,13 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     [self addRegionSelectionBar];
     [self addVersionLabel];
     [self addLogoImage];
+    [self addAppTitleLabel];
+    [self addAppSubTitleLabel];
 
     if (([[UIDevice currentDevice].model hasPrefix:@"iPhone"] || [[UIDevice currentDevice].model hasPrefix:@"iPod"]) && (self.view.bounds.size.width > self.view.bounds.size.height)) {
         logoView.hidden = YES;
+        appTitleLabel.hidden = YES;
+        appSubTitleLabel.hidden = YES;
     }
 
     // TODO: load/save config here to have the user immediately complete the permission prompt
@@ -207,12 +213,16 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
         [self.view addConstraint:startButtonScreenHeight];
         if ([[UIDevice currentDevice].model hasPrefix:@"iPhone"]) {
             logoView.hidden = YES;
+            appTitleLabel.hidden = YES;
+            appSubTitleLabel.hidden = YES;
         }
     } else {
         [self.view removeConstraint:startButtonScreenHeight];
         [self.view addConstraint:startButtonScreenWidth];
         if ([[UIDevice currentDevice].model hasPrefix:@"iPhone"]) {
             logoView.hidden = NO;
+            appTitleLabel.hidden = NO;
+            appSubTitleLabel.hidden = NO;
         }
     }
 
@@ -351,6 +361,75 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                                                           attribute:NSLayoutAttributeCenterX
                                                          multiplier:1.0
                                                            constant:0]];
+}
+
+- (void)addAppTitleLabel {
+    appTitleLabel = [[UILabel alloc] init];
+    appTitleLabel.translatesAutoresizingMaskIntoConstraints = NO;
+    appTitleLabel.text = NSLocalizedStringWithDefaultValue(@"APP_TITLE_MAIN_VIEW", nil, [NSBundle mainBundle], @"PSIPHON", @"Text for app title on main view.");
+    appTitleLabel.textAlignment = NSTextAlignmentCenter;
+    appTitleLabel.textColor = [UIColor whiteColor];
+    appTitleLabel.font = [UIFont systemFontOfSize:appTitleLabel.font.pointSize + 3.f];
+    [self.view addSubview:appTitleLabel];
+    
+    // Setup autolayout
+    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:appTitleLabel
+                                                          attribute:NSLayoutAttributeTop
+                                                          relatedBy:NSLayoutRelationGreaterThanOrEqual
+                                                             toItem:self.topLayoutGuide
+                                                          attribute:NSLayoutAttributeBottom
+                                                         multiplier:1.0
+                                                           constant:90]];
+    
+    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:appTitleLabel
+                                                          attribute:NSLayoutAttributeLeft
+                                                          relatedBy:NSLayoutRelationEqual
+                                                             toItem:self.view
+                                                          attribute:NSLayoutAttributeLeft
+                                                         multiplier:1.0
+                                                           constant:15.0]];
+    
+    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:appTitleLabel
+                                                          attribute:NSLayoutAttributeRight
+                                                          relatedBy:NSLayoutRelationEqual
+                                                             toItem:self.view
+                                                          attribute:NSLayoutAttributeRight
+                                                         multiplier:1.0
+                                                           constant:-15.0]];
+}
+
+- (void)addAppSubTitleLabel {
+    appSubTitleLabel = [[UILabel alloc] init];
+    appSubTitleLabel.translatesAutoresizingMaskIntoConstraints = NO;
+    appSubTitleLabel.text = NSLocalizedStringWithDefaultValue(@"APP_SUB_TITLE_MAIN_VIEW", nil, [NSBundle mainBundle], @"BEYOND BORDERS", @"Text for app subtitle on main view.");
+    appSubTitleLabel.textAlignment = NSTextAlignmentCenter;
+    appSubTitleLabel.textColor = [UIColor whiteColor];
+    [self.view addSubview:appSubTitleLabel];
+    
+    // Setup autolayout
+    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:appSubTitleLabel
+                                                          attribute:NSLayoutAttributeTop
+                                                          relatedBy:NSLayoutRelationGreaterThanOrEqual
+                                                             toItem:appTitleLabel
+                                                          attribute:NSLayoutAttributeBottom
+                                                         multiplier:1.0
+                                                           constant:0]];
+    
+    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:appSubTitleLabel
+                                                          attribute:NSLayoutAttributeLeft
+                                                          relatedBy:NSLayoutRelationEqual
+                                                             toItem:self.view
+                                                          attribute:NSLayoutAttributeLeft
+                                                         multiplier:1.0
+                                                           constant:15.0]];
+    
+    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:appSubTitleLabel
+                                                          attribute:NSLayoutAttributeRight
+                                                          relatedBy:NSLayoutRelationEqual
+                                                             toItem:self.view
+                                                          attribute:NSLayoutAttributeRight
+                                                         multiplier:1.0
+                                                           constant:-15.0]];
 }
 
 - (void)addSettingsButton {
@@ -497,7 +576,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                                                                                 toItem:startStopButton
                                                                              attribute:NSLayoutAttributeBottom
                                                                             multiplier:1.0
-                                                                              constant:30.0];
+                                                                              constant:80.0];
     spaceToStartStopButton.priority = 999;
     [self.view addConstraint:spaceToStartStopButton];
 
