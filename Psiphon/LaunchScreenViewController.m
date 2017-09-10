@@ -122,6 +122,7 @@ static const NSString *ItemStatusContext;
     return UIStatusBarStyleLightContent;
 }
 
+/*
 - (BOOL)shouldAutorotate {
     if ([[UIDevice currentDevice].model hasPrefix:@"iPhone"] || [[UIDevice currentDevice].model hasPrefix:@"iPod"]) {
         return NO;
@@ -136,6 +137,7 @@ static const NSString *ItemStatusContext;
         return UIInterfaceOrientationMaskAll;
     }
 }
+*/
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
     
