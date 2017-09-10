@@ -55,7 +55,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     Notifier *notifier;
 
     // UI elements
-    UIImageView *logoView;
+    //UIImageView *logoView;
     UILabel *appTitleLabel;
     UILabel *appSubTitleLabel;
     UIButton *startStopButton;
@@ -132,12 +132,12 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     [self addStatusLabel];
     [self addRegionSelectionBar];
     [self addVersionLabel];
-    [self addLogoImage];
+    //[self addLogoImage];
     [self addAppTitleLabel];
     [self addAppSubTitleLabel];
 
     if (([[UIDevice currentDevice].model hasPrefix:@"iPhone"] || [[UIDevice currentDevice].model hasPrefix:@"iPod"]) && (self.view.bounds.size.width > self.view.bounds.size.height)) {
-        logoView.hidden = YES;
+        //logoView.hidden = YES;
         appTitleLabel.hidden = YES;
         appSubTitleLabel.hidden = YES;
     }
@@ -212,7 +212,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
         [self.view removeConstraint:startButtonScreenWidth];
         [self.view addConstraint:startButtonScreenHeight];
         if ([[UIDevice currentDevice].model hasPrefix:@"iPhone"]) {
-            logoView.hidden = YES;
+            //logoView.hidden = YES;
             appTitleLabel.hidden = YES;
             appSubTitleLabel.hidden = YES;
         }
@@ -220,7 +220,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
         [self.view removeConstraint:startButtonScreenHeight];
         [self.view addConstraint:startButtonScreenWidth];
         if ([[UIDevice currentDevice].model hasPrefix:@"iPhone"]) {
-            logoView.hidden = NO;
+            //logoView.hidden = NO;
             appTitleLabel.hidden = NO;
             appSubTitleLabel.hidden = NO;
         }
@@ -338,7 +338,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     isStartStopButtonHaloOn = FALSE;
 }
 
-- (void)addLogoImage {
+/*- (void)addLogoImage {
     logoView = [[UIImageView alloc] init];
     [logoView setImage:[UIImage imageNamed:@"Logo"]];
     [logoView setTranslatesAutoresizingMaskIntoConstraints:NO];
@@ -361,7 +361,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                                                           attribute:NSLayoutAttributeCenterX
                                                          multiplier:1.0
                                                            constant:0]];
-}
+}*/
 
 - (void)addAppTitleLabel {
     appTitleLabel = [[UILabel alloc] init];
@@ -375,11 +375,11 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     // Setup autolayout
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:appTitleLabel
                                                           attribute:NSLayoutAttributeTop
-                                                          relatedBy:NSLayoutRelationGreaterThanOrEqual
+                                                          relatedBy:NSLayoutRelationLessThanOrEqual
                                                              toItem:self.topLayoutGuide
                                                           attribute:NSLayoutAttributeBottom
                                                          multiplier:1.0
-                                                           constant:90]];
+                                                           constant:30]];
     
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:appTitleLabel
                                                           attribute:NSLayoutAttributeLeft
