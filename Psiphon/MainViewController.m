@@ -138,8 +138,8 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 
     if (([[UIDevice currentDevice].model hasPrefix:@"iPhone"] || [[UIDevice currentDevice].model hasPrefix:@"iPod"]) && (self.view.bounds.size.width > self.view.bounds.size.height)) {
         //logoView.hidden = YES;
-        appTitleLabel.hidden = YES;
-        appSubTitleLabel.hidden = YES;
+        //appTitleLabel.hidden = YES;
+        //appSubTitleLabel.hidden = YES;
     }
 
     // TODO: load/save config here to have the user immediately complete the permission prompt
@@ -189,6 +189,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     return UIStatusBarStyleLightContent;
 }
 
+/*
 - (BOOL)shouldAutorotate {
     if ([[UIDevice currentDevice].model hasPrefix:@"iPhone"] || [[UIDevice currentDevice].model hasPrefix:@"iPod"]) {
         return NO;
@@ -203,6 +204,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
         return UIInterfaceOrientationMaskAll;
     }
 }
+*/
 
 // Reload when rotate
 - (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator {
@@ -213,16 +215,16 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
         [self.view addConstraint:startButtonScreenHeight];
         if ([[UIDevice currentDevice].model hasPrefix:@"iPhone"]) {
             //logoView.hidden = YES;
-            appTitleLabel.hidden = YES;
-            appSubTitleLabel.hidden = YES;
+            //appTitleLabel.hidden = YES;
+            //appSubTitleLabel.hidden = YES;
         }
     } else {
         [self.view removeConstraint:startButtonScreenHeight];
         [self.view addConstraint:startButtonScreenWidth];
         if ([[UIDevice currentDevice].model hasPrefix:@"iPhone"]) {
             //logoView.hidden = NO;
-            appTitleLabel.hidden = NO;
-            appSubTitleLabel.hidden = NO;
+            //appTitleLabel.hidden = NO;
+            //appSubTitleLabel.hidden = NO;
         }
     }
 
@@ -369,7 +371,11 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     appTitleLabel.text = NSLocalizedStringWithDefaultValue(@"APP_TITLE_MAIN_VIEW", nil, [NSBundle mainBundle], @"PSIPHON", @"Text for app title on main view.");
     appTitleLabel.textAlignment = NSTextAlignmentCenter;
     appTitleLabel.textColor = [UIColor whiteColor];
-    appTitleLabel.font = [UIFont fontWithName:@"Bourbon-Oblique" size:self.view.frame.size.width * 0.10625f];
+    int narrowestWidth = self.view.frame.size.width;
+    if (self.view.frame.size.height < self.view.frame.size.width) {
+        narrowestWidth = self.view.frame.size.height;
+    }
+    appTitleLabel.font = [UIFont fontWithName:@"Bourbon-Oblique" size:narrowestWidth * 0.10625f];
     [self.view addSubview:appTitleLabel];
     
     // Setup autolayout
@@ -379,7 +385,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                                                              toItem:self.topLayoutGuide
                                                           attribute:NSLayoutAttributeBottom
                                                          multiplier:1.0
-                                                           constant:30]];
+                                                           constant:30.0]];
     
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:appTitleLabel
                                                           attribute:NSLayoutAttributeLeft
@@ -404,15 +410,27 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     appSubTitleLabel.text = NSLocalizedStringWithDefaultValue(@"APP_SUB_TITLE_MAIN_VIEW", nil, [NSBundle mainBundle], @"BEYOND BORDERS", @"Text for app subtitle on main view.");
     appSubTitleLabel.textAlignment = NSTextAlignmentCenter;
     appSubTitleLabel.textColor = [UIColor whiteColor];
-    appSubTitleLabel.font = [UIFont fontWithName:@"Bourbon-Oblique" size:self.view.frame.size.width * 0.10625f/2.0f];
+    int narrowestWidth = self.view.frame.size.width;
+    if (self.view.frame.size.height < self.view.frame.size.width) {
+        narrowestWidth = self.view.frame.size.height;
+    }
+    appSubTitleLabel.font = [UIFont fontWithName:@"Bourbon-Oblique" size:narrowestWidth * 0.10625f/2.0f];
     [self.view addSubview:appSubTitleLabel];
     
     // Setup autolayout
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:appSubTitleLabel
                                                           attribute:NSLayoutAttributeTop
-                                                          relatedBy:NSLayoutRelationGreaterThanOrEqual
+                                                          relatedBy:NSLayoutRelationEqual
                                                              toItem:appTitleLabel
                                                           attribute:NSLayoutAttributeBottom
+                                                         multiplier:1.0
+                                                           constant:0]];
+    
+    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:appSubTitleLabel
+                                                          attribute:NSLayoutAttributeBottom
+                                                          relatedBy:NSLayoutRelationLessThanOrEqual
+                                                             toItem:adLabel
+                                                          attribute:NSLayoutAttributeTop
                                                          multiplier:1.0
                                                            constant:0]];
     
@@ -833,14 +851,6 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 
     // Setup autolayout
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:adLabel
-                                                          attribute:NSLayoutAttributeTop
-                                                          relatedBy:NSLayoutRelationGreaterThanOrEqual
-                                                             toItem:self.topLayoutGuide
-                                                          attribute:NSLayoutAttributeBottom
-                                                         multiplier:1.0
-                                                           constant:0]];
-    
-    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:adLabel
                                                           attribute:NSLayoutAttributeBottom
                                                           relatedBy:NSLayoutRelationGreaterThanOrEqual
                                                              toItem:startStopButton
@@ -848,6 +858,14 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                                                          multiplier:1.0
                                                            constant:-30.0]];
 
+    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:adLabel
+                                                          attribute:NSLayoutAttributeBottom
+                                                          relatedBy:NSLayoutRelationLessThanOrEqual
+                                                             toItem:startStopButton
+                                                          attribute:NSLayoutAttributeTop
+                                                         multiplier:1.0
+                                                           constant:0]];
+    
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:adLabel
                                                           attribute:NSLayoutAttributeLeft
                                                           relatedBy:NSLayoutRelationEqual
