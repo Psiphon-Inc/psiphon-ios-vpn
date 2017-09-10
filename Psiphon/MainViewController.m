@@ -369,7 +369,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     appTitleLabel.text = NSLocalizedStringWithDefaultValue(@"APP_TITLE_MAIN_VIEW", nil, [NSBundle mainBundle], @"PSIPHON", @"Text for app title on main view.");
     appTitleLabel.textAlignment = NSTextAlignmentCenter;
     appTitleLabel.textColor = [UIColor whiteColor];
-    appTitleLabel.font = [UIFont systemFontOfSize:appTitleLabel.font.pointSize + 3.f];
+    appTitleLabel.font = [UIFont fontWithName:@"Bourbon-Oblique" size:self.view.frame.size.width * 0.10625f];
     [self.view addSubview:appTitleLabel];
     
     // Setup autolayout
@@ -404,6 +404,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     appSubTitleLabel.text = NSLocalizedStringWithDefaultValue(@"APP_SUB_TITLE_MAIN_VIEW", nil, [NSBundle mainBundle], @"BEYOND BORDERS", @"Text for app subtitle on main view.");
     appSubTitleLabel.textAlignment = NSTextAlignmentCenter;
     appSubTitleLabel.textColor = [UIColor whiteColor];
+    appSubTitleLabel.font = [UIFont fontWithName:@"Bourbon-Oblique" size:self.view.frame.size.width * 0.10625f/2.0f];
     [self.view addSubview:appSubTitleLabel];
     
     // Setup autolayout
