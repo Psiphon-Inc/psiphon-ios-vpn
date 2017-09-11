@@ -25,7 +25,7 @@
     NSString *appGroupIdentifier;
 }
 
-void cfNotificationCallback(CFNotificationCenterRef center, void *observer, CFStringRef name,
+static void cfNotificationCallback(CFNotificationCenterRef center, void *observer, CFStringRef name,
   void const *object, CFDictionaryRef userInfo) {
 
     NSString *key = (__bridge NSString *) name;
