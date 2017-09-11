@@ -38,23 +38,21 @@
 #define COL_HOMEPAGE_URL @"url"
 #define COL_HOMEPAGE_TIMESTAMP @"timestamp"
 
-// Tunnel State Table
-#define TABLE_TUN_STATE @"tunnel_state"
-#define COL_TUN_STATE_CONNECTED @"connected"
-
-// App (container) State Table
-#define TABLE_APP_STATE @"app_state"
-#define COL_APP_STATE_FOREGROUND @"foreground"
-
 // Egress Regions Table
 #define TABLE_EGRESS_REGIONS @"egress_regions"
 #define COL_EGRESS_REGIONS_REGION_NAME @"url"
 #define COL_EGRESS_REGIONS_TIMESTAMP @"timestamp"
 
+/* NSUserDefaults keys */
+
+#define TUN_CONNECTED_KEY @"tun_connected"
+#define APP_FOREGROUND_KEY @"app_foreground"
+
 @implementation Homepage
 @end
 
 @implementation PsiphonDataSharedDB {
+    NSUserDefaults *sharedDefaults;
     FMDatabaseQueue *q;
 
     NSString *appGroupIdentifier;
@@ -75,6 +73,9 @@
     self = [super init];
     if (self) {
         appGroupIdentifier = identifier;
+
+        sharedDefaults = [[NSUserDefaults alloc] initWithSuiteName:identifier];
+
         databasePath = [[[NSFileManager defaultManager] containerURLForSecurityApplicationGroupIdentifier:appGroupIdentifier] path];
 
         lastLogRowId = -1;
@@ -104,15 +105,7 @@
         "CREATE TABLE IF NOT EXISTS " TABLE_EGRESS_REGIONS " ("
         COL_ID " INTEGER PRIMARY KEY AUTOINCREMENT, "
         COL_EGRESS_REGIONS_REGION_NAME " TEXT NOT NULL, "
-        COL_EGRESS_REGIONS_TIMESTAMP " TIMESTAMP DEFAULT CURRENT_TIMESTAMP);"
-
-       "CREATE TABLE IF NOT EXISTS " TABLE_TUN_STATE " ("
-        COL_ID " INTEGER PRIMARY KEY AUTOINCREMENT, "
-        COL_TUN_STATE_CONNECTED " INTEGER NOT NULL);"
-
-       "CREATE TABLE IF NOT EXISTS " TABLE_APP_STATE " ("
-        COL_ID " INTEGER PRIMARY KEY AUTOINCREMENT, "
-        COL_APP_STATE_FOREGROUND " INTEGER NOT NULL);";
+        COL_EGRESS_REGIONS_TIMESTAMP " TIMESTAMP DEFAULT CURRENT_TIMESTAMP);";
 
     LOG_DEBUG(@"Create DATABASE");
 
@@ -359,109 +352,47 @@
 #pragma mark - Tunnel State table methods
 
 /**
- * @brief Inserts new tunnel connected state into the database, and deletes
- *        all previous records.
- * @param connected Tunnel core connected status
- * @return YES if database operation finished successfully, NO otherwise.
+ * @brief Sets tunnel connection state in shared NSUserDefaults dictionary.
+ *        NOTE: This method blocks until changes are written to disk.
+ * @param connected Tunnel core connected status.
+ * @return TRUE if change was persisted to disk successfully, FALSE otherwise.
  */
 - (BOOL)updateTunnelConnectedState:(BOOL)connected {
-    __block BOOL success = NO;
-    [q inTransaction:^(FMDatabase *db, BOOL *rollback) {
-        success = [db executeUpdate:@"DELETE FROM " TABLE_TUN_STATE];
-        success |= [db executeUpdate:
-          @"INSERT INTO " TABLE_TUN_STATE " (" COL_TUN_STATE_CONNECTED ") VALUES (?)", @(connected), nil];
-
-        if (!success) {
-            LOG_ERROR(@"Rolling back, error %@", [db lastError]);
-            *rollback = YES;
-            return;
-        }
-    }];
-
-    return success;
+    [sharedDefaults setBool:connected forKey:TUN_CONNECTED_KEY];
+    return [sharedDefaults synchronize];
 }
 
 /**
- * @brief Returns previously written tunnel state from the database.
+ * @brief Returns previously persisted tunnel state from the shared NSUserDefaults.
  *        This state is invalid if the network extension is not running.
- * @return YES if tunnel is connected, NO otherwise.
+ *        NOTE: returns FALSE if no previous value was set using updateTunnelConnectedState:
+ * @return TRUE if tunnel is connected, FALSE otherwise.
  */
 - (BOOL)getTunnelConnectedState {
-    __block BOOL connected = NO;
-
-    [q inDatabase:^(FMDatabase *db) {
-        FMResultSet *rs = [db executeQuery:@"SELECT * FROM " TABLE_TUN_STATE];
-
-        if (rs == nil) {
-            LOG_ERROR(@"%@", [db lastError]);
-            return;
-        }
-
-        if (![rs next]) {
-            LOG_ERROR(@"No previous data recorded.");
-            return;
-        }
-
-        connected = [rs boolForColumn:COL_TUN_STATE_CONNECTED];
-
-        [rs close];
-    }];
-
-    return connected;
+    // Returns FALSE if no previous value was associated with this key.
+    return [sharedDefaults boolForKey:TUN_CONNECTED_KEY];
 }
 
 # pragma mark - App State table methods
 
 /**
- * @brief Inserts new app foreground state into the database, and deletes
- *        all previous records.
- * @param foregournd Whether app is on the foreground or not.
- * @return YES if database operation finished successfully, NO otherwise.
+ * @brief Sets app foreground state in shared NSSUserDefaults dictionary.
+ *        NOTE: this method blocks until changes are written to disk.
+ * @param foreground Whether app is on the foreground or not.
+ * @return TRUE if change was persisted to disk successfully, FALSE otherwise.
  */
 - (BOOL)updateAppForegroundState:(BOOL)foreground {
-    __block BOOL success = NO;
-    [q inTransaction:^(FMDatabase *db, BOOL *rollback) {
-        success = [db executeUpdate:@"DELETE FROM " TABLE_APP_STATE];
-        success |= [db executeUpdate:
-          @"INSERT INTO " TABLE_APP_STATE " (" COL_APP_STATE_FOREGROUND ") VALUES (?)",
-          @(foreground), nil];
-
-        if (!success) {
-            LOG_ERROR(@"Rolling back, error %@", [db lastError]);
-            *rollback = YES;
-            return;
-        }
-    }];
-
-    return success;
+    [sharedDefaults setBool:foreground forKey:APP_FOREGROUND_KEY];
+    return [sharedDefaults synchronize];
 }
 
 /**
- * @brief Returns previously written foreground app state from the database.
- * @return YES if app if on the foreground, NO otherwise.
+ * @brief Returns previously persisted app foreground state from the shared NSUserDefaults
+ *        NOTE: returns FALSE if no previous value was set using updateAppForegroundState:
+ * @return TRUE if app if on the foreground, FALSE otherwise.
  */
 - (BOOL)getAppForegroundState {
-    __block BOOL foreground = NO;
-
-    [q inDatabase:^(FMDatabase *db) {
-        FMResultSet *rs = [db executeQuery:@"SELECT * FROM " TABLE_APP_STATE];
-
-        if (rs == nil) {
-            LOG_ERROR(@"%@", [db lastError]);
-            return;
-        }
-
-        if (![rs next]) {
-            LOG_ERROR(@"Failed to retrieve row successfully. Aborting.");
-            abort();
-        }
-
-        foreground = [rs boolForColumn:COL_APP_STATE_FOREGROUND];
-
-        [rs close];
-    }];
-
-    return foreground;
+    return [sharedDefaults boolForKey:APP_FOREGROUND_KEY];
 }
 
 #pragma mark - Helper methods
