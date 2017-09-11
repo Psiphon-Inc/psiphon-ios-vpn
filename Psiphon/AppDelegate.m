@@ -247,12 +247,12 @@
                 if ([homepages count] > 0) {
                     NSUInteger randIndex = arc4random() % [homepages count];
                     Homepage *homepage = homepages[randIndex];
-
-                    [[UIApplication sharedApplication] openURL:homepage.url options:@{}
-                                             completionHandler:^(BOOL success) {
-                                                 shownHomepage = success;
-                                             }];
-
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        [[UIApplication sharedApplication] openURL:homepage.url options:@{}
+                                                 completionHandler:^(BOOL success) {
+                                                     shownHomepage = success;
+                                                 }];
+                    });
                 }
             }
         });
