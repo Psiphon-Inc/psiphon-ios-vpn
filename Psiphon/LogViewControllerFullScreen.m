@@ -69,7 +69,7 @@
 
 #if DEBUG
             for (DiagnosticEntry *log in logs) {
-                DEBUG(@"%@ %@", [log getTimestampForDisplay], [log message]);
+               LOG_DEBUG(@"%@ %@", [log getTimestampForDisplay], [log message]);
             }
 #endif
         });

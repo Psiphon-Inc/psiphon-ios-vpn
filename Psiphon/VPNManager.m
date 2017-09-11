@@ -98,7 +98,7 @@
 
         if (error) {
             if (completionHandler) {
-                ERROR(@"%@", error);
+                LOG_ERROR(@"%@", error);
                 completionHandler([VPNManager errorWithCode:VPNManagerErrorLoadConfigsFailed]);
             }
             return;
@@ -107,7 +107,7 @@
         // If there are no configurations, create one
         // if there is more than one, abort!
         if ([allManagers count] == 0) {
-            WARN(@"No VPN configurations found.");
+            LOG_WARN(@"No VPN configurations found.");
             NETunnelProviderManager *newManager = [[NETunnelProviderManager alloc] init];
             NETunnelProviderProtocol *providerProtocol = [[NETunnelProviderProtocol alloc] init];
             providerProtocol.providerBundleIdentifier = @"ca.psiphon.Psiphon.PsiphonVPN";
@@ -115,7 +115,7 @@
             newManager.protocolConfiguration.serverAddress = @"localhost";
             self.targetManager = newManager;
         } else if ([allManagers count] > 1) {
-            ERROR(@"%lu VPN configurations found, only expected 1. Aborting", (unsigned long)[allManagers count]);
+            LOG_ERROR(@"%lu VPN configurations found, only expected 1. Aborting", (unsigned long)[allManagers count]);
             if (completionHandler) {
                 completionHandler([VPNManager errorWithCode:VPNManagerErrorTooManyConfigsFounds]);
             }
@@ -126,12 +126,12 @@
         // enabled VPN Configuration from the prefrences.
         [self.targetManager setEnabled:TRUE];
 
-        DEBUG(@"call saveToPreferencesWithCompletionHandler");
+       LOG_DEBUG(@"call saveToPreferencesWithCompletionHandler");
 
         [self.targetManager saveToPreferencesWithCompletionHandler:^(NSError * _Nullable error) {
             if (error != nil) {
                 // User denied permission to add VPN Configuration.
-                ERROR(@"failed to save the configuration: %@", error);
+                LOG_ERROR(@"failed to save the configuration: %@", error);
                 if (completionHandler) {
                     completionHandler([VPNManager errorWithCode:VPNManagerErrorUserDeniedConfigInstall]);
                 }
@@ -140,28 +140,28 @@
 
             [self.targetManager loadFromPreferencesWithCompletionHandler:^(NSError * _Nullable error) {
                 if (error != nil) {
-                    ERROR(@"second loadFromPreferences failed");
+                    LOG_ERROR(@"second loadFromPreferences failed");
                     if (completionHandler) {
                         completionHandler([VPNManager errorWithCode:VPNManagerErrorLoadConfigsFailed]);
                     }
                     return;
                 }
 
-                DEBUG(@"Call targetManager.connection.startVPNTunnel()");
+               LOG_DEBUG(@"Call targetManager.connection.startVPNTunnel()");
                 NSError *vpnStartError;
                 NSDictionary *extensionOptions = @{EXTENSION_OPTION_START_FROM_CONTAINER : @YES};
 
                 BOOL vpnStartSuccess = [self.targetManager.connection startVPNTunnelWithOptions:extensionOptions
                                                                                  andReturnError:&vpnStartError];
                 if (!vpnStartSuccess) {
-                    ERROR(@"startVPNTunnel failed: %@", vpnStartError);
+                    LOG_ERROR(@"startVPNTunnel failed: %@", vpnStartError);
                     if (completionHandler) {
                         completionHandler([VPNManager errorWithCode:VPNManagerErrorNEStartFailed]);
                     }
                     return;
                 }
 
-                DEBUG(@"startVPNTunnel success");
+               LOG_DEBUG(@"startVPNTunnel success");
                 if (completionHandler) {
                     completionHandler(nil);
                 }
@@ -175,7 +175,7 @@
     if (s == NEVPNStatusConnecting) {
         [notifier post:@"M.startVPN"];
     } else {
-        WARN(@"Network extension is not in connecting state.");
+        LOG_WARN(@"Network extension is not in connecting state.");
     }
 }
 

@@ -95,7 +95,7 @@
 }
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-    DEBUG();
+   LOG_DEBUG();
     // Override point for customization after application launch.
     self.window = [[UIWindow alloc] initWithFrame:UIScreen.mainScreen.bounds];
 
@@ -116,13 +116,13 @@
 }
 
 - (void)applicationWillResignActive:(UIApplication *)application {
-    DEBUG();
+   LOG_DEBUG();
     // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
     // Use this method to pause ongoing tasks, disable timers, and invalidate graphics rendering callbacks. Games should use this method to pause the game.
 }
 
 - (void)applicationDidEnterBackground:(UIApplication *)application {
-    DEBUG();
+   LOG_DEBUG();
     // Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later.
     // If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
     [notifier post:@"D.applicationDidEnterBackground"];
@@ -130,7 +130,7 @@
 }
 
 - (void)applicationWillEnterForeground:(UIApplication *)application {
-    DEBUG();
+   LOG_DEBUG();
     // Called as part of the transition from the background to the active state; here you can undo many of the changes made on entering the background.
     
     [self setRootViewController];
@@ -139,7 +139,7 @@
 }
 
 - (void)applicationDidBecomeActive:(UIApplication *)application {
-    DEBUG();
+   LOG_DEBUG();
     // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
     [sharedDB updateAppForegroundState:YES];
 
@@ -155,7 +155,7 @@
 }
 
 - (void)applicationWillTerminate:(UIApplication *)application {
-    DEBUG();
+   LOG_DEBUG();
     // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
 }
 
@@ -242,7 +242,7 @@
 
 - (void)listenForNEMessages {
     [notifier listenForNotification:@"NE.newHomepages" listener:^{
-        DEBUG(@"Received notification NE.newHomepages");
+       LOG_DEBUG(@"Received notification NE.newHomepages");
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
             if (!shownHomepage) {
                 NSArray<Homepage *> *homepages = [sharedDB getAllHomepages];
@@ -261,7 +261,7 @@
     }];
 
     [notifier listenForNotification:@"NE.tunnelConnected" listener:^{
-        DEBUG(@"Received notification NE.tunnelConnected");
+       LOG_DEBUG(@"Received notification NE.tunnelConnected");
         // If we haven't had a chance to load an Ad, and the
         // tunnel is already connected, give up on the Ad and
         // start the VPN. Otherwise the startVPN message will be
@@ -272,7 +272,7 @@
     }];
 
     [notifier listenForNotification:@"NE.onAvailableEgressRegions" listener:^{ // TODO should be put in a constants file
-        DEBUG(@"Received notification NE.onAvailableEgressRegions");
+       LOG_DEBUG(@"Received notification NE.onAvailableEgressRegions");
         // Update available regions
         // TODO: this code is duplicated in MainViewController updateAvailableRegions
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{

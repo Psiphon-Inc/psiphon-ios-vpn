@@ -114,13 +114,13 @@
         COL_ID " INTEGER PRIMARY KEY AUTOINCREMENT, "
         COL_APP_STATE_FOREGROUND " INTEGER NOT NULL);";
 
-    DEBUG(@"Create DATABASE");
+    LOG_DEBUG(@"Create DATABASE");
 
     __block BOOL success = FALSE;
     [q inDatabase:^(FMDatabase *db) {
         success = [db executeStatements:CREATE_TABLE_STATEMENTS];
         if (!success) {
-            ERROR(@"%@", [db lastError]);
+            LOG_ERROR(@"%@", [db lastError]);
         }
     }];
 
@@ -140,7 +140,7 @@
     [q inDatabase:^(FMDatabase *db) {
         success = [db executeStatements:CLEAR_TABLES];
         if (!success) {
-            ERROR(@"%@", [db lastError]);
+            LOG_ERROR(@"%@", [db lastError]);
         }
     }];
 
@@ -165,7 +165,7 @@
         }
 
         if (!success) {
-            ERROR(@"Rolling back, error %@", [db lastError]);
+            LOG_ERROR(@"Rolling back, error %@", [db lastError]);
             *rollback = TRUE;
             return;
         }
@@ -184,7 +184,7 @@
         FMResultSet *rs = [db executeQuery:@"SELECT * FROM " TABLE_HOMEPAGE];
 
         if (rs == nil) {
-            ERROR(@"%@", [db lastError]);
+            LOG_ERROR(@"%@", [db lastError]);
             return;
         }
 
@@ -221,7 +221,7 @@
         }
 
         if (!success) {
-            ERROR(@"Rolling back, error %@", [db lastError]);
+            LOG_ERROR(@"Rolling back, error %@", [db lastError]);
             *rollback = TRUE;
             return;
         }
@@ -240,7 +240,7 @@
         FMResultSet *rs = [db executeQuery:@"SELECT * FROM " TABLE_EGRESS_REGIONS];
 
         if (rs == nil) {
-            ERROR(@"%@", [db lastError]);
+            LOG_ERROR(@"%@", [db lastError]);
             return;
         }
 
@@ -268,7 +268,7 @@
           withErrorAndBindings:&err, message, @YES, nil /* TODO */];
 
         if (!success) {
-            ERROR(@"%@", err);
+            LOG_ERROR(@"%@", err);
             // TODO: error handling/logging
         }
     }];
@@ -302,7 +302,7 @@
           withErrorAndBindings:&err, @MAX_LOG_LINES, nil];
 
         if (!success) {
-            ERROR(@"%@", err);
+            LOG_ERROR(@"%@", err);
             // TODO: error handling/logging
         }
     }];
@@ -331,7 +331,7 @@
         FMResultSet *rs = [db executeQuery:@"SELECT * FROM log WHERE _ID > (?);", @(lastId), nil];
 
         if (rs == nil) {
-            ERROR(@"%@", [db lastError]);
+            LOG_ERROR(@"%@", [db lastError]);
             return;
         }
 
@@ -372,7 +372,7 @@
           @"INSERT INTO " TABLE_TUN_STATE " (" COL_TUN_STATE_CONNECTED ") VALUES (?)", @(connected), nil];
 
         if (!success) {
-            ERROR(@"Rolling back, error %@", [db lastError]);
+            LOG_ERROR(@"Rolling back, error %@", [db lastError]);
             *rollback = YES;
             return;
         }
@@ -393,12 +393,12 @@
         FMResultSet *rs = [db executeQuery:@"SELECT * FROM " TABLE_TUN_STATE];
 
         if (rs == nil) {
-            ERROR(@"%@", [db lastError]);
+            LOG_ERROR(@"%@", [db lastError]);
             return;
         }
 
         if (![rs next]) {
-            ERROR(@"No previous data recorded.");
+            LOG_ERROR(@"No previous data recorded.");
             return;
         }
 
@@ -427,7 +427,7 @@
           @(foreground), nil];
 
         if (!success) {
-            ERROR(@"Rolling back, error %@", [db lastError]);
+            LOG_ERROR(@"Rolling back, error %@", [db lastError]);
             *rollback = YES;
             return;
         }
@@ -447,12 +447,12 @@
         FMResultSet *rs = [db executeQuery:@"SELECT * FROM " TABLE_APP_STATE];
 
         if (rs == nil) {
-            ERROR(@"%@", [db lastError]);
+            LOG_ERROR(@"%@", [db lastError]);
             return;
         }
 
         if (![rs next]) {
-            ERROR(@"Failed to retrieve row successfully. Aborting.");
+            LOG_ERROR(@"Failed to retrieve row successfully. Aborting.");
             abort();
         }
 

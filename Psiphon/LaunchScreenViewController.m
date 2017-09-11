@@ -70,13 +70,13 @@ static const NSString *ItemStatusContext;
                  playerLayer.videoGravity = AVLayerVideoGravityResizeAspect;
                  playerLayer.needsDisplayOnBoundsChange = YES;
 
-                 DEBUG(@"Loading video");
+                LOG_DEBUG(@"Loading video");
                  [self.view.layer addSublayer:playerLayer];
                  self.view.layer.needsDisplayOnBoundsChange = YES;
              }
              else {
                  // You should deal with the error appropriately.
-                 DEBUG(@"The asset's tracks were not loaded:\n%@", [error localizedDescription]);
+                LOG_DEBUG(@"The asset's tracks were not loaded:\n%@", [error localizedDescription]);
              }
         });
      }];
