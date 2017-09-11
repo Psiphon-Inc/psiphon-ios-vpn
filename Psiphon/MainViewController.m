@@ -228,8 +228,20 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
         }
     }
 
+    if (isStartStopButtonHaloOn && startStopButtonHalo) {
+        startStopButtonHalo.position = CGPointMake(size.width/2, size.height/2); // keep halo centered
+    }
+
     [self.view addConstraint:startButtonWidth];
-    [coordinator animateAlongsideTransition:nil completion:^(id<UIViewControllerTransitionCoordinatorContext> context) {
+
+    [coordinator animateAlongsideTransition:^(id<UIViewControllerTransitionCoordinatorContext> context) {
+        if (isStartStopButtonHaloOn && startStopButtonHalo) {
+            startStopButtonHalo.hidden = YES;
+        }
+    } completion:^(id<UIViewControllerTransitionCoordinatorContext> context) {
+        if (isStartStopButtonHaloOn && startStopButtonHalo) {
+            startStopButtonHalo.hidden = NO;
+        }
     }];
 
     [super viewWillTransitionToSize:size withTransitionCoordinator:coordinator];
