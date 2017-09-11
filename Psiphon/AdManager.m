@@ -74,17 +74,17 @@
 }
 
 - (void)initializeAds {
-    DEBUG();
+   LOG_DEBUG();
     
     if ([self shouldShowUntunneledAds]) {
         if (!self.untunneledInterstitial) {
-            DEBUG(@"Initializing");
+           LOG_DEBUG(@"Initializing");
             // Init code.
             [GADMobileAds configureWithApplicationID:@"ca-app-pub-1072041961750291~2085686375"];
             [self loadUntunneledInterstitial];
         }
     } else if (!self.untunneledInterstitialIsShowing) {
-        DEBUG(@"Deinitializing");
+       LOG_DEBUG(@"Deinitializing");
         // De-init code.
         [MPInterstitialAdController removeSharedInterstitialAdController:self.untunneledInterstitial];
         self.untunneledInterstitial = nil;
@@ -100,7 +100,7 @@
 }
 
 - (void)loadUntunneledInterstitial {
-    DEBUG();
+   LOG_DEBUG();
     self.untunneledInterstitial = [MPInterstitialAdController
       interstitialAdControllerForAdUnitId:@"4250ebf7b28043e08ddbe04d444d79e4"];
     self.untunneledInterstitial.delegate = self;
@@ -108,7 +108,7 @@
 }
 
 - (void)showUntunneledInterstitial {
-    DEBUG();
+   LOG_DEBUG();
     if ([self untunneledInterstitialIsReady]) {
         [self.untunneledInterstitial showFromViewController:[[AppDelegate sharedAppDelegate] getMainViewController]];
     } else {
@@ -134,27 +134,27 @@
 #pragma mark - Interestitial callbacks
 
 - (void)interstitialDidLoadAd:(MPInterstitialAdController *)interstitial {
-    DEBUG();
+   LOG_DEBUG();
 
     [self postAdsLoadStateDidChangeNotification];
 }
 
 - (void)interstitialWillAppear:(MPInterstitialAdController *)interstitial {
-    DEBUG();
+   LOG_DEBUG();
     
     self.untunneledInterstitialIsShowing = TRUE;
     self.untunneledInterstitialHasShown = TRUE;
 }
 
 - (void)interstitialDidFailToLoadAd:(MPInterstitialAdController *)interstitial {
-    DEBUG();
+   LOG_DEBUG();
     
     // Don't retry.
     [self postAdsLoadStateDidChangeNotification];
 }
 
 - (void)interstitialDidExpire:(MPInterstitialAdController *)interstitial {
-    DEBUG();
+   LOG_DEBUG();
 
     [self postAdsLoadStateDidChangeNotification];
 
@@ -162,7 +162,7 @@
 }
 
 - (void)interstitialDidDisappear:(MPInterstitialAdController *)interstitial {
-    DEBUG();
+   LOG_DEBUG();
 
     self.untunneledInterstitialIsShowing = FALSE;
     

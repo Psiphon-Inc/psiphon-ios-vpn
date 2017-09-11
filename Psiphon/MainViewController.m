@@ -110,7 +110,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 #pragma mark - Lifecycle methods
 
 - (void)viewDidLoad {
-    DEBUG();
+   LOG_DEBUG();
     [super viewDidLoad];
 
     // TODO: check if database exists first
@@ -147,7 +147,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 }
 
 - (void)viewDidAppear:(BOOL)animated {
-    DEBUG();
+   LOG_DEBUG();
     [super viewDidAppear:animated];
     // Available regions may have changed in the background
     [self updateAvailableRegions];
@@ -163,7 +163,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 }
 
 - (void)viewWillAppear:(BOOL)animated {
-    DEBUG();
+   LOG_DEBUG();
     [super viewWillAppear:animated];
 
     // Listen for VPN status changes from VPNManager.
@@ -175,14 +175,14 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
-    DEBUG();
+   LOG_DEBUG();
     [super viewWillDisappear:animated];
     // Stop listening for diagnostic messages (we don't want to hold the shared db lock while backgrounded)
     [notifier stopListeningForAllNotifications];
 }
 
 - (void)viewDidDisappear:(BOOL)animated {
-    DEBUG();
+   LOG_DEBUG();
     [super viewDidDisappear:animated];
 }
 
@@ -285,7 +285,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
         }
 
     } else {
-        DEBUG(@"call [vpnManager stopVPN]");
+       LOG_DEBUG(@"call [vpnManager stopVPN]");
         [vpnManager stopVPN];
 
         [self removePulsingHaloLayer];

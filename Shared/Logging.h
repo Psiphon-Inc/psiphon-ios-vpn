@@ -22,21 +22,21 @@
 #if DEBUG
 
 // Logs a message to Apple System Log facility with log level DEBUG
-#define DEBUG(format, ...) \
+#define LOG_DEBUG(format, ...) \
  NSLog((@"<DEBUG> %s [Line %d]: " format), __PRETTY_FUNCTION__, __LINE__, ##__VA_ARGS__)
 
 // Logs a message to Apple System Log facility with log level WARN
-#define WARN(format, ...) \
+#define LOG_WARN(format, ...) \
  NSLog((@"<WARN> %s [Line %d]: " format), __PRETTY_FUNCTION__, __LINE__, ##__VA_ARGS__)
 
 // Logs a message to Apple System Log facility with log level ERROR
-#define ERROR(format, ...) \
+#define LOG_ERROR(format, ...) \
  NSLog((@"<ERROR> %s [Line %d]: " format), __PRETTY_FUNCTION__, __LINE__, ##__VA_ARGS__)
 
 #else
 
-#define DEBUG(...)
-#define WARN(...)
-#define ERROR(...)
+#define LOG_DEBUG(...)
+#define LOG_WARN(...)
+#define LOG_ERROR(...)
 
 #endif

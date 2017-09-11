@@ -92,7 +92,7 @@ static const double kDefaultLogTruncationInterval = 12 * 60 * 60; // 12 hours
         [self setTunnelNetworkSettings:[self getTunnelSettings] completionHandler:^(NSError *_Nullable error) {
 
             if (error != nil) {
-                ERROR(@"setTunnelNetworkSettings failed: %@", error);
+                LOG_ERROR(@"setTunnelNetworkSettings failed: %@", error);
                 startTunnelCompletionHandler([[NSError alloc] initWithDomain:PSIPHON_TUNNEL_ERROR_DOMAIN code:PSIPHON_TUNNEL_ERROR_BAD_CONFIGURATION userInfo:nil]);
                 return;
             }
@@ -100,7 +100,7 @@ static const double kDefaultLogTruncationInterval = 12 * 60 * 60; // 12 hours
 
             BOOL success = [weakPsiphonTunnel start:FALSE];
             if (!success) {
-                ERROR(@"psiphonTunnel.start failed");
+                LOG_ERROR(@"psiphonTunnel.start failed");
                 startTunnelCompletionHandler([[NSError alloc] initWithDomain:PSIPHON_TUNNEL_ERROR_DOMAIN code:PSIPHON_TUNNEL_ERROR_INTERAL_ERROR userInfo:nil]);
                 return;
             }
@@ -271,7 +271,7 @@ static const double kDefaultLogTruncationInterval = 12 * 60 * 60; // 12 hours
       stringByAppendingPathComponent:@"psiphon_config"];
 
     if (![fileManager fileExistsAtPath:bundledConfigPath]) {
-        ERROR(@"Config file not found. Aborting now.");
+        LOG_ERROR(@"Config file not found. Aborting now.");
         abort();
     }
 
@@ -316,7 +316,7 @@ static const double kDefaultLogTruncationInterval = 12 * 60 * 60; // 12 hours
 }
 
 - (void)onConnecting {
-    DEBUG(@"onConnecting");
+    LOG_DEBUG(@"onConnecting");
 
     self.reasserting = TRUE;
     
@@ -325,7 +325,7 @@ static const double kDefaultLogTruncationInterval = 12 * 60 * 60; // 12 hours
 }
 
 - (void)onConnected {
-    DEBUG(@"onConnected");
+    LOG_DEBUG(@"onConnected");
 
     // Write state to the database
     [sharedDB updateTunnelConnectedState:TRUE];

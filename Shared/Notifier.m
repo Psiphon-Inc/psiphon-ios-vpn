@@ -58,7 +58,7 @@ void cfNotificationCallback(CFNotificationCenterRef center, void *observer, CFSt
 
 - (void)listenForNotification:(nonnull NSString *)key listener:(nonnull void(^)(void))listener {
     if (listeners[key]) {
-        ERROR(@"already listening on key %@", key);
+        LOG_ERROR(@"already listening on key %@", key);
         return;
     }
 
