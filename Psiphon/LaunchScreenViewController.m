@@ -164,11 +164,12 @@ static const NSString *ItemStatusContext;
     loadingLabel = [[UILabel alloc] init];
     loadingLabel.translatesAutoresizingMaskIntoConstraints = NO;
     loadingLabel.adjustsFontSizeToFitWidth = YES;
-    loadingLabel.text = @"Loading...";
+    loadingLabel.text = NSLocalizedStringWithDefaultValue(@"LOADING", nil, [NSBundle mainBundle], @"Loading...", @"Text displayed while app loads");
     loadingLabel.textAlignment = NSTextAlignmentCenter;
     loadingLabel.textColor = [UIColor whiteColor];
+
     [self.view addSubview:loadingLabel];
-    
+
     // Setup autolayout
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:loadingLabel
                                                           attribute:NSLayoutAttributeBottom
