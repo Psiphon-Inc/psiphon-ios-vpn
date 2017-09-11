@@ -34,6 +34,7 @@
 #import "VPNManager.h"
 #import "AdManager.h"
 #import "PulsingHaloLayer.h"
+#import "Logging.h"
 
 static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSString *b) {
     return (([a length] == 0) && ([b length] == 0)) || ([a isEqualToString:b]);
@@ -109,7 +110,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 #pragma mark - Lifecycle methods
 
 - (void)viewDidLoad {
-    NSLog(@"MainViewController: viewDidLoad");
+    DEBUG();
     [super viewDidLoad];
 
     // TODO: check if database exists first
@@ -146,7 +147,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 }
 
 - (void)viewDidAppear:(BOOL)animated {
-    NSLog(@"MainViewController: viewDidAppear");
+    DEBUG();
     [super viewDidAppear:animated];
     // Available regions may have changed in the background
     [self updateAvailableRegions];
@@ -162,7 +163,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 }
 
 - (void)viewWillAppear:(BOOL)animated {
-    NSLog(@"MainViewController: viewWillAppear");
+    DEBUG();
     [super viewWillAppear:animated];
 
     // Listen for VPN status changes from VPNManager.
@@ -174,14 +175,14 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
-    NSLog(@"MainViewController: viewWillDisappear");
+    DEBUG();
     [super viewWillDisappear:animated];
     // Stop listening for diagnostic messages (we don't want to hold the shared db lock while backgrounded)
     [notifier stopListeningForAllNotifications];
 }
 
 - (void)viewDidDisappear:(BOOL)animated {
-    NSLog(@"MainViewController: viewDidDisappear");
+    DEBUG();
     [super viewDidDisappear:animated];
 }
 
@@ -284,7 +285,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
         }
 
     } else {
-        NSLog(@"call targetManager.connection.stopVPNTunnel()");
+        DEBUG(@"call [vpnManager stopVPN]");
         [vpnManager stopVPN];
 
         [self removePulsingHaloLayer];

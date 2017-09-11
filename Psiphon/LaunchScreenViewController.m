@@ -20,7 +20,7 @@
 #import <Foundation/Foundation.h>
 #import <AVFoundation/AVFoundation.h>
 #import "LaunchScreenViewController.h"
-#import "AppDelegate.h"
+#import "Logging.h"
 
 @interface LaunchScreenViewController ()
 
@@ -70,13 +70,13 @@ static const NSString *ItemStatusContext;
                  playerLayer.videoGravity = AVLayerVideoGravityResizeAspect;
                  playerLayer.needsDisplayOnBoundsChange = YES;
 
-                 NSLog(@"Loading Video");
+                 DEBUG(@"Loading video");
                  [self.view.layer addSublayer:playerLayer];
                  self.view.layer.needsDisplayOnBoundsChange = YES;
              }
              else {
                  // You should deal with the error appropriately.
-                 NSLog(@"The asset's tracks were not loaded:\n%@", [error localizedDescription]);
+                 DEBUG(@"The asset's tracks were not loaded:\n%@", [error localizedDescription]);
              }
         });
      }];

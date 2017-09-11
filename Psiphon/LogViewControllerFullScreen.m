@@ -21,6 +21,7 @@
 #import "PsiphonDataSharedDB.h"
 #import "SharedConstants.h"
 #import "Notifier.h"
+#import "Logging.h"
 
 @implementation LogViewControllerFullScreen {
     PsiphonData *psiphonData;
@@ -68,7 +69,7 @@
 
 #if DEBUG
             for (DiagnosticEntry *log in logs) {
-                NSLog(@"%@ %@", [log getTimestampForDisplay], [log message]);
+                DEBUG(@"%@ %@", [log getTimestampForDisplay], [log message]);
             }
 #endif
         });

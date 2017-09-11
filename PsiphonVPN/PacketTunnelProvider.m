@@ -27,6 +27,7 @@
 #import "PsiphonDataSharedDB.h"
 #import "SharedConstants.h"
 #import "Notifier.h"
+#import "Logging.h"
 
 static const double kDefaultLogTruncationInterval = 12 * 60 * 60; // 12 hours
 
@@ -91,7 +92,7 @@ static const double kDefaultLogTruncationInterval = 12 * 60 * 60; // 12 hours
         [self setTunnelNetworkSettings:[self getTunnelSettings] completionHandler:^(NSError *_Nullable error) {
 
             if (error != nil) {
-                NSLog(@"setTunnelNetworkSettings failed: %@", error);
+                ERROR(@"setTunnelNetworkSettings failed: %@", error);
                 startTunnelCompletionHandler([[NSError alloc] initWithDomain:PSIPHON_TUNNEL_ERROR_DOMAIN code:PSIPHON_TUNNEL_ERROR_BAD_CONFIGURATION userInfo:nil]);
                 return;
             }
@@ -99,7 +100,7 @@ static const double kDefaultLogTruncationInterval = 12 * 60 * 60; // 12 hours
 
             BOOL success = [weakPsiphonTunnel start:FALSE];
             if (!success) {
-                NSLog(@"psiphonTunnel.start failed");
+                ERROR(@"psiphonTunnel.start failed");
                 startTunnelCompletionHandler([[NSError alloc] initWithDomain:PSIPHON_TUNNEL_ERROR_DOMAIN code:PSIPHON_TUNNEL_ERROR_INTERAL_ERROR userInfo:nil]);
                 return;
             }
@@ -270,7 +271,7 @@ static const double kDefaultLogTruncationInterval = 12 * 60 * 60; // 12 hours
       stringByAppendingPathComponent:@"psiphon_config"];
 
     if (![fileManager fileExistsAtPath:bundledConfigPath]) {
-        NSLog(@"Config file not found. Aborting now.");
+        ERROR(@"Config file not found. Aborting now.");
         abort();
     }
 
@@ -315,7 +316,7 @@ static const double kDefaultLogTruncationInterval = 12 * 60 * 60; // 12 hours
 }
 
 - (void)onConnecting {
-    NSLog(@"onConnecting");
+    DEBUG(@"onConnecting");
 
     self.reasserting = TRUE;
     
@@ -324,7 +325,7 @@ static const double kDefaultLogTruncationInterval = 12 * 60 * 60; // 12 hours
 }
 
 - (void)onConnected {
-    NSLog(@"onConnected");
+    DEBUG(@"onConnected");
 
     // Write state to the database
     [sharedDB updateTunnelConnectedState:TRUE];
