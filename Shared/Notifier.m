@@ -18,15 +18,14 @@
  */
 
 #import "Notifier.h"
-
-#define TAG @"Notifier: "
+#import "Logging.h"
 
 @implementation Notifier {
     NSMutableDictionary *listeners;
     NSString *appGroupIdentifier;
 }
 
-void cfNotificationCallback(CFNotificationCenterRef center, void *observer, CFStringRef name,
+static void cfNotificationCallback(CFNotificationCenterRef center, void *observer, CFStringRef name,
   void const *object, CFDictionaryRef userInfo) {
 
     NSString *key = (__bridge NSString *) name;
@@ -59,7 +58,7 @@ void cfNotificationCallback(CFNotificationCenterRef center, void *observer, CFSt
 
 - (void)listenForNotification:(nonnull NSString *)key listener:(nonnull void(^)(void))listener {
     if (listeners[key]) {
-        NSLog(TAG @"already listening on key %@", key);
+        LOG_ERROR(@"already listening on key %@", key);
         return;
     }
 
