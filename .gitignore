@@ -32,6 +32,7 @@ go-ios-build
 
 psiphon_config
 embedded_server_entries
+Bourbon-Oblique.otf
 
 # Cocoapods
 Pods

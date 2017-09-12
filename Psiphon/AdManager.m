@@ -18,16 +18,48 @@
  */
 
 #import "AdManager.h"
+#import "VPNManager.h"
+#import "AppDelegate.h"
+#import "Logging.h"
 
+@import GoogleMobileAds;
 
-@implementation AdManager
+@interface AdManager ()
+
+@property (nonatomic, retain) MPInterstitialAdController *untunneledInterstitial;
+
+@end
+
+@implementation AdManager {
+    VPNManager *vpnManager;
+}
 
 - (instancetype)init {
     self = [super init];
     if (self) {
-        self.adWillShow = FALSE;
+        self.untunneledInterstitialIsShowing = FALSE;
+        self.untunneledInterstitialHasShown = FALSE;
+        vpnManager = [VPNManager sharedInstance];
+
+        [[NSNotificationCenter defaultCenter]
+          addObserver:self selector:@selector(vpnStatusDidChange) name:@kVPNStatusChangeNotificationName object:vpnManager];
+        //TODO: stop listening on dealloc.
     }
     return self;
+}
+
+- (void)vpnStatusDidChange {
+    if ([vpnManager getVPNStatus] == VPNStatusDisconnected) {
+        // The VPN is stopped. Initialize ads after a delay:
+        //    - to ensure regular untunneled networking is ready
+        //    - because it's likely the user will be leaving the app, so we don't want to request
+        //      another ad right away
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 5 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
+            [self initializeAds];
+        });
+    } else if ([vpnManager getVPNStatus] == VPNStatusConnected) {
+        [self initializeAds];
+    }
 }
 
 #pragma mark - Public methods
@@ -39,6 +71,105 @@
         sharedInstance = [[self alloc] init];
     });
     return sharedInstance;
+}
+
+- (void)initializeAds {
+   LOG_DEBUG();
+    
+    if ([self shouldShowUntunneledAds]) {
+        if (!self.untunneledInterstitial) {
+           LOG_DEBUG(@"Initializing");
+            // Init code.
+            [GADMobileAds configureWithApplicationID:@"ca-app-pub-1072041961750291~2085686375"];
+            [self loadUntunneledInterstitial];
+        }
+    } else if (!self.untunneledInterstitialIsShowing) {
+       LOG_DEBUG(@"Deinitializing");
+        // De-init code.
+        [MPInterstitialAdController removeSharedInterstitialAdController:self.untunneledInterstitial];
+        self.untunneledInterstitial = nil;
+        self.untunneledInterstitialHasShown = FALSE;
+
+        [self postAdsLoadStateDidChangeNotification];
+    }
+}
+
+- (bool)shouldShowUntunneledAds {
+    VPNStatus vpnStatus = [vpnManager getVPNStatus];
+    return vpnStatus == VPNStatusInvalid || vpnStatus == VPNStatusDisconnected;
+}
+
+- (void)loadUntunneledInterstitial {
+   LOG_DEBUG();
+    self.untunneledInterstitial = [MPInterstitialAdController
+      interstitialAdControllerForAdUnitId:@"4250ebf7b28043e08ddbe04d444d79e4"];
+    self.untunneledInterstitial.delegate = self;
+    [self.untunneledInterstitial loadAd];
+}
+
+- (void)showUntunneledInterstitial {
+   LOG_DEBUG();
+    if ([self untunneledInterstitialIsReady]) {
+        [self.untunneledInterstitial showFromViewController:[[AppDelegate sharedAppDelegate] getMainViewController]];
+    } else {
+        // Start the tunnel
+        [vpnManager startTunnelWithCompletionHandler:^(NSError *error) {}];
+    }
+}
+
+- (BOOL)untunneledInterstitialIsReady {
+    if (self.untunneledInterstitial) {
+        return self.untunneledInterstitial.ready;
+    }
+    return FALSE;
+}
+
+// Posts kAdsDidLoad notification.
+// Listeners of this message can call adIsReady to get the latest state.
+- (void)postAdsLoadStateDidChangeNotification {
+    [[NSNotificationCenter defaultCenter]
+      postNotificationName:@kAdsDidLoad object:self];
+}
+
+#pragma mark - Interestitial callbacks
+
+- (void)interstitialDidLoadAd:(MPInterstitialAdController *)interstitial {
+   LOG_DEBUG();
+
+    [self postAdsLoadStateDidChangeNotification];
+}
+
+- (void)interstitialWillAppear:(MPInterstitialAdController *)interstitial {
+   LOG_DEBUG();
+    
+    self.untunneledInterstitialIsShowing = TRUE;
+    self.untunneledInterstitialHasShown = TRUE;
+}
+
+- (void)interstitialDidFailToLoadAd:(MPInterstitialAdController *)interstitial {
+   LOG_DEBUG();
+    
+    // Don't retry.
+    [self postAdsLoadStateDidChangeNotification];
+}
+
+- (void)interstitialDidExpire:(MPInterstitialAdController *)interstitial {
+   LOG_DEBUG();
+
+    [self postAdsLoadStateDidChangeNotification];
+
+    [interstitial loadAd];
+}
+
+- (void)interstitialDidDisappear:(MPInterstitialAdController *)interstitial {
+   LOG_DEBUG();
+
+    self.untunneledInterstitialIsShowing = FALSE;
+    
+    [self postAdsLoadStateDidChangeNotification];
+
+    // Start the tunnel
+    [vpnManager startTunnelWithCompletionHandler:^(NSError *error) {}];
 }
 
 @end

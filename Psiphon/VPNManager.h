@@ -48,12 +48,13 @@ typedef NS_ENUM(NSInteger, VPNStatus) {
 
 @interface VPNManager : NSObject
 
-+ (instancetype)sharedInstance;
++ (instancetype _Nullable )sharedInstance;
 
 /**
  * Starts the network extension process and also the tunnel.
  * VPN will not start until startVPN is called.
  * @param completionHandler If no errors occurred, then error is set to nil.
+ *        Error code is set to one of VPNManagerError* errors.
  */
 - (void)startTunnelWithCompletionHandler:(nullable void (^)(NSError * _Nullable error))completionHandler;
 

@@ -18,12 +18,21 @@
  */
 
 #import <Foundation/Foundation.h>
+#import <mopub-ios-sdk/MPInterstitialAdController.h>
 
+#define kAdsDidLoad "MPAdsDidLoad"
 
-@interface AdManager : NSObject
+@interface AdManager : NSObject <MPInterstitialAdControllerDelegate>
 
-@property BOOL adWillShow;
+@property BOOL untunneledInterstitialIsShowing;
+@property BOOL untunneledInterstitialHasShown;
 
 + (instancetype)sharedInstance;
+
+- (void)initializeAds;
+
+- (BOOL)untunneledInterstitialIsReady;
+
+- (void)showUntunneledInterstitial;
 
 @end

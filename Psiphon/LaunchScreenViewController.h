@@ -19,12 +19,10 @@
 
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
-#import "MPInterstitialAdController.h"
 
-@import GoogleMobileAds;
+@interface LaunchScreenViewController : UIViewController
 
-@interface LaunchScreenViewController : UIViewController <MPInterstitialAdControllerDelegate>
-
-@property (nonatomic, retain) MPInterstitialAdController *untunneledInterstitial;
+@property (strong, nonatomic) UIProgressView *progressView;
+@property (strong, nonatomic) UILabel *secondLabel;
 
 @end
