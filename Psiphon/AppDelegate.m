@@ -17,7 +17,7 @@
  *
  */
 
-#import <PsiphonTunnel/PsiphonTunnel.h>
+#import <PsiphonTunnel/Reachability.h>
 #import "AppDelegate.h"
 #import "PsiphonClientCommonLibraryHelpers.h"
 #import "PsiphonDataSharedDB.h"
