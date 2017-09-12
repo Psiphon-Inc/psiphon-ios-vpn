@@ -61,6 +61,7 @@ static const NSString *ItemStatusContext;
                  self.loadingVideo = [AVPlayer playerWithPlayerItem:self.videoFile];
                  
                  playerLayer = [AVPlayerLayer playerLayerWithPlayer:self.loadingVideo];
+                 [self setupVideoLayerFrame:self.view.bounds.size];
                  playerLayer.videoGravity = AVLayerVideoGravityResizeAspect;
                  playerLayer.needsDisplayOnBoundsChange = YES;
 
