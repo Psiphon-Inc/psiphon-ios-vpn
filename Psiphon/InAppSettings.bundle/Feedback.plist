@@ -21,12 +21,16 @@
 		<dict>
 			<key>Title</key>
 			<string>Your Comments</string>
+			<key>BundleTable</key>
+			<string>PsiphonClientCommonLibrary</string>
 			<key>Type</key>
 			<string>PSGroupSpecifier</string>
 		</dict>
 		<dict>
 			<key>Title</key>
 			<string>Proxy</string>
+			<key>BundleTable</key>
+			<string>PsiphonClientCommonLibrary</string>
 			<key>Type</key>
 			<string>IASKCustomViewSpecifier</string>
 			<key>Key</key>
@@ -35,6 +39,8 @@
 		<dict>
 			<key>Title</key>
 			<string>Your Email Address</string>
+			<key>BundleTable</key>
+			<string>PsiphonClientCommonLibrary</string>
 			<key>Type</key>
 			<string>PSGroupSpecifier</string>
 		</dict>
@@ -45,6 +51,8 @@
 			<string>email</string>
 			<key>IASKPlaceholder</key>
 			<string>Where can we respond to you?</string>
+			<key>BundleTable</key>
+			<string>PsiphonClientCommonLibrary</string>
 			<key>KeyboardType</key>
 			<string>EmailAddress</string>
 			<key>AutocorrectionType</key>
@@ -53,6 +61,8 @@
 		<dict>
 			<key>Title</key>
 			<string>Diagnostic Data</string>
+			<key>BundleTable</key>
+			<string>PsiphonClientCommonLibrary</string>
 			<key>Type</key>
 			<string>PSGroupSpecifier</string>
 		</dict>
@@ -63,6 +73,8 @@
 			<string>sendDiagnostics</string>
 			<key>Title</key>
 			<string>Upload diagnostic data</string>
+			<key>BundleTable</key>
+			<string>PsiphonClientCommonLibrary</string>
 			<key>Type</key>
 			<string>PSToggleSwitchSpecifier</string>
 		</dict>

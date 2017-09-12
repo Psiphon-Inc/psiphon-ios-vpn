@@ -30,12 +30,13 @@ framework
 go-ios-build
 *.xcworkspace
 
-psiphon_config
-embedded_server_entries
-Bourbon-Oblique.otf
-
 # Cocoapods
 Pods
 
 # Intellij IDE
 .idea
+
+psiphon_config
+embedded_server_entries
+Bourbon-Oblique.otf
+transifex_conf.json

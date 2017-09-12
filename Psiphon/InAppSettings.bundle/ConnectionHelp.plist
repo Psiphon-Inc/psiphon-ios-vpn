@@ -11,10 +11,14 @@
 			<string>PSGroupSpecifier</string>
 			<key>FooterText</key>
 			<string>Changing your region to Best Performance increases your chances of getting connected.</string>
+			<key>BundleTable</key>
+			<string>PsiphonClientCommonLibrary</string>
 		</dict>
 		<dict>
 			<key>Title</key>
 			<string>Change Region</string>
+			<key>BundleTable</key>
+			<string>PsiphonClientCommonLibrary</string>
 			<key>Key</key>
 			<string>regionSelection</string>
 			<key>Type</key>
@@ -27,6 +31,8 @@
 			<string>PSGroupSpecifier</string>
 			<key>FooterText</key>
 			<string>Disabling timeouts may help you stay connected on slower networks.</string>
+			<key>BundleTable</key>
+			<string>PsiphonClientCommonLibrary</string>
 		</dict>
 		<dict>
 			<key>DefaultValue</key>
@@ -35,6 +41,8 @@
 			<string>disableTimeouts</string>
 			<key>Title</key>
 			<string>Disable Timeouts</string>
+			<key>BundleTable</key>
+			<string>PsiphonClientCommonLibrary</string>
 			<key>Type</key>
 			<string>PSToggleSwitchSpecifier</string>
 		</dict>
@@ -43,12 +51,16 @@
 			<string>PSGroupSpecifier</string>
 			<key>FooterText</key>
 			<string>Reconnecting to the Psiphon server may help if your current connection is slow or non-responsive.</string>
+			<key>BundleTable</key>
+			<string>PsiphonClientCommonLibrary</string>
 		</dict>
 		<dict>
 			<key>Key</key>
 			<string>forceReconnect</string>
 			<key>Title</key>
 			<string>Reconnect to the Psiphon server</string>
+			<key>BundleTable</key>
+			<string>PsiphonClientCommonLibrary</string>
 			<key>Type</key>
 			<string>IASKButtonSpecifier</string>
 		</dict>
