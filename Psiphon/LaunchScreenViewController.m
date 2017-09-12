@@ -101,6 +101,7 @@ static const NSString *ItemStatusContext;
 
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
+    [self.loadingVideo seekToTime:kCMTimeZero];
     [self setupVideoLayerFrame:self.view.bounds.size];
     [self.loadingVideo play];
 }
