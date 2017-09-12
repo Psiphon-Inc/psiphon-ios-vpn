@@ -17,6 +17,7 @@
  *
  */
 
+#import <PsiphonTunnel/Reachability.h>
 #import "AppDelegate.h"
 #import "PsiphonClientCommonLibraryHelpers.h"
 #import "PsiphonDataSharedDB.h"
@@ -168,8 +169,13 @@
 
 - (void)setRootViewController {
     // If VPN disconnected, launch with animation, else launch with MainViewController.
-    if (([vpnManager getVPNStatus] == VPNStatusDisconnected || [vpnManager getVPNStatus] == VPNStatusInvalid) &&
-        ![adManager untunneledInterstitialIsReady] && ![adManager untunneledInterstitialHasShown]) {
+
+    NetworkStatus networkStatus = [[Reachability reachabilityForInternetConnection] currentReachabilityStatus];
+
+    if ( networkStatus != NotReachable
+      && ([vpnManager getVPNStatus] == VPNStatusDisconnected || [vpnManager getVPNStatus] == VPNStatusInvalid)
+      && ![adManager untunneledInterstitialIsReady] && ![adManager untunneledInterstitialHasShown]) {
+
         [adManager initializeAds];
         self.window.rootViewController = launchScreenViewController;
         if (timerCount <= 0) {
