@@ -17,7 +17,7 @@ PODS:
     - mopub-ios-sdk/Core
     - mopub-ios-sdk/Moat
   - MPUBMoatMobileAppKit (3.2.1)
-  - PsiphonClientCommonLibrary (0.1.4):
+  - PsiphonClientCommonLibrary (0.2.0):
     - InAppSettingsKit
   - VungleSDK-iOS (5.1.0)
 
@@ -26,13 +26,14 @@ DEPENDENCIES:
   - Google-Mobile-Ads-SDK (= 7.22.0)
   - InAppSettingsKit (from `https://github.com/Psiphon-Inc/InAppSettingsKit.git`)
   - mopub-ios-sdk (= 4.16.0)
-  - PsiphonClientCommonLibrary (from `https://github.com/Psiphon-Inc/psiphon-ios-client-common-library.git`)
+  - PsiphonClientCommonLibrary (from `https://github.com/Psiphon-Inc/psiphon-ios-client-common-library.git`, commit `fe2897f`)
   - VungleSDK-iOS (= 5.1.0)
 
 EXTERNAL SOURCES:
   InAppSettingsKit:
     :git: https://github.com/Psiphon-Inc/InAppSettingsKit.git
   PsiphonClientCommonLibrary:
+    :commit: fe2897f
     :git: https://github.com/Psiphon-Inc/psiphon-ios-client-common-library.git
 
 CHECKOUT OPTIONS:
@@ -40,7 +41,7 @@ CHECKOUT OPTIONS:
     :commit: e0dfb73924359ca42f1551220a55117d91d0ab6f
     :git: https://github.com/Psiphon-Inc/InAppSettingsKit.git
   PsiphonClientCommonLibrary:
-    :commit: ea49d81582531f68340ae04877704e39f360692a
+    :commit: fe2897f
     :git: https://github.com/Psiphon-Inc/psiphon-ios-client-common-library.git
 
 SPEC CHECKSUMS:
@@ -49,9 +50,9 @@ SPEC CHECKSUMS:
   InAppSettingsKit: 94d2fba3ccd700fc4e32c6d09fabcc0af2426744
   mopub-ios-sdk: d656c7b5ccecc309115ac1ea280de76c72a301f7
   MPUBMoatMobileAppKit: f93733fbb17a5387228f4e29f1cd07c934d63cab
-  PsiphonClientCommonLibrary: 7be99df5034640fd97bd141e7f6244329702c506
+  PsiphonClientCommonLibrary: 79bec47ed98f3eeb504afebae90bf5ec74f2021c
   VungleSDK-iOS: c4d55906035371baa4190162d57929cf5811c61f
 
-PODFILE CHECKSUM: c2367ebbece9afbe6cb6399013f505790a3d5ed2
+PODFILE CHECKSUM: a3a49623a0f5f48deeddd0bc94708b3e32a677e1
 
 COCOAPODS: 1.3.1

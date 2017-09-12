@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, Psiphon Inc. Created by Draven Johnson on 2017-08-30.
+ * Copyright (c) 2017, Psiphon Inc.
  * All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,12 +17,11 @@
  *
  */
 
-#import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
+#import "PsiphonSettingsViewController.h"
+#import "LaunchScreenViewController.h"
 
-@interface LaunchScreenViewController : UIViewController
 
-@property (strong, nonatomic) UIProgressView *progressView;
-@property (strong, nonatomic) UILabel *secondLabel;
+@interface MainViewController : UIViewController <PsiphonSettingsViewControllerDelegate>
 
 @end

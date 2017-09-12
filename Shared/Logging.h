@@ -17,14 +17,26 @@
  *
  */
 
-#import <UIKit/UIKit.h>
-#import "PsiphonSettingsViewController.h"
-#import "MPInterstitialAdController.h"
-#import "LaunchScreenViewController.h"
+#import <Foundation/Foundation.h>
 
-#define adsDidLoad "MPAdsDidLoad"
+#if DEBUG
 
-@interface ViewController : UIViewController <MPInterstitialAdControllerDelegate, PsiphonSettingsViewControllerDelegate>
-@property (nonatomic, retain) MPInterstitialAdController *untunneledInterstitial;
+// Logs a message to Apple System Log facility with log level DEBUG
+#define LOG_DEBUG(format, ...) \
+ NSLog((@"<DEBUG> %s [Line %d]: " format), __PRETTY_FUNCTION__, __LINE__, ##__VA_ARGS__)
 
-@end
+// Logs a message to Apple System Log facility with log level WARN
+#define LOG_WARN(format, ...) \
+ NSLog((@"<WARN> %s [Line %d]: " format), __PRETTY_FUNCTION__, __LINE__, ##__VA_ARGS__)
+
+// Logs a message to Apple System Log facility with log level ERROR
+#define LOG_ERROR(format, ...) \
+ NSLog((@"<ERROR> %s [Line %d]: " format), __PRETTY_FUNCTION__, __LINE__, ##__VA_ARGS__)
+
+#else
+
+#define LOG_DEBUG(...)
+#define LOG_WARN(...)
+#define LOG_ERROR(...)
+
+#endif

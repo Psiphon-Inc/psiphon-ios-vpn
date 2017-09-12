@@ -19,14 +19,13 @@
 
 #import <UIKit/UIKit.h>
 #import "MPInterstitialAdController.h"
-#import "ViewController.h"
+#import "MainViewController.h"
 
 @interface AppDelegate : UIResponder <UIApplicationDelegate>
 
 @property (strong, nonatomic) UIWindow *window;
 
 + (AppDelegate *)sharedAppDelegate;
-
-- (void) switchToMainViewController:(MPInterstitialAdController *)ads :(ViewController *)vc;
+- (MainViewController *)getMainViewController;
 
 @end

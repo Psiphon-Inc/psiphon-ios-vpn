@@ -25,6 +25,13 @@
 #import "RegionAdapter.h"
 #import "VPNManager.h"
 #import "AdManager.h"
+#import "Logging.h"
+
+#if DEBUG
+#define kLaunchScreenTimerCount 1
+#else
+#define kLaunchScreenTimerCount 10
+#endif
 
 @interface AppDelegate ()
 @end
@@ -35,7 +42,15 @@
     PsiphonDataSharedDB *sharedDB;
     Notifier *notifier;
 
+    // Loading Timer
+    NSTimer *loadingTimer;
+    NSInteger timerCount;
+
     BOOL shownHomepage;
+    
+    // ViewController
+    MainViewController *mainViewController;
+    LaunchScreenViewController *launchScreenViewController;
 }
 
 - (instancetype)init {
@@ -45,55 +60,86 @@
         adManager = [AdManager sharedInstance];
         sharedDB = [[PsiphonDataSharedDB alloc] initForAppGroupIdentifier:APP_GROUP_IDENTIFIER];
         notifier = [[Notifier alloc] initWithAppGroupIdentifier:APP_GROUP_IDENTIFIER];
+        
+        mainViewController = [[MainViewController alloc] init];
+        launchScreenViewController = [[LaunchScreenViewController alloc] init];
+
+        timerCount = kLaunchScreenTimerCount;
     }
     return self;
 }
 
-+ (AppDelegate *)sharedAppDelegate{
++ (AppDelegate *)sharedAppDelegate {
     return (AppDelegate *)[UIApplication sharedApplication].delegate;
+}
+
+- (MainViewController *)getMainViewController {
+    return mainViewController;
+}
+
+- (void)onVPNStatusDidChange {
+    if ([vpnManager getVPNStatus] == VPNStatusDisconnected
+      || [vpnManager getVPNStatus] == VPNStatusRestarting) {
+        shownHomepage = FALSE;
+    }
 }
 
 # pragma mark - Lifecycle methods
 
 - (BOOL)application:(UIApplication *)application willFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
 	[self initializeDefaults];
+    [[NSNotificationCenter defaultCenter]
+      addObserver:self selector:@selector(switchViewControllerWhenAdsLoaded) name:@kAdsDidLoad object:adManager];
+
 	return YES;
 }
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-    NSLog(@"AppDelegate: application:didFinishLaunchingWithOptions:");
+   LOG_DEBUG();
     // Override point for customization after application launch.
     self.window = [[UIWindow alloc] initWithFrame:UIScreen.mainScreen.bounds];
-    self.window.rootViewController = [[LaunchScreenViewController alloc] init];
+
+    // TODO: if VPN disconnected, launch with animation, else launch with MainViewController.
+    [self setRootViewController];
+
     [self.window makeKeyAndVisible];
 
     shownHomepage = FALSE;
+    // Listen for VPN status changes from VPNManager.
+    [[NSNotificationCenter defaultCenter]
+      addObserver:self selector:@selector(onVPNStatusDidChange) name:@kVPNStatusChangeNotificationName object:vpnManager];
+
+    // Listen for the network extension messages.
     [self listenForNEMessages];
 
     return YES;
 }
 
 - (void)applicationWillResignActive:(UIApplication *)application {
-    NSLog(@"AppDelegate: applicationWillResignActive");
+   LOG_DEBUG();
     // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
     // Use this method to pause ongoing tasks, disable timers, and invalidate graphics rendering callbacks. Games should use this method to pause the game.
-    [sharedDB updateAppForegroundState:NO];
-    [notifier post:@"D.appWillResignActive"];
 }
 
 - (void)applicationDidEnterBackground:(UIApplication *)application {
-    NSLog(@"AppDelegate: applicationDidEnterBackground");
+   LOG_DEBUG();
     // Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later.
     // If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
+    [notifier post:@"D.applicationDidEnterBackground"];
+    [sharedDB updateAppForegroundState:NO];
 }
 
 - (void)applicationWillEnterForeground:(UIApplication *)application {
-    NSLog(@"AppDelegate: applicationWillEnterForeground");
+   LOG_DEBUG();
     // Called as part of the transition from the background to the active state; here you can undo many of the changes made on entering the background.
+    
+    [self setRootViewController];
+    
+    // TODO: init MainViewController.
 }
 
 - (void)applicationDidBecomeActive:(UIApplication *)application {
-    NSLog(@"AppDelegate: applicationDidBecomeActive");
+   LOG_DEBUG();
     // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
     [sharedDB updateAppForegroundState:YES];
 
@@ -102,14 +148,14 @@
     dispatch_async(dispatch_get_main_queue(), ^{
         // If the tunnel is in Connected state, and we're now showing ads
         // send startVPN message.
-        if (!adManager.adWillShow && [vpnManager isTunnelConnected]) {
+        if (![adManager untunneledInterstitialIsShowing] && [vpnManager isTunnelConnected]) {
             [vpnManager startVPN];
         }
     });
 }
 
 - (void)applicationWillTerminate:(UIApplication *)application {
-    NSLog(@"AppDelegate: applicationWillTerminate");
+   LOG_DEBUG();
     // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
 }
 
@@ -120,15 +166,55 @@
 
 #pragma mark - View controller switch
 
-- (void)switchToMainViewController:(MPInterstitialAdController *)ads :(ViewController *)vc {
-    vc.untunneledInterstitial = ads;
+- (void)setRootViewController {
+    // If VPN disconnected, launch with animation, else launch with MainViewController.
+    if (([vpnManager getVPNStatus] == VPNStatusDisconnected || [vpnManager getVPNStatus] == VPNStatusInvalid) &&
+        ![adManager untunneledInterstitialIsReady] && ![adManager untunneledInterstitialHasShown]) {
+        [adManager initializeAds];
+        self.window.rootViewController = launchScreenViewController;
+        if (timerCount <= 0) {
+            // Reset timer to 10 if it's 0 and need load ads again.
+            timerCount = 10;
+        }
+        [self startLaunchingScreenTimer];
+    } else {
+        self.window.rootViewController = mainViewController;
+    }
+}
 
-    [self changeRootViewController:vc];
+- (void)switchViewControllerWhenAdsLoaded {
+    [loadingTimer invalidate];
+    timerCount = 0;
+    [self changeRootViewController:mainViewController];
+}
+
+- (void)switchViewControllerWhenExpire:(NSTimer*)timer {
+    if (timerCount <= 0) {
+        [loadingTimer invalidate];
+        [self changeRootViewController:mainViewController];
+        return;
+    }
+    timerCount -=1;
+    launchScreenViewController.progressView.progress = (10 - timerCount)/10.0f;
+}
+
+- (void)startLaunchingScreenTimer {
+    if (!loadingTimer || ![loadingTimer isValid]) {
+        loadingTimer = [NSTimer scheduledTimerWithTimeInterval:1.0
+                                                         target:self
+                                                       selector:@selector(switchViewControllerWhenExpire:)
+                                                       userInfo:nil
+                                                        repeats:YES];
+    }
 }
 
 - (void)changeRootViewController:(UIViewController*)viewController {
     if (!self.window.rootViewController) {
         self.window.rootViewController = viewController;
+        return;
+    }
+    
+    if (self.window.rootViewController == viewController) {
         return;
     }
 
@@ -156,37 +242,39 @@
 
 - (void)listenForNEMessages {
     [notifier listenForNotification:@"NE.newHomepages" listener:^{
+       LOG_DEBUG(@"Received notification NE.newHomepages");
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
             if (!shownHomepage) {
                 NSArray<Homepage *> *homepages = [sharedDB getAllHomepages];
                 if ([homepages count] > 0) {
                     NSUInteger randIndex = arc4random() % [homepages count];
                     Homepage *homepage = homepages[randIndex];
-
-                    [[UIApplication sharedApplication] openURL:homepage.url options:@{}
-                                             completionHandler:^(BOOL success) {
-                                                 shownHomepage = success;
-                                             }];
-
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        [[UIApplication sharedApplication] openURL:homepage.url options:@{}
+                                                 completionHandler:^(BOOL success) {
+                                                     shownHomepage = success;
+                                                 }];
+                    });
                 }
             }
         });
     }];
 
     [notifier listenForNotification:@"NE.tunnelConnected" listener:^{
-        NSLog(@"received NE.tunnelConnected");
+       LOG_DEBUG(@"Received notification NE.tunnelConnected");
         // If we haven't had a chance to load an Ad, and the
         // tunnel is already connected, give up on the Ad and
         // start the VPN. Otherwise the startVPN message will be
         // sent after the Ad has disappeared.
-        if (!adManager.adWillShow) {
+        if (![adManager untunneledInterstitialIsShowing]) {
             [vpnManager startVPN];
         }
     }];
 
     [notifier listenForNotification:@"NE.onAvailableEgressRegions" listener:^{ // TODO should be put in a constants file
+       LOG_DEBUG(@"Received notification NE.onAvailableEgressRegions");
         // Update available regions
-        // TODO: this code is duplicated in ViewController updateAvailableRegions
+        // TODO: this code is duplicated in MainViewController updateAvailableRegions
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
             NSArray<NSString *> *regions = [sharedDB getAllEgressRegions];
             [[RegionAdapter sharedInstance] onAvailableEgressRegions:regions];

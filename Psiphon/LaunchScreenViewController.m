@@ -1,4 +1,3 @@
-
 /*
  * Copyright (c) 2017, Psiphon Inc.
  * All rights reserved.
@@ -21,18 +20,12 @@
 #import <Foundation/Foundation.h>
 #import <AVFoundation/AVFoundation.h>
 #import "LaunchScreenViewController.h"
-#import "AppDelegate.h"
-#import "ViewController.h"
-
-@import NetworkExtension;
-@import GoogleMobileAds;
+#import "Logging.h"
 
 @interface LaunchScreenViewController ()
 
-@property (nonatomic) NEVPNManager *targetManager;
-
 @property (strong, nonatomic) AVPlayer *loadingVideo;
-@property (nonatomic) AVPlayerItem *viedoFile;
+@property (nonatomic) AVPlayerItem *videoFile;
 
 @end
 
@@ -42,11 +35,8 @@ static const NSString *ItemStatusContext;
     // videoPlayer
     AVPlayerLayer* playerLayer;
 
-    // Loading Timer
-    NSTimer *_loadingTimer;
-
-    // Main View Controller
-    ViewController *mainViewController;
+    // Loading Text
+    UILabel *loadingLabel;
 }
 
 - (id)init {
@@ -54,7 +44,7 @@ static const NSString *ItemStatusContext;
     
     NSString *tracksKey = @"tracks";
     
-    NSURL *fileURL = [[NSBundle mainBundle] URLForResource:@"loading" withExtension:@"mov"];
+    NSURL *fileURL = [[NSBundle mainBundle] URLForResource:@"launch" withExtension:@"m4v"];
     
     AVURLAsset *asset = [AVURLAsset URLAssetWithURL:fileURL options:nil];
     
@@ -64,24 +54,24 @@ static const NSString *ItemStatusContext;
             NSError *error;
             AVKeyValueStatus status = [asset statusOfValueForKey:tracksKey error:&error];
              if (status == AVKeyValueStatusLoaded) {
-                 self.viedoFile = [AVPlayerItem playerItemWithAsset:asset];
+                 self.videoFile = [AVPlayerItem playerItemWithAsset:asset];
                  // ensure that this is done before the playerItem is associated with the player
-                 [self.viedoFile addObserver:self forKeyPath:@"status" options:NSKeyValueObservingOptionInitial context:&ItemStatusContext];
-                 [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(playerItemDidReachEnd:) name:AVPlayerItemDidPlayToEndTimeNotification object:self.viedoFile];
-                 self.loadingVideo = [AVPlayer playerWithPlayerItem:self.viedoFile];
+                 [self.videoFile addObserver:self forKeyPath:@"status" options:NSKeyValueObservingOptionInitial context:&ItemStatusContext];
+                 [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(playerItemDidReachEnd:) name:AVPlayerItemDidPlayToEndTimeNotification object:self.videoFile];
+                 self.loadingVideo = [AVPlayer playerWithPlayerItem:self.videoFile];
                  
                  playerLayer = [AVPlayerLayer playerLayerWithPlayer:self.loadingVideo];
-                 playerLayer.frame = self.view.bounds;
+                 [self setupVideoLayerFrame:self.view.bounds.size];
                  playerLayer.videoGravity = AVLayerVideoGravityResizeAspect;
                  playerLayer.needsDisplayOnBoundsChange = YES;
 
-                 NSLog(@"Loading Video");
+                LOG_DEBUG(@"Loading video");
                  [self.view.layer addSublayer:playerLayer];
                  self.view.layer.needsDisplayOnBoundsChange = YES;
              }
              else {
                  // You should deal with the error appropriately.
-                 NSLog(@"The asset's tracks were not loaded:\n%@", [error localizedDescription]);
+                LOG_DEBUG(@"The asset's tracks were not loaded:\n%@", [error localizedDescription]);
              }
         });
      }];
@@ -91,12 +81,7 @@ static const NSString *ItemStatusContext;
 
 - (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator {
 
-    if (size.width > size.height) {
-        // Landscape
-        playerLayer.frame = CGRectMake(0, 0, size.width, size.height);
-    } else {
-        playerLayer.frame = CGRectMake(0, 0, size.width, size.height);
-    }
+    [self setupVideoLayerFrame:size];
 
     [coordinator animateAlongsideTransition:nil completion:^(id<UIViewControllerTransitionCoordinatorContext> context) {
     }];
@@ -107,24 +92,52 @@ static const NSString *ItemStatusContext;
 - (void)viewDidLoad {
     [super viewDidLoad];
     // TODO: Add something to handle the syncUI when screen rotate
-    [self.view setBackgroundColor:[UIColor whiteColor]];
+    [self.view setBackgroundColor:[UIColor blackColor]];
+    [self addLoadingLabel];
+    [self addProgressView];
+    [self setNeedsStatusBarAppearanceUpdate];
     [self syncUI];
-    mainViewController =  [[ViewController alloc] init];
 }
 
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
+    [self setupVideoLayerFrame:self.view.bounds.size];
     [self.loadingVideo play];
-    NSLog(@"Play Video");
-    [self initializeAds];
-    [self startLaunchingScreenTimer];
-    [[NSNotificationCenter defaultCenter]
-            addObserver:self selector:@selector(switchViewControllerWhenExpire:) name:@adsDidLoad object:mainViewController];
+}
+
+- (void)setupVideoLayerFrame:(CGSize)size {
+    if (size.width > size.height) {
+        // Landscape
+        playerLayer.frame = CGRectMake((size.width - size.width / 1.5) / 2, 30, size.width / 1.5, size.height / 1.5);
+    } else {
+        playerLayer.frame = CGRectMake(0, 0, size.width, size.height);
+    }
 }
 
 - (void)playerItemDidReachEnd:(NSNotification *)notification {
     [self.loadingVideo seekToTime:kCMTimeZero];
 }
+
+- (UIStatusBarStyle)preferredStatusBarStyle {
+    return UIStatusBarStyleLightContent;
+}
+
+/*
+- (BOOL)shouldAutorotate {
+    if ([[UIDevice currentDevice].model hasPrefix:@"iPhone"] || [[UIDevice currentDevice].model hasPrefix:@"iPod"]) {
+        return NO;
+    }
+    return YES;
+}
+
+- (UIInterfaceOrientationMask)supportedInterfaceOrientations {
+    if ([[UIDevice currentDevice].model hasPrefix:@"iPhone"] || [[UIDevice currentDevice].model hasPrefix:@"iPod"]) {
+        return UIInterfaceOrientationMaskPortrait + UIInterfaceOrientationMaskPortraitUpsideDown;
+    } else {
+        return UIInterfaceOrientationMaskAll;
+    }
+}
+*/
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
     
@@ -147,52 +160,71 @@ static const NSString *ItemStatusContext;
     }
 }
 
-- (void) switchViewControllerWhenExpire:(NSTimer*)timer {
-    if (self.viedoFile != nil) {
-        [self.viedoFile removeObserver:self forKeyPath:@"status"];
-    }
-    [_loadingTimer invalidate];
-    [[AppDelegate sharedAppDelegate] switchToMainViewController:_untunneledInterstitial:mainViewController];
+- (void)addLoadingLabel {
+    loadingLabel = [[UILabel alloc] init];
+    loadingLabel.translatesAutoresizingMaskIntoConstraints = NO;
+    loadingLabel.adjustsFontSizeToFitWidth = YES;
+    loadingLabel.text = NSLocalizedStringWithDefaultValue(@"LOADING", nil, [NSBundle mainBundle], @"Loading...", @"Text displayed while app loads");
+    loadingLabel.textAlignment = NSTextAlignmentCenter;
+    loadingLabel.textColor = [UIColor whiteColor];
+
+    [self.view addSubview:loadingLabel];
+
+    // Setup autolayout
+    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:loadingLabel
+                                                          attribute:NSLayoutAttributeBottom
+                                                          relatedBy:NSLayoutRelationGreaterThanOrEqual
+                                                             toItem:self.view
+                                                          attribute:NSLayoutAttributeBottom
+                                                         multiplier:1.0
+                                                           constant:-30.0]];
+    
+    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:loadingLabel
+                                                          attribute:NSLayoutAttributeRight
+                                                          relatedBy:NSLayoutRelationEqual
+                                                             toItem:self.view
+                                                          attribute:NSLayoutAttributeRight
+                                                         multiplier:1.0
+                                                           constant:-30.0]];
+    
+    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:loadingLabel
+                                                          attribute:NSLayoutAttributeLeft
+                                                          relatedBy:NSLayoutRelationEqual
+                                                             toItem:self.view
+                                                          attribute:NSLayoutAttributeLeft
+                                                         multiplier:1.0
+                                                           constant:30]];
 }
 
-- (void) startLaunchingScreenTimer {
-    if (!_loadingTimer || ![_loadingTimer isValid]) {
-        _loadingTimer = [NSTimer scheduledTimerWithTimeInterval:10.0
-                                                           target:self
-                                                         selector:@selector(switchViewControllerWhenExpire:)
-                                                         userInfo:nil
-                                                          repeats:NO];
-    }
-}
-
-/*!
- @brief Returns true if NEVPNConnectionStatus is Connected, Connecting or Reasserting.
- */
-- (BOOL) isVPNActive{
-    NEVPNStatus status = self.targetManager.connection.status;
-    return (status == NEVPNStatusConnecting
-            || status == NEVPNStatusConnected
-            || status == NEVPNStatusReasserting);
-}
-
-# pragma mark - Ads
-
-- (void)initializeAds {
-    NSLog(@"initializeAds");
-    if (![self isVPNActive]) {
-        [GADMobileAds configureWithApplicationID:@"ca-app-pub-1072041961750291~2085686375"];
-        [self loadUntunneledInterstitial];
-    }
-}
-
-- (void)loadUntunneledInterstitial {
-    NSLog(@"loadUntunneledInterstitial");
-    self.untunneledInterstitial = [MPInterstitialAdController
-        interstitialAdControllerForAdUnitId:@"4250ebf7b28043e08ddbe04d444d79e4"];
-
-    self.untunneledInterstitial.delegate = mainViewController;
-
-    [self.untunneledInterstitial loadAd];
+- (void)addProgressView {
+    self.progressView = [[UIProgressView alloc] init];
+    self.progressView.translatesAutoresizingMaskIntoConstraints = NO;
+    [self.view addSubview:self.progressView];
+    
+    // Setup autolayout
+    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:self.progressView
+                                                          attribute:NSLayoutAttributeBottom
+                                                          relatedBy:NSLayoutRelationGreaterThanOrEqual
+                                                             toItem:loadingLabel
+                                                          attribute:NSLayoutAttributeTop
+                                                         multiplier:1.0
+                                                           constant:-15.0]];
+    
+    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:self.progressView
+                                                          attribute:NSLayoutAttributeLeft
+                                                          relatedBy:NSLayoutRelationEqual
+                                                             toItem:self.view
+                                                          attribute:NSLayoutAttributeLeft
+                                                         multiplier:1.0
+                                                           constant:15.0]];
+    
+    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:self.progressView
+                                                          attribute:NSLayoutAttributeRight
+                                                          relatedBy:NSLayoutRelationEqual
+                                                             toItem:self.view
+                                                          attribute:NSLayoutAttributeRight
+                                                         multiplier:1.0
+                                                           constant:-15.0]];
 }
 
 @end

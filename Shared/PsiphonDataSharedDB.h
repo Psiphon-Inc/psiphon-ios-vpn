@@ -17,8 +17,6 @@
  *
  */
 
-#define TAG @"PsiphonDataSharedDB: "
-
 #import <Foundation/Foundation.h>
 #ifndef TARGET_IS_EXTENSION
 #import "PsiphonData.h"
