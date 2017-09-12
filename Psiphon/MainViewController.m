@@ -471,7 +471,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                                                              toItem:adLabel
                                                           attribute:NSLayoutAttributeTop
                                                          multiplier:1.0
-                                                           constant:0]];
+                                                           constant:-10.0]];
     
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:appSubTitleLabel
                                                           attribute:NSLayoutAttributeLeft
@@ -903,7 +903,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                                                              toItem:startStopButton
                                                           attribute:NSLayoutAttributeTop
                                                          multiplier:1.0
-                                                           constant:0]];
+                                                           constant:-10.0]];
     
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:adLabel
                                                           attribute:NSLayoutAttributeLeft
