@@ -7,8 +7,10 @@ target 'Psiphon' do
 
   # Pods for Psiphon
   pod 'FMDB', '2.7.2'
-  pod 'PsiphonClientCommonLibrary', :git => 'https://github.com/Psiphon-Inc/psiphon-ios-client-common-library.git', :commit => 'fe2897f'
-  pod "InAppSettingsKit", :git => "https://github.com/Psiphon-Inc/InAppSettingsKit.git"
+  pod "InAppSettingsKit", :git => "https://github.com/Psiphon-Inc/InAppSettingsKit.git", :commit => '2fe96b0d622fe4f8dfc70c61057598aec283d109'
+  #pod "InAppSettingsKit", :path => "../InAppSettingsKit"
+  pod 'PsiphonClientCommonLibrary', :git => "https://github.com/Psiphon-Inc/psiphon-ios-client-common-library.git", :commit => '56daadf91daf7f939f24f8cadce3008d36fd09c1'
+  #pod 'PsiphonClientCommonLibrary', :path => "../psiphon-ios-client-common-library/"
 
   pod 'mopub-ios-sdk', '4.16.0'
   pod 'Google-Mobile-Ads-SDK', '7.22.0'

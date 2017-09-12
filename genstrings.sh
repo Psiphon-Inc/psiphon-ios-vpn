@@ -29,7 +29,7 @@ mkdir -p "${TEMP_DIR}"
 # Go through all source files, extracting localizable strings into appropriate
 # `x.strings` files in a temp directory.
 # NOTE: We are excluding cocoapods files. This may need to be revisited in the future.
-find . -path ./Pods -prune -o -name "*.m" -o -name "*.h" -o -name "*.swift" | xargs genstrings -o ${TEMP_DIR}
+find . Pods/InAppSettingsKit -path ./Pods -prune -o -name "*.m" -o -name "*.h" -o -name "*.swift" | xargs genstrings -o ${TEMP_DIR}
 
 # Go through the `x.strings` files, converting from UTF-16 to UTF-8 and moving
 # them into their proper location.

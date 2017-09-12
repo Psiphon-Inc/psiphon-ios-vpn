@@ -1,39 +1,68 @@
-/* Text for button that plays the main screen ad */
+/* Text for button that tell users there will by a short video ad. */
 "AD_LOADED" = "Ad Loaded";
+
+/* Text for app subtitle on main view. */
+"APP_SUB_TITLE_MAIN_VIEW" = "BEYOND BORDERS";
+
+/* Text for app title on main view. */
+"APP_TITLE_MAIN_VIEW" = "PSIPHON";
 
 /* Text showing the app version. The '%@' placeholder is the version number. So it will look like 'Version 2'. */
 "APP_VERSION" = "Version %@";
 
+/* Text above change region button that allows user to select their desired server region */
+"CHANGE_REGION" = "Change Region";
+
 /* Done button in navigation bar
-   Title of the button that dismisses region selection dialog */
-"DONE_ACTION" = "Done";
+   Title of the button that dismisses region selection dialog
+   Title of the button that dismisses the settings menu (InAppSettingsKit) */
+"DONE_ACTION" = "Valmis";
+
+/* Text displayed while app loads */
+"LOADING" = "Loading...";
 
 /* Log view title bar text */
-"LOGS_TITLE" = "Logs";
+"LOGS_TITLE" = "Logitiedostot";
+
+/* Shown when the device is not configured for sending email. (InAppSettingsKit) */
+"MAIL_NOT_CONFIGURED" = "Mail not configured";
+
+/* Description for the 'Mail not configured' message. (InAppSettingsKit) */
+"MAIL_NOT_CONFIGURED_DESC" = "This device is not configured for sending Email. Please configure the Mail settings in the Settings app.";
+
+/* Alert title informing user there is no internet connection */
+"NO_INTERNET" = "No Internet Connection";
+
+/* Alert OK Button
+   Alert OK Button. (InAppSettingsKit) */
+"OK_BUTTON" = "Valmis";
 
 /* Alert message informing the user they should open the app to finish connecting to the VPN. */
 "OPEN_PSIPHON_APP" = "Please open Psiphon app to finish connecting.";
 
-/* Title which is displayed beside the flag of the country which the user has chosen to connect to. */
-"SERVER_REGION" = "Server region";
+/* Title of the settings (aka preferences) view (InAppSettingsKit) */
+"SETTINGS_TITLE" = "Asetukset";
+
+/* Alert message informing user to turn on their cellular data or wifi to connect to the internet */
+"TURN_ON_DATE" = "Turn on cellular data or use Wi-Fi to access data.";
 
 /* Alert message informing user they have to open the app */
 "USE_PSIPHON_APP" = "To connect, use the Psiphon application.";
 
 /* Status when the VPN is connected to a Psiphon server */
-"VPN_STATUS_CONNECTED" = "Connected";
+"VPN_STATUS_CONNECTED" = "Yhdistetty";
 
 /* Status when the VPN is connecting; that is, trying to connect to a Psiphon server */
 "VPN_STATUS_CONNECTING" = "Connecting";
 
 /* Status when the VPN is not connected to a Psiphon server, not trying to connect, and not in an error state */
-"VPN_STATUS_DISCONNECTED" = "Disconnected";
+"VPN_STATUS_DISCONNECTED" = "Yhteys katkaistu";
 
 /* Status when the VPN is disconnecting. Sometimes going from connected to disconnected can take some time, and this is that state. */
 "VPN_STATUS_DISCONNECTING" = "Disconnecting";
 
 /* Status when the VPN is in an invalid state. For example, if the user doesn't give permission for the VPN configuration to be installed, and therefore the Psiphon VPN can't even try to connect. */
-"VPN_STATUS_INVALID" = "Invalid";
+"VPN_STATUS_INVALID" = "Yhteys katkaistu";
 
 /* Status when the VPN was connected to a Psiphon server, got disconnected unexpectedly, and is currently trying to reconnect */
 "VPN_STATUS_RECONNECTING" = "Reconnecting";

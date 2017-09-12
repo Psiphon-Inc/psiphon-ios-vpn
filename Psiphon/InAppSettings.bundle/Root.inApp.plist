@@ -7,12 +7,16 @@
 		<dict>
 			<key>Title</key>
 			<string>Psiphon</string>
+			<key>BundleTable</key>
+			<string>PsiphonClientCommonLibrary</string>
 			<key>Type</key>
 			<string>PSGroupSpecifier</string>
 		</dict>
 		<dict>
 			<key>Title</key>
 			<string>Change Region</string>
+			<key>BundleTable</key>
+			<string>PsiphonClientCommonLibrary</string>
 			<key>Key</key>
 			<string>regionSelection</string>
 			<key>Type</key>
@@ -23,6 +27,8 @@
 		<dict>
 			<key>Title</key>
 			<string>Language</string>
+			<key>BundleTable</key>
+			<string>PsiphonClientCommonLibrary</string>
 			<key>Key</key>
 			<string>appLanguage</string>
 			<key>Type</key>
@@ -83,6 +89,8 @@
 			<string>disableTimeouts</string>
 			<key>Title</key>
 			<string>Disable Timeouts</string>
+			<key>BundleTable</key>
+			<string>PsiphonClientCommonLibrary</string>
 			<key>Type</key>
 			<string>PSToggleSwitchSpecifier</string>
 		</dict>
@@ -93,6 +101,8 @@
 			<string>useUpstreamProxy</string>
 			<key>Title</key>
 			<string>Use upstream proxy</string>
+			<key>BundleTable</key>
+			<string>PsiphonClientCommonLibrary</string>
 			<key>Type</key>
 			<string>PSToggleSwitchSpecifier</string>
 		</dict>
@@ -101,6 +111,8 @@
 			<string>upstreamProxyHostAddress</string>
 			<key>Title</key>
 			<string>Host address</string>
+			<key>BundleTable</key>
+			<string>PsiphonClientCommonLibrary</string>
 			<key>Type</key>
 			<string>IASKCustomViewSpecifier</string>
 			<key>AutocorrectionType</key>
@@ -113,6 +125,8 @@
 		<dict>
 			<key>Title</key>
 			<string>Port</string>
+			<key>BundleTable</key>
+			<string>PsiphonClientCommonLibrary</string>
 			<key>Key</key>
 			<string>upstreamProxyPort</string>
 			<key>Type</key>
@@ -131,6 +145,8 @@
 			<string>useProxyAuthentication</string>
 			<key>Title</key>
 			<string>Use proxy authentication</string>
+			<key>BundleTable</key>
+			<string>PsiphonClientCommonLibrary</string>
 			<key>Type</key>
 			<string>PSToggleSwitchSpecifier</string>
 		</dict>
@@ -139,6 +155,8 @@
 			<string>proxyUsername</string>
 			<key>Title</key>
 			<string>Proxy username</string>
+			<key>BundleTable</key>
+			<string>PsiphonClientCommonLibrary</string>
 			<key>Type</key>
 			<string>IASKCustomViewSpecifier</string>
 			<key>AutocorrectionType</key>
@@ -153,6 +171,8 @@
 			<true/>
 			<key>Title</key>
 			<string>Proxy password</string>
+			<key>BundleTable</key>
+			<string>PsiphonClientCommonLibrary</string>
 			<key>Key</key>
 			<string>proxyPassword</string>
 			<key>IASKPlaceholder</key>
@@ -163,6 +183,8 @@
 			<string>proxyDomain</string>
 			<key>Title</key>
 			<string>Proxy domain</string>
+			<key>BundleTable</key>
+			<string>PsiphonClientCommonLibrary</string>
 			<key>Type</key>
 			<string>IASKCustomViewSpecifier</string>
 			<key>AutocorrectionType</key>
@@ -173,6 +195,8 @@
 		<dict>
 			<key>Title</key>
 			<string>Help</string>
+			<key>BundleTable</key>
+			<string>PsiphonClientCommonLibrary</string>
 			<key>Type</key>
 			<string>PSGroupSpecifier</string>
 		</dict>
@@ -181,12 +205,16 @@
 			<string>ConnectionHelp</string>
 			<key>Title</key>
 			<string>My connection is bad, help!</string>
+			<key>BundleTable</key>
+			<string>PsiphonClientCommonLibrary</string>
 			<key>Type</key>
 			<string>PSChildPaneSpecifier</string>
 		</dict>
 		<dict>
 			<key>Title</key>
 			<string>Feedback</string>
+			<key>BundleTable</key>
+			<string>PsiphonClientCommonLibrary</string>
 			<key>File</key>
 			<string>Feedback</string>
 			<key>Key</key>
@@ -197,6 +225,8 @@
 		<dict>
 			<key>Title</key>
 			<string>FAQ</string>
+			<key>BundleTable</key>
+			<string>PsiphonClientCommonLibrary</string>
 			<key>Type</key>
 			<string>IASKCustomViewSpecifier</string>
 			<key>Key</key>
@@ -205,6 +235,8 @@
 		<dict>
 			<key>Title</key>
 			<string>Privacy Policy</string>
+			<key>BundleTable</key>
+			<string>PsiphonClientCommonLibrary</string>
 			<key>Type</key>
 			<string>IASKCustomViewSpecifier</string>
 			<key>Key</key>
@@ -213,6 +245,8 @@
 		<dict>
 			<key>Title</key>
 			<string>Terms of Use</string>
+			<key>BundleTable</key>
+			<string>PsiphonClientCommonLibrary</string>
 			<key>Type</key>
 			<string>IASKCustomViewSpecifier</string>
 			<key>Key</key>
@@ -221,6 +255,8 @@
 		<dict>
 			<key>Title</key>
 			<string>About</string>
+			<key>BundleTable</key>
+			<string>PsiphonClientCommonLibrary</string>
 			<key>Type</key>
 			<string>IASKCustomViewSpecifier</string>
 			<key>Key</key>
