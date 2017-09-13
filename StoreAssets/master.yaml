@@ -1,0 +1,25 @@
+# Info about how Transifex handles YAML can be found here: https://docs.transifex.com/formats/yaml
+
+# NOTE: When making a major change to a string -- one where you don't want to use old translations for it -- change the string's key. Otherwise, old translations will be used.
+
+en:
+  # The name of the app, as it appears in the App Store
+  app_name: Psiphon
+
+  # The "subtitle" for the app, which appears under the app name in the App Store
+  subtitle: Beyond Borders
+
+  # The description of the App, as it appears in the App Store
+  description: |
+    After helping tens of millions of users get access to the apps and sites they love, Psiphon has launched its first app for iOS!  Our new app seamlessly integrates access to the Psiphon network, securely connecting you to your apps and sites.
+
+    No matter where you are in the world, the Psiphon app will connect you to your favorite apps and sites. The app also provides you with an extra layer of protection when using public Wi-Fi services or other networks that could be untrustworthy.
+
+    Key Features include:
+    • Free, unlimited personal use.
+    • Easy to download, install, and use. No registration or configuration required.
+    • Automatic selection of protocols to provide fast, reliable access, every time.
+    • Multiple language support and configurable server location.
+
+  # Keywords to help people find the app in the App Store. Must be comma-separated.
+  keywords: Psiphon, proxy
