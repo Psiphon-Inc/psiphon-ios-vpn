@@ -1,8 +1,8 @@
 /* Text for button that tell users there will by a short video ad. */
-"AD_LOADED" = "Watch a short video while we get ready to connect you";
+"AD_LOADED" = "Regardez une courte vidéo pendant que nous nous préparons à vous connecter";
 
 /* Text for app subtitle on main view. */
-"APP_SUB_TITLE_MAIN_VIEW" = "BEYOND BORDERS";
+"APP_SUB_TITLE_MAIN_VIEW" = "PAR-DELÀ LES FRONTIÈRES";
 
 /* Text for app title on main view. */
 "APP_TITLE_MAIN_VIEW" = "PSIPHON";
@@ -28,26 +28,26 @@
 "MAIL_NOT_CONFIGURED" = "Le courriel n'est pas configuré";
 
 /* Description for the 'Mail not configured' message. (InAppSettingsKit) */
-"MAIL_NOT_CONFIGURED_DESC" = "Cet appareil n'est pas configuré pour envoyer des courriels. Veuillez configurer les paramètres de courriel dans l'appli Paramètres.";
+"MAIL_NOT_CONFIGURED_DESC" = "Cet appareil n'est pas configuré pour envoyer des courriels. Veuillez configurer les paramètres de courriel dans l'appli Réglages.";
 
 /* Alert title informing user there is no internet connection */
-"NO_INTERNET" = "No Internet Connection";
+"NO_INTERNET" = "Aucune connexion Internet";
 
 /* Alert OK Button
    Alert OK Button. (InAppSettingsKit) */
 "OK_BUTTON" = "OK";
 
 /* Alert message informing the user they should open the app to finish connecting to the VPN. */
-"OPEN_PSIPHON_APP" = "Please open Psiphon app to finish connecting.";
+"OPEN_PSIPHON_APP" = "Veuillez ouvrir l'appli Psiphon pour finir de vous connecter.";
 
 /* Title of the settings (aka preferences) view (InAppSettingsKit) */
 "SETTINGS_TITLE" = "Paramètres";
 
 /* Alert message informing user to turn on their cellular data or wifi to connect to the internet */
-"TURN_ON_DATE" = "Turn on cellular data or use Wi-Fi to access data.";
+"TURN_ON_DATE" = "Activez les données cellulaires ou utilisez le Wi-Fi pour accéder aux données.";
 
 /* Alert message informing user they have to open the app */
-"USE_PSIPHON_APP" = "To connect, use the Psiphon application.";
+"USE_PSIPHON_APP" = "Pour vous connecter, utilisez l'application Psiphon.";
 
 /* Status when the VPN is connected to a Psiphon server */
 "VPN_STATUS_CONNECTED" = "Connecté";
