@@ -14,7 +14,8 @@
 "CHANGE_REGION" = "Change Region";
 
 /* Done button in navigation bar
-   Title of the button that dismisses region selection dialog */
+   Title of the button that dismisses region selection dialog
+   Title of the button that dismisses the settings menu (InAppSettingsKit) */
 "DONE_ACTION" = "Done";
 
 /* Text displayed while app loads */
@@ -23,14 +24,24 @@
 /* Log view title bar text */
 "LOGS_TITLE" = "Logs";
 
+/* Shown when the device is not configured for sending email. (InAppSettingsKit) */
+"MAIL_NOT_CONFIGURED" = "Mail not configured";
+
+/* Description for the 'Mail not configured' message. (InAppSettingsKit) */
+"MAIL_NOT_CONFIGURED_DESC" = "This device is not configured for sending Email. Please configure the Mail settings in the Settings app.";
+
 /* Alert title informing user there is no internet connection */
 "NO_INTERNET" = "No Internet Connection";
 
-/* Alert OK Button */
+/* Alert OK Button
+   Alert OK Button. (InAppSettingsKit) */
 "OK_BUTTON" = "OK";
 
 /* Alert message informing the user they should open the app to finish connecting to the VPN. */
 "OPEN_PSIPHON_APP" = "Please open Psiphon app to finish connecting.";
+
+/* Title of the settings (aka preferences) view (InAppSettingsKit) */
+"SETTINGS_TITLE" = "Settings";
 
 /* Alert message informing user to turn on their cellular data or wifi to connect to the internet */
 "TURN_ON_DATE" = "Turn on cellular data or use Wi-Fi to access data.";
