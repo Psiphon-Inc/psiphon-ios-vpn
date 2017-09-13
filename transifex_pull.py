@@ -248,7 +248,7 @@ def pull_ios_browser_translations():
 
 
 def pull_ios_asset_translations():
-    resname = 'ios-browser-app-store-assets'
+    resname = 'ios-vpn-app-store-assets'
     process_resource(
         resname,
         lambda lang: './StoreAssets/%s.yaml' % (lang, ),
@@ -304,8 +304,7 @@ def _getconfig():
 def go():
     pull_ios_browser_translations()
 
-    # TODO: Add assets resource
-    #pull_ios_asset_translations()
+    pull_ios_asset_translations()
 
     print('FINISHED')
 
