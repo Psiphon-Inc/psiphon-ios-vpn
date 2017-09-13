@@ -177,7 +177,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     [self onVPNStatusDidChange];
 
     // Reset UILabel Text for Localizables
-    [self initLocalizables];
+//    [self initLocalizables];
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
@@ -346,8 +346,8 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     [self presentViewController:alert animated:TRUE completion:nil];
 }
 
-- (void) initLocalizables {
-    // Re init label text for Language.
+- (void) reloadLocalizablesString {
+    // Reload label text for Language.
     adLabel.text = NSLocalizedStringWithDefaultValue(@"AD_LOADED", nil, [NSBundle mainBundle], @"Watch a short video while we get ready to connect you", @"Text for button that tell users there will by a short video ad.");
     appTitleLabel.text = NSLocalizedStringWithDefaultValue(@"APP_TITLE_MAIN_VIEW", nil, [NSBundle mainBundle], @"PSIPHON", @"Text for app title on main view.");
     appSubTitleLabel.text = NSLocalizedStringWithDefaultValue(@"APP_SUB_TITLE_MAIN_VIEW", nil, [NSBundle mainBundle], @"BEYOND BORDERS", @"Text for app subtitle on main view.");
@@ -1018,6 +1018,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
         [appSettingsViewController dismissViewControllerAnimated:NO completion:^{
             [[RegionAdapter sharedInstance] reloadTitlesForNewLocalization];
             [weakSelf openSettingsMenu];
+            [self reloadLocalizablesString];
         }];
     }
 }
