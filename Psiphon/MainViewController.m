@@ -272,6 +272,9 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     } else {
         [self removePulsingHaloLayer];
     }
+
+    // Notify PsiphonSettingsViewController that the state has changed
+    [[NSNotificationCenter defaultCenter] postNotificationName:kPsiphonConnectionStateNotification object:nil];
 }
 
 - (void)onStartStopTap:(UIButton *)sender {
@@ -1039,6 +1042,16 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 
 - (BOOL)shouldEnableSettingsLinks {
     return YES;
+}
+
+- (NSArray<NSString*>*)hiddenSpecifierKeys {
+    VPNStatus status = [vpnManager getVPNStatus];
+    if (status == VPNStatusInvalid ||
+        status == VPNStatusDisconnected ||
+        status == VPNStatusDisconnecting) {
+        return @[kForceReconnect, kForceReconnectFooter];
+    }
+    return nil;
 }
 
 #pragma mark - Psiphon Settings
