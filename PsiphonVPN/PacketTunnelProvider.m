@@ -69,7 +69,7 @@ static const double kDefaultLogTruncationInterval = 12 * 60 * 60; // 12 hours
         // state variables
         shouldStartVPN = FALSE;
     }
-    
+
     return self;
 }
 
@@ -80,7 +80,7 @@ static const double kDefaultLogTruncationInterval = 12 * 60 * 60; // 12 hours
 
         // Listen for messages from the container
         [self listenForContainerMessages];
-        
+
         // Truncate logs every 12 hours
         [sharedDB truncateLogsOnInterval:(NSTimeInterval) kDefaultLogTruncationInterval];
 
@@ -112,7 +112,7 @@ static const double kDefaultLogTruncationInterval = 12 * 60 * 60; // 12 hours
     } else {
         // TODO: localize the following string
         [self displayMessage:
-            NSLocalizedStringWithDefaultValue(@"USE_PSIPHON_APP", nil, [NSBundle mainBundle], @"To connect, use the Psiphon application.", @"Alert message informing user they have to open the app")
+            NSLocalizedStringWithDefaultValue(@"USE_PSIPHON_APP", nil, [NSBundle mainBundle], @"To connect, use the Psiphon app", @"Alert message informing user they have to open the app")
           completionHandler:^(BOOL success) {
 //               TODO: error handling?
           }];
@@ -120,13 +120,13 @@ static const double kDefaultLogTruncationInterval = 12 * 60 * 60; // 12 hours
         startTunnelCompletionHandler([NSError
           errorWithDomain:PSIPHON_TUNNEL_ERROR_DOMAIN code:PSIPHON_TUNNEL_ERROR_BAD_START userInfo:nil]);
     }
-    
+
 }
 
 - (void)stopTunnelWithReason:(NEProviderStopReason)reason completionHandler:(void (^)(void)) completionHandler {
 
     [sharedDB updateTunnelConnectedState:FALSE];
-    
+
     // Assumes stopTunnelWithReason called exactly once only after startTunnelWithOptions.completionHandler(nil)
     if (vpnStartCompletionHandler) {
         vpnStartCompletionHandler([NSError
@@ -137,12 +137,12 @@ static const double kDefaultLogTruncationInterval = 12 * 60 * 60; // 12 hours
     [psiphonTunnel stop];
 
     completionHandler();
-    
+
     return;
 }
 
 - (void)handleAppMessage:(NSData *)messageData completionHandler:(nullable void (^)(NSData * __nullable responseData))completionHandler {
-    
+
     if (completionHandler != nil) {
         completionHandler(messageData);
     }
@@ -157,24 +157,24 @@ static const double kDefaultLogTruncationInterval = 12 * 60 * 60; // 12 hours
 }
 
 - (NEPacketTunnelNetworkSettings *)getTunnelSettings {
-    
+
     // TODO: select available private address range, like Android does:
     // https://github.com/Psiphon-Labs/psiphon-tunnel-core/blob/cff370d33e418772d89c3a4a117b87757e1470b2/MobileLibrary/Android/PsiphonTunnel/PsiphonTunnel.java#L718
-    
+
     NEPacketTunnelNetworkSettings *newSettings = [[NEPacketTunnelNetworkSettings alloc] initWithTunnelRemoteAddress:@"172.16.0.1"];
-    
+
     newSettings.IPv4Settings = [[NEIPv4Settings alloc] initWithAddresses:@[@"172.16.0.2"] subnetMasks:@[@"255.255.0.0"]];
-    
+
     newSettings.IPv4Settings.includedRoutes = @[[NEIPv4Route defaultRoute]];
     newSettings.IPv4Settings.excludedRoutes = @[[[NEIPv4Route alloc] initWithDestinationAddress:@"172.16.0.0" subnetMask:@"255.255.0.0"]];
-    
+
     // TODO: call getPacketTunnelDNSResolverIPv6Address
     newSettings.DNSSettings = [[NEDNSSettings alloc] initWithServers:@[[psiphonTunnel getPacketTunnelDNSResolverIPv4Address]]];
-    
+
     newSettings.DNSSettings.searchDomains = @[@""];
-    
+
     newSettings.MTU = @([psiphonTunnel getPacketTunnelMTU]);
-    
+
     return newSettings;
 }
 
@@ -284,7 +284,7 @@ static const double kDefaultLogTruncationInterval = 12 * 60 * 60; // 12 hours
         [self onDiagnosticMessage:[NSString stringWithFormat:@"Aborting. Failed to parse config JSON: %@", err.description]];
         abort();
     }
-         
+
     NSMutableDictionary *mutableConfigCopy = [readOnly mutableCopy];
 
     // TODO: apply mutations to config here
@@ -319,7 +319,7 @@ static const double kDefaultLogTruncationInterval = 12 * 60 * 60; // 12 hours
     LOG_DEBUG(@"onConnecting");
 
     self.reasserting = TRUE;
-    
+
     // Clear list of handshakeHomepages.
     [handshakeHomepages removeAllObjects];
 }
@@ -335,7 +335,7 @@ static const double kDefaultLogTruncationInterval = 12 * 60 * 60; // 12 hours
     }
 
     [notifier post:@"NE.tunnelConnected"];
-    
+
     [self tryStartVPN];
 }
 
