@@ -1,8 +1,8 @@
 /* Text for button that tell users there will by a short video ad. */
-"AD_LOADED" = "Regardez une courte vidéo pendant que nous nous préparons à vous connecter";
+"AD_LOADED" = "Ad Loaded";
 
 /* Text for app subtitle on main view. */
-"APP_SUB_TITLE_MAIN_VIEW" = "PAR-DELÀ LES FRONTIÈRES";
+"APP_SUB_TITLE_MAIN_VIEW" = "BEYOND BORDERS";
 
 /* Text for app title on main view. */
 "APP_TITLE_MAIN_VIEW" = "PSIPHON";
@@ -11,62 +11,62 @@
 "APP_VERSION" = "Version %@";
 
 /* Text above change region button that allows user to select their desired server region */
-"CHANGE_REGION" = "Changer de région";
+"CHANGE_REGION" = "Change Region";
 
 /* Done button in navigation bar
    Title of the button that dismisses region selection dialog
    Title of the button that dismisses the settings menu (InAppSettingsKit) */
-"DONE_ACTION" = "Terminé";
+"DONE_ACTION" = "Selesai";
 
 /* Text displayed while app loads */
-"LOADING" = "Chargement...";
+"LOADING" = "Loading...";
 
 /* Log view title bar text */
-"LOGS_TITLE" = "Journaux";
+"LOGS_TITLE" = "Log";
 
 /* Shown when the device is not configured for sending email. (InAppSettingsKit) */
-"MAIL_NOT_CONFIGURED" = "Le courriel n'est pas configuré";
+"MAIL_NOT_CONFIGURED" = "Mail tidak dikonfigurasi";
 
 /* Description for the 'Mail not configured' message. (InAppSettingsKit) */
-"MAIL_NOT_CONFIGURED_DESC" = "Cet appareil n'est pas configuré pour envoyer des courriels. Veuillez configurer les paramètres de courriel dans l'appli Réglages.";
+"MAIL_NOT_CONFIGURED_DESC" = "Perangkat ini tidak dikonfigurasi untuk mengirim Email. Konfigurasikan pengaturan Mail di aplikasi Settings.";
 
 /* Alert title informing user there is no internet connection */
-"NO_INTERNET" = "Aucune connexion Internet";
+"NO_INTERNET" = "No Internet Connection";
 
 /* Alert OK Button
    Alert OK Button. (InAppSettingsKit) */
-"OK_BUTTON" = "OK";
+"OK_BUTTON" = "OKE";
 
 /* Alert message informing the user they should open the app to finish connecting to the VPN. */
-"OPEN_PSIPHON_APP" = "Veuillez ouvrir l'appli Psiphon pour finir de vous connecter.";
+"OPEN_PSIPHON_APP" = "Please open Psiphon app to finish connecting.";
 
 /* Title of the settings (aka preferences) view (InAppSettingsKit) */
-"SETTINGS_TITLE" = "Paramètres";
+"SETTINGS_TITLE" = "Pengaturan";
 
 /* Alert message informing user to turn on their cellular data or wifi to connect to the internet */
-"TURN_ON_DATE" = "Activez les données cellulaires ou utilisez le Wi-Fi pour accéder aux données.";
+"TURN_ON_DATE" = "Turn on cellular data or use Wi-Fi to access data.";
 
 /* Alert message informing user they have to open the app */
-"USE_PSIPHON_APP" = "Pour vous connecter, utilisez l'application Psiphon.";
+"USE_PSIPHON_APP" = "To connect, use the Psiphon application.";
 
 /* Status when the VPN is connected to a Psiphon server */
-"VPN_STATUS_CONNECTED" = "Connecté";
+"VPN_STATUS_CONNECTED" = "Terhubung";
 
 /* Status when the VPN is connecting; that is, trying to connect to a Psiphon server */
-"VPN_STATUS_CONNECTING" = "Connexion";
+"VPN_STATUS_CONNECTING" = "Menyambung";
 
 /* Status when the VPN is not connected to a Psiphon server, not trying to connect, and not in an error state */
-"VPN_STATUS_DISCONNECTED" = "Déconnecté";
+"VPN_STATUS_DISCONNECTED" = "Terputus";
 
 /* Status when the VPN is disconnecting. Sometimes going from connected to disconnected can take some time, and this is that state. */
-"VPN_STATUS_DISCONNECTING" = "Déconnexion";
+"VPN_STATUS_DISCONNECTING" = "Memutus sambungan";
 
 /* Status when the VPN is in an invalid state. For example, if the user doesn't give permission for the VPN configuration to be installed, and therefore the Psiphon VPN can't even try to connect. */
-"VPN_STATUS_INVALID" = "Déconnecté";
+"VPN_STATUS_INVALID" = "Terputus";
 
 /* Status when the VPN was connected to a Psiphon server, got disconnected unexpectedly, and is currently trying to reconnect */
-"VPN_STATUS_RECONNECTING" = "Reconnexion";
+"VPN_STATUS_RECONNECTING" = "Reconnecting";
 
 /* Status when the VPN is restarting. */
-"VPN_STATUS_RESTARTING" = "Redémarrage";
+"VPN_STATUS_RESTARTING" = "Sedang restart";
 
