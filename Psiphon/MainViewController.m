@@ -756,10 +756,11 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 
     CGFloat spacing = 10; // the amount of spacing to appear between image and title
     CGFloat spacingFromSides = 10.f;
-    regionButton.imageEdgeInsets = UIEdgeInsetsMake(0, 0, 0, spacing);
-    regionButton.titleEdgeInsets = UIEdgeInsetsMake(0, spacing, 0, 0);
-    regionButton.contentEdgeInsets = UIEdgeInsetsMake(0, spacing + spacingFromSides, 0, spacing + spacingFromSides);
 
+    BOOL isRTL = ([UIApplication sharedApplication].userInterfaceLayoutDirection == UIUserInterfaceLayoutDirectionRightToLeft);
+    regionButton.imageEdgeInsets = UIEdgeInsetsMake(0, 0, 0, isRTL ? -spacing : spacing);
+    regionButton.titleEdgeInsets = UIEdgeInsetsMake(0, isRTL ? -spacing : spacing, 0, 0);
+    regionButton.contentEdgeInsets = UIEdgeInsetsMake(0, spacing + spacingFromSides, 0, spacing + spacingFromSides);
     [regionButton addTarget:self action:@selector(onRegionButtonTap:) forControlEvents:UIControlEventTouchUpInside];
     [bottomBar addSubview:regionButton];
     [self updateRegionButton];
@@ -1016,6 +1017,9 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
             [[RegionAdapter sharedInstance] reloadTitlesForNewLocalization];
             [weakSelf openSettingsMenu];
             [self reloadLocalizablesString];
+            [regionButton removeFromSuperview];
+            [regionButtonHeader removeFromSuperview];
+            [self addRegionButton];
         }];
     }
 }
