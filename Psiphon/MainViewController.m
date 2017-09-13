@@ -175,9 +175,6 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 
     // Sync UI with the VPN state
     [self onVPNStatusDidChange];
-
-    // Reset UILabel Text for Localizables
-//    [self initLocalizables];
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
