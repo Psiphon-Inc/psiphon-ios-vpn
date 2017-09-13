@@ -59,11 +59,12 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     //UIImageView *logoView;
     UILabel *appTitleLabel;
     UILabel *appSubTitleLabel;
-    UIButton *startStopButton;
     UILabel *statusLabel;
-    UIButton *regionButton;
     UILabel *versionLabel;
     UILabel *adLabel;
+    UILabel *regionButtonHeader;
+    UIButton *regionButton;
+    UIButton *startStopButton;
     PulsingHaloLayer *startStopButtonHalo;
     BOOL isStartStopButtonHaloOn;
 
@@ -174,6 +175,9 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 
     // Sync UI with the VPN state
     [self onVPNStatusDidChange];
+
+    // Reset UILabel Text for Localizables
+    [self initLocalizables];
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
@@ -340,6 +344,16 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     [alert addAction:defaultAction];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(dismissNoInternetAlert) name:@"UIApplicationWillResignActiveNotification" object:nil];
     [self presentViewController:alert animated:TRUE completion:nil];
+}
+
+- (void) initLocalizables {
+    // Re init label text for Language.
+    adLabel.text = NSLocalizedStringWithDefaultValue(@"AD_LOADED", nil, [NSBundle mainBundle], @"Watch a short video while we get ready to connect you", @"Text for button that tell users there will by a short video ad.");
+    appTitleLabel.text = NSLocalizedStringWithDefaultValue(@"APP_TITLE_MAIN_VIEW", nil, [NSBundle mainBundle], @"PSIPHON", @"Text for app title on main view.");
+    appSubTitleLabel.text = NSLocalizedStringWithDefaultValue(@"APP_SUB_TITLE_MAIN_VIEW", nil, [NSBundle mainBundle], @"BEYOND BORDERS", @"Text for app subtitle on main view.");
+    regionButtonHeader.text = NSLocalizedStringWithDefaultValue(@"CHANGE_REGION", nil, [NSBundle mainBundle], @"Change Region", @"Text above change region button that allows user to select their desired server region");
+    versionLabel.text = [NSString stringWithFormat:NSLocalizedStringWithDefaultValue(@"APP_VERSION", nil, [NSBundle mainBundle], @"Version %@", @"Text showing the app version. The '%@' placeholder is the version number. So it will look like 'Version 2'."),[[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"]];
+
 }
 
 - (NSString *)getVPNStatusDescription:(VPNStatus) status {
@@ -799,7 +813,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                                                            constant:buttonHeight]];
 
     // Add text above region button
-    UILabel *regionButtonHeader = [[UILabel alloc] init];
+    regionButtonHeader = [[UILabel alloc] init];
     regionButtonHeader.translatesAutoresizingMaskIntoConstraints = NO;
 
     regionButtonHeader.text = NSLocalizedStringWithDefaultValue(@"CHANGE_REGION", nil, [NSBundle mainBundle], @"Change Region", @"Text above change region button that allows user to select their desired server region");
