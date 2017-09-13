@@ -317,8 +317,10 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 # pragma mark - UI helper functions
 - (void) dismissNoInternetAlert {
     LOG_DEBUG();
-    [alert dismissViewControllerAnimated:YES completion:nil];
-    alert = nil;
+    if (alert != nil){
+        [alert dismissViewControllerAnimated:YES completion:nil];
+        alert = nil;
+    }
 }
 
 - (void)displayAlertNoInternet {
