@@ -1,1 +1,14 @@
-nb: {app_name: Psiphon, subtitle: Grenseløs}
+nb:
+  app_name: Psiphon
+  subtitle: Grenseløs
+  description: |
+    Etter å ha hjulpet millioner av brukere med hente programmene og nå sidene de elsker, har vi lansert den første Psiphon-appen for iOS. Vårt nye program gir sømløs tilgang til Psiphons omgåelsesnettverk, og kobler deg sikkert til programmene og sidene dine.
+
+    Psiphon-nettleseren vil koble deg til dine favoritt-nettsider og programmer uansett hvor du er i verden. Bruk av Psiphon-programmet gir deg også et ekstra lag med beskyttelse når du bruker offentlige Wi-Fi-tjenester eller andre nettverk som kan være upålitelige.
+
+    Nøkkelfunksjoner:
+    • Gratis for personlig bruk.
+    • Enkelt å laste ned og installere. Ingen registrering eller oppsett kreves.
+    • Automatisk valg av protokoller for å tilby effektiv, pålitelig omgåelse, hver gang.
+    • Støtte for flere språk og valgfri tjenerplassering.
+  keywords: Psiphon, mellomtjener

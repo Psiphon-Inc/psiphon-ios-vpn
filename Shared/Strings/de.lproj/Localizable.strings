@@ -1,8 +1,8 @@
 /* Text for button that tell users there will by a short video ad. */
-"AD_LOADED" = "Ad Loaded";
+"AD_LOADED" = "Sehen Sie sich ein kurzes Video an, während wir uns bereit machen, Sie zu verbinden";
 
 /* Text for app subtitle on main view. */
-"APP_SUB_TITLE_MAIN_VIEW" = "BEYOND BORDERS";
+"APP_SUB_TITLE_MAIN_VIEW" = "JENSEITS DER GRENZEN";
 
 /* Text for app title on main view. */
 "APP_TITLE_MAIN_VIEW" = "PSIPHON";
@@ -31,23 +31,23 @@
 "MAIL_NOT_CONFIGURED_DESC" = "Dieses Gerät ist nicht für das Senden einer E-Mail konfiguriert. Bitte konfigurieren Sie die E-Mail-Einstellungen in der App Einstellungen.";
 
 /* Alert title informing user there is no internet connection */
-"NO_INTERNET" = "No Internet Connection";
+"NO_INTERNET" = "Keine Internetverbindung";
 
 /* Alert OK Button
    Alert OK Button. (InAppSettingsKit) */
 "OK_BUTTON" = "OK";
 
 /* Alert message informing the user they should open the app to finish connecting to the VPN. */
-"OPEN_PSIPHON_APP" = "Please open Psiphon app to finish connecting.";
+"OPEN_PSIPHON_APP" = "Bitte öffnen Sie die Psiphon-App, um die Verbindung zu beenden.";
 
 /* Title of the settings (aka preferences) view (InAppSettingsKit) */
 "SETTINGS_TITLE" = "Einstellungen";
 
 /* Alert message informing user to turn on their cellular data or wifi to connect to the internet */
-"TURN_ON_DATE" = "Turn on cellular data or use Wi-Fi to access data.";
+"TURN_ON_DATE" = "Schalten Sie Mobilfunkdaten ein oder nutzen Sie WLAN, um auf Daten zuzugreifen.";
 
 /* Alert message informing user they have to open the app */
-"USE_PSIPHON_APP" = "To connect, use the Psiphon application.";
+"USE_PSIPHON_APP" = "Verwenden Sie die Psiphon-App, um eine Verbindung herzustellen";
 
 /* Status when the VPN is connected to a Psiphon server */
 "VPN_STATUS_CONNECTED" = "Verbunden";
@@ -65,7 +65,7 @@
 "VPN_STATUS_INVALID" = "Getrennt";
 
 /* Status when the VPN was connected to a Psiphon server, got disconnected unexpectedly, and is currently trying to reconnect */
-"VPN_STATUS_RECONNECTING" = "Reconnecting";
+"VPN_STATUS_RECONNECTING" = "Wiederverbinden";
 
 /* Status when the VPN is restarting. */
 "VPN_STATUS_RESTARTING" = "Starte neu";
