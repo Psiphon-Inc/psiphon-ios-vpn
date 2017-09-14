@@ -17,6 +17,7 @@
  *
  */
 
+#import <PsiphonTunnel/Reachability.h>
 #import "AdManager.h"
 #import "VPNManager.h"
 #import "AppDelegate.h"
@@ -95,8 +96,9 @@
 }
 
 - (bool)shouldShowUntunneledAds {
+    NetworkStatus networkStatus = [[Reachability reachabilityForInternetConnection] currentReachabilityStatus];
     VPNStatus vpnStatus = [vpnManager getVPNStatus];
-    return vpnStatus == VPNStatusInvalid || vpnStatus == VPNStatusDisconnected;
+    return networkStatus != NotReachable && (vpnStatus == VPNStatusInvalid || vpnStatus == VPNStatusDisconnected);
 }
 
 - (void)loadUntunneledInterstitial {
