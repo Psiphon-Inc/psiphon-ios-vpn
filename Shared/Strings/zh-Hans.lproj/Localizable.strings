@@ -47,7 +47,7 @@
 "TURN_ON_DATE" = "打开行动上网或是使用 Wi-Fi 来接取数据";
 
 /* Alert message informing user they have to open the app */
-"USE_PSIPHON_APP" = "使用赛风应用来进行连接";
+"USE_PSIPHON_APP" = "使用赛风应用进行连接";
 
 /* Status when the VPN is connected to a Psiphon server */
 "VPN_STATUS_CONNECTED" = "已连接";

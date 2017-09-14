@@ -1,1 +1,14 @@
-fr: {app_name: Psiphon, subtitle: Par-delà les frontières}
+fr:
+  app_name: Psiphon
+  subtitle: Par-delà les frontières
+  description: |
+    Après avoir aidé des millions d'utilisateurs à obtenir l'accès aux applis et sites qu'ils aiment, Psiphon a lancé sa première appli pour iOS ! Notre nouvelle appli intègre de façon transparente l'accès au réseau de Psiphon, vous connectant en toute sécurité à vos applis et sites.
+
+    Où que vous soyez dans le monde, l'appli Psiphon vous connectera à vos applis et sites Web favoris. L'appli vous fournit aussi une couche supplémentaire de protection quand vous utilisez des services Wi-Fi publics ou d'autres réseaux qui pourraient ne pas être dignes de confiance.
+
+    Les caractéristiques clés incluent :
+    • Usage personnel gratuit et illimité.
+    • Facile à télécharger, à installer et à utiliser. Aucune inscription ni configuration n'est requise.
+    • Sélection automatique des protocoles pour fournir un accès rapide et fiable en tout temps.
+    • Prise en charge multilingue et emplacement des serveurs configurable.
+  keywords: Psiphon, mandataire, proxy
