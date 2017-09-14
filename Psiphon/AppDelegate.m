@@ -191,9 +191,8 @@
 - (void) reloadMainViewController {
     LOG_DEBUG();
     mainViewController = [[MainViewController alloc] init];
+    mainViewController.openSettingImmediatelyOnViewDidAppear = YES;
    [self changeRootViewController:mainViewController];
-
-    [mainViewController setOpenSettingImmediatelyOnViewDidAppear:YES];
 }
 
 - (void)switchViewControllerWhenAdsLoaded {
