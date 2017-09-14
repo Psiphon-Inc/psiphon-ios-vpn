@@ -34,28 +34,6 @@
 
 static const double kDefaultLogTruncationInterval = 12 * 60 * 60; // 12 hours
 
-@interface PrivateAddress : NSObject
-
-@property NSString *ipAddress;
-@property NSString *gateway;
-
-@end
-
-@implementation PrivateAddress
-
--(id)initWithIPAddress:(NSString *)ipAddress_ gateway:(NSString *)gateway_ {
-    self = [super init];
-    if (self) {
-        self.ipAddress = ipAddress_;
-        self.gateway = gateway_;
-    }
-    return self;
-}
-
-@end
-
-//TODO: shareDB calls are blocking, should they be done in a background thread?
-
 @implementation PacketTunnelProvider {
 
     // pointer to startTunnelWithOptions completion handler.
@@ -63,6 +41,7 @@ static const double kDefaultLogTruncationInterval = 12 * 60 * 60; // 12 hours
     void (^vpnStartCompletionHandler)(NSError *__nullable error);
 
     PsiphonTunnel *psiphonTunnel;
+
     PsiphonDataSharedDB *sharedDB;
 
     // Notifier
@@ -82,6 +61,7 @@ static const double kDefaultLogTruncationInterval = 12 * 60 * 60; // 12 hours
         // Create our tunnel instance
         psiphonTunnel = [PsiphonTunnel newPsiphonTunnel:(id <TunneledAppDelegate>) self];
 
+        //TODO: sharedDB calls are blocking, should they be done in a background thread?
         sharedDB = [[PsiphonDataSharedDB alloc] initForAppGroupIdentifier:APP_GROUP_IDENTIFIER];
 
         handshakeHomepages = [[NSMutableArray alloc] init];
@@ -137,7 +117,7 @@ static const double kDefaultLogTruncationInterval = 12 * 60 * 60; // 12 hours
         [self displayMessage:
             NSLocalizedStringWithDefaultValue(@"USE_PSIPHON_APP", nil, [NSBundle mainBundle], @"To connect, use the Psiphon app", @"Alert message informing user they have to open the app")
           completionHandler:^(BOOL success) {
-//               TODO: error handling?
+              // TODO: error handling?
           }];
 
         startTunnelCompletionHandler([NSError
@@ -170,7 +150,6 @@ static const double kDefaultLogTruncationInterval = 12 * 60 * 60; // 12 hours
         completionHandler(messageData);
     }
 }
-
 
 - (void)sleepWithCompletionHandler:(void (^)(void))completionHandler {
     completionHandler();
@@ -209,18 +188,18 @@ static const double kDefaultLogTruncationInterval = 12 * 60 * 60; // 12 hours
 
 - (NEPacketTunnelNetworkSettings *)getTunnelSettings {
 
-    // select available private address range, like Android does:
+    // Select available private address range, like Android does:
     // https://github.com/Psiphon-Labs/psiphon-tunnel-core/blob/cff370d33e418772d89c3a4a117b87757e1470b2/MobileLibrary/Android/PsiphonTunnel/PsiphonTunnel.java#L718
     // NOTE that the user may still connect to a WiFi network while the VPN is enabled that could conflict with the selected
     // address range
 
     NSMutableDictionary *candidates = [NSMutableDictionary dictionary];
-    candidates[@"172"] = [[PrivateAddress alloc] initWithIPAddress:@"172.16.0.2" gateway:@"172.16.0.1"];
-    candidates[@"10"] = [[PrivateAddress alloc] initWithIPAddress:@"10.0.0.2" gateway:@"10.0.0.1"];
-    candidates[@"192"] = [[PrivateAddress alloc] initWithIPAddress:@"192.168.0.2" gateway:@"192.168.0.1"];
-    candidates[@"169"] = [[PrivateAddress alloc] initWithIPAddress:@"169.254.1.2" gateway:@"169.254.1.1"];
-
-    PrivateAddress *selectedAddress = [[candidates allValues] objectAtIndex:0];
+    candidates[@"172"] = @[@"172.16.0.2", @"172.16.0.1"];
+    candidates[@"10"] = @[@"10.0.0.2", @"10.0.0.1"];
+    candidates[@"192"] = @[@"192.168.0.2", @"192.168.0.1"];
+    candidates[@"169"] = @[@"169.254.1.2", @"169.254.1.1"];
+    
+    NSArray *selectedAddress = [[candidates allValues] objectAtIndex:0];
 
     NSArray *networkInterfacesIPAddresses = [self getNetworkInterfacesIPv4Addresses];
     for (NSString *ipAddress in networkInterfacesIPAddresses) {
@@ -244,11 +223,11 @@ static const double kDefaultLogTruncationInterval = 12 * 60 * 60; // 12 hours
         selectedAddress = [[candidates allValues] objectAtIndex:0];
     }
     
-    LOG_DEBUG(@"Selected private address: %@", selectedAddress.ipAddress);
+    LOG_DEBUG(@"Selected private address: %@", selectedAddress[0]);
 
-    NEPacketTunnelNetworkSettings *newSettings = [[NEPacketTunnelNetworkSettings alloc] initWithTunnelRemoteAddress:selectedAddress.gateway];
+    NEPacketTunnelNetworkSettings *newSettings = [[NEPacketTunnelNetworkSettings alloc] initWithTunnelRemoteAddress:selectedAddress[1]];
     
-    newSettings.IPv4Settings = [[NEIPv4Settings alloc] initWithAddresses:@[selectedAddress.ipAddress] subnetMasks:@[@"255.255.255.0"]];
+    newSettings.IPv4Settings = [[NEIPv4Settings alloc] initWithAddresses:@[selectedAddress[0]] subnetMasks:@[@"255.255.255.0"]];
     
     newSettings.IPv4Settings.includedRoutes = @[[NEIPv4Route defaultRoute]];
     
