@@ -28,8 +28,31 @@
 #import "SharedConstants.h"
 #import "Notifier.h"
 #import "Logging.h"
+#import <ifaddrs.h>
+#import <arpa/inet.h>
+#import <net/if.h>
 
 static const double kDefaultLogTruncationInterval = 12 * 60 * 60; // 12 hours
+
+@interface PrivateAddress : NSObject
+
+@property NSString *ipAddress;
+@property NSString *gateway;
+
+@end
+
+@implementation PrivateAddress
+
+-(id)initWithIPAddress:(NSString *)ipAddress_ gateway:(NSString *)gateway_ {
+    self = [super init];
+    if (self) {
+        self.ipAddress = ipAddress_;
+        self.gateway = gateway_;
+    }
+    return self;
+}
+
+@end
 
 //TODO: shareDB calls are blocking, should they be done in a background thread?
 
@@ -156,17 +179,81 @@ static const double kDefaultLogTruncationInterval = 12 * 60 * 60; // 12 hours
 - (void)wake {
 }
 
+- (NSArray *)getNetworkInterfacesIPv4Addresses {
+    
+    // Getting list of all interfaces' IPv4 addresses
+    NSMutableArray *upIfIpAddressList = [NSMutableArray new];
+    
+    struct ifaddrs *interfaces;
+    if (getifaddrs(&interfaces) == 0) {
+        struct ifaddrs *interface;
+        for (interface=interfaces; interface; interface=interface->ifa_next) {
+            
+            // Only IFF_UP interfaces. Loopback is ignored.
+            if (interface->ifa_flags & IFF_UP && !(interface->ifa_flags & IFF_LOOPBACK)) {
+                
+                if (interface->ifa_addr && interface->ifa_addr->sa_family==AF_INET) {
+                    struct sockaddr_in *in = (struct sockaddr_in*) interface->ifa_addr;
+                    NSString *interfaceAddress = [NSString stringWithUTF8String:inet_ntoa(in->sin_addr)];
+                    [upIfIpAddressList addObject:interfaceAddress];
+                }
+            }
+        }
+    }
+    
+    // Free getifaddrs data
+    freeifaddrs(interfaces);
+    
+    return upIfIpAddressList;
+}
+
 - (NEPacketTunnelNetworkSettings *)getTunnelSettings {
 
-    // TODO: select available private address range, like Android does:
+    // select available private address range, like Android does:
     // https://github.com/Psiphon-Labs/psiphon-tunnel-core/blob/cff370d33e418772d89c3a4a117b87757e1470b2/MobileLibrary/Android/PsiphonTunnel/PsiphonTunnel.java#L718
+    // NOTE that the user may still connect to a WiFi network while the VPN is enabled that could conflict with the selected
+    // address range
 
-    NEPacketTunnelNetworkSettings *newSettings = [[NEPacketTunnelNetworkSettings alloc] initWithTunnelRemoteAddress:@"172.16.0.1"];
+    NSMutableDictionary *candidates = [NSMutableDictionary dictionary];
+    candidates[@"172"] = [[PrivateAddress alloc] initWithIPAddress:@"172.16.0.2" gateway:@"172.16.0.1"];
+    candidates[@"10"] = [[PrivateAddress alloc] initWithIPAddress:@"10.0.0.2" gateway:@"10.0.0.1"];
+    candidates[@"192"] = [[PrivateAddress alloc] initWithIPAddress:@"192.168.0.2" gateway:@"192.168.0.1"];
+    candidates[@"169"] = [[PrivateAddress alloc] initWithIPAddress:@"169.254.1.2" gateway:@"169.254.1.1"];
 
-    newSettings.IPv4Settings = [[NEIPv4Settings alloc] initWithAddresses:@[@"172.16.0.2"] subnetMasks:@[@"255.255.0.0"]];
+    PrivateAddress *selectedAddress = [[candidates allValues] objectAtIndex:0];
 
+    NSArray *networkInterfacesIPAddresses = [self getNetworkInterfacesIPv4Addresses];
+    for (NSString *ipAddress in networkInterfacesIPAddresses) {
+        LOG_DEBUG(@"Interface: %@", ipAddress);
+        
+        if ([ipAddress hasPrefix:@"10."]) {
+            [candidates removeObjectForKey:@"10"];
+        } else if ([ipAddress length] >= 6 &&
+                   [[ipAddress substringToIndex:6] compare:@"172.16"] >= 0 &&
+                   [[ipAddress substringToIndex:6] compare:@"172.31"] <= 0 &&
+                   [ipAddress characterAtIndex:6] == '.') {
+            [candidates removeObjectForKey:@"172"];
+        } else if ([ipAddress hasPrefix:@"192.168"]) {
+            [candidates removeObjectForKey:@"192"];
+        } else if ([ipAddress hasPrefix:@"169.254"]) {
+            [candidates removeObjectForKey:@"169"];
+        }
+    }
+    
+    if ([candidates count] > 0) {
+        selectedAddress = [[candidates allValues] objectAtIndex:0];
+    }
+    
+    LOG_DEBUG(@"Selected private address: %@", selectedAddress.ipAddress);
+
+    NEPacketTunnelNetworkSettings *newSettings = [[NEPacketTunnelNetworkSettings alloc] initWithTunnelRemoteAddress:selectedAddress.gateway];
+    
+    newSettings.IPv4Settings = [[NEIPv4Settings alloc] initWithAddresses:@[selectedAddress.ipAddress] subnetMasks:@[@"255.255.255.0"]];
+    
     newSettings.IPv4Settings.includedRoutes = @[[NEIPv4Route defaultRoute]];
-    newSettings.IPv4Settings.excludedRoutes = @[[[NEIPv4Route alloc] initWithDestinationAddress:@"172.16.0.0" subnetMask:@"255.255.0.0"]];
+    
+    // TODO: split tunneling could be implemented here
+    newSettings.IPv4Settings.excludedRoutes = @[];
 
     // TODO: call getPacketTunnelDNSResolverIPv6Address
     newSettings.DNSSettings = [[NEDNSSettings alloc] initWithServers:@[[psiphonTunnel getPacketTunnelDNSResolverIPv4Address]]];
