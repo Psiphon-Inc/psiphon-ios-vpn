@@ -194,12 +194,14 @@ static const double kDefaultLogTruncationInterval = 12 * 60 * 60; // 12 hours
     // address range
 
     NSMutableDictionary *candidates = [NSMutableDictionary dictionary];
-    candidates[@"172"] = @[@"172.16.0.2", @"172.16.0.1"];
-    candidates[@"10"] = @[@"10.0.0.2", @"10.0.0.1"];
-    candidates[@"192"] = @[@"192.168.0.2", @"192.168.0.1"];
+    candidates[@"192.0.2"] = @[@"192.0.2.2", @"192.0.2.1"];
     candidates[@"169"] = @[@"169.254.1.2", @"169.254.1.1"];
+    candidates[@"172"] = @[@"172.16.0.2", @"172.16.0.1"];
+    candidates[@"192"] = @[@"192.168.0.2", @"192.168.0.1"];
+    candidates[@"10"] = @[@"10.0.0.2", @"10.0.0.1"];
     
-    NSArray *selectedAddress = [[candidates allValues] objectAtIndex:0];
+    static NSString *const preferredCandidate = @"192.0.2";
+    NSArray *selectedAddress = candidates[preferredCandidate];
 
     NSArray *networkInterfacesIPAddresses = [self getNetworkInterfacesIPv4Addresses];
     for (NSString *ipAddress in networkInterfacesIPAddresses) {
@@ -216,10 +218,12 @@ static const double kDefaultLogTruncationInterval = 12 * 60 * 60; // 12 hours
             [candidates removeObjectForKey:@"192"];
         } else if ([ipAddress hasPrefix:@"169.254"]) {
             [candidates removeObjectForKey:@"169"];
+        } else if ([ipAddress hasPrefix:@"192.0.2."]) {
+            [candidates removeObjectForKey:@"192.0.2"];
         }
     }
     
-    if ([candidates count] > 0) {
+    if ([candidates objectForKey:preferredCandidate] == nil && [candidates count] > 0) {
         selectedAddress = [[candidates allValues] objectAtIndex:0];
     }
     
