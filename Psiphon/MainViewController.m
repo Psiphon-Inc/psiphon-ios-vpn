@@ -332,16 +332,17 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
           alertControllerWithTitle:NSLocalizedStringWithDefaultValue(@"NO_INTERNET", nil, [NSBundle mainBundle], @"No Internet Connection", @"Alert title informing user there is no internet connection")
                            message:NSLocalizedStringWithDefaultValue(@"TURN_ON_DATE", nil, [NSBundle mainBundle], @"Turn on cellular data or use Wi-Fi to access data.", @"Alert message informing user to turn on their cellular data or wifi to connect to the internet")
                     preferredStyle:UIAlertControllerStyleAlert];
+
+        UIAlertAction *defaultAction = [UIAlertAction
+          actionWithTitle:NSLocalizedStringWithDefaultValue(@"OK_BUTTON", nil, [NSBundle mainBundle], @"OK", @"Alert OK Button")
+                    style:UIAlertActionStyleDefault
+                  handler:^(UIAlertAction *action) {
+                  }];
+
+        [alert addAction:defaultAction];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(dismissNoInternetAlert) name:@"UIApplicationWillResignActiveNotification" object:nil];
     }
 
-    UIAlertAction *defaultAction = [UIAlertAction
-      actionWithTitle:NSLocalizedStringWithDefaultValue(@"OK_BUTTON", nil, [NSBundle mainBundle], @"OK", @"Alert OK Button")
-                style:UIAlertActionStyleDefault
-              handler:^(UIAlertAction *action) {
-              }];
-
-    [alert addAction:defaultAction];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(dismissNoInternetAlert) name:@"UIApplicationWillResignActiveNotification" object:nil];
     [self presentViewController:alert animated:TRUE completion:nil];
 }
 
