@@ -389,6 +389,10 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     isStartStopButtonHaloOn = FALSE;
 }
 
+- (BOOL) isRightToLeft {
+    return ([UIApplication sharedApplication].userInterfaceLayoutDirection == UIUserInterfaceLayoutDirectionRightToLeft);
+}
+
 /*- (void)addLogoImage {
     logoView = [[UIImageView alloc] init];
     [logoView setImage:[UIImage imageNamed:@"Logo"]];
@@ -541,11 +545,12 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                                                          multiplier:1.0
                                                            constant:gearTemplate.size.height/2 + 8.f]];
 
+
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:settingsButton
                                                           attribute:NSLayoutAttributeCenterX
                                                           relatedBy:NSLayoutRelationEqual
                                                              toItem:self.view
-                                                          attribute:NSLayoutAttributeRight
+                                                          attribute:NSLayoutAttributeTrailing
                                                          multiplier:1.0
                                                            constant:-gearTemplate.size.width/2 - 13.f]];
 
@@ -769,7 +774,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     CGFloat spacing = 10; // the amount of spacing to appear between image and title
     CGFloat spacingFromSides = 10.f;
 
-    BOOL isRTL = ([UIApplication sharedApplication].userInterfaceLayoutDirection == UIUserInterfaceLayoutDirectionRightToLeft);
+    BOOL isRTL = [self isRightToLeft];
     regionButton.imageEdgeInsets = UIEdgeInsetsMake(0, 0, 0, isRTL ? -spacing : spacing);
     regionButton.titleEdgeInsets = UIEdgeInsetsMake(0, isRTL ? -spacing : spacing, 0, 0);
     regionButton.contentEdgeInsets = UIEdgeInsetsMake(0, spacing + spacingFromSides, 0, spacing + spacingFromSides);
@@ -886,12 +891,12 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 
     // Setup autolayout
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:versionLabel
-                                                          attribute:NSLayoutAttributeLeft
+                                                          attribute:NSLayoutAttributeLeading
                                                           relatedBy:NSLayoutRelationEqual
                                                              toItem:self.view
-                                                          attribute:NSLayoutAttributeLeft
+                                                          attribute:NSLayoutAttributeLeading
                                                          multiplier:1.0
-                                                          constant:10.0]];
+                                                           constant:10.0]];
 
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:versionLabel
                                                           attribute:NSLayoutAttributeCenterY
