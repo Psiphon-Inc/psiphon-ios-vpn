@@ -418,6 +418,22 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                                                            constant:0]];
 }*/
 
+- (BOOL)unsupportedCharactersForFont:(NSString*)font withString:(NSString*)string {
+    for (NSInteger charIdx = 0; charIdx < string.length; charIdx++) {
+        NSString *character = [NSString stringWithFormat:@"%C", [string characterAtIndex:charIdx]];
+        // TODO: need to enumerate a longer list of special characters for this to be more correct.
+        if ([character isEqualToString:@" "]) {
+            // Skip special characters
+            continue;
+        }
+        CGFontRef cgFont = CGFontCreateWithFontName((CFStringRef)font);
+        if (CGFontGetGlyphWithGlyphName(cgFont,  (__bridge CFStringRef)character) == 0) {
+            return YES;
+        }
+    }
+    return NO;
+}
+
 - (void)addAppTitleLabel {
     appTitleLabel = [[UILabel alloc] init];
     appTitleLabel.translatesAutoresizingMaskIntoConstraints = NO;
@@ -429,6 +445,10 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
         narrowestWidth = self.view.frame.size.height;
     }
     appTitleLabel.font = [UIFont fontWithName:@"Bourbon-Oblique" size:narrowestWidth * 0.10625f];
+    if ([self unsupportedCharactersForFont:appTitleLabel.font.fontName withString:appTitleLabel.text]) {
+        appTitleLabel.font = [UIFont systemFontOfSize:narrowestWidth * 0.075f];
+    }
+
     [self.view addSubview:appTitleLabel];
     
     // Setup autolayout
@@ -468,6 +488,10 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
         narrowestWidth = self.view.frame.size.height;
     }
     appSubTitleLabel.font = [UIFont fontWithName:@"Bourbon-Oblique" size:narrowestWidth * 0.10625f/2.0f];
+    if ([self unsupportedCharactersForFont:appSubTitleLabel.font.fontName withString:appSubTitleLabel.text]) {
+        appSubTitleLabel.font = [UIFont systemFontOfSize:narrowestWidth * 0.075f/2.0f];
+    }
+
     [self.view addSubview:appSubTitleLabel];
     
     // Setup autolayout
