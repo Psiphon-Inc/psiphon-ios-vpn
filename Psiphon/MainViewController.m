@@ -110,12 +110,21 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 
         // Open Setting after change it
         self.openSettingImmediatelyOnViewDidAppear = NO;
+
+        [[NSNotificationCenter defaultCenter]
+                addObserver:self selector:@selector(onVPNStatusDidChange) name:@kVPNStatusChangeNotificationName object:vpnManager];
+
+        [[NSNotificationCenter defaultCenter]
+                addObserver:self selector:@selector(onAdStatusDidChange) name:@kAdsDidLoad object:adManager];
     }
     return self;
 }
 
-#pragma mark - Lifecycle methods
+- (void) dealloc {
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+}
 
+#pragma mark - Lifecycle methods
 - (void)viewDidLoad {
    LOG_DEBUG();
     [super viewDidLoad];
@@ -163,12 +172,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     if (self.openSettingImmediatelyOnViewDidAppear) {
         [self openSettingsMenu];
         self.openSettingImmediatelyOnViewDidAppear = NO;
-        return;
-
     }
-
-    [[NSNotificationCenter defaultCenter]
-      addObserver:self selector:@selector(onAdStatusDidChange) name:@kAdsDidLoad object:adManager];
 }
 
 - (void)viewDidLayoutSubviews {
@@ -181,8 +185,6 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     [super viewWillAppear:animated];
 
     // Listen for VPN status changes from VPNManager.
-    [[NSNotificationCenter defaultCenter]
-      addObserver:self selector:@selector(onVPNStatusDidChange) name:@kVPNStatusChangeNotificationName object:vpnManager];
 
     // Sync UI with the VPN state
     [self onVPNStatusDidChange];
