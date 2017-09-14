@@ -109,7 +109,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
         [self persistSettingsToSharedUserDefaults];
 
         // Open Setting after change it
-        [self setOpenSettingImmediatelyOnViewDidAppear:NO];
+        self.openSettingImmediatelyOnViewDidAppear = NO;
     }
     return self;
 }
@@ -162,7 +162,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 
     if (self.openSettingImmediatelyOnViewDidAppear) {
         [self openSettingsMenu];
-        [self setOpenSettingImmediatelyOnViewDidAppear:NO];
+        self.openSettingImmediatelyOnViewDidAppear = NO;
         return;
 
     }
