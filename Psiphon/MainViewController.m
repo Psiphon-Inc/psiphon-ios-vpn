@@ -35,6 +35,7 @@
 #import "AdManager.h"
 #import "PulsingHaloLayer.h"
 #import "Logging.h"
+#import "AppDelegate.h"
 
 static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSString *b) {
     return (([a length] == 0) && ([b length] == 0)) || ([a isEqualToString:b]);
@@ -106,6 +107,9 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
         // VPN Config user defaults
         psiphonConfigUserDefaults = [PsiphonConfigUserDefaults sharedInstance];
         [self persistSettingsToSharedUserDefaults];
+
+        // Open Setting after change it
+        [self setOpenSettingImmediatelyOnViewDidAppear:NO];
     }
     return self;
 }
@@ -155,6 +159,13 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     // Available regions may have changed in the background
     [self updateAvailableRegions];
     [self updateRegionButton];
+
+    if (self.openSettingImmediatelyOnViewDidAppear) {
+        [self openSettingsMenu];
+        [self setOpenSettingImmediatelyOnViewDidAppear:NO];
+        return;
+
+    }
 
     [[NSNotificationCenter defaultCenter]
       addObserver:self selector:@selector(onAdStatusDidChange) name:@kAdsDidLoad object:adManager];
@@ -1019,11 +1030,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
         __weak MainViewController *weakSelf = self;
         [appSettingsViewController dismissViewControllerAnimated:NO completion:^{
             [[RegionAdapter sharedInstance] reloadTitlesForNewLocalization];
-            [weakSelf openSettingsMenu];
-            [self reloadLocalizablesString];
-            [regionButton removeFromSuperview];
-            [regionButtonHeader removeFromSuperview];
-            [self addRegionButton];
+            [[AppDelegate sharedAppDelegate] reloadMainViewController];
         }];
     }
 }
