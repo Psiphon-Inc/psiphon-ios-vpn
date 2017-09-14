@@ -521,23 +521,14 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                                                          multiplier:1.0
                                                            constant:gearTemplate.size.height/2 + 8.f]];
 
-    if ([self isRightToLeft]){
-        [self.view addConstraint:[NSLayoutConstraint constraintWithItem:settingsButton
+
+    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:settingsButton
                                                               attribute:NSLayoutAttributeCenterX
                                                               relatedBy:NSLayoutRelationEqual
                                                                  toItem:self.view
-                                                              attribute:NSLayoutAttributeLeft
-                                                             multiplier:1.0
-                                                               constant:gearTemplate.size.width/2 + 13.f]];
-    } else {
-        [self.view addConstraint:[NSLayoutConstraint constraintWithItem:settingsButton
-                                                              attribute:NSLayoutAttributeCenterX
-                                                              relatedBy:NSLayoutRelationEqual
-                                                                 toItem:self.view
-                                                              attribute:NSLayoutAttributeRight
+                                                              attribute:NSLayoutAttributeTrailing
                                                              multiplier:1.0
                                                                constant:-gearTemplate.size.width/2 - 13.f]];
-    }
 
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:settingsButton
                                                           attribute:NSLayoutAttributeWidth
@@ -875,23 +866,13 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     [self.view addSubview:versionLabel];
 
     // Setup autolayout
-    if ([self isRightToLeft]){
-        [self.view addConstraint:[NSLayoutConstraint constraintWithItem:versionLabel
-                                                              attribute:NSLayoutAttributeRight
+    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:versionLabel
+                                                              attribute:NSLayoutAttributeLeading
                                                               relatedBy:NSLayoutRelationEqual
                                                                  toItem:self.view
-                                                              attribute:NSLayoutAttributeRight
-                                                             multiplier:1.0
-                                                               constant:-10.0]];
-    } else {
-        [self.view addConstraint:[NSLayoutConstraint constraintWithItem:versionLabel
-                                                              attribute:NSLayoutAttributeLeft
-                                                              relatedBy:NSLayoutRelationEqual
-                                                                 toItem:self.view
-                                                              attribute:NSLayoutAttributeLeft
+                                                              attribute:NSLayoutAttributeLeading
                                                              multiplier:1.0
                                                                constant:10.0]];
-    }
 
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:versionLabel
                                                           attribute:NSLayoutAttributeCenterY
