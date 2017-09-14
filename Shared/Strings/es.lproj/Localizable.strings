@@ -47,7 +47,7 @@
 "TURN_ON_DATE" = "Active los datos móviles o use Wi-Fi para acceder a los datos.";
 
 /* Alert message informing user they have to open the app */
-"USE_PSIPHON_APP" = "Para conectar, use la aplicación Psiphon.";
+"USE_PSIPHON_APP" = "Para conectar, use la app de Psiphon";
 
 /* Status when the VPN is connected to a Psiphon server */
 "VPN_STATUS_CONNECTED" = "Conectado";
