@@ -24,4 +24,6 @@
 
 @interface MainViewController : UIViewController <PsiphonSettingsViewControllerDelegate>
 
+@property (nonatomic) BOOL openSettingImmediatelyOnView;
+
 @end

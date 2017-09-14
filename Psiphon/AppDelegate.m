@@ -188,6 +188,14 @@
     }
 }
 
+- (void) reloadMainViewController {
+    LOG_DEBUG();
+    mainViewController = [[MainViewController alloc] init];
+   [self changeRootViewController:mainViewController];
+
+    [mainViewController setOpenSettingImmediatelyOnView:YES];
+}
+
 - (void)switchViewControllerWhenAdsLoaded {
     [loadingTimer invalidate];
     timerCount = 0;
