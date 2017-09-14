@@ -109,7 +109,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
         [self persistSettingsToSharedUserDefaults];
 
         // Open Setting after change it
-        [self setOpenSettingImmediatelyOnView:NO];
+        [self setOpenSettingImmediatelyOnViewDidAppear:NO];
     }
     return self;
 }
@@ -160,9 +160,9 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     [self updateAvailableRegions];
     [self updateRegionButton];
 
-    if (self.openSettingImmediatelyOnView) {
+    if (self.openSettingImmediatelyOnViewDidAppear) {
         [self openSettingsMenu];
-        [self setOpenSettingImmediatelyOnView:NO];
+        [self setOpenSettingImmediatelyOnViewDidAppear:NO];
         return;
 
     }
@@ -1031,11 +1031,6 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
         [appSettingsViewController dismissViewControllerAnimated:NO completion:^{
             [[RegionAdapter sharedInstance] reloadTitlesForNewLocalization];
             [[AppDelegate sharedAppDelegate] reloadMainViewController];
-            [weakSelf openSettingsMenu];
-//            [self reloadLocalizablesString];
-//            [regionButton removeFromSuperview];
-//            [regionButtonHeader removeFromSuperview];
-//            [self addRegionButton];
         }];
     }
 }

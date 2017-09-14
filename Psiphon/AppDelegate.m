@@ -193,7 +193,7 @@
     mainViewController = [[MainViewController alloc] init];
    [self changeRootViewController:mainViewController];
 
-    [mainViewController setOpenSettingImmediatelyOnView:YES];
+    [mainViewController setOpenSettingImmediatelyOnViewDidAppear:YES];
 }
 
 - (void)switchViewControllerWhenAdsLoaded {
