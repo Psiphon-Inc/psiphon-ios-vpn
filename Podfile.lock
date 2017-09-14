@@ -17,7 +17,7 @@ PODS:
     - mopub-ios-sdk/Core
     - mopub-ios-sdk/Moat
   - MPUBMoatMobileAppKit (3.2.1)
-  - PsiphonClientCommonLibrary (0.2.3):
+  - PsiphonClientCommonLibrary (0.2.5):
     - InAppSettingsKit
   - VungleSDK-iOS (5.1.0)
 
@@ -26,7 +26,7 @@ DEPENDENCIES:
   - Google-Mobile-Ads-SDK (= 7.23.0)
   - InAppSettingsKit (from `https://github.com/Psiphon-Inc/InAppSettingsKit.git`, commit `2fe96b0d622fe4f8dfc70c61057598aec283d109`)
   - mopub-ios-sdk (= 4.16.0)
-  - PsiphonClientCommonLibrary (from `https://github.com/Psiphon-Inc/psiphon-ios-client-common-library.git`, commit `56daadf91daf7f939f24f8cadce3008d36fd09c1`)
+  - PsiphonClientCommonLibrary (from `https://github.com/Psiphon-Inc/psiphon-ios-client-common-library.git`, commit `e7d67a0e2ba454e486bfde54337db7097833254f`)
   - VungleSDK-iOS (= 5.1.0)
 
 EXTERNAL SOURCES:
@@ -34,7 +34,7 @@ EXTERNAL SOURCES:
     :commit: 2fe96b0d622fe4f8dfc70c61057598aec283d109
     :git: https://github.com/Psiphon-Inc/InAppSettingsKit.git
   PsiphonClientCommonLibrary:
-    :commit: 56daadf91daf7f939f24f8cadce3008d36fd09c1
+    :commit: e7d67a0e2ba454e486bfde54337db7097833254f
     :git: https://github.com/Psiphon-Inc/psiphon-ios-client-common-library.git
 
 CHECKOUT OPTIONS:
@@ -42,7 +42,7 @@ CHECKOUT OPTIONS:
     :commit: 2fe96b0d622fe4f8dfc70c61057598aec283d109
     :git: https://github.com/Psiphon-Inc/InAppSettingsKit.git
   PsiphonClientCommonLibrary:
-    :commit: 56daadf91daf7f939f24f8cadce3008d36fd09c1
+    :commit: e7d67a0e2ba454e486bfde54337db7097833254f
     :git: https://github.com/Psiphon-Inc/psiphon-ios-client-common-library.git
 
 SPEC CHECKSUMS:
@@ -51,7 +51,7 @@ SPEC CHECKSUMS:
   InAppSettingsKit: 032b83d145bdf129a555037b05c457456d59ec92
   mopub-ios-sdk: d656c7b5ccecc309115ac1ea280de76c72a301f7
   MPUBMoatMobileAppKit: f93733fbb17a5387228f4e29f1cd07c934d63cab
-  PsiphonClientCommonLibrary: 42c82092dbdbdf4e75548b2ddb8df227591e2c1f
+  PsiphonClientCommonLibrary: ad9f4ad4784371a9995d39e04e06244e717f84e1
   VungleSDK-iOS: c4d55906035371baa4190162d57929cf5811c61f
 
 PODFILE CHECKSUM: d5c5d861a54ff393994eff30ea974edb329db41f
