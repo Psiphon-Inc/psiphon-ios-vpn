@@ -35,6 +35,7 @@
 #import "AdManager.h"
 #import "PulsingHaloLayer.h"
 #import "Logging.h"
+#import "AppDelegate.h"
 
 static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSString *b) {
     return (([a length] == 0) && ([b length] == 0)) || ([a isEqualToString:b]);
@@ -59,11 +60,12 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     //UIImageView *logoView;
     UILabel *appTitleLabel;
     UILabel *appSubTitleLabel;
-    UIButton *startStopButton;
     UILabel *statusLabel;
-    UIButton *regionButton;
     UILabel *versionLabel;
     UILabel *adLabel;
+    UILabel *regionButtonHeader;
+    UIButton *regionButton;
+    UIButton *startStopButton;
     PulsingHaloLayer *startStopButtonHalo;
     BOOL isStartStopButtonHaloOn;
 
@@ -105,12 +107,18 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
         // VPN Config user defaults
         psiphonConfigUserDefaults = [PsiphonConfigUserDefaults sharedInstance];
         [self persistSettingsToSharedUserDefaults];
+
+        // Open Setting after change it
+        self.openSettingImmediatelyOnViewDidAppear = NO;
     }
     return self;
 }
 
-#pragma mark - Lifecycle methods
+- (void) dealloc {
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+}
 
+#pragma mark - Lifecycle methods
 - (void)viewDidLoad {
    LOG_DEBUG();
     [super viewDidLoad];
@@ -145,6 +153,12 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
         //appSubTitleLabel.hidden = YES;
     }
 
+    [[NSNotificationCenter defaultCenter]
+            addObserver:self selector:@selector(onVPNStatusDidChange) name:@kVPNStatusChangeNotificationName object:vpnManager];
+
+    [[NSNotificationCenter defaultCenter]
+            addObserver:self selector:@selector(onAdStatusDidChange) name:@kAdsDidLoad object:adManager];
+
     // TODO: load/save config here to have the user immediately complete the permission prompt
 }
 
@@ -155,8 +169,10 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     [self updateAvailableRegions];
     [self updateRegionButton];
 
-    [[NSNotificationCenter defaultCenter]
-      addObserver:self selector:@selector(onAdStatusDidChange) name:@kAdsDidLoad object:adManager];
+    if (self.openSettingImmediatelyOnViewDidAppear) {
+        [self openSettingsMenu];
+        self.openSettingImmediatelyOnViewDidAppear = NO;
+    }
 }
 
 - (void)viewDidLayoutSubviews {
@@ -169,8 +185,6 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     [super viewWillAppear:animated];
 
     // Listen for VPN status changes from VPNManager.
-    [[NSNotificationCenter defaultCenter]
-      addObserver:self selector:@selector(onVPNStatusDidChange) name:@kVPNStatusChangeNotificationName object:vpnManager];
 
     // Sync UI with the VPN state
     [self onVPNStatusDidChange];
@@ -191,23 +205,6 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 - (UIStatusBarStyle)preferredStatusBarStyle {
     return UIStatusBarStyleLightContent;
 }
-
-/*
-- (BOOL)shouldAutorotate {
-    if ([[UIDevice currentDevice].model hasPrefix:@"iPhone"] || [[UIDevice currentDevice].model hasPrefix:@"iPod"]) {
-        return NO;
-    }
-    return YES;
-}
-
-- (UIInterfaceOrientationMask)supportedInterfaceOrientations {
-    if ([[UIDevice currentDevice].model hasPrefix:@"iPhone"] || [[UIDevice currentDevice].model hasPrefix:@"iPod"]) {
-        return UIInterfaceOrientationMaskPortrait + UIInterfaceOrientationMaskPortraitUpsideDown;
-    } else {
-        return UIInterfaceOrientationMaskAll;
-    }
-}
-*/
 
 // Reload when rotate
 - (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator {
@@ -394,6 +391,10 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     isStartStopButtonHaloOn = FALSE;
 }
 
+- (BOOL) isRightToLeft {
+    return ([UIApplication sharedApplication].userInterfaceLayoutDirection == UIUserInterfaceLayoutDirectionRightToLeft);
+}
+
 /*- (void)addLogoImage {
     logoView = [[UIImageView alloc] init];
     [logoView setImage:[UIImage imageNamed:@"Logo"]];
@@ -419,6 +420,22 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                                                            constant:0]];
 }*/
 
+- (BOOL)unsupportedCharactersForFont:(NSString*)font withString:(NSString*)string {
+    for (NSInteger charIdx = 0; charIdx < string.length; charIdx++) {
+        NSString *character = [NSString stringWithFormat:@"%C", [string characterAtIndex:charIdx]];
+        // TODO: need to enumerate a longer list of special characters for this to be more correct.
+        if ([character isEqualToString:@" "]) {
+            // Skip special characters
+            continue;
+        }
+        CGFontRef cgFont = CGFontCreateWithFontName((CFStringRef)font);
+        if (CGFontGetGlyphWithGlyphName(cgFont,  (__bridge CFStringRef)character) == 0) {
+            return YES;
+        }
+    }
+    return NO;
+}
+
 - (void)addAppTitleLabel {
     appTitleLabel = [[UILabel alloc] init];
     appTitleLabel.translatesAutoresizingMaskIntoConstraints = NO;
@@ -430,6 +447,10 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
         narrowestWidth = self.view.frame.size.height;
     }
     appTitleLabel.font = [UIFont fontWithName:@"Bourbon-Oblique" size:narrowestWidth * 0.10625f];
+    if ([self unsupportedCharactersForFont:appTitleLabel.font.fontName withString:appTitleLabel.text]) {
+        appTitleLabel.font = [UIFont systemFontOfSize:narrowestWidth * 0.075f];
+    }
+
     [self.view addSubview:appTitleLabel];
     
     // Setup autolayout
@@ -469,6 +490,10 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
         narrowestWidth = self.view.frame.size.height;
     }
     appSubTitleLabel.font = [UIFont fontWithName:@"Bourbon-Oblique" size:narrowestWidth * 0.10625f/2.0f];
+    if ([self unsupportedCharactersForFont:appSubTitleLabel.font.fontName withString:appSubTitleLabel.text]) {
+        appSubTitleLabel.font = [UIFont systemFontOfSize:narrowestWidth * 0.075f/2.0f];
+    }
+
     [self.view addSubview:appSubTitleLabel];
     
     // Setup autolayout
@@ -522,11 +547,12 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                                                          multiplier:1.0
                                                            constant:gearTemplate.size.height/2 + 8.f]];
 
+
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:settingsButton
                                                           attribute:NSLayoutAttributeCenterX
                                                           relatedBy:NSLayoutRelationEqual
                                                              toItem:self.view
-                                                          attribute:NSLayoutAttributeRight
+                                                          attribute:NSLayoutAttributeTrailing
                                                          multiplier:1.0
                                                            constant:-gearTemplate.size.width/2 - 13.f]];
 
@@ -749,10 +775,11 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 
     CGFloat spacing = 10; // the amount of spacing to appear between image and title
     CGFloat spacingFromSides = 10.f;
-    regionButton.imageEdgeInsets = UIEdgeInsetsMake(0, 0, 0, spacing);
-    regionButton.titleEdgeInsets = UIEdgeInsetsMake(0, spacing, 0, 0);
-    regionButton.contentEdgeInsets = UIEdgeInsetsMake(0, spacing + spacingFromSides, 0, spacing + spacingFromSides);
 
+    BOOL isRTL = [self isRightToLeft];
+    regionButton.imageEdgeInsets = UIEdgeInsetsMake(0, 0, 0, isRTL ? -spacing : spacing);
+    regionButton.titleEdgeInsets = UIEdgeInsetsMake(0, isRTL ? -spacing : spacing, 0, 0);
+    regionButton.contentEdgeInsets = UIEdgeInsetsMake(0, spacing + spacingFromSides, 0, spacing + spacingFromSides);
     [regionButton addTarget:self action:@selector(onRegionButtonTap:) forControlEvents:UIControlEventTouchUpInside];
     [bottomBar addSubview:regionButton];
     [self updateRegionButton];
@@ -803,7 +830,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                                                            constant:buttonHeight]];
 
     // Add text above region button
-    UILabel *regionButtonHeader = [[UILabel alloc] init];
+    regionButtonHeader = [[UILabel alloc] init];
     regionButtonHeader.translatesAutoresizingMaskIntoConstraints = NO;
 
     regionButtonHeader.text = NSLocalizedStringWithDefaultValue(@"CHANGE_REGION", nil, [NSBundle mainBundle], @"Change Region", @"Text above change region button that allows user to select their desired server region");
@@ -866,12 +893,12 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 
     // Setup autolayout
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:versionLabel
-                                                          attribute:NSLayoutAttributeLeft
+                                                          attribute:NSLayoutAttributeLeading
                                                           relatedBy:NSLayoutRelationEqual
                                                              toItem:self.view
-                                                          attribute:NSLayoutAttributeLeft
+                                                          attribute:NSLayoutAttributeLeading
                                                          multiplier:1.0
-                                                          constant:10.0]];
+                                                           constant:10.0]];
 
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:versionLabel
                                                           attribute:NSLayoutAttributeCenterY
@@ -1007,7 +1034,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
         __weak MainViewController *weakSelf = self;
         [appSettingsViewController dismissViewControllerAnimated:NO completion:^{
             [[RegionAdapter sharedInstance] reloadTitlesForNewLocalization];
-            [weakSelf openSettingsMenu];
+            [[AppDelegate sharedAppDelegate] reloadMainViewController];
         }];
     }
 }
