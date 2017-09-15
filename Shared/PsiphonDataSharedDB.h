@@ -31,6 +31,8 @@
 
 @interface PsiphonDataSharedDB : NSObject
 - (id)initForAppGroupIdentifier:(NSString*)identifier;
+- (void)lock;
+- (void)unlock;
 - (BOOL)createDatabase;
 - (BOOL)clearDatabase;
 
