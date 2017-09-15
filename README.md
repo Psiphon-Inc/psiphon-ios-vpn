@@ -74,7 +74,7 @@ To add a language to this project, follow these steps:
 
 3. **Run `transifex_pull.py`.** This will pull all translations, including the newly added one. You should see that `Shared/Strings/<new-language>.lproj/Localizable.strings` has been updated (translated) and that `StoreAssets/<new-language>.yaml` has been created.
 
-4. **Add the language to our in-app language selector.** In `Psiphon/InAppSettings.bundle/Root.inApp.plist`, add the new language code and the name of the language as it's written in that language. If the language is not one of our top 3 or 4, it should be added in alphabetical order, based on the language code. Note that if the language was first added to PsiphonClientCommonLibrary, then the name will be (should be) available in that's project's [`Root.inApp.plist`](https://github.com/Psiphon-Inc/psiphon-ios-client-common-library/blob/master/Example/PsiphonClientCommonLibrary/InAppSettings.bundle/Root.inApp.plist).
+4. **Add the language to our in-app language selector.** In `Psiphon/InAppSettings.bundle/Root.inApp.plist`, add the new language code and the name of the language as it's written in that language. If the language is not one of our top 3 or 4, it should be added in alphabetical order, based on the language code. Note that if the language was first added to PsiphonClientCommonLibrary, then the name will be (should be) available in that project's [`Root.inApp.plist`](https://github.com/Psiphon-Inc/psiphon-ios-client-common-library/blob/master/Example/PsiphonClientCommonLibrary/InAppSettings.bundle/Root.inApp.plist). (Otherwise check the [Omniglot list](http://www.omniglot.com/language/names.htm).)
 
 Do some testing. Commit.
 
