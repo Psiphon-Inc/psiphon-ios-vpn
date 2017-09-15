@@ -27,5 +27,6 @@
 
 + (AppDelegate *)sharedAppDelegate;
 - (MainViewController *)getMainViewController;
+- (void) reloadMainViewController;
 
 @end
