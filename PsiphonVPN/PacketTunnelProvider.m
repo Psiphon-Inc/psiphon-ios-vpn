@@ -152,7 +152,12 @@ static const double kDefaultLogTruncationInterval = 12 * 60 * 60; // 12 hours
 }
 
 - (void)sleepWithCompletionHandler:(void (^)(void))completionHandler {
+    // Wait until no DB call is in progress on any other thread...
+    [sharedDB lock];
+    // ...and then call the completion handler.
     completionHandler();
+    // TODO: at this point, are all other threads suspended? Should we defer the unlock until wake?
+    [sharedDB unlock];
 }
 
 - (void)wake {

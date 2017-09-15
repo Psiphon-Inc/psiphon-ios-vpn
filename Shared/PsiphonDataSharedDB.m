@@ -58,10 +58,11 @@
     NSString *appGroupIdentifier;
     NSString *databasePath;
 
+    NSLock *dbLock;
+
     // Log Table
     int lastLogRowId;
     NSTimer *logTruncateTimer;
-    NSLock *lastLogRowIdLock;
 }
 
 /*!
@@ -78,8 +79,9 @@
 
         databasePath = [[[NSFileManager defaultManager] containerURLForSecurityApplicationGroupIdentifier:appGroupIdentifier] path];
 
+        dbLock = [[NSLock alloc] init];
+
         lastLogRowId = -1;
-        lastLogRowIdLock = [[NSLock alloc] init];
 
         q = [FMDatabaseQueue databaseQueueWithPath:[databasePath stringByAppendingPathComponent:SHARED_DATABASE_NAME]];
     }
@@ -88,7 +90,23 @@
 
 #pragma mark - Database operations
 
+/*!
+ * @brief Call lock to ensure no database calls are in progress for situations such as process suspension.
+          When lock returns, no database calls are in progress and all database calls will block until unlock
+          is called. unlock _must_ be called to avoid permanantly blocking other threads; lock is not recursive
+          and must not be called multiple times without unlocking.
+ */
+- (void)lock {
+    [dbLock lock];
+}
+
+- (void)unlock {
+    [dbLock unlock];
+}
+
 - (BOOL)createDatabase {
+
+    [self lock];
 
     NSString *CREATE_TABLE_STATEMENTS =
       @"CREATE TABLE IF NOT EXISTS " TABLE_LOG " ("
@@ -117,6 +135,8 @@
         }
     }];
 
+    [self unlock];
+
     return success;
 }
 
@@ -125,6 +145,9 @@
  * @return TRUE on success.
  */
 - (BOOL)clearDatabase {
+
+    [self lock];
+
     NSString *CLEAR_TABLES =
       @"DELETE FROM " TABLE_LOG " ;"
        "DELETE FROM " TABLE_HOMEPAGE " ;";
@@ -137,6 +160,8 @@
         }
     }];
 
+    [self unlock];
+
     return success;
 }
 
@@ -148,6 +173,9 @@
  * @return TRUE on success.
  */
 - (BOOL)updateHomepages:(NSArray<NSString *> *)homepageUrls {
+
+    [self lock];
+
     __block BOOL success = FALSE;
     [q inTransaction:^(FMDatabase *db, BOOL *rollback) {
         success = [db executeUpdate:@"DELETE FROM " TABLE_HOMEPAGE " ;"];
@@ -164,6 +192,8 @@
         }
     }];
 
+    [self unlock];
+
     return success;
 }
 
@@ -171,6 +201,9 @@
  * @return NSArray of Homepages.
  */
 - (NSArray<Homepage *> *)getAllHomepages {
+
+    [self lock];
+
     NSMutableArray<Homepage *> *homepages = [[NSMutableArray alloc] init];
 
     [q inDatabase:^(FMDatabase *db) {
@@ -192,6 +225,8 @@
         [rs close];
     }];
 
+    [self unlock];
+
     return homepages;
 }
 
@@ -204,6 +239,9 @@
  */
 // TODO: is timestamp needed? Maybe we can use this to detect staleness later
 - (BOOL)insertNewEgressRegions:(NSArray<NSString *> *)regions {
+
+    [self lock];
+
     __block BOOL success = FALSE;
     [q inTransaction:^(FMDatabase *db, BOOL *rollback) {
         success = [db executeUpdate:@"DELETE FROM " TABLE_EGRESS_REGIONS " ;"];
@@ -220,6 +258,8 @@
         }
     }];
 
+    [self unlock];
+
     return success;
 }
 
@@ -227,6 +267,9 @@
  * @return NSArray of region codes.
  */
 - (NSArray<NSString *> *)getAllEgressRegions {
+
+    [self lock];
+
     NSMutableArray<NSString *> *regions = [[NSMutableArray alloc] init];
 
     [q inDatabase:^(FMDatabase *db) {
@@ -245,12 +288,17 @@
         [rs close];
     }];
 
+    [self unlock];
+
     return regions;
 }
 
 #pragma mark - Log Table methods
 
 - (BOOL)insertDiagnosticMessage:(NSString*)message {
+
+    [self lock];
+
     __block BOOL success;
     [q inDatabase:^(FMDatabase *db) {
         NSError *err;
@@ -265,6 +313,9 @@
             // TODO: error handling/logging
         }
     }];
+
+    [self unlock];
+
     return success;
 }
 
@@ -283,6 +334,9 @@
 }
 
 - (BOOL)truncateLogs {
+
+    [self lock];
+
     // Truncate logs to MAX_LOG_LINES lines
     __block BOOL success = FALSE;
 
@@ -300,6 +354,8 @@
         }
     }];
 
+    [self unlock];
+
     return success;
 }
 
@@ -313,13 +369,17 @@
 }
 
 - (NSArray<DiagnosticEntry*>*)getLogsNewerThanId:(int)lastId {
-    NSMutableArray<DiagnosticEntry*>* logs = [[NSMutableArray alloc] init];
-    // Prevent fetching the same logs multiple times
-    [lastLogRowIdLock lock];
+
+    [self lock];
+
+    // Note: lastLogRowId logic depends on dbLock for correct
+    // behavior with concurrent calls to getLogsNewerThanId.
     if (lastLogRowId > lastId) {
-        [lastLogRowIdLock unlock];
+        [self unlock];
         return nil;
     }
+
+    NSMutableArray<DiagnosticEntry*>* logs = [[NSMutableArray alloc] init];
     [q inDatabase:^(FMDatabase *db) {
         FMResultSet *rs = [db executeQuery:@"SELECT * FROM log WHERE _ID > (?);", @(lastId), nil];
 
@@ -333,7 +393,7 @@
 
             NSString *timestampString = [rs stringForColumn:COL_LOG_TIMESTAMP];
             NSString *json = [rs stringForColumn:COL_LOG_LOGJSON];
-//          BOOL isDiagnostic = [rs boolForColumn:COL_LOG_IS_DIAGNOSTIC]; // TODO
+            //BOOL isDiagnostic = [rs boolForColumn:COL_LOG_IS_DIAGNOSTIC]; // TODO
 
             NSDate *timestampDate = [PsiphonDataSharedDB dateFromTimestamp:timestampString];
 
@@ -343,7 +403,8 @@
 
         [rs close];
     }];
-    [lastLogRowIdLock unlock];
+
+    [self unlock];
 
     return logs;
 }
