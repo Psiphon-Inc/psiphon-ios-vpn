@@ -110,12 +110,6 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 
         // Open Setting after change it
         self.openSettingImmediatelyOnViewDidAppear = NO;
-
-        [[NSNotificationCenter defaultCenter]
-                addObserver:self selector:@selector(onVPNStatusDidChange) name:@kVPNStatusChangeNotificationName object:vpnManager];
-
-        [[NSNotificationCenter defaultCenter]
-                addObserver:self selector:@selector(onAdStatusDidChange) name:@kAdsDidLoad object:adManager];
     }
     return self;
 }
@@ -158,6 +152,12 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
         //appTitleLabel.hidden = YES;
         //appSubTitleLabel.hidden = YES;
     }
+
+    [[NSNotificationCenter defaultCenter]
+            addObserver:self selector:@selector(onVPNStatusDidChange) name:@kVPNStatusChangeNotificationName object:vpnManager];
+
+    [[NSNotificationCenter defaultCenter]
+            addObserver:self selector:@selector(onAdStatusDidChange) name:@kAdsDidLoad object:adManager];
 
     // TODO: load/save config here to have the user immediately complete the permission prompt
 }
