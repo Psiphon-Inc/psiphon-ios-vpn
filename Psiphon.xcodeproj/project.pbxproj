@@ -131,6 +131,12 @@
 		661DA4CC1F683A2E00BB4B93 /* vi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = vi; path = Strings/vi.lproj/Localizable.strings; sourceTree = "<group>"; };
 		661DA4CD1F683A3800BB4B93 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "Strings/zh-Hans.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		661DA4CE1F683A4000BB4B93 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "Strings/zh-Hant.lproj/Localizable.strings"; sourceTree = "<group>"; };
+		6651BE001F6B11AA00D65633 /* az */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = az; path = Strings/az.lproj/Localizable.strings; sourceTree = "<group>"; };
+		6651BE011F6B131300D65633 /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = Strings/uk.lproj/Localizable.strings; sourceTree = "<group>"; };
+		6651BE021F6B154C00D65633 /* uz */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uz; path = Strings/uz.lproj/Localizable.strings; sourceTree = "<group>"; };
+		6651BE031F6B15A200D65633 /* ky */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ky; path = Strings/ky.lproj/Localizable.strings; sourceTree = "<group>"; };
+		6651BE041F6B176500D65633 /* kk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = kk; path = Strings/kk.lproj/Localizable.strings; sourceTree = "<group>"; };
+		6651BE051F6B177000D65633 /* my */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = my; path = Strings/my.lproj/Localizable.strings; sourceTree = "<group>"; };
 		668AF9BE1E92CBD3008CAAAA /* NetworkExtension.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = NetworkExtension.framework; path = System/Library/Frameworks/NetworkExtension.framework; sourceTree = SDKROOT; };
 		7FC2D3C7A4325CD15FDF15E9 /* libPods-PsiphonVPN.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-PsiphonVPN.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		93B819F4480DF3E24C22ACD7 /* libPods-Psiphon.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Psiphon.a"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -471,6 +477,12 @@
 				vi,
 				"zh-Hans",
 				"zh-Hant",
+				az,
+				uk,
+				uz,
+				ky,
+				kk,
+				my,
 			);
 			mainGroup = CE26FC811BBDC7B700B83375;
 			productRefGroup = CE26FC8B1BBDC7B800B83375 /* Products */;
@@ -555,8 +567,8 @@
 			);
 			inputPaths = (
 				"${SRCROOT}/Pods/Target Support Files/Pods-Psiphon/Pods-Psiphon-resources.sh",
-				"$PODS_CONFIGURATION_BUILD_DIR/InAppSettingsKit/InAppSettingsKit.bundle",
-				"$PODS_CONFIGURATION_BUILD_DIR/PsiphonClientCommonLibrary/PsiphonClientCommonLibrary.bundle",
+				$PODS_CONFIGURATION_BUILD_DIR/InAppSettingsKit/InAppSettingsKit.bundle,
+				$PODS_CONFIGURATION_BUILD_DIR/PsiphonClientCommonLibrary/PsiphonClientCommonLibrary.bundle,
 				"${PODS_ROOT}/mopub-ios-sdk/MoPubSDK/Internal/Common/MPAdBrowserController.xib",
 				"${PODS_ROOT}/mopub-ios-sdk/MoPubSDK/Resources/MPCloseBtn.png",
 				"${PODS_ROOT}/mopub-ios-sdk/MoPubSDK/Resources/MPCloseBtn@2x.png",
@@ -710,6 +722,12 @@
 				661DA4CC1F683A2E00BB4B93 /* vi */,
 				661DA4CD1F683A3800BB4B93 /* zh-Hans */,
 				661DA4CE1F683A4000BB4B93 /* zh-Hant */,
+				6651BE001F6B11AA00D65633 /* az */,
+				6651BE011F6B131300D65633 /* uk */,
+				6651BE021F6B154C00D65633 /* uz */,
+				6651BE031F6B15A200D65633 /* ky */,
+				6651BE041F6B176500D65633 /* kk */,
+				6651BE051F6B177000D65633 /* my */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";
