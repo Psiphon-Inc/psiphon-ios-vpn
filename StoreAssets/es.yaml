@@ -1,1 +1,14 @@
-es: {app_name: Psiphon, subtitle: Cruzando fronteras}
+es:
+  app_name: Psiphon
+  subtitle: Cruzando fronteras
+  description: |
+    Tras ayudar a decenas de millones de usuarios a obtener acceso a las aplicaciones y sitios que aman, ¡Psiphon ha lanzado su primera app oficial para iOS! Nuestra nueva app integra con armonía el acceso a la red Psiphon, conectándole de forma segura a sus aplicaciones y sitios.
+
+    No importa en qué parte del mundo esté, la app de Psiphon le conectará a sus aplicaciones y sitios. La app también le proporciona una capa extra de protección al usar servicios Wi-Fi públicos u otras redes que podrían no ser de confianza.
+
+    Las características clave incluyen:
+    • Uso personal ilimitado gratuito.
+    • Fácil descarga, instalación, y uso. No requiere registro o configuración.
+    • Selección automática de protocolos para proporcionar acceso rápido y fiable en todo momento.
+    • Asistencia para varios idiomas y ubicación configurable del servidor.
+  keywords: Psiphon, proxy
