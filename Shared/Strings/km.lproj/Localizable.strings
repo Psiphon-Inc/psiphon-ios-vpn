@@ -28,7 +28,7 @@
 "MAIL_NOT_CONFIGURED" = "សារមិនបានកំណត់";
 
 /* Description for the 'Mail not configured' message. (InAppSettingsKit) */
-"MAIL_NOT_CONFIGURED_DESC" = "This device is not configured for sending Email. Please configure the Mail settings in the Settings app.";
+"MAIL_NOT_CONFIGURED_DESC" = "ឧបករណ៍នេះ មិនបានកំណត់សម្រាប់បញ្ជូនអ៊ីម៉ែលទេ។ សូមកំណត់ សារក្នុងកម្មវិធី កំណត់។";
 
 /* Alert title informing user there is no internet connection */
 "NO_INTERNET" = "គ្មានបណ្តាញអ៊ីនធឺណែត";
@@ -47,7 +47,7 @@
 "TURN_ON_DATE" = "បើក អ៊ីនធឺណែតទូរស័ព្ទ ឬប្រើប្រាស់Wi-Fi ដើម្បីតភ្ជាប់។";
 
 /* Alert message informing user they have to open the app */
-"USE_PSIPHON_APP" = "To connect, use the Psiphon application.";
+"USE_PSIPHON_APP" = "ដើម្បីតភ្ជាប់ ប្រើប្រាស់កម្មវិធី Psiphon";
 
 /* Status when the VPN is connected to a Psiphon server */
 "VPN_STATUS_CONNECTED" = "បានតភ្ជាប់";

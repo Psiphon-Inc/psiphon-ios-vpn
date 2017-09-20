@@ -1,1 +1,14 @@
-vi: {app_name: Psiphon, subtitle: Vượt Biên Giới}
+vi:
+  app_name: Psiphon
+  subtitle: Xuyên Biên Giới
+  description: |
+    Sau khi giúp cho hàng chục triệu người dùng truy cập vào các trang mạng ưa thích, Psiphon đã tung ra ứng dụng chính thức đầu tiên cho hệ iOS! Ứng dụng trình duyệt mới này tích hợp việc truy cập một cách liền lạc vào mạng Psiphon, kết nối bạn an toàn vào mạng.
+
+    Bất cứ bạn ở nơi nào trên thế giới, ứng dụng Trình Duyệt Psiphon sẽ kết nối bạn đến trang web muốn vào. Ứng dụng còn cung cấp thêm một lớp bảo vệ an toàn khi bạn dùng wifi công cộng hoặc khi bạn dùng một mạng không tin cậy.
+
+    Các tính năng then chốt bao gồm:
+    • Miễn phí, không giới hạn khi sử dụng cho cá nhân.
+    • Tải xuống, cài đặt và sử dụng dễ dàng. Không cần phải đăng ký, cấu hình.
+    • Tự động chọn giao thức phù hợp để có truy cập lẹ và chắc chắn mọi lúc.
+    • Hỗ trợ nhiều ngôn ngữ và chọn được vị trí của máy chủ.
+  keywords: Psiphon, proxy
