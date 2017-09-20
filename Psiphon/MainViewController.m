@@ -429,7 +429,9 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
             continue;
         }
         CGFontRef cgFont = CGFontCreateWithFontName((CFStringRef)font);
-        if (CGFontGetGlyphWithGlyphName(cgFont,  (__bridge CFStringRef)character) == 0) {
+        BOOL unsupported = (CGFontGetGlyphWithGlyphName(cgFont,  (__bridge CFStringRef)character) == 0);
+        CGFontRelease(cgFont);
+        if (unsupported) {
             return YES;
         }
     }
