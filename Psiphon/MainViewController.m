@@ -261,6 +261,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 - (void)onVPNStatusDidChange {
     // Update UI
     VPNStatus s = [vpnManager getVPNStatus];
+    startStopButton.highlighted = [vpnManager isVPNActive] && ![vpnManager isVPNConnected];
     startStopButton.selected = [vpnManager isVPNConnected];
     statusLabel.text = [self getVPNStatusDescription:s];
 
@@ -580,6 +581,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 - (void)addStartAndStopButton {
 
     UIImage *stopButtonImage = [UIImage imageNamed:@"StopButton"];
+    UIImage *connectingButtonImage = [UIImage imageNamed:@"ConnectingButton"];
     UIImage *startButtonImage = [UIImage imageNamed:@"StartButton"];
 
     startStopButton = [UIButton buttonWithType:UIButtonTypeCustom];
@@ -588,9 +590,11 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     startStopButton.contentVerticalAlignment = UIControlContentVerticalAlignmentFill;
 
     [startStopButton setImage:startButtonImage forState:UIControlStateNormal];
+    [startStopButton setImage:connectingButtonImage forState:UIControlStateHighlighted];
     [startStopButton setImage:stopButtonImage forState:UIControlStateSelected];
 
     [startStopButton addTarget:self action:@selector(onStartStopTap:) forControlEvents:UIControlEventTouchUpInside];
+    startStopButton.highlighted = [vpnManager isVPNActive] && ![vpnManager isVPNConnected];
     startStopButton.selected = [vpnManager isVPNConnected];
 
     // Shadow and Radius
