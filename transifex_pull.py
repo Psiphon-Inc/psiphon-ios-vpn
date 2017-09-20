@@ -34,8 +34,10 @@ import yaml
 
 
 DEFAULT_LANGS = {
+    'am': 'am',         # Amharic
     'ar': 'ar',         # Arabic
     'az@latin': 'az',   # Azerbaijani
+    'be': 'be',         # Belarusian
     'bo': 'bo',         # Tibetan
     'de': 'de',         # German
     'el_GR': 'el',      # Greek

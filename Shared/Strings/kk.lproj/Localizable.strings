@@ -1,14 +1,14 @@
 /* Text for button that tell users there will by a short video ad. */
-"AD_LOADED" = "Watch a short video while we get ready to connect you";
+"AD_LOADED" = "Байланыс дайындалып тұрған кезде қысқа видеоны қараңыз";
 
 /* Text for app subtitle on main view. */
-"APP_SUB_TITLE_MAIN_VIEW" = "BEYOND BORDERS";
+"APP_SUB_TITLE_MAIN_VIEW" = "ШЕКАРАЛАРСЫЗ";
 
 /* Text for app title on main view. */
 "APP_TITLE_MAIN_VIEW" = "PSIPHON";
 
 /* Text showing the app version. The '%@' placeholder is the version number. So it will look like 'Version 2'. */
-"APP_VERSION" = "Version %@";
+"APP_VERSION" = "Нұсқасы %@";
 
 /* Text above change region button that allows user to select their desired server region */
 "CHANGE_REGION" = "Аймақты өзгерту";
@@ -19,7 +19,7 @@
 "DONE_ACTION" = "Дайын";
 
 /* Text displayed while app loads */
-"LOADING" = "Loading...";
+"LOADING" = "Жүктелуде...";
 
 /* Log view title bar text */
 "LOGS_TITLE" = "Журналдар";
@@ -31,23 +31,23 @@
 "MAIL_NOT_CONFIGURED_DESC" = "Бұл құрылғы эл. поштаны жіберуге бапталмаған. Баптаулар қолданбасында пошта баптауларын орнатыңыз.";
 
 /* Alert title informing user there is no internet connection */
-"NO_INTERNET" = "No Internet Connection";
+"NO_INTERNET" = "Интернетпен байланыс жоқ";
 
 /* Alert OK Button
    Alert OK Button. (InAppSettingsKit) */
 "OK_BUTTON" = "ОК";
 
 /* Alert message informing the user they should open the app to finish connecting to the VPN. */
-"OPEN_PSIPHON_APP" = "Please open Psiphon app to finish connecting.";
+"OPEN_PSIPHON_APP" = "Байланыс орнатуды аяқтау үшін Psiphon қолданбасын ашыңыз.";
 
 /* Title of the settings (aka preferences) view (InAppSettingsKit) */
 "SETTINGS_TITLE" = "Баптаулар";
 
 /* Alert message informing user to turn on their cellular data or wifi to connect to the internet */
-"TURN_ON_DATE" = "Turn on cellular data or use Wi-Fi to access data.";
+"TURN_ON_DATE" = "Деректерге қатынау үшін мобильді деректерді іске қосыңыз немесе Wi-Fi қолданыңыз.";
 
 /* Alert message informing user they have to open the app */
-"USE_PSIPHON_APP" = "To connect, use the Psiphon app";
+"USE_PSIPHON_APP" = "Байланысу үшін Psiphon қолданбасын қолданыңыз";
 
 /* Status when the VPN is connected to a Psiphon server */
 "VPN_STATUS_CONNECTED" = "Байланысқан";
@@ -65,8 +65,8 @@
 "VPN_STATUS_INVALID" = "Байланыс үзілді";
 
 /* Status when the VPN was connected to a Psiphon server, got disconnected unexpectedly, and is currently trying to reconnect */
-"VPN_STATUS_RECONNECTING" = "Reconnecting";
+"VPN_STATUS_RECONNECTING" = "Қайта байланысу";
 
 /* Status when the VPN is restarting. */
-"VPN_STATUS_RESTARTING" = "Restarting";
+"VPN_STATUS_RESTARTING" = "Қайта іске қосылу";
 

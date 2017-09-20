@@ -47,7 +47,7 @@
 "TURN_ON_DATE" = "Увімкніть стільникові дані або скористайтеся Wi-Fi для доступу до даних.";
 
 /* Alert message informing user they have to open the app */
-"USE_PSIPHON_APP" = "To connect, use the Psiphon app";
+"USE_PSIPHON_APP" = "Для підключення використовуйте додаток Psiphon";
 
 /* Status when the VPN is connected to a Psiphon server */
 "VPN_STATUS_CONNECTED" = "З'єднано";
