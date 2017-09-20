@@ -195,7 +195,7 @@
 
 - (BOOL)isVPNActive {
     VPNStatus s = [self getVPNStatus];
-    return (s == VPNStatusConnecting || s == VPNStatusConnected || s == NEVPNStatusReasserting || s == VPNStatusRestarting);
+    return (s == VPNStatusConnecting || s == VPNStatusConnected || s == VPNStatusReasserting || s == VPNStatusRestarting);
 }
 
 - (BOOL)isVPNConnected {
