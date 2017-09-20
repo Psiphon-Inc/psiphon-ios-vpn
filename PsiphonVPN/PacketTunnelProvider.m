@@ -388,6 +388,8 @@ static const double kDefaultLogTruncationInterval = 12 * 60 * 60; // 12 hours
 - (void)onConnecting {
     LOG_DEBUG(@"onConnecting");
 
+    [sharedDB updateTunnelConnectedState:FALSE];
+
     self.reasserting = TRUE;
 
     // Clear list of handshakeHomepages.
@@ -397,7 +399,6 @@ static const double kDefaultLogTruncationInterval = 12 * 60 * 60; // 12 hours
 - (void)onConnected {
     LOG_DEBUG(@"onConnected");
 
-    // Write state to the database
     [sharedDB updateTunnelConnectedState:TRUE];
 
     if (!vpnStartCompletionHandler) {
