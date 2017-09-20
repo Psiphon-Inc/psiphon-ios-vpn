@@ -87,6 +87,11 @@ typedef NS_ENUM(NSInteger, VPNStatus) {
 - (BOOL)isVPNActive;
 
 /**
+ * @return TRUE if the VPN is in the Connected state.
+ */
+- (BOOL)isVPNConnected;
+
+/**
  * @return TRUE if the tunnel has connected, FALSE otherwise.
  */
 - (BOOL)isTunnelConnected;
