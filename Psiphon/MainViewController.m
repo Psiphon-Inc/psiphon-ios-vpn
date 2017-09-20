@@ -261,8 +261,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 - (void)onVPNStatusDidChange {
     // Update UI
     VPNStatus s = [vpnManager getVPNStatus];
-    startStopButton.highlighted = [vpnManager isVPNActive] && ![vpnManager isVPNConnected];
-    startStopButton.selected = [vpnManager isVPNConnected];
+    [self updateButtonState];
     statusLabel.text = [self getVPNStatusDescription:s];
 
     if (s == VPNStatusConnecting || s == VPNStatusRestarting || s == VPNStatusReasserting) {
@@ -578,24 +577,29 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     [settingsButton addTarget:self action:@selector(onSettingsButtonTap:) forControlEvents:UIControlEventTouchUpInside];
 }
 
-- (void)addStartAndStopButton {
+- (void)updateButtonState {
+    if ([vpnManager isVPNActive] && ![vpnManager isVPNConnected]) {
+        UIImage *connectingButtonImage = [UIImage imageNamed:@"ConnectingButton"];
+        [startStopButton setImage:connectingButtonImage forState:UIControlStateNormal];
+    }
+    else if ([vpnManager isVPNConnected]) {
+        UIImage *stopButtonImage = [UIImage imageNamed:@"StopButton"];
+        [startStopButton setImage:stopButtonImage forState:UIControlStateNormal];
+    }
+    else {
+        UIImage *startButtonImage = [UIImage imageNamed:@"StartButton"];
+        [startStopButton setImage:startButtonImage forState:UIControlStateNormal];
+    }
+}
 
-    UIImage *stopButtonImage = [UIImage imageNamed:@"StopButton"];
-    UIImage *connectingButtonImage = [UIImage imageNamed:@"ConnectingButton"];
-    UIImage *startButtonImage = [UIImage imageNamed:@"StartButton"];
+- (void)addStartAndStopButton {
 
     startStopButton = [UIButton buttonWithType:UIButtonTypeCustom];
     startStopButton.translatesAutoresizingMaskIntoConstraints = NO;
     startStopButton.contentHorizontalAlignment = UIControlContentHorizontalAlignmentFill;
     startStopButton.contentVerticalAlignment = UIControlContentVerticalAlignmentFill;
-
-    [startStopButton setImage:startButtonImage forState:UIControlStateNormal];
-    [startStopButton setImage:connectingButtonImage forState:UIControlStateHighlighted];
-    [startStopButton setImage:stopButtonImage forState:UIControlStateSelected];
-
     [startStopButton addTarget:self action:@selector(onStartStopTap:) forControlEvents:UIControlEventTouchUpInside];
-    startStopButton.highlighted = [vpnManager isVPNActive] && ![vpnManager isVPNConnected];
-    startStopButton.selected = [vpnManager isVPNConnected];
+    [self updateButtonState];
 
     // Shadow and Radius
     startStopButton.layer.shadowOffset = CGSizeMake(0, 6.0f);
