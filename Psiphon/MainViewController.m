@@ -261,7 +261,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 - (void)onVPNStatusDidChange {
     // Update UI
     VPNStatus s = [vpnManager getVPNStatus];
-    startStopButton.selected = [vpnManager isTunnelConnected];
+    startStopButton.selected = [vpnManager isVPNConnected];
     statusLabel.text = [self getVPNStatusDescription:s];
 
     if (s == VPNStatusConnecting || s == VPNStatusRestarting || s == VPNStatusReasserting) {
@@ -589,7 +589,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     [startStopButton setImage:stopButtonImage forState:UIControlStateSelected];
 
     [startStopButton addTarget:self action:@selector(onStartStopTap:) forControlEvents:UIControlEventTouchUpInside];
-    startStopButton.selected = [vpnManager isTunnelConnected];
+    startStopButton.selected = [vpnManager isVPNConnected];
 
     // Shadow and Radius
     startStopButton.layer.shadowOffset = CGSizeMake(0, 6.0f);

@@ -198,6 +198,10 @@
     return (s == VPNStatusConnecting || s == VPNStatusConnected || s == NEVPNStatusReasserting || s == VPNStatusRestarting);
 }
 
+- (BOOL)isVPNConnected {
+    return VPNStatusConnected == [self getVPNStatus];
+}
+
 - (BOOL)isTunnelConnected {
     return [self isVPNActive] && [sharedDB getTunnelConnectedState];
 }
