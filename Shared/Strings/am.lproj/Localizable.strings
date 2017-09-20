@@ -1,72 +1,72 @@
 /* Text for button that tell users there will by a short video ad. */
-"AD_LOADED" = "Xem một video ngắn trong lúc chúng tôi chuẩn bị để kết nối bạn";
+"AD_LOADED" = "እርስዎን ለማገናኘት እየተዘጋጀን ይህን አጭር ቪዲዮ ይመልከቱ ";
 
 /* Text for app subtitle on main view. */
-"APP_SUB_TITLE_MAIN_VIEW" = "XUYÊN BIẾN GIỚI";
+"APP_SUB_TITLE_MAIN_VIEW" = "ድንበር አልባ ";
 
 /* Text for app title on main view. */
-"APP_TITLE_MAIN_VIEW" = "PSIPHON";
+"APP_TITLE_MAIN_VIEW" = "ሳይፈን ";
 
 /* Text showing the app version. The '%@' placeholder is the version number. So it will look like 'Version 2'. */
-"APP_VERSION" = "Phiên bản %@";
+"APP_VERSION" = "ብጅት %@";
 
 /* Text above change region button that allows user to select their desired server region */
-"CHANGE_REGION" = "Đổi Khu Vực";
+"CHANGE_REGION" = "ክልል ለውጥ ";
 
 /* Done button in navigation bar
    Title of the button that dismisses region selection dialog
    Title of the button that dismisses the settings menu (InAppSettingsKit) */
-"DONE_ACTION" = "Xong";
+"DONE_ACTION" = "ተሰርቷል ";
 
 /* Text displayed while app loads */
-"LOADING" = "Đang tải...";
+"LOADING" = "በመጫን ላይ...";
 
 /* Log view title bar text */
-"LOGS_TITLE" = "Ký sự";
+"LOGS_TITLE" = "መዝገቦች ";
 
 /* Shown when the device is not configured for sending email. (InAppSettingsKit) */
-"MAIL_NOT_CONFIGURED" = "Email chưa được cấu hình";
+"MAIL_NOT_CONFIGURED" = "ሜሉ አልተዋቀረም ";
 
 /* Description for the 'Mail not configured' message. (InAppSettingsKit) */
-"MAIL_NOT_CONFIGURED_DESC" = "Thiết bị này chưa được cấu hình để gửi Email. Xin cấu hình thiết đặt email trong ứng dụng thiết đặt";
+"MAIL_NOT_CONFIGURED_DESC" = "ይህ መሳሪያ ኢሜል ለመላክ አልተዋቀረም። በመተግበሪያው ቅንብሮች በመግባት የሜል ቅንብሩን እባክዎ ያዋቅሩ።  ";
 
 /* Alert title informing user there is no internet connection */
-"NO_INTERNET" = "Không Có Kết Nối Internet";
+"NO_INTERNET" = "የኢንተርኔት ግንኙነት የለም ";
 
 /* Alert OK Button
    Alert OK Button. (InAppSettingsKit) */
-"OK_BUTTON" = "OK";
+"OK_BUTTON" = "እሺ ";
 
 /* Alert message informing the user they should open the app to finish connecting to the VPN. */
-"OPEN_PSIPHON_APP" = "Xin mở ứng dụng Psiphon lên để hoàn tất kết nối.";
+"OPEN_PSIPHON_APP" = "ግንኙነቱን ለመጨረስ የሳይፈን መተግበሪያውን እባክዎን ይክፈቱ። ";
 
 /* Title of the settings (aka preferences) view (InAppSettingsKit) */
-"SETTINGS_TITLE" = "Thiết đặt";
+"SETTINGS_TITLE" = "ቅንብሮች";
 
 /* Alert message informing user to turn on their cellular data or wifi to connect to the internet */
-"TURN_ON_DATE" = "Bật mở internet của điện thoại hoặc dùng Wi-Fi để truy cập.";
+"TURN_ON_DATE" = "ዳታን ለማግኘት የተንቀሳቃሽ ስልክ ዳታን ያብሩ ወይም  Wi-Fi  ይጠቀ። ";
 
 /* Alert message informing user they have to open the app */
-"USE_PSIPHON_APP" = "Để kết nối, dùng ứng dụng Psiphon";
+"USE_PSIPHON_APP" = "ለመገናኘት የሳይፈን መተግበሪያን ይጠቀሙ";
 
 /* Status when the VPN is connected to a Psiphon server */
-"VPN_STATUS_CONNECTED" = "Đã kết nối";
+"VPN_STATUS_CONNECTED" = "ተገናኝቷል ";
 
 /* Status when the VPN is connecting; that is, trying to connect to a Psiphon server */
-"VPN_STATUS_CONNECTING" = "Đang kết nối";
+"VPN_STATUS_CONNECTING" = "በመገናኘት ላይ....";
 
 /* Status when the VPN is not connected to a Psiphon server, not trying to connect, and not in an error state */
-"VPN_STATUS_DISCONNECTED" = "Đã dừng kết nối";
+"VPN_STATUS_DISCONNECTED" = "ተለያይቷል ";
 
 /* Status when the VPN is disconnecting. Sometimes going from connected to disconnected can take some time, and this is that state. */
-"VPN_STATUS_DISCONNECTING" = "Đang ngắt kết nối";
+"VPN_STATUS_DISCONNECTING" = "በመለያየት ላይ ";
 
 /* Status when the VPN is in an invalid state. For example, if the user doesn't give permission for the VPN configuration to be installed, and therefore the Psiphon VPN can't even try to connect. */
-"VPN_STATUS_INVALID" = "Đã dừng kết nối";
+"VPN_STATUS_INVALID" = "ተለያይቷል ";
 
 /* Status when the VPN was connected to a Psiphon server, got disconnected unexpectedly, and is currently trying to reconnect */
-"VPN_STATUS_RECONNECTING" = "Đang kết nối lại";
+"VPN_STATUS_RECONNECTING" = "ከእንደገና እያገናኘ ነው ";
 
 /* Status when the VPN is restarting. */
-"VPN_STATUS_RESTARTING" = "Đang khởi động lại";
+"VPN_STATUS_RESTARTING" = "ከእንደገና እያስጀመረ ነው ";
 
