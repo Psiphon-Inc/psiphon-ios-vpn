@@ -381,8 +381,14 @@ static const double kDefaultLogTruncationInterval = 12 * 60 * 60; // 12 hours
 
 - (void)onDiagnosticMessage:(NSString * _Nonnull)message {
     [sharedDB insertDiagnosticMessage:message];
-    // notify container that there is new data in shared sqlite database
+#if DEBUG
+    // Notify container that there is new data in shared sqlite database.
+    // This is only needed in debug mode where the log view is enabled
+    // in the container. LogViewController needs to know when new logs
+    // have entered the shared database so it can update its view to
+    // display the latest diagnostic entries.
     [notifier post:@"NE.onDiagnosticMessage"];
+#endif
 }
 
 - (void)onConnecting {
