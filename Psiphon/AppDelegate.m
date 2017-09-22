@@ -88,11 +88,13 @@
 # pragma mark - Lifecycle methods
 
 - (BOOL)application:(UIApplication *)application willFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-	[self initializeDefaults];
+    [self initializeDefaults];
     [[NSNotificationCenter defaultCenter]
       addObserver:self selector:@selector(switchViewControllerWhenAdsLoaded) name:@kAdsDidLoad object:adManager];
 
-	return YES;
+    [sharedDB truncateLogs];
+    
+    return YES;
 }
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
