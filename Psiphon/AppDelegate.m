@@ -27,6 +27,8 @@
 #import "VPNManager.h"
 #import "AdManager.h"
 #import "Logging.h"
+#import "IAPHelper.h"
+#import "IAPViewController.h"
 
 #if DEBUG
 #define kLaunchScreenTimerCount 1
@@ -90,10 +92,11 @@
 - (BOOL)application:(UIApplication *)application willFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     [self initializeDefaults];
     [[NSNotificationCenter defaultCenter]
-      addObserver:self selector:@selector(switchViewControllerWhenAdsLoaded) name:@kAdsDidLoad object:adManager];
+     addObserver:self selector:@selector(switchViewControllerWhenAdsLoaded) name:@kAdsDidLoad object:adManager];
 
     [sharedDB truncateLogs];
-    
+    [[IAPHelper sharedInstance] startProductsRequest];
+
     return YES;
 }
 
@@ -176,7 +179,8 @@
 
     if ( networkStatus != NotReachable
       && ([vpnManager getVPNStatus] == VPNStatusDisconnected || [vpnManager getVPNStatus] == VPNStatusInvalid)
-      && ![adManager untunneledInterstitialIsReady] && ![adManager untunneledInterstitialHasShown]) {
+      && ![adManager untunneledInterstitialIsReady] && ![adManager untunneledInterstitialHasShown]
+		&& [adManager shouldShowUntunneledAds]) {
 
         [adManager initializeAds];
         self.window.rootViewController = launchScreenViewController;
@@ -259,6 +263,10 @@
     [notifier listenForNotification:@"NE.newHomepages" listener:^{
        LOG_DEBUG(@"Received notification NE.newHomepages");
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+			// Don't open homepages for paid subscribers
+			if ([[IAPHelper sharedInstance] hasActiveSubscriptionForDate:[NSDate date]]) {
+				return;
+			}
             if (!shownHomepage) {
                 NSArray<Homepage *> *homepages = [sharedDB getAllHomepages];
                 if ([homepages count] > 0) {
@@ -284,6 +292,35 @@
         if (![adManager untunneledInterstitialIsShowing]) {
             [vpnManager startVPN];
         }
+
+		// check if user has a valid subscription but the receipt is not valid
+		IAPHelper *iapHelper = [IAPHelper sharedInstance];
+		if([iapHelper hasActiveSubscriptionForDate:[NSDate date]] && ![iapHelper verifyReceipt]) {
+			// Stop the tunnel and prompt user to refresh app receipt
+			[vpnManager stopVPN];
+
+			NSString *alertTitle = NSLocalizedStringWithDefaultValue(@"BAD_RECEIPT_ALERT_TITLE", nil, [NSBundle mainBundle], @"Invalid app receipt", @"Alert title informing user that app receipt is not valid");
+
+			NSString *alertMessage = NSLocalizedStringWithDefaultValue(@"BAD_RECEIPT_ALERT_MESSAGE", nil, [NSBundle mainBundle], @"Your subscription receipt can not be verified, please refresh it and try again.", @"Alert message informing user that subscription receipt can not be verified");
+
+			UIAlertController *alert = [UIAlertController
+										alertControllerWithTitle:alertTitle
+										message:alertMessage
+										preferredStyle:UIAlertControllerStyleAlert];
+
+			UIAlertAction *defaultAction = [UIAlertAction
+											actionWithTitle:NSLocalizedStringWithDefaultValue(@"OK_BUTTON", nil, [NSBundle mainBundle], @"OK", @"Alert OK Button")
+											style:UIAlertActionStyleDefault
+											handler:^(UIAlertAction *action) {
+												IAPViewController * iapViewController = [[IAPViewController alloc]init];
+												iapViewController.openedFromSettings = NO;
+												UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:iapViewController];
+												[self.window.rootViewController presentViewController:navController animated:YES completion:nil];
+											}];
+			[alert addAction:defaultAction];
+			[self.window.rootViewController presentViewController:alert animated:TRUE completion:nil];
+		}
+
     }];
 
     [notifier listenForNotification:@"NE.onAvailableEgressRegions" listener:^{ // TODO should be put in a constants file
@@ -295,6 +332,78 @@
             [[RegionAdapter sharedInstance] onAvailableEgressRegions:regions];
         });
     }];
+
+	[notifier listenForNotification:@"NE.onAvailableEgressRegions" listener:^{ // TODO should be put in a constants file
+		LOG_DEBUG(@"Received notification NE.onAvailableEgressRegions");
+		// Update available regions
+		// TODO: this code is duplicated in MainViewController updateAvailableRegions
+		dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+			NSArray<NSString *> *regions = [sharedDB getAllEgressRegions];
+			[[RegionAdapter sharedInstance] onAvailableEgressRegions:regions];
+		});
+	}];
+
+	[notifier listenForNotification:@"NE.onServerTimestamp" listener:^{
+		LOG_DEBUG(@"Received notification NE.onServerTimestamp");
+		dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+			// Check if user has an active subscription in the device's time
+			// If NO - do nothing
+			// If YES - proceed with checking the subscription against server timestamp
+
+			if(![[IAPHelper sharedInstance]hasActiveSubscriptionForDate:[NSDate date]]) {
+				return;
+			}
+
+			NSString *serverTimestamp = [sharedDB getServerTimestamp];
+
+			// The following code adapted from
+			// https://developer.apple.com/library/content/documentation/Cocoa/Conceptual/DataFormatting/Articles/dfDateFormatting10_4.html
+			static NSDateFormatter *    sRFC3339DateFormatter;
+			NSDate *                    serverDate;
+
+			// If the date formatters aren't already set up, do that now and cache them
+			// for subsequence reuse.
+			if (sRFC3339DateFormatter == nil) {
+				NSLocale *                  enUSPOSIXLocale;
+
+				sRFC3339DateFormatter = [[NSDateFormatter alloc] init];
+
+				enUSPOSIXLocale = [NSLocale localeWithLocaleIdentifier:@"en_US_POSIX"];
+
+				[sRFC3339DateFormatter setLocale:enUSPOSIXLocale];
+				[sRFC3339DateFormatter setDateFormat:@"yyyy'-'MM'-'dd'T'HH':'mm':'ss'Z'"];
+				[sRFC3339DateFormatter setTimeZone:[NSTimeZone timeZoneForSecondsFromGMT:0]];
+			}
+
+			serverDate = [sRFC3339DateFormatter dateFromString:serverTimestamp];
+			if (serverDate != nil) {
+				if(![[IAPHelper sharedInstance]hasActiveSubscriptionForDate:serverDate]) {
+					// User is possibly cheating, terminate the app due to 'Invalid Receipt'.
+					// Stop the tunnel, show alert with title and message
+					// and terminate the app due to 'Invalid Receipt'when user clicks 'OK'
+					[vpnManager stopVPN];
+
+					NSString *alertTitle = NSLocalizedStringWithDefaultValue(@"BAD_CLOCK_ALERT_TITLE", nil, [NSBundle mainBundle], @"Clock is out of sync", @"Alert title informing user that the device clock needs to be updated with current time");
+
+					NSString *alertMessage = NSLocalizedStringWithDefaultValue(@"BAD_CLOCK_ALERT_MESSAGE", nil, [NSBundle mainBundle], @"We've detected the time on your device is out of sync with your time zone. Please update your clock settings and restart the app", @"Alert message informing user that the device clock needs to be updated with current time");
+
+					UIAlertController *alert = [UIAlertController
+												alertControllerWithTitle:alertTitle
+												message:alertMessage
+												preferredStyle:UIAlertControllerStyleAlert];
+
+					UIAlertAction *defaultAction = [UIAlertAction
+													actionWithTitle:NSLocalizedStringWithDefaultValue(@"OK_BUTTON", nil, [NSBundle mainBundle], @"OK", @"Alert OK Button")
+													style:UIAlertActionStyleDefault
+													handler:^(UIAlertAction *action) {
+														[[IAPHelper sharedInstance] terminateForInvalidReceipt];
+													}];
+					[alert addAction:defaultAction];
+					[self.window.rootViewController presentViewController:alert animated:TRUE completion:nil];
+				}
+			}
+		});
+	}];
 }
 
 @end

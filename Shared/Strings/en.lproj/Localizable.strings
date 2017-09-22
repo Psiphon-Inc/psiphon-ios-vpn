@@ -10,12 +10,31 @@
 /* Text showing the app version. The '%@' placeholder is the version number. So it will look like 'Version 2'. */
 "APP_VERSION" = "Version %@";
 
+/* Alert message informing user that the device clock needs to be updated with current time */
+"BAD_CLOCK_ALERT_MESSAGE" = "We've detected the time on your device is out of sync with your time zone. Please update your clock settings and restart the app";
+
+/* Alert title informing user that the device clock needs to be updated with current time */
+"BAD_CLOCK_ALERT_TITLE" = "Clock is out of sync";
+
+/* Alert message informing user that subscription receipt can not be verified */
+"BAD_RECEIPT_ALERT_MESSAGE" = "Your subscription receipt can not be verified, please refresh it and try again.";
+
+/* Alert title informing user that app receipt is not valid */
+"BAD_RECEIPT_ALERT_TITLE" = "Invalid app receipt";
+
+/* Buy subscription dialog footer text */
+"BUY_SUBSCRIPTIONS_FOOTER_TEXT" = "Restore prevously bought subscriptions or refresh subscription receipt";
+
+/* Buy subscription dialog header text */
+"BUY_SUBSCRIPTIONS_HEADER_TEXT" = "Buy subscription to remove ads.";
+
 /* Text above change region button that allows user to select their desired server region */
 "CHANGE_REGION" = "Change Region";
 
 /* Done button in navigation bar
    Title of the button that dismisses region selection dialog
-   Title of the button that dismisses the settings menu (InAppSettingsKit) */
+   Title of the button that dismisses the settings menu (InAppSettingsKit)
+   Title of the button that dismisses the subscriptions menu */
 "DONE_ACTION" = "Done";
 
 /* Text displayed while app loads */
@@ -33,6 +52,9 @@
 /* Alert title informing user there is no internet connection */
 "NO_INTERNET" = "No Internet Connection";
 
+/* Subscriptions view text that is visible when the list of subscriptions is not available */
+"NO_PRODUCTS_TEXT" = "Could not retrieve subscriptions from the App Store. Pull to refresh or try again later.";
+
 /* Alert OK Button
    Alert OK Button. (InAppSettingsKit) */
 "OK_BUTTON" = "OK";
@@ -42,6 +64,9 @@
 
 /* Title of the settings (aka preferences) view (InAppSettingsKit) */
 "SETTINGS_TITLE" = "Settings";
+
+/* Title of the dialog for available in-app paid subscriptions */
+"SUBSCRIPTIONS" = "Subscriptions";
 
 /* Alert message informing user to turn on their cellular data or wifi to connect to the internet */
 "TURN_ON_DATE" = "Turn on cellular data or use Wi-Fi to access data.";

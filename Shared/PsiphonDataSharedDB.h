@@ -59,6 +59,9 @@
 - (BOOL)updateAppForegroundState:(BOOL)foreground;
 - (BOOL)getAppForegroundState;
 
+// Server timestamp
+- (void)updateServerTimestamp:(NSString*)timestamp;
+- (NSString*)getServerTimestamp;
 @end
 
 
