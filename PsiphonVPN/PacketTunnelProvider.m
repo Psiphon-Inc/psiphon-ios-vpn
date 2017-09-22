@@ -52,6 +52,9 @@ static const double kDefaultLogTruncationInterval = 12 * 60 * 60; // 12 hours
     // State variables
     BOOL shouldStartVPN;  // Start vpn decision made by the container.
 
+    // Serial queue for inserting diagnostic logs into the shared db.
+    dispatch_queue_t serialDiagnosticsQueue;
+
 }
 
 - (id)init {
@@ -71,6 +74,8 @@ static const double kDefaultLogTruncationInterval = 12 * 60 * 60; // 12 hours
 
         // state variables
         shouldStartVPN = FALSE;
+
+        serialDiagnosticsQueue = dispatch_queue_create("ca.psiphon.Psiphon.PsiphonVPN.SerialDiagnosticsQueue", DISPATCH_QUEUE_SERIAL);
     }
 
     return self;
@@ -380,15 +385,19 @@ static const double kDefaultLogTruncationInterval = 12 * 60 * 60; // 12 hours
 }
 
 - (void)onDiagnosticMessage:(NSString * _Nonnull)message {
-    [sharedDB insertDiagnosticMessage:message];
+    dispatch_async(serialDiagnosticsQueue, ^{
+        [self performBackgroundTaskWithReason:@"onDiagnosticMessage" usingBlock:^{
+            [sharedDB insertDiagnosticMessage:message];
 #if DEBUG
-    // Notify container that there is new data in shared sqlite database.
-    // This is only needed in debug mode where the log view is enabled
-    // in the container. LogViewController needs to know when new logs
-    // have entered the shared database so it can update its view to
-    // display the latest diagnostic entries.
-    [notifier post:@"NE.onDiagnosticMessage"];
+            // Notify container that there is new data in shared sqlite database.
+            // This is only needed in debug mode where the log view is enabled
+            // in the container. LogViewController needs to know when new logs
+            // have entered the shared database so it can update its view to
+            // display the latest diagnostic entries.
+            [notifier post:@"NE.onDiagnosticMessage"];
 #endif
+        }];
+    });
 }
 
 - (void)onConnecting {
@@ -429,14 +438,76 @@ static const double kDefaultLogTruncationInterval = 12 * 60 * 60; // 12 hours
 }
 
 - (void)onAvailableEgressRegions:(NSArray *)regions {
-	[sharedDB insertNewEgressRegions:regions];
+    [sharedDB insertNewEgressRegions:regions];
 
-	// Notify container
-	[notifier post:@"NE.onAvailableEgressRegions"];
+    // Notify container
+    [notifier post:@"NE.onAvailableEgressRegions"];
 }
 
 - (void)onInternetReachabilityChanged:(Reachability* _Nonnull)reachability {
-	NSString *strReachabilityFlags = [reachability currentReachabilityFlagsToString];
-	[self onDiagnosticMessage:[NSString stringWithFormat:@"onInternetReachabilityChanged: %@", strReachabilityFlags]];
+    NSString *strReachabilityFlags = [reachability currentReachabilityFlagsToString];
+    [self onDiagnosticMessage:[NSString stringWithFormat:@"onInternetReachabilityChanged: %@", strReachabilityFlags]];
 }
+
+/*
+ * Execute block as a background task. The background task will end after your block argument returns. The reason string is used for debugging.
+ *
+ * This method will not return until the background task completes successfully or expires.
+ * This method should be used as a wrapper for any code that can result in a lock being obtained on a file in the shared app group container.
+ * This method must be used if the code could hold this manner of lock while the extension is being suspended.
+ * If the extension holds a lock during suspension it will be terminated by the OS with exception code 0xdead10cc.
+ */
+- (void)performBackgroundTaskWithReason:(NSString * _Nonnull)reason usingBlock:(void (^)())block {
+    // Follows template provided by "Requesting Background Assertions for Asynchronous Tasks" in:
+    // https://developer.apple.com/library/content/documentation/General/Conceptual/WatchKitProgrammingGuide/iOSSupport.html
+    dispatch_semaphore_t expiringActivityCompleted = dispatch_semaphore_create(0);
+    dispatch_semaphore_t blockExecutedOrActivityExpired = dispatch_semaphore_create(0);
+    [[NSProcessInfo processInfo] performExpiringActivityWithReason:reason usingBlock:^(BOOL expired) {
+        // This block is executed on an anonymous background queue.
+        // Note: this block can be called multiple times. If you are given
+        // a background task assertion, the block will be called with
+        // expiring == false. Then, if the app suddenly needs to terminate, the system can revoke
+        // the assertion by calling this block a second time with expiring == true.
+        if (expired) {
+            // Your app has not been given a background task assertion,
+            // or the current background task assertion has been revoked.
+
+            // You have a brief bit of time to perform any clean-up activities.
+
+            // Clean up any running tasks.
+            // Cancel any long synchronous tasks (if possible).
+            // Unblock the thread (if blocked).
+            dispatch_semaphore_signal(blockExecutedOrActivityExpired);
+
+            // Allow performBackgroundTaskWithReason to return.
+            dispatch_semaphore_signal(expiringActivityCompleted);
+        } else {
+            // Your app has been given a background task assertion.
+
+            // The background task assertion lasts until this method returns, or until
+            // the assertion is revoked.
+
+            // perform long synchronous tasks here
+            // or kick off asynchronous task and block this thread.
+            // Be sure to unblock the thread when the asynchronous task is complete.
+            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+                block();
+                dispatch_semaphore_signal(blockExecutedOrActivityExpired);
+            });
+            long timedOut = dispatch_semaphore_wait(blockExecutedOrActivityExpired, dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC * 60));
+            if (timedOut == 0) {
+                // Async task completed successfully or the activity was expired.
+                LOG_DEBUG(@"onDiagnosticMessage: semaphore wait returned successfully");
+            } else {
+                LOG_DEBUG(@"onDiagnosticMessage: semaphore wait timed out");
+            }
+
+            // Allow performBackgroundTaskWithReason to return.
+            dispatch_semaphore_signal(expiringActivityCompleted);
+        }
+    }];
+
+    dispatch_semaphore_wait(expiringActivityCompleted, dispatch_time(DISPATCH_TIME_FOREVER, 0));
+}
+
 @end
