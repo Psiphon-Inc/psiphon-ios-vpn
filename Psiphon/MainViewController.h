@@ -18,7 +18,7 @@
  */
 
 #import <UIKit/UIKit.h>
-#import "PsiphonSettingsViewController.h"
+#import "SettingsViewController.h"
 #import "LaunchScreenViewController.h"
 
 

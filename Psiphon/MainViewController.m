@@ -35,7 +35,9 @@
 #import "AdManager.h"
 #import "PulsingHaloLayer.h"
 #import "Logging.h"
+#import "IAPViewController.h"
 #import "AppDelegate.h"
+#import "IAPHelper.h"
 
 static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSString *b) {
     return (([a length] == 0) && ([b length] == 0)) || ([a isEqualToString:b]);
@@ -159,6 +161,18 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     [[NSNotificationCenter defaultCenter]
             addObserver:self selector:@selector(onAdStatusDidChange) name:@kAdsDidLoad object:adManager];
 
+	// Observe IAP transaction notification
+	[[NSNotificationCenter defaultCenter] addObserver:self
+											 selector:@selector(updatedIAPTransactionState)
+												 name:kIAPSKPaymentTransactionStatePurchased
+											   object:nil];
+	[[NSNotificationCenter defaultCenter] addObserver:self
+											 selector:@selector(updatedIAPTransactionState)
+												 name:kIAPSKPaymentTransactionStateRestored
+											   object:nil];
+
+
+
     // TODO: load/save config here to have the user immediately complete the permission prompt
 }
 
@@ -270,7 +284,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
         [self removePulsingHaloLayer];
     }
 
-    // Notify PsiphonSettingsViewController that the state has changed
+    // Notify SettingsViewController that the state has changed
     [[NSNotificationCenter defaultCenter] postNotificationName:kPsiphonConnectionStateNotification object:nil];
 }
 
@@ -300,6 +314,10 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 
 - (void)onRegionButtonTap:(UIButton *)sender {
     [self openRegionSelection];
+}
+
+- (void) onAppLabelTap {
+	[self openIAPViewController];
 }
 
 #if DEBUG
@@ -479,6 +497,10 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                                                           attribute:NSLayoutAttributeRight
                                                          multiplier:1.0
                                                            constant:-15.0]];
+	UITapGestureRecognizer *tapGestureRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(onAppLabelTap)];
+	tapGestureRecognizer.numberOfTapsRequired = 1;
+	[appTitleLabel addGestureRecognizer:tapGestureRecognizer];
+	appTitleLabel.userInteractionEnabled = YES;
 }
 
 - (void)addAppSubTitleLabel {
@@ -1095,7 +1117,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 #pragma mark - Psiphon Settings
 
 - (void)openSettingsMenu {
-    appSettingsViewController = [[PsiphonSettingsViewController alloc] init];
+    appSettingsViewController = [[SettingsViewController alloc] init];
     appSettingsViewController.delegate = appSettingsViewController;
     appSettingsViewController.showCreditsFooter = NO;
     appSettingsViewController.showDoneButton = YES;
@@ -1148,4 +1170,21 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     [regionButton setTitle:regionText forState:UIControlStateNormal];
 }
 
+#pragma mark - IAP
+
+- (void) openIAPViewController {
+	IAPViewController * iapViewController = [[IAPViewController alloc]init];
+	iapViewController.openedFromSettings = NO;
+	UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:iapViewController];
+	[self presentViewController:navController animated:YES completion:nil];
+}
+
+- (void)updatedIAPTransactionState {
+	if (![adManager shouldShowUntunneledAds]) {
+		// if user subscription state has changed to valid
+		// try to deinit ads if currently not showing and hide adLabel
+		[adManager initializeAds];
+		adLabel.hidden = YES;
+	}
+}
 @end
