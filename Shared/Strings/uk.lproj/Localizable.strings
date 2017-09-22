@@ -11,7 +11,7 @@
 "APP_VERSION" = "Версія %@";
 
 /* Text above change region button that allows user to select their desired server region */
-"CHANGE_REGION" = "Змінити Область";
+"CHANGE_REGION" = "Змінити країну";
 
 /* Done button in navigation bar
    Title of the button that dismisses region selection dialog
@@ -28,17 +28,17 @@
 "MAIL_NOT_CONFIGURED" = "Пошта не налаштована";
 
 /* Description for the 'Mail not configured' message. (InAppSettingsKit) */
-"MAIL_NOT_CONFIGURED_DESC" = "Цей пристрій не налаштовано для надсилання електронної пошти. Будь ласка, Зконфігуруйте налаштування пошти в додатку Налаштування.";
+"MAIL_NOT_CONFIGURED_DESC" = "Цей пристрій не налаштовано для надсилання електронної пошти. Будь ласка, здійсніть налаштування пошти в програмі Налаштування.";
 
 /* Alert title informing user there is no internet connection */
-"NO_INTERNET" = "Немає підключення до Інтернету";
+"NO_INTERNET" = "Немає під'єднання до Інтернету";
 
 /* Alert OK Button
    Alert OK Button. (InAppSettingsKit) */
-"OK_BUTTON" = "ОК";
+"OK_BUTTON" = "Гаразд";
 
 /* Alert message informing the user they should open the app to finish connecting to the VPN. */
-"OPEN_PSIPHON_APP" = "Будь ласка, відкрийте додаток Psiphon, щоб завершити підключення.";
+"OPEN_PSIPHON_APP" = "Будь ласка, відкрийте застосунок Psiphon, щоб завершити під'єднання.";
 
 /* Title of the settings (aka preferences) view (InAppSettingsKit) */
 "SETTINGS_TITLE" = "Налаштування";
@@ -47,7 +47,7 @@
 "TURN_ON_DATE" = "Увімкніть стільникові дані або скористайтеся Wi-Fi для доступу до даних.";
 
 /* Alert message informing user they have to open the app */
-"USE_PSIPHON_APP" = "Для підключення використовуйте додаток Psiphon";
+"USE_PSIPHON_APP" = "Для під'єднання використовуйте застосунок Psiphon";
 
 /* Status when the VPN is connected to a Psiphon server */
 "VPN_STATUS_CONNECTED" = "З'єднано";
@@ -65,7 +65,7 @@
 "VPN_STATUS_INVALID" = "Роз'єднано";
 
 /* Status when the VPN was connected to a Psiphon server, got disconnected unexpectedly, and is currently trying to reconnect */
-"VPN_STATUS_RECONNECTING" = "Підключення знову";
+"VPN_STATUS_RECONNECTING" = "Повторне з'єднання";
 
 /* Status when the VPN is restarting. */
 "VPN_STATUS_RESTARTING" = "Перезавантаження";
