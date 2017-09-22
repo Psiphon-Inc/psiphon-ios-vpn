@@ -28,7 +28,6 @@
 /*!
  * @brief Sends Darwin notification with given key.
  * @param key Unique notification key.
- * @return TRUE if notification is posted successfully.
  */
 - (void)post:(nonnull NSString *)key;
 
