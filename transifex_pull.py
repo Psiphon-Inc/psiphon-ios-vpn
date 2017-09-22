@@ -30,7 +30,12 @@ import codecs
 import argparse
 import requests
 import localizable
-import yaml
+
+# To install this dependency on macOS:
+# pip install --upgrade setuptools --user python
+# pip install --upgrade ruamel.yaml --user python
+from ruamel.yaml import YAML
+from ruamel.yaml.compat import StringIO
 
 
 DEFAULT_LANGS = {
@@ -71,13 +76,28 @@ DEFAULT_LANGS = {
 RTL_LANGS = ('ar', 'fa', 'he')
 
 
-def process_resource(resource, output_path_fn, output_mutator_fn, output_merge_fn,
+UNTRANSLATED_FLAG = '[UNTRANSLATED]'
+
+
+# From https://yaml.readthedocs.io/en/latest/example.html#output-of-dump-as-a-string
+class YAML_StringDumper(YAML):
+    def dump(self, data, stream=None, **kw):
+        inefficient = False
+        if stream is None:
+            inefficient = True
+            stream = StringIO()
+        YAML.dump(self, data, stream, **kw)
+        if inefficient:
+            return stream.getvalue()
+
+
+def process_resource(resource, output_path_fn, output_mutator_fn,
                      bom, encoding='utf-8'):
     '''
     `output_path_fn` must be callable. It will be passed the language code and
     must return the path+filename to write to.
-    `output_mutator_fn` must be callable. It will be passed the output and the
-    current language code. May be None.
+    `output_mutator_fn` must be callable. It will be passed `lang, fname, translation`
+    and must return the resulting translation. May be None.
     '''
 
     langs = DEFAULT_LANGS
@@ -98,24 +118,9 @@ def process_resource(resource, output_path_fn, output_mutator_fn, output_merge_f
     for in_lang, out_lang in langs.items():
         r = request('resource/%s/translation/%s' % (resource, in_lang))
 
-        if output_mutator_fn:
-            # Transifex doesn't support the special character-type
-            # modifiers we need for some languages,
-            # like 'ug' -> 'ug@Latn'. So we'll need to hack in the
-            # character-type info.
-            content = output_mutator_fn(r['content'], out_lang)
-        else:
-            content = r['content']
-
-        # Make line endings consistently Unix-y.
-        content = content.replace('\r\n', '\n')
-
         output_path = output_path_fn(out_lang)
 
-        if output_merge_fn:
-            content = output_merge_fn(out_lang, os.path.basename(output_path), content)
-
-        # Path sure the output directory exists.
+        # Make sure the output directory exists.
         try:
             os.makedirs(os.path.dirname(output_path))
         except OSError as ex:
@@ -124,9 +129,18 @@ def process_resource(resource, output_path_fn, output_mutator_fn, output_merge_f
             else:
                 raise
 
+        if output_mutator_fn:
+            content = output_mutator_fn(out_lang, os.path.basename(output_path), r['content'])
+        else:
+            content = r['content']
+
+        # Make line endings consistently Unix-y.
+        content = content.replace('\r\n', '\n')
+
         with codecs.open(output_path, 'w', encoding) as f:
             if bom:
                 f.write(u'\uFEFF')
+
             f.write(content)
 
 
@@ -160,12 +174,12 @@ def request(command, params=None):
     return r.json()
 
 
-def yaml_lang_change(in_yaml, to_lang):
+def yaml_lang_change(to_lang, _, in_yaml):
+    """
+    Transifex doesn't support the special character-type modifiers we need for some
+    languages, like 'ug' -> 'ug@Latn'. So we'll need to hack in the  character-type info.
+    """
     return to_lang + in_yaml[in_yaml.find(':'):]
-
-
-def html_doctype_add(in_html, to_lang):
-    return '<!DOCTYPE html>\n' + in_html
 
 
 def merge_storeassets_translations(lang, fname, fresh):
@@ -174,15 +188,18 @@ def merge_storeassets_translations(lang, fname, fresh):
     a translation is incomplete. So we'll merge old translations into fresh ones.
     """
 
-    fresh_translation = yaml.load(fresh)
+    yml = YAML_StringDumper()
+    yml.encoding = None # unicode, which we'll encode when writing the file
 
-    with open('./StoreAssets/master.yaml') as f:
-        english_translation = yaml.load(f)
+    fresh_translation = yml.load(fresh)
+
+    with codecs.open('./StoreAssets/master.yaml', encoding='utf-8') as f:
+        english_translation = yml.load(f)
 
     existing_fname = './StoreAssets/%s' % fname
     try:
-        with open(existing_fname) as f:
-            existing_translation = yaml.load(f)
+        with codecs.open(existing_fname, encoding='utf-8') as f:
+            existing_translation = yml.load(f)
     except Exception as ex:
         print('merge_storeassets_translations: failed to open existing translation: %s -- %s\n' % (existing_fname, ex))
         return fresh
@@ -190,11 +207,11 @@ def merge_storeassets_translations(lang, fname, fresh):
     # Transifex does not populate YAML translations with the English fallback
     # for missing values.
 
-    for key, value in english_translation['en']:
+    for key in english_translation['en']:
         if not fresh_translation[lang].get(key) and existing_translation[lang].get(key):
             fresh_translation[lang][key] = existing_translation[lang].get(key)
 
-    return yaml.dump(fresh_translation)
+    return yml.dump(fresh_translation)
 
 
 def merge_applestrings_translations(lang, fname, fresh):
@@ -215,21 +232,33 @@ def merge_applestrings_translations(lang, fname, fresh):
     fresh_merged = ''
 
     for entry in fresh_translation:
-        try: english = next(x['value'] for x in english_translation if x['key'] == entry['key'])
-        except: english = None
-        try: existing = next(x['value'] for x in existing_translation if x['key'] == entry['key'])
-        except: existing = None
+        try:
+            english = next(x['value'] for x in english_translation if x['key'] == entry['key'])
+        except:
+            english = None
 
-        fresh = entry['value']
+        try:
+            existing = next(x for x in existing_translation if x['key'] == entry['key'])
 
-        if fresh == english and existing is not None and existing != english:
+            # Make sure we don't fall back on an untranslated value. See comment
+            # on function `flag_untranslated_*` for details.
+            if UNTRANSLATED_FLAG in existing['comment']:
+                existing = None
+            else:
+                existing = existing['value']
+        except:
+            existing = None
+
+        fresh_value = entry['value']
+
+        if fresh_value == english and existing is not None and existing != english:
             # DEBUG
-            #print('merge_applestrings_translations:', entry['key'], fresh, existing)
+            #print('merge_applestrings_translations:', entry['key'], fresh_value, existing)
 
             # The fresh translation has the English fallback
-            fresh = existing
+            fresh_value = existing
 
-        escaped_fresh = fresh.replace('"', '\\"').replace('\n', '\\n')
+        escaped_fresh = fresh_value.replace('"', '\\"').replace('\n', '\\n')
 
         fresh_merged += '/*%s*/\n"%s" = "%s";\n\n' % (entry['comment'],
                                                       entry['key'],
@@ -238,27 +267,83 @@ def merge_applestrings_translations(lang, fname, fresh):
     return fresh_merged
 
 
-def pull_ios_browser_translations():
+def flag_untranslated_applestrings(lang, fname, fresh):
+    """
+    When retrieved from Transifex, Apple .strings files include all string table
+    entries, with the English provided for untranslated strings. This counteracts
+    our efforts to fall back to previous translations when strings change. Like so:
+    - Let's say the entry `"CANCEL_ACTION" = "Cancel";` is untranslated for French.
+      It will be in the French strings file as the English.
+    - Later we change "Cancel" to "Stop" in the English, but don't change the key.
+    - On the next transifex_pull, this script will detect that the string is untranslated
+      and will look at the previous French "translation" -- which is the previous
+      English. It will see that that string differs and get fooled into thinking
+      that it's a valid previous translation.
+    - The French UI will keep showing "Cancel" instead of "Stop".
+
+    While pulling translations, we are going to flag incoming non-translated strings,
+    so that we can check later and not use them a previous translation. We'll do
+    this "flagging" by putting the string "[UNTRANSLATED]" into the string comment.
+
+    (An alternative approach that would also work: Remove any untranslated string
+    table entries. But this seems more drastic than modifying a comment could have
+    unforeseen side-effects.)
+    """
+
+    fresh_translation = localizable.parse_strings(content=fresh)
+    english_translation = localizable.parse_strings(filename='./Shared/Strings/en.lproj/%s' % fname)
+    fresh_flagged = ''
+
+    for entry in fresh_translation:
+        try: english = next(x['value'] for x in english_translation if x['key'] == entry['key'])
+        except: english = None
+
+        if entry['value'] == english:
+            # DEBUG
+            #print('flag_untranslated_applestrings:', entry['key'], entry['value'])
+
+            # The string is untranslated, so flag the comment
+            entry['comment'] = UNTRANSLATED_FLAG + entry['comment']
+
+        entry['value'] = entry['value'].replace('"', '\\"').replace('\n', '\\n')
+
+        fresh_flagged += '/*%s*/\n"%s" = "%s";\n\n' % (entry['comment'],
+                                                       entry['key'],
+                                                       entry['value'])
+
+    return fresh_flagged
+
+
+def pull_ios_app_translations():
     resources = (
         ('ios-vpn-app-localizablestrings', 'Localizable.strings'),
     )
 
+    def mutator_fn(lang, fname, content):
+        content = merge_applestrings_translations(lang, fname, content)
+        content = flag_untranslated_applestrings(lang, fname, content)
+        return content
+
     for resname, fname in resources:
         process_resource(resname,
                          lambda lang: './Shared/Strings/%s.lproj/%s' % (lang, fname),
-                         None,
-                         merge_applestrings_translations,
+                         mutator_fn,
                          bom=False)
         print('%s: DONE' % (resname,))
 
 
 def pull_ios_asset_translations():
     resname = 'ios-vpn-app-store-assets'
+
+    def mutator_fn(lang, fname, content):
+        content = yaml_lang_change(lang, fname, content)
+        content = merge_storeassets_translations(lang, fname, content)
+        return content
+
     process_resource(
         resname,
         lambda lang: './StoreAssets/%s.yaml' % (lang, ),
-        yaml_lang_change,
-        None,
+        mutator_fn,
         bom=False)
     print('%s: DONE' % (resname, ))
 
@@ -307,7 +392,7 @@ def _getconfig():
 
 
 def go():
-    pull_ios_browser_translations()
+    pull_ios_app_translations()
 
     pull_ios_asset_translations()
 
