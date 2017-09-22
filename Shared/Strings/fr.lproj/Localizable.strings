@@ -4,10 +4,10 @@
 /* Text for app subtitle on main view. */
 "APP_SUB_TITLE_MAIN_VIEW" = "PAR-DELÀ LES FRONTIÈRES";
 
-/* Text for app title on main view. */
+/*[UNTRANSLATED] Text for app title on main view. */
 "APP_TITLE_MAIN_VIEW" = "PSIPHON";
 
-/* Text showing the app version. The '%@' placeholder is the version number. So it will look like 'Version 2'. */
+/*[UNTRANSLATED] Text showing the app version. The '%@' placeholder is the version number. So it will look like 'Version 2'. */
 "APP_VERSION" = "Version %@";
 
 /* Text above change region button that allows user to select their desired server region */
@@ -33,7 +33,7 @@
 /* Alert title informing user there is no internet connection */
 "NO_INTERNET" = "Aucune connexion Internet";
 
-/* Alert OK Button
+/*[UNTRANSLATED] Alert OK Button
    Alert OK Button. (InAppSettingsKit) */
 "OK_BUTTON" = "OK";
 
