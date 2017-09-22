@@ -13,8 +13,8 @@ target 'Psiphon' do
   #pod 'PsiphonClientCommonLibrary', :path => "../psiphon-ios-client-common-library/"
 
   pod 'mopub-ios-sdk', '4.16.0'
-  pod 'Google-Mobile-Ads-SDK', '7.23.0'
-  pod 'VungleSDK-iOS', '5.1.0'
+  pod 'Google-Mobile-Ads-SDK', '7.24.0'
+  pod 'VungleSDK-iOS', '5.2.0'
 end
 
 target 'PsiphonVPN' do
