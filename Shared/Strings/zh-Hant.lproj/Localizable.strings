@@ -33,7 +33,7 @@
 /* Alert title informing user there is no internet connection */
 "NO_INTERNET" = "無網路連線　";
 
-/* Alert OK Button
+/*[UNTRANSLATED] Alert OK Button
    Alert OK Button. (InAppSettingsKit) */
 "OK_BUTTON" = "OK";
 

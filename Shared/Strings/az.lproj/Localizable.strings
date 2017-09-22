@@ -4,7 +4,7 @@
 /* Text for app subtitle on main view. */
 "APP_SUB_TITLE_MAIN_VIEW" = "SƏRHƏDLƏRİ AŞARAQ";
 
-/* Text for app title on main view. */
+/*[UNTRANSLATED] Text for app title on main view. */
 "APP_TITLE_MAIN_VIEW" = "PSIPHON";
 
 /* Text showing the app version. The '%@' placeholder is the version number. So it will look like 'Version 2'. */
