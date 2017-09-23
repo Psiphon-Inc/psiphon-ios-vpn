@@ -133,10 +133,14 @@ NSString *const kIAPSKPaymentTransactionStateRestored = @"kIAPSKPaymentTransacti
 		return NO;
 	}
 
+	// Leave build number check out because receipt may not get refreshed automatically
+	// when a new version is installed.
+	/*
 	NSString *applicationVersion = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleVersion"];
 	if (![receipt.appVersion isEqualToString:applicationVersion]) {
 		return NO;
 	}
+	 */
 
 	if (![receipt verifyReceiptHash]) {
 		return NO;

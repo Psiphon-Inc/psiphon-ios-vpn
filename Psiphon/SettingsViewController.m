@@ -52,7 +52,6 @@
 	return cell;
 }
 
-
 - (void) openIAPViewController {
 	IAPViewController * iapViewController = [[IAPViewController alloc]init];
 	iapViewController.openedFromSettings = YES;
