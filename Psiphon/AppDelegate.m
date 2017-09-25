@@ -312,7 +312,7 @@
 											actionWithTitle:NSLocalizedStringWithDefaultValue(@"OK_BUTTON", nil, [NSBundle mainBundle], @"OK", @"Alert OK Button")
 											style:UIAlertActionStyleDefault
 											handler:^(UIAlertAction *action) {
-												IAPViewController * iapViewController = [[IAPViewController alloc]init];
+												IAPViewController *iapViewController = [[IAPViewController alloc]init];
 												iapViewController.openedFromSettings = NO;
 												UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:iapViewController];
 												[self.window.rootViewController presentViewController:navController animated:YES completion:nil];

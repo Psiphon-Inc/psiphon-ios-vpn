@@ -188,7 +188,7 @@ static NSString *iapCellID = @"IAPTableCellID";
 	label.text = NSLocalizedStringWithDefaultValue(@"BUY_SUBSCRIPTIONS_FOOTER_TEXT",
 												   nil,
 												   [NSBundle mainBundle],
-												   @"Restore prevously bought subscriptions or refresh subscription receipt",
+												   @"Restore prevously bought subscription or refresh subscription receipt",
 												   @"Buy subscription dialog footer text");
 	label.textAlignment = NSTextAlignmentCenter;
 	label.translatesAutoresizingMaskIntoConstraints = NO;
@@ -196,15 +196,22 @@ static NSString *iapCellID = @"IAPTableCellID";
 	[cellView addSubview:label];
 
 
-	NSString *restoreButtonTitle = @"Restore existing subscription";
+	NSString *restoreButtonTitle = NSLocalizedStringWithDefaultValue(@"RESTORE_SUBSCRIPTION_BUTTON_TITLE",
+																	 nil,
+																	 [NSBundle mainBundle],
+																	 @"Restore my subscription",
+																	 @"Restore my subscription button title");
 	UIButton* restoreButton = [UIButton buttonWithType:UIButtonTypeSystem];
 	[restoreButton setTitle:restoreButtonTitle forState:UIControlStateNormal];
 	[restoreButton addTarget:self action:@selector(restoreAction) forControlEvents:UIControlEventTouchUpInside];
 	restoreButton.translatesAutoresizingMaskIntoConstraints = NO;
 	[cellView addSubview:restoreButton];
 
-
-	NSString *refreshButtonTitle = @"Refresh receipt";
+	NSString *refreshButtonTitle = NSLocalizedStringWithDefaultValue(@"REFRESH_APP_RECEIPT_BUTTON_TITLE",
+																	   nil,
+																	   [NSBundle mainBundle],
+																	   @"Refresh receipt",
+																	   @"Refresh receipt button title");
 	UIButton* refreshButton = [UIButton buttonWithType:UIButtonTypeSystem];
 	[refreshButton setTitle:refreshButtonTitle forState:UIControlStateNormal];
 	[refreshButton addTarget:self action:@selector(refreshReceiptAction) forControlEvents:UIControlEventTouchUpInside];

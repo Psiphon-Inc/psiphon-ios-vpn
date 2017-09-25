@@ -64,7 +64,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     UILabel *appSubTitleLabel;
     UILabel *statusLabel;
     UILabel *versionLabel;
-    UILabel *adLabel;
+	UIButton *subscriptionButton;
     UILabel *regionButtonHeader;
     UIButton *regionButton;
     UIButton *startStopButton;
@@ -140,14 +140,14 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     //  TODO: wrap this in a function which always
     //  calls them in the right order
     [self addSettingsButton];
+	[self addRegionSelectionBar];
     [self addStartAndStopButton];
-    [self addAdLabel];
+	[self addAppTitleLabel];
+	[self addAppSubTitleLabel];
+	[self addSubscriptionButton];
     [self addStatusLabel];
-    [self addRegionSelectionBar];
     [self addVersionLabel];
     //[self addLogoImage];
-    [self addAppTitleLabel];
-    [self addAppSubTitleLabel];
 
     if (([[UIDevice currentDevice].model hasPrefix:@"iPhone"] || [[UIDevice currentDevice].model hasPrefix:@"iPod"]) && (self.view.bounds.size.width > self.view.bounds.size.height)) {
         //logoView.hidden = YES;
@@ -157,9 +157,6 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 
     [[NSNotificationCenter defaultCenter]
             addObserver:self selector:@selector(onVPNStatusDidChange) name:@kVPNStatusChangeNotificationName object:vpnManager];
-
-    [[NSNotificationCenter defaultCenter]
-            addObserver:self selector:@selector(onAdStatusDidChange) name:@kAdsDidLoad object:adManager];
 
 	// Observe IAP transaction notification
 	[[NSNotificationCenter defaultCenter] addObserver:self
@@ -223,10 +220,12 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 // Reload when rotate
 - (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator {
     [self.view removeConstraint:startButtonWidth];
+	[self setRegionSelectionConstraints:size];
 
     if (size.width > size.height) {
         [self.view removeConstraint:startButtonScreenWidth];
         [self.view addConstraint:startButtonScreenHeight];
+        regionButtonHeader.hidden = YES;
         if ([[UIDevice currentDevice].model hasPrefix:@"iPhone"]) {
             //logoView.hidden = YES;
             //appTitleLabel.hidden = YES;
@@ -235,15 +234,12 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     } else {
         [self.view removeConstraint:startButtonScreenHeight];
         [self.view addConstraint:startButtonScreenWidth];
+        regionButtonHeader.hidden = NO;
         if ([[UIDevice currentDevice].model hasPrefix:@"iPhone"]) {
             //logoView.hidden = NO;
             //appTitleLabel.hidden = NO;
             //appSubTitleLabel.hidden = NO;
         }
-    }
-
-    if (isStartStopButtonHaloOn && startStopButtonHalo) {
-        startStopButtonHalo.position = CGPointMake(size.width/2, size.height/2); // keep halo centered
     }
 
     [self.view addConstraint:startButtonWidth];
@@ -259,15 +255,6 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     }];
 
     [super viewWillTransitionToSize:size withTransitionCoordinator:coordinator];
-}
-
-#pragma mark - Callbacks
-
-- (void)onAdStatusDidChange{
-
-    // TODO: cast from NSObject to BOOL
-    adLabel.hidden = ![adManager untunneledInterstitialIsReady];
-
 }
 
 #pragma mark - UI callbacks
@@ -316,7 +303,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     [self openRegionSelection];
 }
 
-- (void) onAppLabelTap {
+- (void) onSubscriptionTap {
 	[self openIAPViewController];
 }
 
@@ -392,7 +379,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     CGFloat radius = (CGFloat) (MIN(self.view.frame.size.width, self.view.frame.size.height) / 2.5);
 
     startStopButtonHalo = [PulsingHaloLayer layer];
-    startStopButtonHalo.position = self.view.center;
+    startStopButtonHalo.position = startStopButton.center;
     startStopButtonHalo.radius = radius;
     startStopButtonHalo.backgroundColor =
       [UIColor colorWithRed:0.44 green:0.51 blue:0.58 alpha:1.0].CGColor;
@@ -480,27 +467,15 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                                                              toItem:self.topLayoutGuide
                                                           attribute:NSLayoutAttributeBottom
                                                          multiplier:1.0
-                                                           constant:30.0]];
+                                                           constant:0]];
     
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:appTitleLabel
-                                                          attribute:NSLayoutAttributeLeft
+                                                          attribute:NSLayoutAttributeCenterX
                                                           relatedBy:NSLayoutRelationEqual
                                                              toItem:self.view
-                                                          attribute:NSLayoutAttributeLeft
+                                                          attribute:NSLayoutAttributeCenterX
                                                          multiplier:1.0
-                                                           constant:15.0]];
-    
-    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:appTitleLabel
-                                                          attribute:NSLayoutAttributeRight
-                                                          relatedBy:NSLayoutRelationEqual
-                                                             toItem:self.view
-                                                          attribute:NSLayoutAttributeRight
-                                                         multiplier:1.0
-                                                           constant:-15.0]];
-	UITapGestureRecognizer *tapGestureRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(onAppLabelTap)];
-	tapGestureRecognizer.numberOfTapsRequired = 1;
-	[appTitleLabel addGestureRecognizer:tapGestureRecognizer];
-	appTitleLabel.userInteractionEnabled = YES;
+                                                           constant:0.0]];
 }
 
 - (void)addAppSubTitleLabel {
@@ -528,16 +503,8 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                                                           attribute:NSLayoutAttributeBottom
                                                          multiplier:1.0
                                                            constant:0]];
-    
-    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:appSubTitleLabel
-                                                          attribute:NSLayoutAttributeBottom
-                                                          relatedBy:NSLayoutRelationLessThanOrEqual
-                                                             toItem:adLabel
-                                                          attribute:NSLayoutAttributeTop
-                                                         multiplier:1.0
-                                                           constant:-10.0]];
-    
-    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:appSubTitleLabel
+
+	[self.view addConstraint:[NSLayoutConstraint constraintWithItem:appSubTitleLabel
                                                           attribute:NSLayoutAttributeLeft
                                                           relatedBy:NSLayoutRelationEqual
                                                              toItem:self.view
@@ -615,7 +582,6 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 }
 
 - (void)addStartAndStopButton {
-
     startStopButton = [UIButton buttonWithType:UIButtonTypeCustom];
     startStopButton.translatesAutoresizingMaskIntoConstraints = NO;
     startStopButton.contentHorizontalAlignment = UIControlContentHorizontalAlignmentFill;
@@ -632,14 +598,6 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     [self.view addSubview:startStopButton];
 
     // Setup autolayout
-    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:startStopButton
-                                                          attribute:NSLayoutAttributeCenterY
-                                                          relatedBy:NSLayoutRelationEqual
-                                                             toItem:self.view
-                                                          attribute:NSLayoutAttributeCenterY
-                                                         multiplier:1.0
-                                                           constant:0]];
-
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:startStopButton
                                                           attribute:NSLayoutAttributeCenterX
                                                           relatedBy:NSLayoutRelationEqual
@@ -695,45 +653,31 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     // Setup autolayout
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:statusLabel
                                                           attribute:NSLayoutAttributeTop
-                                                          relatedBy:NSLayoutRelationGreaterThanOrEqual
+                                                          relatedBy:NSLayoutRelationLessThanOrEqual
                                                              toItem:startStopButton
                                                           attribute:NSLayoutAttributeBottom
                                                          multiplier:1.0
-                                                           constant:0.0]];
+                                                           constant:4.0]];
 
-    NSLayoutConstraint *spaceToStartStopButton = [NSLayoutConstraint constraintWithItem:statusLabel
-                                                                             attribute:NSLayoutAttributeTop
-                                                                             relatedBy:NSLayoutRelationEqual
-                                                                                toItem:startStopButton
-                                                                             attribute:NSLayoutAttributeBottom
-                                                                            multiplier:1.0
-                                                                              constant:80.0];
-    spaceToStartStopButton.priority = 999;
-    [self.view addConstraint:spaceToStartStopButton];
-
-    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:statusLabel
-                                                          attribute:NSLayoutAttributeLeft
+	[self.view addConstraint:[NSLayoutConstraint constraintWithItem:statusLabel
+                                                          attribute:NSLayoutAttributeCenterX
                                                           relatedBy:NSLayoutRelationEqual
                                                              toItem:self.view
-                                                          attribute:NSLayoutAttributeLeft
+                                                          attribute:NSLayoutAttributeCenterX
                                                          multiplier:1.0
-                                                           constant:15.0]];
+                                                           constant:0]];
+	// setup layout equal distribution
+	UILayoutGuide *leadingGuide = [UILayoutGuide new];
+	UILayoutGuide *trailingGuide = [UILayoutGuide new];
+	[self.view addLayoutGuide:leadingGuide];
+	[self.view addLayoutGuide:trailingGuide];
 
-    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:statusLabel
-                                                          attribute:NSLayoutAttributeRight
-                                                          relatedBy:NSLayoutRelationEqual
-                                                             toItem:self.view
-                                                          attribute:NSLayoutAttributeRight
-                                                         multiplier:1.0
-                                                           constant:-15.0]];
-
-    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:statusLabel
-                                                          attribute:NSLayoutAttributeHeight
-                                                          relatedBy:NSLayoutRelationEqual
-                                                             toItem:nil
-                                                          attribute:NSLayoutAttributeNotAnAttribute
-                                                         multiplier:1.0
-                                                           constant:30.0]];
+	[trailingGuide.heightAnchor constraintGreaterThanOrEqualToConstant:.1].active = YES;
+	[leadingGuide.heightAnchor constraintEqualToAnchor:trailingGuide.heightAnchor].active = YES;
+	[leadingGuide.topAnchor constraintEqualToAnchor:appSubTitleLabel.bottomAnchor].active = YES;
+	[leadingGuide.bottomAnchor constraintEqualToAnchor:startStopButton.topAnchor].active = YES;
+	[trailingGuide.topAnchor constraintEqualToAnchor:statusLabel.bottomAnchor].active = YES;
+	[trailingGuide.bottomAnchor constraintEqualToAnchor:subscriptionButton.topAnchor].active = YES;
 }
 
 - (void)addRegionSelectionBar {
@@ -772,27 +716,19 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                                                           attribute:NSLayoutAttributeRight
                                                          multiplier:1.0
                                                            constant:0]];
-
-    NSLayoutConstraint *heightConstraint = [NSLayoutConstraint constraintWithItem:bottomBar
-                                                              attribute:NSLayoutAttributeHeight
-                                                              relatedBy:NSLayoutRelationEqual
-                                                                 toItem:nil
-                                                              attribute:NSLayoutAttributeNotAnAttribute
-                                                             multiplier:1.0
-                                                               constant:120];
-    heightConstraint.priority = 999;
-    [self.view addConstraint:heightConstraint];
-
-    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:bottomBar
-                                                          attribute:NSLayoutAttributeTop
-                                                          relatedBy:NSLayoutRelationGreaterThanOrEqual
-                                                             toItem:statusLabel
-                                                          attribute:NSLayoutAttributeBottom
-                                                         multiplier:1.0
-                                                           constant:0]];
 }
 
 - (void)addRegionButton {
+	// Add text above region button first
+	regionButtonHeader = [[UILabel alloc] init];
+	regionButtonHeader.translatesAutoresizingMaskIntoConstraints = NO;
+
+	regionButtonHeader.text = NSLocalizedStringWithDefaultValue(@"CHANGE_REGION", nil, [NSBundle mainBundle], @"Change Region", @"Text above change region button that allows user to select their desired server region");
+	regionButtonHeader.adjustsFontSizeToFitWidth = NO;
+	regionButtonHeader.font = [regionButtonHeader.font fontWithSize:14];
+	[bottomBar addSubview:regionButtonHeader];
+
+	// Now the button
     regionButton = [[UIButton alloc] init];
     regionButton.translatesAutoresizingMaskIntoConstraints = NO;
 
@@ -813,106 +749,28 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     regionButton.titleEdgeInsets = UIEdgeInsetsMake(0, isRTL ? -spacing : spacing, 0, 0);
     regionButton.contentEdgeInsets = UIEdgeInsetsMake(0, spacing + spacingFromSides, 0, spacing + spacingFromSides);
     [regionButton addTarget:self action:@selector(onRegionButtonTap:) forControlEvents:UIControlEventTouchUpInside];
+	// Set button height
+	[regionButton addConstraint:[NSLayoutConstraint constraintWithItem:regionButton
+															 attribute:NSLayoutAttributeHeight
+															 relatedBy:NSLayoutRelationEqual
+																toItem:nil
+															 attribute:NSLayoutAttributeNotAnAttribute
+															multiplier:1.0
+															  constant:buttonHeight]];
     [bottomBar addSubview:regionButton];
     [self updateRegionButton];
-
-    // Setup autolayout
-    NSLayoutConstraint *centerInBottomBar = [NSLayoutConstraint constraintWithItem:regionButton
-                                                                         attribute:NSLayoutAttributeCenterY
-                                                                         relatedBy:NSLayoutRelationEqual
-                                                                            toItem:bottomBar
-                                                                         attribute:NSLayoutAttributeCenterY
-                                                                        multiplier:1.0
-                                                                          constant:10];
-    centerInBottomBar.priority = 999;
-    [bottomBar addConstraint:centerInBottomBar];
-
-    [bottomBar addConstraint:[NSLayoutConstraint constraintWithItem:regionButton
-                                                          attribute:NSLayoutAttributeCenterX
-                                                          relatedBy:NSLayoutRelationEqual
-                                                             toItem:bottomBar
-                                                          attribute:NSLayoutAttributeCenterX
-                                                         multiplier:1.0
-                                                           constant:0]];
-
-    NSLayoutConstraint *widthConstraint = [NSLayoutConstraint constraintWithItem:regionButton
-                                                                       attribute:NSLayoutAttributeWidth
-                                                                       relatedBy:NSLayoutRelationEqual
-                                                                          toItem:bottomBar
-                                                                       attribute:NSLayoutAttributeWidth
-                                                                      multiplier:.7
-                                                                        constant:0];
-    widthConstraint.priority = 999; // allow constraint to be broken to enforce max width
-    [bottomBar addConstraint:widthConstraint];
-
-    [bottomBar addConstraint:[NSLayoutConstraint constraintWithItem:regionButton
-                                                          attribute:NSLayoutAttributeWidth
-                                                          relatedBy:NSLayoutRelationLessThanOrEqual
-                                                             toItem:nil
-                                                          attribute:NSLayoutAttributeNotAnAttribute
-                                                         multiplier:1.0
-                                                           constant:220]];
-
-    [bottomBar addConstraint:[NSLayoutConstraint constraintWithItem:regionButton
-                                                          attribute:NSLayoutAttributeHeight
-                                                          relatedBy:NSLayoutRelationEqual
-                                                             toItem:nil
-                                                          attribute:NSLayoutAttributeNotAnAttribute
-                                                         multiplier:1.0
-                                                           constant:buttonHeight]];
-
-    // Add text above region button
-    regionButtonHeader = [[UILabel alloc] init];
-    regionButtonHeader.translatesAutoresizingMaskIntoConstraints = NO;
-
-    regionButtonHeader.text = NSLocalizedStringWithDefaultValue(@"CHANGE_REGION", nil, [NSBundle mainBundle], @"Change Region", @"Text above change region button that allows user to select their desired server region");
-    regionButtonHeader.adjustsFontSizeToFitWidth = NO;
-    regionButtonHeader.font = [UIFont systemFontOfSize:regionButton.titleLabel.font.pointSize - 3.f];
-
-    [bottomBar addSubview:regionButtonHeader];
-
-    // Setup autolayout
-    [bottomBar addConstraint:[NSLayoutConstraint constraintWithItem:regionButtonHeader
-                                                          attribute:NSLayoutAttributeBottom
-                                                          relatedBy:NSLayoutRelationEqual
-                                                             toItem:regionButton
-                                                          attribute:NSLayoutAttributeTop
-                                                         multiplier:1.0
-                                                           constant:-7.5f]];
-
-    [bottomBar addConstraint:[NSLayoutConstraint constraintWithItem:regionButtonHeader
-                                                          attribute:NSLayoutAttributeCenterX
-                                                          relatedBy:NSLayoutRelationEqual
-                                                             toItem:bottomBar
-                                                          attribute:NSLayoutAttributeCenterX
-                                                         multiplier:1.0
-                                                           constant:0]];
-
-    [bottomBar addConstraint:[NSLayoutConstraint constraintWithItem:regionButtonHeader
-                                                          attribute:NSLayoutAttributeTop
-                                                          relatedBy:NSLayoutRelationGreaterThanOrEqual
-                                                             toItem:bottomBar
-                                                          attribute:NSLayoutAttributeTop
-                                                         multiplier:1.0
-                                                           constant:0]];
-
-    [bottomBar addConstraint:[NSLayoutConstraint constraintWithItem:regionButtonHeader
-                                                          attribute:NSLayoutAttributeHeight
-                                                          relatedBy:NSLayoutRelationEqual
-                                                             toItem:nil
-                                                          attribute:NSLayoutAttributeNotAnAttribute
-                                                         multiplier:1.0
-                                                           constant:20]];
+	[self setRegionSelectionConstraints:self.view.frame.size];
 }
 
 - (void)addVersionLabel {
     versionLabel = [[UILabel alloc] init];
     versionLabel.translatesAutoresizingMaskIntoConstraints = NO;
     versionLabel.adjustsFontSizeToFitWidth = YES;
-    versionLabel.text = [NSString stringWithFormat:NSLocalizedStringWithDefaultValue(@"APP_VERSION", nil, [NSBundle mainBundle], @"Version %@", @"Text showing the app version. The '%@' placeholder is the version number. So it will look like 'Version 2'."),[[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"]];
+    versionLabel.text = [NSString stringWithFormat:NSLocalizedStringWithDefaultValue(@"APP_VERSION", nil, [NSBundle mainBundle], @"v.%@", @"Text showing the app version. The '%@' placeholder is the version number. So it will look like 'v.2'."),[[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"]];
     ;
     versionLabel.userInteractionEnabled = YES;
     versionLabel.textColor = [UIColor whiteColor];
+	versionLabel.font = [versionLabel.font fontWithSize:13];
 
 #if DEBUG
     UITapGestureRecognizer *tapRecognizer = [[UITapGestureRecognizer alloc]
@@ -949,51 +807,42 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                                                            constant:50.0]];
 }
 
-- (void)addAdLabel {
-    adLabel = [[UILabel alloc] init];
-    adLabel.translatesAutoresizingMaskIntoConstraints = NO;
-    adLabel.text = NSLocalizedStringWithDefaultValue(@"AD_LOADED", nil, [NSBundle mainBundle], @"Watch a short video while we get ready to connect you", @"Text for button that tell users there will by a short video ad.");
-    adLabel.textAlignment = NSTextAlignmentCenter;
-    adLabel.textColor = [UIColor whiteColor];
-    adLabel.lineBreakMode = NSLineBreakByWordWrapping;
-    adLabel.numberOfLines = 0;
-    [self.view addSubview:adLabel];
-    if (![adManager untunneledInterstitialIsReady]){
-        adLabel.hidden = true;
-    }
+- (void) addSubscriptionButton {
+	subscriptionButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+	subscriptionButton.layer.cornerRadius = 20;
+	subscriptionButton.clipsToBounds = YES;
+	[subscriptionButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+	subscriptionButton.backgroundColor = [[UIColor alloc] initWithRed:42.0/255 green:157.0/255 blue:242.0/255 alpha:1];
 
-    // Setup autolayout
-    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:adLabel
-                                                          attribute:NSLayoutAttributeBottom
-                                                          relatedBy:NSLayoutRelationGreaterThanOrEqual
-                                                             toItem:startStopButton
-                                                          attribute:NSLayoutAttributeTop
-                                                         multiplier:1.0
-                                                           constant:-30.0]];
+	subscriptionButton.contentEdgeInsets = UIEdgeInsetsMake(10.0f, 30.0f, 10.0f, 30.0f);
 
-    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:adLabel
-                                                          attribute:NSLayoutAttributeBottom
-                                                          relatedBy:NSLayoutRelationLessThanOrEqual
-                                                             toItem:startStopButton
-                                                          attribute:NSLayoutAttributeTop
-                                                         multiplier:1.0
-                                                           constant:-10.0]];
-    
-    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:adLabel
-                                                          attribute:NSLayoutAttributeLeft
-                                                          relatedBy:NSLayoutRelationEqual
-                                                             toItem:self.view
-                                                          attribute:NSLayoutAttributeLeft
-                                                         multiplier:1.0
-                                                           constant:15.0]];
+	NSString *subscriptionButtonTitle = NSLocalizedStringWithDefaultValue(@"SUBSCRIPTION_BUTTON_TITLE",
+																		  nil,
+																		  [NSBundle mainBundle],
+																		  @"Go ad-free now!",
+																		  @"Text for button that opens paid subscriptions manager UI");
+	[subscriptionButton setTitle:subscriptionButtonTitle forState:UIControlStateNormal];
+	[subscriptionButton addTarget:self action:@selector(onSubscriptionTap) forControlEvents:UIControlEventTouchUpInside];
+	subscriptionButton.translatesAutoresizingMaskIntoConstraints = NO;
+	[self.view addSubview:subscriptionButton];
 
-    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:adLabel
-                                                          attribute:NSLayoutAttributeRight
-                                                          relatedBy:NSLayoutRelationEqual
-                                                             toItem:self.view
-                                                          attribute:NSLayoutAttributeRight
-                                                         multiplier:1.0
-                                                           constant:-15.0]];
+
+
+	// Setup autolayout
+	[self.view addConstraint:[NSLayoutConstraint constraintWithItem:subscriptionButton
+														  attribute:NSLayoutAttributeCenterX
+														  relatedBy:NSLayoutRelationEqual
+															 toItem:self.view
+														  attribute:NSLayoutAttributeCenterX
+														 multiplier:1.0
+														   constant:0]];
+	[self.view addConstraint:[NSLayoutConstraint constraintWithItem:subscriptionButton
+														  attribute:NSLayoutAttributeBottom
+														  relatedBy:NSLayoutRelationLessThanOrEqual
+															 toItem:bottomBar
+														  attribute:NSLayoutAttributeTop
+														 multiplier:1.0
+														   constant:-10]];
 }
 
 #pragma mark - FeedbackViewControllerDelegate methods and helpers
@@ -1170,10 +1019,138 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     [regionButton setTitle:regionText forState:UIControlStateNormal];
 }
 
+- (void) setRegionSelectionConstraints:(CGSize) size {
+    [bottomBar removeConstraints:[bottomBar constraints]];
+    if (size.width > size.height) {
+        [bottomBar addConstraint:[NSLayoutConstraint constraintWithItem:regionButton
+                                                              attribute:NSLayoutAttributeBottom
+                                                              relatedBy:NSLayoutRelationEqual
+                                                                 toItem:bottomBar
+                                                              attribute:NSLayoutAttributeBottom
+                                                             multiplier:1.0
+                                                               constant:-7]];
+
+        [bottomBar addConstraint:[NSLayoutConstraint constraintWithItem:regionButton
+                                                              attribute:NSLayoutAttributeTop
+                                                              relatedBy:NSLayoutRelationEqual
+                                                                 toItem:bottomBar
+                                                              attribute:NSLayoutAttributeTop
+                                                             multiplier:1.0
+                                                               constant:7]];
+
+// Option 2
+        [bottomBar addConstraint:[NSLayoutConstraint constraintWithItem:regionButton
+                                                              attribute:NSLayoutAttributeCenterX
+                                                              relatedBy:NSLayoutRelationEqual
+                                                                 toItem:bottomBar
+                                                              attribute:NSLayoutAttributeCenterX
+                                                             multiplier:1.0
+                                                               constant:0]];
+//
+
+        [bottomBar addConstraint:[NSLayoutConstraint constraintWithItem:regionButtonHeader
+                                                              attribute:NSLayoutAttributeCenterY
+                                                              relatedBy:NSLayoutRelationEqual
+                                                                 toItem:regionButton
+                                                              attribute:NSLayoutAttributeCenterY
+                                                             multiplier:1.0
+                                                               constant:0]];
+
+        [bottomBar addConstraint:[NSLayoutConstraint constraintWithItem:regionButtonHeader
+                                                              attribute:NSLayoutAttributeTrailing
+                                                              relatedBy:NSLayoutRelationEqual
+                                                                 toItem:regionButton
+                                                              attribute:NSLayoutAttributeLeading
+                                                             multiplier:1.0
+                                                               constant:-5]];
+// Option 3
+        regionButtonHeader.hidden = YES;
+//
+
+/*
+ // Option 1
+        // Add left and right padding with layout guides
+        for (UILayoutGuide * guide in [bottomBar layoutGuides]) {
+            [bottomBar removeLayoutGuide:guide];
+        }
+        UILayoutGuide *leadingGuide = [UILayoutGuide new];
+        UILayoutGuide *trailingGuide = [UILayoutGuide new];
+        [bottomBar addLayoutGuide:leadingGuide];
+        [bottomBar addLayoutGuide:trailingGuide];
+
+        [trailingGuide.widthAnchor constraintGreaterThanOrEqualToConstant:.1].active = YES;
+        [leadingGuide.widthAnchor constraintEqualToAnchor:trailingGuide.widthAnchor].active = YES;
+        [leadingGuide.leadingAnchor constraintEqualToAnchor:bottomBar.leadingAnchor].active = YES;
+        [leadingGuide.trailingAnchor constraintEqualToAnchor:regionButtonHeader.leadingAnchor].active = YES;
+        [trailingGuide.leadingAnchor constraintEqualToAnchor:regionButton.trailingAnchor].active = YES;
+        [trailingGuide.trailingAnchor constraintEqualToAnchor:bottomBar.trailingAnchor].active = YES;
+ */
+    } else {
+        [bottomBar addConstraint:[NSLayoutConstraint constraintWithItem:regionButtonHeader
+                                                              attribute:NSLayoutAttributeTop
+                                                              relatedBy:NSLayoutRelationEqual
+                                                                 toItem:bottomBar
+                                                              attribute:NSLayoutAttributeTop
+                                                             multiplier:1.0
+                                                               constant:5]];
+
+        [bottomBar addConstraint:[NSLayoutConstraint constraintWithItem:regionButtonHeader
+                                                              attribute:NSLayoutAttributeCenterX
+                                                              relatedBy:NSLayoutRelationEqual
+                                                                 toItem:bottomBar
+                                                              attribute:NSLayoutAttributeCenterX
+                                                             multiplier:1.0
+                                                               constant:0]];
+
+
+        [bottomBar addConstraint:[NSLayoutConstraint constraintWithItem:regionButton
+                                                              attribute:NSLayoutAttributeBottom
+                                                              relatedBy:NSLayoutRelationEqual
+                                                                 toItem:bottomBar
+                                                              attribute:NSLayoutAttributeBottom
+                                                             multiplier:1.0
+                                                               constant:-7]];
+
+        [bottomBar addConstraint:[NSLayoutConstraint constraintWithItem:regionButton
+                                                              attribute:NSLayoutAttributeTop
+                                                              relatedBy:NSLayoutRelationEqual
+                                                                 toItem:regionButtonHeader
+                                                              attribute:NSLayoutAttributeBottom
+                                                             multiplier:1.0
+                                                               constant:7]];
+
+        [bottomBar addConstraint:[NSLayoutConstraint constraintWithItem:regionButton
+                                                              attribute:NSLayoutAttributeCenterX
+                                                              relatedBy:NSLayoutRelationEqual
+                                                                 toItem:bottomBar
+                                                              attribute:NSLayoutAttributeCenterX
+                                                             multiplier:1.0
+                                                               constant:0]];
+
+        NSLayoutConstraint *widthConstraint = [NSLayoutConstraint constraintWithItem:regionButton
+                                                                           attribute:NSLayoutAttributeWidth
+                                                                           relatedBy:NSLayoutRelationEqual
+                                                                              toItem:bottomBar
+                                                                           attribute:NSLayoutAttributeWidth
+                                                                          multiplier:.7
+                                                                            constant:0];
+        widthConstraint.priority = 999; // allow constraint to be broken to enforce max width
+        [bottomBar addConstraint:widthConstraint];
+
+        [bottomBar addConstraint:[NSLayoutConstraint constraintWithItem:regionButton
+                                                              attribute:NSLayoutAttributeWidth
+                                                              relatedBy:NSLayoutRelationLessThanOrEqual
+                                                                 toItem:nil
+                                                              attribute:NSLayoutAttributeNotAnAttribute
+                                                             multiplier:1.0
+                                                               constant:220]];
+    }
+}
+
 #pragma mark - IAP
 
 - (void) openIAPViewController {
-	IAPViewController * iapViewController = [[IAPViewController alloc]init];
+	IAPViewController *iapViewController = [[IAPViewController alloc]init];
 	iapViewController.openedFromSettings = NO;
 	UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:iapViewController];
 	[self presentViewController:navController animated:YES completion:nil];
@@ -1184,7 +1161,6 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 		// if user subscription state has changed to valid
 		// try to deinit ads if currently not showing and hide adLabel
 		[adManager initializeAds];
-		adLabel.hidden = YES;
 	}
 }
 @end
