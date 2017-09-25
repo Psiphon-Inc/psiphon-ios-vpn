@@ -53,7 +53,7 @@
 }
 
 - (void) openIAPViewController {
-	IAPViewController * iapViewController = [[IAPViewController alloc]init];
+	IAPViewController *iapViewController = [[IAPViewController alloc]init];
 	iapViewController.openedFromSettings = YES;
 	[self.navigationController pushViewController:iapViewController animated:YES];
 }
