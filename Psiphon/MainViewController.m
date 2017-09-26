@@ -461,14 +461,14 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     [self.view addSubview:appTitleLabel];
     
     // Setup autolayout
-    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:appTitleLabel
-                                                          attribute:NSLayoutAttributeTop
-                                                          relatedBy:NSLayoutRelationLessThanOrEqual
-                                                             toItem:self.topLayoutGuide
-                                                          attribute:NSLayoutAttributeBottom
-                                                         multiplier:1.0
-                                                           constant:0]];
-    
+	[self.view addConstraint:[NSLayoutConstraint constraintWithItem:appTitleLabel
+														  attribute:NSLayoutAttributeBottom
+														  relatedBy:NSLayoutRelationLessThanOrEqual
+															 toItem:self.view
+														  attribute:NSLayoutAttributeBottom
+														 multiplier:.14
+														   constant:0]];
+
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:appTitleLabel
                                                           attribute:NSLayoutAttributeCenterX
                                                           relatedBy:NSLayoutRelationEqual
@@ -656,8 +656,8 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                                                           relatedBy:NSLayoutRelationLessThanOrEqual
                                                              toItem:startStopButton
                                                           attribute:NSLayoutAttributeBottom
-                                                         multiplier:1.0
-                                                           constant:4.0]];
+                                                         multiplier:1.07f
+                                                           constant:-5.0]];
 
 	[self.view addConstraint:[NSLayoutConstraint constraintWithItem:statusLabel
                                                           attribute:NSLayoutAttributeCenterX
@@ -812,6 +812,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 	subscriptionButton.layer.cornerRadius = 20;
 	subscriptionButton.clipsToBounds = YES;
 	[subscriptionButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+	subscriptionButton.titleLabel.font = [UIFont boldSystemFontOfSize:subscriptionButton.titleLabel.font.pointSize];
 	subscriptionButton.backgroundColor = [[UIColor alloc] initWithRed:42.0/255 green:157.0/255 blue:242.0/255 alpha:1];
 
 	subscriptionButton.contentEdgeInsets = UIEdgeInsetsMake(10.0f, 30.0f, 10.0f, 30.0f);
@@ -1038,7 +1039,6 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                                                              multiplier:1.0
                                                                constant:7]];
 
-// Option 2
         [bottomBar addConstraint:[NSLayoutConstraint constraintWithItem:regionButton
                                                               attribute:NSLayoutAttributeCenterX
                                                               relatedBy:NSLayoutRelationEqual
@@ -1046,9 +1046,8 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                                                               attribute:NSLayoutAttributeCenterX
                                                              multiplier:1.0
                                                                constant:0]];
-//
 
-        [bottomBar addConstraint:[NSLayoutConstraint constraintWithItem:regionButtonHeader
+		[bottomBar addConstraint:[NSLayoutConstraint constraintWithItem:regionButtonHeader
                                                               attribute:NSLayoutAttributeCenterY
                                                               relatedBy:NSLayoutRelationEqual
                                                                  toItem:regionButton
@@ -1063,28 +1062,6 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                                                               attribute:NSLayoutAttributeLeading
                                                              multiplier:1.0
                                                                constant:-5]];
-// Option 3
-        regionButtonHeader.hidden = YES;
-//
-
-/*
- // Option 1
-        // Add left and right padding with layout guides
-        for (UILayoutGuide * guide in [bottomBar layoutGuides]) {
-            [bottomBar removeLayoutGuide:guide];
-        }
-        UILayoutGuide *leadingGuide = [UILayoutGuide new];
-        UILayoutGuide *trailingGuide = [UILayoutGuide new];
-        [bottomBar addLayoutGuide:leadingGuide];
-        [bottomBar addLayoutGuide:trailingGuide];
-
-        [trailingGuide.widthAnchor constraintGreaterThanOrEqualToConstant:.1].active = YES;
-        [leadingGuide.widthAnchor constraintEqualToAnchor:trailingGuide.widthAnchor].active = YES;
-        [leadingGuide.leadingAnchor constraintEqualToAnchor:bottomBar.leadingAnchor].active = YES;
-        [leadingGuide.trailingAnchor constraintEqualToAnchor:regionButtonHeader.leadingAnchor].active = YES;
-        [trailingGuide.leadingAnchor constraintEqualToAnchor:regionButton.trailingAnchor].active = YES;
-        [trailingGuide.trailingAnchor constraintEqualToAnchor:bottomBar.trailingAnchor].active = YES;
- */
     } else {
         [bottomBar addConstraint:[NSLayoutConstraint constraintWithItem:regionButtonHeader
                                                               attribute:NSLayoutAttributeTop
