@@ -53,7 +53,7 @@ Translations for this project are in two places: in [PsiphonClientCommonLibrary]
 
 Updating the PsiphonClientCommonLibrary strings involves updating the pod for that library in this project. You can run `pod update PsiphonClientCommonLibrary` or modify the target commit hash in the [`Podfile`](https://github.com/Psiphon-Inc/psiphon-ios-vpn/blob/master/Podfile) and then run `pod install`. (Instructions for how to update the strings in PsiphonClientCommonLibrary can be found in that project's README.)
 
-To update the strings in this app, run `./transifex_pull.py` from the project root (with a valid `transifex_conf.json` in place). `git status` will show you which languages changed. Do some smoke tests on those languages.
+To update the strings in this app, run `./transifex_pull.py` from the project root (with a valid `transifex_conf.json` in place). `git status` will show you which languages changed. Do some smoke tests on those languages and commit.
 
 While running `transifex_pull.py` you may see some output like this:
 ```no-highlight
