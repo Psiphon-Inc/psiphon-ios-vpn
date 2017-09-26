@@ -97,10 +97,10 @@
 }
 
 - (BOOL)shouldShowUntunneledAds {
-	// Check if user has an active subscription first
-	BOOL hasActiveSubscription = [[IAPHelper sharedInstance] hasActiveSubscriptionForDate:[NSDate date]];
+    // Check if user has an active subscription first
+    BOOL hasActiveSubscription = [[IAPHelper sharedInstance] hasActiveSubscriptionForDate:[NSDate date]];
 
-	NetworkStatus networkStatus = [[Reachability reachabilityForInternetConnection] currentReachabilityStatus];
+    NetworkStatus networkStatus = [[Reachability reachabilityForInternetConnection] currentReachabilityStatus];
     VPNStatus vpnStatus = [vpnManager getVPNStatus];
     return networkStatus != NotReachable && (vpnStatus == VPNStatusInvalid || vpnStatus == VPNStatusDisconnected) && !hasActiveSubscription;
 }
