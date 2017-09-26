@@ -372,6 +372,8 @@ static const double kDefaultLogTruncationInterval = 12 * 60 * 60; // 12 hours
     [mutableConfigCopy addEntriesFromDictionary:[psiphonConfigUserDefaults dictionaryRepresentation]];
 
     mutableConfigCopy[@"PacketTunnelTunFileDescriptor"] = fd;
+    
+    mutableConfigCopy[@"ClientVersion"] = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleVersion"];
 
     jsonData  = [NSJSONSerialization dataWithJSONObject:mutableConfigCopy
       options:0 error:&err];
