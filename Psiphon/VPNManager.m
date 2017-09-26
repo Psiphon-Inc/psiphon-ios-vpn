@@ -92,6 +92,7 @@
 
     // Reset restartRequired flag
     restartRequired = FALSE;
+    [self setStartStopButtonPressed:TRUE];
 
     [NETunnelProviderManager loadAllFromPreferencesWithCompletionHandler:
       ^(NSArray<NETunnelProviderManager *> * _Nullable allManagers, NSError * _Nullable error) {
@@ -139,6 +140,7 @@
             }
 
             [self.targetManager loadFromPreferencesWithCompletionHandler:^(NSError * _Nullable error) {
+                [self setStartStopButtonPressed:FALSE];
                 if (error != nil) {
                     LOG_ERROR(@"second loadFromPreferences failed");
                     if (completionHandler) {
