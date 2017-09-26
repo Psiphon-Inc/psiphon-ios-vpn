@@ -1,14 +1,11 @@
-/* Text for button that tell users there will by a short video ad. */
-"AD_LOADED" = "Watch a short video while we get ready to connect you";
-
 /* Text for app subtitle on main view. */
 "APP_SUB_TITLE_MAIN_VIEW" = "BEYOND BORDERS";
 
 /* Text for app title on main view. */
 "APP_TITLE_MAIN_VIEW" = "PSIPHON";
 
-/* Text showing the app version. The '%@' placeholder is the version number. So it will look like 'Version 2'. */
-"APP_VERSION" = "Version %@";
+/* Text showing the app version. The '%@' placeholder is the version number. So it will look like 'v.2'. */
+"APP_VERSION" = "v.%@";
 
 /* Alert message informing user that the device clock needs to be updated with current time */
 "BAD_CLOCK_ALERT_MESSAGE" = "We've detected the time on your device is out of sync with your time zone. Please update your clock settings and restart the app";
@@ -23,7 +20,7 @@
 "BAD_RECEIPT_ALERT_TITLE" = "Invalid app receipt";
 
 /* Buy subscription dialog footer text */
-"BUY_SUBSCRIPTIONS_FOOTER_TEXT" = "Restore prevously bought subscriptions or refresh subscription receipt";
+"BUY_SUBSCRIPTIONS_FOOTER_TEXT" = "Restore prevously bought subscription or refresh subscription receipt";
 
 /* Buy subscription dialog header text */
 "BUY_SUBSCRIPTIONS_HEADER_TEXT" = "Buy subscription to remove ads.";
@@ -62,8 +59,17 @@
 /* Alert message informing the user they should open the app to finish connecting to the VPN. */
 "OPEN_PSIPHON_APP" = "Please open Psiphon app to finish connecting.";
 
+/* Refresh receipt button title */
+"REFRESH_APP_RECEIPT_BUTTON_TITLE" = "Refresh receipt";
+
+/* Restore my subscription button title */
+"RESTORE_SUBSCRIPTION_BUTTON_TITLE" = "Restore my subscription";
+
 /* Title of the settings (aka preferences) view (InAppSettingsKit) */
 "SETTINGS_TITLE" = "Settings";
+
+/* Text for button that opens paid subscriptions manager UI */
+"SUBSCRIPTION_BUTTON_TITLE" = "Go ad-free now!";
 
 /* Title of the dialog for available in-app paid subscriptions */
 "SUBSCRIPTIONS" = "Subscriptions";
