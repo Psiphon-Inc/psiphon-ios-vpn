@@ -28,34 +28,34 @@
 @implementation SettingsViewController
 
 - (void)viewWillAppear:(BOOL)animated {
-	if([IAPHelper canMakePayments] == NO) {
-		self.hiddenKeys = [[NSSet alloc] initWithArray:@[kSettingsSubscription]];
-	}
-	[super viewWillAppear:animated];
+    if([IAPHelper canMakePayments] == NO) {
+        self.hiddenKeys = [[NSSet alloc] initWithArray:@[kSettingsSubscription]];
+    }
+    [super viewWillAppear:animated];
 }
 
 - (void)settingsViewController:(IASKAppSettingsViewController*)sender tableView:(UITableView *)tableView didSelectCustomViewSpecifier:(IASKSpecifier*)specifier {
-	[super settingsViewController:self tableView:tableView didSelectCustomViewSpecifier:specifier];
-	if ([specifier.key isEqualToString:kSettingsSubscription]) {
-		[self openIAPViewController];
-	}
+    [super settingsViewController:self tableView:tableView didSelectCustomViewSpecifier:specifier];
+    if ([specifier.key isEqualToString:kSettingsSubscription]) {
+        [self openIAPViewController];
+    }
 }
 
 - (UITableViewCell*)tableView:(UITableView*)tableView cellForSpecifier:(IASKSpecifier*)specifier {
-	UITableViewCell *cell = [super tableView:tableView cellForSpecifier:specifier];
+    UITableViewCell *cell = [super tableView:tableView cellForSpecifier:specifier];
 
-	if ([specifier.key isEqualToString:kSettingsSubscription]) {
-		[cell setAccessoryType:UITableViewCellAccessoryDisclosureIndicator];
-		[cell.textLabel setText:specifier.title];
-	}
+    if ([specifier.key isEqualToString:kSettingsSubscription]) {
+        [cell setAccessoryType:UITableViewCellAccessoryDisclosureIndicator];
+        [cell.textLabel setText:specifier.title];
+    }
 
-	return cell;
+    return cell;
 }
 
 - (void) openIAPViewController {
-	IAPViewController *iapViewController = [[IAPViewController alloc]init];
-	iapViewController.openedFromSettings = YES;
-	[self.navigationController pushViewController:iapViewController animated:YES];
+    IAPViewController *iapViewController = [[IAPViewController alloc]init];
+    iapViewController.openedFromSettings = YES;
+    [self.navigationController pushViewController:iapViewController animated:YES];
 }
 
 @end
