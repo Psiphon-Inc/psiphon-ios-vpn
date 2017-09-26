@@ -38,16 +38,16 @@
 "OK_BUTTON" = "Oldu";
 
 /* Alert message informing the user they should open the app to finish connecting to the VPN. */
-"OPEN_PSIPHON_APP" = "Qoşulmaq üçün, zəhmət olmasa. Psiphon tətbiqetməsini açın";
+"OPEN_PSIPHON_APP" = "Qoşulmaq üçün, zəhmət olmasa, Psiphon tətbiqetməsini açın";
 
 /* Title of the settings (aka preferences) view (InAppSettingsKit) */
 "SETTINGS_TITLE" = "Quraşdırmalar";
 
 /* Alert message informing user to turn on their cellular data or wifi to connect to the internet */
-"TURN_ON_DATE" = "Data xidmətini açın və ya WIFI keçin ki əlaqə yaransın";
+"TURN_ON_DATE" = "Data xidmətini açın, ya da WIFI-ya keçin ki, əlaqə yaransın";
 
 /* Alert message informing user they have to open the app */
-"USE_PSIPHON_APP" = "Qoşulmaq üçün Psiphon tətqbietməsinə keç";
+"USE_PSIPHON_APP" = "Qoşulmaq üçün Psiphon tətqbietməsinə keçin";
 
 /* Status when the VPN is connected to a Psiphon server */
 "VPN_STATUS_CONNECTED" = "Qoşuldu";

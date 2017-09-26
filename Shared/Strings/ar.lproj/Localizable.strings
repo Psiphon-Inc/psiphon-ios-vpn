@@ -1,14 +1,14 @@
-/*[UNTRANSLATED] Text for button that tell users there will by a short video ad. */
-"AD_LOADED" = "Watch a short video while we get ready to connect you";
+/* Text for button that tell users there will by a short video ad. */
+"AD_LOADED" = "شاهد مقطع فيديو قصير بينما نقوم بالاتصال.";
 
-/*[UNTRANSLATED] Text for app subtitle on main view. */
-"APP_SUB_TITLE_MAIN_VIEW" = "BEYOND BORDERS";
+/* Text for app subtitle on main view. */
+"APP_SUB_TITLE_MAIN_VIEW" = "ما وراء الحدود";
 
 /* Text for app title on main view. */
 "APP_TITLE_MAIN_VIEW" = "سايفون";
 
-/*[UNTRANSLATED] Text showing the app version. The '%@' placeholder is the version number. So it will look like 'Version 2'. */
-"APP_VERSION" = "Version %@";
+/* Text showing the app version. The '%@' placeholder is the version number. So it will look like 'Version 2'. */
+"APP_VERSION" = "الإصدار %@";
 
 /* Text above change region button that allows user to select their desired server region */
 "CHANGE_REGION" = "تغيير المنطقة";
@@ -28,26 +28,26 @@
 "MAIL_NOT_CONFIGURED" = "لم يتم إعداد البريد الإلكتروني";
 
 /* Description for the 'Mail not configured' message. (InAppSettingsKit) */
-"MAIL_NOT_CONFIGURED_DESC" = "إعدادات الجهاز لا تسمح إراسل البريد إلكتروني. الرجاء التحقق من إعدادات البريد الإلكتروني ضمن الإعدادات.";
+"MAIL_NOT_CONFIGURED_DESC" = "إعدادات الجهاز لا تسمح بإرسال بريد إلكتروني. الرجاء التحقق من إعدادات البريد الإلكتروني ضمن الإعدادات.";
 
-/*[UNTRANSLATED] Alert title informing user there is no internet connection */
-"NO_INTERNET" = "No Internet Connection";
+/* Alert title informing user there is no internet connection */
+"NO_INTERNET" = "لا يوجد إتصال بالانترنت";
 
 /* Alert OK Button
    Alert OK Button. (InAppSettingsKit) */
 "OK_BUTTON" = "موافق";
 
-/*[UNTRANSLATED] Alert message informing the user they should open the app to finish connecting to the VPN. */
-"OPEN_PSIPHON_APP" = "Please open Psiphon app to finish connecting.";
+/* Alert message informing the user they should open the app to finish connecting to the VPN. */
+"OPEN_PSIPHON_APP" = "يُرجى فتح تطبيق سايفون لإنهاء الاتصال.";
 
 /* Title of the settings (aka preferences) view (InAppSettingsKit) */
 "SETTINGS_TITLE" = "الإعدادات";
 
-/*[UNTRANSLATED] Alert message informing user to turn on their cellular data or wifi to connect to the internet */
-"TURN_ON_DATE" = "Turn on cellular data or use Wi-Fi to access data.";
+/* Alert message informing user to turn on their cellular data or wifi to connect to the internet */
+"TURN_ON_DATE" = "فعِّل بيانات الشبكة أو استخدم الواي فاي للوصول إلى البيانات.";
 
 /* Alert message informing user they have to open the app */
-"USE_PSIPHON_APP" = "To connect, use the Psiphon application.";
+"USE_PSIPHON_APP" = "للاتصال، استخدمْ تطبيق سايفون.";
 
 /* Status when the VPN is connected to a Psiphon server */
 "VPN_STATUS_CONNECTED" = "متصل";
@@ -64,8 +64,8 @@
 /* Status when the VPN is in an invalid state. For example, if the user doesn't give permission for the VPN configuration to be installed, and therefore the Psiphon VPN can't even try to connect. */
 "VPN_STATUS_INVALID" = "غير متصل";
 
-/*[UNTRANSLATED] Status when the VPN was connected to a Psiphon server, got disconnected unexpectedly, and is currently trying to reconnect */
-"VPN_STATUS_RECONNECTING" = "Reconnecting";
+/* Status when the VPN was connected to a Psiphon server, got disconnected unexpectedly, and is currently trying to reconnect */
+"VPN_STATUS_RECONNECTING" = "تجري إعادة الاتصال";
 
 /* Status when the VPN is restarting. */
 "VPN_STATUS_RESTARTING" = "أعد التشغيل";
