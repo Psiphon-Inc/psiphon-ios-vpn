@@ -1077,7 +1077,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 
 - (void) setRegionSelectionConstraints:(CGSize) size {
     [bottomBar removeConstraints:[bottomBar constraints]];
-    if (size.width > size.height) {
+    if (size.width > size.height && [[UIDevice currentDevice]userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
         regionButtonHeader.hidden = YES;
         [bottomBar addConstraint:[NSLayoutConstraint constraintWithItem:regionButton
                                                               attribute:NSLayoutAttributeBottom
