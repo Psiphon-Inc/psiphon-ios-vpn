@@ -93,20 +93,18 @@
     // Reset restartRequired flag
     restartRequired = FALSE;
 
-    // Set startStopButton pressed flag to TRUE
+    // Set startStopButtonPressed flag to TRUE
     [self setStartStopButtonPressed:TRUE];
 
     [NETunnelProviderManager loadAllFromPreferencesWithCompletionHandler:
       ^(NSArray<NETunnelProviderManager *> * _Nullable allManagers, NSError * _Nullable error) {
 
         if (error) {
-            // Reset startStopButton pressed flag if error
+            // Reset startStopButtonPressed flag to FALSE when error and exiting.
             [self setStartStopButtonPressed:FALSE];
             if (completionHandler) {
                 LOG_ERROR(@"%@", error);
                 completionHandler([VPNManager errorWithCode:VPNManagerErrorLoadConfigsFailed]);
-                // Reset startStopButton pressed flag if error
-                [self setStartStopButtonPressed:FALSE];
             }
             return;
         }
@@ -122,7 +120,7 @@
             newManager.protocolConfiguration.serverAddress = @"localhost";
             self.targetManager = newManager;
         } else if ([allManagers count] > 1) {
-            // Reset startStopButton pressed flag if error
+            // Reset startStopButtonPressed flag to FALSE when error and exiting.
             [self setStartStopButtonPressed:FALSE];
             LOG_ERROR(@"%lu VPN configurations found, only expected 1. Aborting", (unsigned long)[allManagers count]);
             if (completionHandler) {
@@ -139,7 +137,7 @@
 
         [self.targetManager saveToPreferencesWithCompletionHandler:^(NSError * _Nullable error) {
             if (error != nil) {
-                // Reset startStopButton pressed flag if error
+                // Reset startStopButtonPressed flag to FALSE when error and exiting.
                 [self setStartStopButtonPressed:FALSE];
                 // User denied permission to add VPN Configuration.
                 LOG_ERROR(@"failed to save the configuration: %@", error);
@@ -150,7 +148,7 @@
             }
 
             [self.targetManager loadFromPreferencesWithCompletionHandler:^(NSError * _Nullable error) {
-                // Set flag to FLASE when it's finished.
+                // Reset startStopButtonPressed flag to FLASE when it finished loading preferences.
                 [self setStartStopButtonPressed:FALSE];
                 if (error != nil) {
                     LOG_ERROR(@"second loadFromPreferences failed");
