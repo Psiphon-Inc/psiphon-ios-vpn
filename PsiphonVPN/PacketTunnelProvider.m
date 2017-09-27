@@ -198,7 +198,7 @@ static const double kDefaultLogTruncationInterval = 12 * 60 * 60; // 12 hours
  * This method must be used if the code could hold this manner of lock while the extension is being suspended.
  * If the extension holds a lock during suspension it will be terminated by the OS with exception code 0xdead10cc.
  */
-- (void)performBackgroundTaskWithReason:(NSString * _Nonnull)reason usingBlock:(void (^)())block {
+- (void)performBackgroundTaskWithReason:(NSString * _Nonnull)reason usingBlock:(void (^)(void))block {
     // Follows template provided by "Requesting Background Assertions for Asynchronous Tasks" in:
     // https://developer.apple.com/library/content/documentation/General/Conceptual/WatchKitProgrammingGuide/iOSSupport.html
     dispatch_semaphore_t expiringActivityCompleted = dispatch_semaphore_create(0);
