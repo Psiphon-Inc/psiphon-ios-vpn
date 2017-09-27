@@ -352,29 +352,19 @@
             if(![[IAPHelper sharedInstance]hasActiveSubscriptionForDate:[NSDate date]]) {
                 return;
             }
-
-            NSString *serverTimestamp = [sharedDB getServerTimestamp];
-
             // The following code adapted from
             // https://developer.apple.com/library/content/documentation/Cocoa/Conceptual/DataFormatting/Articles/dfDateFormatting10_4.html
-            static NSDateFormatter *    sRFC3339DateFormatter;
-            NSDate *                    serverDate;
-
-            // If the date formatters aren't already set up, do that now and cache them
-            // for subsequence reuse.
-            if (sRFC3339DateFormatter == nil) {
-                NSLocale *                  enUSPOSIXLocale;
-
+            static NSDateFormatter *sRFC3339DateFormatter;
+            static dispatch_once_t once;
+            dispatch_once(&once, ^{
                 sRFC3339DateFormatter = [[NSDateFormatter alloc] init];
+                sRFC3339DateFormatter.locale = [NSLocale localeWithLocaleIdentifier:@"en_US_POSIX"];
+                sRFC3339DateFormatter.dateFormat = @"yyyy'-'MM'-'dd'T'HH':'mm':'ss'Z'";
+                sRFC3339DateFormatter.timeZone = [NSTimeZone timeZoneForSecondsFromGMT:0];
+            });
 
-                enUSPOSIXLocale = [NSLocale localeWithLocaleIdentifier:@"en_US_POSIX"];
-
-                [sRFC3339DateFormatter setLocale:enUSPOSIXLocale];
-                [sRFC3339DateFormatter setDateFormat:@"yyyy'-'MM'-'dd'T'HH':'mm':'ss'Z'"];
-                [sRFC3339DateFormatter setTimeZone:[NSTimeZone timeZoneForSecondsFromGMT:0]];
-            }
-
-            serverDate = [sRFC3339DateFormatter dateFromString:serverTimestamp];
+            NSString *serverTimestamp = [sharedDB getServerTimestamp];
+            NSDate *serverDate = [sRFC3339DateFormatter dateFromString:serverTimestamp];
             if (serverDate != nil) {
                 if(![[IAPHelper sharedInstance]hasActiveSubscriptionForDate:serverDate]) {
                     // User is possibly cheating, terminate the app due to 'Invalid Receipt'.
