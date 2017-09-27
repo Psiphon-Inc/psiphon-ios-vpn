@@ -53,9 +53,6 @@ static const double kDefaultLogTruncationInterval = 12 * 60 * 60; // 12 hours
     // State variables
     BOOL shouldStartVPN;  // Start vpn decision made by the container.
 
-    // Serial queue for inserting diagnostic logs into the shared db.
-    dispatch_queue_t serialDiagnosticsQueue;
-
     // Time formatter for log messages.
     // NOTE: NSDateFormatter is threadsafe.
     NSDateFormatter *rfc3339Formatter;
@@ -79,8 +76,6 @@ static const double kDefaultLogTruncationInterval = 12 * 60 * 60; // 12 hours
 
         // state variables
         shouldStartVPN = FALSE;
-
-        serialDiagnosticsQueue = dispatch_queue_create("ca.psiphon.Psiphon.PsiphonVPN.SerialDiagnosticsQueue", DISPATCH_QUEUE_SERIAL);
         
         // RFC3339 Time formatter
         rfc3339Formatter = [NSDateFormatter createRFC3339Formatter];
@@ -177,19 +172,21 @@ static const double kDefaultLogTruncationInterval = 12 * 60 * 60; // 12 hours
 }
 
 - (void)logMessage:(NSString * _Nonnull)message withTimestamp:(NSString * _Nonnull)timestamp{
-    dispatch_async(serialDiagnosticsQueue, ^{
-        [self performBackgroundTaskWithReason:@"onDiagnosticMessage" usingBlock:^{
-            [sharedDB insertDiagnosticMessage:message withTimestamp:timestamp];
+    // Called synchronously on PsiphonTunnel's callback queue.
+    // Any database or file operations should be performed
+    // synchronously before returning to guarantee ordering of
+    // database insertions, writes, etc.
+    [self performBackgroundTaskWithReason:@"onDiagnosticMessage" usingBlock:^{
+        [sharedDB insertDiagnosticMessage:message withTimestamp:timestamp];
 #if DEBUG
-            // Notify container that there is new data in shared sqlite database.
-            // This is only needed in debug mode where the log view is enabled
-            // in the container. LogViewController needs to know when new logs
-            // have entered the shared database so it can update its view to
-            // display the latest diagnostic entries.
-            [notifier post:@"NE.onDiagnosticMessage"];
+        // Notify container that there is new data in shared sqlite database.
+        // This is only needed in debug mode where the log view is enabled
+        // in the container. LogViewController needs to know when new logs
+        // have entered the shared database so it can update its view to
+        // display the latest diagnostic entries.
+        [notifier post:@"NE.onDiagnosticMessage"];
 #endif
-        }];
-    });
+    }];
 }
 
 
