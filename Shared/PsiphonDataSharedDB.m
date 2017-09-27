@@ -22,7 +22,8 @@
 #import "Logging.h"
 #import "NSDateFormatter+RFC3339.h"
 
-#define MAX_LOG_LINES 250
+#define MAX_LOG_LINES 500
+#define TRUNCATION_LOG_LINES 250
 #define SHARED_DATABASE_NAME @"psiphon_data_archive.db"
 
 // ID
@@ -61,7 +62,6 @@
 
     // Log Table
     int lastLogRowId;
-    NSTimer *logTruncateTimer;
     NSLock *lastLogRowIdLock;
     
     // RFC3339 Date Formatter
@@ -118,26 +118,6 @@
     __block BOOL success = FALSE;
     [q inDatabase:^(FMDatabase *db) {
         success = [db executeStatements:CREATE_TABLE_STATEMENTS];
-        if (!success) {
-            LOG_ERROR(@"%@", [db lastError]);
-        }
-    }];
-
-    return success;
-}
-
-/*!
- * @brief Clears all tables in the database.
- * @return TRUE on success.
- */
-- (BOOL)clearDatabase {
-    NSString *CLEAR_TABLES =
-      @"DELETE FROM " TABLE_LOG " ;"
-       "DELETE FROM " TABLE_HOMEPAGE " ;";
-
-    __block BOOL success = FALSE;
-    [q inDatabase:^(FMDatabase *db) {
-        success = [db executeStatements:CLEAR_TABLES];
         if (!success) {
             LOG_ERROR(@"%@", [db lastError]);
         }
@@ -257,6 +237,10 @@
 #pragma mark - Log Table methods
 
 - (BOOL)insertDiagnosticMessage:(NSString *)message withTimestamp:(NSString *)timestamp {
+
+    // Truncates logs if necessary.
+    [self truncateLogs];
+    
     __block BOOL success;
     [q inDatabase:^(FMDatabase *db) {
         NSError *err;
@@ -275,35 +259,30 @@
     return success;
 }
 
-- (void)truncateLogsOnInterval:(NSTimeInterval)interval {
-    if (logTruncateTimer != nil) {
-        [logTruncateTimer invalidate];
-    }
-    logTruncateTimer = [NSTimer scheduledTimerWithTimeInterval:interval
-                                                        target:self
-                                                      selector:@selector(truncateLogs)
-                                                      userInfo:nil
-                                                       repeats:YES];
-
-    // trigger timer to truncate logs immediately
-    [logTruncateTimer fire];
-}
-
+/**
+ Truncates logs only if number of rows reached MAX_LOG_LINES.
+ @return TRUE if truncation proceeded and succeeded, FALSE otherwise.
+ */
 - (BOOL)truncateLogs {
-    // Truncate logs to MAX_LOG_LINES lines
+    // Truncate logs to TRUNCATION_LOG_LINES lines if reached MAX_LOG_LINES.
     __block BOOL success = FALSE;
 
     [q inDatabase:^(FMDatabase *db) {
         NSError *err;
-        success = [db executeUpdate:
-          @"DELETE FROM " TABLE_LOG
-          " WHERE " COL_ID " NOT IN "
-          "(SELECT " COL_ID " FROM " TABLE_LOG " ORDER BY " COL_ID " DESC LIMIT (?));"
-          withErrorAndBindings:&err, @MAX_LOG_LINES, nil];
-
-        if (!success) {
-            LOG_ERROR(@"%@", err);
-            // TODO: error handling/logging
+        
+        int rows = [db intForQuery:@"SELECT COUNT(" COL_ID ") FROM " TABLE_LOG];
+        
+        if (rows >= MAX_LOG_LINES) {
+            success = [db executeUpdate:
+                       @"DELETE FROM " TABLE_LOG
+                       " WHERE " COL_ID " NOT IN "
+                       "(SELECT " COL_ID " FROM " TABLE_LOG " ORDER BY " COL_ID " DESC LIMIT (?));"
+                   withErrorAndBindings:&err, @TRUNCATION_LOG_LINES, nil];
+            
+            if (!success) {
+                LOG_ERROR(@"%@", err);
+                // TODO: error handling/logging
+            }
         }
     }];
 
