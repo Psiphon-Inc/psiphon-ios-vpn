@@ -51,10 +51,6 @@ static const double kDefaultLogTruncationInterval = 12 * 60 * 60; // 12 hours
 
     // State variables
     BOOL shouldStartVPN;  // Start vpn decision made by the container.
-
-    // Serial queue for inserting diagnostic logs into the shared db.
-    dispatch_queue_t serialDiagnosticsQueue;
-
 }
 
 - (id)init {
@@ -74,8 +70,6 @@ static const double kDefaultLogTruncationInterval = 12 * 60 * 60; // 12 hours
 
         // state variables
         shouldStartVPN = FALSE;
-
-        serialDiagnosticsQueue = dispatch_queue_create("ca.psiphon.Psiphon.PsiphonVPN.SerialDiagnosticsQueue", DISPATCH_QUEUE_SERIAL);
     }
 
     return self;
@@ -387,19 +381,21 @@ static const double kDefaultLogTruncationInterval = 12 * 60 * 60; // 12 hours
 }
 
 - (void)onDiagnosticMessage:(NSString * _Nonnull)message {
-    dispatch_async(serialDiagnosticsQueue, ^{
-        [self performBackgroundTaskWithReason:@"onDiagnosticMessage" usingBlock:^{
-            [sharedDB insertDiagnosticMessage:message];
+    // Called synchronously on PsiphonTunnel's callback queue.
+    // Any database or file operations should be performed
+    // synchronously before returning to guarantee ordering of
+    // database insertions, writes, etc.
+    [self performBackgroundTaskWithReason:@"onDiagnosticMessage" usingBlock:^{
+        [sharedDB insertDiagnosticMessage:message];
 #if DEBUG
-            // Notify container that there is new data in shared sqlite database.
-            // This is only needed in debug mode where the log view is enabled
-            // in the container. LogViewController needs to know when new logs
-            // have entered the shared database so it can update its view to
-            // display the latest diagnostic entries.
-            [notifier post:@"NE.onDiagnosticMessage"];
+        // Notify container that there is new data in shared sqlite database.
+        // This is only needed in debug mode where the log view is enabled
+        // in the container. LogViewController needs to know when new logs
+        // have entered the shared database so it can update its view to
+        // display the latest diagnostic entries.
+        [notifier post:@"NE.onDiagnosticMessage"];
 #endif
-        }];
-    });
+    }];
 }
 
 - (void)onConnecting {
