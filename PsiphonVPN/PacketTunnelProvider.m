@@ -33,8 +33,6 @@
 #import <net/if.h>
 #import "NSDateFormatter+RFC3339.h"
 
-static const double kDefaultLogTruncationInterval = 12 * 60 * 60; // 12 hours
-
 @implementation PacketTunnelProvider {
 
     // pointer to startTunnelWithOptions completion handler.
@@ -91,9 +89,6 @@ static const double kDefaultLogTruncationInterval = 12 * 60 * 60; // 12 hours
 
         // Listen for messages from the container
         [self listenForContainerMessages];
-
-        // Truncate logs every 12 hours
-        [sharedDB truncateLogsOnInterval:(NSTimeInterval) kDefaultLogTruncationInterval];
 
         // Reset tunnel connected state.
         [sharedDB updateTunnelConnectedState:FALSE];

@@ -32,7 +32,6 @@
 @interface PsiphonDataSharedDB : NSObject
 - (id)initForAppGroupIdentifier:(NSString*)identifier;
 - (BOOL)createDatabase;
-- (BOOL)clearDatabase;
 
 - (BOOL)insertNewEgressRegions:(NSArray<NSString *> *)regions;
 - (NSArray<NSString *> *)getAllEgressRegions;
@@ -42,9 +41,6 @@
 - (NSArray<Homepage *> *)getAllHomepages;
 
 // Logs table
-#ifdef TARGET_IS_EXTENSION
-- (void)truncateLogsOnInterval:(NSTimeInterval)interval; // should only be called by the app extension
-#endif
 - (BOOL)truncateLogs;
 - (BOOL)insertDiagnosticMessage:(NSString *)message withTimestamp:(NSString *)timestamp;
 #ifndef TARGET_IS_EXTENSION
