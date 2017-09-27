@@ -42,7 +42,7 @@
 
 // Logs table
 - (BOOL)truncateLogs;
-- (BOOL)insertDiagnosticMessage:(NSString*)message;
+- (BOOL)insertDiagnosticMessage:(NSString *)message withTimestamp:(NSString *)timestamp;
 #ifndef TARGET_IS_EXTENSION
 - (NSArray<DiagnosticEntry*>*)getNewLogs;
 #endif
