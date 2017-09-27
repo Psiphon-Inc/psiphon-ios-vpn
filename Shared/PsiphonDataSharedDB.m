@@ -20,6 +20,7 @@
 #import "PsiphonDataSharedDB.h"
 #import "FMDB.h"
 #import "Logging.h"
+#import "NSDateFormatter+RFC3339.h"
 
 #define MAX_LOG_LINES 250
 #define SHARED_DATABASE_NAME @"psiphon_data_archive.db"
@@ -62,6 +63,9 @@
     int lastLogRowId;
     NSTimer *logTruncateTimer;
     NSLock *lastLogRowIdLock;
+    
+    // RFC3339 Date Formatter
+    NSDateFormatter *rfc3339Formatter;
 }
 
 /*!
@@ -82,6 +86,8 @@
         lastLogRowIdLock = [[NSLock alloc] init];
 
         q = [FMDatabaseQueue databaseQueueWithPath:[databasePath stringByAppendingPathComponent:SHARED_DATABASE_NAME]];
+        
+        rfc3339Formatter = [NSDateFormatter createRFC3339Formatter];
     }
     return self;
 }
@@ -95,7 +101,7 @@
         COL_ID " INTEGER PRIMARY KEY AUTOINCREMENT, "
         COL_LOG_LOGJSON " TEXT NOT NULL, "
         COL_LOG_IS_DIAGNOSTIC " BOOLEAN DEFAULT 0, "
-        COL_LOG_TIMESTAMP " TIMESTAMP DEFAULT CURRENT_TIMESTAMP);"
+        COL_LOG_TIMESTAMP " TEXT NOT NULL);"
 
        "CREATE TABLE IF NOT EXISTS " TABLE_HOMEPAGE " ("
         COL_ID " INTEGER PRIMARY KEY AUTOINCREMENT, "
@@ -250,15 +256,16 @@
 
 #pragma mark - Log Table methods
 
-- (BOOL)insertDiagnosticMessage:(NSString*)message {
+- (BOOL)insertDiagnosticMessage:(NSString *)message withTimestamp:(NSString *)timestamp {
     __block BOOL success;
     [q inDatabase:^(FMDatabase *db) {
         NSError *err;
 
+        // TODO: IS_DIAGNOSTIC is always YES.
         success = [db executeUpdate:
           @"INSERT INTO " TABLE_LOG
-          " (" COL_LOG_LOGJSON ", " COL_LOG_IS_DIAGNOSTIC ") VALUES (?,?)"
-          withErrorAndBindings:&err, message, @YES, nil /* TODO */];
+          " (" COL_LOG_LOGJSON ", " COL_LOG_IS_DIAGNOSTIC ", " COL_LOG_TIMESTAMP ") VALUES (?,?,?)"
+          withErrorAndBindings:&err, message, @YES, timestamp, nil];
 
         if (!success) {
             LOG_ERROR(@"%@", err);
@@ -314,12 +321,14 @@
 
 - (NSArray<DiagnosticEntry*>*)getLogsNewerThanId:(int)lastId {
     NSMutableArray<DiagnosticEntry*>* logs = [[NSMutableArray alloc] init];
+    
     // Prevent fetching the same logs multiple times
     [lastLogRowIdLock lock];
     if (lastLogRowId > lastId) {
         [lastLogRowIdLock unlock];
         return nil;
     }
+    
     [q inDatabase:^(FMDatabase *db) {
         FMResultSet *rs = [db executeQuery:@"SELECT * FROM log WHERE _ID > (?);", @(lastId), nil];
 
@@ -335,7 +344,12 @@
             NSString *json = [rs stringForColumn:COL_LOG_LOGJSON];
 //          BOOL isDiagnostic = [rs boolForColumn:COL_LOG_IS_DIAGNOSTIC]; // TODO
 
-            NSDate *timestampDate = [PsiphonDataSharedDB dateFromTimestamp:timestampString];
+            NSDate *timestampDate = [rfc3339Formatter dateFromString:timestampString];
+            if (!timestampDate) {
+                // If the time storage format has changed, pass a date as a placeholder.
+                // For now we don't need to convert old values into the new values.
+                timestampDate = [NSDate dateWithTimeIntervalSince1970:0];
+            }
 
             DiagnosticEntry *d = [[DiagnosticEntry alloc] init:json andTimestamp:timestampDate];
             [logs addObject:d];
@@ -343,6 +357,7 @@
 
         [rs close];
     }];
+    
     [lastLogRowIdLock unlock];
 
     return logs;
@@ -393,16 +408,6 @@
  */
 - (BOOL)getAppForegroundState {
     return [sharedDefaults boolForKey:APP_FOREGROUND_KEY];
-}
-
-#pragma mark - Helper methods
-
-+ (NSDate *)dateFromTimestamp:(NSString *)timestamp {
-    NSDateFormatter * formatter = [[NSDateFormatter alloc] init];
-    [formatter setDateFormat:@"yyyy-MM-dd HH:mm:ss"];
-    formatter.timeZone = [NSTimeZone timeZoneWithName:@"UTC"];
-    formatter.locale = [[NSLocale alloc] initWithLocaleIdentifier:@"en_US_POSIX"];
-    return [formatter dateFromString:timestamp];
 }
 
 @end
