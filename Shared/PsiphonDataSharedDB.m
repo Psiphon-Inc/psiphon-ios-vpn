@@ -21,7 +21,8 @@
 #import "FMDB.h"
 #import "Logging.h"
 
-#define MAX_LOG_LINES 250
+#define MAX_LOG_LINES 500
+#define TRUNCATION_LOG_LINES 250
 #define SHARED_DATABASE_NAME @"psiphon_data_archive.db"
 
 // ID
@@ -251,6 +252,10 @@
 #pragma mark - Log Table methods
 
 - (BOOL)insertDiagnosticMessage:(NSString*)message {
+    
+    // Truncates logs if necessary.
+    [self truncateLogs];
+    
     __block BOOL success;
     [q inDatabase:^(FMDatabase *db) {
         NSError *err;
@@ -282,21 +287,31 @@
     [logTruncateTimer fire];
 }
 
+
+/**
+ Truncates logs only if number of rows reached MAX_LOG_LINES.
+ @return TRUE if truncation proceeded and succeeded, FALSE otherwise.
+ */
 - (BOOL)truncateLogs {
-    // Truncate logs to MAX_LOG_LINES lines
+    // Truncate logs to TRUNCATION_LOG_LINES lines if reached MAX_LOG_LINES.
     __block BOOL success = FALSE;
 
     [q inDatabase:^(FMDatabase *db) {
         NSError *err;
-        success = [db executeUpdate:
-          @"DELETE FROM " TABLE_LOG
-          " WHERE " COL_ID " NOT IN "
-          "(SELECT " COL_ID " FROM " TABLE_LOG " ORDER BY " COL_ID " DESC LIMIT (?));"
-          withErrorAndBindings:&err, @MAX_LOG_LINES, nil];
-
-        if (!success) {
-            LOG_ERROR(@"%@", err);
-            // TODO: error handling/logging
+        
+        int rows = [db intForQuery:@"SELECT COUNT(" COL_ID ") FROM " TABLE_LOG];
+        
+        if (rows >= MAX_LOG_LINES) {
+            success = [db executeUpdate:
+                       @"DELETE FROM " TABLE_LOG
+                       " WHERE " COL_ID " NOT IN "
+                       "(SELECT " COL_ID " FROM " TABLE_LOG " ORDER BY " COL_ID " DESC LIMIT (?));"
+                   withErrorAndBindings:&err, @TRUNCATION_LOG_LINES, nil];
+            
+            if (!success) {
+                LOG_ERROR(@"%@", err);
+                // TODO: error handling/logging
+            }
         }
     }];
 
