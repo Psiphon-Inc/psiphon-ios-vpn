@@ -22,8 +22,8 @@
 #import "Logging.h"
 #import "NSDateFormatter+RFC3339.h"
 
-#define MAX_LOG_LINES 500
-#define TRUNCATION_LOG_LINES 250
+#define TRUNCATE_AT_LOG_LINES 500
+#define RETAIN_LOG_LINES 250
 #define SHARED_DATABASE_NAME @"psiphon_data_archive.db"
 
 // ID
@@ -260,11 +260,10 @@
 }
 
 /**
- Truncates logs only if number of rows reached MAX_LOG_LINES.
+ Truncates logs to RETAIN_LOG_LINES when number of log >= TRUNCATE_AT_LOG_LINES.
  @return TRUE if truncation proceeded and succeeded, FALSE otherwise.
  */
 - (BOOL)truncateLogs {
-    // Truncate logs to TRUNCATION_LOG_LINES lines if reached MAX_LOG_LINES.
     __block BOOL success = FALSE;
 
     [q inDatabase:^(FMDatabase *db) {
@@ -272,12 +271,12 @@
         
         int rows = [db intForQuery:@"SELECT COUNT(" COL_ID ") FROM " TABLE_LOG];
         
-        if (rows >= MAX_LOG_LINES) {
+        if (rows >= TRUNCATE_AT_LOG_LINES) {
             success = [db executeUpdate:
                        @"DELETE FROM " TABLE_LOG
                        " WHERE " COL_ID " NOT IN "
                        "(SELECT " COL_ID " FROM " TABLE_LOG " ORDER BY " COL_ID " DESC LIMIT (?));"
-                   withErrorAndBindings:&err, @TRUNCATION_LOG_LINES, nil];
+                   withErrorAndBindings:&err, @RETAIN_LOG_LINES, nil];
             
             if (!success) {
                 LOG_ERROR(@"%@", err);
