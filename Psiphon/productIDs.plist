@@ -2,6 +2,11 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <array>
-	<string>ca.psiphon.Psiphon.monthly</string>
+	<string>ca.psiphon.Psiphon.1.week</string>
+	<string>ca.psiphon.Psiphon.1.month</string>
+	<string>ca.psiphon.Psiphon.2.month</string>
+	<string>ca.psiphon.Psiphon.3.month</string>
+	<string>ca.psiphon.Psiphon.6.month</string>
+	<string>ca.psiphon.Psiphon.1.year</string>
 </array>
 </plist>
