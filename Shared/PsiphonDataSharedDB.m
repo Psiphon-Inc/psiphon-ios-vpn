@@ -121,26 +121,6 @@
     return success;
 }
 
-/*!
- * @brief Clears all tables in the database.
- * @return TRUE on success.
- */
-- (BOOL)clearDatabase {
-    NSString *CLEAR_TABLES =
-      @"DELETE FROM " TABLE_LOG " ;"
-       "DELETE FROM " TABLE_HOMEPAGE " ;";
-
-    __block BOOL success = FALSE;
-    [q inDatabase:^(FMDatabase *db) {
-        success = [db executeStatements:CLEAR_TABLES];
-        if (!success) {
-            LOG_ERROR(@"%@", [db lastError]);
-        }
-    }];
-
-    return success;
-}
-
 #pragma mark - Homepage Table methods
 
 /*!

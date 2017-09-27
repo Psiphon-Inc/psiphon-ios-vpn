@@ -32,7 +32,6 @@
 @interface PsiphonDataSharedDB : NSObject
 - (id)initForAppGroupIdentifier:(NSString*)identifier;
 - (BOOL)createDatabase;
-- (BOOL)clearDatabase;
 
 - (BOOL)insertNewEgressRegions:(NSArray<NSString *> *)regions;
 - (NSArray<NSString *> *)getAllEgressRegions;
