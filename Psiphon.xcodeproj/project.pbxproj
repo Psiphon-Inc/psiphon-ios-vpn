@@ -36,6 +36,8 @@
 		CE4E9BC21BBEECFC0060FF8B /* PsiphonVPN.entitlements in Resources */ = {isa = PBXBuildFile; fileRef = CE4E9BC11BBEECFC0060FF8B /* PsiphonVPN.entitlements */; };
 		CE7B76431F54881F00EA44BD /* PsiphonTunnel.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 66094F781E8067520069EC4E /* PsiphonTunnel.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		DF693CA78CF5B67C2D14694C /* libPods-Psiphon.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 93B819F4480DF3E24C22ACD7 /* libPods-Psiphon.a */; };
+		EF441B011F7AF14A008A7D82 /* NSDateFormatter+RFC3339.m in Sources */ = {isa = PBXBuildFile; fileRef = EF441B001F7AF14A008A7D82 /* NSDateFormatter+RFC3339.m */; };
+		EF441B021F7AF14A008A7D82 /* NSDateFormatter+RFC3339.m in Sources */ = {isa = PBXBuildFile; fileRef = EF441B001F7AF14A008A7D82 /* NSDateFormatter+RFC3339.m */; };
 		EF652CD11F352212002AFB48 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = EF652CD01F352212002AFB48 /* main.m */; };
 		EF652CD61F35224C002AFB48 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = EF652CD31F35224C002AFB48 /* AppDelegate.m */; };
 		EF652CD71F35224C002AFB48 /* MainViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = EF652CD51F35224C002AFB48 /* MainViewController.m */; };
@@ -159,6 +161,8 @@
 		CE4E9BBF1BBEECF30060FF8B /* Psiphon.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = Psiphon.entitlements; sourceTree = "<group>"; };
 		CE4E9BC11BBEECFC0060FF8B /* PsiphonVPN.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = PsiphonVPN.entitlements; sourceTree = "<group>"; };
 		E5B1A49D5110614A1693CCFA /* Pods-PsiphonVPN.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PsiphonVPN.release.xcconfig"; path = "Pods/Target Support Files/Pods-PsiphonVPN/Pods-PsiphonVPN.release.xcconfig"; sourceTree = "<group>"; };
+		EF441B001F7AF14A008A7D82 /* NSDateFormatter+RFC3339.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "NSDateFormatter+RFC3339.m"; sourceTree = "<group>"; };
+		EF441B031F7AF263008A7D82 /* NSDateFormatter+RFC3339.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSDateFormatter+RFC3339.h"; sourceTree = "<group>"; };
 		EF652CD01F352212002AFB48 /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		EF652CD21F35224C002AFB48 /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		EF652CD31F35224C002AFB48 /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -239,6 +243,8 @@
 				EFB3E62D1F66F23F004AAE8C /* Logging.h */,
 				EF6C1F501F59E46500709554 /* embedded_server_entries */,
 				EF6C1F511F59E46500709554 /* psiphon_config */,
+				EF441B001F7AF14A008A7D82 /* NSDateFormatter+RFC3339.m */,
+				EF441B031F7AF263008A7D82 /* NSDateFormatter+RFC3339.h */,
 			);
 			path = Shared;
 			sourceTree = "<group>";
@@ -666,6 +672,7 @@
 				EFED7EBC1F55C8550078980F /* LogViewControllerFullScreen.m in Sources */,
 				197DABF11F54C0CA00DD5C3B /* MPInstanceProvider+Vungle.m in Sources */,
 				EF652CD11F352212002AFB48 /* main.m in Sources */,
+				EF441B011F7AF14A008A7D82 /* NSDateFormatter+RFC3339.m in Sources */,
 				EF652CD61F35224C002AFB48 /* AppDelegate.m in Sources */,
 				EFB3E62C1F621111004AAE8C /* PulsingHaloLayer.m in Sources */,
 				9BFEC4F02A47FF8265635803 /* Notifier.m in Sources */,
@@ -684,6 +691,7 @@
 				EF652CDA1F352271002AFB48 /* PacketTunnelProvider.m in Sources */,
 				4E0DCB1E1F2855FC00495781 /* PsiphonDataSharedDB.m in Sources */,
 				9BFECD1880B51B0E2EAEFF1F /* Notifier.m in Sources */,
+				EF441B021F7AF14A008A7D82 /* NSDateFormatter+RFC3339.m in Sources */,
 				9BFECF8895D5FE1940A6F700 /* PsiphonConfigUserDefaults.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
