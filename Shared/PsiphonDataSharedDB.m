@@ -253,21 +253,6 @@
     return success;
 }
 
-- (void)truncateLogsOnInterval:(NSTimeInterval)interval {
-    if (logTruncateTimer != nil) {
-        [logTruncateTimer invalidate];
-    }
-    logTruncateTimer = [NSTimer scheduledTimerWithTimeInterval:interval
-                                                        target:self
-                                                      selector:@selector(truncateLogs)
-                                                      userInfo:nil
-                                                       repeats:YES];
-
-    // trigger timer to truncate logs immediately
-    [logTruncateTimer fire];
-}
-
-
 /**
  Truncates logs only if number of rows reached MAX_LOG_LINES.
  @return TRUE if truncation proceeded and succeeded, FALSE otherwise.

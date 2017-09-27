@@ -41,9 +41,6 @@
 - (NSArray<Homepage *> *)getAllHomepages;
 
 // Logs table
-#ifdef TARGET_IS_EXTENSION
-- (void)truncateLogsOnInterval:(NSTimeInterval)interval; // should only be called by the app extension
-#endif
 - (BOOL)truncateLogs;
 - (BOOL)insertDiagnosticMessage:(NSString*)message;
 #ifndef TARGET_IS_EXTENSION

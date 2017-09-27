@@ -32,8 +32,6 @@
 #import <arpa/inet.h>
 #import <net/if.h>
 
-static const double kDefaultLogTruncationInterval = 12 * 60 * 60; // 12 hours
-
 @implementation PacketTunnelProvider {
 
     // pointer to startTunnelWithOptions completion handler.
