@@ -452,6 +452,11 @@
     [handshakeHomepages addObject:url];
 }
 
+- (void)onServerTimestamp:(NSString * _Nonnull)timestamp {
+	[sharedDB updateServerTimestamp:timestamp];
+	[notifier post:@"NE.onServerTimestamp"];
+}
+
 - (void)onAvailableEgressRegions:(NSArray *)regions {
     [sharedDB insertNewEgressRegions:regions];
 
