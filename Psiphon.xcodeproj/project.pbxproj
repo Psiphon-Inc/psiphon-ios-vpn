@@ -14,6 +14,13 @@
 		197DABF51F54C15400DD5C3B /* VungleInstanceMediationSettings.m in Sources */ = {isa = PBXBuildFile; fileRef = 197DABF41F54C15400DD5C3B /* VungleInstanceMediationSettings.m */; };
 		19CB75071F54ADB300F78219 /* MPGoogleAdMobBannerCustomEvent.m in Sources */ = {isa = PBXBuildFile; fileRef = 19CB75041F54ADB300F78219 /* MPGoogleAdMobBannerCustomEvent.m */; };
 		19CB75081F54ADB300F78219 /* MPGoogleAdMobInterstitialCustomEvent.m in Sources */ = {isa = PBXBuildFile; fileRef = 19CB75061F54ADB300F78219 /* MPGoogleAdMobInterstitialCustomEvent.m */; };
+		440D75BB1F59DF1B005C603B /* IAPHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 440D75BA1F59DF1B005C603B /* IAPHelper.m */; };
+		440D75BE1F59E041005C603B /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 440D75BD1F59E041005C603B /* StoreKit.framework */; };
+		4435CC271F70566000F3A809 /* SettingsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4435CC261F70566000F3A809 /* SettingsViewController.m */; };
+		448AD86E1F5DC8C000316BA9 /* productIDs.plist in Resources */ = {isa = PBXBuildFile; fileRef = 448AD86D1F5DC8C000316BA9 /* productIDs.plist */; };
+		44D9B0FD1F673417007D1E69 /* RMAppReceipt.m in Sources */ = {isa = PBXBuildFile; fileRef = 44D9B0FC1F673417007D1E69 /* RMAppReceipt.m */; };
+		44D9B1001F67470E007D1E69 /* IAPViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 44D9B0FF1F67470E007D1E69 /* IAPViewController.m */; };
+		44E15D571F6C808D00344C33 /* AppleIncRootCertificate.cer in Resources */ = {isa = PBXBuildFile; fileRef = 44E15D561F6C804000344C33 /* AppleIncRootCertificate.cer */; };
 		4E0774961F566B040097BC8C /* InAppSettings.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 4E0774951F566ADA0097BC8C /* InAppSettings.bundle */; };
 		4E0DCB1A1F28481E00495781 /* PsiphonDataSharedDB.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E0DCB191F28481E00495781 /* PsiphonDataSharedDB.m */; };
 		4E0DCB1E1F2855FC00495781 /* PsiphonDataSharedDB.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E0DCB191F28481E00495781 /* PsiphonDataSharedDB.m */; };
@@ -104,6 +111,17 @@
 		19CB75061F54ADB300F78219 /* MPGoogleAdMobInterstitialCustomEvent.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MPGoogleAdMobInterstitialCustomEvent.m; sourceTree = "<group>"; };
 		356E24BD75F31797E5125CBE /* Pods-Psiphon.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Psiphon.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Psiphon/Pods-Psiphon.debug.xcconfig"; sourceTree = "<group>"; };
 		3C9EBD507F3B7B0B4A9974C7 /* Pods-Psiphon.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Psiphon.release.xcconfig"; path = "Pods/Target Support Files/Pods-Psiphon/Pods-Psiphon.release.xcconfig"; sourceTree = "<group>"; };
+		440D75BA1F59DF1B005C603B /* IAPHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IAPHelper.m; sourceTree = "<group>"; };
+		440D75BC1F59DF45005C603B /* IAPHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IAPHelper.h; sourceTree = "<group>"; };
+		440D75BD1F59E041005C603B /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
+		4435CC251F70566000F3A809 /* SettingsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SettingsViewController.h; sourceTree = "<group>"; };
+		4435CC261F70566000F3A809 /* SettingsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SettingsViewController.m; sourceTree = "<group>"; };
+		448AD86D1F5DC8C000316BA9 /* productIDs.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = productIDs.plist; sourceTree = "<group>"; };
+		44D9B0FB1F673417007D1E69 /* RMAppReceipt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RMAppReceipt.h; sourceTree = "<group>"; };
+		44D9B0FC1F673417007D1E69 /* RMAppReceipt.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RMAppReceipt.m; sourceTree = "<group>"; };
+		44D9B0FE1F67470E007D1E69 /* IAPViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IAPViewController.h; sourceTree = "<group>"; };
+		44D9B0FF1F67470E007D1E69 /* IAPViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IAPViewController.m; sourceTree = "<group>"; };
+		44E15D561F6C804000344C33 /* AppleIncRootCertificate.cer */ = {isa = PBXFileReference; lastKnownFileType = file; path = AppleIncRootCertificate.cer; sourceTree = "<group>"; };
 		4E0774951F566ADA0097BC8C /* InAppSettings.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = InAppSettings.bundle; sourceTree = "<group>"; };
 		4E0DCB181F28481E00495781 /* PsiphonDataSharedDB.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PsiphonDataSharedDB.h; sourceTree = "<group>"; };
 		4E0DCB191F28481E00495781 /* PsiphonDataSharedDB.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PsiphonDataSharedDB.m; sourceTree = "<group>"; };
@@ -165,7 +183,7 @@
 		EF441B031F7AF263008A7D82 /* NSDateFormatter+RFC3339.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSDateFormatter+RFC3339.h"; sourceTree = "<group>"; };
 		EF652CD01F352212002AFB48 /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		EF652CD21F35224C002AFB48 /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
-		EF652CD31F35224C002AFB48 /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
+		EF652CD31F35224C002AFB48 /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; usesTabs = 0; };
 		EF652CD41F35224C002AFB48 /* MainViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MainViewController.h; sourceTree = "<group>"; };
 		EF652CD51F35224C002AFB48 /* MainViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MainViewController.m; sourceTree = "<group>"; };
 		EF652CD81F352271002AFB48 /* PacketTunnelProvider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PacketTunnelProvider.h; sourceTree = "<group>"; };
@@ -193,6 +211,7 @@
 			files = (
 				19059EA31F50923400C04739 /* libFMDB.a in Frameworks */,
 				668AF9C01E92CBE0008CAAAA /* NetworkExtension.framework in Frameworks */,
+				440D75BE1F59E041005C603B /* StoreKit.framework in Frameworks */,
 				DF693CA78CF5B67C2D14694C /* libPods-Psiphon.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -229,6 +248,21 @@
 			name = "3rd Party Adapters";
 			sourceTree = "<group>";
 		};
+		448AD86C1F5DC89000316BA9 /* IAP */ = {
+			isa = PBXGroup;
+			children = (
+				44D9B0FB1F673417007D1E69 /* RMAppReceipt.h */,
+				44D9B0FC1F673417007D1E69 /* RMAppReceipt.m */,
+				440D75BC1F59DF45005C603B /* IAPHelper.h */,
+				440D75BA1F59DF1B005C603B /* IAPHelper.m */,
+				448AD86D1F5DC8C000316BA9 /* productIDs.plist */,
+				44E15D561F6C804000344C33 /* AppleIncRootCertificate.cer */,
+				44D9B0FE1F67470E007D1E69 /* IAPViewController.h */,
+				44D9B0FF1F67470E007D1E69 /* IAPViewController.m */,
+			);
+			name = IAP;
+			sourceTree = "<group>";
+		};
 		4E0DCB101F28458100495781 /* Shared */ = {
 			isa = PBXGroup;
 			children = (
@@ -252,6 +286,7 @@
 		668AF9B81E92CB60008CAAAA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				440D75BD1F59E041005C603B /* StoreKit.framework */,
 				19059EA21F50923400C04739 /* libFMDB.a */,
 				668AF9BE1E92CBD3008CAAAA /* NetworkExtension.framework */,
 				93B819F4480DF3E24C22ACD7 /* libPods-Psiphon.a */,
@@ -308,10 +343,13 @@
 				EF652CD51F35224C002AFB48 /* MainViewController.m */,
 				4E0774951F566ADA0097BC8C /* InAppSettings.bundle */,
 				197DABF21F54C0EA00DD5C3B /* 3rd Party Adapters */,
+				448AD86C1F5DC89000316BA9 /* IAP */,
 				9BFEC04426D8558CB89D3798 /* VPNManager.m */,
 				9BFEC74F24453B8E4B1AFC39 /* VPNManager.h */,
 				9BFECE9247474C83FD8C2948 /* AdManager.m */,
 				9BFEC66B7F0E98CBC5631F06 /* AdManager.h */,
+				4435CC251F70566000F3A809 /* SettingsViewController.h */,
+				4435CC261F70566000F3A809 /* SettingsViewController.m */,
 			);
 			path = Psiphon;
 			sourceTree = "<group>";
@@ -432,6 +470,9 @@
 							com.apple.ApplicationGroups.iOS = {
 								enabled = 1;
 							};
+							com.apple.InAppPurchase = {
+								enabled = 1;
+							};
 							com.apple.Keychain = {
 								enabled = 0;
 							};
@@ -510,6 +551,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				44E15D571F6C808D00344C33 /* AppleIncRootCertificate.cer in Resources */,
 				6615A5EA1F58A95500026C98 /* Localizable.strings in Resources */,
 				EF6C1F521F59E46500709554 /* embedded_server_entries in Resources */,
 				EF6C1F541F59E46500709554 /* psiphon_config in Resources */,
@@ -519,6 +561,7 @@
 				CE26FC951BBDC7B800B83375 /* Assets.xcassets in Resources */,
 				F136C2951F62E3E1000D3EAB /* LaunchScreen.xib in Resources */,
 				CE4E9BC01BBEECF30060FF8B /* Psiphon.entitlements in Resources */,
+				448AD86E1F5DC8C000316BA9 /* productIDs.plist in Resources */,
 				963708A91F65D4810038894E /* Bourbon-Oblique.otf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -669,9 +712,13 @@
 				197DABEB1F54BEED00DD5C3B /* VungleInterstitialCustomEvent.m in Sources */,
 				197DABF51F54C15400DD5C3B /* VungleInstanceMediationSettings.m in Sources */,
 				4E0DCB1A1F28481E00495781 /* PsiphonDataSharedDB.m in Sources */,
+				4435CC271F70566000F3A809 /* SettingsViewController.m in Sources */,
 				EFED7EBC1F55C8550078980F /* LogViewControllerFullScreen.m in Sources */,
+				440D75BB1F59DF1B005C603B /* IAPHelper.m in Sources */,
 				197DABF11F54C0CA00DD5C3B /* MPInstanceProvider+Vungle.m in Sources */,
+				44D9B0FD1F673417007D1E69 /* RMAppReceipt.m in Sources */,
 				EF652CD11F352212002AFB48 /* main.m in Sources */,
+				44D9B1001F67470E007D1E69 /* IAPViewController.m in Sources */,
 				EF441B011F7AF14A008A7D82 /* NSDateFormatter+RFC3339.m in Sources */,
 				EF652CD61F35224C002AFB48 /* AppDelegate.m in Sources */,
 				EFB3E62C1F621111004AAE8C /* PulsingHaloLayer.m in Sources */,

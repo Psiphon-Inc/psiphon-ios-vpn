@@ -17,13 +17,10 @@
  *
  */
 
-#import <UIKit/UIKit.h>
-#import "SettingsViewController.h"
-#import "LaunchScreenViewController.h"
+#import "PsiphonSettingsViewController.h"
+// Specifier keys for cells in settings menu
+#define kSettingsSubscription			@"settingsSubscription"
 
-
-@interface MainViewController : UIViewController <PsiphonSettingsViewControllerDelegate>
-
-@property (nonatomic) BOOL openSettingImmediatelyOnViewDidAppear;
+@interface SettingsViewController : PsiphonSettingsViewController
 
 @end

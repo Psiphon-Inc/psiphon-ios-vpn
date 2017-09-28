@@ -49,6 +49,7 @@
 
 #define TUN_CONNECTED_KEY @"tun_connected"
 #define APP_FOREGROUND_KEY @"app_foreground"
+#define SERVER_TIMESTAMP_KEY @"server_timestamp"
 
 @implementation Homepage
 @end
@@ -386,6 +387,26 @@
  */
 - (BOOL)getAppForegroundState {
     return [sharedDefaults boolForKey:APP_FOREGROUND_KEY];
+}
+
+#pragma mark - Server timestamp methods
+
+/**
+ * @brief Sets server timestamp in shared NSSUserDefaults dictionary.
+ * @param timestamp from the handshake in RFC3339 format.
+ * @return TRUE if change was persisted to disk successfully, FALSE otherwise.
+ */
+- (void)updateServerTimestamp:(NSString*) timestamp {
+	[sharedDefaults setObject:timestamp forKey:SERVER_TIMESTAMP_KEY];
+	[sharedDefaults synchronize];
+}
+
+/**
+ * @brief Returns previously persisted server timestamp from the shared NSUserDefaults
+ * @return NSString* timestamp in RFC3339 format.
+ */
+- (NSString*)getServerTimestamp {
+	return [sharedDefaults stringForKey:SERVER_TIMESTAMP_KEY];
 }
 
 @end
