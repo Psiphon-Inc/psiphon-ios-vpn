@@ -968,7 +968,6 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 
 - (void)reloadAndOpenSettings {
     if (appSettingsViewController != nil) {
-        __weak MainViewController *weakSelf = self;
         [appSettingsViewController dismissViewControllerAnimated:NO completion:^{
             [[RegionAdapter sharedInstance] reloadTitlesForNewLocalization];
             [[AppDelegate sharedAppDelegate] reloadMainViewController];

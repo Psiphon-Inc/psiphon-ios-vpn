@@ -46,7 +46,21 @@
 
     if ([specifier.key isEqualToString:kSettingsSubscription]) {
         [cell setAccessoryType:UITableViewCellAccessoryDisclosureIndicator];
-        [cell.textLabel setText:specifier.title];
+        NSString *subscriptionItemTitle;
+        if([[IAPHelper sharedInstance]hasActiveSubscriptionForDate:[NSDate date]]) {
+            subscriptionItemTitle = NSLocalizedStringWithDefaultValue(@"SETTINGS_SUBSCRIPTION_ACTIVE",
+                                                                      nil,
+                                                                      [NSBundle mainBundle],
+                                                                      @"Subscriptions",
+                                                                      @"Subscriptions item title in the app settings when user has an active subscription. Clicking this item opens subscriptions view");
+        } else {
+            subscriptionItemTitle = NSLocalizedStringWithDefaultValue(@"SETTINGS_SUBSCRIPTION_NOT_ACTIVE",
+                                                                      nil,
+                                                                      [NSBundle mainBundle],
+                                                                      @"Go Premium!",
+                                                                      @"Subscriptions item title in the app settings when user does not have an active subscription. Clicking this item opens subscriptions view");
+        }
+        [cell.textLabel setText:subscriptionItemTitle];
     }
 
     return cell;
