@@ -14,7 +14,7 @@
 		</dict>
 		<dict>
 			<key>Title</key>
-			<string>SETTINGS_SUBSCRIPTION</string>
+			<string>!!! Not in the Root.strings, this title is set from SettingVewController!!!</string>
 			<key>Key</key>
 			<string>settingsSubscription</string>
 			<key>Type</key>

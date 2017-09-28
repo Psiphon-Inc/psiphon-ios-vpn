@@ -65,6 +65,12 @@
 /* Restore my subscription button title */
 "RESTORE_SUBSCRIPTION_BUTTON_TITLE" = "Restore my subscription";
 
+/* Subscriptions item title in the app settings when user has an active subscription. Clicking this item opens subscriptions view */
+"SETTINGS_SUBSCRIPTION_ACTIVE" = "Subscriptions";
+
+/* Subscriptions item title in the app settings when user does not have an active subscription. Clicking this item opens subscriptions view */
+"SETTINGS_SUBSCRIPTION_NOT_ACTIVE" = "Go Premium!";
+
 /* Title of the settings (aka preferences) view (InAppSettingsKit) */
 "SETTINGS_TITLE" = "Settings";
 

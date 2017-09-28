@@ -177,10 +177,9 @@
     NetworkStatus networkStatus = [[Reachability reachabilityForInternetConnection] currentReachabilityStatus];
 
     if ( networkStatus != NotReachable
-        && ([vpnManager getVPNStatus] == VPNStatusDisconnected || [vpnManager getVPNStatus] == VPNStatusInvalid)
-        && ![adManager untunneledInterstitialIsReady] && ![adManager untunneledInterstitialHasShown]
+      && ([vpnManager getVPNStatus] == VPNStatusDisconnected || [vpnManager getVPNStatus] == VPNStatusInvalid)
+      && ![adManager untunneledInterstitialIsReady] && ![adManager untunneledInterstitialHasShown] && ![vpnManager startStopButtonPressed]
         && [adManager shouldShowUntunneledAds]) {
-
         [adManager initializeAds];
         self.window.rootViewController = launchScreenViewController;
         if (timerCount <= 0) {
