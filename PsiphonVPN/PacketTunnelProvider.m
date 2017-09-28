@@ -162,7 +162,6 @@
 }
 
 - (void)logMessage:(NSString * _Nonnull)message {
-    // This is a convenience method that is not part
     [self logMessage:message withTimestamp:[rfc3339Formatter stringFromDate:[NSDate date]]];
 }
 
