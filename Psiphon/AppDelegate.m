@@ -176,7 +176,7 @@
 
     if ( networkStatus != NotReachable
       && ([vpnManager getVPNStatus] == VPNStatusDisconnected || [vpnManager getVPNStatus] == VPNStatusInvalid)
-      && ![adManager untunneledInterstitialIsReady] && ![adManager untunneledInterstitialHasShown]) {
+      && ![adManager untunneledInterstitialIsReady] && ![adManager untunneledInterstitialHasShown] && ![vpnManager startStopButtonPressed]) {
 
         [adManager initializeAds];
         self.window.rootViewController = launchScreenViewController;

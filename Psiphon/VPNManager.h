@@ -48,6 +48,8 @@ typedef NS_ENUM(NSInteger, VPNStatus) {
 
 @interface VPNManager : NSObject
 
+@property (nonatomic) BOOL startStopButtonPressed;
+
 + (instancetype _Nullable )sharedInstance;
 
 /**
