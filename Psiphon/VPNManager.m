@@ -93,10 +93,15 @@
     // Reset restartRequired flag
     restartRequired = FALSE;
 
+    // Set startStopButtonPressed flag to TRUE
+    [self setStartStopButtonPressed:TRUE];
+
     [NETunnelProviderManager loadAllFromPreferencesWithCompletionHandler:
       ^(NSArray<NETunnelProviderManager *> * _Nullable allManagers, NSError * _Nullable error) {
 
         if (error) {
+            // Reset startStopButtonPressed flag to FALSE when error and exiting.
+            [self setStartStopButtonPressed:FALSE];
             if (completionHandler) {
                 LOG_ERROR(@"%@", error);
                 completionHandler([VPNManager errorWithCode:VPNManagerErrorLoadConfigsFailed]);
@@ -115,6 +120,8 @@
             newManager.protocolConfiguration.serverAddress = @"localhost";
             self.targetManager = newManager;
         } else if ([allManagers count] > 1) {
+            // Reset startStopButtonPressed flag to FALSE when error and exiting.
+            [self setStartStopButtonPressed:FALSE];
             LOG_ERROR(@"%lu VPN configurations found, only expected 1. Aborting", (unsigned long)[allManagers count]);
             if (completionHandler) {
                 completionHandler([VPNManager errorWithCode:VPNManagerErrorTooManyConfigsFounds]);
@@ -130,6 +137,8 @@
 
         [self.targetManager saveToPreferencesWithCompletionHandler:^(NSError * _Nullable error) {
             if (error != nil) {
+                // Reset startStopButtonPressed flag to FALSE when error and exiting.
+                [self setStartStopButtonPressed:FALSE];
                 // User denied permission to add VPN Configuration.
                 LOG_ERROR(@"failed to save the configuration: %@", error);
                 if (completionHandler) {
@@ -139,6 +148,8 @@
             }
 
             [self.targetManager loadFromPreferencesWithCompletionHandler:^(NSError * _Nullable error) {
+                // Reset startStopButtonPressed flag to FLASE when it finished loading preferences.
+                [self setStartStopButtonPressed:FALSE];
                 if (error != nil) {
                     LOG_ERROR(@"second loadFromPreferences failed");
                     if (completionHandler) {
