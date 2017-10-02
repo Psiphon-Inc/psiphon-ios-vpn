@@ -161,10 +161,6 @@
 - (void)wake {
 }
 
-- (void)logMessage:(NSString * _Nonnull)message {
-    [self logMessage:message withTimestamp:[rfc3339Formatter stringFromDate:[NSDate date]]];
-}
-
 - (void)logMessage:(NSString * _Nonnull)message withTimestamp:(NSString * _Nonnull)timestamp{
 
     // Certain aspects of the diagnostics currently depend on
@@ -381,7 +377,7 @@
     NSDictionary *readOnly = [NSJSONSerialization JSONObjectWithData:jsonData options:kNilOptions error:&err];
 
     if (err) {
-        [self logMessage:[NSString stringWithFormat:@"Aborting. Failed to parse config JSON: %@", err.description]];
+        LOG_ERROR(@"%@", [NSString stringWithFormat:@"Aborting. Failed to parse config JSON: %@", err.description]);
         abort();
     }
 
@@ -404,7 +400,7 @@
       options:0 error:&err];
 
     if (err) {
-        [self logMessage:[NSString stringWithFormat:@"Aborting. Failed to create JSON data from config object: %@", err.description]];
+        LOG_ERROR(@"%@", [NSString stringWithFormat:@"Aborting. Failed to create JSON data from config object: %@", err.description]);
         abort();
     }
 
@@ -461,7 +457,7 @@
 
 - (void)onInternetReachabilityChanged:(Reachability* _Nonnull)reachability {
     NSString *strReachabilityFlags = [reachability currentReachabilityFlagsToString];
-    [self logMessage:[NSString stringWithFormat:@"onInternetReachabilityChanged: %@", strReachabilityFlags]];
+    LOG_DEBUG(@"%@", [NSString stringWithFormat:@"onInternetReachabilityChanged: %@", strReachabilityFlags]);
 }
 
 @end
