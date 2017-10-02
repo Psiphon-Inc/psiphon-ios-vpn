@@ -47,6 +47,7 @@
 
 /* NSUserDefaults keys */
 
+#define EGRESS_REGIONS_KEY @"egress_regions"
 #define TUN_CONNECTED_KEY @"tun_connected"
 #define APP_FOREGROUND_KEY @"app_foreground"
 
@@ -184,54 +185,21 @@
 #pragma mark - Egress Regions Table methods
 
 /*!
- * @brief Deletes previous set of regions, then inserts new set of regions.
+ * @brief Sets set of egress regions in shared NSUserDefaults
  * @param regions
- * @return TRUE on success.
+ * @return TRUE if data was saved to disk successfully, otherwise FALSE.
  */
 // TODO: is timestamp needed? Maybe we can use this to detect staleness later
 - (BOOL)insertNewEgressRegions:(NSArray<NSString *> *)regions {
-    __block BOOL success = FALSE;
-    [q inTransaction:^(FMDatabase *db, BOOL *rollback) {
-        success = [db executeUpdate:@"DELETE FROM " TABLE_EGRESS_REGIONS " ;"];
-
-        for (NSString *region in regions) {
-            success |= [db executeUpdate:
-                        @"INSERT INTO " TABLE_EGRESS_REGIONS " (" COL_EGRESS_REGIONS_REGION_NAME ") VALUES (?)", region, nil];
-        }
-
-        if (!success) {
-            LOG_ERROR(@"Rolling back, error %@", [db lastError]);
-            *rollback = TRUE;
-            return;
-        }
-    }];
-
-    return success;
+    [sharedDefaults setObject:regions forKey:EGRESS_REGIONS_KEY];
+    return [sharedDefaults synchronize];
 }
 
 /*!
  * @return NSArray of region codes.
  */
 - (NSArray<NSString *> *)getAllEgressRegions {
-    NSMutableArray<NSString *> *regions = [[NSMutableArray alloc] init];
-
-    [q inDatabase:^(FMDatabase *db) {
-        FMResultSet *rs = [db executeQuery:@"SELECT * FROM " TABLE_EGRESS_REGIONS];
-
-        if (rs == nil) {
-            LOG_ERROR(@"%@", [db lastError]);
-            return;
-        }
-
-        while ([rs next]) {
-            NSString *region = [rs stringForColumn:COL_EGRESS_REGIONS_REGION_NAME];
-            [regions addObject:region];
-        }
-
-        [rs close];
-    }];
-
-    return regions;
+    return [sharedDefaults objectForKey:EGRESS_REGIONS_KEY];
 }
 
 #pragma mark - Log Table methods
