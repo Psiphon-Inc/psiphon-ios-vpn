@@ -46,15 +46,8 @@
     // Notifier
     Notifier *notifier;
 
-    NSMutableArray<NSString *> *handshakeHomepages;
-
     // State variables
     BOOL shouldStartVPN;  // Start vpn decision made by the container.
-
-    // Time formatter for log messages.
-    // NOTE: NSDateFormatter is threadsafe.
-    NSDateFormatter *rfc3339Formatter;
-
 }
 
 - (id)init {
@@ -67,16 +60,11 @@
         //TODO: sharedDB calls are blocking, should they be done in a background thread?
         sharedDB = [[PsiphonDataSharedDB alloc] initForAppGroupIdentifier:APP_GROUP_IDENTIFIER];
 
-        handshakeHomepages = [[NSMutableArray alloc] init];
-
         // Notifier
         notifier = [[Notifier alloc] initWithAppGroupIdentifier:APP_GROUP_IDENTIFIER];
 
         // state variables
         shouldStartVPN = FALSE;
-        
-        // RFC3339 Time formatter
-        rfc3339Formatter = [NSDateFormatter createRFC3339Formatter];
     }
 
     return self;
@@ -295,13 +283,9 @@
             vpnStartCompletionHandler(nil);
             vpnStartCompletionHandler = nil;
 
-            if ([handshakeHomepages count] > 0) {
-                BOOL success = [sharedDB updateHomepages:handshakeHomepages];
-                if (success) {
-                    [notifier post:@"NE.newHomepages"];
-                    [handshakeHomepages removeAllObjects];
-                }
-            }
+            // Since we're still using two-start process, we will notify
+            // the container through NE.newHomepages notification.
+            [notifier post:@"NE.newHomepages"];
 
             return TRUE;
         }
@@ -417,9 +401,6 @@
     [sharedDB updateTunnelConnectedState:FALSE];
 
     self.reasserting = TRUE;
-
-    // Clear list of handshakeHomepages.
-    [handshakeHomepages removeAllObjects];
 }
 
 - (void)onConnected {
@@ -440,12 +421,6 @@
 }
 
 - (void)onHomepage:(NSString * _Nonnull)url {
-    for (NSString *p in handshakeHomepages) {
-        if ([url isEqualToString:p]) {
-            return;
-        }
-    }
-    [handshakeHomepages addObject:url];
 }
 
 - (void)onAvailableEgressRegions:(NSArray *)regions {
@@ -461,15 +436,11 @@
 }
 
 - (NSString * _Nullable)getHomepageNoticesPath {
-    return [[[[NSFileManager defaultManager]
-      containerURLForSecurityApplicationGroupIdentifier:APP_GROUP_IDENTIFIER] path]
-      stringByAppendingPathComponent:@"homepage_notices"];;
+    return [sharedDB homepageNoticesPath];
 }
 
 - (NSString * _Nullable)getRotatingNoticesPath {
-    return [[[[NSFileManager defaultManager]
-      containerURLForSecurityApplicationGroupIdentifier:APP_GROUP_IDENTIFIER] path]
-      stringByAppendingPathComponent:@"rotating_notices"];;
+    return [sharedDB rotatingLogNoticesPath];
 }
 
 @end

@@ -35,21 +35,16 @@
 #define COL_LOG_IS_DIAGNOSTIC @"is_diagnostic"
 #define COL_LOG_TIMESTAMP @"timestamp"
 
-// Homepages Table
-#define TABLE_HOMEPAGE @"homepages"
-#define COL_HOMEPAGE_URL @"url"
-#define COL_HOMEPAGE_TIMESTAMP @"timestamp"
-
 // Egress Regions Table
 #define TABLE_EGRESS_REGIONS @"egress_regions"
 #define COL_EGRESS_REGIONS_REGION_NAME @"url"
 #define COL_EGRESS_REGIONS_TIMESTAMP @"timestamp"
 
-/* NSUserDefaults keys */
-
+/* Shared NSUserDefaults keys */
 #define EGRESS_REGIONS_KEY @"egress_regions"
 #define TUN_CONNECTED_KEY @"tun_connected"
 #define APP_FOREGROUND_KEY @"app_foreground"
+
 
 @implementation Homepage
 @end
@@ -104,11 +99,6 @@
         COL_LOG_IS_DIAGNOSTIC " BOOLEAN DEFAULT 0, "
         COL_LOG_TIMESTAMP " TEXT NOT NULL);"
 
-       "CREATE TABLE IF NOT EXISTS " TABLE_HOMEPAGE " ("
-        COL_ID " INTEGER PRIMARY KEY AUTOINCREMENT, "
-        COL_HOMEPAGE_URL " TEXT NOT NULL, "
-        COL_HOMEPAGE_TIMESTAMP " TIMESTAMP DEFAULT CURRENT_TIMESTAMP);"
-
         "CREATE TABLE IF NOT EXISTS " TABLE_EGRESS_REGIONS " ("
         COL_ID " INTEGER PRIMARY KEY AUTOINCREMENT, "
         COL_EGRESS_REGIONS_REGION_NAME " TEXT NOT NULL, "
@@ -127,59 +117,45 @@
     return success;
 }
 
-#pragma mark - Homepage Table methods
+#pragma mark - Homepage methods
 
 /*!
- * @brief Deletes previous set of homepages, then inserts new set of homepages.
- * @param homepageUrls
- * @return TRUE on success.
- */
-- (BOOL)updateHomepages:(NSArray<NSString *> *)homepageUrls {
-    __block BOOL success = FALSE;
-    [q inTransaction:^(FMDatabase *db, BOOL *rollback) {
-        success = [db executeUpdate:@"DELETE FROM " TABLE_HOMEPAGE " ;"];
-
-        for (NSString *url in homepageUrls) {
-            success |= [db executeUpdate:
-              @"INSERT INTO " TABLE_HOMEPAGE " (" COL_HOMEPAGE_URL ") VALUES (?)", url, nil];
-        }
-
-        if (!success) {
-            LOG_ERROR(@"Rolling back, error %@", [db lastError]);
-            *rollback = TRUE;
-            return;
-        }
-    }];
-
-    return success;
-}
-
-/*!
+ * Reads shared homepages file.
  * @return NSArray of Homepages.
  */
-- (NSArray<Homepage *> *)getAllHomepages {
+- (NSArray<Homepage *> *)getHomepages {
     NSMutableArray<Homepage *> *homepages = [[NSMutableArray alloc] init];
 
-    [q inDatabase:^(FMDatabase *db) {
-        FMResultSet *rs = [db executeQuery:@"SELECT * FROM " TABLE_HOMEPAGE];
+    NSError *err;
+    NSString *data = [NSString stringWithContentsOfFile:[self homepageNoticesPath]
+                                               encoding:NSUTF8StringEncoding
+                                                  error:&err];
 
-        if (rs == nil) {
-            LOG_ERROR(@"%@", [db lastError]);
-            return;
+    if (err) {
+        LOG_ERROR(@"%@", err);
+        return nil;
+    }
+
+    NSArray *homepageNotices = [data componentsSeparatedByString:@"\n"];
+    for (NSString *line in homepageNotices) {
+        NSDictionary *dict = [NSJSONSerialization JSONObjectWithData:[line dataUsingEncoding:NSUTF8StringEncoding]
+                                                             options:0 error:&err];
+
+        if (dict) {
+            Homepage *h = [[Homepage alloc] init];
+            h.url = [NSURL URLWithString:dict[@"data"][@"url"]];
+            h.timestamp = [rfc3339Formatter dateFromString:dict[@"timestamp"]];
+            [homepages addObject:h];
         }
-
-        while ([rs next]) {
-            Homepage *homepage = [[Homepage alloc] init];
-            homepage.url = [NSURL URLWithString:[rs stringForColumn:COL_HOMEPAGE_URL]];
-            homepage.timestamp = [rs dateForColumn:COL_HOMEPAGE_TIMESTAMP];
-
-            [homepages addObject:homepage];
-        }
-
-        [rs close];
-    }];
+    }
 
     return homepages;
+}
+
+- (NSString *)homepageNoticesPath {
+    return [[[[NSFileManager defaultManager]
+      containerURLForSecurityApplicationGroupIdentifier:appGroupIdentifier] path]
+      stringByAppendingPathComponent:@"homepage_notices"];
 }
 
 #pragma mark - Egress Regions Table methods
@@ -203,6 +179,12 @@
 }
 
 #pragma mark - Log Table methods
+
+- (NSString *)rotatingLogNoticesPath {
+    return [[[[NSFileManager defaultManager]
+      containerURLForSecurityApplicationGroupIdentifier:appGroupIdentifier] path]
+            stringByAppendingPathComponent:@"rotating_notices"];
+}
 
 - (BOOL)insertDiagnosticMessage:(NSString *)message withTimestamp:(NSString *)timestamp {
 
