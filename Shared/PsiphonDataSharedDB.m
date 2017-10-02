@@ -47,7 +47,6 @@
 
 /* NSUserDefaults keys */
 
-#define EGRESS_REGIONS_KEY @"egress_regions"
 #define TUN_CONNECTED_KEY @"tun_connected"
 #define APP_FOREGROUND_KEY @"app_foreground"
 
@@ -185,21 +184,54 @@
 #pragma mark - Egress Regions Table methods
 
 /*!
- * @brief Sets set of egress regions in shared NSUserDefaults
+ * @brief Deletes previous set of regions, then inserts new set of regions.
  * @param regions
- * @return TRUE if data was saved to disk successfully, otherwise FALSE.
+ * @return TRUE on success.
  */
 // TODO: is timestamp needed? Maybe we can use this to detect staleness later
 - (BOOL)insertNewEgressRegions:(NSArray<NSString *> *)regions {
-    [sharedDefaults setObject:regions forKey:EGRESS_REGIONS_KEY];
-    return [sharedDefaults synchronize];
+    __block BOOL success = FALSE;
+    [q inTransaction:^(FMDatabase *db, BOOL *rollback) {
+        success = [db executeUpdate:@"DELETE FROM " TABLE_EGRESS_REGIONS " ;"];
+
+        for (NSString *region in regions) {
+            success |= [db executeUpdate:
+                        @"INSERT INTO " TABLE_EGRESS_REGIONS " (" COL_EGRESS_REGIONS_REGION_NAME ") VALUES (?)", region, nil];
+        }
+
+        if (!success) {
+            LOG_ERROR(@"Rolling back, error %@", [db lastError]);
+            *rollback = TRUE;
+            return;
+        }
+    }];
+
+    return success;
 }
 
 /*!
  * @return NSArray of region codes.
  */
 - (NSArray<NSString *> *)getAllEgressRegions {
-    return [sharedDefaults objectForKey:EGRESS_REGIONS_KEY];
+    NSMutableArray<NSString *> *regions = [[NSMutableArray alloc] init];
+
+    [q inDatabase:^(FMDatabase *db) {
+        FMResultSet *rs = [db executeQuery:@"SELECT * FROM " TABLE_EGRESS_REGIONS];
+
+        if (rs == nil) {
+            LOG_ERROR(@"%@", [db lastError]);
+            return;
+        }
+
+        while ([rs next]) {
+            NSString *region = [rs stringForColumn:COL_EGRESS_REGIONS_REGION_NAME];
+            [regions addObject:region];
+        }
+
+        [rs close];
+    }];
+
+    return regions;
 }
 
 #pragma mark - Log Table methods
