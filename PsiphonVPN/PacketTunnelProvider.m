@@ -460,4 +460,16 @@
     LOG_DEBUG(@"%@", [NSString stringWithFormat:@"onInternetReachabilityChanged: %@", strReachabilityFlags]);
 }
 
+- (NSString * _Nullable)getHomepageNoticesPath {
+    return [[[[NSFileManager defaultManager]
+      containerURLForSecurityApplicationGroupIdentifier:APP_GROUP_IDENTIFIER] path]
+      stringByAppendingPathComponent:@"homepage_notices"];;
+}
+
+- (NSString * _Nullable)getRotatingNoticesPath {
+    return [[[[NSFileManager defaultManager]
+      containerURLForSecurityApplicationGroupIdentifier:APP_GROUP_IDENTIFIER] path]
+      stringByAppendingPathComponent:@"rotating_notices"];;
+}
+
 @end
