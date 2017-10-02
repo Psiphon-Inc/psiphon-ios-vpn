@@ -36,11 +36,11 @@
 - (BOOL)insertNewEgressRegions:(NSArray<NSString *> *)regions;
 - (NSArray<NSString *> *)getAllEgressRegions;
 
-// Home page table
-- (BOOL)updateHomepages:(NSArray<NSString *> *)homepageUrls;
-- (NSArray<Homepage *> *)getAllHomepages;
+- (NSArray<Homepage *> *)getHomepages;
+- (NSString *)homepageNoticesPath;
 
 // Logs table
+- (NSString *)rotatingLogNoticesPath;
 - (BOOL)truncateLogs;
 - (BOOL)insertDiagnosticMessage:(NSString *)message withTimestamp:(NSString *)timestamp;
 #ifndef TARGET_IS_EXTENSION
