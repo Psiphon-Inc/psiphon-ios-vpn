@@ -28,7 +28,7 @@ usage () {
     exit 1
 }
 
-setup () {
+setup_env () {
     cd ${BASE_DIR}
 
     PSIPHON_IOS_VPN_XCODE_WORKSPACE="${BASE_DIR}"
@@ -38,7 +38,9 @@ setup () {
 
     # Clean previous output
     rm -rf "${BUILD_DIR}"
+}
 
+setup_install () {
     # Install pods
     pod install --repo-update
 }
@@ -89,13 +91,32 @@ increment_plists_and_commit () {
         echo "Container and extension version numbers out of sync, aborting..."
         exit 1
     fi
+
+    commit_message="${container_commit_message}"
     git add "${PSIPHON_IOS_VPN_XCODE_WORKSPACE}/Psiphon/Info.plist"
     git add "${PSIPHON_IOS_VPN_XCODE_WORKSPACE}/PsiphonVPN/Info.plist"
 
-    git commit -m "${container_commit_message}"
+    git commit -m "${commit_message}"
     if [[ $? != 0 ]]; then
         echo "Failed to git commit plist changes, aborting..."
         exit 1
+    fi
+
+    # Only tag release builds
+    if [[ "$1" == "release" ]]; then
+        # Get tag by retrieving the version number at the end of the commit message:
+        # TestFlight commit messages are in the form:
+        #   "TestFlight version <CFBundleShortVersionString#>"
+        # Release commit messages are in the form:
+        #   "TestFlight version <CFBundleShortVersionString#>; Release version <CFBundleVersion#>"
+        # Tag will be of the form: vX.Y.Z
+        # E.g.: v1.2.3
+        tag="v${commit_message##* }" # trim everything up to and including last space
+        git tag "${tag}"
+        if [[ $? != 0 ]]; then
+            echo "Failed to git tag plist commit, aborting..."
+            exit 1
+        fi
     fi
 }
 
@@ -126,7 +147,8 @@ case $TARGET_DISTRIBUTION_PLATFORM in
     release)
         CONFIGURATION="Release"
         EXPORT_OPTIONS_PLIST="exportAppStoreOptions.plist"
-        setup
+        setup_env
+        setup_install
         increment_build_numbers_for_release
         build
         upload_ipa
@@ -134,7 +156,8 @@ case $TARGET_DISTRIBUTION_PLATFORM in
     testflight)
         CONFIGURATION="Release"
         EXPORT_OPTIONS_PLIST="exportAppStoreOptions.plist"
-        setup
+        setup_env
+        setup_install
         increment_build_numbers_for_testflight
         build
         upload_ipa
@@ -142,7 +165,8 @@ case $TARGET_DISTRIBUTION_PLATFORM in
     internal)
         CONFIGURATION="Debug"
         EXPORT_OPTIONS_PLIST="exportDevelopmentOptions.plist"
-        setup
+        setup_env
+        setup_install
         build
         ;;
     *)
