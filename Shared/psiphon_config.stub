@@ -4,5 +4,6 @@
   "RemoteServerListSignaturePublicKey": "...",
   "RemoteServerListURLs": "[...]",
   "ObfuscatedServerListRootURLs": "[...]",
-  "feedbackConfig": {...}
+  "feedbackConfig": {...},
+  "subscriptionConfig": {...}
 }
