@@ -400,6 +400,12 @@
     
     mutableConfigCopy[@"ClientVersion"] = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleVersion"];
 
+    // SponsorId override
+    NSString* sponsorId = [sharedDB getSponsorId];
+    if(sponsorId && [sponsorId length]) {
+        mutableConfigCopy[@"SponsorId"] = sponsorId;
+    }
+
     jsonData  = [NSJSONSerialization dataWithJSONObject:mutableConfigCopy
       options:0 error:&err];
 
@@ -454,7 +460,6 @@
 
 - (void)onServerTimestamp:(NSString * _Nonnull)timestamp {
 	[sharedDB updateServerTimestamp:timestamp];
-	[notifier post:@"NE.onServerTimestamp"];
 }
 
 - (void)onAvailableEgressRegions:(NSArray *)regions {
