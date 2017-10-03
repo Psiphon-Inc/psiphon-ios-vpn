@@ -92,8 +92,6 @@
     [[NSNotificationCenter defaultCenter]
       addObserver:self selector:@selector(switchViewControllerWhenAdsLoaded) name:@kAdsDidLoad object:adManager];
 
-    [sharedDB truncateLogs];
-    
     return YES;
 }
 

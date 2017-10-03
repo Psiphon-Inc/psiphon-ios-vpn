@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		19059EA31F50923400C04739 /* libFMDB.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 19059EA21F50923400C04739 /* libFMDB.a */; };
 		197DABEB1F54BEED00DD5C3B /* VungleInterstitialCustomEvent.m in Sources */ = {isa = PBXBuildFile; fileRef = 197DABEA1F54BEED00DD5C3B /* VungleInterstitialCustomEvent.m */; };
 		197DABEE1F54C09E00DD5C3B /* MPVungleRouter.m in Sources */ = {isa = PBXBuildFile; fileRef = 197DABED1F54C09E00DD5C3B /* MPVungleRouter.m */; };
 		197DABF11F54C0CA00DD5C3B /* MPInstanceProvider+Vungle.m in Sources */ = {isa = PBXBuildFile; fileRef = 197DABF01F54C0CA00DD5C3B /* MPInstanceProvider+Vungle.m */; };
@@ -89,7 +88,6 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		19059EA21F50923400C04739 /* libFMDB.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libFMDB.a; path = "Pods/../build/Debug-iphoneos/FMDB/libFMDB.a"; sourceTree = "<group>"; };
 		197DABE91F54BEED00DD5C3B /* VungleInterstitialCustomEvent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VungleInterstitialCustomEvent.h; sourceTree = "<group>"; };
 		197DABEA1F54BEED00DD5C3B /* VungleInterstitialCustomEvent.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VungleInterstitialCustomEvent.m; sourceTree = "<group>"; };
 		197DABEC1F54C09E00DD5C3B /* MPVungleRouter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MPVungleRouter.h; sourceTree = "<group>"; };
@@ -191,7 +189,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				19059EA31F50923400C04739 /* libFMDB.a in Frameworks */,
 				668AF9C01E92CBE0008CAAAA /* NetworkExtension.framework in Frameworks */,
 				DF693CA78CF5B67C2D14694C /* libPods-Psiphon.a in Frameworks */,
 			);
@@ -252,7 +249,6 @@
 		668AF9B81E92CB60008CAAAA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				19059EA21F50923400C04739 /* libFMDB.a */,
 				668AF9BE1E92CBD3008CAAAA /* NetworkExtension.framework */,
 				93B819F4480DF3E24C22ACD7 /* libPods-Psiphon.a */,
 				7FC2D3C7A4325CD15FDF15E9 /* libPods-PsiphonVPN.a */,
@@ -871,10 +867,7 @@
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = Psiphon/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PROJECT_DIR)/build/Debug-iphoneos/FMDB",
-				);
+				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				OTHER_SWIFT_FLAGS = "-D DEBUG";
 				PRODUCT_BUNDLE_IDENTIFIER = ca.psiphon.Psiphon;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -897,10 +890,7 @@
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = Psiphon/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PROJECT_DIR)/build/Debug-iphoneos/FMDB",
-				);
+				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				OTHER_SWIFT_FLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = ca.psiphon.Psiphon;
 				PRODUCT_NAME = "$(TARGET_NAME)";

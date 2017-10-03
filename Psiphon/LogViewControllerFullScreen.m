@@ -58,22 +58,22 @@
     // and populates psiphonData in-memory database.
     // LogViewControllers listens for new log notifications from PsiphonData.
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        NSArray<DiagnosticEntry *> *logs = [sharedDB getNewLogs];
+        NSArray<DiagnosticEntry *> *logs = [sharedDB getAllLogs];
         [psiphonData addDiagnosticEntries:logs];
     });
 
-    [notifier listenForNotification:@"NE.onDiagnosticMessage" listener:^{
-        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-            NSArray<DiagnosticEntry *> *logs = [sharedDB getNewLogs];
-            [psiphonData addDiagnosticEntries:logs];
-
-#if DEBUG
-            for (DiagnosticEntry *log in logs) {
-               LOG_DEBUG(@"%@ %@", [log getTimestampForDisplay], [log message]);
-            }
-#endif
-        });
-    }];
+//    [notifier listenForNotification:@"NE.onDiagnosticMessage" listener:^{
+//        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+//            NSArray<DiagnosticEntry *> *logs = [sharedDB getNewLogs];
+//            [psiphonData addDiagnosticEntries:logs];
+//
+//#if DEBUG
+//            for (DiagnosticEntry *log in logs) {
+//               LOG_DEBUG(@"%@ %@", [log getTimestampForDisplay], [log message]);
+//            }
+//#endif
+//        });
+//    }];
 }
 
 - (void)viewWillDisappear:(BOOL)animated {

@@ -18,27 +18,9 @@
  */
 
 #import "PsiphonDataSharedDB.h"
-#import "FMDB.h"
 #import "Logging.h"
 #import "NSDateFormatter+RFC3339.h"
-
-#define TRUNCATE_AT_LOG_LINES 500
-#define RETAIN_LOG_LINES 250
-#define SHARED_DATABASE_NAME @"psiphon_data_archive.db"
-
-// ID
-#define COL_ID @"_ID"
-
-// Log Table
-#define TABLE_LOG @"log"
-#define COL_LOG_LOGJSON @"logjson"
-#define COL_LOG_IS_DIAGNOSTIC @"is_diagnostic"
-#define COL_LOG_TIMESTAMP @"timestamp"
-
-// Egress Regions Table
-#define TABLE_EGRESS_REGIONS @"egress_regions"
-#define COL_EGRESS_REGIONS_REGION_NAME @"url"
-#define COL_EGRESS_REGIONS_TIMESTAMP @"timestamp"
+#import "PsiphonData.h"
 
 /* Shared NSUserDefaults keys */
 #define EGRESS_REGIONS_KEY @"egress_regions"
@@ -51,15 +33,9 @@
 
 @implementation PsiphonDataSharedDB {
     NSUserDefaults *sharedDefaults;
-    FMDatabaseQueue *q;
 
     NSString *appGroupIdentifier;
-    NSString *databasePath;
 
-    // Log Table
-    int lastLogRowId;
-    NSLock *lastLogRowIdLock;
-    
     // RFC3339 Date Formatter
     NSDateFormatter *rfc3339Formatter;
 }
@@ -76,45 +52,9 @@
 
         sharedDefaults = [[NSUserDefaults alloc] initWithSuiteName:identifier];
 
-        databasePath = [[[NSFileManager defaultManager] containerURLForSecurityApplicationGroupIdentifier:appGroupIdentifier] path];
-
-        lastLogRowId = -1;
-        lastLogRowIdLock = [[NSLock alloc] init];
-
-        q = [FMDatabaseQueue databaseQueueWithPath:[databasePath stringByAppendingPathComponent:SHARED_DATABASE_NAME]];
-        
         rfc3339Formatter = [NSDateFormatter createRFC3339Formatter];
     }
     return self;
-}
-
-#pragma mark - Database operations
-
-- (BOOL)createDatabase {
-
-    NSString *CREATE_TABLE_STATEMENTS =
-      @"CREATE TABLE IF NOT EXISTS " TABLE_LOG " ("
-        COL_ID " INTEGER PRIMARY KEY AUTOINCREMENT, "
-        COL_LOG_LOGJSON " TEXT NOT NULL, "
-        COL_LOG_IS_DIAGNOSTIC " BOOLEAN DEFAULT 0, "
-        COL_LOG_TIMESTAMP " TEXT NOT NULL);"
-
-        "CREATE TABLE IF NOT EXISTS " TABLE_EGRESS_REGIONS " ("
-        COL_ID " INTEGER PRIMARY KEY AUTOINCREMENT, "
-        COL_EGRESS_REGIONS_REGION_NAME " TEXT NOT NULL, "
-        COL_EGRESS_REGIONS_TIMESTAMP " TIMESTAMP DEFAULT CURRENT_TIMESTAMP);";
-
-    LOG_DEBUG(@"Create DATABASE");
-
-    __block BOOL success = FALSE;
-    [q inDatabase:^(FMDatabase *db) {
-        success = [db executeStatements:CREATE_TABLE_STATEMENTS];
-        if (!success) {
-            LOG_ERROR(@"%@", [db lastError]);
-        }
-    }];
-
-    return success;
 }
 
 #pragma mark - Homepage methods
@@ -186,110 +126,101 @@
             stringByAppendingPathComponent:@"rotating_notices"];
 }
 
-- (BOOL)insertDiagnosticMessage:(NSString *)message withTimestamp:(NSString *)timestamp {
-
-    // Truncates logs if necessary.
-    [self truncateLogs];
-    
-    __block BOOL success;
-    [q inDatabase:^(FMDatabase *db) {
-        NSError *err;
-
-        // TODO: IS_DIAGNOSTIC is always YES.
-        success = [db executeUpdate:
-          @"INSERT INTO " TABLE_LOG
-          " (" COL_LOG_LOGJSON ", " COL_LOG_IS_DIAGNOSTIC ", " COL_LOG_TIMESTAMP ") VALUES (?,?,?)"
-          withErrorAndBindings:&err, message, @YES, timestamp, nil];
-
-        if (!success) {
-            LOG_ERROR(@"%@", err);
-            // TODO: error handling/logging
-        }
-    }];
-    return success;
-}
-
-/**
- Truncates logs to RETAIN_LOG_LINES when number of log >= TRUNCATE_AT_LOG_LINES.
- @return TRUE if truncation proceeded and succeeded, FALSE otherwise.
- */
-- (BOOL)truncateLogs {
-    __block BOOL success = FALSE;
-
-    [q inDatabase:^(FMDatabase *db) {
-        NSError *err;
-        
-        int rows = [db intForQuery:@"SELECT COUNT(" COL_ID ") FROM " TABLE_LOG];
-        
-        if (rows >= TRUNCATE_AT_LOG_LINES) {
-            success = [db executeUpdate:
-                       @"DELETE FROM " TABLE_LOG
-                       " WHERE " COL_ID " NOT IN "
-                       "(SELECT " COL_ID " FROM " TABLE_LOG " ORDER BY " COL_ID " DESC LIMIT (?));"
-                   withErrorAndBindings:&err, @RETAIN_LOG_LINES, nil];
-            
-            if (!success) {
-                LOG_ERROR(@"%@", err);
-                // TODO: error handling/logging
-            }
-        }
-    }];
-
-    return success;
+- (NSString *)rotatingLockNoticesBackupPath {
+    return [[self rotatingLogNoticesPath] stringByAppendingString:@".1"];
 }
 
 #ifndef TARGET_IS_EXTENSION
 - (NSArray<DiagnosticEntry*>*)getAllLogs {
-    return [self getLogsNewerThanId:-1];
+
+    NSMutableArray<DiagnosticEntry *> *entries = [[NSMutableArray alloc] init];
+
+    NSString *backupLogLines = [self tryReadingFile:[NSURL fileURLWithPath:[self rotatingLockNoticesBackupPath]]];
+    [self readLogsData:backupLogLines intoArray:entries];
+
+    NSString *logLines = [self tryReadingFile:[NSURL fileURLWithPath:[self rotatingLogNoticesPath]]];
+    [self readLogsData:logLines intoArray:entries];
+
+    return entries;
 }
 
-- (NSArray<DiagnosticEntry*>*)getNewLogs {
-    return [self getLogsNewerThanId:lastLogRowId];
-}
+- (void)readLogsData:(NSString *)logLines intoArray:(NSMutableArray<DiagnosticEntry *> *)entries {
+    NSError *err;
 
-- (NSArray<DiagnosticEntry*>*)getLogsNewerThanId:(int)lastId {
-    NSMutableArray<DiagnosticEntry*>* logs = [[NSMutableArray alloc] init];
-    
-    // Prevent fetching the same logs multiple times
-    [lastLogRowIdLock lock];
-    if (lastLogRowId > lastId) {
-        [lastLogRowIdLock unlock];
-        return nil;
-    }
-    
-    [q inDatabase:^(FMDatabase *db) {
-        FMResultSet *rs = [db executeQuery:@"SELECT * FROM log WHERE _ID > (?);", @(lastId), nil];
+    if (logLines) {
+        for (NSString *logLine in [logLines componentsSeparatedByString:@"\n"]) {
+            NSDictionary *dict = [NSJSONSerialization JSONObjectWithData:[logLine dataUsingEncoding:NSUTF8StringEncoding]
+                                                                 options:0 error:&err];
 
-        if (rs == nil) {
-            LOG_ERROR(@"%@", [db lastError]);
-            return;
-        }
-
-        while ([rs next]) {
-            lastLogRowId = [rs intForColumn:COL_ID];
-
-            NSString *timestampString = [rs stringForColumn:COL_LOG_TIMESTAMP];
-            NSString *json = [rs stringForColumn:COL_LOG_LOGJSON];
-//          BOOL isDiagnostic = [rs boolForColumn:COL_LOG_IS_DIAGNOSTIC]; // TODO
-
-            NSDate *timestampDate = [rfc3339Formatter dateFromString:timestampString];
-            if (!timestampDate) {
-                // If the time storage format has changed, pass a date as a placeholder.
-                // For now we don't need to convert old values into the new values.
-                timestampDate = [NSDate dateWithTimeIntervalSince1970:0];
+            if (err) {
+                LOG_ERROR("Error: %@", err);
             }
 
-            DiagnosticEntry *d = [[DiagnosticEntry alloc] init:json andTimestamp:timestampDate];
-            [logs addObject:d];
+            if (dict) {
+                NSString *msg = [NSString stringWithFormat:@"%@: %@", dict[@"noticeType"],
+                    [self getSimpleDictionaryDescription:dict[@"data"]]];
+                NSDate *timestamp = [rfc3339Formatter dateFromString:dict[@"timestamp"]];
+                [entries addObject:[[DiagnosticEntry alloc] init:(msg ? msg : @"Failed to read notice message.") andTimestamp:timestamp ? timestamp : [NSDate dateWithTimeIntervalSince1970:0]]];
+            }
         }
-
-        [rs close];
-    }];
-    
-    [lastLogRowIdLock unlock];
-
-    return logs;
+    }
 }
+
+- (NSString *)tryReadingFile:(NSURL *)fileUrl {
+    NSData *fileData;
+    NSError *err;
+
+    NSFileHandle *fileHandle = [NSFileHandle fileHandleForReadingFromURL:fileUrl error:&err];
+
+    if (err) {
+        LOG_ERROR(@"Error opening file handle for %@: Error: %@", fileUrl, err);
+    }
+
+    if (!fileHandle) {
+        return nil;
+    }
+
+    fileData = [fileHandle readDataToEndOfFile];
+    [fileHandle closeFile];
+
+    if (!fileData) {
+        return nil;
+    }
+
+    return [[NSString alloc] initWithData:fileData encoding:NSUTF8StringEncoding];
+}
+
+
+// This class returns a simple string representation of the dictionary dict.
+// Unlike description method of NSDictionary, the string returned by this
+// function doesn't include new-line character or semicolon.
+- (NSString *)getSimpleDictionaryDescription:(NSDictionary *)dict {
+    if (![dict isKindOfClass:[NSDictionary class]]) {
+        return [dict description];
+    }
+    
+    NSMutableString *desc = [NSMutableString string];
+    [desc appendString:@"{"];
+    NSArray *allKeys = [dict allKeys];
+    for (NSUInteger i = 0; i < [allKeys count] ; ++i) {
+        id object = dict[allKeys[i]];
+        NSString *key = [allKeys[i] description];
+        NSString *value;
+        if ([object isKindOfClass:[NSDictionary class]]) {
+            value = [self getSimpleDictionaryDescription:object];
+        } else {
+            value = [object description];
+        }
+        [desc appendString:[NSString stringWithFormat:@"%@:%@", key, value]];
+        if (i < [allKeys count] - 1) {
+            [desc appendString:@","];
+        }
+    }
+    [desc appendString:@"}"];
+
+    return desc;
+}
+
 #endif
 
 #pragma mark - Tunnel State table methods

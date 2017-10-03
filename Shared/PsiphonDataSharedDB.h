@@ -31,7 +31,6 @@
 
 @interface PsiphonDataSharedDB : NSObject
 - (id)initForAppGroupIdentifier:(NSString*)identifier;
-- (BOOL)createDatabase;
 
 - (BOOL)insertNewEgressRegions:(NSArray<NSString *> *)regions;
 - (NSArray<NSString *> *)getAllEgressRegions;
@@ -41,10 +40,8 @@
 
 // Logs table
 - (NSString *)rotatingLogNoticesPath;
-- (BOOL)truncateLogs;
-- (BOOL)insertDiagnosticMessage:(NSString *)message withTimestamp:(NSString *)timestamp;
 #ifndef TARGET_IS_EXTENSION
-- (NSArray<DiagnosticEntry*>*)getNewLogs;
+- (NSArray<DiagnosticEntry*>*)getAllLogs;
 #endif
 
 // Tunnel state table
