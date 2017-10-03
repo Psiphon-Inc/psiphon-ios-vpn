@@ -58,6 +58,10 @@
 // Server timestamp
 - (void)updateServerTimestamp:(NSString*)timestamp;
 - (NSString*)getServerTimestamp;
+
+// Sponsor ID
+- (void) updateSponsorId:(NSString*)sponsorId;
+- (NSString*)getSponsorId;
 @end
 
 

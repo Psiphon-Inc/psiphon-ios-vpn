@@ -56,6 +56,15 @@
     LaunchScreenViewController *launchScreenViewController;
 }
 
+// Helper method to get top most presenting controller
++ (UIViewController*) topMostController {
+    UIViewController *topController = [UIApplication sharedApplication].keyWindow.rootViewController;
+    while (topController.presentedViewController) {
+        topController = topController.presentedViewController;
+    }
+    return topController;
+}
+
 - (instancetype)init {
     self = [super init];
     if (self) {
@@ -261,10 +270,6 @@
     [notifier listenForNotification:@"NE.newHomepages" listener:^{
         LOG_DEBUG(@"Received notification NE.newHomepages");
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-            // Don't open homepages for paid subscribers
-            if ([[IAPHelper sharedInstance] hasActiveSubscriptionForDate:[NSDate date]]) {
-                return;
-            }
             if (!shownHomepage) {
                 NSArray<Homepage *> *homepages = [sharedDB getAllHomepages];
                 if ([homepages count] > 0) {
@@ -283,20 +288,11 @@
 
     [notifier listenForNotification:@"NE.tunnelConnected" listener:^{
         LOG_DEBUG(@"Received notification NE.tunnelConnected");
-        // If we haven't had a chance to load an Ad, and the
-        // tunnel is already connected, give up on the Ad and
-        // start the VPN. Otherwise the startVPN message will be
-        // sent after the Ad has disappeared.
-        if (![adManager untunneledInterstitialIsShowing]) {
-            [vpnManager startVPN];
-        }
-
-        // check if user has a valid subscription but the receipt is not valid
+        // Check if user has an active subscription but the receipt is not valid.
         IAPHelper *iapHelper = [IAPHelper sharedInstance];
         if([iapHelper hasActiveSubscriptionForDate:[NSDate date]] && ![iapHelper verifyReceipt]) {
-            // Stop the tunnel and prompt user to refresh app receipt
+            // Stop the VPN and prompt user to refresh app receipt.
             [vpnManager stopVPN];
-
             NSString *alertTitle = NSLocalizedStringWithDefaultValue(@"BAD_RECEIPT_ALERT_TITLE", nil, [NSBundle mainBundle], @"Invalid app receipt", @"Alert title informing user that app receipt is not valid");
 
             NSString *alertMessage = NSLocalizedStringWithDefaultValue(@"BAD_RECEIPT_ALERT_MESSAGE", nil, [NSBundle mainBundle], @"Your subscription receipt can not be verified, please refresh it and try again.", @"Alert message informing user that subscription receipt can not be verified");
@@ -313,44 +309,17 @@
                                                 IAPViewController *iapViewController = [[IAPViewController alloc]init];
                                                 iapViewController.openedFromSettings = NO;
                                                 UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:iapViewController];
-                                                [self.window.rootViewController presentViewController:navController animated:YES completion:nil];
+                                                [[AppDelegate topMostController] presentViewController:navController animated:YES completion:nil];
                                             }];
             [alert addAction:defaultAction];
-            [self.window.rootViewController presentViewController:alert animated:TRUE completion:nil];
+            [[AppDelegate topMostController] presentViewController:alert animated:TRUE completion:nil];
+            return;
         }
 
-    }];
-
-    [notifier listenForNotification:@"NE.onAvailableEgressRegions" listener:^{ // TODO should be put in a constants file
-        LOG_DEBUG(@"Received notification NE.onAvailableEgressRegions");
-        // Update available regions
-        // TODO: this code is duplicated in MainViewController updateAvailableRegions
-        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-            NSArray<NSString *> *regions = [sharedDB getAllEgressRegions];
-            [[RegionAdapter sharedInstance] onAvailableEgressRegions:regions];
-        });
-    }];
-
-    [notifier listenForNotification:@"NE.onAvailableEgressRegions" listener:^{ // TODO should be put in a constants file
-        LOG_DEBUG(@"Received notification NE.onAvailableEgressRegions");
-        // Update available regions
-        // TODO: this code is duplicated in MainViewController updateAvailableRegions
-        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-            NSArray<NSString *> *regions = [sharedDB getAllEgressRegions];
-            [[RegionAdapter sharedInstance] onAvailableEgressRegions:regions];
-        });
-    }];
-
-    [notifier listenForNotification:@"NE.onServerTimestamp" listener:^{
-        LOG_DEBUG(@"Received notification NE.onServerTimestamp");
-        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-            // Check if user has an active subscription in the device's time
-            // If NO - do nothing
-            // If YES - proceed with checking the subscription against server timestamp
-
-            if(![[IAPHelper sharedInstance]hasActiveSubscriptionForDate:[NSDate date]]) {
-                return;
-            }
+        // Check if user has an active subscription in the device's time
+        // If NO - do nothing
+        // If YES - proceed with checking the subscription against server timestamp
+        if([[IAPHelper sharedInstance]hasActiveSubscriptionForDate:[NSDate date]]) {
             // The following code adapted from
             // https://developer.apple.com/library/content/documentation/Cocoa/Conceptual/DataFormatting/Articles/dfDateFormatting10_4.html
             static NSDateFormatter *sRFC3339DateFormatter;
@@ -368,7 +337,7 @@
                 if(![[IAPHelper sharedInstance]hasActiveSubscriptionForDate:serverDate]) {
                     // User is possibly cheating, terminate the app due to 'Invalid Receipt'.
                     // Stop the tunnel, show alert with title and message
-                    // and terminate the app due to 'Invalid Receipt'when user clicks 'OK'
+                    // and terminate the app due to 'Invalid Receipt' when user clicks 'OK'.
                     [vpnManager stopVPN];
 
                     NSString *alertTitle = NSLocalizedStringWithDefaultValue(@"BAD_CLOCK_ALERT_TITLE", nil, [NSBundle mainBundle], @"Clock is out of sync", @"Alert title informing user that the device clock needs to be updated with current time");
@@ -387,9 +356,39 @@
                                                         [[IAPHelper sharedInstance] terminateForInvalidReceipt];
                                                     }];
                     [alert addAction:defaultAction];
-                    [self.window.rootViewController presentViewController:alert animated:TRUE completion:nil];
+                    [[AppDelegate topMostController] presentViewController:alert animated:TRUE completion:nil];
+                    return;
                 }
             }
+        }
+
+        // If we haven't had a chance to load an Ad, and the
+        // tunnel is already connected, give up on the Ad and
+        // start the VPN. Otherwise the startVPN message will be
+        // sent after the Ad has disappeared.
+        if (![adManager untunneledInterstitialIsShowing]) {
+            [vpnManager startVPN];
+        }
+
+    }];
+
+    [notifier listenForNotification:@"NE.onAvailableEgressRegions" listener:^{ // TODO should be put in a constants file
+        LOG_DEBUG(@"Received notification NE.onAvailableEgressRegions");
+        // Update available regions
+        // TODO: this code is duplicated in MainViewController updateAvailableRegions
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+            NSArray<NSString *> *regions = [sharedDB getAllEgressRegions];
+            [[RegionAdapter sharedInstance] onAvailableEgressRegions:regions];
+        });
+    }];
+
+    [notifier listenForNotification:@"NE.onAvailableEgressRegions" listener:^{ // TODO should be put in a constants file
+        LOG_DEBUG(@"Received notification NE.onAvailableEgressRegions");
+        // Update available regions
+        // TODO: this code is duplicated in MainViewController updateAvailableRegions
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+            NSArray<NSString *> *regions = [sharedDB getAllEgressRegions];
+            [[RegionAdapter sharedInstance] onAvailableEgressRegions:regions];
         });
     }];
 }
