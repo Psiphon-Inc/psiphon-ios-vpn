@@ -904,7 +904,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 #pragma mark - FeedbackViewControllerDelegate methods and helpers
 
 - (NSString *)getPsiphonConfig {
-    return [PsiphonClientCommonLibraryHelpers getPsiphonConfigForFeedbackUpload];
+    return [PsiphonClientCommonLibraryHelpers getPsiphonBundledConfig];
 }
 
 - (void)userSubmittedFeedback:(NSUInteger)selectedThumbIndex comments:(NSString *)comments email:(NSString *)email uploadDiagnostics:(BOOL)uploadDiagnostics {
