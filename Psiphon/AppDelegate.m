@@ -261,7 +261,7 @@
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
             if (!shownHomepage) {
                 NSArray<Homepage *> *homepages = [sharedDB getHomepages];
-                if ([homepages count] > 0) {
+                if (homepages && [homepages count] > 0) {
                     NSUInteger randIndex = arc4random() % [homepages count];
                     Homepage *homepage = homepages[randIndex];
                     dispatch_async(dispatch_get_main_queue(), ^{
