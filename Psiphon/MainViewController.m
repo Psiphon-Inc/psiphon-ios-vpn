@@ -123,13 +123,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
    LOG_DEBUG();
     [super viewDidLoad];
 
-    // TODO: check if database exists first
-    BOOL success = [sharedDB createDatabase];
-    if (!success) {
-        // TODO : do some error handling
-    }
-
-    // Add any available regions from shared db to region adapter
+   // Add any available regions from shared db to region adapter
     [self updateAvailableRegions];
 
     // Setting up the UI
@@ -984,7 +978,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     // Ensure psiphon data is populated with latest logs
     // TODO: should this be a delegate method of Psiphon Data in shared library/
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        NSArray<DiagnosticEntry *> *logs = [sharedDB getNewLogs];
+        NSArray<DiagnosticEntry *> *logs = [sharedDB getAllLogs];
         [[PsiphonData sharedInstance] addDiagnosticEntries:logs];
 
         __weak MainViewController *weakSelf = self;

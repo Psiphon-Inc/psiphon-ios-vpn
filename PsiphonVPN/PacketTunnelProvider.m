@@ -149,29 +149,6 @@
 - (void)wake {
 }
 
-- (void)logMessage:(NSString * _Nonnull)message withTimestamp:(NSString * _Nonnull)timestamp{
-
-    // Certain aspects of the diagnostics currently depend on
-    // insert order, not timestamp order; for example, truncation.
-    // Since tunnel-core notices are dispatched synchronously to
-    // onDiagnostic on the callback queue, they will be inserted
-    // in timestamp order.
-
-    [sharedDB insertDiagnosticMessage:message withTimestamp:timestamp];
-
-#if DEBUG
-
-    // Notify container that there is new data in shared sqlite database.
-    // This is only needed in debug mode where the log view is enabled
-    // in the container. LogViewController needs to know when new logs
-    // have entered the shared database so it can update its view to
-    // display the latest diagnostic entries.
-
-    [notifier post:@"NE.onDiagnosticMessage"];
-
-#endif
-}
-
 - (NSArray *)getNetworkInterfacesIPv4Addresses {
     
     // Getting list of all interfaces' IPv4 addresses
@@ -392,7 +369,7 @@
 }
 
 - (void)onDiagnosticMessage:(NSString * _Nonnull)message withTimestamp:(NSString * _Nonnull)timestamp {
-    [self logMessage:message withTimestamp:timestamp];
+    // Do nothing.
 }
 
 - (void)onConnecting {
