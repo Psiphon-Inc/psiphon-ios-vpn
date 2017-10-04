@@ -410,14 +410,14 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 }*/
 
 - (BOOL)unsupportedCharactersForFont:(NSString*)font withString:(NSString*)string {
-    for (NSInteger charIdx = 0; charIdx < string.length; charIdx++) {
+    for (NSUInteger charIdx = 0; charIdx < string.length; charIdx++) {
         NSString *character = [NSString stringWithFormat:@"%C", [string characterAtIndex:charIdx]];
         // TODO: need to enumerate a longer list of special characters for this to be more correct.
         if ([character isEqualToString:@" "]) {
             // Skip special characters
             continue;
         }
-        CGFontRef cgFont = CGFontCreateWithFontName((CFStringRef)font);
+        CGFontRef cgFont = CGFontCreateWithFontName((__bridge CFStringRef)font);
         BOOL unsupported = (CGFontGetGlyphWithGlyphName(cgFont,  (__bridge CFStringRef)character) == 0);
         CGFontRelease(cgFont);
         if (unsupported) {
@@ -433,7 +433,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     appTitleLabel.text = NSLocalizedStringWithDefaultValue(@"APP_TITLE_MAIN_VIEW", nil, [NSBundle mainBundle], @"PSIPHON", @"Text for app title on main view.");
     appTitleLabel.textAlignment = NSTextAlignmentCenter;
     appTitleLabel.textColor = [UIColor whiteColor];
-    int narrowestWidth = self.view.frame.size.width;
+    CGFloat narrowestWidth = self.view.frame.size.width;
     if (self.view.frame.size.height < self.view.frame.size.width) {
         narrowestWidth = self.view.frame.size.height;
     }
@@ -476,7 +476,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     appSubTitleLabel.text = NSLocalizedStringWithDefaultValue(@"APP_SUB_TITLE_MAIN_VIEW", nil, [NSBundle mainBundle], @"BEYOND BORDERS", @"Text for app subtitle on main view.");
     appSubTitleLabel.textAlignment = NSTextAlignmentCenter;
     appSubTitleLabel.textColor = [UIColor whiteColor];
-    int narrowestWidth = self.view.frame.size.width;
+    CGFloat narrowestWidth = self.view.frame.size.width;
     if (self.view.frame.size.height < self.view.frame.size.width) {
         narrowestWidth = self.view.frame.size.height;
     }
