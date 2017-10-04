@@ -368,10 +368,6 @@
     return [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
 }
 
-- (void)onDiagnosticMessage:(NSString * _Nonnull)message withTimestamp:(NSString * _Nonnull)timestamp {
-    // Do nothing.
-}
-
 - (void)onConnecting {
     LOG_DEBUG(@"onConnecting");
 
@@ -419,5 +415,10 @@
 - (NSString * _Nullable)getRotatingNoticesPath {
     return [sharedDB rotatingLogNoticesPath];
 }
+
+- (void)onDiagnosticMessage:(NSString *_Nonnull)message withTimestamp:(NSString *_Nonnull)timestamp {
+    LOG_ERROR(@"tunnel-core: %@:%@", timestamp, message);
+}
+
 
 @end

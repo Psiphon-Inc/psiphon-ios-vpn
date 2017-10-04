@@ -131,6 +131,9 @@
 }
 
 #ifndef TARGET_IS_EXTENSION
+
+// Reads all log files and tries parses the json lines contained in each.
+// This method is not meant to handle large files.
 - (NSArray<DiagnosticEntry*>*)getAllLogs {
 
     NSMutableArray<DiagnosticEntry *> *entries = [[NSMutableArray alloc] init];
@@ -151,11 +154,10 @@
         for (NSString *logLine in [logLines componentsSeparatedByString:@"\n"]) {
             NSDictionary *dict = [NSJSONSerialization JSONObjectWithData:[logLine dataUsingEncoding:NSUTF8StringEncoding]
                                                                  options:0 error:&err];
-
             if (err) {
                 LOG_ERROR("Error: %@", err);
             }
-
+            
             if (dict) {
                 NSString *msg = [NSString stringWithFormat:@"%@: %@", dict[@"noticeType"],
                     [self getSimpleDictionaryDescription:dict[@"data"]]];

@@ -23,7 +23,6 @@
 #endif
 
 @interface Homepage : NSObject
-// TODO: readonly necessary?!
 @property (nonatomic) NSURL *url;
 @property (nonatomic) NSDate *timestamp;
 
