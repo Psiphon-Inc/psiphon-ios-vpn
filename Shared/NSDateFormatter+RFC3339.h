@@ -19,6 +19,6 @@
 
 @interface NSDateFormatter (NSDateFormatterRFC3339)
 
-+ (instancetype)createRFC3339Formatter;
++ (instancetype)createRFC3339MilliFormatter;
 
 @end
