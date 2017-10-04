@@ -77,9 +77,6 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     // UI Layer
     CAGradientLayer *backgroundGradient;
 
-    // VPN Config user defaults
-    PsiphonConfigUserDefaults *psiphonConfigUserDefaults;
-
     // Settings
     PsiphonSettingsViewController *appSettingsViewController;
     UIButton *settingsButton;
@@ -104,8 +101,6 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
         // Notifier
         notifier = [[Notifier alloc] initWithAppGroupIdentifier:APP_GROUP_IDENTIFIER];
 
-        // VPN Config user defaults
-        psiphonConfigUserDefaults = [PsiphonConfigUserDefaults sharedInstance];
         [self persistSettingsToSharedUserDefaults];
 
         // Open Setting after change it

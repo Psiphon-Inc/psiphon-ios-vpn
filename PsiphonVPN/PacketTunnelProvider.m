@@ -31,7 +31,6 @@
 #import <ifaddrs.h>
 #import <arpa/inet.h>
 #import <net/if.h>
-#import "NSDateFormatter+RFC3339.h"
 
 @implementation PacketTunnelProvider {
 
@@ -214,8 +213,8 @@
         }
     }
     
-    if ([candidates objectForKey:preferredCandidate] == nil && [candidates count] > 0) {
-        selectedAddress = [[candidates allValues] objectAtIndex:0];
+    if (candidates[preferredCandidate] == nil && [candidates count] > 0) {
+        selectedAddress = candidates.allValues[0];
     }
     
     LOG_DEBUG(@"Selected private address: %@", selectedAddress[0]);
@@ -390,12 +389,6 @@
     [self tryStartVPN];
 }
 
-- (void)onExiting {
-}
-
-- (void)onHomepage:(NSString * _Nonnull)url {
-}
-
 - (void)onAvailableEgressRegions:(NSArray *)regions {
     [sharedDB insertNewEgressRegions:regions];
 
@@ -419,6 +412,5 @@
 - (void)onDiagnosticMessage:(NSString *_Nonnull)message withTimestamp:(NSString *_Nonnull)timestamp {
     LOG_ERROR(@"tunnel-core: %@:%@", timestamp, message);
 }
-
 
 @end
