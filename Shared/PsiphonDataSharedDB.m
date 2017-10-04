@@ -51,7 +51,7 @@
 
         sharedDefaults = [[NSUserDefaults alloc] initWithSuiteName:identifier];
 
-        rfc3339Formatter = [NSDateFormatter createRFC3339Formatter];
+        rfc3339Formatter = [NSDateFormatter createRFC3339MilliFormatter];
     }
     return self;
 }

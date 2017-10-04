@@ -22,7 +22,7 @@
 
 @implementation NSDateFormatter (NSDateFormatterRFC3339)
 
-+ (instancetype)createRFC3339Formatter {
++ (instancetype)createRFC3339MilliFormatter {
     NSDateFormatter *f = [[NSDateFormatter alloc] init];
     NSLocale *enUSPOSIXLocale = [NSLocale localeWithLocaleIdentifier:@"en_US_POSIX"];
     [f setLocale:enUSPOSIXLocale];
