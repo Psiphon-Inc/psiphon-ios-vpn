@@ -125,7 +125,7 @@
             stringByAppendingPathComponent:@"rotating_notices"];
 }
 
-- (NSString *)rotatingLockNoticesBackupPath {
+- (NSString *)rotatingLogNoticesBackupPath {
     return [[self rotatingLogNoticesPath] stringByAppendingString:@".1"];
 }
 
@@ -137,7 +137,7 @@
 
     NSMutableArray<DiagnosticEntry *> *entries = [[NSMutableArray alloc] init];
 
-    NSString *backupLogLines = [self tryReadingFile:[NSURL fileURLWithPath:[self rotatingLockNoticesBackupPath]]];
+    NSString *backupLogLines = [self tryReadingFile:[NSURL fileURLWithPath:[self rotatingLogNoticesBackupPath]]];
     [self readLogsData:backupLogLines intoArray:entries];
 
     NSString *logLines = [self tryReadingFile:[NSURL fileURLWithPath:[self rotatingLogNoticesPath]]];
