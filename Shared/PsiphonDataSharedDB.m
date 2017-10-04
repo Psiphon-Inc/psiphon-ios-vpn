@@ -157,7 +157,7 @@
             NSDictionary *dict = [NSJSONSerialization JSONObjectWithData:[logLine dataUsingEncoding:NSUTF8StringEncoding]
                                                                  options:0 error:&err];
             if (err) {
-                LOG_ERROR("Error: %@", err);
+                LOG_ERROR("Failed to parse log line (%@). Error: %@", logLine, err);
             }
             
             if (dict) {
@@ -166,13 +166,13 @@
                 NSDate *timestamp = [rfc3339Formatter dateFromString:dict[@"timestamp"]];
 
                 if (!msg) {
-                    LOG_ERROR("Failed to read notice message.");
+                    LOG_ERROR("Failed to read notice message for log line (%@).", logLine);
                     // Puts place holder value for message.
                     msg = @"Failed to read notice message.";
                 }
 
                 if (!timestamp) {
-                    LOG_ERROR("Failed to parse timestamp: %@.", dict[@"timestamp"]);
+                    LOG_ERROR("Failed to parse timestamp: (%@) for log line (%@)", dict[@"timestamp"], logLine);
                     // Puts placeholder value for timestamp.
                     timestamp = [NSDate dateWithTimeIntervalSince1970:0];
                 }
