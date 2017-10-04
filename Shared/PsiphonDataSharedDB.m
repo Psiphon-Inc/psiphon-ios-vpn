@@ -154,6 +154,11 @@
 
     if (logLines) {
         for (NSString *logLine in [logLines componentsSeparatedByString:@"\n"]) {
+
+            if (!logLine || [logLine length] == 0) {
+                continue;
+            }
+
             NSDictionary *dict = [NSJSONSerialization JSONObjectWithData:[logLine dataUsingEncoding:NSUTF8StringEncoding]
                                                                  options:0 error:&err];
             if (err) {
