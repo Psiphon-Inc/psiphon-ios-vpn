@@ -54,6 +54,7 @@
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
 
+
     // Reads data from the database on a global background thread,
     // and populates psiphonData in-memory database.
     // LogViewControllers listens for new log notifications from PsiphonData.
@@ -61,19 +62,6 @@
         NSArray<DiagnosticEntry *> *logs = [sharedDB getAllLogs];
         [psiphonData addDiagnosticEntries:logs];
     });
-
-//    [notifier listenForNotification:@"NE.onDiagnosticMessage" listener:^{
-//        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-//            NSArray<DiagnosticEntry *> *logs = [sharedDB getNewLogs];
-//            [psiphonData addDiagnosticEntries:logs];
-//
-//#if DEBUG
-//            for (DiagnosticEntry *log in logs) {
-//               LOG_DEBUG(@"%@ %@", [log getTimestampForDisplay], [log message]);
-//            }
-//#endif
-//        });
-//    }];
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
