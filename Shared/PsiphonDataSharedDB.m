@@ -146,6 +146,9 @@
     return entries;
 }
 
+// readLogsData tries to parse logLines, and for each JSON formatted line creates
+// a DiagnosticEntry which is appended to entries.
+// This method doesn't throw any errors on failure, and will log errors encountered.
 - (void)readLogsData:(NSString *)logLines intoArray:(NSMutableArray<DiagnosticEntry *> *)entries {
     NSError *err;
 
@@ -161,34 +164,68 @@
                 NSString *msg = [NSString stringWithFormat:@"%@: %@", dict[@"noticeType"],
                     [self getSimpleDictionaryDescription:dict[@"data"]]];
                 NSDate *timestamp = [rfc3339Formatter dateFromString:dict[@"timestamp"]];
-                [entries addObject:[[DiagnosticEntry alloc] init:(msg ? msg : @"Failed to read notice message.") andTimestamp:timestamp ? timestamp : [NSDate dateWithTimeIntervalSince1970:0]]];
+
+                if (!msg) {
+                    LOG_ERROR("Failed to read notice message.");
+                    // Puts place holder value for message.
+                    msg = @"Failed to read notice message.";
+                }
+
+                if (!timestamp) {
+                    LOG_ERROR("Failed to parse timestamp: %@.", dict[@"timestamp"]);
+                    // Puts placeholder value for timestamp.
+                    timestamp = [NSDate dateWithTimeIntervalSince1970:0];
+                }
+
+                [entries addObject:[[DiagnosticEntry alloc] init:msg andTimestamp:timestamp]];
             }
         }
     }
 }
 
+// tryReadingFile opens file pointed to by fileUrl and tries to read its contentent.
+// Reading operation is retried 2 more times if it fails for any reason.
+// No errors are thrown if opening the file/reading operations fail.
 - (NSString *)tryReadingFile:(NSURL *)fileUrl {
     NSData *fileData;
     NSError *err;
 
-    NSFileHandle *fileHandle = [NSFileHandle fileHandleForReadingFromURL:fileUrl error:&err];
+    for (int i = 0; i < 3; ++i) {
 
-    if (err) {
-        LOG_ERROR(@"Error opening file handle for %@: Error: %@", fileUrl, err);
+        NSFileHandle *fileHandle = [NSFileHandle fileHandleForReadingFromURL:fileUrl error:&err];
+
+        if (err) {
+            LOG_ERROR(@"Error opening file handle for %@: Error: %@", fileUrl, err);
+        }
+
+        // fileHandle is nil if no file exists at the provided path.
+        if (!fileHandle) {
+            return nil;
+        }
+
+        @try {
+            // From https://developer.apple.com/documentation/foundation/nsfilehandle/1413916-readdataoflength?language=objc
+            // readDataToEndOfFile raises NSFileHandleOperationException if attempts
+            // to determine file-handle type fail or if attempts to read from the file
+            // or channel fail.
+            fileData = [fileHandle readDataToEndOfFile];
+
+            if (fileData) {
+                return [[NSString alloc] initWithData:fileData encoding:NSUTF8StringEncoding];
+            }
+        }
+        @catch (NSException *e) {
+            LOG_ERROR(@"Error reading file: %@", [e debugDescription]);
+        }
+        @finally {
+            [fileHandle closeFile];
+        }
+
+        // Put thread to sleep for 100 ms and try again.
+        [NSThread sleepForTimeInterval:0.1f];
     }
 
-    if (!fileHandle) {
-        return nil;
-    }
-
-    fileData = [fileHandle readDataToEndOfFile];
-    [fileHandle closeFile];
-
-    if (!fileData) {
-        return nil;
-    }
-
-    return [[NSString alloc] initWithData:fileData encoding:NSUTF8StringEncoding];
+    return nil;
 }
 
 
