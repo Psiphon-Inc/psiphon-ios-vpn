@@ -30,6 +30,10 @@ framework
 go-ios-build
 *.xcworkspace
 
+# Build Automation
+CipherShare
+psi_export_doc.log
+
 # Cocoapods
 Pods
 
