@@ -21,6 +21,10 @@
 #import "Logging.h"
 #import "NSDateFormatter+RFC3339.h"
 
+// File operations parameters
+#define MAX_RETRIES 3
+#define RETRY_SLEEP_TIME 0.1f  // Sleep for 100 milliseconds.
+
 /* Shared NSUserDefaults keys */
 #define EGRESS_REGIONS_KEY @"egress_regions"
 #define TUN_CONNECTED_KEY @"tun_connected"
@@ -63,28 +67,39 @@
  * @return NSArray of Homepages.
  */
 - (NSArray<Homepage *> *)getHomepages {
-    NSMutableArray<Homepage *> *homepages = [[NSMutableArray alloc] init];
-
+    NSMutableArray<Homepage *> *homepages = nil;
     NSError *err;
-    NSString *data = [NSString stringWithContentsOfFile:[self homepageNoticesPath]
-                                               encoding:NSUTF8StringEncoding
-                                                  error:&err];
 
-    if (err) {
-        LOG_ERROR(@"%@", err);
-        return nil;
-    }
+    for (int i = 0; i < MAX_RETRIES; ++i) {
+        NSString *data = [NSString stringWithContentsOfFile:[self homepageNoticesPath]
+                                                   encoding:NSUTF8StringEncoding
+                                                      error:&err];
+        if (err) {
+            LOG_ERROR(@"Failed reading homepage notices file. Error:%@", err);
 
-    NSArray *homepageNotices = [data componentsSeparatedByString:@"\n"];
-    for (NSString *line in homepageNotices) {
-        NSDictionary *dict = [NSJSONSerialization JSONObjectWithData:[line dataUsingEncoding:NSUTF8StringEncoding]
-                                                             options:0 error:&err];
+            // Sleep for 100ms before trying again.
+            [NSThread sleepForTimeInterval:RETRY_SLEEP_TIME];
+            continue;
+        }
 
-        if (dict) {
-            Homepage *h = [[Homepage alloc] init];
-            h.url = [NSURL URLWithString:dict[@"data"][@"url"]];
-            h.timestamp = [rfc3339Formatter dateFromString:dict[@"timestamp"]];
-            [homepages addObject:h];
+        // There are usually about 40 homepages
+        homepages = [NSMutableArray arrayWithCapacity:40];
+        NSArray *homepageNotices = [data componentsSeparatedByString:@"\n"];
+
+        for (NSString *line in homepageNotices) {
+            NSDictionary *dict = [NSJSONSerialization JSONObjectWithData:[line dataUsingEncoding:NSUTF8StringEncoding]
+                                                                 options:0 error:&err];
+
+            if (err) {
+                LOG_ERROR(@"Failed parsing homepage notices file. Error:%@", err);
+            }
+
+            if (dict) {
+                Homepage *h = [[Homepage alloc] init];
+                h.url = [NSURL URLWithString:dict[@"data"][@"url"]];
+                h.timestamp = [rfc3339Formatter dateFromString:dict[@"timestamp"]];
+                [homepages addObject:h];
+            }
         }
     }
 
@@ -131,16 +146,35 @@
 
 #ifndef TARGET_IS_EXTENSION
 
+
+#if DEBUG
+- (NSString *)getFileSize:(NSString *)filePath {
+    NSError *err;
+    unsigned long long byteCount = [[[NSFileManager defaultManager] attributesOfItemAtPath:filePath error:&err] fileSize];
+    if (err) {
+        NSLog(@"Error reading file size. Error: %@", err);
+        return nil;
+    }
+    return [NSByteCountFormatter stringFromByteCount:byteCount countStyle:NSByteCountFormatterCountStyleBinary];
+}
+#endif
+
 // Reads all log files and tries parses the json lines contained in each.
 // This method is not meant to handle large files.
 - (NSArray<DiagnosticEntry*>*)getAllLogs {
 
+    LOG_DEBUG(@"TEST Log filesize:%@", [self getFileSize:[self rotatingLogNoticesPath]]);
+    LOG_DEBUG(@"TEST Log backup filesize:%@", [self getFileSize:[self rotatingLogNoticesBackupPath]]);
+
     NSMutableArray<DiagnosticEntry *> *entries = [[NSMutableArray alloc] init];
 
+    // Reads both log files all at once (max of 2MB) into memory,
+    // and defers any processing after the read in order to reduce
+    // the chance of a log rotation happening midway.
     NSString *backupLogLines = [self tryReadingFile:[NSURL fileURLWithPath:[self rotatingLogNoticesBackupPath]]];
-    [self readLogsData:backupLogLines intoArray:entries];
-
     NSString *logLines = [self tryReadingFile:[NSURL fileURLWithPath:[self rotatingLogNoticesPath]]];
+
+    [self readLogsData:backupLogLines intoArray:entries];
     [self readLogsData:logLines intoArray:entries];
 
     return entries;
@@ -164,7 +198,7 @@
             if (err) {
                 LOG_ERROR("Failed to parse log line (%@). Error: %@", logLine, err);
             }
-            
+
             if (dict) {
                 NSString *msg = [NSString stringWithFormat:@"%@: %@", dict[@"noticeType"],
                     [self getSimpleDictionaryDescription:dict[@"data"]]];
@@ -195,7 +229,7 @@
     NSData *fileData;
     NSError *err;
 
-    for (int i = 0; i < 3; ++i) {
+    for (int i = 0; i < MAX_RETRIES; ++i) {
 
         NSFileHandle *fileHandle = [NSFileHandle fileHandleForReadingFromURL:fileUrl error:&err];
 
@@ -227,7 +261,7 @@
         }
 
         // Put thread to sleep for 100 ms and try again.
-        [NSThread sleepForTimeInterval:0.1f];
+        [NSThread sleepForTimeInterval:RETRY_SLEEP_TIME];
     }
 
     return nil;
