@@ -58,7 +58,7 @@ def export_ciphershare_document(ciphershare_document_path, export_file_path):
                 ciphershare_document_path,
                 export_temp_file_path)
 
-        print cmd
+        print cmd.replace(psi_ops_config.CIPHERSHARE_PASSWORD, '****')
 
         proc = subprocess.Popen(shlex.split(cmd), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         output = proc.communicate()
