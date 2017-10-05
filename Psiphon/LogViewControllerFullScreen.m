@@ -44,17 +44,18 @@
 
     // UIBar
     [self setTitle:NSLocalizedStringWithDefaultValue(@"LOGS_TITLE", nil, [NSBundle mainBundle], @"Logs", @"Log view title bar text")];
+
     UIBarButtonItem *doneButton = [[UIBarButtonItem alloc]
-      initWithTitle:NSLocalizedStringWithDefaultValue(@"DONE_ACTION", nil, [NSBundle mainBundle], @"Done", @"Done button in navigation bar")
-      style:UIBarButtonItemStyleDone target:self action:@selector(onNavigationDoneTap)];
+      initWithTitle:@"Done" style:UIBarButtonItemStyleDone target:self action:@selector(onNavigationDoneTap)];
+
+    UIBarButtonItem *reloadButton = [[UIBarButtonItem alloc]
+      initWithTitle:@"Reload" style:UIBarButtonItemStylePlain target:self action:@selector(onReloadTap)];
+
 
     [self.navigationItem setRightBarButtonItem:doneButton];
+    [self.navigationItem setLeftBarButtonItem:reloadButton];
 
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        NSArray<DiagnosticEntry*> *entries = [sharedDB getAllLogs];
-        self.diagnosticEntries = [entries subarrayWithRange:NSMakeRange([entries count] - NUM_LOGS_DISPLAY , NUM_LOGS_DISPLAY)];
-        [self onDataChanged];
-    });
+    [self loadDataAsync];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -68,8 +69,27 @@
     [notifier stopListeningForAllNotifications];
 }
 
+#pragma mark - Helper functions
+
+- (void)loadDataAsync {
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        NSArray<DiagnosticEntry*> *entries = [sharedDB getAllLogs];
+        self.diagnosticEntries = [entries subarrayWithRange:NSMakeRange([entries count] - NUM_LOGS_DISPLAY , NUM_LOGS_DISPLAY)];
+
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self onDataChanged];
+        });
+    });
+}
+
+#pragma mark - UI Callbacks
+
 - (void)onNavigationDoneTap {
     [self dismissViewControllerAnimated:YES completion:nil];
+}
+
+- (void)onReloadTap {
+    [self loadDataAsync];
 }
 
 @end
