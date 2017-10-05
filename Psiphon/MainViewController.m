@@ -966,15 +966,14 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 #pragma mark - FeedbackViewControllerDelegate methods and helpers
 
 - (NSString *)getPsiphonConfig {
-    return [PsiphonClientCommonLibraryHelpers getPsiphonConfigForFeedbackUpload];
+    return [PsiphonClientCommonLibraryHelpers getPsiphonBundledConfig];
 }
 
 - (void)userSubmittedFeedback:(NSUInteger)selectedThumbIndex comments:(NSString *)comments email:(NSString *)email uploadDiagnostics:(BOOL)uploadDiagnostics {
     // Ensure psiphon data is populated with latest logs
     // TODO: should this be a delegate method of Psiphon Data in shared library/
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        NSArray<DiagnosticEntry *> *logs = [sharedDB getAllLogs];
-        [[PsiphonData sharedInstance] addDiagnosticEntries:logs];
+        NSArray<DiagnosticEntry *> *diagnosticEntries = [sharedDB getAllLogs];
 
         __weak MainViewController *weakSelf = self;
         SendFeedbackHandler sendFeedbackHandler = ^(NSString *jsonString, NSString *pubKey, NSString *uploadServer, NSString *uploadServerHeaders){
@@ -991,7 +990,8 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                              withClientPlatform:@"ios-vpn"
                              withConnectionType:[self getConnectionType]
                                    isJailbroken:[JailbreakCheck isDeviceJailbroken]
-                            sendFeedbackHandler:sendFeedbackHandler];
+                            sendFeedbackHandler:sendFeedbackHandler
+                              diagnosticEntries:diagnosticEntries];
     });
 }
 

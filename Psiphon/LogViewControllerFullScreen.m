@@ -21,10 +21,11 @@
 #import "PsiphonDataSharedDB.h"
 #import "SharedConstants.h"
 #import "Notifier.h"
-#import "Logging.h"
+
+// Number logs to display
+#define NUM_LOGS_DISPLAY 250
 
 @implementation LogViewControllerFullScreen {
-    PsiphonData *psiphonData;
     PsiphonDataSharedDB *sharedDB;
     Notifier *notifier;
 }
@@ -32,7 +33,6 @@
 - (instancetype)init {
     self = [super init];
     if (self) {
-        psiphonData = [PsiphonData sharedInstance];
         sharedDB = [[PsiphonDataSharedDB alloc] initForAppGroupIdentifier:APP_GROUP_IDENTIFIER];
         notifier = [[Notifier alloc] initWithAppGroupIdentifier:APP_GROUP_IDENTIFIER];
     }
@@ -49,19 +49,16 @@
       style:UIBarButtonItemStyleDone target:self action:@selector(onNavigationDoneTap)];
 
     [self.navigationItem setRightBarButtonItem:doneButton];
+
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        NSArray<DiagnosticEntry*> *entries = [sharedDB getAllLogs];
+        self.diagnosticEntries = [entries subarrayWithRange:NSMakeRange([entries count] - NUM_LOGS_DISPLAY , NUM_LOGS_DISPLAY)];
+        [self onDataChanged];
+    });
 }
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
-
-
-    // Reads data from the database on a global background thread,
-    // and populates psiphonData in-memory database.
-    // LogViewControllers listens for new log notifications from PsiphonData.
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        NSArray<DiagnosticEntry *> *logs = [sharedDB getAllLogs];
-        [psiphonData addDiagnosticEntries:logs];
-    });
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
