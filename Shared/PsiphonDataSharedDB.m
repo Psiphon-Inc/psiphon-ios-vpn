@@ -20,7 +20,6 @@
 #import "PsiphonDataSharedDB.h"
 #import "Logging.h"
 #import "NSDateFormatter+RFC3339.h"
-#import <mach/mach_time.h>
 
 // File operations parameters
 #define MAX_RETRIES 3
@@ -132,6 +131,11 @@
     NSArray *homepageNotices = [data componentsSeparatedByString:@"\n"];
 
     for (NSString *line in homepageNotices) {
+
+        if (!line || [line length] == 0) {
+            continue;
+        }
+
         NSDictionary *dict = [NSJSONSerialization JSONObjectWithData:[line dataUsingEncoding:NSUTF8StringEncoding]
                                                              options:0 error:&err];
 
@@ -196,7 +200,6 @@
     NSError *err;
     unsigned long long byteCount = [[[NSFileManager defaultManager] attributesOfItemAtPath:filePath error:&err] fileSize];
     if (err) {
-        NSLog(@"Error reading file size. Error: %@", err);
         return nil;
     }
     return [NSByteCountFormatter stringFromByteCount:byteCount countStyle:NSByteCountFormatterCountStyleBinary];
@@ -206,9 +209,6 @@
 // Reads all log files and tries parses the json lines contained in each.
 // This method is not meant to handle large files.
 - (NSArray<DiagnosticEntry*>*)getAllLogs {
-
-    mach_timebase_info_data_t info;
-    uint64_t start = mach_absolute_time();
 
     LOG_DEBUG(@"TEST Log filesize:%@", [self getFileSize:[self rotatingLogNoticesPath]]);
     LOG_DEBUG(@"TEST Log backup filesize:%@", [self getFileSize:[self rotatingLogNoticesBackupPath]]);
@@ -223,13 +223,6 @@
 
     [self readLogsData:backupLogLines intoArray:entries];
     [self readLogsData:logLines intoArray:entries];
-
-    uint64_t end = mach_absolute_time();
-    uint64_t elapsed = end - start;
-
-    uint64_t nanos = elapsed * info.numer / info.denom;
-    float cost = (float)nanos / NSEC_PER_SEC;
-    LOG_DEBUG(@"TEST Time elapsed: (%f ms)\n", cost * 1000);
 
     return entries;
 }
