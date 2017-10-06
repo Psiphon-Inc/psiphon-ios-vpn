@@ -20,6 +20,7 @@
 #import "PsiphonDataSharedDB.h"
 #import "Logging.h"
 #import "NSDateFormatter+RFC3339.h"
+#import <mach/mach_time.h>
 
 // File operations parameters
 #define MAX_RETRIES 3
@@ -70,36 +71,34 @@
     NSMutableArray<Homepage *> *homepages = nil;
     NSError *err;
 
-    for (int i = 0; i < MAX_RETRIES; ++i) {
-        NSString *data = [NSString stringWithContentsOfFile:[self homepageNoticesPath]
-                                                   encoding:NSUTF8StringEncoding
-                                                      error:&err];
-        if (err) {
-            LOG_ERROR(@"Failed reading homepage notices file. Error:%@", err);
+//    NSString *data = [NSString stringWithContentsOfFile:[self homepageNoticesPath]
+//                                               encoding:NSUTF8StringEncoding
+//                                                  error:&err];
 
-            // Sleep for 100ms before trying again.
-            [NSThread sleepForTimeInterval:RETRY_SLEEP_TIME];
-            continue;
+    NSString *data = [self tryReadingFile:[NSURL fileURLWithPath:[self homepageNoticesPath]]];
+    
+    if (!data) {
+        LOG_ERROR(@"Failed reading homepage notices file. Error:%@", err);
+        return nil;
+    }
+
+    // Pre-allocation optimization
+    homepages = [NSMutableArray arrayWithCapacity:50];
+    NSArray *homepageNotices = [data componentsSeparatedByString:@"\n"];
+
+    for (NSString *line in homepageNotices) {
+        NSDictionary *dict = [NSJSONSerialization JSONObjectWithData:[line dataUsingEncoding:NSUTF8StringEncoding]
+                                                             options:0 error:&err];
+
+        if (err) {
+            LOG_ERROR(@"Failed parsing homepage notices file. Error:%@", err);
         }
 
-        // There are usually about 40 homepages
-        homepages = [NSMutableArray arrayWithCapacity:40];
-        NSArray *homepageNotices = [data componentsSeparatedByString:@"\n"];
-
-        for (NSString *line in homepageNotices) {
-            NSDictionary *dict = [NSJSONSerialization JSONObjectWithData:[line dataUsingEncoding:NSUTF8StringEncoding]
-                                                                 options:0 error:&err];
-
-            if (err) {
-                LOG_ERROR(@"Failed parsing homepage notices file. Error:%@", err);
-            }
-
-            if (dict) {
-                Homepage *h = [[Homepage alloc] init];
-                h.url = [NSURL URLWithString:dict[@"data"][@"url"]];
-                h.timestamp = [rfc3339Formatter dateFromString:dict[@"timestamp"]];
-                [homepages addObject:h];
-            }
+        if (dict) {
+            Homepage *h = [[Homepage alloc] init];
+            h.url = [NSURL URLWithString:dict[@"data"][@"url"]];
+            h.timestamp = [rfc3339Formatter dateFromString:dict[@"timestamp"]];
+            [homepages addObject:h];
         }
     }
 
@@ -163,6 +162,9 @@
 // This method is not meant to handle large files.
 - (NSArray<DiagnosticEntry*>*)getAllLogs {
 
+    mach_timebase_info_data_t info;
+    uint64_t start = mach_absolute_time();
+
     LOG_DEBUG(@"TEST Log filesize:%@", [self getFileSize:[self rotatingLogNoticesPath]]);
     LOG_DEBUG(@"TEST Log backup filesize:%@", [self getFileSize:[self rotatingLogNoticesBackupPath]]);
 
@@ -176,6 +178,13 @@
 
     [self readLogsData:backupLogLines intoArray:entries];
     [self readLogsData:logLines intoArray:entries];
+
+    uint64_t end = mach_absolute_time();
+    uint64_t elapsed = end - start;
+
+    uint64_t nanos = elapsed * info.numer / info.denom;
+    float cost = (float)nanos / NSEC_PER_SEC;
+    LOG_DEBUG(@"TEST Time elapsed: (%f ms)\n", cost * 1000);
 
     return entries;
 }
