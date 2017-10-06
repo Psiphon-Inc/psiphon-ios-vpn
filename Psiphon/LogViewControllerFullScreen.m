@@ -22,8 +22,8 @@
 #import "SharedConstants.h"
 #import "Notifier.h"
 
-// Number logs to display
-#define NUM_LOGS_DISPLAY 250
+// Maximum number logs to display.
+#define MAX_LOGS_DISPLAY 250
 
 @implementation LogViewControllerFullScreen {
     PsiphonDataSharedDB *sharedDB;
@@ -74,7 +74,12 @@
 - (void)loadDataAsync {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         NSArray<DiagnosticEntry*> *entries = [sharedDB getAllLogs];
-        self.diagnosticEntries = [entries subarrayWithRange:NSMakeRange([entries count] - NUM_LOGS_DISPLAY , NUM_LOGS_DISPLAY)];
+        
+        if ([entries count] > MAX_LOGS_DISPLAY) {
+            self.diagnosticEntries = [entries subarrayWithRange:NSMakeRange([entries count] - MAX_LOGS_DISPLAY , MAX_LOGS_DISPLAY)];
+        } else {
+            self.diagnosticEntries = entries;
+        }
 
         dispatch_async(dispatch_get_main_queue(), ^{
             [self onDataChanged];
