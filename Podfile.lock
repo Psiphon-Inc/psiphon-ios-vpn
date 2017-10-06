@@ -14,7 +14,7 @@ PODS:
     - mopub-ios-sdk/Core
     - mopub-ios-sdk/Moat
   - MPUBMoatMobileAppKit (3.2.1)
-  - PsiphonClientCommonLibrary (0.2.12):
+  - PsiphonClientCommonLibrary (0.2.13):
     - InAppSettingsKit
   - VungleSDK-iOS (5.2.0)
 
@@ -22,7 +22,7 @@ DEPENDENCIES:
   - Google-Mobile-Ads-SDK (= 7.24.0)
   - InAppSettingsKit (from `https://github.com/Psiphon-Inc/InAppSettingsKit.git`, commit `877f342`)
   - mopub-ios-sdk (= 4.16.0)
-  - PsiphonClientCommonLibrary (from `https://github.com/Psiphon-Inc/psiphon-ios-client-common-library.git`, commit `d197ef3`, branch `no-database`)
+  - PsiphonClientCommonLibrary (from `https://github.com/Psiphon-Inc/psiphon-ios-client-common-library.git`, commit `651fdd0`, branch `master`)
   - VungleSDK-iOS (= 5.2.0)
 
 EXTERNAL SOURCES:
@@ -30,8 +30,8 @@ EXTERNAL SOURCES:
     :commit: 877f342
     :git: https://github.com/Psiphon-Inc/InAppSettingsKit.git
   PsiphonClientCommonLibrary:
-    :branch: no-database
-    :commit: d197ef3
+    :branch: master
+    :commit: 651fdd0
     :git: https://github.com/Psiphon-Inc/psiphon-ios-client-common-library.git
 
 CHECKOUT OPTIONS:
@@ -39,7 +39,7 @@ CHECKOUT OPTIONS:
     :commit: 877f342
     :git: https://github.com/Psiphon-Inc/InAppSettingsKit.git
   PsiphonClientCommonLibrary:
-    :commit: d197ef3b49f568bf77d3ce3749327927a99b37b1
+    :commit: 651fdd043659f0c8a608de5fd18ba243fa07f235
     :git: https://github.com/Psiphon-Inc/psiphon-ios-client-common-library.git
 
 SPEC CHECKSUMS:
@@ -47,9 +47,9 @@ SPEC CHECKSUMS:
   InAppSettingsKit: e81b468f9944bec83b1389a1e201600cc34ae922
   mopub-ios-sdk: d656c7b5ccecc309115ac1ea280de76c72a301f7
   MPUBMoatMobileAppKit: f93733fbb17a5387228f4e29f1cd07c934d63cab
-  PsiphonClientCommonLibrary: a29cab30271cc7221fa6ed3cf1f1b8c6a409b642
+  PsiphonClientCommonLibrary: c08d380e376c411ea132be2ab65065bf3ebed3bb
   VungleSDK-iOS: ad8fdb94efa34e026f25528ff9592af05c665095
 
-PODFILE CHECKSUM: c5c5b2c0530c0df4b9545607f39aa55863465129
+PODFILE CHECKSUM: 9ebd66ee4acc2460a481ca2d3ffdf52c2c25cadb
 
 COCOAPODS: 1.3.1

@@ -8,7 +8,7 @@ target 'Psiphon' do
   # Pods for Psiphon
   pod "InAppSettingsKit", :git => "https://github.com/Psiphon-Inc/InAppSettingsKit.git", :commit => '877f342'
   #pod "InAppSettingsKit", :path => "../InAppSettingsKit"
-  pod 'PsiphonClientCommonLibrary', :git => "https://github.com/Psiphon-Inc/psiphon-ios-client-common-library.git", :branch => 'no-database', :commit => 'd197ef3'
+  pod 'PsiphonClientCommonLibrary', :git => "https://github.com/Psiphon-Inc/psiphon-ios-client-common-library.git", :branch => 'master', :commit => '651fdd0'
   #pod 'PsiphonClientCommonLibrary', :path => "../psiphon-ios-client-common-library/"
 
   pod 'mopub-ios-sdk', '4.16.0'
