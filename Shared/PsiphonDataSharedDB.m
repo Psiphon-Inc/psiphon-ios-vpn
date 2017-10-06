@@ -61,6 +61,51 @@
     return self;
 }
 
+// tryReadingFile opens file pointed to by fileUrl and tries to read its contentent.
+// Reading operation is retried 2 more times if it fails for any reason.
+// No errors are thrown if opening the file/reading operations fail.
++ (NSString *)tryReadingFile:(NSURL *)fileUrl {
+    NSData *fileData;
+    NSError *err;
+
+    for (int i = 0; i < MAX_RETRIES; ++i) {
+
+        NSFileHandle *fileHandle = [NSFileHandle fileHandleForReadingFromURL:fileUrl error:&err];
+
+        if (err) {
+            LOG_ERROR(@"Error opening file handle for %@: Error: %@", fileUrl, err);
+        }
+
+        // fileHandle is nil if no file exists at the provided path.
+        if (!fileHandle) {
+            return nil;
+        }
+
+        @try {
+            // From https://developer.apple.com/documentation/foundation/nsfilehandle/1413916-readdataoflength?language=objc
+            // readDataToEndOfFile raises NSFileHandleOperationException if attempts
+            // to determine file-handle type fail or if attempts to read from the file
+            // or channel fail.
+            fileData = [fileHandle readDataToEndOfFile];
+
+            if (fileData) {
+                return [[NSString alloc] initWithData:fileData encoding:NSUTF8StringEncoding];
+            }
+        }
+        @catch (NSException *e) {
+            LOG_ERROR(@"Error reading file: %@", [e debugDescription]);
+        }
+        @finally {
+            [fileHandle closeFile];
+        }
+
+        // Put thread to sleep for 100 ms and try again.
+        [NSThread sleepForTimeInterval:RETRY_SLEEP_TIME];
+    }
+
+    return nil;
+}
+
 #pragma mark - Homepage methods
 
 /*!
@@ -75,8 +120,8 @@
 //                                               encoding:NSUTF8StringEncoding
 //                                                  error:&err];
 
-    NSString *data = [self tryReadingFile:[NSURL fileURLWithPath:[self homepageNoticesPath]]];
-    
+    NSString *data = [PsiphonDataSharedDB tryReadingFile:[NSURL fileURLWithPath:[self homepageNoticesPath]]];
+
     if (!data) {
         LOG_ERROR(@"Failed reading homepage notices file. Error:%@", err);
         return nil;
@@ -173,8 +218,8 @@
     // Reads both log files all at once (max of 2MB) into memory,
     // and defers any processing after the read in order to reduce
     // the chance of a log rotation happening midway.
-    NSString *backupLogLines = [self tryReadingFile:[NSURL fileURLWithPath:[self rotatingLogNoticesBackupPath]]];
-    NSString *logLines = [self tryReadingFile:[NSURL fileURLWithPath:[self rotatingLogNoticesPath]]];
+    NSString *backupLogLines = [PsiphonDataSharedDB tryReadingFile:[NSURL fileURLWithPath:[self rotatingLogNoticesBackupPath]]];
+    NSString *logLines = [PsiphonDataSharedDB tryReadingFile:[NSURL fileURLWithPath:[self rotatingLogNoticesPath]]];
 
     [self readLogsData:backupLogLines intoArray:entries];
     [self readLogsData:logLines intoArray:entries];
@@ -229,51 +274,6 @@
             }
         }
     }
-}
-
-// tryReadingFile opens file pointed to by fileUrl and tries to read its contentent.
-// Reading operation is retried 2 more times if it fails for any reason.
-// No errors are thrown if opening the file/reading operations fail.
-- (NSString *)tryReadingFile:(NSURL *)fileUrl {
-    NSData *fileData;
-    NSError *err;
-
-    for (int i = 0; i < MAX_RETRIES; ++i) {
-
-        NSFileHandle *fileHandle = [NSFileHandle fileHandleForReadingFromURL:fileUrl error:&err];
-
-        if (err) {
-            LOG_ERROR(@"Error opening file handle for %@: Error: %@", fileUrl, err);
-        }
-
-        // fileHandle is nil if no file exists at the provided path.
-        if (!fileHandle) {
-            return nil;
-        }
-
-        @try {
-            // From https://developer.apple.com/documentation/foundation/nsfilehandle/1413916-readdataoflength?language=objc
-            // readDataToEndOfFile raises NSFileHandleOperationException if attempts
-            // to determine file-handle type fail or if attempts to read from the file
-            // or channel fail.
-            fileData = [fileHandle readDataToEndOfFile];
-
-            if (fileData) {
-                return [[NSString alloc] initWithData:fileData encoding:NSUTF8StringEncoding];
-            }
-        }
-        @catch (NSException *e) {
-            LOG_ERROR(@"Error reading file: %@", [e debugDescription]);
-        }
-        @finally {
-            [fileHandle closeFile];
-        }
-
-        // Put thread to sleep for 100 ms and try again.
-        [NSThread sleepForTimeInterval:RETRY_SLEEP_TIME];
-    }
-
-    return nil;
 }
 
 
