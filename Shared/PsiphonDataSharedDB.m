@@ -60,19 +60,31 @@
     return self;
 }
 
-// tryReadingFile opens file pointed to by fileUrl and tries to read its contentent.
+#pragma mark - File operations
+
+#ifndef TARGET_IS_EXTENSION
+
++ (NSString *)tryReadingFile:(NSString *)filePath {
+    return [PsiphonDataSharedDB tryReadingFile:filePath
+                                    fromOffset:0
+                                  offsetInFile:nil];
+}
+
+// tryReadingFile opens file pointed to by fileUrl and tries to read its content.
 // Reading operation is retried 2 more times if it fails for any reason.
 // No errors are thrown if opening the file/reading operations fail.
-+ (NSString *)tryReadingFile:(NSURL *)fileUrl {
++ (NSString *)tryReadingFile:(NSString *)filePath fromOffset:(unsigned long long)bytesOffset offsetInFile:(unsigned long long *)offsetInFile {
     NSData *fileData;
     NSError *err;
 
     for (int i = 0; i < MAX_RETRIES; ++i) {
 
-        NSFileHandle *fileHandle = [NSFileHandle fileHandleForReadingFromURL:fileUrl error:&err];
+        NSFileHandle *fileHandle = [NSFileHandle
+          fileHandleForReadingFromURL:[NSURL fileURLWithPath:filePath]
+                                error:&err];
 
         if (err) {
-            LOG_ERROR(@"Error opening file handle for %@: Error: %@", fileUrl, err);
+            LOG_ERROR(@"Error opening file handle for %@: Error: %@", filePath, err);
         }
 
         // fileHandle is nil if no file exists at the provided path.
@@ -85,10 +97,16 @@
             // readDataToEndOfFile raises NSFileHandleOperationException if attempts
             // to determine file-handle type fail or if attempts to read from the file
             // or channel fail.
+            [fileHandle seekToFileOffset:bytesOffset];
             fileData = [fileHandle readDataToEndOfFile];
 
             if (fileData) {
+                if (offsetInFile) {
+                    (* offsetInFile) = [fileHandle offsetInFile];
+                }
                 return [[NSString alloc] initWithData:fileData encoding:NSUTF8StringEncoding];
+            } else {
+                (* offsetInFile) = (unsigned long long) 0;
             }
         }
         @catch (NSException *e) {
@@ -105,8 +123,94 @@
     return nil;
 }
 
+// readLogsData tries to parse logLines, and for each JSON formatted line creates
+// a DiagnosticEntry which is appended to entries.
+// This method doesn't throw any errors on failure, and will log errors encountered.
+- (void)readLogsData:(NSString *)logLines intoArray:(NSMutableArray<DiagnosticEntry *> *)entries {
+    NSError *err;
+
+    if (logLines) {
+        for (NSString *logLine in [logLines componentsSeparatedByString:@"\n"]) {
+
+            if (!logLine || [logLine length] == 0) {
+                continue;
+            }
+
+            NSDictionary *dict = [NSJSONSerialization JSONObjectWithData:[logLine dataUsingEncoding:NSUTF8StringEncoding]
+                                                                 options:0 error:&err];
+            if (err) {
+                LOG_ERROR("Failed to parse log line (%@). Error: %@", logLine, err);
+            }
+
+            if (dict) {
+                NSString *msg = [NSString stringWithFormat:@"%@: %@", dict[@"noticeType"],
+                                                           [PsiphonDataSharedDB getSimpleDictionaryDescription:dict[@"data"]]];
+                NSDate *timestamp = [rfc3339Formatter dateFromString:dict[@"timestamp"]];
+
+                if (!msg) {
+                    LOG_ERROR("Failed to read notice message for log line (%@).", logLine);
+                    // Puts place holder value for message.
+                    msg = @"Failed to read notice message.";
+                }
+
+                if (!timestamp) {
+                    LOG_ERROR("Failed to parse timestamp: (%@) for log line (%@)", dict[@"timestamp"], logLine);
+                    // Puts placeholder value for timestamp.
+                    timestamp = [NSDate dateWithTimeIntervalSince1970:0];
+                }
+
+                [entries addObject:[[DiagnosticEntry alloc] init:msg andTimestamp:timestamp]];
+            }
+        }
+    }
+}
+
+// This class returns a simple string representation of the dictionary dict.
+// Unlike description method of NSDictionary, the string returned by this
+// function doesn't include new-line character or semicolon.
++ (NSString *)getSimpleDictionaryDescription:(NSDictionary *)dict {
+    if (![dict isKindOfClass:[NSDictionary class]]) {
+        return [dict description];
+    }
+
+    NSMutableString *desc = [NSMutableString string];
+    [desc appendString:@"{"];
+    NSArray *allKeys = [dict allKeys];
+    for (NSUInteger i = 0; i < [allKeys count] ; ++i) {
+        id object = dict[allKeys[i]];
+        NSString *key = [allKeys[i] description];
+        NSString *value;
+        if ([object isKindOfClass:[NSDictionary class]]) {
+            value = [self getSimpleDictionaryDescription:object];
+        } else {
+            value = [object description];
+        }
+        [desc appendString:[NSString stringWithFormat:@"%@:%@", key, value]];
+        if (i < [allKeys count] - 1) {
+            [desc appendString:@","];
+        }
+    }
+    [desc appendString:@"}"];
+
+    return desc;
+}
+
+#if DEBUG
+- (NSString *)getFileSize:(NSString *)filePath {
+    NSError *err;
+    unsigned long long byteCount = [[[NSFileManager defaultManager] attributesOfItemAtPath:filePath error:&err] fileSize];
+    if (err) {
+        return nil;
+    }
+    return [NSByteCountFormatter stringFromByteCount:byteCount countStyle:NSByteCountFormatterCountStyleBinary];
+}
+#endif
+
+#endif
+
 #pragma mark - Homepage methods
 
+#ifndef TARGET_IS_EXTENSION
 /*!
  * Reads shared homepages file.
  * @return NSArray of Homepages.
@@ -115,11 +219,7 @@
     NSMutableArray<Homepage *> *homepages = nil;
     NSError *err;
 
-//    NSString *data = [NSString stringWithContentsOfFile:[self homepageNoticesPath]
-//                                               encoding:NSUTF8StringEncoding
-//                                                  error:&err];
-
-    NSString *data = [PsiphonDataSharedDB tryReadingFile:[NSURL fileURLWithPath:[self homepageNoticesPath]]];
+    NSString *data = [PsiphonDataSharedDB tryReadingFile:[self homepageNoticesPath]];
 
     if (!data) {
         LOG_ERROR(@"Failed reading homepage notices file. Error:%@", err);
@@ -153,6 +253,7 @@
 
     return homepages;
 }
+#endif
 
 - (NSString *)homepageNoticesPath {
     return [[[[NSFileManager defaultManager]
@@ -194,18 +295,6 @@
 
 #ifndef TARGET_IS_EXTENSION
 
-
-#if DEBUG
-- (NSString *)getFileSize:(NSString *)filePath {
-    NSError *err;
-    unsigned long long byteCount = [[[NSFileManager defaultManager] attributesOfItemAtPath:filePath error:&err] fileSize];
-    if (err) {
-        return nil;
-    }
-    return [NSByteCountFormatter stringFromByteCount:byteCount countStyle:NSByteCountFormatterCountStyleBinary];
-}
-#endif
-
 // Reads all log files and tries parses the json lines contained in each.
 // This method is not meant to handle large files.
 - (NSArray<DiagnosticEntry*>*)getAllLogs {
@@ -218,86 +307,13 @@
     // Reads both log files all at once (max of 2MB) into memory,
     // and defers any processing after the read in order to reduce
     // the chance of a log rotation happening midway.
-    NSString *backupLogLines = [PsiphonDataSharedDB tryReadingFile:[NSURL fileURLWithPath:[self rotatingLogNoticesBackupPath]]];
-    NSString *logLines = [PsiphonDataSharedDB tryReadingFile:[NSURL fileURLWithPath:[self rotatingLogNoticesPath]]];
+    NSString *backupLogLines = [PsiphonDataSharedDB tryReadingFile:[self rotatingLogNoticesBackupPath]];
+    NSString *logLines = [PsiphonDataSharedDB tryReadingFile:[self rotatingLogNoticesPath]];
 
     [self readLogsData:backupLogLines intoArray:entries];
     [self readLogsData:logLines intoArray:entries];
 
     return entries;
-}
-
-// readLogsData tries to parse logLines, and for each JSON formatted line creates
-// a DiagnosticEntry which is appended to entries.
-// This method doesn't throw any errors on failure, and will log errors encountered.
-- (void)readLogsData:(NSString *)logLines intoArray:(NSMutableArray<DiagnosticEntry *> *)entries {
-    NSError *err;
-
-    if (logLines) {
-        for (NSString *logLine in [logLines componentsSeparatedByString:@"\n"]) {
-
-            if (!logLine || [logLine length] == 0) {
-                continue;
-            }
-
-            NSDictionary *dict = [NSJSONSerialization JSONObjectWithData:[logLine dataUsingEncoding:NSUTF8StringEncoding]
-                                                                 options:0 error:&err];
-            if (err) {
-                LOG_ERROR("Failed to parse log line (%@). Error: %@", logLine, err);
-            }
-
-            if (dict) {
-                NSString *msg = [NSString stringWithFormat:@"%@: %@", dict[@"noticeType"],
-                    [self getSimpleDictionaryDescription:dict[@"data"]]];
-                NSDate *timestamp = [rfc3339Formatter dateFromString:dict[@"timestamp"]];
-
-                if (!msg) {
-                    LOG_ERROR("Failed to read notice message for log line (%@).", logLine);
-                    // Puts place holder value for message.
-                    msg = @"Failed to read notice message.";
-                }
-
-                if (!timestamp) {
-                    LOG_ERROR("Failed to parse timestamp: (%@) for log line (%@)", dict[@"timestamp"], logLine);
-                    // Puts placeholder value for timestamp.
-                    timestamp = [NSDate dateWithTimeIntervalSince1970:0];
-                }
-
-                [entries addObject:[[DiagnosticEntry alloc] init:msg andTimestamp:timestamp]];
-            }
-        }
-    }
-}
-
-
-// This class returns a simple string representation of the dictionary dict.
-// Unlike description method of NSDictionary, the string returned by this
-// function doesn't include new-line character or semicolon.
-- (NSString *)getSimpleDictionaryDescription:(NSDictionary *)dict {
-    if (![dict isKindOfClass:[NSDictionary class]]) {
-        return [dict description];
-    }
-    
-    NSMutableString *desc = [NSMutableString string];
-    [desc appendString:@"{"];
-    NSArray *allKeys = [dict allKeys];
-    for (NSUInteger i = 0; i < [allKeys count] ; ++i) {
-        id object = dict[allKeys[i]];
-        NSString *key = [allKeys[i] description];
-        NSString *value;
-        if ([object isKindOfClass:[NSDictionary class]]) {
-            value = [self getSimpleDictionaryDescription:object];
-        } else {
-            value = [object description];
-        }
-        [desc appendString:[NSString stringWithFormat:@"%@:%@", key, value]];
-        if (i < [allKeys count] - 1) {
-            [desc appendString:@","];
-        }
-    }
-    [desc appendString:@"}"];
-
-    return desc;
 }
 
 #endif
