@@ -22,23 +22,24 @@
 #import "SharedConstants.h"
 #import "Logging.h"
 
-// Maximum number logs to display.
-#define MAX_LOGS_DISPLAY 250
+// Initial maximum number of logs to load.
+#define MAX_LOGS_LOAD 250
 
 /*
  * Limitations:
  *      - Only the main rotating_notices log file is read and monitored for changes.
  *      - File change monitoring fails if file the log file has not been created yet.
- *
+ *      - Log file truncation is not handled.
  */
 @implementation LogViewControllerFullScreen {
+
+    UIActivityIndicatorView *activityIndicator;
+
     PsiphonDataSharedDB *sharedDB;
 
+    NSFileHandle *logFileHandle;
     unsigned long long bytesReadFileOffset;
-
-    // TODO: need to truncate entries if it becomes too large.
     NSMutableArray<DiagnosticEntry *> *entries;
-
     dispatch_queue_t workQueue;
 }
 
@@ -46,6 +47,14 @@
     self = [super init];
     if (self) {
         sharedDB = [[PsiphonDataSharedDB alloc] initForAppGroupIdentifier:APP_GROUP_IDENTIFIER];
+
+        NSError *err;
+
+        // NSFileHandle opened with fileHandleForReadingFromURL ows its associated
+        // file descriptor, and will close it automatically when deallocated.
+        logFileHandle = [NSFileHandle
+          fileHandleForReadingFromURL:[NSURL fileURLWithPath:[sharedDB rotatingLogNoticesPath]]
+                                error:&err];
 
         bytesReadFileOffset = (unsigned long long) 0;
         entries = [[NSMutableArray alloc] init];
@@ -59,8 +68,17 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
 
+    // Activity Indicator
+    activityIndicator = [[UIActivityIndicatorView alloc]
+      initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhiteLarge];
+    [activityIndicator setHidesWhenStopped:TRUE];
+    activityIndicator.color = [UIColor blueColor];
+    activityIndicator.center = self.view.center;
+
+    [self.view addSubview:activityIndicator];
+
     // UIBar
-    [self setTitle:NSLocalizedStringWithDefaultValue(@"LOGS_TITLE", nil, [NSBundle mainBundle], @"Logs", @"Log view title bar text")];
+    [self setTitle:@"Logs"];
 
     UIBarButtonItem *doneButton = [[UIBarButtonItem alloc]
       initWithTitle:@"Done" style:UIBarButtonItemStyleDone target:self action:@selector(onNavigationDoneTap)];
@@ -68,11 +86,10 @@
     UIBarButtonItem *reloadButton = [[UIBarButtonItem alloc]
       initWithTitle:@"Reload" style:UIBarButtonItemStylePlain target:self action:@selector(onReloadTap)];
 
-
     [self.navigationItem setRightBarButtonItem:doneButton];
     [self.navigationItem setLeftBarButtonItem:reloadButton];
 
-    [self loadDataAsync];
+    [self loadDataAsync:TRUE];
 
     // Setup listeners for logs file.
     [self setupLogFileListener];
@@ -89,19 +106,26 @@
 }
 
 - (void)onReloadTap {
-    [self loadDataAsync];
+    [self loadDataAsync:TRUE];
 }
 
 #pragma mark - Helper functions
 
-- (void)loadDataAsync {
+- (void)loadDataAsync:(BOOL)showSpinner {
+
+    // Caller should show spinner only when user performs an action.
+    if (showSpinner) {
+        [activityIndicator startAnimating];
+    }
+
     dispatch_async(workQueue, ^{
 
         unsigned long long newBytesReadFileOffset;
 
         NSString *logData = [PsiphonDataSharedDB tryReadingFile:[sharedDB rotatingLogNoticesPath]
-                                                     fromOffset:bytesReadFileOffset
-                                                   offsetInFile:(&newBytesReadFileOffset)];
+                                                usingFileHanlde:&logFileHandle
+                                                 readFromOffset:bytesReadFileOffset
+                                                   readToOffset:&newBytesReadFileOffset];
 
         LOG_DEBUG(@"TEST old file offset %llu", bytesReadFileOffset);
         LOG_DEBUG(@"TEST new file offset %llu", newBytesReadFileOffset);
@@ -111,19 +135,43 @@
 
             bytesReadFileOffset = newBytesReadFileOffset;
 
+            // Current number of rows in the table.
+            NSUInteger currentNumRows = [self.diagnosticEntries count];
+
+            BOOL truncateFirstRead = (currentNumRows == 0);
+
             [sharedDB readLogsData:logData intoArray:entries];
 
-            if ([entries count] > MAX_LOGS_DISPLAY) {
-                self.diagnosticEntries = [entries
-                  subarrayWithRange:NSMakeRange([entries count] - MAX_LOGS_DISPLAY, MAX_LOGS_DISPLAY)];
-            } else {
-                self.diagnosticEntries = entries;
+            // On the first load, truncate array entries to MAX_LOGS_LOAD
+            if (truncateFirstRead) {
+                entries = [[NSMutableArray alloc] initWithArray:
+                  [entries subarrayWithRange:NSMakeRange([entries count] - MAX_LOGS_LOAD, MAX_LOGS_LOAD)]];
             }
 
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [self onDataChanged];
+            // Calculate IndexPaths
+            NSUInteger numRowsToAdd = [entries count] - currentNumRows;
+
+            NSMutableArray *indexPaths = [[NSMutableArray alloc] initWithCapacity:numRowsToAdd];
+            for (int i = 0; i < numRowsToAdd; ++i) {
+                [indexPaths addObject:[NSIndexPath indexPathForRow:(i+currentNumRows) inSection:0]];
+            }
+
+            self.diagnosticEntries = entries;
+
+            // Block until the table is updated.
+            dispatch_sync(dispatch_get_main_queue(), ^{
+
+                [self.tableView beginUpdates];
+                [self.tableView insertRowsAtIndexPaths:indexPaths withRowAnimation:UITableViewRowAnimationNone];
+                [self.tableView endUpdates];
+                [self scrollToBottom];
+
+                if (showSpinner) {
+                    [activityIndicator stopAnimating];
+                }
             });
         }
+
     });
 }
 
@@ -139,23 +187,22 @@
 
     __block dispatch_source_t dispatchSource;
 
-//    dispatch_queue_t globalQueue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
-
     dispatchSource = dispatch_source_create(DISPATCH_SOURCE_TYPE_VNODE, (uintptr_t) fd,
       mask, workQueue);
 
     dispatch_source_set_event_handler(dispatchSource, ^{
         unsigned long flag = dispatch_source_get_data(dispatchSource);
 
+        // TODO: what flag is sent when file is truncated.
         if (flag & DISPATCH_VNODE_WRITE) {
             LOG_DEBUG(@"TEST Dispatch_vnode_write");
-            [self loadDataAsync];
+            [self loadDataAsync:FALSE];
         } else if (flag & DISPATCH_VNODE_EXTEND){
             LOG_DEBUG(@"TEST Dispatch_vnode_extend");
         } else if (flag & DISPATCH_VNODE_DELETE) {
             LOG_DEBUG(@"TEST Dispatch_vnode_delete");
             bytesReadFileOffset = 0;
-//            dispatch_source_cancel(dispatchSource);
+            dispatch_source_cancel(dispatchSource);
         }
     });
 

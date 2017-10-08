@@ -65,31 +65,42 @@
 #ifndef TARGET_IS_EXTENSION
 
 + (NSString *)tryReadingFile:(NSString *)filePath {
+    NSFileHandle *fileHandle;
+    // NSFileHandle will close automatically when deallocated.
     return [PsiphonDataSharedDB tryReadingFile:filePath
-                                    fromOffset:0
-                                  offsetInFile:nil];
+                               usingFileHanlde:&fileHandle
+                                readFromOffset:0
+                                  readToOffset:nil];
 }
 
-// tryReadingFile opens file pointed to by fileUrl and tries to read its content.
-// Reading operation is retried 2 more times if it fails for any reason.
+// tryReadingFile will open a new NSFileHandle for reading filePath and sets fileHandlePtr
+// to point to it, if fileHandlePtr points to nil. Otherwise provided NSFileHandle pointed
+// to by fileHandlePtr is used.
+// Reading operation is retried MAX_RETRIES more times if it fails for any reason,
+// while putting the thread to sleep for an amount of time defined by RETRY_SLEEP_TIME.
 // No errors are thrown if opening the file/reading operations fail.
-+ (NSString *)tryReadingFile:(NSString *)filePath fromOffset:(unsigned long long)bytesOffset offsetInFile:(unsigned long long *)offsetInFile {
++ (NSString *)tryReadingFile:(NSString * _Nonnull)filePath
+             usingFileHanlde:(NSFileHandle * __strong *  _Nonnull)fileHandlePtr
+              readFromOffset:(unsigned long long)bytesOffset
+                readToOffset:(unsigned long long *)readToOffset {
+
     NSData *fileData;
     NSError *err;
 
     for (int i = 0; i < MAX_RETRIES; ++i) {
 
-        NSFileHandle *fileHandle = [NSFileHandle
-          fileHandleForReadingFromURL:[NSURL fileURLWithPath:filePath]
-                                error:&err];
+        if (!(*fileHandlePtr)) {
+            // NOTE: NSFileHandle created with fileHandleForReadingFromURL
+            //       the handle owns its associated file descriptor, and will
+            //       close it automatically when deallocated.
+            (*fileHandlePtr) = [NSFileHandle fileHandleForReadingFromURL:[NSURL fileURLWithPath:filePath]
+                                                                error:&err];
+            if (err) {
+                LOG_ERROR(@"Error opening file handle for %@: Error: %@", filePath, err);
 
-        if (err) {
-            LOG_ERROR(@"Error opening file handle for %@: Error: %@", filePath, err);
-        }
-
-        // fileHandle is nil if no file exists at the provided path.
-        if (!fileHandle) {
-            return nil;
+                // If the file doesn't exist yet, try again.
+                continue;
+            }
         }
 
         @try {
@@ -97,23 +108,20 @@
             // readDataToEndOfFile raises NSFileHandleOperationException if attempts
             // to determine file-handle type fail or if attempts to read from the file
             // or channel fail.
-            [fileHandle seekToFileOffset:bytesOffset];
-            fileData = [fileHandle readDataToEndOfFile];
+            [(*fileHandlePtr) seekToFileOffset:bytesOffset];
+            fileData = [(*fileHandlePtr) readDataToEndOfFile];
 
             if (fileData) {
-                if (offsetInFile) {
-                    (* offsetInFile) = [fileHandle offsetInFile];
+                if (readToOffset) {
+                    (* readToOffset) = [(*fileHandlePtr) offsetInFile];
                 }
                 return [[NSString alloc] initWithData:fileData encoding:NSUTF8StringEncoding];
             } else {
-                (* offsetInFile) = (unsigned long long) 0;
+                (* readToOffset) = (unsigned long long) 0;
             }
         }
         @catch (NSException *e) {
             LOG_ERROR(@"Error reading file: %@", [e debugDescription]);
-        }
-        @finally {
-            [fileHandle closeFile];
         }
 
         // Put thread to sleep for 100 ms and try again.
