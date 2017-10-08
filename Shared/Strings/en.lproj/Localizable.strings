@@ -20,9 +20,6 @@
 /* Text displayed while app loads */
 "LOADING" = "Loading...";
 
-/* Log view title bar text */
-"LOGS_TITLE" = "Logs";
-
 /* Shown when the device is not configured for sending email. (InAppSettingsKit) */
 "MAIL_NOT_CONFIGURED" = "Mail not configured";
 
