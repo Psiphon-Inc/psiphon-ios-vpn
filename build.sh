@@ -83,7 +83,7 @@ increment_build_numbers_for_testflight () {
 }
 
 increment_plists_and_commit () {
-    git checkout master
+    git pull
     container_commit_message=$(python "${PSIPHON_IOS_VPN_XCODE_WORKSPACE}/increment_plist.py" --plist "${PSIPHON_IOS_VPN_XCODE_WORKSPACE}/Psiphon/Info.plist" --distribution_platform $1 --version_string)
     if [[ $? != 0 ]]; then
         echo "Incrementing container plist failed, aborting..."
