@@ -73,12 +73,20 @@
                                   readToOffset:nil];
 }
 
-// tryReadingFile will open a new NSFileHandle for reading filePath and sets fileHandlePtr
-// to point to it, if fileHandlePtr points to nil. Otherwise provided NSFileHandle pointed
-// to by fileHandlePtr is used.
-// Reading operation is retried MAX_RETRIES more times if it fails for any reason,
-// while putting the thread to sleep for an amount of time defined by RETRY_SLEEP_TIME.
-// No errors are thrown if opening the file/reading operations fail.
+
+/*!
+ * If fileHandlePtr points to nil, then a new NSFileHandle for
+ * reading filePath is created and fileHandlePtr is set to point to the new object.
+ * If fileHandlePtr points to a NSFileHandle, it will be used for reading.
+ * Reading operation is retried MAX_RETRIES more times if it fails for any reason,
+ * while putting the thread to sleep for an amount of time defined by RETRY_SLEEP_TIME.
+ * No errors are thrown if opening the file/reading operations fail.
+ * @param filePath Path used to create a NSFileHandle if fileHandlePtr points to nil.
+ * @param fileHandlePtr Pointer to existing NSFileHandle or nil.
+ * @param bytesOffset The byte offset to seek to before reading.
+ * @param readToOffset Populated with the file offset that was read to.
+ * @return UTF8 string of read file content.
+ */
 + (NSString *)tryReadingFile:(NSString * _Nonnull)filePath
              usingFileHanlde:(NSFileHandle * __strong *  _Nonnull)fileHandlePtr
               readFromOffset:(unsigned long long)bytesOffset
@@ -97,6 +105,10 @@
                                                                 error:&err];
             if (err) {
                 LOG_ERROR(@"Error opening file handle for %@: Error: %@", filePath, err);
+
+                // Reset the fileHandlePtr in order to create a new NSFileHandle
+                // on the next retry.
+                (*fileHandlePtr) = nil;
 
                 // If the file doesn't exist yet, try again.
                 continue;
