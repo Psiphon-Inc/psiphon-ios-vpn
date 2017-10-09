@@ -112,10 +112,10 @@
 
 #pragma mark - Helper functions
 
-- (void)loadDataAsync:(BOOL)showSpinner {
+- (void)loadDataAsync:(BOOL)userAction {
 
     // Caller should show spinner only when user performs an action.
-    if (showSpinner) {
+    if (userAction) {
         [activityIndicator startAnimating];
     }
 
@@ -139,12 +139,12 @@
             // Current number of rows in the table.
             NSUInteger currentNumRows = [self.diagnosticEntries count];
 
-            BOOL truncateFirstRead = (currentNumRows == 0);
+            BOOL isFirstLogRead = (currentNumRows == 0);
 
             [sharedDB readLogsData:logData intoArray:entries];
 
             // On the first load, truncate array entries to MAX_LOGS_LOAD
-            if (truncateFirstRead && ([entries count] > MAX_LOGS_LOAD)) {
+            if (isFirstLogRead && ([entries count] > MAX_LOGS_LOAD)) {
                 entries = [[NSMutableArray alloc] initWithArray:
                   [entries subarrayWithRange:NSMakeRange([entries count] - MAX_LOGS_LOAD, MAX_LOGS_LOAD)]];
             }
@@ -159,14 +159,22 @@
 
             // Block until the table is updated.
             dispatch_sync(dispatch_get_main_queue(), ^{
+                // Checks if last row was visible before the update.
+                BOOL lastRowWasVisible = isFirstLogRead || [self.tableView.indexPathsForVisibleRows containsObject:
+                  [NSIndexPath indexPathForRow:(currentNumRows - 1) inSection:0]];
 
                 [self.tableView beginUpdates];
                 self.diagnosticEntries = [entries copy];
                 [self.tableView insertRowsAtIndexPaths:indexPaths withRowAnimation:UITableViewRowAnimationNone];
                 [self.tableView endUpdates];
-                [self scrollToBottom];
 
-                if (showSpinner) {
+                // Only scroll to bottom if last row before the update
+                // was visible on the screen.
+                if (lastRowWasVisible || userAction) {
+                    [self scrollToBottom];
+                }
+
+                if (userAction) {
                     [activityIndicator stopAnimating];
                 }
             });
