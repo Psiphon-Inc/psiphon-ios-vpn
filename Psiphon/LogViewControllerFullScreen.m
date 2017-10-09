@@ -27,7 +27,8 @@
 
 /*
  * Limitations:
- *      - Only the main rotating_notices log file is read and monitored for changes.
+ *      - Only the main rotating_notices log file and not the backup
+ *        is read and monitored for changes.
  *      - File change monitoring fails if file the log file has not been created yet.
  *      - Log file truncation is not handled.
  */
@@ -143,7 +144,7 @@
             [sharedDB readLogsData:logData intoArray:entries];
 
             // On the first load, truncate array entries to MAX_LOGS_LOAD
-            if (truncateFirstRead) {
+            if (truncateFirstRead && ([entries count] > MAX_LOGS_LOAD)) {
                 entries = [[NSMutableArray alloc] initWithArray:
                   [entries subarrayWithRange:NSMakeRange([entries count] - MAX_LOGS_LOAD, MAX_LOGS_LOAD)]];
             }
@@ -156,12 +157,11 @@
                 [indexPaths addObject:[NSIndexPath indexPathForRow:(i+currentNumRows) inSection:0]];
             }
 
-            self.diagnosticEntries = entries;
-
             // Block until the table is updated.
             dispatch_sync(dispatch_get_main_queue(), ^{
 
                 [self.tableView beginUpdates];
+                self.diagnosticEntries = [entries copy];
                 [self.tableView insertRowsAtIndexPaths:indexPaths withRowAnimation:UITableViewRowAnimationNone];
                 [self.tableView endUpdates];
                 [self scrollToBottom];
@@ -180,6 +180,7 @@
 
     if (fd == -1) {
         LOG_ERROR(@"Error opening log file to watch. errno: %s", strerror(errno));
+        [activityIndicator stopAnimating];
         return;
     }
 
