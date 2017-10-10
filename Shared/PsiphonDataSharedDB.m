@@ -105,6 +105,8 @@
                                                                 error:&err];
             if (err) {
                 LOG_ERROR(@"Error opening file handle for %@: Error: %@", filePath, err);
+                // On failure explicitly setting fileHandlePtr to point to nil.
+                (*fileHandlePtr) = nil;
             }
         }
 
