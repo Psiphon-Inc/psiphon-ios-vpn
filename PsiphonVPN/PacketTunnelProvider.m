@@ -421,7 +421,7 @@
     if (!prevUpstreamProxyErrorMessage || ![message isEqualToString:prevUpstreamProxyErrorMessage]) {
         prevUpstreamProxyErrorMessage = message;
         NSString *alertDisplayMessage = [NSString stringWithFormat:@"%@\n\n(%@)",
-            NSLocalizedStringWithDefaultValue(@"CHECK_UPSTREAM_PROXY_SETTING", nil, [NSBundle mainBundle], @"Check the upstream proxy settings to make sure that they are correct.", @"Alert message informing the user that should check the upstream proxy settings within the app to make sure that the user has previously provided correct values."),
+            NSLocalizedStringWithDefaultValue(@"CHECK_UPSTREAM_PROXY_SETTING", nil, [NSBundle mainBundle], @"You have configured Psiphon to use an upstream proxy.\nHowever, we seem to be unable to connect to a Psiphon server through that proxy.\nPlease fix the settings and try again.", @"Main text in the 'Upstream Proxy Error' dialog box. This is shown when the user has directly altered these settings, and those settings are (probably) erroneous."),
             message];
         [self displayMessage:alertDisplayMessage
            completionHandler:^(BOOL success) {
