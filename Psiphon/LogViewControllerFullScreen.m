@@ -104,7 +104,6 @@
     }
 }
 
-
 #pragma mark - UI Callbacks
 
 - (void)onNavigationDoneTap {
@@ -193,7 +192,6 @@
                 });
             }
         }
-
 
     });
 }

@@ -413,4 +413,19 @@
     LOG_ERROR(@"tunnel-core: %@:%@", timestamp, message);
 }
 
+- (void)onUpstreamProxyError:(NSString *_Nonnull)message {
+    static NSString *prevUpstreamProxyErrorMessage;
+
+    if (!prevUpstreamProxyErrorMessage || ![message isEqualToString:prevUpstreamProxyErrorMessage]) {
+        prevUpstreamProxyErrorMessage = message;
+        NSString *alertDisplayMessage = [NSString stringWithFormat:@"%@\n\n(%@)",
+            NSLocalizedStringWithDefaultValue(@"CHECK_UPSTREAM_PROXY_SETTING", nil, [NSBundle mainBundle], @"Check the upstream proxy settings to make sure that they are correct.", @"Alert message informing the user that should check the upstream proxy settings within the app to make sure that the user has previously provided correct values."),
+            message];
+        [self displayMessage:alertDisplayMessage
+           completionHandler:^(BOOL success) {
+               // Do nothing.
+           }];
+    }
+}
+
 @end
