@@ -13,6 +13,9 @@
 /* Text above change region button that allows user to select their desired server region */
 "CHANGE_REGION" = "Change Region";
 
+/* Alert message informing the user that should check the upstream proxy settings within the app to make sure that the user has previously provided correct values. */
+"CHECK_UPSTREAM_PROXY_SETTING" = "Check the upstream proxy settings to make sure that they are correct.";
+
 /* Title of the button that dismisses region selection dialog
    Title of the button that dismisses the settings menu (InAppSettingsKit) */
 "DONE_ACTION" = "Done";
@@ -41,9 +44,6 @@
 
 /* Alert message informing user to turn on their cellular data or wifi to connect to the internet */
 "TURN_ON_DATE" = "Turn on cellular data or use Wi-Fi to access data.";
-
-/* Alert message informing the user that should check the upstream proxy settings within the app to make sure that they've provided correct values. */
-"CHECK_UPSTREAM_PROXY_SETTING" = "Check the upstream proxy settings to make sure that they are correct.";
 
 /* Alert message informing user they have to open the app */
 "USE_PSIPHON_APP" = "To connect, use the Psiphon app";

@@ -414,6 +414,8 @@
 }
 
 - (void)onUpstreamProxyError:(NSString *_Nonnull)message {
+    // The life of prevUpstreamProxyErrorMessage should be limited to the life
+    // of a tunnel core connection attempt.
     static NSString *prevUpstreamProxyErrorMessage;
 
     if (!prevUpstreamProxyErrorMessage || ![message isEqualToString:prevUpstreamProxyErrorMessage]) {

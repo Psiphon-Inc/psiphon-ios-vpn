@@ -68,7 +68,7 @@
     NSFileHandle *fileHandle;
     // NSFileHandle will close automatically when deallocated.
     return [PsiphonDataSharedDB tryReadingFile:filePath
-                               usingFileHanlde:&fileHandle
+                               usingFileHandle:&fileHandle
                                 readFromOffset:0
                                   readToOffset:nil];
 }
@@ -87,8 +87,8 @@
  * @param readToOffset Populated with the file offset that was read to.
  * @return UTF8 string of read file content.
  */
-+ (NSString *)tryReadingFile:(NSString * _Nonnull)filePath
-             usingFileHanlde:(NSFileHandle * __strong *  _Nonnull)fileHandlePtr
++ (NSString *)tryReadingFile:(NSString *_Nonnull)filePath
+             usingFileHandle:(NSFileHandle *__strong *_Nonnull)fileHandlePtr
               readFromOffset:(unsigned long long)bytesOffset
                 readToOffset:(unsigned long long *)readToOffset {
 
