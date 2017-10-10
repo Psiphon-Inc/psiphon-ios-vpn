@@ -23,7 +23,6 @@
 #endif
 
 @interface Homepage : NSObject
-// TODO: readonly necessary?!
 @property (nonatomic) NSURL *url;
 @property (nonatomic) NSDate *timestamp;
 
@@ -31,20 +30,17 @@
 
 @interface PsiphonDataSharedDB : NSObject
 - (id)initForAppGroupIdentifier:(NSString*)identifier;
-- (BOOL)createDatabase;
 
 - (BOOL)insertNewEgressRegions:(NSArray<NSString *> *)regions;
 - (NSArray<NSString *> *)getAllEgressRegions;
 
-// Home page table
-- (BOOL)updateHomepages:(NSArray<NSString *> *)homepageUrls;
-- (NSArray<Homepage *> *)getAllHomepages;
+- (NSArray<Homepage *> *)getHomepages;
+- (NSString *)homepageNoticesPath;
 
 // Logs table
-- (BOOL)truncateLogs;
-- (BOOL)insertDiagnosticMessage:(NSString *)message withTimestamp:(NSString *)timestamp;
+- (NSString *)rotatingLogNoticesPath;
 #ifndef TARGET_IS_EXTENSION
-- (NSArray<DiagnosticEntry*>*)getNewLogs;
+- (NSArray<DiagnosticEntry*>*)getAllLogs;
 #endif
 
 // Tunnel state table

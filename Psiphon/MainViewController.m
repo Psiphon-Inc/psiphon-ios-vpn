@@ -78,10 +78,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     
     // UI Layer
     CAGradientLayer *backgroundGradient;
-    
-    // VPN Config user defaults
-    PsiphonConfigUserDefaults *psiphonConfigUserDefaults;
-    
+
     // Settings
     PsiphonSettingsViewController *appSettingsViewController;
     UIButton *settingsButton;
@@ -105,9 +102,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
         
         // Notifier
         notifier = [[Notifier alloc] initWithAppGroupIdentifier:APP_GROUP_IDENTIFIER];
-        
-        // VPN Config user defaults
-        psiphonConfigUserDefaults = [PsiphonConfigUserDefaults sharedInstance];
+
         [self persistSettingsToSharedUserDefaults];
         
         // Open Setting after change it
@@ -124,14 +119,8 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 - (void)viewDidLoad {
     LOG_DEBUG();
     [super viewDidLoad];
-    
-    // TODO: check if database exists first
-    BOOL success = [sharedDB createDatabase];
-    if (!success) {
-        // TODO : do some error handling
-    }
-    
-    // Add any available regions from shared db to region adapter
+
+   // Add any available regions from shared db to region adapter
     [self updateAvailableRegions];
     
     // Setting up the UI
@@ -426,14 +415,14 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
  }*/
 
 - (BOOL)unsupportedCharactersForFont:(NSString*)font withString:(NSString*)string {
-    for (NSInteger charIdx = 0; charIdx < string.length; charIdx++) {
+    for (NSUInteger charIdx = 0; charIdx < string.length; charIdx++) {
         NSString *character = [NSString stringWithFormat:@"%C", [string characterAtIndex:charIdx]];
         // TODO: need to enumerate a longer list of special characters for this to be more correct.
         if ([character isEqualToString:@" "]) {
             // Skip special characters
             continue;
         }
-        CGFontRef cgFont = CGFontCreateWithFontName((CFStringRef)font);
+        CGFontRef cgFont = CGFontCreateWithFontName((__bridge CFStringRef)font);
         BOOL unsupported = (CGFontGetGlyphWithGlyphName(cgFont,  (__bridge CFStringRef)character) == 0);
         CGFontRelease(cgFont);
         if (unsupported) {
@@ -449,7 +438,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     appTitleLabel.text = NSLocalizedStringWithDefaultValue(@"APP_TITLE_MAIN_VIEW", nil, [NSBundle mainBundle], @"PSIPHON", @"Text for app title on main view.");
     appTitleLabel.textAlignment = NSTextAlignmentCenter;
     appTitleLabel.textColor = [UIColor whiteColor];
-    int narrowestWidth = self.view.frame.size.width;
+    CGFloat narrowestWidth = self.view.frame.size.width;
     if (self.view.frame.size.height < self.view.frame.size.width) {
         narrowestWidth = self.view.frame.size.height;
     }
@@ -504,7 +493,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     appSubTitleLabel.text = NSLocalizedStringWithDefaultValue(@"APP_SUB_TITLE_MAIN_VIEW", nil, [NSBundle mainBundle], @"BEYOND BORDERS", @"Text for app subtitle on main view.");
     appSubTitleLabel.textAlignment = NSTextAlignmentCenter;
     appSubTitleLabel.textColor = [UIColor whiteColor];
-    int narrowestWidth = self.view.frame.size.width;
+    CGFloat narrowestWidth = self.view.frame.size.width;
     if (self.view.frame.size.height < self.view.frame.size.width) {
         narrowestWidth = self.view.frame.size.height;
     }
@@ -911,9 +900,8 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     // Ensure psiphon data is populated with latest logs
     // TODO: should this be a delegate method of Psiphon Data in shared library/
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        NSArray<DiagnosticEntry *> *logs = [sharedDB getNewLogs];
-        [[PsiphonData sharedInstance] addDiagnosticEntries:logs];
-        
+        NSArray<DiagnosticEntry *> *diagnosticEntries = [sharedDB getAllLogs];
+
         __weak MainViewController *weakSelf = self;
         SendFeedbackHandler sendFeedbackHandler = ^(NSString *jsonString, NSString *pubKey, NSString *uploadServer, NSString *uploadServerHeaders){
             PsiphonTunnel *inactiveTunnel = [PsiphonTunnel newPsiphonTunnel:weakSelf]; // TODO: we need to update PsiphonTunnel framework not require this and fix this warning
@@ -929,7 +917,8 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                              withClientPlatform:@"ios-vpn"
                              withConnectionType:[self getConnectionType]
                                    isJailbroken:[JailbreakCheck isDeviceJailbroken]
-                            sendFeedbackHandler:sendFeedbackHandler];
+                            sendFeedbackHandler:sendFeedbackHandler
+                              diagnosticEntries:diagnosticEntries];
     });
 }
 
