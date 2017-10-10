@@ -314,8 +314,8 @@
 // This method is not meant to handle large files.
 - (NSArray<DiagnosticEntry*>*)getAllLogs {
 
-    LOG_DEBUG(@"TEST Log filesize:%@", [self getFileSize:[self rotatingLogNoticesPath]]);
-    LOG_DEBUG(@"TEST Log backup filesize:%@", [self getFileSize:[self rotatingLogNoticesBackupPath]]);
+    LOG_DEBUG(@"Log filesize:%@", [self getFileSize:[self rotatingLogNoticesPath]]);
+    LOG_DEBUG(@"Log backup filesize:%@", [self getFileSize:[self rotatingLogNoticesBackupPath]]);
 
     NSMutableArray<DiagnosticEntry *> *entries = [[NSMutableArray alloc] init];
 

@@ -138,9 +138,9 @@
                                                  readFromOffset:bytesReadFileOffset
                                                    readToOffset:&newBytesReadFileOffset];
 
-        LOG_DEBUG(@"TEST old file offset %llu", bytesReadFileOffset);
-        LOG_DEBUG(@"TEST new file offset %llu", newBytesReadFileOffset);
-        LOG_DEBUG(@"TEST bytes read %llu", (newBytesReadFileOffset - bytesReadFileOffset));
+        LOG_DEBUG(@"Log old file offset %llu", bytesReadFileOffset);
+        LOG_DEBUG(@"Log new file offset %llu", newBytesReadFileOffset);
+        LOG_DEBUG(@"Log bytes read %llu", (newBytesReadFileOffset - bytesReadFileOffset));
 
         if (logData && ([logData length] > 0)) {
 
@@ -215,19 +215,19 @@
 
         // TODO: what flag is sent when file is truncated.
         if (flag & DISPATCH_VNODE_WRITE) {
-            LOG_DEBUG(@"TEST Dispatch_vnode_write");
+            LOG_DEBUG(@"Log Dispatch_vnode_write");
             [self loadDataAsync:FALSE];
         } else if (flag & DISPATCH_VNODE_EXTEND){
-            LOG_DEBUG(@"TEST Dispatch_vnode_extend");
+            LOG_DEBUG(@"Log Dispatch_vnode_extend");
         } else if (flag & DISPATCH_VNODE_DELETE) {
-            LOG_DEBUG(@"TEST Dispatch_vnode_delete");
+            LOG_DEBUG(@"Log Dispatch_vnode_delete");
             bytesReadFileOffset = 0;
             dispatch_source_cancel(dispatchSource);
         }
     });
 
     dispatch_source_set_cancel_handler(dispatchSource, ^{
-        LOG_DEBUG(@"TEST dispatchSource Cancelled");
+        LOG_DEBUG(@"Log dispatchSource Cancelled");
         close(fd);
     });
 
