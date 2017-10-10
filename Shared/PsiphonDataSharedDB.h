@@ -35,7 +35,7 @@
 
 #ifndef TARGET_IS_EXTENSION
 + (NSString *)tryReadingFile:(NSString *)filePath;
-+ (NSString *)tryReadingFile:(NSString *_Nonnull)filePath usingFileHandle:(NSFileHandle *__strong *_Nonnull)fileHandlePtr readFromOffset:(unsigned long long)bytesOffset readToOffset:(unsigned long long *)readToOffset;
++ (NSString *)tryReadingFile:(NSString *)filePath usingFileHandle:(NSFileHandle *__strong *)fileHandlePtr readFromOffset:(unsigned long long)bytesOffset readToOffset:(unsigned long long *)readToOffset;
 - (void)readLogsData:(NSString *)logLines intoArray:(NSMutableArray<DiagnosticEntry *> *)entries;
 - (NSArray<Homepage *> *)getHomepages;
 #endif
