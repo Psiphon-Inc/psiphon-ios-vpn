@@ -134,7 +134,7 @@
         BOOL isFirstLogRead = (bytesReadFileOffset == 0);
 
         NSString *logData = [PsiphonDataSharedDB tryReadingFile:[sharedDB rotatingLogNoticesPath]
-                                                usingFileHanlde:&logFileHandle
+                                                usingFileHandle:&logFileHandle
                                                  readFromOffset:bytesReadFileOffset
                                                    readToOffset:&newBytesReadFileOffset];
 
