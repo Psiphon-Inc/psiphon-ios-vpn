@@ -41,6 +41,8 @@
     NSFileHandle *logFileHandle;
     unsigned long long bytesReadFileOffset;
     dispatch_queue_t workQueue;
+
+    dispatch_source_t dispatchSource;
 }
 
 - (instancetype)init {
@@ -94,9 +96,12 @@
     [self setupLogFileListener];
 }
 
-- (void)viewWillAppear:(BOOL)animated {
-    [super viewWillAppear:animated];
+- (void)viewWillDisappear:(BOOL)animated {
+    [super viewWillDisappear:animated];
+    // Cancel dispatch source to stop receiving file change notifications.
+    dispatch_source_cancel(dispatchSource);
 }
+
 
 #pragma mark - UI Callbacks
 
@@ -191,8 +196,6 @@
     }
 
     unsigned long mask = DISPATCH_VNODE_WRITE | DISPATCH_VNODE_EXTEND | DISPATCH_VNODE_DELETE;
-
-    __block dispatch_source_t dispatchSource;
 
     dispatchSource = dispatch_source_create(DISPATCH_SOURCE_TYPE_VNODE, (uintptr_t) fd,
       mask, workQueue);
