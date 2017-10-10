@@ -40,7 +40,6 @@
 
     NSFileHandle *logFileHandle;
     unsigned long long bytesReadFileOffset;
-    NSMutableArray<DiagnosticEntry *> *entries;
     dispatch_queue_t workQueue;
 }
 
@@ -58,7 +57,6 @@
                                 error:&err];
 
         bytesReadFileOffset = (unsigned long long) 0;
-        entries = [[NSMutableArray alloc] init];
 
         workQueue = dispatch_queue_create([(APP_GROUP_IDENTIFIER @".LogViewWorkQueue") UTF8String],
           DISPATCH_QUEUE_SERIAL);
@@ -112,6 +110,10 @@
 
 #pragma mark - Helper functions
 
+/*!
+ * Submits work to workQueue to read new bytes from the log file an update the tableView.
+ * @param userAction Whether a user action initiated data loading.
+ */
 - (void)loadDataAsync:(BOOL)userAction {
 
     // Caller should show spinner only when user performs an action.
@@ -123,6 +125,8 @@
 
         unsigned long long newBytesReadFileOffset;
 
+        BOOL isFirstLogRead = (bytesReadFileOffset == 0);
+
         NSString *logData = [PsiphonDataSharedDB tryReadingFile:[sharedDB rotatingLogNoticesPath]
                                                 usingFileHanlde:&logFileHandle
                                                  readFromOffset:bytesReadFileOffset
@@ -132,39 +136,33 @@
         LOG_DEBUG(@"TEST new file offset %llu", newBytesReadFileOffset);
         LOG_DEBUG(@"TEST bytes read %llu", (newBytesReadFileOffset - bytesReadFileOffset));
 
-        if (logData) {
+        if (logData && ([logData length] > 0)) {
 
             bytesReadFileOffset = newBytesReadFileOffset;
-
-            // Current number of rows in the table.
-            NSUInteger currentNumRows = [self.diagnosticEntries count];
-
-            BOOL isFirstLogRead = (currentNumRows == 0);
-
-            [sharedDB readLogsData:logData intoArray:entries];
+            NSMutableArray *newEntries = [[NSMutableArray alloc] init];
+            [sharedDB readLogsData:logData intoArray:newEntries];
 
             // On the first load, truncate array entries to MAX_LOGS_LOAD
-            if (isFirstLogRead && ([entries count] > MAX_LOGS_LOAD)) {
-                entries = [[NSMutableArray alloc] initWithArray:
-                  [entries subarrayWithRange:NSMakeRange([entries count] - MAX_LOGS_LOAD, MAX_LOGS_LOAD)]];
+            if (isFirstLogRead && ([newEntries count] > MAX_LOGS_LOAD)) {
+                newEntries = [[NSMutableArray alloc] initWithArray:
+                  [newEntries subarrayWithRange:NSMakeRange([newEntries count] - MAX_LOGS_LOAD, MAX_LOGS_LOAD)]];
             }
 
-            // Calculate IndexPaths
-            NSUInteger numRowsToAdd = [entries count] - currentNumRows;
+            dispatch_async(dispatch_get_main_queue(), ^{
+                // Calculate IndexPaths
+                NSUInteger currentNumRows = [self.diagnosticEntries count];
+                NSUInteger numRowsToAdd = [newEntries count];
+                NSMutableArray *indexPaths = [[NSMutableArray alloc] initWithCapacity:numRowsToAdd];
+                for (int i = 0; i < numRowsToAdd; ++i) {
+                    [indexPaths addObject:[NSIndexPath indexPathForRow:(i+currentNumRows) inSection:0]];
+                }
 
-            NSMutableArray *indexPaths = [[NSMutableArray alloc] initWithCapacity:numRowsToAdd];
-            for (int i = 0; i < numRowsToAdd; ++i) {
-                [indexPaths addObject:[NSIndexPath indexPathForRow:(i+currentNumRows) inSection:0]];
-            }
-
-            // Block until the table is updated.
-            dispatch_sync(dispatch_get_main_queue(), ^{
                 // Checks if last row was visible before the update.
                 BOOL lastRowWasVisible = isFirstLogRead || [self.tableView.indexPathsForVisibleRows containsObject:
                   [NSIndexPath indexPathForRow:(currentNumRows - 1) inSection:0]];
 
                 [self.tableView beginUpdates];
-                self.diagnosticEntries = [entries copy];
+                [self.diagnosticEntries addObjectsFromArray:newEntries];
                 [self.tableView insertRowsAtIndexPaths:indexPaths withRowAnimation:UITableViewRowAnimationNone];
                 [self.tableView endUpdates];
 
