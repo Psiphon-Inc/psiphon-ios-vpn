@@ -181,7 +181,17 @@
                     [activityIndicator stopAnimating];
                 }
             });
+        } else {
+            // At this point there was nothing to load,
+            // we resort to scrolling to bottom of screen.
+            if (userAction) {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [activityIndicator stopAnimating];
+                    [self scrollToBottom];
+                });
+            }
         }
+
 
     });
 }
