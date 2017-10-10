@@ -13,8 +13,8 @@
 /* Text above change region button that allows user to select their desired server region */
 "CHANGE_REGION" = "Change Region";
 
-/* Alert message informing the user that should check the upstream proxy settings within the app to make sure that the user has previously provided correct values. */
-"CHECK_UPSTREAM_PROXY_SETTING" = "Check the upstream proxy settings to make sure that they are correct.";
+/* Main text in the 'Upstream Proxy Error' dialog box. This is shown when the user has directly altered these settings, and those settings are (probably) erroneous. */
+"CHECK_UPSTREAM_PROXY_SETTING" = "You have configured Psiphon to use an upstream proxy.\nHowever, we seem to be unable to connect to a Psiphon server through that proxy.\nPlease fix the settings and try again.";
 
 /* Title of the button that dismisses region selection dialog
    Title of the button that dismisses the settings menu (InAppSettingsKit) */
