@@ -18,54 +18,29 @@
  */
 
 #import "PsiphonDataSharedDB.h"
-#import "FMDB.h"
 #import "Logging.h"
 #import "NSDateFormatter+RFC3339.h"
 
-#define TRUNCATE_AT_LOG_LINES 500
-#define RETAIN_LOG_LINES 250
-#define SHARED_DATABASE_NAME @"psiphon_data_archive.db"
+// File operations parameters
+#define MAX_RETRIES 3
+#define RETRY_SLEEP_TIME 0.1f  // Sleep for 100 milliseconds.
 
-// ID
-#define COL_ID @"_ID"
-
-// Log Table
-#define TABLE_LOG @"log"
-#define COL_LOG_LOGJSON @"logjson"
-#define COL_LOG_IS_DIAGNOSTIC @"is_diagnostic"
-#define COL_LOG_TIMESTAMP @"timestamp"
-
-// Homepages Table
-#define TABLE_HOMEPAGE @"homepages"
-#define COL_HOMEPAGE_URL @"url"
-#define COL_HOMEPAGE_TIMESTAMP @"timestamp"
-
-// Egress Regions Table
-#define TABLE_EGRESS_REGIONS @"egress_regions"
-#define COL_EGRESS_REGIONS_REGION_NAME @"url"
-#define COL_EGRESS_REGIONS_TIMESTAMP @"timestamp"
-
-/* NSUserDefaults keys */
-
+/* Shared NSUserDefaults keys */
+#define EGRESS_REGIONS_KEY @"egress_regions"
 #define TUN_CONNECTED_KEY @"tun_connected"
 #define APP_FOREGROUND_KEY @"app_foreground"
 #define SERVER_TIMESTAMP_KEY @"server_timestamp"
 #define SPONSOR_ID_KEY @"sponsor_id"
+
 
 @implementation Homepage
 @end
 
 @implementation PsiphonDataSharedDB {
     NSUserDefaults *sharedDefaults;
-    FMDatabaseQueue *q;
 
     NSString *appGroupIdentifier;
-    NSString *databasePath;
 
-    // Log Table
-    int lastLogRowId;
-    NSLock *lastLogRowIdLock;
-    
     // RFC3339 Date Formatter
     NSDateFormatter *rfc3339Formatter;
 }
@@ -82,266 +57,251 @@
 
         sharedDefaults = [[NSUserDefaults alloc] initWithSuiteName:identifier];
 
-        databasePath = [[[NSFileManager defaultManager] containerURLForSecurityApplicationGroupIdentifier:appGroupIdentifier] path];
-
-        lastLogRowId = -1;
-        lastLogRowIdLock = [[NSLock alloc] init];
-
-        q = [FMDatabaseQueue databaseQueueWithPath:[databasePath stringByAppendingPathComponent:SHARED_DATABASE_NAME]];
-        
-        rfc3339Formatter = [NSDateFormatter createRFC3339Formatter];
+        rfc3339Formatter = [NSDateFormatter createRFC3339MilliFormatter];
     }
     return self;
 }
 
-#pragma mark - Database operations
+// tryReadingFile opens file pointed to by fileUrl and tries to read its contentent.
+// Reading operation is retried 2 more times if it fails for any reason.
+// No errors are thrown if opening the file/reading operations fail.
++ (NSString *)tryReadingFile:(NSURL *)fileUrl {
+    NSData *fileData;
+    NSError *err;
 
-- (BOOL)createDatabase {
+    for (int i = 0; i < MAX_RETRIES; ++i) {
 
-    NSString *CREATE_TABLE_STATEMENTS =
-      @"CREATE TABLE IF NOT EXISTS " TABLE_LOG " ("
-        COL_ID " INTEGER PRIMARY KEY AUTOINCREMENT, "
-        COL_LOG_LOGJSON " TEXT NOT NULL, "
-        COL_LOG_IS_DIAGNOSTIC " BOOLEAN DEFAULT 0, "
-        COL_LOG_TIMESTAMP " TEXT NOT NULL);"
+        NSFileHandle *fileHandle = [NSFileHandle fileHandleForReadingFromURL:fileUrl error:&err];
 
-       "CREATE TABLE IF NOT EXISTS " TABLE_HOMEPAGE " ("
-        COL_ID " INTEGER PRIMARY KEY AUTOINCREMENT, "
-        COL_HOMEPAGE_URL " TEXT NOT NULL, "
-        COL_HOMEPAGE_TIMESTAMP " TIMESTAMP DEFAULT CURRENT_TIMESTAMP);"
-
-        "CREATE TABLE IF NOT EXISTS " TABLE_EGRESS_REGIONS " ("
-        COL_ID " INTEGER PRIMARY KEY AUTOINCREMENT, "
-        COL_EGRESS_REGIONS_REGION_NAME " TEXT NOT NULL, "
-        COL_EGRESS_REGIONS_TIMESTAMP " TIMESTAMP DEFAULT CURRENT_TIMESTAMP);";
-
-    LOG_DEBUG(@"Create DATABASE");
-
-    __block BOOL success = FALSE;
-    [q inDatabase:^(FMDatabase *db) {
-        success = [db executeStatements:CREATE_TABLE_STATEMENTS];
-        if (!success) {
-            LOG_ERROR(@"%@", [db lastError]);
+        if (err) {
+            LOG_ERROR(@"Error opening file handle for %@: Error: %@", fileUrl, err);
         }
-    }];
 
-    return success;
+        // fileHandle is nil if no file exists at the provided path.
+        if (!fileHandle) {
+            return nil;
+        }
+
+        @try {
+            // From https://developer.apple.com/documentation/foundation/nsfilehandle/1413916-readdataoflength?language=objc
+            // readDataToEndOfFile raises NSFileHandleOperationException if attempts
+            // to determine file-handle type fail or if attempts to read from the file
+            // or channel fail.
+            fileData = [fileHandle readDataToEndOfFile];
+
+            if (fileData) {
+                return [[NSString alloc] initWithData:fileData encoding:NSUTF8StringEncoding];
+            }
+        }
+        @catch (NSException *e) {
+            LOG_ERROR(@"Error reading file: %@", [e debugDescription]);
+        }
+        @finally {
+            [fileHandle closeFile];
+        }
+
+        // Put thread to sleep for 100 ms and try again.
+        [NSThread sleepForTimeInterval:RETRY_SLEEP_TIME];
+    }
+
+    return nil;
 }
 
-#pragma mark - Homepage Table methods
+#pragma mark - Homepage methods
 
 /*!
- * @brief Deletes previous set of homepages, then inserts new set of homepages.
- * @param homepageUrls
- * @return TRUE on success.
- */
-- (BOOL)updateHomepages:(NSArray<NSString *> *)homepageUrls {
-    __block BOOL success = FALSE;
-    [q inTransaction:^(FMDatabase *db, BOOL *rollback) {
-        success = [db executeUpdate:@"DELETE FROM " TABLE_HOMEPAGE " ;"];
-
-        for (NSString *url in homepageUrls) {
-            success |= [db executeUpdate:
-              @"INSERT INTO " TABLE_HOMEPAGE " (" COL_HOMEPAGE_URL ") VALUES (?)", url, nil];
-        }
-
-        if (!success) {
-            LOG_ERROR(@"Rolling back, error %@", [db lastError]);
-            *rollback = TRUE;
-            return;
-        }
-    }];
-
-    return success;
-}
-
-/*!
+ * Reads shared homepages file.
  * @return NSArray of Homepages.
  */
-- (NSArray<Homepage *> *)getAllHomepages {
-    NSMutableArray<Homepage *> *homepages = [[NSMutableArray alloc] init];
+- (NSArray<Homepage *> *)getHomepages {
+    NSMutableArray<Homepage *> *homepages = nil;
+    NSError *err;
 
-    [q inDatabase:^(FMDatabase *db) {
-        FMResultSet *rs = [db executeQuery:@"SELECT * FROM " TABLE_HOMEPAGE];
+//    NSString *data = [NSString stringWithContentsOfFile:[self homepageNoticesPath]
+//                                               encoding:NSUTF8StringEncoding
+//                                                  error:&err];
 
-        if (rs == nil) {
-            LOG_ERROR(@"%@", [db lastError]);
-            return;
+    NSString *data = [PsiphonDataSharedDB tryReadingFile:[NSURL fileURLWithPath:[self homepageNoticesPath]]];
+
+    if (!data) {
+        LOG_ERROR(@"Failed reading homepage notices file. Error:%@", err);
+        return nil;
+    }
+
+    // Pre-allocation optimization
+    homepages = [NSMutableArray arrayWithCapacity:50];
+    NSArray *homepageNotices = [data componentsSeparatedByString:@"\n"];
+
+    for (NSString *line in homepageNotices) {
+
+        if (!line || [line length] == 0) {
+            continue;
         }
 
-        while ([rs next]) {
-            Homepage *homepage = [[Homepage alloc] init];
-            homepage.url = [NSURL URLWithString:[rs stringForColumn:COL_HOMEPAGE_URL]];
-            homepage.timestamp = [rs dateForColumn:COL_HOMEPAGE_TIMESTAMP];
+        NSDictionary *dict = [NSJSONSerialization JSONObjectWithData:[line dataUsingEncoding:NSUTF8StringEncoding]
+                                                             options:0 error:&err];
 
-            [homepages addObject:homepage];
+        if (err) {
+            LOG_ERROR(@"Failed parsing homepage notices file. Error:%@", err);
         }
 
-        [rs close];
-    }];
+        if (dict) {
+            Homepage *h = [[Homepage alloc] init];
+            h.url = [NSURL URLWithString:dict[@"data"][@"url"]];
+            h.timestamp = [rfc3339Formatter dateFromString:dict[@"timestamp"]];
+            [homepages addObject:h];
+        }
+    }
 
     return homepages;
+}
+
+- (NSString *)homepageNoticesPath {
+    return [[[[NSFileManager defaultManager]
+      containerURLForSecurityApplicationGroupIdentifier:appGroupIdentifier] path]
+      stringByAppendingPathComponent:@"homepage_notices"];
 }
 
 #pragma mark - Egress Regions Table methods
 
 /*!
- * @brief Deletes previous set of regions, then inserts new set of regions.
+ * @brief Sets set of egress regions in shared NSUserDefaults
  * @param regions
- * @return TRUE on success.
+ * @return TRUE if data was saved to disk successfully, otherwise FALSE.
  */
 // TODO: is timestamp needed? Maybe we can use this to detect staleness later
 - (BOOL)insertNewEgressRegions:(NSArray<NSString *> *)regions {
-    __block BOOL success = FALSE;
-    [q inTransaction:^(FMDatabase *db, BOOL *rollback) {
-        success = [db executeUpdate:@"DELETE FROM " TABLE_EGRESS_REGIONS " ;"];
-
-        for (NSString *region in regions) {
-            success |= [db executeUpdate:
-                        @"INSERT INTO " TABLE_EGRESS_REGIONS " (" COL_EGRESS_REGIONS_REGION_NAME ") VALUES (?)", region, nil];
-        }
-
-        if (!success) {
-            LOG_ERROR(@"Rolling back, error %@", [db lastError]);
-            *rollback = TRUE;
-            return;
-        }
-    }];
-
-    return success;
+    [sharedDefaults setObject:regions forKey:EGRESS_REGIONS_KEY];
+    return [sharedDefaults synchronize];
 }
 
 /*!
  * @return NSArray of region codes.
  */
 - (NSArray<NSString *> *)getAllEgressRegions {
-    NSMutableArray<NSString *> *regions = [[NSMutableArray alloc] init];
-
-    [q inDatabase:^(FMDatabase *db) {
-        FMResultSet *rs = [db executeQuery:@"SELECT * FROM " TABLE_EGRESS_REGIONS];
-
-        if (rs == nil) {
-            LOG_ERROR(@"%@", [db lastError]);
-            return;
-        }
-
-        while ([rs next]) {
-            NSString *region = [rs stringForColumn:COL_EGRESS_REGIONS_REGION_NAME];
-            [regions addObject:region];
-        }
-
-        [rs close];
-    }];
-
-    return regions;
+    return [sharedDefaults objectForKey:EGRESS_REGIONS_KEY];
 }
 
 #pragma mark - Log Table methods
 
-- (BOOL)insertDiagnosticMessage:(NSString *)message withTimestamp:(NSString *)timestamp {
-
-    // Truncates logs if necessary.
-    [self truncateLogs];
-    
-    __block BOOL success;
-    [q inDatabase:^(FMDatabase *db) {
-        NSError *err;
-
-        // TODO: IS_DIAGNOSTIC is always YES.
-        success = [db executeUpdate:
-          @"INSERT INTO " TABLE_LOG
-          " (" COL_LOG_LOGJSON ", " COL_LOG_IS_DIAGNOSTIC ", " COL_LOG_TIMESTAMP ") VALUES (?,?,?)"
-          withErrorAndBindings:&err, message, @YES, timestamp, nil];
-
-        if (!success) {
-            LOG_ERROR(@"%@", err);
-            // TODO: error handling/logging
-        }
-    }];
-    return success;
+- (NSString *)rotatingLogNoticesPath {
+    return [[[[NSFileManager defaultManager]
+      containerURLForSecurityApplicationGroupIdentifier:appGroupIdentifier] path]
+            stringByAppendingPathComponent:@"rotating_notices"];
 }
 
-/**
- Truncates logs to RETAIN_LOG_LINES when number of log >= TRUNCATE_AT_LOG_LINES.
- @return TRUE if truncation proceeded and succeeded, FALSE otherwise.
- */
-- (BOOL)truncateLogs {
-    __block BOOL success = FALSE;
-
-    [q inDatabase:^(FMDatabase *db) {
-        NSError *err;
-        
-        int rows = [db intForQuery:@"SELECT COUNT(" COL_ID ") FROM " TABLE_LOG];
-        
-        if (rows >= TRUNCATE_AT_LOG_LINES) {
-            success = [db executeUpdate:
-                       @"DELETE FROM " TABLE_LOG
-                       " WHERE " COL_ID " NOT IN "
-                       "(SELECT " COL_ID " FROM " TABLE_LOG " ORDER BY " COL_ID " DESC LIMIT (?));"
-                   withErrorAndBindings:&err, @RETAIN_LOG_LINES, nil];
-            
-            if (!success) {
-                LOG_ERROR(@"%@", err);
-                // TODO: error handling/logging
-            }
-        }
-    }];
-
-    return success;
+- (NSString *)rotatingLogNoticesBackupPath {
+    return [[self rotatingLogNoticesPath] stringByAppendingString:@".1"];
 }
 
 #ifndef TARGET_IS_EXTENSION
-- (NSArray<DiagnosticEntry*>*)getAllLogs {
-    return [self getLogsNewerThanId:-1];
-}
 
-- (NSArray<DiagnosticEntry*>*)getNewLogs {
-    return [self getLogsNewerThanId:lastLogRowId];
-}
 
-- (NSArray<DiagnosticEntry*>*)getLogsNewerThanId:(int)lastId {
-    NSMutableArray<DiagnosticEntry*>* logs = [[NSMutableArray alloc] init];
-    
-    // Prevent fetching the same logs multiple times
-    [lastLogRowIdLock lock];
-    if (lastLogRowId > lastId) {
-        [lastLogRowIdLock unlock];
+#if DEBUG
+- (NSString *)getFileSize:(NSString *)filePath {
+    NSError *err;
+    unsigned long long byteCount = [[[NSFileManager defaultManager] attributesOfItemAtPath:filePath error:&err] fileSize];
+    if (err) {
         return nil;
     }
-    
-    [q inDatabase:^(FMDatabase *db) {
-        FMResultSet *rs = [db executeQuery:@"SELECT * FROM log WHERE _ID > (?);", @(lastId), nil];
+    return [NSByteCountFormatter stringFromByteCount:byteCount countStyle:NSByteCountFormatterCountStyleBinary];
+}
+#endif
 
-        if (rs == nil) {
-            LOG_ERROR(@"%@", [db lastError]);
-            return;
-        }
+// Reads all log files and tries parses the json lines contained in each.
+// This method is not meant to handle large files.
+- (NSArray<DiagnosticEntry*>*)getAllLogs {
 
-        while ([rs next]) {
-            lastLogRowId = [rs intForColumn:COL_ID];
+    LOG_DEBUG(@"TEST Log filesize:%@", [self getFileSize:[self rotatingLogNoticesPath]]);
+    LOG_DEBUG(@"TEST Log backup filesize:%@", [self getFileSize:[self rotatingLogNoticesBackupPath]]);
 
-            NSString *timestampString = [rs stringForColumn:COL_LOG_TIMESTAMP];
-            NSString *json = [rs stringForColumn:COL_LOG_LOGJSON];
-//          BOOL isDiagnostic = [rs boolForColumn:COL_LOG_IS_DIAGNOSTIC]; // TODO
+    NSMutableArray<DiagnosticEntry *> *entries = [[NSMutableArray alloc] init];
 
-            NSDate *timestampDate = [rfc3339Formatter dateFromString:timestampString];
-            if (!timestampDate) {
-                // If the time storage format has changed, pass a date as a placeholder.
-                // For now we don't need to convert old values into the new values.
-                timestampDate = [NSDate dateWithTimeIntervalSince1970:0];
+    // Reads both log files all at once (max of 2MB) into memory,
+    // and defers any processing after the read in order to reduce
+    // the chance of a log rotation happening midway.
+    NSString *backupLogLines = [PsiphonDataSharedDB tryReadingFile:[NSURL fileURLWithPath:[self rotatingLogNoticesBackupPath]]];
+    NSString *logLines = [PsiphonDataSharedDB tryReadingFile:[NSURL fileURLWithPath:[self rotatingLogNoticesPath]]];
+
+    [self readLogsData:backupLogLines intoArray:entries];
+    [self readLogsData:logLines intoArray:entries];
+
+    return entries;
+}
+
+// readLogsData tries to parse logLines, and for each JSON formatted line creates
+// a DiagnosticEntry which is appended to entries.
+// This method doesn't throw any errors on failure, and will log errors encountered.
+- (void)readLogsData:(NSString *)logLines intoArray:(NSMutableArray<DiagnosticEntry *> *)entries {
+    NSError *err;
+
+    if (logLines) {
+        for (NSString *logLine in [logLines componentsSeparatedByString:@"\n"]) {
+
+            if (!logLine || [logLine length] == 0) {
+                continue;
             }
 
-            DiagnosticEntry *d = [[DiagnosticEntry alloc] init:json andTimestamp:timestampDate];
-            [logs addObject:d];
+            NSDictionary *dict = [NSJSONSerialization JSONObjectWithData:[logLine dataUsingEncoding:NSUTF8StringEncoding]
+                                                                 options:0 error:&err];
+            if (err) {
+                LOG_ERROR("Failed to parse log line (%@). Error: %@", logLine, err);
+            }
+
+            if (dict) {
+                NSString *msg = [NSString stringWithFormat:@"%@: %@", dict[@"noticeType"],
+                    [self getSimpleDictionaryDescription:dict[@"data"]]];
+                NSDate *timestamp = [rfc3339Formatter dateFromString:dict[@"timestamp"]];
+
+                if (!msg) {
+                    LOG_ERROR("Failed to read notice message for log line (%@).", logLine);
+                    // Puts place holder value for message.
+                    msg = @"Failed to read notice message.";
+                }
+
+                if (!timestamp) {
+                    LOG_ERROR("Failed to parse timestamp: (%@) for log line (%@)", dict[@"timestamp"], logLine);
+                    // Puts placeholder value for timestamp.
+                    timestamp = [NSDate dateWithTimeIntervalSince1970:0];
+                }
+
+                [entries addObject:[[DiagnosticEntry alloc] init:msg andTimestamp:timestamp]];
+            }
         }
-
-        [rs close];
-    }];
-    
-    [lastLogRowIdLock unlock];
-
-    return logs;
+    }
 }
+
+
+// This class returns a simple string representation of the dictionary dict.
+// Unlike description method of NSDictionary, the string returned by this
+// function doesn't include new-line character or semicolon.
+- (NSString *)getSimpleDictionaryDescription:(NSDictionary *)dict {
+    if (![dict isKindOfClass:[NSDictionary class]]) {
+        return [dict description];
+    }
+    
+    NSMutableString *desc = [NSMutableString string];
+    [desc appendString:@"{"];
+    NSArray *allKeys = [dict allKeys];
+    for (NSUInteger i = 0; i < [allKeys count] ; ++i) {
+        id object = dict[allKeys[i]];
+        NSString *key = [allKeys[i] description];
+        NSString *value;
+        if ([object isKindOfClass:[NSDictionary class]]) {
+            value = [self getSimpleDictionaryDescription:object];
+        } else {
+            value = [object description];
+        }
+        [desc appendString:[NSString stringWithFormat:@"%@:%@", key, value]];
+        if (i < [allKeys count] - 1) {
+            [desc appendString:@","];
+        }
+    }
+    [desc appendString:@"}"];
+
+    return desc;
+}
+
 #endif
 
 #pragma mark - Tunnel State table methods

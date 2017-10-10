@@ -31,7 +31,6 @@
 #import <ifaddrs.h>
 #import <arpa/inet.h>
 #import <net/if.h>
-#import "NSDateFormatter+RFC3339.h"
 
 @implementation PacketTunnelProvider {
 
@@ -46,15 +45,8 @@
     // Notifier
     Notifier *notifier;
 
-    NSMutableArray<NSString *> *handshakeHomepages;
-
     // State variables
     BOOL shouldStartVPN;  // Start vpn decision made by the container.
-
-    // Time formatter for log messages.
-    // NOTE: NSDateFormatter is threadsafe.
-    NSDateFormatter *rfc3339Formatter;
-
 }
 
 - (id)init {
@@ -67,16 +59,11 @@
         //TODO: sharedDB calls are blocking, should they be done in a background thread?
         sharedDB = [[PsiphonDataSharedDB alloc] initForAppGroupIdentifier:APP_GROUP_IDENTIFIER];
 
-        handshakeHomepages = [[NSMutableArray alloc] init];
-
         // Notifier
         notifier = [[Notifier alloc] initWithAppGroupIdentifier:APP_GROUP_IDENTIFIER];
 
         // state variables
         shouldStartVPN = FALSE;
-        
-        // RFC3339 Time formatter
-        rfc3339Formatter = [NSDateFormatter createRFC3339Formatter];
     }
 
     return self;
@@ -161,33 +148,6 @@
 - (void)wake {
 }
 
-- (void)logMessage:(NSString * _Nonnull)message {
-    [self logMessage:message withTimestamp:[rfc3339Formatter stringFromDate:[NSDate date]]];
-}
-
-- (void)logMessage:(NSString * _Nonnull)message withTimestamp:(NSString * _Nonnull)timestamp{
-
-    // Certain aspects of the diagnostics currently depend on
-    // insert order, not timestamp order; for example, truncation.
-    // Since tunnel-core notices are dispatched synchronously to
-    // onDiagnostic on the callback queue, they will be inserted
-    // in timestamp order.
-
-    [sharedDB insertDiagnosticMessage:message withTimestamp:timestamp];
-
-#if DEBUG
-
-    // Notify container that there is new data in shared sqlite database.
-    // This is only needed in debug mode where the log view is enabled
-    // in the container. LogViewController needs to know when new logs
-    // have entered the shared database so it can update its view to
-    // display the latest diagnostic entries.
-
-    [notifier post:@"NE.onDiagnosticMessage"];
-
-#endif
-}
-
 - (NSArray *)getNetworkInterfacesIPv4Addresses {
     
     // Getting list of all interfaces' IPv4 addresses
@@ -253,8 +213,8 @@
         }
     }
     
-    if ([candidates objectForKey:preferredCandidate] == nil && [candidates count] > 0) {
-        selectedAddress = [[candidates allValues] objectAtIndex:0];
+    if (candidates[preferredCandidate] == nil && [candidates count] > 0) {
+        selectedAddress = candidates.allValues[0];
     }
     
     LOG_DEBUG(@"Selected private address: %@", selectedAddress[0]);
@@ -299,13 +259,9 @@
             vpnStartCompletionHandler(nil);
             vpnStartCompletionHandler = nil;
 
-            if ([handshakeHomepages count] > 0) {
-                BOOL success = [sharedDB updateHomepages:handshakeHomepages];
-                if (success) {
-                    [notifier post:@"NE.newHomepages"];
-                    [handshakeHomepages removeAllObjects];
-                }
-            }
+            // Since we're still using two-start process, we will notify
+            // the container through NE.newHomepages notification.
+            [notifier post:@"NE.newHomepages"];
 
             return TRUE;
         }
@@ -381,7 +337,7 @@
     NSDictionary *readOnly = [NSJSONSerialization JSONObjectWithData:jsonData options:kNilOptions error:&err];
 
     if (err) {
-        [self logMessage:[NSString stringWithFormat:@"Aborting. Failed to parse config JSON: %@", err.description]];
+        LOG_ERROR(@"%@", [NSString stringWithFormat:@"Aborting. Failed to parse config JSON: %@", err.description]);
         abort();
     }
 
@@ -410,15 +366,11 @@
       options:0 error:&err];
 
     if (err) {
-        [self logMessage:[NSString stringWithFormat:@"Aborting. Failed to create JSON data from config object: %@", err.description]];
+        LOG_ERROR(@"%@", [NSString stringWithFormat:@"Aborting. Failed to create JSON data from config object: %@", err.description]);
         abort();
     }
 
     return [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
-}
-
-- (void)onDiagnosticMessage:(NSString * _Nonnull)message withTimestamp:(NSString * _Nonnull)timestamp {
-    [self logMessage:message withTimestamp:timestamp];
 }
 
 - (void)onConnecting {
@@ -427,9 +379,6 @@
     [sharedDB updateTunnelConnectedState:FALSE];
 
     self.reasserting = TRUE;
-
-    // Clear list of handshakeHomepages.
-    [handshakeHomepages removeAllObjects];
 }
 
 - (void)onConnected {
@@ -446,18 +395,6 @@
     [self tryStartVPN];
 }
 
-- (void)onExiting {
-}
-
-- (void)onHomepage:(NSString * _Nonnull)url {
-    for (NSString *p in handshakeHomepages) {
-        if ([url isEqualToString:p]) {
-            return;
-        }
-    }
-    [handshakeHomepages addObject:url];
-}
-
 - (void)onServerTimestamp:(NSString * _Nonnull)timestamp {
 	[sharedDB updateServerTimestamp:timestamp];
 }
@@ -471,7 +408,19 @@
 
 - (void)onInternetReachabilityChanged:(Reachability* _Nonnull)reachability {
     NSString *strReachabilityFlags = [reachability currentReachabilityFlagsToString];
-    [self logMessage:[NSString stringWithFormat:@"onInternetReachabilityChanged: %@", strReachabilityFlags]];
+    LOG_DEBUG(@"%@", [NSString stringWithFormat:@"onInternetReachabilityChanged: %@", strReachabilityFlags]);
+}
+
+- (NSString * _Nullable)getHomepageNoticesPath {
+    return [sharedDB homepageNoticesPath];
+}
+
+- (NSString * _Nullable)getRotatingNoticesPath {
+    return [sharedDB rotatingLogNoticesPath];
+}
+
+- (void)onDiagnosticMessage:(NSString *_Nonnull)message withTimestamp:(NSString *_Nonnull)timestamp {
+    LOG_ERROR(@"tunnel-core: %@:%@", timestamp, message);
 }
 
 @end
