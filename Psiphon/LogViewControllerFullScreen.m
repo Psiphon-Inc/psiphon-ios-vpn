@@ -99,7 +99,9 @@
 - (void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
     // Cancel dispatch source to stop receiving file change notifications.
-    dispatch_source_cancel(dispatchSource);
+    if (dispatchSource) {
+        dispatch_source_cancel(dispatchSource);
+    }
 }
 
 

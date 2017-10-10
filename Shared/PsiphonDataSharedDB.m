@@ -105,35 +105,30 @@
                                                                 error:&err];
             if (err) {
                 LOG_ERROR(@"Error opening file handle for %@: Error: %@", filePath, err);
-
-                // Reset the fileHandlePtr in order to create a new NSFileHandle
-                // on the next retry.
-                (*fileHandlePtr) = nil;
-
-                // If the file doesn't exist yet, try again.
-                continue;
             }
         }
 
-        @try {
-            // From https://developer.apple.com/documentation/foundation/nsfilehandle/1413916-readdataoflength?language=objc
-            // readDataToEndOfFile raises NSFileHandleOperationException if attempts
-            // to determine file-handle type fail or if attempts to read from the file
-            // or channel fail.
-            [(*fileHandlePtr) seekToFileOffset:bytesOffset];
-            fileData = [(*fileHandlePtr) readDataToEndOfFile];
+        if ((*fileHandlePtr)) {
+            @try {
+                // From https://developer.apple.com/documentation/foundation/nsfilehandle/1413916-readdataoflength?language=objc
+                // readDataToEndOfFile raises NSFileHandleOperationException if attempts
+                // to determine file-handle type fail or if attempts to read from the file
+                // or channel fail.
+                [(*fileHandlePtr) seekToFileOffset:bytesOffset];
+                fileData = [(*fileHandlePtr) readDataToEndOfFile];
 
-            if (fileData) {
-                if (readToOffset) {
-                    (* readToOffset) = [(*fileHandlePtr) offsetInFile];
+                if (fileData) {
+                    if (readToOffset) {
+                        (*readToOffset) = [(*fileHandlePtr) offsetInFile];
+                    }
+                    return [[NSString alloc] initWithData:fileData encoding:NSUTF8StringEncoding];
+                } else {
+                    (*readToOffset) = (unsigned long long) 0;
                 }
-                return [[NSString alloc] initWithData:fileData encoding:NSUTF8StringEncoding];
-            } else {
-                (* readToOffset) = (unsigned long long) 0;
             }
-        }
-        @catch (NSException *e) {
-            LOG_ERROR(@"Error reading file: %@", [e debugDescription]);
+            @catch (NSException *e) {
+                LOG_ERROR(@"Error reading file: %@", [e debugDescription]);
+            }
         }
 
         // Put thread to sleep for 100 ms and try again.
