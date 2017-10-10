@@ -28,8 +28,7 @@
 /* Text above change region button that allows user to select their desired server region */
 "CHANGE_REGION" = "Change Region";
 
-/* Done button in navigation bar
-   Title of the button that dismisses region selection dialog
+/* Title of the button that dismisses region selection dialog
    Title of the button that dismisses the settings menu (InAppSettingsKit)
    Title of the button that dismisses the subscriptions menu */
 "DONE_ACTION" = "Done";

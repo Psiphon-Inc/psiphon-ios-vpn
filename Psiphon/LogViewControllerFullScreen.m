@@ -21,10 +21,11 @@
 #import "PsiphonDataSharedDB.h"
 #import "SharedConstants.h"
 #import "Notifier.h"
-#import "Logging.h"
+
+// Maximum number logs to display.
+#define MAX_LOGS_DISPLAY 250
 
 @implementation LogViewControllerFullScreen {
-    PsiphonData *psiphonData;
     PsiphonDataSharedDB *sharedDB;
     Notifier *notifier;
 }
@@ -32,7 +33,6 @@
 - (instancetype)init {
     self = [super init];
     if (self) {
-        psiphonData = [PsiphonData sharedInstance];
         sharedDB = [[PsiphonDataSharedDB alloc] initForAppGroupIdentifier:APP_GROUP_IDENTIFIER];
         notifier = [[Notifier alloc] initWithAppGroupIdentifier:APP_GROUP_IDENTIFIER];
     }
@@ -44,36 +44,22 @@
 
     // UIBar
     [self setTitle:NSLocalizedStringWithDefaultValue(@"LOGS_TITLE", nil, [NSBundle mainBundle], @"Logs", @"Log view title bar text")];
+
     UIBarButtonItem *doneButton = [[UIBarButtonItem alloc]
-      initWithTitle:NSLocalizedStringWithDefaultValue(@"DONE_ACTION", nil, [NSBundle mainBundle], @"Done", @"Done button in navigation bar")
-      style:UIBarButtonItemStyleDone target:self action:@selector(onNavigationDoneTap)];
+      initWithTitle:@"Done" style:UIBarButtonItemStyleDone target:self action:@selector(onNavigationDoneTap)];
+
+    UIBarButtonItem *reloadButton = [[UIBarButtonItem alloc]
+      initWithTitle:@"Reload" style:UIBarButtonItemStylePlain target:self action:@selector(onReloadTap)];
+
 
     [self.navigationItem setRightBarButtonItem:doneButton];
+    [self.navigationItem setLeftBarButtonItem:reloadButton];
+
+    [self loadDataAsync];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
-
-    // Reads data from the database on a global background thread,
-    // and populates psiphonData in-memory database.
-    // LogViewControllers listens for new log notifications from PsiphonData.
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        NSArray<DiagnosticEntry *> *logs = [sharedDB getNewLogs];
-        [psiphonData addDiagnosticEntries:logs];
-    });
-
-    [notifier listenForNotification:@"NE.onDiagnosticMessage" listener:^{
-        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-            NSArray<DiagnosticEntry *> *logs = [sharedDB getNewLogs];
-            [psiphonData addDiagnosticEntries:logs];
-
-#if DEBUG
-            for (DiagnosticEntry *log in logs) {
-               LOG_DEBUG(@"%@ %@", [log getTimestampForDisplay], [log message]);
-            }
-#endif
-        });
-    }];
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
@@ -83,8 +69,32 @@
     [notifier stopListeningForAllNotifications];
 }
 
+#pragma mark - Helper functions
+
+- (void)loadDataAsync {
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        NSArray<DiagnosticEntry*> *entries = [sharedDB getAllLogs];
+        
+        if ([entries count] > MAX_LOGS_DISPLAY) {
+            self.diagnosticEntries = [entries subarrayWithRange:NSMakeRange([entries count] - MAX_LOGS_DISPLAY , MAX_LOGS_DISPLAY)];
+        } else {
+            self.diagnosticEntries = entries;
+        }
+
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self onDataChanged];
+        });
+    });
+}
+
+#pragma mark - UI Callbacks
+
 - (void)onNavigationDoneTap {
     [self dismissViewControllerAnimated:YES completion:nil];
+}
+
+- (void)onReloadTap {
+    [self loadDataAsync];
 }
 
 @end

@@ -6,10 +6,9 @@ target 'Psiphon' do
   #use_frameworks!
 
   # Pods for Psiphon
-  pod 'FMDB', '2.7.2'
   pod "InAppSettingsKit", :git => "https://github.com/Psiphon-Inc/InAppSettingsKit.git", :commit => '877f342'
   #pod "InAppSettingsKit", :path => "../InAppSettingsKit"
-  pod 'PsiphonClientCommonLibrary', :git => "https://github.com/Psiphon-Inc/psiphon-ios-client-common-library.git", :commit => '7b5f646'
+  pod 'PsiphonClientCommonLibrary', :git => "https://github.com/Psiphon-Inc/psiphon-ios-client-common-library.git", :branch => 'master', :commit => '651fdd0'
   #pod 'PsiphonClientCommonLibrary', :path => "../psiphon-ios-client-common-library/"
 
   pod 'OpenSSL', '1.0.210'
@@ -22,6 +21,4 @@ target 'PsiphonVPN' do
   # Comment the next line if you're not using Swift and don't want to use dynamic frameworks
   #use_frameworks!
 
-  # Pods for PsiphonVPN
-  pod 'FMDB', '2.7.2'
 end

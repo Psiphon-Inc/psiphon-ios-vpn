@@ -102,7 +102,6 @@
     [self initializeDefaults];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(switchViewControllerWhenAdsLoaded) name:@kAdsDidLoad object:adManager];
 
-    [sharedDB truncateLogs];
     [[IAPHelper sharedInstance] startProductsRequest];
 
     return YES;
@@ -271,8 +270,8 @@
         LOG_DEBUG(@"Received notification NE.newHomepages");
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
             if (!shownHomepage) {
-                NSArray<Homepage *> *homepages = [sharedDB getAllHomepages];
-                if ([homepages count] > 0) {
+                NSArray<Homepage *> *homepages = [sharedDB getHomepages];
+                if (homepages && [homepages count] > 0) {
                     NSUInteger randIndex = arc4random() % [homepages count];
                     Homepage *homepage = homepages[randIndex];
                     dispatch_async(dispatch_get_main_queue(), ^{
