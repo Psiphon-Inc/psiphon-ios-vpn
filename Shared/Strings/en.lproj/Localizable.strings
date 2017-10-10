@@ -13,15 +13,15 @@
 /* Text above change region button that allows user to select their desired server region */
 "CHANGE_REGION" = "Change Region";
 
+/* Main text in the 'Upstream Proxy Error' dialog box. This is shown when the user has directly altered these settings, and those settings are (probably) erroneous. */
+"CHECK_UPSTREAM_PROXY_SETTING" = "You have configured Psiphon to use an upstream proxy.\nHowever, we seem to be unable to connect to a Psiphon server through that proxy.\nPlease fix the settings and try again.";
+
 /* Title of the button that dismisses region selection dialog
    Title of the button that dismisses the settings menu (InAppSettingsKit) */
 "DONE_ACTION" = "Done";
 
 /* Text displayed while app loads */
 "LOADING" = "Loading...";
-
-/* Log view title bar text */
-"LOGS_TITLE" = "Logs";
 
 /* Shown when the device is not configured for sending email. (InAppSettingsKit) */
 "MAIL_NOT_CONFIGURED" = "Mail not configured";
