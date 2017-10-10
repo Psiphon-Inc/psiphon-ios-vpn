@@ -129,7 +129,7 @@
 
     dispatch_async(workQueue, ^{
 
-        unsigned long long newBytesReadFileOffset;
+        unsigned long long newBytesReadFileOffset = 0;
 
         BOOL isFirstLogRead = (bytesReadFileOffset == 0);
 
