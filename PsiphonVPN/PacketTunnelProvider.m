@@ -423,4 +423,21 @@
     LOG_ERROR(@"tunnel-core: %@:%@", timestamp, message);
 }
 
+- (void)onUpstreamProxyError:(NSString *_Nonnull)message {
+    // The life of prevUpstreamProxyErrorMessage should be limited to the life
+    // of a tunnel core connection attempt.
+    static NSString *prevUpstreamProxyErrorMessage;
+
+    if (!prevUpstreamProxyErrorMessage || ![message isEqualToString:prevUpstreamProxyErrorMessage]) {
+        prevUpstreamProxyErrorMessage = message;
+        NSString *alertDisplayMessage = [NSString stringWithFormat:@"%@\n\n(%@)",
+            NSLocalizedStringWithDefaultValue(@"CHECK_UPSTREAM_PROXY_SETTING", nil, [NSBundle mainBundle], @"You have configured Psiphon to use an upstream proxy.\nHowever, we seem to be unable to connect to a Psiphon server through that proxy.\nPlease fix the settings and try again.", @"Main text in the 'Upstream Proxy Error' dialog box. This is shown when the user has directly altered these settings, and those settings are (probably) erroneous."),
+            message];
+        [self displayMessage:alertDisplayMessage
+           completionHandler:^(BOOL success) {
+               // Do nothing.
+           }];
+    }
+}
+
 @end

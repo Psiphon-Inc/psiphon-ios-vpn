@@ -103,7 +103,11 @@ NSString *const kIAPSKPaymentTransactionStateRestored = @"kIAPSKPaymentTransacti
 }
 
 - (void)productsRequest:(SKProductsRequest *)request didReceiveResponse:(SKProductsResponse *)response {
-    self.storeProducts = response.products;
+    // Sort products by price
+    NSSortDescriptor *mySortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"price" ascending:YES];
+    NSMutableArray *sortArray = [[NSMutableArray alloc] initWithArray:response.products];
+    [sortArray sortUsingDescriptors:[NSArray arrayWithObject:mySortDescriptor]];
+    self.storeProducts = sortArray;
     [[NSNotificationCenter defaultCenter]postNotificationName:kIAPSKProductsRequestDidReceiveResponse object:nil];
 }
 
