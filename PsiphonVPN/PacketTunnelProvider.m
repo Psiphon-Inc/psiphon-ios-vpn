@@ -28,6 +28,7 @@
 #import "SharedConstants.h"
 #import "Notifier.h"
 #import "Logging.h"
+#import "Notice.h"
 #import <ifaddrs.h>
 #import <arpa/inet.h>
 #import <net/if.h>
@@ -45,6 +46,9 @@
     // Notifier
     Notifier *notifier;
 
+    // Notice logger
+    Notice *noticeLogger;
+
     // State variables
     BOOL shouldStartVPN;  // Start vpn decision made by the container.
 }
@@ -61,6 +65,9 @@
 
         // Notifier
         notifier = [[Notifier alloc] initWithAppGroupIdentifier:APP_GROUP_IDENTIFIER];
+
+        // Notice logger
+        noticeLogger = [Notice sharedInstance];
 
         // state variables
         shouldStartVPN = FALSE;
@@ -86,6 +93,7 @@
 
             if (error != nil) {
                 LOG_ERROR(@"setTunnelNetworkSettings failed: %@", error);
+                [noticeLogger noticeError:@"setTunnelNetworkSettings failed: %@", [error description]];
                 startTunnelCompletionHandler([[NSError alloc] initWithDomain:PSIPHON_TUNNEL_ERROR_DOMAIN code:PSIPHON_TUNNEL_ERROR_BAD_CONFIGURATION userInfo:nil]);
                 return;
             }
@@ -94,6 +102,7 @@
             BOOL success = [weakPsiphonTunnel start:FALSE];
             if (!success) {
                 LOG_ERROR(@"psiphonTunnel.start failed");
+                [noticeLogger noticeError:@"psiphonTunnel.start failed"];
                 startTunnelCompletionHandler([[NSError alloc] initWithDomain:PSIPHON_TUNNEL_ERROR_DOMAIN code:PSIPHON_TUNNEL_ERROR_INTERAL_ERROR userInfo:nil]);
                 return;
             }
@@ -328,6 +337,7 @@
 
     if (![fileManager fileExistsAtPath:bundledConfigPath]) {
         LOG_ERROR(@"Config file not found. Aborting now.");
+        [noticeLogger noticeError:@"Config file not found. Aborting now."];
         abort();
     }
 
@@ -338,6 +348,7 @@
 
     if (err) {
         LOG_ERROR(@"%@", [NSString stringWithFormat:@"Aborting. Failed to parse config JSON: %@", err.description]);
+        [noticeLogger noticeError:@"Aborting. Failed to parse config JSON: %@", err.description];
         abort();
     }
 
@@ -361,6 +372,7 @@
 
     if (err) {
         LOG_ERROR(@"%@", [NSString stringWithFormat:@"Aborting. Failed to create JSON data from config object: %@", err.description]);
+        [noticeLogger noticeError:@"Aborting. Failed to create JSON data from config object: %@", err.description];
         abort();
     }
 
@@ -411,6 +423,7 @@
 
 - (void)onDiagnosticMessage:(NSString *_Nonnull)message withTimestamp:(NSString *_Nonnull)timestamp {
     LOG_ERROR(@"tunnel-core: %@:%@", timestamp, message);
+    [noticeLogger noticeError:[NSString stringWithFormat:@"onDiagnosticMessage:%@", message] withTimestamp:timestamp];
 }
 
 - (void)onUpstreamProxyError:(NSString *_Nonnull)message {
