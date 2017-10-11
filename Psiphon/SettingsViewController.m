@@ -57,7 +57,7 @@
             subscriptionItemTitle = NSLocalizedStringWithDefaultValue(@"SETTINGS_SUBSCRIPTION_NOT_ACTIVE",
                                                                       nil,
                                                                       [NSBundle mainBundle],
-                                                                      @"Go Premium!",
+                                                                      @"Go premium!",
                                                                       @"Subscriptions item title in the app settings when user does not have an active subscription. Clicking this item opens subscriptions view");
         }
         [cell.textLabel setText:subscriptionItemTitle];
