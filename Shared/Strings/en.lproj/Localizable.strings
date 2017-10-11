@@ -1,3 +1,6 @@
+/* Text for button that tell users there will by a short video ad. */
+"AD_LOADED" = "Watch a short video while we get ready to connect you";
+
 /* Text for app subtitle on main view. */
 "APP_SUB_TITLE_MAIN_VIEW" = "BEYOND BORDERS";
 
@@ -23,7 +26,7 @@
 "BUY_SUBSCRIPTIONS_FOOTER_TEXT" = "Restore prevously bought subscription or refresh subscription receipt";
 
 /* Buy subscription dialog header text */
-"BUY_SUBSCRIPTIONS_HEADER_TEXT" = "Buy subscription to remove ads.";
+"BUY_SUBSCRIPTIONS_HEADER_TEXT" = "Buy a subscription to remove ads and surf the Internet faster!";
 
 /* Text above change region button that allows user to select their desired server region */
 "CHANGE_REGION" = "Change Region";
@@ -71,13 +74,13 @@
 "SETTINGS_SUBSCRIPTION_ACTIVE" = "Subscriptions";
 
 /* Subscriptions item title in the app settings when user does not have an active subscription. Clicking this item opens subscriptions view */
-"SETTINGS_SUBSCRIPTION_NOT_ACTIVE" = "Go Premium!";
+"SETTINGS_SUBSCRIPTION_NOT_ACTIVE" = "Go premium!";
 
 /* Title of the settings (aka preferences) view (InAppSettingsKit) */
 "SETTINGS_TITLE" = "Settings";
 
 /* Text for button that opens paid subscriptions manager UI */
-"SUBSCRIPTION_BUTTON_TITLE" = "Go ad-free now!";
+"SUBSCRIPTION_BUTTON_TITLE" = "Go premium now!";
 
 /* Title of the dialog for available in-app paid subscriptions */
 "SUBSCRIPTIONS" = "Subscriptions";

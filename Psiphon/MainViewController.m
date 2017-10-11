@@ -64,6 +64,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     UILabel *appSubTitleLabel;
     UILabel *statusLabel;
     UILabel *versionLabel;
+    UILabel *adLabel;
     UIButton *subscriptionButton;
     UILabel *regionButtonHeader;
     UIButton *regionButton;
@@ -75,6 +76,8 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     NSLayoutConstraint *startButtonScreenWidth;
     NSLayoutConstraint *startButtonScreenHeight;
     NSLayoutConstraint *startButtonWidth;
+    NSLayoutConstraint *bottomBarTop;
+    NSLayoutConstraint *subscriptionButtonTop;
     
     // UI Layer
     CAGradientLayer *backgroundGradient;
@@ -131,21 +134,29 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     [self addSettingsButton];
     [self addRegionSelectionBar];
     [self addStartAndStopButton];
+    [self addAdLabel];
     [self addAppTitleLabel];
     [self addAppSubTitleLabel];
     [self addSubscriptionButton];
     [self addStatusLabel];
     [self addVersionLabel];
-    //[self addLogoImage];
-    
+    [self setupLayoutGuides];
+
     if (([[UIDevice currentDevice].model hasPrefix:@"iPhone"] || [[UIDevice currentDevice].model hasPrefix:@"iPod"]) && (self.view.bounds.size.width > self.view.bounds.size.height)) {
         //logoView.hidden = YES;
         //appTitleLabel.hidden = YES;
         //appSubTitleLabel.hidden = YES;
     }
     
-    [[NSNotificationCenter defaultCenter]
-     addObserver:self selector:@selector(onVPNStatusDidChange) name:@kVPNStatusChangeNotificationName object:vpnManager];
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(onVPNStatusDidChange)
+                                                 name:@kVPNStatusChangeNotificationName
+                                               object:vpnManager];
+
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(onAdStatusDidChange)
+                                                 name:@kAdsDidLoad
+                                               object:adManager];
     
     // Observe IAP transaction notification
     [[NSNotificationCenter defaultCenter] addObserver:self
@@ -154,11 +165,13 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                                                object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(updatedIAPTransactionState)
-                                                 name:kIAPSKPaymentTransactionStateRestored
+                                                 name:kIAPSKPaymentQueuePaymentQueueRestoreCompletedTransactionsFinished
                                                object:nil];
-    
-    
-    
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(updatedIAPTransactionState)
+                                                 name:kIAPSKPaymentQueueRestoreCompletedTransactionsFailedWithError
+                                               object:nil];
+
     // TODO: load/save config here to have the user immediately complete the permission prompt
 }
 
@@ -188,6 +201,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     
     // Sync UI with the VPN state
     [self onVPNStatusDidChange];
+    [self onAdStatusDidChange];
     [self updateSubscriptionUI];
 }
 
@@ -216,17 +230,13 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
         [self.view removeConstraint:startButtonScreenWidth];
         [self.view addConstraint:startButtonScreenHeight];
         if ([[UIDevice currentDevice].model hasPrefix:@"iPhone"]) {
-            //logoView.hidden = YES;
-            //appTitleLabel.hidden = YES;
-            //appSubTitleLabel.hidden = YES;
+            adLabel.hidden = YES;
         }
     } else {
         [self.view removeConstraint:startButtonScreenHeight];
         [self.view addConstraint:startButtonScreenWidth];
         if ([[UIDevice currentDevice].model hasPrefix:@"iPhone"]) {
-            //logoView.hidden = NO;
-            //appTitleLabel.hidden = NO;
-            //appSubTitleLabel.hidden = NO;
+            adLabel.hidden = ![adManager untunneledInterstitialIsReady];
         }
     }
     
@@ -261,6 +271,10 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     
     // Notify SettingsViewController that the state has changed
     [[NSNotificationCenter defaultCenter] postNotificationName:kPsiphonConnectionStateNotification object:nil];
+}
+
+- (void)onAdStatusDidChange{
+    adLabel.hidden = ![adManager untunneledInterstitialIsReady];
 }
 
 - (void)onStartStopTap:(UIButton *)sender {
@@ -633,6 +647,56 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     [self.view addConstraint:startButtonWidth];
 }
 
+- (void)addAdLabel {
+    adLabel = [[UILabel alloc] init];
+    adLabel.translatesAutoresizingMaskIntoConstraints = NO;
+    adLabel.text = NSLocalizedStringWithDefaultValue(@"AD_LOADED", nil, [NSBundle mainBundle], @"Watch a short video while we get ready to connect you", @"Text for button that tell users there will by a short video ad.");
+    adLabel.textAlignment = NSTextAlignmentCenter;
+    adLabel.textColor = [UIColor lightGrayColor];
+    adLabel.lineBreakMode = NSLineBreakByWordWrapping;
+    adLabel.numberOfLines = 0;
+    UIFontDescriptor * fontD = [adLabel.font.fontDescriptor
+                                fontDescriptorWithSymbolicTraits:UIFontDescriptorTraitItalic];
+    adLabel.font = [UIFont fontWithDescriptor:fontD size:adLabel.font.pointSize - 1];
+    [self.view addSubview:adLabel];
+    if (![adManager untunneledInterstitialIsReady]){
+        adLabel.hidden = true;
+    }
+
+    // Setup autolayout
+    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:adLabel
+                                                          attribute:NSLayoutAttributeBottom
+                                                          relatedBy:NSLayoutRelationGreaterThanOrEqual
+                                                             toItem:startStopButton
+                                                          attribute:NSLayoutAttributeTop
+                                                         multiplier:1.0
+                                                           constant:-30.0]];
+
+    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:adLabel
+                                                          attribute:NSLayoutAttributeBottom
+                                                          relatedBy:NSLayoutRelationLessThanOrEqual
+                                                             toItem:startStopButton
+                                                          attribute:NSLayoutAttributeTop
+                                                         multiplier:1.0
+                                                           constant:-10.0]];
+
+    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:adLabel
+                                                          attribute:NSLayoutAttributeLeft
+                                                          relatedBy:NSLayoutRelationEqual
+                                                             toItem:self.view
+                                                          attribute:NSLayoutAttributeLeft
+                                                         multiplier:1.0
+                                                           constant:15.0]];
+
+    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:adLabel
+                                                          attribute:NSLayoutAttributeRight
+                                                          relatedBy:NSLayoutRelationEqual
+                                                             toItem:self.view
+                                                          attribute:NSLayoutAttributeRight
+                                                         multiplier:1.0
+                                                           constant:-15.0]];
+}
+
 - (void)addStatusLabel {
     statusLabel = [[UILabel alloc] init];
     statusLabel.translatesAutoresizingMaskIntoConstraints = NO;
@@ -840,7 +904,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     NSString *subscriptionButtonTitle = NSLocalizedStringWithDefaultValue(@"SUBSCRIPTION_BUTTON_TITLE",
                                                                           nil,
                                                                           [NSBundle mainBundle],
-                                                                          @"Go ad-free now!",
+                                                                          @"Go premium now!",
                                                                           @"Text for button that opens paid subscriptions manager UI");
     [subscriptionButton setTitle:subscriptionButtonTitle forState:UIControlStateNormal];
     [subscriptionButton addTarget:self action:@selector(onSubscriptionTap) forControlEvents:UIControlEventTouchUpInside];
@@ -1167,30 +1231,34 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     return size.height;
 }
 
-- (void) updateSubscriptionUI {
+- (void)setupLayoutGuides {
     // setup layout equal distribution
     UILayoutGuide *topSpacerGuide = [UILayoutGuide new];
     UILayoutGuide *bottomSpacerGuide = [UILayoutGuide new];
-    
+
     [self.view addLayoutGuide:topSpacerGuide];
     [self.view addLayoutGuide:bottomSpacerGuide];
-    
+
     [topSpacerGuide.heightAnchor constraintGreaterThanOrEqualToConstant:.1].active = YES;
     [bottomSpacerGuide.heightAnchor constraintEqualToAnchor:topSpacerGuide.heightAnchor].active = YES;
-    
+
     [topSpacerGuide.topAnchor constraintEqualToAnchor:appSubTitleLabel.bottomAnchor].active = YES;
     [topSpacerGuide.bottomAnchor constraintEqualToAnchor:startStopButton.topAnchor].active = YES;
     [bottomSpacerGuide.topAnchor constraintEqualToAnchor:statusLabel.bottomAnchor].active = YES;
-    
-    NSLayoutConstraint *bottomBarTop = [bottomSpacerGuide.bottomAnchor constraintEqualToAnchor:bottomBar.topAnchor];
-    NSLayoutConstraint *subscriptionButtonTop = [bottomSpacerGuide.bottomAnchor constraintEqualToAnchor:subscriptionButton.topAnchor];
-    
+
+    bottomBarTop = [bottomSpacerGuide.bottomAnchor constraintEqualToAnchor:bottomBar.topAnchor];
+    subscriptionButtonTop = [bottomSpacerGuide.bottomAnchor constraintEqualToAnchor:subscriptionButton.topAnchor];
+}
+
+- (void) updateSubscriptionUI {
     if(![IAPHelper canMakePayments] || [[IAPHelper sharedInstance]hasActiveSubscriptionForDate:[NSDate date]]) {
         subscriptionButton.hidden = YES;
+        adLabel.hidden = YES;
         subscriptionButtonTop.active = NO;
         bottomBarTop.active = YES;
     } else {
         subscriptionButton.hidden = NO;
+        adLabel.hidden = ![adManager untunneledInterstitialIsReady];
         bottomBarTop.active = NO;
         subscriptionButtonTop.active = YES;
     }
@@ -1210,6 +1278,18 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
         // if user subscription state has changed to valid
         // try to deinit ads if currently not showing and hide adLabel
         [adManager initializeAds];
+
+        // Restart the VPN if user is currently running a non-subscription config
+        NSString *bundledConfigStr = [PsiphonClientCommonLibraryHelpers getPsiphonBundledConfig];
+        if(bundledConfigStr) {
+            NSDictionary *config = [PsiphonClientCommonLibraryHelpers jsonToDictionary:bundledConfigStr];
+            if (config) {
+                NSDictionary *subscriptionConfig = [config objectForKey:@"subscriptionConfig"];
+                if(subscriptionConfig[@"SponsorId"] && !([sharedDB getSponsorId].length)) {
+                    [vpnManager restartVPN];
+                }
+            }
+        }
     }
 }
 @end
