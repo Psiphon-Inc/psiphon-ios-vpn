@@ -20,6 +20,7 @@
 #import "PsiphonDataSharedDB.h"
 #import "Logging.h"
 #import "NSDateFormatter+RFC3339.h"
+#import "Notice.h"
 
 // File operations parameters
 #define MAX_RETRIES 3
@@ -41,6 +42,11 @@
 
     // RFC3339 Date Formatter
     NSDateFormatter *rfc3339Formatter;
+
+//#ifdef TARGET_IS_EXTENSION
+    dispatch_queue_t extensionWorkQueue;
+    NSFileHandle *extensionLogFileHandle;
+//#endif
 }
 
 /*!
@@ -52,9 +58,7 @@
     self = [super init];
     if (self) {
         appGroupIdentifier = identifier;
-
         sharedDefaults = [[NSUserDefaults alloc] initWithSuiteName:identifier];
-
         rfc3339Formatter = [NSDateFormatter createRFC3339MilliFormatter];
     }
     return self;
@@ -72,7 +76,6 @@
                                 readFromOffset:0
                                   readToOffset:nil];
 }
-
 
 /*!
  * If fileHandlePtr points to nil, then a new NSFileHandle for
@@ -298,7 +301,7 @@
     return [sharedDefaults objectForKey:EGRESS_REGIONS_KEY];
 }
 
-#pragma mark - Log Table methods
+#pragma mark - Logging
 
 - (NSString *)rotatingLogNoticesPath {
     return [[[[NSFileManager defaultManager]
@@ -306,8 +309,15 @@
             stringByAppendingPathComponent:@"rotating_notices"];
 }
 
-- (NSString *)rotatingLogNoticesBackupPath {
+- (NSString *)rotatingOlderLogNoticesPath {
     return [[self rotatingLogNoticesPath] stringByAppendingString:@".1"];
+}
+
+// Private function.
+- (NSString *)extensionLogNoticesPath {
+    return [[[[NSFileManager defaultManager]
+      containerURLForSecurityApplicationGroupIdentifier:appGroupIdentifier] path]
+      stringByAppendingPathComponent:@"extension_notices"];
 }
 
 #ifndef TARGET_IS_EXTENSION
@@ -317,20 +327,52 @@
 - (NSArray<DiagnosticEntry*>*)getAllLogs {
 
     LOG_DEBUG(@"Log filesize:%@", [self getFileSize:[self rotatingLogNoticesPath]]);
-    LOG_DEBUG(@"Log backup filesize:%@", [self getFileSize:[self rotatingLogNoticesBackupPath]]);
+    LOG_DEBUG(@"Log backup filesize:%@", [self getFileSize:[self rotatingOlderLogNoticesPath]]);
 
-    NSMutableArray<DiagnosticEntry *> *entries = [[NSMutableArray alloc] init];
+    NSMutableArray<NSMutableArray<DiagnosticEntry *> *> *entriesArray = [[NSMutableArray alloc] initWithCapacity:3];
 
-    // Reads both log files all at once (max of 2MB) into memory,
+    // Reads both tunnel-core log files all at once (max of 2MB) into memory,
     // and defers any processing after the read in order to reduce
     // the chance of a log rotation happening midway.
-    NSString *backupLogLines = [PsiphonDataSharedDB tryReadingFile:[self rotatingLogNoticesBackupPath]];
-    NSString *logLines = [PsiphonDataSharedDB tryReadingFile:[self rotatingLogNoticesPath]];
+    entriesArray[0] = [[NSMutableArray alloc] init];
+    NSString *tunnelCoreOlderLogs = [PsiphonDataSharedDB tryReadingFile:[self rotatingOlderLogNoticesPath]];
+    NSString *tunnelCoreLogs = [PsiphonDataSharedDB tryReadingFile:[self rotatingLogNoticesPath]];
+    [self readLogsData:tunnelCoreOlderLogs intoArray:entriesArray[0]];
+    [self readLogsData:tunnelCoreLogs intoArray:entriesArray[0]];
 
-    [self readLogsData:backupLogLines intoArray:entries];
-    [self readLogsData:logLines intoArray:entries];
+    entriesArray[1] = [[NSMutableArray alloc] init];
+    NSString *containerOlderLogs = [PsiphonDataSharedDB tryReadingFile:[Notice containerRotatingOlderLogNoticesPath]];
+    NSString *containerLogs = [PsiphonDataSharedDB tryReadingFile:[Notice containerRotatingLogNoticesPath]];
+    [self readLogsData:containerOlderLogs intoArray:entriesArray[1]];
+    [self readLogsData:containerLogs intoArray:entriesArray[1]];
 
-    return entries;
+    entriesArray[2] = [[NSMutableArray alloc] init];
+    NSString *extensionOlderLogs = [PsiphonDataSharedDB tryReadingFile:[Notice extensionRotatingOlderLogNoticesPath]];
+    NSString *extensionLogs = [PsiphonDataSharedDB tryReadingFile:[Notice extensionRotatingLogNoticesPath]];
+    [self readLogsData:extensionOlderLogs intoArray:entriesArray[2]];
+    [self readLogsData:extensionLogs intoArray:entriesArray[2]];
+
+
+    // Sorts classes of logs in entriesArray based on the timestamp of the last log in each class.
+    NSArray *sortedEntriesArray = [entriesArray sortedArrayUsingComparator:^NSComparisonResult(id obj1, id obj2) {
+        NSDate *obj1LastTimestamp = [[(NSArray<DiagnosticEntry *> *) obj1 lastObject] timestamp];
+        NSDate *obj2LastTimestamp = [[(NSArray<DiagnosticEntry *> *) obj2 lastObject] timestamp];
+        return [obj2LastTimestamp compare:obj1LastTimestamp];
+    }];
+
+    // Calculates total number of logs and initializes an array of that size.
+    NSUInteger totalNumLogs = 0;
+    for (NSUInteger i = 0; i < [entriesArray count]; ++i) {
+        totalNumLogs += [entriesArray[i] count];
+    }
+
+    NSMutableArray<DiagnosticEntry *> *allEntries = [[NSMutableArray alloc] initWithCapacity:totalNumLogs];
+
+    for (NSUInteger j = 0; j < [sortedEntriesArray count]; ++j) {
+        [allEntries addObjectsFromArray:sortedEntriesArray[j]];
+    }
+
+    return allEntries;
 }
 
 #endif

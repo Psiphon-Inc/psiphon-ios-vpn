@@ -21,6 +21,7 @@
 #import "PsiphonDataSharedDB.h"
 #import "SharedConstants.h"
 #import "Logging.h"
+#import "Notice.h"
 
 // Initial maximum number of logs to load.
 #define MAX_LOGS_LOAD 250
@@ -43,25 +44,22 @@
     dispatch_queue_t workQueue;
 
     dispatch_source_t dispatchSource;
+    
+    NSString *logPath;
 }
 
 - (instancetype)init {
     self = [super init];
     if (self) {
         sharedDB = [[PsiphonDataSharedDB alloc] initForAppGroupIdentifier:APP_GROUP_IDENTIFIER];
-
-        NSError *err;
-
-        // NSFileHandle opened with fileHandleForReadingFromURL ows its associated
-        // file descriptor, and will close it automatically when deallocated.
-        logFileHandle = [NSFileHandle
-          fileHandleForReadingFromURL:[NSURL fileURLWithPath:[sharedDB rotatingLogNoticesPath]]
-                                error:&err];
-
-        bytesReadFileOffset = (unsigned long long) 0;
+        logFileHandle = nil;
+        dispatchSource = nil;
+        bytesReadFileOffset = 0;
 
         workQueue = dispatch_queue_create([(APP_GROUP_IDENTIFIER @".LogViewWorkQueue") UTF8String],
           DISPATCH_QUEUE_SERIAL);
+        
+        logPath = [sharedDB rotatingLogNoticesPath];
     }
     return self;
 }
@@ -91,9 +89,6 @@
     [self.navigationItem setLeftBarButtonItem:reloadButton];
 
     [self loadDataAsync:TRUE];
-
-    // Setup listeners for logs file.
-    [self setupLogFileListener];
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
@@ -120,6 +115,7 @@
  * Submits work to workQueue to read new bytes from the log file an update the tableView.
  * @param userAction Whether a user action initiated data loading.
  */
+// loadDataAsync is thread-safe.
 - (void)loadDataAsync:(BOOL)userAction {
 
     // Caller should show spinner only when user performs an action.
@@ -129,11 +125,33 @@
 
     dispatch_async(workQueue, ^{
 
-        unsigned long long newBytesReadFileOffset = 0;
+        if (!logFileHandle) {
+            NSError *err;
 
+            // NSFileHandle opened with fileHandleForReadingFromURL ows its associated
+            // file descriptor, and will close it automatically when deallocated.
+            logFileHandle = [NSFileHandle
+              fileHandleForReadingFromURL:[NSURL fileURLWithPath:logPath]
+                                    error:&err];
+            bytesReadFileOffset = 0;
+
+            if (err) {
+                LOG_ERROR(@"Failed to open log file. Error: %@", err);
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [activityIndicator stopAnimating];
+                });
+                return;
+            }
+        }
+
+        if (!dispatchSource) {
+            [self setupLogFileListener];
+        }
+
+        unsigned long long newBytesReadFileOffset = 0;
         BOOL isFirstLogRead = (bytesReadFileOffset == 0);
 
-        NSString *logData = [PsiphonDataSharedDB tryReadingFile:[sharedDB rotatingLogNoticesPath]
+        NSString *logData = [PsiphonDataSharedDB tryReadingFile:logPath
                                                 usingFileHandle:&logFileHandle
                                                  readFromOffset:bytesReadFileOffset
                                                    readToOffset:&newBytesReadFileOffset];
@@ -196,12 +214,13 @@
     });
 }
 
+// setupLogFileListener method is thread-safe.
 - (void)setupLogFileListener {
-    int fd = open([[sharedDB rotatingLogNoticesPath] UTF8String], O_RDONLY);
+    
+    int fd = open([logPath UTF8String], O_RDONLY);
 
     if (fd == -1) {
         LOG_ERROR(@"Error opening log file to watch. errno: %s", strerror(errno));
-        [activityIndicator stopAnimating];
         return;
     }
 
@@ -229,6 +248,7 @@
     dispatch_source_set_cancel_handler(dispatchSource, ^{
         LOG_DEBUG(@"Log dispatchSource Cancelled");
         close(fd);
+        dispatchSource = nil;
     });
 
     dispatch_resume(dispatchSource);
