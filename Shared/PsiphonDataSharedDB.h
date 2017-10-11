@@ -29,25 +29,30 @@
 @end
 
 @interface PsiphonDataSharedDB : NSObject
+
+
 - (id)initForAppGroupIdentifier:(NSString*)identifier;
+
+#ifndef TARGET_IS_EXTENSION
++ (NSString *)tryReadingFile:(NSString *)filePath;
++ (NSString *)tryReadingFile:(NSString *)filePath usingFileHandle:(NSFileHandle *__strong *)fileHandlePtr readFromOffset:(unsigned long long)bytesOffset readToOffset:(unsigned long long *)readToOffset;
+- (void)readLogsData:(NSString *)logLines intoArray:(NSMutableArray<DiagnosticEntry *> *)entries;
+- (NSArray<Homepage *> *)getHomepages;
+#endif
 
 - (BOOL)insertNewEgressRegions:(NSArray<NSString *> *)regions;
 - (NSArray<NSString *> *)getAllEgressRegions;
 
-- (NSArray<Homepage *> *)getHomepages;
 - (NSString *)homepageNoticesPath;
 
-// Logs table
 - (NSString *)rotatingLogNoticesPath;
 #ifndef TARGET_IS_EXTENSION
 - (NSArray<DiagnosticEntry*>*)getAllLogs;
 #endif
 
-// Tunnel state table
 - (BOOL)updateTunnelConnectedState:(BOOL)connected;
 - (BOOL)getTunnelConnectedState;
 
-// App state table
 - (BOOL)updateAppForegroundState:(BOOL)foreground;
 - (BOOL)getAppForegroundState;
 
