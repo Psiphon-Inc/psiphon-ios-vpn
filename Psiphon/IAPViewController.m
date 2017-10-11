@@ -77,7 +77,7 @@ static NSString *iapCellID = @"IAPTableCellID";
         // retry getting products from the store
         [self startProductsRequest];
     }
-    
+
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(reloadProducts)
                                                  name:kIAPSKProductsRequestDidFailWithError
@@ -96,13 +96,7 @@ static NSString *iapCellID = @"IAPTableCellID";
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(reloadProducts)
                                                  name:kIAPSKPaymentQueuePaymentQueueRestoreCompletedTransactionsFinished
-                                               object:nil];
-    
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(reloadProducts)
-                                                 name:kIAPSKPaymentTransactionStateRestored
-                                               object:nil];
-    
+                                               object:nil];    
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(reloadProducts)
                                                  name:kIAPSKPaymentQueueRestoreCompletedTransactionsFailedWithError
@@ -111,6 +105,7 @@ static NSString *iapCellID = @"IAPTableCellID";
                                              selector:@selector(reloadProducts)
                                                  name:kIAPSKRequestRequestDidFinish
                                                object:nil];
+
 }
 
 
@@ -130,7 +125,6 @@ static NSString *iapCellID = @"IAPTableCellID";
         self.tableView.separatorStyle = UITableViewCellSeparatorStyleSingleLine;
         numOfSections                 = 1;
         tableView.tableHeaderView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, self.tableView.bounds.size.width, 0.01f)];
-        ;
     } else {
         UITextView *noProductsTextView = [[UITextView alloc] initWithFrame:CGRectMake(0, 0, tableView.bounds.size.width, tableView.bounds.size.height)];
         noProductsTextView.editable = NO;
@@ -163,7 +157,7 @@ static NSString *iapCellID = @"IAPTableCellID";
     label.text = NSLocalizedStringWithDefaultValue(@"BUY_SUBSCRIPTIONS_HEADER_TEXT",
                                                    nil,
                                                    [NSBundle mainBundle],
-                                                   @"Buy subscription to remove ads.",
+                                                   @"Buy a subscription to remove ads and surf the Internet faster!",
                                                    @"Buy subscription dialog header text");
     label.textAlignment = NSTextAlignmentCenter;
     label.translatesAutoresizingMaskIntoConstraints = NO;
@@ -335,7 +329,7 @@ static NSString *iapCellID = @"IAPTableCellID";
     }
 }
 
-- (void) reloadProducts {
+- (void)reloadProducts {
     if (self.refreshControl.isRefreshing) {
         [self.refreshControl endRefreshing];
     }
