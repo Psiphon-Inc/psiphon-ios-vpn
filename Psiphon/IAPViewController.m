@@ -211,18 +211,31 @@ static NSString *iapCellID = @"IAPTableCellID";
                                                                      nil,
                                                                      [NSBundle mainBundle],
                                                                      @"Refresh receipt",
-                                                                     @"Refresh receipt button title");
+                                                                     @"Refresh app receipt button title");
     UIButton* refreshButton = [UIButton buttonWithType:UIButtonTypeSystem];
     [refreshButton setTitle:refreshButtonTitle forState:UIControlStateNormal];
     [refreshButton addTarget:self action:@selector(refreshReceiptAction) forControlEvents:UIControlEventTouchUpInside];
     refreshButton.translatesAutoresizingMaskIntoConstraints = NO;
-    
     [cellView addSubview:refreshButton];
     
+    NSString *manageSubscriptionsButtonTitle = NSLocalizedStringWithDefaultValue(@"MANAGE_SUBSCRIPTIONS_BUTTON_TITLE",
+                                                                     nil,
+                                                                     [NSBundle mainBundle],
+                                                                     @"Manage my subscriptions",
+                                                                     @"Manage my subscriptions button title");
+    UIButton* manageSubscriptionsButton = [UIButton buttonWithType:UIButtonTypeSystem];
+    [manageSubscriptionsButton setTitle:manageSubscriptionsButtonTitle forState:UIControlStateNormal];
+    [manageSubscriptionsButton addTarget:self action:@selector(manageSubscriptionsAction) forControlEvents:UIControlEventTouchUpInside];
+    manageSubscriptionsButton.translatesAutoresizingMaskIntoConstraints = NO;
+    [cellView addSubview:manageSubscriptionsButton];
+
     [cellView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|-[label]-|" options:0 metrics:nil views:@{ @"label": label}]];
     [cellView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|-[restoreButton]-|" options:0 metrics:nil views:@{ @"restoreButton": restoreButton}]];
     [cellView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|-[refreshButton]-|" options:0 metrics:nil views:@{ @"refreshButton": refreshButton}]];
-    [cellView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|-10-[label]-10-[restoreButton]-10-[refreshButton]-|" options:0 metrics:nil views:@{ @"label": label, @"restoreButton": restoreButton, @"refreshButton": refreshButton}]];
+    [cellView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|-[manageSubscriptionsButton]-|" options:0 metrics:nil views:@{ @"manageSubscriptionsButton": manageSubscriptionsButton}]];
+    [cellView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|-10-[label]-10-[restoreButton]-10-[refreshButton]-50-[manageSubscriptionsButton]-|"
+                                                                     options:0 metrics:nil
+                                                                       views:@{ @"label": label, @"restoreButton": restoreButton, @"refreshButton": refreshButton, @"manageSubscriptionsButton": manageSubscriptionsButton}]];
     
     return cellView;
 }
@@ -283,7 +296,7 @@ static NSString *iapCellID = @"IAPTableCellID";
     return NO;
 }
 
-- (void) buyButtonPressed:(UISegmentedControl *)sender {
+- (void)buyButtonPressed:(UISegmentedControl *)sender {
     int productID = (int)sender.tag;
     
     if([IAPHelper sharedInstance].storeProducts.count > productID) {
@@ -292,7 +305,7 @@ static NSString *iapCellID = @"IAPTableCellID";
     }
 }
 
-- (void) restoreAction {
+- (void)restoreAction {
     if (!self.refreshControl.isRefreshing) {
         [self.refreshControl beginRefreshing];
         [self.tableView setContentOffset:CGPointMake(0, self.tableView.contentOffset.y-self.refreshControl.frame.size.height) animated:YES];
@@ -300,12 +313,18 @@ static NSString *iapCellID = @"IAPTableCellID";
     [[IAPHelper sharedInstance] restoreSubscriptions];
 }
 
-- (void) refreshReceiptAction {
+- (void)refreshReceiptAction {
     if (!self.refreshControl.isRefreshing) {
         [self.refreshControl beginRefreshing];
         [self.tableView setContentOffset:CGPointMake(0, self.tableView.contentOffset.y-self.refreshControl.frame.size.height) animated:YES];
     }
     [[IAPHelper sharedInstance] refreshReceipt];
+}
+
+- (void)manageSubscriptionsAction {
+    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"itms-apps://buy.itunes.apple.com/WebObjects/MZFinance.woa/wa/manageSubscriptions"]
+                                       options:@{}
+                             completionHandler:nil];
 }
 
 - (void)dismissViewController {
