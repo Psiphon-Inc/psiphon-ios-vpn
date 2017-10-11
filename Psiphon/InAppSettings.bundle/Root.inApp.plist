@@ -6,7 +6,7 @@
 	<array>
 		<dict>
 			<key>Title</key>
-			<string>Psiphon</string>
+			<string>PSIPHON</string>
 			<key>BundleTable</key>
 			<string>PsiphonClientCommonLibrary</string>
 			<key>Type</key>
@@ -14,7 +14,7 @@
 		</dict>
 		<dict>
 			<key>Title</key>
-			<string>Change Region</string>
+			<string>CHANGE_REGION</string>
 			<key>BundleTable</key>
 			<string>PsiphonClientCommonLibrary</string>
 			<key>Key</key>
@@ -26,7 +26,7 @@
 		</dict>
 		<dict>
 			<key>Title</key>
-			<string>Language</string>
+			<string>SETTINGS_LANGUAGE</string>
 			<key>BundleTable</key>
 			<string>PsiphonClientCommonLibrary</string>
 			<key>Key</key>
@@ -73,154 +73,155 @@
 			</array>
 			<key>Titles</key>
 			<array>
-				<string>Default language</string>
-				<string>English</string>
-				<string>فارسی</string>
-				<string>العربية</string>
-				<string>简体中文</string>
-				<string>繁体中文</string>
-				<string>ኣማርኛ</string>
-				<string>Azərbaycanca</string>
-				<string>Беларуская</string>
-				<string>བོད་ཡིག</string>
-				<string>Deutsch</string>
-				<string>Ελληνικά</string>
-				<string>Español</string>
-				<string>Suomi</string>
-				<string>Français</string>
-				<string>Hrvatski</string>
-				<string>Bahasa Indonesia</string>
-				<string>Қазақша</string>
-				<string>ភាសាខ្មែរ</string>
-				<string>한국어</string>
-				<string>Кыргызча</string>
-				<string>မြန်မာစာ</string>
-				<string>Norsk bokmål</string>
-				<string>Nederlands</string>
-				<string>Português (Brasil)</string>
-				<string>Português (Portugal)</string>
-				<string>Русский</string>
-				<string>ภาษาไทย</string>
-				<string>Türkmençe</string>
-				<string>Türkçe</string>
-				<string>Українська</string>
-				<string>O'zbekcha</string>
-				<string>Tiếng Việt</string>
+				<dict>
+					<key>Title</key>
+					<string>DEFAULT_LANGUAGE</string>
+					<key>BundleTable</key>
+					<string>PsiphonClientCommonLibrary</string>
+				</dict>
+				<dict>
+					<key>Title</key>
+					<string>English</string>
+				</dict>
+				<dict>
+					<key>Title</key>
+					<string>فارسی</string>
+				</dict>
+				<dict>
+					<key>Title</key>
+					<string>العربية</string>
+				</dict>
+				<dict>
+					<key>Title</key>
+					<string>简体中文</string>
+				</dict>
+				<dict>
+					<key>Title</key>
+					<string>繁体中文</string>
+				</dict>
+				<dict>
+					<key>Title</key>
+					<string>ኣማርኛ</string>
+				</dict>
+				<dict>
+					<key>Title</key>
+					<string>Azərbaycanca</string>
+				</dict>
+				<dict>
+					<key>Title</key>
+					<string>Беларуская</string>
+				</dict>
+				<dict>
+					<key>Title</key>
+					<string>བོད་ཡིག</string>
+				</dict>
+				<dict>
+					<key>Title</key>
+					<string>Deutsch</string>
+				</dict>
+				<dict>
+					<key>Title</key>
+					<string>Ελληνικά</string>
+				</dict>
+				<dict>
+					<key>Title</key>
+					<string>Español</string>
+				</dict>
+				<dict>
+					<key>Title</key>
+					<string>Suomi</string>
+				</dict>
+				<dict>
+					<key>Title</key>
+					<string>Français</string>
+				</dict>
+				<dict>
+					<key>Title</key>
+					<string>Hrvatski</string>
+				</dict>
+				<dict>
+					<key>Title</key>
+					<string>Bahasa Indonesia</string>
+				</dict>
+				<dict>
+					<key>Title</key>
+					<string>Қазақша</string>
+				</dict>
+				<dict>
+					<key>Title</key>
+					<string>ភាសាខ្មែរ</string>
+				</dict>
+				<dict>
+					<key>Title</key>
+					<string>한국어</string>
+				</dict>
+				<dict>
+					<key>Title</key>
+					<string>Кыргызча</string>
+				</dict>
+				<dict>
+					<key>Title</key>
+					<string>မြန်မာစာ</string>
+				</dict>
+				<dict>
+					<key>Title</key>
+					<string>Norsk bokmål</string>
+				</dict>
+				<dict>
+					<key>Title</key>
+					<string>Nederlands</string>
+				</dict>
+				<dict>
+					<key>Title</key>
+					<string>Português (Brasil)</string>
+				</dict>
+				<dict>
+					<key>Title</key>
+					<string>Português (Portugal)</string>
+				</dict>
+				<dict>
+					<key>Title</key>
+					<string>Русский</string>
+				</dict>
+				<dict>
+					<key>Title</key>
+					<string>ภาษาไทย</string>
+				</dict>
+				<dict>
+					<key>Title</key>
+					<string>Türkmençe</string>
+				</dict>
+				<dict>
+					<key>Title</key>
+					<string>Türkçe</string>
+				</dict>
+				<dict>
+					<key>Title</key>
+					<string>Українська</string>
+				</dict>
+				<dict>
+					<key>Title</key>
+					<string>O'zbekcha</string>
+				</dict>
+				<dict>
+					<key>Title</key>
+					<string>Tiếng Việt</string>
+				</dict>
 			</array>
 		</dict>
 		<dict>
-			<key>DefaultValue</key>
-			<false/>
-			<key>Key</key>
-			<string>disableTimeouts</string>
-			<key>Title</key>
-			<string>Disable Timeouts</string>
+			<key>File</key>
+			<string>PsiphonSettings</string>
 			<key>BundleTable</key>
 			<string>PsiphonClientCommonLibrary</string>
-			<key>Type</key>
-			<string>PSToggleSwitchSpecifier</string>
-		</dict>
-		<dict>
-			<key>DefaultValue</key>
-			<false/>
-			<key>Key</key>
-			<string>useUpstreamProxy</string>
 			<key>Title</key>
-			<string>Use upstream proxy</string>
-			<key>BundleTable</key>
-			<string>PsiphonClientCommonLibrary</string>
+			<string>PSIPHON_SUBSETTINGS_LABEL</string>
 			<key>Type</key>
-			<string>PSToggleSwitchSpecifier</string>
-		</dict>
-		<dict>
-			<key>Key</key>
-			<string>upstreamProxyHostAddress</string>
-			<key>Title</key>
-			<string>Host address</string>
-			<key>BundleTable</key>
-			<string>PsiphonClientCommonLibrary</string>
-			<key>Type</key>
-			<string>IASKCustomViewSpecifier</string>
-			<key>AutocorrectionType</key>
-			<string>No</string>
-			<key>KeyboardType</key>
-			<string>URL</string>
-			<key>IASKPlaceholder</key>
-			<string>example.com</string>
+			<string>PSChildPaneSpecifier</string>
 		</dict>
 		<dict>
 			<key>Title</key>
-			<string>Port</string>
-			<key>BundleTable</key>
-			<string>PsiphonClientCommonLibrary</string>
-			<key>Key</key>
-			<string>upstreamProxyPort</string>
-			<key>Type</key>
-			<string>IASKCustomViewSpecifier</string>
-			<key>KeyboardType</key>
-			<string>NumberPad</string>
-			<key>AutocorrectionType</key>
-			<string>No</string>
-			<key>IASKPlaceholder</key>
-			<string>12345</string>
-		</dict>
-		<dict>
-			<key>DefaultValue</key>
-			<false/>
-			<key>Key</key>
-			<string>useProxyAuthentication</string>
-			<key>Title</key>
-			<string>Use proxy authentication</string>
-			<key>BundleTable</key>
-			<string>PsiphonClientCommonLibrary</string>
-			<key>Type</key>
-			<string>PSToggleSwitchSpecifier</string>
-		</dict>
-		<dict>
-			<key>Key</key>
-			<string>proxyUsername</string>
-			<key>Title</key>
-			<string>Proxy username</string>
-			<key>BundleTable</key>
-			<string>PsiphonClientCommonLibrary</string>
-			<key>Type</key>
-			<string>IASKCustomViewSpecifier</string>
-			<key>AutocorrectionType</key>
-			<string>No</string>
-			<key>IASKPlaceholder</key>
-			<string>username</string>
-		</dict>
-		<dict>
-			<key>Type</key>
-			<string>IASKCustomViewSpecifier</string>
-			<key>IsSecure</key>
-			<true/>
-			<key>Title</key>
-			<string>Proxy password</string>
-			<key>BundleTable</key>
-			<string>PsiphonClientCommonLibrary</string>
-			<key>Key</key>
-			<string>proxyPassword</string>
-			<key>IASKPlaceholder</key>
-			<string>password</string>
-		</dict>
-		<dict>
-			<key>Key</key>
-			<string>proxyDomain</string>
-			<key>Title</key>
-			<string>Proxy domain</string>
-			<key>BundleTable</key>
-			<string>PsiphonClientCommonLibrary</string>
-			<key>Type</key>
-			<string>IASKCustomViewSpecifier</string>
-			<key>AutocorrectionType</key>
-			<string>No</string>
-			<key>IASKPlaceholder</key>
-			<string>example.com</string>
-		</dict>
-		<dict>
-			<key>Title</key>
-			<string>Help</string>
+			<string>SETTINGS_HELP_SECTION</string>
 			<key>BundleTable</key>
 			<string>PsiphonClientCommonLibrary</string>
 			<key>Type</key>
@@ -229,20 +230,20 @@
 		<dict>
 			<key>File</key>
 			<string>ConnectionHelp</string>
-			<key>Title</key>
-			<string>My connection is bad, help!</string>
 			<key>BundleTable</key>
 			<string>PsiphonClientCommonLibrary</string>
+			<key>Title</key>
+			<string>SETTINGS_BAD_CONNECTION_SUBSETTINGS_LABEL</string>
 			<key>Type</key>
 			<string>PSChildPaneSpecifier</string>
 		</dict>
 		<dict>
-			<key>Title</key>
+			<key>File</key>
 			<string>Feedback</string>
 			<key>BundleTable</key>
 			<string>PsiphonClientCommonLibrary</string>
-			<key>File</key>
-			<string>Feedback</string>
+			<key>Title</key>
+			<string>SETTINGS_FEEDBACK_SUBSETTINGS_LABEL</string>
 			<key>Key</key>
 			<string>feedback</string>
 			<key>Type</key>
@@ -250,7 +251,7 @@
 		</dict>
 		<dict>
 			<key>Title</key>
-			<string>FAQ</string>
+			<string>SETTINGS_FAQ</string>
 			<key>BundleTable</key>
 			<string>PsiphonClientCommonLibrary</string>
 			<key>Type</key>
@@ -260,7 +261,7 @@
 		</dict>
 		<dict>
 			<key>Title</key>
-			<string>Privacy Policy</string>
+			<string>SETTINGS_PRIVACY_POLICY</string>
 			<key>BundleTable</key>
 			<string>PsiphonClientCommonLibrary</string>
 			<key>Type</key>
@@ -270,7 +271,7 @@
 		</dict>
 		<dict>
 			<key>Title</key>
-			<string>Terms of Use</string>
+			<string>SETTINGS_TERMS_OF_USE</string>
 			<key>BundleTable</key>
 			<string>PsiphonClientCommonLibrary</string>
 			<key>Type</key>
@@ -280,7 +281,7 @@
 		</dict>
 		<dict>
 			<key>Title</key>
-			<string>About</string>
+			<string>SETTINGS_ABOUT</string>
 			<key>BundleTable</key>
 			<string>PsiphonClientCommonLibrary</string>
 			<key>Type</key>

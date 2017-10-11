@@ -1,6 +1,6 @@
 PODS:
   - Google-Mobile-Ads-SDK (7.24.0)
-  - InAppSettingsKit (2.9.2)
+  - InAppSettingsKit (2.9.4)
   - mopub-ios-sdk (4.16.0):
     - mopub-ios-sdk/MoPubSDK (= 4.16.0)
   - mopub-ios-sdk/Avid (4.16.0):
@@ -14,42 +14,41 @@ PODS:
     - mopub-ios-sdk/Core
     - mopub-ios-sdk/Moat
   - MPUBMoatMobileAppKit (3.2.1)
-  - PsiphonClientCommonLibrary (0.2.13):
+  - PsiphonClientCommonLibrary (0.2.14):
     - InAppSettingsKit
   - VungleSDK-iOS (5.2.0)
 
 DEPENDENCIES:
   - Google-Mobile-Ads-SDK (= 7.24.0)
-  - InAppSettingsKit (from `https://github.com/Psiphon-Inc/InAppSettingsKit.git`, commit `877f342`)
+  - InAppSettingsKit (from `https://github.com/Psiphon-Inc/InAppSettingsKit.git`, commit `598c498`)
   - mopub-ios-sdk (= 4.16.0)
-  - PsiphonClientCommonLibrary (from `https://github.com/Psiphon-Inc/psiphon-ios-client-common-library.git`, commit `651fdd0`, branch `master`)
+  - PsiphonClientCommonLibrary (from `https://github.com/Psiphon-Inc/psiphon-ios-client-common-library.git`, commit `c1f162f`)
   - VungleSDK-iOS (= 5.2.0)
 
 EXTERNAL SOURCES:
   InAppSettingsKit:
-    :commit: 877f342
+    :commit: 598c498
     :git: https://github.com/Psiphon-Inc/InAppSettingsKit.git
   PsiphonClientCommonLibrary:
-    :branch: master
-    :commit: 651fdd0
+    :commit: c1f162f
     :git: https://github.com/Psiphon-Inc/psiphon-ios-client-common-library.git
 
 CHECKOUT OPTIONS:
   InAppSettingsKit:
-    :commit: 877f342
+    :commit: 598c498
     :git: https://github.com/Psiphon-Inc/InAppSettingsKit.git
   PsiphonClientCommonLibrary:
-    :commit: 651fdd043659f0c8a608de5fd18ba243fa07f235
+    :commit: c1f162f
     :git: https://github.com/Psiphon-Inc/psiphon-ios-client-common-library.git
 
 SPEC CHECKSUMS:
   Google-Mobile-Ads-SDK: f405b7acb098fe89e6fcd05fdbf400c1a5bcb935
-  InAppSettingsKit: e81b468f9944bec83b1389a1e201600cc34ae922
+  InAppSettingsKit: 567ef538698cd6cf3afb9c5529b89a8936fdacb5
   mopub-ios-sdk: d656c7b5ccecc309115ac1ea280de76c72a301f7
   MPUBMoatMobileAppKit: f93733fbb17a5387228f4e29f1cd07c934d63cab
-  PsiphonClientCommonLibrary: c08d380e376c411ea132be2ab65065bf3ebed3bb
+  PsiphonClientCommonLibrary: 74fb17a3bb72c4648a87cfd59478c7d1dda7244e
   VungleSDK-iOS: ad8fdb94efa34e026f25528ff9592af05c665095
 
-PODFILE CHECKSUM: 9ebd66ee4acc2460a481ca2d3ffdf52c2c25cadb
+PODFILE CHECKSUM: bf091cf2857221361108f30402bc09eb32372edd
 
 COCOAPODS: 1.3.1
