@@ -92,7 +92,7 @@
         }
     }
 
-    [noticeLogger noticeError:@"Unknown NEVPNConnection status: (%d)", self.targetManager.connection.status];
+    [noticeLogger noticeError:@"Unknown NEVPNConnection status: (%ld)", self.targetManager.connection.status];
     return -1;
 }
 
@@ -147,8 +147,8 @@
         } else if ([allManagers count] > 1) {
             // Reset startStopButtonPressed flag to FALSE when error and exiting.
             [self setStartStopButtonPressed:FALSE];
-            LOG_ERROR(@"%u VPN configurations found, only expected 1. Aborting", [allManagers count]);
-            [noticeLogger noticeError:@"(%u) VPN configurations were found. Only expected 1", [allManagers count]];
+            LOG_ERROR(@"%lu VPN configurations found, only expected 1. Aborting", [allManagers count]);
+            [noticeLogger noticeError:@"(%lu) VPN configurations were found. Only expected 1", [allManagers count]];
             if (completionHandler) {
                 completionHandler([VPNManager errorWithCode:VPNManagerErrorTooManyConfigsFounds]);
             }

@@ -95,7 +95,7 @@
 
             if (error != nil) {
                 LOG_ERROR(@"setTunnelNetworkSettings failed: %@", error);
-                [noticeLogger noticeError:@"setTunnelNetworkSettings failed: %@", error];
+                [[NoticeLogger sharedInstance] noticeError:@"setTunnelNetworkSettings failed: %@", error];
                 startTunnelCompletionHandler([[NSError alloc] initWithDomain:PSIPHON_TUNNEL_ERROR_DOMAIN code:PSIPHON_TUNNEL_ERROR_BAD_CONFIGURATION userInfo:nil]);
                 return;
             }
@@ -104,7 +104,7 @@
             BOOL success = [weakPsiphonTunnel start:FALSE];
             if (!success) {
                 LOG_ERROR(@"psiphonTunnel.start failed");
-                [noticeLogger noticeError:@"psiphonTunnel.start failed"];
+                [[NoticeLogger sharedInstance] noticeError:@"psiphonTunnel.start failed"];
                 startTunnelCompletionHandler([[NSError alloc] initWithDomain:PSIPHON_TUNNEL_ERROR_DOMAIN code:PSIPHON_TUNNEL_ERROR_INTERAL_ERROR userInfo:nil]);
                 return;
             }
