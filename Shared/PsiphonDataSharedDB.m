@@ -30,6 +30,8 @@
 #define EGRESS_REGIONS_KEY @"egress_regions"
 #define TUN_CONNECTED_KEY @"tun_connected"
 #define APP_FOREGROUND_KEY @"app_foreground"
+#define SERVER_TIMESTAMP_KEY @"server_timestamp"
+#define SPONSOR_ID_KEY @"sponsor_id"
 
 
 @implementation Homepage
@@ -413,6 +415,41 @@
  */
 - (BOOL)getAppForegroundState {
     return [sharedDefaults boolForKey:APP_FOREGROUND_KEY];
+}
+
+#pragma mark - Server timestamp methods
+
+/**
+ * @brief Sets server timestamp in shared NSSUserDefaults dictionary.
+ * @param timestamp from the handshake in RFC3339 format.
+ * @return TRUE if change was persisted to disk successfully, FALSE otherwise.
+ */
+- (void)updateServerTimestamp:(NSString*) timestamp {
+	[sharedDefaults setObject:timestamp forKey:SERVER_TIMESTAMP_KEY];
+	[sharedDefaults synchronize];
+}
+
+/**
+ * @brief Returns previously persisted server timestamp from the shared NSUserDefaults
+ * @return NSString* timestamp in RFC3339 format.
+ */
+- (NSString*)getServerTimestamp {
+	return [sharedDefaults stringForKey:SERVER_TIMESTAMP_KEY];
+}
+
+# pragma mark - Sponsor ID
+
+- (void) updateSponsorId:(NSString*)sponsorId {
+    if(sponsorId && [sponsorId length]) {
+        [sharedDefaults setObject:sponsorId forKey:SPONSOR_ID_KEY];
+    } else {
+        [sharedDefaults removeObjectForKey:SPONSOR_ID_KEY];
+    }
+    [sharedDefaults synchronize];
+}
+
+- (NSString*)getSponsorId {
+    return [sharedDefaults stringForKey:SPONSOR_ID_KEY];
 }
 
 @end

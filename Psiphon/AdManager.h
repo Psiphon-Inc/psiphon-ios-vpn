@@ -35,4 +35,6 @@
 
 - (void)showUntunneledInterstitial;
 
+- (BOOL)shouldShowUntunneledAds;
+
 @end
