@@ -1,0 +1,6 @@
+{
+    "objcRootDir": ".",
+    "objcIgnoreDirs": ["Pods"],
+    "plistFiles": ["Psiphon/InAppSettings.bundle/Root.inApp.plist"],
+    "enLprojDir": "Shared/Strings/en.lproj"
+}

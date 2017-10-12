@@ -24,6 +24,8 @@
 #import "Notifier.h"
 #import "Logging.h"
 #import "NoticeLogger.h"
+#import "PsiphonClientCommonLibraryHelpers.h"
+#import "IAPHelper.h"
 
 @interface VPNManager ()
 
@@ -95,6 +97,22 @@
 }
 
 - (void)startTunnelWithCompletionHandler:(nullable void (^)(NSError * _Nullable error))completionHandler {
+    // Overide SponsorID if user has active subscrption
+    if([[IAPHelper sharedInstance]hasActiveSubscriptionForDate:[NSDate date]]) {
+        NSString *bundledConfigStr = [PsiphonClientCommonLibraryHelpers getPsiphonBundledConfig];
+        if(bundledConfigStr) {
+            NSDictionary *config = [PsiphonClientCommonLibraryHelpers jsonToDictionary:bundledConfigStr];
+            if (config) {
+                NSDictionary *subscriptionConfig = [config objectForKey:@"subscriptionConfig"];
+                if(subscriptionConfig) {
+                    [sharedDB updateSponsorId:(NSString*)subscriptionConfig[@"SponsorId"]];
+                }
+            }
+        }
+    } else {
+        // otherwise delete the entry
+        [sharedDB updateSponsorId:nil];
+    }
 
     // Reset restartRequired flag
     restartRequired = FALSE;

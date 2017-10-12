@@ -18,12 +18,7 @@
  */
 
 #import <UIKit/UIKit.h>
-#import "SettingsViewController.h"
-#import "LaunchScreenViewController.h"
 
-
-@interface MainViewController : UIViewController <PsiphonSettingsViewControllerDelegate>
-
-@property (nonatomic) BOOL openSettingImmediatelyOnViewDidAppear;
-
+@interface IAPViewController : UIViewController
+@property (nonatomic, assign)  BOOL openedFromSettings;
 @end
