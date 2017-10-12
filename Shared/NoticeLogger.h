@@ -20,7 +20,7 @@
 #import <Foundation/Foundation.h>
 
 
-@interface Notice : NSObject
+@interface NoticeLogger : NSObject
 
 + (instancetype)sharedInstance;
 

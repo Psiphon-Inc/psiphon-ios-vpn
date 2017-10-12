@@ -28,7 +28,7 @@
 #import "SharedConstants.h"
 #import "Notifier.h"
 #import "Logging.h"
-#import "Notice.h"
+#import "NoticeLogger.h"
 #import <ifaddrs.h>
 #import <arpa/inet.h>
 #import <net/if.h>
@@ -47,7 +47,7 @@
     Notifier *notifier;
 
     // Notice logger
-    Notice *noticeLogger;
+    NoticeLogger *noticeLogger;
 
     // State variables
     BOOL shouldStartVPN;  // Start vpn decision made by the container.
@@ -67,7 +67,7 @@
         notifier = [[Notifier alloc] initWithAppGroupIdentifier:APP_GROUP_IDENTIFIER];
 
         // Notice logger
-        noticeLogger = [Notice sharedInstance];
+        noticeLogger = [NoticeLogger sharedInstance];
 
         // state variables
         shouldStartVPN = FALSE;
@@ -93,7 +93,7 @@
 
             if (error != nil) {
                 LOG_ERROR(@"setTunnelNetworkSettings failed: %@", error);
-                [noticeLogger noticeError:@"setTunnelNetworkSettings failed: %@", [error description]];
+                [noticeLogger noticeError:@"setTunnelNetworkSettings failed: %@", error];
                 startTunnelCompletionHandler([[NSError alloc] initWithDomain:PSIPHON_TUNNEL_ERROR_DOMAIN code:PSIPHON_TUNNEL_ERROR_BAD_CONFIGURATION userInfo:nil]);
                 return;
             }

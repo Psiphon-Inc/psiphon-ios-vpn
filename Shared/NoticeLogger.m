@@ -17,7 +17,7 @@
  *
  */
 
-#import "Notice.h"
+#import "NoticeLogger.h"
 #import "SharedConstants.h"
 #import "NSDateFormatter+RFC3339.h"
 #import "Logging.h"
@@ -50,7 +50,7 @@
  *
  */
 
-@implementation Notice {
+@implementation NoticeLogger {
     dispatch_queue_t serialWorkQueue;
 
     NSString *rotatingFilepath;
@@ -68,11 +68,11 @@
     dispatch_once(&once, ^{
 
         #ifdef TARGET_IS_EXTENSION
-        sharedInstance = [[self alloc] initWithFilepath:[Notice extensionRotatingLogNoticesPath] 
-                                          olderFilepath:[Notice extensionRotatingOlderLogNoticesPath]];
+        sharedInstance = [[self alloc] initWithFilepath:[NoticeLogger extensionRotatingLogNoticesPath]
+                                          olderFilepath:[NoticeLogger extensionRotatingOlderLogNoticesPath]];
         #else
-        sharedInstance = [[self alloc] initWithFilepath:[Notice containerRotatingLogNoticesPath] 
-                                          olderFilepath:[Notice containerRotatingOlderLogNoticesPath]];
+        sharedInstance = [[self alloc] initWithFilepath:[NoticeLogger containerRotatingLogNoticesPath]
+                                          olderFilepath:[NoticeLogger containerRotatingOlderLogNoticesPath]];
         #endif
     });
 
@@ -86,7 +86,7 @@
 }
 
 + (NSString *)containerRotatingOlderLogNoticesPath {
-    return [[Notice containerRotatingLogNoticesPath] stringByAppendingString:@".1"];
+    return [[NoticeLogger containerRotatingLogNoticesPath] stringByAppendingString:@".1"];
 }
 
 + (NSString *)extensionRotatingLogNoticesPath {
@@ -96,14 +96,17 @@
 }
 
 + (NSString *)extensionRotatingOlderLogNoticesPath {
-    return [[Notice extensionRotatingLogNoticesPath] stringByAppendingString:@".1"];
+    return [[NoticeLogger extensionRotatingLogNoticesPath] stringByAppendingString:@".1"];
 }
 
 - (void)noticeError:(NSString *)format, ... {
-    va_list args;
-    va_start(args, format);
-    NSString *message = [[NSString alloc] initWithFormat:format arguments:args];
-    va_end(args);
+    NSString *message = nil;
+    if (format) {
+        va_list args;
+        va_start(args, format);
+        message = [[NSString alloc] initWithFormat:format arguments:args];
+        va_end(args);
+    }
 
     [self noticeError:message withTimestamp:[rfc3339Formatter stringFromDate:[NSDate date]]];
 }
@@ -160,6 +163,11 @@
 
 - (void)outputNotice:(NSString *)data withNoticeType:(NSString *)noticeType andTimestamp:(NSString *)timestamp {
 
+    if (!data) {
+        LOG_ERROR(@"Got nil data");
+        data = @"nil data";
+    }
+
     dispatch_async(serialWorkQueue, ^{
 
         NSError *err;
@@ -176,10 +184,24 @@
 
         // Example output format:
         // {"data":{"message":"shutdown operate tunnel"},"noticeType":"Info","showUser":false,"timestamp":"2006-01-02T15:04:05.999-07:00"}
-        NSData *output = [[NSString
-          stringWithFormat:@"{\"data\":\"%@\",\"noticeType\":\"%@\",\"showUser\":false,\"timestamp\":\"%@\"}\n",
-                               data, noticeType, timestamp] dataUsingEncoding:NSUTF8StringEncoding];
+        NSDictionary *outputDic = @{
+          @"data": data,
+          @"noticeType": noticeType,
+          @"showUser": @NO,
+          @"timestamp": timestamp
+        };
+
+        // The resulting output will be UTF-8 encoded.
+        NSData *output = [NSJSONSerialization dataWithJSONObject:outputDic options:kNilOptions error:&err];
+
+        if (err) {
+            LOG_ERROR(@"Aborting log write. Failed to serialize JSON object: (%@)", outputDic);
+            return;
+        }
+
+        // Writes output, and add delimiter.
         [fileHandle writeData:output];
+        [fileHandle writeData:[@"\n" dataUsingEncoding:NSUTF8StringEncoding]];
 
         // Sync and close file before (possible) rotation.
         [fileHandle synchronizeFile];
