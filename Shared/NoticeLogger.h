@@ -30,7 +30,7 @@
 + (NSString *)extensionRotatingLogNoticesPath;
 + (NSString *)extensionRotatingOlderLogNoticesPath;
 
-- (void)noticeError:(NSString *)format, ... ;
+- (void)noticeError:(NSString *)format, ... NS_FORMAT_FUNCTION(1,2) ;
 - (void)noticeError:(NSString *)message withTimestamp:(NSString *)timestamp;
 
 @end
