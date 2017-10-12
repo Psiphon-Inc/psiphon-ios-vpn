@@ -22,7 +22,7 @@ DEPENDENCIES:
   - Google-Mobile-Ads-SDK (= 7.24.0)
   - InAppSettingsKit (from `https://github.com/Psiphon-Inc/InAppSettingsKit.git`, commit `598c498`)
   - mopub-ios-sdk (= 4.16.0)
-  - PsiphonClientCommonLibrary (from `https://github.com/Psiphon-Inc/psiphon-ios-client-common-library.git`, commit `c1f162f`)
+  - PsiphonClientCommonLibrary (from `https://github.com/Psiphon-Inc/psiphon-ios-client-common-library.git`, commit `411c23a`)
   - VungleSDK-iOS (= 5.2.0)
 
 EXTERNAL SOURCES:
@@ -30,7 +30,7 @@ EXTERNAL SOURCES:
     :commit: 598c498
     :git: https://github.com/Psiphon-Inc/InAppSettingsKit.git
   PsiphonClientCommonLibrary:
-    :commit: c1f162f
+    :commit: 411c23a
     :git: https://github.com/Psiphon-Inc/psiphon-ios-client-common-library.git
 
 CHECKOUT OPTIONS:
@@ -38,7 +38,7 @@ CHECKOUT OPTIONS:
     :commit: 598c498
     :git: https://github.com/Psiphon-Inc/InAppSettingsKit.git
   PsiphonClientCommonLibrary:
-    :commit: c1f162f
+    :commit: 411c23a
     :git: https://github.com/Psiphon-Inc/psiphon-ios-client-common-library.git
 
 SPEC CHECKSUMS:
@@ -49,6 +49,6 @@ SPEC CHECKSUMS:
   PsiphonClientCommonLibrary: 74fb17a3bb72c4648a87cfd59478c7d1dda7244e
   VungleSDK-iOS: ad8fdb94efa34e026f25528ff9592af05c665095
 
-PODFILE CHECKSUM: bf091cf2857221361108f30402bc09eb32372edd
+PODFILE CHECKSUM: b66120647f2c7b5ea072337a42057b7146d000d4
 
 COCOAPODS: 1.3.1

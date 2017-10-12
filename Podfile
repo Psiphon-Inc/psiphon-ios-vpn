@@ -11,7 +11,7 @@ target 'Psiphon' do
   # Pods for Psiphon
   pod "InAppSettingsKit", :git => "https://github.com/Psiphon-Inc/InAppSettingsKit.git", :commit => '598c498'
   #pod "InAppSettingsKit", :path => "../InAppSettingsKit"
-  pod 'PsiphonClientCommonLibrary', :git => "https://github.com/Psiphon-Inc/psiphon-ios-client-common-library.git", :commit => 'c1f162f'
+  pod 'PsiphonClientCommonLibrary', :git => "https://github.com/Psiphon-Inc/psiphon-ios-client-common-library.git", :commit => '411c23a'
 
   pod 'mopub-ios-sdk', '4.16.0'
   pod 'Google-Mobile-Ads-SDK', '7.24.0'
