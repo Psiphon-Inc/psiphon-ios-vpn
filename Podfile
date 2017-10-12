@@ -13,6 +13,7 @@ target 'Psiphon' do
   #pod "InAppSettingsKit", :path => "../InAppSettingsKit"
   pod 'PsiphonClientCommonLibrary', :git => "https://github.com/Psiphon-Inc/psiphon-ios-client-common-library.git", :commit => '411c23a'
 
+  pod 'OpenSSL', '1.0.210'
   pod 'mopub-ios-sdk', '4.16.0'
   pod 'Google-Mobile-Ads-SDK', '7.24.0'
   pod 'VungleSDK-iOS', '5.2.0'
