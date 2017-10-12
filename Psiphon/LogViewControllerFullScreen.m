@@ -21,7 +21,7 @@
 #import "PsiphonDataSharedDB.h"
 #import "SharedConstants.h"
 #import "Logging.h"
-#import "Notice.h"
+#import "NoticeLogger.h"
 
 // Initial maximum number of logs to load.
 #define MAX_LOGS_LOAD 250
