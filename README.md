@@ -45,6 +45,8 @@ Many of the strings in those files are translated in PsiphonClientCommonLibrary,
 
 For items and strings _not_ in PsiphonClientCommonLibrary: When adding or modifying strings, you _must_ reflect the changes in [`en.lproj/Root.strings`][Root.strings]. Use the `ALL_CAPS` form described above for the key (yes, that means that the plists will be full of non-English keys), as well as the minor/major edit considerations for changing a key. Provide a comment in `Root.strings` for every entry -- this is the description/context for translators.
 
+Also, make sure you implement required methods when adding a new specifier of `IASKCustomViewSpecifier` type, see [InAppSettingsKit README](https://github.com/Psiphon-Inc/InAppSettingsKit#iaskcustomviewspecifier).
+
 ### Updating translations
 
 Translations for this project are in two places: in [PsiphonClientCommonLibrary](https://github.com/Psiphon-Inc/psiphon-ios-client-common-library/tree/master/PsiphonClientCommonLibrary/Resources/Strings) and in [this project](https://github.com/Psiphon-Inc/psiphon-ios-vpn/tree/master/Shared/Strings). The former has the settings and feedback strings common to all Psiphon iOS apps. The latter has the strings specific to this app.

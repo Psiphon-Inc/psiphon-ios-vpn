@@ -359,6 +359,12 @@
     
     mutableConfigCopy[@"ClientVersion"] = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleVersion"];
 
+    // SponsorId override
+    NSString* sponsorId = [sharedDB getSponsorId];
+    if(sponsorId && [sponsorId length]) {
+        mutableConfigCopy[@"SponsorId"] = sponsorId;
+    }
+
     jsonData  = [NSJSONSerialization dataWithJSONObject:mutableConfigCopy
       options:0 error:&err];
 
@@ -390,6 +396,10 @@
     [notifier post:@"NE.tunnelConnected"];
 
     [self tryStartVPN];
+}
+
+- (void)onServerTimestamp:(NSString * _Nonnull)timestamp {
+	[sharedDB updateServerTimestamp:timestamp];
 }
 
 - (void)onAvailableEgressRegions:(NSArray *)regions {
