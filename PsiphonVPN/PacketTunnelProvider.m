@@ -31,10 +31,12 @@
 #import <ifaddrs.h>
 #import <arpa/inet.h>
 #import <net/if.h>
+#import <stdatomic.h>
+
 
 @implementation PacketTunnelProvider {
 
-    // pointer to startTunnelWithOptions completion handler.
+    // Pointer to startTunnelWithOptions completion handler.
     // NOTE: value is expected to be nil after completion handler has been called.
     void (^vpnStartCompletionHandler)(NSError *__nullable error);
 
@@ -42,11 +44,12 @@
 
     PsiphonDataSharedDB *sharedDB;
 
-    // Notifier
     Notifier *notifier;
 
-    // State variables
-    BOOL shouldStartVPN;  // Start vpn decision made by the container.
+    // Start vpn decision made by the container.
+    BOOL shouldStartVPN;
+
+    _Atomic BOOL showUpstreamProxyErrorMessage;
 }
 
 - (id)init {
@@ -59,11 +62,11 @@
         //TODO: sharedDB calls are blocking, should they be done in a background thread?
         sharedDB = [[PsiphonDataSharedDB alloc] initForAppGroupIdentifier:APP_GROUP_IDENTIFIER];
 
-        // Notifier
         notifier = [[Notifier alloc] initWithAppGroupIdentifier:APP_GROUP_IDENTIFIER];
 
-        // state variables
         shouldStartVPN = FALSE;
+
+        atomic_init(&self->showUpstreamProxyErrorMessage, TRUE);
     }
 
     return self;
@@ -424,20 +427,24 @@
 }
 
 - (void)onUpstreamProxyError:(NSString *_Nonnull)message {
-    // The life of prevUpstreamProxyErrorMessage should be limited to the life
-    // of a tunnel core connection attempt.
-    static NSString *prevUpstreamProxyErrorMessage;
 
-    if (!prevUpstreamProxyErrorMessage || ![message isEqualToString:prevUpstreamProxyErrorMessage]) {
-        prevUpstreamProxyErrorMessage = message;
-        NSString *alertDisplayMessage = [NSString stringWithFormat:@"%@\n\n(%@)",
-            NSLocalizedStringWithDefaultValue(@"CHECK_UPSTREAM_PROXY_SETTING", nil, [NSBundle mainBundle], @"You have configured Psiphon to use an upstream proxy.\nHowever, we seem to be unable to connect to a Psiphon server through that proxy.\nPlease fix the settings and try again.", @"Main text in the 'Upstream Proxy Error' dialog box. This is shown when the user has directly altered these settings, and those settings are (probably) erroneous."),
-            message];
-        [self displayMessage:alertDisplayMessage
-           completionHandler:^(BOOL success) {
-               // Do nothing.
-           }];
+    // Display at most one error message. The many connection
+    // attempts and variety of error messages from tunnel-core
+    // would otherwise result in too many pop ups.
+
+    // onUpstreamProxyError may be called concurrently.
+    BOOL expected = TRUE;
+    if (!atomic_compare_exchange_strong(&self->showUpstreamProxyErrorMessage, &expected, FALSE)) {
+        return;
     }
+
+    NSString *alertDisplayMessage = [NSString stringWithFormat:@"%@\n\n(%@)",
+        NSLocalizedStringWithDefaultValue(@"CHECK_UPSTREAM_PROXY_SETTING", nil, [NSBundle mainBundle], @"You have configured Psiphon to use an upstream proxy.\nHowever, we seem to be unable to connect to a Psiphon server through that proxy.\nPlease fix the settings and try again.", @"Main text in the 'Upstream Proxy Error' dialog box. This is shown when the user has directly altered these settings, and those settings are (probably) erroneous."),
+            message];
+    [self displayMessage:alertDisplayMessage
+       completionHandler:^(BOOL success) {
+           // Do nothing.
+       }];
 }
 
 @end
