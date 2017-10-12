@@ -31,6 +31,8 @@
 #import <ifaddrs.h>
 #import <arpa/inet.h>
 #import <net/if.h>
+#import <stdatomic.h>
+
 
 @implementation PacketTunnelProvider {
 
@@ -47,8 +49,7 @@
     // Start vpn decision made by the container.
     BOOL shouldStartVPN;
 
-    NSLock *previousUpstreamProxyErrorMessageLock;
-    NSString *previousUpstreamProxyErrorMessage;
+    _Atomic BOOL showUpstreamProxyErrorMessage;
 }
 
 - (id)init {
@@ -65,8 +66,7 @@
 
         shouldStartVPN = FALSE;
 
-        previousUpstreamProxyErrorMessageLock = [[NSLock alloc] init];
-        previousUpstreamProxyErrorMessage = nil;
+        atomic_init(&self->showUpstreamProxyErrorMessage, TRUE);
     }
 
     return self;
@@ -418,18 +418,13 @@
 
 - (void)onUpstreamProxyError:(NSString *_Nonnull)message {
 
-    // Serialize access to previousUpstreamProxyErrorMessage, as
+    // Display at most one error message. The many connection
+    // attempts and variety of error messages from tunnel-core
+    // would otherwise result in too many pop ups.
+
     // onUpstreamProxyError may be called concurrently.
-
-    [previousUpstreamProxyErrorMessageLock lock];
-    BOOL newMessage = FALSE;
-    if (!previousUpstreamProxyErrorMessage || ![message isEqualToString:previousUpstreamProxyErrorMessage]) {
-        newMessage = TRUE;
-        previousUpstreamProxyErrorMessage = message;
-    }
-    [previousUpstreamProxyErrorMessageLock unlock];
-
-    if (newMessage == FALSE) {
+    BOOL expected = TRUE;
+    if (!atomic_compare_exchange_strong(&self->showUpstreamProxyErrorMessage, &expected, FALSE)) {
         return;
     }
 
