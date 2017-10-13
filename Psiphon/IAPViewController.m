@@ -182,7 +182,7 @@ static NSString *iapCellID = @"IAPTableCellID";
     label.text = NSLocalizedStringWithDefaultValue(@"BUY_SUBSCRIPTIONS_FOOTER_TEXT",
                                                    nil,
                                                    [NSBundle mainBundle],
-                                                   @"Restore prevously bought subscription or refresh subscription receipt",
+                                                   @"Restore previously bought subscription or refresh subscription receipt",
                                                    @"Buy subscription dialog footer text");
     label.textAlignment = NSTextAlignmentCenter;
     label.translatesAutoresizingMaskIntoConstraints = NO;
