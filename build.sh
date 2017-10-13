@@ -47,12 +47,10 @@ setup_env () {
     fi
 }
 
-setup_install () {
+build () {
     # Install pods
     pod install --repo-update
-}
 
-build () {
     # Build
     xcodebuild -workspace "${PSIPHON_IOS_VPN_XCODE_WORKSPACE}/Psiphon.xcworkspace" -scheme Psiphon -sdk iphoneos -configuration "${CONFIGURATION}" archive -archivePath "${BUILD_DIR}/Psiphon.xcarchive"
     if [[ $? != 0 ]]; then
@@ -155,7 +153,6 @@ case $TARGET_DISTRIBUTION_PLATFORM in
         CONFIGURATION="Release"
         EXPORT_OPTIONS_PLIST="exportAppStoreOptions.plist"
         setup_env
-        setup_install
         increment_build_numbers_for_release
         build
         upload_ipa
@@ -164,7 +161,6 @@ case $TARGET_DISTRIBUTION_PLATFORM in
         CONFIGURATION="Release"
         EXPORT_OPTIONS_PLIST="exportAppStoreOptions.plist"
         setup_env
-        setup_install
         increment_build_numbers_for_testflight
         build
         upload_ipa
@@ -173,7 +169,6 @@ case $TARGET_DISTRIBUTION_PLATFORM in
         CONFIGURATION="Debug"
         EXPORT_OPTIONS_PLIST="exportDevelopmentOptions.plist"
         setup_env
-        setup_install
         build
         ;;
     *)
