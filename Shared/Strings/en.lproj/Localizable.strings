@@ -25,7 +25,7 @@
 "BAD_RECEIPT_ALERT_TITLE" = "Invalid app receipt";
 
 /* Buy subscription dialog footer text */
-"BUY_SUBSCRIPTIONS_FOOTER_TEXT" = "Restore prevously bought subscription or refresh subscription receipt";
+"BUY_SUBSCRIPTIONS_FOOTER_TEXT" = "Restore previously bought subscription or refresh subscription receipt";
 
 /* Buy subscription dialog header text */
 "BUY_SUBSCRIPTIONS_HEADER_TEXT" = "Buy a subscription to remove ads and surf the Internet faster!";
