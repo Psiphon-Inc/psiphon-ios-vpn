@@ -22,6 +22,7 @@
 // Psiphon config keys
 #define PSIPHON_CONFIG_EGRESS_REGION @"EgressRegion"
 #define PSIPHON_CONFIG_UPSTREAM_PROXY_URL @"UpstreamProxyUrl"
+#define PSIPHON_CONFIG_UPSTREAM_PROXY_CUSTOM_HEADERS @"UpstreamProxyCustomHeaders"
 
 @interface PsiphonConfigUserDefaults : NSObject
 
