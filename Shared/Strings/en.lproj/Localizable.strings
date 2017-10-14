@@ -1,7 +1,7 @@
 /* THIS FILE IS GENERATED. DO NOT EDIT. */
 
-/* Active subscription detail text, example: This subscription expires on 2017-01-01 and will automatically renew for $3.99 */
-"ACTIVE_SUBSCRIPTION_DETAIL_TEXT" = "This subscription expires on %1$@ and will automatically renew for %2$@";
+/* Active subscription detail text, example: Expires on 2017-01-01, renewal cost is $3.99 */
+"ACTIVE_SUBSCRIPTION_DETAIL_TEXT" = "Expires on %1$@, renewal cost is %2$@";
 
 /* Text for button that tell users there will by a short video ad. */
 "AD_LOADED" = "Watch a short video while we get ready to connect you";

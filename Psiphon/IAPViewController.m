@@ -259,8 +259,8 @@ static NSString *iapCellID = @"IAPTableCellID";
 		NSString *detailTextFormat = NSLocalizedStringWithDefaultValue(@"ACTIVE_SUBSCRIPTION_DETAIL_TEXT",
 																					 nil,
 																					 [NSBundle mainBundle],
-																					 @"This subscription expires on %@ and will automatically renew for %@",
-																 @"Active subscription detail text, example: This subscription expires on 2017-01-01 and will automatically renew for $3.99");
+																					 @"Expires on %@, renewal cost is %@",
+																 @"Active subscription detail text, example: Expires on 2017-01-01, renewal cost is $3.99");
 
 		NSDateFormatter* df = [NSDateFormatter new];
 		df.dateFormat= [NSDateFormatter dateFormatFromTemplate:@"MMddYY" options:0 locale:[NSLocale currentLocale]];
