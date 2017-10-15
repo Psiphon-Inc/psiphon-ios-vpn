@@ -181,7 +181,7 @@ static NSString *iapCellID = @"IAPTableCellID";
     label.text = NSLocalizedStringWithDefaultValue(@"BUY_SUBSCRIPTIONS_FOOTER_TEXT",
                                                    nil,
                                                    [NSBundle mainBundle],
-                                                   @"Subscription is auto-renewable which means that once purchased it will be automatically renewed until you cancel it 24 hours prior to the end of the current period.\n\niTunes Account will be charged for renewal within 24-hours prior to the end of the current period with the cost of subscription.\n\nManage your Subscription and Auto-Renewal by going to your Account Settings.",
+                                                   @"A subscription is auto-renewable which means that once purchased it will be automatically renewed until you cancel it 24 hours prior to the end of the current period.\n\nYour iTunes Account will be charged for renewal within 24-hours prior to the end of the current period with the cost of subscription.\n\nManage your Subscription and Auto-Renewal by going to your Account Settings.",
                                                    @"Buy subscription dialog footer text");
     label.textAlignment = NSTextAlignmentLeft;
     label.translatesAutoresizingMaskIntoConstraints = NO;
