@@ -1,5 +1,8 @@
 /* THIS FILE IS GENERATED. DO NOT EDIT. */
 
+/* Active subscription detail text, example: Expires on 2017-01-01, renewal cost is $3.99 */
+"ACTIVE_SUBSCRIPTION_DETAIL_TEXT" = "Expires on %1$@, renewal cost is %2$@";
+
 /* Text for button that tell users there will by a short video ad. */
 "AD_LOADED" = "Watch a short video while we get ready to connect you";
 
@@ -25,7 +28,7 @@
 "BAD_RECEIPT_ALERT_TITLE" = "Invalid app receipt";
 
 /* Buy subscription dialog footer text */
-"BUY_SUBSCRIPTIONS_FOOTER_TEXT" = "Restore previously bought subscription or refresh subscription receipt";
+"BUY_SUBSCRIPTIONS_FOOTER_TEXT" = "A subscription is auto-renewable which means that once purchased it will be automatically renewed until you cancel it 24 hours prior to the end of the current period.\n\nYour iTunes Account will be charged for renewal within 24-hours prior to the end of the current period with the cost of subscription.\n\nManage your Subscription and Auto-Renewal by going to your Account Settings.";
 
 /* Buy subscription dialog header text */
 "BUY_SUBSCRIPTIONS_HEADER_TEXT" = "Buy a subscription to remove ads and surf the Internet faster!";
@@ -43,9 +46,6 @@
 /* Text displayed while app loads */
 "LOADING" = "Loading...";
 
-/* Manage my subscriptions button title */
-"MANAGE_SUBSCRIPTIONS_BUTTON_TITLE" = "Manage my subscriptions";
-
 /* Alert title informing user there is no internet connection */
 "NO_INTERNET" = "No Internet Connection";
 
@@ -59,10 +59,10 @@
 "OPEN_PSIPHON_APP" = "Please open Psiphon app to finish connecting.";
 
 /* Refresh app receipt button title */
-"REFRESH_APP_RECEIPT_BUTTON_TITLE" = "Refresh receipt";
+"REFRESH_APP_RECEIPT_BUTTON_TITLE" = "Refresh app receipt";
 
 /* Restore my subscription button title */
-"RESTORE_SUBSCRIPTION_BUTTON_TITLE" = "Restore my subscription";
+"RESTORE_SUBSCRIPTION_BUTTON_TITLE" = "Restore my existing subscription";
 
 /* Subscriptions item title in the app settings when user has an active subscription. Clicking this item opens subscriptions view */
 "SETTINGS_SUBSCRIPTION_ACTIVE" = "Subscriptions";

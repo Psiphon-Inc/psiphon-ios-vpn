@@ -160,17 +160,17 @@ static NSURL *_appleRootCertificateURL = nil;
     return NO;
 }
 
--(BOOL)containsActiveAutoRenewableSubscriptionOfProductIdentifier:(NSString *)productIdentifier forDate:(NSDate *)date
+-(RMAppReceiptIAP*)getActiveAutoRenewableSubscriptionOfProductIdentifier:(NSString *)productIdentifier forDate:(NSDate *)date
 {
 	{
 		for (RMAppReceiptIAP *iap in self.inAppPurchases)
 		{
 			if ([iap.productIdentifier isEqualToString:productIdentifier] && [iap isActiveAutoRenewableSubscriptionForDate:date]) {
-				return YES;
+				return iap;
 			}
 		}
 
-		return NO;
+		return nil;
 	}
 }
 
