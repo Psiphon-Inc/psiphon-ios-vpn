@@ -175,16 +175,15 @@ static NSString *iapCellID = @"IAPTableCellID";
     
     UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, cellView.bounds.size.width, cellView.bounds.size.height)];
     label.numberOfLines = 0;
-    label.lineBreakMode = NSLineBreakByWordWrapping;
-    
+
     label.font = [label.font fontWithSize:13];
     label.textColor = [UIColor darkGrayColor];
     label.text = NSLocalizedStringWithDefaultValue(@"BUY_SUBSCRIPTIONS_FOOTER_TEXT",
                                                    nil,
                                                    [NSBundle mainBundle],
-                                                   @"Restore prevously bought subscription or refresh subscription receipt",
+                                                   @"A subscription is auto-renewable which means that once purchased it will be automatically renewed until you cancel it 24 hours prior to the end of the current period.\n\nYour iTunes Account will be charged for renewal within 24-hours prior to the end of the current period with the cost of subscription.\n\nManage your Subscription and Auto-Renewal by going to your Account Settings.",
                                                    @"Buy subscription dialog footer text");
-    label.textAlignment = NSTextAlignmentCenter;
+    label.textAlignment = NSTextAlignmentLeft;
     label.translatesAutoresizingMaskIntoConstraints = NO;
     
     [cellView addSubview:label];
@@ -193,7 +192,7 @@ static NSString *iapCellID = @"IAPTableCellID";
     NSString *restoreButtonTitle = NSLocalizedStringWithDefaultValue(@"RESTORE_SUBSCRIPTION_BUTTON_TITLE",
                                                                      nil,
                                                                      [NSBundle mainBundle],
-                                                                     @"Restore my subscription",
+                                                                     @"Restore my existing subscription",
                                                                      @"Restore my subscription button title");
     UIButton* restoreButton = [UIButton buttonWithType:UIButtonTypeSystem];
     [restoreButton setTitle:restoreButtonTitle forState:UIControlStateNormal];
@@ -204,7 +203,7 @@ static NSString *iapCellID = @"IAPTableCellID";
     NSString *refreshButtonTitle = NSLocalizedStringWithDefaultValue(@"REFRESH_APP_RECEIPT_BUTTON_TITLE",
                                                                      nil,
                                                                      [NSBundle mainBundle],
-                                                                     @"Refresh receipt",
+                                                                     @"Refresh app receipt",
                                                                      @"Refresh app receipt button title");
     UIButton* refreshButton = [UIButton buttonWithType:UIButtonTypeSystem];
     [refreshButton setTitle:refreshButtonTitle forState:UIControlStateNormal];
@@ -212,24 +211,13 @@ static NSString *iapCellID = @"IAPTableCellID";
     refreshButton.translatesAutoresizingMaskIntoConstraints = NO;
     [cellView addSubview:refreshButton];
     
-    NSString *manageSubscriptionsButtonTitle = NSLocalizedStringWithDefaultValue(@"MANAGE_SUBSCRIPTIONS_BUTTON_TITLE",
-                                                                     nil,
-                                                                     [NSBundle mainBundle],
-                                                                     @"Manage my subscriptions",
-                                                                     @"Manage my subscriptions button title");
-    UIButton* manageSubscriptionsButton = [UIButton buttonWithType:UIButtonTypeSystem];
-    [manageSubscriptionsButton setTitle:manageSubscriptionsButtonTitle forState:UIControlStateNormal];
-    [manageSubscriptionsButton addTarget:self action:@selector(manageSubscriptionsAction) forControlEvents:UIControlEventTouchUpInside];
-    manageSubscriptionsButton.translatesAutoresizingMaskIntoConstraints = NO;
-    [cellView addSubview:manageSubscriptionsButton];
 
     [cellView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|-[label]-|" options:0 metrics:nil views:@{ @"label": label}]];
     [cellView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|-[restoreButton]-|" options:0 metrics:nil views:@{ @"restoreButton": restoreButton}]];
     [cellView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|-[refreshButton]-|" options:0 metrics:nil views:@{ @"refreshButton": refreshButton}]];
-    [cellView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|-[manageSubscriptionsButton]-|" options:0 metrics:nil views:@{ @"manageSubscriptionsButton": manageSubscriptionsButton}]];
-    [cellView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|-10-[label]-10-[restoreButton]-10-[refreshButton]-50-[manageSubscriptionsButton]-|"
+    [cellView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|-10-[label]-10-[restoreButton]-10-[refreshButton]-|"
                                                                      options:0 metrics:nil
-                                                                       views:@{ @"label": label, @"restoreButton": restoreButton, @"refreshButton": refreshButton, @"manageSubscriptionsButton": manageSubscriptionsButton}]];
+																	   views:@{ @"label": label, @"restoreButton": restoreButton, @"refreshButton": refreshButton}]];
     
     return cellView;
 }
@@ -257,14 +245,28 @@ static NSString *iapCellID = @"IAPTableCellID";
     cell.textLabel.text = product.localizedTitle;
     
     RMAppReceipt *receipt = [[IAPHelper sharedInstance] appReceipt];
-    
-    BOOL isActiveSubscription = receipt && [receipt
-                                            containsActiveAutoRenewableSubscriptionOfProductIdentifier:product.productIdentifier
-                                            forDate:[NSDate date]];
-    
-    if (isActiveSubscription) {
+	RMAppReceiptIAP *activeSubscriptionReceipt = nil;
+
+	if(receipt) {
+		activeSubscriptionReceipt = [receipt getActiveAutoRenewableSubscriptionOfProductIdentifier:product.productIdentifier
+																		 forDate:[NSDate date]];
+	}
+
+    if (activeSubscriptionReceipt) {
         cell.accessoryType = UITableViewCellAccessoryCheckmark;
         cell.accessoryView = nil;
+
+		NSString *detailTextFormat = NSLocalizedStringWithDefaultValue(@"ACTIVE_SUBSCRIPTION_DETAIL_TEXT",
+																					 nil,
+																					 [NSBundle mainBundle],
+																					 @"Expires on %@, renewal cost is %@",
+																 @"Active subscription detail text, example: Expires on 2017-01-01, renewal cost is $3.99");
+
+		NSDateFormatter* df = [NSDateFormatter new];
+		df.dateFormat= [NSDateFormatter dateFormatFromTemplate:@"MMddYY" options:0 locale:[NSLocale currentLocale]];
+		NSString *dateString = [df stringFromDate:activeSubscriptionReceipt.subscriptionExpirationDate];
+
+		cell.detailTextLabel.text = [NSString stringWithFormat:detailTextFormat, dateString, localizedPrice];
     } else {
         UISegmentedControl *buyButton = [[UISegmentedControl alloc]initWithItems:[NSArray arrayWithObject:localizedPrice]];
         buyButton.momentary = YES;
@@ -313,12 +315,6 @@ static NSString *iapCellID = @"IAPTableCellID";
         [self.tableView setContentOffset:CGPointMake(0, self.tableView.contentOffset.y-self.refreshControl.frame.size.height) animated:YES];
     }
     [[IAPHelper sharedInstance] refreshReceipt];
-}
-
-- (void)manageSubscriptionsAction {
-    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"itms-apps://buy.itunes.apple.com/WebObjects/MZFinance.woa/wa/manageSubscriptions"]
-                                       options:@{}
-                             completionHandler:nil];
 }
 
 - (void)dismissViewController {

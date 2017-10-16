@@ -169,7 +169,7 @@ NSString *const kIAPSKPaymentTransactionStateRestored = @"kIAPSKPaymentTransacti
     BOOL hasSubscription = NO;
     
     for (NSString* productID in self.bundledProductIDS) {
-        hasSubscription = [[self appReceipt] containsActiveAutoRenewableSubscriptionOfProductIdentifier:productID forDate:date];
+        hasSubscription = [[self appReceipt] getActiveAutoRenewableSubscriptionOfProductIdentifier:productID forDate:date];
         if (hasSubscription) {
             break;
         }
