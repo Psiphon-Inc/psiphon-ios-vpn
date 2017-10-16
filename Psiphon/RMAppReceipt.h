@@ -20,9 +20,12 @@
 
 #import <Foundation/Foundation.h>
 
+@class RMAppReceiptIAP;
+
 /** Represents the app receipt.
  */
 __attribute__((availability(ios,introduced=7.0)))
+
 @interface RMAppReceipt : NSObject
 
 /** The app’s bundle identifier. 
@@ -81,7 +84,7 @@ __attribute__((availability(ios,introduced=7.0)))
  @warning Auto-renewable subscription lapses are possible. If you are checking against the current date, you might want to deduct some time as tolerance.
  @warning If this method fails Apple recommends to refresh the receipt and try again once.
  */
-- (BOOL)containsActiveAutoRenewableSubscriptionOfProductIdentifier:(NSString *)productIdentifier forDate:(NSDate *)date;
+- (RMAppReceiptIAP *)getActiveAutoRenewableSubscriptionOfProductIdentifier:(NSString *)productIdentifier forDate:(NSDate *)date;
 
 /** Returns wheter the receipt hash corresponds to the device's GUID by calcuting the expected hash using the GUID, bundleIdentifierData and opaqueValue.
  @return YES if the hash contained in the receipt corresponds to the device's GUID, NO otherwise.
