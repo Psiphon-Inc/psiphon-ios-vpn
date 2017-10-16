@@ -796,7 +796,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     regionButtonHeader = [[UILabel alloc] init];
     regionButtonHeader.translatesAutoresizingMaskIntoConstraints = NO;
     
-    regionButtonHeader.text = NSLocalizedStringWithDefaultValue(@"CHANGE_REGION", nil, [NSBundle mainBundle], @"Change Region", @"Text above change region button that allows user to select their desired server region");
+    regionButtonHeader.text = NSLocalizedStringWithDefaultValue(@"CHANGE_REGION", nil, [NSBundle mainBundle], @"Change region", @"Text above change region button that allows user to select their desired server region");
     regionButtonHeader.adjustsFontSizeToFitWidth = NO;
     regionButtonHeader.font = [regionButtonHeader.font fontWithSize:14];
     [bottomBar addSubview:regionButtonHeader];
