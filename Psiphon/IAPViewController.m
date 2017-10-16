@@ -157,8 +157,8 @@ static NSString *iapCellID = @"IAPTableCellID";
     label.text = NSLocalizedStringWithDefaultValue(@"BUY_SUBSCRIPTIONS_HEADER_TEXT",
                                                    nil,
                                                    [NSBundle mainBundle],
-                                                   @"Buy a subscription to remove ads and surf the Internet faster!",
-                                                   @"Buy subscription dialog header text");
+                                                   @"Premium subscriptions remove ads and let you surf the Internet faster!",
+                                                   @"Premium subscriptions dialog header text");
     label.textAlignment = NSTextAlignmentCenter;
     label.translatesAutoresizingMaskIntoConstraints = NO;
     
