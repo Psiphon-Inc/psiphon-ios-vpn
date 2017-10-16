@@ -1274,6 +1274,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 }
 
 - (void)updatedIAPTransactionState {
+    [self updateSubscriptionUI];
     if (![adManager shouldShowUntunneledAds]) {
         // if user subscription state has changed to valid
         // try to deinit ads if currently not showing and hide adLabel
