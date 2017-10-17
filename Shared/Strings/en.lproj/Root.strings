@@ -1,5 +1,2 @@
 /* THIS FILE IS GENERATED. DO NOT EDIT. */
 
-/* Settings item text. Leads to settings specific to the Psiphon tunnel, like 'Disable timeouts' and 'Use upstream proxy'. */
-"PSIPHON_SUBSETTINGS_LABEL" = "Psiphon Settings";
-
