@@ -9,9 +9,6 @@
 /* Text for app subtitle on main view. */
 "APP_SUB_TITLE_MAIN_VIEW" = "BEYOND BORDERS";
 
-/* Text for app title on main view. */
-"APP_TITLE_MAIN_VIEW" = "PSIPHON";
-
 /* Text showing the app version. The '%@' placeholder is the version number. So it will look like 'v.2'. */
 "APP_VERSION" = "v.%@";
 
@@ -36,7 +33,7 @@
 /* Text above change region button that allows user to select their desired server region */
 "CHANGE_REGION" = "Change Region";
 
-/* Main text in the 'Upstream Proxy Error' dialog box. This is shown when the user has directly altered these settings, and those settings are (probably) erroneous. */
+/* Main text in the 'Upstream Proxy Error' dialog box. This is shown when the user has directly altered these settings, and those settings are (probably) erroneous. DO NOT translate 'Psiphon'. */
 "CHECK_UPSTREAM_PROXY_SETTING" = "You have configured Psiphon to use an upstream proxy.\nHowever, we seem to be unable to connect to a Psiphon server through that proxy.\nPlease fix the settings and try again.";
 
 /* Title of the button that dismisses region selection dialog
@@ -55,7 +52,7 @@
 /* Alert OK Button */
 "OK_BUTTON" = "OK";
 
-/* Alert message informing the user they should open the app to finish connecting to the VPN. */
+/* Alert message informing the user they should open the app to finish connecting to the VPN. DO NOT translate 'Psiphon'. */
 "OPEN_PSIPHON_APP" = "Please open Psiphon app to finish connecting.";
 
 /* Refresh app receipt button title */
@@ -79,7 +76,7 @@
 /* Alert message informing user to turn on their cellular data or wifi to connect to the internet */
 "TURN_ON_DATE" = "Turn on cellular data or use Wi-Fi to access data.";
 
-/* Alert message informing user they have to open the app */
+/* Alert message informing user they have to open the app. DO NOT translate 'Psiphon'. */
 "USE_PSIPHON_APP" = "To connect, use the Psiphon app";
 
 /* Status when the VPN is connected to a Psiphon server */
