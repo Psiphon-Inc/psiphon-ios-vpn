@@ -329,22 +329,22 @@
 			<key>IASKPlaceholder</key>
 			<string>EXAMPLE_HOSTNAME</string>
 		</dict>
-        <dict>
-            <key>File</key>
-            <string>CustomHeaders</string>
-            <key>Key</key>
-            <string>setUpstreamProxyCustomHeaders</string>
-            <key>Title</key>
-            <string>PSIPHON_CUSTOM_HEADERS_SUBSETTINGS_LABEL</string>
-            <key>TitleDefault</key>
-            <string>Custom HTTP headers</string>
-            <key>TitleDescription</key>
-            <string>Settings item text. Leads to settings specific to the custom headers.</string>
-            <key>BundleTable</key>
-            <string>PsiphonClientCommonLibrary</string>
-            <key>Type</key>
-            <string>PSChildPaneSpecifier</string>
-        </dict>
+		<dict>
+			<key>File</key>
+			<string>CustomHeaders</string>
+			<key>Key</key>
+			<string>setUpstreamProxyCustomHeaders</string>
+			<key>Title</key>
+			<string>PSIPHON_CUSTOM_HEADERS_SUBSETTINGS_LABEL</string>
+			<key>TitleDefault</key>
+			<string>Custom HTTP headers</string>
+			<key>TitleDescription</key>
+			<string>Settings item text. Leads to settings specific to the custom headers.</string>
+			<key>BundleTable</key>
+			<string>PsiphonClientCommonLibrary</string>
+			<key>Type</key>
+			<string>PSChildPaneSpecifier</string>
+		</dict>
 		<dict>
 			<key>Title</key>
 			<string>SETTINGS_HELP_SECTION</string>
