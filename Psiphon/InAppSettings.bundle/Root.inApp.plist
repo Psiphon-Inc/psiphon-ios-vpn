@@ -335,9 +335,9 @@
             <key>Key</key>
             <string>setUpstreamProxyCustomHeaders</string>
             <key>Title</key>
-            <string>PSIPHON_CUSTOME_HEADERS_SUBSETTINGS_LABEL</string>
+            <string>PSIPHON_CUSTOM_HEADERS_SUBSETTINGS_LABEL</string>
             <key>TitleDefault</key>
-            <string>Custom Headers</string>
+            <string>Custom headers</string>
             <key>TitleDescription</key>
             <string>Settings item text. Leads to settings specific to the custom headers.</string>
             <key>BundleTable</key>
