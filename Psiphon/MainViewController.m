@@ -939,7 +939,38 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 #pragma mark - FeedbackViewControllerDelegate methods and helpers
 
 - (NSString *)getPsiphonConfig {
-    return [PsiphonClientCommonLibraryHelpers getPsiphonBundledConfig];
+    NSString *bundledConfigStr = [PsiphonClientCommonLibraryHelpers getPsiphonBundledConfig];
+
+    // Return bundled config as is if user doesn't have an active subscription
+    if(![[IAPHelper sharedInstance]hasActiveSubscriptionForDate:[NSDate date]]) {
+        return bundledConfigStr;
+    }
+
+    // Otherwise override sponsor ID
+    NSData *jsonData = [bundledConfigStr dataUsingEncoding:NSUTF8StringEncoding];
+    NSError *err = nil;
+    NSDictionary *readOnly = [NSJSONSerialization JSONObjectWithData:jsonData options:kNilOptions error:&err];
+
+    if (err) {
+        LOG_ERROR(@"%@", [NSString stringWithFormat:@"Aborting. Failed to parse config JSON: %@", err.description]);
+        abort();
+    }
+
+    NSMutableDictionary *mutableConfigCopy = [readOnly mutableCopy];
+
+    NSDictionary *readOnlySubscriptionConfig = [readOnly objectForKey:@"subscriptionConfig"];
+    if(readOnlySubscriptionConfig && readOnlySubscriptionConfig[@"SponsorId"]) {
+        mutableConfigCopy[@"SponsorId"] = readOnlySubscriptionConfig[@"SponsorId"];
+    }
+
+    jsonData  = [NSJSONSerialization dataWithJSONObject:mutableConfigCopy options:0 error:&err];
+
+    if (err) {
+        LOG_ERROR(@"%@", [NSString stringWithFormat:@"Aborting. Failed to create JSON data from config object: %@", err.description]);
+        abort();
+    }
+
+    return [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
 }
 
 - (void)userSubmittedFeedback:(NSUInteger)selectedThumbIndex comments:(NSString *)comments email:(NSString *)email uploadDiagnostics:(BOOL)uploadDiagnostics {
