@@ -1,5 +1,5 @@
 /* THIS FILE IS GENERATED. DO NOT EDIT. */
 
 /* Settings item text. Leads to settings specific to the custom headers. */
-"PSIPHON_CUSTOME_HEADERS_SUBSETTINGS_LABEL" = "Custom Headers";
+"PSIPHON_CUSTOM_HEADERS_SUBSETTINGS_LABEL" = "Custom HTTP headers";
 
