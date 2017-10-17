@@ -5,10 +5,9 @@
 	<key>PreferenceSpecifiers</key>
 	<array>
 		<dict>
+			<!-- Untranslated -->
 			<key>Title</key>
-			<string>PSIPHON</string>
-			<key>BundleTable</key>
-			<string>PsiphonClientCommonLibrary</string>
+			<string>Psiphon</string>
 			<key>Type</key>
 			<string>PSGroupSpecifier</string>
 		</dict>
@@ -21,7 +20,7 @@
 			<string>IASKCustomViewSpecifier</string>
 			<key>DefaultValue</key>
 			<string></string>
-		</dict>		
+		</dict>
 		<dict>
 			<key>Title</key>
 			<string>CHANGE_REGION</string>
