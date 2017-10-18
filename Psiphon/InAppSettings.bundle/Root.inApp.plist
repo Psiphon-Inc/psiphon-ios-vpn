@@ -21,7 +21,7 @@
 			<string>IASKCustomViewSpecifier</string>
 			<key>DefaultValue</key>
 			<string></string>
-		</dict>		
+		</dict>
 		<dict>
 			<key>Title</key>
 			<string>CHANGE_REGION</string>
@@ -336,10 +336,6 @@
 			<string>setUpstreamProxyCustomHeaders</string>
 			<key>Title</key>
 			<string>PSIPHON_CUSTOM_HEADERS_SUBSETTINGS_LABEL</string>
-			<key>TitleDefault</key>
-			<string>Custom HTTP headers</string>
-			<key>TitleDescription</key>
-			<string>Settings item text. Leads to settings specific to the custom headers.</string>
 			<key>BundleTable</key>
 			<string>PsiphonClientCommonLibrary</string>
 			<key>Type</key>
