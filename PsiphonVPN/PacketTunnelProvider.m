@@ -116,7 +116,7 @@
     } else {
         // TODO: localize the following string
         [self displayMessage:
-            NSLocalizedStringWithDefaultValue(@"USE_PSIPHON_APP", nil, [NSBundle mainBundle], @"To connect, use the Psiphon app", @"Alert message informing user they have to open the app")
+            NSLocalizedStringWithDefaultValue(@"USE_PSIPHON_APP", nil, [NSBundle mainBundle], @"To connect, use the Psiphon app", @"Alert message informing user they have to open the app. DO NOT translate 'Psiphon'.")
           completionHandler:^(BOOL success) {
               // TODO: error handling?
           }];
@@ -160,18 +160,18 @@
 }
 
 - (NSArray *)getNetworkInterfacesIPv4Addresses {
-    
+
     // Getting list of all interfaces' IPv4 addresses
     NSMutableArray *upIfIpAddressList = [NSMutableArray new];
-    
+
     struct ifaddrs *interfaces;
     if (getifaddrs(&interfaces) == 0) {
         struct ifaddrs *interface;
         for (interface=interfaces; interface; interface=interface->ifa_next) {
-            
+
             // Only IFF_UP interfaces. Loopback is ignored.
             if (interface->ifa_flags & IFF_UP && !(interface->ifa_flags & IFF_LOOPBACK)) {
-                
+
                 if (interface->ifa_addr && interface->ifa_addr->sa_family==AF_INET) {
                     struct sockaddr_in *in = (struct sockaddr_in*) interface->ifa_addr;
                     NSString *interfaceAddress = [NSString stringWithUTF8String:inet_ntoa(in->sin_addr)];
@@ -180,10 +180,10 @@
             }
         }
     }
-    
+
     // Free getifaddrs data
     freeifaddrs(interfaces);
-    
+
     return upIfIpAddressList;
 }
 
@@ -200,14 +200,14 @@
     candidates[@"172"] = @[@"172.16.0.2", @"172.16.0.1"];
     candidates[@"192"] = @[@"192.168.0.2", @"192.168.0.1"];
     candidates[@"10"] = @[@"10.0.0.2", @"10.0.0.1"];
-    
+
     static NSString *const preferredCandidate = @"192.0.2";
     NSArray *selectedAddress = candidates[preferredCandidate];
 
     NSArray *networkInterfacesIPAddresses = [self getNetworkInterfacesIPv4Addresses];
     for (NSString *ipAddress in networkInterfacesIPAddresses) {
         LOG_DEBUG(@"Interface: %@", ipAddress);
-        
+
         if ([ipAddress hasPrefix:@"10."]) {
             [candidates removeObjectForKey:@"10"];
         } else if ([ipAddress length] >= 6 &&
@@ -223,19 +223,19 @@
             [candidates removeObjectForKey:@"192.0.2"];
         }
     }
-    
+
     if (candidates[preferredCandidate] == nil && [candidates count] > 0) {
         selectedAddress = candidates.allValues[0];
     }
-    
+
     LOG_DEBUG(@"Selected private address: %@", selectedAddress[0]);
 
     NEPacketTunnelNetworkSettings *newSettings = [[NEPacketTunnelNetworkSettings alloc] initWithTunnelRemoteAddress:selectedAddress[1]];
-    
+
     newSettings.IPv4Settings = [[NEIPv4Settings alloc] initWithAddresses:@[selectedAddress[0]] subnetMasks:@[@"255.255.255.0"]];
-    
+
     newSettings.IPv4Settings.includedRoutes = @[[NEIPv4Route defaultRoute]];
-    
+
     // TODO: split tunneling could be implemented here
     newSettings.IPv4Settings.excludedRoutes = @[];
 
@@ -304,7 +304,7 @@
 
 - (void)displayOpenAppMessage {
     [self displayMessage:
-        NSLocalizedStringWithDefaultValue(@"OPEN_PSIPHON_APP", nil, [NSBundle mainBundle], @"Please open Psiphon app to finish connecting.", @"Alert message informing the user they should open the app to finish connecting to the VPN.")
+        NSLocalizedStringWithDefaultValue(@"OPEN_PSIPHON_APP", nil, [NSBundle mainBundle], @"Please open Psiphon app to finish connecting.", @"Alert message informing the user they should open the app to finish connecting to the VPN. DO NOT translate 'Psiphon'.")
        completionHandler:^(BOOL success) {
            // TODO: error handling?
        }];
@@ -366,7 +366,7 @@
     [mutableConfigCopy addEntriesFromDictionary:[psiphonConfigUserDefaults dictionaryRepresentation]];
 
     mutableConfigCopy[@"PacketTunnelTunFileDescriptor"] = fd;
-    
+
     mutableConfigCopy[@"ClientVersion"] = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleVersion"];
 
     // SponsorId override
@@ -451,7 +451,7 @@
     }
 
     NSString *alertDisplayMessage = [NSString stringWithFormat:@"%@\n\n(%@)",
-        NSLocalizedStringWithDefaultValue(@"CHECK_UPSTREAM_PROXY_SETTING", nil, [NSBundle mainBundle], @"You have configured Psiphon to use an upstream proxy.\nHowever, we seem to be unable to connect to a Psiphon server through that proxy.\nPlease fix the settings and try again.", @"Main text in the 'Upstream Proxy Error' dialog box. This is shown when the user has directly altered these settings, and those settings are (probably) erroneous."),
+        NSLocalizedStringWithDefaultValue(@"CHECK_UPSTREAM_PROXY_SETTING", nil, [NSBundle mainBundle], @"You have configured Psiphon to use an upstream proxy.\nHowever, we seem to be unable to connect to a Psiphon server through that proxy.\nPlease fix the settings and try again.", @"Main text in the 'Upstream Proxy Error' dialog box. This is shown when the user has directly altered these settings, and those settings are (probably) erroneous. DO NOT translate 'Psiphon'."),
             message];
     [self displayMessage:alertDisplayMessage
        completionHandler:^(BOOL success) {
