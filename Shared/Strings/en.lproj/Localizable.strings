@@ -67,6 +67,12 @@
 /* Subscriptions item title in the app settings when user does not have an active subscription. Clicking this item opens subscriptions view */
 "SETTINGS_SUBSCRIPTION_NOT_ACTIVE" = "Go premium!";
 
+/* Automatically start VPN On demand settings toggle */
+"SETTINGS_VPN_ON_DEMAND" = "Auto-start VPN on demand";
+
+/* VPN On demand setting detail text showing when user doesn't have an active subscription and the item is disabled. */
+"SETTINGS_VPN_ON_DEMAND_DETAIL" = "Subscription only";
+
 /* Text for button that opens paid subscriptions manager UI */
 "SUBSCRIPTION_BUTTON_TITLE" = "Go premium now!";
 
