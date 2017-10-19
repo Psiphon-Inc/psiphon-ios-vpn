@@ -20,6 +20,8 @@
 #import "PsiphonSettingsViewController.h"
 // Specifier keys for cells in settings menu
 #define kSettingsSubscription			@"settingsSubscription"
+#define kVpnOnDemand                    @"vpnOnDemand"
+#define kVpnOnDemandSettingHasChanged   @"kVpnOnDemandSettingHasChanged"
 
 @interface SettingsViewController : PsiphonSettingsViewController
 

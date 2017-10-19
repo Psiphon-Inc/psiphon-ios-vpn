@@ -20,6 +20,11 @@
 #import "SettingsViewController.h"
 #import "IAPHelper.h"
 #import "IAPViewController.h"
+#import "IASKSwitch.h"
+
+@interface IASKAppSettingsViewController ()
+- (void) toggledValue:(id)sender;
+@end
 
 @interface SettingsViewController ()
 
@@ -31,7 +36,26 @@
     if([IAPHelper canMakePayments] == NO) {
         self.hiddenKeys = [[NSSet alloc] initWithArray:@[kSettingsSubscription]];
     }
+    // Observe IAP transaction notification
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(updatedIAPTransactionState)
+                                                 name:kIAPSKPaymentTransactionStatePurchased
+                                               object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(updatedIAPTransactionState)
+                                                 name:kIAPSKPaymentQueuePaymentQueueRestoreCompletedTransactionsFinished
+                                               object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(updatedIAPTransactionState)
+                                                 name:kIAPSKPaymentQueueRestoreCompletedTransactionsFailedWithError
+                                               object:nil];
+
     [super viewWillAppear:animated];
+}
+
+- (void) viewDidDisappear:(BOOL)animated {
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+    [super viewDidDisappear:animated];
 }
 
 - (void)settingsViewController:(IASKAppSettingsViewController*)sender tableView:(UITableView *)tableView didSelectCustomViewSpecifier:(IASKSpecifier*)specifier {
@@ -42,12 +66,18 @@
 }
 
 - (UITableViewCell*)tableView:(UITableView*)tableView cellForSpecifier:(IASKSpecifier*)specifier {
-    UITableViewCell *cell = [super tableView:tableView cellForSpecifier:specifier];
+    UITableViewCell *cell = nil;
+    if (![specifier.key isEqualToString:kSettingsSubscription] && ![specifier.key isEqualToString:kVpnOnDemand]) {
+        cell = [super tableView:tableView cellForSpecifier:specifier];
+        return cell;
+    }
 
+    BOOL hasActiveSubscription = [[IAPHelper sharedInstance]hasActiveSubscriptionForDate:[NSDate date]];
     if ([specifier.key isEqualToString:kSettingsSubscription]) {
+        cell = [super tableView:tableView cellForSpecifier:specifier];
         [cell setAccessoryType:UITableViewCellAccessoryDisclosureIndicator];
         NSString *subscriptionItemTitle;
-        if([[IAPHelper sharedInstance]hasActiveSubscriptionForDate:[NSDate date]]) {
+        if(hasActiveSubscription) {
             subscriptionItemTitle = NSLocalizedStringWithDefaultValue(@"SETTINGS_SUBSCRIPTION_ACTIVE",
                                                                       nil,
                                                                       [NSBundle mainBundle],
@@ -61,15 +91,72 @@
                                                                       @"Subscriptions item title in the app settings when user does not have an active subscription. Clicking this item opens subscriptions view");
         }
         [cell.textLabel setText:subscriptionItemTitle];
+
+    } else if ([specifier.key isEqualToString:kVpnOnDemand]) {
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:@"Cell"];
+        cell.selectionStyle = UITableViewCellSelectionStyleNone;
+        cell.accessoryView = [[IASKSwitch alloc] initWithFrame:CGRectMake(0, 0, 79, 27)];
+        [((IASKSwitch*)cell.accessoryView) addTarget:self action:@selector(toggledValue:) forControlEvents:UIControlEventValueChanged];
+
+        cell.textLabel.text = NSLocalizedStringWithDefaultValue(@"SETTINGS_VPN_ON_DEMAND",
+                                                                     nil,
+                                                                     [NSBundle mainBundle],
+                                                                     @"Auto-start VPN on demand",
+                                                                     @"Automatically start VPN On demand settings toggle");
+
+        id currentValue = [self.settingsStore objectForKey:specifier.key];
+        BOOL toggleState;
+        if (currentValue) {
+            if ([currentValue isEqual:specifier.trueValue]) {
+                toggleState = YES;
+            } else if ([currentValue isEqual:specifier.falseValue]) {
+                toggleState = NO;
+            } else {
+                toggleState = [currentValue boolValue];
+            }
+        } else {
+            toggleState = specifier.defaultBoolValue;
+        }
+        IASKSwitch *toggle = (IASKSwitch*)cell.accessoryView;
+        toggle.key = specifier.key;
+        toggle.on = toggleState && hasActiveSubscription;
+
+        NSString *subscriptionOnlySubtitle;
+        if(!hasActiveSubscription) {
+            cell.userInteractionEnabled = NO;
+            cell.textLabel.enabled = NO;
+            cell.detailTextLabel.enabled = NO;
+            subscriptionOnlySubtitle = NSLocalizedStringWithDefaultValue(@"SETTINGS_VPN_ON_DEMAND_DETAIL",
+                                                                      nil,
+                                                                      [NSBundle mainBundle],
+                                                                      @"Subscription only",
+                                                                      @"VPN On demand setting detail text showing when user doesn't have an active subscription and the item is disabled.");
+        } else {
+            cell.userInteractionEnabled = YES;
+            cell.textLabel.enabled = YES;
+            subscriptionOnlySubtitle = @"";
+        }
+
+        cell.detailTextLabel.text = subscriptionOnlySubtitle;
     }
 
+    assert(cell != nil);
     return cell;
+}
+
+- (void)toggledValue:(id)sender {
+    [super toggledValue:sender];
+    [[NSNotificationCenter defaultCenter] postNotificationName:kVpnOnDemandSettingHasChanged object:nil];
 }
 
 - (void) openIAPViewController {
     IAPViewController *iapViewController = [[IAPViewController alloc]init];
     iapViewController.openedFromSettings = YES;
     [self.navigationController pushViewController:iapViewController animated:YES];
+}
+
+- (void) updatedIAPTransactionState {
+    [self.tableView reloadData];
 }
 
 @end
