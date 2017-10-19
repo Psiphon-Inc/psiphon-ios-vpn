@@ -795,8 +795,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     // Add text above region button first
     regionButtonHeader = [[UILabel alloc] init];
     regionButtonHeader.translatesAutoresizingMaskIntoConstraints = NO;
-
-    regionButtonHeader.text = NSLocalizedStringWithDefaultValue(@"CHANGE_REGION", nil, [NSBundle mainBundle], @"Change Region", @"Text above change region button that allows user to select their desired server region");
+    regionButtonHeader.text = NSLocalizedStringWithDefaultValue(@"CHANGE_REGION", nil, [NSBundle mainBundle], @"Change region", @"Text above change region button that allows user to select their desired server region");
     regionButtonHeader.adjustsFontSizeToFitWidth = NO;
     regionButtonHeader.font = [regionButtonHeader.font fontWithSize:14];
     [bottomBar addSubview:regionButtonHeader];
@@ -1307,6 +1306,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 }
 
 - (void)updatedIAPTransactionState {
+    [self updateSubscriptionUI];
     if (![adManager shouldShowUntunneledAds]) {
         // if user subscription state has changed to valid
         // try to deinit ads if currently not showing and hide adLabel
