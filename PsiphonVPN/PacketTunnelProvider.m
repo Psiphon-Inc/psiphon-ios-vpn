@@ -28,6 +28,8 @@
 #import "SharedConstants.h"
 #import "Notifier.h"
 #import "Logging.h"
+#import "IAPHelper.h"
+#import "NSDateFormatter+RFC3339.h"
 #import <ifaddrs.h>
 #import <arpa/inet.h>
 #import <net/if.h>
@@ -400,6 +402,36 @@
 
 - (void)onServerTimestamp:(NSString * _Nonnull)timestamp {
 	[sharedDB updateServerTimestamp:timestamp];
+
+    // Check if user has an active subscription in the device's time
+    // If NO - do nothing
+    // If YES - proceed with checking the subscription against server timestamp
+    if([[IAPHelper sharedInstance]hasActiveSubscriptionForDate:[NSDate date]]) {
+        // The following code adapted from
+        // https://developer.apple.com/library/content/documentation/Cocoa/Conceptual/DataFormatting/Articles/dfDateFormatting10_4.html
+        NSDateFormatter *rfc3339DateFormatter = [NSDateFormatter createRFC3339Formatter];
+
+        NSString *serverTimestamp = [sharedDB getServerTimestamp];
+        NSDate *serverDate = [rfc3339DateFormatter dateFromString:serverTimestamp];
+        if (serverDate != nil) {
+            if(![[IAPHelper sharedInstance]hasActiveSubscriptionForDate:serverDate]) {
+                // User is possibly cheating, terminate the app due to 'Invalid Receipt'.
+                // Stop the tunnel, show alert with title and message
+                // and terminate the app due to 'Invalid Receipt' when user clicks 'OK'.
+                NSString *alertMessage = NSLocalizedStringWithDefaultValue(@"BAD_CLOCK_ALERT_MESSAGE", nil, [NSBundle mainBundle], @"We've detected the time on your device is out of sync with your time zone. Please update your clock settings and restart the app", @"Alert message informing user that the device clock needs to be updated with current time");
+                [self stopTunnelWithReason:NEProviderStopReasonNone completionHandler:^{
+                    // Do nothing.
+                }];
+
+                [[IAPHelper sharedInstance] terminateForInvalidReceipt];
+
+                [self displayMessage:alertMessage completionHandler:^(BOOL success) {
+                    // Do nothing.
+                }];
+            }
+        }
+    }
+
 }
 
 - (void)onAvailableEgressRegions:(NSArray *)regions {
