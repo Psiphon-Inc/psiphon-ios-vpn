@@ -15,9 +15,6 @@
 /* Alert message informing user that the device clock needs to be updated with current time */
 "BAD_CLOCK_ALERT_MESSAGE" = "We've detected the time on your device is out of sync with your time zone. Please update your clock settings and restart the app";
 
-/* Alert title informing user that the device clock needs to be updated with current time */
-"BAD_CLOCK_ALERT_TITLE" = "Clock is out of sync";
-
 /* Alert message informing user that subscription receipt can not be verified */
 "BAD_RECEIPT_ALERT_MESSAGE" = "Your subscription receipt can not be verified, please refresh it and try again.";
 

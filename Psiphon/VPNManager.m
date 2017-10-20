@@ -25,6 +25,7 @@
 #import "Logging.h"
 #import "PsiphonClientCommonLibraryHelpers.h"
 #import "IAPHelper.h"
+#import "SettingsViewController.h"
 
 @interface VPNManager ()
 
@@ -49,7 +50,7 @@
 
         self.targetManager = [NEVPNManager sharedManager];
 
-        // Load previous NETunnelProviderManager, if any.
+        // Load previously saved (if any) VPN configuration.
         [NETunnelProviderManager loadAllFromPreferencesWithCompletionHandler:
           ^(NSArray<NETunnelProviderManager *> *managers, NSError *error) {
               if ([managers count] == 1) {
@@ -88,6 +89,7 @@
             case NEVPNStatusDisconnecting: return VPNStatusDisconnecting;
         }
     }
+    return VPNStatusInvalid;
 }
 
 - (void)startTunnelWithCompletionHandler:(nullable void (^)(NSError * _Nullable error))completionHandler {
@@ -117,84 +119,91 @@
     [NETunnelProviderManager loadAllFromPreferencesWithCompletionHandler:
       ^(NSArray<NETunnelProviderManager *> * _Nullable allManagers, NSError * _Nullable error) {
 
-        if (error) {
-            // Reset startStopButtonPressed flag to FALSE when error and exiting.
-            [self setStartStopButtonPressed:FALSE];
-            if (completionHandler) {
-                LOG_ERROR(@"%@", error);
-                completionHandler([VPNManager errorWithCode:VPNManagerErrorLoadConfigsFailed]);
-            }
-            return;
-        }
+          if (error) {
+              // Reset startStopButtonPressed flag to FALSE when error and exiting.
+              [self setStartStopButtonPressed:FALSE];
+              if (completionHandler) {
+                  LOG_ERROR(@"%@", error);
+                  completionHandler([VPNManager errorWithCode:VPNManagerErrorLoadConfigsFailed]);
+              }
+              return;
+          }
+          
+          // If there are no configurations, create one
+          // if there is more than one, abort!
+          if ([allManagers count] == 0) {
+              LOG_WARN(@"No VPN configurations found.");
+              NETunnelProviderManager *newManager = [[NETunnelProviderManager alloc] init];
+              NETunnelProviderProtocol *providerProtocol = [[NETunnelProviderProtocol alloc] init];
+              providerProtocol.providerBundleIdentifier = @"ca.psiphon.Psiphon.PsiphonVPN";
+              newManager.protocolConfiguration = providerProtocol;
+              newManager.protocolConfiguration.serverAddress = @"localhost";
+              self.targetManager = newManager;
+          } else if ([allManagers count] > 1) {
+              // Reset startStopButtonPressed flag to FALSE when error and exiting.
+              [self setStartStopButtonPressed:FALSE];
+              LOG_ERROR(@"%lu VPN configurations found, only expected 1. Aborting", (unsigned long)[allManagers count]);
+              if (completionHandler) {
+                  completionHandler([VPNManager errorWithCode:VPNManagerErrorTooManyConfigsFounds]);
+              }
+              return;
+          }
+          
+          // Unconditionally sets enabled state of the VPN configuration to TRUE.
+          // Enabled state can become FALSE by changing the "enabled" VPN configuration
+          // through the iOS settings, or if the user has installed a new VPN configuration.
+          [self.targetManager setEnabled:TRUE];
 
-        // If there are no configurations, create one
-        // if there is more than one, abort!
-        if ([allManagers count] == 0) {
-            LOG_WARN(@"No VPN configurations found.");
-            NETunnelProviderManager *newManager = [[NETunnelProviderManager alloc] init];
-            NETunnelProviderProtocol *providerProtocol = [[NETunnelProviderProtocol alloc] init];
-            providerProtocol.providerBundleIdentifier = @"ca.psiphon.Psiphon.PsiphonVPN";
-            newManager.protocolConfiguration = providerProtocol;
-            newManager.protocolConfiguration.serverAddress = @"localhost";
-            self.targetManager = newManager;
-        } else if ([allManagers count] > 1) {
-            // Reset startStopButtonPressed flag to FALSE when error and exiting.
-            [self setStartStopButtonPressed:FALSE];
-            LOG_ERROR(@"%lu VPN configurations found, only expected 1. Aborting", (unsigned long)[allManagers count]);
-            if (completionHandler) {
-                completionHandler([VPNManager errorWithCode:VPNManagerErrorTooManyConfigsFounds]);
-            }
-            return;
-        }
+          // Double-checks Connect On Demand enabled state of the VPN configuration,
+          // so that it matches user's preferences.
+          BOOL onDemandSetting = [[NSUserDefaults standardUserDefaults] boolForKey:kVpnOnDemand];
+          [self setTargetManagerOnDemand:onDemandSetting];
 
-        // setEnabled becomes false if the user changes the
-        // enabled VPN Configuration from the prefrences.
-        [self.targetManager setEnabled:TRUE];
 
-       LOG_DEBUG(@"call saveToPreferencesWithCompletionHandler");
-
-        [self.targetManager saveToPreferencesWithCompletionHandler:^(NSError * _Nullable error) {
-            if (error != nil) {
-                // Reset startStopButtonPressed flag to FALSE when error and exiting.
-                [self setStartStopButtonPressed:FALSE];
-                // User denied permission to add VPN Configuration.
-                LOG_ERROR(@"failed to save the configuration: %@", error);
-                if (completionHandler) {
-                    completionHandler([VPNManager errorWithCode:VPNManagerErrorUserDeniedConfigInstall]);
-                }
-                return;
-            }
-
-            [self.targetManager loadFromPreferencesWithCompletionHandler:^(NSError * _Nullable error) {
-                // Reset startStopButtonPressed flag to FLASE when it finished loading preferences.
-                [self setStartStopButtonPressed:FALSE];
-                if (error != nil) {
-                    LOG_ERROR(@"second loadFromPreferences failed");
-                    if (completionHandler) {
-                        completionHandler([VPNManager errorWithCode:VPNManagerErrorLoadConfigsFailed]);
-                    }
-                    return;
-                }
-
-               LOG_DEBUG(@"Call targetManager.connection.startVPNTunnel()");
-                NSError *vpnStartError;
-                NSDictionary *extensionOptions = @{EXTENSION_OPTION_START_FROM_CONTAINER : @YES};
-
-                BOOL vpnStartSuccess = [self.targetManager.connection startVPNTunnelWithOptions:extensionOptions
-                                                                                 andReturnError:&vpnStartError];
-                if (!vpnStartSuccess) {
-                    LOG_ERROR(@"startVPNTunnel failed: %@", vpnStartError);
-                    if (completionHandler) {
-                        completionHandler([VPNManager errorWithCode:VPNManagerErrorNEStartFailed]);
-                    }
-                    return;
-                }
-
-               LOG_DEBUG(@"startVPNTunnel success");
-                if (completionHandler) {
-                    completionHandler(nil);
-                }
-            }];
+          LOG_DEBUG(@"call saveToPreferencesWithCompletionHandler");
+          
+          [self.targetManager saveToPreferencesWithCompletionHandler:^(NSError * _Nullable error) {
+              if (error != nil) {
+                  // Reset startStopButtonPressed flag to FALSE when error and exiting.
+                  [self setStartStopButtonPressed:FALSE];
+                  // User denied permission to add VPN Configuration.
+                  LOG_ERROR(@"failed to save the configuration: %@", error);
+                  if (completionHandler) {
+                      completionHandler([VPNManager errorWithCode:VPNManagerErrorUserDeniedConfigInstall]);
+                  }
+                  return;
+              }
+              
+              [self.targetManager loadFromPreferencesWithCompletionHandler:^(NSError * _Nullable error) {
+                  // Reset startStopButtonPressed flag to FLASE when it finished loading preferences.
+                  [self setStartStopButtonPressed:FALSE];
+                  if (error != nil) {
+                      LOG_ERROR(@"second loadFromPreferences failed");
+                      if (completionHandler) {
+                          completionHandler([VPNManager errorWithCode:VPNManagerErrorLoadConfigsFailed]);
+                      }
+                      return;
+                  }
+                  
+                  LOG_DEBUG(@"Call targetManager.connection.startVPNTunnel()");
+                  NSError *vpnStartError;
+                  NSDictionary *extensionOptions = @{EXTENSION_OPTION_START_FROM_CONTAINER : @YES};
+                  
+                  BOOL vpnStartSuccess = [self.targetManager.connection startVPNTunnelWithOptions:extensionOptions
+                                                                                   andReturnError:&vpnStartError];
+                  if (!vpnStartSuccess) {
+                      LOG_ERROR(@"startVPNTunnel failed: %@", vpnStartError);
+                      if (completionHandler) {
+                          completionHandler([VPNManager errorWithCode:VPNManagerErrorNEStartFailed]);
+                      }
+                      return;
+                  }
+                  
+                  LOG_DEBUG(@"startVPNTunnel success");
+                  if (completionHandler) {
+                      completionHandler(nil);
+                  }
+              }];
         }];
     }];
 }
@@ -215,7 +224,6 @@
     }
 }
 
-
 - (void)stopVPN {
     if (self.targetManager.connection) {
         [self.targetManager.connection stopVPNTunnel];
@@ -233,6 +241,56 @@
 
 - (BOOL)isTunnelConnected {
     return [self isVPNActive] && [sharedDB getTunnelConnectedState];
+}
+
+- (void)updateVPNConfigurationOnDemandSetting {
+    if (self.targetManager) {
+        BOOL onDemandSetting = [[NSUserDefaults standardUserDefaults] boolForKey:kVpnOnDemand];
+        if ([self setTargetManagerOnDemand:onDemandSetting]) {
+            // Save the updated configuration.
+            [self.targetManager saveToPreferencesWithCompletionHandler:^(NSError *error) {
+                if (error) {
+                    // TODO: log this error with Notices.
+                    LOG_ERROR(@"Failed to save VPN configuration. Error: %@", error);
+                }
+            }];
+        }
+    }
+}
+
+- (BOOL)isVPNConfigurationInstalled {
+    return self.targetManager != nil;
+}
+
+- (BOOL)isVPNConfigurationOnDemandEnabled {
+    if (self.targetManager) {
+        return self.targetManager.isOnDemandEnabled;
+    }
+    return FALSE;
+}
+
+#pragma mark - Helper methods
+
+/*!
+ * Sets the VPN configuration On Demand capability.
+ * @param enable Whether or not to enable On Demand capability.
+ * @return TRUE if VPN configuration was updated, FALSE otherwise.
+ */
+- (BOOL)setTargetManagerOnDemand:(BOOL)enable {
+    if (self.targetManager) {
+        if (self.targetManager.isOnDemandEnabled != enable) {
+            if (enable) {
+                // If set to TRUE, also set the onDemand rules.
+                NEOnDemandRule *connectRule = [NEOnDemandRuleConnect new];
+                [self.targetManager setOnDemandRules:@[connectRule]];
+
+                LOG_DEBUG(@"TEST number of ondemand rules: %lu", [self.targetManager.onDemandRules count]);
+            }
+            [self.targetManager setOnDemandEnabled:enable];
+            return TRUE;
+        }
+    }
+    return FALSE;
 }
 
 #pragma mark - Private methods

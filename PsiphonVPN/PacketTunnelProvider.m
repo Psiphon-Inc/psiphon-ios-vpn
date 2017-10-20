@@ -76,8 +76,12 @@
 
 - (void)startTunnelWithOptions:(nullable NSDictionary<NSString *, NSObject *> *)options completionHandler:(void (^)(NSError *__nullable error))startTunnelCompletionHandler {
 
-    // TODO: This method wouldn't work with "boot to VPN"
-    if (options[EXTENSION_OPTION_START_FROM_CONTAINER]) {
+    // VPN should only start if it is started from the container app directly,
+    // or if the user has a valid subscription.
+    // NOTE: This is not a complete subscription verification,
+    //       specifically the receipt is not verified at this point.
+    if (options[EXTENSION_OPTION_START_FROM_CONTAINER] ||
+      [[IAPHelper sharedInstance] hasActiveSubscriptionForDate:[NSDate date]]) {
 
         // Listen for messages from the container
         [self listenForContainerMessages];
@@ -108,6 +112,7 @@
 
         }];
     } else {
+
         // TODO: localize the following string
         [self displayMessage:
             NSLocalizedStringWithDefaultValue(@"USE_PSIPHON_APP", nil, [NSBundle mainBundle], @"To connect, use the Psiphon app", @"Alert message informing user they have to open the app. DO NOT translate 'Psiphon'.")
@@ -115,8 +120,8 @@
               // TODO: error handling?
           }];
 
-        startTunnelCompletionHandler([NSError
-          errorWithDomain:PSIPHON_TUNNEL_ERROR_DOMAIN code:PSIPHON_TUNNEL_ERROR_BAD_START userInfo:nil]);
+//        startTunnelCompletionHandler([NSError
+//          errorWithDomain:PSIPHON_TUNNEL_ERROR_DOMAIN code:PSIPHON_TUNNEL_ERROR_BAD_START userInfo:nil]);
     }
 
 }
@@ -256,7 +261,11 @@
         return FALSE;
     }
 
-    if ([sharedDB getAppForegroundState]) {
+    // Start the device VPN only if the app is launched from the container app,
+    // or if the user has a valid subscription.
+    // NOTE: This is not a complete subscription verification,
+    //       specifically the receipt is not verified at this point.
+    if ([sharedDB getAppForegroundState] || [[IAPHelper sharedInstance] hasActiveSubscriptionForDate:[NSDate date]]) {
 
         if (vpnStartCompletionHandler &&
           [psiphonTunnel getConnectionState] == PsiphonConnectionStateConnected) {
