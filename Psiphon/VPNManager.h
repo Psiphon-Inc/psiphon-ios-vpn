@@ -98,4 +98,22 @@ typedef NS_ENUM(NSInteger, VPNStatus) {
  */
 - (BOOL)isTunnelConnected;
 
+/**
+ * vpnOnDemandChanged should be called after a user change to VPN on demand settings,
+ * so that the change will be reflected in the VPN configuration.
+ */
+- (void)updateVPNConfigurationOnDemandSetting;
+
+/**
+ * Whether or not VPN configuration is installed on the device.
+ * @return TRUE if installed, FALSE otherwise.
+ */
+- (BOOL)isVPNConfigurationInstalled;
+
+/**
+ * Whether or not VPN configuration onDemand is enabled or not.
+ * @return TRUE if enabled, FALSE otherwise.
+ */
+- (BOOL)isVPNConfigurationOnDemandEnabled;
+
 @end
