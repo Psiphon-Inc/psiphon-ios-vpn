@@ -73,8 +73,14 @@
 /* Text for button that opens paid subscriptions manager UI */
 "SUBSCRIPTION_BUTTON_TITLE" = "Go premium now!";
 
+/* Alert message informing user that their subscription has expired, and that the VPN will stop in an hour if subscription is not renewed. */
+"SUBSCRIPTION_EXPIRED_WILL_KILL_TUNNEL" = "We have noticed that your subscription has expired, Psiphon VPN will stop automatically in an hour if subscription is not renewed. Please open Psiphon app to renew your subscription to continue using Pro features.";
+
 /* Title of the dialog for available in-app paid subscriptions */
 "SUBSCRIPTIONS" = "Subscriptions";
+
+/* Alert message informing user that the VPN has been stopped automatically since the subscription has expired. */
+"TUNNEL_KILLED" = "Psiphon VPN has been stopped automatically since your subscription has expired.";
 
 /* Alert message informing user to turn on their cellular data or wifi to connect to the internet */
 "TURN_ON_DATE" = "Turn on cellular data or use Wi-Fi to access data.";
