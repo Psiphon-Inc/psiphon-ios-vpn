@@ -17,9 +17,9 @@
  *
  */
 
-@interface NSDateFormatter (NSDateFormatterRFC3339)
+// Queries
+#define PROVIDER_MSG_IS_TUNNEL_STARTED "is_tunnel_started"
 
-+ (instancetype)createRFC3339MilliFormatter;
-+ (instancetype)createRFC3339Formatter;
-
-@end
+// Responses
+#define PROVIDER_RESP_TRUE "true"
+#define PROVIDER_RESP_FALSE "false"

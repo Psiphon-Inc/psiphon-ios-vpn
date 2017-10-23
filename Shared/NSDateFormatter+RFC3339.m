@@ -24,10 +24,17 @@
 
 + (instancetype)createRFC3339MilliFormatter {
     NSDateFormatter *f = [[NSDateFormatter alloc] init];
-    NSLocale *enUSPOSIXLocale = [NSLocale localeWithLocaleIdentifier:@"en_US_POSIX"];
-    [f setLocale:enUSPOSIXLocale];
-    [f setDateFormat:@"yyyy'-'MM'-'dd'T'HH':'mm':'ss.SSSZZZZZ"];
-    [f setTimeZone:[NSTimeZone timeZoneForSecondsFromGMT:0]];
+    f.locale = [NSLocale localeWithLocaleIdentifier:@"en_US_POSIX"];
+    f.dateFormat = @"yyyy'-'MM'-'dd'T'HH':'mm':'ss.SSSZZZZZ";
+    f.timeZone = [NSTimeZone timeZoneForSecondsFromGMT:0];
+    return f;
+}
+
++ (instancetype)createRFC3339Formatter {
+    NSDateFormatter *f = [[NSDateFormatter alloc] init];
+    f.locale = [NSLocale localeWithLocaleIdentifier:@"en_US_POSIX"];
+    f.dateFormat = @"yyyy'-'MM'-'dd'T'HH':'mm':'ss'Z'";
+    f.timeZone = [NSTimeZone timeZoneForSecondsFromGMT:0];
     return f;
 }
 
