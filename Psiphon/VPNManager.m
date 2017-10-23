@@ -26,6 +26,7 @@
 #import "PsiphonClientCommonLibraryHelpers.h"
 #import "IAPHelper.h"
 #import "SettingsViewController.h"
+#import "ProviderMessageKeys.h"
 
 @interface VPNManager ()
 
@@ -73,6 +74,9 @@
 }
 
 - (VPNStatus)getVPNStatus {
+
+    // Checks to see if the extension process is running without Psiphon tunnel having been started.
+
     if (restartRequired) {
         // If extension is restarting due to a call to restartVPN, then
         // we don't want to show the Disconnecting and Disconnected states
@@ -99,7 +103,7 @@
         if(bundledConfigStr) {
             NSDictionary *config = [PsiphonClientCommonLibraryHelpers jsonToDictionary:bundledConfigStr];
             if (config) {
-                NSDictionary *subscriptionConfig = [config objectForKey:@"subscriptionConfig"];
+                NSDictionary *subscriptionConfig = config[@"subscriptionConfig"];
                 if(subscriptionConfig) {
                     [sharedDB updateSponsorId:(NSString*)subscriptionConfig[@"SponsorId"]];
                 }
@@ -154,11 +158,11 @@
           // through the iOS settings, or if the user has installed a new VPN configuration.
           [self.targetManager setEnabled:TRUE];
 
-          // Double-checks Connect On Demand enabled state of the VPN configuration,
+          // Double-checks "Connect On Demand" enabled state of the VPN configuration,
           // so that it matches user's preferences.
-          BOOL onDemandSetting = [[NSUserDefaults standardUserDefaults] boolForKey:kVpnOnDemand];
-          [self setTargetManagerOnDemand:onDemandSetting];
-
+          BOOL connectOnDemand = [[NSUserDefaults standardUserDefaults] boolForKey:kVpnOnDemand];
+          [self updateTargetManagerConnectOnDemand:connectOnDemand];
+          LOG_DEBUG(@"TEST number of onDemand rules: %lu", [self.targetManager.onDemandRules count]);
 
           LOG_DEBUG(@"call saveToPreferencesWithCompletionHandler");
           
@@ -227,6 +231,8 @@
 - (void)stopVPN {
     if (self.targetManager.connection) {
         [self.targetManager.connection stopVPNTunnel];
+    } else {
+        LOG_ERROR(@"targetManager.connection is nil");
     }
 }
 
@@ -243,17 +249,37 @@
     return [self isVPNActive] && [sharedDB getTunnelConnectedState];
 }
 
-- (void)updateVPNConfigurationOnDemandSetting {
-    if (self.targetManager) {
-        BOOL onDemandSetting = [[NSUserDefaults standardUserDefaults] boolForKey:kVpnOnDemand];
-        if ([self setTargetManagerOnDemand:onDemandSetting]) {
-            // Save the updated configuration.
-            [self.targetManager saveToPreferencesWithCompletionHandler:^(NSError *error) {
-                if (error) {
-                    // TODO: log this error with Notices.
-                    LOG_ERROR(@"Failed to save VPN configuration. Error: %@", error);
+
+- (void)isTunnelStarted:(void (^)(NSError * _Nullable error, BOOL tunnelStarted))completionHandler {
+    NETunnelProviderSession *session = (NETunnelProviderSession *) self.targetManager.connection;
+    if (session && (self.targetManager.connection.status != NEVPNStatusInvalid)) {
+        NSError *err;
+        NSString *query = @PROVIDER_MSG_IS_TUNNEL_STARTED;
+
+        BOOL sent = [session sendProviderMessage:[query dataUsingEncoding:NSUTF8StringEncoding]
+                         returnError:&err
+                     responseHandler:^(NSData *responseData) {
+
+            if (responseData) {
+                NSString *response = [[NSString alloc] initWithData:responseData encoding:NSUTF8StringEncoding];
+                if ([response isEqualToString:@PROVIDER_RESP_FALSE]) {
+                    completionHandler(nil, FALSE);
+                } else if ([response isEqualToString:@PROVIDER_RESP_TRUE]) {
+                    completionHandler(nil, TRUE);
+                } else {
+                    LOG_ERROR(@"Aborting. Invalid response (%@) to query (%@).", response, query);
+                    abort();
                 }
-            }];
+            }
+        }];
+        
+        if (sent) {
+            LOG_DEBUG(@"TEST: query sent to provider");
+        }
+
+        if (err) {
+            LOG_ERROR(@"Failed to send message to the provider. Error:%@", err);
+            completionHandler(err, nil);
         }
     }
 }
@@ -263,32 +289,57 @@
 }
 
 - (BOOL)isVPNConfigurationOnDemandEnabled {
+    return self.targetManager.isOnDemandEnabled;
+}
+
+- (void)updateVPNConfigurationOnDemandSetting:(BOOL)onDemandEnabled completionHandler:(void (^)(NSError * _Nullable error, BOOL changeSaved))completionHandler {
     if (self.targetManager) {
-        return self.targetManager.isOnDemandEnabled;
+        if ([self updateTargetManagerConnectOnDemand:onDemandEnabled]) {
+            // Save the updated configuration.
+            [self.targetManager saveToPreferencesWithCompletionHandler:^(NSError *error) {
+                if (error) {
+                    // TODO: log this error with Notices.
+                    LOG_ERROR(@"Failed to save VPN configuration. Error: %@", error);
+                    completionHandler(error, FALSE);
+                } else {
+                    completionHandler(nil, TRUE);
+                }
+            }];
+        } else {
+            completionHandler(nil, FALSE);
+        }
+    } else {
+        LOG_ERROR(@"targetManager is nil");
+        completionHandler([[NSError alloc] initWithDomain:kVPNManagerErrorDomain code:VPNManagerErrorNoTargetManager userInfo:nil], FALSE);
     }
-    return FALSE;
+}
+
+- (void)removeConnectOnDemandRules:(nullable void (^)(NSError * _Nullable error))completionHandler {
+    if (self.targetManager) {
+        [self.targetManager setOnDemandRules:@[]];
+        [self.targetManager setOnDemandEnabled:FALSE];
+        [self.targetManager saveToPreferencesWithCompletionHandler:completionHandler];
+    } else {
+        LOG_ERROR(@"targetManager is nil");
+        completionHandler([[NSError alloc] initWithDomain:kVPNManagerErrorDomain code:VPNManagerErrorNoTargetManager userInfo:nil]);
+    }
 }
 
 #pragma mark - Helper methods
 
 /*!
- * Sets the VPN configuration On Demand capability.
- * @param enable Whether or not to enable On Demand capability.
+ * Sets the VPN configuration On Demand capability according to user's preferences.
+ * NOTE: this method does not save the targetManager.
  * @return TRUE if VPN configuration was updated, FALSE otherwise.
  */
-- (BOOL)setTargetManagerOnDemand:(BOOL)enable {
-    if (self.targetManager) {
-        if (self.targetManager.isOnDemandEnabled != enable) {
-            if (enable) {
-                // If set to TRUE, also set the onDemand rules.
-                NEOnDemandRule *connectRule = [NEOnDemandRuleConnect new];
-                [self.targetManager setOnDemandRules:@[connectRule]];
-
-                LOG_DEBUG(@"TEST number of ondemand rules: %lu", [self.targetManager.onDemandRules count]);
-            }
-            [self.targetManager setOnDemandEnabled:enable];
-            return TRUE;
+- (BOOL)updateTargetManagerConnectOnDemand:(BOOL)enabled {
+    if (self.targetManager.isOnDemandEnabled != enabled) {
+        if (enabled) {
+            NEOnDemandRule *connectRule = [NEOnDemandRuleConnect new];
+            [self.targetManager setOnDemandRules:@[connectRule]];
         }
+        [self.targetManager setOnDemandEnabled:enabled];
+        return TRUE;
     }
     return FALSE;
 }

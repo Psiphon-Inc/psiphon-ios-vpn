@@ -1330,7 +1330,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 }
 
 - (void)vpnOnDemandSettingChanged {
-    [[VPNManager sharedInstance] updateVPNConfigurationOnDemandSetting];
+//    [[VPNManager sharedInstance] updateVPNConfigurationOnDemandSetting];
 }
 
 @end

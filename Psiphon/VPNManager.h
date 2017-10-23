@@ -28,6 +28,7 @@ typedef NS_ENUM(NSInteger, VPNManagerErrorCode) {
     VPNManagerErrorTooManyConfigsFounds = 2,
     VPNManagerErrorUserDeniedConfigInstall = 3,
     VPNManagerErrorNEStartFailed = 4,
+    VPNManagerErrorNoTargetManager = 5,
 };
 
 typedef NS_ENUM(NSInteger, VPNStatus) {
@@ -36,14 +37,18 @@ typedef NS_ENUM(NSInteger, VPNStatus) {
     VPNStatusDisconnected = 1,
     /*! @const VPNStatusConnecting network extension process is running, and the tunnel has started (tunnel could be in connecting or connected state). */
     VPNStatusConnecting = 2,
-    /*!VPNStatusConnected network extension process is running and the tunnel is connected. */
+    /*! @const VPNStatusConnected network extension process is running and the tunnel is connected. */
     VPNStatusConnected = 3,
-    /*!VPNStatusReasserting network extension process is running, and the tunnel is reconnecting or has already connected. */
+    /*! @const VPNStatusReasserting network extension process is running, and the tunnel is reconnecting or has already connected. */
     VPNStatusReasserting = 4,
-    /*!VPNStatusDisconnecting tunnel and the network extension process are being stopped.*/
+    /*! @const VPNStatusDisconnecting tunnel and the network extension process are being stopped.*/
     VPNStatusDisconnecting = 5,
     /*! @const VPNStatusRestarting Stopping previous network extension process, and starting a new one. */
     VPNStatusRestarting = 6,
+    /*! @const VPNStatusNoTunnel Extension process is running, but Psiphon tunnel will not be started.
+     * This is usually due to user's expired subscription or starting tunnel from system setting
+     * without a valid subscription */
+    VPNStatusNoTunnel = 7,
 };
 
 @interface VPNManager : NSObject
@@ -98,11 +103,8 @@ typedef NS_ENUM(NSInteger, VPNStatus) {
  */
 - (BOOL)isTunnelConnected;
 
-/**
- * vpnOnDemandChanged should be called after a user change to VPN on demand settings,
- * so that the change will be reflected in the VPN configuration.
- */
-- (void)updateVPNConfigurationOnDemandSetting;
+// TODO: write docs
+- (void)isTunnelStarted:(void (^)(NSError * _Nullable error, BOOL tunnelStarted))completionHandler;
 
 /**
  * Whether or not VPN configuration is installed on the device.
@@ -115,5 +117,24 @@ typedef NS_ENUM(NSInteger, VPNStatus) {
  * @return TRUE if enabled, FALSE otherwise.
  */
 - (BOOL)isVPNConfigurationOnDemandEnabled;
+
+/**
+ * Updates and saves VPN configuration Connect On Demand.
+ * - If onDemandEnabled is different from current VPN configuration setting, then the completionHandler
+ *   changeSaved is set to TRUE with error set to nil.
+ * - If onDemandEnabled is same as VPN configuration setting, then the completionHandler changeSaved
+ *   is set to FALSE with error set to nil.
+ * @param onDemandEnabled Toggle VPN configuration Connect On Demand capability.
+ * @param completionHandler Block called after operation completes.
+ */
+- (void)updateVPNConfigurationOnDemandSetting:(BOOL)onDemandEnabled completionHandler:(void (^)(NSError * _Nullable error, BOOL changeSaved))completionHandler;
+
+/**
+ * Removes Connect On Demand rules from VPN configuration.
+ * @param completionHandler If Connect On Demand rule is removed successfully,
+ *        completionhandler error is set to nil. If VPNManager has no target manager
+ *        error code is set to VPNManagerErrorNoTargetManager.
+ */
+- (void)removeConnectOnDemandRules:(nullable void (^)(NSError * _Nullable error))completionHandler;
 
 @end
