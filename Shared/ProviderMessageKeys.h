@@ -17,6 +17,9 @@
  *
  */
 
+#define EXTENSION_OPTION_START_FROM_CONTAINER @"startFromContainer"
+#define EXTENSION_OPTION_TRUE @"true"
+
 // Queries
 #define PROVIDER_MSG_IS_TUNNEL_STARTED "is_tunnel_started"
 
