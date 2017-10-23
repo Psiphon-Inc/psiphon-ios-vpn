@@ -20,6 +20,7 @@
 #import "SettingsViewController.h"
 #import "IAPHelper.h"
 #import "IAPViewController.h"
+#import "VPNManager.h"
 
 @interface SettingsViewController ()
 @end
@@ -114,7 +115,7 @@
                                                                       @"Subscription only",
                                                                       @"VPN On demand setting detail text showing when user doesn't have an active subscription and the item is disabled.");
         } else {
-            [self setVpnOnDemandToggleState];
+            vpnOnDemandToggle.on = [[VPNManager sharedInstance] isVPNConfigurationOnDemandEnabled];
             cell.userInteractionEnabled = YES;
             cell.textLabel.enabled = YES;
             subscriptionOnlySubtitle = @"";
@@ -127,14 +128,15 @@
     return cell;
 }
 
-- (void) setVpnOnDemandToggleState {
-    // vpnOnDemandToggle.on = true;
-    // TODO: get the state from VPNManager
-}
-
 - (void)toggledVpnOnDemandValue:(id)sender {
     UISwitch *toggle = (UISwitch*)sender;
-    [[NSNotificationCenter defaultCenter] postNotificationName:kVpnOnDemandSettingHasChanged object:nil userInfo:@{kVpnOnDemandSettingHasChanged: @([toggle isOn])}];
+
+    __weak SettingsViewController *weakSelf = self;
+    [[VPNManager sharedInstance] updateVPNConfigurationOnDemandSetting:[toggle isOn]
+                                                     completionHandler:^(NSError *error, BOOL changeSaved) {
+
+        [weakSelf.tableView reloadData];
+    }];
 }
 
 - (void) openIAPViewController {

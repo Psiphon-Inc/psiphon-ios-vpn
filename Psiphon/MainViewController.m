@@ -172,10 +172,6 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                                              selector:@selector(updatedIAPTransactionState)
                                                  name:kIAPSKPaymentQueueRestoreCompletedTransactionsFailedWithError
                                                object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(vpnOnDemandSettingChanged)
-                                                 name:kVpnOnDemandSettingHasChanged
-                                               object:nil];
 
     // TODO: load/save config here to have the user immediately complete the permission prompt
 }
@@ -1327,10 +1323,6 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
             }
         }
     }
-}
-
-- (void)vpnOnDemandSettingChanged {
-//    [[VPNManager sharedInstance] updateVPNConfigurationOnDemandSetting];
 }
 
 @end
