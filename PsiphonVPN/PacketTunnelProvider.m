@@ -90,8 +90,14 @@
     // or if the user has a valid subscription.
     // NOTE: This is not a complete subscription verification,
     //       specifically the receipt is not verified at this point.
-    if (options[EXTENSION_OPTION_START_FROM_CONTAINER] ||
-      [[IAPHelper sharedInstance] hasActiveSubscriptionForDate:[NSDate date]]) {
+
+    BOOL hasActiveSubscription = [[IAPHelper sharedInstance] hasActiveSubscriptionForDate:[NSDate date]];
+
+    if (options[EXTENSION_OPTION_START_FROM_CONTAINER] || hasActiveSubscription) {
+
+        if (hasActiveSubscription) {
+            shouldStartVPN = TRUE;
+        }
 
         // Listen for messages from the container
         [self listenForContainerMessages];
