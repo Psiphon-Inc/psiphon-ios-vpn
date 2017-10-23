@@ -38,6 +38,7 @@
 #import "IAPViewController.h"
 #import "AppDelegate.h"
 #import "IAPHelper.h"
+#import "SettingsViewController.h"
 
 static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSString *b) {
     return (([a length] == 0) && ([b length] == 0)) || ([a isEqualToString:b]);
@@ -1315,7 +1316,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
         if(bundledConfigStr) {
             NSDictionary *config = [PsiphonClientCommonLibraryHelpers jsonToDictionary:bundledConfigStr];
             if (config) {
-                NSDictionary *subscriptionConfig = [config objectForKey:@"subscriptionConfig"];
+                NSDictionary *subscriptionConfig = config[@"subscriptionConfig"];
                 if(subscriptionConfig[@"SponsorId"] && !([sharedDB getSponsorId].length)) {
                     [vpnManager restartVPN];
                 }
@@ -1323,4 +1324,5 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
         }
     }
 }
+
 @end

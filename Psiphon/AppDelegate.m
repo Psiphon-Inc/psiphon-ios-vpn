@@ -156,6 +156,31 @@
     // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
     [sharedDB updateAppForegroundState:YES];
 
+    // Checks if the extension is in a zombie state.
+    [vpnManager isTunnelStarted:^(NSError *error, BOOL tunnelStarted) {
+        if (error) {
+            LOG_ERROR(@"Failed to send message to extension. Error: %@", error);
+            return;
+        }
+
+        if (!tunnelStarted) {
+            // At this point the extension is a zombie.
+            // Stop the Network Extension process and reset the "Connect On Demand"
+            // VPN configuration.
+
+            LOG_WARN(@"Network Extension is in a zombie state. Stopping the extension.");
+
+            [[NSUserDefaults standardUserDefaults] setBool:FALSE forKey:kVpnOnDemand];
+            [vpnManager removeConnectOnDemandRules:^(NSError * _Nullable error) {
+                if (error) {
+                    LOG_ERROR(@"Failed to remove Connect On Demand rules. Error: %@", error);
+                }
+            }];
+            [vpnManager stopVPN];
+        }
+
+    }];
+
     // If the extension has been waiting for the app to come into foreground,
     // send the VPNManager startVPN message again.
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -312,52 +337,6 @@
             [alert addAction:defaultAction];
             [[AppDelegate topMostController] presentViewController:alert animated:TRUE completion:nil];
             return;
-        }
-
-        // Check if user has an active subscription in the device's time
-        // If NO - do nothing
-        // If YES - proceed with checking the subscription against server timestamp
-        if([[IAPHelper sharedInstance]hasActiveSubscriptionForDate:[NSDate date]]) {
-            // The following code adapted from
-            // https://developer.apple.com/library/content/documentation/Cocoa/Conceptual/DataFormatting/Articles/dfDateFormatting10_4.html
-            static NSDateFormatter *sRFC3339DateFormatter;
-            static dispatch_once_t once;
-            dispatch_once(&once, ^{
-                sRFC3339DateFormatter = [[NSDateFormatter alloc] init];
-                sRFC3339DateFormatter.locale = [NSLocale localeWithLocaleIdentifier:@"en_US_POSIX"];
-                sRFC3339DateFormatter.dateFormat = @"yyyy'-'MM'-'dd'T'HH':'mm':'ss'Z'";
-                sRFC3339DateFormatter.timeZone = [NSTimeZone timeZoneForSecondsFromGMT:0];
-            });
-
-            NSString *serverTimestamp = [sharedDB getServerTimestamp];
-            NSDate *serverDate = [sRFC3339DateFormatter dateFromString:serverTimestamp];
-            if (serverDate != nil) {
-                if(![[IAPHelper sharedInstance]hasActiveSubscriptionForDate:serverDate]) {
-                    // User is possibly cheating, terminate the app due to 'Invalid Receipt'.
-                    // Stop the tunnel, show alert with title and message
-                    // and terminate the app due to 'Invalid Receipt' when user clicks 'OK'.
-                    [vpnManager stopVPN];
-
-                    NSString *alertTitle = NSLocalizedStringWithDefaultValue(@"BAD_CLOCK_ALERT_TITLE", nil, [NSBundle mainBundle], @"Clock is out of sync", @"Alert title informing user that the device clock needs to be updated with current time");
-
-                    NSString *alertMessage = NSLocalizedStringWithDefaultValue(@"BAD_CLOCK_ALERT_MESSAGE", nil, [NSBundle mainBundle], @"We've detected the time on your device is out of sync with your time zone. Please update your clock settings and restart the app", @"Alert message informing user that the device clock needs to be updated with current time");
-
-                    UIAlertController *alert = [UIAlertController
-                                                alertControllerWithTitle:alertTitle
-                                                message:alertMessage
-                                                preferredStyle:UIAlertControllerStyleAlert];
-
-                    UIAlertAction *defaultAction = [UIAlertAction
-                                                    actionWithTitle:NSLocalizedStringWithDefaultValue(@"OK_BUTTON", nil, [NSBundle mainBundle], @"OK", @"Alert OK Button")
-                                                    style:UIAlertActionStyleDefault
-                                                    handler:^(UIAlertAction *action) {
-                                                        [[IAPHelper sharedInstance] terminateForInvalidReceipt];
-                                                    }];
-                    [alert addAction:defaultAction];
-                    [[AppDelegate topMostController] presentViewController:alert animated:TRUE completion:nil];
-                    return;
-                }
-            }
         }
 
         // If we haven't had a chance to load an Ad, and the
