@@ -56,6 +56,8 @@
     // was started.
     BOOL psiphonTunnelStartedAtStart;
 
+    BOOL tunnelStartedFromContainer;
+
     _Atomic BOOL showUpstreamProxyErrorMessage;
 }
 
@@ -73,6 +75,7 @@
 
         shouldStartVPN = FALSE;
         psiphonTunnelStartedAtStart = FALSE;
+        tunnelStartedFromContainer = FALSE;
 
         atomic_init(&self->showUpstreamProxyErrorMessage, TRUE);
     }
@@ -82,23 +85,22 @@
 
 - (void)startTunnelWithOptions:(nullable NSDictionary<NSString *, NSObject *> *)options completionHandler:(void (^)(NSError *__nullable error))startTunnelCompletionHandler {
 
-    // 1. start from the container -> start tunnel -> on connected start the VPN
-    // 2. start from anywhere with active subs - > start tunnel -> on connected start the vpn
-    // 3. start from anywhere else -> start the VPN, don't start the tunnel.
-
     // VPN should only start if it is started from the container app directly,
     // or if the user has a valid subscription.
     // NOTE: This is not a complete subscription verification,
     //       specifically the receipt is not verified at this point.
-
     BOOL hasActiveSubscription = [[IAPHelper sharedInstance] hasActiveSubscriptionForDate:[NSDate date]];
+    tunnelStartedFromContainer = [((NSString *)options[EXTENSION_OPTION_START_FROM_CONTAINER]) isEqualToString:EXTENSION_OPTION_TRUE];
 
-    if (options[EXTENSION_OPTION_START_FROM_CONTAINER] || hasActiveSubscription) {
+    if (tunnelStartedFromContainer || hasActiveSubscription) {
 
         if (hasActiveSubscription) {
             shouldStartVPN = TRUE;
-        }
 
+            // Kick-off subscription timer.
+            [self subscriptionCheck];
+        }
+        
         // Listen for messages from the container
         [self listenForContainerMessages];
 
@@ -345,6 +347,46 @@
             [self displayOpenAppMessage];
         }
     }];
+}
+
+- (void)subscriptionCheck {
+    __weak PacketTunnelProvider *weakSelf = self;
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 5 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
+        // If user's subscription has expired, then give them an hour of extra grace period
+        // before killing the tunnel.
+        if ([[IAPHelper sharedInstance] hasActiveSubscriptionForDate:[NSDate date]]) {
+            // User has an active subscription. Check later.
+            [weakSelf subscriptionCheck];
+        } else {
+            // User doesn't have an active subscription. Notify them, after making sure they've checked
+            // the notification we will start an hour of extra grace period.
+            [self displayMessage:NSLocalizedStringWithDefaultValue(@"SUBSCRIPTION_EXPIRED_WILL_KILL_TUNNEL", nil, [NSBundle mainBundle], @"We have noticed that your subscription has expired, Psiphon VPN will stop automatically in an hour if subscription is not renewed. Please open Psiphon app to renew your subscription to continue using Pro features.", @"Alert message informing user that their subscription has expired, and that the VPN will stop in an hour if subscription is not renewed.")
+               completionHandler:^(BOOL success) {
+                   // Wait for the user to acknowledge the message before starting the extra grace period.
+                   if (success) {
+                       dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 5 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
+                           // Grace period has finished. Checks if the subscription has been renewed, otherwise kill the VPN.
+                           if ([[IAPHelper sharedInstance] hasActiveSubscriptionForDate:[NSDate date]]) {
+                               // Subscription has been renewed.
+                               [weakSelf subscriptionCheck];
+                           } else {
+                               // Subscription has not been renewed. Stop the tunnel.
+                               [weakSelf displayMessage:NSLocalizedStringWithDefaultValue(@"TUNNEL_KILLED", nil, [NSBundle mainBundle], @"Psiphon VPN has been stopped automatically since your subscription has expired.", @"Alert message informing user that the VPN has been stopped automatically since the subscription has expired.")
+                                  completionHandler:^(BOOL success) {
+                                      // Do nothing.
+                               }];
+                   
+                               // NOTE: If extension tries to exit with stopTunnelWithReason::,
+                               // the system will create a new extension process and set the VPN state to reconnecting.
+                               // Therefore, to stop the VPN, we will stop the tunnel here and simply exit the process.
+                               [psiphonTunnel stop];
+                               exit(0);
+                           }
+                       });
+                   }
+               }];
+        }
+    });
 }
 
 #pragma mark - Helper methods
