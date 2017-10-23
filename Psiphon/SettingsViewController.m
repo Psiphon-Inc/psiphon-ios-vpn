@@ -20,17 +20,13 @@
 #import "SettingsViewController.h"
 #import "IAPHelper.h"
 #import "IAPViewController.h"
-#import "IASKSwitch.h"
-
-@interface IASKAppSettingsViewController ()
-- (void) toggledValue:(id)sender;
-@end
 
 @interface SettingsViewController ()
-
 @end
 
-@implementation SettingsViewController
+@implementation SettingsViewController {
+    UISwitch *vpnOnDemandToggle;
+}
 
 - (void)viewWillAppear:(BOOL)animated {
     if([IAPHelper canMakePayments] == NO) {
@@ -95,8 +91,9 @@
     } else if ([specifier.key isEqualToString:kVpnOnDemand]) {
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:@"Cell"];
         cell.selectionStyle = UITableViewCellSelectionStyleNone;
-        cell.accessoryView = [[IASKSwitch alloc] initWithFrame:CGRectMake(0, 0, 79, 27)];
-        [((IASKSwitch*)cell.accessoryView) addTarget:self action:@selector(toggledValue:) forControlEvents:UIControlEventValueChanged];
+        cell.accessoryView = [[UISwitch alloc] initWithFrame:CGRectMake(0, 0, 79, 27)];
+        vpnOnDemandToggle = (UISwitch*)cell.accessoryView;
+        [vpnOnDemandToggle addTarget:self action:@selector(toggledVpnOnDemandValue:) forControlEvents:UIControlEventValueChanged];
 
         cell.textLabel.text = NSLocalizedStringWithDefaultValue(@"SETTINGS_VPN_ON_DEMAND",
                                                                      nil,
@@ -104,25 +101,10 @@
                                                                      @"Auto-start VPN on demand",
                                                                      @"Automatically start VPN On demand settings toggle");
 
-        id currentValue = [self.settingsStore objectForKey:specifier.key];
-        BOOL toggleState;
-        if (currentValue) {
-            if ([currentValue isEqual:specifier.trueValue]) {
-                toggleState = YES;
-            } else if ([currentValue isEqual:specifier.falseValue]) {
-                toggleState = NO;
-            } else {
-                toggleState = [currentValue boolValue];
-            }
-        } else {
-            toggleState = specifier.defaultBoolValue;
-        }
-        IASKSwitch *toggle = (IASKSwitch*)cell.accessoryView;
-        toggle.key = specifier.key;
-        toggle.on = toggleState && hasActiveSubscription;
 
         NSString *subscriptionOnlySubtitle;
         if(!hasActiveSubscription) {
+            vpnOnDemandToggle.on = NO;
             cell.userInteractionEnabled = NO;
             cell.textLabel.enabled = NO;
             cell.detailTextLabel.enabled = NO;
@@ -132,6 +114,7 @@
                                                                       @"Subscription only",
                                                                       @"VPN On demand setting detail text showing when user doesn't have an active subscription and the item is disabled.");
         } else {
+            [self setVpnOnDemandToggleState];
             cell.userInteractionEnabled = YES;
             cell.textLabel.enabled = YES;
             subscriptionOnlySubtitle = @"";
@@ -144,9 +127,14 @@
     return cell;
 }
 
-- (void)toggledValue:(id)sender {
-    [super toggledValue:sender];
-    [[NSNotificationCenter defaultCenter] postNotificationName:kVpnOnDemandSettingHasChanged object:nil];
+- (void) setVpnOnDemandToggleState {
+    // vpnOnDemandToggle.on = true;
+    // TODO: get the state from VPNManager
+}
+
+- (void)toggledVpnOnDemandValue:(id)sender {
+    UISwitch *toggle = (UISwitch*)sender;
+    [[NSNotificationCenter defaultCenter] postNotificationName:kVpnOnDemandSettingHasChanged object:nil userInfo:@{kVpnOnDemandSettingHasChanged: @([toggle isOn])}];
 }
 
 - (void) openIAPViewController {
