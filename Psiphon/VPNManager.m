@@ -191,7 +191,7 @@
                   
                   LOG_DEBUG(@"Call targetManager.connection.startVPNTunnel()");
                   NSError *vpnStartError;
-                  NSDictionary *extensionOptions = @{EXTENSION_OPTION_START_FROM_CONTAINER : @YES};
+                  NSDictionary *extensionOptions = @{EXTENSION_OPTION_START_FROM_CONTAINER : EXTENSION_OPTION_TRUE};
                   
                   BOOL vpnStartSuccess = [self.targetManager.connection startVPNTunnelWithOptions:extensionOptions
                                                                                    andReturnError:&vpnStartError];
