@@ -50,9 +50,11 @@
     [super viewWillAppear:animated];
 }
 
-- (void) viewDidDisappear:(BOOL)animated {
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
-    [super viewDidDisappear:animated];
+- (void)viewWillDisappear:(BOOL)animated {
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:kIAPSKPaymentTransactionStatePurchased object:nil];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:kIAPSKPaymentQueuePaymentQueueRestoreCompletedTransactionsFinished object:nil];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:kIAPSKPaymentQueueRestoreCompletedTransactionsFailedWithError object:nil];
+    [super viewWillDisappear:animated];
 }
 
 - (void)settingsViewController:(IASKAppSettingsViewController*)sender tableView:(UITableView *)tableView didSelectCustomViewSpecifier:(IASKSpecifier*)specifier {
