@@ -251,11 +251,11 @@
 }
 
 - (void)updateVPNConfigurationOnDemandSetting:(BOOL)onDemandEnabled completionHandler:(void (^)(NSError * _Nullable error, BOOL changeSaved))completionHandler {
+    [[NSUserDefaults standardUserDefaults] setBool:onDemandEnabled forKey:kVpnOnDemand];
     if ([self updateTargetManagerConnectOnDemand:onDemandEnabled]) {
         // Save the updated configuration.
         [self.targetManager saveToPreferencesWithCompletionHandler:^(NSError *error) {
             if (error) {
-                // TODO: log this error with Notices.
                 LOG_ERROR(@"Failed to save VPN configuration. Error: %@", error);
                 completionHandler(error, FALSE);
             } else {
