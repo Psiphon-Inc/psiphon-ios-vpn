@@ -116,6 +116,7 @@ typedef NS_ENUM(NSInteger, VPNStatus) {
 
 /**
  * Updates and saves VPN configuration Connect On Demand.
+ * This method also updates the NSUserDefaults with key kVpnOnDemand.
  * - If onDemandEnabled is different from current VPN configuration setting, then the completionHandler
  *   changeSaved is set to TRUE with error set to nil.
  * - If onDemandEnabled is same as VPN configuration setting, then the completionHandler changeSaved

@@ -166,9 +166,6 @@
         LOG_WARN(@"Network Extension is in a zombie state. Stopping the extension.");
 
         [vpnManager stopVPN];
-        if (![[IAPHelper sharedInstance] hasActiveSubscriptionForDate:[NSDate date]]) {
-            [[NSUserDefaults standardUserDefaults] setBool:FALSE forKey:kVpnOnDemand];
-        }
         [vpnManager updateVPNConfigurationOnDemandSetting:FALSE completionHandler:^(NSError *error, BOOL changeSaved) {
             if (error) {
                 LOG_ERROR(@"Failed to remove Connect On Demand rules. Error: %@", error);
