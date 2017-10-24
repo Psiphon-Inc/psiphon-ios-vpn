@@ -292,10 +292,43 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 
     } else {
         LOG_DEBUG(@"call [vpnManager stopVPN]");
-        [vpnManager stopVPN];
+
+        if ([vpnManager isOnDemandEnabled]) {
+            // Alert the user that Connect On Demand is enabled, and if they
+            // would like Connect On Demand to be disabled, and the extension to be stopped.
+            NSString *alertTitle = NSLocalizedStringWithDefaultValue(@"CONNECT_ON_DEMAND_ALERT_TITLE", nil, [NSBundle mainBundle], @"Auto-start VPN is enabled", @"Alert dialog title informing user that 'Auto-start VPN' feature is enabled");
+            NSString *alertMessage = NSLocalizedStringWithDefaultValue(@"CONNECT_ON_DEMAND_ALERT_BODY", nil, [NSBundle mainBundle], @"We cannot turn off the VPN since \"Auto-start VPN\" is enabled.\nWould you like to disable \"Auto-start VPN\" on demand and stop the VPN?", "Alert dialog body informing the user that the 'Auto-start VPN on demand' feature is enabled and that the VPN cannot be stopped. Followed by asking the user if they would like to disable the 'Auto-start VPN on demand' feature, and stop the VPN.");
+
+            UIAlertController *alert = [UIAlertController
+              alertControllerWithTitle:alertTitle message:alertMessage preferredStyle:UIAlertControllerStyleAlert];
+
+            UIAlertAction *okAction = [UIAlertAction
+              actionWithTitle:NSLocalizedString(@"OK_BUTTON", @"Alert OK button")
+                        style:UIAlertActionStyleDestructive
+                      handler:^(UIAlertAction *action) {
+                          [vpnManager updateVPNConfigurationOnDemandSetting:FALSE completionHandler:^(NSError *error, BOOL changeSaved) {
+                              [vpnManager stopVPN];
+                          }];
+                      }];
+
+            UIAlertAction *cancelAction = [UIAlertAction
+              actionWithTitle:NSLocalizedStringWithDefaultValue(@"CANCEL_BUTTON", nil, [NSBundle mainBundle], @"Cancel", @"Alert Cancel button")
+                        style:UIAlertActionStyleCancel
+                      handler:^(UIAlertAction *action) {
+                        // Do nothing
+                      }];
+
+            [alert addAction:okAction];
+            [alert addAction:cancelAction];
+            [self presentViewController:alert animated:TRUE completion:nil];
+
+        } else {
+            [vpnManager stopVPN];
+        }
 
         [self removePulsingHaloLayer];
     }
+
     [self updateSubscriptionUI];
 }
 
