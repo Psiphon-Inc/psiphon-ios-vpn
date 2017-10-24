@@ -44,8 +44,8 @@
 - (NSArray<NSString *> *)getAllEgressRegions;
 
 - (NSString *)homepageNoticesPath;
-
 - (NSString *)rotatingLogNoticesPath;
+
 #ifndef TARGET_IS_EXTENSION
 - (NSArray<DiagnosticEntry*>*)getAllLogs;
 #endif

@@ -20,6 +20,7 @@
 #import "PsiphonDataSharedDB.h"
 #import "Logging.h"
 #import "NSDateFormatter+RFC3339.h"
+#import "NoticeLogger.h"
 
 // File operations parameters
 #define MAX_RETRIES 3
@@ -43,6 +44,9 @@
 
     // RFC3339 Date Formatter
     NSDateFormatter *rfc3339Formatter;
+
+    // Notice Logger
+    NoticeLogger *noticeLogger;
 }
 
 /*!
@@ -54,10 +58,9 @@
     self = [super init];
     if (self) {
         appGroupIdentifier = identifier;
-
         sharedDefaults = [[NSUserDefaults alloc] initWithSuiteName:identifier];
-
         rfc3339Formatter = [NSDateFormatter createRFC3339MilliFormatter];
+        noticeLogger = [NoticeLogger sharedInstance];
     }
     return self;
 }
@@ -74,7 +77,6 @@
                                 readFromOffset:0
                                   readToOffset:nil];
 }
-
 
 /*!
  * If fileHandlePtr points to nil, then a new NSFileHandle for
@@ -107,6 +109,8 @@
                                                                 error:&err];
             if (err) {
                 LOG_ERROR(@"Error opening file handle for %@: Error: %@", filePath, err);
+                // On failure explicitly setting fileHandlePtr to point to nil.
+                (*fileHandlePtr) = nil;
             }
         }
 
@@ -130,6 +134,8 @@
             }
             @catch (NSException *e) {
                 LOG_ERROR(@"Error reading file: %@", [e debugDescription]);
+                [[NoticeLogger sharedInstance] noticeError:@"Error reading file: %@", [e debugDescription]];
+
             }
         }
 
@@ -157,21 +163,40 @@
                                                                  options:0 error:&err];
             if (err) {
                 LOG_ERROR("Failed to parse log line (%@). Error: %@", logLine, err);
+                [noticeLogger noticeError:@"Failed to parse log line (%@). Error: %@", logLine, err];
             }
 
             if (dict) {
-                NSString *msg = [NSString stringWithFormat:@"%@: %@", dict[@"noticeType"],
-                                                           [PsiphonDataSharedDB getSimpleDictionaryDescription:dict[@"data"]]];
+                // data key of dict dictionary, could either contains a dictionary, or another simple object.
+                // In case the value is a dictionary, cannot rely on description method of dictionary, since it adds new-line characters
+                // and semicolons to make it human-readable, but is unsuitable for our purposes.
+                NSString *data = nil;
+                if (![dict[@"data"] isKindOfClass:[NSDictionary class]]) {
+                    data = [dict[@"data"] description];
+                } else {
+                    NSData *serializedDictionary = [NSJSONSerialization dataWithJSONObject:dict[@"data"] options:kNilOptions error:&err];
+                    data = [[NSString alloc] initWithData:serializedDictionary encoding:NSUTF8StringEncoding];
+                }
+                
+                NSString *msg = nil;
+                if (err) {
+                    LOG_ERROR("Failed to serialize dictionary as JSON (%@)", dict[@"noticeType"]);
+                } else {
+                    msg = [NSString stringWithFormat:@"%@: %@", dict[@"noticeType"], data];
+                }
+
                 NSDate *timestamp = [rfc3339Formatter dateFromString:dict[@"timestamp"]];
 
                 if (!msg) {
                     LOG_ERROR("Failed to read notice message for log line (%@).", logLine);
+                    [noticeLogger noticeError:@"Failed to read notice message for log line (%@)", logLine];
                     // Puts place holder value for message.
                     msg = @"Failed to read notice message.";
                 }
 
                 if (!timestamp) {
                     LOG_ERROR("Failed to parse timestamp: (%@) for log line (%@)", dict[@"timestamp"], logLine);
+                    [noticeLogger noticeError:@"Failed to parse timestamp: (%@) for log line (%@)", dict[@"timestamp"], logLine];
                     // Puts placeholder value for timestamp.
                     timestamp = [NSDate dateWithTimeIntervalSince1970:0];
                 }
@@ -180,36 +205,6 @@
             }
         }
     }
-}
-
-// This class returns a simple string representation of the dictionary dict.
-// Unlike description method of NSDictionary, the string returned by this
-// function doesn't include new-line character or semicolon.
-+ (NSString *)getSimpleDictionaryDescription:(NSDictionary *)dict {
-    if (![dict isKindOfClass:[NSDictionary class]]) {
-        return [dict description];
-    }
-
-    NSMutableString *desc = [NSMutableString string];
-    [desc appendString:@"{"];
-    NSArray *allKeys = [dict allKeys];
-    for (NSUInteger i = 0; i < [allKeys count] ; ++i) {
-        id object = dict[allKeys[i]];
-        NSString *key = [allKeys[i] description];
-        NSString *value;
-        if ([object isKindOfClass:[NSDictionary class]]) {
-            value = [self getSimpleDictionaryDescription:object];
-        } else {
-            value = [object description];
-        }
-        [desc appendString:[NSString stringWithFormat:@"%@:%@", key, value]];
-        if (i < [allKeys count] - 1) {
-            [desc appendString:@","];
-        }
-    }
-    [desc appendString:@"}"];
-
-    return desc;
 }
 
 #if DEBUG
@@ -240,6 +235,7 @@
 
     if (!data) {
         LOG_ERROR(@"Failed reading homepage notices file. Error:%@", err);
+        [noticeLogger noticeError:@"Failed reading homepage notices. Error:%@", err];
         return nil;
     }
 
@@ -258,6 +254,7 @@
 
         if (err) {
             LOG_ERROR(@"Failed parsing homepage notices file. Error:%@", err);
+            [noticeLogger noticeError:@"Failed parsing homepage notices file. Error:%@", err];
         }
 
         if (dict) {
@@ -298,7 +295,7 @@
     return [sharedDefaults objectForKey:EGRESS_REGIONS_KEY];
 }
 
-#pragma mark - Log Table methods
+#pragma mark - Logging
 
 - (NSString *)rotatingLogNoticesPath {
     return [[[[NSFileManager defaultManager]
@@ -306,8 +303,15 @@
             stringByAppendingPathComponent:@"rotating_notices"];
 }
 
-- (NSString *)rotatingLogNoticesBackupPath {
+- (NSString *)rotatingOlderLogNoticesPath {
     return [[self rotatingLogNoticesPath] stringByAppendingString:@".1"];
+}
+
+// Private function.
+- (NSString *)extensionLogNoticesPath {
+    return [[[[NSFileManager defaultManager]
+      containerURLForSecurityApplicationGroupIdentifier:appGroupIdentifier] path]
+      stringByAppendingPathComponent:@"extension_notices"];
 }
 
 #ifndef TARGET_IS_EXTENSION
@@ -317,20 +321,52 @@
 - (NSArray<DiagnosticEntry*>*)getAllLogs {
 
     LOG_DEBUG(@"Log filesize:%@", [self getFileSize:[self rotatingLogNoticesPath]]);
-    LOG_DEBUG(@"Log backup filesize:%@", [self getFileSize:[self rotatingLogNoticesBackupPath]]);
+    LOG_DEBUG(@"Log backup filesize:%@", [self getFileSize:[self rotatingOlderLogNoticesPath]]);
 
-    NSMutableArray<DiagnosticEntry *> *entries = [[NSMutableArray alloc] init];
+    NSMutableArray<NSMutableArray<DiagnosticEntry *> *> *entriesArray = [[NSMutableArray alloc] initWithCapacity:3];
 
-    // Reads both log files all at once (max of 2MB) into memory,
+    // Reads both tunnel-core log files all at once (max of 2MB) into memory,
     // and defers any processing after the read in order to reduce
     // the chance of a log rotation happening midway.
-    NSString *backupLogLines = [PsiphonDataSharedDB tryReadingFile:[self rotatingLogNoticesBackupPath]];
-    NSString *logLines = [PsiphonDataSharedDB tryReadingFile:[self rotatingLogNoticesPath]];
+    entriesArray[0] = [[NSMutableArray alloc] init];
+    NSString *tunnelCoreOlderLogs = [PsiphonDataSharedDB tryReadingFile:[self rotatingOlderLogNoticesPath]];
+    NSString *tunnelCoreLogs = [PsiphonDataSharedDB tryReadingFile:[self rotatingLogNoticesPath]];
+    [self readLogsData:tunnelCoreOlderLogs intoArray:entriesArray[0]];
+    [self readLogsData:tunnelCoreLogs intoArray:entriesArray[0]];
 
-    [self readLogsData:backupLogLines intoArray:entries];
-    [self readLogsData:logLines intoArray:entries];
+    entriesArray[1] = [[NSMutableArray alloc] init];
+    NSString *containerOlderLogs = [PsiphonDataSharedDB tryReadingFile:[NoticeLogger containerRotatingOlderLogNoticesPath]];
+    NSString *containerLogs = [PsiphonDataSharedDB tryReadingFile:[NoticeLogger containerRotatingLogNoticesPath]];
+    [self readLogsData:containerOlderLogs intoArray:entriesArray[1]];
+    [self readLogsData:containerLogs intoArray:entriesArray[1]];
 
-    return entries;
+    entriesArray[2] = [[NSMutableArray alloc] init];
+    NSString *extensionOlderLogs = [PsiphonDataSharedDB tryReadingFile:[NoticeLogger extensionRotatingOlderLogNoticesPath]];
+    NSString *extensionLogs = [PsiphonDataSharedDB tryReadingFile:[NoticeLogger extensionRotatingLogNoticesPath]];
+    [self readLogsData:extensionOlderLogs intoArray:entriesArray[2]];
+    [self readLogsData:extensionLogs intoArray:entriesArray[2]];
+
+
+    // Sorts classes of logs in entriesArray based on the timestamp of the last log in each class.
+    NSArray *sortedEntriesArray = [entriesArray sortedArrayUsingComparator:^NSComparisonResult(id obj1, id obj2) {
+        NSDate *obj1LastTimestamp = [[(NSArray<DiagnosticEntry *> *) obj1 lastObject] timestamp];
+        NSDate *obj2LastTimestamp = [[(NSArray<DiagnosticEntry *> *) obj2 lastObject] timestamp];
+        return [obj2LastTimestamp compare:obj1LastTimestamp];
+    }];
+
+    // Calculates total number of logs and initializes an array of that size.
+    NSUInteger totalNumLogs = 0;
+    for (NSUInteger i = 0; i < [entriesArray count]; ++i) {
+        totalNumLogs += [entriesArray[i] count];
+    }
+
+    NSMutableArray<DiagnosticEntry *> *allEntries = [[NSMutableArray alloc] initWithCapacity:totalNumLogs];
+
+    for (NSUInteger j = 0; j < [sortedEntriesArray count]; ++j) {
+        [allEntries addObjectsFromArray:sortedEntriesArray[j]];
+    }
+
+    return allEntries;
 }
 
 #endif
