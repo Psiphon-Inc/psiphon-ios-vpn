@@ -47,8 +47,12 @@
  * - "data": additional structured data payload.
  * - "showUser": whether the information should be displayed to the user.
  * - "timestamp": UTC timezone, RFC3339Milli format timestamp for notice event.
+ * 
+ * Logging errors in this class:
+ *  LOG_ERROR_NO_NOTICE should only be used in this class to log errors.
  *
  */
+
 
 @implementation NoticeLogger {
     NSLock *writeLock;
@@ -98,7 +102,11 @@
     return [[NoticeLogger extensionRotatingLogNoticesPath] stringByAppendingString:@".1"];
 }
 
-- (void)noticeError:(NSString *)format, ... {
+- (void)noticeError:(NSString *)message {
+    [self noticeError:message withTimestamp:[rfc3339Formatter stringFromDate:[NSDate date]]];
+}
+
+- (void)noticeErrorWithFormat:(NSString *)format, ... {
     NSString *message = nil;
     if (format) {
         va_list args;
@@ -136,12 +144,11 @@
 
         // Checks if rotatingFilepath exists, creates the the file if it doesn't exist.
         if ([fileManager fileExistsAtPath:rotatingFilepath]) {
-
             NSError *err;
             rotatingCurrentFileSize = [[fileManager attributesOfItemAtPath:rotatingFilepath error:&err] fileSize];
 
             if (err) {
-                LOG_ERROR(@"Failed to get log file bytes count");
+                LOG_ERROR_NO_NOTICE(@"Failed to get log file bytes count");
                 // This is fatal, return nil.
                 return nil;
             }
@@ -165,7 +172,7 @@
     [writeLock lock];
 
     if (!data) {
-        LOG_ERROR(@"Got nil data");
+        LOG_ERROR_NO_NOTICE(@"Got nil data");
         data = @"nil data";
     }
 
@@ -174,7 +181,7 @@
     NSFileHandle *fileHandle = [NSFileHandle fileHandleForWritingToURL:[NSURL fileURLWithPath:rotatingFilepath]
                                                                  error:&err];
     if (err) {
-        LOG_ERROR(@"Failed to open file handle for path (%@). Error: %@", rotatingFilepath, err);
+        LOG_ERROR_NO_NOTICE(@"Failed to open file handle for path (%@). Error: %@", rotatingFilepath, err);
         return;
     }
 
@@ -194,7 +201,7 @@
     NSData *output = [NSJSONSerialization dataWithJSONObject:outputDic options:kNilOptions error:&err];
 
     if (err) {
-        LOG_ERROR(@"Aborting log write. Failed to serialize JSON object: (%@)", outputDic);
+        LOG_ERROR_NO_NOTICE(@"Aborting log write. Failed to serialize JSON object: (%@)", outputDic);
         return;
     }
 
@@ -223,7 +230,7 @@
 
             // Do no abort, continue with truncating original log.
             if (err) {
-                LOG_ERROR(@"Failed to rotate log file at path (%@). Error: %@", rotatingFilepath, err);
+                LOG_ERROR_NO_NOTICE(@"Failed to rotate log file at path (%@). Error: %@", rotatingFilepath, err);
                 err = nil;
             }
         }
@@ -236,7 +243,7 @@
 
             rotatingCurrentFileSize = 0;
         } else {
-            LOG_ERROR(@"Failed to truncate notices file for type (%@)", noticeType);
+            LOG_ERROR_NO_NOTICE(@"Failed to truncate notices file for type (%@)", noticeType);
         }
     }
 

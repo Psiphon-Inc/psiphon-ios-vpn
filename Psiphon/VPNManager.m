@@ -34,7 +34,6 @@
 @end
 
 @implementation VPNManager {
-    NoticeLogger *noticeLogger;
     Notifier *notifier;
     PsiphonDataSharedDB *sharedDB;
     id localVPNStatusObserver;
@@ -46,7 +45,6 @@
 - (instancetype)init {
     self = [super init];
     if (self) {
-        noticeLogger = [NoticeLogger sharedInstance];
         notifier = [[Notifier alloc] initWithAppGroupIdentifier:APP_GROUP_IDENTIFIER];
         sharedDB = [[PsiphonDataSharedDB alloc] initForAppGroupIdentifier:APP_GROUP_IDENTIFIER];
 
@@ -92,7 +90,7 @@
         }
     }
 
-    [noticeLogger noticeError:@"Unknown NEVPNConnection status: (%ld)", self.targetManager.connection.status];
+    LOG_ERROR(@"Unknown NEVPNConnection status: (%ld)", self.targetManager.connection.status);
     return -1;
 }
 
@@ -127,8 +125,7 @@
             // Reset startStopButtonPressed flag to FALSE when error and exiting.
             [self setStartStopButtonPressed:FALSE];
             if (completionHandler) {
-                LOG_ERROR(@"%@", error);
-                [noticeLogger noticeError:@"Failed to load VPN configuration. Error:(%@)", error];
+                LOG_ERROR(@"Failed to load VPN configuration. Error:%@", error);
                 completionHandler([VPNManager errorWithCode:VPNManagerErrorLoadConfigsFailed]);
             }
             return;
@@ -148,7 +145,6 @@
             // Reset startStopButtonPressed flag to FALSE when error and exiting.
             [self setStartStopButtonPressed:FALSE];
             LOG_ERROR(@"%lu VPN configurations found, only expected 1. Aborting", [allManagers count]);
-            [noticeLogger noticeError:@"(%lu) VPN configurations were found. Only expected 1", [allManagers count]];
             if (completionHandler) {
                 completionHandler([VPNManager errorWithCode:VPNManagerErrorTooManyConfigsFounds]);
             }
@@ -167,7 +163,6 @@
                 [self setStartStopButtonPressed:FALSE];
                 // User denied permission to add VPN Configuration.
                 LOG_ERROR(@"failed to save the configuration: %@", error);
-                [noticeLogger noticeError:@"Failed to save VPN configuration. Error:(%@)", error];
                 if (completionHandler) {
                     completionHandler([VPNManager errorWithCode:VPNManagerErrorUserDeniedConfigInstall]);
                 }
@@ -178,8 +173,7 @@
                 // Reset startStopButtonPressed flag to FLASE when it finished loading preferences.
                 [self setStartStopButtonPressed:FALSE];
                 if (error != nil) {
-                    LOG_ERROR(@"second loadFromPreferences failed");
-                    [noticeLogger noticeError:@"Failed to reload VPN configuration. Error:(%@)", error];
+                    LOG_ERROR(@"Failed to reload VPN configuration. Error:(%@)", error);
                     if (completionHandler) {
                         completionHandler([VPNManager errorWithCode:VPNManagerErrorLoadConfigsFailed]);
                     }
@@ -193,8 +187,7 @@
                 BOOL vpnStartSuccess = [self.targetManager.connection startVPNTunnelWithOptions:extensionOptions
                                                                                  andReturnError:&vpnStartError];
                 if (!vpnStartSuccess) {
-                    LOG_ERROR(@"startVPNTunnel failed: %@", vpnStartError);
-                    [noticeLogger noticeError:@"Failed to start network extension. Error:(%@)", vpnStartError];
+                    LOG_ERROR(@"Failed to start network extension. Error:(%@)", vpnStartError);
                     if (completionHandler) {
                         completionHandler([VPNManager errorWithCode:VPNManagerErrorNEStartFailed]);
                     }

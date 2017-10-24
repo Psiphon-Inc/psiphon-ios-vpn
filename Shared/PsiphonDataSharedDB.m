@@ -44,9 +44,6 @@
 
     // RFC3339 Date Formatter
     NSDateFormatter *rfc3339Formatter;
-
-    // Notice Logger
-    NoticeLogger *noticeLogger;
 }
 
 /*!
@@ -60,7 +57,6 @@
         appGroupIdentifier = identifier;
         sharedDefaults = [[NSUserDefaults alloc] initWithSuiteName:identifier];
         rfc3339Formatter = [NSDateFormatter createRFC3339MilliFormatter];
-        noticeLogger = [NoticeLogger sharedInstance];
     }
     return self;
 }
@@ -108,7 +104,7 @@
             (*fileHandlePtr) = [NSFileHandle fileHandleForReadingFromURL:[NSURL fileURLWithPath:filePath]
                                                                 error:&err];
             if (err) {
-                LOG_ERROR(@"Error opening file handle for %@: Error: %@", filePath, err);
+                LOG_WARN(@"Error opening file handle for %@: Error: %@", filePath, err);
                 // On failure explicitly setting fileHandlePtr to point to nil.
                 (*fileHandlePtr) = nil;
             }
@@ -134,7 +130,6 @@
             }
             @catch (NSException *e) {
                 LOG_ERROR(@"Error reading file: %@", [e debugDescription]);
-                [[NoticeLogger sharedInstance] noticeError:@"Error reading file: %@", [e debugDescription]];
 
             }
         }
@@ -162,8 +157,7 @@
             NSDictionary *dict = [NSJSONSerialization JSONObjectWithData:[logLine dataUsingEncoding:NSUTF8StringEncoding]
                                                                  options:0 error:&err];
             if (err) {
-                LOG_ERROR("Failed to parse log line (%@). Error: %@", logLine, err);
-                [noticeLogger noticeError:@"Failed to parse log line (%@). Error: %@", logLine, err];
+                LOG_ERROR(@"Failed to parse log line (%@). Error: %@", logLine, err);
             }
 
             if (dict) {
@@ -180,7 +174,7 @@
                 
                 NSString *msg = nil;
                 if (err) {
-                    LOG_ERROR("Failed to serialize dictionary as JSON (%@)", dict[@"noticeType"]);
+                    LOG_ERROR(@"Failed to serialize dictionary as JSON (%@)", dict[@"noticeType"]);
                 } else {
                     msg = [NSString stringWithFormat:@"%@: %@", dict[@"noticeType"], data];
                 }
@@ -188,15 +182,13 @@
                 NSDate *timestamp = [rfc3339Formatter dateFromString:dict[@"timestamp"]];
 
                 if (!msg) {
-                    LOG_ERROR("Failed to read notice message for log line (%@).", logLine);
-                    [noticeLogger noticeError:@"Failed to read notice message for log line (%@)", logLine];
+                    LOG_ERROR(@"Failed to read notice message for log line (%@).", logLine);
                     // Puts place holder value for message.
                     msg = @"Failed to read notice message.";
                 }
 
                 if (!timestamp) {
-                    LOG_ERROR("Failed to parse timestamp: (%@) for log line (%@)", dict[@"timestamp"], logLine);
-                    [noticeLogger noticeError:@"Failed to parse timestamp: (%@) for log line (%@)", dict[@"timestamp"], logLine];
+                    LOG_ERROR(@"Failed to parse timestamp: (%@) for log line (%@)", dict[@"timestamp"], logLine);
                     // Puts placeholder value for timestamp.
                     timestamp = [NSDate dateWithTimeIntervalSince1970:0];
                 }
@@ -235,7 +227,6 @@
 
     if (!data) {
         LOG_ERROR(@"Failed reading homepage notices file. Error:%@", err);
-        [noticeLogger noticeError:@"Failed reading homepage notices. Error:%@", err];
         return nil;
     }
 
@@ -254,7 +245,6 @@
 
         if (err) {
             LOG_ERROR(@"Failed parsing homepage notices file. Error:%@", err);
-            [noticeLogger noticeError:@"Failed parsing homepage notices file. Error:%@", err];
         }
 
         if (dict) {
