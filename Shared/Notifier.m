@@ -60,9 +60,7 @@ static void cfNotificationCallback(CFNotificationCenterRef center, void *observe
 
 - (void)listenForNotification:(nonnull NSString *)key listener:(nonnull void(^)(void))listener {
     if (listeners[key]) {
-        LOG_ERROR(@"already listening on key %@", key);
-        [[NoticeLogger sharedInstance]
-          noticeError:@"Notifier:listenForNotification: attempt to double listen on key:(%@)", key];
+        LOG_WARN(@"already listening on key %@", key);
         return;
     }
 
