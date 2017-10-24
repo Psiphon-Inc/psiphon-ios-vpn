@@ -18,6 +18,10 @@
  */
 
 #import <Foundation/Foundation.h>
+#import "NoticeLogger.h"
+
+
+void LOG_ERROR(NSString *format, ...) NS_FORMAT_FUNCTION(1,2);
 
 #if DEBUG
 
@@ -29,14 +33,18 @@
 #define LOG_WARN(format, ...) \
  NSLog((@"<WARN> %s [Line %d]: " format), __PRETTY_FUNCTION__, __LINE__, ##__VA_ARGS__)
 
-// Logs a message to Apple System Log facility with log level ERROR
-#define LOG_ERROR(format, ...) \
- NSLog((@"<ERROR> %s [Line %d]: " format), __PRETTY_FUNCTION__, __LINE__, ##__VA_ARGS__)
+// Logs error only to Apple System Log facility, these logs are not
+// logged with NoticeLogger class.
+#define LOG_ERROR_NO_NOTICE(format, ...) \
+  NSLog((@"<ERROR> %s [Line %d]: " format), __PRETTY_FUNCTION__, __LINE__, ##__VA_ARGS__)
 
 #else
 
 #define LOG_DEBUG(...)
+
 #define LOG_WARN(...)
-#define LOG_ERROR(...)
+
+#define LOG_ERROR_NO_NOTICE(...)
 
 #endif
+
