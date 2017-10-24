@@ -28,7 +28,6 @@ typedef NS_ENUM(NSInteger, VPNManagerErrorCode) {
     VPNManagerErrorTooManyConfigsFounds = 2,
     VPNManagerErrorUserDeniedConfigInstall = 3,
     VPNManagerErrorNEStartFailed = 4,
-    VPNManagerErrorNoTargetManager = 5,
 };
 
 typedef NS_ENUM(NSInteger, VPNStatus) {
@@ -103,14 +102,11 @@ typedef NS_ENUM(NSInteger, VPNStatus) {
  */
 - (BOOL)isTunnelConnected;
 
-// TODO: write docs
-- (void)isTunnelStarted:(void (^_Nonnull)(NSError * _Nullable error, BOOL tunnelStarted))completionHandler;
-
 /**
- * Whether or not VPN configuration is installed on the device.
- * @return TRUE if installed, FALSE otherwise.
+ * @return TRUE if the extension is in a zombie state. This means the extension process is running
+ *         however no Psiphon tunnel was creted, usually due to expired subscription.
  */
-- (BOOL)isVPNConfigurationInstalled;
+- (BOOL)isExtensionZombie;
 
 /**
  * Whether or not VPN configuration onDemand is enabled or not.
@@ -128,13 +124,5 @@ typedef NS_ENUM(NSInteger, VPNStatus) {
  * @param completionHandler Block called after operation completes.
  */
 - (void)updateVPNConfigurationOnDemandSetting:(BOOL)onDemandEnabled completionHandler:(void (^_Nonnull)(NSError * _Nullable error, BOOL changeSaved))completionHandler;
-
-/**
- * Removes Connect On Demand rules from VPN configuration.
- * @param completionHandler If Connect On Demand rule is removed successfully,
- *        completionhandler error is set to nil. If VPNManager has no target manager
- *        error code is set to VPNManagerErrorNoTargetManager.
- */
-- (void)removeConnectOnDemandRules:(nullable void (^)(NSError * _Nullable error))completionHandler;
 
 @end
