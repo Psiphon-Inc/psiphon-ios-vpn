@@ -33,8 +33,8 @@
  * Notices are newline "\n" delimited.
  *
  * Since this class is used by the network extension process, it is light
- * in its footprint. One side-effect is that the log file will be opened
- * and closed ever
+ * in its memory footprint. One side-effect is that the log file will be opened
+ * and closed every time noticeError: is called.
  *
  * Notices are encoded in JSON, in the same format as psiphon-tunnel-core,
  *
