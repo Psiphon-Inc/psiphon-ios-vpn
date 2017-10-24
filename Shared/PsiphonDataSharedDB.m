@@ -307,13 +307,6 @@
     return [[self rotatingLogNoticesPath] stringByAppendingString:@".1"];
 }
 
-// Private function.
-- (NSString *)extensionLogNoticesPath {
-    return [[[[NSFileManager defaultManager]
-      containerURLForSecurityApplicationGroupIdentifier:appGroupIdentifier] path]
-      stringByAppendingPathComponent:@"extension_notices"];
-}
-
 #ifndef TARGET_IS_EXTENSION
 
 // Reads all log files and tries parses the json lines contained in each.
