@@ -39,27 +39,33 @@
 
     PsiphonDataSharedDB *sharedDB;
 
+    NSString *logFilePath;
     NSFileHandle *logFileHandle;
     unsigned long long bytesReadFileOffset;
     dispatch_queue_t workQueue;
 
     dispatch_source_t dispatchSource;
-    
-    NSString *logPath;
 }
 
-- (instancetype)init {
+- (instancetype)initWithLogPath:(NSString *)logPath title:(NSString *)title{
     self = [super init];
     if (self) {
+
+        [self setTitle:title];
+        logFilePath = logPath;
         sharedDB = [[PsiphonDataSharedDB alloc] initForAppGroupIdentifier:APP_GROUP_IDENTIFIER];
-        logFileHandle = nil;
-        dispatchSource = nil;
-        bytesReadFileOffset = 0;
+
+        // NSFileHandle opened with fileHandleForReadingFromURL ows its associated
+        // file descriptor, and will close it automatically when deallocated.
+        NSError *err;
+        logFileHandle = [NSFileHandle
+          fileHandleForReadingFromURL:[NSURL fileURLWithPath:logFilePath]
+                                error:&err];
+
+        bytesReadFileOffset = (unsigned long long) 0;
 
         workQueue = dispatch_queue_create([(APP_GROUP_IDENTIFIER @".LogViewWorkQueue") UTF8String],
           DISPATCH_QUEUE_SERIAL);
-        
-        logPath = [sharedDB rotatingLogNoticesPath];
     }
     return self;
 }
@@ -77,7 +83,6 @@
     [self.view addSubview:activityIndicator];
 
     // UIBar
-    [self setTitle:@"Logs"];
 
     UIBarButtonItem *doneButton = [[UIBarButtonItem alloc]
       initWithTitle:@"Done" style:UIBarButtonItemStyleDone target:self action:@selector(onNavigationDoneTap)];
@@ -89,6 +94,9 @@
     [self.navigationItem setLeftBarButtonItem:reloadButton];
 
     [self loadDataAsync:TRUE];
+
+    // Setup listeners for logs file.
+    [self setupLogFileListener];
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
@@ -115,7 +123,6 @@
  * Submits work to workQueue to read new bytes from the log file an update the tableView.
  * @param userAction Whether a user action initiated data loading.
  */
-// loadDataAsync is thread-safe.
 - (void)loadDataAsync:(BOOL)userAction {
 
     // Caller should show spinner only when user performs an action.
@@ -125,33 +132,11 @@
 
     dispatch_async(workQueue, ^{
 
-        if (!logFileHandle) {
-            NSError *err;
+        unsigned long long newBytesReadFileOffset;
 
-            // NSFileHandle opened with fileHandleForReadingFromURL ows its associated
-            // file descriptor, and will close it automatically when deallocated.
-            logFileHandle = [NSFileHandle
-              fileHandleForReadingFromURL:[NSURL fileURLWithPath:logPath]
-                                    error:&err];
-            bytesReadFileOffset = 0;
-
-            if (err) {
-                LOG_ERROR(@"Failed to open log file. Error: %@", err);
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    [activityIndicator stopAnimating];
-                });
-                return;
-            }
-        }
-
-        if (!dispatchSource) {
-            [self setupLogFileListener];
-        }
-
-        unsigned long long newBytesReadFileOffset = 0;
         BOOL isFirstLogRead = (bytesReadFileOffset == 0);
 
-        NSString *logData = [PsiphonDataSharedDB tryReadingFile:logPath
+        NSString *logData = [PsiphonDataSharedDB tryReadingFile:logFilePath
                                                 usingFileHandle:&logFileHandle
                                                  readFromOffset:bytesReadFileOffset
                                                    readToOffset:&newBytesReadFileOffset];
@@ -214,13 +199,12 @@
     });
 }
 
-// setupLogFileListener method is thread-safe.
 - (void)setupLogFileListener {
-    
-    int fd = open([logPath UTF8String], O_RDONLY);
+    int fd = open([logFilePath UTF8String], O_RDONLY);
 
     if (fd == -1) {
         LOG_ERROR(@"Error opening log file to watch. errno: %s", strerror(errno));
+        [activityIndicator stopAnimating];
         return;
     }
 
@@ -248,10 +232,50 @@
     dispatch_source_set_cancel_handler(dispatchSource, ^{
         LOG_DEBUG(@"Log dispatchSource Cancelled");
         close(fd);
-        dispatchSource = nil;
     });
 
     dispatch_resume(dispatchSource);
+}
+
+@end
+
+@implementation TabbedLogViewController {
+    PsiphonDataSharedDB *sharedDB;
+}
+
+- (instancetype)initWithCoder:(NSCoder *)coder {
+    self = [super initWithCoder:coder];
+    if (self) {
+        sharedDB = [[PsiphonDataSharedDB alloc] initForAppGroupIdentifier:APP_GROUP_IDENTIFIER];
+    }
+
+    return self;
+}
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+
+    LogViewControllerFullScreen *tunnelCore = [[LogViewControllerFullScreen alloc] initWithLogPath:[sharedDB rotatingLogNoticesPath] title:@"Tunnel Core"];
+    LogViewControllerFullScreen *networkExtension = [[LogViewControllerFullScreen alloc] initWithLogPath:[NoticeLogger extensionRotatingLogNoticesPath] title:@"Extension"];
+    LogViewControllerFullScreen *container = [[LogViewControllerFullScreen alloc] initWithLogPath:[NoticeLogger containerRotatingLogNoticesPath] title:@"Container"];
+
+    UINavigationController *nav1 = [[UINavigationController alloc] initWithRootViewController:tunnelCore];
+    nav1.modalPresentationStyle = UIModalPresentationFullScreen;
+    nav1.modalTransitionStyle = UIModalTransitionStyleCoverVertical;
+    UINavigationController *nav2 = [[UINavigationController alloc] initWithRootViewController:networkExtension];
+    nav2.modalPresentationStyle = UIModalPresentationFullScreen;
+    nav2.modalTransitionStyle = UIModalTransitionStyleCoverVertical;
+    UINavigationController *nav3 = [[UINavigationController alloc] initWithRootViewController:container];
+    nav3.modalPresentationStyle = UIModalPresentationFullScreen;
+    nav3.modalTransitionStyle = UIModalTransitionStyleCoverVertical;
+
+
+    nav1.tabBarItem = [[UITabBarItem alloc] initWithTitle:@"Tunnel Core" image:nil tag:0];
+    nav2.tabBarItem =  [[UITabBarItem alloc] initWithTitle:@"Extension" image:nil tag:1];
+    nav3.tabBarItem = [[UITabBarItem alloc] initWithTitle:@"Container" image:nil tag:2];
+
+    NSArray *viewControllers = @[nav1, nav2, nav3];
+    [self setViewControllers:viewControllers animated:FALSE];
 }
 
 @end
