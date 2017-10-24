@@ -18,10 +18,20 @@
  */
 
 #import <Foundation/Foundation.h>
-#import "LogViewController.h"
+#import "NoticeLogger.h"
 
-@interface LogViewControllerFullScreen : LogViewController
-@end
+void LOG_ERROR(NSString *format, ...) {
+    NSString *message = nil;
+    if (format) {
+        va_list args;
+        va_start(args, format);
+        message = [[NSString alloc] initWithFormat:format arguments:args];
+        va_end(args);
 
-@interface TabbedLogViewController : UITabBarController
-@end
+#if DEBUG
+        NSLog(@"<ERROR> %@", message);
+#endif
+
+        [[NoticeLogger sharedInstance] noticeError:message];
+    }
+}

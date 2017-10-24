@@ -312,13 +312,8 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 
 #if DEBUG
 - (void)onVersionLabelTap:(UILabel *)sender {
-    LogViewControllerFullScreen *log = [[LogViewControllerFullScreen alloc] init];
-
-    UINavigationController *nav = [[UINavigationController alloc] initWithRootViewController:log];
-    nav.modalPresentationStyle = UIModalPresentationFullScreen;
-    nav.modalTransitionStyle = UIModalTransitionStyleCoverVertical;
-
-    [self presentViewController:nav animated:YES completion:nil];
+    TabbedLogViewController *viewController = [[TabbedLogViewController alloc] initWithCoder:nil];
+    [self presentViewController:viewController animated:YES completion:nil];
 }
 #endif
 

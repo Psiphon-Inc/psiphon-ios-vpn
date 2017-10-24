@@ -18,10 +18,20 @@
  */
 
 #import <Foundation/Foundation.h>
-#import "LogViewController.h"
 
-@interface LogViewControllerFullScreen : LogViewController
-@end
 
-@interface TabbedLogViewController : UITabBarController
+@interface NoticeLogger : NSObject
+
++ (instancetype)sharedInstance;
+
++ (NSString *)containerRotatingLogNoticesPath;
++ (NSString *)containerRotatingOlderLogNoticesPath;
+
++ (NSString *)extensionRotatingLogNoticesPath;
++ (NSString *)extensionRotatingOlderLogNoticesPath;
+
+- (void)noticeError:(NSString *)message;
+- (void)noticeErrorWithFormat:(NSString *)format, ... NS_FORMAT_FUNCTION(1,2);
+- (void)noticeError:(NSString *)message withTimestamp:(NSString *)timestamp;
+
 @end

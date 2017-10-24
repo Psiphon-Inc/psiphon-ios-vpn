@@ -21,6 +21,7 @@
 #import "PsiphonDataSharedDB.h"
 #import "SharedConstants.h"
 #import "Logging.h"
+#import "NoticeLogger.h"
 
 // Initial maximum number of logs to load.
 #define MAX_LOGS_LOAD 250
@@ -38,6 +39,7 @@
 
     PsiphonDataSharedDB *sharedDB;
 
+    NSString *logFilePath;
     NSFileHandle *logFileHandle;
     unsigned long long bytesReadFileOffset;
     dispatch_queue_t workQueue;
@@ -45,17 +47,19 @@
     dispatch_source_t dispatchSource;
 }
 
-- (instancetype)init {
+- (instancetype)initWithLogPath:(NSString *)logPath title:(NSString *)title{
     self = [super init];
     if (self) {
-        sharedDB = [[PsiphonDataSharedDB alloc] initForAppGroupIdentifier:APP_GROUP_IDENTIFIER];
 
-        NSError *err;
+        [self setTitle:title];
+        logFilePath = logPath;
+        sharedDB = [[PsiphonDataSharedDB alloc] initForAppGroupIdentifier:APP_GROUP_IDENTIFIER];
 
         // NSFileHandle opened with fileHandleForReadingFromURL ows its associated
         // file descriptor, and will close it automatically when deallocated.
+        NSError *err;
         logFileHandle = [NSFileHandle
-          fileHandleForReadingFromURL:[NSURL fileURLWithPath:[sharedDB rotatingLogNoticesPath]]
+          fileHandleForReadingFromURL:[NSURL fileURLWithPath:logFilePath]
                                 error:&err];
 
         bytesReadFileOffset = (unsigned long long) 0;
@@ -79,7 +83,6 @@
     [self.view addSubview:activityIndicator];
 
     // UIBar
-    [self setTitle:@"Logs"];
 
     UIBarButtonItem *doneButton = [[UIBarButtonItem alloc]
       initWithTitle:@"Done" style:UIBarButtonItemStyleDone target:self action:@selector(onNavigationDoneTap)];
@@ -133,7 +136,7 @@
 
         BOOL isFirstLogRead = (bytesReadFileOffset == 0);
 
-        NSString *logData = [PsiphonDataSharedDB tryReadingFile:[sharedDB rotatingLogNoticesPath]
+        NSString *logData = [PsiphonDataSharedDB tryReadingFile:logFilePath
                                                 usingFileHandle:&logFileHandle
                                                  readFromOffset:bytesReadFileOffset
                                                    readToOffset:&newBytesReadFileOffset];
@@ -197,7 +200,7 @@
 }
 
 - (void)setupLogFileListener {
-    int fd = open([[sharedDB rotatingLogNoticesPath] UTF8String], O_RDONLY);
+    int fd = open([logFilePath UTF8String], O_RDONLY);
 
     if (fd == -1) {
         LOG_ERROR(@"Error opening log file to watch. errno: %s", strerror(errno));
@@ -232,6 +235,47 @@
     });
 
     dispatch_resume(dispatchSource);
+}
+
+@end
+
+@implementation TabbedLogViewController {
+    PsiphonDataSharedDB *sharedDB;
+}
+
+- (instancetype)initWithCoder:(NSCoder *)coder {
+    self = [super initWithCoder:coder];
+    if (self) {
+        sharedDB = [[PsiphonDataSharedDB alloc] initForAppGroupIdentifier:APP_GROUP_IDENTIFIER];
+    }
+
+    return self;
+}
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+
+    LogViewControllerFullScreen *tunnelCore = [[LogViewControllerFullScreen alloc] initWithLogPath:[sharedDB rotatingLogNoticesPath] title:@"Tunnel Core"];
+    LogViewControllerFullScreen *networkExtension = [[LogViewControllerFullScreen alloc] initWithLogPath:[NoticeLogger extensionRotatingLogNoticesPath] title:@"Extension"];
+    LogViewControllerFullScreen *container = [[LogViewControllerFullScreen alloc] initWithLogPath:[NoticeLogger containerRotatingLogNoticesPath] title:@"Container"];
+
+    UINavigationController *nav1 = [[UINavigationController alloc] initWithRootViewController:tunnelCore];
+    nav1.modalPresentationStyle = UIModalPresentationFullScreen;
+    nav1.modalTransitionStyle = UIModalTransitionStyleCoverVertical;
+    UINavigationController *nav2 = [[UINavigationController alloc] initWithRootViewController:networkExtension];
+    nav2.modalPresentationStyle = UIModalPresentationFullScreen;
+    nav2.modalTransitionStyle = UIModalTransitionStyleCoverVertical;
+    UINavigationController *nav3 = [[UINavigationController alloc] initWithRootViewController:container];
+    nav3.modalPresentationStyle = UIModalPresentationFullScreen;
+    nav3.modalTransitionStyle = UIModalTransitionStyleCoverVertical;
+
+
+    nav1.tabBarItem = [[UITabBarItem alloc] initWithTitle:@"Tunnel Core" image:nil tag:0];
+    nav2.tabBarItem =  [[UITabBarItem alloc] initWithTitle:@"Extension" image:nil tag:1];
+    nav3.tabBarItem = [[UITabBarItem alloc] initWithTitle:@"Container" image:nil tag:2];
+
+    NSArray *viewControllers = @[nav1, nav2, nav3];
+    [self setViewControllers:viewControllers animated:FALSE];
 }
 
 @end
