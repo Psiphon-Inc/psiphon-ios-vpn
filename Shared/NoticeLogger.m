@@ -206,7 +206,7 @@
     [fileHandle synchronizeFile];
     [fileHandle closeFile];
 
-    rotatingCurrentFileSize += [output length];
+    rotatingCurrentFileSize += [output length] + 1;
 
     // Check file size, and rotate if necessary.
     NSFileManager *fileManager = [NSFileManager defaultManager];
