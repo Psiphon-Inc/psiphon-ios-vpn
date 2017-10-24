@@ -51,8 +51,7 @@
  */
 
 @implementation NoticeLogger {
-    dispatch_queue_t serialWorkQueue;
-
+    NSLock *writeLock;
     NSString *rotatingFilepath;
     NSString *rotatingOlderFilepath;
     unsigned long long rotatingCurrentFileSize;
@@ -126,8 +125,8 @@
 - (instancetype)initWithFilepath:(NSString *)noticesFilepath olderFilepath:(NSString *)olderFilepath {
     self = [super init];
     if (self) {
-         serialWorkQueue = dispatch_queue_create([APP_GROUP_IDENTIFIER @"noticeWorkQueue" UTF8String],
-           DISPATCH_QUEUE_SERIAL);
+        writeLock = [[NSLock alloc] init];
+
         rfc3339Formatter = [NSDateFormatter createRFC3339MilliFormatter];
 
         rotatingFilepath = noticesFilepath;
@@ -163,84 +162,85 @@
 
 - (void)outputNotice:(NSString *)data withNoticeType:(NSString *)noticeType andTimestamp:(NSString *)timestamp {
 
+    [writeLock lock];
+
     if (!data) {
         LOG_ERROR(@"Got nil data");
         data = @"nil data";
     }
 
-    dispatch_async(serialWorkQueue, ^{
+    NSError *err;
 
-        NSError *err;
+    NSFileHandle *fileHandle = [NSFileHandle fileHandleForWritingToURL:[NSURL fileURLWithPath:rotatingFilepath]
+                                                                 error:&err];
+    if (err) {
+        LOG_ERROR(@"Failed to open file handle for path (%@). Error: %@", rotatingFilepath, err);
+        return;
+    }
 
-        NSFileHandle *fileHandle = [NSFileHandle fileHandleForWritingToURL:[NSURL fileURLWithPath:rotatingFilepath]
-                                                                     error:&err];
-        if (err) {
-            LOG_ERROR(@"Failed to open file handle for path (%@). Error: %@", rotatingFilepath, err);
-            return;
-        }
+    // Prepare file handle for appending.
+    [fileHandle seekToEndOfFile];
 
-        // Prepare file handle for appending.
-        [fileHandle seekToEndOfFile];
+    // Example output format:
+    // {"data":{"message":"shutdown operate tunnel"},"noticeType":"Info","showUser":false,"timestamp":"2006-01-02T15:04:05.999-07:00"}
+    NSDictionary *outputDic = @{
+      @"data": data,
+      @"noticeType": noticeType,
+      @"showUser": @NO,
+      @"timestamp": timestamp
+    };
 
-        // Example output format:
-        // {"data":{"message":"shutdown operate tunnel"},"noticeType":"Info","showUser":false,"timestamp":"2006-01-02T15:04:05.999-07:00"}
-        NSDictionary *outputDic = @{
-          @"data": data,
-          @"noticeType": noticeType,
-          @"showUser": @NO,
-          @"timestamp": timestamp
-        };
+    // The resulting output will be UTF-8 encoded.
+    NSData *output = [NSJSONSerialization dataWithJSONObject:outputDic options:kNilOptions error:&err];
 
-        // The resulting output will be UTF-8 encoded.
-        NSData *output = [NSJSONSerialization dataWithJSONObject:outputDic options:kNilOptions error:&err];
+    if (err) {
+        LOG_ERROR(@"Aborting log write. Failed to serialize JSON object: (%@)", outputDic);
+        return;
+    }
 
-        if (err) {
-            LOG_ERROR(@"Aborting log write. Failed to serialize JSON object: (%@)", outputDic);
-            return;
-        }
+    // Writes output, and add delimiter.
+    [fileHandle writeData:output];
+    [fileHandle writeData:[@"\n" dataUsingEncoding:NSUTF8StringEncoding]];
 
-        // Writes output, and add delimiter.
-        [fileHandle writeData:output];
-        [fileHandle writeData:[@"\n" dataUsingEncoding:NSUTF8StringEncoding]];
+    // Sync and close file before (possible) rotation.
+    [fileHandle synchronizeFile];
+    [fileHandle closeFile];
 
-        // Sync and close file before (possible) rotation.
-        [fileHandle synchronizeFile];
-        [fileHandle closeFile];
+    rotatingCurrentFileSize += [output length];
 
-        rotatingCurrentFileSize += [output length];
+    // Check file size, and rotate if necessary.
+    NSFileManager *fileManager = [NSFileManager defaultManager];
 
-        // Check file size, and rotate if necessary.
-        NSFileManager *fileManager = [NSFileManager defaultManager];
+    if (rotatingCurrentFileSize > MAX_NOTICE_FILE_SIZE_BYTES) {
 
-        if (rotatingCurrentFileSize > MAX_NOTICE_FILE_SIZE_BYTES) {
-            
-            LOG_DEBUG(@"Rotating notices for type (%@)", noticeType);
-            
-            // Remove old log file if it exists.
-            if ([fileManager fileExistsAtPath:rotatingOlderFilepath]) {
-                if ([fileManager removeItemAtPath:rotatingOlderFilepath error:&err]) {
-                    [fileManager moveItemAtPath:rotatingFilepath toPath:rotatingOlderFilepath error:&err];
-                }
+        LOG_DEBUG(@"Rotating notices for type (%@)", noticeType);
 
-                // Do no abort, continue with truncating original log.
-                if (err) {
-                    LOG_ERROR(@"Failed to rotate log file at path (%@). Error: %@", rotatingFilepath, err);
-                    err = nil;
-                }
+        // Remove old log file if it exists.
+        if ([fileManager fileExistsAtPath:rotatingOlderFilepath]) {
+            if ([fileManager removeItemAtPath:rotatingOlderFilepath error:&err]) {
+                [fileManager moveItemAtPath:rotatingFilepath toPath:rotatingOlderFilepath error:&err];
             }
 
-            // Truncate log file.
-            NSFileHandle *truncationFileHandle = [NSFileHandle fileHandleForUpdatingAtPath:rotatingFilepath];
-            if (truncationFileHandle) {
-                [truncationFileHandle truncateFileAtOffset:0];
-                [truncationFileHandle closeFile];
-
-                rotatingCurrentFileSize = 0;
-            } else {
-                LOG_ERROR(@"Failed to truncate notices file for type (%@)", noticeType);
+            // Do no abort, continue with truncating original log.
+            if (err) {
+                LOG_ERROR(@"Failed to rotate log file at path (%@). Error: %@", rotatingFilepath, err);
+                err = nil;
             }
         }
-    });
+
+        // Truncate log file.
+        NSFileHandle *truncationFileHandle = [NSFileHandle fileHandleForUpdatingAtPath:rotatingFilepath];
+        if (truncationFileHandle) {
+            [truncationFileHandle truncateFileAtOffset:0];
+            [truncationFileHandle closeFile];
+
+            rotatingCurrentFileSize = 0;
+        } else {
+            LOG_ERROR(@"Failed to truncate notices file for type (%@)", noticeType);
+        }
+    }
+
+    [writeLock unlock];
 }
 
 @end
