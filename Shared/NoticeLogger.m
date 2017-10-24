@@ -182,6 +182,7 @@
                                                                  error:&err];
     if (err) {
         LOG_ERROR_NO_NOTICE(@"Failed to open file handle for path (%@). Error: %@", rotatingFilepath, err);
+        [writeLock unlock];
         return;
     }
 
@@ -202,6 +203,7 @@
 
     if (err) {
         LOG_ERROR_NO_NOTICE(@"Aborting log write. Failed to serialize JSON object: (%@)", outputDic);
+        [writeLock unlock];
         return;
     }
 
