@@ -115,7 +115,7 @@
                                                                       @"Subscription only",
                                                                       @"VPN On demand setting detail text showing when user doesn't have an active subscription and the item is disabled.");
         } else {
-            vpnOnDemandToggle.on = [[VPNManager sharedInstance] isVPNConfigurationOnDemandEnabled];
+            vpnOnDemandToggle.on = [[VPNManager sharedInstance] isOnDemandEnabled];
             cell.userInteractionEnabled = YES;
             cell.textLabel.enabled = YES;
             subscriptionOnlySubtitle = @"";

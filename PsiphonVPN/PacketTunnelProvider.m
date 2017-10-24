@@ -35,6 +35,11 @@
 #import <net/if.h>
 #import <stdatomic.h>
 
+// NOTE:
+// To handle the Network Extension zombie state, PsiphonDataSharedDB tunnelConnectedState should not be
+// set to TRUE if the VPN is not active.
+// The mismatch between VPN connected stated and PsiphonDataSharedDB tunnelConnectedState
+// is used to detect a zombie extension process.
 
 @implementation PacketTunnelProvider {
 
