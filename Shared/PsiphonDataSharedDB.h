@@ -22,14 +22,16 @@
 #import "PsiphonData.h"
 #endif
 
+
 @interface Homepage : NSObject
+
 @property (nonatomic) NSURL *url;
 @property (nonatomic) NSDate *timestamp;
 
 @end
 
-@interface PsiphonDataSharedDB : NSObject
 
+@interface PsiphonDataSharedDB : NSObject
 
 - (id)initForAppGroupIdentifier:(NSString*)identifier;
 
@@ -63,8 +65,5 @@
 // Sponsor ID
 - (void) updateSponsorId:(NSString*)sponsorId;
 - (NSString*)getSponsorId;
+
 @end
-
-
-
-
