@@ -26,7 +26,6 @@
 #import "PsiphonClientCommonLibraryHelpers.h"
 #import "IAPHelper.h"
 #import "SettingsViewController.h"
-#import "ProviderMessageKeys.h"
 
 @interface VPNManager ()
 
@@ -186,7 +185,7 @@
                   
                   LOG_DEBUG(@"Call targetManager.connection.startVPNTunnel()");
                   NSError *vpnStartError;
-                  NSDictionary *extensionOptions = @{EXTENSION_OPTION_START_FROM_CONTAINER : EXTENSION_OPTION_TRUE};
+                  NSDictionary *extensionOptions = @{EXTENSION_OPTION_START_FROM_CONTAINER : EXTENSION_TRUE};
                   
                   BOOL vpnStartSuccess = [self.targetManager.connection startVPNTunnelWithOptions:extensionOptions
                                                                                    andReturnError:&vpnStartError];
@@ -244,41 +243,8 @@
     return [self isVPNActive] && [sharedDB getTunnelConnectedState];
 }
 
-- (void)isTunnelStarted:(void (^)(NSError * _Nullable error, BOOL tunnelStarted))completionHandler {
-    NETunnelProviderSession *session = (NETunnelProviderSession *) self.targetManager.connection;
-    if (session && (self.targetManager.connection.status != NEVPNStatusInvalid)) {
-        NSError *err;
-        NSString *query = @PROVIDER_MSG_IS_TUNNEL_STARTED;
-
-        BOOL sent = [session sendProviderMessage:[query dataUsingEncoding:NSUTF8StringEncoding]
-                         returnError:&err
-                     responseHandler:^(NSData *responseData) {
-
-            if (responseData) {
-                NSString *response = [[NSString alloc] initWithData:responseData encoding:NSUTF8StringEncoding];
-                if ([response isEqualToString:@PROVIDER_RESP_FALSE]) {
-                    completionHandler(nil, FALSE);
-                } else if ([response isEqualToString:@PROVIDER_RESP_TRUE]) {
-                    completionHandler(nil, TRUE);
-                } else {
-                    LOG_ERROR(@"Aborting. Invalid response (%@) to query (%@).", response, query);
-                }
-            }
-        }];
-        
-        if (sent) {
-            LOG_DEBUG(@"TEST: query sent to provider");
-        }
-
-        if (err) {
-            LOG_ERROR(@"Failed to send message to the provider. Error:%@", err);
-            completionHandler(err, nil);
-        }
-    }
-}
-
-- (BOOL)isVPNConfigurationInstalled {
-    return self.targetManager != nil;
+- (BOOL)isExtensionZombie {
+    return (self.targetManager.connection.status == NEVPNStatusConnected) && (![sharedDB getTunnelConnectedState]);
 }
 
 - (BOOL)isVPNConfigurationOnDemandEnabled {
@@ -286,35 +252,19 @@
 }
 
 - (void)updateVPNConfigurationOnDemandSetting:(BOOL)onDemandEnabled completionHandler:(void (^)(NSError * _Nullable error, BOOL changeSaved))completionHandler {
-    if (self.targetManager) {
-        if ([self updateTargetManagerConnectOnDemand:onDemandEnabled]) {
-            // Save the updated configuration.
-            [self.targetManager saveToPreferencesWithCompletionHandler:^(NSError *error) {
-                if (error) {
-                    // TODO: log this error with Notices.
-                    LOG_ERROR(@"Failed to save VPN configuration. Error: %@", error);
-                    completionHandler(error, FALSE);
-                } else {
-                    completionHandler(nil, TRUE);
-                }
-            }];
-        } else {
-            completionHandler(nil, FALSE);
-        }
+    if ([self updateTargetManagerConnectOnDemand:onDemandEnabled]) {
+        // Save the updated configuration.
+        [self.targetManager saveToPreferencesWithCompletionHandler:^(NSError *error) {
+            if (error) {
+                // TODO: log this error with Notices.
+                LOG_ERROR(@"Failed to save VPN configuration. Error: %@", error);
+                completionHandler(error, FALSE);
+            } else {
+                completionHandler(nil, TRUE);
+            }
+        }];
     } else {
-        LOG_ERROR(@"targetManager is nil");
-        completionHandler([[NSError alloc] initWithDomain:kVPNManagerErrorDomain code:VPNManagerErrorNoTargetManager userInfo:nil], FALSE);
-    }
-}
-
-- (void)removeConnectOnDemandRules:(nullable void (^)(NSError * _Nullable error))completionHandler {
-    if (self.targetManager) {
-        [self.targetManager setOnDemandEnabled:FALSE];
-        [self.targetManager setOnDemandRules:@[]];
-        [self.targetManager saveToPreferencesWithCompletionHandler:completionHandler];
-    } else {
-        LOG_ERROR(@"targetManager is nil");
-        completionHandler([[NSError alloc] initWithDomain:kVPNManagerErrorDomain code:VPNManagerErrorNoTargetManager userInfo:nil]);
+        completionHandler(nil, FALSE);
     }
 }
 
