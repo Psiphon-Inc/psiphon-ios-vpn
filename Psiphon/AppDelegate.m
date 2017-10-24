@@ -170,13 +170,13 @@
 
             LOG_WARN(@"Network Extension is in a zombie state. Stopping the extension.");
 
-            [[NSUserDefaults standardUserDefaults] setBool:FALSE forKey:kVpnOnDemand];
+//            [[NSUserDefaults standardUserDefaults] setBool:FALSE forKey:kVpnOnDemand];
+            [vpnManager stopVPN];
             [vpnManager removeConnectOnDemandRules:^(NSError * _Nullable error) {
                 if (error) {
                     LOG_ERROR(@"Failed to remove Connect On Demand rules. Error: %@", error);
                 }
             }];
-            [vpnManager stopVPN];
         }
 
     }];

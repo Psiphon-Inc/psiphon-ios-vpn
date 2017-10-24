@@ -310,7 +310,9 @@
     // or if the user has a valid subscription.
     // NOTE: This is not a complete subscription verification,
     //       specifically the receipt is not verified at this point.
-    if ([sharedDB getAppForegroundState] || [[IAPHelper sharedInstance] hasActiveSubscriptionForDate:[NSDate date]]) {
+
+    BOOL hasActiveSubscription = [[IAPHelper sharedInstance] hasActiveSubscriptionForDate:[NSDate date]];
+    if ([sharedDB getAppForegroundState] || hasActiveSubscription) {
 
         //
         if (vpnStartCompletionHandler &&
@@ -319,9 +321,12 @@
             vpnStartCompletionHandler(nil);
             vpnStartCompletionHandler = nil;
 
-            // Since we're still using two-start process, we will notify
-            // the container through NE.newHomepages notification.
-            [notifier post:@"NE.newHomepages"];
+            // Post homepage notification only if the user doesn't have an active subscription.
+            if (!hasActiveSubscription) {
+                // Since we're still using two-start process, we will notify
+                // the container through NE.newHomepages notification.
+                [notifier post:@"NE.newHomepages"];
+            }
 
             return TRUE;
         }
@@ -351,6 +356,7 @@
 
 - (void)subscriptionCheck {
     __weak PacketTunnelProvider *weakSelf = self;
+    // TODO: change timers to proper values before submitting
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 5 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
         // If user's subscription has expired, then give them an hour of extra grace period
         // before killing the tunnel.

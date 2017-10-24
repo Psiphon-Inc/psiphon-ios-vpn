@@ -97,7 +97,7 @@
 }
 
 - (void)startTunnelWithCompletionHandler:(nullable void (^)(NSError * _Nullable error))completionHandler {
-    // Overide SponsorID if user has active subscrption
+    // Override SponsorID if user has active subscription.
     if([[IAPHelper sharedInstance]hasActiveSubscriptionForDate:[NSDate date]]) {
         NSString *bundledConfigStr = [PsiphonClientCommonLibraryHelpers getPsiphonBundledConfig];
         if(bundledConfigStr) {
@@ -137,12 +137,7 @@
           // if there is more than one, abort!
           if ([allManagers count] == 0) {
               LOG_WARN(@"No VPN configurations found.");
-              NETunnelProviderManager *newManager = [[NETunnelProviderManager alloc] init];
-              NETunnelProviderProtocol *providerProtocol = [[NETunnelProviderProtocol alloc] init];
-              providerProtocol.providerBundleIdentifier = @"ca.psiphon.Psiphon.PsiphonVPN";
-              newManager.protocolConfiguration = providerProtocol;
-              newManager.protocolConfiguration.serverAddress = @"localhost";
-              self.targetManager = newManager;
+              self.targetManager = [self createProviderManager];
           } else if ([allManagers count] > 1) {
               // Reset startStopButtonPressed flag to FALSE when error and exiting.
               [self setStartStopButtonPressed:FALSE];
@@ -249,7 +244,6 @@
     return [self isVPNActive] && [sharedDB getTunnelConnectedState];
 }
 
-
 - (void)isTunnelStarted:(void (^)(NSError * _Nullable error, BOOL tunnelStarted))completionHandler {
     NETunnelProviderSession *session = (NETunnelProviderSession *) self.targetManager.connection;
     if (session && (self.targetManager.connection.status != NEVPNStatusInvalid)) {
@@ -268,7 +262,6 @@
                     completionHandler(nil, TRUE);
                 } else {
                     LOG_ERROR(@"Aborting. Invalid response (%@) to query (%@).", response, query);
-                    abort();
                 }
             }
         }];
@@ -316,8 +309,8 @@
 
 - (void)removeConnectOnDemandRules:(nullable void (^)(NSError * _Nullable error))completionHandler {
     if (self.targetManager) {
-        [self.targetManager setOnDemandRules:@[]];
         [self.targetManager setOnDemandEnabled:FALSE];
+        [self.targetManager setOnDemandRules:@[]];
         [self.targetManager saveToPreferencesWithCompletionHandler:completionHandler];
     } else {
         LOG_ERROR(@"targetManager is nil");
@@ -345,6 +338,16 @@
 }
 
 #pragma mark - Private methods
+
+- (NETunnelProviderManager *)createProviderManager {
+    NETunnelProviderManager *newManager = [[NETunnelProviderManager alloc] init];
+    NETunnelProviderProtocol *providerProtocol = [[NETunnelProviderProtocol alloc] init];
+    providerProtocol.providerBundleIdentifier = @"ca.psiphon.Psiphon.PsiphonVPN";
+    newManager.protocolConfiguration = providerProtocol;
+    newManager.protocolConfiguration.serverAddress = @"localhost";
+    [newManager setEnabled:TRUE];
+    return newManager;
+}
 
 - (void)setTargetManager:(NEVPNManager *)targetManager {
 
