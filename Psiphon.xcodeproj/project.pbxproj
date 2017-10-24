@@ -158,11 +158,10 @@
 		668AF9BE1E92CBD3008CAAAA /* NetworkExtension.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = NetworkExtension.framework; path = System/Library/Frameworks/NetworkExtension.framework; sourceTree = SDKROOT; };
 		7FC2D3C7A4325CD15FDF15E9 /* libPods-PsiphonVPN.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-PsiphonVPN.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		93B819F4480DF3E24C22ACD7 /* libPods-Psiphon.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Psiphon.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		963708A81F65D4810038894E /* Bourbon-Oblique.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Bourbon-Oblique.otf"; sourceTree = "<group>"; };
+		963708A81F65D4810038894E /* Bourbon-Oblique.otf */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Bourbon-Oblique.otf"; sourceTree = "<group>"; };
 		9BFEC0419AD3808370915E01 /* PsiphonConfigUserDefaults.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PsiphonConfigUserDefaults.h; sourceTree = "<group>"; };
 		9BFEC04426D8558CB89D3798 /* VPNManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VPNManager.m; sourceTree = "<group>"; };
 		9BFEC3165745A5D14C8C3C08 /* Notifier.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Notifier.h; sourceTree = "<group>"; };
-		9BFEC3D45E0492C240A6F7B8 /* ProviderMessageKeys.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ProviderMessageKeys.h; sourceTree = "<group>"; };
 		9BFEC584519C408D9D6D3FF1 /* PsiphonConfigUserDefaults.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PsiphonConfigUserDefaults.m; sourceTree = "<group>"; };
 		9BFEC66B7F0E98CBC5631F06 /* AdManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AdManager.h; sourceTree = "<group>"; };
 		9BFEC74F24453B8E4B1AFC39 /* VPNManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VPNManager.h; sourceTree = "<group>"; };
@@ -276,7 +275,6 @@
 				EF6C1F511F59E46500709554 /* psiphon_config */,
 				EF441B001F7AF14A008A7D82 /* NSDateFormatter+RFC3339.m */,
 				EF441B031F7AF263008A7D82 /* NSDateFormatter+RFC3339.h */,
-				9BFEC3D45E0492C240A6F7B8 /* ProviderMessageKeys.h */,
 			);
 			path = Shared;
 			sourceTree = "<group>";

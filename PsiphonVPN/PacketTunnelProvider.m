@@ -34,7 +34,6 @@
 #import <arpa/inet.h>
 #import <net/if.h>
 #import <stdatomic.h>
-#import "ProviderMessageKeys.h"
 
 
 @implementation PacketTunnelProvider {
@@ -51,10 +50,6 @@
 
     // Start vpn decision made by the container.
     BOOL shouldStartVPN;
-
-    // Whether or not Psiphon tunnel has been started when the extension
-    // was started.
-    BOOL psiphonTunnelStartedAtStart;
 
     BOOL tunnelStartedFromContainer;
 
@@ -74,7 +69,6 @@
         notifier = [[Notifier alloc] initWithAppGroupIdentifier:APP_GROUP_IDENTIFIER];
 
         shouldStartVPN = FALSE;
-        psiphonTunnelStartedAtStart = FALSE;
         tunnelStartedFromContainer = FALSE;
 
         atomic_init(&self->showUpstreamProxyErrorMessage, TRUE);
@@ -90,7 +84,7 @@
     // NOTE: This is not a complete subscription verification,
     //       specifically the receipt is not verified at this point.
     BOOL hasActiveSubscription = [[IAPHelper sharedInstance] hasActiveSubscriptionForDate:[NSDate date]];
-    tunnelStartedFromContainer = [((NSString *)options[EXTENSION_OPTION_START_FROM_CONTAINER]) isEqualToString:EXTENSION_OPTION_TRUE];
+    tunnelStartedFromContainer = [((NSString *)options[EXTENSION_OPTION_START_FROM_CONTAINER]) isEqualToString:EXTENSION_TRUE];
 
     if (tunnelStartedFromContainer || hasActiveSubscription) {
 
@@ -128,19 +122,19 @@
             // Completion handler should be called after tunnel is connected.
             vpnStartCompletionHandler = startTunnelCompletionHandler;
 
-            psiphonTunnelStartedAtStart = TRUE;
         }];
     } else {
         // If the user is not a subscriber, or subscription has expired
-        // we will call the startTunnelCompletionHandler to stop onDemand rules from
-        // kicking-in over and over.
+        // we will call the startTunnelCompletionHandler(nil) with no errors to stop onDemand rules from
+        // kicking-in over and over if they are in effect.
 
-        psiphonTunnelStartedAtStart = FALSE;
+        [sharedDB updateTunnelConnectedState:FALSE];
 
+        // TODO: provide a more descriptive error message
         [self displayMessage:
             NSLocalizedStringWithDefaultValue(@"USE_PSIPHON_APP", nil, [NSBundle mainBundle], @"To connect, use the Psiphon app", @"Alert message informing user they have to open the app. DO NOT translate 'Psiphon'.")
           completionHandler:^(BOOL success) {
-              // TODO: error handling?
+              // Do nothing.
           }];
 
         startTunnelCompletionHandler(nil);
@@ -163,34 +157,15 @@
     [psiphonTunnel stop];
 
     completionHandler();
-
-    return;
 }
 
-// If the Network Extension is not already running, and the container sends
+// If the Network Extension is *not* running, and the container sends
 // a messages with [NETunnelProviderSession sendProviderMessage:::] then
 // the system creates a new extension process, and instantiates PacketTunnelProvider.
 - (void)handleAppMessage:(NSData *)messageData
        completionHandler:(nullable void (^)(NSData * __nullable responseData))completionHandler {
 
     if (completionHandler != nil) {
-
-        if (messageData) {
-            NSString *query = [[NSString alloc] initWithData:messageData encoding:NSUTF8StringEncoding];
-            if ([@PROVIDER_MSG_IS_TUNNEL_STARTED isEqualToString:query]) {
-                // If the Psiphon tunnel has been started when the extension was started
-                // responds with PROVIDER_RESP_TRUE, otherwise responds with PROVIDER_RESP_FALSE
-                NSData *respData;
-                if (psiphonTunnelStartedAtStart) {
-                    respData = [@PROVIDER_RESP_TRUE dataUsingEncoding:NSUTF8StringEncoding];
-                } else {
-                    respData = [@PROVIDER_RESP_FALSE dataUsingEncoding:NSUTF8StringEncoding];
-                }
-                completionHandler(respData);
-                return;
-            }
-        }
-
         // If completionHandler is not nil, iOS expects it to always be executed.
         completionHandler(messageData);
     }
