@@ -156,7 +156,6 @@
           // so that it matches user's preferences.
           BOOL connectOnDemand = [[NSUserDefaults standardUserDefaults] boolForKey:kVpnOnDemand];
           [self updateTargetManagerConnectOnDemand:connectOnDemand];
-          LOG_DEBUG(@"TEST number of onDemand rules: %lu", [self.targetManager.onDemandRules count]);
 
           LOG_DEBUG(@"call saveToPreferencesWithCompletionHandler");
           
@@ -247,7 +246,7 @@
     return (self.targetManager.connection.status == NEVPNStatusConnected) && (![sharedDB getTunnelConnectedState]);
 }
 
-- (BOOL)isVPNConfigurationOnDemandEnabled {
+- (BOOL)isOnDemandEnabled {
     return self.targetManager.isOnDemandEnabled;
 }
 

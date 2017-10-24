@@ -112,7 +112,7 @@ typedef NS_ENUM(NSInteger, VPNStatus) {
  * Whether or not VPN configuration onDemand is enabled or not.
  * @return TRUE if enabled, FALSE otherwise.
  */
-- (BOOL)isVPNConfigurationOnDemandEnabled;
+- (BOOL)isOnDemandEnabled;
 
 /**
  * Updates and saves VPN configuration Connect On Demand.
