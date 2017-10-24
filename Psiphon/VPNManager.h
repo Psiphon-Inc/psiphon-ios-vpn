@@ -104,7 +104,7 @@ typedef NS_ENUM(NSInteger, VPNStatus) {
 - (BOOL)isTunnelConnected;
 
 // TODO: write docs
-- (void)isTunnelStarted:(void (^)(NSError * _Nullable error, BOOL tunnelStarted))completionHandler;
+- (void)isTunnelStarted:(void (^_Nonnull)(NSError * _Nullable error, BOOL tunnelStarted))completionHandler;
 
 /**
  * Whether or not VPN configuration is installed on the device.
@@ -127,7 +127,7 @@ typedef NS_ENUM(NSInteger, VPNStatus) {
  * @param onDemandEnabled Toggle VPN configuration Connect On Demand capability.
  * @param completionHandler Block called after operation completes.
  */
-- (void)updateVPNConfigurationOnDemandSetting:(BOOL)onDemandEnabled completionHandler:(void (^)(NSError * _Nullable error, BOOL changeSaved))completionHandler;
+- (void)updateVPNConfigurationOnDemandSetting:(BOOL)onDemandEnabled completionHandler:(void (^_Nonnull)(NSError * _Nullable error, BOOL changeSaved))completionHandler;
 
 /**
  * Removes Connect On Demand rules from VPN configuration.
