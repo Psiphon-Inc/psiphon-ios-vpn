@@ -23,6 +23,7 @@
 #import "SharedConstants.h"
 #import "Notifier.h"
 #import "Logging.h"
+#import "NoticeLogger.h"
 #import "PsiphonClientCommonLibraryHelpers.h"
 #import "IAPHelper.h"
 
@@ -88,6 +89,9 @@
             case NEVPNStatusDisconnecting: return VPNStatusDisconnecting;
         }
     }
+
+    LOG_ERROR(@"Unknown NEVPNConnection status: (%ld)", self.targetManager.connection.status);
+    return -1;
 }
 
 - (void)startTunnelWithCompletionHandler:(nullable void (^)(NSError * _Nullable error))completionHandler {
@@ -121,7 +125,7 @@
             // Reset startStopButtonPressed flag to FALSE when error and exiting.
             [self setStartStopButtonPressed:FALSE];
             if (completionHandler) {
-                LOG_ERROR(@"%@", error);
+                LOG_ERROR(@"Failed to load VPN configuration. Error:%@", error);
                 completionHandler([VPNManager errorWithCode:VPNManagerErrorLoadConfigsFailed]);
             }
             return;
@@ -140,7 +144,7 @@
         } else if ([allManagers count] > 1) {
             // Reset startStopButtonPressed flag to FALSE when error and exiting.
             [self setStartStopButtonPressed:FALSE];
-            LOG_ERROR(@"%lu VPN configurations found, only expected 1. Aborting", (unsigned long)[allManagers count]);
+            LOG_ERROR(@"%lu VPN configurations found, only expected 1. Aborting", [allManagers count]);
             if (completionHandler) {
                 completionHandler([VPNManager errorWithCode:VPNManagerErrorTooManyConfigsFounds]);
             }
@@ -169,7 +173,7 @@
                 // Reset startStopButtonPressed flag to FLASE when it finished loading preferences.
                 [self setStartStopButtonPressed:FALSE];
                 if (error != nil) {
-                    LOG_ERROR(@"second loadFromPreferences failed");
+                    LOG_ERROR(@"Failed to reload VPN configuration. Error:(%@)", error);
                     if (completionHandler) {
                         completionHandler([VPNManager errorWithCode:VPNManagerErrorLoadConfigsFailed]);
                     }
@@ -183,7 +187,7 @@
                 BOOL vpnStartSuccess = [self.targetManager.connection startVPNTunnelWithOptions:extensionOptions
                                                                                  andReturnError:&vpnStartError];
                 if (!vpnStartSuccess) {
-                    LOG_ERROR(@"startVPNTunnel failed: %@", vpnStartError);
+                    LOG_ERROR(@"Failed to start network extension. Error:(%@)", vpnStartError);
                     if (completionHandler) {
                         completionHandler([VPNManager errorWithCode:VPNManagerErrorNEStartFailed]);
                     }
