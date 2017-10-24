@@ -27,11 +27,20 @@
 /* Premium subscriptions dialog header text */
 "BUY_SUBSCRIPTIONS_HEADER_TEXT" = "Remove ads and surf the Internet faster with a premium subscription!";
 
+/* Alert Cancel button */
+"CANCEL_BUTTON" = "Cancel";
+
 /* Text above change region button that allows user to select their desired server region */
 "CHANGE_REGION" = "Change region";
 
 /* Main text in the 'Upstream Proxy Error' dialog box. This is shown when the user has directly altered these settings, and those settings are (probably) erroneous. DO NOT translate 'Psiphon'. */
 "CHECK_UPSTREAM_PROXY_SETTING" = "You have configured Psiphon to use an upstream proxy.\nHowever, we seem to be unable to connect to a Psiphon server through that proxy.\nPlease fix the settings and try again.";
+
+/* Alert dialog body informing the user that the 'Auto-start VPN on demand' feature is enabled and that the VPN cannot be stopped. Followed by asking the user if they would like to disable the 'Auto-start VPN on demand' feature and stop the VPN. */
+"CONNECT_ON_DEMAND_ALERT_BODY" = "We cannot turn off the VPN since \"Auto-start VPN\" is enabled.\nWould you like to disable \"Auto-start VPN\" on demand and stop the VPN?";
+
+/* Alert dialog title informing user that 'Auto-start VPN' feature is enabled */
+"CONNECT_ON_DEMAND_ALERT_TITLE" = "Auto-start VPN is enabled";
 
 /* Title of the button that dismisses region selection dialog
    Title of the button that dismisses the subscriptions menu */
@@ -46,7 +55,8 @@
 /* Subscriptions view text that is visible when the list of subscriptions is not available */
 "NO_PRODUCTS_TEXT" = "Could not retrieve subscriptions from the App Store. Pull to refresh or try again later.";
 
-/* Alert OK Button */
+/* Alert OK Button
+   Alert OK button */
 "OK_BUTTON" = "OK";
 
 /* Alert message informing the user they should open the app to finish connecting to the VPN. DO NOT translate 'Psiphon'. */

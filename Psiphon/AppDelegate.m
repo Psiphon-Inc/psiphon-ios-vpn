@@ -156,12 +156,8 @@
     // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
     [sharedDB updateAppForegroundState:YES];
 
-    LOG_DEBUG(@"TEST: before isTunnelStarted %ld", [vpnManager getVPNStatus]);
-
     // Checks if the extension is in a zombie state.
     if ([vpnManager isExtensionZombie]) {
-
-        LOG_DEBUG(@"TEST: after isTunnelStarted %ld", [vpnManager getVPNStatus]);
 
         // At this point the extension is a zombie since the process is running
         // but it has refused to start the tunnel due to invalid subscription.
