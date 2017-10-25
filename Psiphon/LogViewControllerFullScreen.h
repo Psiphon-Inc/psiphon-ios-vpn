@@ -22,3 +22,6 @@
 
 @interface LogViewControllerFullScreen : LogViewController
 @end
+
+@interface TabbedLogViewController : UITabBarController
+@end

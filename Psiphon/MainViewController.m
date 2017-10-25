@@ -303,7 +303,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
               alertControllerWithTitle:alertTitle message:alertMessage preferredStyle:UIAlertControllerStyleAlert];
 
             UIAlertAction *okAction = [UIAlertAction
-              actionWithTitle:NSLocalizedString(@"OK_BUTTON", @"Alert OK button")
+              actionWithTitle:NSLocalizedStringWithDefaultValue(@"OK_BUTTON", nil, [NSBundle mainBundle], @"OK", @"Alert OK button")
                         style:UIAlertActionStyleDestructive
                       handler:^(UIAlertAction *action) {
                           [vpnManager updateVPNConfigurationOnDemandSetting:FALSE completionHandler:^(NSError *error, BOOL changeSaved) {
@@ -346,13 +346,8 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 
 #if DEBUG
 - (void)onVersionLabelTap:(UILabel *)sender {
-    LogViewControllerFullScreen *log = [[LogViewControllerFullScreen alloc] init];
-
-    UINavigationController *nav = [[UINavigationController alloc] initWithRootViewController:log];
-    nav.modalPresentationStyle = UIModalPresentationFullScreen;
-    nav.modalTransitionStyle = UIModalTransitionStyleCoverVertical;
-
-    [self presentViewController:nav animated:YES completion:nil];
+    TabbedLogViewController *viewController = [[TabbedLogViewController alloc] initWithCoder:nil];
+    [self presentViewController:viewController animated:YES completion:nil];
 }
 #endif
 
@@ -1098,9 +1093,11 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 }
 
 - (void)persistUpstreamProxySettings {
-    NSString *upstreamProxyUrl = [[UpstreamProxySettings sharedInstance] getUpstreamProxyUrl];
     NSUserDefaults *userDefaults = [[NSUserDefaults alloc] initWithSuiteName:APP_GROUP_IDENTIFIER];
+    NSString *upstreamProxyUrl = [[UpstreamProxySettings sharedInstance] getUpstreamProxyUrl];
     [userDefaults setObject:upstreamProxyUrl forKey:PSIPHON_CONFIG_UPSTREAM_PROXY_URL];
+    NSString *upstreamProxyCustomHeaders = [[UpstreamProxySettings sharedInstance] getUpstreamProxyCustomHeaders];
+    [userDefaults setObject:upstreamProxyCustomHeaders forKey:PSIPHON_CONFIG_UPSTREAM_PROXY_CUSTOM_HEADERS];
 }
 
 - (BOOL)shouldEnableSettingsLinks {
