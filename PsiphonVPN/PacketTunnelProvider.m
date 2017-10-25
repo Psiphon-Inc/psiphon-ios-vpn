@@ -130,10 +130,19 @@
         }];
     } else {
         // If the user is not a subscriber, or subscription has expired
-        // we will call the startTunnelCompletionHandler(nil) with no errors to stop onDemand rules from
-        // kicking-in over and over if they are in effect.
+        // we will call the startTunnelCompletionHandler(nil) with no errors
+        // to stop "Connect On Demand" rules from kicking-in over and over if they are in effect.
+        //
+        // This method has the side-effect of showing Psiphon VPN as "Connected' in the system settings,
+        // however, traffic will not be routed.
+        // To potentially stop leaking sensitive traffic while in this state,
+        // we will route the network to a dead-end.
 
         [sharedDB updateTunnelConnectedState:FALSE];
+
+        [self setTunnelNetworkSettings:[self getTunnelSettings] completionHandler:^(NSError *error) {
+            startTunnelCompletionHandler(nil);
+        }];
 
         // TODO: provide a more descriptive error message
         [self displayMessage:
@@ -141,8 +150,6 @@
           completionHandler:^(BOOL success) {
               // Do nothing.
           }];
-
-        startTunnelCompletionHandler(nil);
 
     }
 
