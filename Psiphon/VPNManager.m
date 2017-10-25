@@ -253,40 +253,28 @@
     return self.targetManager.isOnDemandEnabled;
 }
 
-- (void)updateVPNConfigurationOnDemandSetting:(BOOL)onDemandEnabled completionHandler:(void (^)(NSError * _Nullable error, BOOL changeSaved))completionHandler {
+- (void)updateVPNConfigurationOnDemandSetting:(BOOL)onDemandEnabled completionHandler:(void (^)(NSError * _Nullable error))completionHandler {
     [[NSUserDefaults standardUserDefaults] setBool:onDemandEnabled forKey:kVpnOnDemand];
-    if ([self updateTargetManagerConnectOnDemand:onDemandEnabled]) {
-        // Save the updated configuration.
-        [self.targetManager saveToPreferencesWithCompletionHandler:^(NSError *error) {
-            if (error) {
-                LOG_ERROR(@"Failed to save VPN configuration. Error: %@", error);
-                completionHandler(error, FALSE);
-            } else {
-                completionHandler(nil, TRUE);
-            }
-        }];
-    } else {
-        completionHandler(nil, FALSE);
-    }
+    [self updateTargetManagerConnectOnDemand:onDemandEnabled];
+    // Save the updated configuration.
+    [self.targetManager saveToPreferencesWithCompletionHandler:^(NSError *error) {
+        if (error) {
+            LOG_ERROR(@"Failed to save VPN configuration. Error: %@", error);
+        }
+        completionHandler(error);
+    }];
 }
 
 #pragma mark - Helper methods
 
-/*!
- * Sets the VPN configuration On Demand capability according to user's preferences.
- * NOTE: this method does not save the targetManager.
- * @return TRUE if VPN configuration was updated, FALSE otherwise.
- */
-- (BOOL)updateTargetManagerConnectOnDemand:(BOOL)enabled {
-    if (self.targetManager.isOnDemandEnabled != enabled) {
-        if (enabled) {
-            NEOnDemandRule *connectRule = [NEOnDemandRuleConnect new];
-            [self.targetManager setOnDemandRules:@[connectRule]];
-        }
-        [self.targetManager setOnDemandEnabled:enabled];
-        return TRUE;
+// Sets the VPN configuration On Demand capability according to user's preferences.
+// NOTE: this method does not save the updated targetManager to VPN Configuration.
+- (void)updateTargetManagerConnectOnDemand:(BOOL)enabled {
+    if (enabled) {
+        NEOnDemandRule *connectRule = [NEOnDemandRuleConnect new];
+        [self.targetManager setOnDemandRules:@[connectRule]];
     }
-    return FALSE;
+    [self.targetManager setOnDemandEnabled:enabled];
 }
 
 #pragma mark - Private methods

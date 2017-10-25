@@ -302,11 +302,12 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
             UIAlertController *alert = [UIAlertController
               alertControllerWithTitle:alertTitle message:alertMessage preferredStyle:UIAlertControllerStyleAlert];
 
-            UIAlertAction *okAction = [UIAlertAction
-              actionWithTitle:NSLocalizedStringWithDefaultValue(@"OK_BUTTON", nil, [NSBundle mainBundle], @"OK", @"Alert OK button")
+            UIAlertAction *disableAction = [UIAlertAction
+              actionWithTitle:NSLocalizedStringWithDefaultValue(@"DISABLE_BUTTON", nil, [NSBundle mainBundle], @"Disable Auto-start VPN", @"Disable Auto-start VPN feature button label")
                         style:UIAlertActionStyleDestructive
                       handler:^(UIAlertAction *action) {
-                          [vpnManager updateVPNConfigurationOnDemandSetting:FALSE completionHandler:^(NSError *error, BOOL changeSaved) {
+                          [vpnManager updateVPNConfigurationOnDemandSetting:FALSE completionHandler:^(NSError *error) {
+                              // Either way stop the vpn.
                               [vpnManager stopVPN];
                           }];
                       }];
@@ -318,7 +319,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                         // Do nothing
                       }];
 
-            [alert addAction:okAction];
+            [alert addAction:disableAction];
             [alert addAction:cancelAction];
             [self presentViewController:alert animated:TRUE completion:nil];
 
@@ -389,7 +390,9 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
         case VPNStatusDisconnecting: return NSLocalizedStringWithDefaultValue(@"VPN_STATUS_DISCONNECTING", nil, [NSBundle mainBundle], @"Disconnecting", @"Status when the VPN is disconnecting. Sometimes going from connected to disconnected can take some time, and this is that state.");
         case VPNStatusReasserting: return NSLocalizedStringWithDefaultValue(@"VPN_STATUS_RECONNECTING", nil, [NSBundle mainBundle], @"Reconnecting", @"Status when the VPN was connected to a Psiphon server, got disconnected unexpectedly, and is currently trying to reconnect");
         case VPNStatusRestarting: return NSLocalizedStringWithDefaultValue(@"VPN_STATUS_RESTARTING", nil, [NSBundle mainBundle], @"Restarting", @"Status when the VPN is restarting.");
+        case VPNStatusNoTunnel: return @"";
     }
+    LOG_ERROR(@"MainViewController unhandled VPNStatus (%ld)", status);
     return nil;
 }
 
