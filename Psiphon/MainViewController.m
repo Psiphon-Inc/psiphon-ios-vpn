@@ -303,7 +303,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
               alertControllerWithTitle:alertTitle message:alertMessage preferredStyle:UIAlertControllerStyleAlert];
 
             UIAlertAction *disableAction = [UIAlertAction
-              actionWithTitle:NSLocalizedStringWithDefaultValue(@"DISABLE_BUTTON", nil, [NSBundle mainBundle], @"Disable Auto-start VPN", @"Disable Auto-start VPN feature button label")
+              actionWithTitle:NSLocalizedStringWithDefaultValue(@"DISABLE_BUTTON", nil, [NSBundle mainBundle], @"Disable Auto-start VPN and Stop", @"Disable Auto-start VPN feature and Stop the VPN button label")
                         style:UIAlertActionStyleDestructive
                       handler:^(UIAlertAction *action) {
                           [vpnManager updateVPNConfigurationOnDemandSetting:FALSE completionHandler:^(NSError *error) {
