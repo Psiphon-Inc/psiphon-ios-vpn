@@ -155,10 +155,16 @@
           // through the iOS settings, or if the user has installed a new VPN configuration.
           [self.targetManager setEnabled:TRUE];
 
+          // Adds "always connect" Connect On Demand rule to the configuration.
+          if (!self.targetManager.onDemandRules || ([self.targetManager.onDemandRules count] == 0)) {
+              NEOnDemandRule *connectRule = [NEOnDemandRuleConnect new];
+              [self.targetManager setOnDemandRules:@[connectRule]];
+          }
+          
           // Double-checks "Connect On Demand" enabled state of the VPN configuration,
           // so that it matches user's preferences.
           BOOL connectOnDemand = [[NSUserDefaults standardUserDefaults] boolForKey:kVpnOnDemand];
-          [self updateTargetManagerConnectOnDemand:connectOnDemand];
+          [self.targetManager setOnDemandEnabled:connectOnDemand];
 
           LOG_DEBUG(@"call saveToPreferencesWithCompletionHandler");
           
@@ -255,7 +261,7 @@
 
 - (void)updateVPNConfigurationOnDemandSetting:(BOOL)onDemandEnabled completionHandler:(void (^)(NSError * _Nullable error))completionHandler {
     [[NSUserDefaults standardUserDefaults] setBool:onDemandEnabled forKey:kVpnOnDemand];
-    [self updateTargetManagerConnectOnDemand:onDemandEnabled];
+    [self.targetManager setOnDemandEnabled:onDemandEnabled];
     // Save the updated configuration.
     [self.targetManager saveToPreferencesWithCompletionHandler:^(NSError *error) {
         if (error) {
@@ -263,18 +269,6 @@
         }
         completionHandler(error);
     }];
-}
-
-#pragma mark - Helper methods
-
-// Sets the VPN configuration On Demand capability according to user's preferences.
-// NOTE: this method does not save the updated targetManager to VPN Configuration.
-- (void)updateTargetManagerConnectOnDemand:(BOOL)enabled {
-    if (enabled) {
-        NEOnDemandRule *connectRule = [NEOnDemandRuleConnect new];
-        [self.targetManager setOnDemandRules:@[connectRule]];
-    }
-    [self.targetManager setOnDemandEnabled:enabled];
 }
 
 #pragma mark - Private methods
