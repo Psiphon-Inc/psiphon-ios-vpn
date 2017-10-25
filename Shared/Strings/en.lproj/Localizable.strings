@@ -30,8 +30,8 @@
 /* Alert Cancel button */
 "CANCEL_BUTTON" = "Cancel";
 
-/* Alert message informing user that Psiphon VPN has failed to start since they're not a subscriber or their subscription has expired, and that Psiphon VPN can only be started from the Psiphon app. DO NOT translate 'Psiphon' and 'Psiphon VPN'. */
-"CANNOT_START_TUNNEL_DUE_TO_SUBSCRIPTION" = "Failed to start Psiphon VPN, please open Psiphon app.\nSince you're not a subscriber or your subscription has expired, Psiphon VPN can only be started from the Psiphon app.";
+/* Alert message informing user that their subscription has expired or that they're not a subscriber, therefore Psiphon can only be started from the Psiphon app. DO NOT translate 'Psiphon'. */
+"CANNOT_START_TUNNEL_DUE_TO_SUBSCRIPTION" = "Your Psiphon subscription has expired.\nSince you're not a subscriber or your subscription has expired, Psiphon can only be started from the Psiphon app.";
 
 /* Text above change region button that allows user to select their desired server region */
 "CHANGE_REGION" = "Change region";
@@ -88,14 +88,14 @@
 /* Text for button that opens paid subscriptions manager UI */
 "SUBSCRIPTION_BUTTON_TITLE" = "Go premium now!";
 
-/* Alert message informing user that their subscription has expired, and that the VPN will stop in an hour if subscription is not renewed. */
-"SUBSCRIPTION_EXPIRED_WILL_KILL_TUNNEL" = "We have noticed that your subscription has expired, Psiphon VPN will stop automatically in an hour if subscription is not renewed. Please open Psiphon app to renew your subscription to continue using Pro features.";
+/* Alert message informing user that their subscription has expired, and that Psiphon will stop in an hour if subscription is not renewed. Do not translate 'Psiphon'. */
+"SUBSCRIPTION_EXPIRED_WILL_KILL_TUNNEL" = "Your Psiphon subscription has expired. Psiphon will stop automatically in an hour if subscription is not renewed. Open the Psiphon app to review your subscription to continue using premium features.";
 
 /* Title of the dialog for available in-app paid subscriptions */
 "SUBSCRIPTIONS" = "Subscriptions";
 
-/* Alert message informing user that the VPN has been stopped automatically since the subscription has expired. */
-"TUNNEL_KILLED" = "Psiphon VPN has been stopped automatically since your subscription has expired.";
+/* Alert message informing user that Psiphon has been stopped automatically since the subscription has expired. Do not translate 'Psiphon'. */
+"TUNNEL_KILLED" = "Psiphon has been stopped automatically since your subscription has expired.";
 
 /* Alert message informing user to turn on their cellular data or wifi to connect to the internet */
 "TURN_ON_DATE" = "Turn on cellular data or use Wi-Fi to access data.";
