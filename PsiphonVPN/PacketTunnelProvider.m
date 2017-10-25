@@ -137,7 +137,7 @@
 
         // TODO: provide a more descriptive error message
         [self displayMessage:
-            NSLocalizedStringWithDefaultValue(@"CANNOT_START_TUNNEL_DUE_TO_SUBSCRIPTION", nil, [NSBundle mainBundle], @"Failed to start Psiphon VPN, please open Psiphon app.\nSince you're not a subscriber or your subscription has expired, Psiphon VPN can only be started from the Psiphon app.", @"Alert message informing user that Psiphon VPN has failed to start since they're not a subscriber or their subscription has expired, and that Psiphon VPN can only be started from the Psiphon app. DO NOT translate 'Psiphon' and 'Psiphon VPN'.")
+            NSLocalizedStringWithDefaultValue(@"CANNOT_START_TUNNEL_DUE_TO_SUBSCRIPTION", nil, [NSBundle mainBundle], @"Your Psiphon subscription has expired.\nSince you're not a subscriber or your subscription has expired, Psiphon can only be started from the Psiphon app.", @"Alert message informing user that their subscription has expired or that they're not a subscriber, therefore Psiphon can only be started from the Psiphon app. DO NOT translate 'Psiphon'.")
           completionHandler:^(BOOL success) {
               // Do nothing.
           }];
@@ -353,7 +353,7 @@
         } else {
             // User doesn't have an active subscription. Notify them, after making sure they've checked
             // the notification we will start an hour of extra grace period.
-            [self displayMessage:NSLocalizedStringWithDefaultValue(@"SUBSCRIPTION_EXPIRED_WILL_KILL_TUNNEL", nil, [NSBundle mainBundle], @"We have noticed that your subscription has expired, Psiphon VPN will stop automatically in an hour if subscription is not renewed. Please open Psiphon app to renew your subscription to continue using Pro features.", @"Alert message informing user that their subscription has expired, and that the VPN will stop in an hour if subscription is not renewed.")
+            [self displayMessage:NSLocalizedStringWithDefaultValue(@"SUBSCRIPTION_EXPIRED_WILL_KILL_TUNNEL", nil, [NSBundle mainBundle], @"Your Psiphon subscription has expired. Psiphon will stop automatically in an hour if subscription is not renewed. Open the Psiphon app to review your subscription to continue using premium features.", @"Alert message informing user that their subscription has expired, and that Psiphon will stop in an hour if subscription is not renewed. Do not translate 'Psiphon'.")
                completionHandler:^(BOOL success) {
                    // Wait for the user to acknowledge the message before starting the extra grace period.
                    if (success) {
@@ -364,7 +364,7 @@
                                [weakSelf startSubscriptionCheckTimer];
                            } else {
                                // Subscription has not been renewed. Stop the tunnel.
-                               [weakSelf displayMessage:NSLocalizedStringWithDefaultValue(@"TUNNEL_KILLED", nil, [NSBundle mainBundle], @"Psiphon VPN has been stopped automatically since your subscription has expired.", @"Alert message informing user that the VPN has been stopped automatically since the subscription has expired.")
+                               [weakSelf displayMessage:NSLocalizedStringWithDefaultValue(@"TUNNEL_KILLED", nil, [NSBundle mainBundle], @"Psiphon has been stopped automatically since your subscription has expired.", @"Alert message informing user that Psiphon has been stopped automatically since the subscription has expired. Do not translate 'Psiphon'.")
                                   completionHandler:^(BOOL success) {
                                       // Do nothing.
                                }];

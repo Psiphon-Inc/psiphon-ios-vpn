@@ -201,17 +201,19 @@
 
     NetworkStatus networkStatus = [[Reachability reachabilityForInternetConnection] currentReachabilityStatus];
 
-    if ( networkStatus != NotReachable
-      && ([vpnManager getVPNStatus] == VPNStatusDisconnected || [vpnManager getVPNStatus] == VPNStatusInvalid)
-      && ![adManager untunneledInterstitialIsReady] && ![adManager untunneledInterstitialHasShown] && ![vpnManager startStopButtonPressed]
+    if (networkStatus != NotReachable
+        && ([vpnManager getVPNStatus] == VPNStatusDisconnected || [vpnManager getVPNStatus] == VPNStatusInvalid)
+        && ![adManager untunneledInterstitialIsReady] && ![adManager untunneledInterstitialHasShown] && ![vpnManager startStopButtonPressed]
         && [adManager shouldShowUntunneledAds]) {
+
         [adManager initializeAds];
         self.window.rootViewController = launchScreenViewController;
         if (timerCount <= 0) {
-            // Reset timer to 10 if it's 0 and need load ads again.
-            timerCount = 10;
+            // Reset timer tokLaunchScreenTimerCount if it's 0 and need load ads again.
+            timerCount = kLaunchScreenTimerCount;
         }
         [self startLaunchingScreenTimer];
+
     } else {
         self.window.rootViewController = mainViewController;
     }
