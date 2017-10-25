@@ -39,6 +39,7 @@
     PsiphonDataSharedDB *sharedDB;
     id localVPNStatusObserver;
     BOOL restartRequired;
+    BOOL recoveringFromZombieProcess;
 }
 
 @synthesize targetManager = _targetManager;
@@ -48,6 +49,8 @@
     if (self) {
         notifier = [[Notifier alloc] initWithAppGroupIdentifier:APP_GROUP_IDENTIFIER];
         sharedDB = [[PsiphonDataSharedDB alloc] initForAppGroupIdentifier:APP_GROUP_IDENTIFIER];
+        restartRequired = FALSE;
+        recoveringFromZombieProcess = FALSE;
 
         self.targetManager = [NEVPNManager sharedManager];
 
@@ -75,7 +78,17 @@
 
 - (VPNStatus)getVPNStatus {
 
-    // Checks to see if the extension process is running without Psiphon tunnel having been started.
+    if ([self isExtensionZombie]) {
+        // VPN status at this point is NEVPNStatusConnected
+        recoveringFromZombieProcess = TRUE;
+    } else if (self.targetManager.connection.status == NEVPNStatusDisconnected && recoveringFromZombieProcess) {
+        // Zombie process has been fully stopped at this point.
+        recoveringFromZombieProcess = FALSE;
+    }
+
+    if (recoveringFromZombieProcess) {
+        return VPNStatusNoTunnel;
+    }
 
     if (restartRequired) {
         // If extension is restarting due to a call to restartVPN, then
@@ -232,6 +245,9 @@
 
 - (void)stopVPN {
     if (self.targetManager.connection) {
+        if ([self isExtensionZombie]) {
+            recoveringFromZombieProcess = TRUE;
+        }
         [self.targetManager.connection stopVPNTunnel];
     } else {
         LOG_ERROR(@"targetManager.connection is nil");
