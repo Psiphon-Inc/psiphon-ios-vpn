@@ -23,6 +23,7 @@
 #import "SharedConstants.h"
 #import "Notifier.h"
 #import "Logging.h"
+#import "NoticeLogger.h"
 #import "PsiphonClientCommonLibraryHelpers.h"
 #import "IAPHelper.h"
 #import "SettingsViewController.h"
@@ -92,6 +93,8 @@
             case NEVPNStatusDisconnecting: return VPNStatusDisconnecting;
         }
     }
+
+    LOG_ERROR(@"Unknown NEVPNConnection status: (%ld)", self.targetManager.connection.status);
     return VPNStatusInvalid;
 }
 

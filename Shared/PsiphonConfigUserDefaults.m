@@ -83,6 +83,14 @@
         [userConfigs setObject:upstreamProxyUrl forKey:PSIPHON_CONFIG_UPSTREAM_PROXY_URL];
     }
 
+    id upstreamProxyCustomHeaders = [userDefaults objectForKey:PSIPHON_CONFIG_UPSTREAM_PROXY_CUSTOM_HEADERS];
+    if ([upstreamProxyCustomHeaders isKindOfClass:[NSDictionary class]]) {
+        NSDictionary *customHeaders = (NSDictionary*)upstreamProxyCustomHeaders;
+        if ([customHeaders count] > 0) {
+            [userConfigs setObject:customHeaders forKey:PSIPHON_CONFIG_UPSTREAM_PROXY_CUSTOM_HEADERS];
+        }
+    }
+
     return userConfigs;
 }
 

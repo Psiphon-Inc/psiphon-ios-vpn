@@ -18,25 +18,20 @@
  */
 
 #import <Foundation/Foundation.h>
+#import "NoticeLogger.h"
 
-// Psiphon config keys
-#define PSIPHON_CONFIG_EGRESS_REGION @"EgressRegion"
-#define PSIPHON_CONFIG_UPSTREAM_PROXY_URL @"UpstreamProxyUrl"
-#define PSIPHON_CONFIG_UPSTREAM_PROXY_CUSTOM_HEADERS @"CustomHeaders"
+void LOG_ERROR(NSString *format, ...) {
+    NSString *message = nil;
+    if (format) {
+        va_list args;
+        va_start(args, format);
+        message = [[NSString alloc] initWithFormat:format arguments:args];
+        va_end(args);
 
-@interface PsiphonConfigUserDefaults : NSObject
+#if DEBUG
+        NSLog(@"<ERROR> %@", message);
+#endif
 
-+ (instancetype)sharedInstance;
-- (instancetype)initWithSuiteName:(NSString *)suiteName;
-
-- (BOOL)setEgressRegion:(NSString *)newRegion;
-
-/*!
- *
- * @return Returns dictionary of saved user values for psiphon config,
- *         if no configs are saved, returns an empty dictionary.
- */
-- (NSDictionary *)dictionaryRepresentation;
-
-@end
-
+        [[NoticeLogger sharedInstance] noticeError:message];
+    }
+}

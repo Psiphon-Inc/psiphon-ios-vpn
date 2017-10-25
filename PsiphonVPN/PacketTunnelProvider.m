@@ -452,7 +452,7 @@
       options:0 error:&err];
 
     if (err) {
-        LOG_ERROR(@"%@", [NSString stringWithFormat:@"Aborting. Failed to create JSON data from config object: %@", err.description]);
+        LOG_ERROR(@"Aborting. Failed to create JSON data from config object: %@", err);
         abort();
     }
 

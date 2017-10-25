@@ -19,24 +19,19 @@
 
 #import <Foundation/Foundation.h>
 
-// Psiphon config keys
-#define PSIPHON_CONFIG_EGRESS_REGION @"EgressRegion"
-#define PSIPHON_CONFIG_UPSTREAM_PROXY_URL @"UpstreamProxyUrl"
-#define PSIPHON_CONFIG_UPSTREAM_PROXY_CUSTOM_HEADERS @"CustomHeaders"
 
-@interface PsiphonConfigUserDefaults : NSObject
+@interface NoticeLogger : NSObject
 
 + (instancetype)sharedInstance;
-- (instancetype)initWithSuiteName:(NSString *)suiteName;
 
-- (BOOL)setEgressRegion:(NSString *)newRegion;
++ (NSString *)containerRotatingLogNoticesPath;
++ (NSString *)containerRotatingOlderLogNoticesPath;
 
-/*!
- *
- * @return Returns dictionary of saved user values for psiphon config,
- *         if no configs are saved, returns an empty dictionary.
- */
-- (NSDictionary *)dictionaryRepresentation;
++ (NSString *)extensionRotatingLogNoticesPath;
++ (NSString *)extensionRotatingOlderLogNoticesPath;
+
+- (void)noticeError:(NSString *)message;
+- (void)noticeErrorWithFormat:(NSString *)format, ... NS_FORMAT_FUNCTION(1,2);
+- (void)noticeError:(NSString *)message withTimestamp:(NSString *)timestamp;
 
 @end
-
