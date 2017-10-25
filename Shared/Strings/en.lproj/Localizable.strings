@@ -40,13 +40,13 @@
 "CHECK_UPSTREAM_PROXY_SETTING" = "You have configured Psiphon to use an upstream proxy.\nHowever, we seem to be unable to connect to a Psiphon server through that proxy.\nPlease fix the settings and try again.";
 
 /* Alert dialog body informing the user that the 'Auto-start VPN on demand' feature is enabled and that the VPN cannot be stopped. Followed by asking the user if they would like to disable the 'Auto-start VPN on demand' feature, and stop the VPN. */
-"CONNECT_ON_DEMAND_ALERT_BODY" = "We cannot turn off the VPN since \"Auto-start VPN\" is enabled.\nWould you like to disable \"Auto-start VPN\" on demand and stop the VPN?";
+"CONNECT_ON_DEMAND_ALERT_BODY" = "Cannot stop the VPN while \"Auto-start VPN\" is enabled.\nWould you like to disable \"Auto-start VPN\" on demand and stop the VPN?";
 
 /* Alert dialog title informing user that 'Auto-start VPN' feature is enabled */
 "CONNECT_ON_DEMAND_ALERT_TITLE" = "Auto-start VPN is enabled";
 
-/* Disable Auto-start VPN feature button label */
-"DISABLE_BUTTON" = "Disable Auto-start VPN";
+/* Disable Auto-start VPN feature and Stop the VPN button label */
+"DISABLE_BUTTON" = "Disable Auto-start VPN and Stop";
 
 /* Title of the button that dismisses region selection dialog
    Title of the button that dismisses the subscriptions menu */
