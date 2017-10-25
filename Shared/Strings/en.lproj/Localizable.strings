@@ -30,6 +30,9 @@
 /* Alert Cancel button */
 "CANCEL_BUTTON" = "Cancel";
 
+/* Alert message informing user that Psiphon VPN has failed to start since they're not a subscriber or their subscription has expired, and that Psiphon VPN can only be started from the Psiphon app. DO NOT translate 'Psiphon' and 'Psiphon VPN'. */
+"CANNOT_START_TUNNEL_DUE_TO_SUBSCRIPTION" = "Failed to start Psiphon VPN, please open Psiphon app.\nSince you're not a subscriber or your subscription has expired, Psiphon VPN can only be started from the Psiphon app.";
+
 /* Text above change region button that allows user to select their desired server region */
 "CHANGE_REGION" = "Change region";
 
@@ -41,6 +44,9 @@
 
 /* Alert dialog title informing user that 'Auto-start VPN' feature is enabled */
 "CONNECT_ON_DEMAND_ALERT_TITLE" = "Auto-start VPN is enabled";
+
+/* Disable Auto-start VPN feature button label */
+"DISABLE_BUTTON" = "Disable Auto-start VPN";
 
 /* Title of the button that dismisses region selection dialog
    Title of the button that dismisses the subscriptions menu */
@@ -55,8 +61,7 @@
 /* Subscriptions view text that is visible when the list of subscriptions is not available */
 "NO_PRODUCTS_TEXT" = "Could not retrieve subscriptions from the App Store. Pull to refresh or try again later.";
 
-/* Alert OK Button
-   Alert OK button */
+/* Alert OK Button */
 "OK_BUTTON" = "OK";
 
 /* Alert message informing the user they should open the app to finish connecting to the VPN. DO NOT translate 'Psiphon'. */
@@ -94,9 +99,6 @@
 
 /* Alert message informing user to turn on their cellular data or wifi to connect to the internet */
 "TURN_ON_DATE" = "Turn on cellular data or use Wi-Fi to access data.";
-
-/* Alert message informing user they have to open the app. DO NOT translate 'Psiphon'. */
-"USE_PSIPHON_APP" = "To connect, use the Psiphon app";
 
 /* Status when the VPN is connected to a Psiphon server */
 "VPN_STATUS_CONNECTED" = "Connected";
