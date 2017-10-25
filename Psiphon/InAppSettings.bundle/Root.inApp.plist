@@ -341,8 +341,6 @@
 			<string>PSChildPaneSpecifier</string>
 		</dict>
 		<dict>
-			<key>DefaultValue</key>
-			<false/>
 			<key>Key</key>
 			<string>vpnOnDemand</string>
 			<key>Title</key>
