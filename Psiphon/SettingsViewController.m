@@ -135,8 +135,7 @@
 
     __weak SettingsViewController *weakSelf = self;
     [[VPNManager sharedInstance] updateVPNConfigurationOnDemandSetting:[toggle isOn]
-                                                     completionHandler:^(NSError *error, BOOL changeSaved) {
-
+                                                     completionHandler:^(NSError *error) {
         [weakSelf.tableView reloadData];
     }];
 }

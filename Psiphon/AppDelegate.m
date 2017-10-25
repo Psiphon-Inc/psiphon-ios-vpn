@@ -166,9 +166,9 @@
         LOG_WARN(@"Network Extension is in a zombie state. Stopping the extension.");
 
         [vpnManager stopVPN];
-        [vpnManager updateVPNConfigurationOnDemandSetting:FALSE completionHandler:^(NSError *error, BOOL changeSaved) {
+        [vpnManager updateVPNConfigurationOnDemandSetting:FALSE completionHandler:^(NSError *error) {
             if (error) {
-                LOG_ERROR(@"Failed to remove Connect On Demand rules. Error: %@", error);
+                LOG_ERROR(@"Failed to disable Connect On Demand. Error: %@", error);
             }
         }];
     }

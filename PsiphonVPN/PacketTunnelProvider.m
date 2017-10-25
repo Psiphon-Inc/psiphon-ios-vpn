@@ -137,7 +137,7 @@
 
         // TODO: provide a more descriptive error message
         [self displayMessage:
-            NSLocalizedStringWithDefaultValue(@"USE_PSIPHON_APP", nil, [NSBundle mainBundle], @"To connect, use the Psiphon app", @"Alert message informing user they have to open the app. DO NOT translate 'Psiphon'.")
+            NSLocalizedStringWithDefaultValue(@"CANNOT_START_TUNNEL_DUE_TO_SUBSCRIPTION", nil, [NSBundle mainBundle], @"Failed to start Psiphon VPN, please open Psiphon app.\nSince you're not a subscriber or your subscription has expired, Psiphon VPN can only be started from the Psiphon app.", @"Alert message informing user that Psiphon VPN has failed to start since they're not a subscriber or their subscription has expired, and that Psiphon VPN can only be started from the Psiphon app. DO NOT translate 'Psiphon' and 'Psiphon VPN'.")
           completionHandler:^(BOOL success) {
               // Do nothing.
           }];
