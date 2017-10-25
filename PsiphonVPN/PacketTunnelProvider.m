@@ -97,7 +97,7 @@
             shouldStartVPN = TRUE;
 
             // Kick-off subscription timer.
-            [self subscriptionCheck];
+            [self startSubscriptionCheckTimer];
         }
         
         // Listen for messages from the container
@@ -334,15 +334,22 @@
     }];
 }
 
-- (void)subscriptionCheck {
+- (void)startSubscriptionCheckTimer {
     __weak PacketTunnelProvider *weakSelf = self;
-    // TODO: change timers to proper values before submitting
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 5 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
+
+#if DEBUG
+    int64_t subscriptionCheckIntervalInSec = 5;
+    int64_t gracePeriodInSec = 5;
+#else
+    int64_t subscriptionCheckIntervalInSec = 24 * 60 * 60;  // 24 hours.
+    int64_t gracePeriodInSec = 1 * 60 * 60;  // 1 hour.
+#endif
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, subscriptionCheckIntervalInSec * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
         // If user's subscription has expired, then give them an hour of extra grace period
         // before killing the tunnel.
         if ([[IAPHelper sharedInstance] hasActiveSubscriptionForDate:[NSDate date]]) {
             // User has an active subscription. Check later.
-            [weakSelf subscriptionCheck];
+            [weakSelf startSubscriptionCheckTimer];
         } else {
             // User doesn't have an active subscription. Notify them, after making sure they've checked
             // the notification we will start an hour of extra grace period.
@@ -350,11 +357,11 @@
                completionHandler:^(BOOL success) {
                    // Wait for the user to acknowledge the message before starting the extra grace period.
                    if (success) {
-                       dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 5 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
+                       dispatch_after(dispatch_time(DISPATCH_TIME_NOW, gracePeriodInSec * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
                            // Grace period has finished. Checks if the subscription has been renewed, otherwise kill the VPN.
                            if ([[IAPHelper sharedInstance] hasActiveSubscriptionForDate:[NSDate date]]) {
                                // Subscription has been renewed.
-                               [weakSelf subscriptionCheck];
+                               [weakSelf startSubscriptionCheckTimer];
                            } else {
                                // Subscription has not been renewed. Stop the tunnel.
                                [weakSelf displayMessage:NSLocalizedStringWithDefaultValue(@"TUNNEL_KILLED", nil, [NSBundle mainBundle], @"Psiphon VPN has been stopped automatically since your subscription has expired.", @"Alert message informing user that the VPN has been stopped automatically since the subscription has expired.")
