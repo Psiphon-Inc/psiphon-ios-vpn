@@ -129,14 +129,14 @@
 
         }];
     } else {
-        // If the user is not a subscriber, or subscription has expired
-        // we will call the startTunnelCompletionHandler(nil) with no errors
-        // to stop "Connect On Demand" rules from kicking-in over and over if they are in effect.
+        // If the user is not a subscriber, or if their subscription has expired
+        // we will call the startTunnelCompletionHandler(nil) with nil to
+        // stop "Connect On Demand" rules from kicking-in over and over if they are in effect.
         //
-        // This method has the side-effect of showing Psiphon VPN as "Connected' in the system settings,
-        // however, traffic will not be routed.
-        // To potentially stop leaking sensitive traffic while in this state,
-        // we will route the network to a dead-end.
+        // This method has the side-effect of showing Psiphon VPN as "Connected" in the system settings,
+        // however, traffic will not be routed if setTunnelNetworkSettings:: is not called.
+        // To potentially stop leaking sensitive traffic while in this state, we will route
+        // the network to a dead-end by not start psiphonTunnel.
 
         [sharedDB updateTunnelConnectedState:FALSE];
 
@@ -144,12 +144,7 @@
             startTunnelCompletionHandler(nil);
         }];
 
-        // TODO: provide a more descriptive error message
-        [self displayMessage:
-            NSLocalizedStringWithDefaultValue(@"CANNOT_START_TUNNEL_DUE_TO_SUBSCRIPTION", nil, [NSBundle mainBundle], @"Your Psiphon subscription has expired.\nSince you're not a subscriber or your subscription has expired, Psiphon can only be started from the Psiphon app.", @"Alert message informing user that their subscription has expired or that they're not a subscriber, therefore Psiphon can only be started from the Psiphon app. DO NOT translate 'Psiphon'.")
-          completionHandler:^(BOOL success) {
-              // Do nothing.
-          }];
+        [self showRepeatingNoTunnelAlert];
 
     }
 
@@ -341,6 +336,22 @@
     }];
 }
 
+- (void)showRepeatingNoTunnelAlert {
+
+    int64_t intervalInSec = 60; // Every minute.
+
+    [self displayMessage:
+        NSLocalizedStringWithDefaultValue(@"CANNOT_START_TUNNEL_DUE_TO_SUBSCRIPTION", nil, [NSBundle mainBundle], @"Your Psiphon subscription has expired.\nSince you're not a subscriber or your subscription has expired, Psiphon can only be started from the Psiphon app.", @"Alert message informing user that their subscription has expired or that they're not a subscriber, therefore Psiphon can only be started from the Psiphon app. DO NOT translate 'Psiphon'.")
+       completionHandler:^(BOOL success) {
+           // If the user dismisses the message, show the alert again in intervalInSec seconds.
+           if (success) {
+               dispatch_after(dispatch_time(DISPATCH_TIME_NOW, intervalInSec * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
+                   [self showRepeatingNoTunnelAlert];
+               });
+           }
+       }];
+}
+
 - (void)startSubscriptionCheckTimer {
     __weak PacketTunnelProvider *weakSelf = self;
 
@@ -351,6 +362,7 @@
     int64_t subscriptionCheckIntervalInSec = 24 * 60 * 60;  // 24 hours.
     int64_t gracePeriodInSec = 1 * 60 * 60;  // 1 hour.
 #endif
+
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, subscriptionCheckIntervalInSec * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
         // If user's subscription has expired, then give them an hour of extra grace period
         // before killing the tunnel.
