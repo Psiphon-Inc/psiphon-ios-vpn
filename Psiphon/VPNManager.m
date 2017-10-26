@@ -59,6 +59,12 @@
               }
           }];
 
+        // Listen for applicationDidBecomeActive event.
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(applicationDidBecomeActiveHandler)
+                                                     name:UIApplicationDidBecomeActiveNotification
+                                                   object:nil];
+
     }
     return self;
 }
@@ -267,6 +273,21 @@
     }];
 }
 
+- (void)updateVPNConfigurationOnDemandSetting:(BOOL)onDemandEnabled completionHandler:(void (^)(NSError * _Nullable error))completionHandler {
+    [[NSUserDefaults standardUserDefaults] setBool:onDemandEnabled forKey:kVpnOnDemand];
+    [self.targetManager setOnDemandEnabled:onDemandEnabled];
+    // Save the updated configuration.
+    [self.targetManager saveToPreferencesWithCompletionHandler:^(NSError *error) {
+        if (error) {
+            LOG_ERROR(@"Failed to save VPN configuration. Error: %@", error);
+        }
+        completionHandler(error);
+    }];
+}
+
+
+#pragma mark - Private methods
+
 - (void)isExtensionZombie:(void (^)(BOOL extensionIsZombie))completionHandler {
     [self queryExtension:EXTENSION_QUERY_IS_PROVIDER_ZOMBIE completionHandler:^(NSError *error, NSString *response) {
 
@@ -286,21 +307,6 @@
     }];
 }
 
-- (void)updateVPNConfigurationOnDemandSetting:(BOOL)onDemandEnabled completionHandler:(void (^)(NSError * _Nullable error))completionHandler {
-    [[NSUserDefaults standardUserDefaults] setBool:onDemandEnabled forKey:kVpnOnDemand];
-    [self.targetManager setOnDemandEnabled:onDemandEnabled];
-    // Save the updated configuration.
-    [self.targetManager saveToPreferencesWithCompletionHandler:^(NSError *error) {
-        if (error) {
-            LOG_ERROR(@"Failed to save VPN configuration. Error: %@", error);
-        }
-        completionHandler(error);
-    }];
-}
-
-
-#pragma mark - Private methods
-
 - (NETunnelProviderManager *)createProviderManager {
     NETunnelProviderManager *newManager = [[NETunnelProviderManager alloc] init];
     NETunnelProviderProtocol *providerProtocol = [[NETunnelProviderProtocol alloc] init];
@@ -314,7 +320,7 @@
 - (void)setTargetManager:(NEVPNManager *)targetManager {
 
     _targetManager = targetManager;
-    [self vpnStatusDidChangeCallback];
+    [self vpnStatusDidChangeHandler];
 
     // Listening to NEVPNManager status change notifications.
     localVPNStatusObserver = [[NSNotificationCenter defaultCenter]
@@ -322,12 +328,26 @@
       object:_targetManager.connection queue:NSOperationQueue.mainQueue
       usingBlock:^(NSNotification * _Nonnull note) {
 
-          [self vpnStatusDidChangeCallback];
+          [self vpnStatusDidChangeHandler];
 
       }];
 }
 
-- (void)vpnStatusDidChangeCallback {
+- (void)vpnStatusDidChangeHandler {
+
+
+    // Kill extension if it's a zombie.
+    [self isExtensionZombie:^(BOOL isZombie) {
+        if (isZombie) {
+            LOG_WARN(@"Extension is zombie");
+            [self updateVPNConfigurationOnDemandSetting:FALSE completionHandler:^(NSError *error) {
+                if (error) {
+                    LOG_ERROR(@"Failed to disable Connect On Demand. Error: %@", error);
+                }
+                [self stopVPN];
+            }];
+        }
+    }];
 
     // To restart the VPN, should wait till NEVPNStatusDisconnected is received.
     // We can then start a new tunnel.
@@ -373,6 +393,10 @@
 - (void)postStatusChangeNotification {
     [[NSNotificationCenter defaultCenter]
       postNotificationName:@kVPNStatusChangeNotificationName object:self];
+}
+
+- (void)applicationDidBecomeActiveHandler {
+    [self vpnStatusDidChangeHandler];
 }
 
 - (void)dealloc {

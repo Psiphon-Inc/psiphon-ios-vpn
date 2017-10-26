@@ -147,7 +147,6 @@
         }];
 
         [self showRepeatingNoTunnelAlert];
-
     }
 
 }

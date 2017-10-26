@@ -112,12 +112,6 @@ typedef NS_ENUM(NSInteger, VPNStatus) {
 - (void)isTunnelConnected:(void (^ _Nonnull)(BOOL tunnelIsConnected))completionHandler;
 
 /**
- * Queries the Network Extension whether the extension is in a zombie state or not.
- * @param completionHandler  Called with extensionIsZombie set to TRUE if extension is a zombie, FALSE otherwise.
- */
-- (void)isExtensionZombie:(void (^ _Nonnull)(BOOL extensionIsZombie))completionHandler;
-
-/**
  * Updates and saves VPN configuration Connect On Demand.
  * This method also updates the NSUserDefaults with key kVpnOnDemand.
  * @param onDemandEnabled Toggle VPN configuration Connect On Demand capability.
