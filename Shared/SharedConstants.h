@@ -22,3 +22,11 @@
 // Network Extension options
 #define EXTENSION_OPTION_START_FROM_CONTAINER @"startFromContainer"
 #define EXTENSION_TRUE @"true"
+
+// Network Extension queries
+#define EXTENSION_QUERY_IS_PROVIDER_ZOMBIE @"isProviderZombie"
+#define EXTENSION_QUERY_IS_TUNNEL_CONNECTED @"isTunnelConnected"
+
+// Network Extension query responses
+#define EXTENSION_RESP_TRUE @"true"
+#define EXTENSION_RESP_FALSE @"false"

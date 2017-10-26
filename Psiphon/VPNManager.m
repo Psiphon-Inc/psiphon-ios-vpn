@@ -38,7 +38,6 @@
     PsiphonDataSharedDB *sharedDB;
     id localVPNStatusObserver;
     BOOL restartRequired;
-    BOOL extensionIsZombie;
 }
 
 @synthesize targetManager = _targetManager;
@@ -49,7 +48,6 @@
         notifier = [[Notifier alloc] initWithAppGroupIdentifier:APP_GROUP_IDENTIFIER];
         sharedDB = [[PsiphonDataSharedDB alloc] initForAppGroupIdentifier:APP_GROUP_IDENTIFIER];
         restartRequired = FALSE;
-        extensionIsZombie = FALSE;
 
         self.targetManager = [NEVPNManager sharedManager];
 
@@ -61,11 +59,6 @@
               }
           }];
 
-        // Listen for applicationDidBecomeActive event.
-        [[NSNotificationCenter defaultCenter] addObserver:self
-                                                 selector:@selector(applicationDidBecomeActiveCallback)
-                                                     name:UIApplicationDidBecomeActiveNotification
-                                                   object:nil];
     }
     return self;
 }
@@ -83,11 +76,7 @@
 
 - (VPNStatus)getVPNStatus {
 
-    if (extensionIsZombie) {
-
-        return VPNStatusZombie;
-
-    } else if (restartRequired) {
+    if (restartRequired) {
         // If extension is restarting due to a call to restartVPN, then
         // we don't want to show the Disconnecting and Disconnected states
         // to the observers, and instead simply notify them that the
@@ -255,12 +244,46 @@
     return VPNStatusConnected == [self getVPNStatus];
 }
 
-- (BOOL)isTunnelConnected {
-    return [self isVPNActive] && [sharedDB getTunnelConnectedState];
-}
-
 - (BOOL)isOnDemandEnabled {
     return self.targetManager.isOnDemandEnabled;
+}
+
+- (void)isTunnelConnected:(void (^)(BOOL tunnelIsConnected))completionHandler {
+    [self queryExtension:EXTENSION_QUERY_IS_TUNNEL_CONNECTED completionHandler:^(NSError *error, NSString *response) {
+
+        if ([error code] == VPNManagerQueryErrorSendFailed) {
+            completionHandler(FALSE);
+            return;
+        }
+
+        if ([EXTENSION_RESP_TRUE isEqualToString:response]) {
+            completionHandler(TRUE);
+        } else if ([EXTENSION_RESP_FALSE isEqualToString:response]) {
+            completionHandler(FALSE);
+        } else {
+            LOG_ERROR(@"Unexpected query response (%@)", response);
+            completionHandler(FALSE);
+        }
+    }];
+}
+
+- (void)isExtensionZombie:(void (^)(BOOL extensionIsZombie))completionHandler {
+    [self queryExtension:EXTENSION_QUERY_IS_PROVIDER_ZOMBIE completionHandler:^(NSError *error, NSString *response) {
+
+        if ([error code] == VPNManagerQueryErrorSendFailed) {
+            completionHandler(FALSE);
+            return;
+        }
+
+        if ([EXTENSION_RESP_TRUE isEqualToString:response]) {
+            completionHandler(TRUE);
+        } else if ([EXTENSION_RESP_FALSE isEqualToString:response]) {
+            completionHandler(FALSE);
+        } else {
+            LOG_ERROR(@"Unexpected query response (%@)", response);
+            completionHandler(FALSE);
+        }
+    }];
 }
 
 - (void)updateVPNConfigurationOnDemandSetting:(BOOL)onDemandEnabled completionHandler:(void (^)(NSError * _Nullable error))completionHandler {
@@ -274,6 +297,7 @@
         completionHandler(error);
     }];
 }
+
 
 #pragma mark - Private methods
 
@@ -305,32 +329,11 @@
 
 - (void)vpnStatusDidChangeCallback {
 
-    if (self.targetManager.connection.status == NEVPNStatusDisconnected && [sharedDB getTunnelConnectedState]) {
-        LOG_ERROR(@"Invalid persisted tunnelConnectedState");
-        [sharedDB updateTunnelConnectedState:FALSE];
-    }
-
-    if (self.targetManager.connection.status == NEVPNStatusDisconnected) {
-        // Zombie process has been fully stopped at this point.
-        LOG_WARN(@"Zombie killed");
-        extensionIsZombie = FALSE;
-    } else if (self.targetManager.connection.status == NEVPNStatusConnected && ![sharedDB getTunnelConnectedState]) {
-        LOG_WARN(@"Extension is zombie");
-        extensionIsZombie = TRUE;
-
-        [self updateVPNConfigurationOnDemandSetting:FALSE completionHandler:^(NSError *error) {
-            if (error) {
-                LOG_ERROR(@"Failed to disable Connect On Demand. Error: %@", error);
-            }
-            [self stopVPN];
-        }];
-    }
-
     // To restart the VPN, should wait till NEVPNStatusDisconnected is received.
     // We can then start a new tunnel.
     // If restartRequired then start  a new network extension process if the previous
     // one has already been disconnected.
-    if (self.targetManager.connection.status == NEVPNStatusDisconnected && restartRequired && !extensionIsZombie) {
+    if (self.targetManager.connection.status == NEVPNStatusDisconnected && restartRequired) {
         dispatch_async(dispatch_get_main_queue(), ^{
             restartRequired = FALSE;
             [self startTunnelWithCompletionHandler:nil];
@@ -342,22 +345,42 @@
     [self postStatusChangeNotification];
 }
 
+- (void)queryExtension:(NSString *)query completionHandler:(void (^)(NSError * _Nullable error, NSString * _Nullable response))completionHandler {
+    NETunnelProviderSession *session = (NETunnelProviderSession *) self.targetManager.connection;
+    if (session && [self isVPNActive]) {
+        NSError *err;
+
+        BOOL sent = [session sendProviderMessage:[query dataUsingEncoding:NSUTF8StringEncoding]
+                                     returnError:&err
+                                 responseHandler:^(NSData *responseData) {
+                                     NSString *response = [[NSString alloc] initWithData:responseData encoding:NSUTF8StringEncoding];
+                                     completionHandler(nil, response);
+                                 }];
+
+        if (sent) {
+            LOG_DEBUG(@"Query (%@) sent to tunnel provider", query);
+        }
+
+        if (err) {
+            LOG_ERROR(@"Failed to send message to the provider. Error:%@", err);
+            completionHandler(err, nil);
+        }
+    } else {
+        completionHandler([VPNManager errorWithCode:VPNManagerQueryErrorSendFailed], nil);
+    }
+}
+
 - (void)postStatusChangeNotification {
     [[NSNotificationCenter defaultCenter]
       postNotificationName:@kVPNStatusChangeNotificationName object:self];
 }
 
-- (void)applicationDidBecomeActiveCallback {
-    [self vpnStatusDidChangeCallback];
-}
-
 - (void)dealloc {
     NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
     [nc removeObserver:localVPNStatusObserver];
-    [nc removeObserver:self name:UIApplicationDidBecomeActiveNotification object:nil];
 }
 
-+ (NSError *)errorWithCode:(VPNManagerErrorCode)code {
++ (NSError *)errorWithCode:(NSInteger)code {
     return [[NSError alloc] initWithDomain:kVPNManagerErrorDomain code:code userInfo:nil];
 }
 

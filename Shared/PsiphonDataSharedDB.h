@@ -52,9 +52,6 @@
 - (NSArray<DiagnosticEntry*>*)getAllLogs;
 #endif
 
-- (BOOL)updateTunnelConnectedState:(BOOL)connected;
-- (BOOL)getTunnelConnectedState;
-
 - (BOOL)updateAppForegroundState:(BOOL)foreground;
 - (BOOL)getAppForegroundState;
 
