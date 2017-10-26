@@ -60,6 +60,12 @@
                   self.targetManager = managers[0];
               }
           }];
+
+        // Listen for applicationDidBecomeActive event.
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(applicationDidBecomeActiveCallback)
+                                                     name:UIApplicationDidBecomeActiveNotification
+                                                   object:nil];
     }
     return self;
 }
@@ -121,9 +127,6 @@
         [sharedDB updateSponsorId:nil];
     }
 
-    // Reset restartRequired flag
-    restartRequired = FALSE;
-
     // Set startStopButtonPressed flag to TRUE
     [self setStartStopButtonPressed:TRUE];
 
@@ -139,7 +142,7 @@
               }
               return;
           }
-          
+
           // If there are no configurations, create one
           // if there is more than one, abort!
           if ([allManagers count] == 0) {
@@ -154,7 +157,7 @@
               }
               return;
           }
-          
+
           // Unconditionally sets enabled state of the VPN configuration to TRUE.
           // Enabled state can become FALSE by changing the "enabled" VPN configuration
           // through the iOS settings, or if the user has installed a new VPN configuration.
@@ -165,14 +168,14 @@
               NEOnDemandRule *connectRule = [NEOnDemandRuleConnect new];
               [self.targetManager setOnDemandRules:@[connectRule]];
           }
-          
+
           // Double-checks "Connect On Demand" enabled state of the VPN configuration,
           // so that it matches user's preferences.
           BOOL connectOnDemand = [[NSUserDefaults standardUserDefaults] boolForKey:kVpnOnDemand];
           [self.targetManager setOnDemandEnabled:connectOnDemand];
 
           LOG_DEBUG(@"call saveToPreferencesWithCompletionHandler");
-          
+
           [self.targetManager saveToPreferencesWithCompletionHandler:^(NSError * _Nullable error) {
               if (error != nil) {
                   // Reset startStopButtonPressed flag to FALSE when error and exiting.
@@ -184,7 +187,7 @@
                   }
                   return;
               }
-              
+
               [self.targetManager loadFromPreferencesWithCompletionHandler:^(NSError * _Nullable error) {
                   // Reset startStopButtonPressed flag to FLASE when it finished loading preferences.
                   [self setStartStopButtonPressed:FALSE];
@@ -195,11 +198,11 @@
                       }
                       return;
                   }
-                  
+
                   LOG_DEBUG(@"Call targetManager.connection.startVPNTunnel()");
                   NSError *vpnStartError;
                   NSDictionary *extensionOptions = @{EXTENSION_OPTION_START_FROM_CONTAINER : EXTENSION_TRUE};
-                  
+
                   BOOL vpnStartSuccess = [self.targetManager.connection startVPNTunnelWithOptions:extensionOptions
                                                                                    andReturnError:&vpnStartError];
                   if (!vpnStartSuccess) {
@@ -209,7 +212,7 @@
                       }
                       return;
                   }
-                  
+
                   LOG_DEBUG(@"startVPNTunnel success");
                   if (completionHandler) {
                       completionHandler(nil);
@@ -287,7 +290,7 @@
 - (void)setTargetManager:(NEVPNManager *)targetManager {
 
     _targetManager = targetManager;
-    [self postStatusChangeNotification];
+    [self vpnStatusDidChangeCallback];
 
     // Listening to NEVPNManager status change notifications.
     localVPNStatusObserver = [[NSNotificationCenter defaultCenter]
@@ -295,37 +298,48 @@
       object:_targetManager.connection queue:NSOperationQueue.mainQueue
       usingBlock:^(NSNotification * _Nonnull note) {
 
-          // To restart the VPN, should wait till NEVPNStatusDisconnected is received.
-          // We can then start a new tunnel.
-          // If restartRequired then start  a new network extension process if the previous
-          // one has already been disconnected.
-          if (_targetManager.connection.status == NEVPNStatusDisconnected && restartRequired) {
-              dispatch_async(dispatch_get_main_queue(), ^{
-                  [self startTunnelWithCompletionHandler:nil];
-              });
-          }
-
-          if (_targetManager.connection.status == NEVPNStatusDisconnected) {
-              // Zombie process has been fully stopped at this point.
-              LOG_WARN(@"Zombie killed");
-              extensionIsZombie = FALSE;
-          } else if (_targetManager.connection.status == NEVPNStatusConnected && ![sharedDB getTunnelConnectedState]) {
-              LOG_WARN(@"Extension is zombie");
-              extensionIsZombie = TRUE;
-
-              [self updateVPNConfigurationOnDemandSetting:FALSE completionHandler:^(NSError *error) {
-                  if (error) {
-                      LOG_ERROR(@"Failed to disable Connect On Demand. Error: %@", error);
-                  }
-                  [self stopVPN];
-              }];
-          }
-
-          // Since VPN state changes can happen in this block, observers
-          // should always be notified at the end of this block.
-          [self postStatusChangeNotification];
+          [self vpnStatusDidChangeCallback];
 
       }];
+}
+
+- (void)vpnStatusDidChangeCallback {
+
+    if (self.targetManager.connection.status == NEVPNStatusDisconnected && [sharedDB getTunnelConnectedState]) {
+        LOG_ERROR(@"Invalid persisted tunnelConnectedState");
+        [sharedDB updateTunnelConnectedState:FALSE];
+    }
+
+    if (self.targetManager.connection.status == NEVPNStatusDisconnected) {
+        // Zombie process has been fully stopped at this point.
+        LOG_WARN(@"Zombie killed");
+        extensionIsZombie = FALSE;
+    } else if (self.targetManager.connection.status == NEVPNStatusConnected && ![sharedDB getTunnelConnectedState]) {
+        LOG_WARN(@"Extension is zombie");
+        extensionIsZombie = TRUE;
+
+        [self updateVPNConfigurationOnDemandSetting:FALSE completionHandler:^(NSError *error) {
+            if (error) {
+                LOG_ERROR(@"Failed to disable Connect On Demand. Error: %@", error);
+            }
+            [self stopVPN];
+        }];
+    }
+
+    // To restart the VPN, should wait till NEVPNStatusDisconnected is received.
+    // We can then start a new tunnel.
+    // If restartRequired then start  a new network extension process if the previous
+    // one has already been disconnected.
+    if (self.targetManager.connection.status == NEVPNStatusDisconnected && restartRequired && !extensionIsZombie) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            restartRequired = FALSE;
+            [self startTunnelWithCompletionHandler:nil];
+        });
+    }
+
+    // Since VPN state changes can happen in this block, observers
+    // should always be notified at the end of this block.
+    [self postStatusChangeNotification];
 }
 
 - (void)postStatusChangeNotification {
@@ -333,8 +347,14 @@
       postNotificationName:@kVPNStatusChangeNotificationName object:self];
 }
 
+- (void)applicationDidBecomeActiveCallback {
+    [self vpnStatusDidChangeCallback];
+}
+
 - (void)dealloc {
-    [[NSNotificationCenter defaultCenter] removeObserver:localVPNStatusObserver];
+    NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
+    [nc removeObserver:localVPNStatusObserver];
+    [nc removeObserver:self name:UIApplicationDidBecomeActiveNotification object:nil];
 }
 
 + (NSError *)errorWithCode:(VPNManagerErrorCode)code {
