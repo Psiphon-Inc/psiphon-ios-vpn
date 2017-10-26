@@ -228,7 +228,7 @@
     }
 }
 
-- (void)restartVPN {
+- (void)restartVPNIfActive {
     if (self.targetManager.connection && [self isVPNActive]) {
         restartRequired = YES;
         [self.targetManager.connection stopVPNTunnel];
