@@ -23,7 +23,6 @@
 #import "SharedConstants.h"
 #import "Notifier.h"
 #import "Logging.h"
-#import "NoticeLogger.h"
 #import "PsiphonClientCommonLibraryHelpers.h"
 #import "IAPHelper.h"
 #import "SettingsViewController.h"
@@ -39,7 +38,7 @@
     PsiphonDataSharedDB *sharedDB;
     id localVPNStatusObserver;
     BOOL restartRequired;
-    BOOL recoveringFromZombieProcess;
+    BOOL extensionIsZombie;
 }
 
 @synthesize targetManager = _targetManager;
@@ -50,7 +49,7 @@
         notifier = [[Notifier alloc] initWithAppGroupIdentifier:APP_GROUP_IDENTIFIER];
         sharedDB = [[PsiphonDataSharedDB alloc] initForAppGroupIdentifier:APP_GROUP_IDENTIFIER];
         restartRequired = FALSE;
-        recoveringFromZombieProcess = FALSE;
+        extensionIsZombie = FALSE;
 
         self.targetManager = [NEVPNManager sharedManager];
 
@@ -78,24 +77,17 @@
 
 - (VPNStatus)getVPNStatus {
 
-    if ([self isExtensionZombie]) {
-        // VPN status at this point is NEVPNStatusConnected
-        recoveringFromZombieProcess = TRUE;
-    } else if (self.targetManager.connection.status == NEVPNStatusDisconnected && recoveringFromZombieProcess) {
-        // Zombie process has been fully stopped at this point.
-        recoveringFromZombieProcess = FALSE;
-    }
+    if (extensionIsZombie) {
 
-    if (recoveringFromZombieProcess) {
-        return VPNStatusNoTunnel;
-    }
+        return VPNStatusZombie;
 
-    if (restartRequired) {
+    } else if (restartRequired) {
         // If extension is restarting due to a call to restartVPN, then
         // we don't want to show the Disconnecting and Disconnected states
         // to the observers, and instead simply notify them that the
         // extension is restarting.
         return VPNStatusRestarting;
+
     } else {
         switch (self.targetManager.connection.status) {
             case NEVPNStatusInvalid: return VPNStatusInvalid;
@@ -245,9 +237,6 @@
 
 - (void)stopVPN {
     if (self.targetManager.connection) {
-        if ([self isExtensionZombie]) {
-            recoveringFromZombieProcess = TRUE;
-        }
         [self.targetManager.connection stopVPNTunnel];
     } else {
         LOG_ERROR(@"targetManager.connection is nil");
@@ -265,10 +254,6 @@
 
 - (BOOL)isTunnelConnected {
     return [self isVPNActive] && [sharedDB getTunnelConnectedState];
-}
-
-- (BOOL)isExtensionZombie {
-    return (self.targetManager.connection.status == NEVPNStatusConnected) && (![sharedDB getTunnelConnectedState]);
 }
 
 - (BOOL)isOnDemandEnabled {
@@ -310,9 +295,6 @@
       object:_targetManager.connection queue:NSOperationQueue.mainQueue
       usingBlock:^(NSNotification * _Nonnull note) {
 
-          // Observers of kVPNStatusChangeNotificationName will be notified at the same time.
-          [self postStatusChangeNotification];
-
           // To restart the VPN, should wait till NEVPNStatusDisconnected is received.
           // We can then start a new tunnel.
           // If restartRequired then start  a new network extension process if the previous
@@ -322,6 +304,26 @@
                   [self startTunnelWithCompletionHandler:nil];
               });
           }
+
+          if (_targetManager.connection.status == NEVPNStatusDisconnected) {
+              // Zombie process has been fully stopped at this point.
+              LOG_WARN(@"Zombie killed");
+              extensionIsZombie = FALSE;
+          } else if (_targetManager.connection.status == NEVPNStatusConnected && ![sharedDB getTunnelConnectedState]) {
+              LOG_WARN(@"Extension is zombie");
+              extensionIsZombie = TRUE;
+
+              [self updateVPNConfigurationOnDemandSetting:FALSE completionHandler:^(NSError *error) {
+                  if (error) {
+                      LOG_ERROR(@"Failed to disable Connect On Demand. Error: %@", error);
+                  }
+                  [self stopVPN];
+              }];
+          }
+
+          // Since VPN state changes can happen in this block, observers
+          // should always be notified at the end of this block.
+          [self postStatusChangeNotification];
 
       }];
 }

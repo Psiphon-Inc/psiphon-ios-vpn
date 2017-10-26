@@ -22,8 +22,3 @@
 // Network Extension options
 #define EXTENSION_OPTION_START_FROM_CONTAINER @"startFromContainer"
 #define EXTENSION_TRUE @"true"
-#define EXTENSION_FALSE @"false"
-#define EXTENSION_INVALID_QUERY @"invalid"
-
-// Network Extension queries
-#define EXTENSION_QUERY_IS_TUNNEL_STARTED @"isTunnelStarted"
