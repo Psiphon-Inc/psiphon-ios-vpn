@@ -47,7 +47,7 @@ typedef NS_ENUM(NSInteger, VPNStatus) {
     /*! @const VPNStatusNoTunnel Extension process is running, but Psiphon tunnel will not be started.
      * This is usually due to user's expired subscription or starting tunnel from system setting
      * without a valid subscription */
-    VPNStatusNoTunnel = 7,
+    VPNStatusZombie = 7,
 };
 
 @interface VPNManager : NSObject
@@ -101,12 +101,6 @@ typedef NS_ENUM(NSInteger, VPNStatus) {
  * @return TRUE if the tunnel has connected, FALSE otherwise.
  */
 - (BOOL)isTunnelConnected;
-
-/**
- * @return TRUE if the extension is in a zombie state. This means the extension process is running
- *         however no Psiphon tunnel was creted, usually due to expired subscription.
- */
-- (BOOL)isExtensionZombie;
 
 /**
  * Whether or not VPN configuration onDemand is enabled or not.

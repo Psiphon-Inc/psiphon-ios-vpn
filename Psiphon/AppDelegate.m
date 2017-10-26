@@ -156,24 +156,6 @@
     // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
     [sharedDB updateAppForegroundState:YES];
 
-    // Checks if the extension is in a zombie state.
-    if ([vpnManager isExtensionZombie]) {
-
-        // At this point the extension is a zombie since the process is running
-        // but it has refused to start the tunnel due to invalid subscription.
-        // Stop the Network Extension process and disable Connect On Demand.
-
-        LOG_WARN(@"Network Extension is in a zombie state. Stopping the extension.");
-
-        [vpnManager updateVPNConfigurationOnDemandSetting:FALSE completionHandler:^(NSError *error) {
-            if (error) {
-                LOG_ERROR(@"Failed to disable Connect On Demand. Error: %@", error);
-            }
-            [vpnManager stopVPN];
-        }];
-
-    }
-
     // If the extension has been waiting for the app to come into foreground,
     // send the VPNManager startVPN message again.
     dispatch_async(dispatch_get_main_queue(), ^{
