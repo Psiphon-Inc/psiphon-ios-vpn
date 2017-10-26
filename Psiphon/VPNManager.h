@@ -22,12 +22,18 @@
 // NSNotification name for VPN status change notifications.
 #define kVPNStatusChangeNotificationName "VPNStatusChange"
 
+// VPNManager error codes
 #define kVPNManagerErrorDomain @"VPNManagerErrorDomain"
+
 typedef NS_ENUM(NSInteger, VPNManagerErrorCode) {
     VPNManagerErrorLoadConfigsFailed = 1,
     VPNManagerErrorTooManyConfigsFounds = 2,
     VPNManagerErrorUserDeniedConfigInstall = 3,
     VPNManagerErrorNEStartFailed = 4,
+};
+
+typedef NS_ENUM(NSInteger, VPNManagerQueryErrorCode) {
+    VPNManagerQueryErrorSendFailed = 1,
 };
 
 typedef NS_ENUM(NSInteger, VPNStatus) {
@@ -44,10 +50,6 @@ typedef NS_ENUM(NSInteger, VPNStatus) {
     VPNStatusDisconnecting = 5,
     /*! @const VPNStatusRestarting Stopping previous network extension process, and starting a new one. */
     VPNStatusRestarting = 6,
-    /*! @const VPNStatusNoTunnel Extension process is running, but Psiphon tunnel will not be started.
-     * This is usually due to user's expired subscription or starting tunnel from system setting
-     * without a valid subscription */
-    VPNStatusZombie = 7,
 };
 
 @interface VPNManager : NSObject
@@ -98,15 +100,22 @@ typedef NS_ENUM(NSInteger, VPNStatus) {
 - (BOOL)isVPNConnected;
 
 /**
- * @return TRUE if the tunnel has connected, FALSE otherwise.
- */
-- (BOOL)isTunnelConnected;
-
-/**
  * Whether or not VPN configuration onDemand is enabled or not.
  * @return TRUE if enabled, FALSE otherwise.
  */
 - (BOOL)isOnDemandEnabled;
+
+/**
+ * Queries the Network Extension whether Psiphon tunnel is in connected state or not.
+ * @param completionHandler Called with tunnelIsConnected set to TRUE if Psiphon tunnel is connected, FALSE otherwise.
+ */
+- (void)isTunnelConnected:(void (^ _Nonnull)(BOOL tunnelIsConnected))completionHandler;
+
+/**
+ * Queries the Network Extension whether the extension is in a zombie state or not.
+ * @param completionHandler  Called with extensionIsZombie set to TRUE if extension is a zombie, FALSE otherwise.
+ */
+- (void)isExtensionZombie:(void (^ _Nonnull)(BOOL extensionIsZombie))completionHandler;
 
 /**
  * Updates and saves VPN configuration Connect On Demand.

@@ -156,13 +156,30 @@
     // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
     [sharedDB updateAppForegroundState:YES];
 
+    // Kill extension if it's a zombie.
+    [vpnManager isExtensionZombie:^(BOOL isZombie) {
+        if (isZombie) {
+            LOG_WARN(@"Extension is zombie");
+            [vpnManager updateVPNConfigurationOnDemandSetting:FALSE completionHandler:^(NSError *error) {
+                if (error) {
+                    LOG_ERROR(@"Failed to disable Connect On Demand. Error: %@", error);
+                }
+                [vpnManager stopVPN];
+            }];
+        }
+    }];
+
     // If the extension has been waiting for the app to come into foreground,
     // send the VPNManager startVPN message again.
     dispatch_async(dispatch_get_main_queue(), ^{
         // If the tunnel is in Connected state, and we're now showing ads
         // send startVPN message.
-        if (![adManager untunneledInterstitialIsShowing] && [vpnManager isTunnelConnected]) {
-            [vpnManager startVPN];
+        if (![adManager untunneledInterstitialIsShowing]) {
+            [vpnManager isTunnelConnected:^(BOOL tunnelIsConnected) {
+                if (tunnelIsConnected) {
+                    [vpnManager startVPN];
+                }
+            }];
         }
     });
 }
