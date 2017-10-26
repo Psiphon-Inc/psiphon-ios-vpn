@@ -306,8 +306,8 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
               actionWithTitle:NSLocalizedStringWithDefaultValue(@"DISABLE_BUTTON", nil, [NSBundle mainBundle], @"Disable Auto-start VPN and Stop", @"Disable Auto-start VPN feature and Stop the VPN button label")
                         style:UIAlertActionStyleDestructive
                       handler:^(UIAlertAction *action) {
+                          // Disable "Connect On Demand" and stop the VPN.
                           [vpnManager updateVPNConfigurationOnDemandSetting:FALSE completionHandler:^(NSError *error) {
-                              // Either way stop the vpn.
                               [vpnManager stopVPN];
                           }];
                       }];

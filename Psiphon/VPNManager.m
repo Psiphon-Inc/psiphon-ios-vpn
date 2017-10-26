@@ -275,13 +275,25 @@
 
 - (void)updateVPNConfigurationOnDemandSetting:(BOOL)onDemandEnabled completionHandler:(void (^)(NSError * _Nullable error))completionHandler {
     [[NSUserDefaults standardUserDefaults] setBool:onDemandEnabled forKey:kVpnOnDemand];
-    [self.targetManager setOnDemandEnabled:onDemandEnabled];
-    // Save the updated configuration.
-    [self.targetManager saveToPreferencesWithCompletionHandler:^(NSError *error) {
-        if (error) {
-            LOG_ERROR(@"Failed to save VPN configuration. Error: %@", error);
+
+    // Make sure configuration is not stale by loading again.
+    [self.targetManager loadFromPreferencesWithCompletionHandler:^(NSError *error) {
+        [self.targetManager setOnDemandEnabled:onDemandEnabled];
+
+        if (onDemandEnabled) {
+            // Auto-start VPN on demand has been turned on by the user.
+            // To avoid unexpected conflict with other VPN configurations,
+            // re-enable this VPN configuration.
+            [self.targetManager setEnabled:TRUE];
         }
-        completionHandler(error);
+        // Save the updated configuration.
+        [self.targetManager saveToPreferencesWithCompletionHandler:^(NSError *error) {
+            if (error) {
+                LOG_ERROR(@"Failed to save VPN configuration. Error: %@", error);
+            }
+            completionHandler(error);
+        }];
+
     }];
 }
 
