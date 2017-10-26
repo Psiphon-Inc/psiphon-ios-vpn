@@ -335,7 +335,6 @@
 
 - (void)vpnStatusDidChangeHandler {
 
-
     // Kill extension if it's a zombie.
     [self isExtensionZombie:^(BOOL isZombie) {
         if (isZombie) {
@@ -374,6 +373,7 @@
                                      returnError:&err
                                  responseHandler:^(NSData *responseData) {
                                      NSString *response = [[NSString alloc] initWithData:responseData encoding:NSUTF8StringEncoding];
+                                     LOG_DEBUG(@"Query response (%@)", response);
                                      completionHandler(nil, response);
                                  }];
 
