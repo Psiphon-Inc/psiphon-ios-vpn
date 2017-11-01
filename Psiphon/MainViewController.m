@@ -37,7 +37,8 @@
 #import "Logging.h"
 #import "IAPViewController.h"
 #import "AppDelegate.h"
-#import "IAPHelper.h"
+#import "IAPStoreHelper.h"
+#import "IAPReceiptHelper.h"
 #import "SettingsViewController.h"
 
 static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSString *b) {
@@ -972,7 +973,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     NSString *bundledConfigStr = [PsiphonClientCommonLibraryHelpers getPsiphonBundledConfig];
 
     // Return bundled config as is if user doesn't have an active subscription
-    if(![[IAPHelper sharedInstance]hasActiveSubscriptionForDate:[NSDate date]]) {
+    if(![[IAPReceiptHelper sharedInstance]hasActiveSubscriptionForDate:[NSDate date]]) {
         return bundledConfigStr;
     }
 
@@ -1314,7 +1315,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 }
 
 - (void) updateSubscriptionUI {
-    if(![IAPHelper canMakePayments] || [[IAPHelper sharedInstance]hasActiveSubscriptionForDate:[NSDate date]]) {
+    if(![IAPStoreHelper canMakePayments] || [[IAPReceiptHelper sharedInstance]hasActiveSubscriptionForDate:[NSDate date]]) {
         subscriptionButton.hidden = YES;
         adLabel.hidden = YES;
         subscriptionButtonTop.active = NO;
