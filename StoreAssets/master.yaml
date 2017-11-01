@@ -9,7 +9,7 @@ en:
   # The "subtitle" for the app, which appears under the app name in the App Store
   subtitle: Beyond Borders
 
-  # The description of the App, as it appears in the App Store
+  # The description of the App, as it appears in the App Store. Note that the "bullets" must be the character -- • -- and not an HTML entity like &bull;.
   description: |
     After helping tens of millions of users get access to the apps and sites they love, Psiphon has launched its first app for iOS!  Our new app seamlessly integrates access to the Psiphon network, securely connecting you to your apps and sites.
 
