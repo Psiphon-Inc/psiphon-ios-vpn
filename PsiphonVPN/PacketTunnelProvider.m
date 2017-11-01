@@ -569,10 +569,6 @@
     if ([fm fileExistsAtPath:path isDirectory:&isDirectory] && ![exceptions containsObject:path]) {
         NSDictionary *attrs = [fm attributesOfItemAtPath:path error:&err];
         if (err) {
-            // DEBUG remove
-            [self displayMessage:[NSString stringWithFormat:@"1. %@", err.description] completionHandler:^(BOOL success) {
-            }];
-
             LOG_ERROR(@"Failed to get file attributes for path (%@) (%@)", path, err);
             return FALSE;
         }
@@ -580,10 +576,6 @@
         if (attrs[NSFileProtectionKey] != NSFileProtectionNone) {
             [fm setAttributes:@{NSFileProtectionKey: NSFileProtectionNone} ofItemAtPath:path error:&err];
             if (err) {
-                // DEBUG remove
-                [self displayMessage:[NSString stringWithFormat:@"2. %@", err.description] completionHandler:^(BOOL success) {
-                }];
-
                 LOG_ERROR(@"Failed to set the protection level of dir(%@)", path);
                 return FALSE;
             }
