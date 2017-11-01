@@ -24,7 +24,7 @@
 #import "Notifier.h"
 #import "Logging.h"
 #import "PsiphonClientCommonLibraryHelpers.h"
-#import "IAPHelper.h"
+#import "IAPReceiptHelper.h"
 #import "SettingsViewController.h"
 
 @interface VPNManager ()
@@ -106,7 +106,7 @@
 
 - (void)startTunnelWithCompletionHandler:(nullable void (^)(NSError * _Nullable error))completionHandler {
     // Override SponsorID if user has active subscription.
-    if([[IAPHelper sharedInstance]hasActiveSubscriptionForDate:[NSDate date]]) {
+    if([[IAPReceiptHelper sharedInstance]hasActiveSubscriptionForDate:[NSDate date]]) {
         NSString *bundledConfigStr = [PsiphonClientCommonLibraryHelpers getPsiphonBundledConfig];
         if(bundledConfigStr) {
             NSDictionary *config = [PsiphonClientCommonLibraryHelpers jsonToDictionary:bundledConfigStr];

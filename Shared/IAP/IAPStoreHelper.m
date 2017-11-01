@@ -1,4 +1,23 @@
-#import "IAPHelper.h"
+/*
+ * Copyright (c) 2017, Psiphon Inc.
+ * All rights reserved.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
+
+#import "IAPStoreHelper.h"
 
 NSString *const kIAPSKProductsRequestDidReceiveResponse = @"kIAPSKProductsRequestDidReceiveResponse";
 NSString *const kIAPSKProductsRequestDidFailWithError = @"kIAPSKProductsRequestDidFailWithError";
@@ -12,26 +31,21 @@ NSString *const kIAPSKPaymentTransactionStatePurchased = @"kIAPSKPaymentTransact
 NSString *const kIAPSKPaymentTransactionStateRestored = @"kIAPSKPaymentTransactionStateRestored";
 
 
-@interface IAPHelper()<SKPaymentTransactionObserver,SKProductsRequestDelegate>
+@interface IAPStoreHelper()<SKPaymentTransactionObserver,SKProductsRequestDelegate>
 @end
 
-@implementation IAPHelper
+@implementation IAPStoreHelper
 
 + (instancetype)sharedInstance {
-    static IAPHelper *iapHelper = nil;
+    static IAPStoreHelper *iapStoreHelper = nil;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        iapHelper = [[IAPHelper alloc]init];
+        iapStoreHelper = [[IAPStoreHelper alloc]init];
         NSURL *plistURL = [[NSBundle mainBundle] URLForResource:@"productIDs" withExtension:@"plist"];
-        [RMAppReceipt setAppleRootCertificateURL: [[NSBundle mainBundle] URLForResource:@"AppleIncRootCertificate" withExtension:@"cer"]];
-        iapHelper.bundledProductIDS = [NSArray arrayWithContentsOfURL:plistURL];
-        [[SKPaymentQueue defaultQueue]addTransactionObserver:iapHelper];
+        iapStoreHelper.bundledProductIDS = [NSArray arrayWithContentsOfURL:plistURL];
+        [[SKPaymentQueue defaultQueue]addTransactionObserver:iapStoreHelper];
     });
-    return iapHelper;
-}
-
-- (RMAppReceipt *)appReceipt {
-    return [RMAppReceipt bundleReceipt];
+    return iapStoreHelper;
 }
 
 - (void)dealloc {
@@ -91,10 +105,6 @@ NSString *const kIAPSKPaymentTransactionStateRestored = @"kIAPSKPaymentTransacti
     [receiptRefreshRequest start];
 }
 
-- (void) terminateForInvalidReceipt {
-    SKTerminateForInvalidReceipt();
-}
-
 - (void)startProductsRequest {
     NSSet* subscriptionIDs = [NSSet setWithArray:self.bundledProductIDS];
     SKProductsRequest *productsRequest = [[SKProductsRequest alloc]initWithProductIdentifiers:subscriptionIDs];
@@ -123,58 +133,6 @@ NSString *const kIAPSKPaymentTransactionStateRestored = @"kIAPSKPaymentTransacti
 - (void)buyProduct:(SKProduct *)product {
     SKPayment * payment = [SKPayment paymentWithProduct:product];
     [[SKPaymentQueue defaultQueue] addPayment:payment];
-}
-
-- (BOOL) verifyReceipt  {
-    RMAppReceipt* receipt = [self appReceipt];
-    
-    if (!receipt) {
-        return NO;
-    }
-    
-    NSString *bundleIdentifier = [[NSBundle mainBundle] bundleIdentifier];
-    if (![receipt.bundleIdentifier isEqualToString:bundleIdentifier]) {
-        return NO;
-    }
-    
-    // Leave build number check out because receipt may not get refreshed automatically
-    // when a new version is installed.
-    /*
-     NSString *applicationVersion = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleVersion"];
-     if (![receipt.appVersion isEqualToString:applicationVersion]) {
-     return NO;
-     }
-     */
-    
-    if (![receipt verifyReceiptHash]) {
-        return NO;
-    }
-    
-    return YES;
-}
-
-- (BOOL) hasActiveSubscriptionForDate:(NSDate*)date {
-    // Assuming the products are subscriptions only check all product IDs in
-    // the receipt against the bundled products list and determine if
-    // we have at least one active subscription for current date.
-    if(![self appReceipt]) {
-        return NO;
-    }
-    
-#if !DEBUG
-    // Allow some tolerance IRL.
-    date = [date dateByAddingTimeInterval:-SUBSCRIPTION_CHECK_GRACE_PERIOD_INTERVAL];
-#endif
-    
-    BOOL hasSubscription = NO;
-    
-    for (NSString* productID in self.bundledProductIDS) {
-        hasSubscription = [[self appReceipt] getActiveAutoRenewableSubscriptionOfProductIdentifier:productID forDate:date];
-        if (hasSubscription) {
-            break;
-        }
-    }
-    return hasSubscription;
 }
 
 @end
