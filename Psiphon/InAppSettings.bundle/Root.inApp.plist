@@ -383,8 +383,7 @@
 			<string>SETTINGS_FAQ</string>
 			<key>BundleTable</key>
 			<string>PsiphonClientCommonLibrary</string>
-			<key>Type</key
-				>
+			<key>Type</key>
 			<string>IASKCustomViewSpecifier</string>
 			<key>Key</key>
 			<string>faq</string>

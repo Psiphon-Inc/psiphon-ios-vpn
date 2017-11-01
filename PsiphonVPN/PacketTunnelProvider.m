@@ -105,7 +105,7 @@
     // Set file protection of all files needed by the extension and Psiphon tunnel framework to NSFileProtectionNone.
     // This is required in order for "Connect On Demand" to work.
     // Extension should not start if this operation fails.
-    if (![self downgradeFileProtectionToNone:paths withExceptions:@[[self getBootTestFilePath]]]) {
+    if (![self downgradeFileProtectionToNone:paths withExceptions:@[ [self getBootTestFilePath] ]]) {
         LOG_ERROR(@"Aborting. Failed to set file protection.");
         abort();
     }
@@ -200,7 +200,7 @@
     completionHandler();
 }
 
-- (void)killExtensionForExpireSubscription {
+- (void)killExtensionForExpiredSubscription {
     [self displayMessage:NSLocalizedStringWithDefaultValue(@"TUNNEL_KILLED", nil, [NSBundle mainBundle], @"Psiphon has been stopped automatically since your subscription has expired.", @"Alert message informing user that Psiphon has been stopped automatically since the subscription has expired. Do not translate 'Psiphon'.")
        completionHandler:^(BOOL success) {
            // Do nothing.
@@ -414,7 +414,7 @@
 
     [self displayMessage:
         NSLocalizedStringWithDefaultValue(@"CANNOT_START_TUNNEL_DUE_TO_SUBSCRIPTION", nil, [NSBundle mainBundle], @"Your Psiphon subscription has expired.\nSince you're not a subscriber or your subscription has expired, Psiphon can only be started from the Psiphon app.\n\nPlease open the Psiphon app.", @"Alert message informing user that their subscription has expired or that they're not a subscriber, therefore Psiphon can only be started from the Psiphon app. DO NOT translate 'Psiphon'.")
-       completionHandler:^(BOOL success) {
+           completionHandler:^(BOOL success) {
            // If the user dismisses the message, show the alert again in intervalInSec seconds.
            if (success) {
                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, intervalInSec * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
@@ -450,7 +450,7 @@
               if ([[IAPReceiptHelper sharedInstance] hasActiveSubscriptionForDate:[NSDate date]]) {
                   [self startSubscriptionCheckTimer];
               } else {
-                  [self killExtensionForExpireSubscription];
+                  [self killExtensionForExpiredSubscription];
               }
           }
 
@@ -488,7 +488,7 @@
                                [weakSelf startSubscriptionCheckTimer];
                            } else {
                                // Subscription has not been renewed. Stop the tunnel.
-                               [self killExtensionForExpireSubscription];
+                               [self killExtensionForExpiredSubscription];
                            }
                        });
                    }
@@ -743,7 +743,7 @@
         NSString *serverTimestamp = [sharedDB getServerTimestamp];
         NSDate *serverDate = [rfc3339DateFormatter dateFromString:serverTimestamp];
         if (serverDate != nil) {
-            if(![[IAPReceiptHelper sharedInstance]hasActiveSubscriptionForDate:serverDate]) {
+            if(![[IAPReceiptHelper sharedInstance] hasActiveSubscriptionForDate:serverDate]) {
                 // User is possibly cheating, terminate the app due to 'Invalid Receipt'.
                 // Stop the tunnel, show alert with title and message
                 // and terminate the app due to 'Invalid Receipt' when user clicks 'OK'.
@@ -752,7 +752,7 @@
                     // Do nothing.
                 }];
 
-                [IAPReceiptHelper  terminateForInvalidReceipt];
+                [IAPReceiptHelper terminateForInvalidReceipt];
 
                 [self displayMessage:alertMessage completionHandler:^(BOOL success) {
                     // Do nothing.
