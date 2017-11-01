@@ -18,7 +18,8 @@
  */
 
 #import "SettingsViewController.h"
-#import "IAPHelper.h"
+#import "IAPReceiptHelper.h"
+#import "IAPStoreHelper.h"
 #import "IAPViewController.h"
 #import "VPNManager.h"
 
@@ -30,7 +31,7 @@
 }
 
 - (void)viewWillAppear:(BOOL)animated {
-    if([IAPHelper canMakePayments] == NO) {
+    if([IAPStoreHelper canMakePayments] == NO) {
         self.hiddenKeys = [[NSSet alloc] initWithArray:@[kSettingsSubscription]];
     }
     // Observe IAP transaction notification
@@ -71,7 +72,7 @@
         return cell;
     }
 
-    BOOL hasActiveSubscription = [[IAPHelper sharedInstance]hasActiveSubscriptionForDate:[NSDate date]];
+    BOOL hasActiveSubscription = [[IAPReceiptHelper sharedInstance]hasActiveSubscriptionForDate:[NSDate date]];
     if ([specifier.key isEqualToString:kSettingsSubscription]) {
         cell = [super tableView:tableView cellForSpecifier:specifier];
         [cell setAccessoryType:UITableViewCellAccessoryDisclosureIndicator];
