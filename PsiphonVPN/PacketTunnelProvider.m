@@ -35,12 +35,6 @@
 #import <net/if.h>
 #import <stdatomic.h>
 
-// NOTE:
-// To handle the Network Extension zombie state, PsiphonDataSharedDB tunnelConnectedState should not be
-// set to TRUE if the VPN is not active.
-// The mismatch between VPN connected stated and PsiphonDataSharedDB tunnelConnectedState
-// is used to detect a zombie extension process.
-
 @implementation PacketTunnelProvider {
 
     // Pointer to startTunnelWithOptions completion handler.
@@ -53,18 +47,16 @@
 
     Notifier *notifier;
 
-    // Start vpn decision.
-    // shouldStartVPN value will not be altered after it is set to TRUE.
+    // Start vpn decision. If FALSE, VPN should not be activated, even though Psiphon tunnel might be connected.
+    // shouldStartVPN SHOULD NOT be altered after it is set to TRUE.
     BOOL shouldStartVPN;
-
-    BOOL tunnelStartedFromContainer;
 
     BOOL extensionIsZombie;
 
-    // Whether the extension is started from boot with device in locked state.
+    // startFromBootWithReceipt is TRUE if the extension is started from boot with device is in locked state
     // AND a subscription receipt file exists.
-    // This flag is important since we need to be able to defer subscription check
-    // if the device ends up in this state.
+    // This flag is used to defer subscription check, while the device is still in a locked state
+    // and app receipt not readable by the extension process.
     BOOL startFromBootWithReceipt;
 
     _Atomic BOOL showUpstreamProxyErrorMessage;
@@ -83,7 +75,6 @@
         notifier = [[Notifier alloc] initWithAppGroupIdentifier:APP_GROUP_IDENTIFIER];
 
         shouldStartVPN = FALSE;
-        tunnelStartedFromContainer = FALSE;
         extensionIsZombie = FALSE;
 
         atomic_init(&self->showUpstreamProxyErrorMessage, TRUE);
@@ -92,17 +83,18 @@
     return self;
 }
 
-
-
 - (void)startTunnelWithOptions:(nullable NSDictionary<NSString *, NSObject *> *)options completionHandler:(void (^)(NSError *__nullable error))startTunnelCompletionHandler {
 
     // Creates boot test file if it doesn't already exist.
+    // A boot test file is a file with protection type NSFileProtectionCompleteUntilFirstUserAuthentication,
+    // used to test if the device is still locked since boot.
+    // NOTE: it is assumed that this file is first created while the device is in an unlocked state.
     if (![self createBootTestFile]) {
         LOG_ERROR(@"Failed to create/check for boot test file");
         abort();
     }
 
-    // List of paths to check. The list could contain files or directories.
+    // List of paths to downgrade file protection to NSFileProtectionNone. The list could contain files or directories.
     NSArray<NSString *> *paths = @[
       // Note that this directory is not accessible in the container.
       [[[[NSFileManager defaultManager] URLsForDirectory:NSLibraryDirectory inDomains:NSUserDomainMask] lastObject] path],
@@ -110,38 +102,35 @@
       [[[NSFileManager defaultManager] containerURLForSecurityApplicationGroupIdentifier:APP_GROUP_IDENTIFIER] path],
     ];
 
-    NSArray<NSString *> *exceptions = @[
-      [self getBootTestFilePath],
-    ];
-
     // Set file protection of all files needed by the extension and Psiphon tunnel framework to NSFileProtectionNone.
     // This is required in order for "Connect On Demand" to work.
     // Extension should not start if this operation fails.
-    if (![self downgradeFileProtectionToNone:paths withExceptions:exceptions]) {
+    if (![self downgradeFileProtectionToNone:paths withExceptions:@[[self getBootTestFilePath]]]) {
         LOG_ERROR(@"Aborting. Failed to set file protection.");
         abort();
     }
-
-#if DEBUG
-    [self listDirectory:paths[0] resource:@"Library"];
-    [self listDirectory:paths[1] resource:@"Shared container"];
-#endif
 
     // VPN should only start if it is started from the container app directly,
     // OR if the user has a valid subscription
     // OR if the extension is started after boot but before being unlocked.
     // NOTE: This is not a comprehensive subscription verification.
     BOOL hasActiveSubscription = [[IAPReceiptHelper sharedInstance] hasActiveSubscriptionForDate:[NSDate date]];
-    startFromBootWithReceipt = [self isStartBootTestFileLocked] && [self hasAppReceipt];
-    tunnelStartedFromContainer = [((NSString *)options[EXTENSION_OPTION_START_FROM_CONTAINER]) isEqualToString:EXTENSION_TRUE];
+    BOOL startFromBoot = [self isStartBootTestFileLocked];
+    startFromBootWithReceipt = startFromBoot && [self hasAppReceipt];
+    BOOL tunnelStartedFromContainer = [((NSString *)options[EXTENSION_OPTION_START_FROM_CONTAINER]) isEqualToString:EXTENSION_TRUE];
 
-    LOG_ERROR(@"startFromBootWithReceipt %d\nhasActiveSubscription: %d\ntunneStartedFromContainer %d\n", startFromBootWithReceipt, hasActiveSubscription, tunnelStartedFromContainer);
+#if DEBUG
+    [self listDirectory:paths[0] resource:@"Library"];
+    [self listDirectory:paths[1] resource:@"Shared container"];
+    LOG_ERROR(@"startFromBootWithReceipt %d\nhasActiveSubscription: %d\ntunnelStartedFromContainer %d\n", startFromBootWithReceipt, hasActiveSubscription, tunnelStartedFromContainer);
+#endif
 
     if (tunnelStartedFromContainer || hasActiveSubscription || startFromBootWithReceipt) {
 
         shouldStartVPN = hasActiveSubscription || startFromBootWithReceipt;
 
         if (startFromBootWithReceipt) {
+            // Defer subscription check, until the device is unlocked.
             [self deferSubscriptionCheck];
         }
 
@@ -192,7 +181,7 @@
             weakSelf.reasserting = TRUE;
         }];
 
-        [self showRepeatingNoTunnelAlert];
+        [self showRepeatingExpiredSubscriptionAlert];
     }
 
 }
@@ -415,7 +404,11 @@
     }];
 }
 
-- (void)showRepeatingNoTunnelAlert {
+/*!
+ * Shows "subscription expired" alert to the user.
+ * This alert will only be shown again after a time interval after the user *dismisses* the current alert.
+ */
+- (void)showRepeatingExpiredSubscriptionAlert {
 
     int64_t intervalInSec = 60; // Every minute.
 
@@ -425,7 +418,7 @@
            // If the user dismisses the message, show the alert again in intervalInSec seconds.
            if (success) {
                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, intervalInSec * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
-                   [self showRepeatingNoTunnelAlert];
+                   [self showRepeatingExpiredSubscriptionAlert];
                });
            }
        }];
@@ -450,7 +443,9 @@
       dispatch_get_main_queue(), ^{
 
           if ([self isStartBootTestFileLocked]) {
-                [self deferSubscriptionCheck];
+              // Device is still not unlocked since boot.
+              // Defer subscription check again.
+              [self deferSubscriptionCheck];
           } else {
               if ([[IAPReceiptHelper sharedInstance] hasActiveSubscriptionForDate:[NSDate date]]) {
                   [self startSubscriptionCheckTimer];
