@@ -27,7 +27,8 @@
 #import "VPNManager.h"
 #import "AdManager.h"
 #import "Logging.h"
-#import "IAPHelper.h"
+#import "IAPStoreHelper.h"
+#import "IAPReceiptHelper.h"
 #import "IAPViewController.h"
 
 #if DEBUG
@@ -102,7 +103,7 @@
     [self initializeDefaults];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(switchViewControllerWhenAdsLoaded) name:@kAdsDidLoad object:adManager];
 
-    [[IAPHelper sharedInstance] startProductsRequest];
+    [[IAPStoreHelper sharedInstance] startProductsRequest];
 
     return YES;
 }
@@ -294,8 +295,8 @@
     [notifier listenForNotification:@"NE.tunnelConnected" listener:^{
         LOG_DEBUG(@"Received notification NE.tunnelConnected");
         // Check if user has an active subscription but the receipt is not valid.
-        IAPHelper *iapHelper = [IAPHelper sharedInstance];
-        if([iapHelper hasActiveSubscriptionForDate:[NSDate date]] && ![iapHelper verifyReceipt]) {
+        IAPReceiptHelper *iapReceiptHelper = [IAPReceiptHelper sharedInstance];
+        if([iapReceiptHelper hasActiveSubscriptionForDate:[NSDate date]] && ![iapReceiptHelper verifyReceipt]) {
             // Stop the VPN and prompt user to refresh app receipt.
             [vpnManager stopVPN];
             NSString *alertTitle = NSLocalizedStringWithDefaultValue(@"BAD_RECEIPT_ALERT_TITLE", nil, [NSBundle mainBundle], @"Invalid app receipt", @"Alert title informing user that app receipt is not valid");

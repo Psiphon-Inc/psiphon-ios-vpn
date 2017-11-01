@@ -28,7 +28,7 @@
 #import "SharedConstants.h"
 #import "Notifier.h"
 #import "Logging.h"
-#import "IAPHelper.h"
+#import "IAPReceiptHelper.h"
 #import "NSDateFormatter+RFC3339.h"
 #import <ifaddrs.h>
 #import <arpa/inet.h>
@@ -131,7 +131,7 @@
     // OR if the user has a valid subscription
     // OR if the extension is started after boot but before being unlocked.
     // NOTE: This is not a comprehensive subscription verification.
-    BOOL hasActiveSubscription = [[IAPHelper sharedInstance] hasActiveSubscriptionForDate:[NSDate date]];
+    BOOL hasActiveSubscription = [[IAPReceiptHelper sharedInstance] hasActiveSubscriptionForDate:[NSDate date]];
     startFromBootWithReceipt = [self isStartBootTestFileLocked] && [self hasAppReceipt];
     tunnelStartedFromContainer = [((NSString *)options[EXTENSION_OPTION_START_FROM_CONTAINER]) isEqualToString:EXTENSION_TRUE];
 
@@ -377,7 +377,7 @@
     // OR if the extension is started after boot but before being unlocked.
     // NOTE: This is not a complete subscription verification,
     //       specifically the receipt is not verified at this point.
-    BOOL hasActiveSubscription = [[IAPHelper sharedInstance] hasActiveSubscriptionForDate:[NSDate date]];
+    BOOL hasActiveSubscription = [[IAPReceiptHelper sharedInstance] hasActiveSubscriptionForDate:[NSDate date]];
     if ([sharedDB getAppForegroundState] || hasActiveSubscription || startFromBootWithReceipt) {
 
         //
@@ -452,7 +452,7 @@
           if ([self isStartBootTestFileLocked]) {
                 [self deferSubscriptionCheck];
           } else {
-              if ([[IAPHelper sharedInstance] hasActiveSubscriptionForDate:[NSDate date]]) {
+              if ([[IAPReceiptHelper sharedInstance] hasActiveSubscriptionForDate:[NSDate date]]) {
                   [self startSubscriptionCheckTimer];
               } else {
                   [self killExtensionForExpireSubscription];
@@ -476,7 +476,7 @@
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, subscriptionCheckIntervalInSec * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
         // If user's subscription has expired, then give them an hour of extra grace period
         // before killing the tunnel.
-        if ([[IAPHelper sharedInstance] hasActiveSubscriptionForDate:[NSDate date]]) {
+        if ([[IAPReceiptHelper sharedInstance] hasActiveSubscriptionForDate:[NSDate date]]) {
             // User has an active subscription. Check later.
             [weakSelf startSubscriptionCheckTimer];
         } else {
@@ -488,7 +488,7 @@
                    if (success) {
                        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, gracePeriodInSec * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
                            // Grace period has finished. Checks if the subscription has been renewed, otherwise kill the VPN.
-                           if ([[IAPHelper sharedInstance] hasActiveSubscriptionForDate:[NSDate date]]) {
+                           if ([[IAPReceiptHelper sharedInstance] hasActiveSubscriptionForDate:[NSDate date]]) {
                                // Subscription has been renewed.
                                [weakSelf startSubscriptionCheckTimer];
                            } else {
@@ -740,7 +740,7 @@
     // Check if user has an active subscription in the device's time
     // If NO - do nothing
     // If YES - proceed with checking the subscription against server timestamp
-    if([[IAPHelper sharedInstance]hasActiveSubscriptionForDate:[NSDate date]]) {
+    if([[IAPReceiptHelper sharedInstance]hasActiveSubscriptionForDate:[NSDate date]]) {
         // The following code adapted from
         // https://developer.apple.com/library/content/documentation/Cocoa/Conceptual/DataFormatting/Articles/dfDateFormatting10_4.html
         NSDateFormatter *rfc3339DateFormatter = [NSDateFormatter createRFC3339Formatter];
@@ -748,7 +748,7 @@
         NSString *serverTimestamp = [sharedDB getServerTimestamp];
         NSDate *serverDate = [rfc3339DateFormatter dateFromString:serverTimestamp];
         if (serverDate != nil) {
-            if(![[IAPHelper sharedInstance]hasActiveSubscriptionForDate:serverDate]) {
+            if(![[IAPReceiptHelper sharedInstance]hasActiveSubscriptionForDate:serverDate]) {
                 // User is possibly cheating, terminate the app due to 'Invalid Receipt'.
                 // Stop the tunnel, show alert with title and message
                 // and terminate the app due to 'Invalid Receipt' when user clicks 'OK'.
@@ -757,7 +757,7 @@
                     // Do nothing.
                 }];
 
-                [[IAPHelper sharedInstance] terminateForInvalidReceipt];
+                [IAPReceiptHelper  terminateForInvalidReceipt];
 
                 [self displayMessage:alertMessage completionHandler:^(BOOL success) {
                     // Do nothing.

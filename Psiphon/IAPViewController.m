@@ -18,7 +18,8 @@
  */
 
 #import "IAPViewController.h"
-#import "IAPHelper.h"
+#import "IAPStoreHelper.h"
+#import "IAPReceiptHelper.h"
 
 
 static NSString *iapCellID = @"IAPTableCellID";
@@ -73,7 +74,7 @@ static NSString *iapCellID = @"IAPTableCellID";
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     
-    if([[IAPHelper sharedInstance].storeProducts count] == 0) {
+    if([[IAPStoreHelper sharedInstance].storeProducts count] == 0) {
         // retry getting products from the store
         [self startProductsRequest];
     }
@@ -121,7 +122,7 @@ static NSString *iapCellID = @"IAPTableCellID";
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
     NSInteger numOfSections = 0;
-    if ([[IAPHelper sharedInstance].storeProducts count]) {
+    if ([[IAPStoreHelper sharedInstance].storeProducts count]) {
         self.tableView.separatorStyle = UITableViewCellSeparatorStyleSingleLine;
         numOfSections                 = 1;
         tableView.tableHeaderView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, self.tableView.bounds.size.width, 0.01f)];
@@ -143,7 +144,7 @@ static NSString *iapCellID = @"IAPTableCellID";
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return [[IAPHelper sharedInstance].storeProducts count];
+    return [[IAPStoreHelper sharedInstance].storeProducts count];
 }
 
 - (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section {
@@ -223,7 +224,7 @@ static NSString *iapCellID = @"IAPTableCellID";
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    SKProduct * product = (SKProduct *) [IAPHelper sharedInstance].storeProducts[indexPath.row];
+    SKProduct * product = (SKProduct *) [IAPStoreHelper sharedInstance].storeProducts[indexPath.row];
     
     IAPTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:iapCellID];
     if (cell == nil) {
@@ -244,7 +245,7 @@ static NSString *iapCellID = @"IAPTableCellID";
     cell.detailTextLabel.text = product.localizedDescription;
     cell.textLabel.text = product.localizedTitle;
     
-    RMAppReceipt *receipt = [[IAPHelper sharedInstance] appReceipt];
+    RMAppReceipt *receipt = [[IAPReceiptHelper sharedInstance] appReceipt];
 	RMAppReceiptIAP *activeSubscriptionReceipt = nil;
 
 	if(receipt) {
@@ -295,9 +296,9 @@ static NSString *iapCellID = @"IAPTableCellID";
 - (void)buyButtonPressed:(UISegmentedControl *)sender {
     int productID = (int)sender.tag;
     
-    if([IAPHelper sharedInstance].storeProducts.count > productID) {
-        SKProduct* product = [IAPHelper sharedInstance].storeProducts[productID];
-        [[IAPHelper sharedInstance] buyProduct:product];
+    if([IAPStoreHelper sharedInstance].storeProducts.count > productID) {
+        SKProduct* product = [IAPStoreHelper sharedInstance].storeProducts[productID];
+        [[IAPStoreHelper sharedInstance] buyProduct:product];
     }
 }
 
@@ -306,7 +307,7 @@ static NSString *iapCellID = @"IAPTableCellID";
         [self.refreshControl beginRefreshing];
         [self.tableView setContentOffset:CGPointMake(0, self.tableView.contentOffset.y-self.refreshControl.frame.size.height) animated:YES];
     }
-    [[IAPHelper sharedInstance] restoreSubscriptions];
+    [[IAPStoreHelper sharedInstance] restoreSubscriptions];
 }
 
 - (void)refreshReceiptAction {
@@ -314,7 +315,7 @@ static NSString *iapCellID = @"IAPTableCellID";
         [self.refreshControl beginRefreshing];
         [self.tableView setContentOffset:CGPointMake(0, self.tableView.contentOffset.y-self.refreshControl.frame.size.height) animated:YES];
     }
-    [[IAPHelper sharedInstance] refreshReceipt];
+    [[IAPStoreHelper sharedInstance] refreshReceipt];
 }
 
 - (void)dismissViewController {
@@ -337,7 +338,7 @@ static NSString *iapCellID = @"IAPTableCellID";
         [self.refreshControl beginRefreshing];
         [self.tableView setContentOffset:CGPointMake(0, self.tableView.contentOffset.y-self.refreshControl.frame.size.height) animated:YES];
     }
-    [[IAPHelper sharedInstance] startProductsRequest];
+    [[IAPStoreHelper sharedInstance] startProductsRequest];
 }
 
 
