@@ -53,15 +53,6 @@
 
 - (RMAppReceipt *)appReceipt {
     NSURL *URL = [NSBundle mainBundle].appStoreReceiptURL;
-    if(_cachedAppReceipt == nil) {
-        NSString *path = URL.path;
-        const BOOL exists = [[NSFileManager defaultManager] fileExistsAtPath:path isDirectory:nil];
-        if (exists) {
-            _cachedAppReceipt  =  [RMAppReceipt bundleReceipt];
-        }
-        return _cachedAppReceipt;
-    }
-
     NSNumber* theSize;
     NSInteger fileSize = 0;
 
@@ -69,6 +60,7 @@
         fileSize = [theSize integerValue];
         if (fileSize != _cachedAppReceipFileSize) {
             _cachedAppReceipt  =  [RMAppReceipt bundleReceipt];
+            _cachedAppReceipFileSize = fileSize;
         }
     }
     return _cachedAppReceipt;
@@ -118,7 +110,8 @@
     BOOL hasSubscription = NO;
 
     for (NSString* productID in self.bundledProductIDS) {
-        hasSubscription = [[self appReceipt] getActiveAutoRenewableSubscriptionOfProductIdentifier:productID forDate:date];
+        NSDate *subscriptionExpirationDate = [[self appReceipt].inAppSubscriptions objectForKey:productID];
+        hasSubscription = (subscriptionExpirationDate && [date compare:subscriptionExpirationDate] != NSOrderedDescending);
         if (hasSubscription) {
             break;
         }
