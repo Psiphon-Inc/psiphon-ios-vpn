@@ -246,14 +246,15 @@ static NSString *iapCellID = @"IAPTableCellID";
     cell.textLabel.text = product.localizedTitle;
     
     RMAppReceipt *receipt = [[IAPReceiptHelper sharedInstance] appReceipt];
-	RMAppReceiptIAP *activeSubscriptionReceipt = nil;
+    BOOL isActiveSubscription = NO;
+    NSDate *subscriptionExpirationDate = nil;
 
 	if(receipt) {
-		activeSubscriptionReceipt = [receipt getActiveAutoRenewableSubscriptionOfProductIdentifier:product.productIdentifier
-																		 forDate:[NSDate date]];
+        subscriptionExpirationDate = [receipt.inAppSubscriptions objectForKey:product.productIdentifier];
+        isActiveSubscription = (subscriptionExpirationDate && [[NSDate date] compare:subscriptionExpirationDate] != NSOrderedDescending);
 	}
 
-    if (activeSubscriptionReceipt) {
+    if (isActiveSubscription) {
         cell.accessoryType = UITableViewCellAccessoryCheckmark;
         cell.accessoryView = nil;
 
@@ -265,7 +266,7 @@ static NSString *iapCellID = @"IAPTableCellID";
 
 		NSDateFormatter* df = [NSDateFormatter new];
 		df.dateFormat= [NSDateFormatter dateFormatFromTemplate:@"MMddYY" options:0 locale:[NSLocale currentLocale]];
-		NSString *dateString = [df stringFromDate:activeSubscriptionReceipt.subscriptionExpirationDate];
+		NSString *dateString = [df stringFromDate:subscriptionExpirationDate];
 
 		cell.detailTextLabel.text = [NSString stringWithFormat:detailTextFormat, dateString, localizedPrice];
     } else {

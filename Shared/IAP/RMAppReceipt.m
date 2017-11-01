@@ -128,7 +128,7 @@ static NSURL *_appleRootCertificateURL = nil;
 {
     if (self = [super init])
     {
-        NSMutableArray *purchases = [NSMutableArray array];
+        NSMutableDictionary<NSString*, NSDate*> *subscriptions = [NSMutableDictionary new];
          // Explicit casting to avoid errors when compiling as Objective-C++
         [RMAppReceipt enumerateASN1Attributes:(const uint8_t*)asn1Data.bytes length:asn1Data.length usingBlock:^(NSData *data, int type) {
             const uint8_t *s = (const uint8_t*)data.bytes;
@@ -150,8 +150,14 @@ static NSURL *_appleRootCertificateURL = nil;
                     break;
                 case RMAppReceiptASN1TypeInAppPurchaseReceipt:
                 {
-                    RMAppReceiptIAP *purchase = [[RMAppReceiptIAP alloc] initWithASN1Data:data];
-                    [purchases addObject:purchase];
+                    RMAppReceiptIAP *iapReceipt = [[RMAppReceiptIAP alloc] initWithASN1Data:data];
+                    if(iapReceipt.subscriptionExpirationDate && !iapReceipt.cancellationDate) {
+                        NSString *subscriptionID = iapReceipt.productIdentifier;
+                        NSDate *currentExpirationDate = [subscriptions objectForKey:subscriptionID];
+                        if (currentExpirationDate == nil || [currentExpirationDate compare:iapReceipt.subscriptionExpirationDate] == NSOrderedAscending) {
+                            subscriptions[iapReceipt.productIdentifier] = iapReceipt.subscriptionExpirationDate;
+                        }
+                    }
                     break;
                 }
                 case RMAppReceiptASN1TypeOriginalAppVersion:
@@ -165,32 +171,9 @@ static NSURL *_appleRootCertificateURL = nil;
                 }
             }
         }];
-        _inAppPurchases = purchases;
+        _inAppSubscriptions = subscriptions;
     }
     return self;
-}
-
-- (BOOL)containsInAppPurchaseOfProductIdentifier:(NSString*)productIdentifier
-{
-    for (RMAppReceiptIAP *purchase in _inAppPurchases)
-    {
-        if ([purchase.productIdentifier isEqualToString:productIdentifier]) return YES;
-    }
-    return NO;
-}
-
--(RMAppReceiptIAP*)getActiveAutoRenewableSubscriptionOfProductIdentifier:(NSString *)productIdentifier forDate:(NSDate *)date
-{
-	{
-		for (RMAppReceiptIAP *iap in self.inAppPurchases)
-		{
-			if ([iap.productIdentifier isEqualToString:productIdentifier] && [iap isActiveAutoRenewableSubscriptionForDate:date]) {
-				return iap;
-			}
-		}
-
-		return nil;
-	}
 }
 
 - (BOOL)verifyReceiptHash
@@ -211,6 +194,7 @@ static NSURL *_appleRootCertificateURL = nil;
     
     return [expectedHash isEqualToData:self.receiptHash];
 }
+
 
 + (RMAppReceipt*)bundleReceipt
 {
