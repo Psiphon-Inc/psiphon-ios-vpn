@@ -18,6 +18,7 @@
  */
 
 #import <NetworkExtension/NetworkExtension.h>
+#import "AppDelegate.h"
 #import "VPNManager.h"
 #import "PsiphonDataSharedDB.h"
 #import "SharedConstants.h"
@@ -73,6 +74,12 @@
 }
 
 - (VPNStatus)getVPNStatus {
+#ifdef DEBUG
+    if ([AppDelegate isRunningUITest]) {
+        return VPNStatusConnected;
+    }
+#endif
+
     if (restartRequired) {
         // If extension is restarting due to a call to restartVPN, then
         // we don't want to show the Disconnecting and Disconnected states
