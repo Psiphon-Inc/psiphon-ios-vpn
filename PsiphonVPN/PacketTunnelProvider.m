@@ -35,6 +35,22 @@
 #import <net/if.h>
 #import <stdatomic.h>
 
+
+// Notes on file protection:
+// iOS has different file protection mechanisms to protect user's data. While this is important for protecting
+// user's data, it is not needed (and offers no benefits) for application data.
+//
+// When files are created, iOS >7, defaults to protection level NSFileProtectionCompleteUntilFirstUserAuthentication.
+// This affects files created and used by tunnel-core and the extension, preventing them to function if the
+// process is started at boot but before the user has unlocked their device.
+//
+// To mitigate this situation, for the very first the extension runs, all folders and files required by the extension
+// and tunnel-core are set to protection level NSFileProtectionNone. With the exception of the app subscription receipt
+// file, which the process doesn't have rights to modify it's protection level.
+// Therefore, checking subscription receipt is deferred indefinitely until the device is unlocked, and the process is
+// able to open and read the file. (method isStartBootTestFileLocked performs the test that checks if the device
+// has been unlocked or not.)
+//
 @implementation PacketTunnelProvider {
 
     // Pointer to startTunnelWithOptions completion handler.
@@ -53,10 +69,10 @@
 
     BOOL extensionIsZombie;
 
-    // startFromBootWithReceipt is TRUE if the extension is started from boot with device is in locked state
+    // startFromBootWithReceipt is TRUE if the extension is started from boot, and the device is in a locked state
     // AND a subscription receipt file exists.
-    // This flag is used to defer subscription check, while the device is still in a locked state
-    // and app receipt not readable by the extension process.
+    // This flag is used to defer subscription check while the device is still in a locked state.
+    // Until the device is unlocked, extension process will not have permission to read the app receipt.
     BOOL startFromBootWithReceipt;
 
     _Atomic BOOL showUpstreamProxyErrorMessage;
@@ -85,12 +101,13 @@
 
 - (void)startTunnelWithOptions:(nullable NSDictionary<NSString *, NSObject *> *)options completionHandler:(void (^)(NSError *__nullable error))startTunnelCompletionHandler {
 
-    // Creates boot test file if it doesn't already exist.
-    // A boot test file is a file with protection type NSFileProtectionCompleteUntilFirstUserAuthentication,
-    // used to test if the device is still locked since boot.
-    // NOTE: it is assumed that this file is first created while the device is in an unlocked state.
+    // Creates boot test file used for testing if device is unlocked since boot.
+    // A boot test file is a file with protection type NSFileProtectionCompleteUntilFirstUserAuthentication.
+    // NOTE: it is assumed that this file is first created while the device is in an unlocked state,
+    //       since file with such protection level cannot be created while device is still locked from boot.
     if (![self createBootTestFile]) {
-        LOG_ERROR(@"Failed to create/check for boot test file");
+        // Undefined behaviour wrt. Connect On Demand. Fail fast.
+        LOG_ERROR(@"Aborting. Failed to create/check for boot test file");
         abort();
     }
 
@@ -104,8 +121,8 @@
 
     // Set file protection of all files needed by the extension and Psiphon tunnel framework to NSFileProtectionNone.
     // This is required in order for "Connect On Demand" to work.
-    // Extension should not start if this operation fails.
     if (![self downgradeFileProtectionToNone:paths withExceptions:@[ [self getBootTestFilePath] ]]) {
+        // Undefined behaviour wrt. Connect On Demand. Fail fast.
         LOG_ERROR(@"Aborting. Failed to set file protection.");
         abort();
     }
@@ -122,7 +139,8 @@
 #if DEBUG
     [self listDirectory:paths[0] resource:@"Library"];
     [self listDirectory:paths[1] resource:@"Shared container"];
-    LOG_ERROR(@"startFromBootWithReceipt %d\nhasActiveSubscription: %d\ntunnelStartedFromContainer %d\n", startFromBootWithReceipt, hasActiveSubscription, tunnelStartedFromContainer);
+    LOG_ERROR(@"startFromBoot %d\nstartFromBootWithReceipt %d\nhasActiveSubscription: %d\ntunnelStartedFromContainer %d\n",
+      startFromBoot, startFromBootWithReceipt, hasActiveSubscription, tunnelStartedFromContainer);
 #endif
 
     if (tunnelStartedFromContainer || hasActiveSubscription || startFromBootWithReceipt) {
@@ -130,12 +148,20 @@
         shouldStartVPN = hasActiveSubscription || startFromBootWithReceipt;
 
         if (startFromBootWithReceipt) {
+            // Device is started from boot, but before the user has unlocked it first.
             // Defer subscription check, until the device is unlocked.
+            // Deferral time is defined within deferSubscriptionCheck (currently every 5 mintes).
+            // If the the device is never unlocked, subscription will never be checked, and the tunnel
+            // will be active indefinitely until stopped.
             [self deferSubscriptionCheck];
         }
 
         if (hasActiveSubscription) {
-            // Kick-off subscription timer.
+            // Regardless of whether the extension is started from the container by the user, or by the system,
+            // if the user has an active subscription, checks their subscription again in an interval defined within
+            // startSubscriptionCheckTimer (currently every 24 hours).
+            // If the subscription expires at some point in the future, the user is given a grace period (currently 1 hour)
+            // before the tunnel and the VPN are stopped completely.
             [self startSubscriptionCheckTimer];
         }
 
@@ -523,6 +549,16 @@
                   attributes:@{NSFileProtectionKey: NSFileProtectionCompleteUntilFirstUserAuthentication}];
     }
 
+    NSError *err;
+    NSDictionary<NSFileAttributeKey, id> *attrs = [fm attributesOfItemAtPath:[self getBootTestFilePath] error:&err];
+    if (err) {
+        LOG_ERROR(@"Failed to get file attributes for boot test file. (%@)", err);
+        return FALSE;
+    } else if (![attrs[NSFileProtectionKey] isEqualToString:NSFileProtectionCompleteUntilFirstUserAuthentication]) {
+        LOG_ERROR(@"Boot test file has it's protection level changed to (%@)", attrs[NSFileProtectionKey]);
+        return FALSE;
+    }
+
     return TRUE;
 }
 
@@ -568,7 +604,7 @@
             return FALSE;
         }
 
-        if (attrs[NSFileProtectionKey] != NSFileProtectionNone) {
+        if (![attrs[NSFileProtectionKey] isEqualToString:NSFileProtectionNone]) {
             [fm setAttributes:@{NSFileProtectionKey: NSFileProtectionNone} ofItemAtPath:path error:&err];
             if (err) {
                 LOG_ERROR(@"Failed to set the protection level of dir(%@)", path);
