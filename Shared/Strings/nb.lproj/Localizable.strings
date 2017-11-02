@@ -1,38 +1,38 @@
+/* Active subscription detail text, example: Expires on 2017-01-01, renewal cost is $3.99 */
+"ACTIVE_SUBSCRIPTION_DETAIL_TEXT" = "Utløper den %1$@, fornyelseskostnad er %2$@";
+
 /* Text for button that tell users there will by a short video ad. */
 "AD_LOADED" = "Se en video mens vi kobler deg til";
 
 /* Text for app subtitle on main view. */
 "APP_SUB_TITLE_MAIN_VIEW" = "FORBI GRENSER";
 
-/*[UNTRANSLATED] Text for app title on main view. */
-"APP_TITLE_MAIN_VIEW" = "PSIPHON";
-
 /* Text showing the app version. The '%@' placeholder is the version number. So it will look like 'v.2'. */
 "APP_VERSION" = "Versjon %@";
 
-/*[UNTRANSLATED] Alert message informing user that the device clock needs to be updated with current time */
-"BAD_CLOCK_ALERT_MESSAGE" = "We've detected the time on your device is out of sync with your time zone. Please update your clock settings and restart the app";
+/* Alert message informing user that the device clock needs to be updated with current time */
+"BAD_CLOCK_ALERT_MESSAGE" = "Vi har oppdaget at klokka på din enhet ikke er i takt med tidssonen din. Oppdater klokkeinnstillingene og start programmet på nytt.";
 
-/*[UNTRANSLATED] Alert title informing user that the device clock needs to be updated with current time */
-"BAD_CLOCK_ALERT_TITLE" = "Clock is out of sync";
+/* Alert title informing user that the device clock needs to be updated with current time */
+"BAD_CLOCK_ALERT_TITLE" = "Klokka er ute av takt";
 
-/*[UNTRANSLATED] Alert message informing user that subscription receipt can not be verified */
-"BAD_RECEIPT_ALERT_MESSAGE" = "Your subscription receipt can not be verified, please refresh it and try again.";
+/* Alert message informing user that subscription receipt can not be verified */
+"BAD_RECEIPT_ALERT_MESSAGE" = "Din abonnementskvittering kan ikke bekreftes, gjenoppfrisk den og prøv igjen.";
 
-/*[UNTRANSLATED] Alert title informing user that app receipt is not valid */
-"BAD_RECEIPT_ALERT_TITLE" = "Invalid app receipt";
+/* Alert title informing user that app receipt is not valid */
+"BAD_RECEIPT_ALERT_TITLE" = "Ugyldig programkvittering";
 
-/*[UNTRANSLATED] Buy subscription dialog footer text */
-"BUY_SUBSCRIPTIONS_FOOTER_TEXT" = "Restore previously bought subscription or refresh subscription receipt";
+/* Buy subscription dialog footer text */
+"BUY_SUBSCRIPTIONS_FOOTER_TEXT" = "Et abonnement er automatisk fornybart, hvilket betyr at når du har kjøpt det, vil det bli automatisk fornyet til du kansellerer det, et døgn før slutten av gjeldende periode.\n\nDin iTunes-konto vil bli belastet for fornyelse innen et døgn før slutten av gjeldende periode beløpende abonnementskostnaden.\n\nBehandle dine abonnementer og automatisk fornyelse ved å gå til din kontoinnstillinger.";
 
-/*[UNTRANSLATED] Buy subscription dialog header text */
-"BUY_SUBSCRIPTIONS_HEADER_TEXT" = "Buy a subscription to remove ads and surf the Internet faster!";
+/* Premium subscriptions dialog header text */
+"BUY_SUBSCRIPTIONS_HEADER_TEXT" = "Fjern reklame og surf på Internett raskere med et premium-abonnement.";
 
 /* Text above change region button that allows user to select their desired server region */
 "CHANGE_REGION" = "Endre region";
 
-/*[UNTRANSLATED] Main text in the 'Upstream Proxy Error' dialog box. This is shown when the user has directly altered these settings, and those settings are (probably) erroneous. */
-"CHECK_UPSTREAM_PROXY_SETTING" = "You have configured Psiphon to use an upstream proxy.\nHowever, we seem to be unable to connect to a Psiphon server through that proxy.\nPlease fix the settings and try again.";
+/* Main text in the 'Upstream Proxy Error' dialog box. This is shown when the user has directly altered these settings, and those settings are (probably) erroneous. DO NOT translate 'Psiphon'. */
+"CHECK_UPSTREAM_PROXY_SETTING" = "Du har satt opp Psiphon til å bruke en oppstrømstjener.\nDog, lar det seg ikke gjøre å koble til noen Psiphon-tjener på den mellomtjeneren.\nFiks innstillingene og prøv igjen.";
 
 /* Title of the button that dismisses region selection dialog
    Title of the button that dismisses the subscriptions menu */
@@ -41,43 +41,40 @@
 /* Text displayed while app loads */
 "LOADING" = "Laster…";
 
-/*[UNTRANSLATED] Manage my subscriptions button title */
-"MANAGE_SUBSCRIPTIONS_BUTTON_TITLE" = "Manage my subscriptions";
-
 /* Alert title informing user there is no internet connection */
 "NO_INTERNET" = "Ingen internettilknytning";
 
-/*[UNTRANSLATED] Subscriptions view text that is visible when the list of subscriptions is not available */
-"NO_PRODUCTS_TEXT" = "Could not retrieve subscriptions from the App Store. Pull to refresh or try again later.";
+/* Subscriptions view text that is visible when the list of subscriptions is not available */
+"NO_PRODUCTS_TEXT" = "Kan ikke hente abonnementer fra programbutikk. Dra for å gjenoppfriske og prøv igjen senere.";
 
 /*[UNTRANSLATED] Alert OK Button */
 "OK_BUTTON" = "OK";
 
-/* Alert message informing the user they should open the app to finish connecting to the VPN. */
+/* Alert message informing the user they should open the app to finish connecting to the VPN. DO NOT translate 'Psiphon'. */
 "OPEN_PSIPHON_APP" = "Åpne Psipohn-programmet for å fullføre oppkobling.";
 
-/*[UNTRANSLATED] Refresh app receipt button title */
-"REFRESH_APP_RECEIPT_BUTTON_TITLE" = "Refresh receipt";
+/* Refresh app receipt button title */
+"REFRESH_APP_RECEIPT_BUTTON_TITLE" = "Gjenoppfrisk programkvittering";
 
-/*[UNTRANSLATED] Restore my subscription button title */
-"RESTORE_SUBSCRIPTION_BUTTON_TITLE" = "Restore my subscription";
+/* Restore my subscription button title */
+"RESTORE_SUBSCRIPTION_BUTTON_TITLE" = "Gjenopprett eksisterende abonnement";
 
-/*[UNTRANSLATED] Subscriptions item title in the app settings when user has an active subscription. Clicking this item opens subscriptions view */
-"SETTINGS_SUBSCRIPTION_ACTIVE" = "Subscriptions";
+/* Subscriptions item title in the app settings when user has an active subscription. Clicking this item opens subscriptions view */
+"SETTINGS_SUBSCRIPTION_ACTIVE" = "Abonnementer";
 
-/*[UNTRANSLATED] Subscriptions item title in the app settings when user does not have an active subscription. Clicking this item opens subscriptions view */
-"SETTINGS_SUBSCRIPTION_NOT_ACTIVE" = "Go premium!";
+/* Subscriptions item title in the app settings when user does not have an active subscription. Clicking this item opens subscriptions view */
+"SETTINGS_SUBSCRIPTION_NOT_ACTIVE" = "Kjøp premium.";
 
-/*[UNTRANSLATED] Text for button that opens paid subscriptions manager UI */
-"SUBSCRIPTION_BUTTON_TITLE" = "Go premium now!";
+/* Text for button that opens paid subscriptions manager UI */
+"SUBSCRIPTION_BUTTON_TITLE" = "Kjøp premium nå.";
 
-/*[UNTRANSLATED] Title of the dialog for available in-app paid subscriptions */
-"SUBSCRIPTIONS" = "Subscriptions";
+/* Title of the dialog for available in-app paid subscriptions */
+"SUBSCRIPTIONS" = "Abonnementer";
 
 /* Alert message informing user to turn on their cellular data or wifi to connect to the internet */
 "TURN_ON_DATE" = "Skru på mobildata eller bruk Wi-Fi for å få tilgang.";
 
-/* Alert message informing user they have to open the app */
+/* Alert message informing user they have to open the app. DO NOT translate 'Psiphon'. */
 "USE_PSIPHON_APP" = "For å koble til, bruk Psiphon-programmet";
 
 /* Status when the VPN is connected to a Psiphon server */

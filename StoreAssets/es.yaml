@@ -2,13 +2,37 @@ es:
   app_name: Psiphon
   subtitle: Cruzando fronteras
   description: |
-    Tras ayudar a decenas de millones de usuarios a obtener acceso a las aplicaciones y sitios que aman, ¡Psiphon ha lanzado su primera app oficial para iOS! Nuestra nueva app integra con armonía el acceso a la red Psiphon, conectándole de forma segura a sus aplicaciones y sitios.
+    Tras ayudar a decenas de millones de usuarios a obtener acceso a las aplicaciones y sitios que aman, ¡Psiphon ha lanzado su primera app para iOS! Nuestra nueva app integra armónicamente el acceso a la red Psiphon, conectándole de forma segura a sus aplicaciones y sitios.
 
-    No importa en qué parte del mundo esté, la app de Psiphon le conectará a sus aplicaciones y sitios. La app también le proporciona una capa extra de protección al usar servicios Wi-Fi públicos u otras redes que podrían no ser de confianza.
+    No importa en qué parte del mundo esté, la app de Psiphon le conectará a sus aplicaciones y sitios favoritos. La app también le proporciona una capa extra de protección al usar servicios Wi-Fi públicos u otras redes que podrían no ser de confianza.
 
     Las características clave incluyen:
-    • Uso personal ilimitado gratuito.
+    • Uso personal ilimitado y gratuito.
     • Fácil descarga, instalación, y uso. No requiere registro o configuración.
     • Selección automática de protocolos para proporcionar acceso rápido y fiable en todo momento.
-    • Asistencia para varios idiomas y ubicación configurable del servidor.
+    • Soporte en varios idiomas y ubicación configurable del servidor.
+
+    Acerca de las suscripciones:
+    • ¡Una suscripción elimina la publicidad y le permite surfear Internet más rápido!
+    • Periodo de prueba gratuito de 3 días.
+    • Precios: 2,99 US$ para una semana, 9,99 US$ para un mes, o 99,99 US$ para un año.
+    • El importe se cargará en su cuenta de iTunes a la confirmación de la compra.
+    • Las suscripciones se renuevan automáticamente a menos que la auto-renovación esté desactivada al menos 24 horas antes del final del periodo de vigencia.
+    • Su cuenta será cargada para la renovación dentro de las 24 horas previas al final del periodo de vigencia, y se identificará el coste de la suscripción.
+    • No se permite cancelación alguna de una suscripción vigente durante el periodo activo de suscripción.
+    • Las suscripciones se pueden administrar y la auto-renovación se puede desactivar yendo a la Configuración de su cuenta tras la compra.
+    • Cualquier porción no usada del periodo de prueba gratuito se extinguirá cuando compre una suscripción
+
+    Política de privacidad: https://psiphon.ca/es/privacy.html
+    Condiciones de uso: https://psiphon.ca/es/license.html
   keywords: Psiphon, proxy
+  subscriptions:
+    weekly:
+      title: Premium 1 semana
+      description: Suscripción auto-renovable
+    monthly:
+      title: Premium 1 mes
+      description: Suscripción auto-renovable
+    yearly:
+      title: Premium 1 año
+      description: Suscripción auto-renovable

@@ -62,6 +62,7 @@ DEFAULT_LANGS = {
     'pt_BR': 'pt-BR',   # Portuguese-Brazil
     'pt_PT': 'pt-PT',   # Portuguese-Portugal
     'ru': 'ru',         # Russian
+    'tg': 'tg',         # Tajik
     'th': 'th',         # Thai
     'tk': 'tk',         # Turkmen
     'tr': 'tr',         # Turkish
