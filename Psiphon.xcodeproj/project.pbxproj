@@ -13,6 +13,7 @@
 		197DABF51F54C15400DD5C3B /* VungleInstanceMediationSettings.m in Sources */ = {isa = PBXBuildFile; fileRef = 197DABF41F54C15400DD5C3B /* VungleInstanceMediationSettings.m */; };
 		19CB75071F54ADB300F78219 /* MPGoogleAdMobBannerCustomEvent.m in Sources */ = {isa = PBXBuildFile; fileRef = 19CB75041F54ADB300F78219 /* MPGoogleAdMobBannerCustomEvent.m */; };
 		19CB75081F54ADB300F78219 /* MPGoogleAdMobInterstitialCustomEvent.m in Sources */ = {isa = PBXBuildFile; fileRef = 19CB75061F54ADB300F78219 /* MPGoogleAdMobInterstitialCustomEvent.m */; };
+		1CCE42B98511DA5E8E19713C /* libPods-Psiphon.a in Frameworks */ = {isa = PBXBuildFile; fileRef = CB8BB19F016330264C4DCB80 /* libPods-Psiphon.a */; };
 		440D75BB1F59DF1B005C603B /* IAPHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 440D75BA1F59DF1B005C603B /* IAPHelper.m */; };
 		440D75BE1F59E041005C603B /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 440D75BD1F59E041005C603B /* StoreKit.framework */; };
 		4435CC271F70566000F3A809 /* SettingsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4435CC261F70566000F3A809 /* SettingsViewController.m */; };
@@ -28,7 +29,6 @@
 		6615A5EB1F58A95B00026C98 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 6615A5E81F58A95500026C98 /* Localizable.strings */; };
 		668AF9BF1E92CBD3008CAAAA /* NetworkExtension.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 668AF9BE1E92CBD3008CAAAA /* NetworkExtension.framework */; };
 		668AF9C01E92CBE0008CAAAA /* NetworkExtension.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 668AF9BE1E92CBD3008CAAAA /* NetworkExtension.framework */; };
-		835F4CF2164D9028E9E7086E /* libPods-PsiphonVPN.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 7FC2D3C7A4325CD15FDF15E9 /* libPods-PsiphonVPN.a */; };
 		963708A91F65D4810038894E /* Bourbon-Oblique.otf in Resources */ = {isa = PBXBuildFile; fileRef = 963708A81F65D4810038894E /* Bourbon-Oblique.otf */; };
 		9BFEC4475166B2EEAF192D37 /* VPNManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC04426D8558CB89D3798 /* VPNManager.m */; };
 		9BFEC4F02A47FF8265635803 /* Notifier.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC91ED4A1C511520E9948 /* Notifier.m */; };
@@ -36,12 +36,12 @@
 		9BFECD1880B51B0E2EAEFF1F /* Notifier.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC91ED4A1C511520E9948 /* Notifier.m */; };
 		9BFECF8895D5FE1940A6F700 /* PsiphonConfigUserDefaults.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC584519C408D9D6D3FF1 /* PsiphonConfigUserDefaults.m */; };
 		9BFECFEB3BC9F10542C1A416 /* PsiphonConfigUserDefaults.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC584519C408D9D6D3FF1 /* PsiphonConfigUserDefaults.m */; };
+		B1D9FF416DDCA97A40A325AA /* libPods-PsiphonVPN.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 01122727D6CE50B340C55DBE /* libPods-PsiphonVPN.a */; };
 		CE26FC951BBDC7B800B83375 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = CE26FC941BBDC7B800B83375 /* Assets.xcassets */; };
 		CE26FCAC1BBDC85900B83375 /* PsiphonVPN.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = CE26FCA31BBDC85900B83375 /* PsiphonVPN.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		CE4E9BC01BBEECF30060FF8B /* Psiphon.entitlements in Resources */ = {isa = PBXBuildFile; fileRef = CE4E9BBF1BBEECF30060FF8B /* Psiphon.entitlements */; };
 		CE4E9BC21BBEECFC0060FF8B /* PsiphonVPN.entitlements in Resources */ = {isa = PBXBuildFile; fileRef = CE4E9BC11BBEECFC0060FF8B /* PsiphonVPN.entitlements */; };
 		CE7B76431F54881F00EA44BD /* PsiphonTunnel.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 66094F781E8067520069EC4E /* PsiphonTunnel.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		DF693CA78CF5B67C2D14694C /* libPods-Psiphon.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 93B819F4480DF3E24C22ACD7 /* libPods-Psiphon.a */; };
 		EF35E8101F9FA748003B3102 /* Logging.m in Sources */ = {isa = PBXBuildFile; fileRef = EF35E80F1F9FA748003B3102 /* Logging.m */; };
 		EF35E8111F9FA748003B3102 /* Logging.m in Sources */ = {isa = PBXBuildFile; fileRef = EF35E80F1F9FA748003B3102 /* Logging.m */; };
 		EF441B011F7AF14A008A7D82 /* NSDateFormatter+RFC3339.m in Sources */ = {isa = PBXBuildFile; fileRef = EF441B001F7AF14A008A7D82 /* NSDateFormatter+RFC3339.m */; };
@@ -99,6 +99,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		01122727D6CE50B340C55DBE /* libPods-PsiphonVPN.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-PsiphonVPN.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		197DABE91F54BEED00DD5C3B /* VungleInterstitialCustomEvent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VungleInterstitialCustomEvent.h; sourceTree = "<group>"; };
 		197DABEA1F54BEED00DD5C3B /* VungleInterstitialCustomEvent.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VungleInterstitialCustomEvent.m; sourceTree = "<group>"; };
 		197DABEC1F54C09E00DD5C3B /* MPVungleRouter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MPVungleRouter.h; sourceTree = "<group>"; };
@@ -111,8 +112,6 @@
 		19CB75041F54ADB300F78219 /* MPGoogleAdMobBannerCustomEvent.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MPGoogleAdMobBannerCustomEvent.m; sourceTree = "<group>"; };
 		19CB75051F54ADB300F78219 /* MPGoogleAdMobInterstitialCustomEvent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MPGoogleAdMobInterstitialCustomEvent.h; sourceTree = "<group>"; };
 		19CB75061F54ADB300F78219 /* MPGoogleAdMobInterstitialCustomEvent.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MPGoogleAdMobInterstitialCustomEvent.m; sourceTree = "<group>"; };
-		356E24BD75F31797E5125CBE /* Pods-Psiphon.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Psiphon.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Psiphon/Pods-Psiphon.debug.xcconfig"; sourceTree = "<group>"; };
-		3C9EBD507F3B7B0B4A9974C7 /* Pods-Psiphon.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Psiphon.release.xcconfig"; path = "Pods/Target Support Files/Pods-Psiphon/Pods-Psiphon.release.xcconfig"; sourceTree = "<group>"; };
 		440D75BA1F59DF1B005C603B /* IAPHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IAPHelper.m; sourceTree = "<group>"; };
 		440D75BC1F59DF45005C603B /* IAPHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IAPHelper.h; sourceTree = "<group>"; };
 		440D75BD1F59E041005C603B /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
@@ -127,7 +126,7 @@
 		4E0774951F566ADA0097BC8C /* InAppSettings.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = InAppSettings.bundle; sourceTree = "<group>"; };
 		4E0DCB181F28481E00495781 /* PsiphonDataSharedDB.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PsiphonDataSharedDB.h; sourceTree = "<group>"; };
 		4E0DCB191F28481E00495781 /* PsiphonDataSharedDB.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PsiphonDataSharedDB.m; sourceTree = "<group>"; };
-		5B16DAE36833528D56EAB657 /* Pods-PsiphonVPN.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PsiphonVPN.debug.xcconfig"; path = "Pods/Target Support Files/Pods-PsiphonVPN/Pods-PsiphonVPN.debug.xcconfig"; sourceTree = "<group>"; };
+		571DC9418AF936E60179F07C /* Pods-Psiphon.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Psiphon.release.xcconfig"; path = "Pods/Target Support Files/Pods-Psiphon/Pods-Psiphon.release.xcconfig"; sourceTree = "<group>"; };
 		66094F781E8067520069EC4E /* PsiphonTunnel.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = PsiphonTunnel.framework; sourceTree = "<group>"; };
 		6615A5E91F58A95500026C98 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = Strings/en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		6615A5EC1F58A95E00026C98 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = Strings/fr.lproj/Localizable.strings; sourceTree = "<group>"; };
@@ -153,6 +152,7 @@
 		661DA4CC1F683A2E00BB4B93 /* vi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = vi; path = Strings/vi.lproj/Localizable.strings; sourceTree = "<group>"; };
 		661DA4CD1F683A3800BB4B93 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "Strings/zh-Hans.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		661DA4CE1F683A4000BB4B93 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "Strings/zh-Hant.lproj/Localizable.strings"; sourceTree = "<group>"; };
+		663EEF3A1FAB857A0034A9E7 /* tg */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = tg; path = Strings/tg.lproj/Localizable.strings; sourceTree = "<group>"; };
 		664469C71F72C2F8005E995B /* am */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = am; path = Strings/am.lproj/Localizable.strings; sourceTree = "<group>"; };
 		664469C81F72C305005E995B /* be */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = be; path = Strings/be.lproj/Localizable.strings; sourceTree = "<group>"; };
 		6651BE001F6B11AA00D65633 /* az */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = az; path = Strings/az.lproj/Localizable.strings; sourceTree = "<group>"; };
@@ -162,8 +162,7 @@
 		6651BE041F6B176500D65633 /* kk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = kk; path = Strings/kk.lproj/Localizable.strings; sourceTree = "<group>"; };
 		6651BE051F6B177000D65633 /* my */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = my; path = Strings/my.lproj/Localizable.strings; sourceTree = "<group>"; };
 		668AF9BE1E92CBD3008CAAAA /* NetworkExtension.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = NetworkExtension.framework; path = System/Library/Frameworks/NetworkExtension.framework; sourceTree = SDKROOT; };
-		7FC2D3C7A4325CD15FDF15E9 /* libPods-PsiphonVPN.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-PsiphonVPN.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		93B819F4480DF3E24C22ACD7 /* libPods-Psiphon.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Psiphon.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		6B2646D9B515A2990796D972 /* Pods-PsiphonVPN.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PsiphonVPN.release.xcconfig"; path = "Pods/Target Support Files/Pods-PsiphonVPN/Pods-PsiphonVPN.release.xcconfig"; sourceTree = "<group>"; };
 		963708A81F65D4810038894E /* Bourbon-Oblique.otf */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Bourbon-Oblique.otf"; sourceTree = "<group>"; };
 		9BFEC0419AD3808370915E01 /* PsiphonConfigUserDefaults.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PsiphonConfigUserDefaults.h; sourceTree = "<group>"; };
 		9BFEC04426D8558CB89D3798 /* VPNManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VPNManager.m; sourceTree = "<group>"; };
@@ -173,6 +172,7 @@
 		9BFEC74F24453B8E4B1AFC39 /* VPNManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VPNManager.h; sourceTree = "<group>"; };
 		9BFEC91ED4A1C511520E9948 /* Notifier.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Notifier.m; sourceTree = "<group>"; };
 		9BFECE9247474C83FD8C2948 /* AdManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AdManager.m; sourceTree = "<group>"; };
+		CB8BB19F016330264C4DCB80 /* libPods-Psiphon.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Psiphon.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		CE26FC8A1BBDC7B800B83375 /* Psiphon.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Psiphon.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		CE26FC941BBDC7B800B83375 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		CE26FC991BBDC7B800B83375 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -180,7 +180,8 @@
 		CE26FCA91BBDC85900B83375 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		CE4E9BBF1BBEECF30060FF8B /* Psiphon.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = Psiphon.entitlements; sourceTree = "<group>"; };
 		CE4E9BC11BBEECFC0060FF8B /* PsiphonVPN.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = PsiphonVPN.entitlements; sourceTree = "<group>"; };
-		E5B1A49D5110614A1693CCFA /* Pods-PsiphonVPN.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PsiphonVPN.release.xcconfig"; path = "Pods/Target Support Files/Pods-PsiphonVPN/Pods-PsiphonVPN.release.xcconfig"; sourceTree = "<group>"; };
+		DD100E19194B9A79F5D7DF55 /* Pods-PsiphonVPN.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PsiphonVPN.debug.xcconfig"; path = "Pods/Target Support Files/Pods-PsiphonVPN/Pods-PsiphonVPN.debug.xcconfig"; sourceTree = "<group>"; };
+		EDB109A2FBFB32D821FF121D /* Pods-Psiphon.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Psiphon.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Psiphon/Pods-Psiphon.debug.xcconfig"; sourceTree = "<group>"; };
 		EF35E80F1F9FA748003B3102 /* Logging.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Logging.m; sourceTree = "<group>"; };
 		EF441B001F7AF14A008A7D82 /* NSDateFormatter+RFC3339.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "NSDateFormatter+RFC3339.m"; sourceTree = "<group>"; };
 		EF441B031F7AF263008A7D82 /* NSDateFormatter+RFC3339.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSDateFormatter+RFC3339.h"; sourceTree = "<group>"; };
@@ -216,7 +217,7 @@
 			files = (
 				668AF9C01E92CBE0008CAAAA /* NetworkExtension.framework in Frameworks */,
 				440D75BE1F59E041005C603B /* StoreKit.framework in Frameworks */,
-				DF693CA78CF5B67C2D14694C /* libPods-Psiphon.a in Frameworks */,
+				1CCE42B98511DA5E8E19713C /* libPods-Psiphon.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -226,7 +227,7 @@
 			files = (
 				668AF9BF1E92CBD3008CAAAA /* NetworkExtension.framework in Frameworks */,
 				66094F7A1E8067520069EC4E /* PsiphonTunnel.framework in Frameworks */,
-				835F4CF2164D9028E9E7086E /* libPods-PsiphonVPN.a in Frameworks */,
+				B1D9FF416DDCA97A40A325AA /* libPods-PsiphonVPN.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -295,8 +296,8 @@
 			children = (
 				440D75BD1F59E041005C603B /* StoreKit.framework */,
 				668AF9BE1E92CBD3008CAAAA /* NetworkExtension.framework */,
-				93B819F4480DF3E24C22ACD7 /* libPods-Psiphon.a */,
-				7FC2D3C7A4325CD15FDF15E9 /* libPods-PsiphonVPN.a */,
+				CB8BB19F016330264C4DCB80 /* libPods-Psiphon.a */,
+				01122727D6CE50B340C55DBE /* libPods-PsiphonVPN.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -318,7 +319,7 @@
 				CE26FCA41BBDC85900B83375 /* PsiphonVPN */,
 				CE26FC8B1BBDC7B800B83375 /* Products */,
 				668AF9B81E92CB60008CAAAA /* Frameworks */,
-				D7FCE2C370AA9959455E0B27 /* Pods */,
+				FF0DC6191C07A3FC5D6EE10A /* Pods */,
 			);
 			sourceTree = "<group>";
 		};
@@ -371,17 +372,6 @@
 			path = PsiphonVPN;
 			sourceTree = "<group>";
 		};
-		D7FCE2C370AA9959455E0B27 /* Pods */ = {
-			isa = PBXGroup;
-			children = (
-				356E24BD75F31797E5125CBE /* Pods-Psiphon.debug.xcconfig */,
-				3C9EBD507F3B7B0B4A9974C7 /* Pods-Psiphon.release.xcconfig */,
-				5B16DAE36833528D56EAB657 /* Pods-PsiphonVPN.debug.xcconfig */,
-				E5B1A49D5110614A1693CCFA /* Pods-PsiphonVPN.release.xcconfig */,
-			);
-			name = Pods;
-			sourceTree = "<group>";
-		};
 		EF652CCF1F3521F8002AFB48 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
@@ -412,6 +402,17 @@
 			name = Resource;
 			sourceTree = "<group>";
 		};
+		FF0DC6191C07A3FC5D6EE10A /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				EDB109A2FBFB32D821FF121D /* Pods-Psiphon.debug.xcconfig */,
+				571DC9418AF936E60179F07C /* Pods-Psiphon.release.xcconfig */,
+				DD100E19194B9A79F5D7DF55 /* Pods-PsiphonVPN.debug.xcconfig */,
+				6B2646D9B515A2990796D972 /* Pods-PsiphonVPN.release.xcconfig */,
+			);
+			name = Pods;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -419,15 +420,15 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = CE26FC9C1BBDC7B800B83375 /* Build configuration list for PBXNativeTarget "Psiphon" */;
 			buildPhases = (
-				622B33EEEDA08E03A1393E3C /* [CP] Check Pods Manifest.lock */,
+				68C760D8B13A9BB7EA40BC08 /* [CP] Check Pods Manifest.lock */,
 				CE26FC861BBDC7B800B83375 /* Sources */,
 				CE26FC871BBDC7B800B83375 /* Frameworks */,
 				CE26FC881BBDC7B800B83375 /* Resources */,
 				CE26FCB01BBDC85900B83375 /* Embed App Extensions */,
 				CE7B76421F54881600EA44BD /* CopyFiles */,
 				CE7B76441F54882300EA44BD /* ShellScript */,
-				E139E4ECC3931E011BA196CC /* [CP] Embed Pods Frameworks */,
-				5A4AAC688E9BB83617A22241 /* [CP] Copy Pods Resources */,
+				42B1EE2DE97B7854FBBA1A54 /* [CP] Embed Pods Frameworks */,
+				21155824791FFB36F5A49A19 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -443,11 +444,11 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = CE26FCAD1BBDC85900B83375 /* Build configuration list for PBXNativeTarget "PsiphonVPN" */;
 			buildPhases = (
-				297A8C93AE9B77B5EA4B202A /* [CP] Check Pods Manifest.lock */,
+				2DBF001E8C4C4AD1FBA710D1 /* [CP] Check Pods Manifest.lock */,
 				CE26FC9F1BBDC85900B83375 /* Sources */,
 				CE26FCA01BBDC85900B83375 /* Frameworks */,
 				CE26FCA11BBDC85900B83375 /* Resources */,
-				161C08D1804CD97A2BC7B1BF /* [CP] Copy Pods Resources */,
+				24518C7BCB63170C70E39002 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -540,6 +541,7 @@
 				my,
 				am,
 				be,
+				tg,
 			);
 			mainGroup = CE26FC811BBDC7B700B83375;
 			productRefGroup = CE26FC8B1BBDC7B800B83375 /* Products */;
@@ -586,40 +588,7 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		161C08D1804CD97A2BC7B1BF /* [CP] Copy Pods Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "[CP] Copy Pods Resources";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-PsiphonVPN/Pods-PsiphonVPN-resources.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		297A8C93AE9B77B5EA4B202A /* [CP] Check Pods Manifest.lock */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
-				"${PODS_ROOT}/Manifest.lock",
-			);
-			name = "[CP] Check Pods Manifest.lock";
-			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-PsiphonVPN-checkManifestLockResult.txt",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
-			showEnvVarsInLog = 0;
-		};
-		5A4AAC688E9BB83617A22241 /* [CP] Copy Pods Resources */ = {
+		21155824791FFB36F5A49A19 /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -659,7 +628,55 @@
 			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-Psiphon/Pods-Psiphon-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		622B33EEEDA08E03A1393E3C /* [CP] Check Pods Manifest.lock */ = {
+		24518C7BCB63170C70E39002 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-PsiphonVPN/Pods-PsiphonVPN-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		2DBF001E8C4C4AD1FBA710D1 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-PsiphonVPN-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		42B1EE2DE97B7854FBBA1A54 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-Psiphon/Pods-Psiphon-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		68C760D8B13A9BB7EA40BC08 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -689,21 +706,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "bash \"${BUILT_PRODUCTS_DIR}/${FRAMEWORKS_FOLDER_PATH}/PsiphonTunnel.framework/strip-frameworks.sh\"\n\n/usr/bin/env python \"./genstrings.py\"\nif [ $? != 0 ] ; then\n    exit 1\nfi\n";
-		};
-		E139E4ECC3931E011BA196CC /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-Psiphon/Pods-Psiphon-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -799,6 +801,7 @@
 				6651BE051F6B177000D65633 /* my */,
 				664469C71F72C2F8005E995B /* am */,
 				664469C81F72C305005E995B /* be */,
+				663EEF3A1FAB857A0034A9E7 /* tg */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";
@@ -918,7 +921,7 @@
 		};
 		CE26FC9D1BBDC7B800B83375 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 356E24BD75F31797E5125CBE /* Pods-Psiphon.debug.xcconfig */;
+			baseConfigurationReference = EDB109A2FBFB32D821FF121D /* Pods-Psiphon.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = Psiphon/Psiphon.entitlements;
@@ -941,7 +944,7 @@
 		};
 		CE26FC9E1BBDC7B800B83375 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 3C9EBD507F3B7B0B4A9974C7 /* Pods-Psiphon.release.xcconfig */;
+			baseConfigurationReference = 571DC9418AF936E60179F07C /* Pods-Psiphon.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = Psiphon/Psiphon.entitlements;
@@ -964,7 +967,7 @@
 		};
 		CE26FCAE1BBDC85900B83375 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 5B16DAE36833528D56EAB657 /* Pods-PsiphonVPN.debug.xcconfig */;
+			baseConfigurationReference = DD100E19194B9A79F5D7DF55 /* Pods-PsiphonVPN.debug.xcconfig */;
 			buildSettings = {
 				APPLICATION_EXTENSION_API_ONLY = YES;
 				CODE_SIGN_ENTITLEMENTS = PsiphonVPN/PsiphonVPN.entitlements;
@@ -993,7 +996,7 @@
 		};
 		CE26FCAF1BBDC85900B83375 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = E5B1A49D5110614A1693CCFA /* Pods-PsiphonVPN.release.xcconfig */;
+			baseConfigurationReference = 6B2646D9B515A2990796D972 /* Pods-PsiphonVPN.release.xcconfig */;
 			buildSettings = {
 				APPLICATION_EXTENSION_API_ONLY = YES;
 				CODE_SIGN_ENTITLEMENTS = PsiphonVPN/PsiphonVPN.entitlements;
