@@ -1,1 +1,11 @@
-de: {app_name: Psiphon, subtitle: Jenseits von Grenzen, keywords: 'Psiphon, Proxy'}
+de:
+  app_name: Psiphon
+  subtitle: Jenseits von Grenzen
+  keywords: Psiphon, Proxy
+  subscriptions:
+    weekly:
+      title: Premium 1 Woche
+    monthly:
+      title: Premium 1 Monat
+    yearly:
+      title: Premium 1 Jahr
