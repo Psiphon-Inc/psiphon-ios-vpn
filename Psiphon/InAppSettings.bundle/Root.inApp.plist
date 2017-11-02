@@ -346,6 +346,14 @@
 			<string>PSChildPaneSpecifier</string>
 		</dict>
 		<dict>
+			<key>Key</key>
+			<string>vpnOnDemand</string>
+			<key>Title</key>
+			<string>!!! Not in the Root.strings, this title is set from SettingVewController!!!</string>
+			<key>Type</key>
+			<string>IASKCustomViewSpecifier</string>
+		</dict>
+		<dict>
 			<key>Title</key>
 			<string>SETTINGS_HELP_SECTION</string>
 			<key>BundleTable</key>

@@ -28,13 +28,29 @@
 #import "SharedConstants.h"
 #import "Notifier.h"
 #import "Logging.h"
-#import "NoticeLogger.h"
+#import "IAPReceiptHelper.h"
+#import "NSDateFormatter+RFC3339.h"
 #import <ifaddrs.h>
 #import <arpa/inet.h>
 #import <net/if.h>
 #import <stdatomic.h>
 
 
+// Notes on file protection:
+// iOS has different file protection mechanisms to protect user's data. While this is important for protecting
+// user's data, it is not needed (and offers no benefits) for application data.
+//
+// When files are created, iOS >7, defaults to protection level NSFileProtectionCompleteUntilFirstUserAuthentication.
+// This affects files created and used by tunnel-core and the extension, preventing them to function if the
+// process is started at boot but before the user has unlocked their device.
+//
+// To mitigate this situation, for the very first the extension runs, all folders and files required by the extension
+// and tunnel-core are set to protection level NSFileProtectionNone. With the exception of the app subscription receipt
+// file, which the process doesn't have rights to modify it's protection level.
+// Therefore, checking subscription receipt is deferred indefinitely until the device is unlocked, and the process is
+// able to open and read the file. (method isStartBootTestFileLocked performs the test that checks if the device
+// has been unlocked or not.)
+//
 @implementation PacketTunnelProvider {
 
     // Pointer to startTunnelWithOptions completion handler.
@@ -47,8 +63,17 @@
 
     Notifier *notifier;
 
-    // Start vpn decision made by the container.
+    // Start vpn decision. If FALSE, VPN should not be activated, even though Psiphon tunnel might be connected.
+    // shouldStartVPN SHOULD NOT be altered after it is set to TRUE.
     BOOL shouldStartVPN;
+
+    BOOL extensionIsZombie;
+
+    // startFromBootWithReceipt is TRUE if the extension is started from boot, and the device is in a locked state
+    // AND a subscription receipt file exists.
+    // This flag is used to defer subscription check while the device is still in a locked state.
+    // Until the device is unlocked, extension process will not have permission to read the app receipt.
+    BOOL startFromBootWithReceipt;
 
     _Atomic BOOL showUpstreamProxyErrorMessage;
 }
@@ -66,6 +91,7 @@
         notifier = [[Notifier alloc] initWithAppGroupIdentifier:APP_GROUP_IDENTIFIER];
 
         shouldStartVPN = FALSE;
+        extensionIsZombie = FALSE;
 
         atomic_init(&self->showUpstreamProxyErrorMessage, TRUE);
     }
@@ -75,14 +101,72 @@
 
 - (void)startTunnelWithOptions:(nullable NSDictionary<NSString *, NSObject *> *)options completionHandler:(void (^)(NSError *__nullable error))startTunnelCompletionHandler {
 
-    // TODO: This method wouldn't work with "boot to VPN"
-    if (options[EXTENSION_OPTION_START_FROM_CONTAINER]) {
+    // Creates boot test file used for testing if device is unlocked since boot.
+    // A boot test file is a file with protection type NSFileProtectionCompleteUntilFirstUserAuthentication.
+    // NOTE: it is assumed that this file is first created while the device is in an unlocked state,
+    //       since file with such protection level cannot be created while device is still locked from boot.
+    if (![self createBootTestFile]) {
+        // Undefined behaviour wrt. Connect On Demand. Fail fast.
+        LOG_ERROR(@"Aborting. Failed to create/check for boot test file");
+        abort();
+    }
+
+    // List of paths to downgrade file protection to NSFileProtectionNone. The list could contain files or directories.
+    NSArray<NSString *> *paths = @[
+      // Note that this directory is not accessible in the container.
+      [[[[NSFileManager defaultManager] URLsForDirectory:NSLibraryDirectory inDomains:NSUserDomainMask] lastObject] path],
+      // Shared container, containing logs and other data.
+      [[[NSFileManager defaultManager] containerURLForSecurityApplicationGroupIdentifier:APP_GROUP_IDENTIFIER] path],
+    ];
+
+    // Set file protection of all files needed by the extension and Psiphon tunnel framework to NSFileProtectionNone.
+    // This is required in order for "Connect On Demand" to work.
+    if (![self downgradeFileProtectionToNone:paths withExceptions:@[ [self getBootTestFilePath] ]]) {
+        // Undefined behaviour wrt. Connect On Demand. Fail fast.
+        LOG_ERROR(@"Aborting. Failed to set file protection.");
+        abort();
+    }
+
+    // VPN should only start if it is started from the container app directly,
+    // OR if the user has a valid subscription
+    // OR if the extension is started after boot but before being unlocked.
+    // NOTE: This is not a comprehensive subscription verification.
+    BOOL hasActiveSubscription = [[IAPReceiptHelper sharedInstance] hasActiveSubscriptionForDate:[NSDate date]];
+    BOOL startFromBoot = [self isStartBootTestFileLocked];
+    startFromBootWithReceipt = startFromBoot && [self hasAppReceipt];
+    BOOL tunnelStartedFromContainer = [((NSString *)options[EXTENSION_OPTION_START_FROM_CONTAINER]) isEqualToString:EXTENSION_TRUE];
+
+#if DEBUG
+    [self listDirectory:paths[0] resource:@"Library"];
+    [self listDirectory:paths[1] resource:@"Shared container"];
+    LOG_ERROR(@"startFromBoot %d\nstartFromBootWithReceipt %d\nhasActiveSubscription: %d\ntunnelStartedFromContainer %d\n",
+      startFromBoot, startFromBootWithReceipt, hasActiveSubscription, tunnelStartedFromContainer);
+#endif
+
+    if (tunnelStartedFromContainer || hasActiveSubscription || startFromBootWithReceipt) {
+
+        shouldStartVPN = hasActiveSubscription || startFromBootWithReceipt;
+
+        if (startFromBootWithReceipt) {
+            // Device is started from boot, but before the user has unlocked it first.
+            // Defer subscription check, until the device is unlocked.
+            // Deferral time is defined within deferSubscriptionCheck (currently every 5 mintes).
+            // If the the device is never unlocked, subscription will never be checked, and the tunnel
+            // will be active indefinitely until stopped.
+            [self deferSubscriptionCheck];
+        }
+
+        if (hasActiveSubscription) {
+            // Regardless of whether the extension is started from the container by the user, or by the system,
+            // if the user has an active subscription, checks their subscription again in an interval defined within
+            // startSubscriptionCheckTimer (currently every 24 hours).
+            // If the subscription expires at some point in the future, the user is given a grace period (currently 1 hour)
+            // before the tunnel and the VPN are stopped completely.
+            [self startSubscriptionCheckTimer];
+        }
 
         // Listen for messages from the container
         [self listenForContainerMessages];
-
-        // Reset tunnel connected state.
-        [sharedDB updateTunnelConnectedState:FALSE];
 
         __weak PsiphonTunnel *weakPsiphonTunnel = psiphonTunnel;
 
@@ -90,15 +174,14 @@
 
             if (error != nil) {
                 LOG_ERROR(@"setTunnelNetworkSettings failed: %@", error);
-                startTunnelCompletionHandler([[NSError alloc] initWithDomain:PSIPHON_TUNNEL_ERROR_DOMAIN code:PSIPHON_TUNNEL_ERROR_BAD_CONFIGURATION userInfo:nil]);
+                startTunnelCompletionHandler([[NSError alloc] initWithDomain:kPsiphonTunnelErrorDomain code:PsiphonTunnelErrorBadConfiguration userInfo:nil]);
                 return;
             }
-
 
             BOOL success = [weakPsiphonTunnel start:FALSE];
             if (!success) {
                 LOG_ERROR(@"psiphonTunnel.start failed");
-                startTunnelCompletionHandler([[NSError alloc] initWithDomain:PSIPHON_TUNNEL_ERROR_DOMAIN code:PSIPHON_TUNNEL_ERROR_INTERAL_ERROR userInfo:nil]);
+                startTunnelCompletionHandler([[NSError alloc] initWithDomain:kPsiphonTunnelErrorDomain code:PsiphonTunnelErrorInternalError userInfo:nil]);
                 return;
             }
 
@@ -107,40 +190,89 @@
 
         }];
     } else {
-        // TODO: localize the following string
-        [self displayMessage:
-            NSLocalizedStringWithDefaultValue(@"USE_PSIPHON_APP", nil, [NSBundle mainBundle], @"To connect, use the Psiphon app", @"Alert message informing user they have to open the app. DO NOT translate 'Psiphon'.")
-          completionHandler:^(BOOL success) {
-              // TODO: error handling?
-          }];
+        // If the user is not a subscriber, or if their subscription has expired
+        // we will call the startTunnelCompletionHandler(nil) with nil to
+        // stop "Connect On Demand" rules from kicking-in over and over if they are in effect.
+        //
+        // This method has the side-effect of showing Psiphon VPN as "Connected" in the system settings,
+        // however, traffic will not be routed if setTunnelNetworkSettings:: is not called.
+        // To potentially stop leaking sensitive traffic while in this state, we will route
+        // the network to a dead-end by not start psiphonTunnel.
 
-        startTunnelCompletionHandler([NSError
-          errorWithDomain:PSIPHON_TUNNEL_ERROR_DOMAIN code:PSIPHON_TUNNEL_ERROR_BAD_START userInfo:nil]);
+        extensionIsZombie = TRUE;
+
+        __weak PacketTunnelProvider *weakSelf = self;
+        [self setTunnelNetworkSettings:[self getTunnelSettings] completionHandler:^(NSError *error) {
+            startTunnelCompletionHandler(nil);
+            weakSelf.reasserting = TRUE;
+        }];
+
+        [self showRepeatingExpiredSubscriptionAlert];
     }
 
 }
 
 - (void)stopTunnelWithReason:(NEProviderStopReason)reason completionHandler:(void (^)(void)) completionHandler {
 
-    [sharedDB updateTunnelConnectedState:FALSE];
-
     // Assumes stopTunnelWithReason called exactly once only after startTunnelWithOptions.completionHandler(nil)
     if (vpnStartCompletionHandler) {
         vpnStartCompletionHandler([NSError
-          errorWithDomain:PSIPHON_TUNNEL_ERROR_DOMAIN code:PSIPHON_TUNNEL_ERROR_STOPPED_BEFORE_CONNECTED userInfo:nil]);
+          errorWithDomain:kPsiphonTunnelErrorDomain code:PsiphonTunnelErrorStoppedBeforeConnected userInfo:nil]);
         vpnStartCompletionHandler = nil;
     }
 
     [psiphonTunnel stop];
 
     completionHandler();
-
-    return;
 }
 
-- (void)handleAppMessage:(NSData *)messageData completionHandler:(nullable void (^)(NSData * __nullable responseData))completionHandler {
+- (void)killExtensionForExpiredSubscription {
+    [self displayMessage:NSLocalizedStringWithDefaultValue(@"TUNNEL_KILLED", nil, [NSBundle mainBundle], @"Psiphon has been stopped automatically since your subscription has expired.", @"Alert message informing user that Psiphon has been stopped automatically since the subscription has expired. Do not translate 'Psiphon'.")
+       completionHandler:^(BOOL success) {
+           // Do nothing.
+       }];
+    // NOTE: If extension tries to exit with stopTunnelWithReason::,
+    // the system will create a new extension process and set the VPN state to reconnecting.
+    // Therefore, to stop the VPN, we will stop the Psiphon tunnel here and simply exit the process.
+    [psiphonTunnel stop];
+    exit(1);
+}
+
+#define EXTENSION_RESP_TRUE_DATA [EXTENSION_RESP_TRUE dataUsingEncoding:NSUTF8StringEncoding]
+#define EXTENSION_RESP_FALSE_DATA [EXTENSION_RESP_FALSE dataUsingEncoding:NSUTF8StringEncoding]
+
+// If the Network Extension is *not* running, and the container sends
+// a messages with [NETunnelProviderSession sendProviderMessage:::] then
+// the system creates a new extension process, and instantiates PacketTunnelProvider.
+- (void)handleAppMessage:(NSData *)messageData
+       completionHandler:(nullable void (^)(NSData * __nullable responseData))completionHandler {
 
     if (completionHandler != nil) {
+
+        if (messageData) {
+
+            NSData *respData = nil;
+            NSString *query = [[NSString alloc] initWithData:messageData encoding:NSUTF8StringEncoding];
+
+            if ([EXTENSION_QUERY_IS_PROVIDER_ZOMBIE isEqualToString:query]) {
+                // If the Psiphon tunnel has been started when the extension was started
+                // responds with EXTENSION_RESP_TRUE, otherwise responds with EXTENSION_RESP_FALSE
+                respData = (extensionIsZombie) ? EXTENSION_RESP_TRUE_DATA : EXTENSION_RESP_FALSE_DATA;
+            } else if ([EXTENSION_QUERY_IS_TUNNEL_CONNECTED isEqualToString:query]) {
+                if ([psiphonTunnel getConnectionState] == PsiphonConnectionStateConnected) {
+                    respData = EXTENSION_RESP_TRUE_DATA;
+                } else {
+                    respData = EXTENSION_RESP_FALSE_DATA;
+                }
+            }
+
+            if (respData) {
+                completionHandler(respData);
+                return;
+            }
+        }
+
+        // If completionHandler is not nil, iOS expects it to always be executed.
         completionHandler(messageData);
     }
 }
@@ -255,16 +387,21 @@
         return FALSE;
     }
 
-    if ([sharedDB getAppForegroundState]) {
+    // Start the device VPN only if the app is launched from the container app,
+    // OR if the user has a valid subscription,
+    // OR if the extension is started after boot but before being unlocked.
+    // NOTE: This is not a complete subscription verification,
+    //       specifically the receipt is not verified at this point.
+    BOOL hasActiveSubscription = [[IAPReceiptHelper sharedInstance] hasActiveSubscriptionForDate:[NSDate date]];
+    if ([sharedDB getAppForegroundState] || hasActiveSubscription || startFromBootWithReceipt) {
 
+        //
         if (vpnStartCompletionHandler &&
           [psiphonTunnel getConnectionState] == PsiphonConnectionStateConnected) {
 
             vpnStartCompletionHandler(nil);
             vpnStartCompletionHandler = nil;
 
-            // Since we're still using two-start process, we will notify
-            // the container through NE.newHomepages notification.
             [notifier post:@"NE.newHomepages"];
 
             return TRUE;
@@ -283,17 +420,216 @@
     }];
 
     [notifier listenForNotification:@"D.applicationDidEnterBackground" listener:^{
-        // If the VPN start message has not been received by the container,
-        // and the container goes to the background alert user to open the app.
-        // Note: We expect the value of shouldStartVPN to be set to TRUE on the
-        //       first call to startVPN, and not be modified after that.
+        // If the VPN start message ("M.startVPN") has not been received from the container,
+        // and the container goes to the background, then alert the user to open the app.
+        //
+        // Note: We expect the value of shouldStartVPN to not be altered after it is set to TRUE.
         if (!shouldStartVPN) {
             [self displayOpenAppMessage];
         }
     }];
 }
 
+/*!
+ * Shows "subscription expired" alert to the user.
+ * This alert will only be shown again after a time interval after the user *dismisses* the current alert.
+ */
+- (void)showRepeatingExpiredSubscriptionAlert {
+
+    int64_t intervalInSec = 60; // Every minute.
+
+    [self displayMessage:
+        NSLocalizedStringWithDefaultValue(@"CANNOT_START_TUNNEL_DUE_TO_SUBSCRIPTION", nil, [NSBundle mainBundle], @"Your Psiphon subscription has expired.\nSince you're not a subscriber or your subscription has expired, Psiphon can only be started from the Psiphon app.\n\nPlease open the Psiphon app.", @"Alert message informing user that their subscription has expired or that they're not a subscriber, therefore Psiphon can only be started from the Psiphon app. DO NOT translate 'Psiphon'.")
+           completionHandler:^(BOOL success) {
+           // If the user dismisses the message, show the alert again in intervalInSec seconds.
+           if (success) {
+               dispatch_after(dispatch_time(DISPATCH_TIME_NOW, intervalInSec * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
+                   [self showRepeatingExpiredSubscriptionAlert];
+               });
+           }
+       }];
+}
+
+// If the app receipt cannot be accessed while the device is locked,
+// defer subscription check to a later time.
+- (void)deferSubscriptionCheck {
+    // Checks every subscriptionDeferralIntervalInSec seconds if the subscription receipt is valid.
+    // If cannot read subscription, defer again.
+    // If can read subscription, and check fails, stop the tunnel.
+    // If the subscription check passes: call startSubscriptionCheckTimer.
+
+#if DEBUG
+    int64_t subscriptionDeferralIntervalInSec = 5; // 5 seconds.
+#else
+    int64_t subscriptionDeferralIntervalInSec = 5 * 60; // 5 minutes.
+#endif
+
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW,
+      subscriptionDeferralIntervalInSec * NSEC_PER_SEC),
+      dispatch_get_main_queue(), ^{
+
+          if ([self isStartBootTestFileLocked]) {
+              // Device is still not unlocked since boot.
+              // Defer subscription check again.
+              [self deferSubscriptionCheck];
+          } else {
+              if ([[IAPReceiptHelper sharedInstance] hasActiveSubscriptionForDate:[NSDate date]]) {
+                  [self startSubscriptionCheckTimer];
+              } else {
+                  [self killExtensionForExpiredSubscription];
+              }
+          }
+
+    });
+}
+
+- (void)startSubscriptionCheckTimer {
+    __weak PacketTunnelProvider *weakSelf = self;
+
+#if DEBUG
+    int64_t subscriptionCheckIntervalInSec = 5; // 5 seconds.
+    int64_t gracePeriodInSec = 5; // 5 seconds.
+#else
+    int64_t subscriptionCheckIntervalInSec = 24 * 60 * 60;  // 24 hours.
+    int64_t gracePeriodInSec = 1 * 60 * 60;  // 1 hour.
+#endif
+
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, subscriptionCheckIntervalInSec * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
+        // If user's subscription has expired, then give them an hour of extra grace period
+        // before killing the tunnel.
+        if ([[IAPReceiptHelper sharedInstance] hasActiveSubscriptionForDate:[NSDate date]]) {
+            // User has an active subscription. Check later.
+            [weakSelf startSubscriptionCheckTimer];
+        } else {
+            // User doesn't have an active subscription. Notify them, after making sure they've checked
+            // the notification we will start an hour of extra grace period.
+            [self displayMessage:NSLocalizedStringWithDefaultValue(@"SUBSCRIPTION_EXPIRED_WILL_KILL_TUNNEL", nil, [NSBundle mainBundle], @"Your Psiphon subscription has expired. Psiphon will stop automatically in an hour if subscription is not renewed. Open the Psiphon app to review your subscription to continue using premium features.", @"Alert message informing user that their subscription has expired, and that Psiphon will stop in an hour if subscription is not renewed. Do not translate 'Psiphon'.")
+               completionHandler:^(BOOL success) {
+                   // Wait for the user to acknowledge the message before starting the extra grace period.
+                   if (success) {
+                       dispatch_after(dispatch_time(DISPATCH_TIME_NOW, gracePeriodInSec * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
+                           // Grace period has finished. Checks if the subscription has been renewed, otherwise kill the VPN.
+                           if ([[IAPReceiptHelper sharedInstance] hasActiveSubscriptionForDate:[NSDate date]]) {
+                               // Subscription has been renewed.
+                               [weakSelf startSubscriptionCheckTimer];
+                           } else {
+                               // Subscription has not been renewed. Stop the tunnel.
+                               [self killExtensionForExpiredSubscription];
+                           }
+                       });
+                   }
+               }];
+        }
+    });
+}
+
+// hasAppReceipt returns TRUE if an app receipt file exists, FALSE otherwise.
+// This method doesn't check the content of the receipt.
+- (BOOL)hasAppReceipt {
+    NSFileManager *fm = [NSFileManager defaultManager];
+    return [fm fileExistsAtPath:[[[NSBundle mainBundle] appStoreReceiptURL] path]];
+}
+
+- (BOOL)isStartBootTestFileLocked {
+    FILE *fp = fopen([[self getBootTestFilePath] UTF8String], "r");
+    if (fp == NULL && errno == EPERM) {
+        return TRUE;
+    }
+    if (fp != NULL) fclose(fp);
+    return FALSE;
+}
+
+- (BOOL)createBootTestFile {
+    NSFileManager *fm = [NSFileManager defaultManager];
+
+    // Need to check for existence of file, even though the extension may not have permission to open it.
+    if (![fm fileExistsAtPath:[self getBootTestFilePath]]) {
+        return [fm createFileAtPath:[self getBootTestFilePath]
+                    contents:[@"boot_test_file" dataUsingEncoding:NSUTF8StringEncoding]
+                  attributes:@{NSFileProtectionKey: NSFileProtectionCompleteUntilFirstUserAuthentication}];
+    }
+
+    NSError *err;
+    NSDictionary<NSFileAttributeKey, id> *attrs = [fm attributesOfItemAtPath:[self getBootTestFilePath] error:&err];
+    if (err) {
+        LOG_ERROR(@"Failed to get file attributes for boot test file. (%@)", err);
+        return FALSE;
+    } else if (![attrs[NSFileProtectionKey] isEqualToString:NSFileProtectionCompleteUntilFirstUserAuthentication]) {
+        LOG_ERROR(@"Boot test file has it's protection level changed to (%@)", attrs[NSFileProtectionKey]);
+        return FALSE;
+    }
+
+    return TRUE;
+}
+
+/*!
+ * downgradeFileProtectionToNone sets the file protection type of paths to NSFileProtectionNone
+ * so that they can be read from or written to at any time.
+ * Attributes of exceptions remain untouched.
+ * This is required for VPN "Connect On Demand" to work.
+ * NOTE: All files containing sensitive information about the user should have file protection level
+ *       NSFileProtectionCompleteUntilFirstUserAuthentication at the minimum. This is solely required for protecting
+ *       user's data.
+ *
+ * @param paths List of file or directory paths to downgrade to NSFileProtectionNone.
+ * @param exceptions List of file or directory paths to exclude from the downgrade operation.
+ * @return TRUE if operation finished successfully, FALSE otherwise.
+ */
+- (BOOL)downgradeFileProtectionToNone:(NSArray<NSString *> *)paths withExceptions:(NSArray<NSString *> *)exceptions {
+    for (NSString *path in paths) {
+        if (![self setFileProtectionNoneRecursively:path withExceptions:exceptions]) {
+            return FALSE;
+        }
+    }
+    return TRUE;
+}
+
 #pragma mark - Helper methods
+
+- (NSString *)getBootTestFilePath {
+    return [[[[NSFileManager defaultManager] containerURLForSecurityApplicationGroupIdentifier:APP_GROUP_IDENTIFIER] path]
+      stringByAppendingPathComponent:BOOT_TEST_FILE_NAME];
+}
+
+- (BOOL)setFileProtectionNoneRecursively:(NSString *)path withExceptions:(NSArray<NSString *> *)exceptions{
+
+    NSError *err;
+    NSFileManager *fm = [NSFileManager defaultManager];
+
+    BOOL isDirectory;
+    if ([fm fileExistsAtPath:path isDirectory:&isDirectory] && ![exceptions containsObject:path]) {
+        NSDictionary *attrs = [fm attributesOfItemAtPath:path error:&err];
+        if (err) {
+            LOG_ERROR(@"Failed to get file attributes for path (%@) (%@)", path, err);
+            return FALSE;
+        }
+
+        if (![attrs[NSFileProtectionKey] isEqualToString:NSFileProtectionNone]) {
+            [fm setAttributes:@{NSFileProtectionKey: NSFileProtectionNone} ofItemAtPath:path error:&err];
+            if (err) {
+                LOG_ERROR(@"Failed to set the protection level of dir(%@)", path);
+                return FALSE;
+            }
+        }
+
+        if (isDirectory) {
+            NSArray<NSString *> *contents = [fm contentsOfDirectoryAtPath:path error:&err];
+            if (err) {
+                LOG_ERROR(@"Failed to get contents of directory (%@) (%@)", path, err);
+            }
+
+            for (NSString * item in contents) {
+                if (![self setFileProtectionNoneRecursively:[path stringByAppendingPathComponent:item] withExceptions:exceptions]) {
+                    return FALSE;
+                }
+            }
+
+        }
+
+    }
+
+    return TRUE;
+}
 
 - (void)displayOpenAppMessage {
     [self displayMessage:
@@ -302,6 +638,40 @@
            // TODO: error handling?
        }];
 }
+
+#if DEBUG
+- (void)listDirectory:(NSString *)dir resource:(NSString *)resource{
+    NSError *err;
+    NSFileManager *fm = [NSFileManager defaultManager];
+    NSMutableArray<NSString *> *desc = [NSMutableArray array];
+
+    NSArray<NSString *> *files = [fm contentsOfDirectoryAtPath:dir error:&err];
+
+    NSDictionary *dirattrs = [fm attributesOfItemAtPath:dir error:&err];
+    LOG_ERROR(@"Dir (%@) attributes:\n\n%@", [dir lastPathComponent], dirattrs[NSFileProtectionKey]);
+
+    if ([files count] > 0) {
+        for (NSString *f in files) {
+            NSString *file;
+            if (![[f stringByDeletingLastPathComponent] isEqualToString:dir]) {
+                file = [dir stringByAppendingPathComponent:f];
+            } else {
+                file = f;
+            }
+
+            BOOL isDir;
+            [fm fileExistsAtPath:file isDirectory:&isDir];
+            NSDictionary *attrs = [fm attributesOfItemAtPath:file error:&err];
+            if (err) {
+//            LOG_ERROR(@"filepath: %@, %@",file, err);
+            }
+            [desc addObject:[NSString stringWithFormat:@"%@ : %@ : %@", [file lastPathComponent], (isDir) ? @"dir" : @"file", attrs[NSFileProtectionKey]]];
+        }
+
+        LOG_ERROR(@"Resource (%@) Checking files at dir (%@)\n%@", resource, [dir lastPathComponent], desc);
+    }
+}
+#endif
 
 @end
 
@@ -380,15 +750,11 @@
 - (void)onConnecting {
     LOG_DEBUG(@"onConnecting");
 
-    [sharedDB updateTunnelConnectedState:FALSE];
-
     self.reasserting = TRUE;
 }
 
 - (void)onConnected {
     LOG_DEBUG(@"onConnected");
-
-    [sharedDB updateTunnelConnectedState:TRUE];
 
     if (!vpnStartCompletionHandler) {
         self.reasserting = FALSE;
@@ -401,6 +767,36 @@
 
 - (void)onServerTimestamp:(NSString * _Nonnull)timestamp {
 	[sharedDB updateServerTimestamp:timestamp];
+
+    // Check if user has an active subscription in the device's time
+    // If NO - do nothing
+    // If YES - proceed with checking the subscription against server timestamp
+    if([[IAPReceiptHelper sharedInstance]hasActiveSubscriptionForDate:[NSDate date]]) {
+        // The following code adapted from
+        // https://developer.apple.com/library/content/documentation/Cocoa/Conceptual/DataFormatting/Articles/dfDateFormatting10_4.html
+        NSDateFormatter *rfc3339DateFormatter = [NSDateFormatter createRFC3339Formatter];
+
+        NSString *serverTimestamp = [sharedDB getServerTimestamp];
+        NSDate *serverDate = [rfc3339DateFormatter dateFromString:serverTimestamp];
+        if (serverDate != nil) {
+            if(![[IAPReceiptHelper sharedInstance] hasActiveSubscriptionForDate:serverDate]) {
+                // User is possibly cheating, terminate the app due to 'Invalid Receipt'.
+                // Stop the tunnel, show alert with title and message
+                // and terminate the app due to 'Invalid Receipt' when user clicks 'OK'.
+                NSString *alertMessage = NSLocalizedStringWithDefaultValue(@"BAD_CLOCK_ALERT_MESSAGE", nil, [NSBundle mainBundle], @"We've detected the time on your device is out of sync with your time zone. Please update your clock settings and restart the app", @"Alert message informing user that the device clock needs to be updated with current time");
+                [self stopTunnelWithReason:NEProviderStopReasonNone completionHandler:^{
+                    // Do nothing.
+                }];
+
+                [IAPReceiptHelper terminateForInvalidReceipt];
+
+                [self displayMessage:alertMessage completionHandler:^(BOOL success) {
+                    // Do nothing.
+                }];
+            }
+        }
+    }
+
 }
 
 - (void)onAvailableEgressRegions:(NSArray *)regions {

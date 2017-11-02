@@ -18,7 +18,8 @@
  */
 
 #import "IAPViewController.h"
-#import "IAPHelper.h"
+#import "IAPStoreHelper.h"
+#import "IAPReceiptHelper.h"
 
 
 static NSString *iapCellID = @"IAPTableCellID";
@@ -41,13 +42,13 @@ static NSString *iapCellID = @"IAPTableCellID";
     self.priceFormatter = [[NSNumberFormatter alloc] init];
     self.priceFormatter.formatterBehavior = NSNumberFormatterBehavior10_4;
     self.priceFormatter.numberStyle = NSNumberFormatterCurrencyStyle;
-
+    
     self.tableView = [[UITableView alloc] initWithFrame:CGRectZero style:UITableViewStyleGrouped];
     self.tableView.separatorInset = UIEdgeInsetsMake(0, 0, 0, 0);
     self.tableView.delegate = self;
     self.tableView.dataSource = self;
     self.view = self.tableView;
-
+    
     self.refreshControl = [[UIRefreshControl alloc] init];
     [self.refreshControl addTarget:self action:@selector(startProductsRequest) forControlEvents:UIControlEventValueChanged];
     [self.tableView addSubview:self.refreshControl];
@@ -56,10 +57,10 @@ static NSString *iapCellID = @"IAPTableCellID";
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-
+    
     NSString* title = NSLocalizedStringWithDefaultValue(@"SUBSCRIPTIONS", nil, [NSBundle mainBundle], @"Subscriptions", @"Title of the dialog for available in-app paid subscriptions");
     self.title = title;
-
+    
     if (!_openedFromSettings) {
         NSString* rightButtonTitle = NSLocalizedStringWithDefaultValue(@"DONE_ACTION", nil, [NSBundle mainBundle], @"Done", @"Title of the button that dismisses the subscriptions menu");
         self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc]
@@ -72,8 +73,8 @@ static NSString *iapCellID = @"IAPTableCellID";
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
-
-    if([[IAPHelper sharedInstance].storeProducts count] == 0) {
+    
+    if([[IAPStoreHelper sharedInstance].storeProducts count] == 0) {
         // retry getting products from the store
         [self startProductsRequest];
     }
@@ -82,21 +83,21 @@ static NSString *iapCellID = @"IAPTableCellID";
                                              selector:@selector(reloadProducts)
                                                  name:kIAPSKProductsRequestDidFailWithError
                                                object:nil];
-
+    
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(reloadProducts)
                                                  name:kIAPSKProductsRequestDidReceiveResponse
                                                object:nil];
-
+    
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(reloadProducts)
                                                  name:kIAPSKPaymentTransactionStatePurchased
                                                object:nil];
-
+    
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(reloadProducts)
                                                  name:kIAPSKPaymentQueuePaymentQueueRestoreCompletedTransactionsFinished
-                                               object:nil];
+                                               object:nil];    
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(reloadProducts)
                                                  name:kIAPSKPaymentQueueRestoreCompletedTransactionsFailedWithError
@@ -111,7 +112,7 @@ static NSString *iapCellID = @"IAPTableCellID";
 
 - (void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
-
+    
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
@@ -121,7 +122,7 @@ static NSString *iapCellID = @"IAPTableCellID";
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
     NSInteger numOfSections = 0;
-    if ([[IAPHelper sharedInstance].storeProducts count]) {
+    if ([[IAPStoreHelper sharedInstance].storeProducts count]) {
         self.tableView.separatorStyle = UITableViewCellSeparatorStyleSingleLine;
         numOfSections                 = 1;
         tableView.tableHeaderView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, self.tableView.bounds.size.width, 0.01f)];
@@ -138,17 +139,17 @@ static NSString *iapCellID = @"IAPTableCellID";
         tableView.tableHeaderView = noProductsTextView;
         tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
     }
-
+    
     return numOfSections;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return [[IAPHelper sharedInstance].storeProducts count];
+    return [[IAPStoreHelper sharedInstance].storeProducts count];
 }
 
 - (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section {
     UIView* cellView = [[UIView alloc] initWithFrame:CGRectZero];
-
+    
     UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, cellView.bounds.size.width, cellView.bounds.size.height)];
     label.numberOfLines = 0;
     label.lineBreakMode = NSLineBreakByWordWrapping;
@@ -158,21 +159,21 @@ static NSString *iapCellID = @"IAPTableCellID";
                                                    nil,
                                                    [NSBundle mainBundle],
                                                    @"Remove ads and surf the Internet faster with a premium subscription!",
-                                                   @"Premium subscriptions dialog header text. If “Premium” doesn't easily translate, please choose a term that conveys “Pro” or “Extra” or “Better” or “Elite”.");
+                                                   @"Premium subscriptions dialog header text");
     label.textAlignment = NSTextAlignmentCenter;
     label.translatesAutoresizingMaskIntoConstraints = NO;
-
+    
     [cellView addSubview:label];
-
+    
     [cellView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|-5-[label]-5-|" options:0 metrics:nil views:@{ @"label": label}]];
     [cellView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|-10-[label]-10-|" options:0 metrics:nil views:@{ @"label": label}]];
-
+    
     return cellView;
 }
 
 - (UIView *)tableView:(UITableView *)tableView viewForFooterInSection:(NSInteger)section {
     UIView* cellView = [[UIView alloc] initWithFrame:CGRectZero];
-
+    
     UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, cellView.bounds.size.width, cellView.bounds.size.height)];
     label.numberOfLines = 0;
 
@@ -185,10 +186,10 @@ static NSString *iapCellID = @"IAPTableCellID";
                                                    @"Buy subscription dialog footer text");
     label.textAlignment = NSTextAlignmentLeft;
     label.translatesAutoresizingMaskIntoConstraints = NO;
-
+    
     [cellView addSubview:label];
-
-
+    
+    
     NSString *restoreButtonTitle = NSLocalizedStringWithDefaultValue(@"RESTORE_SUBSCRIPTION_BUTTON_TITLE",
                                                                      nil,
                                                                      [NSBundle mainBundle],
@@ -199,7 +200,7 @@ static NSString *iapCellID = @"IAPTableCellID";
     [restoreButton addTarget:self action:@selector(restoreAction) forControlEvents:UIControlEventTouchUpInside];
     restoreButton.translatesAutoresizingMaskIntoConstraints = NO;
     [cellView addSubview:restoreButton];
-
+    
     NSString *refreshButtonTitle = NSLocalizedStringWithDefaultValue(@"REFRESH_APP_RECEIPT_BUTTON_TITLE",
                                                                      nil,
                                                                      [NSBundle mainBundle],
@@ -210,7 +211,7 @@ static NSString *iapCellID = @"IAPTableCellID";
     [refreshButton addTarget:self action:@selector(refreshReceiptAction) forControlEvents:UIControlEventTouchUpInside];
     refreshButton.translatesAutoresizingMaskIntoConstraints = NO;
     [cellView addSubview:refreshButton];
-
+    
 
     [cellView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|-[label]-|" options:0 metrics:nil views:@{ @"label": label}]];
     [cellView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|-[restoreButton]-|" options:0 metrics:nil views:@{ @"restoreButton": restoreButton}]];
@@ -218,41 +219,42 @@ static NSString *iapCellID = @"IAPTableCellID";
     [cellView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|-10-[label]-10-[restoreButton]-10-[refreshButton]-|"
                                                                      options:0 metrics:nil
 																	   views:@{ @"label": label, @"restoreButton": restoreButton, @"refreshButton": refreshButton}]];
-
+    
     return cellView;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    SKProduct * product = (SKProduct *) [IAPHelper sharedInstance].storeProducts[indexPath.row];
-
+    SKProduct * product = (SKProduct *) [IAPStoreHelper sharedInstance].storeProducts[indexPath.row];
+    
     IAPTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:iapCellID];
     if (cell == nil) {
         cell = [[IAPTableViewCell alloc]initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:iapCellID];
-
+        
         self.tableView.rowHeight = UITableViewAutomaticDimension;
         self.tableView.estimatedRowHeight = 66.0f;
-
+        
         self.tableView.sectionFooterHeight = UITableViewAutomaticDimension;
         self.tableView.estimatedSectionFooterHeight = 66.0f;
-
+        
         self.tableView.sectionHeaderHeight = UITableViewAutomaticDimension;
         self.tableView.estimatedSectionHeaderHeight = 66.0f;
     }
-
+    
     [self.priceFormatter setLocale:product.priceLocale];
     NSString *localizedPrice = [self.priceFormatter stringFromNumber:product.price];
     cell.detailTextLabel.text = product.localizedDescription;
     cell.textLabel.text = product.localizedTitle;
-
-    RMAppReceipt *receipt = [[IAPHelper sharedInstance] appReceipt];
-	RMAppReceiptIAP *activeSubscriptionReceipt = nil;
+    
+    RMAppReceipt *receipt = [[IAPReceiptHelper sharedInstance] appReceipt];
+    BOOL isActiveSubscription = NO;
+    NSDate *subscriptionExpirationDate = nil;
 
 	if(receipt) {
-		activeSubscriptionReceipt = [receipt getActiveAutoRenewableSubscriptionOfProductIdentifier:product.productIdentifier
-																		 forDate:[NSDate date]];
+        subscriptionExpirationDate = [receipt.inAppSubscriptions objectForKey:product.productIdentifier];
+        isActiveSubscription = (subscriptionExpirationDate && [[NSDate date] compare:subscriptionExpirationDate] != NSOrderedDescending);
 	}
 
-    if (activeSubscriptionReceipt) {
+    if (isActiveSubscription) {
         cell.accessoryType = UITableViewCellAccessoryCheckmark;
         cell.accessoryView = nil;
 
@@ -264,7 +266,7 @@ static NSString *iapCellID = @"IAPTableCellID";
 
 		NSDateFormatter* df = [NSDateFormatter new];
 		df.dateFormat= [NSDateFormatter dateFormatFromTemplate:@"MMddYY" options:0 locale:[NSLocale currentLocale]];
-		NSString *dateString = [df stringFromDate:activeSubscriptionReceipt.subscriptionExpirationDate];
+		NSString *dateString = [df stringFromDate:subscriptionExpirationDate];
 
 		cell.detailTextLabel.text = [NSString stringWithFormat:detailTextFormat, dateString, localizedPrice];
     } else {
@@ -276,7 +278,7 @@ static NSString *iapCellID = @"IAPTableCellID";
             forControlEvents:UIControlEventValueChanged];
         cell.accessoryView = buyButton;
     }
-
+    
     return cell;
 }
 
@@ -294,10 +296,10 @@ static NSString *iapCellID = @"IAPTableCellID";
 
 - (void)buyButtonPressed:(UISegmentedControl *)sender {
     int productID = (int)sender.tag;
-
-    if([IAPHelper sharedInstance].storeProducts.count > productID) {
-        SKProduct* product = [IAPHelper sharedInstance].storeProducts[productID];
-        [[IAPHelper sharedInstance] buyProduct:product];
+    
+    if([IAPStoreHelper sharedInstance].storeProducts.count > productID) {
+        SKProduct* product = [IAPStoreHelper sharedInstance].storeProducts[productID];
+        [[IAPStoreHelper sharedInstance] buyProduct:product];
     }
 }
 
@@ -306,7 +308,7 @@ static NSString *iapCellID = @"IAPTableCellID";
         [self.refreshControl beginRefreshing];
         [self.tableView setContentOffset:CGPointMake(0, self.tableView.contentOffset.y-self.refreshControl.frame.size.height) animated:YES];
     }
-    [[IAPHelper sharedInstance] restoreSubscriptions];
+    [[IAPStoreHelper sharedInstance] restoreSubscriptions];
 }
 
 - (void)refreshReceiptAction {
@@ -314,7 +316,7 @@ static NSString *iapCellID = @"IAPTableCellID";
         [self.refreshControl beginRefreshing];
         [self.tableView setContentOffset:CGPointMake(0, self.tableView.contentOffset.y-self.refreshControl.frame.size.height) animated:YES];
     }
-    [[IAPHelper sharedInstance] refreshReceipt];
+    [[IAPStoreHelper sharedInstance] refreshReceipt];
 }
 
 - (void)dismissViewController {
@@ -337,7 +339,7 @@ static NSString *iapCellID = @"IAPTableCellID";
         [self.refreshControl beginRefreshing];
         [self.tableView setContentOffset:CGPointMake(0, self.tableView.contentOffset.y-self.refreshControl.frame.size.height) animated:YES];
     }
-    [[IAPHelper sharedInstance] startProductsRequest];
+    [[IAPStoreHelper sharedInstance] startProductsRequest];
 }
 
 
@@ -356,12 +358,12 @@ static NSString *iapCellID = @"IAPTableCellID";
         self.detailTextLabel.lineBreakMode = NSLineBreakByWordWrapping;
         self.detailTextLabel.numberOfLines = 0;
         self.detailTextLabel.translatesAutoresizingMaskIntoConstraints = NO;
-
+        
         [self.contentView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|-[textLabel]-|" options:0 metrics:nil views:@{ @"textLabel": self.textLabel}]];
         [self.contentView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|-[detailTextLabel]-|" options:0 metrics:nil views:@{ @"detailTextLabel": self.detailTextLabel}]];
         [self.contentView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|-[textLabel][detailTextLabel]-|" options:0 metrics:nil views:@{ @"textLabel": self.textLabel, @"detailTextLabel": self.detailTextLabel}]];
     }
-
+    
     return self;
 }
 

@@ -27,7 +27,8 @@
 #import "VPNManager.h"
 #import "AdManager.h"
 #import "Logging.h"
-#import "IAPHelper.h"
+#import "IAPStoreHelper.h"
+#import "IAPReceiptHelper.h"
 #import "IAPViewController.h"
 
 #if DEBUG
@@ -102,7 +103,7 @@
     [self initializeDefaults];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(switchViewControllerWhenAdsLoaded) name:@kAdsDidLoad object:adManager];
 
-    [[IAPHelper sharedInstance] startProductsRequest];
+    [[IAPStoreHelper sharedInstance] startProductsRequest];
 
     return YES;
 }
@@ -156,13 +157,18 @@
     // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
     [sharedDB updateAppForegroundState:YES];
 
+
     // If the extension has been waiting for the app to come into foreground,
     // send the VPNManager startVPN message again.
     dispatch_async(dispatch_get_main_queue(), ^{
         // If the tunnel is in Connected state, and we're now showing ads
         // send startVPN message.
-        if (![adManager untunneledInterstitialIsShowing] && [vpnManager isTunnelConnected]) {
-            [vpnManager startVPN];
+        if (![adManager untunneledInterstitialIsShowing]) {
+            [vpnManager isTunnelConnected:^(BOOL tunnelIsConnected) {
+                if (tunnelIsConnected) {
+                    [vpnManager startVPN];
+                }
+            }];
         }
     });
 }
@@ -183,17 +189,19 @@
 
     NetworkStatus networkStatus = [[Reachability reachabilityForInternetConnection] currentReachabilityStatus];
 
-    if ( networkStatus != NotReachable
-      && ([vpnManager getVPNStatus] == VPNStatusDisconnected || [vpnManager getVPNStatus] == VPNStatusInvalid)
-      && ![adManager untunneledInterstitialIsReady] && ![adManager untunneledInterstitialHasShown] && ![vpnManager startStopButtonPressed]
+    if (networkStatus != NotReachable
+        && ([vpnManager getVPNStatus] == VPNStatusDisconnected || [vpnManager getVPNStatus] == VPNStatusInvalid)
+        && ![adManager untunneledInterstitialIsReady] && ![adManager untunneledInterstitialHasShown] && ![vpnManager startStopButtonPressed]
         && [adManager shouldShowUntunneledAds]) {
+
         [adManager initializeAds];
         self.window.rootViewController = launchScreenViewController;
         if (timerCount <= 0) {
-            // Reset timer to 10 if it's 0 and need load ads again.
-            timerCount = 10;
+            // Reset timer tokLaunchScreenTimerCount if it's 0 and need load ads again.
+            timerCount = kLaunchScreenTimerCount;
         }
         [self startLaunchingScreenTimer];
+
     } else {
         self.window.rootViewController = mainViewController;
     }
@@ -287,8 +295,8 @@
     [notifier listenForNotification:@"NE.tunnelConnected" listener:^{
         LOG_DEBUG(@"Received notification NE.tunnelConnected");
         // Check if user has an active subscription but the receipt is not valid.
-        IAPHelper *iapHelper = [IAPHelper sharedInstance];
-        if([iapHelper hasActiveSubscriptionForDate:[NSDate date]] && ![iapHelper verifyReceipt]) {
+        IAPReceiptHelper *iapReceiptHelper = [IAPReceiptHelper sharedInstance];
+        if([iapReceiptHelper hasActiveSubscriptionForDate:[NSDate date]] && ![iapReceiptHelper verifyReceipt]) {
             // Stop the VPN and prompt user to refresh app receipt.
             [vpnManager stopVPN];
             NSString *alertTitle = NSLocalizedStringWithDefaultValue(@"BAD_RECEIPT_ALERT_TITLE", nil, [NSBundle mainBundle], @"Invalid app receipt", @"Alert title informing user that app receipt is not valid");
@@ -312,52 +320,6 @@
             [alert addAction:defaultAction];
             [[AppDelegate topMostController] presentViewController:alert animated:TRUE completion:nil];
             return;
-        }
-
-        // Check if user has an active subscription in the device's time
-        // If NO - do nothing
-        // If YES - proceed with checking the subscription against server timestamp
-        if([[IAPHelper sharedInstance]hasActiveSubscriptionForDate:[NSDate date]]) {
-            // The following code adapted from
-            // https://developer.apple.com/library/content/documentation/Cocoa/Conceptual/DataFormatting/Articles/dfDateFormatting10_4.html
-            static NSDateFormatter *sRFC3339DateFormatter;
-            static dispatch_once_t once;
-            dispatch_once(&once, ^{
-                sRFC3339DateFormatter = [[NSDateFormatter alloc] init];
-                sRFC3339DateFormatter.locale = [NSLocale localeWithLocaleIdentifier:@"en_US_POSIX"];
-                sRFC3339DateFormatter.dateFormat = @"yyyy'-'MM'-'dd'T'HH':'mm':'ss'Z'";
-                sRFC3339DateFormatter.timeZone = [NSTimeZone timeZoneForSecondsFromGMT:0];
-            });
-
-            NSString *serverTimestamp = [sharedDB getServerTimestamp];
-            NSDate *serverDate = [sRFC3339DateFormatter dateFromString:serverTimestamp];
-            if (serverDate != nil) {
-                if(![[IAPHelper sharedInstance]hasActiveSubscriptionForDate:serverDate]) {
-                    // User is possibly cheating, terminate the app due to 'Invalid Receipt'.
-                    // Stop the tunnel, show alert with title and message
-                    // and terminate the app due to 'Invalid Receipt' when user clicks 'OK'.
-                    [vpnManager stopVPN];
-
-                    NSString *alertTitle = NSLocalizedStringWithDefaultValue(@"BAD_CLOCK_ALERT_TITLE", nil, [NSBundle mainBundle], @"Clock is out of sync", @"Alert title informing user that the device clock needs to be updated with current time");
-
-                    NSString *alertMessage = NSLocalizedStringWithDefaultValue(@"BAD_CLOCK_ALERT_MESSAGE", nil, [NSBundle mainBundle], @"We've detected the time on your device is out of sync with your time zone. Please update your clock settings and restart the app", @"Alert message informing user that the device clock needs to be updated with current time");
-
-                    UIAlertController *alert = [UIAlertController
-                                                alertControllerWithTitle:alertTitle
-                                                message:alertMessage
-                                                preferredStyle:UIAlertControllerStyleAlert];
-
-                    UIAlertAction *defaultAction = [UIAlertAction
-                                                    actionWithTitle:NSLocalizedStringWithDefaultValue(@"OK_BUTTON", nil, [NSBundle mainBundle], @"OK", @"Alert OK Button")
-                                                    style:UIAlertActionStyleDefault
-                                                    handler:^(UIAlertAction *action) {
-                                                        [[IAPHelper sharedInstance] terminateForInvalidReceipt];
-                                                    }];
-                    [alert addAction:defaultAction];
-                    [[AppDelegate topMostController] presentViewController:alert animated:TRUE completion:nil];
-                    return;
-                }
-            }
         }
 
         // If we haven't had a chance to load an Ad, and the

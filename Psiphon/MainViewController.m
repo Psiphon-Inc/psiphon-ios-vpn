@@ -37,7 +37,9 @@
 #import "Logging.h"
 #import "IAPViewController.h"
 #import "AppDelegate.h"
-#import "IAPHelper.h"
+#import "IAPStoreHelper.h"
+#import "IAPReceiptHelper.h"
+#import "SettingsViewController.h"
 
 static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSString *b) {
     return (([a length] == 0) && ([b length] == 0)) || ([a isEqualToString:b]);
@@ -291,10 +293,44 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 
     } else {
         LOG_DEBUG(@"call [vpnManager stopVPN]");
-        [vpnManager stopVPN];
+
+        if ([vpnManager isOnDemandEnabled]) {
+            // Alert the user that Connect On Demand is enabled, and if they
+            // would like Connect On Demand to be disabled, and the extension to be stopped.
+            NSString *alertTitle = NSLocalizedStringWithDefaultValue(@"CONNECT_ON_DEMAND_ALERT_TITLE", nil, [NSBundle mainBundle], @"Auto-start VPN is enabled", @"Alert dialog title informing user that 'Auto-start VPN' feature is enabled");
+            NSString *alertMessage = NSLocalizedStringWithDefaultValue(@"CONNECT_ON_DEMAND_ALERT_BODY", nil, [NSBundle mainBundle], @"Cannot stop the VPN while \"Auto-start VPN\" is enabled.\nWould you like to disable \"Auto-start VPN\" on demand and stop the VPN?", "Alert dialog body informing the user that the 'Auto-start VPN on demand' feature is enabled and that the VPN cannot be stopped. Followed by asking the user if they would like to disable the 'Auto-start VPN on demand' feature, and stop the VPN.");
+
+            UIAlertController *alert = [UIAlertController
+              alertControllerWithTitle:alertTitle message:alertMessage preferredStyle:UIAlertControllerStyleAlert];
+
+            UIAlertAction *disableAction = [UIAlertAction
+              actionWithTitle:NSLocalizedStringWithDefaultValue(@"DISABLE_BUTTON", nil, [NSBundle mainBundle], @"Disable Auto-start VPN and Stop", @"Disable Auto-start VPN feature and Stop the VPN button label")
+                        style:UIAlertActionStyleDestructive
+                      handler:^(UIAlertAction *action) {
+                          // Disable "Connect On Demand" and stop the VPN.
+                          [vpnManager updateVPNConfigurationOnDemandSetting:FALSE completionHandler:^(NSError *error) {
+                              [vpnManager stopVPN];
+                          }];
+                      }];
+
+            UIAlertAction *cancelAction = [UIAlertAction
+              actionWithTitle:NSLocalizedStringWithDefaultValue(@"CANCEL_BUTTON", nil, [NSBundle mainBundle], @"Cancel", @"Alert Cancel button")
+                        style:UIAlertActionStyleCancel
+                      handler:^(UIAlertAction *action) {
+                        // Do nothing
+                      }];
+
+            [alert addAction:disableAction];
+            [alert addAction:cancelAction];
+            [self presentViewController:alert animated:TRUE completion:nil];
+
+        } else {
+            [vpnManager stopVPN];
+        }
 
         [self removePulsingHaloLayer];
     }
+
     [self updateSubscriptionUI];
 }
 
@@ -356,6 +392,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
         case VPNStatusReasserting: return NSLocalizedStringWithDefaultValue(@"VPN_STATUS_RECONNECTING", nil, [NSBundle mainBundle], @"Reconnecting", @"Status when the VPN was connected to a Psiphon server, got disconnected unexpectedly, and is currently trying to reconnect");
         case VPNStatusRestarting: return NSLocalizedStringWithDefaultValue(@"VPN_STATUS_RESTARTING", nil, [NSBundle mainBundle], @"Restarting", @"Status when the VPN is restarting.");
     }
+    LOG_ERROR(@"MainViewController unhandled VPNStatus (%ld)", status);
     return nil;
 }
 
@@ -936,7 +973,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     NSString *bundledConfigStr = [PsiphonClientCommonLibraryHelpers getPsiphonBundledConfig];
 
     // Return bundled config as is if user doesn't have an active subscription
-    if(![[IAPHelper sharedInstance]hasActiveSubscriptionForDate:[NSDate date]]) {
+    if(![[IAPReceiptHelper sharedInstance]hasActiveSubscriptionForDate:[NSDate date]]) {
         return bundledConfigStr;
     }
 
@@ -1038,7 +1075,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 - (void)settingsWillDismissWithForceReconnect:(BOOL)forceReconnect {
     if (forceReconnect) {
         [self persistSettingsToSharedUserDefaults];
-        [vpnManager restartVPN];
+        [vpnManager restartVPNIfActive];
     }
 }
 
@@ -1114,7 +1151,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     if (!safeStringsEqual(selectedRegion, selectedRegionSnapShot)) {
         [self persistSelectedRegion];
         [self updateRegionButton];
-        [vpnManager restartVPN];
+        [vpnManager restartVPNIfActive];
     }
     [regionSelectionNavController dismissViewControllerAnimated:YES completion:nil];
     regionSelectionNavController = nil;
@@ -1278,7 +1315,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 }
 
 - (void) updateSubscriptionUI {
-    if(![IAPHelper canMakePayments] || [[IAPHelper sharedInstance]hasActiveSubscriptionForDate:[NSDate date]]) {
+    if(![IAPStoreHelper canMakePayments] || [[IAPReceiptHelper sharedInstance]hasActiveSubscriptionForDate:[NSDate date]]) {
         subscriptionButton.hidden = YES;
         adLabel.hidden = YES;
         subscriptionButtonTop.active = NO;
@@ -1312,12 +1349,13 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
         if(bundledConfigStr) {
             NSDictionary *config = [PsiphonClientCommonLibraryHelpers jsonToDictionary:bundledConfigStr];
             if (config) {
-                NSDictionary *subscriptionConfig = [config objectForKey:@"subscriptionConfig"];
+                NSDictionary *subscriptionConfig = config[@"subscriptionConfig"];
                 if(subscriptionConfig[@"SponsorId"] && !([sharedDB getSponsorId].length)) {
-                    [vpnManager restartVPN];
+                    [vpnManager restartVPNIfActive];
                 }
             }
         }
     }
 }
+
 @end

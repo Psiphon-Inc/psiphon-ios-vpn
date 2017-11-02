@@ -28,7 +28,6 @@
 
 /* Shared NSUserDefaults keys */
 #define EGRESS_REGIONS_KEY @"egress_regions"
-#define TUN_CONNECTED_KEY @"tun_connected"
 #define APP_FOREGROUND_KEY @"app_foreground"
 #define SERVER_TIMESTAMP_KEY @"server_timestamp"
 #define SPONSOR_ID_KEY @"sponsor_id"
@@ -353,30 +352,6 @@
 }
 
 #endif
-
-#pragma mark - Tunnel State table methods
-
-/**
- * @brief Sets tunnel connection state in shared NSUserDefaults dictionary.
- *        NOTE: This method blocks until changes are written to disk.
- * @param connected Tunnel core connected status.
- * @return TRUE if change was persisted to disk successfully, FALSE otherwise.
- */
-- (BOOL)updateTunnelConnectedState:(BOOL)connected {
-    [sharedDefaults setBool:connected forKey:TUN_CONNECTED_KEY];
-    return [sharedDefaults synchronize];
-}
-
-/**
- * @brief Returns previously persisted tunnel state from the shared NSUserDefaults.
- *        This state is invalid if the network extension is not running.
- *        NOTE: returns FALSE if no previous value was set using updateTunnelConnectedState:
- * @return TRUE if tunnel is connected, FALSE otherwise.
- */
-- (BOOL)getTunnelConnectedState {
-    // Returns FALSE if no previous value was associated with this key.
-    return [sharedDefaults boolForKey:TUN_CONNECTED_KEY];
-}
 
 # pragma mark - App State table methods
 

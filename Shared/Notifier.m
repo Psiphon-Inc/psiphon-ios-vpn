@@ -20,7 +20,6 @@
 #import <NetworkExtension/NetworkExtension.h>
 #import "Notifier.h"
 #import "Logging.h"
-#import "NoticeLogger.h"
 
 @implementation Notifier {
     NSMutableDictionary *listeners;

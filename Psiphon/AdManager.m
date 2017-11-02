@@ -22,7 +22,7 @@
 #import "VPNManager.h"
 #import "AppDelegate.h"
 #import "Logging.h"
-#import "IAPHelper.h"
+#import "IAPReceiptHelper.h"
 
 @import GoogleMobileAds;
 
@@ -102,7 +102,7 @@
 
 - (BOOL)shouldShowUntunneledAds {
     // Check if user has an active subscription first
-    BOOL hasActiveSubscription = [[IAPHelper sharedInstance] hasActiveSubscriptionForDate:[NSDate date]];
+    BOOL hasActiveSubscription = [[IAPReceiptHelper sharedInstance] hasActiveSubscriptionForDate:[NSDate date]];
 
     NetworkStatus networkStatus = [[Reachability reachabilityForInternetConnection] currentReachabilityStatus];
     VPNStatus vpnStatus = [vpnManager getVPNStatus];

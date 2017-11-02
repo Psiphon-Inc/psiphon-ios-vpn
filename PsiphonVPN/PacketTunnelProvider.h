@@ -19,12 +19,18 @@
 
 #import <NetworkExtension/NEPacketTunnelProvider.h>
 
+// Name of the file in shared container used to test if the extension has started,
+// while the device is in locked state from boot.
+#define BOOT_TEST_FILE_NAME @"boot_test_file"
+
 // PsiphonTunnel Errors
-#define PSIPHON_TUNNEL_ERROR_DOMAIN             @"psiphonTunnelErrorSettingsDomain"
-#define PSIPHON_TUNNEL_ERROR_BAD_CONFIGURATION  1
-#define PSIPHON_TUNNEL_ERROR_INTERAL_ERROR      2
-#define PSIPHON_TUNNEL_ERROR_BAD_START          3  // Error code for when the user tries to start the VPN anywhere butthe container app.
-#define PSIPHON_TUNNEL_ERROR_STOPPED_BEFORE_CONNECTED 4
+#define kPsiphonTunnelErrorDomain @"psiphonTunnelErrorSettingsDomain"
+
+typedef NS_ENUM(NSInteger, PacketTunnelProviderErrorCode) {
+    PsiphonTunnelErrorBadConfiguration = 1,
+    PsiphonTunnelErrorInternalError = 2,
+    PsiphonTunnelErrorStoppedBeforeConnected = 3,
+};
 
 @interface PacketTunnelProvider : NEPacketTunnelProvider
 

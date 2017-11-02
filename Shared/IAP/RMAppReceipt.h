@@ -17,6 +17,24 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 //
+/*
+ * Copyright (c) 2017, Psiphon Inc.
+ * All rights reserved.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
 
 #import <Foundation/Foundation.h>
 
@@ -54,7 +72,7 @@ __attribute__((availability(ios,introduced=7.0)))
 /** Array of in-app purchases contained in the receipt.
  @see RMAppReceiptIAP
  */
-@property (nonatomic, strong, readonly) NSArray *inAppPurchases;
+@property (nonatomic, strong, readonly) NSDictionary<NSString*, NSDate*> *inAppSubscriptions;
 
 /** The version of the app that was originally purchased. This corresponds to the value of CFBundleVersion (in iOS) or CFBundleShortVersionString (in OS X) in the Info.plist file when the purchase was originally made. In the sandbox environment, the value of this field is always “1.0”.
  */
@@ -70,21 +88,6 @@ __attribute__((availability(ios,introduced=7.0)))
  */
 - (instancetype)initWithASN1Data:(NSData*)asn1Data NS_DESIGNATED_INITIALIZER;
 - (instancetype)init NS_UNAVAILABLE;
-
-/** Returns whether there is an in-app purchase in the receipt for the given product.
- @param productIdentifier The identifier of the product.
- @return YES if there is an in-app purchase for the given product, NO otherwise.
- */
-- (BOOL)containsInAppPurchaseOfProductIdentifier:(NSString*)productIdentifier;
-
-/** Returns whether the receipt contains an active auto-renewable subscription for the given product identifier and for the given date.
- @param productIdentifier The identifier of the auto-renewable subscription.
- @param date The date in which the latest auto-renewable subscription should be active. If you are using the current date, you might not want to take it from the device in case the user has changed it.
- @return YES if the latest auto-renewable subscription is active for the given date, NO otherwise.
- @warning Auto-renewable subscription lapses are possible. If you are checking against the current date, you might want to deduct some time as tolerance.
- @warning If this method fails Apple recommends to refresh the receipt and try again once.
- */
-- (RMAppReceiptIAP *)getActiveAutoRenewableSubscriptionOfProductIdentifier:(NSString *)productIdentifier forDate:(NSDate *)date;
 
 /** Returns wheter the receipt hash corresponds to the device's GUID by calcuting the expected hash using the GUID, bundleIdentifierData and opaqueValue.
  @return YES if the hash contained in the receipt corresponds to the device's GUID, NO otherwise.
