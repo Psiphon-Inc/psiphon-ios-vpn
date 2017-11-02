@@ -40,17 +40,17 @@ en:
 
   subscriptions:
     weekly:
-      # 1 week subscription title.
+      # 1 week subscription title. If “Premium” doesn't easily translate, please choose a term that conveys “Pro” or “Extra” or “Better” or “Elite”.
       title: Premium 1 week
       # 1 week subscription description.
       description: Auto-renewable subscription
     monthly:
-      # 1 month subscription title.
+      # 1 month subscription title. If “Premium” doesn't easily translate, please choose a term that conveys “Pro” or “Extra” or “Better” or “Elite”.
       title: Premium 1 month
       # 1 month subscription description.
       description: Auto-renewable subscription
     yearly:
-      # 1 year subscription title.
+      # 1 year subscription title. If “Premium” doesn't easily translate, please choose a term that conveys “Pro” or “Extra” or “Better” or “Elite”.
       title: Premium 1 year
       # 1 year subscription description
       description: Auto-renewable subscription
