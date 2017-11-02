@@ -86,14 +86,18 @@
             [self loadUntunneledInterstitial];
         }
     } else if (!self.untunneledInterstitialIsShowing) {
-       LOG_DEBUG(@"Deinitializing");
-        // De-init code.
-        [MPInterstitialAdController removeSharedInterstitialAdController:self.untunneledInterstitial];
-        self.untunneledInterstitial = nil;
-        self.untunneledInterstitialHasShown = FALSE;
-
-        [self postAdsLoadStateDidChangeNotification];
+        [self deinitializeAds];
     }
+}
+
+- (void)deinitializeAds {
+    LOG_DEBUG(@"Deinitializing");
+    // De-init code.
+    [MPInterstitialAdController removeSharedInterstitialAdController:self.untunneledInterstitial];
+    self.untunneledInterstitial = nil;
+    self.untunneledInterstitialHasShown = FALSE;
+    
+    [self postAdsLoadStateDidChangeNotification];
 }
 
 - (BOOL)shouldShowUntunneledAds {
@@ -156,7 +160,7 @@
    LOG_DEBUG();
     
     // Don't retry.
-    [self postAdsLoadStateDidChangeNotification];
+    [self deinitializeAds];
 }
 
 - (void)interstitialDidExpire:(MPInterstitialAdController *)interstitial {
