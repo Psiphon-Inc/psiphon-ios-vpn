@@ -1,38 +1,38 @@
+/* Active subscription detail text, example: Expires on 2017-01-01, renewal cost is $3.99 */
+"ACTIVE_SUBSCRIPTION_DETAIL_TEXT" = "Expire le %1$@, le coût de renouvellement est %2$@";
+
 /* Text for button that tell users there will by a short video ad. */
 "AD_LOADED" = "Regardez une courte vidéo pendant que nous nous préparons à vous connecter";
 
 /* Text for app subtitle on main view. */
 "APP_SUB_TITLE_MAIN_VIEW" = "PAR-DELÀ LES FRONTIÈRES";
 
-/*[UNTRANSLATED] Text for app title on main view. */
-"APP_TITLE_MAIN_VIEW" = "PSIPHON";
+/* Text showing the app version. The '%@' placeholder is the version number. So it will look like 'v.2'. */
+"APP_VERSION" = "v. %@";
 
-/*[UNTRANSLATED] Text showing the app version. The '%@' placeholder is the version number. So it will look like 'v.2'. */
-"APP_VERSION" = "v.%@";
+/* Alert message informing user that the device clock needs to be updated with current time */
+"BAD_CLOCK_ALERT_MESSAGE" = "Nous avons détecté que l’heure de votre appareil n’est pas synchronisée avec votre fuseau horaire. Veuillez mettre vos paramètres d’horloge à jour et redémarrer l’appli";
 
-/*[UNTRANSLATED] Alert message informing user that the device clock needs to be updated with current time */
-"BAD_CLOCK_ALERT_MESSAGE" = "We've detected the time on your device is out of sync with your time zone. Please update your clock settings and restart the app";
+/* Alert title informing user that the device clock needs to be updated with current time */
+"BAD_CLOCK_ALERT_TITLE" = "L’horloge est désynchronisée";
 
-/*[UNTRANSLATED] Alert title informing user that the device clock needs to be updated with current time */
-"BAD_CLOCK_ALERT_TITLE" = "Clock is out of sync";
+/* Alert message informing user that subscription receipt can not be verified */
+"BAD_RECEIPT_ALERT_MESSAGE" = "Votre reçu d’abonnement ne peut pas être vérifié, veuillez l’actualiser et essayer de nouveau.";
 
-/*[UNTRANSLATED] Alert message informing user that subscription receipt can not be verified */
-"BAD_RECEIPT_ALERT_MESSAGE" = "Your subscription receipt can not be verified, please refresh it and try again.";
+/* Alert title informing user that app receipt is not valid */
+"BAD_RECEIPT_ALERT_TITLE" = "Le reçu d’appli est invalide";
 
-/*[UNTRANSLATED] Alert title informing user that app receipt is not valid */
-"BAD_RECEIPT_ALERT_TITLE" = "Invalid app receipt";
+/* Buy subscription dialog footer text */
+"BUY_SUBSCRIPTIONS_FOOTER_TEXT" = "Après achat, un abonnement sera renouvelé automatiquement jusqu’à ce que vous l’annuliez 24 heures avant la fin de la période actuelle.\n\nLe renouvellement, soit le coût de l’abonnement, sera facturé à votre compte iTunes dans les 24 heures avant la fin de la période actuelle.\n\nGérez votre abonnement et le renouvellement automatique en vous rendant dans les réglages de votre compte.";
 
-/*[UNTRANSLATED] Buy subscription dialog footer text */
-"BUY_SUBSCRIPTIONS_FOOTER_TEXT" = "Restore previously bought subscription or refresh subscription receipt";
-
-/*[UNTRANSLATED] Buy subscription dialog header text */
-"BUY_SUBSCRIPTIONS_HEADER_TEXT" = "Buy a subscription to remove ads and surf the Internet faster!";
+/*[UNTRANSLATED] Premium subscriptions dialog header text */
+"BUY_SUBSCRIPTIONS_HEADER_TEXT" = "Remove ads and surf the Internet faster with a premium subscription!";
 
 /* Text above change region button that allows user to select their desired server region */
 "CHANGE_REGION" = "Changer de région";
 
-/*[UNTRANSLATED] Main text in the 'Upstream Proxy Error' dialog box. This is shown when the user has directly altered these settings, and those settings are (probably) erroneous. */
-"CHECK_UPSTREAM_PROXY_SETTING" = "You have configured Psiphon to use an upstream proxy.\nHowever, we seem to be unable to connect to a Psiphon server through that proxy.\nPlease fix the settings and try again.";
+/* Main text in the 'Upstream Proxy Error' dialog box. This is shown when the user has directly altered these settings, and those settings are (probably) erroneous. DO NOT translate 'Psiphon'. */
+"CHECK_UPSTREAM_PROXY_SETTING" = "Vous avez configuré Psiphon pour qu’il utilise un serveur mandataire ascendant.\nCependant, il semble que nous ne soyons pas en mesure de nous connecter à un serveur Psiphon par ce mandataire.\nVeuillez corriger les paramètres et ressayer.";
 
 /* Title of the button that dismisses region selection dialog
    Title of the button that dismisses the subscriptions menu */
@@ -41,26 +41,23 @@
 /* Text displayed while app loads */
 "LOADING" = "Chargement...";
 
-/*[UNTRANSLATED] Manage my subscriptions button title */
-"MANAGE_SUBSCRIPTIONS_BUTTON_TITLE" = "Manage my subscriptions";
-
 /* Alert title informing user there is no internet connection */
 "NO_INTERNET" = "Aucune connexion Internet";
 
-/*[UNTRANSLATED] Subscriptions view text that is visible when the list of subscriptions is not available */
-"NO_PRODUCTS_TEXT" = "Could not retrieve subscriptions from the App Store. Pull to refresh or try again later.";
+/* Subscriptions view text that is visible when the list of subscriptions is not available */
+"NO_PRODUCTS_TEXT" = "Impossible de récupérer les abonnements de la logithèque App Store. Tirez vers le bas pour actualiser ou ressayez ultérieurement.";
 
 /*[UNTRANSLATED] Alert OK Button */
 "OK_BUTTON" = "OK";
 
-/* Alert message informing the user they should open the app to finish connecting to the VPN. */
-"OPEN_PSIPHON_APP" = "Veuillez ouvrir l'appli Psiphon pour finir de vous connecter.";
+/* Alert message informing the user they should open the app to finish connecting to the VPN. DO NOT translate 'Psiphon'. */
+"OPEN_PSIPHON_APP" = "Veuillez ouvrir l’appli Psiphon pour finir de vous connecter.";
 
-/*[UNTRANSLATED] Refresh app receipt button title */
-"REFRESH_APP_RECEIPT_BUTTON_TITLE" = "Refresh receipt";
+/* Refresh app receipt button title */
+"REFRESH_APP_RECEIPT_BUTTON_TITLE" = "Actualiser le reçu de l’appli";
 
-/*[UNTRANSLATED] Restore my subscription button title */
-"RESTORE_SUBSCRIPTION_BUTTON_TITLE" = "Restore my subscription";
+/* Restore my subscription button title */
+"RESTORE_SUBSCRIPTION_BUTTON_TITLE" = "Restaurer mon abonnement existant";
 
 /* Subscriptions item title in the app settings when user has an active subscription. Clicking this item opens subscriptions view */
 "SETTINGS_SUBSCRIPTION_ACTIVE" = "Abonnements";
@@ -77,8 +74,8 @@
 /* Alert message informing user to turn on their cellular data or wifi to connect to the internet */
 "TURN_ON_DATE" = "Activez les données cellulaires ou utilisez le Wi-Fi pour accéder aux données.";
 
-/* Alert message informing user they have to open the app */
-"USE_PSIPHON_APP" = "Pour vous connecter, utilisez l'appli Psiphon.";
+/* Alert message informing user they have to open the app. DO NOT translate 'Psiphon'. */
+"USE_PSIPHON_APP" = "Pour vous connecter, utilisez l’appli Psiphon.";
 
 /* Status when the VPN is connected to a Psiphon server */
 "VPN_STATUS_CONNECTED" = "Connecté";
