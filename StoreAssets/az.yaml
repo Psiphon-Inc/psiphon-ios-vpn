@@ -1,14 +1,11 @@
-az:
-  app_name: Psiphon
-  subtitle: Sərhədsiz
-  description: |
-    On milyonlarla insana sevdikləri saytlara giriş imkanı verdikdən sonra Psiphon iOS üçün ilk rəsmi tətbiqetməsini işə salıb! Yeni səyyah tətbiqetməmiz Psiphon şəbəkəsinə nəzərə çarpmadan qoşulur və saytlara təhlükəsiz qoşulmanı təmin edir.
-
-    Dünyanın harasında olursunuz olun, Psiphon səyyah tətbiqetməsi istədiyiniz sayta qoşulmanı təmin edəcək. İctimai Wi-Fi-dan isitfadə zamanı və ya hansısa etibarsız şəbəkəyə qoşulduqda tətbiqetməmiz əlavə təhlükəsizlik təminatı verir.
-
-    Əsas göstəricilərə daxildir:
-    • Pulsuz. limitsiz istifadə.
-    • Asan yükləmə, qoşulma və istifadə. Qeydiyyat və quraşdırmaya gərək yoxdur.
-    • Həmişə sürətli və etimadlı çıxış əldə etmək üçün avtomatik protokol seçimi.
-    • Çoxdilli yardım və dəyişəbilən server yerləşməsi.
-  keywords: Psiphon, proksi
+az: {app_name: Psiphon, subtitle: Sərhədsiz, keywords: 'Psiphon, proksi', description: "On\
+    \ milyonlarla insana sevdikləri saytlara giriş imkanı verdikdən sonra Psiphon\
+    \ iOS üçün ilk rəsmi tətbiqetməsini işə salıb! Yeni səyyah tətbiqetməmiz Psiphon\
+    \ şəbəkəsinə nəzərə çarpmadan qoşulur və saytlara təhlükəsiz qoşulmanı təmin edir.\n\
+    \nDünyanın harasında olursunuz olun, Psiphon səyyah tətbiqetməsi istədiyiniz sayta\
+    \ qoşulmanı təmin edəcək. İctimai Wi-Fi-dan isitfadə zamanı və ya hansısa etibarsız\
+    \ şəbəkəyə qoşulduqda tətbiqetməmiz əlavə təhlükəsizlik təminatı verir.\n\nƏsas\
+    \ göstəricilərə daxildir:\n• Pulsuz. limitsiz istifadə.\n• Asan yükləmə, qoşulma\
+    \ və istifadə. Qeydiyyat və quraşdırmaya gərək yoxdur.\n• Həmişə sürətli və etimadlı\
+    \ çıxış əldə etmək üçün avtomatik protokol seçimi.\n• Çoxdilli yardım və dəyişəbilən\
+    \ server yerləşməsi.\n"}
