@@ -22,12 +22,18 @@
 // NSNotification name for VPN status change notifications.
 #define kVPNStatusChangeNotificationName "VPNStatusChange"
 
+// VPNManager error codes
 #define kVPNManagerErrorDomain @"VPNManagerErrorDomain"
+
 typedef NS_ENUM(NSInteger, VPNManagerErrorCode) {
     VPNManagerErrorLoadConfigsFailed = 1,
     VPNManagerErrorTooManyConfigsFounds = 2,
     VPNManagerErrorUserDeniedConfigInstall = 3,
     VPNManagerErrorNEStartFailed = 4,
+};
+
+typedef NS_ENUM(NSInteger, VPNManagerQueryErrorCode) {
+    VPNManagerQueryErrorSendFailed = 1,
 };
 
 typedef NS_ENUM(NSInteger, VPNStatus) {
@@ -36,11 +42,11 @@ typedef NS_ENUM(NSInteger, VPNStatus) {
     VPNStatusDisconnected = 1,
     /*! @const VPNStatusConnecting network extension process is running, and the tunnel has started (tunnel could be in connecting or connected state). */
     VPNStatusConnecting = 2,
-    /*!VPNStatusConnected network extension process is running and the tunnel is connected. */
+    /*! @const VPNStatusConnected network extension process is running and the tunnel is connected. */
     VPNStatusConnected = 3,
-    /*!VPNStatusReasserting network extension process is running, and the tunnel is reconnecting or has already connected. */
+    /*! @const VPNStatusReasserting network extension process is running, and the tunnel is reconnecting or has already connected. */
     VPNStatusReasserting = 4,
-    /*!VPNStatusDisconnecting tunnel and the network extension process are being stopped.*/
+    /*! @const VPNStatusDisconnecting tunnel and the network extension process are being stopped.*/
     VPNStatusDisconnecting = 5,
     /*! @const VPNStatusRestarting Stopping previous network extension process, and starting a new one. */
     VPNStatusRestarting = 6,
@@ -67,10 +73,10 @@ typedef NS_ENUM(NSInteger, VPNStatus) {
 - (void)startVPN;
 
 /**
- * Stops the currently running network extension.
+ * Restarts the the network extension if already active.
  * Note: If no network extension process is running nothing happens.
  */
-- (void)restartVPN;
+- (void)restartVPNIfActive;
 
 /**
  * Stops the tunnel and stops the network extension process.
@@ -94,8 +100,23 @@ typedef NS_ENUM(NSInteger, VPNStatus) {
 - (BOOL)isVPNConnected;
 
 /**
- * @return TRUE if the tunnel has connected, FALSE otherwise.
+ * Whether or not VPN configuration onDemand is enabled or not.
+ * @return TRUE if enabled, FALSE otherwise.
  */
-- (BOOL)isTunnelConnected;
+- (BOOL)isOnDemandEnabled;
+
+/**
+ * Queries the Network Extension whether Psiphon tunnel is in connected state or not.
+ * @param completionHandler Called with tunnelIsConnected set to TRUE if Psiphon tunnel is connected, FALSE otherwise.
+ */
+- (void)isTunnelConnected:(void (^ _Nonnull)(BOOL tunnelIsConnected))completionHandler;
+
+/**
+ * Updates and saves VPN configuration Connect On Demand.
+ * This method also updates the NSUserDefaults with key kVpnOnDemand.
+ * @param onDemandEnabled Toggle VPN configuration Connect On Demand capability.
+ * @param completionHandler Block called after operation completes. error is set to nil if operation finished successfully.
+ */
+- (void)updateVPNConfigurationOnDemandSetting:(BOOL)onDemandEnabled completionHandler:(void (^_Nonnull)(NSError * _Nullable error))completionHandler;
 
 @end

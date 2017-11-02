@@ -17,16 +17,18 @@
  *
  */
 
-#define APP_GROUP_IDENTIFIER @"group.ca.psiphon.Psiphon"
+#import "RMAppReceipt.h"
 
-// Network Extension options
-#define EXTENSION_OPTION_START_FROM_CONTAINER @"startFromContainer"
-#define EXTENSION_TRUE @"true"
+#define SUBSCRIPTION_CHECK_GRACE_PERIOD_INTERVAL 2 * 60 * 60 * 24  // two days
 
-// Network Extension queries
-#define EXTENSION_QUERY_IS_PROVIDER_ZOMBIE @"isProviderZombie"
-#define EXTENSION_QUERY_IS_TUNNEL_CONNECTED @"isTunnelConnected"
+@interface IAPReceiptHelper : NSObject
 
-// Network Extension query responses
-#define EXTENSION_RESP_TRUE @"true"
-#define EXTENSION_RESP_FALSE @"false"
+@property (nonatomic,strong) NSArray *bundledProductIDS;
+
++ (instancetype)sharedInstance;
+- (BOOL) hasActiveSubscriptionForDate:(NSDate*)date;
+- (BOOL) verifyReceipt;
+- (RMAppReceipt*) appReceipt;
++ (void) terminateForInvalidReceipt;
+@end
+

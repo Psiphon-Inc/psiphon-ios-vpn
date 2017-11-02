@@ -18,8 +18,6 @@
  */
 
 #import <Foundation/Foundation.h>
-#import "NoticeLogger.h"
-
 
 void LOG_ERROR(NSString *format, ...) NS_FORMAT_FUNCTION(1,2);
 
