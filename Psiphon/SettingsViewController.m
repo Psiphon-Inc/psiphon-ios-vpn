@@ -58,7 +58,7 @@
                                                                       nil,
                                                                       [NSBundle mainBundle],
                                                                       @"Go premium!",
-                                                                      @"Subscriptions item title in the app settings when user does not have an active subscription. Clicking this item opens subscriptions view");
+                                                                      @"Subscriptions item title in the app settings when user does not have an active subscription. Clicking this item opens subscriptions view. If “Premium” doesn't easily translate, please choose a term that conveys “Pro” or “Extra” or “Better” or “Elite”.");
         }
         [cell.textLabel setText:subscriptionItemTitle];
     }
