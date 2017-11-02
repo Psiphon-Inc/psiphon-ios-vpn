@@ -50,7 +50,7 @@
     NSInteger timerCount;
 
     BOOL shownHomepage;
-    
+
     // ViewController
     MainViewController *mainViewController;
     LaunchScreenViewController *launchScreenViewController;
@@ -72,7 +72,7 @@
         adManager = [AdManager sharedInstance];
         sharedDB = [[PsiphonDataSharedDB alloc] initForAppGroupIdentifier:APP_GROUP_IDENTIFIER];
         notifier = [[Notifier alloc] initWithAppGroupIdentifier:APP_GROUP_IDENTIFIER];
-        
+
         mainViewController = [[MainViewController alloc] init];
         launchScreenViewController = [[LaunchScreenViewController alloc] init];
 
@@ -145,9 +145,9 @@
 - (void)applicationWillEnterForeground:(UIApplication *)application {
     LOG_DEBUG();
     // Called as part of the transition from the background to the active state; here you can undo many of the changes made on entering the background.
-    
+
     [self setRootViewController];
-    
+
     // TODO: init MainViewController.
 }
 
@@ -237,7 +237,7 @@
         self.window.rootViewController = viewController;
         return;
     }
-    
+
     if (self.window.rootViewController == viewController) {
         return;
     }
@@ -293,7 +293,7 @@
             [vpnManager stopVPN];
             NSString *alertTitle = NSLocalizedStringWithDefaultValue(@"BAD_RECEIPT_ALERT_TITLE", nil, [NSBundle mainBundle], @"Invalid app receipt", @"Alert title informing user that app receipt is not valid");
 
-            NSString *alertMessage = NSLocalizedStringWithDefaultValue(@"BAD_RECEIPT_ALERT_MESSAGE", nil, [NSBundle mainBundle], @"Your subscription receipt can not be verified, please refresh it and try again.", @"Alert message informing user that subscription receipt can not be verified");
+            NSString *alertMessage = NSLocalizedStringWithDefaultValue(@"BAD_RECEIPT_ALERT_MESSAGE", nil, [NSBundle mainBundle], @"Your subscription receipt cannot be verified, please refresh it and try again.", @"Alert message informing user that subscription receipt cannot be verified");
 
             UIAlertController *alert = [UIAlertController
                                         alertControllerWithTitle:alertTitle
