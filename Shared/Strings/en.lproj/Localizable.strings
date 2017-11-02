@@ -18,8 +18,8 @@
 /* Alert title informing user that the device clock needs to be updated with current time */
 "BAD_CLOCK_ALERT_TITLE" = "Clock is out of sync";
 
-/* Alert message informing user that subscription receipt can not be verified */
-"BAD_RECEIPT_ALERT_MESSAGE" = "Your subscription receipt can not be verified, please refresh it and try again.";
+/* Alert message informing user that subscription receipt cannot be verified */
+"BAD_RECEIPT_ALERT_MESSAGE" = "Your subscription receipt cannot be verified, please refresh it and try again.";
 
 /* Alert title informing user that app receipt is not valid */
 "BAD_RECEIPT_ALERT_TITLE" = "Invalid app receipt";
