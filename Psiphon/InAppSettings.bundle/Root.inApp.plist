@@ -13,7 +13,7 @@
 		</dict>
 		<dict>
 			<key>Title</key>
-			<string>!!! Not in the Root.strings, this title is set from SettingVewController!!!</string>
+			<string>!!! Not in the Root.strings, this title is set from SettingsViewController!!!</string>
 			<key>Key</key>
 			<string>settingsSubscription</string>
 			<key>Type</key>
@@ -224,8 +224,8 @@
 			</array>
 		</dict>
 		<dict>
-			<key>DefaultValue</key>
-			<false/>
+			<key>File</key>
+			<string>DisableTimeouts</string>
 			<key>Key</key>
 			<string>disableTimeouts</string>
 			<key>Title</key>
@@ -233,7 +233,7 @@
 			<key>BundleTable</key>
 			<string>PsiphonClientCommonLibrary</string>
 			<key>Type</key>
-			<string>PSToggleSwitchSpecifier</string>
+			<string>PSChildPaneSpecifier</string>
 		</dict>
 		<dict>
 			<key>DefaultValue</key>
