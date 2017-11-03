@@ -7,6 +7,7 @@
 ### Building
 - Replace `Shared/psiphon_config.stub` with your configuration file.
 - Replace `Shared/embedded_server_entries.stub` with your server entries file.
+- Replace `Psiphon/Bourbon-Oblique.otf` with the "Psiphon" font file.
 - Run `pod install` to install the third-party libraries.
 
 ## I18n/L10n

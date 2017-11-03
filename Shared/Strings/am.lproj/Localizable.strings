@@ -1,11 +1,11 @@
+/*[UNTRANSLATED] Active subscription detail text, example: Expires on 2017-01-01, renewal cost is $3.99 */
+"ACTIVE_SUBSCRIPTION_DETAIL_TEXT" = "Expires on %1$@, renewal cost is %2$@";
+
 /* Text for button that tell users there will by a short video ad. */
 "AD_LOADED" = "እርስዎን ለማገናኘት እየተዘጋጀን ይህን አጭር ቪዲዮ ይመልከቱ ";
 
 /* Text for app subtitle on main view. */
 "APP_SUB_TITLE_MAIN_VIEW" = "ድንበር አቋራጭ ";
-
-/* Text for app title on main view. */
-"APP_TITLE_MAIN_VIEW" = "ሳይፈን ";
 
 /* Text showing the app version. The '%@' placeholder is the version number. So it will look like 'v.2'. */
 "APP_VERSION" = "ብጅት %@";
@@ -23,15 +23,15 @@
 "BAD_RECEIPT_ALERT_TITLE" = "Invalid app receipt";
 
 /*[UNTRANSLATED] Buy subscription dialog footer text */
-"BUY_SUBSCRIPTIONS_FOOTER_TEXT" = "Restore previously bought subscription or refresh subscription receipt";
+"BUY_SUBSCRIPTIONS_FOOTER_TEXT" = "A subscription is auto-renewable which means that once purchased it will be automatically renewed until you cancel it 24 hours prior to the end of the current period.\n\nYour iTunes Account will be charged for renewal within 24-hours prior to the end of the current period with the cost of subscription.\n\nManage your Subscription and Auto-Renewal by going to your Account Settings.";
 
-/*[UNTRANSLATED] Buy subscription dialog header text */
-"BUY_SUBSCRIPTIONS_HEADER_TEXT" = "Buy a subscription to remove ads and surf the Internet faster!";
+/*[UNTRANSLATED] Premium subscriptions dialog header text */
+"BUY_SUBSCRIPTIONS_HEADER_TEXT" = "Remove ads and surf the Internet faster with a premium subscription!";
 
 /* Text above change region button that allows user to select their desired server region */
 "CHANGE_REGION" = "ክልል ለውጥ ";
 
-/*[UNTRANSLATED] Main text in the 'Upstream Proxy Error' dialog box. This is shown when the user has directly altered these settings, and those settings are (probably) erroneous. */
+/*[UNTRANSLATED] Main text in the 'Upstream Proxy Error' dialog box. This is shown when the user has directly altered these settings, and those settings are (probably) erroneous. DO NOT translate 'Psiphon'. */
 "CHECK_UPSTREAM_PROXY_SETTING" = "You have configured Psiphon to use an upstream proxy.\nHowever, we seem to be unable to connect to a Psiphon server through that proxy.\nPlease fix the settings and try again.";
 
 /* Title of the button that dismisses region selection dialog
@@ -40,9 +40,6 @@
 
 /* Text displayed while app loads */
 "LOADING" = "በመጫን ላይ...";
-
-/*[UNTRANSLATED] Manage my subscriptions button title */
-"MANAGE_SUBSCRIPTIONS_BUTTON_TITLE" = "Manage my subscriptions";
 
 /* Alert title informing user there is no internet connection */
 "NO_INTERNET" = "የኢንተርኔት ግንኙነት የለም ";
@@ -53,14 +50,14 @@
 /* Alert OK Button */
 "OK_BUTTON" = "እሺ ";
 
-/* Alert message informing the user they should open the app to finish connecting to the VPN. */
+/* Alert message informing the user they should open the app to finish connecting to the VPN. DO NOT translate 'Psiphon'. */
 "OPEN_PSIPHON_APP" = "ግንኙነቱን ለመጨረስ የሳይፈን መተግበሪያውን እባክዎን ይክፈቱ። ";
 
 /*[UNTRANSLATED] Refresh app receipt button title */
-"REFRESH_APP_RECEIPT_BUTTON_TITLE" = "Refresh receipt";
+"REFRESH_APP_RECEIPT_BUTTON_TITLE" = "Refresh app receipt";
 
 /*[UNTRANSLATED] Restore my subscription button title */
-"RESTORE_SUBSCRIPTION_BUTTON_TITLE" = "Restore my subscription";
+"RESTORE_SUBSCRIPTION_BUTTON_TITLE" = "Restore my existing subscription";
 
 /*[UNTRANSLATED] Subscriptions item title in the app settings when user has an active subscription. Clicking this item opens subscriptions view */
 "SETTINGS_SUBSCRIPTION_ACTIVE" = "Subscriptions";
@@ -77,7 +74,7 @@
 /* Alert message informing user to turn on their cellular data or wifi to connect to the internet */
 "TURN_ON_DATE" = "ዳታን ለማግኘት የተንቀሳቃሽ ስልክ ዳታን ያብሩ ወይም  Wi-Fi  ይጠቀሙ። ";
 
-/* Alert message informing user they have to open the app */
+/* Alert message informing user they have to open the app. DO NOT translate 'Psiphon'. */
 "USE_PSIPHON_APP" = "ለመገናኘት የሳይፈን መተግበሪያን ይጠቀሙ";
 
 /* Status when the VPN is connected to a Psiphon server */
