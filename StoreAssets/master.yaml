@@ -9,7 +9,7 @@ en:
   # The "subtitle" for the app, which appears under the app name in the App Store
   subtitle: Beyond Borders
 
-  # The description of the App, as it appears in the App Store
+  # The description of the App, as it appears in the App Store. Note that the "bullets" must be the character -- • -- and not an HTML entity like &bull;.
   description: |
     After helping tens of millions of users get access to the apps and sites they love, Psiphon has launched its first app for iOS!  Our new app seamlessly integrates access to the Psiphon network, securely connecting you to your apps and sites.
 
@@ -40,17 +40,17 @@ en:
 
   subscriptions:
     weekly:
-      # 1 week subscription title.
+      # 1 week subscription title. If “Premium” doesn't easily translate, please choose a term that conveys “Pro” or “Extra” or “Better” or “Elite”.
       title: Premium 1 week
       # 1 week subscription description.
       description: Auto-renewable subscription
     monthly:
-      # 1 month subscription title.
+      # 1 month subscription title. If “Premium” doesn't easily translate, please choose a term that conveys “Pro” or “Extra” or “Better” or “Elite”.
       title: Premium 1 month
       # 1 month subscription description.
       description: Auto-renewable subscription
     yearly:
-      # 1 year subscription title.
+      # 1 year subscription title. If “Premium” doesn't easily translate, please choose a term that conveys “Pro” or “Extra” or “Better” or “Elite”.
       title: Premium 1 year
       # 1 year subscription description
       description: Auto-renewable subscription

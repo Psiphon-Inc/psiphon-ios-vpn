@@ -1,0 +1,100 @@
+/* Active subscription detail text, example: Expires on 2017-01-01, renewal cost is $3.99 */
+"ACTIVE_SUBSCRIPTION_DETAIL_TEXT" = "Санаи %1$@ мӯҳлаташ ба охир мерасад, арзиши азнавсозӣ %2$@мебошад";
+
+/* Text for button that tell users there will by a short video ad. */
+"AD_LOADED" = "То он даме, ки мо шуморо пайваст месозем видеои кӯтоҳро тамошо кунед";
+
+/* Text for app subtitle on main view. */
+"APP_SUB_TITLE_MAIN_VIEW" = "ФАРРОХТАР АЗ САРҲАДҲО";
+
+/*[UNTRANSLATED] Text showing the app version. The '%@' placeholder is the version number. So it will look like 'v.2'. */
+"APP_VERSION" = "v.%@";
+
+/* Alert message informing user that the device clock needs to be updated with current time */
+"BAD_CLOCK_ALERT_MESSAGE" = "Мо мушоҳида намудем, ки вақт дар дастгоҳи шумо бо вақти минтақаи шумо мувофиқ нест. Лутфан соати худро таҳвил сохта, нармафзорро аз нав фаъол намоед.";
+
+/* Alert title informing user that the device clock needs to be updated with current time */
+"BAD_CLOCK_ALERT_TITLE" = "Соат номувофиқ аст";
+
+/* Alert message informing user that subscription receipt can not be verified */
+"BAD_RECEIPT_ALERT_MESSAGE" = "Расиди аъзогии шумо тасдиқ карда намешавад, лутфан онро аз нав сохта кушишро такрор намоед.";
+
+/* Alert title informing user that app receipt is not valid */
+"BAD_RECEIPT_ALERT_TITLE" = "Расиди ғайритасдиқи нармафзор";
+
+/* Buy subscription dialog footer text */
+"BUY_SUBSCRIPTIONS_FOOTER_TEXT" = "Аъзогӣ ба таври автоматӣ нав карда мешавад, ин маънои онро дорад, ки пас аз харид то он замоне, ки шумо 24 соат пеш аз анҷоми мӯҳлати ҷорӣ онро қатъ месозед, нав карда мешавад.\n\nАз ҳисоби iTunes-и шумо барои нав сохтани аъзогӣ дар давоми 24 соат пеш аз мӯлати анҷоми аъзогии ҷорӣ, маблағ ситонида мешавад. \n\nБарои идора намудани Аъзогӣ ва навшавии автоматӣ ба Ҷурсозиҳои Ҳисоби худ ворид шавед.";
+
+/* Premium subscriptions dialog header text */
+"BUY_SUBSCRIPTIONS_HEADER_TEXT" = "Бо аъзогии сатҳи олӣ эълонҳоро бартараф сохта, интернетро бо суръати баланд истифода намоед!";
+
+/* Text above change region button that allows user to select their desired server region */
+"CHANGE_REGION" = "Ивази минтақа";
+
+/* Main text in the 'Upstream Proxy Error' dialog box. This is shown when the user has directly altered these settings, and those settings are (probably) erroneous. DO NOT translate 'Psiphon'. */
+"CHECK_UPSTREAM_PROXY_SETTING" = "Шумо Psiphon-ро барои проксии баромад истифода бурдан танзим кардаед.\nАммо мо бо истифодаи проксии мазкур ба серверҳои Psiphon пайваст шуда наметавонем.\nТанзимро ислоҳ карда, кӯшишро такрор намоед.";
+
+/* Title of the button that dismisses region selection dialog
+   Title of the button that dismisses the subscriptions menu */
+"DONE_ACTION" = "Тайёр";
+
+/* Text displayed while app loads */
+"LOADING" = "Бор шуда истодааст...";
+
+/* Alert title informing user there is no internet connection */
+"NO_INTERNET" = "Алоқаи Интернет Мавҷуд Нест ";
+
+/* Subscriptions view text that is visible when the list of subscriptions is not available */
+"NO_PRODUCTS_TEXT" = "Аъзогӣ аз App Store барқарор карда нашуд. Онро аз нав созед ё кӯшишро баъдтар такрор намоед.";
+
+/* Alert OK Button */
+"OK_BUTTON" = "ОК";
+
+/* Alert message informing the user they should open the app to finish connecting to the VPN. DO NOT translate 'Psiphon'. */
+"OPEN_PSIPHON_APP" = "Лутфан барои пайвастшавиро анҷом додан нармафзори Psiphon-ро кушоед.";
+
+/* Refresh app receipt button title */
+"REFRESH_APP_RECEIPT_BUTTON_TITLE" = "Расиди ғайритасдиқи нармафзорро аз нав сохтан";
+
+/* Restore my subscription button title */
+"RESTORE_SUBSCRIPTION_BUTTON_TITLE" = "Аъзогии мазкури маро барқарор сохтан";
+
+/* Subscriptions item title in the app settings when user has an active subscription. Clicking this item opens subscriptions view */
+"SETTINGS_SUBSCRIPTION_ACTIVE" = "Аъзогиҳо";
+
+/* Subscriptions item title in the app settings when user does not have an active subscription. Clicking this item opens subscriptions view */
+"SETTINGS_SUBSCRIPTION_NOT_ACTIVE" = "Ба сатҳи олӣ рафтан!";
+
+/* Text for button that opens paid subscriptions manager UI */
+"SUBSCRIPTION_BUTTON_TITLE" = "Ҳамин ҳоло ба сатҳи олӣ рафтан!";
+
+/* Title of the dialog for available in-app paid subscriptions */
+"SUBSCRIPTIONS" = "Аъзогиҳо";
+
+/* Alert message informing user to turn on their cellular data or wifi to connect to the internet */
+"TURN_ON_DATE" = "Барои дастрасӣ ба маълумотҳо алоқаи мобилӣ фаъол намоед ё аз Wi Fi истифода намоед.";
+
+/* Alert message informing user they have to open the app. DO NOT translate 'Psiphon'. */
+"USE_PSIPHON_APP" = "Барои пайваст шудан нармафзори Psiphon-ро истифода баред";
+
+/* Status when the VPN is connected to a Psiphon server */
+"VPN_STATUS_CONNECTED" = "Пайваст шудем";
+
+/* Status when the VPN is connecting; that is, trying to connect to a Psiphon server */
+"VPN_STATUS_CONNECTING" = "Пайваст мешавем";
+
+/* Status when the VPN is not connected to a Psiphon server, not trying to connect, and not in an error state */
+"VPN_STATUS_DISCONNECTED" = "Ҷудо шудем";
+
+/* Status when the VPN is disconnecting. Sometimes going from connected to disconnected can take some time, and this is that state. */
+"VPN_STATUS_DISCONNECTING" = "Ҷудо мешавем";
+
+/* Status when the VPN is in an invalid state. For example, if the user doesn't give permission for the VPN configuration to be installed, and therefore the Psiphon VPN can't even try to connect. */
+"VPN_STATUS_INVALID" = "Ҷудо шудем";
+
+/* Status when the VPN was connected to a Psiphon server, got disconnected unexpectedly, and is currently trying to reconnect */
+"VPN_STATUS_RECONNECTING" = "Азнавпайвастшавӣ";
+
+/* Status when the VPN is restarting. */
+"VPN_STATUS_RESTARTING" = "Аз нав бакордароӣ ";
+

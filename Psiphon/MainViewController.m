@@ -936,7 +936,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                                                                           nil,
                                                                           [NSBundle mainBundle],
                                                                           @"Go premium now!",
-                                                                          @"Text for button that opens paid subscriptions manager UI");
+                                                                          @"Text for button that opens paid subscriptions manager UI. If “Premium” doesn't easily translate, please choose a term that conveys “Pro” or “Extra” or “Better” or “Elite”.");
     [subscriptionButton setTitle:subscriptionButtonTitle forState:UIControlStateNormal];
     [subscriptionButton addTarget:self action:@selector(onSubscriptionTap) forControlEvents:UIControlEventTouchUpInside];
     subscriptionButton.translatesAutoresizingMaskIntoConstraints = NO;

@@ -15,8 +15,8 @@
 /* Alert message informing user that the device clock needs to be updated with current time */
 "BAD_CLOCK_ALERT_MESSAGE" = "We've detected the time on your device is out of sync with your time zone. Please update your clock settings and restart the app";
 
-/* Alert message informing user that subscription receipt can not be verified */
-"BAD_RECEIPT_ALERT_MESSAGE" = "Your subscription receipt can not be verified, please refresh it and try again.";
+/* Alert message informing user that subscription receipt cannot be verified */
+"BAD_RECEIPT_ALERT_MESSAGE" = "Your subscription receipt cannot be verified, please refresh it and try again.";
 
 /* Alert title informing user that app receipt is not valid */
 "BAD_RECEIPT_ALERT_TITLE" = "Invalid app receipt";
@@ -76,7 +76,7 @@
 /* Subscriptions item title in the app settings when user has an active subscription. Clicking this item opens subscriptions view */
 "SETTINGS_SUBSCRIPTION_ACTIVE" = "Subscriptions";
 
-/* Subscriptions item title in the app settings when user does not have an active subscription. Clicking this item opens subscriptions view */
+/* Subscriptions item title in the app settings when user does not have an active subscription. Clicking this item opens subscriptions view. If “Premium” doesn't easily translate, please choose a term that conveys “Pro” or “Extra” or “Better” or “Elite”. */
 "SETTINGS_SUBSCRIPTION_NOT_ACTIVE" = "Go premium!";
 
 /* Automatically start VPN On demand settings toggle */
@@ -85,7 +85,7 @@
 /* VPN On demand setting detail text showing when user doesn't have an active subscription and the item is disabled. */
 "SETTINGS_VPN_ON_DEMAND_DETAIL" = "Subscription only";
 
-/* Text for button that opens paid subscriptions manager UI */
+/* Text for button that opens paid subscriptions manager UI. If “Premium” doesn't easily translate, please choose a term that conveys “Pro” or “Extra” or “Better” or “Elite”. */
 "SUBSCRIPTION_BUTTON_TITLE" = "Go premium now!";
 
 /* Alert message informing user that their subscription has expired, and that Psiphon will stop in an hour if subscription is not renewed. Do not translate 'Psiphon'. */
