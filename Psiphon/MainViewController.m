@@ -191,6 +191,11 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 - (void)viewDidLayoutSubviews {
     [super viewDidLayoutSubviews];
     backgroundGradient.frame = self.view.bounds;
+
+    if (isStartStopButtonHaloOn && startStopButtonHalo != nil) {
+        // Keep pulsing halo centered on the start/stop button
+        startStopButtonHalo.position = startStopButton.center;
+    }
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -215,6 +220,13 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 - (void)viewDidDisappear:(BOOL)animated {
     LOG_DEBUG();
     [super viewDidDisappear:animated];
+
+    if (isStartStopButtonHaloOn && startStopButtonHalo != nil) {
+        // The pulsing halo animation will complete when MainViewController's view disappears.
+        // Subsequently, PulsingHaloLayer will remove itself from its superview (see PulsingHaloLayer.m).
+        // PulsingHaloLayer will be re-added if needed when MainViewController's view re-appears.
+        [self removePulsingHaloLayer];
+    }
 }
 
 - (UIStatusBarStyle)preferredStatusBarStyle {
@@ -390,7 +402,6 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 
 - (void)removePulsingHaloLayer {
     [startStopButtonHalo stop];
-
     isStartStopButtonHaloOn = FALSE;
 }
 
