@@ -39,6 +39,7 @@
 #import "IAPViewController.h"
 #import "AppDelegate.h"
 #import "IAPHelper.h"
+#import "UIAlertController+Window.h"
 
 static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSString *b) {
     return (([a length] == 0) && ([b length] == 0)) || ([a isEqualToString:b]);
@@ -92,7 +93,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     UIView *bottomBar;
     NSString *selectedRegionSnapShot;
 
-    UIAlertController *alert;
+    UIAlertController *alertControllerNoInternet;
 }
 
 - (id)init {
@@ -331,17 +332,18 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 #endif
 
 # pragma mark - UI helper functions
+
 - (void) dismissNoInternetAlert {
     LOG_DEBUG();
-    if (alert != nil){
-        [alert dismissViewControllerAnimated:YES completion:nil];
-        alert = nil;
+    if (alertControllerNoInternet != nil){
+        [alertControllerNoInternet dismissViewControllerAnimated:YES completion:nil];
+        alertControllerNoInternet = nil;
     }
 }
 
 - (void)displayAlertNoInternet {
-    if (alert == nil){
-        alert = [UIAlertController
+    if (alertControllerNoInternet == nil){
+        alertControllerNoInternet = [UIAlertController
                  alertControllerWithTitle:NSLocalizedStringWithDefaultValue(@"NO_INTERNET", nil, [NSBundle mainBundle], @"No Internet Connection", @"Alert title informing user there is no internet connection")
                  message:NSLocalizedStringWithDefaultValue(@"TURN_ON_DATE", nil, [NSBundle mainBundle], @"Turn on cellular data or use Wi-Fi to access data.", @"Alert message informing user to turn on their cellular data or wifi to connect to the internet")
                  preferredStyle:UIAlertControllerStyleAlert];
@@ -352,11 +354,26 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                                         handler:^(UIAlertAction *action) {
                                         }];
 
-        [alert addAction:defaultAction];
+        [alertControllerNoInternet addAction:defaultAction];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(dismissNoInternetAlert) name:@"UIApplicationWillResignActiveNotification" object:nil];
     }
 
-    [self presentViewController:alert animated:TRUE completion:nil];
+    [alertControllerNoInternet showAnimated];
+}
+
+- (void)displayCorruptSettingsFileAlert {
+    UIAlertController *alert = [UIAlertController
+      alertControllerWithTitle:NSLocalizedStringWithDefaultValue(@"CORRUPT_SETTINGS_ALERT_TITLE", nil, [NSBundle mainBundle], @"Corrupt Settings", @"Alert dialog title (MainViewController)")
+                       message:NSLocalizedStringWithDefaultValue(@"CORRUPT_SETTINGS_MESSAGE", nil, [NSBundle mainBundle], @"Your app settings file appears to be corrupt. Try reinstalling the app to repair the file.", @"Alert dialog message informing the user that the settings file in the app is corrupt, and that they can potentially fix this issue by re-installing the app.")
+                preferredStyle:UIAlertControllerStyleAlert];
+
+    UIAlertAction *defaultAction = [UIAlertAction actionWithTitle:NSLocalizedStringWithDefaultValue(@"OK_BUTTON", nil, [NSBundle mainBundle], @"OK", @"Alert OK Button")
+                                                            style:UIAlertActionStyleDefault
+                                                          handler:^(UIAlertAction *action) {
+                                                              // Do nothing.
+                                                          }];
+    [alert addAction:defaultAction];
+    [alert showAnimated];
 }
 
 - (NSString *)getVPNStatusDescription:(VPNStatus) status {
@@ -944,7 +961,12 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 
 #pragma mark - FeedbackViewControllerDelegate methods and helpers
 
-- (NSString *)getPsiphonConfig {
+/*!
+ * If Psiphon config string could no be created, corrupt message alert is displayed
+ * to the user.
+ * @return Psiphon config string, or nil of config string could not be created.
+ */
+- (NSString * _Nullable)getPsiphonConfig {
     NSString *bundledConfigStr = [PsiphonClientCommonLibraryHelpers getPsiphonBundledConfig];
 
     // Return bundled config as is if user doesn't have an active subscription
@@ -958,8 +980,9 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     NSDictionary *readOnly = [NSJSONSerialization JSONObjectWithData:jsonData options:kNilOptions error:&err];
 
     if (err) {
-        LOG_ERROR(@"%@", [NSString stringWithFormat:@"Aborting. Failed to parse config JSON: %@", err.description]);
-        abort();
+        LOG_ERROR(@"%@", [NSString stringWithFormat:@"Failed to parse config JSON: %@", err.description]);
+        [self displayCorruptSettingsFileAlert];
+        return nil;
     }
 
     NSMutableDictionary *mutableConfigCopy = [readOnly mutableCopy];
@@ -972,8 +995,9 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     jsonData  = [NSJSONSerialization dataWithJSONObject:mutableConfigCopy options:0 error:&err];
 
     if (err) {
-        LOG_ERROR(@"%@", [NSString stringWithFormat:@"Aborting. Failed to create JSON data from config object: %@", err.description]);
-        abort();
+        LOG_ERROR(@"%@", [NSString stringWithFormat:@"Failed to create JSON data from config object: %@", err.description]);
+        [self displayCorruptSettingsFileAlert];
+        return nil;
     }
 
     return [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
@@ -991,12 +1015,18 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
             [inactiveTunnel sendFeedback:jsonString publicKey:pubKey uploadServer:uploadServer uploadServerHeaders:uploadServerHeaders];
         };
 
+        NSString *psiphonConfig = [self getPsiphonConfig];
+        if (!psiphonConfig) {
+            // Corrupt settings file. Return early.
+            return;
+        }
+
         [FeedbackUpload generateAndSendFeedback:selectedThumbIndex
                                       buildInfo:[PsiphonTunnel getBuildInfo]
                                        comments:comments
                                           email:email
                              sendDiagnosticInfo:uploadDiagnostics
-                              withPsiphonConfig:[self getPsiphonConfig]
+                              withPsiphonConfig:psiphonConfig
                              withClientPlatform:@"ios-vpn"
                              withConnectionType:[self getConnectionType]
                                    isJailbroken:[JailbreakCheck isDeviceJailbroken]
