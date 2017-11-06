@@ -1007,6 +1007,13 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     // Ensure psiphon data is populated with latest logs
     // TODO: should this be a delegate method of Psiphon Data in shared library/
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+
+        NSString *psiphonConfig = [self getPsiphonConfig];
+        if (!psiphonConfig) {
+            // Corrupt settings file. Return early.
+            return;
+        }
+
         NSArray<DiagnosticEntry *> *diagnosticEntries = [sharedDB getAllLogs];
 
         __weak MainViewController *weakSelf = self;
@@ -1014,12 +1021,6 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
             PsiphonTunnel *inactiveTunnel = [PsiphonTunnel newPsiphonTunnel:weakSelf]; // TODO: we need to update PsiphonTunnel framework not require this and fix this warning
             [inactiveTunnel sendFeedback:jsonString publicKey:pubKey uploadServer:uploadServer uploadServerHeaders:uploadServerHeaders];
         };
-
-        NSString *psiphonConfig = [self getPsiphonConfig];
-        if (!psiphonConfig) {
-            // Corrupt settings file. Return early.
-            return;
-        }
 
         [FeedbackUpload generateAndSendFeedback:selectedThumbIndex
                                       buildInfo:[PsiphonTunnel getBuildInfo]
