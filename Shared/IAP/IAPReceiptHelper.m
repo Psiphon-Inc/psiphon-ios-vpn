@@ -102,6 +102,7 @@
         return NO;
     }
 
+
 #if !DEBUG
     // Allow some tolerance IRL.
     date = [date dateByAddingTimeInterval:-SUBSCRIPTION_CHECK_GRACE_PERIOD_INTERVAL];
@@ -110,13 +111,14 @@
     BOOL hasSubscription = NO;
 
     for (NSString* productID in self.bundledProductIDS) {
-        NSDate *subscriptionExpirationDate = [[self appReceipt].inAppSubscriptions objectForKey:productID];
+        NSDate *subscriptionExpirationDate = [[self appReceipt] expirationDateForProduct:productID];
         hasSubscription = (subscriptionExpirationDate && [date compare:subscriptionExpirationDate] != NSOrderedDescending);
         if (hasSubscription) {
-            break;
+            return YES;
         }
     }
-    return hasSubscription;
+
+    return NO;
 }
 
 @end

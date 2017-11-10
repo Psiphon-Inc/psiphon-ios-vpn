@@ -250,7 +250,7 @@ static NSString *iapCellID = @"IAPTableCellID";
     NSDate *subscriptionExpirationDate = nil;
 
 	if(receipt) {
-        subscriptionExpirationDate = [receipt.inAppSubscriptions objectForKey:product.productIdentifier];
+        subscriptionExpirationDate = [receipt expirationDateForProduct:product.productIdentifier];
         isActiveSubscription = (subscriptionExpirationDate && [[NSDate date] compare:subscriptionExpirationDate] != NSOrderedDescending);
 	}
 
