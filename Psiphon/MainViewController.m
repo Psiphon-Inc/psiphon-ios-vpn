@@ -39,7 +39,7 @@
 #import "IAPViewController.h"
 #import "AppDelegate.h"
 #import "IAPHelper.h"
-#import "UIAlertController+Window.h"
+#import "UIAlertController+Delegate.h"
 
 static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSString *b) {
     return (([a length] == 0) && ([b length] == 0)) || ([a isEqualToString:b]);
@@ -96,6 +96,9 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     UIAlertController *alertControllerNoInternet;
 }
 
+// No heavy initialization should be done here, since RootContainerController
+// expects this method to return immediately.
+// All such initialization could be deferred to viewDidLoad callback.
 - (id)init {
     self = [super init];
     if (self) {
@@ -333,7 +336,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 
 # pragma mark - UI helper functions
 
-- (void) dismissNoInternetAlert {
+- (void)dismissNoInternetAlert {
     LOG_DEBUG();
     if (alertControllerNoInternet != nil){
         [alertControllerNoInternet dismissViewControllerAnimated:YES completion:nil];
@@ -358,7 +361,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(dismissNoInternetAlert) name:@"UIApplicationWillResignActiveNotification" object:nil];
     }
 
-    [alertControllerNoInternet showAnimated];
+    [alertControllerNoInternet presentFromTopController];
 }
 
 - (void)displayCorruptSettingsFileAlert {
@@ -373,7 +376,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                                                               // Do nothing.
                                                           }];
     [alert addAction:defaultAction];
-    [alert showAnimated];
+    [alert presentFromTopController];
 }
 
 - (NSString *)getVPNStatusDescription:(VPNStatus) status {
@@ -964,6 +967,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 /*!
  * If Psiphon config string could no be created, corrupt message alert is displayed
  * to the user.
+ * This method can be called from background-thread.
  * @return Psiphon config string, or nil of config string could not be created.
  */
 - (NSString * _Nullable)getPsiphonConfig {
@@ -981,7 +985,9 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 
     if (err) {
         LOG_ERROR(@"%@", [NSString stringWithFormat:@"Failed to parse config JSON: %@", err.description]);
-        [self displayCorruptSettingsFileAlert];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self displayCorruptSettingsFileAlert];
+        });
         return nil;
     }
 
@@ -996,7 +1002,9 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 
     if (err) {
         LOG_ERROR(@"%@", [NSString stringWithFormat:@"Failed to create JSON data from config object: %@", err.description]);
-        [self displayCorruptSettingsFileAlert];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self displayCorruptSettingsFileAlert];
+        });
         return nil;
     }
 
@@ -1346,7 +1354,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 
 #pragma mark - IAP
 
-- (void) openIAPViewController {
+- (void)openIAPViewController {
     IAPViewController *iapViewController = [[IAPViewController alloc]init];
     iapViewController.openedFromSettings = NO;
     UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:iapViewController];
@@ -1365,7 +1373,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
         if(bundledConfigStr) {
             NSDictionary *config = [PsiphonClientCommonLibraryHelpers jsonToDictionary:bundledConfigStr];
             if (config) {
-                NSDictionary *subscriptionConfig = [config objectForKey:@"subscriptionConfig"];
+                NSDictionary *subscriptionConfig = config[@"subscriptionConfig"];
                 if(subscriptionConfig[@"SponsorId"] && !([sharedDB getSponsorId].length)) {
                     [vpnManager restartVPN];
                 }
@@ -1373,4 +1381,5 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
         }
     }
 }
+
 @end
