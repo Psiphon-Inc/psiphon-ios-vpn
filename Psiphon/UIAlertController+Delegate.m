@@ -17,12 +17,23 @@
  *
  */
 
-#import <UIKit/UIKit.h>
+#import "UIAlertController+Delegate.h"
 
-@interface UIAlertController (Window)
+@implementation UIAlertController (Delegate)
 
-- (void)showAnimated;
++ (UIViewController *)getTopMostViewController {
+    UIViewController *topController = [UIApplication sharedApplication].keyWindow.rootViewController;
+    while(topController.presentedViewController) {
+        topController = topController.presentedViewController;
+    }
+    return topController;
+}
 
-- (void)showWithAnimation:(BOOL)animated;
+/**
+ * Presents this instance from application's key window top most view controller.
+ */
+- (void)presentFromTopController {
+    [[UIAlertController getTopMostViewController] presentViewController:self animated:TRUE completion:nil];
+}
 
 @end

@@ -21,9 +21,20 @@
 #import <AVFoundation/AVFoundation.h>
 #import "LaunchScreenViewController.h"
 #import "Logging.h"
+#import "RootContainerController.h"
+#import "AppDelegate.h"
+
+#if DEBUG
+#define kLaunchScreenTimerCount 1.f
+#else
+#define kLaunchScreenTimerCount 10.f
+#endif
+
+#define kTimerInterval 1.f
 
 @interface LaunchScreenViewController ()
 
+@property (strong, nonatomic) UIProgressView *progressView;
 @property (strong, nonatomic) AVPlayer *loadingVideo;
 @property (nonatomic) AVPlayerItem *videoFile;
 
@@ -37,11 +48,15 @@ static const NSString *ItemStatusContext;
 
     // Loading Text
     UILabel *loadingLabel;
+
+    // Loading Timer
+    NSTimer *loadingTimer;
+    float timerCount;
 }
 
 - (id)init {
     self = [super init];
-    
+
     NSString *tracksKey = @"tracks";
     
     NSURL *fileURL = [[NSBundle mainBundle] URLForResource:@"launch" withExtension:@"m4v"];
@@ -79,6 +94,14 @@ static const NSString *ItemStatusContext;
     return self;
 }
 
+- (void)dealloc {
+    // Must unregister observers from AVPlayerItem.
+    [self.videoFile removeObserver:self forKeyPath:@"status"];
+}
+
+
+#pragma mark - Lifecycle Methods
+
 - (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator {
 
     [self setupVideoLayerFrame:size];
@@ -104,7 +127,28 @@ static const NSString *ItemStatusContext;
     [self.loadingVideo seekToTime:kCMTimeZero];
     [self setupVideoLayerFrame:self.view.bounds.size];
     [self.loadingVideo play];
+
+    // Reset the timer count.
+    timerCount = 0.f;
+
+    loadingTimer = [NSTimer scheduledTimerWithTimeInterval:kTimerInterval repeats:TRUE block:^(NSTimer *timer) {
+        timerCount += kTimerInterval;
+        [self.progressView setProgress:(timerCount / kLaunchScreenTimerCount) animated:TRUE];
+        if (timerCount >= kLaunchScreenTimerCount) {
+            [timer invalidate];
+
+            [[AppDelegate sharedAppDelegate] launchScreenFinished];
+        }
+    }];
 }
+
+- (void)viewWillDisappear:(BOOL)animated {
+    [super viewWillDisappear:animated];
+    // Stops the timer and removes it from the run loop.
+    [loadingTimer invalidate];
+}
+
+#pragma mark -
 
 - (void)setupVideoLayerFrame:(CGSize)size {
     if (size.width > size.height) {
@@ -126,10 +170,9 @@ static const NSString *ItemStatusContext;
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
     
     if (context == &ItemStatusContext) {
-        dispatch_async(dispatch_get_main_queue(),
-                       ^{
-                           [self syncUI];
-                       });
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self syncUI];
+        });
         return;
     }
     [super observeValueForKeyPath:keyPath ofObject:object

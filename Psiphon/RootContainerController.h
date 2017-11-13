@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, Psiphon Inc.
+ * Copyright (c) 2017, Psiphon Inc.
  * All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,19 +18,18 @@
  */
 
 #import <UIKit/UIKit.h>
+#import "MainViewController.h"
 
-@interface AppDelegate : UIResponder <UIApplicationDelegate>
+@interface RootContainerController : UIViewController
 
-@property (strong, nonatomic) UIWindow *window;
+/* Only RootContainerController should manager MainViewController.
+ * Value is nil until RootContainerController is loaded into memory.*/
+@property (nonatomic, strong, readonly) MainViewController *mainViewController;
 
-+ (AppDelegate *)sharedAppDelegate;
-+ (BOOL)isRunningUITest;
-
-/* Ads */
-- (UIViewController *)getAdsPresentingViewController;
-- (void)launchScreenFinished;
-
-/* Reloads MainViewController. Used after a settings change. */
 - (void)reloadMainViewController;
+
+- (void)showLaunchScreen;
+
+- (void)removeLaunchScreen;
 
 @end
