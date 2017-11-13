@@ -973,15 +973,17 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 - (NSString * _Nullable)getPsiphonConfig {
     NSString *bundledConfigStr = [PsiphonClientCommonLibraryHelpers getPsiphonBundledConfig];
 
+    // Always parses the config string to ensure its valid, even the config string will not be modified.
+    NSData *jsonData = [bundledConfigStr dataUsingEncoding:NSUTF8StringEncoding];
+    NSError *err = nil;
+    NSDictionary *readOnly = [NSJSONSerialization JSONObjectWithData:jsonData options:kNilOptions error:&err];
+
     // Return bundled config as is if user doesn't have an active subscription
-    if(![[IAPHelper sharedInstance]hasActiveSubscriptionForDate:[NSDate date]]) {
+    if(!(err || [[IAPHelper sharedInstance]hasActiveSubscriptionForDate:[NSDate date]])) {
         return bundledConfigStr;
     }
 
     // Otherwise override sponsor ID
-    NSData *jsonData = [bundledConfigStr dataUsingEncoding:NSUTF8StringEncoding];
-    NSError *err = nil;
-    NSDictionary *readOnly = [NSJSONSerialization JSONObjectWithData:jsonData options:kNilOptions error:&err];
 
     if (err) {
         LOG_ERROR(@"%@", [NSString stringWithFormat:@"Failed to parse config JSON: %@", err.description]);
@@ -993,7 +995,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 
     NSMutableDictionary *mutableConfigCopy = [readOnly mutableCopy];
 
-    NSDictionary *readOnlySubscriptionConfig = [readOnly objectForKey:@"subscriptionConfig"];
+    NSDictionary *readOnlySubscriptionConfig = readOnly[@"subscriptionConfig"];
     if(readOnlySubscriptionConfig && readOnlySubscriptionConfig[@"SponsorId"]) {
         mutableConfigCopy[@"SponsorId"] = readOnlySubscriptionConfig[@"SponsorId"];
     }
