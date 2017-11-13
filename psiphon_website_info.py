@@ -21,12 +21,14 @@
 import argparse
 import json
 import re
+import transifex_pull
 import urllib2
 from datetime import datetime
 
 
 class PsiphonWebsiteInfo:
     default_language_code = 'en'
+    language_code_mappings = {v: k for k, v in transifex_pull.DEFAULT_LANGS.iteritems()}  # invert language code mappings
 
     def __init__(self):
         self._localization = self.Localization()
@@ -84,13 +86,19 @@ class PsiphonWebsiteInfo:
     def faq_url(self, code):
         """Returns Psiphon faq url for target l10n, falling back on english url"""
         if not self._localization.supported(code):
-            code = self.default_language_code
+            if code in self.language_code_mappings:
+                code = self.language_code_mappings[code]
+            else:
+                code = self.default_language_code
         return self.FAQ.localized_url(code)
 
     def privacy_policy_url(self, code):
         """Returns Psiphon privacy policy url for target l10n, falling back on english url"""
         if not self._localization.supported(code):
-            code = self.default_language_code
+            if code in self.language_code_mappings:
+                code = self.language_code_mappings[code]
+            else:
+                code = self.default_language_code
         return self.PrivacyPolicy.localized_url(code)
 
 
