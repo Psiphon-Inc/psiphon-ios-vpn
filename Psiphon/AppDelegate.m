@@ -135,6 +135,8 @@
     LOG_DEBUG();
     // Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later.
     // If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
+
+    [[UIApplication sharedApplication] ignoreSnapshotOnNextApplicationLaunch];
     [notifier post:@"D.applicationDidEnterBackground"];
     [sharedDB updateAppForegroundState:NO];
 }
@@ -202,10 +204,12 @@
 }
 
 - (void)onAdsLoaded {
+    LOG_DEBUG();
     [rootContainerController removeLaunchScreen];
 }
 
 - (void)launchScreenFinished {
+    LOG_DEBUG();
     [rootContainerController removeLaunchScreen];
 }
 
