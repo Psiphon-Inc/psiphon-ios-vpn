@@ -182,16 +182,18 @@
 #pragma mark - Ads
 
 - (void)loadAdsIfNeeded {
-    NetworkStatus networkStatus = [[Reachability reachabilityForInternetConnection] currentReachabilityStatus];
 
-    if ( networkStatus != NotReachable
-      && ([vpnManager getVPNStatus] == VPNStatusDisconnected || [vpnManager getVPNStatus] == VPNStatusInvalid)
-      && ![adManager untunneledInterstitialIsReady] && ![adManager untunneledInterstitialHasShown] && ![vpnManager startStopButtonPressed]
-      && [adManager shouldShowUntunneledAds]) {
+    if ([adManager shouldShowUntunneledAds]
+      && ![adManager untunneledInterstitialIsReady]
+      && ![adManager untunneledInterstitialHasShown]
+      && ![vpnManager startStopButtonPressed]) {
 
-        // Loads Ads and shows the launch screen.
-        [adManager initializeAds];
         [rootContainerController showLaunchScreen];
+
+        dispatch_async(dispatch_get_main_queue(), ^{
+                [adManager initializeAds];
+        });
+
     } else {
         // Removes launch screen if already showing.
         [rootContainerController removeLaunchScreen];
