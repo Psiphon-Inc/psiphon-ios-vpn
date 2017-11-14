@@ -63,7 +63,6 @@
 		EFB3E62C1F621111004AAE8C /* PulsingHaloLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = EFB3E6291F621111004AAE8C /* PulsingHaloLayer.m */; };
 		EFED7EBC1F55C8550078980F /* LogViewControllerFullScreen.m in Sources */ = {isa = PBXBuildFile; fileRef = EFED7EBB1F55C8550078980F /* LogViewControllerFullScreen.m */; };
 		F132D7E01F5739A800AF7F91 /* LaunchScreenViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = F132D7DF1F5739A800AF7F91 /* LaunchScreenViewController.m */; };
-		F136C2911F61F7FB000D3EAB /* launch.m4v in Resources */ = {isa = PBXBuildFile; fileRef = F136C2901F61F7FA000D3EAB /* launch.m4v */; };
 		F136C2931F61FB5F000D3EAB /* connecting.m4v in Resources */ = {isa = PBXBuildFile; fileRef = F136C2921F61FB5E000D3EAB /* connecting.m4v */; };
 		F136C2951F62E3E1000D3EAB /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = F136C2941F62E3E1000D3EAB /* LaunchScreen.xib */; };
 /* End PBXBuildFile section */
@@ -224,7 +223,6 @@
 		EFED7EBB1F55C8550078980F /* LogViewControllerFullScreen.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LogViewControllerFullScreen.m; sourceTree = "<group>"; };
 		F132D7DE1F5739A800AF7F91 /* LaunchScreenViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LaunchScreenViewController.h; sourceTree = "<group>"; };
 		F132D7DF1F5739A800AF7F91 /* LaunchScreenViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LaunchScreenViewController.m; sourceTree = "<group>"; };
-		F136C2901F61F7FA000D3EAB /* launch.m4v */ = {isa = PBXFileReference; lastKnownFileType = file; path = launch.m4v; sourceTree = "<group>"; };
 		F136C2921F61FB5E000D3EAB /* connecting.m4v */ = {isa = PBXFileReference; lastKnownFileType = file; path = connecting.m4v; sourceTree = "<group>"; };
 		F136C2941F62E3E1000D3EAB /* LaunchScreen.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = LaunchScreen.xib; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -439,7 +437,6 @@
 				CE26FC941BBDC7B800B83375 /* Assets.xcassets */,
 				F136C2941F62E3E1000D3EAB /* LaunchScreen.xib */,
 				F136C2921F61FB5E000D3EAB /* connecting.m4v */,
-				F136C2901F61F7FA000D3EAB /* launch.m4v */,
 			);
 			name = Resource;
 			sourceTree = "<group>";
@@ -639,7 +636,6 @@
 				EF6C1F521F59E46500709554 /* embedded_server_entries in Resources */,
 				EF6C1F541F59E46500709554 /* psiphon_config in Resources */,
 				F136C2931F61FB5F000D3EAB /* connecting.m4v in Resources */,
-				F136C2911F61F7FB000D3EAB /* launch.m4v in Resources */,
 				4E0774961F566B040097BC8C /* InAppSettings.bundle in Resources */,
 				CE26FC951BBDC7B800B83375 /* Assets.xcassets in Resources */,
 				F136C2951F62E3E1000D3EAB /* LaunchScreen.xib in Resources */,

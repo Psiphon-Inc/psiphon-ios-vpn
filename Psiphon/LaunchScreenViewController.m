@@ -18,7 +18,6 @@
  */
 
 #import <Foundation/Foundation.h>
-#import <AVFoundation/AVFoundation.h>
 #import "LaunchScreenViewController.h"
 #import "Logging.h"
 #import "RootContainerController.h"
@@ -32,71 +31,35 @@
 
 #define kTimerInterval 1.f
 
+#define kLogoToScreenRatio 0.69f
+
 @interface LaunchScreenViewController ()
 
 @property (strong, nonatomic) UIProgressView *progressView;
-@property (strong, nonatomic) AVPlayer *loadingVideo;
-@property (nonatomic) AVPlayerItem *videoFile;
 
 @end
 
 static const NSString *ItemStatusContext;
 
 @implementation LaunchScreenViewController {
-    // videoPlayer
-    AVPlayerLayer* playerLayer;
-
     // Loading Text
     UILabel *loadingLabel;
 
     // Loading Timer
     NSTimer *loadingTimer;
     float timerCount;
+
+    NSLayoutConstraint *logoScreenWidth;
+    NSLayoutConstraint *logoScreenHeight;
+    NSLayoutConstraint *logoWidth;
 }
 
 - (id)init {
     self = [super init];
-
-    NSString *tracksKey = @"tracks";
-    
-    NSURL *fileURL = [[NSBundle mainBundle] URLForResource:@"launch" withExtension:@"m4v"];
-    
-    AVURLAsset *asset = [AVURLAsset URLAssetWithURL:fileURL options:nil];
-    
-    [asset loadValuesAsynchronouslyForKeys:@[tracksKey] completionHandler:^{
-        
-        dispatch_async(dispatch_get_main_queue(), ^{
-            NSError *error;
-            AVKeyValueStatus status = [asset statusOfValueForKey:tracksKey error:&error];
-             if (status == AVKeyValueStatusLoaded) {
-                 self.videoFile = [AVPlayerItem playerItemWithAsset:asset];
-                 // ensure that this is done before the playerItem is associated with the player
-                 [self.videoFile addObserver:self forKeyPath:@"status" options:NSKeyValueObservingOptionInitial context:&ItemStatusContext];
-                 [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(playerItemDidReachEnd:) name:AVPlayerItemDidPlayToEndTimeNotification object:self.videoFile];
-                 self.loadingVideo = [AVPlayer playerWithPlayerItem:self.videoFile];
-                 
-                 playerLayer = [AVPlayerLayer playerLayerWithPlayer:self.loadingVideo];
-                 [self setupVideoLayerFrame:self.view.bounds.size];
-                 playerLayer.videoGravity = AVLayerVideoGravityResizeAspect;
-                 playerLayer.needsDisplayOnBoundsChange = YES;
-
-                LOG_DEBUG(@"Loading video");
-                 [self.view.layer addSublayer:playerLayer];
-                 self.view.layer.needsDisplayOnBoundsChange = YES;
-             }
-             else {
-                 // You should deal with the error appropriately.
-                LOG_DEBUG(@"The asset's tracks were not loaded:\n%@", [error localizedDescription]);
-             }
-        });
-     }];
-    
     return self;
 }
 
 - (void)dealloc {
-    // Must unregister observers from AVPlayerItem.
-    [self.videoFile removeObserver:self forKeyPath:@"status"];
 }
 
 
@@ -104,7 +67,17 @@ static const NSString *ItemStatusContext;
 
 - (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator {
 
-    [self setupVideoLayerFrame:size];
+    [self.view removeConstraint:logoWidth];
+
+    if (size.width > size.height) {
+        [self.view removeConstraint:logoScreenWidth];
+        [self.view addConstraint:logoScreenHeight];
+    } else {
+        [self.view removeConstraint:logoScreenHeight];
+        [self.view addConstraint:logoScreenWidth];
+    }
+
+    [self.view addConstraint:logoWidth];
 
     [coordinator animateAlongsideTransition:nil completion:^(id<UIViewControllerTransitionCoordinatorContext> context) {
     }];
@@ -114,27 +87,27 @@ static const NSString *ItemStatusContext;
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    // TODO: Add something to handle the syncUI when screen rotate
-    [self.view setBackgroundColor:[UIColor blackColor]];
+
+    [self.view setBackgroundColor:[[UIColor blackColor] colorWithAlphaComponent:0.83f]];
+
     [self addLoadingLabel];
     [self addProgressView];
+    [self addPsiphonLogo];
     [self setNeedsStatusBarAppearanceUpdate];
-    [self syncUI];
 }
 
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
-    [self.loadingVideo seekToTime:kCMTimeZero];
-    [self setupVideoLayerFrame:self.view.bounds.size];
-    [self.loadingVideo play];
+
 
     // Reset the timer count.
-    timerCount = 0.f;
+    timerCount = 1.f;
+    [self.progressView setProgress:timerCount / kLaunchScreenTimerCount animated:TRUE];
 
     loadingTimer = [NSTimer scheduledTimerWithTimeInterval:kTimerInterval repeats:TRUE block:^(NSTimer *timer) {
         timerCount += kTimerInterval;
         [self.progressView setProgress:(timerCount / kLaunchScreenTimerCount) animated:TRUE];
-        if (timerCount >= kLaunchScreenTimerCount) {
+        if (timerCount >= kLaunchScreenTimerCount + kTimerInterval) {
             [timer invalidate];
 
             [[AppDelegate sharedAppDelegate] launchScreenFinished];
@@ -148,43 +121,18 @@ static const NSString *ItemStatusContext;
     [loadingTimer invalidate];
 }
 
-#pragma mark -
+- (void)willMoveToParentViewController:(nullable UIViewController *)parent {
+    [super willMoveToParentViewController:parent];
 
-- (void)setupVideoLayerFrame:(CGSize)size {
-    if (size.width > size.height) {
-        // Landscape
-        playerLayer.frame = CGRectMake((size.width - size.width / 1.5) / 2, 30, size.width / 1.5, size.height / 1.5);
-    } else {
-        playerLayer.frame = CGRectMake(0, 0, size.width, size.height);
+    if (parent == nil) {
+        // no more parenting.
     }
 }
 
-- (void)playerItemDidReachEnd:(NSNotification *)notification {
-    [self.loadingVideo seekToTime:kCMTimeZero];
-}
+#pragma mark -
 
 - (UIStatusBarStyle)preferredStatusBarStyle {
     return UIStatusBarStyleLightContent;
-}
-
-- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
-    
-    if (context == &ItemStatusContext) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [self syncUI];
-        });
-        return;
-    }
-    [super observeValueForKeyPath:keyPath ofObject:object
-                           change:change context:context];
-    return;
-}
-
-- (void)syncUI {
-    if ((self.loadingVideo.currentItem != nil) &&
-        ([self.loadingVideo.currentItem status] == AVPlayerItemStatusReadyToPlay)) {
-            [self.loadingVideo play];
-    }
 }
 
 - (void)addLoadingLabel {
@@ -199,20 +147,28 @@ static const NSString *ItemStatusContext;
 
     // Setup autolayout
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:loadingLabel
+                                                          attribute:NSLayoutAttributeHeight
+                                                          relatedBy:NSLayoutRelationEqual
+                                                             toItem:nil
+                                                          attribute:NSLayoutAttributeNotAnAttribute
+                                                         multiplier:1.0
+                                                           constant:30.f]];
+
+    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:loadingLabel
                                                           attribute:NSLayoutAttributeBottom
-                                                          relatedBy:NSLayoutRelationGreaterThanOrEqual
+                                                          relatedBy:NSLayoutRelationEqual
                                                              toItem:self.view
                                                           attribute:NSLayoutAttributeBottom
                                                          multiplier:1.0
-                                                           constant:-30.0]];
-    
+                                                           constant:-30.f]];
+
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:loadingLabel
                                                           attribute:NSLayoutAttributeRight
                                                           relatedBy:NSLayoutRelationEqual
                                                              toItem:self.view
                                                           attribute:NSLayoutAttributeRight
                                                          multiplier:1.0
-                                                           constant:-30.0]];
+                                                           constant:-30.f]];
     
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:loadingLabel
                                                           attribute:NSLayoutAttributeLeft
@@ -226,16 +182,26 @@ static const NSString *ItemStatusContext;
 - (void)addProgressView {
     self.progressView = [[UIProgressView alloc] init];
     self.progressView.translatesAutoresizingMaskIntoConstraints = NO;
+    self.progressView.tintColor = [[UIColor redColor] colorWithAlphaComponent:1.0];
+
     [self.view addSubview:self.progressView];
-    
+
     // Setup autolayout
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:self.progressView
+                                                          attribute:NSLayoutAttributeHeight
+                                                          relatedBy:NSLayoutRelationEqual
+                                                             toItem:nil
+                                                          attribute:NSLayoutAttributeNotAnAttribute
+                                                         multiplier:1.0
+                                                           constant:2]];
+
+    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:self.progressView
                                                           attribute:NSLayoutAttributeBottom
-                                                          relatedBy:NSLayoutRelationGreaterThanOrEqual
+                                                          relatedBy:NSLayoutRelationEqual
                                                              toItem:loadingLabel
                                                           attribute:NSLayoutAttributeTop
                                                          multiplier:1.0
-                                                           constant:-15.0]];
+                                                           constant:-15.f]];
     
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:self.progressView
                                                           attribute:NSLayoutAttributeLeft
@@ -251,7 +217,76 @@ static const NSString *ItemStatusContext;
                                                              toItem:self.view
                                                           attribute:NSLayoutAttributeRight
                                                          multiplier:1.0
-                                                           constant:-15.0]];
+                                                           constant:-15.f]];
+}
+
+- (void)addPsiphonLogo {
+    UIImage *logoImage = [UIImage imageNamed:@"LaunchScreen"];
+    UIImageView *logoView = [[UIImageView alloc] initWithImage:logoImage];
+    logoView.translatesAutoresizingMaskIntoConstraints = NO;
+    [self.view addSubview:logoView];
+
+    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:logoView
+                                                          attribute:NSLayoutAttributeCenterX
+                                                          relatedBy:NSLayoutRelationEqual
+                                                             toItem:self.view
+                                                          attribute:NSLayoutAttributeCenterX
+                                                         multiplier:1.0
+                                                           constant:0.0]];
+
+    NSLayoutConstraint *centerYConstraint = [NSLayoutConstraint constraintWithItem:logoView
+                                                          attribute:NSLayoutAttributeCenterY
+                                                          relatedBy:NSLayoutRelationEqual
+                                                             toItem:self.view
+                                                          attribute:NSLayoutAttributeCenterY
+                                                         multiplier:1.0
+                                                           constant:0.0];
+
+    centerYConstraint.priority = 999;
+    [self.view addConstraint:centerYConstraint];
+
+    logoScreenWidth = [NSLayoutConstraint constraintWithItem:logoView
+                                                   attribute:NSLayoutAttributeWidth
+                                                   relatedBy:NSLayoutRelationEqual
+                                                      toItem:self.view
+                                                   attribute:NSLayoutAttributeWidth
+                                                  multiplier:kLogoToScreenRatio
+                                                    constant:0];
+
+    logoScreenHeight = [NSLayoutConstraint constraintWithItem:logoView
+                                                    attribute:NSLayoutAttributeHeight
+                                                    relatedBy:NSLayoutRelationEqual
+                                                       toItem:self.view
+                                                    attribute:NSLayoutAttributeHeight
+                                                   multiplier:kLogoToScreenRatio
+                                                     constant:0];
+
+    logoWidth = [NSLayoutConstraint constraintWithItem:logoView
+                                             attribute:NSLayoutAttributeHeight
+                                             relatedBy:NSLayoutRelationEqual
+                                                toItem:logoView
+                                             attribute:NSLayoutAttributeWidth
+                                            multiplier:1.0
+                                              constant:0];
+
+    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:self.progressView
+                                                          attribute:NSLayoutAttributeTop
+                                                          relatedBy:NSLayoutRelationGreaterThanOrEqual
+                                                             toItem:logoView
+                                                          attribute:NSLayoutAttributeBottom
+                                                         multiplier:1.0
+                                                           constant:10.0]];
+
+    CGSize viewSize = self.view.bounds.size;
+
+    if (viewSize.width > viewSize.height) {
+        [self.view addConstraint:logoScreenHeight];
+    } else {
+        [self.view addConstraint:logoScreenWidth];
+    }
+
+    [self.view addConstraint:logoWidth];
+
 }
 
 @end

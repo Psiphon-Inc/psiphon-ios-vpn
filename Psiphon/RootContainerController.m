@@ -55,17 +55,13 @@
 
 @end
 
-@implementation RootContainerController {
-    // Boolean value indicating if the launch screen should be launched first.
-    BOOL firstLaunchScreen;
-}
+@implementation RootContainerController
 
 - (instancetype)init {
     self = [super init];
     if (self) {
         self.launchScreenViewController = nil;
         self.mainViewController = nil;
-        firstLaunchScreen = TRUE;
     }
     return self;
 }
@@ -80,18 +76,15 @@
     // not be called) unless removeLaunchScreen has been called before viewDidLoad.
     // This prevents the launch screen from taking too long to show up on the screen.
 
-    self.mainViewController = [[MainViewController alloc] init];
     // Note that addChildViewController: has nothing to do with
     // ViewController lifecycle methods.
+    self.mainViewController = [[MainViewController alloc] init];
     [self addChildViewController:self.mainViewController];
+    [self displayChildVC:self.mainViewController];
 
-    if (firstLaunchScreen) {
-        self.launchScreenViewController = [[LaunchScreenViewController alloc] init];
-        [self addChildViewController:self.launchScreenViewController];
-        [self displayChildVC:self.launchScreenViewController];
-    } else {
-        [self displayChildVC:self.mainViewController];
-    }
+    self.launchScreenViewController = [[LaunchScreenViewController alloc] init];
+    [self addChildViewController:self.launchScreenViewController];
+    [self displayChildVC:self.launchScreenViewController];
 }
 
 // Note: addChildViewController should be called before a view controller can be displayed.
@@ -173,21 +166,14 @@
 - (void)removeLaunchScreen {
     LOG_DEBUG();
     if ([self.childViewControllers containsObject:self.launchScreenViewController]) {
-        [self removeChildVC:self.launchScreenViewController];
-        self.launchScreenViewController = nil;
-    }
 
-    // If this is the first call to remove the launch screen, and if the container
-    // has been loaded into memory, then load MainViewController by calling displayChildVC:
-    if (firstLaunchScreen) {
-        firstLaunchScreen = FALSE;
+        [UIView animateWithDuration:0.8 animations:^{
+            self.launchScreenViewController.view.alpha = 0.0;
+        } completion:^(BOOL finished) {
+            [self removeChildVC:self.launchScreenViewController];
+            self.launchScreenViewController = nil;
+        }];
 
-        // If removeLaunchScreen has been called before container is loaded into memory
-        // defer displaying MainViewController to when viewDidLoad callback is called.
-        if (self.viewLoaded) {
-            // root view controller has already been loaded, with the
-            [self displayChildVC:self.mainViewController];
-        }
     }
 }
 
