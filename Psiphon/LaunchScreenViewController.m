@@ -88,7 +88,14 @@ static const NSString *ItemStatusContext;
 - (void)viewDidLoad {
     [super viewDidLoad];
 
-    [self.view setBackgroundColor:[[UIColor blackColor] colorWithAlphaComponent:0.83f]];
+    // Adds background blur effect.
+    self.view.backgroundColor = [UIColor clearColor];
+    UIBlurEffect *bgBlurEffect = [UIBlurEffect effectWithStyle:UIBlurEffectStyleDark];
+    UIVisualEffectView *bgBlurEffectView = [[UIVisualEffectView alloc] initWithEffect:bgBlurEffect];
+    bgBlurEffectView.frame = self.view.bounds;
+    bgBlurEffectView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+
+    [self.view addSubview:bgBlurEffectView];
 
     [self addLoadingLabel];
     [self addProgressView];
