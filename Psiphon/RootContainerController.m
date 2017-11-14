@@ -79,18 +79,16 @@
     // Note that addChildViewController: has nothing to do with
     // ViewController lifecycle methods.
     self.mainViewController = [[MainViewController alloc] init];
-    [self addChildViewController:self.mainViewController];
     [self displayChildVC:self.mainViewController];
 
     self.launchScreenViewController = [[LaunchScreenViewController alloc] init];
-    [self addChildViewController:self.launchScreenViewController];
     [self displayChildVC:self.launchScreenViewController];
 }
 
-// Note: addChildViewController should be called before a view controller can be displayed.
 - (void)displayChildVC:(UIViewController *)viewController {
     LOG_DEBUG();
     // The order of method calls is what UIKit expects, and should not be changed.
+    [self addChildViewController:viewController];
     viewController.view.frame = self.view.bounds;
     [self.view addSubview:viewController.view];
     [viewController didMoveToParentViewController:self];
@@ -108,10 +106,20 @@
 
 #pragma mark - Status bar delegation
 
+/**
+ * The last child view controller added, is the one currently being displayed full-screen.
+ * @sa displayChildVC
+ * @return the child view controller whose status bar appearance that will be used.
+ */
 - (UIViewController *)childViewControllerForStatusBarStyle {
     return [self.childViewControllers lastObject];
 }
 
+/**
+ * The last child view controller added, is the one currently being displayed full-screen.
+ * @sa displayChildVC
+ * @return the child view controller whose status bar appearance that will be used.
+ */
 - (UIViewController *)childViewControllerForStatusBarHidden {
     return [self.childViewControllers lastObject];
 }
@@ -128,7 +136,6 @@
 
         // Creates new child MainViewController, and adds its view to current root view hierarchy.
         self.mainViewController = [[MainViewController alloc] init];
-        [self addChildViewController:self.mainViewController];
         [self displayChildVC:self.mainViewController];
     }
 }
@@ -144,13 +151,12 @@
         return;
     }
 
-    if (self.launchScreenViewController) {
+    if ([self.childViewControllers containsObject:self.launchScreenViewController]) {
         // Launch screen is not previously removed. Return immediately.
         return;
     }
 
     self.launchScreenViewController = [[LaunchScreenViewController alloc] init];
-    [self addChildViewController:self.launchScreenViewController];
     [self displayChildVC:self.launchScreenViewController];
 }
 
