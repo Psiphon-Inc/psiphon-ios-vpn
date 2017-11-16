@@ -86,6 +86,25 @@
     return (AppDelegate *)[UIApplication sharedApplication].delegate;
 }
 
++ (BOOL)isRunningUITest {
+#ifdef DEBUG
+    static BOOL runningUITest;
+    static dispatch_once_t once;
+    dispatch_once(&once, ^{
+        if ([[NSUserDefaults standardUserDefaults] boolForKey:@"FASTLANE_SNAPSHOT"]) {
+            NSDictionary *environmentDictionary = [[NSProcessInfo processInfo] environment];
+            if (environmentDictionary[@"PsiphonUITestEnvironment"] != nil) {
+                runningUITest = TRUE;
+            }
+        }
+
+    });
+    return runningUITest;
+#else
+    return FALSE;
+#endif
+}
+
 - (MainViewController *)getMainViewController {
     return mainViewController;
 }

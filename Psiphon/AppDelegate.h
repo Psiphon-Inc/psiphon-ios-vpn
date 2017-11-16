@@ -26,7 +26,8 @@
 @property (strong, nonatomic) UIWindow *window;
 
 + (AppDelegate *)sharedAppDelegate;
++ (BOOL)isRunningUITest;
 - (MainViewController *)getMainViewController;
-- (void) reloadMainViewController;
+- (void)reloadMainViewController;
 
 @end

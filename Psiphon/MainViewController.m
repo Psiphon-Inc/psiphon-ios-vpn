@@ -19,6 +19,7 @@
 
 #import <Foundation/Foundation.h>
 #import <PsiphonTunnel/PsiphonTunnel.h>
+#import "AppDelegate.h"
 #import "FeedbackUpload.h"
 #import "LogViewControllerFullScreen.h"
 #import "PsiphonConfigUserDefaults.h"
@@ -1171,6 +1172,16 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 - (void)updateAvailableRegions {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         NSArray<NSString *> *regions = [sharedDB getAllEgressRegions];
+#ifdef DEBUG
+        if ([AppDelegate isRunningUITest]) {
+            // fake the availability of all regions in the UI for automated screenshots
+            NSMutableArray *faked_regions = [[NSMutableArray alloc] init];
+            for (Region *region in [[RegionAdapter sharedInstance] getRegions]) {
+                [faked_regions addObject:region.code];
+            }
+            regions = faked_regions;
+        }
+#endif
         [[RegionAdapter sharedInstance] onAvailableEgressRegions:regions];
     });
 }

@@ -82,12 +82,12 @@ increment_build_numbers_for_testflight () {
 
 increment_plists_and_commit () {
     git pull
-    container_commit_message=$(python "${PSIPHON_IOS_VPN_XCODE_WORKSPACE}/increment_plist.py" --plist "${PSIPHON_IOS_VPN_XCODE_WORKSPACE}/Psiphon/Info.plist" --distribution_platform $1 --version_string)
+    container_commit_message=$(python "${PSIPHON_IOS_VPN_XCODE_WORKSPACE}/info_plist.py" --plist "${PSIPHON_IOS_VPN_XCODE_WORKSPACE}/Psiphon/Info.plist" --increment_for $1 --output human_readable)
     if [[ $? != 0 ]]; then
         echo "Incrementing container plist failed, aborting..."
         exit 1
     fi
-    extension_commit_message=$(python "${PSIPHON_IOS_VPN_XCODE_WORKSPACE}/increment_plist.py" --plist "${PSIPHON_IOS_VPN_XCODE_WORKSPACE}/PsiphonVPN/Info.plist" --distribution_platform $1 --version_string)
+    extension_commit_message=$(python "${PSIPHON_IOS_VPN_XCODE_WORKSPACE}/info_plist.py" --plist "${PSIPHON_IOS_VPN_XCODE_WORKSPACE}/PsiphonVPN/Info.plist" --increment_for $1 --output human_readable)
     if [[ $? != 0 ]]; then
         echo "Incrementing extension plist failed, aborting..."
         exit 1
@@ -105,23 +105,6 @@ increment_plists_and_commit () {
     if [[ $? != 0 ]]; then
         echo "Failed to git commit plist changes, aborting..."
         exit 1
-    fi
-
-    # Only tag release builds
-    if [[ "$1" == "release" ]]; then
-        # Get tag by retrieving the version number at the end of the commit message:
-        # TestFlight commit messages are in the form:
-        #   "TestFlight version <CFBundleShortVersionString#>"
-        # Release commit messages are in the form:
-        #   "TestFlight version <CFBundleShortVersionString#>; Release version <CFBundleVersion#>"
-        # Tag will be of the form: vX.Y.Z
-        # E.g.: v1.2.3
-        tag="v${commit_message##* }" # trim everything up to and including last space
-        git tag "${tag}"
-        if [[ $? != 0 ]]; then
-            echo "Failed to git tag plist commit, aborting..."
-            exit 1
-        fi
     fi
 }
 
