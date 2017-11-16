@@ -18,10 +18,13 @@
  */
 
 #import <Foundation/Foundation.h>
+#import "AppDelegate.h"
 #import "LaunchScreenViewController.h"
 #import "Logging.h"
+#import "PsiphonProgressView.h"
+#import "PureLayout.h"
 #import "RootContainerController.h"
-#import "AppDelegate.h"
+#import "FBShimmeringView.h"
 
 #if DEBUG
 #define kLaunchScreenTimerCount 1.f
@@ -31,11 +34,11 @@
 
 #define kTimerInterval 1.f
 
-#define kLogoToScreenRatio 0.69f
+#define kProgressViewToScreenRatio 0.9f
+#define kProgressViewMaxDimensionLength 500.f
+
 
 @interface LaunchScreenViewController ()
-
-@property (strong, nonatomic) UIProgressView *progressView;
 
 @end
 
@@ -47,43 +50,17 @@ static const NSString *ItemStatusContext;
 
     // Loading Timer
     NSTimer *loadingTimer;
-    float timerCount;
+    CGFloat timerCount;
 
-    NSLayoutConstraint *logoScreenWidth;
-    NSLayoutConstraint *logoScreenHeight;
-    NSLayoutConstraint *logoWidth;
+    // Loading Animation
+    PsiphonProgressView *progressView;
 }
 
-- (id)init {
-    self = [super init];
-    return self;
+- (UIStatusBarStyle)preferredStatusBarStyle {
+    return UIStatusBarStyleLightContent;
 }
-
-- (void)dealloc {
-}
-
 
 #pragma mark - Lifecycle Methods
-
-- (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator {
-
-    [self.view removeConstraint:logoWidth];
-
-    if (size.width > size.height) {
-        [self.view removeConstraint:logoScreenWidth];
-        [self.view addConstraint:logoScreenHeight];
-    } else {
-        [self.view removeConstraint:logoScreenHeight];
-        [self.view addConstraint:logoScreenWidth];
-    }
-
-    [self.view addConstraint:logoWidth];
-
-    [coordinator animateAlongsideTransition:nil completion:^(id<UIViewControllerTransitionCoordinatorContext> context) {
-    }];
-
-    [super viewWillTransitionToSize:size withTransitionCoordinator:coordinator];
-}
 
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -94,32 +71,29 @@ static const NSString *ItemStatusContext;
     UIVisualEffectView *bgBlurEffectView = [[UIVisualEffectView alloc] initWithEffect:bgBlurEffect];
     bgBlurEffectView.frame = self.view.bounds;
     bgBlurEffectView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-
     [self.view addSubview:bgBlurEffectView];
 
-    [self addLoadingLabel];
     [self addProgressView];
-    [self addPsiphonLogo];
+    [self addLoadingLabel];
+
     [self setNeedsStatusBarAppearanceUpdate];
 }
 
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
 
-
     // Reset the timer count.
-    timerCount = 1.f;
-    [self.progressView setProgress:timerCount / kLaunchScreenTimerCount animated:TRUE];
+    timerCount = 0.f;
 
     loadingTimer = [NSTimer scheduledTimerWithTimeInterval:kTimerInterval repeats:TRUE block:^(NSTimer *timer) {
         timerCount += kTimerInterval;
-        [self.progressView setProgress:(timerCount / kLaunchScreenTimerCount) animated:TRUE];
+        [progressView setProgress:timerCount / kLaunchScreenTimerCount];
         if (timerCount >= kLaunchScreenTimerCount + kTimerInterval) {
             [timer invalidate];
-
             [[AppDelegate sharedAppDelegate] launchScreenFinished];
         }
     }];
+    [loadingTimer fire];
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
@@ -136,164 +110,67 @@ static const NSString *ItemStatusContext;
     }
 }
 
-#pragma mark -
+#pragma mark - helpers
 
-- (UIStatusBarStyle)preferredStatusBarStyle {
-    return UIStatusBarStyleLightContent;
+- (void)addProgressView {
+    progressView = [[PsiphonProgressView alloc] init];
+    progressView.translatesAutoresizingMaskIntoConstraints = NO;
+    [self.view addSubview:progressView];
+
+    [progressView.centerXAnchor constraintEqualToAnchor:self.view.centerXAnchor].active = YES;
+    NSLayoutConstraint *centerYAnchor = [progressView.centerYAnchor constraintEqualToAnchor:self.view.centerYAnchor];
+    // Allow constraint to be broken
+    centerYAnchor.priority = UILayoutPriorityDefaultHigh;
+    centerYAnchor.active = YES;
+
+    [progressView autoSetDimensionsToSize:[self progressViewSize]];
 }
 
 - (void)addLoadingLabel {
+    // Add view for shimmering effect
+    FBShimmeringView *shimmeringView = [[FBShimmeringView alloc] init];
+    shimmeringView.translatesAutoresizingMaskIntoConstraints = NO;
+
+    shimmeringView.shimmeringSpeed = 100.f;
+    shimmeringView.shimmeringHighlightWidth = 0.7f;
+    shimmeringView.shimmering = YES;
+
+    [self.view addSubview:shimmeringView];
+    [shimmeringView.heightAnchor constraintEqualToConstant:30.f].active = YES;
+    [shimmeringView.widthAnchor constraintEqualToAnchor:progressView.widthAnchor].active = YES;
+    [shimmeringView.centerXAnchor constraintEqualToAnchor:self.view.centerXAnchor].active = YES;
+    [shimmeringView.topAnchor constraintGreaterThanOrEqualToAnchor:progressView.bottomAnchor].active = YES;
+    [shimmeringView.bottomAnchor constraintEqualToAnchor:self.bottomLayoutGuide.bottomAnchor constant:-15].active = YES;
+
+    // Add loading label
     loadingLabel = [[UILabel alloc] init];
     loadingLabel.translatesAutoresizingMaskIntoConstraints = NO;
+
     loadingLabel.adjustsFontSizeToFitWidth = YES;
     loadingLabel.text = NSLocalizedStringWithDefaultValue(@"LOADING", nil, [NSBundle mainBundle], @"Loading...", @"Text displayed while app loads");
     loadingLabel.textAlignment = NSTextAlignmentCenter;
-    loadingLabel.textColor = [UIColor whiteColor];
+    loadingLabel.textColor = [[UIColor whiteColor] colorWithAlphaComponent:0.6];
+    loadingLabel.font = [UIFont systemFontOfSize:20 weight:UIFontWeightThin];
 
-    [self.view addSubview:loadingLabel];
+    [shimmeringView addSubview:loadingLabel];
+    [loadingLabel.heightAnchor constraintEqualToAnchor:shimmeringView.heightAnchor multiplier:0].active = YES;
+    [loadingLabel.widthAnchor constraintEqualToAnchor:shimmeringView.widthAnchor multiplier:0].active = YES;
+    [loadingLabel.centerXAnchor constraintEqualToAnchor:shimmeringView.centerXAnchor constant:0.f].active = YES;
+    [loadingLabel.centerYAnchor constraintEqualToAnchor:shimmeringView.centerYAnchor constant:0.f].active = YES;
 
-    // Setup autolayout
-    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:loadingLabel
-                                                          attribute:NSLayoutAttributeHeight
-                                                          relatedBy:NSLayoutRelationEqual
-                                                             toItem:nil
-                                                          attribute:NSLayoutAttributeNotAnAttribute
-                                                         multiplier:1.0
-                                                           constant:30.f]];
-
-    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:loadingLabel
-                                                          attribute:NSLayoutAttributeBottom
-                                                          relatedBy:NSLayoutRelationEqual
-                                                             toItem:self.view
-                                                          attribute:NSLayoutAttributeBottom
-                                                         multiplier:1.0
-                                                           constant:-30.f]];
-
-    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:loadingLabel
-                                                          attribute:NSLayoutAttributeRight
-                                                          relatedBy:NSLayoutRelationEqual
-                                                             toItem:self.view
-                                                          attribute:NSLayoutAttributeRight
-                                                         multiplier:1.0
-                                                           constant:-30.f]];
-    
-    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:loadingLabel
-                                                          attribute:NSLayoutAttributeLeft
-                                                          relatedBy:NSLayoutRelationEqual
-                                                             toItem:self.view
-                                                          attribute:NSLayoutAttributeLeft
-                                                         multiplier:1.0
-                                                           constant:30]];
+    shimmeringView.contentView = loadingLabel;
 }
 
-- (void)addProgressView {
-    self.progressView = [[UIProgressView alloc] init];
-    self.progressView.translatesAutoresizingMaskIntoConstraints = NO;
-    self.progressView.tintColor = [[UIColor redColor] colorWithAlphaComponent:1.0];
-
-    [self.view addSubview:self.progressView];
-
-    // Setup autolayout
-    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:self.progressView
-                                                          attribute:NSLayoutAttributeHeight
-                                                          relatedBy:NSLayoutRelationEqual
-                                                             toItem:nil
-                                                          attribute:NSLayoutAttributeNotAnAttribute
-                                                         multiplier:1.0
-                                                           constant:2]];
-
-    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:self.progressView
-                                                          attribute:NSLayoutAttributeBottom
-                                                          relatedBy:NSLayoutRelationEqual
-                                                             toItem:loadingLabel
-                                                          attribute:NSLayoutAttributeTop
-                                                         multiplier:1.0
-                                                           constant:-15.f]];
-    
-    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:self.progressView
-                                                          attribute:NSLayoutAttributeLeft
-                                                          relatedBy:NSLayoutRelationEqual
-                                                             toItem:self.view
-                                                          attribute:NSLayoutAttributeLeft
-                                                         multiplier:1.0
-                                                           constant:15.0]];
-    
-    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:self.progressView
-                                                          attribute:NSLayoutAttributeRight
-                                                          relatedBy:NSLayoutRelationEqual
-                                                             toItem:self.view
-                                                          attribute:NSLayoutAttributeRight
-                                                         multiplier:1.0
-                                                           constant:-15.f]];
-}
-
-- (void)addPsiphonLogo {
-    UIImage *logoImage = [UIImage imageNamed:@"LaunchScreen"];
-    UIImageView *logoView = [[UIImageView alloc] initWithImage:logoImage];
-    logoView.translatesAutoresizingMaskIntoConstraints = NO;
-    [self.view addSubview:logoView];
-
-    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:logoView
-                                                          attribute:NSLayoutAttributeCenterX
-                                                          relatedBy:NSLayoutRelationEqual
-                                                             toItem:self.view
-                                                          attribute:NSLayoutAttributeCenterX
-                                                         multiplier:1.0
-                                                           constant:0.0]];
-
-    NSLayoutConstraint *centerYConstraint = [NSLayoutConstraint constraintWithItem:logoView
-                                                          attribute:NSLayoutAttributeCenterY
-                                                          relatedBy:NSLayoutRelationEqual
-                                                             toItem:self.view
-                                                          attribute:NSLayoutAttributeCenterY
-                                                         multiplier:1.0
-                                                           constant:0.0];
-
-    centerYConstraint.priority = 999;
-    [self.view addConstraint:centerYConstraint];
-
-    logoScreenWidth = [NSLayoutConstraint constraintWithItem:logoView
-                                                   attribute:NSLayoutAttributeWidth
-                                                   relatedBy:NSLayoutRelationEqual
-                                                      toItem:self.view
-                                                   attribute:NSLayoutAttributeWidth
-                                                  multiplier:kLogoToScreenRatio
-                                                    constant:0];
-
-    logoScreenHeight = [NSLayoutConstraint constraintWithItem:logoView
-                                                    attribute:NSLayoutAttributeHeight
-                                                    relatedBy:NSLayoutRelationEqual
-                                                       toItem:self.view
-                                                    attribute:NSLayoutAttributeHeight
-                                                   multiplier:kLogoToScreenRatio
-                                                     constant:0];
-
-    logoWidth = [NSLayoutConstraint constraintWithItem:logoView
-                                             attribute:NSLayoutAttributeHeight
-                                             relatedBy:NSLayoutRelationEqual
-                                                toItem:logoView
-                                             attribute:NSLayoutAttributeWidth
-                                            multiplier:1.0
-                                              constant:0];
-
-    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:self.progressView
-                                                          attribute:NSLayoutAttributeTop
-                                                          relatedBy:NSLayoutRelationGreaterThanOrEqual
-                                                             toItem:logoView
-                                                          attribute:NSLayoutAttributeBottom
-                                                         multiplier:1.0
-                                                           constant:10.0]];
-
-    CGSize viewSize = self.view.bounds.size;
-
-    if (viewSize.width > viewSize.height) {
-        [self.view addConstraint:logoScreenHeight];
-    } else {
-        [self.view addConstraint:logoScreenWidth];
+- (CGSize)progressViewSize {
+    CGFloat len = kProgressViewToScreenRatio * [self minDimensionLength];
+    if (len > kProgressViewMaxDimensionLength) {
+        len = kProgressViewMaxDimensionLength;
     }
+    return CGSizeMake(len, len);
+}
 
-    [self.view addConstraint:logoWidth];
-
+- (CGFloat)minDimensionLength {
+    return MIN(self.view.frame.size.width, self.view.frame.size.height);
 }
 
 @end
