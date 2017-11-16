@@ -128,7 +128,7 @@ static NSURL *_appleRootCertificateURL = nil;
 {
     if (self = [super init])
     {
-        NSMutableArray *subscriptions = [[NSMutableArray alloc] init];
+        NSMutableDictionary *subscriptions = [[NSMutableDictionary alloc] init];
          // Explicit casting to avoid errors when compiling as Objective-C++
         [RMAppReceipt enumerateASN1Attributes:(const uint8_t*)asn1Data.bytes length:asn1Data.length usingBlock:^(NSData *data, int type) {
             const uint8_t *s = (const uint8_t*)data.bytes;
@@ -147,33 +147,27 @@ static NSURL *_appleRootCertificateURL = nil;
                     break;
                 case RMAppReceiptASN1TypeInAppPurchaseReceipt:
                 {
-                    RMAppReceiptIAP *iapReceipt = [[RMAppReceiptIAP alloc] initWithASN1Data:data];
-                    if(iapReceipt.cancellationDate) {
-                        break;
-                    }
-                    // sanity check
-                    if(iapReceipt.subscriptionExpirationDate == nil || iapReceipt.productIdentifier == nil) {
-                        break;
-                    }
+                    @autoreleasepool {
+                        RMAppReceiptIAP *iapReceipt = [[RMAppReceiptIAP alloc] initWithASN1Data:data];
+                        if(iapReceipt.cancellationDate) {
+                            iapReceipt = nil;
+                            break;
+                        }
+                        // sanity check
+                        if(iapReceipt.subscriptionExpirationDate == nil || iapReceipt.productIdentifier == nil) {
+                            iapReceipt = nil;
+                            break;
+                        }
 
-                    if ([subscriptions count] == 0) {
-                        [subscriptions addObject:iapReceipt];
-                    } else {
-                        BOOL foundProductIdentifier = NO;
-                        for(int i = 0; i < [subscriptions count]; i++) {
-                            RMAppReceiptIAP *curIap = subscriptions[i];
-                            if([curIap.productIdentifier isEqualToString:iapReceipt.productIdentifier]) {
-                                foundProductIdentifier = YES;
-                                // if new expiration date  > old then replace with new
-                                if([curIap.subscriptionExpirationDate compare:iapReceipt.subscriptionExpirationDate] == NSOrderedAscending) {
-                                    [subscriptions replaceObjectAtIndex:i withObject:iapReceipt];
-                                }
-                                break;
+                        NSDate *subscriptionExpirationDate = [subscriptions objectForKey:iapReceipt.productIdentifier];
+                        if (!subscriptionExpirationDate) {
+                            [subscriptions setObject:[iapReceipt.subscriptionExpirationDate copy] forKey:iapReceipt.productIdentifier];
+                        } else {
+                            if ([subscriptionExpirationDate compare:iapReceipt.subscriptionExpirationDate] == NSOrderedAscending) {
+                                [subscriptions setObject:[iapReceipt.subscriptionExpirationDate copy] forKey:iapReceipt.productIdentifier];
                             }
                         }
-                        if(!foundProductIdentifier) {
-                            [subscriptions addObject:iapReceipt];
-                        }
+                        iapReceipt = nil;
                     }
                 }
                 default:
@@ -328,15 +322,8 @@ static NSURL *_appleRootCertificateURL = nil;
 
 - (NSDate*)expirationDateForProduct:(NSString*)productIdentifier
 {
-    for(RMAppReceiptIAP* iap in self.inAppSubscriptions) {
-        if([iap.productIdentifier isEqualToString:productIdentifier]) {
-
-            return iap.subscriptionExpirationDate;
-        }
-    }
-    return nil;
+    return [self.inAppSubscriptions objectForKey:productIdentifier];
 }
-
 @end
 
 @implementation RMAppReceiptIAP

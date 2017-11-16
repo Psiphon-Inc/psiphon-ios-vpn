@@ -68,7 +68,7 @@ __attribute__((availability(ios,introduced=7.0)))
 /** Array of in-app purchases contained in the receipt.
  @see RMAppReceiptIAP
  */
-@property (nonatomic, strong, readonly) NSArray *inAppSubscriptions;
+@property (nonatomic, strong, readonly) NSDictionary *inAppSubscriptions;
 
 
 /** Returns an initialized app receipt from the given data.
@@ -97,6 +97,9 @@ __attribute__((availability(ios,introduced=7.0)))
  */
 + (void)setAppleRootCertificateURL:(NSURL*)url;
 
+/*
+ Get subscription expiration date for give product ID
+ */
 - (NSDate*)expirationDateForProduct:(NSString*)productIdentifier;
 
 @end

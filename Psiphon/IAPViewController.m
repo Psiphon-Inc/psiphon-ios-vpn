@@ -245,14 +245,14 @@ static NSString *iapCellID = @"IAPTableCellID";
     cell.detailTextLabel.text = product.localizedDescription;
     cell.textLabel.text = product.localizedTitle;
     
-    RMAppReceipt *receipt = [[IAPReceiptHelper sharedInstance] appReceipt];
+    NSDictionary *iaps = [[IAPReceiptHelper sharedInstance] iapSubscriptions];
     BOOL isActiveSubscription = NO;
     NSDate *subscriptionExpirationDate = nil;
 
-	if(receipt) {
-        subscriptionExpirationDate = [receipt expirationDateForProduct:product.productIdentifier];
+    if(iaps) {
+        subscriptionExpirationDate = [iaps objectForKey:product.productIdentifier];
         isActiveSubscription = (subscriptionExpirationDate && [[NSDate date] compare:subscriptionExpirationDate] != NSOrderedDescending);
-	}
+    }
 
     if (isActiveSubscription) {
         cell.accessoryType = UITableViewCellAccessoryCheckmark;
