@@ -70,7 +70,7 @@
                 }
 
                 NSString *bundleIdentifier = [[NSBundle mainBundle] bundleIdentifier];
-                if (![receipt.bundleIdentifier isEqualToString:bundleIdentifier]) {
+                if (![bundleIdentifier containsString:receipt.bundleIdentifier]) {
                     _iapSubscriptions = nil;
                 } else {
                     _iapSubscriptions = [NSDictionary dictionaryWithDictionary:receipt.inAppSubscriptions];
