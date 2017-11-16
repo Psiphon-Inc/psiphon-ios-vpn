@@ -40,6 +40,15 @@ Pods
 # Intellij IDE
 .idea
 
+# itmsp packages
+*.itmsp
+
+# python bytecode files
+*.pyc
+
+# fastlane screenshots
+screenshots
+
 psiphon_config
 embedded_server_entries
 Bourbon-Oblique.otf
