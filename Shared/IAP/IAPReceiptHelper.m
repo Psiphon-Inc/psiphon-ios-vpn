@@ -18,6 +18,7 @@
  */
 
 #import "IAPReceiptHelper.h"
+#import "Logging.h"
 #import <StoreKit/StoreKit.h>
 
 
@@ -57,6 +58,11 @@
 
     if ([URL getResourceValue:&theSize forKey:NSURLFileSizeKey error:nil]) {
         fileSize = [theSize integerValue];
+
+#if DEBUG
+        LOG_ERROR(@"App receipt file size %d", fileSize);
+#endif
+
         if (fileSize != _cachedAppReceipFileSize) {
             _cachedAppReceipFileSize = fileSize;
             @autoreleasepool {

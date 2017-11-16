@@ -106,17 +106,26 @@ typedef NS_ENUM(NSInteger, VPNStatus) {
 - (BOOL)isOnDemandEnabled;
 
 /**
- * Queries the Network Extension whether Psiphon tunnel is in connected state or not.
- * @param completionHandler Called with tunnelIsConnected set to TRUE if Psiphon tunnel is connected, FALSE otherwise.
- */
-- (void)isTunnelConnected:(void (^ _Nonnull)(BOOL tunnelIsConnected))completionHandler;
-
-/**
  * Updates and saves VPN configuration Connect On Demand.
  * This method also updates the NSUserDefaults with key kVpnOnDemand.
  * @param onDemandEnabled Toggle VPN configuration Connect On Demand capability.
  * @param completionHandler Block called after operation completes. error is set to nil if operation finished successfully.
  */
 - (void)updateVPNConfigurationOnDemandSetting:(BOOL)onDemandEnabled completionHandler:(void (^_Nonnull)(NSError * _Nullable error))completionHandler;
+
+#pragma mark - Extension query methods
+
+/**
+ * Queries the Network Extension whether Psiphon tunnel is in connected state or not.
+ * @param completionHandler Called with tunnelIsConnected set to TRUE if Psiphon tunnel is connected, FALSE otherwise.
+ */
+- (void)queryNEIsTunnelConnected:(void (^ _Nonnull)(BOOL tunnelIsConnected))completionHandler;
+
+/**
+ * Queries the Network Extension for the sponsor Id in use by the tunnel.
+ * @param completionHandler Called with empty string if the VPN is not active or the tunnel is not running,
+ *                          otherwise called with the sponsor Id used by the tunnel.
+ */
+- (void)queryNEForCurrentSponsorId:(void (^_Nonnull)(NSString * _Nonnull currentSponsorId))completionHandler;
 
 @end

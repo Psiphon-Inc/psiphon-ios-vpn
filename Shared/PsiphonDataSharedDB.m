@@ -395,19 +395,4 @@
 	return [sharedDefaults stringForKey:SERVER_TIMESTAMP_KEY];
 }
 
-# pragma mark - Sponsor ID
-
-- (void) updateSponsorId:(NSString*)sponsorId {
-    if(sponsorId && [sponsorId length]) {
-        [sharedDefaults setObject:sponsorId forKey:SPONSOR_ID_KEY];
-    } else {
-        [sharedDefaults removeObjectForKey:SPONSOR_ID_KEY];
-    }
-    [sharedDefaults synchronize];
-}
-
-- (NSString*)getSponsorId {
-    return [sharedDefaults stringForKey:SPONSOR_ID_KEY];
-}
-
 @end

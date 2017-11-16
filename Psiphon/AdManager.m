@@ -100,6 +100,7 @@
     [self postAdsLoadStateDidChangeNotification];
 }
 
+// TODO: This is a blocking function called on main thread.
 - (BOOL)shouldShowUntunneledAds {
     // Check if user has an active subscription first
     BOOL hasActiveSubscription = [[IAPReceiptHelper sharedInstance] hasActiveSubscriptionForDate:[NSDate date]];
