@@ -105,22 +105,6 @@
 }
 
 - (void)startTunnelWithCompletionHandler:(nullable void (^)(NSError * _Nullable error))completionHandler {
-    // Override SponsorID if user has active subscription.
-    if([[IAPReceiptHelper sharedInstance]hasActiveSubscriptionForDate:[NSDate date]]) {
-        NSString *bundledConfigStr = [PsiphonClientCommonLibraryHelpers getPsiphonBundledConfig];
-        if(bundledConfigStr) {
-            NSDictionary *config = [PsiphonClientCommonLibraryHelpers jsonToDictionary:bundledConfigStr];
-            if (config) {
-                NSDictionary *subscriptionConfig = config[@"subscriptionConfig"];
-                if(subscriptionConfig) {
-                    [sharedDB updateSponsorId:(NSString*)subscriptionConfig[@"SponsorId"]];
-                }
-            }
-        }
-    } else {
-        // otherwise delete the entry
-        [sharedDB updateSponsorId:nil];
-    }
 
     // Set startStopButtonPressed flag to TRUE
     [self setStartStopButtonPressed:TRUE];
@@ -254,25 +238,6 @@
     return self.targetManager.isOnDemandEnabled;
 }
 
-- (void)isTunnelConnected:(void (^)(BOOL tunnelIsConnected))completionHandler {
-    [self queryExtension:EXTENSION_QUERY_IS_TUNNEL_CONNECTED completionHandler:^(NSError *error, NSString *response) {
-
-        if ([error code] == VPNManagerQueryErrorSendFailed) {
-            completionHandler(FALSE);
-            return;
-        }
-
-        if ([EXTENSION_RESP_TRUE isEqualToString:response]) {
-            completionHandler(TRUE);
-        } else if ([EXTENSION_RESP_FALSE isEqualToString:response]) {
-            completionHandler(FALSE);
-        } else {
-            LOG_ERROR(@"Unexpected query response (%@)", response);
-            completionHandler(FALSE);
-        }
-    }];
-}
-
 - (void)updateVPNConfigurationOnDemandSetting:(BOOL)onDemandEnabled completionHandler:(void (^)(NSError * _Nullable error))completionHandler {
     [[NSUserDefaults standardUserDefaults] setBool:onDemandEnabled forKey:kVpnOnDemand];
 
@@ -297,10 +262,43 @@
     }];
 }
 
+#pragma mark - Public network Extension query methods
 
-#pragma mark - Private methods
+- (void)queryNEIsTunnelConnected:(void (^ _Nonnull)(BOOL tunnelIsConnected))completionHandler {
+    [self queryExtension:EXTENSION_QUERY_IS_TUNNEL_CONNECTED completionHandler:^(NSError *error, NSString *response) {
 
-- (void)isExtensionZombie:(void (^)(BOOL extensionIsZombie))completionHandler {
+        if ([error code] == VPNManagerQueryErrorSendFailed) {
+            completionHandler(FALSE);
+            return;
+        }
+
+        if ([EXTENSION_RESP_TRUE isEqualToString:response]) {
+            completionHandler(TRUE);
+        } else if ([EXTENSION_RESP_FALSE isEqualToString:response]) {
+            completionHandler(FALSE);
+        } else {
+            LOG_ERROR(@"Unexpected query response (%@)", response);
+            completionHandler(FALSE);
+        }
+    }];
+}
+
+- (void)queryNEForCurrentSponsorId:(void (^_Nonnull)(NSString * _Nonnull currentSponsorId))completionHandler {
+    [self queryExtension:EXTENSION_QUERY_GET_SPONSOR_ID completionHandler:^(NSError *error, NSString *response) {
+
+        if (error) {
+            LOG_ERROR(@"failed extension query (%@)", error);
+            completionHandler(nil);
+        } else {
+            completionHandler(response);
+        }
+
+    }];
+}
+
+#pragma mark - Private network Extension query methods
+
+- (void)isExtensionZombie:(void (^_Nonnull)(BOOL extensionIsZombie))completionHandler {
     [self queryExtension:EXTENSION_QUERY_IS_PROVIDER_ZOMBIE completionHandler:^(NSError *error, NSString *response) {
 
         if ([error code] == VPNManagerQueryErrorSendFailed) {
@@ -318,6 +316,8 @@
         }
     }];
 }
+
+#pragma mark - Private methods
 
 - (NETunnelProviderManager *)createProviderManager {
     NETunnelProviderManager *newManager = [[NETunnelProviderManager alloc] init];

@@ -1350,22 +1350,39 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 
 - (void)updatedIAPTransactionState {
     [self updateSubscriptionUI];
+
+    // TODO: re-check this logic
     if (![adManager shouldShowUntunneledAds]) {
         // if user subscription state has changed to valid
         // try to deinit ads if currently not showing and hide adLabel
         [adManager initializeAds];
+    }
 
-        // Restart the VPN if user is currently running a non-subscription config
-        NSString *bundledConfigStr = [PsiphonClientCommonLibraryHelpers getPsiphonBundledConfig];
-        if(bundledConfigStr) {
-            NSDictionary *config = [PsiphonClientCommonLibraryHelpers jsonToDictionary:bundledConfigStr];
-            if (config) {
-                NSDictionary *subscriptionConfig = config[@"subscriptionConfig"];
-                if(subscriptionConfig[@"SponsorId"] && !([sharedDB getSponsorId].length)) {
-                    [vpnManager restartVPNIfActive];
+    // If the user gets an active subscription and the network extension is active,
+    // queries the network extension to check if the extension is using the subscription SponsorId.
+    // If not, restarts the extension.
+    if ([[IAPReceiptHelper sharedInstance] hasActiveSubscriptionForDate:[NSDate date]] && [vpnManager isVPNActive]) {
+        [vpnManager queryNEForCurrentSponsorId:^(NSString *currentSponsorId) {
+
+            // Reads config file in a background thread.
+            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+
+                NSString *bundledConfigStr = [PsiphonClientCommonLibraryHelpers getPsiphonBundledConfig];
+                if (bundledConfigStr) {
+                    NSDictionary *config = [PsiphonClientCommonLibraryHelpers jsonToDictionary:bundledConfigStr];
+                    if (config) {
+                        NSDictionary *subscriptionConfig = config[@"subscriptionConfig"];
+                        if (![subscriptionConfig[@"SponsorId"] isEqualToString:currentSponsorId]) {
+
+                            dispatch_async(dispatch_get_main_queue(), ^{
+                                [vpnManager restartVPNIfActive];
+                            });
+
+                        }
+                    }
                 }
-            }
-        }
+            });
+        }];
     }
 }
 

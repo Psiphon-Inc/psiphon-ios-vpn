@@ -63,6 +63,8 @@
 
     Notifier *notifier;
 
+    NSString *currentSponsorId;
+
     // Start vpn decision. If FALSE, VPN should not be activated, even though Psiphon tunnel might be connected.
     // shouldStartVPN SHOULD NOT be altered after it is set to TRUE.
     BOOL shouldStartVPN;
@@ -89,6 +91,8 @@
         sharedDB = [[PsiphonDataSharedDB alloc] initForAppGroupIdentifier:APP_GROUP_IDENTIFIER];
 
         notifier = [[Notifier alloc] initWithAppGroupIdentifier:APP_GROUP_IDENTIFIER];
+
+        currentSponsorId = nil;
 
         shouldStartVPN = FALSE;
         extensionIsZombie = FALSE;
@@ -264,6 +268,14 @@
                 } else {
                     respData = EXTENSION_RESP_FALSE_DATA;
                 }
+            } else if ([EXTENSION_QUERY_GET_SPONSOR_ID isEqualToString:query]) {
+
+                if (currentSponsorId) {
+                    respData = [currentSponsorId dataUsingEncoding:NSUTF8StringEncoding];
+                } else {
+                    respData = [@"" dataUsingEncoding:NSUTF8StringEncoding];
+                }
+
             }
 
             if (respData) {
@@ -731,10 +743,14 @@
     mutableConfigCopy[@"ClientVersion"] = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleVersion"];
 
     // SponsorId override
-    NSString* sponsorId = [sharedDB getSponsorId];
-    if(sponsorId && [sponsorId length]) {
-        mutableConfigCopy[@"SponsorId"] = sponsorId;
+    if([[IAPReceiptHelper sharedInstance]hasActiveSubscriptionForDate:[NSDate date]]) {
+        NSDictionary *readOnlySubscriptionConfig = [readOnly objectForKey:@"subscriptionConfig"];
+        if(readOnlySubscriptionConfig && readOnlySubscriptionConfig[@"SponsorId"]) {
+            mutableConfigCopy[@"SponsorId"] = readOnlySubscriptionConfig[@"SponsorId"];
+        }
     }
+
+    currentSponsorId = mutableConfigCopy[@"SponsorId"];
 
     jsonData  = [NSJSONSerialization dataWithJSONObject:mutableConfigCopy
       options:0 error:&err];
