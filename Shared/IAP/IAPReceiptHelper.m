@@ -65,7 +65,7 @@
                     return nil;
                 }
 
-                if([receipt verifyReceiptHash]) {
+                if(![receipt verifyReceiptHash]) {
                     return nil;
                 }
 
