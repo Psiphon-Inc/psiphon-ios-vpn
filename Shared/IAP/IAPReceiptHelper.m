@@ -58,12 +58,17 @@
     if ([URL getResourceValue:&theSize forKey:NSURLFileSizeKey error:nil]) {
         fileSize = [theSize integerValue];
         if (fileSize != _cachedAppReceipFileSize) {
+            _cachedAppReceipFileSize = fileSize;
             @autoreleasepool {
                 RMAppReceipt *receipt  =  [RMAppReceipt bundleReceipt];
                 if(!receipt) {
                     return nil;
                 }
-                _cachedAppReceipFileSize = fileSize;
+
+                if([receipt verifyReceiptHash]) {
+                    return nil;
+                }
+
                 NSString *bundleIdentifier = [[NSBundle mainBundle] bundleIdentifier];
                 if (![receipt.bundleIdentifier isEqualToString:bundleIdentifier]) {
                     _iapSubscriptions = nil;
