@@ -1,5 +1,5 @@
 # Uncomment the lines below you want to change by removing the # in the beginning
-ios_version '11.0.1'
+#ios_version '11.0.1'
 
 # A list of devices you want to take the screenshots from
 devices([
@@ -17,7 +17,7 @@ devices([
 #  "iPad (5th generation)",
 #  "iPad Pro (9.7 inch)",
 #  "iPad Pro (10.5-inch)",
-  "iPad Pro (12.9 inch)",
+  "iPad Pro (12.9-inch)",
   "iPhone X"
  ])
 
