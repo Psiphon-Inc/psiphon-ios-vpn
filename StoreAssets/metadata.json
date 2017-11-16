@@ -30,7 +30,7 @@
     "display_targets": {
         "iPhone 6 Plus": "iOS-5.5-in",
         "iPhone X": "iOS-5.8-in",
-        "iPad Pro (12.9 inch)": "iOS-iPad-Pro"
+        "iPad Pro (12.9-inch)": "iOS-iPad-Pro"
     },
     "screenshots": [
         {
