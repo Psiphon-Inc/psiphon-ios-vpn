@@ -15,12 +15,6 @@
 /* Alert message informing user that the device clock needs to be updated with current time */
 "BAD_CLOCK_ALERT_MESSAGE" = "We've detected the time on your device is out of sync with your time zone. Please update your clock settings and restart the app";
 
-/* Alert message informing user that subscription receipt cannot be verified */
-"BAD_RECEIPT_ALERT_MESSAGE" = "Your subscription receipt cannot be verified, please refresh it and try again.";
-
-/* Alert title informing user that app receipt is not valid */
-"BAD_RECEIPT_ALERT_TITLE" = "Invalid app receipt";
-
 /* Buy subscription dialog footer text */
 "BUY_SUBSCRIPTIONS_FOOTER_TEXT" = "A subscription is auto-renewable which means that once purchased it will be automatically renewed until you cancel it 24 hours prior to the end of the current period.\n\nYour iTunes Account will be charged for renewal within 24-hours prior to the end of the current period with the cost of subscription.\n\nManage your Subscription and Auto-Renewal by going to your Account Settings.";
 

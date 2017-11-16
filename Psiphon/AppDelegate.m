@@ -294,34 +294,6 @@
 
     [notifier listenForNotification:@"NE.tunnelConnected" listener:^{
         LOG_DEBUG(@"Received notification NE.tunnelConnected");
-        // Check if user has an active subscription but the receipt is not valid.
-        IAPReceiptHelper *iapReceiptHelper = [IAPReceiptHelper sharedInstance];
-        if([iapReceiptHelper hasActiveSubscriptionForDate:[NSDate date]] && ![iapReceiptHelper verifyReceipt]) {
-            // Stop the VPN and prompt user to refresh app receipt.
-            [vpnManager stopVPN];
-            NSString *alertTitle = NSLocalizedStringWithDefaultValue(@"BAD_RECEIPT_ALERT_TITLE", nil, [NSBundle mainBundle], @"Invalid app receipt", @"Alert title informing user that app receipt is not valid");
-
-            NSString *alertMessage = NSLocalizedStringWithDefaultValue(@"BAD_RECEIPT_ALERT_MESSAGE", nil, [NSBundle mainBundle], @"Your subscription receipt cannot be verified, please refresh it and try again.", @"Alert message informing user that subscription receipt cannot be verified");
-
-            UIAlertController *alert = [UIAlertController
-                                        alertControllerWithTitle:alertTitle
-                                        message:alertMessage
-                                        preferredStyle:UIAlertControllerStyleAlert];
-
-            UIAlertAction *defaultAction = [UIAlertAction
-                                            actionWithTitle:NSLocalizedStringWithDefaultValue(@"OK_BUTTON", nil, [NSBundle mainBundle], @"OK", @"Alert OK Button")
-                                            style:UIAlertActionStyleDefault
-                                            handler:^(UIAlertAction *action) {
-                                                IAPViewController *iapViewController = [[IAPViewController alloc]init];
-                                                iapViewController.openedFromSettings = NO;
-                                                UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:iapViewController];
-                                                [[AppDelegate topMostController] presentViewController:navController animated:YES completion:nil];
-                                            }];
-            [alert addAction:defaultAction];
-            [[AppDelegate topMostController] presentViewController:alert animated:TRUE completion:nil];
-            return;
-        }
-
         // If we haven't had a chance to load an Ad, and the
         // tunnel is already connected, give up on the Ad and
         // start the VPN. Otherwise the startVPN message will be
