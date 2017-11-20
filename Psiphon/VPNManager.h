@@ -32,6 +32,8 @@ typedef NS_ENUM(NSInteger, VPNManagerErrorCode) {
     VPNManagerErrorNEStartFailed = 4,
 };
 
+#define kVPNManagerQueryErrorDomain @"VPNManagerQueryErrorDomain"
+
 typedef NS_ENUM(NSInteger, VPNManagerQueryErrorCode) {
     VPNManagerQueryErrorSendFailed = 1,
 };
