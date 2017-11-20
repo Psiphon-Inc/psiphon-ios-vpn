@@ -284,7 +284,7 @@
         } else if ([EXTENSION_RESP_FALSE isEqualToString:response]) {
             completionHandler(FALSE);
         } else {
-            LOG_ERROR(@"Unexpected query response (%@)", response);
+            LOG_ERROR(@"Unexpected query response (%@). error(%@)", response, error);
             completionHandler(FALSE);
         }
     }];
@@ -318,7 +318,7 @@
         } else if ([EXTENSION_RESP_FALSE isEqualToString:response]) {
             completionHandler(FALSE);
         } else {
-            LOG_ERROR(@"Unexpected query response (%@)", response);
+            LOG_ERROR(@"Unexpected query response (%@). error(%@)", response, error);
             completionHandler(FALSE);
         }
     }];
@@ -383,7 +383,7 @@
     [self postStatusChangeNotification];
 }
 
-- (void)queryExtension:(NSString *)query completionHandler:(void (^)(NSError * _Nullable error, NSString * _Nullable response))completionHandler {
+- (void)queryExtension:(NSString *)query completionHandler:(void (^ _Nonnull)(NSError * _Nullable error, NSString * _Nullable response))completionHandler {
     NETunnelProviderSession *session = (NETunnelProviderSession *) self.targetManager.connection;
     if (session && [self isVPNActive]) {
         NSError *err;
@@ -405,7 +405,7 @@
             completionHandler(err, nil);
         }
     } else {
-        completionHandler([VPNManager errorWithCode:VPNManagerQueryErrorSendFailed], nil);
+        completionHandler([VPNManager queryErrorWithCode:VPNManagerQueryErrorSendFailed], nil);
     }
 }
 
@@ -423,8 +423,12 @@
     [nc removeObserver:localVPNStatusObserver];
 }
 
-+ (NSError *)errorWithCode:(NSInteger)code {
++ (NSError *)errorWithCode:(VPNManagerErrorCode)code {
     return [[NSError alloc] initWithDomain:kVPNManagerErrorDomain code:code userInfo:nil];
+}
+
++ (NSError *)queryErrorWithCode:(VPNManagerQueryErrorCode)code {
+    return [[NSError alloc] initWithDomain:kVPNManagerQueryErrorDomain code:code userInfo:nil];
 }
 
 @end
