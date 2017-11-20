@@ -18,7 +18,6 @@
  */
 
 #import <Foundation/Foundation.h>
-#import <PsiphonTunnel/PsiphonTunnel.h>
 #import "AppDelegate.h"
 #import "FeedbackUpload.h"
 #import "LogViewControllerFullScreen.h"
@@ -942,7 +941,11 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                                                            constant:-10]];
 }
 
-#pragma mark - FeedbackViewControllerDelegate methods and helpers
+#pragma mark - TunneledAppDelegate methods
+
+- (void)onDiagnosticMessage:(NSString *_Nonnull)message withTimestamp:(NSString *_Nonnull)timestamp {
+    [[NoticeLogger sharedInstance] noticeError:message];
+}
 
 - (NSString *)getPsiphonConfig {
     NSString *bundledConfigStr = [PsiphonClientCommonLibraryHelpers getPsiphonBundledConfig];
@@ -969,6 +972,11 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
         mutableConfigCopy[@"SponsorId"] = readOnlySubscriptionConfig[@"SponsorId"];
     }
 
+#if DEBUG
+    // Ensure diagnostic notices are emitted when debugging
+    mutableConfigCopy[@"EmitDiagnosticNotices"] = @TRUE;
+#endif
+
     jsonData  = [NSJSONSerialization dataWithJSONObject:mutableConfigCopy options:0 error:&err];
 
     if (err) {
@@ -978,6 +986,12 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 
     return [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
 }
+
+- (NSString * _Nullable)getEmbeddedServerEntries {
+    return nil;
+}
+
+#pragma mark - FeedbackViewControllerDelegate methods and helpers
 
 - (void)userSubmittedFeedback:(NSUInteger)selectedThumbIndex comments:(NSString *)comments email:(NSString *)email uploadDiagnostics:(BOOL)uploadDiagnostics {
     // Ensure psiphon data is populated with latest logs
