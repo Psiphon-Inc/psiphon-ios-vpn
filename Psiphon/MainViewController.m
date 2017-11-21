@@ -1050,7 +1050,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 - (void)settingsWillDismissWithForceReconnect:(BOOL)forceReconnect {
     if (forceReconnect) {
         [self persistSettingsToSharedUserDefaults];
-        [vpnManager restartVPN];
+        [vpnManager restartVPNIfActive];
     }
 }
 
@@ -1126,7 +1126,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     if (!safeStringsEqual(selectedRegion, selectedRegionSnapShot)) {
         [self persistSelectedRegion];
         [self updateRegionButton];
-        [vpnManager restartVPN];
+        [vpnManager restartVPNIfActive];
     }
     [regionSelectionNavController dismissViewControllerAnimated:YES completion:nil];
     regionSelectionNavController = nil;
@@ -1336,7 +1336,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
             if (config) {
                 NSDictionary *subscriptionConfig = [config objectForKey:@"subscriptionConfig"];
                 if(subscriptionConfig[@"SponsorId"] && !([sharedDB getSponsorId].length)) {
-                    [vpnManager restartVPN];
+                    [vpnManager restartVPNIfActive];
                 }
             }
         }

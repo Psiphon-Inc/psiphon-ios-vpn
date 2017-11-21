@@ -81,7 +81,7 @@
 #endif
 
     if (restartRequired) {
-        // If extension is restarting due to a call to restartVPN, then
+        // If extension is restarting due to a call to restartVPNIfActive, then
         // we don't want to show the Disconnecting and Disconnected states
         // to the observers, and instead simply notify them that the
         // extension is restarting.
@@ -219,7 +219,7 @@
     }
 }
 
-- (void)restartVPN {
+- (void)restartVPNIfActive {
     if (self.targetManager.connection && [self isVPNActive]) {
         restartRequired = YES;
         [self.targetManager.connection stopVPNTunnel];

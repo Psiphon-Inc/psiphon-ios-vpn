@@ -70,7 +70,7 @@ typedef NS_ENUM(NSInteger, VPNStatus) {
  * Stops the currently running network extension.
  * Note: If no network extension process is running nothing happens.
  */
-- (void)restartVPN;
+- (void)restartVPNIfActive;
 
 /**
  * Stops the tunnel and stops the network extension process.
