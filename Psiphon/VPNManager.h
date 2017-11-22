@@ -22,35 +22,52 @@
 // NSNotification name for VPN status change notifications.
 #define kVPNStatusChangeNotificationName "VPNStatusChange"
 
-#define kVPNManagerErrorDomain @"VPNManagerErrorDomain"
-typedef NS_ENUM(NSInteger, VPNManagerErrorCode) {
-    VPNManagerErrorLoadConfigsFailed = 1,
-    VPNManagerErrorTooManyConfigsFounds = 2,
-    VPNManagerErrorUserDeniedConfigInstall = 3,
-    VPNManagerErrorNEStartFailed = 4,
+FOUNDATION_EXPORT NSString * const VPNManagerErrorDomain;
+
+/*!
+ * @typedef VPNManagerErrorCode
+ * @abstract VPNManager error codes
+ */
+typedef NS_ENUM(NSInteger, VPNManagerStartErrorCode) {
+    VPNManagerStartErrorLoadConfigsFailed = 1,
+    VPNManagerStartErrorTooManyConfigsFounds = 2,
+    VPNManagerStartErrorUserDeniedConfigInstall = 3,
+    VPNManagerStartErrorNEStartFailed = 4,
 };
 
+/*!
+ * @typedef VPNStatus
+ * @abstract VPN status codes
+ *
+ * VPNManager status is a superset of NEVPNConnection status codes.
+ */
 typedef NS_ENUM(NSInteger, VPNStatus) {
+    /*! @const VPNStatusInvalid The VPN is not configured. */
     VPNStatusInvalid = 0,
     /*! @const VPNStatusDisconnected No network extension process is running (When restarting VPNManager status will be VPNStatusRestarting). */
     VPNStatusDisconnected = 1,
-    /*! @const VPNStatusConnecting network extension process is running, and the tunnel has started (tunnel could be in connecting or connected state). */
+    /*! @const VPNStatusConnecting Network extension process is running, and the tunnel has started (tunnel could be in connecting or connected state). */
     VPNStatusConnecting = 2,
-    /*!VPNStatusConnected network extension process is running and the tunnel is connected. */
+    /*!VPNStatusConnected Network extension process is running and the tunnel is connected. */
     VPNStatusConnected = 3,
-    /*!VPNStatusReasserting network extension process is running, and the tunnel is reconnecting or has already connected. */
+    /*!VPNStatusReasserting Network extension process is running, and the tunnel is reconnecting or has already connected. */
     VPNStatusReasserting = 4,
-    /*!VPNStatusDisconnecting tunnel and the network extension process are being stopped.*/
+    /*!VPNStatusDisconnecting The tunnel and the network extension process are being stopped. */
     VPNStatusDisconnecting = 5,
     /*! @const VPNStatusRestarting Stopping previous network extension process, and starting a new one. */
     VPNStatusRestarting = 6,
 };
 
+/*!
+ * @interface VPNManager
+ * @discussion The VPNManager class is the single point of interaction with the Network Extension.
+ *
+ */
 @interface VPNManager : NSObject
 
 @property (nonatomic) BOOL startStopButtonPressed;
 
-+ (instancetype _Nullable )sharedInstance;
++ (instancetype _Nullable)sharedInstance;
 
 /**
  * Starts the network extension process and also the tunnel.

@@ -28,6 +28,9 @@
 #import "PsiphonClientCommonLibraryHelpers.h"
 #import "IAPHelper.h"
 
+
+NSString *const VPNManagerErrorDomain = @"VPNManagerErrorDomain";
+
 @interface VPNManager ()
 
 @property (nonatomic) NEVPNManager *targetManager;
@@ -133,7 +136,7 @@
             [self setStartStopButtonPressed:FALSE];
             if (completionHandler) {
                 LOG_ERROR(@"Failed to load VPN configuration. Error:%@", error);
-                completionHandler([VPNManager errorWithCode:VPNManagerErrorLoadConfigsFailed]);
+                completionHandler([VPNManager errorWithCode:VPNManagerStartErrorLoadConfigsFailed]);
             }
             return;
         }
@@ -153,7 +156,7 @@
             [self setStartStopButtonPressed:FALSE];
             LOG_ERROR(@"%lu VPN configurations found, only expected 1. Aborting", [allManagers count]);
             if (completionHandler) {
-                completionHandler([VPNManager errorWithCode:VPNManagerErrorTooManyConfigsFounds]);
+                completionHandler([VPNManager errorWithCode:VPNManagerStartErrorTooManyConfigsFounds]);
             }
             return;
         }
@@ -171,7 +174,7 @@
                 // User denied permission to add VPN Configuration.
                 LOG_ERROR(@"failed to save the configuration: %@", error);
                 if (completionHandler) {
-                    completionHandler([VPNManager errorWithCode:VPNManagerErrorUserDeniedConfigInstall]);
+                    completionHandler([VPNManager errorWithCode:VPNManagerStartErrorUserDeniedConfigInstall]);
                 }
                 return;
             }
@@ -182,7 +185,7 @@
                 if (error != nil) {
                     LOG_ERROR(@"Failed to reload VPN configuration. Error:(%@)", error);
                     if (completionHandler) {
-                        completionHandler([VPNManager errorWithCode:VPNManagerErrorLoadConfigsFailed]);
+                        completionHandler([VPNManager errorWithCode:VPNManagerStartErrorLoadConfigsFailed]);
                     }
                     return;
                 }
@@ -196,7 +199,7 @@
                 if (!vpnStartSuccess) {
                     LOG_ERROR(@"Failed to start network extension. Error:(%@)", vpnStartError);
                     if (completionHandler) {
-                        completionHandler([VPNManager errorWithCode:VPNManagerErrorNEStartFailed]);
+                        completionHandler([VPNManager errorWithCode:VPNManagerStartErrorNEStartFailed]);
                     }
                     return;
                 }
@@ -284,8 +287,10 @@
     [[NSNotificationCenter defaultCenter] removeObserver:localVPNStatusObserver];
 }
 
-+ (NSError *)errorWithCode:(VPNManagerErrorCode)code {
-    return [[NSError alloc] initWithDomain:kVPNManagerErrorDomain code:code userInfo:nil];
+#pragma mark - Error conveniece methods
+
++ (NSError *)errorWithCode:(VPNManagerStartErrorCode)code {
+    return [[NSError alloc] initWithDomain:VPNManagerErrorDomain code:code userInfo:nil];
 }
 
 @end
