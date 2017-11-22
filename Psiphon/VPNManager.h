@@ -42,7 +42,7 @@ typedef NS_ENUM(NSInteger, VPNManagerStartErrorCode) {
  * VPNManager status is a superset of NEVPNConnection status codes.
  */
 typedef NS_ENUM(NSInteger, VPNStatus) {
-    /*! @const VPNStatusInvalid The VPN is not configured. */
+    /*! @const VPNStatusInvalid The VPN is not configured or unexpected vpn state. */
     VPNStatusInvalid = 0,
     /*! @const VPNStatusDisconnected No network extension process is running (When restarting VPNManager status will be VPNStatusRestarting). */
     VPNStatusDisconnected = 1,
