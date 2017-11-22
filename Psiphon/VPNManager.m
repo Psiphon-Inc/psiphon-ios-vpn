@@ -28,9 +28,6 @@
 #import "PsiphonClientCommonLibraryHelpers.h"
 #import "IAPHelper.h"
 
-
-NSString *const VPNManagerErrorDomain = @"VPNManagerErrorDomain";
-
 @interface VPNManager ()
 
 @property (nonatomic) NEVPNManager *targetManager;
@@ -193,7 +190,7 @@ NSString *const VPNManagerErrorDomain = @"VPNManagerErrorDomain";
 
                LOG_DEBUG(@"Call targetManager.connection.startVPNTunnel()");
                 NSError *vpnStartError;
-                NSDictionary *extensionOptions = @{EXTENSION_OPTION_START_FROM_CONTAINER : @YES};
+                NSDictionary *extensionOptions = @{EXTENSION_START_FROM_CONTAINER : EXTENSION_START_FROM_CONTAINER_TRUE};
 
                 BOOL vpnStartSuccess = [self.targetManager.connection startVPNTunnelWithOptions:extensionOptions
                                                                                  andReturnError:&vpnStartError];
@@ -246,8 +243,26 @@ NSString *const VPNManagerErrorDomain = @"VPNManagerErrorDomain";
     return VPNStatusConnected == [self getVPNStatus];
 }
 
-- (BOOL)isTunnelConnected {
-    return [self isVPNActive] && [sharedDB getTunnelConnectedState];
+#pragma mark - Public network Extension query methods
+
+- (void)queryNEIsTunnelConnected:(void (^ _Nonnull)(BOOL tunnelIsConnected))completionHandler {
+    [self queryExtension:EXTENSION_QUERY_IS_TUNNEL_CONNECTED responseHandler:^(NSError *error, NSString *response) {
+
+        if (error) {
+            LOG_ERROR(@"query tunnel connected failed %@", error);
+            completionHandler(FALSE);
+            return;
+        }
+
+        if ([EXTENSION_RESP_TRUE isEqualToString:response]) {
+            completionHandler(TRUE);
+        } else if ([EXTENSION_RESP_FALSE isEqualToString:response]) {
+            completionHandler(FALSE);
+        } else {
+            LOG_ERROR(@"Unexpected query response (%@)", response);
+            completionHandler(FALSE);
+        }
+    }];
 }
 
 #pragma mark - Private methods
@@ -279,6 +294,38 @@ NSString *const VPNManagerErrorDomain = @"VPNManagerErrorDomain";
       }];
 }
 
+/**
+ * Sends a query to the extension.
+ * @param query Query string, typically from SharedConstants.h
+ * @param responseHandler Required block that handles the result from the query. If an error occurs,
+ *    error object is set with one of VPNQueryErrorCode codes. Otherwise error is nil.
+ */
+- (void)queryExtension:(NSString *)query responseHandler:(void (^ _Nonnull)(NSError * _Nullable error, NSString * _Nullable response))responseHandler {
+    NETunnelProviderSession *session = (NETunnelProviderSession *) self.targetManager.connection;
+    NSError *error;
+    if (session && [self isVPNActive]) {
+
+        BOOL sent = [session sendProviderMessage:[query dataUsingEncoding:NSUTF8StringEncoding]
+                                     returnError:&error
+                                 responseHandler:^(NSData *responseData) {
+                                     NSString *response = [[NSString alloc] initWithData:responseData encoding:NSUTF8StringEncoding];
+                                     LOG_DEBUG(@"Query response (%@)", response);
+                                     if (response) {
+                                         responseHandler(nil, response);
+                                     } else {
+                                         responseHandler([VPNManager queryError:query withCode:VPNQueryErrorNilResponse andError:nil], nil);
+                                     }
+                                 }];
+
+        if (sent) {
+            LOG_DEBUG(@"Query (%@) sent to tunnel provider", query);
+            return;
+        }
+    }
+
+    responseHandler([VPNManager queryError:query withCode:VPNQueryErrorSendFailed andError:error], nil);
+}
+
 - (void)postStatusChangeNotification {
     [[NSNotificationCenter defaultCenter]
       postNotificationName:@kVPNStatusChangeNotificationName object:self];
@@ -292,6 +339,23 @@ NSString *const VPNManagerErrorDomain = @"VPNManagerErrorDomain";
 
 + (NSError *)errorWithCode:(VPNManagerStartErrorCode)code {
     return [[NSError alloc] initWithDomain:VPNManagerErrorDomain code:code userInfo:nil];
+}
+
++ (NSError *)queryError:(NSString * _Nonnull)query withCode:(VPNQueryErrorCode)code andError:(NSError * _Nullable)error {
+
+    NSString *description;
+    switch (code) {
+        case VPNQueryErrorSendFailed: description = @"vpn query send failed"; break;
+        case VPNQueryErrorNilResponse: description = @"nil response"; break;
+    }
+
+    NSMutableDictionary *userInfo = [NSMutableDictionary dictionary];
+    userInfo[NSLocalizedDescriptionKey] = description;
+    userInfo[VPNQueryKey] = query;
+    if (error) {
+        userInfo[NSUnderlyingErrorKey] = error;
+    }
+    return [[NSError alloc] initWithDomain:VPNQueryErrorDomain code:code userInfo:userInfo];
 }
 
 @end

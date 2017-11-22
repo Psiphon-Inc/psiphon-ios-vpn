@@ -22,9 +22,9 @@
 // NSNotification name for VPN status change notifications.
 #define kVPNStatusChangeNotificationName "VPNStatusChange"
 
-FOUNDATION_EXPORT NSString * const VPNManagerErrorDomain;
+#define VPNManagerErrorDomain @"VPNManagerErrorDomain"
 
-/*!
+/**
  * @typedef VPNManagerErrorCode
  * @abstract VPNManager error codes
  */
@@ -35,7 +35,19 @@ typedef NS_ENUM(NSInteger, VPNManagerStartErrorCode) {
     VPNManagerStartErrorNEStartFailed = 4,
 };
 
-/*!
+#define VPNQueryErrorDomain @"VPNQueryErrorDomain"
+#define VPNQueryKey @"query"
+
+/**
+ * @typedef VPNQueryErrorCode
+ * @abstract VPN query error codes
+ */
+typedef NS_ENUM(NSInteger, VPNQueryErrorCode) {
+    VPNQueryErrorSendFailed = 1,
+    VPNQueryErrorNilResponse = 2,
+};
+
+/**
  * @typedef VPNStatus
  * @abstract VPN status codes
  *
@@ -48,17 +60,17 @@ typedef NS_ENUM(NSInteger, VPNStatus) {
     VPNStatusDisconnected = 1,
     /*! @const VPNStatusConnecting Network extension process is running, and the tunnel has started (tunnel could be in connecting or connected state). */
     VPNStatusConnecting = 2,
-    /*!VPNStatusConnected Network extension process is running and the tunnel is connected. */
+    /*! @const VPNStatusConnected Network extension process is running and the tunnel is connected. */
     VPNStatusConnected = 3,
-    /*!VPNStatusReasserting Network extension process is running, and the tunnel is reconnecting or has already connected. */
+    /*! @const VPNStatusReasserting Network extension process is running, and the tunnel is reconnecting or has already connected. */
     VPNStatusReasserting = 4,
-    /*!VPNStatusDisconnecting The tunnel and the network extension process are being stopped. */
+    /*! @const VPNStatusDisconnecting The tunnel and the network extension process are being stopped. */
     VPNStatusDisconnecting = 5,
     /*! @const VPNStatusRestarting Stopping previous network extension process, and starting a new one. */
     VPNStatusRestarting = 6,
 };
 
-/*!
+/**
  * @interface VPNManager
  * @discussion The VPNManager class is the single point of interaction with the Network Extension.
  *
@@ -111,8 +123,9 @@ typedef NS_ENUM(NSInteger, VPNStatus) {
 - (BOOL)isVPNConnected;
 
 /**
- * @return TRUE if the tunnel has connected, FALSE otherwise.
+ * Queries the Network Extension whether Psiphon tunnel is in connected state or not.
+ * @param completionHandler Called with tunnelIsConnected set to TRUE if Psiphon tunnel is connected, FALSE otherwise.
  */
-- (BOOL)isTunnelConnected;
+- (void)queryNEIsTunnelConnected:(void (^ _Nonnull)(BOOL tunnelIsConnected))completionHandler;
 
 @end
