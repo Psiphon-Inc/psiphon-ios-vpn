@@ -77,6 +77,7 @@ NSString *const VPNManagerErrorDomain = @"VPNManagerErrorDomain";
 }
 
 - (VPNStatus)getVPNStatus {
+
 #ifdef DEBUG
     if ([AppDelegate isRunningUITest]) {
         return VPNStatusConnected;
@@ -101,7 +102,7 @@ NSString *const VPNManagerErrorDomain = @"VPNManagerErrorDomain";
     }
 
     LOG_ERROR(@"Unknown NEVPNConnection status: (%ld)", self.targetManager.connection.status);
-    return -1;
+    return VPNStatusInvalid;
 }
 
 - (void)startTunnelWithCompletionHandler:(nullable void (^)(NSError * _Nullable error))completionHandler {
