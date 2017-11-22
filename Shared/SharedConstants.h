@@ -19,5 +19,13 @@
 
 #define APP_GROUP_IDENTIFIER @"group.ca.psiphon.Psiphon"
 
-#define EXTENSION_OPTION_START_FROM_CONTAINER @"startFromContainer"
+// Network Extension options
+#define EXTENSION_START_FROM_CONTAINER @"startFromContainer"
+#define EXTENSION_START_FROM_CONTAINER_TRUE @"true"
 
+// Network Extension queries
+#define EXTENSION_QUERY_IS_TUNNEL_CONNECTED @"isTunnelConnected"
+
+// Network Extension query responses
+#define EXTENSION_RESP_TRUE @"true"
+#define EXTENSION_RESP_FALSE @"false"
