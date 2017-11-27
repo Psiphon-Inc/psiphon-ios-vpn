@@ -16,7 +16,6 @@ PODS:
   - PsiphonClientCommonLibrary (0.2.23):
     - InAppSettingsKit
   - PureLayout (3.0.2)
-  - Shimmer (1.0.2)
   - VungleSDK-iOS (5.3.0)
 
 DEPENDENCIES:
@@ -26,7 +25,6 @@ DEPENDENCIES:
   - OpenSSL (= 1.0.210)
   - PsiphonClientCommonLibrary (from `https://github.com/Psiphon-Inc/psiphon-ios-client-common-library.git`, commit `89d14eb`)
   - PureLayout (= 3.0.2)
-  - Shimmer (= 1.0.2)
   - VungleSDK-iOS (= 5.3.0)
 
 EXTERNAL SOURCES:
@@ -52,9 +50,8 @@ SPEC CHECKSUMS:
   OpenSSL: 246ffb948e9d56466727fd318134af35f5aa764e
   PsiphonClientCommonLibrary: 26bb145e07f3bdaf9b83328d6bd865ecad76e85b
   PureLayout: 4d550abe49a94f24c2808b9b95db9131685fe4cd
-  Shimmer: c5374be1c2b0c9e292fb05b339a513cf291cac86
   VungleSDK-iOS: af3aa92d0f4a923505a9416646ffef5250592150
 
-PODFILE CHECKSUM: 545f7e3057cb29c4025653a6635ac4fae4cc2d6a
+PODFILE CHECKSUM: b86c08af6481c2ee041bb3c1c2342adc6ec53048
 
 COCOAPODS: 1.3.1

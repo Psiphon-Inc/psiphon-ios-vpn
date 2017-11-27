@@ -24,7 +24,6 @@
 #import "PsiphonProgressView.h"
 #import "PureLayout.h"
 #import "RootContainerController.h"
-#import "FBShimmeringView.h"
 
 #if DEBUG
 #define kLaunchScreenTimerCount 1.f
@@ -127,22 +126,6 @@ static const NSString *ItemStatusContext;
 }
 
 - (void)addLoadingLabel {
-    // Add view for shimmering effect
-    FBShimmeringView *shimmeringView = [[FBShimmeringView alloc] init];
-    shimmeringView.translatesAutoresizingMaskIntoConstraints = NO;
-
-    shimmeringView.shimmeringSpeed = 100.f;
-    shimmeringView.shimmeringHighlightWidth = 0.7f;
-    shimmeringView.shimmering = YES;
-
-    [self.view addSubview:shimmeringView];
-    [shimmeringView.heightAnchor constraintEqualToConstant:30.f].active = YES;
-    [shimmeringView.widthAnchor constraintEqualToAnchor:progressView.widthAnchor].active = YES;
-    [shimmeringView.centerXAnchor constraintEqualToAnchor:self.view.centerXAnchor].active = YES;
-    [shimmeringView.topAnchor constraintGreaterThanOrEqualToAnchor:progressView.bottomAnchor].active = YES;
-    [shimmeringView.bottomAnchor constraintEqualToAnchor:self.bottomLayoutGuide.bottomAnchor constant:-15].active = YES;
-
-    // Add loading label
     loadingLabel = [[UILabel alloc] init];
     loadingLabel.translatesAutoresizingMaskIntoConstraints = NO;
 
@@ -152,13 +135,12 @@ static const NSString *ItemStatusContext;
     loadingLabel.textColor = [[UIColor whiteColor] colorWithAlphaComponent:0.6];
     loadingLabel.font = [UIFont systemFontOfSize:20 weight:UIFontWeightThin];
 
-    [shimmeringView addSubview:loadingLabel];
-    [loadingLabel.heightAnchor constraintEqualToAnchor:shimmeringView.heightAnchor multiplier:0].active = YES;
-    [loadingLabel.widthAnchor constraintEqualToAnchor:shimmeringView.widthAnchor multiplier:0].active = YES;
-    [loadingLabel.centerXAnchor constraintEqualToAnchor:shimmeringView.centerXAnchor constant:0.f].active = YES;
-    [loadingLabel.centerYAnchor constraintEqualToAnchor:shimmeringView.centerYAnchor constant:0.f].active = YES;
-
-    shimmeringView.contentView = loadingLabel;
+    [self.view addSubview:loadingLabel];
+    [loadingLabel.heightAnchor constraintEqualToConstant:30.f].active = YES;
+    [loadingLabel.widthAnchor constraintEqualToAnchor:progressView.widthAnchor].active = YES;
+    [loadingLabel.centerXAnchor constraintEqualToAnchor:self.view.centerXAnchor].active = YES;
+    [loadingLabel.topAnchor constraintGreaterThanOrEqualToAnchor:progressView.bottomAnchor].active = YES;
+    [loadingLabel.bottomAnchor constraintEqualToAnchor:self.bottomLayoutGuide.bottomAnchor constant:-15].active = YES;
 }
 
 - (CGSize)progressViewSize {
