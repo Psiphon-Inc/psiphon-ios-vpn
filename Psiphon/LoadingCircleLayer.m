@@ -49,8 +49,7 @@
     return self;
 }
 
-+ (BOOL)needsDisplayForKey:(NSString *)key
-{
++ (BOOL)needsDisplayForKey:(NSString *)key {
     // Returning true for a given property causes the layer's contents to
     // be redrawn when the property is changed.
     // See https://developer.apple.com/documentation/quartzcore/calayer/1410769-needsdisplay.
@@ -61,8 +60,7 @@
     return [super needsDisplayForKey:key];
 }
 
-- (id<CAAction>)actionForKey:(NSString *)key
-{
+- (id<CAAction>)actionForKey:(NSString *)key {
     // Returns the action object associated with the event named by the
     // string 'event'.
     // See https://developer.apple.com/documentation/quartzcore/calayer/1410844-action.
@@ -77,8 +75,7 @@
     return [super actionForKey:key];
 }
 
--(void)drawInContext:(CGContextRef)ctx
-{
+-(void)drawInContext:(CGContextRef)ctx {
     CGRect rect = self.bounds;
 
     // Clear previous drawings
@@ -96,7 +93,7 @@
     CGContextStrokePath(ctx);
 }
 
-# pragma mark - helpers
+#pragma mark - helpers
 
 - (CGFloat)getLoadingCircleRadius {
     CGFloat radius = 0;
