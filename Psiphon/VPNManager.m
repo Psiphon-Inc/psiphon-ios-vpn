@@ -74,6 +74,7 @@
 }
 
 - (VPNStatus)getVPNStatus {
+
 #ifdef DEBUG
     if ([AppDelegate isRunningUITest]) {
         return VPNStatusConnected;
@@ -81,7 +82,7 @@
 #endif
 
     if (restartRequired) {
-        // If extension is restarting due to a call to restartVPN, then
+        // If extension is restarting due to a call to restartVPNIfActive, then
         // we don't want to show the Disconnecting and Disconnected states
         // to the observers, and instead simply notify them that the
         // extension is restarting.
@@ -98,7 +99,7 @@
     }
 
     LOG_ERROR(@"Unknown NEVPNConnection status: (%ld)", self.targetManager.connection.status);
-    return -1;
+    return VPNStatusInvalid;
 }
 
 - (void)startTunnelWithCompletionHandler:(nullable void (^)(NSError * _Nullable error))completionHandler {
@@ -133,7 +134,7 @@
             [self setStartStopButtonPressed:FALSE];
             if (completionHandler) {
                 LOG_ERROR(@"Failed to load VPN configuration. Error:%@", error);
-                completionHandler([VPNManager errorWithCode:VPNManagerErrorLoadConfigsFailed]);
+                completionHandler([VPNManager errorWithCode:VPNManagerStartErrorLoadConfigsFailed]);
             }
             return;
         }
@@ -153,7 +154,7 @@
             [self setStartStopButtonPressed:FALSE];
             LOG_ERROR(@"%lu VPN configurations found, only expected 1. Aborting", [allManagers count]);
             if (completionHandler) {
-                completionHandler([VPNManager errorWithCode:VPNManagerErrorTooManyConfigsFounds]);
+                completionHandler([VPNManager errorWithCode:VPNManagerStartErrorTooManyConfigsFounds]);
             }
             return;
         }
@@ -171,7 +172,7 @@
                 // User denied permission to add VPN Configuration.
                 LOG_ERROR(@"failed to save the configuration: %@", error);
                 if (completionHandler) {
-                    completionHandler([VPNManager errorWithCode:VPNManagerErrorUserDeniedConfigInstall]);
+                    completionHandler([VPNManager errorWithCode:VPNManagerStartErrorUserDeniedConfigInstall]);
                 }
                 return;
             }
@@ -182,21 +183,21 @@
                 if (error != nil) {
                     LOG_ERROR(@"Failed to reload VPN configuration. Error:(%@)", error);
                     if (completionHandler) {
-                        completionHandler([VPNManager errorWithCode:VPNManagerErrorLoadConfigsFailed]);
+                        completionHandler([VPNManager errorWithCode:VPNManagerStartErrorLoadConfigsFailed]);
                     }
                     return;
                 }
 
                LOG_DEBUG(@"Call targetManager.connection.startVPNTunnel()");
                 NSError *vpnStartError;
-                NSDictionary *extensionOptions = @{EXTENSION_OPTION_START_FROM_CONTAINER : @YES};
+                NSDictionary *extensionOptions = @{EXTENSION_START_FROM_CONTAINER : EXTENSION_START_FROM_CONTAINER_TRUE};
 
                 BOOL vpnStartSuccess = [self.targetManager.connection startVPNTunnelWithOptions:extensionOptions
                                                                                  andReturnError:&vpnStartError];
                 if (!vpnStartSuccess) {
                     LOG_ERROR(@"Failed to start network extension. Error:(%@)", vpnStartError);
                     if (completionHandler) {
-                        completionHandler([VPNManager errorWithCode:VPNManagerErrorNEStartFailed]);
+                        completionHandler([VPNManager errorWithCode:VPNManagerStartErrorNEStartFailed]);
                     }
                     return;
                 }
@@ -219,7 +220,7 @@
     }
 }
 
-- (void)restartVPN {
+- (void)restartVPNIfActive {
     if (self.targetManager.connection && [self isVPNActive]) {
         restartRequired = YES;
         [self.targetManager.connection stopVPNTunnel];
@@ -242,8 +243,26 @@
     return VPNStatusConnected == [self getVPNStatus];
 }
 
-- (BOOL)isTunnelConnected {
-    return [self isVPNActive] && [sharedDB getTunnelConnectedState];
+#pragma mark - Public network Extension query methods
+
+- (void)queryNEIsTunnelConnected:(void (^ _Nonnull)(BOOL tunnelIsConnected))completionHandler {
+    [self queryExtension:EXTENSION_QUERY_IS_TUNNEL_CONNECTED responseHandler:^(NSError *error, NSString *response) {
+
+        if (error) {
+            LOG_WARN(@"query 'isTunnelConnected' failed %@", error);
+            completionHandler(FALSE);
+            return;
+        }
+
+        if ([EXTENSION_RESP_TRUE isEqualToString:response]) {
+            completionHandler(TRUE);
+        } else if ([EXTENSION_RESP_FALSE isEqualToString:response]) {
+            completionHandler(FALSE);
+        } else {
+            LOG_ERROR(@"Unexpected query response (%@)", response);
+            completionHandler(FALSE);
+        }
+    }];
 }
 
 #pragma mark - Private methods
@@ -275,6 +294,38 @@
       }];
 }
 
+/**
+ * Sends a query to the extension.
+ * @param query Query string, typically from SharedConstants.h
+ * @param responseHandler Required block that handles the result from the query. If an error occurs,
+ *    error object is set with one of VPNQueryErrorCode codes. Otherwise error is nil.
+ */
+- (void)queryExtension:(NSString *)query responseHandler:(void (^ _Nonnull)(NSError * _Nullable error, NSString * _Nullable response))responseHandler {
+    NETunnelProviderSession *session = (NETunnelProviderSession *) self.targetManager.connection;
+    NSError *error;
+    if (session && [self isVPNActive]) {
+
+        BOOL sent = [session sendProviderMessage:[query dataUsingEncoding:NSUTF8StringEncoding]
+                                     returnError:&error
+                                 responseHandler:^(NSData *responseData) {
+                                     NSString *response = [[NSString alloc] initWithData:responseData encoding:NSUTF8StringEncoding];
+                                     LOG_DEBUG(@"Query response (%@)", response);
+                                     if (response) {
+                                         responseHandler(nil, response);
+                                     } else {
+                                         responseHandler([VPNManager queryError:query withCode:VPNQueryErrorNilResponse andError:nil], nil);
+                                     }
+                                 }];
+
+        if (sent) {
+            LOG_DEBUG(@"Query (%@) sent to tunnel provider", query);
+            return;
+        }
+    }
+
+    responseHandler([VPNManager queryError:query withCode:VPNQueryErrorSendFailed andError:error], nil);
+}
+
 - (void)postStatusChangeNotification {
     [[NSNotificationCenter defaultCenter]
       postNotificationName:@kVPNStatusChangeNotificationName object:self];
@@ -284,8 +335,27 @@
     [[NSNotificationCenter defaultCenter] removeObserver:localVPNStatusObserver];
 }
 
-+ (NSError *)errorWithCode:(VPNManagerErrorCode)code {
-    return [[NSError alloc] initWithDomain:kVPNManagerErrorDomain code:code userInfo:nil];
+#pragma mark - Error conveniece methods
+
++ (NSError *)errorWithCode:(VPNManagerStartErrorCode)code {
+    return [[NSError alloc] initWithDomain:VPNManagerErrorDomain code:code userInfo:nil];
+}
+
++ (NSError *)queryError:(NSString * _Nonnull)query withCode:(VPNQueryErrorCode)code andError:(NSError * _Nullable)error {
+
+    NSString *description;
+    switch (code) {
+        case VPNQueryErrorSendFailed: description = @"vpn query send failed"; break;
+        case VPNQueryErrorNilResponse: description = @"nil response"; break;
+    }
+
+    NSMutableDictionary *userInfo = [NSMutableDictionary dictionary];
+    userInfo[NSLocalizedDescriptionKey] = description;
+    userInfo[VPNQueryKey] = query;
+    if (error) {
+        userInfo[NSUnderlyingErrorKey] = error;
+    }
+    return [[NSError alloc] initWithDomain:VPNQueryErrorDomain code:code userInfo:userInfo];
 }
 
 @end

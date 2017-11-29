@@ -75,14 +75,13 @@
 
 - (void)startTunnelWithOptions:(nullable NSDictionary<NSString *, NSObject *> *)options completionHandler:(void (^)(NSError *__nullable error))startTunnelCompletionHandler {
 
-    // TODO: This method wouldn't work with "boot to VPN"
-    if (options[EXTENSION_OPTION_START_FROM_CONTAINER]) {
+    BOOL tunnelStartedFromContainer = [((NSString *)options[EXTENSION_START_FROM_CONTAINER])
+      isEqualToString:EXTENSION_START_FROM_CONTAINER_TRUE];
+
+    if (tunnelStartedFromContainer) {
 
         // Listen for messages from the container
         [self listenForContainerMessages];
-
-        // Reset tunnel connected state.
-        [sharedDB updateTunnelConnectedState:FALSE];
 
         __weak PsiphonTunnel *weakPsiphonTunnel = psiphonTunnel;
 
@@ -122,8 +121,6 @@
 
 - (void)stopTunnelWithReason:(NEProviderStopReason)reason completionHandler:(void (^)(void)) completionHandler {
 
-    [sharedDB updateTunnelConnectedState:FALSE];
-
     // Assumes stopTunnelWithReason called exactly once only after startTunnelWithOptions.completionHandler(nil)
     if (vpnStartCompletionHandler) {
         vpnStartCompletionHandler([NSError
@@ -138,9 +135,37 @@
     return;
 }
 
-- (void)handleAppMessage:(NSData *)messageData completionHandler:(nullable void (^)(NSData * __nullable responseData))completionHandler {
+#define _EXTENSION_RESP_TRUE_DATA [EXTENSION_RESP_TRUE dataUsingEncoding:NSUTF8StringEncoding]
+#define _EXTENSION_RESP_FALSE_DATA [EXTENSION_RESP_FALSE dataUsingEncoding:NSUTF8StringEncoding]
+
+// If the Network Extension is *not* running, and the container sends
+// a messages with [NETunnelProviderSession sendProviderMessage:::] then
+// the system creates a new extension process, and instantiates PacketTunnelProvider.
+- (void)handleAppMessage:(NSData *)messageData
+       completionHandler:(nullable void (^)(NSData * __nullable responseData))completionHandler {
 
     if (completionHandler != nil) {
+
+        if (messageData) {
+
+            NSData *respData = nil;
+            NSString *query = [[NSString alloc] initWithData:messageData encoding:NSUTF8StringEncoding];
+
+            if ([EXTENSION_QUERY_IS_TUNNEL_CONNECTED isEqualToString:query]) {
+                if ([psiphonTunnel getConnectionState] == PsiphonConnectionStateConnected) {
+                    respData = _EXTENSION_RESP_TRUE_DATA;
+                } else {
+                    respData = _EXTENSION_RESP_FALSE_DATA;
+                }
+            }
+
+            if (respData) {
+                completionHandler(respData);
+                return;
+            }
+        }
+
+        // If completionHandler is not nil, iOS expects it to always be executed.
         completionHandler(messageData);
     }
 }
@@ -389,16 +414,11 @@
 
 - (void)onConnecting {
     LOG_DEBUG(@"onConnecting");
-
-    [sharedDB updateTunnelConnectedState:FALSE];
-
     self.reasserting = TRUE;
 }
 
 - (void)onConnected {
     LOG_DEBUG(@"onConnected");
-
-    [sharedDB updateTunnelConnectedState:TRUE];
 
     if (!vpnStartCompletionHandler) {
         self.reasserting = FALSE;
