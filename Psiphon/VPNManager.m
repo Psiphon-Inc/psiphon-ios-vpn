@@ -249,7 +249,7 @@
     [self queryExtension:EXTENSION_QUERY_IS_TUNNEL_CONNECTED responseHandler:^(NSError *error, NSString *response) {
 
         if (error) {
-            LOG_ERROR(@"query tunnel connected failed %@", error);
+            LOG_WARN(@"query 'isTunnelConnected' failed %@", error);
             completionHandler(FALSE);
             return;
         }
