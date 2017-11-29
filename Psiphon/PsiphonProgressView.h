@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, Psiphon Inc.
+ * Copyright (c) 2017, Psiphon Inc. Created by Draven Johnson on 2017-08-30.
  * All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -19,18 +19,10 @@
 
 #import <UIKit/UIKit.h>
 
-@interface AppDelegate : UIResponder <UIApplicationDelegate>
+@interface PsiphonProgressView : UIView
 
-@property (strong, nonatomic) UIWindow *window;
+/* Percent complete in the range [0, 1]. */
 
-+ (AppDelegate *)sharedAppDelegate;
-+ (BOOL)isRunningUITest;
-
-/* Ads */
-- (UIViewController *)getAdsPresentingViewController;
-- (void)launchScreenFinished;
-
-/* Reloads MainViewController. Used after a settings change. */
-- (void)reloadMainViewController;
+@property (nonatomic) CGFloat progress;
 
 @end

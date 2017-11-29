@@ -17,8 +17,32 @@
  *
  */
 
-#import <Foundation/Foundation.h>
+#import <QuartzCore/QuartzCore.h>
 #import <UIKit/UIKit.h>
 
-@interface LaunchScreenViewController : UIViewController
+@interface LoadingCircleLayer : CALayer
+
+/* Percent complete in the range [0, 1]. */
+
+@property (nonatomic) CGFloat progress;
+
+/* If set property takes precedence over `circleRadiusRatio`. */
+
+@property (nonatomic) CGFloat circleRadius;
+
+/* Set circle radius to a percentage of LoadingCircleLayer's bounds.
+ * That is:
+ * radius = (MIN(layer.width, layer.height) / 2) * circleRadiusRation
+ * in pseudocode. This will not update the circleRadius property. */
+
+@property (nonatomic) CGFloat circleRadiusRatio;
+
+@property (nonatomic) BOOL drawClockwise;
+
+@property (nonatomic) CGFloat lineWidth;
+
+@property (nonatomic) CGColorRef lineColor;
+
+@property (nonatomic) NSTimeInterval updateDuration;
+
 @end

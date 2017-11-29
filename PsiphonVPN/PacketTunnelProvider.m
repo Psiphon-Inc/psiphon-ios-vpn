@@ -303,6 +303,13 @@
        }];
 }
 
+- (void)displayCorruptSettingsFileMessage {
+    [self displayMessage:NSLocalizedStringWithDefaultValue(@"CORRUPT_SETTINGS_MESSAGE", nil, [NSBundle mainBundle], @"Your app settings file appears to be corrupt. Try reinstalling the app to repair the file.", @"Alert dialog message informing the user that the settings file in the app is corrupt, and that they can potentially fix this issue by re-installing the app.")
+       completionHandler:^(BOOL success) {
+           // Do nothing.
+       }];
+}
+
 @end
 
 #pragma mark - TunneledAppDelegate
@@ -332,6 +339,7 @@
 
     if (![fileManager fileExistsAtPath:bundledConfigPath]) {
         LOG_ERROR(@"Config file not found. Aborting now.");
+        [self displayCorruptSettingsFileMessage];
         abort();
     }
 
@@ -342,6 +350,7 @@
 
     if (err) {
         LOG_ERROR(@"%@", [NSString stringWithFormat:@"Aborting. Failed to parse config JSON: %@", err.description]);
+        [self displayCorruptSettingsFileMessage];
         abort();
     }
 
@@ -371,6 +380,7 @@
 
     if (err) {
         LOG_ERROR(@"Aborting. Failed to create JSON data from config object: %@", err);
+        [self displayCorruptSettingsFileMessage];
         abort();
     }
 
