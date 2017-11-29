@@ -158,8 +158,12 @@
     dispatch_async(dispatch_get_main_queue(), ^{
         // If the tunnel is in Connected state, and we're now showing ads
         // send startVPN message.
-        if (![adManager untunneledInterstitialIsShowing] && [vpnManager isTunnelConnected]) {
-            [vpnManager startVPN];
+        if (![adManager untunneledInterstitialIsShowing]) {
+            [vpnManager queryNEIsTunnelConnected:^(BOOL tunnelIsConnected) {
+                if (tunnelIsConnected) {
+                    [vpnManager startVPN];
+                }
+            }];
         }
     });
 }
