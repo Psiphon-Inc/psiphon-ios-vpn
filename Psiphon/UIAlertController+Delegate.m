@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, Psiphon Inc.
+ * Copyright (c) 2017, Psiphon Inc.
  * All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,20 +17,23 @@
  *
  */
 
-#import <UIKit/UIKit.h>
+#import "UIAlertController+Delegate.h"
 
-@interface AppDelegate : UIResponder <UIApplicationDelegate>
+@implementation UIAlertController (Delegate)
 
-@property (strong, nonatomic) UIWindow *window;
++ (UIViewController *)getTopMostViewController {
+    UIViewController *topController = [UIApplication sharedApplication].keyWindow.rootViewController;
+    while(topController.presentedViewController) {
+        topController = topController.presentedViewController;
+    }
+    return topController;
+}
 
-+ (AppDelegate *)sharedAppDelegate;
-+ (BOOL)isRunningUITest;
-
-/* Ads */
-- (UIViewController *)getAdsPresentingViewController;
-- (void)launchScreenFinished;
-
-/* Reloads MainViewController. Used after a settings change. */
-- (void)reloadMainViewController;
+/**
+ * Presents this instance from application's key window top most view controller.
+ */
+- (void)presentFromTopController {
+    [[UIAlertController getTopMostViewController] presentViewController:self animated:TRUE completion:nil];
+}
 
 @end

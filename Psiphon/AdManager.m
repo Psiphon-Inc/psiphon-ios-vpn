@@ -120,7 +120,7 @@
 - (void)showUntunneledInterstitial {
    LOG_DEBUG();
     if ([self untunneledInterstitialIsReady]) {
-        [self.untunneledInterstitial showFromViewController:[[AppDelegate sharedAppDelegate] getMainViewController]];
+        [self.untunneledInterstitial showFromViewController:[[AppDelegate sharedAppDelegate] getAdsPresentingViewController]];
     } else {
         // Start the tunnel
         [vpnManager startTunnelWithCompletionHandler:^(NSError *error) {}];

@@ -1,5 +1,5 @@
 # Uncomment the next line to define a global platform for your project
-platform :ios, '8.0'
+platform :ios, '10.0'
 
  # Disable sending stats
 ENV['COCOAPODS_DISABLE_STATS'] = 'true'
@@ -15,9 +15,10 @@ target 'Psiphon' do
   #pod "PsiphonClientCommonLibrary", :path => "../psiphon-ios-client-common-library"
 
   pod 'OpenSSL', '1.0.210'
-  pod 'mopub-ios-sdk', '4.16.0'
-  pod 'Google-Mobile-Ads-SDK', '7.24.0'
-  pod 'VungleSDK-iOS', '5.2.0'
+  pod 'mopub-ios-sdk', '4.18.0'
+  pod 'Google-Mobile-Ads-SDK', '7.25.0'
+  pod 'VungleSDK-iOS', '5.3.0'
+  pod 'PureLayout', '3.0.2'
 end
 
 target 'PsiphonVPN' do

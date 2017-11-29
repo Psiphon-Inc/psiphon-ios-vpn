@@ -29,12 +29,9 @@
 #import "Logging.h"
 #import "IAPHelper.h"
 #import "IAPViewController.h"
-
-#if DEBUG
-#define kLaunchScreenTimerCount 1
-#else
-#define kLaunchScreenTimerCount 10
-#endif
+#import "MPInterstitialAdController.h"
+#import "RootContainerController.h"
+#import "UIAlertController+Delegate.h"
 
 @interface AppDelegate ()
 @end
@@ -45,24 +42,9 @@
     PsiphonDataSharedDB *sharedDB;
     Notifier *notifier;
 
-    // Loading Timer
-    NSTimer *loadingTimer;
-    NSInteger timerCount;
-
     BOOL shownHomepage;
 
-    // ViewController
-    MainViewController *mainViewController;
-    LaunchScreenViewController *launchScreenViewController;
-}
-
-// Helper method to get top most presenting controller
-+ (UIViewController*) topMostController {
-    UIViewController *topController = [UIApplication sharedApplication].keyWindow.rootViewController;
-    while (topController.presentedViewController) {
-        topController = topController.presentedViewController;
-    }
-    return topController;
+    RootContainerController *rootContainerController;
 }
 
 - (instancetype)init {
@@ -73,10 +55,7 @@
         sharedDB = [[PsiphonDataSharedDB alloc] initForAppGroupIdentifier:APP_GROUP_IDENTIFIER];
         notifier = [[Notifier alloc] initWithAppGroupIdentifier:APP_GROUP_IDENTIFIER];
 
-        mainViewController = [[MainViewController alloc] init];
-        launchScreenViewController = [[LaunchScreenViewController alloc] init];
-
-        timerCount = kLaunchScreenTimerCount;
+        shownHomepage = FALSE;
     }
     return self;
 }
@@ -104,10 +83,6 @@
 #endif
 }
 
-- (MainViewController *)getMainViewController {
-    return mainViewController;
-}
-
 - (void)onVPNStatusDidChange {
     if ([vpnManager getVPNStatus] == VPNStatusDisconnected
         || [vpnManager getVPNStatus] == VPNStatusRestarting) {
@@ -119,7 +94,8 @@
 
 - (BOOL)application:(UIApplication *)application willFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     [self initializeDefaults];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(switchViewControllerWhenAdsLoaded) name:@kAdsDidLoad object:adManager];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onAdsLoaded)
+                                                 name:@kAdsDidLoad object:adManager];
 
     [[IAPHelper sharedInstance] startProductsRequest];
 
@@ -131,15 +107,17 @@
     // Override point for customization after application launch.
     self.window = [[UIWindow alloc] initWithFrame:UIScreen.mainScreen.bounds];
 
-    // TODO: if VPN disconnected, launch with animation, else launch with MainViewController.
-    [self setRootViewController];
-
+    rootContainerController = [[RootContainerController alloc] init];
+    self.window.rootViewController = rootContainerController;
+    // UIKit always waits for application:didFinishLaunchingWithOptions:
+    // to return before making the window visible on the screen.
     [self.window makeKeyAndVisible];
 
-    shownHomepage = FALSE;
+    [self loadAdsIfNeeded];
+
     // Listen for VPN status changes from VPNManager.
     [[NSNotificationCenter defaultCenter]
-     addObserver:self selector:@selector(onVPNStatusDidChange) name:@kVPNStatusChangeNotificationName object:vpnManager];
+      addObserver:self selector:@selector(onVPNStatusDidChange) name:@kVPNStatusChangeNotificationName object:vpnManager];
 
     // Listen for the network extension messages.
     [self listenForNEMessages];
@@ -157,6 +135,8 @@
     LOG_DEBUG();
     // Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later.
     // If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
+
+    [[UIApplication sharedApplication] ignoreSnapshotOnNextApplicationLaunch];
     [notifier post:@"D.applicationDidEnterBackground"];
     [sharedDB updateAppForegroundState:NO];
 }
@@ -165,9 +145,7 @@
     LOG_DEBUG();
     // Called as part of the transition from the background to the active state; here you can undo many of the changes made on entering the background.
 
-    [self setRootViewController];
-
-    // TODO: init MainViewController.
+    [self loadAdsIfNeeded];
 }
 
 - (void)applicationDidBecomeActive:(UIApplication *)application {
@@ -195,90 +173,46 @@
     [PsiphonClientCommonLibraryHelpers initializeDefaultsForPlistsFromRoot:@"Root.inApp"];
 }
 
-#pragma mark - View controller switch
-
-- (void)setRootViewController {
-    // If VPN disconnected, launch with animation, else launch with MainViewController.
-
-    NetworkStatus networkStatus = [[Reachability reachabilityForInternetConnection] currentReachabilityStatus];
-
-    if ( networkStatus != NotReachable
-      && ([vpnManager getVPNStatus] == VPNStatusDisconnected || [vpnManager getVPNStatus] == VPNStatusInvalid)
-      && ![adManager untunneledInterstitialIsReady] && ![adManager untunneledInterstitialHasShown] && ![vpnManager startStopButtonPressed]
-        && [adManager shouldShowUntunneledAds]) {
-        [adManager initializeAds];
-        self.window.rootViewController = launchScreenViewController;
-        if (timerCount <= 0) {
-            // Reset timer to 10 if it's 0 and need load ads again.
-            timerCount = 10;
-        }
-        [self startLaunchingScreenTimer];
-    } else {
-        self.window.rootViewController = mainViewController;
-    }
-}
-
-- (void) reloadMainViewController {
+- (void)reloadMainViewController {
     LOG_DEBUG();
-    mainViewController = [[MainViewController alloc] init];
-    mainViewController.openSettingImmediatelyOnViewDidAppear = YES;
-    [self changeRootViewController:mainViewController];
+    [rootContainerController reloadMainViewController];
+    rootContainerController.mainViewController.openSettingImmediatelyOnViewDidAppear = TRUE;
 }
 
-- (void)switchViewControllerWhenAdsLoaded {
-    [loadingTimer invalidate];
-    timerCount = 0;
-    [self changeRootViewController:mainViewController];
-}
+#pragma mark - Ads
 
-- (void)switchViewControllerWhenExpire:(NSTimer*)timer {
-    if (timerCount <= 0) {
-        [loadingTimer invalidate];
-        [self changeRootViewController:mainViewController];
-        return;
-    }
-    timerCount -=1;
-    launchScreenViewController.progressView.progress = (10 - timerCount)/10.0f;
-}
+- (void)loadAdsIfNeeded {
 
-- (void)startLaunchingScreenTimer {
-    if (!loadingTimer || ![loadingTimer isValid]) {
-        loadingTimer = [NSTimer scheduledTimerWithTimeInterval:1.0
-                                                        target:self
-                                                      selector:@selector(switchViewControllerWhenExpire:)
-                                                      userInfo:nil
-                                                       repeats:YES];
+    if ([adManager shouldShowUntunneledAds]
+      && ![adManager untunneledInterstitialIsReady]
+      && ![adManager untunneledInterstitialHasShown]
+      && ![vpnManager startStopButtonPressed]) {
+
+        [rootContainerController showLaunchScreen];
+
+        dispatch_async(dispatch_get_main_queue(), ^{
+                [adManager initializeAds];
+        });
+
+    } else {
+        // Removes launch screen if already showing.
+        [rootContainerController removeLaunchScreen];
     }
 }
 
-- (void)changeRootViewController:(UIViewController*)viewController {
-    if (!self.window.rootViewController) {
-        self.window.rootViewController = viewController;
-        return;
-    }
+// Returns the ViewController responsible for presenting ads.
+- (UIViewController *)getAdsPresentingViewController {
+    return rootContainerController.mainViewController;
+}
 
-    if (self.window.rootViewController == viewController) {
-        return;
-    }
+- (void)onAdsLoaded {
+    LOG_DEBUG();
+    [rootContainerController removeLaunchScreen];
+}
 
-    UIViewController *prevViewController = self.window.rootViewController;
-
-    UIView *snapShot = [self.window snapshotViewAfterScreenUpdates:YES];
-    [viewController.view addSubview:snapShot];
-
-    self.window.rootViewController = viewController;
-
-    [prevViewController dismissViewControllerAnimated:NO completion:^{
-        // Remove the root view in case it is still showing
-        [prevViewController.view removeFromSuperview];
-    }];
-
-    [UIView animateWithDuration:.3 animations:^{
-        snapShot.layer.opacity = 0;
-        snapShot.layer.transform = CATransform3DMakeScale(1.5, 1.5, 1.5);
-    } completion:^(BOOL finished) {
-        [snapShot removeFromSuperview];
-    }];
+- (void)launchScreenFinished {
+    LOG_DEBUG();
+    [rootContainerController removeLaunchScreen];
 }
 
 #pragma mark - Network Extension
@@ -326,10 +260,10 @@
                                                 IAPViewController *iapViewController = [[IAPViewController alloc]init];
                                                 iapViewController.openedFromSettings = NO;
                                                 UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:iapViewController];
-                                                [[AppDelegate topMostController] presentViewController:navController animated:YES completion:nil];
+                                                [rootContainerController presentViewController:navController animated:YES completion:nil];
                                             }];
             [alert addAction:defaultAction];
-            [[AppDelegate topMostController] presentViewController:alert animated:TRUE completion:nil];
+            [alert presentFromTopController];
             return;
         }
 
@@ -373,7 +307,7 @@
                                                         [[IAPHelper sharedInstance] terminateForInvalidReceipt];
                                                     }];
                     [alert addAction:defaultAction];
-                    [[AppDelegate topMostController] presentViewController:alert animated:TRUE completion:nil];
+                    [alert presentFromTopController];
                     return;
                 }
             }
