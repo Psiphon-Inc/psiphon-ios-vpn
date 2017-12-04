@@ -28,6 +28,8 @@
 		4E1FE1CB1FB213860031211C /* SnapshotHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E1FE1CA1FB213860031211C /* SnapshotHelper.swift */; };
 		4E6E98A91FC776CD002B35CD /* LoadingCircleLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E6E98A81FC776CD002B35CD /* LoadingCircleLayer.m */; };
 		4E6E98AC1FC776EA002B35CD /* PsiphonProgressView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E6E98AA1FC776EA002B35CD /* PsiphonProgressView.m */; };
+		4EE51E7F1FD5BF82009A0B57 /* EmbeddedServerEntries.m in Sources */ = {isa = PBXBuildFile; fileRef = 4EE51E7E1FD5BF82009A0B57 /* EmbeddedServerEntries.m */; };
+		4EFFBFC91FD204D300C1D81A /* EmbeddedServerEntriesHelpers.c in Sources */ = {isa = PBXBuildFile; fileRef = 4EFFBFC71FD204D300C1D81A /* EmbeddedServerEntriesHelpers.c */; };
 		66094F7A1E8067520069EC4E /* PsiphonTunnel.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 66094F781E8067520069EC4E /* PsiphonTunnel.framework */; };
 		6615A5EA1F58A95500026C98 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 6615A5E81F58A95500026C98 /* Localizable.strings */; };
 		6615A5EB1F58A95B00026C98 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 6615A5E81F58A95500026C98 /* Localizable.strings */; };
@@ -145,6 +147,10 @@
 		4E6E98A81FC776CD002B35CD /* LoadingCircleLayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LoadingCircleLayer.m; sourceTree = "<group>"; };
 		4E6E98AA1FC776EA002B35CD /* PsiphonProgressView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PsiphonProgressView.m; sourceTree = "<group>"; };
 		4E6E98AB1FC776EA002B35CD /* PsiphonProgressView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PsiphonProgressView.h; sourceTree = "<group>"; };
+		4EE51E7D1FD5BF82009A0B57 /* EmbeddedServerEntries.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = EmbeddedServerEntries.h; sourceTree = "<group>"; };
+		4EE51E7E1FD5BF82009A0B57 /* EmbeddedServerEntries.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = EmbeddedServerEntries.m; sourceTree = "<group>"; };
+		4EFFBFC71FD204D300C1D81A /* EmbeddedServerEntriesHelpers.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = EmbeddedServerEntriesHelpers.c; sourceTree = "<group>"; };
+		4EFFBFC81FD204D300C1D81A /* EmbeddedServerEntriesHelpers.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = EmbeddedServerEntriesHelpers.h; sourceTree = "<group>"; };
 		571DC9418AF936E60179F07C /* Pods-Psiphon.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Psiphon.release.xcconfig"; path = "Pods/Target Support Files/Pods-Psiphon/Pods-Psiphon.release.xcconfig"; sourceTree = "<group>"; };
 		66094F781E8067520069EC4E /* PsiphonTunnel.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = PsiphonTunnel.framework; sourceTree = "<group>"; };
 		6615A5E91F58A95500026C98 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = Strings/en.lproj/Localizable.strings; sourceTree = "<group>"; };
@@ -342,6 +348,17 @@
 			name = "Launch Screen";
 			sourceTree = "<group>";
 		};
+		4EE51E801FD5E023009A0B57 /* Server Entry Reader */ = {
+			isa = PBXGroup;
+			children = (
+				4EE51E7D1FD5BF82009A0B57 /* EmbeddedServerEntries.h */,
+				4EE51E7E1FD5BF82009A0B57 /* EmbeddedServerEntries.m */,
+				4EFFBFC81FD204D300C1D81A /* EmbeddedServerEntriesHelpers.h */,
+				4EFFBFC71FD204D300C1D81A /* EmbeddedServerEntriesHelpers.c */,
+			);
+			name = "Server Entry Reader";
+			sourceTree = "<group>";
+		};
 		668AF9B81E92CB60008CAAAA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
@@ -388,31 +405,32 @@
 		CE26FC8C1BBDC7B800B83375 /* Psiphon */ = {
 			isa = PBXGroup;
 			children = (
-				F136C2981F62E81F000D3EAB /* Resource */,
-				EFB3E6281F621100004AAE8C /* External */,
-				4E6E98A61FC776AE002B35CD /* Launch Screen */,
-				EFED7EBA1F55C8550078980F /* LogViewControllerFullScreen.h */,
-				EFED7EBB1F55C8550078980F /* LogViewControllerFullScreen.m */,
-				EF652CCF1F3521F8002AFB48 /* Supporting Files */,
-				CE4E9BBF1BBEECF30060FF8B /* Psiphon.entitlements */,
-				CE26FC991BBDC7B800B83375 /* Info.plist */,
-				EF652CD21F35224C002AFB48 /* AppDelegate.h */,
-				EF652CD31F35224C002AFB48 /* AppDelegate.m */,
-				EF652CD41F35224C002AFB48 /* MainViewController.h */,
-				EF652CD51F35224C002AFB48 /* MainViewController.m */,
-				4E0774951F566ADA0097BC8C /* InAppSettings.bundle */,
 				197DABF21F54C0EA00DD5C3B /* 3rd Party Adapters */,
+				EFB3E6281F621100004AAE8C /* External */,
 				448AD86C1F5DC89000316BA9 /* IAP */,
-				9BFEC04426D8558CB89D3798 /* VPNManager.m */,
-				9BFEC74F24453B8E4B1AFC39 /* VPNManager.h */,
+				4E6E98A61FC776AE002B35CD /* Launch Screen */,
+				F136C2981F62E81F000D3EAB /* Resource */,
+				4EE51E801FD5E023009A0B57 /* Server Entry Reader */,
+				EF652CCF1F3521F8002AFB48 /* Supporting Files */,
+				CE26FC991BBDC7B800B83375 /* Info.plist */,
+				CE4E9BBF1BBEECF30060FF8B /* Psiphon.entitlements */,
+				4E0774951F566ADA0097BC8C /* InAppSettings.bundle */,
 				9BFECE9247474C83FD8C2948 /* AdManager.m */,
 				9BFEC66B7F0E98CBC5631F06 /* AdManager.h */,
-				4435CC251F70566000F3A809 /* SettingsViewController.h */,
-				4435CC261F70566000F3A809 /* SettingsViewController.m */,
+				EF652CD21F35224C002AFB48 /* AppDelegate.h */,
+				EF652CD31F35224C002AFB48 /* AppDelegate.m */,
+				EFED7EBA1F55C8550078980F /* LogViewControllerFullScreen.h */,
+				EFED7EBB1F55C8550078980F /* LogViewControllerFullScreen.m */,
+				EF652CD41F35224C002AFB48 /* MainViewController.h */,
+				EF652CD51F35224C002AFB48 /* MainViewController.m */,
 				9BFECD08E94D7F89F680EE7F /* RootContainerController.m */,
 				9BFEC490C2C4C9BC5AAEF3EC /* RootContainerController.h */,
+				4435CC251F70566000F3A809 /* SettingsViewController.h */,
+				4435CC261F70566000F3A809 /* SettingsViewController.m */,
 				9BFECC83CBA7EC14401D96CA /* UIAlertController+Delegate.m */,
 				9BFEC04883D37538D77D71D7 /* UIAlertController+Delegate.h */,
+				9BFEC04426D8558CB89D3798 /* VPNManager.m */,
+				9BFEC74F24453B8E4B1AFC39 /* VPNManager.h */,
 			);
 			path = Psiphon;
 			sourceTree = "<group>";
@@ -812,11 +830,13 @@
 				F132D7E01F5739A800AF7F91 /* LaunchScreenViewController.m in Sources */,
 				19CB75081F54ADB300F78219 /* MPGoogleAdMobInterstitialCustomEvent.m in Sources */,
 				197DABEB1F54BEED00DD5C3B /* VungleInterstitialCustomEvent.m in Sources */,
+				4EFFBFC91FD204D300C1D81A /* EmbeddedServerEntriesHelpers.c in Sources */,
 				197DABF51F54C15400DD5C3B /* VungleInstanceMediationSettings.m in Sources */,
 				4E6E98A91FC776CD002B35CD /* LoadingCircleLayer.m in Sources */,
 				4E0DCB1A1F28481E00495781 /* PsiphonDataSharedDB.m in Sources */,
 				4435CC271F70566000F3A809 /* SettingsViewController.m in Sources */,
 				EFED7EBC1F55C8550078980F /* LogViewControllerFullScreen.m in Sources */,
+				4EE51E7F1FD5BF82009A0B57 /* EmbeddedServerEntries.m in Sources */,
 				440D75BB1F59DF1B005C603B /* IAPHelper.m in Sources */,
 				197DABF11F54C0CA00DD5C3B /* MPInstanceProvider+Vungle.m in Sources */,
 				44D9B0FD1F673417007D1E69 /* RMAppReceipt.m in Sources */,

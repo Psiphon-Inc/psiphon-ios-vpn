@@ -19,19 +19,20 @@
 
 #import <PsiphonTunnel/Reachability.h>
 #import "AppDelegate.h"
-#import "PsiphonClientCommonLibraryHelpers.h"
-#import "PsiphonDataSharedDB.h"
-#import "SharedConstants.h"
-#import "Notifier.h"
-#import "RegionAdapter.h"
-#import "VPNManager.h"
 #import "AdManager.h"
-#import "Logging.h"
+#import "EmbeddedServerEntries.h"
 #import "IAPHelper.h"
 #import "IAPViewController.h"
+#import "Logging.h"
 #import "MPInterstitialAdController.h"
+#import "Notifier.h"
+#import "PsiphonClientCommonLibraryHelpers.h"
+#import "PsiphonDataSharedDB.h"
+#import "RegionAdapter.h"
 #import "RootContainerController.h"
+#import "SharedConstants.h"
 #import "UIAlertController+Delegate.h"
+#import "VPNManager.h"
 
 @interface AppDelegate ()
 @end
@@ -62,6 +63,23 @@
 
 + (AppDelegate *)sharedAppDelegate {
     return (AppDelegate *)[UIApplication sharedApplication].delegate;
+}
+
++ (BOOL)isFirstRunOfAppVersion {
+    static BOOL firstRunOfVersion;
+    static dispatch_once_t once;
+    dispatch_once(&once, ^{
+        NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+        NSString *appVersion = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleVersion"];
+        NSString *lastLaunchAppVersion = [userDefaults stringForKey:@"LastCFBundleVersion"];
+        if ([appVersion isEqualToString:lastLaunchAppVersion]) {
+            firstRunOfVersion = FALSE;
+        } else {
+            firstRunOfVersion = TRUE;
+            [userDefaults setObject:appVersion forKey:@"LastCFBundleVersion"];
+        }
+    });
+    return firstRunOfVersion;
 }
 
 + (BOOL)isRunningUITest {
@@ -98,6 +116,10 @@
                                                  name:@kAdsDidLoad object:adManager];
 
     [[IAPHelper sharedInstance] startProductsRequest];
+
+    if ([AppDelegate isFirstRunOfAppVersion]) {
+        [self updateAvailableEgressRegionsOnFirstRunOfAppVersion];
+    }
 
     return YES;
 }
@@ -217,6 +239,26 @@
 - (void)launchScreenFinished {
     LOG_DEBUG();
     [rootContainerController removeLaunchScreen];
+}
+
+#pragma mark - Embedded Server Entries
+
+/*!
+ * @brief Updates available egress regions from embedded server entries.
+ *
+ * This function should only be called once per app version on first launch.
+ */
+- (void)updateAvailableEgressRegionsOnFirstRunOfAppVersion {
+    NSString *embeddedServerEntriesPath = [[[NSBundle mainBundle] resourcePath] stringByAppendingPathComponent:@"embedded_server_entries"];
+    NSArray *embeddedEgressRegions = [EmbeddedServerEntries egressRegionsFromFile:embeddedServerEntriesPath];
+
+    LOG_DEBUG("Available embedded egress regions: %@.", embeddedEgressRegions);
+
+    if ([embeddedEgressRegions count] > 0) {
+        [sharedDB insertNewEmbeddedEgressRegions:embeddedEgressRegions];
+    } else {
+        LOG_ERROR(@"Error no egress regions found in %@.", embeddedServerEntriesPath);
+    }
 }
 
 #pragma mark - Network Extension
