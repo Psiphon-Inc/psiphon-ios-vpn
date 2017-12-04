@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, Psiphon Inc.
+ * Copyright (c) 2017, Psiphon Inc.
  * All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,21 +17,8 @@
  *
  */
 
-#import <UIKit/UIKit.h>
+#import <Foundation/Foundation.h>
 
-@interface AppDelegate : UIResponder <UIApplicationDelegate>
-
-@property (strong, nonatomic) UIWindow *window;
-
-+ (AppDelegate *)sharedAppDelegate;
-+ (BOOL)isFirstRunOfAppVersion;
-+ (BOOL)isRunningUITest;
-
-/* Ads */
-- (UIViewController *)getAdsPresentingViewController;
-- (void)launchScreenFinished;
-
-/* Reloads MainViewController. Used after a settings change. */
-- (void)reloadMainViewController;
-
+@interface EmbeddedServerEntries : NSObject
++ (NSArray*)egressRegionsFromFile:(NSString*)filePath;
 @end
