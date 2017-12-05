@@ -21,6 +21,9 @@
 		44D9B0FD1F673417007D1E69 /* RMAppReceipt.m in Sources */ = {isa = PBXBuildFile; fileRef = 44D9B0FC1F673417007D1E69 /* RMAppReceipt.m */; };
 		44D9B1001F67470E007D1E69 /* IAPViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 44D9B0FF1F67470E007D1E69 /* IAPViewController.m */; };
 		44E15D571F6C808D00344C33 /* AppleIncRootCertificate.cer in Resources */ = {isa = PBXBuildFile; fileRef = 44E15D561F6C804000344C33 /* AppleIncRootCertificate.cer */; };
+		4E0101B11FD743F900B070D2 /* EmbeddedServerEntriesTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E0101B01FD743F900B070D2 /* EmbeddedServerEntriesTest.m */; };
+		4E0101B41FD74B0200B070D2 /* PsiphonConfigFiles.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E0101B31FD74B0200B070D2 /* PsiphonConfigFiles.m */; };
+		4E0101B51FD74B0200B070D2 /* PsiphonConfigFiles.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E0101B31FD74B0200B070D2 /* PsiphonConfigFiles.m */; };
 		4E0774961F566B040097BC8C /* InAppSettings.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 4E0774951F566ADA0097BC8C /* InAppSettings.bundle */; };
 		4E0D88241FA06B2400ADB61E /* PsiphonUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E0D88231FA06B2400ADB61E /* PsiphonUITests.swift */; };
 		4E0DCB1A1F28481E00495781 /* PsiphonDataSharedDB.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E0DCB191F28481E00495781 /* PsiphonDataSharedDB.m */; };
@@ -71,6 +74,13 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		4E0101AB1FD742B300B070D2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = CE26FC821BBDC7B700B83375 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = CE26FC891BBDC7B800B83375;
+			remoteInfo = Psiphon;
+		};
 		4E0D88261FA06B2400ADB61E /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = CE26FC821BBDC7B700B83375 /* Project object */;
@@ -136,6 +146,11 @@
 		44D9B0FE1F67470E007D1E69 /* IAPViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IAPViewController.h; sourceTree = "<group>"; };
 		44D9B0FF1F67470E007D1E69 /* IAPViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IAPViewController.m; sourceTree = "<group>"; };
 		44E15D561F6C804000344C33 /* AppleIncRootCertificate.cer */ = {isa = PBXFileReference; lastKnownFileType = file; path = AppleIncRootCertificate.cer; sourceTree = "<group>"; };
+		4E0101A61FD742B300B070D2 /* PsiphonTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PsiphonTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		4E0101AA1FD742B300B070D2 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		4E0101B01FD743F900B070D2 /* EmbeddedServerEntriesTest.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = EmbeddedServerEntriesTest.m; sourceTree = "<group>"; };
+		4E0101B21FD74B0200B070D2 /* PsiphonConfigFiles.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PsiphonConfigFiles.h; sourceTree = "<group>"; };
+		4E0101B31FD74B0200B070D2 /* PsiphonConfigFiles.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PsiphonConfigFiles.m; sourceTree = "<group>"; };
 		4E0774951F566ADA0097BC8C /* InAppSettings.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = InAppSettings.bundle; sourceTree = "<group>"; };
 		4E0D88211FA06B2400ADB61E /* PsiphonUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PsiphonUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		4E0D88231FA06B2400ADB61E /* PsiphonUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PsiphonUITests.swift; sourceTree = "<group>"; };
@@ -238,6 +253,13 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		4E0101A31FD742B300B070D2 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		4E0D881E1FA06B2400ADB61E /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -302,6 +324,15 @@
 			name = IAP;
 			sourceTree = "<group>";
 		};
+		4E0101A71FD742B300B070D2 /* PsiphonTests */ = {
+			isa = PBXGroup;
+			children = (
+				4E0101B01FD743F900B070D2 /* EmbeddedServerEntriesTest.m */,
+				4E0101AA1FD742B300B070D2 /* Info.plist */,
+			);
+			path = PsiphonTests;
+			sourceTree = "<group>";
+		};
 		4E0D88221FA06B2400ADB61E /* PsiphonUITests */ = {
 			isa = PBXGroup;
 			children = (
@@ -316,21 +347,23 @@
 			isa = PBXGroup;
 			children = (
 				669A10B61F58A74E00EE831F /* Strings */,
+				EF6C1F501F59E46500709554 /* embedded_server_entries */,
+				EF6C1F511F59E46500709554 /* psiphon_config */,
+				EFB3E62D1F66F23F004AAE8C /* Logging.h */,
+				EF35E80F1F9FA748003B3102 /* Logging.m */,
+				4E0101B21FD74B0200B070D2 /* PsiphonConfigFiles.h */,
+				4E0101B31FD74B0200B070D2 /* PsiphonConfigFiles.m */,
+				9BFEC0419AD3808370915E01 /* PsiphonConfigUserDefaults.h */,
+				9BFEC584519C408D9D6D3FF1 /* PsiphonConfigUserDefaults.m */,
 				4E0DCB181F28481E00495781 /* PsiphonDataSharedDB.h */,
 				4E0DCB191F28481E00495781 /* PsiphonDataSharedDB.m */,
 				EF652CDB1F365B8C002AFB48 /* SharedConstants.h */,
-				9BFEC91ED4A1C511520E9948 /* Notifier.m */,
-				9BFEC3165745A5D14C8C3C08 /* Notifier.h */,
-				9BFEC0419AD3808370915E01 /* PsiphonConfigUserDefaults.h */,
-				9BFEC584519C408D9D6D3FF1 /* PsiphonConfigUserDefaults.m */,
-				EFB3E62D1F66F23F004AAE8C /* Logging.h */,
-				EF6C1F501F59E46500709554 /* embedded_server_entries */,
-				EF6C1F511F59E46500709554 /* psiphon_config */,
-				EF441B001F7AF14A008A7D82 /* NSDateFormatter+RFC3339.m */,
-				EF441B031F7AF263008A7D82 /* NSDateFormatter+RFC3339.h */,
 				EF639C2D1F8FCE2A009D6B42 /* NoticeLogger.h */,
 				EF639C2E1F8FCE2A009D6B42 /* NoticeLogger.m */,
-				EF35E80F1F9FA748003B3102 /* Logging.m */,
+				9BFEC91ED4A1C511520E9948 /* Notifier.m */,
+				9BFEC3165745A5D14C8C3C08 /* Notifier.h */,
+				EF441B001F7AF14A008A7D82 /* NSDateFormatter+RFC3339.m */,
+				EF441B031F7AF263008A7D82 /* NSDateFormatter+RFC3339.h */,
 			);
 			path = Shared;
 			sourceTree = "<group>";
@@ -386,6 +419,7 @@
 				CE26FC8C1BBDC7B800B83375 /* Psiphon */,
 				CE26FCA41BBDC85900B83375 /* PsiphonVPN */,
 				4E0D88221FA06B2400ADB61E /* PsiphonUITests */,
+				4E0101A71FD742B300B070D2 /* PsiphonTests */,
 				CE26FC8B1BBDC7B800B83375 /* Products */,
 				668AF9B81E92CB60008CAAAA /* Frameworks */,
 				FF0DC6191C07A3FC5D6EE10A /* Pods */,
@@ -398,6 +432,7 @@
 				CE26FC8A1BBDC7B800B83375 /* Psiphon.app */,
 				CE26FCA31BBDC85900B83375 /* PsiphonVPN.appex */,
 				4E0D88211FA06B2400ADB61E /* PsiphonUITests.xctest */,
+				4E0101A61FD742B300B070D2 /* PsiphonTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -488,6 +523,24 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		4E0101A51FD742B300B070D2 /* PsiphonTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 4E0101AF1FD742B300B070D2 /* Build configuration list for PBXNativeTarget "PsiphonTests" */;
+			buildPhases = (
+				4E0101A21FD742B300B070D2 /* Sources */,
+				4E0101A31FD742B300B070D2 /* Frameworks */,
+				4E0101A41FD742B300B070D2 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				4E0101AC1FD742B300B070D2 /* PBXTargetDependency */,
+			);
+			name = PsiphonTests;
+			productName = PsiphonTests;
+			productReference = 4E0101A61FD742B300B070D2 /* PsiphonTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 		4E0D88201FA06B2400ADB61E /* PsiphonUITests */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 4E0D882A1FA06B2400ADB61E /* Build configuration list for PBXNativeTarget "PsiphonUITests" */;
@@ -559,6 +612,12 @@
 				LastUpgradeCheck = 0900;
 				ORGANIZATIONNAME = "Psiphon Inc.";
 				TargetAttributes = {
+					4E0101A51FD742B300B070D2 = {
+						CreatedOnToolsVersion = 9.1;
+						DevelopmentTeam = Q6HLNEX92A;
+						ProvisioningStyle = Automatic;
+						TestTargetID = CE26FC891BBDC7B800B83375;
+					};
 					4E0D88201FA06B2400ADB61E = {
 						CreatedOnToolsVersion = 9.1;
 						DevelopmentTeam = Q6HLNEX92A;
@@ -648,11 +707,19 @@
 				CE26FC891BBDC7B800B83375 /* Psiphon */,
 				CE26FCA21BBDC85900B83375 /* PsiphonVPN */,
 				4E0D88201FA06B2400ADB61E /* PsiphonUITests */,
+				4E0101A51FD742B300B070D2 /* PsiphonTests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		4E0101A41FD742B300B070D2 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		4E0D881F1FA06B2400ADB61E /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -813,6 +880,14 @@
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		4E0101A21FD742B300B070D2 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4E0101B11FD743F900B070D2 /* EmbeddedServerEntriesTest.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		4E0D881D1FA06B2400ADB61E /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -834,6 +909,7 @@
 				197DABF51F54C15400DD5C3B /* VungleInstanceMediationSettings.m in Sources */,
 				4E6E98A91FC776CD002B35CD /* LoadingCircleLayer.m in Sources */,
 				4E0DCB1A1F28481E00495781 /* PsiphonDataSharedDB.m in Sources */,
+				4E0101B41FD74B0200B070D2 /* PsiphonConfigFiles.m in Sources */,
 				4435CC271F70566000F3A809 /* SettingsViewController.m in Sources */,
 				EFED7EBC1F55C8550078980F /* LogViewControllerFullScreen.m in Sources */,
 				4EE51E7F1FD5BF82009A0B57 /* EmbeddedServerEntries.m in Sources */,
@@ -864,6 +940,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				EF652CDA1F352271002AFB48 /* PacketTunnelProvider.m in Sources */,
+				4E0101B51FD74B0200B070D2 /* PsiphonConfigFiles.m in Sources */,
 				4E0DCB1E1F2855FC00495781 /* PsiphonDataSharedDB.m in Sources */,
 				9BFECD1880B51B0E2EAEFF1F /* Notifier.m in Sources */,
 				EF639C301F8FCE37009D6B42 /* NoticeLogger.m in Sources */,
@@ -876,6 +953,11 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		4E0101AC1FD742B300B070D2 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = CE26FC891BBDC7B800B83375 /* Psiphon */;
+			targetProxy = 4E0101AB1FD742B300B070D2 /* PBXContainerItemProxy */;
+		};
 		4E0D88271FA06B2400ADB61E /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = CE26FC891BBDC7B800B83375 /* Psiphon */;
@@ -932,6 +1014,52 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
+		4E0101AD1FD742B300B070D2 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = Q6HLNEX92A;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				INFOPLIST_FILE = PsiphonTests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.1;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.psiphon.PsiphonTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Psiphon.app/Psiphon";
+			};
+			name = Debug;
+		};
+		4E0101AE1FD742B300B070D2 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = Q6HLNEX92A;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				INFOPLIST_FILE = PsiphonTests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.1;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.psiphon.PsiphonTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Psiphon.app/Psiphon";
+			};
+			name = Release;
+		};
 		4E0D88281FA06B2400ADB61E /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -1200,6 +1328,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		4E0101AF1FD742B300B070D2 /* Build configuration list for PBXNativeTarget "PsiphonTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4E0101AD1FD742B300B070D2 /* Debug */,
+				4E0101AE1FD742B300B070D2 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		4E0D882A1FA06B2400ADB61E /* Build configuration list for PBXNativeTarget "PsiphonUITests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
