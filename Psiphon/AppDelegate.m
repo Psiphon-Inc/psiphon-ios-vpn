@@ -27,6 +27,7 @@
 #import "MPInterstitialAdController.h"
 #import "Notifier.h"
 #import "PsiphonClientCommonLibraryHelpers.h"
+#import "PsiphonConfigFiles.h"
 #import "PsiphonDataSharedDB.h"
 #import "RegionAdapter.h"
 #import "RootContainerController.h"
@@ -249,7 +250,7 @@
  * This function should only be called once per app version on first launch.
  */
 - (void)updateAvailableEgressRegionsOnFirstRunOfAppVersion {
-    NSString *embeddedServerEntriesPath = [[[NSBundle mainBundle] resourcePath] stringByAppendingPathComponent:@"embedded_server_entries"];
+    NSString *embeddedServerEntriesPath = [PsiphonConfigFiles embeddedServerEntriesPath];
     NSArray *embeddedEgressRegions = [EmbeddedServerEntries egressRegionsFromFile:embeddedServerEntriesPath];
 
     LOG_DEBUG("Available embedded egress regions: %@.", embeddedEgressRegions);
