@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, Psiphon Inc.
+ * Copyright (c) 2017, Psiphon Inc.
  * All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,21 +17,20 @@
  *
  */
 
-#import <UIKit/UIKit.h>
+#import "PsiphonConfigFiles.h"
 
-@interface AppDelegate : UIResponder <UIApplicationDelegate>
+// File names
+#define EMBEDDED_SERVER_ENTRIES @"embedded_server_entries"
+#define PSIPHON_CONFIG @"psiphon_config"
 
-@property (strong, nonatomic) UIWindow *window;
+@implementation PsiphonConfigFiles
 
-+ (AppDelegate *)sharedAppDelegate;
-+ (BOOL)isFirstRunOfAppVersion;
-+ (BOOL)isRunningUITest;
++ (NSString*)embeddedServerEntriesPath {
+    return [[[NSBundle mainBundle] resourcePath] stringByAppendingPathComponent:EMBEDDED_SERVER_ENTRIES];
+}
 
-/* Ads */
-- (UIViewController *)getAdsPresentingViewController;
-- (void)launchScreenFinished;
-
-/* Reloads MainViewController. Used after a settings change. */
-- (void)reloadMainViewController;
++ (NSString*)psiphonConfigPath {
+    return [[[NSBundle mainBundle] resourcePath] stringByAppendingPathComponent:PSIPHON_CONFIG];
+}
 
 @end

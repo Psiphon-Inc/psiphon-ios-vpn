@@ -30,12 +30,22 @@
       shouldUseLaunchSchemeArgsEnv = "YES">
       <Testables>
          <TestableReference
-            skipped = "NO">
+            skipped = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "4E0D88201FA06B2400ADB61E"
                BuildableName = "PsiphonUITests.xctest"
                BlueprintName = "PsiphonUITests"
+               ReferencedContainer = "container:Psiphon.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "4E0101A51FD742B300B070D2"
+               BuildableName = "PsiphonTests.xctest"
+               BlueprintName = "PsiphonTests"
                ReferencedContainer = "container:Psiphon.xcodeproj">
             </BuildableReference>
          </TestableReference>
