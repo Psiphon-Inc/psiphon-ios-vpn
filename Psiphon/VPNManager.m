@@ -98,7 +98,7 @@
         }
     }
 
-    LOG_ERROR(@"Unknown NEVPNConnection status: (%ld)", self.targetManager.connection.status);
+    LOG_ERROR(@"Unknown NEVPNConnection status: (%ld)", (long)self.targetManager.connection.status);
     return VPNStatusInvalid;
 }
 

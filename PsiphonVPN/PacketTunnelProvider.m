@@ -23,6 +23,7 @@
 #import <NetworkExtension/NEDNSSettings.h>
 #import <NetworkExtension/NEPacketTunnelFlow.h>
 #import "PacketTunnelProvider.h"
+#import "PsiphonConfigFiles.h"
 #import "PsiphonConfigUserDefaults.h"
 #import "PsiphonDataSharedDB.h"
 #import "SharedConstants.h"
@@ -349,18 +350,14 @@
 }
 
 - (NSString * _Nullable)getEmbeddedServerEntriesPath {
-    NSString *serverEntriesPath = [[[NSBundle mainBundle]
-      resourcePath] stringByAppendingPathComponent:@"embedded_server_entries"];
-
-    return serverEntriesPath;
+    return [PsiphonConfigFiles embeddedServerEntriesPath];
 }
 
 - (NSString * _Nullable)getPsiphonConfig {
 
     NSFileManager *fileManager = [NSFileManager defaultManager];
 
-    NSString *bundledConfigPath = [[[NSBundle mainBundle] resourcePath]
-      stringByAppendingPathComponent:@"psiphon_config"];
+    NSString *bundledConfigPath = [PsiphonConfigFiles psiphonConfigPath];
 
     if (![fileManager fileExistsAtPath:bundledConfigPath]) {
         LOG_ERROR(@"Config file not found. Aborting now.");
