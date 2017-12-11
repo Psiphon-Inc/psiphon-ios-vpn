@@ -291,26 +291,17 @@
         if([iapHelper hasActiveSubscriptionForDate:[NSDate date]] && ![iapHelper verifyReceipt]) {
             // Stop the VPN and prompt user to refresh app receipt.
             [vpnManager stopVPN];
-            NSString *alertTitle = NSLocalizedStringWithDefaultValue(@"BAD_RECEIPT_ALERT_TITLE", nil, [NSBundle mainBundle], @"Invalid app receipt", @"Alert title informing user that app receipt is not valid");
 
-            NSString *alertMessage = NSLocalizedStringWithDefaultValue(@"BAD_RECEIPT_ALERT_MESSAGE", nil, [NSBundle mainBundle], @"Your subscription receipt cannot be verified, please refresh it and try again.", @"Alert message informing user that subscription receipt cannot be verified");
+            [UIAlertController presentSimpleAlertWithTitle:NSLocalizedStringWithDefaultValue(@"BAD_RECEIPT_ALERT_TITLE", nil, [NSBundle mainBundle], @"Invalid app receipt", @"Alert title informing user that app receipt is not valid")
+                                                   message:NSLocalizedStringWithDefaultValue(@"BAD_RECEIPT_ALERT_MESSAGE", nil, [NSBundle mainBundle], @"Your subscription receipt cannot be verified, please refresh it and try again.", @"Alert message informing user that subscription receipt cannot be verified")
+                                            preferredStyle:UIAlertControllerStyleAlert
+                                                 okHandler:^(UIAlertAction *action) {
+                                                     IAPViewController *iapViewController = [[IAPViewController alloc]init];
+                                                     iapViewController.openedFromSettings = NO;
+                                                     UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:iapViewController];
+                                                     [rootContainerController presentViewController:navController animated:YES completion:nil];
+                                                 }];
 
-            UIAlertController *alert = [UIAlertController
-                                        alertControllerWithTitle:alertTitle
-                                        message:alertMessage
-                                        preferredStyle:UIAlertControllerStyleAlert];
-
-            UIAlertAction *defaultAction = [UIAlertAction
-                                            actionWithTitle:NSLocalizedStringWithDefaultValue(@"OK_BUTTON", nil, [NSBundle mainBundle], @"OK", @"Alert OK Button")
-                                            style:UIAlertActionStyleDefault
-                                            handler:^(UIAlertAction *action) {
-                                                IAPViewController *iapViewController = [[IAPViewController alloc]init];
-                                                iapViewController.openedFromSettings = NO;
-                                                UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:iapViewController];
-                                                [rootContainerController presentViewController:navController animated:YES completion:nil];
-                                            }];
-            [alert addAction:defaultAction];
-            [alert presentFromTopController];
             return;
         }
 
@@ -338,23 +329,12 @@
                     // and terminate the app due to 'Invalid Receipt' when user clicks 'OK'.
                     [vpnManager stopVPN];
 
-                    NSString *alertTitle = NSLocalizedStringWithDefaultValue(@"BAD_CLOCK_ALERT_TITLE", nil, [NSBundle mainBundle], @"Clock is out of sync", @"Alert title informing user that the device clock needs to be updated with current time");
-
-                    NSString *alertMessage = NSLocalizedStringWithDefaultValue(@"BAD_CLOCK_ALERT_MESSAGE", nil, [NSBundle mainBundle], @"We've detected the time on your device is out of sync with your time zone. Please update your clock settings and restart the app", @"Alert message informing user that the device clock needs to be updated with current time");
-
-                    UIAlertController *alert = [UIAlertController
-                                                alertControllerWithTitle:alertTitle
-                                                message:alertMessage
-                                                preferredStyle:UIAlertControllerStyleAlert];
-
-                    UIAlertAction *defaultAction = [UIAlertAction
-                                                    actionWithTitle:NSLocalizedStringWithDefaultValue(@"OK_BUTTON", nil, [NSBundle mainBundle], @"OK", @"Alert OK Button")
-                                                    style:UIAlertActionStyleDefault
-                                                    handler:^(UIAlertAction *action) {
-                                                        [[IAPHelper sharedInstance] terminateForInvalidReceipt];
-                                                    }];
-                    [alert addAction:defaultAction];
-                    [alert presentFromTopController];
+                    [UIAlertController presentSimpleAlertWithTitle:NSLocalizedStringWithDefaultValue(@"BAD_CLOCK_ALERT_TITLE", nil, [NSBundle mainBundle], @"Clock is out of sync", @"Alert title informing user that the device clock needs to be updated with current time")
+                                                           message:NSLocalizedStringWithDefaultValue(@"BAD_CLOCK_ALERT_MESSAGE", nil, [NSBundle mainBundle], @"We've detected the time on your device is out of sync with your time zone. Please update your clock settings and restart the app", @"Alert message informing user that the device clock needs to be updated with current time")
+                                                    preferredStyle:UIAlertControllerStyleAlert
+                                                         okHandler:^(UIAlertAction *action) {
+                                                             [[IAPHelper sharedInstance] terminateForInvalidReceipt];
+                                                         }];
                     return;
                 }
             }

@@ -364,18 +364,10 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 }
 
 - (void)displayCorruptSettingsFileAlert {
-    UIAlertController *alert = [UIAlertController
-      alertControllerWithTitle:NSLocalizedStringWithDefaultValue(@"CORRUPT_SETTINGS_ALERT_TITLE", nil, [NSBundle mainBundle], @"Corrupt Settings", @"Alert dialog title (MainViewController)")
-                       message:NSLocalizedStringWithDefaultValue(@"CORRUPT_SETTINGS_MESSAGE", nil, [NSBundle mainBundle], @"Your app settings file appears to be corrupt. Try reinstalling the app to repair the file.", @"Alert dialog message informing the user that the settings file in the app is corrupt, and that they can potentially fix this issue by re-installing the app.")
-                preferredStyle:UIAlertControllerStyleAlert];
-
-    UIAlertAction *defaultAction = [UIAlertAction actionWithTitle:NSLocalizedStringWithDefaultValue(@"OK_BUTTON", nil, [NSBundle mainBundle], @"OK", @"Alert OK Button")
-                                                            style:UIAlertActionStyleDefault
-                                                          handler:^(UIAlertAction *action) {
-                                                              // Do nothing.
-                                                          }];
-    [alert addAction:defaultAction];
-    [alert presentFromTopController];
+    [UIAlertController presentSimpleAlertWithTitle:NSLocalizedStringWithDefaultValue(@"CORRUPT_SETTINGS_ALERT_TITLE", nil, [NSBundle mainBundle], @"Corrupt Settings", @"Alert dialog title (MainViewController)")
+                                           message:NSLocalizedStringWithDefaultValue(@"CORRUPT_SETTINGS_MESSAGE", nil, [NSBundle mainBundle], @"Your app settings file appears to be corrupt. Try reinstalling the app to repair the file.", @"Alert dialog message informing the user that the settings file in the app is corrupt, and that they can potentially fix this issue by re-installing the app.")
+                                    preferredStyle:UIAlertControllerStyleAlert
+                                         okHandler:nil];
 }
 
 - (NSString *)getVPNStatusDescription:(VPNStatus) status {
