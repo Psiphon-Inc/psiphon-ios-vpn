@@ -30,7 +30,7 @@
 
 @interface VPNManager ()
 
-@property (nonatomic) NETunnelProviderManager *providerManager;
+@property (nonatomic, setter=setProviderManager:) NETunnelProviderManager *providerManager;
 
 @end
 
@@ -40,8 +40,6 @@
     id localVPNStatusObserver;
     BOOL restartRequired;
 }
-
-@synthesize providerManager = _providerManager;
 
 - (instancetype)init {
     self = [super init];
@@ -109,7 +107,7 @@
         if(bundledConfigStr) {
             NSDictionary *config = [PsiphonClientCommonLibraryHelpers jsonToDictionary:bundledConfigStr];
             if (config) {
-                NSDictionary *subscriptionConfig = [config objectForKey:@"subscriptionConfig"];
+                NSDictionary *subscriptionConfig = config[@"subscriptionConfig"];
                 if(subscriptionConfig) {
                     [sharedDB updateSponsorId:(NSString*)subscriptionConfig[@"SponsorId"]];
                 }
@@ -152,10 +150,7 @@
             newManager.protocolConfiguration.serverAddress = @"localhost";
             self.providerManager = newManager;
 
-        } else if ([allManagers count] == 1) {
-            self.providerManager = allManagers[0];
-
-        } else {
+        } else if ([allManagers count] > 1) {
             // Reset startStopButtonPressed flag to FALSE when error and exiting.
             [self setStartStopButtonPressed:FALSE];
             LOG_ERROR(@"%lu VPN configurations found, only expected 1. Aborting", [allManagers count]);
@@ -278,6 +273,9 @@
 - (void)setProviderManager:(NETunnelProviderManager *)providerManager {
 
     _providerManager = providerManager;
+    if (localVPNStatusObserver) {
+        [[NSNotificationCenter defaultCenter] removeObserver:localVPNStatusObserver];
+    }
     [self postStatusChangeNotification];
 
     // Listening to NEVPNManager status change notifications.
@@ -359,7 +357,7 @@
 
     NSMutableDictionary *userInfo = [NSMutableDictionary dictionary];
     userInfo[NSLocalizedDescriptionKey] = description;
-    userInfo[VPNQueryKey] = query;
+    userInfo[VPNQueryErrorUserInfoQueryKey] = query;
     if (error) {
         userInfo[NSUnderlyingErrorKey] = error;
     }
