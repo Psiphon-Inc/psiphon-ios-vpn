@@ -22,27 +22,27 @@
 // NSNotification name for VPN status change notifications.
 #define kVPNStatusChangeNotificationName "VPNStatusChange"
 
-#define VPNManagerErrorDomain @"VPNManagerErrorDomain"
+static NSString *const VPNManagerErrorDomain = @"VPNManagerErrorDomain";
 
 /**
  * @typedef VPNManagerErrorCode
  * @abstract VPNManager error codes
  */
-typedef NS_ENUM(NSInteger, VPNManagerStartErrorCode) {
+typedef NS_ERROR_ENUM(VPNManagerErrorDomain, VPNManagerStartErrorCode) {
     VPNManagerStartErrorLoadConfigsFailed = 1,
     VPNManagerStartErrorTooManyConfigsFounds = 2,
     VPNManagerStartErrorUserDeniedConfigInstall = 3,
     VPNManagerStartErrorNEStartFailed = 4,
 };
 
-#define VPNQueryErrorDomain @"VPNQueryErrorDomain"
-#define VPNQueryKey @"query"
+#define VPNQueryErrorUserInfoQueryKey @"query"
 
+static NSString *const VPNQueryErrorDomain = @"VPNQueryErrorDomain";
 /**
  * @typedef VPNQueryErrorCode
  * @abstract VPN query error codes
  */
-typedef NS_ENUM(NSInteger, VPNQueryErrorCode) {
+typedef NS_ERROR_ENUM(VPNQueryErrorDomain, VPNQueryErrorCode) {
     VPNQueryErrorSendFailed = 1,
     VPNQueryErrorNilResponse = 2,
 };
