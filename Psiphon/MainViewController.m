@@ -152,17 +152,24 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
         //appSubTitleLabel.hidden = YES;
     }
 
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(onVPNStatusDidChange)
-                                                 name:@kVPNStatusChangeNotificationName
-                                               object:vpnManager];
-
+    // Observer AdManager notifications
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(onAdStatusDidChange)
                                                  name:@kAdsDidLoad
                                                object:adManager];
+    // Observe VPNManager notifications
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(onVPNStatusDidChange)
+                                                 name:kVPNStatusChangeNotificationName
+                                               object:vpnManager];
 
-    // Observe IAP transaction notification
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(onVPNStartFailed)
+                                                 name:kVPNStartFailure
+                                               object:vpnManager];
+
+
+    // Observe IAP transaction notifications
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(updatedIAPTransactionState)
                                                  name:kIAPSKPaymentTransactionStatePurchased
@@ -272,6 +279,14 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 }
 
 #pragma mark - UI callbacks
+
+- (void)onVPNStartFailed {
+    // Alert the user that the VPN failed to start, and that they should try again.
+    [UIAlertController presentSimpleAlertWithTitle:NSLocalizedStringWithDefaultValue(@"VPN_START_FAIL_TITLE", nil, [NSBundle mainBundle], @"Unable to start", @"Alert dialog title indicating to the user that Psiphon was unable to start (MainViewController)")
+                                           message:NSLocalizedStringWithDefaultValue(@"VPN_START_FAIL_MESSAGE", nil, [NSBundle mainBundle], @"An error occurred while starting Psiphon. Please try again. If this problem persists, try reinstalling the Psiphon app.", @"Alert dialog message informing the user that an error occurred while starting Psiphon (Do not translate 'Psiphon'). The user should try again, and if the problem persists, they should try reinstalling the app.")
+                                    preferredStyle:UIAlertControllerStyleAlert
+                                         okHandler:nil];
+}
 
 - (void)onVPNStatusDidChange {
     // Update UI

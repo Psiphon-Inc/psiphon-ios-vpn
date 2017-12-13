@@ -140,7 +140,7 @@
 
     // Listen for VPN status changes from VPNManager.
     [[NSNotificationCenter defaultCenter]
-      addObserver:self selector:@selector(onVPNStatusDidChange) name:@kVPNStatusChangeNotificationName object:vpnManager];
+      addObserver:self selector:@selector(onVPNStatusDidChange) name:kVPNStatusChangeNotificationName object:vpnManager];
 
     // Listen for the network extension messages.
     [self listenForNEMessages];
