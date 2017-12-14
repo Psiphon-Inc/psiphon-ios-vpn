@@ -30,6 +30,7 @@
 #import "Notifier.h"
 #import "Logging.h"
 #import "NoticeLogger.h"
+#import "PacketTunnelUtils.h"
 #import <ifaddrs.h>
 #import <arpa/inet.h>
 #import <net/if.h>
@@ -121,6 +122,9 @@
 }
 
 - (void)stopTunnelWithReason:(NEProviderStopReason)reason completionHandler:(void (^)(void)) completionHandler {
+
+    // Always log the stop reason.
+    LOG_ERROR(@"Tunnel stopped. Reason: %ld %@", reason, [PacketTunnelUtils textStopReason:reason]);
 
     // Assumes stopTunnelWithReason called exactly once only after startTunnelWithOptions.completionHandler(nil)
     if (vpnStartCompletionHandler) {
