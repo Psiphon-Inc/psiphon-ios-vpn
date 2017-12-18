@@ -28,12 +28,20 @@
 #import "SharedConstants.h"
 #import "Notifier.h"
 #import "Logging.h"
-#import "IAPReceiptHelper.h"
+#import "IAPSubscriptionHelper.h"
+#import "SubscriptionVerifier.h"
 #import "NSDateFormatter+RFC3339.h"
 #import <ifaddrs.h>
 #import <arpa/inet.h>
 #import <net/if.h>
 #import <stdatomic.h>
+
+static NSDateFormatter *__rfc3339DateFormatter = nil;
+
+@interface IAPSubscriptionHelper (HasActiveSubscriptionInDict)
++ (BOOL) hasActiveSubscriptionForDate:(NSDate*)date inDict:(NSDictionary*)subscriptionDict;
+@end
+
 
 
 // Notes on file protection:
@@ -98,6 +106,14 @@
         extensionIsZombie = FALSE;
 
         atomic_init(&self->showUpstreamProxyErrorMessage, TRUE);
+
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(killExtensionForBadClock)
+                                                     name:kPsiphonSubscriptionCloskIsOffNotification object:nil];
+
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(killExtensionForInvalidReceipt)
+                                                     name:kPsiphonSubscriptionInvalidReceiptNotification object:nil];
     }
 
     return self;
@@ -135,7 +151,7 @@
     // OR if the user has a valid subscription
     // OR if the extension is started after boot but before being unlocked.
     // NOTE: This is not a comprehensive subscription verification.
-    BOOL hasActiveSubscription = [[IAPReceiptHelper sharedInstance] hasActiveSubscriptionForDate:[NSDate date]];
+    BOOL hasActiveSubscription = [[IAPSubscriptionHelper class] hasActiveSubscriptionForDate:[NSDate date]];
     BOOL startFromBoot = [self isStartBootTestFileLocked];
     startFromBootWithReceipt = startFromBoot && [self hasAppReceipt];
     BOOL tunnelStartedFromContainer = [((NSString *)options[EXTENSION_OPTION_START_FROM_CONTAINER]) isEqualToString:EXTENSION_TRUE];
@@ -231,7 +247,12 @@
 }
 
 - (void)killExtensionForExpiredSubscription {
-    [self displayMessage:NSLocalizedStringWithDefaultValue(@"TUNNEL_KILLED", nil, [NSBundle mainBundle], @"Psiphon has been stopped automatically since your subscription has expired.", @"Alert message informing user that Psiphon has been stopped automatically since the subscription has expired. Do not translate 'Psiphon'.")
+    NSString *alertMessage = NSLocalizedStringWithDefaultValue(@"TUNNEL_KILLED", nil, [NSBundle mainBundle], @"Psiphon has been stopped automatically since your subscription has expired.", @"Alert message informing user that Psiphon has been stopped automatically since the subscription has expired. Do not translate 'Psiphon'.");
+    [self killExtensionWithAlertMessage:alertMessage];
+ }
+
+- (void)killExtensionWithAlertMessage:(NSString*) alertMessage {
+    [self displayMessage:alertMessage
        completionHandler:^(BOOL success) {
            // Do nothing.
        }];
@@ -404,7 +425,7 @@
     // OR if the extension is started after boot but before being unlocked.
     // NOTE: This is not a complete subscription verification,
     //       specifically the receipt is not verified at this point.
-    BOOL hasActiveSubscription = [[IAPReceiptHelper sharedInstance] hasActiveSubscriptionForDate:[NSDate date]];
+    BOOL hasActiveSubscription = [[IAPSubscriptionHelper class] hasActiveSubscriptionForDate:[NSDate date]];
     if ([sharedDB getAppForegroundState] || hasActiveSubscription || startFromBootWithReceipt) {
 
         //
@@ -485,7 +506,7 @@
               // Defer subscription check again.
               [self deferSubscriptionCheck];
           } else {
-              if ([[IAPReceiptHelper sharedInstance] hasActiveSubscriptionForDate:[NSDate date]]) {
+              if ([[IAPSubscriptionHelper class] hasActiveSubscriptionForDate:[NSDate date]]) {
                   [self startSubscriptionCheckTimer];
               } else {
                   [self killExtensionForExpiredSubscription];
@@ -509,7 +530,7 @@
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, subscriptionCheckIntervalInSec * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
         // If user's subscription has expired, then give them an hour of extra grace period
         // before killing the tunnel.
-        if ([[IAPReceiptHelper sharedInstance] hasActiveSubscriptionForDate:[NSDate date]]) {
+        if ([[IAPSubscriptionHelper class] hasActiveSubscriptionForDate:[NSDate date]]) {
             // User has an active subscription. Check later.
             [weakSelf startSubscriptionCheckTimer];
         } else {
@@ -521,7 +542,7 @@
                    if (success) {
                        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, gracePeriodInSec * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
                            // Grace period has finished. Checks if the subscription has been renewed, otherwise kill the VPN.
-                           if ([[IAPReceiptHelper sharedInstance] hasActiveSubscriptionForDate:[NSDate date]]) {
+                           if ([[IAPSubscriptionHelper class] hasActiveSubscriptionForDate:[NSDate date]]) {
                                // Subscription has been renewed.
                                [weakSelf startSubscriptionCheckTimer];
                            } else {
@@ -743,7 +764,7 @@
     mutableConfigCopy[@"ClientVersion"] = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleVersion"];
 
     // SponsorId override
-    if([[IAPReceiptHelper sharedInstance]hasActiveSubscriptionForDate:[NSDate date]]) {
+    if([[IAPSubscriptionHelper class] hasActiveSubscriptionForDate:[NSDate date]]) {
         NSDictionary *readOnlySubscriptionConfig = [readOnly objectForKey:@"subscriptionConfig"];
         if(readOnlySubscriptionConfig && readOnlySubscriptionConfig[@"SponsorId"]) {
             mutableConfigCopy[@"SponsorId"] = readOnlySubscriptionConfig[@"SponsorId"];
@@ -787,7 +808,7 @@
     // Check if user has an active subscription in the device's time
     // If NO - do nothing
     // If YES - proceed with checking the subscription against server timestamp
-    if([[IAPReceiptHelper sharedInstance]hasActiveSubscriptionForDate:[NSDate date]]) {
+    if([[IAPSubscriptionHelper class] hasActiveSubscriptionForDate:[NSDate date]]) {
         // The following code adapted from
         // https://developer.apple.com/library/content/documentation/Cocoa/Conceptual/DataFormatting/Articles/dfDateFormatting10_4.html
         NSDateFormatter *rfc3339DateFormatter = [NSDateFormatter createRFC3339Formatter];
@@ -795,25 +816,24 @@
         NSString *serverTimestamp = [sharedDB getServerTimestamp];
         NSDate *serverDate = [rfc3339DateFormatter dateFromString:serverTimestamp];
         if (serverDate != nil) {
-            if(![[IAPReceiptHelper sharedInstance] hasActiveSubscriptionForDate:serverDate]) {
+            if(![[IAPSubscriptionHelper class] hasActiveSubscriptionForDate:serverDate]) {
                 // User is possibly cheating, terminate the app due to 'Invalid Receipt'.
-                // Stop the tunnel, show alert with title and message
-                // and terminate the app due to 'Invalid Receipt' when user clicks 'OK'.
-                NSString *alertMessage = NSLocalizedStringWithDefaultValue(@"BAD_CLOCK_ALERT_MESSAGE", nil, [NSBundle mainBundle], @"We've detected the time on your device is out of sync with your time zone. Please update your clock settings and restart the app", @"Alert message informing user that the device clock needs to be updated with current time");
-                [self stopTunnelWithReason:NEProviderStopReasonNone completionHandler:^{
-                    // Do nothing.
-                }];
-
-                [IAPReceiptHelper terminateForInvalidReceipt];
-
-                [self displayMessage:alertMessage completionHandler:^(BOOL success) {
-                    // Do nothing.
-                }];
+                [self killExtensionForBadClock];
             }
         }
     }
-
 }
+
+- (void)killExtensionForBadClock {
+    NSString *alertMessage = NSLocalizedStringWithDefaultValue(@"BAD_CLOCK_ALERT_MESSAGE", nil, [NSBundle mainBundle], @"We've detected the time on your device is out of sync with your time zone. Please update your clock settings and restart the app", @"Alert message informing user that the device clock needs to be updated with current time");
+    [self killExtensionWithAlertMessage:alertMessage];
+}
+
+- (void)killExtensionForInvalidReceipt {
+    NSString *alertMessage = NSLocalizedStringWithDefaultValue(@"BAD_RECEIPT_ALERT_MESSAGE", nil, [NSBundle mainBundle], @"Your subscription receipt can not be verified, please refresh it and try again.", @"Alert message informing user that subscription receipt can not be verified");
+    [self killExtensionWithAlertMessage:alertMessage];
+}
+
 
 - (void)onAvailableEgressRegions:(NSArray *)regions {
     [sharedDB insertNewEgressRegions:regions];
@@ -858,6 +878,85 @@
        completionHandler:^(BOOL success) {
            // Do nothing.
        }];
+}
+
+
+// A
+
+- (void) updateSubscriptionDictionaryFromRemote {
+    NSDictionary* sharedDict = [[IAPSubscriptionHelper class] sharedSubscriptionDictionary];
+    if(![[IAPSubscriptionHelper class] shouldUpdateSubscriptionDictinary:sharedDict withPendingRenewalInfoCheck:YES]) {
+        return;
+    }
+
+
+    dispatch_semaphore_t sema = dispatch_semaphore_create(0);
+
+    __block NSMutableDictionary* subscriptionDict = nil;
+    [[[SubscriptionVerifier alloc] init] startWithCompletionHandler: ^(NSDictionary *dict, NSError *error) {
+        PsiphonDataSharedDB *sharedDB = [[PsiphonDataSharedDB alloc] initForAppGroupIdentifier:APP_GROUP_IDENTIFIER];
+        if (!error) {
+            if (dict) {
+                // add app receipt file size
+                NSNumber* appReceiptFileSize = nil;
+                [[NSBundle mainBundle].appStoreReceiptURL getResourceValue:&appReceiptFileSize forKey:NSURLFileSizeKey error:nil];
+
+                subscriptionDict = [[NSMutableDictionary alloc] initWithDictionary:dict];
+                [subscriptionDict setObject:appReceiptFileSize forKey:kAppReceiptFileSize];
+
+                // Convert date strings to dates
+                NSString* latestSubscriptionExpirationDateString = (NSString*)[dict objectForKey:kLatestExpirationDate];
+                if([latestSubscriptionExpirationDateString length]) {
+                    if(!__rfc3339DateFormatter) {
+                        __rfc3339DateFormatter = [NSDateFormatter createRFC3339Formatter];
+                    }
+                    NSDate* latestSubscriptionExpirationDate = [__rfc3339DateFormatter dateFromString:latestSubscriptionExpirationDateString];
+                    [subscriptionDict setObject:latestSubscriptionExpirationDate forKey:kLatestExpirationDate];
+                } else {
+                    [subscriptionDict removeObjectForKey:kLatestExpirationDate];
+                }
+
+                NSDate *requestDate = nil;
+                NSString *requestDateString = (NSString*)[subscriptionDict objectForKey:kRequestDate];
+                if([requestDateString length]) {
+                    if(!__rfc3339DateFormatter) {
+                        __rfc3339DateFormatter = [NSDateFormatter createRFC3339Formatter];
+                    }
+                    requestDate = [__rfc3339DateFormatter dateFromString:requestDateString];
+                    [subscriptionDict setObject:requestDate forKey:kRequestDate];
+                } else {
+                    [subscriptionDict removeObjectForKey:kRequestDate];
+                }
+
+
+                [sharedDB updateSubscriptionDictionary:(NSDictionary*)subscriptionDict];
+
+                // "Clock is off" notification  if user has an active subscription in server time
+                // but in device time it appears to be expired.
+                if (requestDate) {
+                    if([[IAPSubscriptionHelper class] hasActiveSubscriptionForDate:requestDate inDict:subscriptionDict]
+                       && [[IAPSubscriptionHelper class] hasActiveSubscriptionForDate:[NSDate date] inDict:subscriptionDict]) {
+                        [[NSNotificationCenter defaultCenter] postNotificationName:kPsiphonSubscriptionCloskIsOffNotification object:nil];
+                    }
+                }
+            }
+        } else {
+            LOG_ERROR(@"Subscription verifier error: %@, %ld", error.localizedDescription, (long)error.code);
+
+            // Notify observers if invalid receipt
+            if (error.code == PsiphonReceiptValidationInvalidReceiptError) {
+                [[NSNotificationCenter defaultCenter] postNotificationName:kPsiphonSubscriptionInvalidReceiptNotification object:nil];
+            }
+        }
+        dispatch_semaphore_signal(sema);
+    } andSocksPort:0];
+
+    dispatch_time_t timeout = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(receiptRequestTimeOutSeconds * NSEC_PER_SEC));
+    long result = dispatch_semaphore_wait(sema, timeout);
+    if(result != 0) {
+        // request timed out
+        // TODO: give grace period?
+    }
 }
 
 @end

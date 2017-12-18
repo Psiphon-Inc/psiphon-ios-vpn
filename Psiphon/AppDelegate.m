@@ -28,7 +28,7 @@
 #import "AdManager.h"
 #import "Logging.h"
 #import "IAPStoreHelper.h"
-#import "IAPReceiptHelper.h"
+#import "IAPSubscriptionHelper.h"
 #import "IAPViewController.h"
 
 #if DEBUG

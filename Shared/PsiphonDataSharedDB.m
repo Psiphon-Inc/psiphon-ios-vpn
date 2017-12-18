@@ -31,6 +31,7 @@
 #define APP_FOREGROUND_KEY @"app_foreground"
 #define SERVER_TIMESTAMP_KEY @"server_timestamp"
 #define SPONSOR_ID_KEY @"sponsor_id"
+#define IAP_SUBSCRIPTION_DICTIONARY_KEY @"iap_subscription_dictionary"
 
 
 @implementation Homepage
@@ -393,6 +394,28 @@
  */
 - (NSString*)getServerTimestamp {
 	return [sharedDefaults stringForKey:SERVER_TIMESTAMP_KEY];
+}
+
+#pragma mark - Subscription dictionary methods
+
+/**
+ * @brief Sets subscription data dictionary in shared NSSUserDefaults dictionary.
+ * @param subscription dictionary from the app receipt
+ */
+- (void)updateSubscriptionDictionary:(NSDictionary*)iapDict {
+    [sharedDefaults setObject:iapDict forKey:IAP_SUBSCRIPTION_DICTIONARY_KEY];
+    [sharedDefaults synchronize];
+}
+
+/**
+ * @brief Returns previously persisted subscription dictionary from the shared NSUserDefaults
+ */
+- (NSDictionary*)getSubscriptionDictionary {
+   id dict = [sharedDefaults objectForKey:IAP_SUBSCRIPTION_DICTIONARY_KEY];
+    if ([dict isKindOfClass:[NSDictionary class]]) {
+        return dict;
+    }
+    return nil;
 }
 
 @end

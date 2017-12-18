@@ -18,22 +18,13 @@
  */
 
 #import <Foundation/Foundation.h>
-#include <UIKit/UIKit.h>
+#import <UIKit/UIKit.h>
 #import <StoreKit/StoreKit.h>
-
-#define SUBSCRIPTION_CHECK_GRACE_PERIOD_INTERVAL 2 * 60 * 60 * 24  // two days
 
 extern NSString *const kIAPSKProductsRequestDidReceiveResponse;
 extern NSString *const kIAPSKProductsRequestDidFailWithError;
 extern NSString *const kIAPSKRequestRequestDidFinish;
-extern NSString *const kIAPSKPaymentQueueRestoreCompletedTransactionsFailedWithError;
-extern NSString *const kIAPSKPaymentQueuePaymentQueueRestoreCompletedTransactionsFinished;
-extern NSString *const kIAPSKPaymentTransactionStatePurchasing;
-extern NSString *const kIAPSSKPaymentTransactionStateDeferred;
-extern NSString *const kIAPSKPaymentTransactionStateFailed;
-extern NSString *const kIAPSKPaymentTransactionStatePurchased;
-extern NSString *const kIAPSKPaymentTransactionStateRestored;
-
+extern NSString *const kIAPHelperUpdatedSubscriptionDictionary;
 
 @interface IAPStoreHelper : NSObject
 

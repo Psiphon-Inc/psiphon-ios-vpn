@@ -39,7 +39,7 @@
 #import "IAPViewController.h"
 #import "AppDelegate.h"
 #import "IAPStoreHelper.h"
-#import "IAPReceiptHelper.h"
+#import "IAPSubscriptionHelper.h"
 #import "SettingsViewController.h"
 
 static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSString *b) {
@@ -161,18 +161,10 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                                                  name:@kAdsDidLoad
                                                object:adManager];
 
-    // Observe IAP transaction notification
+    // Observe IAP subscription  changes
     [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(updatedIAPTransactionState)
-                                                 name:kIAPSKPaymentTransactionStatePurchased
-                                               object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(updatedIAPTransactionState)
-                                                 name:kIAPSKPaymentQueuePaymentQueueRestoreCompletedTransactionsFinished
-                                               object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(updatedIAPTransactionState)
-                                                 name:kIAPSKPaymentQueueRestoreCompletedTransactionsFailedWithError
+                                             selector:@selector(updatedSubscriptionDictionary)
+                                                 name:kIAPHelperUpdatedSubscriptionDictionary
                                                object:nil];
 
     // TODO: load/save config here to have the user immediately complete the permission prompt
@@ -985,7 +977,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     NSString *bundledConfigStr = [PsiphonClientCommonLibraryHelpers getPsiphonBundledConfig];
 
     // Return bundled config as is if user doesn't have an active subscription
-    if(![[IAPReceiptHelper sharedInstance]hasActiveSubscriptionForDate:[NSDate date]]) {
+    if(![[IAPSubscriptionHelper class] hasActiveSubscriptionForDate:[NSDate date]]) {
         return bundledConfigStr;
     }
 
@@ -1337,17 +1329,23 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 }
 
 - (void) updateSubscriptionUI {
-    if(![IAPStoreHelper canMakePayments] || [[IAPReceiptHelper sharedInstance]hasActiveSubscriptionForDate:[NSDate date]]) {
-        subscriptionButton.hidden = YES;
-        adLabel.hidden = YES;
-        subscriptionButtonTop.active = NO;
-        bottomBarTop.active = YES;
-    } else {
-        subscriptionButton.hidden = NO;
-        adLabel.hidden = ![adManager untunneledInterstitialIsReady];
-        bottomBarTop.active = NO;
-        subscriptionButtonTop.active = YES;
-    }
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        BOOL success = [[IAPSubscriptionHelper class] hasActiveSubscriptionForDate:[NSDate date]];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if(success) {
+                subscriptionButton.hidden = YES;
+                adLabel.hidden = YES;
+                subscriptionButtonTop.active = NO;
+                bottomBarTop.active = YES;
+            } else {
+                subscriptionButton.hidden = NO;
+                adLabel.hidden = ![adManager untunneledInterstitialIsReady];
+                bottomBarTop.active = NO;
+                subscriptionButtonTop.active = YES;
+            }
+
+        });
+    });
 }
 
 #pragma mark - IAP
@@ -1359,7 +1357,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     [self presentViewController:navController animated:YES completion:nil];
 }
 
-- (void)updatedIAPTransactionState {
+- (void)updatedSubscriptionDictionary {
     [self updateSubscriptionUI];
 
     // TODO: re-check this logic
@@ -1372,29 +1370,34 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     // If the user gets an active subscription and the network extension is active,
     // queries the network extension to check if the extension is using the subscription SponsorId.
     // If not, restarts the extension.
-    if ([[IAPReceiptHelper sharedInstance] hasActiveSubscriptionForDate:[NSDate date]] && [vpnManager isVPNActive]) {
-        [vpnManager queryNEForCurrentSponsorId:^(NSString *currentSponsorId) {
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
 
-            // Reads config file in a background thread.
-            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        if ([[IAPSubscriptionHelper class] hasActiveSubscriptionForDate:[NSDate date]] && [vpnManager isVPNActive]) {
+            dispatch_async(dispatch_get_main_queue(), ^{
 
-                NSString *bundledConfigStr = [PsiphonClientCommonLibraryHelpers getPsiphonBundledConfig];
-                if (bundledConfigStr) {
-                    NSDictionary *config = [PsiphonClientCommonLibraryHelpers jsonToDictionary:bundledConfigStr];
-                    if (config) {
-                        NSDictionary *subscriptionConfig = config[@"subscriptionConfig"];
-                        if (![subscriptionConfig[@"SponsorId"] isEqualToString:currentSponsorId]) {
+                [vpnManager queryNEForCurrentSponsorId:^(NSString *currentSponsorId) {
 
-                            dispatch_async(dispatch_get_main_queue(), ^{
-                                [vpnManager restartVPNIfActive];
-                            });
+                    // Reads config file in a background thread.
+                    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
 
+                        NSString *bundledConfigStr = [PsiphonClientCommonLibraryHelpers getPsiphonBundledConfig];
+                        if (bundledConfigStr) {
+                            NSDictionary *config = [PsiphonClientCommonLibraryHelpers jsonToDictionary:bundledConfigStr];
+                            if (config) {
+                                NSDictionary *subscriptionConfig = config[@"subscriptionConfig"];
+                                if (![subscriptionConfig[@"SponsorId"] isEqualToString:currentSponsorId]) {
+                                    dispatch_async(dispatch_get_main_queue(), ^{
+
+                                        [vpnManager restartVPNIfActive];
+                                    });
+                                }
+                            }
                         }
-                    }
-                }
+                    });
+                }];
             });
-        }];
-    }
+        }
+    });
 }
 
 @end
