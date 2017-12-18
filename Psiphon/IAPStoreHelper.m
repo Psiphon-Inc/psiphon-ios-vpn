@@ -18,20 +18,17 @@
  */
 
 #import "IAPStoreHelper.h"
+#import "RMAppReceipt.h"
+#import "IAPSubscriptionHelper.h"
+
 
 NSString *const kIAPSKProductsRequestDidReceiveResponse = @"kIAPSKProductsRequestDidReceiveResponse";
 NSString *const kIAPSKProductsRequestDidFailWithError = @"kIAPSKProductsRequestDidFailWithError";
 NSString *const kIAPSKRequestRequestDidFinish = @"kIAPSKRequestRequestDidFinish";
-NSString *const kIAPSKPaymentQueueRestoreCompletedTransactionsFailedWithError = @"kIAPSKPaymentQueueRestoreCompletedTransactionsFailedWithError";
-NSString *const kIAPSKPaymentQueuePaymentQueueRestoreCompletedTransactionsFinished = @"kIAPSKPaymentQueuePaymentQueueRestoreCompletedTransactionsFinished";
-NSString *const kIAPSKPaymentTransactionStatePurchasing = @"kIAPSKPaymentTransactionStatePurchasing";
-NSString *const kIAPSSKPaymentTransactionStateDeferred = @"kIAPSSKPaymentTransactionStateDeferred";
-NSString *const kIAPSKPaymentTransactionStateFailed = @"kIAPSKPaymentTransactionStateFailed";
-NSString *const kIAPSKPaymentTransactionStatePurchased = @"kIAPSKPaymentTransactionStatePurchased";
-NSString *const kIAPSKPaymentTransactionStateRestored = @"kIAPSKPaymentTransactionStateRestored";
-
+NSString *const kIAPHelperUpdatedSubscriptionDictionary = @"kIAPHelperUpdatedSubscriptionDictionary";
 
 @interface IAPStoreHelper()<SKPaymentTransactionObserver,SKProductsRequestDelegate>
+- (void) updateSubscriptionDictionaryFromLocalReceipt;
 @end
 
 @implementation IAPStoreHelper
@@ -44,6 +41,7 @@ NSString *const kIAPSKPaymentTransactionStateRestored = @"kIAPSKPaymentTransacti
         NSURL *plistURL = [[NSBundle mainBundle] URLForResource:@"productIDs" withExtension:@"plist"];
         iapStoreHelper.bundledProductIDS = [NSArray arrayWithContentsOfURL:plistURL];
         [[SKPaymentQueue defaultQueue]addTransactionObserver:iapStoreHelper];
+        [iapStoreHelper updateSubscriptionDictionaryFromLocalReceipt];
     });
     return iapStoreHelper;
 }
@@ -60,12 +58,35 @@ NSString *const kIAPSKPaymentTransactionStateRestored = @"kIAPSKPaymentTransacti
     [[SKPaymentQueue defaultQueue]restoreCompletedTransactions];
 }
 
+- (void) updateSubscriptionDictionaryFromLocalReceipt {
+
+    NSDictionary *subscriptionDict = [[IAPSubscriptionHelper class] sharedSubscriptionDictionary];
+
+    if(![[IAPSubscriptionHelper class] shouldUpdateSubscriptionDictinary:subscriptionDict withPendingRenewalInfoCheck:NO]) {
+        return;
+    }
+
+    @autoreleasepool {
+        RMAppReceipt *receipt  =  [RMAppReceipt bundleReceipt];
+        if(receipt && [receipt verifyReceiptHash]) {
+            NSString *bundleIdentifier = [[NSBundle mainBundle] bundleIdentifier];
+            if ([bundleIdentifier containsString:receipt.bundleIdentifier]) {
+                subscriptionDict = [NSDictionary dictionaryWithDictionary:receipt.inAppSubscriptions];
+            }
+        }
+        receipt = nil;
+    }
+
+    [[IAPSubscriptionHelper class] storesharedSubscriptionDisctionary:subscriptionDict];
+    [[NSNotificationCenter defaultCenter] postNotificationName:kIAPHelperUpdatedSubscriptionDictionary object:nil];
+}
+
 - (void)paymentQueue:(SKPaymentQueue *)queue restoreCompletedTransactionsFailedWithError:(NSError *)error {
-    [[NSNotificationCenter defaultCenter] postNotificationName:kIAPSKPaymentQueueRestoreCompletedTransactionsFailedWithError object:error];
+    [self updateSubscriptionDictionaryFromLocalReceipt];
 }
 
 - (void)paymentQueueRestoreCompletedTransactionsFinished:(SKPaymentQueue *)queue {
-    [[NSNotificationCenter defaultCenter] postNotificationName:kIAPSKPaymentQueuePaymentQueueRestoreCompletedTransactionsFinished object:nil];
+    [self updateSubscriptionDictionaryFromLocalReceipt];
 }
 
 - (void)paymentQueue:(SKPaymentQueue *)queue updatedTransactions:(NSArray *)transactions {
@@ -73,26 +94,22 @@ NSString *const kIAPSKPaymentTransactionStateRestored = @"kIAPSKPaymentTransacti
         switch (transaction.transactionState) {
                 
             case SKPaymentTransactionStatePurchasing: {
-                [[NSNotificationCenter defaultCenter] postNotificationName:kIAPSKPaymentTransactionStatePurchasing object:nil];
                 break;
             }
             case SKPaymentTransactionStateDeferred:{
-                [[NSNotificationCenter defaultCenter] postNotificationName:kIAPSSKPaymentTransactionStateDeferred object:nil];
                 break;
             }
             case SKPaymentTransactionStateFailed:{
                 [[SKPaymentQueue defaultQueue]finishTransaction:transaction];
-                [[NSNotificationCenter defaultCenter] postNotificationName:kIAPSKPaymentTransactionStateFailed object:nil];
                 break;
             }
             case SKPaymentTransactionStatePurchased:{
                 [[SKPaymentQueue defaultQueue]finishTransaction:transaction];
-                [[NSNotificationCenter defaultCenter] postNotificationName:kIAPSKPaymentTransactionStatePurchased object:nil];
+                [self updateSubscriptionDictionaryFromLocalReceipt];
                 break;
             }
             case SKPaymentTransactionStateRestored: {
                 [[SKPaymentQueue defaultQueue]finishTransaction:transaction];
-                [[NSNotificationCenter defaultCenter] postNotificationName:kIAPSKPaymentTransactionStateRestored object:nil];
                 break;
             }
         }
@@ -125,9 +142,12 @@ NSString *const kIAPSKPaymentTransactionStateRestored = @"kIAPSKPaymentTransacti
     [[NSNotificationCenter defaultCenter]postNotificationName:kIAPSKProductsRequestDidFailWithError object:nil];
 }
 
-
 - (void)requestDidFinish:(SKRequest *)request {
-    [[NSNotificationCenter defaultCenter]postNotificationName:kIAPSKRequestRequestDidFinish object:nil];
+    if ([request isKindOfClass:[SKReceiptRefreshRequest class]]) {
+        [self updateSubscriptionDictionaryFromLocalReceipt];
+    } else {
+        [[NSNotificationCenter defaultCenter]postNotificationName:kIAPSKRequestRequestDidFinish object:nil];
+    }
 }
 
 - (void)buyProduct:(SKProduct *)product {

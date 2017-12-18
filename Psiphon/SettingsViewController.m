@@ -18,7 +18,7 @@
  */
 
 #import "SettingsViewController.h"
-#import "IAPReceiptHelper.h"
+#import "IAPSubscriptionHelper.h"
 #import "IAPStoreHelper.h"
 #import "IAPViewController.h"
 #import "VPNManager.h"
@@ -34,27 +34,17 @@
     if([IAPStoreHelper canMakePayments] == NO) {
         self.hiddenKeys = [[NSSet alloc] initWithArray:@[kSettingsSubscription]];
     }
-    // Observe IAP transaction notification
+    // Observe IAP subscription changes
     [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(updatedIAPTransactionState)
-                                                 name:kIAPSKPaymentTransactionStatePurchased
-                                               object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(updatedIAPTransactionState)
-                                                 name:kIAPSKPaymentQueuePaymentQueueRestoreCompletedTransactionsFinished
-                                               object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(updatedIAPTransactionState)
-                                                 name:kIAPSKPaymentQueueRestoreCompletedTransactionsFailedWithError
+                                             selector:@selector(updatedSubscriptionDictionary)
+                                                 name:kIAPHelperUpdatedSubscriptionDictionary
                                                object:nil];
 
     [super viewWillAppear:animated];
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:kIAPSKPaymentTransactionStatePurchased object:nil];
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:kIAPSKPaymentQueuePaymentQueueRestoreCompletedTransactionsFinished object:nil];
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:kIAPSKPaymentQueueRestoreCompletedTransactionsFailedWithError object:nil];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:kIAPHelperUpdatedSubscriptionDictionary object:nil];
     [super viewWillDisappear:animated];
 }
 
@@ -72,8 +62,8 @@
         return cell;
     }
 
-    BOOL hasActiveSubscription = [[IAPReceiptHelper sharedInstance]hasActiveSubscriptionForDate:[NSDate date]];
     if ([specifier.key isEqualToString:kSettingsSubscription]) {
+        BOOL hasActiveSubscription = [[IAPSubscriptionHelper class] hasActiveSubscriptionForDate:[NSDate date]];
         cell = [super tableView:tableView cellForSpecifier:specifier];
         [cell setAccessoryType:UITableViewCellAccessoryDisclosureIndicator];
         NSString *subscriptionItemTitle;
@@ -107,6 +97,7 @@
 
 
         NSString *subscriptionOnlySubtitle;
+        BOOL hasActiveSubscription = [[IAPSubscriptionHelper class] hasActiveSubscriptionForDate:[NSDate date]];
         if(!hasActiveSubscription) {
             vpnOnDemandToggle.on = NO;
             cell.userInteractionEnabled = NO;
@@ -147,7 +138,7 @@
     [self.navigationController pushViewController:iapViewController animated:YES];
 }
 
-- (void) updatedIAPTransactionState {
+- (void) updatedSubscriptionDictionary {
     [self.tableView reloadData];
 }
 

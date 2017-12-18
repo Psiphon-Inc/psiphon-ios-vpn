@@ -17,16 +17,21 @@
  *
  */
 
-#import "RMAppReceipt.h"
+#import <Foundation/Foundation.h>
+#import <UIKit/UIKit.h>
+#import "SharedConstants.h"
 
-#define SUBSCRIPTION_CHECK_GRACE_PERIOD_INTERVAL 2 * 60 * 60 * 24  // two days
 
-@interface IAPReceiptHelper : NSObject
+#define SUBSCRIPTION_CHECK_GRACE_PERIOD_INTERVAL        2 * 60 * 60 * 24  // two days
+#define kPsiphonSubscriptionInvalidReceiptNotification  @"kPsiphonSubscriptionInvalidReceiptNotification"
+#define kPsiphonSubscriptionCloskIsOffNotification      @"kPsiphonSubscriptionCloskIsOffNotification"
 
-@property (nonatomic,strong) NSArray *bundledProductIDS;
+@interface IAPSubscriptionHelper : NSObject
 
-+ (instancetype)sharedInstance;
-- (BOOL) hasActiveSubscriptionForDate:(NSDate*)date;
-- (NSDictionary*) iapSubscriptions;
-+ (void) terminateForInvalidReceipt;
++ (NSDictionary*)sharedSubscriptionDictionary;
++ (void)storesharedSubscriptionDisctionary:(NSDictionary*)dict;
+
++ (BOOL)hasActiveSubscriptionForDate:(NSDate*)date;
++ (BOOL)shouldUpdateSubscriptionDictinary:(NSDictionary*)subscriptionDict withPendingRenewalInfoCheck:(BOOL)check;
+
 @end

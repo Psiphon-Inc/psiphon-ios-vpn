@@ -59,4 +59,7 @@
 - (void)updateServerTimestamp:(NSString*)timestamp;
 - (NSString*)getServerTimestamp;
 
+// Subscription dictionary
+- (void)updateSubscriptionDictionary:(NSDictionary*)iapDictionary;
+- (NSDictionary*)getSubscriptionDictionary;
 @end

@@ -19,8 +19,10 @@
 
 #import "IAPViewController.h"
 #import "IAPStoreHelper.h"
-#import "IAPReceiptHelper.h"
-
+#import "IAPSubscriptionHelper.h"
+#import "NSDateFormatter+RFC3339.h"
+#import "PsiphonDataSharedDB.h"
+#import "SharedConstants.h"
 
 static NSString *iapCellID = @"IAPTableCellID";
 
@@ -32,6 +34,10 @@ static NSString *iapCellID = @"IAPTableCellID";
 @property (nonatomic, strong) UITableView *tableView;
 @property (nonatomic, strong) NSNumberFormatter *priceFormatter;
 @property (nonatomic, strong) UIRefreshControl *refreshControl;
+
+@property (nonatomic, assign) BOOL hasActiveSubscription;
+@property (nonatomic, strong) SKProduct *latestSubscriptionProduct;
+@property (nonatomic, strong) NSDate *latestSubscriptionExpirationDate;
 @end
 
 
@@ -91,24 +97,14 @@ static NSString *iapCellID = @"IAPTableCellID";
     
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(reloadProducts)
-                                                 name:kIAPSKPaymentTransactionStatePurchased
-                                               object:nil];
-    
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(reloadProducts)
-                                                 name:kIAPSKPaymentQueuePaymentQueueRestoreCompletedTransactionsFinished
-                                               object:nil];    
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(reloadProducts)
-                                                 name:kIAPSKPaymentQueueRestoreCompletedTransactionsFailedWithError
-                                               object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(reloadProducts)
                                                  name:kIAPSKRequestRequestDidFinish
                                                object:nil];
 
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(reloadProducts)
+                                                 name:kIAPHelperUpdatedSubscriptionDictionary
+                                               object:nil];
 }
-
 
 - (void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
@@ -121,10 +117,31 @@ static NSString *iapCellID = @"IAPTableCellID";
 #pragma mark - Table view data source
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
+    // Check if there's an active subscription and store metadata
+    NSDictionary *subscriptionDictionary = [[IAPSubscriptionHelper class] sharedSubscriptionDictionary];
+    self.latestSubscriptionExpirationDate = nil;
+    self.hasActiveSubscription = NO;
+    self.latestSubscriptionProduct = nil;
+
+    if(subscriptionDictionary && [subscriptionDictionary isKindOfClass:[NSDictionary class]]) {
+        self.latestSubscriptionExpirationDate = [subscriptionDictionary objectForKey:kLatestExpirationDate];
+        if(self.latestSubscriptionExpirationDate && [[NSDate date] compare:self.latestSubscriptionExpirationDate] != NSOrderedDescending) {
+            NSString *productID = [subscriptionDictionary objectForKey:kProductId];
+
+            for (SKProduct * product in [IAPStoreHelper sharedInstance].storeProducts) {
+                if ([product.productIdentifier isEqualToString:productID]) {
+                    self.latestSubscriptionProduct = product;
+                    self.hasActiveSubscription = (self.latestSubscriptionExpirationDate && [[NSDate date] compare:self.latestSubscriptionExpirationDate] != NSOrderedDescending);
+                    break;
+                }
+            }
+        }
+    }
+
     NSInteger numOfSections = 0;
     if ([[IAPStoreHelper sharedInstance].storeProducts count]) {
         self.tableView.separatorStyle = UITableViewCellSeparatorStyleSingleLine;
-        numOfSections                 = 1;
+        numOfSections = 1;
         tableView.tableHeaderView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, self.tableView.bounds.size.width, 0.01f)];
     } else {
         UITextView *noProductsTextView = [[UITextView alloc] initWithFrame:CGRectMake(0, 0, tableView.bounds.size.width, tableView.bounds.size.height)];
@@ -144,6 +161,9 @@ static NSString *iapCellID = @"IAPTableCellID";
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
+    if(self.hasActiveSubscription) {
+        return 1;
+    }
     return [[IAPStoreHelper sharedInstance].storeProducts count];
 }
 
@@ -153,16 +173,26 @@ static NSString *iapCellID = @"IAPTableCellID";
     UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, cellView.bounds.size.width, cellView.bounds.size.height)];
     label.numberOfLines = 0;
     label.lineBreakMode = NSLineBreakByWordWrapping;
-    label.font = [label.font fontWithSize:13];
     label.textColor = [UIColor darkGrayColor];
-    label.text = NSLocalizedStringWithDefaultValue(@"BUY_SUBSCRIPTIONS_HEADER_TEXT",
-                                                   nil,
-                                                   [NSBundle mainBundle],
-                                                   @"Remove ads and surf the Internet faster with a premium subscription!",
-                                                   @"Premium subscriptions dialog header text");
-    label.textAlignment = NSTextAlignmentCenter;
     label.translatesAutoresizingMaskIntoConstraints = NO;
-    
+    label.textAlignment = NSTextAlignmentCenter;
+    label.font = [label.font fontWithSize:13];
+
+
+    if(!self.hasActiveSubscription) {
+        label.text = NSLocalizedStringWithDefaultValue(@"BUY_SUBSCRIPTIONS_HEADER_TEXT",
+                                                       nil,
+                                                       [NSBundle mainBundle],
+                                                       @"Remove ads and surf the Internet faster with a premium subscription!",
+                                                       @"Premium subscriptions dialog header text");
+
+    } else {
+        label.text = NSLocalizedStringWithDefaultValue(@"ACTIVE_SUBSCRIPTION_SECTION_TITLE",
+                                                       nil,
+                                                       [NSBundle mainBundle],
+                                                       @"Current subscription",
+                                                       @"Title of the section in the subscription dialog that shows currently active subscription information.");
+   }
     [cellView addSubview:label];
     
     [cellView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|-5-[label]-5-|" options:0 metrics:nil views:@{ @"label": label}]];
@@ -218,57 +248,45 @@ static NSString *iapCellID = @"IAPTableCellID";
     [cellView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|-[refreshButton]-|" options:0 metrics:nil views:@{ @"refreshButton": refreshButton}]];
     [cellView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|-10-[label]-10-[restoreButton]-10-[refreshButton]-|"
                                                                      options:0 metrics:nil
-																	   views:@{ @"label": label, @"restoreButton": restoreButton, @"refreshButton": refreshButton}]];
+                                                                       views:@{ @"label": label, @"restoreButton": restoreButton, @"refreshButton": refreshButton}]];
     
     return cellView;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    SKProduct * product = (SKProduct *) [IAPStoreHelper sharedInstance].storeProducts[indexPath.row];
-    
     IAPTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:iapCellID];
     if (cell == nil) {
         cell = [[IAPTableViewCell alloc]initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:iapCellID];
-        
+
         self.tableView.rowHeight = UITableViewAutomaticDimension;
         self.tableView.estimatedRowHeight = 66.0f;
-        
+
         self.tableView.sectionFooterHeight = UITableViewAutomaticDimension;
         self.tableView.estimatedSectionFooterHeight = 66.0f;
-        
+
         self.tableView.sectionHeaderHeight = UITableViewAutomaticDimension;
         self.tableView.estimatedSectionHeaderHeight = 66.0f;
     }
-    
+    SKProduct * product = (SKProduct *) [IAPStoreHelper sharedInstance].storeProducts[indexPath.row];
     [self.priceFormatter setLocale:product.priceLocale];
     NSString *localizedPrice = [self.priceFormatter stringFromNumber:product.price];
-    cell.detailTextLabel.text = product.localizedDescription;
     cell.textLabel.text = product.localizedTitle;
-    
-    NSDictionary *iaps = [[IAPReceiptHelper sharedInstance] iapSubscriptions];
-    BOOL isActiveSubscription = NO;
-    NSDate *subscriptionExpirationDate = nil;
+    cell.detailTextLabel.text = product.localizedDescription;
 
-    if(iaps) {
-        subscriptionExpirationDate = [iaps objectForKey:product.productIdentifier];
-        isActiveSubscription = (subscriptionExpirationDate && [[NSDate date] compare:subscriptionExpirationDate] != NSOrderedDescending);
-    }
-
-    if (isActiveSubscription) {
+    if(self.hasActiveSubscription) {
         cell.accessoryType = UITableViewCellAccessoryCheckmark;
         cell.accessoryView = nil;
+        cell.textLabel.text = self.latestSubscriptionProduct.localizedTitle;
+        NSString *detailTextFormat = NSLocalizedStringWithDefaultValue(@"ACTIVE_SUBSCRIPTION_DETAIL_TEXT",
+                                                                       nil,
+                                                                       [NSBundle mainBundle],
+                                                                       @"Expires on %@",
+                                                                       @"Active subscription detail text, example: Expires on 2017-01-01");
 
-		NSString *detailTextFormat = NSLocalizedStringWithDefaultValue(@"ACTIVE_SUBSCRIPTION_DETAIL_TEXT",
-																					 nil,
-																					 [NSBundle mainBundle],
-																					 @"Expires on %@, renewal cost is %@",
-																 @"Active subscription detail text, example: Expires on 2017-01-01, renewal cost is $3.99");
-
-		NSDateFormatter* df = [NSDateFormatter new];
-		df.dateFormat= [NSDateFormatter dateFormatFromTemplate:@"MMddYY" options:0 locale:[NSLocale currentLocale]];
-		NSString *dateString = [df stringFromDate:subscriptionExpirationDate];
-
-		cell.detailTextLabel.text = [NSString stringWithFormat:detailTextFormat, dateString, localizedPrice];
+        NSDateFormatter* df = [NSDateFormatter new];
+        df.dateFormat= [NSDateFormatter dateFormatFromTemplate:@"MMddYY" options:0 locale:[NSLocale currentLocale]];
+        NSString *dateString = [df stringFromDate:self.latestSubscriptionExpirationDate];
+        cell.detailTextLabel.text = [NSString stringWithFormat:detailTextFormat, dateString];
     } else {
         UISegmentedControl *buyButton = [[UISegmentedControl alloc]initWithItems:[NSArray arrayWithObject:localizedPrice]];
         buyButton.momentary = YES;
@@ -278,7 +296,7 @@ static NSString *iapCellID = @"IAPTableCellID";
             forControlEvents:UIControlEventValueChanged];
         cell.accessoryView = buyButton;
     }
-    
+
     return cell;
 }
 
@@ -296,7 +314,7 @@ static NSString *iapCellID = @"IAPTableCellID";
 
 - (void)buyButtonPressed:(UISegmentedControl *)sender {
     int productID = (int)sender.tag;
-    
+
     if([IAPStoreHelper sharedInstance].storeProducts.count > productID) {
         SKProduct* product = [IAPStoreHelper sharedInstance].storeProducts[productID];
         [[IAPStoreHelper sharedInstance] buyProduct:product];
@@ -304,19 +322,30 @@ static NSString *iapCellID = @"IAPTableCellID";
 }
 
 - (void)restoreAction {
-    if (!self.refreshControl.isRefreshing) {
-        [self.refreshControl beginRefreshing];
-        [self.tableView setContentOffset:CGPointMake(0, self.tableView.contentOffset.y-self.refreshControl.frame.size.height) animated:YES];
-    }
+    [self beginRefreshing];
     [[IAPStoreHelper sharedInstance] restoreSubscriptions];
 }
 
 - (void)refreshReceiptAction {
+    [self beginRefreshing];
+    [[IAPStoreHelper sharedInstance] refreshReceipt];
+}
+
+- (void) beginRefreshing {
     if (!self.refreshControl.isRefreshing) {
         [self.refreshControl beginRefreshing];
         [self.tableView setContentOffset:CGPointMake(0, self.tableView.contentOffset.y-self.refreshControl.frame.size.height) animated:YES];
     }
-    [[IAPStoreHelper sharedInstance] refreshReceipt];
+    // Timeout after 20 seconds
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 20 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
+        [self endRefreshing];
+    });
+}
+
+- (void) endRefreshing {
+    if (self.refreshControl.isRefreshing) {
+        [self.refreshControl endRefreshing];
+    }
 }
 
 - (void)dismissViewController {
@@ -328,17 +357,12 @@ static NSString *iapCellID = @"IAPTableCellID";
 }
 
 - (void)reloadProducts {
-    if (self.refreshControl.isRefreshing) {
-        [self.refreshControl endRefreshing];
-    }
+    [self endRefreshing];
     [self.tableView reloadData];
 }
 
 - (void) startProductsRequest {
-    if (!self.refreshControl.isRefreshing) {
-        [self.refreshControl beginRefreshing];
-        [self.tableView setContentOffset:CGPointMake(0, self.tableView.contentOffset.y-self.refreshControl.frame.size.height) animated:YES];
-    }
+    [self beginRefreshing];
     [[IAPStoreHelper sharedInstance] startProductsRequest];
 }
 

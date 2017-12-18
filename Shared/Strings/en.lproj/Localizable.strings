@@ -1,7 +1,10 @@
 /* THIS FILE IS GENERATED. DO NOT EDIT. */
 
-/* Active subscription detail text, example: Expires on 2017-01-01, renewal cost is $3.99 */
-"ACTIVE_SUBSCRIPTION_DETAIL_TEXT" = "Expires on %1$@, renewal cost is %2$@";
+/* Active subscription detail text, example: Expires on 2017-01-01 */
+"ACTIVE_SUBSCRIPTION_DETAIL_TEXT" = "Expires on %@";
+
+/* Title of the section in the subscription dialog that shows currently active subscription information. */
+"ACTIVE_SUBSCRIPTION_SECTION_TITLE" = "Current subscription";
 
 /* Text for button that tell users there will by a short video ad. */
 "AD_LOADED" = "Watch a short video while we get ready to connect you";
@@ -14,6 +17,9 @@
 
 /* Alert message informing user that the device clock needs to be updated with current time */
 "BAD_CLOCK_ALERT_MESSAGE" = "We've detected the time on your device is out of sync with your time zone. Please update your clock settings and restart the app";
+
+/* Alert message informing user that subscription receipt can not be verified */
+"BAD_RECEIPT_ALERT_MESSAGE" = "Your subscription receipt can not be verified, please refresh it and try again.";
 
 /* Buy subscription dialog footer text */
 "BUY_SUBSCRIPTIONS_FOOTER_TEXT" = "A subscription is auto-renewable which means that once purchased it will be automatically renewed until you cancel it 24 hours prior to the end of the current period.\n\nYour iTunes Account will be charged for renewal within 24-hours prior to the end of the current period with the cost of subscription.\n\nManage your Subscription and Auto-Renewal by going to your Account Settings.";
