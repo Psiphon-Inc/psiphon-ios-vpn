@@ -30,7 +30,9 @@
 
 @interface VPNManager ()
 
-@property (nonatomic) NEVPNManager *targetManager;
+@property (nonatomic, setter=setProviderManager:) NETunnelProviderManager *providerManager;
+
+@property (nonatomic) BOOL restartRequired;
 
 @end
 
@@ -38,10 +40,11 @@
     Notifier *notifier;
     PsiphonDataSharedDB *sharedDB;
     id localVPNStatusObserver;
-    BOOL restartRequired;
-}
 
-@synthesize targetManager = _targetManager;
+    // Due to the race condition with loading VPN configurations in the init method, and also
+    // in the startTunnel method, a dispatch group is used to synchronize this loading behaviour.
+    dispatch_group_t initGroup;
+}
 
 - (instancetype)init {
     self = [super init];
@@ -49,14 +52,21 @@
         notifier = [[Notifier alloc] initWithAppGroupIdentifier:APP_GROUP_IDENTIFIER];
         sharedDB = [[PsiphonDataSharedDB alloc] initForAppGroupIdentifier:APP_GROUP_IDENTIFIER];
 
-        self.targetManager = [NEVPNManager sharedManager];
+        initGroup = dispatch_group_create();
+
+        // Increment number of outstanding tasks in the initGroup due to asynchronous initialization.
+        dispatch_group_enter(initGroup);
 
         // Load previous NETunnelProviderManager, if any.
         [NETunnelProviderManager loadAllFromPreferencesWithCompletionHandler:
           ^(NSArray<NETunnelProviderManager *> *managers, NSError *error) {
               if ([managers count] == 1) {
-                  self.targetManager = managers[0];
+                  self.providerManager = managers[0];
+              } else if ([managers count] > 1) {
+                  LOG_ERROR(@"more than 1 VPN configuration found");
               }
+
+              dispatch_group_leave(initGroup);
           }];
     }
     return self;
@@ -75,20 +85,24 @@
 
 - (VPNStatus)getVPNStatus {
 
+    if (!self.providerManager) {
+        return VPNStatusInvalid;
+    }
+
 #ifdef DEBUG
     if ([AppDelegate isRunningUITest]) {
         return VPNStatusConnected;
     }
 #endif
 
-    if (restartRequired) {
+    if (self.restartRequired) {
         // If extension is restarting due to a call to restartVPNIfActive, then
         // we don't want to show the Disconnecting and Disconnected states
         // to the observers, and instead simply notify them that the
         // extension is restarting.
         return VPNStatusRestarting;
     } else {
-        switch (self.targetManager.connection.status) {
+        switch (self.providerManager.connection.status) {
             case NEVPNStatusInvalid: return VPNStatusInvalid;
             case NEVPNStatusDisconnected: return VPNStatusDisconnected;
             case NEVPNStatusConnecting: return VPNStatusConnecting;
@@ -98,140 +112,190 @@
         }
     }
 
-    LOG_ERROR(@"Unknown NEVPNConnection status: (%ld)", (long)self.targetManager.connection.status);
+    LOG_ERROR(@"Unknown NEVPNConnection status: (%ld)", (long)self.providerManager.connection.status);
     return VPNStatusInvalid;
 }
 
-- (void)startTunnelWithCompletionHandler:(nullable void (^)(NSError * _Nullable error))completionHandler {
-    // Overide SponsorID if user has active subscrption
-    if([[IAPHelper sharedInstance]hasActiveSubscriptionForDate:[NSDate date]]) {
-        NSString *bundledConfigStr = [PsiphonClientCommonLibraryHelpers getPsiphonBundledConfig];
-        if(bundledConfigStr) {
-            NSDictionary *config = [PsiphonClientCommonLibraryHelpers jsonToDictionary:bundledConfigStr];
-            if (config) {
-                NSDictionary *subscriptionConfig = [config objectForKey:@"subscriptionConfig"];
-                if(subscriptionConfig) {
-                    [sharedDB updateSponsorId:(NSString*)subscriptionConfig[@"SponsorId"]];
-                }
-            }
+- (void)startTunnel {
+
+    if (self.providerManager) {
+        NEVPNStatus s = self.providerManager.connection.status;
+        if (s != NEVPNStatusInvalid && s != NEVPNStatusDisconnected) {
+            LOG_DEBUG(@"Not starting. VPN Status not invalid or disconnected.");
+            return;
         }
-    } else {
-        // otherwise delete the entry
-        [sharedDB updateSponsorId:nil];
     }
 
-    // Reset restartRequired flag
-    restartRequired = FALSE;
+    // Only one call to startTunnel should be allowed while waiting for the callback chain to finish.
+    // tunnelStarting is set to FALSE after the callback chain finishes successfully, or if an error occurs.
+    static BOOL tunnelStarting = FALSE;
 
-    // Set startStopButtonPressed flag to TRUE
-    [self setStartStopButtonPressed:TRUE];
+    if (tunnelStarting) {
+        return;
+    }
+    tunnelStarting = TRUE;
 
-    [NETunnelProviderManager loadAllFromPreferencesWithCompletionHandler:
-      ^(NSArray<NETunnelProviderManager *> * _Nullable allManagers, NSError * _Nullable error) {
+    // Waits until initGroup has no remaining outstanding tasks.
+    dispatch_group_notify(initGroup, dispatch_get_main_queue(), ^{
+        LOG_DEBUG(@"dispatch block starting");
 
-        if (error) {
-            // Reset startStopButtonPressed flag to FALSE when error and exiting.
-            [self setStartStopButtonPressed:FALSE];
-            if (completionHandler) {
-                LOG_ERROR(@"Failed to load VPN configuration. Error:%@", error);
-                completionHandler([VPNManager errorWithCode:VPNManagerStartErrorLoadConfigsFailed]);
+        self.providerManager = nil;
+
+        // Override SponsorID if user has active subscription
+        if([[IAPHelper sharedInstance] hasActiveSubscriptionForDate:[NSDate date]]) {
+            NSString *bundledConfigStr = [PsiphonClientCommonLibraryHelpers getPsiphonBundledConfig];
+            if(bundledConfigStr) {
+                NSDictionary *config = [PsiphonClientCommonLibraryHelpers jsonToDictionary:bundledConfigStr];
+                if (config) {
+                    NSDictionary *subscriptionConfig = config[@"subscriptionConfig"];
+                    if(subscriptionConfig) {
+                        [sharedDB updateSponsorId:(NSString*)subscriptionConfig[@"SponsorId"]];
+                    }
+                }
             }
-            return;
+        } else {
+            // otherwise delete the entry
+            [sharedDB updateSponsorId:nil];
         }
 
-        // If there are no configurations, create one
-        // if there is more than one, abort!
-        if ([allManagers count] == 0) {
-            LOG_WARN(@"No VPN configurations found.");
-            NETunnelProviderManager *newManager = [[NETunnelProviderManager alloc] init];
-            NETunnelProviderProtocol *providerProtocol = [[NETunnelProviderProtocol alloc] init];
-            providerProtocol.providerBundleIdentifier = @"ca.psiphon.Psiphon.PsiphonVPN";
-            newManager.protocolConfiguration = providerProtocol;
-            newManager.protocolConfiguration.serverAddress = @"localhost";
-            self.targetManager = newManager;
-        } else if ([allManagers count] > 1) {
-            // Reset startStopButtonPressed flag to FALSE when error and exiting.
-            [self setStartStopButtonPressed:FALSE];
-            LOG_ERROR(@"%lu VPN configurations found, only expected 1. Aborting", [allManagers count]);
-            if (completionHandler) {
-                completionHandler([VPNManager errorWithCode:VPNManagerStartErrorTooManyConfigsFounds]);
-            }
-            return;
-        }
+        // Reset restartRequired flag
+        self.restartRequired = FALSE;
 
-        // setEnabled becomes false if the user changes the
-        // enabled VPN Configuration from the prefrences.
-        [self.targetManager setEnabled:TRUE];
+        // Set startStopButtonPressed flag to TRUE
+        [self setStartStopButtonPressed:TRUE];
 
-       LOG_DEBUG(@"call saveToPreferencesWithCompletionHandler");
+        [NETunnelProviderManager loadAllFromPreferencesWithCompletionHandler:
+          ^(NSArray<NETunnelProviderManager *> * _Nullable allManagers, NSError * _Nullable error) {
 
-        [self.targetManager saveToPreferencesWithCompletionHandler:^(NSError * _Nullable error) {
-            if (error != nil) {
-                // Reset startStopButtonPressed flag to FALSE when error and exiting.
-                [self setStartStopButtonPressed:FALSE];
-                // User denied permission to add VPN Configuration.
-                LOG_ERROR(@"failed to save the configuration: %@", error);
-                if (completionHandler) {
-                    completionHandler([VPNManager errorWithCode:VPNManagerStartErrorUserDeniedConfigInstall]);
-                }
-                return;
-            }
+              LOG_DEBUG("Finished loading VPN Configurations.");
 
-            [self.targetManager loadFromPreferencesWithCompletionHandler:^(NSError * _Nullable error) {
-                // Reset startStopButtonPressed flag to FLASE when it finished loading preferences.
-                [self setStartStopButtonPressed:FALSE];
-                if (error != nil) {
-                    LOG_ERROR(@"Failed to reload VPN configuration. Error:(%@)", error);
-                    if (completionHandler) {
-                        completionHandler([VPNManager errorWithCode:VPNManagerStartErrorLoadConfigsFailed]);
-                    }
-                    return;
-                }
+              if (error) {
+                  // Reset startStopButtonPressed flag to FALSE when error and exiting.
+                  [self setStartStopButtonPressed:FALSE];
+                  LOG_ERROR(@"Failed to load VPN configurations. Error:%@", error);
 
-               LOG_DEBUG(@"Call targetManager.connection.startVPNTunnel()");
-                NSError *vpnStartError;
-                NSDictionary *extensionOptions = @{EXTENSION_START_FROM_CONTAINER : EXTENSION_START_FROM_CONTAINER_TRUE};
+                  [self postStartFailureNotification:VPNManagerStartErrorConfigLoadFailed];
 
-                BOOL vpnStartSuccess = [self.targetManager.connection startVPNTunnelWithOptions:extensionOptions
-                                                                                 andReturnError:&vpnStartError];
-                if (!vpnStartSuccess) {
-                    LOG_ERROR(@"Failed to start network extension. Error:(%@)", vpnStartError);
-                    if (completionHandler) {
-                        completionHandler([VPNManager errorWithCode:VPNManagerStartErrorNEStartFailed]);
-                    }
-                    return;
-                }
+                  tunnelStarting = FALSE;
+                  return;
+              }
 
-               LOG_DEBUG(@"startVPNTunnel success");
-                if (completionHandler) {
-                    completionHandler(nil);
-                }
-            }];
-        }];
-    }];
+              NETunnelProviderManager *__providerManager;
+
+              // If there are no configurations, create one
+              // if there is more than one, abort!
+              if ([allManagers count] == 0) {
+                  LOG_WARN(@"No VPN configurations found.");
+                  __providerManager = [[NETunnelProviderManager alloc] init];
+                  NETunnelProviderProtocol *providerProtocol = [[NETunnelProviderProtocol alloc] init];
+                  providerProtocol.providerBundleIdentifier = @"ca.psiphon.Psiphon.PsiphonVPN";
+                  __providerManager.protocolConfiguration = providerProtocol;
+                  __providerManager.protocolConfiguration.serverAddress = @"localhost";
+
+              } else if ([allManagers count] == 1) {
+                  __providerManager = allManagers[0];
+
+              } else {
+                  [self setStartStopButtonPressed:FALSE];
+
+                  LOG_ERROR(@"%lu VPN configurations found, only expected 1. Deleting all configurations.", [allManagers count]);
+
+                  [self cleanupAllTunnelProviderManagers:allManagers withCompletionHandler:^{
+                      [self postStartFailureNotification:VPNManagerStartErrorTooManyConfigsFounds];
+                  }];
+
+                  tunnelStarting = FALSE;
+                  return;
+              }
+
+              // setEnabled becomes false if the user changes the
+              // enabled VPN Configuration from the preferences.
+              [__providerManager setEnabled:TRUE];
+
+              [__providerManager saveToPreferencesWithCompletionHandler:^(NSError * _Nullable error) {
+                  LOG_DEBUG();
+
+                  if (error != nil) {
+
+                      [self setStartStopButtonPressed:FALSE];
+
+                      // User denied permission to add VPN Configuration.
+                      LOG_ERROR(@"Failed to save the configuration:%@", error);
+
+                      if (error.code == NEVPNErrorConfigurationInvalid || error.code == NEVPNErrorConfigurationUnknown) {
+                          // Fatal errors.
+                          [self cleanupAllTunnelProviderManagers:@[__providerManager] withCompletionHandler:^{
+                              [self postStartFailureNotification:VPNManagerStartErrorConfigSaveFailed];
+                          }];
+
+                      } else {
+                          // These errors might be resolved on trying again.
+                          [self postStartFailureNotification:VPNManagerStartErrorConfigSaveFailed];
+                      }
+
+                      tunnelStarting = FALSE;
+                      return;
+                  }
+
+                  [__providerManager loadFromPreferencesWithCompletionHandler:^(NSError *error) {
+
+                      if (error != nil) {
+                          LOG_ERROR(@"Failed to reload VPN configuration. Error:(%@)", error);
+                          [self postStartFailureNotification:VPNManagerStartErrorConfigLoadFailed];
+
+                          tunnelStarting = FALSE;
+                          return;
+                      }
+
+                      self.providerManager = __providerManager;
+
+                      LOG_DEBUG(@"Call providerManager.connection.startVPNTunnel()");
+                      NSError *vpnStartError;
+                      NSDictionary *extensionOptions = @{EXTENSION_START_FROM_CONTAINER: EXTENSION_START_FROM_CONTAINER_TRUE};
+
+                      BOOL vpnStartSuccess = [self.providerManager.connection startVPNTunnelWithOptions:extensionOptions andReturnError:&vpnStartError];
+
+                      if (!vpnStartSuccess) {
+                          LOG_ERROR(@"Failed to start network extension. Error:(%@)", vpnStartError);
+                          [self postStartFailureNotification:VPNManagerStartErrorNEStartFailed];
+                      }
+
+                      LOG_DEBUG(@"Network Extension started successfully.");
+
+                      tunnelStarting = FALSE;
+                  }];
+              }];
+          }];
+    });
 }
 
 - (void)startVPN {
-    NEVPNStatus s = self.targetManager.connection.status;
-    if (s == NEVPNStatusConnecting) {
-        [notifier post:@"M.startVPN"];
-    } else {
-        LOG_WARN(@"Network extension is not in connecting state.");
-    }
+    dispatch_group_notify(initGroup, dispatch_get_main_queue(), ^{
+        NEVPNStatus s = self.providerManager.connection.status;
+        if (s == NEVPNStatusConnecting) {
+            [notifier post:@"M.startVPN"];
+        } else {
+            LOG_WARN(@"Network extension is not in connecting state.");
+        }
+    });
 }
 
 - (void)restartVPNIfActive {
-    if (self.targetManager.connection && [self isVPNActive]) {
-        restartRequired = YES;
-        [self.targetManager.connection stopVPNTunnel];
-    }
+    dispatch_group_notify(initGroup, dispatch_get_main_queue(), ^{
+        if (self.providerManager.connection && [self isVPNActive]) {
+            self.restartRequired = YES;
+            [self.providerManager.connection stopVPNTunnel];
+        }
+    });
 }
 
 
 - (void)stopVPN {
-    if (self.targetManager.connection) {
-        [self.targetManager.connection stopVPNTunnel];
-    }
+    dispatch_group_notify(initGroup, dispatch_get_main_queue(), ^{
+        if (self.providerManager.connection) {
+            [self.providerManager.connection stopVPNTunnel];
+        }
+    });
 }
 
 - (BOOL)isVPNActive {
@@ -267,31 +331,64 @@
 
 #pragma mark - Private methods
 
-- (void)setTargetManager:(NEVPNManager *)targetManager {
+- (void)cleanupAllTunnelProviderManagers:(NSArray<NETunnelProviderManager *> *_Nullable)allManagers
+                   withCompletionHandler:(void (^_Nonnull)(void))completionHandler {
 
-    _targetManager = targetManager;
+    // Remove any references to now invalid VPN configurations.
+    self.providerManager = nil;
+
+    dispatch_group_t cleanupDispatchGroup = dispatch_group_create();
+    for (NETunnelProviderManager *tpm in allManagers) {
+
+        // Increment number of outstanding tasks in initGroup.
+        dispatch_group_enter(cleanupDispatchGroup);
+        [tpm removeFromPreferencesWithCompletionHandler:^(NSError *error) {
+            if (error) {
+                LOG_ERROR(@"Failed to remove VPN configuration: %@", error);
+            }
+
+            dispatch_group_leave(cleanupDispatchGroup);
+        }];
+    }
+
+    // Waits for all tasks submitted to cleanupDispatchGroup to complete before calling completionHandler.
+    dispatch_group_notify(cleanupDispatchGroup, dispatch_get_main_queue(), ^{
+        completionHandler();
+    });
+}
+
+- (void)setProviderManager:(NETunnelProviderManager *)providerManager {
+
+    _providerManager = providerManager;
+    if (localVPNStatusObserver) {
+        [[NSNotificationCenter defaultCenter] removeObserver:localVPNStatusObserver];
+    }
+
+    // Post notification status change.
+    // NOTE: there may not be an actual status change.
     [self postStatusChangeNotification];
 
-    // Listening to NEVPNManager status change notifications.
-    localVPNStatusObserver = [[NSNotificationCenter defaultCenter]
-      addObserverForName:NEVPNStatusDidChangeNotification
-      object:_targetManager.connection queue:NSOperationQueue.mainQueue
-      usingBlock:^(NSNotification * _Nonnull note) {
+    if (_providerManager) {
+        // Listening to NEVPNManager status change notifications.
+        localVPNStatusObserver = [[NSNotificationCenter defaultCenter]
+          addObserverForName:NEVPNStatusDidChangeNotification
+                      object:_providerManager.connection queue:NSOperationQueue.mainQueue
+                  usingBlock:^(NSNotification *_Nonnull note) {
 
-          // Observers of kVPNStatusChangeNotificationName will be notified at the same time.
-          [self postStatusChangeNotification];
+                      // Observers of kVPNStatusChangeNotificationName will be notified at the same time.
+                      [self postStatusChangeNotification];
 
-          // To restart the VPN, should wait till NEVPNStatusDisconnected is received.
-          // We can then start a new tunnel.
-          // If restartRequired then start  a new network extension process if the previous
-          // one has already been disconnected.
-          if (_targetManager.connection.status == NEVPNStatusDisconnected && restartRequired) {
-              dispatch_async(dispatch_get_main_queue(), ^{
-                  [self startTunnelWithCompletionHandler:nil];
-              });
-          }
-
-      }];
+                      // To restart the VPN, should wait till NEVPNStatusDisconnected is received.
+                      // We can then start a new tunnel.
+                      // If restartRequired then start  a new network extension process if the previous
+                      // one has already been disconnected.
+                      if (_providerManager.connection.status == NEVPNStatusDisconnected && self.restartRequired) {
+                          dispatch_async(dispatch_get_main_queue(), ^{
+                              [self startTunnel];
+                          });
+                      }
+                  }];
+    }
 }
 
 /**
@@ -301,7 +398,7 @@
  *    error object is set with one of VPNQueryErrorCode codes. Otherwise error is nil.
  */
 - (void)queryExtension:(NSString *)query responseHandler:(void (^ _Nonnull)(NSError * _Nullable error, NSString * _Nullable response))responseHandler {
-    NETunnelProviderSession *session = (NETunnelProviderSession *) self.targetManager.connection;
+    NETunnelProviderSession *session = (NETunnelProviderSession *) self.providerManager.connection;
     NSError *error;
     if (session && [self isVPNActive]) {
 
@@ -326,9 +423,13 @@
     responseHandler([VPNManager queryError:query withCode:VPNQueryErrorSendFailed andError:error], nil);
 }
 
+- (void)postStartFailureNotification:(VPNManagerStartErrorCode) error {
+    [[NSNotificationCenter defaultCenter] postNotificationName:kVPNStartFailure object:self];
+}
+
 - (void)postStatusChangeNotification {
     [[NSNotificationCenter defaultCenter]
-      postNotificationName:@kVPNStatusChangeNotificationName object:self];
+      postNotificationName:kVPNStatusChangeNotificationName object:self];
 }
 
 - (void)dealloc {
@@ -351,7 +452,7 @@
 
     NSMutableDictionary *userInfo = [NSMutableDictionary dictionary];
     userInfo[NSLocalizedDescriptionKey] = description;
-    userInfo[VPNQueryKey] = query;
+    userInfo[VPNQueryErrorUserInfoQueryKey] = query;
     if (error) {
         userInfo[NSUnderlyingErrorKey] = error;
     }

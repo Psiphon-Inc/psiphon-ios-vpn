@@ -41,6 +41,8 @@
 @end
 
 @implementation PsiphonDataSharedDB {
+
+    // NSUserDefaults objects are thread-safe.
     NSUserDefaults *sharedDefaults;
 
     NSString *appGroupIdentifier;
