@@ -21,6 +21,13 @@
 
 @implementation UIAlertController (Delegate)
 
++ (void)presentSimpleAlertWithTitle:(NSString *_Nonnull)title message:(NSString *_Nonnull)message preferredStyle:(UIAlertControllerStyle)preferredStyle okHandler:(void (^ _Nullable)(UIAlertAction *action))okHandler {
+    UIAlertController *ac = [UIAlertController alertControllerWithTitle:title message:message preferredStyle:preferredStyle];
+    UIAlertAction *okAction = [UIAlertAction actionWithTitle:NSLocalizedStringWithDefaultValue(@"OK_BUTTON", nil, [NSBundle mainBundle], @"OK", @"Alert OK Button") style:UIAlertActionStyleDefault handler:okHandler];
+    [ac addAction:okAction];
+    [ac presentFromTopController];
+}
+
 + (UIViewController *)getTopMostViewController {
     UIViewController *topController = [UIApplication sharedApplication].keyWindow.rootViewController;
     while(topController.presentedViewController) {
