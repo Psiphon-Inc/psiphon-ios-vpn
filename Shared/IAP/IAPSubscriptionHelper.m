@@ -26,7 +26,42 @@
 
 @implementation IAPSubscriptionHelper
 
-+ (BOOL)shouldUpdateSubscriptionDictinary:(NSDictionary*)subscriptionDict withPendingRenewalInfoCheck:(BOOL)check {
+// TODO: should only be performed once per extension lifetime
++ (BOOL)shouldStartTunnelAsSubscriber {
+
+    NSDictionary *subscriptionDict = [[self class] sharedSubscriptionDictionary];
+
+    if (!subscriptionDict) {
+        LOG_INFO(@"no subscription dictionary found");
+        return NO;
+    }
+
+    // If already has valid subscription - YES
+    if ([[self class] hasActiveSubscriptionForDate:[NSDate date]]) {
+        return YES;
+    }
+
+    NSArray *pending_renewal_info = subscriptionDict[kPendingRenewalInfo];
+
+    // If expired and pending renewal info is missing start as subscriber.
+    if(!pending_renewal_info) {
+        LOG_INFO(@"subscription pending renewal is missing");
+        return YES;
+    }
+
+    if([pending_renewal_info count] == 1 && [pending_renewal_info[0] isKindOfClass:[NSDictionary class]]) {
+        NSString *auto_renew_status = [pending_renewal_info[0] objectForKey:kAutoRenewStatus];
+        if (auto_renew_status && [auto_renew_status isEqualToString:@"1"]) {
+            LOG_INFO(@"tunnel should start as subscriber");
+            return YES;
+        }
+    }
+
+    LOG_INFO(@"tunnel should not start as subscriber");
+    return NO;
+}
+
++ (BOOL)shouldUpdateSubscriptionDictionary:(NSDictionary*)subscriptionDict withPendingRenewalInfoCheck:(BOOL)check {
     // If no receipt - NO
     NSURL *URL = [NSBundle mainBundle].appStoreReceiptURL;
     NSString *path = URL.path;
@@ -43,7 +78,7 @@
     // Receipt file size has changed since last check - YES
     NSNumber* appReceiptFileSize = nil;
     [[NSBundle mainBundle].appStoreReceiptURL getResourceValue:&appReceiptFileSize forKey:NSURLFileSizeKey error:nil];
-    NSNumber* dictAppReceiptFileSize = [subscriptionDict objectForKey:kAppReceiptFileSize];
+    NSNumber* dictAppReceiptFileSize = subscriptionDict[kAppReceiptFileSize];
     if ([appReceiptFileSize unsignedIntValue] != [dictAppReceiptFileSize unsignedIntValue]) {
         return YES;
     }
@@ -55,7 +90,7 @@
 
     // else we have an expired subscription
     if(check) {
-        NSArray *pending_renewal_info = [subscriptionDict objectForKey:kPendingRenewalInfo];
+        NSArray *pending_renewal_info = subscriptionDict[kPendingRenewalInfo];
 
         // If expired and pending renewal info is missing - we are
         if(!pending_renewal_info) {
@@ -79,18 +114,17 @@
     return [sharedDB getSubscriptionDictionary];
 }
 
-+ (void)storesharedSubscriptionDisctionary:(NSDictionary*)dict {
++ (void)storeSharedSubscriptionDictionary:(NSDictionary*)dict {
     PsiphonDataSharedDB *sharedDB = [[PsiphonDataSharedDB alloc] initForAppGroupIdentifier:APP_GROUP_IDENTIFIER];
     [sharedDB updateSubscriptionDictionary:dict];
 }
-
 
 + (BOOL)hasActiveSubscriptionForDate:(NSDate*)date {
     NSDictionary* dict = [[self class] sharedSubscriptionDictionary];
     return [[self class] hasActiveSubscriptionForDate:date inDict:dict];
 }
 
-+ (BOOL) hasActiveSubscriptionForDate:(NSDate*)date inDict:(NSDictionary*)subscriptionDict {
++ (BOOL)hasActiveSubscriptionForDate:(NSDate*)date inDict:(NSDictionary*)subscriptionDict {
 
     if(!subscriptionDict) {
         return NO;

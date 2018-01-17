@@ -17,15 +17,19 @@
  *
  */
 
-#define APP_GROUP_IDENTIFIER @"group.ca.psiphon.Psiphon"
+/**
+ * Bridge header file between the extension and the container.
+ */
 
-// App receipt fields keys and constants
-#define kAppReceiptFileSize                             @"app_receipt_file_size"
-#define kLatestExpirationDate                           @"latest_expiration_date"
-#define kProductId                                      @"product_id"
-#define kPendingRenewalInfo                             @"pending_renewal_info"
-#define kAutoRenewStatus                                @"auto_renew_status"
-#define kAutoRenewProductId                             @"auto_renew_product_id"
-#define kRequestDate                                    @"request_date"
+// Network Extension options
+#define EXTENSION_OPTION_START_FROM_CONTAINER @"startFromContainer"
+#define EXTENSION_OPTION_TRUE @"true"
 
+// Network Extension queries
+#define EXTENSION_QUERY_IS_PROVIDER_ZOMBIE @"isProviderZombie"
+#define EXTENSION_QUERY_IS_TUNNEL_CONNECTED @"isTunnelConnected"
+#define EXTENSION_QUERY_GET_SPONSOR_ID @"getSponsorId"
 
+// Network Extension boolean query responses
+#define EXTENSION_RESP_TRUE @"true"
+#define EXTENSION_RESP_FALSE @"false"

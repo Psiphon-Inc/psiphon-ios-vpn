@@ -27,6 +27,9 @@ void LOG_ERROR(NSString *format, ...) NS_FORMAT_FUNCTION(1,2);
 #define LOG_DEBUG(format, ...) \
  NSLog((@"<DEBUG> %s [Line %d]: " format), __PRETTY_FUNCTION__, __LINE__, ##__VA_ARGS__)
 
+#define LOG_INFO(format, ...) \
+ NSLog((@"<INFO> %s [Line %d]: " format), __PRETTY_FUNCTION__, __LINE__, ##__VA_ARGS__)
+
 // Logs a message to Apple System Log facility with log level WARN
 #define LOG_WARN(format, ...) \
  NSLog((@"<WARN> %s [Line %d]: " format), __PRETTY_FUNCTION__, __LINE__, ##__VA_ARGS__)
@@ -39,6 +42,9 @@ void LOG_ERROR(NSString *format, ...) NS_FORMAT_FUNCTION(1,2);
 #else
 
 #define LOG_DEBUG(...)
+
+// TODO: could we keep this in production?
+#define LOG_INFO(...)
 
 #define LOG_WARN(...)
 

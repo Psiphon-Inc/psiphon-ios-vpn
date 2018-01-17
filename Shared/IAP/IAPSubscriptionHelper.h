@@ -22,16 +22,20 @@
 #import "SharedConstants.h"
 
 
-#define SUBSCRIPTION_CHECK_GRACE_PERIOD_INTERVAL        2 * 60 * 60 * 24  // two days
-#define kPsiphonSubscriptionInvalidReceiptNotification  @"kPsiphonSubscriptionInvalidReceiptNotification"
-#define kPsiphonSubscriptionCloskIsOffNotification      @"kPsiphonSubscriptionCloskIsOffNotification"
+#define SUBSCRIPTION_CHECK_GRACE_PERIOD_INTERVAL        (2 * 60 * 60 * 24)  // two days
 
 @interface IAPSubscriptionHelper : NSObject
 
 + (NSDictionary*)sharedSubscriptionDictionary;
-+ (void)storesharedSubscriptionDisctionary:(NSDictionary*)dict;
++ (void)storeSharedSubscriptionDictionary:(NSDictionary*)dict;
 
 + (BOOL)hasActiveSubscriptionForDate:(NSDate*)date;
-+ (BOOL)shouldUpdateSubscriptionDictinary:(NSDictionary*)subscriptionDict withPendingRenewalInfoCheck:(BOOL)check;
++ (BOOL)hasActiveSubscriptionForDate:(NSDate*)date inDict:(NSDictionary *)subscriptionDict;
+
++ (BOOL)shouldUpdateSubscriptionDictionary:(NSDictionary*)subscriptionDict withPendingRenewalInfoCheck:(BOOL)check;
+
+#ifdef TARGET_IS_EXTENSION
++ (BOOL)shouldStartTunnelAsSubscriber;
+#endif
 
 @end

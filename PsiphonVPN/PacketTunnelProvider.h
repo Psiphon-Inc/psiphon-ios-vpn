@@ -17,11 +17,7 @@
  *
  */
 
-#import <NetworkExtension/NEPacketTunnelProvider.h>
-
-// Name of the file in shared container used to test if the extension has started,
-// while the device is in locked state from boot.
-#define BOOT_TEST_FILE_NAME @"boot_test_file"
+#import "ABCPacketTunnelProvider.h"
 
 // PsiphonTunnel Errors
 #define kPsiphonTunnelErrorDomain @"psiphonTunnelErrorSettingsDomain"
@@ -32,6 +28,6 @@ typedef NS_ENUM(NSInteger, PacketTunnelProviderErrorCode) {
     PsiphonTunnelErrorStoppedBeforeConnected = 3,
 };
 
-@interface PacketTunnelProvider : NEPacketTunnelProvider
+@interface PacketTunnelProvider : ABCPacketTunnelProvider <ABCPacketTunnelProviderProtocol>
 
 @end
