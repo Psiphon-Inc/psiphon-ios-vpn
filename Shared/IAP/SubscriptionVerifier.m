@@ -43,7 +43,7 @@ enum {
 
 @implementation SubscriptionVerifier
 
-- (void)startWithCompletionHandler:(SubscriptionVerifierCompletionHandler)receiptUploadCompletionHandler andSocksPort:(NSInteger)socksPort {
+- (void)startWithCompletionHandler:(SubscriptionVerifierCompletionHandler)receiptUploadCompletionHandler {
     NSURL *                 sendURL;
     NSMutableURLRequest *   request;
     NSString *              bodyPrefixStr;
@@ -106,19 +106,6 @@ enum {
 
     NSURLSessionConfiguration *sessionConfig = [NSURLSessionConfiguration defaultSessionConfiguration];
     sessionConfig.timeoutIntervalForRequest = receiptRequestTimeOutSeconds;
-
-    if(socksPort > 0) {
-        NSNumber* socksProxyPort = [NSNumber numberWithInteger:socksPort];
-        NSDictionary *proxyDict = @{
-                                    @"SOCKSEnable" : [NSNumber numberWithInt:1],
-                                    (NSString *)kCFStreamPropertySOCKSProxyHost : @"localhost",
-                                    (NSString *)kCFStreamPropertySOCKSProxyPort : socksProxyPort,
-
-                                    @"HTTPEnable"  : [NSNumber numberWithInt:0],
-                                    @"HTTPSEnable" : [NSNumber numberWithInt:0],
-                                    };
-        sessionConfig.connectionProxyDictionary = proxyDict;
-    }
 
     NSURLSession *session = [NSURLSession sessionWithConfiguration:sessionConfig];
 

@@ -1350,7 +1350,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 
 #pragma mark - IAP
 
-- (void) openIAPViewController {
+- (void)openIAPViewController {
     IAPViewController *iapViewController = [[IAPViewController alloc]init];
     iapViewController.openedFromSettings = NO;
     UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:iapViewController];

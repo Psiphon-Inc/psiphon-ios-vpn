@@ -17,15 +17,15 @@
  *
  */
 
-#define APP_GROUP_IDENTIFIER @"group.ca.psiphon.Psiphon"
+#import <Foundation/Foundation.h>
 
-// App receipt fields keys and constants
-#define kAppReceiptFileSize                             @"app_receipt_file_size"
-#define kLatestExpirationDate                           @"latest_expiration_date"
-#define kProductId                                      @"product_id"
-#define kPendingRenewalInfo                             @"pending_renewal_info"
-#define kAutoRenewStatus                                @"auto_renew_status"
-#define kAutoRenewProductId                             @"auto_renew_product_id"
-#define kRequestDate                                    @"request_date"
+@interface FileUtils : NSObject
 
 
++ (BOOL)downgradeFileProtectionToNone:(NSArray<NSString *> *)paths withExceptions:(NSArray<NSString *> *)exceptions;
+
+#if DEBUG
++ (void)listDirectory:(NSString *)dir resource:(NSString *)resource;
+#endif
+
+@end

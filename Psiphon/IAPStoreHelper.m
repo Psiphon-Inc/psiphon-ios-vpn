@@ -61,8 +61,8 @@ NSString *const kIAPHelperUpdatedSubscriptionDictionary = @"kIAPHelperUpdatedSub
 - (void) updateSubscriptionDictionaryFromLocalReceipt {
 
     NSDictionary *subscriptionDict = [[IAPSubscriptionHelper class] sharedSubscriptionDictionary];
-
-    if(![[IAPSubscriptionHelper class] shouldUpdateSubscriptionDictinary:subscriptionDict withPendingRenewalInfoCheck:NO]) {
+    
+    if(![[IAPSubscriptionHelper class] shouldUpdateSubscriptionDictionary:subscriptionDict withPendingRenewalInfoCheck:NO]) {
         return;
     }
 
@@ -77,7 +77,7 @@ NSString *const kIAPHelperUpdatedSubscriptionDictionary = @"kIAPHelperUpdatedSub
         receipt = nil;
     }
 
-    [[IAPSubscriptionHelper class] storesharedSubscriptionDisctionary:subscriptionDict];
+    [[IAPSubscriptionHelper class] storeSharedSubscriptionDictionary:subscriptionDict];
     [[NSNotificationCenter defaultCenter] postNotificationName:kIAPHelperUpdatedSubscriptionDictionary object:nil];
 }
 

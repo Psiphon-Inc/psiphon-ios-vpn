@@ -21,7 +21,7 @@
 #import "AppDelegate.h"
 #import "VPNManager.h"
 #import "PsiphonDataSharedDB.h"
-#import "SharedConstants.h"
+#import "NEBridge.h"
 #import "Notifier.h"
 #import "Logging.h"
 #import "PsiphonClientCommonLibraryHelpers.h"
@@ -187,7 +187,7 @@
 
                   LOG_DEBUG(@"Call targetManager.connection.startVPNTunnel()");
                   NSError *vpnStartError;
-                  NSDictionary *extensionOptions = @{EXTENSION_OPTION_START_FROM_CONTAINER : EXTENSION_TRUE};
+                  NSDictionary *extensionOptions = @{EXTENSION_OPTION_START_FROM_CONTAINER : EXTENSION_OPTION_TRUE};
 
                   BOOL vpnStartSuccess = [self.targetManager.connection startVPNTunnelWithOptions:extensionOptions
                                                                                    andReturnError:&vpnStartError];

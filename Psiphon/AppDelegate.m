@@ -226,7 +226,7 @@
     }
 }
 
-- (void) reloadMainViewController {
+- (void)reloadMainViewController {
     LOG_DEBUG();
     mainViewController = [[MainViewController alloc] init];
     mainViewController.openSettingImmediatelyOnViewDidAppear = YES;
