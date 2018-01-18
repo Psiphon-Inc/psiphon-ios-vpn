@@ -163,6 +163,7 @@
 		4E6E98A81FC776CD002B35CD /* LoadingCircleLayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LoadingCircleLayer.m; sourceTree = "<group>"; };
 		4E6E98AA1FC776EA002B35CD /* PsiphonProgressView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PsiphonProgressView.m; sourceTree = "<group>"; };
 		4E6E98AB1FC776EA002B35CD /* PsiphonProgressView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PsiphonProgressView.h; sourceTree = "<group>"; };
+		4E74B388201141AB007B3A6D /* bn */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = bn; path = Strings/bn.lproj/Localizable.strings; sourceTree = "<group>"; };
 		4EE51E7D1FD5BF82009A0B57 /* EmbeddedServerEntries.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = EmbeddedServerEntries.h; sourceTree = "<group>"; };
 		4EE51E7E1FD5BF82009A0B57 /* EmbeddedServerEntries.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = EmbeddedServerEntries.m; sourceTree = "<group>"; };
 		4EFFBFC71FD204D300C1D81A /* EmbeddedServerEntriesHelpers.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = EmbeddedServerEntriesHelpers.c; sourceTree = "<group>"; };
@@ -703,6 +704,7 @@
 				am,
 				be,
 				tg,
+				bn,
 			);
 			mainGroup = CE26FC811BBDC7B700B83375;
 			productRefGroup = CE26FC8B1BBDC7B800B83375 /* Products */;
@@ -1013,6 +1015,7 @@
 				664469C71F72C2F8005E995B /* am */,
 				664469C81F72C305005E995B /* be */,
 				663EEF3A1FAB857A0034A9E7 /* tg */,
+				4E74B388201141AB007B3A6D /* bn */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";

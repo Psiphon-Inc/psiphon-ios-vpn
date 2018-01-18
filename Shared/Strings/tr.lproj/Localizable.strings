@@ -16,8 +16,8 @@
 /*[UNTRANSLATED] Alert title informing user that the device clock needs to be updated with current time */
 "BAD_CLOCK_ALERT_TITLE" = "Clock is out of sync";
 
-/*[UNTRANSLATED] Alert message informing user that subscription receipt can not be verified */
-"BAD_RECEIPT_ALERT_MESSAGE" = "Your subscription receipt can not be verified, please refresh it and try again.";
+/*[UNTRANSLATED] Alert message informing user that subscription receipt cannot be verified */
+"BAD_RECEIPT_ALERT_MESSAGE" = "Your subscription receipt cannot be verified, please refresh it and try again.";
 
 /*[UNTRANSLATED] Alert title informing user that app receipt is not valid */
 "BAD_RECEIPT_ALERT_TITLE" = "Invalid app receipt";
@@ -25,7 +25,7 @@
 /*[UNTRANSLATED] Buy subscription dialog footer text */
 "BUY_SUBSCRIPTIONS_FOOTER_TEXT" = "A subscription is auto-renewable which means that once purchased it will be automatically renewed until you cancel it 24 hours prior to the end of the current period.\n\nYour iTunes Account will be charged for renewal within 24-hours prior to the end of the current period with the cost of subscription.\n\nManage your Subscription and Auto-Renewal by going to your Account Settings.";
 
-/*[UNTRANSLATED] Premium subscriptions dialog header text */
+/*[UNTRANSLATED] Premium subscriptions dialog header text. If “Premium” doesn't easily translate, please choose a term that conveys “Pro” or “Extra” or “Better” or “Elite”. */
 "BUY_SUBSCRIPTIONS_HEADER_TEXT" = "Remove ads and surf the Internet faster with a premium subscription!";
 
 /*[UNTRANSLATED] Text above change region button that allows user to select their desired server region */
@@ -33,6 +33,12 @@
 
 /*[UNTRANSLATED] Main text in the 'Upstream Proxy Error' dialog box. This is shown when the user has directly altered these settings, and those settings are (probably) erroneous. DO NOT translate 'Psiphon'. */
 "CHECK_UPSTREAM_PROXY_SETTING" = "You have configured Psiphon to use an upstream proxy.\nHowever, we seem to be unable to connect to a Psiphon server through that proxy.\nPlease fix the settings and try again.";
+
+/*[UNTRANSLATED] Alert dialog title (MainViewController) */
+"CORRUPT_SETTINGS_ALERT_TITLE" = "Corrupt Settings";
+
+/*[UNTRANSLATED] Alert dialog message informing the user that the settings file in the app is corrupt, and that they can potentially fix this issue by re-installing the app. */
+"CORRUPT_SETTINGS_MESSAGE" = "Your app settings file appears to be corrupt. Try reinstalling the app to repair the file.";
 
 /* Title of the button that dismisses region selection dialog
    Title of the button that dismisses the subscriptions menu */
@@ -62,10 +68,10 @@
 /*[UNTRANSLATED] Subscriptions item title in the app settings when user has an active subscription. Clicking this item opens subscriptions view */
 "SETTINGS_SUBSCRIPTION_ACTIVE" = "Subscriptions";
 
-/*[UNTRANSLATED] Subscriptions item title in the app settings when user does not have an active subscription. Clicking this item opens subscriptions view */
+/*[UNTRANSLATED] Subscriptions item title in the app settings when user does not have an active subscription. Clicking this item opens subscriptions view. If “Premium” doesn't easily translate, please choose a term that conveys “Pro” or “Extra” or “Better” or “Elite”. */
 "SETTINGS_SUBSCRIPTION_NOT_ACTIVE" = "Go premium!";
 
-/*[UNTRANSLATED] Text for button that opens paid subscriptions manager UI */
+/*[UNTRANSLATED] Text for button that opens paid subscriptions manager UI. If “Premium” doesn't easily translate, please choose a term that conveys “Pro” or “Extra” or “Better” or “Elite”. */
 "SUBSCRIPTION_BUTTON_TITLE" = "Go premium now!";
 
 /*[UNTRANSLATED] Title of the dialog for available in-app paid subscriptions */
@@ -76,6 +82,12 @@
 
 /* Alert message informing user they have to open the app. DO NOT translate 'Psiphon'. */
 "USE_PSIPHON_APP" = "To connect, use the Psiphon application.";
+
+/*[UNTRANSLATED] Alert dialog message informing the user that an error occurred while starting Psiphon (Do not translate 'Psiphon'). The user should try again, and if the problem persists, they should try reinstalling the app. */
+"VPN_START_FAIL_MESSAGE" = "An error occurred while starting Psiphon. Please try again. If this problem persists, try reinstalling the Psiphon app.";
+
+/*[UNTRANSLATED] Alert dialog title indicating to the user that Psiphon was unable to start (MainViewController) */
+"VPN_START_FAIL_TITLE" = "Unable to start";
 
 /* Status when the VPN is connected to a Psiphon server */
 "VPN_STATUS_CONNECTED" = "Bağlanıldı";
