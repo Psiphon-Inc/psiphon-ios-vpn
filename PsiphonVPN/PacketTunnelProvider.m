@@ -107,7 +107,8 @@ static NSDateFormatter *__rfc3339DateFormatter = nil;
     // OR if the user possibly has a valid subscription
     // OR if the extension is started after boot but before being unlocked.
 
-    self.startTunnelAsSubscriber = [IAPSubscriptionHelper shouldStartTunnelAsSubscriber];
+    //self.startTunnelAsSubscriber = [IAPSubscriptionHelper shouldStartTunnelAsSubscriber];
+    self.startTunnelAsSubscriber = FALSE;
 
     if (self.NEStartMethod == NEStartMethodFromContainer || self.startTunnelAsSubscriber) {
 
@@ -388,7 +389,7 @@ static NSDateFormatter *__rfc3339DateFormatter = nil;
                     }
 
                 } else {
-                    [self killExtensionForExpiredSubscription];
+                    [self startGracePeriod];
                 }
             }
         }
@@ -463,11 +464,11 @@ static NSDateFormatter *__rfc3339DateFormatter = nil;
 
     __weak PacketTunnelProvider *weakSelf = self;
 
-#if DEBUG
+    #if DEBUG
     int64_t subscriptionCheckIntervalInSec = 5; // 5 seconds.
-#else
+    #else
     int64_t subscriptionCheckIntervalInSec = 24 * 60 * 60;  // 24 hours.
-#endif
+    #endif
 
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, subscriptionCheckIntervalInSec * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
         // If user's subscription has expired, then give them an hour of extra grace period
@@ -476,18 +477,18 @@ static NSDateFormatter *__rfc3339DateFormatter = nil;
             // User has an active subscription. Check later.
             [weakSelf _startSubscriptionCheckTimer:FALSE];
         } else {
-            [self startGracePeriod];
+            [self trySubscriptionCheck];
         }
     });
 }
 
 - (void)startGracePeriod {
 
-#if DEBUG
+    #if DEBUG
     int64_t gracePeriodInSec = 5; // 5 seconds.
-#else
+    #else
     int64_t gracePeriodInSec = 1 * 60 * 60;  // 1 hour.
-#endif
+    #endif
 
     __weak PacketTunnelProvider *weakSelf = self;
 
