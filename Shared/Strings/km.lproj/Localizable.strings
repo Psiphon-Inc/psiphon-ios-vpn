@@ -1,5 +1,5 @@
 /* Active subscription detail text, example: Expires on 2017-01-01, renewal cost is $3.99 */
-"ACTIVE_SUBSCRIPTION_DETAIL_TEXT" = "ផុតកំណត់នៅ %1$@, ថ្លៃភ្ជាប់ឡើងវិញគឺ %2$@";
+"ACTIVE_SUBSCRIPTION_DETAIL_TEXT" = "ផុតកំណត់នៅ %1$@, តម្លៃភ្ជាប់ឡើងវិញគឺ %2$@";
 
 /* Text for button that tell users there will by a short video ad. */
 "AD_LOADED" = "មើលវីដេអូខ្លីនៅពេលយើងខ្ញុំកំពុងតភ្ជាប់ជូនអ្នក";
@@ -16,16 +16,16 @@
 /* Alert title informing user that the device clock needs to be updated with current time */
 "BAD_CLOCK_ALERT_TITLE" = "ម៉ោងមិនត្រូវគ្នា";
 
-/* Alert message informing user that subscription receipt can not be verified */
-"BAD_RECEIPT_ALERT_MESSAGE" = "ការទទួលការភ្ជាប់របស់អ្នកមិនអាចផ្ទៀងផ្ទាត់បាន, សូមត្រួតពិនិត្យវា និងសាកល្បងម្តងទៀត។";
+/* Alert message informing user that subscription receipt cannot be verified */
+"BAD_RECEIPT_ALERT_MESSAGE" = "មិនអាចផ្ទៀងផ្ទាត់វិក័យប័ត្រជាវរបស់អ្នកបានទេ សូមធ្វើឡើងវិញ ហើយព្យាយាមម្តងទៀត។";
 
 /* Alert title informing user that app receipt is not valid */
 "BAD_RECEIPT_ALERT_TITLE" = "ការទទួលកម្មវិធីមិនត្រឹមត្រូវ";
 
-/*[UNTRANSLATED] Buy subscription dialog footer text */
-"BUY_SUBSCRIPTIONS_FOOTER_TEXT" = "A subscription is auto-renewable which means that once purchased it will be automatically renewed until you cancel it 24 hours prior to the end of the current period.\n\nYour iTunes Account will be charged for renewal within 24-hours prior to the end of the current period with the cost of subscription.\n\nManage your Subscription and Auto-Renewal by going to your Account Settings.";
+/* Buy subscription dialog footer text */
+"BUY_SUBSCRIPTIONS_FOOTER_TEXT" = "ការជាវគឺអាចបន្តដោយស្វ័យប្រវត្តិ ដែលមានន័យថា នៅពេលដែលបានទិញវានឹងត្រូវបន្តដោយស្វ័យប្រវត្តិរហូតទាល់តែអ្នកបោះបង់វាចោល 24 ម៉ោងមុនពេលបញ្ចប់នៃរយៈពេលបច្ចុប្បន្ន។\n\nគណនីកម្មវិធី iTunes របស់អ្នកនឹងត្រូវបានគិតថ្លៃសម្រាប់ការបន្តក្នុងរយៈពេល 24 ម៉ោងមុនពេលបញ្ចប់នៃរយៈពេលបច្ចុប្បន្នជាមួយនឹងតម្លៃនៃការជាវ។\n\nគ្រប់គ្រងការជាវរបស់អ្នកនិងការបន្តស្វ័យប្រវត្តិដោយចូលទៅកាន់ការកំណត់គណនីរបស់អ្នក។";
 
-/* Premium subscriptions dialog header text */
+/* Premium subscriptions dialog header text. If “Premium” doesn't easily translate, please choose a term that conveys “Pro” or “Extra” or “Better” or “Elite”. */
 "BUY_SUBSCRIPTIONS_HEADER_TEXT" = "លុបចោលផ្ទាំងពាណិជ្ជកម្ម និងបើកអ៊ីនធឺណែតលឿនជាមុន ជាមួយការតភ្ជាប់កញ្ជប់ខ្ពស់។";
 
 /* Text above change region button that allows user to select their desired server region */
@@ -34,9 +34,15 @@
 /* Main text in the 'Upstream Proxy Error' dialog box. This is shown when the user has directly altered these settings, and those settings are (probably) erroneous. DO NOT translate 'Psiphon'. */
 "CHECK_UPSTREAM_PROXY_SETTING" = "អ្នកបានកំណត់ Psiphon ដើម្បីប្រើជា ប្រូហ្ស៊ី​ខាងលើ។\nទោះយ៉ាងណា, យើងហាក់ដូចជាមិនអាចតភ្ជាប់ទៅកាន់ម៉ាស៊ីនមេ Psiphon តាមរយៈ​ប្រូហ្ស៊ី​នោះទេ។\nសូមកែសំរួលការកំណត់ និងសាកល្បងម្តងទៀត។";
 
+/* Alert dialog title (MainViewController) */
+"CORRUPT_SETTINGS_ALERT_TITLE" = "ការកំណត់មានបញ្ហា";
+
+/* Alert dialog message informing the user that the settings file in the app is corrupt, and that they can potentially fix this issue by re-installing the app. */
+"CORRUPT_SETTINGS_MESSAGE" = "ឯកសារកំណត់កម្មវិធីរបស់អ្នកមានបញ្ហា។ ព្យាយាមដំឡើងកម្មវិធីឡើងវិញ ដើម្បីជួសជុលឯកសារនេះ។";
+
 /* Title of the button that dismisses region selection dialog
    Title of the button that dismisses the subscriptions menu */
-"DONE_ACTION" = "បញ្ចប់";
+"DONE_ACTION" = "រួចរាល់";
 
 /* Text displayed while app loads */
 "LOADING" = "កំពុងផ្ទុក...";
@@ -62,10 +68,10 @@
 /* Subscriptions item title in the app settings when user has an active subscription. Clicking this item opens subscriptions view */
 "SETTINGS_SUBSCRIPTION_ACTIVE" = "ការភ្ជាប់";
 
-/* Subscriptions item title in the app settings when user does not have an active subscription. Clicking this item opens subscriptions view */
+/* Subscriptions item title in the app settings when user does not have an active subscription. Clicking this item opens subscriptions view. If “Premium” doesn't easily translate, please choose a term that conveys “Pro” or “Extra” or “Better” or “Elite”. */
 "SETTINGS_SUBSCRIPTION_NOT_ACTIVE" = "ប្តូរទៅកញ្ចប់ខ្ពស់!";
 
-/* Text for button that opens paid subscriptions manager UI */
+/* Text for button that opens paid subscriptions manager UI. If “Premium” doesn't easily translate, please choose a term that conveys “Pro” or “Extra” or “Better” or “Elite”. */
 "SUBSCRIPTION_BUTTON_TITLE" = "ប្តូរទៅកញ្ចប់ខ្ពស់ឥលូវនេះ!";
 
 /* Title of the dialog for available in-app paid subscriptions */
@@ -77,8 +83,14 @@
 /* Alert message informing user they have to open the app. DO NOT translate 'Psiphon'. */
 "USE_PSIPHON_APP" = "ដើម្បីតភ្ជាប់ ប្រើប្រាស់កម្មវិធី Psiphon";
 
+/* Alert dialog message informing the user that an error occurred while starting Psiphon (Do not translate 'Psiphon'). The user should try again, and if the problem persists, they should try reinstalling the app. */
+"VPN_START_FAIL_MESSAGE" = "មានបញ្ហាកើតឡើង​ នៅពេលដំណើការ Psiphon។ សូមព្យាយាមម្តងទៀត។ ប្រសិនបើ បញ្ហានៅតែមាន សាកល្បងដំឡើងកម្មវិធីនេះ សារឡើងវិញ។";
+
+/* Alert dialog title indicating to the user that Psiphon was unable to start (MainViewController) */
+"VPN_START_FAIL_TITLE" = "មិនអាចចាប់ផ្តើម";
+
 /* Status when the VPN is connected to a Psiphon server */
-"VPN_STATUS_CONNECTED" = "បានតភ្ជាប់";
+"VPN_STATUS_CONNECTED" = "បានភ្ជាប់";
 
 /* Status when the VPN is connecting; that is, trying to connect to a Psiphon server */
 "VPN_STATUS_CONNECTING" = "កំពុងតភ្ជាប់";
