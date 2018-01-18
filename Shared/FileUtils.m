@@ -37,14 +37,14 @@
  */
 + (BOOL)downgradeFileProtectionToNone:(NSArray<NSString *> *)paths withExceptions:(NSArray<NSString *> *)exceptions {
     for (NSString *path in paths) {
-        if (![[self class] setFileProtectionNoneRecursively:path withExceptions:exceptions]) {
+        if (![FileUtils setFileProtectionNoneRecursively:path withExceptions:exceptions]) {
             return FALSE;
         }
     }
     return TRUE;
 }
 
-- (BOOL)setFileProtectionNoneRecursively:(NSString *)path withExceptions:(NSArray<NSString *> *)exceptions{
++ (BOOL)setFileProtectionNoneRecursively:(NSString *)path withExceptions:(NSArray<NSString *> *)exceptions{
 
     NSError *err;
     NSFileManager *fm = [NSFileManager defaultManager];
