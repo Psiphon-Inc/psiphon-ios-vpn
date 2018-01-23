@@ -26,6 +26,11 @@ extern NSString *const kIAPSKProductsRequestDidFailWithError;
 extern NSString *const kIAPSKRequestRequestDidFinish;
 extern NSString *const kIAPHelperUpdatedSubscriptionDictionary;
 
+extern NSString *const kAppReceiptFileSize;
+extern NSString *const kLatestExpirationDate;
+extern NSString *const kProductId;
+
+
 @interface IAPStoreHelper : NSObject
 
 @property (nonatomic,strong) NSArray *storeProducts;
@@ -37,4 +42,12 @@ extern NSString *const kIAPHelperUpdatedSubscriptionDictionary;
 - (void) refreshReceipt;
 - (void)startProductsRequest;
 - (void)buyProduct:(SKProduct*)product;
+
+// Subscription
++ (NSDictionary*)subscriptionDictionary;
++ (void)storeSubscriptionDictionary:(NSDictionary*)dict;
++ (BOOL)hasActiveSubscriptionForDate:(NSDate*)date;
++ (BOOL)hasActiveSubscriptionForDate:(NSDate*)date inDict:(NSDictionary *)subscriptionDict;
++ (BOOL)shouldUpdateSubscriptionDictionary:(NSDictionary*)subscriptionDict;
+
 @end

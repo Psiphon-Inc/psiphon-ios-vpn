@@ -15,8 +15,6 @@
 		19CB75081F54ADB300F78219 /* MPGoogleAdMobInterstitialCustomEvent.m in Sources */ = {isa = PBXBuildFile; fileRef = 19CB75061F54ADB300F78219 /* MPGoogleAdMobInterstitialCustomEvent.m */; };
 		440D75BE1F59E041005C603B /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 440D75BD1F59E041005C603B /* StoreKit.framework */; };
 		4435CC271F70566000F3A809 /* SettingsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4435CC261F70566000F3A809 /* SettingsViewController.m */; };
-		447254F61FAA2AAA00ADD3EA /* IAPSubscriptionHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 447254F51FAA2AAA00ADD3EA /* IAPSubscriptionHelper.m */; };
-		44808F4B1FAA314000E94123 /* IAPSubscriptionHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 447254F51FAA2AAA00ADD3EA /* IAPSubscriptionHelper.m */; };
 		44A0CAEE1FCCCDEC00859DB3 /* SubscriptionVerifier.m in Sources */ = {isa = PBXBuildFile; fileRef = 44E3CB6B1FCCA83200C80C82 /* SubscriptionVerifier.m */; };
 		44A0CAF21FE04A4500859DB3 /* AppleIncRootCertificate.cer in Resources */ = {isa = PBXBuildFile; fileRef = 44A0CAF01FE04A4500859DB3 /* AppleIncRootCertificate.cer */; };
 		44A0CAF31FE04A4500859DB3 /* RMAppReceipt.m in Sources */ = {isa = PBXBuildFile; fileRef = 44A0CAF11FE04A4500859DB3 /* RMAppReceipt.m */; };
@@ -135,8 +133,6 @@
 		440D75BD1F59E041005C603B /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 		4435CC251F70566000F3A809 /* SettingsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SettingsViewController.h; sourceTree = "<group>"; };
 		4435CC261F70566000F3A809 /* SettingsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SettingsViewController.m; sourceTree = "<group>"; };
-		447254F41FAA2A8A00ADD3EA /* IAPSubscriptionHelper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IAPSubscriptionHelper.h; sourceTree = "<group>"; };
-		447254F51FAA2AAA00ADD3EA /* IAPSubscriptionHelper.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = IAPSubscriptionHelper.m; sourceTree = "<group>"; };
 		44A0CAEF1FE04A4500859DB3 /* RMAppReceipt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RMAppReceipt.h; sourceTree = "<group>"; };
 		44A0CAF01FE04A4500859DB3 /* AppleIncRootCertificate.cer */ = {isa = PBXFileReference; lastKnownFileType = file; path = AppleIncRootCertificate.cer; sourceTree = "<group>"; };
 		44A0CAF11FE04A4500859DB3 /* RMAppReceipt.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RMAppReceipt.m; sourceTree = "<group>"; };
@@ -323,7 +319,6 @@
 		4E0DCB101F28458100495781 /* Shared */ = {
 			isa = PBXGroup;
 			children = (
-				EF743FC11F99546B00AC89A2 /* IAP */,
 				669A10B61F58A74E00EE831F /* Strings */,
 				4E0DCB181F28481E00495781 /* PsiphonDataSharedDB.h */,
 				4E0DCB191F28481E00495781 /* PsiphonDataSharedDB.m */,
@@ -421,6 +416,7 @@
 		CE26FCA41BBDC85900B83375 /* PsiphonVPN */ = {
 			isa = PBXGroup;
 			children = (
+				EF743FC11F99546B00AC89A2 /* IAP */,
 				CE4E9BC11BBEECFC0060FF8B /* PsiphonVPN.entitlements */,
 				CE26FCA91BBDC85900B83375 /* Info.plist */,
 				EF652CD81F352271002AFB48 /* PacketTunnelProvider.h */,
@@ -447,8 +443,6 @@
 				44E3CB6B1FCCA83200C80C82 /* SubscriptionVerifier.m */,
 				44E3CB631FC73A6700C80C82 /* MTBase64InputStream.h */,
 				44E3CB621FC73A6700C80C82 /* MTBase64InputStream.m */,
-				447254F41FAA2A8A00ADD3EA /* IAPSubscriptionHelper.h */,
-				447254F51FAA2AAA00ADD3EA /* IAPSubscriptionHelper.m */,
 			);
 			path = IAP;
 			sourceTree = "<group>";
@@ -833,7 +827,6 @@
 			files = (
 				EF652CD71F35224C002AFB48 /* MainViewController.m in Sources */,
 				F132D7E01F5739A800AF7F91 /* LaunchScreenViewController.m in Sources */,
-				447254F61FAA2AAA00ADD3EA /* IAPSubscriptionHelper.m in Sources */,
 				19CB75081F54ADB300F78219 /* MPGoogleAdMobInterstitialCustomEvent.m in Sources */,
 				197DABEB1F54BEED00DD5C3B /* VungleInterstitialCustomEvent.m in Sources */,
 				197DABF51F54C15400DD5C3B /* VungleInstanceMediationSettings.m in Sources */,
@@ -868,7 +861,6 @@
 			files = (
 				44A0CAEE1FCCCDEC00859DB3 /* SubscriptionVerifier.m in Sources */,
 				44E3CB681FC7535800C80C82 /* MTBase64InputStream.m in Sources */,
-				44808F4B1FAA314000E94123 /* IAPSubscriptionHelper.m in Sources */,
 				EF652CDA1F352271002AFB48 /* PacketTunnelProvider.m in Sources */,
 				4E0DCB1E1F2855FC00495781 /* PsiphonDataSharedDB.m in Sources */,
 				9BFECD1880B51B0E2EAEFF1F /* Notifier.m in Sources */,

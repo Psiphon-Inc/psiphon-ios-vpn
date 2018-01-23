@@ -18,7 +18,6 @@
  */
 
 #import "SettingsViewController.h"
-#import "IAPSubscriptionHelper.h"
 #import "IAPStoreHelper.h"
 #import "IAPViewController.h"
 #import "VPNManager.h"
@@ -63,7 +62,7 @@
     }
 
     if ([specifier.key isEqualToString:kSettingsSubscription]) {
-        BOOL hasActiveSubscription = [[IAPSubscriptionHelper class] hasActiveSubscriptionForDate:[NSDate date]];
+        BOOL hasActiveSubscription = [[IAPStoreHelper class] hasActiveSubscriptionForDate:[NSDate date]];
         cell = [super tableView:tableView cellForSpecifier:specifier];
         [cell setAccessoryType:UITableViewCellAccessoryDisclosureIndicator];
         NSString *subscriptionItemTitle;
@@ -97,7 +96,7 @@
 
 
         NSString *subscriptionOnlySubtitle;
-        BOOL hasActiveSubscription = [[IAPSubscriptionHelper class] hasActiveSubscriptionForDate:[NSDate date]];
+        BOOL hasActiveSubscription = [[IAPStoreHelper class] hasActiveSubscriptionForDate:[NSDate date]];
         if(!hasActiveSubscription) {
             vpnOnDemandToggle.on = NO;
             cell.userInteractionEnabled = NO;

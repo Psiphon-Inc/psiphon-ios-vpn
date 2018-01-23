@@ -18,14 +18,3 @@
  */
 
 #define APP_GROUP_IDENTIFIER @"group.ca.psiphon.Psiphon"
-
-// App receipt fields keys and constants
-#define kAppReceiptFileSize                             @"app_receipt_file_size"
-#define kLatestExpirationDate                           @"latest_expiration_date"
-#define kProductId                                      @"product_id"
-#define kPendingRenewalInfo                             @"pending_renewal_info"
-#define kAutoRenewStatus                                @"auto_renew_status"
-#define kAutoRenewProductId                             @"auto_renew_product_id"
-#define kRequestDate                                    @"request_date"
-
-
