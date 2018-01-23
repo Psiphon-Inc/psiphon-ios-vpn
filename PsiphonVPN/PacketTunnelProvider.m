@@ -28,7 +28,6 @@
 #import "SharedConstants.h"
 #import "Notifier.h"
 #import "Logging.h"
-#import "IAPSubscriptionHelper.h"
 #import "SubscriptionVerifier.h"
 #import "NSDateFormatter+RFC3339.h"
 #import <ifaddrs.h>

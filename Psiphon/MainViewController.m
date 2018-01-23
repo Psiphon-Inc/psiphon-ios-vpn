@@ -39,7 +39,6 @@
 #import "IAPViewController.h"
 #import "AppDelegate.h"
 #import "IAPStoreHelper.h"
-#import "IAPSubscriptionHelper.h"
 #import "SettingsViewController.h"
 
 static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSString *b) {
@@ -977,7 +976,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     NSString *bundledConfigStr = [PsiphonClientCommonLibraryHelpers getPsiphonBundledConfig];
 
     // Return bundled config as is if user doesn't have an active subscription
-    if(![[IAPSubscriptionHelper class] hasActiveSubscriptionForDate:[NSDate date]]) {
+    if(![[IAPStoreHelper class] hasActiveSubscriptionForDate:[NSDate date]]) {
         return bundledConfigStr;
     }
 
@@ -1330,7 +1329,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 
 - (void) updateSubscriptionUI {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        BOOL success = [[IAPSubscriptionHelper class] hasActiveSubscriptionForDate:[NSDate date]];
+        BOOL success = [[IAPStoreHelper class] hasActiveSubscriptionForDate:[NSDate date]];
         dispatch_async(dispatch_get_main_queue(), ^{
             if(success) {
                 subscriptionButton.hidden = YES;
@@ -1372,7 +1371,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     // If not, restarts the extension.
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
 
-        if ([[IAPSubscriptionHelper class] hasActiveSubscriptionForDate:[NSDate date]] && [vpnManager isVPNActive]) {
+        if ([[IAPStoreHelper class] hasActiveSubscriptionForDate:[NSDate date]] && [vpnManager isVPNActive]) {
             dispatch_async(dispatch_get_main_queue(), ^{
 
                 [vpnManager queryNEForCurrentSponsorId:^(NSString *currentSponsorId) {

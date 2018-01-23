@@ -25,7 +25,7 @@
 #import "Notifier.h"
 #import "Logging.h"
 #import "PsiphonClientCommonLibraryHelpers.h"
-#import "IAPSubscriptionHelper.h"
+#import "SharedConstants.h"
 #import "SettingsViewController.h"
 
 @interface VPNManager ()

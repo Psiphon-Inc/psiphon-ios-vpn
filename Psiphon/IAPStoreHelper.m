@@ -19,13 +19,21 @@
 
 #import "IAPStoreHelper.h"
 #import "RMAppReceipt.h"
-#import "IAPSubscriptionHelper.h"
 
 
 NSString *const kIAPSKProductsRequestDidReceiveResponse = @"kIAPSKProductsRequestDidReceiveResponse";
 NSString *const kIAPSKProductsRequestDidFailWithError = @"kIAPSKProductsRequestDidFailWithError";
 NSString *const kIAPSKRequestRequestDidFinish = @"kIAPSKRequestRequestDidFinish";
 NSString *const kIAPHelperUpdatedSubscriptionDictionary = @"kIAPHelperUpdatedSubscriptionDictionary";
+
+// App receipt fields keys and constants
+NSString *const kAppReceiptFileSize = @"app_receipt_file_size";
+NSString *const kLatestExpirationDate = @"latest_expiration_date";
+NSString *const kProductId = @"product_id";
+
+NSString *const kSubscriptionDictionary = @"kSubscriptionDictionary";
+
+
 
 @interface IAPStoreHelper()<SKPaymentTransactionObserver,SKProductsRequestDelegate>
 - (void) updateSubscriptionDictionaryFromLocalReceipt;
@@ -60,9 +68,9 @@ NSString *const kIAPHelperUpdatedSubscriptionDictionary = @"kIAPHelperUpdatedSub
 
 - (void) updateSubscriptionDictionaryFromLocalReceipt {
 
-    NSDictionary *subscriptionDict = [[IAPSubscriptionHelper class] sharedSubscriptionDictionary];
+    NSDictionary *subscriptionDict = [[self class] subscriptionDictionary];
     
-    if(![[IAPSubscriptionHelper class] shouldUpdateSubscriptionDictionary:subscriptionDict withPendingRenewalInfoCheck:NO]) {
+    if(![[self class] shouldUpdateSubscriptionDictionary:subscriptionDict]) {
         return;
     }
 
@@ -77,7 +85,7 @@ NSString *const kIAPHelperUpdatedSubscriptionDictionary = @"kIAPHelperUpdatedSub
         receipt = nil;
     }
 
-    [[IAPSubscriptionHelper class] storeSharedSubscriptionDictionary:subscriptionDict];
+    [[self class] storeSubscriptionDictionary:subscriptionDict];
     [[NSNotificationCenter defaultCenter] postNotificationName:kIAPHelperUpdatedSubscriptionDictionary object:nil];
 }
 
@@ -155,4 +163,66 @@ NSString *const kIAPHelperUpdatedSubscriptionDictionary = @"kIAPHelperUpdatedSub
     [[SKPaymentQueue defaultQueue] addPayment:payment];
 }
 
++ (BOOL)shouldUpdateSubscriptionDictionary:(NSDictionary*)subscriptionDict {
+    // If no receipt - NO
+    NSURL *URL = [NSBundle mainBundle].appStoreReceiptURL;
+    NSString *path = URL.path;
+    const BOOL exists = [[NSFileManager defaultManager] fileExistsAtPath:path isDirectory:nil];
+    if (!exists) {
+        return NO;
+    }
+
+    // There's receipt but no subscriptionDictionary - YES
+    if(!subscriptionDict) {
+        return YES;
+    }
+
+    // Receipt file size has changed since last check - YES
+    NSNumber* appReceiptFileSize = nil;
+    [[NSBundle mainBundle].appStoreReceiptURL getResourceValue:&appReceiptFileSize forKey:NSURLFileSizeKey error:nil];
+    NSNumber* dictAppReceiptFileSize = subscriptionDict[kAppReceiptFileSize];
+    if ([appReceiptFileSize unsignedIntValue] != [dictAppReceiptFileSize unsignedIntValue]) {
+        return YES;
+    }
+
+    // If user has an active subscription for date - NO
+    if ([[self class] hasActiveSubscriptionForDate:[NSDate date] inDict:subscriptionDict]) {
+        return NO;
+    }
+
+    return NO;
+}
+
++ (NSDictionary*)subscriptionDictionary {
+    return (NSDictionary*)[[NSUserDefaults standardUserDefaults] dictionaryForKey:kSubscriptionDictionary];
+}
+
++ (void)storeSubscriptionDictionary:(NSDictionary*)dict {
+    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+    [userDefaults setObject:dict forKey:kSubscriptionDictionary];
+    [userDefaults synchronize];
+}
+
++ (BOOL)hasActiveSubscriptionForDate:(NSDate*)date {
+    NSDictionary* dict = [[self class] subscriptionDictionary];
+    return [[self class] hasActiveSubscriptionForDate:date inDict:dict];
+}
+
++ (BOOL)hasActiveSubscriptionForDate:(NSDate*)date inDict:(NSDictionary*)subscriptionDict {
+
+    if(!subscriptionDict) {
+        return NO;
+    }
+    // Allow some tolerance IRL.
+#if !DEBUG
+    date = [date dateByAdingTimeInterval:-SUBSCRIPTION_CHECK_GRACE_PERIOD_INTERVAL];
+#endif
+
+    NSDate *latestExpirationDate = [subscriptionDict objectForKey:kLatestExpirationDate];
+
+    if(latestExpirationDate && [date compare:latestExpirationDate] != NSOrderedDescending) {
+        return YES;
+    }
+    return NO;
+}
 @end

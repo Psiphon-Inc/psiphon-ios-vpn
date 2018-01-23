@@ -38,6 +38,11 @@
 
 #import <Foundation/Foundation.h>
 
+extern NSString *const kAppReceiptFileSize;
+extern NSString *const kLatestExpirationDate;
+extern NSString *const kProductId;
+
+
 @class RMAppReceiptIAP;
 
 /** Represents the app receipt.

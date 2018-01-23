@@ -19,7 +19,6 @@
 
 #import "IAPViewController.h"
 #import "IAPStoreHelper.h"
-#import "IAPSubscriptionHelper.h"
 #import "NSDateFormatter+RFC3339.h"
 #import "PsiphonDataSharedDB.h"
 #import "SharedConstants.h"
@@ -118,7 +117,7 @@ static NSString *iapCellID = @"IAPTableCellID";
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
     // Check if there's an active subscription and store metadata
-    NSDictionary *subscriptionDictionary = [[IAPSubscriptionHelper class] sharedSubscriptionDictionary];
+    NSDictionary *subscriptionDictionary = [[IAPStoreHelper class] subscriptionDictionary];
     self.latestSubscriptionExpirationDate = nil;
     self.hasActiveSubscription = NO;
     self.latestSubscriptionProduct = nil;
