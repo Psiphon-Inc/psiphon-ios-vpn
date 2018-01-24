@@ -19,17 +19,13 @@
 
 #import "IAPStoreHelper.h"
 #import "RMAppReceipt.h"
+#import "SharedConstants.h"
 
 
 NSString *const kIAPSKProductsRequestDidReceiveResponse = @"kIAPSKProductsRequestDidReceiveResponse";
 NSString *const kIAPSKProductsRequestDidFailWithError = @"kIAPSKProductsRequestDidFailWithError";
 NSString *const kIAPSKRequestRequestDidFinish = @"kIAPSKRequestRequestDidFinish";
 NSString *const kIAPHelperUpdatedSubscriptionDictionary = @"kIAPHelperUpdatedSubscriptionDictionary";
-
-// App receipt fields keys and constants
-NSString *const kAppReceiptFileSize = @"app_receipt_file_size";
-NSString *const kLatestExpirationDate = @"latest_expiration_date";
-NSString *const kProductId = @"product_id";
 
 NSString *const kSubscriptionDictionary = @"kSubscriptionDictionary";
 
@@ -213,10 +209,6 @@ NSString *const kSubscriptionDictionary = @"kSubscriptionDictionary";
     if(!subscriptionDict) {
         return NO;
     }
-    // Allow some tolerance IRL.
-#if !DEBUG
-    date = [date dateByAdingTimeInterval:-SUBSCRIPTION_CHECK_GRACE_PERIOD_INTERVAL];
-#endif
 
     NSDate *latestExpirationDate = [subscriptionDict objectForKey:kLatestExpirationDate];
 
