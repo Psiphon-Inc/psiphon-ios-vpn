@@ -26,11 +26,6 @@ extern NSString *const kIAPSKProductsRequestDidFailWithError;
 extern NSString *const kIAPSKRequestRequestDidFinish;
 extern NSString *const kIAPHelperUpdatedSubscriptionDictionary;
 
-extern NSString *const kAppReceiptFileSize;
-extern NSString *const kLatestExpirationDate;
-extern NSString *const kProductId;
-
-
 @interface IAPStoreHelper : NSObject
 
 @property (nonatomic,strong) NSArray *storeProducts;

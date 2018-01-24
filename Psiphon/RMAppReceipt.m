@@ -43,6 +43,8 @@
 #import <openssl/objects.h>
 #import <openssl/sha.h>
 #import <openssl/x509.h>
+#import "SharedConstants.h"
+
 
 // From https://developer.apple.com/library/ios/releasenotes/General/ValidateAppStoreReceipt/Chapters/ReceiptFields.html#//apple_ref/doc/uid/TP40010573-CH106-SW1
 NSInteger const RMAppReceiptASN1TypeBundleIdentifier = 2;
