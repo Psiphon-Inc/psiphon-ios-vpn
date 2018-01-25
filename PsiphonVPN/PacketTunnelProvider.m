@@ -329,11 +329,11 @@ typedef NS_ENUM(NSInteger, PsiphonSubscriptionState) {
 
             self.reasserting = FALSE;
 
-            if ([self startVPN]) {
-                [notifier post:@"NE.newHomepages"];
-            }
-
+            [self startVPN];
+            [notifier post:@"NE.newHomepages"];
+            
             [self trySubscriptionCheck];
+
             return TRUE;
         }
     }
