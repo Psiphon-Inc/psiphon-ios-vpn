@@ -778,6 +778,15 @@ typedef NS_ENUM(NSInteger, PsiphonSubscriptionState) {
 
     mutableConfigCopy[@"ClientVersion"] = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleVersion"];
 
+    // Authorizations
+    NSDictionary *authDict = [self authorizationDictionary];
+    if (authDict) {
+        NSString *authorizationString = authDict[kSignedAuthorization];
+        if ([authorizationString length]) {
+            mutableConfigCopy[@"Authorizations"] = [[NSArray alloc] initWithObjects:authorizationString, nil];
+        }
+    }
+
     // SponsorId override
     if(self.startTunnelSubscriptionState != PsiphonSubscriptionStateNotSubscribed) {
         NSDictionary *readOnlySubscriptionConfig = readOnly[@"subscriptionConfig"];
