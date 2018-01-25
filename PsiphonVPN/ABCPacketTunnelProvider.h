@@ -48,9 +48,6 @@ typedef NS_ENUM(NSInteger, NEStartMethod) {
 
 - (NSString *_Nonnull)sponsorId;
 
-@optional
-- (void)onVPNStarted;
-
 @end
 
 @interface ABCPacketTunnelProvider : NEPacketTunnelProvider
@@ -64,7 +61,6 @@ typedef NS_ENUM(NSInteger, NEStartMethod) {
  * @return TRUE if starting VPN for the first time, FALSE otherwise.
  */
 - (BOOL)startVPN;
-
 
 - (BOOL)isDeviceLocked;
 

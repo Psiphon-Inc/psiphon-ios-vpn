@@ -116,15 +116,7 @@
     if (vpnStartCompletionHandler) {
         vpnStartCompletionHandler(nil);
         vpnStartCompletionHandler = nil;
-        self.reasserting = FALSE;
-
         self.VPNStarted = TRUE;
-
-        // Call onVPNStarted asynchronously.
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [(id <ABCPacketTunnelProviderProtocol>) self onVPNStarted];
-        });
-
         return TRUE;
     }
     return FALSE;

@@ -199,10 +199,6 @@ typedef NS_ENUM(NSInteger, PsiphonSubscriptionState) {
     }];
 }
 
-- (void)onVPNStarted {
-    [self trySubscriptionCheck];
-}
-
 #pragma mark - Query methods
 
 - (BOOL)isNEZombie {
@@ -319,7 +315,7 @@ typedef NS_ENUM(NSInteger, PsiphonSubscriptionState) {
 /*!
  * @brief Calls startTunnelWithOptions completion handler
  * to start the tunnel, if the connection state is Connected.
- * @return TRUE if completion handler called, FALSE otherwise.
+ * @return TRUE if VPN is started, FALSE otherwise.
  */
 - (BOOL)tryStartVPN {
     // Checks if the container has made the decision
@@ -330,10 +326,15 @@ typedef NS_ENUM(NSInteger, PsiphonSubscriptionState) {
 
     if ([sharedDB getAppForegroundState] || self.startTunnelSubscriptionState != PsiphonSubscriptionStateNotSubscribed) {
         if ([psiphonTunnel getConnectionState] == PsiphonConnectionStateConnected) {
+
+            self.reasserting = FALSE;
+
             if ([self startVPN]) {
                 [notifier post:@"NE.newHomepages"];
-                return TRUE;
             }
+
+            [self trySubscriptionCheck];
+            return TRUE;
         }
     }
 
@@ -817,7 +818,6 @@ typedef NS_ENUM(NSInteger, PsiphonSubscriptionState) {
     LOG_DEBUG(@"onConnected");
     [notifier post:@"NE.tunnelConnected"];
     [self tryStartVPN];
-    [self trySubscriptionCheck];
 }
 
 - (void)onServerTimestamp:(NSString * _Nonnull)timestamp {
