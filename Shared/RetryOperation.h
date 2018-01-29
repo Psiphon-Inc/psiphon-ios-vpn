@@ -30,7 +30,7 @@
  *        be scheduled for execution, until the next time -execute method is called on this RetryOperation instance.
  * @return An instance of RetryOperation.
  */
-+ (instancetype)retryOperationForeverEvery:(int)interval
++ (instancetype _Nonnull)retryOperationForeverEvery:(int)interval
                                      block:(void (^_Nonnull)(void (^_Nonnull retryCallback)(NSError *_Nullable error)))block;
 
 /**
@@ -43,7 +43,7 @@
  *        be scheduled for execution, until the next time -execute method is called on this RetryOperation instance.
  * @return An instance of RetryOperation.
  */
-+ (instancetype)retryOperation:(int)retryCount
++ (instancetype _Nonnull)retryOperation:(int)retryCount
                  intervalInSec:(int)interval
                        backoff:(BOOL)backoff
                          block:(void (^_Nonnull)(void (^_Nonnull retryCallback)(NSError *_Nullable error)))block;

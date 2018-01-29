@@ -22,7 +22,9 @@
 #import "SharedConstants.h"
 #import "Logging.h"
 #import "FileUtils.h"
-#import "PacketTunnelProvider.h"
+
+
+NSString *_Nonnull const ABCPsiphonTunnelErrorDomain = @"ABCPsiphonTunnelErrorDomain";
 
 @interface ABCPacketTunnelProvider ()
 
@@ -101,9 +103,8 @@
 - (void)stopTunnelWithReason:(NEProviderStopReason)reason completionHandler:(void (^)(void))completionHandler {
     // Assumes stopTunnelWithReason called exactly once only after startTunnelWithOptions.completionHandler(nil)
     if (vpnStartCompletionHandler) {
-        // TODO: make a new error don't user PacketTunnelProvider error domain ... .
         vpnStartCompletionHandler([NSError
-          errorWithDomain:kPsiphonTunnelErrorDomain code:PsiphonTunnelErrorStoppedBeforeConnected userInfo:nil]);
+          errorWithDomain:ABCPsiphonTunnelErrorDomain code:PsiphonTunnelErrorStoppedBeforeConnected userInfo:nil]);
         vpnStartCompletionHandler = nil;
     }
 

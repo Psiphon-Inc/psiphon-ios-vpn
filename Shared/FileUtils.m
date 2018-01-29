@@ -106,12 +106,12 @@
             [fm fileExistsAtPath:file isDirectory:&isDir];
             NSDictionary *attrs = [fm attributesOfItemAtPath:file error:&err];
             if (err) {
-//            LOG_ERROR(@"filepath: %@, %@",file, err);
+                LOG_DEBUG_NOTICE(@"filepath: %@, %@",file, err);
             }
             [desc addObject:[NSString stringWithFormat:@"%@ : %@ : %@", [file lastPathComponent], (isDir) ? @"dir" : @"file", attrs[NSFileProtectionKey]]];
         }
 
-        LOG_ERROR(@"Resource (%@) Checking files at dir (%@)\n%@", resource, [dir lastPathComponent], desc);
+        LOG_DEBUG_NOTICE(@"Resource (%@) Checking files at dir (%@)\n%@", resource, [dir lastPathComponent], desc);
     }
 }
 #endif
