@@ -36,7 +36,11 @@
 #import <net/if.h>
 #import <stdatomic.h>
 
+
+NSString *_Nonnull const PsiphonTunnelErrorDomain = @"PsiphonTunnelErrorDomain";
+
 static NSDateFormatter *__rfc3339DateFormatter = nil;
+
 #define kAuthorizationDictionary        @"kAuthorizationDictionary"
 #define kSignedAuthorization            @"signed_authorization"
 #define kAuthorizationExpires           @"kAuthorizationExpires"
@@ -113,8 +117,9 @@ typedef NS_ENUM(NSInteger, PsiphonSubscriptionState) {
     return self;
 }
 
-
 - (void)startTunnelWithErrorHandler:(void (^_Nonnull)(NSError *_Nonnull error))errorHandler {
+
+    LOG_DEBUG_NOTICE();
 
     // VPN should only start if it is started from the container app directly,
     // OR if the user possibly has a valid subscription
@@ -141,7 +146,7 @@ typedef NS_ENUM(NSInteger, PsiphonSubscriptionState) {
 
             if (error != nil) {
                 LOG_ERROR(@"setTunnelNetworkSettings failed: %@", error);
-                errorHandler([[NSError alloc] initWithDomain:kPsiphonTunnelErrorDomain code:PsiphonTunnelErrorBadConfiguration userInfo:nil]);
+                errorHandler([[NSError alloc] initWithDomain:PsiphonTunnelErrorDomain code:PsiphonTunnelErrorBadConfiguration userInfo:nil]);
                 return;
             }
 
@@ -150,7 +155,7 @@ typedef NS_ENUM(NSInteger, PsiphonSubscriptionState) {
 
             if (!success) {
                 LOG_ERROR(@"tunnel start failed");
-                errorHandler([[NSError alloc] initWithDomain:kPsiphonTunnelErrorDomain code:PsiphonTunnelErrorInternalError userInfo:nil]);
+                errorHandler([[NSError alloc] initWithDomain:PsiphonTunnelErrorDomain code:PsiphonTunnelErrorInternalError userInfo:nil]);
                 return;
             }
 
@@ -177,6 +182,7 @@ typedef NS_ENUM(NSInteger, PsiphonSubscriptionState) {
 }
 
 - (void)stopTunnelWithReason:(NEProviderStopReason)reason {
+    LOG_DEBUG_NOTICE(@"tunnel stopped with error %lu", reason);
     [psiphonTunnel stop];
 }
 
@@ -188,15 +194,15 @@ typedef NS_ENUM(NSInteger, PsiphonSubscriptionState) {
     }
 }
 
+- (void)displayMessageAndKillExtension:(NSError *)error {
+    LOG_ERROR(@"killing extension error-domain:%@ error-code:%lu", error.domain, error.code);
 
-- (void)displayMessageAndKillExtension:(NSString*) alertMessage {
-    // TODO: test : does stopTunnelWithReason get called? What is the reason?
+    // Stop the Psiphon tunnel immediately.
     [psiphonTunnel stop];
 
-    [self displayMessage:alertMessage completionHandler:^(BOOL success) {
-       // Exit only after the user has clicked OK button.
-       // TODO: does stopTunnelWithReason get called? maybe create our own reasons and log them.
-       exit(1);
+    [self displayMessage:error.localizedDescription completionHandler:^(BOOL success) {
+        // Exit only after the user has clicked OK button.
+        exit(1);
     }];
 }
 
@@ -365,7 +371,11 @@ typedef NS_ENUM(NSInteger, PsiphonSubscriptionState) {
 
 - (void)trySubscriptionCheck {
 
+    LOG_DEBUG_NOTICE();
+
     if (self.VPNStarted && [psiphonTunnel getConnectionState] == PsiphonConnectionStateConnected) {
+
+        LOG_DEBUG_NOTICE(@"vpn started and tunnel is connected");
 
         if ([self isDeviceLocked] && self.NEStartMethod == NEStartMethodFromBoot) {
             // Device is started from boot, but before the user has unlocked it first.
@@ -379,18 +389,19 @@ typedef NS_ENUM(NSInteger, PsiphonSubscriptionState) {
 
         NSDictionary *authorizationDictionary = [self authorizationDictionary];
 
-
-        // TODO: does shouldUpdateSubscription.. return FALSE after the subscription dictionary has been updated.
         if ([self shouldUpdateAuthorization:authorizationDictionary]) {
             // Do remote check.
+            LOG_DEBUG_NOTICE(@"will update authorization dictionary from remote");
             [self updateAuthorizationDictionaryFromRemote];
 
         } else {
             // Check authorization.
 
             if ([self hasActiveAuthorizationForDate:[NSDate date] inDict:authorizationDictionary]) {
+                LOG_DEBUG_NOTICE(@"device has active authorization");
 
                 if (self.startTunnelSubscriptionState != PsiphonSubscriptionStateSubscribed) {
+                    LOG_DEBUG_NOTICE(@"tunnel subscription state changed restarting tunnel");
                     self.startTunnelSubscriptionState = PsiphonSubscriptionStateSubscribed;
                     [self restartTunnel];
                 }
@@ -403,14 +414,18 @@ typedef NS_ENUM(NSInteger, PsiphonSubscriptionState) {
 
             } else {
 
+                LOG_DEBUG_NOTICE(@"device does not have active authorization");
+
                 if (self.NEStartMethod == NEStartMethodFromContainer) {
 
                     if (self.startTunnelSubscriptionState != PsiphonSubscriptionStateNotSubscribed) {
+                        LOG_DEBUG_NOTICE(@"tunnel started from container restarting tunnel");
                         self.startTunnelSubscriptionState = PsiphonSubscriptionStateNotSubscribed;
                         [self restartTunnel];
                     }
 
                 } else {
+                    LOG_DEBUG_NOTICE(@"tunnel not started from the container killing with grace");
                     [self startGracePeriod];
                 }
             }
@@ -448,9 +463,10 @@ typedef NS_ENUM(NSInteger, PsiphonSubscriptionState) {
 // defer subscription check to a later time.
 - (void)deferSubscriptionCheck {
     // Checks every subscriptionDeferralIntervalInSec seconds if the subscription receipt is valid.
-    // If cannot read subscription, defer again.
-    // If can read subscription, and check fails, stop the tunnel.
-    // If the subscription check passes: call startSubscriptionCheckTimer.
+    // If cannot read subscription receipt, defer again.
+    // If can read subscription receipt, try subscription check.
+
+    LOG_DEBUG_NOTICE(@"defer subscription check");
 
     #if DEBUG
     const int subscriptionDeferralIntervalInSec = 5; // 5 seconds.
@@ -467,8 +483,10 @@ typedef NS_ENUM(NSInteger, PsiphonSubscriptionState) {
               if ([self isDeviceLocked]) {
                   // Device is still not unlocked since boot.
                   // Defer subscription check again.
+                  LOG_DEBUG_NOTICE(@"device still locked deferring again");
                   retryCallback([[NSError alloc] init]);
               } else {
+                  LOG_DEBUG_NOTICE(@"device unlocked checking subscription ");
                   [self trySubscriptionCheck];
                   retryCallback(nil);
               }
@@ -480,6 +498,8 @@ typedef NS_ENUM(NSInteger, PsiphonSubscriptionState) {
 
 - (void)startSubscriptionCheckTimer {
 
+    LOG_DEBUG_NOTICE();
+
     #if DEBUG
     const int subscriptionCheckIntervalInSec = 5; // 5 seconds.
     #else
@@ -489,7 +509,6 @@ typedef NS_ENUM(NSInteger, PsiphonSubscriptionState) {
     if (self.startTunnelSubscriptionState == PsiphonSubscriptionStateNotSubscribed) {
         return;
     }
-
 
     static RetryOperation *operation = nil;
 
@@ -546,17 +565,26 @@ typedef NS_ENUM(NSInteger, PsiphonSubscriptionState) {
 
 - (void)killExtensionForExpiredSubscription {
     NSString *alertMessage = NSLocalizedStringWithDefaultValue(@"TUNNEL_KILLED", nil, [NSBundle mainBundle], @"Psiphon has been stopped automatically since your subscription has expired.", @"Alert message informing user that Psiphon has been stopped automatically since the subscription has expired. Do not translate 'Psiphon'.");
-    [self displayMessageAndKillExtension:alertMessage];
+    NSError *error = [NSError errorWithDomain:PsiphonTunnelErrorDomain
+                                         code:PsiphonTunnelErrorSubscriptionExpired
+                                     userInfo:@{NSLocalizedDescriptionKey: alertMessage}];
+    [self displayMessageAndKillExtension:error];
 }
 
 - (void)killExtensionForBadClock {
     NSString *alertMessage = NSLocalizedStringWithDefaultValue(@"BAD_CLOCK_ALERT_MESSAGE", nil, [NSBundle mainBundle], @"We've detected the time on your device is out of sync with your time zone. Please update your clock settings and restart the app", @"Alert message informing user that the device clock needs to be updated with current time");
-    [self displayMessageAndKillExtension:alertMessage];
+    NSError *error = [NSError errorWithDomain:PsiphonTunnelErrorDomain
+                                         code:PsiphonTunnelErrorSubscriptionBadClock
+                                     userInfo:@{NSLocalizedDescriptionKey: alertMessage}];
+    [self displayMessageAndKillExtension:error];
 }
 
 - (void)killExtensionForInvalidReceipt {
     NSString *alertMessage = NSLocalizedStringWithDefaultValue(@"BAD_RECEIPT_ALERT_MESSAGE", nil, [NSBundle mainBundle], @"Your subscription receipt can not be verified, please refresh it and try again.", @"Alert message informing user that subscription receipt can not be verified");
-    [self displayMessageAndKillExtension:alertMessage];
+    NSError *error = [NSError errorWithDomain:PsiphonTunnelErrorDomain
+                                         code:PsiphonTunnelErrorSubscriptionInvalidReceipt
+                                     userInfo:@{NSLocalizedDescriptionKey: alertMessage}];
+    [self displayMessageAndKillExtension:error];
 }
 
 - (void)updateAuthorizationDictionaryFromRemote {
@@ -635,6 +663,8 @@ typedef NS_ENUM(NSInteger, PsiphonSubscriptionState) {
                         }
                     }
 
+                    LOG_DEBUG_NOTICE(@"fetched authorization from remote successfully");
+
                     // Operation finished successfully.
                     retryCallback(nil);
 
@@ -651,8 +681,9 @@ typedef NS_ENUM(NSInteger, PsiphonSubscriptionState) {
                     }
                 }
 
-                // TODO: do we want this code to run in all cases.
-                if (![weakSelf hasActiveAuthorizationForDate:[NSDate date] inDict:[weakSelf authorizationDictionary]] && weakSelf.startTunnelSubscriptionState != PsiphonSubscriptionStateNotSubscribed) {
+                if (![weakSelf hasActiveAuthorizationForDate:[NSDate date] inDict:[weakSelf authorizationDictionary]]
+                  && weakSelf.startTunnelSubscriptionState != PsiphonSubscriptionStateNotSubscribed) {
+                    LOG_DEBUG_NOTICE(@"device has no active authorization but subscription state is subscribed or maybe subscribed");
                     [weakSelf trySubscriptionCheck];
                 }
             }];
@@ -663,7 +694,7 @@ typedef NS_ENUM(NSInteger, PsiphonSubscriptionState) {
 }
 
 - (NSDictionary*)authorizationDictionary {
-    return (NSDictionary*)[[NSUserDefaults standardUserDefaults] dictionaryForKey:kAuthorizationDictionary];
+    return [[NSUserDefaults standardUserDefaults] dictionaryForKey:kAuthorizationDictionary];
 }
 
 - (void)storeAuthorizationDictionary:(NSDictionary*)dict {
@@ -672,38 +703,43 @@ typedef NS_ENUM(NSInteger, PsiphonSubscriptionState) {
     [userDefaults synchronize];
 }
 
-- (BOOL) shouldUpdateAuthorization:(NSDictionary*)dict {
+- (BOOL)shouldUpdateAuthorization:(NSDictionary*)dict {
     // If no receipt - NO
     NSURL *URL = [NSBundle mainBundle].appStoreReceiptURL;
     NSString *path = URL.path;
     const BOOL exists = [[NSFileManager defaultManager] fileExistsAtPath:path isDirectory:nil];
     if (!exists) {
+        LOG_DEBUG_NOTICE(@"receipt does not exist");
         return NO;
     }
 
     // There's receipt but no authorization dictionary - YES
     if(!dict) {
+        LOG_DEBUG_NOTICE(@"receipt exist by no authorization dictionary");
         return YES;
     }
 
     // Receipt file size has changed since last check - YES
-    NSNumber* appReceiptFileSize = nil;
+    NSNumber *appReceiptFileSize = nil;
     [[NSBundle mainBundle].appStoreReceiptURL getResourceValue:&appReceiptFileSize forKey:NSURLFileSizeKey error:nil];
-    NSNumber* dictAppReceiptFileSize = dict[kAppReceiptFileSize];
+    NSNumber *dictAppReceiptFileSize = dict[kAppReceiptFileSize];
     if ([appReceiptFileSize unsignedIntValue] != [dictAppReceiptFileSize unsignedIntValue]) {
+        LOG_DEBUG_NOTICE(@"receipt file size changed since last check");
         return YES;
     }
 
     // If user has an active authorization for date - NO
     if ([self hasActiveAuthorizationForDate:[NSDate date] inDict:dict]) {
+        LOG_DEBUG_NOTICE(@"device has active authorization for date");
         return NO;
     }
 
     // else we have an expired subscription
     NSArray *pending_renewal_info = dict[kPendingRenewalInfo];
 
-    // If expired and pending renewal info is missing - we are
+    // If expired and pending renewal info is missing - YES
     if(!pending_renewal_info) {
+        LOG_DEBUG_NOTICE(@"pending renewal info is missing");
         return YES;
     }
 
@@ -711,10 +747,12 @@ typedef NS_ENUM(NSInteger, PsiphonSubscriptionState) {
     if([pending_renewal_info count] == 1 && [pending_renewal_info[0] isKindOfClass:[NSDictionary class]]) {
         NSString *auto_renew_status = [pending_renewal_info[0] objectForKey:kAutoRenewStatus];
         if (auto_renew_status && [auto_renew_status isEqualToString:@"1"]) {
+            LOG_DEBUG_NOTICE(@"subscription expired but user's last known intention is to auto-renew");
             return YES;
         }
     }
 
+    LOG_DEBUG_NOTICE(@"authorization token update not needed");
     return NO;
 }
 
@@ -770,7 +808,7 @@ typedef NS_ENUM(NSInteger, PsiphonSubscriptionState) {
 
     NSMutableDictionary *mutableConfigCopy = [readOnly mutableCopy];
 
-    // TODO: apply mutations to config here
+    // Applying mutations to config
     NSNumber *fd = (NSNumber*)[[self packetFlow] valueForKeyPath:@"socket.fileDescriptor"];
 
     // In case of duplicate keys, value from psiphonConfigUserDefaults

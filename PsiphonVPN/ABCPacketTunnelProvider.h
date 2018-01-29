@@ -17,8 +17,20 @@
  *
  */
 
+
 #import <NetworkExtension/NEPacketTunnelProvider.h>
 #import "NEBridge.h"
+
+
+// ABCPacketTunnelProvider Errors
+FOUNDATION_EXTERN NSString *_Nonnull const ABCPsiphonTunnelErrorDomain;
+
+typedef NS_ERROR_ENUM(ABCPsiphonTunnelErrorDomain, ABCPsiphonTunnelErrorCode) {
+    PsiphonTunnelErrorBadConfiguration = 1,
+    PsiphonTunnelErrorInternalError = 2,
+    PsiphonTunnelErrorStoppedBeforeConnected = 3,
+};
+
 
 // Name of the file in shared container used to test if the extension has started,
 // while the device is in locked state from boot.
@@ -32,6 +44,7 @@ typedef NS_ENUM(NSInteger, NEStartMethod) {
     /*! @const NEStartMethodOther The Network Extension process was either started by "Connect On Demand" rules, or by the user from system settings. */
     NEStartMethodOther,
 };
+
 
 @protocol ABCPacketTunnelProviderProtocol
 
@@ -49,6 +62,7 @@ typedef NS_ENUM(NSInteger, NEStartMethod) {
 - (NSString *_Nonnull)sponsorId;
 
 @end
+
 
 @interface ABCPacketTunnelProvider : NEPacketTunnelProvider
 

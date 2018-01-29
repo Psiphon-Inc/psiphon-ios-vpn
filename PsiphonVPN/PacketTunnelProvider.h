@@ -20,12 +20,12 @@
 #import "ABCPacketTunnelProvider.h"
 
 // PsiphonTunnel Errors
-#define kPsiphonTunnelErrorDomain @"psiphonTunnelErrorSettingsDomain"
+FOUNDATION_EXTERN NSString *_Nonnull const PsiphonTunnelErrorDomain;
 
-typedef NS_ENUM(NSInteger, PacketTunnelProviderErrorCode) {
-    PsiphonTunnelErrorBadConfiguration = 1,
-    PsiphonTunnelErrorInternalError = 2,
-    PsiphonTunnelErrorStoppedBeforeConnected = 3,
+typedef NS_ERROR_ENUM(PsiphonTunnelErrorDomain, PacketTunnelProviderErrorCode) {
+    PsiphonTunnelErrorSubscriptionExpired = 1,
+    PsiphonTunnelErrorSubscriptionBadClock = 2,
+    PsiphonTunnelErrorSubscriptionInvalidReceipt = 3,
 };
 
 @interface PacketTunnelProvider : ABCPacketTunnelProvider <ABCPacketTunnelProviderProtocol>
