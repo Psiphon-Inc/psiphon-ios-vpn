@@ -19,41 +19,58 @@
 
 #import "RetryOperation.h"
 
+#define RETRY_FOREVER -1
+
 @interface RetryOperation ()
 
-@property (nonatomic) void (^_Nonnull block)(void (^_Nonnull) (NSError *_Nullable error));
+@property (nonatomic, nonnull) void (^ onNextBlock)(void (^_Nonnull) (NSError *_Nullable error));
+@property (nonatomic, nullable) void (^ onFinishedBlock)(NSError *_Nullable lastError);
 @property (nonatomic) int retryCount;
-@property (nonatomic) int retryInterval;
+@property (nonatomic) NSTimeInterval retryInterval;
 @property (nonatomic) BOOL backoff;
 
 @end
 
 @implementation RetryOperation {
     int currentRetryCount;
-    int currentTimeInterval;
+    NSTimeInterval currentTimeInterval;
     BOOL isRunning;
     BOOL isCancelled;
 }
 
 #pragma mark - Public methods
 
-+ (instancetype)retryOperationForeverEvery:(int)interval
-                                     block:(void (^_Nonnull)(void (^_Nonnull retryCallback)(NSError *_Nullable error)))block {
-
-    return [RetryOperation retryOperation:-1
-                            intervalInSec:interval
-                                  backoff:FALSE
-                                    block:block];
++ (instancetype)retryOperationForeverEvery:(NSTimeInterval)interval
+                                    onNext:(void (^_Nonnull)(void (^_Nonnull retryCallback)(NSError *_Nullable error)))onNextBlock
+{
+    return [RetryOperation retryOperation:RETRY_FOREVER
+                                 interval:interval
+                                  backoff:FALSE onNext:onNextBlock
+                               onFinished:nil];
 }
 
 + (instancetype)retryOperation:(int)retryCount
-                 intervalInSec:(int)interval
+                      interval:(NSTimeInterval)interval
                        backoff:(BOOL)backoff
-                         block:(void (^_Nonnull)(void (^_Nonnull retryCallback)(NSError *_Nullable error)))block {
+                        onNext:(void (^ _Nonnull)(void (^_Nonnull retryCallback)(NSError *_Nullable error)))onNextBlock
+{
+    return [RetryOperation retryOperation:retryCount
+                                 interval:interval
+                                  backoff:backoff
+                                   onNext:onNextBlock
+                               onFinished:nil];
+}
 
++ (instancetype)retryOperation:(int)retryCount
+                      interval:(NSTimeInterval)interval
+                       backoff:(BOOL)backoff
+                        onNext:(void (^ _Nonnull)(void (^_Nonnull retryCallback)(NSError *_Nullable error)))onNextBlock
+                    onFinished:(void (^_Nullable)(NSError *_Nullable lastError))onFinishedBlock
+{
     RetryOperation *instance = [[RetryOperation alloc] init];
     if (instance) {
-        instance.block = block;
+        instance.onNextBlock = onNextBlock;
+        instance.onFinishedBlock = onFinishedBlock;
         instance.retryCount = retryCount;
         instance.retryInterval = interval;
         instance.backoff = backoff;
@@ -70,7 +87,7 @@
 - (void)execute {
     // Only schedule operation if it is not already running.
     if (!isRunning) {
-        [self runBlock];
+        [self runOnNextBlock];
     }
 }
 
@@ -83,35 +100,48 @@
     isCancelled = FALSE;
 }
 
-- (void)scheduleBlock {
+- (void)scheduleOnNextBlock:(NSError *_Nullable)lastError {
 
-    // Do not schedule if operation is cancelled.
-    if (isCancelled) {
-        [self resetState];
-        return;
-    }
-
-    if (self.retryCount == -1 || currentRetryCount < self.retryCount) {
+    if (self.retryCount == RETRY_FOREVER || currentRetryCount < self.retryCount) {
 
         // Operation is running, and block will execute soon.
         isRunning = TRUE;
 
         dispatch_after(
-          dispatch_time(DISPATCH_TIME_NOW, currentTimeInterval * NSEC_PER_SEC),
+          dispatch_time(DISPATCH_TIME_NOW, lround(currentTimeInterval * NSEC_PER_SEC)),
           dispatch_get_main_queue(), ^{
-              [self runBlock];
+              [self runOnNextBlock];
           });
 
-        currentRetryCount += 1;
+        // Updates counter if not running forever.
+        if (self.retryCount != RETRY_FOREVER) {
+            currentRetryCount += 1;
+        }
         // If flag set, do exponential backoff.
         if (self.backoff) {
             currentTimeInterval *= 2;
         }
 
+    } else if (currentRetryCount == self.retryCount) {
+        // Finished retrying, calling onFinished block.
+        [self scheduleOnFinishedBlock:lastError];
     }
 }
 
-- (void)runBlock {
+// scheduleOnFinishedBlock executed the onFinished block immediately (interval time is ignored).
+- (void)scheduleOnFinishedBlock:(NSError *_Nullable)lastError {
+    if (self.onFinishedBlock) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            self.onFinishedBlock(lastError);
+            [self resetState];
+        });
+    } else {
+        // There is no onFinishedBlock to call, just reset the state.
+        [self resetState];
+    }
+}
+
+- (void)runOnNextBlock {
 
     isRunning = TRUE;
 
@@ -121,13 +151,19 @@
         return;
     }
 
-    self.block(^(NSError *_Nullable error) {
+    self.onNextBlock(^(NSError *_Nullable error) {
+        // Do not schedule if operation is cancelled.
+        if (isCancelled) {
+            [self resetState];
+            return;
+        }
+
         if (error) {
             // There was an error, schedule the block to be executed again.
-            [self scheduleBlock];
+            [self scheduleOnNextBlock:error];
         } else {
-            // Done, reset state.
-            [self resetState];
+            // Done, schedule onFinished block.
+            [self scheduleOnFinishedBlock:nil];
         }
     });
 }

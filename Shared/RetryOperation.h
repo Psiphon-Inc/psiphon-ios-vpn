@@ -30,23 +30,38 @@
  *        be scheduled for execution, until the next time -execute method is called on this RetryOperation instance.
  * @return An instance of RetryOperation.
  */
-+ (instancetype _Nonnull)retryOperationForeverEvery:(int)interval
-                                     block:(void (^_Nonnull)(void (^_Nonnull retryCallback)(NSError *_Nullable error)))block;
++ (instancetype _Nonnull)retryOperationForeverEvery:(NSTimeInterval)interval
+                                    onNext:(void (^_Nonnull)(void (^_Nonnull retryCallback)(NSError *_Nullable error)))onNextBlock;
 
 /**
- * Creates a RetryOperation that accepts a block to execute.
- * @param retryCount Number of times to retry executing the block. Pass 0 for no retries.
- * @param interval Time interval in seconds between the retries.
- * @param backoff Exponentially backoff on retries.
- * @param block A block to execute. If block calls retryCallback with an error, then the next execution of the block
- *        is immediately scheduled (using GCD). If the block calls retryCallback with nil the block will no longer
- *        be scheduled for execution, until the next time -execute method is called on this RetryOperation instance.
+ * Convenience method, same as retryOperation:interval:backoff:onNext:onFinished: but without the onFinished block;
  * @return An instance of RetryOperation.
  */
 + (instancetype _Nonnull)retryOperation:(int)retryCount
-                 intervalInSec:(int)interval
+                      interval:(NSTimeInterval)interval
                        backoff:(BOOL)backoff
-                         block:(void (^_Nonnull)(void (^_Nonnull retryCallback)(NSError *_Nullable error)))block;
+                        onNext:(void (^ _Nonnull)(void (^_Nonnull retryCallback)(NSError *_Nullable error)))onNextBlock;
+
+/**
+ * Creates a RetryOperation that accepts a block to execute.
+ * @param retryCount Number of times (greater or equal to 0) to retry executing the block. Pass 0 for no retries.
+ * @param interval Time interval in seconds between the retries.
+ * @param backoff Exponentially backoff on retries.
+ * @param onNextBlock A block to execute after -execute method is called.
+ *        If the block calls retryCallback with an error, then the next execution of the block
+ *        is immediately scheduled (using GCD). If the block calls retryCallback with nil the block will no longer
+ *        be scheduled for execution, until the next time -execute method is called on this RetryOperation instance.
+ * @param onFinishedBlock An optional block, scheduled to be executed on the main thread immediately after
+ *        the last time onNext block is executed.
+ *        This block is always executed, unless the RetryOperation instance is cancelled.
+ *        If the last call to onNext passed an error, that error will be passed to the onCompleted block.
+ * @return An instance of RetryOperation.
+ */
++ (instancetype _Nonnull)retryOperation:(int)retryCount
+                      interval:(NSTimeInterval)interval
+                       backoff:(BOOL)backoff
+                        onNext:(void (^ _Nonnull)(void (^_Nonnull retryCallback)(NSError *_Nullable error)))onNextBlock
+                    onFinished:(void (^_Nullable)(NSError *_Nullable lastError))onFinishedBlock;
 
 /**
  * Cancels the next scheduled execution of the block.
