@@ -21,8 +21,4 @@
 #import <UIKit/UIKit.h>
 
 @interface LaunchScreenViewController : UIViewController
-
-@property (strong, nonatomic) UIProgressView *progressView;
-@property (strong, nonatomic) UILabel *secondLabel;
-
 @end

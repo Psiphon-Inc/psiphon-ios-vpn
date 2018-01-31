@@ -19,54 +19,92 @@
 
 #import <Foundation/Foundation.h>
 
-// NSNotification name for VPN status change notifications.
-#define kVPNStatusChangeNotificationName "VPNStatusChange"
+/**
+ * NSNotification name for VPN status change notifications.
+ * Notification with this name might be posted many times,
+ * without an actual change to the VPN status.
+ */
+#define kVPNStatusChangeNotificationName @"VPNStatusChange"
 
-// VPNManager error codes
-#define kVPNManagerErrorDomain @"VPNManagerErrorDomain"
+/**
+ * NSNotification name for VPN start failures.
+ */
+#define kVPNStartFailure @"VPNStartFailure"
 
-typedef NS_ENUM(NSInteger, VPNManagerErrorCode) {
-    VPNManagerErrorLoadConfigsFailed = 1,
-    VPNManagerErrorTooManyConfigsFounds = 2,
-    VPNManagerErrorUserDeniedConfigInstall = 3,
-    VPNManagerErrorNEStartFailed = 4,
+
+static NSString *_Nonnull const VPNManagerErrorDomain = @"VPNManagerErrorDomain";
+
+/**
+ * @typedef VPNManagerErrorCode
+ * @abstract VPNManager error codes
+ */
+typedef NS_ERROR_ENUM(VPNManagerErrorDomain, VPNManagerStartErrorCode) {
+    /*! @const VPNManagerStartErrorConfigLoadFailed Failed to load VPN configurations. */
+    VPNManagerStartErrorConfigLoadFailed = 1,
+    /*! @const VPNManagerStartErrorTooManyConfigsFounds More than expected VPN configurations found. */
+    VPNManagerStartErrorTooManyConfigsFounds = 2,
+    /*! @const VPNManagerStartErrorConfigSaveFailed Failed to save VPN configuration. */
+    VPNManagerStartErrorConfigSaveFailed = 3,
+    /*! @const VPNManagerStartErrorNEStartFailed Failed to start VPN. */
+    VPNManagerStartErrorNEStartFailed = 4,
 };
 
-#define kVPNManagerQueryErrorDomain @"VPNManagerQueryErrorDomain"
+#define VPNQueryErrorUserInfoQueryKey @"query"
 
-typedef NS_ENUM(NSInteger, VPNManagerQueryErrorCode) {
-    VPNManagerQueryErrorSendFailed = 1,
+static NSString *_Nonnull const VPNQueryErrorDomain = @"VPNQueryErrorDomain";
+
+/**
+ * @typedef VPNQueryErrorCode
+ * @abstract VPN query error codes
+ */
+typedef NS_ERROR_ENUM(VPNQueryErrorDomain, VPNQueryErrorCode) {
+    VPNQueryErrorSendFailed = 1,
+    VPNQueryErrorNilResponse = 2,
 };
 
+/**
+ * @typedef VPNStatus
+ * @abstract VPN status codes
+ *
+ * VPNManager status is a superset of NEVPNConnection status codes.
+ */
 typedef NS_ENUM(NSInteger, VPNStatus) {
+    /*! @const VPNStatusInvalid The VPN is not configured or unexpected vpn state. */
     VPNStatusInvalid = 0,
     /*! @const VPNStatusDisconnected No network extension process is running (When restarting VPNManager status will be VPNStatusRestarting). */
     VPNStatusDisconnected = 1,
-    /*! @const VPNStatusConnecting network extension process is running, and the tunnel has started (tunnel could be in connecting or connected state). */
+    /*! @const VPNStatusConnecting Network extension process is running, and the tunnel has started (tunnel could be in connecting or connected state). */
     VPNStatusConnecting = 2,
-    /*! @const VPNStatusConnected network extension process is running and the tunnel is connected. */
+    /*! @const VPNStatusConnected Network extension process is running and the tunnel is connected. */
     VPNStatusConnected = 3,
-    /*! @const VPNStatusReasserting network extension process is running, and the tunnel is reconnecting or has already connected. */
+    /*! @const VPNStatusReasserting Network extension process is running, and the tunnel is reconnecting or has already connected. */
     VPNStatusReasserting = 4,
-    /*! @const VPNStatusDisconnecting tunnel and the network extension process are being stopped.*/
+    /*! @const VPNStatusDisconnecting The tunnel and the network extension process are being stopped. */
     VPNStatusDisconnecting = 5,
     /*! @const VPNStatusRestarting Stopping previous network extension process, and starting a new one. */
     VPNStatusRestarting = 6,
 };
 
+/**
+ * @interface VPNManager
+ * @discussion The VPNManager class is the single point of interaction with the Network Extension.
+ * @attention VPNManager is not thread-safe.
+ */
 @interface VPNManager : NSObject
 
+// TODO: remove UI flags and elements from VPNManager
 @property (nonatomic) BOOL startStopButtonPressed;
 
-+ (instancetype _Nullable )sharedInstance;
++ (instancetype _Nullable)sharedInstance;
 
 /**
- * Starts the network extension process and also the tunnel.
+ * Starts the Network Extension process and also the tunnel.
  * VPN will not start until startVPN is called.
- * @param completionHandler If no errors occurred, then error is set to nil.
- *        Error code is set to one of VPNManagerError* errors.
+ *
+ * @details To listen for errors starting Network Extension, interested
+ *          parties should observe kVPNStartFailure NSNotification.
  */
-- (void)startTunnelWithCompletionHandler:(nullable void (^)(NSError * _Nullable error))completionHandler;
+- (void)startTunnel;
 
 /**
  * Signals the network extension to start the VPN.

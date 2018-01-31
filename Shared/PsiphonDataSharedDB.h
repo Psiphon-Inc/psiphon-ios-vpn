@@ -43,7 +43,11 @@
 #endif
 
 - (BOOL)insertNewEgressRegions:(NSArray<NSString *> *)regions;
+#ifndef TARGET_IS_EXTENSION
 - (NSArray<NSString *> *)getAllEgressRegions;
+- (void)insertNewEmbeddedEgressRegions:(NSArray<NSString *> *)regions;
+- (NSArray<NSString *> *)getAllEmbeddedEgressRegions;
+#endif
 
 - (NSString *)homepageNoticesPath;
 - (NSString *)rotatingLogNoticesPath;
@@ -59,7 +63,4 @@
 - (void)updateServerTimestamp:(NSString*)timestamp;
 - (NSString*)getServerTimestamp;
 
-// Subscription dictionary
-- (void)updateSubscriptionDictionary:(NSDictionary*)iapDictionary;
-- (NSDictionary*)getSubscriptionDictionary;
 @end

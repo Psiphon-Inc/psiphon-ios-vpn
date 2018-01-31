@@ -56,6 +56,7 @@
 				<string>az</string>
 				<string>be</string>
 				<string>bo</string>
+				<string>bn</string>
 				<string>de</string>
 				<string>el</string>
 				<string>es</string>
@@ -120,6 +121,10 @@
 				<dict>
 					<key>Title</key>
 					<string>Беларуская</string>
+				</dict>
+				<dict>
+					<key>Title</key>
+					<string>বাংলা</string>
 				</dict>
 				<dict>
 					<key>Title</key>

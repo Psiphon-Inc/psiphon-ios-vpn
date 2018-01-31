@@ -30,14 +30,17 @@
 #define EGRESS_REGIONS_KEY @"egress_regions"
 #define APP_FOREGROUND_KEY @"app_foreground"
 #define SERVER_TIMESTAMP_KEY @"server_timestamp"
-#define SPONSOR_ID_KEY @"sponsor_id"
-#define IAP_SUBSCRIPTION_DICTIONARY_KEY @"iap_subscription_dictionary"
 
+#ifndef TARGET_IS_EXTENSION
+#define EMBEDDED_EGRESS_REGIONS_KEY @"embedded_server_entries_egress_regions"
+#endif
 
 @implementation Homepage
 @end
 
 @implementation PsiphonDataSharedDB {
+
+    // NSUserDefaults objects are thread-safe.
     NSUserDefaults *sharedDefaults;
 
     NSString *appGroupIdentifier;
@@ -49,7 +52,6 @@
 /*!
  * @brief Don't share an instance across threads.
  * @param identifier
- * @return
  */
 - (id)initForAppGroupIdentifier:(NSString*)identifier {
     self = [super init];
@@ -278,12 +280,60 @@
     return [sharedDefaults synchronize];
 }
 
+#ifndef TARGET_IS_EXTENSION
+
 /*!
+ * @brief Merges egress regions in shared and standard user defaults.
+ * Egress regions in shared user defaults are updated by the extension.
+ * Egress regions in standard user defaults are updated by parsing egress
+ * regions in embedded server entries.
  * @return NSArray of region codes.
  */
 - (NSArray<NSString *> *)getAllEgressRegions {
-    return [sharedDefaults objectForKey:EGRESS_REGIONS_KEY];
+    NSMutableOrderedSet *egressRegions = [[NSMutableOrderedSet alloc] init];
+
+    id sharedDBEgressRegions = [sharedDefaults objectForKey:EGRESS_REGIONS_KEY];
+    if (sharedDBEgressRegions == nil) {
+        LOG_DEBUG(@"No egress regions found in shared user defaults.");
+    } else if ([sharedDBEgressRegions isKindOfClass:[NSArray<NSString*> class]]) {
+        [egressRegions addObjectsFromArray:(NSArray<NSString*>*)sharedDBEgressRegions];
+    } else {
+        LOG_ERROR(@"Error egress regions for key (%@) in shared defaults are not NSArray<NSString*>* but %@", EGRESS_REGIONS_KEY, [sharedDBEgressRegions class]);
+    }
+
+    id embeddedEgressRegions = [[NSUserDefaults standardUserDefaults] objectForKey:EMBEDDED_EGRESS_REGIONS_KEY];
+    if (embeddedEgressRegions == nil) {
+        LOG_DEBUG(@"No embedded egress regions found in standard user defaults.");
+    } else if ([embeddedEgressRegions isKindOfClass:[NSArray<NSString*> class]]) {
+        [egressRegions addObjectsFromArray:(NSArray<NSString*>*)embeddedEgressRegions];
+    } else {
+        LOG_ERROR(@"Error egress regions for key (%@) in standard user defaults are not NSArray<NSString*>* but %@", EMBEDDED_EGRESS_REGIONS_KEY, [embeddedEgressRegions class]);
+    }
+
+    if ([egressRegions count] == 0) {
+        LOG_ERROR(@"No egress regions found in shared or standard user defaults.");
+        return nil;
+    }
+
+    return [egressRegions array];
 }
+
+/*!
+ * @brief Sets set of egress regions in standard NSUserDefaults
+ * @param regions
+
+ */
+- (void)insertNewEmbeddedEgressRegions:(NSArray<NSString *> *)regions {
+    [[NSUserDefaults standardUserDefaults] setObject:regions forKey:EMBEDDED_EGRESS_REGIONS_KEY];
+}
+
+/*!
+ * @return NSArray of region codes.
+ */
+- (NSArray<NSString *> *)getAllEmbeddedEgressRegions {
+    return [[NSUserDefaults standardUserDefaults] objectForKey:EMBEDDED_EGRESS_REGIONS_KEY];
+}
+#endif
 
 #pragma mark - Logging
 
@@ -394,28 +444,6 @@
  */
 - (NSString*)getServerTimestamp {
 	return [sharedDefaults stringForKey:SERVER_TIMESTAMP_KEY];
-}
-
-#pragma mark - Subscription dictionary methods
-
-/**
- * @brief Sets subscription data dictionary in shared NSSUserDefaults dictionary.
- * @param subscription dictionary from the app receipt
- */
-- (void)updateSubscriptionDictionary:(NSDictionary*)iapDict {
-    [sharedDefaults setObject:iapDict forKey:IAP_SUBSCRIPTION_DICTIONARY_KEY];
-    [sharedDefaults synchronize];
-}
-
-/**
- * @brief Returns previously persisted subscription dictionary from the shared NSUserDefaults
- */
-- (NSDictionary*)getSubscriptionDictionary {
-   id dict = [sharedDefaults objectForKey:IAP_SUBSCRIPTION_DICTIONARY_KEY];
-    if ([dict isKindOfClass:[NSDictionary class]]) {
-        return dict;
-    }
-    return nil;
 }
 
 @end

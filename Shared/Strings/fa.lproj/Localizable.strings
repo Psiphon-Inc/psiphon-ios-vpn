@@ -1,5 +1,5 @@
-/*[UNTRANSLATED] Active subscription detail text, example: Expires on 2017-01-01, renewal cost is $3.99 */
-"ACTIVE_SUBSCRIPTION_DETAIL_TEXT" = "Expires on %1$@, renewal cost is %2$@";
+/* Active subscription detail text, example: Expires on 2017-01-01, renewal cost is $3.99 */
+"ACTIVE_SUBSCRIPTION_DETAIL_TEXT" = "تاریخ انقضا %1$@, هزینه تمدید %2$@";
 
 /* Text for button that tell users there will by a short video ad. */
 "AD_LOADED" = "یک ویدیو کوتاه را تماشا کنید تا ارتباط را برای شما برقرار کنیم";
@@ -10,29 +10,35 @@
 /* Text showing the app version. The '%@' placeholder is the version number. So it will look like 'v.2'. */
 "APP_VERSION" = "نسخه %@";
 
-/*[UNTRANSLATED] Alert message informing user that the device clock needs to be updated with current time */
-"BAD_CLOCK_ALERT_MESSAGE" = "We've detected the time on your device is out of sync with your time zone. Please update your clock settings and restart the app";
+/* Alert message informing user that the device clock needs to be updated with current time */
+"BAD_CLOCK_ALERT_MESSAGE" = "ما متوجه شده ایم که زمان در دستگاه شما همگام با منطقه زمانی شما نیست. لطفا تنظیمات ساعت خود را به روز کنید و برنامه را مجددا راه اندازی کنید";
 
-/*[UNTRANSLATED] Alert title informing user that the device clock needs to be updated with current time */
-"BAD_CLOCK_ALERT_TITLE" = "Clock is out of sync";
+/* Alert title informing user that the device clock needs to be updated with current time */
+"BAD_CLOCK_ALERT_TITLE" = "ساعت هماهنگ نیست";
 
-/*[UNTRANSLATED] Alert message informing user that subscription receipt can not be verified */
-"BAD_RECEIPT_ALERT_MESSAGE" = "Your subscription receipt can not be verified, please refresh it and try again.";
+/* Alert message informing user that subscription receipt cannot be verified */
+"BAD_RECEIPT_ALERT_MESSAGE" = "رسید اشتراک شما تأیید نمی شود، لطفا آنرا رفرش کرده و دوباره امتحان کنید.";
 
-/*[UNTRANSLATED] Alert title informing user that app receipt is not valid */
-"BAD_RECEIPT_ALERT_TITLE" = "Invalid app receipt";
+/* Alert title informing user that app receipt is not valid */
+"BAD_RECEIPT_ALERT_TITLE" = "رسید برنامه نامعتبر است";
 
-/*[UNTRANSLATED] Buy subscription dialog footer text */
-"BUY_SUBSCRIPTIONS_FOOTER_TEXT" = "A subscription is auto-renewable which means that once purchased it will be automatically renewed until you cancel it 24 hours prior to the end of the current period.\n\nYour iTunes Account will be charged for renewal within 24-hours prior to the end of the current period with the cost of subscription.\n\nManage your Subscription and Auto-Renewal by going to your Account Settings.";
+/* Buy subscription dialog footer text */
+"BUY_SUBSCRIPTIONS_FOOTER_TEXT" = "اشتراک به صورت خودکار تمدید خواهد شد، یعنی خرید شما به صورت خودکار تمدید خواهد شد مگر با لغو کردن آن 24 ساعت قبل از پایان دوره‌ی فعلی.\n\nتمدید اشتراک از اعتبار حساب iTunes شما، 24 ساعت قبل از پایان دوره فعالی صورت خواهد پذیرفت.\n\nشما می‌توانید اشتراک خود و تمدید خودکار را با مراجعه به تنظیمات حساب خود، تغییر دهید.";
 
-/*[UNTRANSLATED] Premium subscriptions dialog header text */
-"BUY_SUBSCRIPTIONS_HEADER_TEXT" = "Remove ads and surf the Internet faster with a premium subscription!";
+/* Premium subscriptions dialog header text. If “Premium” doesn't easily translate, please choose a term that conveys “Pro” or “Extra” or “Better” or “Elite”. */
+"BUY_SUBSCRIPTIONS_HEADER_TEXT" = "حذف تبلیغات و سرعت بیشتر در گشت و گذار در اینترنت با خرید اشتراک!";
 
 /* Text above change region button that allows user to select their desired server region */
-"CHANGE_REGION" = "تغییر کشور";
+"CHANGE_REGION" = "تغییر کشور ";
 
-/*[UNTRANSLATED] Main text in the 'Upstream Proxy Error' dialog box. This is shown when the user has directly altered these settings, and those settings are (probably) erroneous. DO NOT translate 'Psiphon'. */
-"CHECK_UPSTREAM_PROXY_SETTING" = "You have configured Psiphon to use an upstream proxy.\nHowever, we seem to be unable to connect to a Psiphon server through that proxy.\nPlease fix the settings and try again.";
+/* Main text in the 'Upstream Proxy Error' dialog box. This is shown when the user has directly altered these settings, and those settings are (probably) erroneous. DO NOT translate 'Psiphon'. */
+"CHECK_UPSTREAM_PROXY_SETTING" = "شما سایفون را برای استفاده از پروکسی تنظیم کرده‌اید.\nهرچند ما قادر به اتصال به سرور سایفون از طریق این پروکسی نبودیم.\nلطفا پس از درست کردن تنطیمات، دوباره امتحان کنید.";
+
+/* Alert dialog title (MainViewController) */
+"CORRUPT_SETTINGS_ALERT_TITLE" = "تنظیمات از بین رفته";
+
+/* Alert dialog message informing the user that the settings file in the app is corrupt, and that they can potentially fix this issue by re-installing the app. */
+"CORRUPT_SETTINGS_MESSAGE" = "به نظر می رسد که فایل تنظیمات برنامه شما از بین رفته است. برای تعمیر فایل مجددا برنامه را نصب کنید.";
 
 /* Title of the button that dismisses region selection dialog
    Title of the button that dismisses the subscriptions menu */
@@ -44,8 +50,8 @@
 /* Alert title informing user there is no internet connection */
 "NO_INTERNET" = "عدم اتصال به اینترنت";
 
-/*[UNTRANSLATED] Subscriptions view text that is visible when the list of subscriptions is not available */
-"NO_PRODUCTS_TEXT" = "Could not retrieve subscriptions from the App Store. Pull to refresh or try again later.";
+/* Subscriptions view text that is visible when the list of subscriptions is not available */
+"NO_PRODUCTS_TEXT" = "اطلاعات اشتراک قادر به دریافت از App Store نبود. دوباره امتحان کنید.";
 
 /* Alert OK Button */
 "OK_BUTTON" = "تایید";
@@ -56,26 +62,32 @@
 /*[UNTRANSLATED] Refresh app receipt button title */
 "REFRESH_APP_RECEIPT_BUTTON_TITLE" = "Refresh app receipt";
 
-/*[UNTRANSLATED] Restore my subscription button title */
-"RESTORE_SUBSCRIPTION_BUTTON_TITLE" = "Restore my existing subscription";
+/* Restore my subscription button title */
+"RESTORE_SUBSCRIPTION_BUTTON_TITLE" = "بازگردانی اشتراک فعلی من";
 
-/*[UNTRANSLATED] Subscriptions item title in the app settings when user has an active subscription. Clicking this item opens subscriptions view */
-"SETTINGS_SUBSCRIPTION_ACTIVE" = "Subscriptions";
+/* Subscriptions item title in the app settings when user has an active subscription. Clicking this item opens subscriptions view */
+"SETTINGS_SUBSCRIPTION_ACTIVE" = "اشتراک ها";
 
-/*[UNTRANSLATED] Subscriptions item title in the app settings when user does not have an active subscription. Clicking this item opens subscriptions view */
-"SETTINGS_SUBSCRIPTION_NOT_ACTIVE" = "Go premium!";
+/* Subscriptions item title in the app settings when user does not have an active subscription. Clicking this item opens subscriptions view. If “Premium” doesn't easily translate, please choose a term that conveys “Pro” or “Extra” or “Better” or “Elite”. */
+"SETTINGS_SUBSCRIPTION_NOT_ACTIVE" = "مشترک شوید!";
 
-/*[UNTRANSLATED] Text for button that opens paid subscriptions manager UI */
-"SUBSCRIPTION_BUTTON_TITLE" = "Go premium now!";
+/* Text for button that opens paid subscriptions manager UI. If “Premium” doesn't easily translate, please choose a term that conveys “Pro” or “Extra” or “Better” or “Elite”. */
+"SUBSCRIPTION_BUTTON_TITLE" = "هم اکنون حق اشتراک داشته باشید!";
 
-/*[UNTRANSLATED] Title of the dialog for available in-app paid subscriptions */
-"SUBSCRIPTIONS" = "Subscriptions";
+/* Title of the dialog for available in-app paid subscriptions */
+"SUBSCRIPTIONS" = "اشتراک ها";
 
 /* Alert message informing user to turn on their cellular data or wifi to connect to the internet */
 "TURN_ON_DATE" = "اینترنت تلفن همراه را روشن کنید یا از Wi-Fi برای دسترسی به داده‌ها استفاده کنید.";
 
 /* Alert message informing user they have to open the app. DO NOT translate 'Psiphon'. */
 "USE_PSIPHON_APP" = "برای اتصال، از برنامه سایفون استفاده کنید";
+
+/* Alert dialog message informing the user that an error occurred while starting Psiphon (Do not translate 'Psiphon'). The user should try again, and if the problem persists, they should try reinstalling the app. */
+"VPN_START_FAIL_MESSAGE" = "خطا در شروع سایفون رخ داد. لطفا دوباره امتحان کنید و اگر این مشکل مداوم بود، اپ سایفون را دوباره نصب کنید.";
+
+/* Alert dialog title indicating to the user that Psiphon was unable to start (MainViewController) */
+"VPN_START_FAIL_TITLE" = "ناتوان در شروع";
 
 /* Status when the VPN is connected to a Psiphon server */
 "VPN_STATUS_CONNECTED" = "وصل شد";
