@@ -23,6 +23,7 @@
 #import <NetworkExtension/NEDNSSettings.h>
 #import <NetworkExtension/NEPacketTunnelFlow.h>
 #import "PacketTunnelProvider.h"
+#import "PsiphonConfigFiles.h"
 #import "PsiphonConfigUserDefaults.h"
 #import "PsiphonDataSharedDB.h"
 #import "SharedConstants.h"
@@ -31,6 +32,8 @@
 #import "SubscriptionVerifier.h"
 #import "NSDateFormatter+RFC3339.h"
 #import "RetryOperation.h"
+#import "NoticeLogger.h"
+#import "PacketTunnelUtils.h"
 #import <ifaddrs.h>
 #import <arpa/inet.h>
 #import <net/if.h>
@@ -184,7 +187,9 @@ typedef NS_ENUM(NSInteger, PsiphonSubscriptionState) {
 }
 
 - (void)stopTunnelWithReason:(NEProviderStopReason)reason {
-    LOG_DEBUG_NOTICE(@"tunnel stopped with error %lu", reason);
+    // Always log the stop reason.
+    LOG_ERROR(@"Tunnel stopped. Reason: %ld %@", reason, [PacketTunnelUtils textStopReason:reason]);
+    
     [psiphonTunnel stop];
 }
 
@@ -588,6 +593,13 @@ typedef NS_ENUM(NSInteger, PsiphonSubscriptionState) {
     [self displayMessageAndKillExtension:error];
 }
 
+- (void)displayCorruptSettingsFileMessage {
+    [self displayMessage:NSLocalizedStringWithDefaultValue(@"CORRUPT_SETTINGS_MESSAGE", nil, [NSBundle mainBundle], @"Your app settings file appears to be corrupt. Try reinstalling the app to repair the file.", @"Alert dialog message informing the user that the settings file in the app is corrupt, and that they can potentially fix this issue by re-installing the app.")
+       completionHandler:^(BOOL success) {
+           // Do nothing.
+       }];
+}
+
 - (void)updateAuthorizationDictionaryFromRemote {
 
     static RetryOperation *operation = nil;
@@ -777,21 +789,18 @@ typedef NS_ENUM(NSInteger, PsiphonSubscriptionState) {
 }
 
 - (NSString * _Nullable)getEmbeddedServerEntriesPath {
-    NSString *serverEntriesPath = [[[NSBundle mainBundle]
-      resourcePath] stringByAppendingPathComponent:@"embedded_server_entries"];
-
-    return serverEntriesPath;
+    return [PsiphonConfigFiles embeddedServerEntriesPath];
 }
 
 - (NSString * _Nullable)getPsiphonConfig {
 
     NSFileManager *fileManager = [NSFileManager defaultManager];
 
-    NSString *bundledConfigPath = [[[NSBundle mainBundle] resourcePath]
-      stringByAppendingPathComponent:@"psiphon_config"];
+    NSString *bundledConfigPath = [PsiphonConfigFiles psiphonConfigPath];
 
     if (![fileManager fileExistsAtPath:bundledConfigPath]) {
         LOG_ERROR(@"Config file not found. Aborting now.");
+        [self displayCorruptSettingsFileMessage];
         abort();
     }
 
@@ -802,6 +811,7 @@ typedef NS_ENUM(NSInteger, PsiphonSubscriptionState) {
 
     if (err) {
         LOG_ERROR(@"%@", [NSString stringWithFormat:@"Aborting. Failed to parse config JSON: %@", err.description]);
+        [self displayCorruptSettingsFileMessage];
         abort();
     }
 
@@ -844,6 +854,7 @@ typedef NS_ENUM(NSInteger, PsiphonSubscriptionState) {
 
     if (err) {
         LOG_ERROR(@"Aborting. Failed to create JSON data from config object: %@", err);
+        [self displayCorruptSettingsFileMessage];
         abort();
     }
 

@@ -18,16 +18,20 @@
  */
 
 #import <UIKit/UIKit.h>
-#import "MPInterstitialAdController.h"
-#import "MainViewController.h"
 
 @interface AppDelegate : UIResponder <UIApplicationDelegate>
 
 @property (strong, nonatomic) UIWindow *window;
 
 + (AppDelegate *)sharedAppDelegate;
++ (BOOL)isFirstRunOfAppVersion;
 + (BOOL)isRunningUITest;
-- (MainViewController *)getMainViewController;
+
+/* Ads */
+- (UIViewController *)getAdsPresentingViewController;
+- (void)launchScreenFinished;
+
+/* Reloads MainViewController. Used after a settings change. */
 - (void)reloadMainViewController;
 
 @end

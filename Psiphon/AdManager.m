@@ -44,8 +44,7 @@
         vpnManager = [VPNManager sharedInstance];
 
         [[NSNotificationCenter defaultCenter]
-          addObserver:self selector:@selector(vpnStatusDidChange) name:@kVPNStatusChangeNotificationName object:vpnManager];
-        //TODO: stop listening on dealloc.
+          addObserver:self selector:@selector(vpnStatusDidChange) name:kVPNStatusChangeNotificationName object:vpnManager];
     }
     return self;
 }
@@ -121,10 +120,10 @@
 - (void)showUntunneledInterstitial {
    LOG_DEBUG();
     if ([self untunneledInterstitialIsReady]) {
-        [self.untunneledInterstitial showFromViewController:[[AppDelegate sharedAppDelegate] getMainViewController]];
+        [self.untunneledInterstitial showFromViewController:[[AppDelegate sharedAppDelegate] getAdsPresentingViewController]];
     } else {
         // Start the tunnel
-        [vpnManager startTunnelWithCompletionHandler:^(NSError *error) {}];
+        [vpnManager startTunnel];
     }
 }
 
@@ -180,7 +179,7 @@
     [self postAdsLoadStateDidChangeNotification];
 
     // Start the tunnel
-    [vpnManager startTunnelWithCompletionHandler:^(NSError *error) {}];
+    [vpnManager startTunnel];
 }
 
 @end

@@ -34,7 +34,7 @@ extern NSString *const kIAPHelperUpdatedSubscriptionDictionary;
 + (instancetype)sharedInstance;
 + (BOOL)canMakePayments;
 - (void)restoreSubscriptions;
-- (void) refreshReceipt;
+- (void)refreshReceipt;
 - (void)startProductsRequest;
 - (void)buyProduct:(SKProduct*)product;
 

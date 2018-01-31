@@ -18,7 +18,6 @@
  */
 
 #import <Foundation/Foundation.h>
-#import <PsiphonTunnel/PsiphonTunnel.h>
 #import "AppDelegate.h"
 #import "FeedbackUpload.h"
 #import "LogViewControllerFullScreen.h"
@@ -39,7 +38,9 @@
 #import "IAPViewController.h"
 #import "AppDelegate.h"
 #import "IAPStoreHelper.h"
-#import "SettingsViewController.h"
+#import "LaunchScreenViewController.h"
+#import "UIAlertController+Delegate.h"
+#import "NoticeLogger.h"
 
 static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSString *b) {
     return (([a length] == 0) && ([b length] == 0)) || ([a isEqualToString:b]);
@@ -93,9 +94,12 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     UIView *bottomBar;
     NSString *selectedRegionSnapShot;
 
-    UIAlertController *alert;
+    UIAlertController *alertControllerNoInternet;
 }
 
+// No heavy initialization should be done here, since RootContainerController
+// expects this method to return immediately.
+// All such initialization could be deferred to viewDidLoad callback.
 - (id)init {
     self = [super init];
     if (self) {
@@ -150,17 +154,23 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
         //appSubTitleLabel.hidden = YES;
     }
 
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(onVPNStatusDidChange)
-                                                 name:@kVPNStatusChangeNotificationName
-                                               object:vpnManager];
-
+    // Observer AdManager notifications
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(onAdStatusDidChange)
                                                  name:@kAdsDidLoad
                                                object:adManager];
+    // Observe VPNManager notifications
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(onVPNStatusDidChange)
+                                                 name:kVPNStatusChangeNotificationName
+                                               object:vpnManager];
 
-    // Observe IAP subscription  changes
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(onVPNStartFailed)
+                                                 name:kVPNStartFailure
+                                               object:vpnManager];
+
+    // Observe IAP transaction notifications
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(updatedSubscriptionDictionary)
                                                  name:kIAPHelperUpdatedSubscriptionDictionary
@@ -263,6 +273,14 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 
 #pragma mark - UI callbacks
 
+- (void)onVPNStartFailed {
+    // Alert the user that the VPN failed to start, and that they should try again.
+    [UIAlertController presentSimpleAlertWithTitle:NSLocalizedStringWithDefaultValue(@"VPN_START_FAIL_TITLE", nil, [NSBundle mainBundle], @"Unable to start", @"Alert dialog title indicating to the user that Psiphon was unable to start (MainViewController)")
+                                           message:NSLocalizedStringWithDefaultValue(@"VPN_START_FAIL_MESSAGE", nil, [NSBundle mainBundle], @"An error occurred while starting Psiphon. Please try again. If this problem persists, try reinstalling the Psiphon app.", @"Alert dialog message informing the user that an error occurred while starting Psiphon (Do not translate 'Psiphon'). The user should try again, and if the problem persists, they should try reinstalling the app.")
+                                    preferredStyle:UIAlertControllerStyleAlert
+                                         okHandler:nil];
+}
+
 - (void)onVPNStatusDidChange {
     // Update UI
     VPNStatus s = [vpnManager getVPNStatus];
@@ -358,17 +376,18 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 #endif
 
 # pragma mark - UI helper functions
-- (void) dismissNoInternetAlert {
+
+- (void)dismissNoInternetAlert {
     LOG_DEBUG();
-    if (alert != nil){
-        [alert dismissViewControllerAnimated:YES completion:nil];
-        alert = nil;
+    if (alertControllerNoInternet != nil){
+        [alertControllerNoInternet dismissViewControllerAnimated:YES completion:nil];
+        alertControllerNoInternet = nil;
     }
 }
 
 - (void)displayAlertNoInternet {
-    if (alert == nil){
-        alert = [UIAlertController
+    if (alertControllerNoInternet == nil){
+        alertControllerNoInternet = [UIAlertController
                  alertControllerWithTitle:NSLocalizedStringWithDefaultValue(@"NO_INTERNET", nil, [NSBundle mainBundle], @"No Internet Connection", @"Alert title informing user there is no internet connection")
                  message:NSLocalizedStringWithDefaultValue(@"TURN_ON_DATE", nil, [NSBundle mainBundle], @"Turn on cellular data or use Wi-Fi to access data.", @"Alert message informing user to turn on their cellular data or wifi to connect to the internet")
                  preferredStyle:UIAlertControllerStyleAlert];
@@ -379,11 +398,18 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                                         handler:^(UIAlertAction *action) {
                                         }];
 
-        [alert addAction:defaultAction];
+        [alertControllerNoInternet addAction:defaultAction];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(dismissNoInternetAlert) name:@"UIApplicationWillResignActiveNotification" object:nil];
     }
 
-    [self presentViewController:alert animated:TRUE completion:nil];
+    [alertControllerNoInternet presentFromTopController];
+}
+
+- (void)displayCorruptSettingsFileAlert {
+    [UIAlertController presentSimpleAlertWithTitle:NSLocalizedStringWithDefaultValue(@"CORRUPT_SETTINGS_ALERT_TITLE", nil, [NSBundle mainBundle], @"Corrupt Settings", @"Alert dialog title (MainViewController)")
+                                           message:NSLocalizedStringWithDefaultValue(@"CORRUPT_SETTINGS_MESSAGE", nil, [NSBundle mainBundle], @"Your app settings file appears to be corrupt. Try reinstalling the app to repair the file.", @"Alert dialog message informing the user that the settings file in the app is corrupt, and that they can potentially fix this issue by re-installing the app.")
+                                    preferredStyle:UIAlertControllerStyleAlert
+                                         okHandler:nil];
 }
 
 - (NSString *)getVPNStatusDescription:(VPNStatus) status {
@@ -970,47 +996,82 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                                                            constant:-10]];
 }
 
-#pragma mark - FeedbackViewControllerDelegate methods and helpers
+#pragma mark - TunneledAppDelegate methods
 
-- (NSString *)getPsiphonConfig {
+- (void)onDiagnosticMessage:(NSString *_Nonnull)message withTimestamp:(NSString *_Nonnull)timestamp {
+    [[NoticeLogger sharedInstance] noticeError:message];
+}
+
+/*!
+ * If Psiphon config string could no be created, corrupt message alert is displayed
+ * to the user.
+ * This method can be called from background-thread.
+ * @return Psiphon config string, or nil of config string could not be created.
+ */
+- (NSString * _Nullable)getPsiphonConfig {
     NSString *bundledConfigStr = [PsiphonClientCommonLibraryHelpers getPsiphonBundledConfig];
 
-    // Return bundled config as is if user doesn't have an active subscription
-    if(![[IAPStoreHelper class] hasActiveSubscriptionForDate:[NSDate date]]) {
-        return bundledConfigStr;
-    }
-
-    // Otherwise override sponsor ID
+    // Always parses the config string to ensure its valid, even the config string will not be modified.
     NSData *jsonData = [bundledConfigStr dataUsingEncoding:NSUTF8StringEncoding];
     NSError *err = nil;
     NSDictionary *readOnly = [NSJSONSerialization JSONObjectWithData:jsonData options:kNilOptions error:&err];
 
+    // Return bundled config as is if user doesn't have an active subscription
+    if(![[IAPStoreHelper class] hasActiveSubscriptionForDate:[NSDate date]] && !err) {
+        return bundledConfigStr;
+    }
+
+    // Otherwise override sponsor ID
     if (err) {
-        LOG_ERROR(@"%@", [NSString stringWithFormat:@"Aborting. Failed to parse config JSON: %@", err.description]);
-        abort();
+        LOG_ERROR(@"%@", [NSString stringWithFormat:@"Failed to parse config JSON: %@", err.description]);
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self displayCorruptSettingsFileAlert];
+        });
+        return nil;
     }
 
     NSMutableDictionary *mutableConfigCopy = [readOnly mutableCopy];
 
-    NSDictionary *readOnlySubscriptionConfig = [readOnly objectForKey:@"subscriptionConfig"];
+    NSDictionary *readOnlySubscriptionConfig = readOnly[@"subscriptionConfig"];
     if(readOnlySubscriptionConfig && readOnlySubscriptionConfig[@"SponsorId"]) {
         mutableConfigCopy[@"SponsorId"] = readOnlySubscriptionConfig[@"SponsorId"];
     }
 
+#if DEBUG
+    // Ensure diagnostic notices are emitted when debugging
+    mutableConfigCopy[@"EmitDiagnosticNotices"] = @TRUE;
+#endif
+
     jsonData  = [NSJSONSerialization dataWithJSONObject:mutableConfigCopy options:0 error:&err];
 
     if (err) {
-        LOG_ERROR(@"%@", [NSString stringWithFormat:@"Aborting. Failed to create JSON data from config object: %@", err.description]);
-        abort();
+        LOG_ERROR(@"%@", [NSString stringWithFormat:@"Failed to create JSON data from config object: %@", err.description]);
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self displayCorruptSettingsFileAlert];
+        });
+        return nil;
     }
 
     return [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
 }
 
+- (NSString * _Nullable)getEmbeddedServerEntries {
+    return nil;
+}
+
+#pragma mark - FeedbackViewControllerDelegate methods and helpers
+
 - (void)userSubmittedFeedback:(NSUInteger)selectedThumbIndex comments:(NSString *)comments email:(NSString *)email uploadDiagnostics:(BOOL)uploadDiagnostics {
     // Ensure psiphon data is populated with latest logs
     // TODO: should this be a delegate method of Psiphon Data in shared library/
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+
+        NSString *psiphonConfig = [self getPsiphonConfig];
+        if (!psiphonConfig) {
+            // Corrupt settings file. Return early.
+            return;
+        }
+
         NSArray<DiagnosticEntry *> *diagnosticEntries = [sharedDB getAllLogs];
 
         __weak MainViewController *weakSelf = self;
@@ -1024,7 +1085,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                                        comments:comments
                                           email:email
                              sendDiagnosticInfo:uploadDiagnostics
-                              withPsiphonConfig:[self getPsiphonConfig]
+                              withPsiphonConfig:psiphonConfig
                              withClientPlatform:@"ios-vpn"
                              withConnectionType:[self getConnectionType]
                                    isJailbroken:[JailbreakCheck isDeviceJailbroken]
@@ -1102,7 +1163,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     NSUserDefaults *userDefaults = [[NSUserDefaults alloc] initWithSuiteName:APP_GROUP_IDENTIFIER];
     NSString *upstreamProxyUrl = [[UpstreamProxySettings sharedInstance] getUpstreamProxyUrl];
     [userDefaults setObject:upstreamProxyUrl forKey:PSIPHON_CONFIG_UPSTREAM_PROXY_URL];
-    NSString *upstreamProxyCustomHeaders = [[UpstreamProxySettings sharedInstance] getUpstreamProxyCustomHeaders];
+    NSDictionary *upstreamProxyCustomHeaders = [[UpstreamProxySettings sharedInstance] getUpstreamProxyCustomHeaders];
     [userDefaults setObject:upstreamProxyCustomHeaders forKey:PSIPHON_CONFIG_UPSTREAM_PROXY_CUSTOM_HEADERS];
 }
 
@@ -1395,6 +1456,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                     });
                 }];
             });
+
         }
     });
 }
