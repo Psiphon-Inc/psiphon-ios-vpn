@@ -17,7 +17,7 @@
  *
  */
 
-#import "ABCPacketTunnelProvider.h"
+#import "BasePacketTunnelProvider.h"
 
 // PsiphonTunnel Errors
 FOUNDATION_EXTERN NSString *_Nonnull const PsiphonTunnelErrorDomain;
@@ -28,6 +28,6 @@ typedef NS_ERROR_ENUM(PsiphonTunnelErrorDomain, PacketTunnelProviderErrorCode) {
     PsiphonTunnelErrorSubscriptionInvalidReceipt = 3,
 };
 
-@interface PacketTunnelProvider : ABCPacketTunnelProvider <ABCPacketTunnelProviderProtocol>
+@interface PacketTunnelProvider : BasePacketTunnelProvider <BasePacketTunnelProviderProtocol>
 
 @end
