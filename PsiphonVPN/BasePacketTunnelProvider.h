@@ -21,11 +21,10 @@
 #import <NetworkExtension/NEPacketTunnelProvider.h>
 #import "NEBridge.h"
 
+// BasePacketTunnelProvider Errors
+FOUNDATION_EXTERN NSString *_Nonnull const BasePsiphonTunnelErrorDomain;
 
-// ABCPacketTunnelProvider Errors
-FOUNDATION_EXTERN NSString *_Nonnull const ABCPsiphonTunnelErrorDomain;
-
-typedef NS_ERROR_ENUM(ABCPsiphonTunnelErrorDomain, ABCPsiphonTunnelErrorCode) {
+typedef NS_ERROR_ENUM(BasePsiphonTunnelErrorDomain, ABCPsiphonTunnelErrorCode) {
     PsiphonTunnelErrorBadConfiguration = 1,
     PsiphonTunnelErrorInternalError = 2,
     PsiphonTunnelErrorStoppedBeforeConnected = 3,
@@ -45,8 +44,9 @@ typedef NS_ENUM(NSInteger, NEStartMethod) {
     NEStartMethodOther,
 };
 
+#pragma mark - BasePacketTunnelProvider protocol
 
-@protocol ABCPacketTunnelProviderProtocol
+@protocol BasePacketTunnelProviderProtocol
 
 @required
 - (void)startTunnelWithErrorHandler:(void (^_Nonnull)(NSError *_Nonnull error))errorHandler;
@@ -63,8 +63,9 @@ typedef NS_ENUM(NSInteger, NEStartMethod) {
 
 @end
 
+#pragma mark - BasePacketTunnelProvider
 
-@interface ABCPacketTunnelProvider : NEPacketTunnelProvider
+@interface BasePacketTunnelProvider : NEPacketTunnelProvider
 
 @property (nonatomic, readonly) NEStartMethod NEStartMethod;
 

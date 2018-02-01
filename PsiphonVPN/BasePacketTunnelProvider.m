@@ -18,15 +18,15 @@
  */
 
 #import <Foundation/Foundation.h>
-#import "ABCPacketTunnelProvider.h"
+#import "BasePacketTunnelProvider.h"
 #import "SharedConstants.h"
 #import "Logging.h"
 #import "FileUtils.h"
 
 
-NSString *_Nonnull const ABCPsiphonTunnelErrorDomain = @"ABCPsiphonTunnelErrorDomain";
+NSString *_Nonnull const BasePsiphonTunnelErrorDomain = @"BasePsiphonTunnelErrorDomain";
 
-@interface ABCPacketTunnelProvider ()
+@interface BasePacketTunnelProvider ()
 
 @property (nonatomic, readwrite) NEStartMethod NEStartMethod;
 
@@ -35,7 +35,7 @@ NSString *_Nonnull const ABCPsiphonTunnelErrorDomain = @"ABCPsiphonTunnelErrorDo
 @end
 
 
-@implementation ABCPacketTunnelProvider {
+@implementation BasePacketTunnelProvider {
     // Pointer to startTunnelWithOptions completion handler.
     // NOTE: value is expected to be nil after completion handler has been called.
     void (^vpnStartCompletionHandler)(NSError *__nullable error);
@@ -89,7 +89,7 @@ NSString *_Nonnull const ABCPsiphonTunnelErrorDomain = @"ABCPsiphonTunnelErrorDo
     vpnStartCompletionHandler = completionHandler;
 
     // Start the tunnel.
-    [(id <ABCPacketTunnelProviderProtocol>)self startTunnelWithErrorHandler:^(NSError *error) {
+    [(id <BasePacketTunnelProviderProtocol>)self startTunnelWithErrorHandler:^(NSError *error) {
         if (error) {
             vpnStartCompletionHandler(error);
             vpnStartCompletionHandler = nil;
@@ -104,11 +104,11 @@ NSString *_Nonnull const ABCPsiphonTunnelErrorDomain = @"ABCPsiphonTunnelErrorDo
     // Assumes stopTunnelWithReason called exactly once only after startTunnelWithOptions.completionHandler(nil)
     if (vpnStartCompletionHandler) {
         vpnStartCompletionHandler([NSError
-          errorWithDomain:ABCPsiphonTunnelErrorDomain code:PsiphonTunnelErrorStoppedBeforeConnected userInfo:nil]);
+          errorWithDomain:BasePsiphonTunnelErrorDomain code:PsiphonTunnelErrorStoppedBeforeConnected userInfo:nil]);
         vpnStartCompletionHandler = nil;
     }
 
-    [(id <ABCPacketTunnelProviderProtocol>)self stopTunnelWithReason:reason];
+    [(id <BasePacketTunnelProviderProtocol>)self stopTunnelWithReason:reason];
 
     completionHandler();
 }
@@ -140,13 +140,13 @@ NSString *_Nonnull const ABCPsiphonTunnelErrorDomain = @"ABCPsiphonTunnelErrorDo
     if ([EXTENSION_QUERY_IS_PROVIDER_ZOMBIE isEqualToString:query]) {
         // If the Psiphon tunnel has been started when the extension was started
         // responds with EXTENSION_RESP_TRUE, otherwise responds with EXTENSION_RESP_FALSE
-        respData = [(id <ABCPacketTunnelProviderProtocol>)self isNEZombie] ? EXTENSION_RESP_TRUE_DATA : EXTENSION_RESP_FALSE_DATA;
+        respData = [(id <BasePacketTunnelProviderProtocol>)self isNEZombie] ? EXTENSION_RESP_TRUE_DATA : EXTENSION_RESP_FALSE_DATA;
 
     } else if ([EXTENSION_QUERY_IS_TUNNEL_CONNECTED isEqualToString:query]) {
-        respData = ([(id <ABCPacketTunnelProviderProtocol>)self isTunnelConnected]) ? EXTENSION_RESP_TRUE_DATA : EXTENSION_RESP_FALSE_DATA;
+        respData = ([(id <BasePacketTunnelProviderProtocol>)self isTunnelConnected]) ? EXTENSION_RESP_TRUE_DATA : EXTENSION_RESP_FALSE_DATA;
 
     } else if ([EXTENSION_QUERY_GET_SPONSOR_ID isEqualToString:query]) {
-        respData = [[(id <ABCPacketTunnelProviderProtocol>)self sponsorId] dataUsingEncoding:NSUTF8StringEncoding];
+        respData = [[(id <BasePacketTunnelProviderProtocol>)self sponsorId] dataUsingEncoding:NSUTF8StringEncoding];
     }
 
     if (respData) {

@@ -34,6 +34,7 @@
 #import "RetryOperation.h"
 #import "NoticeLogger.h"
 #import "PacketTunnelUtils.h"
+#import "Authorizations.h"
 #import <ifaddrs.h>
 #import <arpa/inet.h>
 #import <net/if.h>
@@ -44,9 +45,7 @@ NSString *_Nonnull const PsiphonTunnelErrorDomain = @"PsiphonTunnelErrorDomain";
 
 static NSDateFormatter *__rfc3339DateFormatter = nil;
 
-#define kAuthorizationDictionary        @"kAuthorizationDictionary"
 #define kSignedAuthorization            @"signed_authorization"
-#define kAuthorizationExpires           @"kAuthorizationExpires"
 #define kPendingRenewalInfo             @"pending_renewal_info"
 #define kAutoRenewStatus                @"auto_renew_status"
 #define kRequestDate                    @"request_date"
@@ -56,7 +55,6 @@ typedef NS_ENUM(NSInteger, PsiphonSubscriptionState) {
     PsiphonSubscriptionStateMaybeSubscribed,
     PsiphonSubscriptionStateSubscribed,
 };
-
 
 // Notes on file protection:
 // iOS has different file protection mechanisms to protect user's data. While this is important for protecting
@@ -128,13 +126,14 @@ typedef NS_ENUM(NSInteger, PsiphonSubscriptionState) {
     // OR if the user possibly has a valid subscription
     // OR if the extension is started after boot but before being unlocked.
 
-    NSDictionary *authorizationDictionary = [self authorizationDictionary];
+    Authorizations *authorizations = [Authorizations createFromPersistedAuthorizations];
+    Subscription *subscription = [Subscription createFromPersistedSubscription];
 
     self.startTunnelSubscriptionState = PsiphonSubscriptionStateNotSubscribed;
 
-    if([self hasActiveAuthorizationForDate:[NSDate date] inDict:authorizationDictionary]) {
+    if([self hasActiveAuthorizationForDate:[NSDate date] inAuthorizations:authorizations]) {
         self.startTunnelSubscriptionState = PsiphonSubscriptionStateSubscribed;
-    } else if ([self shouldUpdateAuthorization:authorizationDictionary]) {
+    } else if ([self shouldUpdateSubscriptionTokens:subscription withAuthorizations:authorizations]) {
         self.startTunnelSubscriptionState = PsiphonSubscriptionStateMaybeSubscribed;
     }
 
@@ -394,17 +393,18 @@ typedef NS_ENUM(NSInteger, PsiphonSubscriptionState) {
             return;
         }
 
-        NSDictionary *authorizationDictionary = [self authorizationDictionary];
+        Authorizations *authorizations = [Authorizations createFromPersistedAuthorizations];
+        Subscription *subscription = [Subscription createFromPersistedSubscription];
 
-        if ([self shouldUpdateAuthorization:authorizationDictionary]) {
+        if ([self shouldUpdateSubscriptionTokens:subscription withAuthorizations:authorizations]) {
             // Do remote check.
             LOG_DEBUG_NOTICE(@"will update authorization dictionary from remote");
             [self updateAuthorizationDictionaryFromRemote];
 
         } else {
-            // Check authorization.
 
-            if ([self hasActiveAuthorizationForDate:[NSDate date] inDict:authorizationDictionary]) {
+            // Check authorization.
+            if ([self hasActiveAuthorizationForDate:[NSDate date] inAuthorizations:authorizations]) {
                 LOG_DEBUG_NOTICE(@"device has active authorization");
 
                 if (self.startTunnelSubscriptionState != PsiphonSubscriptionStateSubscribed) {
@@ -449,17 +449,17 @@ typedef NS_ENUM(NSInteger, PsiphonSubscriptionState) {
     static RetryOperation *operation = nil;
     if (!operation) {
         operation = [RetryOperation retryOperation:10 interval:60 backoff:FALSE
-                                            onNext:^(void (^retryCallback)(NSError *)) {
-                                                [self displayMessage:
-                                                    NSLocalizedStringWithDefaultValue(@"CANNOT_START_TUNNEL_DUE_TO_SUBSCRIPTION", nil, [NSBundle mainBundle], @"Your Psiphon subscription has expired.\nSince you're not a subscriber or your subscription has expired, Psiphon can only be started from the Psiphon app.\n\nPlease open the Psiphon app.", @"Alert message informing user that their subscription has expired or that they're not a subscriber, therefore Psiphon can only be started from the Psiphon app. DO NOT translate 'Psiphon'.")
-                                                   completionHandler:^(BOOL success) {
-                                                       // If the user dismisses the message, show the alert again in intervalInSec seconds.
-                                                       if (success) {
-                                                           retryCallback([[NSError alloc] init]);
-                                                       }
-                                                   }];
+          onNext:^(void (^retryCallback)(NSError *)) {
+              [self displayMessage:
+                  NSLocalizedStringWithDefaultValue(@"CANNOT_START_TUNNEL_DUE_TO_SUBSCRIPTION", nil, [NSBundle mainBundle], @"Your Psiphon subscription has expired.\nSince you're not a subscriber or your subscription has expired, Psiphon can only be started from the Psiphon app.\n\nPlease open the Psiphon app.", @"Alert message informing user that their subscription has expired or that they're not a subscriber, therefore Psiphon can only be started from the Psiphon app. DO NOT translate 'Psiphon'.")
+                 completionHandler:^(BOOL success) {
+                     // If the user dismisses the message, show the alert again in intervalInSec seconds.
+                     if (success) {
+                         retryCallback([[NSError alloc] init]);
+                     }
+                 }];
 
-                                            }];
+          }];
     }
 
     [operation execute];
@@ -522,17 +522,18 @@ typedef NS_ENUM(NSInteger, PsiphonSubscriptionState) {
         __weak PacketTunnelProvider *weakSelf = self;
         operation = [RetryOperation retryOperationForeverEvery:subscriptionCheckInterval
           onNext:^(void (^retryCallback)(NSError *)) {
-            // If user's subscription has expired, then give them an hour of extra grace period
-            // before killing the tunnel.
-            if ([weakSelf hasActiveAuthorizationForDate:[NSDate date] inDict:[weakSelf authorizationDictionary]]) {
-                // User has an active subscription. Check later.
-                retryCallback([[NSError alloc] init]);
-            } else {
-                [weakSelf trySubscriptionCheck];
+              // If user's subscription has expired, then give them an hour of extra grace period
+              // before killing the tunnel.
+              Authorizations *authorizations = [Authorizations createFromPersistedAuthorizations];
+              if ([weakSelf hasActiveAuthorizationForDate:[NSDate date] inAuthorizations:authorizations]) {
+                  // User has an active subscription. Check later.
+                  retryCallback([[NSError alloc] init]);
+              } else {
+                  [weakSelf trySubscriptionCheck];
 
-                // Don't schedule again.
-                retryCallback(nil);
-            }
+                  // Don't schedule again.
+                  retryCallback(nil);
+              }
         }];
     }
 
@@ -557,7 +558,8 @@ typedef NS_ENUM(NSInteger, PsiphonSubscriptionState) {
            if (success) {
                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, gracePeriodInSec * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
                    // Grace period has finished. Checks if the subscription has been renewed, otherwise kill the VPN.
-                   if ([weakSelf hasActiveAuthorizationForDate:[NSDate date] inDict:[weakSelf authorizationDictionary]]) {
+                   Authorizations *authorizations = [Authorizations createFromPersistedAuthorizations];
+                   if ([weakSelf hasActiveAuthorizationForDate:[NSDate date] inAuthorizations:authorizations]) {
                        // Subscription has been renewed.
                        [weakSelf startSubscriptionCheckTimer];
                    } else {
@@ -608,47 +610,28 @@ typedef NS_ENUM(NSInteger, PsiphonSubscriptionState) {
         __weak PacketTunnelProvider *weakSelf = self;
         operation = [RetryOperation retryOperation:6 interval:30 backoff:TRUE onNext:^(void (^retryCallback)(NSError *_Nullable)) {
 
-            __block NSMutableDictionary *remoteAuthDict = nil;
-
-            [[[SubscriptionVerifier alloc] init] startWithCompletionHandler:^(NSDictionary *dict, NSError *error) {
+            [[[SubscriptionVerifier alloc] init] startWithCompletionHandler:^(NSDictionary *remoteAuthDict, NSError *error) {
 
                 if (!error) {
-                    if (dict) {
+                    if (remoteAuthDict) {
                         // add app receipt file size
                         NSNumber *appReceiptFileSize = nil;
                         [[NSBundle mainBundle].appStoreReceiptURL getResourceValue:&appReceiptFileSize forKey:NSURLFileSizeKey error:nil];
 
-                        remoteAuthDict = [[NSMutableDictionary alloc] initWithDictionary:dict];
-                        remoteAuthDict[kAppReceiptFileSize] = appReceiptFileSize;
 
+                        Authorizations *authorizations = [Authorizations createFromPersistedAuthorizations];
+                        Subscription *subscription = [Subscription createFromPersistedSubscription];
 
-                        // remove old auth expires value if any.
-                        [remoteAuthDict removeObjectForKey:kAuthorizationExpires];
-                        // decode base64 encoded auth token and extract expiration date as NSDate
-                        NSString *base64String = remoteAuthDict[kSignedAuthorization];
-                        if (base64String) {
-                            NSError *err;
-                            NSDictionary *signedAuthDict = [NSJSONSerialization JSONObjectWithData:[[NSData alloc] initWithBase64EncodedString:base64String options:0]
-                                                                                           options:0 error:&err];
-                            if (err) {
-                                LOG_ERROR(@"Failed parsing signed authorization base64 encoded token. Error:%@", err);
-                            } else {
-                                NSDictionary *authorizationDict = signedAuthDict[@"Authorization"];
-                                NSString *authExpiresDateString = (NSString *) authorizationDict[@"Expires"];
-                                if ([authExpiresDateString length]) {
-                                    if (!__rfc3339DateFormatter) {
-                                        __rfc3339DateFormatter = [NSDateFormatter createRFC3339Formatter];
-                                    }
-                                    NSDate *authExpiresDate = [__rfc3339DateFormatter dateFromString:authExpiresDateString];
-                                    remoteAuthDict[kAuthorizationExpires] = authExpiresDate;
-                                }
-                            }
-                        }
+                        [subscription setAppReceiptFileSize:appReceiptFileSize];
+                        [subscription setPendingRenewalInfo:remoteAuthDict[@"pending_renewal_info"]];
+                        [authorizations addTokens:@[ remoteAuthDict[@"signed_authorization"]] ];
+
+                        [authorizations persistChanges];
+                        [subscription persistChanges];
 
                         // Extract request date from the response and convert to NSDate
                         NSDate *requestDate = nil;
                         NSString *requestDateString = (NSString *) remoteAuthDict[kRequestDate];
-                        [remoteAuthDict removeObjectForKey:kRequestDate];
 
                         if ([requestDateString length]) {
                             if (!__rfc3339DateFormatter) {
@@ -657,13 +640,11 @@ typedef NS_ENUM(NSInteger, PsiphonSubscriptionState) {
                             requestDate = [__rfc3339DateFormatter dateFromString:requestDateString];
                         }
 
-                        [weakSelf storeAuthorizationDictionary:remoteAuthDict];
-
                         // "Clock is off" notification  if user has an active subscription in server time
                         // but in device time it appears to be expired.
                         if (requestDate) {
-                            if ([weakSelf hasActiveAuthorizationForDate:requestDate inDict:remoteAuthDict]
-                              && ![weakSelf hasActiveAuthorizationForDate:[NSDate date] inDict:remoteAuthDict]) {
+                            if ([weakSelf hasActiveAuthorizationForDate:requestDate inAuthorizations:authorizations]
+                              && ![weakSelf hasActiveAuthorizationForDate:[NSDate date] inAuthorizations:authorizations]) {
                                 [weakSelf killExtensionForBadClock];
                             }
                         }
@@ -675,7 +656,7 @@ typedef NS_ENUM(NSInteger, PsiphonSubscriptionState) {
                     retryCallback(nil);
 
                 } else {
-                    LOG_ERROR(@"Subscription verifier error: %@, %ld", error.localizedDescription, (long) error.code);
+                    LOG_ERROR(@"subscription verifier error: %@, %ld", error.localizedDescription, (long) error.code);
 
                     // Notify observers if invalid receipt
                     if (error.code == PsiphonReceiptValidationInvalidReceiptError) {
@@ -687,16 +668,10 @@ typedef NS_ENUM(NSInteger, PsiphonSubscriptionState) {
                         retryCallback(error);
                     }
                 }
-
-                // TODO: remove this
-//                if (![weakSelf hasActiveAuthorizationForDate:[NSDate date] inDict:[weakSelf authorizationDictionary]]
-//                  && weakSelf.startTunnelSubscriptionState != PsiphonSubscriptionStateNotSubscribed) {
-//                    LOG_DEBUG_NOTICE(@"device has no active authorization but subscription state is subscribed or maybe subscribed");
-//                    [weakSelf trySubscriptionCheck];
-//                }
             }];
           }
           onFinished:^(NSError *lastError) {
+              // TODO: do some error handling (infinite loop condition)
               [weakSelf trySubscriptionCheck];
           }];
     }
@@ -704,17 +679,7 @@ typedef NS_ENUM(NSInteger, PsiphonSubscriptionState) {
     [operation execute];
 }
 
-- (NSDictionary*)authorizationDictionary {
-    return [[NSUserDefaults standardUserDefaults] dictionaryForKey:kAuthorizationDictionary];
-}
-
-- (void)storeAuthorizationDictionary:(NSDictionary*)dict {
-    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
-    [userDefaults setObject:dict forKey:kAuthorizationDictionary];
-    [userDefaults synchronize];
-}
-
-- (BOOL)shouldUpdateAuthorization:(NSDictionary*)dict {
+- (BOOL)shouldUpdateSubscriptionTokens:(Subscription *)subscription withAuthorizations:(Authorizations *)authorizations {
     // If no receipt - NO
     NSURL *URL = [NSBundle mainBundle].appStoreReceiptURL;
     NSString *path = URL.path;
@@ -724,40 +689,44 @@ typedef NS_ENUM(NSInteger, PsiphonSubscriptionState) {
         return NO;
     }
 
-    // There's receipt but no authorization dictionary - YES
-    if(!dict) {
-        LOG_DEBUG_NOTICE(@"receipt exist by no authorization dictionary");
+    // There's receipt but no subscription persisted - YES
+    if([subscription isEmpty]) {
+        LOG_DEBUG_NOTICE(@"receipt exist by no subscription persisted");
+        return YES;
+    }
+
+    // If there's no authorization token with Apple subcription access type - YES
+    if (![authorizations hasTokenWithAccessType:kAuthorizationAccessTypeApple]) {
+        LOG_DEBUG_NOTICE(@"there is no authorization with apple subscription access type");
         return YES;
     }
 
     // Receipt file size has changed since last check - YES
     NSNumber *appReceiptFileSize = nil;
     [[NSBundle mainBundle].appStoreReceiptURL getResourceValue:&appReceiptFileSize forKey:NSURLFileSizeKey error:nil];
-    NSNumber *dictAppReceiptFileSize = dict[kAppReceiptFileSize];
-    if ([appReceiptFileSize unsignedIntValue] != [dictAppReceiptFileSize unsignedIntValue]) {
-        LOG_DEBUG_NOTICE(@"receipt file size changed (%@) since last check (%@)", appReceiptFileSize, dictAppReceiptFileSize);
+    if ([appReceiptFileSize unsignedIntValue] != [subscription.appReceiptFileSize unsignedIntValue]) {
+        LOG_DEBUG_NOTICE(@"receipt file size changed (%@) since last check (%@)", appReceiptFileSize, subscription.appReceiptFileSize);
         return YES;
     }
 
     // If user has an active authorization for date - NO
-    if ([self hasActiveAuthorizationForDate:[NSDate date] inDict:dict]) {
+    if ([self hasActiveAuthorizationForDate:[NSDate date] inAuthorizations:authorizations]) {
         LOG_DEBUG_NOTICE(@"device has active authorization for date");
         return NO;
     }
 
-    // else we have an expired subscription
-    NSArray *pending_renewal_info = dict[kPendingRenewalInfo];
-
     // If expired and pending renewal info is missing - YES
-    if(!pending_renewal_info) {
+    if(!subscription.pendingRenewalInfo) {
         LOG_DEBUG_NOTICE(@"pending renewal info is missing");
         return YES;
     }
 
     // If expired but user's last known intention was to auto-renew - YES
-    if([pending_renewal_info count] == 1 && [pending_renewal_info[0] isKindOfClass:[NSDictionary class]]) {
-        NSString *auto_renew_status = [pending_renewal_info[0] objectForKey:kAutoRenewStatus];
-        if (auto_renew_status && [auto_renew_status isEqualToString:@"1"]) {
+    if([subscription.pendingRenewalInfo count] == 1
+      && [subscription.pendingRenewalInfo[0] isKindOfClass:[NSDictionary class]]) {
+
+        NSString *autoRenewStatus = [subscription.pendingRenewalInfo[0] objectForKey:kAutoRenewStatus];
+        if (autoRenewStatus && [autoRenewStatus isEqualToString:@"1"]) {
             LOG_DEBUG_NOTICE(@"subscription expired but user's last known intention is to auto-renew");
             return YES;
         }
@@ -767,12 +736,18 @@ typedef NS_ENUM(NSInteger, PsiphonSubscriptionState) {
     return NO;
 }
 
-- (BOOL)hasActiveAuthorizationForDate:(NSDate*) date inDict:(NSDictionary*) dict {
-    if(!dict) {
+- (BOOL)hasActiveAuthorizationForDate:(NSDate *)date inAuthorizations:(Authorizations *)authorizations {
+    if(!authorizations) {
         return NO;
     }
-    NSDate *authExpires = dict[kAuthorizationExpires];
-    return authExpires && [date compare:authExpires] != NSOrderedDescending;
+
+    for (Authorization *authorization in authorizations.tokens) {
+        if ([date compare:authorization.expires] != NSOrderedDescending) {
+            return TRUE;
+        }
+    }
+
+    return FALSE;
 }
 
 @end
@@ -831,11 +806,16 @@ typedef NS_ENUM(NSInteger, PsiphonSubscriptionState) {
     mutableConfigCopy[@"ClientVersion"] = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleVersion"];
 
     // Authorizations
-    NSDictionary *authDict = [self authorizationDictionary];
-    if (authDict) {
-        NSString *authorizationString = authDict[kSignedAuthorization];
-        if ([authorizationString length]) {
-            mutableConfigCopy[@"Authorizations"] = @[ authorizationString ];
+    Authorizations *authorizations = [Authorizations createFromPersistedAuthorizations];
+    if (authorizations) {
+        NSMutableArray *configTokens = [NSMutableArray array];
+
+        for (Authorization *token in authorizations.tokens) {
+            [configTokens addObject:token.base64Representation];
+        }
+
+        if ([configTokens count] > 0) {
+            mutableConfigCopy[@"Authorizations"] = configTokens;
         }
     }
 
@@ -878,8 +858,8 @@ typedef NS_ENUM(NSInteger, PsiphonSubscriptionState) {
     // Check if user has an active subscription in the device's time
     // If NO - do nothing
     // If YES - proceed with checking the subscription against server timestamp
-    NSDictionary* dict = [self authorizationDictionary];
-    if([self hasActiveAuthorizationForDate:[NSDate date] inDict:dict]) {
+    Authorizations *authorizations = [Authorizations createFromPersistedAuthorizations];
+    if([self hasActiveAuthorizationForDate:[NSDate date] inAuthorizations:authorizations]) {
         // The following code adapted from
         // https://developer.apple.com/library/content/documentation/Cocoa/Conceptual/DataFormatting/Articles/dfDateFormatting10_4.html
         NSDateFormatter *rfc3339DateFormatter = [NSDateFormatter createRFC3339Formatter];
@@ -887,7 +867,7 @@ typedef NS_ENUM(NSInteger, PsiphonSubscriptionState) {
         NSString *serverTimestamp = [sharedDB getServerTimestamp];
         NSDate *serverDate = [rfc3339DateFormatter dateFromString:serverTimestamp];
         if (serverDate != nil) {
-            if(![self hasActiveAuthorizationForDate:serverDate inDict:dict]) {
+            if(![self hasActiveAuthorizationForDate:serverDate inAuthorizations:authorizations]) {
                 // User is possibly cheating, terminate the app due to 'Bad Clock'.
                 [self killExtensionForBadClock];
             }
