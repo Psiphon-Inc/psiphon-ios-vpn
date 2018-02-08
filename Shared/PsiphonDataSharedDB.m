@@ -44,9 +44,6 @@
     NSUserDefaults *sharedDefaults;
 
     NSString *appGroupIdentifier;
-
-    // RFC3339 Date Formatter
-    NSDateFormatter *rfc3339Formatter;
 }
 
 /*!
@@ -58,7 +55,6 @@
     if (self) {
         appGroupIdentifier = identifier;
         sharedDefaults = [[NSUserDefaults alloc] initWithSuiteName:identifier];
-        rfc3339Formatter = [NSDateFormatter createRFC3339MilliFormatter];
     }
     return self;
 }
@@ -181,7 +177,7 @@
                     msg = [NSString stringWithFormat:@"%@: %@", dict[@"noticeType"], data];
                 }
 
-                NSDate *timestamp = [rfc3339Formatter dateFromString:dict[@"timestamp"]];
+                NSDate *timestamp = [[NSDateFormatter sharedRFC3339MilliDateFormatter] dateFromString:dict[@"timestamp"]];
 
                 if (!msg) {
                     LOG_ERROR(@"Failed to read notice message for log line (%@).", logLine);
@@ -252,7 +248,7 @@
         if (dict) {
             Homepage *h = [[Homepage alloc] init];
             h.url = [NSURL URLWithString:dict[@"data"][@"url"]];
-            h.timestamp = [rfc3339Formatter dateFromString:dict[@"timestamp"]];
+            h.timestamp = [[NSDateFormatter sharedRFC3339MilliDateFormatter] dateFromString:dict[@"timestamp"]];
             [homepages addObject:h];
         }
     }

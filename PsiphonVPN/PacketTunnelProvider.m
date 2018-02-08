@@ -31,24 +31,29 @@
 #import "Logging.h"
 #import "SubscriptionVerifier.h"
 #import "NSDateFormatter+RFC3339.h"
-#import "RetryOperation.h"
 #import "NoticeLogger.h"
 #import "PacketTunnelUtils.h"
 #import "Authorizations.h"
+#import "RACSignal.h"
+#import "RACSignal+Operations.h"
+#import "RACDisposable.h"
+#import "NSObject+RACPropertySubscribing.h"
+#import "NSArray+RACSequenceAdditions.h"
+#import "RACSequence.h"
+#import "RACTuple.h"
+#import "RACSignal+Operations2.h"
+#import "RACScheduler.h"
+#import "RACCompoundDisposable.h"
 #import <ifaddrs.h>
 #import <arpa/inet.h>
 #import <net/if.h>
 #import <stdatomic.h>
+#import <ReactiveObjC/RACSubject.h>
+#import <ReactiveObjC/RACReplaySubject.h>
 
+#define SEC_PER_24HR (24 * 60 * 60)  // number of seconds per 24 hours.
 
 NSString *_Nonnull const PsiphonTunnelErrorDomain = @"PsiphonTunnelErrorDomain";
-
-static NSDateFormatter *__rfc3339DateFormatter = nil;
-
-#define kSignedAuthorization            @"signed_authorization"
-#define kPendingRenewalInfo             @"pending_renewal_info"
-#define kAutoRenewStatus                @"auto_renew_status"
-#define kRequestDate                    @"request_date"
 
 typedef NS_ENUM(NSInteger, PsiphonSubscriptionState) {
     PsiphonSubscriptionStateNotSubscribed,
@@ -75,7 +80,7 @@ typedef NS_ENUM(NSInteger, PsiphonSubscriptionState) {
 
 @property (nonatomic) BOOL extensionIsZombie;
 
-@property (nonatomic)  PsiphonSubscriptionState startTunnelSubscriptionState;
+@property (nonatomic) PsiphonSubscriptionState startTunnelSubscriptionState;
 
 // Start vpn decision. If FALSE, VPN should not be activated, even though Psiphon tunnel might be connected.
 // shouldStartVPN SHOULD NOT be altered after it is set to TRUE.
@@ -94,11 +99,21 @@ typedef NS_ENUM(NSInteger, PsiphonSubscriptionState) {
     NSString *_Nonnull currentSponsorId;
 
     _Atomic BOOL showUpstreamProxyErrorMessage;
+
+    // An infinite signal that emits Psiphon tunnel connection state.
+    // When subscribed, replays the last known connection state.
+    RACReplaySubject<NSNumber *> *tunnelConnectionStateSignal;
+
+    // An infinite signal that emits @(0) if the subscription authorization token was invalid,
+    // and @(1) if it was valid (or non-existent).
+    // When subscribed, replays the last item this subject was sent by onActiveAuthorizationIDs callback.
+    RACReplaySubject<NSNumber *> *subscriptionAuthorizationTokenActive;
+
+    RACCompoundDisposable *globalDisposable;
 }
 
 - (id)init {
     self = [super init];
-
     if (self) {
         // Create our tunnel instance
         psiphonTunnel = [PsiphonTunnel newPsiphonTunnel:(id <TunneledAppDelegate>) self];
@@ -112,10 +127,192 @@ typedef NS_ENUM(NSInteger, PsiphonSubscriptionState) {
 
         atomic_init(&self->showUpstreamProxyErrorMessage, TRUE);
 
-        self.extensionIsZombie = FALSE;
-    }
+        _extensionIsZombie = FALSE;
 
+        globalDisposable = [RACCompoundDisposable compoundDisposable];
+    }
     return self;
+}
+
+// Initializes ReactiveObjC signals for subscription check and subscribes to them.
+// This method shouldn't be called if no subscription check is necessary.
+- (void)startPeriodicSubscriptionCheck {
+
+    self->tunnelConnectionStateSignal = [RACReplaySubject replaySubjectWithCapacity:1];
+
+    self->subscriptionAuthorizationTokenActive = [RACReplaySubject replaySubjectWithCapacity:1];
+
+    // tunnelConnectedSignal is an infinite signal that emits an item whenever Psiphon tunnel is connected.
+    RACSignal *tunnelConnectedSignal = [self->tunnelConnectionStateSignal filter:^BOOL(NSNumber *x) {
+        return (PsiphonConnectionState)[x integerValue] == PsiphonConnectionStateConnected;
+    }];
+
+    // shouldUpdateSubscriptionToken is a finite signal that emits a single @(0) if a new subscription token
+    // needs to be attained, otherwise it emits a single @(0).
+    RACSignal<NSNumber *> *shouldUpdateSubscriptionTokens = [RACSignal createSignal:^RACDisposable *(id <RACSubscriber> subscriber) {
+        Subscription *subscription = [Subscription createFromPersistedSubscription];
+        NSNumber *value = ([subscription shouldUpdateSubscriptionToken]) ? @(0) : @(1);
+        [subscriber sendNext:value];
+        [subscriber sendCompleted];
+
+        // Nothing to cleanup.
+        return nil;
+    }];
+
+    // shouldContactSubscriptionServer is a finite signal that emits an item if subscription verifier server
+    // should be contacted, or completes immediately if the server does not need to be contacted.
+    RACSignal *shouldContactSubscriptionServer = [[[self->subscriptionAuthorizationTokenActive
+      take:1]
+      zipWith:shouldUpdateSubscriptionTokens]
+      flattenMap:^RACSignal *(RACTwoTuple<NSNumber *, NSNumber *> *value) {
+          if ([value.first isEqualToNumber:@(0)] || [value.second isEqualToNumber:@(0)]) {
+              return [RACSignal return:nil];
+          } else {
+              return [RACSignal empty];
+          }
+      }];
+
+#if DEBUG
+    const int networkRetryCount = 3;
+#else
+    const int networkRetryCount = 5;
+#endif
+
+    RACSignal *updateSubscriptionTokenSignal = [[[[[self subscriptionReceiptUnlocked]
+      flattenMap:^RACSignal *(id value) {
+          // Emits an item when Psiphon tunnel is connected and VPN is started.
+          LOG_DEBUG_NOTICE(@"$$subscription receipt is readable");
+          return [self.vpnStartedSignal zipWith:[tunnelConnectedSignal take:1]];
+      }]
+      flattenMap:^RACSignal *(id value) {
+          // After VPN started and Psiphon is connected, returns a signal that emits an item
+          // if Subscription authorization token needs to be updated.
+          return shouldContactSubscriptionServer;
+      }]
+      flattenMap:^RACSignal *(id value) {
+          // Emits an item whose value is the dictionary returned from the subscription verifier server,
+          // emits an error on all errors.
+          LOG_DEBUG_NOTICE(@"$$requesting new subscription authorization token: value: %@", value);
+          return [self updateSubscriptionAuthorizationTokenFromRemote];
+      }]
+      retryWhen:^RACSignal *(RACSignal *errors) {
+          return [[errors
+            zipWith:[RACSignal rangeStartFrom:1 count:networkRetryCount]]
+            flattenMap:^RACSignal *(RACTwoTuple *value) {
+                NSError *error = (NSError *) value.first;
+                NSInteger retryCount = [(NSNumber *) value.second integerValue];
+                // Emits the error on the last retry.
+                if (retryCount == networkRetryCount) {
+                    return [RACSignal error:error];
+                }
+                return [RACSignal timer:pow(4, retryCount)];
+            }];
+      }];
+
+
+    __weak PacketTunnelProvider *weakSelf = self;
+
+    // interval signal is the root observable that initiates the chain of subscription check signals.
+    RACDisposable *subscriptionCheckTimerDisposable = [[[RACSignal interval:SEC_PER_24HR onScheduler:[RACScheduler mainThreadScheduler]]
+      startWith:nil]
+      subscribeNext:^(NSDate *x) {
+
+          LOG_DEBUG_NOTICE(@"subscription check timer interval emitted");
+
+          __block RACDisposable *selfDisposable = [updateSubscriptionTokenSignal
+            subscribeNext:^(NSDictionary *remoteAuthDict) {
+
+                LOG_DEBUG_NOTICE(@"received dict from server:%@", remoteAuthDict);
+
+                // Received remote auth dict from the server.
+                NSError *error;
+                NSNumber *appReceiptFileSize = nil;
+                [[NSBundle mainBundle].appStoreReceiptURL
+                  getResourceValue:&appReceiptFileSize
+                            forKey:NSURLFileSizeKey
+                             error:&error];
+
+                if (error) {
+                    LOG_ERROR(@"error getting receipt file size:%@", error);
+                }
+
+                // Updates subscription info
+                Subscription *subscription = [Subscription createFromPersistedSubscription];
+                [subscription setAppReceiptFileSize:appReceiptFileSize];
+                [subscription setPendingRenewalInfo:remoteAuthDict[RemoteSubscriptionVerifierPendingRenewalInfo]];
+                Authorization *authorizationToken = [[Authorization alloc]
+                  initWithEncodedToken:remoteAuthDict[RemoteSubscriptionVerifierSignedAuthorization]];
+                [subscription setAuthorizationToken:authorizationToken];
+                [subscription persistChanges];
+
+                // Extract request date from the response and convert to NSDate
+                NSDate *requestDate = nil;
+                NSString *requestDateString = (NSString *)remoteAuthDict[RemoteSubscriptionVerifierRequestDate];
+
+                if ([requestDateString length]) {
+                    requestDate = [[NSDateFormatter sharedRFC3339DateFormatter] dateFromString:requestDateString];
+                }
+
+                // "Clock is off" notification  if user has an active subscription in server time
+                // but in device time it appears to be expired.
+                if (requestDate) {
+                    if ([subscription hasActiveSubscriptionTokenForDate:requestDate]
+                        && ![subscription hasActiveSubscriptionTokenForDate:[NSDate date]]) {
+                        [weakSelf killExtensionForBadClock];
+                        return;
+                    }
+                }
+
+                // Received token from server successfully.
+                if (subscription.authorizationToken) {
+
+                    // subscription has a valid authorization token, restart the tunnel to connect with the new token.
+                    weakSelf.startTunnelSubscriptionState = PsiphonSubscriptionStateSubscribed;
+                    [weakSelf restartTunnel];
+
+                } else {
+
+                    // server returned no authorization token, restart only if the extension was not started
+                    // from the container.
+                    if (weakSelf.NEStartMethod == NEStartMethodFromContainer) {
+
+                        if (weakSelf.startTunnelSubscriptionState != PsiphonSubscriptionStateNotSubscribed) {
+                            LOG_DEBUG_NOTICE(@"tunnel started from container restarting tunnel");
+                            weakSelf.startTunnelSubscriptionState = PsiphonSubscriptionStateNotSubscribed;
+                            [self restartTunnel];
+                        }
+
+                    } else {
+                        LOG_DEBUG_NOTICE(@"tunnel not started from the container killing with grace");
+                        [self startGracePeriod];
+                    }
+
+                }
+
+            }
+            error:^(NSError *error) {
+                LOG_ERROR(@"subscription verifier error: %@, %ld", error.localizedDescription, (long) error.code);
+
+                // Kill the extension for an invalid receipt,
+                // else do nothing.
+                if (error.code == PsiphonReceiptValidationInvalidReceiptError) {
+                    [weakSelf killExtensionForInvalidReceipt];
+                }
+
+                [globalDisposable removeDisposable:selfDisposable];
+                [selfDisposable dispose];
+            }
+            completed:^{
+                LOG_DEBUG_NOTICE(@"$$finished");
+                [globalDisposable removeDisposable:selfDisposable];
+                [selfDisposable dispose];
+            }];
+
+          [globalDisposable addDisposable:selfDisposable];
+
+      }];
+
+    [globalDisposable addDisposable:subscriptionCheckTimerDisposable];
 }
 
 - (void)startTunnelWithErrorHandler:(void (^_Nonnull)(NSError *_Nonnull error))errorHandler {
@@ -126,23 +323,32 @@ typedef NS_ENUM(NSInteger, PsiphonSubscriptionState) {
     // OR if the user possibly has a valid subscription
     // OR if the extension is started after boot but before being unlocked.
 
-    Authorizations *authorizations = [Authorizations createFromPersistedAuthorizations];
     Subscription *subscription = [Subscription createFromPersistedSubscription];
-
     self.startTunnelSubscriptionState = PsiphonSubscriptionStateNotSubscribed;
 
-    if([self hasActiveAuthorizationForDate:[NSDate date] inAuthorizations:authorizations]) {
+    if ([subscription hasActiveSubscriptionTokenForDate:[NSDate date]]) {
         self.startTunnelSubscriptionState = PsiphonSubscriptionStateSubscribed;
-    } else if ([self shouldUpdateSubscriptionTokens:subscription withAuthorizations:authorizations]) {
+    } else if ([subscription shouldUpdateSubscriptionToken]) {
         self.startTunnelSubscriptionState = PsiphonSubscriptionStateMaybeSubscribed;
     }
 
     LOG_DEBUG_NOTICE(@"starting tunnel with state %lu", self.startTunnelSubscriptionState);
 
-    if (self.NEStartMethod == NEStartMethodFromContainer || self.startTunnelSubscriptionState != PsiphonSubscriptionStateNotSubscribed) {
+    if (self.NEStartMethod == NEStartMethodFromContainer
+        || self.startTunnelSubscriptionState != PsiphonSubscriptionStateNotSubscribed) {
 
         // Listen for messages from the container
         [self listenForContainerMessages];
+
+        if (self.startTunnelSubscriptionState != PsiphonSubscriptionStateNotSubscribed) {
+            // Starts the periodic (24 hour) timer for subscription check and starts to perform subscription
+            // check immediately.
+            [self startPeriodicSubscriptionCheck];
+
+            // If there maybe a valid subscription, there is no need to wait
+            // for the container to send "M.startVPN" signal.
+            self.shouldStartVPN = TRUE;
+        }
 
         __weak PsiphonTunnel *weakPsiphonTunnel = psiphonTunnel;
 
@@ -187,9 +393,11 @@ typedef NS_ENUM(NSInteger, PsiphonSubscriptionState) {
 
 - (void)stopTunnelWithReason:(NEProviderStopReason)reason {
     // Always log the stop reason.
-    LOG_ERROR(@"Tunnel stopped. Reason: %ld %@", reason, [PacketTunnelUtils textStopReason:reason]);
+    LOG_ERROR(@"Tunnel stopped. Reason: %ld %@", (long)reason, [PacketTunnelUtils textStopReason:reason]);
     
     [psiphonTunnel stop];
+
+    [globalDisposable dispose];
 }
 
 - (void)restartTunnel {
@@ -201,7 +409,7 @@ typedef NS_ENUM(NSInteger, PsiphonSubscriptionState) {
 }
 
 - (void)displayMessageAndKillExtension:(NSError *)error {
-    LOG_ERROR(@"killing extension error-domain:%@ error-code:%lu", error.domain, error.code);
+    LOG_ERROR(@"killing extension error-domain:%@ error-code:%lu", error.domain, (long)error.code);
 
     // Stop the Psiphon tunnel immediately.
     [psiphonTunnel stop];
@@ -339,18 +547,12 @@ typedef NS_ENUM(NSInteger, PsiphonSubscriptionState) {
 
     if ([sharedDB getAppForegroundState] || self.startTunnelSubscriptionState != PsiphonSubscriptionStateNotSubscribed) {
         if ([psiphonTunnel getConnectionState] == PsiphonConnectionStateConnected) {
-
             self.reasserting = FALSE;
-
             [self startVPN];
             [notifier post:@"NE.newHomepages"];
-
-            [self trySubscriptionCheck];
-
             return TRUE;
         }
     }
-
     return FALSE;
 }
 
@@ -373,71 +575,49 @@ typedef NS_ENUM(NSInteger, PsiphonSubscriptionState) {
     }];
 }
 
-#pragma mark - Subscription
+#pragma mark - Subscription Observables
 
-- (void)trySubscriptionCheck {
+// A finite signal that emits an item when device is unlocked.
+- (RACSignal *)subscriptionReceiptUnlocked {
+#if DEBUG
+    const NSTimeInterval retryInterval = 5; // 5 seconds.
+#else
+    const NSTimeInterval retryInterval = 5 * 60; // 5 minutes.
+#endif
 
-    LOG_DEBUG_NOTICE();
+    // Leeway of 5 seconds added in the interest of system performance / power consumption.
+    const NSTimeInterval leeway = 5; // 5 seconds.
 
-    if (self.VPNStarted && [psiphonTunnel getConnectionState] == PsiphonConnectionStateConnected) {
+    return [[[[RACSignal interval:retryInterval onScheduler:[RACScheduler mainThreadScheduler] withLeeway:leeway]
+      startWith:nil]
+      skipWhileBlock:^BOOL(id x) {
+          LOG_DEBUG_NOTICE(@"check if device is locked");
+          return [self isDeviceLocked];
+      }]
+      // take:1 on an infinite signal, effectively turns it into a finite signal after it emits its first item.
+      take:1];
+}
 
-        LOG_DEBUG_NOTICE(@"vpn started and tunnel is connected");
+- (RACSignal<NSDictionary *> *)updateSubscriptionAuthorizationTokenFromRemote {
+    return [RACSignal createSignal:^RACDisposable *(id <RACSubscriber> subscriber) {
 
-        if ([self isDeviceLocked] && self.NEStartMethod == NEStartMethodFromBoot) {
-            // Device is started from boot, but before the user has unlocked it first.
-            // Defer subscription check, until the device is unlocked.
-            // Deferral time is defined within deferSubscriptionCheck (currently every 5 minutes).
-            // If the the device is never unlocked, subscription will never be checked, and the tunnel
-            // will be active indefinitely until stopped.
-            [self deferSubscriptionCheck];
-            return;
-        }
+        LOG_DEBUG_NOTICE(@"##$ updating token");
+        [[[SubscriptionVerifier alloc] init] startWithCompletionHandler:^(NSDictionary *remoteAuthDict, NSError *error) {
 
-        Authorizations *authorizations = [Authorizations createFromPersistedAuthorizations];
-        Subscription *subscription = [Subscription createFromPersistedSubscription];
+            LOG_DEBUG_NOTICE(@"##$ server replied: error:%@, nilDic?:%d", error, remoteAuthDict==nil);
 
-        if ([self shouldUpdateSubscriptionTokens:subscription withAuthorizations:authorizations]) {
-            // Do remote check.
-            LOG_DEBUG_NOTICE(@"will update authorization dictionary from remote");
-            [self updateAuthorizationDictionaryFromRemote];
-
-        } else {
-
-            // Check authorization.
-            if ([self hasActiveAuthorizationForDate:[NSDate date] inAuthorizations:authorizations]) {
-                LOG_DEBUG_NOTICE(@"device has active authorization");
-
-                if (self.startTunnelSubscriptionState != PsiphonSubscriptionStateSubscribed) {
-                    LOG_DEBUG_NOTICE(@"tunnel subscription state changed restarting tunnel");
-                    self.startTunnelSubscriptionState = PsiphonSubscriptionStateSubscribed;
-                    [self restartTunnel];
-                }
-
-                // if the user has an active subscription, checks their subscription again in an interval defined within
-                // startSubscriptionCheckTimer (currently every 24 hours).
-                // If the subscription expires at some point in the future, the user is given a grace period (currently 1 hour)
-                // before the tunnel and the VPN are stopped completely.
-                [self startSubscriptionCheckTimer];
-
+            if (error) {
+                [subscriber sendError:error];
             } else {
-
-                LOG_DEBUG_NOTICE(@"device does not have active authorization");
-
-                if (self.NEStartMethod == NEStartMethodFromContainer) {
-
-                    if (self.startTunnelSubscriptionState != PsiphonSubscriptionStateNotSubscribed) {
-                        LOG_DEBUG_NOTICE(@"tunnel started from container restarting tunnel");
-                        self.startTunnelSubscriptionState = PsiphonSubscriptionStateNotSubscribed;
-                        [self restartTunnel];
-                    }
-
-                } else {
-                    LOG_DEBUG_NOTICE(@"tunnel not started from the container killing with grace");
-                    [self startGracePeriod];
+                if (remoteAuthDict) {
+                    [subscriber sendNext:remoteAuthDict];
                 }
+                [subscriber sendCompleted];
             }
-        }
-    }
+        }];
+
+        return nil;
+    }];
 }
 
 /*!
@@ -445,108 +625,27 @@ typedef NS_ENUM(NSInteger, PsiphonSubscriptionState) {
  * This alert will only be shown again after a time interval after the user *dismisses* the current alert.
  */
 - (void)showRepeatingExpiredSubscriptionAlert {
+    const int64_t intervalInSec = 60; // Every minute.
 
-    static RetryOperation *operation = nil;
-    if (!operation) {
-        operation = [RetryOperation retryOperation:10 interval:60 backoff:FALSE
-          onNext:^(void (^retryCallback)(NSError *)) {
-              [self displayMessage:
-                  NSLocalizedStringWithDefaultValue(@"CANNOT_START_TUNNEL_DUE_TO_SUBSCRIPTION", nil, [NSBundle mainBundle], @"Your Psiphon subscription has expired.\nSince you're not a subscriber or your subscription has expired, Psiphon can only be started from the Psiphon app.\n\nPlease open the Psiphon app.", @"Alert message informing user that their subscription has expired or that they're not a subscriber, therefore Psiphon can only be started from the Psiphon app. DO NOT translate 'Psiphon'.")
-                 completionHandler:^(BOOL success) {
-                     // If the user dismisses the message, show the alert again in intervalInSec seconds.
-                     if (success) {
-                         retryCallback([[NSError alloc] init]);
-                     }
-                 }];
-
-          }];
-    }
-
-    [operation execute];
-}
-
-// If the app receipt cannot be accessed while the device is locked,
-// defer subscription check to a later time.
-- (void)deferSubscriptionCheck {
-    // Checks every subscriptionDeferralIntervalInSec seconds if the subscription receipt is valid.
-    // If cannot read subscription receipt, defer again.
-    // If can read subscription receipt, try subscription check.
-
-    LOG_DEBUG_NOTICE(@"defer subscription check");
-
-    #if DEBUG
-    const NSTimeInterval subscriptionDeferralInterval = 5; // 5 seconds.
-    #else
-    const NSTimeInterval subscriptionDeferralInterval = 5 * 60; // 5 minutes.
-    #endif
-
-    static RetryOperation *operation = nil;
-
-    if (!operation) {
-        operation = [RetryOperation retryOperationForeverEvery:subscriptionDeferralInterval
-          onNext:^(void (^retryCallback)(NSError *)) {
-
-              if ([self isDeviceLocked]) {
-                  // Device is still not unlocked since boot.
-                  // Defer subscription check again.
-                  LOG_DEBUG_NOTICE(@"device still locked deferring again");
-                  retryCallback([[NSError alloc] init]);
-              } else {
-                  LOG_DEBUG_NOTICE(@"device unlocked checking subscription ");
-                  [self trySubscriptionCheck];
-                  retryCallback(nil);
-              }
-          }];
-    }
-
-    [operation execute];
-}
-
-- (void)startSubscriptionCheckTimer {
-
-    LOG_DEBUG_NOTICE();
-
-    #if DEBUG
-    const NSTimeInterval subscriptionCheckInterval = 5; // 5 seconds.
-    #else
-    const NSTimeInterval subscriptionCheckInterval = 24 * 60 * 60;  // 24 hours.
-    #endif
-
-    if (self.startTunnelSubscriptionState == PsiphonSubscriptionStateNotSubscribed) {
-        return;
-    }
-
-    static RetryOperation *operation = nil;
-
-    if (!operation) {
-        __weak PacketTunnelProvider *weakSelf = self;
-        operation = [RetryOperation retryOperationForeverEvery:subscriptionCheckInterval
-          onNext:^(void (^retryCallback)(NSError *)) {
-              // If user's subscription has expired, then give them an hour of extra grace period
-              // before killing the tunnel.
-              Authorizations *authorizations = [Authorizations createFromPersistedAuthorizations];
-              if ([weakSelf hasActiveAuthorizationForDate:[NSDate date] inAuthorizations:authorizations]) {
-                  // User has an active subscription. Check later.
-                  retryCallback([[NSError alloc] init]);
-              } else {
-                  [weakSelf trySubscriptionCheck];
-
-                  // Don't schedule again.
-                  retryCallback(nil);
-              }
-        }];
-    }
-
-    [operation execute];
+    [self displayMessage:
+        NSLocalizedStringWithDefaultValue(@"CANNOT_START_TUNNEL_DUE_TO_SUBSCRIPTION", nil, [NSBundle mainBundle], @"Your Psiphon subscription has expired.\nSince you're not a subscriber or your subscription has expired, Psiphon can only be started from the Psiphon app.\n\nPlease open the Psiphon app.", @"Alert message informing user that their subscription has expired or that they're not a subscriber, therefore Psiphon can only be started from the Psiphon app. DO NOT translate 'Psiphon'.")
+       completionHandler:^(BOOL success) {
+           // If the user dismisses the message, show the alert again in intervalInSec seconds.
+           if (success) {
+               dispatch_after(dispatch_time(DISPATCH_TIME_NOW, intervalInSec * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
+                   [self showRepeatingExpiredSubscriptionAlert];
+               });
+           }
+       }];
 }
 
 - (void)startGracePeriod {
 
-    #if DEBUG
+#if DEBUG
     int64_t gracePeriodInSec = 5; // 5 seconds.
-    #else
+#else
     int64_t gracePeriodInSec = 1 * 60 * 60;  // 1 hour.
-    #endif
+#endif
 
     __weak PacketTunnelProvider *weakSelf = self;
 
@@ -558,11 +657,8 @@ typedef NS_ENUM(NSInteger, PsiphonSubscriptionState) {
            if (success) {
                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, gracePeriodInSec * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
                    // Grace period has finished. Checks if the subscription has been renewed, otherwise kill the VPN.
-                   Authorizations *authorizations = [Authorizations createFromPersistedAuthorizations];
-                   if ([weakSelf hasActiveAuthorizationForDate:[NSDate date] inAuthorizations:authorizations]) {
-                       // Subscription has been renewed.
-                       [weakSelf startSubscriptionCheckTimer];
-                   } else {
+                   Subscription *subscription = [Subscription createFromPersistedSubscription];
+                   if (![subscription hasActiveSubscriptionTokenForDate:[NSDate date]]) {
                        // Subscription has not been renewed. Stop the tunnel.
                        [weakSelf killExtensionForExpiredSubscription];
                    }
@@ -600,154 +696,6 @@ typedef NS_ENUM(NSInteger, PsiphonSubscriptionState) {
        completionHandler:^(BOOL success) {
            // Do nothing.
        }];
-}
-
-- (void)updateAuthorizationDictionaryFromRemote {
-
-    static RetryOperation *operation = nil;
-
-    if (!operation) {
-        __weak PacketTunnelProvider *weakSelf = self;
-        operation = [RetryOperation retryOperation:6 interval:30 backoff:TRUE onNext:^(void (^retryCallback)(NSError *_Nullable)) {
-
-            [[[SubscriptionVerifier alloc] init] startWithCompletionHandler:^(NSDictionary *remoteAuthDict, NSError *error) {
-
-                if (!error) {
-                    if (remoteAuthDict) {
-                        // add app receipt file size
-                        NSNumber *appReceiptFileSize = nil;
-                        [[NSBundle mainBundle].appStoreReceiptURL getResourceValue:&appReceiptFileSize forKey:NSURLFileSizeKey error:nil];
-
-
-                        Authorizations *authorizations = [Authorizations createFromPersistedAuthorizations];
-                        Subscription *subscription = [Subscription createFromPersistedSubscription];
-
-                        [subscription setAppReceiptFileSize:appReceiptFileSize];
-                        [subscription setPendingRenewalInfo:remoteAuthDict[@"pending_renewal_info"]];
-                        [authorizations addTokens:@[ remoteAuthDict[@"signed_authorization"]] ];
-
-                        [authorizations persistChanges];
-                        [subscription persistChanges];
-
-                        // Extract request date from the response and convert to NSDate
-                        NSDate *requestDate = nil;
-                        NSString *requestDateString = (NSString *) remoteAuthDict[kRequestDate];
-
-                        if ([requestDateString length]) {
-                            if (!__rfc3339DateFormatter) {
-                                __rfc3339DateFormatter = [NSDateFormatter createRFC3339Formatter];
-                            }
-                            requestDate = [__rfc3339DateFormatter dateFromString:requestDateString];
-                        }
-
-                        // "Clock is off" notification  if user has an active subscription in server time
-                        // but in device time it appears to be expired.
-                        if (requestDate) {
-                            if ([weakSelf hasActiveAuthorizationForDate:requestDate inAuthorizations:authorizations]
-                              && ![weakSelf hasActiveAuthorizationForDate:[NSDate date] inAuthorizations:authorizations]) {
-                                [weakSelf killExtensionForBadClock];
-                            }
-                        }
-                    }
-
-                    LOG_DEBUG_NOTICE(@"fetched authorization from remote successfully");
-
-                    // Operation finished successfully.
-                    retryCallback(nil);
-
-                } else {
-                    LOG_ERROR(@"subscription verifier error: %@, %ld", error.localizedDescription, (long) error.code);
-
-                    // Notify observers if invalid receipt
-                    if (error.code == PsiphonReceiptValidationInvalidReceiptError) {
-                        [weakSelf killExtensionForInvalidReceipt];
-
-                    } else if (error.code == PsiphonReceiptValidationHTTPError ||
-                      error.code == PsiphonReceiptValidationNSURLSessionError) {
-                        // Retry again.
-                        retryCallback(error);
-                    }
-                }
-            }];
-          }
-          onFinished:^(NSError *lastError) {
-              // TODO: do some error handling (infinite loop condition)
-              [weakSelf trySubscriptionCheck];
-          }];
-    }
-
-    [operation execute];
-}
-
-- (BOOL)shouldUpdateSubscriptionTokens:(Subscription *)subscription withAuthorizations:(Authorizations *)authorizations {
-    // If no receipt - NO
-    NSURL *URL = [NSBundle mainBundle].appStoreReceiptURL;
-    NSString *path = URL.path;
-    const BOOL exists = [[NSFileManager defaultManager] fileExistsAtPath:path isDirectory:nil];
-    if (!exists) {
-        LOG_DEBUG_NOTICE(@"receipt does not exist");
-        return NO;
-    }
-
-    // There's receipt but no subscription persisted - YES
-    if([subscription isEmpty]) {
-        LOG_DEBUG_NOTICE(@"receipt exist by no subscription persisted");
-        return YES;
-    }
-
-    // If there's no authorization token with Apple subcription access type - YES
-    if (![authorizations hasTokenWithAccessType:kAuthorizationAccessTypeApple]) {
-        LOG_DEBUG_NOTICE(@"there is no authorization with apple subscription access type");
-        return YES;
-    }
-
-    // Receipt file size has changed since last check - YES
-    NSNumber *appReceiptFileSize = nil;
-    [[NSBundle mainBundle].appStoreReceiptURL getResourceValue:&appReceiptFileSize forKey:NSURLFileSizeKey error:nil];
-    if ([appReceiptFileSize unsignedIntValue] != [subscription.appReceiptFileSize unsignedIntValue]) {
-        LOG_DEBUG_NOTICE(@"receipt file size changed (%@) since last check (%@)", appReceiptFileSize, subscription.appReceiptFileSize);
-        return YES;
-    }
-
-    // If user has an active authorization for date - NO
-    if ([self hasActiveAuthorizationForDate:[NSDate date] inAuthorizations:authorizations]) {
-        LOG_DEBUG_NOTICE(@"device has active authorization for date");
-        return NO;
-    }
-
-    // If expired and pending renewal info is missing - YES
-    if(!subscription.pendingRenewalInfo) {
-        LOG_DEBUG_NOTICE(@"pending renewal info is missing");
-        return YES;
-    }
-
-    // If expired but user's last known intention was to auto-renew - YES
-    if([subscription.pendingRenewalInfo count] == 1
-      && [subscription.pendingRenewalInfo[0] isKindOfClass:[NSDictionary class]]) {
-
-        NSString *autoRenewStatus = [subscription.pendingRenewalInfo[0] objectForKey:kAutoRenewStatus];
-        if (autoRenewStatus && [autoRenewStatus isEqualToString:@"1"]) {
-            LOG_DEBUG_NOTICE(@"subscription expired but user's last known intention is to auto-renew");
-            return YES;
-        }
-    }
-
-    LOG_DEBUG_NOTICE(@"authorization token update not needed");
-    return NO;
-}
-
-- (BOOL)hasActiveAuthorizationForDate:(NSDate *)date inAuthorizations:(Authorizations *)authorizations {
-    if(!authorizations) {
-        return NO;
-    }
-
-    for (Authorization *authorization in authorizations.tokens) {
-        if ([date compare:authorization.expires] != NSOrderedDescending) {
-            return TRUE;
-        }
-    }
-
-    return FALSE;
 }
 
 @end
@@ -805,18 +753,17 @@ typedef NS_ENUM(NSInteger, PsiphonSubscriptionState) {
 
     mutableConfigCopy[@"ClientVersion"] = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleVersion"];
 
-    // Authorizations
-    Authorizations *authorizations = [Authorizations createFromPersistedAuthorizations];
-    if (authorizations) {
-        NSMutableArray *configTokens = [NSMutableArray array];
 
-        for (Authorization *token in authorizations.tokens) {
-            [configTokens addObject:token.base64Representation];
-        }
+    NSMutableArray *authorizationTokens = [NSMutableArray array];
 
-        if ([configTokens count] > 0) {
-            mutableConfigCopy[@"Authorizations"] = configTokens;
-        }
+    // Add subscription tokens
+    Subscription *subscription = [Subscription createFromPersistedSubscription];
+    if (subscription.authorizationToken) {
+        [authorizationTokens addObject:subscription.authorizationToken.base64Representation];
+    }
+
+    if ([authorizationTokens count] > 0) {
+        mutableConfigCopy[@"Authorizations"] = [authorizationTokens copy];
     }
 
     // SponsorId override
@@ -841,9 +788,36 @@ typedef NS_ENUM(NSInteger, PsiphonSubscriptionState) {
     return [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
 }
 
+- (void)onConnectionStateChangedFrom:(PsiphonConnectionState)oldState to:(PsiphonConnectionState)newState {
+    [self->tunnelConnectionStateSignal sendNext:@(newState)];
+}
+
 - (void)onConnecting {
     LOG_DEBUG(@"onConnecting");
     self.reasserting = TRUE;
+}
+
+- (void)onActiveAuthorizationIDs:(NSArray * _Nonnull)authorizationIds {
+
+    if (authorizationIds && [authorizationIds count] > 0) {
+
+        Subscription *subscription = [Subscription createFromPersistedSubscription];
+
+        if (![authorizationIds containsObject:subscription.authorizationToken.ID]) {
+
+            subscription.authorizationToken = nil;
+            [subscription persistChanges];
+
+            // Send value of 0 if subscription authorization token was invalid.
+            [self->subscriptionAuthorizationTokenActive sendNext:@(0)];
+
+            return;
+        }
+    }
+    
+    // Send value of 1 if subscription authorization token was not invalid (i.e. non-existent or valid)
+    [self->subscriptionAuthorizationTokenActive sendNext:@(1)];
+
 }
 
 - (void)onConnected {
@@ -855,20 +829,28 @@ typedef NS_ENUM(NSInteger, PsiphonSubscriptionState) {
 - (void)onServerTimestamp:(NSString * _Nonnull)timestamp {
 	[sharedDB updateServerTimestamp:timestamp];
 
+    NSDate *serverDate = [[NSDateFormatter sharedRFC3339DateFormatter] dateFromString:timestamp];
+
     // Check if user has an active subscription in the device's time
     // If NO - do nothing
     // If YES - proceed with checking the subscription against server timestamp
     Authorizations *authorizations = [Authorizations createFromPersistedAuthorizations];
-    if([self hasActiveAuthorizationForDate:[NSDate date] inAuthorizations:authorizations]) {
+    Subscription *subscription = [Subscription createFromPersistedSubscription];
+    if ([authorizations hasActiveAuthorizationTokenForDate:[NSDate date]]) {
         // The following code adapted from
         // https://developer.apple.com/library/content/documentation/Cocoa/Conceptual/DataFormatting/Articles/dfDateFormatting10_4.html
-        NSDateFormatter *rfc3339DateFormatter = [NSDateFormatter createRFC3339Formatter];
-
-        NSString *serverTimestamp = [sharedDB getServerTimestamp];
-        NSDate *serverDate = [rfc3339DateFormatter dateFromString:serverTimestamp];
         if (serverDate != nil) {
-            if(![self hasActiveAuthorizationForDate:serverDate inAuthorizations:authorizations]) {
-                // User is possibly cheating, terminate the app due to 'Bad Clock'.
+            if (![authorizations hasActiveAuthorizationTokenForDate:serverDate]) {
+                // User is possibly cheating, terminate extension due to 'Bad Clock'.
+                [self killExtensionForBadClock];
+            }
+        }
+    }
+
+    if ([subscription hasActiveSubscriptionTokenForDate:[NSDate date]]) {
+        if (serverDate != nil) {
+            if (![subscription hasActiveSubscriptionTokenForDate:serverDate]) {
+                // User is possibly cheating, terminate extension due to 'Bad Clock'.
                 [self killExtensionForBadClock];
             }
         }
