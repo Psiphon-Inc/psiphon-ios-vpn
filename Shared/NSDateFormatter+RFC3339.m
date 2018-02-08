@@ -38,4 +38,22 @@
     return f;
 }
 
++ (instancetype)sharedRFC3339DateFormatter {
+    static NSDateFormatter *f = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        f = [NSDateFormatter createRFC3339Formatter];
+    });
+    return f;
+}
+
++ (instancetype)sharedRFC3339MilliDateFormatter {
+    static NSDateFormatter *f = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        f = [NSDateFormatter createRFC3339MilliFormatter];
+    });
+    return f;
+}
+
 @end

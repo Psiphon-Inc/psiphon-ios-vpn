@@ -22,6 +22,7 @@
 #import "SharedConstants.h"
 #import "Logging.h"
 #import "FileUtils.h"
+#import "RACReplaySubject.h"
 
 
 NSString *_Nonnull const BasePsiphonTunnelErrorDomain = @"BasePsiphonTunnelErrorDomain";
@@ -40,6 +41,15 @@ NSString *_Nonnull const BasePsiphonTunnelErrorDomain = @"BasePsiphonTunnelError
     // NOTE: value is expected to be nil after completion handler has been called.
     void (^vpnStartCompletionHandler)(NSError *__nullable error);
 }
+
+- (instancetype)init {
+    self = [super init];
+    if (self) {
+        self.vpnStartedSignal = [RACReplaySubject replaySubjectWithCapacity:1];
+    }
+    return self;
+}
+
 
 /**
  * Subclasses should not override this function.
@@ -118,6 +128,10 @@ NSString *_Nonnull const BasePsiphonTunnelErrorDomain = @"BasePsiphonTunnelError
         vpnStartCompletionHandler(nil);
         vpnStartCompletionHandler = nil;
         self.VPNStarted = TRUE;
+
+        [self.vpnStartedSignal sendNext:nil];
+        [self.vpnStartedSignal sendCompleted];
+
         return TRUE;
     }
     return FALSE;

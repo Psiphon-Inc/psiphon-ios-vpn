@@ -21,6 +21,8 @@
 #import <NetworkExtension/NEPacketTunnelProvider.h>
 #import "NEBridge.h"
 
+@class RACReplaySubject;
+
 // BasePacketTunnelProvider Errors
 FOUNDATION_EXTERN NSString *_Nonnull const BasePsiphonTunnelErrorDomain;
 
@@ -70,6 +72,11 @@ typedef NS_ENUM(NSInteger, NEStartMethod) {
 @property (nonatomic, readonly) NEStartMethod NEStartMethod;
 
 @property (nonatomic, readonly) BOOL VPNStarted;
+
+/**
+ * vpnStartedSignal is a finite signal that emits an item when the VPN is started and completes immediately.
+ */
+@property (nonatomic, nonnull) RACReplaySubject *vpnStartedSignal;
 
 /**
  * Starts system VPN and sets the connection state to 'Connected'.

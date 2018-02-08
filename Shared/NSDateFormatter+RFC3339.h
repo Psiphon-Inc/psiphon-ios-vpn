@@ -22,4 +22,7 @@
 + (instancetype)createRFC3339MilliFormatter;
 + (instancetype)createRFC3339Formatter;
 
++ (instancetype)sharedRFC3339DateFormatter API_AVAILABLE(macos(10.9), ios(7.0));
++ (instancetype)sharedRFC3339MilliDateFormatter API_AVAILABLE(macos(10.9), ios(7.0));
+
 @end

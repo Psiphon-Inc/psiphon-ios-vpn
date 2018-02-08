@@ -34,6 +34,8 @@
 @property (nonatomic, readonly, nonnull) NSString *accessType;
 @property (nonatomic, readonly, nonnull) NSDate *expires;
 
+- (instancetype _Nullable)initWithEncodedToken:(NSString *)encodedToken;
+
 @end
 
 
@@ -50,6 +52,8 @@
  * @return An instance of Authorizations class.
  */
 + (Authorizations *_Nonnull)createFromPersistedAuthorizations;
+
+- (BOOL)isEmpty;
 
 /**
  * Given list of authorization IDs, this method removes any persisted authorization token
@@ -81,8 +85,16 @@
  */
 - (BOOL)persistChanges;
 
+- (BOOL)hasActiveAuthorizationTokenForDate:(NSDate *)date;
+
 @end
 
+#pragma mark - Subscriptions
+
+#define RemoteSubscriptionVerifierSignedAuthorization                @"signed_authorization"
+#define RemoteSubscriptionVerifierRequestDate                        @"request_date"
+#define RemoteSubscriptionVerifierPendingRenewalInfo                 @"pending_renewal_info"
+#define RemoteSubscriptionVerifierPendingRenewalInfoAutoRenewStatus  @"auto_renew_status"
 
 @interface Subscription : NSObject
 
@@ -94,6 +106,8 @@
  * @ https://developer.apple.com/library/content/releasenotes/General/ValidateAppStoreReceipt/Chapters/ValidateRemotely.html#//apple_ref/doc/uid/TP40010573-CH104-SW2
  */
 @property (nonatomic, nullable, readwrite) NSArray *pendingRenewalInfo;
+
+@property (nonatomic, nullable, readwrite) Authorization *authorizationToken;
 
 /**
  * Reads NSUserDefaults and wraps the result in an Authorizations instance.
@@ -114,5 +128,11 @@
  * @return TRUE if data was saved to disk successfully, FALSE otherwise.
  */
 - (BOOL)persistChanges;
+
+// TODO: write documentation
+- (BOOL)hasActiveSubscriptionTokenForDate:(NSDate *)date;
+
+// TODO: write documentation
+- (BOOL)shouldUpdateSubscriptionToken;
 
 @end

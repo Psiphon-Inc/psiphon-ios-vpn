@@ -21,12 +21,11 @@
 #import "NSDateFormatter+RFC3339.h"
 #import "Logging.h"
 
-static NSDateFormatter *__rfc3339DateFormatter;
-
 // Subscription dictionary keys
 #define kSubscriptionDictionary         @"kSubscriptionDictionary"
 #define kAppReceiptFileSize             @"kAppReceiptFileSize"
 #define kPendingRenewalInfo             @"kPendingRenewalInfo"
+#define kSubscriptionAuthorizationToken @"kSubscriptionAuthorizationToken"
 
 // Authorizations dictionary keys
 #define kAuthorizationDictionary        @"kAuthorizationDictionary"
@@ -98,10 +97,7 @@ static NSDateFormatter *__rfc3339DateFormatter;
             LOG_ERROR(@"authorization token 'Expires' is empty");
             return nil;
         }
-        if (!__rfc3339DateFormatter) {
-            __rfc3339DateFormatter = [NSDateFormatter createRFC3339Formatter];
-        }
-        self.expires = [__rfc3339DateFormatter dateFromString:authExpiresDateString];
+        self.expires = [[NSDateFormatter sharedRFC3339DateFormatter] dateFromString:authExpiresDateString];
         if (!self.expires) {
             LOG_ERROR(@"authorization token failed to parse RFC3339 date string (%@)", authExpiresDateString);
             return nil;
@@ -123,6 +119,10 @@ static NSDateFormatter *__rfc3339DateFormatter;
     instance->dictionaryRepresentation = [[NSMutableDictionary alloc]
       initWithDictionary:[[NSUserDefaults standardUserDefaults] dictionaryForKey:kAuthorizationDictionary]];
     return instance;
+}
+
+- (BOOL)isEmpty {
+    return (self->dictionaryRepresentation == nil) || ([self->dictionaryRepresentation count] == 0);
 }
 
 - (void)removeTokensNotIn:(NSArray<NSString *> *_Nullable)authorizationIds {
@@ -188,6 +188,20 @@ static NSDateFormatter *__rfc3339DateFormatter;
     self->dictionaryRepresentation[kSignedAuthorizations] = tokensToPersist;
 }
 
+- (BOOL)hasActiveAuthorizationTokenForDate:(NSDate *)date {
+    if ([self isEmpty]) {
+        return FALSE;
+    }
+
+    for (Authorization *authorization in self.tokens) {
+        if ([date compare:[authorization expires]] != NSOrderedDescending) {
+            return TRUE;
+        }
+    }
+
+    return FALSE;
+}
+
 @end
 
 #pragma mark - Subscription
@@ -204,7 +218,7 @@ static NSDateFormatter *__rfc3339DateFormatter;
 }
 
 - (BOOL)isEmpty {
-    return [self->dictionaryRepresentation count] == 0;
+    return (self->dictionaryRepresentation == nil) || ([self->dictionaryRepresentation count] == 0);
 }
 
 - (BOOL)persistChanges {
@@ -227,6 +241,77 @@ static NSDateFormatter *__rfc3339DateFormatter;
 
 - (void)setPendingRenewalInfo:(NSArray *)pendingRenewalInfo {
     self->dictionaryRepresentation[kPendingRenewalInfo] = pendingRenewalInfo;
+}
+
+- (Authorization *)authorizationToken {
+   return [[Authorization alloc] initWithEncodedToken:self->dictionaryRepresentation[kSubscriptionAuthorizationToken]];
+}
+
+- (void)setAuthorizationToken:(Authorization *)authorizationToken {
+    self->dictionaryRepresentation[kSubscriptionAuthorizationToken] = authorizationToken.base64Representation;
+}
+
+- (BOOL)hasActiveSubscriptionTokenForDate:(NSDate *)date {
+
+    if ([self isEmpty]) {
+        return FALSE;
+    }
+
+    if ([date compare:[self.authorizationToken expires]] != NSOrderedDescending) {
+        return TRUE;
+    }
+    return FALSE;
+}
+
+- (BOOL)shouldUpdateSubscriptionToken {
+    // If no receipt - NO
+    NSURL *URL = [NSBundle mainBundle].appStoreReceiptURL;
+    NSString *path = URL.path;
+    const BOOL exists = [[NSFileManager defaultManager] fileExistsAtPath:path isDirectory:nil];
+    if (!exists) {
+        LOG_DEBUG_NOTICE(@"receipt does not exist");
+        return NO;
+    }
+
+    // There's receipt but no subscription persisted - YES
+    if([self isEmpty]) {
+        LOG_DEBUG_NOTICE(@"receipt exist by no subscription persisted");
+        return YES;
+    }
+
+    // Receipt file size has changed since last check - YES
+    NSNumber *appReceiptFileSize = nil;
+    [[NSBundle mainBundle].appStoreReceiptURL getResourceValue:&appReceiptFileSize forKey:NSURLFileSizeKey error:nil];
+    if ([appReceiptFileSize unsignedIntValue] != [self.appReceiptFileSize unsignedIntValue]) {
+        LOG_DEBUG_NOTICE(@"receipt file size changed (%@) since last check (%@)", appReceiptFileSize, self.appReceiptFileSize);
+        return YES;
+    }
+
+    // If user has an active authorization for date - NO
+    if ([self hasActiveSubscriptionTokenForDate:[NSDate date]]) {
+        LOG_DEBUG_NOTICE(@"device has active authorization for date");
+        return NO;
+    }
+
+    // If expired and pending renewal info is missing - YES
+    if(!self.pendingRenewalInfo) {
+        LOG_DEBUG_NOTICE(@"pending renewal info is missing");
+        return YES;
+    }
+
+    // If expired but user's last known intention was to auto-renew - YES
+    if([self.pendingRenewalInfo count] == 1
+      && [self.pendingRenewalInfo[0] isKindOfClass:[NSDictionary class]]) {
+
+        NSString *autoRenewStatus = [self.pendingRenewalInfo[0] objectForKey:RemoteSubscriptionVerifierPendingRenewalInfoAutoRenewStatus];
+        if (autoRenewStatus && [autoRenewStatus isEqualToString:@"1"]) {
+            LOG_DEBUG_NOTICE(@"subscription expired but user's last known intention is to auto-renew");
+            return YES;
+        }
+    }
+
+    LOG_DEBUG_NOTICE(@"authorization token update not needed");
+    return NO;
 }
 
 @end
