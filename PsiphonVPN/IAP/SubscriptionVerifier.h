@@ -33,6 +33,6 @@ typedef NS_ENUM(NSInteger, PsiphonReceiptValidationErrorCode) {
 
 @interface SubscriptionVerifier : NSObject
 
-- (void)startWithCompletionHandler:(SubscriptionVerifierCompletionHandler)receiptUploadCompletionHandler;
+- (void)startWithCompletionHandler:(SubscriptionVerifierCompletionHandler _Nonnull)receiptUploadCompletionHandler;
 
 @end

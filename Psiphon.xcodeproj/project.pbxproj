@@ -20,8 +20,8 @@
 		44A0CAF31FE04A4500859DB3 /* RMAppReceipt.m in Sources */ = {isa = PBXBuildFile; fileRef = 44A0CAF11FE04A4500859DB3 /* RMAppReceipt.m */; };
 		44A0CAF41FE04A7400859DB3 /* AppleIncRootCertificate.cer in Resources */ = {isa = PBXBuildFile; fileRef = 44A0CAF01FE04A4500859DB3 /* AppleIncRootCertificate.cer */; };
 		44D9B1001F67470E007D1E69 /* IAPViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 44D9B0FF1F67470E007D1E69 /* IAPViewController.m */; };
-		44E3CB641FC73A6700C80C82 /* MTBase64InputStream.m in Sources */ = {isa = PBXBuildFile; fileRef = 44E3CB621FC73A6700C80C82 /* MTBase64InputStream.m */; };
-		44E3CB681FC7535800C80C82 /* MTBase64InputStream.m in Sources */ = {isa = PBXBuildFile; fileRef = 44E3CB621FC73A6700C80C82 /* MTBase64InputStream.m */; };
+		44E3CB641FC73A6700C80C82 /* SubscriptionReceiptInputStream.m in Sources */ = {isa = PBXBuildFile; fileRef = 44E3CB621FC73A6700C80C82 /* SubscriptionReceiptInputStream.m */; };
+		44E3CB681FC7535800C80C82 /* SubscriptionReceiptInputStream.m in Sources */ = {isa = PBXBuildFile; fileRef = 44E3CB621FC73A6700C80C82 /* SubscriptionReceiptInputStream.m */; };
 		44E3CB6C1FCCA83200C80C82 /* SubscriptionVerifier.m in Sources */ = {isa = PBXBuildFile; fileRef = 44E3CB6B1FCCA83200C80C82 /* SubscriptionVerifier.m */; };
 		4E0774961F566B040097BC8C /* InAppSettings.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 4E0774951F566ADA0097BC8C /* InAppSettings.bundle */; };
 		4E0D88241FA06B2400ADB61E /* PsiphonUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E0D88231FA06B2400ADB61E /* PsiphonUITests.swift */; };
@@ -147,8 +147,8 @@
 		44A0CAF11FE04A4500859DB3 /* RMAppReceipt.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RMAppReceipt.m; sourceTree = "<group>"; };
 		44D9B0FE1F67470E007D1E69 /* IAPViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IAPViewController.h; sourceTree = "<group>"; };
 		44D9B0FF1F67470E007D1E69 /* IAPViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IAPViewController.m; sourceTree = "<group>"; };
-		44E3CB621FC73A6700C80C82 /* MTBase64InputStream.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MTBase64InputStream.m; sourceTree = "<group>"; };
-		44E3CB631FC73A6700C80C82 /* MTBase64InputStream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTBase64InputStream.h; sourceTree = "<group>"; };
+		44E3CB621FC73A6700C80C82 /* SubscriptionReceiptInputStream.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SubscriptionReceiptInputStream.m; sourceTree = "<group>"; };
+		44E3CB631FC73A6700C80C82 /* SubscriptionReceiptInputStream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SubscriptionReceiptInputStream.h; sourceTree = "<group>"; };
 		44E3CB6A1FCCA83100C80C82 /* SubscriptionVerifier.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SubscriptionVerifier.h; sourceTree = "<group>"; };
 		44E3CB6B1FCCA83200C80C82 /* SubscriptionVerifier.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SubscriptionVerifier.m; sourceTree = "<group>"; };
 		4E0774951F566ADA0097BC8C /* InAppSettings.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = InAppSettings.bundle; sourceTree = "<group>"; };
@@ -489,8 +489,8 @@
 			children = (
 				44E3CB6A1FCCA83100C80C82 /* SubscriptionVerifier.h */,
 				44E3CB6B1FCCA83200C80C82 /* SubscriptionVerifier.m */,
-				44E3CB631FC73A6700C80C82 /* MTBase64InputStream.h */,
-				44E3CB621FC73A6700C80C82 /* MTBase64InputStream.m */,
+				44E3CB631FC73A6700C80C82 /* SubscriptionReceiptInputStream.h */,
+				44E3CB621FC73A6700C80C82 /* SubscriptionReceiptInputStream.m */,
 			);
 			path = IAP;
 			sourceTree = "<group>";
@@ -897,7 +897,7 @@
 				EF35E8101F9FA748003B3102 /* Logging.m in Sources */,
 				EFC2F5C420226782007B52F9 /* RootContainerController.m in Sources */,
 				EF652CD11F352212002AFB48 /* main.m in Sources */,
-				44E3CB641FC73A6700C80C82 /* MTBase64InputStream.m in Sources */,
+				44E3CB641FC73A6700C80C82 /* SubscriptionReceiptInputStream.m in Sources */,
 				44A0CAF31FE04A4500859DB3 /* RMAppReceipt.m in Sources */,
 				44D9B1001F67470E007D1E69 /* IAPViewController.m in Sources */,
 				EF441B011F7AF14A008A7D82 /* NSDateFormatter+RFC3339.m in Sources */,
@@ -923,7 +923,7 @@
 			files = (
 				EFC2F5CC20226835007B52F9 /* PsiphonConfigFiles.m in Sources */,
 				44A0CAEE1FCCCDEC00859DB3 /* SubscriptionVerifier.m in Sources */,
-				44E3CB681FC7535800C80C82 /* MTBase64InputStream.m in Sources */,
+				44E3CB681FC7535800C80C82 /* SubscriptionReceiptInputStream.m in Sources */,
 				EF652CDA1F352271002AFB48 /* PacketTunnelProvider.m in Sources */,
 				4E0DCB1E1F2855FC00495781 /* PsiphonDataSharedDB.m in Sources */,
 				9BFECD1880B51B0E2EAEFF1F /* Notifier.m in Sources */,
@@ -1167,6 +1167,7 @@
 				CODE_SIGN_ENTITLEMENTS = Psiphon/Psiphon.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = "";
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = Psiphon/Info.plist;
@@ -1213,6 +1214,7 @@
 				CODE_SIGN_ENTITLEMENTS = PsiphonVPN/PsiphonVPN.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = "";
 				ENABLE_BITCODE = NO;
 				GCC_PREPROCESSOR_DEFINITIONS = (
