@@ -37,7 +37,7 @@
     [request setHTTPMethod:@"POST"];
     [request setValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
 
-    NSURLSessionConfiguration *sessionConfig = [NSURLSessionConfiguration defaultSessionConfiguration];
+    NSURLSessionConfiguration *sessionConfig = [NSURLSessionConfiguration ephemeralSessionConfiguration];
     sessionConfig.timeoutIntervalForRequest = kReceiptRequestTimeOutSeconds;
 
     urlSession = [NSURLSession sessionWithConfiguration:sessionConfig];
@@ -46,6 +46,7 @@
 
         dispatch_async(dispatch_get_main_queue(), ^{
 
+            // Session is no longer needed, invalidates and cancels outstanding tasks.
             [urlSession invalidateAndCancel];
 
             if (receiptUploadCompletionHandler) {
