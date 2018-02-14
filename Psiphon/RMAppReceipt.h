@@ -17,6 +17,24 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 //
+/*
+ * Copyright (c) 2017, Psiphon Inc.
+ * All rights reserved.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
 
 #import <Foundation/Foundation.h>
 
@@ -39,10 +57,6 @@ __attribute__((availability(ios,introduced=7.0)))
  */
 @property (nonatomic, strong, readonly) NSData *bundleIdentifierData;
 
-/** The app’s version number. This corresponds to the value of CFBundleVersion (in iOS) or CFBundleShortVersionString (in OS X) in the Info.plist.
- */
-@property (nonatomic, strong, readonly) NSString *appVersion;
-
 /** An opaque value used as part of the SHA-1 hash.
  */
 @property (nonatomic, strong, readonly) NSData *opaqueValue;
@@ -54,15 +68,8 @@ __attribute__((availability(ios,introduced=7.0)))
 /** Array of in-app purchases contained in the receipt.
  @see RMAppReceiptIAP
  */
-@property (nonatomic, strong, readonly) NSArray *inAppPurchases;
+@property (nonatomic, strong, readonly) NSDictionary *inAppSubscriptions;
 
-/** The version of the app that was originally purchased. This corresponds to the value of CFBundleVersion (in iOS) or CFBundleShortVersionString (in OS X) in the Info.plist file when the purchase was originally made. In the sandbox environment, the value of this field is always “1.0”.
- */
-@property (nonatomic, strong, readonly) NSString *originalAppVersion;
-
-/** The date that the app receipt expires. Only for apps purchased through the Volume Purchase Program. If nil, the receipt does not expire. When validating a receipt, compare this date to the current date to determine whether the receipt is expired. Do not try to use this date to calculate any other information, such as the time remaining before expiration.
- */
-@property (nonatomic, strong, readonly) NSDate *expirationDate;
 
 /** Returns an initialized app receipt from the given data.
  @param asn1Data ASN1 data
@@ -70,21 +77,6 @@ __attribute__((availability(ios,introduced=7.0)))
  */
 - (instancetype)initWithASN1Data:(NSData*)asn1Data NS_DESIGNATED_INITIALIZER;
 - (instancetype)init NS_UNAVAILABLE;
-
-/** Returns whether there is an in-app purchase in the receipt for the given product.
- @param productIdentifier The identifier of the product.
- @return YES if there is an in-app purchase for the given product, NO otherwise.
- */
-- (BOOL)containsInAppPurchaseOfProductIdentifier:(NSString*)productIdentifier;
-
-/** Returns whether the receipt contains an active auto-renewable subscription for the given product identifier and for the given date.
- @param productIdentifier The identifier of the auto-renewable subscription.
- @param date The date in which the latest auto-renewable subscription should be active. If you are using the current date, you might not want to take it from the device in case the user has changed it.
- @return YES if the latest auto-renewable subscription is active for the given date, NO otherwise.
- @warning Auto-renewable subscription lapses are possible. If you are checking against the current date, you might want to deduct some time as tolerance.
- @warning If this method fails Apple recommends to refresh the receipt and try again once.
- */
-- (RMAppReceiptIAP *)getActiveAutoRenewableSubscriptionOfProductIdentifier:(NSString *)productIdentifier forDate:(NSDate *)date;
 
 /** Returns wheter the receipt hash corresponds to the device's GUID by calcuting the expected hash using the GUID, bundleIdentifierData and opaqueValue.
  @return YES if the hash contained in the receipt corresponds to the device's GUID, NO otherwise.
@@ -111,42 +103,9 @@ __attribute__((availability(ios,introduced=7.0)))
  */
 @interface RMAppReceiptIAP : NSObject
 
-/** The number of items purchased. This value corresponds to the quantity property of the SKPayment object stored in the transaction’s payment property.
- */
-@property (nonatomic, readonly) NSInteger quantity;
-
 /** The product identifier of the item that was purchased. This value corresponds to the productIdentifier property of the SKPayment object stored in the transaction’s payment property. 
  */
 @property (nonatomic, strong, readonly) NSString *productIdentifier;
-
-/**
- The transaction identifier of the item that was purchased. This value corresponds to the transaction’s transactionIdentifier property.
- */
-@property (nonatomic, strong, readonly) NSString *transactionIdentifier;
-
-/** For a transaction that restores a previous transaction, the transaction identifier of the original transaction. Otherwise, identical to the transaction identifier. 
- 
- This value corresponds to the original transaction’s transactionIdentifier property. 
- 
- All receipts in a chain of renewals for an auto-renewable subscription have the same value for this field.
- */
-@property (nonatomic, strong, readonly) NSString *originalTransactionIdentifier;
-
-/** The date and time that the item was purchased. This value corresponds to the transaction’s transactionDate property. 
- 
- For a transaction that restores a previous transaction, the purchase date is the date of the restoration. Use `originalPurchaseDate` to get the date of the original transaction.
- 
- In an auto-renewable subscription receipt, this is always the date when the subscription was purchased or renewed, regardles of whether the transaction has been restored
- */
-@property (nonatomic, strong, readonly) NSDate *purchaseDate;
-
-/** For a transaction that restores a previous transaction, the date of the original transaction.
-
- This value corresponds to the original transaction’s transactionDate property.
- 
- In an auto-renewable subscription receipt, this indicates the beginning of the subscription period, even if the subscription has been renewed.
- */
-@property (nonatomic, strong, readonly) NSDate *originalPurchaseDate;
 
 /**
  The expiration date for the subscription. 
@@ -159,23 +118,11 @@ __attribute__((availability(ios,introduced=7.0)))
  */
 @property (nonatomic, strong, readonly) NSDate *cancellationDate;
 
-/** The primary key for identifying subscription purchases.
- */
-@property (nonatomic, readonly) NSInteger webOrderLineItemID;
-
 /** Returns an initialized in-app purchase from the given data.
  @param asn1Data ASN1 data
  @return An initialized in-app purchase from the given data.
  */
 - (instancetype)initWithASN1Data:(NSData*)asn1Data NS_DESIGNATED_INITIALIZER;
 - (instancetype)init NS_UNAVAILABLE;
-
-/** Returns whether the auto renewable subscription is active for the given date.
- @param date The date in which the auto-renewable subscription should be active. If you are using the current date, you might not want to take it from the device in case the user has changed it.
-@return YES if the auto-renewable subscription is active for the given date, NO otherwise.
- @warning Auto-renewable subscription lapses are possible. If you are checking against the current date, you might want to deduct some time as tolerance.
- @warning If this method fails Apple recommends to refresh the receipt and try again once.
- */
-- (BOOL)isActiveAutoRenewableSubscriptionForDate:(NSDate*)date;
 
 @end

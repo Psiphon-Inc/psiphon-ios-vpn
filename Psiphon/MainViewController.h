@@ -20,8 +20,6 @@
 #import <PsiphonTunnel/PsiphonTunnel.h>
 #import <UIKit/UIKit.h>
 #import "SettingsViewController.h"
-#import "LaunchScreenViewController.h"
-
 
 @interface MainViewController : UIViewController <PsiphonSettingsViewControllerDelegate, TunneledAppDelegate>
 

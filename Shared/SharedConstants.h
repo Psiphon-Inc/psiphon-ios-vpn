@@ -17,15 +17,10 @@
  *
  */
 
-#define APP_GROUP_IDENTIFIER @"group.ca.psiphon.Psiphon"
+#define APP_GROUP_IDENTIFIER    @"group.ca.psiphon.Psiphon"
 
-// Network Extension options
-#define EXTENSION_START_FROM_CONTAINER @"startFromContainer"
-#define EXTENSION_START_FROM_CONTAINER_TRUE @"true"
+// Common app receipt fields keys and constants
+#define kAppReceiptFileSize                             @"app_receipt_file_size"
+#define kLatestExpirationDate                           @"latest_expiration_date"
+#define kProductId                                      @"product_id"
 
-// Network Extension queries
-#define EXTENSION_QUERY_IS_TUNNEL_CONNECTED @"isTunnelConnected"
-
-// Network Extension query responses
-#define EXTENSION_RESP_TRUE @"true"
-#define EXTENSION_RESP_FALSE @"false"

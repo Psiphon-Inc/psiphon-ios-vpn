@@ -37,8 +37,10 @@
 #import "Logging.h"
 #import "IAPViewController.h"
 #import "AppDelegate.h"
-#import "IAPHelper.h"
+#import "IAPStoreHelper.h"
+#import "LaunchScreenViewController.h"
 #import "UIAlertController+Delegate.h"
+#import "NoticeLogger.h"
 
 static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSString *b) {
     return (([a length] == 0) && ([b length] == 0)) || ([a isEqualToString:b]);
@@ -168,19 +170,10 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                                                  name:kVPNStartFailure
                                                object:vpnManager];
 
-
     // Observe IAP transaction notifications
     [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(updatedIAPTransactionState)
-                                                 name:kIAPSKPaymentTransactionStatePurchased
-                                               object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(updatedIAPTransactionState)
-                                                 name:kIAPSKPaymentQueuePaymentQueueRestoreCompletedTransactionsFinished
-                                               object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(updatedIAPTransactionState)
-                                                 name:kIAPSKPaymentQueueRestoreCompletedTransactionsFailedWithError
+                                             selector:@selector(updatedSubscriptionDictionary)
+                                                 name:kIAPHelperUpdatedSubscriptionDictionary
                                                object:nil];
 
     // TODO: load/save config here to have the user immediately complete the permission prompt
@@ -322,10 +315,44 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 
     } else {
         LOG_DEBUG(@"call [vpnManager stopVPN]");
-        [vpnManager stopVPN];
+
+        if ([vpnManager isOnDemandEnabled]) {
+            // Alert the user that Connect On Demand is enabled, and if they
+            // would like Connect On Demand to be disabled, and the extension to be stopped.
+            NSString *alertTitle = NSLocalizedStringWithDefaultValue(@"CONNECT_ON_DEMAND_ALERT_TITLE", nil, [NSBundle mainBundle], @"Auto-start VPN is enabled", @"Alert dialog title informing user that 'Auto-start VPN' feature is enabled");
+            NSString *alertMessage = NSLocalizedStringWithDefaultValue(@"CONNECT_ON_DEMAND_ALERT_BODY", nil, [NSBundle mainBundle], @"Cannot stop the VPN while \"Auto-start VPN\" is enabled.\nWould you like to disable \"Auto-start VPN\" on demand and stop the VPN?", "Alert dialog body informing the user that the 'Auto-start VPN on demand' feature is enabled and that the VPN cannot be stopped. Followed by asking the user if they would like to disable the 'Auto-start VPN on demand' feature, and stop the VPN.");
+
+            UIAlertController *alert = [UIAlertController
+              alertControllerWithTitle:alertTitle message:alertMessage preferredStyle:UIAlertControllerStyleAlert];
+
+            UIAlertAction *disableAction = [UIAlertAction
+              actionWithTitle:NSLocalizedStringWithDefaultValue(@"DISABLE_BUTTON", nil, [NSBundle mainBundle], @"Disable Auto-start VPN and Stop", @"Disable Auto-start VPN feature and Stop the VPN button label")
+                        style:UIAlertActionStyleDestructive
+                      handler:^(UIAlertAction *action) {
+                          // Disable "Connect On Demand" and stop the VPN.
+                          [vpnManager updateVPNConfigurationOnDemandSetting:FALSE completionHandler:^(NSError *error) {
+                              [vpnManager stopVPN];
+                          }];
+                      }];
+
+            UIAlertAction *cancelAction = [UIAlertAction
+              actionWithTitle:NSLocalizedStringWithDefaultValue(@"CANCEL_BUTTON", nil, [NSBundle mainBundle], @"Cancel", @"Alert Cancel button")
+                        style:UIAlertActionStyleCancel
+                      handler:^(UIAlertAction *action) {
+                        // Do nothing
+                      }];
+
+            [alert addAction:disableAction];
+            [alert addAction:cancelAction];
+            [self presentViewController:alert animated:TRUE completion:nil];
+
+        } else {
+            [vpnManager stopVPN];
+        }
 
         [self removePulsingHaloLayer];
     }
+
     [self updateSubscriptionUI];
 }
 
@@ -395,6 +422,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
         case VPNStatusReasserting: return NSLocalizedStringWithDefaultValue(@"VPN_STATUS_RECONNECTING", nil, [NSBundle mainBundle], @"Reconnecting", @"Status when the VPN was connected to a Psiphon server, got disconnected unexpectedly, and is currently trying to reconnect");
         case VPNStatusRestarting: return NSLocalizedStringWithDefaultValue(@"VPN_STATUS_RESTARTING", nil, [NSBundle mainBundle], @"Restarting", @"Status when the VPN is restarting.");
     }
+    LOG_ERROR(@"MainViewController unhandled VPNStatus (%ld)", status);
     return nil;
 }
 
@@ -989,12 +1017,11 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     NSDictionary *readOnly = [NSJSONSerialization JSONObjectWithData:jsonData options:kNilOptions error:&err];
 
     // Return bundled config as is if user doesn't have an active subscription
-    if(!(err || [[IAPHelper sharedInstance]hasActiveSubscriptionForDate:[NSDate date]])) {
+    if(![[IAPStoreHelper class] hasActiveSubscriptionForDate:[NSDate date]] && !err) {
         return bundledConfigStr;
     }
 
     // Otherwise override sponsor ID
-
     if (err) {
         LOG_ERROR(@"%@", [NSString stringWithFormat:@"Failed to parse config JSON: %@", err.description]);
         dispatch_async(dispatch_get_main_queue(), ^{
@@ -1136,7 +1163,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     NSUserDefaults *userDefaults = [[NSUserDefaults alloc] initWithSuiteName:APP_GROUP_IDENTIFIER];
     NSString *upstreamProxyUrl = [[UpstreamProxySettings sharedInstance] getUpstreamProxyUrl];
     [userDefaults setObject:upstreamProxyUrl forKey:PSIPHON_CONFIG_UPSTREAM_PROXY_URL];
-    NSString *upstreamProxyCustomHeaders = [[UpstreamProxySettings sharedInstance] getUpstreamProxyCustomHeaders];
+    NSDictionary *upstreamProxyCustomHeaders = [[UpstreamProxySettings sharedInstance] getUpstreamProxyCustomHeaders];
     [userDefaults setObject:upstreamProxyCustomHeaders forKey:PSIPHON_CONFIG_UPSTREAM_PROXY_CUSTOM_HEADERS];
 }
 
@@ -1362,17 +1389,23 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 }
 
 - (void) updateSubscriptionUI {
-    if(![IAPHelper canMakePayments] || [[IAPHelper sharedInstance]hasActiveSubscriptionForDate:[NSDate date]]) {
-        subscriptionButton.hidden = YES;
-        adLabel.hidden = YES;
-        subscriptionButtonTop.active = NO;
-        bottomBarTop.active = YES;
-    } else {
-        subscriptionButton.hidden = NO;
-        adLabel.hidden = ![adManager untunneledInterstitialIsReady];
-        bottomBarTop.active = NO;
-        subscriptionButtonTop.active = YES;
-    }
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        BOOL success = [[IAPStoreHelper class] hasActiveSubscriptionForDate:[NSDate date]];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if(success) {
+                subscriptionButton.hidden = YES;
+                adLabel.hidden = YES;
+                subscriptionButtonTop.active = NO;
+                bottomBarTop.active = YES;
+            } else {
+                subscriptionButton.hidden = NO;
+                adLabel.hidden = ![adManager untunneledInterstitialIsReady];
+                bottomBarTop.active = NO;
+                subscriptionButtonTop.active = YES;
+            }
+
+        });
+    });
 }
 
 #pragma mark - IAP
@@ -1384,25 +1417,48 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     [self presentViewController:navController animated:YES completion:nil];
 }
 
-- (void)updatedIAPTransactionState {
+- (void)updatedSubscriptionDictionary {
     [self updateSubscriptionUI];
+
+    // TODO: re-check this logic
     if (![adManager shouldShowUntunneledAds]) {
         // if user subscription state has changed to valid
         // try to deinit ads if currently not showing and hide adLabel
         [adManager initializeAds];
-
-        // Restart the VPN if user is currently running a non-subscription config
-        NSString *bundledConfigStr = [PsiphonClientCommonLibraryHelpers getPsiphonBundledConfig];
-        if(bundledConfigStr) {
-            NSDictionary *config = [PsiphonClientCommonLibraryHelpers jsonToDictionary:bundledConfigStr];
-            if (config) {
-                NSDictionary *subscriptionConfig = config[@"subscriptionConfig"];
-                if(subscriptionConfig[@"SponsorId"] && !([sharedDB getSponsorId].length)) {
-                    [vpnManager restartVPNIfActive];
-                }
-            }
-        }
     }
+
+    // If the user gets an active subscription and the network extension is active,
+    // queries the network extension to check if the extension is using the subscription SponsorId.
+    // If not, restarts the extension.
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+
+        if ([[IAPStoreHelper class] hasActiveSubscriptionForDate:[NSDate date]] && [vpnManager isVPNActive]) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+
+                [vpnManager queryNEForCurrentSponsorId:^(NSString *currentSponsorId) {
+
+                    // Reads config file in a background thread.
+                    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+
+                        NSString *bundledConfigStr = [PsiphonClientCommonLibraryHelpers getPsiphonBundledConfig];
+                        if (bundledConfigStr) {
+                            NSDictionary *config = [PsiphonClientCommonLibraryHelpers jsonToDictionary:bundledConfigStr];
+                            if (config) {
+                                NSDictionary *subscriptionConfig = config[@"subscriptionConfig"];
+                                if (![subscriptionConfig[@"SponsorId"] isEqualToString:currentSponsorId]) {
+                                    dispatch_async(dispatch_get_main_queue(), ^{
+
+                                        [vpnManager restartVPNIfActive];
+                                    });
+                                }
+                            }
+                        }
+                    });
+                }];
+            });
+
+        }
+    });
 }
 
 @end

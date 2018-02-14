@@ -18,16 +18,20 @@
  */
 
 #import <Foundation/Foundation.h>
-#import "NoticeLogger.h"
-
 
 void LOG_ERROR(NSString *format, ...) NS_FORMAT_FUNCTION(1,2);
 
 #if DEBUG
 
+#define LOG_DEBUG_NOTICE(format, ...) \
+ LOG_ERROR((@"<DEBUG> %s [Line %d]: " format), __PRETTY_FUNCTION__, __LINE__, ##__VA_ARGS__)
+
 // Logs a message to Apple System Log facility with log level DEBUG
 #define LOG_DEBUG(format, ...) \
  NSLog((@"<DEBUG> %s [Line %d]: " format), __PRETTY_FUNCTION__, __LINE__, ##__VA_ARGS__)
+
+#define LOG_INFO(format, ...) \
+ NSLog((@"<INFO> %s [Line %d]: " format), __PRETTY_FUNCTION__, __LINE__, ##__VA_ARGS__)
 
 // Logs a message to Apple System Log facility with log level WARN
 #define LOG_WARN(format, ...) \
@@ -40,7 +44,11 @@ void LOG_ERROR(NSString *format, ...) NS_FORMAT_FUNCTION(1,2);
 
 #else
 
+#define LOG_DEBUG_NOTICE(...)
+
 #define LOG_DEBUG(...)
+
+#define LOG_INFO(...)
 
 #define LOG_WARN(...)
 

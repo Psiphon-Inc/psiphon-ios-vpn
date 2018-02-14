@@ -11,12 +11,12 @@
 "APP_VERSION" = "v. %@";
 
 /* Alert message informing user that the device clock needs to be updated with current time */
-"BAD_CLOCK_ALERT_MESSAGE" = "Nous avons détecté que l’heure de votre appareil n’est pas synchronisée avec votre fuseau horaire. Veuillez mettre vos paramètres d’horloge à jour et redémarrer l’appli";
+"BAD_CLOCK_ALERT_MESSAGE" = "Nous avons détecté que l’heure de votre appareil n’est pas synchronisée avec votre fuseau horaire. Veuillez mettre vos paramètres d’horloge à jour et redémarrer l’appli.";
 
 /* Alert title informing user that the device clock needs to be updated with current time */
 "BAD_CLOCK_ALERT_TITLE" = "L’horloge est désynchronisée";
 
-/* Alert message informing user that subscription receipt can not be verified */
+/* Alert message informing user that subscription receipt cannot be verified */
 "BAD_RECEIPT_ALERT_MESSAGE" = "Votre reçu d’abonnement ne peut pas être vérifié, veuillez l’actualiser et essayer de nouveau.";
 
 /* Alert title informing user that app receipt is not valid */
@@ -25,14 +25,20 @@
 /* Buy subscription dialog footer text */
 "BUY_SUBSCRIPTIONS_FOOTER_TEXT" = "Après achat, un abonnement sera renouvelé automatiquement jusqu’à ce que vous l’annuliez 24 heures avant la fin de la période actuelle.\n\nLe renouvellement, soit le coût de l’abonnement, sera facturé à votre compte iTunes dans les 24 heures avant la fin de la période actuelle.\n\nGérez votre abonnement et le renouvellement automatique en vous rendant dans les réglages de votre compte.";
 
-/*[UNTRANSLATED] Premium subscriptions dialog header text */
-"BUY_SUBSCRIPTIONS_HEADER_TEXT" = "Remove ads and surf the Internet faster with a premium subscription!";
+/* Premium subscriptions dialog header text. If “Premium” doesn't easily translate, please choose a term that conveys “Pro” or “Extra” or “Better” or “Elite”. */
+"BUY_SUBSCRIPTIONS_HEADER_TEXT" = "Supprimez les publicités et surfez plus rapidement sur Internet avec un abonnement Pro !";
 
 /* Text above change region button that allows user to select their desired server region */
 "CHANGE_REGION" = "Changer de région";
 
 /* Main text in the 'Upstream Proxy Error' dialog box. This is shown when the user has directly altered these settings, and those settings are (probably) erroneous. DO NOT translate 'Psiphon'. */
 "CHECK_UPSTREAM_PROXY_SETTING" = "Vous avez configuré Psiphon pour qu’il utilise un serveur mandataire ascendant.\nCependant, il semble que nous ne soyons pas en mesure de nous connecter à un serveur Psiphon par ce mandataire.\nVeuillez corriger les paramètres et ressayer.";
+
+/* Alert dialog title (MainViewController) */
+"CORRUPT_SETTINGS_ALERT_TITLE" = "Réglages corrompus";
+
+/* Alert dialog message informing the user that the settings file in the app is corrupt, and that they can potentially fix this issue by re-installing the app. */
+"CORRUPT_SETTINGS_MESSAGE" = "Votre fichier des réglages de l’appli semble être corrompu. Essayez de réinstaller l’appli pour réparer le fichier.";
 
 /* Title of the button that dismisses region selection dialog
    Title of the button that dismisses the subscriptions menu */
@@ -62,11 +68,11 @@
 /* Subscriptions item title in the app settings when user has an active subscription. Clicking this item opens subscriptions view */
 "SETTINGS_SUBSCRIPTION_ACTIVE" = "Abonnements";
 
-/*[UNTRANSLATED] Subscriptions item title in the app settings when user does not have an active subscription. Clicking this item opens subscriptions view */
-"SETTINGS_SUBSCRIPTION_NOT_ACTIVE" = "Go premium!";
+/* Subscriptions item title in the app settings when user does not have an active subscription. Clicking this item opens subscriptions view. If “Premium” doesn't easily translate, please choose a term that conveys “Pro” or “Extra” or “Better” or “Elite”. */
+"SETTINGS_SUBSCRIPTION_NOT_ACTIVE" = "Passez Pro !";
 
-/*[UNTRANSLATED] Text for button that opens paid subscriptions manager UI */
-"SUBSCRIPTION_BUTTON_TITLE" = "Go premium now!";
+/* Text for button that opens paid subscriptions manager UI. If “Premium” doesn't easily translate, please choose a term that conveys “Pro” or “Extra” or “Better” or “Elite”. */
+"SUBSCRIPTION_BUTTON_TITLE" = "Passez Pro maintenant !";
 
 /* Title of the dialog for available in-app paid subscriptions */
 "SUBSCRIPTIONS" = "Abonnements";
@@ -76,6 +82,12 @@
 
 /* Alert message informing user they have to open the app. DO NOT translate 'Psiphon'. */
 "USE_PSIPHON_APP" = "Pour vous connecter, utilisez l’appli Psiphon.";
+
+/* Alert dialog message informing the user that an error occurred while starting Psiphon (Do not translate 'Psiphon'). The user should try again, and if the problem persists, they should try reinstalling the app. */
+"VPN_START_FAIL_MESSAGE" = "Une erreur est survenue lors du démarrage de Psiphon. Veuillez ressayer. Si le problème persiste, tentez de réinstaller l’appli Psiphon.";
+
+/* Alert dialog title indicating to the user that Psiphon was unable to start (MainViewController) */
+"VPN_START_FAIL_TITLE" = "Impossible de démarrer";
 
 /* Status when the VPN is connected to a Psiphon server */
 "VPN_STATUS_CONNECTED" = "Connecté";

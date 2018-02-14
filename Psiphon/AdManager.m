@@ -22,7 +22,7 @@
 #import "VPNManager.h"
 #import "AppDelegate.h"
 #import "Logging.h"
-#import "IAPHelper.h"
+#import "IAPStoreHelper.h"
 
 @import GoogleMobileAds;
 
@@ -99,9 +99,10 @@
     [self postAdsLoadStateDidChangeNotification];
 }
 
+// TODO: This is a blocking function called on main thread.
 - (BOOL)shouldShowUntunneledAds {
     // Check if user has an active subscription first
-    BOOL hasActiveSubscription = [[IAPHelper sharedInstance] hasActiveSubscriptionForDate:[NSDate date]];
+    BOOL hasActiveSubscription = [[IAPStoreHelper class] hasActiveSubscriptionForDate:[NSDate date]];
 
     NetworkStatus networkStatus = [[Reachability reachabilityForInternetConnection] currentReachabilityStatus];
     VPNStatus vpnStatus = [vpnManager getVPNStatus];

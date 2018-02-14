@@ -18,12 +18,33 @@
 //  limitations under the License.
 //
 
+/*
+ * Copyright (c) 2017, Psiphon Inc.
+ * All rights reserved.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
+
 #import "RMAppReceipt.h"
 #import <UIKit/UIKit.h>
 #import <openssl/pkcs7.h>
 #import <openssl/objects.h>
 #import <openssl/sha.h>
 #import <openssl/x509.h>
+#import "SharedConstants.h"
+
 
 // From https://developer.apple.com/library/ios/releasenotes/General/ValidateAppStoreReceipt/Chapters/ReceiptFields.html#//apple_ref/doc/uid/TP40010573-CH106-SW1
 NSInteger const RMAppReceiptASN1TypeBundleIdentifier = 2;
@@ -109,7 +130,7 @@ static NSURL *_appleRootCertificateURL = nil;
 {
     if (self = [super init])
     {
-        NSMutableArray *purchases = [NSMutableArray array];
+        NSMutableDictionary *subscriptions = [[NSMutableDictionary alloc] init];
          // Explicit casting to avoid errors when compiling as Objective-C++
         [RMAppReceipt enumerateASN1Attributes:(const uint8_t*)asn1Data.bytes length:asn1Data.length usingBlock:^(NSData *data, int type) {
             const uint8_t *s = (const uint8_t*)data.bytes;
@@ -120,9 +141,6 @@ static NSURL *_appleRootCertificateURL = nil;
                     _bundleIdentifierData = data;
                     _bundleIdentifier = RMASN1ReadUTF8String(&s, length);
                     break;
-                case RMAppReceiptASN1TypeAppVersion:
-                    _appVersion = RMASN1ReadUTF8String(&s, length);
-                    break;
                 case RMAppReceiptASN1TypeOpaqueValue:
                     _opaqueValue = data;
                     break;
@@ -131,47 +149,40 @@ static NSURL *_appleRootCertificateURL = nil;
                     break;
                 case RMAppReceiptASN1TypeInAppPurchaseReceipt:
                 {
-                    RMAppReceiptIAP *purchase = [[RMAppReceiptIAP alloc] initWithASN1Data:data];
-                    [purchases addObject:purchase];
-                    break;
+                    @autoreleasepool {
+                        RMAppReceiptIAP *iapReceipt = [[RMAppReceiptIAP alloc] initWithASN1Data:data];
+                        if(iapReceipt.cancellationDate) {
+                            iapReceipt = nil;
+                            break;
+                        }
+                        // sanity check
+                        if(iapReceipt.subscriptionExpirationDate == nil || iapReceipt.productIdentifier == nil) {
+                            iapReceipt = nil;
+                            break;
+                        }
+
+                        NSDate *latestExpirationDate = [subscriptions objectForKey:kLatestExpirationDate];
+
+                        if (!latestExpirationDate || [latestExpirationDate compare:iapReceipt.subscriptionExpirationDate] == NSOrderedAscending) {
+                            [subscriptions setObject:[iapReceipt.subscriptionExpirationDate copy] forKey:kLatestExpirationDate];
+                            [subscriptions setObject:[iapReceipt.productIdentifier copy] forKey:kProductId];
+                        }
+                        iapReceipt = nil;
+                    }
                 }
-                case RMAppReceiptASN1TypeOriginalAppVersion:
-                    _originalAppVersion = RMASN1ReadUTF8String(&s, length);
+                default:
                     break;
-                case RMAppReceiptASN1TypeExpirationDate:
-                {
-                    NSString *string = RMASN1ReadIA5SString(&s, length);
-                    _expirationDate = [RMAppReceipt formatRFC3339String:string];
-                    break;
-                }
             }
         }];
-        _inAppPurchases = purchases;
+
+        if (subscriptions) {
+            NSNumber *appReceiptFileSize;
+            [[NSBundle mainBundle].appStoreReceiptURL getResourceValue:&appReceiptFileSize forKey:NSURLFileSizeKey error:nil];
+            [subscriptions setObject:appReceiptFileSize forKey:kAppReceiptFileSize];
+        }
+        _inAppSubscriptions = (NSDictionary*)subscriptions;
     }
     return self;
-}
-
-- (BOOL)containsInAppPurchaseOfProductIdentifier:(NSString*)productIdentifier
-{
-    for (RMAppReceiptIAP *purchase in _inAppPurchases)
-    {
-        if ([purchase.productIdentifier isEqualToString:productIdentifier]) return YES;
-    }
-    return NO;
-}
-
--(RMAppReceiptIAP*)getActiveAutoRenewableSubscriptionOfProductIdentifier:(NSString *)productIdentifier forDate:(NSDate *)date
-{
-	{
-		for (RMAppReceiptIAP *iap in self.inAppPurchases)
-		{
-			if ([iap.productIdentifier isEqualToString:productIdentifier] && [iap isActiveAutoRenewableSubscriptionForDate:date]) {
-				return iap;
-			}
-		}
-
-		return nil;
-	}
 }
 
 - (BOOL)verifyReceiptHash
@@ -192,6 +203,7 @@ static NSURL *_appleRootCertificateURL = nil;
     
     return [expectedHash isEqualToData:self.receiptHash];
 }
+
 
 + (RMAppReceipt*)bundleReceipt
 {
@@ -254,11 +266,7 @@ static NSURL *_appleRootCertificateURL = nil;
         if (certificate)
         {
             X509_STORE_add_cert(store, certificate);
-            
-            BIO *payload = BIO_new(BIO_s_mem());
-            result = PKCS7_verify(container, NULL, store, NULL, payload, 0);
-            BIO_free(payload);
-            
+            result = PKCS7_verify(container, NULL, store, NULL, NULL, 0);
             X509_free(certificate);
         }
     }
@@ -332,39 +340,15 @@ static NSURL *_appleRootCertificateURL = nil;
             const NSUInteger length = data.length;
             switch (type)
             {
-                case RMAppReceiptASN1TypeQuantity:
-                    _quantity = RMASN1ReadInteger(&p, length);
-                    break;
                 case RMAppReceiptASN1TypeProductIdentifier:
                     _productIdentifier = RMASN1ReadUTF8String(&p, length);
                     break;
-                case RMAppReceiptASN1TypeTransactionIdentifier:
-                    _transactionIdentifier = RMASN1ReadUTF8String(&p, length);
-                    break;
-                case RMAppReceiptASN1TypePurchaseDate:
-                {
-                    NSString *string = RMASN1ReadIA5SString(&p, length);
-                    _purchaseDate = [RMAppReceipt formatRFC3339String:string];
-                    break;
-                }
-                case RMAppReceiptASN1TypeOriginalTransactionIdentifier:
-                    _originalTransactionIdentifier = RMASN1ReadUTF8String(&p, length);
-                    break;
-                case RMAppReceiptASN1TypeOriginalPurchaseDate:
-                {
-                    NSString *string = RMASN1ReadIA5SString(&p, length);
-                    _originalPurchaseDate = [RMAppReceipt formatRFC3339String:string];
-                    break;
-                }
                 case RMAppReceiptASN1TypeSubscriptionExpirationDate:
                 {
                     NSString *string = RMASN1ReadIA5SString(&p, length);
                     _subscriptionExpirationDate = [RMAppReceipt formatRFC3339String:string];
                     break;
                 }
-                case RMAppReceiptASN1TypeWebOrderLineItemID:
-                    _webOrderLineItemID = RMASN1ReadInteger(&p, length);
-                    break;
                 case RMAppReceiptASN1TypeCancellationDate:
                 {
                     NSString *string = RMASN1ReadIA5SString(&p, length);
@@ -375,15 +359,6 @@ static NSURL *_appleRootCertificateURL = nil;
         }];
     }
     return self;
-}
-
-- (BOOL)isActiveAutoRenewableSubscriptionForDate:(NSDate*)date
-{
-    NSAssert(self.subscriptionExpirationDate != nil, @"The product %@ is not an auto-renewable subscription.", self.productIdentifier);
-    
-    if (self.cancellationDate) return NO;
-    
-    return  [date compare:self.subscriptionExpirationDate] != NSOrderedDescending;
 }
 
 @end

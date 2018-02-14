@@ -59,9 +59,6 @@
     NSString *rotatingFilepath;
     NSString *rotatingOlderFilepath;
     unsigned long long rotatingCurrentFileSize;
-
-    // NSDateFormatter is thread-safe.
-    NSDateFormatter *rfc3339Formatter;
 }
 
 #pragma mark - Public methods
@@ -105,7 +102,7 @@
 }
 
 - (void)noticeError:(NSString *)message {
-    [self noticeError:message withTimestamp:[rfc3339Formatter stringFromDate:[NSDate date]]];
+    [self noticeError:message withTimestamp:[[NSDateFormatter sharedRFC3339MilliDateFormatter] stringFromDate:[NSDate date]]];
 }
 
 - (void)noticeErrorWithFormat:(NSString *)format, ... {
@@ -117,7 +114,7 @@
         va_end(args);
     }
 
-    [self noticeError:message withTimestamp:[rfc3339Formatter stringFromDate:[NSDate date]]];
+    [self noticeError:message withTimestamp:[[NSDateFormatter sharedRFC3339MilliDateFormatter] stringFromDate:[NSDate date]]];
 }
 
 - (void)noticeError:(NSString *)message withTimestamp:(NSString *)timestamp {
@@ -136,8 +133,6 @@
     self = [super init];
     if (self) {
         writeLock = [[NSLock alloc] init];
-
-        rfc3339Formatter = [NSDateFormatter createRFC3339MilliFormatter];
 
         rotatingFilepath = noticesFilepath;
         rotatingOlderFilepath = olderFilepath;
