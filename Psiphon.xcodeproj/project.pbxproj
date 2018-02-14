@@ -20,9 +20,7 @@
 		44A0CAF31FE04A4500859DB3 /* RMAppReceipt.m in Sources */ = {isa = PBXBuildFile; fileRef = 44A0CAF11FE04A4500859DB3 /* RMAppReceipt.m */; };
 		44A0CAF41FE04A7400859DB3 /* AppleIncRootCertificate.cer in Resources */ = {isa = PBXBuildFile; fileRef = 44A0CAF01FE04A4500859DB3 /* AppleIncRootCertificate.cer */; };
 		44D9B1001F67470E007D1E69 /* IAPViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 44D9B0FF1F67470E007D1E69 /* IAPViewController.m */; };
-		44E3CB641FC73A6700C80C82 /* SubscriptionReceiptInputStream.m in Sources */ = {isa = PBXBuildFile; fileRef = 44E3CB621FC73A6700C80C82 /* SubscriptionReceiptInputStream.m */; };
 		44E3CB681FC7535800C80C82 /* SubscriptionReceiptInputStream.m in Sources */ = {isa = PBXBuildFile; fileRef = 44E3CB621FC73A6700C80C82 /* SubscriptionReceiptInputStream.m */; };
-		44E3CB6C1FCCA83200C80C82 /* SubscriptionVerifier.m in Sources */ = {isa = PBXBuildFile; fileRef = 44E3CB6B1FCCA83200C80C82 /* SubscriptionVerifier.m */; };
 		4E0774961F566B040097BC8C /* InAppSettings.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 4E0774951F566ADA0097BC8C /* InAppSettings.bundle */; };
 		4E0D88241FA06B2400ADB61E /* PsiphonUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E0D88231FA06B2400ADB61E /* PsiphonUITests.swift */; };
 		4E0DCB1A1F28481E00495781 /* PsiphonDataSharedDB.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E0DCB191F28481E00495781 /* PsiphonDataSharedDB.m */; };
@@ -886,7 +884,6 @@
 				197DABEB1F54BEED00DD5C3B /* VungleInterstitialCustomEvent.m in Sources */,
 				197DABF51F54C15400DD5C3B /* VungleInstanceMediationSettings.m in Sources */,
 				4E0DCB1A1F28481E00495781 /* PsiphonDataSharedDB.m in Sources */,
-				44E3CB6C1FCCA83200C80C82 /* SubscriptionVerifier.m in Sources */,
 				4435CC271F70566000F3A809 /* SettingsViewController.m in Sources */,
 				EFED7EBC1F55C8550078980F /* LogViewControllerFullScreen.m in Sources */,
 				EFC2F5C320226782007B52F9 /* EmbeddedServerEntriesHelpers.c in Sources */,
@@ -897,7 +894,6 @@
 				EF35E8101F9FA748003B3102 /* Logging.m in Sources */,
 				EFC2F5C420226782007B52F9 /* RootContainerController.m in Sources */,
 				EF652CD11F352212002AFB48 /* main.m in Sources */,
-				44E3CB641FC73A6700C80C82 /* SubscriptionReceiptInputStream.m in Sources */,
 				44A0CAF31FE04A4500859DB3 /* RMAppReceipt.m in Sources */,
 				44D9B1001F67470E007D1E69 /* IAPViewController.m in Sources */,
 				EF441B011F7AF14A008A7D82 /* NSDateFormatter+RFC3339.m in Sources */,
