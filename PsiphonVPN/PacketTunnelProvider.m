@@ -221,34 +221,21 @@ typedef NS_ENUM(NSInteger, PsiphonSubscriptionState) {
 
           __block RACDisposable *selfDisposable = [updateSubscriptionTokenSignal
             subscribeNext:^(NSDictionary *remoteAuthDict) {
-
                 LOG_DEBUG_NOTICE(@"received dict from server:%@", remoteAuthDict);
 
-                // Received remote auth dict from the server.
-                NSError *error;
-                NSNumber *appReceiptFileSize = nil;
-                [[NSBundle mainBundle].appStoreReceiptURL
-                  getResourceValue:&appReceiptFileSize
-                            forKey:NSURLFileSizeKey
-                             error:&error];
-
-                if (error) {
-                    LOG_ERROR(@"error getting receipt file size:%@", error);
-                }
-
-                // Updates subscription info
+                // Updates subscription and persists subscription.
                 Subscription *subscription = [Subscription createFromPersistedSubscription];
-                [subscription setAppReceiptFileSize:appReceiptFileSize];
-                [subscription setPendingRenewalInfo:remoteAuthDict[RemoteSubscriptionVerifierPendingRenewalInfo]];
-                Authorization *authorizationToken = [[Authorization alloc]
-                  initWithEncodedToken:remoteAuthDict[RemoteSubscriptionVerifierSignedAuthorization]];
-                [subscription setAuthorizationToken:authorizationToken];
+                NSError *error = [subscription updateSubscriptionWithRemoteAuthDict:remoteAuthDict];
+                if (error) {
+                    LOG_ERROR(@"error updating subscription:%@", error);
+                    // Do nothing.
+                    return;
+                }
                 [subscription persistChanges];
 
-                // Extract request date from the response and convert to NSDate
+                // Extract request date from the response and convert to NSDate.
                 NSDate *requestDate = nil;
-                NSString *requestDateString = (NSString *)remoteAuthDict[RemoteSubscriptionVerifierRequestDate];
-
+                NSString *requestDateString = (NSString *) remoteAuthDict[kRemoteSubscriptionVerifierRequestDate];
                 if ([requestDateString length]) {
                     requestDate = [[NSDateFormatter sharedRFC3339DateFormatter] dateFromString:requestDateString];
                 }
@@ -257,13 +244,13 @@ typedef NS_ENUM(NSInteger, PsiphonSubscriptionState) {
                 // but in device time it appears to be expired.
                 if (requestDate) {
                     if ([subscription hasActiveSubscriptionTokenForDate:requestDate]
-                        && ![subscription hasActiveSubscriptionTokenForDate:[NSDate date]]) {
+                      && ![subscription hasActiveSubscriptionTokenForDate:[NSDate date]]) {
                         [weakSelf killExtensionForBadClock];
                         return;
                     }
                 }
 
-                // Received token from server successfully.
+                // If subscription has a valid authorization token, restarts the tunnel with the new token.
                 if (subscription.authorizationToken) {
 
                     // subscription has a valid authorization token, restart the tunnel to connect with the new token.
