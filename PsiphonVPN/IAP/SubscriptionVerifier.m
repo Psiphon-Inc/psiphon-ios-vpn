@@ -38,7 +38,7 @@
     [request setValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
 
     NSURLSessionConfiguration *sessionConfig = [NSURLSessionConfiguration defaultSessionConfiguration];
-    sessionConfig.timeoutIntervalForRequest = receiptRequestTimeOutSeconds;
+    sessionConfig.timeoutIntervalForRequest = kReceiptRequestTimeOutSeconds;
 
     urlSession = [NSURLSession sessionWithConfiguration:sessionConfig];
 
@@ -72,9 +72,10 @@
                     return;
                 }
 
-                NSDictionary *dict = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&error];
+                NSError *jsonError;
+                NSDictionary *dict = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&jsonError];
 
-                if (error) {
+                if (jsonError) {
                     NSDictionary *errorDict = @{NSLocalizedDescriptionKey: @"JSON parse failure", NSUnderlyingErrorKey: error};
                     NSError *err = [[NSError alloc] initWithDomain:kReceiptValidationErrorDomain code:PsiphonReceiptValidationJSONParseError userInfo:errorDict];
                     receiptUploadCompletionHandler(nil, err);

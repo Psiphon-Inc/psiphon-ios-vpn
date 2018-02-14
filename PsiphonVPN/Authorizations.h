@@ -34,7 +34,7 @@
 @property (nonatomic, readonly, nonnull) NSString *accessType;
 @property (nonatomic, readonly, nonnull) NSDate *expires;
 
-- (instancetype _Nullable)initWithEncodedToken:(NSString *)encodedToken;
+- (instancetype _Nullable)initWithEncodedToken:(NSString *_Nullable)encodedToken;
 
 @end
 
@@ -85,16 +85,16 @@
  */
 - (BOOL)persistChanges;
 
-- (BOOL)hasActiveAuthorizationTokenForDate:(NSDate *)date;
+- (BOOL)hasActiveAuthorizationTokenForDate:(NSDate *_Nonnull)date;
 
 @end
 
 #pragma mark - Subscriptions
 
-#define RemoteSubscriptionVerifierSignedAuthorization                @"signed_authorization"
-#define RemoteSubscriptionVerifierRequestDate                        @"request_date"
-#define RemoteSubscriptionVerifierPendingRenewalInfo                 @"pending_renewal_info"
-#define RemoteSubscriptionVerifierPendingRenewalInfoAutoRenewStatus  @"auto_renew_status"
+#define kRemoteSubscriptionVerifierSignedAuthorization                @"signed_authorization"
+#define kRemoteSubscriptionVerifierRequestDate                        @"request_date"
+#define kRemoteSubscriptionVerifierPendingRenewalInfo                 @"pending_renewal_info"
+#define kRemoteSubscriptionVerifierPendingRenewalInfoAutoRenewStatus  @"auto_renew_status"
 
 @interface Subscription : NSObject
 
@@ -103,7 +103,7 @@
 
 /**
  * App Store subscription pending renewal info details.
- * @ https://developer.apple.com/library/content/releasenotes/General/ValidateAppStoreReceipt/Chapters/ValidateRemotely.html#//apple_ref/doc/uid/TP40010573-CH104-SW2
+ * https://developer.apple.com/library/content/releasenotes/General/ValidateAppStoreReceipt/Chapters/ValidateRemotely.html#//apple_ref/doc/uid/TP40010573-CH104-SW2
  */
 @property (nonatomic, nullable, readwrite) NSArray *pendingRenewalInfo;
 
@@ -130,9 +130,11 @@
 - (BOOL)persistChanges;
 
 // TODO: write documentation
-- (BOOL)hasActiveSubscriptionTokenForDate:(NSDate *)date;
+- (BOOL)hasActiveSubscriptionTokenForDate:(NSDate *_Nonnull)date;
 
 // TODO: write documentation
 - (BOOL)shouldUpdateSubscriptionToken;
+
+- (NSError *_Nullable)updateSubscriptionWithRemoteAuthDict:(NSDictionary *_Nullable)remoteAuthDict;
 
 @end

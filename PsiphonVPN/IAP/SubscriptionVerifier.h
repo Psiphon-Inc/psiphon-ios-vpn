@@ -20,7 +20,7 @@
 #import <UIKit/UIKit.h>
 
 typedef void(^SubscriptionVerifierCompletionHandler)(NSDictionary* dictionary, NSError *error);
-#define receiptRequestTimeOutSeconds        20.0
+#define kReceiptRequestTimeOutSeconds        20.0
 #define kReceiptValidationErrorDomain       @"psiphonReceiptValidationErrorDomain"
 #define kRemoteVerificationURL              @"https://subscription.psiphon3.com/appstore"
 

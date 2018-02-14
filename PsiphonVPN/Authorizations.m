@@ -303,7 +303,7 @@
     if([self.pendingRenewalInfo count] == 1
       && [self.pendingRenewalInfo[0] isKindOfClass:[NSDictionary class]]) {
 
-        NSString *autoRenewStatus = [self.pendingRenewalInfo[0] objectForKey:RemoteSubscriptionVerifierPendingRenewalInfoAutoRenewStatus];
+        NSString *autoRenewStatus = [self.pendingRenewalInfo[0] objectForKey:kRemoteSubscriptionVerifierPendingRenewalInfoAutoRenewStatus];
         if (autoRenewStatus && [autoRenewStatus isEqualToString:@"1"]) {
             LOG_DEBUG_NOTICE(@"subscription expired but user's last known intention is to auto-renew");
             return YES;
@@ -313,5 +313,30 @@
     LOG_DEBUG_NOTICE(@"authorization token update not needed");
     return NO;
 }
+
+- (NSError *)updateSubscriptionWithRemoteAuthDict:(NSDictionary *)remoteAuthDict {
+
+    if (!remoteAuthDict) {
+        return nil;
+    }
+    
+    // Gets app subscription receipt file size.
+    NSError *err;
+    NSNumber *appReceiptFileSize = nil;
+    [[NSBundle mainBundle].appStoreReceiptURL getResourceValue:&appReceiptFileSize forKey:NSURLFileSizeKey error:&err];
+    if (err) {
+        return err;
+    }
+
+    // Updates subscription dictionary.
+    [self setAppReceiptFileSize:appReceiptFileSize];
+    [self setPendingRenewalInfo:remoteAuthDict[kRemoteSubscriptionVerifierPendingRenewalInfo]];
+    Authorization *authorizationToken = [[Authorization alloc]
+      initWithEncodedToken:remoteAuthDict[kRemoteSubscriptionVerifierSignedAuthorization]];
+    [self setAuthorizationToken:authorizationToken];
+
+    return nil;
+}
+
 
 @end
