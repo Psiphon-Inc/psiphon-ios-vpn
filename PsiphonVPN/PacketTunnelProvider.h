@@ -17,15 +17,17 @@
  *
  */
 
-#import <NetworkExtension/NEPacketTunnelProvider.h>
+#import "BasePacketTunnelProvider.h"
 
 // PsiphonTunnel Errors
-#define PSIPHON_TUNNEL_ERROR_DOMAIN             @"psiphonTunnelErrorSettingsDomain"
-#define PSIPHON_TUNNEL_ERROR_BAD_CONFIGURATION  1
-#define PSIPHON_TUNNEL_ERROR_INTERAL_ERROR      2
-#define PSIPHON_TUNNEL_ERROR_BAD_START          3  // Error code for when the user tries to start the VPN anywhere butthe container app.
-#define PSIPHON_TUNNEL_ERROR_STOPPED_BEFORE_CONNECTED 4
+FOUNDATION_EXTERN NSString *_Nonnull const PsiphonTunnelErrorDomain;
 
-@interface PacketTunnelProvider : NEPacketTunnelProvider
+typedef NS_ERROR_ENUM(PsiphonTunnelErrorDomain, PacketTunnelProviderErrorCode) {
+    PsiphonTunnelErrorSubscriptionExpired = 1,
+    PsiphonTunnelErrorSubscriptionBadClock = 2,
+    PsiphonTunnelErrorSubscriptionInvalidReceipt = 3,
+};
+
+@interface PacketTunnelProvider : BasePacketTunnelProvider <BasePacketTunnelProviderProtocol>
 
 @end
