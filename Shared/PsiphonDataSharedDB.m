@@ -28,14 +28,12 @@
 
 /* Shared NSUserDefaults keys */
 #define EGRESS_REGIONS_KEY @"egress_regions"
-#define TUN_CONNECTED_KEY @"tun_connected"
 #define APP_FOREGROUND_KEY @"app_foreground"
 #define SERVER_TIMESTAMP_KEY @"server_timestamp"
-#define SPONSOR_ID_KEY @"sponsor_id"
+
 #ifndef TARGET_IS_EXTENSION
 #define EMBEDDED_EGRESS_REGIONS_KEY @"embedded_server_entries_egress_regions"
 #endif
-
 
 @implementation Homepage
 @end
@@ -46,9 +44,6 @@
     NSUserDefaults *sharedDefaults;
 
     NSString *appGroupIdentifier;
-
-    // RFC3339 Date Formatter
-    NSDateFormatter *rfc3339Formatter;
 }
 
 /*!
@@ -60,7 +55,6 @@
     if (self) {
         appGroupIdentifier = identifier;
         sharedDefaults = [[NSUserDefaults alloc] initWithSuiteName:identifier];
-        rfc3339Formatter = [NSDateFormatter createRFC3339MilliFormatter];
     }
     return self;
 }
@@ -183,7 +177,7 @@
                     msg = [NSString stringWithFormat:@"%@: %@", dict[@"noticeType"], data];
                 }
 
-                NSDate *timestamp = [rfc3339Formatter dateFromString:dict[@"timestamp"]];
+                NSDate *timestamp = [[NSDateFormatter sharedRFC3339MilliDateFormatter] dateFromString:dict[@"timestamp"]];
 
                 if (!msg) {
                     LOG_ERROR(@"Failed to read notice message for log line (%@).", logLine);
@@ -254,7 +248,7 @@
         if (dict) {
             Homepage *h = [[Homepage alloc] init];
             h.url = [NSURL URLWithString:dict[@"data"][@"url"]];
-            h.timestamp = [rfc3339Formatter dateFromString:dict[@"timestamp"]];
+            h.timestamp = [[NSDateFormatter sharedRFC3339MilliDateFormatter] dateFromString:dict[@"timestamp"]];
             [homepages addObject:h];
         }
     }
@@ -446,21 +440,6 @@
  */
 - (NSString*)getServerTimestamp {
 	return [sharedDefaults stringForKey:SERVER_TIMESTAMP_KEY];
-}
-
-# pragma mark - Sponsor ID
-
-- (void) updateSponsorId:(NSString*)sponsorId {
-    if(sponsorId && [sponsorId length]) {
-        [sharedDefaults setObject:sponsorId forKey:SPONSOR_ID_KEY];
-    } else {
-        [sharedDefaults removeObjectForKey:SPONSOR_ID_KEY];
-    }
-    [sharedDefaults synchronize];
-}
-
-- (NSString*)getSponsorId {
-    return [sharedDefaults stringForKey:SPONSOR_ID_KEY];
 }
 
 @end

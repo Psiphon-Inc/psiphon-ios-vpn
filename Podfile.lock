@@ -13,9 +13,10 @@ PODS:
     - mopub-ios-sdk/Core
     - mopub-ios-sdk/Moat
   - OpenSSL (1.0.210)
-  - PsiphonClientCommonLibrary (0.2.23):
+  - PsiphonClientCommonLibrary (0.2.25):
     - InAppSettingsKit
   - PureLayout (3.0.2)
+  - ReactiveObjC (3.1.0)
   - VungleSDK-iOS (5.3.0)
 
 DEPENDENCIES:
@@ -23,8 +24,9 @@ DEPENDENCIES:
   - InAppSettingsKit (from `https://github.com/Psiphon-Inc/InAppSettingsKit.git`, commit `598c498`)
   - mopub-ios-sdk (= 4.18.0)
   - OpenSSL (= 1.0.210)
-  - PsiphonClientCommonLibrary (from `https://github.com/Psiphon-Inc/psiphon-ios-client-common-library.git`, commit `89d14eb`)
+  - PsiphonClientCommonLibrary (from `https://github.com/Psiphon-Inc/psiphon-ios-client-common-library.git`, commit `c39fce5`)
   - PureLayout (= 3.0.2)
+  - ReactiveObjC (~> 3.1)
   - VungleSDK-iOS (= 5.3.0)
 
 EXTERNAL SOURCES:
@@ -32,7 +34,7 @@ EXTERNAL SOURCES:
     :commit: 598c498
     :git: https://github.com/Psiphon-Inc/InAppSettingsKit.git
   PsiphonClientCommonLibrary:
-    :commit: 89d14eb
+    :commit: c39fce5
     :git: https://github.com/Psiphon-Inc/psiphon-ios-client-common-library.git
 
 CHECKOUT OPTIONS:
@@ -40,7 +42,7 @@ CHECKOUT OPTIONS:
     :commit: 598c498
     :git: https://github.com/Psiphon-Inc/InAppSettingsKit.git
   PsiphonClientCommonLibrary:
-    :commit: 89d14eb
+    :commit: c39fce5
     :git: https://github.com/Psiphon-Inc/psiphon-ios-client-common-library.git
 
 SPEC CHECKSUMS:
@@ -48,10 +50,11 @@ SPEC CHECKSUMS:
   InAppSettingsKit: 567ef538698cd6cf3afb9c5529b89a8936fdacb5
   mopub-ios-sdk: 043a81e7e3ccd2b888fec35880b13e2876c16ff3
   OpenSSL: 246ffb948e9d56466727fd318134af35f5aa764e
-  PsiphonClientCommonLibrary: 26bb145e07f3bdaf9b83328d6bd865ecad76e85b
+  PsiphonClientCommonLibrary: 857ad08ea6b0b0e5482c44a9c1620460fcf966d3
   PureLayout: 4d550abe49a94f24c2808b9b95db9131685fe4cd
+  ReactiveObjC: 2a38ea15335de4119d8b17caf1db1484f61db902
   VungleSDK-iOS: af3aa92d0f4a923505a9416646ffef5250592150
 
-PODFILE CHECKSUM: b86c08af6481c2ee041bb3c1c2342adc6ec53048
+PODFILE CHECKSUM: 51c1e0bda64ac6d6cc6773fd6a21271db8292f74
 
 COCOAPODS: 1.3.1

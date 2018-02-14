@@ -45,7 +45,7 @@
         case NEProviderStopReasonConnectionFailed: return @"the connection failed";
     }
 
-    return [NSString stringWithFormat:@"unknown stop reason (%ld)", stopReason];
+    return [NSString stringWithFormat:@"unknown stop reason (%ld)", (long)stopReason];
 }
 
 @end
