@@ -212,94 +212,93 @@ typedef NS_ENUM(NSInteger, PsiphonSubscriptionState) {
 
     __weak PacketTunnelProvider *weakSelf = self;
 
-    // interval signal is the root observable that initiates the chain of subscription check signals.
-    RACDisposable *subscriptionCheckTimerDisposable = [[[RACSignal interval:SEC_PER_24HR onScheduler:[RACScheduler mainThreadScheduler]]
-      startWith:nil]
-      subscribeNext:^(NSDate *x) {
+    __block RACDisposable *selfDisposable = [updateSubscriptionTokenSignal
+      subscribeNext:^(NSDictionary *remoteAuthDict) {
+          LOG_DEBUG_NOTICE(@"received dict from server:%@", remoteAuthDict);
 
-          LOG_DEBUG_NOTICE(@"subscription check timer interval emitted");
+          // Updates subscription and persists subscription.
+          Subscription *subscription = [Subscription createFromPersistedSubscription];
+          NSError *error = [subscription updateSubscriptionWithRemoteAuthDict:remoteAuthDict];
+          if (error) {
+              LOG_ERROR(@"error updating subscription:%@", error);
+              // Do nothing.
+              return;
+          }
+          [subscription persistChanges];
 
-          __block RACDisposable *selfDisposable = [updateSubscriptionTokenSignal
-            subscribeNext:^(NSDictionary *remoteAuthDict) {
-                LOG_DEBUG_NOTICE(@"received dict from server:%@", remoteAuthDict);
+          // Extract request date from the response and convert to NSDate.
+          NSDate *requestDate = nil;
+          NSString *requestDateString = (NSString *) remoteAuthDict[kRemoteSubscriptionVerifierRequestDate];
+          if ([requestDateString length]) {
+              requestDate = [[NSDateFormatter sharedRFC3339DateFormatter] dateFromString:requestDateString];
+          }
 
-                // Updates subscription and persists subscription.
-                Subscription *subscription = [Subscription createFromPersistedSubscription];
-                NSError *error = [subscription updateSubscriptionWithRemoteAuthDict:remoteAuthDict];
-                if (error) {
-                    LOG_ERROR(@"error updating subscription:%@", error);
-                    // Do nothing.
-                    return;
-                }
-                [subscription persistChanges];
+          // "Clock is off" notification  if user has an active subscription in server time
+          // but in device time it appears to be expired.
+          if (requestDate) {
+              if ([subscription hasActiveSubscriptionTokenForDate:requestDate]
+                && ![subscription hasActiveSubscriptionTokenForDate:[NSDate date]]) {
+                  [weakSelf killExtensionForBadClock];
+                  return;
+              }
+          }
 
-                // Extract request date from the response and convert to NSDate.
-                NSDate *requestDate = nil;
-                NSString *requestDateString = (NSString *) remoteAuthDict[kRemoteSubscriptionVerifierRequestDate];
-                if ([requestDateString length]) {
-                    requestDate = [[NSDateFormatter sharedRFC3339DateFormatter] dateFromString:requestDateString];
-                }
+          // If subscription has a valid authorization token, restarts the tunnel with the new token.
+          if (subscription.authorizationToken) {
 
-                // "Clock is off" notification  if user has an active subscription in server time
-                // but in device time it appears to be expired.
-                if (requestDate) {
-                    if ([subscription hasActiveSubscriptionTokenForDate:requestDate]
-                      && ![subscription hasActiveSubscriptionTokenForDate:[NSDate date]]) {
-                        [weakSelf killExtensionForBadClock];
-                        return;
-                    }
-                }
+              // subscription has a valid authorization token, restart the tunnel to connect with the new token.
+              weakSelf.startTunnelSubscriptionState = PsiphonSubscriptionStateSubscribed;
+              [weakSelf restartTunnel];
 
-                // If subscription has a valid authorization token, restarts the tunnel with the new token.
-                if (subscription.authorizationToken) {
+          } else {
 
-                    // subscription has a valid authorization token, restart the tunnel to connect with the new token.
-                    weakSelf.startTunnelSubscriptionState = PsiphonSubscriptionStateSubscribed;
-                    [weakSelf restartTunnel];
+              // server returned no authorization token, restart only if the extension was not started
+              // from the container.
+              if (weakSelf.NEStartMethod == NEStartMethodFromContainer) {
 
-                } else {
+                  if (weakSelf.startTunnelSubscriptionState != PsiphonSubscriptionStateNotSubscribed) {
+                      LOG_DEBUG_NOTICE(@"tunnel started from container restarting tunnel");
+                      weakSelf.startTunnelSubscriptionState = PsiphonSubscriptionStateNotSubscribed;
+                      [self restartTunnel];
+                  }
 
-                    // server returned no authorization token, restart only if the extension was not started
-                    // from the container.
-                    if (weakSelf.NEStartMethod == NEStartMethodFromContainer) {
+              } else {
+                  LOG_DEBUG_NOTICE(@"tunnel not started from the container killing with grace");
+                  [self startGracePeriod];
+              }
 
-                        if (weakSelf.startTunnelSubscriptionState != PsiphonSubscriptionStateNotSubscribed) {
-                            LOG_DEBUG_NOTICE(@"tunnel started from container restarting tunnel");
-                            weakSelf.startTunnelSubscriptionState = PsiphonSubscriptionStateNotSubscribed;
-                            [self restartTunnel];
-                        }
+          }
 
-                    } else {
-                        LOG_DEBUG_NOTICE(@"tunnel not started from the container killing with grace");
-                        [self startGracePeriod];
-                    }
+      }
+      error:^(NSError *error) {
+          LOG_ERROR(@"subscription verifier error: %@, %ld", error.localizedDescription, (long) error.code);
 
-                }
+          // Kill the extension for an invalid receipt,
+          // else do nothing.
+          if (error.code == PsiphonReceiptValidationInvalidReceiptError) {
+              [weakSelf killExtensionForInvalidReceipt];
+          }
 
-            }
-            error:^(NSError *error) {
-                LOG_ERROR(@"subscription verifier error: %@, %ld", error.localizedDescription, (long) error.code);
-
-                // Kill the extension for an invalid receipt,
-                // else do nothing.
-                if (error.code == PsiphonReceiptValidationInvalidReceiptError) {
-                    [weakSelf killExtensionForInvalidReceipt];
-                }
-
-                [globalDisposable removeDisposable:selfDisposable];
-                [selfDisposable dispose];
-            }
-            completed:^{
-                LOG_DEBUG_NOTICE(@"$$finished");
-                [globalDisposable removeDisposable:selfDisposable];
-                [selfDisposable dispose];
-            }];
-
-          [globalDisposable addDisposable:selfDisposable];
-
+          [globalDisposable removeDisposable:selfDisposable];
+          [selfDisposable dispose];
+      }
+      completed:^{
+          LOG_DEBUG_NOTICE(@"$$finished");
+          [globalDisposable removeDisposable:selfDisposable];
+          [selfDisposable dispose];
       }];
 
-    [globalDisposable addDisposable:subscriptionCheckTimerDisposable];
+    [globalDisposable addDisposable:selfDisposable];
+
+
+    // Schedules next subscription check.
+    // NOTE: The previous subscription check operation is assumed to be finished by the time
+    //       the next operation occurs. No checks are performed to see if the previous
+    //       operation has finished.
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC * SEC_PER_24HR), dispatch_get_main_queue(), ^{
+        [self startPeriodicSubscriptionCheck];
+    });
+
 }
 
 - (void)startTunnelWithErrorHandler:(void (^_Nonnull)(NSError *_Nonnull error))errorHandler {
