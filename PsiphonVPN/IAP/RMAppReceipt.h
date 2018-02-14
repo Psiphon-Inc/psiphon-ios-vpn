@@ -97,6 +97,11 @@ __attribute__((availability(ios,introduced=7.0)))
  */
 + (void)setAppleRootCertificateURL:(NSURL*)url;
 
+/*
+ Get subscription expiration date for give product ID
+ */
+- (NSDate*)expirationDateForProduct:(NSString*)productIdentifier;
+
 @end
 
 /** Represents an in-app purchase in the app receipt.

@@ -43,8 +43,6 @@
 #import <openssl/objects.h>
 #import <openssl/sha.h>
 #import <openssl/x509.h>
-#import "SharedConstants.h"
-
 
 // From https://developer.apple.com/library/ios/releasenotes/General/ValidateAppStoreReceipt/Chapters/ReceiptFields.html#//apple_ref/doc/uid/TP40010573-CH106-SW1
 NSInteger const RMAppReceiptASN1TypeBundleIdentifier = 2;
@@ -161,11 +159,13 @@ static NSURL *_appleRootCertificateURL = nil;
                             break;
                         }
 
-                        NSDate *latestExpirationDate = [subscriptions objectForKey:kLatestExpirationDate];
-
-                        if (!latestExpirationDate || [latestExpirationDate compare:iapReceipt.subscriptionExpirationDate] == NSOrderedAscending) {
-                            [subscriptions setObject:[iapReceipt.subscriptionExpirationDate copy] forKey:kLatestExpirationDate];
-                            [subscriptions setObject:[iapReceipt.productIdentifier copy] forKey:kProductId];
+                        NSDate *subscriptionExpirationDate = [subscriptions objectForKey:iapReceipt.productIdentifier];
+                        if (!subscriptionExpirationDate) {
+                            [subscriptions setObject:[iapReceipt.subscriptionExpirationDate copy] forKey:iapReceipt.productIdentifier];
+                        } else {
+                            if ([subscriptionExpirationDate compare:iapReceipt.subscriptionExpirationDate] == NSOrderedAscending) {
+                                [subscriptions setObject:[iapReceipt.subscriptionExpirationDate copy] forKey:iapReceipt.productIdentifier];
+                            }
                         }
                         iapReceipt = nil;
                     }
@@ -174,13 +174,7 @@ static NSURL *_appleRootCertificateURL = nil;
                     break;
             }
         }];
-
-        if (subscriptions) {
-            NSNumber *appReceiptFileSize;
-            [[NSBundle mainBundle].appStoreReceiptURL getResourceValue:&appReceiptFileSize forKey:NSURLFileSizeKey error:nil];
-            [subscriptions setObject:appReceiptFileSize forKey:kAppReceiptFileSize];
-        }
-        _inAppSubscriptions = (NSDictionary*)subscriptions;
+        _inAppSubscriptions = subscriptions;
     }
     return self;
 }
@@ -326,6 +320,10 @@ static NSURL *_appleRootCertificateURL = nil;
     return date;
 }
 
+- (NSDate*)expirationDateForProduct:(NSString*)productIdentifier
+{
+    return [self.inAppSubscriptions objectForKey:productIdentifier];
+}
 @end
 
 @implementation RMAppReceiptIAP

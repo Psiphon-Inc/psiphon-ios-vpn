@@ -17,12 +17,22 @@
  *
  */
 
-#import <PsiphonTunnel/PsiphonTunnel.h>
 #import <UIKit/UIKit.h>
-#import "SettingsViewController.h"
 
-@interface MainViewController : UIViewController <PsiphonSettingsViewControllerDelegate, TunneledAppDelegate>
+typedef void(^SubscriptionVerifierCompletionHandler)(NSDictionary* dictionary, NSError *error);
+#define kReceiptRequestTimeOutSeconds        20.0
+#define kReceiptValidationErrorDomain       @"psiphonReceiptValidationErrorDomain"
+#define kRemoteVerificationURL              @"https://subscription.psiphon3.com/appstore"
 
-@property (nonatomic) BOOL openSettingImmediatelyOnViewDidAppear;
+typedef NS_ENUM(NSInteger, PsiphonReceiptValidationErrorCode) {
+    PsiphonReceiptValidationNSURLSessionError,
+    PsiphonReceiptValidationHTTPError,
+    PsiphonReceiptValidationInvalidReceiptError,
+    PsiphonReceiptValidationJSONParseError,
+};
+
+@interface SubscriptionVerifier : NSObject
+
+- (void)startWithCompletionHandler:(SubscriptionVerifierCompletionHandler _Nonnull)receiptUploadCompletionHandler;
 
 @end
