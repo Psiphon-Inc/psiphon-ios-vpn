@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, Psiphon Inc.
+ * Copyright (c) 2018, Psiphon Inc.
  * All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,17 +17,10 @@
  *
  */
 
-#import "BasePacketTunnelProvider.h"
+#import <Foundation/Foundation.h>
 
-// PsiphonTunnel Subscription Errors
-FOUNDATION_EXTERN NSString *_Nonnull const PsiphonTunnelSubscriptionErrorDomain;
+@interface NSError (Convenience)
 
-typedef NS_ERROR_ENUM(PsiphonTunnelSubscriptionErrorDomain, PacketTunnelProviderErrorCode) {
-    PsiphonTunnelErrorSubscriptionExpired = 1,
-    PsiphonTunnelErrorSubscriptionBadClock = 2,
-    PsiphonTunnelErrorSubscriptionInvalidReceipt = 3,
-};
-
-@interface PacketTunnelProvider : BasePacketTunnelProvider <BasePacketTunnelProviderProtocol>
++ (instancetype)errorWithDomain:(NSErrorDomain)domain code:(NSInteger)code;
 
 @end
