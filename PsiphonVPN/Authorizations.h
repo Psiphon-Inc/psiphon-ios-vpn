@@ -18,31 +18,14 @@
  */
 
 #import <Foundation/Foundation.h>
-
-// Authorization AccessTypes
-
-#if DEBUG
-#define kAuthorizationAccessTypeApple     @"apple-subscription-test"
-#else
-#define kAuthorizationAccessTypeApple     @"apple-subscription"
-#endif
-
-@interface Authorization : NSObject
-
-@property (nonatomic, readonly, nonnull) NSString *base64Representation;
-@property (nonatomic, readonly, nonnull) NSString *ID;
-@property (nonatomic, readonly, nonnull) NSString *accessType;
-@property (nonatomic, readonly, nonnull) NSDate *expires;
-
-- (instancetype _Nullable)initWithEncodedToken:(NSString *_Nullable)encodedToken;
-
-@end
+#import "UserDefaultsModelProtocol.h"
+#import "AuthorizationToken.h"
 
 
-@interface Authorizations : NSObject
+@interface Authorizations : NSObject <UserDefaultsModelProtocol>
 
 /** Array of authorization tokens. */
-@property (nonatomic, nullable, readonly) NSArray<Authorization *> *tokens;
+@property (nonatomic, nullable, readonly) NSArray<AuthorizationToken *> *tokens;
 
 /**
  * Reads NSUserDefaults and wraps the result in an Authorizations instance.
@@ -51,7 +34,7 @@
  *            instance to disk.
  * @return An instance of Authorizations class.
  */
-+ (Authorizations *_Nonnull)createFromPersistedAuthorizations;
++ (Authorizations *_Nonnull)fromPersistedDefaults;
 
 - (BOOL)isEmpty;
 
@@ -91,50 +74,3 @@
 
 #pragma mark - Subscriptions
 
-#define kRemoteSubscriptionVerifierSignedAuthorization                @"signed_authorization"
-#define kRemoteSubscriptionVerifierRequestDate                        @"request_date"
-#define kRemoteSubscriptionVerifierPendingRenewalInfo                 @"pending_renewal_info"
-#define kRemoteSubscriptionVerifierPendingRenewalInfoAutoRenewStatus  @"auto_renew_status"
-
-@interface Subscription : NSObject
-
-/** App Store subscription receipt file size. */
-@property (nonatomic, nullable, readwrite) NSNumber *appReceiptFileSize;
-
-/**
- * App Store subscription pending renewal info details.
- * https://developer.apple.com/library/content/releasenotes/General/ValidateAppStoreReceipt/Chapters/ValidateRemotely.html#//apple_ref/doc/uid/TP40010573-CH104-SW2
- */
-@property (nonatomic, nullable, readwrite) NSArray *pendingRenewalInfo;
-
-@property (nonatomic, nullable, readwrite) Authorization *authorizationToken;
-
-/**
- * Reads NSUserDefaults and wraps the result in an Authorizations instance.
- * The underlying dictionary can only be manipulated by changing the properties of this instance.
- * @attention -persistChanges should be called to persist any changes made to the returned instance to disk.
- * @return An instance of Authorizations class.
- */
-+ (Subscription *_Nonnull)createFromPersistedSubscription;
-
-/**
- * @return TRUE if underlying dictionary is empty.
- */
-- (BOOL)isEmpty;
-
-/**
- * Persists changes made to this instance to NSUserDefaults.
- * This is a blocking function.
- * @return TRUE if data was saved to disk successfully, FALSE otherwise.
- */
-- (BOOL)persistChanges;
-
-// TODO: write documentation
-- (BOOL)hasActiveSubscriptionTokenForDate:(NSDate *_Nonnull)date;
-
-// TODO: write documentation
-- (BOOL)shouldUpdateSubscriptionToken;
-
-- (NSError *_Nullable)updateSubscriptionWithRemoteAuthDict:(NSDictionary *_Nullable)remoteAuthDict;
-
-@end
