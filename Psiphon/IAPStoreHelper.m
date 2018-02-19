@@ -20,6 +20,7 @@
 #import "IAPStoreHelper.h"
 #import "RMAppReceipt.h"
 #import "SharedConstants.h"
+#import "NSDate+Comparator.h"
 
 
 NSString *const kIAPSKProductsRequestDidReceiveResponse = @"kIAPSKProductsRequestDidReceiveResponse";
@@ -210,9 +211,9 @@ NSString *const kSubscriptionDictionary = @"kSubscriptionDictionary";
         return NO;
     }
 
-    NSDate *latestExpirationDate = [subscriptionDict objectForKey:kLatestExpirationDate];
+    NSDate *latestExpirationDate = subscriptionDict[kLatestExpirationDate];
 
-    if(latestExpirationDate && [date compare:latestExpirationDate] != NSOrderedDescending) {
+    if(latestExpirationDate && [date beforeOrEqualTo:latestExpirationDate]) {
         return YES;
     }
     return NO;

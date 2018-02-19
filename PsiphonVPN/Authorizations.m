@@ -21,6 +21,7 @@
 #import "NSDateFormatter+RFC3339.h"
 #import "Logging.h"
 #import "AuthorizationToken.h"
+#import "NSDate+Comparator.h"
 
 // Authorizations dictionary keys
 #define kAuthorizationDictionary        @"kAuthorizationDictionary"
@@ -113,7 +114,7 @@
     }
 
     for (AuthorizationToken *authorization in self.tokens) {
-        if ([date compare:[authorization expires]] != NSOrderedDescending) {
+        if ([date beforeOrEqualTo:[authorization expires]]) {
             return TRUE;
         }
     }

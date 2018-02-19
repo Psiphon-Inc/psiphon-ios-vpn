@@ -22,6 +22,7 @@
 #import "NSDateFormatter+RFC3339.h"
 #import "PsiphonDataSharedDB.h"
 #import "SharedConstants.h"
+#import "NSDate+Comparator.h"
 
 static NSString *iapCellID = @"IAPTableCellID";
 
@@ -123,15 +124,18 @@ static NSString *iapCellID = @"IAPTableCellID";
     self.latestSubscriptionProduct = nil;
 
     if(subscriptionDictionary && [subscriptionDictionary isKindOfClass:[NSDictionary class]]) {
-        self.latestSubscriptionExpirationDate = [subscriptionDictionary objectForKey:kLatestExpirationDate];
-        if(self.latestSubscriptionExpirationDate && [[NSDate date] compare:self.latestSubscriptionExpirationDate] != NSOrderedDescending) {
-            NSString *productID = [subscriptionDictionary objectForKey:kProductId];
+        self.latestSubscriptionExpirationDate = subscriptionDictionary[kLatestExpirationDate];
+        if(self.latestSubscriptionExpirationDate) {
+            NSDate *currentDate = [NSDate date];
+            if ([currentDate beforeOrEqualTo:self.latestSubscriptionExpirationDate]) {
+                NSString *productID = subscriptionDictionary[kProductId];
 
-            for (SKProduct * product in [IAPStoreHelper sharedInstance].storeProducts) {
-                if ([product.productIdentifier isEqualToString:productID]) {
-                    self.latestSubscriptionProduct = product;
-                    self.hasActiveSubscription = (self.latestSubscriptionExpirationDate && [[NSDate date] compare:self.latestSubscriptionExpirationDate] != NSOrderedDescending);
-                    break;
+                for (SKProduct *product in [IAPStoreHelper sharedInstance].storeProducts) {
+                    if ([product.productIdentifier isEqualToString:productID]) {
+                        self.latestSubscriptionProduct = product;
+                        self.hasActiveSubscription = (self.latestSubscriptionExpirationDate && [currentDate beforeOrEqualTo:self.latestSubscriptionExpirationDate]);
+                        break;
+                    }
                 }
             }
         }
