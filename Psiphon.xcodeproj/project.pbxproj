@@ -36,7 +36,9 @@
 		9BFEC41EFF02F742C1C5F7C2 /* FileUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC3123D928C7C591D2677 /* FileUtils.m */; };
 		9BFEC4475166B2EEAF192D37 /* VPNManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC04426D8558CB89D3798 /* VPNManager.m */; };
 		9BFEC4F02A47FF8265635803 /* Notifier.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC91ED4A1C511520E9948 /* Notifier.m */; };
+		9BFEC54AB3089FE1D9E0A89D /* NSDate+Comparator.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC949B40E8103F12D61CF /* NSDate+Comparator.m */; };
 		9BFEC9B33C9614EE922EC5FE /* FileUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC3123D928C7C591D2677 /* FileUtils.m */; };
+		9BFECA1B566157428BD79808 /* NSDate+Comparator.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC949B40E8103F12D61CF /* NSDate+Comparator.m */; };
 		9BFECB33EB0C6F13DD54D2F1 /* NSError+Convenience.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFECEF91E11E3EE5D20E5B2 /* NSError+Convenience.m */; };
 		9BFECB6BF077F45D491093F1 /* AuthorizationToken.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC31B61584FD2EAAF5DE6 /* AuthorizationToken.m */; };
 		9BFECBB8768C47FDA5117171 /* NSError+Convenience.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFECEF91E11E3EE5D20E5B2 /* NSError+Convenience.m */; };
@@ -217,9 +219,11 @@
 		9BFEC8783D4222F2272E50E7 /* BasePacketTunnelProvider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BasePacketTunnelProvider.h; sourceTree = "<group>"; };
 		9BFEC8BB2716DBBAB4DEC637 /* NSError+Convenience.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSError+Convenience.h"; sourceTree = "<group>"; };
 		9BFEC91ED4A1C511520E9948 /* Notifier.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Notifier.m; sourceTree = "<group>"; };
+		9BFEC949B40E8103F12D61CF /* NSDate+Comparator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSDate+Comparator.m"; sourceTree = "<group>"; };
 		9BFECAAC102D23A2D39CBBE1 /* RACSignal+Operations2.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "RACSignal+Operations2.m"; sourceTree = "<group>"; };
 		9BFECC3FADE9C8A76A0913DE /* BasePacketTunnelProvider.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BasePacketTunnelProvider.m; sourceTree = "<group>"; };
 		9BFECC9B2B9F2BFBD4F8A47B /* UserDefaultsModelProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UserDefaultsModelProtocol.h; sourceTree = "<group>"; };
+		9BFECDCC3659EE393EC4A8F7 /* NSDate+Comparator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSDate+Comparator.h"; sourceTree = "<group>"; };
 		9BFECE9247474C83FD8C2948 /* AdManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AdManager.m; sourceTree = "<group>"; };
 		9BFECEF91E11E3EE5D20E5B2 /* NSError+Convenience.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSError+Convenience.m"; sourceTree = "<group>"; };
 		CB8BB19F016330264C4DCB80 /* libPods-Psiphon.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Psiphon.a"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -383,6 +387,8 @@
 				9BFEC673CE5EA236279F07BD /* AuthorizationToken.h */,
 				9BFECEF91E11E3EE5D20E5B2 /* NSError+Convenience.m */,
 				9BFEC8BB2716DBBAB4DEC637 /* NSError+Convenience.h */,
+				9BFEC949B40E8103F12D61CF /* NSDate+Comparator.m */,
+				9BFECDCC3659EE393EC4A8F7 /* NSDate+Comparator.h */,
 			);
 			path = Shared;
 			sourceTree = "<group>";
@@ -930,6 +936,7 @@
 				9BFEC41EFF02F742C1C5F7C2 /* FileUtils.m in Sources */,
 				9BFECB6BF077F45D491093F1 /* AuthorizationToken.m in Sources */,
 				9BFECB33EB0C6F13DD54D2F1 /* NSError+Convenience.m in Sources */,
+				9BFECA1B566157428BD79808 /* NSDate+Comparator.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -954,6 +961,7 @@
 				9BFECFF6D50B52E15AE019C6 /* RACSignal+Operations2.m in Sources */,
 				9BFECEA225F023F895CC8DA1 /* AuthorizationToken.m in Sources */,
 				9BFECBB8768C47FDA5117171 /* NSError+Convenience.m in Sources */,
+				9BFEC54AB3089FE1D9E0A89D /* NSDate+Comparator.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

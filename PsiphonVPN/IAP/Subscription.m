@@ -21,6 +21,7 @@
 #import "Subscription.h"
 #import "SubscriptionReceiptInputStream.h"
 #import "Logging.h"
+#import "NSDate+Comparator.h"
 
 NSString *_Nonnull const ReceiptValidationErrorDomain = @"PsiphonReceiptValidationErrorDomain";
 
@@ -148,16 +149,10 @@ NSString *_Nonnull const ReceiptValidationErrorDomain = @"PsiphonReceiptValidati
 }
 
 - (BOOL)hasActiveSubscriptionTokenForDate:(NSDate *)date {
-
     if ([self isEmpty]) {
         return FALSE;
     }
-
-    // TRUE if date is before token expiration.
-    if ([date compare:self.authorizationToken.expires] != NSOrderedDescending) {
-        return TRUE;
-    }
-    return FALSE;
+    return [self.authorizationToken.expires afterOrEqualTo:date];
 }
 
 - (BOOL)shouldUpdateSubscriptionToken {
