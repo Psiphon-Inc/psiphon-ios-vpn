@@ -23,7 +23,7 @@
 #import "Logging.h"
 #import "FileUtils.h"
 #import "RACReplaySubject.h"
-
+#import "NSError+Convenience.h"
 
 NSString *_Nonnull const BasePsiphonTunnelErrorDomain = @"BasePsiphonTunnelErrorDomain";
 
@@ -113,8 +113,8 @@ NSString *_Nonnull const BasePsiphonTunnelErrorDomain = @"BasePsiphonTunnelError
 - (void)stopTunnelWithReason:(NEProviderStopReason)reason completionHandler:(void (^)(void))completionHandler {
     // Assumes stopTunnelWithReason called exactly once only after startTunnelWithOptions.completionHandler(nil)
     if (vpnStartCompletionHandler) {
-        vpnStartCompletionHandler([NSError
-          errorWithDomain:BasePsiphonTunnelErrorDomain code:PsiphonTunnelErrorStoppedBeforeConnected userInfo:nil]);
+        vpnStartCompletionHandler([NSError errorWithDomain:BasePsiphonTunnelErrorDomain
+                                                      code:BasePsiphonTunnelErrorStoppedBeforeConnected]);
         vpnStartCompletionHandler = nil;
     }
 
