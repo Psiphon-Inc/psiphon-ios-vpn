@@ -76,13 +76,13 @@ typedef NS_ENUM(NSInteger, AuthorizationTokenActivity) {
 
 @interface PacketTunnelProvider ()
 
-@property (nonatomic) BOOL extensionIsZombie;
+@property (atomic) BOOL extensionIsZombie;
 
-@property (nonatomic) PsiphonSubscriptionState startTunnelSubscriptionState;
+@property (atomic) PsiphonSubscriptionState startTunnelSubscriptionState;
 
 // Start vpn decision. If FALSE, VPN should not be activated, even though Psiphon tunnel might be connected.
 // shouldStartVPN SHOULD NOT be altered after it is set to TRUE.
-@property (nonatomic) BOOL shouldStartVPN;
+@property (atomic) BOOL shouldStartVPN;
 
 @end
 
@@ -598,6 +598,8 @@ typedef NS_ENUM(NSInteger, AuthorizationTokenActivity) {
 }
 
 - (void)listenForContainerMessages {
+    // The notifier callbacks are always called on the main thread.
+
     [notifier listenForNotification:@"M.startVPN" listener:^{
         // If the tunnel is connected, starts the VPN.
         // Otherwise, should establish the VPN after onConnected has been called.
@@ -702,10 +704,8 @@ typedef NS_ENUM(NSInteger, AuthorizationTokenActivity) {
 }
 
 - (void)displayCorruptSettingsFileMessage {
-    [self displayMessage:NSLocalizedStringWithDefaultValue(@"CORRUPT_SETTINGS_MESSAGE", nil, [NSBundle mainBundle], @"Your app settings file appears to be corrupt. Try reinstalling the app to repair the file.", @"Alert dialog message informing the user that the settings file in the app is corrupt, and that they can potentially fix this issue by re-installing the app.")
-       completionHandler:^(BOOL success) {
-           // Do nothing.
-       }];
+    NSString *message = NSLocalizedStringWithDefaultValue(@"CORRUPT_SETTINGS_MESSAGE", nil, [NSBundle mainBundle], @"Your app settings file appears to be corrupt. Try reinstalling the app to repair the file.", @"Alert dialog message informing the user that the settings file in the app is corrupt, and that they can potentially fix this issue by re-installing the app.");
+    [self displayMessage:message];
 }
 
 @end
@@ -827,7 +827,9 @@ typedef NS_ENUM(NSInteger, AuthorizationTokenActivity) {
         [self->subscriptionAuthorizationTokenActive sendNext:@(AuthorizationTokenActiveOrEmpty)];
     }
 
-    [self subscriptionCheck];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self subscriptionCheck];
+    });
 }
 
 - (void)onConnected {
