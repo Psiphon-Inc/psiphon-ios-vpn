@@ -24,7 +24,7 @@
 #import "RACSubscriber.h"
 
 typedef void(^SubscriptionVerifierCompletionHandler)(NSDictionary *_Nullable dictionary, NSNumber *_Nonnull submittedReceiptFileSize, NSError *_Nullable error);
-#define kReceiptRequestTimeOutSeconds        20.0
+#define kReceiptRequestTimeOutSeconds       60.0
 #define kRemoteVerificationURL              @"https://subscription.psiphon3.com/appstore"
 
 // Subscription verifier response fields
