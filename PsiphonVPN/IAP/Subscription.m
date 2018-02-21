@@ -179,6 +179,9 @@ NSString *_Nonnull const ReceiptValidationErrorDomain = @"PsiphonReceiptValidati
     if ([self isEmpty]) {
         return FALSE;
     }
+    if (!self.authorizationToken) {
+        return FALSE;
+    }
     return [self.authorizationToken.expires afterOrEqualTo:date];
 }
 
