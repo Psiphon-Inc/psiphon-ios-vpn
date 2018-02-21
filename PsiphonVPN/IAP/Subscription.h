@@ -20,9 +20,10 @@
 #import <UIKit/UIKit.h>
 #import "UserDefaultsModelProtocol.h"
 #import "AuthorizationToken.h"
+#import "RACSignal.h"
+#import "RACSubscriber.h"
 
-
-typedef void(^SubscriptionVerifierCompletionHandler)(NSDictionary *_Nullable dictionary, NSError *_Nullable error);
+typedef void(^SubscriptionVerifierCompletionHandler)(NSDictionary *_Nullable dictionary, NSNumber *_Nonnull submittedReceiptFileSize, NSError *_Nullable error);
 #define kReceiptRequestTimeOutSeconds        20.0
 #define kRemoteVerificationURL              @"https://subscription.psiphon3.com/appstore"
 
@@ -42,14 +43,10 @@ typedef NS_ERROR_ENUM(ReceiptValidationErrorDomain, PsiphonReceiptValidationErro
 };
 
 
-@interface SubscriptionVerifierTask : NSObject
 
-/**
- * Starts asynchronous task that upload current App Store receipt file to the subscription verifier server,
- * and calls receiptUploadCompletionHandler with the response from the server.
- * @param receiptUploadCompletionHandler Completion handler called with the result of the network request.
- */
-- (void)startWithCompletionHandler:(SubscriptionVerifierCompletionHandler _Nonnull)receiptUploadCompletionHandler;
+@interface SubscriptionVerifierService : NSObject
+
++ (RACSignal<NSDictionary *> *_Nonnull)updateSubscriptionAuthorizationTokenFromRemote;
 
 @end
 
@@ -110,5 +107,29 @@ typedef NS_ERROR_ENUM(ReceiptValidationErrorDomain, PsiphonReceiptValidationErro
  * @return nil if this instance is updated successfully, error otherwise.
  */
 - (NSError *_Nullable)updateSubscriptionWithRemoteAuthDict:(NSDictionary *_Nullable)remoteAuthDict;
+
+@end
+
+#pragma mark - Subscription Result Model
+
+FOUNDATION_EXTERN NSString *_Nonnull const SubscriptionResultErrorDomain;
+
+typedef NS_ERROR_ENUM(SubscriptionResultErrorDomain, SubscriptionResultErrorCode) {
+    SubscriptionResultErrorExpired = 100,
+    SubscriptionResultErrorInvalidReceipt = 101
+};
+
+@interface SubscriptionResultModel : NSObject
+
+/** Error with domain SubscriptionResultErrorDomain */
+@property (nonatomic, nullable) NSError *error;
+
+@property (nonatomic, nullable) NSDictionary *remoteAuthDict;
+
+@property (nonatomic, nullable) NSNumber *submittedReceiptFileSize;
+
++ (SubscriptionResultModel *_Nonnull)failed:(SubscriptionResultErrorCode)errorCode;
+
++ (SubscriptionResultModel *_Nonnull)success:(NSDictionary *_Nonnull)remoteAuthDict receiptFilSize:(NSNumber *_Nonnull)receiptFileSize;
 
 @end

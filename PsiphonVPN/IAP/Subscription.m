@@ -22,13 +22,37 @@
 #import "SubscriptionReceiptInputStream.h"
 #import "Logging.h"
 #import "NSDate+Comparator.h"
+#import "NSError+Convenience.h"
+#import "RACTuple.h"
 
 NSString *_Nonnull const ReceiptValidationErrorDomain = @"PsiphonReceiptValidationErrorDomain";
 
-@implementation SubscriptionVerifierTask {
+@implementation SubscriptionVerifierService {
     NSURLSession *urlSession;
 }
 
++ (RACSignal<NSDictionary *> *)updateSubscriptionAuthorizationTokenFromRemote {
+    return [RACSignal createSignal:^RACDisposable *(id <RACSubscriber> subscriber) {
+
+        [[[SubscriptionVerifierService alloc] init] startWithCompletionHandler:^(NSDictionary *remoteAuthDict, NSNumber *submittedReceiptFileSize, NSError *error) {
+
+            if (error) {
+                [subscriber sendError:error];
+            } else {
+                [subscriber sendNext:[RACTwoTuple pack:remoteAuthDict :submittedReceiptFileSize]];
+                [subscriber sendCompleted];
+            }
+        }];
+
+        return nil;
+    }];
+}
+
+/**
+ * Starts asynchronous task that upload current App Store receipt file to the subscription verifier server,
+ * and calls receiptUploadCompletionHandler with the response from the server.
+ * @param receiptUploadCompletionHandler Completion handler called with the result of the network request.
+ */
 - (void)startWithCompletionHandler:(SubscriptionVerifierCompletionHandler _Nonnull)receiptUploadCompletionHandler {
     NSMutableURLRequest *request;
 
@@ -36,6 +60,9 @@ NSString *_Nonnull const ReceiptValidationErrorDomain = @"PsiphonReceiptValidati
 
     request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:kRemoteVerificationURL]];
     assert(request != nil);
+
+    NSNumber *appReceiptFileSize;
+    [[NSBundle mainBundle].appStoreReceiptURL getResourceValue:&appReceiptFileSize forKey:NSURLFileSizeKey error:nil];
 
     [request setHTTPBodyStream:[[SubscriptionReceiptInputStream alloc] initWithURL:[NSBundle mainBundle].appStoreReceiptURL]];
     [request setHTTPMethod:@"POST"];
@@ -57,7 +84,7 @@ NSString *_Nonnull const ReceiptValidationErrorDomain = @"PsiphonReceiptValidati
                 if (error) {
                     NSDictionary *errorDict = @{NSLocalizedDescriptionKey: @"NSURLSession error", NSUnderlyingErrorKey: error};
                     NSError *err = [[NSError alloc] initWithDomain:ReceiptValidationErrorDomain code:PsiphonReceiptValidationErrorNSURLSessionFailed userInfo:errorDict];
-                    receiptUploadCompletionHandler(nil, err);
+                    receiptUploadCompletionHandler(nil, appReceiptFileSize, err);
                     return;
                 }
 
@@ -66,14 +93,14 @@ NSString *_Nonnull const ReceiptValidationErrorDomain = @"PsiphonReceiptValidati
                     NSString *description = [NSString stringWithFormat:@"HTTP code: %ld", (long) httpResponse.statusCode];
                     NSDictionary *errorDict = @{NSLocalizedDescriptionKey: description};
                     NSError *err = [[NSError alloc] initWithDomain:ReceiptValidationErrorDomain code:PsiphonReceiptValidationErrorHTTPFailed userInfo:errorDict];
-                    receiptUploadCompletionHandler(nil, err);
+                    receiptUploadCompletionHandler(nil, appReceiptFileSize, err);
                     return;
                 }
 
                 if (data.length == 0) {
                     NSDictionary *errorDict = @{NSLocalizedDescriptionKey: @"Empty server response"};
                     NSError *err = [[NSError alloc] initWithDomain:ReceiptValidationErrorDomain code:PsiphonReceiptValidationErrorInvalidReceipt userInfo:errorDict];
-                    receiptUploadCompletionHandler(nil, err);
+                    receiptUploadCompletionHandler(nil, appReceiptFileSize, err);
                     return;
                 }
 
@@ -83,11 +110,11 @@ NSString *_Nonnull const ReceiptValidationErrorDomain = @"PsiphonReceiptValidati
                 if (jsonError) {
                     NSDictionary *errorDict = @{NSLocalizedDescriptionKey: @"JSON parse failure", NSUnderlyingErrorKey: error};
                     NSError *err = [[NSError alloc] initWithDomain:ReceiptValidationErrorDomain code:PsiphonReceiptValidationErrorJSONParseFailed userInfo:errorDict];
-                    receiptUploadCompletionHandler(nil, err);
+                    receiptUploadCompletionHandler(nil, appReceiptFileSize, err);
                     return;
                 }
 
-                receiptUploadCompletionHandler(dict, nil);
+                receiptUploadCompletionHandler(dict, appReceiptFileSize, nil);
             }
         });
     }];
@@ -172,10 +199,10 @@ NSString *_Nonnull const ReceiptValidationErrorDomain = @"PsiphonReceiptValidati
     }
 
     // Receipt file size has changed since last check - YES
-    NSNumber *appReceiptFileSize = nil;
-    [[NSBundle mainBundle].appStoreReceiptURL getResourceValue:&appReceiptFileSize forKey:NSURLFileSizeKey error:nil];
-    if ([appReceiptFileSize unsignedIntValue] != [self.appReceiptFileSize unsignedIntValue]) {
-        LOG_DEBUG_NOTICE(@"receipt file size changed (%@) since last check (%@)", appReceiptFileSize, self.appReceiptFileSize);
+    NSNumber *currentReceiptFileSize;
+    [[NSBundle mainBundle].appStoreReceiptURL getResourceValue:&currentReceiptFileSize forKey:NSURLFileSizeKey error:nil];
+    if ([currentReceiptFileSize unsignedIntValue] != [self.appReceiptFileSize unsignedIntValue]) {
+        LOG_DEBUG_NOTICE(@"receipt file size changed (%@) since last check (%@)", currentReceiptFileSize, self.appReceiptFileSize);
         return YES;
     }
 
@@ -229,5 +256,29 @@ NSString *_Nonnull const ReceiptValidationErrorDomain = @"PsiphonReceiptValidati
 
     return nil;
 }
+
+@end
+
+#pragma mark - Subscription Result Model
+
+NSString *_Nonnull const SubscriptionResultErrorDomain = @"SubscriptionResultErrorDomain";
+
+@implementation SubscriptionResultModel
+
++ (SubscriptionResultModel *)failed:(SubscriptionResultErrorCode)errorCode {
+    SubscriptionResultModel *instance = [[SubscriptionResultModel alloc] init];
+    instance.error = [NSError errorWithDomain:SubscriptionResultErrorDomain code:errorCode];
+    instance.remoteAuthDict = nil;
+    return instance;
+}
+
++ (SubscriptionResultModel *)success:(NSDictionary *_Nonnull)remoteAuthDict receiptFilSize:(NSNumber *)receiptFileSize {
+    SubscriptionResultModel *instance = [[SubscriptionResultModel alloc] init];
+    instance.error = nil;
+    instance.remoteAuthDict = remoteAuthDict;
+    instance.submittedReceiptFileSize = receiptFileSize;
+    return instance;
+}
+
 
 @end
