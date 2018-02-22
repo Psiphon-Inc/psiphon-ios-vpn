@@ -455,7 +455,7 @@ typedef NS_ENUM(NSInteger, AuthorizationTokenActivity) {
             weakSelf.reasserting = TRUE;
         }];
 
-        [self showRepeatingExpiredSubscriptionAlert];
+        [self displayRepeatingZombieAlert];
     }
 }
 
@@ -674,7 +674,7 @@ typedef NS_ENUM(NSInteger, AuthorizationTokenActivity) {
  * Shows "subscription expired" alert to the user.
  * This alert will only be shown again after a time interval after the user *dismisses* the current alert.
  */
-- (void)showRepeatingExpiredSubscriptionAlert {
+- (void)displayRepeatingZombieAlert {
     const int64_t intervalSec = 60; // Every minute.
 
     [self displayMessage:
@@ -683,7 +683,7 @@ typedef NS_ENUM(NSInteger, AuthorizationTokenActivity) {
            // If the user dismisses the message, show the alert again in intervalSec seconds.
            if (success) {
                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, intervalSec * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
-                   [self showRepeatingExpiredSubscriptionAlert];
+                   [self displayRepeatingZombieAlert];
                });
            }
        }];
