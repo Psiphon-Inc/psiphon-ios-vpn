@@ -41,6 +41,7 @@
 #import "LaunchScreenViewController.h"
 #import "UIAlertController+Delegate.h"
 #import "NoticeLogger.h"
+#import "NEBridge.h"
 
 static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSString *b) {
     return (([a length] == 0) && ([b length] == 0)) || ([a isEqualToString:b]);
@@ -1435,26 +1436,8 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
         if ([[IAPStoreHelper class] hasActiveSubscriptionForDate:[NSDate date]] && [vpnManager isVPNActive]) {
             dispatch_async(dispatch_get_main_queue(), ^{
 
-                [vpnManager queryNEForCurrentSponsorId:^(NSString *currentSponsorId) {
-
-                    // Reads config file in a background thread.
-                    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-
-                        NSString *bundledConfigStr = [PsiphonClientCommonLibraryHelpers getPsiphonBundledConfig];
-                        if (bundledConfigStr) {
-                            NSDictionary *config = [PsiphonClientCommonLibraryHelpers jsonToDictionary:bundledConfigStr];
-                            if (config) {
-                                NSDictionary *subscriptionConfig = config[@"subscriptionConfig"];
-                                if (![subscriptionConfig[@"SponsorId"] isEqualToString:currentSponsorId]) {
-                                    dispatch_async(dispatch_get_main_queue(), ^{
-
-                                        [vpnManager restartVPNIfActive];
-                                    });
-                                }
-                            }
-                        }
-                    });
-                }];
+                // Asks the extension to perform a subscription check.
+                [notifier post:NOTIFIER_FORCE_SUBSCRIPTION_CHECK];
             });
 
         }

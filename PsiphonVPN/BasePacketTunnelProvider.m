@@ -158,9 +158,6 @@ NSString *_Nonnull const BasePsiphonTunnelErrorDomain = @"BasePsiphonTunnelError
 
     } else if ([EXTENSION_QUERY_IS_TUNNEL_CONNECTED isEqualToString:query]) {
         respData = ([(id <BasePacketTunnelProviderProtocol>)self isTunnelConnected]) ? EXTENSION_RESP_TRUE_DATA : EXTENSION_RESP_FALSE_DATA;
-
-    } else if ([EXTENSION_QUERY_GET_SPONSOR_ID isEqualToString:query]) {
-        respData = [[(id <BasePacketTunnelProviderProtocol>)self sponsorId] dataUsingEncoding:NSUTF8StringEncoding];
     }
 
     if (respData) {

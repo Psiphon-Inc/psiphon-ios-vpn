@@ -161,11 +161,4 @@ typedef NS_ENUM(NSInteger, VPNStatus) {
  */
 - (void)queryNEIsTunnelConnected:(void (^ _Nonnull)(BOOL tunnelIsConnected))completionHandler;
 
-/**
- * Queries the Network Extension for the sponsor Id in use by the tunnel.
- * @param completionHandler Called with empty string if the VPN is not active or the tunnel is not running,
- *                          otherwise called with the sponsor Id used by the tunnel.
- */
-- (void)queryNEForCurrentSponsorId:(void (^_Nonnull)(NSString * _Nonnull currentSponsorId))completionHandler;
-
 @end
