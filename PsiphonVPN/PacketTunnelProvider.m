@@ -696,24 +696,29 @@ typedef NS_ENUM(NSInteger, AuthorizationTokenActivity) {
 #else
     int64_t gracePeriodSec = 1 * 60 * 60;  // 1 hour.
 #endif
-
     __weak PacketTunnelProvider *weakSelf = self;
 
     // User doesn't have an active subscription. Notify them, after making sure they've checked
     // the notification we will start an hour of extra grace period.
+    // NOTE: Waits for the user to acknowledge the message before starting the extra grace period.
     [self displayMessage:NSLocalizedStringWithDefaultValue(@"SUBSCRIPTION_EXPIRED_WILL_KILL_TUNNEL", nil, [NSBundle mainBundle], @"Your Psiphon subscription has expired. Psiphon will stop automatically in an hour if subscription is not renewed. Open the Psiphon app to review your subscription to continue using premium features.", @"Alert message informing user that their subscription has expired, and that Psiphon will stop in an hour if subscription is not renewed. Do not translate 'Psiphon'.")
        completionHandler:^(BOOL success) {
-           // Wait for the user to acknowledge the message before starting the extra grace period.
-           if (success) {
-               dispatch_after(dispatch_time(DISPATCH_TIME_NOW, gracePeriodSec * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
-                   // Grace period has finished. Checks if the subscription has been renewed, otherwise kill the VPN.
-                   Subscription *subscription = [Subscription fromPersistedDefaults];
-                   if (![subscription hasActiveSubscriptionTokenForDate:[NSDate date]]) {
-                       // Subscription has not been renewed. Stop the tunnel.
-                       [weakSelf killExtensionForExpiredSubscription];
-                   }
-               });
+
+           if (!success) {
+               return;
            }
+
+           dispatch_after(dispatch_walltime(NULL, gracePeriodSec * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
+               // Grace period has finished. Checks if the subscription has been renewed, otherwise kill the VPN.
+               Subscription *subscription = [Subscription fromPersistedDefaults];
+               if ([subscription shouldUpdateSubscriptionToken]) {
+                   LOG_DEBUG_NOTICE(@"grace period expired should update subscription");
+                   [self subscriptionCheck:TRUE];
+               } else {
+                   LOG_DEBUG_NOTICE(@"grace period expired killing extension");
+                   [weakSelf killExtensionForExpiredSubscription];
+               }
+           });
        }];
 }
 
