@@ -37,6 +37,7 @@
 #import "Logging.h"
 #import "IAPStoreHelper.h"
 #import "IAPViewController.h"
+#import "NEBridge.h"
 
 
 @interface AppDelegate ()
@@ -164,7 +165,7 @@
     // If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
 
     [[UIApplication sharedApplication] ignoreSnapshotOnNextApplicationLaunch];
-    [notifier post:@"D.applicationDidEnterBackground"];
+    [notifier post:NOTIFIER_APP_DID_ENTER_BACKGROUND];
     [sharedDB updateAppForegroundState:NO];
 }
 
@@ -270,7 +271,7 @@
 #pragma mark - Network Extension
 
 - (void)listenForNEMessages {
-    [notifier listenForNotification:@"NE.newHomepages" listener:^{
+    [notifier listenForNotification:NOTIFIER_NEW_HOMEPAGES listener:^{
         LOG_DEBUG(@"Received notification NE.newHomepages");
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
             if (!shownHomepage) {
@@ -289,7 +290,7 @@
         });
     }];
 
-    [notifier listenForNotification:@"NE.tunnelConnected" listener:^{
+    [notifier listenForNotification:NOTIFIER_TUNNEL_CONNECTED listener:^{
         LOG_DEBUG(@"Received notification NE.tunnelConnected");
 
         // If we haven't had a chance to load an Ad, and the
@@ -301,7 +302,7 @@
         }
     }];
 
-    [notifier listenForNotification:@"NE.onAvailableEgressRegions" listener:^{ // TODO should be put in a constants file
+    [notifier listenForNotification:NOTIFIER_ON_AVAILABLE_EGRESS_REGIONS listener:^{ // TODO should be put in a constants file
         LOG_DEBUG(@"Received notification NE.onAvailableEgressRegions");
         // Update available regions
         // TODO: this code is duplicated in MainViewController updateAvailableRegions
@@ -311,15 +312,6 @@
         });
     }];
 
-    [notifier listenForNotification:@"NE.onAvailableEgressRegions" listener:^{ // TODO should be put in a constants file
-        LOG_DEBUG(@"Received notification NE.onAvailableEgressRegions");
-        // Update available regions
-        // TODO: this code is duplicated in MainViewController updateAvailableRegions
-        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-            NSArray<NSString *> *regions = [sharedDB getAllEgressRegions];
-            [[RegionAdapter sharedInstance] onAvailableEgressRegions:regions];
-        });
-    }];
 }
 
 @end

@@ -58,8 +58,6 @@ typedef NS_ENUM(NSInteger, NEStartMethod) {
 
 - (BOOL)isTunnelConnected;
 
-- (NSString *_Nonnull)sponsorId;
-
 @end
 
 #pragma mark - BasePacketTunnelProvider

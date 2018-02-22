@@ -94,18 +94,16 @@ typedef NS_ENUM(NSInteger, AuthorizationTokenActivity) {
 
     Notifier *notifier;
 
-    NSString *_Nonnull currentSponsorId;
-
     _Atomic BOOL showUpstreamProxyErrorMessage;
 
     // An infinite signal that emits Psiphon tunnel connection state.
     // When subscribed, replays the last known connection state.
-    RACReplaySubject<NSNumber *> *tunnelConnectionStateSignal;
+    RACReplaySubject<NSNumber *> *tunnelConnectionStateSubject;
 
     // An infinite signal that emits @(0) if the subscription authorization token was invalid,
     // and @(1) if it was valid (or non-existent).
     // When subscribed, replays the last item this subject was sent by onActiveAuthorizationIDs callback.
-    RACReplaySubject<NSNumber *> *subscriptionAuthorizationTokenActive;
+    RACReplaySubject<NSNumber *> *subscriptionAuthorizationTokenActiveSubject;
 
     RACDisposable *subscriptionDisposable;
 }
@@ -120,8 +118,6 @@ typedef NS_ENUM(NSInteger, AuthorizationTokenActivity) {
 
         notifier = [[Notifier alloc] initWithAppGroupIdentifier:APP_GROUP_IDENTIFIER];
 
-        currentSponsorId = @"";
-
         atomic_init(&self->showUpstreamProxyErrorMessage, TRUE);
 
         _extensionIsZombie = FALSE;
@@ -130,13 +126,31 @@ typedef NS_ENUM(NSInteger, AuthorizationTokenActivity) {
 }
 
 - (void)initSubscriptionCheckSubjects {
-    self->tunnelConnectionStateSignal = [RACReplaySubject replaySubjectWithCapacity:1];
-    self->subscriptionAuthorizationTokenActive = [RACReplaySubject replaySubjectWithCapacity:1];
+    self->tunnelConnectionStateSubject = [RACReplaySubject replaySubjectWithCapacity:1];
+    self->subscriptionAuthorizationTokenActiveSubject = [RACReplaySubject replaySubjectWithCapacity:1];
+}
+
+- (void)forceSubscriptionCheck {
+    // Bootstraps the signals if they were not initialized already (i.e. the tunnel started with
+    // the PsiphonSubscriptionStateNotSubscribed state).
+    if (!self->tunnelConnectionStateSubject && !self->subscriptionAuthorizationTokenActiveSubject) {
+        self->tunnelConnectionStateSubject = [RACReplaySubject replaySubjectWithCapacity:1];
+        self->subscriptionAuthorizationTokenActiveSubject = [RACReplaySubject replaySubjectWithCapacity:1];
+    }
+
+    // Sends current connection status to the tunnelConnectionStateSubject subject.
+    [self->tunnelConnectionStateSubject sendNext:@([psiphonTunnel getConnectionState])];
+
+    // Since no subscription token was passed (otherwise tunnel would start with a different subscription state)
+    // We can send AuthorizationTokenActiveOrEmpty to subscriptionAuthorizationTokenActiveSubject subject.
+    [self->subscriptionAuthorizationTokenActiveSubject sendNext:@(AuthorizationTokenActiveOrEmpty)];
+
+    [self subscriptionCheck:TRUE];
 }
 
 // Initializes ReactiveObjC signals for subscription check and subscribes to them.
 // This method shouldn't be called if no subscription check is necessary.
-- (void)subscriptionCheck {
+- (void)subscriptionCheck:(BOOL)skipCurrentSubscriptionStateCheck {
 
     __weak PacketTunnelProvider *weakSelf = self;
 
@@ -146,11 +160,13 @@ typedef NS_ENUM(NSInteger, AuthorizationTokenActivity) {
     };
 
     void (^handleExpiredSubscription)(void) = ^{
-        if (weakSelf.NEStartMethod == NEStartMethodFromContainer) {
+        PsiphonSubscriptionState previousState = weakSelf.startTunnelSubscriptionState;
+        weakSelf.startTunnelSubscriptionState = PsiphonSubscriptionStateNotSubscribed;
 
-            if (weakSelf.startTunnelSubscriptionState != PsiphonSubscriptionStateNotSubscribed) {
-                LOG_DEBUG_NOTICE(@"tunnel started from container restarting tunnel");
-                weakSelf.startTunnelSubscriptionState = PsiphonSubscriptionStateNotSubscribed;
+        if (weakSelf.NEStartMethod == NEStartMethodFromContainer) {
+            LOG_DEBUG_NOTICE(@"tunnel started from container restarting tunnel");
+            if (previousState != PsiphonSubscriptionStateNotSubscribed) {
+                // Restart the tunnel to connect with the correct sponsor ID.
                 [weakSelf restartTunnel];
             }
 
@@ -162,7 +178,8 @@ typedef NS_ENUM(NSInteger, AuthorizationTokenActivity) {
 
 
     // NO-OP if subscription state is not subscribed.
-    if (self.startTunnelSubscriptionState == PsiphonSubscriptionStateNotSubscribed) {
+    if (!skipCurrentSubscriptionStateCheck &&
+      self.startTunnelSubscriptionState == PsiphonSubscriptionStateNotSubscribed) {
         return;
     }
 
@@ -170,7 +187,7 @@ typedef NS_ENUM(NSInteger, AuthorizationTokenActivity) {
     [subscriptionDisposable dispose];
 
     // tunnelConnectedSignal is an infinite signal that emits an item whenever Psiphon tunnel is connected.
-    RACSignal *tunnelConnectedSignal = [self->tunnelConnectionStateSignal
+    RACSignal *tunnelConnectedSignal = [self->tunnelConnectionStateSubject
       filter:^BOOL(NSNumber *x) {
         return (PsiphonConnectionState)[x integerValue] == PsiphonConnectionStateConnected;
     }];
@@ -197,7 +214,7 @@ typedef NS_ENUM(NSInteger, AuthorizationTokenActivity) {
         return nil;
     }];
 
-    RACSignal *activeLocalSubscriptionCheck = [[self->subscriptionAuthorizationTokenActive
+    RACSignal *activeLocalSubscriptionCheck = [[self->subscriptionAuthorizationTokenActiveSubject
       take:1]
       flattenMap:^RACSignal *(NSNumber *subscriptionTokenValidity) {
           if ([subscriptionTokenValidity integerValue] == AuthorizationTokenInactive) {
@@ -293,8 +310,16 @@ typedef NS_ENUM(NSInteger, AuthorizationTokenActivity) {
               return;
           }
 
+          NSString *tunnelAuthTokenID;
+
           // Updates subscription and persists subscription.
           Subscription *subscription = [Subscription fromPersistedDefaults];
+
+          // Keep a copy of the token passed to the tunnel previously.
+          // This token represents the authorization token accepted by the Psiphon server,
+          // regardless of what token was passed to the server.
+          tunnelAuthTokenID = [subscription.authorizationToken.ID copy];
+
           subscription.appReceiptFileSize = result.submittedReceiptFileSize;
           NSError *error = [subscription updateSubscriptionWithRemoteAuthDict:result.remoteAuthDict];
           if (error) {
@@ -323,10 +348,13 @@ typedef NS_ENUM(NSInteger, AuthorizationTokenActivity) {
           }
 
           if (subscription.authorizationToken) {
-              // New authorization token was received from the subscription verifier server.
-              // Restarts the tunnel to connect with the new token.
-              handleNewAuthorizationToken();
 
+              // New authorization token was received from the subscription verifier server.
+              // Restarts the tunnel to connect with the new token only if it is different from
+              // the token in use by the tunnel.
+              if (![subscription.authorizationToken.ID isEqualToString:tunnelAuthTokenID]) {
+                  handleNewAuthorizationToken();
+              }
           } else {
               // Server returned no authorization token, treats this as if subscription was expired.
               handleExpiredSubscription();
@@ -341,7 +369,7 @@ typedef NS_ENUM(NSInteger, AuthorizationTokenActivity) {
           dispatch_after(
             dispatch_time(DISPATCH_TIME_NOW, secs_in_3_hours * NSEC_PER_SEC),
             dispatch_get_main_queue(), ^{
-                [weakSelf subscriptionCheck];
+                [weakSelf subscriptionCheck:FALSE];
             });
 
           // Cleanup.
@@ -471,10 +499,6 @@ typedef NS_ENUM(NSInteger, AuthorizationTokenActivity) {
     return [psiphonTunnel getConnectionState] == PsiphonConnectionStateConnected;
 }
 
-- (NSString *_Nonnull)sponsorId {
-    return currentSponsorId;
-}
-
 #pragma mark -
 
 - (void)sleepWithCompletionHandler:(void (^)(void))completionHandler {
@@ -590,7 +614,7 @@ typedef NS_ENUM(NSInteger, AuthorizationTokenActivity) {
         if ([psiphonTunnel getConnectionState] == PsiphonConnectionStateConnected) {
             self.reasserting = FALSE;
             [self startVPN];
-            [notifier post:@"NE.newHomepages"];
+            [notifier post:NOTIFIER_NEW_HOMEPAGES];
             return TRUE;
         }
     }
@@ -600,14 +624,14 @@ typedef NS_ENUM(NSInteger, AuthorizationTokenActivity) {
 - (void)listenForContainerMessages {
     // The notifier callbacks are always called on the main thread.
 
-    [notifier listenForNotification:@"M.startVPN" listener:^{
+    [notifier listenForNotification:NOTIFIER_START_VPN listener:^{
         // If the tunnel is connected, starts the VPN.
         // Otherwise, should establish the VPN after onConnected has been called.
         self.shouldStartVPN = TRUE; // This should be set before calling tryStartVPN.
         [self tryStartVPN];
     }];
 
-    [notifier listenForNotification:@"D.applicationDidEnterBackground" listener:^{
+    [notifier listenForNotification:NOTIFIER_APP_DID_ENTER_BACKGROUND listener:^{
         // If the VPN start message ("M.startVPN") has not been received from the container,
         // and the container goes to the background, then alert the user to open the app.
         //
@@ -615,6 +639,11 @@ typedef NS_ENUM(NSInteger, AuthorizationTokenActivity) {
         if (!self.shouldStartVPN) {
             [self displayMessage:NSLocalizedStringWithDefaultValue(@"OPEN_PSIPHON_APP", nil, [NSBundle mainBundle], @"Please open Psiphon app to finish connecting.", @"Alert message informing the user they should open the app to finish connecting to the VPN. DO NOT translate 'Psiphon'.")];
         }
+    }];
+
+    [notifier listenForNotification:NOTIFIER_FORCE_SUBSCRIPTION_CHECK listener:^{
+        // Container received a new subscription transaction.
+        [self forceSubscriptionCheck];
     }];
 }
 
@@ -784,8 +813,6 @@ typedef NS_ENUM(NSInteger, AuthorizationTokenActivity) {
         }
     }
 
-    currentSponsorId = mutableConfigCopy[@"SponsorId"];
-
     jsonData  = [NSJSONSerialization dataWithJSONObject:mutableConfigCopy
       options:0 error:&err];
 
@@ -799,7 +826,7 @@ typedef NS_ENUM(NSInteger, AuthorizationTokenActivity) {
 }
 
 - (void)onConnectionStateChangedFrom:(PsiphonConnectionState)oldState to:(PsiphonConnectionState)newState {
-    [self->tunnelConnectionStateSignal sendNext:@(newState)];
+    [self->tunnelConnectionStateSubject sendNext:@(newState)];
 }
 
 - (void)onConnecting {
@@ -819,22 +846,22 @@ typedef NS_ENUM(NSInteger, AuthorizationTokenActivity) {
         [subscription persistChanges];
 
         // Send value AuthorizationTokenInactive if subscription authorization token was invalid.
-        [self->subscriptionAuthorizationTokenActive sendNext:@(AuthorizationTokenInactive)];
+        [self->subscriptionAuthorizationTokenActiveSubject sendNext:@(AuthorizationTokenInactive)];
 
     } else {
 
         // Send value AuthorizationTokenActiveOrEmpty if subscription authorization token was not invalid (i.e. token is non-existent or valid)
-        [self->subscriptionAuthorizationTokenActive sendNext:@(AuthorizationTokenActiveOrEmpty)];
+        [self->subscriptionAuthorizationTokenActiveSubject sendNext:@(AuthorizationTokenActiveOrEmpty)];
     }
 
     dispatch_async(dispatch_get_main_queue(), ^{
-        [self subscriptionCheck];
+        [self subscriptionCheck:FALSE];
     });
 }
 
 - (void)onConnected {
     LOG_DEBUG_NOTICE(@"onConnected with subscription status %lu", (long)self.startTunnelSubscriptionState);
-    [notifier post:@"NE.tunnelConnected"];
+    [notifier post:NOTIFIER_TUNNEL_CONNECTED];
     [self tryStartVPN];
 }
 
@@ -873,7 +900,7 @@ typedef NS_ENUM(NSInteger, AuthorizationTokenActivity) {
     [sharedDB insertNewEgressRegions:regions];
 
     // Notify container
-    [notifier post:@"NE.onAvailableEgressRegions"];
+    [notifier post:NOTIFIER_ON_AVAILABLE_EGRESS_REGIONS];
 }
 
 - (void)onInternetReachabilityChanged:(Reachability* _Nonnull)reachability {

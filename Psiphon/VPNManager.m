@@ -275,7 +275,7 @@
     dispatch_group_notify(initGroup, dispatch_get_main_queue(), ^{
         NEVPNStatus s = self.providerManager.connection.status;
         if (s == NEVPNStatusConnecting) {
-            [notifier post:@"M.startVPN"];
+            [notifier post:NOTIFIER_START_VPN];
         } else {
             LOG_WARN(@"Network extension is not in connecting state.");
         }
@@ -332,19 +332,6 @@
             }
             completionHandler(error);
         }];
-
-    }];
-}
-
-- (void)queryNEForCurrentSponsorId:(void (^_Nonnull)(NSString * _Nonnull currentSponsorId))completionHandler {
-    [self queryExtension:EXTENSION_QUERY_GET_SPONSOR_ID completionHandler:^(NSError *error, NSString *response) {
-
-        if (error) {
-            LOG_ERROR(@"failed extension query (%@)", error);
-            completionHandler(@"");
-        } else {
-            completionHandler(response);
-        }
 
     }];
 }
