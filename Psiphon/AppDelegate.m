@@ -365,6 +365,23 @@ NSNotificationName const AppDelegateSubscriptionDidActivateNotification = @"AppD
     }];
 }
 
+- (void)onSubscriptionActivated {
+    [self subscriptionExpiryTimer];
+
+    // Asks the extension to perform a subscription check if it is running currently.
+    if ([vpnManager isVPNActive]) {
+        [notifier post:NOTIFIER_FORCE_SUBSCRIPTION_CHECK];
+    }
+
+    // Checks if user previously preferred to have Connect On Demand enabled,
+    // Re-enable it upon subscription since it may have been disabled if the previous subscription expired.
+    BOOL userPreferredOnDemandSetting = [[NSUserDefaults standardUserDefaults] boolForKey:SettingsConnectOnDemandBoolKey];
+    [vpnManager updateVPNConfigurationOnDemandSetting:userPreferredOnDemandSetting completionHandler:^(NSError *error) {
+        // Do nothing.
+    }];
+
+}
+
 - (void)onUpdatedSubscriptionDictionary {
 
     if (![adManager shouldShowUntunneledAds]) {
@@ -382,15 +399,8 @@ NSNotificationName const AppDelegateSubscriptionDidActivateNotification = @"AppD
         dispatch_async_main(^{
 
             if (isSubscribed) {
+                [weakSelf onSubscriptionActivated];
 
-                [weakSelf subscriptionExpiryTimer];
-
-                // Asks the extension to perform a subscription check if it is running currently.
-                if ([vpnManager isVPNActive]) {
-                    [notifier post:NOTIFIER_FORCE_SUBSCRIPTION_CHECK];
-                }
-
-                // Updates UI with the new subscription data.
                 [[NSNotificationCenter defaultCenter] postNotificationName:AppDelegateSubscriptionDidActivateNotification object:nil];
             }
         });
