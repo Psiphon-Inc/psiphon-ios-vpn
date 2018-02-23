@@ -24,15 +24,15 @@
  * Notification with this name might be posted many times,
  * without an actual change to the VPN status.
  */
-#define kVPNStatusChangeNotificationName @"VPNStatusChange"
+FOUNDATION_EXPORT NSNotificationName _Nonnull const VPNManagerStatusDidChangeNotification;
 
 /**
  * NSNotification name for VPN start failures.
  */
-#define kVPNStartFailure @"VPNStartFailure"
+FOUNDATION_EXPORT NSNotificationName _Nonnull const VPNManagerVPNStartDidFailNotification;
 
 
-static NSString *_Nonnull const VPNManagerErrorDomain = @"VPNManagerErrorDomain";
+FOUNDATION_EXPORT NSErrorDomain _Nonnull const VPNManagerErrorDomain;
 
 /**
  * @typedef VPNManagerErrorCode
@@ -51,7 +51,7 @@ typedef NS_ERROR_ENUM(VPNManagerErrorDomain, VPNManagerStartErrorCode) {
 
 #define VPNQueryErrorUserInfoQueryKey @"query"
 
-static NSString *_Nonnull const VPNQueryErrorDomain = @"VPNQueryErrorDomain";
+FOUNDATION_EXPORT NSErrorDomain _Nonnull const VPNQueryErrorDomain;
 
 /**
  * @typedef VPNQueryErrorCode
@@ -147,7 +147,6 @@ typedef NS_ENUM(NSInteger, VPNStatus) {
 
 /**
  * Updates and saves VPN configuration Connect On Demand.
- * This method also updates the NSUserDefaults with key kVpnOnDemand.
  * @param onDemandEnabled Toggle VPN configuration Connect On Demand capability.
  * @param completionHandler Block called after operation completes. error is set to nil if operation finished successfully.
  */
@@ -160,12 +159,5 @@ typedef NS_ENUM(NSInteger, VPNStatus) {
  * @param completionHandler Called with tunnelIsConnected set to TRUE if Psiphon tunnel is connected, FALSE otherwise.
  */
 - (void)queryNEIsTunnelConnected:(void (^ _Nonnull)(BOOL tunnelIsConnected))completionHandler;
-
-/**
- * Queries the Network Extension for the sponsor Id in use by the tunnel.
- * @param completionHandler Called with empty string if the VPN is not active or the tunnel is not running,
- *                          otherwise called with the sponsor Id used by the tunnel.
- */
-- (void)queryNEForCurrentSponsorId:(void (^_Nonnull)(NSString * _Nonnull currentSponsorId))completionHandler;
 
 @end

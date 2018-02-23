@@ -19,13 +19,12 @@
 
 #import "BasePacketTunnelProvider.h"
 
-// PsiphonTunnel Subscription Errors
-FOUNDATION_EXTERN NSString *_Nonnull const PsiphonTunnelSubscriptionErrorDomain;
+// BasePacketTunnelProvider Errors
+FOUNDATION_EXTERN NSString *_Nonnull const PsiphonTunnelErrorDomain;
 
-typedef NS_ERROR_ENUM(PsiphonTunnelSubscriptionErrorDomain, PacketTunnelProviderErrorCode) {
-    PsiphonTunnelErrorSubscriptionExpired = 1,
-    PsiphonTunnelErrorSubscriptionBadClock = 2,
-    PsiphonTunnelErrorSubscriptionInvalidReceipt = 3,
+typedef NS_ERROR_ENUM(PsiphonTunnelErrorDomain, PsiphonTunnelErrorCode) {
+    PsiphonTunnelErrorBadConfiguration = 2000,
+    PsiphonTunnelErrorInternalError = 2001
 };
 
 @interface PacketTunnelProvider : BasePacketTunnelProvider <BasePacketTunnelProviderProtocol>

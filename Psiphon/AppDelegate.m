@@ -37,16 +37,18 @@
 #import "Logging.h"
 #import "IAPStoreHelper.h"
 #import "IAPViewController.h"
+#import "NEBridge.h"
+#import "DispatchUtils.h"
 
-
-@interface AppDelegate ()
-@end
+NSNotificationName const AppDelegateSubscriptionDidExpireNotification = @"AppDelegateSubscriptionDidExpireNotification";
+NSNotificationName const AppDelegateSubscriptionDidActivateNotification = @"AppDelegateSubscriptionDidActivateNotification";
 
 @implementation AppDelegate {
     VPNManager *vpnManager;
     AdManager *adManager;
     PsiphonDataSharedDB *sharedDB;
     Notifier *notifier;
+    NSTimer *subscriptionCheckTimer;
 
     BOOL shownHomepage;
 
@@ -106,19 +108,19 @@
 #endif
 }
 
-- (void)onVPNStatusDidChange {
-    if ([vpnManager getVPNStatus] == VPNStatusDisconnected
-        || [vpnManager getVPNStatus] == VPNStatusRestarting) {
-        shownHomepage = FALSE;
-    }
-}
-
 # pragma mark - Lifecycle methods
 
 - (BOOL)application:(UIApplication *)application willFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     [self initializeDefaults];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onAdsLoaded)
-                                                 name:@kAdsDidLoad object:adManager];
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(onAdsLoaded)
+                                                 name:AdManagerAdsDidLoadNotification
+                                               object:adManager];
+
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(onUpdatedSubscriptionDictionary)
+                                                 name:IAPHelperUpdatedSubscriptionDictionaryNotification
+                                               object:nil];
 
     [[IAPStoreHelper sharedInstance] startProductsRequest];
 
@@ -144,35 +146,12 @@
 
     // Listen for VPN status changes from VPNManager.
     [[NSNotificationCenter defaultCenter]
-      addObserver:self selector:@selector(onVPNStatusDidChange) name:kVPNStatusChangeNotificationName object:vpnManager];
+      addObserver:self selector:@selector(onVPNStatusDidChange) name:VPNManagerStatusDidChangeNotification object:vpnManager];
 
     // Listen for the network extension messages.
     [self listenForNEMessages];
 
     return YES;
-}
-
-- (void)applicationWillResignActive:(UIApplication *)application {
-    LOG_DEBUG();
-    // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
-    // Use this method to pause ongoing tasks, disable timers, and invalidate graphics rendering callbacks. Games should use this method to pause the game.
-}
-
-- (void)applicationDidEnterBackground:(UIApplication *)application {
-    LOG_DEBUG();
-    // Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later.
-    // If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
-
-    [[UIApplication sharedApplication] ignoreSnapshotOnNextApplicationLaunch];
-    [notifier post:@"D.applicationDidEnterBackground"];
-    [sharedDB updateAppForegroundState:NO];
-}
-
-- (void)applicationWillEnterForeground:(UIApplication *)application {
-    LOG_DEBUG();
-    // Called as part of the transition from the background to the active state; here you can undo many of the changes made on entering the background.
-
-    [self loadAdsIfNeeded];
 }
 
 - (void)applicationDidBecomeActive:(UIApplication *)application {
@@ -194,12 +173,43 @@
             }];
         }
     });
+
+    // Starts subscription expiry timer if there is an active subscription.
+    [self subscriptionExpiryTimer];
+}
+
+- (void)applicationWillResignActive:(UIApplication *)application {
+    LOG_DEBUG();
+    // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
+    // Use this method to pause ongoing tasks, disable timers, and invalidate graphics rendering callbacks. Games should use this method to pause the game.
+
+    // Cancel subscription expiry timer if active.
+    [subscriptionCheckTimer invalidate];
+}
+
+- (void)applicationDidEnterBackground:(UIApplication *)application {
+    LOG_DEBUG();
+    // Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later.
+    // If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
+
+    [[UIApplication sharedApplication] ignoreSnapshotOnNextApplicationLaunch];
+    [notifier post:NOTIFIER_APP_DID_ENTER_BACKGROUND];
+    [sharedDB updateAppForegroundState:NO];
+}
+
+- (void)applicationWillEnterForeground:(UIApplication *)application {
+    LOG_DEBUG();
+    // Called as part of the transition from the background to the active state; here you can undo many of the changes made on entering the background.
+
+    [self loadAdsIfNeeded];
 }
 
 - (void)applicationWillTerminate:(UIApplication *)application {
     LOG_DEBUG();
     // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
 }
+
+#pragma mark -
 
 - (void)initializeDefaults {
     [PsiphonClientCommonLibraryHelpers initializeDefaultsForPlistsFromRoot:@"Root.inApp"];
@@ -209,6 +219,13 @@
     LOG_DEBUG();
     [rootContainerController reloadMainViewController];
     rootContainerController.mainViewController.openSettingImmediatelyOnViewDidAppear = TRUE;
+}
+
+- (void)onVPNStatusDidChange {
+    if ([vpnManager getVPNStatus] == VPNStatusDisconnected
+      || [vpnManager getVPNStatus] == VPNStatusRestarting) {
+        shownHomepage = FALSE;
+    }
 }
 
 #pragma mark - Ads
@@ -270,7 +287,7 @@
 #pragma mark - Network Extension
 
 - (void)listenForNEMessages {
-    [notifier listenForNotification:@"NE.newHomepages" listener:^{
+    [notifier listenForNotification:NOTIFIER_NEW_HOMEPAGES listener:^{
         LOG_DEBUG(@"Received notification NE.newHomepages");
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
             if (!shownHomepage) {
@@ -289,7 +306,7 @@
         });
     }];
 
-    [notifier listenForNotification:@"NE.tunnelConnected" listener:^{
+    [notifier listenForNotification:NOTIFIER_TUNNEL_CONNECTED listener:^{
         LOG_DEBUG(@"Received notification NE.tunnelConnected");
 
         // If we haven't had a chance to load an Ad, and the
@@ -301,7 +318,7 @@
         }
     }];
 
-    [notifier listenForNotification:@"NE.onAvailableEgressRegions" listener:^{ // TODO should be put in a constants file
+    [notifier listenForNotification:NOTIFIER_ON_AVAILABLE_EGRESS_REGIONS listener:^{ // TODO should be put in a constants file
         LOG_DEBUG(@"Received notification NE.onAvailableEgressRegions");
         // Update available regions
         // TODO: this code is duplicated in MainViewController updateAvailableRegions
@@ -309,17 +326,90 @@
             NSArray<NSString *> *regions = [sharedDB getAllEgressRegions];
             [[RegionAdapter sharedInstance] onAvailableEgressRegions:regions];
         });
+    }];
+}
+
+#pragma mark - Subscription
+
+- (void)subscriptionExpiryTimer {
+
+    __weak AppDelegate *weakSelf = self;
+
+    dispatch_async_global(^{
+        NSDate *expiryDate;
+        BOOL activeSubscription = [IAPStoreHelper hasActiveSubscriptionForDate:[NSDate date] getExpiryDate:&expiryDate];
+
+        dispatch_async_main(^{
+            if (activeSubscription) {
+                NSTimeInterval interval = [expiryDate timeIntervalSinceNow];
+                
+                if (interval > 0) {
+                    // Checks if another timer is already running.
+                    if (![subscriptionCheckTimer isValid]) {
+                        subscriptionCheckTimer = [NSTimer scheduledTimerWithTimeInterval:interval repeats:NO block:^(NSTimer *timer) {
+                            [weakSelf subscriptionExpiryTimer];
+                        }];
+                    }
+                }
+            } else {
+                // Instead of subscribing to the notification in this class, calls the handler directly.
+                [weakSelf onSubscriptionExpired];
+                
+                // Notifies all interested listeners that there is no active subscription.
+                [[NSNotificationCenter defaultCenter] postNotificationName:AppDelegateSubscriptionDidExpireNotification object:nil];
+            }
+        });
+    });
+}
+
+- (void)onSubscriptionExpired {
+
+    // Disables Connect On Demand setting of the VPN Configuration.
+    [vpnManager updateVPNConfigurationOnDemandSetting:FALSE completionHandler:^(NSError *error) {
+        // Do nothing.
+    }];
+}
+
+- (void)onSubscriptionActivated {
+    [self subscriptionExpiryTimer];
+
+    // Asks the extension to perform a subscription check if it is running currently.
+    if ([vpnManager isVPNActive]) {
+        [notifier post:NOTIFIER_FORCE_SUBSCRIPTION_CHECK];
+    }
+
+    // Checks if user previously preferred to have Connect On Demand enabled,
+    // Re-enable it upon subscription since it may have been disabled if the previous subscription expired.
+    BOOL userPreferredOnDemandSetting = [[NSUserDefaults standardUserDefaults] boolForKey:SettingsConnectOnDemandBoolKey];
+    [vpnManager updateVPNConfigurationOnDemandSetting:userPreferredOnDemandSetting completionHandler:^(NSError *error) {
+        // Do nothing.
     }];
 
-    [notifier listenForNotification:@"NE.onAvailableEgressRegions" listener:^{ // TODO should be put in a constants file
-        LOG_DEBUG(@"Received notification NE.onAvailableEgressRegions");
-        // Update available regions
-        // TODO: this code is duplicated in MainViewController updateAvailableRegions
-        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-            NSArray<NSString *> *regions = [sharedDB getAllEgressRegions];
-            [[RegionAdapter sharedInstance] onAvailableEgressRegions:regions];
+}
+
+- (void)onUpdatedSubscriptionDictionary {
+
+    if (![adManager shouldShowUntunneledAds]) {
+        // if user subscription state has changed to valid
+        // try to deinit ads if currently not showing and hide adLabel
+        [adManager initializeAds];
+    }
+
+    __weak AppDelegate *weakSelf = self;
+
+    dispatch_async_global(^{
+
+        BOOL isSubscribed = [IAPStoreHelper hasActiveSubscriptionForNow];
+
+        dispatch_async_main(^{
+
+            if (isSubscribed) {
+                [weakSelf onSubscriptionActivated];
+
+                [[NSNotificationCenter defaultCenter] postNotificationName:AppDelegateSubscriptionDidActivateNotification object:nil];
+            }
         });
-    }];
+    });
 }
 
 @end
