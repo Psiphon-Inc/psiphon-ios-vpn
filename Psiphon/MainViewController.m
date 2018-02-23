@@ -42,13 +42,11 @@
 #import "UIAlertController+Delegate.h"
 #import "NoticeLogger.h"
 #import "NEBridge.h"
+#import "DispatchUtils.h"
 
 static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSString *b) {
     return (([a length] == 0) && ([b length] == 0)) || ([a isEqualToString:b]);
 };
-
-@interface MainViewController ()
-@end
 
 @implementation MainViewController {
 
@@ -158,26 +156,29 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     // Observer AdManager notifications
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(onAdStatusDidChange)
-                                                 name:@kAdsDidLoad
+                                                 name:AdManagerAdsDidLoadNotification
                                                object:adManager];
     // Observe VPNManager notifications
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(onVPNStatusDidChange)
-                                                 name:kVPNStatusChangeNotificationName
+                                                 name:VPNManagerStatusDidChangeNotification
                                                object:vpnManager];
 
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(onVPNStartFailed)
-                                                 name:kVPNStartFailure
+                                                 name:VPNManagerVPNStartDidFailNotification
                                                object:vpnManager];
 
-    // Observe IAP transaction notifications
     [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(updatedSubscriptionDictionary)
-                                                 name:kIAPHelperUpdatedSubscriptionDictionary
+                                             selector:@selector(onSubscriptionActivated)
+                                                 name:AppDelegateSubscriptionDidActivateNotification
                                                object:nil];
 
-    // TODO: load/save config here to have the user immediately complete the permission prompt
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(onSubscriptionExpired)
+                                                 name:AppDelegateSubscriptionDidExpireNotification
+                                               object:nil];
+
 }
 
 - (void)viewDidAppear:(BOOL)animated {
@@ -212,7 +213,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     // Sync UI with the VPN state
     [self onVPNStatusDidChange];
     [self onAdStatusDidChange];
-    [self updateSubscriptionUI];
+    [self checkSubscriptionStateAndUpdateUI];
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
@@ -331,6 +332,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                         style:UIAlertActionStyleDestructive
                       handler:^(UIAlertAction *action) {
                           // Disable "Connect On Demand" and stop the VPN.
+                          [[NSUserDefaults standardUserDefaults] setBool:FALSE forKey:SettingsConnectOnDemandBoolKey];
                           [vpnManager updateVPNConfigurationOnDemandSetting:FALSE completionHandler:^(NSError *error) {
                               [vpnManager stopVPN];
                           }];
@@ -354,7 +356,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
         [self removePulsingHaloLayer];
     }
 
-    [self updateSubscriptionUI];
+    [self checkSubscriptionStateAndUpdateUI];
 }
 
 - (void)onSettingsButtonTap:(UIButton *)sender {
@@ -461,7 +463,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     isStartStopButtonHaloOn = FALSE;
 }
 
-- (BOOL) isRightToLeft {
+- (BOOL)isRightToLeft {
     return ([UIApplication sharedApplication].userInterfaceLayoutDirection == UIUserInterfaceLayoutDirectionRightToLeft);
 }
 
@@ -812,7 +814,6 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                                                           attribute:NSLayoutAttributeCenterX
                                                          multiplier:1.0
                                                            constant:0]];
-    [self updateSubscriptionUI];
 }
 
 - (void)addRegionSelectionBar {
@@ -952,7 +953,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                                                            constant:50.0]];
 }
 
-- (void) addSubscriptionButton {
+- (void)addSubscriptionButton {
     subscriptionButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
     subscriptionButton.layer.cornerRadius = 20;
     subscriptionButton.clipsToBounds = YES;
@@ -1018,7 +1019,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     NSDictionary *readOnly = [NSJSONSerialization JSONObjectWithData:jsonData options:kNilOptions error:&err];
 
     // Return bundled config as is if user doesn't have an active subscription
-    if(![[IAPStoreHelper class] hasActiveSubscriptionForDate:[NSDate date]] && !err) {
+    if(![IAPStoreHelper hasActiveSubscriptionForNow] && !err) {
         return bundledConfigStr;
     }
 
@@ -1248,7 +1249,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     [regionButton setTitle:regionText forState:UIControlStateNormal];
 }
 
-- (void) setRegionSelectionConstraints:(CGSize) size {
+- (void)setRegionSelectionConstraints:(CGSize) size {
     [bottomBar removeConstraints:[bottomBar constraints]];
     if (size.width > size.height && [[UIDevice currentDevice]userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
         regionButtonHeader.hidden = YES;
@@ -1389,27 +1390,21 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     subscriptionButtonTop = [bottomSpacerGuide.bottomAnchor constraintEqualToAnchor:subscriptionButton.topAnchor];
 }
 
-- (void) updateSubscriptionUI {
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        BOOL success = [[IAPStoreHelper class] hasActiveSubscriptionForDate:[NSDate date]];
-        dispatch_async(dispatch_get_main_queue(), ^{
-            if(success) {
-                subscriptionButton.hidden = YES;
-                adLabel.hidden = YES;
-                subscriptionButtonTop.active = NO;
-                bottomBarTop.active = YES;
-            } else {
-                subscriptionButton.hidden = NO;
-                adLabel.hidden = ![adManager untunneledInterstitialIsReady];
-                bottomBarTop.active = NO;
-                subscriptionButtonTop.active = YES;
-            }
+#pragma mark - Subscription
 
-        });
-    });
+- (void)updateSubscriptionUIWithSubscribedState:(BOOL)isSubscribed {
+    if(isSubscribed) {
+        subscriptionButton.hidden = YES;
+        adLabel.hidden = YES;
+        subscriptionButtonTop.active = NO;
+        bottomBarTop.active = YES;
+    } else {
+        subscriptionButton.hidden = NO;
+        adLabel.hidden = ![adManager untunneledInterstitialIsReady];
+        bottomBarTop.active = NO;
+        subscriptionButtonTop.active = YES;
+    }
 }
-
-#pragma mark - IAP
 
 - (void)openIAPViewController {
     IAPViewController *iapViewController = [[IAPViewController alloc]init];
@@ -1418,30 +1413,22 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     [self presentViewController:navController animated:YES completion:nil];
 }
 
-- (void)updatedSubscriptionDictionary {
-    [self updateSubscriptionUI];
+- (void)checkSubscriptionStateAndUpdateUI {
+    __weak MainViewController *weakSelf = self;
 
-    // TODO: re-check this logic
-    if (![adManager shouldShowUntunneledAds]) {
-        // if user subscription state has changed to valid
-        // try to deinit ads if currently not showing and hide adLabel
-        [adManager initializeAds];
-    }
+    [IAPStoreHelper hasActiveSubscriptionForNowOnBlock:^(BOOL isActive) {
+        [weakSelf updateSubscriptionUIWithSubscribedState:isActive];
+    }];
+}
 
-    // If the user gets an active subscription and the network extension is active,
-    // queries the network extension to check if the extension is using the subscription SponsorId.
-    // If not, restarts the extension.
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+- (void)onSubscriptionActivated {
+    // Updates subscription UI.
+    [self updateSubscriptionUIWithSubscribedState:TRUE];
+}
 
-        if ([[IAPStoreHelper class] hasActiveSubscriptionForDate:[NSDate date]] && [vpnManager isVPNActive]) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-
-                // Asks the extension to perform a subscription check.
-                [notifier post:NOTIFIER_FORCE_SUBSCRIPTION_CHECK];
-            });
-
-        }
-    });
+- (void)onSubscriptionExpired {
+    // Updates subscription UI.
+    [self updateSubscriptionUIWithSubscribedState:FALSE];
 }
 
 @end
