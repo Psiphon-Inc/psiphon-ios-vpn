@@ -19,6 +19,10 @@
 
 #import <UIKit/UIKit.h>
 
+// Subscription notifications
+FOUNDATION_EXPORT NSNotificationName const AppDelegateSubscriptionDidExpireNotification;
+FOUNDATION_EXPORT NSNotificationName const AppDelegateSubscriptionDidActivateNotification;
+
 @interface AppDelegate : UIResponder <UIApplicationDelegate>
 
 @property (strong, nonatomic) UIWindow *window;
@@ -31,7 +35,12 @@
 - (UIViewController *)getAdsPresentingViewController;
 - (void)launchScreenFinished;
 
-/* Reloads MainViewController. Used after a settings change. */
+/**
+ * Reloads the MainViewController.
+ *
+ * @details
+ * reloadMainViewController is meant to be used after a settings change (e.g. default language).
+ */
 - (void)reloadMainViewController;
 
 @end
