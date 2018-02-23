@@ -46,7 +46,7 @@
 #import <ReactiveObjC/RACSubject.h>
 #import <ReactiveObjC/RACReplaySubject.h>
 
-NSString *_Nonnull const PsiphonTunnelErrorDomain = @"PsiphonTunnelErrorDomain";
+NSErrorDomain _Nonnull const PsiphonTunnelErrorDomain = @"PsiphonTunnelErrorDomain";
 
 typedef NS_ENUM(NSInteger, PsiphonSubscriptionState) {
     PsiphonSubscriptionStateNotSubscribed,

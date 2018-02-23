@@ -222,8 +222,8 @@ NSNotificationName const AppDelegateSubscriptionDidActivateNotification = @"AppD
 }
 
 - (void)onVPNStatusDidChange {
-    if ([vpnManager getVPNStatus] == VPNStatusDisconnected
-      || [vpnManager getVPNStatus] == VPNStatusRestarting) {
+    if ([vpnManager VPNStatus] == VPNStatusDisconnected
+      || [vpnManager VPNStatus] == VPNStatusRestarting) {
         shownHomepage = FALSE;
     }
 }

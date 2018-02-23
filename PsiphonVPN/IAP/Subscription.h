@@ -17,7 +17,6 @@
  *
  */
 
-#import <UIKit/UIKit.h>
 #import "UserDefaults.h"
 #import "AuthorizationToken.h"
 #import "RACSignal.h"
@@ -33,7 +32,7 @@ typedef void(^SubscriptionVerifierCompletionHandler)(NSDictionary *_Nullable dic
 #define kRemoteSubscriptionVerifierPendingRenewalInfo                 @"pending_renewal_info"
 #define kRemoteSubscriptionVerifierPendingRenewalInfoAutoRenewStatus  @"auto_renew_status"
 
-FOUNDATION_EXPORT NSString *_Nonnull const ReceiptValidationErrorDomain;
+FOUNDATION_EXPORT NSErrorDomain _Nonnull const ReceiptValidationErrorDomain;
 
 typedef NS_ERROR_ENUM(ReceiptValidationErrorDomain, PsiphonReceiptValidationErrorCode) {
     PsiphonReceiptValidationErrorNSURLSessionFailed,
@@ -41,7 +40,6 @@ typedef NS_ERROR_ENUM(ReceiptValidationErrorDomain, PsiphonReceiptValidationErro
     PsiphonReceiptValidationErrorInvalidReceipt,
     PsiphonReceiptValidationErrorJSONParseFailed,
 };
-
 
 
 @interface SubscriptionVerifierService : NSObject
@@ -112,7 +110,7 @@ typedef NS_ERROR_ENUM(ReceiptValidationErrorDomain, PsiphonReceiptValidationErro
 
 #pragma mark - Subscription Result Model
 
-FOUNDATION_EXTERN NSString *_Nonnull const SubscriptionResultErrorDomain;
+FOUNDATION_EXTERN NSErrorDomain _Nonnull const SubscriptionResultErrorDomain;
 
 typedef NS_ERROR_ENUM(SubscriptionResultErrorDomain, SubscriptionResultErrorCode) {
     SubscriptionResultErrorExpired = 100,

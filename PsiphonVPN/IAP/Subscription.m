@@ -25,7 +25,7 @@
 #import "NSError+Convenience.h"
 #import "RACTuple.h"
 
-NSString *_Nonnull const ReceiptValidationErrorDomain = @"PsiphonReceiptValidationErrorDomain";
+NSErrorDomain _Nonnull const ReceiptValidationErrorDomain = @"PsiphonReceiptValidationErrorDomain";
 
 @implementation SubscriptionVerifierService {
     NSURLSession *urlSession;
