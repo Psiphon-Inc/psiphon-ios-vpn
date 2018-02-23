@@ -108,13 +108,6 @@ NSNotificationName const AppDelegateSubscriptionDidActivateNotification = @"AppD
 #endif
 }
 
-- (void)onVPNStatusDidChange {
-    if ([vpnManager getVPNStatus] == VPNStatusDisconnected
-        || [vpnManager getVPNStatus] == VPNStatusRestarting) {
-        shownHomepage = FALSE;
-    }
-}
-
 # pragma mark - Lifecycle methods
 
 - (BOOL)application:(UIApplication *)application willFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
@@ -158,33 +151,7 @@ NSNotificationName const AppDelegateSubscriptionDidActivateNotification = @"AppD
     // Listen for the network extension messages.
     [self listenForNEMessages];
 
-    // Starts subscription expiry timer if there is an active subscription.
-    [self subscriptionExpiryTimer];
-
     return YES;
-}
-
-- (void)applicationWillResignActive:(UIApplication *)application {
-    LOG_DEBUG();
-    // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
-    // Use this method to pause ongoing tasks, disable timers, and invalidate graphics rendering callbacks. Games should use this method to pause the game.
-}
-
-- (void)applicationDidEnterBackground:(UIApplication *)application {
-    LOG_DEBUG();
-    // Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later.
-    // If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
-
-    [[UIApplication sharedApplication] ignoreSnapshotOnNextApplicationLaunch];
-    [notifier post:NOTIFIER_APP_DID_ENTER_BACKGROUND];
-    [sharedDB updateAppForegroundState:NO];
-}
-
-- (void)applicationWillEnterForeground:(UIApplication *)application {
-    LOG_DEBUG();
-    // Called as part of the transition from the background to the active state; here you can undo many of the changes made on entering the background.
-
-    [self loadAdsIfNeeded];
 }
 
 - (void)applicationDidBecomeActive:(UIApplication *)application {
@@ -206,12 +173,43 @@ NSNotificationName const AppDelegateSubscriptionDidActivateNotification = @"AppD
             }];
         }
     });
+
+    // Starts subscription expiry timer if there is an active subscription.
+    [self subscriptionExpiryTimer];
+}
+
+- (void)applicationWillResignActive:(UIApplication *)application {
+    LOG_DEBUG();
+    // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
+    // Use this method to pause ongoing tasks, disable timers, and invalidate graphics rendering callbacks. Games should use this method to pause the game.
+
+    // Cancel subscription expiry timer if active.
+    [subscriptionCheckTimer invalidate];
+}
+
+- (void)applicationDidEnterBackground:(UIApplication *)application {
+    LOG_DEBUG();
+    // Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later.
+    // If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
+
+    [[UIApplication sharedApplication] ignoreSnapshotOnNextApplicationLaunch];
+    [notifier post:NOTIFIER_APP_DID_ENTER_BACKGROUND];
+    [sharedDB updateAppForegroundState:NO];
+}
+
+- (void)applicationWillEnterForeground:(UIApplication *)application {
+    LOG_DEBUG();
+    // Called as part of the transition from the background to the active state; here you can undo many of the changes made on entering the background.
+
+    [self loadAdsIfNeeded];
 }
 
 - (void)applicationWillTerminate:(UIApplication *)application {
     LOG_DEBUG();
     // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
 }
+
+#pragma mark -
 
 - (void)initializeDefaults {
     [PsiphonClientCommonLibraryHelpers initializeDefaultsForPlistsFromRoot:@"Root.inApp"];
@@ -221,6 +219,13 @@ NSNotificationName const AppDelegateSubscriptionDidActivateNotification = @"AppD
     LOG_DEBUG();
     [rootContainerController reloadMainViewController];
     rootContainerController.mainViewController.openSettingImmediatelyOnViewDidAppear = TRUE;
+}
+
+- (void)onVPNStatusDidChange {
+    if ([vpnManager getVPNStatus] == VPNStatusDisconnected
+      || [vpnManager getVPNStatus] == VPNStatusRestarting) {
+        shownHomepage = FALSE;
+    }
 }
 
 #pragma mark - Ads
