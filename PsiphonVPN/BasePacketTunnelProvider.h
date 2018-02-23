@@ -17,7 +17,6 @@
  *
  */
 
-
 #import <NetworkExtension/NEPacketTunnelProvider.h>
 #import "NEBridge.h"
 
@@ -27,9 +26,7 @@
 FOUNDATION_EXTERN NSString *_Nonnull const BasePsiphonTunnelErrorDomain;
 
 typedef NS_ERROR_ENUM(BasePsiphonTunnelErrorDomain, ABCPsiphonTunnelErrorCode) {
-    PsiphonTunnelErrorBadConfiguration = 1,
-    PsiphonTunnelErrorInternalError = 2,
-    PsiphonTunnelErrorStoppedBeforeConnected = 3,
+    BasePsiphonTunnelErrorStoppedBeforeConnected = 1000,
 };
 
 
@@ -60,8 +57,6 @@ typedef NS_ENUM(NSInteger, NEStartMethod) {
 - (BOOL)isNEZombie;
 
 - (BOOL)isTunnelConnected;
-
-- (NSString *_Nonnull)sponsorId;
 
 @end
 

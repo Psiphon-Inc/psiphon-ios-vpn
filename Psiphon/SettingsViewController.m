@@ -21,100 +21,164 @@
 #import "IAPStoreHelper.h"
 #import "IAPViewController.h"
 #import "VPNManager.h"
+#import "AppDelegate.h"
+
+// NSUserDefaults keys
+/**
+ * SettingsConnectOnDemandBoolKey represents user's preference for Connect On Demand.
+ * This preference should not be displayed to the user directly, and only the VPN configuration
+ * saved Connect On Demand value should be displayed to user.
+ */
+UserDefaultsKey const SettingsConnectOnDemandBoolKey = @"SettingsViewController.ConnectOnDemandKey";
+
+// Specifier keys for cells in settings menu
+// These keys are defined in Psiphon/InAppSettings.bundle/Root.inApp.plist
+NSString * const SettingsSubscriptionCellSpecifierKey = @"settingsSubscription";
+NSString * const ConnectOnDemandCellSpecifierKey = @"vpnOnDemand";
 
 @interface SettingsViewController ()
+
+@property (assign) BOOL hasActiveSubscription;
+
 @end
 
 @implementation SettingsViewController {
-    UISwitch *vpnOnDemandToggle;
+
+    // Subscription row
+    UITableViewCell *subscriptionTableViewCell;
+
+    // Connect On Demand row
+    UISwitch *connectOnDemandToggle;
+    UITableViewCell *connectOnDemandCell;
+}
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+
+    [[NSNotificationCenter defaultCenter] addObserverForName:AppDelegateSubscriptionDidActivateNotification
+                                                      object:nil
+                                                       queue:[NSOperationQueue mainQueue]
+                                                  usingBlock:^(NSNotification *note) {
+                                                      self.hasActiveSubscription = TRUE;
+                                                      [self updateSubscriptionUIElements];
+                                                  }];
+
+    [[NSNotificationCenter defaultCenter] addObserverForName:AppDelegateSubscriptionDidExpireNotification
+                                                      object:nil
+                                                       queue:[NSOperationQueue mainQueue]
+                                                  usingBlock:^(NSNotification *note) {
+                                                      self.hasActiveSubscription = FALSE;
+                                                      [self updateSubscriptionUIElements];
+                                                  }];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
-    if([IAPStoreHelper canMakePayments] == NO) {
-        self.hiddenKeys = [[NSSet alloc] initWithArray:@[kSettingsSubscription]];
+
+    if(![IAPStoreHelper canMakePayments]) {
+        self.hiddenKeys = [[NSSet alloc] initWithArray:@[SettingsSubscriptionCellSpecifierKey]];
     }
-    // Observe IAP subscription changes
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(updatedSubscriptionDictionary)
-                                                 name:kIAPHelperUpdatedSubscriptionDictionary
-                                               object:nil];
+
+    [self checkSubscriptionStateAndUpdateUI];
 
     [super viewWillAppear:animated];
 }
 
-- (void)viewWillDisappear:(BOOL)animated {
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:kIAPHelperUpdatedSubscriptionDictionary object:nil];
-    [super viewWillDisappear:animated];
+- (void)checkSubscriptionStateAndUpdateUI {
+    __weak SettingsViewController *weakSelf = self;
+    [IAPStoreHelper hasActiveSubscriptionForNowOnBlock:^(BOOL isActive) {
+        if (weakSelf.hasActiveSubscription != isActive) {
+            weakSelf.hasActiveSubscription = isActive;
+            [weakSelf updateSubscriptionUIElements];
+        }
+    }];
 }
+
+#pragma mark - UI update methods
+
+- (void)updateSubscriptionUIElements {
+    [self updateSubscriptionCell];
+    [self updateConnectOnDemandCell];
+}
+
+- (void)updateSubscriptionCell {
+    NSString *subscriptionCellTitle;
+    if (self.hasActiveSubscription) {
+        subscriptionCellTitle = NSLocalizedStringWithDefaultValue(@"SETTINGS_SUBSCRIPTION_ACTIVE",
+          nil,
+          [NSBundle mainBundle],
+          @"Subscriptions",
+          @"Subscriptions item title in the app settings when user has an active subscription. Clicking this item opens subscriptions view");
+    } else {
+        subscriptionCellTitle = NSLocalizedStringWithDefaultValue(@"SETTINGS_SUBSCRIPTION_NOT_ACTIVE",
+          nil,
+          [NSBundle mainBundle],
+          @"Go premium!",
+          @"Subscriptions item title in the app settings when user does not have an active subscription. Clicking this item opens subscriptions view. If “Premium” doesn't easily translate, please choose a term that conveys “Pro” or “Extra” or “Better” or “Elite”.");
+    }
+
+    [subscriptionTableViewCell.textLabel setText:subscriptionCellTitle];
+}
+
+- (void)updateConnectOnDemandCell {
+    NSString *subscriptionOnlySubtitle;
+    if(!self.hasActiveSubscription) {
+        connectOnDemandToggle.on = NO;
+        connectOnDemandCell.userInteractionEnabled = NO;
+        connectOnDemandCell.textLabel.enabled = NO;
+        connectOnDemandCell.detailTextLabel.enabled = NO;
+        subscriptionOnlySubtitle = NSLocalizedStringWithDefaultValue(@"SETTINGS_VPN_ON_DEMAND_DETAIL",
+          nil,
+          [NSBundle mainBundle],
+          @"Subscription only",
+          @"VPN On demand setting detail text showing when user doesn't have an active subscription and the item is disabled.");
+    } else {
+        connectOnDemandToggle.on = [[VPNManager sharedInstance] isOnDemandEnabled];
+        connectOnDemandCell.userInteractionEnabled = YES;
+        connectOnDemandCell.textLabel.enabled = YES;
+        subscriptionOnlySubtitle = @"";
+    }
+
+    connectOnDemandCell.detailTextLabel.text = subscriptionOnlySubtitle;
+}
+
+#pragma mark - Table constuctor methods
 
 - (void)settingsViewController:(IASKAppSettingsViewController*)sender tableView:(UITableView *)tableView didSelectCustomViewSpecifier:(IASKSpecifier*)specifier {
     [super settingsViewController:self tableView:tableView didSelectCustomViewSpecifier:specifier];
-    if ([specifier.key isEqualToString:kSettingsSubscription]) {
+    if ([specifier.key isEqualToString:SettingsSubscriptionCellSpecifierKey]) {
         [self openIAPViewController];
     }
 }
 
 - (UITableViewCell*)tableView:(UITableView*)tableView cellForSpecifier:(IASKSpecifier*)specifier {
     UITableViewCell *cell = nil;
-    if (![specifier.key isEqualToString:kSettingsSubscription] && ![specifier.key isEqualToString:kVpnOnDemand]) {
+    if (![specifier.key isEqualToString:SettingsSubscriptionCellSpecifierKey] && ![specifier.key isEqualToString:ConnectOnDemandCellSpecifierKey]) {
         cell = [super tableView:tableView cellForSpecifier:specifier];
         return cell;
     }
 
-    if ([specifier.key isEqualToString:kSettingsSubscription]) {
-        BOOL hasActiveSubscription = [[IAPStoreHelper class] hasActiveSubscriptionForDate:[NSDate date]];
+    if ([specifier.key isEqualToString:SettingsSubscriptionCellSpecifierKey]) {
+
         cell = [super tableView:tableView cellForSpecifier:specifier];
         [cell setAccessoryType:UITableViewCellAccessoryDisclosureIndicator];
-        NSString *subscriptionItemTitle;
-        if(hasActiveSubscription) {
-            subscriptionItemTitle = NSLocalizedStringWithDefaultValue(@"SETTINGS_SUBSCRIPTION_ACTIVE",
-                                                                      nil,
-                                                                      [NSBundle mainBundle],
-                                                                      @"Subscriptions",
-                                                                      @"Subscriptions item title in the app settings when user has an active subscription. Clicking this item opens subscriptions view");
-        } else {
-            subscriptionItemTitle = NSLocalizedStringWithDefaultValue(@"SETTINGS_SUBSCRIPTION_NOT_ACTIVE",
-                                                                      nil,
-                                                                      [NSBundle mainBundle],
-                                                                      @"Go premium!",
-                                                                      @"Subscriptions item title in the app settings when user does not have an active subscription. Clicking this item opens subscriptions view. If “Premium” doesn't easily translate, please choose a term that conveys “Pro” or “Extra” or “Better” or “Elite”.");
-        }
-        [cell.textLabel setText:subscriptionItemTitle];
+        subscriptionTableViewCell = cell;
+        [self updateSubscriptionCell];
 
-    } else if ([specifier.key isEqualToString:kVpnOnDemand]) {
+    } else if ([specifier.key isEqualToString:ConnectOnDemandCellSpecifierKey]) {
+
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:@"Cell"];
         cell.selectionStyle = UITableViewCellSelectionStyleNone;
         cell.accessoryView = [[UISwitch alloc] initWithFrame:CGRectMake(0, 0, 79, 27)];
-        vpnOnDemandToggle = (UISwitch*)cell.accessoryView;
-        [vpnOnDemandToggle addTarget:self action:@selector(toggledVpnOnDemandValue:) forControlEvents:UIControlEventValueChanged];
+        connectOnDemandToggle = (UISwitch*)cell.accessoryView;
+        [connectOnDemandToggle addTarget:self action:@selector(toggledVpnOnDemandValue:) forControlEvents:UIControlEventValueChanged];
 
         cell.textLabel.text = NSLocalizedStringWithDefaultValue(@"SETTINGS_VPN_ON_DEMAND",
                                                                      nil,
                                                                      [NSBundle mainBundle],
                                                                      @"Auto-start VPN on demand",
                                                                      @"Automatically start VPN On demand settings toggle");
-
-
-        NSString *subscriptionOnlySubtitle;
-        BOOL hasActiveSubscription = [[IAPStoreHelper class] hasActiveSubscriptionForDate:[NSDate date]];
-        if(!hasActiveSubscription) {
-            vpnOnDemandToggle.on = NO;
-            cell.userInteractionEnabled = NO;
-            cell.textLabel.enabled = NO;
-            cell.detailTextLabel.enabled = NO;
-            subscriptionOnlySubtitle = NSLocalizedStringWithDefaultValue(@"SETTINGS_VPN_ON_DEMAND_DETAIL",
-                                                                      nil,
-                                                                      [NSBundle mainBundle],
-                                                                      @"Subscription only",
-                                                                      @"VPN On demand setting detail text showing when user doesn't have an active subscription and the item is disabled.");
-        } else {
-            vpnOnDemandToggle.on = [[VPNManager sharedInstance] isOnDemandEnabled];
-            cell.userInteractionEnabled = YES;
-            cell.textLabel.enabled = YES;
-            subscriptionOnlySubtitle = @"";
-        }
-
-        cell.detailTextLabel.text = subscriptionOnlySubtitle;
+        connectOnDemandCell = cell;
+        [self updateConnectOnDemandCell];
     }
 
     assert(cell != nil);
@@ -124,21 +188,19 @@
 - (void)toggledVpnOnDemandValue:(id)sender {
     UISwitch *toggle = (UISwitch*)sender;
 
+    [[NSUserDefaults standardUserDefaults] setBool:[toggle isOn] forKey:SettingsConnectOnDemandBoolKey];
+
     __weak SettingsViewController *weakSelf = self;
     [[VPNManager sharedInstance] updateVPNConfigurationOnDemandSetting:[toggle isOn]
-                                                     completionHandler:^(NSError *error) {
+      completionHandler:^(NSError *error) {
         [weakSelf.tableView reloadData];
     }];
 }
 
-- (void) openIAPViewController {
+- (void)openIAPViewController {
     IAPViewController *iapViewController = [[IAPViewController alloc]init];
     iapViewController.openedFromSettings = YES;
     [self.navigationController pushViewController:iapViewController animated:YES];
-}
-
-- (void) updatedSubscriptionDictionary {
-    [self.tableView reloadData];
 }
 
 @end

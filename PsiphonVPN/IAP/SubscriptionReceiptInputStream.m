@@ -325,11 +325,11 @@ static const NSUInteger kDefaultLength = 513;
 }
 
 - (nullable id)propertyForKey:(NSStreamPropertyKey)key {
-    return [super propertyForKey:key];
+    return nil;
 }
 
 - (BOOL)setProperty:(nullable id)property forKey:(NSStreamPropertyKey)key {
-    return [super setProperty:property forKey:key];
+    return NO;
 }
 
 @end

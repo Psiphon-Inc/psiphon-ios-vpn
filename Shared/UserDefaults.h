@@ -19,6 +19,25 @@
 
 #import <Foundation/Foundation.h>
 
+/**
+ * NSUserDefaults key type.
+ *
+ * UserDefaultsKey identifier should be composed in this way:
+ * [Name of associated class (or first part of name for long class names] + [UniquePartOfName] + [Type] + Key
+ *
+ * NSUserDefaults key string should be composed in this way:
+ * [Full name of associated class] . [UniquePartOfName] + [Type] + Key
+ *
+ * e.g. In SettingsViewController you might have:
+ * UserDefaultsKey const SettingsConnectOnDemandBoolKey = @"SettingsViewController.ConnectOnDemandBoolKey"
+ *
+ */
+typedef NSString * UserDefaultsKey;
+
+
+/**
+ * Protocol for model objects that store their data using NSUserDefaults.
+ */
 @protocol UserDefaultsModelProtocol
 
 @required

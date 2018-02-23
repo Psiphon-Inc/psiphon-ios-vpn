@@ -163,7 +163,7 @@ static NSURL *_appleRootCertificateURL = nil;
                         if (!subscriptionExpirationDate) {
                             [subscriptions setObject:[iapReceipt.subscriptionExpirationDate copy] forKey:iapReceipt.productIdentifier];
                         } else {
-                            if ([subscriptionExpirationDate compare:iapReceipt.subscriptionExpirationDate] == NSOrderedAscending) {
+                            if ([subscriptionExpirationDate before:iapReceipt.subscriptionExpirationDate]) {
                                 [subscriptions setObject:[iapReceipt.subscriptionExpirationDate copy] forKey:iapReceipt.productIdentifier];
                             }
                         }

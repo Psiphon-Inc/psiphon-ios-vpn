@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, Psiphon Inc.
+ * Copyright (c) 2018, Psiphon Inc.
  * All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,24 +17,29 @@
  *
  */
 
-#import <Foundation/Foundation.h>
-#import <mopub-ios-sdk/MPInterstitialAdController.h>
+#import "NSDate+Comparator.h"
 
-FOUNDATION_EXPORT NSNotificationName const AdManagerAdsDidLoadNotification;
 
-@interface AdManager : NSObject <MPInterstitialAdControllerDelegate>
+@implementation NSDate (Comparator)
 
-@property BOOL untunneledInterstitialIsShowing;
-@property BOOL untunneledInterstitialHasShown;
+- (BOOL)before:(NSDate *)time {
+    return [self compare:time] == NSOrderedAscending;
+}
 
-+ (instancetype)sharedInstance;
+- (BOOL)after:(NSDate *)time {
+    return [self compare:time] == NSOrderedDescending;
+}
 
-- (void)initializeAds;
+- (BOOL)equal:(NSDate *)time {
+    return [self compare:time] == NSOrderedSame;
+}
 
-- (BOOL)untunneledInterstitialIsReady;
+- (BOOL)beforeOrEqualTo:(NSDate *)time {
+    return [self compare:time] != NSOrderedDescending;
+}
 
-- (void)showUntunneledInterstitial;
-
-- (BOOL)shouldShowUntunneledAds;
+- (BOOL)afterOrEqualTo:(NSDate *)time {
+    return [self compare:time] != NSOrderedAscending;
+}
 
 @end

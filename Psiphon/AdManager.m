@@ -26,6 +26,9 @@
 
 @import GoogleMobileAds;
 
+
+NSNotificationName const AdManagerAdsDidLoadNotification = @"AdManagerAdsDidLoadNotification";
+
 @interface AdManager ()
 
 @property (nonatomic, retain) MPInterstitialAdController *untunneledInterstitial;
@@ -44,7 +47,7 @@
         vpnManager = [VPNManager sharedInstance];
 
         [[NSNotificationCenter defaultCenter]
-          addObserver:self selector:@selector(vpnStatusDidChange) name:kVPNStatusChangeNotificationName object:vpnManager];
+          addObserver:self selector:@selector(vpnStatusDidChange) name:VPNManagerStatusDidChangeNotification object:vpnManager];
     }
     return self;
 }
@@ -102,7 +105,7 @@
 // TODO: This is a blocking function called on main thread.
 - (BOOL)shouldShowUntunneledAds {
     // Check if user has an active subscription first
-    BOOL hasActiveSubscription = [[IAPStoreHelper class] hasActiveSubscriptionForDate:[NSDate date]];
+    BOOL hasActiveSubscription = [IAPStoreHelper hasActiveSubscriptionForNow];
 
     NetworkStatus networkStatus = [[Reachability reachabilityForInternetConnection] currentReachabilityStatus];
     VPNStatus vpnStatus = [vpnManager getVPNStatus];
@@ -134,11 +137,11 @@
     return FALSE;
 }
 
-// Posts kAdsDidLoad notification.
+// Posts AdManagerAdsDidLoadNotification notification.
 // Listeners of this message can call adIsReady to get the latest state.
 - (void)postAdsLoadStateDidChangeNotification {
     [[NSNotificationCenter defaultCenter]
-      postNotificationName:@kAdsDidLoad object:self];
+      postNotificationName:AdManagerAdsDidLoadNotification object:self];
 }
 
 #pragma mark - Interestitial callbacks
