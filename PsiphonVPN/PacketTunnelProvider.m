@@ -692,7 +692,7 @@ typedef NS_ENUM(NSInteger, AuthorizationTokenActivity) {
 - (void)startGracePeriod {
 
 #if DEBUG
-    int64_t gracePeriodSec = 5; // 5 seconds.
+    int64_t gracePeriodSec = 2 * 60; // 2 minutes.
 #else
     int64_t gracePeriodSec = 1 * 60 * 60;  // 1 hour.
 #endif

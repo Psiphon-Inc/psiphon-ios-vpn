@@ -24,15 +24,15 @@
  * Notification with this name might be posted many times,
  * without an actual change to the VPN status.
  */
-FOUNDATION_EXPORT NSNotificationName const VPNManagerStatusDidChangeNotification;
+FOUNDATION_EXPORT NSNotificationName _Nonnull const VPNManagerStatusDidChangeNotification;
 
 /**
  * NSNotification name for VPN start failures.
  */
-FOUNDATION_EXPORT NSNotificationName const VPNManagerVPNStartDidFailNotification;
+FOUNDATION_EXPORT NSNotificationName _Nonnull const VPNManagerVPNStartDidFailNotification;
 
 
-FOUNDATION_EXPORT NSErrorDomain const VPNManagerErrorDomain;
+FOUNDATION_EXPORT NSErrorDomain _Nonnull const VPNManagerErrorDomain;
 
 /**
  * @typedef VPNManagerErrorCode
@@ -51,7 +51,7 @@ typedef NS_ERROR_ENUM(VPNManagerErrorDomain, VPNManagerStartErrorCode) {
 
 #define VPNQueryErrorUserInfoQueryKey @"query"
 
-FOUNDATION_EXPORT NSErrorDomain const VPNQueryErrorDomain;
+FOUNDATION_EXPORT NSErrorDomain _Nonnull const VPNQueryErrorDomain;
 
 /**
  * @typedef VPNQueryErrorCode
