@@ -598,19 +598,10 @@ typedef NS_ENUM(NSInteger, AuthorizationTokenActivity) {
     return newSettings;
 }
 
-/*!
- * @brief Calls startTunnelWithOptions completion handler
- * to start the tunnel, if the connection state is Connected.
- * @return TRUE if VPN is started, FALSE otherwise.
- */
+// Starts VPN and notifies the container of homepages (if any) when
+// `self.shouldStartVPN` is TRUE or the container is in the foreground.
 - (BOOL)tryStartVPN {
-    // Checks if the container has made the decision
-    // for the VPN to be started.
-    if (!self.shouldStartVPN) {
-        return FALSE;
-    }
-
-    if ([sharedDB getAppForegroundState] || self.startTunnelSubscriptionState != PsiphonSubscriptionStateNotSubscribed) {
+    if (self.shouldStartVPN || [sharedDB getAppForegroundState]) {
         if ([psiphonTunnel getConnectionState] == PsiphonConnectionStateConnected) {
             self.reasserting = FALSE;
             [self startVPN];
