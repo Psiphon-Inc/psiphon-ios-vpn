@@ -29,8 +29,8 @@ static NSString *iapCellID = @"IAPTableCellID";
 @interface IAPTableViewCell : UITableViewCell
 @end
 
-
 @interface IAPViewController () <UITableViewDataSource, UITableViewDelegate>
+
 @property (nonatomic, strong) UITableView *tableView;
 @property (nonatomic, strong) NSNumberFormatter *priceFormatter;
 @property (nonatomic, strong) UIRefreshControl *refreshControl;
@@ -38,11 +38,10 @@ static NSString *iapCellID = @"IAPTableCellID";
 @property (nonatomic, assign) BOOL hasActiveSubscription;
 @property (nonatomic, strong) SKProduct *latestSubscriptionProduct;
 @property (nonatomic, strong) NSDate *latestSubscriptionExpirationDate;
+
 @end
 
-
-@implementation IAPViewController {
-}
+@implementation IAPViewController
 
 - (void)loadView {
     self.priceFormatter = [[NSNumberFormatter alloc] init];
@@ -87,22 +86,22 @@ static NSString *iapCellID = @"IAPTableCellID";
 
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(reloadProducts)
-                                                 name:kIAPSKProductsRequestDidFailWithError
+                                                 name:IAPSKProductsRequestDidFailWithErrorNotification
                                                object:nil];
     
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(reloadProducts)
-                                                 name:kIAPSKProductsRequestDidReceiveResponse
+                                                 name:IAPSKProductsRequestDidReceiveResponseNotification
                                                object:nil];
     
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(reloadProducts)
-                                                 name:kIAPSKRequestRequestDidFinish
+                                                 name:IAPSKRequestRequestDidFinishNotification
                                                object:nil];
 
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(reloadProducts)
-                                                 name:kIAPHelperUpdatedSubscriptionDictionary
+                                                 name:IAPHelperUpdatedSubscriptionDictionaryNotification
                                                object:nil];
 }
 
@@ -111,8 +110,6 @@ static NSString *iapCellID = @"IAPTableCellID";
     
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
-
-
 
 #pragma mark - Table view data source
 
@@ -334,7 +331,7 @@ static NSString *iapCellID = @"IAPTableCellID";
     [[IAPStoreHelper sharedInstance] refreshReceipt];
 }
 
-- (void) beginRefreshing {
+- (void)beginRefreshing {
     if (!self.refreshControl.isRefreshing) {
         [self.refreshControl beginRefreshing];
         [self.tableView setContentOffset:CGPointMake(0, self.tableView.contentOffset.y-self.refreshControl.frame.size.height) animated:YES];
@@ -345,7 +342,7 @@ static NSString *iapCellID = @"IAPTableCellID";
     });
 }
 
-- (void) endRefreshing {
+- (void)endRefreshing {
     if (self.refreshControl.isRefreshing) {
         [self.refreshControl endRefreshing];
     }
@@ -364,17 +361,17 @@ static NSString *iapCellID = @"IAPTableCellID";
     [self.tableView reloadData];
 }
 
-- (void) startProductsRequest {
+- (void)startProductsRequest {
     [self beginRefreshing];
     [[IAPStoreHelper sharedInstance] startProductsRequest];
 }
-
 
 @end
 
 #pragma mark - IAPTableViewCell auto resizable cell implementation
 
 @implementation IAPTableViewCell
+
 - (id)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier {
     self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
     if (self) {
@@ -402,4 +399,3 @@ static NSString *iapCellID = @"IAPTableCellID";
 }
 
 @end
-

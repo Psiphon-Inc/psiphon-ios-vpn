@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, Psiphon Inc.
+ * Copyright (c) 2018, Psiphon Inc.
  * All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,11 +17,24 @@
  *
  */
 
-#import "PsiphonSettingsViewController.h"
-#import "UserDefaults.h"
+#include <dispatch/object.h>
+#include <dispatch/queue.h>
+#include <dispatch/time.h>
+#include <sys/param.h>
+#include "DispatchUtils.h"
 
-FOUNDATION_EXPORT UserDefaultsKey const SettingsConnectOnDemandBoolKey;
+void dispatch_async_global(dispatch_block_t block) {
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), block);
+}
 
-@interface SettingsViewController : PsiphonSettingsViewController
+void dispatch_async_main(dispatch_block_t block) {
+    dispatch_async(dispatch_get_main_queue(), block);
+}
 
-@end
+dispatch_time_t dispatch_time_since_now(int64_t interval) {
+    return dispatch_time(DISPATCH_TIME_NOW, (int64_t) interval * NSEC_PER_SEC);
+}
+
+dispatch_time_t dispatch_walltime_sec(int64_t interval) {
+    return dispatch_walltime(NULL, interval * NSEC_PER_SEC);
+}

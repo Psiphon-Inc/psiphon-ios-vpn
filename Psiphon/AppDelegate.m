@@ -38,16 +38,17 @@
 #import "IAPStoreHelper.h"
 #import "IAPViewController.h"
 #import "NEBridge.h"
+#import "DispatchUtils.h"
 
-
-@interface AppDelegate ()
-@end
+NSNotificationName const AppDelegateSubscriptionDidExpireNotification = @"AppDelegateSubscriptionDidExpireNotification";
+NSNotificationName const AppDelegateSubscriptionDidActivateNotification = @"AppDelegateSubscriptionDidActivateNotification";
 
 @implementation AppDelegate {
     VPNManager *vpnManager;
     AdManager *adManager;
     PsiphonDataSharedDB *sharedDB;
     Notifier *notifier;
+    NSTimer *subscriptionCheckTimer;
 
     BOOL shownHomepage;
 
@@ -118,8 +119,15 @@
 
 - (BOOL)application:(UIApplication *)application willFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     [self initializeDefaults];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onAdsLoaded)
-                                                 name:@kAdsDidLoad object:adManager];
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(onAdsLoaded)
+                                                 name:AdManagerAdsDidLoadNotification
+                                               object:adManager];
+
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(onUpdatedSubscriptionDictionary)
+                                                 name:IAPHelperUpdatedSubscriptionDictionaryNotification
+                                               object:nil];
 
     [[IAPStoreHelper sharedInstance] startProductsRequest];
 
@@ -145,10 +153,13 @@
 
     // Listen for VPN status changes from VPNManager.
     [[NSNotificationCenter defaultCenter]
-      addObserver:self selector:@selector(onVPNStatusDidChange) name:kVPNStatusChangeNotificationName object:vpnManager];
+      addObserver:self selector:@selector(onVPNStatusDidChange) name:VPNManagerStatusDidChangeNotification object:vpnManager];
 
     // Listen for the network extension messages.
     [self listenForNEMessages];
+
+    // Starts subscription expiry timer if there is an active subscription.
+    [self subscriptionExpiryTimer];
 
     return YES;
 }
@@ -311,7 +322,79 @@
             [[RegionAdapter sharedInstance] onAvailableEgressRegions:regions];
         });
     }];
+}
 
+#pragma mark - Subscription
+
+- (void)subscriptionExpiryTimer {
+
+    __weak AppDelegate *weakSelf = self;
+
+    dispatch_async_global(^{
+        NSDate *expiryDate;
+        BOOL activeSubscription = [IAPStoreHelper hasActiveSubscriptionForDate:[NSDate date] getExpiryDate:&expiryDate];
+
+        dispatch_async_main(^{
+            if (activeSubscription) {
+                NSTimeInterval interval = [expiryDate timeIntervalSinceNow];
+                
+                if (interval > 0) {
+                    // Checks if another timer is already running.
+                    if (![subscriptionCheckTimer isValid]) {
+                        subscriptionCheckTimer = [NSTimer scheduledTimerWithTimeInterval:interval repeats:NO block:^(NSTimer *timer) {
+                            [weakSelf subscriptionExpiryTimer];
+                        }];
+                    }
+                }
+            } else {
+                // Instead of subscribing to the notification in this class, calls the handler directly.
+                [weakSelf onSubscriptionExpired];
+                
+                // Notifies all interested listeners that there is no active subscription.
+                [[NSNotificationCenter defaultCenter] postNotificationName:AppDelegateSubscriptionDidExpireNotification object:nil];
+            }
+        });
+    });
+}
+
+- (void)onSubscriptionExpired {
+
+    // Disables Connect On Demand setting of the VPN Configuration.
+    [vpnManager updateVPNConfigurationOnDemandSetting:FALSE completionHandler:^(NSError *error) {
+        // Do nothing.
+    }];
+}
+
+- (void)onUpdatedSubscriptionDictionary {
+
+    if (![adManager shouldShowUntunneledAds]) {
+        // if user subscription state has changed to valid
+        // try to deinit ads if currently not showing and hide adLabel
+        [adManager initializeAds];
+    }
+
+    __weak AppDelegate *weakSelf = self;
+
+    dispatch_async_global(^{
+
+        BOOL isSubscribed = [IAPStoreHelper hasActiveSubscriptionForNow];
+
+        dispatch_async_main(^{
+
+            if (isSubscribed) {
+
+                [weakSelf subscriptionExpiryTimer];
+
+                // Asks the extension to perform a subscription check if it is running currently.
+                if ([vpnManager isVPNActive]) {
+                    [notifier post:NOTIFIER_FORCE_SUBSCRIPTION_CHECK];
+                }
+
+                // Updates UI with the new subscription data.
+                [[NSNotificationCenter defaultCenter] postNotificationName:AppDelegateSubscriptionDidActivateNotification object:nil];
+            }
+        });
+    });
 }
 
 @end

@@ -37,17 +37,19 @@
 		9BFEC4475166B2EEAF192D37 /* VPNManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC04426D8558CB89D3798 /* VPNManager.m */; };
 		9BFEC4F02A47FF8265635803 /* Notifier.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC91ED4A1C511520E9948 /* Notifier.m */; };
 		9BFEC54AB3089FE1D9E0A89D /* NSDate+Comparator.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC949B40E8103F12D61CF /* NSDate+Comparator.m */; };
+		9BFEC8BBFF41E07AAD944A19 /* DispatchUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC4FD03E7187918C49B7D /* DispatchUtils.m */; };
 		9BFEC9B33C9614EE922EC5FE /* FileUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC3123D928C7C591D2677 /* FileUtils.m */; };
 		9BFECA1B566157428BD79808 /* NSDate+Comparator.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC949B40E8103F12D61CF /* NSDate+Comparator.m */; };
+		9BFECA3C6368DD0AA2C46728 /* DispatchUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC4FD03E7187918C49B7D /* DispatchUtils.m */; };
 		9BFECB33EB0C6F13DD54D2F1 /* NSError+Convenience.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFECEF91E11E3EE5D20E5B2 /* NSError+Convenience.m */; };
 		9BFECB6BF077F45D491093F1 /* AuthorizationToken.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC31B61584FD2EAAF5DE6 /* AuthorizationToken.m */; };
 		9BFECBB8768C47FDA5117171 /* NSError+Convenience.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFECEF91E11E3EE5D20E5B2 /* NSError+Convenience.m */; };
 		9BFECC5AE8636FBEF73D85D3 /* AdManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFECE9247474C83FD8C2948 /* AdManager.m */; };
 		9BFECC62159FBEAA1A69F4F9 /* BasePacketTunnelProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFECC3FADE9C8A76A0913DE /* BasePacketTunnelProvider.m */; };
 		9BFECD1880B51B0E2EAEFF1F /* Notifier.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC91ED4A1C511520E9948 /* Notifier.m */; };
-		9BFECE5505C42426FC9627C8 /* UserDefaultsModelProtocol.h in Resources */ = {isa = PBXBuildFile; fileRef = 9BFECC9B2B9F2BFBD4F8A47B /* UserDefaultsModelProtocol.h */; };
+		9BFECE5505C42426FC9627C8 /* UserDefaults.h in Resources */ = {isa = PBXBuildFile; fileRef = 9BFECC9B2B9F2BFBD4F8A47B /* UserDefaults.h */; };
 		9BFECEA225F023F895CC8DA1 /* AuthorizationToken.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC31B61584FD2EAAF5DE6 /* AuthorizationToken.m */; };
-		9BFECF65871BB6B522C33F1E /* UserDefaultsModelProtocol.h in Resources */ = {isa = PBXBuildFile; fileRef = 9BFECC9B2B9F2BFBD4F8A47B /* UserDefaultsModelProtocol.h */; };
+		9BFECF65871BB6B522C33F1E /* UserDefaults.h in Resources */ = {isa = PBXBuildFile; fileRef = 9BFECC9B2B9F2BFBD4F8A47B /* UserDefaults.h */; };
 		9BFECF8895D5FE1940A6F700 /* PsiphonConfigUserDefaults.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC584519C408D9D6D3FF1 /* PsiphonConfigUserDefaults.m */; };
 		9BFECFEB3BC9F10542C1A416 /* PsiphonConfigUserDefaults.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC584519C408D9D6D3FF1 /* PsiphonConfigUserDefaults.m */; };
 		9BFECFF6D50B52E15AE019C6 /* RACSignal+Operations2.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFECAAC102D23A2D39CBBE1 /* RACSignal+Operations2.m */; };
@@ -205,11 +207,13 @@
 		9BFEC0419AD3808370915E01 /* PsiphonConfigUserDefaults.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PsiphonConfigUserDefaults.h; sourceTree = "<group>"; };
 		9BFEC04426D8558CB89D3798 /* VPNManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VPNManager.m; sourceTree = "<group>"; };
 		9BFEC089261DAF8C18FB51C6 /* FileUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FileUtils.h; sourceTree = "<group>"; };
+		9BFEC199CC1A07833B948031 /* DispatchUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DispatchUtils.h; sourceTree = "<group>"; };
 		9BFEC1C9F506CE1DF07306D2 /* NEBridge.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NEBridge.h; sourceTree = "<group>"; };
 		9BFEC3123D928C7C591D2677 /* FileUtils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FileUtils.m; sourceTree = "<group>"; };
 		9BFEC3165745A5D14C8C3C08 /* Notifier.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Notifier.h; sourceTree = "<group>"; };
 		9BFEC31B61584FD2EAAF5DE6 /* AuthorizationToken.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AuthorizationToken.m; sourceTree = "<group>"; };
 		9BFEC3D27AD09E29BF0DB9AC /* Authorizations.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Authorizations.h; sourceTree = "<group>"; };
+		9BFEC4FD03E7187918C49B7D /* DispatchUtils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DispatchUtils.m; sourceTree = "<group>"; };
 		9BFEC584519C408D9D6D3FF1 /* PsiphonConfigUserDefaults.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PsiphonConfigUserDefaults.m; sourceTree = "<group>"; };
 		9BFEC66B7F0E98CBC5631F06 /* AdManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AdManager.h; sourceTree = "<group>"; };
 		9BFEC673CE5EA236279F07BD /* AuthorizationToken.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AuthorizationToken.h; sourceTree = "<group>"; };
@@ -222,7 +226,7 @@
 		9BFEC949B40E8103F12D61CF /* NSDate+Comparator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSDate+Comparator.m"; sourceTree = "<group>"; };
 		9BFECAAC102D23A2D39CBBE1 /* RACSignal+Operations2.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "RACSignal+Operations2.m"; sourceTree = "<group>"; };
 		9BFECC3FADE9C8A76A0913DE /* BasePacketTunnelProvider.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BasePacketTunnelProvider.m; sourceTree = "<group>"; };
-		9BFECC9B2B9F2BFBD4F8A47B /* UserDefaultsModelProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UserDefaultsModelProtocol.h; sourceTree = "<group>"; };
+		9BFECC9B2B9F2BFBD4F8A47B /* UserDefaults.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UserDefaults.h; sourceTree = "<group>"; };
 		9BFECDCC3659EE393EC4A8F7 /* NSDate+Comparator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSDate+Comparator.h"; sourceTree = "<group>"; };
 		9BFECE9247474C83FD8C2948 /* AdManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AdManager.m; sourceTree = "<group>"; };
 		9BFECEF91E11E3EE5D20E5B2 /* NSError+Convenience.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSError+Convenience.m"; sourceTree = "<group>"; };
@@ -382,13 +386,15 @@
 				EF35E80F1F9FA748003B3102 /* Logging.m */,
 				9BFEC3123D928C7C591D2677 /* FileUtils.m */,
 				9BFEC089261DAF8C18FB51C6 /* FileUtils.h */,
-				9BFECC9B2B9F2BFBD4F8A47B /* UserDefaultsModelProtocol.h */,
+				9BFECC9B2B9F2BFBD4F8A47B /* UserDefaults.h */,
 				9BFEC31B61584FD2EAAF5DE6 /* AuthorizationToken.m */,
 				9BFEC673CE5EA236279F07BD /* AuthorizationToken.h */,
 				9BFECEF91E11E3EE5D20E5B2 /* NSError+Convenience.m */,
 				9BFEC8BB2716DBBAB4DEC637 /* NSError+Convenience.h */,
 				9BFEC949B40E8103F12D61CF /* NSDate+Comparator.m */,
 				9BFECDCC3659EE393EC4A8F7 /* NSDate+Comparator.h */,
+				9BFEC4FD03E7187918C49B7D /* DispatchUtils.m */,
+				9BFEC199CC1A07833B948031 /* DispatchUtils.h */,
 			);
 			path = Shared;
 			sourceTree = "<group>";
@@ -746,7 +752,7 @@
 				EF743FCA1F99549000AC89A2 /* productIDs.plist in Resources */,
 				44A0CAF21FE04A4500859DB3 /* AppleIncRootCertificate.cer in Resources */,
 				963708A91F65D4810038894E /* Bourbon-Oblique.otf in Resources */,
-				9BFECE5505C42426FC9627C8 /* UserDefaultsModelProtocol.h in Resources */,
+				9BFECE5505C42426FC9627C8 /* UserDefaults.h in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -760,7 +766,7 @@
 				6615A5EB1F58A95B00026C98 /* Localizable.strings in Resources */,
 				EF6C1F531F59E46500709554 /* embedded_server_entries in Resources */,
 				EF743FCB1F99549000AC89A2 /* productIDs.plist in Resources */,
-				9BFECF65871BB6B522C33F1E /* UserDefaultsModelProtocol.h in Resources */,
+				9BFECF65871BB6B522C33F1E /* UserDefaults.h in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -937,6 +943,7 @@
 				9BFECB6BF077F45D491093F1 /* AuthorizationToken.m in Sources */,
 				9BFECB33EB0C6F13DD54D2F1 /* NSError+Convenience.m in Sources */,
 				9BFECA1B566157428BD79808 /* NSDate+Comparator.m in Sources */,
+				9BFEC8BBFF41E07AAD944A19 /* DispatchUtils.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -962,6 +969,7 @@
 				9BFECEA225F023F895CC8DA1 /* AuthorizationToken.m in Sources */,
 				9BFECBB8768C47FDA5117171 /* NSError+Convenience.m in Sources */,
 				9BFEC54AB3089FE1D9E0A89D /* NSDate+Comparator.m in Sources */,
+				9BFECA3C6368DD0AA2C46728 /* DispatchUtils.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

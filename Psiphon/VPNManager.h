@@ -24,15 +24,15 @@
  * Notification with this name might be posted many times,
  * without an actual change to the VPN status.
  */
-#define kVPNStatusChangeNotificationName @"VPNStatusChange"
+FOUNDATION_EXPORT NSNotificationName const VPNManagerStatusDidChangeNotification;
 
 /**
  * NSNotification name for VPN start failures.
  */
-#define kVPNStartFailure @"VPNStartFailure"
+FOUNDATION_EXPORT NSNotificationName const VPNManagerVPNStartDidFailNotification;
 
 
-static NSString *_Nonnull const VPNManagerErrorDomain = @"VPNManagerErrorDomain";
+FOUNDATION_EXPORT NSErrorDomain const VPNManagerErrorDomain;
 
 /**
  * @typedef VPNManagerErrorCode
@@ -51,7 +51,7 @@ typedef NS_ERROR_ENUM(VPNManagerErrorDomain, VPNManagerStartErrorCode) {
 
 #define VPNQueryErrorUserInfoQueryKey @"query"
 
-static NSString *_Nonnull const VPNQueryErrorDomain = @"VPNQueryErrorDomain";
+FOUNDATION_EXPORT NSErrorDomain const VPNQueryErrorDomain;
 
 /**
  * @typedef VPNQueryErrorCode
@@ -147,7 +147,6 @@ typedef NS_ENUM(NSInteger, VPNStatus) {
 
 /**
  * Updates and saves VPN configuration Connect On Demand.
- * This method also updates the NSUserDefaults with key kVpnOnDemand.
  * @param onDemandEnabled Toggle VPN configuration Connect On Demand capability.
  * @param completionHandler Block called after operation completes. error is set to nil if operation finished successfully.
  */

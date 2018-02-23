@@ -21,16 +21,14 @@
 #import "RMAppReceipt.h"
 #import "SharedConstants.h"
 #import "NSDate+Comparator.h"
+#import "DispatchUtils.h"
 
-
-NSString *const kIAPSKProductsRequestDidReceiveResponse = @"kIAPSKProductsRequestDidReceiveResponse";
-NSString *const kIAPSKProductsRequestDidFailWithError = @"kIAPSKProductsRequestDidFailWithError";
-NSString *const kIAPSKRequestRequestDidFinish = @"kIAPSKRequestRequestDidFinish";
-NSString *const kIAPHelperUpdatedSubscriptionDictionary = @"kIAPHelperUpdatedSubscriptionDictionary";
+NSNotificationName const IAPSKProductsRequestDidReceiveResponseNotification = @"IAPSKProductsRequestDidReceiveResponseNotification";
+NSNotificationName const IAPSKProductsRequestDidFailWithErrorNotification = @"IAPSKProductsRequestDidFailWithErrorNotification";
+NSNotificationName const IAPSKRequestRequestDidFinishNotification = @"IAPSKRequestRequestDidFinishNotification";
+NSNotificationName const IAPHelperUpdatedSubscriptionDictionaryNotification = @"IAPHelperUpdatedSubscriptionDictionaryNotification";
 
 NSString *const kSubscriptionDictionary = @"kSubscriptionDictionary";
-
-
 
 @interface IAPStoreHelper()<SKPaymentTransactionObserver,SKProductsRequestDelegate>
 - (void) updateSubscriptionDictionaryFromLocalReceipt;
@@ -63,7 +61,7 @@ NSString *const kSubscriptionDictionary = @"kSubscriptionDictionary";
     [[SKPaymentQueue defaultQueue]restoreCompletedTransactions];
 }
 
-- (void) updateSubscriptionDictionaryFromLocalReceipt {
+- (void)updateSubscriptionDictionaryFromLocalReceipt {
 
     NSDictionary *subscriptionDict = [[self class] subscriptionDictionary];
     
@@ -83,7 +81,7 @@ NSString *const kSubscriptionDictionary = @"kSubscriptionDictionary";
     }
 
     [[self class] storeSubscriptionDictionary:subscriptionDict];
-    [[NSNotificationCenter defaultCenter] postNotificationName:kIAPHelperUpdatedSubscriptionDictionary object:nil];
+    [[NSNotificationCenter defaultCenter] postNotificationName:IAPHelperUpdatedSubscriptionDictionaryNotification object:nil];
 }
 
 - (void)paymentQueue:(SKPaymentQueue *)queue restoreCompletedTransactionsFailedWithError:(NSError *)error {
@@ -140,18 +138,18 @@ NSString *const kSubscriptionDictionary = @"kSubscriptionDictionary";
     NSMutableArray *sortArray = [[NSMutableArray alloc] initWithArray:response.products];
     [sortArray sortUsingDescriptors:[NSArray arrayWithObject:mySortDescriptor]];
     self.storeProducts = sortArray;
-    [[NSNotificationCenter defaultCenter]postNotificationName:kIAPSKProductsRequestDidReceiveResponse object:nil];
+    [[NSNotificationCenter defaultCenter]postNotificationName:IAPSKProductsRequestDidReceiveResponseNotification object:nil];
 }
 
 - (void)request:(SKRequest *)request didFailWithError:(NSError *)error {
-    [[NSNotificationCenter defaultCenter]postNotificationName:kIAPSKProductsRequestDidFailWithError object:nil];
+    [[NSNotificationCenter defaultCenter]postNotificationName:IAPSKProductsRequestDidFailWithErrorNotification object:nil];
 }
 
 - (void)requestDidFinish:(SKRequest *)request {
     if ([request isKindOfClass:[SKReceiptRefreshRequest class]]) {
         [self updateSubscriptionDictionaryFromLocalReceipt];
     } else {
-        [[NSNotificationCenter defaultCenter]postNotificationName:kIAPSKRequestRequestDidFinish object:nil];
+        [[NSNotificationCenter defaultCenter]postNotificationName:IAPSKRequestRequestDidFinishNotification object:nil];
     }
 }
 
@@ -183,7 +181,7 @@ NSString *const kSubscriptionDictionary = @"kSubscriptionDictionary";
     }
 
     // If user has an active subscription for date - NO
-    if ([[self class] hasActiveSubscriptionForDate:[NSDate date] inDict:subscriptionDict]) {
+    if ([[self class] hasActiveSubscriptionForDate:[NSDate date] inDict:subscriptionDict getExpiryDate:nil]) {
         return NO;
     }
 
@@ -200,12 +198,29 @@ NSString *const kSubscriptionDictionary = @"kSubscriptionDictionary";
     [userDefaults synchronize];
 }
 
-+ (BOOL)hasActiveSubscriptionForDate:(NSDate*)date {
-    NSDictionary* dict = [[self class] subscriptionDictionary];
-    return [[self class] hasActiveSubscriptionForDate:date inDict:dict];
++ (void)hasActiveSubscriptionForNowOnBlock:(void (^)(BOOL isActive))block {
+    dispatch_async_global(^{
+        BOOL isActive = [[self class] hasActiveSubscriptionForNow];
+        dispatch_async_main(^{
+            block(isActive);
+        });
+    });
 }
 
-+ (BOOL)hasActiveSubscriptionForDate:(NSDate*)date inDict:(NSDictionary*)subscriptionDict {
++ (BOOL)hasActiveSubscriptionForNow {
+    return [[self class] hasActiveSubscriptionForDate:[NSDate date]];
+}
+
++ (BOOL)hasActiveSubscriptionForDate:(NSDate*)date {
+    return [[self class] hasActiveSubscriptionForDate:date getExpiryDate:nil];
+}
+
++ (BOOL)hasActiveSubscriptionForDate:(NSDate *)date getExpiryDate:(NSDate **)expiryDate {
+    NSDictionary* dict = [[self class] subscriptionDictionary];
+    return [[self class] hasActiveSubscriptionForDate:date inDict:dict getExpiryDate:expiryDate];
+}
+
++ (BOOL)hasActiveSubscriptionForDate:(NSDate*)date inDict:(NSDictionary*)subscriptionDict getExpiryDate:(NSDate **)expiryDate{
 
     if(!subscriptionDict) {
         return NO;
@@ -214,6 +229,11 @@ NSString *const kSubscriptionDictionary = @"kSubscriptionDictionary";
     NSDate *latestExpirationDate = subscriptionDict[kLatestExpirationDate];
 
     if(latestExpirationDate && [date beforeOrEqualTo:latestExpirationDate]) {
+
+        if (expiryDate) {
+            (*expiryDate) = [latestExpirationDate copy];
+        }
+
         return YES;
     }
     return NO;
