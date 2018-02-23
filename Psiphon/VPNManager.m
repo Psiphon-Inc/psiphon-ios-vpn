@@ -68,7 +68,14 @@ NSErrorDomain const VPNQueryErrorDomain = @"VPNQueryErrorDomain";
         [NETunnelProviderManager loadAllFromPreferencesWithCompletionHandler:
           ^(NSArray<NETunnelProviderManager *> *managers, NSError *error) {
               if ([managers count] == 1) {
-                  self.providerManager = managers[0];
+                  _providerManager = managers[0];
+
+                  // If Connect On Demand was changed through system settings
+                  // update user's preferred Connect On Demand state.
+                  [[NSUserDefaults standardUserDefaults]
+                    setBool:_providerManager.isOnDemandEnabled forKey:SettingsConnectOnDemandBoolKey];
+
+
               } else if ([managers count] > 1) {
                   LOG_ERROR(@"more than 1 VPN configuration found");
               }
