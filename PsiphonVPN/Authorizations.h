@@ -18,7 +18,7 @@
  */
 
 #import <Foundation/Foundation.h>
-#import "UserDefaultsModelProtocol.h"
+#import "UserDefaults.h"
 #import "AuthorizationToken.h"
 
 

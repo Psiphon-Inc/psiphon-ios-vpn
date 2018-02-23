@@ -20,13 +20,17 @@
 #import <NetworkExtension/NetworkExtension.h>
 #import "AppDelegate.h"
 #import "VPNManager.h"
-#import "PsiphonDataSharedDB.h"
 #import "NEBridge.h"
 #import "Notifier.h"
 #import "Logging.h"
-#import "PsiphonClientCommonLibraryHelpers.h"
 #import "SharedConstants.h"
 #import "SettingsViewController.h"
+
+NSNotificationName const VPNManagerStatusDidChangeNotification = @"VPNManagerStatusDidChangeNotification";
+NSNotificationName const VPNManagerVPNStartDidFailNotification = @"VPNManagerVPNStartDidFailNotification";
+
+NSErrorDomain const VPNManagerErrorDomain = @"VPNManagerErrorDomain";
+NSErrorDomain const VPNQueryErrorDomain = @"VPNQueryErrorDomain";
 
 @interface VPNManager ()
 
@@ -38,7 +42,6 @@
 
 @implementation VPNManager {
     Notifier *notifier;
-    PsiphonDataSharedDB *sharedDB;
     id localVPNStatusObserver;
 
     // Due to the race condition with loading VPN configurations in the init method, and also
@@ -50,30 +53,36 @@
     self = [super init];
     if (self) {
         notifier = [[Notifier alloc] initWithAppGroupIdentifier:APP_GROUP_IDENTIFIER];
-        sharedDB = [[PsiphonDataSharedDB alloc] initForAppGroupIdentifier:APP_GROUP_IDENTIFIER];
 
         initGroup = dispatch_group_create();
 
         // Increment number of outstanding tasks in the initGroup due to asynchronous initialization.
         dispatch_group_enter(initGroup);
 
+        __weak VPNManager *weakSelf = self;
+
         // Load previously saved (if any) VPN configuration.
         [NETunnelProviderManager loadAllFromPreferencesWithCompletionHandler:
           ^(NSArray<NETunnelProviderManager *> *managers, NSError *error) {
               if ([managers count] == 1) {
-                  self.providerManager = managers[0];
+
+                  // References to `self` should be used with care in the init function.
+                  weakSelf.providerManager = managers[0];
+
+                  // If Connect On Demand setting was changed since the last time the app was opened,
+                  // reset user's preference to the same state as the VPN Configuration.
+                  [[NSUserDefaults standardUserDefaults]
+                    setBool:weakSelf.providerManager.isOnDemandEnabled forKey:SettingsConnectOnDemandBoolKey];
+
+
               } else if ([managers count] > 1) {
                   LOG_ERROR(@"more than 1 VPN configuration found");
               }
 
+              [weakSelf vpnStatusDidChangeHandler];
+
               dispatch_group_leave(initGroup);
           }];
-
-        // Listen for applicationDidBecomeActive event.
-        [[NSNotificationCenter defaultCenter] addObserver:self
-                                                 selector:@selector(applicationDidBecomeActiveHandler)
-                                                     name:UIApplicationDidBecomeActiveNotification
-                                                   object:nil];
 
     }
     return self;
@@ -143,6 +152,9 @@
     }
     tunnelStarting = TRUE;
 
+    // Set startStopButtonPressed flag to TRUE
+    [self setStartStopButtonPressed:TRUE];
+
     // Waits until initGroup has no remaining outstanding tasks.
     dispatch_group_notify(initGroup, dispatch_get_main_queue(), ^{
         LOG_DEBUG(@"dispatch block starting");
@@ -151,9 +163,6 @@
 
         // Reset restartRequired flag
         self.restartRequired = FALSE;
-
-        // Set startStopButtonPressed flag to TRUE
-        [self setStartStopButtonPressed:TRUE];
 
         [NETunnelProviderManager loadAllFromPreferencesWithCompletionHandler:
           ^(NSArray<NETunnelProviderManager *> * _Nullable allManagers, NSError * _Nullable error) {
@@ -208,11 +217,6 @@
                   NEOnDemandRule *connectRule = [NEOnDemandRuleConnect new];
                   [__providerManager setOnDemandRules:@[connectRule]];
               }
-              
-              // Double-checks "Connect On Demand" enabled state of the VPN configuration,
-              // so that it matches user's preferences.
-              BOOL connectOnDemand = [[NSUserDefaults standardUserDefaults] boolForKey:kVpnOnDemand];
-              [__providerManager setOnDemandEnabled:connectOnDemand];
 
               [__providerManager saveToPreferencesWithCompletionHandler:^(NSError * _Nullable error) {
                   LOG_DEBUG();
@@ -275,7 +279,7 @@
     dispatch_group_notify(initGroup, dispatch_get_main_queue(), ^{
         NEVPNStatus s = self.providerManager.connection.status;
         if (s == NEVPNStatusConnecting) {
-            [notifier post:@"M.startVPN"];
+            [notifier post:NOTIFIER_START_VPN];
         } else {
             LOG_WARN(@"Network extension is not in connecting state.");
         }
@@ -313,7 +317,6 @@
 }
 
 - (void)updateVPNConfigurationOnDemandSetting:(BOOL)onDemandEnabled completionHandler:(void (^)(NSError * _Nullable error))completionHandler {
-    [[NSUserDefaults standardUserDefaults] setBool:onDemandEnabled forKey:kVpnOnDemand];
 
     // Make sure configuration is not stale by loading again.
     [self.providerManager loadFromPreferencesWithCompletionHandler:^(NSError *error) {
@@ -322,7 +325,7 @@
         if (onDemandEnabled) {
             // Auto-start VPN on demand has been turned on by the user.
             // To avoid unexpected conflict with other VPN configurations,
-            // re-enable this VPN configuration.
+            // re-enable Psiphon's VPN configuration.
             [self.providerManager setEnabled:TRUE];
         }
         // Save the updated configuration.
@@ -332,19 +335,6 @@
             }
             completionHandler(error);
         }];
-
-    }];
-}
-
-- (void)queryNEForCurrentSponsorId:(void (^_Nonnull)(NSString * _Nonnull currentSponsorId))completionHandler {
-    [self queryExtension:EXTENSION_QUERY_GET_SPONSOR_ID completionHandler:^(NSError *error, NSString *response) {
-
-        if (error) {
-            LOG_ERROR(@"failed extension query (%@)", error);
-            completionHandler(@"");
-        } else {
-            completionHandler(response);
-        }
 
     }];
 }
@@ -439,7 +429,7 @@
                       object:_providerManager.connection queue:NSOperationQueue.mainQueue
                   usingBlock:^(NSNotification *_Nonnull note) {
 
-                      // Observers of kVPNStatusChangeNotificationName will be notified at the same time.
+                      // Observers of VPNManagerStatusDidChangeNotification will be notified at the same time.
                       [self postStatusChangeNotification];
 
                       // To restart the VPN, should wait till NEVPNStatusDisconnected is received.
@@ -488,7 +478,7 @@
 }
 
 - (void)postStartFailureNotification:(VPNManagerStartErrorCode) error {
-    [[NSNotificationCenter defaultCenter] postNotificationName:kVPNStartFailure object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationName:VPNManagerVPNStartDidFailNotification object:self];
 }
 
 - (void)vpnStatusDidChangeHandler {
@@ -550,11 +540,7 @@
 
 - (void)postStatusChangeNotification {
     [[NSNotificationCenter defaultCenter]
-      postNotificationName:kVPNStatusChangeNotificationName object:self];
-}
-
-- (void)applicationDidBecomeActiveHandler {
-    [self vpnStatusDidChangeHandler];
+      postNotificationName:VPNManagerStatusDidChangeNotification object:self];
 }
 
 - (void)dealloc {
