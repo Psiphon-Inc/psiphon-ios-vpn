@@ -285,7 +285,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 
 - (void)onVPNStatusDidChange {
     // Update UI
-    VPNStatus s = [vpnManager getVPNStatus];
+    VPNStatus s = [vpnManager VPNStatus];
     [self updateButtonState];
     statusLabel.text = [self getVPNStatusDescription:s];
 
@@ -765,7 +765,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     statusLabel = [[UILabel alloc] init];
     statusLabel.translatesAutoresizingMaskIntoConstraints = NO;
     statusLabel.adjustsFontSizeToFitWidth = YES;
-    statusLabel.text = [self getVPNStatusDescription:[vpnManager getVPNStatus]];
+    statusLabel.text = [self getVPNStatusDescription:[vpnManager VPNStatus]];
     statusLabel.textAlignment = NSTextAlignmentCenter;
     statusLabel.textColor = [UIColor whiteColor];
     [self.view addSubview:statusLabel];
@@ -1174,7 +1174,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 }
 
 - (NSArray<NSString*>*)hiddenSpecifierKeys {
-    VPNStatus status = [vpnManager getVPNStatus];
+    VPNStatus status = [vpnManager VPNStatus];
     if (status == VPNStatusInvalid ||
         status == VPNStatusDisconnected ||
         status == VPNStatusDisconnecting) {

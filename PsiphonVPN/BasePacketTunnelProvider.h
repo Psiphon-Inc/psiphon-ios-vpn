@@ -23,7 +23,7 @@
 @class RACReplaySubject;
 
 // BasePacketTunnelProvider Errors
-FOUNDATION_EXTERN NSString *_Nonnull const BasePsiphonTunnelErrorDomain;
+FOUNDATION_EXTERN NSErrorDomain _Nonnull const BasePsiphonTunnelErrorDomain;
 
 typedef NS_ERROR_ENUM(BasePsiphonTunnelErrorDomain, ABCPsiphonTunnelErrorCode) {
     BasePsiphonTunnelErrorStoppedBeforeConnected = 1000,

@@ -25,7 +25,7 @@
 #import "RACReplaySubject.h"
 #import "NSError+Convenience.h"
 
-NSString *_Nonnull const BasePsiphonTunnelErrorDomain = @"BasePsiphonTunnelErrorDomain";
+NSErrorDomain _Nonnull const BasePsiphonTunnelErrorDomain = @"BasePsiphonTunnelErrorDomain";
 
 @interface BasePacketTunnelProvider ()
 

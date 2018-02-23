@@ -99,7 +99,7 @@ NSErrorDomain const VPNQueryErrorDomain = @"VPNQueryErrorDomain";
     return sharedInstance;
 }
 
-- (VPNStatus)getVPNStatus {
+- (VPNStatus)VPNStatus {
 
     if (!self.providerManager) {
         return VPNStatusInvalid;
@@ -304,12 +304,12 @@ NSErrorDomain const VPNQueryErrorDomain = @"VPNQueryErrorDomain";
 }
 
 - (BOOL)isVPNActive {
-    VPNStatus s = [self getVPNStatus];
+    VPNStatus s = [self VPNStatus];
     return (s == VPNStatusConnecting || s == VPNStatusConnected || s == VPNStatusReasserting || s == VPNStatusRestarting);
 }
 
 - (BOOL)isVPNConnected {
-    return VPNStatusConnected == [self getVPNStatus];
+    return VPNStatusConnected == [self VPNStatus];
 }
 
 - (BOOL)isOnDemandEnabled {
