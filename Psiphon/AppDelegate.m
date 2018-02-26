@@ -291,16 +291,20 @@ NSNotificationName const AppDelegateSubscriptionDidActivateNotification = @"AppD
         LOG_DEBUG(@"Received notification NE.newHomepages");
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
             if (!shownHomepage) {
-                NSArray<Homepage *> *homepages = [sharedDB getHomepages];
-                if (homepages && [homepages count] > 0) {
-                    NSUInteger randIndex = arc4random() % [homepages count];
-                    Homepage *homepage = homepages[randIndex];
-                    dispatch_async(dispatch_get_main_queue(), ^{
-                        [[UIApplication sharedApplication] openURL:homepage.url options:@{}
-                                                 completionHandler:^(BOOL success) {
-                                                     shownHomepage = success;
-                                                 }];
-                    });
+                // Only opens landing page if the VPN is active.
+                // Landing page should not be opened outside of the tunnel.
+                if ([vpnManager isVPNActive]) {
+                    NSArray<Homepage *> *homepages = [sharedDB getHomepages];
+                    if (homepages && [homepages count] > 0) {
+                        NSUInteger randIndex = arc4random() % [homepages count];
+                        Homepage *homepage = homepages[randIndex];
+                        dispatch_async(dispatch_get_main_queue(), ^{
+                            [[UIApplication sharedApplication] openURL:homepage.url options:@{}
+                                                     completionHandler:^(BOOL success) {
+                                                         shownHomepage = success;
+                                                     }];
+                        });
+                    }
                 }
             }
         });
