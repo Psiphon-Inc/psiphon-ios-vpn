@@ -22,7 +22,12 @@
 #import "NSDateFormatter+RFC3339.h"
 #import "Logging.h"
 
+#if DEBUG
+#define MAX_NOTICE_FILE_SIZE_BYTES 164000
+#else
 #define MAX_NOTICE_FILE_SIZE_BYTES 64000
+#endif
+
 #define NOTICE_FILENAME_EXTENSION "extension_notices"
 #define NOTICE_FILENAME_CONTAINER "container_notices"
 
