@@ -21,10 +21,17 @@
 #import <UIKit/UIKit.h>
 #import <StoreKit/StoreKit.h>
 
+
+NS_ASSUME_NONNULL_BEGIN
+
 FOUNDATION_EXPORT NSNotificationName const IAPSKProductsRequestDidReceiveResponseNotification;
 FOUNDATION_EXPORT NSNotificationName const IAPSKProductsRequestDidFailWithErrorNotification;
 FOUNDATION_EXPORT NSNotificationName const IAPSKRequestRequestDidFinishNotification;
 FOUNDATION_EXPORT NSNotificationName const IAPHelperUpdatedSubscriptionDictionaryNotification;
+
+/* Subscription purchase state notification */
+FOUNDATION_EXPORT NSNotificationName const IAPHelperPaymentTransactionUpdateNotification;
+FOUNDATION_EXPORT NSString * const IAPHelperPaymentTransactionUpdateKey;
 
 @interface IAPStoreHelper : NSObject
 
@@ -70,8 +77,10 @@ FOUNDATION_EXPORT NSNotificationName const IAPHelperUpdatedSubscriptionDictionar
  * @param expiryDate If not nil, and the return value is TRUE, it will point to NSDate with expiration time.
  * @return TRUE if subscription is active, FALSE otherwise.
  */
-+ (BOOL)hasActiveSubscriptionForDate:(NSDate *)date getExpiryDate:(NSDate **)expiryDate;
++ (BOOL)hasActiveSubscriptionForDate:(NSDate *)date getExpiryDate:(NSDate *_Nullable *_Nullable)expiryDate;
 
 + (BOOL)shouldUpdateSubscriptionDictionary:(NSDictionary*)subscriptionDict;
 
 @end
+
+NS_ASSUME_NONNULL_END
