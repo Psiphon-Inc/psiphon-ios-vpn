@@ -134,6 +134,30 @@ NSErrorDomain _Nonnull const ReceiptValidationErrorDomain = @"PsiphonReceiptVali
     NSMutableDictionary *dictionaryRepresentation;
 }
 
++ (RACSignal<NSNumber *> *_Nonnull)localSubscriptionCheck {
+    return [RACSignal createSignal:^RACDisposable *(id <RACSubscriber> subscriber) {
+        Subscription *subscription = [Subscription fromPersistedDefaults];
+        if ([subscription shouldUpdateSubscriptionToken]) {
+            // subscription server needs to be contacted.
+            [subscriber sendNext:@(SubscriptionCheckShouldUpdateToken)];
+            [subscriber sendCompleted];
+        } else {
+            // subscription server doesn't need to be contacted.
+            // Checks if subscription is active compared to device's clock.
+            if ([subscription hasActiveSubscriptionTokenForDate:[NSDate date]]) {
+                [subscriber sendNext:@(SubscriptionCheckHasActiveToken)];
+                [subscriber sendCompleted];
+            } else {
+                // Send error, subscription has expired.
+                [subscriber sendNext:@(SubscriptionCheckTokenExpired)];
+                [subscriber sendCompleted];
+            }
+        }
+
+        return nil;
+    }];
+}
+
 + (Subscription *_Nonnull)fromPersistedDefaults {
     Subscription *instance = [[Subscription alloc] init];
     NSDictionary *persistedDic = [[NSUserDefaults standardUserDefaults] dictionaryForKey:kSubscriptionDictionary];
@@ -173,6 +197,10 @@ NSErrorDomain _Nonnull const ReceiptValidationErrorDomain = @"PsiphonReceiptVali
 
 - (void)setAuthorizationToken:(AuthorizationToken *)authorizationToken {
     self->dictionaryRepresentation[kSubscriptionAuthorizationToken] = authorizationToken.base64Representation;
+}
+
+- (BOOL)hasActiveSubscriptionForNow {
+    return [self hasActiveSubscriptionTokenForDate:[NSDate date]];
 }
 
 - (BOOL)hasActiveSubscriptionTokenForDate:(NSDate *)date {
@@ -264,24 +292,108 @@ NSErrorDomain _Nonnull const ReceiptValidationErrorDomain = @"PsiphonReceiptVali
 
 #pragma mark - Subscription Result Model
 
-NSString *_Nonnull const SubscriptionResultErrorDomain = @"SubscriptionResultErrorDomain";
+NSErrorDomain _Nonnull const SubscriptionResultErrorDomain = @"SubscriptionResultErrorDomain";
+
+@interface SubscriptionResultModel ()
+
+@property (nonatomic, readwrite, assign) BOOL inProgress;
+
+/** Error with domain SubscriptionResultErrorDomain */
+@property (nonatomic, readwrite, nullable) NSError *error;
+
+@property (nonatomic, readwrite, nullable) NSDictionary *remoteAuthDict;
+
+@property (nonatomic, readwrite, nullable) NSNumber *submittedReceiptFileSize;
+
+@end
 
 @implementation SubscriptionResultModel
 
-+ (SubscriptionResultModel *)failed:(SubscriptionResultErrorCode)errorCode {
++ (SubscriptionResultModel *_Nonnull)inProgress {
     SubscriptionResultModel *instance = [[SubscriptionResultModel alloc] init];
-    instance.error = [NSError errorWithDomain:SubscriptionResultErrorDomain code:errorCode];
+    instance.inProgress = TRUE;
+    instance.error = nil;
     instance.remoteAuthDict = nil;
+    instance.submittedReceiptFileSize = nil;
     return instance;
 }
 
-+ (SubscriptionResultModel *)success:(NSDictionary *_Nonnull)remoteAuthDict receiptFilSize:(NSNumber *)receiptFileSize {
++ (SubscriptionResultModel *)failed:(SubscriptionResultErrorCode)errorCode {
     SubscriptionResultModel *instance = [[SubscriptionResultModel alloc] init];
+    instance.inProgress = FALSE;
+    instance.error = [NSError errorWithDomain:SubscriptionResultErrorDomain code:errorCode];
+    instance.remoteAuthDict = nil;
+    instance.submittedReceiptFileSize = nil;
+    return instance;
+}
+
++ (SubscriptionResultModel *)success:(NSDictionary *_Nullable)remoteAuthDict receiptFilSize:(NSNumber *_Nullable)receiptFileSize {
+    SubscriptionResultModel *instance = [[SubscriptionResultModel alloc] init];
+    instance.inProgress = FALSE;
     instance.error = nil;
     instance.remoteAuthDict = remoteAuthDict;
     instance.submittedReceiptFileSize = receiptFileSize;
     return instance;
 }
 
+@end
+
+#pragma mark - Subscription state
+
+typedef NS_ENUM(NSInteger, SubscriptionStateEnum) {
+    SubscriptionStateNotSubscribed = 1,
+    SubscriptionStateInProgress = 2,
+    SubscriptionStateSubscribed = 3,
+};
+
+@interface SubscriptionState ()
+
+@property (atomic, readwrite) SubscriptionStateEnum state;
+
+@end
+
+@implementation SubscriptionState
+
++ (SubscriptionState *_Nonnull)initialStateFromSubscription:(Subscription *)subscription {
+    SubscriptionState *instance = [[SubscriptionState alloc] init];
+    instance.state = SubscriptionStateNotSubscribed;
+
+    if ([subscription hasActiveSubscriptionTokenForDate:[NSDate date]]) {
+        instance.state = SubscriptionStateSubscribed;
+    } else if ([subscription shouldUpdateSubscriptionToken]) {
+        instance.state = SubscriptionStateInProgress;
+    }
+
+    return instance;
+}
+
+- (BOOL)isSubscribedOrInProgress {
+    return self.state != SubscriptionStateNotSubscribed;
+}
+
+- (BOOL)isInProgress {
+   return self.state == SubscriptionStateInProgress;
+}
+
+- (void)setStateSubscribed {
+    self.state = SubscriptionStateSubscribed;
+}
+
+- (void)setStateInProgress {
+    self.state = SubscriptionStateInProgress;
+}
+
+- (void)setStateNotSubscribed {
+    self.state = SubscriptionStateNotSubscribed;
+}
+
+- (NSString *_Nonnull)textDescription {
+    switch (self.state) {
+        case SubscriptionStateNotSubscribed: return @"subscription not subscribed";
+        case SubscriptionStateInProgress: return @"subscription in progress";
+        case SubscriptionStateSubscribed: return @"subscription subscribed";
+    }
+    return @"";
+}
 
 @end

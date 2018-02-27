@@ -22,6 +22,8 @@
 #import "RACSignal.h"
 #import "RACSubscriber.h"
 
+NS_ASSUME_NONNULL_BEGIN
+
 typedef void(^SubscriptionVerifierCompletionHandler)(NSDictionary *_Nullable dictionary, NSNumber *_Nonnull submittedReceiptFileSize, NSError *_Nullable error);
 #define kReceiptRequestTimeOutSeconds       60.0
 #define kRemoteVerificationURL              @"https://subscription.psiphon3.com/appstore"
@@ -32,7 +34,7 @@ typedef void(^SubscriptionVerifierCompletionHandler)(NSDictionary *_Nullable dic
 #define kRemoteSubscriptionVerifierPendingRenewalInfo                 @"pending_renewal_info"
 #define kRemoteSubscriptionVerifierPendingRenewalInfoAutoRenewStatus  @"auto_renew_status"
 
-FOUNDATION_EXPORT NSErrorDomain _Nonnull const ReceiptValidationErrorDomain;
+FOUNDATION_EXPORT NSErrorDomain const ReceiptValidationErrorDomain;
 
 typedef NS_ERROR_ENUM(ReceiptValidationErrorDomain, PsiphonReceiptValidationErrorCode) {
     PsiphonReceiptValidationErrorNSURLSessionFailed,
@@ -44,10 +46,16 @@ typedef NS_ERROR_ENUM(ReceiptValidationErrorDomain, PsiphonReceiptValidationErro
 
 @interface SubscriptionVerifierService : NSObject
 
-+ (RACSignal<NSDictionary *> *_Nonnull)updateSubscriptionAuthorizationTokenFromRemote;
++ (RACSignal<NSDictionary *> *)updateSubscriptionAuthorizationTokenFromRemote;
 
 @end
 
+
+typedef NS_ENUM(NSInteger, SubscriptionCheckEnum) {
+    SubscriptionCheckShouldUpdateToken,
+    SubscriptionCheckHasActiveToken,
+    SubscriptionCheckTokenExpired,
+};
 
 @interface Subscription : NSObject <UserDefaultsModelProtocol>
 
@@ -63,12 +71,21 @@ typedef NS_ERROR_ENUM(ReceiptValidationErrorDomain, PsiphonReceiptValidationErro
 @property (nonatomic, nullable, readwrite) AuthorizationToken * authorizationToken;
 
 /**
+ * Create a signal that returns an item of type SubscriptionCheckEnum.
+ * The value returned only reflects subscription information available locally, and should be combined
+ * with other sources of information regarding subscription token validity to determine if the token is valid,
+ * or whether the subscription verifier server needs to contacted.
+ * @return Returns a signal that emits one of SubscriptionCheckEnum enums and then completes immediately.
+ */
++ (RACSignal<NSNumber *> *)localSubscriptionCheck;
+
+/**
  * Reads NSUserDefaults and wraps the result in an Authorizations instance.
  * The underlying dictionary can only be manipulated by changing the properties of this instance.
  * @attention -persistChanges should be called to persist any changes made to the returned instance to disk.
  * @return An instance of Authorizations class.
  */
-+ (Subscription *_Nonnull)fromPersistedDefaults;
++ (Subscription *)fromPersistedDefaults;
 
 /**
  * @return TRUE if underlying dictionary is empty.
@@ -83,11 +100,17 @@ typedef NS_ERROR_ENUM(ReceiptValidationErrorDomain, PsiphonReceiptValidationErro
 - (BOOL)persistChanges;
 
 /**
+ * Checks whether there is active subscription against current time.
+ * @return TRUE if subscription is active, FALSE otherwise.
+ */
+- (BOOL)hasActiveSubscriptionForNow;
+
+/**
  * Returns TRUE if authorization token is active compared to provided date.
  * @param date Date to compare the authorization token expiration to.
  * @return TRUE if subscription is active, FALSE otherwise.
  */
-- (BOOL)hasActiveSubscriptionTokenForDate:(NSDate *_Nonnull)date;
+- (BOOL)hasActiveSubscriptionTokenForDate:(NSDate *)date;
 
 /**
  * Returns TRUE if Subscription info is missing, the App Store receipt has changed, or we expect
@@ -110,7 +133,7 @@ typedef NS_ERROR_ENUM(ReceiptValidationErrorDomain, PsiphonReceiptValidationErro
 
 #pragma mark - Subscription Result Model
 
-FOUNDATION_EXTERN NSErrorDomain _Nonnull const SubscriptionResultErrorDomain;
+FOUNDATION_EXTERN NSErrorDomain const SubscriptionResultErrorDomain;
 
 typedef NS_ERROR_ENUM(SubscriptionResultErrorDomain, SubscriptionResultErrorCode) {
     SubscriptionResultErrorExpired = 100,
@@ -119,15 +142,44 @@ typedef NS_ERROR_ENUM(SubscriptionResultErrorDomain, SubscriptionResultErrorCode
 
 @interface SubscriptionResultModel : NSObject
 
+@property (nonatomic, readonly, assign) BOOL inProgress;
+
 /** Error with domain SubscriptionResultErrorDomain */
-@property (nonatomic, nullable) NSError *error;
+@property (nonatomic, readonly, nullable) NSError *error;
 
-@property (nonatomic, nullable) NSDictionary *remoteAuthDict;
+@property (nonatomic, readonly, nullable) NSDictionary *remoteAuthDict;
 
-@property (nonatomic, nullable) NSNumber *submittedReceiptFileSize;
+@property (nonatomic, readonly, nullable) NSNumber *submittedReceiptFileSize;
 
-+ (SubscriptionResultModel *_Nonnull)failed:(SubscriptionResultErrorCode)errorCode;
++ (SubscriptionResultModel *)inProgress;
 
-+ (SubscriptionResultModel *_Nonnull)success:(NSDictionary *_Nonnull)remoteAuthDict receiptFilSize:(NSNumber *_Nonnull)receiptFileSize;
++ (SubscriptionResultModel *)failed:(SubscriptionResultErrorCode)errorCode;
+
++ (SubscriptionResultModel *)success:(NSDictionary *_Nullable)remoteAuthDict receiptFilSize:(NSNumber *_Nullable)receiptFileSize;
 
 @end
+
+# pragma mark - Subscription state
+
+/**
+ * SubscriptionState class is thread-safe.
+ */
+@interface SubscriptionState : NSObject
+
++ (SubscriptionState *)initialStateFromSubscription:(Subscription *)subscription;
+
+- (BOOL)isSubscribedOrInProgress;
+
+- (BOOL)isInProgress;
+
+- (void)setStateSubscribed;
+
+- (void)setStateInProgress;
+
+- (void)setStateNotSubscribed;
+
+- (NSString *)textDescription;
+
+@end
+
+NS_ASSUME_NONNULL_END
