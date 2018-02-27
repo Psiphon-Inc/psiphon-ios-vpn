@@ -28,6 +28,10 @@ NSNotificationName const IAPSKProductsRequestDidFailWithErrorNotification = @"IA
 NSNotificationName const IAPSKRequestRequestDidFinishNotification = @"IAPSKRequestRequestDidFinishNotification";
 NSNotificationName const IAPHelperUpdatedSubscriptionDictionaryNotification = @"IAPHelperUpdatedSubscriptionDictionaryNotification";
 
+/* Subscription purchase state notification */
+NSNotificationName const IAPHelperPaymentTransactionUpdateNotification = @"IAPHelperPaymentTransactionUpdateNotification";
+NSString * const IAPHelperPaymentTransactionUpdateKey = @"IAPHelperPaymentTransactionUpdateKey";
+
 NSString *const kSubscriptionDictionary = @"kSubscriptionDictionary";
 
 @interface IAPStoreHelper()<SKPaymentTransactionObserver,SKProductsRequestDelegate>
@@ -94,6 +98,13 @@ NSString *const kSubscriptionDictionary = @"kSubscriptionDictionary";
 
 - (void)paymentQueue:(SKPaymentQueue *)queue updatedTransactions:(NSArray *)transactions {
     for (SKPaymentTransaction *transaction in transactions) {
+
+        // Sends notification containing updates state of a transaction.
+        [[NSNotificationCenter defaultCenter]
+          postNotificationName:IAPHelperPaymentTransactionUpdateNotification
+                        object:nil
+                      userInfo:@{IAPHelperPaymentTransactionUpdateKey : @(transaction.transactionState)}];
+
         switch (transaction.transactionState) {
                 
             case SKPaymentTransactionStatePurchasing: {
