@@ -43,6 +43,7 @@
 #import "RACTuple.h"
 #import "RACSignal+Operations2.h"
 #import "RACScheduler.h"
+#import "Asserts.h"
 #import <ReactiveObjC/RACSubject.h>
 #import <ReactiveObjC/RACReplaySubject.h>
 
@@ -125,6 +126,13 @@ typedef NS_ENUM(NSInteger, GracePeriodState) {
 }
 
 - (void)forceSubscriptionCheck {
+
+    if (self->tunnelConnectionStateSubject) {
+        PSIAssert(self->subscriptionAuthorizationTokenActiveSubject);
+    } else {
+        PSIAssert(!self->subscriptionAuthorizationTokenActiveSubject);
+    }
+
     // Bootstraps the signals if they were not initialized already (i.e. the tunnel started with
     // the PsiphonSubscriptionStateNotSubscribed state).
     if (!self->tunnelConnectionStateSubject && !self->subscriptionAuthorizationTokenActiveSubject) {
@@ -145,7 +153,7 @@ typedef NS_ENUM(NSInteger, GracePeriodState) {
 // This method shouldn't be called if no subscription check is necessary.
 //
 // While the subscription process is ongoing, the extension's subscriptionCheckState is set to in-progress.
-// Once subscription check is finished, subscriptionCheckState is set to the appropriate state:
+// Once subscription check is finished, subscriptionCheckState is set to the appropriate state.
 //
 - (void)checkSubscription {
 
@@ -156,6 +164,8 @@ typedef NS_ENUM(NSInteger, GracePeriodState) {
 
     void (^handleExpiredSubscription)(void) = ^{
         LOG_DEBUG_NOTICE(@"subscription expired restarting tunnel");
+
+        PSIAssert([weakSelf.subscriptionCheckState isInProgress]);
 
         if (weakSelf.extensionStartMethod == ExtensionStartMethodFromContainer) {
 

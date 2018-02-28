@@ -213,6 +213,7 @@
 		9BFEC3165745A5D14C8C3C08 /* Notifier.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Notifier.h; sourceTree = "<group>"; };
 		9BFEC31B61584FD2EAAF5DE6 /* AuthorizationToken.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AuthorizationToken.m; sourceTree = "<group>"; };
 		9BFEC3D27AD09E29BF0DB9AC /* Authorizations.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Authorizations.h; sourceTree = "<group>"; };
+		9BFEC4D609BFCD0DC812BDB3 /* Asserts.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Asserts.h; sourceTree = "<group>"; };
 		9BFEC4FD03E7187918C49B7D /* DispatchUtils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DispatchUtils.m; sourceTree = "<group>"; };
 		9BFEC584519C408D9D6D3FF1 /* PsiphonConfigUserDefaults.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PsiphonConfigUserDefaults.m; sourceTree = "<group>"; };
 		9BFEC66B7F0E98CBC5631F06 /* AdManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AdManager.h; sourceTree = "<group>"; };
@@ -393,6 +394,7 @@
 				9BFECDCC3659EE393EC4A8F7 /* NSDate+Comparator.h */,
 				9BFEC4FD03E7187918C49B7D /* DispatchUtils.m */,
 				9BFEC199CC1A07833B948031 /* DispatchUtils.h */,
+				9BFEC4D609BFCD0DC812BDB3 /* Asserts.h */,
 			);
 			path = Shared;
 			sourceTree = "<group>";
