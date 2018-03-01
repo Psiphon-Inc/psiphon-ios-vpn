@@ -19,7 +19,6 @@
 
 #import <Foundation/Foundation.h>
 #import "Subscription.h"
-#import "SubscriptionReceiptInputStream.h"
 #import "Logging.h"
 #import "NSDate+Comparator.h"
 #import "NSError+Convenience.h"
@@ -64,9 +63,9 @@ NSErrorDomain _Nonnull const ReceiptValidationErrorDomain = @"PsiphonReceiptVali
     NSNumber *appReceiptFileSize;
     [[NSBundle mainBundle].appStoreReceiptURL getResourceValue:&appReceiptFileSize forKey:NSURLFileSizeKey error:nil];
 
-    [request setHTTPBodyStream:[[SubscriptionReceiptInputStream alloc] initWithURL:[NSBundle mainBundle].appStoreReceiptURL]];
+    [request setHTTPBodyStream:[NSInputStream inputStreamWithURL:NSBundle.mainBundle.appStoreReceiptURL]];
     [request setHTTPMethod:@"POST"];
-    [request setValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
+    [request setValue:@"application/octet-stream" forHTTPHeaderField:@"Content-Type"];
 
     NSURLSessionConfiguration *sessionConfig = [NSURLSessionConfiguration ephemeralSessionConfiguration];
     sessionConfig.timeoutIntervalForRequest = kReceiptRequestTimeOutSeconds;
