@@ -40,9 +40,9 @@
 #import "IAPStoreHelper.h"
 #import "LaunchScreenViewController.h"
 #import "UIAlertController+Delegate.h"
-#import "NoticeLogger.h"
 #import "NEBridge.h"
 #import "DispatchUtils.h"
+#import "PsiFeedbackLogger.h"
 
 static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSString *b) {
     return (([a length] == 0) && ([b length] == 0)) || ([a isEqualToString:b]);
@@ -425,7 +425,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
         case VPNStatusReasserting: return NSLocalizedStringWithDefaultValue(@"VPN_STATUS_RECONNECTING", nil, [NSBundle mainBundle], @"Reconnecting", @"Status when the VPN was connected to a Psiphon server, got disconnected unexpectedly, and is currently trying to reconnect");
         case VPNStatusRestarting: return NSLocalizedStringWithDefaultValue(@"VPN_STATUS_RESTARTING", nil, [NSBundle mainBundle], @"Restarting", @"Status when the VPN is restarting.");
     }
-    LOG_ERROR(@"MainViewController unhandled VPNStatus (%ld)", status);
+    [PsiFeedbackLogger error:@"MainViewController unhandled VPNStatus (%ld)", status];
     return nil;
 }
 
@@ -1001,7 +1001,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 #pragma mark - TunneledAppDelegate methods
 
 - (void)onDiagnosticMessage:(NSString *_Nonnull)message withTimestamp:(NSString *_Nonnull)timestamp {
-    [[NoticeLogger sharedInstance] noticeError:message];
+    [PsiFeedbackLogger logNoticeWithType:@"FeedbackUpload" message:message timestamp:timestamp];
 }
 
 /*!
@@ -1025,7 +1025,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 
     // Otherwise override sponsor ID
     if (err) {
-        LOG_ERROR(@"%@", [NSString stringWithFormat:@"Failed to parse config JSON: %@", err.description]);
+        [PsiFeedbackLogger error:@"%@", [NSString stringWithFormat:@"Failed to parse config JSON: %@", err.description]];
         dispatch_async(dispatch_get_main_queue(), ^{
             [self displayCorruptSettingsFileAlert];
         });
@@ -1047,7 +1047,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     jsonData  = [NSJSONSerialization dataWithJSONObject:mutableConfigCopy options:0 error:&err];
 
     if (err) {
-        LOG_ERROR(@"%@", [NSString stringWithFormat:@"Failed to create JSON data from config object: %@", err.description]);
+        [PsiFeedbackLogger error:@"%@", [NSString stringWithFormat:@"Failed to create JSON data from config object: %@", err.description]];
         dispatch_async(dispatch_get_main_queue(), ^{
             [self displayCorruptSettingsFileAlert];
         });

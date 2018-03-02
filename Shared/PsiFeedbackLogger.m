@@ -17,10 +17,9 @@
  *
  */
 
-#import "NoticeLogger.h"
+#import "PsiFeedbackLogger.h"
 #import "SharedConstants.h"
 #import "NSDateFormatter+RFC3339.h"
-#import "Logging.h"
 
 #if DEBUG
 #define MAX_NOTICE_FILE_SIZE_BYTES 164000
@@ -32,6 +31,28 @@
 #define NOTICE_FILENAME_CONTAINER "container_notices"
 
 #define MAX_RETRIES 2
+
+#if DEBUG
+#define LOG_ERROR_NO_NOTICE(format, ...) \
+  NSLog((@"<ERROR> %s [Line %d]: " format), __PRETTY_FUNCTION__, __LINE__, ##__VA_ARGS__)
+#else
+#define LOG_ERROR_NO_NOTICE(...)
+#endif
+
+#define CONVERT_FORMAT_ARGS_TO_NSSTRING(str, format) \
+    va_list args; \
+    va_start(args, format); \
+    str = [[NSString alloc] initWithFormat:format arguments:args]; \
+    va_end(args);
+
+
+#ifdef TARGET_IS_EXTENSION
+NSString * const InfoNoticeType = @"ExtensionInfo";
+NSString * const ErrorNoticeType = @"ExtensionError";
+#else
+NSString * const InfoNoticeType = @"ContainerInfo";
+NSString * const ErrorNoticeType = @"ContainerError";
+#endif
 
 /**
  * All the methods in this class are non-blocking and thread-safe.
@@ -59,11 +80,33 @@
  *  LOG_ERROR_NO_NOTICE should only be used in this class to log errors.
  *
  */
-@implementation NoticeLogger {
+@implementation PsiFeedbackLogger {
     NSLock *writeLock;
     NSString *rotatingFilepath;
     NSString *rotatingOlderFilepath;
     unsigned long long rotatingCurrentFileSize;
+}
+
+#pragma mark - Class properties
+
++ (NSString *)containerRotatingLogNoticesPath {
+    return [[[[NSFileManager defaultManager]
+      containerURLForSecurityApplicationGroupIdentifier:APP_GROUP_IDENTIFIER] path]
+      stringByAppendingPathComponent:@NOTICE_FILENAME_CONTAINER];
+}
+
++ (NSString *)containerRotatingOlderLogNoticesPath {
+    return [PsiFeedbackLogger.containerRotatingLogNoticesPath stringByAppendingString:@".1"];
+}
+
++ (NSString *)extensionRotatingLogNoticesPath {
+    return [[[[NSFileManager defaultManager]
+      containerURLForSecurityApplicationGroupIdentifier:APP_GROUP_IDENTIFIER] path]
+      stringByAppendingPathComponent:@NOTICE_FILENAME_EXTENSION];
+}
+
++ (NSString *)extensionRotatingOlderLogNoticesPath {
+    return [PsiFeedbackLogger.extensionRotatingLogNoticesPath stringByAppendingString:@".1"];
 }
 
 #pragma mark - Public methods
@@ -75,61 +118,96 @@
     dispatch_once(&once, ^{
 
         #ifdef TARGET_IS_EXTENSION
-        sharedInstance = [[self alloc] initWithFilepath:[NoticeLogger extensionRotatingLogNoticesPath]
-                                          olderFilepath:[NoticeLogger extensionRotatingOlderLogNoticesPath]];
+        sharedInstance = [[self alloc] initWithFilepath:PsiFeedbackLogger.extensionRotatingLogNoticesPath
+                                          olderFilepath:PsiFeedbackLogger.extensionRotatingOlderLogNoticesPath];
         #else
-        sharedInstance = [[self alloc] initWithFilepath:[NoticeLogger containerRotatingLogNoticesPath]
-                                          olderFilepath:[NoticeLogger containerRotatingOlderLogNoticesPath]];
+        sharedInstance = [[self alloc] initWithFilepath:[PsiFeedbackLogger containerRotatingLogNoticesPath]
+                                          olderFilepath:[PsiFeedbackLogger containerRotatingOlderLogNoticesPath]];
         #endif
     });
 
     return sharedInstance;
 }
 
-+ (NSString *)containerRotatingLogNoticesPath {
-    return [[[[NSFileManager defaultManager]
-      containerURLForSecurityApplicationGroupIdentifier:APP_GROUP_IDENTIFIER] path]
-      stringByAppendingPathComponent:@NOTICE_FILENAME_CONTAINER];
+#if TARGET_IS_EXTENSION && DEBUG
++ (void)debug:(NSString *)format, ... {
+
+    NSString *message;
+    CONVERT_FORMAT_ARGS_TO_NSSTRING(message, format);
+    [[PsiFeedbackLogger sharedInstance] writeMessage:message withNoticeType:@"Extension<Debug>"];
+
+    NSLog(@"<DEBUG> %@", message);
 }
-
-+ (NSString *)containerRotatingOlderLogNoticesPath {
-    return [[NoticeLogger containerRotatingLogNoticesPath] stringByAppendingString:@".1"];
-}
-
-+ (NSString *)extensionRotatingLogNoticesPath {
-    return [[[[NSFileManager defaultManager]
-      containerURLForSecurityApplicationGroupIdentifier:APP_GROUP_IDENTIFIER] path]
-      stringByAppendingPathComponent:@NOTICE_FILENAME_EXTENSION];
-}
-
-+ (NSString *)extensionRotatingOlderLogNoticesPath {
-    return [[NoticeLogger extensionRotatingLogNoticesPath] stringByAppendingString:@".1"];
-}
-
-- (void)noticeError:(NSString *)message {
-    [self noticeError:message withTimestamp:[[NSDateFormatter sharedRFC3339MilliDateFormatter] stringFromDate:[NSDate date]]];
-}
-
-- (void)noticeErrorWithFormat:(NSString *)format, ... {
-    NSString *message = nil;
-    if (format) {
-        va_list args;
-        va_start(args, format);
-        message = [[NSString alloc] initWithFormat:format arguments:args];
-        va_end(args);
-    }
-
-    [self noticeError:message withTimestamp:[[NSDateFormatter sharedRFC3339MilliDateFormatter] stringFromDate:[NSDate date]]];
-}
-
-- (void)noticeError:(NSString *)message withTimestamp:(NSString *)timestamp {
-    NSString *noticeType;
-#ifdef TARGET_IS_EXTENSION
-    noticeType = @"Extension";
-#else
-    noticeType = @"Container";
 #endif
-    [self outputNotice:message withNoticeType:noticeType andTimestamp:timestamp];
+
++ (void)info:(NSString *)format, ... {
+
+    NSString *message;
+    CONVERT_FORMAT_ARGS_TO_NSSTRING(message, format);
+    [[PsiFeedbackLogger sharedInstance] writeMessage:message withNoticeType:InfoNoticeType];
+
+#ifdef DEBUG
+    NSLog(@"<INFO> %@", message);
+#endif
+
+}
+
++ (void)info:(NSString *)sourceType message:(NSString *)format, ... {
+
+    NSString *message;
+    CONVERT_FORMAT_ARGS_TO_NSSTRING(message, format);
+    NSDictionary *data = @{sourceType : message};
+    [[PsiFeedbackLogger sharedInstance] writeData:data noticeType:InfoNoticeType];
+
+#ifdef DEBUG
+    NSLog(@"<INFO> %@", data);
+#endif
+
+}
+
++ (void)error:(NSString *)format, ... {
+
+    NSString *message;
+    CONVERT_FORMAT_ARGS_TO_NSSTRING(message, format);
+    [[PsiFeedbackLogger sharedInstance] writeMessage:message withNoticeType:ErrorNoticeType];
+
+#if DEBUG
+    NSLog(@"<ERROR> %@", message);
+#endif
+
+}
+
++ (void)error:(NSString *)sourceType message:(NSString *)format, ... {
+
+    NSString *message;
+    CONVERT_FORMAT_ARGS_TO_NSSTRING(message, format);
+    NSDictionary *data = @{sourceType : message};
+    [[PsiFeedbackLogger sharedInstance] writeData:data noticeType:ErrorNoticeType];
+
+#ifdef DEBUG
+    NSLog(@"<ERROR> %@", data);
+#endif
+
+}
+
++ (void)error:(NSString *)sourceType message:(NSString *)message object:(NSError *)error {
+
+//    NSString *message = [NSString stringWithFormat:@"Domain=%@ Description=%@ Code=%ld", error.domain, error.localizedDescription, (long) error.code];
+    NSDictionary *data = @{sourceType : @{@"message" : message,
+                                          @"NSError" : @{@"domain" : error.domain,
+                                                         @"code"   : @(error.code),
+                                                         @"description" : error.localizedDescription}}};
+
+    [[PsiFeedbackLogger sharedInstance] writeData:data noticeType:ErrorNoticeType];
+
+#ifdef DEBUG
+    NSLog(@"<ERROR> %@", data);
+#endif
+
+}
+
++ (void)logNoticeWithType:(NSString *)noticeType message:(NSString *)message timestamp:(NSString *)timestamp {
+    [[PsiFeedbackLogger sharedInstance] writeData:@{@"message": message} noticeType:noticeType timestamp:timestamp];
 }
 
 # pragma mark - Private methods
@@ -167,11 +245,25 @@
     return self;
 }
 
-- (void)outputNotice:(NSString *)data withNoticeType:(NSString *)noticeType andTimestamp:(NSString *)timestamp {
+- (void)writeMessage:(NSString *)message withNoticeType:(NSString *)noticeType {
+    [self writeMessage:message withNoticeType:noticeType andTimestamp:[[NSDateFormatter sharedRFC3339MilliDateFormatter] stringFromDate:[NSDate date]]];
+}
+
+- (void)writeMessage:(NSString *)message withNoticeType:(NSString *)noticeType andTimestamp:(NSString *)timestamp {
+    [self writeData:@{@"message": message} noticeType:noticeType timestamp:timestamp];
+}
+
+- (void)writeData:(NSDictionary<NSString *, NSString *> *)data noticeType:(NSString *)noticeType {
+    [self writeData:data
+         noticeType:noticeType
+          timestamp:[[NSDateFormatter sharedRFC3339MilliDateFormatter] stringFromDate:[NSDate date]]];
+}
+
+- (void)writeData:(NSDictionary<NSString *, NSString *> *)data noticeType:(NSString *)noticeType timestamp:(NSString *)timestamp {
 
     if (!data) {
-        LOG_ERROR_NO_NOTICE(@"Got nil data");
-        data = @"nil data";
+        LOG_ERROR_NO_NOTICE(@"output notice nil data");
+        data = @{@"data" : @"nil data"};
     }
 
     NSError *err;
@@ -254,7 +346,6 @@
 }
 
 - (BOOL)rotateFile:(NSString *)filePath toFile:(NSString *)olderFilePath {
-    LOG_DEBUG(@"Rotating %@", filePath);
 
     // Check file size, and rotate if necessary.
     NSFileManager *fileManager = [NSFileManager defaultManager];

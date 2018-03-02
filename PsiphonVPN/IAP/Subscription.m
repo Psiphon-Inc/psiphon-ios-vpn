@@ -19,10 +19,11 @@
 
 #import <Foundation/Foundation.h>
 #import "Subscription.h"
-#import "Logging.h"
 #import "NSDate+Comparator.h"
 #import "NSError+Convenience.h"
 #import "RACTuple.h"
+#import "PsiFeedbackLogger.h"
+#import "Logging.h"
 
 NSErrorDomain _Nonnull const ReceiptValidationErrorDomain = @"PsiphonReceiptValidationErrorDomain";
 
@@ -58,7 +59,6 @@ NSErrorDomain _Nonnull const ReceiptValidationErrorDomain = @"PsiphonReceiptVali
     // Open a connection for the URL, configured to POST the file.
 
     request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:kRemoteVerificationURL]];
-    assert(request != nil);
 
     NSNumber *appReceiptFileSize;
     [[NSBundle mainBundle].appStoreReceiptURL getResourceValue:&appReceiptFileSize forKey:NSURLFileSizeKey error:nil];
@@ -218,13 +218,13 @@ NSErrorDomain _Nonnull const ReceiptValidationErrorDomain = @"PsiphonReceiptVali
     NSString *path = URL.path;
     const BOOL exists = [[NSFileManager defaultManager] fileExistsAtPath:path isDirectory:nil];
     if (!exists) {
-        LOG_DEBUG_NOTICE(@"receipt does not exist");
+        LOG_DEBUG(@"receipt does not exist");
         return NO;
     }
 
     // There's receipt but no subscription persisted - YES
     if([self isEmpty]) {
-        LOG_DEBUG_NOTICE(@"receipt exist by no subscription persisted");
+        LOG_DEBUG(@"receipt exist by no subscription persisted");
         return YES;
     }
 
@@ -232,19 +232,19 @@ NSErrorDomain _Nonnull const ReceiptValidationErrorDomain = @"PsiphonReceiptVali
     NSNumber *currentReceiptFileSize;
     [[NSBundle mainBundle].appStoreReceiptURL getResourceValue:&currentReceiptFileSize forKey:NSURLFileSizeKey error:nil];
     if ([currentReceiptFileSize unsignedIntValue] != [self.appReceiptFileSize unsignedIntValue]) {
-        LOG_DEBUG_NOTICE(@"receipt file size changed (%@) since last check (%@)", currentReceiptFileSize, self.appReceiptFileSize);
+        LOG_DEBUG(@"receipt file size changed (%@) since last check (%@)", currentReceiptFileSize, self.appReceiptFileSize);
         return YES;
     }
 
     // If user has an active authorization for date - NO
     if ([self hasActiveSubscriptionTokenForDate:[NSDate date]]) {
-        LOG_DEBUG_NOTICE(@"device has active authorization for date");
+        LOG_DEBUG(@"device has active authorization for date");
         return NO;
     }
 
     // If expired and pending renewal info is missing - YES
     if(!self.pendingRenewalInfo) {
-        LOG_DEBUG_NOTICE(@"pending renewal info is missing");
+        LOG_DEBUG(@"pending renewal info is missing");
         return YES;
     }
 
@@ -254,12 +254,12 @@ NSErrorDomain _Nonnull const ReceiptValidationErrorDomain = @"PsiphonReceiptVali
 
         NSString *autoRenewStatus = [self.pendingRenewalInfo[0] objectForKey:kRemoteSubscriptionVerifierPendingRenewalInfoAutoRenewStatus];
         if (autoRenewStatus && [autoRenewStatus isEqualToString:@"1"]) {
-            LOG_DEBUG_NOTICE(@"subscription expired but user's last known intention is to auto-renew");
+            LOG_DEBUG(@"subscription expired but user's last known intention is to auto-renew");
             return YES;
         }
     }
 
-    LOG_DEBUG_NOTICE(@"authorization token update not needed");
+    LOG_DEBUG(@"authorization token update not needed");
     return NO;
 }
 
@@ -388,9 +388,9 @@ typedef NS_ENUM(NSInteger, SubscriptionStateEnum) {
 
 - (NSString *_Nonnull)textDescription {
     switch (self.state) {
-        case SubscriptionStateNotSubscribed: return @"subscription not subscribed";
-        case SubscriptionStateInProgress: return @"subscription in progress";
-        case SubscriptionStateSubscribed: return @"subscription subscribed";
+        case SubscriptionStateNotSubscribed: return @"subscription state not subscribed";
+        case SubscriptionStateInProgress: return @"subscription state in progress";
+        case SubscriptionStateSubscribed: return @"subscription state subscribed";
     }
     return @"";
 }

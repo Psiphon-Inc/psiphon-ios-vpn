@@ -25,11 +25,11 @@
 
 
 #import <Foundation/Foundation.h>
-#import "Logging.h"
+#import "PsiFeedbackLogger.h"
 
 #ifndef PSIAssert
 
-#ifdef DEBUG
+#if DEBUG
 
 // PSIAssert() should be used in Obj-C methods.
 // PSICAssert() should be used in free functions.
@@ -38,13 +38,13 @@
 
 #define PSIAssert(X)                                                                                                   \
     if (!(X)) {                                                                                                        \
-        LOG_ERROR(@"%s Assertion failed: %s", __PRETTY_FUNCTION__, CONVERT_EXPR_TO_STRING(X));                         \
+        [PsiFeedbackLogger error:@"%s Assertion failed: %s", __PRETTY_FUNCTION__, CONVERT_EXPR_TO_STRING(X)];                         \
         NSAssert(0, @"Assertion failed: %s", CONVERT_EXPR_TO_STRING(X));                                               \
     }
 
 #define PSICAssert(X)                                                                                                  \
     if (!(X)) {                                                                                                        \
-        LOG_ERROR(@"%s Assertion failed: %s", __PRETTY_FUNCTION__, CONVERT_EXPR_TO_STRING(X));                         \
+        [PsiFeedbackLogger error:@"%s Assertion failed: %s", __PRETTY_FUNCTION__, CONVERT_EXPR_TO_STRING(X)];                         \
         NSCAssert(0, @"Assertion failed: %s", CONVERT_EXPR_TO_STRING(X));                                              \
     }
 
