@@ -1226,7 +1226,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 - (void)updateAvailableRegions {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         NSArray<NSString *> *regions = [sharedDB getAllEgressRegions];
-#ifdef DEBUG
+#if DEBUG
         if ([AppDelegate isRunningUITest]) {
             // fake the availability of all regions in the UI for automated screenshots
             NSMutableArray *faked_regions = [[NSMutableArray alloc] init];
