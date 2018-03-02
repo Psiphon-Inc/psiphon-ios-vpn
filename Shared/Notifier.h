@@ -18,7 +18,7 @@
  */
 
 #import <Foundation/Foundation.h>
-#include <notify.h>
+#import <notify.h>
 
 
 @interface Notifier : NSObject

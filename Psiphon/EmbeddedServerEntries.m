@@ -20,6 +20,7 @@
 #import "EmbeddedServerEntries.h"
 #import "EmbeddedServerEntriesHelpers.h"
 #import "Logging.h"
+#import "PsiFeedbackLogger.h"
 
 #define kEmbeddedServerEntryRegionJsonKey @"region"
 
@@ -35,7 +36,7 @@
 
     fp = fopen([filePath UTF8String], "r");
     if (fp == NULL) {
-        LOG_ERROR(@"Error failed to open embedded server entry file at path (%@).", filePath);
+        [PsiFeedbackLogger error:@"Error failed to open embedded server entry file at path (%@).", filePath];
         return nil;
     }
 
@@ -51,13 +52,13 @@
         errno = 0;
         char *decoded = hex_decode(line);
         if (decoded == NULL) {
-            LOG_ERROR(@"Error failed to hex decode line (%lu) in embedded server entries file at path (#%@): %s.", line_number, filePath, strerror(errno));
+            [PsiFeedbackLogger error:@"Error failed to hex decode line (%lu) in embedded server entries file at path (#%@): %s.", line_number, filePath, strerror(errno)];
             break;
         }
 
         char *json = server_entry_json(decoded);
         if (json == NULL) {
-            LOG_ERROR(@"Error failed to find server entry in hex decoded line (#%lu) in embedded server entries file at path (%@).", line_number, filePath);
+            [PsiFeedbackLogger error:@"Error failed to find server entry in hex decoded line (#%lu) in embedded server entries file at path (%@).", line_number, filePath];
             free(decoded);
             break;
         }
@@ -65,25 +66,25 @@
         NSData *jsonData = [NSData dataWithBytes:json length:strlen(json)];
         free(decoded);
         if (jsonData == nil) {
-            LOG_ERROR(@"Error failed to convert embedded server entry json data from line (#%lu) to NSData.", line_number);
+            [PsiFeedbackLogger error:@"Error failed to convert embedded server entry json data from line (#%lu) to NSData.", line_number];
             break;
         }
 
         NSError *error = nil;
         NSDictionary *jsonObject = [NSJSONSerialization JSONObjectWithData:jsonData options:kNilOptions error:&error];
         if (error != nil) {
-            LOG_ERROR(@"Error failed to serialize json object from decoded server entry on line (#%lu): %@.", line_number, error);
+            [PsiFeedbackLogger error:@"Error failed to serialize json object from decoded server entry on line (#%lu): %@.", line_number, error];
             break;
         }
 
         id regionObject = jsonObject[kEmbeddedServerEntryRegionJsonKey];
         if (regionObject == nil) {
-            LOG_ERROR(@"Error failed to find region key (%@) in embedded server entry json on line (#%lu).", kEmbeddedServerEntryRegionJsonKey, line_number);
+            [PsiFeedbackLogger error:@"Error failed to find region key (%@) in embedded server entry json on line (#%lu).", kEmbeddedServerEntryRegionJsonKey, line_number];
             break;
         } else if ([regionObject isKindOfClass:[NSString class]]) {
             [egressRegions addObject:(NSString*)regionObject];
         } else {
-            LOG_ERROR(@"Error region in embedded server entry on line (#%lu) is not NSString but %@.", line_number, [regionObject class]);
+            [PsiFeedbackLogger error:@"Error region in embedded server entry on line (#%lu) is not NSString but %@.", line_number, [regionObject class]];
             break;
         }
 
@@ -91,13 +92,13 @@
     }
 
     if (nread == -1 && errno != 0 && ferror(fp) != 0) {
-        LOG_ERROR(@"Error reading embedded server entries file at path (%@): %s.", filePath, strerror(errno));
+        [PsiFeedbackLogger error:@"Error reading embedded server entries file at path (%@): %s.", filePath, strerror(errno)];
     }
 
     errno = 0;
     int ret = fclose(fp);
     if (ret != 0) {
-        LOG_ERROR(@"Error closing file stream for embedded server entries file at path (%@): %s.", filePath, strerror(errno));
+        [PsiFeedbackLogger error:@"Error closing file stream for embedded server entries file at path (%@): %s.", filePath, strerror(errno)];
     }
 
     if (line != NULL) {

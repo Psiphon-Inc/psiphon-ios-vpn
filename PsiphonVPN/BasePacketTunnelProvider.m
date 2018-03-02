@@ -20,16 +20,16 @@
 #import <Foundation/Foundation.h>
 #import "BasePacketTunnelProvider.h"
 #import "SharedConstants.h"
-#import "Logging.h"
+#import "PsiFeedbackLogger.h"
 #import "FileUtils.h"
 #import "RACReplaySubject.h"
 #import "NSError+Convenience.h"
 
-NSString *_Nonnull const BasePsiphonTunnelErrorDomain = @"BasePsiphonTunnelErrorDomain";
+NSErrorDomain _Nonnull const BasePsiphonTunnelErrorDomain = @"BasePsiphonTunnelErrorDomain";
 
 @interface BasePacketTunnelProvider ()
 
-@property (nonatomic, readwrite) NEStartMethod NEStartMethod;
+@property (nonatomic, readwrite) ExtensionStartMethodEnum NEStartMethod;
 
 @property (nonatomic, readwrite) BOOL VPNStarted;
 
@@ -61,7 +61,7 @@ NSString *_Nonnull const BasePsiphonTunnelErrorDomain = @"BasePsiphonTunnelError
     //       since file with such protection level cannot be created while device is still locked from boot.
     if (![self createBootTestFile]) {
         // Undefined behaviour wrt. Connect On Demand. Fail fast.
-        LOG_ERROR(@"Aborting. Failed to create/check for boot test file.");
+        [PsiFeedbackLogger error:@"Aborting. Failed to create/check for boot test file."];
         abort();
     }
 
@@ -77,7 +77,7 @@ NSString *_Nonnull const BasePsiphonTunnelErrorDomain = @"BasePsiphonTunnelError
     // This is required in order for "Connect On Demand" to work.
     if (![FileUtils downgradeFileProtectionToNone:paths withExceptions:@[ [self getBootTestFilePath] ]]) {
         // Undefined behaviour wrt. Connect On Demand. Fail fast.
-        LOG_ERROR(@"Aborting. Failed to set file protection.");
+        [PsiFeedbackLogger error:@"Aborting. Failed to set file protection."];
         abort();
     }
 
@@ -88,11 +88,11 @@ NSString *_Nonnull const BasePsiphonTunnelErrorDomain = @"BasePsiphonTunnelError
 
     // Determine how the extension was started.
     if ([self isStartBootTestFileLocked]) {
-        self.NEStartMethod = NEStartMethodFromBoot;
+        self.NEStartMethod = ExtensionStartMethodFromBoot;
     } else if ([((NSString *)options[EXTENSION_OPTION_START_FROM_CONTAINER]) isEqualToString:EXTENSION_OPTION_TRUE]) {
-        self.NEStartMethod = NEStartMethodFromContainer;
+        self.NEStartMethod = ExtensionStartMethodFromContainer;
     } else {
-        self.NEStartMethod = NEStartMethodOther;
+        self.NEStartMethod = ExtensionStartMethodOther;
     }
 
     // Hold a reference to the completionHandler
@@ -206,10 +206,10 @@ NSString *_Nonnull const BasePsiphonTunnelErrorDomain = @"BasePsiphonTunnelError
     NSError *err;
     NSDictionary<NSFileAttributeKey, id> *attrs = [fm attributesOfItemAtPath:[self getBootTestFilePath] error:&err];
     if (err) {
-        LOG_ERROR(@"Failed to get file attributes for boot test file. (%@)", err);
+        [PsiFeedbackLogger error:@"Failed to get file attributes for boot test file. (%@)", err];
         return FALSE;
     } else if (![attrs[NSFileProtectionKey] isEqualToString:NSFileProtectionCompleteUntilFirstUserAuthentication]) {
-        LOG_ERROR(@"Boot test file has it's protection level changed to (%@)", attrs[NSFileProtectionKey]);
+        [PsiFeedbackLogger error:@"Boot test file has it's protection level changed to (%@)", attrs[NSFileProtectionKey]];
         return FALSE;
     }
 

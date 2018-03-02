@@ -19,6 +19,7 @@
 
 #import "FileUtils.h"
 #import "Logging.h"
+#import "PsiFeedbackLogger.h"
 
 @implementation FileUtils
 
@@ -53,14 +54,14 @@
     if ([fm fileExistsAtPath:path isDirectory:&isDirectory] && ![exceptions containsObject:path]) {
         NSDictionary *attrs = [fm attributesOfItemAtPath:path error:&err];
         if (err) {
-            LOG_ERROR(@"Failed to get file attributes for path (%@) (%@)", path, err);
+            [PsiFeedbackLogger error:@"Failed to get file attributes for path (%@) (%@)", path, err];
             return FALSE;
         }
 
         if (![attrs[NSFileProtectionKey] isEqualToString:NSFileProtectionNone]) {
             [fm setAttributes:@{NSFileProtectionKey: NSFileProtectionNone} ofItemAtPath:path error:&err];
             if (err) {
-                LOG_ERROR(@"Failed to set the protection level of dir(%@)", path);
+                [PsiFeedbackLogger error:@"Failed to set the protection level of dir(%@)", path];
                 return FALSE;
             }
         }
@@ -68,7 +69,7 @@
         if (isDirectory) {
             NSArray<NSString *> *contents = [fm contentsOfDirectoryAtPath:path error:&err];
             if (err) {
-                LOG_ERROR(@"Failed to get contents of directory (%@) (%@)", path, err);
+                [PsiFeedbackLogger error:@"Failed to get contents of directory (%@) (%@)", path, err];
             }
 
             for (NSString * item in contents) {
@@ -91,7 +92,7 @@
     NSArray<NSString *> *files = [fm contentsOfDirectoryAtPath:dir error:&err];
 
     NSDictionary *dirattrs = [fm attributesOfItemAtPath:dir error:&err];
-    LOG_ERROR(@"Dir (%@) attributes:\n\n%@", [dir lastPathComponent], dirattrs[NSFileProtectionKey]);
+    [PsiFeedbackLogger error:@"Dir (%@) attributes:\n\n%@", [dir lastPathComponent], dirattrs[NSFileProtectionKey]];
 
     if ([files count] > 0) {
         for (NSString *f in files) {
@@ -106,12 +107,12 @@
             [fm fileExistsAtPath:file isDirectory:&isDir];
             NSDictionary *attrs = [fm attributesOfItemAtPath:file error:&err];
             if (err) {
-                LOG_DEBUG_NOTICE(@"filepath: %@, %@",file, err);
+                LOG_DEBUG(@"filepath: %@, %@",file, err);
             }
             [desc addObject:[NSString stringWithFormat:@"%@ : %@ : %@", [file lastPathComponent], (isDir) ? @"dir" : @"file", attrs[NSFileProtectionKey]]];
         }
 
-        LOG_DEBUG_NOTICE(@"Resource (%@) Checking files at dir (%@)\n%@", resource, [dir lastPathComponent], desc);
+        LOG_DEBUG(@"Resource (%@) Checking files at dir (%@)\n%@", resource, [dir lastPathComponent], desc);
     }
 }
 #endif

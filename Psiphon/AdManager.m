@@ -53,7 +53,7 @@ NSNotificationName const AdManagerAdsDidLoadNotification = @"AdManagerAdsDidLoad
 }
 
 - (void)vpnStatusDidChange {
-    if ([vpnManager getVPNStatus] == VPNStatusDisconnected) {
+    if ([vpnManager VPNStatus] == VPNStatusDisconnected) {
         // The VPN is stopped. Initialize ads after a delay:
         //    - to ensure regular untunneled networking is ready
         //    - because it's likely the user will be leaving the app, so we don't want to request
@@ -61,7 +61,7 @@ NSNotificationName const AdManagerAdsDidLoadNotification = @"AdManagerAdsDidLoad
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 5 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
             [self initializeAds];
         });
-    } else if ([vpnManager getVPNStatus] == VPNStatusConnected) {
+    } else if ([vpnManager VPNStatus] == VPNStatusConnected) {
         [self initializeAds];
     }
 }
@@ -108,7 +108,7 @@ NSNotificationName const AdManagerAdsDidLoadNotification = @"AdManagerAdsDidLoad
     BOOL hasActiveSubscription = [IAPStoreHelper hasActiveSubscriptionForNow];
 
     NetworkStatus networkStatus = [[Reachability reachabilityForInternetConnection] currentReachabilityStatus];
-    VPNStatus vpnStatus = [vpnManager getVPNStatus];
+    VPNStatus vpnStatus = [vpnManager VPNStatus];
     return networkStatus != NotReachable && (vpnStatus == VPNStatusInvalid || vpnStatus == VPNStatusDisconnected) && !hasActiveSubscription;
 }
 

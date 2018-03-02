@@ -17,10 +17,10 @@
  *
  */
 
-#include "EmbeddedServerEntriesHelpers.h"
-#include <errno.h>
-#include <stdlib.h>
-#include <string.h>
+#import "EmbeddedServerEntriesHelpers.h"
+#import <errno.h>
+#import <stdlib.h>
+#import <string.h>
 
 // Forward declarations of helpers
 void drop_last_char_if_char(char *s, int c);
