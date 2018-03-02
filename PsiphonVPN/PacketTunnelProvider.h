@@ -20,7 +20,7 @@
 #import "BasePacketTunnelProvider.h"
 
 // BasePacketTunnelProvider Errors
-FOUNDATION_EXTERN NSString *_Nonnull const PsiphonTunnelErrorDomain;
+FOUNDATION_EXTERN NSErrorDomain _Nonnull const PsiphonTunnelErrorDomain;
 
 typedef NS_ERROR_ENUM(PsiphonTunnelErrorDomain, PsiphonTunnelErrorCode) {
     PsiphonTunnelErrorBadConfiguration = 2000,
