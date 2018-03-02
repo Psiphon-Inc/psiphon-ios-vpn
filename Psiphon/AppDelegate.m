@@ -36,9 +36,9 @@
 #import "AdManager.h"
 #import "Logging.h"
 #import "IAPStoreHelper.h"
-#import "IAPViewController.h"
 #import "NEBridge.h"
 #import "DispatchUtils.h"
+#import "PsiFeedbackLogger.h"
 
 NSNotificationName const AppDelegateSubscriptionDidExpireNotification = @"AppDelegateSubscriptionDidExpireNotification";
 NSNotificationName const AppDelegateSubscriptionDidActivateNotification = @"AppDelegateSubscriptionDidActivateNotification";
@@ -90,7 +90,7 @@ NSNotificationName const AppDelegateSubscriptionDidActivateNotification = @"AppD
 }
 
 + (BOOL)isRunningUITest {
-#ifdef DEBUG
+#if DEBUG
     static BOOL runningUITest;
     static dispatch_once_t once;
     dispatch_once(&once, ^{
@@ -222,8 +222,8 @@ NSNotificationName const AppDelegateSubscriptionDidActivateNotification = @"AppD
 }
 
 - (void)onVPNStatusDidChange {
-    if ([vpnManager getVPNStatus] == VPNStatusDisconnected
-      || [vpnManager getVPNStatus] == VPNStatusRestarting) {
+    if ([vpnManager VPNStatus] == VPNStatusDisconnected
+      || [vpnManager VPNStatus] == VPNStatusRestarting) {
         shownHomepage = FALSE;
     }
 }
@@ -280,7 +280,7 @@ NSNotificationName const AppDelegateSubscriptionDidActivateNotification = @"AppD
     if ([embeddedEgressRegions count] > 0) {
         [sharedDB insertNewEmbeddedEgressRegions:embeddedEgressRegions];
     } else {
-        LOG_ERROR(@"Error no egress regions found in %@.", embeddedServerEntriesPath);
+        [PsiFeedbackLogger error:@"Error no egress regions found in %@.", embeddedServerEntriesPath];
     }
 }
 
@@ -291,16 +291,20 @@ NSNotificationName const AppDelegateSubscriptionDidActivateNotification = @"AppD
         LOG_DEBUG(@"Received notification NE.newHomepages");
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
             if (!shownHomepage) {
-                NSArray<Homepage *> *homepages = [sharedDB getHomepages];
-                if (homepages && [homepages count] > 0) {
-                    NSUInteger randIndex = arc4random() % [homepages count];
-                    Homepage *homepage = homepages[randIndex];
-                    dispatch_async(dispatch_get_main_queue(), ^{
-                        [[UIApplication sharedApplication] openURL:homepage.url options:@{}
-                                                 completionHandler:^(BOOL success) {
-                                                     shownHomepage = success;
-                                                 }];
-                    });
+                // Only opens landing page if the VPN is active.
+                // Landing page should not be opened outside of the tunnel.
+                if ([vpnManager isVPNActive]) {
+                    NSArray<Homepage *> *homepages = [sharedDB getHomepages];
+                    if (homepages && [homepages count] > 0) {
+                        NSUInteger randIndex = arc4random() % [homepages count];
+                        Homepage *homepage = homepages[randIndex];
+                        dispatch_async(dispatch_get_main_queue(), ^{
+                            [[UIApplication sharedApplication] openURL:homepage.url options:@{}
+                                                     completionHandler:^(BOOL success) {
+                                                         shownHomepage = success;
+                                                     }];
+                        });
+                    }
                 }
             }
         });

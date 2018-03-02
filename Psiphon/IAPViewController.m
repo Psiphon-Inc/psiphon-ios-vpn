@@ -39,6 +39,8 @@ static NSString *iapCellID = @"IAPTableCellID";
 @property (nonatomic, strong) SKProduct *latestSubscriptionProduct;
 @property (nonatomic, strong) NSDate *latestSubscriptionExpirationDate;
 
+@property (nonatomic, strong) UIColor *buyButtonTintColor;
+
 @end
 
 @implementation IAPViewController
@@ -74,6 +76,12 @@ static NSString *iapCellID = @"IAPTableCellID";
                                                   target:self
                                                   action:@selector(dismissViewController)];
     }
+
+    // Listens to IAPStoreHelper transaction states.
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(onPaymentTransactionUpdate:)
+                                                 name:IAPHelperPaymentTransactionUpdateNotification
+                                               object:nil];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -289,12 +297,15 @@ static NSString *iapCellID = @"IAPTableCellID";
         cell.detailTextLabel.text = [NSString stringWithFormat:detailTextFormat, dateString];
     } else {
         UISegmentedControl *buyButton = [[UISegmentedControl alloc]initWithItems:[NSArray arrayWithObject:localizedPrice]];
+        self.buyButtonTintColor = buyButton.tintColor;
         buyButton.momentary = YES;
         buyButton.tag = indexPath.row;
         [buyButton addTarget:self
                       action:@selector(buyButtonPressed:)
             forControlEvents:UIControlEventValueChanged];
         cell.accessoryView = buyButton;
+
+
     }
 
     return cell;
@@ -364,6 +375,43 @@ static NSString *iapCellID = @"IAPTableCellID";
 - (void)startProductsRequest {
     [self beginRefreshing];
     [[IAPStoreHelper sharedInstance] startProductsRequest];
+}
+
+- (void)onPaymentTransactionUpdate:(NSNotification *)notification {
+    SKPaymentTransactionState transactionState = (SKPaymentTransactionState) [notification.userInfo[IAPHelperPaymentTransactionUpdateKey] integerValue];
+
+    if (SKPaymentTransactionStatePurchasing == transactionState) {
+        [self setPurchaseButtonUIInterface:FALSE];
+    } else {
+        [self setPurchaseButtonUIInterface:TRUE];
+    }
+}
+
+- (void)setPurchaseButtonUIInterface:(BOOL)interactionEnabled {
+    NSInteger numSections = [self.tableView numberOfSections];
+
+    if (numSections == 1) {
+
+        NSInteger numRows = [self.tableView numberOfRowsInSection:0];
+
+        for (NSInteger i = 0; i < numRows; i++) {
+            UITableViewCell *cell = [self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:i inSection:0]];
+
+            if (cell.accessoryView
+              && [cell.accessoryView isKindOfClass:[UISegmentedControl class]]
+              && [cell isKindOfClass:[IAPTableViewCell class]]) {
+
+                UISegmentedControl *buyButton = (UISegmentedControl *) cell.accessoryView;
+                if (interactionEnabled) {
+                    [buyButton setTintColor:self.buyButtonTintColor];
+                } else {
+                    [buyButton setTintColor:UIColor.grayColor];
+                }
+                
+                buyButton.userInteractionEnabled = interactionEnabled;
+            }
+        }
+    }
 }
 
 @end

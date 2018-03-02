@@ -25,6 +25,7 @@
 #import "Logging.h"
 #import "SharedConstants.h"
 #import "SettingsViewController.h"
+#import "PsiFeedbackLogger.h"
 
 NSNotificationName const VPNManagerStatusDidChangeNotification = @"VPNManagerStatusDidChangeNotification";
 NSNotificationName const VPNManagerVPNStartDidFailNotification = @"VPNManagerVPNStartDidFailNotification";
@@ -76,7 +77,7 @@ NSErrorDomain const VPNQueryErrorDomain = @"VPNQueryErrorDomain";
 
 
               } else if ([managers count] > 1) {
-                  LOG_ERROR(@"more than 1 VPN configuration found");
+                  [PsiFeedbackLogger error:@"more than 1 VPN configuration found"];
               }
 
               [weakSelf vpnStatusDidChangeHandler];
@@ -99,13 +100,13 @@ NSErrorDomain const VPNQueryErrorDomain = @"VPNQueryErrorDomain";
     return sharedInstance;
 }
 
-- (VPNStatus)getVPNStatus {
+- (VPNStatus)VPNStatus {
 
     if (!self.providerManager) {
         return VPNStatusInvalid;
     }
 
-#ifdef DEBUG
+#if DEBUG
     if ([AppDelegate isRunningUITest]) {
         return VPNStatusConnected;
     }
@@ -129,7 +130,7 @@ NSErrorDomain const VPNQueryErrorDomain = @"VPNQueryErrorDomain";
         }
     }
 
-    LOG_ERROR(@"Unknown NEVPNConnection status: (%ld)", self.providerManager.connection.status);
+    [PsiFeedbackLogger error:@"Unknown NEVPNConnection status: (%ld)", self.providerManager.connection.status];
     return VPNStatusInvalid;
 }
 
@@ -172,7 +173,7 @@ NSErrorDomain const VPNQueryErrorDomain = @"VPNQueryErrorDomain";
               if (error) {
                   // Reset startStopButtonPressed flag to FALSE when error and exiting.
                   [self setStartStopButtonPressed:FALSE];
-                  LOG_ERROR(@"Failed to load VPN configurations. Error:%@", error);
+                  [PsiFeedbackLogger error:@"Failed to load VPN configurations. Error:%@", error];
 
                   [self postStartFailureNotification:VPNManagerStartErrorConfigLoadFailed];
 
@@ -198,7 +199,7 @@ NSErrorDomain const VPNQueryErrorDomain = @"VPNQueryErrorDomain";
               } else {
                   [self setStartStopButtonPressed:FALSE];
 
-                  LOG_ERROR(@"%lu VPN configurations found, only expected 1. Deleting all configurations.", [allManagers count]);
+                  [PsiFeedbackLogger error:@"%lu VPN configurations found, only expected 1. Deleting all configurations.", [allManagers count]];
 
                   [self cleanupAllTunnelProviderManagers:allManagers withCompletionHandler:^{
                       [self postStartFailureNotification:VPNManagerStartErrorTooManyConfigsFounds];
@@ -226,7 +227,7 @@ NSErrorDomain const VPNQueryErrorDomain = @"VPNQueryErrorDomain";
                       [self setStartStopButtonPressed:FALSE];
 
                       // User denied permission to add VPN Configuration.
-                      LOG_ERROR(@"Failed to save the configuration:%@", error);
+                      [PsiFeedbackLogger error:@"Failed to save the configuration:%@", error];
 
                       if (error.code == NEVPNErrorConfigurationInvalid || error.code == NEVPNErrorConfigurationUnknown) {
                           // Fatal errors.
@@ -246,7 +247,7 @@ NSErrorDomain const VPNQueryErrorDomain = @"VPNQueryErrorDomain";
                   [__providerManager loadFromPreferencesWithCompletionHandler:^(NSError *error) {
 
                       if (error != nil) {
-                          LOG_ERROR(@"Failed to reload VPN configuration. Error:(%@)", error);
+                          [PsiFeedbackLogger error:@"Failed to reload VPN configuration. Error:(%@)", error];
                           [self postStartFailureNotification:VPNManagerStartErrorConfigLoadFailed];
 
                           tunnelStarting = FALSE;
@@ -262,7 +263,7 @@ NSErrorDomain const VPNQueryErrorDomain = @"VPNQueryErrorDomain";
                       BOOL vpnStartSuccess = [self.providerManager.connection startVPNTunnelWithOptions:extensionOptions andReturnError:&vpnStartError];
 
                       if (!vpnStartSuccess) {
-                          LOG_ERROR(@"Failed to start network extension. Error:(%@)", vpnStartError);
+                          [PsiFeedbackLogger error:@"Failed to start network extension. Error:(%@)", vpnStartError];
                           [self postStartFailureNotification:VPNManagerStartErrorNEStartFailed];
                       }
 
@@ -304,12 +305,12 @@ NSErrorDomain const VPNQueryErrorDomain = @"VPNQueryErrorDomain";
 }
 
 - (BOOL)isVPNActive {
-    VPNStatus s = [self getVPNStatus];
+    VPNStatus s = [self VPNStatus];
     return (s == VPNStatusConnecting || s == VPNStatusConnected || s == VPNStatusReasserting || s == VPNStatusRestarting);
 }
 
 - (BOOL)isVPNConnected {
-    return VPNStatusConnected == [self getVPNStatus];
+    return VPNStatusConnected == [self VPNStatus];
 }
 
 - (BOOL)isOnDemandEnabled {
@@ -331,7 +332,7 @@ NSErrorDomain const VPNQueryErrorDomain = @"VPNQueryErrorDomain";
         // Save the updated configuration.
         [self.providerManager saveToPreferencesWithCompletionHandler:^(NSError *error) {
             if (error) {
-                LOG_ERROR(@"Failed to save VPN configuration. Error: %@", error);
+                [PsiFeedbackLogger error:@"Failed to save VPN configuration. Error: %@", error];
             }
             completionHandler(error);
         }];
@@ -354,7 +355,7 @@ NSErrorDomain const VPNQueryErrorDomain = @"VPNQueryErrorDomain";
         } else if ([EXTENSION_RESP_FALSE isEqualToString:response]) {
             completionHandler(FALSE);
         } else {
-            LOG_ERROR(@"Unexpected query response (%@). error(%@)", response, error);
+            [PsiFeedbackLogger error:@"Unexpected query response (%@). error(%@)", response, error];
             completionHandler(FALSE);
         }
     }];
@@ -376,7 +377,7 @@ NSErrorDomain const VPNQueryErrorDomain = @"VPNQueryErrorDomain";
         } else if ([EXTENSION_RESP_FALSE isEqualToString:response]) {
             completionHandler(FALSE);
         } else {
-            LOG_ERROR(@"Unexpected query response (%@). error(%@)", response, error);
+            [PsiFeedbackLogger error:@"Unexpected query response (%@). error(%@)", response, error];
             completionHandler(FALSE);
         }
     }];
@@ -398,7 +399,7 @@ NSErrorDomain const VPNQueryErrorDomain = @"VPNQueryErrorDomain";
         dispatch_group_enter(cleanupDispatchGroup);
         [tpm removeFromPreferencesWithCompletionHandler:^(NSError *error) {
             if (error) {
-                LOG_ERROR(@"Failed to remove VPN configuration: %@", error);
+                [PsiFeedbackLogger error:@"Failed to remove VPN configuration: %@", error];
             }
 
             dispatch_group_leave(cleanupDispatchGroup);
@@ -489,7 +490,7 @@ NSErrorDomain const VPNQueryErrorDomain = @"VPNQueryErrorDomain";
             LOG_WARN(@"Extension is zombie");
             [self updateVPNConfigurationOnDemandSetting:FALSE completionHandler:^(NSError *error) {
                 if (error) {
-                    LOG_ERROR(@"Failed to disable Connect On Demand. Error: %@", error);
+                    [PsiFeedbackLogger error:@"Failed to disable Connect On Demand. Error: %@", error];
                 }
                 [self stopVPN];
             }];
@@ -530,7 +531,7 @@ NSErrorDomain const VPNQueryErrorDomain = @"VPNQueryErrorDomain";
         }
 
         if (err) {
-            LOG_ERROR(@"Failed to send message to the provider. Error:%@", err);
+            [PsiFeedbackLogger error:@"Failed to send message to the provider. Error:%@", err];
             completionHandler(err, nil);
         }
     } else {

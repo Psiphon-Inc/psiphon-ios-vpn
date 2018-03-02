@@ -20,7 +20,6 @@
 		44A0CAF31FE04A4500859DB3 /* RMAppReceipt.m in Sources */ = {isa = PBXBuildFile; fileRef = 44A0CAF11FE04A4500859DB3 /* RMAppReceipt.m */; };
 		44A0CAF41FE04A7400859DB3 /* AppleIncRootCertificate.cer in Resources */ = {isa = PBXBuildFile; fileRef = 44A0CAF01FE04A4500859DB3 /* AppleIncRootCertificate.cer */; };
 		44D9B1001F67470E007D1E69 /* IAPViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 44D9B0FF1F67470E007D1E69 /* IAPViewController.m */; };
-		44E3CB681FC7535800C80C82 /* SubscriptionReceiptInputStream.m in Sources */ = {isa = PBXBuildFile; fileRef = 44E3CB621FC73A6700C80C82 /* SubscriptionReceiptInputStream.m */; };
 		4E0774961F566B040097BC8C /* InAppSettings.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 4E0774951F566ADA0097BC8C /* InAppSettings.bundle */; };
 		4E0D88241FA06B2400ADB61E /* PsiphonUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E0D88231FA06B2400ADB61E /* PsiphonUITests.swift */; };
 		4E0DCB1A1F28481E00495781 /* PsiphonDataSharedDB.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E0DCB191F28481E00495781 /* PsiphonDataSharedDB.m */; };
@@ -60,12 +59,10 @@
 		CE4E9BC21BBEECFC0060FF8B /* PsiphonVPN.entitlements in Resources */ = {isa = PBXBuildFile; fileRef = CE4E9BC11BBEECFC0060FF8B /* PsiphonVPN.entitlements */; };
 		CE7B76431F54881F00EA44BD /* PsiphonTunnel.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 66094F781E8067520069EC4E /* PsiphonTunnel.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		D672BC574F14042B4D77AB28 /* libPods-Psiphon.a in Frameworks */ = {isa = PBXBuildFile; fileRef = CB8BB19F016330264C4DCB80 /* libPods-Psiphon.a */; };
-		EF35E8101F9FA748003B3102 /* Logging.m in Sources */ = {isa = PBXBuildFile; fileRef = EF35E80F1F9FA748003B3102 /* Logging.m */; };
-		EF35E8111F9FA748003B3102 /* Logging.m in Sources */ = {isa = PBXBuildFile; fileRef = EF35E80F1F9FA748003B3102 /* Logging.m */; };
 		EF441B011F7AF14A008A7D82 /* NSDateFormatter+RFC3339.m in Sources */ = {isa = PBXBuildFile; fileRef = EF441B001F7AF14A008A7D82 /* NSDateFormatter+RFC3339.m */; };
 		EF441B021F7AF14A008A7D82 /* NSDateFormatter+RFC3339.m in Sources */ = {isa = PBXBuildFile; fileRef = EF441B001F7AF14A008A7D82 /* NSDateFormatter+RFC3339.m */; };
-		EF639C2F1F8FCE37009D6B42 /* NoticeLogger.m in Sources */ = {isa = PBXBuildFile; fileRef = EF639C2E1F8FCE2A009D6B42 /* NoticeLogger.m */; };
-		EF639C301F8FCE37009D6B42 /* NoticeLogger.m in Sources */ = {isa = PBXBuildFile; fileRef = EF639C2E1F8FCE2A009D6B42 /* NoticeLogger.m */; };
+		EF639C2F1F8FCE37009D6B42 /* PsiFeedbackLogger.m in Sources */ = {isa = PBXBuildFile; fileRef = EF639C2E1F8FCE2A009D6B42 /* PsiFeedbackLogger.m */; };
+		EF639C301F8FCE37009D6B42 /* PsiFeedbackLogger.m in Sources */ = {isa = PBXBuildFile; fileRef = EF639C2E1F8FCE2A009D6B42 /* PsiFeedbackLogger.m */; };
 		EF652CD11F352212002AFB48 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = EF652CD01F352212002AFB48 /* main.m */; };
 		EF652CD61F35224C002AFB48 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = EF652CD31F35224C002AFB48 /* AppDelegate.m */; };
 		EF652CD71F35224C002AFB48 /* MainViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = EF652CD51F35224C002AFB48 /* MainViewController.m */; };
@@ -155,8 +152,6 @@
 		44A0CAF11FE04A4500859DB3 /* RMAppReceipt.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RMAppReceipt.m; sourceTree = "<group>"; };
 		44D9B0FE1F67470E007D1E69 /* IAPViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IAPViewController.h; sourceTree = "<group>"; };
 		44D9B0FF1F67470E007D1E69 /* IAPViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IAPViewController.m; sourceTree = "<group>"; };
-		44E3CB621FC73A6700C80C82 /* SubscriptionReceiptInputStream.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SubscriptionReceiptInputStream.m; sourceTree = "<group>"; };
-		44E3CB631FC73A6700C80C82 /* SubscriptionReceiptInputStream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SubscriptionReceiptInputStream.h; sourceTree = "<group>"; };
 		44E3CB6A1FCCA83100C80C82 /* Subscription.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Subscription.h; sourceTree = "<group>"; };
 		44E3CB6B1FCCA83200C80C82 /* Subscription.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Subscription.m; sourceTree = "<group>"; };
 		4E0774951F566ADA0097BC8C /* InAppSettings.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = InAppSettings.bundle; sourceTree = "<group>"; };
@@ -213,6 +208,7 @@
 		9BFEC3165745A5D14C8C3C08 /* Notifier.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Notifier.h; sourceTree = "<group>"; };
 		9BFEC31B61584FD2EAAF5DE6 /* AuthorizationToken.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AuthorizationToken.m; sourceTree = "<group>"; };
 		9BFEC3D27AD09E29BF0DB9AC /* Authorizations.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Authorizations.h; sourceTree = "<group>"; };
+		9BFEC4D609BFCD0DC812BDB3 /* Asserts.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Asserts.h; sourceTree = "<group>"; };
 		9BFEC4FD03E7187918C49B7D /* DispatchUtils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DispatchUtils.m; sourceTree = "<group>"; };
 		9BFEC584519C408D9D6D3FF1 /* PsiphonConfigUserDefaults.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PsiphonConfigUserDefaults.m; sourceTree = "<group>"; };
 		9BFEC66B7F0E98CBC5631F06 /* AdManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AdManager.h; sourceTree = "<group>"; };
@@ -240,11 +236,10 @@
 		CE4E9BC11BBEECFC0060FF8B /* PsiphonVPN.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = PsiphonVPN.entitlements; sourceTree = "<group>"; };
 		DD100E19194B9A79F5D7DF55 /* Pods-PsiphonVPN.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PsiphonVPN.debug.xcconfig"; path = "Pods/Target Support Files/Pods-PsiphonVPN/Pods-PsiphonVPN.debug.xcconfig"; sourceTree = "<group>"; };
 		EDB109A2FBFB32D821FF121D /* Pods-Psiphon.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Psiphon.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Psiphon/Pods-Psiphon.debug.xcconfig"; sourceTree = "<group>"; };
-		EF35E80F1F9FA748003B3102 /* Logging.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Logging.m; sourceTree = "<group>"; };
 		EF441B001F7AF14A008A7D82 /* NSDateFormatter+RFC3339.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "NSDateFormatter+RFC3339.m"; sourceTree = "<group>"; };
 		EF441B031F7AF263008A7D82 /* NSDateFormatter+RFC3339.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSDateFormatter+RFC3339.h"; sourceTree = "<group>"; };
-		EF639C2D1F8FCE2A009D6B42 /* NoticeLogger.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = NoticeLogger.h; sourceTree = "<group>"; };
-		EF639C2E1F8FCE2A009D6B42 /* NoticeLogger.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = NoticeLogger.m; sourceTree = "<group>"; };
+		EF639C2D1F8FCE2A009D6B42 /* PsiFeedbackLogger.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PsiFeedbackLogger.h; sourceTree = "<group>"; };
+		EF639C2E1F8FCE2A009D6B42 /* PsiFeedbackLogger.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PsiFeedbackLogger.m; sourceTree = "<group>"; };
 		EF652CD01F352212002AFB48 /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		EF652CD21F35224C002AFB48 /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		EF652CD31F35224C002AFB48 /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; usesTabs = 0; };
@@ -379,9 +374,8 @@
 				EF6C1F511F59E46500709554 /* psiphon_config */,
 				EF441B001F7AF14A008A7D82 /* NSDateFormatter+RFC3339.m */,
 				EF441B031F7AF263008A7D82 /* NSDateFormatter+RFC3339.h */,
-				EF639C2D1F8FCE2A009D6B42 /* NoticeLogger.h */,
-				EF639C2E1F8FCE2A009D6B42 /* NoticeLogger.m */,
-				EF35E80F1F9FA748003B3102 /* Logging.m */,
+				EF639C2D1F8FCE2A009D6B42 /* PsiFeedbackLogger.h */,
+				EF639C2E1F8FCE2A009D6B42 /* PsiFeedbackLogger.m */,
 				9BFEC3123D928C7C591D2677 /* FileUtils.m */,
 				9BFEC089261DAF8C18FB51C6 /* FileUtils.h */,
 				9BFECC9B2B9F2BFBD4F8A47B /* UserDefaults.h */,
@@ -393,6 +387,7 @@
 				9BFECDCC3659EE393EC4A8F7 /* NSDate+Comparator.h */,
 				9BFEC4FD03E7187918C49B7D /* DispatchUtils.m */,
 				9BFEC199CC1A07833B948031 /* DispatchUtils.h */,
+				9BFEC4D609BFCD0DC812BDB3 /* Asserts.h */,
 			);
 			path = Shared;
 			sourceTree = "<group>";
@@ -513,8 +508,6 @@
 			children = (
 				44E3CB6A1FCCA83100C80C82 /* Subscription.h */,
 				44E3CB6B1FCCA83200C80C82 /* Subscription.m */,
-				44E3CB631FC73A6700C80C82 /* SubscriptionReceiptInputStream.h */,
-				44E3CB621FC73A6700C80C82 /* SubscriptionReceiptInputStream.m */,
 			);
 			path = IAP;
 			sourceTree = "<group>";
@@ -917,7 +910,6 @@
 				EFC2F5C820226782007B52F9 /* LoadingCircleLayer.m in Sources */,
 				197DABF11F54C0CA00DD5C3B /* MPInstanceProvider+Vungle.m in Sources */,
 				EFC2F5C520226782007B52F9 /* EmbeddedServerEntries.m in Sources */,
-				EF35E8101F9FA748003B3102 /* Logging.m in Sources */,
 				EFC2F5C420226782007B52F9 /* RootContainerController.m in Sources */,
 				EF652CD11F352212002AFB48 /* main.m in Sources */,
 				44A0CAF31FE04A4500859DB3 /* RMAppReceipt.m in Sources */,
@@ -928,7 +920,7 @@
 				EF743FC81F99549000AC89A2 /* IAPStoreHelper.m in Sources */,
 				EFB3E62C1F621111004AAE8C /* PulsingHaloLayer.m in Sources */,
 				EFC2F5C720226782007B52F9 /* UIAlertController+Delegate.m in Sources */,
-				EF639C2F1F8FCE37009D6B42 /* NoticeLogger.m in Sources */,
+				EF639C2F1F8FCE37009D6B42 /* PsiFeedbackLogger.m in Sources */,
 				9BFEC4F02A47FF8265635803 /* Notifier.m in Sources */,
 				9BFECFEB3BC9F10542C1A416 /* PsiphonConfigUserDefaults.m in Sources */,
 				197DABEE1F54C09E00DD5C3B /* MPVungleRouter.m in Sources */,
@@ -949,15 +941,13 @@
 			files = (
 				EFC2F5CC20226835007B52F9 /* PsiphonConfigFiles.m in Sources */,
 				44A0CAEE1FCCCDEC00859DB3 /* Subscription.m in Sources */,
-				44E3CB681FC7535800C80C82 /* SubscriptionReceiptInputStream.m in Sources */,
 				EF652CDA1F352271002AFB48 /* PacketTunnelProvider.m in Sources */,
 				4E0DCB1E1F2855FC00495781 /* PsiphonDataSharedDB.m in Sources */,
 				9BFECD1880B51B0E2EAEFF1F /* Notifier.m in Sources */,
-				EF639C301F8FCE37009D6B42 /* NoticeLogger.m in Sources */,
+				EF639C301F8FCE37009D6B42 /* PsiFeedbackLogger.m in Sources */,
 				EF441B021F7AF14A008A7D82 /* NSDateFormatter+RFC3339.m in Sources */,
 				9BFECF8895D5FE1940A6F700 /* PsiphonConfigUserDefaults.m in Sources */,
 				EFC2F5B620226758007B52F9 /* PacketTunnelUtils.m in Sources */,
-				EF35E8111F9FA748003B3102 /* Logging.m in Sources */,
 				9BFEC9B33C9614EE922EC5FE /* FileUtils.m in Sources */,
 				9BFECC62159FBEAA1A69F4F9 /* BasePacketTunnelProvider.m in Sources */,
 				9BFEC20939C9436B34A525B1 /* Authorizations.m in Sources */,
