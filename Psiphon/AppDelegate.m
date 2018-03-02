@@ -90,7 +90,7 @@ NSNotificationName const AppDelegateSubscriptionDidActivateNotification = @"AppD
 }
 
 + (BOOL)isRunningUITest {
-#ifdef DEBUG
+#if DEBUG
     static BOOL runningUITest;
     static dispatch_once_t once;
     dispatch_once(&once, ^{

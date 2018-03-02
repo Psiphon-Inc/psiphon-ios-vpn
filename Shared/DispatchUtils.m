@@ -17,11 +17,11 @@
  *
  */
 
-#include <dispatch/object.h>
-#include <dispatch/queue.h>
-#include <dispatch/time.h>
-#include <sys/param.h>
-#include "DispatchUtils.h"
+#import <dispatch/object.h>
+#import <dispatch/queue.h>
+#import <dispatch/time.h>
+#import <sys/param.h>
+#import "DispatchUtils.h"
 
 void dispatch_async_global(dispatch_block_t block) {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), block);

@@ -18,7 +18,7 @@
  */
 
 #import <Foundation/Foundation.h>
-#ifndef TARGET_IS_EXTENSION
+#if !(TARGET_IS_EXTENSION)
 #import "PsiphonData.h"
 #endif
 
@@ -35,7 +35,7 @@
 
 - (id)initForAppGroupIdentifier:(NSString*)identifier;
 
-#ifndef TARGET_IS_EXTENSION
+#if !(TARGET_IS_EXTENSION)
 + (NSString *)tryReadingFile:(NSString *)filePath;
 + (NSString *)tryReadingFile:(NSString *)filePath usingFileHandle:(NSFileHandle *__strong *)fileHandlePtr readFromOffset:(unsigned long long)bytesOffset readToOffset:(unsigned long long *)readToOffset;
 - (void)readLogsData:(NSString *)logLines intoArray:(NSMutableArray<DiagnosticEntry *> *)entries;
@@ -43,7 +43,7 @@
 #endif
 
 - (BOOL)insertNewEgressRegions:(NSArray<NSString *> *)regions;
-#ifndef TARGET_IS_EXTENSION
+#if !(TARGET_IS_EXTENSION)
 - (NSArray<NSString *> *)getAllEgressRegions;
 - (void)insertNewEmbeddedEgressRegions:(NSArray<NSString *> *)regions;
 - (NSArray<NSString *> *)getAllEmbeddedEgressRegions;
@@ -52,7 +52,7 @@
 - (NSString *)homepageNoticesPath;
 - (NSString *)rotatingLogNoticesPath;
 
-#ifndef TARGET_IS_EXTENSION
+#if !(TARGET_IS_EXTENSION)
 - (NSArray<DiagnosticEntry*>*)getAllLogs;
 #endif
 

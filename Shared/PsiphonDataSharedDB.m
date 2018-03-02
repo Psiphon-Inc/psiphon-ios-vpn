@@ -31,7 +31,7 @@
 #define APP_FOREGROUND_KEY @"app_foreground"
 #define SERVER_TIMESTAMP_KEY @"server_timestamp"
 
-#ifndef TARGET_IS_EXTENSION
+#if !(TARGET_IS_EXTENSION)
 #define EMBEDDED_EGRESS_REGIONS_KEY @"embedded_server_entries_egress_regions"
 #endif
 
@@ -61,7 +61,7 @@
 
 #pragma mark - File operations
 
-#ifndef TARGET_IS_EXTENSION
+#if !(TARGET_IS_EXTENSION)
 
 + (NSString *)tryReadingFile:(NSString *)filePath {
     NSFileHandle *fileHandle;
@@ -212,7 +212,7 @@
 
 #pragma mark - Homepage methods
 
-#ifndef TARGET_IS_EXTENSION
+#if !(TARGET_IS_EXTENSION)
 /*!
  * Reads shared homepages file.
  * @return NSArray of Homepages.
@@ -276,7 +276,7 @@
     return [sharedDefaults synchronize];
 }
 
-#ifndef TARGET_IS_EXTENSION
+#if !(TARGET_IS_EXTENSION)
 
 /*!
  * @brief Merges egress regions in shared and standard user defaults.
@@ -343,7 +343,7 @@
     return [[self rotatingLogNoticesPath] stringByAppendingString:@".1"];
 }
 
-#ifndef TARGET_IS_EXTENSION
+#if !(TARGET_IS_EXTENSION)
 
 // Reads all log files and tries parses the json lines contained in each.
 // This method is not meant to handle large files.

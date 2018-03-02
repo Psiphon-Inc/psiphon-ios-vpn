@@ -46,7 +46,7 @@
     va_end(args);
 
 
-#ifdef TARGET_IS_EXTENSION
+#if TARGET_IS_EXTENSION
 NSString * const InfoNoticeType = @"ExtensionInfo";
 NSString * const ErrorNoticeType = @"ExtensionError";
 #else
@@ -117,7 +117,7 @@ NSString * const ErrorNoticeType = @"ContainerError";
 
     dispatch_once(&once, ^{
 
-        #ifdef TARGET_IS_EXTENSION
+        #if TARGET_IS_EXTENSION
         sharedInstance = [[self alloc] initWithFilepath:PsiFeedbackLogger.extensionRotatingLogNoticesPath
                                           olderFilepath:PsiFeedbackLogger.extensionRotatingOlderLogNoticesPath];
         #else
@@ -146,7 +146,7 @@ NSString * const ErrorNoticeType = @"ContainerError";
     CONVERT_FORMAT_ARGS_TO_NSSTRING(message, format);
     [[PsiFeedbackLogger sharedInstance] writeMessage:message withNoticeType:InfoNoticeType];
 
-#ifdef DEBUG
+#if DEBUG
     NSLog(@"<INFO> %@", message);
 #endif
 
@@ -159,7 +159,7 @@ NSString * const ErrorNoticeType = @"ContainerError";
     NSDictionary *data = @{sourceType : message};
     [[PsiFeedbackLogger sharedInstance] writeData:data noticeType:InfoNoticeType];
 
-#ifdef DEBUG
+#if DEBUG
     NSLog(@"<INFO> %@", data);
 #endif
 
@@ -184,7 +184,7 @@ NSString * const ErrorNoticeType = @"ContainerError";
     NSDictionary *data = @{sourceType : message};
     [[PsiFeedbackLogger sharedInstance] writeData:data noticeType:ErrorNoticeType];
 
-#ifdef DEBUG
+#if DEBUG
     NSLog(@"<ERROR> %@", data);
 #endif
 
@@ -200,7 +200,7 @@ NSString * const ErrorNoticeType = @"ContainerError";
 
     [[PsiFeedbackLogger sharedInstance] writeData:data noticeType:ErrorNoticeType];
 
-#ifdef DEBUG
+#if DEBUG
     NSLog(@"<ERROR> %@", data);
 #endif
 

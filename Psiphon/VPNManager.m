@@ -106,7 +106,7 @@ NSErrorDomain const VPNQueryErrorDomain = @"VPNQueryErrorDomain";
         return VPNStatusInvalid;
     }
 
-#ifdef DEBUG
+#if DEBUG
     if ([AppDelegate isRunningUITest]) {
         return VPNStatusConnected;
     }
