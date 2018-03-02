@@ -127,7 +127,7 @@ typedef NS_ENUM(NSInteger, VPNStatus) {
  * @return VPNManager status reflect NEVPNStatus of NEVPNManager
  * with the addition of a VPNStatusRestarting status.
  */
-- (VPNStatus)getVPNStatus;
+- (VPNStatus)VPNStatus;
 
 /**
  * @return TRUE if the VPN is in the Connecting, Connected or Reasserting state.

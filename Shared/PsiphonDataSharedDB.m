@@ -20,7 +20,7 @@
 #import "PsiphonDataSharedDB.h"
 #import "Logging.h"
 #import "NSDateFormatter+RFC3339.h"
-#import "NoticeLogger.h"
+#import "PsiFeedbackLogger.h"
 
 // File operations parameters
 #define MAX_RETRIES 3
@@ -31,7 +31,7 @@
 #define APP_FOREGROUND_KEY @"app_foreground"
 #define SERVER_TIMESTAMP_KEY @"server_timestamp"
 
-#ifndef TARGET_IS_EXTENSION
+#if !(TARGET_IS_EXTENSION)
 #define EMBEDDED_EGRESS_REGIONS_KEY @"embedded_server_entries_egress_regions"
 #endif
 
@@ -61,7 +61,7 @@
 
 #pragma mark - File operations
 
-#ifndef TARGET_IS_EXTENSION
+#if !(TARGET_IS_EXTENSION)
 
 + (NSString *)tryReadingFile:(NSString *)filePath {
     NSFileHandle *fileHandle;
@@ -127,7 +127,7 @@
                 }
             }
             @catch (NSException *e) {
-                LOG_ERROR(@"Error reading file: %@", [e debugDescription]);
+                [PsiFeedbackLogger error:@"Error reading file: %@", [e debugDescription]];
 
             }
         }
@@ -155,7 +155,7 @@
             NSDictionary *dict = [NSJSONSerialization JSONObjectWithData:[logLine dataUsingEncoding:NSUTF8StringEncoding]
                                                                  options:0 error:&err];
             if (err) {
-                LOG_ERROR(@"Failed to parse log line (%@). Error: %@", logLine, err);
+                [PsiFeedbackLogger error:@"Failed to parse log line (%@). Error: %@", logLine, err];
             }
 
             if (dict) {
@@ -172,7 +172,7 @@
                 
                 NSString *msg = nil;
                 if (err) {
-                    LOG_ERROR(@"Failed to serialize dictionary as JSON (%@)", dict[@"noticeType"]);
+                    [PsiFeedbackLogger error:@"Failed to serialize dictionary as JSON (%@)", dict[@"noticeType"]];
                 } else {
                     msg = [NSString stringWithFormat:@"%@: %@", dict[@"noticeType"], data];
                 }
@@ -180,13 +180,13 @@
                 NSDate *timestamp = [[NSDateFormatter sharedRFC3339MilliDateFormatter] dateFromString:dict[@"timestamp"]];
 
                 if (!msg) {
-                    LOG_ERROR(@"Failed to read notice message for log line (%@).", logLine);
+                    [PsiFeedbackLogger error:@"Failed to read notice message for log line (%@).", logLine];
                     // Puts place holder value for message.
                     msg = @"Failed to read notice message.";
                 }
 
                 if (!timestamp) {
-                    LOG_ERROR(@"Failed to parse timestamp: (%@) for log line (%@)", dict[@"timestamp"], logLine);
+                    [PsiFeedbackLogger error:@"Failed to parse timestamp: (%@) for log line (%@)", dict[@"timestamp"], logLine];
                     // Puts placeholder value for timestamp.
                     timestamp = [NSDate dateWithTimeIntervalSince1970:0];
                 }
@@ -212,7 +212,7 @@
 
 #pragma mark - Homepage methods
 
-#ifndef TARGET_IS_EXTENSION
+#if !(TARGET_IS_EXTENSION)
 /*!
  * Reads shared homepages file.
  * @return NSArray of Homepages.
@@ -224,7 +224,7 @@
     NSString *data = [PsiphonDataSharedDB tryReadingFile:[self homepageNoticesPath]];
 
     if (!data) {
-        LOG_ERROR(@"Failed reading homepage notices file. Error:%@", err);
+        [PsiFeedbackLogger error:@"Failed reading homepage notices file. Error:%@", err];
         return nil;
     }
 
@@ -242,7 +242,7 @@
                                                              options:0 error:&err];
 
         if (err) {
-            LOG_ERROR(@"Failed parsing homepage notices file. Error:%@", err);
+            [PsiFeedbackLogger error:@"Failed parsing homepage notices file. Error:%@", err];
         }
 
         if (dict) {
@@ -276,7 +276,7 @@
     return [sharedDefaults synchronize];
 }
 
-#ifndef TARGET_IS_EXTENSION
+#if !(TARGET_IS_EXTENSION)
 
 /*!
  * @brief Merges egress regions in shared and standard user defaults.
@@ -294,7 +294,7 @@
     } else if ([sharedDBEgressRegions isKindOfClass:[NSArray<NSString*> class]]) {
         [egressRegions addObjectsFromArray:(NSArray<NSString*>*)sharedDBEgressRegions];
     } else {
-        LOG_ERROR(@"Error egress regions for key (%@) in shared defaults are not NSArray<NSString*>* but %@", EGRESS_REGIONS_KEY, [sharedDBEgressRegions class]);
+        [PsiFeedbackLogger error:@"Error egress regions for key (%@) in shared defaults are not NSArray<NSString*>* but %@", EGRESS_REGIONS_KEY, [sharedDBEgressRegions class]];
     }
 
     id embeddedEgressRegions = [[NSUserDefaults standardUserDefaults] objectForKey:EMBEDDED_EGRESS_REGIONS_KEY];
@@ -303,11 +303,11 @@
     } else if ([embeddedEgressRegions isKindOfClass:[NSArray<NSString*> class]]) {
         [egressRegions addObjectsFromArray:(NSArray<NSString*>*)embeddedEgressRegions];
     } else {
-        LOG_ERROR(@"Error egress regions for key (%@) in standard user defaults are not NSArray<NSString*>* but %@", EMBEDDED_EGRESS_REGIONS_KEY, [embeddedEgressRegions class]);
+        [PsiFeedbackLogger error:@"Error egress regions for key (%@) in standard user defaults are not NSArray<NSString*>* but %@", EMBEDDED_EGRESS_REGIONS_KEY, [embeddedEgressRegions class]];
     }
 
     if ([egressRegions count] == 0) {
-        LOG_ERROR(@"No egress regions found in shared or standard user defaults.");
+        [PsiFeedbackLogger error:@"No egress regions found in shared or standard user defaults."];
         return nil;
     }
 
@@ -343,7 +343,7 @@
     return [[self rotatingLogNoticesPath] stringByAppendingString:@".1"];
 }
 
-#ifndef TARGET_IS_EXTENSION
+#if !(TARGET_IS_EXTENSION)
 
 // Reads all log files and tries parses the json lines contained in each.
 // This method is not meant to handle large files.
@@ -364,14 +364,14 @@
     [self readLogsData:tunnelCoreLogs intoArray:entriesArray[0]];
 
     entriesArray[1] = [[NSMutableArray alloc] init];
-    NSString *containerOlderLogs = [PsiphonDataSharedDB tryReadingFile:[NoticeLogger containerRotatingOlderLogNoticesPath]];
-    NSString *containerLogs = [PsiphonDataSharedDB tryReadingFile:[NoticeLogger containerRotatingLogNoticesPath]];
+    NSString *containerOlderLogs = [PsiphonDataSharedDB tryReadingFile:[PsiFeedbackLogger containerRotatingOlderLogNoticesPath]];
+    NSString *containerLogs = [PsiphonDataSharedDB tryReadingFile:[PsiFeedbackLogger containerRotatingLogNoticesPath]];
     [self readLogsData:containerOlderLogs intoArray:entriesArray[1]];
     [self readLogsData:containerLogs intoArray:entriesArray[1]];
 
     entriesArray[2] = [[NSMutableArray alloc] init];
-    NSString *extensionOlderLogs = [PsiphonDataSharedDB tryReadingFile:[NoticeLogger extensionRotatingOlderLogNoticesPath]];
-    NSString *extensionLogs = [PsiphonDataSharedDB tryReadingFile:[NoticeLogger extensionRotatingLogNoticesPath]];
+    NSString *extensionOlderLogs = [PsiphonDataSharedDB tryReadingFile:[PsiFeedbackLogger extensionRotatingOlderLogNoticesPath]];
+    NSString *extensionLogs = [PsiphonDataSharedDB tryReadingFile:[PsiFeedbackLogger extensionRotatingLogNoticesPath]];
     [self readLogsData:extensionOlderLogs intoArray:entriesArray[2]];
     [self readLogsData:extensionLogs intoArray:entriesArray[2]];
 

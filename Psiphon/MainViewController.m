@@ -40,9 +40,9 @@
 #import "IAPStoreHelper.h"
 #import "LaunchScreenViewController.h"
 #import "UIAlertController+Delegate.h"
-#import "NoticeLogger.h"
 #import "NEBridge.h"
 #import "DispatchUtils.h"
+#import "PsiFeedbackLogger.h"
 
 static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSString *b) {
     return (([a length] == 0) && ([b length] == 0)) || ([a isEqualToString:b]);
@@ -285,7 +285,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 
 - (void)onVPNStatusDidChange {
     // Update UI
-    VPNStatus s = [vpnManager getVPNStatus];
+    VPNStatus s = [vpnManager VPNStatus];
     [self updateButtonState];
     statusLabel.text = [self getVPNStatusDescription:s];
 
@@ -425,7 +425,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
         case VPNStatusReasserting: return NSLocalizedStringWithDefaultValue(@"VPN_STATUS_RECONNECTING", nil, [NSBundle mainBundle], @"Reconnecting", @"Status when the VPN was connected to a Psiphon server, got disconnected unexpectedly, and is currently trying to reconnect");
         case VPNStatusRestarting: return NSLocalizedStringWithDefaultValue(@"VPN_STATUS_RESTARTING", nil, [NSBundle mainBundle], @"Restarting", @"Status when the VPN is restarting.");
     }
-    LOG_ERROR(@"MainViewController unhandled VPNStatus (%ld)", status);
+    [PsiFeedbackLogger error:@"MainViewController unhandled VPNStatus (%ld)", status];
     return nil;
 }
 
@@ -765,7 +765,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     statusLabel = [[UILabel alloc] init];
     statusLabel.translatesAutoresizingMaskIntoConstraints = NO;
     statusLabel.adjustsFontSizeToFitWidth = YES;
-    statusLabel.text = [self getVPNStatusDescription:[vpnManager getVPNStatus]];
+    statusLabel.text = [self getVPNStatusDescription:[vpnManager VPNStatus]];
     statusLabel.textAlignment = NSTextAlignmentCenter;
     statusLabel.textColor = [UIColor whiteColor];
     [self.view addSubview:statusLabel];
@@ -1001,7 +1001,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 #pragma mark - TunneledAppDelegate methods
 
 - (void)onDiagnosticMessage:(NSString *_Nonnull)message withTimestamp:(NSString *_Nonnull)timestamp {
-    [[NoticeLogger sharedInstance] noticeError:message];
+    [PsiFeedbackLogger logNoticeWithType:@"FeedbackUpload" message:message timestamp:timestamp];
 }
 
 /*!
@@ -1025,7 +1025,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 
     // Otherwise override sponsor ID
     if (err) {
-        LOG_ERROR(@"%@", [NSString stringWithFormat:@"Failed to parse config JSON: %@", err.description]);
+        [PsiFeedbackLogger error:@"%@", [NSString stringWithFormat:@"Failed to parse config JSON: %@", err.description]];
         dispatch_async(dispatch_get_main_queue(), ^{
             [self displayCorruptSettingsFileAlert];
         });
@@ -1047,7 +1047,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     jsonData  = [NSJSONSerialization dataWithJSONObject:mutableConfigCopy options:0 error:&err];
 
     if (err) {
-        LOG_ERROR(@"%@", [NSString stringWithFormat:@"Failed to create JSON data from config object: %@", err.description]);
+        [PsiFeedbackLogger error:@"%@", [NSString stringWithFormat:@"Failed to create JSON data from config object: %@", err.description]];
         dispatch_async(dispatch_get_main_queue(), ^{
             [self displayCorruptSettingsFileAlert];
         });
@@ -1174,7 +1174,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 }
 
 - (NSArray<NSString*>*)hiddenSpecifierKeys {
-    VPNStatus status = [vpnManager getVPNStatus];
+    VPNStatus status = [vpnManager VPNStatus];
     if (status == VPNStatusInvalid ||
         status == VPNStatusDisconnected ||
         status == VPNStatusDisconnecting) {
@@ -1226,7 +1226,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 - (void)updateAvailableRegions {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         NSArray<NSString *> *regions = [sharedDB getAllEgressRegions];
-#ifdef DEBUG
+#if DEBUG
         if ([AppDelegate isRunningUITest]) {
             // fake the availability of all regions in the UI for automated screenshots
             NSMutableArray *faked_regions = [[NSMutableArray alloc] init];
