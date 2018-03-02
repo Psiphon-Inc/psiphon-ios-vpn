@@ -18,7 +18,7 @@
  */
 
 #import "AuthorizationToken.h"
-#import "Logging.h"
+#import "PsiFeedbackLogger.h"
 #import "NSDateFormatter+RFC3339.h"
 
 @interface AuthorizationToken ()
@@ -55,7 +55,7 @@
         NSData *data = [[NSData alloc] initWithBase64EncodedString:encodedToken options:0];
         NSDictionary *authorizationObjectDict = [NSJSONSerialization JSONObjectWithData:data options:0 error:&error];
         if (error) {
-            LOG_ERROR(@"failed to parse authorization token:%@", error);
+            [PsiFeedbackLogger error:@"failed to parse authorization token:%@", error];
             return nil;
         }
 
@@ -67,26 +67,26 @@
         // Get ID
         self.ID = authDict[@"ID"];
         if ([self.ID length] == 0) {
-            LOG_ERROR(@"authorization token 'ID' is empty");
+            [PsiFeedbackLogger error:@"authorization token 'ID' is empty"];
             return nil;
         }
 
         // Get AccessType
         self.accessType = authDict[@"AccessType"];
         if ([self.accessType length] == 0) {
-            LOG_ERROR(@"authorization token 'AccessType' is empty");
+            [PsiFeedbackLogger error:@"authorization token 'AccessType' is empty"];
             return nil;
         }
 
         // Get Expires date
         NSString *authExpiresDateString = (NSString *) authDict[@"Expires"];
         if ([authExpiresDateString length] == 0) {
-            LOG_ERROR(@"authorization token 'Expires' is empty");
+            [PsiFeedbackLogger error:@"authorization token 'Expires' is empty"];
             return nil;
         }
         self.expires = [[NSDateFormatter sharedRFC3339DateFormatter] dateFromString:authExpiresDateString];
         if (!self.expires) {
-            LOG_ERROR(@"authorization token failed to parse RFC3339 date string (%@)", authExpiresDateString);
+            [PsiFeedbackLogger error:@"authorization token failed to parse RFC3339 date string (%@)", authExpiresDateString];
             return nil;
         }
     }

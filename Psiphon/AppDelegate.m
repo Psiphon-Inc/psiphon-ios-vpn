@@ -36,9 +36,9 @@
 #import "AdManager.h"
 #import "Logging.h"
 #import "IAPStoreHelper.h"
-#import "IAPViewController.h"
 #import "NEBridge.h"
 #import "DispatchUtils.h"
+#import "PsiFeedbackLogger.h"
 
 NSNotificationName const AppDelegateSubscriptionDidExpireNotification = @"AppDelegateSubscriptionDidExpireNotification";
 NSNotificationName const AppDelegateSubscriptionDidActivateNotification = @"AppDelegateSubscriptionDidActivateNotification";
@@ -280,7 +280,7 @@ NSNotificationName const AppDelegateSubscriptionDidActivateNotification = @"AppD
     if ([embeddedEgressRegions count] > 0) {
         [sharedDB insertNewEmbeddedEgressRegions:embeddedEgressRegions];
     } else {
-        LOG_ERROR(@"Error no egress regions found in %@.", embeddedServerEntriesPath);
+        [PsiFeedbackLogger error:@"Error no egress regions found in %@.", embeddedServerEntriesPath];
     }
 }
 
