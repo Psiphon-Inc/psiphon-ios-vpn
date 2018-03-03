@@ -159,6 +159,10 @@ typedef NS_ENUM(NSInteger, GracePeriodState) {
 //
 - (void)checkSubscription {
 
+    PSIAssert(self.subscriptionCheckState != nil);
+    PSIAssert(self->tunnelConnectionStateSubject != nil);
+    PSIAssert(self->subscriptionAuthorizationTokenActiveSubject != nil);
+
     __weak PacketTunnelProvider *weakSelf = self;
 
     // Dispose of ongoing subscription check if any.
