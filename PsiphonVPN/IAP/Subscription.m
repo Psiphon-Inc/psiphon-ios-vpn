@@ -18,6 +18,7 @@
  */
 
 #import <Foundation/Foundation.h>
+#import <ReactiveObjC/RACDisposable.h>
 #import "Subscription.h"
 #import "NSDate+Comparator.h"
 #import "NSError+Convenience.h"
@@ -34,7 +35,9 @@ NSErrorDomain _Nonnull const ReceiptValidationErrorDomain = @"PsiphonReceiptVali
 + (RACSignal<NSDictionary *> *)updateSubscriptionAuthorizationTokenFromRemote {
     return [RACSignal createSignal:^RACDisposable *(id <RACSubscriber> subscriber) {
 
-        [[[SubscriptionVerifierService alloc] init] startWithCompletionHandler:^(NSDictionary *remoteAuthDict, NSNumber *submittedReceiptFileSize, NSError *error) {
+        SubscriptionVerifierService *service = [[SubscriptionVerifierService alloc] init];
+
+        [service startWithCompletionHandler:^(NSDictionary *remoteAuthDict, NSNumber *submittedReceiptFileSize, NSError *error) {
 
             if (error) {
                 [subscriber sendError:error];
@@ -44,7 +47,12 @@ NSErrorDomain _Nonnull const ReceiptValidationErrorDomain = @"PsiphonReceiptVali
             }
         }];
 
-        return nil;
+        return [RACDisposable disposableWithBlock:^{
+            @autoreleasepool {
+                [service cancel];
+            }
+        }];
+
     }];
 }
 
@@ -119,6 +127,10 @@ NSErrorDomain _Nonnull const ReceiptValidationErrorDomain = @"PsiphonReceiptVali
     }];
 
     [postDataTask resume];
+}
+
+- (void)cancel {
+    [urlSession invalidateAndCancel];
 }
 
 @end
