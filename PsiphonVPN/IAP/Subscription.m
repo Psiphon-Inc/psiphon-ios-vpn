@@ -25,6 +25,7 @@
 #import "RACTuple.h"
 #import "PsiFeedbackLogger.h"
 #import "Logging.h"
+#import "Asserts.h"
 
 NSErrorDomain _Nonnull const ReceiptValidationErrorDomain = @"PsiphonReceiptValidationErrorDomain";
 
@@ -357,13 +358,10 @@ typedef NS_ENUM(NSInteger, SubscriptionStateEnum) {
     SubscriptionStateSubscribed = 3,
 };
 
-@interface SubscriptionState ()
-
-@property (atomic, readwrite) SubscriptionStateEnum state;
-
-@end
-
-@implementation SubscriptionState
+@implementation SubscriptionState {
+    NSObject *_lock;
+    SubscriptionStateEnum _state;
+}
 
 + (SubscriptionState *_Nonnull)initialStateFromSubscription:(Subscription *)subscription {
     SubscriptionState *instance = [[SubscriptionState alloc] init];
@@ -376,6 +374,27 @@ typedef NS_ENUM(NSInteger, SubscriptionStateEnum) {
     }
 
     return instance;
+}
+
+- (instancetype)init {
+    self = [super init];
+    if (self) {
+        _lock = [[NSObject alloc] init];
+    }
+    return self;
+}
+
+- (void)setState:(SubscriptionStateEnum)newState {
+    @synchronized (_lock) {
+        _state = newState;
+    }
+}
+
+- (SubscriptionStateEnum)state {
+    @synchronized (_lock) {
+        PSIAssert(_state != 0);
+        return _state;
+    }
 }
 
 - (BOOL)isSubscribedOrInProgress {
