@@ -36,7 +36,6 @@
 #import "Subscription.h"
 #import "PacketTunnelUtils.h"
 #import "Authorizations.h"
-#import "NSDateFormatter+RFC3339.h"
 #import "NSError+Convenience.h"
 #import "RACSignal+Operations.h"
 #import "RACDisposable.h"
@@ -44,6 +43,7 @@
 #import "RACSignal+Operations2.h"
 #import "RACScheduler.h"
 #import "Asserts.h"
+#import "NSDate+PSIDateExtension.h"
 #import <ReactiveObjC/RACSubject.h>
 #import <ReactiveObjC/RACReplaySubject.h>
 
@@ -359,7 +359,7 @@ typedef NS_ENUM(NSInteger, GracePeriodState) {
           NSDate *requestDate = nil;
           NSString *requestDateString = (NSString *) result.remoteAuthDict[kRemoteSubscriptionVerifierRequestDate];
           if ([requestDateString length]) {
-              requestDate = [[NSDateFormatter sharedRFC3339DateFormatter] dateFromString:requestDateString];
+              requestDate = [NSDate fromRFC3339String:requestDateString];
           }
 
           // Bad Clock error if user has an active subscription in server time
@@ -899,9 +899,10 @@ typedef NS_ENUM(NSInteger, GracePeriodState) {
 }
 
 - (void)onServerTimestamp:(NSString * _Nonnull)timestamp {
+
 	[sharedDB updateServerTimestamp:timestamp];
 
-    NSDate *serverDate = [[NSDateFormatter sharedRFC3339DateFormatter] dateFromString:timestamp];
+    NSDate *serverTimestamp = [NSDate fromRFC3339String:timestamp];
 
     // Check if user has an active subscription in the device's time
     // If NO - do nothing
@@ -911,8 +912,8 @@ typedef NS_ENUM(NSInteger, GracePeriodState) {
     if ([authorizations hasActiveAuthorizationTokenForDate:[NSDate date]]) {
         // The following code adapted from
         // https://developer.apple.com/library/content/documentation/Cocoa/Conceptual/DataFormatting/Articles/dfDateFormatting10_4.html
-        if (serverDate != nil) {
-            if (![authorizations hasActiveAuthorizationTokenForDate:serverDate]) {
+        if (serverTimestamp != nil) {
+            if (![authorizations hasActiveAuthorizationTokenForDate:serverTimestamp]) {
                 // User is possibly cheating, terminate extension due to 'Bad Clock'.
                 [self killExtensionForBadClock];
             }
@@ -920,8 +921,8 @@ typedef NS_ENUM(NSInteger, GracePeriodState) {
     }
 
     if ([subscription hasActiveSubscriptionTokenForDate:[NSDate date]]) {
-        if (serverDate != nil) {
-            if (![subscription hasActiveSubscriptionTokenForDate:serverDate]) {
+        if (serverTimestamp != nil) {
+            if (![subscription hasActiveSubscriptionTokenForDate:serverTimestamp]) {
                 // User is possibly cheating, terminate extension due to 'Bad Clock'.
                 [self killExtensionForBadClock];
             }
