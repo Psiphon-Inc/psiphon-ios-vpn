@@ -294,10 +294,14 @@ NSNotificationName const AppDelegateSubscriptionDidActivateNotification = @"AppD
                 // Only opens landing page if the VPN is active.
                 // Landing page should not be opened outside of the tunnel.
                 if ([vpnManager isVPNActive]) {
+
                     NSArray<Homepage *> *homepages = [sharedDB getHomepages];
                     if (homepages && [homepages count] > 0) {
                         NSUInteger randIndex = arc4random() % [homepages count];
                         Homepage *homepage = homepages[randIndex];
+
+                        [PsiFeedbackLogger infoWithType:@"LandingPage" message:@"open landing page with VPN status %ld", (long) [vpnManager VPNStatus]];
+
                         dispatch_async(dispatch_get_main_queue(), ^{
                             [[UIApplication sharedApplication] openURL:homepage.url options:@{}
                                                      completionHandler:^(BOOL success) {
