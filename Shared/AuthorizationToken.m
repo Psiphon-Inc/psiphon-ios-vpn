@@ -19,7 +19,7 @@
 
 #import "AuthorizationToken.h"
 #import "PsiFeedbackLogger.h"
-#import "NSDateFormatter+RFC3339.h"
+#import "NSDate+PSIDateExtension.h"
 
 @interface AuthorizationToken ()
 
@@ -84,7 +84,8 @@
             [PsiFeedbackLogger error:@"authorization token 'Expires' is empty"];
             return nil;
         }
-        self.expires = [[NSDateFormatter sharedRFC3339DateFormatter] dateFromString:authExpiresDateString];
+
+        self.expires = [NSDate fromRFC3339String:authExpiresDateString];
         if (!self.expires) {
             [PsiFeedbackLogger error:@"authorization token failed to parse RFC3339 date string (%@)", authExpiresDateString];
             return nil;

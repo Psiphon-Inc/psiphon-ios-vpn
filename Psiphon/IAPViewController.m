@@ -19,7 +19,6 @@
 
 #import "IAPViewController.h"
 #import "IAPStoreHelper.h"
-#import "NSDateFormatter+RFC3339.h"
 #import "PsiphonDataSharedDB.h"
 #import "SharedConstants.h"
 #import "NSDate+Comparator.h"

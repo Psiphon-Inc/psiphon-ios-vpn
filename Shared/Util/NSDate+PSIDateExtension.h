@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, Psiphon Inc.
+ * Copyright (c) 2018, Psiphon Inc.
  * All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,12 +17,27 @@
  *
  */
 
-@interface NSDateFormatter (NSDateFormatterRFC3339)
+#import <Foundation/Foundation.h>
 
-+ (instancetype)createRFC3339MilliFormatter;
-+ (instancetype)createRFC3339Formatter;
+NS_ASSUME_NONNULL_BEGIN
 
-+ (instancetype)sharedRFC3339DateFormatter API_AVAILABLE(macos(10.9), ios(7.0));
-+ (instancetype)sharedRFC3339MilliDateFormatter API_AVAILABLE(macos(10.9), ios(7.0));
+@interface NSDate (PSIDateExtension)
+
++ (NSString *)nowRFC3339Milli;
+
+/**
+ * Create NSDate object from RFC3339 formatted timestamp.
+ * @param timestamp RFC3339 formatted timestamp.
+ * @return NSDate object or nil of timestamp string cannot be parsed.
+ */
++ (NSDate *_Nullable)fromRFC3339String:(NSString *)timestamp;
+
+/**
+ * Formats current date with precision of 3 decimal points on the second.
+ * @return RFC3339 timestamp.
+ */
+- (NSString *)RFC3339MilliString;
 
 @end
+
+NS_ASSUME_NONNULL_END

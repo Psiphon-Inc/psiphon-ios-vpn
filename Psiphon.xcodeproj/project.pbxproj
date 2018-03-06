@@ -32,17 +32,9 @@
 		668AF9C01E92CBE0008CAAAA /* NetworkExtension.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 668AF9BE1E92CBD3008CAAAA /* NetworkExtension.framework */; };
 		963708A91F65D4810038894E /* Bourbon-Oblique.otf in Resources */ = {isa = PBXBuildFile; fileRef = 963708A81F65D4810038894E /* Bourbon-Oblique.otf */; };
 		9BFEC20939C9436B34A525B1 /* Authorizations.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC6BB4BF098D016B7F28C /* Authorizations.m */; };
-		9BFEC41EFF02F742C1C5F7C2 /* FileUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC3123D928C7C591D2677 /* FileUtils.m */; };
 		9BFEC4475166B2EEAF192D37 /* VPNManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC04426D8558CB89D3798 /* VPNManager.m */; };
 		9BFEC4F02A47FF8265635803 /* Notifier.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC91ED4A1C511520E9948 /* Notifier.m */; };
-		9BFEC54AB3089FE1D9E0A89D /* NSDate+Comparator.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC949B40E8103F12D61CF /* NSDate+Comparator.m */; };
-		9BFEC8BBFF41E07AAD944A19 /* DispatchUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC4FD03E7187918C49B7D /* DispatchUtils.m */; };
-		9BFEC9B33C9614EE922EC5FE /* FileUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC3123D928C7C591D2677 /* FileUtils.m */; };
-		9BFECA1B566157428BD79808 /* NSDate+Comparator.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC949B40E8103F12D61CF /* NSDate+Comparator.m */; };
-		9BFECA3C6368DD0AA2C46728 /* DispatchUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC4FD03E7187918C49B7D /* DispatchUtils.m */; };
-		9BFECB33EB0C6F13DD54D2F1 /* NSError+Convenience.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFECEF91E11E3EE5D20E5B2 /* NSError+Convenience.m */; };
 		9BFECB6BF077F45D491093F1 /* AuthorizationToken.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC31B61584FD2EAAF5DE6 /* AuthorizationToken.m */; };
-		9BFECBB8768C47FDA5117171 /* NSError+Convenience.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFECEF91E11E3EE5D20E5B2 /* NSError+Convenience.m */; };
 		9BFECC5AE8636FBEF73D85D3 /* AdManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFECE9247474C83FD8C2948 /* AdManager.m */; };
 		9BFECC62159FBEAA1A69F4F9 /* BasePacketTunnelProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFECC3FADE9C8A76A0913DE /* BasePacketTunnelProvider.m */; };
 		9BFECD1880B51B0E2EAEFF1F /* Notifier.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC91ED4A1C511520E9948 /* Notifier.m */; };
@@ -51,7 +43,6 @@
 		9BFECF65871BB6B522C33F1E /* UserDefaults.h in Resources */ = {isa = PBXBuildFile; fileRef = 9BFECC9B2B9F2BFBD4F8A47B /* UserDefaults.h */; };
 		9BFECF8895D5FE1940A6F700 /* PsiphonConfigUserDefaults.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC584519C408D9D6D3FF1 /* PsiphonConfigUserDefaults.m */; };
 		9BFECFEB3BC9F10542C1A416 /* PsiphonConfigUserDefaults.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC584519C408D9D6D3FF1 /* PsiphonConfigUserDefaults.m */; };
-		9BFECFF6D50B52E15AE019C6 /* RACSignal+Operations2.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFECAAC102D23A2D39CBBE1 /* RACSignal+Operations2.m */; };
 		B1D9FF416DDCA97A40A325AA /* libPods-PsiphonVPN.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 01122727D6CE50B340C55DBE /* libPods-PsiphonVPN.a */; };
 		CE26FC951BBDC7B800B83375 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = CE26FC941BBDC7B800B83375 /* Assets.xcassets */; };
 		CE26FCAC1BBDC85900B83375 /* PsiphonVPN.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = CE26FCA31BBDC85900B83375 /* PsiphonVPN.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
@@ -59,8 +50,6 @@
 		CE4E9BC21BBEECFC0060FF8B /* PsiphonVPN.entitlements in Resources */ = {isa = PBXBuildFile; fileRef = CE4E9BC11BBEECFC0060FF8B /* PsiphonVPN.entitlements */; };
 		CE7B76431F54881F00EA44BD /* PsiphonTunnel.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 66094F781E8067520069EC4E /* PsiphonTunnel.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		D672BC574F14042B4D77AB28 /* libPods-Psiphon.a in Frameworks */ = {isa = PBXBuildFile; fileRef = CB8BB19F016330264C4DCB80 /* libPods-Psiphon.a */; };
-		EF441B011F7AF14A008A7D82 /* NSDateFormatter+RFC3339.m in Sources */ = {isa = PBXBuildFile; fileRef = EF441B001F7AF14A008A7D82 /* NSDateFormatter+RFC3339.m */; };
-		EF441B021F7AF14A008A7D82 /* NSDateFormatter+RFC3339.m in Sources */ = {isa = PBXBuildFile; fileRef = EF441B001F7AF14A008A7D82 /* NSDateFormatter+RFC3339.m */; };
 		EF639C2F1F8FCE37009D6B42 /* PsiFeedbackLogger.m in Sources */ = {isa = PBXBuildFile; fileRef = EF639C2E1F8FCE2A009D6B42 /* PsiFeedbackLogger.m */; };
 		EF639C301F8FCE37009D6B42 /* PsiFeedbackLogger.m in Sources */ = {isa = PBXBuildFile; fileRef = EF639C2E1F8FCE2A009D6B42 /* PsiFeedbackLogger.m */; };
 		EF652CD11F352212002AFB48 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = EF652CD01F352212002AFB48 /* main.m */; };
@@ -74,6 +63,27 @@
 		EF743FC81F99549000AC89A2 /* IAPStoreHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = EF743FC21F99549000AC89A2 /* IAPStoreHelper.m */; };
 		EF743FCA1F99549000AC89A2 /* productIDs.plist in Resources */ = {isa = PBXBuildFile; fileRef = EF743FC31F99549000AC89A2 /* productIDs.plist */; };
 		EF743FCB1F99549000AC89A2 /* productIDs.plist in Resources */ = {isa = PBXBuildFile; fileRef = EF743FC31F99549000AC89A2 /* productIDs.plist */; };
+		EF90D7A1204F22C900228A63 /* timestamp_valid.c in Sources */ = {isa = PBXBuildFile; fileRef = EF90D78D204F22C900228A63 /* timestamp_valid.c */; };
+		EF90D7A2204F22C900228A63 /* timestamp_compare.c in Sources */ = {isa = PBXBuildFile; fileRef = EF90D78E204F22C900228A63 /* timestamp_compare.c */; };
+		EF90D7A3204F22C900228A63 /* timestamp_tm.c in Sources */ = {isa = PBXBuildFile; fileRef = EF90D78F204F22C900228A63 /* timestamp_tm.c */; };
+		EF90D7A4204F22C900228A63 /* timestamp_format.c in Sources */ = {isa = PBXBuildFile; fileRef = EF90D790204F22C900228A63 /* timestamp_format.c */; };
+		EF90D7A5204F22C900228A63 /* timestamp_parse.c in Sources */ = {isa = PBXBuildFile; fileRef = EF90D791204F22C900228A63 /* timestamp_parse.c */; };
+		EF90D7A6204F22C900228A63 /* NSDate+Comparator.m in Sources */ = {isa = PBXBuildFile; fileRef = EF90D796204F22C900228A63 /* NSDate+Comparator.m */; };
+		EF90D7A7204F22C900228A63 /* NSDate+PSIDateExtension.m in Sources */ = {isa = PBXBuildFile; fileRef = EF90D797204F22C900228A63 /* NSDate+PSIDateExtension.m */; };
+		EF90D7A8204F22C900228A63 /* DispatchUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = EF90D798204F22C900228A63 /* DispatchUtils.m */; };
+		EF90D7A9204F22C900228A63 /* FileUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = EF90D799204F22C900228A63 /* FileUtils.m */; };
+		EF90D7AA204F22C900228A63 /* NSError+Convenience.m in Sources */ = {isa = PBXBuildFile; fileRef = EF90D79A204F22C900228A63 /* NSError+Convenience.m */; };
+		EF90D7AC204F22E300228A63 /* RACSignal+Operations2.m in Sources */ = {isa = PBXBuildFile; fileRef = EF90D79F204F22C900228A63 /* RACSignal+Operations2.m */; };
+		EF90D7AF204F231900228A63 /* timestamp_valid.c in Sources */ = {isa = PBXBuildFile; fileRef = EF90D78D204F22C900228A63 /* timestamp_valid.c */; };
+		EF90D7B0204F231B00228A63 /* timestamp_compare.c in Sources */ = {isa = PBXBuildFile; fileRef = EF90D78E204F22C900228A63 /* timestamp_compare.c */; };
+		EF90D7B1204F231E00228A63 /* timestamp_tm.c in Sources */ = {isa = PBXBuildFile; fileRef = EF90D78F204F22C900228A63 /* timestamp_tm.c */; };
+		EF90D7B2204F232100228A63 /* timestamp_format.c in Sources */ = {isa = PBXBuildFile; fileRef = EF90D790204F22C900228A63 /* timestamp_format.c */; };
+		EF90D7B3204F232300228A63 /* timestamp_parse.c in Sources */ = {isa = PBXBuildFile; fileRef = EF90D791204F22C900228A63 /* timestamp_parse.c */; };
+		EF90D7B4204F234100228A63 /* NSDate+Comparator.m in Sources */ = {isa = PBXBuildFile; fileRef = EF90D796204F22C900228A63 /* NSDate+Comparator.m */; };
+		EF90D7B5204F234700228A63 /* NSDate+PSIDateExtension.m in Sources */ = {isa = PBXBuildFile; fileRef = EF90D797204F22C900228A63 /* NSDate+PSIDateExtension.m */; };
+		EF90D7B6204F235100228A63 /* DispatchUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = EF90D798204F22C900228A63 /* DispatchUtils.m */; };
+		EF90D7B7204F235800228A63 /* FileUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = EF90D799204F22C900228A63 /* FileUtils.m */; };
+		EF90D7B8204F236400228A63 /* NSError+Convenience.m in Sources */ = {isa = PBXBuildFile; fileRef = EF90D79A204F22C900228A63 /* NSError+Convenience.m */; };
 		EFB3E62C1F621111004AAE8C /* PulsingHaloLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = EFB3E6291F621111004AAE8C /* PulsingHaloLayer.m */; };
 		EFC2F5B620226758007B52F9 /* PacketTunnelUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = EFC2F5B420226757007B52F9 /* PacketTunnelUtils.m */; };
 		EFC2F5C320226782007B52F9 /* EmbeddedServerEntriesHelpers.c in Sources */ = {isa = PBXBuildFile; fileRef = EFC2F5B920226781007B52F9 /* EmbeddedServerEntriesHelpers.c */; };
@@ -201,31 +211,21 @@
 		963708A81F65D4810038894E /* Bourbon-Oblique.otf */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Bourbon-Oblique.otf"; sourceTree = "<group>"; };
 		9BFEC0419AD3808370915E01 /* PsiphonConfigUserDefaults.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PsiphonConfigUserDefaults.h; sourceTree = "<group>"; };
 		9BFEC04426D8558CB89D3798 /* VPNManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VPNManager.m; sourceTree = "<group>"; };
-		9BFEC089261DAF8C18FB51C6 /* FileUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FileUtils.h; sourceTree = "<group>"; };
-		9BFEC199CC1A07833B948031 /* DispatchUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DispatchUtils.h; sourceTree = "<group>"; };
 		9BFEC1C9F506CE1DF07306D2 /* NEBridge.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NEBridge.h; sourceTree = "<group>"; };
-		9BFEC3123D928C7C591D2677 /* FileUtils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FileUtils.m; sourceTree = "<group>"; };
 		9BFEC3165745A5D14C8C3C08 /* Notifier.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Notifier.h; sourceTree = "<group>"; };
 		9BFEC31B61584FD2EAAF5DE6 /* AuthorizationToken.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AuthorizationToken.m; sourceTree = "<group>"; };
 		9BFEC3D27AD09E29BF0DB9AC /* Authorizations.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Authorizations.h; sourceTree = "<group>"; };
 		9BFEC4D609BFCD0DC812BDB3 /* Asserts.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Asserts.h; sourceTree = "<group>"; };
-		9BFEC4FD03E7187918C49B7D /* DispatchUtils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DispatchUtils.m; sourceTree = "<group>"; };
 		9BFEC584519C408D9D6D3FF1 /* PsiphonConfigUserDefaults.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PsiphonConfigUserDefaults.m; sourceTree = "<group>"; };
 		9BFEC66B7F0E98CBC5631F06 /* AdManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AdManager.h; sourceTree = "<group>"; };
 		9BFEC673CE5EA236279F07BD /* AuthorizationToken.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AuthorizationToken.h; sourceTree = "<group>"; };
 		9BFEC6BB4BF098D016B7F28C /* Authorizations.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Authorizations.m; sourceTree = "<group>"; };
-		9BFEC7391F70DF2F48C0EE85 /* RACSignal+Operations2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "RACSignal+Operations2.h"; sourceTree = "<group>"; };
 		9BFEC74F24453B8E4B1AFC39 /* VPNManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VPNManager.h; sourceTree = "<group>"; };
 		9BFEC8783D4222F2272E50E7 /* BasePacketTunnelProvider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BasePacketTunnelProvider.h; sourceTree = "<group>"; };
-		9BFEC8BB2716DBBAB4DEC637 /* NSError+Convenience.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSError+Convenience.h"; sourceTree = "<group>"; };
 		9BFEC91ED4A1C511520E9948 /* Notifier.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Notifier.m; sourceTree = "<group>"; };
-		9BFEC949B40E8103F12D61CF /* NSDate+Comparator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSDate+Comparator.m"; sourceTree = "<group>"; };
-		9BFECAAC102D23A2D39CBBE1 /* RACSignal+Operations2.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "RACSignal+Operations2.m"; sourceTree = "<group>"; };
 		9BFECC3FADE9C8A76A0913DE /* BasePacketTunnelProvider.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BasePacketTunnelProvider.m; sourceTree = "<group>"; };
 		9BFECC9B2B9F2BFBD4F8A47B /* UserDefaults.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UserDefaults.h; sourceTree = "<group>"; };
-		9BFECDCC3659EE393EC4A8F7 /* NSDate+Comparator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSDate+Comparator.h"; sourceTree = "<group>"; };
 		9BFECE9247474C83FD8C2948 /* AdManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AdManager.m; sourceTree = "<group>"; };
-		9BFECEF91E11E3EE5D20E5B2 /* NSError+Convenience.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSError+Convenience.m"; sourceTree = "<group>"; };
 		CB8BB19F016330264C4DCB80 /* libPods-Psiphon.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Psiphon.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		CE26FC8A1BBDC7B800B83375 /* Psiphon.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Psiphon.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		CE26FC941BBDC7B800B83375 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -236,8 +236,6 @@
 		CE4E9BC11BBEECFC0060FF8B /* PsiphonVPN.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = PsiphonVPN.entitlements; sourceTree = "<group>"; };
 		DD100E19194B9A79F5D7DF55 /* Pods-PsiphonVPN.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PsiphonVPN.debug.xcconfig"; path = "Pods/Target Support Files/Pods-PsiphonVPN/Pods-PsiphonVPN.debug.xcconfig"; sourceTree = "<group>"; };
 		EDB109A2FBFB32D821FF121D /* Pods-Psiphon.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Psiphon.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Psiphon/Pods-Psiphon.debug.xcconfig"; sourceTree = "<group>"; };
-		EF441B001F7AF14A008A7D82 /* NSDateFormatter+RFC3339.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "NSDateFormatter+RFC3339.m"; sourceTree = "<group>"; };
-		EF441B031F7AF263008A7D82 /* NSDateFormatter+RFC3339.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSDateFormatter+RFC3339.h"; sourceTree = "<group>"; };
 		EF639C2D1F8FCE2A009D6B42 /* PsiFeedbackLogger.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PsiFeedbackLogger.h; sourceTree = "<group>"; };
 		EF639C2E1F8FCE2A009D6B42 /* PsiFeedbackLogger.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PsiFeedbackLogger.m; sourceTree = "<group>"; };
 		EF652CD01F352212002AFB48 /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
@@ -253,6 +251,24 @@
 		EF743FC21F99549000AC89A2 /* IAPStoreHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IAPStoreHelper.m; sourceTree = "<group>"; };
 		EF743FC31F99549000AC89A2 /* productIDs.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = productIDs.plist; sourceTree = "<group>"; };
 		EF743FC71F99549000AC89A2 /* IAPStoreHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IAPStoreHelper.h; sourceTree = "<group>"; };
+		EF90D78D204F22C900228A63 /* timestamp_valid.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = timestamp_valid.c; sourceTree = "<group>"; };
+		EF90D78E204F22C900228A63 /* timestamp_compare.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = timestamp_compare.c; sourceTree = "<group>"; };
+		EF90D78F204F22C900228A63 /* timestamp_tm.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = timestamp_tm.c; sourceTree = "<group>"; };
+		EF90D790204F22C900228A63 /* timestamp_format.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = timestamp_format.c; sourceTree = "<group>"; };
+		EF90D791204F22C900228A63 /* timestamp_parse.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = timestamp_parse.c; sourceTree = "<group>"; };
+		EF90D792204F22C900228A63 /* timestamp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = timestamp.h; sourceTree = "<group>"; };
+		EF90D794204F22C900228A63 /* FileUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FileUtils.h; sourceTree = "<group>"; };
+		EF90D795204F22C900228A63 /* NSError+Convenience.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSError+Convenience.h"; sourceTree = "<group>"; };
+		EF90D796204F22C900228A63 /* NSDate+Comparator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSDate+Comparator.m"; sourceTree = "<group>"; };
+		EF90D797204F22C900228A63 /* NSDate+PSIDateExtension.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSDate+PSIDateExtension.m"; sourceTree = "<group>"; };
+		EF90D798204F22C900228A63 /* DispatchUtils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DispatchUtils.m; sourceTree = "<group>"; };
+		EF90D799204F22C900228A63 /* FileUtils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FileUtils.m; sourceTree = "<group>"; };
+		EF90D79A204F22C900228A63 /* NSError+Convenience.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSError+Convenience.m"; sourceTree = "<group>"; };
+		EF90D79B204F22C900228A63 /* DispatchUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DispatchUtils.h; sourceTree = "<group>"; };
+		EF90D79C204F22C900228A63 /* NSDate+PSIDateExtension.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSDate+PSIDateExtension.h"; sourceTree = "<group>"; };
+		EF90D79D204F22C900228A63 /* NSDate+Comparator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSDate+Comparator.h"; sourceTree = "<group>"; };
+		EF90D79F204F22C900228A63 /* RACSignal+Operations2.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "RACSignal+Operations2.m"; sourceTree = "<group>"; };
+		EF90D7A0204F22C900228A63 /* RACSignal+Operations2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "RACSignal+Operations2.h"; sourceTree = "<group>"; };
 		EFB3E6291F621111004AAE8C /* PulsingHaloLayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PulsingHaloLayer.m; sourceTree = "<group>"; };
 		EFB3E62A1F621111004AAE8C /* PulsingHaloLayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PulsingHaloLayer.h; sourceTree = "<group>"; };
 		EFB3E62B1F621111004AAE8C /* PulsingHalo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PulsingHalo.h; sourceTree = "<group>"; };
@@ -358,7 +374,9 @@
 		4E0DCB101F28458100495781 /* Shared */ = {
 			isa = PBXGroup;
 			children = (
-				EFB0613220291C710089C3DE /* reactive */,
+				EF90D78B204F22C900228A63 /* External */,
+				EF90D79E204F22C900228A63 /* ReactiveExtensions */,
+				EF90D793204F22C900228A63 /* Util */,
 				EFC2F5C9202267B0007B52F9 /* PsiphonConfigFiles.h */,
 				EFC2F5CA202267B0007B52F9 /* PsiphonConfigFiles.m */,
 				669A10B61F58A74E00EE831F /* Strings */,
@@ -372,21 +390,11 @@
 				EFB3E62D1F66F23F004AAE8C /* Logging.h */,
 				EF6C1F501F59E46500709554 /* embedded_server_entries */,
 				EF6C1F511F59E46500709554 /* psiphon_config */,
-				EF441B001F7AF14A008A7D82 /* NSDateFormatter+RFC3339.m */,
-				EF441B031F7AF263008A7D82 /* NSDateFormatter+RFC3339.h */,
 				EF639C2D1F8FCE2A009D6B42 /* PsiFeedbackLogger.h */,
 				EF639C2E1F8FCE2A009D6B42 /* PsiFeedbackLogger.m */,
-				9BFEC3123D928C7C591D2677 /* FileUtils.m */,
-				9BFEC089261DAF8C18FB51C6 /* FileUtils.h */,
 				9BFECC9B2B9F2BFBD4F8A47B /* UserDefaults.h */,
 				9BFEC31B61584FD2EAAF5DE6 /* AuthorizationToken.m */,
 				9BFEC673CE5EA236279F07BD /* AuthorizationToken.h */,
-				9BFECEF91E11E3EE5D20E5B2 /* NSError+Convenience.m */,
-				9BFEC8BB2716DBBAB4DEC637 /* NSError+Convenience.h */,
-				9BFEC949B40E8103F12D61CF /* NSDate+Comparator.m */,
-				9BFECDCC3659EE393EC4A8F7 /* NSDate+Comparator.h */,
-				9BFEC4FD03E7187918C49B7D /* DispatchUtils.m */,
-				9BFEC199CC1A07833B948031 /* DispatchUtils.h */,
 				9BFEC4D609BFCD0DC812BDB3 /* Asserts.h */,
 			);
 			path = Shared;
@@ -512,13 +520,51 @@
 			path = IAP;
 			sourceTree = "<group>";
 		};
-		EFB0613220291C710089C3DE /* reactive */ = {
+		EF90D78B204F22C900228A63 /* External */ = {
 			isa = PBXGroup;
 			children = (
-				9BFECAAC102D23A2D39CBBE1 /* RACSignal+Operations2.m */,
-				9BFEC7391F70DF2F48C0EE85 /* RACSignal+Operations2.h */,
+				EF90D78C204F22C900228A63 /* c-timestamp */,
 			);
-			path = reactive;
+			path = External;
+			sourceTree = "<group>";
+		};
+		EF90D78C204F22C900228A63 /* c-timestamp */ = {
+			isa = PBXGroup;
+			children = (
+				EF90D78D204F22C900228A63 /* timestamp_valid.c */,
+				EF90D78E204F22C900228A63 /* timestamp_compare.c */,
+				EF90D78F204F22C900228A63 /* timestamp_tm.c */,
+				EF90D790204F22C900228A63 /* timestamp_format.c */,
+				EF90D791204F22C900228A63 /* timestamp_parse.c */,
+				EF90D792204F22C900228A63 /* timestamp.h */,
+			);
+			path = "c-timestamp";
+			sourceTree = "<group>";
+		};
+		EF90D793204F22C900228A63 /* Util */ = {
+			isa = PBXGroup;
+			children = (
+				EF90D794204F22C900228A63 /* FileUtils.h */,
+				EF90D799204F22C900228A63 /* FileUtils.m */,
+				EF90D795204F22C900228A63 /* NSError+Convenience.h */,
+				EF90D79A204F22C900228A63 /* NSError+Convenience.m */,
+				EF90D79D204F22C900228A63 /* NSDate+Comparator.h */,
+				EF90D796204F22C900228A63 /* NSDate+Comparator.m */,
+				EF90D79C204F22C900228A63 /* NSDate+PSIDateExtension.h */,
+				EF90D797204F22C900228A63 /* NSDate+PSIDateExtension.m */,
+				EF90D79B204F22C900228A63 /* DispatchUtils.h */,
+				EF90D798204F22C900228A63 /* DispatchUtils.m */,
+			);
+			path = Util;
+			sourceTree = "<group>";
+		};
+		EF90D79E204F22C900228A63 /* ReactiveExtensions */ = {
+			isa = PBXGroup;
+			children = (
+				EF90D79F204F22C900228A63 /* RACSignal+Operations2.m */,
+				EF90D7A0204F22C900228A63 /* RACSignal+Operations2.h */,
+			);
+			path = ReactiveExtensions;
 			sourceTree = "<group>";
 		};
 		EFB3E6281F621100004AAE8C /* External */ = {
@@ -769,8 +815,8 @@
 			);
 			inputPaths = (
 				"${SRCROOT}/Pods/Target Support Files/Pods-Psiphon/Pods-Psiphon-resources.sh",
-				$PODS_CONFIGURATION_BUILD_DIR/InAppSettingsKit/InAppSettingsKit.bundle,
-				$PODS_CONFIGURATION_BUILD_DIR/PsiphonClientCommonLibrary/PsiphonClientCommonLibrary.bundle,
+				"${PODS_CONFIGURATION_BUILD_DIR}/InAppSettingsKit/InAppSettingsKit.bundle",
+				"${PODS_CONFIGURATION_BUILD_DIR}/PsiphonClientCommonLibrary/PsiphonClientCommonLibrary.bundle",
 				"${PODS_ROOT}/mopub-ios-sdk/MoPubSDK/Internal/Common/MPAdBrowserController.xib",
 				"${PODS_ROOT}/mopub-ios-sdk/MoPubSDK/Resources/MPCloseBtn.png",
 				"${PODS_ROOT}/mopub-ios-sdk/MoPubSDK/Resources/MPCloseBtn@2x.png",
@@ -795,7 +841,29 @@
 			);
 			name = "[CP] Copy Pods Resources";
 			outputPaths = (
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/InAppSettingsKit.bundle",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/PsiphonClientCommonLibrary.bundle",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/MPAdBrowserController.nib",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/MPCloseBtn.png",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/MPCloseBtn@2x.png",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/MPCloseBtn@3x.png",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/MPCloseButtonX.png",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/MPCloseButtonX@2x.png",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/MPCloseButtonX@3x.png",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/MPCountdownTimer.html",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/MPDAAIcon.png",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/MPDAAIcon@2x.png",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/MPDAAIcon@3x.png",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/MPMutedBtn.png",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/MPMutedBtn@2x.png",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/MPMutedBtn@3x.png",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/MPPlayBtn.png",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/MPPlayBtn@2x.png",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/MPPlayBtn@3x.png",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/MPUnmutedBtn.png",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/MPUnmutedBtn@2x.png",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/MPUnmutedBtn@3x.png",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/MRAID.bundle",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -897,7 +965,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EF90D7A6204F22C900228A63 /* NSDate+Comparator.m in Sources */,
 				EF652CD71F35224C002AFB48 /* MainViewController.m in Sources */,
+				EF90D7A4204F22C900228A63 /* timestamp_format.c in Sources */,
 				F132D7E01F5739A800AF7F91 /* LaunchScreenViewController.m in Sources */,
 				19CB75081F54ADB300F78219 /* MPGoogleAdMobInterstitialCustomEvent.m in Sources */,
 				197DABEB1F54BEED00DD5C3B /* VungleInterstitialCustomEvent.m in Sources */,
@@ -910,12 +980,15 @@
 				EFC2F5C820226782007B52F9 /* LoadingCircleLayer.m in Sources */,
 				197DABF11F54C0CA00DD5C3B /* MPInstanceProvider+Vungle.m in Sources */,
 				EFC2F5C520226782007B52F9 /* EmbeddedServerEntries.m in Sources */,
+				EF90D7A9204F22C900228A63 /* FileUtils.m in Sources */,
+				EF90D7A1204F22C900228A63 /* timestamp_valid.c in Sources */,
 				EFC2F5C420226782007B52F9 /* RootContainerController.m in Sources */,
+				EF90D7A5204F22C900228A63 /* timestamp_parse.c in Sources */,
 				EF652CD11F352212002AFB48 /* main.m in Sources */,
 				44A0CAF31FE04A4500859DB3 /* RMAppReceipt.m in Sources */,
 				44D9B1001F67470E007D1E69 /* IAPViewController.m in Sources */,
-				EF441B011F7AF14A008A7D82 /* NSDateFormatter+RFC3339.m in Sources */,
 				EFC2F5CB202267B1007B52F9 /* PsiphonConfigFiles.m in Sources */,
+				EF90D7A7204F22C900228A63 /* NSDate+PSIDateExtension.m in Sources */,
 				EF652CD61F35224C002AFB48 /* AppDelegate.m in Sources */,
 				EF743FC81F99549000AC89A2 /* IAPStoreHelper.m in Sources */,
 				EFB3E62C1F621111004AAE8C /* PulsingHaloLayer.m in Sources */,
@@ -925,13 +998,13 @@
 				9BFECFEB3BC9F10542C1A416 /* PsiphonConfigUserDefaults.m in Sources */,
 				197DABEE1F54C09E00DD5C3B /* MPVungleRouter.m in Sources */,
 				19CB75071F54ADB300F78219 /* MPGoogleAdMobBannerCustomEvent.m in Sources */,
+				EF90D7AA204F22C900228A63 /* NSError+Convenience.m in Sources */,
+				EF90D7A8204F22C900228A63 /* DispatchUtils.m in Sources */,
 				9BFEC4475166B2EEAF192D37 /* VPNManager.m in Sources */,
 				9BFECC5AE8636FBEF73D85D3 /* AdManager.m in Sources */,
-				9BFEC41EFF02F742C1C5F7C2 /* FileUtils.m in Sources */,
+				EF90D7A2204F22C900228A63 /* timestamp_compare.c in Sources */,
 				9BFECB6BF077F45D491093F1 /* AuthorizationToken.m in Sources */,
-				9BFECB33EB0C6F13DD54D2F1 /* NSError+Convenience.m in Sources */,
-				9BFECA1B566157428BD79808 /* NSDate+Comparator.m in Sources */,
-				9BFEC8BBFF41E07AAD944A19 /* DispatchUtils.m in Sources */,
+				EF90D7A3204F22C900228A63 /* timestamp_tm.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -939,23 +1012,28 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EF90D7AC204F22E300228A63 /* RACSignal+Operations2.m in Sources */,
 				EFC2F5CC20226835007B52F9 /* PsiphonConfigFiles.m in Sources */,
+				EF90D7B1204F231E00228A63 /* timestamp_tm.c in Sources */,
+				EF90D7B3204F232300228A63 /* timestamp_parse.c in Sources */,
+				EF90D7B8204F236400228A63 /* NSError+Convenience.m in Sources */,
+				EF90D7B5204F234700228A63 /* NSDate+PSIDateExtension.m in Sources */,
 				44A0CAEE1FCCCDEC00859DB3 /* Subscription.m in Sources */,
 				EF652CDA1F352271002AFB48 /* PacketTunnelProvider.m in Sources */,
 				4E0DCB1E1F2855FC00495781 /* PsiphonDataSharedDB.m in Sources */,
 				9BFECD1880B51B0E2EAEFF1F /* Notifier.m in Sources */,
+				EF90D7AF204F231900228A63 /* timestamp_valid.c in Sources */,
 				EF639C301F8FCE37009D6B42 /* PsiFeedbackLogger.m in Sources */,
-				EF441B021F7AF14A008A7D82 /* NSDateFormatter+RFC3339.m in Sources */,
+				EF90D7B6204F235100228A63 /* DispatchUtils.m in Sources */,
+				EF90D7B2204F232100228A63 /* timestamp_format.c in Sources */,
 				9BFECF8895D5FE1940A6F700 /* PsiphonConfigUserDefaults.m in Sources */,
+				EF90D7B7204F235800228A63 /* FileUtils.m in Sources */,
 				EFC2F5B620226758007B52F9 /* PacketTunnelUtils.m in Sources */,
-				9BFEC9B33C9614EE922EC5FE /* FileUtils.m in Sources */,
+				EF90D7B0204F231B00228A63 /* timestamp_compare.c in Sources */,
 				9BFECC62159FBEAA1A69F4F9 /* BasePacketTunnelProvider.m in Sources */,
+				EF90D7B4204F234100228A63 /* NSDate+Comparator.m in Sources */,
 				9BFEC20939C9436B34A525B1 /* Authorizations.m in Sources */,
-				9BFECFF6D50B52E15AE019C6 /* RACSignal+Operations2.m in Sources */,
 				9BFECEA225F023F895CC8DA1 /* AuthorizationToken.m in Sources */,
-				9BFECBB8768C47FDA5117171 /* NSError+Convenience.m in Sources */,
-				9BFEC54AB3089FE1D9E0A89D /* NSDate+Comparator.m in Sources */,
-				9BFECA3C6368DD0AA2C46728 /* DispatchUtils.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
