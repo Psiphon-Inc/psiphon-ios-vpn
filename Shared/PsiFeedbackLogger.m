@@ -19,7 +19,7 @@
 
 #import "PsiFeedbackLogger.h"
 #import "SharedConstants.h"
-#import "NSDateFormatter+RFC3339.h"
+#import "NSDate+PSIDateExtension.h"
 
 #if DEBUG
 #define MAX_NOTICE_FILE_SIZE_BYTES 164000
@@ -152,7 +152,7 @@ NSString * const ErrorNoticeType = @"ContainerError";
 
 }
 
-+ (void)info:(NSString *)sourceType message:(NSString *)format, ... {
++ (void)infoWithType:(NSString *)sourceType message:(NSString *)format, ... {
 
     NSString *message;
     CONVERT_FORMAT_ARGS_TO_NSSTRING(message, format);
@@ -177,7 +177,7 @@ NSString * const ErrorNoticeType = @"ContainerError";
 
 }
 
-+ (void)error:(NSString *)sourceType message:(NSString *)format, ... {
++ (void)errorWithType:(NSString *)sourceType message:(NSString *)format, ... {
 
     NSString *message;
     CONVERT_FORMAT_ARGS_TO_NSSTRING(message, format);
@@ -190,7 +190,7 @@ NSString * const ErrorNoticeType = @"ContainerError";
 
 }
 
-+ (void)error:(NSString *)sourceType message:(NSString *)message object:(NSError *)error {
++ (void)errorWithType:(NSString *)sourceType message:(NSString *)message object:(NSError *)error {
 
 //    NSString *message = [NSString stringWithFormat:@"Domain=%@ Description=%@ Code=%ld", error.domain, error.localizedDescription, (long) error.code];
     NSDictionary *data = @{sourceType : @{@"message" : message,
@@ -246,7 +246,7 @@ NSString * const ErrorNoticeType = @"ContainerError";
 }
 
 - (void)writeMessage:(NSString *)message withNoticeType:(NSString *)noticeType {
-    [self writeMessage:message withNoticeType:noticeType andTimestamp:[[NSDateFormatter sharedRFC3339MilliDateFormatter] stringFromDate:[NSDate date]]];
+    [self writeMessage:message withNoticeType:noticeType andTimestamp:[NSDate nowRFC3339Milli]];
 }
 
 - (void)writeMessage:(NSString *)message withNoticeType:(NSString *)noticeType andTimestamp:(NSString *)timestamp {
@@ -256,7 +256,7 @@ NSString * const ErrorNoticeType = @"ContainerError";
 - (void)writeData:(NSDictionary<NSString *, NSString *> *)data noticeType:(NSString *)noticeType {
     [self writeData:data
          noticeType:noticeType
-          timestamp:[[NSDateFormatter sharedRFC3339MilliDateFormatter] stringFromDate:[NSDate date]]];
+          timestamp:[NSDate nowRFC3339Milli]];
 }
 
 - (void)writeData:(NSDictionary<NSString *, NSString *> *)data noticeType:(NSString *)noticeType timestamp:(NSString *)timestamp {
