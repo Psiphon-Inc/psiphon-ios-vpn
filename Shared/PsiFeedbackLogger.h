@@ -36,13 +36,13 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (void)info:(NSString *)format, ... NS_FORMAT_FUNCTION(1,2);
 
-+ (void)info:(NSString *)sourceType message:(NSString *)format, ... NS_FORMAT_FUNCTION(2,3);
++ (void)infoWithType:(NSString *)sourceType message:(NSString *)format, ... NS_FORMAT_FUNCTION(2,3);
 
 + (void)error:(NSString *)format, ... NS_FORMAT_FUNCTION(1,2);
 
-+ (void)error:(NSString *)sourceType message:(NSString *)format, ... NS_FORMAT_FUNCTION(2,3);
++ (void)errorWithType:(NSString *)sourceType message:(NSString *)format, ... NS_FORMAT_FUNCTION(2,3);
 
-+ (void)error:(NSString *)sourceType message:(NSString *_Nullable)message object:(NSError *)error;
++ (void)errorWithType:(NSString *)sourceType message:(NSString *)message object:(NSError *)error;
 
 + (void)logNoticeWithType:(NSString *)noticeType message:(NSString *)message timestamp:(NSString *)timestamp;
 

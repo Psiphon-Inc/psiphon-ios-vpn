@@ -36,7 +36,6 @@
 #import "Subscription.h"
 #import "PacketTunnelUtils.h"
 #import "Authorizations.h"
-#import "NSDateFormatter+RFC3339.h"
 #import "NSError+Convenience.h"
 #import "RACSignal+Operations.h"
 #import "RACDisposable.h"
@@ -44,11 +43,12 @@
 #import "RACSignal+Operations2.h"
 #import "RACScheduler.h"
 #import "Asserts.h"
+#import "NSDate+PSIDateExtension.h"
+#import "DispatchUtils.h"
 #import <ReactiveObjC/RACSubject.h>
 #import <ReactiveObjC/RACReplaySubject.h>
 
 NSErrorDomain _Nonnull const PsiphonTunnelErrorDomain = @"PsiphonTunnelErrorDomain";
-
 
 typedef NS_ENUM(NSInteger, AuthorizationTokenActivity) {
     AuthorizationTokenRejected,
@@ -159,6 +159,10 @@ typedef NS_ENUM(NSInteger, GracePeriodState) {
 //
 - (void)checkSubscription {
 
+    PSIAssert(self.subscriptionCheckState != nil);
+    PSIAssert(self->tunnelConnectionStateSubject != nil);
+    PSIAssert(self->subscriptionAuthorizationTokenActiveSubject != nil);
+
     __weak PacketTunnelProvider *weakSelf = self;
 
     // Dispose of ongoing subscription check if any.
@@ -170,10 +174,11 @@ typedef NS_ENUM(NSInteger, GracePeriodState) {
 
         if (weakSelf.extensionStartMethod == ExtensionStartMethodFromContainer) {
 
-            [PsiFeedbackLogger info:@"SubscriptionCheck" message:@"token expired restarting tunnel"];
+            [PsiFeedbackLogger infoWithType:@"SubscriptionCheck" message:@"token expired restarting tunnel"];
 
             // Restarts the tunnel to re-connect with the correct sponsor ID.
             [weakSelf.subscriptionCheckState setStateNotSubscribed];
+
             [weakSelf restartTunnel];
 
         } else {
@@ -182,11 +187,11 @@ typedef NS_ENUM(NSInteger, GracePeriodState) {
             // and another subscription check happens.
 
             if (self.gracePeriodState == GracePeriodStateDone) {
-                [PsiFeedbackLogger info:@"SubscriptionCheck" message:@"grace period finished killing extension"];
+                [PsiFeedbackLogger infoWithType:@"SubscriptionCheck" message:@"grace period finished killing extension"];
 
                 [self killExtensionForExpiredSubscription];
             } else {
-                [PsiFeedbackLogger info:@"SubscriptionCheck" message:@"token expired starting grace period"];
+                [PsiFeedbackLogger infoWithType:@"SubscriptionCheck" message:@"token expired starting grace period"];
                 [self startGracePeriod];
             }
         }
@@ -226,7 +231,7 @@ typedef NS_ENUM(NSInteger, GracePeriodState) {
     RACSignal *updateSubscriptionTokenSignal = [[[[[self subscriptionReceiptUnlocked]
       flattenMap:^RACSignal *(id nilValue) {
           // Emits an item when Psiphon tunnel is connected and VPN is started.
-          [PsiFeedbackLogger info:@"SubscriptionCheck" message:@"receipt is readable"];
+          [PsiFeedbackLogger infoWithType:@"SubscriptionCheck" message:@"receipt is readable"];
           return [self.vpnStartedSignal zipWith:[tunnelConnectedSignal take:1]];
       }]
       flattenMap:^RACSignal *(id nilValue) {
@@ -238,16 +243,16 @@ typedef NS_ENUM(NSInteger, GracePeriodState) {
 
           switch ((SubscriptionCheckEnum) [subscriptionCheckObject integerValue]) {
               case SubscriptionCheckTokenExpired:
-                  [PsiFeedbackLogger info:@"SubscriptionCheck" message:@"token expired"];
+                  [PsiFeedbackLogger infoWithType:@"SubscriptionCheck" message:@"token expired"];
                   return [RACSignal return:[SubscriptionResultModel failed:SubscriptionResultErrorExpired]];
 
               case SubscriptionCheckHasActiveToken:
-                  [PsiFeedbackLogger info:@"SubscriptionCheck" message:@"token already active"];
+                  [PsiFeedbackLogger infoWithType:@"SubscriptionCheck" message:@"token already active"];
                   return [RACSignal return:[SubscriptionResultModel success:nil receiptFilSize:nil]];
 
               case SubscriptionCheckShouldUpdateToken:
 
-                  [PsiFeedbackLogger info:@"SubscriptionCheck" message:@"token request"];
+                  [PsiFeedbackLogger infoWithType:@"SubscriptionCheck" message:@"token request"];
 
                   // Emits an item whose value is the dictionary returned from the subscription verifier server,
                   // emits an error on all errors.
@@ -280,7 +285,7 @@ typedef NS_ENUM(NSInteger, GracePeriodState) {
                     }];
 
               default:
-                  [PsiFeedbackLogger error:@"SubscriptionCheck" message:@"unhandled check value %@", subscriptionCheckObject];
+                  [PsiFeedbackLogger errorWithType:@"SubscriptionCheck" message:@"unhandled check value %@", subscriptionCheckObject];
                   abort();
           }
       }]
@@ -296,7 +301,7 @@ typedef NS_ENUM(NSInteger, GracePeriodState) {
               // Subscription check is in progress.
               // Sets extension's subscription status to in progress.
 
-              [PsiFeedbackLogger info:@"SubscriptionCheck" message:@"started"];
+              [PsiFeedbackLogger infoWithType:@"SubscriptionCheck" message:@"started"];
               [weakSelf.subscriptionCheckState setStateInProgress];
               return;
           }
@@ -322,7 +327,7 @@ typedef NS_ENUM(NSInteger, GracePeriodState) {
                       break;
 
                   default:
-                      [PsiFeedbackLogger error:@"SubscriptionCheck" message:@"unhandled error code %ld", (long) result.error.code];
+                      [PsiFeedbackLogger errorWithType:@"SubscriptionCheck" message:@"unhandled error code %ld", (long) result.error.code];
                       abort();
                       break;
               }
@@ -332,68 +337,74 @@ typedef NS_ENUM(NSInteger, GracePeriodState) {
           // At this point, subscription check finished and received response
           // from the subscription verifier server.
 
-          NSString *tunnelAuthTokenID;
+          @autoreleasepool {
 
-          // Updates subscription and persists subscription.
-          Subscription *subscription = [Subscription fromPersistedDefaults];
+              NSString *tunnelAuthTokenID;
 
-          // Keep a copy of the token passed to the tunnel previously.
-          // This token represents the authorization token accepted by the Psiphon server,
-          // regardless of what token was passed to the server.
-          tunnelAuthTokenID = [subscription.authorizationToken.ID copy];
+              // Updates subscription and persists subscription.
+              Subscription *subscription = [Subscription fromPersistedDefaults];
 
-          subscription.appReceiptFileSize = result.submittedReceiptFileSize;
-          NSError *error = [subscription updateSubscriptionWithRemoteAuthDict:result.remoteAuthDict];
-          if (error) {
-              [PsiFeedbackLogger error:@"SubscriptionCheck" message:@"failed to read remote auth data:%@", error];
-              return;
-          }
-          [subscription persistChanges];
+              // Keep a copy of the token passed to the tunnel previously.
+              // This token represents the authorization token accepted by the Psiphon server,
+              // regardless of what token was passed to the server.
+              tunnelAuthTokenID = [subscription.authorizationToken.ID copy];
 
-          [PsiFeedbackLogger info:@"SubscriptionCheck" message:@"received token expiring on %@", subscription.authorizationToken.expires];
-
-          // Extract request date from the response and convert to NSDate.
-          NSDate *requestDate = nil;
-          NSString *requestDateString = (NSString *) result.remoteAuthDict[kRemoteSubscriptionVerifierRequestDate];
-          if ([requestDateString length]) {
-              requestDate = [[NSDateFormatter sharedRFC3339DateFormatter] dateFromString:requestDateString];
-          }
-
-          // Bad Clock error if user has an active subscription in server time
-          // but in device time it appears to be expired.
-          if (requestDate) {
-              if ([subscription hasActiveSubscriptionTokenForDate:requestDate]
-                && ![subscription hasActiveSubscriptionTokenForDate:[NSDate date]]) {
-                  [self killExtensionForBadClock];
+              subscription.appReceiptFileSize = result.submittedReceiptFileSize;
+              NSError *error = [subscription updateSubscriptionWithRemoteAuthDict:result.remoteAuthDict];
+              if (error) {
+                  [PsiFeedbackLogger errorWithType:@"SubscriptionCheck" message:@"failed to read remote auth data:%@", error];
                   return;
               }
-          }
+              [subscription persistChanges];
 
-          if (subscription.authorizationToken) {
+              [PsiFeedbackLogger infoWithType:@"SubscriptionCheck" message:@"received token expiring on %@", subscription.authorizationToken.expires];
 
-              // New authorization token was received from the subscription verifier server.
-              // Restarts the tunnel to connect with the new token only if it is different from
-              // the token in use by the tunnel.
-              if (![subscription.authorizationToken.ID isEqualToString:tunnelAuthTokenID]) {
-
-                  if (self.gracePeriodState == GracePeriodStateDone) {
-                      // Grace period has finished, and subscription check finished successfully
-                      // with a new token.
-                      // Resets grace period state.
-                      self.gracePeriodState = GracePeriodStateInactive;
-                  }
-
-                  [weakSelf.subscriptionCheckState setStateSubscribed];
-                  [weakSelf restartTunnel];
+              // Extract request date from the response and convert to NSDate.
+              NSDate *requestDate = nil;
+              NSString *requestDateString = (NSString *) result.remoteAuthDict[kRemoteSubscriptionVerifierRequestDate];
+              if ([requestDateString length]) {
+                  requestDate = [NSDate fromRFC3339String:requestDateString];
               }
-          } else {
-              // Server returned no authorization token, treats this as if subscription was expired.
-              handleExpiredSubscription();
-          } 
+
+              // Bad Clock error if user has an active subscription in server time
+              // but in device time it appears to be expired.
+              if (requestDate) {
+                  if ([subscription hasActiveSubscriptionTokenForDate:requestDate]
+                    && ![subscription hasActiveSubscriptionTokenForDate:[NSDate date]]) {
+                      [self killExtensionForBadClock];
+                      return;
+                  }
+              }
+
+              if (subscription.authorizationToken) {
+
+                  // New authorization token was received from the subscription verifier server.
+                  // Restarts the tunnel to connect with the new token only if it is different from
+                  // the token in use by the tunnel.
+                  if (![subscription.authorizationToken.ID isEqualToString:tunnelAuthTokenID]) {
+
+                      if (self.gracePeriodState == GracePeriodStateDone) {
+                          // Grace period has finished, and subscription check finished successfully
+                          // with a new token.
+                          // Resets grace period state.
+                          self.gracePeriodState = GracePeriodStateInactive;
+                      }
+
+                      [weakSelf.subscriptionCheckState setStateSubscribed];
+
+                      dispatch_async_main(^{
+                          [weakSelf restartTunnel];
+                      });
+                  }
+              } else {
+                  // Server returned no authorization token, treats this as if subscription was expired.
+                  handleExpiredSubscription();
+              }
+          }
 
       }
       error:^(NSError *error) {
-          [PsiFeedbackLogger error:@"SubscriptionCheck" message:@"token request failed" object:error];
+          [PsiFeedbackLogger errorWithType:@"SubscriptionCheck" message:@"token request failed" object:error];
 
           // Schedules another subscription check in 3 hours.
           const int64_t secs_in_3_hours = 3 * 60 * 60;
@@ -408,7 +419,7 @@ typedef NS_ENUM(NSInteger, GracePeriodState) {
           subscriptionDisposable = nil;
       }
       completed:^{
-          [PsiFeedbackLogger info:@"SubscriptionCheck" message:@"finished"];
+          [PsiFeedbackLogger infoWithType:@"SubscriptionCheck" message:@"finished"];
           // Cleanup.
           [subscriptionDisposable dispose];
           subscriptionDisposable = nil;
@@ -496,11 +507,17 @@ typedef NS_ENUM(NSInteger, GracePeriodState) {
 }
 
 - (void)restartTunnel {
-    [psiphonTunnel stop];
 
-    if (![psiphonTunnel start:FALSE]) {
-        [PsiFeedbackLogger error:@"tunnel start failed"];
-    }
+    // Tunnel restarts are expensive, postpone restart for
+    // a chance for objects not used anymore to be deallocated.
+    dispatch_async_main(^{
+      [psiphonTunnel stop];
+
+      if (![psiphonTunnel start:FALSE]) {
+          [PsiFeedbackLogger error:@"tunnel start failed"];
+      }
+    });
+
 }
 
 - (void)displayMessageAndKillExtension:(NSString *)message {
@@ -641,6 +658,9 @@ typedef NS_ENUM(NSInteger, GracePeriodState) {
     // The notifier callbacks are always called on the main thread.
 
     [notifier listenForNotification:NOTIFIER_START_VPN listener:^{
+
+        LOG_DEBUG(@"container signaled VPN to start");
+
         // If the tunnel is connected, starts the VPN.
         // Otherwise, should establish the VPN after onConnected has been called.
         self.shouldStartVPN = TRUE; // This should be set before calling tryStartVPN.
@@ -648,6 +668,9 @@ typedef NS_ENUM(NSInteger, GracePeriodState) {
     }];
 
     [notifier listenForNotification:NOTIFIER_APP_DID_ENTER_BACKGROUND listener:^{
+
+        LOG_DEBUG(@"container entered background");
+
         // If the VPN start message ("M.startVPN") has not been received from the container,
         // and the container goes to the background, then alert the user to open the app.
         //
@@ -659,6 +682,7 @@ typedef NS_ENUM(NSInteger, GracePeriodState) {
 
     [notifier listenForNotification:NOTIFIER_FORCE_SUBSCRIPTION_CHECK listener:^{
         // Container received a new subscription transaction.
+        [PsiFeedbackLogger infoWithType:@"ExtensionNotification" message:@"force subscription check"];
         [self forceSubscriptionCheck];
     }];
 }
@@ -743,13 +767,13 @@ typedef NS_ENUM(NSInteger, GracePeriodState) {
 }
 
 - (void)killExtensionForBadClock {
-    [PsiFeedbackLogger error:@"ExitReason" message:@"bad clock"];
+    [PsiFeedbackLogger errorWithType:@"ExitReason" message:@"bad clock"];
     NSString *message = NSLocalizedStringWithDefaultValue(@"BAD_CLOCK_ALERT_MESSAGE", nil, [NSBundle mainBundle], @"We've detected the time on your device is out of sync with your time zone. Please update your clock settings and restart the app", @"Alert message informing user that the device clock needs to be updated with current time");
     [self displayMessageAndKillExtension:message];
 }
 
 - (void)killExtensionForInvalidReceipt {
-    [PsiFeedbackLogger error:@"ExitReason" message:@"invalid subscription receipt"];
+    [PsiFeedbackLogger errorWithType:@"ExitReason" message:@"invalid subscription receipt"];
     NSString *message = NSLocalizedStringWithDefaultValue(@"BAD_RECEIPT_ALERT_MESSAGE", nil, [NSBundle mainBundle], @"Your subscription receipt can not be verified, please refresh it and try again.", @"Alert message informing user that subscription receipt can not be verified");
     [self displayMessageAndKillExtension:message];
 }
@@ -783,7 +807,7 @@ typedef NS_ENUM(NSInteger, GracePeriodState) {
     NSString *bundledConfigPath = [PsiphonConfigFiles psiphonConfigPath];
 
     if (![fileManager fileExistsAtPath:bundledConfigPath]) {
-        [PsiFeedbackLogger error:@"ExitReason" message:@"config file not found"];
+        [PsiFeedbackLogger errorWithType:@"ExitReason" message:@"config file not found"];
         [self displayCorruptSettingsFileMessage];
         abort();
     }
@@ -794,7 +818,7 @@ typedef NS_ENUM(NSInteger, GracePeriodState) {
     NSDictionary *readOnly = [NSJSONSerialization JSONObjectWithData:jsonData options:kNilOptions error:&err];
 
     if (err) {
-        [PsiFeedbackLogger error:@"ExitReason" message:@"config file parse failed" object:err];
+        [PsiFeedbackLogger errorWithType:@"ExitReason" message:@"config file parse failed" object:err];
         [self displayCorruptSettingsFileMessage];
         abort();
     }
@@ -839,7 +863,7 @@ typedef NS_ENUM(NSInteger, GracePeriodState) {
       options:0 error:&err];
 
     if (err) {
-        [PsiFeedbackLogger error:@"ExitReason" message:@"failed to create JSON data from config object" object:err];
+        [PsiFeedbackLogger errorWithType:@"ExitReason" message:@"failed to create JSON data from config object" object:err];
         [self displayCorruptSettingsFileMessage];
         abort();
     }
@@ -889,9 +913,10 @@ typedef NS_ENUM(NSInteger, GracePeriodState) {
 }
 
 - (void)onServerTimestamp:(NSString * _Nonnull)timestamp {
+
 	[sharedDB updateServerTimestamp:timestamp];
 
-    NSDate *serverDate = [[NSDateFormatter sharedRFC3339DateFormatter] dateFromString:timestamp];
+    NSDate *serverTimestamp = [NSDate fromRFC3339String:timestamp];
 
     // Check if user has an active subscription in the device's time
     // If NO - do nothing
@@ -901,8 +926,8 @@ typedef NS_ENUM(NSInteger, GracePeriodState) {
     if ([authorizations hasActiveAuthorizationTokenForDate:[NSDate date]]) {
         // The following code adapted from
         // https://developer.apple.com/library/content/documentation/Cocoa/Conceptual/DataFormatting/Articles/dfDateFormatting10_4.html
-        if (serverDate != nil) {
-            if (![authorizations hasActiveAuthorizationTokenForDate:serverDate]) {
+        if (serverTimestamp != nil) {
+            if (![authorizations hasActiveAuthorizationTokenForDate:serverTimestamp]) {
                 // User is possibly cheating, terminate extension due to 'Bad Clock'.
                 [self killExtensionForBadClock];
             }
@@ -910,8 +935,8 @@ typedef NS_ENUM(NSInteger, GracePeriodState) {
     }
 
     if ([subscription hasActiveSubscriptionTokenForDate:[NSDate date]]) {
-        if (serverDate != nil) {
-            if (![subscription hasActiveSubscriptionTokenForDate:serverDate]) {
+        if (serverTimestamp != nil) {
+            if (![subscription hasActiveSubscriptionTokenForDate:serverTimestamp]) {
                 // User is possibly cheating, terminate extension due to 'Bad Clock'.
                 [self killExtensionForBadClock];
             }

@@ -18,7 +18,6 @@
  */
 
 #import "Authorizations.h"
-#import "NSDateFormatter+RFC3339.h"
 #import "Logging.h"
 #import "AuthorizationToken.h"
 #import "NSDate+Comparator.h"
