@@ -1041,7 +1041,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 
 #if DEBUG
     // Ensure diagnostic notices are emitted when debugging
-    mutableConfigCopy[@"EmitDiagnosticNotices"] = @TRUE;
+    mutableConfigCopy[@"EmitDiagnosticNotices"] = [NSNumber numberWithBool:YES];
 #endif
 
     jsonData  = [NSJSONSerialization dataWithJSONObject:mutableConfigCopy options:0 error:&err];

@@ -18,12 +18,14 @@
  */
 
 #import <Foundation/Foundation.h>
+#import <ReactiveObjC/RACDisposable.h>
 #import "Subscription.h"
 #import "NSDate+Comparator.h"
 #import "NSError+Convenience.h"
 #import "RACTuple.h"
 #import "PsiFeedbackLogger.h"
 #import "Logging.h"
+#import "Asserts.h"
 
 NSErrorDomain _Nonnull const ReceiptValidationErrorDomain = @"PsiphonReceiptValidationErrorDomain";
 
@@ -34,7 +36,9 @@ NSErrorDomain _Nonnull const ReceiptValidationErrorDomain = @"PsiphonReceiptVali
 + (RACSignal<NSDictionary *> *)updateSubscriptionAuthorizationTokenFromRemote {
     return [RACSignal createSignal:^RACDisposable *(id <RACSubscriber> subscriber) {
 
-        [[[SubscriptionVerifierService alloc] init] startWithCompletionHandler:^(NSDictionary *remoteAuthDict, NSNumber *submittedReceiptFileSize, NSError *error) {
+        SubscriptionVerifierService *service = [[SubscriptionVerifierService alloc] init];
+
+        [service startWithCompletionHandler:^(NSDictionary *remoteAuthDict, NSNumber *submittedReceiptFileSize, NSError *error) {
 
             if (error) {
                 [subscriber sendError:error];
@@ -44,7 +48,12 @@ NSErrorDomain _Nonnull const ReceiptValidationErrorDomain = @"PsiphonReceiptVali
             }
         }];
 
-        return nil;
+        return [RACDisposable disposableWithBlock:^{
+            @autoreleasepool {
+                [service cancel];
+            }
+        }];
+
     }];
 }
 
@@ -74,51 +83,58 @@ NSErrorDomain _Nonnull const ReceiptValidationErrorDomain = @"PsiphonReceiptVali
 
     NSURLSessionDataTask *postDataTask = [urlSession dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
 
+        [PsiFeedbackLogger infoWithType:@"SubscriptionVerifierService" message:@"received response"];
+
         dispatch_async(dispatch_get_main_queue(), ^{
 
             // Session is no longer needed, invalidates and cancels outstanding tasks.
             [urlSession invalidateAndCancel];
 
-            if (receiptUploadCompletionHandler) {
-                if (error) {
-                    NSDictionary *errorDict = @{NSLocalizedDescriptionKey: @"NSURLSession error", NSUnderlyingErrorKey: error};
-                    NSError *err = [[NSError alloc] initWithDomain:ReceiptValidationErrorDomain code:PsiphonReceiptValidationErrorNSURLSessionFailed userInfo:errorDict];
-                    receiptUploadCompletionHandler(nil, appReceiptFileSize, err);
-                    return;
-                }
-
-                NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *) response;
-                if (httpResponse.statusCode != 200) {
-                    NSString *description = [NSString stringWithFormat:@"HTTP code: %ld", (long) httpResponse.statusCode];
-                    NSDictionary *errorDict = @{NSLocalizedDescriptionKey: description};
-                    NSError *err = [[NSError alloc] initWithDomain:ReceiptValidationErrorDomain code:PsiphonReceiptValidationErrorHTTPFailed userInfo:errorDict];
-                    receiptUploadCompletionHandler(nil, appReceiptFileSize, err);
-                    return;
-                }
-
-                if (data.length == 0) {
-                    NSDictionary *errorDict = @{NSLocalizedDescriptionKey: @"Empty server response"};
-                    NSError *err = [[NSError alloc] initWithDomain:ReceiptValidationErrorDomain code:PsiphonReceiptValidationErrorInvalidReceipt userInfo:errorDict];
-                    receiptUploadCompletionHandler(nil, appReceiptFileSize, err);
-                    return;
-                }
-
-                NSError *jsonError;
-                NSDictionary *dict = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&jsonError];
-
-                if (jsonError) {
-                    NSDictionary *errorDict = @{NSLocalizedDescriptionKey: @"JSON parse failure", NSUnderlyingErrorKey: error};
-                    NSError *err = [[NSError alloc] initWithDomain:ReceiptValidationErrorDomain code:PsiphonReceiptValidationErrorJSONParseFailed userInfo:errorDict];
-                    receiptUploadCompletionHandler(nil, appReceiptFileSize, err);
-                    return;
-                }
-
-                receiptUploadCompletionHandler(dict, appReceiptFileSize, nil);
+            if (error) {
+                NSDictionary *errorDict = @{NSLocalizedDescriptionKey: @"NSURLSession error", NSUnderlyingErrorKey: error};
+                NSError *err = [[NSError alloc] initWithDomain:ReceiptValidationErrorDomain code:PsiphonReceiptValidationErrorNSURLSessionFailed userInfo:errorDict];
+                receiptUploadCompletionHandler(nil, appReceiptFileSize, err);
+                return;
             }
+
+            NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *) response;
+            if (httpResponse.statusCode != 200) {
+                NSString *description = [NSString stringWithFormat:@"HTTP code: %ld", (long) httpResponse.statusCode];
+                NSDictionary *errorDict = @{NSLocalizedDescriptionKey: description};
+                NSError *err = [[NSError alloc] initWithDomain:ReceiptValidationErrorDomain code:PsiphonReceiptValidationErrorHTTPFailed userInfo:errorDict];
+                receiptUploadCompletionHandler(nil, appReceiptFileSize, err);
+                return;
+            }
+
+            if (data.length == 0) {
+                NSDictionary *errorDict = @{NSLocalizedDescriptionKey: @"Empty server response"};
+                NSError *err = [[NSError alloc] initWithDomain:ReceiptValidationErrorDomain code:PsiphonReceiptValidationErrorInvalidReceipt userInfo:errorDict];
+                receiptUploadCompletionHandler(nil, appReceiptFileSize, err);
+                return;
+            }
+
+            NSError *jsonError;
+            NSDictionary *dict = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&jsonError];
+
+            if (jsonError) {
+                NSDictionary *errorDict = @{NSLocalizedDescriptionKey: @"JSON parse failure", NSUnderlyingErrorKey: error};
+                NSError *err = [[NSError alloc] initWithDomain:ReceiptValidationErrorDomain code:PsiphonReceiptValidationErrorJSONParseFailed userInfo:errorDict];
+                receiptUploadCompletionHandler(nil, appReceiptFileSize, err);
+                return;
+            }
+
+            receiptUploadCompletionHandler(dict, appReceiptFileSize, nil);
         });
     }];
 
     [postDataTask resume];
+
+    [PsiFeedbackLogger infoWithType:@"SubscriptionVerifierService" message:@"token request submitted"];
+
+}
+
+- (void)cancel {
+    [urlSession invalidateAndCancel];
 }
 
 @end
@@ -345,13 +361,10 @@ typedef NS_ENUM(NSInteger, SubscriptionStateEnum) {
     SubscriptionStateSubscribed = 3,
 };
 
-@interface SubscriptionState ()
-
-@property (atomic, readwrite) SubscriptionStateEnum state;
-
-@end
-
-@implementation SubscriptionState
+@implementation SubscriptionState {
+    NSObject *_lock;
+    SubscriptionStateEnum _state;
+}
 
 + (SubscriptionState *_Nonnull)initialStateFromSubscription:(Subscription *)subscription {
     SubscriptionState *instance = [[SubscriptionState alloc] init];
@@ -364,6 +377,27 @@ typedef NS_ENUM(NSInteger, SubscriptionStateEnum) {
     }
 
     return instance;
+}
+
+- (instancetype)init {
+    self = [super init];
+    if (self) {
+        _lock = [[NSObject alloc] init];
+    }
+    return self;
+}
+
+- (void)setState:(SubscriptionStateEnum)newState {
+    @synchronized (_lock) {
+        _state = newState;
+    }
+}
+
+- (SubscriptionStateEnum)state {
+    @synchronized (_lock) {
+        PSIAssert(_state != 0);
+        return _state;
+    }
 }
 
 - (BOOL)isSubscribedOrInProgress {

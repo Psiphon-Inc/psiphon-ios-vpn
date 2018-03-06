@@ -19,8 +19,8 @@
 
 #import "PsiphonDataSharedDB.h"
 #import "Logging.h"
-#import "NSDateFormatter+RFC3339.h"
 #import "PsiFeedbackLogger.h"
+#import "NSDate+PSIDateExtension.h"
 
 // File operations parameters
 #define MAX_RETRIES 3
@@ -177,7 +177,7 @@
                     msg = [NSString stringWithFormat:@"%@: %@", dict[@"noticeType"], data];
                 }
 
-                NSDate *timestamp = [[NSDateFormatter sharedRFC3339MilliDateFormatter] dateFromString:dict[@"timestamp"]];
+                NSDate *timestamp = [NSDate fromRFC3339String:dict[@"timestamp"]];
 
                 if (!msg) {
                     [PsiFeedbackLogger error:@"Failed to read notice message for log line (%@).", logLine];
@@ -248,7 +248,7 @@
         if (dict) {
             Homepage *h = [[Homepage alloc] init];
             h.url = [NSURL URLWithString:dict[@"data"][@"url"]];
-            h.timestamp = [[NSDateFormatter sharedRFC3339MilliDateFormatter] dateFromString:dict[@"timestamp"]];
+            h.timestamp = [NSDate fromRFC3339String:dict[@"timestamp"]];
             [homepages addObject:h];
         }
     }
