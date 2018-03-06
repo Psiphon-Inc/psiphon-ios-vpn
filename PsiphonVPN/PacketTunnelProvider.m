@@ -174,7 +174,7 @@ typedef NS_ENUM(NSInteger, GracePeriodState) {
 
         if (weakSelf.extensionStartMethod == ExtensionStartMethodFromContainer) {
 
-            [PsiFeedbackLogger info:@"SubscriptionCheck" message:@"token expired restarting tunnel"];
+            [PsiFeedbackLogger infoWithType:@"SubscriptionCheck" message:@"token expired restarting tunnel"];
 
             // Restarts the tunnel to re-connect with the correct sponsor ID.
             [weakSelf.subscriptionCheckState setStateNotSubscribed];
@@ -186,11 +186,11 @@ typedef NS_ENUM(NSInteger, GracePeriodState) {
             // and another subscription check happens.
 
             if (self.gracePeriodState == GracePeriodStateDone) {
-                [PsiFeedbackLogger info:@"SubscriptionCheck" message:@"grace period finished killing extension"];
+                [PsiFeedbackLogger infoWithType:@"SubscriptionCheck" message:@"grace period finished killing extension"];
 
                 [self killExtensionForExpiredSubscription];
             } else {
-                [PsiFeedbackLogger info:@"SubscriptionCheck" message:@"token expired starting grace period"];
+                [PsiFeedbackLogger infoWithType:@"SubscriptionCheck" message:@"token expired starting grace period"];
                 [self startGracePeriod];
             }
         }
@@ -230,7 +230,7 @@ typedef NS_ENUM(NSInteger, GracePeriodState) {
     RACSignal *updateSubscriptionTokenSignal = [[[[[self subscriptionReceiptUnlocked]
       flattenMap:^RACSignal *(id nilValue) {
           // Emits an item when Psiphon tunnel is connected and VPN is started.
-          [PsiFeedbackLogger info:@"SubscriptionCheck" message:@"receipt is readable"];
+          [PsiFeedbackLogger infoWithType:@"SubscriptionCheck" message:@"receipt is readable"];
           return [self.vpnStartedSignal zipWith:[tunnelConnectedSignal take:1]];
       }]
       flattenMap:^RACSignal *(id nilValue) {
@@ -242,16 +242,16 @@ typedef NS_ENUM(NSInteger, GracePeriodState) {
 
           switch ((SubscriptionCheckEnum) [subscriptionCheckObject integerValue]) {
               case SubscriptionCheckTokenExpired:
-                  [PsiFeedbackLogger info:@"SubscriptionCheck" message:@"token expired"];
+                  [PsiFeedbackLogger infoWithType:@"SubscriptionCheck" message:@"token expired"];
                   return [RACSignal return:[SubscriptionResultModel failed:SubscriptionResultErrorExpired]];
 
               case SubscriptionCheckHasActiveToken:
-                  [PsiFeedbackLogger info:@"SubscriptionCheck" message:@"token already active"];
+                  [PsiFeedbackLogger infoWithType:@"SubscriptionCheck" message:@"token already active"];
                   return [RACSignal return:[SubscriptionResultModel success:nil receiptFilSize:nil]];
 
               case SubscriptionCheckShouldUpdateToken:
 
-                  [PsiFeedbackLogger info:@"SubscriptionCheck" message:@"token request"];
+                  [PsiFeedbackLogger infoWithType:@"SubscriptionCheck" message:@"token request"];
 
                   // Emits an item whose value is the dictionary returned from the subscription verifier server,
                   // emits an error on all errors.
@@ -284,7 +284,7 @@ typedef NS_ENUM(NSInteger, GracePeriodState) {
                     }];
 
               default:
-                  [PsiFeedbackLogger error:@"SubscriptionCheck" message:@"unhandled check value %@", subscriptionCheckObject];
+                  [PsiFeedbackLogger errorWithType:@"SubscriptionCheck" message:@"unhandled check value %@", subscriptionCheckObject];
                   abort();
           }
       }]
@@ -300,7 +300,7 @@ typedef NS_ENUM(NSInteger, GracePeriodState) {
               // Subscription check is in progress.
               // Sets extension's subscription status to in progress.
 
-              [PsiFeedbackLogger info:@"SubscriptionCheck" message:@"started"];
+              [PsiFeedbackLogger infoWithType:@"SubscriptionCheck" message:@"started"];
               [weakSelf.subscriptionCheckState setStateInProgress];
               return;
           }
@@ -326,7 +326,7 @@ typedef NS_ENUM(NSInteger, GracePeriodState) {
                       break;
 
                   default:
-                      [PsiFeedbackLogger error:@"SubscriptionCheck" message:@"unhandled error code %ld", (long) result.error.code];
+                      [PsiFeedbackLogger errorWithType:@"SubscriptionCheck" message:@"unhandled error code %ld", (long) result.error.code];
                       abort();
                       break;
               }
@@ -349,12 +349,12 @@ typedef NS_ENUM(NSInteger, GracePeriodState) {
           subscription.appReceiptFileSize = result.submittedReceiptFileSize;
           NSError *error = [subscription updateSubscriptionWithRemoteAuthDict:result.remoteAuthDict];
           if (error) {
-              [PsiFeedbackLogger error:@"SubscriptionCheck" message:@"failed to read remote auth data:%@", error];
+              [PsiFeedbackLogger errorWithType:@"SubscriptionCheck" message:@"failed to read remote auth data:%@", error];
               return;
           }
           [subscription persistChanges];
 
-          [PsiFeedbackLogger info:@"SubscriptionCheck" message:@"received token expiring on %@", subscription.authorizationToken.expires];
+          [PsiFeedbackLogger infoWithType:@"SubscriptionCheck" message:@"received token expiring on %@", subscription.authorizationToken.expires];
 
           // Extract request date from the response and convert to NSDate.
           NSDate *requestDate = nil;
@@ -397,7 +397,7 @@ typedef NS_ENUM(NSInteger, GracePeriodState) {
 
       }
       error:^(NSError *error) {
-          [PsiFeedbackLogger error:@"SubscriptionCheck" message:@"token request failed" object:error];
+          [PsiFeedbackLogger errorWithType:@"SubscriptionCheck" message:@"token request failed" object:error];
 
           // Schedules another subscription check in 3 hours.
           const int64_t secs_in_3_hours = 3 * 60 * 60;
@@ -412,7 +412,7 @@ typedef NS_ENUM(NSInteger, GracePeriodState) {
           subscriptionDisposable = nil;
       }
       completed:^{
-          [PsiFeedbackLogger info:@"SubscriptionCheck" message:@"finished"];
+          [PsiFeedbackLogger infoWithType:@"SubscriptionCheck" message:@"finished"];
           // Cleanup.
           [subscriptionDisposable dispose];
           subscriptionDisposable = nil;
@@ -747,13 +747,13 @@ typedef NS_ENUM(NSInteger, GracePeriodState) {
 }
 
 - (void)killExtensionForBadClock {
-    [PsiFeedbackLogger error:@"ExitReason" message:@"bad clock"];
+    [PsiFeedbackLogger errorWithType:@"ExitReason" message:@"bad clock"];
     NSString *message = NSLocalizedStringWithDefaultValue(@"BAD_CLOCK_ALERT_MESSAGE", nil, [NSBundle mainBundle], @"We've detected the time on your device is out of sync with your time zone. Please update your clock settings and restart the app", @"Alert message informing user that the device clock needs to be updated with current time");
     [self displayMessageAndKillExtension:message];
 }
 
 - (void)killExtensionForInvalidReceipt {
-    [PsiFeedbackLogger error:@"ExitReason" message:@"invalid subscription receipt"];
+    [PsiFeedbackLogger errorWithType:@"ExitReason" message:@"invalid subscription receipt"];
     NSString *message = NSLocalizedStringWithDefaultValue(@"BAD_RECEIPT_ALERT_MESSAGE", nil, [NSBundle mainBundle], @"Your subscription receipt can not be verified, please refresh it and try again.", @"Alert message informing user that subscription receipt can not be verified");
     [self displayMessageAndKillExtension:message];
 }
@@ -787,7 +787,7 @@ typedef NS_ENUM(NSInteger, GracePeriodState) {
     NSString *bundledConfigPath = [PsiphonConfigFiles psiphonConfigPath];
 
     if (![fileManager fileExistsAtPath:bundledConfigPath]) {
-        [PsiFeedbackLogger error:@"ExitReason" message:@"config file not found"];
+        [PsiFeedbackLogger errorWithType:@"ExitReason" message:@"config file not found"];
         [self displayCorruptSettingsFileMessage];
         abort();
     }
@@ -798,7 +798,7 @@ typedef NS_ENUM(NSInteger, GracePeriodState) {
     NSDictionary *readOnly = [NSJSONSerialization JSONObjectWithData:jsonData options:kNilOptions error:&err];
 
     if (err) {
-        [PsiFeedbackLogger error:@"ExitReason" message:@"config file parse failed" object:err];
+        [PsiFeedbackLogger errorWithType:@"ExitReason" message:@"config file parse failed" object:err];
         [self displayCorruptSettingsFileMessage];
         abort();
     }
@@ -843,7 +843,7 @@ typedef NS_ENUM(NSInteger, GracePeriodState) {
       options:0 error:&err];
 
     if (err) {
-        [PsiFeedbackLogger error:@"ExitReason" message:@"failed to create JSON data from config object" object:err];
+        [PsiFeedbackLogger errorWithType:@"ExitReason" message:@"failed to create JSON data from config object" object:err];
         [self displayCorruptSettingsFileMessage];
         abort();
     }
