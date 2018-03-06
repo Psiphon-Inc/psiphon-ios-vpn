@@ -88,42 +88,40 @@ NSErrorDomain _Nonnull const ReceiptValidationErrorDomain = @"PsiphonReceiptVali
             // Session is no longer needed, invalidates and cancels outstanding tasks.
             [urlSession invalidateAndCancel];
 
-            if (receiptUploadCompletionHandler) {
-                if (error) {
-                    NSDictionary *errorDict = @{NSLocalizedDescriptionKey: @"NSURLSession error", NSUnderlyingErrorKey: error};
-                    NSError *err = [[NSError alloc] initWithDomain:ReceiptValidationErrorDomain code:PsiphonReceiptValidationErrorNSURLSessionFailed userInfo:errorDict];
-                    receiptUploadCompletionHandler(nil, appReceiptFileSize, err);
-                    return;
-                }
-
-                NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *) response;
-                if (httpResponse.statusCode != 200) {
-                    NSString *description = [NSString stringWithFormat:@"HTTP code: %ld", (long) httpResponse.statusCode];
-                    NSDictionary *errorDict = @{NSLocalizedDescriptionKey: description};
-                    NSError *err = [[NSError alloc] initWithDomain:ReceiptValidationErrorDomain code:PsiphonReceiptValidationErrorHTTPFailed userInfo:errorDict];
-                    receiptUploadCompletionHandler(nil, appReceiptFileSize, err);
-                    return;
-                }
-
-                if (data.length == 0) {
-                    NSDictionary *errorDict = @{NSLocalizedDescriptionKey: @"Empty server response"};
-                    NSError *err = [[NSError alloc] initWithDomain:ReceiptValidationErrorDomain code:PsiphonReceiptValidationErrorInvalidReceipt userInfo:errorDict];
-                    receiptUploadCompletionHandler(nil, appReceiptFileSize, err);
-                    return;
-                }
-
-                NSError *jsonError;
-                NSDictionary *dict = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&jsonError];
-
-                if (jsonError) {
-                    NSDictionary *errorDict = @{NSLocalizedDescriptionKey: @"JSON parse failure", NSUnderlyingErrorKey: error};
-                    NSError *err = [[NSError alloc] initWithDomain:ReceiptValidationErrorDomain code:PsiphonReceiptValidationErrorJSONParseFailed userInfo:errorDict];
-                    receiptUploadCompletionHandler(nil, appReceiptFileSize, err);
-                    return;
-                }
-
-                receiptUploadCompletionHandler(dict, appReceiptFileSize, nil);
+            if (error) {
+                NSDictionary *errorDict = @{NSLocalizedDescriptionKey: @"NSURLSession error", NSUnderlyingErrorKey: error};
+                NSError *err = [[NSError alloc] initWithDomain:ReceiptValidationErrorDomain code:PsiphonReceiptValidationErrorNSURLSessionFailed userInfo:errorDict];
+                receiptUploadCompletionHandler(nil, appReceiptFileSize, err);
+                return;
             }
+
+            NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *) response;
+            if (httpResponse.statusCode != 200) {
+                NSString *description = [NSString stringWithFormat:@"HTTP code: %ld", (long) httpResponse.statusCode];
+                NSDictionary *errorDict = @{NSLocalizedDescriptionKey: description};
+                NSError *err = [[NSError alloc] initWithDomain:ReceiptValidationErrorDomain code:PsiphonReceiptValidationErrorHTTPFailed userInfo:errorDict];
+                receiptUploadCompletionHandler(nil, appReceiptFileSize, err);
+                return;
+            }
+
+            if (data.length == 0) {
+                NSDictionary *errorDict = @{NSLocalizedDescriptionKey: @"Empty server response"};
+                NSError *err = [[NSError alloc] initWithDomain:ReceiptValidationErrorDomain code:PsiphonReceiptValidationErrorInvalidReceipt userInfo:errorDict];
+                receiptUploadCompletionHandler(nil, appReceiptFileSize, err);
+                return;
+            }
+
+            NSError *jsonError;
+            NSDictionary *dict = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&jsonError];
+
+            if (jsonError) {
+                NSDictionary *errorDict = @{NSLocalizedDescriptionKey: @"JSON parse failure", NSUnderlyingErrorKey: error};
+                NSError *err = [[NSError alloc] initWithDomain:ReceiptValidationErrorDomain code:PsiphonReceiptValidationErrorJSONParseFailed userInfo:errorDict];
+                receiptUploadCompletionHandler(nil, appReceiptFileSize, err);
+                return;
+            }
+
+            receiptUploadCompletionHandler(dict, appReceiptFileSize, nil);
         });
     }];
 
