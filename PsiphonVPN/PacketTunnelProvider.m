@@ -49,7 +49,6 @@
 
 NSErrorDomain _Nonnull const PsiphonTunnelErrorDomain = @"PsiphonTunnelErrorDomain";
 
-
 typedef NS_ENUM(NSInteger, AuthorizationTokenActivity) {
     AuthorizationTokenRejected,
     AuthorizationTokenActiveOrEmpty
@@ -645,6 +644,9 @@ typedef NS_ENUM(NSInteger, GracePeriodState) {
     // The notifier callbacks are always called on the main thread.
 
     [notifier listenForNotification:NOTIFIER_START_VPN listener:^{
+
+        LOG_DEBUG(@"container signaled VPN to start");
+
         // If the tunnel is connected, starts the VPN.
         // Otherwise, should establish the VPN after onConnected has been called.
         self.shouldStartVPN = TRUE; // This should be set before calling tryStartVPN.
@@ -652,6 +654,9 @@ typedef NS_ENUM(NSInteger, GracePeriodState) {
     }];
 
     [notifier listenForNotification:NOTIFIER_APP_DID_ENTER_BACKGROUND listener:^{
+
+        LOG_DEBUG(@"container entered background");
+
         // If the VPN start message ("M.startVPN") has not been received from the container,
         // and the container goes to the background, then alert the user to open the app.
         //
@@ -663,6 +668,7 @@ typedef NS_ENUM(NSInteger, GracePeriodState) {
 
     [notifier listenForNotification:NOTIFIER_FORCE_SUBSCRIPTION_CHECK listener:^{
         // Container received a new subscription transaction.
+        [PsiFeedbackLogger infoWithType:@"ExtensionNotification" message:@"force subscription check"];
         [self forceSubscriptionCheck];
     }];
 }

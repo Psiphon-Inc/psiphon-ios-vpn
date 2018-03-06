@@ -83,6 +83,8 @@ NSErrorDomain _Nonnull const ReceiptValidationErrorDomain = @"PsiphonReceiptVali
 
     NSURLSessionDataTask *postDataTask = [urlSession dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
 
+        [PsiFeedbackLogger infoWithType:@"SubscriptionVerifierService" message:@"received response"];
+
         dispatch_async(dispatch_get_main_queue(), ^{
 
             // Session is no longer needed, invalidates and cancels outstanding tasks.
@@ -126,6 +128,9 @@ NSErrorDomain _Nonnull const ReceiptValidationErrorDomain = @"PsiphonReceiptVali
     }];
 
     [postDataTask resume];
+
+    [PsiFeedbackLogger infoWithType:@"SubscriptionVerifierService" message:@"token request submitted"];
+
 }
 
 - (void)cancel {
