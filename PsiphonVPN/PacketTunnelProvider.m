@@ -44,6 +44,7 @@
 #import "RACScheduler.h"
 #import "Asserts.h"
 #import "NSDate+PSIDateExtension.h"
+#import "DispatchUtils.h"
 #import <ReactiveObjC/RACSubject.h>
 #import <ReactiveObjC/RACReplaySubject.h>
 
@@ -177,6 +178,7 @@ typedef NS_ENUM(NSInteger, GracePeriodState) {
 
             // Restarts the tunnel to re-connect with the correct sponsor ID.
             [weakSelf.subscriptionCheckState setStateNotSubscribed];
+
             [weakSelf restartTunnel];
 
         } else {
@@ -335,64 +337,70 @@ typedef NS_ENUM(NSInteger, GracePeriodState) {
           // At this point, subscription check finished and received response
           // from the subscription verifier server.
 
-          NSString *tunnelAuthTokenID;
+          @autoreleasepool {
 
-          // Updates subscription and persists subscription.
-          Subscription *subscription = [Subscription fromPersistedDefaults];
+              NSString *tunnelAuthTokenID;
 
-          // Keep a copy of the token passed to the tunnel previously.
-          // This token represents the authorization token accepted by the Psiphon server,
-          // regardless of what token was passed to the server.
-          tunnelAuthTokenID = [subscription.authorizationToken.ID copy];
+              // Updates subscription and persists subscription.
+              Subscription *subscription = [Subscription fromPersistedDefaults];
 
-          subscription.appReceiptFileSize = result.submittedReceiptFileSize;
-          NSError *error = [subscription updateSubscriptionWithRemoteAuthDict:result.remoteAuthDict];
-          if (error) {
-              [PsiFeedbackLogger errorWithType:@"SubscriptionCheck" message:@"failed to read remote auth data:%@", error];
-              return;
-          }
-          [subscription persistChanges];
+              // Keep a copy of the token passed to the tunnel previously.
+              // This token represents the authorization token accepted by the Psiphon server,
+              // regardless of what token was passed to the server.
+              tunnelAuthTokenID = [subscription.authorizationToken.ID copy];
 
-          [PsiFeedbackLogger infoWithType:@"SubscriptionCheck" message:@"received token expiring on %@", subscription.authorizationToken.expires];
-
-          // Extract request date from the response and convert to NSDate.
-          NSDate *requestDate = nil;
-          NSString *requestDateString = (NSString *) result.remoteAuthDict[kRemoteSubscriptionVerifierRequestDate];
-          if ([requestDateString length]) {
-              requestDate = [NSDate fromRFC3339String:requestDateString];
-          }
-
-          // Bad Clock error if user has an active subscription in server time
-          // but in device time it appears to be expired.
-          if (requestDate) {
-              if ([subscription hasActiveSubscriptionTokenForDate:requestDate]
-                && ![subscription hasActiveSubscriptionTokenForDate:[NSDate date]]) {
-                  [self killExtensionForBadClock];
+              subscription.appReceiptFileSize = result.submittedReceiptFileSize;
+              NSError *error = [subscription updateSubscriptionWithRemoteAuthDict:result.remoteAuthDict];
+              if (error) {
+                  [PsiFeedbackLogger errorWithType:@"SubscriptionCheck" message:@"failed to read remote auth data:%@", error];
                   return;
               }
-          }
+              [subscription persistChanges];
 
-          if (subscription.authorizationToken) {
+              [PsiFeedbackLogger infoWithType:@"SubscriptionCheck" message:@"received token expiring on %@", subscription.authorizationToken.expires];
 
-              // New authorization token was received from the subscription verifier server.
-              // Restarts the tunnel to connect with the new token only if it is different from
-              // the token in use by the tunnel.
-              if (![subscription.authorizationToken.ID isEqualToString:tunnelAuthTokenID]) {
-
-                  if (self.gracePeriodState == GracePeriodStateDone) {
-                      // Grace period has finished, and subscription check finished successfully
-                      // with a new token.
-                      // Resets grace period state.
-                      self.gracePeriodState = GracePeriodStateInactive;
-                  }
-
-                  [weakSelf.subscriptionCheckState setStateSubscribed];
-                  [weakSelf restartTunnel];
+              // Extract request date from the response and convert to NSDate.
+              NSDate *requestDate = nil;
+              NSString *requestDateString = (NSString *) result.remoteAuthDict[kRemoteSubscriptionVerifierRequestDate];
+              if ([requestDateString length]) {
+                  requestDate = [NSDate fromRFC3339String:requestDateString];
               }
-          } else {
-              // Server returned no authorization token, treats this as if subscription was expired.
-              handleExpiredSubscription();
-          } 
+
+              // Bad Clock error if user has an active subscription in server time
+              // but in device time it appears to be expired.
+              if (requestDate) {
+                  if ([subscription hasActiveSubscriptionTokenForDate:requestDate]
+                    && ![subscription hasActiveSubscriptionTokenForDate:[NSDate date]]) {
+                      [self killExtensionForBadClock];
+                      return;
+                  }
+              }
+
+              if (subscription.authorizationToken) {
+
+                  // New authorization token was received from the subscription verifier server.
+                  // Restarts the tunnel to connect with the new token only if it is different from
+                  // the token in use by the tunnel.
+                  if (![subscription.authorizationToken.ID isEqualToString:tunnelAuthTokenID]) {
+
+                      if (self.gracePeriodState == GracePeriodStateDone) {
+                          // Grace period has finished, and subscription check finished successfully
+                          // with a new token.
+                          // Resets grace period state.
+                          self.gracePeriodState = GracePeriodStateInactive;
+                      }
+
+                      [weakSelf.subscriptionCheckState setStateSubscribed];
+
+                      dispatch_async_main(^{
+                          [weakSelf restartTunnel];
+                      });
+                  }
+              } else {
+                  // Server returned no authorization token, treats this as if subscription was expired.
+                  handleExpiredSubscription();
+              }
+          }
 
       }
       error:^(NSError *error) {
@@ -499,11 +507,17 @@ typedef NS_ENUM(NSInteger, GracePeriodState) {
 }
 
 - (void)restartTunnel {
-    [psiphonTunnel stop];
 
-    if (![psiphonTunnel start:FALSE]) {
-        [PsiFeedbackLogger error:@"tunnel start failed"];
-    }
+    // Tunnel restarts are expensive, postpone restart for
+    // a chance for objects not used anymore to be deallocated.
+    dispatch_async_main(^{
+      [psiphonTunnel stop];
+
+      if (![psiphonTunnel start:FALSE]) {
+          [PsiFeedbackLogger error:@"tunnel start failed"];
+      }
+    });
+
 }
 
 - (void)displayMessageAndKillExtension:(NSString *)message {
