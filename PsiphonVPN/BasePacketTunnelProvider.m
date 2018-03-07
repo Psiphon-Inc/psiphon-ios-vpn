@@ -29,7 +29,7 @@ NSErrorDomain _Nonnull const BasePsiphonTunnelErrorDomain = @"BasePsiphonTunnelE
 
 @interface BasePacketTunnelProvider ()
 
-@property (nonatomic, readwrite) ExtensionStartMethodEnum NEStartMethod;
+@property (nonatomic, readwrite) ExtensionStartMethodEnum extensionStartMethod;
 
 @property (nonatomic, readwrite) BOOL VPNStarted;
 
@@ -88,11 +88,11 @@ NSErrorDomain _Nonnull const BasePsiphonTunnelErrorDomain = @"BasePsiphonTunnelE
 
     // Determine how the extension was started.
     if ([self isStartBootTestFileLocked]) {
-        self.NEStartMethod = ExtensionStartMethodFromBoot;
+        self.extensionStartMethod = ExtensionStartMethodFromBoot;
     } else if ([((NSString *)options[EXTENSION_OPTION_START_FROM_CONTAINER]) isEqualToString:EXTENSION_OPTION_TRUE]) {
-        self.NEStartMethod = ExtensionStartMethodFromContainer;
+        self.extensionStartMethod = ExtensionStartMethodFromContainer;
     } else {
-        self.NEStartMethod = ExtensionStartMethodOther;
+        self.extensionStartMethod = ExtensionStartMethodOther;
     }
 
     // Hold a reference to the completionHandler
