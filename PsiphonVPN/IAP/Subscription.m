@@ -342,7 +342,7 @@ NSErrorDomain _Nonnull const SubscriptionResultErrorDomain = @"SubscriptionResul
     return instance;
 }
 
-+ (SubscriptionResultModel *)success:(NSDictionary *_Nullable)remoteAuthDict receiptFilSize:(NSNumber *_Nullable)receiptFileSize {
++ (SubscriptionResultModel *)success:(NSDictionary *_Nullable)remoteAuthDict receiptFileSize:(NSNumber *_Nullable)receiptFileSize {
     SubscriptionResultModel *instance = [[SubscriptionResultModel alloc] init];
     instance.inProgress = FALSE;
     instance.error = nil;

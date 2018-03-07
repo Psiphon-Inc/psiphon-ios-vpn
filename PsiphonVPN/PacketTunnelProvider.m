@@ -248,7 +248,7 @@ typedef NS_ENUM(NSInteger, GracePeriodState) {
 
               case SubscriptionCheckHasActiveToken:
                   [PsiFeedbackLogger infoWithType:@"SubscriptionCheck" message:@"token already active"];
-                  return [RACSignal return:[SubscriptionResultModel success:nil receiptFilSize:nil]];
+                  return [RACSignal return:[SubscriptionResultModel success:nil receiptFileSize:nil]];
 
               case SubscriptionCheckShouldUpdateToken:
 
@@ -271,7 +271,7 @@ typedef NS_ENUM(NSInteger, GracePeriodState) {
                     }]
                     map:^SubscriptionResultModel *(RACTwoTuple<NSDictionary *, NSNumber *> *response) {
                         // Wraps the response in SubscriptionResultModel.
-                        return [SubscriptionResultModel success:response.first receiptFilSize:response.second];
+                        return [SubscriptionResultModel success:response.first receiptFileSize:response.second];
                     }]
                     catch:^RACSignal *(NSError *error) {
                         // Return SubscriptionResultModel for PsiphonReceiptValidationErrorInvalidReceipt error code.
