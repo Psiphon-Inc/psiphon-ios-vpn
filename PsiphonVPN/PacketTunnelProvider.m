@@ -414,14 +414,10 @@ typedef NS_ENUM(NSInteger, GracePeriodState) {
                 [weakSelf checkSubscription];
             });
 
-          // Cleanup.
-          [subscriptionDisposable dispose];
           subscriptionDisposable = nil;
       }
       completed:^{
           [PsiFeedbackLogger infoWithType:@"SubscriptionCheck" message:@"finished"];
-          // Cleanup.
-          [subscriptionDisposable dispose];
           subscriptionDisposable = nil;
       }];
 }
@@ -511,8 +507,6 @@ typedef NS_ENUM(NSInteger, GracePeriodState) {
     // Tunnel restarts are expensive, postpone restart for
     // a chance for objects not used anymore to be deallocated.
     dispatch_async_main(^{
-      [psiphonTunnel stop];
-
       if (![psiphonTunnel start:FALSE]) {
           [PsiFeedbackLogger error:@"tunnel start failed"];
       }
