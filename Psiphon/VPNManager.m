@@ -26,6 +26,7 @@
 #import "SharedConstants.h"
 #import "SettingsViewController.h"
 #import "PsiFeedbackLogger.h"
+#import "DispatchUtils.h"
 
 NSNotificationName const VPNManagerStatusDidChangeNotification = @"VPNManagerStatusDidChangeNotification";
 NSNotificationName const VPNManagerVPNStartDidFailNotification = @"VPNManagerVPNStartDidFailNotification";
@@ -340,6 +341,20 @@ NSErrorDomain const VPNQueryErrorDomain = @"VPNQueryErrorDomain";
     }];
 }
 
+- (void)killExtensionIfZombie {
+    [self isExtensionZombie:^(BOOL isZombie) {
+        if (isZombie) {
+            LOG_WARN(@"Extension is zombie");
+            [self updateVPNConfigurationOnDemandSetting:FALSE completionHandler:^(NSError *error) {
+                if (error) {
+                    [PsiFeedbackLogger error:@"Failed to disable Connect On Demand. Error: %@", error];
+                }
+                [self stopVPN];
+            }];
+        }
+    }];
+}
+
 #pragma mark - Private network Extension query methods
 
 - (void)isExtensionZombie:(void (^_Nonnull)(BOOL extensionIsZombie))completionHandler {
@@ -484,25 +499,14 @@ NSErrorDomain const VPNQueryErrorDomain = @"VPNQueryErrorDomain";
 
 - (void)vpnStatusDidChangeHandler {
 
-    // Kill extension if it's a zombie.
-    [self isExtensionZombie:^(BOOL isZombie) {
-        if (isZombie) {
-            LOG_WARN(@"Extension is zombie");
-            [self updateVPNConfigurationOnDemandSetting:FALSE completionHandler:^(NSError *error) {
-                if (error) {
-                    [PsiFeedbackLogger error:@"Failed to disable Connect On Demand. Error: %@", error];
-                }
-                [self stopVPN];
-            }];
-        }
-    }];
+    [self killExtensionIfZombie];
 
     // To restart the VPN, should wait till NEVPNStatusDisconnected is received.
     // We can then start a new tunnel.
     // If restartRequired then start  a new network extension process if the previous
     // one has already been disconnected.
     if (self.providerManager.connection.status == NEVPNStatusDisconnected && self.restartRequired) {
-        dispatch_async(dispatch_get_main_queue(), ^{
+        dispatch_async_main(^{
             self.restartRequired = FALSE;
             [self startTunnel];
         });

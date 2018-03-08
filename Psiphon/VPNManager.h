@@ -152,6 +152,11 @@ typedef NS_ENUM(NSInteger, VPNStatus) {
  */
 - (void)updateVPNConfigurationOnDemandSetting:(BOOL)onDemandEnabled completionHandler:(void (^_Nonnull)(NSError * _Nullable error))completionHandler;
 
+/**
+ * Kills extension if it's a zombie.
+ */
+- (void)killExtensionIfZombie;
+
 #pragma mark - Extension query methods
 
 /**
