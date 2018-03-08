@@ -155,7 +155,7 @@ typedef NS_ERROR_ENUM(SubscriptionResultErrorDomain, SubscriptionResultErrorCode
 
 + (SubscriptionResultModel *)failed:(SubscriptionResultErrorCode)errorCode;
 
-+ (SubscriptionResultModel *)success:(NSDictionary *_Nullable)remoteAuthDict receiptFilSize:(NSNumber *_Nullable)receiptFileSize;
++ (SubscriptionResultModel *)success:(NSDictionary *_Nullable)remoteAuthDict receiptFileSize:(NSNumber *_Nullable)receiptFileSize;
 
 @end
 
