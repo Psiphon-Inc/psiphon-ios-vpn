@@ -45,6 +45,7 @@
 #import "Asserts.h"
 #import "NSDate+PSIDateExtension.h"
 #import "DispatchUtils.h"
+#import "RACSignal.h"
 #import <ReactiveObjC/RACSubject.h>
 #import <ReactiveObjC/RACReplaySubject.h>
 
@@ -88,6 +89,13 @@ typedef NS_ENUM(NSInteger, GracePeriodState) {
 
     _Atomic BOOL showUpstreamProxyErrorMessage;
 
+    // Serial queue of work to be done following callbacks from PsiphonTunnel.
+    dispatch_queue_t workQueue;
+
+    // NOTE: RACScheduler objects are all serial schedulers and cheap to create.
+    //       The underlying implementation creates a GCD dispatch queues.
+    RACScheduler *subscriptionScheduler;
+
     // An infinite signal that emits Psiphon tunnel connection state.
     // When subscribed, replays the last known connection state.
     RACReplaySubject<NSNumber *> *tunnelConnectionStateSubject;
@@ -112,6 +120,8 @@ typedef NS_ENUM(NSInteger, GracePeriodState) {
 
         atomic_init(&self->showUpstreamProxyErrorMessage, TRUE);
 
+        workQueue = dispatch_queue_create("ca.psiphon.PsiphonVPN.workQueue", DISPATCH_QUEUE_SERIAL);
+
         _extensionIsZombie = FALSE;
         _subscriptionCheckState = nil;
         _shouldStartVPN = FALSE;
@@ -120,35 +130,51 @@ typedef NS_ENUM(NSInteger, GracePeriodState) {
     return self;
 }
 
-- (void)initSubscriptionCheckSubjects {
+- (void)initSubscriptionCheckObjects {
+    self->subscriptionScheduler = [RACScheduler schedulerWithPriority:RACSchedulerPriorityDefault];
     self->tunnelConnectionStateSubject = [RACReplaySubject replaySubjectWithCapacity:1];
     self->subscriptionAuthorizationTokenActiveSubject = [RACReplaySubject replaySubjectWithCapacity:1];
 }
 
-- (void)forceSubscriptionCheck {
+// scheduleSubscriptionCheck should be used to schedule any subscription check.
+// NOTE: This method is thread-safe.
+- (void)scheduleSubscriptionCheckWithRemoteCheckForced:(BOOL)remoteCheckForced {
 
-    if (self->tunnelConnectionStateSubject) {
-        PSIAssert(self->subscriptionAuthorizationTokenActiveSubject);
-    } else {
-        PSIAssert(!self->subscriptionAuthorizationTokenActiveSubject);
+    // Dispose of ongoing subscription check if any.
+    [subscriptionDisposable dispose];
+
+    // Bootstraps subjects used by subscription check.
+    if (remoteCheckForced) {
+        if (self->tunnelConnectionStateSubject) {
+            PSIAssert(self->subscriptionAuthorizationTokenActiveSubject);
+        } else {
+            PSIAssert(!self->subscriptionAuthorizationTokenActiveSubject);
+        }
+
+        // Bootstraps the signals if they were not initialized already (i.e. the tunnel started with
+        // the PsiphonSubscriptionStateNotSubscribed state).
+        if (!self->tunnelConnectionStateSubject && !self->subscriptionAuthorizationTokenActiveSubject) {
+            [self initSubscriptionCheckObjects];
+        }
+
+        // Bootstraps tunnelConnectionStateSubject by sending current connection status to it.
+        [self->tunnelConnectionStateSubject sendNext:@([psiphonTunnel getConnectionState])];
+
+        // Bootstraps subscriptionAuthorizationTokenActiveSubject by a item of type AuthorizationTokenActivity to it.
+        // The value doesn't matter since the subscription is forced.
+        [self->subscriptionAuthorizationTokenActiveSubject sendNext:@(AuthorizationTokenActiveOrEmpty)];
     }
 
-    // Bootstraps the signals if they were not initialized already (i.e. the tunnel started with
-    // the PsiphonSubscriptionStateNotSubscribed state).
-    if (!self->tunnelConnectionStateSubject && !self->subscriptionAuthorizationTokenActiveSubject) {
-        [self initSubscriptionCheckSubjects];
-    }
+    PSIAssert(self->subscriptionScheduler != nil);
 
-    // Sends current connection status to the tunnelConnectionStateSubject subject.
-    [self->tunnelConnectionStateSubject sendNext:@([psiphonTunnel getConnectionState])];
+    [self->subscriptionScheduler schedule:^{
+        [self checkSubscriptionWithRemoteCheckForced:remoteCheckForced];
+    }];
 
-    // Since no subscription token was passed (otherwise tunnel would start with a different subscription state)
-    // We can send AuthorizationTokenActiveOrEmpty to subscriptionAuthorizationTokenActiveSubject subject.
-    [self->subscriptionAuthorizationTokenActiveSubject sendNext:@(AuthorizationTokenActiveOrEmpty)];
-
-    [self checkSubscription];
 }
 
+// scheduleSubscriptionCheckWithRemoteCheckForced should always be preferred to this method.
+//
 // Initializes ReactiveObjC signals for subscription check and subscribes to them.
 // This method shouldn't be called if no subscription check is necessary.
 //
@@ -157,16 +183,14 @@ typedef NS_ENUM(NSInteger, GracePeriodState) {
 //
 // NOTE: This method be invoked only if a subscription check is necessary.
 //
-- (void)checkSubscription {
+- (void)checkSubscriptionWithRemoteCheckForced:(BOOL)remoteCheckForced {
 
     PSIAssert(self.subscriptionCheckState != nil);
+    PSIAssert(self->subscriptionScheduler == RACScheduler.currentScheduler);
     PSIAssert(self->tunnelConnectionStateSubject != nil);
     PSIAssert(self->subscriptionAuthorizationTokenActiveSubject != nil);
 
     __weak PacketTunnelProvider *weakSelf = self;
-
-    // Dispose of ongoing subscription check if any.
-    [subscriptionDisposable dispose];
 
     void (^handleExpiredSubscription)(void) = ^{
 
@@ -203,21 +227,29 @@ typedef NS_ENUM(NSInteger, GracePeriodState) {
         return (PsiphonConnectionState)[x integerValue] == PsiphonConnectionStateConnected;
     }];
 
-    // activeLocalSubscriptionCheckSignal is a finite signal that emits one of SubscriptionCheckEnum enums.
-    // This signal combines information from local subscription check and information received from the tunnel,
+    // subscriptionCheckSignal is a finite signal that emits an item of type SubscriptionCheckEnum.
+    // If remoteCheckForced is TRUE, the signal immediately emits an item with value SubscriptionCheckShouldUpdateToken.
+    // Otherwise, it combines information from local subscription check and information received from the tunnel,
     // to determine how the subscription check should be performed. (i.e. does remote server need to be contacted).
-    RACSignal<NSNumber *> *activeLocalSubscriptionCheckSignal = [[self->subscriptionAuthorizationTokenActiveSubject
-      take:1]
-      flattenMap:^RACSignal *(NSNumber *subscriptionTokenValidity) {
-          if ([subscriptionTokenValidity integerValue] == AuthorizationTokenRejected) {
-              // Previous subscription token sent is not active, should contact subscription server.
+    //
+    RACSignal<NSNumber *> *subscriptionCheckSignal = [[RACSignal return:[NSNumber numberWithBool:remoteCheckForced]]
+      flattenMap:^RACSignal *(NSNumber *forceBoolValue) {
+          if ([forceBoolValue boolValue]) {
               return [RACSignal return:@(SubscriptionCheckShouldUpdateToken)];
           } else {
-              // Either no subscription authorization token was passed or it was valid.
-              return [Subscription localSubscriptionCheck];
+              return [[self->subscriptionAuthorizationTokenActiveSubject
+                take:1]
+                flattenMap:^RACSignal *(NSNumber *subscriptionTokenValidity) {
+                    if ([subscriptionTokenValidity integerValue] == AuthorizationTokenRejected) {
+                        // Previous subscription token sent is not active, should contact subscription server.
+                        return [RACSignal return:@(SubscriptionCheckShouldUpdateToken)];
+                    } else {
+                        // Either no subscription authorization token was passed or it was valid.
+                        return [Subscription localSubscriptionCheck];
+                    }
+                }];
           }
       }];
-
 
 #if DEBUG
     const int networkRetryCount = 3;
@@ -226,8 +258,8 @@ typedef NS_ENUM(NSInteger, GracePeriodState) {
 #endif
 
     // updateSubscriptionTokenSignal is a finite signal that emits two items of type SubscriptionResultModel.
-    // When the signal is subscribed to it immediately emits SubscriptionResultModel with inProgress set to TRUE,
-    // the subscriber should set the correct internal state following
+    // When the signal is subscribed to it immediately emits SubscriptionResultModel with inProgress set to TRUE.
+    //
     RACSignal *updateSubscriptionTokenSignal = [[[[[self subscriptionReceiptUnlocked]
       flattenMap:^RACSignal *(id nilValue) {
           // Emits an item when Psiphon tunnel is connected and VPN is started.
@@ -236,8 +268,8 @@ typedef NS_ENUM(NSInteger, GracePeriodState) {
       }]
       flattenMap:^RACSignal *(id nilValue) {
           // After VPN started and Psiphon is connected, returns a signal that emits an item
-          // if Subscription authorization token needs to be updated.
-          return activeLocalSubscriptionCheckSignal;
+          // of type SubscriptionCheckEnum.
+          return subscriptionCheckSignal;
       }]
       flattenMap:^RACSignal *(NSNumber *subscriptionCheckObject) {
 
@@ -248,7 +280,7 @@ typedef NS_ENUM(NSInteger, GracePeriodState) {
 
               case SubscriptionCheckHasActiveToken:
                   [PsiFeedbackLogger infoWithType:@"SubscriptionCheck" message:@"token already active"];
-                  return [RACSignal return:[SubscriptionResultModel success:nil receiptFilSize:nil]];
+                  return [RACSignal return:[SubscriptionResultModel success:nil receiptFileSize:nil]];
 
               case SubscriptionCheckShouldUpdateToken:
 
@@ -271,7 +303,7 @@ typedef NS_ENUM(NSInteger, GracePeriodState) {
                     }]
                     map:^SubscriptionResultModel *(RACTwoTuple<NSDictionary *, NSNumber *> *response) {
                         // Wraps the response in SubscriptionResultModel.
-                        return [SubscriptionResultModel success:response.first receiptFilSize:response.second];
+                        return [SubscriptionResultModel success:response.first receiptFileSize:response.second];
                     }]
                     catch:^RACSignal *(NSError *error) {
                         // Return SubscriptionResultModel for PsiphonReceiptValidationErrorInvalidReceipt error code.
@@ -291,10 +323,12 @@ typedef NS_ENUM(NSInteger, GracePeriodState) {
       }]
       startWith:[SubscriptionResultModel inProgress]];
 
+    [RACScheduler schedulerWithPriority:RACSchedulerPriorityDefault];
+
     // Subscribes to the updateSubscriptionTokenSignal signal.
     // Subscription methods should always get called from the main thread.
     subscriptionDisposable = [[updateSubscriptionTokenSignal
-      deliverOnMainThread]
+      subscribeOn:subscriptionScheduler]
       subscribeNext:^(SubscriptionResultModel *result) {
 
           if (result.inProgress) {
@@ -392,9 +426,7 @@ typedef NS_ENUM(NSInteger, GracePeriodState) {
 
                       [weakSelf.subscriptionCheckState setStateSubscribed];
 
-                      dispatch_async_main(^{
-                          [weakSelf restartTunnel];
-                      });
+                      [weakSelf restartTunnel];
                   }
               } else {
                   // Server returned no authorization token, treats this as if subscription was expired.
@@ -411,17 +443,13 @@ typedef NS_ENUM(NSInteger, GracePeriodState) {
           dispatch_after(
             dispatch_time(DISPATCH_TIME_NOW, secs_in_3_hours * NSEC_PER_SEC),
             dispatch_get_main_queue(), ^{
-                [weakSelf checkSubscription];
+                [weakSelf scheduleSubscriptionCheckWithRemoteCheckForced:FALSE];
             });
 
-          // Cleanup.
-          [subscriptionDisposable dispose];
           subscriptionDisposable = nil;
       }
       completed:^{
           [PsiFeedbackLogger infoWithType:@"SubscriptionCheck" message:@"finished"];
-          // Cleanup.
-          [subscriptionDisposable dispose];
           subscriptionDisposable = nil;
       }];
 }
@@ -446,7 +474,7 @@ typedef NS_ENUM(NSInteger, GracePeriodState) {
 
         if ([self.subscriptionCheckState isSubscribedOrInProgress]) {
             
-            [self initSubscriptionCheckSubjects];
+            [self initSubscriptionCheckObjects];
 
             // If there maybe a valid subscription, there is no need to wait
             // for the container to send "M.startVPN" signal.
@@ -510,9 +538,7 @@ typedef NS_ENUM(NSInteger, GracePeriodState) {
 
     // Tunnel restarts are expensive, postpone restart for
     // a chance for objects not used anymore to be deallocated.
-    dispatch_async_main(^{
-      [psiphonTunnel stop];
-
+    dispatch_async(self->workQueue, ^{
       if (![psiphonTunnel start:FALSE]) {
           [PsiFeedbackLogger error:@"tunnel start failed"];
       }
@@ -683,7 +709,7 @@ typedef NS_ENUM(NSInteger, GracePeriodState) {
     [notifier listenForNotification:NOTIFIER_FORCE_SUBSCRIPTION_CHECK listener:^{
         // Container received a new subscription transaction.
         [PsiFeedbackLogger infoWithType:@"ExtensionNotification" message:@"force subscription check"];
-        [self forceSubscriptionCheck];
+        [self scheduleSubscriptionCheckWithRemoteCheckForced:TRUE];
     }];
 }
 
@@ -756,7 +782,7 @@ typedef NS_ENUM(NSInteger, GracePeriodState) {
 
            dispatch_after(dispatch_walltime(NULL, gracePeriodSec * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
                weakSelf.gracePeriodState = GracePeriodStateDone;
-               [self checkSubscription];
+               [self scheduleSubscriptionCheckWithRemoteCheckForced:FALSE];
            });
        }];
 }
@@ -881,27 +907,37 @@ typedef NS_ENUM(NSInteger, GracePeriodState) {
 
 - (void)onActiveAuthorizationIDs:(NSArray * _Nonnull)authorizationIds {
 
-    // It is assumed that the subscription info at this point is the same as the subscription info
-    // passed in getPsiphonConfig callback.
-    Subscription *subscription = [Subscription fromPersistedDefaults];
-    if (subscription.authorizationToken && ![authorizationIds containsObject:subscription.authorizationToken.ID]) {
+    __weak PacketTunnelProvider *weakSelf = self;
 
-        // Remove persisted token.
-        subscription.authorizationToken = nil;
-        [subscription persistChanges];
+    // Do not block callbacks.
+    dispatch_async(self->workQueue, ^{
 
-        // Send value AuthorizationTokenRejected if subscription authorization token was invalid.
-        [self->subscriptionAuthorizationTokenActiveSubject sendNext:@(AuthorizationTokenRejected)];
+        if (!weakSelf) {
+            return;
+        }
 
-    } else {
+        PacketTunnelProvider *strongSelf = weakSelf;
 
-        // Send value AuthorizationTokenActiveOrEmpty if subscription authorization token was not invalid (i.e. token is non-existent or valid)
-        [self->subscriptionAuthorizationTokenActiveSubject sendNext:@(AuthorizationTokenActiveOrEmpty)];
-    }
+        // It is assumed that the subscription info at this point is the same as the subscription info
+        // passed in getPsiphonConfig callback.
+        Subscription *subscription = [Subscription fromPersistedDefaults];
+        if (subscription.authorizationToken && ![authorizationIds containsObject:subscription.authorizationToken.ID]) {
 
-    dispatch_async(dispatch_get_main_queue(), ^{
-        if ([self.subscriptionCheckState isSubscribedOrInProgress]) {
-            [self checkSubscription];
+            // Remove persisted token.
+            subscription.authorizationToken = nil;
+            [subscription persistChanges];
+
+            // Send value AuthorizationTokenRejected if subscription authorization token was invalid.
+            [strongSelf->subscriptionAuthorizationTokenActiveSubject sendNext:@(AuthorizationTokenRejected)];
+
+        } else {
+
+            // Send value AuthorizationTokenActiveOrEmpty if subscription authorization token was not invalid (i.e. token is non-existent or valid)
+            [strongSelf->subscriptionAuthorizationTokenActiveSubject sendNext:@(AuthorizationTokenActiveOrEmpty)];
+        }
+
+        if ([strongSelf.subscriptionCheckState isSubscribedOrInProgress]) {
+            [strongSelf scheduleSubscriptionCheckWithRemoteCheckForced:FALSE];
         }
     });
 }
@@ -914,34 +950,37 @@ typedef NS_ENUM(NSInteger, GracePeriodState) {
 
 - (void)onServerTimestamp:(NSString * _Nonnull)timestamp {
 
-	[sharedDB updateServerTimestamp:timestamp];
+    dispatch_async(self->workQueue, ^{
+        
+        [sharedDB updateServerTimestamp:timestamp];
 
-    NSDate *serverTimestamp = [NSDate fromRFC3339String:timestamp];
+        NSDate *serverTimestamp = [NSDate fromRFC3339String:timestamp];
 
-    // Check if user has an active subscription in the device's time
-    // If NO - do nothing
-    // If YES - proceed with checking the subscription against server timestamp
-    Authorizations *authorizations = [Authorizations fromPersistedDefaults];
-    Subscription *subscription = [Subscription fromPersistedDefaults];
-    if ([authorizations hasActiveAuthorizationTokenForDate:[NSDate date]]) {
-        // The following code adapted from
-        // https://developer.apple.com/library/content/documentation/Cocoa/Conceptual/DataFormatting/Articles/dfDateFormatting10_4.html
-        if (serverTimestamp != nil) {
-            if (![authorizations hasActiveAuthorizationTokenForDate:serverTimestamp]) {
-                // User is possibly cheating, terminate extension due to 'Bad Clock'.
-                [self killExtensionForBadClock];
+        // Check if user has an active subscription in the device's time
+        // If NO - do nothing
+        // If YES - proceed with checking the subscription against server timestamp
+        Authorizations *authorizations = [Authorizations fromPersistedDefaults];
+        Subscription *subscription = [Subscription fromPersistedDefaults];
+        if ([authorizations hasActiveAuthorizationTokenForDate:[NSDate date]]) {
+            // The following code adapted from
+            // https://developer.apple.com/library/content/documentation/Cocoa/Conceptual/DataFormatting/Articles/dfDateFormatting10_4.html
+            if (serverTimestamp != nil) {
+                if (![authorizations hasActiveAuthorizationTokenForDate:serverTimestamp]) {
+                    // User is possibly cheating, terminate extension due to 'Bad Clock'.
+                    [self killExtensionForBadClock];
+                }
             }
         }
-    }
 
-    if ([subscription hasActiveSubscriptionTokenForDate:[NSDate date]]) {
-        if (serverTimestamp != nil) {
-            if (![subscription hasActiveSubscriptionTokenForDate:serverTimestamp]) {
-                // User is possibly cheating, terminate extension due to 'Bad Clock'.
-                [self killExtensionForBadClock];
+        if ([subscription hasActiveSubscriptionTokenForDate:[NSDate date]]) {
+            if (serverTimestamp != nil) {
+                if (![subscription hasActiveSubscriptionTokenForDate:serverTimestamp]) {
+                    // User is possibly cheating, terminate extension due to 'Bad Clock'.
+                    [self killExtensionForBadClock];
+                }
             }
         }
-    }
+    });
 }
 
 - (void)onAvailableEgressRegions:(NSArray *)regions {
