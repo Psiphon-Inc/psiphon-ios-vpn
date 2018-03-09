@@ -826,7 +826,7 @@ typedef NS_ENUM(NSInteger, GracePeriodState) {
     return [PsiphonConfigFiles embeddedServerEntriesPath];
 }
 
-- (NSString * _Nullable)getPsiphonConfig {
+- (NSDictionary * _Nullable)getPsiphonConfig {
 
     NSFileManager *fileManager = [NSFileManager defaultManager];
 
@@ -885,16 +885,7 @@ typedef NS_ENUM(NSInteger, GracePeriodState) {
         }
     }
 
-    jsonData = [NSJSONSerialization dataWithJSONObject:mutableConfigCopy
-      options:0 error:&err];
-
-    if (err) {
-        [PsiFeedbackLogger errorWithType:@"ExitReason" message:@"failed to create JSON data from config object" object:err];
-        [self displayCorruptSettingsFileMessage];
-        abort();
-    }
-
-    return [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
+    return mutableConfigCopy;
 }
 
 - (void)onConnectionStateChangedFrom:(PsiphonConnectionState)oldState to:(PsiphonConnectionState)newState {
