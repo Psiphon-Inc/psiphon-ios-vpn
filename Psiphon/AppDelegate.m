@@ -162,7 +162,7 @@ NSNotificationName const AppDelegateSubscriptionDidActivateNotification = @"AppD
 
     // If the extension has been waiting for the app to come into foreground,
     // send the VPNManager startVPN message again.
-    dispatch_async(dispatch_get_main_queue(), ^{
+    dispatch_async_main(^{
         // If the tunnel is in Connected state, and we're now showing ads
         // send startVPN message.
         if (![adManager untunneledInterstitialIsShowing]) {
@@ -173,6 +173,9 @@ NSNotificationName const AppDelegateSubscriptionDidActivateNotification = @"AppD
             }];
         }
     });
+
+    // Kill extension if it's become a zombie.
+    [vpnManager killExtensionIfZombie];
 
     // Starts subscription expiry timer if there is an active subscription.
     [self subscriptionExpiryTimer];
