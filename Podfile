@@ -14,6 +14,7 @@ target 'Psiphon' do
   pod 'PsiphonClientCommonLibrary', :git => "https://github.com/Psiphon-Inc/psiphon-ios-client-common-library.git", :commit => 'c39fce5'
   #pod "PsiphonClientCommonLibrary", :path => "../psiphon-ios-client-common-library"
 
+  pod 'ReactiveObjC', :git => "https://github.com/Psiphon-Inc/ReactiveObjC.git", :commit => 'b2ac770'
   pod 'OpenSSL', '1.0.210'
   pod 'mopub-ios-sdk', '4.18.0'
   pod 'Google-Mobile-Ads-SDK', '7.25.0'
