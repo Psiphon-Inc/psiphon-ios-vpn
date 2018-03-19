@@ -17,11 +17,14 @@
  *
  */
 
+#import <ReactiveObjC/RACSignal.h>
+#import <ReactiveObjC/RACSignal+Operations.h>
 #import "SettingsViewController.h"
 #import "IAPStoreHelper.h"
 #import "IAPViewController.h"
 #import "VPNManager.h"
 #import "AppDelegate.h"
+#import "RACCompoundDisposable.h"
 
 // NSUserDefaults keys
 /**
@@ -40,6 +43,8 @@ NSString * const ConnectOnDemandCellSpecifierKey = @"vpnOnDemand";
 
 @property (assign) BOOL hasActiveSubscription;
 
+@property (nonatomic) RACCompoundDisposable *compoundDisposable;
+
 @end
 
 @implementation SettingsViewController {
@@ -50,6 +55,18 @@ NSString * const ConnectOnDemandCellSpecifierKey = @"vpnOnDemand";
     // Connect On Demand row
     UISwitch *connectOnDemandToggle;
     UITableViewCell *connectOnDemandCell;
+}
+
+- (instancetype)init {
+    self = [super init];
+    if (self) {
+        _compoundDisposable = [RACCompoundDisposable compoundDisposable];
+    }
+    return self;
+}
+
+- (void)dealloc {
+    [self.compoundDisposable dispose];
 }
 
 - (void)viewDidLoad {
@@ -132,7 +149,22 @@ NSString * const ConnectOnDemandCellSpecifierKey = @"vpnOnDemand";
           @"Subscription only",
           @"VPN On demand setting detail text showing when user doesn't have an active subscription and the item is disabled.");
     } else {
-        connectOnDemandToggle.on = [[VPNManager sharedInstance] isOnDemandEnabled];
+
+        __weak SettingsViewController *weakSelf = self;
+
+        __block RACDisposable *disposable = [[[[VPNManager sharedInstance] isConnectOnDemandEnabled]
+          deliverOnMainThread]
+          subscribeNext:^(NSNumber *enabled) {
+              connectOnDemandToggle.on = [enabled boolValue];
+          } error:^(NSError *error) {
+              [weakSelf.compoundDisposable removeDisposable:disposable];
+          } completed:^{
+              [weakSelf.compoundDisposable removeDisposable:disposable];
+          }];
+
+        [self.compoundDisposable addDisposable:disposable];
+
+
         connectOnDemandCell.userInteractionEnabled = YES;
         connectOnDemandCell.textLabel.enabled = YES;
         subscriptionOnlySubtitle = @"";
@@ -191,10 +223,19 @@ NSString * const ConnectOnDemandCellSpecifierKey = @"vpnOnDemand";
     [[NSUserDefaults standardUserDefaults] setBool:[toggle isOn] forKey:SettingsConnectOnDemandBoolKey];
 
     __weak SettingsViewController *weakSelf = self;
-    [[VPNManager sharedInstance] updateVPNConfigurationOnDemandSetting:[toggle isOn]
-      completionHandler:^(NSError *error) {
-        [weakSelf.tableView reloadData];
-    }];
+
+    __block RACDisposable *disposable = [[[[VPNManager sharedInstance]
+      setConnectOnDemandEnabled:[toggle isOn]]
+      deliverOnMainThread]
+      subscribeNext:^(NSNumber *success) {
+          [weakSelf.tableView reloadData];
+      } error:^(NSError *error) {
+          [weakSelf.compoundDisposable removeDisposable:disposable];
+      }   completed:^{
+          [weakSelf.compoundDisposable removeDisposable:disposable];
+      }];
+
+    [self.compoundDisposable addDisposable:disposable];
 }
 
 - (void)openIAPViewController {

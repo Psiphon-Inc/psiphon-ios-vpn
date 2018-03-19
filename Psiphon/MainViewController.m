@@ -18,6 +18,7 @@
  */
 
 #import <Foundation/Foundation.h>
+#import <ReactiveObjC/RACSignal+Operations.h>
 #import "AppDelegate.h"
 #import "FeedbackUpload.h"
 #import "LogViewControllerFullScreen.h"
@@ -43,17 +44,24 @@
 #import "NEBridge.h"
 #import "DispatchUtils.h"
 #import "PsiFeedbackLogger.h"
+#import "RACCompoundDisposable.h"
+#import "RACTuple.h"
+#import "RACReplaySubject.h"
+#import "RACSignal+Operations.h"
 
 static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSString *b) {
     return (([a length] == 0) && ([b length] == 0)) || ([a isEqualToString:b]);
 };
 
+@interface MainViewController ()
+
+@property (nonatomic) RACCompoundDisposable *compoundDisposable;
+@property (nonatomic) AdManager *adManager;
+@property (nonatomic) VPNManager *vpnManager;
+
+@end
+
 @implementation MainViewController {
-
-    // VPN Manager
-    VPNManager *vpnManager;
-
-    AdManager *adManager;
 
     PsiphonDataSharedDB *sharedDB;
 
@@ -102,9 +110,12 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 - (id)init {
     self = [super init];
     if (self) {
-        vpnManager = [VPNManager sharedInstance];
 
-        adManager = [AdManager sharedInstance];
+        _compoundDisposable = [RACCompoundDisposable compoundDisposable];
+
+        _vpnManager = [VPNManager sharedInstance];
+
+        _adManager = [AdManager sharedInstance];
 
         sharedDB = [[PsiphonDataSharedDB alloc] initForAppGroupIdentifier:APP_GROUP_IDENTIFIER];
 
@@ -121,6 +132,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 
 - (void) dealloc {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
+    [self.compoundDisposable dispose];
 }
 
 #pragma mark - Lifecycle methods
@@ -153,22 +165,88 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
         //appSubTitleLabel.hidden = YES;
     }
 
+    __weak MainViewController *weakSelf = self;
+
+    // Observe VPN status for updating UI state
+    RACDisposable *tunnelStatusDisposable = [[self.vpnManager.lastTunnelStatus
+      deliverOnMainThread]
+      subscribeNext:^(NSNumber *statusObject) {
+          VPNStatus s = (VPNStatus) [statusObject integerValue];
+
+          [weakSelf updateUIConnectionState:s];
+
+          if (s == VPNStatusConnecting ||
+            s == VPNStatusRestarting ||
+            s == VPNStatusReasserting) {
+
+              [weakSelf addPulsingHaloLayer];
+
+          } else {
+              [weakSelf removePulsingHaloLayer];
+          }
+
+          // Notify SettingsViewController that the state has changed.
+          // Note that this constant is used PsiphonClientCommonLibrary, and cannot simply be replaced by a RACSignal.
+          [[NSNotificationCenter defaultCenter] postNotificationName:kPsiphonConnectionStateNotification object:nil];
+
+      }];
+
+    [self.compoundDisposable addDisposable:tunnelStatusDisposable];
+
+    RACDisposable *vpnStartStatusDisposable = [[self.vpnManager.vpnStartStatus
+      deliverOnMainThread]
+      subscribeNext:^(NSNumber *statusObject) {
+          VPNStartStatus startStatus = (VPNStartStatus) [statusObject integerValue];
+
+          if (startStatus == VPNStartStatusStart) {
+              [startStopButton setHighlighted:TRUE];
+          } else {
+              [startStopButton setHighlighted:FALSE];
+          }
+
+          if (startStatus == VPNStartStatusFailedUserPermissionDenied) {
+
+              // Alert the user that their permission is required in order to install the VPN configuration.
+              UIAlertController *alert = [UIAlertController alertControllerWithTitle:NSLocalizedStringWithDefaultValue(@"VPN_START_PERMISSION_REQUIRED_TITLE", nil, [NSBundle mainBundle], @"Permission required", @"Alert dialog title indicating to the user that Psiphon needs their permission")
+                                                                             message:NSLocalizedStringWithDefaultValue(@"VPN_START_PERMISSION_DENIED_MESSAGE", nil, [NSBundle mainBundle], @"Psiphon needs your permission to install a VPN profile in order to connect.\n\nPsiphon is committed to protecting the privacy of our users. You can review our privacy policy by tapping \"Privacy Policy\".", @"('Privacy Policy' should be the same translation as privacy policy button VPN_START_PRIVACY_POLICY_BUTTON), (Do not translate 'VPN profile'), (Do not translate 'Psiphon')")
+                                                                      preferredStyle:UIAlertControllerStyleAlert];
+
+              UIAlertAction *privacyPolicyAction = [UIAlertAction actionWithTitle:NSLocalizedStringWithDefaultValue(@"VPN_START_PRIVACY_POLICY_BUTTON", nil, [NSBundle mainBundle], @"Privacy Policy", @"Button label taking user's to our Privacy Policy page")
+                                                                            style:UIAlertActionStyleDefault
+                                                                          handler:^(UIAlertAction *action) {
+                                                                              NSString *urlString = NSLocalizedStringWithDefaultValue(@"PRIVACY_POLICY_URL", nil, [PsiphonClientCommonLibraryHelpers commonLibraryBundle], @"https://psiphon.ca/en/privacy.html", @"External link to the privacy policy page. Please update this with the correct language specific link (if available) e.g. https://psiphon.ca/fr/privacy.html for french.");
+                                                                              [[UIApplication sharedApplication] openURL:[NSURL URLWithString:urlString] options:@{} completionHandler:^(BOOL success) {
+                                                                                  // Do nothing.
+                                                                              }];
+                                                                          }];
+
+              UIAlertAction *dismissAction = [UIAlertAction actionWithTitle:@"Dismiss" style:UIAlertActionStyleCancel
+                                                                    handler:^(UIAlertAction *action) {
+                                                                        // Do nothing.
+                                                                    }];
+
+              [alert addAction:privacyPolicyAction];
+              [alert addAction:dismissAction];
+              [alert presentFromTopController];
+
+          } else if (startStatus == VPNStartStatusFailedOther) {
+
+              // Alert the user that the VPN failed to start, and that they should try again.
+              [UIAlertController presentSimpleAlertWithTitle:NSLocalizedStringWithDefaultValue(@"VPN_START_FAIL_TITLE", nil, [NSBundle mainBundle], @"Unable to start", @"Alert dialog title indicating to the user that Psiphon was unable to start (MainViewController)")
+                                                     message:NSLocalizedStringWithDefaultValue(@"VPN_START_FAIL_MESSAGE", nil, [NSBundle mainBundle], @"An error occurred while starting Psiphon. Please try again. If this problem persists, try reinstalling the Psiphon app.", @"Alert dialog message informing the user that an error occurred while starting Psiphon (Do not translate 'Psiphon'). The user should try again, and if the problem persists, they should try reinstalling the app.")
+                                              preferredStyle:UIAlertControllerStyleAlert
+                                                   okHandler:nil];
+          }
+      }];
+
+    [self.compoundDisposable addDisposable:vpnStartStatusDisposable];
+
     // Observer AdManager notifications
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(onAdStatusDidChange)
                                                  name:AdManagerAdsDidLoadNotification
-                                               object:adManager];
+                                               object:self.adManager];
     // Observe VPNManager notifications
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(onVPNStatusDidChange)
-                                                 name:VPNManagerStatusDidChangeNotification
-                                               object:vpnManager];
-
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(onVPNStartFailed)
-                                                 name:VPNManagerVPNStartDidFailNotification
-                                               object:vpnManager];
-
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(onSubscriptionActivated)
                                                  name:AppDelegateSubscriptionDidActivateNotification
@@ -211,7 +289,6 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     // Listen for VPN status changes from VPNManager.
 
     // Sync UI with the VPN state
-    [self onVPNStatusDidChange];
     [self onAdStatusDidChange];
     [self checkSubscriptionStateAndUpdateUI];
 }
@@ -254,7 +331,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
         [self.view removeConstraint:startButtonScreenHeight];
         [self.view addConstraint:startButtonScreenWidth];
         if ([[UIDevice currentDevice].model hasPrefix:@"iPhone"]) {
-            adLabel.hidden = ![adManager untunneledInterstitialIsReady];
+            adLabel.hidden = ![self.adManager untunneledInterstitialIsReady];
         }
     }
 
@@ -275,87 +352,105 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 
 #pragma mark - UI callbacks
 
-- (void)onVPNStartFailed {
-    // Alert the user that the VPN failed to start, and that they should try again.
-    [UIAlertController presentSimpleAlertWithTitle:NSLocalizedStringWithDefaultValue(@"VPN_START_FAIL_TITLE", nil, [NSBundle mainBundle], @"Unable to start", @"Alert dialog title indicating to the user that Psiphon was unable to start (MainViewController)")
-                                           message:NSLocalizedStringWithDefaultValue(@"VPN_START_FAIL_MESSAGE", nil, [NSBundle mainBundle], @"An error occurred while starting Psiphon. Please try again. If this problem persists, try reinstalling the Psiphon app.", @"Alert dialog message informing the user that an error occurred while starting Psiphon (Do not translate 'Psiphon'). The user should try again, and if the problem persists, they should try reinstalling the app.")
-                                    preferredStyle:UIAlertControllerStyleAlert
-                                         okHandler:nil];
-}
-
-- (void)onVPNStatusDidChange {
-    // Update UI
-    VPNStatus s = [vpnManager VPNStatus];
-    [self updateButtonState];
-    statusLabel.text = [self getVPNStatusDescription:s];
-
-    if (s == VPNStatusConnecting || s == VPNStatusRestarting || s == VPNStatusReasserting) {
-        [self addPulsingHaloLayer];
-    } else {
-        [self removePulsingHaloLayer];
-    }
-
-    // Notify SettingsViewController that the state has changed
-    [[NSNotificationCenter defaultCenter] postNotificationName:kPsiphonConnectionStateNotification object:nil];
-}
-
 - (void)onAdStatusDidChange{
-    adLabel.hidden = ![adManager untunneledInterstitialIsReady];
+    adLabel.hidden = ![self.adManager untunneledInterstitialIsReady];
 }
 
 - (void)onStartStopTap:(UIButton *)sender {
 
-    if (![vpnManager isVPNActive]) {
+    __weak MainViewController *weakSelf = self;
 
-        // Alerts the user if there is no internet connection.
-        Reachability *reachability = [Reachability reachabilityForInternetConnection];
-        if ([reachability currentReachabilityStatus] == NotReachable) {
-            [self displayAlertNoInternet];
-        } else {
-            [adManager showUntunneledInterstitial];
-        }
+    // signal emits a single two tuple (isVPNActive, connectOnDemandEnables).
+    __block RACDisposable *disposable = [[[[self.vpnManager isVPNActive]
+      flattenMap:^RACSignal<NSNumber *> *(RACTwoTuple<NSNumber *, NSNumber *> *value) {
 
-    } else {
-        LOG_DEBUG(@"call [vpnManager stopVPN]");
+          // If VPN is already running, checks if ConnectOnDemand is enabled, otherwise returns the result immediately.
+          BOOL isActive = [value.first boolValue];
+          if (isActive) {
+              return [[weakSelf.vpnManager isConnectOnDemandEnabled]
+                map:^id(NSNumber *connectOnDemandEnabled) {
+                    return [RACTwoTuple pack:@(TRUE) :connectOnDemandEnabled];
+                }];
+          } else {
+              return [RACSignal return:[RACTwoTuple pack:@(FALSE) :@(FALSE)]];
+          }
+      }]
+      deliverOnMainThread]
+      subscribeNext:^(RACTwoTuple<NSNumber *, NSNumber *> *result) {
 
-        if ([vpnManager isOnDemandEnabled]) {
-            // Alert the user that Connect On Demand is enabled, and if they
-            // would like Connect On Demand to be disabled, and the extension to be stopped.
-            NSString *alertTitle = NSLocalizedStringWithDefaultValue(@"CONNECT_ON_DEMAND_ALERT_TITLE", nil, [NSBundle mainBundle], @"Auto-start VPN is enabled", @"Alert dialog title informing user that 'Auto-start VPN' feature is enabled");
-            NSString *alertMessage = NSLocalizedStringWithDefaultValue(@"CONNECT_ON_DEMAND_ALERT_BODY", nil, [NSBundle mainBundle], @"Cannot stop the VPN while \"Auto-start VPN\" is enabled.\nWould you like to disable \"Auto-start VPN\" on demand and stop the VPN?", "Alert dialog body informing the user that the 'Auto-start VPN on demand' feature is enabled and that the VPN cannot be stopped. Followed by asking the user if they would like to disable the 'Auto-start VPN on demand' feature, and stop the VPN.");
+          // Unpacks the tuple.
+          BOOL isVPNActive = [result.first boolValue];
+          BOOL connectOnDemandEnabled = [result.second boolValue];
 
-            UIAlertController *alert = [UIAlertController
-              alertControllerWithTitle:alertTitle message:alertMessage preferredStyle:UIAlertControllerStyleAlert];
+          if (!isVPNActive) {
+              // Alerts the user if there is no internet connection.
+              Reachability *reachability = [Reachability reachabilityForInternetConnection];
+              if ([reachability currentReachabilityStatus] == NotReachable) {
+                  [weakSelf displayAlertNoInternet];
+              } else {
+                  [weakSelf.adManager showUntunneledInterstitial];
+              }
 
-            UIAlertAction *disableAction = [UIAlertAction
-              actionWithTitle:NSLocalizedStringWithDefaultValue(@"DISABLE_BUTTON", nil, [NSBundle mainBundle], @"Disable Auto-start VPN and Stop", @"Disable Auto-start VPN feature and Stop the VPN button label")
-                        style:UIAlertActionStyleDestructive
-                      handler:^(UIAlertAction *action) {
-                          // Disable "Connect On Demand" and stop the VPN.
-                          [[NSUserDefaults standardUserDefaults] setBool:FALSE forKey:SettingsConnectOnDemandBoolKey];
-                          [vpnManager updateVPNConfigurationOnDemandSetting:FALSE completionHandler:^(NSError *error) {
-                              [vpnManager stopVPN];
-                          }];
-                      }];
+          } else {
 
-            UIAlertAction *cancelAction = [UIAlertAction
-              actionWithTitle:NSLocalizedStringWithDefaultValue(@"CANCEL_BUTTON", nil, [NSBundle mainBundle], @"Cancel", @"Alert Cancel button")
-                        style:UIAlertActionStyleCancel
-                      handler:^(UIAlertAction *action) {
-                        // Do nothing
-                      }];
+              if (!connectOnDemandEnabled) {
 
-            [alert addAction:disableAction];
-            [alert addAction:cancelAction];
-            [self presentViewController:alert animated:TRUE completion:nil];
+                  [weakSelf.vpnManager stopVPN];
 
-        } else {
-            [vpnManager stopVPN];
-        }
+              } else {
+                  // Alert the user that Connect On Demand is enabled, and if they
+                  // would like Connect On Demand to be disabled, and the extension to be stopped.
+                  NSString *alertTitle = NSLocalizedStringWithDefaultValue(@"CONNECT_ON_DEMAND_ALERT_TITLE", nil, [NSBundle mainBundle], @"Auto-start VPN is enabled", @"Alert dialog title informing user that 'Auto-start VPN' feature is enabled");
+                  NSString *alertMessage = NSLocalizedStringWithDefaultValue(@"CONNECT_ON_DEMAND_ALERT_BODY", nil, [NSBundle mainBundle], @"Cannot stop the VPN while \"Auto-start VPN\" is enabled.\nWould you like to disable \"Auto-start VPN\" on demand and stop the VPN?", "Alert dialog body informing the user that the 'Auto-start VPN on demand' feature is enabled and that the VPN cannot be stopped. Followed by asking the user if they would like to disable the 'Auto-start VPN on demand' feature, and stop the VPN.");
 
-        [self removePulsingHaloLayer];
-    }
+                  UIAlertController *alert = [UIAlertController
+                    alertControllerWithTitle:alertTitle message:alertMessage preferredStyle:UIAlertControllerStyleAlert];
 
+                  UIAlertAction *disableAction = [UIAlertAction
+                    actionWithTitle:NSLocalizedStringWithDefaultValue(@"DISABLE_BUTTON", nil, [NSBundle mainBundle], @"Disable Auto-start VPN and Stop", @"Disable Auto-start VPN feature and Stop the VPN button label")
+                              style:UIAlertActionStyleDestructive
+                            handler:^(UIAlertAction *action) {
+                                // Disable "Connect On Demand" and stop the VPN.
+                                [[NSUserDefaults standardUserDefaults] setBool:FALSE forKey:SettingsConnectOnDemandBoolKey];
+
+                                __block RACDisposable *disposable = [[weakSelf.vpnManager setConnectOnDemandEnabled:FALSE]
+                                  subscribeNext:^(NSNumber *x) {
+                                      // Stops the VPN only after ConnectOnDemand is disabled.
+                                      [weakSelf.vpnManager stopVPN];
+                                  } error:^(NSError *error) {
+                                      [weakSelf.compoundDisposable removeDisposable:disposable];
+                                  }   completed:^{
+                                      [weakSelf.compoundDisposable removeDisposable:disposable];
+                                  }];
+
+                                [weakSelf.compoundDisposable addDisposable:disposable];
+                            }];
+
+                  UIAlertAction *cancelAction = [UIAlertAction
+                    actionWithTitle:NSLocalizedStringWithDefaultValue(@"CANCEL_BUTTON", nil, [NSBundle mainBundle], @"Cancel", @"Alert Cancel button")
+                              style:UIAlertActionStyleCancel
+                            handler:^(UIAlertAction *action) {
+                                // Do nothing
+                            }];
+
+                  [alert addAction:disableAction];
+                  [alert addAction:cancelAction];
+                  [self presentViewController:alert animated:TRUE completion:nil];
+
+              }
+
+              [self removePulsingHaloLayer];
+          }
+
+      } error:^(NSError *error) {
+          [weakSelf.compoundDisposable removeDisposable:disposable];
+      }   completed:^{
+          [weakSelf.compoundDisposable removeDisposable:disposable];
+      }];
+
+    [self.compoundDisposable addDisposable:disposable];
+
+    // Performs a subscription check, in case the UI gets out of sync with the subscription status.
     [self checkSubscriptionStateAndUpdateUI];
 }
 
@@ -636,12 +731,16 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     [settingsButton addTarget:self action:@selector(onSettingsButtonTap:) forControlEvents:UIControlEventTouchUpInside];
 }
 
-- (void)updateButtonState {
-    if ([vpnManager isVPNActive] && ![vpnManager isVPNConnected]) {
+- (void)updateUIConnectionState:(VPNStatus)s {
+
+    [startStopButton setHighlighted:FALSE];
+
+    if ([VPNManager mapIsVPNActive:s] && s != VPNStatusConnected) {
         UIImage *connectingButtonImage = [UIImage imageNamed:@"ConnectingButton"];
+
         [startStopButton setImage:connectingButtonImage forState:UIControlStateNormal];
     }
-    else if ([vpnManager isVPNConnected]) {
+    else if (s == VPNStatusConnected) {
         UIImage *stopButtonImage = [UIImage imageNamed:@"StopButton"];
         [startStopButton setImage:stopButtonImage forState:UIControlStateNormal];
     }
@@ -649,6 +748,8 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
         UIImage *startButtonImage = [UIImage imageNamed:@"StartButton"];
         [startStopButton setImage:startButtonImage forState:UIControlStateNormal];
     }
+
+    statusLabel.text = [self getVPNStatusDescription:s];
 }
 
 - (void)addStartAndStopButton {
@@ -657,7 +758,6 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     startStopButton.contentHorizontalAlignment = UIControlContentHorizontalAlignmentFill;
     startStopButton.contentVerticalAlignment = UIControlContentVerticalAlignmentFill;
     [startStopButton addTarget:self action:@selector(onStartStopTap:) forControlEvents:UIControlEventTouchUpInside];
-    [self updateButtonState];
 
     // Shadow and Radius
     startStopButton.layer.shadowOffset = CGSizeMake(0, 6.0f);
@@ -723,7 +823,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                                 fontDescriptorWithSymbolicTraits:UIFontDescriptorTraitItalic];
     adLabel.font = [UIFont fontWithDescriptor:fontD size:adLabel.font.pointSize - 1];
     [self.view addSubview:adLabel];
-    if (![adManager untunneledInterstitialIsReady]){
+    if (![self.adManager untunneledInterstitialIsReady]){
         adLabel.hidden = true;
     }
 
@@ -765,7 +865,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     statusLabel = [[UILabel alloc] init];
     statusLabel.translatesAutoresizingMaskIntoConstraints = NO;
     statusLabel.adjustsFontSizeToFitWidth = YES;
-    statusLabel.text = [self getVPNStatusDescription:[vpnManager VPNStatus]];
+    statusLabel.text = [self getVPNStatusDescription:(VPNStatus) [[self.vpnManager.lastTunnelStatus first] integerValue]];
     statusLabel.textAlignment = NSTextAlignmentCenter;
     statusLabel.textColor = [UIColor whiteColor];
     [self.view addSubview:statusLabel];
@@ -1141,7 +1241,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 - (void)settingsWillDismissWithForceReconnect:(BOOL)forceReconnect {
     if (forceReconnect) {
         [self persistSettingsToSharedUserDefaults];
-        [vpnManager restartVPNIfActive];
+        [self.vpnManager restartVPNIfActive];
     }
 }
 
@@ -1174,12 +1274,15 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 }
 
 - (NSArray<NSString*>*)hiddenSpecifierKeys {
-    VPNStatus status = [vpnManager VPNStatus];
-    if (status == VPNStatusInvalid ||
-        status == VPNStatusDisconnected ||
-        status == VPNStatusDisconnecting) {
+
+    VPNStatus s = (VPNStatus) [[self.vpnManager.lastTunnelStatus first] integerValue];
+
+    if (s == VPNStatusInvalid ||
+        s == VPNStatusDisconnected ||
+        s == VPNStatusDisconnecting ) {
         return @[kForceReconnect, kForceReconnectFooter];
     }
+
     return nil;
 }
 
@@ -1217,7 +1320,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     if (!safeStringsEqual(selectedRegion, selectedRegionSnapShot)) {
         [self persistSelectedRegion];
         [self updateRegionButton];
-        [vpnManager restartVPNIfActive];
+        [self.vpnManager restartVPNIfActive];
     }
     [regionSelectionNavController dismissViewControllerAnimated:YES completion:nil];
     regionSelectionNavController = nil;
@@ -1400,7 +1503,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
         bottomBarTop.active = YES;
     } else {
         subscriptionButton.hidden = NO;
-        adLabel.hidden = ![adManager untunneledInterstitialIsReady];
+        adLabel.hidden = ![self.adManager untunneledInterstitialIsReady];
         bottomBarTop.active = NO;
         subscriptionButtonTop.active = YES;
     }
