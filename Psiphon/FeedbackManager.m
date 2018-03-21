@@ -40,11 +40,10 @@
 
 - (void)onDiagnosticMessage:(NSString *_Nonnull)message withTimestamp:(NSString *_Nonnull)timestamp {
     if ([message isEqualToString:@"Feedback upload successful"]) {
-        atomic_fetch_add(&numUploadsInFlight, -1);
+        [self uploadCompletedOrFailed];
         BOOL lastUploadInFlight = numUploadsInFlight == 0;
         if (![self progressViewHasBeenDismissed] && lastUploadInFlight) {
             dispatch_async_main(^{
-                [self removeUploadInProgressView];
                 [UIAlertController presentSimpleAlertWithTitle:NSLocalizedStringWithDefaultValue(@"FEEDBACK_UPLOAD_SUCCESSFUL_TITLE", nil, [NSBundle mainBundle], @"Feedback uploaded successfully", @"Alert dialog title indicating to the user that their feedback has been successfully uploaded to Psiphon's servers.")
                                                        message:NSLocalizedStringWithDefaultValue(@"FEEDBACK_UPLOAD_SUCCESSFUL_MESSAGE", nil, [NSBundle mainBundle], @"Thank you for helping improve Psiphon!", @"Alert dialog message thanking the user for helping improve the Psiphon network by submitting their feedback.")
                                                 preferredStyle:UIAlertControllerStyleAlert
@@ -52,10 +51,9 @@
             });
         }
     } else if ([message containsString:@"Feedback upload error"]) {
-        atomic_fetch_add(&numUploadsInFlight, -1);
+        [self uploadCompletedOrFailed];
 #if DEBUG
         dispatch_async_main(^{
-            [self removeUploadInProgressView];
             [UIAlertController presentSimpleAlertWithTitle:NSLocalizedStringWithDefaultValue(@"FEEDBACK_UPLOAD_FAILED_TITLE", nil, [NSBundle mainBundle], @"Feedback upload failed", @"Alert dialog title indicating to the user that the app has failed to upload their feedback to Psiphon's servers.")
                                                    message:NSLocalizedStringWithDefaultValue(@"FEEDBACK_UPLOAD_FAILED_MESSAGE", nil, [NSBundle mainBundle], @"An error occured while uploading your feedback. Please try again. Your feedback helps us improve the Psiphon network.", @"Alert dialog message indicating to the user that the app has failed to upload their feedback and that they should try again. ")
                                             preferredStyle:UIAlertControllerStyleAlert
@@ -127,6 +125,7 @@
 #pragma mark - FeedbackViewControllerDelegate protocol implementation
 
 - (void)userSubmittedFeedback:(NSUInteger)selectedThumbIndex comments:(NSString *)comments email:(NSString *)email uploadDiagnostics:(BOOL)uploadDiagnostics {
+    [self uploadInFlight];
     // Ensure psiphon data is populated with latest logs
     // TODO: should this be a delegate method of Psiphon Data in shared library
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
@@ -145,23 +144,24 @@
                 inactiveTunnel = [PsiphonTunnel newPsiphonTunnel:weakSelf]; // TODO: we need to update PsiphonTunnel framework to not require this and fix this warning
             }
             [inactiveTunnel sendFeedback:jsonString publicKey:pubKey uploadServer:uploadServer uploadServerHeaders:uploadServerHeaders];
-            atomic_fetch_add(&numUploadsInFlight, 1);
-            dispatch_async_main(^{
-                [self showUploadInProgressView];
-            });
         };
 
-        [FeedbackUpload generateAndSendFeedback:selectedThumbIndex
-                                      buildInfo:[PsiphonTunnel getBuildInfo]
-                                       comments:comments
-                                          email:email
-                             sendDiagnosticInfo:uploadDiagnostics
-                              withPsiphonConfig:psiphonConfig
-                             withClientPlatform:@"ios-vpn"
-                             withConnectionType:[self getConnectionType]
-                                   isJailbroken:[JailbreakCheck isDeviceJailbroken]
-                            sendFeedbackHandler:sendFeedbackHandler
-                              diagnosticEntries:diagnosticEntries];
+        NSError *err = [FeedbackUpload generateAndSendFeedback:selectedThumbIndex
+                                                     buildInfo:[PsiphonTunnel getBuildInfo]
+                                                      comments:comments
+                                                         email:email
+                                            sendDiagnosticInfo:uploadDiagnostics
+                                             withPsiphonConfig:psiphonConfig
+                                            withClientPlatform:@"ios-vpn"
+                                            withConnectionType:[self getConnectionType]
+                                                  isJailbroken:[JailbreakCheck isDeviceJailbroken]
+                                           sendFeedbackHandler:sendFeedbackHandler
+                                             diagnosticEntries:diagnosticEntries];
+
+        if (err != nil) {
+            // Feedback upload was never started
+            [self uploadCompletedOrFailed];
+        }
     });
 }
 
@@ -184,12 +184,28 @@
 }
 
 - (void)removeUploadInProgressView {
-    [uploadProgressAlert hideAnimated:YES];
-    uploadProgressAlert = nil;
+    dispatch_async_main(^{
+        [uploadProgressAlert hideAnimated:YES];
+        uploadProgressAlert = nil;
+    });
 }
 
 - (BOOL)progressViewHasBeenDismissed {
     return uploadProgressAlert == nil;
+}
+
+- (void)uploadInFlight {
+    atomic_fetch_add(&numUploadsInFlight, 1);
+    dispatch_async_main(^{
+        [self showUploadInProgressView];
+    });
+}
+
+- (void)uploadCompletedOrFailed {
+    atomic_fetch_sub(&numUploadsInFlight, 1);
+    if (uploadProgressAlert != nil) {
+        [self removeUploadInProgressView];
+    }
 }
 
 // Get connection type for feedback
