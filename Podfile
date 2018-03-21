@@ -19,6 +19,7 @@ target 'Psiphon' do
   pod 'Google-Mobile-Ads-SDK', '7.25.0'
   pod 'VungleSDK-iOS', '5.3.0'
   pod 'PureLayout', '3.0.2'
+  pod 'MBProgressHUD', '~> 1.1.0'
 end
 
 target 'PsiphonVPN' do
