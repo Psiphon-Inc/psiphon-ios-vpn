@@ -18,10 +18,12 @@
  */
 
 #import "IAPViewController.h"
+#import "AppDelegate.h"
 #import "IAPStoreHelper.h"
+#import "MBProgressHUD.h"
+#import "NSDate+Comparator.h"
 #import "PsiphonDataSharedDB.h"
 #import "SharedConstants.h"
-#import "NSDate+Comparator.h"
 
 static NSString *iapCellID = @"IAPTableCellID";
 
@@ -42,7 +44,9 @@ static NSString *iapCellID = @"IAPTableCellID";
 
 @end
 
-@implementation IAPViewController
+@implementation IAPViewController {
+    MBProgressHUD *buyProgressAlert;
+}
 
 - (void)loadView {
     self.priceFormatter = [[NSNumberFormatter alloc] init];
@@ -380,9 +384,26 @@ static NSString *iapCellID = @"IAPTableCellID";
     SKPaymentTransactionState transactionState = (SKPaymentTransactionState) [notification.userInfo[IAPHelperPaymentTransactionUpdateKey] integerValue];
 
     if (SKPaymentTransactionStatePurchasing == transactionState) {
+        [self showProgressSpinnerAndBlockUI];
         [self setPurchaseButtonUIInterface:FALSE];
     } else {
+        [self dismissProgressSpinnerAndUnblockUI];
         [self setPurchaseButtonUIInterface:TRUE];
+    }
+}
+
+- (void)showProgressSpinnerAndBlockUI {
+    if (buyProgressAlert != nil) {
+        [buyProgressAlert hideAnimated:YES];
+    }
+    buyProgressAlert = [MBProgressHUD showHUDAddedTo:AppDelegate.getTopMostViewController.view animated:YES];
+    buyProgressAlert.mode = MBProgressHUDModeIndeterminate;
+}
+
+- (void)dismissProgressSpinnerAndUnblockUI {
+    if (buyProgressAlert != nil) {
+        [buyProgressAlert hideAnimated:YES];
+        buyProgressAlert = nil;
     }
 }
 

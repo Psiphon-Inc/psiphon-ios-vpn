@@ -18,6 +18,7 @@
  */
 
 #import "FeedbackManager.h"
+#import "AppDelegate.h"
 #import "DispatchUtils.h"
 #import "FeedbackUpload.h"
 #import "IAPStoreHelper.h"
@@ -170,19 +171,8 @@
 
 #pragma mark - Helpers
 
-+ (UIViewController*)topMostController
-{
-    UIViewController *topController = [UIApplication sharedApplication].keyWindow.rootViewController;
-
-    while (topController.presentedViewController) {
-        topController = topController.presentedViewController;
-    }
-
-    return topController;
-}
-
 - (void)showUploadInProgressView {
-    uploadProgressAlert = [MBProgressHUD showHUDAddedTo:FeedbackManager.topMostController.view animated:YES];
+    uploadProgressAlert = [MBProgressHUD showHUDAddedTo:AppDelegate.getTopMostViewController.view animated:YES];
     uploadProgressAlert.mode = MBProgressHUDModeIndeterminate;
     uploadProgressAlert.label.text = NSLocalizedStringWithDefaultValue(@"FEEDBACK_UPLOAD_IN_PROGRESS_MESSAGE", nil, [NSBundle mainBundle], @"Encrypting and securely uploading feedback…", @"Alert dialog title indicating to the user that their feedback is being encrypted and securely uploaded to Psiphon's servers.");
     uploadProgressAlert.label.adjustsFontSizeToFitWidth = YES;
