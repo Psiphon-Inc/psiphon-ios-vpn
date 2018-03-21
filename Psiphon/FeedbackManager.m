@@ -174,7 +174,7 @@
 - (void)showUploadInProgressView {
     uploadProgressAlert = [MBProgressHUD showHUDAddedTo:AppDelegate.getTopMostViewController.view animated:YES];
     uploadProgressAlert.mode = MBProgressHUDModeIndeterminate;
-    uploadProgressAlert.label.text = NSLocalizedStringWithDefaultValue(@"FEEDBACK_UPLOAD_IN_PROGRESS_MESSAGE", nil, [NSBundle mainBundle], @"Encrypting and securely uploading feedback…", @"Alert dialog title indicating to the user that their feedback is being encrypted and securely uploaded to Psiphon's servers.");
+    uploadProgressAlert.label.text = NSLocalizedStringWithDefaultValue(@"FEEDBACK_UPLOAD_IN_PROGRESS_MESSAGE", nil, [NSBundle mainBundle], @"Sending feedback…", @"Alert dialog title indicating to the user that their feedback is being encrypted and securely uploaded to Psiphon's servers.");
     uploadProgressAlert.label.adjustsFontSizeToFitWidth = YES;
     uploadProgressAlert.label.numberOfLines = 0;
     uploadProgressAlert.backgroundView.style = MBProgressHUDBackgroundStyleSolidColor;

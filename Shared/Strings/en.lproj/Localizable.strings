@@ -68,7 +68,7 @@
 "FEEDBACK_UPLOAD_IN_PROGRESS_BACKGROUND_BUTTON_TITLE" = "Background";
 
 /* Alert dialog title indicating to the user that their feedback is being encrypted and securely uploaded to Psiphon's servers. */
-"FEEDBACK_UPLOAD_IN_PROGRESS_MESSAGE" = "Encrypting and securely uploading feedback…";
+"FEEDBACK_UPLOAD_IN_PROGRESS_MESSAGE" = "Sending feedback…";
 
 /* Alert dialog message thanking the user for helping improve the Psiphon network by submitting their feedback. */
 "FEEDBACK_UPLOAD_SUCCESSFUL_MESSAGE" = "Thank you for helping improve Psiphon!";
