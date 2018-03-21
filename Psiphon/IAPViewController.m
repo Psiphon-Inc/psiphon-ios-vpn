@@ -46,6 +46,7 @@ static NSString *iapCellID = @"IAPTableCellID";
 
 @implementation IAPViewController {
     MBProgressHUD *buyProgressAlert;
+    NSTimer *buyProgressAlertTimer;
 }
 
 - (void)loadView {
@@ -397,10 +398,20 @@ static NSString *iapCellID = @"IAPTableCellID";
         [buyProgressAlert hideAnimated:YES];
     }
     buyProgressAlert = [MBProgressHUD showHUDAddedTo:AppDelegate.getTopMostViewController.view animated:YES];
-    buyProgressAlert.mode = MBProgressHUDModeIndeterminate;
+
+    buyProgressAlertTimer = [NSTimer scheduledTimerWithTimeInterval:60 repeats:NO block:^(NSTimer * _Nonnull timer) {
+        if (buyProgressAlert  != nil) {
+            [buyProgressAlert.button setTitle:NSLocalizedStringWithDefaultValue(@"BUY_REQUEST_PROGRESS_ALERT_DISMISS_BUTTON_TITLE", nil, [NSBundle mainBundle], @"Dismiss", @"Title of button on alert view which shows the progress of the user's buy request. Hitting this button dismisses the alert and the buy request continues processing in the background.") forState:UIControlStateNormal];
+            [buyProgressAlert.button addTarget:self action:@selector(dismissProgressSpinnerAndUnblockUI) forControlEvents:UIControlEventTouchUpInside];
+        }
+    }];
 }
 
 - (void)dismissProgressSpinnerAndUnblockUI {
+    if (buyProgressAlertTimer != nil) {
+        [buyProgressAlertTimer invalidate];
+        buyProgressAlertTimer = nil;
+    }
     if (buyProgressAlert != nil) {
         [buyProgressAlert hideAnimated:YES];
         buyProgressAlert = nil;
