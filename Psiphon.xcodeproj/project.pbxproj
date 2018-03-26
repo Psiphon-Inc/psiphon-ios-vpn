@@ -25,6 +25,7 @@
 		4E0DCB1A1F28481E00495781 /* PsiphonDataSharedDB.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E0DCB191F28481E00495781 /* PsiphonDataSharedDB.m */; };
 		4E0DCB1E1F2855FC00495781 /* PsiphonDataSharedDB.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E0DCB191F28481E00495781 /* PsiphonDataSharedDB.m */; };
 		4E1FE1CB1FB213860031211C /* SnapshotHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E1FE1CA1FB213860031211C /* SnapshotHelper.swift */; };
+		4E5BD4F52061982300AD4724 /* FeedbackManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E5BD4F42061982300AD4724 /* FeedbackManager.m */; };
 		66094F7A1E8067520069EC4E /* PsiphonTunnel.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 66094F781E8067520069EC4E /* PsiphonTunnel.framework */; };
 		6615A5EA1F58A95500026C98 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 6615A5E81F58A95500026C98 /* Localizable.strings */; };
 		6615A5EB1F58A95B00026C98 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 6615A5E81F58A95500026C98 /* Localizable.strings */; };
@@ -171,6 +172,8 @@
 		4E0DCB181F28481E00495781 /* PsiphonDataSharedDB.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PsiphonDataSharedDB.h; sourceTree = "<group>"; };
 		4E0DCB191F28481E00495781 /* PsiphonDataSharedDB.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PsiphonDataSharedDB.m; sourceTree = "<group>"; };
 		4E1FE1CA1FB213860031211C /* SnapshotHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SnapshotHelper.swift; sourceTree = "<group>"; };
+		4E5BD4F32061982300AD4724 /* FeedbackManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FeedbackManager.h; sourceTree = "<group>"; };
+		4E5BD4F42061982300AD4724 /* FeedbackManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FeedbackManager.m; sourceTree = "<group>"; };
 		571DC9418AF936E60179F07C /* Pods-Psiphon.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Psiphon.release.xcconfig"; path = "Pods/Target Support Files/Pods-Psiphon/Pods-Psiphon.release.xcconfig"; sourceTree = "<group>"; };
 		66094F781E8067520069EC4E /* PsiphonTunnel.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = PsiphonTunnel.framework; sourceTree = "<group>"; };
 		6615A5E91F58A95500026C98 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = Strings/en.lproj/Localizable.strings; sourceTree = "<group>"; };
@@ -400,6 +403,15 @@
 			path = Shared;
 			sourceTree = "<group>";
 		};
+		4E5BD4F62061982C00AD4724 /* Feedback */ = {
+			isa = PBXGroup;
+			children = (
+				4E5BD4F32061982300AD4724 /* FeedbackManager.h */,
+				4E5BD4F42061982300AD4724 /* FeedbackManager.m */,
+			);
+			name = Feedback;
+			sourceTree = "<group>";
+		};
 		668AF9B81E92CB60008CAAAA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
@@ -471,6 +483,7 @@
 				EF652CD31F35224C002AFB48 /* AppDelegate.m */,
 				EF652CD41F35224C002AFB48 /* MainViewController.h */,
 				EF652CD51F35224C002AFB48 /* MainViewController.m */,
+				4E5BD4F62061982C00AD4724 /* Feedback */,
 				4E0774951F566ADA0097BC8C /* InAppSettings.bundle */,
 				197DABF21F54C0EA00DD5C3B /* 3rd Party Adapters */,
 				448AD86C1F5DC89000316BA9 /* IAP */,
@@ -999,6 +1012,7 @@
 				197DABEE1F54C09E00DD5C3B /* MPVungleRouter.m in Sources */,
 				19CB75071F54ADB300F78219 /* MPGoogleAdMobBannerCustomEvent.m in Sources */,
 				EF90D7AA204F22C900228A63 /* NSError+Convenience.m in Sources */,
+				4E5BD4F52061982300AD4724 /* FeedbackManager.m in Sources */,
 				EF90D7A8204F22C900228A63 /* DispatchUtils.m in Sources */,
 				9BFEC4475166B2EEAF192D37 /* VPNManager.m in Sources */,
 				9BFECC5AE8636FBEF73D85D3 /* AdManager.m in Sources */,

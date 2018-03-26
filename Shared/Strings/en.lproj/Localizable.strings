@@ -21,6 +21,9 @@
 /* Alert message informing user that subscription receipt can not be verified */
 "BAD_RECEIPT_ALERT_MESSAGE" = "Your subscription receipt can not be verified, please refresh it and try again.";
 
+/* Title of button on alert view which shows the progress of the user's buy request. Hitting this button dismisses the alert and the buy request continues processing in the background. */
+"BUY_REQUEST_PROGRESS_ALERT_DISMISS_BUTTON_TITLE" = "Dismiss";
+
 /* Buy subscription dialog footer text */
 "BUY_SUBSCRIPTIONS_FOOTER_TEXT" = "A subscription is auto-renewable which means that once purchased it will be automatically renewed until you cancel it 24 hours prior to the end of the current period.\n\nYour iTunes Account will be charged for renewal within 24-hours prior to the end of the current period with the cost of subscription.\n\nManage your Subscription and Auto-Renewal by going to your Account Settings.";
 
@@ -45,7 +48,7 @@
 /* Alert dialog title informing user that 'Auto-start VPN' feature is enabled */
 "CONNECT_ON_DEMAND_ALERT_TITLE" = "Auto-start VPN is enabled";
 
-/* Alert dialog title (MainViewController) */
+/* Alert dialog title of alert which informs the user that the settings file in the app is corrupt. */
 "CORRUPT_SETTINGS_ALERT_TITLE" = "Corrupt Settings";
 
 /* Alert dialog message informing the user that the settings file in the app is corrupt, and that they can potentially fix this issue by re-installing the app. */
@@ -57,6 +60,24 @@
 /* Title of the button that dismisses region selection dialog
    Title of the button that dismisses the subscriptions menu */
 "DONE_ACTION" = "Done";
+
+/* Alert dialog message indicating to the user that the app has failed to upload their feedback and that they should try again.  */
+"FEEDBACK_UPLOAD_FAILED_MESSAGE" = "An error occured while uploading your feedback. Please try again. Your feedback helps us improve the Psiphon network.";
+
+/* Alert dialog title indicating to the user that the app has failed to upload their feedback to Psiphon's servers. */
+"FEEDBACK_UPLOAD_FAILED_TITLE" = "Feedback upload failed";
+
+/* Title of button on alert view which shows the progress of the users feedback being uploaded to Psiphon's servers. Hitting this button dismisses the alert and the upload continues in the background. */
+"FEEDBACK_UPLOAD_IN_PROGRESS_BACKGROUND_BUTTON_TITLE" = "Background";
+
+/* Alert dialog title indicating to the user that their feedback is being encrypted and securely uploaded to Psiphon's servers. */
+"FEEDBACK_UPLOAD_IN_PROGRESS_MESSAGE" = "Sending feedback…";
+
+/* Alert dialog message thanking the user for helping improve the Psiphon network by submitting their feedback. */
+"FEEDBACK_UPLOAD_SUCCESSFUL_MESSAGE" = "Thank you for helping improve Psiphon!";
+
+/* Alert dialog title indicating to the user that their feedback has been successfully uploaded to Psiphon's servers. */
+"FEEDBACK_UPLOAD_SUCCESSFUL_TITLE" = "Feedback uploaded successfully";
 
 /* Text displayed while app loads */
 "LOADING" = "Loading...";

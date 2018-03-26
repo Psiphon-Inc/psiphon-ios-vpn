@@ -18,31 +18,31 @@
  */
 
 #import <Foundation/Foundation.h>
+#import <PsiphonTunnel/PsiphonTunnel.h>
+#import "MainViewController.h"
+#import "AdManager.h"
 #import "AppDelegate.h"
-#import "FeedbackUpload.h"
+#import "DispatchUtils.h"
+#import "FeedbackManager.h"
+#import "IAPStoreHelper.h"
+#import "IAPViewController.h"
+#import "LaunchScreenViewController.h"
+#import "Logging.h"
 #import "LogViewControllerFullScreen.h"
-#import "PsiphonConfigUserDefaults.h"
+#import "PsiFeedbackLogger.h"
 #import "PsiphonClientCommonLibraryHelpers.h"
+#import "PsiphonConfigUserDefaults.h"
 #import "PsiphonDataSharedDB.h"
+#import "PulsingHaloLayer.h"
 #import "RegionAdapter.h"
 #import "RegionSelectionViewController.h"
 #import "SharedConstants.h"
+#import "NEBridge.h"
 #import "Notifier.h"
+#import "UIAlertController+Delegate.h"
 #import "UIImage+CountryFlag.h"
 #import "UpstreamProxySettings.h"
-#import "MainViewController.h"
 #import "VPNManager.h"
-#import "AdManager.h"
-#import "PulsingHaloLayer.h"
-#import "Logging.h"
-#import "IAPViewController.h"
-#import "AppDelegate.h"
-#import "IAPStoreHelper.h"
-#import "LaunchScreenViewController.h"
-#import "UIAlertController+Delegate.h"
-#import "NEBridge.h"
-#import "DispatchUtils.h"
-#import "PsiFeedbackLogger.h"
 
 static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSString *b) {
     return (([a length] == 0) && ([b length] == 0)) || ([a isEqualToString:b]);
@@ -94,6 +94,8 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     NSString *selectedRegionSnapShot;
 
     UIAlertController *alertControllerNoInternet;
+
+    FeedbackManager *feedbackManager;
 }
 
 // No heavy initialization should be done here, since RootContainerController
@@ -105,6 +107,8 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
         vpnManager = [VPNManager sharedInstance];
 
         adManager = [AdManager sharedInstance];
+
+        feedbackManager = [[FeedbackManager alloc] init];
 
         sharedDB = [[PsiphonDataSharedDB alloc] initForAppGroupIdentifier:APP_GROUP_IDENTIFIER];
 
@@ -406,13 +410,6 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     }
 
     [alertControllerNoInternet presentFromTopController];
-}
-
-- (void)displayCorruptSettingsFileAlert {
-    [UIAlertController presentSimpleAlertWithTitle:NSLocalizedStringWithDefaultValue(@"CORRUPT_SETTINGS_ALERT_TITLE", nil, [NSBundle mainBundle], @"Corrupt Settings", @"Alert dialog title (MainViewController)")
-                                           message:NSLocalizedStringWithDefaultValue(@"CORRUPT_SETTINGS_MESSAGE", nil, [NSBundle mainBundle], @"Your app settings file appears to be corrupt. Try reinstalling the app to repair the file.", @"Alert dialog message informing the user that the settings file in the app is corrupt, and that they can potentially fix this issue by re-installing the app.")
-                                    preferredStyle:UIAlertControllerStyleAlert
-                                         okHandler:nil];
 }
 
 - (NSString *)getVPNStatusDescription:(VPNStatus) status {
@@ -998,129 +995,14 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                                                            constant:-10]];
 }
 
-#pragma mark - TunneledAppDelegate methods
-
-- (void)onDiagnosticMessage:(NSString *_Nonnull)message withTimestamp:(NSString *_Nonnull)timestamp {
-    [PsiFeedbackLogger logNoticeWithType:@"FeedbackUpload" message:message timestamp:timestamp];
-}
-
-/*!
- * If Psiphon config string could no be created, corrupt message alert is displayed
- * to the user.
- * This method can be called from background-thread.
- * @return Psiphon config string, or nil of config string could not be created.
- */
-- (NSString * _Nullable)getPsiphonConfig {
-    NSString *bundledConfigStr = [PsiphonClientCommonLibraryHelpers getPsiphonBundledConfig];
-
-    // Always parses the config string to ensure its valid, even the config string will not be modified.
-    NSData *jsonData = [bundledConfigStr dataUsingEncoding:NSUTF8StringEncoding];
-    NSError *err = nil;
-    NSDictionary *readOnly = [NSJSONSerialization JSONObjectWithData:jsonData options:kNilOptions error:&err];
-
-    // Return bundled config as is if user doesn't have an active subscription
-    if(![IAPStoreHelper hasActiveSubscriptionForNow] && !err) {
-        return bundledConfigStr;
-    }
-
-    // Otherwise override sponsor ID
-    if (err) {
-        [PsiFeedbackLogger error:@"%@", [NSString stringWithFormat:@"Failed to parse config JSON: %@", err.description]];
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [self displayCorruptSettingsFileAlert];
-        });
-        return nil;
-    }
-
-    NSMutableDictionary *mutableConfigCopy = [readOnly mutableCopy];
-
-    NSDictionary *readOnlySubscriptionConfig = readOnly[@"subscriptionConfig"];
-    if(readOnlySubscriptionConfig && readOnlySubscriptionConfig[@"SponsorId"]) {
-        mutableConfigCopy[@"SponsorId"] = readOnlySubscriptionConfig[@"SponsorId"];
-    }
-
-#if DEBUG
-    // Ensure diagnostic notices are emitted when debugging
-    mutableConfigCopy[@"EmitDiagnosticNotices"] = [NSNumber numberWithBool:YES];
-#endif
-
-    jsonData  = [NSJSONSerialization dataWithJSONObject:mutableConfigCopy options:0 error:&err];
-
-    if (err) {
-        [PsiFeedbackLogger error:@"%@", [NSString stringWithFormat:@"Failed to create JSON data from config object: %@", err.description]];
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [self displayCorruptSettingsFileAlert];
-        });
-        return nil;
-    }
-
-    return [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
-}
-
-- (NSString * _Nullable)getEmbeddedServerEntries {
-    return nil;
-}
-
 #pragma mark - FeedbackViewControllerDelegate methods and helpers
 
 - (void)userSubmittedFeedback:(NSUInteger)selectedThumbIndex comments:(NSString *)comments email:(NSString *)email uploadDiagnostics:(BOOL)uploadDiagnostics {
-    // Ensure psiphon data is populated with latest logs
-    // TODO: should this be a delegate method of Psiphon Data in shared library/
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-
-        NSString *psiphonConfig = [self getPsiphonConfig];
-        if (!psiphonConfig) {
-            // Corrupt settings file. Return early.
-            return;
-        }
-
-        NSArray<DiagnosticEntry *> *diagnosticEntries = [sharedDB getAllLogs];
-
-        __weak MainViewController *weakSelf = self;
-        SendFeedbackHandler sendFeedbackHandler = ^(NSString *jsonString, NSString *pubKey, NSString *uploadServer, NSString *uploadServerHeaders){
-            PsiphonTunnel *inactiveTunnel = [PsiphonTunnel newPsiphonTunnel:weakSelf]; // TODO: we need to update PsiphonTunnel framework not require this and fix this warning
-            [inactiveTunnel sendFeedback:jsonString publicKey:pubKey uploadServer:uploadServer uploadServerHeaders:uploadServerHeaders];
-        };
-
-        [FeedbackUpload generateAndSendFeedback:selectedThumbIndex
-                                      buildInfo:[PsiphonTunnel getBuildInfo]
-                                       comments:comments
-                                          email:email
-                             sendDiagnosticInfo:uploadDiagnostics
-                              withPsiphonConfig:psiphonConfig
-                             withClientPlatform:@"ios-vpn"
-                             withConnectionType:[self getConnectionType]
-                                   isJailbroken:[JailbreakCheck isDeviceJailbroken]
-                            sendFeedbackHandler:sendFeedbackHandler
-                              diagnosticEntries:diagnosticEntries];
-    });
+    [feedbackManager userSubmittedFeedback:selectedThumbIndex comments:comments email:email uploadDiagnostics:uploadDiagnostics];
 }
 
 - (void)userPressedURL:(NSURL *)URL {
     [[UIApplication sharedApplication] openURL:URL options:@{} completionHandler:nil];
-}
-
-// Get connection type for feedback
-- (NSString*)getConnectionType {
-
-    Reachability *reachability = [Reachability reachabilityForInternetConnection];
-
-    NetworkStatus status = [reachability currentReachabilityStatus];
-
-    if(status == NotReachable)
-        {
-        return @"none";
-        }
-    else if (status == ReachableViaWiFi)
-        {
-        return @"WIFI";
-        }
-    else if (status == ReachableViaWWAN)
-        {
-        return @"mobile";
-        }
-
-    return @"error";
 }
 
 #pragma mark - PsiphonSettingsViewControllerDelegate methods and helpers
