@@ -43,4 +43,6 @@ FOUNDATION_EXPORT NSNotificationName const AppDelegateSubscriptionDidActivateNot
  */
 - (void)reloadMainViewController;
 
++ (UIViewController *)getTopMostViewController;
+
 @end

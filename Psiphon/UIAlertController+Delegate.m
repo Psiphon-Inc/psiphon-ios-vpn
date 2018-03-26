@@ -17,6 +17,7 @@
  *
  */
 
+#import "AppDelegate.h"
 #import "UIAlertController+Delegate.h"
 
 @implementation UIAlertController (Delegate)
@@ -28,19 +29,11 @@
     [ac presentFromTopController];
 }
 
-+ (UIViewController *)getTopMostViewController {
-    UIViewController *topController = [UIApplication sharedApplication].keyWindow.rootViewController;
-    while(topController.presentedViewController) {
-        topController = topController.presentedViewController;
-    }
-    return topController;
-}
-
 /**
  * Presents this instance from application's key window top most view controller.
  */
 - (void)presentFromTopController {
-    [[UIAlertController getTopMostViewController] presentViewController:self animated:TRUE completion:nil];
+    [[AppDelegate getTopMostViewController] presentViewController:self animated:TRUE completion:nil];
 }
 
 @end

@@ -11,7 +11,7 @@ target 'Psiphon' do
   # Pods for Psiphon
   pod "InAppSettingsKit", :git => "https://github.com/Psiphon-Inc/InAppSettingsKit.git", :commit => '598c498'
   #pod "InAppSettingsKit", :path => "../InAppSettingsKit"
-  pod 'PsiphonClientCommonLibrary', :git => "https://github.com/Psiphon-Inc/psiphon-ios-client-common-library.git", :commit => 'c39fce5'
+  pod 'PsiphonClientCommonLibrary', :git => "https://github.com/Psiphon-Inc/psiphon-ios-client-common-library.git", :commit => '5caca65'
   #pod "PsiphonClientCommonLibrary", :path => "../psiphon-ios-client-common-library"
 
   pod 'ReactiveObjC', :git => "https://github.com/Psiphon-Inc/ReactiveObjC.git", :commit => 'b2ac770'
@@ -20,6 +20,7 @@ target 'Psiphon' do
   pod 'Google-Mobile-Ads-SDK', '7.25.0'
   pod 'VungleSDK-iOS', '5.3.0'
   pod 'PureLayout', '3.0.2'
+  pod 'MBProgressHUD', '~> 1.1.0'
 end
 
 target 'PsiphonVPN' do
