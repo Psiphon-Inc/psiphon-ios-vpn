@@ -391,7 +391,8 @@ NSString * const VPNManagerLogType = @"VPNManager";
 
 // setConnectOnDemandEnabled: returns a signal that when subscribed to updates tunnelProviderManager's
 // onDemandEnabled property with the provided parameter if different and then emits TRUE as NSNumber on success
-// and FALSE on failure. If provided parameter is not different, then the returned signal completes immediately.
+// and FALSE on failure. If provided parameter is not different, then the returned signal
+// emits TRUE and completes immediately.
 // All errors are caught and logged, and FALSE is emitted in their place.
 //
 // If tunnelProviderManager is nil, returned signal completes immediately.
@@ -399,7 +400,7 @@ NSString * const VPNManagerLogType = @"VPNManager";
 - (RACSignal<NSNumber *> *)setConnectOnDemandEnabled:(BOOL)onDemandEnabled {
     __weak VPNManager *weakSelf = self;
 
-    return [[[[[[[VPNManager loadTunnelProviderManager]
+    return [[[[VPNManager loadTunnelProviderManager]
       flattenMap:^RACSignal<NETunnelProviderManager *> *(NETunnelProviderManager *providerManager) {
 
           if (!providerManager) {
@@ -408,7 +409,7 @@ NSString * const VPNManagerLogType = @"VPNManager";
 
           // return empty signal as NO-OP if there is not change in status.
           if (providerManager.onDemandEnabled == onDemandEnabled) {
-              return [RACSignal empty];
+              return [RACSignal return:[NSNumber numberWithBool:TRUE]];
           }
 
           providerManager.onDemandEnabled = onDemandEnabled;
@@ -420,16 +421,18 @@ NSString * const VPNManagerLogType = @"VPNManager";
               providerManager.enabled = TRUE;
           }
 
-          return [RACSignal defer:providerManager selectorWithErrorCallback:@selector(saveToPreferencesWithCompletionHandler:)];
-      }]
-      flattenMap:^RACSignal<NETunnelProviderManager *> *(NETunnelProviderManager *providerManager) {
-          return [RACSignal defer:providerManager selectorWithErrorCallback:@selector(loadFromPreferencesWithCompletionHandler:)];
-      }]
-      doNext:^(NETunnelProviderManager *providerManager) {
-          weakSelf.tunnelProviderManager = providerManager;
-      }]
-      map:^id(id value) {
-          return [NSNumber numberWithBool:TRUE];
+          // Returned signal, saves and loads the tunnel provider manager.
+          return [[[[RACSignal defer:providerManager selectorWithErrorCallback:@selector(saveToPreferencesWithCompletionHandler:)]
+            flattenMap:^RACSignal<NETunnelProviderManager *> *(NETunnelProviderManager *manager) {
+                return [RACSignal defer:manager selectorWithErrorCallback:@selector(loadFromPreferencesWithCompletionHandler:)];
+            }]
+            doNext:^(NETunnelProviderManager *manager) {
+                weakSelf.tunnelProviderManager = manager;
+            }]
+            map:^NSNumber *(NETunnelProviderManager *x) {
+                return [NSNumber numberWithBool:TRUE];
+          }];
+
       }]
       catch:^RACSignal *(NSError *error) {
           [PsiFeedbackLogger errorWithType:VPNManagerLogType message:@"error setting OnDemandEnabled" object:error];
@@ -443,7 +446,7 @@ NSString * const VPNManagerLogType = @"VPNManager";
     __weak VPNManager *weakSelf = self;
 
     __block RACDisposable *disposable = [[[self isExtensionZombie]
-      flattenMap:^RACSignal *(NSNumber *isZombie) {
+      flattenMap:^RACSignal<NSNumber *> *(NSNumber *isZombie) {
 
           if ([isZombie boolValue]) {
               return [weakSelf setConnectOnDemandEnabled:FALSE];
@@ -451,13 +454,15 @@ NSString * const VPNManagerLogType = @"VPNManager";
               return [RACSignal empty];
           }
       }]
-      subscribeError:^(NSError *error) {
+      subscribeNext:^(NSNumber *x) {
+          // Whether or not VPN configuration update succeeded or not, stop the VPN.
+          [weakSelf stopVPN];
+      }
+      error:^(NSError *error) {
           [PsiFeedbackLogger errorWithType:VPNManagerLogType message:@"error killing zombie extensioin" object:error];
           [weakSelf.compoundDisposable removeDisposable:disposable];
       }
       completed:^{
-          // Whether or not VPN configuration update succeeded or not, stop the VPN.
-          [weakSelf stopVPN];
           [weakSelf.compoundDisposable removeDisposable:disposable];
       }];
 
