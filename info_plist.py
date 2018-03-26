@@ -55,12 +55,12 @@ class InfoPlist:
     def sync(self):
         if self.plist[self.version_key] != str(self.version_key):
             if self.debug:
-                print '{0} updated from {1} to {2}'.format(self.version_key, self.plist[self.version_key], self.version)
+                print('{0} updated from {1} to {2}'.format(self.version_key, self.plist[self.version_key], self.version))
         if self.plist[self.short_version_key] != str(self.short_version):
             if self.debug:
-                print '{0} updated from {1} to {2}'.format(self.short_version_key,
+                print('{0} updated from {1} to {2}'.format(self.short_version_key,
                                                            self.plist[self.short_version_key],
-                                                           self.short_version)
+                                                           self.short_version))
         self.plist[self.version_key] = str(self.version)
         self.plist[self.short_version_key] = str(self.short_version)
         plistlib.writePlist(self.plist, self.plist_path)
@@ -82,6 +82,9 @@ class InfoPlist:
 
     def human_readable_version_string(self):
         return 'TestFlight version {0}; Release version {1}'.format(self.version, self.short_version)
+
+    def git_tag_name(self):
+        return "{}v{}".format(self.testflight_version_string(), self.release_version_string())
 
 
 if __name__ == "__main__":
@@ -106,7 +109,7 @@ if __name__ == "__main__":
 
     parser.add_argument("-o",
                         "--output",
-                        choices=['human_readable', 'short_version', 'version'],
+                        choices=['human_readable', 'git_tag_name', 'short_version', 'version'],
                         default='human_readable',
                         help="Print the specified version string",
                         required=False,
@@ -132,13 +135,12 @@ if __name__ == "__main__":
 
     if args.output is not None:
         if args.output == 'version':
-            print info_plist.testflight_version_string()
+            print(info_plist.testflight_version_string())
         elif args.output == 'short_version':
-            print info_plist.release_version_string()
+            print(info_plist.release_version_string())
+        elif args.output == 'git_tag_name':
+            print(info_plist.git_tag_name())
         elif args.output == 'human_readable':
-            print info_plist.human_readable_version_string()
+            print(info_plist.human_readable_version_string())
         else:
             sys.exit('Invalid output specified. Must be "short_version" or "version".')
-
-else:
-    print "[%s] Initialized as a library" % (datetime.datetime.now())

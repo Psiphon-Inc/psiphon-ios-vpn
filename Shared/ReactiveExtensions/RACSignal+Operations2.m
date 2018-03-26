@@ -20,10 +20,54 @@
 #import <ReactiveObjC/RACSignal+Operations.h>
 #import <ReactiveObjC/RACSubject.h>
 #import <ReactiveObjC/RACDisposable.h>
+#import <ReactiveObjC/NSArray+RACSequenceAdditions.h>
+#import <ReactiveObjC/RACScheduler.h>
 #import "RACSignal+Operations2.h"
 #import "RACCompoundDisposable.h"
+#import "RACSequence.h"
+#import "Asserts.h"
+#import "Logging.h"
+#import "AsyncOperation.h"
+#import "RACTargetQueueScheduler.h"
 
 @implementation RACSignal (Operations2)
+
++ (RACSignal *)defer:(id)object selectorWithErrorCallback:(SEL)aSelector {
+
+    PSIAssert(object != nil);
+    PSIAssert([object respondsToSelector:aSelector])
+
+    return [RACSignal createSignal:^RACDisposable *(id <RACSubscriber> subscriber) {
+
+        NSMethodSignature *methodSignature = [object methodSignatureForSelector:aSelector];
+        NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:methodSignature];
+        invocation.target = object;
+        invocation.selector = aSelector;
+
+        void (^completionHandler)(NSError *error) = ^(NSError *error) {
+            if (error) {
+                [subscriber sendError:error];
+                return;
+            }
+
+            [subscriber sendNext:object];
+            [subscriber sendCompleted];
+        };
+
+        [invocation setArgument:&completionHandler atIndex:2];
+        [invocation retainArguments];
+
+        RACDisposable *subscriptionDisposable = [[RACScheduler currentScheduler] schedule:^{
+            [invocation invoke];
+        }];
+
+        return subscriptionDisposable;
+    }];
+}
+
++ (RACSignal *)fromArray:(NSArray *)array {
+    return array.rac_sequence.signal;
+}
 
 + (RACSignal *)timer:(NSTimeInterval)delay {
     return [[RACSignal return:@(0)] delay:delay];
@@ -114,6 +158,63 @@
         resubscribe();
 
         [compoundDisposable addDisposable:notificationDisposable];
+        return compoundDisposable;
+    }];
+}
+
+- (RACSignal *)unsafeSubscribeOnSerialQueue:(NSOperationQueue *)operationQueue scheduler:(RACTargetQueueScheduler *)queueScheduler {
+
+    NSAssert(operationQueue.underlyingQueue != nil, @"operationQueue must have underlying dispatch operationQueue set");
+    NSAssert(operationQueue.maxConcurrentOperationCount == 1, @"operationQueue must be serial");
+
+    return [RACSignal createSignal:^RACDisposable *(id <RACSubscriber> subscriber) {
+
+        RACCompoundDisposable *compoundDisposable = [RACCompoundDisposable compoundDisposable];
+
+        AsyncOperation *operation = [[AsyncOperation alloc] initWithBlock:^(void (^completionHandler)(NSError *)) {
+
+            // Subscribes on the provided scheduler, and adds the scheduling disposable to `compoundDisposable`.
+            [compoundDisposable addDisposable:[queueScheduler schedule:^{
+
+                // Adds subscription disposable to `compoundDisposable`.
+                [compoundDisposable addDisposable:[self subscribeNext:^(id x) {
+
+                    // To prevent unbounded size increase of compoundDisposable,
+                    // do not add the returned scheduling disposable to returned `compoundDisposable`.
+                    // This doesn't carry a risk.
+                    [queueScheduler schedule:^{
+                        [subscriber sendNext:x];
+                    }];
+
+                } error:^(NSError *error) {
+
+                    completionHandler(error);
+
+                    // There is no risk of not adding returned subscription disposable
+                    // to the returned `compoundDisposable`.
+                    [queueScheduler schedule:^{
+                       [subscriber sendError:error];
+                    }];
+
+                } completed:^{
+
+                    completionHandler(nil);
+
+                    // There is no risk of not adding returned subscription disposable
+                    // to the returned `compoundDisposable`.
+                    [queueScheduler schedule:^{
+                        [subscriber sendCompleted];
+                    }];
+                }]];
+            }]];
+        }];
+
+        [compoundDisposable addDisposable:[RACDisposable disposableWithBlock:^{
+            [operation cancel];
+        }]];
+
+        [operationQueue addOperation:operation];
+
         return compoundDisposable;
     }];
 }

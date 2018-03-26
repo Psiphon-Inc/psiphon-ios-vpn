@@ -18,48 +18,56 @@
  */
 
 #import <Foundation/Foundation.h>
+#import <PsiphonTunnel/PsiphonTunnel.h>
+#import "MainViewController.h"
+#import "AdManager.h"
 #import "AppDelegate.h"
-#import "FeedbackUpload.h"
+#import "DispatchUtils.h"
+#import "FeedbackManager.h"
+#import "IAPStoreHelper.h"
+#import "IAPViewController.h"
+#import "LaunchScreenViewController.h"
+#import "Logging.h"
 #import "LogViewControllerFullScreen.h"
-#import "PsiphonConfigUserDefaults.h"
+#import "PsiFeedbackLogger.h"
 #import "PsiphonClientCommonLibraryHelpers.h"
+#import "PsiphonConfigUserDefaults.h"
 #import "PsiphonDataSharedDB.h"
+#import "PulsingHaloLayer.h"
 #import "RegionAdapter.h"
 #import "RegionSelectionViewController.h"
 #import "SharedConstants.h"
+#import "NEBridge.h"
 #import "Notifier.h"
+#import "UIAlertController+Delegate.h"
 #import "UIImage+CountryFlag.h"
 #import "UpstreamProxySettings.h"
-#import "MainViewController.h"
 #import "VPNManager.h"
-#import "AdManager.h"
-#import "PulsingHaloLayer.h"
-#import "Logging.h"
-#import "IAPViewController.h"
-#import "AppDelegate.h"
-#import "IAPStoreHelper.h"
-#import "LaunchScreenViewController.h"
-#import "UIAlertController+Delegate.h"
-#import "NEBridge.h"
-#import "DispatchUtils.h"
-#import "PsiFeedbackLogger.h"
+#import "RACCompoundDisposable.h"
+#import "RACTuple.h"
+#import "RACReplaySubject.h"
+#import "RACSignal+Operations.h"
+#import "RACSignal+Operations.h"
 
 static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSString *b) {
     return (([a length] == 0) && ([b length] == 0)) || ([a isEqualToString:b]);
 };
 
+@interface MainViewController ()
+
+@property (nonatomic) RACCompoundDisposable *compoundDisposable;
+@property (nonatomic) AdManager *adManager;
+@property (nonatomic) VPNManager *vpnManager;
+
+@end
+
 @implementation MainViewController {
-
-    // VPN Manager
-    VPNManager *vpnManager;
-
-    AdManager *adManager;
-
+    
     PsiphonDataSharedDB *sharedDB;
-
+    
     // Notifier
     Notifier *notifier;
-
+    
     // UI elements
     //UIImageView *logoView;
     UILabel *appTitleLabel;
@@ -73,27 +81,29 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     UIButton *startStopButton;
     PulsingHaloLayer *startStopButtonHalo;
     BOOL isStartStopButtonHaloOn;
-
+    
     // UI Constraint
     NSLayoutConstraint *startButtonScreenWidth;
     NSLayoutConstraint *startButtonScreenHeight;
     NSLayoutConstraint *startButtonWidth;
     NSLayoutConstraint *bottomBarTop;
     NSLayoutConstraint *subscriptionButtonTop;
-
+    
     // UI Layer
     CAGradientLayer *backgroundGradient;
-
+    
     // Settings
     PsiphonSettingsViewController *appSettingsViewController;
     UIButton *settingsButton;
-
+    
     // Region Selection
     UINavigationController *regionSelectionNavController;
     UIView *bottomBar;
     NSString *selectedRegionSnapShot;
-
+    
     UIAlertController *alertControllerNoInternet;
+    
+    FeedbackManager *feedbackManager;
 }
 
 // No heavy initialization should be done here, since RootContainerController
@@ -102,17 +112,22 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 - (id)init {
     self = [super init];
     if (self) {
-        vpnManager = [VPNManager sharedInstance];
-
-        adManager = [AdManager sharedInstance];
-
+        
+        _compoundDisposable = [RACCompoundDisposable compoundDisposable];
+        
+        _vpnManager = [VPNManager sharedInstance];
+        
+        _adManager = [AdManager sharedInstance];
+        
+        feedbackManager = [[FeedbackManager alloc] init];
+        
         sharedDB = [[PsiphonDataSharedDB alloc] initForAppGroupIdentifier:APP_GROUP_IDENTIFIER];
-
+        
         // Notifier
         notifier = [[Notifier alloc] initWithAppGroupIdentifier:APP_GROUP_IDENTIFIER];
-
+        
         [self persistSettingsToSharedUserDefaults];
-
+        
         // Open Setting after change it
         self.openSettingImmediatelyOnViewDidAppear = NO;
     }
@@ -121,16 +136,17 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 
 - (void) dealloc {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
+    [self.compoundDisposable dispose];
 }
 
 #pragma mark - Lifecycle methods
 - (void)viewDidLoad {
     LOG_DEBUG();
     [super viewDidLoad];
-
-   // Add any available regions from shared db to region adapter
+    
+    // Add any available regions from shared db to region adapter
     [self updateAvailableRegions];
-
+    
     // Setting up the UI
     [self setBackgroundGradient];
     [self setNeedsStatusBarAppearanceUpdate];
@@ -146,39 +162,105 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     [self addStatusLabel];
     [self addVersionLabel];
     [self setupLayoutGuides];
-
+    
     if (([[UIDevice currentDevice].model hasPrefix:@"iPhone"] || [[UIDevice currentDevice].model hasPrefix:@"iPod"]) && (self.view.bounds.size.width > self.view.bounds.size.height)) {
         //logoView.hidden = YES;
         //appTitleLabel.hidden = YES;
         //appSubTitleLabel.hidden = YES;
     }
-
+    
+    __weak MainViewController *weakSelf = self;
+    
+    // Observe VPN status for updating UI state
+    RACDisposable *tunnelStatusDisposable = [[self.vpnManager.lastTunnelStatus
+                                              deliverOnMainThread]
+                                             subscribeNext:^(NSNumber *statusObject) {
+                                                 VPNStatus s = (VPNStatus) [statusObject integerValue];
+                                                 
+                                                 [weakSelf updateUIConnectionState:s];
+                                                 
+                                                 if (s == VPNStatusConnecting ||
+                                                     s == VPNStatusRestarting ||
+                                                     s == VPNStatusReasserting) {
+                                                     
+                                                     [weakSelf addPulsingHaloLayer];
+                                                     
+                                                 } else {
+                                                     [weakSelf removePulsingHaloLayer];
+                                                 }
+                                                 
+                                                 // Notify SettingsViewController that the state has changed.
+                                                 // Note that this constant is used PsiphonClientCommonLibrary, and cannot simply be replaced by a RACSignal.
+                                                 [[NSNotificationCenter defaultCenter] postNotificationName:kPsiphonConnectionStateNotification object:nil];
+                                                 
+                                             }];
+    
+    [self.compoundDisposable addDisposable:tunnelStatusDisposable];
+    
+    RACDisposable *vpnStartStatusDisposable = [[self.vpnManager.vpnStartStatus
+                                                deliverOnMainThread]
+                                               subscribeNext:^(NSNumber *statusObject) {
+                                                   VPNStartStatus startStatus = (VPNStartStatus) [statusObject integerValue];
+                                                   
+                                                   if (startStatus == VPNStartStatusStart) {
+                                                       [startStopButton setHighlighted:TRUE];
+                                                   } else {
+                                                       [startStopButton setHighlighted:FALSE];
+                                                   }
+                                                   
+                                                   if (startStatus == VPNStartStatusFailedUserPermissionDenied) {
+                                                       
+                                                       // Alert the user that their permission is required in order to install the VPN configuration.
+                                                       UIAlertController *alert = [UIAlertController alertControllerWithTitle:NSLocalizedStringWithDefaultValue(@"VPN_START_PERMISSION_REQUIRED_TITLE", nil, [NSBundle mainBundle], @"Permission required", @"Alert dialog title indicating to the user that Psiphon needs their permission")
+                                                                                                                      message:NSLocalizedStringWithDefaultValue(@"VPN_START_PERMISSION_DENIED_MESSAGE", nil, [NSBundle mainBundle], @"Psiphon needs your permission to install a VPN profile in order to connect.\n\nPsiphon is committed to protecting the privacy of our users. You can review our privacy policy by tapping \"Privacy Policy\".", @"('Privacy Policy' should be the same translation as privacy policy button VPN_START_PRIVACY_POLICY_BUTTON), (Do not translate 'VPN profile'), (Do not translate 'Psiphon')")
+                                                                                                               preferredStyle:UIAlertControllerStyleAlert];
+                                                       
+                                                       UIAlertAction *privacyPolicyAction = [UIAlertAction actionWithTitle:NSLocalizedStringWithDefaultValue(@"VPN_START_PRIVACY_POLICY_BUTTON", nil, [NSBundle mainBundle], @"Privacy Policy", @"Button label taking user's to our Privacy Policy page")
+                                                                                                                     style:UIAlertActionStyleDefault
+                                                                                                                   handler:^(UIAlertAction *action) {
+                                                                                                                       NSString *urlString = NSLocalizedStringWithDefaultValue(@"PRIVACY_POLICY_URL", nil, [PsiphonClientCommonLibraryHelpers commonLibraryBundle], @"https://psiphon.ca/en/privacy.html", @"External link to the privacy policy page. Please update this with the correct language specific link (if available) e.g. https://psiphon.ca/fr/privacy.html for french.");
+                                                                                                                       [[UIApplication sharedApplication] openURL:[NSURL URLWithString:urlString] options:@{} completionHandler:^(BOOL success) {
+                                                                                                                           // Do nothing.
+                                                                                                                       }];
+                                                                                                                   }];
+                                                       
+                                                       UIAlertAction *dismissAction = [UIAlertAction actionWithTitle:@"Dismiss" style:UIAlertActionStyleCancel
+                                                                                                             handler:^(UIAlertAction *action) {
+                                                                                                                 // Do nothing.
+                                                                                                             }];
+                                                       
+                                                       [alert addAction:privacyPolicyAction];
+                                                       [alert addAction:dismissAction];
+                                                       [alert presentFromTopController];
+                                                       
+                                                   } else if (startStatus == VPNStartStatusFailedOther) {
+                                                       
+                                                       // Alert the user that the VPN failed to start, and that they should try again.
+                                                       [UIAlertController presentSimpleAlertWithTitle:NSLocalizedStringWithDefaultValue(@"VPN_START_FAIL_TITLE", nil, [NSBundle mainBundle], @"Unable to start", @"Alert dialog title indicating to the user that Psiphon was unable to start (MainViewController)")
+                                                                                              message:NSLocalizedStringWithDefaultValue(@"VPN_START_FAIL_MESSAGE", nil, [NSBundle mainBundle], @"An error occurred while starting Psiphon. Please try again. If this problem persists, try reinstalling the Psiphon app.", @"Alert dialog message informing the user that an error occurred while starting Psiphon (Do not translate 'Psiphon'). The user should try again, and if the problem persists, they should try reinstalling the app.")
+                                                                                       preferredStyle:UIAlertControllerStyleAlert
+                                                                                            okHandler:nil];
+                                                   }
+                                               }];
+    
+    [self.compoundDisposable addDisposable:vpnStartStatusDisposable];
+    
     // Observer AdManager notifications
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(onAdStatusDidChange)
                                                  name:AdManagerAdsDidLoadNotification
-                                               object:adManager];
+                                               object:self.adManager];
     // Observe VPNManager notifications
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(onVPNStatusDidChange)
-                                                 name:VPNManagerStatusDidChangeNotification
-                                               object:vpnManager];
-
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(onVPNStartFailed)
-                                                 name:VPNManagerVPNStartDidFailNotification
-                                               object:vpnManager];
-
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(onSubscriptionActivated)
                                                  name:AppDelegateSubscriptionDidActivateNotification
                                                object:nil];
-
+    
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(onSubscriptionExpired)
                                                  name:AppDelegateSubscriptionDidExpireNotification
                                                object:nil];
-
+    
 }
 
 - (void)viewDidAppear:(BOOL)animated {
@@ -187,7 +269,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     // Available regions may have changed in the background
     [self updateAvailableRegions];
     [self updateRegionButton];
-
+    
     if (self.openSettingImmediatelyOnViewDidAppear) {
         [self openSettingsMenu];
         self.openSettingImmediatelyOnViewDidAppear = NO;
@@ -197,7 +279,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 - (void)viewDidLayoutSubviews {
     [super viewDidLayoutSubviews];
     backgroundGradient.frame = self.view.bounds;
-
+    
     if (isStartStopButtonHaloOn && startStopButtonHalo != nil) {
         // Keep pulsing halo centered on the start/stop button
         startStopButtonHalo.position = startStopButton.center;
@@ -207,11 +289,10 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 - (void)viewWillAppear:(BOOL)animated {
     LOG_DEBUG();
     [super viewWillAppear:animated];
-
+    
     // Listen for VPN status changes from VPNManager.
-
+    
     // Sync UI with the VPN state
-    [self onVPNStatusDidChange];
     [self onAdStatusDidChange];
     [self checkSubscriptionStateAndUpdateUI];
 }
@@ -226,7 +307,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 - (void)viewDidDisappear:(BOOL)animated {
     LOG_DEBUG();
     [super viewDidDisappear:animated];
-
+    
     if (isStartStopButtonHaloOn && startStopButtonHalo != nil) {
         // The pulsing halo animation will complete when MainViewController's view disappears.
         // Subsequently, PulsingHaloLayer will remove itself from its superview (see PulsingHaloLayer.m).
@@ -243,7 +324,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 - (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator {
     [self.view removeConstraint:startButtonWidth];
     [self setRegionSelectionConstraints:size];
-
+    
     if (size.width > size.height) {
         [self.view removeConstraint:startButtonScreenWidth];
         [self.view addConstraint:startButtonScreenHeight];
@@ -254,12 +335,12 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
         [self.view removeConstraint:startButtonScreenHeight];
         [self.view addConstraint:startButtonScreenWidth];
         if ([[UIDevice currentDevice].model hasPrefix:@"iPhone"]) {
-            adLabel.hidden = ![adManager untunneledInterstitialIsReady];
+            adLabel.hidden = ![self.adManager untunneledInterstitialIsReady];
         }
     }
-
+    
     [self.view addConstraint:startButtonWidth];
-
+    
     [coordinator animateAlongsideTransition:^(id<UIViewControllerTransitionCoordinatorContext> context) {
         if (isStartStopButtonHaloOn && startStopButtonHalo) {
             startStopButtonHalo.hidden = YES;
@@ -269,93 +350,111 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
             startStopButtonHalo.hidden = NO;
         }
     }];
-
+    
     [super viewWillTransitionToSize:size withTransitionCoordinator:coordinator];
 }
 
 #pragma mark - UI callbacks
 
-- (void)onVPNStartFailed {
-    // Alert the user that the VPN failed to start, and that they should try again.
-    [UIAlertController presentSimpleAlertWithTitle:NSLocalizedStringWithDefaultValue(@"VPN_START_FAIL_TITLE", nil, [NSBundle mainBundle], @"Unable to start", @"Alert dialog title indicating to the user that Psiphon was unable to start (MainViewController)")
-                                           message:NSLocalizedStringWithDefaultValue(@"VPN_START_FAIL_MESSAGE", nil, [NSBundle mainBundle], @"An error occurred while starting Psiphon. Please try again. If this problem persists, try reinstalling the Psiphon app.", @"Alert dialog message informing the user that an error occurred while starting Psiphon (Do not translate 'Psiphon'). The user should try again, and if the problem persists, they should try reinstalling the app.")
-                                    preferredStyle:UIAlertControllerStyleAlert
-                                         okHandler:nil];
-}
-
-- (void)onVPNStatusDidChange {
-    // Update UI
-    VPNStatus s = [vpnManager VPNStatus];
-    [self updateButtonState];
-    statusLabel.text = [self getVPNStatusDescription:s];
-
-    if (s == VPNStatusConnecting || s == VPNStatusRestarting || s == VPNStatusReasserting) {
-        [self addPulsingHaloLayer];
-    } else {
-        [self removePulsingHaloLayer];
-    }
-
-    // Notify SettingsViewController that the state has changed
-    [[NSNotificationCenter defaultCenter] postNotificationName:kPsiphonConnectionStateNotification object:nil];
-}
-
 - (void)onAdStatusDidChange{
-    adLabel.hidden = ![adManager untunneledInterstitialIsReady];
+    adLabel.hidden = ![self.adManager untunneledInterstitialIsReady];
 }
 
 - (void)onStartStopTap:(UIButton *)sender {
+    
+    __weak MainViewController *weakSelf = self;
+    
+    // signal emits a single two tuple (isVPNActive, connectOnDemandEnabled).
+    __block RACDisposable *disposable = [[[[self.vpnManager isVPNActive]
+      flattenMap:^RACSignal<NSNumber *> *(RACTwoTuple<NSNumber *, NSNumber *> *value) {
 
-    if (![vpnManager isVPNActive]) {
+          // If VPN is already running, checks if ConnectOnDemand is enabled, otherwise returns the result immediately.
+          BOOL isActive = [value.first boolValue];
+          if (isActive) {
+              return [[weakSelf.vpnManager isConnectOnDemandEnabled]
+                      map:^id(NSNumber *connectOnDemandEnabled) {
+                          return [RACTwoTuple pack:@(TRUE) :connectOnDemandEnabled];
+                      }];
+          } else {
+              return [RACSignal return:[RACTwoTuple pack:@(FALSE) :@(FALSE)]];
+          }
+      }]
+      deliverOnMainThread]
+      subscribeNext:^(RACTwoTuple<NSNumber *, NSNumber *> *result) {
 
-        // Alerts the user if there is no internet connection.
-        Reachability *reachability = [Reachability reachabilityForInternetConnection];
-        if ([reachability currentReachabilityStatus] == NotReachable) {
-            [self displayAlertNoInternet];
-        } else {
-            [adManager showUntunneledInterstitial];
-        }
+          // Unpacks the tuple.
+          BOOL isVPNActive = [result.first boolValue];
+          BOOL connectOnDemandEnabled = [result.second boolValue];
 
-    } else {
-        LOG_DEBUG(@"call [vpnManager stopVPN]");
+          if (!isVPNActive) {
+              // Alerts the user if there is no internet connection.
+              Reachability *reachability = [Reachability reachabilityForInternetConnection];
+              if ([reachability currentReachabilityStatus] == NotReachable) {
+                  [weakSelf displayAlertNoInternet];
+              } else {
+                  [weakSelf.adManager showUntunneledInterstitial];
+              }
 
-        if ([vpnManager isOnDemandEnabled]) {
-            // Alert the user that Connect On Demand is enabled, and if they
-            // would like Connect On Demand to be disabled, and the extension to be stopped.
-            NSString *alertTitle = NSLocalizedStringWithDefaultValue(@"CONNECT_ON_DEMAND_ALERT_TITLE", nil, [NSBundle mainBundle], @"Auto-start VPN is enabled", @"Alert dialog title informing user that 'Auto-start VPN' feature is enabled");
-            NSString *alertMessage = NSLocalizedStringWithDefaultValue(@"CONNECT_ON_DEMAND_ALERT_BODY", nil, [NSBundle mainBundle], @"Cannot stop the VPN while \"Auto-start VPN\" is enabled.\nWould you like to disable \"Auto-start VPN\" on demand and stop the VPN?", "Alert dialog body informing the user that the 'Auto-start VPN on demand' feature is enabled and that the VPN cannot be stopped. Followed by asking the user if they would like to disable the 'Auto-start VPN on demand' feature, and stop the VPN.");
+          } else {
 
-            UIAlertController *alert = [UIAlertController
-              alertControllerWithTitle:alertTitle message:alertMessage preferredStyle:UIAlertControllerStyleAlert];
+              if (!connectOnDemandEnabled) {
 
-            UIAlertAction *disableAction = [UIAlertAction
-              actionWithTitle:NSLocalizedStringWithDefaultValue(@"DISABLE_BUTTON", nil, [NSBundle mainBundle], @"Disable Auto-start VPN and Stop", @"Disable Auto-start VPN feature and Stop the VPN button label")
-                        style:UIAlertActionStyleDestructive
-                      handler:^(UIAlertAction *action) {
-                          // Disable "Connect On Demand" and stop the VPN.
-                          [[NSUserDefaults standardUserDefaults] setBool:FALSE forKey:SettingsConnectOnDemandBoolKey];
-                          [vpnManager updateVPNConfigurationOnDemandSetting:FALSE completionHandler:^(NSError *error) {
-                              [vpnManager stopVPN];
+                  [weakSelf.vpnManager stopVPN];
+
+              } else {
+                  // Alert the user that Connect On Demand is enabled, and if they
+                  // would like Connect On Demand to be disabled, and the extension to be stopped.
+                  NSString *alertTitle = NSLocalizedStringWithDefaultValue(@"CONNECT_ON_DEMAND_ALERT_TITLE", nil, [NSBundle mainBundle], @"Auto-start VPN is enabled", @"Alert dialog title informing user that 'Auto-start VPN' feature is enabled");
+                  NSString *alertMessage = NSLocalizedStringWithDefaultValue(@"CONNECT_ON_DEMAND_ALERT_BODY", nil, [NSBundle mainBundle], @"Cannot stop the VPN while \"Auto-start VPN\" is enabled.\nWould you like to disable \"Auto-start VPN\" on demand and stop the VPN?", "Alert dialog body informing the user that the 'Auto-start VPN on demand' feature is enabled and that the VPN cannot be stopped. Followed by asking the user if they would like to disable the 'Auto-start VPN on demand' feature, and stop the VPN.");
+
+                  UIAlertController *alert = [UIAlertController
+                                              alertControllerWithTitle:alertTitle message:alertMessage preferredStyle:UIAlertControllerStyleAlert];
+
+                  UIAlertAction *disableAction = [UIAlertAction
+                    actionWithTitle:NSLocalizedStringWithDefaultValue(@"DISABLE_BUTTON", nil, [NSBundle mainBundle], @"Disable Auto-start VPN and Stop", @"Disable Auto-start VPN feature and Stop the VPN button label")
+                    style:UIAlertActionStyleDestructive
+                    handler:^(UIAlertAction *action) {
+                        // Disable "Connect On Demand" and stop the VPN.
+                        [[NSUserDefaults standardUserDefaults] setBool:FALSE forKey:SettingsConnectOnDemandBoolKey];
+
+                        __block RACDisposable *disposable = [[weakSelf.vpnManager setConnectOnDemandEnabled:FALSE]
+                          subscribeNext:^(NSNumber *x) {
+                              // Stops the VPN only after ConnectOnDemand is disabled.
+                              [weakSelf.vpnManager stopVPN];
+                          } error:^(NSError *error) {
+                              [weakSelf.compoundDisposable removeDisposable:disposable];
+                          }   completed:^{
+                              [weakSelf.compoundDisposable removeDisposable:disposable];
                           }];
-                      }];
 
-            UIAlertAction *cancelAction = [UIAlertAction
-              actionWithTitle:NSLocalizedStringWithDefaultValue(@"CANCEL_BUTTON", nil, [NSBundle mainBundle], @"Cancel", @"Alert Cancel button")
-                        style:UIAlertActionStyleCancel
-                      handler:^(UIAlertAction *action) {
-                        // Do nothing
-                      }];
+                        [weakSelf.compoundDisposable addDisposable:disposable];
+                    }];
 
-            [alert addAction:disableAction];
-            [alert addAction:cancelAction];
-            [self presentViewController:alert animated:TRUE completion:nil];
+                  UIAlertAction *cancelAction = [UIAlertAction
+                                                 actionWithTitle:NSLocalizedStringWithDefaultValue(@"CANCEL_BUTTON", nil, [NSBundle mainBundle], @"Cancel", @"Alert Cancel button")
+                                                 style:UIAlertActionStyleCancel
+                                                 handler:^(UIAlertAction *action) {
+                                                     // Do nothing
+                                                 }];
 
-        } else {
-            [vpnManager stopVPN];
-        }
+                  [alert addAction:disableAction];
+                  [alert addAction:cancelAction];
+                  [self presentViewController:alert animated:TRUE completion:nil];
 
-        [self removePulsingHaloLayer];
-    }
+              }
 
+              [self removePulsingHaloLayer];
+          }
+
+    } error:^(NSError *error) {
+        [weakSelf.compoundDisposable removeDisposable:disposable];
+    }   completed:^{
+        [weakSelf.compoundDisposable removeDisposable:disposable];
+    }];
+    
+    [self.compoundDisposable addDisposable:disposable];
+    
+    // Performs a subscription check, in case the UI gets out of sync with the subscription status.
     [self checkSubscriptionStateAndUpdateUI];
 }
 
@@ -391,28 +490,21 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 - (void)displayAlertNoInternet {
     if (alertControllerNoInternet == nil){
         alertControllerNoInternet = [UIAlertController
-                 alertControllerWithTitle:NSLocalizedStringWithDefaultValue(@"NO_INTERNET", nil, [NSBundle mainBundle], @"No Internet Connection", @"Alert title informing user there is no internet connection")
-                 message:NSLocalizedStringWithDefaultValue(@"TURN_ON_DATE", nil, [NSBundle mainBundle], @"Turn on cellular data or use Wi-Fi to access data.", @"Alert message informing user to turn on their cellular data or wifi to connect to the internet")
-                 preferredStyle:UIAlertControllerStyleAlert];
-
+                                     alertControllerWithTitle:NSLocalizedStringWithDefaultValue(@"NO_INTERNET", nil, [NSBundle mainBundle], @"No Internet Connection", @"Alert title informing user there is no internet connection")
+                                     message:NSLocalizedStringWithDefaultValue(@"TURN_ON_DATE", nil, [NSBundle mainBundle], @"Turn on cellular data or use Wi-Fi to access data.", @"Alert message informing user to turn on their cellular data or wifi to connect to the internet")
+                                     preferredStyle:UIAlertControllerStyleAlert];
+        
         UIAlertAction *defaultAction = [UIAlertAction
                                         actionWithTitle:NSLocalizedStringWithDefaultValue(@"OK_BUTTON", nil, [NSBundle mainBundle], @"OK", @"Alert OK Button")
                                         style:UIAlertActionStyleDefault
                                         handler:^(UIAlertAction *action) {
                                         }];
-
+        
         [alertControllerNoInternet addAction:defaultAction];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(dismissNoInternetAlert) name:@"UIApplicationWillResignActiveNotification" object:nil];
     }
-
+    
     [alertControllerNoInternet presentFromTopController];
-}
-
-- (void)displayCorruptSettingsFileAlert {
-    [UIAlertController presentSimpleAlertWithTitle:NSLocalizedStringWithDefaultValue(@"CORRUPT_SETTINGS_ALERT_TITLE", nil, [NSBundle mainBundle], @"Corrupt Settings", @"Alert dialog title (MainViewController)")
-                                           message:NSLocalizedStringWithDefaultValue(@"CORRUPT_SETTINGS_MESSAGE", nil, [NSBundle mainBundle], @"Your app settings file appears to be corrupt. Try reinstalling the app to repair the file.", @"Alert dialog message informing the user that the settings file in the app is corrupt, and that they can potentially fix this issue by re-installing the app.")
-                                    preferredStyle:UIAlertControllerStyleAlert
-                                         okHandler:nil];
 }
 
 - (NSString *)getVPNStatusDescription:(VPNStatus) status {
@@ -431,9 +523,9 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 
 - (void)setBackgroundGradient {
     backgroundGradient = [CAGradientLayer layer];
-
+    
     backgroundGradient.colors = @[(id)[UIColor colorWithRed:0.17 green:0.17 blue:0.28 alpha:1.0].CGColor, (id)[UIColor colorWithRed:0.28 green:0.36 blue:0.46 alpha:1.0].CGColor];
-
+    
     [self.view.layer insertSublayer:backgroundGradient atIndex:0];
 }
 
@@ -443,18 +535,18 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
         return;
     }
     isStartStopButtonHaloOn = TRUE;
-
+    
     CGFloat radius = (CGFloat) (MIN(self.view.frame.size.width, self.view.frame.size.height) / 2.5);
-
+    
     startStopButtonHalo = [PulsingHaloLayer layer];
     startStopButtonHalo.position = startStopButton.center;
     startStopButtonHalo.radius = radius;
     startStopButtonHalo.backgroundColor =
     [UIColor colorWithRed:0.44 green:0.51 blue:0.58 alpha:1.0].CGColor;
     startStopButtonHalo.haloLayerNumber = 3;
-
+    
     [self.view.layer insertSublayer:startStopButtonHalo below:startStopButton.layer];
-
+    
     [startStopButtonHalo start];
 }
 
@@ -471,9 +563,9 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
  logoView = [[UIImageView alloc] init];
  [logoView setImage:[UIImage imageNamed:@"Logo"]];
  [logoView setTranslatesAutoresizingMaskIntoConstraints:NO];
-
+ 
  [self.view addSubview:logoView];
-
+ 
  // Setup autolayout
  [self.view addConstraint:[NSLayoutConstraint constraintWithItem:logoView
  attribute:NSLayoutAttributeTop
@@ -482,7 +574,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
  attribute:NSLayoutAttributeBottom
  multiplier:1.0
  constant:30]];
-
+ 
  [self.view addConstraint:[NSLayoutConstraint constraintWithItem:logoView
  attribute:NSLayoutAttributeCenterX
  relatedBy:NSLayoutRelationEqual
@@ -506,9 +598,9 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     if ([PsiphonClientCommonLibraryHelpers unsupportedCharactersForFont:appTitleLabel.font.fontName withString:appTitleLabel.text]) {
         appTitleLabel.font = [UIFont systemFontOfSize:narrowestWidth * 0.075f];
     }
-
+    
     [self.view addSubview:appTitleLabel];
-
+    
     // Setup autolayout
     CGFloat labelHeight = [self getLabelHeight:appTitleLabel];
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:appTitleLabel
@@ -518,7 +610,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                                                           attribute:NSLayoutAttributeNotAnAttribute
                                                          multiplier:1.0
                                                            constant:labelHeight]];
-
+    
     NSLayoutConstraint *floatingVerticallyConstraint =[NSLayoutConstraint constraintWithItem:appTitleLabel
                                                                                    attribute:NSLayoutAttributeBottom
                                                                                    relatedBy:NSLayoutRelationEqual
@@ -529,7 +621,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     // This constraint will be broken in case the next constraint can't be enforced
     floatingVerticallyConstraint.priority = 999;
     [self.view addConstraint:floatingVerticallyConstraint];
-
+    
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:appTitleLabel
                                                           attribute:NSLayoutAttributeTop
                                                           relatedBy:NSLayoutRelationGreaterThanOrEqual
@@ -537,7 +629,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                                                           attribute:NSLayoutAttributeTop
                                                          multiplier:1.0
                                                            constant:0.0]];
-
+    
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:appTitleLabel
                                                           attribute:NSLayoutAttributeCenterX
                                                           relatedBy:NSLayoutRelationEqual
@@ -561,9 +653,9 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     if ([PsiphonClientCommonLibraryHelpers unsupportedCharactersForFont:appSubTitleLabel.font.fontName withString:appSubTitleLabel.text]) {
         appSubTitleLabel.font = [UIFont systemFontOfSize:narrowestWidth * 0.075f/2.0f];
     }
-
+    
     [self.view addSubview:appSubTitleLabel];
-
+    
     // Setup autolayout
     CGFloat labelHeight = [self getLabelHeight:appSubTitleLabel];
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:appSubTitleLabel
@@ -573,7 +665,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                                                           attribute:NSLayoutAttributeNotAnAttribute
                                                          multiplier:1.0
                                                            constant:labelHeight]];
-
+    
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:appSubTitleLabel
                                                           attribute:NSLayoutAttributeTop
                                                           relatedBy:NSLayoutRelationEqual
@@ -581,7 +673,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                                                           attribute:NSLayoutAttributeBottom
                                                          multiplier:1.0
                                                            constant:0]];
-
+    
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:appSubTitleLabel
                                                           attribute:NSLayoutAttributeCenterX
                                                           relatedBy:NSLayoutRelationEqual
@@ -598,7 +690,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     [settingsButton setImage:gearTemplate forState:UIControlStateNormal];
     [settingsButton setTintColor:[UIColor whiteColor]];
     [self.view addSubview:settingsButton];
-
+    
     // Setup autolayout
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:settingsButton
                                                           attribute:NSLayoutAttributeCenterY
@@ -607,8 +699,8 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                                                           attribute:NSLayoutAttributeBottom
                                                          multiplier:1.0
                                                            constant:gearTemplate.size.height/2 + 8.f]];
-
-
+    
+    
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:settingsButton
                                                           attribute:NSLayoutAttributeCenterX
                                                           relatedBy:NSLayoutRelationEqual
@@ -616,7 +708,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                                                           attribute:NSLayoutAttributeTrailing
                                                          multiplier:1.0
                                                            constant:-gearTemplate.size.width/2 - 13.f]];
-
+    
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:settingsButton
                                                           attribute:NSLayoutAttributeWidth
                                                           relatedBy:NSLayoutRelationEqual
@@ -624,7 +716,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                                                           attribute:NSLayoutAttributeNotAnAttribute
                                                          multiplier:1.0
                                                            constant:80]];
-
+    
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:settingsButton
                                                           attribute:NSLayoutAttributeHeight
                                                           relatedBy:NSLayoutRelationEqual
@@ -632,16 +724,20 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                                                           attribute:NSLayoutAttributeWidth
                                                          multiplier:1.0
                                                            constant:0.f]];
-
+    
     [settingsButton addTarget:self action:@selector(onSettingsButtonTap:) forControlEvents:UIControlEventTouchUpInside];
 }
 
-- (void)updateButtonState {
-    if ([vpnManager isVPNActive] && ![vpnManager isVPNConnected]) {
+- (void)updateUIConnectionState:(VPNStatus)s {
+    
+    [startStopButton setHighlighted:FALSE];
+    
+    if ([VPNManager mapIsVPNActive:s] && s != VPNStatusConnected) {
         UIImage *connectingButtonImage = [UIImage imageNamed:@"ConnectingButton"];
+        
         [startStopButton setImage:connectingButtonImage forState:UIControlStateNormal];
     }
-    else if ([vpnManager isVPNConnected]) {
+    else if (s == VPNStatusConnected) {
         UIImage *stopButtonImage = [UIImage imageNamed:@"StopButton"];
         [startStopButton setImage:stopButtonImage forState:UIControlStateNormal];
     }
@@ -649,6 +745,8 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
         UIImage *startButtonImage = [UIImage imageNamed:@"StartButton"];
         [startStopButton setImage:startButtonImage forState:UIControlStateNormal];
     }
+    
+    statusLabel.text = [self getVPNStatusDescription:s];
 }
 
 - (void)addStartAndStopButton {
@@ -657,16 +755,15 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     startStopButton.contentHorizontalAlignment = UIControlContentHorizontalAlignmentFill;
     startStopButton.contentVerticalAlignment = UIControlContentVerticalAlignmentFill;
     [startStopButton addTarget:self action:@selector(onStartStopTap:) forControlEvents:UIControlEventTouchUpInside];
-    [self updateButtonState];
-
+    
     // Shadow and Radius
     startStopButton.layer.shadowOffset = CGSizeMake(0, 6.0f);
     startStopButton.layer.shadowOpacity = 0.18f;
     startStopButton.layer.shadowRadius = 0.0f;
     startStopButton.layer.masksToBounds = NO;
-
+    
     [self.view addSubview:startStopButton];
-
+    
     // Setup autolayout
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:startStopButton
                                                           attribute:NSLayoutAttributeCenterX
@@ -675,7 +772,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                                                           attribute:NSLayoutAttributeCenterX
                                                          multiplier:1.0
                                                            constant:0]];
-
+    
     startButtonScreenHeight = [NSLayoutConstraint constraintWithItem:startStopButton
                                                            attribute:NSLayoutAttributeHeight
                                                            relatedBy:NSLayoutRelationEqual
@@ -683,7 +780,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                                                            attribute:NSLayoutAttributeHeight
                                                           multiplier:0.33f
                                                             constant:0];
-
+    
     startButtonScreenWidth = [NSLayoutConstraint constraintWithItem:startStopButton
                                                           attribute:NSLayoutAttributeWidth
                                                           relatedBy:NSLayoutRelationEqual
@@ -691,7 +788,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                                                           attribute:NSLayoutAttributeWidth
                                                          multiplier:0.33f
                                                            constant:0];
-
+    
     startButtonWidth = [NSLayoutConstraint constraintWithItem:startStopButton
                                                     attribute:NSLayoutAttributeHeight
                                                     relatedBy:NSLayoutRelationEqual
@@ -699,15 +796,15 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                                                     attribute:NSLayoutAttributeWidth
                                                    multiplier:1.0
                                                      constant:0];
-
+    
     CGSize viewSize = self.view.bounds.size;
-
+    
     if (viewSize.width > viewSize.height) {
         [self.view addConstraint:startButtonScreenHeight];
     } else {
         [self.view addConstraint:startButtonScreenWidth];
     }
-
+    
     [self.view addConstraint:startButtonWidth];
 }
 
@@ -723,10 +820,10 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                                 fontDescriptorWithSymbolicTraits:UIFontDescriptorTraitItalic];
     adLabel.font = [UIFont fontWithDescriptor:fontD size:adLabel.font.pointSize - 1];
     [self.view addSubview:adLabel];
-    if (![adManager untunneledInterstitialIsReady]){
+    if (![self.adManager untunneledInterstitialIsReady]){
         adLabel.hidden = true;
     }
-
+    
     // Setup autolayout
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:adLabel
                                                           attribute:NSLayoutAttributeBottom
@@ -735,7 +832,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                                                           attribute:NSLayoutAttributeTop
                                                          multiplier:1.0
                                                            constant:-30.0]];
-
+    
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:adLabel
                                                           attribute:NSLayoutAttributeBottom
                                                           relatedBy:NSLayoutRelationLessThanOrEqual
@@ -743,7 +840,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                                                           attribute:NSLayoutAttributeTop
                                                          multiplier:1.0
                                                            constant:-10.0]];
-
+    
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:adLabel
                                                           attribute:NSLayoutAttributeLeft
                                                           relatedBy:NSLayoutRelationEqual
@@ -751,7 +848,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                                                           attribute:NSLayoutAttributeLeft
                                                          multiplier:1.0
                                                            constant:15.0]];
-
+    
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:adLabel
                                                           attribute:NSLayoutAttributeRight
                                                           relatedBy:NSLayoutRelationEqual
@@ -765,11 +862,11 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     statusLabel = [[UILabel alloc] init];
     statusLabel.translatesAutoresizingMaskIntoConstraints = NO;
     statusLabel.adjustsFontSizeToFitWidth = YES;
-    statusLabel.text = [self getVPNStatusDescription:[vpnManager VPNStatus]];
+    statusLabel.text = [self getVPNStatusDescription:(VPNStatus) [[self.vpnManager.lastTunnelStatus first] integerValue]];
     statusLabel.textAlignment = NSTextAlignmentCenter;
     statusLabel.textColor = [UIColor whiteColor];
     [self.view addSubview:statusLabel];
-
+    
     // Setup autolayout
     CGFloat labelHeight = [self getLabelHeight:statusLabel];
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:statusLabel
@@ -779,7 +876,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                                                           attribute:NSLayoutAttributeNotAnAttribute
                                                          multiplier:1.0
                                                            constant:labelHeight]];
-
+    
     NSLayoutConstraint *floatingConstraint = [NSLayoutConstraint constraintWithItem:statusLabel
                                                                           attribute:NSLayoutAttributeTop
                                                                           relatedBy:NSLayoutRelationEqual
@@ -797,8 +894,8 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                                                           attribute:NSLayoutAttributeBottom
                                                          multiplier:1.0
                                                            constant:1]];
-
-
+    
+    
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:statusLabel
                                                           attribute:NSLayoutAttributeTop
                                                           relatedBy:NSLayoutRelationLessThanOrEqual
@@ -806,7 +903,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                                                           attribute:NSLayoutAttributeBottom
                                                          multiplier:1.0
                                                            constant:15]];
-
+    
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:statusLabel
                                                           attribute:NSLayoutAttributeCenterX
                                                           relatedBy:NSLayoutRelationEqual
@@ -825,9 +922,9 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     bottomBar = [[UIView alloc] init];
     bottomBar.translatesAutoresizingMaskIntoConstraints = NO;
     bottomBar.backgroundColor = [UIColor whiteColor];
-
+    
     [self.view addSubview:bottomBar];
-
+    
     // Setup autolayout
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:bottomBar
                                                           attribute:NSLayoutAttributeBottom
@@ -836,7 +933,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                                                           attribute:NSLayoutAttributeBottom
                                                          multiplier:1.0
                                                            constant:0]];
-
+    
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:bottomBar
                                                           attribute:NSLayoutAttributeLeading
                                                           relatedBy:NSLayoutRelationEqual
@@ -844,7 +941,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                                                           attribute:NSLayoutAttributeLeading
                                                          multiplier:1.0
                                                            constant:0]];
-
+    
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:bottomBar
                                                           attribute:NSLayoutAttributeTrailing
                                                           relatedBy:NSLayoutRelationEqual
@@ -862,7 +959,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     regionButtonHeader.adjustsFontSizeToFitWidth = NO;
     regionButtonHeader.font = [regionButtonHeader.font fontWithSize:14];
     [bottomBar addSubview:regionButtonHeader];
-
+    
     // Restrict label's height to the actual size
     CGFloat labelHeight = [self getLabelHeight:regionButtonHeader];
     [regionButtonHeader addConstraint:[NSLayoutConstraint constraintWithItem:regionButtonHeader
@@ -872,12 +969,12 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                                                                    attribute:NSLayoutAttributeNotAnAttribute
                                                                   multiplier:1.0
                                                                     constant:labelHeight]];
-
-
+    
+    
     // Now the button
     regionButton = [[UIButton alloc] init];
     regionButton.translatesAutoresizingMaskIntoConstraints = NO;
-
+    
     CGFloat buttonHeight = 45;
     regionButton.layer.borderColor = [UIColor lightGrayColor].CGColor;
     regionButton.layer.borderWidth = 1.f;
@@ -886,10 +983,10 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     [regionButton setTitleColor:[UIColor lightGrayColor] forState:UIControlStateHighlighted];
     regionButton.titleLabel.font = [UIFont systemFontOfSize:regionButton.titleLabel.font.pointSize weight:UIFontWeightLight];
     regionButton.titleLabel.adjustsFontSizeToFitWidth = YES;
-
+    
     CGFloat spacing = 10; // the amount of spacing to appear between image and title
     CGFloat spacingFromSides = 10.f;
-
+    
     BOOL isRTL = [self isRightToLeft];
     regionButton.imageEdgeInsets = UIEdgeInsetsMake(0, 0, 0, isRTL ? -spacing : spacing);
     regionButton.titleEdgeInsets = UIEdgeInsetsMake(0, isRTL ? -spacing : spacing, 0, 0);
@@ -917,16 +1014,16 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     versionLabel.userInteractionEnabled = YES;
     versionLabel.textColor = [UIColor whiteColor];
     versionLabel.font = [versionLabel.font fontWithSize:13];
-
+    
 #if DEBUG
     UITapGestureRecognizer *tapRecognizer = [[UITapGestureRecognizer alloc]
                                              initWithTarget:self action:@selector(onVersionLabelTap:)];
     tapRecognizer.numberOfTapsRequired = 1;
     [versionLabel addGestureRecognizer:tapRecognizer];
 #endif
-
+    
     [self.view addSubview:versionLabel];
-
+    
     // Setup autolayout
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:versionLabel
                                                           attribute:NSLayoutAttributeLeading
@@ -935,7 +1032,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                                                           attribute:NSLayoutAttributeLeading
                                                          multiplier:1.0
                                                            constant:10.0]];
-
+    
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:versionLabel
                                                           attribute:NSLayoutAttributeCenterY
                                                           relatedBy:NSLayoutRelationEqual
@@ -943,7 +1040,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                                                           attribute:NSLayoutAttributeCenterY
                                                          multiplier:1.0
                                                            constant:0]];
-
+    
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:versionLabel
                                                           attribute:NSLayoutAttributeHeight
                                                           relatedBy:NSLayoutRelationEqual
@@ -960,9 +1057,9 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     [subscriptionButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
     subscriptionButton.titleLabel.font = [UIFont boldSystemFontOfSize:subscriptionButton.titleLabel.font.pointSize];
     subscriptionButton.backgroundColor = [[UIColor alloc] initWithRed:42.0/255 green:157.0/255 blue:242.0/255 alpha:1];
-
+    
     subscriptionButton.contentEdgeInsets = UIEdgeInsetsMake(10.0f, 30.0f, 10.0f, 30.0f);
-
+    
     NSString *subscriptionButtonTitle = NSLocalizedStringWithDefaultValue(@"SUBSCRIPTION_BUTTON_TITLE",
                                                                           nil,
                                                                           [NSBundle mainBundle],
@@ -972,7 +1069,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     [subscriptionButton addTarget:self action:@selector(onSubscriptionTap) forControlEvents:UIControlEventTouchUpInside];
     subscriptionButton.translatesAutoresizingMaskIntoConstraints = NO;
     [self.view addSubview:subscriptionButton];
-
+    
     // Setup autolayout
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:subscriptionButton
                                                           attribute:NSLayoutAttributeHeight
@@ -981,7 +1078,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                                                           attribute:NSLayoutAttributeNotAnAttribute
                                                          multiplier:1.0
                                                            constant:40]];
-
+    
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:subscriptionButton
                                                           attribute:NSLayoutAttributeCenterX
                                                           relatedBy:NSLayoutRelationEqual
@@ -998,129 +1095,14 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                                                            constant:-10]];
 }
 
-#pragma mark - TunneledAppDelegate methods
-
-- (void)onDiagnosticMessage:(NSString *_Nonnull)message withTimestamp:(NSString *_Nonnull)timestamp {
-    [PsiFeedbackLogger logNoticeWithType:@"FeedbackUpload" message:message timestamp:timestamp];
-}
-
-/*!
- * If Psiphon config string could no be created, corrupt message alert is displayed
- * to the user.
- * This method can be called from background-thread.
- * @return Psiphon config string, or nil of config string could not be created.
- */
-- (NSString * _Nullable)getPsiphonConfig {
-    NSString *bundledConfigStr = [PsiphonClientCommonLibraryHelpers getPsiphonBundledConfig];
-
-    // Always parses the config string to ensure its valid, even the config string will not be modified.
-    NSData *jsonData = [bundledConfigStr dataUsingEncoding:NSUTF8StringEncoding];
-    NSError *err = nil;
-    NSDictionary *readOnly = [NSJSONSerialization JSONObjectWithData:jsonData options:kNilOptions error:&err];
-
-    // Return bundled config as is if user doesn't have an active subscription
-    if(![IAPStoreHelper hasActiveSubscriptionForNow] && !err) {
-        return bundledConfigStr;
-    }
-
-    // Otherwise override sponsor ID
-    if (err) {
-        [PsiFeedbackLogger error:@"%@", [NSString stringWithFormat:@"Failed to parse config JSON: %@", err.description]];
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [self displayCorruptSettingsFileAlert];
-        });
-        return nil;
-    }
-
-    NSMutableDictionary *mutableConfigCopy = [readOnly mutableCopy];
-
-    NSDictionary *readOnlySubscriptionConfig = readOnly[@"subscriptionConfig"];
-    if(readOnlySubscriptionConfig && readOnlySubscriptionConfig[@"SponsorId"]) {
-        mutableConfigCopy[@"SponsorId"] = readOnlySubscriptionConfig[@"SponsorId"];
-    }
-
-#if DEBUG
-    // Ensure diagnostic notices are emitted when debugging
-    mutableConfigCopy[@"EmitDiagnosticNotices"] = [NSNumber numberWithBool:YES];
-#endif
-
-    jsonData  = [NSJSONSerialization dataWithJSONObject:mutableConfigCopy options:0 error:&err];
-
-    if (err) {
-        [PsiFeedbackLogger error:@"%@", [NSString stringWithFormat:@"Failed to create JSON data from config object: %@", err.description]];
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [self displayCorruptSettingsFileAlert];
-        });
-        return nil;
-    }
-
-    return [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
-}
-
-- (NSString * _Nullable)getEmbeddedServerEntries {
-    return nil;
-}
-
 #pragma mark - FeedbackViewControllerDelegate methods and helpers
 
 - (void)userSubmittedFeedback:(NSUInteger)selectedThumbIndex comments:(NSString *)comments email:(NSString *)email uploadDiagnostics:(BOOL)uploadDiagnostics {
-    // Ensure psiphon data is populated with latest logs
-    // TODO: should this be a delegate method of Psiphon Data in shared library/
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-
-        NSString *psiphonConfig = [self getPsiphonConfig];
-        if (!psiphonConfig) {
-            // Corrupt settings file. Return early.
-            return;
-        }
-
-        NSArray<DiagnosticEntry *> *diagnosticEntries = [sharedDB getAllLogs];
-
-        __weak MainViewController *weakSelf = self;
-        SendFeedbackHandler sendFeedbackHandler = ^(NSString *jsonString, NSString *pubKey, NSString *uploadServer, NSString *uploadServerHeaders){
-            PsiphonTunnel *inactiveTunnel = [PsiphonTunnel newPsiphonTunnel:weakSelf]; // TODO: we need to update PsiphonTunnel framework not require this and fix this warning
-            [inactiveTunnel sendFeedback:jsonString publicKey:pubKey uploadServer:uploadServer uploadServerHeaders:uploadServerHeaders];
-        };
-
-        [FeedbackUpload generateAndSendFeedback:selectedThumbIndex
-                                      buildInfo:[PsiphonTunnel getBuildInfo]
-                                       comments:comments
-                                          email:email
-                             sendDiagnosticInfo:uploadDiagnostics
-                              withPsiphonConfig:psiphonConfig
-                             withClientPlatform:@"ios-vpn"
-                             withConnectionType:[self getConnectionType]
-                                   isJailbroken:[JailbreakCheck isDeviceJailbroken]
-                            sendFeedbackHandler:sendFeedbackHandler
-                              diagnosticEntries:diagnosticEntries];
-    });
+    [feedbackManager userSubmittedFeedback:selectedThumbIndex comments:comments email:email uploadDiagnostics:uploadDiagnostics];
 }
 
 - (void)userPressedURL:(NSURL *)URL {
     [[UIApplication sharedApplication] openURL:URL options:@{} completionHandler:nil];
-}
-
-// Get connection type for feedback
-- (NSString*)getConnectionType {
-
-    Reachability *reachability = [Reachability reachabilityForInternetConnection];
-
-    NetworkStatus status = [reachability currentReachabilityStatus];
-
-    if(status == NotReachable)
-        {
-        return @"none";
-        }
-    else if (status == ReachableViaWiFi)
-        {
-        return @"WIFI";
-        }
-    else if (status == ReachableViaWWAN)
-        {
-        return @"mobile";
-        }
-
-    return @"error";
 }
 
 #pragma mark - PsiphonSettingsViewControllerDelegate methods and helpers
@@ -1141,7 +1123,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 - (void)settingsWillDismissWithForceReconnect:(BOOL)forceReconnect {
     if (forceReconnect) {
         [self persistSettingsToSharedUserDefaults];
-        [vpnManager restartVPNIfActive];
+        [self.vpnManager restartVPNIfActive];
     }
 }
 
@@ -1174,12 +1156,15 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 }
 
 - (NSArray<NSString*>*)hiddenSpecifierKeys {
-    VPNStatus status = [vpnManager VPNStatus];
-    if (status == VPNStatusInvalid ||
-        status == VPNStatusDisconnected ||
-        status == VPNStatusDisconnecting) {
+    
+    VPNStatus s = (VPNStatus) [[self.vpnManager.lastTunnelStatus first] integerValue];
+    
+    if (s == VPNStatusInvalid ||
+        s == VPNStatusDisconnected ||
+        s == VPNStatusDisconnecting ) {
         return @[kForceReconnect, kForceReconnectFooter];
     }
+    
     return nil;
 }
 
@@ -1193,7 +1178,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     appSettingsViewController.neverShowPrivacySettings = YES;
     appSettingsViewController.settingsDelegate = self;
     appSettingsViewController.preferencesSnapshot = [[[NSUserDefaults standardUserDefaults] dictionaryRepresentation] copy];
-
+    
     UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:appSettingsViewController];
     [self presentViewController:navController animated:YES completion:nil];
 }
@@ -1208,7 +1193,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                                                                    style:UIBarButtonItemStyleDone target:self
                                                                   action:@selector(regionSelectionDidEnd)];
     regionSelectionViewController.navigationItem.rightBarButtonItem = doneButton;
-
+    
     [self presentViewController:regionSelectionNavController animated:YES completion:nil];
 }
 
@@ -1217,7 +1202,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     if (!safeStringsEqual(selectedRegion, selectedRegionSnapShot)) {
         [self persistSelectedRegion];
         [self updateRegionButton];
-        [vpnManager restartVPNIfActive];
+        [self.vpnManager restartVPNIfActive];
     }
     [regionSelectionNavController dismissViewControllerAnimated:YES completion:nil];
     regionSelectionNavController = nil;
@@ -1244,7 +1229,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     Region *selectedRegion = [[RegionAdapter sharedInstance] getSelectedRegion];
     UIImage *flag = [[PsiphonClientCommonLibraryHelpers imageFromCommonLibraryNamed:selectedRegion.flagResourceId] countryFlag];
     [regionButton setImage:flag forState:UIControlStateNormal];
-
+    
     NSString *regionText = [[RegionAdapter sharedInstance] getLocalizedRegionTitle:selectedRegion.code];
     [regionButton setTitle:regionText forState:UIControlStateNormal];
 }
@@ -1260,7 +1245,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                                                               attribute:NSLayoutAttributeBottom
                                                              multiplier:1.0
                                                                constant:-7]];
-
+        
         [bottomBar addConstraint:[NSLayoutConstraint constraintWithItem:regionButton
                                                               attribute:NSLayoutAttributeTop
                                                               relatedBy:NSLayoutRelationEqual
@@ -1268,7 +1253,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                                                               attribute:NSLayoutAttributeTop
                                                              multiplier:1.0
                                                                constant:7]];
-
+        
         [bottomBar addConstraint:[NSLayoutConstraint constraintWithItem:regionButton
                                                               attribute:NSLayoutAttributeCenterX
                                                               relatedBy:NSLayoutRelationEqual
@@ -1276,7 +1261,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                                                               attribute:NSLayoutAttributeCenterX
                                                              multiplier:1.0
                                                                constant:0]];
-
+        
         [bottomBar addConstraint:[NSLayoutConstraint constraintWithItem:regionButtonHeader
                                                               attribute:NSLayoutAttributeCenterY
                                                               relatedBy:NSLayoutRelationEqual
@@ -1284,7 +1269,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                                                               attribute:NSLayoutAttributeCenterY
                                                              multiplier:1.0
                                                                constant:0]];
-
+        
         [bottomBar addConstraint:[NSLayoutConstraint constraintWithItem:regionButtonHeader
                                                               attribute:NSLayoutAttributeTrailing
                                                               relatedBy:NSLayoutRelationEqual
@@ -1301,7 +1286,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                                                               attribute:NSLayoutAttributeTop
                                                              multiplier:1.0
                                                                constant:5]];
-
+        
         [bottomBar addConstraint:[NSLayoutConstraint constraintWithItem:regionButtonHeader
                                                               attribute:NSLayoutAttributeCenterX
                                                               relatedBy:NSLayoutRelationEqual
@@ -1309,8 +1294,8 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                                                               attribute:NSLayoutAttributeCenterX
                                                              multiplier:1.0
                                                                constant:0]];
-
-
+        
+        
         [bottomBar addConstraint:[NSLayoutConstraint constraintWithItem:regionButton
                                                               attribute:NSLayoutAttributeBottom
                                                               relatedBy:NSLayoutRelationEqual
@@ -1318,7 +1303,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                                                               attribute:NSLayoutAttributeBottom
                                                              multiplier:1.0
                                                                constant:-7]];
-
+        
         [bottomBar addConstraint:[NSLayoutConstraint constraintWithItem:regionButton
                                                               attribute:NSLayoutAttributeTop
                                                               relatedBy:NSLayoutRelationEqual
@@ -1326,7 +1311,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                                                               attribute:NSLayoutAttributeBottom
                                                              multiplier:1.0
                                                                constant:7]];
-
+        
         [bottomBar addConstraint:[NSLayoutConstraint constraintWithItem:regionButton
                                                               attribute:NSLayoutAttributeCenterX
                                                               relatedBy:NSLayoutRelationEqual
@@ -1334,7 +1319,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                                                               attribute:NSLayoutAttributeCenterX
                                                              multiplier:1.0
                                                                constant:0]];
-
+        
         NSLayoutConstraint *widthConstraint = [NSLayoutConstraint constraintWithItem:regionButton
                                                                            attribute:NSLayoutAttributeWidth
                                                                            relatedBy:NSLayoutRelationEqual
@@ -1344,7 +1329,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                                                                             constant:0];
         widthConstraint.priority = 999; // allow constraint to be broken to enforce max width
         [bottomBar addConstraint:widthConstraint];
-
+        
         [bottomBar addConstraint:[NSLayoutConstraint constraintWithItem:regionButton
                                                               attribute:NSLayoutAttributeWidth
                                                               relatedBy:NSLayoutRelationLessThanOrEqual
@@ -1359,15 +1344,15 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 - (CGFloat)getLabelHeight:(UILabel*)label {
     CGSize constraint = CGSizeMake(label.frame.size.width, CGFLOAT_MAX);
     CGSize size;
-
+    
     NSStringDrawingContext *context = [[NSStringDrawingContext alloc] init];
     CGSize boundingBox = [label.text boundingRectWithSize:constraint
                                                   options:NSStringDrawingUsesLineFragmentOrigin
                                                attributes:@{NSFontAttributeName:label.font}
                                                   context:context].size;
-
+    
     size = CGSizeMake(ceil(boundingBox.width), ceil(boundingBox.height));
-
+    
     return size.height;
 }
 
@@ -1375,17 +1360,17 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     // setup layout equal distribution
     UILayoutGuide *topSpacerGuide = [UILayoutGuide new];
     UILayoutGuide *bottomSpacerGuide = [UILayoutGuide new];
-
+    
     [self.view addLayoutGuide:topSpacerGuide];
     [self.view addLayoutGuide:bottomSpacerGuide];
-
+    
     [topSpacerGuide.heightAnchor constraintGreaterThanOrEqualToConstant:.1].active = YES;
     [bottomSpacerGuide.heightAnchor constraintEqualToAnchor:topSpacerGuide.heightAnchor].active = YES;
-
+    
     [topSpacerGuide.topAnchor constraintEqualToAnchor:appSubTitleLabel.bottomAnchor].active = YES;
     [topSpacerGuide.bottomAnchor constraintEqualToAnchor:startStopButton.topAnchor].active = YES;
     [bottomSpacerGuide.topAnchor constraintEqualToAnchor:statusLabel.bottomAnchor].active = YES;
-
+    
     bottomBarTop = [bottomSpacerGuide.bottomAnchor constraintEqualToAnchor:bottomBar.topAnchor];
     subscriptionButtonTop = [bottomSpacerGuide.bottomAnchor constraintEqualToAnchor:subscriptionButton.topAnchor];
 }
@@ -1400,7 +1385,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
         bottomBarTop.active = YES;
     } else {
         subscriptionButton.hidden = NO;
-        adLabel.hidden = ![adManager untunneledInterstitialIsReady];
+        adLabel.hidden = ![self.adManager untunneledInterstitialIsReady];
         bottomBarTop.active = NO;
         subscriptionButtonTop.active = YES;
     }
@@ -1415,7 +1400,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 
 - (void)checkSubscriptionStateAndUpdateUI {
     __weak MainViewController *weakSelf = self;
-
+    
     [IAPStoreHelper hasActiveSubscriptionForNowOnBlock:^(BOOL isActive) {
         [weakSelf updateSubscriptionUIWithSubscribedState:isActive];
     }];

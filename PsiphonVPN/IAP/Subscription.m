@@ -27,6 +27,7 @@
 #import "PsiFeedbackLogger.h"
 #import "Logging.h"
 #import "Asserts.h"
+#import "RACCompoundDisposable.h"
 
 NSErrorDomain _Nonnull const ReceiptValidationErrorDomain = @"PsiphonReceiptValidationErrorDomain";
 
@@ -37,14 +38,20 @@ NSErrorDomain _Nonnull const ReceiptValidationErrorDomain = @"PsiphonReceiptVali
 + (RACSignal<NSDictionary *> *)updateSubscriptionAuthorizationTokenFromRemote {
     return [RACSignal createSignal:^RACDisposable *(id <RACSubscriber> subscriber) {
 
+        // This object holds a reference to the current scheduler, in order to schedule
+        // the events sent to the subscriber on the same scheduler it is subscribed on,
+        // since the callback from `SubscriptionVerifierService startWithCompletionHandler`
+        // is executed on an operation queue managed by the system.
         PSIAssert(RACScheduler.currentScheduler != nil);
         RACScheduler *scheduler = RACScheduler.currentScheduler;
+
+        RACCompoundDisposable *compoundDisposable = [RACCompoundDisposable compoundDisposable];
 
         SubscriptionVerifierService *service = [[SubscriptionVerifierService alloc] init];
         [service startWithCompletionHandler:^(NSDictionary *remoteAuthDict, NSNumber *submittedReceiptFileSize, NSError *error) {
 
             // Schedule subscription events on the same scheduler this signal was subscribed on.
-            [scheduler schedule:^{
+            RACDisposable *schedulingDisposable = [scheduler schedule:^{
                 if (error) {
                     [subscriber sendError:error];
                 } else {
@@ -52,14 +59,17 @@ NSErrorDomain _Nonnull const ReceiptValidationErrorDomain = @"PsiphonReceiptVali
                     [subscriber sendCompleted];
                 }
             }];
+
+            [compoundDisposable addDisposable:schedulingDisposable];
         }];
 
-        return [RACDisposable disposableWithBlock:^{
+        [compoundDisposable addDisposable:[RACDisposable disposableWithBlock:^{
             @autoreleasepool {
                 [service cancel];
             }
-        }];
+        }]];
 
+        return compoundDisposable;
     }];
 }
 

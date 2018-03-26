@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, Psiphon Inc.
+ * Copyright (c) 2018, Psiphon Inc.
  * All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -19,47 +19,28 @@
 
 #import <Foundation/Foundation.h>
 
-/**
- * NSNotification name for VPN status change notifications.
- * Notification with this name might be posted many times,
- * without an actual change to the VPN status.
- */
-FOUNDATION_EXPORT NSNotificationName _Nonnull const VPNManagerStatusDidChangeNotification;
+NS_ASSUME_NONNULL_BEGIN
 
-/**
- * NSNotification name for VPN start failures.
- */
-FOUNDATION_EXPORT NSNotificationName _Nonnull const VPNManagerVPNStartDidFailNotification;
+@class RACReplaySubject<ValueType>;
+@class RACSignal<__covariant ValueType>;
+@class RACTwoTuple<__covariant First, __covariant Second>;
 
+FOUNDATION_EXPORT NSErrorDomain const VPNManagerErrorDomain;
 
-FOUNDATION_EXPORT NSErrorDomain _Nonnull const VPNManagerErrorDomain;
-
-/**
- * @typedef VPNManagerErrorCode
- * @abstract VPNManager error codes
- */
-typedef NS_ERROR_ENUM(VPNManagerErrorDomain, VPNManagerStartErrorCode) {
+typedef NS_ERROR_ENUM(VPNManagerErrorDomain, VPNManagerConfigErrorCode) {
     /*! @const VPNManagerStartErrorConfigLoadFailed Failed to load VPN configurations. */
-    VPNManagerStartErrorConfigLoadFailed = 1,
+    VPNManagerConfigErrorLoadFailed = 100,
     /*! @const VPNManagerStartErrorTooManyConfigsFounds More than expected VPN configurations found. */
-    VPNManagerStartErrorTooManyConfigsFounds = 2,
+    VPNManagerConfigErrorTooManyConfigsFounds = 101,
     /*! @const VPNManagerStartErrorConfigSaveFailed Failed to save VPN configuration. */
-    VPNManagerStartErrorConfigSaveFailed = 3,
-    /*! @const VPNManagerStartErrorNEStartFailed Failed to start VPN. */
-    VPNManagerStartErrorNEStartFailed = 4,
+    VPNManagerConfigErrorConfigSaveFailed = 102,
 };
 
-#define VPNQueryErrorUserInfoQueryKey @"query"
+typedef NS_ERROR_ENUM(VPNManagerErrorDomain, VPNManagerQueryErrorCode) {
 
-FOUNDATION_EXPORT NSErrorDomain _Nonnull const VPNQueryErrorDomain;
+    VPNManagerQuerySendFailed = 200,
 
-/**
- * @typedef VPNQueryErrorCode
- * @abstract VPN query error codes
- */
-typedef NS_ERROR_ENUM(VPNQueryErrorDomain, VPNQueryErrorCode) {
-    VPNQueryErrorSendFailed = 1,
-    VPNQueryErrorNilResponse = 2,
+    VPNManagerQueryNilResponse = 201,
 };
 
 /**
@@ -70,32 +51,54 @@ typedef NS_ERROR_ENUM(VPNQueryErrorDomain, VPNQueryErrorCode) {
  */
 typedef NS_ENUM(NSInteger, VPNStatus) {
     /*! @const VPNStatusInvalid The VPN is not configured or unexpected vpn state. */
-    VPNStatusInvalid = 0,
+      VPNStatusInvalid = 0,
     /*! @const VPNStatusDisconnected No network extension process is running (When restarting VPNManager status will be VPNStatusRestarting). */
-    VPNStatusDisconnected = 1,
+      VPNStatusDisconnected = 1,
     /*! @const VPNStatusConnecting Network extension process is running, and the tunnel has started (tunnel could be in connecting or connected state). */
-    VPNStatusConnecting = 2,
+      VPNStatusConnecting = 2,
     /*! @const VPNStatusConnected Network extension process is running and the tunnel is connected. */
-    VPNStatusConnected = 3,
+      VPNStatusConnected = 3,
     /*! @const VPNStatusReasserting Network extension process is running, and the tunnel is reconnecting or has already connected. */
-    VPNStatusReasserting = 4,
+      VPNStatusReasserting = 4,
     /*! @const VPNStatusDisconnecting The tunnel and the network extension process are being stopped. */
-    VPNStatusDisconnecting = 5,
+      VPNStatusDisconnecting = 5,
     /*! @const VPNStatusRestarting Stopping previous network extension process, and starting a new one. */
-    VPNStatusRestarting = 6,
+      VPNStatusRestarting = 6,
 };
 
-/**
- * @interface VPNManager
- * @discussion The VPNManager class is the single point of interaction with the Network Extension.
- * @attention VPNManager is not thread-safe.
- */
+typedef NS_ENUM(NSInteger, VPNStartStatus) {
+    /*! @const VPNStartStatusStart The VPN start process has started. */
+    VPNStartStatusStart,
+    /*! @const VPNStartStatusFinished The VPN start process has finished successfully. */
+    VPNStartStatusFinished,
+    /*! @const VPNStartStatusFailedUserPermissionDenied The VPN start process failed due to user denying installation of a VPN configuration. */
+    VPNStartStatusFailedUserPermissionDenied,
+    /*! @const VPNStartStatusFailedOther The VPN start process failed due to any reason other than user denying permission. */
+    VPNStartStatusFailedOther
+};
+
 @interface VPNManager : NSObject
 
-// TODO: remove UI flags and elements from VPNManager
-@property (nonatomic) BOOL startStopButtonPressed;
+/**
+ * vpnStartStatus replay subject emits one of VPNStartStatus enums,
+ * from when startTunnel is called to when it finishes.
+ *
+ * @scheduler vpnStartStatus delivers its events on the main thread.
+ */
+@property (nonatomic, readonly) RACSignal<NSNumber *> *vpnStartStatus;
 
-+ (instancetype _Nullable)sharedInstance;
+/**
+ * Emits the last know VPN status (type VPNStatus).
+ * This replay subject is never empty and starts with `VPNStatusInvalid`,
+ * until the VPN configuration is loaded (if any).
+ *
+ * @attention This observable may not emit the latest VPN status when subscribed to.
+ *
+ * @scheduler lastTunnelStatus delivers its events on the main thread.
+ */
+@property (nonatomic, readonly) RACReplaySubject<NSNumber *> *lastTunnelStatus;
+
++ (VPNManager *)sharedInstance;
 
 /**
  * Starts the Network Extension process and also the tunnel.
@@ -113,56 +116,70 @@ typedef NS_ENUM(NSInteger, VPNStatus) {
 - (void)startVPN;
 
 /**
+ * Stops the tunnel and stops the network extension process.
+ */
+- (void)stopVPN;
+
+/**
  * Restarts the the network extension if already active.
  * Note: If no network extension process is running nothing happens.
  */
 - (void)restartVPNIfActive;
 
 /**
- * Stops the tunnel and stops the network extension process.
+ * Returns TRUE if VPNStatus is in an active state.
+ *
+ * @details VPN state is considered active if it is one of the following: `VPNStatusConnecting`, `VPNStatusConnected`,
+ *          `VPNStatusReasserting` and `VPNStatusRestarting`.
+ * @param s VPN status.
+ * @return TRUE if status `s` is considered active, FALSE otherwise.
  */
-- (void)stopVPN;
++ (BOOL)mapIsVPNActive:(VPNStatus)s;
 
 /**
- * @return VPNManager status reflect NEVPNStatus of NEVPNManager
- * with the addition of a VPNStatusRestarting status.
+ * isVPNActive signal when subscribed to, emits a RACTwoTuple of (is vpn active, vpn status),
+ * and then completes.
+ *
+ * If no VPN configuration was previously saved, it emits `(FALSE, VPNStatusInvalid)` tuple.
+ *
+ * @scheduler isVPNActive delivers its events on a background thread.
+ *
  */
-- (VPNStatus)VPNStatus;
+- (RACSignal<RACTwoTuple<NSNumber *, NSNumber *> *> *)isVPNActive;
 
 /**
- * @return TRUE if the VPN is in the Connecting, Connected or Reasserting state.
+ * isConnectOnDemandEnabled signal when subscribed to emits TRUE as NSNumber
+ * if the VPN configuration's Connect On Demand is enabled, emits FALSE otherwise.
+ *
+ * @scheduler isConnectOnDemandEnabled delivers its events on a background thread.
  */
-- (BOOL)isVPNActive;
-
-/**
- * @return TRUE if the VPN is in the Connected state.
- */
-- (BOOL)isVPNConnected;
-
-/**
- * Whether or not VPN configuration onDemand is enabled or not.
- * @return TRUE if enabled, FALSE otherwise.
- */
-- (BOOL)isOnDemandEnabled;
+- (RACSignal<NSNumber *> *)isConnectOnDemandEnabled;
 
 /**
  * Updates and saves VPN configuration Connect On Demand.
+ *
+ * The returned signal emits TRUE as NSNumber if succeeded, FALSE otherwise, and the completes.
+ * All internal errors are caught, and instead FALSE is emitted.
+ *
  * @param onDemandEnabled Toggle VPN configuration Connect On Demand capability.
- * @param completionHandler Block called after operation completes. error is set to nil if operation finished successfully.
+ *
+ * @scheduler setConnectOnDemandEnabled: delivers its events on a background thread.
  */
-- (void)updateVPNConfigurationOnDemandSetting:(BOOL)onDemandEnabled completionHandler:(void (^_Nonnull)(NSError * _Nullable error))completionHandler;
+- (RACSignal<NSNumber *> *)setConnectOnDemandEnabled:(BOOL)onDemandEnabled;
 
 /**
  * Kills extension if it's a zombie.
  */
 - (void)killExtensionIfZombie;
 
-#pragma mark - Extension query methods
-
 /**
  * Queries the Network Extension whether Psiphon tunnel is in connected state or not.
  * @param completionHandler Called with tunnelIsConnected set to TRUE if Psiphon tunnel is connected, FALSE otherwise.
+ *
+ * @scheduler isPsiphonTunnelConnected: delivers its events on a background thread
  */
-- (void)queryNEIsTunnelConnected:(void (^ _Nonnull)(BOOL tunnelIsConnected))completionHandler;
+- (RACSignal<NSNumber *> *)isPsiphonTunnelConnected;
 
 @end
+
+NS_ASSUME_NONNULL_END
