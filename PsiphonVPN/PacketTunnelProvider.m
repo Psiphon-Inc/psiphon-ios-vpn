@@ -224,7 +224,7 @@ typedef NS_ENUM(NSInteger, GracePeriodState) {
     // tunnelConnectedSignal is an infinite signal that emits an item whenever Psiphon tunnel is connected.
     RACSignal *tunnelConnectedSignal = [self->tunnelConnectionStateSubject
       filter:^BOOL(NSNumber *x) {
-        return (PsiphonConnectionState)[x integerValue] == PsiphonConnectionStateConnected;
+        return [x integerValue] == PsiphonConnectionStateConnected;
     }];
 
     // subscriptionCheckSignal is a finite signal that emits an item of type SubscriptionCheckEnum.

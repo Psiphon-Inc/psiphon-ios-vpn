@@ -94,6 +94,9 @@
 /* Alert message informing the user they should open the app to finish connecting to the VPN. DO NOT translate 'Psiphon'. */
 "OPEN_PSIPHON_APP" = "Please open Psiphon app to finish connecting.";
 
+/* External link to the privacy policy page. Please update this with the correct language specific link (if available) e.g. https://psiphon.ca/fr/privacy.html for french. */
+"PRIVACY_POLICY_URL" = "https://psiphon.ca/en/privacy.html";
+
 /* Refresh app receipt button title */
 "REFRESH_APP_RECEIPT_BUTTON_TITLE" = "Refresh app receipt";
 
@@ -132,6 +135,15 @@
 
 /* Alert dialog title indicating to the user that Psiphon was unable to start (MainViewController) */
 "VPN_START_FAIL_TITLE" = "Unable to start";
+
+/* ('Privacy Policy' should be the same translation as privacy policy button VPN_START_PRIVACY_POLICY_BUTTON), (Do not translate 'VPN profile'), (Do not translate 'Psiphon') */
+"VPN_START_PERMISSION_DENIED_MESSAGE" = "Psiphon needs your permission to install a VPN profile in order to connect.\n\nPsiphon is committed to protecting the privacy of our users. You can review our privacy policy by tapping \"Privacy Policy\".";
+
+/* Alert dialog title indicating to the user that Psiphon needs their permission */
+"VPN_START_PERMISSION_REQUIRED_TITLE" = "Permission required";
+
+/* Button label taking user's to our Privacy Policy page */
+"VPN_START_PRIVACY_POLICY_BUTTON" = "Privacy Policy";
 
 /* Status when the VPN is connected to a Psiphon server */
 "VPN_STATUS_CONNECTED" = "Connected";

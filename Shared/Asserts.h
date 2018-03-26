@@ -38,13 +38,13 @@
 
 #define PSIAssert(X)                                                                                                   \
     if (!(X)) {                                                                                                        \
-        [PsiFeedbackLogger error:@"%s Assertion failed: %s", __PRETTY_FUNCTION__, CONVERT_EXPR_TO_STRING(X)];                         \
+        [PsiFeedbackLogger error:@"%s Assertion failed: %s", __PRETTY_FUNCTION__, CONVERT_EXPR_TO_STRING(X)];          \
         NSAssert(0, @"Assertion failed: %s", CONVERT_EXPR_TO_STRING(X));                                               \
     }
 
 #define PSICAssert(X)                                                                                                  \
     if (!(X)) {                                                                                                        \
-        [PsiFeedbackLogger error:@"%s Assertion failed: %s", __PRETTY_FUNCTION__, CONVERT_EXPR_TO_STRING(X)];                         \
+        [PsiFeedbackLogger error:@"%s Assertion failed: %s", __PRETTY_FUNCTION__, CONVERT_EXPR_TO_STRING(X)];          \
         NSCAssert(0, @"Assertion failed: %s", CONVERT_EXPR_TO_STRING(X));                                              \
     }
 
