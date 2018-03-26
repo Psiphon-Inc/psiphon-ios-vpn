@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, Psiphon Inc.
+ * Copyright (c) 2018, Psiphon Inc.
  * All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,11 +17,19 @@
  *
  */
 
-#import <UIKit/UIKit.h>
-#import "SettingsViewController.h"
+#import <Foundation/Foundation.h>
+#import "RACSignal.h"
 
-@interface MainViewController : UIViewController <PsiphonSettingsViewControllerDelegate>
+NS_ASSUME_NONNULL_BEGIN
 
-@property (nonatomic) BOOL openSettingImmediatelyOnViewDidAppear;
+typedef void (^OperationBlockCompletionHandler)(void(^completionHandler)(NSError * error));
+
+@interface AsyncOperation : NSOperation
+
+@property (nonatomic, readonly) NSError *error;
+
+- (instancetype)initWithBlock:(OperationBlockCompletionHandler)block;
 
 @end
+
+NS_ASSUME_NONNULL_END
