@@ -18,10 +18,12 @@
  */
 
 #import "IAPViewController.h"
+#import "AppDelegate.h"
 #import "IAPStoreHelper.h"
+#import "MBProgressHUD.h"
+#import "NSDate+Comparator.h"
 #import "PsiphonDataSharedDB.h"
 #import "SharedConstants.h"
-#import "NSDate+Comparator.h"
 
 static NSString *iapCellID = @"IAPTableCellID";
 
@@ -42,7 +44,10 @@ static NSString *iapCellID = @"IAPTableCellID";
 
 @end
 
-@implementation IAPViewController
+@implementation IAPViewController {
+    MBProgressHUD *buyProgressAlert;
+    NSTimer *buyProgressAlertTimer;
+}
 
 - (void)loadView {
     self.priceFormatter = [[NSNumberFormatter alloc] init];
@@ -380,9 +385,36 @@ static NSString *iapCellID = @"IAPTableCellID";
     SKPaymentTransactionState transactionState = (SKPaymentTransactionState) [notification.userInfo[IAPHelperPaymentTransactionUpdateKey] integerValue];
 
     if (SKPaymentTransactionStatePurchasing == transactionState) {
+        [self showProgressSpinnerAndBlockUI];
         [self setPurchaseButtonUIInterface:FALSE];
     } else {
+        [self dismissProgressSpinnerAndUnblockUI];
         [self setPurchaseButtonUIInterface:TRUE];
+    }
+}
+
+- (void)showProgressSpinnerAndBlockUI {
+    if (buyProgressAlert != nil) {
+        [buyProgressAlert hideAnimated:YES];
+    }
+    buyProgressAlert = [MBProgressHUD showHUDAddedTo:AppDelegate.getTopMostViewController.view animated:YES];
+
+    buyProgressAlertTimer = [NSTimer scheduledTimerWithTimeInterval:60 repeats:NO block:^(NSTimer * _Nonnull timer) {
+        if (buyProgressAlert  != nil) {
+            [buyProgressAlert.button setTitle:NSLocalizedStringWithDefaultValue(@"BUY_REQUEST_PROGRESS_ALERT_DISMISS_BUTTON_TITLE", nil, [NSBundle mainBundle], @"Dismiss", @"Title of button on alert view which shows the progress of the user's buy request. Hitting this button dismisses the alert and the buy request continues processing in the background.") forState:UIControlStateNormal];
+            [buyProgressAlert.button addTarget:self action:@selector(dismissProgressSpinnerAndUnblockUI) forControlEvents:UIControlEventTouchUpInside];
+        }
+    }];
+}
+
+- (void)dismissProgressSpinnerAndUnblockUI {
+    if (buyProgressAlertTimer != nil) {
+        [buyProgressAlertTimer invalidate];
+        buyProgressAlertTimer = nil;
+    }
+    if (buyProgressAlert != nil) {
+        [buyProgressAlert hideAnimated:YES];
+        buyProgressAlert = nil;
     }
 }
 
