@@ -356,8 +356,7 @@ NSNotificationName const AppDelegateSubscriptionDidActivateNotification = @"AppD
 
             // Only opens landing page if the VPN is active.
             // Landing page should not be opened outside of the tunnel.
-            __block RACDisposable *disposable = [[[vpnManager isVPNActive]
-              deliverOnMainThread]
+            __block RACDisposable *disposable = [[vpnManager isVPNActive]
               subscribeNext:^(RACTwoTuple<NSNumber *, NSNumber *> *result) {
 
                   BOOL isActive = [result.first boolValue];
