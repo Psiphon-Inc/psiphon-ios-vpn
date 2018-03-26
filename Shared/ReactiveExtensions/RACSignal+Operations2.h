@@ -20,6 +20,10 @@
 #import <Foundation/Foundation.h>
 #import "RACSignal.h"
 
+NS_ASSUME_NONNULL_BEGIN
+
+@class RACTargetQueueScheduler;
+
 /**
  * This category provides convenience operation methods not found
  * in the ReactiveObjC library.
@@ -27,7 +31,31 @@
 @interface RACSignal (Operations2)
 
 /**
+ * Returns a signal that calls provided selector on the given object when subscribed to and passes a callback block
+ * to the selector's first parameter.
+ *
+ * Note that the selector should only have one callback parameter of type `(void (^)(NSError *error))`.
+ * The signal emits an error if the callback returns an error, otherwise the signal emits the given object and completes.
+ *
+ * @attention The selector should should only take one parameter of type `(void (^)(NSError *error))`
+ *
+ * @param object The object that accepts message from the provided selector.
+ * @param aSelector The message to send the provided object.
+ * @return A signal whose observer's subscriptions trigger an invocation of the provided selector on the given object.
+ */
++ (RACSignal *)defer:(id)object selectorWithErrorCallback:(SEL)aSelector;
+
+/**
+ * Converts an NSArray into a signal that emits the items in the array in sequence.
+ *
+ * @param array The source sequence
+ * @return A signal that emits each item in the source NSArray.
+ */
++ (RACSignal *)fromArray:(NSArray *)array;
+
+/**
  * Returns an observable that emits (0) after a specified delay, and then completes.
+ *
  * @param delay The initial delay before emitting a single 0.
  * @return An observable that emits one item after a specified delay, and then completed.
  */
@@ -50,8 +78,30 @@
  *
  * @param notificationHandler Receives an observable of error notifications from the source with which
  *        a user can complete or error, aborting the retry.
+ *
  * @return The source observable modified with retry logic.
  */
 - (RACSignal *)retryWhen:(RACSignal *(^)(RACSignal * errors))notificationHandler;
 
+/**
+ * Asynchronously subscribes observers to this signal on the specified operation queue.
+ * The operation queue is required to have underlying dispatch queue and that it must be serial.
+ *
+ * The operation added to `queue` is completed after the source signal has emitted one of the
+ * terminal events, and then the event is forwarded to subscribers to the returned signal.
+ *
+ * @attention As long as the signal has not terminated (i.e. has not emitted error or completed),
+ *            the `queue` will be blocked.
+ *            This can cause an issue if two operations on the `queue` are dependent and both wait
+ *            indefinitely for the other operation to finish.
+ *
+ * @param operationQueue operation queue with underlying serial dispatch queue to subscribe observers on.
+ * @param queueScheduler RACTargetQueueScheduler with the same underlying dispatch queue and the `queue`.
+ * @return The source observable modified so that its subscriptions happens on the specified NSOperationQueue.
+ */
+- (RACSignal *)unsafeSubscribeOnSerialQueue:(NSOperationQueue *)operationQueue
+                                  scheduler:(RACTargetQueueScheduler *)queueScheduler;
+
 @end
+
+NS_ASSUME_NONNULL_END
