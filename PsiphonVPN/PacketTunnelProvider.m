@@ -870,6 +870,7 @@ typedef NS_ENUM(NSInteger, GracePeriodState) {
     // Add subscription tokens
     Subscription *subscription = [Subscription fromPersistedDefaults];
     if (subscription.authorizationToken) {
+        [PsiFeedbackLogger infoWithType:@"PacketTunnelProvider" message:@"config Authorizations subscription token ID:%@", subscription.authorizationToken.ID];
         [authorizationTokens addObject:subscription.authorizationToken.base64Representation];
     }
 
