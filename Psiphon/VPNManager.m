@@ -342,8 +342,13 @@ NSString * const VPNManagerLogType = @"VPNManager";
           if (!providerManager) {
               return;
           }
-          weakSelf.restartRequired = TRUE;
-          [providerManager.connection stopVPNTunnel];
+
+          BOOL isActive = [VPNManager mapIsVPNActive:[weakSelf mapVPNStatus:providerManager.connection.status]];
+
+          if (isActive) {
+              weakSelf.restartRequired = TRUE;
+              [providerManager.connection stopVPNTunnel];
+          }
 
       } error:^(NSError *error) {
           [weakSelf.compoundDisposable removeDisposable:disposable];
