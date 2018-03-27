@@ -35,7 +35,7 @@
 + (RACSignal *)defer:(id)object selectorWithErrorCallback:(SEL)aSelector {
 
     PSIAssert(object != nil);
-    PSIAssert([object respondsToSelector:aSelector])
+    PSIAssert([object respondsToSelector:aSelector]);
 
     return [RACSignal createSignal:^RACDisposable *(id <RACSubscriber> subscriber) {
 
