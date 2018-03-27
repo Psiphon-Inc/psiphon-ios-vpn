@@ -548,9 +548,6 @@ typedef NS_ENUM(NSInteger, GracePeriodState) {
 
 - (void)displayMessageAndKillExtension:(NSString *)message {
 
-    // Stop the Psiphon tunnel immediately.
-    [psiphonTunnel stop];
-
     [self displayMessage:message completionHandler:^(BOOL success) {
         // Exit only after the user has clicked OK button.
         exit(1);
