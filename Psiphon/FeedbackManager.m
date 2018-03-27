@@ -40,28 +40,11 @@
 
 - (void)onDiagnosticMessage:(NSString *_Nonnull)message withTimestamp:(NSString *_Nonnull)timestamp {
     if ([message isEqualToString:@"Feedback upload successful"]) {
-        [self uploadCompletedOrFailed];
-        BOOL lastUploadInFlight = numUploadsInFlight == 0;
-        if (![self progressViewHasBeenDismissed] && lastUploadInFlight) {
-            dispatch_async_main(^{
-                [UIAlertController presentSimpleAlertWithTitle:NSLocalizedStringWithDefaultValue(@"FEEDBACK_UPLOAD_SUCCESSFUL_TITLE", nil, [NSBundle mainBundle], @"Feedback uploaded successfully", @"Alert dialog title indicating to the user that their feedback has been successfully uploaded to Psiphon's servers.")
-                                                       message:NSLocalizedStringWithDefaultValue(@"FEEDBACK_UPLOAD_SUCCESSFUL_MESSAGE", nil, [NSBundle mainBundle], @"Thank you for helping improve Psiphon!", @"Alert dialog message thanking the user for helping improve the Psiphon network by submitting their feedback.")
-                                                preferredStyle:UIAlertControllerStyleAlert
-                                                     okHandler:nil];
-            });
-        }
+        [self uploadCompletedSuccessfully];
     } else if ([message containsString:@"Feedback upload error"]) {
-        [self uploadCompletedOrFailed];
-#if DEBUG
-        dispatch_async_main(^{
-            [UIAlertController presentSimpleAlertWithTitle:NSLocalizedStringWithDefaultValue(@"FEEDBACK_UPLOAD_FAILED_TITLE", nil, [NSBundle mainBundle], @"Feedback upload failed", @"Alert dialog title indicating to the user that the app has failed to upload their feedback to Psiphon's servers.")
-                                                   message:NSLocalizedStringWithDefaultValue(@"FEEDBACK_UPLOAD_FAILED_MESSAGE", nil, [NSBundle mainBundle], @"An error occured while uploading your feedback. Please try again. Your feedback helps us improve the Psiphon network.", @"Alert dialog message indicating to the user that the app has failed to upload their feedback and that they should try again. ")
-                                            preferredStyle:UIAlertControllerStyleAlert
-                                                 okHandler:nil]; // TODO: add retry button
-        });
-#endif
+        [self uploadFailed];
     }
-
+    
     [PsiFeedbackLogger logNoticeWithType:@"FeedbackUpload" message:message timestamp:timestamp];
 }
 
@@ -73,17 +56,17 @@
  */
 - (NSString * _Nullable)getPsiphonConfig {
     NSString *bundledConfigStr = [PsiphonClientCommonLibraryHelpers getPsiphonBundledConfig];
-
+    
     // Always parses the config string to ensure its valid, even the config string will not be modified.
     NSData *jsonData = [bundledConfigStr dataUsingEncoding:NSUTF8StringEncoding];
     NSError *err = nil;
     NSDictionary *readOnly = [NSJSONSerialization JSONObjectWithData:jsonData options:kNilOptions error:&err];
-
+    
     // Return bundled config as is if user doesn't have an active subscription
     if(![IAPStoreHelper hasActiveSubscriptionForNow] && !err) {
         return bundledConfigStr;
     }
-
+    
     // Otherwise override sponsor ID
     if (err) {
         [PsiFeedbackLogger error:@"%@", [NSString stringWithFormat:@"Failed to parse config JSON: %@", err.description]];
@@ -92,21 +75,21 @@
         });
         return nil;
     }
-
+    
     NSMutableDictionary *mutableConfigCopy = [readOnly mutableCopy];
-
+    
     NSDictionary *readOnlySubscriptionConfig = readOnly[@"subscriptionConfig"];
     if(readOnlySubscriptionConfig && readOnlySubscriptionConfig[@"SponsorId"]) {
         mutableConfigCopy[@"SponsorId"] = readOnlySubscriptionConfig[@"SponsorId"];
     }
-
+    
 #if DEBUG
     // Ensure diagnostic notices are emitted when debugging
     mutableConfigCopy[@"EmitDiagnosticNotices"] = [NSNumber numberWithBool:YES];
 #endif
-
+    
     jsonData  = [NSJSONSerialization dataWithJSONObject:mutableConfigCopy options:0 error:&err];
-
+    
     if (err) {
         [PsiFeedbackLogger error:@"%@", [NSString stringWithFormat:@"Failed to create JSON data from config object: %@", err.description]];
         dispatch_async(dispatch_get_main_queue(), ^{
@@ -114,7 +97,7 @@
         });
         return nil;
     }
-
+    
     return [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
 }
 
@@ -134,9 +117,9 @@
             // Corrupt settings file. Return early.
             return;
         }
-
+        
         NSArray<DiagnosticEntry *> *diagnosticEntries = [[[PsiphonDataSharedDB alloc] initForAppGroupIdentifier:APP_GROUP_IDENTIFIER] getAllLogs];
-
+        
         __weak FeedbackManager *weakSelf = self;
         SendFeedbackHandler sendFeedbackHandler = ^(NSString *jsonString, NSString *pubKey, NSString *uploadServer, NSString *uploadServerHeaders) {
             if (inactiveTunnel == nil) {
@@ -145,7 +128,7 @@
             }
             [inactiveTunnel sendFeedback:jsonString publicKey:pubKey uploadServer:uploadServer uploadServerHeaders:uploadServerHeaders];
         };
-
+        
         NSError *err = [FeedbackUpload generateAndSendFeedback:selectedThumbIndex
                                                      buildInfo:[PsiphonTunnel getBuildInfo]
                                                       comments:comments
@@ -157,10 +140,10 @@
                                                   isJailbroken:[JailbreakCheck isDeviceJailbroken]
                                            sendFeedbackHandler:sendFeedbackHandler
                                              diagnosticEntries:diagnosticEntries];
-
+        
         if (err != nil) {
             // Feedback upload was never started
-            [self uploadCompletedOrFailed];
+            [self uploadFailed];
         }
     });
 }
@@ -201,20 +184,46 @@
     });
 }
 
-- (void)uploadCompletedOrFailed {
+- (void)uploadCompletedSuccessfully {
     atomic_fetch_sub(&numUploadsInFlight, 1);
-    if (uploadProgressAlert != nil) {
+    BOOL lastUploadCompleted = atomic_load(&numUploadsInFlight) == 0;
+    
+    if (lastUploadCompleted && uploadProgressAlert != nil) {
+        [self removeUploadInProgressView];
+        dispatch_async_main(^{
+            [UIAlertController presentSimpleAlertWithTitle:NSLocalizedStringWithDefaultValue(@"FEEDBACK_UPLOAD_SUCCESSFUL_TITLE", nil, [NSBundle mainBundle], @"Feedback uploaded successfully", @"Alert dialog title indicating to the user that their feedback has been successfully uploaded to Psiphon's servers.")
+                                                   message:NSLocalizedStringWithDefaultValue(@"FEEDBACK_UPLOAD_SUCCESSFUL_MESSAGE", nil, [NSBundle mainBundle], @"Thank you for helping improve Psiphon!", @"Alert dialog message thanking the user for helping improve the Psiphon network by submitting their feedback.")
+                                            preferredStyle:UIAlertControllerStyleAlert
+                                                 okHandler:nil];
+        });
+    }
+}
+
+- (void)uploadFailed {
+    atomic_fetch_sub(&numUploadsInFlight, 1);
+    BOOL lastUploadCompleted = atomic_load(&numUploadsInFlight) == 0;
+    
+    if (lastUploadCompleted && uploadProgressAlert != nil) {
         [self removeUploadInProgressView];
     }
+    
+#if DEBUG
+    dispatch_async_main(^{
+        [UIAlertController presentSimpleAlertWithTitle:NSLocalizedStringWithDefaultValue(@"FEEDBACK_UPLOAD_FAILED_TITLE", nil, [NSBundle mainBundle], @"Feedback upload failed", @"Alert dialog title indicating to the user that the app has failed to upload their feedback to Psiphon's servers.")
+                                               message:NSLocalizedStringWithDefaultValue(@"FEEDBACK_UPLOAD_FAILED_MESSAGE", nil, [NSBundle mainBundle], @"An error occured while uploading your feedback. Please try again. Your feedback helps us improve the Psiphon network.", @"Alert dialog message indicating to the user that the app has failed to upload their feedback and that they should try again. ")
+                                        preferredStyle:UIAlertControllerStyleAlert
+                                             okHandler:nil]; // TODO: add retry button
+    });
+#endif
 }
 
 // Get connection type for feedback
 - (NSString*)getConnectionType {
-
+    
     Reachability *reachability = [Reachability reachabilityForInternetConnection];
-
+    
     NetworkStatus status = [reachability currentReachabilityStatus];
-
+    
     if(status == NotReachable)
     {
         return @"none";
@@ -227,7 +236,7 @@
     {
         return @"mobile";
     }
-
+    
     return @"error";
 }
 
@@ -239,3 +248,4 @@
 }
 
 @end
+
