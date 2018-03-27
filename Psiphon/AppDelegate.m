@@ -396,7 +396,7 @@ NSNotificationName const AppDelegateSubscriptionDidActivateNotification = @"AppD
         }
     }];
 
-    [notifier listenForNotification:NOTIFIER_ON_AVAILABLE_EGRESS_REGIONS listener:^{ // TODO should be put in a constants file
+    [notifier listenForNotification:NOTIFIER_ON_AVAILABLE_EGRESS_REGIONS listener:^{
         LOG_DEBUG(@"Received notification NE.onAvailableEgressRegions");
         // Update available regions
         // TODO: this code is duplicated in MainViewController updateAvailableRegions

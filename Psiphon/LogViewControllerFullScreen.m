@@ -200,6 +200,9 @@
 }
 
 - (void)setupLogFileListener {
+
+    // TODO: log file rotation is not handled.
+
     int fd = open([logFilePath UTF8String], O_RDONLY);
 
     if (fd == -1) {
@@ -216,7 +219,6 @@
     dispatch_source_set_event_handler(dispatchSource, ^{
         unsigned long flag = dispatch_source_get_data(dispatchSource);
 
-        // TODO: what flag is sent when file is truncated.
         if (flag & DISPATCH_VNODE_WRITE) {
             LOG_DEBUG(@"Log Dispatch_vnode_write");
             [self loadDataAsync:FALSE];

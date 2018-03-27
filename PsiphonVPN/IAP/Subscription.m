@@ -201,6 +201,7 @@ NSErrorDomain _Nonnull const ReceiptValidationErrorDomain = @"PsiphonReceiptVali
 - (BOOL)persistChanges {
     NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
     [userDefaults setObject:self->dictionaryRepresentation forKey:kSubscriptionDictionary];
+    // TODO: synchronize will be deprecated.
     return [userDefaults synchronize];
 }
 
