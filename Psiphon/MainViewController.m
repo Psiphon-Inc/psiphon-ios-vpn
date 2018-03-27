@@ -148,10 +148,9 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     [self updateAvailableRegions];
     
     // Setting up the UI
+    // calls them in the right order
     [self setBackgroundGradient];
     [self setNeedsStatusBarAppearanceUpdate];
-    //  TODO: wrap this in a function which always
-    //  calls them in the right order
     [self addSettingsButton];
     [self addRegionSelectionBar];
     [self addStartAndStopButton];

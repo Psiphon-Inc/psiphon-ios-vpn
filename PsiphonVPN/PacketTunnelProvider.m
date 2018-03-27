@@ -548,9 +548,6 @@ typedef NS_ENUM(NSInteger, GracePeriodState) {
 
 - (void)displayMessageAndKillExtension:(NSString *)message {
 
-    // Stop the Psiphon tunnel immediately.
-    [psiphonTunnel stop];
-
     [self displayMessage:message completionHandler:^(BOOL success) {
         // Exit only after the user has clicked OK button.
         exit(1);
@@ -870,6 +867,7 @@ typedef NS_ENUM(NSInteger, GracePeriodState) {
     // Add subscription tokens
     Subscription *subscription = [Subscription fromPersistedDefaults];
     if (subscription.authorizationToken) {
+        [PsiFeedbackLogger infoWithType:@"PacketTunnelProvider" message:@"config Authorizations subscription token ID:%@", subscription.authorizationToken.ID];
         [authorizationTokens addObject:subscription.authorizationToken.base64Representation];
     }
 
