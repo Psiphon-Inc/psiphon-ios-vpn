@@ -1,4 +1,5 @@
 PODS:
+  - CustomIOSAlertView (0.9.5)
   - Google-Mobile-Ads-SDK (7.25.0)
   - InAppSettingsKit (2.9.4)
   - MBProgressHUD (1.1.0)
@@ -21,6 +22,7 @@ PODS:
   - VungleSDK-iOS (5.3.0)
 
 DEPENDENCIES:
+  - CustomIOSAlertView (~> 0.9.5)
   - Google-Mobile-Ads-SDK (= 7.25.0)
   - InAppSettingsKit (from `https://github.com/Psiphon-Inc/InAppSettingsKit.git`, commit `598c498`)
   - MBProgressHUD (~> 1.1.0)
@@ -54,6 +56,7 @@ CHECKOUT OPTIONS:
     :git: https://github.com/Psiphon-Inc/ReactiveObjC.git
 
 SPEC CHECKSUMS:
+  CustomIOSAlertView: cc4fa8e36219be3fd5ebcd40789f5b4aaae0f38e
   Google-Mobile-Ads-SDK: 113804f266381a30f982ad3c18063d4e0155414f
   InAppSettingsKit: 567ef538698cd6cf3afb9c5529b89a8936fdacb5
   MBProgressHUD: e7baa36a220447d8aeb12769bf0585582f3866d9
@@ -64,6 +67,6 @@ SPEC CHECKSUMS:
   ReactiveObjC: 2a38ea15335de4119d8b17caf1db1484f61db902
   VungleSDK-iOS: af3aa92d0f4a923505a9416646ffef5250592150
 
-PODFILE CHECKSUM: 4ecd3b488c003c53fc6a804b3b9bbad24f9666fe
+PODFILE CHECKSUM: 06df6582568d598409a59fae8a4e9e2cb42db6af
 
 COCOAPODS: 1.4.0

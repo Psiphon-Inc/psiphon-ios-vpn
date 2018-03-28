@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, Psiphon Inc.
+ * Copyright (c) 2018, Psiphon Inc.
  * All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,14 +17,14 @@
  *
  */
 
-#import "PsiphonSettingsViewController.h"
-#import "UserDefaults.h"
+#import <Foundation/Foundation.h>
+#import "AuthorizationToken.h"
+#import "PsiCashProduct.h"
 
-FOUNDATION_EXPORT UserDefaultsKey const SettingsConnectOnDemandBoolKey;
-
-// Specifier keys for cells in settings menu
-#define kSettingsPsiCash                @"settingsPsiCash"
-
-@interface SettingsViewController : PsiphonSettingsViewController
-
+@interface ExpiringPurchase : NSObject <Persistable>
+@property (nonatomic, readonly) AuthorizationToken *authToken;
+@property (nonatomic, readonly) NSString *productName;
+@property (nonatomic, readonly) NSDate *expiryDate;
+@property (nonatomic, readonly) id<PsiCashProductSKU> sku;
++ (ExpiringPurchase*)expiringPurchaseWithProductName:(NSString*)productName SKU:(id<PsiCashProductSKU>)sku expiryDate:(NSDate*)date andAuthToken:(AuthorizationToken*)authToken;
 @end

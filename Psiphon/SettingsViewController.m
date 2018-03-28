@@ -196,10 +196,10 @@ NSString * const ConnectOnDemandCellSpecifierKey = @"vpnOnDemand";
         [connectOnDemandToggle addTarget:self action:@selector(toggledVpnOnDemandValue:) forControlEvents:UIControlEventValueChanged];
 
         cell.textLabel.text = NSLocalizedStringWithDefaultValue(@"SETTINGS_VPN_ON_DEMAND",
-                                                                     nil,
-                                                                     [NSBundle mainBundle],
-                                                                     @"Auto-start VPN on demand",
-                                                                     @"Automatically start VPN On demand settings toggle");
+                                                                nil,
+                                                                [NSBundle mainBundle],
+                                                                @"Auto-start VPN on demand",
+                                                                @"Automatically start VPN On demand settings toggle");
         connectOnDemandCell = cell;
         [self updateConnectOnDemandCell];
     }

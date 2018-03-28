@@ -51,6 +51,8 @@
 
 PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
 
+#import "PsiCashClient.h"
+
 @interface AppDelegate ()
 
 // Public properties
@@ -167,8 +169,9 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
     // Override point for customization after application launch.
     self.window = [[UIWindow alloc] initWithFrame:UIScreen.mainScreen.bounds];
 
-    rootContainerController = [[RootContainerController alloc] init];
+     rootContainerController = [[RootContainerController alloc] init];
     self.window.rootViewController = rootContainerController;
+//    self.window.rootViewController = [[PsiCashViewController alloc] init];
     // UIKit always waits for application:didFinishLaunchingWithOptions:
     // to return before making the window visible on the screen.
     [self.window makeKeyAndVisible];
@@ -195,6 +198,14 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
 
     // Listen for the network extension messages.
     [self listenForNEMessages];
+
+    // Start PsiCash lifecycle
+    if ([PsiCashClient shouldExposePsiCash]) {
+        LOG_DEBUG("PsiCash Enabled");
+        [[PsiCashClient sharedInstance] refreshState];
+    } else {
+        LOG_DEBUG("PsiCash Disabled");
+    }
 
     return YES;
 }
@@ -257,6 +268,14 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
     // Called as part of the transition from the background to the active state; here you can undo many of the changes made on entering the background.
 
     [self loadAdsIfNeeded];
+
+    // Start PsiCash lifecycle
+    if ([PsiCashClient shouldExposePsiCash]) {
+        LOG_DEBUG("PsiCash Enabled");
+        [[PsiCashClient sharedInstance] refreshState];
+    } else {
+        LOG_DEBUG("PsiCash Disabled");
+    }
 }
 
 - (void)applicationWillTerminate:(UIApplication *)application {

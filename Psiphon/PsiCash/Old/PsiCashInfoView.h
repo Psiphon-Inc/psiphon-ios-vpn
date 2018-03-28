@@ -17,14 +17,8 @@
  *
  */
 
-#import "PsiphonSettingsViewController.h"
-#import "UserDefaults.h"
+#import <UIKit/UIKit.h>
 
-FOUNDATION_EXPORT UserDefaultsKey const SettingsConnectOnDemandBoolKey;
-
-// Specifier keys for cells in settings menu
-#define kSettingsPsiCash                @"settingsPsiCash"
-
-@interface SettingsViewController : PsiphonSettingsViewController
+@interface PsiCashInfoView : UIView
 
 @end
