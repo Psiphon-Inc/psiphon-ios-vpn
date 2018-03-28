@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, Psiphon Inc.
+ * Copyright (c) 2018, Psiphon Inc.
  * All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,14 +17,15 @@
  *
  */
 
-#import "PsiphonSettingsViewController.h"
-#import "UserDefaults.h"
+#import <Foundation/Foundation.h>
+#import "ExpiringPurchase.h"
+#import "ReactiveObjC.h"
 
-FOUNDATION_EXPORT UserDefaultsKey const SettingsConnectOnDemandBoolKey;
-
-// Specifier keys for cells in settings menu
-#define kSettingsPsiCash                @"settingsPsiCash"
-
-@interface SettingsViewController : PsiphonSettingsViewController
-
+@interface ExpiringPurchases : NSObject <Persistable>
+@property (strong, nonatomic, readonly) RACReplaySubject<ExpiringPurchase*>* expiredPurchaseStream;
++ (ExpiringPurchases*)fromPersistedUserDefaults;
++ (ExpiringPurchases*)fromPersistedUserDefaultsWithKey:(NSString*)key;
+- (NSArray<ExpiringPurchase*>*)activePurchases;
+- (void)addExpiringPurchase:(ExpiringPurchase*)purchase;
+- (NSArray<ExpiringPurchase*>*)removeExpiredPurchases;
 @end

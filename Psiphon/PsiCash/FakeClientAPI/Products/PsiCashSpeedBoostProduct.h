@@ -18,11 +18,23 @@
  */
 
 #import <Foundation/Foundation.h>
+#import "PsiCashProduct.h"
 
-@interface NSError (Convenience)
+NS_ASSUME_NONNULL_BEGIN
 
-+ (instancetype)errorWithDomain:(NSErrorDomain)domain code:(NSInteger)code;
-
-+ (instancetype)errorWithDomain:(NSErrorDomain)domain code:(NSInteger)code andLocalizedDescription:(NSString*)localizedDescription;
-
+@interface PsiCashSpeedBoostProductSKU : NSObject <PsiCashProductSKU, Persistable>
++ (PsiCashSpeedBoostProductSKU*)skuWitDistinguisher:(NSString*)distinguisher withHours:(NSNumber*)hours andPrice:(NSNumber*)price;
+- (NSNumber*)hours;
+- (double)priceInPsi;
 @end
+
+@protocol PsiCashSpeedBoostPurchaseReceiver
+- (void)targetSpeedBoostProductSKUChanged:(PsiCashSpeedBoostProductSKU*_Nullable)sku;
+@end
+
+@interface PsiCashSpeedBoostProduct : NSObject <PsiCashProduct>
++ (PsiCashSpeedBoostProduct*)productWithSKUs:(NSArray<PsiCashSpeedBoostProductSKU*>*)skus;
+@property (nonatomic, readonly) NSArray<PsiCashSpeedBoostProductSKU*> *skusOrderedByPriceAscending;
+@end
+
+NS_ASSUME_NONNULL_END

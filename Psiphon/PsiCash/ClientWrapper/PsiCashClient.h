@@ -17,14 +17,17 @@
  *
  */
 
-#import "PsiphonSettingsViewController.h"
-#import "UserDefaults.h"
 
-FOUNDATION_EXPORT UserDefaultsKey const SettingsConnectOnDemandBoolKey;
+#import <Foundation/Foundation.h>
+#import "psicash_api.hpp"
+#import "PsiCashClientModelEmitter.h"
+#import "PsiCashSpeedBoostProduct.h"
+#import "ReactiveObjC.h"
 
-// Specifier keys for cells in settings menu
-#define kSettingsPsiCash                @"settingsPsiCash"
-
-@interface SettingsViewController : PsiphonSettingsViewController
-
+@interface PsiCashClient : NSObject
+@property (atomic, readonly) PsiCashClientModelEmitter *clientModelObservable;
++ (instancetype)sharedInstance;
++ (BOOL)shouldExposePsiCash;
+- (void)refreshState;
+- (void)purchaseSpeedBoostProduct:(PsiCashSpeedBoostProductSKU*)sku;
 @end

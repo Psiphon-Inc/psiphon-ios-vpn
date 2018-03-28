@@ -51,6 +51,12 @@
 #import "RACSignal.h"
 #import "Asserts.h"
 
+#import "PsiCashBalanceView.h"
+#import "PsiCashClient.h"
+#import "PsiCashSpeedBoostMeterView.h"
+#import "PsiCashTableViewController.h"
+
+
 static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSString *b) {
     return (([a length] == 0) && ([b length] == 0)) || ([a isEqualToString:b]);
 };
@@ -106,6 +112,11 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     UIAlertController *alertControllerNoInternet;
     
     FeedbackManager *feedbackManager;
+
+    // PsiCash
+    PsiCashPurchaseAlertView *alertView;
+    PsiCashSpeedBoostMeterView *speedBoostMeter;
+    PsiCashClientModel *model;
 }
 
 // No heavy initialization should be done here, since RootContainerController
@@ -160,6 +171,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     [self addAppTitleLabel];
     [self addAppSubTitleLabel];
     [self addSubscriptionButton];
+    [self addPsiCashBalanceView];
     [self addStatusLabel];
     [self addVersionLabel];
     [self setupLayoutGuides];
@@ -289,6 +301,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
         [self openSettingsMenu];
         self.openSettingImmediatelyOnViewDidAppear = NO;
     }
+//    [self onPsiCashBalanceTap:nil]; // TODO
 }
 
 - (void)viewDidLayoutSubviews {
@@ -694,6 +707,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                                                          multiplier:1.0
                                                            constant:0]];
 }
+
 
 - (void)addSettingsButton {
     settingsButton = [[UIButton alloc] init];
@@ -1182,6 +1196,10 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 
 #pragma mark - Psiphon Settings
 
+-(void)notice:(NSString *)noticeJSON {
+    NSLog(@"Got notice %@", noticeJSON);
+}
+
 - (void)openSettingsMenu {
     appSettingsViewController = [[SettingsViewController alloc] init];
     appSettingsViewController.delegate = appSettingsViewController;
@@ -1389,10 +1407,132 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 
 #pragma mark - Subscription
 
+- (void)updateSubscriptionUIWithSubscribedState:(BOOL)isSubscribed {
+    if(isSubscribed) {
+        subscriptionButton.hidden = YES;
+        adLabel.hidden = YES;
+        subscriptionButtonTop.active = NO;
+        bottomBarTop.active = YES;
+    } else {
+        subscriptionButton.hidden = NO;
+        adLabel.hidden = ![self.adManager untunneledInterstitialIsReady];
+        bottomBarTop.active = NO;
+        subscriptionButtonTop.active = YES;
+    }
+    subscriptionButton.hidden = YES; // TODO: base on some PsiCash blah
+}
+
 - (void)openIAPViewController {
     IAPViewController *iapViewController = [[IAPViewController alloc]init];
     iapViewController.openedFromSettings = NO;
     UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:iapViewController];
+    [self presentViewController:navController animated:YES completion:nil];
+}
+
+- (void)checkSubscriptionStateAndUpdateUI {
+    __weak MainViewController *weakSelf = self;
+    
+    [IAPStoreHelper hasActiveSubscriptionForNowOnBlock:^(BOOL isActive) {
+        [weakSelf updateSubscriptionUIWithSubscribedState:isActive];
+    }];
+}
+
+- (void)onSubscriptionActivated {
+    // Updates subscription UI.
+    [self updateSubscriptionUIWithSubscribedState:TRUE];
+}
+
+- (void)onSubscriptionExpired {
+    // Updates subscription UI.
+    [self updateSubscriptionUIWithSubscribedState:FALSE];
+}
+
+#pragma mark - PsiCash
+
+#pragma mark - PsiCashPurchaseAlertViewDelegate protocol
+
+- (void)stateBecameStale {
+    [alertView close];
+    alertView = nil;
+}
+
+- (void)showPurchaseAlertView {
+    if (alertView != nil) {
+        [alertView close];
+        alertView = nil;
+    }
+
+    if ([model hasActiveSpeedBoostPurchase]) {
+        alertView = [PsiCashPurchaseAlertView alreadySpeedBoostingAlert];
+    } else  if ([model hasPendingPurchase]) {
+        alertView = [PsiCashPurchaseAlertView pendingPurchaseAlert];
+    } else {
+        alertView = [PsiCashPurchaseAlertView purchaseAlert];
+    }
+
+    alertView.controllerDelegate = self;
+    [alertView bindWithModel:model];
+    [alertView show];
+}
+
+- (void)addPsiCashBalanceView {
+    // Speed Boost Meter
+    speedBoostMeter = [[PsiCashSpeedBoostMeterView alloc] init];
+    speedBoostMeter.translatesAutoresizingMaskIntoConstraints = NO;
+
+    UITapGestureRecognizer *speedBoostMeterTap = [[UITapGestureRecognizer alloc]
+                                                  initWithTarget:self action:@selector(showPurchaseAlertView)];
+    speedBoostMeterTap.numberOfTapsRequired = 1;
+    [speedBoostMeter addGestureRecognizer:speedBoostMeterTap];
+
+    [self.view addSubview:speedBoostMeter];
+
+    [speedBoostMeter.centerXAnchor constraintEqualToAnchor:subscriptionButton.centerXAnchor].active = YES;
+    [speedBoostMeter.centerYAnchor constraintEqualToAnchor:subscriptionButton.centerYAnchor].active = YES;
+    [speedBoostMeter.widthAnchor constraintEqualToAnchor:subscriptionButton.widthAnchor multiplier:1.2 constant:0].active = YES;
+    [speedBoostMeter.heightAnchor constraintEqualToAnchor:subscriptionButton.heightAnchor].active = YES;
+
+    subscriptionButton.hidden = YES;
+
+    // PsiCash balance view
+    PsiCashBalanceView *balanceView = [[PsiCashBalanceView alloc] init];
+    balanceView.translatesAutoresizingMaskIntoConstraints = NO;
+
+    UITapGestureRecognizer *tapRecognizer = [[UITapGestureRecognizer alloc]
+                                             initWithTarget:self action:@selector(onPsiCashBalanceTap:)];
+    tapRecognizer.numberOfTapsRequired = 1;
+    [balanceView addGestureRecognizer:tapRecognizer];
+
+    [self.view addSubview:balanceView];
+
+    [balanceView.centerXAnchor constraintEqualToAnchor:speedBoostMeter.centerXAnchor].active = YES;
+    [balanceView.bottomAnchor constraintEqualToAnchor:speedBoostMeter.topAnchor].active = YES;
+    [balanceView.widthAnchor constraintEqualToAnchor:subscriptionButton.widthAnchor].active = YES;
+    [balanceView.heightAnchor constraintEqualToAnchor:subscriptionButton.heightAnchor].active = YES;
+
+    __weak MainViewController *weakSelf = self;
+    RACDisposable * balanceViewUpdates = [[PsiCashClient.sharedInstance.clientModelObservable.emitter deliverOnMainThread] subscribeNext:^(PsiCashClientModel *newClientModel) {
+        __strong MainViewController *strongSelf = weakSelf;
+        if (strongSelf != nil) {
+
+            BOOL stateChanged = [model hasActiveSpeedBoostPurchase] ^ [newClientModel hasActiveSpeedBoostPurchase] || [model hasPendingPurchase] ^ [newClientModel hasPendingPurchase];
+
+            model = newClientModel;
+
+            if (stateChanged && alertView != nil) {
+                [self showPurchaseAlertView];
+            }
+
+            [balanceView bindWithModel:model]; // TODO: don't capture like this
+            [speedBoostMeter bindWithModel:model];
+        }
+    }]; // TODO: dispose
+}
+
+- (void)onPsiCashBalanceTap:(UILabel *)sender {
+    PsiCashTableViewController *psiCashViewController = [[PsiCashTableViewController alloc] init];
+    //    psiCashViewController.openedFromSettings = NO;
+    UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:psiCashViewController];
     [self presentViewController:navController animated:YES completion:nil];
 }
 

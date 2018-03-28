@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, Psiphon Inc.
+ * Copyright (c) 2018, Psiphon Inc.
  * All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,14 +17,24 @@
  *
  */
 
-#import "PsiphonSettingsViewController.h"
-#import "UserDefaults.h"
+#import <Foundation/Foundation.h>
 
-FOUNDATION_EXPORT UserDefaultsKey const SettingsConnectOnDemandBoolKey;
+NS_ASSUME_NONNULL_BEGIN
 
-// Specifier keys for cells in settings menu
-#define kSettingsPsiCash                @"settingsPsiCash"
-
-@interface SettingsViewController : PsiphonSettingsViewController
-
+@protocol Persistable
++ (id)fromDictionary:(NSDictionary*)dictionary;
+- (NSDictionary<NSString*, id<NSCopying, NSSecureCoding>>*)dictionaryRepresentation;
 @end
+
+@protocol PsiCashProductSKU <Persistable>
+@property (nonatomic, readonly) id<NSCopying, NSSecureCoding> variant;
+@property (nonatomic, readonly) NSString *distinguisher;
+@property (nonatomic, readonly) NSNumber *price;
+@end
+
+@protocol PsiCashProduct
++ (NSString*)purchaseClass;
+@property (nonatomic, readonly) NSArray *skusOrderedByPriceAscending;
+@end
+
+NS_ASSUME_NONNULL_END
