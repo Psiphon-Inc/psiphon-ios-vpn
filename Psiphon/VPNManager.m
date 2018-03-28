@@ -464,7 +464,7 @@ NSString * const VPNManagerLogType = @"VPNManager";
           [weakSelf stopVPN];
       }
       error:^(NSError *error) {
-          [PsiFeedbackLogger errorWithType:VPNManagerLogType message:@"error killing zombie extensioin" object:error];
+          [PsiFeedbackLogger errorWithType:VPNManagerLogType message:@"error killing zombie extension" object:error];
           [weakSelf.compoundDisposable removeDisposable:disposable];
       }
       completed:^{
