@@ -391,7 +391,8 @@ typedef NS_ENUM(NSInteger, GracePeriodState) {
               }
               [subscription persistChanges];
 
-              [PsiFeedbackLogger infoWithType:@"SubscriptionCheck" message:@"received token expiring on %@", subscription.authorizationToken.expires];
+              [PsiFeedbackLogger infoWithType:@"SubscriptionCheck" message:@"received token %@ expiring on %@", subscription.authorizationToken.ID,
+                  subscription.authorizationToken.expires];
 
               // Extract request date from the response and convert to NSDate.
               NSDate *requestDate = nil;
