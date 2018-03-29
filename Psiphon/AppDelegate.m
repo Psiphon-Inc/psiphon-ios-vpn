@@ -367,11 +367,16 @@ NSNotificationName const AppDelegateSubscriptionDidActivateNotification = @"AppD
                       [PsiFeedbackLogger infoWithType:@"LandingPage"
                                               message:@"open landing page with VPN status %ld", (long) status];
 
-                      [[UIApplication sharedApplication] openURL:homepage.url
-                                                         options:@{}
-                                               completionHandler:^(BOOL success) {
-                                                   weakSelf.shownLandingPageForCurrentSession = success;
-                                               }];
+                      // Not officially documented by Apple, however a runtime warning is generated sometimes
+                      // stating that [UIApplication openURL:options:completionHandler:] must be used from
+                      // the main thread only.
+                      dispatch_async_main(^{
+                          [[UIApplication sharedApplication] openURL:homepage.url
+                                                             options:@{}
+                                                   completionHandler:^(BOOL success) {
+                                                       weakSelf.shownLandingPageForCurrentSession = success;
+                                                   }];
+                      });
                   }
               } error:^(NSError *error) {
                   [weakSelf.compoundDisposable removeDisposable:disposable];
