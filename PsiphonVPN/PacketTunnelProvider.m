@@ -465,7 +465,8 @@ typedef NS_ENUM(NSInteger, GracePeriodState) {
     Subscription *subscription = [Subscription fromPersistedDefaults];
     self.subscriptionCheckState = [SubscriptionState initialStateFromSubscription:subscription];
 
-    [PsiFeedbackLogger info:@"starting tunnel with %@", [self.subscriptionCheckState textDescription]];
+    [PsiFeedbackLogger info:@"start tunnel method:%@ subscription state:%@",
+        [self extensionStartMethodTextDescription], [self.subscriptionCheckState textDescription]];
 
     if (self.extensionStartMethod == ExtensionStartMethodFromContainer
         || [self.subscriptionCheckState isSubscribedOrInProgress]) {
