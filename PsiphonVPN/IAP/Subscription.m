@@ -437,9 +437,9 @@ typedef NS_ENUM(NSInteger, SubscriptionStateEnum) {
 
 - (NSString *_Nonnull)textDescription {
     switch (self.state) {
-        case SubscriptionStateNotSubscribed: return @"subscription state not subscribed";
-        case SubscriptionStateInProgress: return @"subscription state in progress";
-        case SubscriptionStateSubscribed: return @"subscription state subscribed";
+        case SubscriptionStateNotSubscribed: return @"not subscribed";
+        case SubscriptionStateInProgress: return @"in progress";
+        case SubscriptionStateSubscribed: return @"subscribed";
     }
     return @"";
 }
