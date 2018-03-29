@@ -68,8 +68,6 @@ typedef NS_ENUM(NSInteger, ExtensionStartMethodEnum) {
 
 - (void)stopTunnelWithReason:(NEProviderStopReason)reason;
 
-- (void)restartTunnel;
-
 - (BOOL)isNEZombie;
 
 - (BOOL)isTunnelConnected;
