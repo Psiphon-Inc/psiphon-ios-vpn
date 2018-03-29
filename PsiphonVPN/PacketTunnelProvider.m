@@ -471,8 +471,45 @@ typedef NS_ENUM(NSInteger, GracePeriodState) {
     if (self.extensionStartMethod == ExtensionStartMethodFromContainer
         || [self.subscriptionCheckState isSubscribedOrInProgress]) {
 
-        // Listen for messages from the container
-        [self listenForContainerMessages];
+        // Sets listener for notification from the container.
+        {
+            void (^notifierListenerBlock)(NSString *) = ^(NSString *key) {
+                // The notifier callbacks are made on the main thread.
+
+                if ([key isEqualToString:NOTIFIER_START_VPN]) {
+
+                    LOG_DEBUG(@"container signaled VPN to start");
+
+                    // If the tunnel is connected, starts the VPN.
+                    // Otherwise, should establish the VPN after onConnected has been called.
+                    self.shouldStartVPN = TRUE; // This should be set before calling tryStartVPN.
+                    [self tryStartVPN];
+
+                } else if ([key isEqualToString:NOTIFIER_APP_DID_ENTER_BACKGROUND]) {
+
+                    LOG_DEBUG(@"container entered background");
+
+                    // If the VPN start message ("M.startVPN") has not been received from the container,
+                    // and the container goes to the background, then alert the user to open the app.
+                    //
+                    // Note: We expect the value of shouldStartVPN to not be altered after it is set to TRUE.
+                    if (!self.shouldStartVPN) {
+                        [self displayMessage:NSLocalizedStringWithDefaultValue(@"OPEN_PSIPHON_APP", nil, [NSBundle mainBundle], @"Please open Psiphon app to finish connecting.", @"Alert message informing the user they should open the app to finish connecting to the VPN. DO NOT translate 'Psiphon'.")];
+                    }
+                    
+                } else if ([key isEqualToString:NOTIFIER_FORCE_SUBSCRIPTION_CHECK]) {
+
+                    // Container received a new subscription transaction.
+                    [PsiFeedbackLogger infoWithType:@"ExtensionNotification" message:@"force subscription check"];
+                    [self scheduleSubscriptionCheckWithRemoteCheckForced:TRUE];
+                }
+
+            };
+
+            [notifier listenForNotification:NOTIFIER_START_VPN listener:notifierListenerBlock];
+            [notifier listenForNotification:NOTIFIER_APP_DID_ENTER_BACKGROUND listener:notifierListenerBlock];
+            [notifier listenForNotification:NOTIFIER_FORCE_SUBSCRIPTION_CHECK listener:notifierListenerBlock];
+        }
 
         if ([self.subscriptionCheckState isSubscribedOrInProgress]) {
             
@@ -677,39 +714,6 @@ typedef NS_ENUM(NSInteger, GracePeriodState) {
         }
     }
     return FALSE;
-}
-
-- (void)listenForContainerMessages {
-    // The notifier callbacks are always called on the main thread.
-
-    [notifier listenForNotification:NOTIFIER_START_VPN listener:^{
-
-        LOG_DEBUG(@"container signaled VPN to start");
-
-        // If the tunnel is connected, starts the VPN.
-        // Otherwise, should establish the VPN after onConnected has been called.
-        self.shouldStartVPN = TRUE; // This should be set before calling tryStartVPN.
-        [self tryStartVPN];
-    }];
-
-    [notifier listenForNotification:NOTIFIER_APP_DID_ENTER_BACKGROUND listener:^{
-
-        LOG_DEBUG(@"container entered background");
-
-        // If the VPN start message ("M.startVPN") has not been received from the container,
-        // and the container goes to the background, then alert the user to open the app.
-        //
-        // Note: We expect the value of shouldStartVPN to not be altered after it is set to TRUE.
-        if (!self.shouldStartVPN) {
-            [self displayMessage:NSLocalizedStringWithDefaultValue(@"OPEN_PSIPHON_APP", nil, [NSBundle mainBundle], @"Please open Psiphon app to finish connecting.", @"Alert message informing the user they should open the app to finish connecting to the VPN. DO NOT translate 'Psiphon'.")];
-        }
-    }];
-
-    [notifier listenForNotification:NOTIFIER_FORCE_SUBSCRIPTION_CHECK listener:^{
-        // Container received a new subscription transaction.
-        [PsiFeedbackLogger infoWithType:@"ExtensionNotification" message:@"force subscription check"];
-        [self scheduleSubscriptionCheckWithRemoteCheckForced:TRUE];
-    }];
 }
 
 #pragma mark - Subscription

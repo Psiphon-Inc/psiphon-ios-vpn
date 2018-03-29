@@ -20,9 +20,11 @@
 #import <NetworkExtension/NetworkExtension.h>
 #import "Notifier.h"
 #import "Logging.h"
+#import "DispatchUtils.h"
+#import "Asserts.h"
 
 @implementation Notifier {
-    NSMutableDictionary *listeners;
+    NSMutableDictionary<NSString *, void(^)(NSString *)> *listeners;
     NSString *appGroupIdentifier;
 }
 
@@ -57,11 +59,9 @@ static void cfNotificationCallback(CFNotificationCenterRef center, void *observe
     }
 }
 
-- (void)listenForNotification:(nonnull NSString *)key listener:(nonnull void(^)(void))listener {
-    if (listeners[key]) {
-        LOG_WARN(@"already listening on key %@", key);
-        return;
-    }
+- (void)listenForNotification:(nonnull NSString *)key listener:(nonnull void(^)(NSString *))listener {
+    // Assert that no listener is setup on that key already.
+    PSIAssert(listeners[key] == nil);
 
     listeners[key] = listener;
 
@@ -77,7 +77,7 @@ static void cfNotificationCallback(CFNotificationCenterRef center, void *observe
     }
 }
 
-- (void)stopListening:(nonnull NSString *)key {
+- (void)removeListenerForKey:(nonnull NSString *)key {
     [listeners removeObjectForKey:key];
 
     // Remove self from Darwin notify center for the given key.
@@ -90,7 +90,7 @@ static void cfNotificationCallback(CFNotificationCenterRef center, void *observe
     }
 }
 
-- (void)stopListeningForAllNotifications {
+- (void)removeAllListeners {
     CFNotificationCenterRef center = CFNotificationCenterGetDarwinNotifyCenter();
     if (center) {
         [listeners removeAllObjects];
@@ -101,12 +101,15 @@ static void cfNotificationCallback(CFNotificationCenterRef center, void *observe
 #pragma mark - Private
 
 - (void)notificationCallback:(NSString *)key {
-    id listenerBlock = [listeners valueForKey:key];
+
+    void (^listenerBlock)(NSString *) = [listeners valueForKey:key];
+
     if (listenerBlock) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            ((void (^)(void)) listenerBlock)();
+        dispatch_async_main(^{
+            listenerBlock(key);
         });
     }
+
 }
 
 @end

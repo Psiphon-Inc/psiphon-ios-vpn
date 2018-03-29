@@ -300,7 +300,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     LOG_DEBUG();
     [super viewWillDisappear:animated];
     // Stop listening for diagnostic messages (we don't want to hold the shared db lock while backgrounded)
-    [notifier stopListeningForAllNotifications];
+    [notifier removeAllListeners];
 }
 
 - (void)viewDidDisappear:(BOOL)animated {
