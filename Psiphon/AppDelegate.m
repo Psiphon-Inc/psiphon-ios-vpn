@@ -331,7 +331,7 @@ NSNotificationName const AppDelegateSubscriptionDidActivateNotification = @"AppD
 
     __weak AppDelegate *weakSelf = self;
 
-    [notifier listenForNotification:NOTIFIER_NEW_HOMEPAGES listener:^{
+    [notifier listenForNotification:NOTIFIER_NEW_HOMEPAGES listener:^(NSString *key){
         LOG_DEBUG(@"Received notification NE.newHomepages");
 
         // Ignore the notification from the extension, since a landing page has
@@ -384,7 +384,7 @@ NSNotificationName const AppDelegateSubscriptionDidActivateNotification = @"AppD
         });
     }];
 
-    [notifier listenForNotification:NOTIFIER_TUNNEL_CONNECTED listener:^{
+    [notifier listenForNotification:NOTIFIER_TUNNEL_CONNECTED listener:^(NSString *key){
         LOG_DEBUG(@"Received notification NE.tunnelConnected");
 
         // If we haven't had a chance to load an Ad, and the
@@ -396,7 +396,7 @@ NSNotificationName const AppDelegateSubscriptionDidActivateNotification = @"AppD
         }
     }];
 
-    [notifier listenForNotification:NOTIFIER_ON_AVAILABLE_EGRESS_REGIONS listener:^{
+    [notifier listenForNotification:NOTIFIER_ON_AVAILABLE_EGRESS_REGIONS listener:^(NSString *key){
         LOG_DEBUG(@"Received notification NE.onAvailableEgressRegions");
         // Update available regions
         // TODO: this code is duplicated in MainViewController updateAvailableRegions
