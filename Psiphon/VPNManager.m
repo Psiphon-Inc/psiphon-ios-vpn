@@ -52,7 +52,7 @@ NSString * const VPNManagerLogType = @"VPNManager";
 @property (nonatomic, readwrite) RACSignal<NSNumber *> *vpnStartStatus;
 
 // Events should only be submitted to this subject on the main thread.
-@property (nonatomic, readwrite) RACReplaySubject<NSNumber *> *lastTunnelStatus;
+@property (nonatomic, readwrite) RACSignal<NSNumber *> *lastTunnelStatus;
 
 // Private properties
 @property (getter=tunnelProviderManager, setter=setTunnelProviderManager:) NETunnelProviderManager *tunnelProviderManager;
@@ -61,10 +61,16 @@ NSString * const VPNManagerLogType = @"VPNManager";
 @property (nonatomic) RACTargetQueueScheduler *serialQueueScheduer;
 
 @property (nonatomic) Notifier *notifier;
+
 @property (atomic) BOOL restartRequired;
+@property (atomic) BOOL extensionIsZombie;
 
 @property (nonatomic) RACCompoundDisposable *compoundDisposable;
+
+// Replay subjects are wrapped in signals that deliver only on the main thread.
 @property (nonatomic) RACReplaySubject<NSNumber *> *internalStartStatus;
+
+@property (nonatomic) RACReplaySubject<NSNumber *> *internalTunnelStatus;
 
 @end
 
@@ -81,9 +87,18 @@ NSString * const VPNManagerLogType = @"VPNManager";
         localVPNStatusObserver = nil;
 
         _internalStartStatus = [RACReplaySubject replaySubjectWithCapacity:1];
+        _internalTunnelStatus = [RACReplaySubject replaySubjectWithCapacity:1];
+
+        // Bootstrap connectionStatus with NEVPNStatusInvalid.
+        //       and the imperative code that requires a VPN status immediately.
+        //       This way, we don't risk blocking the main thread.
+        [_internalTunnelStatus sendNext:@(VPNStatusInvalid)];
 
         _restartRequired = FALSE;
         _notifier = [[Notifier alloc] initWithAppGroupIdentifier:APP_GROUP_IDENTIFIER];
+
+        _restartRequired = FALSE;
+        _extensionIsZombie = FALSE;
 
         NSString *queueName = @"ca.psiphon.Psiphon.VPNManagerSerialQueue";
         serialDispatchQueue = dispatch_queue_create([queueName UTF8String], DISPATCH_QUEUE_SERIAL);
@@ -95,14 +110,15 @@ NSString * const VPNManagerLogType = @"VPNManager";
         _serialQueueScheduer = [[RACTargetQueueScheduler alloc] initWithName:queueName targetQueue:serialDispatchQueue];
 
         // Public properties.
+        __weak VPNManager *weakSelf = self;
+
         _vpnStartStatus = [_internalStartStatus deliverOnMainThread];
 
-        _lastTunnelStatus = [RACReplaySubject replaySubjectWithCapacity:1];
-
-        // Bootstrap connectionStatus with NEVPNStatusInvalid.
-        //       and the imperative code that requires a VPN status immediately.
-        //       This way, we don't risk blocking the main thread.
-        [_lastTunnelStatus sendNext:@(VPNStatusInvalid)];
+        _lastTunnelStatus = [[_internalTunnelStatus map:^NSNumber *(NSNumber *connectionStatus) {
+            NEVPNStatus s = (NEVPNStatus) [connectionStatus integerValue];
+            return @([weakSelf mapVPNStatus:s]);
+        }]
+        deliverOnMainThread];
 
         _compoundDisposable = [RACCompoundDisposable compoundDisposable];
 
@@ -141,14 +157,11 @@ NSString * const VPNManagerLogType = @"VPNManager";
         }
 
         if (!_tunnelProviderManager) {
-            // Events to lastTunnelStatus should be submitted on the main thread.
-            dispatch_async_main(^{
-                [self.lastTunnelStatus sendNext:@(VPNStatusInvalid)];
-            });
+            [self.internalTunnelStatus sendNext:@(NEVPNStatusInvalid)];
             return;
         }
 
-        [self.lastTunnelStatus sendNext:@([self mapVPNStatus:_tunnelProviderManager.connection.status])];
+        [self.internalTunnelStatus sendNext:@(_tunnelProviderManager.connection.status)];
 
         __weak VPNManager *weakSelf = self;
 
@@ -159,7 +172,8 @@ NSString * const VPNManagerLogType = @"VPNManager";
                   usingBlock:^(NSNotification *_Nonnull note) {
 
                       // Observers of VPNManagerStatusDidChangeNotification will be notified at the same time.
-                      [self.lastTunnelStatus sendNext:@([self mapVPNStatus:_tunnelProviderManager.connection.status])];
+
+                      [self.internalTunnelStatus sendNext:@(_tunnelProviderManager.connection.status)];
 
                       // If restartRequired flag is on, waits until VPN status is NEVPNStatusDisconnected.
                       if (_tunnelProviderManager.connection.status == NEVPNStatusDisconnected &&
@@ -211,6 +225,36 @@ NSString * const VPNManagerLogType = @"VPNManager";
         [instance.compoundDisposable addDisposable:disposable];
     });
     return instance;
+}
+
+// fix as in fix the zombie state
+- (void)checkOrFixVPNStatus {
+
+    __weak VPNManager *weakSelf = self;
+
+    __block RACDisposable *disposable = [[[self isExtensionZombie]
+      flattenMap:^RACSignal<NSNumber *> *(NSNumber *isZombie) {
+
+          if ([isZombie boolValue]) {
+              weakSelf.extensionIsZombie = TRUE;
+              return [weakSelf setConnectOnDemandEnabled:FALSE];
+          } else {
+              return [RACSignal empty];
+          }
+      }]
+      subscribeNext:^(NSNumber *x) {
+          // Whether or not VPN configuration update succeeded or not, stop the VPN.
+          [weakSelf stopVPN];
+      }
+      error:^(NSError *error) {
+          [PsiFeedbackLogger errorWithType:VPNManagerLogType message:@"error killing zombie extension" object:error];
+          [weakSelf.compoundDisposable removeDisposable:disposable];
+      }
+      completed:^{
+          [weakSelf.compoundDisposable removeDisposable:disposable];
+      }];
+
+    [self.compoundDisposable addDisposable:disposable];
 }
 
 - (void)startTunnel {
@@ -322,6 +366,9 @@ NSString * const VPNManagerLogType = @"VPNManager";
       subscribeNext:^(NETunnelProviderManager *_Nullable providerManager) {
 
           [providerManager.connection stopVPNTunnel];
+
+          // Tunnel is being stopped, and previous zombie status can be reset.
+          weakSelf.extensionIsZombie = FALSE;
 
       } error:^(NSError *error) {
           [weakSelf.compoundDisposable removeDisposable:disposable];
@@ -446,34 +493,6 @@ NSString * const VPNManagerLogType = @"VPNManager";
       unsafeSubscribeOnSerialQueue:self.serialOperationQueue scheduler:self.serialQueueScheduer];
 }
 
-- (void)killExtensionIfZombie {
-
-    __weak VPNManager *weakSelf = self;
-
-    __block RACDisposable *disposable = [[[self isExtensionZombie]
-      flattenMap:^RACSignal<NSNumber *> *(NSNumber *isZombie) {
-
-          if ([isZombie boolValue]) {
-              return [weakSelf setConnectOnDemandEnabled:FALSE];
-          } else {
-              return [RACSignal empty];
-          }
-      }]
-      subscribeNext:^(NSNumber *x) {
-          // Whether or not VPN configuration update succeeded or not, stop the VPN.
-          [weakSelf stopVPN];
-      }
-      error:^(NSError *error) {
-          [PsiFeedbackLogger errorWithType:VPNManagerLogType message:@"error killing zombie extension" object:error];
-          [weakSelf.compoundDisposable removeDisposable:disposable];
-      }
-      completed:^{
-          [weakSelf.compoundDisposable removeDisposable:disposable];
-      }];
-
-    [self.compoundDisposable addDisposable:disposable];
-}
-
 + (BOOL)mapIsVPNActive:(VPNStatus)s {
     return (s == VPNStatusConnecting ||
             s == VPNStatusConnected ||
@@ -497,16 +516,19 @@ NSString * const VPNManagerLogType = @"VPNManager";
         // to the observers, and instead simply notify them that the
         // extension is restarting.
         return VPNStatusRestarting;
+    }
 
-    } else {
-        switch (status) {
-            case NEVPNStatusInvalid: return VPNStatusInvalid;
-            case NEVPNStatusDisconnected: return VPNStatusDisconnected;
-            case NEVPNStatusConnecting: return VPNStatusConnecting;
-            case NEVPNStatusConnected: return VPNStatusConnected;
-            case NEVPNStatusReasserting: return VPNStatusReasserting;
-            case NEVPNStatusDisconnecting: return VPNStatusDisconnecting;
-        }
+    if (self.extensionIsZombie) {
+        return VPNStatusZombie;
+    }
+
+    switch (status) {
+        case NEVPNStatusInvalid: return VPNStatusInvalid;
+        case NEVPNStatusDisconnected: return VPNStatusDisconnected;
+        case NEVPNStatusConnecting: return VPNStatusConnecting;
+        case NEVPNStatusConnected: return VPNStatusConnected;
+        case NEVPNStatusReasserting: return VPNStatusReasserting;
+        case NEVPNStatusDisconnecting: return VPNStatusDisconnecting;
     }
 
     [PsiFeedbackLogger error:@"Unknown NEVPNConnection status: (%ld)", (long) status];

@@ -171,27 +171,26 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     __weak MainViewController *weakSelf = self;
     
     // Observe VPN status for updating UI state
-    RACDisposable *tunnelStatusDisposable = [[self.vpnManager.lastTunnelStatus
-                                              deliverOnMainThread]
+    RACDisposable *tunnelStatusDisposable = [self.vpnManager.lastTunnelStatus
                                              subscribeNext:^(NSNumber *statusObject) {
                                                  VPNStatus s = (VPNStatus) [statusObject integerValue];
-                                                 
+
                                                  [weakSelf updateUIConnectionState:s];
-                                                 
+
                                                  if (s == VPNStatusConnecting ||
                                                      s == VPNStatusRestarting ||
                                                      s == VPNStatusReasserting) {
-                                                     
+
                                                      [weakSelf addPulsingHaloLayer];
-                                                     
+
                                                  } else {
                                                      [weakSelf removePulsingHaloLayer];
                                                  }
-                                                 
+
                                                  // Notify SettingsViewController that the state has changed.
                                                  // Note that this constant is used PsiphonClientCommonLibrary, and cannot simply be replaced by a RACSignal.
                                                  [[NSNotificationCenter defaultCenter] postNotificationName:kPsiphonConnectionStateNotification object:nil];
-                                                 
+
                                              }];
     
     [self.compoundDisposable addDisposable:tunnelStatusDisposable];
@@ -515,6 +514,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
         case VPNStatusDisconnecting: return NSLocalizedStringWithDefaultValue(@"VPN_STATUS_DISCONNECTING", nil, [NSBundle mainBundle], @"Disconnecting", @"Status when the VPN is disconnecting. Sometimes going from connected to disconnected can take some time, and this is that state.");
         case VPNStatusReasserting: return NSLocalizedStringWithDefaultValue(@"VPN_STATUS_RECONNECTING", nil, [NSBundle mainBundle], @"Reconnecting", @"Status when the VPN was connected to a Psiphon server, got disconnected unexpectedly, and is currently trying to reconnect");
         case VPNStatusRestarting: return NSLocalizedStringWithDefaultValue(@"VPN_STATUS_RESTARTING", nil, [NSBundle mainBundle], @"Restarting", @"Status when the VPN is restarting.");
+        case VPNStatusZombie: return @"...";
     }
     [PsiFeedbackLogger error:@"MainViewController unhandled VPNStatus (%ld)", status];
     return nil;

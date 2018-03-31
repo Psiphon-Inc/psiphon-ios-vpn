@@ -64,6 +64,8 @@ typedef NS_ENUM(NSInteger, VPNStatus) {
       VPNStatusDisconnecting = 5,
     /*! @const VPNStatusRestarting Stopping previous network extension process, and starting a new one. */
       VPNStatusRestarting = 6,
+    /*! @const VPNStatusZombie Network extension is in the zombie state. */
+    VPNStatusZombie = 7,
 };
 
 typedef NS_ENUM(NSInteger, VPNStartStatus) {
@@ -96,9 +98,14 @@ typedef NS_ENUM(NSInteger, VPNStartStatus) {
  *
  * @scheduler lastTunnelStatus delivers its events on the main thread.
  */
-@property (nonatomic, readonly) RACReplaySubject<NSNumber *> *lastTunnelStatus;
+@property (nonatomic, readonly) RACSignal<NSNumber *> *lastTunnelStatus;
 
 + (VPNManager *)sharedInstance;
+
+/**
+ * Must be called whenever the application becomes active for VPNManager to update its status.
+ */
+- (void)checkOrFixVPNStatus;
 
 /**
  * Starts the Network Extension process and also the tunnel.
@@ -166,11 +173,6 @@ typedef NS_ENUM(NSInteger, VPNStartStatus) {
  * @scheduler setConnectOnDemandEnabled: delivers its events on a background thread.
  */
 - (RACSignal<NSNumber *> *)setConnectOnDemandEnabled:(BOOL)onDemandEnabled;
-
-/**
- * Kills extension if it's a zombie.
- */
-- (void)killExtensionIfZombie;
 
 /**
  * Queries the Network Extension whether Psiphon tunnel is in connected state or not.
