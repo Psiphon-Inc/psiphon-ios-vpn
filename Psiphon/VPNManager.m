@@ -58,7 +58,7 @@ NSString * const VPNManagerLogType = @"VPNManager";
 @property (getter=tunnelProviderManager, setter=setTunnelProviderManager:) NETunnelProviderManager *tunnelProviderManager;
 
 @property (nonatomic) NSOperationQueue *serialOperationQueue;
-@property (nonatomic) RACTargetQueueScheduler *serialQueueScheduer;
+@property (nonatomic) RACTargetQueueScheduler *serialQueueScheduler;
 
 @property (nonatomic) Notifier *notifier;
 
@@ -107,7 +107,7 @@ NSString * const VPNManagerLogType = @"VPNManager";
         _serialOperationQueue.maxConcurrentOperationCount = 1;
         _serialOperationQueue.underlyingQueue = serialDispatchQueue;
 
-        _serialQueueScheduer = [[RACTargetQueueScheduler alloc] initWithName:queueName targetQueue:serialDispatchQueue];
+        _serialQueueScheduler = [[RACTargetQueueScheduler alloc] initWithName:queueName targetQueue:serialDispatchQueue];
 
         // Public properties.
         __weak VPNManager *weakSelf = self;
@@ -203,7 +203,7 @@ NSString * const VPNManagerLogType = @"VPNManager";
 
         // Adds loading VPN operation to `serialOperationQueue` before returning shared instance.
         __block RACDisposable *disposable = [[[VPNManager loadTunnelProviderManager]
-          unsafeSubscribeOnSerialQueue:instance.serialOperationQueue scheduler:instance.serialQueueScheduer]
+          unsafeSubscribeOnSerialQueue:instance.serialOperationQueue scheduler:instance.serialQueueScheduler]
           subscribeNext:^(NETunnelProviderManager *tunnelProvider) {
               if (tunnelProvider) {
                   instance.tunnelProviderManager = tunnelProvider;
@@ -309,7 +309,7 @@ NSString * const VPNManagerLogType = @"VPNManager";
           }
 
       }]
-      unsafeSubscribeOnSerialQueue:self.serialOperationQueue scheduler:self.serialQueueScheduer]
+      unsafeSubscribeOnSerialQueue:self.serialOperationQueue scheduler:self.serialQueueScheduler]
       subscribeError:^(NSError *error) {
           [PsiFeedbackLogger errorWithType:VPNManagerLogType message:@"failed to start" object:error];
 
@@ -337,7 +337,7 @@ NSString * const VPNManagerLogType = @"VPNManager";
     __weak VPNManager *weakSelf = self;
 
     __block RACDisposable *disposable = [[[self deferredTunnelProviderManager]
-      unsafeSubscribeOnSerialQueue:self.serialOperationQueue scheduler:self.serialQueueScheduer]
+      unsafeSubscribeOnSerialQueue:self.serialOperationQueue scheduler:self.serialQueueScheduler]
       subscribeNext:^(NETunnelProviderManager *_Nullable providerManager) {
 
           if (!providerManager) {
@@ -362,7 +362,7 @@ NSString * const VPNManagerLogType = @"VPNManager";
     __weak VPNManager *weakSelf = self;
 
     __block RACDisposable *disposable = [[[self deferredTunnelProviderManager]
-      unsafeSubscribeOnSerialQueue:self.serialOperationQueue scheduler:self.serialQueueScheduer]
+      unsafeSubscribeOnSerialQueue:self.serialOperationQueue scheduler:self.serialQueueScheduler]
       subscribeNext:^(NETunnelProviderManager *_Nullable providerManager) {
 
           [providerManager.connection stopVPNTunnel];
@@ -384,7 +384,7 @@ NSString * const VPNManagerLogType = @"VPNManager";
     __weak VPNManager *weakSelf = self;
 
     __block RACDisposable *disposable = [[[self deferredTunnelProviderManager]
-      unsafeSubscribeOnSerialQueue:self.serialOperationQueue scheduler:self.serialQueueScheduer]
+      unsafeSubscribeOnSerialQueue:self.serialOperationQueue scheduler:self.serialQueueScheduler]
       subscribeNext:^(NETunnelProviderManager *_Nullable providerManager) {
           if (!providerManager) {
               return;
@@ -444,7 +444,7 @@ NSString * const VPNManagerLogType = @"VPNManager";
               return [NSNumber numberWithBool:FALSE];
           }
       }]
-      unsafeSubscribeOnSerialQueue:self.serialOperationQueue scheduler:self.serialQueueScheduer];
+      unsafeSubscribeOnSerialQueue:self.serialOperationQueue scheduler:self.serialQueueScheduler];
 }
 
 // setConnectOnDemandEnabled: returns a signal that when subscribed to updates tunnelProviderManager's
@@ -496,7 +496,7 @@ NSString * const VPNManagerLogType = @"VPNManager";
           [PsiFeedbackLogger errorWithType:VPNManagerLogType message:@"error setting OnDemandEnabled" object:error];
           return [RACSignal return:[NSNumber numberWithBool:FALSE]];
       }]
-      unsafeSubscribeOnSerialQueue:self.serialOperationQueue scheduler:self.serialQueueScheduer];
+      unsafeSubscribeOnSerialQueue:self.serialOperationQueue scheduler:self.serialQueueScheduler];
 }
 
 + (BOOL)mapIsVPNActive:(VPNStatus)s {
@@ -633,8 +633,8 @@ NSString * const VPNManagerLogType = @"VPNManager";
           NEVPNStatus s = session.status;
 
           if (s == NEVPNStatusConnected ||
-            s == NEVPNStatusConnecting ||
-            s == NEVPNStatusReasserting) {
+              s == NEVPNStatusConnecting ||
+              s == NEVPNStatusReasserting ) {
 
               return [VPNManager sendProviderSessionMessage:query session:session];
 
@@ -653,7 +653,7 @@ NSString * const VPNManagerLogType = @"VPNManager";
 
           return nil;
       }]
-      unsafeSubscribeOnSerialQueue:self.serialOperationQueue scheduler:self.serialQueueScheduer];
+      unsafeSubscribeOnSerialQueue:self.serialOperationQueue scheduler:self.serialQueueScheduler];
 }
 
 // sendProviderSessionMessage:session: returns a signal that when subscribed to sends message to the tunnel provider
