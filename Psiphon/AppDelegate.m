@@ -193,9 +193,11 @@ NSNotificationName const AppDelegateSubscriptionDidActivateNotification = @"AppD
 
     __weak AppDelegate *weakSelf = self;
 
+    // Before submitting any other work to the VPNManager, update its status.
+    [vpnManager checkOrFixVPNStatus];
+
     // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
     [sharedDB updateAppForegroundState:YES];
-
 
     // If the extension has been waiting for the app to come into foreground,
     // send the VPNManager startVPN message again.
@@ -215,9 +217,6 @@ NSNotificationName const AppDelegateSubscriptionDidActivateNotification = @"AppD
         [self.compoundDisposable addDisposable:disposable];
 
     }
-
-    // Kill extension if it's become a zombie.
-    [vpnManager killExtensionIfZombie];
 
     // Starts subscription expiry timer if there is an active subscription.
     [self subscriptionExpiryTimer];
