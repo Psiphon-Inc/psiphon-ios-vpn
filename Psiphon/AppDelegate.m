@@ -204,7 +204,7 @@ NSNotificationName const AppDelegateSubscriptionDidActivateNotification = @"AppD
     if (![adManager untunneledInterstitialIsShowing]) {
 
         __block RACDisposable *disposable = [[vpnManager isPsiphonTunnelConnected]
-          subscribeNext:^(NSNumber *connected) {
+          subscribeNext:^(NSNumber *_Nullable connected) {
               if ([connected boolValue]) {
                   [vpnManager startVPN];
               }

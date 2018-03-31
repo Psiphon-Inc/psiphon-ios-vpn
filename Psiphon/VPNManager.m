@@ -412,18 +412,24 @@ NSString * const VPNManagerLogType = @"VPNManager";
 
     __weak VPNManager *weakSelf = self;
 
-    return [[[self deferredTunnelProviderManager]
-      map:^RACTwoTuple<NSNumber *, NSNumber *> *(NETunnelProviderManager *_Nullable providerManager) {
-
-          if (providerManager) {
-              VPNStatus s = [weakSelf mapVPNStatus:(NEVPNStatus) providerManager.connection.status];
-              BOOL isActive = [VPNManager mapIsVPNActive:s];
-              return [RACTwoTuple pack:[NSNumber numberWithBool:isActive] :@(s)];
+    return [[self isExtensionZombie]
+      flattenMap:^RACSignal *(NSNumber *_Nullable isZombie) {
+          if ([isZombie boolValue]) {
+              weakSelf.extensionIsZombie = TRUE;
+              return [RACSignal return:[RACTwoTuple pack:[NSNumber numberWithBool:FALSE] :@(VPNStatusZombie)]];
           } else {
-              return [RACTwoTuple pack:[NSNumber numberWithBool:FALSE] :@(VPNStatusInvalid)];
+              return [[self deferredTunnelProviderManager]
+                map:^RACTwoTuple<NSNumber *, NSNumber *> *(NETunnelProviderManager *_Nullable providerManager) {
+                    if (providerManager) {
+                        VPNStatus s = [weakSelf mapVPNStatus:(NEVPNStatus) providerManager.connection.status];
+                        BOOL isActive = [VPNManager mapIsVPNActive:s];
+                        return [RACTwoTuple pack:[NSNumber numberWithBool:isActive] :@(s)];
+                    } else {
+                        return [RACTwoTuple pack:[NSNumber numberWithBool:FALSE] :@(VPNStatusInvalid)];
+                    }
+                }];
           }
-      }]
-      unsafeSubscribeOnSerialQueue:self.serialOperationQueue scheduler:self.serialQueueScheduer];
+      }];
 }
 
 // isConnectOnDemandEnabled returns a signal that when subscribed to emits boolean value as NSNumber,
@@ -599,7 +605,7 @@ NSString * const VPNManagerLogType = @"VPNManager";
 }
 
 // isPsiphonTunnelConnected returns a signal that when subscribed to sends "isTunnelConnected" query to the extension
-// and then emits boolean response as NSNumber, or the signal completes immediately if extension is not active.
+// and then emits boolean response as NSNumber, or nil if extension is not active.
 // Note: the returned signal emits FALSE if the extension returns empty response.
 - (RACSignal<NSNumber *> *)isPsiphonTunnelConnected {
     return [[self queryActiveVPN:EXTENSION_QUERY_IS_TUNNEL_CONNECTED]
@@ -609,23 +615,19 @@ NSString * const VPNManagerLogType = @"VPNManager";
       }];
 }
 
-// queryActiveVPN returns a signal that when subscribed to completes immediately if the extension is not running,
+// queryActiveVPN returns a signal that when subscribed to emits nil if the extension is not running,
 // otherwise emits boolean value as NSNumber as the query response.
 // Returned signal terminates with an error if the extension returns empty response.
 - (RACSignal<NSNumber *> *)queryActiveVPN:(NSString *)query {
 
-    __weak VPNManager *weakSelf = self;
-
-    return [[[[RACSignal defer:^RACSignal * {
-          return [RACSignal return:weakSelf.tunnelProviderManager];
-      }]
+    return [[[[self deferredTunnelProviderManager]
       flattenMap:^RACSignal<NSString *> *(NETunnelProviderManager *providerManager) {
 
           NETunnelProviderSession *session = (NETunnelProviderSession *) providerManager.connection;
 
           if (!session) {
               // There is no tunnel provider, immediately completes the signal.
-              return [RACSignal empty];
+              return [RACSignal return:nil];
           }
 
           NEVPNStatus s = session.status;
@@ -638,7 +640,7 @@ NSString * const VPNManagerLogType = @"VPNManager";
 
           } else {
               // Tunnel is not active, immediately completes the signal.
-              return [RACSignal empty];
+              return [RACSignal return:nil];
           }
       }]
       map:^NSNumber *(NSString *response) {
@@ -649,7 +651,6 @@ NSString * const VPNManagerLogType = @"VPNManager";
               return [NSNumber numberWithBool:FALSE];
           }
 
-          NSAssert(0, @"Invalid response value:%@", response);
           return nil;
       }]
       unsafeSubscribeOnSerialQueue:self.serialOperationQueue scheduler:self.serialQueueScheduer];
