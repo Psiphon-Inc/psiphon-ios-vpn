@@ -144,8 +144,9 @@ typedef NS_ENUM(NSInteger, VPNStartStatus) {
 + (BOOL)mapIsVPNActive:(VPNStatus)s;
 
 /**
- * isVPNActive signal when subscribed to, emits a RACTwoTuple of (is vpn active, vpn status),
- * and then completes.
+ * isVPNActive returns a signal that when subscribed to, queries the extension if its zombie,
+ * and then checks NETunnelProviderManager connection status if the extension is not in the zombie state.
+ * Returned signal emits a RACTwoTuple of (is vpn active, vpn status), and then completes.
  *
  * If no VPN configuration was previously saved, it emits `(FALSE, VPNStatusInvalid)` tuple.
  *
@@ -176,9 +177,9 @@ typedef NS_ENUM(NSInteger, VPNStartStatus) {
 
 /**
  * Queries the Network Extension whether Psiphon tunnel is in connected state or not.
- * @param completionHandler Called with tunnelIsConnected set to TRUE if Psiphon tunnel is connected, FALSE otherwise.
+ * @attention Returned signal emits nil if there is no active session.
  *
- * @scheduler isPsiphonTunnelConnected: delivers its events on a background thread
+ * @scheduler isPsiphonTunnelConnected: delivers its events on a background thread.
  */
 - (RACSignal<NSNumber *> *)isPsiphonTunnelConnected;
 
