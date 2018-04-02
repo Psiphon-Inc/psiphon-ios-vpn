@@ -19,6 +19,7 @@
 
 #import <PsiphonTunnel/Reachability.h>
 #import <ReactiveObjC/RACTuple.h>
+#import <NetworkExtension/NetworkExtension.h>
 #import "AppDelegate.h"
 #import "AdManager.h"
 #import "EmbeddedServerEntries.h"
@@ -340,6 +341,9 @@ NSNotificationName const AppDelegateSubscriptionDidActivateNotification = @"AppD
             return;
         }
 
+        // Eagerly set the value to TRUE.
+        weakSelf.shownLandingPageForCurrentSession = TRUE;
+        
         dispatch_async_global(^{
 
             // If a landing page is not already shown for the current session, randomly choose
@@ -348,6 +352,7 @@ NSNotificationName const AppDelegateSubscriptionDidActivateNotification = @"AppD
             NSArray<Homepage *> *homepages = [weakSelf.sharedDB getHomepages];
 
             if (!homepages || [homepages count] == 0) {
+                weakSelf.shownLandingPageForCurrentSession = FALSE;
                 return;
             }
 
@@ -356,31 +361,40 @@ NSNotificationName const AppDelegateSubscriptionDidActivateNotification = @"AppD
 
             // Only opens landing page if the VPN is active.
             // Landing page should not be opened outside of the tunnel.
-            __block RACDisposable *disposable = [[weakSelf.vpnManager isVPNActive]
-              subscribeNext:^(RACTwoTuple<NSNumber *, NSNumber *> *result) {
+            __block RACDisposable *disposable = [[[weakSelf.vpnManager isExtensionZombie]
+              deliverOnMainThread]
+              subscribeNext:^(NSNumber *isZombie) {
 
-                  BOOL isActive = [result.first boolValue];
-                  VPNStatus status = (VPNStatus) [result.second integerValue];
+                  if ([isZombie boolValue]) {
+                      weakSelf.shownLandingPageForCurrentSession = FALSE;
+                      return;
+                  }
 
-                  if (isActive) {
+                  NEVPNStatus s = weakSelf.vpnManager.tunnelProviderStatus;
+
+                  if (s == NEVPNStatusConnecting ||
+                      s == NEVPNStatusConnected ||
+                      s == NEVPNStatusReasserting) {
 
                       [PsiFeedbackLogger infoWithType:@"LandingPage"
-                                              message:@"open landing page with VPN status %ld", (long) status];
+                                              message:@"open landing page with VPN status %ld", (long) s];
 
                       // Not officially documented by Apple, however a runtime warning is generated sometimes
                       // stating that [UIApplication openURL:options:completionHandler:] must be used from
                       // the main thread only.
-                      dispatch_async_main(^{
-                          [[UIApplication sharedApplication] openURL:homepage.url
-                                                             options:@{}
-                                                   completionHandler:^(BOOL success) {
-                                                       weakSelf.shownLandingPageForCurrentSession = success;
-                                                   }];
-                      });
+                      [[UIApplication sharedApplication] openURL:homepage.url
+                                                         options:@{}
+                                               completionHandler:^(BOOL success) {
+                                                   weakSelf.shownLandingPageForCurrentSession = success;
+                                               }];
+
+                  } else {
+                      weakSelf.shownLandingPageForCurrentSession = FALSE;
                   }
+
               } error:^(NSError *error) {
                   [weakSelf.compoundDisposable removeDisposable:disposable];
-              }   completed:^{
+              } completed:^{
                   [weakSelf.compoundDisposable removeDisposable:disposable];
               }];
 
