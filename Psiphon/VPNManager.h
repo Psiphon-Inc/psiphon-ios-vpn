@@ -18,6 +18,7 @@
  */
 
 #import <Foundation/Foundation.h>
+#import <NetworkExtension/NetworkExtension.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -100,6 +101,11 @@ typedef NS_ENUM(NSInteger, VPNStartStatus) {
  */
 @property (nonatomic, readonly) RACSignal<NSNumber *> *lastTunnelStatus;
 
+/**
+ * VPN status code from underlying NETunnelProviderManager.
+ */
+@property (nonatomic, readonly) NEVPNStatus tunnelProviderStatus;
+
 + (VPNManager *)sharedInstance;
 
 /**
@@ -174,6 +180,14 @@ typedef NS_ENUM(NSInteger, VPNStartStatus) {
  * @scheduler setConnectOnDemandEnabled: delivers its events on a background thread.
  */
 - (RACSignal<NSNumber *> *)setConnectOnDemandEnabled:(BOOL)onDemandEnabled;
+
+/**
+ * Queries the Network Extension whether it is in the zombie state.
+ * @attention Returned signal emits nil if there is no active session.
+ *
+ * @scheduler isExtensionZombie delivers its events on a background thread.
+ */
+- (RACSignal<NSNumber *> *)isExtensionZombie;
 
 /**
  * Queries the Network Extension whether Psiphon tunnel is in connected state or not.

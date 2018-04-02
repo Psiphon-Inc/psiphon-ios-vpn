@@ -17,7 +17,6 @@
  *
  */
 
-#import <NetworkExtension/NetworkExtension.h>
 #import <ReactiveObjC/RACScheduler.h>
 #import <ReactiveObjC/RACTuple.h>
 #import "VPNManager.h"
@@ -53,6 +52,8 @@ NSString * const VPNManagerLogType = @"VPNManager";
 
 // Events should only be submitted to this subject on the main thread.
 @property (nonatomic, readwrite) RACSignal<NSNumber *> *lastTunnelStatus;
+
+@property (nonatomic, getter=tunnelProviderStatus) NEVPNStatus tunnelProviderStatus;
 
 // Private properties
 @property (getter=tunnelProviderManager, setter=setTunnelProviderManager:) NETunnelProviderManager *tunnelProviderManager;
@@ -138,6 +139,16 @@ NSString * const VPNManagerLogType = @"VPNManager";
     return [RACSignal defer:^RACSignal * {
         return [RACSignal return:weakSelf.tunnelProviderManager];
     }];
+}
+
+- (NEVPNStatus)tunnelProviderStatus {
+    @synchronized (self) {
+        if (self.tunnelProviderManager) {
+            return self.tunnelProviderManager.connection.status;
+        }
+
+        return NEVPNStatusInvalid;
+    }
 }
 
 // All operations involving `tunnelProviderManager` property are serialized on the `serialOperationQueue`.
