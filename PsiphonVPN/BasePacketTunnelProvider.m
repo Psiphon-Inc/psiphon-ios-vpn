@@ -24,6 +24,7 @@
 #import "FileUtils.h"
 #import "RACReplaySubject.h"
 #import "NSError+Convenience.h"
+#import "Asserts.h"
 
 NSErrorDomain _Nonnull const BasePsiphonTunnelErrorDomain = @"BasePsiphonTunnelErrorDomain";
 
@@ -222,6 +223,17 @@ NSErrorDomain _Nonnull const BasePsiphonTunnelErrorDomain = @"BasePsiphonTunnelE
     [self displayMessage:message completionHandler:^(BOOL success) {
         // Do nothing.
     }];
+}
+
+- (NSString *)extensionStartMethodTextDescription {
+    switch (self.extensionStartMethod) {
+        case ExtensionStartMethodFromContainer: return @"container";
+        case ExtensionStartMethodFromBoot: return @"boot";
+        case ExtensionStartMethodOther: return @"other";
+        default: PSIAssert(FALSE);
+    }
+
+    return @"";
 }
 
 @end
