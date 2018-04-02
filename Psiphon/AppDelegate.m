@@ -51,6 +51,8 @@
 NSNotificationName const AppDelegateSubscriptionDidExpireNotification = @"AppDelegateSubscriptionDidExpireNotification";
 NSNotificationName const AppDelegateSubscriptionDidActivateNotification = @"AppDelegateSubscriptionDidActivateNotification";
 
+PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
+
 @interface AppDelegate ()
 
 @property (atomic) BOOL shownLandingPageForCurrentSession;
@@ -376,7 +378,7 @@ NSNotificationName const AppDelegateSubscriptionDidActivateNotification = @"AppD
                       s == NEVPNStatusConnected ||
                       s == NEVPNStatusReasserting) {
 
-                      [PsiFeedbackLogger infoWithType:@"LandingPage"
+                      [PsiFeedbackLogger infoWithType:LandingPageLogType
                                               message:@"open landing page with VPN status %ld", (long) s];
 
                       // Not officially documented by Apple, however a runtime warning is generated sometimes

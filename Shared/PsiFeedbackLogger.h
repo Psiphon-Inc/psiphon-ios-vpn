@@ -21,6 +21,8 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+typedef NSString * PsiFeedbackLogType;
+
 @interface PsiFeedbackLogger : NSObject
 
 @property (class, nonatomic, readonly) NSString * containerRotatingLogNoticesPath;
@@ -36,13 +38,13 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (void)info:(NSString *)format, ... NS_FORMAT_FUNCTION(1,2);
 
-+ (void)infoWithType:(NSString *)sourceType message:(NSString *)format, ... NS_FORMAT_FUNCTION(2,3);
++ (void)infoWithType:(PsiFeedbackLogType)sourceType message:(NSString *)format, ... NS_FORMAT_FUNCTION(2,3);
 
 + (void)error:(NSString *)format, ... NS_FORMAT_FUNCTION(1,2);
 
-+ (void)errorWithType:(NSString *)sourceType message:(NSString *)format, ... NS_FORMAT_FUNCTION(2,3);
++ (void)errorWithType:(PsiFeedbackLogType)sourceType message:(NSString *)format, ... NS_FORMAT_FUNCTION(2,3);
 
-+ (void)errorWithType:(NSString *)sourceType message:(NSString *)message object:(NSError *)error;
++ (void)errorWithType:(PsiFeedbackLogType)sourceType message:(NSString *)message object:(NSError *)error;
 
 + (void)logNoticeWithType:(NSString *)noticeType message:(NSString *)message timestamp:(NSString *)timestamp;
 
