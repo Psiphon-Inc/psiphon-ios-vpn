@@ -70,15 +70,6 @@ typedef NS_ENUM(NSInteger, GracePeriodState) {
     GracePeriodStateDone
 };
 
-// PsiphonTunnel extension
-@interface PsiphonTunnel ()
-
-// Exposing private method implemented in PsiphonTunnel.
-// It is expected that PsiphonTunnel will not generated a new session ID, when this method is called.
-- (BOOL)start;
-
-@end
-
 @interface PacketTunnelProvider ()
 
 @property (atomic) BOOL extensionIsZombie;
@@ -595,7 +586,7 @@ typedef NS_ENUM(NSInteger, GracePeriodState) {
     dispatch_async(self->workQueue, ^{
 
         // It is expected that the private start method of PsiphonTunnel will not generate a new session ID.
-        if (![psiphonTunnel start]) {
+        if (![psiphonTunnel stopAndReconnectWithCurrentSessionID]) {
             [PsiFeedbackLogger error:@"tunnel start failed"];
         }
     });
