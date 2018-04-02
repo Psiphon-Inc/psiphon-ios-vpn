@@ -43,7 +43,7 @@
 
 NSErrorDomain const VPNManagerErrorDomain = @"VPNManagerErrorDomain";
 
-NSString * const VPNManagerLogType = @"VPNManager";
+PsiFeedbackLogType const VPNManagerLogType = @"VPNManager";
 
 @interface VPNManager ()
 
