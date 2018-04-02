@@ -19,6 +19,7 @@
 
 #import <PsiphonTunnel/Reachability.h>
 #import <ReactiveObjC/RACTuple.h>
+#import <NetworkExtension/NetworkExtension.h>
 #import "AppDelegate.h"
 #import "AdManager.h"
 #import "EmbeddedServerEntries.h"
@@ -50,19 +51,22 @@
 NSNotificationName const AppDelegateSubscriptionDidExpireNotification = @"AppDelegateSubscriptionDidExpireNotification";
 NSNotificationName const AppDelegateSubscriptionDidActivateNotification = @"AppDelegateSubscriptionDidActivateNotification";
 
+PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
+
 @interface AppDelegate ()
 
 @property (atomic) BOOL shownLandingPageForCurrentSession;
 @property (nonatomic) RACCompoundDisposable *compoundDisposable;
 
+@property (nonatomic) VPNManager *vpnManager;
+@property (nonatomic) PsiphonDataSharedDB *sharedDB;
+@property (nonatomic) NSTimer *subscriptionCheckTimer;
+
 @end
 
 @implementation AppDelegate {
-    VPNManager *vpnManager;
     AdManager *adManager;
-    PsiphonDataSharedDB *sharedDB;
     Notifier *notifier;
-    NSTimer *subscriptionCheckTimer;
 
     RootContainerController *rootContainerController;
 }
@@ -70,11 +74,11 @@ NSNotificationName const AppDelegateSubscriptionDidActivateNotification = @"AppD
 - (instancetype)init {
     self = [super init];
     if (self) {
-        vpnManager = [VPNManager sharedInstance];
         adManager = [AdManager sharedInstance];
-        sharedDB = [[PsiphonDataSharedDB alloc] initForAppGroupIdentifier:APP_GROUP_IDENTIFIER];
         notifier = [[Notifier alloc] initWithAppGroupIdentifier:APP_GROUP_IDENTIFIER];
 
+        _vpnManager = [VPNManager sharedInstance];
+        _sharedDB = [[PsiphonDataSharedDB alloc] initForAppGroupIdentifier:APP_GROUP_IDENTIFIER];
         _shownLandingPageForCurrentSession = FALSE;
         _compoundDisposable = [RACCompoundDisposable compoundDisposable];
     }
@@ -165,13 +169,13 @@ NSNotificationName const AppDelegateSubscriptionDidActivateNotification = @"AppD
     [self loadAdsIfNeeded];
 
     // Listen for VPN status changes from VPNManager.
-    __block RACDisposable *disposable = [vpnManager.lastTunnelStatus
+    __block RACDisposable *disposable = [self.vpnManager.lastTunnelStatus
       subscribeNext:^(NSNumber *statusObject) {
           VPNStatus s = (VPNStatus) [statusObject integerValue];
 
           if (s == VPNStatusDisconnected || s == VPNStatusRestarting ) {
               // Resets the homepage flag if the VPN has disconnected or is restarting.
-              self.shownLandingPageForCurrentSession = FALSE;
+              weakSelf.shownLandingPageForCurrentSession = FALSE;
           }
 
       } error:^(NSError *error) {
@@ -193,18 +197,20 @@ NSNotificationName const AppDelegateSubscriptionDidActivateNotification = @"AppD
 
     __weak AppDelegate *weakSelf = self;
 
-    // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
-    [sharedDB updateAppForegroundState:YES];
+    // Before submitting any other work to the VPNManager, update its status.
+    [self.vpnManager checkOrFixVPNStatus];
 
+    // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
+    [self.sharedDB updateAppForegroundState:YES];
 
     // If the extension has been waiting for the app to come into foreground,
     // send the VPNManager startVPN message again.
     if (![adManager untunneledInterstitialIsShowing]) {
 
-        __block RACDisposable *disposable = [[vpnManager isPsiphonTunnelConnected]
-          subscribeNext:^(NSNumber *connected) {
+        __block RACDisposable *disposable = [[self.vpnManager isPsiphonTunnelConnected]
+          subscribeNext:^(NSNumber *_Nullable connected) {
               if ([connected boolValue]) {
-                  [vpnManager startVPN];
+                  [weakSelf.vpnManager startVPN];
               }
           } error:^(NSError *error) {
               [weakSelf.compoundDisposable removeDisposable:disposable];
@@ -216,9 +222,6 @@ NSNotificationName const AppDelegateSubscriptionDidActivateNotification = @"AppD
 
     }
 
-    // Kill extension if it's become a zombie.
-    [vpnManager killExtensionIfZombie];
-
     // Starts subscription expiry timer if there is an active subscription.
     [self subscriptionExpiryTimer];
 }
@@ -229,7 +232,7 @@ NSNotificationName const AppDelegateSubscriptionDidActivateNotification = @"AppD
     // Use this method to pause ongoing tasks, disable timers, and invalidate graphics rendering callbacks. Games should use this method to pause the game.
 
     // Cancel subscription expiry timer if active.
-    [subscriptionCheckTimer invalidate];
+    [self.subscriptionCheckTimer invalidate];
 }
 
 - (void)applicationDidEnterBackground:(UIApplication *)application {
@@ -239,7 +242,7 @@ NSNotificationName const AppDelegateSubscriptionDidActivateNotification = @"AppD
 
     [[UIApplication sharedApplication] ignoreSnapshotOnNextApplicationLaunch];
     [notifier post:NOTIFIER_APP_DID_ENTER_BACKGROUND];
-    [sharedDB updateAppForegroundState:NO];
+    [self.sharedDB updateAppForegroundState:NO];
 }
 
 - (void)applicationWillEnterForeground:(UIApplication *)application {
@@ -270,7 +273,7 @@ NSNotificationName const AppDelegateSubscriptionDidActivateNotification = @"AppD
 
 - (void)loadAdsIfNeeded {
 
-    VPNStatus s = (VPNStatus) [[[vpnManager lastTunnelStatus] first] integerValue];
+    VPNStatus s = (VPNStatus) [[[self.vpnManager lastTunnelStatus] first] integerValue];
 
     if ([adManager shouldShowUntunneledAds] &&
         ![adManager untunneledInterstitialIsReady] &&
@@ -319,7 +322,7 @@ NSNotificationName const AppDelegateSubscriptionDidActivateNotification = @"AppD
     LOG_DEBUG("Available embedded egress regions: %@.", embeddedEgressRegions);
 
     if ([embeddedEgressRegions count] > 0) {
-        [sharedDB insertNewEmbeddedEgressRegions:embeddedEgressRegions];
+        [self.sharedDB insertNewEmbeddedEgressRegions:embeddedEgressRegions];
     } else {
         [PsiFeedbackLogger error:@"Error no egress regions found in %@.", embeddedServerEntriesPath];
     }
@@ -331,7 +334,7 @@ NSNotificationName const AppDelegateSubscriptionDidActivateNotification = @"AppD
 
     __weak AppDelegate *weakSelf = self;
 
-    [notifier listenForNotification:NOTIFIER_NEW_HOMEPAGES listener:^{
+    [notifier listenForNotification:NOTIFIER_NEW_HOMEPAGES listener:^(NSString *key){
         LOG_DEBUG(@"Received notification NE.newHomepages");
 
         // Ignore the notification from the extension, since a landing page has
@@ -340,14 +343,18 @@ NSNotificationName const AppDelegateSubscriptionDidActivateNotification = @"AppD
             return;
         }
 
+        // Eagerly set the value to TRUE.
+        weakSelf.shownLandingPageForCurrentSession = TRUE;
+        
         dispatch_async_global(^{
 
             // If a landing page is not already shown for the current session, randomly choose
             // a landing page from the list supplied by Psiphon tunnel.
 
-            NSArray<Homepage *> *homepages = [sharedDB getHomepages];
+            NSArray<Homepage *> *homepages = [weakSelf.sharedDB getHomepages];
 
             if (!homepages || [homepages count] == 0) {
+                weakSelf.shownLandingPageForCurrentSession = FALSE;
                 return;
             }
 
@@ -356,26 +363,40 @@ NSNotificationName const AppDelegateSubscriptionDidActivateNotification = @"AppD
 
             // Only opens landing page if the VPN is active.
             // Landing page should not be opened outside of the tunnel.
-            __block RACDisposable *disposable = [[vpnManager isVPNActive]
-              subscribeNext:^(RACTwoTuple<NSNumber *, NSNumber *> *result) {
+            __block RACDisposable *disposable = [[[weakSelf.vpnManager isExtensionZombie]
+              deliverOnMainThread]
+              subscribeNext:^(NSNumber *isZombie) {
 
-                  BOOL isActive = [result.first boolValue];
-                  VPNStatus status = (VPNStatus) [result.second integerValue];
+                  if ([isZombie boolValue]) {
+                      weakSelf.shownLandingPageForCurrentSession = FALSE;
+                      return;
+                  }
 
-                  if (isActive) {
+                  NEVPNStatus s = weakSelf.vpnManager.tunnelProviderStatus;
 
-                      [PsiFeedbackLogger infoWithType:@"LandingPage"
-                                              message:@"open landing page with VPN status %ld", (long) status];
+                  if (s == NEVPNStatusConnecting ||
+                      s == NEVPNStatusConnected ||
+                      s == NEVPNStatusReasserting) {
 
+                      [PsiFeedbackLogger infoWithType:LandingPageLogType
+                                              message:@"open landing page with VPN status %ld", (long) s];
+
+                      // Not officially documented by Apple, however a runtime warning is generated sometimes
+                      // stating that [UIApplication openURL:options:completionHandler:] must be used from
+                      // the main thread only.
                       [[UIApplication sharedApplication] openURL:homepage.url
                                                          options:@{}
                                                completionHandler:^(BOOL success) {
                                                    weakSelf.shownLandingPageForCurrentSession = success;
                                                }];
+
+                  } else {
+                      weakSelf.shownLandingPageForCurrentSession = FALSE;
                   }
+
               } error:^(NSError *error) {
                   [weakSelf.compoundDisposable removeDisposable:disposable];
-              }   completed:^{
+              } completed:^{
                   [weakSelf.compoundDisposable removeDisposable:disposable];
               }];
 
@@ -384,7 +405,7 @@ NSNotificationName const AppDelegateSubscriptionDidActivateNotification = @"AppD
         });
     }];
 
-    [notifier listenForNotification:NOTIFIER_TUNNEL_CONNECTED listener:^{
+    [notifier listenForNotification:NOTIFIER_TUNNEL_CONNECTED listener:^(NSString *key){
         LOG_DEBUG(@"Received notification NE.tunnelConnected");
 
         // If we haven't had a chance to load an Ad, and the
@@ -392,16 +413,16 @@ NSNotificationName const AppDelegateSubscriptionDidActivateNotification = @"AppD
         // start the VPN. Otherwise the startVPN message will be
         // sent after the Ad has disappeared.
         if (![adManager untunneledInterstitialIsShowing]) {
-            [vpnManager startVPN];
+            [weakSelf.vpnManager startVPN];
         }
     }];
 
-    [notifier listenForNotification:NOTIFIER_ON_AVAILABLE_EGRESS_REGIONS listener:^{
+    [notifier listenForNotification:NOTIFIER_ON_AVAILABLE_EGRESS_REGIONS listener:^(NSString *key){
         LOG_DEBUG(@"Received notification NE.onAvailableEgressRegions");
         // Update available regions
         // TODO: this code is duplicated in MainViewController updateAvailableRegions
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-            NSArray<NSString *> *regions = [sharedDB getAllEgressRegions];
+            NSArray<NSString *> *regions = [weakSelf.sharedDB getAllEgressRegions];
             [[RegionAdapter sharedInstance] onAvailableEgressRegions:regions];
         });
     }];
@@ -423,8 +444,8 @@ NSNotificationName const AppDelegateSubscriptionDidActivateNotification = @"AppD
                 
                 if (interval > 0) {
                     // Checks if another timer is already running.
-                    if (![subscriptionCheckTimer isValid]) {
-                        subscriptionCheckTimer = [NSTimer scheduledTimerWithTimeInterval:interval
+                    if (![weakSelf.subscriptionCheckTimer isValid]) {
+                        weakSelf.subscriptionCheckTimer = [NSTimer scheduledTimerWithTimeInterval:interval
                                                                                  repeats:NO
                                                                                    block:^(NSTimer *timer) {
                             [weakSelf subscriptionExpiryTimer];
@@ -447,7 +468,7 @@ NSNotificationName const AppDelegateSubscriptionDidActivateNotification = @"AppD
     __weak AppDelegate *weakSelf = self;
 
     // Disables Connect On Demand setting of the VPN Configuration.
-    __block RACDisposable *disposable = [[vpnManager setConnectOnDemandEnabled:FALSE]
+    __block RACDisposable *disposable = [[self.vpnManager setConnectOnDemandEnabled:FALSE]
       subscribeError:^(NSError *error) {
           [weakSelf.compoundDisposable removeDisposable:disposable];
       } completed:^{
@@ -464,7 +485,7 @@ NSNotificationName const AppDelegateSubscriptionDidActivateNotification = @"AppD
     [self subscriptionExpiryTimer];
 
     // Asks the extension to perform a subscription check if it is running currently.
-    __block RACDisposable *vpnActiveDisposable = [[vpnManager isVPNActive]
+    __block RACDisposable *vpnActiveDisposable = [[self.vpnManager isVPNActive]
       subscribeNext:^(RACTwoTuple<NSNumber *, NSNumber *> *value) {
         BOOL isActive = [value.first boolValue];
 
@@ -486,7 +507,7 @@ NSNotificationName const AppDelegateSubscriptionDidActivateNotification = @"AppD
     BOOL userPreferredOnDemandSetting = [[NSUserDefaults standardUserDefaults]
       boolForKey:SettingsConnectOnDemandBoolKey];
 
-    __block RACDisposable *onDemandDisposable = [[vpnManager setConnectOnDemandEnabled:userPreferredOnDemandSetting]
+    __block RACDisposable *onDemandDisposable = [[self.vpnManager setConnectOnDemandEnabled:userPreferredOnDemandSetting]
       subscribeError:^(NSError *error) {
           [weakSelf.compoundDisposable removeDisposable:onDemandDisposable];
     } completed:^{

@@ -31,6 +31,8 @@
 
 NSErrorDomain _Nonnull const ReceiptValidationErrorDomain = @"PsiphonReceiptValidationErrorDomain";
 
+PsiFeedbackLogType const SubscriptionVerifierServiceLogType = @"SubscriptionVerifierService";
+
 @implementation SubscriptionVerifierService {
     NSURLSession *urlSession;
 }
@@ -100,7 +102,7 @@ NSErrorDomain _Nonnull const ReceiptValidationErrorDomain = @"PsiphonReceiptVali
 
     NSURLSessionDataTask *postDataTask = [urlSession dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
 
-        [PsiFeedbackLogger infoWithType:@"SubscriptionVerifierService" message:@"received response"];
+        [PsiFeedbackLogger infoWithType:SubscriptionVerifierServiceLogType message:@"received response"];
 
         // Session is no longer needed, invalidates and cancels outstanding tasks.
         [urlSession invalidateAndCancel];
@@ -143,7 +145,7 @@ NSErrorDomain _Nonnull const ReceiptValidationErrorDomain = @"PsiphonReceiptVali
 
     [postDataTask resume];
 
-    [PsiFeedbackLogger infoWithType:@"SubscriptionVerifierService" message:@"token request submitted"];
+    [PsiFeedbackLogger infoWithType:SubscriptionVerifierServiceLogType message:@"token request submitted"];
 
 }
 
@@ -437,9 +439,9 @@ typedef NS_ENUM(NSInteger, SubscriptionStateEnum) {
 
 - (NSString *_Nonnull)textDescription {
     switch (self.state) {
-        case SubscriptionStateNotSubscribed: return @"subscription state not subscribed";
-        case SubscriptionStateInProgress: return @"subscription state in progress";
-        case SubscriptionStateSubscribed: return @"subscription state subscribed";
+        case SubscriptionStateNotSubscribed: return @"not subscribed";
+        case SubscriptionStateInProgress: return @"in progress";
+        case SubscriptionStateSubscribed: return @"subscribed";
     }
     return @"";
 }

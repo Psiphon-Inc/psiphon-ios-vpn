@@ -228,7 +228,7 @@ NSString * const ConnectOnDemandCellSpecifierKey = @"vpnOnDemand";
       setConnectOnDemandEnabled:[toggle isOn]]
       deliverOnMainThread]
       subscribeNext:^(NSNumber *success) {
-          [weakSelf.tableView reloadData];
+          [weakSelf updateConnectOnDemandCell];
       } error:^(NSError *error) {
           [weakSelf.compoundDisposable removeDisposable:disposable];
       }   completed:^{

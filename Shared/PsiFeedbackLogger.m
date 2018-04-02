@@ -152,7 +152,7 @@ NSString * const ErrorNoticeType = @"ContainerError";
 
 }
 
-+ (void)infoWithType:(NSString *)sourceType message:(NSString *)format, ... {
++ (void)infoWithType:(PsiFeedbackLogType)sourceType message:(NSString *)format, ... {
 
     NSString *message;
     CONVERT_FORMAT_ARGS_TO_NSSTRING(message, format);
@@ -177,7 +177,7 @@ NSString * const ErrorNoticeType = @"ContainerError";
 
 }
 
-+ (void)errorWithType:(NSString *)sourceType message:(NSString *)format, ... {
++ (void)errorWithType:(PsiFeedbackLogType)sourceType message:(NSString *)format, ... {
 
     NSString *message;
     CONVERT_FORMAT_ARGS_TO_NSSTRING(message, format);
@@ -190,7 +190,7 @@ NSString * const ErrorNoticeType = @"ContainerError";
 
 }
 
-+ (void)errorWithType:(NSString *)sourceType message:(NSString *)message object:(NSError *)error {
++ (void)errorWithType:(PsiFeedbackLogType)sourceType message:(NSString *)message object:(NSError *)error {
 
 //    NSString *message = [NSString stringWithFormat:@"Domain=%@ Description=%@ Code=%ld", error.domain, error.localizedDescription, (long) error.code];
     NSDictionary *data = @{sourceType : @{@"message" : message,

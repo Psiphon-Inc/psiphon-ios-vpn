@@ -35,15 +35,16 @@
 // able to open and read the file. (method isStartBootTestFileLocked performs the test that checks if the device
 // has been unlocked or not.)
 
+NS_ASSUME_NONNULL_BEGIN
+
 @class RACReplaySubject;
 
 // BasePacketTunnelProvider Errors
-FOUNDATION_EXTERN NSErrorDomain _Nonnull const BasePsiphonTunnelErrorDomain;
+FOUNDATION_EXTERN NSErrorDomain const BasePsiphonTunnelErrorDomain;
 
 typedef NS_ERROR_ENUM(BasePsiphonTunnelErrorDomain, ABCPsiphonTunnelErrorCode) {
     BasePsiphonTunnelErrorStoppedBeforeConnected = 1000,
 };
-
 
 // Name of the file in shared container used to test if the extension has started,
 // while the device is in locked state from boot.
@@ -63,11 +64,9 @@ typedef NS_ENUM(NSInteger, ExtensionStartMethodEnum) {
 @protocol BasePacketTunnelProviderProtocol
 
 @required
-- (void)startTunnelWithErrorHandler:(void (^_Nonnull)(NSError *_Nonnull error))errorHandler;
+- (void)startTunnelWithErrorHandler:(void (^)(NSError *error))errorHandler;
 
 - (void)stopTunnelWithReason:(NEProviderStopReason)reason;
-
-- (void)restartTunnel;
 
 - (BOOL)isNEZombie;
 
@@ -96,6 +95,10 @@ typedef NS_ENUM(NSInteger, ExtensionStartMethodEnum) {
 
 - (BOOL)isDeviceLocked;
 
-- (void)displayMessage:(NSString *_Nonnull)message;
+- (void)displayMessage:(NSString *)message;
+
+- (NSString *)extensionStartMethodTextDescription;
 
 @end
+
+NS_ASSUME_NONNULL_END

@@ -18,6 +18,7 @@
  */
 
 #import <Foundation/Foundation.h>
+#import <NetworkExtension/NetworkExtension.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -51,19 +52,21 @@ typedef NS_ERROR_ENUM(VPNManagerErrorDomain, VPNManagerQueryErrorCode) {
  */
 typedef NS_ENUM(NSInteger, VPNStatus) {
     /*! @const VPNStatusInvalid The VPN is not configured or unexpected vpn state. */
-      VPNStatusInvalid = 0,
+    VPNStatusInvalid = 0,
     /*! @const VPNStatusDisconnected No network extension process is running (When restarting VPNManager status will be VPNStatusRestarting). */
-      VPNStatusDisconnected = 1,
+    VPNStatusDisconnected = 1,
     /*! @const VPNStatusConnecting Network extension process is running, and the tunnel has started (tunnel could be in connecting or connected state). */
-      VPNStatusConnecting = 2,
+    VPNStatusConnecting = 2,
     /*! @const VPNStatusConnected Network extension process is running and the tunnel is connected. */
-      VPNStatusConnected = 3,
+    VPNStatusConnected = 3,
     /*! @const VPNStatusReasserting Network extension process is running, and the tunnel is reconnecting or has already connected. */
-      VPNStatusReasserting = 4,
+    VPNStatusReasserting = 4,
     /*! @const VPNStatusDisconnecting The tunnel and the network extension process are being stopped. */
-      VPNStatusDisconnecting = 5,
+    VPNStatusDisconnecting = 5,
     /*! @const VPNStatusRestarting Stopping previous network extension process, and starting a new one. */
-      VPNStatusRestarting = 6,
+    VPNStatusRestarting = 6,
+    /*! @const VPNStatusZombie Network extension is in the zombie state. */
+    VPNStatusZombie = 7,
 };
 
 typedef NS_ENUM(NSInteger, VPNStartStatus) {
@@ -96,9 +99,19 @@ typedef NS_ENUM(NSInteger, VPNStartStatus) {
  *
  * @scheduler lastTunnelStatus delivers its events on the main thread.
  */
-@property (nonatomic, readonly) RACReplaySubject<NSNumber *> *lastTunnelStatus;
+@property (nonatomic, readonly) RACSignal<NSNumber *> *lastTunnelStatus;
+
+/**
+ * VPN status code from underlying NETunnelProviderManager.
+ */
+@property (nonatomic, readonly) NEVPNStatus tunnelProviderStatus;
 
 + (VPNManager *)sharedInstance;
+
+/**
+ * Must be called whenever the application becomes active for VPNManager to update its status.
+ */
+- (void)checkOrFixVPNStatus;
 
 /**
  * Starts the Network Extension process and also the tunnel.
@@ -137,8 +150,9 @@ typedef NS_ENUM(NSInteger, VPNStartStatus) {
 + (BOOL)mapIsVPNActive:(VPNStatus)s;
 
 /**
- * isVPNActive signal when subscribed to, emits a RACTwoTuple of (is vpn active, vpn status),
- * and then completes.
+ * isVPNActive returns a signal that when subscribed to, queries the extension if its zombie,
+ * and then checks NETunnelProviderManager connection status if the extension is not in the zombie state.
+ * Returned signal emits a RACTwoTuple of (is vpn active, vpn status), and then completes.
  *
  * If no VPN configuration was previously saved, it emits `(FALSE, VPNStatusInvalid)` tuple.
  *
@@ -168,15 +182,18 @@ typedef NS_ENUM(NSInteger, VPNStartStatus) {
 - (RACSignal<NSNumber *> *)setConnectOnDemandEnabled:(BOOL)onDemandEnabled;
 
 /**
- * Kills extension if it's a zombie.
+ * Queries the Network Extension whether it is in the zombie state.
+ * @attention Returned signal emits nil if there is no active session.
+ *
+ * @scheduler isExtensionZombie delivers its events on a background thread.
  */
-- (void)killExtensionIfZombie;
+- (RACSignal<NSNumber *> *)isExtensionZombie;
 
 /**
  * Queries the Network Extension whether Psiphon tunnel is in connected state or not.
- * @param completionHandler Called with tunnelIsConnected set to TRUE if Psiphon tunnel is connected, FALSE otherwise.
+ * @attention Returned signal emits nil if there is no active session.
  *
- * @scheduler isPsiphonTunnelConnected: delivers its events on a background thread
+ * @scheduler isPsiphonTunnelConnected delivers its events on a background thread.
  */
 - (RACSignal<NSNumber *> *)isPsiphonTunnelConnected;
 
