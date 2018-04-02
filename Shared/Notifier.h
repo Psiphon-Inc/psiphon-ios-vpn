@@ -20,16 +20,17 @@
 #import <Foundation/Foundation.h>
 #import <notify.h>
 
+NS_ASSUME_NONNULL_BEGIN
 
 @interface Notifier : NSObject
 
-- (nullable instancetype)initWithAppGroupIdentifier:(nonnull NSString *)identifier;
+- (_Nullable instancetype)initWithAppGroupIdentifier:(NSString *)identifier;
 
 /*!
  * @brief Sends Darwin notification with given key.
  * @param key Unique notification key.
  */
-- (void)post:(nonnull NSString *)key;
+- (void)post:(NSString *)key;
 
 /*!
  * @brief Registers provided listener with Darwin notifications
@@ -37,18 +38,20 @@
  * @param key Unique notification key.
  * @param listener Listener to be called when a notification with given key is sent.
  */
-- (void)listenForNotification:(nonnull NSString *)key listener:(nonnull void(^)(void))listener;
+- (void)listenForNotification:(NSString *)key listener:(void(^)(NSString *key))listener;
 
 /*!
  * @brief Unregisters listener associated with the given notification key.
  * @param key Unique notification key.
  */
-- (void)stopListening:(nonnull NSString *)key;
+- (void)removeListenerForKey:(nonnull NSString *)key;
 
 /*!
  * @brief All listeners registered with this Notifier
  * will be unregistered.
  */
-- (void)stopListeningForAllNotifications;
+- (void)removeAllListeners;
 
 @end
+
+NS_ASSUME_NONNULL_END

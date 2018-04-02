@@ -171,76 +171,75 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     __weak MainViewController *weakSelf = self;
     
     // Observe VPN status for updating UI state
-    RACDisposable *tunnelStatusDisposable = [[self.vpnManager.lastTunnelStatus
-                                              deliverOnMainThread]
-                                             subscribeNext:^(NSNumber *statusObject) {
-                                                 VPNStatus s = (VPNStatus) [statusObject integerValue];
-                                                 
-                                                 [weakSelf updateUIConnectionState:s];
-                                                 
-                                                 if (s == VPNStatusConnecting ||
-                                                     s == VPNStatusRestarting ||
-                                                     s == VPNStatusReasserting) {
-                                                     
-                                                     [weakSelf addPulsingHaloLayer];
-                                                     
-                                                 } else {
-                                                     [weakSelf removePulsingHaloLayer];
-                                                 }
-                                                 
-                                                 // Notify SettingsViewController that the state has changed.
-                                                 // Note that this constant is used PsiphonClientCommonLibrary, and cannot simply be replaced by a RACSignal.
-                                                 [[NSNotificationCenter defaultCenter] postNotificationName:kPsiphonConnectionStateNotification object:nil];
-                                                 
-                                             }];
+    RACDisposable *tunnelStatusDisposable = [self.vpnManager.lastTunnelStatus
+      subscribeNext:^(NSNumber *statusObject) {
+          VPNStatus s = (VPNStatus) [statusObject integerValue];
+
+          [weakSelf updateUIConnectionState:s];
+
+          if (s == VPNStatusConnecting ||
+              s == VPNStatusRestarting ||
+              s == VPNStatusReasserting) {
+
+              [weakSelf addPulsingHaloLayer];
+
+          } else {
+              [weakSelf removePulsingHaloLayer];
+          }
+
+          // Notify SettingsViewController that the state has changed.
+          // Note that this constant is used PsiphonClientCommonLibrary, and cannot simply be replaced by a RACSignal.
+          [[NSNotificationCenter defaultCenter] postNotificationName:kPsiphonConnectionStateNotification object:nil];
+
+      }];
     
     [self.compoundDisposable addDisposable:tunnelStatusDisposable];
     
     RACDisposable *vpnStartStatusDisposable = [[self.vpnManager.vpnStartStatus
-                                                deliverOnMainThread]
-                                               subscribeNext:^(NSNumber *statusObject) {
-                                                   VPNStartStatus startStatus = (VPNStartStatus) [statusObject integerValue];
-                                                   
-                                                   if (startStatus == VPNStartStatusStart) {
-                                                       [startStopButton setHighlighted:TRUE];
-                                                   } else {
-                                                       [startStopButton setHighlighted:FALSE];
-                                                   }
-                                                   
-                                                   if (startStatus == VPNStartStatusFailedUserPermissionDenied) {
-                                                       
-                                                       // Alert the user that their permission is required in order to install the VPN configuration.
-                                                       UIAlertController *alert = [UIAlertController alertControllerWithTitle:NSLocalizedStringWithDefaultValue(@"VPN_START_PERMISSION_REQUIRED_TITLE", nil, [NSBundle mainBundle], @"Permission required", @"Alert dialog title indicating to the user that Psiphon needs their permission")
-                                                                                                                      message:NSLocalizedStringWithDefaultValue(@"VPN_START_PERMISSION_DENIED_MESSAGE", nil, [NSBundle mainBundle], @"Psiphon needs your permission to install a VPN profile in order to connect.\n\nPsiphon is committed to protecting the privacy of our users. You can review our privacy policy by tapping \"Privacy Policy\".", @"('Privacy Policy' should be the same translation as privacy policy button VPN_START_PRIVACY_POLICY_BUTTON), (Do not translate 'VPN profile'), (Do not translate 'Psiphon')")
-                                                                                                               preferredStyle:UIAlertControllerStyleAlert];
-                                                       
-                                                       UIAlertAction *privacyPolicyAction = [UIAlertAction actionWithTitle:NSLocalizedStringWithDefaultValue(@"VPN_START_PRIVACY_POLICY_BUTTON", nil, [NSBundle mainBundle], @"Privacy Policy", @"Button label taking user's to our Privacy Policy page")
-                                                                                                                     style:UIAlertActionStyleDefault
-                                                                                                                   handler:^(UIAlertAction *action) {
-                                                                                                                       NSString *urlString = NSLocalizedStringWithDefaultValue(@"PRIVACY_POLICY_URL", nil, [PsiphonClientCommonLibraryHelpers commonLibraryBundle], @"https://psiphon.ca/en/privacy.html", @"External link to the privacy policy page. Please update this with the correct language specific link (if available) e.g. https://psiphon.ca/fr/privacy.html for french.");
-                                                                                                                       [[UIApplication sharedApplication] openURL:[NSURL URLWithString:urlString] options:@{} completionHandler:^(BOOL success) {
-                                                                                                                           // Do nothing.
-                                                                                                                       }];
-                                                                                                                   }];
-                                                       
-                                                       UIAlertAction *dismissAction = [UIAlertAction actionWithTitle:@"Dismiss" style:UIAlertActionStyleCancel
-                                                                                                             handler:^(UIAlertAction *action) {
-                                                                                                                 // Do nothing.
-                                                                                                             }];
-                                                       
-                                                       [alert addAction:privacyPolicyAction];
-                                                       [alert addAction:dismissAction];
-                                                       [alert presentFromTopController];
-                                                       
-                                                   } else if (startStatus == VPNStartStatusFailedOther) {
-                                                       
-                                                       // Alert the user that the VPN failed to start, and that they should try again.
-                                                       [UIAlertController presentSimpleAlertWithTitle:NSLocalizedStringWithDefaultValue(@"VPN_START_FAIL_TITLE", nil, [NSBundle mainBundle], @"Unable to start", @"Alert dialog title indicating to the user that Psiphon was unable to start (MainViewController)")
-                                                                                              message:NSLocalizedStringWithDefaultValue(@"VPN_START_FAIL_MESSAGE", nil, [NSBundle mainBundle], @"An error occurred while starting Psiphon. Please try again. If this problem persists, try reinstalling the Psiphon app.", @"Alert dialog message informing the user that an error occurred while starting Psiphon (Do not translate 'Psiphon'). The user should try again, and if the problem persists, they should try reinstalling the app.")
-                                                                                       preferredStyle:UIAlertControllerStyleAlert
-                                                                                            okHandler:nil];
-                                                   }
-                                               }];
+      deliverOnMainThread]
+      subscribeNext:^(NSNumber *statusObject) {
+          VPNStartStatus startStatus = (VPNStartStatus) [statusObject integerValue];
+
+          if (startStatus == VPNStartStatusStart) {
+              [startStopButton setHighlighted:TRUE];
+          } else {
+              [startStopButton setHighlighted:FALSE];
+          }
+
+          if (startStatus == VPNStartStatusFailedUserPermissionDenied) {
+              
+              // Alert the user that their permission is required in order to install the VPN configuration.
+              UIAlertController *alert = [UIAlertController alertControllerWithTitle:NSLocalizedStringWithDefaultValue(@"VPN_START_PERMISSION_REQUIRED_TITLE", nil, [NSBundle mainBundle], @"Permission required", @"Alert dialog title indicating to the user that Psiphon needs their permission")
+                                                                             message:NSLocalizedStringWithDefaultValue(@"VPN_START_PERMISSION_DENIED_MESSAGE", nil, [NSBundle mainBundle], @"Psiphon needs your permission to install a VPN profile in order to connect.\n\nPsiphon is committed to protecting the privacy of our users. You can review our privacy policy by tapping \"Privacy Policy\".", @"('Privacy Policy' should be the same translation as privacy policy button VPN_START_PRIVACY_POLICY_BUTTON), (Do not translate 'VPN profile'), (Do not translate 'Psiphon')")
+                                                                      preferredStyle:UIAlertControllerStyleAlert];
+
+              UIAlertAction *privacyPolicyAction = [UIAlertAction actionWithTitle:NSLocalizedStringWithDefaultValue(@"VPN_START_PRIVACY_POLICY_BUTTON", nil, [NSBundle mainBundle], @"Privacy Policy", @"Button label taking user's to our Privacy Policy page")
+                                                                            style:UIAlertActionStyleDefault
+                                                                          handler:^(UIAlertAction *action) {
+                                                                              NSString *urlString = NSLocalizedStringWithDefaultValue(@"PRIVACY_POLICY_URL", nil, [PsiphonClientCommonLibraryHelpers commonLibraryBundle], @"https://psiphon.ca/en/privacy.html", @"External link to the privacy policy page. Please update this with the correct language specific link (if available) e.g. https://psiphon.ca/fr/privacy.html for french.");
+                                                                              [[UIApplication sharedApplication] openURL:[NSURL URLWithString:urlString] options:@{} completionHandler:^(BOOL success) {
+                                                                                  // Do nothing.
+                                                                              }];
+                                                                          }];
+
+              UIAlertAction *dismissAction = [UIAlertAction actionWithTitle:@"Dismiss" style:UIAlertActionStyleCancel
+                                                                    handler:^(UIAlertAction *action) {
+                                                                        // Do nothing.
+                                                                    }];
+
+              [alert addAction:privacyPolicyAction];
+              [alert addAction:dismissAction];
+              [alert presentFromTopController];
+
+          } else if (startStatus == VPNStartStatusFailedOther) {
+
+              // Alert the user that the VPN failed to start, and that they should try again.
+              [UIAlertController presentSimpleAlertWithTitle:NSLocalizedStringWithDefaultValue(@"VPN_START_FAIL_TITLE", nil, [NSBundle mainBundle], @"Unable to start", @"Alert dialog title indicating to the user that Psiphon was unable to start (MainViewController)")
+                                                     message:NSLocalizedStringWithDefaultValue(@"VPN_START_FAIL_MESSAGE", nil, [NSBundle mainBundle], @"An error occurred while starting Psiphon. Please try again. If this problem persists, try reinstalling the Psiphon app.", @"Alert dialog message informing the user that an error occurred while starting Psiphon (Do not translate 'Psiphon'). The user should try again, and if the problem persists, they should try reinstalling the app.")
+                                              preferredStyle:UIAlertControllerStyleAlert
+                                                   okHandler:nil];
+          }
+      }];
     
     [self.compoundDisposable addDisposable:vpnStartStatusDisposable];
     
@@ -300,7 +299,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     LOG_DEBUG();
     [super viewWillDisappear:animated];
     // Stop listening for diagnostic messages (we don't want to hold the shared db lock while backgrounded)
-    [notifier stopListeningForAllNotifications];
+    [notifier removeAllListeners];
 }
 
 - (void)viewDidDisappear:(BOOL)animated {
@@ -515,6 +514,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
         case VPNStatusDisconnecting: return NSLocalizedStringWithDefaultValue(@"VPN_STATUS_DISCONNECTING", nil, [NSBundle mainBundle], @"Disconnecting", @"Status when the VPN is disconnecting. Sometimes going from connected to disconnected can take some time, and this is that state.");
         case VPNStatusReasserting: return NSLocalizedStringWithDefaultValue(@"VPN_STATUS_RECONNECTING", nil, [NSBundle mainBundle], @"Reconnecting", @"Status when the VPN was connected to a Psiphon server, got disconnected unexpectedly, and is currently trying to reconnect");
         case VPNStatusRestarting: return NSLocalizedStringWithDefaultValue(@"VPN_STATUS_RESTARTING", nil, [NSBundle mainBundle], @"Restarting", @"Status when the VPN is restarting.");
+        case VPNStatusZombie: return @"...";
     }
     [PsiFeedbackLogger error:@"MainViewController unhandled VPNStatus (%ld)", status];
     return nil;
