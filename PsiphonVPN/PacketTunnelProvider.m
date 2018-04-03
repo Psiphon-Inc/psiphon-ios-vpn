@@ -70,9 +70,24 @@ typedef NS_ENUM(NSInteger, GracePeriodState) {
     GracePeriodStateDone
 };
 
+/** PacketTunnelProvider state */
+typedef NS_ENUM(NSInteger, TunnelProviderState) {
+    /** @const TunnelProviderStateInit PacketTunnelProvider instance is initialized. */
+    TunnelProviderStateInit,
+    /** @const TunnelProviderStateStarted PacketTunnelProvider has started PsiphonTunnel. */
+    TunnelProviderStateStarted,
+    /** @const TunnelProviderStateZombie PacketTunnelProvider has entered zombie state, all packets will be eaten. */
+    TunnelProviderStateZombie,
+    /** @const TunnelProviderStateKillMessageSent PacketTunnelProvider has displayed a message to the user that it will exit soon or when the message has been dismissed by the user. */
+    TunnelProviderStateKillMessageSent
+};
+
 @interface PacketTunnelProvider ()
 
-@property (atomic) BOOL extensionIsZombie;
+/**
+ * PacketTunnelProvider state.
+ */
+@property (atomic) TunnelProviderState tunnelProviderState;
 
 @property (nonatomic) SubscriptionState *subscriptionCheckState;
 
@@ -82,11 +97,11 @@ typedef NS_ENUM(NSInteger, GracePeriodState) {
 
 @property (nonatomic) GracePeriodState gracePeriodState;
 
+@property (nonatomic) PsiphonTunnel *psiphonTunnel;
+
 @end
 
 @implementation PacketTunnelProvider {
-
-    PsiphonTunnel *psiphonTunnel;
 
     PsiphonDataSharedDB *sharedDB;
 
@@ -116,9 +131,6 @@ typedef NS_ENUM(NSInteger, GracePeriodState) {
 - (id)init {
     self = [super init];
     if (self) {
-        // Create our tunnel instance
-        psiphonTunnel = [PsiphonTunnel newPsiphonTunnel:(id <TunneledAppDelegate>) self];
-
         sharedDB = [[PsiphonDataSharedDB alloc] initForAppGroupIdentifier:APP_GROUP_IDENTIFIER];
 
         notifier = [[Notifier alloc] initWithAppGroupIdentifier:APP_GROUP_IDENTIFIER];
@@ -127,7 +139,9 @@ typedef NS_ENUM(NSInteger, GracePeriodState) {
 
         workQueue = dispatch_queue_create("ca.psiphon.PsiphonVPN.workQueue", DISPATCH_QUEUE_SERIAL);
 
-        _extensionIsZombie = FALSE;
+        _psiphonTunnel = [PsiphonTunnel newPsiphonTunnel:(id <TunneledAppDelegate>) self];
+
+        _tunnelProviderState = TunnelProviderStateInit;
         _subscriptionCheckState = nil;
         _shouldStartVPN = FALSE;
         _gracePeriodState = GracePeriodStateInactive;
@@ -163,7 +177,7 @@ typedef NS_ENUM(NSInteger, GracePeriodState) {
         }
 
         // Bootstraps tunnelConnectionStateSubject by sending current connection status to it.
-        [self->tunnelConnectionStateSubject sendNext:@([psiphonTunnel getConnectionState])];
+        [self->tunnelConnectionStateSubject sendNext:@([self.psiphonTunnel getConnectionState])];
 
         // Bootstraps subscriptionAuthorizationTokenActiveSubject by a item of type AuthorizationTokenActivity to it.
         // The value doesn't matter since the subscription is forced.
@@ -461,6 +475,8 @@ typedef NS_ENUM(NSInteger, GracePeriodState) {
 }
 
 - (void)startTunnelWithErrorHandler:(void (^_Nonnull)(NSError *_Nonnull error))errorHandler {
+    
+    __weak PacketTunnelProvider *weakSelf = self;
 
     // VPN should only start if it is started from the container app directly,
     // OR if the user possibly has a valid subscription
@@ -525,8 +541,6 @@ typedef NS_ENUM(NSInteger, GracePeriodState) {
             self.shouldStartVPN = TRUE;
         }
 
-        __weak PsiphonTunnel *weakPsiphonTunnel = psiphonTunnel;
-
         [self setTunnelNetworkSettings:[self getTunnelSettings] completionHandler:^(NSError *_Nullable error) {
 
             if (error != nil) {
@@ -536,13 +550,15 @@ typedef NS_ENUM(NSInteger, GracePeriodState) {
             }
 
             // Starts Psiphon tunnel.
-            BOOL success = [weakPsiphonTunnel start:FALSE];
+            BOOL success = [weakSelf.psiphonTunnel start:FALSE];
 
             if (!success) {
                 [PsiFeedbackLogger error:@"tunnel start failed"];
                 errorHandler([NSError errorWithDomain:PsiphonTunnelErrorDomain code:PsiphonTunnelErrorInternalError]);
                 return;
             }
+
+            weakSelf.tunnelProviderState = TunnelProviderStateStarted;
 
         }];
 
@@ -556,9 +572,8 @@ typedef NS_ENUM(NSInteger, GracePeriodState) {
 
         [PsiFeedbackLogger info:@"zombie mode"];
 
-        self.extensionIsZombie = TRUE;
+        self.tunnelProviderState = TunnelProviderStateZombie;
 
-        __weak PacketTunnelProvider *weakSelf = self;
         [self setTunnelNetworkSettings:[self getTunnelSettings] completionHandler:^(NSError *error) {
             [weakSelf startVPN];
             weakSelf.reasserting = TRUE;
@@ -575,7 +590,7 @@ typedef NS_ENUM(NSInteger, GracePeriodState) {
     // Cleanup.
     [subscriptionDisposable dispose];
     
-    [psiphonTunnel stop];
+    [self.psiphonTunnel stop];
 }
 
 // Restarts the tunnel while preserving the current session ID.
@@ -586,7 +601,7 @@ typedef NS_ENUM(NSInteger, GracePeriodState) {
     dispatch_async(self->workQueue, ^{
 
         // It is expected that the private start method of PsiphonTunnel will not generate a new session ID.
-        if (![psiphonTunnel stopAndReconnectWithCurrentSessionID]) {
+        if (![self.psiphonTunnel stopAndReconnectWithCurrentSessionID]) {
             [PsiFeedbackLogger error:@"tunnel start failed"];
         }
     });
@@ -595,20 +610,45 @@ typedef NS_ENUM(NSInteger, GracePeriodState) {
 
 - (void)displayMessageAndKillExtension:(NSString *)message {
 
-    [self displayMessage:message completionHandler:^(BOOL success) {
-        // Exit only after the user has clicked OK button.
-        exit(1);
-    }];
+    // If failed to display, retry in 60 seconds.
+    const int64_t retryInterval = 60;
+
+    __weak __block void (^weakDisplayAndKill)(NSString *message);
+    void (^displayAndKill)(NSString *message);
+
+    weakDisplayAndKill = displayAndKill = ^(NSString *message) {
+
+        [self displayMessage:message completionHandler:^(BOOL success) {
+
+            // If failed, retry again in `retryInterval` seconds.
+            if (!success) {
+                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, retryInterval * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
+                    weakDisplayAndKill(message);
+                });
+            }
+
+            // Exit only after the user has dismissed the message.
+            exit(1);
+        }];
+    };
+
+    if (self.tunnelProviderState == TunnelProviderStateKillMessageSent) {
+        return;
+    }
+
+    self.tunnelProviderState = TunnelProviderStateKillMessageSent;
+
+    displayAndKill(message);
 }
 
 #pragma mark - Query methods
 
 - (BOOL)isNEZombie {
-    return self.extensionIsZombie;
+    return self.tunnelProviderState == TunnelProviderStateZombie;
 }
 
 - (BOOL)isTunnelConnected {
-    return [psiphonTunnel getConnectionState] == PsiphonConnectionStateConnected;
+    return [self.psiphonTunnel getConnectionState] == PsiphonConnectionStateConnected;
 }
 
 #pragma mark -
@@ -701,11 +741,11 @@ typedef NS_ENUM(NSInteger, GracePeriodState) {
     newSettings.IPv4Settings.excludedRoutes = @[];
 
     // TODO: call getPacketTunnelDNSResolverIPv6Address
-    newSettings.DNSSettings = [[NEDNSSettings alloc] initWithServers:@[[psiphonTunnel getPacketTunnelDNSResolverIPv4Address]]];
+    newSettings.DNSSettings = [[NEDNSSettings alloc] initWithServers:@[[self.psiphonTunnel getPacketTunnelDNSResolverIPv4Address]]];
 
     newSettings.DNSSettings.searchDomains = @[@""];
 
-    newSettings.MTU = @([psiphonTunnel getPacketTunnelMTU]);
+    newSettings.MTU = @([self.psiphonTunnel getPacketTunnelMTU]);
 
     return newSettings;
 }
@@ -714,7 +754,7 @@ typedef NS_ENUM(NSInteger, GracePeriodState) {
 // `self.shouldStartVPN` is TRUE or the container is in the foreground.
 - (BOOL)tryStartVPN {
     if (self.shouldStartVPN || [sharedDB getAppForegroundState]) {
-        if ([psiphonTunnel getConnectionState] == PsiphonConnectionStateConnected) {
+        if ([self.psiphonTunnel getConnectionState] == PsiphonConnectionStateConnected) {
             self.reasserting = FALSE;
             [self startVPN];
             [notifier post:NOTIFIER_NEW_HOMEPAGES];
@@ -751,17 +791,18 @@ typedef NS_ENUM(NSInteger, GracePeriodState) {
  * This alert will only be shown again after a time interval after the user *dismisses* the current alert.
  */
 - (void)displayRepeatingZombieAlert {
+
+    __weak PacketTunnelProvider *weakSelf = self;
+
     const int64_t intervalSec = 60; // Every minute.
 
     [self displayMessage:
         NSLocalizedStringWithDefaultValue(@"CANNOT_START_TUNNEL_DUE_TO_SUBSCRIPTION", nil, [NSBundle mainBundle], @"Your Psiphon subscription has expired.\nSince you're not a subscriber or your subscription has expired, Psiphon can only be started from the Psiphon app.\n\nPlease open the Psiphon app.", @"Alert message informing user that their subscription has expired or that they're not a subscriber, therefore Psiphon can only be started from the Psiphon app. DO NOT translate 'Psiphon'.")
        completionHandler:^(BOOL success) {
            // If the user dismisses the message, show the alert again in intervalSec seconds.
-           if (success) {
-               dispatch_after(dispatch_time(DISPATCH_TIME_NOW, intervalSec * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
-                   [self displayRepeatingZombieAlert];
-               });
-           }
+           dispatch_after(dispatch_time(DISPATCH_TIME_NOW, intervalSec * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
+               [weakSelf displayRepeatingZombieAlert];
+           });
        }];
 }
 
