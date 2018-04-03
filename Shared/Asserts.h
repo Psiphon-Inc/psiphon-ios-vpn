@@ -36,6 +36,8 @@
 
 #define CONVERT_EXPR_TO_STRING(X) #X
 
+#define PSIAssertUnhandled(format, ...) NSAssert(0, format, ##__VA_ARGS__)
+
 #define PSIAssert(X)                                                                                                   \
     if (!(X)) {                                                                                                        \
         [PsiFeedbackLogger error:@"%s Assertion failed: %s", __PRETTY_FUNCTION__, CONVERT_EXPR_TO_STRING(X)];          \
