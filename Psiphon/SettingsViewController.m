@@ -17,14 +17,15 @@
  *
  */
 
-#import <ReactiveObjC/RACSignal.h>
-#import <ReactiveObjC/RACSignal+Operations.h>
 #import "SettingsViewController.h"
 #import "IAPStoreHelper.h"
 #import "IAPViewController.h"
 #import "VPNManager.h"
 #import "AppDelegate.h"
+#import "RACSignal.h"
 #import "RACCompoundDisposable.h"
+#import "RACReplaySubject.h"
+#import "RACSignal+Operations.h"
 
 // NSUserDefaults keys
 /**
@@ -72,21 +73,23 @@ NSString * const ConnectOnDemandCellSpecifierKey = @"vpnOnDemand";
 - (void)viewDidLoad {
     [super viewDidLoad];
 
-    [[NSNotificationCenter defaultCenter] addObserverForName:AppDelegateSubscriptionDidActivateNotification
-                                                      object:nil
-                                                       queue:[NSOperationQueue mainQueue]
-                                                  usingBlock:^(NSNotification *note) {
-                                                      self.hasActiveSubscription = TRUE;
-                                                      [self updateSubscriptionUIElements];
-                                                  }];
+    __weak SettingsViewController *weakSelf = self;
 
-    [[NSNotificationCenter defaultCenter] addObserverForName:AppDelegateSubscriptionDidExpireNotification
-                                                      object:nil
-                                                       queue:[NSOperationQueue mainQueue]
-                                                  usingBlock:^(NSNotification *note) {
-                                                      self.hasActiveSubscription = FALSE;
-                                                      [self updateSubscriptionUIElements];
-                                                  }];
+    __block RACDisposable *disposable = [[AppDelegate sharedAppDelegate].subscriptionStatus
+      subscribeNext:^(NSNumber *value) {
+          UserSubscriptionStatus s = (UserSubscriptionStatus) [value integerValue];
+
+          weakSelf.hasActiveSubscription = (s == UserSubscriptionActive);
+          [weakSelf updateSubscriptionUIElements];
+
+      } error:^(NSError *error) {
+          [weakSelf.compoundDisposable removeDisposable:disposable];
+      } completed:^{
+          [weakSelf.compoundDisposable removeDisposable:disposable];
+      }];
+
+    [self.compoundDisposable addDisposable:disposable];
+
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -95,19 +98,7 @@ NSString * const ConnectOnDemandCellSpecifierKey = @"vpnOnDemand";
         self.hiddenKeys = [[NSSet alloc] initWithArray:@[SettingsSubscriptionCellSpecifierKey]];
     }
 
-    [self checkSubscriptionStateAndUpdateUI];
-
     [super viewWillAppear:animated];
-}
-
-- (void)checkSubscriptionStateAndUpdateUI {
-    __weak SettingsViewController *weakSelf = self;
-    [IAPStoreHelper hasActiveSubscriptionForNowOnBlock:^(BOOL isActive) {
-        if (weakSelf.hasActiveSubscription != isActive) {
-            weakSelf.hasActiveSubscription = isActive;
-            [weakSelf updateSubscriptionUIElements];
-        }
-    }];
 }
 
 #pragma mark - UI update methods

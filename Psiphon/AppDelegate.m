@@ -47,14 +47,18 @@
 #import "RACCompoundDisposable.h"
 #import "RACSignal+Operations.h"
 #import "RACReplaySubject.h"
-
-NSNotificationName const AppDelegateSubscriptionDidExpireNotification = @"AppDelegateSubscriptionDidExpireNotification";
-NSNotificationName const AppDelegateSubscriptionDidActivateNotification = @"AppDelegateSubscriptionDidActivateNotification";
+#import "Asserts.h"
 
 PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
 
 @interface AppDelegate ()
 
+// Public properties
+
+// subscriptionStatus should only be sent events to from the main thread.
+@property (nonatomic, readwrite) RACReplaySubject<NSNumber *> *subscriptionStatus;
+
+// Private properties
 @property (atomic) BOOL shownLandingPageForCurrentSession;
 @property (nonatomic) RACCompoundDisposable *compoundDisposable;
 
@@ -76,6 +80,9 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
     if (self) {
         adManager = [AdManager sharedInstance];
         notifier = [[Notifier alloc] initWithAppGroupIdentifier:APP_GROUP_IDENTIFIER];
+
+        _subscriptionStatus = [RACReplaySubject replaySubjectWithCapacity:1];
+        [_subscriptionStatus sendNext:@(UserSubscriptionUnknown)];
 
         _vpnManager = [VPNManager sharedInstance];
         _sharedDB = [[PsiphonDataSharedDB alloc] initForAppGroupIdentifier:APP_GROUP_IDENTIFIER];
@@ -197,6 +204,9 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
 
     __weak AppDelegate *weakSelf = self;
 
+    // Starts subscription expiry timer if there is an active subscription.
+    [self subscriptionExpiryTimer];
+
     // Before submitting any other work to the VPNManager, update its status.
     [self.vpnManager checkOrFixVPNStatus];
 
@@ -221,9 +231,6 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
         [self.compoundDisposable addDisposable:disposable];
 
     }
-
-    // Starts subscription expiry timer if there is an active subscription.
-    [self subscriptionExpiryTimer];
 }
 
 - (void)applicationWillResignActive:(UIApplication *)application {
@@ -439,6 +446,10 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
 
         dispatch_async_main(^{
             if (activeSubscription) {
+
+                // Also update the subscription status subject.
+                [weakSelf.subscriptionStatus sendNext:@(UserSubscriptionActive)];
+
                 NSTimeInterval interval = [expiryDate timeIntervalSinceNow];
                 
                 if (interval > 0) {
@@ -454,9 +465,6 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
             } else {
                 // Instead of subscribing to the notification in this class, calls the handler directly.
                 [weakSelf onSubscriptionExpired];
-                
-                // Notifies all interested listeners that there is no active subscription.
-                [[NSNotificationCenter defaultCenter] postNotificationName:AppDelegateSubscriptionDidExpireNotification object:nil];
             }
         });
     });
@@ -465,6 +473,8 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
 - (void)onSubscriptionExpired {
 
     __weak AppDelegate *weakSelf = self;
+
+    [self.subscriptionStatus sendNext:@(UserSubscriptionInactive)];
 
     // Disables Connect On Demand setting of the VPN Configuration.
     __block RACDisposable *disposable = [[self.vpnManager setConnectOnDemandEnabled:FALSE]
@@ -480,6 +490,8 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
 - (void)onSubscriptionActivated {
 
     __weak AppDelegate *weakSelf = self;
+
+    [self.subscriptionStatus sendNext:@(UserSubscriptionActive)];
 
     [self subscriptionExpiryTimer];
 
@@ -517,6 +529,7 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
 
 }
 
+// Called on `IAPHelperUpdatedSubscriptionDictionaryNotification` notification.
 - (void)onUpdatedSubscriptionDictionary {
 
     if (![adManager shouldShowUntunneledAds]) {
@@ -536,11 +549,12 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
             if (isSubscribed) {
                 [weakSelf onSubscriptionActivated];
 
-                [[NSNotificationCenter defaultCenter] postNotificationName:AppDelegateSubscriptionDidActivateNotification object:nil];
             }
         });
     });
 }
+
+#pragma mark -
 
 + (UIViewController *)getTopMostViewController {
     UIViewController *topController = [UIApplication sharedApplication].keyWindow.rootViewController;
