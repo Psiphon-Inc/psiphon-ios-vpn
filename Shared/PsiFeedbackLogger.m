@@ -48,9 +48,11 @@
 
 #if TARGET_IS_EXTENSION
 NSString * const InfoNoticeType = @"ExtensionInfo";
+NSString * const WarnNoticeType = @"ExtensionWarn";
 NSString * const ErrorNoticeType = @"ExtensionError";
 #else
 NSString * const InfoNoticeType = @"ContainerInfo";
+NSString * const WarnNoticeType = @"ContainerWarn";
 NSString * const ErrorNoticeType = @"ContainerError";
 #endif
 
@@ -165,6 +167,30 @@ NSString * const ErrorNoticeType = @"ContainerError";
 
 }
 
++ (void)warnWithType:(PsiFeedbackLogType)sourceType message:(NSString *)format, ... {
+
+    NSString *message;
+    CONVERT_FORMAT_ARGS_TO_NSSTRING(message, format);
+    NSDictionary *data = @{sourceType : message};
+    [[PsiFeedbackLogger sharedInstance] writeData:data noticeType:WarnNoticeType];
+
+#if DEBUG
+    NSLog(@"<WARN> %@", data);
+#endif
+
+}
+
++ (void)warnWithType:(PsiFeedbackLogType)sourceType message:(NSString *)message object:(NSError *)error {
+
+    NSDictionary *data = [PsiFeedbackLogger dataWithSource:sourceType message:message error:error];
+    [[PsiFeedbackLogger sharedInstance] writeData:data noticeType:WarnNoticeType];
+
+#if DEBUG
+    NSLog(@"<WARN> %@", data);
+#endif
+
+}
+
 + (void)error:(NSString *)format, ... {
 
     NSString *message;
@@ -192,12 +218,7 @@ NSString * const ErrorNoticeType = @"ContainerError";
 
 + (void)errorWithType:(PsiFeedbackLogType)sourceType message:(NSString *)message object:(NSError *)error {
 
-//    NSString *message = [NSString stringWithFormat:@"Domain=%@ Description=%@ Code=%ld", error.domain, error.localizedDescription, (long) error.code];
-    NSDictionary *data = @{sourceType : @{@"message" : message,
-                                          @"NSError" : @{@"domain" : error.domain,
-                                                         @"code"   : @(error.code),
-                                                         @"description" : error.localizedDescription}}};
-
+    NSDictionary *data = [PsiFeedbackLogger dataWithSource:sourceType message:message error:error];
     [[PsiFeedbackLogger sharedInstance] writeData:data noticeType:ErrorNoticeType];
 
 #if DEBUG
@@ -372,6 +393,16 @@ NSString * const ErrorNoticeType = @"ContainerError";
     }
 
     return FALSE;
+}
+
+#pragma mark - Log generating methods
+
++ (NSDictionary *)dataWithSource:(NSString *)sourceType message:(NSString *)message error:(NSError *)error {
+
+    return @{sourceType : @{@"message" : message,
+      @"NSError" : @{@"domain" : error.domain,
+        @"code"   : @(error.code),
+        @"description" : error.localizedDescription}}};
 }
 
 @end
