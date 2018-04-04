@@ -610,7 +610,7 @@ PsiFeedbackLogType const VPNManagerLogType = @"VPNManager";
 - (RACSignal<NSNumber *> *)isExtensionZombie {
     return [[self queryActiveVPN:EXTENSION_QUERY_IS_PROVIDER_ZOMBIE]
       catch:^RACSignal<NSNumber *> *(NSError *error) {
-          [PsiFeedbackLogger errorWithType:VPNManagerLogType message:@"isProviderZombie extension query failed" object:error];
+          [PsiFeedbackLogger warnWithType:VPNManagerLogType message:@"isProviderZombie extension query failed" object:error];
           return [RACSignal return:[NSNumber numberWithBool:FALSE]];
       }];
 }
@@ -621,7 +621,7 @@ PsiFeedbackLogType const VPNManagerLogType = @"VPNManager";
 - (RACSignal<NSNumber *> *)isPsiphonTunnelConnected {
     return [[self queryActiveVPN:EXTENSION_QUERY_IS_TUNNEL_CONNECTED]
       catch:^RACSignal<NSNumber *> *(NSError *error) {
-          [PsiFeedbackLogger errorWithType:VPNManagerLogType message:@"isTunnelConnected extension query failed" object:error];
+          [PsiFeedbackLogger warnWithType:VPNManagerLogType message:@"isTunnelConnected extension query failed" object:error];
           return [RACSignal return:[NSNumber numberWithBool:FALSE]];
       }];
 }
@@ -690,7 +690,7 @@ PsiFeedbackLogType const VPNManagerLogType = @"VPNManager";
                      }];
 
         if (error) {
-            [PsiFeedbackLogger errorWithType:VPNManagerLogType message:@"failed to send tunnel provider message" object:error];
+            [PsiFeedbackLogger warnWithType:VPNManagerLogType message:@"failed to send tunnel provider message" object:error];
             [subscriber sendError:error];
         }
 
