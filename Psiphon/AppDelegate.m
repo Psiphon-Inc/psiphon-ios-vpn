@@ -420,7 +420,6 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
     [notifier listenForNotification:NOTIFIER_ON_AVAILABLE_EGRESS_REGIONS listener:^(NSString *key){
         LOG_DEBUG(@"Received notification NE.onAvailableEgressRegions");
         // Update available regions
-        // TODO: this code is duplicated in MainViewController updateAvailableRegions
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
             NSArray<NSString *> *regions = [weakSelf.sharedDB getAllEgressRegions];
             [[RegionAdapter sharedInstance] onAvailableEgressRegions:regions];
