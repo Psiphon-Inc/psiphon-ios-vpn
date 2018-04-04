@@ -37,7 +37,7 @@ PsiFeedbackLogType const SubscriptionVerifierServiceLogType = @"SubscriptionVeri
     NSURLSession *urlSession;
 }
 
-+ (RACSignal<NSDictionary *> *)updateSubscriptionAuthorizationTokenFromRemote {
++ (RACSignal<NSDictionary *> *)updateAuthorizationFromRemote {
     return [RACSignal createSignal:^RACDisposable *(id <RACSubscriber> subscriber) {
 
         // This object holds a reference to the current scheduler, in order to schedule
@@ -145,7 +145,7 @@ PsiFeedbackLogType const SubscriptionVerifierServiceLogType = @"SubscriptionVeri
 
     [postDataTask resume];
 
-    [PsiFeedbackLogger infoWithType:SubscriptionVerifierServiceLogType message:@"token request submitted"];
+    [PsiFeedbackLogger infoWithType:SubscriptionVerifierServiceLogType message:@"authorization request submitted"];
 
 }
 
@@ -159,7 +159,7 @@ PsiFeedbackLogType const SubscriptionVerifierServiceLogType = @"SubscriptionVeri
 #define kSubscriptionDictionary         @"kSubscriptionDictionary"
 #define kAppReceiptFileSize             @"kAppReceiptFileSize"
 #define kPendingRenewalInfo             @"kPendingRenewalInfo"
-#define kSubscriptionAuthorizationToken @"kSubscriptionAuthorizationToken"
+#define kSubscriptionAuthorization      @"kSubscriptionAuthorization"
 
 @implementation Subscription {
     NSMutableDictionary *dictionaryRepresentation;
@@ -168,19 +168,19 @@ PsiFeedbackLogType const SubscriptionVerifierServiceLogType = @"SubscriptionVeri
 + (RACSignal<NSNumber *> *_Nonnull)localSubscriptionCheck {
     return [RACSignal createSignal:^RACDisposable *(id <RACSubscriber> subscriber) {
         Subscription *subscription = [Subscription fromPersistedDefaults];
-        if ([subscription shouldUpdateSubscriptionToken]) {
+        if ([subscription shouldUpdateAuthorization]) {
             // subscription server needs to be contacted.
-            [subscriber sendNext:@(SubscriptionCheckShouldUpdateToken)];
+            [subscriber sendNext:@(SubscriptionCheckShouldUpdateAuthorization)];
             [subscriber sendCompleted];
         } else {
             // subscription server doesn't need to be contacted.
             // Checks if subscription is active compared to device's clock.
-            if ([subscription hasActiveSubscriptionTokenForDate:[NSDate date]]) {
-                [subscriber sendNext:@(SubscriptionCheckHasActiveToken)];
+            if ([subscription hasActiveAuthorizationForDate:[NSDate date]]) {
+                [subscriber sendNext:@(SubscriptionCheckHasActiveAuthorization)];
                 [subscriber sendCompleted];
             } else {
                 // Send error, subscription has expired.
-                [subscriber sendNext:@(SubscriptionCheckTokenExpired)];
+                [subscriber sendNext:@(SubscriptionCheckAuthorizationExpired)];
                 [subscriber sendCompleted];
             }
         }
@@ -223,29 +223,29 @@ PsiFeedbackLogType const SubscriptionVerifierServiceLogType = @"SubscriptionVeri
     self->dictionaryRepresentation[kPendingRenewalInfo] = pendingRenewalInfo;
 }
 
-- (AuthorizationToken *)authorizationToken {
-    return [[AuthorizationToken alloc] initWithEncodedToken:self->dictionaryRepresentation[kSubscriptionAuthorizationToken]];
+- (Authorization *)authorization {
+    return [[Authorization alloc] initWithEncodedAuthorization:self->dictionaryRepresentation[kSubscriptionAuthorization]];
 }
 
-- (void)setAuthorizationToken:(AuthorizationToken *)authorizationToken {
-    self->dictionaryRepresentation[kSubscriptionAuthorizationToken] = authorizationToken.base64Representation;
+- (void)setAuthorization:(Authorization *)authorization {
+    self->dictionaryRepresentation[kSubscriptionAuthorization] = authorization.base64Representation;
 }
 
 - (BOOL)hasActiveSubscriptionForNow {
-    return [self hasActiveSubscriptionTokenForDate:[NSDate date]];
+    return [self hasActiveAuthorizationForDate:[NSDate date]];
 }
 
-- (BOOL)hasActiveSubscriptionTokenForDate:(NSDate *)date {
+- (BOOL)hasActiveAuthorizationForDate:(NSDate *)date {
     if ([self isEmpty]) {
         return FALSE;
     }
-    if (!self.authorizationToken) {
+    if (!self.authorization) {
         return FALSE;
     }
-    return [self.authorizationToken.expires afterOrEqualTo:date];
+    return [self.authorization.expires afterOrEqualTo:date];
 }
 
-- (BOOL)shouldUpdateSubscriptionToken {
+- (BOOL)shouldUpdateAuthorization {
     // If no receipt - NO
     NSURL *URL = [NSBundle mainBundle].appStoreReceiptURL;
     NSString *path = URL.path;
@@ -270,7 +270,7 @@ PsiFeedbackLogType const SubscriptionVerifierServiceLogType = @"SubscriptionVeri
     }
 
     // If user has an active authorization for date - NO
-    if ([self hasActiveSubscriptionTokenForDate:[NSDate date]]) {
+    if ([self hasActiveAuthorizationForDate:[NSDate date]]) {
         LOG_DEBUG(@"device has active authorization for date");
         return NO;
     }
@@ -292,11 +292,11 @@ PsiFeedbackLogType const SubscriptionVerifierServiceLogType = @"SubscriptionVeri
         }
     }
 
-    LOG_DEBUG(@"authorization token update not needed");
+    LOG_DEBUG(@"authorization update not needed");
     return NO;
 }
 
-- (NSError *)updateSubscriptionWithRemoteAuthDict:(NSDictionary *)remoteAuthDict {
+- (NSError *)updateWithRemoteAuthDict:(NSDictionary *_Nullable)remoteAuthDict {
 
     if (!remoteAuthDict) {
         return nil;
@@ -313,9 +313,9 @@ PsiFeedbackLogType const SubscriptionVerifierServiceLogType = @"SubscriptionVeri
     // Updates subscription dictionary.
     [self setAppReceiptFileSize:appReceiptFileSize];
     [self setPendingRenewalInfo:remoteAuthDict[kRemoteSubscriptionVerifierPendingRenewalInfo]];
-    AuthorizationToken *token = [[AuthorizationToken alloc]
-      initWithEncodedToken:remoteAuthDict[kRemoteSubscriptionVerifierSignedAuthorization]];
-    [self setAuthorizationToken:token];
+    Authorization *authorization = [[Authorization alloc]
+      initWithEncodedAuthorization:remoteAuthDict[kRemoteSubscriptionVerifierSignedAuthorization]];
+    [self setAuthorization:authorization];
 
     return nil;
 }
@@ -387,9 +387,9 @@ typedef NS_ENUM(NSInteger, SubscriptionStateEnum) {
     SubscriptionState *instance = [[SubscriptionState alloc] init];
     instance.state = SubscriptionStateNotSubscribed;
 
-    if ([subscription hasActiveSubscriptionTokenForDate:[NSDate date]]) {
+    if ([subscription hasActiveAuthorizationForDate:[NSDate date]]) {
         instance.state = SubscriptionStateSubscribed;
-    } else if ([subscription shouldUpdateSubscriptionToken]) {
+    } else if ([subscription shouldUpdateAuthorization]) {
         instance.state = SubscriptionStateInProgress;
     }
 
