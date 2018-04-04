@@ -17,11 +17,11 @@
  *
  */
 
-#import "AuthorizationToken.h"
+#import "Authorization.h"
 #import "PsiFeedbackLogger.h"
 #import "NSDate+PSIDateExtension.h"
 
-@interface AuthorizationToken ()
+@interface Authorization ()
 
 @property (nonatomic, readwrite) NSString *base64Representation;
 @property (nonatomic, readwrite) NSString *ID;
@@ -30,12 +30,12 @@
 
 @end
 
-@implementation AuthorizationToken
+@implementation Authorization
 
-+ (NSArray<AuthorizationToken *> *_Nonnull)createFromEncodedTokens:(NSArray<NSString *> *)encodedAuthorizations {
-    NSMutableArray<AuthorizationToken *> *authorizations = [NSMutableArray array];
-    for (NSString *encodedToken in encodedAuthorizations) {
-        AuthorizationToken *authorization = [[AuthorizationToken alloc] initWithEncodedToken:encodedToken];
++ (NSArray<Authorization *> *_Nonnull)createFromEncodedAuthorizations:(NSArray<NSString *> *)encodedAuthorizations {
+    NSMutableArray<Authorization *> *authorizations = [NSMutableArray array];
+    for (NSString *encodedAuth in encodedAuthorizations) {
+        Authorization *authorization = [[Authorization alloc] initWithEncodedAuthorization:encodedAuth];
         if (authorization) {
             [authorizations addObject:authorization];
         }
@@ -43,51 +43,51 @@
     return authorizations;
 }
 
-- (instancetype _Nullable)initWithEncodedToken:(NSString *)encodedToken {
+- (instancetype _Nullable)initWithEncodedAuthorization:(NSString *)encodedAuthorization {
     self = [super init];
     if (self) {
-        if (!encodedToken || [encodedToken length] == 0) {
+        if (!encodedAuthorization || [encodedAuthorization length] == 0) {
             return nil;
         }
 
         // Decode Bae64 Authorization.
         NSError *error;
-        NSData *data = [[NSData alloc] initWithBase64EncodedString:encodedToken options:0];
+        NSData *data = [[NSData alloc] initWithBase64EncodedString:encodedAuthorization options:0];
         NSDictionary *authorizationObjectDict = [NSJSONSerialization JSONObjectWithData:data options:0 error:&error];
         if (error) {
-            [PsiFeedbackLogger error:@"failed to parse authorization token:%@", error];
+            [PsiFeedbackLogger error:@"failed to parse authorization:%@", error];
             return nil;
         }
 
         NSDictionary *authDict = authorizationObjectDict[@"Authorization"];
 
         // Store base64 representation
-        self.base64Representation = encodedToken;
+        self.base64Representation = encodedAuthorization;
 
         // Get ID
         self.ID = authDict[@"ID"];
         if ([self.ID length] == 0) {
-            [PsiFeedbackLogger error:@"authorization token 'ID' is empty"];
+            [PsiFeedbackLogger error:@"authorization 'ID' is empty"];
             return nil;
         }
 
         // Get AccessType
         self.accessType = authDict[@"AccessType"];
         if ([self.accessType length] == 0) {
-            [PsiFeedbackLogger error:@"authorization token 'AccessType' is empty"];
+            [PsiFeedbackLogger error:@"authorization 'AccessType' is empty"];
             return nil;
         }
 
         // Get Expires date
         NSString *authExpiresDateString = (NSString *) authDict[@"Expires"];
         if ([authExpiresDateString length] == 0) {
-            [PsiFeedbackLogger error:@"authorization token 'Expires' is empty"];
+            [PsiFeedbackLogger error:@"authorization 'Expires' is empty"];
             return nil;
         }
 
         self.expires = [NSDate fromRFC3339String:authExpiresDateString];
         if (!self.expires) {
-            [PsiFeedbackLogger error:@"authorization token failed to parse RFC3339 date string (%@)", authExpiresDateString];
+            [PsiFeedbackLogger error:@"authorization failed to parse RFC3339 date string (%@)", authExpiresDateString];
             return nil;
         }
     }

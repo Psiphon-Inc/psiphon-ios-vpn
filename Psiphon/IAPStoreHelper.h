@@ -65,7 +65,7 @@ FOUNDATION_EXPORT NSString * const IAPHelperPaymentTransactionUpdateKey;
 
 /**
  * Checks whether there is active subscription given date.
- * @param date Date to compare the authorization token expiration to.
+ * @param date Date to compare the authorization expiration to.
  * @return TRUE if subscription is active, FALSE otherwise.
  */
 + (BOOL)hasActiveSubscriptionForDate:(NSDate*)date;
@@ -73,7 +73,7 @@ FOUNDATION_EXPORT NSString * const IAPHelperPaymentTransactionUpdateKey;
 /**
  * Checks whether there is active subscription given date.
  * If expiryDate is not nil and the method return TRUE, expiryDate will point to NSDate with expiration time.
- * @param date Date to compare the authorization token expiration to.
+ * @param date Date to compare the authorization expiration to.
  * @param expiryDate If not nil, and the return value is TRUE, it will point to NSDate with expiration time.
  * @return TRUE if subscription is active, FALSE otherwise.
  */

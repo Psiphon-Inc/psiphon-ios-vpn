@@ -28,15 +28,15 @@
 #endif
 
 
-@interface AuthorizationToken : NSObject
+@interface Authorization : NSObject
 
 @property (nonatomic, readonly, nonnull) NSString *base64Representation;
 @property (nonatomic, readonly, nonnull) NSString *ID;
 @property (nonatomic, readonly, nonnull) NSString *accessType;
 @property (nonatomic, readonly, nonnull) NSDate *expires;
 
-+ (NSArray<AuthorizationToken *> *_Nonnull)createFromEncodedTokens:(NSArray<NSString *> *_Nullable)encodedAuthorizations;
++ (NSArray<Authorization *> *_Nonnull)createFromEncodedAuthorizations:(NSArray<NSString *> *)encodedAuthorizations;
 
-- (instancetype _Nullable)initWithEncodedToken:(NSString *_Nullable)encodedToken;
+- (instancetype _Nullable)initWithEncodedAuthorization:(NSString *)encodedAuthorization;
 
 @end
