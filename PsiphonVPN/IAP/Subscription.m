@@ -296,28 +296,18 @@ PsiFeedbackLogType const SubscriptionVerifierServiceLogType = @"SubscriptionVeri
     return NO;
 }
 
-- (NSError *)updateWithRemoteAuthDict:(NSDictionary *_Nullable)remoteAuthDict {
+- (void)updateWithRemoteAuthDict:(NSDictionary *_Nullable)remoteAuthDict submittedReceiptFilesize:(NSNumber *)receiptFilesize {
 
     if (!remoteAuthDict) {
-        return nil;
-    }
-
-    // Gets app subscription receipt file size.
-    NSError *err;
-    NSNumber *appReceiptFileSize = nil;
-    [[NSBundle mainBundle].appStoreReceiptURL getResourceValue:&appReceiptFileSize forKey:NSURLFileSizeKey error:&err];
-    if (err) {
-        return err;
+        return;
     }
 
     // Updates subscription dictionary.
-    [self setAppReceiptFileSize:appReceiptFileSize];
+    [self setAppReceiptFileSize:receiptFilesize];
     [self setPendingRenewalInfo:remoteAuthDict[kRemoteSubscriptionVerifierPendingRenewalInfo]];
     Authorization *authorization = [[Authorization alloc]
       initWithEncodedAuthorization:remoteAuthDict[kRemoteSubscriptionVerifierSignedAuthorization]];
     [self setAuthorization:authorization];
-
-    return nil;
 }
 
 @end

@@ -406,12 +406,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
               // regardless of what authorization was passed to the server.
               currentActiveAuthorization = [subscription.authorization.ID copy];
 
-              subscription.appReceiptFileSize = result.submittedReceiptFileSize;
-              NSError *error = [subscription updateWithRemoteAuthDict:result.remoteAuthDict];
-              if (error) {
-                  [PsiFeedbackLogger errorWithType:SubscriptionCheckLogType message:@"failed to read remote auth data:%@", error];
-                  return;
-              }
+              [subscription updateWithRemoteAuthDict:result.remoteAuthDict submittedReceiptFilesize:result.submittedReceiptFileSize];
               [subscription persistChanges];
 
               [PsiFeedbackLogger infoWithType:SubscriptionCheckLogType message:@"received authorization %@ expiring on %@", subscription.authorization.ID,

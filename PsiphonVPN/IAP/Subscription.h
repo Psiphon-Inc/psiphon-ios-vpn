@@ -125,9 +125,9 @@ typedef NS_ENUM(NSInteger, SubscriptionCheckEnum) {
  * Convenience method for updating current subscription instance from the dictionary
  * returned by the subscription verifier server.
  * @param remoteAuthDict Dictionary returned from the subscription verifier server.
- * @return nil if this instance is updated successfully, error otherwise.
+ * @param receiptFilesize File size of the receipt submitted to the subscription verifier server.
  */
-- (NSError *_Nullable)updateWithRemoteAuthDict:(NSDictionary *_Nullable)remoteAuthDict;
+- (void)updateWithRemoteAuthDict:(NSDictionary *_Nullable)remoteAuthDict submittedReceiptFilesize:(NSNumber *)receiptFilesize;
 
 @end
 
