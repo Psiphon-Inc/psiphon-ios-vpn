@@ -169,6 +169,15 @@
 
     return [RACSignal createSignal:^RACDisposable *(id <RACSubscriber> subscriber) {
 
+        // Creates an AsyncOperation when the returned signal is subscribed to, and adds the operation to
+        // the `operationQueue`, waiting to be executed.
+        //
+        // When `operation` gets to the head of the queue and is executed, the source signal is subscribed to
+        // on the `queueScheduler` and its events are forwarded to the `subscriber` on the same `queueScheduler`.
+        //
+        // Once the source signal is terminated, the `operation` changes its status to "finished" and the
+        // `operationQueue` is free to execute the next operations in its queue.
+
         RACCompoundDisposable *compoundDisposable = [RACCompoundDisposable compoundDisposable];
 
         AsyncOperation *operation = [[AsyncOperation alloc] initWithBlock:^(void (^completionHandler)(NSError *)) {
