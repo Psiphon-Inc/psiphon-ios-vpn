@@ -19,13 +19,13 @@
 
 #import <Foundation/Foundation.h>
 #import "UserDefaults.h"
-#import "AuthorizationToken.h"
+#import "Authorization.h"
 
 
-@interface Authorizations : NSObject <UserDefaultsModelProtocol>
+@interface AuthorizationsDatabase : NSObject <UserDefaultsModelProtocol>
 
-/** Array of authorization tokens. */
-@property (nonatomic, nullable, readonly) NSArray<AuthorizationToken *> *tokens;
+/** Array of authorizationns. */
+@property (nonatomic, nullable, readonly) NSArray<Authorization *> *authorizations;
 
 /**
  * Reads NSUserDefaults and wraps the result in an Authorizations instance.
@@ -34,32 +34,32 @@
  *            instance to disk.
  * @return An instance of Authorizations class.
  */
-+ (Authorizations *_Nonnull)fromPersistedDefaults;
++ (AuthorizationsDatabase *_Nonnull)fromPersistedDefaults;
 
 - (BOOL)isEmpty;
 
 /**
- * Given list of authorization IDs, this method removes any persisted authorization token
+ * Given list of authorization IDs, this method removes any persisted authorization
  * whose ID is not in the provided list.
- * If the provided list is nil or empty, all persisted authorization tokens will be removed.
+ * If the provided list is nil or empty, all persisted authorizations will be removed.
  * @attention To persist changes made by this function, you should call -persistChanges method.
  * @param authorizationIds NSArray of authorization IDs to keep.
  */
-- (void)removeTokensNotIn:(NSArray<NSString *> *_Nullable)authorizationIds;
+- (void)removeAuthorizationsNotIn:(NSArray<NSString *> *_Nullable)authorizationIds;
 
 /**
- * Adds Base64 authorization tokens to the list of authorization tokens.
+ * Adds Base64 authorizations to the list of authorizations.
  * @attention To persist changes made by this function, you should call -persistChanges method.
- * @param encodedTokens Base64 encoded authorization token.
+ * @param encodedAuthorizations Base64 encoded authorization.
  */
-- (void)addTokens:(NSArray<NSString *> *_Nullable)encodedTokens;
+- (void)addAuthorizations:(NSArray<NSString *> *_Nullable)encodedAuthorizations;
 
 /**
- * Returns TRUE if this instance contains an authorization token with the given access type.
+ * Returns TRUE if this instance contains an authorization with the given access type.
  * @param accessType Psiphon authorization access type
  * @return TRUE if contains given access type, FALSE otherwise.
  */
-- (BOOL)hasTokenWithAccessType:(NSString *_Nonnull)accessType;
+- (BOOL)hasAuthorizationWithAccessType:(NSString *_Nonnull)accessType;
 
 /**
  * Persists changes made to this instance to NSUserDefaults.
@@ -68,7 +68,7 @@
  */
 - (BOOL)persistChanges;
 
-- (BOOL)hasActiveAuthorizationTokenForDate:(NSDate *_Nonnull)date;
+- (BOOL)hasActiveAuthorizationForDate:(NSDate *_Nonnull)date;
 
 @end
 

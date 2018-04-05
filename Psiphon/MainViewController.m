@@ -48,6 +48,8 @@
 #import "RACReplaySubject.h"
 #import "RACSignal+Operations.h"
 #import "RACSignal+Operations.h"
+#import "RACSignal.h"
+#import "Asserts.h"
 
 static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSString *b) {
     return (([a length] == 0) && ([b length] == 0)) || ([a isEqualToString:b]);
@@ -242,23 +244,38 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
       }];
     
     [self.compoundDisposable addDisposable:vpnStartStatusDisposable];
-    
+
+    // Subscribes to AppDelegate subscription signal.
+    __block RACDisposable *userSubscriptionDisposable = [[AppDelegate sharedAppDelegate].subscriptionStatus
+      subscribeNext:^(NSNumber *value) {
+          UserSubscriptionStatus s = (UserSubscriptionStatus) [value integerValue];
+
+          if(s == UserSubscriptionActive) {
+              subscriptionButton.hidden = YES;
+              adLabel.hidden = YES;
+              subscriptionButtonTop.active = NO;
+              bottomBarTop.active = YES;
+          } else {
+              subscriptionButton.hidden = NO;
+              adLabel.hidden = ![self.adManager untunneledInterstitialIsReady];
+              bottomBarTop.active = NO;
+              subscriptionButtonTop.active = YES;
+          }
+
+      } error:^(NSError *error) {
+          [weakSelf.compoundDisposable removeDisposable:userSubscriptionDisposable];
+      } completed:^{
+          [weakSelf.compoundDisposable removeDisposable:userSubscriptionDisposable];
+      }];
+
+    [self.compoundDisposable addDisposable:userSubscriptionDisposable];
+
     // Observer AdManager notifications
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(onAdStatusDidChange)
                                                  name:AdManagerAdsDidLoadNotification
                                                object:self.adManager];
-    // Observe VPNManager notifications
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(onSubscriptionActivated)
-                                                 name:AppDelegateSubscriptionDidActivateNotification
-                                               object:nil];
-    
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(onSubscriptionExpired)
-                                                 name:AppDelegateSubscriptionDidExpireNotification
-                                               object:nil];
-    
+
 }
 
 - (void)viewDidAppear:(BOOL)animated {
@@ -292,7 +309,6 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     
     // Sync UI with the VPN state
     [self onAdStatusDidChange];
-    [self checkSubscriptionStateAndUpdateUI];
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
@@ -451,9 +467,6 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     }];
     
     [self.compoundDisposable addDisposable:disposable];
-    
-    // Performs a subscription check, in case the UI gets out of sync with the subscription status.
-    [self checkSubscriptionStateAndUpdateUI];
 }
 
 - (void)onSettingsButtonTap:(UIButton *)sender {
@@ -1376,43 +1389,11 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 
 #pragma mark - Subscription
 
-- (void)updateSubscriptionUIWithSubscribedState:(BOOL)isSubscribed {
-    if(isSubscribed) {
-        subscriptionButton.hidden = YES;
-        adLabel.hidden = YES;
-        subscriptionButtonTop.active = NO;
-        bottomBarTop.active = YES;
-    } else {
-        subscriptionButton.hidden = NO;
-        adLabel.hidden = ![self.adManager untunneledInterstitialIsReady];
-        bottomBarTop.active = NO;
-        subscriptionButtonTop.active = YES;
-    }
-}
-
 - (void)openIAPViewController {
     IAPViewController *iapViewController = [[IAPViewController alloc]init];
     iapViewController.openedFromSettings = NO;
     UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:iapViewController];
     [self presentViewController:navController animated:YES completion:nil];
-}
-
-- (void)checkSubscriptionStateAndUpdateUI {
-    __weak MainViewController *weakSelf = self;
-    
-    [IAPStoreHelper hasActiveSubscriptionForNowOnBlock:^(BOOL isActive) {
-        [weakSelf updateSubscriptionUIWithSubscribedState:isActive];
-    }];
-}
-
-- (void)onSubscriptionActivated {
-    // Updates subscription UI.
-    [self updateSubscriptionUIWithSubscribedState:TRUE];
-}
-
-- (void)onSubscriptionExpired {
-    // Updates subscription UI.
-    [self updateSubscriptionUIWithSubscribedState:FALSE];
 }
 
 @end

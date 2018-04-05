@@ -85,18 +85,52 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Asynchronously subscribes observers to this signal on the specified operation queue.
- * The operation queue is required to have underlying dispatch queue and that it must be serial.
+ * The operation queue is required to have underlying serial dispatch queue.
  *
- * The operation added to `queue` is completed after the source signal has emitted one of the
- * terminal events, and then the event is forwarded to subscribers to the returned signal.
+ * @note This operator can cause a deadlock if not used properly (hence the name "unsafe").
  *
- * @attention As long as the signal has not terminated (i.e. has not emitted error or completed),
- *            the `queue` will be blocked.
- *            This can cause an issue if two operations on the `queue` are dependent and both wait
- *            indefinitely for the other operation to finish.
+ * Upon subscription to the returned signal a NSOperation is added to the `operationQueue` is
+ * "finished" after the source signal has emitted one of the terminal events.
+ * Events emitted by the receiver are forwarded to subscribers to the returned signal on the `queueScheduler`.
  *
- * @param operationQueue operation queue with underlying serial dispatch queue to subscribe observers on.
- * @param queueScheduler RACTargetQueueScheduler with the same underlying dispatch queue and the `queue`.
+ * @note `operationQueue` and `queueScheduler` should have the same underlying dispatch queue.
+ *       This is an optimization to avoid creating a RACScheduler from the `operationQueue`
+ *       dispatch queue on every subscription.
+ *
+ * @attention As long as receiver signal has not terminated (i.e. has not emitted error or completed),
+ *            the operation added `operationQueue` will remain the queue and not be removed.
+ *            Therefore, two operations on the same serial queue that are waiting for the other to complete
+ *            will deadlock.
+ *
+ *            Example of a deadlock:
+ *            @code
+ *            dispatch_queue_t serialQueue;
+ *            NSOperationQueue *operationQueue; // with serialQueue as underlying dispatch queue.
+ *            RACTargetQueueScheduler *queueScheduler; // with serialQueue as underlying dispatch queue.
+ *
+ *            RACSignal *signal1 = [[RACSignal return:@"source"]
+ *              unsafeSubscribeOnSerialQueue:operationQueue scheduler:queueScheduler];
+ *
+ *            RACSignal *signal2= [[[[RACSignal return:@"first"] flattenMap:^RACSignal *(id value) {
+ *                return signal1;
+ *              }]
+ *              unsafeSubscribeOnSerialQueue:operationQueue scheduler:queueScheduler]
+ *              subscribeNext:^(id x) {
+ *                 // Never reached due to deadlock.
+ *              }];
+ *
+ *            @endcode
+ *
+ *            signal2 is first scheduled on the operationQueue (queue = [signal2NSOperation]) upon subscription.
+ *            Once signal2NSOperation execution is started, signal2 emits "first", and subsequent flatMap operator
+ *            will return signal1.
+ *            Upon subscription to the returned signal1 from flatMap, signal1NSOperation is added to operationQueue
+ *            (queue = [signal2NSOperation, signal1NSOperation]).
+ *            Since signal1 is waiting for signal2 to terminate, but signal2 is waiting for the result of
+ *            signal1, a deadlock occurs.
+ *
+ * @param operationQueue NSOperationQueue with underlying serial dispatch queue to subscribe observers on.
+ * @param queueScheduler RACTargetQueueScheduler with the same underlying dispatch queue and the `operationQueue`.
  * @return The source observable modified so that its subscriptions happens on the specified NSOperationQueue.
  */
 - (RACSignal *)unsafeSubscribeOnSerialQueue:(NSOperationQueue *)operationQueue
