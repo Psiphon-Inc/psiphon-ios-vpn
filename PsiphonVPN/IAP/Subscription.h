@@ -18,7 +18,7 @@
  */
 
 #import "UserDefaults.h"
-#import "AuthorizationToken.h"
+#import "Authorization.h"
 #import "RACSignal.h"
 #import "RACSubscriber.h"
 
@@ -46,15 +46,15 @@ typedef NS_ERROR_ENUM(ReceiptValidationErrorDomain, PsiphonReceiptValidationErro
 
 @interface SubscriptionVerifierService : NSObject
 
-+ (RACSignal<NSDictionary *> *)updateSubscriptionAuthorizationTokenFromRemote;
++ (RACSignal<NSDictionary *> *)updateAuthorizationFromRemote;
 
 @end
 
 
 typedef NS_ENUM(NSInteger, SubscriptionCheckEnum) {
-    SubscriptionCheckShouldUpdateToken,
-    SubscriptionCheckHasActiveToken,
-    SubscriptionCheckTokenExpired,
+    SubscriptionCheckShouldUpdateAuthorization,
+    SubscriptionCheckHasActiveAuthorization,
+    SubscriptionCheckAuthorizationExpired,
 };
 
 @interface Subscription : NSObject <UserDefaultsModelProtocol>
@@ -68,13 +68,13 @@ typedef NS_ENUM(NSInteger, SubscriptionCheckEnum) {
  */
 @property (nonatomic, nullable, readwrite) NSArray * pendingRenewalInfo;
 
-@property (nonatomic, nullable, readwrite) AuthorizationToken * authorizationToken;
+@property (nonatomic, nullable, readwrite) Authorization * authorization;
 
 /**
  * Create a signal that returns an item of type SubscriptionCheckEnum.
  * The value returned only reflects subscription information available locally, and should be combined
- * with other sources of information regarding subscription token validity to determine if the token is valid,
- * or whether the subscription verifier server needs to contacted.
+ * with other sources of information regarding subscription authorization validity to determine
+ * if the authorization is valid or whether the subscription verifier server needs to contacted.
  * @return Returns a signal that emits one of SubscriptionCheckEnum enums and then completes immediately.
  */
 + (RACSignal<NSNumber *> *)localSubscriptionCheck;
@@ -106,11 +106,11 @@ typedef NS_ENUM(NSInteger, SubscriptionCheckEnum) {
 - (BOOL)hasActiveSubscriptionForNow;
 
 /**
- * Returns TRUE if authorization token is active compared to provided date.
- * @param date Date to compare the authorization token expiration to.
+ * Returns TRUE if subscription authorization is active compared to provided date.
+ * @param date Date to compare the authorization expiration to.
  * @return TRUE if subscription is active, FALSE otherwise.
  */
-- (BOOL)hasActiveSubscriptionTokenForDate:(NSDate *)date;
+- (BOOL)hasActiveAuthorizationForDate:(NSDate *)date;
 
 /**
  * Returns TRUE if Subscription info is missing, the App Store receipt has changed, or we expect
@@ -119,15 +119,15 @@ typedef NS_ENUM(NSInteger, SubscriptionCheckEnum) {
  * subscription verifier server should be contacted to get latest subscription information.
  * @return TRUE if subscription verification server should be contacted, FALSE otherwise.
  */
-- (BOOL)shouldUpdateSubscriptionToken;
+- (BOOL)shouldUpdateAuthorization;
 
 /**
  * Convenience method for updating current subscription instance from the dictionary
  * returned by the subscription verifier server.
  * @param remoteAuthDict Dictionary returned from the subscription verifier server.
- * @return nil if this instance is updated successfully, error otherwise.
+ * @param receiptFilesize File size of the receipt submitted to the subscription verifier server.
  */
-- (NSError *_Nullable)updateSubscriptionWithRemoteAuthDict:(NSDictionary *_Nullable)remoteAuthDict;
+- (void)updateWithRemoteAuthDict:(NSDictionary *_Nullable)remoteAuthDict submittedReceiptFilesize:(NSNumber *)receiptFilesize;
 
 @end
 
