@@ -116,12 +116,14 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
     // Serial queue of work to be done following callbacks from PsiphonTunnel.
     dispatch_queue_t workQueue;
 
+    // Scheduler to be used by AppStore subscription check code.
     // NOTE: RACScheduler objects are all serial schedulers and cheap to create.
     //       The underlying implementation creates a GCD dispatch queues.
     RACScheduler *subscriptionScheduler;
 
     // An infinite signal that emits Psiphon tunnel connection state.
     // When subscribed, replays the last known connection state.
+    // @scheduler Events are delivered on some background system thread.
     RACReplaySubject<NSNumber *> *tunnelConnectionStateSubject;
 
     // An infinite signal that emits @(SubscriptionAuthorizationStatusRejected) if the subscription authorization
@@ -154,7 +156,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 }
 
 - (void)initSubscriptionCheckObjects {
-    self->subscriptionScheduler = [RACScheduler schedulerWithPriority:RACSchedulerPriorityDefault];
+    self->subscriptionScheduler = [RACScheduler schedulerWithPriority:RACSchedulerPriorityDefault name:@"ca.psiphon.Psiphon.PsiphonVPN.SubscriptionScheduler"];
     self->tunnelConnectionStateSubject = [RACReplaySubject replaySubjectWithCapacity:1];
     self->subscriptionAuthorizationActiveSubject = [RACReplaySubject replaySubjectWithCapacity:1];
 }
@@ -345,8 +347,6 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
           }
       }]
       startWith:[SubscriptionResultModel inProgress]];
-
-    [RACScheduler schedulerWithPriority:RACSchedulerPriorityDefault];
 
     // Subscribes to the updateSubscriptionAuthorizationSignal signal.
     // Subscription methods should always get called from the main thread.
@@ -941,7 +941,12 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 }
 
 - (void)onConnectionStateChangedFrom:(PsiphonConnectionState)oldState to:(PsiphonConnectionState)newState {
-    [self->tunnelConnectionStateSubject sendNext:@(newState)];
+    // Do not block PsiphonTunnel callback queue.
+    // Note: ReactiveObjC subjects block until all subscribers have received to the events,
+    //       and also ReactiveObjC `subscribeOn` operator does not behave similar to RxJava counterpart for example.
+    dispatch_async_global(^{
+        [self->tunnelConnectionStateSubject sendNext:@(newState)];
+    });
 }
 
 - (void)onConnecting {
