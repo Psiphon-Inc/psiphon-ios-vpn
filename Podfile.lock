@@ -15,7 +15,7 @@ PODS:
     - mopub-ios-sdk/Core
     - mopub-ios-sdk/Moat
   - OpenSSL (1.0.210)
-  - PsiphonClientCommonLibrary (0.2.26):
+  - PsiphonClientCommonLibrary (0.2.27):
     - InAppSettingsKit
   - PureLayout (3.0.2)
   - ReactiveObjC (3.1.0)
@@ -28,7 +28,7 @@ DEPENDENCIES:
   - MBProgressHUD (~> 1.1.0)
   - mopub-ios-sdk (= 4.18.0)
   - OpenSSL (= 1.0.210)
-  - PsiphonClientCommonLibrary (from `https://github.com/Psiphon-Inc/psiphon-ios-client-common-library.git`, commit `5caca65`)
+  - PsiphonClientCommonLibrary (from `https://github.com/Psiphon-Inc/psiphon-ios-client-common-library.git`, commit `454fa77`)
   - PureLayout (= 3.0.2)
   - ReactiveObjC (from `https://github.com/Psiphon-Inc/ReactiveObjC.git`, commit `b2ac770`)
   - VungleSDK-iOS (= 5.3.0)
@@ -38,7 +38,7 @@ EXTERNAL SOURCES:
     :commit: 598c498
     :git: https://github.com/Psiphon-Inc/InAppSettingsKit.git
   PsiphonClientCommonLibrary:
-    :commit: 5caca65
+    :commit: 454fa77
     :git: https://github.com/Psiphon-Inc/psiphon-ios-client-common-library.git
   ReactiveObjC:
     :commit: b2ac770
@@ -49,7 +49,7 @@ CHECKOUT OPTIONS:
     :commit: 598c498
     :git: https://github.com/Psiphon-Inc/InAppSettingsKit.git
   PsiphonClientCommonLibrary:
-    :commit: 5caca65
+    :commit: 454fa77
     :git: https://github.com/Psiphon-Inc/psiphon-ios-client-common-library.git
   ReactiveObjC:
     :commit: b2ac770
@@ -62,11 +62,11 @@ SPEC CHECKSUMS:
   MBProgressHUD: e7baa36a220447d8aeb12769bf0585582f3866d9
   mopub-ios-sdk: 043a81e7e3ccd2b888fec35880b13e2876c16ff3
   OpenSSL: 246ffb948e9d56466727fd318134af35f5aa764e
-  PsiphonClientCommonLibrary: d4c44e73e7daf20df9c67cf3197b8eeccce14f90
+  PsiphonClientCommonLibrary: cce096bcecbf7b8a833c7ca0216274e79f38c6c5
   PureLayout: 4d550abe49a94f24c2808b9b95db9131685fe4cd
   ReactiveObjC: 2a38ea15335de4119d8b17caf1db1484f61db902
   VungleSDK-iOS: af3aa92d0f4a923505a9416646ffef5250592150
 
-PODFILE CHECKSUM: 06df6582568d598409a59fae8a4e9e2cb42db6af
+PODFILE CHECKSUM: a2132b8299746eb06fdaaa1a3a7c60edf2b1cbe2
 
 COCOAPODS: 1.4.0
