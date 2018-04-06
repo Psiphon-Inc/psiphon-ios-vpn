@@ -298,7 +298,9 @@ static NSString *iapCellID = @"IAPTableCellID";
         NSDateFormatter* df = [NSDateFormatter new];
         df.dateFormat= [NSDateFormatter dateFormatFromTemplate:@"MMddYY" options:0 locale:[NSLocale currentLocale]];
         NSString *dateString = [df stringFromDate:self.latestSubscriptionExpirationDate];
-        cell.detailTextLabel.text = [NSString stringWithFormat:detailTextFormat, dateString];
+
+        // TODO: Remove `localizedPrice` parameter after the all translations have caught up.
+        cell.detailTextLabel.text = [NSString stringWithFormat:detailTextFormat, dateString, localizedPrice];
     } else {
         UISegmentedControl *buyButton = [[UISegmentedControl alloc]initWithItems:[NSArray arrayWithObject:localizedPrice]];
         self.buyButtonTintColor = buyButton.tintColor;
