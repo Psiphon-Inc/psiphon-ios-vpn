@@ -1,5 +1,8 @@
-/* Active subscription detail text, example: Expires on 2017-01-01, renewal cost is $3.99 */
-"ACTIVE_SUBSCRIPTION_DETAIL_TEXT" = "Vervalt op %1$@, verlengkosten zijn %2$@";
+/* Active subscription detail text, example: Expires on 2017-01-01 */
+"ACTIVE_SUBSCRIPTION_DETAIL_TEXT" = "Vervalt op %@";
+
+/* Title of the section in the subscription dialog that shows currently active subscription information. */
+"ACTIVE_SUBSCRIPTION_SECTION_TITLE" = "Huidig abonnement";
 
 /* Text for button that tell users there will by a short video ad. */
 "AD_LOADED" = "Bekijk een korte video terwijl we ons voorbereiden om u te verbinden";
@@ -13,20 +16,23 @@
 /* Alert message informing user that the device clock needs to be updated with current time */
 "BAD_CLOCK_ALERT_MESSAGE" = "We hebben vastgesteld dat de tijd op uw apparaat niet is gesynchroniseerd met uw tijdzone. Werk uw klokinstellingen bij en herstart de app opnieuw";
 
-/* Alert title informing user that the device clock needs to be updated with current time */
-"BAD_CLOCK_ALERT_TITLE" = "Klok is niet gesynchroniseerd";
+/* Alert message informing user that subscription receipt can not be verified */
+"BAD_RECEIPT_ALERT_MESSAGE" = "Uw abonnement ontvangst kan niet worden geverifieerd. Vernieuw deze en probeer het opnieuw.";
 
-/* Alert message informing user that subscription receipt cannot be verified */
-"BAD_RECEIPT_ALERT_MESSAGE" = "Uw abonnementsbon kan niet worden geverifieerd. Vernieuw deze en probeer het opnieuw.";
-
-/* Alert title informing user that app receipt is not valid */
-"BAD_RECEIPT_ALERT_TITLE" = "Ongeldige app-ontvangst";
+/* Title of button on alert view which shows the progress of the user's buy request. Hitting this button dismisses the alert and the buy request continues processing in the background. */
+"BUY_REQUEST_PROGRESS_ALERT_DISMISS_BUTTON_TITLE" = "Afwijzen";
 
 /* Buy subscription dialog footer text */
 "BUY_SUBSCRIPTIONS_FOOTER_TEXT" = "Een abonnement wordt automatisch verlengd, wat betekent dat het eenmaal gekocht, automatisch wordt verlengd totdat u het 24 uur vóór het einde van de lopende periode annuleert.\n\nJe iTunes Account wordt binnen 24 uur vóór het einde van de huidige periode in rekening gebracht voor verlenging met de kosten van het abonnement.\n\nBeheer uw abonnement en automatische verlenging door naar uw accountinstellingen te gaan.";
 
-/* Premium subscriptions dialog header text. If “Premium” doesn't easily translate, please choose a term that conveys “Pro” or “Extra” or “Better” or “Elite”. */
+/* Premium subscriptions dialog header text */
 "BUY_SUBSCRIPTIONS_HEADER_TEXT" = "Verwijder advertenties en surf sneller met een premium abonnement op internet!";
+
+/* Alert Cancel button */
+"CANCEL_BUTTON" = "Annuleren";
+
+/* Alert message informing user that their subscription has expired or that they're not a subscriber, therefore Psiphon can only be started from the Psiphon app. DO NOT translate 'Psiphon'. */
+"CANNOT_START_TUNNEL_DUE_TO_SUBSCRIPTION" = "Je Psiphon-abonnement is verlopen.\nOmdat u geen abonnee bent of uw abonnement is verlopen, kan Psiphon alleen worden gestart vanuit de Psiphon-app.\n";
 
 /* Text above change region button that allows user to select their desired server region */
 "CHANGE_REGION" = "Wijzigen regio";
@@ -34,15 +40,42 @@
 /* Main text in the 'Upstream Proxy Error' dialog box. This is shown when the user has directly altered these settings, and those settings are (probably) erroneous. DO NOT translate 'Psiphon'. */
 "CHECK_UPSTREAM_PROXY_SETTING" = "U hebt Psiphon geconfigureerd om een upstream-proxy te gebruiken.\nWe lijken echter geen verbinding te kunnen maken met een Psiphon-server via die proxy.\nCorrigeer de instellingen en probeer het opnieuw.";
 
-/* Alert dialog title (MainViewController) */
+/* Alert dialog body informing the user that the 'Auto-start VPN on demand' feature is enabled and that the VPN cannot be stopped. Followed by asking the user if they would like to disable the 'Auto-start VPN on demand' feature, and stop the VPN. */
+"CONNECT_ON_DEMAND_ALERT_BODY" = "Kan de VPN niet stoppen terwijl \"Auto-start VPN\" is ingeschakeld.\nWilt u \"Auto-start VPN\" op aanvraag uitschakelen en de VPN stoppen?";
+
+/* Alert dialog title informing user that 'Auto-start VPN' feature is enabled */
+"CONNECT_ON_DEMAND_ALERT_TITLE" = "Auto-start VPN is ingeschakeld";
+
+/* Alert dialog title of alert which informs the user that the settings file in the app is corrupt. */
 "CORRUPT_SETTINGS_ALERT_TITLE" = "Corrupte Instellingen";
 
 /* Alert dialog message informing the user that the settings file in the app is corrupt, and that they can potentially fix this issue by re-installing the app. */
 "CORRUPT_SETTINGS_MESSAGE" = "Uw app-instellingen bestand lijkt corrupt. Probeer de app opnieuw te installeren om het bestand te herstellen.";
 
+/* Disable Auto-start VPN feature and Stop the VPN button label */
+"DISABLE_BUTTON" = "Uitschakelen Auto-Start VPN en stop";
+
 /* Title of the button that dismisses region selection dialog
    Title of the button that dismisses the subscriptions menu */
 "DONE_ACTION" = "Klaar";
+
+/*[UNTRANSLATED] Alert dialog message indicating to the user that the app has failed to upload their feedback and that they should try again.  */
+"FEEDBACK_UPLOAD_FAILED_MESSAGE" = "An error occured while uploading your feedback. Please try again. Your feedback helps us improve the Psiphon network.";
+
+/*[UNTRANSLATED] Alert dialog title indicating to the user that the app has failed to upload their feedback to Psiphon's servers. */
+"FEEDBACK_UPLOAD_FAILED_TITLE" = "Feedback upload failed";
+
+/* Title of button on alert view which shows the progress of the users feedback being uploaded to Psiphon's servers. Hitting this button dismisses the alert and the upload continues in the background. */
+"FEEDBACK_UPLOAD_IN_PROGRESS_BACKGROUND_BUTTON_TITLE" = "achtergrond";
+
+/*[UNTRANSLATED] Alert dialog title indicating to the user that their feedback is being encrypted and securely uploaded to Psiphon's servers. */
+"FEEDBACK_UPLOAD_IN_PROGRESS_MESSAGE" = "Sending feedback…";
+
+/*[UNTRANSLATED] Alert dialog message thanking the user for helping improve the Psiphon network by submitting their feedback. */
+"FEEDBACK_UPLOAD_SUCCESSFUL_MESSAGE" = "Thank you for helping improve Psiphon!";
+
+/*[UNTRANSLATED] Alert dialog title indicating to the user that their feedback has been successfully uploaded to Psiphon's servers. */
+"FEEDBACK_UPLOAD_SUCCESSFUL_TITLE" = "Feedback uploaded successfully";
 
 /* Text displayed while app loads */
 "LOADING" = "Laden...";
@@ -59,6 +92,9 @@
 /* Alert message informing the user they should open the app to finish connecting to the VPN. DO NOT translate 'Psiphon'. */
 "OPEN_PSIPHON_APP" = "A.u.b open de Psiphon-app om de verbinding te voltooien.";
 
+/*[UNTRANSLATED] External link to the privacy policy page. Please update this with the correct language specific link (if available) e.g. https://psiphon.ca/fr/privacy.html for french. */
+"PRIVACY_POLICY_URL" = "https://psiphon.ca/en/privacy.html";
+
 /* Refresh app receipt button title */
 "REFRESH_APP_RECEIPT_BUTTON_TITLE" = "Vernieuw app-ontvangst";
 
@@ -71,23 +107,41 @@
 /* Subscriptions item title in the app settings when user does not have an active subscription. Clicking this item opens subscriptions view. If “Premium” doesn't easily translate, please choose a term that conveys “Pro” or “Extra” or “Better” or “Elite”. */
 "SETTINGS_SUBSCRIPTION_NOT_ACTIVE" = "Ga premium!";
 
+/* Automatically start VPN On demand settings toggle */
+"SETTINGS_VPN_ON_DEMAND" = "Start VPN automatisch op aanvraag";
+
+/* VPN On demand setting detail text showing when user doesn't have an active subscription and the item is disabled. */
+"SETTINGS_VPN_ON_DEMAND_DETAIL" = "Abonnement alleen";
+
 /* Text for button that opens paid subscriptions manager UI. If “Premium” doesn't easily translate, please choose a term that conveys “Pro” or “Extra” or “Better” or “Elite”. */
 "SUBSCRIPTION_BUTTON_TITLE" = "Ga premium nu!";
+
+/* Alert message informing user that their subscription has expired, and that Psiphon will stop in an hour if subscription is not renewed. Do not translate 'Psiphon'. */
+"SUBSCRIPTION_EXPIRED_WILL_KILL_TUNNEL" = "Je Psiphon-abonnement is verlopen. Psiphon stopt automatisch binnen een uur als het abonnement niet wordt verlengd. Open de Psiphon-app om uw abonnement te bekijken om gebruik te blijven maken van premiumfuncties.";
 
 /* Title of the dialog for available in-app paid subscriptions */
 "SUBSCRIPTIONS" = "Abonnementen";
 
+/* Alert message informing user that Psiphon has been stopped automatically since the subscription has expired. Do not translate 'Psiphon'. */
+"TUNNEL_KILLED" = "Psiphon is automatisch gestopt, omdat uw abonnement is verlopen.";
+
 /* Alert message informing user to turn on their cellular data or wifi to connect to the internet */
 "TURN_ON_DATE" = "Inschakelen mobiele gegevens of gebruik Wi-Fi om toegang tot gegevens.";
-
-/* Alert message informing user they have to open the app. DO NOT translate 'Psiphon'. */
-"USE_PSIPHON_APP" = "Bij verbinden, gebruik de Psiphon app";
 
 /* Alert dialog message informing the user that an error occurred while starting Psiphon (Do not translate 'Psiphon'). The user should try again, and if the problem persists, they should try reinstalling the app. */
 "VPN_START_FAIL_MESSAGE" = "Er is een fout opgetreden tijdens het opstarten van Psiphon. Probeer het opnieuw. Als dit probleem aanhoudt, probeert u de Psiphon-app opnieuw te installeren.";
 
 /* Alert dialog title indicating to the user that Psiphon was unable to start (MainViewController) */
 "VPN_START_FAIL_TITLE" = "Kan niet starten";
+
+/*[UNTRANSLATED] ('Privacy Policy' should be the same translation as privacy policy button VPN_START_PRIVACY_POLICY_BUTTON), (Do not translate 'VPN profile'), (Do not translate 'Psiphon') */
+"VPN_START_PERMISSION_DENIED_MESSAGE" = "Psiphon needs your permission to install a VPN profile in order to connect.\n\nPsiphon is committed to protecting the privacy of our users. You can review our privacy policy by tapping \"Privacy Policy\".";
+
+/*[UNTRANSLATED] Alert dialog title indicating to the user that Psiphon needs their permission */
+"VPN_START_PERMISSION_REQUIRED_TITLE" = "Permission required";
+
+/* Button label taking user's to our Privacy Policy page */
+"VPN_START_PRIVACY_POLICY_BUTTON" = "privacybeleid";
 
 /* Status when the VPN is connected to a Psiphon server */
 "VPN_STATUS_CONNECTED" = "Verbonden";
