@@ -1,5 +1,8 @@
-/*[UNTRANSLATED] Active subscription detail text, example: Expires on 2017-01-01, renewal cost is $3.99 */
-"ACTIVE_SUBSCRIPTION_DETAIL_TEXT" = "Expires on %1$@, renewal cost is %2$@";
+/*[UNTRANSLATED] Active subscription detail text, example: Expires on 2017-01-01 */
+"ACTIVE_SUBSCRIPTION_DETAIL_TEXT" = "Expires on %@";
+
+/*[UNTRANSLATED] Title of the section in the subscription dialog that shows currently active subscription information. */
+"ACTIVE_SUBSCRIPTION_SECTION_TITLE" = "Current subscription";
 
 /* Text for button that tell users there will by a short video ad. */
 "AD_LOADED" = "Перегляньте коротке відео, поки ми будемо готові зв'язатися з вами";
@@ -8,41 +11,71 @@
 "APP_SUB_TITLE_MAIN_VIEW" = "БЕЗ КОРДОНІВ";
 
 /* Text showing the app version. The '%@' placeholder is the version number. So it will look like 'v.2'. */
-"APP_VERSION" = "Версія %@";
+"APP_VERSION" = "в.%@";
 
-/*[UNTRANSLATED] Alert message informing user that the device clock needs to be updated with current time */
-"BAD_CLOCK_ALERT_MESSAGE" = "We've detected the time on your device is out of sync with your time zone. Please update your clock settings and restart the app";
+/* Alert message informing user that the device clock needs to be updated with current time */
+"BAD_CLOCK_ALERT_MESSAGE" = "Нами виявлено, що годинник на вашому пристрої не синхронізований з вашим часовим поясом. Будь ласка, оновіть налаштування годинника та перезапустіть програму";
 
-/*[UNTRANSLATED] Alert title informing user that the device clock needs to be updated with current time */
-"BAD_CLOCK_ALERT_TITLE" = "Clock is out of sync";
+/*[UNTRANSLATED] Alert message informing user that subscription receipt can not be verified */
+"BAD_RECEIPT_ALERT_MESSAGE" = "Your subscription receipt can not be verified, please refresh it and try again.";
 
-/*[UNTRANSLATED] Alert message informing user that subscription receipt cannot be verified */
-"BAD_RECEIPT_ALERT_MESSAGE" = "Your subscription receipt cannot be verified, please refresh it and try again.";
-
-/*[UNTRANSLATED] Alert title informing user that app receipt is not valid */
-"BAD_RECEIPT_ALERT_TITLE" = "Invalid app receipt";
+/*[UNTRANSLATED] Title of button on alert view which shows the progress of the user's buy request. Hitting this button dismisses the alert and the buy request continues processing in the background. */
+"BUY_REQUEST_PROGRESS_ALERT_DISMISS_BUTTON_TITLE" = "Dismiss";
 
 /*[UNTRANSLATED] Buy subscription dialog footer text */
 "BUY_SUBSCRIPTIONS_FOOTER_TEXT" = "A subscription is auto-renewable which means that once purchased it will be automatically renewed until you cancel it 24 hours prior to the end of the current period.\n\nYour iTunes Account will be charged for renewal within 24-hours prior to the end of the current period with the cost of subscription.\n\nManage your Subscription and Auto-Renewal by going to your Account Settings.";
 
-/*[UNTRANSLATED] Premium subscriptions dialog header text. If “Premium” doesn't easily translate, please choose a term that conveys “Pro” or “Extra” or “Better” or “Elite”. */
-"BUY_SUBSCRIPTIONS_HEADER_TEXT" = "Remove ads and surf the Internet faster with a premium subscription!";
+/* Premium subscriptions dialog header text */
+"BUY_SUBSCRIPTIONS_HEADER_TEXT" = "Вилучте рекламу та швидше мандруйте просторами інтернету за допомогою преміум-підписки!";
+
+/* Alert Cancel button */
+"CANCEL_BUTTON" = "Скасувати";
+
+/*[UNTRANSLATED] Alert message informing user that their subscription has expired or that they're not a subscriber, therefore Psiphon can only be started from the Psiphon app. DO NOT translate 'Psiphon'. */
+"CANNOT_START_TUNNEL_DUE_TO_SUBSCRIPTION" = "Your Psiphon subscription has expired.\nSince you're not a subscriber or your subscription has expired, Psiphon can only be started from the Psiphon app.\n\nPlease open the Psiphon app.";
 
 /* Text above change region button that allows user to select their desired server region */
 "CHANGE_REGION" = "Змінити країну";
 
-/*[UNTRANSLATED] Main text in the 'Upstream Proxy Error' dialog box. This is shown when the user has directly altered these settings, and those settings are (probably) erroneous. DO NOT translate 'Psiphon'. */
-"CHECK_UPSTREAM_PROXY_SETTING" = "You have configured Psiphon to use an upstream proxy.\nHowever, we seem to be unable to connect to a Psiphon server through that proxy.\nPlease fix the settings and try again.";
+/* Main text in the 'Upstream Proxy Error' dialog box. This is shown when the user has directly altered these settings, and those settings are (probably) erroneous. DO NOT translate 'Psiphon'. */
+"CHECK_UPSTREAM_PROXY_SETTING" = "Ви налаштували Psiphon для використання проксі вищого рангу.\nПроте, нам не вдається під'єднатися до сервера Psiphon через цей проксі.\nБудь ласка, виправте налаштування та спробуйте знову.";
 
-/*[UNTRANSLATED] Alert dialog title (MainViewController) */
-"CORRUPT_SETTINGS_ALERT_TITLE" = "Corrupt Settings";
+/*[UNTRANSLATED] Alert dialog body informing the user that the 'Auto-start VPN on demand' feature is enabled and that the VPN cannot be stopped. Followed by asking the user if they would like to disable the 'Auto-start VPN on demand' feature, and stop the VPN. */
+"CONNECT_ON_DEMAND_ALERT_BODY" = "Cannot stop the VPN while \"Auto-start VPN\" is enabled.\nWould you like to disable \"Auto-start VPN\" on demand and stop the VPN?";
 
-/*[UNTRANSLATED] Alert dialog message informing the user that the settings file in the app is corrupt, and that they can potentially fix this issue by re-installing the app. */
-"CORRUPT_SETTINGS_MESSAGE" = "Your app settings file appears to be corrupt. Try reinstalling the app to repair the file.";
+/*[UNTRANSLATED] Alert dialog title informing user that 'Auto-start VPN' feature is enabled */
+"CONNECT_ON_DEMAND_ALERT_TITLE" = "Auto-start VPN is enabled";
+
+/* Alert dialog title of alert which informs the user that the settings file in the app is corrupt. */
+"CORRUPT_SETTINGS_ALERT_TITLE" = "Параметри пошкодження";
+
+/* Alert dialog message informing the user that the settings file in the app is corrupt, and that they can potentially fix this issue by re-installing the app. */
+"CORRUPT_SETTINGS_MESSAGE" = "Файл налаштувань вашої програми здається пошкодженим. Спробуйте повторно встановити програму для виправлення цього файлу. ";
+
+/*[UNTRANSLATED] Disable Auto-start VPN feature and Stop the VPN button label */
+"DISABLE_BUTTON" = "Disable Auto-start VPN and Stop";
 
 /* Title of the button that dismisses region selection dialog
    Title of the button that dismisses the subscriptions menu */
 "DONE_ACTION" = "Готово";
+
+/*[UNTRANSLATED] Alert dialog message indicating to the user that the app has failed to upload their feedback and that they should try again.  */
+"FEEDBACK_UPLOAD_FAILED_MESSAGE" = "An error occured while uploading your feedback. Please try again. Your feedback helps us improve the Psiphon network.";
+
+/*[UNTRANSLATED] Alert dialog title indicating to the user that the app has failed to upload their feedback to Psiphon's servers. */
+"FEEDBACK_UPLOAD_FAILED_TITLE" = "Feedback upload failed";
+
+/*[UNTRANSLATED] Title of button on alert view which shows the progress of the users feedback being uploaded to Psiphon's servers. Hitting this button dismisses the alert and the upload continues in the background. */
+"FEEDBACK_UPLOAD_IN_PROGRESS_BACKGROUND_BUTTON_TITLE" = "Background";
+
+/*[UNTRANSLATED] Alert dialog title indicating to the user that their feedback is being encrypted and securely uploaded to Psiphon's servers. */
+"FEEDBACK_UPLOAD_IN_PROGRESS_MESSAGE" = "Sending feedback…";
+
+/*[UNTRANSLATED] Alert dialog message thanking the user for helping improve the Psiphon network by submitting their feedback. */
+"FEEDBACK_UPLOAD_SUCCESSFUL_MESSAGE" = "Thank you for helping improve Psiphon!";
+
+/*[UNTRANSLATED] Alert dialog title indicating to the user that their feedback has been successfully uploaded to Psiphon's servers. */
+"FEEDBACK_UPLOAD_SUCCESSFUL_TITLE" = "Feedback uploaded successfully";
 
 /* Text displayed while app loads */
 "LOADING" = "Завантаження...";
@@ -50,8 +83,8 @@
 /* Alert title informing user there is no internet connection */
 "NO_INTERNET" = "Немає під'єднання до Інтернету";
 
-/*[UNTRANSLATED] Subscriptions view text that is visible when the list of subscriptions is not available */
-"NO_PRODUCTS_TEXT" = "Could not retrieve subscriptions from the App Store. Pull to refresh or try again later.";
+/* Subscriptions view text that is visible when the list of subscriptions is not available */
+"NO_PRODUCTS_TEXT" = "Неможливо отримати підписку із  App Store. Потягніть для оновлення або спробуйте знову пізніше.";
 
 /* Alert OK Button */
 "OK_BUTTON" = "Гаразд";
@@ -59,35 +92,56 @@
 /* Alert message informing the user they should open the app to finish connecting to the VPN. DO NOT translate 'Psiphon'. */
 "OPEN_PSIPHON_APP" = "Будь ласка, відкрийте застосунок Psiphon, щоб завершити під'єднання.";
 
+/*[UNTRANSLATED] External link to the privacy policy page. Please update this with the correct language specific link (if available) e.g. https://psiphon.ca/fr/privacy.html for french. */
+"PRIVACY_POLICY_URL" = "https://psiphon.ca/en/privacy.html";
+
 /*[UNTRANSLATED] Refresh app receipt button title */
 "REFRESH_APP_RECEIPT_BUTTON_TITLE" = "Refresh app receipt";
 
-/*[UNTRANSLATED] Restore my subscription button title */
-"RESTORE_SUBSCRIPTION_BUTTON_TITLE" = "Restore my existing subscription";
+/* Restore my subscription button title */
+"RESTORE_SUBSCRIPTION_BUTTON_TITLE" = "Відновити мою наявну підписку";
 
-/*[UNTRANSLATED] Subscriptions item title in the app settings when user has an active subscription. Clicking this item opens subscriptions view */
-"SETTINGS_SUBSCRIPTION_ACTIVE" = "Subscriptions";
+/* Subscriptions item title in the app settings when user has an active subscription. Clicking this item opens subscriptions view */
+"SETTINGS_SUBSCRIPTION_ACTIVE" = "Підписки";
 
-/*[UNTRANSLATED] Subscriptions item title in the app settings when user does not have an active subscription. Clicking this item opens subscriptions view. If “Premium” doesn't easily translate, please choose a term that conveys “Pro” or “Extra” or “Better” or “Elite”. */
-"SETTINGS_SUBSCRIPTION_NOT_ACTIVE" = "Go premium!";
+/* Subscriptions item title in the app settings when user does not have an active subscription. Clicking this item opens subscriptions view. If “Premium” doesn't easily translate, please choose a term that conveys “Pro” or “Extra” or “Better” or “Elite”. */
+"SETTINGS_SUBSCRIPTION_NOT_ACTIVE" = "Перейдіть на преміум!";
 
-/*[UNTRANSLATED] Text for button that opens paid subscriptions manager UI. If “Premium” doesn't easily translate, please choose a term that conveys “Pro” or “Extra” or “Better” or “Elite”. */
-"SUBSCRIPTION_BUTTON_TITLE" = "Go premium now!";
+/*[UNTRANSLATED] Automatically start VPN On demand settings toggle */
+"SETTINGS_VPN_ON_DEMAND" = "Auto-start VPN on demand";
 
-/*[UNTRANSLATED] Title of the dialog for available in-app paid subscriptions */
-"SUBSCRIPTIONS" = "Subscriptions";
+/*[UNTRANSLATED] VPN On demand setting detail text showing when user doesn't have an active subscription and the item is disabled. */
+"SETTINGS_VPN_ON_DEMAND_DETAIL" = "Subscription only";
+
+/* Text for button that opens paid subscriptions manager UI. If “Premium” doesn't easily translate, please choose a term that conveys “Pro” or “Extra” or “Better” or “Elite”. */
+"SUBSCRIPTION_BUTTON_TITLE" = "Вже перейти на преміум!";
+
+/*[UNTRANSLATED] Alert message informing user that their subscription has expired, and that Psiphon will stop in an hour if subscription is not renewed. Do not translate 'Psiphon'. */
+"SUBSCRIPTION_EXPIRED_WILL_KILL_TUNNEL" = "Your Psiphon subscription has expired. Psiphon will stop automatically in an hour if subscription is not renewed. Open the Psiphon app to review your subscription to continue using premium features.";
+
+/* Title of the dialog for available in-app paid subscriptions */
+"SUBSCRIPTIONS" = "Підписки";
+
+/*[UNTRANSLATED] Alert message informing user that Psiphon has been stopped automatically since the subscription has expired. Do not translate 'Psiphon'. */
+"TUNNEL_KILLED" = "Psiphon has been stopped automatically since your subscription has expired.";
 
 /* Alert message informing user to turn on their cellular data or wifi to connect to the internet */
 "TURN_ON_DATE" = "Увімкніть стільникові дані або скористайтеся Wi-Fi для доступу до даних.";
 
-/* Alert message informing user they have to open the app. DO NOT translate 'Psiphon'. */
-"USE_PSIPHON_APP" = "Для під'єднання використовуйте застосунок Psiphon";
+/* Alert dialog message informing the user that an error occurred while starting Psiphon (Do not translate 'Psiphon'). The user should try again, and if the problem persists, they should try reinstalling the app. */
+"VPN_START_FAIL_MESSAGE" = "Трапилася помилка під час запуску Psiphon. Будь ласка, спробуйте знову. Якщо ця проблема не зникне, то спробуйте повторно встановити Psiphon.";
 
-/*[UNTRANSLATED] Alert dialog message informing the user that an error occurred while starting Psiphon (Do not translate 'Psiphon'). The user should try again, and if the problem persists, they should try reinstalling the app. */
-"VPN_START_FAIL_MESSAGE" = "An error occurred while starting Psiphon. Please try again. If this problem persists, try reinstalling the Psiphon app.";
+/* Alert dialog title indicating to the user that Psiphon was unable to start (MainViewController) */
+"VPN_START_FAIL_TITLE" = "Неможливо запустити";
 
-/*[UNTRANSLATED] Alert dialog title indicating to the user that Psiphon was unable to start (MainViewController) */
-"VPN_START_FAIL_TITLE" = "Unable to start";
+/*[UNTRANSLATED] ('Privacy Policy' should be the same translation as privacy policy button VPN_START_PRIVACY_POLICY_BUTTON), (Do not translate 'VPN profile'), (Do not translate 'Psiphon') */
+"VPN_START_PERMISSION_DENIED_MESSAGE" = "Psiphon needs your permission to install a VPN profile in order to connect.\n\nPsiphon is committed to protecting the privacy of our users. You can review our privacy policy by tapping \"Privacy Policy\".";
+
+/*[UNTRANSLATED] Alert dialog title indicating to the user that Psiphon needs their permission */
+"VPN_START_PERMISSION_REQUIRED_TITLE" = "Permission required";
+
+/* Button label taking user's to our Privacy Policy page */
+"VPN_START_PRIVACY_POLICY_BUTTON" = "Політика конфіденційності";
 
 /* Status when the VPN is connected to a Psiphon server */
 "VPN_STATUS_CONNECTED" = "З'єднано";
