@@ -86,7 +86,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
     TunnelProviderStateKillMessageSent
 };
 
-@interface PacketTunnelProvider ()
+@interface PacketTunnelProvider () <NotifierObserver>
 
 /**
  * PacketTunnelProvider state.
@@ -108,8 +108,6 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 @implementation PacketTunnelProvider {
 
     PsiphonDataSharedDB *sharedDB;
-
-    Notifier *notifier;
 
     _Atomic BOOL showUpstreamProxyErrorMessage;
 
@@ -138,8 +136,6 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
     self = [super init];
     if (self) {
         sharedDB = [[PsiphonDataSharedDB alloc] initForAppGroupIdentifier:APP_GROUP_IDENTIFIER];
-
-        notifier = [[Notifier alloc] initWithAppGroupIdentifier:APP_GROUP_IDENTIFIER];
 
         atomic_init(&self->showUpstreamProxyErrorMessage, TRUE);
 
@@ -318,6 +314,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
                         return [[errors
                           zipWith:[RACSignal rangeStartFrom:1 count:networkRetryCount]]
                           flattenMap:^RACSignal *(RACTwoTuple<NSError *, NSNumber *> *retryCountTuple) {
+
                               // Emits the error on the last retry.
                               if ([retryCountTuple.second integerValue] == networkRetryCount) {
                                   return [RACSignal error:retryCountTuple.first];
@@ -474,8 +471,10 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 }
 
 - (void)startTunnelWithErrorHandler:(void (^_Nonnull)(NSError *_Nonnull error))errorHandler {
-    
+
     __weak PacketTunnelProvider *weakSelf = self;
+
+    [[Notifier sharedInstance] registerObserver:self callbackQueue:dispatch_get_main_queue()];
 
     // VPN should only start if it is started from the container app directly,
     // OR if the user possibly has a valid subscription
@@ -490,46 +489,6 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 
     if (self.extensionStartMethod == ExtensionStartMethodFromContainer
         || [self.subscriptionCheckState isSubscribedOrInProgress]) {
-
-        // Sets listener for notification from the container.
-        {
-            void (^notifierListenerBlock)(NSString *) = ^(NSString *key) {
-                // The notifier callbacks are made on the main thread.
-
-                if ([key isEqualToString:NOTIFIER_START_VPN]) {
-
-                    LOG_DEBUG(@"container signaled VPN to start");
-
-                    // If the tunnel is connected, starts the VPN.
-                    // Otherwise, should establish the VPN after onConnected has been called.
-                    self.shouldStartVPN = TRUE; // This should be set before calling tryStartVPN.
-                    [self tryStartVPN];
-
-                } else if ([key isEqualToString:NOTIFIER_APP_DID_ENTER_BACKGROUND]) {
-
-                    LOG_DEBUG(@"container entered background");
-
-                    // If the VPN start message ("M.startVPN") has not been received from the container,
-                    // and the container goes to the background, then alert the user to open the app.
-                    //
-                    // Note: We expect the value of shouldStartVPN to not be altered after it is set to TRUE.
-                    if (!self.shouldStartVPN) {
-                        [self displayMessage:NSLocalizedStringWithDefaultValue(@"OPEN_PSIPHON_APP", nil, [NSBundle mainBundle], @"Please open Psiphon app to finish connecting.", @"Alert message informing the user they should open the app to finish connecting to the VPN. DO NOT translate 'Psiphon'.")];
-                    }
-                    
-                } else if ([key isEqualToString:NOTIFIER_FORCE_SUBSCRIPTION_CHECK]) {
-
-                    // Container received a new subscription transaction.
-                    [PsiFeedbackLogger infoWithType:ExtensionNotificationLogType message:@"force subscription check"];
-                    [self scheduleSubscriptionCheckWithRemoteCheckForced:TRUE];
-                }
-
-            };
-
-            [notifier listenForNotification:NOTIFIER_START_VPN listener:notifierListenerBlock];
-            [notifier listenForNotification:NOTIFIER_APP_DID_ENTER_BACKGROUND listener:notifierListenerBlock];
-            [notifier listenForNotification:NOTIFIER_FORCE_SUBSCRIPTION_CHECK listener:notifierListenerBlock];
-        }
 
         if ([self.subscriptionCheckState isSubscribedOrInProgress]) {
             
@@ -650,6 +609,41 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
     return [self.psiphonTunnel getConnectionState] == PsiphonConnectionStateConnected;
 }
 
+#pragma mark - Notifier callback
+
+- (void)onMessageReceived:(NotifierMessageId)messageId withData:(NSData *)data {
+
+    if (NotifierStartVPN == messageId) {
+
+        LOG_DEBUG(@"container signaled VPN to start");
+
+        // If the tunnel is connected, starts the VPN.
+        // Otherwise, should establish the VPN after onConnected has been called.
+        self.shouldStartVPN = TRUE; // This should be set before calling tryStartVPN.
+        [self tryStartVPN];
+
+    } else if (NotifierAppEnteredBackground == messageId) {
+
+        LOG_DEBUG(@"container entered background");
+
+        // If the VPN start message ("M.startVPN") has not been received from the container,
+        // and the container goes to the background, then alert the user to open the app.
+        //
+        // Note: We expect the value of shouldStartVPN to not be altered after it is set to TRUE.
+        if (!self.shouldStartVPN) {
+            [self displayMessage:NSLocalizedStringWithDefaultValue(@"OPEN_PSIPHON_APP", nil, [NSBundle mainBundle], @"Please open Psiphon app to finish connecting.", @"Alert message informing the user they should open the app to finish connecting to the VPN. DO NOT translate 'Psiphon'.")];
+        }
+
+    } else if (NotifierForceSubscriptionCheck == messageId) {
+
+        // Container received a new subscription transaction.
+        [PsiFeedbackLogger infoWithType:ExtensionNotificationLogType message:@"force subscription check"];
+        [self scheduleSubscriptionCheckWithRemoteCheckForced:TRUE];
+    }
+
+}
+
+
 #pragma mark -
 
 - (void)sleepWithCompletionHandler:(void (^)(void))completionHandler {
@@ -756,7 +750,9 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
         if ([self.psiphonTunnel getConnectionState] == PsiphonConnectionStateConnected) {
             self.reasserting = FALSE;
             [self startVPN];
-            [notifier post:NOTIFIER_NEW_HOMEPAGES];
+            [[Notifier sharedInstance] post:NotifierNewHomepages completionHandler:^(BOOL success) {
+                // Do nothing.
+            }];
             return TRUE;
         }
     }
@@ -991,7 +987,9 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 
 - (void)onConnected {
     LOG_DEBUG(@"connected with %@", [self.subscriptionCheckState textDescription]);
-    [notifier post:NOTIFIER_TUNNEL_CONNECTED];
+    [[Notifier sharedInstance] post:NotifierTunnelConnected completionHandler:^(BOOL success) {
+        // Do nothing.
+    }];
     [self tryStartVPN];
 }
 
@@ -1033,8 +1031,9 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 - (void)onAvailableEgressRegions:(NSArray *)regions {
     [sharedDB insertNewEgressRegions:regions];
 
-    // Notify container
-    [notifier post:NOTIFIER_ON_AVAILABLE_EGRESS_REGIONS];
+    [[Notifier sharedInstance] post:NotifierAvailableEgressRegions completionHandler:^(BOOL success) {
+        // Do nothing.
+    }];
 }
 
 - (void)onInternetReachabilityChanged:(Reachability* _Nonnull)reachability {
