@@ -51,7 +51,7 @@
 
 PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
 
-@interface AppDelegate ()
+@interface AppDelegate () <NotifierObserver>
 
 // Public properties
 
@@ -70,7 +70,6 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
 
 @implementation AppDelegate {
     AdManager *adManager;
-    Notifier *notifier;
 
     RootContainerController *rootContainerController;
 }
@@ -79,7 +78,6 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
     self = [super init];
     if (self) {
         adManager = [AdManager sharedInstance];
-        notifier = [[Notifier alloc] initWithAppGroupIdentifier:APP_GROUP_IDENTIFIER];
 
         _subscriptionStatus = [RACReplaySubject replaySubjectWithCapacity:1];
         [_subscriptionStatus sendNext:@(UserSubscriptionUnknown)];
@@ -139,6 +137,10 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
 # pragma mark - Lifecycle methods
 
 - (BOOL)application:(UIApplication *)application willFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+
+    // Immediately register to receive notifications from the Network Extension process.
+    [[Notifier sharedInstance] registerObserver:self callbackQueue:dispatch_get_main_queue()];
+
     [self initializeDefaults];
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(onAdsLoaded)
@@ -193,9 +195,6 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
 
     [self.compoundDisposable addDisposable:disposable];
 
-    // Listen for the network extension messages.
-    [self listenForNEMessages];
-
     return YES;
 }
 
@@ -248,7 +247,9 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
     // If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
 
     [[UIApplication sharedApplication] ignoreSnapshotOnNextApplicationLaunch];
-    [notifier post:NOTIFIER_APP_DID_ENTER_BACKGROUND];
+    [[Notifier sharedInstance] post:NotifierAppEnteredBackground completionHandler:^(BOOL success) {
+        // Do nothing.
+    }];
     [self.sharedDB updateAppForegroundState:NO];
 }
 
@@ -335,13 +336,14 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
     }
 }
 
-#pragma mark - Network Extension
+#pragma mark - Notifier callback
 
-- (void)listenForNEMessages {
+- (void)onMessageReceived:(NotifierMessageId)messageId withData:(NSData *)data {
 
     __weak AppDelegate *weakSelf = self;
 
-    [notifier listenForNotification:NOTIFIER_NEW_HOMEPAGES listener:^(NSString *key){
+    if (NotifierNewHomepages == messageId) {
+
         LOG_DEBUG(@"Received notification NE.newHomepages");
 
         // Ignore the notification from the extension, since a landing page has
@@ -410,9 +412,8 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
             [weakSelf.compoundDisposable addDisposable:disposable];
 
         });
-    }];
 
-    [notifier listenForNotification:NOTIFIER_TUNNEL_CONNECTED listener:^(NSString *key){
+    } else if (NotifierTunnelConnected == messageId) {
         LOG_DEBUG(@"Received notification NE.tunnelConnected");
 
         // If we haven't had a chance to load an Ad, and the
@@ -422,16 +423,15 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
         if (![adManager untunneledInterstitialIsShowing]) {
             [weakSelf.vpnManager startVPN];
         }
-    }];
 
-    [notifier listenForNotification:NOTIFIER_ON_AVAILABLE_EGRESS_REGIONS listener:^(NSString *key){
+    } if (NotifierAvailableEgressRegions == messageId) {
         LOG_DEBUG(@"Received notification NE.onAvailableEgressRegions");
         // Update available regions
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
             NSArray<NSString *> *regions = [weakSelf.sharedDB getAllEgressRegions];
             [[RegionAdapter sharedInstance] onAvailableEgressRegions:regions];
         });
-    }];
+    };
 }
 
 #pragma mark - Subscription
@@ -501,7 +501,9 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
         BOOL isActive = [value.first boolValue];
 
         if (isActive) {
-            [notifier post:NOTIFIER_FORCE_SUBSCRIPTION_CHECK];
+            [[Notifier sharedInstance] post:NotifierForceSubscriptionCheck completionHandler:^(BOOL success) {
+                // Do nothing.
+            }];
         }
 
     } error:^(NSError *error) {
