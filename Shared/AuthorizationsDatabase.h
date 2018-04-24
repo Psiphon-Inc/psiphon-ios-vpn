@@ -24,13 +24,14 @@
 
 @interface AuthorizationsDatabase : NSObject <UserDefaultsModelProtocol>
 
-/** Array of authorizationns. */
+/** Array of authorizations. */
 @property (nonatomic, nullable, readonly) NSArray<Authorization *> *authorizations;
 
 /**
  * Reads NSUserDefaults and wraps the result in an Authorizations instance.
  * The underlying dictionary can only be manipulated by the provided instance methods.
- * @attention -persistChanges should be called to persist any changes made to the returned
+ *
+ * @attention persistChanges should be called to persist any changes made to the returned
  *            instance to disk.
  * @return An instance of Authorizations class.
  */

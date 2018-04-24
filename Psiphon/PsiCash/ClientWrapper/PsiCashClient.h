@@ -20,14 +20,20 @@
 
 #import <Foundation/Foundation.h>
 #import "psicash_api.hpp"
-#import "PsiCashClientModelEmitter.h"
+#import "PsiCashClientModelStagingArea.h"
 #import "PsiCashSpeedBoostProduct.h"
 #import "ReactiveObjC.h"
 
 @interface PsiCashClient : NSObject
-@property (atomic, readonly) PsiCashClientModelEmitter *clientModelObservable;
+
+// TODO akan: remove this
+//@property (atomic, readonly) PsiCashClientModelStagingArea *clientModelObservable;
+
+@property (nonatomic, readonly) RACReplaySubject<PsiCashClientModel *> *clientModelSignal;
+
 + (instancetype)sharedInstance;
 + (BOOL)shouldExposePsiCash;
 - (void)refreshState;
 - (void)purchaseSpeedBoostProduct:(PsiCashSpeedBoostProductSKU*)sku;
+
 @end

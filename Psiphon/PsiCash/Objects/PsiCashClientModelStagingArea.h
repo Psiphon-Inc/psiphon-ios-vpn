@@ -22,12 +22,27 @@
 #import "PsiCashSpeedBoostProduct.h"
 #import "PsiCashClientModel.h"
 #import "PsiCashAuthPackage.h"
-#import "ReactiveObjC.h"
 #import "psicash_types.hpp"
 
-@interface PsiCashClientModelEmitter : NSObject
-@property (nonatomic, readonly) RACReplaySubject *emitter;
-- (void)emitNextClientModel;
+NS_ASSUME_NONNULL_BEGIN
+
+/**
+ * PsiCashClientModelStagingArea provides a staging area to accumulate changes
+ * to a copy of an instance of PsiCashClientModel.
+ */
+@interface PsiCashClientModelStagingArea : NSObject
+
+/**
+ * The PsiCashClientModel that all the mutations have been applied to.
+ */
+@property (nonatomic, readonly) PsiCashClientModel *stagedModel;
+
+/**
+ * Initializes PsiCashClientModelStagingArea with a copy of PsiCashClientModel.
+ * @param model The model to copy from.
+ */
+- (instancetype)initWithModel:(PsiCashClientModel *_Nullable)model;
+
 - (void)updateAuthPackage:(PsiCashAuthPackage*)authPackage;
 - (void)updateBalanceInNanoPsi:(UInt64)balanceInNanoPsi;
 - (void)updateSpeedBoostProduct:(PsiCashSpeedBoostProduct*)speedBoostProduct;
@@ -35,4 +50,7 @@
 - (void)removeSpeedBoostProductSKU:(PsiCashSpeedBoostProductSKU*)sku;
 - (void)updatePendingPurchases:(NSArray<id<PsiCashProductSKU>>*)purchases;
 - (void)updateActivePurchases:(NSArray<ExpiringPurchase*>*)activePurchases;
+
 @end
+
+NS_ASSUME_NONNULL_END

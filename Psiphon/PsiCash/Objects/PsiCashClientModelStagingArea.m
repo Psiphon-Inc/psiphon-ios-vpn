@@ -17,76 +17,75 @@
  *
  */
 
-#import "PsiCashClientModelEmitter.h"
-#import "ReactiveObjC.h"
+#import "PsiCashClientModelStagingArea.h"
 
-@interface PsiCashClientModelEmitter ()
-@property (nonatomic, readwrite) RACReplaySubject *emitter;
+@interface PsiCashClientModelStagingArea ()
+
+@property (nonatomic, readwrite) PsiCashClientModel *stagedModel;
+
 @end
 
-@implementation PsiCashClientModelEmitter {
-    PsiCashClientModel *model;
-}
+@implementation PsiCashClientModelStagingArea
 
-- (id)init {
+- (instancetype)initWithModel:(PsiCashClientModel *)model {
     self = [super init];
     if (self) {
-        self.emitter = [RACReplaySubject replaySubjectWithCapacity:1];
-        model = [PsiCashClientModel clientModelWithAuthPackage:nil
-                                      andBalanceInNanoPsi:0
-                                     andSpeedBoostProduct:nil
-                                      andPendingPurchases:nil
-                              andActiveSpeedBoostPurchase:nil];
+        if (model) {
+            _stagedModel = [model copy];
+        } else {
+            _stagedModel = [PsiCashClientModel clientModelWithAuthPackage:nil
+                                                      andBalanceInNanoPsi:0
+                                                     andSpeedBoostProduct:nil
+                                                      andPendingPurchases:nil
+                                              andActiveSpeedBoostPurchase:nil];
+        }
     }
     return self;
 }
 
-- (void)emitNextClientModel {
-    dispatch_async(dispatch_get_main_queue(), ^{
-        PsiCashClientModel *copiedModel = [model copy];
-        [self.emitter sendNext:copiedModel];
-    });
-}
+
+//- (void)emitNextClientModel {
+//}
 
 - (void)updateAuthPackage:(PsiCashAuthPackage*)authPackage {
-    model.authPackage = authPackage;
+    self.stagedModel.authPackage = authPackage;
 }
 
 - (void)updateBalanceInNanoPsi:(UInt64)balanceInNanoPsi {
-    model.balanceInNanoPsi = balanceInNanoPsi;
+    self.stagedModel.balanceInNanoPsi = balanceInNanoPsi;
 }
 
 - (void)updateSpeedBoostProduct:(PsiCashSpeedBoostProduct*)speedBoostProduct {
-    model.speedBoostProduct = speedBoostProduct;
+    self.stagedModel.speedBoostProduct = speedBoostProduct;
 }
 
 - (void)updateSpeedBoostProductSKU:(PsiCashSpeedBoostProductSKU*)old withNewPrice:(NSNumber*)price {
-    NSMutableArray<PsiCashSpeedBoostProductSKU*>* newSKUs = [NSMutableArray arrayWithArray:model.speedBoostProduct.skusOrderedByPriceAscending];
+    NSMutableArray<PsiCashSpeedBoostProductSKU*>* newSKUs = [NSMutableArray arrayWithArray:self.stagedModel.speedBoostProduct.skusOrderedByPriceAscending];
     [newSKUs removeObject:old];
     PsiCashSpeedBoostProductSKU *newSKU = [PsiCashSpeedBoostProductSKU skuWitDistinguisher:old.distinguisher withHours:old.hours andPrice:price];
     [newSKUs addObject:newSKU];
-    model.speedBoostProduct = [PsiCashSpeedBoostProduct productWithSKUs:newSKUs];
+    self.stagedModel.speedBoostProduct = [PsiCashSpeedBoostProduct productWithSKUs:newSKUs];
 }
 
 - (void)removeSpeedBoostProductSKU:(PsiCashSpeedBoostProductSKU*)sku {
     // Silently fail if sku doesn't exist
-    NSMutableArray<PsiCashSpeedBoostProductSKU*>* newSKUs = [NSMutableArray arrayWithArray:model.speedBoostProduct.skusOrderedByPriceAscending];
+    NSMutableArray<PsiCashSpeedBoostProductSKU*>* newSKUs = [NSMutableArray arrayWithArray:self.stagedModel.speedBoostProduct.skusOrderedByPriceAscending];
     [newSKUs removeObject:sku];
-    model.speedBoostProduct = [PsiCashSpeedBoostProduct productWithSKUs:newSKUs];
+    self.stagedModel.speedBoostProduct = [PsiCashSpeedBoostProduct productWithSKUs:newSKUs];
 }
 
 - (void)updatePendingPurchases:(NSArray<id<PsiCashProductSKU>>*)purchases {
-    model.pendingPurchases = purchases;
+    self.stagedModel.pendingPurchases = purchases;
 }
 
 - (void)updateActivePurchases:(NSArray<ExpiringPurchase*>*)activePurchases {
     for (ExpiringPurchase *p in activePurchases) {
         if ([p.productName isEqualToString:[PsiCashSpeedBoostProduct purchaseClass]]) {
-            model.activeSpeedBoostPurchase = p;
+            self.stagedModel.activeSpeedBoostPurchase = p;
             return;
         }
     }
-    model.activeSpeedBoostPurchase = nil;
+    self.stagedModel.activeSpeedBoostPurchase = nil;
 }
 
 @end
