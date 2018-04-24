@@ -56,7 +56,7 @@
     };
 
     __weak PsiCashPurchaseAlertView *weakAlertView = alertView;
-    [[PsiCashClient.sharedInstance.clientModelObservable.emitter deliverOnMainThread] subscribeNext:^(PsiCashClientModel *newClientModel) {
+    [[PsiCashClient.sharedInstance.clientModelSignal deliverOnMainThread] subscribeNext:^(PsiCashClientModel *newClientModel) {
         if (weakAlertView != nil) {
             [weakAlertView bindWithModel:newClientModel];
         }
@@ -84,7 +84,7 @@
     };
 
     __weak PsiCashPurchaseAlertView *weakAlertView = alertView;
-    [[PsiCashClient.sharedInstance.clientModelObservable.emitter deliverOnMainThread] subscribeNext:^(PsiCashClientModel *newClientModel) {
+    [[PsiCashClient.sharedInstance.clientModelSignal deliverOnMainThread] subscribeNext:^(PsiCashClientModel *newClientModel) {
         if (weakAlertView != nil) {
             [weakAlertView bindWithModel:newClientModel];
         }
@@ -112,7 +112,7 @@
     };
 
     __weak PsiCashPurchaseAlertView *weakAlertView = alertView;
-    [[PsiCashClient.sharedInstance.clientModelObservable.emitter deliverOnMainThread] subscribeNext:^(PsiCashClientModel *newClientModel) {
+    [[PsiCashClient.sharedInstance.clientModelSignal deliverOnMainThread] subscribeNext:^(PsiCashClientModel *newClientModel) {
         if (weakAlertView != nil) {
             [weakAlertView bindWithModel:newClientModel];
         }

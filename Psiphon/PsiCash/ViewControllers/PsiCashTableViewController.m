@@ -55,7 +55,7 @@
     self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
 
     __weak PsiCashTableViewController *weakSelf = self;
-    clientModelUpdates = [[PsiCashClient.sharedInstance.clientModelObservable.emitter deliverOnMainThread] subscribeNext:^(PsiCashClientModel *newClientModel) {
+    clientModelUpdates = [[PsiCashClient.sharedInstance.clientModelSignal deliverOnMainThread] subscribeNext:^(PsiCashClientModel *newClientModel) {
         __strong PsiCashTableViewController *strongSelf = weakSelf;
         if (strongSelf != nil) {
             BOOL stateChanged = [self.model hasActiveSpeedBoostPurchase] ^ [newClientModel hasActiveSpeedBoostPurchase] || [self.model hasPendingPurchase] ^ [newClientModel hasPendingPurchase];

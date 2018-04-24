@@ -32,7 +32,9 @@
 #import "NSError+Convenience.h"
 
 @interface PsiCashClient ()
-@property (atomic, readwrite) PsiCashClientModelEmitter *clientModelObservable;
+
+@property (nonatomic, readwrite) RACReplaySubject<PsiCashClientModel *> *clientModelSignal;
+
 @end
 
 NSErrorDomain _Nonnull const PsiCashClientLibraryErrorDomain = @"PsiCashClientLibraryErrorDomain";
@@ -42,6 +44,8 @@ NSErrorDomain _Nonnull const PsiCashClientLibraryErrorDomain = @"PsiCashClientLi
     ExpiringPurchases *expiringPurchases;
     // Offload work from PsiCashLib's internal completion queue
     dispatch_queue_t completionQueue;
+
+    PsiCashClientModel *model;
 }
 
 + (BOOL)shouldExposePsiCash {
@@ -57,34 +61,52 @@ NSErrorDomain _Nonnull const PsiCashClientLibraryErrorDomain = @"PsiCashClientLi
     return sharedInstance;
 }
 
-- (id)init {
+- (instancetype)init {
     self = [super init];
-
     if (self) {
         psiCash = [[PsiCash alloc] init]; // TODO: starts the demo-mode client remove when integrating real library
         expiringPurchases = [ExpiringPurchases fromPersistedUserDefaults];
-        self.clientModelObservable = [[PsiCashClientModelEmitter alloc] init];
-        self->completionQueue = dispatch_queue_create("com.psiphon3.PsiCashClient.CompletionQueue", DISPATCH_QUEUE_SERIAL);
+        completionQueue = dispatch_queue_create("com.psiphon3.PsiCashClient.CompletionQueue", DISPATCH_QUEUE_SERIAL);
+        model = nil;
+
+        _clientModelSignal = [RACReplaySubject replaySubjectWithCapacity:1];
+
         [self listenForExpiredPurchases];
     }
-
     return self;
+}
+
+- (void)commitModelStagingArea:(PsiCashClientModelStagingArea *)stagingArea {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self.clientModelSignal sendNext:stagingArea.stagedModel];
+    });
+    model = stagingArea.stagedModel;
 }
 
 #pragma mark - ExpiringPurchases
 
 - (void)listenForExpiredPurchases {
-    [expiringPurchases.expiredPurchaseStream subscribeNext:^(ExpiringPurchase * _Nullable purchase) {
-        dispatch_async(self->completionQueue, ^{
-            [PsiFeedbackLogger infoWithType:PsiCashLogType message:@"Purchase with id %@ expired", purchase.authToken.ID];
-            [self.clientModelObservable updateActivePurchases:[expiringPurchases activePurchases]];
-            [self.clientModelObservable emitNextClientModel];
-        });
-    } error:^(NSError * _Nullable error) {
-        [PsiFeedbackLogger errorWithType:PsiCashLogType message:@"Error while listening for expired purchaes" object:error];
-    } completed:^{
-        [PsiFeedbackLogger errorWithType:PsiCashLogType message:@"%s unexpected completed signal.", __FUNCTION__];
-    }];
+
+    [expiringPurchases.expiredPurchaseStream
+      subscribeNext:^(ExpiringPurchase * _Nullable purchase) {
+
+          dispatch_async(self->completionQueue, ^{
+
+              [PsiFeedbackLogger infoWithType:PsiCashLogType message:@"Purchase with id %@ expired", purchase.authorization.ID];
+
+              PsiCashClientModelStagingArea *stagingArea = [[PsiCashClientModelStagingArea alloc] initWithModel:model];
+              [stagingArea updateActivePurchases:[expiringPurchases activePurchases]];
+              [self commitModelStagingArea:stagingArea];
+
+          });
+
+      }
+      error:^(NSError * _Nullable error) {
+          [PsiFeedbackLogger errorWithType:PsiCashLogType message:@"Error while listening for expired purchaes" object:error];
+      }
+      completed:^{
+          [PsiFeedbackLogger errorWithType:PsiCashLogType message:@"%s unexpected completed signal.", __FUNCTION__];
+      }];
 }
 
 #pragma mark - Helpers
@@ -128,18 +150,20 @@ NSErrorDomain _Nonnull const PsiCashClientLibraryErrorDomain = @"PsiCashClientLi
 
         PsiCashAuthPackage *authPackage = [[PsiCashAuthPackage alloc] initWithValidTokens:r.validTokenTypes];
 
+        PsiCashClientModelStagingArea *stagingArea = [[PsiCashClientModelStagingArea alloc] initWithModel:model];
         if (r.inProgress) {
-            [self.clientModelObservable updateAuthPackage:nil];
-            [self.clientModelObservable updateSpeedBoostProduct:speedBoostProduct];
-            [self.clientModelObservable updateActivePurchases:[expiringPurchases activePurchases]];
+            [stagingArea updateAuthPackage:nil];
+            [stagingArea updateSpeedBoostProduct:speedBoostProduct];
+            [stagingArea updateActivePurchases:[expiringPurchases activePurchases]];
         } else {
-            [self.clientModelObservable updateAuthPackage:authPackage];
-            [self.clientModelObservable updateBalanceInNanoPsi:[r.balance unsignedLongLongValue]];
-            [self.clientModelObservable updateSpeedBoostProduct:speedBoostProduct];
-            [self.clientModelObservable updateActivePurchases:[expiringPurchases activePurchases]];
+            [stagingArea updateAuthPackage:authPackage];
+            [stagingArea updateBalanceInNanoPsi:[r.balance unsignedLongLongValue]];
+            [stagingArea updateSpeedBoostProduct:speedBoostProduct];
+            [stagingArea updateActivePurchases:[expiringPurchases activePurchases]];
         }
 
-        [self.clientModelObservable emitNextClientModel];
+        [self commitModelStagingArea:stagingArea];
+
     } error:^(NSError * _Nullable error) {
         [PsiFeedbackLogger errorWithType:PsiCashLogType message:@"Failed to refresh client state" object:error];
         [self displayAlertWithError:error];
@@ -149,7 +173,7 @@ NSErrorDomain _Nonnull const PsiCashClientLibraryErrorDomain = @"PsiCashClientLi
 }
 
 - (RACSignal<PsiCashRefreshResultModel*>*)refreshStateFromServer {
-    return [RACSignal createSignal:^RACDisposable * _Nullable(id<RACSubscriber>  _Nonnull subscriber) {
+    return [RACSignal createSignal:^RACDisposable *(id<RACSubscriber>  _Nonnull subscriber) {
         [psiCash refreshState:@[[PsiCashSpeedBoostProduct purchaseClass]] withCompletion:
          ^(PsiCashRequestStatus status, NSArray * _Nullable validTokenTypes, BOOL isAccount, NSNumber * _Nullable balance, NSArray * _Nullable purchasePrices, NSError * _Nullable error) {
                 if (status == kSuccess) {
@@ -183,101 +207,115 @@ NSErrorDomain _Nonnull const PsiCashClientLibraryErrorDomain = @"PsiCashClientLi
 #pragma mark - Purchase Signal
 
 - (void)purchaseSpeedBoostProduct:(PsiCashSpeedBoostProductSKU*)sku {
-    [self.clientModelObservable updatePendingPurchases:@[sku]];
-    [self.clientModelObservable emitNextClientModel];
+
+    PsiCashClientModelStagingArea *pendingPurchasesStagingArea = [[PsiCashClientModelStagingArea alloc] initWithModel:model];
+    [pendingPurchasesStagingArea updatePendingPurchases:@[sku]];
+    [self commitModelStagingArea:pendingPurchasesStagingArea];
 
     RACSignal *makePurchase = [self makeExpiringPurchaseTransactionForClass:[PsiCashSpeedBoostProduct purchaseClass]
                                                            andDistinguisher:sku.distinguisher
                                                           withExpectedPrice:sku.price];
 
     [makePurchase subscribeNext:^(PsiCashMakePurchaseResultModel *_Nullable result) {
-         if (result.status == kSuccess) {
-             AuthorizationToken *authToken = [[AuthorizationToken alloc] initWithEncodedToken:result.authorization];
-             NSError *e = nil;
-             if (authToken == nil) {
-                 e = [NSError errorWithDomain:PsiCashClientLibraryErrorDomain code:result.status andLocalizedDescription:@"Got nil auth token from PsiCash library"];
-             }
 
-             if (authToken.accessType != [PsiCashSpeedBoostProduct purchaseClass]) {
-                 NSString *s = [NSString stringWithFormat:@"Got auth token from PsiCash library with wrong purchase class of %@", authToken.accessType];
-                 e = [NSError errorWithDomain:PsiCashClientLibraryErrorDomain code:result.status andLocalizedDescription:s];
-             }
+        PsiCashClientModelStagingArea *stagingArea = [[PsiCashClientModelStagingArea alloc] initWithModel:model];
 
-             [self.clientModelObservable updateBalanceInNanoPsi:[result.balance unsignedLongLongValue]];
+        if (result.status == kSuccess) {
+            Authorization *authorization = [[Authorization alloc] initWithEncodedAuthorization:result.authorization];
+            NSError *e = nil;
+            if (authorization == nil) {
+                e = [NSError errorWithDomain:PsiCashClientLibraryErrorDomain code:result.status andLocalizedDescription:@"Got nil auth token from PsiCash library"];
+            }
 
-             if (e != nil) {
-                 ExpiringPurchase *purchase = [ExpiringPurchase expiringPurchaseWithProductName:[PsiCashSpeedBoostProduct purchaseClass] SKU:sku expiryDate:result.expiry andAuthToken:authToken];
-                 [expiringPurchases addExpiringPurchase:purchase];
-                 [self.clientModelObservable updateActivePurchases:[expiringPurchases activePurchases]];
-             } else {
-                 [PsiFeedbackLogger errorWithType:PsiCashLogType message:@"Received invalid purchase result" object:e];
-             }
-         } else {
-             NSError *e = nil;
-             if (result.status == kExistingTransaction) {
-                 // Ask adam-p about this
-                 PSIAssert(FALSE);
-                 // Price, balance and expiry valid
-                 e = [NSError errorWithDomain:PsiCashClientLibraryErrorDomain code:result.status andLocalizedDescription:@"Error: you are already Speed Boosting."];
+            if (authorization.accessType != [PsiCashSpeedBoostProduct purchaseClass]) {
+                NSString *s = [NSString stringWithFormat:@"Got auth token from PsiCash library with wrong purchase class of %@", authorization.accessType];
+                e = [NSError errorWithDomain:PsiCashClientLibraryErrorDomain code:result.status andLocalizedDescription:s];
+            }
 
-                 AuthorizationToken *authToken = [[AuthorizationToken alloc] initWithEncodedToken:result.authorization];
-                 NSError *e = nil;
-                 if (authToken == nil) {
-                     e = [NSError errorWithDomain:PsiCashClientLibraryErrorDomain code:result.status andLocalizedDescription:@"Got nil auth token from PsiCash library"];
-                 }
+            [stagingArea updateBalanceInNanoPsi:[result.balance unsignedLongLongValue]];
 
-                 if (authToken.accessType != [PsiCashSpeedBoostProduct purchaseClass]) {
-                     NSString *s = [NSString stringWithFormat:@"Got auth token from PsiCash library with wrong purchase class of %@", authToken.accessType];
-                     e = [NSError errorWithDomain:PsiCashClientLibraryErrorDomain code:result.status andLocalizedDescription:s];
-                 }
+            if (e != nil) {
+                ExpiringPurchase *purchase = [ExpiringPurchase expiringPurchaseWithProductName:[PsiCashSpeedBoostProduct purchaseClass] SKU:sku expiryDate:result.expiry andAuthorization:authorization];
+                [expiringPurchases addExpiringPurchase:purchase];
+                [stagingArea updateActivePurchases:[expiringPurchases activePurchases]];
+            } else {
+                [PsiFeedbackLogger errorWithType:PsiCashLogType message:@"Received invalid purchase result" object:e];
+            }
+        } else {
+            NSError *e = nil;
+            if (result.status == kExistingTransaction) {
+                // TODO: Ask adam-p about this
+                PSIAssert(FALSE);
+                // Price, balance and expiry valid
+                e = [NSError errorWithDomain:PsiCashClientLibraryErrorDomain code:result.status andLocalizedDescription:@"Error: you are already Speed Boosting."];
 
-                 if (e != nil) {
-                     [PsiFeedbackLogger errorWithType:PsiCashLogType message:@"Received invalid purchase result" object:e];
-                 }
+                Authorization *authorization = [[Authorization alloc] initWithEncodedAuthorization:result.authorization];
+                NSError *e = nil;
+                if (authorization == nil) {
+                    e = [NSError errorWithDomain:PsiCashClientLibraryErrorDomain code:result.status andLocalizedDescription:@"Got nil auth token from PsiCash library"];
+                }
 
-                 PsiCashSpeedBoostProductSKU *purchasedSKU = [PsiCashSpeedBoostProductSKU skuWitDistinguisher:@"todo" withHours:[NSNumber numberWithInt:1] /* TODO */ andPrice:result.price];
-                 ExpiringPurchase *purchase = [ExpiringPurchase expiringPurchaseWithProductName:[PsiCashSpeedBoostProduct purchaseClass] SKU:purchasedSKU expiryDate:result.expiry andAuthToken:authToken];
+                if (authorization.accessType != [PsiCashSpeedBoostProduct purchaseClass]) {
+                    NSString *s = [NSString stringWithFormat:@"Got auth token from PsiCash library with wrong purchase class of %@", authorization.accessType];
+                    e = [NSError errorWithDomain:PsiCashClientLibraryErrorDomain code:result.status andLocalizedDescription:s];
+                }
 
-                 [expiringPurchases addExpiringPurchase:purchase];
-                 [self.clientModelObservable updateBalanceInNanoPsi:[result.balance unsignedLongLongValue]];
-                 [self.clientModelObservable updateActivePurchases:[expiringPurchases activePurchases]];
-             } else if (result.status == kInsufficientBalance) {
-                 NSString *s = [NSString stringWithFormat:@"Insufficient balance for Speed Boost purchase. Your balance: %@, price: %@.", result.balance, result.price];
-                 e = [NSError errorWithDomain:PsiCashClientLibraryErrorDomain code:result.status andLocalizedDescription:s];
-                 [self.clientModelObservable updateBalanceInNanoPsi:[result.balance unsignedLongLongValue]];
-             } else if (result.status == kTransactionAmountMismatch) {
-                 NSString *s = [NSString stringWithFormat:@"Error: price of Speed Boost is out of date. You attempted to pay %@, but the cost is now %@.", sku.price, result.price];
-                 e = [NSError errorWithDomain:PsiCashClientLibraryErrorDomain code:result.status andLocalizedDescription:s];
-                 [self.clientModelObservable updateBalanceInNanoPsi:[result.balance unsignedLongLongValue]];
-                 [self.clientModelObservable updateSpeedBoostProductSKU:sku withNewPrice:result.price];
-             } else if (result.status == kTransactionTypeNotFound) {
-                 NSString *s = [NSString stringWithFormat:@"Error: Speed Boost product not found. Local products updated. Your app may be out of date. Please check for updates."];
-                 e = [NSError errorWithDomain:PsiCashClientLibraryErrorDomain code:result.status andLocalizedDescription:s];
-                 [self.clientModelObservable removeSpeedBoostProductSKU:sku];
-             } else if (result.status == kInvalidTokens) {
-                 e = [NSError errorWithDomain:PsiCashClientLibraryErrorDomain code:result.status andLocalizedDescription:@"Invalid Tokens: the app has entered an invalid state. Please reinstall the app to continue using PsiCash."];
-             } else if (result.status == kServerError) {
-                 e = [NSError errorWithDomain:PsiCashClientLibraryErrorDomain code:result.status andLocalizedDescription:@"Server error"];
-             } else {
-                 e = [NSError errorWithDomain:PsiCashClientLibraryErrorDomain code:result.status andLocalizedDescription:@"Invalid or unexpected status code returned from PsiCash library"];
-             }
+                if (e != nil) {
+                    [PsiFeedbackLogger errorWithType:PsiCashLogType message:@"Received invalid purchase result" object:e];
+                }
 
-             if (e != nil) {
-                 [self displayAlertWithError:e];
-             }
-         }
+                PsiCashSpeedBoostProductSKU *purchasedSKU = [PsiCashSpeedBoostProductSKU skuWitDistinguisher:@"todo" withHours:[NSNumber numberWithInt:1] /* TODO */ andPrice:result.price];
+                ExpiringPurchase *purchase = [ExpiringPurchase expiringPurchaseWithProductName:[PsiCashSpeedBoostProduct purchaseClass] SKU:purchasedSKU expiryDate:result.expiry andAuthorization:authorization];
 
-         [self.clientModelObservable updatePendingPurchases:nil];
-         [self.clientModelObservable emitNextClientModel];
-     } error:^(NSError * _Nullable error) {
-         [PsiFeedbackLogger errorWithType:PsiCashLogType message:@"%s unexpected error signal.", __FUNCTION__];
-     } completed:^{
-         [PsiFeedbackLogger errorWithType:PsiCashLogType message:@"%s unexpected completed signal.", __FUNCTION__];
-     }];
+                [expiringPurchases addExpiringPurchase:purchase];
+
+                [stagingArea updateBalanceInNanoPsi:[result.balance unsignedLongLongValue]];
+                [stagingArea updateActivePurchases:[expiringPurchases activePurchases]];
+
+            } else if (result.status == kInsufficientBalance) {
+                NSString *s = [NSString stringWithFormat:@"Insufficient balance for Speed Boost purchase. Your balance: %@, price: %@.", result.balance, result.price];
+                e = [NSError errorWithDomain:PsiCashClientLibraryErrorDomain code:result.status andLocalizedDescription:s];
+
+                [stagingArea updateBalanceInNanoPsi:[result.balance unsignedLongLongValue]];
+
+            } else if (result.status == kTransactionAmountMismatch) {
+                NSString *s = [NSString stringWithFormat:@"Error: price of Speed Boost is out of date. You attempted to pay %@, but the cost is now %@.", sku.price, result.price];
+                e = [NSError errorWithDomain:PsiCashClientLibraryErrorDomain code:result.status andLocalizedDescription:s];
+
+                [stagingArea updateBalanceInNanoPsi:[result.balance unsignedLongLongValue]];
+                [stagingArea updateSpeedBoostProductSKU:sku withNewPrice:result.price];
+
+            } else if (result.status == kTransactionTypeNotFound) {
+                NSString *s = [NSString stringWithFormat:@"Error: Speed Boost product not found. Local products updated. Your app may be out of date. Please check for updates."];
+                e = [NSError errorWithDomain:PsiCashClientLibraryErrorDomain code:result.status andLocalizedDescription:s];
+
+                [stagingArea removeSpeedBoostProductSKU:sku];
+
+            } else if (result.status == kInvalidTokens) {
+                e = [NSError errorWithDomain:PsiCashClientLibraryErrorDomain code:result.status andLocalizedDescription:@"Invalid Tokens: the app has entered an invalid state. Please reinstall the app to continue using PsiCash."];
+            } else if (result.status == kServerError) {
+                e = [NSError errorWithDomain:PsiCashClientLibraryErrorDomain code:result.status andLocalizedDescription:@"Server error"];
+            } else {
+                e = [NSError errorWithDomain:PsiCashClientLibraryErrorDomain code:result.status andLocalizedDescription:@"Invalid or unexpected status code returned from PsiCash library"];
+            }
+
+            if (e != nil) {
+                [self displayAlertWithError:e];
+            }
+        }
+
+        [stagingArea updatePendingPurchases:nil];
+        [self commitModelStagingArea:stagingArea];
+
+    } error:^(NSError * _Nullable error) {
+        [PsiFeedbackLogger errorWithType:PsiCashLogType message:@"%s unexpected error signal.", __FUNCTION__];
+    } completed:^{
+        [PsiFeedbackLogger errorWithType:PsiCashLogType message:@"%s unexpected completed signal.", __FUNCTION__];
+    }];
 }
 
 - (RACSignal<PsiCashMakePurchaseResultModel*>*)makeExpiringPurchaseTransactionForClass:(NSString*)transactionClass andDistinguisher:(NSString*)distinguisher withExpectedPrice:(NSNumber*)expectedPrice {
-    return [RACSignal createSignal:^RACDisposable * _Nullable(id<RACSubscriber>  _Nonnull subscriber) {
+    return [RACSignal createSignal:^RACDisposable *(id<RACSubscriber>  _Nonnull subscriber) {
         [psiCash newExpiringPurchaseTransactionForClass:transactionClass
                                       withDistinguisher:distinguisher
                                       withExpectedPrice:expectedPrice

@@ -132,7 +132,7 @@
 }
 
 - (RACSignal<ExpiringPurchase*>*)expireSignalFromPurchase:(ExpiringPurchase*_Nonnull)purchase {
-    return [RACSignal createSignal:^RACDisposable * _Nullable(id<RACSubscriber>  _Nonnull subscriber) {
+    return [RACSignal createSignal:^RACDisposable *(id<RACSubscriber> _Nonnull subscriber) {
         RACCompoundDisposable *compoundDisposable = [RACCompoundDisposable compoundDisposable];
 
         NSTimeInterval timeUntilExpiry = [purchase.expiryDate timeIntervalSinceDate:[NSDate date]];
@@ -162,15 +162,19 @@
 }
 
 - (void)startListeningForExpiringPurchases {
-    disposable = [[[expiringPurchases flattenMap:^__kindof RACSignal * _Nullable(ExpiringPurchase * _Nullable value) {
+    disposable = [[[expiringPurchases flattenMap:^RACSignal *(ExpiringPurchase * _Nullable value) {
         return [self expireSignalFromPurchase:value];
-    }] retry] subscribeNext:^(ExpiringPurchase *purchase) {
+      }]
+      retry]
+      subscribeNext:^(ExpiringPurchase *purchase) {
         [self.expiredPurchaseStream sendNext:purchase];
-    } error:^(NSError * _Nullable error) {
+      }
+      error:^(NSError * _Nullable error) {
         [disposable dispose];
-    } completed:^{
+      }
+      completed:^{
         [disposable dispose];
-    }];
+      }];
 }
 
 - (ExpiringPurchase*)nextExpiringPurchase {

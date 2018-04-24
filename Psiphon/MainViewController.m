@@ -1503,7 +1503,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     [balanceView.heightAnchor constraintEqualToAnchor:subscriptionButton.heightAnchor].active = YES;
 
     __weak MainViewController *weakSelf = self;
-    RACDisposable * balanceViewUpdates = [[PsiCashClient.sharedInstance.clientModelObservable.emitter deliverOnMainThread] subscribeNext:^(PsiCashClientModel *newClientModel) {
+    RACDisposable * balanceViewUpdates = [[PsiCashClient.sharedInstance.clientModelSignal deliverOnMainThread] subscribeNext:^(PsiCashClientModel *newClientModel) {
         __strong MainViewController *strongSelf = weakSelf;
         if (strongSelf != nil) {
 
