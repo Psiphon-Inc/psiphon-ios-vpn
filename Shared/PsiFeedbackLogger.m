@@ -56,6 +56,9 @@ NSString * const WarnNoticeType = @"ContainerWarn";
 NSString * const ErrorNoticeType = @"ContainerError";
 #endif
 
+
+PsiFeedbackLogType const FeedbackInternalLogType = @"FeedbackLoggerInternal";
+
 /**
  * All the methods in this class are non-blocking and thread-safe.
  *
@@ -274,17 +277,19 @@ NSString * const ErrorNoticeType = @"ContainerError";
     [self writeData:@{@"message": message} noticeType:noticeType timestamp:timestamp];
 }
 
-- (void)writeData:(NSDictionary<NSString *, NSString *> *)data noticeType:(NSString *)noticeType {
+- (void)writeData:(NSDictionary *)data noticeType:(NSString *)noticeType {
     [self writeData:data
          noticeType:noticeType
           timestamp:[NSDate nowRFC3339Milli]];
 }
 
-- (void)writeData:(NSDictionary<NSString *, NSString *> *)data noticeType:(NSString *)noticeType timestamp:(NSString *)timestamp {
+- (void)writeData:(NSDictionary *_Nullable)data
+       noticeType:(NSString *_Nonnull)noticeType
+        timestamp:(NSString *_Nonnull)timestamp {
 
     if (!data) {
         LOG_ERROR_NO_NOTICE(@"output notice nil data");
-        data = @{@"data" : @"nil data"};
+        data = @{@"data" : @"nilData"};
     }
 
     NSError *err;
@@ -294,9 +299,19 @@ NSString * const ErrorNoticeType = @"ContainerError";
     NSDictionary *outputDic = @{
       @"data": data,
       @"noticeType": noticeType,
-      @"showUser": @NO,
+      @"showUser": [NSNumber numberWithBool:NO],
       @"timestamp": timestamp
     };
+
+    if (![NSJSONSerialization isValidJSONObject:outputDic]) {
+        [PsiFeedbackLogger errorWithType:FeedbackInternalLogType message:@"invalid log dictionary"];
+
+#if DEBUG
+        abort();
+#endif
+
+        return;
+    }
 
     // The resulting output will be UTF-8 encoded.
     NSData *output = [NSJSONSerialization dataWithJSONObject:outputDic options:kNilOptions error:&err];
