@@ -20,6 +20,8 @@
 #import "PsiFeedbackLogger.h"
 #import "SharedConstants.h"
 #import "NSDate+PSIDateExtension.h"
+#import "Nullity.h"
+#import "Asserts.h"
 
 #if DEBUG
 #define MAX_NOTICE_FILE_SIZE_BYTES 164000
@@ -287,9 +289,19 @@ PsiFeedbackLogType const FeedbackInternalLogType = @"FeedbackLoggerInternal";
        noticeType:(NSString *_Nonnull)noticeType
         timestamp:(NSString *_Nonnull)timestamp {
 
-    if (!data) {
-        LOG_ERROR_NO_NOTICE(@"output notice nil data");
+    if ([Nullity isNil:data]) {
         data = @{@"data" : @"nilData"};
+        PSIAssert(FALSE);
+    }
+
+    if ([Nullity isEmpty:noticeType]) {
+        noticeType = @"emptyNoticeType";
+        PSIAssert(FALSE);
+    }
+
+    if ([Nullity isEmpty:timestamp]) {
+        timestamp = [NSDate nowRFC3339Milli];
+        PSIAssert(FALSE);
     }
 
     NSError *err;
@@ -415,7 +427,7 @@ PsiFeedbackLogType const FeedbackInternalLogType = @"FeedbackLoggerInternal";
 // Unpacks a NSError object to a dictionary representation fit for logging.
 + (NSDictionary *_Nonnull)unpackError:(NSError *_Nullable)error {
 
-    if (!error) {
+    if ([Nullity isNil:error]) {
         return @{@"error": @"nilError"};
     }
 
@@ -424,10 +436,10 @@ PsiFeedbackLogType const FeedbackInternalLogType = @"FeedbackLoggerInternal";
     errorDic[@"code"] = @(error.code);
 
     if (error.userInfo) {
-        if (error.userInfo[NSLocalizedDescriptionKey]) {
+        if (![Nullity isEmpty:error.userInfo[NSLocalizedDescriptionKey]]) {
             errorDic[@"description"] = error.userInfo[NSLocalizedDescriptionKey];
         }
-        if (error.userInfo[NSUnderlyingErrorKey]) {
+        if (![Nullity isNil:error.userInfo[NSUnderlyingErrorKey]]) {
             errorDic[@"underlyingError"] = [PsiFeedbackLogger unpackError:error.userInfo[NSUnderlyingErrorKey]];
         }
     }
@@ -440,11 +452,11 @@ PsiFeedbackLogType const FeedbackInternalLogType = @"FeedbackLoggerInternal";
                                                message:(NSString *_Nullable)message
                                                  error:(NSError *_Nullable)error {
 
-    if (!sourceType) {
+    if ([Nullity isEmpty:sourceType]) {
         sourceType = @"nilSourceType";
     }
 
-    if (!message) {
+    if ([Nullity isEmpty:message]) {
         message = @"nilMessage";
     }
 
