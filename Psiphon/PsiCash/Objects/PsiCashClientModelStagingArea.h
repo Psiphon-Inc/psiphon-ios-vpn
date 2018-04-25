@@ -18,11 +18,9 @@
  */
 
 #import <Foundation/Foundation.h>
-#import "ExpiringPurchase.h"
 #import "PsiCashSpeedBoostProduct.h"
 #import "PsiCashClientModel.h"
 #import "PsiCashAuthPackage.h"
-#import "psicash_types.hpp"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -43,13 +41,13 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (instancetype)initWithModel:(PsiCashClientModel *_Nullable)model;
 
-- (void)updateAuthPackage:(PsiCashAuthPackage*)authPackage;
+- (void)updateAuthPackage:(PsiCashAuthPackage*_Nullable)authPackage;
 - (void)updateBalanceInNanoPsi:(UInt64)balanceInNanoPsi;
 - (void)updateSpeedBoostProduct:(PsiCashSpeedBoostProduct*)speedBoostProduct;
 - (void)updateSpeedBoostProductSKU:(PsiCashSpeedBoostProductSKU*)old withNewPrice:(NSNumber*)price;
 - (void)removeSpeedBoostProductSKU:(PsiCashSpeedBoostProductSKU*)sku;
-- (void)updatePendingPurchases:(NSArray<id<PsiCashProductSKU>>*)purchases;
-- (void)updateActivePurchases:(NSArray<ExpiringPurchase*>*)activePurchases;
+- (void)updatePendingPurchases:(NSArray<id<PsiCashProductSKU>>*_Nullable)purchases;
+- (void)updateActivePurchases:(NSArray<PsiCashPurchase*>*)activePurchases;
 
 @end
 

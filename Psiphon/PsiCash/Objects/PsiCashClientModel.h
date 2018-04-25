@@ -18,7 +18,7 @@
  */
 
 #import <Foundation/Foundation.h>
-#import "ExpiringPurchase.h"
+#import <PsiCashLib/Purchase.h>
 #import "PsiCashSpeedBoostProduct.h"
 #import "PsiCashAuthPackage.h"
 
@@ -28,15 +28,16 @@
 @property (atomic) double balanceInPsi;
 @property (strong, atomic) PsiCashSpeedBoostProduct *speedBoostProduct;
 @property (strong, atomic) NSArray<id<PsiCashProductSKU>> *pendingPurchases;
-@property (strong, atomic) ExpiringPurchase *activeSpeedBoostPurchase;
+@property (strong, atomic) PsiCashPurchase *activeSpeedBoostPurchase;
 + (PsiCashClientModel*)clientModelWithAuthPackage:(PsiCashAuthPackage*)authPackage
                          andBalanceInNanoPsi:(UInt64)balance
                         andSpeedBoostProduct:(PsiCashSpeedBoostProduct*)speedBoostProduct
                          andPendingPurchases:(NSArray<id<PsiCashProductSKU>>*)pendingPurchases
-                 andActiveSpeedBoostPurchase:(ExpiringPurchase*)activeSpeedBoostPurchase;
-- (NSUInteger)hoursEarned;
-- (float)progressToNextHourEarned;
+                 andActiveSpeedBoostPurchase:(PsiCashPurchase*)activeSpeedBoostPurchase;
+- (NSNumber*)hoursEarned;
+- (PsiCashSpeedBoostProductSKU*)minSpeedBoostPurchase;
 - (BOOL)hasActiveSpeedBoostPurchase;
+- (int)minutesOfSpeedBoostRemaining;
 - (BOOL)hasPendingPurchase;
 - (BOOL)hasAuthPackage;
 @end

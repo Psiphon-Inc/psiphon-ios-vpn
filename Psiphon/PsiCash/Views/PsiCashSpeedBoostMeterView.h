@@ -20,6 +20,6 @@
 #import <UIKit/UIKit.h>
 #import "PsiCashClientModel.h"
 
-@interface PsiCashSpeedBoostMeterView : UIView <PsiCashClientModelReceiver>
+@interface PsiCashSpeedBoostMeterView : UIButton <PsiCashClientModelReceiver>
 @end
 

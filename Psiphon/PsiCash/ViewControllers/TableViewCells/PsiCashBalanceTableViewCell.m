@@ -40,8 +40,8 @@
         balanceView.translatesAutoresizingMaskIntoConstraints = NO;
         [balanceView.centerXAnchor constraintEqualToAnchor:self.contentView.centerXAnchor].active = YES;
         [balanceView.centerYAnchor constraintEqualToAnchor:self.contentView.centerYAnchor].active = YES;
-        [balanceView.widthAnchor constraintEqualToAnchor:self.contentView.widthAnchor].active = YES;
-        [balanceView.heightAnchor constraintEqualToAnchor:self.contentView.heightAnchor].active = YES;
+        [balanceView.widthAnchor constraintEqualToConstant:200.f].active = YES;
+        [balanceView.heightAnchor constraintEqualToConstant:45.f].active = YES;
     }
 
     return self;

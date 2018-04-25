@@ -19,21 +19,22 @@
 
 
 #import <Foundation/Foundation.h>
-#import "psicash_api.hpp"
 #import "PsiCashClientModelStagingArea.h"
 #import "PsiCashSpeedBoostProduct.h"
 #import "ReactiveObjC.h"
 
 @interface PsiCashClient : NSObject
 
-// TODO akan: remove this
-//@property (atomic, readonly) PsiCashClientModelStagingArea *clientModelObservable;
-
 @property (nonatomic, readonly) RACReplaySubject<PsiCashClientModel *> *clientModelSignal;
 
 + (instancetype)sharedInstance;
-+ (BOOL)shouldExposePsiCash;
-- (void)refreshState;
+- (NSURL*)homePageURL;
+- (void)scheduleStateRefresh;
 - (void)purchaseSpeedBoostProduct:(PsiCashSpeedBoostProductSKU*)sku;
+/**
+ * @brief Removes any purchases that the extension has marked as invalid from the client model.
+ */
+- (void)authorizationsMarkedExpired;
+
 
 @end

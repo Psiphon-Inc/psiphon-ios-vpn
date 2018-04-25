@@ -21,7 +21,7 @@
 #import "PsiCashClient.h"
 #import "ReactiveObjC.h"
 
-#define kCornerRadius 10.f
+#define kCornerRadius 25.f
 
 @interface PsiCashSpeedBoostMeterView ()
 @property (atomic, readwrite) PsiCashClientModel *model;
@@ -31,9 +31,12 @@
 
 @implementation PsiCashSpeedBoostMeterView {
     UILabel *title;
-    UILabel *hoursLabel;
-    CGFloat progressToNextHour;
     NSTimer *countdownToNextHourExpired;
+    UIImageView *instantBuyButton;
+
+    // Progress bar
+    CAShapeLayer *progressBar;
+    CAGradientLayer *gradient;
 }
 
 - (id)initWithFrame:(CGRect)frame {
@@ -49,95 +52,157 @@
 }
 
 - (void)setupViews {
-    self.backgroundColor = [UIColor colorWithRed:0.26 green:0.54 blue:0.85 alpha:1.0];
-    self.layer.borderColor = [UIColor colorWithRed:0.53 green:0.57 blue:0.62 alpha:1.0].CGColor;
-    self.layer.borderWidth = 1.5f;
     self.layer.cornerRadius = kCornerRadius;
+    self.clipsToBounds = YES;
+    self.backgroundColor = [UIColor colorWithRed:0.16 green:0.18 blue:0.27 alpha:1.0];
+    self.layer.borderWidth = 4.f;
+    self.layer.borderColor = [UIColor colorWithRed:0.29 green:0.31 blue:0.40 alpha:1.0].CGColor;
+
+    instantBuyButton = [[UIImageView alloc] initWithFrame:CGRectMake(60, 95, 90, 90)];
+    instantBuyButton.image = [UIImage imageNamed:@"PsiCash_InstantPurchaseButton"];
+    [instantBuyButton.layer setMinificationFilter:kCAFilterTrilinear];
 
     title = [[UILabel alloc] init];
     title.adjustsFontSizeToFitWidth = YES;
-    title.font = [UIFont systemFontOfSize:12.f];
+    title.font = [UIFont boldSystemFontOfSize:14];
     title.textColor = [UIColor colorWithRed:0.98 green:0.99 blue:1.00 alpha:1.0];
-
-    hoursLabel = [[UILabel alloc] init];
-    hoursLabel.adjustsFontSizeToFitWidth = YES;
-    hoursLabel.font = [UIFont systemFontOfSize:8.f];
-    hoursLabel.textColor = [UIColor colorWithRed:0.98 green:0.99 blue:1.00 alpha:1.0];
 }
 
 - (void)addViews {
+    [self addSubview:instantBuyButton];
     [self addSubview:title];
-    [self addSubview:hoursLabel];
 }
 
 - (void)setupLayoutConstraints {
+    CGFloat instantBuyButtonSize = 20.f;
+    instantBuyButton.translatesAutoresizingMaskIntoConstraints = NO;
+    [instantBuyButton.heightAnchor constraintEqualToConstant:instantBuyButtonSize].active = YES;
+    [instantBuyButton.widthAnchor constraintEqualToConstant:instantBuyButtonSize].active = YES;
+    [instantBuyButton.centerYAnchor constraintEqualToAnchor:self.centerYAnchor].active = YES;
+    [instantBuyButton.leadingAnchor constraintEqualToAnchor:self.leadingAnchor constant:14.f].active = YES;
+    instantBuyButton.contentMode = UIViewContentModeScaleAspectFit;
+
     title.translatesAutoresizingMaskIntoConstraints = NO;
     [title.centerXAnchor constraintEqualToAnchor:self.centerXAnchor].active = YES;
     [title.centerYAnchor constraintEqualToAnchor:self.centerYAnchor].active = YES;
-
-    hoursLabel.translatesAutoresizingMaskIntoConstraints = NO;
-    [hoursLabel.centerYAnchor constraintEqualToAnchor:self.centerYAnchor].active = YES;
-    [hoursLabel.trailingAnchor constraintEqualToAnchor:self.trailingAnchor constant:-kCornerRadius].active = YES;
 }
 
-# pragma mark - Helpers
+# pragma mark - State Changes
 
 - (void)inRetrievingAuthPackageState {
     title.text = @"...";
-    hoursLabel.text = @"";
 }
 
 - (void)inPurchasePendingState {
-    title.text = @"Purchase pending...";
-    hoursLabel.text = @"";
+    title.text = @"Buying Speed Boost...";
 }
 
-- (void)speedBoostChargingWithHoursEarned:(NSUInteger)hoursEarned andProgressToNextHourEarned:(float)progress {
-    if (hoursEarned >= 1) {
-        title.text = [@"Speed Boost Charged" stringByAppendingFormat:@" %.0f%%", progress * 100];
+- (void)speedBoostChargingWithHoursEarned:(NSNumber*)hoursEarned {
+    float progress = [self progressToMinSpeedBoostPurchase];
+    [self addProgressBarWithProgress:progress];
+    self.backgroundColor = [UIColor colorWithRed:0.16 green:0.18 blue:0.27 alpha:1.0];
+
+    if (progress >= 1) {
+        if ([self.model.hoursEarned floatValue] < 1) {
+            title.text = [NSString stringWithFormat:@"%.0fm Speed Boost Available", ([hoursEarned floatValue] * 60)];
+        } else {
+            title.text = [NSString stringWithFormat:@"%luh Speed Boost Available", (unsigned long)[hoursEarned unsignedIntegerValue]];
+        }
     } else {
-        title.text = [@"Speed Boost Charging" stringByAppendingFormat:@" %.0f%%", progress * 100];
+        title.attributedText = [self minSpeedBoostPurchaseTitle];
     }
-    [self setHoursLabelToHours:hoursEarned];
+}
+
+- (void)activeSpeedBoostExpiringIn:(NSTimeInterval)seconds {
+    [self removeProgressBar];
+    self.backgroundColor = [UIColor colorWithRed:0.19 green:0.93 blue:0.88 alpha:1.0];
+
+    if (seconds > 0) {
+        title.text = @"Speed Boost Active";
+        dispatch_async(dispatch_get_main_queue(), ^{
+            countdownToNextHourExpired = [NSTimer scheduledTimerWithTimeInterval:[self timeToNextHourExpired:seconds] repeats:NO block:^(NSTimer * _Nonnull timer) {
+                [self activeSpeedBoostExpiringIn:self.model.activeSpeedBoostPurchase.expiry.timeIntervalSinceNow];
+            }];
+        });
+    } else {
+        [self speedBoostChargingWithHoursEarned:[self.model hoursEarned]];
+    }
+}
+
+#pragma mark - Helpers
+
+- (void)addProgressBarWithProgress:(float)progress {
+    [self removeProgressBar];
+
+    progressBar = [CAShapeLayer layer];
+    gradient = [CAGradientLayer layer];
+    [self.layer insertSublayer:gradient atIndex:0];
+    gradient.startPoint = CGPointMake(0, 0.5);
+    gradient.endPoint = CGPointMake(1.0, 0.5);
+    gradient.mask = progressBar;
+
+    CGFloat progressBarWidth;
+    CGFloat progressBarRadius = kCornerRadius;
+    progressBarWidth = 2 * progressBarRadius + (self.frame.size.width - 2 * progressBarRadius) * progress;
+    gradient.colors = @[(id)[UIColor colorWithRed:0.11 green:0.27 blue:0.69 alpha:1.0].CGColor, (id)[UIColor colorWithRed:0.19 green:0.93 blue:0.88 alpha:1.0].CGColor]; // green gradient
+    progressBar.path = [UIBezierPath bezierPathWithRoundedRect:CGRectMake(0, 0, progressBarWidth, self.frame.size.height) cornerRadius:progressBarRadius].CGPath;
+    gradient.frame = CGRectMake(0, 0, self.frame.size.width, self.frame.size.height);
+}
+
+- (void)removeProgressBar {
+    [progressBar removeFromSuperlayer];
+    progressBar = nil;
+    [gradient removeFromSuperlayer];
+    gradient = nil;
+}
+
+- (void)noSpenderToken {
+    title.text = @"Earn PsiCash to buy Speed Boost";
 }
 
 - (NSTimeInterval)timeToNextHourExpired:(NSTimeInterval)seconds {
     NSTimeInterval secondsRemaining = seconds;
-#if DEBUG
-    NSInteger hoursRemaining = secondsRemaining / (10);
-    NSTimeInterval secondsToNextHourExpired = secondsRemaining - (hoursRemaining * 10);
-#else
-    NSInteger hoursRemaining = secondsRemaining / (60*60);
+    NSInteger hoursRemaining = secondsRemaining / (60 * 60);
     NSTimeInterval secondsToNextHourExpired = secondsRemaining - (hoursRemaining * 60);
-#endif
     return secondsToNextHourExpired;
 }
 
-- (void)activeSpeedBoostExpiringIn:(NSTimeInterval)seconds {
-    if (seconds > 0) {
-#if DEBUG
-        NSUInteger hours = seconds/10;
-#else
-        NSUInteger hours = seconds/(60*60);
-#endif
-        title.text = @"Speed Boosting!";
-        [self setHoursLabelToHours:hours];
-        dispatch_async(dispatch_get_main_queue(), ^{
-            countdownToNextHourExpired = [NSTimer scheduledTimerWithTimeInterval:[self timeToNextHourExpired:seconds] repeats:NO block:^(NSTimer * _Nonnull timer) {
-                [self activeSpeedBoostExpiringIn:self.model.activeSpeedBoostPurchase.expiryDate.timeIntervalSinceNow];
-            }];
-        });
-    } else {
-        title.text = @"Speed Boost expired.";
-        [self setHoursLabelToHours:0];
+- (NSAttributedString*)minSpeedBoostPurchaseTitle {
+    PsiCashSpeedBoostProductSKU *sku = [self.model minSpeedBoostPurchase];
+    if (sku == nil) {
+        return [[NSAttributedString alloc] initWithString:@""];
     }
+
+    NSString *str;
+    if ([sku.hours doubleValue] < 1) {
+        str = [NSString stringWithFormat:@"%dm Speed Boost at ", (int)([sku.hours doubleValue] * 60)];
+    } else {
+        str = [NSString stringWithFormat:@"%ldh Speed Boost at", (long)[sku.hours integerValue]];
+    }
+
+    NSMutableAttributedString *attr = [[NSMutableAttributedString alloc] initWithString:str];
+
+    NSTextAttachment *imageAttachment = [[NSTextAttachment alloc] init];
+    imageAttachment.image = [UIImage imageNamed:@"PsiCash_Coin"];
+    imageAttachment.bounds = CGRectMake(2, -4, 16, 16);
+
+    NSAttributedString *imageString = [NSAttributedString attributedStringWithAttachment:imageAttachment];
+    [attr appendAttributedString:imageString];
+    [attr appendAttributedString:[[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@" %.0f", [sku priceInPsi]]]];
+
+    return attr;
 }
 
-- (void)setHoursLabelToHours:(NSUInteger)hours {
-    hoursLabel.text = [NSString stringWithFormat:@"%luh", (unsigned long)hours];
+- (float)progressToMinSpeedBoostPurchase {
+    PsiCashSpeedBoostProductSKU *sku = [self.model minSpeedBoostPurchase];
+    if (sku == nil) {
+        return 0;
+    }
+
+    return (float)self.model.balanceInNanoPsi / [sku.price unsignedLongLongValue];
 }
 
-# pragma mark - PsiCashClientModelReceiver protocol
+#pragma mark - PsiCashClientModelReceiver protocol
 
 - (void)bindWithModel:(PsiCashClientModel *)clientModel {
     self.model = clientModel;
@@ -149,14 +214,14 @@
 
     if ([self.model hasAuthPackage]) {
         if ([self.model hasActiveSpeedBoostPurchase]) {
-            [self activeSpeedBoostExpiringIn:self.model.activeSpeedBoostPurchase.expiryDate.timeIntervalSinceNow];
+            [self activeSpeedBoostExpiringIn:self.model.activeSpeedBoostPurchase.expiry.timeIntervalSinceNow];
         } else if ([self.model hasPendingPurchase]){
             [self inPurchasePendingState];
         } else {
             if ([self.model.authPackage hasSpenderToken]) {
-                [self speedBoostChargingWithHoursEarned:[self.model hoursEarned] andProgressToNextHourEarned:[self.model progressToNextHourEarned]];
+                [self speedBoostChargingWithHoursEarned:[self.model hoursEarned]];
             } else {
-                assert(false); // TODO: user has no spender token
+                [self noSpenderToken];
             }
         }
     } else {

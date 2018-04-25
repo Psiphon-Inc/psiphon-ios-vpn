@@ -17,7 +17,9 @@
  *
  */
 
+#import <UIKit/UIKit.h>
 #import "PsiCashClientModel.h"
+#import "NSDate+Comparator.h"
 
 @implementation PsiCashClientModel
 
@@ -25,7 +27,7 @@
                          andBalanceInNanoPsi:(UInt64)balance
                         andSpeedBoostProduct:(PsiCashSpeedBoostProduct*)speedBoostProduct
                          andPendingPurchases:(NSArray<id<PsiCashProductSKU>>*)pendingPurchases
-                 andActiveSpeedBoostPurchase:(ExpiringPurchase* /* TODO: typing */)activeSpeedBoostPurchase {
+                 andActiveSpeedBoostPurchase:(PsiCashPurchase* /* TODO: typing */)activeSpeedBoostPurchase {
     PsiCashClientModel *clientModel = [[PsiCashClientModel alloc] init];
     clientModel.authPackage = authPackage;
     clientModel.balanceInNanoPsi = balance;
@@ -36,7 +38,7 @@
     return clientModel;
 }
 
-- (NSUInteger)hoursEarned {
+- (NSNumber*)hoursEarned {
     NSNumber *maxHoursEarned = 0;
 
     for (PsiCashSpeedBoostProductSKU *sku in [self.speedBoostProduct skusOrderedByPriceAscending]) {
@@ -47,30 +49,27 @@
         }
     }
 
-    return [maxHoursEarned unsignedIntegerValue];
+    return maxHoursEarned;
 }
 
-- (float)progressToNextHourEarned {
+- (PsiCashSpeedBoostProductSKU*)minSpeedBoostPurchase {
     NSArray<PsiCashSpeedBoostProductSKU*> *skus = [self.speedBoostProduct skusOrderedByPriceAscending];
-    PsiCashSpeedBoostProductSKU *nextTargetSku;
-    for (PsiCashSpeedBoostProductSKU *sku in skus) {
-        if (self.balanceInNanoPsi < [sku.price unsignedLongLongValue]) {
-            nextTargetSku = sku;
-            break;
-        }
+    if ([skus count] == 0) {
+        nil;
     }
-
-    if ([skus count] > 0 && nextTargetSku == nil) {
-        return 1;
-    } else if (nextTargetSku == nil) {
-        return 0;
-    }
-
-    return (float)self.balanceInNanoPsi / [nextTargetSku.price unsignedLongLongValue];
+    return [skus objectAtIndex:0];
 }
 
 - (BOOL)hasActiveSpeedBoostPurchase {
-    return self.activeSpeedBoostPurchase != nil;
+    if (self.activeSpeedBoostPurchase != nil && [[NSDate date] before:[self.activeSpeedBoostPurchase expiry]]) {
+        return TRUE;
+    }
+    return FALSE;
+}
+
+- (int)minutesOfSpeedBoostRemaining {
+    NSTimeInterval timeRemaing = [[self.activeSpeedBoostPurchase expiry] timeIntervalSinceNow];
+    return timeRemaing < 0 ? 0 : (int)(timeRemaing / 60);
 }
 
 - (BOOL)hasPendingPurchase {

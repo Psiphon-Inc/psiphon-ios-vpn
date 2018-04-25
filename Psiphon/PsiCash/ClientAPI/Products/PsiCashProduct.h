@@ -17,9 +17,19 @@
  *
  */
 
-#import <UIKit/UIKit.h>
-#import "PsiCashClientModel.h"
+#import <Foundation/Foundation.h>
 
-@interface PsiCashBalanceView : UIButton <PsiCashClientModelReceiver>
+NS_ASSUME_NONNULL_BEGIN
+
+@protocol PsiCashProductSKU
+@property (nonatomic, readonly) id<NSCopying, NSSecureCoding> variant;
+@property (nonatomic, readonly) NSString *distinguisher;
+@property (nonatomic, readonly) NSNumber *price;
 @end
 
+@protocol PsiCashProduct
++ (NSString*)purchaseClass;
+@property (nonatomic, readonly) NSArray *skusOrderedByPriceAscending;
+@end
+
+NS_ASSUME_NONNULL_END

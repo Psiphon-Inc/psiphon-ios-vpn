@@ -17,9 +17,15 @@
  *
  */
 
-#import <UIKit/UIKit.h>
-#import "PsiCashClientModel.h"
+#import <Foundation/Foundation.h>
+#import "PsiCashSpeedBoostProduct.h"
+#import <PsiCashLib/PsiCash.h>
+#import <PsiCashLIb/PurchasePrice.h>
 
-@interface PsiCashBalanceView : UIButton <PsiCashClientModelReceiver>
+NS_ASSUME_NONNULL_BEGIN
+
+@interface PsiCashSpeedBoostProduct (PsiCashPurchasePrice)
++ (PsiCashSpeedBoostProduct*_Nullable)productWithPurchasePrices:(NSArray<PsiCashPurchasePrice*>*)purchasePrices;
 @end
 
+NS_ASSUME_NONNULL_END

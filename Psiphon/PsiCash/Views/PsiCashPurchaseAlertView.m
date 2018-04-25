@@ -70,7 +70,7 @@
     alertView->alreadySpeedBoosting = YES;
 
     UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, 250, 150)];
-    label.text = @"Purchase pending...";
+    label.text = @"Buying Speed Boost...";
     label.textAlignment = NSTextAlignmentCenter;
     label.numberOfLines = 0;
     alertView.purchaseView = nil;
@@ -93,12 +93,12 @@
     return alertView;
 }
 
-+ (PsiCashPurchaseAlertView*)alreadySpeedBoostingAlert {
++ (PsiCashPurchaseAlertView*)alreadySpeedBoostingAlertWithNMinutesRemaining:(int)minsRemaining {
     PsiCashPurchaseAlertView *alertView = [[PsiCashPurchaseAlertView alloc] init];
     alertView->alreadySpeedBoosting = YES;
 
     UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, 250, 150)];
-    label.text = @"Speed Boosting!";
+    label.text = [NSString stringWithFormat:@"%d minutes of Speed Boost remaining", minsRemaining];
     label.textAlignment = NSTextAlignmentCenter;
     label.numberOfLines = 0;
     alertView.purchaseView = nil;

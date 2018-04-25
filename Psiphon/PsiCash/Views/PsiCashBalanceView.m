@@ -28,7 +28,7 @@
 #pragma mark -
 
 @implementation PsiCashBalanceView {
-    UIImageView *animatingCoin;
+    UIImageView *coin;
     UILabel *balance;
     UILabel *plusMinusIndicator;
 }
@@ -46,17 +46,14 @@
 }
 
 - (void)setupViews {
-    // Setup animating coin
-    NSArray *imageNames = @[@"Coin1", @"Coin2", @"Coin3", @"Coin4", @"Coin5", @"Coin6"];
-    NSMutableArray *images = [[NSMutableArray alloc] init];
-    for (int i = 0; i < imageNames.count; i++) {
-        [images addObject:[UIImage imageNamed:[imageNames objectAtIndex:i]]];
-    }
+    self.layer.cornerRadius = 20;
+    self.clipsToBounds = YES;
+    self.backgroundColor = [UIColor colorWithRed:0.38 green:0.27 blue:0.92 alpha:1.0];
+    self.contentEdgeInsets = UIEdgeInsetsMake(10.0f, 30.0f, 10.0f, 30.0f);
 
-    animatingCoin = [[UIImageView alloc] initWithFrame:CGRectMake(60, 95, 86, 193)];
-    animatingCoin.animationImages = images;
-    animatingCoin.animationDuration = 0.5;
-    [animatingCoin startAnimating];
+    coin = [[UIImageView alloc] initWithFrame:CGRectMake(60, 95, 90, 90)];
+    coin.image = [UIImage imageNamed:@"PsiCash_Coin"];
+    [coin.layer setMinificationFilter:kCAFilterTrilinear];
 
     // Setup plus minus indicator (indicates the direction of balance changes)
     plusMinusIndicator = [[UILabel alloc] init];
@@ -67,29 +64,29 @@
     // Setup balance label
     balance = [[UILabel alloc] init];
     balance.backgroundColor = [UIColor clearColor];
-    balance.font = [UIFont fontWithName:@"Bourbon-Oblique" size:18.f];
+    balance.font = [UIFont systemFontOfSize:12.f];
     balance.textAlignment = NSTextAlignmentCenter;
-    balance.textColor = [UIColor blackColor];
+    balance.textColor = [UIColor whiteColor];
     balance.userInteractionEnabled = NO;
 }
 
 - (void)addViews {
-    [self addSubview:animatingCoin];
+    [self addSubview:coin];
     [self addSubview:plusMinusIndicator];
     [self addSubview:balance];
 }
 
 - (void)setupLayoutConstraints {
-    CGFloat coinSize = 22.f;
-    animatingCoin.translatesAutoresizingMaskIntoConstraints = NO;
-    [animatingCoin.heightAnchor constraintEqualToConstant:coinSize].active = YES;
-    [animatingCoin.widthAnchor constraintEqualToConstant:coinSize].active = YES;
-    [animatingCoin.centerYAnchor constraintEqualToAnchor:balance.centerYAnchor].active = YES;
-    [animatingCoin.trailingAnchor constraintEqualToAnchor:balance.leadingAnchor constant:-2.5f].active = YES;
+    CGFloat coinSize = 30.f;
+    coin.translatesAutoresizingMaskIntoConstraints = NO;
+    [coin.heightAnchor constraintEqualToConstant:coinSize].active = YES;
+    [coin.widthAnchor constraintEqualToConstant:coinSize].active = YES;
+    [coin.centerYAnchor constraintEqualToAnchor:balance.centerYAnchor].active = YES;
+    [coin.leadingAnchor constraintEqualToAnchor:self.leadingAnchor constant:5.f].active = YES;
 
     plusMinusIndicator.translatesAutoresizingMaskIntoConstraints = NO;
     [plusMinusIndicator.centerYAnchor constraintEqualToAnchor:balance.centerYAnchor].active = YES;
-    [plusMinusIndicator.trailingAnchor constraintEqualToAnchor:animatingCoin.leadingAnchor constant:-2.5f].active = YES;
+    [plusMinusIndicator.trailingAnchor constraintEqualToAnchor:coin.leadingAnchor constant:-2.5f].active = YES;
 
     balance.translatesAutoresizingMaskIntoConstraints = NO;
     [balance.centerXAnchor constraintEqualToAnchor:self.centerXAnchor].active = YES;
@@ -97,7 +94,9 @@
 }
 
 #pragma mark - State Changes
-
+- (NSString*)stringFromBalance:(double)balance {
+    return [NSString stringWithFormat:@"%.2f", balance / 1e9];
+}
 - (void)bindWithModel:(PsiCashClientModel*)clientModel {
     double previousBalance = self.model.balanceInPsi;
 
@@ -105,14 +104,14 @@
 
     if ([self.model hasAuthPackage]) {
         if ([self.model.authPackage hasIndicatorToken]) {
-            balance.text = [NSString stringWithFormat:@"%.2f Psi", clientModel.balanceInNanoPsi / 1e9];
+            balance.text = [self stringFromBalance:clientModel.balanceInNanoPsi];
 
             BOOL shouldAnimate = YES;
             if (self.model.balanceInPsi > previousBalance) {
-                plusMinusIndicator.text = [@"+" stringByAppendingFormat:@"%.2f", self.model.balanceInPsi - previousBalance];
+                plusMinusIndicator.text = [@"+" stringByAppendingString:[self stringFromBalance:self.model.balanceInPsi - previousBalance]];
                 plusMinusIndicator.textColor = [UIColor greenColor];
             } else if (self.model.balanceInPsi < previousBalance) {
-                plusMinusIndicator.text = [@"" stringByAppendingFormat:@"%.2f", self.model.balanceInPsi - previousBalance];;
+                plusMinusIndicator.text = [@"" stringByAppendingString:[self stringFromBalance:self.model.balanceInPsi - previousBalance]];
                 plusMinusIndicator.textColor = [UIColor redColor];
             } else {
                 shouldAnimate = NO;
@@ -131,10 +130,11 @@
                 }];
             }
         } else {
-            assert(false); // TODO: user has no indicator token
+            // First launch: the user has no indicator token
+            balance.text = [self stringFromBalance:0];
         }
     } else {
-        balance.text = @"Updating balance...";
+        // Do nothing
     }
 }
 

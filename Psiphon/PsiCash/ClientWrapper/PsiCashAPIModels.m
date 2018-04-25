@@ -24,7 +24,7 @@
 + (PsiCashRefreshResultModel*)inProgress {
     PsiCashRefreshResultModel *instance = [[PsiCashRefreshResultModel alloc] init];
     instance.inProgress = YES;
-    instance.status = kInvalid;
+    instance.status = PsiCashStatus_Invalid;
     instance.validTokenTypes = nil;
     instance.isAccount = nil;
     instance.balance = nil;
@@ -36,7 +36,7 @@
 + (PsiCashRefreshResultModel*)successWithValidTokenTypes:(NSArray*)validTokenTypes balance:(NSNumber*)balance andPurchasePrices:(NSArray<PsiCashPurchasePrice*>*)purchasePrices {
     PsiCashRefreshResultModel *instance = [[PsiCashRefreshResultModel alloc] init];
     instance.inProgress = NO;
-    instance.status = kSuccess;
+    instance.status = PsiCashStatus_Success;
     instance.validTokenTypes = validTokenTypes;
     instance.isAccount = NO;
     instance.balance = balance;
@@ -52,7 +52,7 @@
 + (PsiCashMakePurchaseResultModel*)inProgress {
     PsiCashMakePurchaseResultModel *instance = [[PsiCashMakePurchaseResultModel alloc] init];
     instance.inProgress = YES;
-    instance.status = kInvalid;
+    instance.status = PsiCashStatus_Invalid;
     instance.price = nil;
     instance.balance = nil;
     instance.expiry = nil;
@@ -61,7 +61,7 @@
     return instance;
 }
 
-+ (PsiCashMakePurchaseResultModel*)failedWithStatus:(PsiCashRequestStatus)status
++ (PsiCashMakePurchaseResultModel*)failedWithStatus:(PsiCashStatus)status
                                       andPrice:(NSNumber*)price
                                     andBalance:(NSNumber*)balance
                                      andExpiry:(NSDate*)expiry
@@ -78,7 +78,7 @@
     return instance;
 }
 
-+ (PsiCashMakePurchaseResultModel*)successWithStatus:(PsiCashRequestStatus)status
++ (PsiCashMakePurchaseResultModel*)successWithStatus:(PsiCashStatus)status
                                        andPrice:(NSNumber*)price
                                      andBalance:(NSNumber*)balance
                                       andExpiry:(NSDate*)expiry

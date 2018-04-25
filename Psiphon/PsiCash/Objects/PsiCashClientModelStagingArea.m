@@ -18,6 +18,7 @@
  */
 
 #import "PsiCashClientModelStagingArea.h"
+#import "NSDate+Comparator.h"
 
 @interface PsiCashClientModelStagingArea ()
 
@@ -42,10 +43,6 @@
     }
     return self;
 }
-
-
-//- (void)emitNextClientModel {
-//}
 
 - (void)updateAuthPackage:(PsiCashAuthPackage*)authPackage {
     self.stagedModel.authPackage = authPackage;
@@ -78,9 +75,9 @@
     self.stagedModel.pendingPurchases = purchases;
 }
 
-- (void)updateActivePurchases:(NSArray<ExpiringPurchase*>*)activePurchases {
-    for (ExpiringPurchase *p in activePurchases) {
-        if ([p.productName isEqualToString:[PsiCashSpeedBoostProduct purchaseClass]]) {
+- (void)updateActivePurchases:(NSArray<PsiCashPurchase*>*)activePurchases {
+    for (PsiCashPurchase *p in activePurchases) {
+        if ([p.transactionClass isEqualToString:[PsiCashSpeedBoostProduct purchaseClass]] && [p.expiry after:[NSDate date]]) {
             self.stagedModel.activeSpeedBoostPurchase = p;
             return;
         }

@@ -48,10 +48,9 @@
 #import "RACSignal+Operations.h"
 #import "RACReplaySubject.h"
 #import "Asserts.h"
+#import "PsiCashClient.h"
 
 PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
-
-#import "PsiCashClient.h"
 
 @interface AppDelegate () <NotifierObserver>
 
@@ -173,7 +172,7 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
 
      rootContainerController = [[RootContainerController alloc] init];
     self.window.rootViewController = rootContainerController;
-//    self.window.rootViewController = [[PsiCashViewController alloc] init];
+
     // UIKit always waits for application:didFinishLaunchingWithOptions:
     // to return before making the window visible on the screen.
     [self.window makeKeyAndVisible];
@@ -198,16 +197,8 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
 
     [self.compoundDisposable addDisposable:disposable];
 
-    // Listen for the network extension messages.
-    [self listenForNEMessages];
-
     // Start PsiCash lifecycle
-    if ([PsiCashClient shouldExposePsiCash]) {
-        LOG_DEBUG("PsiCash Enabled");
-        [[PsiCashClient sharedInstance] refreshState];
-    } else {
-        LOG_DEBUG("PsiCash Disabled");
-    }
+    [[PsiCashClient sharedInstance] scheduleStateRefresh];
 
     return YES;
 }
@@ -271,15 +262,9 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
     LOG_DEBUG();
     // Called as part of the transition from the background to the active state; here you can undo many of the changes made on entering the background.
 
-    [self loadAdsIfNeeded];
+    [[PsiCashClient sharedInstance] scheduleStateRefresh];
 
-    // Start PsiCash lifecycle
-    if ([PsiCashClient shouldExposePsiCash]) {
-        LOG_DEBUG("PsiCash Enabled");
-        [[PsiCashClient sharedInstance] refreshState];
-    } else {
-        LOG_DEBUG("PsiCash Disabled");
-    }
+    [self loadAdsIfNeeded];
 }
 
 - (void)applicationWillTerminate:(UIApplication *)application {
@@ -412,15 +397,20 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
                       [PsiFeedbackLogger infoWithType:LandingPageLogType
                                               message:@"open landing page with VPN status %ld", (long) s];
 
+                      // (pre-1.0) hardcoded URL
+                      // TODO: (1.0) URL should be dynamic (homepage.url)
+                      // TODO: (1.0) first subscription status is UserSubscriptionUnknown
+                      UserSubscriptionStatus s = (UserSubscriptionStatus) [[self subscriptionStatus].first integerValue];
+                      NSURL *url = s == UserSubscriptionActive ? homepage.url : [PsiCashClient.sharedInstance homePageURL];
+
                       // Not officially documented by Apple, however a runtime warning is generated sometimes
                       // stating that [UIApplication openURL:options:completionHandler:] must be used from
                       // the main thread only.
-                      [[UIApplication sharedApplication] openURL:homepage.url
+                      [[UIApplication sharedApplication] openURL:url
                                                          options:@{}
                                                completionHandler:^(BOOL success) {
                                                    weakSelf.shownLandingPageForCurrentSession = success;
                                                }];
-
                   } else {
                       weakSelf.shownLandingPageForCurrentSession = FALSE;
                   }
@@ -455,10 +445,7 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
         });
 
     } else if (NotifierMarkedAuthorizations == messageId) {
-
-        NSSet<NSString *> *markedAuthIDs = [weakSelf.sharedDB getMarkedExpiredAuthorizationIDs];
-        // TODO: remove the authorizations from the library.
-
+        [[PsiCashClient sharedInstance] authorizationsMarkedExpired];
     }
 }
 

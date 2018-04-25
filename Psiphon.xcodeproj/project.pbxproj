@@ -20,7 +20,6 @@
 		44A0CAF31FE04A4500859DB3 /* RMAppReceipt.m in Sources */ = {isa = PBXBuildFile; fileRef = 44A0CAF11FE04A4500859DB3 /* RMAppReceipt.m */; };
 		44A0CAF41FE04A7400859DB3 /* AppleIncRootCertificate.cer in Resources */ = {isa = PBXBuildFile; fileRef = 44A0CAF01FE04A4500859DB3 /* AppleIncRootCertificate.cer */; };
 		4E04844820474831006C3D35 /* PsiCashPurchaseView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E04844720474831006C3D35 /* PsiCashPurchaseView.m */; };
-		4E04845620474E93006C3D35 /* PsiCashBranding.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E04845520474E93006C3D35 /* PsiCashBranding.m */; };
 		4E04845A20487208006C3D35 /* PsiCashSpeedBoostSliderView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E04845920487208006C3D35 /* PsiCashSpeedBoostSliderView.m */; };
 		4E04846B2048A0B9006C3D35 /* PsiCashBalanceView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E0484692048A0B8006C3D35 /* PsiCashBalanceView.m */; };
 		4E0774961F566B040097BC8C /* InAppSettings.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 4E0774951F566ADA0097BC8C /* InAppSettings.bundle */; };
@@ -31,7 +30,8 @@
 		4E2037A1207592A300B99A05 /* PsiCashErrorTypes.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E2037A0207592A300B99A05 /* PsiCashErrorTypes.m */; };
 		4E25A8F4203F5F2200B5A1A4 /* PsiCashSpeedBoostMeterView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E25A8F3203F5F2200B5A1A4 /* PsiCashSpeedBoostMeterView.m */; };
 		4E29DB5F20616DAC0070431F /* ExpiringPurchases.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E29DB5E20616DAC0070431F /* ExpiringPurchases.m */; };
-		4E52639F2071E3A90021FEF5 /* psicash_api.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4E52639E2071E3A90021FEF5 /* psicash_api.cpp */; };
+		4E30745E2097921B00B6D2A3 /* PsiCashLib.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4E30745D2097921B00B6D2A3 /* PsiCashLib.framework */; };
+		4E30745F2097922C00B6D2A3 /* PsiCashLib.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 4E30745D2097921B00B6D2A3 /* PsiCashLib.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		4E5263B7207290360021FEF5 /* EmbeddedServerEntriesHelpers.c in Sources */ = {isa = PBXBuildFile; fileRef = 4E5263B6207290360021FEF5 /* EmbeddedServerEntriesHelpers.c */; };
 		4E5263C4207293720021FEF5 /* PsiphonProgressView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E5263C2207293710021FEF5 /* PsiphonProgressView.m */; };
 		4E5263C7207294600021FEF5 /* EmbeddedServerEntries.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E5263BF207292920021FEF5 /* EmbeddedServerEntries.m */; };
@@ -43,16 +43,13 @@
 		4E5BD4F52061982300AD4724 /* FeedbackManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E5BD4F42061982300AD4724 /* FeedbackManager.m */; };
 		4E5E5F9320598092008D4375 /* PsiCashSpeedBoostProduct.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E5E5F9220598092008D4375 /* PsiCashSpeedBoostProduct.m */; };
 		4E5E5F9620598DC2008D4375 /* PsiCashSpeedBoostProduct+PsiCashPurchasePrice.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E5E5F9520598DC2008D4375 /* PsiCashSpeedBoostProduct+PsiCashPurchasePrice.m */; };
-		4E7B3EB32051E2F1007F752C /* PsiCash.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4E7B3EB22051E2F1007F752C /* PsiCash.mm */; };
 		4E9B2E13204F463100E63784 /* PsiCashClientModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E9B2E12204F463000E63784 /* PsiCashClientModel.m */; };
 		4EC0356F2045179800EE9573 /* PsiCashTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4EC0356E2045179800EE9573 /* PsiCashTableViewController.m */; };
 		4EC035722045191C00EE9573 /* PsiCashBalanceTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 4EC035712045191C00EE9573 /* PsiCashBalanceTableViewCell.m */; };
 		4EC0357520451EBC00EE9573 /* PsiCashSpeedBoostTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 4EC0357420451EBC00EE9573 /* PsiCashSpeedBoostTableViewCell.m */; };
-		4EEB2EFE206431FC006E80EF /* ExpiringPurchase.m in Sources */ = {isa = PBXBuildFile; fileRef = 4EEB2EFD206431FC006E80EF /* ExpiringPurchase.m */; };
 		4EEB2F0220644769006E80EF /* PsiCashAPIModels.m in Sources */ = {isa = PBXBuildFile; fileRef = 4EEB2F0120644769006E80EF /* PsiCashAPIModels.m */; };
 		4EEB2F0520644BD5006E80EF /* PsiCashClientModelStagingArea.m in Sources */ = {isa = PBXBuildFile; fileRef = 4EEB2F0420644BD5006E80EF /* PsiCashClientModelStagingArea.m */; };
-		4EFAAF2E2034CDC800EC0536 /* PsiCashClient.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4EFAAF282034CDC800EC0536 /* PsiCashClient.mm */; };
-		4EFAAF3D2034CDED00EC0536 /* psicash_client.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4EFAAF352034CDED00EC0536 /* psicash_client.cpp */; };
+		4EFAAF2E2034CDC800EC0536 /* PsiCashClient.m in Sources */ = {isa = PBXBuildFile; fileRef = 4EFAAF282034CDC800EC0536 /* PsiCashClient.m */; };
 		66094F7A1E8067520069EC4E /* PsiphonTunnel.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 66094F781E8067520069EC4E /* PsiphonTunnel.framework */; };
 		6615A5EA1F58A95500026C98 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 6615A5E81F58A95500026C98 /* Localizable.strings */; };
 		6615A5EB1F58A95B00026C98 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 6615A5E81F58A95500026C98 /* Localizable.strings */; };
@@ -159,6 +156,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
+				4E30745F2097922C00B6D2A3 /* PsiCashLib.framework in CopyFiles */,
 				CE7B76431F54881F00EA44BD /* PsiphonTunnel.framework in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -189,8 +187,6 @@
 		44E3CB6B1FCCA83200C80C82 /* Subscription.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Subscription.m; sourceTree = "<group>"; };
 		4E0484462047482A006C3D35 /* PsiCashPurchaseView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PsiCashPurchaseView.h; sourceTree = "<group>"; };
 		4E04844720474831006C3D35 /* PsiCashPurchaseView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PsiCashPurchaseView.m; sourceTree = "<group>"; };
-		4E04845420474E93006C3D35 /* PsiCashBranding.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PsiCashBranding.h; sourceTree = "<group>"; };
-		4E04845520474E93006C3D35 /* PsiCashBranding.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PsiCashBranding.m; sourceTree = "<group>"; };
 		4E04845820487208006C3D35 /* PsiCashSpeedBoostSliderView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PsiCashSpeedBoostSliderView.h; sourceTree = "<group>"; };
 		4E04845920487208006C3D35 /* PsiCashSpeedBoostSliderView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PsiCashSpeedBoostSliderView.m; sourceTree = "<group>"; };
 		4E0484692048A0B8006C3D35 /* PsiCashBalanceView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PsiCashBalanceView.m; sourceTree = "<group>"; };
@@ -207,7 +203,7 @@
 		4E25A8F3203F5F2200B5A1A4 /* PsiCashSpeedBoostMeterView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PsiCashSpeedBoostMeterView.m; sourceTree = "<group>"; };
 		4E29DB5D20616DAC0070431F /* ExpiringPurchases.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ExpiringPurchases.h; sourceTree = "<group>"; };
 		4E29DB5E20616DAC0070431F /* ExpiringPurchases.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ExpiringPurchases.m; sourceTree = "<group>"; };
-		4E52639E2071E3A90021FEF5 /* psicash_api.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = psicash_api.cpp; sourceTree = "<group>"; };
+		4E30745D2097921B00B6D2A3 /* PsiCashLib.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = PsiCashLib.framework; sourceTree = "<group>"; };
 		4E5263B120728FAB0021FEF5 /* LoadingCircleLayer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = LoadingCircleLayer.m; sourceTree = "<group>"; };
 		4E5263B5207290360021FEF5 /* EmbeddedServerEntriesHelpers.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EmbeddedServerEntriesHelpers.h; sourceTree = "<group>"; };
 		4E5263B6207290360021FEF5 /* EmbeddedServerEntriesHelpers.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = EmbeddedServerEntriesHelpers.c; sourceTree = "<group>"; };
@@ -231,8 +227,6 @@
 		4E5E5F9220598092008D4375 /* PsiCashSpeedBoostProduct.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PsiCashSpeedBoostProduct.m; sourceTree = "<group>"; };
 		4E5E5F9420598DC2008D4375 /* PsiCashSpeedBoostProduct+PsiCashPurchasePrice.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "PsiCashSpeedBoostProduct+PsiCashPurchasePrice.h"; sourceTree = "<group>"; };
 		4E5E5F9520598DC2008D4375 /* PsiCashSpeedBoostProduct+PsiCashPurchasePrice.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "PsiCashSpeedBoostProduct+PsiCashPurchasePrice.m"; sourceTree = "<group>"; };
-		4E7B3EB12051E2F1007F752C /* PsiCash.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PsiCash.h; sourceTree = "<group>"; };
-		4E7B3EB22051E2F1007F752C /* PsiCash.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = PsiCash.mm; sourceTree = "<group>"; };
 		4E7B3EB5205215A6007F752C /* PsiCashProduct.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PsiCashProduct.h; sourceTree = "<group>"; };
 		4E9B2E11204F463000E63784 /* PsiCashClientModel.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PsiCashClientModel.h; sourceTree = "<group>"; };
 		4E9B2E12204F463000E63784 /* PsiCashClientModel.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PsiCashClientModel.m; sourceTree = "<group>"; };
@@ -242,19 +236,12 @@
 		4EC035712045191C00EE9573 /* PsiCashBalanceTableViewCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PsiCashBalanceTableViewCell.m; sourceTree = "<group>"; };
 		4EC0357320451EBC00EE9573 /* PsiCashSpeedBoostTableViewCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PsiCashSpeedBoostTableViewCell.h; sourceTree = "<group>"; };
 		4EC0357420451EBC00EE9573 /* PsiCashSpeedBoostTableViewCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PsiCashSpeedBoostTableViewCell.m; sourceTree = "<group>"; };
-		4EEB2EFC206431FC006E80EF /* ExpiringPurchase.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ExpiringPurchase.h; sourceTree = "<group>"; };
-		4EEB2EFD206431FC006E80EF /* ExpiringPurchase.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ExpiringPurchase.m; sourceTree = "<group>"; };
 		4EEB2F0020644769006E80EF /* PsiCashAPIModels.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PsiCashAPIModels.h; sourceTree = "<group>"; };
 		4EEB2F0120644769006E80EF /* PsiCashAPIModels.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PsiCashAPIModels.m; sourceTree = "<group>"; };
 		4EEB2F0320644BD5006E80EF /* PsiCashClientModelStagingArea.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PsiCashClientModelStagingArea.h; sourceTree = "<group>"; };
 		4EEB2F0420644BD5006E80EF /* PsiCashClientModelStagingArea.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PsiCashClientModelStagingArea.m; sourceTree = "<group>"; };
 		4EFAAF242034CDC700EC0536 /* PsiCashClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PsiCashClient.h; path = Psiphon/PsiCash/ClientWrapper/PsiCashClient.h; sourceTree = SOURCE_ROOT; };
-		4EFAAF282034CDC800EC0536 /* PsiCashClient.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = PsiCashClient.mm; path = Psiphon/PsiCash/ClientWrapper/PsiCashClient.mm; sourceTree = SOURCE_ROOT; };
-		4EFAAF352034CDED00EC0536 /* psicash_client.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = psicash_client.cpp; path = Psiphon/PsiCash/FakeClientAPI/psicash_client.cpp; sourceTree = SOURCE_ROOT; };
-		4EFAAF362034CDED00EC0536 /* psicash_api.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = psicash_api.hpp; path = Psiphon/PsiCash/FakeClientAPI/psicash_api.hpp; sourceTree = SOURCE_ROOT; };
-		4EFAAF372034CDED00EC0536 /* psicash_client.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = psicash_client.hpp; path = Psiphon/PsiCash/FakeClientAPI/psicash_client.hpp; sourceTree = SOURCE_ROOT; };
-		4EFAAF382034CDED00EC0536 /* psicash_types.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = psicash_types.hpp; path = Psiphon/PsiCash/FakeClientAPI/psicash_types.hpp; sourceTree = SOURCE_ROOT; };
-		4EFAAF392034CDED00EC0536 /* json.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = json.hpp; path = Psiphon/PsiCash/FakeClientAPI/json.hpp; sourceTree = SOURCE_ROOT; };
+		4EFAAF282034CDC800EC0536 /* PsiCashClient.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PsiCashClient.m; path = Psiphon/PsiCash/ClientWrapper/PsiCashClient.m; sourceTree = SOURCE_ROOT; };
 		571DC9418AF936E60179F07C /* Pods-Psiphon.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Psiphon.release.xcconfig"; path = "Pods/Target Support Files/Pods-Psiphon/Pods-Psiphon.release.xcconfig"; sourceTree = "<group>"; };
 		66094F781E8067520069EC4E /* PsiphonTunnel.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = PsiphonTunnel.framework; sourceTree = "<group>"; };
 		6615A5E91F58A95500026C98 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = Strings/en.lproj/Localizable.strings; sourceTree = "<group>"; };
@@ -384,6 +371,7 @@
 			files = (
 				668AF9C01E92CBE0008CAAAA /* NetworkExtension.framework in Frameworks */,
 				440D75BE1F59E041005C603B /* StoreKit.framework in Frameworks */,
+				4E30745E2097921B00B6D2A3 /* PsiCashLib.framework in Frameworks */,
 				D672BC574F14042B4D77AB28 /* libPods-Psiphon.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -485,8 +473,8 @@
 				4E0DCB181F28481E00495781 /* PsiphonDataSharedDB.h */,
 				4E0DCB191F28481E00495781 /* PsiphonDataSharedDB.m */,
 				EF652CDB1F365B8C002AFB48 /* SharedConstants.h */,
-				9BFEC91ED4A1C511520E9948 /* Notifier.m */,
 				9BFEC3165745A5D14C8C3C08 /* Notifier.h */,
+				9BFEC91ED4A1C511520E9948 /* Notifier.m */,
 				9BFEC0419AD3808370915E01 /* PsiphonConfigUserDefaults.h */,
 				9BFEC584519C408D9D6D3FF1 /* PsiphonConfigUserDefaults.m */,
 				EFB3E62D1F66F23F004AAE8C /* Logging.h */,
@@ -521,23 +509,8 @@
 				4E5E5F9420598DC2008D4375 /* PsiCashSpeedBoostProduct+PsiCashPurchasePrice.h */,
 				4E5E5F9520598DC2008D4375 /* PsiCashSpeedBoostProduct+PsiCashPurchasePrice.m */,
 			);
-			path = Products;
-			sourceTree = "<group>";
-		};
-		4E7B3EB42051E2F5007F752C /* FakeClientAPI */ = {
-			isa = PBXGroup;
-			children = (
-				4E5E5F9020598047008D4375 /* Products */,
-				4E7B3EB12051E2F1007F752C /* PsiCash.h */,
-				4E7B3EB22051E2F1007F752C /* PsiCash.mm */,
-				4EFAAF392034CDED00EC0536 /* json.hpp */,
-				4EFAAF372034CDED00EC0536 /* psicash_client.hpp */,
-				4EFAAF352034CDED00EC0536 /* psicash_client.cpp */,
-				4EFAAF362034CDED00EC0536 /* psicash_api.hpp */,
-				4E52639E2071E3A90021FEF5 /* psicash_api.cpp */,
-				4EFAAF382034CDED00EC0536 /* psicash_types.hpp */,
-			);
-			path = FakeClientAPI;
+			name = Products;
+			path = ClientAPI/Products;
 			sourceTree = "<group>";
 		};
 		4E9B2E09204EFB7E00E63784 /* Objects */ = {
@@ -545,8 +518,6 @@
 			children = (
 				4E5263CF20732DDE0021FEF5 /* PsiCashAuthPackage.h */,
 				4E5263D020732DDE0021FEF5 /* PsiCashAuthPackage.m */,
-				4E04845420474E93006C3D35 /* PsiCashBranding.h */,
-				4E04845520474E93006C3D35 /* PsiCashBranding.m */,
 				4E9B2E11204F463000E63784 /* PsiCashClientModel.h */,
 				4E9B2E12204F463000E63784 /* PsiCashClientModel.m */,
 				4EEB2F0320644BD5006E80EF /* PsiCashClientModelStagingArea.h */,
@@ -561,7 +532,7 @@
 			isa = PBXGroup;
 			children = (
 				4EFAAF242034CDC700EC0536 /* PsiCashClient.h */,
-				4EFAAF282034CDC800EC0536 /* PsiCashClient.mm */,
+				4EFAAF282034CDC800EC0536 /* PsiCashClient.m */,
 				4EEB2F0020644769006E80EF /* PsiCashAPIModels.h */,
 				4EEB2F0120644769006E80EF /* PsiCashAPIModels.m */,
 			);
@@ -581,8 +552,6 @@
 		4EEB2EFF2064329C006E80EF /* ExpiringPurchases */ = {
 			isa = PBXGroup;
 			children = (
-				4EEB2EFC206431FC006E80EF /* ExpiringPurchase.h */,
-				4EEB2EFD206431FC006E80EF /* ExpiringPurchase.m */,
 				4E29DB5D20616DAC0070431F /* ExpiringPurchases.h */,
 				4E29DB5E20616DAC0070431F /* ExpiringPurchases.m */,
 			);
@@ -593,7 +562,7 @@
 			isa = PBXGroup;
 			children = (
 				4E9B2E0A204EFB9400E63784 /* ClientWrapper */,
-				4E7B3EB42051E2F5007F752C /* FakeClientAPI */,
+				4E5E5F9020598047008D4375 /* Products */,
 				4E9B2E09204EFB7E00E63784 /* Objects */,
 				4E9B2E0B204EFBA700E63784 /* ViewControllers */,
 				4E04845320474C17006C3D35 /* Views */,
@@ -623,6 +592,7 @@
 		CE26FC811BBDC7B700B83375 = {
 			isa = PBXGroup;
 			children = (
+				4E30745D2097921B00B6D2A3 /* PsiCashLib.framework */,
 				66094F781E8067520069EC4E /* PsiphonTunnel.framework */,
 				4E0DCB101F28458100495781 /* Shared */,
 				CE26FC8C1BBDC7B800B83375 /* Psiphon */,
@@ -1175,7 +1145,6 @@
 				F132D7E01F5739A800AF7F91 /* LaunchScreenViewController.m in Sources */,
 				19CB75081F54ADB300F78219 /* MPGoogleAdMobInterstitialCustomEvent.m in Sources */,
 				4EEB2F0220644769006E80EF /* PsiCashAPIModels.m in Sources */,
-				4EFAAF3D2034CDED00EC0536 /* psicash_client.cpp in Sources */,
 				197DABEB1F54BEED00DD5C3B /* VungleInterstitialCustomEvent.m in Sources */,
 				197DABF51F54C15400DD5C3B /* VungleInstanceMediationSettings.m in Sources */,
 				4E04846B2048A0B9006C3D35 /* PsiCashBalanceView.m in Sources */,
@@ -1194,14 +1163,11 @@
 				44A0CAF31FE04A4500859DB3 /* RMAppReceipt.m in Sources */,
 				EFC2F5CB202267B1007B52F9 /* PsiphonConfigFiles.m in Sources */,
 				EF90D7A7204F22C900228A63 /* NSDate+PSIDateExtension.m in Sources */,
-				4E7B3EB32051E2F1007F752C /* PsiCash.mm in Sources */,
 				4E04845A20487208006C3D35 /* PsiCashSpeedBoostSliderView.m in Sources */,
 				4EC0357520451EBC00EE9573 /* PsiCashSpeedBoostTableViewCell.m in Sources */,
 				197DABF11F54C0CA00DD5C3B /* MPInstanceProvider+Vungle.m in Sources */,
 				4EC0356F2045179800EE9573 /* PsiCashTableViewController.m in Sources */,
-				4EFAAF2E2034CDC800EC0536 /* PsiCashClient.mm in Sources */,
-				4E04845620474E93006C3D35 /* PsiCashBranding.m in Sources */,
-				4EEB2EFE206431FC006E80EF /* ExpiringPurchase.m in Sources */,
+				4EFAAF2E2034CDC800EC0536 /* PsiCashClient.m in Sources */,
 				4EC035722045191C00EE9573 /* PsiCashBalanceTableViewCell.m in Sources */,
 				4E9B2E13204F463100E63784 /* PsiCashClientModel.m in Sources */,
 				EF652CD61F35224C002AFB48 /* AppDelegate.m in Sources */,
@@ -1215,7 +1181,6 @@
 				4E5263C8207294660021FEF5 /* LoadingCircleLayer.m in Sources */,
 				9BFECFEB3BC9F10542C1A416 /* PsiphonConfigUserDefaults.m in Sources */,
 				4E5263CD2072984D0021FEF5 /* IAPViewController.m in Sources */,
-				4E52639F2071E3A90021FEF5 /* psicash_api.cpp in Sources */,
 				4E25A8F4203F5F2200B5A1A4 /* PsiCashSpeedBoostMeterView.m in Sources */,
 				197DABEE1F54C09E00DD5C3B /* MPVungleRouter.m in Sources */,
 				19CB75071F54ADB300F78219 /* MPGoogleAdMobBannerCustomEvent.m in Sources */,
@@ -1497,6 +1462,10 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = "";
 				ENABLE_BITCODE = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Psiphon/PsiCash/FakeClientAPI",
+				);
 				INFOPLIST_FILE = Psiphon/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
@@ -1520,6 +1489,10 @@
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				DEVELOPMENT_TEAM = "";
 				ENABLE_BITCODE = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Psiphon/PsiCash/FakeClientAPI",
+				);
 				INFOPLIST_FILE = Psiphon/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
