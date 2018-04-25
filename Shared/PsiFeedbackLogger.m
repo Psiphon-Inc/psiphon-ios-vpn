@@ -182,7 +182,7 @@ NSString * const ErrorNoticeType = @"ContainerError";
 
 + (void)warnWithType:(PsiFeedbackLogType)sourceType message:(NSString *)message object:(NSError *)error {
 
-    NSDictionary *data = [PsiFeedbackLogger dataWithSource:sourceType message:message error:error];
+    NSDictionary *data = [PsiFeedbackLogger generateDictionaryWithSource:sourceType message:message error:error];
     [[PsiFeedbackLogger sharedInstance] writeData:data noticeType:WarnNoticeType];
 
 #if DEBUG
@@ -218,7 +218,7 @@ NSString * const ErrorNoticeType = @"ContainerError";
 
 + (void)errorWithType:(PsiFeedbackLogType)sourceType message:(NSString *)message object:(NSError *)error {
 
-    NSDictionary *data = [PsiFeedbackLogger dataWithSource:sourceType message:message error:error];
+    NSDictionary *data = [PsiFeedbackLogger generateDictionaryWithSource:sourceType message:message error:error];
     [[PsiFeedbackLogger sharedInstance] writeData:data noticeType:ErrorNoticeType];
 
 #if DEBUG
@@ -397,12 +397,45 @@ NSString * const ErrorNoticeType = @"ContainerError";
 
 #pragma mark - Log generating methods
 
-+ (NSDictionary *)dataWithSource:(NSString *)sourceType message:(NSString *)message error:(NSError *)error {
+// Unpacks a NSError object to a dictionary representation fit for logging.
++ (NSDictionary *_Nonnull)unpackError:(NSError *_Nullable)error {
+
+    if (!error) {
+        return @{@"error": @"nilError"};
+    }
+
+    NSMutableDictionary *errorDic = [NSMutableDictionary dictionary];
+    errorDic[@"domain"] = error.domain;
+    errorDic[@"code"] = @(error.code);
+
+    if (error.userInfo) {
+        if (error.userInfo[NSLocalizedDescriptionKey]) {
+            errorDic[@"description"] = error.userInfo[NSLocalizedDescriptionKey];
+        }
+        if (error.userInfo[NSUnderlyingErrorKey]) {
+            errorDic[@"underlyingError"] = [PsiFeedbackLogger unpackError:error.userInfo[NSUnderlyingErrorKey]];
+        }
+    }
+
+    return errorDic;
+}
+
+// Generates a dictionary fit for logging with the provided fields.
++ (NSDictionary *_Nonnull)generateDictionaryWithSource:(NSString *_Nullable)sourceType
+                                               message:(NSString *_Nullable)message
+                                                 error:(NSError *_Nullable)error {
+
+    if (!sourceType) {
+        sourceType = @"nilSourceType";
+    }
+
+    if (!message) {
+        message = @"nilMessage";
+    }
 
     return @{sourceType : @{@"message" : message,
-      @"NSError" : @{@"domain" : error.domain,
-        @"code"   : @(error.code),
-        @"description" : error.localizedDescription}}};
+                            @"NSError" : [PsiFeedbackLogger unpackError:error]}};
+
 }
 
 @end
