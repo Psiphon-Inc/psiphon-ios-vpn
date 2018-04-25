@@ -30,6 +30,6 @@
 @property (weak, nonatomic) id<PsiCashPurchaseAlertViewDelegate> controllerDelegate;
 + (PsiCashPurchaseAlertView*)purchaseAlert;
 + (PsiCashPurchaseAlertView*)pendingPurchaseAlert;
-+ (PsiCashPurchaseAlertView*)alreadySpeedBoostingAlert;
++ (PsiCashPurchaseAlertView*)alreadySpeedBoostingAlertWithNMinutesRemaining:(int)minsRemaining;
 @end
 

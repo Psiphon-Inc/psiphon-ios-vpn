@@ -38,7 +38,7 @@
         }
 
         for (NSString *tokenType in validTokenTypes) {
-            // TODO: check for duplicates
+            // TODO: (1.0) check for duplicates
             if ([tokenType isEqualToString:@"earner"]) {
                 self.hasEarnerToken = YES;
             } else if ([tokenType isEqualToString:@"indicator"]) {

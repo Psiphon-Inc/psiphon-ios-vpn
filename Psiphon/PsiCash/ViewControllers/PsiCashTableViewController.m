@@ -177,7 +177,7 @@
     }
 
     if ([self.model hasActiveSpeedBoostPurchase]) {
-        alertView = [PsiCashPurchaseAlertView alreadySpeedBoostingAlert];
+        alertView = [PsiCashPurchaseAlertView alreadySpeedBoostingAlertWithNMinutesRemaining:[self.model minutesOfSpeedBoostRemaining]];
     } else  if ([self.model hasPendingPurchase]) {
         alertView = [PsiCashPurchaseAlertView pendingPurchaseAlert];
     } else {

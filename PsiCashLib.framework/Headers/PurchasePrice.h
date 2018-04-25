@@ -17,9 +17,22 @@
  *
  */
 
-#import <UIKit/UIKit.h>
-#import "PsiCashClientModel.h"
+//
+//  PurchasePrice.h
+//  PsiCashLib
+//
 
-@interface PsiCashBalanceView : UIButton <PsiCashClientModelReceiver>
+#ifndef PurchasePrice_h
+#define PurchasePrice_h
+
+#import <Foundation/Foundation.h>
+
+
+@interface PsiCashPurchasePrice : NSObject <NSCoding>
+@property NSString*_Nonnull transactionClass;
+@property NSString*_Nonnull distinguisher;
+@property NSNumber*_Nonnull price;
 @end
 
+
+#endif /* PurchasePrice_h */

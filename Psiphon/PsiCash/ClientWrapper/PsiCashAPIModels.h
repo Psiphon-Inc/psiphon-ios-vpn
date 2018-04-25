@@ -18,7 +18,8 @@
  */
 
 #import <Foundation/Foundation.h>
-#import "PsiCash.h"
+#import <PsiCashLib/PsiCash.h>
+#import <PsiCashLib/PurchasePrice.h>
 
 #pragma mark - RefreshResultModel
 
@@ -26,7 +27,7 @@
 
 @property (nonatomic, readwrite, assign) BOOL inProgress;
 
-@property (nonatomic, readwrite) PsiCashRequestStatus status;
+@property (nonatomic, readwrite) PsiCashStatus status;
 
 @property (nonatomic, readwrite) NSArray *validTokenTypes;
 
@@ -50,7 +51,7 @@
 
 @property (nonatomic, readwrite, assign) BOOL inProgress;
 
-@property (nonatomic, readwrite) PsiCashRequestStatus status;
+@property (nonatomic, readwrite) PsiCashStatus status;
 
 @property (nonatomic, readwrite) NSNumber *price;
 
@@ -64,13 +65,13 @@
 @property (nonatomic, readwrite) NSError *error;
 
 + (PsiCashMakePurchaseResultModel*)inProgress;
-+ (PsiCashMakePurchaseResultModel*)failedWithStatus:(PsiCashRequestStatus)status
++ (PsiCashMakePurchaseResultModel*)failedWithStatus:(PsiCashStatus)status
                                       andPrice:(NSNumber*)price
                                     andBalance:(NSNumber*)balance
                                      andExpiry:(NSDate*)expiry
                               andAuthorization:(NSString*)authorization
                                       andError:(NSError*)error;
-+ (PsiCashMakePurchaseResultModel*)successWithStatus:(PsiCashRequestStatus)status
++ (PsiCashMakePurchaseResultModel*)successWithStatus:(PsiCashStatus)status
                                        andPrice:(NSNumber*)price
                                      andBalance:(NSNumber*)balance
                                       andExpiry:(NSDate*)expiry

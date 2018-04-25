@@ -17,9 +17,13 @@
  *
  */
 
-#import <UIKit/UIKit.h>
-#import "PsiCashClientModel.h"
+#import <Foundation/Foundation.h>
+#import <PsiCashLib/Purchase.h>
+#import "ReactiveObjC.h"
 
-@interface PsiCashBalanceView : UIButton <PsiCashClientModelReceiver>
+@interface ExpiringPurchases : NSObject
+@property (strong, nonatomic, readonly) RACReplaySubject<PsiCashPurchase*>* expiredPurchaseStream;
+- (void)addExpiringPurchase:(PsiCashPurchase*)purchase;
+- (void)addExpiringPurchases:(NSArray<PsiCashPurchase*>*)purchases;
+- (NSArray<PsiCashPurchase*>*)removeExpiredPurchases;
 @end
-

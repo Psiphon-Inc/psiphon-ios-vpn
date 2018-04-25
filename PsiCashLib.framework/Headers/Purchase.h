@@ -17,9 +17,28 @@
  *
  */
 
-#import <UIKit/UIKit.h>
-#import "PsiCashClientModel.h"
+//
+//  Purchase.h
+//  PsiCashLib
+//
 
-@interface PsiCashBalanceView : UIButton <PsiCashClientModelReceiver>
+#ifndef Purchase_h
+#define Purchase_h
+
+
+@interface PsiCashPurchase : NSObject <NSCoding>
+@property (nonnull) NSString* ID;
+@property (nonnull) NSString* transactionClass;
+@property (nonnull) NSString* distinguisher;
+@property (nullable) NSDate* expiry;
+@property (nullable) NSString* authorization;
+
+- (id)initWithID:(NSString*_Nonnull)ID
+transactionClass:(NSString*_Nonnull)transactionClass
+   distinguisher:(NSString*_Nonnull)distinguisher
+          expiry:(NSDate*_Nullable)expiry
+   authorization:(NSString*_Nullable)authorization;
 @end
 
+
+#endif /* Purchase_h */
