@@ -18,10 +18,12 @@
  */
 
 #import <Foundation/Foundation.h>
+
 #if !(TARGET_IS_EXTENSION)
 #import "PsiphonData.h"
 #endif
 
+@class Authorization;
 
 @interface Homepage : NSObject
 
@@ -62,5 +64,21 @@
 // Server timestamp
 - (void)updateServerTimestamp:(NSString*)timestamp;
 - (NSString*)getServerTimestamp;
+
+#pragma mark - Encoded Authorizations
+
+#if !(TARGET_IS_EXTENSION)
+- (void)setContainerAuthorizations:(NSSet<Authorization *> *_Nullable)authorizations;
+#endif
+
+- (NSSet<Authorization *> *_Nonnull)getContainerAuthorizations;
+- (NSSet<Authorization *> *_Nonnull)getNonMarkedAuthorizations;
+
+#if TARGET_IS_EXTENSION
+- (void)markExpiredAuthorizationIDs:(NSSet<NSString *> *_Nullable)authorizations;
+- (void)appendExpiredAuthorizationIDs:(NSSet<NSString *> *_Nullable)authsToAppend;
+#endif
+
+- (NSSet<NSString *> *_Nonnull)getMarkedExpiredAuthorizationIDs;
 
 @end

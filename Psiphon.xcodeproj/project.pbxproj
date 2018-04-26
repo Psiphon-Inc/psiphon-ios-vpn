@@ -79,8 +79,6 @@
 		CE4E9BC21BBEECFC0060FF8B /* PsiphonVPN.entitlements in Resources */ = {isa = PBXBuildFile; fileRef = CE4E9BC11BBEECFC0060FF8B /* PsiphonVPN.entitlements */; };
 		CE7B76431F54881F00EA44BD /* PsiphonTunnel.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 66094F781E8067520069EC4E /* PsiphonTunnel.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		D672BC574F14042B4D77AB28 /* libPods-Psiphon.a in Frameworks */ = {isa = PBXBuildFile; fileRef = CB8BB19F016330264C4DCB80 /* libPods-Psiphon.a */; };
-		EF245C04208F8EBD00766343 /* AuthorizationsDatabase.m in Sources */ = {isa = PBXBuildFile; fileRef = EF245C02208F8EBD00766343 /* AuthorizationsDatabase.m */; };
-		EF245C05208F8EBD00766343 /* AuthorizationsDatabase.m in Sources */ = {isa = PBXBuildFile; fileRef = EF245C02208F8EBD00766343 /* AuthorizationsDatabase.m */; };
 		EF4F1F3D206055F7006A40A1 /* RACSignal+Operations2.m in Sources */ = {isa = PBXBuildFile; fileRef = EF90D79F204F22C900228A63 /* RACSignal+Operations2.m */; };
 		EF639C2F1F8FCE37009D6B42 /* PsiFeedbackLogger.m in Sources */ = {isa = PBXBuildFile; fileRef = EF639C2E1F8FCE2A009D6B42 /* PsiFeedbackLogger.m */; };
 		EF639C301F8FCE37009D6B42 /* PsiFeedbackLogger.m in Sources */ = {isa = PBXBuildFile; fileRef = EF639C2E1F8FCE2A009D6B42 /* PsiFeedbackLogger.m */; };
@@ -322,8 +320,6 @@
 		CE4E9BC11BBEECFC0060FF8B /* PsiphonVPN.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = PsiphonVPN.entitlements; sourceTree = "<group>"; };
 		DD100E19194B9A79F5D7DF55 /* Pods-PsiphonVPN.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PsiphonVPN.debug.xcconfig"; path = "Pods/Target Support Files/Pods-PsiphonVPN/Pods-PsiphonVPN.debug.xcconfig"; sourceTree = "<group>"; };
 		EDB109A2FBFB32D821FF121D /* Pods-Psiphon.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Psiphon.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Psiphon/Pods-Psiphon.debug.xcconfig"; sourceTree = "<group>"; };
-		EF245C02208F8EBD00766343 /* AuthorizationsDatabase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AuthorizationsDatabase.m; sourceTree = "<group>"; };
-		EF245C03208F8EBD00766343 /* AuthorizationsDatabase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AuthorizationsDatabase.h; sourceTree = "<group>"; };
 		EF639C2D1F8FCE2A009D6B42 /* PsiFeedbackLogger.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PsiFeedbackLogger.h; sourceTree = "<group>"; };
 		EF639C2E1F8FCE2A009D6B42 /* PsiFeedbackLogger.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PsiFeedbackLogger.m; sourceTree = "<group>"; };
 		EF652CD01F352212002AFB48 /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
@@ -501,8 +497,6 @@
 				9BFECC9B2B9F2BFBD4F8A47B /* UserDefaults.h */,
 				9BFEC31B61584FD2EAAF5DE6 /* Authorization.m */,
 				9BFEC673CE5EA236279F07BD /* Authorization.h */,
-				EF245C03208F8EBD00766343 /* AuthorizationsDatabase.h */,
-				EF245C02208F8EBD00766343 /* AuthorizationsDatabase.m */,
 				9BFEC4D609BFCD0DC812BDB3 /* Asserts.h */,
 			);
 			path = Shared;
@@ -1231,7 +1225,6 @@
 				EF90D7A8204F22C900228A63 /* DispatchUtils.m in Sources */,
 				9BFECC5AE8636FBEF73D85D3 /* AdManager.m in Sources */,
 				EF90D7A2204F22C900228A63 /* timestamp_compare.c in Sources */,
-				EF245C04208F8EBD00766343 /* AuthorizationsDatabase.m in Sources */,
 				9BFECB6BF077F45D491093F1 /* Authorization.m in Sources */,
 				EF90D7A3204F22C900228A63 /* timestamp_tm.c in Sources */,
 				9BFEC530849525066327C815 /* VPNManager.m in Sources */,
@@ -1253,7 +1246,6 @@
 				EF90D7B1204F231E00228A63 /* timestamp_tm.c in Sources */,
 				EF90D7B3204F232300228A63 /* timestamp_parse.c in Sources */,
 				EF90D7B8204F236400228A63 /* NSError+Convenience.m in Sources */,
-				EF245C05208F8EBD00766343 /* AuthorizationsDatabase.m in Sources */,
 				EF90D7B5204F234700228A63 /* NSDate+PSIDateExtension.m in Sources */,
 				44A0CAEE1FCCCDEC00859DB3 /* Subscription.m in Sources */,
 				EF652CDA1F352271002AFB48 /* PacketTunnelProvider.m in Sources */,

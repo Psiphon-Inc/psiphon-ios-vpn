@@ -35,7 +35,6 @@
 #import "Logging.h"
 #import "Subscription.h"
 #import "PacketTunnelUtils.h"
-#import "AuthorizationsDatabase.h"
 #import "NSError+Convenience.h"
 #import "RACSignal+Operations.h"
 #import "RACDisposable.h"
@@ -102,6 +101,10 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 @property (nonatomic) GracePeriodState gracePeriodState;
 
 @property (nonatomic) PsiphonTunnel *psiphonTunnel;
+
+// Authorization IDs supplied to tunnel-core from the container.
+// NOTE: Does not include subscription authorization ID.
+@property (atomic) NSSet<NSString *> *suppliedContainerAuthorizationIDs;
 
 @end
 
@@ -639,10 +642,20 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
         // Container received a new subscription transaction.
         [PsiFeedbackLogger infoWithType:ExtensionNotificationLogType message:@"force subscription check"];
         [self scheduleSubscriptionCheckWithRemoteCheckForced:TRUE];
+
+    } else if (NotifierUpdatedAuthorizations == messageId) {
+
+        // Restarts the tunnel only if the persisted authorizations have changed from the
+        // last set of authorizations supplied to tunnel-core.
+        NSSet<NSString *> *nonMarkedAuths = [Authorization authorizationIDsFrom:[sharedDB getNonMarkedAuthorizations]];
+
+        if (![nonMarkedAuths isEqualToSet:self.suppliedContainerAuthorizationIDs]) {
+            [self reconnectWithNewConfig];
+        }
+
     }
 
 }
-
 
 #pragma mark -
 
@@ -911,18 +924,27 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 
     mutableConfigCopy[@"ClientVersion"] = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleVersion"];
 
+    // Authorizations to add to Psiphon config.
+    NSMutableArray<NSString *> *encodedAuths = [NSMutableArray array];
 
-    NSMutableArray *authorizations = [NSMutableArray array];
+    {
+        // Add subscription authorization
+        Subscription *subscription = [Subscription fromPersistedDefaults];
+        if (subscription.authorization) {
+            [PsiFeedbackLogger infoWithType:PacketTunnelProviderLogType message:@"config add subscription authorization ID:%@", subscription.authorization.ID];
+            [encodedAuths addObject:subscription.authorization.base64Representation];
+        }
 
-    // Add subscription authorization
-    Subscription *subscription = [Subscription fromPersistedDefaults];
-    if (subscription.authorization) {
-        [PsiFeedbackLogger infoWithType:PacketTunnelProviderLogType message:@"config add subscription authorization ID:%@", subscription.authorization.ID];
-        [authorizations addObject:subscription.authorization.base64Representation];
-    }
+        // Adds authorizations persisted by the container (minus the authorizations already marked as expired).
+        NSSet<Authorization *> *_Nonnull nonMarkedAuths = [sharedDB getNonMarkedAuthorizations];
+        [encodedAuths addObjectsFromArray:[Authorization encodeAuthorizations:nonMarkedAuths]];
 
-    if ([authorizations count] > 0) {
-        mutableConfigCopy[@"Authorizations"] = [authorizations copy];
+        self.suppliedContainerAuthorizationIDs = [Authorization authorizationIDsFrom:nonMarkedAuths];
+
+        // Adds authorizations to psiphon config.
+        if ([encodedAuths count] > 0) {
+            mutableConfigCopy[@"Authorizations"] = [encodedAuths copy];
+        }
     }
 
     // SponsorId override
@@ -974,9 +996,26 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
             [strongSelf->subscriptionAuthorizationActiveSubject sendNext:@(SubscriptionAuthorizationStatusRejected)];
 
         } else {
-
             // Send value SubscriptionAuthorizationStatusActiveOrEmpty if subscription authorization was not invalid (i.e. authorization is non-existent or valid)
             [strongSelf->subscriptionAuthorizationActiveSubject sendNext:@(SubscriptionAuthorizationStatusActiveOrEmpty)];
+        }
+
+        // Marks container authorizations found to be invalid, and sends notification to the container.
+        if ([self.suppliedContainerAuthorizationIDs count] > 0) {
+
+            // Subtracts provided active authorizations from the the set of authorizations supplied in Psiphon config,
+            // to get the set of inactive authorizations.
+            NSMutableSet<NSString *> *inactiveAuthIDs = [NSMutableSet setWithSet:self.suppliedContainerAuthorizationIDs];
+            [inactiveAuthIDs minusSet:[NSSet setWithArray:authorizationIds]];
+
+            // Append inactive authorizations.
+            [sharedDB appendExpiredAuthorizationIDs:inactiveAuthIDs];
+
+            [[Notifier sharedInstance] post:NotifierMarkedAuthorizations
+                          completionHandler:^(BOOL success) {
+                              // Do nothing.
+                          }];
+
         }
 
         if ([strongSelf.subscriptionCheckState isSubscribedOrInProgress]) {
@@ -1004,19 +1043,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
         // Check if user has an active subscription in the device's time
         // If NO - do nothing
         // If YES - proceed with checking the subscription against server timestamp
-        AuthorizationsDatabase *authorizations = [AuthorizationsDatabase fromPersistedDefaults];
         Subscription *subscription = [Subscription fromPersistedDefaults];
-        if ([authorizations hasActiveAuthorizationForDate:[NSDate date]]) {
-            // The following code adapted from
-            // https://developer.apple.com/library/content/documentation/Cocoa/Conceptual/DataFormatting/Articles/dfDateFormatting10_4.html
-            if (serverTimestamp != nil) {
-                if (![authorizations hasActiveAuthorizationForDate:serverTimestamp]) {
-                    // User is possibly cheating, terminate extension due to 'Bad Clock'.
-                    [self killExtensionForBadClock];
-                }
-            }
-        }
-
         if ([subscription hasActiveAuthorizationForDate:[NSDate date]]) {
             if (serverTimestamp != nil) {
                 if (![subscription hasActiveAuthorizationForDate:serverTimestamp]) {

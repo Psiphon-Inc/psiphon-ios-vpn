@@ -32,15 +32,33 @@
 
 @implementation Authorization
 
-+ (NSArray<Authorization *> *_Nonnull)createFromEncodedAuthorizations:(NSArray<NSString *> *)encodedAuthorizations {
-    NSMutableArray<Authorization *> *authorizations = [NSMutableArray array];
-    for (NSString *encodedAuth in encodedAuthorizations) {
-        Authorization *authorization = [[Authorization alloc] initWithEncodedAuthorization:encodedAuth];
-        if (authorization) {
-            [authorizations addObject:authorization];
++ (NSSet<Authorization *> *_Nonnull)createFromEncodedAuthorizations:(NSArray<NSString *> *_Nullable)encodedAuthorizations {
+    NSMutableSet<Authorization *> *authsSet = [NSMutableSet set];
+
+    [encodedAuthorizations enumerateObjectsUsingBlock:^(NSString *obj, NSUInteger idx, BOOL *stop) {
+        Authorization *_Nullable auth = [[Authorization alloc] initWithEncodedAuthorization:obj];
+        if (auth) {
+            [authsSet addObject:auth];
         }
-    }
-    return authorizations;
+    }];
+
+    return authsSet;
+}
+
++ (NSArray<NSString *> *_Nonnull)encodeAuthorizations:(NSSet<Authorization *> *_Nullable)auths {
+    NSMutableArray<NSString *> *encodedAuths = [NSMutableArray array];
+    [auths enumerateObjectsUsingBlock:^(Authorization *obj, BOOL *stop) {
+        [encodedAuths addObject:obj.base64Representation];
+    }];
+    return encodedAuths;
+}
+
++ (NSSet<NSString *> *_Nonnull)authorizationIDsFrom:(NSSet<Authorization *> *_Nullable)authorizations {
+    NSMutableSet<NSString *> *ids = [NSMutableSet set];
+    [authorizations enumerateObjectsUsingBlock:^(Authorization *obj, BOOL *stop) {
+        [ids addObject:obj.ID];
+    }];
+    return ids;
 }
 
 - (instancetype _Nullable)initWithEncodedAuthorization:(NSString *)encodedAuthorization {
@@ -94,5 +112,24 @@
     return self;
 }
 
-@end
+- (BOOL)isEqual:(id)object {
+    // Checks for trivial equality.
+    if (self == object) {
+        return TRUE;
+    }
 
+    // Ignores objects that are not of type Authorization.
+    if (![(NSObject *)object isKindOfClass:[Authorization class]]) {
+        return FALSE;
+    }
+
+    // Authorization IDs are guaranteed to be unique.
+    return [self.ID isEqualToString:((Authorization *)object).ID];
+}
+
+- (NSUInteger)hash {
+    // Authorization ID is itself unique.
+    return [self.ID hash];
+}
+
+@end
