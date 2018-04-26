@@ -29,10 +29,14 @@ typedef NS_ENUM(NSInteger, NotifierMessageId) {
     NotifierTunnelConnected = 101,
     NotifierAvailableEgressRegions = 102,
 
+    NotifierMarkedAuthorizations = 110,
+
     // Messages sent by the container.
     NotifierStartVPN = 200,
     NotifierForceSubscriptionCheck = 201,
     NotifierAppEnteredBackground = 202,
+
+    NotifierUpdatedAuthorizations = 210,
 
 };
 
@@ -52,10 +56,22 @@ typedef NS_ENUM(NSInteger, NotifierMessageId) {
  * If called from the container, posts the message to the network extension.
  * If called from the extension, posts the message to the container.
  *
+ * @param messageId NotifierMessageId of the message.
  * @param completionHandler Called after the message is sent, with the success parameter set.
  *                          Errors are logged.
  */
 - (void)post:(NotifierMessageId)messageId completionHandler:(void (^)(BOOL success))completion;
+
+/**
+ * If called from the container, posts the message to the network extension.
+ * If called from the extension, posts the message to the container.
+ *
+ * @param messageId NotifierMessageId of the message.
+ * @param data Data to send.
+ * @param completionHandler Called after the message is sent, with the success parameter set.
+ *                          Errors are logged.
+ */
+- (void)post:(NotifierMessageId)messageId withData:(NSData *_Nullable)data completionHandler:(void (^)(BOOL success))completion;
 
 /**
  * Adds an observer to the Notifier.

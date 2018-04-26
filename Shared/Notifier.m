@@ -152,10 +152,20 @@ CFDataRef messageCallback(CFMessagePortRef local, SInt32 messageId, CFDataRef da
     }
 }
 
-- (void)post:(NotifierMessageId)messageId completionHandler:(void (^_Nonnull)(BOOL success))completion {
+- (void)post:(NotifierMessageId)messageId completionHandler:(void (^)(BOOL success))completion {
+    [self post:messageId withData:nil completionHandler:completion];
+}
 
-    // NotifierMessageId cannot be 0.
-    PSIAssert(messageId != 0);
+- (void)post:(NotifierMessageId)messageId withData:(NSData *_Nullable)data completionHandler:(void (^_Nonnull)(BOOL success))completion {
+
+    // Sanity check.
+#if TARGET_IS_EXTENSION
+    PSIAssert(messageId >= 100 && messageId < 200);
+#else
+    PSIAssert(messageId >= 200 && messageId < 300);
+#endif
+
+    CFDataRef copy = (__bridge CFDataRef) [data copy];
 
     dispatch_async(sendQueue, ^{
 
@@ -167,8 +177,7 @@ CFDataRef messageCallback(CFMessagePortRef local, SInt32 messageId, CFDataRef da
             return;
         }
 
-        SInt32 error = CFMessagePortSendRequest(remotePort, (SInt32)messageId, NULL,
-          SEND_TIMEOUT, RCV_TIMEOUT, NULL, &ignored);
+        SInt32 error = CFMessagePortSendRequest(remotePort, (SInt32)messageId, copy, SEND_TIMEOUT, RCV_TIMEOUT, NULL, &ignored);
 
         completion(error == kCFMessagePortSuccess);
 

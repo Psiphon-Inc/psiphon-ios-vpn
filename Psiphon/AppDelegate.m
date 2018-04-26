@@ -446,14 +446,20 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
             [weakSelf.vpnManager startVPN];
         }
 
-    } if (NotifierAvailableEgressRegions == messageId) {
+    } else if (NotifierAvailableEgressRegions == messageId) {
         LOG_DEBUG(@"Received notification NE.onAvailableEgressRegions");
         // Update available regions
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
             NSArray<NSString *> *regions = [weakSelf.sharedDB getAllEgressRegions];
             [[RegionAdapter sharedInstance] onAvailableEgressRegions:regions];
         });
-    };
+
+    } else if (NotifierMarkedAuthorizations == messageId) {
+
+        NSSet<NSString *> *markedAuthIDs = [weakSelf.sharedDB getMarkedExpiredAuthorizationIDs];
+        // TODO: remove the authorizations from the library.
+
+    }
 }
 
 #pragma mark - Subscription

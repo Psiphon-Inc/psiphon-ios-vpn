@@ -21,6 +21,8 @@
 #import "Logging.h"
 #import "PsiFeedbackLogger.h"
 #import "NSDate+PSIDateExtension.h"
+#import "UserDefaults.h"
+#import "Authorization.h"
 
 // File operations parameters
 #define MAX_RETRIES 3
@@ -30,6 +32,8 @@
 #define EGRESS_REGIONS_KEY @"egress_regions"
 #define APP_FOREGROUND_KEY @"app_foreground"
 #define SERVER_TIMESTAMP_KEY @"server_timestamp"
+#define kAuthorizationsContainerKey @"authorizations_container_key"
+#define kMarkedAuthorizationIDsExtensionKey @"marked_authorization_ids_extension_key"
 
 #if !(TARGET_IS_EXTENSION)
 #define EMBEDDED_EGRESS_REGIONS_KEY @"embedded_server_entries_egress_regions"
@@ -440,6 +444,68 @@
  */
 - (NSString*)getServerTimestamp {
 	return [sharedDefaults stringForKey:SERVER_TIMESTAMP_KEY];
+}
+
+#pragma mark - Authorizations
+
+#if !TARGET_IS_EXTENSION
+
+- (void)setContainerAuthorizations:(NSSet<Authorization *> *_Nullable)authorizations {
+    // Persists Base64 representation of the Authorizations.
+    [sharedDefaults setObject:[Authorization encodeAuthorizations:authorizations]
+                       forKey:kAuthorizationsContainerKey];
+    [sharedDefaults synchronize];
+}
+
+#endif
+
+- (NSSet<Authorization *> *_Nonnull)getContainerAuthorizations {
+    NSArray<NSString *> *_Nullable encodedAuths = [sharedDefaults stringArrayForKey:kAuthorizationsContainerKey];
+    return [Authorization createFromEncodedAuthorizations:encodedAuths];
+}
+
+- (NSSet<Authorization *> *_Nonnull)getNonMarkedAuthorizations {
+    // Adds authorizations persisted by the container (minus the authorizations already marked as expired).
+    NSMutableSet<Authorization *> *auths = [NSMutableSet set];
+    NSSet<NSString *> *markedAuthIDs = [self getMarkedExpiredAuthorizationIDs];
+
+    [[self getContainerAuthorizations] enumerateObjectsUsingBlock:^(Authorization *obj, BOOL *stop) {
+        if (![markedAuthIDs containsObject:obj.ID]) {
+            [auths addObject:obj];
+        }
+    }];
+
+    return auths;
+}
+
+#if TARGET_IS_EXTENSION
+
+- (void)markExpiredAuthorizationIDs:(NSSet<NSString *> *_Nullable)authorizationIDs {
+    [sharedDefaults setObject:[authorizationIDs allObjects]
+                       forKey:kMarkedAuthorizationIDsExtensionKey];
+    [sharedDefaults synchronize];
+}
+
+- (void)appendExpiredAuthorizationIDs:(NSSet<NSString *> *_Nullable)idsToAppend {
+    // Combines previous marked authorizations with the authorization IDs to append.
+    NSSet<NSString *> *newMarkedAuthIDs = [[self getMarkedExpiredAuthorizationIDs] setByAddingObjectsFromSet:idsToAppend];
+
+    // Don't mark authorization IDs not seen in authorizations persisted by the container.
+    NSMutableSet<NSString *> *markedAuthIDs = [NSMutableSet set];  // Marked IDs to persist.
+    NSSet<NSString *> *containerAuthIDs =[Authorization authorizationIDsFrom:[self getContainerAuthorizations]];
+    [newMarkedAuthIDs enumerateObjectsUsingBlock:^(NSString *authID, BOOL *stop) {
+        if ([containerAuthIDs containsObject:authID]) {
+            [markedAuthIDs addObject:authID];
+        }
+    }];
+
+    [self markExpiredAuthorizationIDs:markedAuthIDs];
+}
+
+#endif
+
+- (NSSet<NSString *> *_Nonnull)getMarkedExpiredAuthorizationIDs {
+    return [NSMutableSet setWithArray:[sharedDefaults stringArrayForKey:kMarkedAuthorizationIDsExtensionKey]];
 }
 
 @end
