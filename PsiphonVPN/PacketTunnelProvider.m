@@ -323,6 +323,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
                                   return [RACSignal error:retryCountTuple.first];
                               }
                               // Exponential backoff.
+                              [PsiFeedbackLogger errorWithType:SubscriptionCheckLogType message:@"retry authorization request" object:retryCountTuple.first];
                               return [RACSignal timer:pow(4, [retryCountTuple.second integerValue])];
                           }];
                     }]

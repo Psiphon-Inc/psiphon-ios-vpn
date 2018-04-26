@@ -102,7 +102,7 @@ PsiFeedbackLogType const SubscriptionVerifierServiceLogType = @"SubscriptionVeri
 
     NSURLSessionDataTask *postDataTask = [urlSession dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
 
-        [PsiFeedbackLogger infoWithType:SubscriptionVerifierServiceLogType message:@"received response"];
+        [PsiFeedbackLogger infoWithType:SubscriptionVerifierServiceLogType message:@"load request completed"];
 
         // Session is no longer needed, invalidates and cancels outstanding tasks.
         [urlSession invalidateAndCancel];
@@ -134,7 +134,7 @@ PsiFeedbackLogType const SubscriptionVerifierServiceLogType = @"SubscriptionVeri
         NSDictionary *dict = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&jsonError];
 
         if (jsonError) {
-            NSDictionary *errorDict = @{NSLocalizedDescriptionKey: @"JSON parse failure", NSUnderlyingErrorKey: error};
+            NSDictionary *errorDict = @{NSLocalizedDescriptionKey:@"JSON parse failure", NSUnderlyingErrorKey:jsonError};
             NSError *err = [[NSError alloc] initWithDomain:ReceiptValidationErrorDomain code:PsiphonReceiptValidationErrorJSONParseFailed userInfo:errorDict];
             receiptUploadCompletionHandler(nil, appReceiptFileSize, err);
             return;
