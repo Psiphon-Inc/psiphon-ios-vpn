@@ -102,7 +102,7 @@ PsiFeedbackLogType const SubscriptionVerifierServiceLogType = @"SubscriptionVeri
 
     NSURLSessionDataTask *postDataTask = [urlSession dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
 
-        [PsiFeedbackLogger infoWithType:SubscriptionVerifierServiceLogType message:@"received response"];
+        [PsiFeedbackLogger infoWithType:SubscriptionVerifierServiceLogType message:@"load request completed"];
 
         // Session is no longer needed, invalidates and cancels outstanding tasks.
         [urlSession invalidateAndCancel];
