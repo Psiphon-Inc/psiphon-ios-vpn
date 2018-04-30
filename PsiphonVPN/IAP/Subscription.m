@@ -37,7 +37,7 @@ PsiFeedbackLogType const SubscriptionVerifierServiceLogType = @"SubscriptionVeri
     NSURLSession *urlSession;
 }
 
-+ (RACSignal<NSDictionary *> *)updateAuthorizationFromRemote {
++ (RACSignal<RACTwoTuple<NSDictionary *, NSNumber *> *> *)updateAuthorizationFromRemote {
     return [RACSignal createSignal:^RACDisposable *(id <RACSubscriber> subscriber) {
 
         // This object holds a reference to the current scheduler, in order to schedule
