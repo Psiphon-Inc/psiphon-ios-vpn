@@ -399,8 +399,7 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
                   NEVPNStatus s = weakSelf.vpnManager.tunnelProviderStatus;
                   if (NEVPNStatusConnected == s) {
 
-                      [PsiFeedbackLogger infoWithType:LandingPageLogType
-                                              message:@"open landing page with VPN status %ld", (long) s];
+                      [PsiFeedbackLogger infoWithType:LandingPageLogType message:@"open landing page"];
 
                       // Not officially documented by Apple, however a runtime warning is generated sometimes
                       // stating that [UIApplication openURL:options:completionHandler:] must be used from
@@ -410,8 +409,10 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
                                                completionHandler:^(BOOL success) {
                                                    weakSelf.shownLandingPageForCurrentSession = success;
                                                }];
-
                   } else {
+
+                      [PsiFeedbackLogger warnWithType:LandingPageLogType
+                                              message:@"fail open with connection status %@", [VPNManager statusTextSystem:s]];
                       weakSelf.shownLandingPageForCurrentSession = FALSE;
                   }
 
