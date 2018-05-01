@@ -32,14 +32,3 @@
 // Network Extension boolean query responses
 #define EXTENSION_RESP_TRUE @"true"
 #define EXTENSION_RESP_FALSE @"false"
-
-// Notifier keys
-// Prefix determines the source of the notification.
-// Notifications that start with "NE." are sent from the network extension.
-#define NOTIFIER_START_VPN @"VPNManager.startVPN"
-#define NOTIFIER_FORCE_SUBSCRIPTION_CHECK @"VPNManager.forceSubscriptionCheck"
-#define NOTIFIER_APP_DID_ENTER_BACKGROUND @"AppDelegate.applicationDidEnterBackground"
-
-#define NOTIFIER_NEW_HOMEPAGES @"NE.newHomepages"
-#define NOTIFIER_TUNNEL_CONNECTED @"NE.tunnelConnected"
-#define NOTIFIER_ON_AVAILABLE_EGRESS_REGIONS @"NE.onAvailableEgressRegions"

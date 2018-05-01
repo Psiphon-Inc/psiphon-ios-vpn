@@ -21,6 +21,7 @@ target 'Psiphon' do
   pod 'VungleSDK-iOS', '5.3.0'
   pod 'PureLayout', '3.0.2'
   pod 'MBProgressHUD', '~> 1.1.0'
+  pod 'CustomIOSAlertView', '~> 0.9.5'
 end
 
 target 'PsiphonVPN' do
