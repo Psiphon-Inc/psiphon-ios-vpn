@@ -30,7 +30,6 @@
 #import "PsiphonClientCommonLibraryHelpers.h"
 #import "PsiphonConfigFiles.h"
 #import "PsiphonDataSharedDB.h"
-#import "RegionAdapter.h"
 #import "RootContainerController.h"
 #import "SharedConstants.h"
 #import "UIAlertController+Delegate.h"
@@ -428,7 +427,7 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
         LOG_DEBUG(@"Received notification NE.onAvailableEgressRegions");
         // Update available regions
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-            NSArray<NSString *> *regions = [weakSelf.sharedDB getAllEgressRegions];
+            NSArray<NSString *> *regions = [weakSelf.sharedDB emittedEgressRegions];
             [[RegionAdapter sharedInstance] onAvailableEgressRegions:regions];
         });
     }];
