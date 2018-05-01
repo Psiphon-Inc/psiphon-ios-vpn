@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, Psiphon Inc.
+ * Copyright (c) 2018, Psiphon Inc.
  * All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,13 +17,15 @@
  *
  */
 
-#import <UIKit/UIKit.h>
-#import "PsiCashPurchaseAlertView.h"
-#import "RegionAdapter.h"
-#import "SettingsViewController.h"
+#import <Foundation/Foundation.h>
 
-@interface MainViewController : UIViewController <PsiphonSettingsViewControllerDelegate, RegionAdapterDelegate, PsiCashPurchaseAlertViewDelegate>
+/**
+ * Utility class for safe checking of null or empty objects.
+ */
+@interface Nullity : NSObject
 
-@property (nonatomic) BOOL openSettingImmediatelyOnViewDidAppear;
++ (BOOL)isNil:(id _Nullable)obj;
+
++ (BOOL)isEmpty:(NSString *_Nullable)str;
 
 @end

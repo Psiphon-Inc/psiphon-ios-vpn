@@ -20,6 +20,8 @@
 #import "PsiFeedbackLogger.h"
 #import "SharedConstants.h"
 #import "NSDate+PSIDateExtension.h"
+#import "Nullity.h"
+#import "Asserts.h"
 
 #if DEBUG
 #define MAX_NOTICE_FILE_SIZE_BYTES 164000
@@ -55,6 +57,9 @@ NSString * const InfoNoticeType = @"ContainerInfo";
 NSString * const WarnNoticeType = @"ContainerWarn";
 NSString * const ErrorNoticeType = @"ContainerError";
 #endif
+
+
+PsiFeedbackLogType const FeedbackInternalLogType = @"FeedbackLoggerInternal";
 
 /**
  * All the methods in this class are non-blocking and thread-safe.
@@ -182,7 +187,7 @@ NSString * const ErrorNoticeType = @"ContainerError";
 
 + (void)warnWithType:(PsiFeedbackLogType)sourceType message:(NSString *)message object:(NSError *)error {
 
-    NSDictionary *data = [PsiFeedbackLogger dataWithSource:sourceType message:message error:error];
+    NSDictionary *data = [PsiFeedbackLogger generateDictionaryWithSource:sourceType message:message error:error];
     [[PsiFeedbackLogger sharedInstance] writeData:data noticeType:WarnNoticeType];
 
 #if DEBUG
@@ -218,7 +223,7 @@ NSString * const ErrorNoticeType = @"ContainerError";
 
 + (void)errorWithType:(PsiFeedbackLogType)sourceType message:(NSString *)message object:(NSError *)error {
 
-    NSDictionary *data = [PsiFeedbackLogger dataWithSource:sourceType message:message error:error];
+    NSDictionary *data = [PsiFeedbackLogger generateDictionaryWithSource:sourceType message:message error:error];
     [[PsiFeedbackLogger sharedInstance] writeData:data noticeType:ErrorNoticeType];
 
 #if DEBUG
@@ -274,17 +279,29 @@ NSString * const ErrorNoticeType = @"ContainerError";
     [self writeData:@{@"message": message} noticeType:noticeType timestamp:timestamp];
 }
 
-- (void)writeData:(NSDictionary<NSString *, NSString *> *)data noticeType:(NSString *)noticeType {
+- (void)writeData:(NSDictionary *)data noticeType:(NSString *)noticeType {
     [self writeData:data
          noticeType:noticeType
           timestamp:[NSDate nowRFC3339Milli]];
 }
 
-- (void)writeData:(NSDictionary<NSString *, NSString *> *)data noticeType:(NSString *)noticeType timestamp:(NSString *)timestamp {
+- (void)writeData:(NSDictionary *_Nullable)data
+       noticeType:(NSString *_Nonnull)noticeType
+        timestamp:(NSString *_Nonnull)timestamp {
 
-    if (!data) {
-        LOG_ERROR_NO_NOTICE(@"output notice nil data");
-        data = @{@"data" : @"nil data"};
+    if ([Nullity isNil:data]) {
+        data = @{@"data" : @"nilData"};
+        PSIAssert(FALSE);
+    }
+
+    if ([Nullity isEmpty:noticeType]) {
+        noticeType = @"emptyNoticeType";
+        PSIAssert(FALSE);
+    }
+
+    if ([Nullity isEmpty:timestamp]) {
+        timestamp = [NSDate nowRFC3339Milli];
+        PSIAssert(FALSE);
     }
 
     NSError *err;
@@ -294,9 +311,19 @@ NSString * const ErrorNoticeType = @"ContainerError";
     NSDictionary *outputDic = @{
       @"data": data,
       @"noticeType": noticeType,
-      @"showUser": @NO,
+      @"showUser": [NSNumber numberWithBool:NO],
       @"timestamp": timestamp
     };
+
+    if (![NSJSONSerialization isValidJSONObject:outputDic]) {
+        [PsiFeedbackLogger errorWithType:FeedbackInternalLogType message:@"invalid log dictionary"];
+
+#if DEBUG
+        abort();
+#endif
+
+        return;
+    }
 
     // The resulting output will be UTF-8 encoded.
     NSData *output = [NSJSONSerialization dataWithJSONObject:outputDic options:kNilOptions error:&err];
@@ -397,12 +424,45 @@ NSString * const ErrorNoticeType = @"ContainerError";
 
 #pragma mark - Log generating methods
 
-+ (NSDictionary *)dataWithSource:(NSString *)sourceType message:(NSString *)message error:(NSError *)error {
+// Unpacks a NSError object to a dictionary representation fit for logging.
++ (NSDictionary *_Nonnull)unpackError:(NSError *_Nullable)error {
+
+    if ([Nullity isNil:error]) {
+        return @{@"error": @"nilError"};
+    }
+
+    NSMutableDictionary *errorDic = [NSMutableDictionary dictionary];
+    errorDic[@"domain"] = error.domain;
+    errorDic[@"code"] = @(error.code);
+
+    if (error.userInfo) {
+        if (![Nullity isEmpty:error.userInfo[NSLocalizedDescriptionKey]]) {
+            errorDic[@"description"] = error.userInfo[NSLocalizedDescriptionKey];
+        }
+        if (![Nullity isNil:error.userInfo[NSUnderlyingErrorKey]]) {
+            errorDic[@"underlyingError"] = [PsiFeedbackLogger unpackError:error.userInfo[NSUnderlyingErrorKey]];
+        }
+    }
+
+    return errorDic;
+}
+
+// Generates a dictionary fit for logging with the provided fields.
++ (NSDictionary *_Nonnull)generateDictionaryWithSource:(NSString *_Nullable)sourceType
+                                               message:(NSString *_Nullable)message
+                                                 error:(NSError *_Nullable)error {
+
+    if ([Nullity isEmpty:sourceType]) {
+        sourceType = @"nilSourceType";
+    }
+
+    if ([Nullity isEmpty:message]) {
+        message = @"nilMessage";
+    }
 
     return @{sourceType : @{@"message" : message,
-      @"NSError" : @{@"domain" : error.domain,
-        @"code"   : @(error.code),
-        @"description" : error.localizedDescription}}};
+                            @"NSError" : [PsiFeedbackLogger unpackError:error]}};
+
 }
 
 @end

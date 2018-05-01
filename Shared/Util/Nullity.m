@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, Psiphon Inc.
+ * Copyright (c) 2018, Psiphon Inc.
  * All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,13 +17,17 @@
  *
  */
 
-#import <UIKit/UIKit.h>
-#import "PsiCashPurchaseAlertView.h"
-#import "RegionAdapter.h"
-#import "SettingsViewController.h"
+#import "Nullity.h"
 
-@interface MainViewController : UIViewController <PsiphonSettingsViewControllerDelegate, RegionAdapterDelegate, PsiCashPurchaseAlertViewDelegate>
 
-@property (nonatomic) BOOL openSettingImmediatelyOnViewDidAppear;
+@implementation Nullity
+
++ (BOOL)isNil:(id)obj {
+    return (obj == nil) || (obj == (id)NSNull.null);
+}
+
++ (BOOL)isEmpty:(NSString *)str {
+    return ([Nullity isNil:str]) || (![str isKindOfClass:[NSString class]]) || ([str length] == 0);
+}
 
 @end
