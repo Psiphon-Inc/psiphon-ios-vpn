@@ -285,7 +285,7 @@
  * regions in embedded server entries.
  * @return NSArray of region codes.
  */
-- (NSArray<NSString *> *)getAllEgressRegions {
+- (NSArray<NSString *> *)embeddedAndEmittedEgressRegions {
     NSMutableOrderedSet *egressRegions = [[NSMutableOrderedSet alloc] init];
 
     id sharedDBEgressRegions = [sharedDefaults objectForKey:EGRESS_REGIONS_KEY];
@@ -326,9 +326,17 @@
 /*!
  * @return NSArray of region codes.
  */
-- (NSArray<NSString *> *)getAllEmbeddedEgressRegions {
+- (NSArray<NSString *> *)embeddedEgressRegions {
     return [[NSUserDefaults standardUserDefaults] objectForKey:EMBEDDED_EGRESS_REGIONS_KEY];
 }
+
+/*!
+ * @return NSArray of region codes.
+ */
+- (NSArray<NSString *> *)emittedEgressRegions {
+    return [sharedDefaults objectForKey:EGRESS_REGIONS_KEY];
+}
+
 #endif
 
 #pragma mark - Logging
