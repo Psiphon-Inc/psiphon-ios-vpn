@@ -34,7 +34,6 @@
 #import "PsiphonConfigUserDefaults.h"
 #import "PsiphonDataSharedDB.h"
 #import "PulsingHaloLayer.h"
-#import "RegionAdapter.h"
 #import "RegionSelectionViewController.h"
 #import "SharedConstants.h"
 #import "NEBridge.h"
@@ -138,6 +137,8 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
         
         // Open Setting after change it
         self.openSettingImmediatelyOnViewDidAppear = NO;
+
+        [RegionAdapter sharedInstance].delegate = self;
     }
     return self;
 }
@@ -999,7 +1000,12 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 
 - (void)updateAvailableRegions {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        NSArray<NSString *> *regions = [sharedDB getAllEgressRegions];
+        NSArray<NSString *> *regions = [sharedDB emittedEgressRegions];
+
+        if (regions == nil) {
+            regions = [sharedDB embeddedEgressRegions];
+        }
+
 #if DEBUG
         if ([AppDelegate isRunningUITest]) {
             // fake the availability of all regions in the UI for automated screenshots
@@ -1169,6 +1175,21 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     topSpacing.active = YES;
     [speedBoostMeter.widthAnchor constraintEqualToConstant:300.f].active = YES;
     [speedBoostMeter.heightAnchor constraintEqualToConstant:50].active = YES;
+}
+
+#pragma mark - RegionAdapterDelegate protocol implementation
+
+- (void)selectedRegionDisappearedThenSwitchedToBestPerformance {
+    dispatch_async_main(^{
+        // Alert the user that the VPN failed to start, and that they should try again.
+        [UIAlertController presentSimpleAlertWithTitle:NSLocalizedStringWithDefaultValue(@"VPN_START_FAIL_REGION_INVALID_TITLE", nil, [NSBundle mainBundle], @"Server Region Unavailable", @"Alert dialog title indicating to the user that Psiphon was unable to start because they selected an egress region that is no longer available")
+                                               message:NSLocalizedStringWithDefaultValue(@"VPN_START_FAIL_REGION_INVALID_MESSAGE", nil, [NSBundle mainBundle], @"The region you selected is no longer available. You must choose a new region or change to the default \"Best performance\" choice.", @"Alert dialog message informing the user that an error occurred while starting Psiphon because they selected an egress region that is no longer available (Do not translate 'Psiphon'). The user should select a different region and try again. Note: the backslash before each quotation mark should be left as is for formatting.")
+                                        preferredStyle:UIAlertControllerStyleAlert
+                                             okHandler:nil];
+        [self updateRegionButton];
+    });
+    [self persistSelectedRegion];
+    [self.vpnManager stopVPN];
 }
 
 @end

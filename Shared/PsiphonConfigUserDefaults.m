@@ -56,15 +56,6 @@
 }
 
 - (NSDictionary *)dictionaryRepresentation {
-    NSArray *disableTimeoutsKeys = @[@"TunnelConnectTimeoutSeconds",
-                                     @"TunnelPortForwardDialTimeoutSeconds",
-                                     @"TunnelSshKeepAliveProbeTimeoutSeconds",
-                                     @"TunnelSshKeepAlivePeriodicTimeoutSeconds",
-                                     @"FetchRemoteServerListTimeoutSeconds",
-                                     @"PsiphonApiServerTimeoutSeconds",
-                                     @"FetchRoutesTimeoutSeconds",
-                                     @"HttpProxyOriginServerTimeoutSeconds"];
-
     NSMutableDictionary *userConfigs = [[NSMutableDictionary alloc] init];
 
     NSString *egressRegion = [userDefaults stringForKey:PSIPHON_CONFIG_EGRESS_REGION];
@@ -73,9 +64,7 @@
     }
 
     if ([userDefaults boolForKey:kDisableTimeouts]) {
-        for (NSString *key in disableTimeoutsKeys) {
-            [userConfigs setObject:@(0) forKey:key];
-        }
+        [userConfigs setObject:@(3.0) forKey:@"NetworkLatencyMultiplier"];
     }
 
     NSString *upstreamProxyUrl = [userDefaults stringForKey:PSIPHON_CONFIG_UPSTREAM_PROXY_URL];
