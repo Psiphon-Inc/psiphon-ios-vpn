@@ -44,9 +44,10 @@
 
 - (BOOL)insertNewEgressRegions:(NSArray<NSString *> *)regions;
 #if !(TARGET_IS_EXTENSION)
-- (NSArray<NSString *> *)getAllEgressRegions;
+- (NSArray<NSString *> *)embeddedAndEmittedEgressRegions;
 - (void)insertNewEmbeddedEgressRegions:(NSArray<NSString *> *)regions;
-- (NSArray<NSString *> *)getAllEmbeddedEgressRegions;
+- (NSArray<NSString *> *)embeddedEgressRegions;
+- (NSArray<NSString *> *)emittedEgressRegions;
 #endif
 
 - (NSString *)homepageNoticesPath;

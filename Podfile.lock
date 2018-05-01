@@ -26,7 +26,7 @@ DEPENDENCIES:
   - MBProgressHUD (~> 1.1.0)
   - mopub-ios-sdk (= 4.18.0)
   - OpenSSL (= 1.0.210)
-  - PsiphonClientCommonLibrary (from `https://github.com/Psiphon-Inc/psiphon-ios-client-common-library.git`, commit `454fa77`)
+  - PsiphonClientCommonLibrary (from `https://github.com/Psiphon-Inc/psiphon-ios-client-common-library.git`, commit `d543828`)
   - PureLayout (= 3.0.2)
   - ReactiveObjC (from `https://github.com/Psiphon-Inc/ReactiveObjC.git`, commit `b2ac770`)
   - VungleSDK-iOS (= 5.3.0)
@@ -36,7 +36,7 @@ EXTERNAL SOURCES:
     :commit: 598c498
     :git: https://github.com/Psiphon-Inc/InAppSettingsKit.git
   PsiphonClientCommonLibrary:
-    :commit: 454fa77
+    :commit: d543828
     :git: https://github.com/Psiphon-Inc/psiphon-ios-client-common-library.git
   ReactiveObjC:
     :commit: b2ac770
@@ -47,7 +47,7 @@ CHECKOUT OPTIONS:
     :commit: 598c498
     :git: https://github.com/Psiphon-Inc/InAppSettingsKit.git
   PsiphonClientCommonLibrary:
-    :commit: 454fa77
+    :commit: d543828
     :git: https://github.com/Psiphon-Inc/psiphon-ios-client-common-library.git
   ReactiveObjC:
     :commit: b2ac770
@@ -64,6 +64,6 @@ SPEC CHECKSUMS:
   ReactiveObjC: 2a38ea15335de4119d8b17caf1db1484f61db902
   VungleSDK-iOS: af3aa92d0f4a923505a9416646ffef5250592150
 
-PODFILE CHECKSUM: 16cd18e0e03a96c43528cf00c9bd44f4b2158a20
+PODFILE CHECKSUM: 807d91fd3fd6b9d97b00567d831ae30d5f4de02d
 
 COCOAPODS: 1.4.0
