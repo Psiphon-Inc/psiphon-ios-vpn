@@ -30,7 +30,6 @@
 		4E2037A1207592A300B99A05 /* PsiCashErrorTypes.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E2037A0207592A300B99A05 /* PsiCashErrorTypes.m */; };
 		4E25A8F4203F5F2200B5A1A4 /* PsiCashSpeedBoostMeterView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E25A8F3203F5F2200B5A1A4 /* PsiCashSpeedBoostMeterView.m */; };
 		4E29DB5F20616DAC0070431F /* ExpiringPurchases.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E29DB5E20616DAC0070431F /* ExpiringPurchases.m */; };
-		4E30745E2097921B00B6D2A3 /* PsiCashLib.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4E30745D2097921B00B6D2A3 /* PsiCashLib.framework */; };
 		4E30745F2097922C00B6D2A3 /* PsiCashLib.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 4E30745D2097921B00B6D2A3 /* PsiCashLib.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		4E5263B7207290360021FEF5 /* EmbeddedServerEntriesHelpers.c in Sources */ = {isa = PBXBuildFile; fileRef = 4E5263B6207290360021FEF5 /* EmbeddedServerEntriesHelpers.c */; };
 		4E5263C4207293720021FEF5 /* PsiphonProgressView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E5263C2207293710021FEF5 /* PsiphonProgressView.m */; };
@@ -57,7 +56,6 @@
 		668AF9C01E92CBE0008CAAAA /* NetworkExtension.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 668AF9BE1E92CBD3008CAAAA /* NetworkExtension.framework */; };
 		963708A91F65D4810038894E /* Bourbon-Oblique.otf in Resources */ = {isa = PBXBuildFile; fileRef = 963708A81F65D4810038894E /* Bourbon-Oblique.otf */; };
 		9BFEC10661A7DC0402AF4B37 /* AsyncOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC6DEB0BE772BE801A9E6 /* AsyncOperation.m */; };
-		9BFEC20939C9436B34A525B1 /* AuthorizationsDatabase.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC6BB4BF098D016B7F28C /* AuthorizationsDatabase.m */; };
 		9BFEC2458D1346F537E9089E /* Nullity.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFECCCF429898FD903B69A6 /* Nullity.m */; };
 		9BFEC4F02A47FF8265635803 /* Notifier.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC91ED4A1C511520E9948 /* Notifier.m */; };
 		9BFEC530849525066327C815 /* VPNManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFECBACAAF0FC84C7EA783E /* VPNManager.m */; };
@@ -376,7 +374,6 @@
 			files = (
 				668AF9C01E92CBE0008CAAAA /* NetworkExtension.framework in Frameworks */,
 				440D75BE1F59E041005C603B /* StoreKit.framework in Frameworks */,
-				4E30745E2097921B00B6D2A3 /* PsiCashLib.framework in Frameworks */,
 				D672BC574F14042B4D77AB28 /* libPods-Psiphon.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1471,10 +1468,7 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = "";
 				ENABLE_BITCODE = NO;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PROJECT_DIR)/Psiphon/PsiCash/FakeClientAPI",
-				);
+				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = Psiphon/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
@@ -1498,10 +1492,7 @@
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				DEVELOPMENT_TEAM = "";
 				ENABLE_BITCODE = NO;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PROJECT_DIR)/Psiphon/PsiCash/FakeClientAPI",
-				);
+				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = Psiphon/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
