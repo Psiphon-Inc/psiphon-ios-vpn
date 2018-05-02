@@ -89,8 +89,8 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     NSLayoutConstraint *startButtonScreenWidth;
     NSLayoutConstraint *startButtonScreenHeight;
     NSLayoutConstraint *startButtonWidth;
-    NSLayoutConstraint *bottomBarTop;
-    NSLayoutConstraint *subscriptionButtonTop;
+    NSLayoutConstraint *bottomBarTopConstraint;
+    NSLayoutConstraint *subscriptionButtonTopConstraint;
     
     // UI Layer
     CAGradientLayer *backgroundGradient;
@@ -252,46 +252,42 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     
     [self.compoundDisposable addDisposable:vpnStartStatusDisposable];
 
+
     // Subscribes to AppDelegate subscription signal.
-    __block RACDisposable *userSubscriptionDisposable = [[AppDelegate sharedAppDelegate].subscriptionStatus
+    __block RACDisposable *disposable = [[AppDelegate sharedAppDelegate].subscriptionStatus
       subscribeNext:^(NSNumber *value) {
           UserSubscriptionStatus s = (UserSubscriptionStatus) [value integerValue];
-
-          if (s == UserSubscriptionActive) {
-              subscriptionButton.hidden = YES;
-              adLabel.hidden = YES;
-              subscriptionButtonTop.active = NO;
-              bottomBarTop.active = YES;
-              // Hide PsiCash
-              appTitleLabel.hidden = NO;
-              appSubTitleLabel.hidden = NO;
-              speedBoostMeter.hidden = YES;
-              balanceView.hidden = YES;
-          } else {
-              subscriptionButton.hidden = NO;
-              adLabel.hidden = ![self.adManager untunneledInterstitialIsReady];
-              bottomBarTop.active = NO;
-              subscriptionButtonTop.active = YES;
-              // Show PsiCash
-              appTitleLabel.hidden = YES;
-              appSubTitleLabel.hidden = YES;
-              speedBoostMeter.hidden = NO;
-              balanceView.hidden = NO;
+          
+          if (s == UserSubscriptionUnknown) {
+              return;
           }
+
+          BOOL showPsiCashUI = (s == UserSubscriptionInactive);
+
+          subscriptionButton.hidden = (s == UserSubscriptionActive);
+          adLabel.hidden = (s == UserSubscriptionActive) || ![self.adManager untunneledInterstitialIsReady];
+          subscriptionButtonTopConstraint.active = !subscriptionButton.hidden;
+          bottomBarTopConstraint.active = subscriptionButton.hidden;
+
+          // PsiCash
+          appTitleLabel.hidden = showPsiCashUI;
+          appSubTitleLabel.hidden = showPsiCashUI;
+          speedBoostMeter.hidden = !showPsiCashUI;
+          balanceView.hidden = !showPsiCashUI;
+
       } error:^(NSError *error) {
-          [weakSelf.compoundDisposable removeDisposable:userSubscriptionDisposable];
+          [self.compoundDisposable removeDisposable:disposable];
       } completed:^{
-          [weakSelf.compoundDisposable removeDisposable:userSubscriptionDisposable];
+          [self.compoundDisposable removeDisposable:disposable];
       }];
 
-    [self.compoundDisposable addDisposable:userSubscriptionDisposable];
+    [self.compoundDisposable addDisposable:disposable];
 
     // Observer AdManager notifications
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(onAdStatusDidChange)
                                                  name:AdManagerAdsDidLoadNotification
                                                object:self.adManager];
-
 }
 
 - (void)viewDidAppear:(BOOL)animated {
@@ -1083,8 +1079,8 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     [topSpacerGuide.bottomAnchor constraintEqualToAnchor:startStopButton.topAnchor].active = YES;
     [bottomSpacerGuide.topAnchor constraintEqualToAnchor:statusLabel.bottomAnchor].active = YES;
     
-    bottomBarTop = [bottomSpacerGuide.bottomAnchor constraintEqualToAnchor:bottomBar.topAnchor];
-    subscriptionButtonTop = [bottomSpacerGuide.bottomAnchor constraintEqualToAnchor:subscriptionButton.topAnchor];
+    bottomBarTopConstraint = [bottomSpacerGuide.bottomAnchor constraintEqualToAnchor:bottomBar.topAnchor];
+    subscriptionButtonTopConstraint = [bottomSpacerGuide.bottomAnchor constraintEqualToAnchor:subscriptionButton.topAnchor];
 }
 
 #pragma mark - Subscription
