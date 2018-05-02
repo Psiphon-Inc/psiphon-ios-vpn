@@ -26,7 +26,7 @@
  */
 typedef NS_ENUM(NSInteger, UserSubscriptionStatus) {
     /** @const UserSubscriptionUnknown User's subscription status is not known yet (pending). */
-    UserSubscriptionUnknown,
+    UserSubscriptionUnknown = 1,
     /** @const UserSubscriptionInActive User does not have an active subscription. */
     UserSubscriptionInactive,
     /** @const UserSubscriptionActive User has an active subscription. */
@@ -53,7 +53,6 @@ typedef NS_ENUM(NSInteger, UserSubscriptionStatus) {
 
 /* Ads */
 - (UIViewController *)getAdsPresentingViewController;
-- (void)launchScreenFinished;
 
 /**
  * Reloads the MainViewController.
