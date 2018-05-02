@@ -79,7 +79,7 @@
     [instantBuyButton.heightAnchor constraintEqualToConstant:instantBuyButtonSize].active = YES;
     [instantBuyButton.widthAnchor constraintEqualToConstant:instantBuyButtonSize].active = YES;
     [instantBuyButton.centerYAnchor constraintEqualToAnchor:self.centerYAnchor].active = YES;
-    [instantBuyButton.leadingAnchor constraintEqualToAnchor:self.leadingAnchor constant:14.f].active = YES;
+    [instantBuyButton.leadingAnchor constraintEqualToAnchor:self.leadingAnchor constant:16.f].active = YES;
     instantBuyButton.contentMode = UIViewContentModeScaleAspectFit;
 
     title.translatesAutoresizingMaskIntoConstraints = NO;
@@ -142,7 +142,7 @@
     gradient.mask = progressBar;
 
     CGFloat progressBarWidth;
-    CGFloat progressBarRadius = kCornerRadius;
+    CGFloat progressBarRadius = progress == 0 ? kCornerRadius : 0;
     progressBarWidth = 2 * progressBarRadius + (self.frame.size.width - 2 * progressBarRadius) * progress;
     gradient.colors = @[(id)[UIColor colorWithRed:0.11 green:0.27 blue:0.69 alpha:1.0].CGColor, (id)[UIColor colorWithRed:0.19 green:0.93 blue:0.88 alpha:1.0].CGColor]; // green gradient
     progressBar.path = [UIBezierPath bezierPathWithRoundedRect:CGRectMake(0, 0, progressBarWidth, self.frame.size.height) cornerRadius:progressBarRadius].CGPath;
