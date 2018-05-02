@@ -18,10 +18,12 @@
  */
 
 #import <Foundation/Foundation.h>
+
 #if !(TARGET_IS_EXTENSION)
 #import "PsiphonData.h"
 #endif
 
+@class Authorization;
 
 @interface Homepage : NSObject
 
@@ -44,9 +46,10 @@
 
 - (BOOL)insertNewEgressRegions:(NSArray<NSString *> *)regions;
 #if !(TARGET_IS_EXTENSION)
-- (NSArray<NSString *> *)getAllEgressRegions;
+- (NSArray<NSString *> *)embeddedAndEmittedEgressRegions;
 - (void)insertNewEmbeddedEgressRegions:(NSArray<NSString *> *)regions;
-- (NSArray<NSString *> *)getAllEmbeddedEgressRegions;
+- (NSArray<NSString *> *)embeddedEgressRegions;
+- (NSArray<NSString *> *)emittedEgressRegions;
 #endif
 
 - (NSString *)homepageNoticesPath;
@@ -69,5 +72,21 @@
 #endif
 
 - (NSNumber *)getContainerEmptyReceiptFileSize;
+
+#pragma mark - Encoded Authorizations
+
+#if !(TARGET_IS_EXTENSION)
+- (void)setContainerAuthorizations:(NSSet<Authorization *> *_Nullable)authorizations;
+#endif
+
+- (NSSet<Authorization *> *_Nonnull)getContainerAuthorizations;
+- (NSSet<Authorization *> *_Nonnull)getNonMarkedAuthorizations;
+
+#if TARGET_IS_EXTENSION
+- (void)markExpiredAuthorizationIDs:(NSSet<NSString *> *_Nullable)authorizations;
+- (void)appendExpiredAuthorizationIDs:(NSSet<NSString *> *_Nullable)authsToAppend;
+#endif
+
+- (NSSet<NSString *> *_Nonnull)getMarkedExpiredAuthorizationIDs;
 
 @end

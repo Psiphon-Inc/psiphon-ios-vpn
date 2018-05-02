@@ -61,8 +61,6 @@ PsiFeedbackLogType const VPNManagerLogType = @"VPNManager";
 @property (nonatomic) NSOperationQueue *serialOperationQueue;
 @property (nonatomic) RACTargetQueueScheduler *serialQueueScheduler;
 
-@property (nonatomic) Notifier *notifier;
-
 @property (atomic) BOOL restartRequired;
 @property (atomic) BOOL extensionIsZombie;
 
@@ -96,7 +94,6 @@ PsiFeedbackLogType const VPNManagerLogType = @"VPNManager";
         [_internalTunnelStatus sendNext:@(VPNStatusInvalid)];
 
         _restartRequired = FALSE;
-        _notifier = [[Notifier alloc] initWithAppGroupIdentifier:APP_GROUP_IDENTIFIER];
 
         _restartRequired = FALSE;
         _extensionIsZombie = FALSE;
@@ -386,7 +383,9 @@ PsiFeedbackLogType const VPNManagerLogType = @"VPNManager";
           }
 
           if (providerManager.connection.status == NEVPNStatusConnecting) {
-              [weakSelf.notifier post:NOTIFIER_START_VPN];
+              [[Notifier sharedInstance] post:NotifierStartVPN completionHandler:^(BOOL success) {
+                  // Do nothing.
+              }];
           }
 
       } error:^(NSError *error) {
