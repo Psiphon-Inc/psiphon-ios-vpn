@@ -46,7 +46,7 @@ typedef NS_ERROR_ENUM(ReceiptValidationErrorDomain, PsiphonReceiptValidationErro
 
 @interface SubscriptionVerifierService : NSObject
 
-+ (RACSignal<NSDictionary *> *)updateAuthorizationFromRemote;
++ (RACSignal<RACTwoTuple<NSDictionary *, NSNumber *> *> *)updateAuthorizationFromRemote;
 
 @end
 
