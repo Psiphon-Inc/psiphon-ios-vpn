@@ -258,17 +258,15 @@ NSErrorDomain _Nonnull const PsiCashClientLibraryErrorDomain = @"PsiCashClientLi
 
     refreshDisposable = [refresh subscribeNext:^(PsiCashRefreshResultModel *_Nullable r) {
 
-        PsiCashSpeedBoostProduct *speedBoostProduct = [self speedBoostProductFromPurchasePrices:r.purchasePrices];
-        PsiCashAuthPackage *authPackage = [[PsiCashAuthPackage alloc] initWithValidTokens:r.validTokenTypes];
-
         PsiCashClientModelStagingArea *stagingArea = [[PsiCashClientModelStagingArea alloc] initWithModel:model];
         if (r.inProgress) {
-            [stagingArea updateSpeedBoostProduct:speedBoostProduct];
             [stagingArea updateActivePurchases:[self getActivePurchases]];
             // Do nothing or refresh from lib?
         } else {
+            PsiCashAuthPackage *authPackage = [[PsiCashAuthPackage alloc] initWithValidTokens:r.validTokenTypes];
             [stagingArea updateAuthPackage:authPackage];
             [stagingArea updateBalanceInNanoPsi:[r.balance unsignedLongLongValue]];
+            PsiCashSpeedBoostProduct *speedBoostProduct = [self speedBoostProductFromPurchasePrices:r.purchasePrices];
             [stagingArea updateSpeedBoostProduct:speedBoostProduct];
             [stagingArea updateActivePurchases:[self getActivePurchases]];
             [self commitModelStagingArea:stagingArea];
@@ -278,7 +276,7 @@ NSErrorDomain _Nonnull const PsiCashClientLibraryErrorDomain = @"PsiCashClientLi
         [PsiFeedbackLogger errorWithType:PsiCashLogType message:@"%s failed to refresh client state %@", __FUNCTION__, error.localizedDescription];
         [self displayAlertWithMessage:@"Failed to update balance"]; // TODO: (1.0) human readable error
     } completed:^{
-        [PsiFeedbackLogger infoWithType:PsiCashLogType message:@"Refreshed state"];
+        [PsiFeedbackLogger infoWithType:PsiCashLogType message:@"refreshed state"];
     }];
 }
 
