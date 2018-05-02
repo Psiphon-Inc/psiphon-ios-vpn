@@ -473,6 +473,7 @@
  */
 - (NSNumber *_Nullable)getContainerEmptyReceiptFileSize {
     return [sharedDefaults objectForKey:kContainerSubscriptionEmptyReceiptKey];
+}
 
 #pragma mark - Authorizations
 
