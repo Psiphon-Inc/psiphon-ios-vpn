@@ -18,6 +18,7 @@
  */
 
 #import <Foundation/Foundation.h>
+#import "PsiFeedbackLogger.h"
 
-extern NSString *_Nonnull const PsiCashLogType;
-extern NSString *_Nonnull const PsiCashClientLibraryErrorDomain;
+extern PsiFeedbackLogType const PsiCashLogType;
+extern NSErrorDomain const PsiCashClientLibraryErrorDomain;

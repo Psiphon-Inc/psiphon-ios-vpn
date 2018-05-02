@@ -97,8 +97,8 @@ NSErrorDomain _Nonnull const PsiCashClientLibraryErrorDomain = @"PsiCashClientLi
     if (e!= nil) {
         // TODO: should never happen because landing page is hardcoded above
         // TOOD: (1.0) handle errors when landing pages are dynamic
-        [PsiFeedbackLogger errorWithType:PsiCashLogType message:@"Got a nil modified landing page URL from %@", hardcodedURL];
-        assert(FALSE);
+        [PsiFeedbackLogger errorWithType:PsiCashLogType message:@"error constructing PsiCash landing page URL" object:e];
+        return [NSURL URLWithString:hardcodedURL];
     }
 
     return [NSURL URLWithString:modifiedURL];
@@ -106,9 +106,7 @@ NSErrorDomain _Nonnull const PsiCashClientLibraryErrorDomain = @"PsiCashClientLi
 
 - (void)scheduleStateRefresh {
     __weak PsiCashClient *weakSelf = self;
-    if (![tunnelStatusDisposable isDisposed]) {
-        [tunnelStatusDisposable dispose];
-    }
+    [tunnelStatusDisposable dispose];
 
     // Observe VPN status for updating UI state
     tunnelStatusDisposable = [vpnManager.lastTunnelStatus
@@ -239,9 +237,7 @@ NSErrorDomain _Nonnull const PsiCashClientLibraryErrorDomain = @"PsiCashClientLi
     const int networkRetryCount = 6;
 #endif
 
-    if (![refreshDisposable isDisposed]) {
-        [refreshDisposable dispose];
-    }
+    [refreshDisposable dispose];
 
     RACSignal *refresh = [[[[self refreshStateFromServer] retryWhen:^RACSignal * _Nonnull(RACSignal * _Nonnull errors) {
         return [[errors
@@ -326,9 +322,7 @@ NSErrorDomain _Nonnull const PsiCashClientLibraryErrorDomain = @"PsiCashClientLi
 #pragma mark - Purchase Signal
 
 - (void)purchaseSpeedBoostProduct:(PsiCashSpeedBoostProductSKU*)sku {
-    if (![purchaseDisposable isDisposed]) {
-        [purchaseDisposable dispose];
-    }
+    [purchaseDisposable dispose];
 
     PsiCashClientModelStagingArea *pendingPurchasesStagingArea = [[PsiCashClientModelStagingArea alloc] initWithModel:model];
     [pendingPurchasesStagingArea updatePendingPurchases:@[sku]];
