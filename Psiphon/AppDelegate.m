@@ -54,6 +54,10 @@
 // is received from the extension.
 #define kLandingPageTimeoutSecs 1.0
 
+// Number of seconds to wait for PsiCashClient to emit an auth package with an earner token, after the
+// landing page notification is received from the extension.
+#define kPsiCashAuthPackageWithEarnerTokenTimeoutSecs 3.0
+
 PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
 
 @interface AppDelegate () <NotifierObserver>
@@ -381,11 +385,30 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
             NSUInteger randIndex = arc4random() % [homepages count];
             Homepage *homepage = homepages[randIndex];
 
+            RACSignal <RACUnit*>*authPackageSignal = [[[[[PsiCashClient.sharedInstance.clientModelSignal
+              filter:^BOOL(PsiCashClientModel * _Nullable model) {
+                  if ([model.authPackage hasEarnerToken]) {
+                      return TRUE;
+                  }
+                  return FALSE;
+              }]
+              map:^id _Nullable(PsiCashClientModel * _Nullable model) {
+                  return RACUnit.defaultUnit;
+              }]
+              take:1]
+              timeout:kPsiCashAuthPackageWithEarnerTokenTimeoutSecs onScheduler:RACScheduler.mainThreadScheduler]
+              catch:^RACSignal * _Nonnull(NSError * _Nonnull error) {
+                  if ([error.domain isEqualToString:RACSignalErrorDomain] && error.code == RACSignalErrorTimedOut) {
+                      return [RACSignal return:RACUnit.defaultUnit];
+                  }
+                  return [RACSignal error:error];
+              }];
+
             // Only opens landing page if the VPN is active (or waits up to a maximum of kLandingPageTimeoutSecs
             // for the tunnel status to become "Connected" before opening the landing page).
             // Landing page should not be opened outside of the tunnel.
 
-            __block RACDisposable *disposable = [[[[[[[weakSelf.vpnManager isExtensionZombie]
+            __block RACDisposable *disposable = [[[[[[[[weakSelf.vpnManager isExtensionZombie]
               combineLatestWith:weakSelf.vpnManager.lastTunnelStatus]
               filter:^BOOL(RACTwoTuple<NSNumber *, NSNumber *> *tuple) {
 
@@ -395,9 +418,10 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
               }]
               take:1]  // Take 1 to terminate the infinite signal.
               timeout:kLandingPageTimeoutSecs onScheduler:RACScheduler.mainThreadScheduler]
+              zipWith:authPackageSignal]
               deliverOnMainThread]
-              subscribeNext:^(RACTwoTuple<NSNumber *, NSNumber *> *x) {
-                  BOOL isZombie = [x.first boolValue];
+              subscribeNext:^(RACTwoTuple<RACTwoTuple<NSNumber *, NSNumber *>*, RACUnit*> *x) {
+                  BOOL isZombie = [x.first.first boolValue];
 
                   if (isZombie) {
                       weakSelf.shownLandingPageForCurrentSession = FALSE;
@@ -411,9 +435,8 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
 
                       // (pre-1.0) hardcoded URL
                       // TODO: (1.0) URL should be dynamic (homepage.url)
-                      // TODO: (1.0) first subscription status is UserSubscriptionUnknown
-                      UserSubscriptionStatus s = (UserSubscriptionStatus) [[self subscriptionStatus].first integerValue];
-                      NSURL *url = s == UserSubscriptionActive ? homepage.url : [PsiCashClient.sharedInstance homePageURL];
+                      NSURL *url = [PsiCashClient.sharedInstance homePageURL];
+                      assert (url != nil);
 
                       // Not officially documented by Apple, however a runtime warning is generated sometimes
                       // stating that [UIApplication openURL:options:completionHandler:] must be used from

@@ -95,7 +95,7 @@ NS_ASSUME_NONNULL_BEGIN
 
     NSArray<NSTextCheckingResult*> *matches = [regex matchesInString:distinguisher options:0 range:searchRange];
     if (matches == nil || matches.count == 0) {
-        [PsiFeedbackLogger errorWithType:PsiCashLogType message:@"%s received invalid distinguisher %@ for SpeedBoostProductSKU; no matches for regex found.", __FUNCTION__, distinguisher];
+        //[PsiFeedbackLogger errorWithType:PsiCashLogType message:@"%s received invalid distinguisher %@ for SpeedBoostProductSKU; no matches for regex found.", __FUNCTION__, distinguisher];
         return nil;
     } else if (matches.count > 1) {
         [PsiFeedbackLogger errorWithType:PsiCashLogType message:@"%s received invalid distinguisher %@ for SpeedBoostProductSKU; multiple matches for regex found.", __FUNCTION__, distinguisher];
