@@ -247,7 +247,7 @@ PsiFeedbackLogType const VPNManagerLogType = @"VPNManager";
         case VPNStatusRestarting: return @"restarting";
         case VPNStatusZombie: return @"zombie";
 
-        default: return [NSString stringWithFormat:@"invalid status (%d)", status];
+        default: return [NSString stringWithFormat:@"invalid status (%ld)", (long)status];
     }
 }
 
@@ -261,7 +261,7 @@ PsiFeedbackLogType const VPNManagerLogType = @"VPNManager";
         case NEVPNStatusReasserting: return @"reasserting";
         case NEVPNStatusDisconnecting: return @"disconnecting";
 
-        default: return [NSString stringWithFormat:@"invalid status (%d)", status];
+        default: return [NSString stringWithFormat:@"invalid status (%ld)", (long)status];
     }
 }
 
