@@ -235,6 +235,36 @@ PsiFeedbackLogType const VPNManagerLogType = @"VPNManager";
     return instance;
 }
 
++ (NSString *)statusText:(VPNStatus)status {
+    switch (status) {
+
+        case VPNStatusInvalid: return @"invalid";
+        case VPNStatusDisconnected: return @"disconnected";
+        case VPNStatusConnecting: return @"connecting";
+        case VPNStatusConnected: return @"connected";
+        case VPNStatusReasserting: return @"reasserting";
+        case VPNStatusDisconnecting: return @"disconnecting";
+        case VPNStatusRestarting: return @"restarting";
+        case VPNStatusZombie: return @"zombie";
+
+        default: return [NSString stringWithFormat:@"invalid status (%d)", status];
+    }
+}
+
++ (NSString *)statusTextSystem:(NEVPNStatus)status {
+    switch (status) {
+
+        case NEVPNStatusInvalid: return @"invalid";
+        case NEVPNStatusDisconnected: return @"disconnected";
+        case NEVPNStatusConnecting: return @"connecting";
+        case NEVPNStatusConnected: return @"connected";
+        case NEVPNStatusReasserting: return @"reasserting";
+        case NEVPNStatusDisconnecting: return @"disconnecting";
+
+        default: return [NSString stringWithFormat:@"invalid status (%d)", status];
+    }
+}
+
 // fix as in fix the zombie state
 - (void)checkOrFixVPNStatus {
 

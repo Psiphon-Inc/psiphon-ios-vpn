@@ -32,6 +32,7 @@
 #define EGRESS_REGIONS_KEY @"egress_regions"
 #define APP_FOREGROUND_KEY @"app_foreground"
 #define SERVER_TIMESTAMP_KEY @"server_timestamp"
+#define kContainerSubscriptionEmptyReceiptKey @"kContainerSubscriptionEmptyReceiptKey"
 #define kAuthorizationsContainerKey @"authorizations_container_key"
 #define kMarkedAuthorizationIDsExtensionKey @"marked_authorization_ids_extension_key"
 
@@ -453,6 +454,25 @@
 - (NSString*)getServerTimestamp {
 	return [sharedDefaults stringForKey:SERVER_TIMESTAMP_KEY];
 }
+
+/**
+ * If the receipt is empty (contains to transactions), the container should use
+ * this method to set the receipt file size to be read by the network extension.
+ * @param receiptFileSize File size of the empty receipt.
+ */
+#if !(TARGET_IS_EXTENSION)
+- (void)setContainerEmptyReceiptFileSize:(NSNumber *_Nullable)receiptFileSize {
+    [sharedDefaults setObject:receiptFileSize forKey:kContainerSubscriptionEmptyReceiptKey];
+    [sharedDefaults synchronize];
+}
+#endif
+
+/**
+ * Returns the file size of previously recorded empty receipt by the container (if any).
+ * @return Nil or file size recorded by the container.
+ */
+- (NSNumber *_Nullable)getContainerEmptyReceiptFileSize {
+    return [sharedDefaults objectForKey:kContainerSubscriptionEmptyReceiptKey];
 
 #pragma mark - Authorizations
 

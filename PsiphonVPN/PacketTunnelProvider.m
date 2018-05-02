@@ -762,6 +762,8 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 - (BOOL)tryStartVPN {
     if (self.shouldStartVPN || [sharedDB getAppForegroundState]) {
         if ([self.psiphonTunnel getConnectionState] == PsiphonConnectionStateConnected) {
+            // The container waits up to `kLandingPageTimeoutSecs` to see the tunnel connected
+            // status from when the Homepage notification is received by it.
             self.reasserting = FALSE;
             [self startVPN];
             [[Notifier sharedInstance] post:NotifierNewHomepages completionHandler:^(BOOL success) {
