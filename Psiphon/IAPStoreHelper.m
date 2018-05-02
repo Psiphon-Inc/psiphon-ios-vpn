@@ -22,6 +22,8 @@
 #import "SharedConstants.h"
 #import "NSDate+Comparator.h"
 #import "DispatchUtils.h"
+#import "PsiphonDataSharedDB.h"
+#import "Nullity.h"
 
 NSNotificationName const IAPSKProductsRequestDidReceiveResponseNotification = @"IAPSKProductsRequestDidReceiveResponseNotification";
 NSNotificationName const IAPSKProductsRequestDidFailWithErrorNotification = @"IAPSKProductsRequestDidFailWithErrorNotification";
@@ -74,11 +76,30 @@ NSString *const kSubscriptionDictionary = @"kSubscriptionDictionary";
     }
 
     @autoreleasepool {
-        RMAppReceipt *receipt  =  [RMAppReceipt bundleReceipt];
+        RMAppReceipt *receipt = [RMAppReceipt bundleReceipt];
         if(receipt && [receipt verifyReceiptHash]) {
             NSString *bundleIdentifier = [[NSBundle mainBundle] bundleIdentifier];
+
             if ([bundleIdentifier containsString:receipt.bundleIdentifier]) {
                 subscriptionDict = [NSDictionary dictionaryWithDictionary:receipt.inAppSubscriptions];
+
+                // If the receipt contains no purchase data, store the app receipt file size in PsiphonDataSharedDB
+                PsiphonDataSharedDB *sharedDB = [[PsiphonDataSharedDB alloc] initForAppGroupIdentifier:APP_GROUP_IDENTIFIER];
+
+                if (receipt.inAppSubscriptions) {
+
+                    // If inAppSubscriptions dictionary is missing expiration date or product id,
+                    // then this receipt has no transactions, and is empty.
+                    if ([Nullity isNil:receipt.inAppSubscriptions[kLatestExpirationDate]] &&
+                        [Nullity isEmpty:receipt.inAppSubscriptions[kProductId]]) {
+
+                        [sharedDB setContainerEmptyReceiptFileSize:receipt.inAppSubscriptions[kAppReceiptFileSize]];
+                    } else {
+                        // The receipt contains purchase data, reset value in the shared DB.
+                        [sharedDB setContainerEmptyReceiptFileSize:nil];
+                    }
+                }
+
             }
         }
         receipt = nil;
@@ -99,6 +120,10 @@ NSString *const kSubscriptionDictionary = @"kSubscriptionDictionary";
 - (void)paymentQueue:(SKPaymentQueue *)queue updatedTransactions:(NSArray *)transactions {
     for (SKPaymentTransaction *transaction in transactions) {
 
+        // Updates subscription dictionary independent of transaction state.
+        // This is to store information about the receipt if it is empty.
+        [self updateSubscriptionDictionaryFromLocalReceipt];
+
         // Sends notification containing updates state of a transaction.
         [[NSNotificationCenter defaultCenter]
           postNotificationName:IAPHelperPaymentTransactionUpdateNotification
@@ -106,7 +131,7 @@ NSString *const kSubscriptionDictionary = @"kSubscriptionDictionary";
                       userInfo:@{IAPHelperPaymentTransactionUpdateKey : @(transaction.transactionState)}];
 
         switch (transaction.transactionState) {
-                
+
             case SKPaymentTransactionStatePurchasing: {
                 break;
             }
@@ -119,7 +144,6 @@ NSString *const kSubscriptionDictionary = @"kSubscriptionDictionary";
             }
             case SKPaymentTransactionStatePurchased:{
                 [[SKPaymentQueue defaultQueue]finishTransaction:transaction];
-                [self updateSubscriptionDictionaryFromLocalReceipt];
                 break;
             }
             case SKPaymentTransactionStateRestored: {
