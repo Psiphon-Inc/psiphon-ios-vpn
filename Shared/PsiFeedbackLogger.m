@@ -359,7 +359,7 @@ PsiFeedbackLogType const FeedbackInternalLogType = @"FeedbackLoggerInternal";
         }
 
         LOG_ERROR_NO_NOTICE(@"Error opening file handle for file (%@): %@", [path lastPathComponent], err);
-        abort();
+        return nil;
     }
     return fh;
 }
@@ -371,17 +371,19 @@ PsiFeedbackLogType const FeedbackInternalLogType = @"FeedbackLoggerInternal";
     @try {
         fh = [self fileHandleForPath:filePath];
 
-        if (fh) {
-            // Appends data to the file, and syncs.
-            [fh seekToEndOfFile];
-            [fh writeData:data];
-            [fh writeData:[@"\n" dataUsingEncoding:NSUTF8StringEncoding]];
-
-            [fh synchronizeFile];
-
-            rotatingCurrentFileSize += [data length] + 1;
-            return TRUE;
+        if (!fh) {
+            return FALSE;
         }
+
+        // Appends data to the file, and syncs.
+        [fh seekToEndOfFile];
+        [fh writeData:data];
+        [fh writeData:[@"\n" dataUsingEncoding:NSUTF8StringEncoding]];
+
+        [fh synchronizeFile];
+
+        rotatingCurrentFileSize += [data length] + 1;
+        return TRUE;
     }
     @catch (NSException *exception) {
         LOG_ERROR_NO_NOTICE(@"Failed to write log: %@", exception);
