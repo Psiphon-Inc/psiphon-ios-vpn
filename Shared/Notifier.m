@@ -61,6 +61,8 @@ static Notifier *sharedInstance;
 
 CFDataRef messageCallback(CFMessagePortRef local, SInt32 messageId, CFDataRef data, void *info) {
 
+    [PsiFeedbackLogger infoWithType:NotifierLogType message:@"received messageId (%d)", messageId];
+
     @synchronized(sharedInstance) {
 
         NSMutableIndexSet *deallocatedDelegates = [NSMutableIndexSet indexSet];
