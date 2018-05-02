@@ -50,6 +50,12 @@
 #import "Asserts.h"
 #import "PsiCashClient.h"
 
+#if DEBUG
+#define kMaxAdLoadingTimeSecs 1.f
+#else
+#define kMaxAdLoadingTimeSecs 10.f
+#endif
+
 // Number of seconds to wait for tunnel status to become "Connected", after the landing page notification
 // is received from the extension.
 #define kLandingPageTimeoutSecs 1.0
@@ -58,6 +64,15 @@
 // landing page notification is received from the extension.
 #define kPsiCashAuthPackageWithEarnerTokenTimeoutSecs 3.0
 
+/**
+ * adLoadingStatus RACSubject values.
+ */
+typedef NS_ENUM(NSInteger, AdLoadingStatus) {
+    AdLoadingStatusUnknown = 1,
+    AdLoadingStatusStarted,
+    AdLoadingStatusFinished
+};
+
 PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
 
 @interface AppDelegate () <NotifierObserver>
@@ -65,7 +80,11 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
 // Public properties
 
 // subscriptionStatus should only be sent events to from the main thread.
+// Emits type UserSubscriptionStatus
 @property (nonatomic, readwrite) RACReplaySubject<NSNumber *> *subscriptionStatus;
+
+// Emits one of AdLoadingStatus types.
+@property (nonatomic, readwrite) RACReplaySubject<NSNumber *> *adLoadingStatus;
 
 // Private properties
 @property (atomic) BOOL shownLandingPageForCurrentSession;
@@ -90,6 +109,9 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
 
         _subscriptionStatus = [RACReplaySubject replaySubjectWithCapacity:1];
         [_subscriptionStatus sendNext:@(UserSubscriptionUnknown)];
+
+        _adLoadingStatus = [RACReplaySubject replaySubjectWithCapacity:1];
+        [_adLoadingStatus sendNext:@(AdLoadingStatusUnknown)];
 
         _vpnManager = [VPNManager sharedInstance];
         _sharedDB = [[PsiphonDataSharedDB alloc] initForAppGroupIdentifier:APP_GROUP_IDENTIFIER];
@@ -143,6 +165,35 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
 #endif
 }
 
+#pragma mark - Reactive signals generators
+
+// Emits RACUnit.defaultUnit and completes immediately once all loading signals have completed.
+- (RACSignal<RACUnit *> *)createAppLoadingSignal {
+
+    // Emits a value when ads have loaded or kMaxAdLoadingTimeSecs has passed.
+    RACSignal *adsLoadingSignal = [[[self.adLoadingStatus
+      filter:^BOOL(NSNumber *value) {
+          AdLoadingStatus s = (AdLoadingStatus) [value integerValue];
+          return (s == AdLoadingStatusFinished);
+      }]
+      take:1]
+      merge:[RACSignal timer:kMaxAdLoadingTimeSecs]];
+
+    // Emits a value when the user subscription status becomes known.
+    RACSignal *subscriptionLoadingSignal = [[self.subscriptionStatus filter:^BOOL(NSNumber *value) {
+        UserSubscriptionStatus s = (UserSubscriptionStatus) [value integerValue];
+        return (s != UserSubscriptionUnknown);
+      }]
+      take:1];
+
+    // Zip all loading signals.
+    // All signals that are zipped are expected to only emit one item (type doesn't matter).
+    return [[RACSignal zip:@[adsLoadingSignal, subscriptionLoadingSignal]] map:^id(RACTuple *value) {
+        LOG_DEBUG(@"loading operations finished");
+        return RACUnit.defaultUnit;
+    }];
+}
+
 # pragma mark - Lifecycle methods
 
 - (BOOL)application:(UIApplication *)application willFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
@@ -185,7 +236,7 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
     // to return before making the window visible on the screen.
     [self.window makeKeyAndVisible];
 
-    [self loadAdsIfNeeded];
+    [self initializeAdsIfNeeded];
 
     // Listen for VPN status changes from VPNManager.
     __block RACDisposable *disposable = [self.vpnManager.lastTunnelStatus
@@ -215,6 +266,21 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
     LOG_DEBUG();
 
     __weak AppDelegate *weakSelf = self;
+
+    // Resets status of the subjects whose state could be stale once the container is foregrounded.
+    [self.subscriptionStatus sendNext:@(UserSubscriptionUnknown)];
+    [self.adLoadingStatus sendNext:@(AdLoadingStatusUnknown)];
+
+    // Subscribes to the app loading signal, and removes the launch screen once all loading is done.
+    __block RACDisposable *disposable = [[self createAppLoadingSignal]
+      subscribeNext:^(RACUnit *x) {
+          [rootContainerController removeLaunchScreen];
+      } error:^(NSError *error) {
+          [weakSelf.compoundDisposable removeDisposable:disposable];
+      } completed:^{
+          [weakSelf.compoundDisposable removeDisposable:disposable];
+      }];
+    [self.compoundDisposable addDisposable:disposable];
 
     // Starts subscription expiry timer if there is an active subscription.
     [self subscriptionExpiryTimer];
@@ -252,6 +318,8 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
 
     // Cancel subscription expiry timer if active.
     [self.subscriptionCheckTimer invalidate];
+
+    [self.sharedDB updateAppForegroundState:NO];
 }
 
 - (void)applicationDidEnterBackground:(UIApplication *)application {
@@ -263,7 +331,6 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
     [[Notifier sharedInstance] post:NotifierAppEnteredBackground completionHandler:^(BOOL success) {
         // Do nothing.
     }];
-    [self.sharedDB updateAppForegroundState:NO];
 }
 
 - (void)applicationWillEnterForeground:(UIApplication *)application {
@@ -272,7 +339,7 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
 
     [[PsiCashClient sharedInstance] scheduleStateRefresh];
 
-    [self loadAdsIfNeeded];
+    [self initializeAdsIfNeeded];
 }
 
 - (void)applicationWillTerminate:(UIApplication *)application {
@@ -294,17 +361,16 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
 
 #pragma mark - Ads
 
-- (void)loadAdsIfNeeded {
+- (void)initializeAdsIfNeeded {
 
     VPNStatus s = (VPNStatus) [[[self.vpnManager lastTunnelStatus] first] integerValue];
 
     if ([adManager shouldShowUntunneledAds] &&
         ![adManager untunneledInterstitialIsReady] &&
         ![adManager untunneledInterstitialHasShown] &&
-        (s == VPNStatusInvalid || s == VPNStatusDisconnected)
-      ){
+        (s == VPNStatusInvalid || s == VPNStatusDisconnected)){
 
-        [rootContainerController showLaunchScreen];
+        [self.adLoadingStatus sendNext:@(AdLoadingStatusStarted)];
 
         dispatch_async(dispatch_get_main_queue(), ^{
                 [adManager initializeAds];
@@ -312,7 +378,7 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
 
     } else {
         // Removes launch screen if already showing.
-        [rootContainerController removeLaunchScreen];
+        [self.adLoadingStatus sendNext:@(AdLoadingStatusFinished)];
     }
 }
 
@@ -323,12 +389,7 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
 
 - (void)onAdsLoaded {
     LOG_DEBUG();
-    [rootContainerController removeLaunchScreen];
-}
-
-- (void)launchScreenFinished {
-    LOG_DEBUG();
-    [rootContainerController removeLaunchScreen];
+    [self.adLoadingStatus sendNext:@(AdLoadingStatusFinished)];
 }
 
 #pragma mark - Embedded Server Entries
@@ -397,7 +458,7 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
               }]
               take:1]
               timeout:kPsiCashAuthPackageWithEarnerTokenTimeoutSecs onScheduler:RACScheduler.mainThreadScheduler]
-              catch:^RACSignal * _Nonnull(NSError * _Nonnull error) {
+              catch:^RACSignal * (NSError * error) {
                   if ([error.domain isEqualToString:RACSignalErrorDomain] && error.code == RACSignalErrorTimedOut) {
                       return [RACSignal return:RACUnit.defaultUnit];
                   }
