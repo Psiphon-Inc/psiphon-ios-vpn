@@ -76,17 +76,17 @@
 #pragma mark - Encoded Authorizations
 
 #if !(TARGET_IS_EXTENSION)
-- (void)setContainerAuthorizations:(NSSet<Authorization *> *_Nullable)authorizations;
+- (void)setContainerAuthorizations:(NSSet<Authorization *> *)authorizations;
 #endif
 
-- (NSSet<Authorization *> *_Nonnull)getContainerAuthorizations;
-- (NSSet<Authorization *> *_Nonnull)getNonMarkedAuthorizations;
+- (NSSet<Authorization *> *)getContainerAuthorizations;
+- (NSSet<Authorization *> *)getNonMarkedAuthorizations;
 
 #if TARGET_IS_EXTENSION
-- (void)markExpiredAuthorizationIDs:(NSSet<NSString *> *_Nullable)authorizations;
-- (void)appendExpiredAuthorizationIDs:(NSSet<NSString *> *_Nullable)authsToAppend;
+- (void)markExpiredAuthorizationIDs:(NSSet<NSString *> *)authorizations;
+- (void)appendExpiredAuthorizationIDs:(NSSet<NSString *> *)authsToAppend;
 #endif
 
-- (NSSet<NSString *> *_Nonnull)getMarkedExpiredAuthorizationIDs;
+- (NSSet<NSString *> *)getMarkedExpiredAuthorizationIDs;
 
 @end

@@ -19,6 +19,6 @@
 
 #import "PsiCashErrorTypes.h"
 
-NSString * _Nonnull const PsiCashLogType = @"PsiCash";
+PsiFeedbackLogType const PsiCashLogType = @"PsiCash";
 
 NSErrorDomain _Nonnull const PsiCashClientErrorDomain = @"PsiCashClientErrorDomain";
