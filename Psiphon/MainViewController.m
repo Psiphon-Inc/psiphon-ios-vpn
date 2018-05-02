@@ -66,9 +66,6 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     
     PsiphonDataSharedDB *sharedDB;
     
-    // Notifier
-    Notifier *notifier;
-    
     // UI elements
     //UIImageView *logoView;
     UILabel *appTitleLabel;
@@ -123,9 +120,6 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
         feedbackManager = [[FeedbackManager alloc] init];
         
         sharedDB = [[PsiphonDataSharedDB alloc] initForAppGroupIdentifier:APP_GROUP_IDENTIFIER];
-        
-        // Notifier
-        notifier = [[Notifier alloc] initWithAppGroupIdentifier:APP_GROUP_IDENTIFIER];
         
         [self persistSettingsToSharedUserDefaults];
         
@@ -315,8 +309,6 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 - (void)viewWillDisappear:(BOOL)animated {
     LOG_DEBUG();
     [super viewWillDisappear:animated];
-    // Stop listening for diagnostic messages (we don't want to hold the shared db lock while backgrounded)
-    [notifier removeAllListeners];
 }
 
 - (void)viewDidDisappear:(BOOL)animated {

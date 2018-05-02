@@ -22,35 +22,49 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+typedef NS_ENUM(NSInteger, NotifierMessageId) {
+
+    // Messages sent by the extension.
+    NotifierNewHomepages = 100,
+    NotifierTunnelConnected = 101,
+    NotifierAvailableEgressRegions = 102,
+
+    // Messages sent by the container.
+    NotifierStartVPN = 200,
+    NotifierForceSubscriptionCheck = 201,
+    NotifierAppEnteredBackground = 202,
+
+};
+
+@protocol NotifierObserver <NSObject>
+
+@required
+
+- (void)onMessageReceived:(NotifierMessageId)messageId withData:(NSData *)data;
+
+@end
+
 @interface Notifier : NSObject
 
-- (_Nullable instancetype)initWithAppGroupIdentifier:(NSString *)identifier;
++ (Notifier *)sharedInstance;
 
-/*!
- * @brief Sends Darwin notification with given key.
- * @param key Unique notification key.
+/**
+ * If called from the container, posts the message to the network extension.
+ * If called from the extension, posts the message to the container.
+ *
+ * @param completionHandler Called after the message is sent, with the success parameter set.
+ *                          Errors are logged.
  */
-- (void)post:(NSString *)key;
+- (void)post:(NotifierMessageId)messageId completionHandler:(void (^)(BOOL success))completion;
 
-/*!
- * @brief Registers provided listener with Darwin notifications
- *        for the given key.
- * @param key Unique notification key.
- * @param listener Listener to be called when a notification with given key is sent.
+/**
+ * Adds an observer to the Notifier.
+ * Nothing happens, if the observer has already been registered.
+ *
+ * @param observer The observer to add to the observers' queue.
+ * @param queue The dispatch queue tha the observer is called on.
  */
-- (void)listenForNotification:(NSString *)key listener:(void(^)(NSString *key))listener;
-
-/*!
- * @brief Unregisters listener associated with the given notification key.
- * @param key Unique notification key.
- */
-- (void)removeListenerForKey:(nonnull NSString *)key;
-
-/*!
- * @brief All listeners registered with this Notifier
- * will be unregistered.
- */
-- (void)removeAllListeners;
+- (void)registerObserver:(id <NotifierObserver>)observer callbackQueue:(dispatch_queue_t)queue;
 
 @end
 
