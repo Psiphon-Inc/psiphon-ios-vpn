@@ -97,6 +97,18 @@
 /* External link to the privacy policy page. Please update this with the correct language specific link (if available) e.g. https://psiphon.ca/fr/privacy.html for french. */
 "PRIVACY_POLICY_URL" = "https://psiphon.ca/en/privacy.html";
 
+/* Text conveying to the user how much the displayed number of hours of Speed Boost costs. %@ should be not be removed but placed in the appropriate location because it will be replaced with the number of hours programmatically. After this sentence the cost of the Speed Boost item will be displayed. For example '1 hour of Speed Boost at 50'. */
+"PSICASH_CONVERSION_HOUR_MESSAGE" = "%@ hour of Speed Boost at";
+
+/* Text conveying to the user how much the displayed number of hours of Speed Boost costs. %@ should be not be removed but placed in the appropriate location because it will be replaced with the number of hours programmatically. After this sentence the cost of the Speed Boost item will be displayed. For example '2 hours of Speed Boost at 100'. */
+"PSICASH_CONVERSION_HOURS_MESSAGE" = "%@ hours of Speed Boost at";
+
+/* Text conveying to the user how much the displayed number of hours of Speed Boost costs. %@ should be not be removed but placed in the appropriate location because it will be replaced with the number of hours programmatically. After this sentence the cost of the Speed Boost item will be displayed. For example '5 mins of Speed Boost at 25'. */
+"PSICASH_CONVERSION_MINS_MESSAGE" = "%d minutes of Speed Boost at";
+
+/* Text conveying to the user that the target Speed Boost product is being loaded */
+"PSICASH_LOADING_SPEED_BOOST_PRODUCTS_MESSAGE" = "Loading Speed Boost product...";
+
 /* Refresh app receipt button title */
 "REFRESH_APP_RECEIPT_BUTTON_TITLE" = "Refresh app receipt";
 

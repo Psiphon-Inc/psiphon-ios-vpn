@@ -18,10 +18,11 @@
  */
 
 #import <UIKit/UIKit.h>
+#import "PsiCashPurchaseAlertView.h"
 #import "RegionAdapter.h"
 #import "SettingsViewController.h"
 
-@interface MainViewController : UIViewController <PsiphonSettingsViewControllerDelegate, RegionAdapterDelegate>
+@interface MainViewController : UIViewController <PsiphonSettingsViewControllerDelegate, RegionAdapterDelegate, PsiCashPurchaseAlertViewDelegate>
 
 @property (nonatomic) BOOL openSettingImmediatelyOnViewDidAppear;
 

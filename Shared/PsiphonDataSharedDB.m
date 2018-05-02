@@ -21,6 +21,8 @@
 #import "Logging.h"
 #import "PsiFeedbackLogger.h"
 #import "NSDate+PSIDateExtension.h"
+#import "UserDefaults.h"
+#import "Authorization.h"
 
 // File operations parameters
 #define MAX_RETRIES 3
@@ -30,6 +32,9 @@
 #define EGRESS_REGIONS_KEY @"egress_regions"
 #define APP_FOREGROUND_KEY @"app_foreground"
 #define SERVER_TIMESTAMP_KEY @"server_timestamp"
+#define kContainerSubscriptionEmptyReceiptKey @"kContainerSubscriptionEmptyReceiptKey"
+#define kAuthorizationsContainerKey @"authorizations_container_key"
+#define kMarkedAuthorizationIDsExtensionKey @"marked_authorization_ids_extension_key"
 
 #if !(TARGET_IS_EXTENSION)
 #define EMBEDDED_EGRESS_REGIONS_KEY @"embedded_server_entries_egress_regions"
@@ -448,6 +453,87 @@
  */
 - (NSString*)getServerTimestamp {
 	return [sharedDefaults stringForKey:SERVER_TIMESTAMP_KEY];
+}
+
+/**
+ * If the receipt is empty (contains to transactions), the container should use
+ * this method to set the receipt file size to be read by the network extension.
+ * @param receiptFileSize File size of the empty receipt.
+ */
+#if !(TARGET_IS_EXTENSION)
+- (void)setContainerEmptyReceiptFileSize:(NSNumber *_Nullable)receiptFileSize {
+    [sharedDefaults setObject:receiptFileSize forKey:kContainerSubscriptionEmptyReceiptKey];
+    [sharedDefaults synchronize];
+}
+#endif
+
+/**
+ * Returns the file size of previously recorded empty receipt by the container (if any).
+ * @return Nil or file size recorded by the container.
+ */
+- (NSNumber *_Nullable)getContainerEmptyReceiptFileSize {
+    return [sharedDefaults objectForKey:kContainerSubscriptionEmptyReceiptKey];
+
+#pragma mark - Authorizations
+
+#if !TARGET_IS_EXTENSION
+
+- (void)setContainerAuthorizations:(NSSet<Authorization *> *_Nullable)authorizations {
+    // Persists Base64 representation of the Authorizations.
+    [sharedDefaults setObject:[Authorization encodeAuthorizations:authorizations]
+                       forKey:kAuthorizationsContainerKey];
+    [sharedDefaults synchronize];
+}
+
+#endif
+
+- (NSSet<Authorization *> *_Nonnull)getContainerAuthorizations {
+    NSArray<NSString *> *_Nullable encodedAuths = [sharedDefaults stringArrayForKey:kAuthorizationsContainerKey];
+    return [Authorization createFromEncodedAuthorizations:encodedAuths];
+}
+
+- (NSSet<Authorization *> *_Nonnull)getNonMarkedAuthorizations {
+    // Adds authorizations persisted by the container (minus the authorizations already marked as expired).
+    NSMutableSet<Authorization *> *auths = [NSMutableSet set];
+    NSSet<NSString *> *markedAuthIDs = [self getMarkedExpiredAuthorizationIDs];
+
+    [[self getContainerAuthorizations] enumerateObjectsUsingBlock:^(Authorization *obj, BOOL *stop) {
+        if (![markedAuthIDs containsObject:obj.ID]) {
+            [auths addObject:obj];
+        }
+    }];
+
+    return auths;
+}
+
+#if TARGET_IS_EXTENSION
+
+- (void)markExpiredAuthorizationIDs:(NSSet<NSString *> *_Nullable)authorizationIDs {
+    [sharedDefaults setObject:[authorizationIDs allObjects]
+                       forKey:kMarkedAuthorizationIDsExtensionKey];
+    [sharedDefaults synchronize];
+}
+
+- (void)appendExpiredAuthorizationIDs:(NSSet<NSString *> *_Nullable)idsToAppend {
+    // Combines previous marked authorizations with the authorization IDs to append.
+    NSSet<NSString *> *newMarkedAuthIDs = [[self getMarkedExpiredAuthorizationIDs] setByAddingObjectsFromSet:idsToAppend];
+
+    // Don't mark authorization IDs not seen in authorizations persisted by the container.
+    NSMutableSet<NSString *> *markedAuthIDs = [NSMutableSet set];  // Marked IDs to persist.
+    NSSet<NSString *> *containerAuthIDs =[Authorization authorizationIDsFrom:[self getContainerAuthorizations]];
+    [newMarkedAuthIDs enumerateObjectsUsingBlock:^(NSString *authID, BOOL *stop) {
+        if ([containerAuthIDs containsObject:authID]) {
+            [markedAuthIDs addObject:authID];
+        }
+    }];
+
+    [self markExpiredAuthorizationIDs:markedAuthIDs];
+}
+
+#endif
+
+- (NSSet<NSString *> *_Nonnull)getMarkedExpiredAuthorizationIDs {
+    return [NSMutableSet setWithArray:[sharedDefaults stringArrayForKey:kMarkedAuthorizationIDsExtensionKey]];
 }
 
 @end

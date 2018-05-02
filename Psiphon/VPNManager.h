@@ -109,6 +109,16 @@ typedef NS_ENUM(NSInteger, VPNStartStatus) {
 + (VPNManager *)sharedInstance;
 
 /**
+ * Returns text description of VPNStatus.
+ */
++ (NSString *)statusText:(VPNStatus)status;
+
+/**
+ * Returns text description of NEVPNStatus.
+ */
++ (NSString *)statusTextSystem:(NEVPNStatus)status;
+
+/**
  * Must be called whenever the application becomes active for VPNManager to update its status.
  */
 - (void)checkOrFixVPNStatus;
