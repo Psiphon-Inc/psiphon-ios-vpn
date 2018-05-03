@@ -750,17 +750,21 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
     return newSettings;
 }
 
-// Starts VPN and notifies the container of homepages (if any) when
-// `self.shouldStartVPN` is TRUE or the container is in the foreground.
+// Starts VPN and notifies the container of homepages (if any) when shouldStartVPN flag is TRUE.
 - (BOOL)tryStartVPN {
-    if (self.shouldStartVPN || [sharedDB getAppForegroundState]) {
-        if ([self.psiphonTunnel getConnectionState] == PsiphonConnectionStateConnected) {
-            self.reasserting = FALSE;
-            [self startVPN];
-            [notifier post:NOTIFIER_NEW_HOMEPAGES];
-            return TRUE;
-        }
+
+    // Don't start the VPN unless this flag has been due to subscription status, or from the container.
+    if (!self.shouldStartVPN) {
+        return FALSE;
     }
+
+    if ([self.psiphonTunnel getConnectionState] == PsiphonConnectionStateConnected) {
+        self.reasserting = FALSE;
+        [self startVPN];
+        [notifier post:NOTIFIER_NEW_HOMEPAGES];
+        return TRUE;
+    }
+
     return FALSE;
 }
 
