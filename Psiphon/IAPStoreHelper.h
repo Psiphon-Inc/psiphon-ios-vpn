@@ -21,6 +21,11 @@
 #import <UIKit/UIKit.h>
 #import <StoreKit/StoreKit.h>
 
+// Common app receipt fields keys and constants
+#define kAppReceiptFileSize                             @"app_receipt_file_size"
+#define kLatestExpirationDate                           @"latest_expiration_date"
+#define kProductId                                      @"product_id"
+
 
 NS_ASSUME_NONNULL_BEGIN
 
