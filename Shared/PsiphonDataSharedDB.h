@@ -64,4 +64,11 @@
 - (void)updateServerTimestamp:(NSString*)timestamp;
 - (NSString*)getServerTimestamp;
 
+// Receipt read by the container
+#if !(TARGET_IS_EXTENSION)
+- (void)setContainerEmptyReceiptFileSize:(NSNumber *)receiptFileSize;
+#endif
+
+- (NSNumber *)getContainerEmptyReceiptFileSize;
+
 @end
