@@ -72,40 +72,8 @@ build () {
     echo "BUILD DONE"
 }
 
-increment_build_numbers_for_release () {
-    increment_plists_and_commit release
-}
-
-increment_build_numbers_for_testflight () {
-    increment_plists_and_commit testflight
-}
-
-increment_plists_and_commit () {
-    git pull
-    container_commit_message=$(python "${PSIPHON_IOS_VPN_XCODE_WORKSPACE}/info_plist.py" --plist "${PSIPHON_IOS_VPN_XCODE_WORKSPACE}/Psiphon/Info.plist" --increment_for $1 --output human_readable)
-    if [[ $? != 0 ]]; then
-        echo "Incrementing container plist failed, aborting..."
-        exit 1
-    fi
-    extension_commit_message=$(python "${PSIPHON_IOS_VPN_XCODE_WORKSPACE}/info_plist.py" --plist "${PSIPHON_IOS_VPN_XCODE_WORKSPACE}/PsiphonVPN/Info.plist" --increment_for $1 --output human_readable)
-    if [[ $? != 0 ]]; then
-        echo "Incrementing extension plist failed, aborting..."
-        exit 1
-    fi
-    if [[ "$container_commit_message" != "" ]] && [[ "$container_commit_message" != "$extension_commit_message" ]]; then
-        echo "Container and extension version numbers out of sync, aborting..."
-        exit 1
-    fi
-
-    commit_message="${container_commit_message}"
-    git add "${PSIPHON_IOS_VPN_XCODE_WORKSPACE}/Psiphon/Info.plist"
-    git add "${PSIPHON_IOS_VPN_XCODE_WORKSPACE}/PsiphonVPN/Info.plist"
-
-    git commit -m "${commit_message}"
-    if [[ $? != 0 ]]; then
-        echo "Failed to git commit plist changes, aborting..."
-        exit 1
-    fi
+inc_vers_and_commit () {
+    python inc_vers.py --$1
 }
 
 upload_ipa () {
@@ -136,7 +104,7 @@ case $TARGET_DISTRIBUTION_PLATFORM in
         CONFIGURATION="Release"
         EXPORT_OPTIONS_PLIST="exportAppStoreOptions.plist"
         setup_env
-        increment_build_numbers_for_release
+        inc_vers_and_commit release
         build
         upload_ipa
         ;;
@@ -144,7 +112,7 @@ case $TARGET_DISTRIBUTION_PLATFORM in
         CONFIGURATION="Release"
         EXPORT_OPTIONS_PLIST="exportAppStoreOptions.plist"
         setup_env
-        increment_build_numbers_for_testflight
+        inc_vers_and_commit testflight
         build
         upload_ipa
         ;;
