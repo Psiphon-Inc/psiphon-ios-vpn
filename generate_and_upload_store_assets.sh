@@ -52,16 +52,9 @@ fi
 echo "Screenshots generated successfully."
 echo "Generating itmsp package..."
 
-# Check that release version numbers match (CFBundleShortVersionString)
-container_short_version_number=$(python info_plist.py -p ./Psiphon/Info.plist -o short_version)
-extension_short_version_number=$(python info_plist.py -p ./PsiphonVPN/Info.plist -o short_version)
+short_version_number=$(agvtool what-marketing-version -terse1)
 
-if [[ "${container_short_version_number}" != "${extension_short_version_number}" ]]; then
-    echo "Container and extension numbers out of sync. Exiting..."
-    exit 1
-fi
-
-VERSION_STRING="${container_short_version_number}"
+VERSION_STRING="${short_version_number}"
 
 python store_assets_itmsp.py --provider "${PROVIDER}" --team_id "${TEAM_ID}" --vendor_id "${VENDOR_ID}" --whats_new "${WHATS_NEW}" --version_string "${VERSION_STRING}" --output_path "${BASE_DIR}"
 if [[ $? != 0 ]]; then
