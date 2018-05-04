@@ -30,6 +30,7 @@
 #define EGRESS_REGIONS_KEY @"egress_regions"
 #define APP_FOREGROUND_KEY @"app_foreground"
 #define SERVER_TIMESTAMP_KEY @"server_timestamp"
+#define kContainerSubscriptionEmptyReceiptKey @"kContainerSubscriptionEmptyReceiptKey"
 
 #if !(TARGET_IS_EXTENSION)
 #define EMBEDDED_EGRESS_REGIONS_KEY @"embedded_server_entries_egress_regions"
@@ -285,7 +286,7 @@
  * regions in embedded server entries.
  * @return NSArray of region codes.
  */
-- (NSArray<NSString *> *)getAllEgressRegions {
+- (NSArray<NSString *> *)embeddedAndEmittedEgressRegions {
     NSMutableOrderedSet *egressRegions = [[NSMutableOrderedSet alloc] init];
 
     id sharedDBEgressRegions = [sharedDefaults objectForKey:EGRESS_REGIONS_KEY];
@@ -326,9 +327,17 @@
 /*!
  * @return NSArray of region codes.
  */
-- (NSArray<NSString *> *)getAllEmbeddedEgressRegions {
+- (NSArray<NSString *> *)embeddedEgressRegions {
     return [[NSUserDefaults standardUserDefaults] objectForKey:EMBEDDED_EGRESS_REGIONS_KEY];
 }
+
+/*!
+ * @return NSArray of region codes.
+ */
+- (NSArray<NSString *> *)emittedEgressRegions {
+    return [sharedDefaults objectForKey:EGRESS_REGIONS_KEY];
+}
+
 #endif
 
 #pragma mark - Logging
@@ -440,6 +449,26 @@
  */
 - (NSString*)getServerTimestamp {
 	return [sharedDefaults stringForKey:SERVER_TIMESTAMP_KEY];
+}
+
+/**
+ * If the receipt is empty (contains to transactions), the container should use
+ * this method to set the receipt file size to be read by the network extension.
+ * @param receiptFileSize File size of the empty receipt.
+ */
+#if !(TARGET_IS_EXTENSION)
+- (void)setContainerEmptyReceiptFileSize:(NSNumber *_Nullable)receiptFileSize {
+    [sharedDefaults setObject:receiptFileSize forKey:kContainerSubscriptionEmptyReceiptKey];
+    [sharedDefaults synchronize];
+}
+#endif
+
+/**
+ * Returns the file size of previously recorded empty receipt by the container (if any).
+ * @return Nil or file size recorded by the container.
+ */
+- (NSNumber *_Nullable)getContainerEmptyReceiptFileSize {
+    return [sharedDefaults objectForKey:kContainerSubscriptionEmptyReceiptKey];
 }
 
 @end
