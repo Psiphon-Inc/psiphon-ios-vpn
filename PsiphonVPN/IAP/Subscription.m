@@ -28,6 +28,8 @@
 #import "Logging.h"
 #import "Asserts.h"
 #import "RACCompoundDisposable.h"
+#import "PsiphonDataSharedDB.h"
+#import "SharedConstants.h"
 
 NSErrorDomain _Nonnull const ReceiptValidationErrorDomain = @"PsiphonReceiptValidationErrorDomain";
 
@@ -37,7 +39,7 @@ PsiFeedbackLogType const SubscriptionVerifierServiceLogType = @"SubscriptionVeri
     NSURLSession *urlSession;
 }
 
-+ (RACSignal<NSDictionary *> *)updateAuthorizationFromRemote {
++ (RACSignal<RACTwoTuple<NSDictionary *, NSNumber *> *> *)updateAuthorizationFromRemote {
     return [RACSignal createSignal:^RACDisposable *(id <RACSubscriber> subscriber) {
 
         // This object holds a reference to the current scheduler, in order to schedule
@@ -247,11 +249,26 @@ PsiFeedbackLogType const SubscriptionVerifierServiceLogType = @"SubscriptionVeri
 
 - (BOOL)shouldUpdateAuthorization {
     // If no receipt - NO
-    NSURL *URL = [NSBundle mainBundle].appStoreReceiptURL;
-    NSString *path = URL.path;
-    const BOOL exists = [[NSFileManager defaultManager] fileExistsAtPath:path isDirectory:nil];
+    NSURL *appReceiptURL = [NSBundle mainBundle].appStoreReceiptURL;
+
+    const BOOL exists = [[NSFileManager defaultManager] fileExistsAtPath:appReceiptURL.path isDirectory:nil];
     if (!exists) {
         LOG_DEBUG(@"receipt does not exist");
+        return NO;
+    }
+
+    NSNumber *currentReceiptFileSize;
+    [appReceiptURL getResourceValue:&currentReceiptFileSize forKey:NSURLFileSizeKey error:nil];
+
+    PsiphonDataSharedDB *sharedDB = [[PsiphonDataSharedDB alloc] initForAppGroupIdentifier:APP_GROUP_IDENTIFIER];
+    NSNumber *containerReceiptSize = [sharedDB getContainerEmptyReceiptFileSize];
+
+    if ([containerReceiptSize unsignedIntValue] == [currentReceiptFileSize unsignedIntValue]) {
+        // Treats as expired receipt.
+        self.appReceiptFileSize = currentReceiptFileSize;
+        self.authorization = nil;
+        [self persistChanges];
+
         return NO;
     }
 
@@ -262,8 +279,6 @@ PsiFeedbackLogType const SubscriptionVerifierServiceLogType = @"SubscriptionVeri
     }
 
     // Receipt file size has changed since last check - YES
-    NSNumber *currentReceiptFileSize;
-    [[NSBundle mainBundle].appStoreReceiptURL getResourceValue:&currentReceiptFileSize forKey:NSURLFileSizeKey error:nil];
     if ([currentReceiptFileSize unsignedIntValue] != [self.appReceiptFileSize unsignedIntValue]) {
         LOG_DEBUG(@"receipt file size changed (%@) since last check (%@)", currentReceiptFileSize, self.appReceiptFileSize);
         return YES;

@@ -20,6 +20,7 @@
 #import <PsiphonTunnel/Reachability.h>
 #import <ReactiveObjC/RACTuple.h>
 #import <NetworkExtension/NetworkExtension.h>
+#import <ReactiveObjC/RACScheduler.h>
 #import "AppDelegate.h"
 #import "AdManager.h"
 #import "EmbeddedServerEntries.h"
@@ -30,7 +31,6 @@
 #import "PsiphonClientCommonLibraryHelpers.h"
 #import "PsiphonConfigFiles.h"
 #import "PsiphonDataSharedDB.h"
-#import "RegionAdapter.h"
 #import "RootContainerController.h"
 #import "SharedConstants.h"
 #import "UIAlertController+Delegate.h"
@@ -48,6 +48,10 @@
 #import "RACSignal+Operations.h"
 #import "RACReplaySubject.h"
 #import "Asserts.h"
+
+// Number of seconds to wait for tunnel status to become "Connected", after the landing page notification
+// is received from the extension.
+#define kLandingPageTimeoutSecs 1.0
 
 PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
 
@@ -368,25 +372,33 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
             NSUInteger randIndex = arc4random() % [homepages count];
             Homepage *homepage = homepages[randIndex];
 
-            // Only opens landing page if the VPN is active.
+            // Only opens landing page if the VPN is active (or waits up to a maximum of kLandingPageTimeoutSecs
+            // for the tunnel status to become "Connected" before opening the landing page).
             // Landing page should not be opened outside of the tunnel.
-            __block RACDisposable *disposable = [[[weakSelf.vpnManager isExtensionZombie]
-              deliverOnMainThread]
-              subscribeNext:^(NSNumber *isZombie) {
 
-                  if ([isZombie boolValue]) {
+            __block RACDisposable *disposable = [[[[[[[weakSelf.vpnManager isExtensionZombie]
+              combineLatestWith:weakSelf.vpnManager.lastTunnelStatus]
+              filter:^BOOL(RACTwoTuple<NSNumber *, NSNumber *> *tuple) {
+
+                  // We're only interested in the Connected status.
+                  VPNStatus s = (VPNStatus) [tuple.second integerValue];
+                  return (s == VPNStatusConnected);
+              }]
+              take:1]  // Take 1 to terminate the infinite signal.
+              timeout:kLandingPageTimeoutSecs onScheduler:RACScheduler.mainThreadScheduler]
+              deliverOnMainThread]
+              subscribeNext:^(RACTwoTuple<NSNumber *, NSNumber *> *x) {
+                  BOOL isZombie = [x.first boolValue];
+
+                  if (isZombie) {
                       weakSelf.shownLandingPageForCurrentSession = FALSE;
                       return;
                   }
 
                   NEVPNStatus s = weakSelf.vpnManager.tunnelProviderStatus;
+                  if (NEVPNStatusConnected == s) {
 
-                  if (s == NEVPNStatusConnecting ||
-                      s == NEVPNStatusConnected ||
-                      s == NEVPNStatusReasserting) {
-
-                      [PsiFeedbackLogger infoWithType:LandingPageLogType
-                                              message:@"open landing page with VPN status %ld", (long) s];
+                      [PsiFeedbackLogger infoWithType:LandingPageLogType message:@"open landing page"];
 
                       // Not officially documented by Apple, however a runtime warning is generated sometimes
                       // stating that [UIApplication openURL:options:completionHandler:] must be used from
@@ -396,12 +408,15 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
                                                completionHandler:^(BOOL success) {
                                                    weakSelf.shownLandingPageForCurrentSession = success;
                                                }];
-
                   } else {
+
+                      [PsiFeedbackLogger warnWithType:LandingPageLogType
+                                              message:@"fail open with connection status %@", [VPNManager statusTextSystem:s]];
                       weakSelf.shownLandingPageForCurrentSession = FALSE;
                   }
 
               } error:^(NSError *error) {
+                  [PsiFeedbackLogger warnWithType:LandingPageLogType message:@"timeout expired" object:error];
                   [weakSelf.compoundDisposable removeDisposable:disposable];
               } completed:^{
                   [weakSelf.compoundDisposable removeDisposable:disposable];
@@ -428,7 +443,7 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
         LOG_DEBUG(@"Received notification NE.onAvailableEgressRegions");
         // Update available regions
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-            NSArray<NSString *> *regions = [weakSelf.sharedDB getAllEgressRegions];
+            NSArray<NSString *> *regions = [weakSelf.sharedDB emittedEgressRegions];
             [[RegionAdapter sharedInstance] onAvailableEgressRegions:regions];
         });
     }];

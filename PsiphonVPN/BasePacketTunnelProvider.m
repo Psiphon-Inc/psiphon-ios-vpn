@@ -62,8 +62,7 @@ NSErrorDomain _Nonnull const BasePsiphonTunnelErrorDomain = @"BasePsiphonTunnelE
     //       since file with such protection level cannot be created while device is still locked from boot.
     if (![self createBootTestFile]) {
         // Undefined behaviour wrt. Connect On Demand. Fail fast.
-        [PsiFeedbackLogger error:@"Aborting. Failed to create/check for boot test file."];
-        abort();
+        [PsiFeedbackLogger error:@"Failed to create/check for boot test file."];
     }
 
     // List of paths to downgrade file protection to NSFileProtectionNone. The list could contain files or directories.
@@ -78,8 +77,7 @@ NSErrorDomain _Nonnull const BasePsiphonTunnelErrorDomain = @"BasePsiphonTunnelE
     // This is required in order for "Connect On Demand" to work.
     if (![FileUtils downgradeFileProtectionToNone:paths withExceptions:@[ [self getBootTestFilePath] ]]) {
         // Undefined behaviour wrt. Connect On Demand. Fail fast.
-        [PsiFeedbackLogger error:@"Aborting. Failed to set file protection."];
-        abort();
+        [PsiFeedbackLogger error:@"Failed to set file protection."];
     }
 
 #if DEBUG
