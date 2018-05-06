@@ -53,11 +53,13 @@ if __name__ == "__main__":
 
     # get most up-to-date version numbers from versioning branch
     call(["git","checkout","versioning"])
+    call(["git","pull"])
     short_version = call_with_output(["agvtool","what-marketing-version","-terse1"])
     version = call_with_output(["agvtool","what-version","-terse"])
 
     # switch back to active branch
     call(["git","checkout",active_branch])
+    call(["git","pull"])
 
     # sync active branch version with versioning branch
     call(["agvtool","new-marketing-version",short_version])
@@ -67,6 +69,10 @@ if __name__ == "__main__":
     inc_version()
     if args.release:
         inc_short_version()
+
+    # get new version strings
+    short_version = call_with_output(["agvtool","what-marketing-version","-terse1"])
+    version = call_with_output(["agvtool","what-version","-terse"])
 
     # commit version changes
     call(["git","add","Psiphon.xcodeproj/project.pbxproj","Psiphon/Info.plist","PsiphonUITests/Info.plist","PsiphonVPN/Info.plist"])
