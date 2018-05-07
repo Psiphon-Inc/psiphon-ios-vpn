@@ -24,7 +24,8 @@ FOUNDATION_EXTERN NSErrorDomain _Nonnull const PsiphonTunnelErrorDomain;
 
 typedef NS_ERROR_ENUM(PsiphonTunnelErrorDomain, PsiphonTunnelErrorCode) {
     PsiphonTunnelErrorBadConfiguration = 2000,
-    PsiphonTunnelErrorInternalError = 2001
+    PsiphonTunnelErrorInternalError = 2001,
+    PsiphonTunnelErrorTunnelNotConnected = 2002,
 };
 
 @interface PacketTunnelProvider : BasePacketTunnelProvider <BasePacketTunnelProviderProtocol>
