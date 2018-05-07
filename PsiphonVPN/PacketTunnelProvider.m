@@ -324,7 +324,13 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
                               }
                               // Exponential backoff.
                               [PsiFeedbackLogger errorWithType:SubscriptionCheckLogType message:@"retry authorization request" object:retryCountTuple.first];
-                              return [RACSignal timer:pow(4, [retryCountTuple.second integerValue])];
+
+                              // Make sure tunnel is connected before retrying.
+                              if ([weakSelf.psiphonTunnel getConnectionState] == PsiphonConnectionStateConnected) {
+                                  return [RACSignal timer:pow(4, [retryCountTuple.second integerValue])];
+                              } else {
+                                  return [RACSignal error:[NSError errorWithDomain:PsiphonTunnelErrorDomain code:PsiphonTunnelErrorTunnelNotConnected]];
+                              }
                           }];
                     }]
                     map:^SubscriptionResultModel *(RACTwoTuple<NSDictionary *, NSNumber *> *response) {
@@ -457,6 +463,11 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
       }
       error:^(NSError *error) {
           [PsiFeedbackLogger errorWithType:SubscriptionCheckLogType message:@"authorization request failed" object:error];
+
+          // No need to retry if the tunnel is not connected.
+          if ([error.domain isEqualToString:PsiphonTunnelErrorDomain] && error.code == PsiphonTunnelErrorTunnelNotConnected) {
+              return;
+          }
 
           // Schedules another subscription check in 3 hours.
           const int64_t secs_in_3_hours = 3 * 60 * 60;
