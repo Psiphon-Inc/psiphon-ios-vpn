@@ -46,6 +46,7 @@
 #import "NSDate+PSIDateExtension.h"
 #import "DispatchUtils.h"
 #import "RACSignal.h"
+#import "RACUnit.h"
 #import <ReactiveObjC/RACSubject.h>
 #import <ReactiveObjC/RACReplaySubject.h>
 
@@ -325,12 +326,14 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
                               // Exponential backoff.
                               [PsiFeedbackLogger errorWithType:SubscriptionCheckLogType message:@"retry authorization request" object:retryCountTuple.first];
 
-                              // Make sure tunnel is connected before retrying.
-                              if ([weakSelf.psiphonTunnel getConnectionState] == PsiphonConnectionStateConnected) {
-                                  return [RACSignal timer:pow(4, [retryCountTuple.second integerValue])];
-                              } else {
-                                  return [RACSignal error:[NSError errorWithDomain:PsiphonTunnelErrorDomain code:PsiphonTunnelErrorTunnelNotConnected]];
-                              }
+                              return [[RACSignal timer:pow(4, [retryCountTuple.second integerValue])] flattenMap:^RACSignal *(id value) {
+                                  // Make sure tunnel is connected before retrying, otherwise terminate subscription chain.
+                                  if ([weakSelf.psiphonTunnel getConnectionState] == PsiphonConnectionStateConnected) {
+                                      return [RACSignal return:RACUnit.defaultUnit];
+                                  } else {
+                                      return [RACSignal error:[NSError errorWithDomain:PsiphonTunnelErrorDomain code:PsiphonTunnelErrorTunnelNotConnected]];
+                                  }
+                              }];
                           }];
                     }]
                     map:^SubscriptionResultModel *(RACTwoTuple<NSDictionary *, NSNumber *> *response) {
