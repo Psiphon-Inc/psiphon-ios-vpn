@@ -47,6 +47,8 @@ typedef NS_ENUM(NSInteger, UserSubscriptionStatus) {
  */
 @property (nonatomic, readonly) RACReplaySubject<NSNumber *> *subscriptionStatus;
 
+@property (atomic) BOOL shownLandingPageForCurrentSession;
+
 + (AppDelegate *)sharedAppDelegate;
 + (BOOL)isFirstRunOfAppVersion;
 + (BOOL)isRunningUITest;

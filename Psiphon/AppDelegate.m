@@ -87,7 +87,6 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
 @property (nonatomic, readwrite) RACReplaySubject<NSNumber *> *adLoadingStatus;
 
 // Private properties
-@property (atomic) BOOL shownLandingPageForCurrentSession;
 @property (nonatomic) RACCompoundDisposable *compoundDisposable;
 
 @property (nonatomic) VPNManager *vpnManager;

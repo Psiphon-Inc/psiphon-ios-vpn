@@ -19,6 +19,7 @@
 
 #import <PsiCashLib/PsiCash.h>
 #import "PsiCashClient.h"
+#import "AppDelegate.h"
 #import "Asserts.h"
 #import "Authorization.h"
 #import "CustomIOSAlertView.h"
@@ -347,6 +348,8 @@ NSErrorDomain _Nonnull const PsiCashClientLibraryErrorDomain = @"PsiCashClientLi
             }
 
             [self updateContainerAuthTokens];
+            // Ensure homepage is shown when extension reconnects with new auth token
+            [AppDelegate sharedAppDelegate].shownLandingPageForCurrentSession = FALSE;
             [[Notifier sharedInstance] post:NotifierUpdatedAuthorizations completionHandler:^(BOOL success) {
                 // Do nothing.
             }];
