@@ -149,11 +149,30 @@ NSErrorDomain _Nonnull const PsiCashClientLibraryErrorDomain = @"PsiCashClientLi
     });
 }
 
-- (PsiCashSpeedBoostProduct*)speedBoostProductFromPurchasePrices:(NSArray<PsiCashPurchasePrice*>*)purchasePrices {
+/**
+ * Hardcode SpeedBoost product to only 1h option for PsiCash 1.0
+ */
+- (NSDictionary<NSString*,NSArray<NSString*>*>*)targetProducts {
+    return @{[PsiCashSpeedBoostProduct purchaseClass]: @[@"1hr"]};
+}
+
+/**
+ * Helper function to parse an array of PsiCashPurchasePrice objects
+ * into a more completely typed PsiCashSpeedBoostProduct object.
+ */
+- (PsiCashSpeedBoostProduct*)speedBoostProductFromPurchasePrices:(NSArray<PsiCashPurchasePrice*>*)purchasePrices withTargetProducts:(NSDictionary<NSString*,NSArray<NSString*>*>*)targets {
     NSMutableArray<PsiCashPurchasePrice*> *speedBoostPurchasePrices = [[NSMutableArray alloc] init];
+    NSArray <NSString*>* targetDistinguishersForSpeedBoost = nil;
+    if (targets != nil) {
+        targetDistinguishersForSpeedBoost = [targets objectForKey:[PsiCashSpeedBoostProduct purchaseClass]];
+    }
+
     for (PsiCashPurchasePrice *price in purchasePrices) {
         if ([price.transactionClass isEqualToString:[PsiCashSpeedBoostProduct purchaseClass]]) {
-            [speedBoostPurchasePrices addObject:price];
+            if (targetDistinguishersForSpeedBoost == nil
+                || (targetDistinguishersForSpeedBoost != nil && [targetDistinguishersForSpeedBoost containsObject:price.distinguisher])) {
+                [speedBoostPurchasePrices addObject:price];
+            }
         } else {
             [PsiFeedbackLogger infoWithType:PsiCashLogType message:@"Ignored PsiCashPurchasePrice with transaction class %@", price.transactionClass];
         }
@@ -224,7 +243,7 @@ NSErrorDomain _Nonnull const PsiCashClientLibraryErrorDomain = @"PsiCashClientLi
     [stagingArea updateBalanceInNanoPsi:[psiCash.balance unsignedLongLongValue]];
     [stagingArea updateActivePurchases:[self getActivePurchases]];
     [stagingArea updateAuthPackage:[[PsiCashAuthPackage alloc] initWithValidTokens:psiCash.validTokenTypes]];
-    [stagingArea updateSpeedBoostProduct:[self speedBoostProductFromPurchasePrices:psiCash.purchasePrices]];
+    [stagingArea updateSpeedBoostProduct:[self speedBoostProductFromPurchasePrices:psiCash.purchasePrices withTargetProducts:[self targetProducts]]];
     [self commitModelStagingArea:stagingArea];
 }
 
@@ -267,7 +286,7 @@ NSErrorDomain _Nonnull const PsiCashClientLibraryErrorDomain = @"PsiCashClientLi
             PsiCashAuthPackage *authPackage = [[PsiCashAuthPackage alloc] initWithValidTokens:r.validTokenTypes];
             [stagingArea updateAuthPackage:authPackage];
             [stagingArea updateBalanceInNanoPsi:[r.balance unsignedLongLongValue]];
-            PsiCashSpeedBoostProduct *speedBoostProduct = [self speedBoostProductFromPurchasePrices:r.purchasePrices];
+            PsiCashSpeedBoostProduct *speedBoostProduct = [self speedBoostProductFromPurchasePrices:r.purchasePrices withTargetProducts:[self targetProducts]];
             [stagingArea updateSpeedBoostProduct:speedBoostProduct];
             [stagingArea updateActivePurchases:[self getActivePurchases]];
             [self commitModelStagingArea:stagingArea];
