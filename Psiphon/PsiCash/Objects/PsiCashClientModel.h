@@ -34,8 +34,8 @@
                         andSpeedBoostProduct:(PsiCashSpeedBoostProduct*)speedBoostProduct
                          andPendingPurchases:(NSArray<id<PsiCashProductSKU>>*)pendingPurchases
                  andActiveSpeedBoostPurchase:(PsiCashPurchase*)activeSpeedBoostPurchase;
-- (NSNumber*)hoursEarned;
-- (PsiCashSpeedBoostProductSKU*)minSpeedBoostPurchase;
+- (PsiCashSpeedBoostProductSKU*)maxSpeedBoostPurchaseEarned;
+- (PsiCashSpeedBoostProductSKU*)minSpeedBoostPurchaseAvailable;
 - (BOOL)hasActiveSpeedBoostPurchase;
 - (int)minutesOfSpeedBoostRemaining;
 - (BOOL)hasPendingPurchase;

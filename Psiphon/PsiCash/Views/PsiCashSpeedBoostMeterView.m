@@ -103,7 +103,7 @@
     self.backgroundColor = [UIColor colorWithRed:0.16 green:0.18 blue:0.27 alpha:1.0];
 
     if (progress >= 1) {
-        if ([self.model.hoursEarned floatValue] < 1) {
+        if ([self.model.maxSpeedBoostPurchaseEarned.hours floatValue] < 1) {
             title.text = [NSString stringWithFormat:@"%.0fm Speed Boost Available", ([hoursEarned floatValue] * 60)];
         } else {
             title.text = [NSString stringWithFormat:@"%luh Speed Boost Available", (unsigned long)[hoursEarned unsignedIntegerValue]];
@@ -125,7 +125,7 @@
             }];
         });
     } else {
-        [self speedBoostChargingWithHoursEarned:[self.model hoursEarned]];
+        [self speedBoostChargingWithHoursEarned:[self.model maxSpeedBoostPurchaseEarned].hours];
     }
 }
 
@@ -168,7 +168,7 @@
 }
 
 - (NSAttributedString*)minSpeedBoostPurchaseTitle {
-    PsiCashSpeedBoostProductSKU *sku = [self.model minSpeedBoostPurchase];
+    PsiCashSpeedBoostProductSKU *sku = [self.model minSpeedBoostPurchaseAvailable];
     if (sku == nil) {
         return [[NSAttributedString alloc] initWithString:@""];
     }
@@ -194,7 +194,7 @@
 }
 
 - (float)progressToMinSpeedBoostPurchase {
-    PsiCashSpeedBoostProductSKU *sku = [self.model minSpeedBoostPurchase];
+    PsiCashSpeedBoostProductSKU *sku = [self.model minSpeedBoostPurchaseAvailable];
     if (sku == nil) {
         return 0;
     }
@@ -219,7 +219,7 @@
             [self inPurchasePendingState];
         } else {
             if ([self.model.authPackage hasSpenderToken]) {
-                [self speedBoostChargingWithHoursEarned:[self.model hoursEarned]];
+                [self speedBoostChargingWithHoursEarned:[self.model maxSpeedBoostPurchaseEarned].hours];
             } else {
                 [self noSpenderToken];
             }
