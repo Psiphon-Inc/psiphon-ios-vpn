@@ -38,13 +38,13 @@
     return clientModel;
 }
 
-- (NSNumber*)hoursEarned {
-    NSNumber *maxHoursEarned = 0;
+- (PsiCashSpeedBoostProductSKU*)maxSpeedBoostPurchaseEarned {
+    PsiCashSpeedBoostProductSKU *maxHoursEarned;
 
     for (PsiCashSpeedBoostProductSKU *sku in [self.speedBoostProduct skusOrderedByPriceAscending]) {
         if (self.balanceInNanoPsi >= [sku.price unsignedLongLongValue]) {
-            if (sku.hours > maxHoursEarned) {
-                maxHoursEarned = sku.hours;
+            if (maxHoursEarned == nil || sku.hours > maxHoursEarned.hours) {
+                maxHoursEarned = sku;
             }
         }
     }
@@ -52,7 +52,7 @@
     return maxHoursEarned;
 }
 
-- (PsiCashSpeedBoostProductSKU*)minSpeedBoostPurchase {
+- (PsiCashSpeedBoostProductSKU*)minSpeedBoostPurchaseAvailable {
     NSArray<PsiCashSpeedBoostProductSKU*> *skus = [self.speedBoostProduct skusOrderedByPriceAscending];
     if ([skus count] == 0) {
         nil;

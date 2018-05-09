@@ -1101,7 +1101,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     alertView = nil;
 }
 
-- (void)showPurchaseAlertView {
+- (void)showPsiCashAlertView {
     if (alertView != nil) {
         [alertView close];
         alertView = nil;
@@ -1112,14 +1112,30 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     } else if ([model hasActiveSpeedBoostPurchase]) {
         alertView = [PsiCashPurchaseAlertView alreadySpeedBoostingAlertWithNMinutesRemaining:[model minutesOfSpeedBoostRemaining]];
     } else  if ([model hasPendingPurchase]) {
-        alertView = [PsiCashPurchaseAlertView pendingPurchaseAlert];
+        // (PsiCash 1.0): Do nothing
+        //alertView = [PsiCashPurchaseAlertView pendingPurchaseAlert];
+        return;
     } else {
-        alertView = [PsiCashPurchaseAlertView purchaseAlert];
+        // (PsiCash 1.0): Do nothing
+        //alertView = [PsiCashPurchaseAlertView purchaseAlert];
+        return;
     }
 
     alertView.controllerDelegate = self;
     [alertView bindWithModel:model];
     [alertView show];
+}
+
+/**
+* Buy max num hours of Speed Boost that the user can afford if possible
+*/
+- (void)instantMaxSpeedBoostPurchase {
+    PsiCashSpeedBoostProductSKU *purchase = [model maxSpeedBoostPurchaseEarned];
+    if (![model hasActiveSpeedBoostPurchase] && purchase != nil) {
+        [PsiCashClient.sharedInstance purchaseSpeedBoostProduct:purchase];
+    } else {
+        [self showPsiCashAlertView];
+    }
 }
 
 - (void)addPsiCashBalanceView {
@@ -1145,7 +1161,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
             model = newClientModel;
 
             if (stateChanged && alertView != nil) {
-                [self showPurchaseAlertView];
+                [self showPsiCashAlertView];
             }
 
             [balanceView bindWithModel:model]; // TODO: don't capture like this
@@ -1158,7 +1174,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     speedBoostMeter.translatesAutoresizingMaskIntoConstraints = NO;
 
     UITapGestureRecognizer *speedBoostMeterTap = [[UITapGestureRecognizer alloc]
-                                                  initWithTarget:self action:@selector(showPurchaseAlertView)];
+                                                  initWithTarget:self action:@selector(instantMaxSpeedBoostPurchase)];
     speedBoostMeterTap.numberOfTapsRequired = 1;
     [speedBoostMeter addGestureRecognizer:speedBoostMeterTap];
 
