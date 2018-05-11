@@ -130,8 +130,8 @@
 /* Title of button on subscriptions page which opens Psiphon's privacy policy webpage */
 "SUBSCRIPTIONS_PRIVACY_POLICY_BUTTON_TEXT" = "Privacy Policy";
 
-/* Title of button on subscriptions page which opens Psiphon's terms of service webpage */
-"SUBSCRIPTIONS_TERMS_OF_SERVICE_BUTTON_TEXT" = "Terms of Service";
+/* Title of button on subscriptions page which opens Psiphon's terms of use webpage */
+"SUBSCRIPTIONS_TERMS_OF_USE_BUTTON_TEXT" = "Terms of Use";
 
 /* Alert message informing user that Psiphon has been stopped automatically since the subscription has expired. Do not translate 'Psiphon'. */
 "TUNNEL_KILLED" = "Psiphon has been stopped automatically since your subscription has expired.";
