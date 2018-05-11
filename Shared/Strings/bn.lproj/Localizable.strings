@@ -77,6 +77,9 @@
 /* Alert dialog title indicating to the user that their feedback has been successfully uploaded to Psiphon's servers. */
 "FEEDBACK_UPLOAD_SUCCESSFUL_TITLE" = "প্রতিক্রিয়া সফলভাবে আপলোড করা হয়েছে";
 
+/*[UNTRANSLATED] External link to the license page. Please update this with the correct language specific link (if available) e.g. https://psiphon.ca/fr/license.html for french. */
+"LICENSE_PAGE_URL" = "https://psiphon.ca/en/license.html";
+
 /* Text displayed while app loads */
 "LOADING" = "লোড হচ্ছে ...";
 
@@ -121,6 +124,12 @@
 
 /* Title of the dialog for available in-app paid subscriptions */
 "SUBSCRIPTIONS" = "সাবস্ক্রিপশনস";
+
+/* Title of button on subscriptions page which opens Psiphon's privacy policy webpage */
+"SUBSCRIPTIONS_PRIVACY_POLICY_BUTTON_TEXT" = "গোপনীয়তা নীতি";
+
+/* Title of button on subscriptions page which opens Psiphon's terms of use webpage */
+"SUBSCRIPTIONS_TERMS_OF_USE_BUTTON_TEXT" = "ব্যবহারের শর্তাবলী";
 
 /* Alert message informing user that Psiphon has been stopped automatically since the subscription has expired. Do not translate 'Psiphon'. */
 "TUNNEL_KILLED" = "আপনার সদস্যতার মেয়াদ শেষ হয়ে গেলে সাইফন স্বয়ংক্রিয়ভাবে বন্ধ হয়ে গেছে।";
