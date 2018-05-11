@@ -1,0 +1,49 @@
+{
+    "_comments": "Screenshots will be displayed on the app store in the order they are defined",
+    "app_store_supported_languages": [
+        "de-DE",
+        "el",
+        "en-US",
+        "es-ES",
+        "fi",
+        "fr-FR",
+        "id",
+        "ko",
+        "no",
+        "nl-NL",
+        "pt-BR",
+        "pt-PT",
+        "ru",
+        "th",
+        "tr",
+        "vi",
+        "zh-Hans",
+        "zh-Hant"
+    ],
+    "language_code_mappings": {
+        "de": "de-DE",
+        "en": "en-US",
+        "es": "es-ES",
+        "fr": "fr-FR",
+        "nl": "nl-NL"
+    },
+    "display_targets": {
+        "iPhone 6 Plus": "iOS-5.5-in",
+        "iPhone X": "iOS-5.8-in",
+        "iPad Pro (12.9-inch)": "iOS-iPad-Pro"
+    },
+    "screenshots": [
+        {
+            "filename_pattern": "<device_type>-main.png"
+        },
+        {
+            "filename_pattern": "<device_type>-settings.png"
+        },
+        {
+            "filename_pattern": "<device_type>-settings-region.png"
+        },
+        {
+            "filename_pattern": "<device_type>-settings-language.png"
+        }
+    ]
+}

@@ -21,7 +21,7 @@
 #import "PsiphonDataSharedDB.h"
 #import "SharedConstants.h"
 #import "Logging.h"
-#import "NoticeLogger.h"
+#import "PsiFeedbackLogger.h"
 
 // Initial maximum number of logs to load.
 #define MAX_LOGS_LOAD 250
@@ -200,10 +200,13 @@
 }
 
 - (void)setupLogFileListener {
+
+    // TODO: log file rotation is not handled.
+
     int fd = open([logFilePath UTF8String], O_RDONLY);
 
     if (fd == -1) {
-        LOG_ERROR(@"Error opening log file to watch. errno: %s", strerror(errno));
+        [PsiFeedbackLogger error:@"Error opening log file to watch. errno: %s", strerror(errno)];
         [activityIndicator stopAnimating];
         return;
     }
@@ -216,7 +219,6 @@
     dispatch_source_set_event_handler(dispatchSource, ^{
         unsigned long flag = dispatch_source_get_data(dispatchSource);
 
-        // TODO: what flag is sent when file is truncated.
         if (flag & DISPATCH_VNODE_WRITE) {
             LOG_DEBUG(@"Log Dispatch_vnode_write");
             [self loadDataAsync:FALSE];
@@ -256,8 +258,8 @@
     [super viewDidLoad];
 
     LogViewControllerFullScreen *tunnelCore = [[LogViewControllerFullScreen alloc] initWithLogPath:[sharedDB rotatingLogNoticesPath] title:@"Tunnel Core"];
-    LogViewControllerFullScreen *networkExtension = [[LogViewControllerFullScreen alloc] initWithLogPath:[NoticeLogger extensionRotatingLogNoticesPath] title:@"Extension"];
-    LogViewControllerFullScreen *container = [[LogViewControllerFullScreen alloc] initWithLogPath:[NoticeLogger containerRotatingLogNoticesPath] title:@"Container"];
+    LogViewControllerFullScreen *networkExtension = [[LogViewControllerFullScreen alloc] initWithLogPath:PsiFeedbackLogger.extensionRotatingLogNoticesPath title:@"Extension"];
+    LogViewControllerFullScreen *container = [[LogViewControllerFullScreen alloc] initWithLogPath:PsiFeedbackLogger.containerRotatingLogNoticesPath title:@"Container"];
 
     UINavigationController *nav1 = [[UINavigationController alloc] initWithRootViewController:tunnelCore];
     nav1.modalPresentationStyle = UIModalPresentationFullScreen;

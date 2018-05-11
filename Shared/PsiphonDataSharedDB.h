@@ -18,7 +18,7 @@
  */
 
 #import <Foundation/Foundation.h>
-#ifndef TARGET_IS_EXTENSION
+#if !(TARGET_IS_EXTENSION)
 #import "PsiphonData.h"
 #endif
 
@@ -35,7 +35,7 @@
 
 - (id)initForAppGroupIdentifier:(NSString*)identifier;
 
-#ifndef TARGET_IS_EXTENSION
+#if !(TARGET_IS_EXTENSION)
 + (NSString *)tryReadingFile:(NSString *)filePath;
 + (NSString *)tryReadingFile:(NSString *)filePath usingFileHandle:(NSFileHandle *__strong *)fileHandlePtr readFromOffset:(unsigned long long)bytesOffset readToOffset:(unsigned long long *)readToOffset;
 - (void)readLogsData:(NSString *)logLines intoArray:(NSMutableArray<DiagnosticEntry *> *)entries;
@@ -43,17 +43,19 @@
 #endif
 
 - (BOOL)insertNewEgressRegions:(NSArray<NSString *> *)regions;
-- (NSArray<NSString *> *)getAllEgressRegions;
+#if !(TARGET_IS_EXTENSION)
+- (NSArray<NSString *> *)embeddedAndEmittedEgressRegions;
+- (void)insertNewEmbeddedEgressRegions:(NSArray<NSString *> *)regions;
+- (NSArray<NSString *> *)embeddedEgressRegions;
+- (NSArray<NSString *> *)emittedEgressRegions;
+#endif
 
 - (NSString *)homepageNoticesPath;
 - (NSString *)rotatingLogNoticesPath;
 
-#ifndef TARGET_IS_EXTENSION
+#if !(TARGET_IS_EXTENSION)
 - (NSArray<DiagnosticEntry*>*)getAllLogs;
 #endif
-
-- (BOOL)updateTunnelConnectedState:(BOOL)connected;
-- (BOOL)getTunnelConnectedState;
 
 - (BOOL)updateAppForegroundState:(BOOL)foreground;
 - (BOOL)getAppForegroundState;
@@ -62,8 +64,11 @@
 - (void)updateServerTimestamp:(NSString*)timestamp;
 - (NSString*)getServerTimestamp;
 
-// Sponsor ID
-- (void) updateSponsorId:(NSString*)sponsorId;
-- (NSString*)getSponsorId;
+// Receipt read by the container
+#if !(TARGET_IS_EXTENSION)
+- (void)setContainerEmptyReceiptFileSize:(NSNumber *)receiptFileSize;
+#endif
+
+- (NSNumber *)getContainerEmptyReceiptFileSize;
 
 @end

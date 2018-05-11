@@ -20,7 +20,7 @@
 #import <Foundation/Foundation.h>
 #import <mopub-ios-sdk/MPInterstitialAdController.h>
 
-#define kAdsDidLoad "MPAdsDidLoad"
+FOUNDATION_EXPORT NSNotificationName const AdManagerAdsDidLoadNotification;
 
 @interface AdManager : NSObject <MPInterstitialAdControllerDelegate>
 

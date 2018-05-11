@@ -18,15 +18,51 @@
  */
 
 #import <UIKit/UIKit.h>
-#import "MPInterstitialAdController.h"
-#import "MainViewController.h"
+
+@class RACReplaySubject<ValueType>;
+
+/**
+ * User's subscription status.
+ */
+typedef NS_ENUM(NSInteger, UserSubscriptionStatus) {
+    /** @const UserSubscriptionUnknown User's subscription status is not known yet (pending). */
+    UserSubscriptionUnknown,
+    /** @const UserSubscriptionInActive User does not have an active subscription. */
+    UserSubscriptionInactive,
+    /** @const UserSubscriptionActive User has an active subscription. */
+    UserSubscriptionActive
+};
 
 @interface AppDelegate : UIResponder <UIApplicationDelegate>
 
 @property (strong, nonatomic) UIWindow *window;
 
+/**
+ * subscriptionStatus emits an item of type `UserSubscriptionStatus` wrapped in NSNumber.
+ * This replay subject has the initial value of `UserSubscriptionUnknown`.
+ *
+ * @note This subject might emit non-unique events.
+ *
+ * @scheduler vpnStartStatus delivers its events on the main thread.
+ */
+@property (nonatomic, readonly) RACReplaySubject<NSNumber *> *subscriptionStatus;
+
 + (AppDelegate *)sharedAppDelegate;
-- (MainViewController *)getMainViewController;
-- (void) reloadMainViewController;
++ (BOOL)isFirstRunOfAppVersion;
++ (BOOL)isRunningUITest;
+
+/* Ads */
+- (UIViewController *)getAdsPresentingViewController;
+- (void)launchScreenFinished;
+
+/**
+ * Reloads the MainViewController.
+ *
+ * @details
+ * reloadMainViewController is meant to be used after a settings change (e.g. default language).
+ */
+- (void)reloadMainViewController;
+
++ (UIViewController *)getTopMostViewController;
 
 @end

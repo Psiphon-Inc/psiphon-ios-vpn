@@ -18,197 +18,141 @@
  */
 
 #import <Foundation/Foundation.h>
-#import <AVFoundation/AVFoundation.h>
+#import "AppDelegate.h"
 #import "LaunchScreenViewController.h"
 #import "Logging.h"
+#import "PsiphonProgressView.h"
+#import "PureLayout.h"
+#import "RootContainerController.h"
+
+#if DEBUG
+#define kLaunchScreenTimerCount 1.f
+#else
+#define kLaunchScreenTimerCount 10.f
+#endif
+
+#define kTimerInterval 1.f
+
+#define kProgressViewToScreenRatio 0.9f
+#define kProgressViewMaxDimensionLength 500.f
+
 
 @interface LaunchScreenViewController ()
-
-@property (strong, nonatomic) AVPlayer *loadingVideo;
-@property (nonatomic) AVPlayerItem *videoFile;
 
 @end
 
 static const NSString *ItemStatusContext;
 
 @implementation LaunchScreenViewController {
-    // videoPlayer
-    AVPlayerLayer* playerLayer;
-
     // Loading Text
     UILabel *loadingLabel;
-}
 
-- (id)init {
-    self = [super init];
-    
-    NSString *tracksKey = @"tracks";
-    
-    NSURL *fileURL = [[NSBundle mainBundle] URLForResource:@"launch" withExtension:@"m4v"];
-    
-    AVURLAsset *asset = [AVURLAsset URLAssetWithURL:fileURL options:nil];
-    
-    [asset loadValuesAsynchronouslyForKeys:@[tracksKey] completionHandler:^{
-        
-        dispatch_async(dispatch_get_main_queue(), ^{
-            NSError *error;
-            AVKeyValueStatus status = [asset statusOfValueForKey:tracksKey error:&error];
-             if (status == AVKeyValueStatusLoaded) {
-                 self.videoFile = [AVPlayerItem playerItemWithAsset:asset];
-                 // ensure that this is done before the playerItem is associated with the player
-                 [self.videoFile addObserver:self forKeyPath:@"status" options:NSKeyValueObservingOptionInitial context:&ItemStatusContext];
-                 [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(playerItemDidReachEnd:) name:AVPlayerItemDidPlayToEndTimeNotification object:self.videoFile];
-                 self.loadingVideo = [AVPlayer playerWithPlayerItem:self.videoFile];
-                 
-                 playerLayer = [AVPlayerLayer playerLayerWithPlayer:self.loadingVideo];
-                 [self setupVideoLayerFrame:self.view.bounds.size];
-                 playerLayer.videoGravity = AVLayerVideoGravityResizeAspect;
-                 playerLayer.needsDisplayOnBoundsChange = YES;
+    // Loading Timer
+    NSTimer *loadingTimer;
+    CGFloat timerCount;
 
-                LOG_DEBUG(@"Loading video");
-                 [self.view.layer addSublayer:playerLayer];
-                 self.view.layer.needsDisplayOnBoundsChange = YES;
-             }
-             else {
-                 // You should deal with the error appropriately.
-                LOG_DEBUG(@"The asset's tracks were not loaded:\n%@", [error localizedDescription]);
-             }
-        });
-     }];
-    
-    return self;
-}
-
-- (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator {
-
-    [self setupVideoLayerFrame:size];
-
-    [coordinator animateAlongsideTransition:nil completion:^(id<UIViewControllerTransitionCoordinatorContext> context) {
-    }];
-
-    [super viewWillTransitionToSize:size withTransitionCoordinator:coordinator];
-}
-
-- (void)viewDidLoad {
-    [super viewDidLoad];
-    // TODO: Add something to handle the syncUI when screen rotate
-    [self.view setBackgroundColor:[UIColor blackColor]];
-    [self addLoadingLabel];
-    [self addProgressView];
-    [self setNeedsStatusBarAppearanceUpdate];
-    [self syncUI];
-}
-
-- (void)viewDidAppear:(BOOL)animated {
-    [super viewDidAppear:animated];
-    [self.loadingVideo seekToTime:kCMTimeZero];
-    [self setupVideoLayerFrame:self.view.bounds.size];
-    [self.loadingVideo play];
-}
-
-- (void)setupVideoLayerFrame:(CGSize)size {
-    if (size.width > size.height) {
-        // Landscape
-        playerLayer.frame = CGRectMake((size.width - size.width / 1.5) / 2, 30, size.width / 1.5, size.height / 1.5);
-    } else {
-        playerLayer.frame = CGRectMake(0, 0, size.width, size.height);
-    }
-}
-
-- (void)playerItemDidReachEnd:(NSNotification *)notification {
-    [self.loadingVideo seekToTime:kCMTimeZero];
+    // Loading Animation
+    PsiphonProgressView *progressView;
 }
 
 - (UIStatusBarStyle)preferredStatusBarStyle {
     return UIStatusBarStyleLightContent;
 }
 
-- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
-    
-    if (context == &ItemStatusContext) {
-        dispatch_async(dispatch_get_main_queue(),
-                       ^{
-                           [self syncUI];
-                       });
-        return;
-    }
-    [super observeValueForKeyPath:keyPath ofObject:object
-                           change:change context:context];
-    return;
+#pragma mark - Lifecycle Methods
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+
+    // Adds background blur effect.
+    self.view.backgroundColor = [UIColor clearColor];
+    UIBlurEffect *bgBlurEffect = [UIBlurEffect effectWithStyle:UIBlurEffectStyleDark];
+    UIVisualEffectView *bgBlurEffectView = [[UIVisualEffectView alloc] initWithEffect:bgBlurEffect];
+    bgBlurEffectView.frame = self.view.bounds;
+    bgBlurEffectView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+    [self.view addSubview:bgBlurEffectView];
+
+    [self addProgressView];
+    [self addLoadingLabel];
+
+    [self setNeedsStatusBarAppearanceUpdate];
 }
 
-- (void)syncUI {
-    if ((self.loadingVideo.currentItem != nil) &&
-        ([self.loadingVideo.currentItem status] == AVPlayerItemStatusReadyToPlay)) {
-            [self.loadingVideo play];
+- (void)viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];
+
+    // Reset the timer count.
+    timerCount = 0.f;
+
+    loadingTimer = [NSTimer scheduledTimerWithTimeInterval:kTimerInterval repeats:TRUE block:^(NSTimer *timer) {
+        timerCount += kTimerInterval;
+        [progressView setProgress:timerCount / kLaunchScreenTimerCount];
+        if (timerCount >= kLaunchScreenTimerCount + kTimerInterval) {
+            [timer invalidate];
+            [[AppDelegate sharedAppDelegate] launchScreenFinished];
+        }
+    }];
+    [loadingTimer fire];
+}
+
+- (void)viewWillDisappear:(BOOL)animated {
+    [super viewWillDisappear:animated];
+    // Stops the timer and removes it from the run loop.
+    [loadingTimer invalidate];
+}
+
+- (void)willMoveToParentViewController:(nullable UIViewController *)parent {
+    [super willMoveToParentViewController:parent];
+
+    if (parent == nil) {
+        // no more parenting.
     }
+}
+
+#pragma mark - helpers
+
+- (void)addProgressView {
+    progressView = [[PsiphonProgressView alloc] init];
+    progressView.translatesAutoresizingMaskIntoConstraints = NO;
+    [self.view addSubview:progressView];
+
+    [progressView.centerXAnchor constraintEqualToAnchor:self.view.centerXAnchor].active = YES;
+    NSLayoutConstraint *centerYAnchor = [progressView.centerYAnchor constraintEqualToAnchor:self.view.centerYAnchor];
+    // Allow constraint to be broken
+    centerYAnchor.priority = UILayoutPriorityDefaultHigh;
+    centerYAnchor.active = YES;
+
+    [progressView autoSetDimensionsToSize:[self progressViewSize]];
 }
 
 - (void)addLoadingLabel {
     loadingLabel = [[UILabel alloc] init];
     loadingLabel.translatesAutoresizingMaskIntoConstraints = NO;
+
     loadingLabel.adjustsFontSizeToFitWidth = YES;
     loadingLabel.text = NSLocalizedStringWithDefaultValue(@"LOADING", nil, [NSBundle mainBundle], @"Loading...", @"Text displayed while app loads");
     loadingLabel.textAlignment = NSTextAlignmentCenter;
-    loadingLabel.textColor = [UIColor whiteColor];
+    loadingLabel.textColor = [[UIColor whiteColor] colorWithAlphaComponent:0.6];
+    loadingLabel.font = [UIFont systemFontOfSize:20 weight:UIFontWeightThin];
 
     [self.view addSubview:loadingLabel];
-
-    // Setup autolayout
-    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:loadingLabel
-                                                          attribute:NSLayoutAttributeBottom
-                                                          relatedBy:NSLayoutRelationGreaterThanOrEqual
-                                                             toItem:self.view
-                                                          attribute:NSLayoutAttributeBottom
-                                                         multiplier:1.0
-                                                           constant:-30.0]];
-    
-    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:loadingLabel
-                                                          attribute:NSLayoutAttributeRight
-                                                          relatedBy:NSLayoutRelationEqual
-                                                             toItem:self.view
-                                                          attribute:NSLayoutAttributeRight
-                                                         multiplier:1.0
-                                                           constant:-30.0]];
-    
-    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:loadingLabel
-                                                          attribute:NSLayoutAttributeLeft
-                                                          relatedBy:NSLayoutRelationEqual
-                                                             toItem:self.view
-                                                          attribute:NSLayoutAttributeLeft
-                                                         multiplier:1.0
-                                                           constant:30]];
+    [loadingLabel.heightAnchor constraintEqualToConstant:30.f].active = YES;
+    [loadingLabel.widthAnchor constraintEqualToAnchor:progressView.widthAnchor].active = YES;
+    [loadingLabel.centerXAnchor constraintEqualToAnchor:self.view.centerXAnchor].active = YES;
+    [loadingLabel.topAnchor constraintGreaterThanOrEqualToAnchor:progressView.bottomAnchor].active = YES;
+    [loadingLabel.bottomAnchor constraintEqualToAnchor:self.bottomLayoutGuide.bottomAnchor constant:-15].active = YES;
 }
 
-- (void)addProgressView {
-    self.progressView = [[UIProgressView alloc] init];
-    self.progressView.translatesAutoresizingMaskIntoConstraints = NO;
-    [self.view addSubview:self.progressView];
-    
-    // Setup autolayout
-    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:self.progressView
-                                                          attribute:NSLayoutAttributeBottom
-                                                          relatedBy:NSLayoutRelationGreaterThanOrEqual
-                                                             toItem:loadingLabel
-                                                          attribute:NSLayoutAttributeTop
-                                                         multiplier:1.0
-                                                           constant:-15.0]];
-    
-    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:self.progressView
-                                                          attribute:NSLayoutAttributeLeft
-                                                          relatedBy:NSLayoutRelationEqual
-                                                             toItem:self.view
-                                                          attribute:NSLayoutAttributeLeft
-                                                         multiplier:1.0
-                                                           constant:15.0]];
-    
-    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:self.progressView
-                                                          attribute:NSLayoutAttributeRight
-                                                          relatedBy:NSLayoutRelationEqual
-                                                             toItem:self.view
-                                                          attribute:NSLayoutAttributeRight
-                                                         multiplier:1.0
-                                                           constant:-15.0]];
+- (CGSize)progressViewSize {
+    CGFloat len = kProgressViewToScreenRatio * [self minDimensionLength];
+    if (len > kProgressViewMaxDimensionLength) {
+        len = kProgressViewMaxDimensionLength;
+    }
+    return CGSizeMake(len, len);
+}
+
+- (CGFloat)minDimensionLength {
+    return MIN(self.view.frame.size.width, self.view.frame.size.height);
 }
 
 @end

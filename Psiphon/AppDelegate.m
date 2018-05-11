@@ -18,109 +18,184 @@
  */
 
 #import <PsiphonTunnel/Reachability.h>
+#import <ReactiveObjC/RACTuple.h>
+#import <NetworkExtension/NetworkExtension.h>
+#import <ReactiveObjC/RACScheduler.h>
 #import "AppDelegate.h"
-#import "PsiphonClientCommonLibraryHelpers.h"
-#import "PsiphonDataSharedDB.h"
-#import "SharedConstants.h"
+#import "AdManager.h"
+#import "EmbeddedServerEntries.h"
+#import "IAPViewController.h"
+#import "Logging.h"
+#import "MPInterstitialAdController.h"
 #import "Notifier.h"
-#import "RegionAdapter.h"
+#import "PsiphonClientCommonLibraryHelpers.h"
+#import "PsiphonConfigFiles.h"
+#import "PsiphonDataSharedDB.h"
+#import "RootContainerController.h"
+#import "SharedConstants.h"
+#import "UIAlertController+Delegate.h"
 #import "VPNManager.h"
 #import "AdManager.h"
 #import "Logging.h"
-#import "IAPHelper.h"
-#import "IAPViewController.h"
+#import "IAPStoreHelper.h"
+#import "NEBridge.h"
+#import "DispatchUtils.h"
+#import "PsiFeedbackLogger.h"
+#import "RACSignal.h"
+#import "RACSignal+Operations2.h"
+#import "NSError+Convenience.h"
+#import "RACCompoundDisposable.h"
+#import "RACSignal+Operations.h"
+#import "RACReplaySubject.h"
+#import "Asserts.h"
 
-#if DEBUG
-#define kLaunchScreenTimerCount 1
-#else
-#define kLaunchScreenTimerCount 10
-#endif
+// Number of seconds to wait for tunnel status to become "Connected", after the landing page notification
+// is received from the extension.
+#define kLandingPageTimeoutSecs 1.0
+
+PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
 
 @interface AppDelegate ()
+
+// Public properties
+
+// subscriptionStatus should only be sent events to from the main thread.
+@property (nonatomic, readwrite) RACReplaySubject<NSNumber *> *subscriptionStatus;
+
+// Private properties
+@property (atomic) BOOL shownLandingPageForCurrentSession;
+@property (nonatomic) RACCompoundDisposable *compoundDisposable;
+
+@property (nonatomic) VPNManager *vpnManager;
+@property (nonatomic) PsiphonDataSharedDB *sharedDB;
+@property (nonatomic) NSTimer *subscriptionCheckTimer;
+
 @end
 
 @implementation AppDelegate {
-    VPNManager *vpnManager;
     AdManager *adManager;
-    PsiphonDataSharedDB *sharedDB;
     Notifier *notifier;
 
-    // Loading Timer
-    NSTimer *loadingTimer;
-    NSInteger timerCount;
-
-    BOOL shownHomepage;
-
-    // ViewController
-    MainViewController *mainViewController;
-    LaunchScreenViewController *launchScreenViewController;
-}
-
-// Helper method to get top most presenting controller
-+ (UIViewController*) topMostController {
-    UIViewController *topController = [UIApplication sharedApplication].keyWindow.rootViewController;
-    while (topController.presentedViewController) {
-        topController = topController.presentedViewController;
-    }
-    return topController;
+    RootContainerController *rootContainerController;
 }
 
 - (instancetype)init {
     self = [super init];
     if (self) {
-        vpnManager = [VPNManager sharedInstance];
         adManager = [AdManager sharedInstance];
-        sharedDB = [[PsiphonDataSharedDB alloc] initForAppGroupIdentifier:APP_GROUP_IDENTIFIER];
         notifier = [[Notifier alloc] initWithAppGroupIdentifier:APP_GROUP_IDENTIFIER];
 
-        mainViewController = [[MainViewController alloc] init];
-        launchScreenViewController = [[LaunchScreenViewController alloc] init];
+        _subscriptionStatus = [RACReplaySubject replaySubjectWithCapacity:1];
+        [_subscriptionStatus sendNext:@(UserSubscriptionUnknown)];
 
-        timerCount = kLaunchScreenTimerCount;
+        _vpnManager = [VPNManager sharedInstance];
+        _sharedDB = [[PsiphonDataSharedDB alloc] initForAppGroupIdentifier:APP_GROUP_IDENTIFIER];
+        _shownLandingPageForCurrentSession = FALSE;
+        _compoundDisposable = [RACCompoundDisposable compoundDisposable];
     }
     return self;
+}
+
+- (void)dealloc {
+    [self.compoundDisposable dispose];
 }
 
 + (AppDelegate *)sharedAppDelegate {
     return (AppDelegate *)[UIApplication sharedApplication].delegate;
 }
 
-- (MainViewController *)getMainViewController {
-    return mainViewController;
++ (BOOL)isFirstRunOfAppVersion {
+    static BOOL firstRunOfVersion;
+    static dispatch_once_t once;
+    dispatch_once(&once, ^{
+        NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+        NSString *appVersion = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleVersion"];
+        NSString *lastLaunchAppVersion = [userDefaults stringForKey:@"LastCFBundleVersion"];
+        if ([appVersion isEqualToString:lastLaunchAppVersion]) {
+            firstRunOfVersion = FALSE;
+        } else {
+            firstRunOfVersion = TRUE;
+            [userDefaults setObject:appVersion forKey:@"LastCFBundleVersion"];
+        }
+    });
+    return firstRunOfVersion;
 }
 
-- (void)onVPNStatusDidChange {
-    if ([vpnManager getVPNStatus] == VPNStatusDisconnected
-        || [vpnManager getVPNStatus] == VPNStatusRestarting) {
-        shownHomepage = FALSE;
-    }
++ (BOOL)isRunningUITest {
+#if DEBUG
+    static BOOL runningUITest;
+    static dispatch_once_t once;
+    dispatch_once(&once, ^{
+        if ([[NSUserDefaults standardUserDefaults] boolForKey:@"FASTLANE_SNAPSHOT"]) {
+            NSDictionary *environmentDictionary = [[NSProcessInfo processInfo] environment];
+            if (environmentDictionary[@"PsiphonUITestEnvironment"] != nil) {
+                runningUITest = TRUE;
+            }
+        }
+
+    });
+    return runningUITest;
+#else
+    return FALSE;
+#endif
 }
 
 # pragma mark - Lifecycle methods
 
 - (BOOL)application:(UIApplication *)application willFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     [self initializeDefaults];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(switchViewControllerWhenAdsLoaded) name:@kAdsDidLoad object:adManager];
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(onAdsLoaded)
+                                                 name:AdManagerAdsDidLoadNotification
+                                               object:adManager];
 
-    [[IAPHelper sharedInstance] startProductsRequest];
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(onUpdatedSubscriptionDictionary)
+                                                 name:IAPHelperUpdatedSubscriptionDictionaryNotification
+                                               object:nil];
+
+    [[IAPStoreHelper sharedInstance] startProductsRequest];
+
+    if ([AppDelegate isFirstRunOfAppVersion]) {
+        [self updateAvailableEgressRegionsOnFirstRunOfAppVersion];
+    }
 
     return YES;
 }
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     LOG_DEBUG();
+
+    __weak AppDelegate *weakSelf = self;
+
     // Override point for customization after application launch.
     self.window = [[UIWindow alloc] initWithFrame:UIScreen.mainScreen.bounds];
 
-    // TODO: if VPN disconnected, launch with animation, else launch with MainViewController.
-    [self setRootViewController];
-
+    rootContainerController = [[RootContainerController alloc] init];
+    self.window.rootViewController = rootContainerController;
+    // UIKit always waits for application:didFinishLaunchingWithOptions:
+    // to return before making the window visible on the screen.
     [self.window makeKeyAndVisible];
 
-    shownHomepage = FALSE;
+    [self loadAdsIfNeeded];
+
     // Listen for VPN status changes from VPNManager.
-    [[NSNotificationCenter defaultCenter]
-     addObserver:self selector:@selector(onVPNStatusDidChange) name:@kVPNStatusChangeNotificationName object:vpnManager];
+    __block RACDisposable *disposable = [self.vpnManager.lastTunnelStatus
+      subscribeNext:^(NSNumber *statusObject) {
+          VPNStatus s = (VPNStatus) [statusObject integerValue];
+
+          if (s == VPNStatusDisconnected || s == VPNStatusRestarting ) {
+              // Resets the homepage flag if the VPN has disconnected or is restarting.
+              weakSelf.shownLandingPageForCurrentSession = FALSE;
+          }
+
+      } error:^(NSError *error) {
+          [weakSelf.compoundDisposable removeDisposable:disposable];
+      } completed:^{
+          [weakSelf.compoundDisposable removeDisposable:disposable];
+      }];
+
+    [self.compoundDisposable addDisposable:disposable];
 
     // Listen for the network extension messages.
     [self listenForNEMessages];
@@ -128,43 +203,64 @@
     return YES;
 }
 
+- (void)applicationDidBecomeActive:(UIApplication *)application {
+    LOG_DEBUG();
+
+    __weak AppDelegate *weakSelf = self;
+
+    // Starts subscription expiry timer if there is an active subscription.
+    [self subscriptionExpiryTimer];
+
+    // Before submitting any other work to the VPNManager, update its status.
+    [self.vpnManager checkOrFixVPNStatus];
+
+    // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
+    [self.sharedDB updateAppForegroundState:YES];
+
+    // If the extension has been waiting for the app to come into foreground,
+    // send the VPNManager startVPN message again.
+    if (![adManager untunneledInterstitialIsShowing]) {
+
+        __block RACDisposable *disposable = [[self.vpnManager isPsiphonTunnelConnected]
+          subscribeNext:^(NSNumber *_Nullable connected) {
+              if ([connected boolValue]) {
+                  [weakSelf.vpnManager startVPN];
+              }
+          } error:^(NSError *error) {
+              [weakSelf.compoundDisposable removeDisposable:disposable];
+          } completed:^{
+              [weakSelf.compoundDisposable removeDisposable:disposable];
+          }];
+
+        [self.compoundDisposable addDisposable:disposable];
+
+    }
+}
+
 - (void)applicationWillResignActive:(UIApplication *)application {
     LOG_DEBUG();
     // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
     // Use this method to pause ongoing tasks, disable timers, and invalidate graphics rendering callbacks. Games should use this method to pause the game.
+
+    // Cancel subscription expiry timer if active.
+    [self.subscriptionCheckTimer invalidate];
 }
 
 - (void)applicationDidEnterBackground:(UIApplication *)application {
     LOG_DEBUG();
     // Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later.
     // If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
-    [notifier post:@"D.applicationDidEnterBackground"];
-    [sharedDB updateAppForegroundState:NO];
+
+    [[UIApplication sharedApplication] ignoreSnapshotOnNextApplicationLaunch];
+    [notifier post:NOTIFIER_APP_DID_ENTER_BACKGROUND];
+    [self.sharedDB updateAppForegroundState:NO];
 }
 
 - (void)applicationWillEnterForeground:(UIApplication *)application {
     LOG_DEBUG();
     // Called as part of the transition from the background to the active state; here you can undo many of the changes made on entering the background.
 
-    [self setRootViewController];
-
-    // TODO: init MainViewController.
-}
-
-- (void)applicationDidBecomeActive:(UIApplication *)application {
-    LOG_DEBUG();
-    // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
-    [sharedDB updateAppForegroundState:YES];
-
-    // If the extension has been waiting for the app to come into foreground,
-    // send the VPNManager startVPN message again.
-    dispatch_async(dispatch_get_main_queue(), ^{
-        // If the tunnel is in Connected state, and we're now showing ads
-        // send startVPN message.
-        if (![adManager untunneledInterstitialIsShowing] && [vpnManager isTunnelConnected]) {
-            [vpnManager startVPN];
-        }
-    });
+    [self loadAdsIfNeeded];
 }
 
 - (void)applicationWillTerminate:(UIApplication *)application {
@@ -172,223 +268,315 @@
     // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
 }
 
+#pragma mark -
+
 - (void)initializeDefaults {
     [PsiphonClientCommonLibraryHelpers initializeDefaultsForPlistsFromRoot:@"Root.inApp"];
 }
 
-#pragma mark - View controller switch
-
-- (void)setRootViewController {
-    // If VPN disconnected, launch with animation, else launch with MainViewController.
-
-    NetworkStatus networkStatus = [[Reachability reachabilityForInternetConnection] currentReachabilityStatus];
-
-    if ( networkStatus != NotReachable
-      && ([vpnManager getVPNStatus] == VPNStatusDisconnected || [vpnManager getVPNStatus] == VPNStatusInvalid)
-      && ![adManager untunneledInterstitialIsReady] && ![adManager untunneledInterstitialHasShown] && ![vpnManager startStopButtonPressed]
-        && [adManager shouldShowUntunneledAds]) {
-        [adManager initializeAds];
-        self.window.rootViewController = launchScreenViewController;
-        if (timerCount <= 0) {
-            // Reset timer to 10 if it's 0 and need load ads again.
-            timerCount = 10;
-        }
-        [self startLaunchingScreenTimer];
-    } else {
-        self.window.rootViewController = mainViewController;
-    }
-}
-
-- (void) reloadMainViewController {
+- (void)reloadMainViewController {
     LOG_DEBUG();
-    mainViewController = [[MainViewController alloc] init];
-    mainViewController.openSettingImmediatelyOnViewDidAppear = YES;
-    [self changeRootViewController:mainViewController];
+    [rootContainerController reloadMainViewController];
+    rootContainerController.mainViewController.openSettingImmediatelyOnViewDidAppear = TRUE;
 }
 
-- (void)switchViewControllerWhenAdsLoaded {
-    [loadingTimer invalidate];
-    timerCount = 0;
-    [self changeRootViewController:mainViewController];
-}
+#pragma mark - Ads
 
-- (void)switchViewControllerWhenExpire:(NSTimer*)timer {
-    if (timerCount <= 0) {
-        [loadingTimer invalidate];
-        [self changeRootViewController:mainViewController];
-        return;
-    }
-    timerCount -=1;
-    launchScreenViewController.progressView.progress = (10 - timerCount)/10.0f;
-}
+- (void)loadAdsIfNeeded {
 
-- (void)startLaunchingScreenTimer {
-    if (!loadingTimer || ![loadingTimer isValid]) {
-        loadingTimer = [NSTimer scheduledTimerWithTimeInterval:1.0
-                                                        target:self
-                                                      selector:@selector(switchViewControllerWhenExpire:)
-                                                      userInfo:nil
-                                                       repeats:YES];
+    VPNStatus s = (VPNStatus) [[[self.vpnManager lastTunnelStatus] first] integerValue];
+
+    if ([adManager shouldShowUntunneledAds] &&
+        ![adManager untunneledInterstitialIsReady] &&
+        ![adManager untunneledInterstitialHasShown] &&
+        (s == VPNStatusInvalid || s == VPNStatusDisconnected)
+      ){
+
+        [rootContainerController showLaunchScreen];
+
+        dispatch_async(dispatch_get_main_queue(), ^{
+                [adManager initializeAds];
+        });
+
+    } else {
+        // Removes launch screen if already showing.
+        [rootContainerController removeLaunchScreen];
     }
 }
 
-- (void)changeRootViewController:(UIViewController*)viewController {
-    if (!self.window.rootViewController) {
-        self.window.rootViewController = viewController;
-        return;
+// Returns the ViewController responsible for presenting ads.
+- (UIViewController *)getAdsPresentingViewController {
+    return rootContainerController.mainViewController;
+}
+
+- (void)onAdsLoaded {
+    LOG_DEBUG();
+    [rootContainerController removeLaunchScreen];
+}
+
+- (void)launchScreenFinished {
+    LOG_DEBUG();
+    [rootContainerController removeLaunchScreen];
+}
+
+#pragma mark - Embedded Server Entries
+
+/*!
+ * @brief Updates available egress regions from embedded server entries.
+ *
+ * This function should only be called once per app version on first launch.
+ */
+- (void)updateAvailableEgressRegionsOnFirstRunOfAppVersion {
+    NSString *embeddedServerEntriesPath = [PsiphonConfigFiles embeddedServerEntriesPath];
+    NSArray *embeddedEgressRegions = [EmbeddedServerEntries egressRegionsFromFile:embeddedServerEntriesPath];
+
+    LOG_DEBUG("Available embedded egress regions: %@.", embeddedEgressRegions);
+
+    if ([embeddedEgressRegions count] > 0) {
+        [self.sharedDB insertNewEmbeddedEgressRegions:embeddedEgressRegions];
+    } else {
+        [PsiFeedbackLogger error:@"Error no egress regions found in %@.", embeddedServerEntriesPath];
     }
-
-    if (self.window.rootViewController == viewController) {
-        return;
-    }
-
-    UIViewController *prevViewController = self.window.rootViewController;
-
-    UIView *snapShot = [self.window snapshotViewAfterScreenUpdates:YES];
-    [viewController.view addSubview:snapShot];
-
-    self.window.rootViewController = viewController;
-
-    [prevViewController dismissViewControllerAnimated:NO completion:^{
-        // Remove the root view in case it is still showing
-        [prevViewController.view removeFromSuperview];
-    }];
-
-    [UIView animateWithDuration:.3 animations:^{
-        snapShot.layer.opacity = 0;
-        snapShot.layer.transform = CATransform3DMakeScale(1.5, 1.5, 1.5);
-    } completion:^(BOOL finished) {
-        [snapShot removeFromSuperview];
-    }];
 }
 
 #pragma mark - Network Extension
 
 - (void)listenForNEMessages {
-    [notifier listenForNotification:@"NE.newHomepages" listener:^{
+
+    __weak AppDelegate *weakSelf = self;
+
+    [notifier listenForNotification:NOTIFIER_NEW_HOMEPAGES listener:^(NSString *key){
         LOG_DEBUG(@"Received notification NE.newHomepages");
-        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-            if (!shownHomepage) {
-                NSArray<Homepage *> *homepages = [sharedDB getHomepages];
-                if (homepages && [homepages count] > 0) {
-                    NSUInteger randIndex = arc4random() % [homepages count];
-                    Homepage *homepage = homepages[randIndex];
-                    dispatch_async(dispatch_get_main_queue(), ^{
-                        [[UIApplication sharedApplication] openURL:homepage.url options:@{}
-                                                 completionHandler:^(BOOL success) {
-                                                     shownHomepage = success;
-                                                 }];
-                    });
-                }
-            }
-        });
-    }];
 
-    [notifier listenForNotification:@"NE.tunnelConnected" listener:^{
-        LOG_DEBUG(@"Received notification NE.tunnelConnected");
-        // Check if user has an active subscription but the receipt is not valid.
-        IAPHelper *iapHelper = [IAPHelper sharedInstance];
-        if([iapHelper hasActiveSubscriptionForDate:[NSDate date]] && ![iapHelper verifyReceipt]) {
-            // Stop the VPN and prompt user to refresh app receipt.
-            [vpnManager stopVPN];
-            NSString *alertTitle = NSLocalizedStringWithDefaultValue(@"BAD_RECEIPT_ALERT_TITLE", nil, [NSBundle mainBundle], @"Invalid app receipt", @"Alert title informing user that app receipt is not valid");
-
-            NSString *alertMessage = NSLocalizedStringWithDefaultValue(@"BAD_RECEIPT_ALERT_MESSAGE", nil, [NSBundle mainBundle], @"Your subscription receipt cannot be verified, please refresh it and try again.", @"Alert message informing user that subscription receipt cannot be verified");
-
-            UIAlertController *alert = [UIAlertController
-                                        alertControllerWithTitle:alertTitle
-                                        message:alertMessage
-                                        preferredStyle:UIAlertControllerStyleAlert];
-
-            UIAlertAction *defaultAction = [UIAlertAction
-                                            actionWithTitle:NSLocalizedStringWithDefaultValue(@"OK_BUTTON", nil, [NSBundle mainBundle], @"OK", @"Alert OK Button")
-                                            style:UIAlertActionStyleDefault
-                                            handler:^(UIAlertAction *action) {
-                                                IAPViewController *iapViewController = [[IAPViewController alloc]init];
-                                                iapViewController.openedFromSettings = NO;
-                                                UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:iapViewController];
-                                                [[AppDelegate topMostController] presentViewController:navController animated:YES completion:nil];
-                                            }];
-            [alert addAction:defaultAction];
-            [[AppDelegate topMostController] presentViewController:alert animated:TRUE completion:nil];
+        // Ignore the notification from the extension, since a landing page has
+        // already been shown for the current session.
+        if (weakSelf.shownLandingPageForCurrentSession) {
             return;
         }
 
-        // Check if user has an active subscription in the device's time
-        // If NO - do nothing
-        // If YES - proceed with checking the subscription against server timestamp
-        if([[IAPHelper sharedInstance]hasActiveSubscriptionForDate:[NSDate date]]) {
-            // The following code adapted from
-            // https://developer.apple.com/library/content/documentation/Cocoa/Conceptual/DataFormatting/Articles/dfDateFormatting10_4.html
-            static NSDateFormatter *sRFC3339DateFormatter;
-            static dispatch_once_t once;
-            dispatch_once(&once, ^{
-                sRFC3339DateFormatter = [[NSDateFormatter alloc] init];
-                sRFC3339DateFormatter.locale = [NSLocale localeWithLocaleIdentifier:@"en_US_POSIX"];
-                sRFC3339DateFormatter.dateFormat = @"yyyy'-'MM'-'dd'T'HH':'mm':'ss'Z'";
-                sRFC3339DateFormatter.timeZone = [NSTimeZone timeZoneForSecondsFromGMT:0];
-            });
+        // Eagerly set the value to TRUE.
+        weakSelf.shownLandingPageForCurrentSession = TRUE;
+        
+        dispatch_async_global(^{
 
-            NSString *serverTimestamp = [sharedDB getServerTimestamp];
-            NSDate *serverDate = [sRFC3339DateFormatter dateFromString:serverTimestamp];
-            if (serverDate != nil) {
-                if(![[IAPHelper sharedInstance]hasActiveSubscriptionForDate:serverDate]) {
-                    // User is possibly cheating, terminate the app due to 'Invalid Receipt'.
-                    // Stop the tunnel, show alert with title and message
-                    // and terminate the app due to 'Invalid Receipt' when user clicks 'OK'.
-                    [vpnManager stopVPN];
+            // If a landing page is not already shown for the current session, randomly choose
+            // a landing page from the list supplied by Psiphon tunnel.
 
-                    NSString *alertTitle = NSLocalizedStringWithDefaultValue(@"BAD_CLOCK_ALERT_TITLE", nil, [NSBundle mainBundle], @"Clock is out of sync", @"Alert title informing user that the device clock needs to be updated with current time");
+            NSArray<Homepage *> *homepages = [weakSelf.sharedDB getHomepages];
 
-                    NSString *alertMessage = NSLocalizedStringWithDefaultValue(@"BAD_CLOCK_ALERT_MESSAGE", nil, [NSBundle mainBundle], @"We've detected the time on your device is out of sync with your time zone. Please update your clock settings and restart the app", @"Alert message informing user that the device clock needs to be updated with current time");
-
-                    UIAlertController *alert = [UIAlertController
-                                                alertControllerWithTitle:alertTitle
-                                                message:alertMessage
-                                                preferredStyle:UIAlertControllerStyleAlert];
-
-                    UIAlertAction *defaultAction = [UIAlertAction
-                                                    actionWithTitle:NSLocalizedStringWithDefaultValue(@"OK_BUTTON", nil, [NSBundle mainBundle], @"OK", @"Alert OK Button")
-                                                    style:UIAlertActionStyleDefault
-                                                    handler:^(UIAlertAction *action) {
-                                                        [[IAPHelper sharedInstance] terminateForInvalidReceipt];
-                                                    }];
-                    [alert addAction:defaultAction];
-                    [[AppDelegate topMostController] presentViewController:alert animated:TRUE completion:nil];
-                    return;
-                }
+            if (!homepages || [homepages count] == 0) {
+                weakSelf.shownLandingPageForCurrentSession = FALSE;
+                return;
             }
-        }
+
+            NSUInteger randIndex = arc4random() % [homepages count];
+            Homepage *homepage = homepages[randIndex];
+
+            // Only opens landing page if the VPN is active (or waits up to a maximum of kLandingPageTimeoutSecs
+            // for the tunnel status to become "Connected" before opening the landing page).
+            // Landing page should not be opened outside of the tunnel.
+
+            __block RACDisposable *disposable = [[[[[[[weakSelf.vpnManager isExtensionZombie]
+              combineLatestWith:weakSelf.vpnManager.lastTunnelStatus]
+              filter:^BOOL(RACTwoTuple<NSNumber *, NSNumber *> *tuple) {
+
+                  // We're only interested in the Connected status.
+                  VPNStatus s = (VPNStatus) [tuple.second integerValue];
+                  return (s == VPNStatusConnected);
+              }]
+              take:1]  // Take 1 to terminate the infinite signal.
+              timeout:kLandingPageTimeoutSecs onScheduler:RACScheduler.mainThreadScheduler]
+              deliverOnMainThread]
+              subscribeNext:^(RACTwoTuple<NSNumber *, NSNumber *> *x) {
+                  BOOL isZombie = [x.first boolValue];
+
+                  if (isZombie) {
+                      weakSelf.shownLandingPageForCurrentSession = FALSE;
+                      return;
+                  }
+
+                  NEVPNStatus s = weakSelf.vpnManager.tunnelProviderStatus;
+                  if (NEVPNStatusConnected == s) {
+
+                      [PsiFeedbackLogger infoWithType:LandingPageLogType message:@"open landing page"];
+
+                      // Not officially documented by Apple, however a runtime warning is generated sometimes
+                      // stating that [UIApplication openURL:options:completionHandler:] must be used from
+                      // the main thread only.
+                      [[UIApplication sharedApplication] openURL:homepage.url
+                                                         options:@{}
+                                               completionHandler:^(BOOL success) {
+                                                   weakSelf.shownLandingPageForCurrentSession = success;
+                                               }];
+                  } else {
+
+                      [PsiFeedbackLogger warnWithType:LandingPageLogType
+                                              message:@"fail open with connection status %@", [VPNManager statusTextSystem:s]];
+                      weakSelf.shownLandingPageForCurrentSession = FALSE;
+                  }
+
+              } error:^(NSError *error) {
+                  [PsiFeedbackLogger warnWithType:LandingPageLogType message:@"timeout expired" object:error];
+                  [weakSelf.compoundDisposable removeDisposable:disposable];
+              } completed:^{
+                  [weakSelf.compoundDisposable removeDisposable:disposable];
+              }];
+
+            [weakSelf.compoundDisposable addDisposable:disposable];
+
+        });
+    }];
+
+    [notifier listenForNotification:NOTIFIER_TUNNEL_CONNECTED listener:^(NSString *key){
+        LOG_DEBUG(@"Received notification NE.tunnelConnected");
 
         // If we haven't had a chance to load an Ad, and the
         // tunnel is already connected, give up on the Ad and
         // start the VPN. Otherwise the startVPN message will be
         // sent after the Ad has disappeared.
         if (![adManager untunneledInterstitialIsShowing]) {
-            [vpnManager startVPN];
+            [weakSelf.vpnManager startVPN];
+        }
+    }];
+
+    [notifier listenForNotification:NOTIFIER_ON_AVAILABLE_EGRESS_REGIONS listener:^(NSString *key){
+        LOG_DEBUG(@"Received notification NE.onAvailableEgressRegions");
+        // Update available regions
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+            NSArray<NSString *> *regions = [weakSelf.sharedDB emittedEgressRegions];
+            [[RegionAdapter sharedInstance] onAvailableEgressRegions:regions];
+        });
+    }];
+}
+
+#pragma mark - Subscription
+
+- (void)subscriptionExpiryTimer {
+
+    __weak AppDelegate *weakSelf = self;
+
+    dispatch_async_global(^{
+        NSDate *expiryDate;
+        BOOL activeSubscription = [IAPStoreHelper hasActiveSubscriptionForDate:[NSDate date] getExpiryDate:&expiryDate];
+
+        dispatch_async_main(^{
+            if (activeSubscription) {
+
+                // Also update the subscription status subject.
+                [weakSelf.subscriptionStatus sendNext:@(UserSubscriptionActive)];
+
+                NSTimeInterval interval = [expiryDate timeIntervalSinceNow];
+                
+                if (interval > 0) {
+                    // Checks if another timer is already running.
+                    if (![weakSelf.subscriptionCheckTimer isValid]) {
+                        weakSelf.subscriptionCheckTimer = [NSTimer scheduledTimerWithTimeInterval:interval
+                                                                                 repeats:NO
+                                                                                   block:^(NSTimer *timer) {
+                            [weakSelf subscriptionExpiryTimer];
+                        }];
+                    }
+                }
+            } else {
+                // Instead of subscribing to the notification in this class, calls the handler directly.
+                [weakSelf onSubscriptionExpired];
+            }
+        });
+    });
+}
+
+- (void)onSubscriptionExpired {
+
+    __weak AppDelegate *weakSelf = self;
+
+    [self.subscriptionStatus sendNext:@(UserSubscriptionInactive)];
+
+    // Disables Connect On Demand setting of the VPN Configuration.
+    __block RACDisposable *disposable = [[self.vpnManager setConnectOnDemandEnabled:FALSE]
+      subscribeError:^(NSError *error) {
+          [weakSelf.compoundDisposable removeDisposable:disposable];
+      } completed:^{
+          [weakSelf.compoundDisposable removeDisposable:disposable];
+      }];
+
+    [self.compoundDisposable addDisposable:disposable];
+}
+
+- (void)onSubscriptionActivated {
+
+    __weak AppDelegate *weakSelf = self;
+
+    [self.subscriptionStatus sendNext:@(UserSubscriptionActive)];
+
+    [self subscriptionExpiryTimer];
+
+    // Asks the extension to perform a subscription check if it is running currently.
+    __block RACDisposable *vpnActiveDisposable = [[self.vpnManager isVPNActive]
+      subscribeNext:^(RACTwoTuple<NSNumber *, NSNumber *> *value) {
+        BOOL isActive = [value.first boolValue];
+
+        if (isActive) {
+            [notifier post:NOTIFIER_FORCE_SUBSCRIPTION_CHECK];
         }
 
+    } error:^(NSError *error) {
+        [weakSelf.compoundDisposable removeDisposable:vpnActiveDisposable];
+    } completed:^{
+        [weakSelf.compoundDisposable removeDisposable:vpnActiveDisposable];
     }];
 
-    [notifier listenForNotification:@"NE.onAvailableEgressRegions" listener:^{ // TODO should be put in a constants file
-        LOG_DEBUG(@"Received notification NE.onAvailableEgressRegions");
-        // Update available regions
-        // TODO: this code is duplicated in MainViewController updateAvailableRegions
-        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-            NSArray<NSString *> *regions = [sharedDB getAllEgressRegions];
-            [[RegionAdapter sharedInstance] onAvailableEgressRegions:regions];
-        });
+    [self.compoundDisposable addDisposable:vpnActiveDisposable];
+
+    // Checks if user previously preferred to have Connect On Demand enabled,
+    // Re-enable it upon subscription since it may have been disabled if the previous subscription expired.
+    // Disables Connect On Demand setting of the VPN Configuration.
+    BOOL userPreferredOnDemandSetting = [[NSUserDefaults standardUserDefaults]
+      boolForKey:SettingsConnectOnDemandBoolKey];
+
+    __block RACDisposable *onDemandDisposable = [[self.vpnManager setConnectOnDemandEnabled:userPreferredOnDemandSetting]
+      subscribeError:^(NSError *error) {
+          [weakSelf.compoundDisposable removeDisposable:onDemandDisposable];
+    } completed:^{
+          [weakSelf.compoundDisposable removeDisposable:onDemandDisposable];
     }];
 
-    [notifier listenForNotification:@"NE.onAvailableEgressRegions" listener:^{ // TODO should be put in a constants file
-        LOG_DEBUG(@"Received notification NE.onAvailableEgressRegions");
-        // Update available regions
-        // TODO: this code is duplicated in MainViewController updateAvailableRegions
-        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-            NSArray<NSString *> *regions = [sharedDB getAllEgressRegions];
-            [[RegionAdapter sharedInstance] onAvailableEgressRegions:regions];
+    [self.compoundDisposable addDisposable:onDemandDisposable];
+
+}
+
+// Called on `IAPHelperUpdatedSubscriptionDictionaryNotification` notification.
+- (void)onUpdatedSubscriptionDictionary {
+
+    if (![adManager shouldShowUntunneledAds]) {
+        // if user subscription state has changed to valid
+        // try to deinit ads if currently not showing and hide adLabel
+        [adManager initializeAds];
+    }
+
+    __weak AppDelegate *weakSelf = self;
+
+    dispatch_async_global(^{
+
+        BOOL isSubscribed = [IAPStoreHelper hasActiveSubscriptionForNow];
+
+        dispatch_async_main(^{
+
+            if (isSubscribed) {
+                [weakSelf onSubscriptionActivated];
+
+            }
         });
-    }];
+    });
+}
+
+#pragma mark -
+
++ (UIViewController *)getTopMostViewController {
+    UIViewController *topController = [UIApplication sharedApplication].keyWindow.rootViewController;
+    while(topController.presentedViewController) {
+        topController = topController.presentedViewController;
+    }
+    return topController;
 }
 
 @end

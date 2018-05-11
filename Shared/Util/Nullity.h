@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, Psiphon Inc.
+ * Copyright (c) 2018, Psiphon Inc.
  * All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,17 +18,14 @@
  */
 
 #import <Foundation/Foundation.h>
-#import "NSDateFormatter+RFC3339.h"
 
-@implementation NSDateFormatter (NSDateFormatterRFC3339)
+/**
+ * Utility class for safe checking of null or empty objects.
+ */
+@interface Nullity : NSObject
 
-+ (instancetype)createRFC3339MilliFormatter {
-    NSDateFormatter *f = [[NSDateFormatter alloc] init];
-    NSLocale *enUSPOSIXLocale = [NSLocale localeWithLocaleIdentifier:@"en_US_POSIX"];
-    [f setLocale:enUSPOSIXLocale];
-    [f setDateFormat:@"yyyy'-'MM'-'dd'T'HH':'mm':'ss.SSSZZZZZ"];
-    [f setTimeZone:[NSTimeZone timeZoneForSecondsFromGMT:0]];
-    return f;
-}
++ (BOOL)isNil:(id _Nullable)obj;
+
++ (BOOL)isEmpty:(NSString *_Nullable)str;
 
 @end
