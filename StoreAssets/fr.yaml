@@ -28,8 +28,11 @@ fr:
   keywords: Psiphon, mandataire, proxy
   subscriptions:
     weekly:
+      title: Pro 1 semaine
       description: Abonnement renouvelable automatique
     monthly:
+      title: Pro 1 mois
       description: Abonnement renouvelable automatique
     yearly:
+      title: Pro 1 an
       description: Abonnement renouvelable automatique

@@ -18,8 +18,9 @@
  */
 
 #import "PsiphonSettingsViewController.h"
-// Specifier keys for cells in settings menu
-#define kSettingsSubscription			@"settingsSubscription"
+#import "UserDefaults.h"
+
+FOUNDATION_EXPORT UserDefaultsKey const SettingsConnectOnDemandBoolKey;
 
 @interface SettingsViewController : PsiphonSettingsViewController
 

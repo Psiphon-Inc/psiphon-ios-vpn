@@ -92,3 +92,11 @@ Adding a language for the listing is pretty obvious in iTunes Connect. As is swi
 Note that the App Store does not support all the languages supported by apps -- the options you see available are all that there are. Notably, Arabic and Farsi are not supported. We may wish to append those languages to the bottom of the English description (as an example, see the [Psiphon Browser listing](https://itunes.apple.com/us/app/psiphon-browser/id1193362444)).
 
 To update translations in iTunes Connect, switch between the languages in the web interface and paste in the corresponding translation from `StoreAssets/<language>.yaml`. _Remember to de-indent the description_.
+
+## Acknowledgements
+
+Psiphon iOS VPN client uses:
+ - [futuretap/InAppSettingsKit](https://github.com/futuretap/InAppSettingsKit)
+ - [ReactiveCocoa/ReactiveObjC](https://github.com/ReactiveCocoa/ReactiveObjC)
+ - [chansen/c-timestamp](https://github.com/chansen/c-timestamp)
+ - [PureLayout](https://github.com/PureLayout/PureLayout)

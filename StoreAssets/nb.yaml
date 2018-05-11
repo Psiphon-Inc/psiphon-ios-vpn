@@ -1,11 +1,38 @@
-nb: {app_name: Psiphon, subtitle: Grenseløs, keywords: 'Psiphon, mellomtjener', description: "Etter\
-    \ å ha hjulpet millioner av brukere med hente programmene og nå sidene de elsker,\
-    \ har vi lansert den første Psiphon-appen for iOS. Vårt nye program gir sømløs\
-    \ tilgang til Psiphons omgåelsesnettverk, og kobler deg sikkert til programmene\
-    \ og sidene dine.\n\nPsiphon-nettleseren vil koble deg til dine favoritt-nettsider\
-    \ og programmer uansett hvor du er i verden. Bruk av Psiphon-programmet gir deg\
-    \ også et ekstra lag med beskyttelse når du bruker offentlige Wi-Fi-tjenester\
-    \ eller andre nettverk som kan være upålitelige.\n\nNøkkelfunksjoner:\n• Gratis\
-    \ for personlig bruk.\n• Enkelt å laste ned og installere. Ingen registrering\
-    \ eller oppsett kreves.\n• Automatisk valg av protokoller for å tilby effektiv,\
-    \ pålitelig omgåelse, hver gang.\n• Støtte for flere språk og valgfri tjenerplassering.\n"}
+nb:
+  app_name: Psiphon
+  subtitle: Grenseløs
+  description: |
+    Etter å ha hjulpet millioner av brukere med hente programmene og nå sidene de elsker, har vi lansert den første Psiphon-appen for iOS. Vårt nye program gir sømløs tilgang til Psiphons omgåelsesnettverk, og kobler deg sikkert til programmene og sidene dine.
+
+    Psiphon-nettleseren vil koble deg til dine favoritt-nettsider og programmer uansett hvor du er i verden. Bruk av Psiphon-programmet gir deg også et ekstra lag med beskyttelse når du bruker offentlige Wi-Fi-tjenester eller andre nettverk som kan være upålitelige.
+
+    Nøkkelfunksjoner:
+    • Gratis for personlig bruk.
+    • Enkelt å laste ned og installere. Ingen registrering eller oppsett kreves.
+    • Automatisk valg av protokoller for å tilby effektiv, pålitelig omgåelse, hver gang.
+    • Støtte for flere språk og valgfri tjenerplassering.
+
+    Om abonnementer:
+    • Et abonnement fjerner reklame og lar deg surfe på nettet raskere!
+    • Tredagers gratis prøveperiode
+    • Priser: 2.99$ fir ei uke, 9.99$ for én måned, eller 99.99$ for ett år.
+    • Betaling belastes din iTunes-konto ved kjøp.
+    • Abonnementer fornyer seg automatisk, med mindre det er slått av minst 24 timer før slutt av inneværende periode.
+    • Kontoen din vil bli belastet for fornyelse 24 timer før periodeslutt, og oppgi kostnad.
+    • Ingen kansellering av nåværende abonnement tillates i inneværende periode.
+    • Abonnementer kan behandles og automatisk fornyelse kan skrus av i kontoinnstillingene etter kjøp.
+    • Enhver ubrukt del av den kostnadsfrie prøveperioden vil oppgis når du kjøper et abonnement.
+
+    Personvernspraksis: https://psiphon.ca/en/privacy.html
+    Bruksvilkår: https://psiphon.ca/en/license.html
+  keywords: Psiphon, mellomtjener
+  subscriptions:
+    weekly:
+      title: Premium 1 uke
+      description: Automatisk fornybart abonnement
+    monthly:
+      title: Premium 1 måned
+      description: Automatisk fornybart abonnement
+    yearly:
+      title: Premium 1 år
+      description: Automatisk fornybart abonnement

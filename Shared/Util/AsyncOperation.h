@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, Psiphon Inc.
+ * Copyright (c) 2018, Psiphon Inc.
  * All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,8 +17,19 @@
  *
  */
 
-@interface NSDateFormatter (NSDateFormatterRFC3339)
+#import <Foundation/Foundation.h>
+#import "RACSignal.h"
 
-+ (instancetype)createRFC3339MilliFormatter;
+NS_ASSUME_NONNULL_BEGIN
+
+typedef void (^OperationBlockCompletionHandler)(void(^completionHandler)(NSError * error));
+
+@interface AsyncOperation : NSOperation
+
+@property (nonatomic, readonly) NSError *error;
+
+- (instancetype)initWithBlock:(OperationBlockCompletionHandler)block;
 
 @end
+
+NS_ASSUME_NONNULL_END

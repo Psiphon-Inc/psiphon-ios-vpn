@@ -17,7 +17,4 @@
  *
  */
 
-#define APP_GROUP_IDENTIFIER @"group.ca.psiphon.Psiphon"
-
-#define EXTENSION_OPTION_START_FROM_CONTAINER @"startFromContainer"
-
+#define APP_GROUP_IDENTIFIER    @"group.ca.psiphon.Psiphon"

@@ -18,20 +18,14 @@
  */
 
 #import <Foundation/Foundation.h>
-#import "NoticeLogger.h"
 
-void LOG_ERROR(NSString *format, ...) {
-    NSString *message = nil;
-    if (format) {
-        va_list args;
-        va_start(args, format);
-        message = [[NSString alloc] initWithFormat:format arguments:args];
-        va_end(args);
+@interface FileUtils : NSObject
+
+
++ (BOOL)downgradeFileProtectionToNone:(NSArray<NSString *> *)paths withExceptions:(NSArray<NSString *> *)exceptions;
 
 #if DEBUG
-        NSLog(@"<ERROR> %@", message);
++ (void)listDirectory:(NSString *)dir resource:(NSString *)resource;
 #endif
 
-        [[NoticeLogger sharedInstance] noticeError:message];
-    }
-}
+@end

@@ -19,8 +19,8 @@
 
 #import "PsiphonDataSharedDB.h"
 #import "Logging.h"
-#import "NSDateFormatter+RFC3339.h"
-#import "NoticeLogger.h"
+#import "PsiFeedbackLogger.h"
+#import "NSDate+PSIDateExtension.h"
 
 // File operations parameters
 #define MAX_RETRIES 3
@@ -28,42 +28,41 @@
 
 /* Shared NSUserDefaults keys */
 #define EGRESS_REGIONS_KEY @"egress_regions"
-#define TUN_CONNECTED_KEY @"tun_connected"
 #define APP_FOREGROUND_KEY @"app_foreground"
 #define SERVER_TIMESTAMP_KEY @"server_timestamp"
-#define SPONSOR_ID_KEY @"sponsor_id"
+#define kContainerSubscriptionEmptyReceiptKey @"kContainerSubscriptionEmptyReceiptKey"
 
+#if !(TARGET_IS_EXTENSION)
+#define EMBEDDED_EGRESS_REGIONS_KEY @"embedded_server_entries_egress_regions"
+#endif
 
 @implementation Homepage
 @end
 
 @implementation PsiphonDataSharedDB {
+
+    // NSUserDefaults objects are thread-safe.
     NSUserDefaults *sharedDefaults;
 
     NSString *appGroupIdentifier;
-
-    // RFC3339 Date Formatter
-    NSDateFormatter *rfc3339Formatter;
 }
 
 /*!
  * @brief Don't share an instance across threads.
  * @param identifier
- * @return
  */
 - (id)initForAppGroupIdentifier:(NSString*)identifier {
     self = [super init];
     if (self) {
         appGroupIdentifier = identifier;
         sharedDefaults = [[NSUserDefaults alloc] initWithSuiteName:identifier];
-        rfc3339Formatter = [NSDateFormatter createRFC3339MilliFormatter];
     }
     return self;
 }
 
 #pragma mark - File operations
 
-#ifndef TARGET_IS_EXTENSION
+#if !(TARGET_IS_EXTENSION)
 
 + (NSString *)tryReadingFile:(NSString *)filePath {
     NSFileHandle *fileHandle;
@@ -129,7 +128,7 @@
                 }
             }
             @catch (NSException *e) {
-                LOG_ERROR(@"Error reading file: %@", [e debugDescription]);
+                [PsiFeedbackLogger error:@"Error reading file: %@", [e debugDescription]];
 
             }
         }
@@ -157,7 +156,7 @@
             NSDictionary *dict = [NSJSONSerialization JSONObjectWithData:[logLine dataUsingEncoding:NSUTF8StringEncoding]
                                                                  options:0 error:&err];
             if (err) {
-                LOG_ERROR(@"Failed to parse log line (%@). Error: %@", logLine, err);
+                [PsiFeedbackLogger error:@"Failed to parse log line (%@). Error: %@", logLine, err];
             }
 
             if (dict) {
@@ -174,21 +173,21 @@
                 
                 NSString *msg = nil;
                 if (err) {
-                    LOG_ERROR(@"Failed to serialize dictionary as JSON (%@)", dict[@"noticeType"]);
+                    [PsiFeedbackLogger error:@"Failed to serialize dictionary as JSON (%@)", dict[@"noticeType"]];
                 } else {
                     msg = [NSString stringWithFormat:@"%@: %@", dict[@"noticeType"], data];
                 }
 
-                NSDate *timestamp = [rfc3339Formatter dateFromString:dict[@"timestamp"]];
+                NSDate *timestamp = [NSDate fromRFC3339String:dict[@"timestamp"]];
 
                 if (!msg) {
-                    LOG_ERROR(@"Failed to read notice message for log line (%@).", logLine);
+                    [PsiFeedbackLogger error:@"Failed to read notice message for log line (%@).", logLine];
                     // Puts place holder value for message.
                     msg = @"Failed to read notice message.";
                 }
 
                 if (!timestamp) {
-                    LOG_ERROR(@"Failed to parse timestamp: (%@) for log line (%@)", dict[@"timestamp"], logLine);
+                    [PsiFeedbackLogger error:@"Failed to parse timestamp: (%@) for log line (%@)", dict[@"timestamp"], logLine];
                     // Puts placeholder value for timestamp.
                     timestamp = [NSDate dateWithTimeIntervalSince1970:0];
                 }
@@ -214,7 +213,7 @@
 
 #pragma mark - Homepage methods
 
-#ifndef TARGET_IS_EXTENSION
+#if !(TARGET_IS_EXTENSION)
 /*!
  * Reads shared homepages file.
  * @return NSArray of Homepages.
@@ -226,7 +225,7 @@
     NSString *data = [PsiphonDataSharedDB tryReadingFile:[self homepageNoticesPath]];
 
     if (!data) {
-        LOG_ERROR(@"Failed reading homepage notices file. Error:%@", err);
+        [PsiFeedbackLogger error:@"Failed reading homepage notices file. Error:%@", err];
         return nil;
     }
 
@@ -244,13 +243,13 @@
                                                              options:0 error:&err];
 
         if (err) {
-            LOG_ERROR(@"Failed parsing homepage notices file. Error:%@", err);
+            [PsiFeedbackLogger error:@"Failed parsing homepage notices file. Error:%@", err];
         }
 
         if (dict) {
             Homepage *h = [[Homepage alloc] init];
             h.url = [NSURL URLWithString:dict[@"data"][@"url"]];
-            h.timestamp = [rfc3339Formatter dateFromString:dict[@"timestamp"]];
+            h.timestamp = [NSDate fromRFC3339String:dict[@"timestamp"]];
             [homepages addObject:h];
         }
     }
@@ -278,12 +277,68 @@
     return [sharedDefaults synchronize];
 }
 
+#if !(TARGET_IS_EXTENSION)
+
+/*!
+ * @brief Merges egress regions in shared and standard user defaults.
+ * Egress regions in shared user defaults are updated by the extension.
+ * Egress regions in standard user defaults are updated by parsing egress
+ * regions in embedded server entries.
+ * @return NSArray of region codes.
+ */
+- (NSArray<NSString *> *)embeddedAndEmittedEgressRegions {
+    NSMutableOrderedSet *egressRegions = [[NSMutableOrderedSet alloc] init];
+
+    id sharedDBEgressRegions = [sharedDefaults objectForKey:EGRESS_REGIONS_KEY];
+    if (sharedDBEgressRegions == nil) {
+        LOG_DEBUG(@"No egress regions found in shared user defaults.");
+    } else if ([sharedDBEgressRegions isKindOfClass:[NSArray<NSString*> class]]) {
+        [egressRegions addObjectsFromArray:(NSArray<NSString*>*)sharedDBEgressRegions];
+    } else {
+        [PsiFeedbackLogger error:@"Error egress regions for key (%@) in shared defaults are not NSArray<NSString*>* but %@", EGRESS_REGIONS_KEY, [sharedDBEgressRegions class]];
+    }
+
+    id embeddedEgressRegions = [[NSUserDefaults standardUserDefaults] objectForKey:EMBEDDED_EGRESS_REGIONS_KEY];
+    if (embeddedEgressRegions == nil) {
+        LOG_DEBUG(@"No embedded egress regions found in standard user defaults.");
+    } else if ([embeddedEgressRegions isKindOfClass:[NSArray<NSString*> class]]) {
+        [egressRegions addObjectsFromArray:(NSArray<NSString*>*)embeddedEgressRegions];
+    } else {
+        [PsiFeedbackLogger error:@"Error egress regions for key (%@) in standard user defaults are not NSArray<NSString*>* but %@", EMBEDDED_EGRESS_REGIONS_KEY, [embeddedEgressRegions class]];
+    }
+
+    if ([egressRegions count] == 0) {
+        [PsiFeedbackLogger error:@"No egress regions found in shared or standard user defaults."];
+        return nil;
+    }
+
+    return [egressRegions array];
+}
+
+/*!
+ * @brief Sets set of egress regions in standard NSUserDefaults
+ * @param regions
+
+ */
+- (void)insertNewEmbeddedEgressRegions:(NSArray<NSString *> *)regions {
+    [[NSUserDefaults standardUserDefaults] setObject:regions forKey:EMBEDDED_EGRESS_REGIONS_KEY];
+}
+
 /*!
  * @return NSArray of region codes.
  */
-- (NSArray<NSString *> *)getAllEgressRegions {
+- (NSArray<NSString *> *)embeddedEgressRegions {
+    return [[NSUserDefaults standardUserDefaults] objectForKey:EMBEDDED_EGRESS_REGIONS_KEY];
+}
+
+/*!
+ * @return NSArray of region codes.
+ */
+- (NSArray<NSString *> *)emittedEgressRegions {
     return [sharedDefaults objectForKey:EGRESS_REGIONS_KEY];
 }
+
+#endif
 
 #pragma mark - Logging
 
@@ -297,7 +352,7 @@
     return [[self rotatingLogNoticesPath] stringByAppendingString:@".1"];
 }
 
-#ifndef TARGET_IS_EXTENSION
+#if !(TARGET_IS_EXTENSION)
 
 // Reads all log files and tries parses the json lines contained in each.
 // This method is not meant to handle large files.
@@ -318,14 +373,14 @@
     [self readLogsData:tunnelCoreLogs intoArray:entriesArray[0]];
 
     entriesArray[1] = [[NSMutableArray alloc] init];
-    NSString *containerOlderLogs = [PsiphonDataSharedDB tryReadingFile:[NoticeLogger containerRotatingOlderLogNoticesPath]];
-    NSString *containerLogs = [PsiphonDataSharedDB tryReadingFile:[NoticeLogger containerRotatingLogNoticesPath]];
+    NSString *containerOlderLogs = [PsiphonDataSharedDB tryReadingFile:[PsiFeedbackLogger containerRotatingOlderLogNoticesPath]];
+    NSString *containerLogs = [PsiphonDataSharedDB tryReadingFile:[PsiFeedbackLogger containerRotatingLogNoticesPath]];
     [self readLogsData:containerOlderLogs intoArray:entriesArray[1]];
     [self readLogsData:containerLogs intoArray:entriesArray[1]];
 
     entriesArray[2] = [[NSMutableArray alloc] init];
-    NSString *extensionOlderLogs = [PsiphonDataSharedDB tryReadingFile:[NoticeLogger extensionRotatingOlderLogNoticesPath]];
-    NSString *extensionLogs = [PsiphonDataSharedDB tryReadingFile:[NoticeLogger extensionRotatingLogNoticesPath]];
+    NSString *extensionOlderLogs = [PsiphonDataSharedDB tryReadingFile:[PsiFeedbackLogger extensionRotatingOlderLogNoticesPath]];
+    NSString *extensionLogs = [PsiphonDataSharedDB tryReadingFile:[PsiFeedbackLogger extensionRotatingLogNoticesPath]];
     [self readLogsData:extensionOlderLogs intoArray:entriesArray[2]];
     [self readLogsData:extensionLogs intoArray:entriesArray[2]];
 
@@ -353,30 +408,6 @@
 }
 
 #endif
-
-#pragma mark - Tunnel State table methods
-
-/**
- * @brief Sets tunnel connection state in shared NSUserDefaults dictionary.
- *        NOTE: This method blocks until changes are written to disk.
- * @param connected Tunnel core connected status.
- * @return TRUE if change was persisted to disk successfully, FALSE otherwise.
- */
-- (BOOL)updateTunnelConnectedState:(BOOL)connected {
-    [sharedDefaults setBool:connected forKey:TUN_CONNECTED_KEY];
-    return [sharedDefaults synchronize];
-}
-
-/**
- * @brief Returns previously persisted tunnel state from the shared NSUserDefaults.
- *        This state is invalid if the network extension is not running.
- *        NOTE: returns FALSE if no previous value was set using updateTunnelConnectedState:
- * @return TRUE if tunnel is connected, FALSE otherwise.
- */
-- (BOOL)getTunnelConnectedState {
-    // Returns FALSE if no previous value was associated with this key.
-    return [sharedDefaults boolForKey:TUN_CONNECTED_KEY];
-}
 
 # pragma mark - App State table methods
 
@@ -420,19 +451,24 @@
 	return [sharedDefaults stringForKey:SERVER_TIMESTAMP_KEY];
 }
 
-# pragma mark - Sponsor ID
-
-- (void) updateSponsorId:(NSString*)sponsorId {
-    if(sponsorId && [sponsorId length]) {
-        [sharedDefaults setObject:sponsorId forKey:SPONSOR_ID_KEY];
-    } else {
-        [sharedDefaults removeObjectForKey:SPONSOR_ID_KEY];
-    }
+/**
+ * If the receipt is empty (contains to transactions), the container should use
+ * this method to set the receipt file size to be read by the network extension.
+ * @param receiptFileSize File size of the empty receipt.
+ */
+#if !(TARGET_IS_EXTENSION)
+- (void)setContainerEmptyReceiptFileSize:(NSNumber *_Nullable)receiptFileSize {
+    [sharedDefaults setObject:receiptFileSize forKey:kContainerSubscriptionEmptyReceiptKey];
     [sharedDefaults synchronize];
 }
+#endif
 
-- (NSString*)getSponsorId {
-    return [sharedDefaults stringForKey:SPONSOR_ID_KEY];
+/**
+ * Returns the file size of previously recorded empty receipt by the container (if any).
+ * @return Nil or file size recorded by the container.
+ */
+- (NSNumber *_Nullable)getContainerEmptyReceiptFileSize {
+    return [sharedDefaults objectForKey:kContainerSubscriptionEmptyReceiptKey];
 }
 
 @end

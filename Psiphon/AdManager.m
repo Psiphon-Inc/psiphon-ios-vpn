@@ -22,13 +22,21 @@
 #import "VPNManager.h"
 #import "AppDelegate.h"
 #import "Logging.h"
-#import "IAPHelper.h"
+#import "IAPStoreHelper.h"
+#import "RACCompoundDisposable.h"
+#import "RACSignal.h"
+#import "RACSignal+Operations.h"
+#import "RACReplaySubject.h"
 
 @import GoogleMobileAds;
+
+NSNotificationName const AdManagerAdsDidLoadNotification = @"AdManagerAdsDidLoadNotification";
 
 @interface AdManager ()
 
 @property (nonatomic, retain) MPInterstitialAdController *untunneledInterstitial;
+
+@property (nonatomic) RACCompoundDisposable *compoundDisposable;
 
 @end
 
@@ -43,25 +51,38 @@
         self.untunneledInterstitialHasShown = FALSE;
         vpnManager = [VPNManager sharedInstance];
 
-        [[NSNotificationCenter defaultCenter]
-          addObserver:self selector:@selector(vpnStatusDidChange) name:@kVPNStatusChangeNotificationName object:vpnManager];
-        //TODO: stop listening on dealloc.
+        _compoundDisposable = [RACCompoundDisposable compoundDisposable];
+
+        // Observe VPN status values.
+        __block RACDisposable *disposable = [vpnManager.lastTunnelStatus
+          subscribeNext:^(NSNumber *statusObject) {
+              VPNStatus s = (VPNStatus) [statusObject integerValue];
+
+              if (s == VPNStatusDisconnected) {
+                  // The VPN is stopped. Initialize ads after a delay:
+                  //    - to ensure regular untunneled networking is ready
+                  //    - because it's likely the user will be leaving the app, so we don't want to request
+                  //      another ad right away
+                  dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 5 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
+                      [self initializeAds];
+                  });
+              } else if (s == VPNStatusConnected) {
+                  [self initializeAds];
+              }
+          } error:^(NSError *error) {
+              [_compoundDisposable removeDisposable:disposable];
+          } completed:^{
+              [_compoundDisposable removeDisposable:disposable];
+          }];
+
+        [_compoundDisposable addDisposable:disposable];
+
     }
     return self;
 }
 
-- (void)vpnStatusDidChange {
-    if ([vpnManager getVPNStatus] == VPNStatusDisconnected) {
-        // The VPN is stopped. Initialize ads after a delay:
-        //    - to ensure regular untunneled networking is ready
-        //    - because it's likely the user will be leaving the app, so we don't want to request
-        //      another ad right away
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 5 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
-            [self initializeAds];
-        });
-    } else if ([vpnManager getVPNStatus] == VPNStatusConnected) {
-        [self initializeAds];
-    }
+- (void)dealloc {
+    [self.compoundDisposable dispose];
 }
 
 #pragma mark - Public methods
@@ -100,13 +121,14 @@
     [self postAdsLoadStateDidChangeNotification];
 }
 
+// TODO: This is a blocking function called on main thread.
 - (BOOL)shouldShowUntunneledAds {
     // Check if user has an active subscription first
-    BOOL hasActiveSubscription = [[IAPHelper sharedInstance] hasActiveSubscriptionForDate:[NSDate date]];
+    BOOL hasActiveSubscription = [IAPStoreHelper hasActiveSubscriptionForNow];
 
     NetworkStatus networkStatus = [[Reachability reachabilityForInternetConnection] currentReachabilityStatus];
-    VPNStatus vpnStatus = [vpnManager getVPNStatus];
-    return networkStatus != NotReachable && (vpnStatus == VPNStatusInvalid || vpnStatus == VPNStatusDisconnected) && !hasActiveSubscription;
+    VPNStatus s = (VPNStatus) [[vpnManager.lastTunnelStatus first] integerValue];
+    return networkStatus != NotReachable && (s == VPNStatusInvalid || s == VPNStatusDisconnected) && !hasActiveSubscription;
 }
 
 - (void)loadUntunneledInterstitial {
@@ -120,10 +142,10 @@
 - (void)showUntunneledInterstitial {
    LOG_DEBUG();
     if ([self untunneledInterstitialIsReady]) {
-        [self.untunneledInterstitial showFromViewController:[[AppDelegate sharedAppDelegate] getMainViewController]];
+        [self.untunneledInterstitial showFromViewController:[[AppDelegate sharedAppDelegate] getAdsPresentingViewController]];
     } else {
         // Start the tunnel
-        [vpnManager startTunnelWithCompletionHandler:^(NSError *error) {}];
+        [vpnManager startTunnel];
     }
 }
 
@@ -134,11 +156,11 @@
     return FALSE;
 }
 
-// Posts kAdsDidLoad notification.
+// Posts AdManagerAdsDidLoadNotification notification.
 // Listeners of this message can call adIsReady to get the latest state.
 - (void)postAdsLoadStateDidChangeNotification {
     [[NSNotificationCenter defaultCenter]
-      postNotificationName:@kAdsDidLoad object:self];
+      postNotificationName:AdManagerAdsDidLoadNotification object:self];
 }
 
 #pragma mark - Interestitial callbacks
@@ -179,7 +201,7 @@
     [self postAdsLoadStateDidChangeNotification];
 
     // Start the tunnel
-    [vpnManager startTunnelWithCompletionHandler:^(NSError *error) {}];
+    [vpnManager startTunnel];
 }
 
 @end

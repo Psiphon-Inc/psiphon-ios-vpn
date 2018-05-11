@@ -18,11 +18,10 @@
  */
 
 #import <UIKit/UIKit.h>
+#import "RegionAdapter.h"
 #import "SettingsViewController.h"
-#import "LaunchScreenViewController.h"
 
-
-@interface MainViewController : UIViewController <PsiphonSettingsViewControllerDelegate>
+@interface MainViewController : UIViewController <PsiphonSettingsViewControllerDelegate, RegionAdapterDelegate>
 
 @property (nonatomic) BOOL openSettingImmediatelyOnViewDidAppear;
 

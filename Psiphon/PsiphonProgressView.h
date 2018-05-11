@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, Psiphon Inc.
+ * Copyright (c) 2017, Psiphon Inc. Created by Draven Johnson on 2017-08-30.
  * All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,21 +17,12 @@
  *
  */
 
-#import <Foundation/Foundation.h>
+#import <UIKit/UIKit.h>
 
+@interface PsiphonProgressView : UIView
 
-@interface NoticeLogger : NSObject
+/* Percent complete in the range [0, 1]. */
 
-+ (instancetype)sharedInstance;
-
-+ (NSString *)containerRotatingLogNoticesPath;
-+ (NSString *)containerRotatingOlderLogNoticesPath;
-
-+ (NSString *)extensionRotatingLogNoticesPath;
-+ (NSString *)extensionRotatingOlderLogNoticesPath;
-
-- (void)noticeError:(NSString *)message;
-- (void)noticeErrorWithFormat:(NSString *)format, ... NS_FORMAT_FUNCTION(1,2);
-- (void)noticeError:(NSString *)message withTimestamp:(NSString *)timestamp;
+@property (nonatomic) CGFloat progress;
 
 @end

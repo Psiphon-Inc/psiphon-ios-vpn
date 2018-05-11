@@ -72,57 +72,8 @@ build () {
     echo "BUILD DONE"
 }
 
-increment_build_numbers_for_release () {
-    increment_plists_and_commit release
-}
-
-increment_build_numbers_for_testflight () {
-    increment_plists_and_commit testflight
-}
-
-increment_plists_and_commit () {
-    git pull
-    container_commit_message=$(python "${PSIPHON_IOS_VPN_XCODE_WORKSPACE}/increment_plist.py" --plist "${PSIPHON_IOS_VPN_XCODE_WORKSPACE}/Psiphon/Info.plist" --distribution_platform $1 --version_string)
-    if [[ $? != 0 ]]; then
-        echo "Incrementing container plist failed, aborting..."
-        exit 1
-    fi
-    extension_commit_message=$(python "${PSIPHON_IOS_VPN_XCODE_WORKSPACE}/increment_plist.py" --plist "${PSIPHON_IOS_VPN_XCODE_WORKSPACE}/PsiphonVPN/Info.plist" --distribution_platform $1 --version_string)
-    if [[ $? != 0 ]]; then
-        echo "Incrementing extension plist failed, aborting..."
-        exit 1
-    fi
-    if [[ "$container_commit_message" != "" ]] && [[ "$container_commit_message" != "$extension_commit_message" ]]; then
-        echo "Container and extension version numbers out of sync, aborting..."
-        exit 1
-    fi
-
-    commit_message="${container_commit_message}"
-    git add "${PSIPHON_IOS_VPN_XCODE_WORKSPACE}/Psiphon/Info.plist"
-    git add "${PSIPHON_IOS_VPN_XCODE_WORKSPACE}/PsiphonVPN/Info.plist"
-
-    git commit -m "${commit_message}"
-    if [[ $? != 0 ]]; then
-        echo "Failed to git commit plist changes, aborting..."
-        exit 1
-    fi
-
-    # Only tag release builds
-    if [[ "$1" == "release" ]]; then
-        # Get tag by retrieving the version number at the end of the commit message:
-        # TestFlight commit messages are in the form:
-        #   "TestFlight version <CFBundleShortVersionString#>"
-        # Release commit messages are in the form:
-        #   "TestFlight version <CFBundleShortVersionString#>; Release version <CFBundleVersion#>"
-        # Tag will be of the form: vX.Y.Z
-        # E.g.: v1.2.3
-        tag="v${commit_message##* }" # trim everything up to and including last space
-        git tag "${tag}"
-        if [[ $? != 0 ]]; then
-            echo "Failed to git tag plist commit, aborting..."
-            exit 1
-        fi
-    fi
+inc_vers_and_commit () {
+    python inc_vers.py --$1
 }
 
 upload_ipa () {
@@ -153,7 +104,7 @@ case $TARGET_DISTRIBUTION_PLATFORM in
         CONFIGURATION="Release"
         EXPORT_OPTIONS_PLIST="exportAppStoreOptions.plist"
         setup_env
-        increment_build_numbers_for_release
+        inc_vers_and_commit release
         build
         upload_ipa
         ;;
@@ -161,7 +112,7 @@ case $TARGET_DISTRIBUTION_PLATFORM in
         CONFIGURATION="Release"
         EXPORT_OPTIONS_PLIST="exportAppStoreOptions.plist"
         setup_env
-        increment_build_numbers_for_testflight
+        inc_vers_and_commit testflight
         build
         upload_ipa
         ;;
