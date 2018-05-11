@@ -257,11 +257,11 @@ static NSString *iapCellID = @"IAPTableCellID";
     UIButton *tosButton = [UIButton buttonWithType:UIButtonTypeSystem];
     [tosButton addTarget:self action:@selector(openToS) forControlEvents:UIControlEventTouchUpInside];
 
-    [tosButton setTitle:NSLocalizedStringWithDefaultValue(@"SUBSCRIPTIONS_TERMS_OF_SERVICE_BUTTON_TEXT",
+    [tosButton setTitle:NSLocalizedStringWithDefaultValue(@"SUBSCRIPTIONS_TERMS_OF_USE_BUTTON_TEXT",
                                                           nil,
                                                           [NSBundle mainBundle],
-                                                          @"Terms of Service",
-                                                          @"Title of button on subscriptions page which opens Psiphon's terms of service webpage")
+                                                          @"Terms of Use",
+                                                          @"Title of button on subscriptions page which opens Psiphon's terms of use webpage")
                forState:UIControlStateNormal];
     tosButton.titleLabel.adjustsFontSizeToFitWidth = YES;
     tosButton.titleLabel.textColor = self.view.tintColor;
