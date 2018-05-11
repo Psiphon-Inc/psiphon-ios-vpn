@@ -19,8 +19,8 @@
 /* Alert message informing user that subscription receipt can not be verified */
 "BAD_RECEIPT_ALERT_MESSAGE" = "您的订阅单据无法验证，请刷新并重试。";
 
-/*[UNTRANSLATED] Title of button on alert view which shows the progress of the user's buy request. Hitting this button dismisses the alert and the buy request continues processing in the background. */
-"BUY_REQUEST_PROGRESS_ALERT_DISMISS_BUTTON_TITLE" = "Dismiss";
+/* Title of button on alert view which shows the progress of the user's buy request. Hitting this button dismisses the alert and the buy request continues processing in the background. */
+"BUY_REQUEST_PROGRESS_ALERT_DISMISS_BUTTON_TITLE" = "忽略";
 
 /* Buy subscription dialog footer text */
 "BUY_SUBSCRIPTIONS_FOOTER_TEXT" = "订阅是自动更新的，这意味着一旦购买，订阅将自动续订，直到您在当前订阅期结束前24小时取消为止。\n您的iTunes账户将在本期结束前的24小时内收取续订费用，并收取订阅费用。\n通过转到您的账户设置来管理您的订阅和自动续订。";
@@ -62,14 +62,14 @@
 /*[UNTRANSLATED] Alert dialog message indicating to the user that the app has failed to upload their feedback and that they should try again.  */
 "FEEDBACK_UPLOAD_FAILED_MESSAGE" = "An error occured while uploading your feedback. Please try again. Your feedback helps us improve the Psiphon network.";
 
-/*[UNTRANSLATED] Alert dialog title indicating to the user that the app has failed to upload their feedback to Psiphon's servers. */
-"FEEDBACK_UPLOAD_FAILED_TITLE" = "Feedback upload failed";
+/* Alert dialog title indicating to the user that the app has failed to upload their feedback to Psiphon's servers. */
+"FEEDBACK_UPLOAD_FAILED_TITLE" = "反馈上传失败";
 
 /* Title of button on alert view which shows the progress of the users feedback being uploaded to Psiphon's servers. Hitting this button dismisses the alert and the upload continues in the background. */
 "FEEDBACK_UPLOAD_IN_PROGRESS_BACKGROUND_BUTTON_TITLE" = "背景";
 
-/*[UNTRANSLATED] Alert dialog title indicating to the user that their feedback is being encrypted and securely uploaded to Psiphon's servers. */
-"FEEDBACK_UPLOAD_IN_PROGRESS_MESSAGE" = "Sending feedback…";
+/* Alert dialog title indicating to the user that their feedback is being encrypted and securely uploaded to Psiphon's servers. */
+"FEEDBACK_UPLOAD_IN_PROGRESS_MESSAGE" = "正在发送反馈…";
 
 /*[UNTRANSLATED] Alert dialog message thanking the user for helping improve the Psiphon network by submitting their feedback. */
 "FEEDBACK_UPLOAD_SUCCESSFUL_MESSAGE" = "Thank you for helping improve Psiphon!";
@@ -130,6 +130,12 @@
 
 /* Alert dialog message informing the user that an error occurred while starting Psiphon (Do not translate 'Psiphon'). The user should try again, and if the problem persists, they should try reinstalling the app. */
 "VPN_START_FAIL_MESSAGE" = "启动赛风时发生错误。请再试一次。如果问题仍然存在，请尝试重新安装赛风应用。";
+
+/*[UNTRANSLATED] Alert dialog message informing the user that an error occurred while starting Psiphon because they selected an egress region that is no longer available (Do not translate 'Psiphon'). The user should select a different region and try again. Note: the backslash before each quotation mark should be left as is for formatting. */
+"VPN_START_FAIL_REGION_INVALID_MESSAGE" = "The region you selected is no longer available. You must choose a new region or change to the default \"Best performance\" choice.";
+
+/* Alert dialog title indicating to the user that Psiphon was unable to start because they selected an egress region that is no longer available */
+"VPN_START_FAIL_REGION_INVALID_TITLE" = "服务器区域不可用";
 
 /* Alert dialog title indicating to the user that Psiphon was unable to start (MainViewController) */
 "VPN_START_FAIL_TITLE" = "无法启动";
