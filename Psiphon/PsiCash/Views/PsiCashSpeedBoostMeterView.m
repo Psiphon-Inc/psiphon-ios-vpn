@@ -22,21 +22,79 @@
 #import "ReactiveObjC.h"
 
 #define kCornerRadius 25.f
+#define kBorderWidth 4.f
+
+@interface InnerMeterView : UIView
+@property (nonatomic, assign) CGFloat progress;
+@end
+
+@implementation InnerMeterView {
+    CAShapeLayer *progressBar;
+    CAGradientLayer *gradient;
+}
+
+- (id)initWithFrame:(CGRect)frame {
+    self = [super initWithFrame:frame];
+
+    if (self) {
+        self.clipsToBounds = YES;
+    }
+
+    return self;
+}
+
+- (void)setBounds:(CGRect)bounds {
+    [super setBounds:bounds];
+    [self updateProgressBarWithProgress:_progress];
+}
+
+- (void)setProgress:(CGFloat)progress {
+    _progress = progress;
+    [self updateProgressBarWithProgress:_progress];
+}
+
+- (void)updateProgressBarWithProgress:(CGFloat)progress {
+    [self removeProgressBar];
+
+    progressBar = [CAShapeLayer layer];
+    gradient = [CAGradientLayer layer];
+    [self.layer insertSublayer:gradient atIndex:0];
+    gradient.startPoint = CGPointMake(0, 0.5);
+    gradient.endPoint = CGPointMake(1.0, 0.5);
+    gradient.mask = progressBar;
+
+    CGFloat progressBarRadius = kCornerRadius;
+    CGFloat progressBarWidth = self.frame.size.width * progress;
+
+    UIRectCorner corners = kCALayerMinXMinYCorner | kCALayerMinXMaxYCorner;
+    if (progress == 0 || progress >= 1) {
+        corners |= kCALayerMaxXMaxYCorner | kCALayerMaxXMinYCorner;
+    }
+
+    gradient.colors = @[(id)[UIColor colorWithRed:0.34 green:0.51 blue:0.95 alpha:1.0].CGColor, (id)[UIColor colorWithRed:0.55 green:0.72 blue:1.00 alpha:1.0].CGColor];
+    progressBar.path = [UIBezierPath bezierPathWithRoundedRect:CGRectMake(0, 0, progressBarWidth, self.frame.size.height) byRoundingCorners:corners cornerRadii:CGSizeMake(progressBarRadius, progressBarRadius)].CGPath;
+    gradient.frame = CGRectMake(0, 0, self.frame.size.width, self.frame.size.height);
+}
+
+- (void)removeProgressBar {
+    [progressBar removeFromSuperlayer];
+    progressBar = nil;
+    [gradient removeFromSuperlayer];
+    gradient = nil;
+}
+
+@end
+
 
 @interface PsiCashSpeedBoostMeterView ()
 @property (atomic, readwrite) PsiCashClientModel *model;
 @end
 
-#pragma mark -
-
 @implementation PsiCashSpeedBoostMeterView {
     UILabel *title;
     NSTimer *countdownToNextHourExpired;
     UIImageView *instantBuyButton;
-
-    // Progress bar
-    CAShapeLayer *progressBar;
-    CAGradientLayer *gradient;
+    InnerMeterView *innerBackground;
 }
 
 - (id)initWithFrame:(CGRect)frame {
@@ -53,10 +111,10 @@
 
 - (void)setupViews {
     self.layer.cornerRadius = kCornerRadius;
+    self.backgroundColor = [UIColor clearColor];
     self.clipsToBounds = YES;
-    self.backgroundColor = [UIColor colorWithRed:0.16 green:0.18 blue:0.27 alpha:1.0];
-    self.layer.borderWidth = 4.f;
-    self.layer.borderColor = [UIColor colorWithRed:0.29 green:0.31 blue:0.40 alpha:1.0].CGColor;
+    self.layer.borderWidth = kBorderWidth;
+    self.layer.borderColor = [UIColor colorWithRed:0.38 green:0.27 blue:0.92 alpha:.12].CGColor;
 
     instantBuyButton = [[UIImageView alloc] initWithFrame:CGRectMake(60, 95, 90, 90)];
     instantBuyButton.image = [UIImage imageNamed:@"PsiCash_InstantPurchaseButton"];
@@ -66,14 +124,25 @@
     title.adjustsFontSizeToFitWidth = YES;
     title.font = [UIFont boldSystemFontOfSize:14];
     title.textColor = [UIColor colorWithRed:0.98 green:0.99 blue:1.00 alpha:1.0];
+
+    innerBackground = [[InnerMeterView alloc] init];
+    innerBackground.backgroundColor = [UIColor colorWithRed:0.00 green:0.00 blue:0.00 alpha:.12];
+    innerBackground.layer.cornerRadius = kCornerRadius - kBorderWidth;
 }
 
 - (void)addViews {
+    [self addSubview:innerBackground];
     [self addSubview:instantBuyButton];
     [self addSubview:title];
 }
 
 - (void)setupLayoutConstraints {
+    innerBackground.translatesAutoresizingMaskIntoConstraints = NO;
+    [innerBackground.widthAnchor constraintEqualToAnchor:self.widthAnchor constant:-kBorderWidth*2].active = YES;
+    [innerBackground.heightAnchor constraintEqualToAnchor:self.heightAnchor constant:-kBorderWidth*2].active = YES;
+    [innerBackground.centerXAnchor constraintEqualToAnchor:self.centerXAnchor].active = YES;
+    [innerBackground.centerYAnchor constraintEqualToAnchor:self.centerYAnchor].active = YES;
+
     CGFloat instantBuyButtonSize = 20.f;
     instantBuyButton.translatesAutoresizingMaskIntoConstraints = NO;
     [instantBuyButton.heightAnchor constraintEqualToConstant:instantBuyButtonSize].active = YES;
@@ -99,8 +168,7 @@
 
 - (void)speedBoostChargingWithHoursEarned:(NSNumber*)hoursEarned {
     float progress = [self progressToMinSpeedBoostPurchase];
-    [self addProgressBarWithProgress:progress];
-    self.backgroundColor = [UIColor colorWithRed:0.16 green:0.18 blue:0.27 alpha:1.0];
+    [innerBackground setProgress:progress];
 
     if (progress >= 1) {
         if ([self.model.maxSpeedBoostPurchaseEarned.hours floatValue] < 1) {
@@ -109,13 +177,12 @@
             title.text = [NSString stringWithFormat:@"%luh Speed Boost Available", (unsigned long)[hoursEarned unsignedIntegerValue]];
         }
     } else {
-        title.attributedText = [self minSpeedBoostPurchaseTitle];
+        title.text = [NSString stringWithFormat:@"Speed Boost Charging %.0f%%", [self progressToMinSpeedBoostPurchase]*100];
     }
 }
 
 - (void)activeSpeedBoostExpiringIn:(NSTimeInterval)seconds {
-    [self removeProgressBar];
-    self.backgroundColor = [UIColor colorWithRed:0.19 green:0.93 blue:0.88 alpha:1.0];
+    innerBackground.progress = 1;
 
     if (seconds > 0) {
         title.text = @"Speed Boost Active";
@@ -130,31 +197,6 @@
 }
 
 #pragma mark - Helpers
-
-- (void)addProgressBarWithProgress:(float)progress {
-    [self removeProgressBar];
-
-    progressBar = [CAShapeLayer layer];
-    gradient = [CAGradientLayer layer];
-    [self.layer insertSublayer:gradient atIndex:0];
-    gradient.startPoint = CGPointMake(0, 0.5);
-    gradient.endPoint = CGPointMake(1.0, 0.5);
-    gradient.mask = progressBar;
-
-    CGFloat progressBarWidth;
-    CGFloat progressBarRadius = progress == 0 ? kCornerRadius : 0;
-    progressBarWidth = 2 * progressBarRadius + (self.frame.size.width - 2 * progressBarRadius) * progress;
-    gradient.colors = @[(id)[UIColor colorWithRed:0.11 green:0.27 blue:0.69 alpha:1.0].CGColor, (id)[UIColor colorWithRed:0.19 green:0.93 blue:0.88 alpha:1.0].CGColor]; // green gradient
-    progressBar.path = [UIBezierPath bezierPathWithRoundedRect:CGRectMake(0, 0, progressBarWidth, self.frame.size.height) cornerRadius:progressBarRadius].CGPath;
-    gradient.frame = CGRectMake(0, 0, self.frame.size.width, self.frame.size.height);
-}
-
-- (void)removeProgressBar {
-    [progressBar removeFromSuperlayer];
-    progressBar = nil;
-    [gradient removeFromSuperlayer];
-    gradient = nil;
-}
 
 - (void)noSpenderToken {
     title.text = @"Earn PsiCash to buy Speed Boost";
@@ -199,7 +241,12 @@
         return 0;
     }
 
-    return (float)self.model.balanceInNanoPsi / [sku.price unsignedLongLongValue];
+    float progress = (float)self.model.balanceInNanoPsi / [sku.price unsignedLongLongValue];
+    if (progress > 1) {
+        progress = 1;
+    }
+
+    return progress;
 }
 
 #pragma mark - PsiCashClientModelReceiver protocol

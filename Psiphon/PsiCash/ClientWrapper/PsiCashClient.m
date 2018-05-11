@@ -100,7 +100,7 @@ NSErrorDomain _Nonnull const PsiCashClientLibraryErrorDomain = @"PsiCashClientLi
         return url;
     }
 
-    return modifiedURL;
+    return [NSURL URLWithString:modifiedURL];
 }
 
 - (void)scheduleStateRefresh {
@@ -365,8 +365,10 @@ NSErrorDomain _Nonnull const PsiCashClientLibraryErrorDomain = @"PsiCashClientLi
             }
 
             [self updateContainerAuthTokens];
-            // Ensure homepage is shown when extension reconnects with new auth token
-            [AppDelegate sharedAppDelegate].shownLandingPageForCurrentSession = FALSE;
+            dispatch_async(dispatch_get_main_queue(), ^{
+                // Ensure homepage is shown when extension reconnects with new auth token
+                [AppDelegate sharedAppDelegate].shownLandingPageForCurrentSession = FALSE;
+            });
             [[Notifier sharedInstance] post:NotifierUpdatedAuthorizations completionHandler:^(BOOL success) {
                 // Do nothing.
             }];
