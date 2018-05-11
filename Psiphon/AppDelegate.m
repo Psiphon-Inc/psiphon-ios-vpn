@@ -228,7 +228,7 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
     // Override point for customization after application launch.
     self.window = [[UIWindow alloc] initWithFrame:UIScreen.mainScreen.bounds];
 
-     rootContainerController = [[RootContainerController alloc] init];
+    rootContainerController = [[RootContainerController alloc] init];
     self.window.rootViewController = rootContainerController;
 
     // UIKit always waits for application:didFinishLaunchingWithOptions:
@@ -493,15 +493,10 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
 
                       [PsiFeedbackLogger infoWithType:LandingPageLogType message:@"open landing page"];
 
-                      // (pre-1.0) hardcoded URL
-                      // TODO: (1.0) URL should be dynamic (homepage.url)
-                      NSURL *url = [PsiCashClient.sharedInstance homePageURL];
-                      assert (url != nil);
-
                       // Not officially documented by Apple, however a runtime warning is generated sometimes
                       // stating that [UIApplication openURL:options:completionHandler:] must be used from
                       // the main thread only.
-                      [[UIApplication sharedApplication] openURL:url
+                      [[UIApplication sharedApplication] openURL:[PsiCashClient.sharedInstance modifiedHomePageURL:homepage.url]
                                                          options:@{}
                                                completionHandler:^(BOOL success) {
                                                    weakSelf.shownLandingPageForCurrentSession = success;

@@ -28,7 +28,7 @@
 @property (nonatomic, readonly) RACReplaySubject<PsiCashClientModel *> *clientModelSignal;
 
 + (instancetype)sharedInstance;
-- (NSURL*)homePageURL;
+- (NSURL*)modifiedHomePageURL:(NSURL*)url;
 - (void)scheduleStateRefresh;
 - (void)purchaseSpeedBoostProduct:(PsiCashSpeedBoostProductSKU*)sku;
 /**

@@ -90,19 +90,17 @@ NSErrorDomain _Nonnull const PsiCashClientLibraryErrorDomain = @"PsiCashClientLi
     return self;
 }
 
-- (NSURL*)homePageURL {
-    NSString *hardcodedURL = @"https://landing.psi.cash/";
+- (NSURL*)modifiedHomePageURL:(NSURL*)url {
     NSString *modifiedURL = nil;
 
-    NSError *e = [psiCash modifyLandingPage:hardcodedURL modifiedURL:&modifiedURL];
+    NSError *e = [psiCash modifyLandingPage:[url absoluteString] modifiedURL:&modifiedURL];
     if (e!= nil) {
         // TODO: should never happen because landing page is hardcoded above
-        // TOOD: (1.0) handle errors when landing pages are dynamic
         [PsiFeedbackLogger errorWithType:PsiCashLogType message:@"error constructing PsiCash landing page URL" object:e];
-        return [NSURL URLWithString:hardcodedURL];
+        return url;
     }
 
-    return [NSURL URLWithString:modifiedURL];
+    return modifiedURL;
 }
 
 - (void)scheduleStateRefresh {
