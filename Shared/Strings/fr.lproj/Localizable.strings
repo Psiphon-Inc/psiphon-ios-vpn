@@ -77,6 +77,9 @@
 /* Alert dialog title indicating to the user that their feedback has been successfully uploaded to Psiphon's servers. */
 "FEEDBACK_UPLOAD_SUCCESSFUL_TITLE" = "Votre rétroaction a été téléversée avec succès";
 
+/* External link to the license page. Please update this with the correct language specific link (if available) e.g. https://psiphon.ca/fr/license.html for french. */
+"LICENSE_PAGE_URL" = "https://psiphon.ca/fr/license.html";
+
 /* Text displayed while app loads */
 "LOADING" = "Chargement...";
 
@@ -121,6 +124,12 @@
 
 /* Title of the dialog for available in-app paid subscriptions */
 "SUBSCRIPTIONS" = "Abonnements";
+
+/* Title of button on subscriptions page which opens Psiphon's privacy policy webpage */
+"SUBSCRIPTIONS_PRIVACY_POLICY_BUTTON_TEXT" = "Politique de confidentialité";
+
+/* Title of button on subscriptions page which opens Psiphon's terms of use webpage */
+"SUBSCRIPTIONS_TERMS_OF_USE_BUTTON_TEXT" = "Conditions générales d’utilisation ";
 
 /* Alert message informing user that Psiphon has been stopped automatically since the subscription has expired. Do not translate 'Psiphon'. */
 "TUNNEL_KILLED" = "Psiphon a été arrêté automatiquement, car votre abonnement est expiré.";
