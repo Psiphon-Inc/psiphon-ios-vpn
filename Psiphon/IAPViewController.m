@@ -22,6 +22,7 @@
 #import "IAPStoreHelper.h"
 #import "MBProgressHUD.h"
 #import "NSDate+Comparator.h"
+#import "PsiphonClientCommonLibraryHelpers.h"
 #import "PsiphonDataSharedDB.h"
 #import "SharedConstants.h"
 
@@ -226,12 +227,50 @@ static NSString *iapCellID = @"IAPTableCellID";
                                                    [NSBundle mainBundle],
                                                    @"A subscription is auto-renewable which means that once purchased it will be automatically renewed until you cancel it 24 hours prior to the end of the current period.\n\nYour iTunes Account will be charged for renewal within 24-hours prior to the end of the current period with the cost of subscription.\n\nManage your Subscription and Auto-Renewal by going to your Account Settings.",
                                                    @"Buy subscription dialog footer text");
+
     label.textAlignment = NSTextAlignmentLeft;
     label.translatesAutoresizingMaskIntoConstraints = NO;
-    
+
     [cellView addSubview:label];
-    
-    
+
+    UIView *terms = [[UIView alloc] init];
+    terms.translatesAutoresizingMaskIntoConstraints = NO;
+    [cellView addSubview:terms];
+
+    UIButton *privacyPolicyButton = [UIButton buttonWithType:UIButtonTypeSystem];
+    [privacyPolicyButton addTarget:self action:@selector(openPrivacyPolicy) forControlEvents:UIControlEventTouchUpInside];
+
+    [privacyPolicyButton setTitle:NSLocalizedStringWithDefaultValue(@"SUBSCRIPTIONS_PRIVACY_POLICY_BUTTON_TEXT",
+                                                                    nil,
+                                                                    [NSBundle mainBundle],
+                                                                    @"Privacy Policy",
+                                                                    @"Title of button on subscriptions page which opens Psiphon's privacy policy webpage")
+                         forState:UIControlStateNormal];
+    privacyPolicyButton.titleLabel.adjustsFontSizeToFitWidth = YES;
+    privacyPolicyButton.titleLabel.textColor = self.view.tintColor;
+    privacyPolicyButton.titleLabel.font = [UIFont systemFontOfSize:12];
+    privacyPolicyButton.titleLabel.numberOfLines = 0;
+
+    privacyPolicyButton.translatesAutoresizingMaskIntoConstraints = NO;
+    [terms addSubview:privacyPolicyButton];
+
+    UIButton *tosButton = [UIButton buttonWithType:UIButtonTypeSystem];
+    [tosButton addTarget:self action:@selector(openToS) forControlEvents:UIControlEventTouchUpInside];
+
+    [tosButton setTitle:NSLocalizedStringWithDefaultValue(@"SUBSCRIPTIONS_TERMS_OF_SERVICE_BUTTON_TEXT",
+                                                          nil,
+                                                          [NSBundle mainBundle],
+                                                          @"Terms of Service",
+                                                          @"Title of button on subscriptions page which opens Psiphon's terms of service webpage")
+               forState:UIControlStateNormal];
+    tosButton.titleLabel.adjustsFontSizeToFitWidth = YES;
+    tosButton.titleLabel.textColor = self.view.tintColor;
+    tosButton.titleLabel.font = [UIFont systemFontOfSize:12];
+    tosButton.titleLabel.numberOfLines = 0;
+
+    tosButton.translatesAutoresizingMaskIntoConstraints = NO;
+    [terms addSubview:tosButton];
+
     NSString *restoreButtonTitle = NSLocalizedStringWithDefaultValue(@"RESTORE_SUBSCRIPTION_BUTTON_TITLE",
                                                                      nil,
                                                                      [NSBundle mainBundle],
@@ -254,14 +293,24 @@ static NSString *iapCellID = @"IAPTableCellID";
     refreshButton.translatesAutoresizingMaskIntoConstraints = NO;
     [cellView addSubview:refreshButton];
     
-
+    [cellView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|-[terms]-|" options:0 metrics:nil views:@{ @"terms": terms}]];
     [cellView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|-[label]-|" options:0 metrics:nil views:@{ @"label": label}]];
     [cellView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|-[restoreButton]-|" options:0 metrics:nil views:@{ @"restoreButton": restoreButton}]];
     [cellView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|-[refreshButton]-|" options:0 metrics:nil views:@{ @"refreshButton": refreshButton}]];
-    [cellView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|-10-[label]-10-[restoreButton]-10-[refreshButton]-|"
+    [cellView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|-[terms(==30)]-[label]-10-[restoreButton]-10-[refreshButton]-|"
                                                                      options:0 metrics:nil
-                                                                       views:@{ @"label": label, @"restoreButton": restoreButton, @"refreshButton": refreshButton}]];
-    
+                                                                       views:@{ @"terms": terms, @"label": label, @"restoreButton": restoreButton, @"refreshButton": refreshButton}]];
+
+    [privacyPolicyButton.heightAnchor constraintEqualToAnchor:terms.heightAnchor].active = YES;
+    [privacyPolicyButton.centerYAnchor constraintEqualToAnchor:terms.centerYAnchor].active = YES;
+    [privacyPolicyButton.leadingAnchor constraintEqualToAnchor:terms.leadingAnchor].active = YES;
+    [privacyPolicyButton.trailingAnchor constraintEqualToAnchor:terms.centerXAnchor].active = YES;
+
+    [tosButton.heightAnchor constraintEqualToAnchor:terms.heightAnchor].active = YES;
+    [tosButton.centerYAnchor constraintEqualToAnchor:terms.centerYAnchor].active = YES;
+    [tosButton.leadingAnchor constraintEqualToAnchor:terms.centerXAnchor].active = YES;
+    [tosButton.trailingAnchor constraintEqualToAnchor:terms.trailingAnchor].active = YES;
+
     return cellView;
 }
 
@@ -335,6 +384,29 @@ static NSString *iapCellID = @"IAPTableCellID";
     if([IAPStoreHelper sharedInstance].storeProducts.count > productID) {
         SKProduct* product = [IAPStoreHelper sharedInstance].storeProducts[productID];
         [[IAPStoreHelper sharedInstance] buyProduct:product];
+    }
+}
+
+- (void)openPrivacyPolicy {
+    NSURL *url = [NSURL URLWithString:NSLocalizedStringWithDefaultValue(@"PRIVACY_POLICY_URL", nil, [PsiphonClientCommonLibraryHelpers commonLibraryBundle], @"https://psiphon.ca/en/privacy.html", @"External link to the privacy policy page. Please update this with the correct language specific link (if available) e.g. https://psiphon.ca/fr/privacy.html for french.")];
+    [self openURL:url];
+}
+
+- (void)openToS {
+    NSURL *url = [NSURL URLWithString:NSLocalizedStringWithDefaultValue(@"LICENSE_PAGE_URL", nil, [PsiphonClientCommonLibraryHelpers commonLibraryBundle], @"https://psiphon.ca/en/license.html", "External link to the license page. Please update this with the correct language specific link (if available) e.g. https://psiphon.ca/fr/license.html for french.")];
+    [self openURL:url];
+}
+
+- (void)openURL:(NSURL*)url {
+    if (url != nil) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            // Not officially documented by Apple, however a runtime warning is generated sometimes
+            // stating that [UIApplication openURL:options:completionHandler:] must be used from
+            // the main thread only.
+            [[UIApplication sharedApplication] openURL:url
+                                               options:@{}
+                                     completionHandler:nil];
+        });
     }
 }
 
