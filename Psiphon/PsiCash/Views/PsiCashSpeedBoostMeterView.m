@@ -123,6 +123,7 @@
     title = [[UILabel alloc] init];
     title.adjustsFontSizeToFitWidth = YES;
     title.font = [UIFont boldSystemFontOfSize:14];
+    title.textAlignment = NSTextAlignmentCenter;
     title.textColor = [UIColor colorWithRed:0.98 green:0.99 blue:1.00 alpha:1.0];
 
     innerBackground = [[InnerMeterView alloc] init];
@@ -154,6 +155,7 @@
     title.translatesAutoresizingMaskIntoConstraints = NO;
     [title.centerXAnchor constraintEqualToAnchor:self.centerXAnchor].active = YES;
     [title.centerYAnchor constraintEqualToAnchor:self.centerYAnchor].active = YES;
+    [title.leadingAnchor constraintEqualToAnchor:instantBuyButton.trailingAnchor].active = YES;
 }
 
 # pragma mark - State Changes

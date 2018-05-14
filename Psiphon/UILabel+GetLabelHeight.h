@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, Psiphon Inc.
+ * Copyright (c) 2018, Psiphon Inc.
  * All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,13 +18,9 @@
  */
 
 #import <UIKit/UIKit.h>
-#import "PsiCashPurchaseAlertView.h"
-#import "RegionAdapter.h"
-#import "PsiCashOnboardingViewController.h"
-#import "SettingsViewController.h"
 
-@interface MainViewController : UIViewController <PsiphonSettingsViewControllerDelegate, RegionAdapterDelegate, PsiCashPurchaseAlertViewDelegate, PsiCashOnboardingViewControllerDelegate>
+@interface UILabel (GetLabelHeight)
 
-@property (nonatomic) BOOL openSettingImmediatelyOnViewDidAppear;
+- (CGFloat)getLabelHeight;
 
 @end
