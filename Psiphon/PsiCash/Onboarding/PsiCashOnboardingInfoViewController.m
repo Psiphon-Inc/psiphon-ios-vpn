@@ -98,22 +98,43 @@
 }
 
 - (void)setGraphicAsSpeedBoostMeter {
-    PsiCashSpeedBoostProductSKU *sku = [PsiCashSpeedBoostProductSKU skuWitDistinguisher:@"1h" withHours:[NSNumber numberWithInteger:1] andPrice:[NSNumber numberWithInteger:1e9]];
+    PsiCashSpeedBoostProductSKU *sku = [PsiCashSpeedBoostProductSKU skuWitDistinguisher:@"1h" withHours:[NSNumber numberWithInteger:1] andPrice:[NSNumber numberWithInteger:10e9]];
     PsiCashBalanceWithSpeedBoostMeter *meter = [[PsiCashBalanceWithSpeedBoostMeter alloc] init];
 
-    UInt64 balance = 0;
-    if (self.index == PsiCashOnboardingPage2Index) {
-        balance = 0.41e9;
-    } else if (self.index == PsiCashOnboardingPage3Index) {
-        balance = 1e9;
-    }
-
     PsiCashClientModel *m = [PsiCashClientModel clientModelWithAuthPackage:[[PsiCashAuthPackage alloc] initWithValidTokens:@[@"indicator", @"earner", @"spender"]]
-                                                       andBalanceInNanoPsi:balance
+                                                       andBalanceInNanoPsi:0
                                                       andSpeedBoostProduct:[PsiCashSpeedBoostProduct productWithSKUs:@[sku]]
                                                        andPendingPurchases:nil
                                                andActiveSpeedBoostPurchase:nil];
-    [meter bindWithModel:m];
+
+    if (self.index == PsiCashOnboardingPage2Index) {
+        m.balanceInNanoPsi = 0e9;
+        [meter bindWithModel:m];
+
+        // Add earning animation
+        if (self.index == PsiCashOnboardingPage2Index) {
+            [NSTimer scheduledTimerWithTimeInterval:1 repeats:YES block:^(NSTimer * _Nonnull timer) {
+                if (m.balanceInNanoPsi >= 7.5e9) {
+                    m.balanceInNanoPsi = 0;
+                    return;
+                } else {
+                    if (m.balanceInNanoPsi == 0) {
+                        [meter bindWithModel:m];
+                    }
+                    m.balanceInNanoPsi += 2.5e9;
+                }
+
+                [PsiCashBalanceWithSpeedBoostMeter earnAnimationWithCompletion:self.view andPsiCashView:meter andCompletion:^{
+                    [meter bindWithModel:m];
+                }];
+                [meter.balance bindWithModel:m];
+            }];
+        }
+    } else if (self.index == PsiCashOnboardingPage3Index) {
+        m.balanceInNanoPsi = 10e9;
+        [meter bindWithModel:m];
+    }
+
     graphic = meter;
     [self.view addSubview:graphic];
 

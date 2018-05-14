@@ -18,8 +18,13 @@
  */
 
 #import <UIKit/UIKit.h>
+#import "PsiCashBalanceView.h"
 #import "PsiCashClientModel.h"
+#import "PsiCashSpeedBoostMeterView.h"
 
 @interface PsiCashBalanceWithSpeedBoostMeter : UIView <PsiCashClientModelReceiver>
-
+@property (strong, readonly, nonatomic) PsiCashBalanceView *balance;
+@property (strong, readonly, nonatomic) PsiCashSpeedBoostMeterView *meter;
++ (void)earnAnimationWithCompletion:(UIView*)parentView andPsiCashView:(PsiCashBalanceWithSpeedBoostMeter*)targetPsiCashView andCompletion:(void (^)(void))completionHandler;
+- (void)earnAnimation;
 @end
