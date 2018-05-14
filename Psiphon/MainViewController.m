@@ -1203,10 +1203,23 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 
             BOOL stateChanged = [model hasActiveSpeedBoostPurchase] ^ [newClientModel hasActiveSpeedBoostPurchase] || [model hasPendingPurchase] ^ [newClientModel hasPendingPurchase];
 
+            BOOL animate = FALSE;
+            if ([model.authPackage hasIndicatorToken] && [newClientModel balanceInNanoPsi] > [model balanceInNanoPsi]) {
+                animate = TRUE;
+            }
+
             model = newClientModel;
 
             if (stateChanged && alertView != nil) {
                 [self showPsiCashAlertView];
+            }
+
+            if (animate) {
+                [PsiCashBalanceWithSpeedBoostMeter earnAnimationWithCompletion:self.view andPsiCashView:psiCashView andCompletion:^{
+                    [psiCashView bindWithModel:model];
+                }];
+                [psiCashView.balance bindWithModel:model];
+                return;
             }
 
             [psiCashView bindWithModel:model];
