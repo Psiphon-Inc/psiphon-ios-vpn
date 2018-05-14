@@ -91,6 +91,27 @@
 /* Alert OK Button */
 "OK_BUTTON" = "OK";
 
+/* Body text on one of the on-boarding screens. It is indicating to the user that Psiphon Browser allows them to access the Internet (without censorship). */
+"ONBOARDING_ACCESS_TEXT" = "The Internet at your fingertips";
+
+/* Title text on one of the on-boarding screens */
+"ONBOARDING_ACCESS_TITLE" = "Access the Web";
+
+/* Body text on one of the on-boarding screens. The intention of this screen is to let the user know that their sites and services -- Facebook, Twitter, etc. -- can be accessed within Psiphon Browser via web pages. DO NOT translate 'Psiphon'. */
+"ONBOARDING_APPS_TEXT" = "Your favorite apps have a web interface that works great in Psiphon Browser";
+
+/* Title text on one of the on-boarding screens. The intention of this screen is to let the user know that their sites and services -- Facebook, Twitter, etc. -- can be accessed within Psiphon Browser via web pages. */
+"ONBOARDING_APPS_TITLE" = "Your Apps in Your Browser";
+
+/* Title text on one of the on-boarding screens. This is the final page of the on-boarding and is sending the user off on their journey across the Internet. */
+"ONBOARDING_BROWSING_TITLE" = "Happy Browsing!";
+
+/* Text of button at the bottom right or left (depending on rtl) of the onboarding screens which allows the user to move on to the next onboarding screen. Note: should be all uppercase (capitalized) when possible. */
+"ONBOARDING_NEXT_BUTTON" = "NEXT";
+
+/* Text of button at the top right or left (depending on rtl) of the onboarding screens which allows user to skip onboarding */
+"ONBOARDING_SKIP_BUTTON" = "SKIP";
+
 /* Alert message informing the user they should open the app to finish connecting to the VPN. DO NOT translate 'Psiphon'. */
 "OPEN_PSIPHON_APP" = "Please open Psiphon app to finish connecting.";
 
@@ -108,6 +129,24 @@
 
 /* Text conveying to the user that the target Speed Boost product is being loaded */
 "PSICASH_LOADING_SPEED_BOOST_PRODUCTS_MESSAGE" = "Loading Speed Boost product...";
+
+/* Body text on the first PsiCash onboarding screen */
+"PSICASH_ONBOARDING_PAGE_1_TEXT" = "A new way for you to enjoy maximum speeds, absolutely free.";
+
+/* Title text on the first PsiCash onboarading screen */
+"PSICASH_ONBOARDING_PAGE_1_TITLE" = "Say hello to PsiCash";
+
+/* Body text on the second PsiCash onboarding screen */
+"PSICASH_ONBOARDING_PAGE_2_TEXT" = "Connect and engage with our content to earn PsiCash.";
+
+/* Title text on the second PsiCash onboarading screen */
+"PSICASH_ONBOARDING_PAGE_2_TITLE" = "Your PsiCash balance";
+
+/* Body text on the third PsiCash onboarding screen */
+"PSICASH_ONBOARDING_PAGE_3_TEXT" = "When you've collected enough PsiCash, you can activate Speed Boost and enjoy Psiphon at max speed!";
+
+/* Title text on the third PsiCash onboarading screen */
+"PSICASH_ONBOARDING_PAGE_3_TITLE" = "Speed Boost";
 
 /* Refresh app receipt button title */
 "REFRESH_APP_RECEIPT_BUTTON_TITLE" = "Refresh app receipt";
