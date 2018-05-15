@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, Psiphon Inc.
+ * Copyright (c) 2017, Psiphon Inc.
  * All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,11 +18,7 @@
  */
 
 #import <UIKit/UIKit.h>
-#import "PsiCashClientModel.h"
+#import "PsiCashOnboardingViewController.h"
 
-@interface PsiCashBalanceView : UIButton <PsiCashClientModelReceiver>
-@property (strong, readonly, nonatomic) UILabel *balance;
-@property (strong, readonly, nonatomic) UIImageView *coin;
-- (void)earnAnimation;
+@interface PsiCashOnboardingInfoViewController : UIViewController <PsiCashOnboardingChildViewController>
 @end
-

@@ -18,19 +18,21 @@
  */
 
 #import "PsiCashBalanceView.h"
+#import "PsiCashBalanceView.h"
 #import "PsiCashClient.h"
+#import "PsiCashSpeedBoostMeterView.h"
 #import "ReactiveObjC.h"
+#import <AudioToolbox/AudioToolbox.h>
 
 @interface PsiCashBalanceView ()
 @property (atomic, readwrite) PsiCashClientModel *model;
+@property (strong, nonatomic) UILabel *balance;
+@property (strong, nonatomic) UIImageView *coin;
 @end
 
 #pragma mark -
 
-@implementation PsiCashBalanceView {
-    UIImageView *coin;
-    UILabel *balance;
-}
+@implementation PsiCashBalanceView
 
 -(id)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
@@ -58,54 +60,73 @@
 
 - (void)setupViews {
     self.clipsToBounds = YES;
-    self.backgroundColor = [UIColor colorWithRed:0.38 green:0.27 blue:0.92 alpha:.12];
+    self.backgroundColor = [UIColor colorWithWhite:0 alpha:.12];
     self.contentEdgeInsets = UIEdgeInsetsMake(10.0f, 30.0f, 10.0f, 30.0f);
 
-    // Setup coin graphic
-    coin = [[UIImageView alloc] initWithFrame:CGRectMake(60, 95, 90, 90)];
-    coin.image = [UIImage imageNamed:@"PsiCash_Coin"];
-    [coin.layer setMinificationFilter:kCAFilterTrilinear];
-
     // Setup balance label
-    balance = [[UILabel alloc] init];
-    balance.backgroundColor = [UIColor clearColor];
-    balance.font = [UIFont boldSystemFontOfSize:16];
-    balance.textAlignment = NSTextAlignmentCenter;
-    balance.textColor = [UIColor whiteColor];
-    balance.userInteractionEnabled = NO;
+    _balance = [[UILabel alloc] init];
+    _balance.backgroundColor = [UIColor clearColor];
+    _balance.font = [UIFont boldSystemFontOfSize:16];
+    _balance.textAlignment = NSTextAlignmentCenter;
+    _balance.textColor = [UIColor whiteColor];
+    _balance.userInteractionEnabled = NO;
+
+    // Setup coin graphic
+    _coin = [[UIImageView alloc] init];
+    _coin.image = [UIImage imageNamed:@"PsiCash_Coin"];
+    [_coin.layer setMinificationFilter:kCAFilterTrilinear];
 }
 
 - (void)addViews {
-    [self addSubview:coin];
-    [self addSubview:balance];
+    [self addSubview:_balance];
+    [self addSubview:_coin];
 }
 
 - (void)setupLayoutConstraints {
-    CGFloat coinSize = 30.f;
-    coin.translatesAutoresizingMaskIntoConstraints = NO;
-    [coin.heightAnchor constraintEqualToConstant:coinSize].active = YES;
-    [coin.widthAnchor constraintEqualToConstant:coinSize].active = YES;
-    [coin.centerYAnchor constraintEqualToAnchor:balance.centerYAnchor].active = YES;
-    [coin.leadingAnchor constraintEqualToAnchor:self.leadingAnchor constant:5.f].active = YES;
+    _balance.translatesAutoresizingMaskIntoConstraints = NO;
+    [_balance.centerXAnchor constraintEqualToAnchor:self.centerXAnchor].active = YES;
+    [_balance.centerYAnchor constraintEqualToAnchor:self.centerYAnchor].active = YES;
 
-    balance.translatesAutoresizingMaskIntoConstraints = NO;
-    [balance.centerXAnchor constraintEqualToAnchor:self.centerXAnchor].active = YES;
-    [balance.centerYAnchor constraintEqualToAnchor:self.centerYAnchor].active = YES;
+    CGFloat coinSize = 30.f;
+    _coin.translatesAutoresizingMaskIntoConstraints = NO;
+    [_coin.heightAnchor constraintEqualToConstant:coinSize].active = YES;
+    [_coin.widthAnchor constraintEqualToConstant:coinSize].active = YES;
+    [_coin.centerYAnchor constraintEqualToAnchor:_balance.centerYAnchor].active = YES;
+    [_coin.trailingAnchor constraintEqualToAnchor:_balance.leadingAnchor constant:-5].active = YES;
+
+}
+
+- (void)earnAnimation {
+    CABasicAnimation *animation =
+    [CABasicAnimation animationWithKeyPath:@"position"];
+    [animation setDuration:0.1];
+    [animation setRepeatCount:1];
+    [animation setAutoreverses:YES];
+    [animation setRemovedOnCompletion:YES];
+
+    [animation setFromValue:[NSValue valueWithCGPoint:
+                             CGPointMake([_coin center].x, [_coin center].y)]];
+    [animation setToValue:[NSValue valueWithCGPoint:
+                           CGPointMake([_coin center].x, [_coin center].y - 10.f)]];
+
+    [[_coin layer] addAnimation:animation forKey:@"position"];
 }
 
 #pragma mark - State Changes
+
 - (NSString*)stringFromBalance:(double)balance {
     return [NSString stringWithFormat:@"%.0f", balance / 1e9];
 }
+
 - (void)bindWithModel:(PsiCashClientModel*)clientModel {
     self.model = clientModel;
 
     if ([self.model hasAuthPackage]) {
         if ([self.model.authPackage hasIndicatorToken]) {
-            balance.text = [self stringFromBalance:clientModel.balanceInNanoPsi];
+            _balance.text = [self stringFromBalance:clientModel.balanceInNanoPsi];
         } else {
             // First launch: the user has no indicator token
-            balance.text = [self stringFromBalance:0];
+            _balance.text = [self stringFromBalance:0];
         }
     } else {
         // Do nothing

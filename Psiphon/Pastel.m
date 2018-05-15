@@ -17,12 +17,25 @@
  *
  */
 
-#import <UIKit/UIKit.h>
-#import "PsiCashClientModel.h"
+#import "Pastel.h"
 
-@interface PsiCashBalanceView : UIButton <PsiCashClientModelReceiver>
-@property (strong, readonly, nonatomic) UILabel *balance;
-@property (strong, readonly, nonatomic) UIImageView *coin;
-- (void)earnAnimation;
-@end
-
+CGPoint PastelPoint(PastelDirection dir) {
+    switch (dir) {
+        case left:
+            return CGPointMake(0.0, 0.5);
+        case top:
+            return CGPointMake(0.5, 0.0);
+        case right:
+            return CGPointMake(1.0, 0.5);
+        case bottom:
+            return CGPointMake(0.5, 1.0);
+        case topLeft:
+            return CGPointMake(0.0, 0.0);
+        case topRight:
+            return CGPointMake(1.0, 0.0);
+        case bottomLeft:
+            return CGPointMake(0.0, 1.0);
+        case bottomRight:
+            return CGPointMake(1.0, 1.0);
+    }
+}

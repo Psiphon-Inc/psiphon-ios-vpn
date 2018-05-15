@@ -17,12 +17,19 @@
  *
  */
 
+#import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
-#import "PsiCashClientModel.h"
 
-@interface PsiCashBalanceView : UIButton <PsiCashClientModelReceiver>
-@property (strong, readonly, nonatomic) UILabel *balance;
-@property (strong, readonly, nonatomic) UIImageView *coin;
-- (void)earnAnimation;
-@end
+typedef NS_ENUM(NSInteger, PastelDirection) {
+    left,
+    top,
+    right,
+    bottom,
+    topLeft,
+    topRight,
+    bottomLeft,
+    bottomRight
+};
+
+CGPoint PastelPoint(PastelDirection dir);
 
