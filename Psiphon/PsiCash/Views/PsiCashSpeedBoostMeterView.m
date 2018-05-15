@@ -18,6 +18,7 @@
  */
 
 #import "PsiCashSpeedBoostMeterView.h"
+#import "PastelView.h"
 #import "PsiCashClient.h"
 #import "ReactiveObjC.h"
 
@@ -31,6 +32,7 @@
 @implementation InnerMeterView {
     CAShapeLayer *progressBar;
     CAGradientLayer *gradient;
+    PastelView *animatedGradientView;
 }
 
 - (id)initWithFrame:(CGRect)frame {
@@ -57,11 +59,7 @@
     [self removeProgressBar];
 
     progressBar = [CAShapeLayer layer];
-    gradient = [CAGradientLayer layer];
-    [self.layer insertSublayer:gradient atIndex:0];
-    gradient.startPoint = CGPointMake(0, 0.5);
-    gradient.endPoint = CGPointMake(1.0, 0.5);
-    gradient.mask = progressBar;
+
 
     CGFloat progressBarRadius = kCornerRadius;
     CGFloat progressBarWidth = self.frame.size.width * progress;
@@ -71,9 +69,25 @@
         corners |= kCALayerMaxXMaxYCorner | kCALayerMaxXMinYCorner;
     }
 
-    gradient.colors = @[(id)[UIColor colorWithRed:0.34 green:0.51 blue:0.95 alpha:1.0].CGColor, (id)[UIColor colorWithRed:0.55 green:0.72 blue:1.00 alpha:1.0].CGColor];
-    progressBar.path = [UIBezierPath bezierPathWithRoundedRect:CGRectMake(0, 0, progressBarWidth, self.frame.size.height) byRoundingCorners:corners cornerRadii:CGSizeMake(progressBarRadius, progressBarRadius)].CGPath;
-    gradient.frame = CGRectMake(0, 0, self.frame.size.width, self.frame.size.height);
+    if (progress >= 1) {
+        animatedGradientView = [[PastelView alloc] init];
+        [self addSubview:animatedGradientView];
+        animatedGradientView.frame = self.bounds;
+
+        progressBar.path = [UIBezierPath bezierPathWithRoundedRect:CGRectMake(0, 0, progressBarWidth, self.frame.size.height) byRoundingCorners:corners cornerRadii:CGSizeMake(progressBarRadius, progressBarRadius)].CGPath;
+        animatedGradientView.frame = CGRectMake(0, 0, self.frame.size.width, self.frame.size.height);
+        [animatedGradientView startAnimation];
+    } else {
+        gradient = [CAGradientLayer layer];
+        [self.layer insertSublayer:gradient atIndex:0];
+        gradient.startPoint = CGPointMake(0, 0.5);
+        gradient.endPoint = CGPointMake(1.0, 0.5);
+        gradient.mask = progressBar;
+
+        gradient.colors = @[(id)[UIColor colorWithRed:0.16 green:0.38 blue:1.00 alpha:1.0].CGColor, (id)[UIColor colorWithRed:0.55 green:0.72 blue:1.00 alpha:1.0].CGColor];
+        progressBar.path = [UIBezierPath bezierPathWithRoundedRect:CGRectMake(0, 0, progressBarWidth, self.frame.size.height) byRoundingCorners:corners cornerRadii:CGSizeMake(progressBarRadius, progressBarRadius)].CGPath;
+        gradient.frame = CGRectMake(0, 0, self.frame.size.width, self.frame.size.height);
+    }
 }
 
 - (void)removeProgressBar {
@@ -81,6 +95,8 @@
     progressBar = nil;
     [gradient removeFromSuperlayer];
     gradient = nil;
+    [animatedGradientView removeFromSuperview];
+    animatedGradientView = nil;
 }
 
 @end
@@ -114,7 +130,7 @@
     self.backgroundColor = [UIColor clearColor];
     self.clipsToBounds = YES;
     self.layer.borderWidth = kBorderWidth;
-    self.layer.borderColor = [UIColor colorWithRed:0.38 green:0.27 blue:0.92 alpha:.12].CGColor;
+    self.layer.borderColor = [UIColor colorWithWhite:0 alpha:.12].CGColor;
 
     instantBuyButton = [[UIImageView alloc] initWithFrame:CGRectMake(60, 95, 90, 90)];
     instantBuyButton.image = [UIImage imageNamed:@"PsiCash_InstantPurchaseButton"];
@@ -127,7 +143,7 @@
     title.textColor = [UIColor colorWithRed:0.98 green:0.99 blue:1.00 alpha:1.0];
 
     innerBackground = [[InnerMeterView alloc] init];
-    innerBackground.backgroundColor = [UIColor colorWithRed:0.00 green:0.00 blue:0.00 alpha:.12];
+    innerBackground.backgroundColor = [UIColor colorWithWhite:0 alpha:.24];
     innerBackground.layer.cornerRadius = kCornerRadius - kBorderWidth;
 }
 

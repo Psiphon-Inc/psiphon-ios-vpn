@@ -95,6 +95,29 @@
     [graphic.widthAnchor constraintEqualToConstant:coinSize].active = YES;
     [graphic.heightAnchor constraintEqualToConstant:coinSize].active = YES;
     [graphic.centerXAnchor constraintEqualToAnchor:self.view.centerXAnchor].active = YES;
+
+    // Add stars
+    [self addStarWithSize:20.f andXAxisAnchor:graphic.trailingAnchor withXConstant:0 andYAxisAnchor:graphic.topAnchor withYConstant:0];
+    UIView *star = [self addStarWithSize:10.f andXAxisAnchor:graphic.leadingAnchor withXConstant:10 andYAxisAnchor:graphic.topAnchor withYConstant:0];
+    star.alpha = 0.6;
+    [self addStarWithSize:15.f andXAxisAnchor:graphic.leadingAnchor withXConstant:0 andYAxisAnchor:graphic.bottomAnchor withYConstant:-10];
+}
+
+- (UIView*)addStarWithSize:(CGFloat)size andXAxisAnchor:(NSLayoutXAxisAnchor*)xAnchor withXConstant:(CGFloat)xConstant andYAxisAnchor:(NSLayoutYAxisAnchor*)yAnchor withYConstant:(CGFloat)yConstant {
+    UIImageView *star = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"Star"]];
+    star.translatesAutoresizingMaskIntoConstraints = NO;
+    star.contentMode = UIViewContentModeScaleAspectFit;
+    [star.layer setMinificationFilter:kCAFilterTrilinear]; // Prevent aliasing
+
+    [self.view addSubview:star];
+
+    star.translatesAutoresizingMaskIntoConstraints = NO;
+    [star.centerXAnchor constraintEqualToAnchor:xAnchor constant:xConstant].active = YES;
+    [star.topAnchor constraintEqualToAnchor:yAnchor constant:yConstant].active = YES;
+    [star.widthAnchor constraintEqualToConstant:size].active = YES;
+    [star.heightAnchor constraintEqualToConstant:size].active = YES;
+
+    return star;
 }
 
 - (void)setGraphicAsSpeedBoostMeter {

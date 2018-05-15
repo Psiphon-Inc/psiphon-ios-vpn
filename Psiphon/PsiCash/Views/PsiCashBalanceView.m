@@ -60,7 +60,7 @@
 
 - (void)setupViews {
     self.clipsToBounds = YES;
-    self.backgroundColor = [UIColor colorWithRed:0.38 green:0.27 blue:0.92 alpha:.12];
+    self.backgroundColor = [UIColor colorWithWhite:0 alpha:.12];
     self.contentEdgeInsets = UIEdgeInsetsMake(10.0f, 30.0f, 10.0f, 30.0f);
 
     // Setup balance label
