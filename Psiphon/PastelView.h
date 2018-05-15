@@ -17,12 +17,13 @@
  *
  */
 
+#import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
-#import "PsiCashClientModel.h"
 
-@interface PsiCashBalanceView : UIButton <PsiCashClientModelReceiver>
-@property (strong, readonly, nonatomic) UILabel *balance;
-@property (strong, readonly, nonatomic) UIImageView *coin;
-- (void)earnAnimation;
+@interface PastelView : UIView <CAAnimationDelegate>
+
+@property (nonatomic, readwrite) NSArray<UIColor *> *colors;
+
+- (void)startAnimation;
+
 @end
-

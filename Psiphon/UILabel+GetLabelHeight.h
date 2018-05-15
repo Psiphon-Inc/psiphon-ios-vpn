@@ -18,11 +18,9 @@
  */
 
 #import <UIKit/UIKit.h>
-#import "PsiCashClientModel.h"
 
-@interface PsiCashBalanceView : UIButton <PsiCashClientModelReceiver>
-@property (strong, readonly, nonatomic) UILabel *balance;
-@property (strong, readonly, nonatomic) UIImageView *coin;
-- (void)earnAnimation;
+@interface UILabel (GetLabelHeight)
+
+- (CGFloat)getLabelHeight;
+
 @end
-

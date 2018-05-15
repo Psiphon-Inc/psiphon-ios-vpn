@@ -18,19 +18,17 @@
  */
 
 #import "PsiCashBalanceWithSpeedBoostMeter.h"
-#import "PsiCashBalanceView.h"
-#import "PsiCashSpeedBoostMeterView.h"
 #import "PsiCashClient.h"
 #import "ReactiveObjC.h"
 
 @interface PsiCashBalanceWithSpeedBoostMeter ()
 @property (atomic, readwrite) PsiCashClientModel *model;
+@property (strong, nonatomic) PsiCashBalanceView *balance;
+@property (strong, nonatomic) PsiCashSpeedBoostMeterView *meter;
 @end
 
 @implementation PsiCashBalanceWithSpeedBoostMeter {
     UIImageView *coin;
-    PsiCashBalanceView *balance;
-    PsiCashSpeedBoostMeterView *meter;
 }
 
 -(id)initWithFrame:(CGRect)frame {
@@ -49,35 +47,88 @@
     [self setBackgroundColor:[UIColor clearColor]];
 
     // Setup balance View
-    balance = [[PsiCashBalanceView alloc] init];
+    _balance = [[PsiCashBalanceView alloc] init];
 
     // Setup Speed Boost meter
-    meter = [[PsiCashSpeedBoostMeterView alloc] init];
+    _meter = [[PsiCashSpeedBoostMeterView alloc] init];
 }
 
 - (void)addViews {
     [self addSubview:coin];
-    [self addSubview:balance];
-    [self addSubview:meter];
+    [self addSubview:_balance];
+    [self addSubview:_meter];
 }
 
 - (void)setupLayoutConstraints {
-    balance.translatesAutoresizingMaskIntoConstraints = NO;
-    [balance.centerXAnchor constraintEqualToAnchor:self.centerXAnchor].active = YES;
-    [balance.topAnchor constraintEqualToAnchor:self.topAnchor].active = YES;
-    [balance.widthAnchor constraintEqualToAnchor:self.widthAnchor multiplier:0.5].active = YES;
-    [balance.heightAnchor constraintEqualToConstant:40.f].active = YES;
+    _balance.translatesAutoresizingMaskIntoConstraints = NO;
+    [_balance.centerXAnchor constraintEqualToAnchor:self.centerXAnchor].active = YES;
+    [_balance.topAnchor constraintEqualToAnchor:self.topAnchor].active = YES;
+    [_balance.widthAnchor constraintEqualToAnchor:self.widthAnchor multiplier:0.5].active = YES;
+    [_balance.heightAnchor constraintEqualToConstant:40.f].active = YES;
 
-    meter.translatesAutoresizingMaskIntoConstraints = NO;
-    [meter.centerXAnchor constraintEqualToAnchor:balance.centerXAnchor].active = YES;
-    [meter.topAnchor constraintEqualToAnchor:balance.bottomAnchor].active = YES;
-    [meter.widthAnchor constraintEqualToAnchor:self.widthAnchor multiplier:0.9].active = YES;
-    [meter.heightAnchor constraintEqualToConstant:50.f].active = YES;
+    _meter.translatesAutoresizingMaskIntoConstraints = NO;
+    [_meter.centerXAnchor constraintEqualToAnchor:_balance.centerXAnchor].active = YES;
+    [_meter.topAnchor constraintEqualToAnchor:_balance.bottomAnchor].active = YES;
+    [_meter.widthAnchor constraintEqualToAnchor:self.widthAnchor multiplier:0.9].active = YES;
+    [_meter.heightAnchor constraintEqualToConstant:50.f].active = YES;
+}
+
+- (void)earnAnimation {
+    [_balance earnAnimation];
 }
 
 - (void)bindWithModel:(PsiCashClientModel *)clientModel {
-    [balance bindWithModel:clientModel];
-    [meter bindWithModel:clientModel];
+    [_balance bindWithModel:clientModel];
+    [_meter bindWithModel:clientModel];
+}
+
+#pragma mark - Animation helpers
+
++ (void)earnAnimationWithCompletion:(UIView*)parentView andPsiCashView:(PsiCashBalanceWithSpeedBoostMeter*)targetPsiCashView andCompletion:(void (^)(void))completionHandler {
+    CGFloat coinSize = targetPsiCashView.balance.coin.frame.size.width;
+    UIImageView *coin = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"PsiCash_Coin"]];
+    coin.image = [UIImage imageNamed:@"PsiCash_Coin"];
+    coin.layer.minificationFilter = kCAFilterTrilinear;
+
+    coin.frame = CGRectMake(0, 0, coinSize, coinSize);
+    CGPoint coinCenter = [targetPsiCashView.balance convertPoint:targetPsiCashView.balance.coin.center toView:parentView];
+    coin.center = coinCenter;
+    [parentView addSubview:coin];
+
+    // Let PsiCashView execute its own earning animation first
+    [targetPsiCashView earnAnimation];
+
+    [CATransaction begin];
+    [CATransaction setCompletionBlock:^{
+        [coin removeFromSuperview];
+        completionHandler();
+    }];
+
+    // Create the coin's trajectory
+    CGPoint arcStart = coinCenter;
+    CGFloat arcRadius = 20;
+    CGFloat arcHeight = 30;
+    CGPoint arcCenter = CGPointMake(arcStart.x + arcRadius, arcStart.y - arcHeight);
+
+    CGMutablePathRef arcPath = CGPathCreateMutable();
+    CGPathMoveToPoint(arcPath, NULL, arcStart.x, arcStart.y);
+    CGPathAddLineToPoint(arcPath, NULL, arcStart.x, arcStart.y - arcHeight);
+    CGPathAddArc(arcPath, NULL, arcCenter.x, arcCenter.y, arcRadius, M_PI, 0, NO);
+    CGPathAddLineToPoint(arcPath, NULL, arcCenter.x + arcRadius, arcStart.y + 50);
+
+    // Create the animation
+    CAKeyframeAnimation *animation = [CAKeyframeAnimation animationWithKeyPath:@"position"];
+    animation.calculationMode = kCAAnimationPaced;
+    animation.path = arcPath;
+    CGPathRelease(arcPath);
+    [animation setAutoreverses:NO];
+    [animation setDuration:.7];
+    [animation setRepeatCount:0];
+    [animation setRemovedOnCompletion:YES];
+
+    // Add and start the animation
+    [[coin layer] addAnimation:animation forKey:@"position"];
+    [CATransaction commit];
 }
 
 @end

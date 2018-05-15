@@ -55,7 +55,9 @@
 #import "PsiCashSpeedBoostMeterView.h"
 #import "PsiCashTableViewController.h"
 #import "PsiCashBalanceWithSpeedBoostMeter.h"
+#import "UILabel+GetLabelHeight.h"
 
+UserDefaultsKey const PsiCashHasBeenOnboardedBoolKey = @"PsiCash.HasBeenOnboarded";
 
 static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSString *b) {
     return (([a length] == 0) && ([b length] == 0)) || ([a isEqualToString:b]);
@@ -553,7 +555,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 - (void)setBackgroundGradient {
     backgroundGradient = [CAGradientLayer layer];
     
-    backgroundGradient.colors = @[(id)[UIColor colorWithRed:0.63 green:0.87 blue:0.99 alpha:1.0].CGColor, (id)[UIColor colorWithRed:0.88 green:0.92 blue:1.00 alpha:1.0].CGColor];
+    backgroundGradient.colors = @[(id)[UIColor colorWithRed:0.57 green:0.62 blue:0.77 alpha:1.0].CGColor, (id)[UIColor colorWithRed:0.24 green:0.26 blue:0.33 alpha:1.0].CGColor];
     
     [self.view.layer insertSublayer:backgroundGradient atIndex:0];
 }
@@ -561,7 +563,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 - (void)drawSwoop {
     if (swoopView == nil) {
         swoopView = [[UIView alloc] initWithFrame:self.view.frame];
-        [swoopView setBackgroundColor:[UIColor colorWithWhite:1 alpha:.12]];
+        [swoopView setBackgroundColor:[UIColor colorWithWhite:0 alpha:.06f]];
         [self.view addSubview:swoopView];
     }
 
@@ -625,7 +627,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     [self.view addSubview:appTitleLabel];
 
     // Setup autolayout
-    CGFloat labelHeight = [self getLabelHeight:appTitleLabel];
+    CGFloat labelHeight = [appTitleLabel getLabelHeight];
     [appTitleLabel.heightAnchor constraintEqualToConstant:labelHeight].active = YES;
     [appTitleLabel.topAnchor constraintEqualToAnchor:self.topLayoutGuide.bottomAnchor].active = YES;
     [appTitleLabel.centerXAnchor constraintEqualToAnchor:self.view.centerXAnchor].active = YES;
@@ -651,7 +653,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     [self.view addSubview:appSubTitleLabel];
 
     // Setup autolayout
-    CGFloat labelHeight = [self getLabelHeight:appSubTitleLabel];
+    CGFloat labelHeight = [appSubTitleLabel getLabelHeight];
     [appSubTitleLabel.heightAnchor constraintEqualToConstant:labelHeight].active = YES;
     [appSubTitleLabel.topAnchor constraintEqualToAnchor:appTitleLabel.bottomAnchor].active = YES;
     [appSubTitleLabel.centerXAnchor constraintEqualToAnchor:self.view.centerXAnchor].active = YES;
@@ -767,7 +769,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     [self.view addSubview:statusLabel];
     
     // Setup autolayout
-    CGFloat labelHeight = [self getLabelHeight:statusLabel];
+    CGFloat labelHeight = [statusLabel getLabelHeight];
     [statusLabel.heightAnchor constraintEqualToConstant:labelHeight].active = YES;
 
     NSLayoutConstraint *floatingConstraint = [NSLayoutConstraint constraintWithItem:statusLabel
@@ -819,11 +821,10 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     [bottomBar addSubview:regionButtonHeader];
     
     // Restrict label's height to the actual size
-    CGFloat labelHeight = [self getLabelHeight:regionButtonHeader];
+    CGFloat labelHeight = [regionButtonHeader getLabelHeight];
     NSLayoutConstraint *labelHeightConstraint = [regionButtonHeader.heightAnchor constraintEqualToConstant:labelHeight];
     [labelHeightConstraint setPriority:999];
     [regionButtonHeader addConstraint:labelHeightConstraint];
-    
     
     // Now the button
     regionButton = [[UIButton alloc] init];
@@ -1076,22 +1077,6 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     }
 }
 
-// From https://stackoverflow.com/questions/27374612/how-do-i-calculate-the-uilabel-height-dynamically
-- (CGFloat)getLabelHeight:(UILabel*)label {
-    CGSize constraint = CGSizeMake(label.frame.size.width, CGFLOAT_MAX);
-    CGSize size;
-    
-    NSStringDrawingContext *context = [[NSStringDrawingContext alloc] init];
-    CGSize boundingBox = [label.text boundingRectWithSize:constraint
-                                                  options:NSStringDrawingUsesLineFragmentOrigin
-                                               attributes:@{NSFontAttributeName:label.font}
-                                                  context:context].size;
-    
-    size = CGSizeMake(ceil(boundingBox.width), ceil(boundingBox.height));
-    
-    return size.height;
-}
-
 - (void)setupLayoutGuides {
     // setup layout equal distribution
     UILayoutGuide *topSpacerGuide = [UILayoutGuide new];
@@ -1166,6 +1151,15 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 * Buy max num hours of Speed Boost that the user can afford if possible
 */
 - (void)instantMaxSpeedBoostPurchase {
+    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+
+    if (![userDefaults boolForKey:PsiCashHasBeenOnboardedBoolKey]) {
+        PsiCashOnboardingViewController *onboarding = [[PsiCashOnboardingViewController alloc] init];
+        onboarding.delegate = self;
+        [self presentViewController:onboarding animated:NO completion:nil];
+        return;
+    }
+
     PsiCashSpeedBoostProductSKU *purchase = [model maxSpeedBoostPurchaseEarned];
     if (![model hasActiveSpeedBoostPurchase] && purchase != nil) {
         [PsiCashClient.sharedInstance purchaseSpeedBoostProduct:purchase];
@@ -1175,7 +1169,6 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 }
 
 - (void)addPsiCashView {
-
     psiCashView = [[PsiCashBalanceWithSpeedBoostMeter alloc] init];
     psiCashView.translatesAutoresizingMaskIntoConstraints = NO;
     [self.view addSubview:psiCashView];
@@ -1191,19 +1184,29 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     [topSpacing setPriority:999];
     topSpacing.active = YES;
 
-    if (self.view.frame.size.width <= 600) {
-        [psiCashView.widthAnchor constraintEqualToAnchor:self.view.widthAnchor multiplier:0.95].active = YES;
+    CGFloat psiCashViewMaxWidth = 400;
+    CGFloat psiCashViewToParentViewWidthRatio = 0.95;
+    if (self.view.frame.size.width * psiCashViewToParentViewWidthRatio > psiCashViewMaxWidth) {
+        [psiCashView.widthAnchor constraintEqualToConstant:psiCashViewMaxWidth].active = YES;
     } else {
-        [psiCashView.widthAnchor constraintEqualToConstant:560].active = YES;
+        [psiCashView.widthAnchor constraintEqualToAnchor:self.view.widthAnchor multiplier:0.95].active = YES;
     }
     [psiCashView.heightAnchor constraintEqualToConstant:100].active = YES;
 
     __weak MainViewController *weakSelf = self;
+
+    [psiCashViewUpdates dispose];
+
     psiCashViewUpdates = [[PsiCashClient.sharedInstance.clientModelSignal deliverOnMainThread] subscribeNext:^(PsiCashClientModel *newClientModel) {
         __strong MainViewController *strongSelf = weakSelf;
         if (strongSelf != nil) {
 
             BOOL stateChanged = [model hasActiveSpeedBoostPurchase] ^ [newClientModel hasActiveSpeedBoostPurchase] || [model hasPendingPurchase] ^ [newClientModel hasPendingPurchase];
+
+            BOOL animate = FALSE;
+            if ([model.authPackage hasIndicatorToken] && [newClientModel balanceInNanoPsi] > [model balanceInNanoPsi]) {
+                animate = TRUE;
+            }
 
             model = newClientModel;
 
@@ -1211,9 +1214,23 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                 [self showPsiCashAlertView];
             }
 
+            if (animate) {
+                [PsiCashBalanceWithSpeedBoostMeter earnAnimationWithCompletion:self.view andPsiCashView:psiCashView andCompletion:^{
+                    [psiCashView bindWithModel:model];
+                }];
+                [psiCashView.balance bindWithModel:model];
+                return;
+            }
+
             [psiCashView bindWithModel:model];
         }
-    }]; // TODO: dispose
+    }];
+}
+
+#pragma mark - PsiCashOnboardingViewControllerDelegate protocol implementation
+
+- (void)onboardingEnded {
+    [[NSUserDefaults standardUserDefaults] setBool:YES forKey:PsiCashHasBeenOnboardedBoolKey];
 }
 
 #pragma mark - RegionAdapterDelegate protocol implementation
