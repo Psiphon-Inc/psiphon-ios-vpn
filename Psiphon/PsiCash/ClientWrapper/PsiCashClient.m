@@ -112,9 +112,7 @@ NSErrorDomain _Nonnull const PsiCashClientLibraryErrorDomain = @"PsiCashClientLi
                               subscribeNext:^(NSNumber *statusObject) {
                                   VPNStatus s = (VPNStatus) [statusObject integerValue];
 
-                                  if (s == VPNStatusConnected ||
-                                      s == VPNStatusConnecting ||
-                                      s == VPNStatusReasserting) {
+                                  if (s == VPNStatusConnected) {
                                       [weakSelf refreshState];
                                   } else {
                                       [refreshDisposable dispose]; // cancel the request in flight

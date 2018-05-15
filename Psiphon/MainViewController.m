@@ -555,7 +555,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 - (void)setBackgroundGradient {
     backgroundGradient = [CAGradientLayer layer];
     
-    backgroundGradient.colors = @[(id)[UIColor colorWithRed:0.63 green:0.87 blue:0.99 alpha:1.0].CGColor, (id)[UIColor colorWithRed:0.88 green:0.92 blue:1.00 alpha:1.0].CGColor];
+    backgroundGradient.colors = @[(id)[UIColor colorWithRed:0.57 green:0.62 blue:0.77 alpha:1.0].CGColor, (id)[UIColor colorWithRed:0.24 green:0.26 blue:0.33 alpha:1.0].CGColor];
     
     [self.view.layer insertSublayer:backgroundGradient atIndex:0];
 }
@@ -563,7 +563,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 - (void)drawSwoop {
     if (swoopView == nil) {
         swoopView = [[UIView alloc] initWithFrame:self.view.frame];
-        [swoopView setBackgroundColor:[UIColor colorWithWhite:1 alpha:.12]];
+        [swoopView setBackgroundColor:[UIColor colorWithWhite:0 alpha:.06f]];
         [self.view addSubview:swoopView];
     }
 
