@@ -73,6 +73,10 @@ typedef NS_ENUM(NSInteger, AdLoadingStatus) {
     AdLoadingStatusFinished
 };
 
+// Number of seconds to wait for tunnel status to become "Connected", after the landing page notification
+// is received from the extension.
+#define kLandingPageTimeoutSecs 1.0
+
 PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
 
 @interface AppDelegate () <NotifierObserver>

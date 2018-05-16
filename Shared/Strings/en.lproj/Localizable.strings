@@ -79,6 +79,9 @@
 /* Alert dialog title indicating to the user that their feedback has been successfully uploaded to Psiphon's servers. */
 "FEEDBACK_UPLOAD_SUCCESSFUL_TITLE" = "Feedback uploaded successfully";
 
+/* External link to the license page. Please update this with the correct language specific link (if available) e.g. https://psiphon.ca/fr/license.html for french. */
+"LICENSE_PAGE_URL" = "https://psiphon.ca/en/license.html";
+
 /* Text displayed while app loads */
 "LOADING" = "Loading...";
 
@@ -91,26 +94,8 @@
 /* Alert OK Button */
 "OK_BUTTON" = "OK";
 
-/* Body text on one of the on-boarding screens. It is indicating to the user that Psiphon Browser allows them to access the Internet (without censorship). */
-"ONBOARDING_ACCESS_TEXT" = "The Internet at your fingertips";
-
-/* Title text on one of the on-boarding screens */
-"ONBOARDING_ACCESS_TITLE" = "Access the Web";
-
-/* Body text on one of the on-boarding screens. The intention of this screen is to let the user know that their sites and services -- Facebook, Twitter, etc. -- can be accessed within Psiphon Browser via web pages. DO NOT translate 'Psiphon'. */
-"ONBOARDING_APPS_TEXT" = "Your favorite apps have a web interface that works great in Psiphon Browser";
-
-/* Title text on one of the on-boarding screens. The intention of this screen is to let the user know that their sites and services -- Facebook, Twitter, etc. -- can be accessed within Psiphon Browser via web pages. */
-"ONBOARDING_APPS_TITLE" = "Your Apps in Your Browser";
-
-/* Title text on one of the on-boarding screens. This is the final page of the on-boarding and is sending the user off on their journey across the Internet. */
-"ONBOARDING_BROWSING_TITLE" = "Happy Browsing!";
-
 /* Text of button at the bottom right or left (depending on rtl) of the onboarding screens which allows the user to move on to the next onboarding screen. Note: should be all uppercase (capitalized) when possible. */
 "ONBOARDING_NEXT_BUTTON" = "NEXT";
-
-/* Text of button at the top right or left (depending on rtl) of the onboarding screens which allows user to skip onboarding */
-"ONBOARDING_SKIP_BUTTON" = "SKIP";
 
 /* Alert message informing the user they should open the app to finish connecting to the VPN. DO NOT translate 'Psiphon'. */
 "OPEN_PSIPHON_APP" = "Please open Psiphon app to finish connecting.";
@@ -174,6 +159,12 @@
 
 /* Title of the dialog for available in-app paid subscriptions */
 "SUBSCRIPTIONS" = "Subscriptions";
+
+/* Title of button on subscriptions page which opens Psiphon's privacy policy webpage */
+"SUBSCRIPTIONS_PRIVACY_POLICY_BUTTON_TEXT" = "Privacy Policy";
+
+/* Title of button on subscriptions page which opens Psiphon's terms of use webpage */
+"SUBSCRIPTIONS_TERMS_OF_USE_BUTTON_TEXT" = "Terms of Use";
 
 /* Alert message informing user that Psiphon has been stopped automatically since the subscription has expired. Do not translate 'Psiphon'. */
 "TUNNEL_KILLED" = "Psiphon has been stopped automatically since your subscription has expired.";
