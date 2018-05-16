@@ -263,7 +263,7 @@ PsiFeedbackLogType const SubscriptionVerifierServiceLogType = @"SubscriptionVeri
     PsiphonDataSharedDB *sharedDB = [[PsiphonDataSharedDB alloc] initForAppGroupIdentifier:APP_GROUP_IDENTIFIER];
     NSNumber *containerReceiptSize = [sharedDB getContainerEmptyReceiptFileSize];
 
-    if ([containerReceiptSize unsignedIntValue] == [currentReceiptFileSize unsignedCharValue]) {
+    if ([containerReceiptSize unsignedIntValue] == [currentReceiptFileSize unsignedIntValue]) {
         // Treats as expired receipt.
         self.appReceiptFileSize = currentReceiptFileSize;
         self.authorization = nil;

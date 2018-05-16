@@ -36,6 +36,7 @@
 #define kAuthorizationsContainerKey @"authorizations_container_key"
 #define kMarkedAuthorizationIDsExtensionKey @"marked_authorization_ids_extension_key"
 
+
 #if !(TARGET_IS_EXTENSION)
 #define EMBEDDED_EGRESS_REGIONS_KEY @"embedded_server_entries_egress_regions"
 #endif
