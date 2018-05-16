@@ -191,11 +191,11 @@
 
 - (void)setBackgroundColourForIndex:(NSInteger)index {
     if (index == PsiCashOnboardingPage1Index) {
-        [self.view setBackgroundColor:[UIColor colorWithRed:0.29 green:0.48 blue:0.98 alpha:1.0]];
+        self.view.layer.contents = (id)[UIImage imageNamed:@"PsiCash_Onboarding_Background_1"].CGImage;
     } else if (index == PsiCashOnboardingPage2Index) {
-        [self.view setBackgroundColor:[UIColor colorWithRed:0.54 green:0.63 blue:1.00 alpha:1.0]];
+        self.view.layer.contents = (id)[UIImage imageNamed:@"PsiCash_Onboarding_Background_2"].CGImage;
     } else if (index == PsiCashOnboardingPage3Index) {
-        [self.view setBackgroundColor:[UIColor colorWithRed:0.68 green:0.71 blue:1.00 alpha:1.0]];
+        self.view.layer.contents = (id)[UIImage imageNamed:@"PsiCash_Onboarding_Background_3"].CGImage;
     }
 }
 
