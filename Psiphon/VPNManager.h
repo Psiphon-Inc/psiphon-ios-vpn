@@ -29,12 +29,8 @@ NS_ASSUME_NONNULL_BEGIN
 FOUNDATION_EXPORT NSErrorDomain const VPNManagerErrorDomain;
 
 typedef NS_ERROR_ENUM(VPNManagerErrorDomain, VPNManagerConfigErrorCode) {
-    /*! @const VPNManagerStartErrorConfigLoadFailed Failed to load VPN configurations. */
-    VPNManagerConfigErrorLoadFailed = 100,
-    /*! @const VPNManagerStartErrorTooManyConfigsFounds More than expected VPN configurations found. */
-    VPNManagerConfigErrorTooManyConfigsFounds = 101,
-    /*! @const VPNManagerStartErrorConfigSaveFailed Failed to save VPN configuration. */
-    VPNManagerConfigErrorConfigSaveFailed = 102,
+    /*! @const VPNManagerConfigMaybeCorrupt VPN configuration removed since it might have been corrupt. */
+      VPNManagerConfigRemovedMaybeCorrupt = 103,
 };
 
 typedef NS_ERROR_ENUM(VPNManagerErrorDomain, VPNManagerQueryErrorCode) {
