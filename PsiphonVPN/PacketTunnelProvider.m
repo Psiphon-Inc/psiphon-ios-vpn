@@ -45,6 +45,7 @@
 #import "NSDate+PSIDateExtension.h"
 #import "DispatchUtils.h"
 #import "RACSignal.h"
+#import "RACUnit.h"
 #import <ReactiveObjC/RACSubject.h>
 #import <ReactiveObjC/RACReplaySubject.h>
 
@@ -324,7 +325,15 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
                               }
                               // Exponential backoff.
                               [PsiFeedbackLogger errorWithType:SubscriptionCheckLogType message:@"retry authorization request" object:retryCountTuple.first];
-                              return [RACSignal timer:pow(4, [retryCountTuple.second integerValue])];
+
+                              return [[RACSignal timer:pow(4, [retryCountTuple.second integerValue])] flattenMap:^RACSignal *(id value) {
+                                  // Make sure tunnel is connected before retrying, otherwise terminate subscription chain.
+                                  if ([weakSelf.psiphonTunnel getConnectionState] == PsiphonConnectionStateConnected) {
+                                      return [RACSignal return:RACUnit.defaultUnit];
+                                  } else {
+                                      return [RACSignal error:[NSError errorWithDomain:PsiphonTunnelErrorDomain code:PsiphonTunnelErrorTunnelNotConnected]];
+                                  }
+                              }];
                           }];
                     }]
                     map:^SubscriptionResultModel *(RACTwoTuple<NSDictionary *, NSNumber *> *response) {
@@ -457,6 +466,11 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
       }
       error:^(NSError *error) {
           [PsiFeedbackLogger errorWithType:SubscriptionCheckLogType message:@"authorization request failed" object:error];
+
+          // No need to retry if the tunnel is not connected.
+          if ([error.domain isEqualToString:PsiphonTunnelErrorDomain] && error.code == PsiphonTunnelErrorTunnelNotConnected) {
+              return;
+          }
 
           // Schedules another subscription check in 3 hours.
           const int64_t secs_in_3_hours = 3 * 60 * 60;
@@ -757,21 +771,24 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
     return newSettings;
 }
 
-// Starts VPN and notifies the container of homepages (if any) when
-// `self.shouldStartVPN` is TRUE or the container is in the foreground.
+// Starts VPN and notifies the container of homepages (if any) when shouldStartVPN flag is TRUE.
 - (BOOL)tryStartVPN {
-    if (self.shouldStartVPN || [sharedDB getAppForegroundState]) {
-        if ([self.psiphonTunnel getConnectionState] == PsiphonConnectionStateConnected) {
-            // The container waits up to `kLandingPageTimeoutSecs` to see the tunnel connected
-            // status from when the Homepage notification is received by it.
-            self.reasserting = FALSE;
-            [self startVPN];
-            [[Notifier sharedInstance] post:NotifierNewHomepages completionHandler:^(BOOL success) {
-                // Do nothing.
-            }];
-            return TRUE;
-        }
+    // Don't start the VPN unless this flag has been due to subscription status, or from the container.
+    if (!self.shouldStartVPN) {
+        return FALSE;
     }
+
+    if ([self.psiphonTunnel getConnectionState] == PsiphonConnectionStateConnected) {
+        // The container waits up to `kLandingPageTimeoutSecs` to see the tunnel connected
+        // status from when the Homepage notification is received by it.
+        self.reasserting = FALSE;
+        [self startVPN];
+        [[Notifier sharedInstance] post:NotifierNewHomepages completionHandler:^(BOOL success) {
+            // Do nothing.
+        }];
+        return TRUE;
+    }
+
     return FALSE;
 }
 
