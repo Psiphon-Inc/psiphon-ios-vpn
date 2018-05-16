@@ -72,7 +72,7 @@
     _balance = [[UILabel alloc] init];
     _balance.backgroundColor = [UIColor clearColor];
     _balance.adjustsFontSizeToFitWidth = YES;
-    _balance.font = [UIFont boldSystemFontOfSize:16];
+    _balance.font = [UIFont boldSystemFontOfSize:20];
     _balance.textAlignment = NSTextAlignmentCenter;
     _balance.textColor = [UIColor whiteColor];
     _balance.userInteractionEnabled = NO;
