@@ -22,7 +22,6 @@
 #import "PsiCashClient.h"
 #import "PsiCashSpeedBoostMeterView.h"
 #import "ReactiveObjC.h"
-#import <AudioToolbox/AudioToolbox.h>
 
 @interface PsiCashBalanceView ()
 @property (atomic, readwrite) PsiCashClientModel *model;
@@ -32,7 +31,9 @@
 
 #pragma mark -
 
-@implementation PsiCashBalanceView
+@implementation PsiCashBalanceView {
+    UIView *containerView;
+}
 
 -(id)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
@@ -63,10 +64,14 @@
     self.backgroundColor = [UIColor colorWithWhite:0 alpha:.12];
     self.contentEdgeInsets = UIEdgeInsetsMake(10.0f, 30.0f, 10.0f, 30.0f);
 
+    // Setup container view
+    containerView = [[UIView alloc] init];
+
     // Setup balance label
     _balance = [[UILabel alloc] init];
     _balance.backgroundColor = [UIColor clearColor];
-    _balance.font = [UIFont boldSystemFontOfSize:16];
+    _balance.adjustsFontSizeToFitWidth = YES;
+    _balance.font = [UIFont boldSystemFontOfSize:20];
     _balance.textAlignment = NSTextAlignmentCenter;
     _balance.textColor = [UIColor whiteColor];
     _balance.userInteractionEnabled = NO;
@@ -78,22 +83,31 @@
 }
 
 - (void)addViews {
+    [self addSubview:containerView];
     [self addSubview:_balance];
     [self addSubview:_coin];
 }
 
 - (void)setupLayoutConstraints {
+    CGFloat coinSize = 30.f;
+
+    containerView.translatesAutoresizingMaskIntoConstraints = NO;
+    [containerView.centerXAnchor constraintEqualToAnchor:self.centerXAnchor].active = YES;
+    [containerView.centerYAnchor constraintEqualToAnchor:self.centerYAnchor].active = YES;
+    [containerView.widthAnchor constraintLessThanOrEqualToAnchor:self.widthAnchor constant:-10].active = YES;
+    [containerView.heightAnchor constraintLessThanOrEqualToAnchor:self.heightAnchor].active = YES;
+
     _balance.translatesAutoresizingMaskIntoConstraints = NO;
-    [_balance.centerXAnchor constraintEqualToAnchor:self.centerXAnchor].active = YES;
+    [_balance.leadingAnchor constraintEqualToAnchor:_coin.trailingAnchor constant:10].active = YES;
+    [_balance.trailingAnchor constraintLessThanOrEqualToAnchor:containerView.trailingAnchor].active = YES;
     [_balance.centerYAnchor constraintEqualToAnchor:self.centerYAnchor].active = YES;
 
-    CGFloat coinSize = 30.f;
     _coin.translatesAutoresizingMaskIntoConstraints = NO;
     [_coin.heightAnchor constraintEqualToConstant:coinSize].active = YES;
     [_coin.widthAnchor constraintEqualToConstant:coinSize].active = YES;
     [_coin.centerYAnchor constraintEqualToAnchor:_balance.centerYAnchor].active = YES;
-    [_coin.trailingAnchor constraintEqualToAnchor:_balance.leadingAnchor constant:-5].active = YES;
-
+    [_coin.leadingAnchor constraintEqualToAnchor:containerView.leadingAnchor].active = YES;
+    [_coin.trailingAnchor constraintEqualToAnchor:_balance.leadingAnchor constant:-10].active = YES;
 }
 
 - (void)earnAnimation {
@@ -115,7 +129,9 @@
 #pragma mark - State Changes
 
 - (NSString*)stringFromBalance:(double)balance {
-    return [NSString stringWithFormat:@"%.0f", balance / 1e9];
+    NSNumberFormatter *formatter = [NSNumberFormatter new];
+    [formatter setNumberStyle:NSNumberFormatterDecimalStyle];
+    return [formatter stringFromNumber:[NSNumber numberWithDouble:balance/1e9]];
 }
 
 - (void)bindWithModel:(PsiCashClientModel*)clientModel {
