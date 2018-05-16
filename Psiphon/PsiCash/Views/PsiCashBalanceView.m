@@ -22,7 +22,6 @@
 #import "PsiCashClient.h"
 #import "PsiCashSpeedBoostMeterView.h"
 #import "ReactiveObjC.h"
-#import <AudioToolbox/AudioToolbox.h>
 
 @interface PsiCashBalanceView ()
 @property (atomic, readwrite) PsiCashClientModel *model;
@@ -130,7 +129,9 @@
 #pragma mark - State Changes
 
 - (NSString*)stringFromBalance:(double)balance {
-    return [NSString stringWithFormat:@"%.0f", balance / 1e9];
+    NSNumberFormatter *formatter = [NSNumberFormatter new];
+    [formatter setNumberStyle:NSNumberFormatterDecimalStyle];
+    return [formatter stringFromNumber:[NSNumber numberWithDouble:balance/1e9]];
 }
 
 - (void)bindWithModel:(PsiCashClientModel*)clientModel {
