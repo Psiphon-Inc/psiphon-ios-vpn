@@ -56,6 +56,7 @@
 #import "PsiCashTableViewController.h"
 #import "PsiCashBalanceWithSpeedBoostMeter.h"
 #import "UILabel+GetLabelHeight.h"
+#import "StarView.h"
 
 UserDefaultsKey const PsiCashHasBeenOnboardedBoolKey = @"PsiCash.HasBeenOnboarded";
 
@@ -117,6 +118,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     PsiCashBalanceWithSpeedBoostMeter *psiCashView;
     RACDisposable *psiCashViewUpdates;
     UIView *swoopView;
+    NSArray<StarView*> *stars;
 }
 
 // Force portrait orientation
@@ -1193,6 +1195,12 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     }
     [psiCashView.heightAnchor constraintEqualToConstant:100].active = YES;
 
+    // Highlight PsiCashView
+    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+    if (![userDefaults boolForKey:PsiCashHasBeenOnboardedBoolKey]) {
+        [self highlightPsiCashOnboardingWithStars];
+    }
+
     __weak MainViewController *weakSelf = self;
 
     [psiCashViewUpdates dispose];
@@ -1227,10 +1235,49 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     }];
 }
 
+- (void)highlightPsiCashOnboardingWithStars {
+    StarView *star1 = [[StarView alloc] init];
+    [self.view addSubview:star1];
+
+    star1.translatesAutoresizingMaskIntoConstraints = NO;
+    [star1.centerXAnchor constraintEqualToAnchor:psiCashView.balance.leadingAnchor constant:5].active = YES;
+    [star1.centerYAnchor constraintEqualToAnchor:psiCashView.meter.bottomAnchor constant:-2].active = YES;
+    [star1.widthAnchor constraintEqualToConstant:20].active = YES;
+    [star1.heightAnchor constraintEqualToAnchor:star1.widthAnchor].active = YES;
+
+    StarView *star2 = [[StarView alloc] init];
+    [self.view addSubview:star2];
+
+    star2.translatesAutoresizingMaskIntoConstraints = NO;
+    [star2.centerXAnchor constraintEqualToAnchor:psiCashView.balance.trailingAnchor constant:20].active = YES;
+    [star2.centerYAnchor constraintEqualToAnchor:psiCashView.meter.topAnchor constant:2].active = YES;
+    [star2.widthAnchor constraintEqualToConstant:25].active = YES;
+    [star2.heightAnchor constraintEqualToAnchor:star2.widthAnchor].active = YES;
+
+    StarView *star3 = [[StarView alloc] init];
+    [self.view addSubview:star3];
+
+    star3.translatesAutoresizingMaskIntoConstraints = NO;
+    [star3.centerXAnchor constraintEqualToAnchor:psiCashView.balance.leadingAnchor constant:-13].active = YES;
+    [star3.centerYAnchor constraintEqualToAnchor:psiCashView.balance.centerYAnchor constant:-5].active = YES;
+    [star3.widthAnchor constraintEqualToConstant:12].active = YES;
+    [star3.heightAnchor constraintEqualToAnchor:star3.widthAnchor].active = YES;
+
+    CGFloat minAlpha = 0.2;
+    [star1 blinkWithPeriod:2 andDelay:0 andMinAlpha:minAlpha];
+    [star2 blinkWithPeriod:3 andDelay:.25 andMinAlpha:minAlpha];
+    [star3 blinkWithPeriod:4 andDelay:.75 andMinAlpha:minAlpha];
+
+    stars = @[star1, star2, star3];
+}
+
 #pragma mark - PsiCashOnboardingViewControllerDelegate protocol implementation
 
 - (void)onboardingEnded {
     [[NSUserDefaults standardUserDefaults] setBool:YES forKey:PsiCashHasBeenOnboardedBoolKey];
+    for (StarView *star in stars) {
+        [star removeFromSuperview];
+    }
 }
 
 #pragma mark - RegionAdapterDelegate protocol implementation
