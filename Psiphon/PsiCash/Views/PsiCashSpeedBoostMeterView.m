@@ -18,6 +18,7 @@
  */
 
 #import "PsiCashSpeedBoostMeterView.h"
+#import "Logging.h"
 #import "PastelView.h"
 #import "PsiCashClient.h"
 #import "ReactiveObjC.h"
@@ -60,7 +61,6 @@
     [self removeProgressBar];
 
     progressBar = [CAShapeLayer layer];
-
 
     CGFloat progressBarRadius = kCornerRadius;
     CGFloat progressBarWidth = self.frame.size.width * progress;
@@ -181,10 +181,6 @@
 
 # pragma mark - State Changes
 
-- (void)inRetrievingAuthPackageState {
-    title.text = @"...";
-}
-
 - (void)inPurchasePendingState {
     title.text = @"Buying Speed Boost...";
 }
@@ -223,13 +219,21 @@
             int m = (int)secondsToExpiry / 60 % 60;
             int s = (int)secondsToExpiry % 60;
 
+            NSMutableAttributedString *attr = [[NSMutableAttributedString alloc] initWithString:@"Speed Boost Active" attributes:@{NSFontAttributeName:[UIFont boldSystemFontOfSize:14]}];
+            NSAttributedString *timeRemaining;
+
+            [attr appendAttributedString:[[NSAttributedString alloc] initWithString:@" - "]];
+            NSDictionary *timeRemainingAttributes = @{NSFontAttributeName:[UIFont boldSystemFontOfSize:14]};
             if (h > 0) {
-                title.text = [NSString stringWithFormat:@"Speed Boost Active - %ih %im", h, m];
+                timeRemaining = [[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@"%ih %im", h, m] attributes:timeRemainingAttributes];
             } else if (m > 0) {
-                title.text = [NSString stringWithFormat:@"Speed Boost Active - %im %is", m, s];
+                timeRemaining = [[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@"%im %is", m, s] attributes:timeRemainingAttributes];
             } else {
-                title.text = [NSString stringWithFormat:@"Speed Boost Active - %is", s];
+                timeRemaining = [[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@"%is", s] attributes:timeRemainingAttributes];
             }
+
+            [attr appendAttributedString:timeRemaining];
+            title.attributedText = attr;
         }];
         [countdownToSpeedBoostExpiry fire];
     });
@@ -246,32 +250,6 @@
     NSInteger hoursRemaining = secondsRemaining / (60 * 60);
     NSTimeInterval secondsToNextHourExpired = secondsRemaining - (hoursRemaining * 60);
     return secondsToNextHourExpired;
-}
-
-- (NSAttributedString*)minSpeedBoostPurchaseTitle {
-    PsiCashSpeedBoostProductSKU *sku = [self.model minSpeedBoostPurchaseAvailable];
-    if (sku == nil) {
-        return [[NSAttributedString alloc] initWithString:@""];
-    }
-
-    NSString *str;
-    if ([sku.hours doubleValue] < 1) {
-        str = [NSString stringWithFormat:@"%dm Speed Boost at ", (int)([sku.hours doubleValue] * 60)];
-    } else {
-        str = [NSString stringWithFormat:@"%ldh Speed Boost at", (long)[sku.hours integerValue]];
-    }
-
-    NSMutableAttributedString *attr = [[NSMutableAttributedString alloc] initWithString:str];
-
-    NSTextAttachment *imageAttachment = [[NSTextAttachment alloc] init];
-    imageAttachment.image = [UIImage imageNamed:@"PsiCash_Coin"];
-    imageAttachment.bounds = CGRectMake(2, -4, 16, 16);
-
-    NSAttributedString *imageString = [NSAttributedString attributedStringWithAttachment:imageAttachment];
-    [attr appendAttributedString:imageString];
-    [attr appendAttributedString:[[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@" %.0f", [sku priceInPsi]]]];
-
-    return attr;
 }
 
 - (float)progressToMinSpeedBoostPurchase {
@@ -294,8 +272,7 @@
     self.model = clientModel;
 
     if (countdownToSpeedBoostExpiry != nil) {
-        NSLog(@"ExpiringPurchases: invalidating timer");
-        // TODO: logger
+        LOG_DEBUG(@"%s invalidating timer", __FUNCTION__);
         [countdownToSpeedBoostExpiry invalidate];
     }
 
@@ -312,7 +289,7 @@
             }
         }
     } else {
-        [self inRetrievingAuthPackageState];
+        [self noSpenderToken];
     }
 }
 
