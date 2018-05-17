@@ -852,6 +852,19 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     [bottomBar addSubview:regionButton];
     [self updateRegionButton];
     [self setRegionSelectionConstraints:self.view.frame.size];
+
+    // Add up arrow indicator
+    UIImage *arrowImage = [UIImage imageNamed:@"UpArrow"];
+    UIImageView *upArrow = [[UIImageView alloc] initWithImage:arrowImage];
+    upArrow.contentMode = UIViewContentModeScaleAspectFit;
+
+    [bottomBar addSubview:upArrow];
+    upArrow.translatesAutoresizingMaskIntoConstraints = NO;
+    [upArrow.leadingAnchor constraintEqualToAnchor:regionButton.trailingAnchor constant:-spacingFromSides].active = YES;
+    [upArrow.centerYAnchor constraintEqualToAnchor:regionButton.centerYAnchor].active = YES;
+    [upArrow.widthAnchor constraintEqualToConstant:15].active = YES;
+    [upArrow.heightAnchor constraintEqualToAnchor:upArrow.widthAnchor].active = YES;
+
 }
 
 - (void)addVersionLabel {
