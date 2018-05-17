@@ -24,16 +24,16 @@
 
 @interface PsiCashClientModel : NSObject
 @property (strong, atomic) PsiCashAuthPackage *authPackage;
-@property (atomic) UInt64 balanceInNanoPsi;
-@property (atomic) double balanceInPsi;
+@property (strong, atomic) NSNumber *balance;
 @property (strong, atomic) PsiCashSpeedBoostProduct *speedBoostProduct;
 @property (strong, atomic) NSArray<id<PsiCashProductSKU>> *pendingPurchases;
 @property (strong, atomic) PsiCashPurchase *activeSpeedBoostPurchase;
 + (PsiCashClientModel*)clientModelWithAuthPackage:(PsiCashAuthPackage*)authPackage
-                         andBalanceInNanoPsi:(UInt64)balance
-                        andSpeedBoostProduct:(PsiCashSpeedBoostProduct*)speedBoostProduct
-                         andPendingPurchases:(NSArray<id<PsiCashProductSKU>>*)pendingPurchases
-                 andActiveSpeedBoostPurchase:(PsiCashPurchase*)activeSpeedBoostPurchase;
+                                       andBalance:(NSNumber*)balance
+                             andSpeedBoostProduct:(PsiCashSpeedBoostProduct*)speedBoostProduct
+                              andPendingPurchases:(NSArray<id<PsiCashProductSKU>>*)pendingPurchases
+                      andActiveSpeedBoostPurchase:(PsiCashPurchase*)activeSpeedBoostPurchase;
++ (NSString*)formattedBalance:(NSNumber*)balance;
 - (PsiCashSpeedBoostProductSKU*)maxSpeedBoostPurchaseEarned;
 - (PsiCashSpeedBoostProductSKU*)minSpeedBoostPurchaseAvailable;
 - (BOOL)hasActiveSpeedBoostPurchase;

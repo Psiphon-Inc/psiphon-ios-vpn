@@ -129,21 +129,15 @@
 
 #pragma mark - State Changes
 
-- (NSString*)stringFromBalance:(double)balance {
-    NSNumberFormatter *formatter = [NSNumberFormatter new];
-    [formatter setNumberStyle:NSNumberFormatterDecimalStyle];
-    return [formatter stringFromNumber:[NSNumber numberWithDouble:balance/1e9]];
-}
-
 - (void)bindWithModel:(PsiCashClientModel*)clientModel {
     self.model = clientModel;
 
     if ([self.model hasAuthPackage]) {
         if ([self.model.authPackage hasIndicatorToken]) {
-            _balance.text = [self stringFromBalance:clientModel.balanceInNanoPsi];
+            _balance.text = [PsiCashClientModel formattedBalance:clientModel.balance];
         } else {
             // First launch: the user has no indicator token
-            _balance.text = [self stringFromBalance:0];
+            _balance.text = [PsiCashClientModel formattedBalance:[NSNumber numberWithInteger:0]];
         }
     } else {
         // Do nothing
