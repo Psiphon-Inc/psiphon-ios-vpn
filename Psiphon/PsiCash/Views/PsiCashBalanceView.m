@@ -101,7 +101,7 @@
     [_balance.widthAnchor constraintGreaterThanOrEqualToConstant:coinSize].active = YES;
     [_balance.leadingAnchor constraintEqualToAnchor:_coin.trailingAnchor constant:10].active = YES;
     [_balance.trailingAnchor constraintLessThanOrEqualToAnchor:containerView.trailingAnchor].active = YES;
-    [_balance.centerYAnchor constraintEqualToAnchor:self.centerYAnchor].active = YES;
+    [_balance.centerYAnchor constraintEqualToAnchor:self.centerYAnchor constant:2].active = YES;
 
     _coin.translatesAutoresizingMaskIntoConstraints = NO;
     [_coin.heightAnchor constraintEqualToConstant:coinSize].active = YES;
