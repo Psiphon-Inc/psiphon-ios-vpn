@@ -27,6 +27,7 @@
 
 @interface InnerMeterView : UIView
 @property (nonatomic, assign) CGFloat progress;
+@property (nonatomic, assign) BOOL speedBoosting;
 @end
 
 @implementation InnerMeterView {
@@ -71,6 +72,10 @@
 
     if (progress >= 1) {
         animatedGradientView = [[PastelView alloc] init];
+        if (_speedBoosting) {
+            animatedGradientView.colors = @[[UIColor colorWithRed:0.50 green:0.49 blue:1.00 alpha:1.0],
+                                            [UIColor colorWithRed:0.62 green:0.38 blue:1.00 alpha:1.0]];
+        }
         [self addSubview:animatedGradientView];
         animatedGradientView.frame = self.bounds;
 
@@ -186,6 +191,7 @@
 
 - (void)speedBoostChargingWithHoursEarned:(NSNumber*)hoursEarned {
     float progress = [self progressToMinSpeedBoostPurchase];
+    [innerBackground setSpeedBoosting:NO];
     [innerBackground setProgress:progress];
 
     if (progress >= 1) {
@@ -200,7 +206,8 @@
 }
 
 - (void)activeSpeedBoostExpiringIn:(NSTimeInterval)seconds {
-    innerBackground.progress = 1;
+    [innerBackground setSpeedBoosting:YES];
+    [innerBackground setProgress:1];
 
     if (seconds > 0) {
         title.text = @"Speed Boost Active";
