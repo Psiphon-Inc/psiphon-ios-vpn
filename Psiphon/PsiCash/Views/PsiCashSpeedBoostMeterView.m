@@ -258,7 +258,7 @@
         return 0;
     }
 
-    float progress = (float)self.model.balanceInNanoPsi / [sku.price unsignedLongLongValue];
+    float progress = (float)self.model.balance.floatValue / sku.price.floatValue;
     if (progress > 1) {
         progress = 1;
     }

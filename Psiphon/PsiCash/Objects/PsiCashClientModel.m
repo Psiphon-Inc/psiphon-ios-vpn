@@ -24,25 +24,30 @@
 @implementation PsiCashClientModel
 
 + (PsiCashClientModel*)clientModelWithAuthPackage:(PsiCashAuthPackage*)authPackage
-                         andBalanceInNanoPsi:(UInt64)balance
-                        andSpeedBoostProduct:(PsiCashSpeedBoostProduct*)speedBoostProduct
-                         andPendingPurchases:(NSArray<id<PsiCashProductSKU>>*)pendingPurchases
-                 andActiveSpeedBoostPurchase:(PsiCashPurchase* /* TODO: typing */)activeSpeedBoostPurchase {
+                                       andBalance:(NSNumber*)balance
+                             andSpeedBoostProduct:(PsiCashSpeedBoostProduct*)speedBoostProduct
+                              andPendingPurchases:(NSArray<id<PsiCashProductSKU>>*)pendingPurchases
+                      andActiveSpeedBoostPurchase:(PsiCashPurchase* /* TODO: typing */)activeSpeedBoostPurchase {
     PsiCashClientModel *clientModel = [[PsiCashClientModel alloc] init];
     clientModel.authPackage = authPackage;
-    clientModel.balanceInNanoPsi = balance;
-    clientModel.balanceInPsi = balance / 1e9;
+    clientModel.balance = balance;
     clientModel.speedBoostProduct = speedBoostProduct;
     clientModel.pendingPurchases = pendingPurchases;
     clientModel.activeSpeedBoostPurchase = activeSpeedBoostPurchase;
     return clientModel;
 }
 
++ (NSString*)formattedBalance:(NSNumber*)balance {
+    NSNumberFormatter *formatter = [NSNumberFormatter new];
+    [formatter setNumberStyle:NSNumberFormatterDecimalStyle];
+    return [formatter stringFromNumber:[NSNumber numberWithDouble:balance.doubleValue/1e9]];
+}
+
 - (PsiCashSpeedBoostProductSKU*)maxSpeedBoostPurchaseEarned {
     PsiCashSpeedBoostProductSKU *maxHoursEarned;
 
     for (PsiCashSpeedBoostProductSKU *sku in [self.speedBoostProduct skusOrderedByPriceAscending]) {
-        if (self.balanceInNanoPsi >= [sku.price unsignedLongLongValue]) {
+        if (self.balance.doubleValue >= sku.price.doubleValue) {
             if (maxHoursEarned == nil || sku.hours > maxHoursEarned.hours) {
                 maxHoursEarned = sku;
             }
@@ -84,10 +89,10 @@
 
 - (id)copyWithZone:(NSZone *)zone {
     return [PsiCashClientModel clientModelWithAuthPackage:self.authPackage
-                                 andBalanceInNanoPsi:self.balanceInNanoPsi
-                                andSpeedBoostProduct:self.speedBoostProduct /* TODO: copy this? */
-                                 andPendingPurchases:self.pendingPurchases /* TODO: copy this? */
-                         andActiveSpeedBoostPurchase:self.activeSpeedBoostPurchase];
+                                               andBalance:self.balance
+                                     andSpeedBoostProduct:self.speedBoostProduct /* TODO: copy this? */
+                                      andPendingPurchases:self.pendingPurchases /* TODO: copy this? */
+                              andActiveSpeedBoostPurchase:self.activeSpeedBoostPurchase];
 }
 
 @end
