@@ -113,7 +113,7 @@
 
 @implementation PsiCashSpeedBoostMeterView {
     UILabel *title;
-    NSTimer *countdownToNextHourExpired;
+    NSTimer *countdownToSpeedBoostExpiry;
     UIImageView *instantBuyButton;
     InnerMeterView *innerBackground;
 }
@@ -209,16 +209,30 @@
     [innerBackground setSpeedBoosting:YES];
     [innerBackground setProgress:1];
 
-    if (seconds > 0) {
-        title.text = @"Speed Boost Active";
-        dispatch_async(dispatch_get_main_queue(), ^{
-            countdownToNextHourExpired = [NSTimer scheduledTimerWithTimeInterval:[self timeToNextHourExpired:seconds] repeats:NO block:^(NSTimer * _Nonnull timer) {
-                [self activeSpeedBoostExpiringIn:self.model.activeSpeedBoostPurchase.expiry.timeIntervalSinceNow];
-            }];
-        });
-    } else {
-        [self speedBoostChargingWithHoursEarned:[self.model maxSpeedBoostPurchaseEarned].hours];
-    }
+    dispatch_async(dispatch_get_main_queue(), ^{
+        countdownToSpeedBoostExpiry = [NSTimer scheduledTimerWithTimeInterval:1 repeats:YES block:^(NSTimer * _Nonnull timer) {
+            NSTimeInterval secondsToExpiry = self.model.activeSpeedBoostPurchase.expiry.timeIntervalSinceNow;
+
+            if (secondsToExpiry < 0) {
+                [timer invalidate];
+                [self speedBoostChargingWithHoursEarned:[self.model maxSpeedBoostPurchaseEarned].hours];
+                return;
+            }
+
+            int h = (int)secondsToExpiry / 3600;
+            int m = (int)secondsToExpiry / 60 % 60;
+            int s = (int)secondsToExpiry % 60;
+
+            if (h > 0) {
+                title.text = [NSString stringWithFormat:@"Speed Boost Active - %ih %im", h, m];
+            } else if (m > 0) {
+                title.text = [NSString stringWithFormat:@"Speed Boost Active - %im %is", m, s];
+            } else {
+                title.text = [NSString stringWithFormat:@"Speed Boost Active - %is", s];
+            }
+        }];
+        [countdownToSpeedBoostExpiry fire];
+    });
 }
 
 #pragma mark - Helpers
@@ -279,9 +293,10 @@
 - (void)bindWithModel:(PsiCashClientModel *)clientModel {
     self.model = clientModel;
 
-    if (countdownToNextHourExpired != nil) {
+    if (countdownToSpeedBoostExpiry != nil) {
         NSLog(@"ExpiringPurchases: invalidating timer");
-        [countdownToNextHourExpired invalidate];
+        // TODO: logger
+        [countdownToSpeedBoostExpiry invalidate];
     }
 
     if ([self.model hasAuthPackage]) {

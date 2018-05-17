@@ -184,6 +184,11 @@
         }
     } else if (self.index == PsiCashOnboardingPage3Index) {
         m.balanceInNanoPsi = 10e9;
+        m.activeSpeedBoostPurchase = [[PsiCashPurchase alloc] initWithID:@"123"
+                                                        transactionClass:[PsiCashSpeedBoostProduct purchaseClass]
+                                                           distinguisher:@"1h"
+                                                                  expiry:[NSDate dateWithTimeIntervalSinceNow:60*60+15]
+                                                           authorization:@"123"];
         [meter bindWithModel:m];
     }
 
