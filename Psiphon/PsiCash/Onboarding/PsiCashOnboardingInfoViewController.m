@@ -19,6 +19,7 @@
 
 #import "PsiCashOnboardingInfoViewController.h"
 #import "PsiCashBalanceWithSpeedBoostMeter.h"
+#import "StarView.h"
 
 #define k5sScreenWidth 320.f
 
@@ -34,6 +35,7 @@
     UIView *graphic;
     UILabel *titleView;
     UILabel *textView;
+    void (^animations)(void);
 }
 
 @synthesize index = _index;
@@ -47,6 +49,14 @@
     [self setPageSpecificContent];
     [self addContentView];
     [self setupLayoutConstraints];
+}
+
+- (void)viewDidLayoutSubviews {
+    [super viewDidLayoutSubviews];
+    if (animations != nil) {
+        animations();
+        animations = nil;
+    }
 }
 
 - (void)setPageSpecificContent {
@@ -76,6 +86,12 @@
     }
 }
 
+- (void)startAnimations {
+    if (animations != nil) {
+        animations();
+    }
+}
+
 - (void)setGraphicAsCoin {
     /* setup graphic view */
     UIImageView *imageView = [[UIImageView alloc] init];
@@ -96,28 +112,41 @@
     [graphic.heightAnchor constraintEqualToConstant:coinSize].active = YES;
     [graphic.centerXAnchor constraintEqualToAnchor:self.view.centerXAnchor].active = YES;
 
-    // Add stars
-    [self addStarWithSize:20.f andXAxisAnchor:graphic.trailingAnchor withXConstant:0 andYAxisAnchor:graphic.topAnchor withYConstant:0];
-    UIView *star = [self addStarWithSize:10.f andXAxisAnchor:graphic.leadingAnchor withXConstant:10 andYAxisAnchor:graphic.topAnchor withYConstant:0];
-    star.alpha = 0.6;
-    [self addStarWithSize:15.f andXAxisAnchor:graphic.leadingAnchor withXConstant:0 andYAxisAnchor:graphic.bottomAnchor withYConstant:-10];
-}
+    // Add blinking stars
 
-- (UIView*)addStarWithSize:(CGFloat)size andXAxisAnchor:(NSLayoutXAxisAnchor*)xAnchor withXConstant:(CGFloat)xConstant andYAxisAnchor:(NSLayoutYAxisAnchor*)yAnchor withYConstant:(CGFloat)yConstant {
-    UIImageView *star = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"Star"]];
-    star.translatesAutoresizingMaskIntoConstraints = NO;
-    star.contentMode = UIViewContentModeScaleAspectFit;
-    [star.layer setMinificationFilter:kCAFilterTrilinear]; // Prevent aliasing
+    StarView *star1 = [[StarView alloc] init];
+    [self.view addSubview:star1];
 
-    [self.view addSubview:star];
+    star1.translatesAutoresizingMaskIntoConstraints = NO;
+    [star1.centerXAnchor constraintEqualToAnchor:graphic.trailingAnchor constant:0].active = YES;
+    [star1.topAnchor constraintEqualToAnchor:graphic.topAnchor constant:0].active = YES;
+    [star1.widthAnchor constraintEqualToConstant:20].active = YES;
+    [star1.heightAnchor constraintEqualToAnchor:star1.widthAnchor].active = YES;
 
-    star.translatesAutoresizingMaskIntoConstraints = NO;
-    [star.centerXAnchor constraintEqualToAnchor:xAnchor constant:xConstant].active = YES;
-    [star.topAnchor constraintEqualToAnchor:yAnchor constant:yConstant].active = YES;
-    [star.widthAnchor constraintEqualToConstant:size].active = YES;
-    [star.heightAnchor constraintEqualToConstant:size].active = YES;
+    StarView *star2 = [[StarView alloc] init];
+    [self.view addSubview:star2];
 
-    return star;
+    star2.translatesAutoresizingMaskIntoConstraints = NO;
+    [star2.centerXAnchor constraintEqualToAnchor:graphic.leadingAnchor constant:10].active = YES;
+    [star2.topAnchor constraintEqualToAnchor:graphic.topAnchor constant:0].active = YES;
+    [star2.widthAnchor constraintEqualToConstant:10].active = YES;
+    [star2.heightAnchor constraintEqualToAnchor:star2.widthAnchor].active = YES;
+
+    StarView *star3 = [[StarView alloc] init];
+    [self.view addSubview:star3];
+
+    star3.translatesAutoresizingMaskIntoConstraints = NO;
+    [star3.centerXAnchor constraintEqualToAnchor:graphic.leadingAnchor constant:0].active = YES;
+    [star3.topAnchor constraintEqualToAnchor:graphic.bottomAnchor constant:-10].active = YES;
+    [star3.widthAnchor constraintEqualToConstant:15].active = YES;
+    [star3.heightAnchor constraintEqualToAnchor:star3.widthAnchor].active = YES;
+
+    animations = ^(void) {
+        CGFloat minAlpha = 0.2;
+        [star1 blinkWithPeriod:2 andDelay:0 andMinAlpha:minAlpha];
+        [star2 blinkWithPeriod:3 andDelay:.25 andMinAlpha:minAlpha];
+        [star3 blinkWithPeriod:4 andDelay:.75 andMinAlpha:minAlpha];
+    };
 }
 
 - (void)setGraphicAsSpeedBoostMeter {
