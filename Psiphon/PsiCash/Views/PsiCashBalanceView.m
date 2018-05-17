@@ -72,7 +72,7 @@
     _balance.backgroundColor = [UIColor clearColor];
     _balance.adjustsFontSizeToFitWidth = YES;
     _balance.font = [UIFont boldSystemFontOfSize:20];
-    _balance.textAlignment = NSTextAlignmentCenter;
+    _balance.textAlignment = NSTextAlignmentLeft;
     _balance.textColor = [UIColor whiteColor];
     _balance.userInteractionEnabled = NO;
 
@@ -98,6 +98,7 @@
     [containerView.heightAnchor constraintLessThanOrEqualToAnchor:self.heightAnchor].active = YES;
 
     _balance.translatesAutoresizingMaskIntoConstraints = NO;
+    [_balance.widthAnchor constraintGreaterThanOrEqualToConstant:coinSize].active = YES;
     [_balance.leadingAnchor constraintEqualToAnchor:_coin.trailingAnchor constant:10].active = YES;
     [_balance.trailingAnchor constraintLessThanOrEqualToAnchor:containerView.trailingAnchor].active = YES;
     [_balance.centerYAnchor constraintEqualToAnchor:self.centerYAnchor].active = YES;
