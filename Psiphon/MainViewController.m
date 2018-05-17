@@ -773,19 +773,8 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     // Setup autolayout
     CGFloat labelHeight = [statusLabel getLabelHeight];
     [statusLabel.heightAnchor constraintEqualToConstant:labelHeight].active = YES;
-
-    NSLayoutConstraint *floatingConstraint = [NSLayoutConstraint constraintWithItem:statusLabel
-                                                                          attribute:NSLayoutAttributeTop
-                                                                          relatedBy:NSLayoutRelationEqual
-                                                                             toItem:startStopButton
-                                                                          attribute:NSLayoutAttributeBottom
-                                                                         multiplier:1.07f
-                                                                           constant:-6];
-    // Allow it to break in favour of the next two constraint
-    floatingConstraint.priority = 999;
-    [self.view addConstraint:floatingConstraint];
     [statusLabel.topAnchor constraintGreaterThanOrEqualToAnchor:startStopButton.bottomAnchor constant:1].active = YES;
-    [statusLabel.topAnchor constraintLessThanOrEqualToAnchor:startStopButton.bottomAnchor constant:15].active = YES;
+    [statusLabel.topAnchor constraintLessThanOrEqualToAnchor:startStopButton.bottomAnchor constant:5].active = YES;
     [statusLabel.centerXAnchor constraintEqualToAnchor:self.view.centerXAnchor].active = YES;
 }
 
