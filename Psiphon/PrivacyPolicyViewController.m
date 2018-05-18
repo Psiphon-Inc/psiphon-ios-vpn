@@ -201,6 +201,28 @@ NSNotificationName const PrivacyPolicyAcceptedNotification = @"PrivacyPoicyAccep
     [getStartedButton.heightAnchor constraintEqualToConstant:52.0].active = TRUE;
     
     [getStartedButton addTarget:self action:@selector(onGetStartedTap) forControlEvents:UIControlEventTouchUpInside];
+    
+    // Close button
+    UIButton *cancelButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+    cancelButton.backgroundColor = [UIColor colorWithWhite:1.0 alpha:0.9];
+    cancelButton.layer.masksToBounds = FALSE;
+    cancelButton.layer.cornerRadius = 10.0;
+    cancelButton.layer.shadowColor = [UIColor.darkGrayColor CGColor];
+    cancelButton.layer.shadowRadius = 4;
+    cancelButton.layer.shadowOpacity = 0.3;
+    cancelButton.layer.shadowOffset = CGSizeMake(1.0, 1.0);
+    [cancelButton setTitle:@"X" forState:UIControlStateNormal];
+    [cancelButton setTitleColor:UIColor.darkGrayColor forState:UIControlStateNormal];
+    [cancelButton addTarget:self action:@selector(onCancelTap) forControlEvents:UIControlEventTouchUpInside];
+    [self.view addSubview:cancelButton];
+
+    // Close button constraints
+    cancelButton.translatesAutoresizingMaskIntoConstraints = FALSE;
+    [cancelButton.trailingAnchor constraintEqualToAnchor:self.view.layoutMarginsGuide.trailingAnchor constant:0.0].active = TRUE;
+    [cancelButton.topAnchor constraintEqualToAnchor:self.view.layoutMarginsGuide.topAnchor constant:0.0].active = TRUE;
+
+
+
 }
 
 - (void)addStackedViews:(UIStackView *)stackView safeAreaInsets:(UIEdgeInsets)safeAreaInsets{
@@ -296,8 +318,14 @@ NSNotificationName const PrivacyPolicyAcceptedNotification = @"PrivacyPoicyAccep
 
 }
 
+# pragma mark - UI Callbacks
+
 - (void)onGetStartedTap {
     [[NSNotificationCenter defaultCenter] postNotificationName:PrivacyPolicyAcceptedNotification object:nil];
+    [self dismissViewControllerAnimated:TRUE completion:nil];
+}
+
+- (void)onCancelTap {
     [self dismissViewControllerAnimated:TRUE completion:nil];
 }
 
