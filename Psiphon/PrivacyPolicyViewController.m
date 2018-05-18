@@ -19,15 +19,28 @@
 
 #import "PrivacyPolicyViewController.h"
 #import "UIColor+Additions.h"
+#import "NSError+Convenience.h"
+#import "PsiFeedbackLogger.h"
 #import "SwoopView.h"
 
 NSNotificationName const PrivacyPolicyAcceptedNotification = @"PrivacyPoicyAcceptedNotification";
+
+NSErrorDomain _Nonnull const PrivacyPolicyErrorDomain = @"PrivacyPolicyErrorDomain";
+
+typedef NS_ERROR_ENUM(PrivacyPolicyErrorDomain, PrivacyPolicyLinkGenerationErrorCode) {
+
+    PrivacyPolicyLinkGenerationFailedToFindHref             = 1 << 0,
+    PrivacyPolicyLinkGenerationFailedToGenerateURL          = 1 << 1,
+    PrivacyPolicyLinkGenerationFailedToFindCloseTag         = 1 << 2,
+    PrivacyPolicyLinkGenerationEncounteredInvalidRange      = 1 << 3,
+
+};
 
 @interface SectionView : UIView
 
 @property (nonatomic) UILabel *header;
 @property (nonatomic) UILabel *subheading;
-@property (nonatomic) UILabel *body;
+@property (nonatomic) UITextView *body;
 @property (nonatomic, weak) UIView *anchorView;
 
 @property (nonatomic) NSNumber *bottomAnchorConstant;
@@ -47,13 +60,20 @@ NSNotificationName const PrivacyPolicyAcceptedNotification = @"PrivacyPoicyAccep
     return l;
 }
 
++ (UITextView *)createTextView {
+    UITextView *t = [[UITextView alloc] init];
+    t.scrollEnabled = NO;
+    t.editable = NO;
+    return t;
+}
+
 - (instancetype)init {
     self = [super init];
     if (self) {
         _header = [SectionView createLabel];
         _header.font = [UIFont systemFontOfSize:26.0f weight:UIFontWeightMedium];
 
-        _body= [SectionView createLabel];
+        _body= [SectionView createTextView];
         _body.alpha = 0.7;
         _body.font = [UIFont systemFontOfSize:18.0f weight:UIFontWeightRegular];
 
@@ -217,6 +237,7 @@ NSNotificationName const PrivacyPolicyAcceptedNotification = @"PrivacyPoicyAccep
 }
 
 - (void)addStackedViews:(UIStackView *)stackView safeAreaInsets:(UIEdgeInsets)safeAreaInsets{
+    NSError *e;
     
     UIView *sec1Container = [[UIView alloc] init];
     sec1Container.backgroundColor = UIColor.paleBlueColor;
@@ -279,7 +300,7 @@ NSNotificationName const PrivacyPolicyAcceptedNotification = @"PrivacyPoicyAccep
     NSMutableArray *sec3BodyItems = [NSMutableArray arrayWithArray:@[
       NSLocalizedStringWithDefaultValue(@"PrivacyInformationCollectedVpndataWhydoespsiphonneedPara1Item1", nil, [NSBundle mainBundle], @"Estimate future costs: The huge amount of user data we transfer each month is a major factor in our costs. It is vital for us to see and understand usage fluctuations.", @"Bullet list text under 'Why does Psiphon need these statistics?' subsection of the 'User VPN Data' section of the Privacy page."),
       NSLocalizedStringWithDefaultValue(@"PrivacyInformationCollectedVpndataWhydoespsiphonneedPara1Item2", nil, [NSBundle mainBundle], @"Optimize for traffic types: Video streaming has different network requirements than web browsing does, which is different than chat, which is different than voice, and so on. Statistics about the number of bytes transferred for some major media providers helps us to understand how to provide the best experience to our users.", @"Bullet list text under 'Why does Psiphon need these statistics?' subsection of the 'User VPN Data' section of the Privacy page."),
-      NSLocalizedStringWithDefaultValue(@"PrivacyInformationCollectedVpndataWhydoespsiphonneedPara1Item3", nil, [NSBundle mainBundle], @"Determine the nature of major censorship events: Sites and services often get blocked suddenly and without warning, which can lead to huge variations in regional usage of Psiphon. For example, we had up to 20x surges in usage within a day when Brazil blocked WhatsApp or Turkey blocked social media.", @"Bullet list text under 'Why does Psiphon need these statistics?' subsection of the 'User VPN Data' section of the Privacy page. If available in your language, the blog post URLs should be updated to the localized post."),
+      NSLocalizedStringWithDefaultValue(@"PrivacyInformationCollectedVpndataWhydoespsiphonneedPara1Item3", nil, [NSBundle mainBundle], @"Determine the nature of major censorship events: Sites and services often get blocked suddenly and without warning, which can lead to huge variations in regional usage of Psiphon. For example, we had up to 20x surges in usage within a day when <a href=\"https://blog-en.psiphon.ca/2016/07/psiphon-usage-surges-as-brazil-blocks.html\" target=\"_blank\">Brazil blocked WhatsApp</a> or <a href=\"https://blog-en.psiphon.ca/2016/11/social-media-and-internet-ban-in-turkey.html\" target=\"_blank\">Turkey blocked social media</a>.", @"Bullet list text under 'Why does Psiphon need these statistics?' subsection of the 'User VPN Data' section of the Privacy page. If available in your language, the blog post URLs should be updated to the localized post."),
       NSLocalizedStringWithDefaultValue(@"PrivacyInformationCollectedVpndataWhydoespsiphonneedPara1Item4", nil, [NSBundle mainBundle], @"Understand who we need to help: Some sites and services will never get blocked anywhere, some will always be blocked in certain countries, and some will occasionally be blocked in some countries. To make sure that our users are able to communicate and learn freely, we need to understand these patterns, see who is affected, and work with partners to make sure their services work best with Psiphon.", @"Bullet list text under 'Why does Psiphon need these statistics?' subsection of the 'User VPN Data' section of the Privacy page. (English is using 'who' instead of 'whom' to reflect common idiom.)"),
     ]];
 
@@ -293,13 +314,17 @@ NSNotificationName const PrivacyPolicyAcceptedNotification = @"PrivacyPoicyAccep
     sec3.anchorView = stackView;
     sec3.header.text = NSLocalizedStringWithDefaultValue(@"PrivacyInformationCollectedVpndataWhydoespsiphonneedSubhead", nil, [NSBundle mainBundle], @"Why does Psiphon need these statistics?", @"Sub-heading in the 'User VPN Data' section of the Privacy Policy page. The section describes why Psiphon needs VPN data stats.");
     sec3.body.text = [NSString stringWithFormat:@"%@\n\n%@", sec3BodyTop, [sec3BodyItems componentsJoinedByString:@"\n\n"]];
+    [self replaceLinksInTextView:sec3.body error:&e];
+    if (e != nil) {
+        [PsiFeedbackLogger error:@"%s failed to replace links: %@", __FUNCTION__, e.localizedDescription];
+    }
     [stackView addArrangedSubview:sec3];
     [sec3 addViewsAndApplyConstraints];
 
     // Section 4
     NSArray *sec4BodyParagraphs = @[
       NSLocalizedStringWithDefaultValue(@"PrivacyInformationCollectedVpndataWhopsiphonshareswithPara1", nil, [NSBundle mainBundle], @"When sharing with third parties, Psiphon only ever provides coarse, aggregate domain-bytes statistics. We never share per-session information or any other possibly-identifying information.", @"Paragraph text in the 'Who does Psiphon share these statistics with?' subsection of the 'User VPN Data' section of the Privacy page."),
-      NSLocalizedStringWithDefaultValue(@"PrivacyInformationCollectedVpndataWhopsiphonshareswithPara2", nil, [NSBundle mainBundle], @"This sharing is typically done with services or organizations we collaborate with — as we did with DW a few years ago. These statistics help us and them answer questions like, “how many bytes were transferred through Psiphon for DW.com to all users in Iran in April?”", @""),
+      NSLocalizedStringWithDefaultValue(@"PrivacyInformationCollectedVpndataWhopsiphonshareswithPara2", nil, [NSBundle mainBundle], @"This sharing is typically done with services or organizations we collaborate with — as <a href=\"http://www.dw.com/en/psiphon-helps-dodge-the-online-trackers/a-16765092\" target=\"_blank\">we did with DW</a> a few years ago. These statistics help us and them answer questions like, “how many bytes were transferred through Psiphon for DW.com to all users in Iran in April?”", @"Paragraph text in the 'Who does Psiphon share these statistics with?' subsection of the 'User VPN Data' section of the Privacy page."),
       NSLocalizedStringWithDefaultValue(@"PrivacyInformationCollectedVpndataWhopsiphonshareswithPara3", nil, [NSBundle mainBundle], @"Again, we specifically do not give detailed or potentially user-identifying information to partners or any other third parties.", @"Paragraph text in the 'Who does Psiphon share these statistics with?' subsection of the 'User VPN Data' section of the Privacy page.")
     ];
 
@@ -307,6 +332,11 @@ NSNotificationName const PrivacyPolicyAcceptedNotification = @"PrivacyPoicyAccep
     sec4.anchorView = stackView;
     sec4.header.text = NSLocalizedStringWithDefaultValue(@"PrivacyInformationCollectedVpndataWhopsiphonshareswithSubhead", nil, [NSBundle mainBundle], @"Who does Psiphon share these statistics with?", @"Sub-heading in the 'User VPN Data' section of the Privacy Policy page. The section describes who Psiphon shares VPN data stats. The answer will be organizations and not specific people, in case that makes a difference in your language.");
     sec4.body.text = [sec4BodyParagraphs componentsJoinedByString:@"\n\n"];
+    [self replaceLinksInTextView:sec4.body error:&e];
+    if (e != nil) {
+        [PsiFeedbackLogger error:@"%s failed to replace links: %@", __FUNCTION__, e.localizedDescription];
+    }
+
     [stackView addArrangedSubview:sec4];
     [sec4 addViewsAndApplyConstraints];
 
@@ -321,6 +351,96 @@ NSNotificationName const PrivacyPolicyAcceptedNotification = @"PrivacyPoicyAccep
 
 - (void)onCancelTap {
     [self dismissViewControllerAnimated:TRUE completion:nil];
+}
+
+/***
+ *
+ * Looks in target text view's text for html links of the form <a href="http://psiphon3.com">some text</a>.
+ * If found these tags are removed and an attributed string is formed with these links. The text view is
+ * then set to use this attributed string.
+ *
+ */
+- (void)replaceLinksInTextView:(UITextView*)textView error:(NSError**)err {
+    NSString *openTag = @"<a[^>]+href=\"(.*?)\"[^>]*>";
+    NSString *closeTag = @"</a>";
+
+    *err = nil;
+
+    NSRegularExpression *openTagRegex = [NSRegularExpression regularExpressionWithPattern:openTag options:0 error:err];
+    if (*err != nil) {
+        return;
+    }
+
+    NSRegularExpression *closeTagRegex = [NSRegularExpression regularExpressionWithPattern:closeTag options:0 error:err];
+    if (*err != nil) {
+        return;
+    }
+
+    NSString *textToProcess = textView.text;
+    NSMutableAttributedString *attr = [[NSMutableAttributedString alloc] initWithString:@""];
+
+    while (textToProcess.length > 0) {
+        // Remove open tag
+        NSArray<NSTextCheckingResult*> *openTagMatches = [openTagRegex matchesInString:textToProcess options:0 range:NSMakeRange(0, textToProcess.length)];
+        if (openTagMatches == nil || openTagMatches.count == 0) {
+            break;
+        }
+
+        NSTextCheckingResult *openTagMatch = [openTagMatches objectAtIndex:0];
+        NSString *openTagText = [textToProcess substringWithRange:NSMakeRange(openTagMatch.range.location, openTagMatch.range.length)];
+        textToProcess = [textToProcess stringByReplacingCharactersInRange:openTagMatch.range withString:@""];
+
+        // Get link
+        NSDataDetector *detect = [[NSDataDetector alloc] initWithTypes:NSTextCheckingTypeLink error:err];
+        if (*err != nil) {
+            return;
+        }
+
+        NSArray<NSTextCheckingResult*> *hrefMatches = [detect matchesInString:openTagText options:0 range:NSMakeRange(0, openTagText.length)];
+        if (hrefMatches == nil || hrefMatches.count == 0) {
+            *err = [NSError errorWithDomain:PrivacyPolicyErrorDomain code:PrivacyPolicyLinkGenerationFailedToFindHref];
+            return;
+        }
+
+        NSTextCheckingResult *hrefMatch = [hrefMatches objectAtIndex:0];
+        NSString *hrefText = [openTagText substringWithRange:NSMakeRange(hrefMatch.range.location, hrefMatch.range.length)];
+        NSURL *url = [NSURL URLWithString:hrefText];
+        if (url == nil) {
+            *err = [NSError errorWithDomain:PrivacyPolicyErrorDomain code:PrivacyPolicyLinkGenerationFailedToGenerateURL];
+            return;
+        }
+
+        // Remove close tag
+        NSArray<NSTextCheckingResult*> *closeTagMatches = [closeTagRegex matchesInString:textToProcess options:0 range:NSMakeRange(0, textToProcess.length)];
+        if (closeTagMatches == nil || closeTagMatches.count == 0) {
+            *err = [NSError errorWithDomain:PrivacyPolicyErrorDomain code:PrivacyPolicyLinkGenerationFailedToFindCloseTag];
+            return;
+        }
+
+        NSTextCheckingResult *closeTagMatch = [closeTagMatches objectAtIndex:0];
+        textToProcess =  [textToProcess stringByReplacingCharactersInRange:closeTagMatch.range withString:@""];
+
+        // Remove remaining text for next processing round
+        NSString *chunkText = [textToProcess substringWithRange:NSMakeRange(0, closeTagMatch.range.location)];
+        textToProcess = [textToProcess substringWithRange:NSMakeRange(closeTagMatch.range.location, textToProcess.length - closeTagMatch.range.location)];
+
+        // Create link
+        NSRange linkRange = NSMakeRange(openTagMatch.range.location, chunkText.length - openTagMatch.range.location);
+        NSDictionary *linkAttributes = @{ NSLinkAttributeName: url, NSFontAttributeName: textView.font};
+
+        NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString:chunkText attributes:@{NSFontAttributeName: textView.font}];
+        [attributedString setAttributes:linkAttributes range:linkRange];
+
+        [attr appendAttributedString:attributedString];
+    }
+
+    if (attr.string.length > 0) {
+        if (textToProcess.length != 0) {
+            // Add remaining unprocessed text
+            [attr appendAttributedString:[[NSAttributedString alloc] initWithString:textToProcess attributes:@{NSFontAttributeName:textView.font}]];
+        }
+        textView.attributedText = attr;
+    }
 }
 
 @end
