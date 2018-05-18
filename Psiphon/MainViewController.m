@@ -1047,6 +1047,11 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                                                             multiplier:1.0
                                                               constant:buttonHeight]];
     [bottomBar addSubview:regionButton];
+
+    if (@available(iOS 11.0, *)) {
+        [regionButton.bottomAnchor constraintEqualToAnchor:self.view.layoutMarginsGuide.bottomAnchor constant:-spacing].active = TRUE;
+    }
+
     [self updateRegionButton];
     [self setRegionSelectionConstraints:self.view.frame.size];
 }
