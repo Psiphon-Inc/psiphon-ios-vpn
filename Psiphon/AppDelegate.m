@@ -173,6 +173,7 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
 
     rootContainerController = [[RootContainerController alloc] init];
     self.window.rootViewController = rootContainerController;
+
     // UIKit always waits for application:didFinishLaunchingWithOptions:
     // to return before making the window visible on the screen.
     [self.window makeKeyAndVisible];

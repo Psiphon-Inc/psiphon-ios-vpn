@@ -100,6 +100,60 @@
 /* External link to the privacy policy page. Please update this with the correct language specific link (if available) e.g. https://psiphon.ca/fr/privacy.html for french. */
 "PRIVACY_POLICY_URL" = "https://psiphon.ca/en/privacy.html";
 
+/* Paragraph text in the 'What does Psiphon do with your VPN data?' subsection of the 'User VPN Data' section of the Privacy page. */
+"PrivacyInformationCollectedVpndataWhatdoespsiphondowithPara1" = "Psiphon looks at your data only to the degree necessary to collect statistics about the usage of our system. We record the total bytes transferred for a user connection, as well as the bytes transferred for some specific domains. These statistics are discarded after 60 days.";
+
+/* Paragraph text in the 'What does Psiphon do with your VPN data?' subsection of the 'User VPN Data' section of the Privacy page. */
+"PrivacyInformationCollectedVpndataWhatdoespsiphondowithPara2" = "Psiphon does not inspect or record full URLs (only domain names), and does not further inspect your data. Psiphon does not modify your data as it passes through the VPN.";
+
+/* Paragraph text in the 'What does Psiphon do with your VPN data?' subsection of the 'User VPN Data' section of the Privacy page. */
+"PrivacyInformationCollectedVpndataWhatdoespsiphondowithPara3" = "Even this coarse data would be difficult to link back to you, since we immediately convert your IP address to geographical info and then discard the IP. Nor is any other identifying information stored.";
+
+/* Sub-heading in the 'User VPN Data' section of the Privacy Policy page. The section describes what Psiphon does with the little bit of VPN data that it collects stats from. */
+"PrivacyInformationCollectedVpndataWhatdoespsiphondowithSubhead" = "What does Psiphon do with your VPN data?";
+
+/* Paragraph text in the 'Who does Psiphon share these statistics with?' subsection of the 'User VPN Data' section of the Privacy page. */
+"PrivacyInformationCollectedVpndataWhopsiphonshareswithPara1" = "When sharing with third parties, Psiphon only ever provides coarse, aggregate domain-bytes statistics. We never share per-session information or any other possibly-identifying information.";
+
+/* No comment provided by engineer. */
+"PrivacyInformationCollectedVpndataWhopsiphonshareswithPara2" = "This sharing is typically done with services or organizations we collaborate with — as we did with DW a few years ago. These statistics help us and them answer questions like, “how many bytes were transferred through Psiphon for DW.com to all users in Iran in April?”";
+
+/* Paragraph text in the 'Who does Psiphon share these statistics with?' subsection of the 'User VPN Data' section of the Privacy page. */
+"PrivacyInformationCollectedVpndataWhopsiphonshareswithPara3" = "Again, we specifically do not give detailed or potentially user-identifying information to partners or any other third parties.";
+
+/* Sub-heading in the 'User VPN Data' section of the Privacy Policy page. The section describes who Psiphon shares VPN data stats. The answer will be organizations and not specific people, in case that makes a difference in your language. */
+"PrivacyInformationCollectedVpndataWhopsiphonshareswithSubhead" = "Who does Psiphon share these statistics with?";
+
+/* Paragraph text in the 'Why should you care?' subsection of the 'User VPN Data' section of the Privacy page. */
+"PrivacyInformationCollectedVpndataWhycarePara1" = "When using a VPN or proxy you should be concerned about what the provider can see in your data, collect from it, and do to it. For some web and email connections, it is theoretically possible for a VPN to see, collect, and modify the contents.";
+
+/* Sub-heading in the 'User VPN Data' section of the Privacy Policy page. The section describes why it's important for users to consider what a VPN does with their traffic data. */
+"PrivacyInformationCollectedVpndataWhycareSubhead" = "Why should you care?";
+
+/* Bullet list text under 'Why does Psiphon need these statistics?' subsection of the 'User VPN Data' section of the Privacy page. */
+"PrivacyInformationCollectedVpndataWhydoespsiphonneedPara1Item1" = "Estimate future costs: The huge amount of user data we transfer each month is a major factor in our costs. It is vital for us to see and understand usage fluctuations.";
+
+/* Bullet list text under 'Why does Psiphon need these statistics?' subsection of the 'User VPN Data' section of the Privacy page. */
+"PrivacyInformationCollectedVpndataWhydoespsiphonneedPara1Item2" = "Optimize for traffic types: Video streaming has different network requirements than web browsing does, which is different than chat, which is different than voice, and so on. Statistics about the number of bytes transferred for some major media providers helps us to understand how to provide the best experience to our users.";
+
+/* Bullet list text under 'Why does Psiphon need these statistics?' subsection of the 'User VPN Data' section of the Privacy page. If available in your language, the blog post URLs should be updated to the localized post. */
+"PrivacyInformationCollectedVpndataWhydoespsiphonneedPara1Item3" = "Determine the nature of major censorship events: Sites and services often get blocked suddenly and without warning, which can lead to huge variations in regional usage of Psiphon. For example, we had up to 20x surges in usage within a day when Brazil blocked WhatsApp or Turkey blocked social media.";
+
+/* Bullet list text under 'Why does Psiphon need these statistics?' subsection of the 'User VPN Data' section of the Privacy page. (English is using 'who' instead of 'whom' to reflect common idiom.) */
+"PrivacyInformationCollectedVpndataWhydoespsiphonneedPara1Item4" = "Understand who we need to help: Some sites and services will never get blocked anywhere, some will always be blocked in certain countries, and some will occasionally be blocked in some countries. To make sure that our users are able to communicate and learn freely, we need to understand these patterns, see who is affected, and work with partners to make sure their services work best with Psiphon.";
+
+/* Paragraph text in the 'Why does Psiphon need these statistics?' subsection of the 'User VPN Data' section of the Privacy page. This paragraph serves as preamble for a detailed list, which is why it ends with a colon. */
+"PrivacyInformationCollectedVpndataWhydoespsiphonneedPara1ListStart" = "This data is used by us to determine how our network is being used. This allows us to do things like:";
+
+/* Sub-heading in the 'User VPN Data' section of the Privacy Policy page. The section describes why Psiphon needs VPN data stats. */
+"PrivacyInformationCollectedVpndataWhydoespsiphonneedSubhead" = "Why does Psiphon need these statistics?";
+
+/* Button label at the end of privacy policy screen, indication that when clicked user can start using Psiphon */
+"PrivacyPolicyGetStartedButtonTitle" = "Get started with Psiphon";
+
+/* page title for the Privacy Policy page */
+"PrivacyTitle" = "Privacy Policy";
+
 /* Refresh app receipt button title */
 "REFRESH_APP_RECEIPT_BUTTON_TITLE" = "Refresh app receipt";
 
