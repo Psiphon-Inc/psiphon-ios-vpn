@@ -87,10 +87,6 @@ NSNotificationName const PrivacyPolicyAcceptedNotification = @"PrivacyPoicyAccep
     // Add subviews
     self.translatesAutoresizingMaskIntoConstraints = FALSE;
     self.preservesSuperviewLayoutMargins = TRUE;
-    [self.centerXAnchor constraintEqualToAnchor:self.anchorView.layoutMarginsGuide.centerXAnchor].active = TRUE;
-    [self.leadingAnchor constraintEqualToAnchor:self.anchorView.layoutMarginsGuide.leadingAnchor].active = TRUE;
-    [self.trailingAnchor constraintEqualToAnchor:self.anchorView.layoutMarginsGuide.trailingAnchor].active = TRUE;
-    [self.widthAnchor constraintEqualToAnchor:self.anchorView.layoutMarginsGuide.widthAnchor].active = TRUE;
     [self.bottomAnchor constraintEqualToAnchor:self.subviews.lastObject.bottomAnchor constant:self.bottomAnchorConstant.floatValue].active = TRUE;
 
     // constraints for all subviews
@@ -132,8 +128,8 @@ NSNotificationName const PrivacyPolicyAcceptedNotification = @"PrivacyPoicyAccep
 
     // scrollView constraints
     _scrollView.translatesAutoresizingMaskIntoConstraints = FALSE;
-    [_scrollView.centerXAnchor constraintEqualToAnchor:self.view.centerXAnchor].active = TRUE;
-    [_scrollView.widthAnchor constraintEqualToAnchor:self.view.widthAnchor].active = TRUE;
+    [_scrollView.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor].active = TRUE;
+    [_scrollView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor].active = TRUE;
     [_scrollView.topAnchor constraintEqualToAnchor:self.view.topAnchor].active = TRUE;
     [_scrollView.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor].active = TRUE;
 
@@ -189,19 +185,17 @@ NSNotificationName const PrivacyPolicyAcceptedNotification = @"PrivacyPoicyAccep
     [getStartedButton setTitle:NSLocalizedStringWithDefaultValue(@"PrivacyPolicyGetStartedButtonTitle", nil, [NSBundle mainBundle], @"Get started with Psiphon", @"Button label at the end of privacy policy screen, indication that when clicked user can start using Psiphon")
                       forState:UIControlStateNormal];
     [getStartedButton setTitleColor:UIColor.whiteColor forState:UIControlStateNormal];
+    [getStartedButton addTarget:self action:@selector(onGetStartedTap) forControlEvents:UIControlEventTouchUpInside];
     [getStartedContainer addSubview:getStartedButton];
     
     // Get started button constraints
     getStartedButton.translatesAutoresizingMaskIntoConstraints = FALSE;
     getStartedButton.preservesSuperviewLayoutMargins = TRUE;
-    
     [getStartedButton.widthAnchor constraintEqualToConstant:223.0].active = TRUE;
     [getStartedButton.centerXAnchor constraintEqualToAnchor:getStartedContainer.centerXAnchor].active = TRUE;
     [getStartedButton.centerYAnchor constraintEqualToAnchor:getStartedContainer.centerYAnchor].active = TRUE;
     [getStartedButton.heightAnchor constraintEqualToConstant:52.0].active = TRUE;
-    
-    [getStartedButton addTarget:self action:@selector(onGetStartedTap) forControlEvents:UIControlEventTouchUpInside];
-    
+
     // Close button
     UIButton *cancelButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
     cancelButton.backgroundColor = [UIColor colorWithWhite:1.0 alpha:0.9];
@@ -220,9 +214,6 @@ NSNotificationName const PrivacyPolicyAcceptedNotification = @"PrivacyPoicyAccep
     cancelButton.translatesAutoresizingMaskIntoConstraints = FALSE;
     [cancelButton.trailingAnchor constraintEqualToAnchor:self.view.layoutMarginsGuide.trailingAnchor constant:0.0].active = TRUE;
     [cancelButton.topAnchor constraintEqualToAnchor:self.view.layoutMarginsGuide.topAnchor constant:0.0].active = TRUE;
-
-
-
 }
 
 - (void)addStackedViews:(UIStackView *)stackView safeAreaInsets:(UIEdgeInsets)safeAreaInsets{
@@ -241,7 +232,7 @@ NSNotificationName const PrivacyPolicyAcceptedNotification = @"PrivacyPoicyAccep
     
     // Section 1
     SectionView *sec1 = [[SectionView alloc] initWithSubheading];
-    sec1.anchorView = stackView;
+    sec1.anchorView = sec1Container;
     sec1.bottomAnchorConstant = @40.0;
     sec1.subviewsTopAnchorConstants = @[@0, @40.0, @16.0, @8.0];
     sec1.header.font = [UIFont systemFontOfSize:32.0f weight:UIFontWeightMedium];
@@ -262,6 +253,9 @@ NSNotificationName const PrivacyPolicyAcceptedNotification = @"PrivacyPoicyAccep
     [sec1swoop.topAnchor constraintEqualToAnchor:sec1Container.layoutMarginsGuide.topAnchor].active = TRUE;
     [sec1swoop.widthAnchor constraintEqualToAnchor:sec1Container.layoutMarginsGuide.widthAnchor].active = TRUE;
     [sec1swoop.heightAnchor constraintEqualToConstant:105.f].active = TRUE;
+    
+    [sec1.leadingAnchor constraintEqualToAnchor:sec1Container.layoutMarginsGuide.leadingAnchor].active = TRUE;
+    [sec1.trailingAnchor constraintEqualToAnchor:sec1Container.layoutMarginsGuide.trailingAnchor].active = TRUE;
     
     [sec1Container.widthAnchor constraintEqualToAnchor:stackView.widthAnchor].active = TRUE;
     [sec1Container.topAnchor constraintEqualToAnchor:sec1.topAnchor constant:-safeAreaInsets.top].active = TRUE;
