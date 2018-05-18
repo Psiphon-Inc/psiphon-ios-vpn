@@ -236,7 +236,7 @@ NSErrorDomain _Nonnull const PsiCashClientLibraryErrorDomain = @"PsiCashClientLi
 - (void)refreshStateFromCache {
     [self updateContainerAuthTokens];
     PsiCashClientModelStagingArea *stagingArea = [[PsiCashClientModelStagingArea alloc] initWithModel:model];
-    [stagingArea updateBalanceInNanoPsi:[psiCash.balance unsignedLongLongValue]];
+    [stagingArea updateBalance:psiCash.balance];
     [stagingArea updateActivePurchases:[self getActivePurchases]];
     [stagingArea updateAuthPackage:[[PsiCashAuthPackage alloc] initWithValidTokens:psiCash.validTokenTypes]];
     [stagingArea updateSpeedBoostProduct:[self speedBoostProductFromPurchasePrices:psiCash.purchasePrices withTargetProducts:[self targetProducts]]];
@@ -246,6 +246,7 @@ NSErrorDomain _Nonnull const PsiCashClientLibraryErrorDomain = @"PsiCashClientLi
 #pragma mark - Refresh Signal
 
 - (void)refreshState {
+    [PsiFeedbackLogger infoWithType:PsiCashLogType message:@"refreshing state"];
 
 #if DEBUG
     const int networkRetryCount = 3;
@@ -281,7 +282,7 @@ NSErrorDomain _Nonnull const PsiCashClientLibraryErrorDomain = @"PsiCashClientLi
         } else {
             PsiCashAuthPackage *authPackage = [[PsiCashAuthPackage alloc] initWithValidTokens:r.validTokenTypes];
             [stagingArea updateAuthPackage:authPackage];
-            [stagingArea updateBalanceInNanoPsi:[r.balance unsignedLongLongValue]];
+            [stagingArea updateBalance:r.balance];
             PsiCashSpeedBoostProduct *speedBoostProduct = [self speedBoostProductFromPurchasePrices:r.purchasePrices withTargetProducts:[self targetProducts]];
             [stagingArea updateSpeedBoostProduct:speedBoostProduct];
             [stagingArea updateActivePurchases:[self getActivePurchases]];
@@ -289,8 +290,8 @@ NSErrorDomain _Nonnull const PsiCashClientLibraryErrorDomain = @"PsiCashClientLi
         }
 
     } error:^(NSError * _Nullable error) {
-        [PsiFeedbackLogger errorWithType:PsiCashLogType message:@"%s failed to refresh client state %@", __FUNCTION__, error.localizedDescription];
-        [self displayAlertWithMessage:@"Failed to update balance"]; // TODO: (1.0) human readable error
+        [PsiFeedbackLogger errorWithType:PsiCashLogType message:@"%s failed to refresh state %@", __FUNCTION__, error.localizedDescription];
+        [self displayAlertWithMessage:@"Failed to sync PsiCash state"];
     } completed:^{
         [PsiFeedbackLogger infoWithType:PsiCashLogType message:@"refreshed state"];
     }];
@@ -336,6 +337,8 @@ NSErrorDomain _Nonnull const PsiCashClientLibraryErrorDomain = @"PsiCashClientLi
 #pragma mark - Purchase Signal
 
 - (void)purchaseSpeedBoostProduct:(PsiCashSpeedBoostProductSKU*)sku {
+    [PsiFeedbackLogger infoWithType:PsiCashLogType message:@"%s attempting to purchase %@", __FUNCTION__, [sku json]];
+
     [purchaseDisposable dispose];
 
     PsiCashClientModelStagingArea *pendingPurchasesStagingArea = [[PsiCashClientModelStagingArea alloc] initWithModel:model];
@@ -371,7 +374,7 @@ NSErrorDomain _Nonnull const PsiCashClientLibraryErrorDomain = @"PsiCashClientLi
                 // Do nothing.
             }];
 
-            [stagingArea updateBalanceInNanoPsi:[result.balance unsignedLongLongValue]];
+            [stagingArea updateBalance:result.balance];
 
             if (e != nil) {
                 [stagingArea updateActivePurchases:[self getActivePurchases]];
@@ -385,19 +388,19 @@ NSErrorDomain _Nonnull const PsiCashClientLibraryErrorDomain = @"PsiCashClientLi
                 // Price, balance and expiry valid
                 e = [NSError errorWithDomain:PsiCashClientLibraryErrorDomain code:result.status andLocalizedDescription:@"Error: you already have an active Speed Boost purchase."];
 
-                [stagingArea updateBalanceInNanoPsi:[result.balance unsignedLongLongValue]];
+                [stagingArea updateBalance:result.balance];
                 [stagingArea updateActivePurchases:[self getActivePurchases]];
             } else if (result.status == PsiCashStatus_InsufficientBalance) {
                 NSString *s = [NSString stringWithFormat:@"Insufficient balance for Speed Boost purchase. Your balance: %.2f, price: %.2f.", result.balance.doubleValue/1e9, result.price.doubleValue/1e9];
                 e = [NSError errorWithDomain:PsiCashClientLibraryErrorDomain code:result.status andLocalizedDescription:s];
 
-                [stagingArea updateBalanceInNanoPsi:[result.balance unsignedLongLongValue]];
+                [stagingArea updateBalance:result.balance];
 
             } else if (result.status == PsiCashStatus_TransactionAmountMismatch) {
                 NSString *s = [NSString stringWithFormat:@"Error: price of Speed Boost is out of date. You attempted to pay %.2f, but the cost is now %.2f.", sku.price.doubleValue/1e9, result.price.doubleValue/1e9];
                 e = [NSError errorWithDomain:PsiCashClientLibraryErrorDomain code:result.status andLocalizedDescription:s];
 
-                [stagingArea updateBalanceInNanoPsi:[result.balance unsignedLongLongValue]];
+                [stagingArea updateBalance:result.balance];
                 [stagingArea updateSpeedBoostProductSKU:sku withNewPrice:result.price];
 
             } else if (result.status == PsiCashStatus_TransactionTypeNotFound) {
@@ -429,7 +432,7 @@ NSErrorDomain _Nonnull const PsiCashClientLibraryErrorDomain = @"PsiCashClientLi
         [PsiFeedbackLogger errorWithType:PsiCashLogType message:@"%s failed to purchase Speed Boost %@", __FUNCTION__, error.localizedDescription];
         [self displayAlertWithMessage:@"Purchase failed, please try again in a few minutes."]; // TODO: (1.0) human readable error and maybe don't encourage spamming the server with purchase request
     } completed:^{
-        [PsiFeedbackLogger errorWithType:PsiCashLogType message:@"%s unexpected completed signal.", __FUNCTION__];
+        [PsiFeedbackLogger infoWithType:PsiCashLogType message:@"%s successfully purchased %@", __FUNCTION__, [sku json]];
     }];
 }
 

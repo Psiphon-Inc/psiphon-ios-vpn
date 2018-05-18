@@ -50,6 +50,21 @@ NS_ASSUME_NONNULL_BEGIN
     return [self.price doubleValue] / 1e9;
 }
 
+- (NSString*)json {
+    NSDictionary *dict = @{
+                           @"distinguisher": self.distinguisher,
+                           @"price": self.price,
+                           @"variant": self.variant
+                           };
+    NSError *writeError = nil;
+    NSData *jsonData = [NSJSONSerialization dataWithJSONObject:dict options:0 error:&writeError];
+    if (writeError) {
+        return [NSString stringWithFormat:@"{\"error\": \"%@\"}", writeError.localizedDescription];
+    }
+    NSString *jsonString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
+    return jsonString;
+}
+
 @end
 
 #pragma mark - PsiCashSpeedBoostProduct

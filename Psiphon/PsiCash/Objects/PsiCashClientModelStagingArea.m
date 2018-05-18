@@ -35,7 +35,7 @@
             _stagedModel = [model copy];
         } else {
             _stagedModel = [PsiCashClientModel clientModelWithAuthPackage:nil
-                                                      andBalanceInNanoPsi:0
+                                                               andBalance:[NSNumber numberWithInteger:0]
                                                      andSpeedBoostProduct:nil
                                                       andPendingPurchases:nil
                                               andActiveSpeedBoostPurchase:nil];
@@ -48,8 +48,8 @@
     self.stagedModel.authPackage = authPackage;
 }
 
-- (void)updateBalanceInNanoPsi:(UInt64)balanceInNanoPsi {
-    self.stagedModel.balanceInNanoPsi = balanceInNanoPsi;
+- (void)updateBalance:(NSNumber*)balance {
+    self.stagedModel.balance = balance;
 }
 
 - (void)updateSpeedBoostProduct:(PsiCashSpeedBoostProduct*)speedBoostProduct {

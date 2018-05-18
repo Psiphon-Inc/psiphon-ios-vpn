@@ -358,7 +358,6 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 // Reload when rotate
 - (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator {
     [self.view removeConstraint:startButtonWidth];
-    [self setRegionSelectionConstraints:size];
     
     if (size.width > size.height) {
         [self.view removeConstraint:startButtonScreenWidth];
@@ -773,19 +772,8 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     // Setup autolayout
     CGFloat labelHeight = [statusLabel getLabelHeight];
     [statusLabel.heightAnchor constraintEqualToConstant:labelHeight].active = YES;
-
-    NSLayoutConstraint *floatingConstraint = [NSLayoutConstraint constraintWithItem:statusLabel
-                                                                          attribute:NSLayoutAttributeTop
-                                                                          relatedBy:NSLayoutRelationEqual
-                                                                             toItem:startStopButton
-                                                                          attribute:NSLayoutAttributeBottom
-                                                                         multiplier:1.07f
-                                                                           constant:-6];
-    // Allow it to break in favour of the next two constraint
-    floatingConstraint.priority = 999;
-    [self.view addConstraint:floatingConstraint];
     [statusLabel.topAnchor constraintGreaterThanOrEqualToAnchor:startStopButton.bottomAnchor constant:1].active = YES;
-    [statusLabel.topAnchor constraintLessThanOrEqualToAnchor:startStopButton.bottomAnchor constant:15].active = YES;
+    [statusLabel.topAnchor constraintLessThanOrEqualToAnchor:startStopButton.bottomAnchor constant:5].active = YES;
     [statusLabel.centerXAnchor constraintEqualToAnchor:self.view.centerXAnchor].active = YES;
 }
 
@@ -817,8 +805,8 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     regionButtonHeader = [[UILabel alloc] init];
     regionButtonHeader.translatesAutoresizingMaskIntoConstraints = NO;
     regionButtonHeader.text = NSLocalizedStringWithDefaultValue(@"CONNECT_VIA", nil, [NSBundle mainBundle], @"Connect via", @"Text above change region button that allows user to select their desired server region");
-    regionButtonHeader.adjustsFontSizeToFitWidth = NO;
-    regionButtonHeader.font = [regionButtonHeader.font fontWithSize:14];
+    regionButtonHeader.adjustsFontSizeToFitWidth = YES;
+    regionButtonHeader.font = [UIFont systemFontOfSize:14];
     regionButtonHeader.textColor = [UIColor colorWithRed:0.00 green:0.00 blue:0.00 alpha:.37f];
     [bottomBar addSubview:regionButtonHeader];
     
@@ -833,25 +821,39 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     regionButton.translatesAutoresizingMaskIntoConstraints = NO;
     
     CGFloat buttonHeight = 45;
-    [regionButton setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
+    [regionButton setTitleColor:[UIColor colorWithWhite:0 alpha:.8] forState:UIControlStateNormal];
     [regionButton setTitleColor:[UIColor lightGrayColor] forState:UIControlStateHighlighted];
-    regionButton.titleLabel.font = [UIFont systemFontOfSize:regionButton.titleLabel.font.pointSize weight:UIFontWeightLight];
+    regionButton.titleLabel.font = [UIFont systemFontOfSize:16 weight:UIFontWeightLight];
     regionButton.titleLabel.adjustsFontSizeToFitWidth = YES;
     
     CGFloat spacing = 10; // the amount of spacing to appear between image and title
-    CGFloat spacingFromSides = 10.f;
-    
-    BOOL isRTL = [self isRightToLeft];
-    regionButton.imageEdgeInsets = UIEdgeInsetsMake(0, 0, 0, isRTL ? -spacing : spacing);
-    regionButton.titleEdgeInsets = UIEdgeInsetsMake(0, isRTL ? -spacing : spacing, 0, 0);
-    regionButton.contentEdgeInsets = UIEdgeInsetsMake(0, spacing + spacingFromSides, 0, spacing + spacingFromSides);
+    regionButton.titleEdgeInsets = UIEdgeInsetsMake(0, spacing, 0, spacing);
     [regionButton addTarget:self action:@selector(onRegionButtonTap:) forControlEvents:UIControlEventTouchUpInside];
 
     // Set button height
     [regionButton.heightAnchor constraintEqualToConstant:buttonHeight].active = YES;
     [bottomBar addSubview:regionButton];
     [self updateRegionButton];
-    [self setRegionSelectionConstraints:self.view.frame.size];
+
+    // Add constraints
+    [regionButtonHeader.topAnchor constraintEqualToAnchor:bottomBar.topAnchor constant:7].active = YES;
+    [regionButtonHeader.centerXAnchor constraintEqualToAnchor:bottomBar.centerXAnchor].active = YES;
+    [regionButton.topAnchor constraintEqualToAnchor:regionButtonHeader.bottomAnchor constant:5].active = YES;
+    [regionButton.bottomAnchor constraintEqualToAnchor:bottomBar.bottomAnchor constant:-7].active = YES;
+    [regionButton.titleLabel.centerXAnchor constraintEqualToAnchor:regionButtonHeader.centerXAnchor].active = YES;
+    [regionButton.widthAnchor constraintEqualToAnchor:bottomBar.widthAnchor multiplier:.7f].active = YES;
+
+    // Add up arrow indicator
+    UIImage *arrowImage = [UIImage imageNamed:@"UpArrow"];
+    UIImageView *upArrow = [[UIImageView alloc] initWithImage:arrowImage];
+    upArrow.contentMode = UIViewContentModeScaleAspectFit;
+
+    [bottomBar addSubview:upArrow];
+    upArrow.translatesAutoresizingMaskIntoConstraints = NO;
+    [upArrow.leftAnchor constraintEqualToAnchor:regionButton.titleLabel.rightAnchor constant:spacing].active = YES;
+    [upArrow.centerYAnchor constraintEqualToAnchor:regionButton.centerYAnchor].active = YES;
+    [upArrow.widthAnchor constraintEqualToConstant:15].active = YES;
+    [upArrow.heightAnchor constraintEqualToAnchor:upArrow.widthAnchor].active = YES;
 }
 
 - (void)addVersionLabel {
@@ -1055,30 +1057,6 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     [regionButton setTitle:regionText forState:UIControlStateNormal];
 }
 
-- (void)setRegionSelectionConstraints:(CGSize) size {
-    [bottomBar removeConstraints:[bottomBar constraints]];
-    if (size.width > size.height && [[UIDevice currentDevice]userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
-        regionButtonHeader.hidden = YES;
-        [regionButton.bottomAnchor constraintEqualToAnchor:bottomBar.bottomAnchor constant:-7].active = YES;
-        [regionButton.topAnchor constraintEqualToAnchor:bottomBar.topAnchor constant:7].active = YES;
-        [regionButton.centerXAnchor constraintEqualToAnchor:bottomBar.centerXAnchor].active = YES;
-        [regionButtonHeader.centerYAnchor constraintEqualToAnchor:regionButton.centerYAnchor].active = YES;
-        [regionButtonHeader.trailingAnchor constraintEqualToAnchor:regionButton.leadingAnchor constant:-5.f].active = YES;
-    } else {
-        regionButtonHeader.hidden = NO;
-        [regionButtonHeader.topAnchor constraintEqualToAnchor:bottomBar.topAnchor constant:7].active = YES;
-        [regionButtonHeader.centerXAnchor constraintEqualToAnchor:bottomBar.centerXAnchor].active = YES;
-        [regionButton.bottomAnchor constraintEqualToAnchor:bottomBar.bottomAnchor constant:-7].active = YES;
-        [regionButton.topAnchor constraintEqualToAnchor:regionButtonHeader.bottomAnchor constant:5].active = YES;
-        [regionButton.centerXAnchor constraintEqualToAnchor:bottomBar.centerXAnchor].active = YES;
-
-        NSLayoutConstraint *widthConstraint = [regionButton.widthAnchor constraintEqualToAnchor:bottomBar.widthAnchor multiplier:.7f];
-        widthConstraint.priority = 999; // allow constraint to be broken to enforce max width
-        widthConstraint.active = YES;
-        [regionButton.widthAnchor constraintLessThanOrEqualToConstant:220].active = YES;
-    }
-}
-
 - (void)setupLayoutGuides {
     // setup layout equal distribution
     UILayoutGuide *topSpacerGuide = [UILayoutGuide new];
@@ -1211,9 +1189,9 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 
             BOOL stateChanged = [model hasActiveSpeedBoostPurchase] ^ [newClientModel hasActiveSpeedBoostPurchase] || [model hasPendingPurchase] ^ [newClientModel hasPendingPurchase];
 
-            BOOL animate = FALSE;
-            if ([model.authPackage hasIndicatorToken] && [newClientModel balanceInNanoPsi] > [model balanceInNanoPsi]) {
-                animate = TRUE;
+            NSComparisonResult balanceChange = [model.balance compare:newClientModel.balance];
+            if (balanceChange != NSOrderedSame) {
+                [self animateBalanceChangeOf:[NSNumber numberWithDouble:newClientModel.balance.doubleValue - model.balance.doubleValue]];
             }
 
             model = newClientModel;
@@ -1222,7 +1200,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                 [self showPsiCashAlertView];
             }
 
-            if (animate) {
+            if (balanceChange == NSOrderedAscending) {
                 [PsiCashBalanceWithSpeedBoostMeter earnAnimationWithCompletion:self.view andPsiCashView:psiCashView andCompletion:^{
                     [psiCashView bindWithModel:model];
                 }];
@@ -1232,6 +1210,38 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 
             [psiCashView bindWithModel:model];
         }
+    }];
+}
+
+- (void)animateBalanceChangeOf:(NSNumber*)delta {
+    UILabel *changeLabel = [[UILabel alloc] init];
+    changeLabel.adjustsFontSizeToFitWidth = YES;
+    if ([delta doubleValue] > 0) {
+        changeLabel.text = [NSString stringWithFormat:@"+%@", [PsiCashClientModel formattedBalance:delta]];
+        changeLabel.textColor = [UIColor colorWithRed:0.15 green:0.90 blue:0.51 alpha:1.0];
+    } else {
+        changeLabel.text = [PsiCashClientModel formattedBalance:delta];
+        changeLabel.textColor = [UIColor colorWithRed:0.16 green:0.38 blue:1.00 alpha:1.0];
+    }
+    changeLabel.translatesAutoresizingMaskIntoConstraints = NO;
+
+    changeLabel.font = [UIFont systemFontOfSize:16];
+    [self.view addSubview:changeLabel];
+
+    [changeLabel.leadingAnchor constraintEqualToAnchor:psiCashView.balance.trailingAnchor constant:5].active = YES;
+    [changeLabel.trailingAnchor constraintLessThanOrEqualToAnchor:self.view.trailingAnchor constant:10].active = YES;
+    [changeLabel.centerYAnchor constraintEqualToAnchor:psiCashView.balance.centerYAnchor constant:2].active = YES;
+
+    changeLabel.alpha = 0;
+    [UIView animateKeyframesWithDuration:1.5 delay:0 options:UIViewKeyframeAnimationOptionCalculationModeLinear animations:^{
+        [UIView addKeyframeWithRelativeStartTime:0 relativeDuration:0.25 animations:^{
+            changeLabel.alpha = 1;
+        }];
+        [UIView addKeyframeWithRelativeStartTime:0.75 relativeDuration:0.25 animations:^{
+            changeLabel.alpha = 0;
+        }];
+    } completion:^(BOOL finished) {
+        [changeLabel removeFromSuperview];
     }];
 }
 

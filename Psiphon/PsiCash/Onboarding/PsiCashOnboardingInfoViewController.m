@@ -154,26 +154,25 @@
     PsiCashBalanceWithSpeedBoostMeter *meter = [[PsiCashBalanceWithSpeedBoostMeter alloc] init];
 
     PsiCashClientModel *m = [PsiCashClientModel clientModelWithAuthPackage:[[PsiCashAuthPackage alloc] initWithValidTokens:@[@"indicator", @"earner", @"spender"]]
-                                                       andBalanceInNanoPsi:0
+                                                                andBalance:[NSNumber numberWithInteger:0]
                                                       andSpeedBoostProduct:[PsiCashSpeedBoostProduct productWithSKUs:@[sku]]
                                                        andPendingPurchases:nil
                                                andActiveSpeedBoostPurchase:nil];
 
     if (self.index == PsiCashOnboardingPage2Index) {
-        m.balanceInNanoPsi = 0e9;
         [meter bindWithModel:m];
 
         // Add earning animation
         if (self.index == PsiCashOnboardingPage2Index) {
             [NSTimer scheduledTimerWithTimeInterval:1 repeats:YES block:^(NSTimer * _Nonnull timer) {
-                if (m.balanceInNanoPsi >= 7.5e9) {
-                    m.balanceInNanoPsi = 0;
+                if (m.balance.doubleValue >= 7.5e9) {
+                    m.balance = [NSNumber numberWithInteger:0];
                     return;
                 } else {
-                    if (m.balanceInNanoPsi == 0) {
+                    if (m.balance.doubleValue == 0) {
                         [meter bindWithModel:m];
                     }
-                    m.balanceInNanoPsi += 2.5e9;
+                    m.balance = [NSNumber numberWithDouble:m.balance.doubleValue + 2.5e9];
                 }
 
                 [PsiCashBalanceWithSpeedBoostMeter earnAnimationWithCompletion:self.view andPsiCashView:meter andCompletion:^{
@@ -183,7 +182,7 @@
             }];
         }
     } else if (self.index == PsiCashOnboardingPage3Index) {
-        m.balanceInNanoPsi = 10e9;
+        m.balance = [NSNumber numberWithDouble:10e9];
         [meter bindWithModel:m];
     }
 
