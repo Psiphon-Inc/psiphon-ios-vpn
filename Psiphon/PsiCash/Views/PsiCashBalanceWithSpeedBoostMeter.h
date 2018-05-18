@@ -25,6 +25,5 @@
 @interface PsiCashBalanceWithSpeedBoostMeter : UIView <PsiCashClientModelReceiver>
 @property (strong, readonly, nonatomic) PsiCashBalanceView *balance;
 @property (strong, readonly, nonatomic) PsiCashSpeedBoostMeterView *meter;
-+ (void)earnAnimationWithCompletion:(UIView*)parentView andPsiCashView:(PsiCashBalanceWithSpeedBoostMeter*)targetPsiCashView andCompletion:(void (^)(void))completionHandler;
-- (void)earnAnimation;
++ (void)animateBalanceChangeOf:(NSNumber*)delta withPsiCashView:(PsiCashBalanceWithSpeedBoostMeter*)psiCashView inParentView:(UIView*)parentView;
 @end
