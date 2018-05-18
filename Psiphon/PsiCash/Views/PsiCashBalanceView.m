@@ -32,7 +32,9 @@
 #pragma mark -
 
 @implementation PsiCashBalanceView {
+    NSNumber *prevBalance;
     UIView *containerView;
+    BOOL authed;
 }
 
 -(id)initWithFrame:(CGRect)frame {
@@ -111,20 +113,35 @@
     [_coin.trailingAnchor constraintEqualToAnchor:_balance.leadingAnchor constant:-10].active = YES;
 }
 
-- (void)earnAnimation {
-    CABasicAnimation *animation =
-    [CABasicAnimation animationWithKeyPath:@"position"];
-    [animation setDuration:0.1];
-    [animation setRepeatCount:1];
-    [animation setAutoreverses:YES];
-    [animation setRemovedOnCompletion:YES];
+- (void)animateBalanceChangeFrom:(NSNumber*)previousBalance toNewBalance:(NSNumber*)newBalance {
+    __block double currentBalance = previousBalance.doubleValue;
+    double chunks = newBalance.doubleValue >= currentBalance ? 1e9 : -1e9;
 
-    [animation setFromValue:[NSValue valueWithCGPoint:
-                             CGPointMake([_coin center].x, [_coin center].y)]];
-    [animation setToValue:[NSValue valueWithCGPoint:
-                           CGPointMake([_coin center].x, [_coin center].y - 10.f)]];
 
-    [[_coin layer] addAnimation:animation forKey:@"position"];
+    NSTimeInterval animationTime = 1;
+    NSTimeInterval animationIntervals = animationTime / ((newBalance.doubleValue - currentBalance) / chunks);
+
+    if (animationIntervals < 0.0001) {
+        CGFloat minInterval = 0.001;
+        chunks = ((newBalance.doubleValue - currentBalance) * minInterval) / animationTime;
+        animationIntervals = minInterval;
+    }
+
+    [NSTimer scheduledTimerWithTimeInterval:animationIntervals repeats:YES block:^(NSTimer * _Nonnull timer) {
+        currentBalance += chunks;
+        _balance.text = [PsiCashClientModel formattedBalance:[NSNumber numberWithDouble:currentBalance]];
+        BOOL done = FALSE;
+        if (chunks >= 0 && currentBalance >= self.model.balance.doubleValue) {
+            done = TRUE;
+        } else if (chunks < 0 && currentBalance <= self.model.balance.doubleValue) {
+            done = TRUE;
+        }
+
+        if (done) {
+            _balance.text = [PsiCashClientModel formattedBalance:self.model.balance];
+            [timer invalidate];
+        }
+    }];
 }
 
 #pragma mark - State Changes
@@ -134,7 +151,14 @@
 
     if ([self.model hasAuthPackage]) {
         if ([self.model.authPackage hasIndicatorToken]) {
-            _balance.text = [PsiCashClientModel formattedBalance:clientModel.balance];
+            if (!authed) {
+                _balance.text = [PsiCashClientModel formattedBalance:clientModel.balance];
+                authed = TRUE;
+            } else {
+                _balance.text = [PsiCashClientModel formattedBalance:prevBalance];
+                [self animateBalanceChangeFrom:prevBalance toNewBalance:clientModel.balance];
+                prevBalance = clientModel.balance;
+            }
         } else {
             // First launch: the user has no indicator token
             _balance.text = [PsiCashClientModel formattedBalance:[NSNumber numberWithInteger:0]];
