@@ -26,6 +26,7 @@ NS_ASSUME_NONNULL_BEGIN
 + (PsiCashSpeedBoostProductSKU*)skuWitDistinguisher:(NSString*)distinguisher withHours:(NSNumber*)hours andPrice:(NSNumber*)price;
 - (NSNumber*)hours;
 - (double)priceInPsi;
+- (NSString*)json;
 @end
 
 @protocol PsiCashSpeedBoostPurchaseReceiver

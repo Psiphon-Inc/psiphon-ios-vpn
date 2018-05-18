@@ -42,7 +42,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)initWithModel:(PsiCashClientModel *_Nullable)model;
 
 - (void)updateAuthPackage:(PsiCashAuthPackage*_Nullable)authPackage;
-- (void)updateBalanceInNanoPsi:(UInt64)balanceInNanoPsi;
+- (void)updateBalance:(NSNumber*)balance;
 - (void)updateSpeedBoostProduct:(PsiCashSpeedBoostProduct*)speedBoostProduct;
 - (void)updateSpeedBoostProductSKU:(PsiCashSpeedBoostProductSKU*)old withNewPrice:(NSNumber*)price;
 - (void)removeSpeedBoostProductSKU:(PsiCashSpeedBoostProductSKU*)sku;
