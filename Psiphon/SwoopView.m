@@ -37,7 +37,6 @@
 - (void)drawRect:(CGRect)rect {
     CGRect bounds = self.bounds;
     CGFloat centerX = bounds.size.width / 2.f;
-    CGFloat centerY = bounds.size.height / 2.f;
     CGFloat boxTopY = bounds.size.height * fillRatio;
 
     CGContextRef c = UIGraphicsGetCurrentContext();
