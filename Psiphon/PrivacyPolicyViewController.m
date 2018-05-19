@@ -136,7 +136,6 @@ typedef NS_ERROR_ENUM(PrivacyPolicyErrorDomain, PrivacyPolicyLinkGenerationError
     UIScrollView *_scrollView;
     UIStackView *_stackView;
 }
-
 - (void)viewDidLoad {
     [super viewDidLoad];
 
@@ -150,7 +149,11 @@ typedef NS_ERROR_ENUM(PrivacyPolicyErrorDomain, PrivacyPolicyLinkGenerationError
     _scrollView.translatesAutoresizingMaskIntoConstraints = FALSE;
     [_scrollView.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor].active = TRUE;
     [_scrollView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor].active = TRUE;
-    [_scrollView.topAnchor constraintEqualToAnchor:self.view.topAnchor].active = TRUE;
+    if (@available(iOS 11.0, *)) {
+        [_scrollView.topAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.topAnchor].active = TRUE;
+    } else {
+        [_scrollView.topAnchor constraintEqualToAnchor:self.topLayoutGuide.bottomAnchor].active = TRUE;
+    }
     [_scrollView.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor].active = TRUE;
 
     // stackView
@@ -165,7 +168,8 @@ typedef NS_ERROR_ENUM(PrivacyPolicyErrorDomain, PrivacyPolicyLinkGenerationError
     // stackView constraints
     _stackView.translatesAutoresizingMaskIntoConstraints = FALSE;
     [_stackView.centerXAnchor constraintEqualToAnchor:_scrollView.centerXAnchor].active = TRUE;
-    [_stackView.widthAnchor constraintEqualToAnchor:_scrollView.widthAnchor].active = TRUE;
+    [_stackView.leadingAnchor constraintEqualToAnchor:_scrollView.leadingAnchor].active = TRUE;
+    [_stackView.trailingAnchor constraintEqualToAnchor:_scrollView.trailingAnchor].active = TRUE;
     [_stackView.topAnchor constraintEqualToAnchor:_scrollView.topAnchor].active = TRUE;
     [_stackView.bottomAnchor constraintEqualToAnchor:_scrollView.bottomAnchor].active = TRUE;
     
@@ -232,8 +236,13 @@ typedef NS_ERROR_ENUM(PrivacyPolicyErrorDomain, PrivacyPolicyLinkGenerationError
 
     // Close button constraints
     cancelButton.translatesAutoresizingMaskIntoConstraints = FALSE;
+    if (@available(iOS 11.0, *)) {
+        [cancelButton.topAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.topAnchor constant:10].active = TRUE;
+    } else {
+        [cancelButton.topAnchor constraintEqualToAnchor:self.topLayoutGuide.bottomAnchor constant:10].active = TRUE;
+    }
     [cancelButton.trailingAnchor constraintEqualToAnchor:self.view.layoutMarginsGuide.trailingAnchor constant:0.0].active = TRUE;
-    [cancelButton.topAnchor constraintEqualToAnchor:self.view.layoutMarginsGuide.topAnchor constant:0.0].active = TRUE;
+
 }
 
 - (void)addStackedViews:(UIStackView *)stackView safeAreaInsets:(UIEdgeInsets)safeAreaInsets{
@@ -245,12 +254,6 @@ typedef NS_ERROR_ENUM(PrivacyPolicyErrorDomain, PrivacyPolicyLinkGenerationError
     sec1Container.layoutMargins = UIEdgeInsetsMake(0.0, safeAreaInsets.left, 0.0, safeAreaInsets.right);
     [stackView addArrangedSubview:sec1Container];
     
-    SwoopView *sec1swoop = [[SwoopView alloc] init];
-    sec1swoop.directionUp = FALSE;
-    [sec1swoop setColor:[UIColor colorWithWhite:1.0 alpha:0.4]];
-    sec1swoop.translatesAutoresizingMaskIntoConstraints = FALSE;
-    [sec1Container addSubview:sec1swoop];
-    
     // Section 1
     SectionView *sec1 = [[SectionView alloc] initWithSubheading];
     sec1.anchorView = sec1Container;
@@ -260,6 +263,7 @@ typedef NS_ERROR_ENUM(PrivacyPolicyErrorDomain, PrivacyPolicyLinkGenerationError
     sec1.header.text = NSLocalizedStringWithDefaultValue(@"PrivacyTitle", nil, [NSBundle mainBundle], @"Privacy Policy", @"page title for the Privacy Policy page");
     sec1.subheading.text = NSLocalizedStringWithDefaultValue(@"PrivacyInformationCollectedVpndataWhycareSubhead", nil, [NSBundle mainBundle], @"Why should you care?", @"Sub-heading in the 'User VPN Data' section of the Privacy Policy page. The section describes why it's important for users to consider what a VPN does with their traffic data.");
     sec1.body.text = NSLocalizedStringWithDefaultValue(@"PrivacyInformationCollectedVpndataWhycarePara1", nil, [NSBundle mainBundle], @"When using a VPN or proxy you should be concerned about what the provider can see in your data, collect from it, and do to it. For some web and email connections, it is theoretically possible for a VPN to see, collect, and modify the contents.", @"Paragraph text in the 'Why should you care?' subsection of the 'User VPN Data' section of the Privacy page.");
+    sec1.body.backgroundColor = UIColor.paleBlueColor;
 
     
     // Adds PrivacyPolicyWelcome image to section 1
@@ -270,10 +274,6 @@ typedef NS_ERROR_ENUM(PrivacyPolicyErrorDomain, PrivacyPolicyLinkGenerationError
     [sec1 insertSubview:welcomeImageView atIndex:0];
     [sec1Container addSubview:sec1];
     [sec1 addViewsAndApplyConstraints];
-    
-    [sec1swoop.topAnchor constraintEqualToAnchor:sec1Container.layoutMarginsGuide.topAnchor].active = TRUE;
-    [sec1swoop.widthAnchor constraintEqualToAnchor:sec1Container.layoutMarginsGuide.widthAnchor].active = TRUE;
-    [sec1swoop.heightAnchor constraintEqualToConstant:105.f].active = TRUE;
     
     [sec1.leadingAnchor constraintEqualToAnchor:sec1Container.layoutMarginsGuide.leadingAnchor].active = TRUE;
     [sec1.trailingAnchor constraintEqualToAnchor:sec1Container.layoutMarginsGuide.trailingAnchor].active = TRUE;
