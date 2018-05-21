@@ -89,7 +89,7 @@
         changeLabel.textColor = [UIColor colorWithRed:0.15 green:0.90 blue:0.51 alpha:1.0];
     } else {
         changeLabel.text = [PsiCashClientModel formattedBalance:delta];
-        changeLabel.textColor = [UIColor colorWithRed:0.16 green:0.38 blue:1.00 alpha:1.0];
+        changeLabel.textColor = [UIColor colorWithRed:0.55 green:0.72 blue:1.00 alpha:1.0];
     }
     changeLabel.translatesAutoresizingMaskIntoConstraints = NO;
 

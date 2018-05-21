@@ -32,9 +32,8 @@
 #pragma mark -
 
 @implementation PsiCashBalanceView {
-    NSNumber *prevBalance;
     UIView *containerView;
-    BOOL authed;
+    NSTimer *animationTimer;
 }
 
 -(id)initWithFrame:(CGRect)frame {
@@ -113,23 +112,29 @@
     [_coin.trailingAnchor constraintEqualToAnchor:_balance.leadingAnchor constant:-10].active = YES;
 }
 
-- (void)animateBalanceChangeFrom:(NSNumber*)previousBalance toNewBalance:(NSNumber*)newBalance {
-    __block double currentBalance = previousBalance.doubleValue;
-    double chunks = newBalance.doubleValue >= currentBalance ? 1e9 : -1e9;
-
-
-    NSTimeInterval animationTime = 1;
-    NSTimeInterval animationIntervals = animationTime / ((newBalance.doubleValue - currentBalance) / chunks);
-
-    if (animationIntervals < 0.0001) {
-        CGFloat minInterval = 0.001;
-        chunks = ((newBalance.doubleValue - currentBalance) * minInterval) / animationTime;
-        animationIntervals = minInterval;
+- (NSTimer*)animateBalanceChangeFrom:(NSNumber*)previousBalance toNewBalance:(NSNumber*)newBalance {
+    NSComparisonResult equality = [previousBalance compare:newBalance];
+    if (equality == NSOrderedSame) {
+        return nil; // nothing to animate
     }
 
-    [NSTimer scheduledTimerWithTimeInterval:animationIntervals repeats:YES block:^(NSTimer * _Nonnull timer) {
+    __block double currentBalance = previousBalance.doubleValue;
+    double chunks = equality == NSOrderedAscending ? 1e9 : -1e9;
+    double balanceDiff = newBalance.doubleValue - currentBalance;
+
+    NSTimeInterval animationTime = 1;
+    NSTimeInterval animationIntervals = (animationTime * chunks) / balanceDiff;
+    NSTimeInterval minAnimationInterval = 0.01;
+
+    if (animationIntervals < minAnimationInterval) {
+        chunks = 1e9 * roundf((balanceDiff * minAnimationInterval) / (animationTime * 1e9));
+        animationIntervals = minAnimationInterval;
+    }
+
+    return [NSTimer scheduledTimerWithTimeInterval:animationIntervals repeats:YES block:^(NSTimer * _Nonnull timer) {
         currentBalance += chunks;
         _balance.text = [PsiCashClientModel formattedBalance:[NSNumber numberWithDouble:currentBalance]];
+
         BOOL done = FALSE;
         if (chunks >= 0 && currentBalance >= self.model.balance.doubleValue) {
             done = TRUE;
@@ -147,17 +152,17 @@
 #pragma mark - State Changes
 
 - (void)bindWithModel:(PsiCashClientModel*)clientModel {
+    NSNumber *previousBalance = self.model.balance;
     self.model = clientModel;
 
     if ([self.model hasAuthPackage]) {
         if ([self.model.authPackage hasIndicatorToken]) {
-            if (!authed) {
+            if (previousBalance == nil) {
                 _balance.text = [PsiCashClientModel formattedBalance:clientModel.balance];
-                authed = TRUE;
             } else {
-                _balance.text = [PsiCashClientModel formattedBalance:prevBalance];
-                [self animateBalanceChangeFrom:prevBalance toNewBalance:clientModel.balance];
-                prevBalance = clientModel.balance;
+                _balance.text = [PsiCashClientModel formattedBalance:previousBalance];
+                [animationTimer invalidate];
+                animationTimer = [self animateBalanceChangeFrom:previousBalance toNewBalance:clientModel.balance];
             }
         } else {
             // First launch: the user has no indicator token
