@@ -160,7 +160,7 @@
                                                andActiveSpeedBoostPurchase:nil];
 
     if (self.index == PsiCashOnboardingPage2Index) {
-        [meter bindWithModel:m];
+        [meter bindWithModel:[m copy]];
         // Add earning animation
         if (self.index == PsiCashOnboardingPage2Index) {
             [NSTimer scheduledTimerWithTimeInterval:1.5 repeats:YES block:^(NSTimer * _Nonnull timer) {
@@ -172,12 +172,12 @@
                     m.balance = [NSNumber numberWithDouble:m.balance.doubleValue + increment];;
                 }
 
-                [meter bindWithModel:m];
+                [meter bindWithModel:[m copy]];
             }];
         }
     } else if (self.index == PsiCashOnboardingPage3Index) {
         m.balance = [NSNumber numberWithDouble:100e9];
-        [meter bindWithModel:m];
+        [meter bindWithModel:[m copy]];
     }
 
     graphic = meter;
