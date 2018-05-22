@@ -48,7 +48,14 @@
 #import "RACSignal+Operations.h"
 #import "RACSignal+Operations.h"
 #import "RACSignal.h"
+#import "RACUnit.h"
+#import "NSNotificationCenter+RACSupport.h"
 #import "Asserts.h"
+#import "PrivacyPolicyViewController.h"
+#import "SwoopView.h"
+#import "UIColor+Additions.h"
+
+UserDefaultsKey const PrivacyPolicyAcceptedBookKey = @"PrivacyPolicy.AcceptedBoolKey";
 
 static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSString *b) {
     return (([a length] == 0) && ([b length] == 0)) || ([a isEqualToString:b]);
@@ -376,11 +383,37 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 }
 
 - (void)onStartStopTap:(UIButton *)sender {
-    
+
     __weak MainViewController *weakSelf = self;
-    
+
+    // Emits unit value if/when the privacy policy is accepted.
+    RACSignal *privacyPolicyAccepted = [[RACSignal return:@([NSUserDefaults.standardUserDefaults boolForKey:PrivacyPolicyAcceptedBookKey])]
+      flattenMap:^RACSignal<RACUnit *> *(NSNumber *ppAccepted) {
+
+        if ([ppAccepted boolValue]) {
+            return [RACSignal return:RACUnit.defaultUnit];
+        } else {
+
+            PrivacyPolicyViewController *c = [[PrivacyPolicyViewController alloc] init];
+            [self presentViewController:c animated:TRUE completion:nil];
+
+            return [[[[NSNotificationCenter defaultCenter]
+              rac_addObserverForName:PrivacyPolicyAcceptedNotification
+                              object:nil]
+              take:1]
+              map:^id(NSNotification *value) {
+                  [NSUserDefaults.standardUserDefaults setBool:TRUE forKey:PrivacyPolicyAcceptedBookKey];
+                  return RACUnit.defaultUnit;
+              }];
+        }
+
+    }];
+
     // signal emits a single two tuple (isVPNActive, connectOnDemandEnabled).
-    __block RACDisposable *disposable = [[[[self.vpnManager isVPNActive]
+    __block RACDisposable *disposable = [[[[privacyPolicyAccepted
+      flattenMap:^RACSignal *(RACUnit *x) {
+        return [weakSelf.vpnManager isVPNActive];
+      }]
       flattenMap:^RACSignal<NSNumber *> *(RACTwoTuple<NSNumber *, NSNumber *> *value) {
 
           // If VPN is already running, checks if ConnectOnDemand is enabled, otherwise returns the result immediately.
@@ -1014,6 +1047,11 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                                                             multiplier:1.0
                                                               constant:buttonHeight]];
     [bottomBar addSubview:regionButton];
+
+    if (@available(iOS 11.0, *)) {
+        [regionButton.bottomAnchor constraintEqualToAnchor:self.view.layoutMarginsGuide.bottomAnchor constant:-spacing].active = TRUE;
+    }
+
     [self updateRegionButton];
     [self setRegionSelectionConstraints:self.view.frame.size];
 }
