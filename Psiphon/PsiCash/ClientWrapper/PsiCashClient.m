@@ -386,9 +386,9 @@ NSErrorDomain _Nonnull const PsiCashClientLibraryErrorDomain = @"PsiCashClientLi
             [stagingArea updateBalance:result.balance];
 
             if (e != nil) {
-                [stagingArea updateActivePurchases:[self getActivePurchases]];
-            } else {
                 [PsiFeedbackLogger errorWithType:PsiCashLogType message:@"Received invalid purchase result" object:e];
+            } else {
+                [stagingArea updateActivePurchases:[self getActivePurchases]];
             }
         } else {
             NSError *e = nil;
