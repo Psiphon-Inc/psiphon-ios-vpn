@@ -41,7 +41,7 @@
     alertView.purchaseView = purchaseView;
     alertView.containerView = purchaseView;
 
-    alertView.buttonTitles = [NSMutableArray arrayWithObjects:@"Buy", @"Cancel", nil];
+    alertView.buttonTitles = [NSMutableArray arrayWithObjects:NSLocalizedStringWithDefaultValue(@"BUY_BUTTON", nil, [NSBundle mainBundle], @"Buy", @"Alert buy button"), NSLocalizedStringWithDefaultValue(@"CANCEL_BUTTON", nil, [NSBundle mainBundle], @"Cancel", @"Alert Cancel button"), nil];
     alertView.closeOnTouchUpOutside = YES;
     alertView.onButtonTouchUpInside = ^(CustomIOSAlertView *alertView, int buttonIndex) {
         PsiCashPurchaseAlertView *purchaseAlertView = (PsiCashPurchaseAlertView*)alertView;
@@ -70,13 +70,13 @@
     alertView->alreadySpeedBoosting = YES;
 
     UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, 250, 150)];
-    label.text = @"Buying Speed Boost...";
+    label.text = NSLocalizedStringWithDefaultValue(@"PSICASH_BUYING_SPEED_BOOST_TEXT", nil, [NSBundle mainBundle], @"Buying Speed Boost...", @"Text which appears in the Speed Boost meter when the user's buy request for Speed Boost is being processed. Please keep this text concise as the width of the text box is restricted in size.");
     label.textAlignment = NSTextAlignmentCenter;
     label.numberOfLines = 0;
     alertView.purchaseView = nil;
     alertView.containerView = label;
 
-    alertView.buttonTitles = [NSMutableArray arrayWithObjects:@"Ok", nil];
+    alertView.buttonTitles = [NSMutableArray arrayWithObjects:NSLocalizedStringWithDefaultValue(@"OK_BUTTON", nil, [NSBundle mainBundle], @"OK", @"Alert OK Button"), nil];
     alertView.closeOnTouchUpOutside = YES;
     alertView.onButtonTouchUpInside = ^(CustomIOSAlertView *alertView, int buttonIndex) {
         PsiCashPurchaseAlertView *purchaseAlertView = (PsiCashPurchaseAlertView*)alertView;
@@ -93,18 +93,18 @@
     return alertView;
 }
 
-+ (PsiCashPurchaseAlertView*)alreadySpeedBoostingAlertWithNMinutesRemaining:(int)minsRemaining {
++ (PsiCashPurchaseAlertView*)alreadySpeedBoostingAlert {
     PsiCashPurchaseAlertView *alertView = [[PsiCashPurchaseAlertView alloc] init];
     alertView->alreadySpeedBoosting = YES;
 
     UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, 250, 150)];
-    label.text = [NSString stringWithFormat:@"%d minutes of Speed Boost remaining", minsRemaining];
+    label.text = NSLocalizedStringWithDefaultValue(@"PSICASH_SPEED_BOOST_ACTIVE_TEXT", nil, [NSBundle mainBundle], @"Speed Boost Active", @"Text which appears in the Speed Boost meter when the user has activated Speed Boost. Please keep this text concise as the width of the text box is restricted in size.");
     label.textAlignment = NSTextAlignmentCenter;
     label.numberOfLines = 0;
     alertView.purchaseView = nil;
     alertView.containerView = label;
 
-    alertView.buttonTitles = [NSMutableArray arrayWithObjects:@"Ok", nil];
+    alertView.buttonTitles = [NSMutableArray arrayWithObjects:NSLocalizedStringWithDefaultValue(@"OK_BUTTON", nil, [NSBundle mainBundle], @"OK", @"Alert OK Button"), nil];
     alertView.closeOnTouchUpOutside = YES;
     alertView.onButtonTouchUpInside = ^(CustomIOSAlertView *alertView, int buttonIndex) {
         PsiCashPurchaseAlertView *purchaseAlertView = (PsiCashPurchaseAlertView*)alertView;

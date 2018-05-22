@@ -180,9 +180,9 @@
     UIViewController <PsiCashOnboardingChildViewController>*presentedViewController = [_pageController.viewControllers objectAtIndex:0];
 
     if (presentedViewController.index == PsiCashOnboardingPage3Index) {
-        [nextButton setTitle:@"DONE" forState:UIControlStateNormal];
+        [nextButton setTitle:NSLocalizedStringWithDefaultValue(@"ONBOARDING_DONE_BUTTON", nil, [NSBundle mainBundle], @"DONE", @"Text of button at the bottom right or left (depending on rtl) of the last onboarding screen which allows the user to finish the onboarding sequence. Note: should be all uppercase (capitalized) when possible.") forState:UIControlStateNormal];
     } else {
-        [nextButton setTitle:@"NEXT" forState:UIControlStateNormal];
+        [nextButton setTitle:NSLocalizedStringWithDefaultValue(@"ONBOARDING_NEXT_BUTTON", nil, [NSBundle mainBundle], @"NEXT", @"Text of button at the bottom right or left (depending on rtl) of the onboarding screens which allows the user to move on to the next onboarding screen. Note: should be all uppercase (capitalized) when possible.") forState:UIControlStateNormal];
     }
 }
 

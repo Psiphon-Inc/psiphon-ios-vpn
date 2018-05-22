@@ -1102,7 +1102,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     if (![model hasAuthPackage] || ![model.authPackage hasSpenderToken]) {
         return;
     } else if ([model hasActiveSpeedBoostPurchase]) {
-        alertView = [PsiCashPurchaseAlertView alreadySpeedBoostingAlertWithNMinutesRemaining:[model minutesOfSpeedBoostRemaining]];
+        alertView = [PsiCashPurchaseAlertView alreadySpeedBoostingAlert];
     } else  if ([model hasPendingPurchase]) {
         // (PsiCash 1.0): Do nothing
         //alertView = [PsiCashPurchaseAlertView pendingPurchaseAlert];
