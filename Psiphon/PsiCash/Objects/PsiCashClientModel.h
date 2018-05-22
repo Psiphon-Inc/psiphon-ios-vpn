@@ -28,11 +28,13 @@
 @property (strong, atomic) PsiCashSpeedBoostProduct *speedBoostProduct;
 @property (strong, atomic) NSArray<id<PsiCashProductSKU>> *pendingPurchases;
 @property (strong, atomic) PsiCashPurchase *activeSpeedBoostPurchase;
+@property (nonatomic, assign) BOOL refreshPending;
 + (PsiCashClientModel*)clientModelWithAuthPackage:(PsiCashAuthPackage*)authPackage
                                        andBalance:(NSNumber*)balance
                              andSpeedBoostProduct:(PsiCashSpeedBoostProduct*)speedBoostProduct
                               andPendingPurchases:(NSArray<id<PsiCashProductSKU>>*)pendingPurchases
-                      andActiveSpeedBoostPurchase:(PsiCashPurchase*)activeSpeedBoostPurchase;
+                      andActiveSpeedBoostPurchase:(PsiCashPurchase*)activeSpeedBoostPurchase
+                                andRefreshPending:(BOOL)refreshPending;
 + (NSString*)formattedBalance:(NSNumber*)balance;
 - (PsiCashSpeedBoostProductSKU*)maxSpeedBoostPurchaseEarned;
 - (PsiCashSpeedBoostProductSKU*)minSpeedBoostPurchaseAvailable;

@@ -28,6 +28,7 @@
 @end
 
 @implementation PsiCashBalanceWithSpeedBoostMeter {
+    UIActivityIndicatorView *activityIndicator;
     UIImageView *coin;
 }
 
@@ -51,12 +52,16 @@
 
     // Setup Speed Boost meter
     _meter = [[PsiCashSpeedBoostMeterView alloc] init];
+
+    // Setup activity indicator
+    activityIndicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhite];
 }
 
 - (void)addViews {
     [self addSubview:coin];
     [self addSubview:_balance];
     [self addSubview:_meter];
+    [self addSubview:activityIndicator];
 }
 
 - (void)setupLayoutConstraints {
@@ -71,9 +76,18 @@
     [_meter.topAnchor constraintEqualToAnchor:_balance.bottomAnchor].active = YES;
     [_meter.widthAnchor constraintEqualToAnchor:self.widthAnchor multiplier:0.9].active = YES;
     [_meter.heightAnchor constraintEqualToConstant:50.f].active = YES;
+
+    activityIndicator.translatesAutoresizingMaskIntoConstraints = NO;
+    [activityIndicator.leadingAnchor constraintEqualToAnchor:_balance.balance.trailingAnchor constant:0].active = YES;
+    [activityIndicator.centerYAnchor constraintEqualToAnchor:_balance.centerYAnchor constant:2].active = YES;
 }
 
 - (void)bindWithModel:(PsiCashClientModel *)clientModel {
+    if (clientModel.refreshPending) {
+        [activityIndicator startAnimating];
+    } else {
+        [activityIndicator stopAnimating];
+    }
     [_balance bindWithModel:clientModel];
     [_meter bindWithModel:clientModel];
 }
