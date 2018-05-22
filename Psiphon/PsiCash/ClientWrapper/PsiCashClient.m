@@ -240,6 +240,7 @@ NSErrorDomain _Nonnull const PsiCashClientLibraryErrorDomain = @"PsiCashClientLi
     [stagingArea updateActivePurchases:[self getActivePurchases]];
     [stagingArea updateAuthPackage:[[PsiCashAuthPackage alloc] initWithValidTokens:psiCash.validTokenTypes]];
     [stagingArea updateSpeedBoostProduct:[self speedBoostProductFromPurchasePrices:psiCash.purchasePrices withTargetProducts:[self targetProducts]]];
+    [stagingArea updateRefreshPending:NO];
     [self commitModelStagingArea:stagingArea];
 }
 
@@ -277,7 +278,9 @@ NSErrorDomain _Nonnull const PsiCashClientLibraryErrorDomain = @"PsiCashClientLi
 
         PsiCashClientModelStagingArea *stagingArea = [[PsiCashClientModelStagingArea alloc] initWithModel:model];
         if (r.inProgress) {
+            [stagingArea updateRefreshPending:YES];
             [stagingArea updateActivePurchases:[self getActivePurchases]];
+            [self commitModelStagingArea:stagingArea];
             // Do nothing or refresh from lib?
         } else {
             PsiCashAuthPackage *authPackage = [[PsiCashAuthPackage alloc] initWithValidTokens:r.validTokenTypes];
@@ -286,10 +289,16 @@ NSErrorDomain _Nonnull const PsiCashClientLibraryErrorDomain = @"PsiCashClientLi
             PsiCashSpeedBoostProduct *speedBoostProduct = [self speedBoostProductFromPurchasePrices:r.purchasePrices withTargetProducts:[self targetProducts]];
             [stagingArea updateSpeedBoostProduct:speedBoostProduct];
             [stagingArea updateActivePurchases:[self getActivePurchases]];
+            [stagingArea updateRefreshPending:NO];
             [self commitModelStagingArea:stagingArea];
         }
 
     } error:^(NSError * _Nullable error) {
+
+        PsiCashClientModelStagingArea *stagingArea = [[PsiCashClientModelStagingArea alloc] initWithModel:model];
+        [stagingArea updateRefreshPending:NO];
+        [self commitModelStagingArea:stagingArea];
+
         [PsiFeedbackLogger errorWithType:PsiCashLogType message:@"%s failed to refresh state %@", __FUNCTION__, error.localizedDescription];
         [self displayAlertWithMessage:@"Failed to sync PsiCash state"];
     } completed:^{

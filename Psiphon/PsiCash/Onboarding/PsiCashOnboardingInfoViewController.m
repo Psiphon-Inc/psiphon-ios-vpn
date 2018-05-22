@@ -157,7 +157,8 @@
                                                                 andBalance:[NSNumber numberWithInteger:0]
                                                       andSpeedBoostProduct:[PsiCashSpeedBoostProduct productWithSKUs:@[sku]]
                                                        andPendingPurchases:nil
-                                               andActiveSpeedBoostPurchase:nil];
+                                               andActiveSpeedBoostPurchase:nil
+                                                         andRefreshPending:NO];
 
     if (self.index == PsiCashOnboardingPage2Index) {
         [meter bindWithModel:[m copy]];
