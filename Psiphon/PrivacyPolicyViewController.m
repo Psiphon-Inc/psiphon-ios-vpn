@@ -136,10 +136,63 @@ typedef NS_ERROR_ENUM(PrivacyPolicyErrorDomain, PrivacyPolicyLinkGenerationError
     UIScrollView *_scrollView;
     UIStackView *_stackView;
 }
+
+// Force portrait orientation
+- (UIInterfaceOrientationMask)supportedInterfaceOrientations {
+    return (UIInterfaceOrientationMaskPortrait | UIInterfaceOrientationMaskPortraitUpsideDown);
+}
+
 - (void)viewDidLoad {
     [super viewDidLoad];
 
     self.view.backgroundColor = UIColor.whiteColor;
+
+    UIEdgeInsets safeAreaInsets;
+    if (@available(iOS 11.0, *)) {
+        safeAreaInsets = UIApplication.sharedApplication.keyWindow.safeAreaInsets;  // Note that self.view.safeAreaInsets is 0 at viewDidLoad
+    } else {
+        safeAreaInsets = UIApplication.sharedApplication.keyWindow.layoutMargins;
+    }
+
+    // Get started with Psiphon button
+    UIView *getStartedContainer = [[UIView alloc] init];
+    {
+        getStartedContainer.backgroundColor = UIColor.paleBlueColor;
+        [self.view addSubview:getStartedContainer];
+
+        // getStartedContainer constraints
+        getStartedContainer.translatesAutoresizingMaskIntoConstraints = FALSE;
+        getStartedContainer.preservesSuperviewLayoutMargins = TRUE;
+        [getStartedContainer.widthAnchor constraintEqualToAnchor:self.view.widthAnchor].active = TRUE;
+        [getStartedContainer.centerXAnchor constraintEqualToAnchor:self.view.layoutMarginsGuide.centerXAnchor].active = TRUE;
+        [getStartedContainer.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor].active = TRUE;
+        [getStartedContainer.heightAnchor constraintEqualToConstant:(CGFloat) (62.0 + safeAreaInsets.bottom)].active = TRUE;
+
+        UIButton *getStartedButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+        getStartedButton.backgroundColor = UIColor.clearBlueColor;
+        getStartedButton.layer.cornerRadius = 5.0;
+        getStartedButton.layer.masksToBounds = FALSE;
+        getStartedButton.layer.shadowColor = [UIColor.clearBlue50Color CGColor];
+        getStartedButton.layer.shadowRadius = 6;
+        getStartedButton.layer.shadowOpacity = 1;
+        getStartedButton.layer.shadowOffset = CGSizeMake(1.0, 1.0);
+        getStartedButton.titleEdgeInsets = UIEdgeInsetsMake(0.0, 24.0, 0.0, 24.0);
+
+        [getStartedButton setTitle:NSLocalizedStringWithDefaultValue(@"PrivacyPolicyGetStartedButtonTitle", nil, [NSBundle mainBundle], @"Get started with Psiphon", @"Button label at the end of privacy policy screen, indication that when clicked user can start using Psiphon")
+                          forState:UIControlStateNormal];
+        [getStartedButton setTitleColor:UIColor.whiteColor forState:UIControlStateNormal];
+        [getStartedButton addTarget:self action:@selector(onGetStartedTap) forControlEvents:UIControlEventTouchUpInside];
+        [getStartedContainer addSubview:getStartedButton];
+
+        // Get started button constraints
+        getStartedButton.translatesAutoresizingMaskIntoConstraints = FALSE;
+        getStartedButton.preservesSuperviewLayoutMargins = TRUE;
+        [getStartedButton.widthAnchor constraintEqualToConstant:223.0].active = TRUE;
+        [getStartedButton.centerXAnchor constraintEqualToAnchor:getStartedContainer.centerXAnchor].active = TRUE;
+        [getStartedButton.topAnchor constraintEqualToAnchor:getStartedContainer.topAnchor constant:16.0].active = TRUE;
+//        [getStartedButton.centerYAnchor constraintEqualToAnchor:getStartedContainer.centerYAnchor].active = TRUE;
+        [getStartedButton.heightAnchor constraintEqualToConstant:42.0].active = TRUE;
+    }
 
     // scrollView
     _scrollView = [[UIScrollView alloc] init];
@@ -154,7 +207,7 @@ typedef NS_ERROR_ENUM(PrivacyPolicyErrorDomain, PrivacyPolicyLinkGenerationError
     } else {
         [_scrollView.topAnchor constraintEqualToAnchor:self.topLayoutGuide.bottomAnchor].active = TRUE;
     }
-    [_scrollView.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor].active = TRUE;
+    [_scrollView.bottomAnchor constraintEqualToAnchor:getStartedContainer.topAnchor].active = TRUE;
 
     // stackView
     _stackView = [[UIStackView alloc] init];
@@ -173,76 +226,41 @@ typedef NS_ERROR_ENUM(PrivacyPolicyErrorDomain, PrivacyPolicyLinkGenerationError
     [_stackView.topAnchor constraintEqualToAnchor:_scrollView.topAnchor].active = TRUE;
     [_stackView.bottomAnchor constraintEqualToAnchor:_scrollView.bottomAnchor].active = TRUE;
     
-    UIEdgeInsets safeAreaInsets;
-    if (@available(iOS 11.0, *)) {
-        safeAreaInsets = UIApplication.sharedApplication.keyWindow.safeAreaInsets;  // Note that self.view.safeAreaInsets is 0 at viewDidLoad
-    } else {
-        safeAreaInsets = UIApplication.sharedApplication.keyWindow.layoutMargins;
-    }
-    
     // Margin to be applied to the texts
     _stackView.layoutMargins = UIEdgeInsetsMake(0.0, 16.0, 0.0, 16);
 
     // Adds all StackView elements to the _stackView.
     [self addStackedViews:_stackView safeAreaInsets:safeAreaInsets];
-    
-    // Get started button
-    SwoopView *getStartedContainer = [[SwoopView alloc] init];
-    [getStartedContainer setColor:UIColor.paleBlueColor];
-    [_stackView addArrangedSubview:getStartedContainer];
-    getStartedContainer.translatesAutoresizingMaskIntoConstraints = FALSE;
-    getStartedContainer.preservesSuperviewLayoutMargins = TRUE;
-    [getStartedContainer.widthAnchor constraintEqualToAnchor:_scrollView.widthAnchor].active = TRUE;
-    [getStartedContainer.centerXAnchor constraintEqualToAnchor:_scrollView.layoutMarginsGuide.centerXAnchor].active = TRUE;
-    [getStartedContainer.heightAnchor constraintEqualToConstant:140.0].active = TRUE;
-    
-    UIButton *getStartedButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
-    getStartedButton.backgroundColor = UIColor.clearBlueColor;
-    getStartedButton.layer.cornerRadius = 5.0;
-    getStartedButton.layer.masksToBounds = FALSE;
-    getStartedButton.layer.shadowColor = [UIColor.clearBlue50Color CGColor];
-    getStartedButton.layer.shadowRadius = 6;
-    getStartedButton.layer.shadowOpacity = 1;
-    getStartedButton.layer.shadowOffset = CGSizeMake(1.0, 1.0);
-    getStartedButton.titleEdgeInsets = UIEdgeInsetsMake(0.0, 24.0, 0.0, 24.0);
-    
-    [getStartedButton setTitle:NSLocalizedStringWithDefaultValue(@"PrivacyPolicyGetStartedButtonTitle", nil, [NSBundle mainBundle], @"Get started with Psiphon", @"Button label at the end of privacy policy screen, indication that when clicked user can start using Psiphon")
+
+
+    // Cancel button
+    {
+        UIButton *cancelButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+        cancelButton.titleEdgeInsets = UIEdgeInsetsMake(0.0, 5.0, 0.0, 5.0);
+        [cancelButton sizeToFit];
+        cancelButton.backgroundColor = [UIColor colorWithWhite:1.0 alpha:0.9];
+        cancelButton.layer.masksToBounds = FALSE;
+        cancelButton.layer.cornerRadius = 10.0;
+        cancelButton.layer.shadowColor = [UIColor.darkGrayColor CGColor];
+        cancelButton.layer.shadowRadius = 4;
+        cancelButton.layer.shadowOpacity = 0.3;
+        cancelButton.layer.shadowOffset = CGSizeMake(1.0, 1.0);
+        [cancelButton setTitle:NSLocalizedStringWithDefaultValue(@"PRIVACY_POLICY_CANCEL_BUTTON", nil, [NSBundle mainBundle], @"Cancel", @"Cancel button title.")
                       forState:UIControlStateNormal];
-    [getStartedButton setTitleColor:UIColor.whiteColor forState:UIControlStateNormal];
-    [getStartedButton addTarget:self action:@selector(onGetStartedTap) forControlEvents:UIControlEventTouchUpInside];
-    [getStartedContainer addSubview:getStartedButton];
-    
-    // Get started button constraints
-    getStartedButton.translatesAutoresizingMaskIntoConstraints = FALSE;
-    getStartedButton.preservesSuperviewLayoutMargins = TRUE;
-    [getStartedButton.widthAnchor constraintEqualToConstant:223.0].active = TRUE;
-    [getStartedButton.centerXAnchor constraintEqualToAnchor:getStartedContainer.centerXAnchor].active = TRUE;
-    [getStartedButton.centerYAnchor constraintEqualToAnchor:getStartedContainer.centerYAnchor].active = TRUE;
-    [getStartedButton.heightAnchor constraintEqualToConstant:52.0].active = TRUE;
+        [cancelButton setTitleColor:UIColor.darkGrayColor forState:UIControlStateNormal];
+        [cancelButton addTarget:self action:@selector(onCancelTap) forControlEvents:UIControlEventTouchUpInside];
+        [self.view addSubview:cancelButton];
 
-    // Close button
-    UIButton *cancelButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
-    cancelButton.backgroundColor = [UIColor colorWithWhite:1.0 alpha:0.9];
-    cancelButton.layer.masksToBounds = FALSE;
-    cancelButton.layer.cornerRadius = 10.0;
-    cancelButton.layer.shadowColor = [UIColor.darkGrayColor CGColor];
-    cancelButton.layer.shadowRadius = 4;
-    cancelButton.layer.shadowOpacity = 0.3;
-    cancelButton.layer.shadowOffset = CGSizeMake(1.0, 1.0);
-    [cancelButton setTitle:@"X" forState:UIControlStateNormal];
-    [cancelButton setTitleColor:UIColor.darkGrayColor forState:UIControlStateNormal];
-    [cancelButton addTarget:self action:@selector(onCancelTap) forControlEvents:UIControlEventTouchUpInside];
-    [self.view addSubview:cancelButton];
-
-    // Close button constraints
-    cancelButton.translatesAutoresizingMaskIntoConstraints = FALSE;
-    if (@available(iOS 11.0, *)) {
-        [cancelButton.topAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.topAnchor constant:10].active = TRUE;
-    } else {
-        [cancelButton.topAnchor constraintEqualToAnchor:self.topLayoutGuide.bottomAnchor constant:10].active = TRUE;
+        // Close button constraints
+        cancelButton.translatesAutoresizingMaskIntoConstraints = FALSE;
+        [cancelButton.widthAnchor constraintEqualToConstant:60.0].active = TRUE;
+        if (@available(iOS 11.0, *)) {
+            [cancelButton.topAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.topAnchor constant:10].active = TRUE;
+        } else {
+            [cancelButton.topAnchor constraintEqualToAnchor:self.topLayoutGuide.bottomAnchor constant:10].active = TRUE;
+        }
+        [cancelButton.trailingAnchor constraintEqualToAnchor:self.view.layoutMarginsGuide.trailingAnchor constant:0.0].active = TRUE;
     }
-    [cancelButton.trailingAnchor constraintEqualToAnchor:self.view.layoutMarginsGuide.trailingAnchor constant:0.0].active = TRUE;
-
 }
 
 - (void)addStackedViews:(UIStackView *)stackView safeAreaInsets:(UIEdgeInsets)safeAreaInsets{
