@@ -211,6 +211,9 @@
 /* ('Privacy Policy' should be the same translation as privacy policy button VPN_START_PRIVACY_POLICY_BUTTON), (Do not translate 'VPN profile'), (Do not translate 'Psiphon') */
 "VPN_START_PERMISSION_DENIED_MESSAGE" = "Psiphon needs your permission to install a VPN profile in order to connect.\n\nPsiphon is committed to protecting the privacy of our users. You can review our privacy policy by tapping \"Privacy Policy\".";
 
+/* Dismiss button title. Dismisses pop-up alert when the user clicks on the button */
+"VPN_START_PERMISSION_DISMISS_BUTTON" = "Dismiss";
+
 /* Alert dialog title indicating to the user that Psiphon needs their permission */
 "VPN_START_PERMISSION_REQUIRED_TITLE" = "Permission required";
 
