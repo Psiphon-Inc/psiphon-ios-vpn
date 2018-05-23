@@ -27,13 +27,15 @@
                                        andBalance:(NSNumber*)balance
                              andSpeedBoostProduct:(PsiCashSpeedBoostProduct*)speedBoostProduct
                               andPendingPurchases:(NSArray<id<PsiCashProductSKU>>*)pendingPurchases
-                      andActiveSpeedBoostPurchase:(PsiCashPurchase* /* TODO: typing */)activeSpeedBoostPurchase {
+                      andActiveSpeedBoostPurchase:(PsiCashPurchase* /* TODO: typing */)activeSpeedBoostPurchase
+                                andRefreshPending:(BOOL)refreshPending {
     PsiCashClientModel *clientModel = [[PsiCashClientModel alloc] init];
     clientModel.authPackage = authPackage;
     clientModel.balance = balance;
     clientModel.speedBoostProduct = speedBoostProduct;
     clientModel.pendingPurchases = pendingPurchases;
     clientModel.activeSpeedBoostPurchase = activeSpeedBoostPurchase;
+    clientModel.refreshPending = refreshPending;
     return clientModel;
 }
 
@@ -92,7 +94,8 @@
                                                andBalance:self.balance
                                      andSpeedBoostProduct:self.speedBoostProduct /* TODO: copy this? */
                                       andPendingPurchases:self.pendingPurchases /* TODO: copy this? */
-                              andActiveSpeedBoostPurchase:self.activeSpeedBoostPurchase];
+                              andActiveSpeedBoostPurchase:self.activeSpeedBoostPurchase
+                                        andRefreshPending:self.refreshPending];
 }
 
 @end

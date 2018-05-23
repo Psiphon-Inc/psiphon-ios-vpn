@@ -21,6 +21,9 @@
 /* Alert message informing user that subscription receipt can not be verified */
 "BAD_RECEIPT_ALERT_MESSAGE" = "Your subscription receipt can not be verified, please refresh it and try again.";
 
+/* Alert buy button */
+"BUY_BUTTON" = "Buy";
+
 /* Title of button on alert view which shows the progress of the user's buy request. Hitting this button dismisses the alert and the buy request continues processing in the background. */
 "BUY_REQUEST_PROGRESS_ALERT_DISMISS_BUTTON_TITLE" = "Dismiss";
 
@@ -94,6 +97,9 @@
 /* Alert OK Button */
 "OK_BUTTON" = "OK";
 
+/* Text of button at the bottom right or left (depending on rtl) of the last onboarding screen which allows the user to finish the onboarding sequence. Note: should be all uppercase (capitalized) when possible. */
+"ONBOARDING_DONE_BUTTON" = "DONE";
+
 /* Text of button at the bottom right or left (depending on rtl) of the onboarding screens which allows the user to move on to the next onboarding screen. Note: should be all uppercase (capitalized) when possible. */
 "ONBOARDING_NEXT_BUTTON" = "NEXT";
 
@@ -102,6 +108,9 @@
 
 /* External link to the privacy policy page. Please update this with the correct language specific link (if available) e.g. https://psiphon.ca/fr/privacy.html for french. */
 "PRIVACY_POLICY_URL" = "https://psiphon.ca/en/privacy.html";
+
+/* Text which appears in the Speed Boost meter when the user's buy request for Speed Boost is being processed. Please keep this text concise as the width of the text box is restricted in size. */
+"PSICASH_BUYING_SPEED_BOOST_TEXT" = "Buying Speed Boost...";
 
 /* Text conveying to the user how much the displayed number of hours of Speed Boost costs. %@ should be not be removed but placed in the appropriate location because it will be replaced with the number of hours programmatically. After this sentence the cost of the Speed Boost item will be displayed. For example '1 hour of Speed Boost at 50'. */
 "PSICASH_CONVERSION_HOUR_MESSAGE" = "%@ hour of Speed Boost at";
@@ -132,6 +141,45 @@
 
 /* Title text on the third PsiCash onboarading screen */
 "PSICASH_ONBOARDING_PAGE_3_TITLE" = "Speed Boost";
+
+/* Alert error message informing user that the app failed to retrieve their PsiCash information from the server */
+"PSICASH_REFRESH_STATE_FAILED_MESSAGE_TEXT" = "Failed to update PsiCash state";
+
+/* Text which appears in the Speed Boost meter when the user has activated Speed Boost. Please keep this text concise as the width of the text box is restricted in size. */
+"PSICASH_SPEED_BOOST_ACTIVE_TEXT" = "Speed Boost Active";
+
+/* Text which appears in the Speed Boost meter when the user has earned enough PsiCash to buy Speed Boost. Please keep this text concise as the width of the text box is restricted in size. */
+"PSICASH_SPEED_BOOST_AVAILABLE_TEXT" = "Speed Boost Available";
+
+/* Text which appears in the Speed Boost meter when the user has not yet earned enough PsiCash to Speed Boost. This text will be accompanied with a percentage indicating to the user how close they are to earning enough PsiCash to buy a minimum amount of Speed Boost. Please keep this text concise as the width of the text box is restricted in size. */
+"PSICASH_SPEED_BOOST_CHARGING_TEXT" = "Speed Boost Charging";
+
+/* Text which appears in the Speed Boost meter when the user has not earned any PsiCash yet. Please keep this text concise as the width of the text box is restricted in size. */
+"PSICASH_SPEED_BOOST_NOAUTH_TEXT" = "Earn PsiCash to buy Speed Boost";
+
+/* Alert error message informing user that their Speed Boost purchase request failed because they already have an active Speed Boost purchase */
+"PSICASH_SPEED_BOOST_PURCHASE_FAILED_ALREADY_ACTIVE_PURCHASE" = "Error: you already have an active Speed Boost purchase.";
+
+/* Alert error message informing user that their Speed Boost purchase request failed because they have an insufficient balance. Required price will be appended after the colon. */
+"PSICASH_SPEED_BOOST_PURCHASE_FAILED_INSUFFICIENT_FUNDS" = "Insufficient balance for Speed Boost purchase. Price:";
+
+/* Alert error message informing user that their Speed Boost purchase request failed because their app has entered an invalid state and that they should try updating or reinstalling the app */
+"PSICASH_SPEED_BOOST_PURCHASE_FAILED_INVALID_TOKENS" = "Invalid Tokens: the app has entered an invalid state. Please reinstall the app to continue using PsiCash.";
+
+/* Alert message informing user that their Speed Boost purchase attempt unexpectedly failed and that they should try again in a few minutes. */
+"PSICASH_SPEED_BOOST_PURCHASE_FAILED_MESSAGE_TEXT" = "Purchase failed, please try again in a few minutes.";
+
+/* Alert error message informing user that their Speed Boost purchase request failed because they tried to make the purchase with an out of date product price. Updated price will be appended after the colon. */
+"PSICASH_SPEED_BOOST_PURCHASE_FAILED_PRICE_OUT_OF_DATE" = "Error: price of Speed Boost is out of date. Price:";
+
+/* Alert error message informing user that their Speed Boost purchase request failed because they attempted to buy a product that is no longer available and that they should try updating or reinstalling the app */
+"PSICASH_SPEED_BOOST_PURCHASE_FAILED_PRODUCT_NOT_FOUND" = "Error: Speed Boost product not found. Local products updated. Your app may be out of date. Please check for updates.";
+
+/* Alert error message informing user that their Speed Boost purchase request failed due to a server error and that they should try again in a few minutes */
+"PSICASH_SPEED_BOOST_PURCHASE_FAILED_SERVER_ERROR" = "Server error. Please try again in a few minutes.";
+
+/* Alert error message informing user that their Speed Boost purchase request failed because of an unknown error */
+"PSICASH_SPEED_BOOST_PURCHASE_FAILED_UNEXPECTED_CODE" = "Invalid or unexpected status code returned from PsiCash library.";
 
 /* Refresh app receipt button title */
 "REFRESH_APP_RECEIPT_BUTTON_TITLE" = "Refresh app receipt";

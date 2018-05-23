@@ -1102,7 +1102,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     if (![model hasAuthPackage] || ![model.authPackage hasSpenderToken]) {
         return;
     } else if ([model hasActiveSpeedBoostPurchase]) {
-        alertView = [PsiCashPurchaseAlertView alreadySpeedBoostingAlertWithNMinutesRemaining:[model minutesOfSpeedBoostRemaining]];
+        alertView = [PsiCashPurchaseAlertView alreadySpeedBoostingAlert];
     } else  if ([model hasPendingPurchase]) {
         // (PsiCash 1.0): Do nothing
         //alertView = [PsiCashPurchaseAlertView pendingPurchaseAlert];
@@ -1191,7 +1191,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 
             NSComparisonResult balanceChange = [model.balance compare:newClientModel.balance];
             if (balanceChange != NSOrderedSame) {
-                [self animateBalanceChangeOf:[NSNumber numberWithDouble:newClientModel.balance.doubleValue - model.balance.doubleValue]];
+                [PsiCashBalanceWithSpeedBoostMeter animateBalanceChangeOf:[NSNumber numberWithDouble:newClientModel.balance.doubleValue - model.balance.doubleValue] withPsiCashView:psiCashView inParentView:self.view];
             }
 
             model = newClientModel;
@@ -1200,48 +1200,8 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                 [self showPsiCashAlertView];
             }
 
-            if (balanceChange == NSOrderedAscending) {
-                [PsiCashBalanceWithSpeedBoostMeter earnAnimationWithCompletion:self.view andPsiCashView:psiCashView andCompletion:^{
-                    [psiCashView bindWithModel:model];
-                }];
-                [psiCashView.balance bindWithModel:model];
-                return;
-            }
-
             [psiCashView bindWithModel:model];
         }
-    }];
-}
-
-- (void)animateBalanceChangeOf:(NSNumber*)delta {
-    UILabel *changeLabel = [[UILabel alloc] init];
-    changeLabel.adjustsFontSizeToFitWidth = YES;
-    if ([delta doubleValue] > 0) {
-        changeLabel.text = [NSString stringWithFormat:@"+%@", [PsiCashClientModel formattedBalance:delta]];
-        changeLabel.textColor = [UIColor colorWithRed:0.15 green:0.90 blue:0.51 alpha:1.0];
-    } else {
-        changeLabel.text = [PsiCashClientModel formattedBalance:delta];
-        changeLabel.textColor = [UIColor colorWithRed:0.16 green:0.38 blue:1.00 alpha:1.0];
-    }
-    changeLabel.translatesAutoresizingMaskIntoConstraints = NO;
-
-    changeLabel.font = [UIFont systemFontOfSize:16];
-    [self.view addSubview:changeLabel];
-
-    [changeLabel.leadingAnchor constraintEqualToAnchor:psiCashView.balance.trailingAnchor constant:5].active = YES;
-    [changeLabel.trailingAnchor constraintLessThanOrEqualToAnchor:self.view.trailingAnchor constant:10].active = YES;
-    [changeLabel.centerYAnchor constraintEqualToAnchor:psiCashView.balance.centerYAnchor constant:2].active = YES;
-
-    changeLabel.alpha = 0;
-    [UIView animateKeyframesWithDuration:1.5 delay:0 options:UIViewKeyframeAnimationOptionCalculationModeLinear animations:^{
-        [UIView addKeyframeWithRelativeStartTime:0 relativeDuration:0.25 animations:^{
-            changeLabel.alpha = 1;
-        }];
-        [UIView addKeyframeWithRelativeStartTime:0.75 relativeDuration:0.25 animations:^{
-            changeLabel.alpha = 0;
-        }];
-    } completion:^(BOOL finished) {
-        [changeLabel removeFromSuperview];
     }];
 }
 
