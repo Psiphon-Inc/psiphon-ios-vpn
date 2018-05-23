@@ -123,6 +123,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     PsiCashPurchaseAlertView *alertView;
     PsiCashClientModel *model;
     PsiCashBalanceWithSpeedBoostMeter *psiCashView;
+    NSLayoutConstraint *psiCashViewHeight;
     RACDisposable *psiCashViewUpdates;
     UIView *swoopView;
     NSArray<StarView*> *stars;
@@ -281,15 +282,13 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
               return;
           }
 
-          BOOL showPsiCashUI = (s == UserSubscriptionInactive);
-
           subscriptionButton.hidden = (s == UserSubscriptionActive);
           adLabel.hidden = (s == UserSubscriptionActive) || ![self.adManager untunneledInterstitialIsReady];
           subscriptionButtonTopConstraint.active = !subscriptionButton.hidden;
           bottomBarTopConstraint.active = subscriptionButton.hidden;
 
-          // PsiCash
-          psiCashView.hidden = !showPsiCashUI;
+          BOOL showPsiCashUI = (s == UserSubscriptionInactive);
+          [self setPsiCashContentHidden:!showPsiCashUI];
 
       } error:^(NSError *error) {
           [self.compoundDisposable removeDisposable:disposable];
@@ -1210,12 +1209,13 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     } else {
         [psiCashView.widthAnchor constraintEqualToAnchor:self.view.widthAnchor multiplier:0.95].active = YES;
     }
-    [psiCashView.heightAnchor constraintEqualToConstant:100].active = YES;
+    psiCashViewHeight = [psiCashView.heightAnchor constraintEqualToConstant:100];
+    psiCashViewHeight.active = YES;
 
     // Highlight PsiCashView
     NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
     if (![userDefaults boolForKey:PsiCashHasBeenOnboardedBoolKey]) {
-        [self highlightPsiCashOnboardingWithStars];
+        [self highlightPsiCashViewWithStars];
     }
 
     __weak MainViewController *weakSelf = self;
@@ -1244,7 +1244,19 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     }];
 }
 
-- (void)highlightPsiCashOnboardingWithStars {
+- (void)setPsiCashContentHidden:(BOOL)hidden {
+    [self setStarsHidden:hidden];
+    psiCashView.hidden = hidden;
+    psiCashViewHeight.constant = hidden ? 0 : 100;
+}
+
+- (void)setStarsHidden:(BOOL)hidden {
+    for (StarView *star in stars) {
+        star.hidden = hidden;
+    }
+}
+
+- (void)highlightPsiCashViewWithStars {
     StarView *star1 = [[StarView alloc] init];
     [self.view addSubview:star1];
 
