@@ -48,6 +48,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)removeSpeedBoostProductSKU:(PsiCashSpeedBoostProductSKU*)sku;
 - (void)updatePendingPurchases:(NSArray<id<PsiCashProductSKU>>*_Nullable)purchases;
 - (void)updateActivePurchases:(NSArray<PsiCashPurchase*>*)activePurchases;
+- (void)updateRefreshPending:(BOOL)refreshPending;
 
 @end
 

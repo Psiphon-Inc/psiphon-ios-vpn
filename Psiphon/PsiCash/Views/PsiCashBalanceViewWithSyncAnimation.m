@@ -32,8 +32,10 @@
 #pragma mark -
 
 @implementation PsiCashBalanceView {
+    NSNumber *prevBalance;
     UIView *containerView;
-    NSTimer *animationTimer;
+    UIActivityIndicatorView *activityIndicator;
+    BOOL authed;
 }
 
 -(id)initWithFrame:(CGRect)frame {
@@ -65,6 +67,8 @@
     self.backgroundColor = [UIColor colorWithWhite:0 alpha:.12];
     self.contentEdgeInsets = UIEdgeInsetsMake(10.0f, 30.0f, 10.0f, 30.0f);
 
+    activityIndicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhiteLarge];
+
     // Setup container view
     containerView = [[UIView alloc] init];
 
@@ -87,6 +91,7 @@
     [self addSubview:containerView];
     [self addSubview:_balance];
     [self addSubview:_coin];
+    [self addSubview:activityIndicator];
 }
 
 - (void)setupLayoutConstraints {
@@ -110,31 +115,29 @@
     [_coin.centerYAnchor constraintEqualToAnchor:_balance.centerYAnchor].active = YES;
     [_coin.leadingAnchor constraintEqualToAnchor:containerView.leadingAnchor].active = YES;
     [_coin.trailingAnchor constraintEqualToAnchor:_balance.leadingAnchor constant:-10].active = YES;
+
+    activityIndicator.translatesAutoresizingMaskIntoConstraints = NO;
+    [activityIndicator.centerXAnchor constraintEqualToAnchor:_coin.centerXAnchor].active = YES;
+    [activityIndicator.centerYAnchor constraintEqualToAnchor:_coin.centerYAnchor].active = YES;
 }
 
-- (NSTimer*)animateBalanceChangeFrom:(NSNumber*)previousBalance toNewBalance:(NSNumber*)newBalance {
-    NSComparisonResult equality = [previousBalance compare:newBalance];
-    if (equality == NSOrderedSame) {
-        return nil; // nothing to animate
-    }
-
+- (void)animateBalanceChangeFrom:(NSNumber*)previousBalance toNewBalance:(NSNumber*)newBalance {
     __block double currentBalance = previousBalance.doubleValue;
-    double chunks = equality == NSOrderedAscending ? 1e9 : -1e9;
-    double balanceDiff = newBalance.doubleValue - currentBalance;
+    double chunks = newBalance.doubleValue >= currentBalance ? 1e9 : -1e9;
+
 
     NSTimeInterval animationTime = 1;
-    NSTimeInterval animationIntervals = (animationTime * chunks) / balanceDiff;
-    NSTimeInterval minAnimationInterval = 0.01;
+    NSTimeInterval animationIntervals = animationTime / ((newBalance.doubleValue - currentBalance) / chunks);
 
-    if (animationIntervals < minAnimationInterval) {
-        chunks = 1e9 * roundf((balanceDiff * minAnimationInterval) / (animationTime * 1e9));
-        animationIntervals = minAnimationInterval;
+    if (animationIntervals < 0.0001) {
+        CGFloat minInterval = 0.001;
+        chunks = 1e9 * roundf(((newBalance.doubleValue - currentBalance) * minInterval) / (animationTime * 1e9));
+        animationIntervals = minInterval;
     }
 
-    return [NSTimer scheduledTimerWithTimeInterval:animationIntervals repeats:YES block:^(NSTimer * _Nonnull timer) {
+    [NSTimer scheduledTimerWithTimeInterval:animationIntervals repeats:YES block:^(NSTimer * _Nonnull timer) {
         currentBalance += chunks;
         _balance.text = [PsiCashClientModel formattedBalance:[NSNumber numberWithDouble:currentBalance]];
-
         BOOL done = FALSE;
         if (chunks >= 0 && currentBalance >= self.model.balance.doubleValue) {
             done = TRUE;
@@ -152,18 +155,23 @@
 #pragma mark - State Changes
 
 - (void)bindWithModel:(PsiCashClientModel*)clientModel {
-    NSNumber *previousBalance = self.model.balance;
     self.model = clientModel;
 
     if ([self.model hasAuthPackage]) {
         if ([self.model.authPackage hasIndicatorToken]) {
-            if (previousBalance == nil) {
-                _balance.text = [PsiCashClientModel formattedBalance:clientModel.balance];
+            if (self.model.refreshPending) {
+                [activityIndicator startAnimating];
             } else {
-                _balance.text = [PsiCashClientModel formattedBalance:previousBalance];
-                [animationTimer invalidate];
-                animationTimer = [self animateBalanceChangeFrom:previousBalance toNewBalance:clientModel.balance];
+                [activityIndicator stopAnimating];
             }
+            if (!authed) {
+                _balance.text = [PsiCashClientModel formattedBalance:clientModel.balance];
+                authed = TRUE;
+            } else {
+                _balance.text = [PsiCashClientModel formattedBalance:prevBalance];
+                [self animateBalanceChangeFrom:prevBalance toNewBalance:clientModel.balance];
+            }
+            prevBalance = clientModel.balance;
         } else {
             // First launch: the user has no indicator token
             _balance.text = [PsiCashClientModel formattedBalance:[NSNumber numberWithInteger:0]];

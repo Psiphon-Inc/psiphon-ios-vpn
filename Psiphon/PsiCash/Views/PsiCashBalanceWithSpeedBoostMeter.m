@@ -28,6 +28,7 @@
 @end
 
 @implementation PsiCashBalanceWithSpeedBoostMeter {
+    UIActivityIndicatorView *activityIndicator;
     UIImageView *coin;
 }
 
@@ -51,12 +52,16 @@
 
     // Setup Speed Boost meter
     _meter = [[PsiCashSpeedBoostMeterView alloc] init];
+
+    // Setup activity indicator
+    activityIndicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhite];
 }
 
 - (void)addViews {
     [self addSubview:coin];
     [self addSubview:_balance];
     [self addSubview:_meter];
+    [self addSubview:activityIndicator];
 }
 
 - (void)setupLayoutConstraints {
@@ -71,64 +76,62 @@
     [_meter.topAnchor constraintEqualToAnchor:_balance.bottomAnchor].active = YES;
     [_meter.widthAnchor constraintEqualToAnchor:self.widthAnchor multiplier:0.9].active = YES;
     [_meter.heightAnchor constraintEqualToConstant:50.f].active = YES;
-}
 
-- (void)earnAnimation {
-    [_balance earnAnimation];
+    activityIndicator.translatesAutoresizingMaskIntoConstraints = NO;
+    [activityIndicator.leadingAnchor constraintEqualToAnchor:_balance.balance.trailingAnchor constant:0].active = YES;
+    [activityIndicator.centerYAnchor constraintEqualToAnchor:_balance.centerYAnchor constant:2].active = YES;
 }
 
 - (void)bindWithModel:(PsiCashClientModel *)clientModel {
+    if (clientModel.refreshPending) {
+        [activityIndicator startAnimating];
+    } else {
+        [activityIndicator stopAnimating];
+    }
     [_balance bindWithModel:clientModel];
     [_meter bindWithModel:clientModel];
 }
 
-#pragma mark - Animation helpers
+#pragma mark - animation helpers
 
-+ (void)earnAnimationWithCompletion:(UIView*)parentView andPsiCashView:(PsiCashBalanceWithSpeedBoostMeter*)targetPsiCashView andCompletion:(void (^)(void))completionHandler {
-    CGFloat coinSize = targetPsiCashView.balance.coin.frame.size.width;
-    UIImageView *coin = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"PsiCash_Coin"]];
-    coin.image = [UIImage imageNamed:@"PsiCash_Coin"];
-    coin.layer.minificationFilter = kCAFilterTrilinear;
++ (void)animateBalanceChangeOf:(NSNumber*)delta withPsiCashView:(PsiCashBalanceWithSpeedBoostMeter*)psiCashView inParentView:(UIView*)parentView {
+    UILabel *changeLabel = [[UILabel alloc] init];
+    changeLabel.textAlignment = NSTextAlignmentLeft;
+    changeLabel.adjustsFontSizeToFitWidth = YES;
+    if ([delta doubleValue] > 0) {
+        changeLabel.text = [NSString stringWithFormat:@"+%@", [PsiCashClientModel formattedBalance:delta]];
+        changeLabel.textColor = [UIColor colorWithRed:0.15 green:0.90 blue:0.51 alpha:1.0];
+    } else {
+        changeLabel.text = [PsiCashClientModel formattedBalance:delta];
+        changeLabel.textColor = [UIColor colorWithRed:0.55 green:0.72 blue:1.00 alpha:1.0];
+    }
+    changeLabel.translatesAutoresizingMaskIntoConstraints = NO;
 
-    coin.frame = CGRectMake(0, 0, coinSize, coinSize);
-    CGPoint coinCenter = [targetPsiCashView.balance convertPoint:targetPsiCashView.balance.coin.center toView:parentView];
-    coin.center = coinCenter;
-    [parentView addSubview:coin];
+    changeLabel.font = [UIFont systemFontOfSize:16];
+    [parentView addSubview:changeLabel];
 
-    // Let PsiCashView execute its own earning animation first
-    [targetPsiCashView earnAnimation];
+    [changeLabel.leadingAnchor constraintEqualToAnchor:psiCashView.balance.balance.trailingAnchor constant:0].active = YES;
+    [changeLabel.trailingAnchor constraintLessThanOrEqualToAnchor:parentView.trailingAnchor constant:10].active = YES;
+    NSLayoutConstraint *centerY = [changeLabel.centerYAnchor constraintEqualToAnchor:psiCashView.balance.centerYAnchor constant:2];
+    centerY.active = YES;
+    [parentView layoutIfNeeded];
 
-    [CATransaction begin];
-    [CATransaction setCompletionBlock:^{
-        [coin removeFromSuperview];
-        completionHandler();
+    changeLabel.alpha = 0;
+    centerY.constant = -10;
+    [UIView animateKeyframesWithDuration:1.5 delay:0 options:UIViewKeyframeAnimationOptionCalculationModeLinear animations:^{
+        [UIView addKeyframeWithRelativeStartTime:0 relativeDuration:0.5 animations:^{
+            changeLabel.alpha = 1;
+            [parentView layoutIfNeeded];
+            centerY.constant = -20;
+        }];
+        [UIView addKeyframeWithRelativeStartTime:0.5 relativeDuration:0.5 animations:^{
+            changeLabel.transform = CGAffineTransformScale(changeLabel.transform, 2, 2);
+            changeLabel.alpha = 0;
+            [parentView layoutIfNeeded];
+        }];
+    } completion:^(BOOL finished) {
+        [changeLabel removeFromSuperview];
     }];
-
-    // Create the coin's trajectory
-    CGPoint arcStart = coinCenter;
-    CGFloat arcRadius = 20;
-    CGFloat arcHeight = 30;
-    CGPoint arcCenter = CGPointMake(arcStart.x + arcRadius, arcStart.y - arcHeight);
-
-    CGMutablePathRef arcPath = CGPathCreateMutable();
-    CGPathMoveToPoint(arcPath, NULL, arcStart.x, arcStart.y);
-    CGPathAddLineToPoint(arcPath, NULL, arcStart.x, arcStart.y - arcHeight);
-    CGPathAddArc(arcPath, NULL, arcCenter.x, arcCenter.y, arcRadius, M_PI, 0, NO);
-    CGPathAddLineToPoint(arcPath, NULL, arcCenter.x + arcRadius, arcStart.y + 50);
-
-    // Create the animation
-    CAKeyframeAnimation *animation = [CAKeyframeAnimation animationWithKeyPath:@"position"];
-    animation.calculationMode = kCAAnimationPaced;
-    animation.path = arcPath;
-    CGPathRelease(arcPath);
-    [animation setAutoreverses:NO];
-    [animation setDuration:.7];
-    [animation setRepeatCount:0];
-    [animation setRemovedOnCompletion:YES];
-
-    // Add and start the animation
-    [[coin layer] addAnimation:animation forKey:@"position"];
-    [CATransaction commit];
 }
 
 @end

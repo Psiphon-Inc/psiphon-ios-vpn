@@ -150,40 +150,35 @@
 }
 
 - (void)setGraphicAsSpeedBoostMeter {
-    PsiCashSpeedBoostProductSKU *sku = [PsiCashSpeedBoostProductSKU skuWitDistinguisher:@"1h" withHours:[NSNumber numberWithInteger:1] andPrice:[NSNumber numberWithInteger:10e9]];
+    PsiCashSpeedBoostProductSKU *sku = [PsiCashSpeedBoostProductSKU skuWitDistinguisher:@"1h" withHours:[NSNumber numberWithInteger:1] andPrice:[NSNumber numberWithInteger:100e9]];
     PsiCashBalanceWithSpeedBoostMeter *meter = [[PsiCashBalanceWithSpeedBoostMeter alloc] init];
 
     PsiCashClientModel *m = [PsiCashClientModel clientModelWithAuthPackage:[[PsiCashAuthPackage alloc] initWithValidTokens:@[@"indicator", @"earner", @"spender"]]
                                                                 andBalance:[NSNumber numberWithInteger:0]
                                                       andSpeedBoostProduct:[PsiCashSpeedBoostProduct productWithSKUs:@[sku]]
                                                        andPendingPurchases:nil
-                                               andActiveSpeedBoostPurchase:nil];
+                                               andActiveSpeedBoostPurchase:nil
+                                                         andRefreshPending:NO];
 
     if (self.index == PsiCashOnboardingPage2Index) {
-        [meter bindWithModel:m];
-
+        [meter bindWithModel:[m copy]];
         // Add earning animation
         if (self.index == PsiCashOnboardingPage2Index) {
-            [NSTimer scheduledTimerWithTimeInterval:1 repeats:YES block:^(NSTimer * _Nonnull timer) {
-                if (m.balance.doubleValue >= 7.5e9) {
+            [NSTimer scheduledTimerWithTimeInterval:1.5 repeats:YES block:^(NSTimer * _Nonnull timer) {
+                if (m.balance.doubleValue >= 50e9) {
                     m.balance = [NSNumber numberWithInteger:0];
-                    return;
                 } else {
-                    if (m.balance.doubleValue == 0) {
-                        [meter bindWithModel:m];
-                    }
-                    m.balance = [NSNumber numberWithDouble:m.balance.doubleValue + 2.5e9];
+                    double increment = 10e9;
+                    [PsiCashBalanceWithSpeedBoostMeter animateBalanceChangeOf:[NSNumber numberWithDouble:increment] withPsiCashView:meter inParentView:self.view];
+                    m.balance = [NSNumber numberWithDouble:m.balance.doubleValue + increment];;
                 }
 
-                [PsiCashBalanceWithSpeedBoostMeter earnAnimationWithCompletion:self.view andPsiCashView:meter andCompletion:^{
-                    [meter bindWithModel:m];
-                }];
-                [meter.balance bindWithModel:m];
+                [meter bindWithModel:[m copy]];
             }];
         }
     } else if (self.index == PsiCashOnboardingPage3Index) {
-        m.balance = [NSNumber numberWithDouble:10e9];
-        [meter bindWithModel:m];
+        m.balance = [NSNumber numberWithDouble:100e9];
+        [meter bindWithModel:[m copy]];
     }
 
     graphic = meter;

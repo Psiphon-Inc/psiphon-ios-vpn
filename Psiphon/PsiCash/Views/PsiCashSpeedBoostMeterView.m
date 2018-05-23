@@ -182,7 +182,7 @@
 # pragma mark - State Changes
 
 - (void)inPurchasePendingState {
-    title.text = @"Buying Speed Boost...";
+    title.text = NSLocalizedStringWithDefaultValue(@"PSICASH_BUYING_SPEED_BOOST_TEXT", nil, [NSBundle mainBundle], @"Buying Speed Boost...", @"Text which appears in the Speed Boost meter when the user's buy request for Speed Boost is being processed. Please keep this text concise as the width of the text box is restricted in size.");
 }
 
 - (void)speedBoostChargingWithHoursEarned:(NSNumber*)hoursEarned {
@@ -191,13 +191,15 @@
     [innerBackground setProgress:progress];
 
     if (progress >= 1) {
+        NSString *speedBoostAvailable = NSLocalizedStringWithDefaultValue(@"PSICASH_SPEED_BOOST_AVAILABLE_TEXT", nil, [NSBundle mainBundle], @"Speed Boost Available", @"Text which appears in the Speed Boost meter when the user has earned enough PsiCash to buy Speed Boost. Please keep this text concise as the width of the text box is restricted in size.");
         if ([self.model.maxSpeedBoostPurchaseEarned.hours floatValue] < 1) {
-            title.text = [NSString stringWithFormat:@"%.0fm Speed Boost Available", ([hoursEarned floatValue] * 60)];
+            title.text = [NSString stringWithFormat:@"%.0fm %@", ([hoursEarned floatValue] * 60), speedBoostAvailable];
         } else {
-            title.text = [NSString stringWithFormat:@"%luh Speed Boost Available", (unsigned long)[hoursEarned unsignedIntegerValue]];
+            title.text = [NSString stringWithFormat:@"%luh %@", (unsigned long)[hoursEarned unsignedIntegerValue], speedBoostAvailable];
         }
     } else {
-        title.text = [NSString stringWithFormat:@"Speed Boost Charging %.0f%%", [self progressToMinSpeedBoostPurchase]*100];
+        NSString *speedBoostCharging = NSLocalizedStringWithDefaultValue(@"PSICASH_SPEED_BOOST_CHARGING_TEXT", nil, [NSBundle mainBundle], @"Speed Boost Charging", @"Text which appears in the Speed Boost meter when the user has not yet earned enough PsiCash to Speed Boost. This text will be accompanied with a percentage indicating to the user how close they are to earning enough PsiCash to buy a minimum amount of Speed Boost. Please keep this text concise as the width of the text box is restricted in size.");
+        title.text = [NSString stringWithFormat:@"%@ %.0f%%", speedBoostCharging, [self progressToMinSpeedBoostPurchase]*100];
     }
 }
 
@@ -219,7 +221,8 @@
             int m = (int)secondsToExpiry / 60 % 60;
             int s = (int)secondsToExpiry % 60;
 
-            NSMutableAttributedString *attr = [[NSMutableAttributedString alloc] initWithString:@"Speed Boost Active" attributes:@{NSFontAttributeName:[UIFont boldSystemFontOfSize:14]}];
+            NSMutableAttributedString *attr = [[NSMutableAttributedString alloc] initWithString:NSLocalizedStringWithDefaultValue(@"PSICASH_SPEED_BOOST_ACTIVE_TEXT", nil, [NSBundle mainBundle], @"Speed Boost Active", @"Text which appears in the Speed Boost meter when the user has activated Speed Boost. Please keep this text concise as the width of the text box is restricted in size.")
+                                                                                     attributes:@{NSFontAttributeName:[UIFont boldSystemFontOfSize:14]}];
             NSAttributedString *timeRemaining;
 
             [attr appendAttributedString:[[NSAttributedString alloc] initWithString:@" - "]];
@@ -242,7 +245,7 @@
 #pragma mark - Helpers
 
 - (void)noSpenderToken {
-    title.text = @"Earn PsiCash to buy Speed Boost";
+    title.text = NSLocalizedStringWithDefaultValue(@"PSICASH_SPEED_BOOST_NOAUTH_TEXT", nil, [NSBundle mainBundle], @"Earn PsiCash to buy Speed Boost", @"Text which appears in the Speed Boost meter when the user has not earned any PsiCash yet. Please keep this text concise as the width of the text box is restricted in size.");
 }
 
 - (NSTimeInterval)timeToNextHourExpired:(NSTimeInterval)seconds {

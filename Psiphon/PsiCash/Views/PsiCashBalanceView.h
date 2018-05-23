@@ -23,6 +23,5 @@
 @interface PsiCashBalanceView : UIButton <PsiCashClientModelReceiver>
 @property (strong, readonly, nonatomic) UILabel *balance;
 @property (strong, readonly, nonatomic) UIImageView *coin;
-- (void)earnAnimation;
 @end
 

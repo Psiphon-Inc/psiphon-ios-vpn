@@ -38,7 +38,8 @@
                                                                andBalance:[NSNumber numberWithInteger:0]
                                                      andSpeedBoostProduct:nil
                                                       andPendingPurchases:nil
-                                              andActiveSpeedBoostPurchase:nil];
+                                              andActiveSpeedBoostPurchase:nil
+                                                        andRefreshPending:NO];
         }
     }
     return self;
@@ -83,6 +84,10 @@
         }
     }
     self.stagedModel.activeSpeedBoostPurchase = nil;
+}
+
+- (void)updateRefreshPending:(BOOL)refreshPending {
+    self.stagedModel.refreshPending = refreshPending;
 }
 
 @end
