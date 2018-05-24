@@ -33,6 +33,7 @@
 #import "SharedConstants.h"
 #import "Notifier.h"
 #import "Logging.h"
+#import "RegionAdapter.h"
 #import "Subscription.h"
 #import "PacketTunnelUtils.h"
 #import "AuthorizationsDatabase.h"
@@ -1054,6 +1055,15 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 
     // Notify container
     [notifier post:NOTIFIER_ON_AVAILABLE_EGRESS_REGIONS];
+
+    PsiphonConfigUserDefaults *userDefaults = [PsiphonConfigUserDefaults sharedInstance];
+
+    NSString *selectedRegion = [userDefaults egressRegion];
+    if (selectedRegion && ![selectedRegion isEqualToString:kPsiphonRegionBestPerformance] && ![regions containsObject:selectedRegion]) {
+        [[PsiphonConfigUserDefaults sharedInstance] setEgressRegion:kPsiphonRegionBestPerformance];
+
+        [self displayMessageAndKillExtension:NSLocalizedStringWithDefaultValue(@"VPN_START_FAIL_REGION_INVALID_MESSAGE", nil, [NSBundle mainBundle], @"The region you selected is no longer available. You must choose a new region or change to the default \"Best performance\" choice.", @"Alert dialog message informing the user that an error occurred while starting Psiphon because they selected an egress region that is no longer available (Do not translate 'Psiphon'). The user should select a different region and try again. Note: the backslash before each quotation mark should be left as is for formatting.")];
+    }
 }
 
 - (void)onInternetReachabilityChanged:(Reachability* _Nonnull)reachability {
