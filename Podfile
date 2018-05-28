@@ -16,9 +16,8 @@ target 'Psiphon' do
 
   pod 'ReactiveObjC', :git => "https://github.com/Psiphon-Inc/ReactiveObjC.git", :commit => 'b2ac770'
   pod 'OpenSSL', '1.0.210'
-  pod 'mopub-ios-sdk', '4.18.0'
-  pod 'Google-Mobile-Ads-SDK', '7.25.0'
-  pod 'VungleSDK-iOS', '5.3.0'
+  pod 'mopub-ios-sdk', '5.0.0'
+  pod 'MoPub-AdMob-Adapters'
   pod 'PureLayout', '3.0.2'
   pod 'MBProgressHUD', '~> 1.1.0'
 end
