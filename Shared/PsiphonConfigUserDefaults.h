@@ -29,6 +29,7 @@
 + (instancetype)sharedInstance;
 - (instancetype)initWithSuiteName:(NSString *)suiteName;
 
+- (NSString*)egressRegion;
 - (BOOL)setEgressRegion:(NSString *)newRegion;
 
 /*!
