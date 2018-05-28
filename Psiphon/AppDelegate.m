@@ -456,34 +456,30 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
 
     __weak AppDelegate *weakSelf = self;
 
-    dispatch_async_global(^{
-        NSDate *expiryDate;
-        BOOL activeSubscription = [IAPStoreHelper hasActiveSubscriptionForDate:[NSDate date] getExpiryDate:&expiryDate];
+    NSDate *expiryDate;
+    BOOL activeSubscription = [IAPStoreHelper hasActiveSubscriptionForDate:[NSDate date] getExpiryDate:&expiryDate];
 
-        dispatch_async_main(^{
-            if (activeSubscription) {
+    if (activeSubscription) {
 
-                // Also update the subscription status subject.
-                [weakSelf.subscriptionStatus sendNext:@(UserSubscriptionActive)];
+        // Also update the subscription status subject.
+        [weakSelf.subscriptionStatus sendNext:@(UserSubscriptionActive)];
 
-                NSTimeInterval interval = [expiryDate timeIntervalSinceNow];
-                
-                if (interval > 0) {
-                    // Checks if another timer is already running.
-                    if (![weakSelf.subscriptionCheckTimer isValid]) {
-                        weakSelf.subscriptionCheckTimer = [NSTimer scheduledTimerWithTimeInterval:interval
-                                                                                 repeats:NO
-                                                                                   block:^(NSTimer *timer) {
-                            [weakSelf subscriptionExpiryTimer];
-                        }];
-                    }
-                }
-            } else {
-                // Instead of subscribing to the notification in this class, calls the handler directly.
-                [weakSelf onSubscriptionExpired];
+        NSTimeInterval interval = [expiryDate timeIntervalSinceNow];
+
+        if (interval > 0) {
+            // Checks if another timer is already running.
+            if (![weakSelf.subscriptionCheckTimer isValid]) {
+                weakSelf.subscriptionCheckTimer = [NSTimer scheduledTimerWithTimeInterval:interval
+                                                                         repeats:NO
+                                                                           block:^(NSTimer *timer) {
+                    [weakSelf subscriptionExpiryTimer];
+                }];
             }
-        });
-    });
+        }
+    } else {
+        // Instead of subscribing to the notification in this class, calls the handler directly.
+        [weakSelf onSubscriptionExpired];
+    }
 }
 
 - (void)onSubscriptionExpired {
