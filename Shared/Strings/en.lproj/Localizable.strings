@@ -27,9 +27,6 @@
 /* Buy subscription dialog footer text */
 "BUY_SUBSCRIPTIONS_NOTICES" = "A subscription is auto-renewable which means that once purchased it will be automatically renewed until you cancel it 24 hours prior to the end of the current period.\n\nYour iTunes Account will be charged for renewal within 24-hours prior to the end of the current period with the cost of subscription.";
 
-/* Alert Cancel button */
-"CANCEL_BUTTON" = "Cancel";
-
 /* Alert message informing user that their subscription has expired or that they're not a subscriber, therefore Psiphon can only be started from the Psiphon app. DO NOT translate 'Psiphon'. */
 "CANNOT_START_TUNNEL_DUE_TO_SUBSCRIPTION" = "Your Psiphon subscription has expired.\nSince you're not a subscriber or your subscription has expired, Psiphon can only be started from the Psiphon app.\n\nPlease open the Psiphon app.";
 
@@ -39,8 +36,8 @@
 /* Main text in the 'Upstream Proxy Error' dialog box. This is shown when the user has directly altered these settings, and those settings are (probably) erroneous. DO NOT translate 'Psiphon'. */
 "CHECK_UPSTREAM_PROXY_SETTING" = "You have configured Psiphon to use an upstream proxy.\nHowever, we seem to be unable to connect to a Psiphon server through that proxy.\nPlease fix the settings and try again.";
 
-/* Alert dialog body informing the user that the 'Auto-start VPN on demand' feature is enabled and that the VPN cannot be stopped. Followed by asking the user if they would like to disable the 'Auto-start VPN on demand' feature, and stop the VPN. */
-"CONNECT_ON_DEMAND_ALERT_BODY" = "Cannot stop the VPN while \"Auto-start VPN\" is enabled.\nWould you like to disable \"Auto-start VPN\" on demand and stop the VPN?";
+/* Alert dialog body informing the user that the 'Auto-start VPN on demand' feature will be disabled and that the VPN cannot be stopped. */
+"CONNECT_ON_DEMAND_ALERT_BODY" = "\"Auto-start VPN\" will be temporarily disabled until the next time Psiphon VPN is started.";
 
 /* Alert dialog title informing user that 'Auto-start VPN' feature is enabled */
 "CONNECT_ON_DEMAND_ALERT_TITLE" = "Auto-start VPN is enabled";
@@ -50,9 +47,6 @@
 
 /* Alert dialog message informing the user that the settings file in the app is corrupt, and that they can potentially fix this issue by re-installing the app. */
 "CORRUPT_SETTINGS_MESSAGE" = "Your app settings file appears to be corrupt. Try reinstalling the app to repair the file.";
-
-/* Disable Auto-start VPN feature and Stop the VPN button label */
-"DISABLE_BUTTON" = "Disable Auto-start VPN and Stop";
 
 /* Title of the button that dismisses region selection dialog
    Title of the button that dismisses the subscriptions menu */
@@ -91,7 +85,8 @@
 /* Subscriptions view text that is visible when the list of subscriptions is not available */
 "NO_PRODUCTS_TEXT" = "Could not retrieve subscriptions from the App Store. Pull to refresh or try again later.";
 
-/* Alert OK Button */
+/* Alert OK Button
+   OK button title */
 "OK_BUTTON" = "OK";
 
 /* Alert message informing the user they should open the app to finish connecting to the VPN. DO NOT translate 'Psiphon'. */

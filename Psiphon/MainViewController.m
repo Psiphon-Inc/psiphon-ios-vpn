@@ -454,17 +454,18 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                   // Alert the user that Connect On Demand is enabled, and if they
                   // would like Connect On Demand to be disabled, and the extension to be stopped.
                   NSString *alertTitle = NSLocalizedStringWithDefaultValue(@"CONNECT_ON_DEMAND_ALERT_TITLE", nil, [NSBundle mainBundle], @"Auto-start VPN is enabled", @"Alert dialog title informing user that 'Auto-start VPN' feature is enabled");
-                  NSString *alertMessage = NSLocalizedStringWithDefaultValue(@"CONNECT_ON_DEMAND_ALERT_BODY", nil, [NSBundle mainBundle], @"Cannot stop the VPN while \"Auto-start VPN\" is enabled.\nWould you like to disable \"Auto-start VPN\" on demand and stop the VPN?", "Alert dialog body informing the user that the 'Auto-start VPN on demand' feature is enabled and that the VPN cannot be stopped. Followed by asking the user if they would like to disable the 'Auto-start VPN on demand' feature, and stop the VPN.");
+                  NSString *alertMessage = NSLocalizedStringWithDefaultValue(@"CONNECT_ON_DEMAND_ALERT_BODY", nil, [NSBundle mainBundle], @"\"Auto-start VPN\" will be temporarily disabled until the next time Psiphon VPN is started.", "Alert dialog body informing the user that the 'Auto-start VPN on demand' feature will be disabled and that the VPN cannot be stopped.");
 
                   UIAlertController *alert = [UIAlertController
                                               alertControllerWithTitle:alertTitle message:alertMessage preferredStyle:UIAlertControllerStyleAlert];
 
-                  UIAlertAction *disableAction = [UIAlertAction
-                    actionWithTitle:NSLocalizedStringWithDefaultValue(@"DISABLE_BUTTON", nil, [NSBundle mainBundle], @"Disable Auto-start VPN and Stop", @"Disable Auto-start VPN feature and Stop the VPN button label")
-                    style:UIAlertActionStyleDestructive
+                  UIAlertAction *stopUntilNextStartAction = [UIAlertAction
+                    actionWithTitle:NSLocalizedStringWithDefaultValue(@"OK_BUTTON", nil, [NSBundle mainBundle], @"OK", @"OK button title")
+                    style:UIAlertActionStyleDefault
                     handler:^(UIAlertAction *action) {
+
                         // Disable "Connect On Demand" and stop the VPN.
-                        [[NSUserDefaults standardUserDefaults] setBool:FALSE forKey:SettingsConnectOnDemandBoolKey];
+                        [[NSUserDefaults standardUserDefaults] setBool:TRUE forKey:VPNManagerConnectOnDemandUntilNextStartBoolKey];
 
                         __block RACDisposable *disposable = [[weakSelf.vpnManager setConnectOnDemandEnabled:FALSE]
                           subscribeNext:^(NSNumber *x) {
@@ -479,17 +480,8 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                         [weakSelf.compoundDisposable addDisposable:disposable];
                     }];
 
-                  UIAlertAction *cancelAction = [UIAlertAction
-                                                 actionWithTitle:NSLocalizedStringWithDefaultValue(@"CANCEL_BUTTON", nil, [NSBundle mainBundle], @"Cancel", @"Alert Cancel button")
-                                                 style:UIAlertActionStyleCancel
-                                                 handler:^(UIAlertAction *action) {
-                                                     // Do nothing
-                                                 }];
-
-                  [alert addAction:disableAction];
-                  [alert addAction:cancelAction];
+                  [alert addAction:stopUntilNextStartAction];
                   [self presentViewController:alert animated:TRUE completion:nil];
-
               }
 
               [self removePulsingHaloLayer];

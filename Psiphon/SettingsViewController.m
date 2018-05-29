@@ -27,14 +27,6 @@
 #import "RACReplaySubject.h"
 #import "RACSignal+Operations.h"
 
-// NSUserDefaults keys
-/**
- * SettingsConnectOnDemandBoolKey represents user's preference for Connect On Demand.
- * This preference should not be displayed to the user directly, and only the VPN configuration
- * saved Connect On Demand value should be displayed to user.
- */
-UserDefaultsKey const SettingsConnectOnDemandBoolKey = @"SettingsViewController.ConnectOnDemandKey";
-
 // Specifier keys for cells in settings menu
 // These keys are defined in Psiphon/InAppSettings.bundle/Root.inApp.plist
 NSString * const SettingsSubscriptionCellSpecifierKey = @"settingsSubscription";
@@ -210,8 +202,6 @@ NSString * const ConnectOnDemandCellSpecifierKey = @"vpnOnDemand";
 
 - (void)toggledVpnOnDemandValue:(id)sender {
     UISwitch *toggle = (UISwitch*)sender;
-
-    [[NSUserDefaults standardUserDefaults] setBool:[toggle isOn] forKey:SettingsConnectOnDemandBoolKey];
 
     __weak SettingsViewController *weakSelf = self;
 
