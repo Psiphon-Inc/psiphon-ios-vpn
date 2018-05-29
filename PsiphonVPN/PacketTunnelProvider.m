@@ -27,12 +27,13 @@
 #import <net/if.h>
 #import <stdatomic.h>
 #import "PacketTunnelProvider.h"
-#import "PsiphonConfigFiles.h"
+#import "PsiphonConfigReader.h"
 #import "PsiphonConfigUserDefaults.h"
 #import "PsiphonDataSharedDB.h"
 #import "SharedConstants.h"
 #import "Notifier.h"
 #import "Logging.h"
+#import "RegionAdapter.h"
 #import "Subscription.h"
 #import "PacketTunnelUtils.h"
 #import "AuthorizationsDatabase.h"
@@ -103,6 +104,8 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 @property (nonatomic) GracePeriodState gracePeriodState;
 
 @property (nonatomic) PsiphonTunnel *psiphonTunnel;
+
+@property (nonatomic) PsiphonConfigSponsorIds *cachedSpondorIDs;
 
 @end
 
@@ -228,8 +231,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 
             // Restarts the tunnel to re-connect with the correct sponsor ID.
             [weakSelf.subscriptionCheckState setStateNotSubscribed];
-
-            [weakSelf reconnectWithNewConfig];
+            [weakSelf reconnectWithConfig:weakSelf.cachedSpondorIDs.defaultSponsorId];
 
         } else {
 
@@ -454,8 +456,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
                       }
 
                       [weakSelf.subscriptionCheckState setStateSubscribed];
-
-                      [weakSelf reconnectWithNewConfig];
+                      [weakSelf reconnectWithConfig:weakSelf.cachedSpondorIDs.subscriptionSponsorId];
                   }
               } else {
                   // Server returned no authorization, treats this as if subscription was expired.
@@ -488,13 +489,15 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
       }];
 }
 
+// VPN should only start if it is started from the container app directly,
+// OR if the user possibly has a valid subscription
+// OR if the extension is started after boot but before being unlocked.
 - (void)startTunnelWithErrorHandler:(void (^_Nonnull)(NSError *_Nonnull error))errorHandler {
     
     __weak PacketTunnelProvider *weakSelf = self;
 
-    // VPN should only start if it is started from the container app directly,
-    // OR if the user possibly has a valid subscription
-    // OR if the extension is started after boot but before being unlocked.
+
+    self.cachedSpondorIDs = [PsiphonConfigReader fromConfigFile].sponsorIds;
 
     // Initializes uninitialized properties.
     Subscription *subscription = [Subscription fromPersistedDefaults];
@@ -607,19 +610,10 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
     [self.psiphonTunnel stop];
 }
 
-// Restarts the tunnel while preserving the current session ID.
-- (void)reconnectWithNewConfig {
-
-    // Tunnel restarts are expensive, postpone restart for
-    // a chance for objects not used anymore to be deallocated.
+- (void)reconnectWithConfig:(NSString *)sponsorId {
     dispatch_async(self->workQueue, ^{
-
-        // It is expected that the private start method of PsiphonTunnel will not generate a new session ID.
-        if (![self.psiphonTunnel stopAndReconnectWithCurrentSessionID]) {
-            [PsiFeedbackLogger error:@"tunnel start failed"];
-        }
+        [self.psiphonTunnel reconnectWithConfig:sponsorId :[self getAllAuthorizations]];
     });
-
 }
 
 - (void)displayMessageAndKillExtension:(NSString *)message {
@@ -782,7 +776,22 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
     return FALSE;
 }
 
-#pragma mark - Subscription
+#pragma mark - Subscription and authorizations
+
+// Returns possibly empty array of authorizations.
+- (NSArray<NSString *> *_Nonnull)getAllAuthorizations {
+
+    NSMutableArray *auths = [NSMutableArray arrayWithCapacity:1];
+
+    // Add subscription authorization
+    Subscription *subscription = [Subscription fromPersistedDefaults];
+    if (subscription.authorization) {
+        [PsiFeedbackLogger infoWithType:PacketTunnelProviderLogType message:@"subscription authorization ID:%@", subscription.authorization.ID];
+        [auths addObject:subscription.authorization.base64Representation];
+    }
+
+    return auths;
+}
 
 // A finite signal that emits an item when device is unlocked.
 - (RACSignal *)subscriptionReceiptUnlocked {
@@ -893,33 +902,19 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 }
 
 - (NSString * _Nullable)getEmbeddedServerEntriesPath {
-    return [PsiphonConfigFiles embeddedServerEntriesPath];
+    return PsiphonConfigReader.embeddedServerEntriesPath;
 }
 
 - (NSDictionary * _Nullable)getPsiphonConfig {
 
-    NSFileManager *fileManager = [NSFileManager defaultManager];
-
-    NSString *bundledConfigPath = [PsiphonConfigFiles psiphonConfigPath];
-
-    if (![fileManager fileExistsAtPath:bundledConfigPath]) {
-        [PsiFeedbackLogger errorWithType:ExitReasonLogType message:@"config file not found"];
+    NSDictionary *configs = [PsiphonConfigReader fromConfigFile].configs;
+    if (!configs) {
         [self displayCorruptSettingsFileMessage];
         abort();
     }
 
-    // Read in psiphon_config JSON
-    NSData *jsonData = [fileManager contentsAtPath:bundledConfigPath];
-    NSError *err = nil;
-    NSDictionary *readOnly = [NSJSONSerialization JSONObjectWithData:jsonData options:kNilOptions error:&err];
-
-    if (err) {
-        [PsiFeedbackLogger errorWithType:ExitReasonLogType message:@"config file parse failed" object:err];
-        [self displayCorruptSettingsFileMessage];
-        abort();
-    }
-
-    NSMutableDictionary *mutableConfigCopy = [readOnly mutableCopy];
+    // Get a mutable copy of the Psiphon configs.
+    NSMutableDictionary *mutableConfigCopy = [configs mutableCopy];
 
     // Applying mutations to config
     NSNumber *fd = (NSNumber*)[[self packetFlow] valueForKeyPath:@"socket.fileDescriptor"];
@@ -934,26 +929,14 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 
     mutableConfigCopy[@"ClientVersion"] = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleVersion"];
 
-
-    NSMutableArray *authorizations = [NSMutableArray array];
-
-    // Add subscription authorization
-    Subscription *subscription = [Subscription fromPersistedDefaults];
-    if (subscription.authorization) {
-        [PsiFeedbackLogger infoWithType:PacketTunnelProviderLogType message:@"config add subscription authorization ID:%@", subscription.authorization.ID];
-        [authorizations addObject:subscription.authorization.base64Representation];
-    }
-
+    NSArray *authorizations = [self getAllAuthorizations];
     if ([authorizations count] > 0) {
         mutableConfigCopy[@"Authorizations"] = [authorizations copy];
     }
 
     // SponsorId override
     if ([self.subscriptionCheckState isSubscribedOrInProgress]) {
-        NSDictionary *readOnlySubscriptionConfig = readOnly[@"subscriptionConfig"];
-        if(readOnlySubscriptionConfig && readOnlySubscriptionConfig[@"SponsorId"]) {
-            mutableConfigCopy[@"SponsorId"] = readOnlySubscriptionConfig[@"SponsorId"];
-        }
+        mutableConfigCopy[@"SponsorId"] = [self.cachedSpondorIDs.subscriptionSponsorId copy];
     }
 
     return mutableConfigCopy;
@@ -1054,6 +1037,15 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 
     // Notify container
     [notifier post:NOTIFIER_ON_AVAILABLE_EGRESS_REGIONS];
+
+    PsiphonConfigUserDefaults *userDefaults = [PsiphonConfigUserDefaults sharedInstance];
+
+    NSString *selectedRegion = [userDefaults egressRegion];
+    if (selectedRegion && ![selectedRegion isEqualToString:kPsiphonRegionBestPerformance] && ![regions containsObject:selectedRegion]) {
+        [[PsiphonConfigUserDefaults sharedInstance] setEgressRegion:kPsiphonRegionBestPerformance];
+
+        [self displayMessageAndKillExtension:NSLocalizedStringWithDefaultValue(@"VPN_START_FAIL_REGION_INVALID_MESSAGE", nil, [NSBundle mainBundle], @"The region you selected is no longer available. You must choose a new region or change to the default \"Best performance\" choice.", @"Alert dialog message informing the user that an error occurred while starting Psiphon because they selected an egress region that is no longer available (Do not translate 'Psiphon'). The user should select a different region and try again. Note: the backslash before each quotation mark should be left as is for formatting.")];
+    }
 }
 
 - (void)onInternetReachabilityChanged:(Reachability* _Nonnull)reachability {
