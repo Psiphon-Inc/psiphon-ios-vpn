@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, Psiphon Inc.
+ * Copyright (c) 2018, Psiphon Inc.
  * All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -19,9 +19,27 @@
 
 #import <Foundation/Foundation.h>
 
-@interface PsiphonConfigFiles : NSObject
+NS_ASSUME_NONNULL_BEGIN
 
-+ (NSString*)embeddedServerEntriesPath;
-+ (NSString*)psiphonConfigPath;
+/** Container object for sponsor Ids */
+@interface PsiphonConfigSponsorIds : NSObject
+
+@property (nonatomic, readonly) NSString *defaultSponsorId;
+@property (nonatomic, readonly) NSString *subscriptionSponsorId;
 
 @end
+
+/** Wrapper class for reading Psiphon config file */
+@interface PsiphonConfigReader : NSObject
+
+@property (class, nonatomic, readonly) NSString *embeddedServerEntriesPath;
+@property (class, nonatomic, readonly) NSString *psiphonConfigPath;
+
+@property (nonatomic, readonly) NSDictionary *configs;
+@property (nonatomic, readonly) PsiphonConfigSponsorIds *sponsorIds;
+
++ (PsiphonConfigReader *_Nullable)fromConfigFile;
+
+@end
+
+NS_ASSUME_NONNULL_END
