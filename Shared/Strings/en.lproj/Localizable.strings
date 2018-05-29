@@ -1,8 +1,5 @@
 /* THIS FILE IS GENERATED. DO NOT EDIT. */
 
-/* Active subscription detail text, example: Expires on 2017-01-01 */
-"ACTIVE_SUBSCRIPTION_DETAIL_TEXT" = "Expires on %@";
-
 /* Title of the section in the subscription dialog that shows currently active subscription information. */
 "ACTIVE_SUBSCRIPTION_SECTION_TITLE" = "Current subscription";
 

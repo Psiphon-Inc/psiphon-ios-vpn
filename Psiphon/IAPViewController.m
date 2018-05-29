@@ -338,18 +338,7 @@ static NSString *iapCellID = @"IAPTableCellID";
         cell.accessoryType = UITableViewCellAccessoryCheckmark;
         cell.accessoryView = nil;
         cell.textLabel.text = self.latestSubscriptionProduct.localizedTitle;
-        NSString *detailTextFormat = NSLocalizedStringWithDefaultValue(@"ACTIVE_SUBSCRIPTION_DETAIL_TEXT",
-                                                                       nil,
-                                                                       [NSBundle mainBundle],
-                                                                       @"Expires on %@",
-                                                                       @"Active subscription detail text, example: Expires on 2017-01-01");
-
-        NSDateFormatter* df = [NSDateFormatter new];
-        df.dateFormat= [NSDateFormatter dateFormatFromTemplate:@"MMddYY" options:0 locale:[NSLocale currentLocale]];
-        NSString *dateString = [df stringFromDate:self.latestSubscriptionExpirationDate];
-
-        // TODO: Remove `localizedPrice` parameter after the all translations have caught up.
-        cell.detailTextLabel.text = [NSString stringWithFormat:detailTextFormat, dateString, localizedPrice];
+        cell.detailTextLabel.text = @"";
     } else {
         UISegmentedControl *buyButton = [[UISegmentedControl alloc]initWithItems:[NSArray arrayWithObject:localizedPrice]];
         self.buyButtonTintColor = buyButton.tintColor;
@@ -359,8 +348,6 @@ static NSString *iapCellID = @"IAPTableCellID";
                       action:@selector(buyButtonPressed:)
             forControlEvents:UIControlEventValueChanged];
         cell.accessoryView = buyButton;
-
-
     }
 
     return cell;
