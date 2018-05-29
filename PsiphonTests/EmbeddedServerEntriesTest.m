@@ -19,7 +19,7 @@
 
 #import <XCTest/XCTest.h>
 #import "EmbeddedServerEntries.h"
-#import "PsiphonConfigFiles.h"
+#import "PsiphonConfigReader.h"
 #import "SharedConstants.h"
 
 @interface EmbeddedServerEntriesTest : XCTestCase
@@ -54,14 +54,14 @@
 }
 
 - (void)testEgressRegionsFromWrongFile {
-    NSArray *embeddedEgressRegions = [EmbeddedServerEntries egressRegionsFromFile:[PsiphonConfigFiles psiphonConfigPath]];
+    NSArray *embeddedEgressRegions = [EmbeddedServerEntries egressRegionsFromFile:PsiphonConfigReader.psiphonConfigPath];
     XCTAssertTrue([embeddedEgressRegions count] == 0);
 }
 
 #pragma mark - Helpers
 
 - (void)egressRegionsFromFile {
-    NSArray *embeddedEgressRegions = [EmbeddedServerEntries egressRegionsFromFile:[PsiphonConfigFiles embeddedServerEntriesPath]];
+    NSArray *embeddedEgressRegions = [EmbeddedServerEntries egressRegionsFromFile:PsiphonConfigReader.embeddedServerEntriesPath];
     XCTAssertTrue([embeddedEgressRegions count] > 0);
 }
 
