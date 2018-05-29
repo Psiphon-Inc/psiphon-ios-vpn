@@ -524,21 +524,6 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
 
     [self.compoundDisposable addDisposable:vpnActiveDisposable];
 
-    // Checks if user previously preferred to have Connect On Demand enabled,
-    // Re-enable it upon subscription since it may have been disabled if the previous subscription expired.
-    // Disables Connect On Demand setting of the VPN Configuration.
-    BOOL userPreferredOnDemandSetting = [[NSUserDefaults standardUserDefaults]
-      boolForKey:SettingsConnectOnDemandBoolKey];
-
-    __block RACDisposable *onDemandDisposable = [[self.vpnManager setConnectOnDemandEnabled:userPreferredOnDemandSetting]
-      subscribeError:^(NSError *error) {
-          [weakSelf.compoundDisposable removeDisposable:onDemandDisposable];
-    } completed:^{
-          [weakSelf.compoundDisposable removeDisposable:onDemandDisposable];
-    }];
-
-    [self.compoundDisposable addDisposable:onDemandDisposable];
-
 }
 
 // Called on `IAPHelperUpdatedSubscriptionDictionaryNotification` notification.
