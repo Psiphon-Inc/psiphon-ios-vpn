@@ -29,7 +29,7 @@
 #import "MPInterstitialAdController.h"
 #import "Notifier.h"
 #import "PsiphonClientCommonLibraryHelpers.h"
-#import "PsiphonConfigFiles.h"
+#import "PsiphonConfigReader.h"
 #import "PsiphonDataSharedDB.h"
 #import "RootContainerController.h"
 #import "SharedConstants.h"
@@ -328,7 +328,7 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
  * This function should only be called once per app version on first launch.
  */
 - (void)updateAvailableEgressRegionsOnFirstRunOfAppVersion {
-    NSString *embeddedServerEntriesPath = [PsiphonConfigFiles embeddedServerEntriesPath];
+    NSString *embeddedServerEntriesPath = PsiphonConfigReader.embeddedServerEntriesPath;
     NSArray *embeddedEgressRegions = [EmbeddedServerEntries egressRegionsFromFile:embeddedServerEntriesPath];
 
     LOG_DEBUG("Available embedded egress regions: %@.", embeddedEgressRegions);
