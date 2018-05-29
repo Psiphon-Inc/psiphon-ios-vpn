@@ -18,9 +18,6 @@
  */
 
 #import "PsiphonSettingsViewController.h"
-#import "UserDefaults.h"
-
-FOUNDATION_EXPORT UserDefaultsKey const SettingsConnectOnDemandBoolKey;
 
 @interface SettingsViewController : PsiphonSettingsViewController
 
