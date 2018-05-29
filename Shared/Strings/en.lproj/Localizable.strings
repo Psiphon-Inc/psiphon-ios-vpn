@@ -21,11 +21,11 @@
 /* Title of button on alert view which shows the progress of the user's buy request. Hitting this button dismisses the alert and the buy request continues processing in the background. */
 "BUY_REQUEST_PROGRESS_ALERT_DISMISS_BUTTON_TITLE" = "Dismiss";
 
-/* Buy subscription dialog footer text */
-"BUY_SUBSCRIPTIONS_FOOTER_TEXT" = "A subscription is auto-renewable which means that once purchased it will be automatically renewed until you cancel it 24 hours prior to the end of the current period.\n\nYour iTunes Account will be charged for renewal within 24-hours prior to the end of the current period with the cost of subscription.\n\nManage your Subscription and Auto-Renewal by going to your Account Settings.";
-
 /* Premium subscriptions dialog header text */
 "BUY_SUBSCRIPTIONS_HEADER_TEXT" = "Remove ads and surf the Internet faster with a premium subscription!";
+
+/* Buy subscription dialog footer text */
+"BUY_SUBSCRIPTIONS_NOTICES" = "A subscription is auto-renewable which means that once purchased it will be automatically renewed until you cancel it 24 hours prior to the end of the current period.\n\nYour iTunes Account will be charged for renewal within 24-hours prior to the end of the current period with the cost of subscription.";
 
 /* Alert Cancel button */
 "CANCEL_BUTTON" = "Cancel";
@@ -81,6 +81,9 @@
 
 /* Text displayed while app loads */
 "LOADING" = "Loading...";
+
+/* Manage subscription button */
+"MANAGE_SUBSCRIPTIONS_BUTTON" = "Manage my subscription";
 
 /* Alert title informing user there is no internet connection */
 "NO_INTERNET" = "No Internet Connection";
