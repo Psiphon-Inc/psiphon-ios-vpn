@@ -31,6 +31,7 @@
 @import GoogleMobileAds;
 
 NSNotificationName const AdManagerAdsDidLoadNotification = @"AdManagerAdsDidLoadNotification";
+NSString* const kUntunneledInterstitialAddUnitID = @"4250ebf7b28043e08ddbe04d444d79e4";
 
 @interface AdManager ()
 
@@ -97,14 +98,40 @@ NSNotificationName const AdManagerAdsDidLoadNotification = @"AdManagerAdsDidLoad
 }
 
 - (void)initializeAds {
-   LOG_DEBUG();
-    
+    LOG_DEBUG();
     if ([self shouldShowUntunneledAds]) {
-        if (!self.untunneledInterstitial) {
-           LOG_DEBUG(@"Initializing");
-            // Init code.
-            [GADMobileAds configureWithApplicationID:@"ca-app-pub-1072041961750291~2085686375"];
-            [self loadUntunneledInterstitial];
+        //  Consent presenter/ad loader helper block
+        void(^showConsentDialogOrLoadAds)(void) = ^{
+            // Try and load/show the consent dialog if needed, otherwise load ads
+            if ([MoPub sharedInstance].shouldShowConsentDialog) {
+                [[MoPub sharedInstance] loadConsentDialogWithCompletion:^(NSError *error){
+                    if (error == nil) {
+                        [[MoPub sharedInstance] showConsentDialogFromViewController:[[AppDelegate sharedAppDelegate] getAdsPresentingViewController] completion:nil];
+                    } else {
+                        LOG_DEBUG(@"MoPub failed to load consent dialog with error: %@", error);
+                    }
+                }];
+            } else {
+                if (!self.untunneledInterstitial) {
+                    LOG_DEBUG(@"Loading ads");
+                    // Init code.
+                    [GADMobileAds configureWithApplicationID:@"ca-app-pub-1072041961750291~2085686375"];
+                    [self loadUntunneledInterstitial];
+                }
+            }
+        };
+
+        // Initialize MoPub if needed, upon completion present consent dialog or load ads
+        if(MPConsentManager.sharedManager.adUnitIdUsedForConsent == nil ) {
+            MPMoPubConfiguration * sdkConfig = [[MPMoPubConfiguration alloc] initWithAdUnitIdForAppInitialization: kUntunneledInterstitialAddUnitID];
+            sdkConfig.globalMediationSettings = @[];
+            sdkConfig.mediatedNetworks = @[];
+            sdkConfig.advancedBidders = nil;
+            [[MoPub sharedInstance] initializeSdkWithConfiguration:sdkConfig completion:^{
+                dispatch_async(dispatch_get_main_queue(), showConsentDialogOrLoadAds);
+            }];
+        } else {
+            dispatch_async(dispatch_get_main_queue(), showConsentDialogOrLoadAds);
         }
     } else if (!self.untunneledInterstitialIsShowing) {
         [self deinitializeAds];
@@ -134,7 +161,7 @@ NSNotificationName const AdManagerAdsDidLoadNotification = @"AdManagerAdsDidLoad
 - (void)loadUntunneledInterstitial {
    LOG_DEBUG();
     self.untunneledInterstitial = [MPInterstitialAdController
-      interstitialAdControllerForAdUnitId:@"4250ebf7b28043e08ddbe04d444d79e4"];
+      interstitialAdControllerForAdUnitId:kUntunneledInterstitialAddUnitID];
     self.untunneledInterstitial.delegate = self;
     [self.untunneledInterstitial loadAd];
 }

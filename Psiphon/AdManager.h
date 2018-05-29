@@ -19,6 +19,8 @@
 
 #import <Foundation/Foundation.h>
 #import <mopub-ios-sdk/MPInterstitialAdController.h>
+#import "MoPub.h"
+#import "MPConsentManager.h"
 
 FOUNDATION_EXPORT NSNotificationName const AdManagerAdsDidLoadNotification;
 

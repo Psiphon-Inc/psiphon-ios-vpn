@@ -7,12 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		197DABEB1F54BEED00DD5C3B /* VungleInterstitialCustomEvent.m in Sources */ = {isa = PBXBuildFile; fileRef = 197DABEA1F54BEED00DD5C3B /* VungleInterstitialCustomEvent.m */; };
-		197DABEE1F54C09E00DD5C3B /* MPVungleRouter.m in Sources */ = {isa = PBXBuildFile; fileRef = 197DABED1F54C09E00DD5C3B /* MPVungleRouter.m */; };
-		197DABF11F54C0CA00DD5C3B /* MPInstanceProvider+Vungle.m in Sources */ = {isa = PBXBuildFile; fileRef = 197DABF01F54C0CA00DD5C3B /* MPInstanceProvider+Vungle.m */; };
-		197DABF51F54C15400DD5C3B /* VungleInstanceMediationSettings.m in Sources */ = {isa = PBXBuildFile; fileRef = 197DABF41F54C15400DD5C3B /* VungleInstanceMediationSettings.m */; };
-		19CB75071F54ADB300F78219 /* MPGoogleAdMobBannerCustomEvent.m in Sources */ = {isa = PBXBuildFile; fileRef = 19CB75041F54ADB300F78219 /* MPGoogleAdMobBannerCustomEvent.m */; };
-		19CB75081F54ADB300F78219 /* MPGoogleAdMobInterstitialCustomEvent.m in Sources */ = {isa = PBXBuildFile; fileRef = 19CB75061F54ADB300F78219 /* MPGoogleAdMobInterstitialCustomEvent.m */; };
 		440D75BE1F59E041005C603B /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 440D75BD1F59E041005C603B /* StoreKit.framework */; };
 		4435CC271F70566000F3A809 /* SettingsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4435CC261F70566000F3A809 /* SettingsViewController.m */; };
 		44A0CAEE1FCCCDEC00859DB3 /* Subscription.m in Sources */ = {isa = PBXBuildFile; fileRef = 44E3CB6B1FCCA83200C80C82 /* Subscription.m */; };
@@ -151,18 +145,6 @@
 
 /* Begin PBXFileReference section */
 		01122727D6CE50B340C55DBE /* libPods-PsiphonVPN.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-PsiphonVPN.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		197DABE91F54BEED00DD5C3B /* VungleInterstitialCustomEvent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VungleInterstitialCustomEvent.h; sourceTree = "<group>"; };
-		197DABEA1F54BEED00DD5C3B /* VungleInterstitialCustomEvent.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VungleInterstitialCustomEvent.m; sourceTree = "<group>"; };
-		197DABEC1F54C09E00DD5C3B /* MPVungleRouter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MPVungleRouter.h; sourceTree = "<group>"; };
-		197DABED1F54C09E00DD5C3B /* MPVungleRouter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MPVungleRouter.m; sourceTree = "<group>"; };
-		197DABEF1F54C0CA00DD5C3B /* MPInstanceProvider+Vungle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "MPInstanceProvider+Vungle.h"; sourceTree = "<group>"; };
-		197DABF01F54C0CA00DD5C3B /* MPInstanceProvider+Vungle.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "MPInstanceProvider+Vungle.m"; sourceTree = "<group>"; };
-		197DABF31F54C15400DD5C3B /* VungleInstanceMediationSettings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VungleInstanceMediationSettings.h; sourceTree = "<group>"; };
-		197DABF41F54C15400DD5C3B /* VungleInstanceMediationSettings.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VungleInstanceMediationSettings.m; sourceTree = "<group>"; };
-		19CB75031F54ADB300F78219 /* MPGoogleAdMobBannerCustomEvent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MPGoogleAdMobBannerCustomEvent.h; sourceTree = "<group>"; };
-		19CB75041F54ADB300F78219 /* MPGoogleAdMobBannerCustomEvent.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MPGoogleAdMobBannerCustomEvent.m; sourceTree = "<group>"; };
-		19CB75051F54ADB300F78219 /* MPGoogleAdMobInterstitialCustomEvent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MPGoogleAdMobInterstitialCustomEvent.h; sourceTree = "<group>"; };
-		19CB75061F54ADB300F78219 /* MPGoogleAdMobInterstitialCustomEvent.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MPGoogleAdMobInterstitialCustomEvent.m; sourceTree = "<group>"; };
 		440D75BD1F59E041005C603B /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 		4435CC251F70566000F3A809 /* SettingsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SettingsViewController.h; sourceTree = "<group>"; };
 		4435CC261F70566000F3A809 /* SettingsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SettingsViewController.m; sourceTree = "<group>"; };
@@ -348,25 +330,6 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		197DABF21F54C0EA00DD5C3B /* 3rd Party Adapters */ = {
-			isa = PBXGroup;
-			children = (
-				19CB75031F54ADB300F78219 /* MPGoogleAdMobBannerCustomEvent.h */,
-				19CB75041F54ADB300F78219 /* MPGoogleAdMobBannerCustomEvent.m */,
-				19CB75051F54ADB300F78219 /* MPGoogleAdMobInterstitialCustomEvent.h */,
-				19CB75061F54ADB300F78219 /* MPGoogleAdMobInterstitialCustomEvent.m */,
-				197DABEF1F54C0CA00DD5C3B /* MPInstanceProvider+Vungle.h */,
-				197DABF01F54C0CA00DD5C3B /* MPInstanceProvider+Vungle.m */,
-				197DABEC1F54C09E00DD5C3B /* MPVungleRouter.h */,
-				197DABED1F54C09E00DD5C3B /* MPVungleRouter.m */,
-				197DABF31F54C15400DD5C3B /* VungleInstanceMediationSettings.h */,
-				197DABF41F54C15400DD5C3B /* VungleInstanceMediationSettings.m */,
-				197DABE91F54BEED00DD5C3B /* VungleInterstitialCustomEvent.h */,
-				197DABEA1F54BEED00DD5C3B /* VungleInterstitialCustomEvent.m */,
-			);
-			name = "3rd Party Adapters";
-			sourceTree = "<group>";
-		};
 		448AD86C1F5DC89000316BA9 /* IAP */ = {
 			isa = PBXGroup;
 			children = (
@@ -505,7 +468,6 @@
 				EF652CD51F35224C002AFB48 /* MainViewController.m */,
 				4E5BD4F62061982C00AD4724 /* Feedback */,
 				4E0774951F566ADA0097BC8C /* InAppSettings.bundle */,
-				197DABF21F54C0EA00DD5C3B /* 3rd Party Adapters */,
 				448AD86C1F5DC89000316BA9 /* IAP */,
 				9BFECE9247474C83FD8C2948 /* AdManager.m */,
 				9BFEC66B7F0E98CBC5631F06 /* AdManager.h */,
@@ -1010,10 +972,7 @@
 				EF652CD71F35224C002AFB48 /* MainViewController.m in Sources */,
 				EF90D7A4204F22C900228A63 /* timestamp_format.c in Sources */,
 				F132D7E01F5739A800AF7F91 /* LaunchScreenViewController.m in Sources */,
-				19CB75081F54ADB300F78219 /* MPGoogleAdMobInterstitialCustomEvent.m in Sources */,
-				197DABEB1F54BEED00DD5C3B /* VungleInterstitialCustomEvent.m in Sources */,
 				EF184DAB20AD25E0006F6F5C /* PrivacyPolicyViewController.m in Sources */,
-				197DABF51F54C15400DD5C3B /* VungleInstanceMediationSettings.m in Sources */,
 				4E0DCB1A1F28481E00495781 /* PsiphonDataSharedDB.m in Sources */,
 				4435CC271F70566000F3A809 /* SettingsViewController.m in Sources */,
 				EFED7EBC1F55C8550078980F /* LogViewControllerFullScreen.m in Sources */,
@@ -1021,7 +980,6 @@
 				EFC2F5C620226782007B52F9 /* PsiphonProgressView.m in Sources */,
 				EF4F1F3D206055F7006A40A1 /* RACSignal+Operations2.m in Sources */,
 				EFC2F5C820226782007B52F9 /* LoadingCircleLayer.m in Sources */,
-				197DABF11F54C0CA00DD5C3B /* MPInstanceProvider+Vungle.m in Sources */,
 				EFC2F5C520226782007B52F9 /* EmbeddedServerEntries.m in Sources */,
 				EF90D7A9204F22C900228A63 /* FileUtils.m in Sources */,
 				EF90D7A1204F22C900228A63 /* timestamp_valid.c in Sources */,
@@ -1039,8 +997,6 @@
 				EF639C2F1F8FCE37009D6B42 /* PsiFeedbackLogger.m in Sources */,
 				9BFEC4F02A47FF8265635803 /* Notifier.m in Sources */,
 				9BFECFEB3BC9F10542C1A416 /* PsiphonConfigUserDefaults.m in Sources */,
-				197DABEE1F54C09E00DD5C3B /* MPVungleRouter.m in Sources */,
-				19CB75071F54ADB300F78219 /* MPGoogleAdMobBannerCustomEvent.m in Sources */,
 				EF90D7AA204F22C900228A63 /* NSError+Convenience.m in Sources */,
 				4E5BD4F52061982300AD4724 /* FeedbackManager.m in Sources */,
 				EF90D7A8204F22C900228A63 /* DispatchUtils.m in Sources */,
