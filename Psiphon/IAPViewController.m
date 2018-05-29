@@ -222,10 +222,10 @@ static NSString *iapCellID = @"IAPTableCellID";
 
     label.font = [label.font fontWithSize:13];
     label.textColor = [UIColor darkGrayColor];
-    label.text = NSLocalizedStringWithDefaultValue(@"BUY_SUBSCRIPTIONS_FOOTER_TEXT",
+    label.text = NSLocalizedStringWithDefaultValue(@"BUY_SUBSCRIPTIONS_NOTICES",
                                                    nil,
                                                    [NSBundle mainBundle],
-                                                   @"A subscription is auto-renewable which means that once purchased it will be automatically renewed until you cancel it 24 hours prior to the end of the current period.\n\nYour iTunes Account will be charged for renewal within 24-hours prior to the end of the current period with the cost of subscription.\n\nManage your Subscription and Auto-Renewal by going to your Account Settings.",
+                                                   @"A subscription is auto-renewable which means that once purchased it will be automatically renewed until you cancel it 24 hours prior to the end of the current period.\n\nYour iTunes Account will be charged for renewal within 24-hours prior to the end of the current period with the cost of subscription.",
                                                    @"Buy subscription dialog footer text");
 
     label.textAlignment = NSTextAlignmentLeft;
@@ -271,6 +271,15 @@ static NSString *iapCellID = @"IAPTableCellID";
     tosButton.translatesAutoresizingMaskIntoConstraints = NO;
     [terms addSubview:tosButton];
 
+
+    // Manage subscriptions button
+    UIButton *manageSubsButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+    [manageSubsButton setTitle:NSLocalizedStringWithDefaultValue(@"MANAGE_SUBSCRIPTIONS_BUTTON", nil, [NSBundle mainBundle], @"Manage my subscription", @"Manage subscription button")
+                      forState:UIControlStateNormal];
+    [manageSubsButton addTarget:self action:@selector(onManageSubscriptionTap) forControlEvents:UIControlEventTouchUpInside];
+    manageSubsButton.translatesAutoresizingMaskIntoConstraints = FALSE;
+    [cellView addSubview:manageSubsButton];
+
     NSString *restoreButtonTitle = NSLocalizedStringWithDefaultValue(@"RESTORE_SUBSCRIPTION_BUTTON_TITLE",
                                                                      nil,
                                                                      [NSBundle mainBundle],
@@ -295,11 +304,12 @@ static NSString *iapCellID = @"IAPTableCellID";
     
     [cellView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|-[terms]-|" options:0 metrics:nil views:@{ @"terms": terms}]];
     [cellView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|-[label]-|" options:0 metrics:nil views:@{ @"label": label}]];
+    [cellView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|-[manageSubsButton]-|" options:0 metrics:nil views:@{ @"manageSubsButton": manageSubsButton}]];
     [cellView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|-[restoreButton]-|" options:0 metrics:nil views:@{ @"restoreButton": restoreButton}]];
     [cellView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|-[refreshButton]-|" options:0 metrics:nil views:@{ @"refreshButton": refreshButton}]];
-    [cellView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|-[terms(==30)]-[label]-10-[restoreButton]-10-[refreshButton]-|"
+    [cellView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|-[terms(==30)]-[label]-10-[manageSubsButton]-10-[restoreButton]-10-[refreshButton]-|"
                                                                      options:0 metrics:nil
-                                                                       views:@{ @"terms": terms, @"label": label, @"restoreButton": restoreButton, @"refreshButton": refreshButton}]];
+                                                                       views:@{ @"terms": terms, @"label": label, @"manageSubsButton": manageSubsButton, @"restoreButton": restoreButton, @"refreshButton": refreshButton}]];
 
     [privacyPolicyButton.heightAnchor constraintEqualToAnchor:terms.heightAnchor].active = YES;
     [privacyPolicyButton.centerYAnchor constraintEqualToAnchor:terms.centerYAnchor].active = YES;
@@ -374,16 +384,6 @@ static NSString *iapCellID = @"IAPTableCellID";
     }
 }
 
-- (void)openPrivacyPolicy {
-    NSURL *url = [NSURL URLWithString:NSLocalizedStringWithDefaultValue(@"PRIVACY_POLICY_URL", nil, [PsiphonClientCommonLibraryHelpers commonLibraryBundle], @"https://psiphon.ca/en/privacy.html", @"External link to the privacy policy page. Please update this with the correct language specific link (if available) e.g. https://psiphon.ca/fr/privacy.html for french.")];
-    [self openURL:url];
-}
-
-- (void)openToS {
-    NSURL *url = [NSURL URLWithString:NSLocalizedStringWithDefaultValue(@"LICENSE_PAGE_URL", nil, [PsiphonClientCommonLibraryHelpers commonLibraryBundle], @"https://psiphon.ca/en/license.html", "External link to the license page. Please update this with the correct language specific link (if available) e.g. https://psiphon.ca/fr/license.html for french.")];
-    [self openURL:url];
-}
-
 - (void)openURL:(NSURL*)url {
     if (url != nil) {
         dispatch_async(dispatch_get_main_queue(), ^{
@@ -395,6 +395,24 @@ static NSString *iapCellID = @"IAPTableCellID";
                                      completionHandler:nil];
         });
     }
+}
+
+- (void)openPrivacyPolicy {
+    NSURL *url = [NSURL URLWithString:NSLocalizedStringWithDefaultValue(@"PRIVACY_POLICY_URL", nil, [PsiphonClientCommonLibraryHelpers commonLibraryBundle], @"https://psiphon.ca/en/privacy.html", @"External link to the privacy policy page. Please update this with the correct language specific link (if available) e.g. https://psiphon.ca/fr/privacy.html for french.")];
+    [self openURL:url];
+}
+
+- (void)openToS {
+    NSURL *url = [NSURL URLWithString:NSLocalizedStringWithDefaultValue(@"LICENSE_PAGE_URL", nil, [PsiphonClientCommonLibraryHelpers commonLibraryBundle], @"https://psiphon.ca/en/license.html", "External link to the license page. Please update this with the correct language specific link (if available) e.g. https://psiphon.ca/fr/license.html for french.")];
+    [self openURL:url];
+}
+
+- (void)onManageSubscriptionTap {
+    // Apple docs: https://developer.apple.com/library/content/documentation/NetworkingInternet/Conceptual/StoreKitGuide/Chapters/Subscriptions.html#//apple_ref/doc/uid/TP40008267-CH7-SW6
+    // Using "itmss" protocol to open iTunes directly. https://stackoverflow.com/a/18135776
+    // If the iTunes app is uninstalled, the system will show a "Restore iTunes Store" dialog, this behaviour is the same
+    // whether the "itmss" protocol is used or not.
+    [self openURL:[NSURL URLWithString:@"itmss://buy.itunes.apple.com/WebObjects/MZFinance.woa/wa/manageSubscriptions"]];
 }
 
 - (void)restoreAction {
