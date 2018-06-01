@@ -571,7 +571,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
     [self.psiphonTunnel stop];
 }
 
-- (void)reconnectWithConfig:(NSString *)sponsorId {
+- (void)reconnectWithConfig:(NSString *_Nullable)sponsorId {
     dispatch_async(self->workQueue, ^{
         [self.psiphonTunnel reconnectWithConfig:sponsorId :[self getAllAuthorizations]];
     });
@@ -658,7 +658,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
         NSSet<NSString *> *nonMarkedAuths = [Authorization authorizationIDsFrom:[sharedDB getNonMarkedAuthorizations]];
 
         if (![nonMarkedAuths isEqualToSet:self.suppliedContainerAuthorizationIDs]) {
-            [self reconnectWithNewConfig];
+            [self reconnectWithConfig:nil];
         }
 
     }
@@ -1057,13 +1057,9 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 - (void)onAvailableEgressRegions:(NSArray *)regions {
     [sharedDB insertNewEgressRegions:regions];
 
-<<<<<<< HEAD
     [[Notifier sharedInstance] post:NotifierAvailableEgressRegions completionHandler:^(BOOL success) {
         // Do nothing.
     }];
-=======
-    // Notify container
-    [notifier post:NOTIFIER_ON_AVAILABLE_EGRESS_REGIONS];
 
     PsiphonConfigUserDefaults *userDefaults = [PsiphonConfigUserDefaults sharedInstance];
 
@@ -1073,7 +1069,6 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 
         [self displayMessageAndKillExtension:NSLocalizedStringWithDefaultValue(@"VPN_START_FAIL_REGION_INVALID_MESSAGE", nil, [NSBundle mainBundle], @"The region you selected is no longer available. You must choose a new region or change to the default \"Best performance\" choice.", @"Alert dialog message informing the user that an error occurred while starting Psiphon because they selected an egress region that is no longer available (Do not translate 'Psiphon'). The user should select a different region and try again. Note: the backslash before each quotation mark should be left as is for formatting.")];
     }
->>>>>>> upstream/master
 }
 
 - (void)onInternetReachabilityChanged:(Reachability* _Nonnull)reachability {

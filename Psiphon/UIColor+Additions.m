@@ -33,4 +33,16 @@
     return [UIColor colorWithRed:41.0f / 255.0f green:98.0f / 255.0f blue:1.0f alpha:0.5f];
 }
 
++ (UIColor * _Nonnull)charcoalGreyColor {
+    return [UIColor colorWithRed:60.0f / 255.0f green:66.0f / 255.0f blue:84.0f / 255.0f alpha:1.0f];
+}
+
++ (UIColor * _Nonnull)weirdGreenColor {
+    return [UIColor colorWithRed:39.0f / 255.0f green:230.0f / 255.0f blue:131.0f / 255.0f alpha:1.0f];
+}
+
++ (UIColor * _Nonnull)purpleButtonColor {
+    return [UIColor colorWithRed:119.0f / 255.0f green:97.0f / 255.0f blue:1.0f alpha:1.0f];
+}
+
 @end

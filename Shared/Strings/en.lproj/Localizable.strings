@@ -1,7 +1,7 @@
 /* THIS FILE IS GENERATED. DO NOT EDIT. */
 
 /* Title of the section in the subscription dialog that shows currently active subscription information. */
-"ACTIVE_SUBSCRIPTION_SECTION_TITLE" = "Current subscription";
+"ACTIVE_SUBSCRIPTION_SECTION_TITLE" = "You're subscribed!";
 
 /* Text for button that tell users there will by a short video ad. */
 "AD_LOADED" = "Watch a short video while we get ready to connect you";
@@ -24,11 +24,11 @@
 /* Title of button on alert view which shows the progress of the user's buy request. Hitting this button dismisses the alert and the buy request continues processing in the background. */
 "BUY_REQUEST_PROGRESS_ALERT_DISMISS_BUTTON_TITLE" = "Dismiss";
 
-/* Premium subscriptions dialog header text */
-"BUY_SUBSCRIPTIONS_HEADER_TEXT" = "Remove ads and surf the Internet faster with a premium subscription!";
-
 /* Buy subscription dialog footer text */
-"BUY_SUBSCRIPTIONS_NOTICES" = "A subscription is auto-renewable which means that once purchased it will be automatically renewed until you cancel it 24 hours prior to the end of the current period.\n\nYour iTunes Account will be charged for renewal within 24-hours prior to the end of the current period with the cost of subscription.";
+"BUY_SUBSCRIPTIONS_FOOTER_TEXT" = "A subscription is auto-renewable which means that once purchased it will be automatically renewed until you cancel it 24 hours prior to the end of the current period.\n\nYour iTunes Account will be charged for renewal within 24-hours prior to the end of the current period with the cost of subscription.";
+
+/* Alert Cancel button */
+"CANCEL_BUTTON" = "Cancel";
 
 /* Alert message informing user that their subscription has expired or that they're not a subscriber, therefore Psiphon can only be started from the Psiphon app. DO NOT translate 'Psiphon'. */
 "CANNOT_START_TUNNEL_DUE_TO_SUBSCRIPTION" = "Your Psiphon subscription has expired.\nSince you're not a subscriber or your subscription has expired, Psiphon can only be started from the Psiphon app.\n\nPlease open the Psiphon app.";
@@ -78,9 +78,6 @@
 
 /* Text displayed while app loads */
 "LOADING" = "Loading...";
-
-/* Manage subscription button */
-"MANAGE_SUBSCRIPTIONS_BUTTON" = "Manage my subscription";
 
 /* Alert title informing user there is no internet connection */
 "NO_INTERNET" = "No Internet Connection";
@@ -233,12 +230,6 @@
 /* Alert error message informing user that their Speed Boost purchase request failed because of an unknown error */
 "PSICASH_SPEED_BOOST_PURCHASE_FAILED_UNEXPECTED_CODE" = "Invalid or unexpected status code returned from PsiCash library.";
 
-/* Refresh app receipt button title */
-"REFRESH_APP_RECEIPT_BUTTON_TITLE" = "Refresh app receipt";
-
-/* Restore my subscription button title */
-"RESTORE_SUBSCRIPTION_BUTTON_TITLE" = "Restore my existing subscription";
-
 /* Subscriptions item title in the app settings when user has an active subscription. Clicking this item opens subscriptions view */
 "SETTINGS_SUBSCRIPTION_ACTIVE" = "Subscriptions";
 
@@ -276,7 +267,13 @@
 "VPN_START_FAIL_MESSAGE" = "An error occurred while starting Psiphon. Please try again. If this problem persists, try reinstalling the Psiphon app.";
 
 /* Alert dialog message informing the user that an error occurred while starting Psiphon because they selected an egress region that is no longer available (Do not translate 'Psiphon'). The user should select a different region and try again. Note: the backslash before each quotation mark should be left as is for formatting. */
+"VPN_START_FAIL_REGION_INVALID_MESSAGE" = "The region you selected is no longer available. You must choose a new region or change to the default \"Best performance\" choice.";
+
+/* Alert dialog message informing the user that an error occurred while starting Psiphon because they selected an egress region that is no longer available (Do not translate 'Psiphon'). The user should select a different region and try again. Note: the backslash before each quotation mark should be left as is for formatting. */
 "VPN_START_FAIL_REGION_INVALID_MESSAGE_1" = "The region you selected is no longer available. You must choose a new region or change to the default \"Fastest Country\" choice.";
+
+/* Alert dialog title indicating to the user that Psiphon was unable to start because they selected an egress region that is no longer available */
+"VPN_START_FAIL_REGION_INVALID_TITLE" = "Server Region Unavailable";
 
 /* Alert dialog title indicating to the user that Psiphon was unable to start (MainViewController) */
 "VPN_START_FAIL_TITLE" = "Unable to start";
