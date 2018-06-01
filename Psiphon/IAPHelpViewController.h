@@ -17,20 +17,18 @@
  *
  */
 
-#import <UIKit/UIKit.h>
+#import <Foundation/Foundation.h>
+#import <PureLayout/ALView+PureLayout.h>
+#import "IAPViewController.h"
+#import "AppDelegate.h"
+#import "IAPStoreHelper.h"
+#import "MBProgressHUD.h"
+#import "NSDate+Comparator.h"
+#import "PsiphonClientCommonLibraryHelpers.h"
+#import "PsiphonDataSharedDB.h"
+#import "SharedConstants.h"
+#import "UIColor+Additions.h"
 
-@interface UIColor (Additions)
-
-+ (UIColor * _Nonnull)paleBlueColor;
-
-+ (UIColor * _Nonnull)clearBlueColor;
-
-+ (UIColor * _Nonnull)clearBlue50Color;
-
-+ (UIColor * _Nonnull)charcoalGreyColor;
-
-+ (UIColor * _Nonnull)weirdGreenColor;
-
-+ (UIColor * _Nonnull)purpleButtonColor;
+@interface IAPHelpViewController : UIViewController
 
 @end

@@ -71,6 +71,7 @@
 		9BFECB6BF077F45D491093F1 /* Authorization.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC31B61584FD2EAAF5DE6 /* Authorization.m */; };
 		9BFECC5AE8636FBEF73D85D3 /* AdManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFECE9247474C83FD8C2948 /* AdManager.m */; };
 		9BFECC62159FBEAA1A69F4F9 /* BasePacketTunnelProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFECC3FADE9C8A76A0913DE /* BasePacketTunnelProvider.m */; };
+		9BFECD174E254989EC97A437 /* IAPHelpViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC220C067BBE75AF970C1 /* IAPHelpViewController.m */; };
 		9BFECD1880B51B0E2EAEFF1F /* Notifier.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC91ED4A1C511520E9948 /* Notifier.m */; };
 		9BFECD2FAA1FCDA88A7D432E /* UIColor+Additions.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC72C282F6060193B2E87 /* UIColor+Additions.m */; };
 		9BFECE5505C42426FC9627C8 /* UserDefaults.h in Resources */ = {isa = PBXBuildFile; fileRef = 9BFECC9B2B9F2BFBD4F8A47B /* UserDefaults.h */; };
@@ -125,7 +126,7 @@
 		EFC2F5B620226758007B52F9 /* PacketTunnelUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = EFC2F5B420226757007B52F9 /* PacketTunnelUtils.m */; };
 		EFC2F5C420226782007B52F9 /* RootContainerController.m in Sources */ = {isa = PBXBuildFile; fileRef = EFC2F5BB20226781007B52F9 /* RootContainerController.m */; };
 		EFC2F5C720226782007B52F9 /* UIAlertController+Delegate.m in Sources */ = {isa = PBXBuildFile; fileRef = EFC2F5C020226782007B52F9 /* UIAlertController+Delegate.m */; };
-		EFC2F5C820226782007B52F9 /* LoadingCircleLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = EFC2F5C220226782007B52F9 /* LoadingCircleLayer.m */; };
+		EFC2F5C820226782007B52F9 /* PBXBuildFile */ = {isa = PBXBuildFile; fileRef = EFC2F5C220226782007B52F9 /* LoadingCircleLayer.m */; };
 		EFC2F5CB202267B1007B52F9 /* PsiphonConfigReader.m in Sources */ = {isa = PBXBuildFile; fileRef = EFC2F5CA202267B0007B52F9 /* PsiphonConfigReader.m */; };
 		EFC2F5CC20226835007B52F9 /* PsiphonConfigReader.m in Sources */ = {isa = PBXBuildFile; fileRef = EFC2F5CA202267B0007B52F9 /* PsiphonConfigReader.m */; };
 		EFED7EBC1F55C8550078980F /* LogViewControllerFullScreen.m in Sources */ = {isa = PBXBuildFile; fileRef = EFED7EBB1F55C8550078980F /* LogViewControllerFullScreen.m */; };
@@ -308,6 +309,7 @@
 		963708A81F65D4810038894E /* Bourbon-Oblique.otf */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Bourbon-Oblique.otf"; sourceTree = "<group>"; };
 		9BFEC0419AD3808370915E01 /* PsiphonConfigUserDefaults.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PsiphonConfigUserDefaults.h; sourceTree = "<group>"; };
 		9BFEC1C9F506CE1DF07306D2 /* NEBridge.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NEBridge.h; sourceTree = "<group>"; };
+		9BFEC220C067BBE75AF970C1 /* IAPHelpViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IAPHelpViewController.m; sourceTree = "<group>"; };
 		9BFEC3165745A5D14C8C3C08 /* Notifier.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Notifier.h; sourceTree = "<group>"; };
 		9BFEC31B61584FD2EAAF5DE6 /* Authorization.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Authorization.m; sourceTree = "<group>"; };
 		9BFEC33236183B2DA0000D5B /* VPNManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VPNManager.h; sourceTree = "<group>"; };
@@ -322,6 +324,7 @@
 		9BFEC8783D4222F2272E50E7 /* BasePacketTunnelProvider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BasePacketTunnelProvider.h; sourceTree = "<group>"; };
 		9BFEC91ED4A1C511520E9948 /* Notifier.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Notifier.m; sourceTree = "<group>"; };
 		9BFECA9ADB17DC329DA64AA5 /* AsyncOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AsyncOperation.h; sourceTree = "<group>"; };
+		9BFECB09D7F866F34551DBD4 /* IAPHelpViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IAPHelpViewController.h; sourceTree = "<group>"; };
 		9BFECBACAAF0FC84C7EA783E /* VPNManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VPNManager.m; sourceTree = "<group>"; };
 		9BFECBF5A83176EA09316CB4 /* SwoopView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SwoopView.m; sourceTree = "<group>"; };
 		9BFECC3FADE9C8A76A0913DE /* BasePacketTunnelProvider.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BasePacketTunnelProvider.m; sourceTree = "<group>"; };
@@ -454,6 +457,8 @@
 				4E5263CC2072984D0021FEF5 /* IAPStoreHelper.m */,
 				4E5263CB2072984D0021FEF5 /* IAPViewController.h */,
 				4E5263CA2072984D0021FEF5 /* IAPViewController.m */,
+				9BFEC220C067BBE75AF970C1 /* IAPHelpViewController.m */,
+				9BFECB09D7F866F34551DBD4 /* IAPHelpViewController.h */,
 			);
 			name = IAP;
 			sourceTree = "<group>";
@@ -1245,7 +1250,7 @@
 				EF652CD11F352212002AFB48 /* main.m in Sources */,
 				4E5DAE6520A942A300E06342 /* UILabel+GetLabelHeight.m in Sources */,
 				44A0CAF31FE04A4500859DB3 /* RMAppReceipt.m in Sources */,
-				44D9B1001F67470E007D1E69 /* IAPViewController.m in Sources */,
+				44D9B1001F67470E007D1E69,
 				EFC2F5CB202267B1007B52F9 /* PsiphonConfigReader.m in Sources */,
 				EF90D7A7204F22C900228A63 /* NSDate+PSIDateExtension.m in Sources */,
 				4E04845A20487208006C3D35 /* PsiCashSpeedBoostSliderView.m in Sources */,
@@ -1292,6 +1297,7 @@
 				9BFEC2458D1346F537E9089E /* Nullity.m in Sources */,
 				9BFECD2FAA1FCDA88A7D432E /* UIColor+Additions.m in Sources */,
 				9BFEC54DB169011DBB9A8FE5 /* SwoopView.m in Sources */,
+				9BFECD174E254989EC97A437 /* IAPHelpViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
