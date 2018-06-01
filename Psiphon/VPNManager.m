@@ -51,6 +51,8 @@ NSErrorDomain const VPNManagerErrorDomain = @"VPNManagerErrorDomain";
 
 PsiFeedbackLogType const VPNManagerLogType = @"VPNManager";
 
+UserDefaultsKey const VPNManagerConnectOnDemandUntilNextStartBoolKey = @"VPNManager.ConnectOnDemandUntilNextStartKey";
+
 @interface VPNManager ()
 
 // Public properties
@@ -221,11 +223,6 @@ PsiFeedbackLogType const VPNManagerLogType = @"VPNManager";
           subscribeNext:^(NETunnelProviderManager *tunnelProvider) {
               if (tunnelProvider) {
                   instance.tunnelProviderManager = tunnelProvider;
-
-                  // If Connect On Demand setting was changed since the last time the app was opened,
-                  // reset user's preference to the same state as the VPN Configuration.
-                  [[NSUserDefaults standardUserDefaults]
-                    setBool:instance.tunnelProviderManager.isOnDemandEnabled forKey:SettingsConnectOnDemandBoolKey];
               }
           }
           error:^(NSError *error) {
@@ -329,6 +326,14 @@ PsiFeedbackLogType const VPNManagerLogType = @"VPNManager";
           if (!providerManager.onDemandRules || [providerManager.onDemandRules count] == 0) {
               NEOnDemandRule *alwaysConnectRule = [NEOnDemandRuleConnect new];
               providerManager.onDemandRules = @[alwaysConnectRule];
+          }
+
+          NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
+          if ([ud boolForKey:VPNManagerConnectOnDemandUntilNextStartBoolKey]) {
+              providerManager.onDemandEnabled = TRUE;
+
+              // Reset VPNManagerConnectOnDemandUntilNextStartBoolKey value.
+              [ud setBool:FALSE forKey:VPNManagerConnectOnDemandUntilNextStartBoolKey];
           }
 
           return providerManager;

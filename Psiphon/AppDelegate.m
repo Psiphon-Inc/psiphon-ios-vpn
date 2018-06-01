@@ -29,7 +29,7 @@
 #import "MPInterstitialAdController.h"
 #import "Notifier.h"
 #import "PsiphonClientCommonLibraryHelpers.h"
-#import "PsiphonConfigFiles.h"
+#import "PsiphonConfigReader.h"
 #import "PsiphonDataSharedDB.h"
 #import "RootContainerController.h"
 #import "SharedConstants.h"
@@ -403,7 +403,7 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
  * This function should only be called once per app version on first launch.
  */
 - (void)updateAvailableEgressRegionsOnFirstRunOfAppVersion {
-    NSString *embeddedServerEntriesPath = [PsiphonConfigFiles embeddedServerEntriesPath];
+    NSString *embeddedServerEntriesPath = PsiphonConfigReader.embeddedServerEntriesPath;
     NSArray *embeddedEgressRegions = [EmbeddedServerEntries egressRegionsFromFile:embeddedServerEntriesPath];
 
     LOG_DEBUG("Available embedded egress regions: %@.", embeddedEgressRegions);
@@ -553,34 +553,30 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
 
     __weak AppDelegate *weakSelf = self;
 
-    dispatch_async_global(^{
-        NSDate *expiryDate;
-        BOOL activeSubscription = [IAPStoreHelper hasActiveSubscriptionForDate:[NSDate date] getExpiryDate:&expiryDate];
+    NSDate *expiryDate;
+    BOOL activeSubscription = [IAPStoreHelper hasActiveSubscriptionForDate:[NSDate date] getExpiryDate:&expiryDate];
 
-        dispatch_async_main(^{
-            if (activeSubscription) {
+    if (activeSubscription) {
 
-                // Also update the subscription status subject.
-                [weakSelf.subscriptionStatus sendNext:@(UserSubscriptionActive)];
+        // Also update the subscription status subject.
+        [weakSelf.subscriptionStatus sendNext:@(UserSubscriptionActive)];
 
-                NSTimeInterval interval = [expiryDate timeIntervalSinceNow];
-                
-                if (interval > 0) {
-                    // Checks if another timer is already running.
-                    if (![weakSelf.subscriptionCheckTimer isValid]) {
-                        weakSelf.subscriptionCheckTimer = [NSTimer scheduledTimerWithTimeInterval:interval
-                                                                                 repeats:NO
-                                                                                   block:^(NSTimer *timer) {
-                            [weakSelf subscriptionExpiryTimer];
-                        }];
-                    }
-                }
-            } else {
-                // Instead of subscribing to the notification in this class, calls the handler directly.
-                [weakSelf onSubscriptionExpired];
+        NSTimeInterval interval = [expiryDate timeIntervalSinceNow];
+
+        if (interval > 0) {
+            // Checks if another timer is already running.
+            if (![weakSelf.subscriptionCheckTimer isValid]) {
+                weakSelf.subscriptionCheckTimer = [NSTimer scheduledTimerWithTimeInterval:interval
+                                                                         repeats:NO
+                                                                           block:^(NSTimer *timer) {
+                    [weakSelf subscriptionExpiryTimer];
+                }];
             }
-        });
-    });
+        }
+    } else {
+        // Instead of subscribing to the notification in this class, calls the handler directly.
+        [weakSelf onSubscriptionExpired];
+    }
 }
 
 - (void)onSubscriptionExpired {
@@ -626,21 +622,6 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
     }];
 
     [self.compoundDisposable addDisposable:vpnActiveDisposable];
-
-    // Checks if user previously preferred to have Connect On Demand enabled,
-    // Re-enable it upon subscription since it may have been disabled if the previous subscription expired.
-    // Disables Connect On Demand setting of the VPN Configuration.
-    BOOL userPreferredOnDemandSetting = [[NSUserDefaults standardUserDefaults]
-      boolForKey:SettingsConnectOnDemandBoolKey];
-
-    __block RACDisposable *onDemandDisposable = [[self.vpnManager setConnectOnDemandEnabled:userPreferredOnDemandSetting]
-      subscribeError:^(NSError *error) {
-          [weakSelf.compoundDisposable removeDisposable:onDemandDisposable];
-    } completed:^{
-          [weakSelf.compoundDisposable removeDisposable:onDemandDisposable];
-    }];
-
-    [self.compoundDisposable addDisposable:onDemandDisposable];
 
 }
 

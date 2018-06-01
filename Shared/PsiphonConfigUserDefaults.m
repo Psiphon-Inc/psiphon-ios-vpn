@@ -47,6 +47,10 @@
     return self;
 }
 
+- (NSString*)egressRegion {
+    return [userDefaults stringForKey:PSIPHON_CONFIG_EGRESS_REGION];
+}
+
 /*!
  * @return True if new data is saved to disk successfully, FALSE otherwise.
  */
