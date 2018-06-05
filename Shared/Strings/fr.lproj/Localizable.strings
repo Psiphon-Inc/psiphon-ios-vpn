@@ -1,6 +1,3 @@
-/* Active subscription detail text, example: Expires on 2017-01-01 */
-"ACTIVE_SUBSCRIPTION_DETAIL_TEXT" = "Expire le %@";
-
 /* Title of the section in the subscription dialog that shows currently active subscription information. */
 "ACTIVE_SUBSCRIPTION_SECTION_TITLE" = "Abonnement actuel";
 
@@ -22,14 +19,11 @@
 /* Title of button on alert view which shows the progress of the user's buy request. Hitting this button dismisses the alert and the buy request continues processing in the background. */
 "BUY_REQUEST_PROGRESS_ALERT_DISMISS_BUTTON_TITLE" = "Fermer";
 
-/* Buy subscription dialog footer text */
-"BUY_SUBSCRIPTIONS_FOOTER_TEXT" = "Après achat, un abonnement sera renouvelé automatiquement jusqu’à ce que vous l’annuliez 24 heures avant la fin de la période actuelle.\n\nLe renouvellement, soit le coût de l’abonnement, sera facturé à votre compte iTunes dans les 24 heures avant la fin de la période actuelle.\n\nGérez votre abonnement et le renouvellement automatique en vous rendant dans les réglages de votre compte.";
-
 /* Premium subscriptions dialog header text */
 "BUY_SUBSCRIPTIONS_HEADER_TEXT" = "Supprimez les publicités et surfez plus rapidement sur Internet avec un abonnement Pro !";
 
-/* Alert Cancel button */
-"CANCEL_BUTTON" = "Annuler";
+/* Buy subscription dialog footer text */
+"BUY_SUBSCRIPTIONS_NOTICES" = "Un abonnement se renouvelle automatiquement, ce qui signifie qu’après achat, il sera renouvelé automatiquement jusqu’à ce que vous l’annuliez 24 heures avant la fin de la période actuelle.\n\nLe renouvellement, soit le coût de l’abonnement, sera facturé à votre compte iTunes dans les 24 heures avant la fin de la période actuelle.";
 
 /* Alert message informing user that their subscription has expired or that they're not a subscriber, therefore Psiphon can only be started from the Psiphon app. DO NOT translate 'Psiphon'. */
 "CANNOT_START_TUNNEL_DUE_TO_SUBSCRIPTION" = "Votre abonnement Psiphon est arrivé à expiration.\nComme vous n’êtes pas abonné ou que votre abonnement est expiré, Psiphon ne peut être démarré qu’à partir de l’appli Psiphon.\n\nVeuillez ouvrir l’appli Psiphon.";
@@ -40,8 +34,8 @@
 /* Main text in the 'Upstream Proxy Error' dialog box. This is shown when the user has directly altered these settings, and those settings are (probably) erroneous. DO NOT translate 'Psiphon'. */
 "CHECK_UPSTREAM_PROXY_SETTING" = "Vous avez configuré Psiphon pour qu’il utilise un serveur mandataire ascendant.\nCependant, il semble que nous ne soyons pas en mesure de nous connecter à un serveur Psiphon par ce mandataire.\nVeuillez corriger les paramètres et ressayer.";
 
-/* Alert dialog body informing the user that the 'Auto-start VPN on demand' feature is enabled and that the VPN cannot be stopped. Followed by asking the user if they would like to disable the 'Auto-start VPN on demand' feature, and stop the VPN. */
-"CONNECT_ON_DEMAND_ALERT_BODY" = "Impossible d’arrêter le RPV tant que « Démarrage automatique du RPV » est activé.\nSouhaitez-vous désactiver le « Démarrage automatique du RPV » à la demande et arrêter le RPV ?";
+/* Alert dialog body informing the user that the 'Auto-start VPN on demand' feature will be disabled and that the VPN cannot be stopped. */
+"CONNECT_ON_DEMAND_ALERT_BODY" = "« Démarrage automatique du RPV » sera désactivé temporairement jusqu’à ce que le prochain RPV Psiphon soit démarré.";
 
 /* Alert dialog title informing user that 'Auto-start VPN' feature is enabled */
 "CONNECT_ON_DEMAND_ALERT_TITLE" = "Le démarrage automatique du RPV est activé";
@@ -51,9 +45,6 @@
 
 /* Alert dialog message informing the user that the settings file in the app is corrupt, and that they can potentially fix this issue by re-installing the app. */
 "CORRUPT_SETTINGS_MESSAGE" = "Votre fichier des réglages de l’appli semble être corrompu. Essayez de réinstaller l’appli pour réparer le fichier.";
-
-/* Disable Auto-start VPN feature and Stop the VPN button label */
-"DISABLE_BUTTON" = "Désactiver le démarrage automatique du RPV et arrêter";
 
 /* Title of the button that dismisses region selection dialog
    Title of the button that dismisses the subscriptions menu */
@@ -83,20 +74,81 @@
 /* Text displayed while app loads */
 "LOADING" = "Chargement...";
 
+/* Manage subscription button */
+"MANAGE_SUBSCRIPTIONS_BUTTON" = "Gérer mon abonnement";
+
 /* Alert title informing user there is no internet connection */
 "NO_INTERNET" = "Aucune connexion Internet";
 
 /* Subscriptions view text that is visible when the list of subscriptions is not available */
 "NO_PRODUCTS_TEXT" = "Impossible de récupérer les abonnements de la logithèque App Store. Tirez vers le bas pour actualiser ou ressayez ultérieurement.";
 
-/*[UNTRANSLATED] Alert OK Button */
+/*[UNTRANSLATED] Alert OK Button
+   OK button title */
 "OK_BUTTON" = "OK";
 
 /* Alert message informing the user they should open the app to finish connecting to the VPN. DO NOT translate 'Psiphon'. */
 "OPEN_PSIPHON_APP" = "Veuillez ouvrir l’appli Psiphon pour finir de vous connecter.";
 
+/* Cancel button title. */
+"PRIVACY_POLICY_CANCEL_BUTTON" = "Annuler";
+
 /* External link to the privacy policy page. Please update this with the correct language specific link (if available) e.g. https://psiphon.ca/fr/privacy.html for french. */
 "PRIVACY_POLICY_URL" = "https://psiphon.ca/fr/privacy.html";
+
+/* Paragraph text in the 'What does Psiphon do with your VPN data?' subsection of the 'User VPN Data' section of the Privacy page. */
+"PrivacyInformationCollectedVpndataWhatdoespsiphondowithPara1" = "Psiphon regarde vos données uniquement dans la mesure nécessaire à la collecte de statistiques sur votre utilisation de notre système. Nous enregistrons le total d’octets transférés par connexion utilisateur, ainsi que les octets transférés pour certains domaines particuliers. Ces statistiques sont détruites après 60 jours.";
+
+/* Paragraph text in the 'What does Psiphon do with your VPN data?' subsection of the 'User VPN Data' section of the Privacy page. */
+"PrivacyInformationCollectedVpndataWhatdoespsiphondowithPara2" = "Psiphon n’inspecte ni n’enregistre des URL entières (seulement les noms de domaines) ni n’examine vos données en profondeur. Psiphon ne modifie pas vos données alors qu’elles transitent par le RPV.";
+
+/* Paragraph text in the 'What does Psiphon do with your VPN data?' subsection of the 'User VPN Data' section of the Privacy page. */
+"PrivacyInformationCollectedVpndataWhatdoespsiphondowithPara3" = "Il serait même difficile de relier ces données brutes à vous, dans la mesure où nous convertissons immédiatement votre adresse IP en information géographique et que nous l’effaçons ensuite. Nous n’enregistrons aucun autre renseignement permettant de vous identifier.";
+
+/* Sub-heading in the 'User VPN Data' section of the Privacy Policy page. The section describes what Psiphon does with the little bit of VPN data that it collects stats from. */
+"PrivacyInformationCollectedVpndataWhatdoespsiphondowithSubhead" = "Qu'est-ce que Psiphon fait avec vos données RPV ?";
+
+/* Paragraph text in the 'Who does Psiphon share these statistics with?' subsection of the 'User VPN Data' section of the Privacy page. */
+"PrivacyInformationCollectedVpndataWhopsiphonshareswithPara1" = "Lors d’un partage avec des tiers, Psiphon ne fournit que des statistiques brutes globales de domaines et d’octets. Nous ne partageons jamais de renseignements par session ni d’autres renseignements qui permettraient potentiellement d’identifier les utilisateurs.";
+
+/* Paragraph text in the 'Who does Psiphon share these statistics with?' subsection of the 'User VPN Data' section of the Privacy page. */
+"PrivacyInformationCollectedVpndataWhopsiphonshareswithPara2" = "Le partage a habituellement lieu avec des services ou des organisations avec lesquelles nous collaborons, comme <a href=\"http://www.dw.com/en/psiphon-helps-dodge-the-online-trackers/a-16765092\" target=\"_blank\">nous l’avons fait avec DW</a> il y a quelques années. Ces statistiques nous aident et les aident à répondre à des questions telles que : « Combien d’octets ont été transférés par Psiphon pour DW.com pour tous les utilisateurs en Iran, en avril ? » ";
+
+/* Paragraph text in the 'Who does Psiphon share these statistics with?' subsection of the 'User VPN Data' section of the Privacy page. */
+"PrivacyInformationCollectedVpndataWhopsiphonshareswithPara3" = "Encore une fois, nous ne communiquons pas spécifiquement de renseignements détaillés ni de renseignements permettant d’identifier les utilisateurs à nos partenaires ou tout autre tiers.";
+
+/* Sub-heading in the 'User VPN Data' section of the Privacy Policy page. The section describes who Psiphon shares VPN data stats. The answer will be organizations and not specific people, in case that makes a difference in your language. */
+"PrivacyInformationCollectedVpndataWhopsiphonshareswithSubhead" = "Avec qui Psiphon partage-t-elle ces statistiques ?";
+
+/* Paragraph text in the 'Why should you care?' subsection of the 'User VPN Data' section of the Privacy page. */
+"PrivacyInformationCollectedVpndataWhycarePara1" = "Quand vous utilisez un RPV ou un mandataire, vous devriez vous soucier de ce que le fournisseur peut voir de vos données, en extraire, et de ce qu’il peut leur faire. Pour certaines connexions Web et de courriel, il est théoriquement possible qu’un RPV puisse voir, recueillir et modifier les contenus.";
+
+/* Sub-heading in the 'User VPN Data' section of the Privacy Policy page. The section describes why it's important for users to consider what a VPN does with their traffic data. */
+"PrivacyInformationCollectedVpndataWhycareSubhead" = "Pourquoi est-ce important ?";
+
+/* Bullet list text under 'Why does Psiphon need these statistics?' subsection of the 'User VPN Data' section of the Privacy page. */
+"PrivacyInformationCollectedVpndataWhydoespsiphonneedPara1Item1" = "D’estimer les coûts futurs : l’énorme quantité de données utilisateur que nous transférons chaque mois est un facteur important de nos coûts. Il est essentiel pour nous de voir et de comprendre les fluctuations d’utilisation.";
+
+/* Bullet list text under 'Why does Psiphon need these statistics?' subsection of the 'User VPN Data' section of the Privacy page. */
+"PrivacyInformationCollectedVpndataWhydoespsiphonneedPara1Item2" = "D’optimiser par types de trafic : les exigences en matière de réseau de la diffusion de vidéo en continu sont différentes de celles de la navigation du Web, qui sont différentes de celles du clavardage, qui sont différentes de celles de la transmission de la voix, etc. Les statistiques sur la quantité d’octets transférés pour certains fournisseurs d’importance de contenu multimédia nous aident à comprendre comment offrir la meilleure expérience à nos utilisateurs.";
+
+/* Bullet list text under 'Why does Psiphon need these statistics?' subsection of the 'User VPN Data' section of the Privacy page. If available in your language, the blog post URLs should be updated to the localized post. */
+"PrivacyInformationCollectedVpndataWhydoespsiphonneedPara1Item3" = "De déterminer la nature d’importants événements de censure : des sites et des services sont souvent bloqués soudainement et sans avertissement, ce qui peut entraîner d’énormes variations de l’utilisation régionale de Psiphon. Par exemple, nous avons connu, en une journée, une hausse subite d’utilisation vingt fois supérieure quand <a href=\"https://blog-en.psiphon.ca/2016/07/psiphon-usage-surges-as-brazil-blocks.html\" target=\"_blank\">le Brésil a bloqué WhatsApp</a> ou quand <a href=\"https://blog-en.psiphon.ca/2016/11/social-media-and-internet-ban-in-turkey.html\" target=\"_blank\">la Turquie a bloqué les médias sociaux</a>.";
+
+/* Bullet list text under 'Why does Psiphon need these statistics?' subsection of the 'User VPN Data' section of the Privacy page. (English is using 'who' instead of 'whom' to reflect common idiom.) */
+"PrivacyInformationCollectedVpndataWhydoespsiphonneedPara1Item4" = "De comprendre qui nous devons aider : certains sites et services ne seront jamais bloqués, nulle part, d’autres seront toujours bloqués dans certains pays, et d’autres encore seront parfois bloqués dans certains pays. Pour nous assurer que nos utilisateurs peuvent communiquer et apprendre en toute liberté, nous devons comprendre ces tendances, voir qui est affecté et travailler avec nos partenaires pour nous assurer que leurs services fonctionnent bien avec Psiphon.";
+
+/* Paragraph text in the 'Why does Psiphon need these statistics?' subsection of the 'User VPN Data' section of the Privacy page. This paragraph serves as preamble for a detailed list, which is why it ends with a colon. */
+"PrivacyInformationCollectedVpndataWhydoespsiphonneedPara1ListStart" = "Nous utilisons ces données pour déterminer comment notre réseau est utilisé. Cela nous permet en autre :";
+
+/* Sub-heading in the 'User VPN Data' section of the Privacy Policy page. The section describes why Psiphon needs VPN data stats. */
+"PrivacyInformationCollectedVpndataWhydoespsiphonneedSubhead" = "Pourquoi Psiphon a-t-elle besoin de ces statistiques ?";
+
+/* Button label at the end of privacy policy screen, indication that when clicked user can start using Psiphon */
+"PrivacyPolicyGetStartedButtonTitle" = "Commencer avec Psiphon";
+
+/* page title for the Privacy Policy page */
+"PrivacyTitle" = "Politique de confidentialité";
 
 /* Refresh app receipt button title */
 "REFRESH_APP_RECEIPT_BUTTON_TITLE" = "Actualiser le reçu de l’appli";
@@ -143,14 +195,14 @@
 /* Alert dialog message informing the user that an error occurred while starting Psiphon because they selected an egress region that is no longer available (Do not translate 'Psiphon'). The user should select a different region and try again. Note: the backslash before each quotation mark should be left as is for formatting. */
 "VPN_START_FAIL_REGION_INVALID_MESSAGE" = "La région que vous avez sélectionnée n’est plus proposée. Vous devez choisir une nouvelle région ou changer pour le choix par défaut « La meilleure performance ».";
 
-/* Alert dialog title indicating to the user that Psiphon was unable to start because they selected an egress region that is no longer available */
-"VPN_START_FAIL_REGION_INVALID_TITLE" = "La région de serveurs n’est pas proposée";
-
 /* Alert dialog title indicating to the user that Psiphon was unable to start (MainViewController) */
 "VPN_START_FAIL_TITLE" = "Impossible de démarrer";
 
 /* ('Privacy Policy' should be the same translation as privacy policy button VPN_START_PRIVACY_POLICY_BUTTON), (Do not translate 'VPN profile'), (Do not translate 'Psiphon') */
 "VPN_START_PERMISSION_DENIED_MESSAGE" = "Psiphon a besoin de votre permission pour installer un profil RPV afin de se connecter.\n\nPsiphon est déterminé à protéger les renseignements personnels de ses utilisateurs. Vous pouvez examiner notre politique de confidentialité en touchant « Politique de confidentialité ».";
+
+/* Dismiss button title. Dismisses pop-up alert when the user clicks on the button */
+"VPN_START_PERMISSION_DISMISS_BUTTON" = "Fermer";
 
 /* Alert dialog title indicating to the user that Psiphon needs their permission */
 "VPN_START_PERMISSION_REQUIRED_TITLE" = "Une permission est exigée";
