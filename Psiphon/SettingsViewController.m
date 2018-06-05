@@ -81,16 +81,23 @@ NSString * const ConnectOnDemandCellSpecifierKey = @"vpnOnDemand";
       }];
 
     [self.compoundDisposable addDisposable:disposable];
-
 }
 
 - (void)viewWillAppear:(BOOL)animated {
-
     if(![IAPStoreHelper canMakePayments]) {
         self.hiddenKeys = [[NSSet alloc] initWithArray:@[SettingsSubscriptionCellSpecifierKey]];
     }
 
     [super viewWillAppear:animated];
+}
+
+- (void)viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];
+
+    // Navigation bar may have been customized, revert
+    self.navigationController.navigationBar.barTintColor = nil;
+    self.navigationController.navigationBar.tintColor = nil;
+    [self.navigationController.navigationBar setTitleTextAttributes:nil];
 }
 
 #pragma mark - UI update methods

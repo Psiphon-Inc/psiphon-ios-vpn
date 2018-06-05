@@ -97,9 +97,6 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     BOOL isStartStopButtonHaloOn;
     
     // UI Constraint
-    NSLayoutConstraint *startButtonScreenWidth;
-    NSLayoutConstraint *startButtonScreenHeight;
-    NSLayoutConstraint *startButtonWidth;
     NSLayoutConstraint *bottomBarTopConstraint;
     NSLayoutConstraint *subscriptionButtonTopConstraint;
     
@@ -364,24 +361,6 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 
 // Reload when rotate
 - (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator {
-    [self.view removeConstraint:startButtonWidth];
-    
-    if (size.width > size.height) {
-        [self.view removeConstraint:startButtonScreenWidth];
-        [self.view addConstraint:startButtonScreenHeight];
-        if ([[UIDevice currentDevice].model hasPrefix:@"iPhone"]) {
-            adLabel.hidden = YES;
-        }
-    } else {
-        [self.view removeConstraint:startButtonScreenHeight];
-        [self.view addConstraint:startButtonScreenWidth];
-        if ([[UIDevice currentDevice].model hasPrefix:@"iPhone"]) {
-            adLabel.hidden = ![self.adManager untunneledInterstitialIsReady];
-        }
-    }
-    
-    [self.view addConstraint:startButtonWidth];
-    
     [coordinator animateAlongsideTransition:^(id<UIViewControllerTransitionCoordinatorContext> context) {
         if (isStartStopButtonHaloOn && startStopButtonHalo) {
             startStopButtonHalo.hidden = YES;
@@ -744,19 +723,8 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     
     // Setup autolayout
     [startStopButton.centerXAnchor constraintEqualToAnchor:self.view.centerXAnchor].active = YES;
-    startButtonScreenHeight = [startStopButton.heightAnchor constraintEqualToAnchor:self.view.heightAnchor multiplier:.4f];
-    startButtonScreenWidth = [startStopButton.widthAnchor constraintEqualToAnchor:self.view.widthAnchor multiplier:.4f];
-    startButtonWidth = [startStopButton.heightAnchor constraintEqualToAnchor:startStopButton.widthAnchor];
-    
-    CGSize viewSize = self.view.bounds.size;
-    
-    if (viewSize.width > viewSize.height) {
-        [self.view addConstraint:startButtonScreenHeight];
-    } else {
-        [self.view addConstraint:startButtonScreenWidth];
-    }
-    
-    [self.view addConstraint:startButtonWidth];
+    [startStopButton.widthAnchor constraintEqualToAnchor:self.view.widthAnchor multiplier:.4f].active = YES;
+    [startStopButton.heightAnchor constraintEqualToAnchor:startStopButton.widthAnchor].active = YES;
 }
 
 - (void)addAdLabel {

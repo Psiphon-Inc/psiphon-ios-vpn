@@ -12,6 +12,9 @@
 /* Text showing the app version. The '%@' placeholder is the version number. So it will look like 'v.2'. */
 "APP_VERSION" = "v.%@";
 
+/* Title of the button which takes the user to the previous screen. Text should be short and one word when possible. */
+"BACK_BUTTON" = "Back";
+
 /* Alert message informing user that the device clock needs to be updated with current time */
 "BAD_CLOCK_ALERT_MESSAGE" = "We've detected the time on your device is out of sync with your time zone. Please update your clock settings and restart the app";
 
@@ -25,7 +28,7 @@
 "BUY_REQUEST_PROGRESS_ALERT_DISMISS_BUTTON_TITLE" = "Dismiss";
 
 /* Buy subscription dialog footer text */
-"BUY_SUBSCRIPTIONS_FOOTER_TEXT" = "A subscription is auto-renewable which means that once purchased it will be automatically renewed until you cancel it 24 hours prior to the end of the current period.\n\nYour iTunes Account will be charged for renewal within 24-hours prior to the end of the current period with the cost of subscription.";
+"BUY_SUBSCRIPTIONS_FOOTER_TEXT" = "A subscription is auto-renewable which means that once purchased it will be automatically renewed until you cancel it 24 hours prior to the end of the current period.\n\nYour iTunes Account will be charged for renewal within 24-hours prior to the end of the current period with the cost of the subscription.";
 
 /* Alert Cancel button */
 "CANCEL_BUTTON" = "Cancel";
@@ -230,6 +233,21 @@
 /* Alert error message informing user that their Speed Boost purchase request failed because of an unknown error */
 "PSICASH_SPEED_BOOST_PURCHASE_FAILED_UNEXPECTED_CODE" = "Invalid or unexpected status code returned from PsiCash library.";
 
+/* Description text below button which refreshes the user's app receipt for an in-app purchase such as a subscription to premium */
+"REFRESH_APP_RECEIPT_BUTTON_DESCRIPTION" = "If you can’t see your subscription, there may be an issue with your app receipt. In this scenario you may need to refresh your app receipt.";
+
+/* Title of button which refreshes the user's app receipt for an in-app purchase such as a subscription to premium */
+"REFRESH_APP_RECEIPT_BUTTON_TITLE" = "Refresh app receipt";
+
+/* Description text below button which restores any existing subscriptions which are still valid that the user has purchased */
+"RESTORE_EXISTING_SUBSCRIPTION_BUTTON_DESCRIPTION" = "If you’re trying to recover a subscription on your account with a new phone you'll need to restore your existing subscription.";
+
+/* Title of button which restores any existing subscriptions which are still valid that the user has purchased */
+"RESTORE_EXISTING_SUBSCRIPTION_BUTTON_TITLE" = "Restore existing subscription";
+
+/* Button which, when pressed, attempts to restore any existing subscriptions the user has purchased */
+"RESTORE_SUBSCRIPTION_BUTTON" = "Restore Subscription";
+
 /* Subscriptions item title in the app settings when user has an active subscription. Clicking this item opens subscriptions view */
 "SETTINGS_SUBSCRIPTION_ACTIVE" = "Subscriptions";
 
@@ -250,6 +268,12 @@
 
 /* Title of the dialog for available in-app paid subscriptions */
 "SUBSCRIPTIONS" = "Subscriptions";
+
+/* Title of the banner on the subscriptions page that tells the user how many initial free days they get once subscribed */
+"SUBSCRIPTIONS_PAGE_BANNER_TITLE" = "Get 3 days of premium FREE when subscribing to any plan";
+
+/* Title of the button on the subscriptions page which, when pressed, navigates the user to the page where they can restore their existing subscription */
+"SUBSCRIPTIONS_PAGE_RESTORE_SUBSCRIPTION_BUTTON" = "I don't see my subscription";
 
 /* Title of button on subscriptions page which opens Psiphon's privacy policy webpage */
 "SUBSCRIPTIONS_PRIVACY_POLICY_BUTTON_TEXT" = "Privacy Policy";
