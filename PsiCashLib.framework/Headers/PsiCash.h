@@ -76,6 +76,11 @@ typedef NS_ENUM(NSInteger, PsiCashStatus) {
 /*! Clear out expired purchases. Return the ones that were expired. Returns nil
     if none were expired. */
 - (NSArray<PsiCashPurchase*>*_Nullable)expirePurchases;
+/*! Force removal of purchases with the given transaction IDs.
+    This is to be called when the Psiphon server indicates that a purchase has
+    expired (even if the local clock hasn't yet indicated it).
+    Can be passed an NSArray literal, like: @code @[id1, id2] @endcode */
+- (void)removePurchases:(NSArray<NSString*>*_Nonnull)ids;
 
 /*! Utilizes stored tokens to craft a landing page URL.
     Returns an error if modification is impossible, or if there is not valid
