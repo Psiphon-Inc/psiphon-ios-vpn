@@ -22,6 +22,7 @@
 #import "IAPViewController.h"
 #import "VPNManager.h"
 #import "AppDelegate.h"
+#import "PsiCashOnboardingViewController.h"
 #import "RACSignal.h"
 #import "RACCompoundDisposable.h"
 #import "RACReplaySubject.h"
@@ -30,6 +31,7 @@
 // Specifier keys for cells in settings menu
 // These keys are defined in Psiphon/InAppSettings.bundle/Root.inApp.plist
 NSString * const SettingsSubscriptionCellSpecifierKey = @"settingsSubscription";
+NSString * const SettingsPsiCashCellSpecifierKey = @"settingsPsiCash";
 NSString * const ConnectOnDemandCellSpecifierKey = @"vpnOnDemand";
 
 @interface SettingsViewController ()
@@ -73,6 +75,7 @@ NSString * const ConnectOnDemandCellSpecifierKey = @"vpnOnDemand";
 
           weakSelf.hasActiveSubscription = (s == UserSubscriptionActive);
           [weakSelf updateSubscriptionUIElements];
+          [weakSelf updateHiddenKeys];
 
       } error:^(NSError *error) {
           [weakSelf.compoundDisposable removeDisposable:disposable];
@@ -83,12 +86,16 @@ NSString * const ConnectOnDemandCellSpecifierKey = @"vpnOnDemand";
     [self.compoundDisposable addDisposable:disposable];
 }
 
-- (void)viewWillAppear:(BOOL)animated {
-    if(![IAPStoreHelper canMakePayments]) {
-        self.hiddenKeys = [[NSSet alloc] initWithArray:@[SettingsSubscriptionCellSpecifierKey]];
-    }
+- (void)updateHiddenKeys {
+    NSMutableSet *hiddenKeys = [NSMutableSet setWithSet:self.hiddenKeys];
+     if(![IAPStoreHelper canMakePayments]) {
+         [hiddenKeys addObject:SettingsSubscriptionCellSpecifierKey];
+     }
 
-    [super viewWillAppear:animated];
+    if (self.hasActiveSubscription) {
+        [hiddenKeys addObject:SettingsPsiCashCellSpecifierKey];
+    }
+    self.hiddenKeys = hiddenKeys;
 }
 
 - (void)viewDidAppear:(BOOL)animated {
@@ -169,12 +176,16 @@ NSString * const ConnectOnDemandCellSpecifierKey = @"vpnOnDemand";
     [super settingsViewController:self tableView:tableView didSelectCustomViewSpecifier:specifier];
     if ([specifier.key isEqualToString:SettingsSubscriptionCellSpecifierKey]) {
         [self openIAPViewController];
+    } else if ([specifier.key isEqualToString:SettingsPsiCashCellSpecifierKey]) {
+        [self openPsiCashViewController];
     }
 }
 
 - (UITableViewCell*)tableView:(UITableView*)tableView cellForSpecifier:(IASKSpecifier*)specifier {
     UITableViewCell *cell = nil;
-    if (![specifier.key isEqualToString:SettingsSubscriptionCellSpecifierKey] && ![specifier.key isEqualToString:ConnectOnDemandCellSpecifierKey]) {
+    if (![specifier.key isEqualToString:SettingsSubscriptionCellSpecifierKey]
+        && ![specifier.key isEqualToString:SettingsPsiCashCellSpecifierKey]
+        && ![specifier.key isEqualToString:ConnectOnDemandCellSpecifierKey]) {
         cell = [super tableView:tableView cellForSpecifier:specifier];
         return cell;
     }
@@ -185,6 +196,16 @@ NSString * const ConnectOnDemandCellSpecifierKey = @"vpnOnDemand";
         [cell setAccessoryType:UITableViewCellAccessoryDisclosureIndicator];
         subscriptionTableViewCell = cell;
         [self updateSubscriptionCell];
+
+    } else if ([specifier.key isEqualToString:SettingsPsiCashCellSpecifierKey]) {
+
+        cell = [super tableView:tableView cellForSpecifier:specifier];
+        [cell setAccessoryType:UITableViewCellAccessoryDisclosureIndicator];
+        [cell.textLabel setText:NSLocalizedStringWithDefaultValue(@"SETTINGS_PSICASH_CELL_TITLE",
+                                                                  nil,
+                                                                  [NSBundle mainBundle],
+                                                                  @"PsiCash",
+                                                                  @"Title of cell in settings menu which, when pressed, launches the PsiCash onboarding")];
 
     } else if ([specifier.key isEqualToString:ConnectOnDemandCellSpecifierKey]) {
 
@@ -230,6 +251,13 @@ NSString * const ConnectOnDemandCellSpecifierKey = @"vpnOnDemand";
     IAPViewController *iapViewController = [[IAPViewController alloc]init];
     iapViewController.openedFromSettings = YES;
     [self.navigationController pushViewController:iapViewController animated:YES];
+}
+
+#pragma mark - PsiCash
+
+- (void)openPsiCashViewController {
+    PsiCashOnboardingViewController *onboarding = [[PsiCashOnboardingViewController alloc] init];
+    [self presentViewController:onboarding animated:NO completion:nil];
 }
 
 @end

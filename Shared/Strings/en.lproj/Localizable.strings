@@ -248,6 +248,9 @@
 /* Button which, when pressed, attempts to restore any existing subscriptions the user has purchased */
 "RESTORE_SUBSCRIPTION_BUTTON" = "Restore Subscription";
 
+/* Title of cell in settings menu which, when pressed, launches the PsiCash onboarding */
+"SETTINGS_PSICASH_CELL_TITLE" = "PsiCash";
+
 /* Subscriptions item title in the app settings when user has an active subscription. Clicking this item opens subscriptions view */
 "SETTINGS_SUBSCRIPTION_ACTIVE" = "Subscriptions";
 
