@@ -1265,12 +1265,6 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 
 - (void)selectedRegionDisappearedThenSwitchedToBestPerformance {
     dispatch_async_main(^{
-        // Alert the user that the VPN failed to start, and that they should try again.
-        [UIAlertController presentSimpleAlertWithTitle:NSLocalizedStringWithDefaultValue(@"VPN_START_FAIL_REGION_INVALID_TITLE", nil, [NSBundle mainBundle], @"Server Region Unavailable", @"Alert dialog title indicating to the user that Psiphon was unable to start because they selected an egress region that is no longer available")
-                                               message:NSLocalizedStringWithDefaultValue(@"VPN_START_FAIL_REGION_INVALID_MESSAGE_1", nil, [NSBundle mainBundle], @"The region you selected is no longer available. You must choose a new region or change to the default \"Fastest Country\" choice.", @"Alert dialog message informing the user that an error occurred while starting Psiphon because they selected an egress region that is no longer available (Do not translate 'Psiphon'). The user should select a different region and try again. Note: the backslash before each quotation mark should be left as is for formatting.")
-                                        preferredStyle:UIAlertControllerStyleAlert
-                                             okHandler:nil];
-
         [self updateRegionButton];
     });
     [self persistSelectedRegion];
