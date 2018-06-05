@@ -269,7 +269,11 @@ static NSString *iapCellID = @"IAPTableCellID";
     manageSubsButton.layer.cornerRadius = 5.0;
     manageSubsButton.layer.masksToBounds = FALSE;
     manageSubsButton.titleEdgeInsets = UIEdgeInsetsMake(0.0, 24.0, 0.0, 24.0);
-    [manageSubsButton setTitle:@"Manage your subscription"
+    [manageSubsButton setTitle:NSLocalizedStringWithDefaultValue(@"SUBSCRIPTIONS_PAGE_MANAGE_SUBSCRIPTION_BUTTON",
+                                                                 nil,
+                                                                 [NSBundle mainBundle],
+                                                                 @"Manage your subscription",
+                                                                 @"Title of the button on the subscriptions page which takes the user of of the app to iTunes where they can view detailed information about their subscription")
                       forState:UIControlStateNormal];
     [manageSubsButton setTitleColor:UIColor.whiteColor forState:UIControlStateNormal];
     [manageSubsButton addTarget:self action:@selector(onManageSubscriptionTap) forControlEvents:UIControlEventTouchUpInside];

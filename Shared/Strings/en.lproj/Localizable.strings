@@ -272,6 +272,9 @@
 /* Title of the banner on the subscriptions page that tells the user how many initial free days they get once subscribed */
 "SUBSCRIPTIONS_PAGE_BANNER_TITLE" = "Get 3 days of premium FREE when subscribing to any plan";
 
+/* Title of the button on the subscriptions page which takes the user of of the app to iTunes where they can view detailed information about their subscription */
+"SUBSCRIPTIONS_PAGE_MANAGE_SUBSCRIPTION_BUTTON" = "Manage your subscription";
+
 /* Title of the button on the subscriptions page which, when pressed, navigates the user to the page where they can restore their existing subscription */
 "SUBSCRIPTIONS_PAGE_RESTORE_SUBSCRIPTION_BUTTON" = "I don't see my subscription";
 
