@@ -214,19 +214,29 @@ NSErrorDomain _Nonnull const PsiCashClientLibraryErrorDomain = @"PsiCashClientLi
  * Returns the set of active purchases from the PsiCash library subtracted by the set
  * of purchases marked as expired by the extension. This handles the scenario where
  * the server has decided a purchase is expired before the library. In this scenario
- * the server should be treated as the ultimate source of truth.
+ * the server should be treated as the ultimate source of truth and these expired
+ * purchases will be removed from the library.
  *
  * @return Returns {setActivePurchaseFromLib | x is not marked expired by the extension}
  */
 - (NSArray<PsiCashPurchase*>*)getActivePurchases {
     NSMutableArray <PsiCashPurchase*>* purchases = [[NSMutableArray alloc] initWithArray:[[psiCash purchases] copy]];
     NSSet<NSString *> *markedAuthIDs = [sharedDB getMarkedExpiredAuthorizationIDs];
+    NSMutableArray *purchasesToRemove = [[NSMutableArray alloc] init];
 
     NSPredicate *predicate = [NSPredicate predicateWithBlock:^BOOL(PsiCashPurchase *evaluatedObject, NSDictionary<NSString *,id> * _Nullable bindings) {
         Authorization *auth = [[Authorization alloc] initWithEncodedAuthorization:evaluatedObject.authorization];
-        return ![markedAuthIDs containsObject:auth.ID];
+        if ([markedAuthIDs containsObject:auth.ID]) {
+            [purchasesToRemove addObject:auth.ID];
+            return FALSE;
+        }
+        return TRUE;
     }];
     [purchases filterUsingPredicate:predicate];
+
+    // Remove purchases indicated as expired by the Psiphon server, but not yet by the PsiCash lib.
+    // This will occur if the local clock is out of sync with that of the PsiCash server.
+    [psiCash removePurchases:purchasesToRemove];
 
     return purchases;
 }
@@ -365,6 +375,7 @@ NSErrorDomain _Nonnull const PsiCashClientLibraryErrorDomain = @"PsiCashClientLi
         if (result.status == PsiCashStatus_Success) {
             Authorization *authorization = [[Authorization alloc] initWithEncodedAuthorization:result.authorization];
             NSError *e = nil;
+
             if (authorization == nil) {
                 e = [NSError errorWithDomain:PsiCashClientLibraryErrorDomain code:result.status andLocalizedDescription:@"Got nil auth token from PsiCash library"];
             }
@@ -401,14 +412,14 @@ NSErrorDomain _Nonnull const PsiCashClientLibraryErrorDomain = @"PsiCashClientLi
                 [stagingArea updateActivePurchases:[self getActivePurchases]];
             } else if (result.status == PsiCashStatus_InsufficientBalance) {
                 NSString *s = NSLocalizedStringWithDefaultValue(@"PSICASH_SPEED_BOOST_PURCHASE_FAILED_INSUFFICIENT_FUNDS", nil, [NSBundle mainBundle], @"Insufficient balance for Speed Boost purchase. Price:", @"Alert error message informing user that their Speed Boost purchase request failed because they have an insufficient balance. Required price will be appended after the colon.");
-                s = [s stringByAppendingString:[NSString stringWithFormat:@" %.2f", result.balance.doubleValue/1e9]];
+                s = [s stringByAppendingString:[NSString stringWithFormat:@" %@", [PsiCashClientModel formattedBalance:result.balance]]];
                 e = [NSError errorWithDomain:PsiCashClientLibraryErrorDomain code:result.status andLocalizedDescription:s];
 
                 [stagingArea updateBalance:result.balance];
 
             } else if (result.status == PsiCashStatus_TransactionAmountMismatch) {
                 NSString *s = NSLocalizedStringWithDefaultValue(@"PSICASH_SPEED_BOOST_PURCHASE_FAILED_PRICE_OUT_OF_DATE", nil, [NSBundle mainBundle], @"Error: price of Speed Boost is out of date. Price:", @"Alert error message informing user that their Speed Boost purchase request failed because they tried to make the purchase with an out of date product price. Updated price will be appended after the colon.");
-                s = [s stringByAppendingString:[NSString stringWithFormat:@" %.2f", result.balance.doubleValue/1e9]];
+                s = [s stringByAppendingString:[NSString stringWithFormat:@" %@", [PsiCashClientModel formattedBalance:result.price]]];
                 e = [NSError errorWithDomain:PsiCashClientLibraryErrorDomain code:result.status andLocalizedDescription:s];
 
                 [stagingArea updateBalance:result.balance];
