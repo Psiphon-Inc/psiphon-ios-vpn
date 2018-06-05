@@ -51,8 +51,7 @@
     [self.navigationController.navigationBar setTitleTextAttributes:@{NSForegroundColorAttributeName: UIColor.whiteColor}];
 
     // Sets navigation bar title.
-    // TODO: localize
-    self.title = @"Restore Subscription";
+    self.title = NSLocalizedStringWithDefaultValue(@"RESTORE_SUBSCRIPTION_BUTTON", nil, [NSBundle mainBundle], @"Restore Subscription", @"Button which, when pressed, attempts to restore any existing subscriptions the user has purchased");
 
     // Listens to IAPStoreHelper transaction states.
     [[NSNotificationCenter defaultCenter] addObserver:self
@@ -61,22 +60,22 @@
                                                object:nil];
 
     [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(onPaymentTransactionUpdate:)
+                                             selector:@selector(reloadProducts)
                                                  name:IAPSKProductsRequestDidFailWithErrorNotification
                                                object:nil];
 
     [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(onPaymentTransactionUpdate:)
+                                             selector:@selector(reloadProducts)
                                                  name:IAPSKProductsRequestDidReceiveResponseNotification
                                                object:nil];
 
     [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(onPaymentTransactionUpdate:)
+                                             selector:@selector(reloadProducts)
                                                  name:IAPSKRequestRequestDidFinishNotification
                                                object:nil];
 
     [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(onPaymentTransactionUpdate:)
+                                             selector:@selector(reloadProducts)
                                                  name:IAPHelperUpdatedSubscriptionDictionaryNotification
                                                object:nil];
 
@@ -142,45 +141,33 @@
 
     UITableViewCell *cell = [[UITableViewCell alloc] init];
 
-    // TODO: localize
     if (indexPath.row == 0) {
         [self createHelpCellContent:cell
-                withHelpDescription:@"If you can’t see your subscription, there may be an issue with something something. Start by etc etc the more common problem."
-                        buttonTitle:@"Refresh app receipt"
+                withHelpDescription:NSLocalizedStringWithDefaultValue(@"REFRESH_APP_RECEIPT_BUTTON_DESCRIPTION",
+                                                                      nil, [NSBundle mainBundle],
+                                                                      @"If you can’t see your subscription, there may be an issue with your app receipt. In this scenario you may need to refresh your app receipt.",
+                                                                      @"Description text below button which refreshes the user's app receipt for an in-app purchase such as a subscription to premium")
+                        buttonTitle:NSLocalizedStringWithDefaultValue(@"REFRESH_APP_RECEIPT_BUTTON_TITLE",
+                                                                      nil,
+                                                                      [NSBundle mainBundle],
+                                                                      @"Refresh app receipt", @"Title of button which refreshes the user's app receipt for an in-app purchase such as a subscription to premium")
                              action:@selector(refreshReceiptAction)];
     }
 
     if (indexPath.row == 1) {
         [self createHelpCellContent:cell
-                withHelpDescription:@"If you’re trying to recover a subscription on your account with a new phone, try this."
-                        buttonTitle:@"Restore existing subscription"
-                             action:@selector(refreshReceiptAction)];
+                withHelpDescription:NSLocalizedStringWithDefaultValue(@"RESTORE_EXISTING_SUBSCRIPTION_BUTTON_DESCRIPTION",
+                                                                      nil,
+                                                                      [NSBundle mainBundle],
+                                                                      @"If you’re trying to recover a subscription on your account with a new phone you'll need to restore your existing subscription.",
+                                                                      @"Description text below button which restores any existing subscriptions which are still valid that the user has purchased")
+                        buttonTitle:NSLocalizedStringWithDefaultValue(@"RESTORE_EXISTING_SUBSCRIPTION_BUTTON_TITLE",
+                                                                      nil,
+                                                                      [NSBundle mainBundle],
+                                                                      @"Restore existing subscription",
+                                                                      @"Title of button which restores any existing subscriptions which are still valid that the user has purchased")
+                             action:@selector(restoreAction)];
     }
-
-    return cell;
-}
-
-#pragma mark - Footer
-
-- (nullable UIView *)tableView:(UITableView *)tableView viewForFooterInSection:(NSInteger)section {
-    UIView *cell = [[UIView alloc] initWithFrame:CGRectZero];
-
-    cell.backgroundColor = UIColor.clearColor;
-
-    UILabel *label = [[UILabel alloc] initWithFrame:CGRectZero];
-    label.numberOfLines = 0;
-    label.font = [label.font fontWithSize:15];
-    label.textColor = UIColor.whiteColor;
-    // TODO: localize
-    label.text = @"Still experiencing issues? Contact support";
-    label.textAlignment = NSTextAlignmentCenter;
-    [cell addSubview:label];
-
-    label.translatesAutoresizingMaskIntoConstraints = FALSE;
-    [label.heightAnchor constraintEqualToAnchor:cell.heightAnchor].active = YES;
-    [label.centerXAnchor constraintEqualToAnchor:cell.centerXAnchor].active = YES;
-    [label.centerYAnchor constraintEqualToAnchor:cell.centerYAnchor].active = YES;
-    [label.topAnchor constraintEqualToAnchor:cell.topAnchor constant:16.0].active = TRUE;
 
     return cell;
 }
@@ -202,10 +189,12 @@
 #pragma mark -
 
 - (void)restoreAction {
+    [self showProgressSpinnerAndBlockUI];
     [[IAPStoreHelper sharedInstance] restoreSubscriptions];
 }
 
 - (void)refreshReceiptAction {
+    [self showProgressSpinnerAndBlockUI];
     [[IAPStoreHelper sharedInstance] refreshReceipt];
 }
 
@@ -237,15 +226,21 @@
     }
 }
 
+- (void)reloadProducts {
+    [self dismissProgressSpinnerAndUnblockUI];
+    [self.navigationController popViewControllerAnimated:YES];
+}
+
 - (void)onPaymentTransactionUpdate:(NSNotification *)notification {
     SKPaymentTransactionState transactionState = (SKPaymentTransactionState) [notification.userInfo[IAPHelperPaymentTransactionUpdateKey] integerValue];
 
-    LOG_DEBUG(@"test transaction state %d", transactionState);
+    LOG_DEBUG(@"test transaction state %ld", (long)transactionState);
     
     if (SKPaymentTransactionStatePurchasing == transactionState) {
         [self showProgressSpinnerAndBlockUI];
     } else {
         [self dismissProgressSpinnerAndUnblockUI];
+        [self.navigationController popViewControllerAnimated:YES];
     }
 }
 

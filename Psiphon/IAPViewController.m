@@ -53,6 +53,10 @@ static NSString *iapCellID = @"IAPTableCellID";
     NSTimer *buyProgressAlertTimer;
 }
 
+- (UIStatusBarStyle)preferredStatusBarStyle {
+    return UIStatusBarStyleLightContent;
+}
+
 - (instancetype)init {
     self = [super init];
     if (self) {
@@ -90,10 +94,13 @@ static NSString *iapCellID = @"IAPTableCellID";
     self.view.backgroundColor = UIColor.charcoalGreyColor;
     self.navigationController.navigationBar.barTintColor = UIColor.charcoalGreyColor;  // Navigation bar background color
     self.navigationController.navigationBar.tintColor = UIColor.purpleButtonColor;  // Navigation bar items color
-    [self.navigationController.navigationBar setTitleTextAttributes:@{NSForegroundColorAttributeName: UIColor.whiteColor}];
+    self.navigationController.navigationBar.titleTextAttributes = @{NSForegroundColorAttributeName: UIColor.whiteColor};
 
     // Sets navigation bar title.
     self.title = NSLocalizedStringWithDefaultValue(@"SUBSCRIPTIONS", nil, [NSBundle mainBundle], @"Subscriptions", @"Title of the dialog for available in-app paid subscriptions");
+
+    // Set back button title of any child view controllers pushed onto the current navigation controller
+    self.navigationItem.backBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedStringWithDefaultValue(@"BACK_BUTTON", nil, [NSBundle mainBundle], @"Back", @"Title of the button which takes the user to the previous screen. Text should be short and one word when possible.") style:UIBarButtonItemStylePlain target:nil action:nil];
 
     // Adds "Done" button (dismiss action) to the navigation bar if it is not opened from Setting menu.
     if (!self.openedFromSettings) {
@@ -129,25 +136,8 @@ static NSString *iapCellID = @"IAPTableCellID";
                                              selector:@selector(reloadProducts)
                                                  name:IAPHelperUpdatedSubscriptionDictionaryNotification
                                                object:nil];
-    
-    // TODO n: does the following information need to be made reactive?
-    // Load subscription information.
-    if ([IAPStoreHelper hasActiveSubscriptionForNow]) {
 
-        // Store latest product expiration date.
-        self.latestSubscriptionExpirationDate = IAPStoreHelper.subscriptionDictionary[kLatestExpirationDate];
-
-        NSString *productId = IAPStoreHelper.subscriptionDictionary[kProductId];
-
-        for (SKProduct *product in [IAPStoreHelper sharedInstance].storeProducts) {
-            if ([product.productIdentifier isEqualToString:productId]) {
-                self.latestSubscriptionProduct = product;
-                self.hasActiveSubscription = TRUE;
-
-                break;
-            }
-        }
-    }
+    [self updateHasActiveSubscription];
 
     // Initializations based on subscription state.
     if (self.hasActiveSubscription) {
@@ -155,7 +145,6 @@ static NSString *iapCellID = @"IAPTableCellID";
     } else {
         self.headerBannerImage = [UIImage imageNamed:@"SubscriptionBanner"];
     }
-
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -170,7 +159,6 @@ static NSString *iapCellID = @"IAPTableCellID";
 - (void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
 
-    // TODO n: is this needed?
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
@@ -248,8 +236,11 @@ static NSString *iapCellID = @"IAPTableCellID";
           @"Title of the section in the subscription dialog that shows currently active subscription information.");
 
     } else {
-        // TODO: localize
-        label.text = @"Get 3 days of premium FREE when subscribing to any plan";
+        label.text = NSLocalizedStringWithDefaultValue(@"SUBSCRIPTIONS_PAGE_BANNER_TITLE",
+                                                       nil,
+                                                       [NSBundle mainBundle],
+                                                       @"Get 3 days of premium FREE when subscribing to any plan",
+                                                       @"Title of the banner on the subscriptions page that tells the user how many initial free days they get once subscribed");
 
     }
     [cellView addSubview:label];
@@ -298,7 +289,11 @@ static NSString *iapCellID = @"IAPTableCellID";
     // Restore subscription button is added if there is no active subscription.
     if (!self.hasActiveSubscription) {
         UIButton *restoreSubsButton = [UIButton buttonWithType:UIButtonTypeSystem];
-        [restoreSubsButton setTitle:@"I don't see my subscription" // TODO: localize
+        [restoreSubsButton setTitle:NSLocalizedStringWithDefaultValue(@"SUBSCRIPTIONS_PAGE_RESTORE_SUBSCRIPTION_BUTTON",
+                                                                      nil,
+                                                                      [NSBundle mainBundle],
+                                                                      @"I don't see my subscription",
+                                                                      @"Title of the button on the subscriptions page which, when pressed, navigates the user to the page where they can restore their existing subscription")
                            forState:UIControlStateNormal];
         [restoreSubsButton setTitleColor:UIColor.weirdGreenColor forState:UIControlStateNormal];
         [restoreSubsButton addTarget:self action:@selector(onSubscriptionHelpTap) forControlEvents:UIControlEventTouchUpInside];
@@ -326,7 +321,7 @@ static NSString *iapCellID = @"IAPTableCellID";
     label.text = NSLocalizedStringWithDefaultValue(@"BUY_SUBSCRIPTIONS_FOOTER_TEXT",
                                                    nil,
                                                    [NSBundle mainBundle],
-                                                   @"A subscription is auto-renewable which means that once purchased it will be automatically renewed until you cancel it 24 hours prior to the end of the current period.\n\nYour iTunes Account will be charged for renewal within 24-hours prior to the end of the current period with the cost of subscription.",
+                                                   @"A subscription is auto-renewable which means that once purchased it will be automatically renewed until you cancel it 24 hours prior to the end of the current period.\n\nYour iTunes Account will be charged for renewal within 24-hours prior to the end of the current period with the cost of the subscription.",
                                                    @"Buy subscription dialog footer text");
 
     label.textAlignment = NSTextAlignmentLeft;
@@ -547,6 +542,7 @@ static NSString *iapCellID = @"IAPTableCellID";
 
 - (void)reloadProducts {
     [self endRefreshingUI];
+    [self updateHasActiveSubscription];
     [self.tableView reloadData];
 }
 
@@ -607,14 +603,34 @@ static NSString *iapCellID = @"IAPTableCellID";
               && [cell isKindOfClass:[IAPTableViewCell class]]) {
 
                 UISegmentedControl *buyButton = (UISegmentedControl *) cell.accessoryView;
-                // TODO n: set the colors
+
                 if (interactionEnabled) {
-//                    [buyButton setTintColor:self.buyButtonTintColor];
+                    [buyButton setTintColor:self.view.tintColor];
                 } else {
                     [buyButton setTintColor:UIColor.grayColor];
                 }
                 
                 buyButton.userInteractionEnabled = interactionEnabled;
+            }
+        }
+    }
+}
+
+- (void)updateHasActiveSubscription {
+    // Load subscription information.
+    if ([IAPStoreHelper hasActiveSubscriptionForNow]) {
+
+        // Store latest product expiration date.
+        self.latestSubscriptionExpirationDate = IAPStoreHelper.subscriptionDictionary[kLatestExpirationDate];
+
+        NSString *productId = IAPStoreHelper.subscriptionDictionary[kProductId];
+
+        for (SKProduct *product in [IAPStoreHelper sharedInstance].storeProducts) {
+            if ([product.productIdentifier isEqualToString:productId]) {
+                self.latestSubscriptionProduct = product;
+                self.hasActiveSubscription = TRUE;
+
+                break;
             }
         }
     }
