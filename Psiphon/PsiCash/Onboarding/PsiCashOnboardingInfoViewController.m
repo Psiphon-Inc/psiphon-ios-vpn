@@ -150,7 +150,7 @@
 }
 
 - (void)setGraphicAsSpeedBoostMeter {
-    PsiCashSpeedBoostProductSKU *sku = [PsiCashSpeedBoostProductSKU skuWitDistinguisher:@"1h" withHours:[NSNumber numberWithInteger:1] andPrice:[NSNumber numberWithInteger:100e9]];
+    PsiCashSpeedBoostProductSKU *sku = [PsiCashSpeedBoostProductSKU skuWitDistinguisher:@"1h" withHours:[NSNumber numberWithInteger:1] andPrice:[NSNumber numberWithDouble:100e9]];
     PsiCashBalanceWithSpeedBoostMeter *meter = [[PsiCashBalanceWithSpeedBoostMeter alloc] init];
 
     PsiCashClientModel *m = [PsiCashClientModel clientModelWithAuthPackage:[[PsiCashAuthPackage alloc] initWithValidTokens:@[@"indicator", @"earner", @"spender"]]
