@@ -1250,7 +1250,6 @@
 				EF652CD11F352212002AFB48 /* main.m in Sources */,
 				4E5DAE6520A942A300E06342 /* UILabel+GetLabelHeight.m in Sources */,
 				44A0CAF31FE04A4500859DB3 /* RMAppReceipt.m in Sources */,
-				44D9B1001F67470E007D1E69,
 				EFC2F5CB202267B1007B52F9 /* PsiphonConfigReader.m in Sources */,
 				EF90D7A7204F22C900228A63 /* NSDate+PSIDateExtension.m in Sources */,
 				4E04845A20487208006C3D35 /* PsiCashSpeedBoostSliderView.m in Sources */,
