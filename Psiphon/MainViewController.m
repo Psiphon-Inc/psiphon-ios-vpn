@@ -52,7 +52,6 @@
 #import "NSNotificationCenter+RACSupport.h"
 #import "Asserts.h"
 #import "PrivacyPolicyViewController.h"
-#import "SwoopView.h"
 #import "UIColor+Additions.h"
 
 UserDefaultsKey const PrivacyPolicyAcceptedBookKey = @"PrivacyPolicy.AcceptedBoolKey";
@@ -124,7 +123,6 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     PsiCashBalanceWithSpeedBoostMeter *psiCashView;
     NSLayoutConstraint *psiCashViewHeight;
     RACDisposable *psiCashViewUpdates;
-    UIView *swoopView;
     NSArray<StarView*> *stars;
 }
 
@@ -176,7 +174,6 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     // Setting up the UI
     // calls them in the right order
     [self setBackgroundGradient];
-    [self drawSwoop];
     [self setNeedsStatusBarAppearanceUpdate];
     [self addSettingsButton];
     [self addRegionSelectionBar];
@@ -321,8 +318,6 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     [super viewDidLayoutSubviews];
 
     backgroundGradient.frame = self.view.bounds;
-
-    [self drawSwoop];
     
     if (isStartStopButtonHaloOn && startStopButtonHalo != nil) {
         // Keep pulsing halo centered on the start/stop button
@@ -570,22 +565,6 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     [self.view.layer insertSublayer:backgroundGradient atIndex:0];
 }
 
-- (void)drawSwoop {
-    if (swoopView == nil) {
-        swoopView = [[UIView alloc] initWithFrame:self.view.frame];
-        [swoopView setBackgroundColor:[UIColor colorWithWhite:0 alpha:.06f]];
-        [self.view addSubview:swoopView];
-    }
-
-    CGFloat radius = self.view.frame.size.width*2/3;
-
-    CAShapeLayer *swoop = [[CAShapeLayer alloc] init];
-    UIBezierPath *rounded = [UIBezierPath bezierPathWithArcCenter:CGPointMake(self.view.center.x,-radius) radius:radius + appSubTitleLabel.frame.origin.y + appSubTitleLabel.frame.size.height + (psiCashView.frame.origin.y - (appSubTitleLabel.frame.origin.y + appSubTitleLabel.frame.size.height))/2 + 5.f startAngle:0 endAngle:2*M_PI clockwise:NO];
-
-    [swoop setPath:rounded.CGPath];
-    swoopView.layer.mask = swoop;
-}
-
 - (void)addPulsingHaloLayer {
     // Don't add multiple layers
     if (isStartStopButtonHaloOn) {
@@ -670,24 +649,20 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 }
 
 - (void)addSettingsButton {
-    CGFloat insetSize = 20.f;
-    CGFloat gearSize = 40 + insetSize * 2;
-
     settingsButton = [[UIButton alloc] init];
-    [settingsButton addTarget:self action:@selector(onSettingsButtonTap:) forControlEvents:UIControlEventTouchUpInside];
-    settingsButton.contentEdgeInsets = UIEdgeInsetsMake(insetSize, insetSize, insetSize, insetSize);
     UIImage *gearTemplate = [[UIImage imageNamed:@"settings"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
     settingsButton.translatesAutoresizingMaskIntoConstraints = NO;
     [settingsButton setImage:gearTemplate forState:UIControlStateNormal];
     [settingsButton setTintColor:[UIColor whiteColor]];
-    settingsButton.layer.cornerRadius = gearSize/2;
     [self.view addSubview:settingsButton];
-    
+
     // Setup autolayout
-    [settingsButton.topAnchor constraintEqualToAnchor:self.topLayoutGuide.bottomAnchor constant:-insetSize/2].active = YES;
-    [settingsButton.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor constant:gearSize/2 - insetSize - 13.f].active = YES;
-    [settingsButton.widthAnchor constraintEqualToConstant:gearSize].active =  YES;
+    [settingsButton.centerYAnchor constraintEqualToAnchor:self.topLayoutGuide.bottomAnchor constant:gearTemplate.size.height/2 + 8.f].active = YES;
+    [settingsButton.centerXAnchor constraintEqualToAnchor:self.view.trailingAnchor constant:-gearTemplate.size.width/2 - 15.f].active = YES;
+    [settingsButton.widthAnchor constraintEqualToConstant:80].active = YES;
     [settingsButton.heightAnchor constraintEqualToAnchor:settingsButton.widthAnchor].active = YES;
+
+    [settingsButton addTarget:self action:@selector(onSettingsButtonTap:) forControlEvents:UIControlEventTouchUpInside];
 }
 
 - (void)updateUIConnectionState:(VPNStatus)s {
@@ -889,20 +864,20 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     versionLabel.userInteractionEnabled = YES;
     versionLabel.textColor = [UIColor whiteColor];
     versionLabel.font = [versionLabel.font fontWithSize:13];
-    
+
 #if DEBUG
     UITapGestureRecognizer *tapRecognizer = [[UITapGestureRecognizer alloc]
                                              initWithTarget:self action:@selector(onVersionLabelTap:)];
     tapRecognizer.numberOfTapsRequired = 1;
     [versionLabel addGestureRecognizer:tapRecognizer];
 #endif
-    
+
     [self.view addSubview:versionLabel];
-    
+
     // Setup autolayout
-    [versionLabel.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor constant:13].active = YES;
-    [versionLabel.topAnchor constraintEqualToAnchor:settingsButton.topAnchor constant:18.f].active = YES;
-    [versionLabel.heightAnchor constraintEqualToConstant:18].active = YES;
+    [versionLabel.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor constant:12].active = YES;
+    [versionLabel.centerYAnchor constraintEqualToAnchor:settingsButton.centerYAnchor].active = YES;
+    [versionLabel.heightAnchor constraintEqualToConstant:50].active = YES;
 }
 
 - (void)addSubscriptionButton {
