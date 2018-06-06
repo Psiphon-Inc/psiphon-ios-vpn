@@ -233,20 +233,20 @@
 /* Alert error message informing user that their Speed Boost purchase request failed because of an unknown error */
 "PSICASH_SPEED_BOOST_PURCHASE_FAILED_UNEXPECTED_CODE" = "Invalid or unexpected status code returned from PsiCash library.";
 
-/* Description text below button which refreshes the user's app receipt for an in-app purchase such as a subscription to premium */
-"REFRESH_APP_RECEIPT_BUTTON_DESCRIPTION" = "If you can’t see your subscription, there may be an issue with your app receipt. In this scenario you may need to refresh your app receipt.";
+/* Description text above a list of scenarios where the user should try refreshing their app receipt to restore an existing subscription */
+"REFRESH_APP_RECEIPT_BUTTON_DESCRIPTION_LIST_HEADER" = "Refresh your app receipt when:";
 
-/* Title of button which refreshes the user's app receipt for an in-app purchase such as a subscription to premium */
-"REFRESH_APP_RECEIPT_BUTTON_TITLE" = "Refresh app receipt";
+/* Point in a list of scenarios where the user should try refreshing their app receipt to restore an existing subscription */
+"REFRESH_APP_RECEIPT_BUTTON_DESCRIPTION_POINT_1" = "You need to recover a subscription on your account with a new phone";
 
-/* Description text below button which restores any existing subscriptions which are still valid that the user has purchased */
-"RESTORE_EXISTING_SUBSCRIPTION_BUTTON_DESCRIPTION" = "If you’re trying to recover a subscription on your account with a new phone you'll need to restore your existing subscription.";
-
-/* Title of button which restores any existing subscriptions which are still valid that the user has purchased */
-"RESTORE_EXISTING_SUBSCRIPTION_BUTTON_TITLE" = "Restore existing subscription";
+/* Point in a list of scenarios where the user should try refreshing their app receipt to restore an existing subscription */
+"REFRESH_APP_RECEIPT_BUTTON_DESCRIPTION_POINT_2" = "You cannot see a subscription you purchased on this device";
 
 /* Button which, when pressed, attempts to restore any existing subscriptions the user has purchased */
 "RESTORE_SUBSCRIPTION_BUTTON" = "Restore Subscription";
+
+/* Title of button which triggers an attempt to restore the user's existing subscription */
+"RESTORE_SUBSCRIPTION_BUTTON_TITLE" = "Restore my subscription";
 
 /* Title of cell in settings menu which, when pressed, launches the PsiCash onboarding */
 "SETTINGS_PSICASH_CELL_TITLE" = "PsiCash";

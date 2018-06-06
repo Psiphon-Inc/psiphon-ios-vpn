@@ -88,7 +88,7 @@
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return 2;
+    return 1;
 }
 
 #pragma mark - TableView Cells
@@ -142,31 +142,25 @@
     UITableViewCell *cell = [[UITableViewCell alloc] init];
 
     if (indexPath.row == 0) {
+        NSString *receiptButtonDescriptionHeader = NSLocalizedStringWithDefaultValue(@"REFRESH_APP_RECEIPT_BUTTON_DESCRIPTION_LIST_HEADER",
+                                                                                     nil, [NSBundle mainBundle],
+                                                                                     @"Refresh your app receipt when:",
+                                                                                     @"Description text above a list of scenarios where the user should try refreshing their app receipt to restore an existing subscription");
+        NSString *receiptButtonDescriptionPoint1 = NSLocalizedStringWithDefaultValue(@"REFRESH_APP_RECEIPT_BUTTON_DESCRIPTION_POINT_1",
+                                                                                     nil, [NSBundle mainBundle],
+                                                                                     @"You need to recover a subscription on your account with a new phone",
+                                                                                     @"Point in a list of scenarios where the user should try refreshing their app receipt to restore an existing subscription");
+        NSString *receiptButtonDescriptionPoint2 = NSLocalizedStringWithDefaultValue(@"REFRESH_APP_RECEIPT_BUTTON_DESCRIPTION_POINT_2",
+                                                                                     nil, [NSBundle mainBundle],
+                                                                                     @"You cannot see a subscription you purchased on this device",
+                                                                                     @"Point in a list of scenarios where the user should try refreshing their app receipt to restore an existing subscription");
         [self createHelpCellContent:cell
-                withHelpDescription:NSLocalizedStringWithDefaultValue(@"REFRESH_APP_RECEIPT_BUTTON_DESCRIPTION",
-                                                                      nil, [NSBundle mainBundle],
-                                                                      @"If you can’t see your subscription, there may be an issue with your app receipt. In this scenario you may need to refresh your app receipt.",
-                                                                      @"Description text below button which refreshes the user's app receipt for an in-app purchase such as a subscription to premium")
-                        buttonTitle:NSLocalizedStringWithDefaultValue(@"REFRESH_APP_RECEIPT_BUTTON_TITLE",
+                withHelpDescription:[NSString stringWithFormat:@"%@\n\n\u2022 %@\n\n\u2022 %@", receiptButtonDescriptionHeader, receiptButtonDescriptionPoint1, receiptButtonDescriptionPoint2]
+                        buttonTitle:NSLocalizedStringWithDefaultValue(@"RESTORE_SUBSCRIPTION_BUTTON_TITLE",
                                                                       nil,
                                                                       [NSBundle mainBundle],
-                                                                      @"Refresh app receipt", @"Title of button which refreshes the user's app receipt for an in-app purchase such as a subscription to premium")
+                                                                      @"Restore my subscription", @"Title of button which triggers an attempt to restore the user's existing subscription")
                              action:@selector(refreshReceiptAction)];
-    }
-
-    if (indexPath.row == 1) {
-        [self createHelpCellContent:cell
-                withHelpDescription:NSLocalizedStringWithDefaultValue(@"RESTORE_EXISTING_SUBSCRIPTION_BUTTON_DESCRIPTION",
-                                                                      nil,
-                                                                      [NSBundle mainBundle],
-                                                                      @"If you’re trying to recover a subscription on your account with a new phone you'll need to restore your existing subscription.",
-                                                                      @"Description text below button which restores any existing subscriptions which are still valid that the user has purchased")
-                        buttonTitle:NSLocalizedStringWithDefaultValue(@"RESTORE_EXISTING_SUBSCRIPTION_BUTTON_TITLE",
-                                                                      nil,
-                                                                      [NSBundle mainBundle],
-                                                                      @"Restore existing subscription",
-                                                                      @"Title of button which restores any existing subscriptions which are still valid that the user has purchased")
-                             action:@selector(restoreAction)];
     }
 
     return cell;
