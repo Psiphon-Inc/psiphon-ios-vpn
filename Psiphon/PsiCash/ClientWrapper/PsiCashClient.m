@@ -227,7 +227,7 @@ NSErrorDomain _Nonnull const PsiCashClientLibraryErrorDomain = @"PsiCashClientLi
     NSPredicate *predicate = [NSPredicate predicateWithBlock:^BOOL(PsiCashPurchase *evaluatedObject, NSDictionary<NSString *,id> * _Nullable bindings) {
         Authorization *auth = [[Authorization alloc] initWithEncodedAuthorization:evaluatedObject.authorization];
         if ([markedAuthIDs containsObject:auth.ID]) {
-            [purchasesToRemove addObject:auth.ID];
+            [purchasesToRemove addObject:evaluatedObject.ID];
             return FALSE;
         }
         return TRUE;
