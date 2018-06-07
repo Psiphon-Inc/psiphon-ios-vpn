@@ -78,7 +78,7 @@ NSErrorDomain _Nonnull const PsiCashClientLibraryErrorDomain = @"PsiCashClientLi
         // TODO: (1.0) notify the user about any purchases that expired while the app was backgrounded
         NSArray <PsiCashPurchase*>* expiredPurchases = [psiCash expirePurchases];
         if (expiredPurchases.count > 0) {
-            [PsiFeedbackLogger infoWithType:PsiCashLogType message:@"Purchases expired: %@", expiredPurchases];
+            [PsiFeedbackLogger infoWithType:PsiCashLogType message:@"Purchases expired: %@", [self diagnosticInfo]];
         }
 
         completionQueue = dispatch_queue_create("com.psiphon3.PsiCashClient.CompletionQueue", DISPATCH_QUEUE_SERIAL);
@@ -252,12 +252,14 @@ NSErrorDomain _Nonnull const PsiCashClientLibraryErrorDomain = @"PsiCashClientLi
     [stagingArea updateSpeedBoostProduct:[self speedBoostProductFromPurchasePrices:psiCash.purchasePrices withTargetProducts:[self targetProducts]]];
     [stagingArea updateRefreshPending:NO];
     [self commitModelStagingArea:stagingArea];
+
+    [PsiFeedbackLogger infoWithType:PsiCashLogType message:@"Refreshed state from cache: %@", [self diagnosticInfo]];
 }
 
 #pragma mark - Refresh Signal
 
 - (void)refreshState {
-    [PsiFeedbackLogger infoWithType:PsiCashLogType message:@"refreshing state"];
+    [PsiFeedbackLogger infoWithType:PsiCashLogType message:@"Refreshing state"];
 
 #if DEBUG
     const int networkRetryCount = 3;
@@ -309,10 +311,10 @@ NSErrorDomain _Nonnull const PsiCashClientLibraryErrorDomain = @"PsiCashClientLi
         [stagingArea updateRefreshPending:NO];
         [self commitModelStagingArea:stagingArea];
 
-        [PsiFeedbackLogger errorWithType:PsiCashLogType message:@"%s failed to refresh state %@", __FUNCTION__, error.localizedDescription];
+        [PsiFeedbackLogger errorWithType:PsiCashLogType message:@"Failed to refresh state %@", error.localizedDescription];
         [self displayAlertWithMessage:NSLocalizedStringWithDefaultValue(@"PSICASH_REFRESH_STATE_FAILED_MESSAGE_TEXT", nil, [NSBundle mainBundle], @"Failed to update PsiCash state", @"Alert error message informing user that the app failed to retrieve their PsiCash information from the server")];
     } completed:^{
-        [PsiFeedbackLogger infoWithType:PsiCashLogType message:@"refreshed state"];
+        [PsiFeedbackLogger infoWithType:PsiCashLogType message:@"Refreshed state: %@", [self diagnosticInfo]];
     }];
 }
 
@@ -356,7 +358,7 @@ NSErrorDomain _Nonnull const PsiCashClientLibraryErrorDomain = @"PsiCashClientLi
 #pragma mark - Purchase Signal
 
 - (void)purchaseSpeedBoostProduct:(PsiCashSpeedBoostProductSKU*)sku {
-    [PsiFeedbackLogger infoWithType:PsiCashLogType message:@"%s attempting to purchase %@", __FUNCTION__, [sku json]];
+    [PsiFeedbackLogger infoWithType:PsiCashLogType message:@"Attempting to purchase %@", [sku json]];
 
     [purchaseDisposable dispose];
 
@@ -441,7 +443,7 @@ NSErrorDomain _Nonnull const PsiCashClientLibraryErrorDomain = @"PsiCashClientLi
 
             if (e != nil) {
                 [self displayAlertWithMessage:e.localizedDescription];
-                [PsiFeedbackLogger errorWithType:PsiCashLogType message:@"%s failed to purchase Speed Boost %@", __FUNCTION__, e.localizedDescription];
+                [PsiFeedbackLogger errorWithType:PsiCashLogType message:@"Failed to purchase Speed Boost %@", e.localizedDescription];
             }
         }
 
@@ -452,10 +454,10 @@ NSErrorDomain _Nonnull const PsiCashClientLibraryErrorDomain = @"PsiCashClientLi
         [stagingArea updatePendingPurchases:nil];
         [self commitModelStagingArea:stagingArea];
 
-        [PsiFeedbackLogger errorWithType:PsiCashLogType message:@"%s failed to purchase Speed Boost %@", __FUNCTION__, error.localizedDescription];
+        [PsiFeedbackLogger errorWithType:PsiCashLogType message:@"Failed to purchase Speed Boost %@", error.localizedDescription];
         [self displayAlertWithMessage:NSLocalizedStringWithDefaultValue(@"PSICASH_SPEED_BOOST_PURCHASE_FAILED_MESSAGE_TEXT", nil, [NSBundle mainBundle], @"Purchase failed, please try again in a few minutes.", @"Alert message informing user that their Speed Boost purchase attempt unexpectedly failed and that they should try again in a few minutes.")];
     } completed:^{
-        [PsiFeedbackLogger infoWithType:PsiCashLogType message:@"%s successfully purchased %@", __FUNCTION__, [sku json]];
+        [PsiFeedbackLogger infoWithType:PsiCashLogType message:@"Purchase successful: %@", [self diagnosticInfo]];
     }];
 }
 
@@ -483,6 +485,24 @@ NSErrorDomain _Nonnull const PsiCashClientLibraryErrorDomain = @"PsiCashClientLi
          }];
         return nil;
     }];
+}
+
+#pragma mark - Logging
+
+-(NSString*)diagnosticInfo {
+    NSDictionary <NSString*, NSObject*>* info = [psiCash getDiagnosticInfo];
+
+    if (![NSJSONSerialization isValidJSONObject:info]) {
+        return @"{\"error\": \"invalid JSON object\"}";
+    }
+
+    NSError *writeError = nil;
+    NSData *jsonData = [NSJSONSerialization dataWithJSONObject:info options:0 error:&writeError];
+    if (writeError) {
+        return [NSString stringWithFormat:@"{\"error\": \"%@\"}", writeError.localizedDescription];
+    }
+    NSString *jsonString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
+    return jsonString;
 }
 
 @end
