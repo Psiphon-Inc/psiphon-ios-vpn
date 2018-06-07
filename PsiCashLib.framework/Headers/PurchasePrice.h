@@ -32,6 +32,8 @@
 @property NSString*_Nonnull transactionClass;
 @property NSString*_Nonnull distinguisher;
 @property NSNumber*_Nonnull price;
+
+- (NSDictionary<NSString*,NSObject*>*_Nonnull)toDictionary;
 @end
 
 
