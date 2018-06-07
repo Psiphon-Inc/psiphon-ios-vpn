@@ -26,4 +26,8 @@
     return [NSError errorWithDomain:domain code:code userInfo:nil];
 }
 
++ (instancetype)errorWithDomain:(NSErrorDomain)domain code:(NSInteger)code andLocalizedDescription:(NSString*)localizedDescription {
+    return [NSError errorWithDomain:domain code:code userInfo:@{NSLocalizedDescriptionKey:localizedDescription}];
+}
+
 @end

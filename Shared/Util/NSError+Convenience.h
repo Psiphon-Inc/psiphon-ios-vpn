@@ -23,4 +23,6 @@
 
 + (instancetype)errorWithDomain:(NSErrorDomain)domain code:(NSInteger)code;
 
++ (instancetype)errorWithDomain:(NSErrorDomain)domain code:(NSInteger)code andLocalizedDescription:(NSString*)localizedDescription;
+
 @end

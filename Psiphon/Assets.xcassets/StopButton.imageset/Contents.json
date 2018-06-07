@@ -2,17 +2,17 @@
   "images" : [
     {
       "idiom" : "universal",
-      "filename" : "disconnect.png",
+      "filename" : "Connected.png",
       "scale" : "1x"
     },
     {
       "idiom" : "universal",
-      "filename" : "disconnect@2x.png",
+      "filename" : "Connected@2x.png",
       "scale" : "2x"
     },
     {
       "idiom" : "universal",
-      "filename" : "disconnect@3x.png",
+      "filename" : "Connected@3x.png",
       "scale" : "3x"
     }
   ],

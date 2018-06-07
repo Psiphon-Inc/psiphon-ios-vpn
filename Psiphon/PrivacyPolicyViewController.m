@@ -29,10 +29,11 @@ NSErrorDomain _Nonnull const PrivacyPolicyErrorDomain = @"PrivacyPolicyErrorDoma
 
 typedef NS_ERROR_ENUM(PrivacyPolicyErrorDomain, PrivacyPolicyLinkGenerationErrorCode) {
 
-    PrivacyPolicyLinkGenerationFailedToFindHref             = 1 << 0,
-    PrivacyPolicyLinkGenerationFailedToGenerateURL          = 1 << 1,
-    PrivacyPolicyLinkGenerationFailedToFindCloseTag         = 1 << 2,
-    PrivacyPolicyLinkGenerationEncounteredInvalidRange      = 1 << 3,
+    PrivacyPolicyLinkGenerationInvalidErrorPointer          = 1 << 0,
+    PrivacyPolicyLinkGenerationFailedToFindHref             = 1 << 1,
+    PrivacyPolicyLinkGenerationFailedToGenerateURL          = 1 << 2,
+    PrivacyPolicyLinkGenerationFailedToFindCloseTag         = 1 << 3,
+    PrivacyPolicyLinkGenerationEncounteredInvalidRange      = 1 << 4,
 
 };
 
@@ -377,8 +378,14 @@ typedef NS_ERROR_ENUM(PrivacyPolicyErrorDomain, PrivacyPolicyLinkGenerationError
  * If found these tags are removed and an attributed string is formed with these links. The text view is
  * then set to use this attributed string.
  *
+ * Returns FALSE if an error occured
  */
-- (void)replaceLinksInTextView:(UITextView*)textView error:(NSError**)err {
+- (BOOL)replaceLinksInTextView:(UITextView*)textView error:(NSError**)err {
+    if (err == nil) {
+        [NSError errorWithDomain:PrivacyPolicyErrorDomain code:PrivacyPolicyLinkGenerationInvalidErrorPointer];
+        return FALSE;
+    }
+
     NSString *openTag = @"<a[^>]+href=\"(.*?)\"[^>]*>";
     NSString *closeTag = @"</a>";
 
@@ -386,12 +393,12 @@ typedef NS_ERROR_ENUM(PrivacyPolicyErrorDomain, PrivacyPolicyLinkGenerationError
 
     NSRegularExpression *openTagRegex = [NSRegularExpression regularExpressionWithPattern:openTag options:0 error:err];
     if (*err != nil) {
-        return;
+        return FALSE;
     }
 
     NSRegularExpression *closeTagRegex = [NSRegularExpression regularExpressionWithPattern:closeTag options:0 error:err];
     if (*err != nil) {
-        return;
+        return FALSE;
     }
 
     NSString *textToProcess = textView.text;
@@ -411,13 +418,13 @@ typedef NS_ERROR_ENUM(PrivacyPolicyErrorDomain, PrivacyPolicyLinkGenerationError
         // Get link
         NSDataDetector *detect = [[NSDataDetector alloc] initWithTypes:NSTextCheckingTypeLink error:err];
         if (*err != nil) {
-            return;
+            return FALSE;
         }
 
         NSArray<NSTextCheckingResult*> *hrefMatches = [detect matchesInString:openTagText options:0 range:NSMakeRange(0, openTagText.length)];
         if (hrefMatches == nil || hrefMatches.count == 0) {
             *err = [NSError errorWithDomain:PrivacyPolicyErrorDomain code:PrivacyPolicyLinkGenerationFailedToFindHref];
-            return;
+            return FALSE;
         }
 
         NSTextCheckingResult *hrefMatch = [hrefMatches objectAtIndex:0];
@@ -425,14 +432,14 @@ typedef NS_ERROR_ENUM(PrivacyPolicyErrorDomain, PrivacyPolicyLinkGenerationError
         NSURL *url = [NSURL URLWithString:hrefText];
         if (url == nil) {
             *err = [NSError errorWithDomain:PrivacyPolicyErrorDomain code:PrivacyPolicyLinkGenerationFailedToGenerateURL];
-            return;
+            return FALSE;
         }
 
         // Remove close tag
         NSArray<NSTextCheckingResult*> *closeTagMatches = [closeTagRegex matchesInString:textToProcess options:0 range:NSMakeRange(0, textToProcess.length)];
         if (closeTagMatches == nil || closeTagMatches.count == 0) {
             *err = [NSError errorWithDomain:PrivacyPolicyErrorDomain code:PrivacyPolicyLinkGenerationFailedToFindCloseTag];
-            return;
+            return FALSE;
         }
 
         NSTextCheckingResult *closeTagMatch = [closeTagMatches objectAtIndex:0];
@@ -459,6 +466,8 @@ typedef NS_ERROR_ENUM(PrivacyPolicyErrorDomain, PrivacyPolicyLinkGenerationError
         }
         textView.attributedText = attr;
     }
+
+    return TRUE;
 }
 
 @end
