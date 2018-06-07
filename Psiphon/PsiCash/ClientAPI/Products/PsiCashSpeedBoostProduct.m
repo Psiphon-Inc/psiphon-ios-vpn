@@ -56,6 +56,11 @@ NS_ASSUME_NONNULL_BEGIN
                            @"price": self.price,
                            @"variant": self.variant
                            };
+
+    if (![NSJSONSerialization isValidJSONObject:dict]) {
+        return @"{\"error\": \"invalid JSON object\"}";
+    }
+
     NSError *writeError = nil;
     NSData *jsonData = [NSJSONSerialization dataWithJSONObject:dict options:0 error:&writeError];
     if (writeError) {

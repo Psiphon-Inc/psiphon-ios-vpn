@@ -34,12 +34,15 @@
 @implementation PsiCashBalanceView {
     UIView *containerView;
     NSTimer *animationTimer;
+    BOOL isRTL;
 }
 
 -(id)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
 
     if (self) {
+        isRTL = ([UIApplication sharedApplication].userInterfaceLayoutDirection == UIUserInterfaceLayoutDirectionRightToLeft);
+
         [self setupViews];
         [self addViews];
         [self setupLayoutConstraints];
@@ -73,7 +76,7 @@
     _balance.backgroundColor = [UIColor clearColor];
     _balance.adjustsFontSizeToFitWidth = YES;
     _balance.font = [UIFont boldSystemFontOfSize:20];
-    _balance.textAlignment = NSTextAlignmentLeft;
+    _balance.textAlignment = isRTL ? NSTextAlignmentRight : NSTextAlignmentLeft;
     _balance.textColor = [UIColor whiteColor];
     _balance.userInteractionEnabled = NO;
 
