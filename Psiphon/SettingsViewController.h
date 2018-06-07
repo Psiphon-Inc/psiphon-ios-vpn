@@ -19,6 +19,9 @@
 
 #import "PsiphonSettingsViewController.h"
 
+// Specifier keys for cells in settings menu
+#define kSettingsPsiCash                @"settingsPsiCash"
+
 @interface SettingsViewController : PsiphonSettingsViewController
 
 @end

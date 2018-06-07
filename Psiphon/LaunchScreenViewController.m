@@ -24,12 +24,7 @@
 #import "PsiphonProgressView.h"
 #import "PureLayout.h"
 #import "RootContainerController.h"
-
-#if DEBUG
-#define kLaunchScreenTimerCount 1.f
-#else
-#define kLaunchScreenTimerCount 10.f
-#endif
+#import "Asserts.h"
 
 #define kTimerInterval 1.f
 
@@ -46,10 +41,6 @@ static const NSString *ItemStatusContext;
 @implementation LaunchScreenViewController {
     // Loading Text
     UILabel *loadingLabel;
-
-    // Loading Timer
-    NSTimer *loadingTimer;
-    CGFloat timerCount;
 
     // Loading Animation
     PsiphonProgressView *progressView;
@@ -76,29 +67,6 @@ static const NSString *ItemStatusContext;
     [self addLoadingLabel];
 
     [self setNeedsStatusBarAppearanceUpdate];
-}
-
-- (void)viewDidAppear:(BOOL)animated {
-    [super viewDidAppear:animated];
-
-    // Reset the timer count.
-    timerCount = 0.f;
-
-    loadingTimer = [NSTimer scheduledTimerWithTimeInterval:kTimerInterval repeats:TRUE block:^(NSTimer *timer) {
-        timerCount += kTimerInterval;
-        [progressView setProgress:timerCount / kLaunchScreenTimerCount];
-        if (timerCount >= kLaunchScreenTimerCount + kTimerInterval) {
-            [timer invalidate];
-            [[AppDelegate sharedAppDelegate] launchScreenFinished];
-        }
-    }];
-    [loadingTimer fire];
-}
-
-- (void)viewWillDisappear:(BOOL)animated {
-    [super viewWillDisappear:animated];
-    // Stops the timer and removes it from the run loop.
-    [loadingTimer invalidate];
 }
 
 - (void)willMoveToParentViewController:(nullable UIViewController *)parent {

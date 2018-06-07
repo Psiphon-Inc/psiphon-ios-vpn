@@ -27,4 +27,10 @@
 
 + (UIColor * _Nonnull)clearBlue50Color;
 
++ (UIColor * _Nonnull)charcoalGreyColor;
+
++ (UIColor * _Nonnull)weirdGreenColor;
+
++ (UIColor * _Nonnull)purpleButtonColor;
+
 @end

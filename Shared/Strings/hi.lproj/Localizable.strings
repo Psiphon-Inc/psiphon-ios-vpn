@@ -1,0 +1,233 @@
+/* Title of the section in the subscription dialog that shows currently active subscription information. */
+"ACTIVE_SUBSCRIPTION_SECTION_TITLE" = "वर्तमान सदस्यता";
+
+/* Text for button that tell users there will by a short video ad. */
+"AD_LOADED" = "जब हम आपको जुड़ने के लिए तैयार होते हैं, तो एक छोटा वीडियो देखें";
+
+/* Text for app subtitle on main view. */
+"APP_SUB_TITLE_MAIN_VIEW" = "सीमाओं के पार";
+
+/* Text showing the app version. The '%@' placeholder is the version number. So it will look like 'v.2'. */
+"APP_VERSION" = "वी%@";
+
+/* Alert message informing user that the device clock needs to be updated with current time */
+"BAD_CLOCK_ALERT_MESSAGE" = "हमने पाया है कि आपके डिवाइस पर समय आपके समय क्षेत्र के साथ समन्वयन से बाहर है। कृपया अपनी घड़ी की सेटिंग अपडेट करें और ऐप को पुनरारंभ करें";
+
+/*[UNTRANSLATED] Alert message informing user that subscription receipt can not be verified */
+"BAD_RECEIPT_ALERT_MESSAGE" = "Your subscription receipt can not be verified, please refresh it and try again.";
+
+/* Title of button on alert view which shows the progress of the user's buy request. Hitting this button dismisses the alert and the buy request continues processing in the background. */
+"BUY_REQUEST_PROGRESS_ALERT_DISMISS_BUTTON_TITLE" = "खारिज करना";
+
+/* Premium subscriptions dialog header text */
+"BUY_SUBSCRIPTIONS_HEADER_TEXT" = "विज्ञापन निकालें और प्रीमियम सदस्यता के साथ इंटरनेट पर तेजी से सर्फ करें!";
+
+/* Buy subscription dialog footer text */
+"BUY_SUBSCRIPTIONS_NOTICES" = "A subscription is auto-renewable which means that once purchased it will be automatically renewed until you cancel it 24 hours prior to the end of the current period.\n\nYour iTunes Account will be charged for renewal within 24-hours prior to the end of the current period with the cost of subscription.";
+
+/* Alert message informing user that their subscription has expired or that they're not a subscriber, therefore Psiphon can only be started from the Psiphon app. DO NOT translate 'Psiphon'. */
+"CANNOT_START_TUNNEL_DUE_TO_SUBSCRIPTION" = "आपकी Psiphon सदस्यता समाप्त हो गई है।\nचूंकि आप कोई ग्राहक नहीं हैं या आपकी सदस्यता समाप्त हो गई है, Psiphon केवल Psiphon ऐप से शुरू किया जा सकता है।\n\nकृपया Psiphon ऐप को खोलें";
+
+/* Text above change region button that allows user to select their desired server region */
+"CHANGE_REGION" = "क्षेत्र बदलें";
+
+/* Main text in the 'Upstream Proxy Error' dialog box. This is shown when the user has directly altered these settings, and those settings are (probably) erroneous. DO NOT translate 'Psiphon'. */
+"CHECK_UPSTREAM_PROXY_SETTING" = "आपने एक अपस्ट्रीम प्रॉक्सी का उपयोग करने के लिए Psiphon को कॉन्फ़िगर किया है\nहालांकि, हम उस प्रॉक्सी के माध्यम से एक Psiphon सर्वर से कनेक्ट करने में असमर्थ हैं\nकृपया सेटिंग ठीक करें और पुनः प्रयास करें।";
+
+/*[UNTRANSLATED] Alert dialog body informing the user that the 'Auto-start VPN on demand' feature will be disabled and that the VPN cannot be stopped. */
+"CONNECT_ON_DEMAND_ALERT_BODY" = "\"Auto-start VPN\" will be temporarily disabled until the next time Psiphon VPN is started.";
+
+/* Alert dialog title informing user that 'Auto-start VPN' feature is enabled */
+"CONNECT_ON_DEMAND_ALERT_TITLE" = "स्वत: प्रारंभ VPN सक्षम है";
+
+/* Alert dialog title of alert which informs the user that the settings file in the app is corrupt. */
+"CORRUPT_SETTINGS_ALERT_TITLE" = "दूषित सेटिंग्स";
+
+/* Alert dialog message informing the user that the settings file in the app is corrupt, and that they can potentially fix this issue by re-installing the app. */
+"CORRUPT_SETTINGS_MESSAGE" = "आपकी ऐप सेटिंग्स फ़ाइल भ्रष्ट प्रतीत होती है। फ़ाइल को सुधारने के लिए ऐप को पुन: इंस्टॉल करने का प्रयास करें।";
+
+/* Title of the button that dismisses region selection dialog
+   Title of the button that dismisses the subscriptions menu */
+"DONE_ACTION" = "सम्पन्न";
+
+/*[UNTRANSLATED] Alert dialog message indicating to the user that the app has failed to upload their feedback and that they should try again.  */
+"FEEDBACK_UPLOAD_FAILED_MESSAGE" = "An error occured while uploading your feedback. Please try again. Your feedback helps us improve the Psiphon network.";
+
+/*[UNTRANSLATED] Alert dialog title indicating to the user that the app has failed to upload their feedback to Psiphon's servers. */
+"FEEDBACK_UPLOAD_FAILED_TITLE" = "Feedback upload failed";
+
+/*[UNTRANSLATED] Title of button on alert view which shows the progress of the users feedback being uploaded to Psiphon's servers. Hitting this button dismisses the alert and the upload continues in the background. */
+"FEEDBACK_UPLOAD_IN_PROGRESS_BACKGROUND_BUTTON_TITLE" = "Background";
+
+/*[UNTRANSLATED] Alert dialog title indicating to the user that their feedback is being encrypted and securely uploaded to Psiphon's servers. */
+"FEEDBACK_UPLOAD_IN_PROGRESS_MESSAGE" = "Sending feedback…";
+
+/*[UNTRANSLATED] Alert dialog message thanking the user for helping improve the Psiphon network by submitting their feedback. */
+"FEEDBACK_UPLOAD_SUCCESSFUL_MESSAGE" = "Thank you for helping improve Psiphon!";
+
+/*[UNTRANSLATED] Alert dialog title indicating to the user that their feedback has been successfully uploaded to Psiphon's servers. */
+"FEEDBACK_UPLOAD_SUCCESSFUL_TITLE" = "Feedback uploaded successfully";
+
+/*[UNTRANSLATED] External link to the license page. Please update this with the correct language specific link (if available) e.g. https://psiphon.ca/fr/license.html for french. */
+"LICENSE_PAGE_URL" = "https://psiphon.ca/en/license.html";
+
+/* Text displayed while app loads */
+"LOADING" = "लोड हो रहा है...";
+
+/* Manage subscription button */
+"MANAGE_SUBSCRIPTIONS_BUTTON" = "Manage my subscription";
+
+/* Alert title informing user there is no internet connection */
+"NO_INTERNET" = "कोई इंटरनेट कनेक्शन नहीं";
+
+/* Subscriptions view text that is visible when the list of subscriptions is not available */
+"NO_PRODUCTS_TEXT" = "एप स्टोर से सदस्यता पुनः प्राप्त नहीं की जा सकी ताज़ा करने के लिए खींचें या बाद में फिर से प्रयास करें";
+
+/* Alert OK Button
+   OK button title */
+"OK_BUTTON" = "ठीक";
+
+/* Alert message informing the user they should open the app to finish connecting to the VPN. DO NOT translate 'Psiphon'. */
+"OPEN_PSIPHON_APP" = "जोड़ने को समाप्त करने के लिए कृपया Psiphon ऐप खोलें।";
+
+/* Cancel button title. */
+"PRIVACY_POLICY_CANCEL_BUTTON" = "रद्द करें ";
+
+/*[UNTRANSLATED] External link to the privacy policy page. Please update this with the correct language specific link (if available) e.g. https://psiphon.ca/fr/privacy.html for french. */
+"PRIVACY_POLICY_URL" = "https://psiphon.ca/en/privacy.html";
+
+/*[UNTRANSLATED] Paragraph text in the 'What does Psiphon do with your VPN data?' subsection of the 'User VPN Data' section of the Privacy page. */
+"PrivacyInformationCollectedVpndataWhatdoespsiphondowithPara1" = "Psiphon looks at your data only to the degree necessary to collect statistics about the usage of our system. We record the total bytes transferred for a user connection, as well as the bytes transferred for some specific domains. These statistics are discarded after 60 days.";
+
+/*[UNTRANSLATED] Paragraph text in the 'What does Psiphon do with your VPN data?' subsection of the 'User VPN Data' section of the Privacy page. */
+"PrivacyInformationCollectedVpndataWhatdoespsiphondowithPara2" = "Psiphon does not inspect or record full URLs (only domain names), and does not further inspect your data. Psiphon does not modify your data as it passes through the VPN.";
+
+/*[UNTRANSLATED] Paragraph text in the 'What does Psiphon do with your VPN data?' subsection of the 'User VPN Data' section of the Privacy page. */
+"PrivacyInformationCollectedVpndataWhatdoespsiphondowithPara3" = "Even this coarse data would be difficult to link back to you, since we immediately convert your IP address to geographical info and then discard the IP. Nor is any other identifying information stored.";
+
+/*[UNTRANSLATED] Sub-heading in the 'User VPN Data' section of the Privacy Policy page. The section describes what Psiphon does with the little bit of VPN data that it collects stats from. */
+"PrivacyInformationCollectedVpndataWhatdoespsiphondowithSubhead" = "What does Psiphon do with your VPN data?";
+
+/*[UNTRANSLATED] Paragraph text in the 'Who does Psiphon share these statistics with?' subsection of the 'User VPN Data' section of the Privacy page. */
+"PrivacyInformationCollectedVpndataWhopsiphonshareswithPara1" = "When sharing with third parties, Psiphon only ever provides coarse, aggregate domain-bytes statistics. We never share per-session information or any other possibly-identifying information.";
+
+/*[UNTRANSLATED] Paragraph text in the 'Who does Psiphon share these statistics with?' subsection of the 'User VPN Data' section of the Privacy page. */
+"PrivacyInformationCollectedVpndataWhopsiphonshareswithPara2" = "This sharing is typically done with services or organizations we collaborate with — as <a href=\"http://www.dw.com/en/psiphon-helps-dodge-the-online-trackers/a-16765092\" target=\"_blank\">we did with DW</a> a few years ago. These statistics help us and them answer questions like, “how many bytes were transferred through Psiphon for DW.com to all users in Iran in April?”";
+
+/*[UNTRANSLATED] Paragraph text in the 'Who does Psiphon share these statistics with?' subsection of the 'User VPN Data' section of the Privacy page. */
+"PrivacyInformationCollectedVpndataWhopsiphonshareswithPara3" = "Again, we specifically do not give detailed or potentially user-identifying information to partners or any other third parties.";
+
+/*[UNTRANSLATED] Sub-heading in the 'User VPN Data' section of the Privacy Policy page. The section describes who Psiphon shares VPN data stats. The answer will be organizations and not specific people, in case that makes a difference in your language. */
+"PrivacyInformationCollectedVpndataWhopsiphonshareswithSubhead" = "Who does Psiphon share these statistics with?";
+
+/*[UNTRANSLATED] Paragraph text in the 'Why should you care?' subsection of the 'User VPN Data' section of the Privacy page. */
+"PrivacyInformationCollectedVpndataWhycarePara1" = "When using a VPN or proxy you should be concerned about what the provider can see in your data, collect from it, and do to it. For some web and email connections, it is theoretically possible for a VPN to see, collect, and modify the contents.";
+
+/*[UNTRANSLATED] Sub-heading in the 'User VPN Data' section of the Privacy Policy page. The section describes why it's important for users to consider what a VPN does with their traffic data. */
+"PrivacyInformationCollectedVpndataWhycareSubhead" = "Why should you care?";
+
+/*[UNTRANSLATED] Bullet list text under 'Why does Psiphon need these statistics?' subsection of the 'User VPN Data' section of the Privacy page. */
+"PrivacyInformationCollectedVpndataWhydoespsiphonneedPara1Item1" = "Estimate future costs: The huge amount of user data we transfer each month is a major factor in our costs. It is vital for us to see and understand usage fluctuations.";
+
+/*[UNTRANSLATED] Bullet list text under 'Why does Psiphon need these statistics?' subsection of the 'User VPN Data' section of the Privacy page. */
+"PrivacyInformationCollectedVpndataWhydoespsiphonneedPara1Item2" = "Optimize for traffic types: Video streaming has different network requirements than web browsing does, which is different than chat, which is different than voice, and so on. Statistics about the number of bytes transferred for some major media providers helps us to understand how to provide the best experience to our users.";
+
+/*[UNTRANSLATED] Bullet list text under 'Why does Psiphon need these statistics?' subsection of the 'User VPN Data' section of the Privacy page. If available in your language, the blog post URLs should be updated to the localized post. */
+"PrivacyInformationCollectedVpndataWhydoespsiphonneedPara1Item3" = "Determine the nature of major censorship events: Sites and services often get blocked suddenly and without warning, which can lead to huge variations in regional usage of Psiphon. For example, we had up to 20x surges in usage within a day when <a href=\"https://blog-en.psiphon.ca/2016/07/psiphon-usage-surges-as-brazil-blocks.html\" target=\"_blank\">Brazil blocked WhatsApp</a> or <a href=\"https://blog-en.psiphon.ca/2016/11/social-media-and-internet-ban-in-turkey.html\" target=\"_blank\">Turkey blocked social media</a>.";
+
+/*[UNTRANSLATED] Bullet list text under 'Why does Psiphon need these statistics?' subsection of the 'User VPN Data' section of the Privacy page. (English is using 'who' instead of 'whom' to reflect common idiom.) */
+"PrivacyInformationCollectedVpndataWhydoespsiphonneedPara1Item4" = "Understand who we need to help: Some sites and services will never get blocked anywhere, some will always be blocked in certain countries, and some will occasionally be blocked in some countries. To make sure that our users are able to communicate and learn freely, we need to understand these patterns, see who is affected, and work with partners to make sure their services work best with Psiphon.";
+
+/*[UNTRANSLATED] Paragraph text in the 'Why does Psiphon need these statistics?' subsection of the 'User VPN Data' section of the Privacy page. This paragraph serves as preamble for a detailed list, which is why it ends with a colon. */
+"PrivacyInformationCollectedVpndataWhydoespsiphonneedPara1ListStart" = "This data is used by us to determine how our network is being used. This allows us to do things like:";
+
+/*[UNTRANSLATED] Sub-heading in the 'User VPN Data' section of the Privacy Policy page. The section describes why Psiphon needs VPN data stats. */
+"PrivacyInformationCollectedVpndataWhydoespsiphonneedSubhead" = "Why does Psiphon need these statistics?";
+
+/*[UNTRANSLATED] Button label at the end of privacy policy screen, indication that when clicked user can start using Psiphon */
+"PrivacyPolicyGetStartedButtonTitle" = "Get started with Psiphon";
+
+/* page title for the Privacy Policy page */
+"PrivacyTitle" = "गोपनीयता नीति";
+
+/* Refresh app receipt button title */
+"REFRESH_APP_RECEIPT_BUTTON_TITLE" = "ऐप रसीद ताज़ा करें";
+
+/* Restore my subscription button title */
+"RESTORE_SUBSCRIPTION_BUTTON_TITLE" = "मेरे मौजूदा सदस्यता को पुनर्स्थापित करें";
+
+/* Subscriptions item title in the app settings when user has an active subscription. Clicking this item opens subscriptions view */
+"SETTINGS_SUBSCRIPTION_ACTIVE" = "सदस्यता";
+
+/* Subscriptions item title in the app settings when user does not have an active subscription. Clicking this item opens subscriptions view. If “Premium” doesn't easily translate, please choose a term that conveys “Pro” or “Extra” or “Better” or “Elite”. */
+"SETTINGS_SUBSCRIPTION_NOT_ACTIVE" = "प्रीमियम के लिए जाएँ!";
+
+/* Automatically start VPN On demand settings toggle */
+"SETTINGS_VPN_ON_DEMAND" = "मांग पर स्वत: शुरू वीपीएन";
+
+/* VPN On demand setting detail text showing when user doesn't have an active subscription and the item is disabled. */
+"SETTINGS_VPN_ON_DEMAND_DETAIL" = "केवल सदस्यता";
+
+/* Text for button that opens paid subscriptions manager UI. If “Premium” doesn't easily translate, please choose a term that conveys “Pro” or “Extra” or “Better” or “Elite”. */
+"SUBSCRIPTION_BUTTON_TITLE" = "अब प्रीमियम जाओ!";
+
+/* Alert message informing user that their subscription has expired, and that Psiphon will stop in an hour if subscription is not renewed. Do not translate 'Psiphon'. */
+"SUBSCRIPTION_EXPIRED_WILL_KILL_TUNNEL" = "आपकी Psiphon सदस्यता समाप्त हो गई है। यदि सदस्यता को नवीनीकृत नहीं किया जाता है तो साइफ़ोन स्वतः एक घंटे में बंद हो जाएगा प्रीमियम फीचर्स का उपयोग जारी रखने के लिए अपनी सदस्यता की समीक्षा करने के लिए Psiphon ऐप को खोलें।";
+
+/* Title of the dialog for available in-app paid subscriptions */
+"SUBSCRIPTIONS" = "सदस्यता";
+
+/* Title of button on subscriptions page which opens Psiphon's privacy policy webpage */
+"SUBSCRIPTIONS_PRIVACY_POLICY_BUTTON_TEXT" = "गोपनीयता नीति";
+
+/*[UNTRANSLATED] Title of button on subscriptions page which opens Psiphon's terms of use webpage */
+"SUBSCRIPTIONS_TERMS_OF_USE_BUTTON_TEXT" = "Terms of Use";
+
+/* Alert message informing user that Psiphon has been stopped automatically since the subscription has expired. Do not translate 'Psiphon'. */
+"TUNNEL_KILLED" = "आपकी सदस्यता की समयसीमा समाप्त होने के बाद साइफ़ोन स्वचालित रूप से बंद कर दिया गया है।";
+
+/* Alert message informing user to turn on their cellular data or wifi to connect to the internet */
+"TURN_ON_DATE" = "डेटा तक पहुंचने के लिए सेलुलर डेटा चालू करें या वाई-फ़ाई का उपयोग करें";
+
+/* Alert dialog message informing the user that an error occurred while starting Psiphon (Do not translate 'Psiphon'). The user should try again, and if the problem persists, they should try reinstalling the app. */
+"VPN_START_FAIL_MESSAGE" = "Psiphon शुरू करते समय एक त्रुटि हुई कृपया पुन: प्रयास करें। यदि यह समस्या बनी रहती है, तो Psiphon ऐप को फिर से स्थापित करने का प्रयास करें";
+
+/*[UNTRANSLATED] Alert dialog message informing the user that an error occurred while starting Psiphon because they selected an egress region that is no longer available (Do not translate 'Psiphon'). The user should select a different region and try again. Note: the backslash before each quotation mark should be left as is for formatting. */
+"VPN_START_FAIL_REGION_INVALID_MESSAGE" = "The region you selected is no longer available. You must choose a new region or change to the default \"Best performance\" choice.";
+
+/* Alert dialog title indicating to the user that Psiphon was unable to start (MainViewController) */
+"VPN_START_FAIL_TITLE" = "प्रारंभ करने में असमर्थ";
+
+/*[UNTRANSLATED] ('Privacy Policy' should be the same translation as privacy policy button VPN_START_PRIVACY_POLICY_BUTTON), (Do not translate 'VPN profile'), (Do not translate 'Psiphon') */
+"VPN_START_PERMISSION_DENIED_MESSAGE" = "Psiphon needs your permission to install a VPN profile in order to connect.\n\nPsiphon is committed to protecting the privacy of our users. You can review our privacy policy by tapping \"Privacy Policy\".";
+
+/* Dismiss button title. Dismisses pop-up alert when the user clicks on the button */
+"VPN_START_PERMISSION_DISMISS_BUTTON" = "खारिज करना";
+
+/*[UNTRANSLATED] Alert dialog title indicating to the user that Psiphon needs their permission */
+"VPN_START_PERMISSION_REQUIRED_TITLE" = "Permission required";
+
+/* Button label taking user's to our Privacy Policy page */
+"VPN_START_PRIVACY_POLICY_BUTTON" = "गोपनीयता नीति";
+
+/* Status when the VPN is connected to a Psiphon server */
+"VPN_STATUS_CONNECTED" = "जुड़े हुए";
+
+/* Status when the VPN is connecting; that is, trying to connect to a Psiphon server */
+"VPN_STATUS_CONNECTING" = "कनेक्ट";
+
+/* Status when the VPN is not connected to a Psiphon server, not trying to connect, and not in an error state */
+"VPN_STATUS_DISCONNECTED" = "डिस्कनेक्ट किया गया";
+
+/* Status when the VPN is disconnecting. Sometimes going from connected to disconnected can take some time, and this is that state. */
+"VPN_STATUS_DISCONNECTING" = "डिस्कनेक्ट कर रहा है";
+
+/* Status when the VPN is in an invalid state. For example, if the user doesn't give permission for the VPN configuration to be installed, and therefore the Psiphon VPN can't even try to connect. */
+"VPN_STATUS_INVALID" = "डिस्कनेक्ट किया गया";
+
+/* Status when the VPN was connected to a Psiphon server, got disconnected unexpectedly, and is currently trying to reconnect */
+"VPN_STATUS_RECONNECTING" = "पुन: कनेक्ट";
+
+/* Status when the VPN is restarting. */
+"VPN_STATUS_RESTARTING" = "पुन: प्रारंभ हो";
+

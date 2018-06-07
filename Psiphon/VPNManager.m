@@ -41,6 +41,12 @@
 #import "DispatchUtils.h"
 #import "RACTargetQueueScheduler.h"
 
+/**
+ * VPNStartSuccessCheckDelay is the delay interval for checking VPN status after starting it.
+ * We expect the VPN to be in a connecting/connected/reasserting state within this short time period after starting it.
+ */
+NSTimeInterval const VPNStartSuccessCheckDelay = 0.5;
+
 NSErrorDomain const VPNManagerErrorDomain = @"VPNManagerErrorDomain";
 
 PsiFeedbackLogType const VPNManagerLogType = @"VPNManager";
@@ -62,8 +68,6 @@ UserDefaultsKey const VPNManagerConnectOnDemandUntilNextStartBoolKey = @"VPNMana
 
 @property (nonatomic) NSOperationQueue *serialOperationQueue;
 @property (nonatomic) RACTargetQueueScheduler *serialQueueScheduler;
-
-@property (nonatomic) Notifier *notifier;
 
 @property (atomic) BOOL restartRequired;
 @property (atomic) BOOL extensionIsZombie;
@@ -98,7 +102,6 @@ UserDefaultsKey const VPNManagerConnectOnDemandUntilNextStartBoolKey = @"VPNMana
         [_internalTunnelStatus sendNext:@(VPNStatusInvalid)];
 
         _restartRequired = FALSE;
-        _notifier = [[Notifier alloc] initWithAppGroupIdentifier:APP_GROUP_IDENTIFIER];
 
         _restartRequired = FALSE;
         _extensionIsZombie = FALSE;
@@ -247,7 +250,7 @@ UserDefaultsKey const VPNManagerConnectOnDemandUntilNextStartBoolKey = @"VPNMana
         case VPNStatusRestarting: return @"restarting";
         case VPNStatusZombie: return @"zombie";
 
-        default: return [NSString stringWithFormat:@"invalid status (%d)", status];
+        default: return [NSString stringWithFormat:@"invalid status (%ld)", (long)status];
     }
 }
 
@@ -261,7 +264,7 @@ UserDefaultsKey const VPNManagerConnectOnDemandUntilNextStartBoolKey = @"VPNMana
         case NEVPNStatusReasserting: return @"reasserting";
         case NEVPNStatusDisconnecting: return @"disconnecting";
 
-        default: return [NSString stringWithFormat:@"invalid status (%d)", status];
+        default: return [NSString stringWithFormat:@"invalid status (%ld)", (long)status];
     }
 }
 
@@ -303,7 +306,7 @@ UserDefaultsKey const VPNManagerConnectOnDemandUntilNextStartBoolKey = @"VPNMana
 
     __weak VPNManager *weakSelf = self;
 
-    __block RACDisposable *disposable = [[[[[[[VPNManager loadTunnelProviderManager]
+    __block RACDisposable *disposable = [[[[[[[[[VPNManager loadTunnelProviderManager]
       map:^NETunnelProviderManager *(NETunnelProviderManager *providerManager) {
 
           if (!providerManager) {
@@ -341,7 +344,7 @@ UserDefaultsKey const VPNManagerConnectOnDemandUntilNextStartBoolKey = @"VPNMana
       flattenMap:^RACSignal *(NETunnelProviderManager *providerManager) {
           return [RACSignal defer:providerManager selectorWithErrorCallback:@selector(loadFromPreferencesWithCompletionHandler:)];
       }]
-      flattenMap:^RACSignal<NSNumber *> *(NETunnelProviderManager *providerManager) {
+      flattenMap:^RACSignal<NETunnelProviderManager *> *(NETunnelProviderManager *providerManager) {
 
           weakSelf.tunnelProviderManager = providerManager;
           NSError *error;
@@ -351,7 +354,40 @@ UserDefaultsKey const VPNManagerConnectOnDemandUntilNextStartBoolKey = @"VPNMana
           if (error) {
               return [RACSignal error:error];
           } else {
+              // The process of connecting to VPN started.
+              [weakSelf.internalStartStatus sendNext:@(VPNStartStatusFinished)];
+
+              return [RACSignal return:providerManager];
+          }
+
+      }]
+      delay:VPNStartSuccessCheckDelay]  // Delay before checking VPN status.
+      flattenMap:^RACSignal<RACUnit *> *(NETunnelProviderManager *providerManager) {
+
+          NEVPNStatus s = providerManager.connection.status;
+
+          // We expect the VPN to have started after the delay.
+
+          if (s == NEVPNStatusConnecting ||
+              s == NEVPNStatusConnected ||
+              s == NEVPNStatusReasserting) {
+
               return [RACSignal return:RACUnit.defaultUnit];
+
+          } else {
+
+              // The VPN is not in the expected connecting/connected state within VPNStartSuccessCheckDelay of starting.
+              // Due to the potential corruption of the VPN configuration, delete the VPN configuration.
+              //
+              // This bug has been observed in the system, and the only solution is to remove the VPN configuration.
+              //
+              return [[RACSignal defer:providerManager
+             selectorWithErrorCallback:@selector(removeFromPreferencesWithCompletionHandler:)]
+                flattenMap:^RACSignal *(id value) {
+                  // End the stream with an error.
+                    return [RACSignal error:[NSError errorWithDomain:VPNManagerErrorDomain code:VPNManagerConfigRemovedMaybeCorrupt]];
+                }];
+
           }
 
       }]
@@ -362,16 +398,17 @@ UserDefaultsKey const VPNManagerConnectOnDemandUntilNextStartBoolKey = @"VPNMana
           if ([error.domain isEqualToString:NEVPNErrorDomain] &&
                error.code == NEVPNErrorConfigurationReadWriteFailed &&
                [error.localizedDescription isEqualToString:@"permission denied"] ) {
-
+              // User denied permission.
               [weakSelf.internalStartStatus sendNext:@(VPNStartStatusFailedUserPermissionDenied)];
+
           } else {
+
               [weakSelf.internalStartStatus sendNext:@(VPNStartStatusFailedOther)];
           }
 
           [weakSelf.compoundDisposable removeDisposable:disposable];
-
-      } completed:^{
-          [weakSelf.internalStartStatus sendNext:@(VPNStartStatusFinished)];
+      }
+      completed:^{
           [weakSelf.compoundDisposable removeDisposable:disposable];
       }];
 
@@ -391,7 +428,9 @@ UserDefaultsKey const VPNManagerConnectOnDemandUntilNextStartBoolKey = @"VPNMana
           }
 
           if (providerManager.connection.status == NEVPNStatusConnecting) {
-              [weakSelf.notifier post:NOTIFIER_START_VPN];
+              [[Notifier sharedInstance] post:NotifierStartVPN completionHandler:^(BOOL success) {
+                  // Do nothing.
+              }];
           }
 
       } error:^(NSError *error) {
