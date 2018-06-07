@@ -36,7 +36,6 @@
 #import "RegionAdapter.h"
 #import "Subscription.h"
 #import "PacketTunnelUtils.h"
-#import "AuthorizationsDatabase.h"
 #import "NSError+Convenience.h"
 #import "RACSignal+Operations.h"
 #import "RACDisposable.h"
@@ -88,7 +87,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
     TunnelProviderStateKillMessageSent
 };
 
-@interface PacketTunnelProvider ()
+@interface PacketTunnelProvider () <NotifierObserver>
 
 /**
  * PacketTunnelProvider state.
@@ -105,6 +104,10 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 
 @property (nonatomic) PsiphonTunnel *psiphonTunnel;
 
+// Authorization IDs supplied to tunnel-core from the container.
+// NOTE: Does not include subscription authorization ID.
+@property (atomic) NSSet<NSString *> *suppliedContainerAuthorizationIDs;
+
 @property (nonatomic) PsiphonConfigSponsorIds *cachedSpondorIDs;
 
 @end
@@ -112,8 +115,6 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 @implementation PacketTunnelProvider {
 
     PsiphonDataSharedDB *sharedDB;
-
-    Notifier *notifier;
 
     _Atomic BOOL showUpstreamProxyErrorMessage;
 
@@ -142,8 +143,6 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
     self = [super init];
     if (self) {
         sharedDB = [[PsiphonDataSharedDB alloc] initForAppGroupIdentifier:APP_GROUP_IDENTIFIER];
-
-        notifier = [[Notifier alloc] initWithAppGroupIdentifier:APP_GROUP_IDENTIFIER];
 
         atomic_init(&self->showUpstreamProxyErrorMessage, TRUE);
 
@@ -321,6 +320,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
                         return [[errors
                           zipWith:[RACSignal rangeStartFrom:1 count:networkRetryCount]]
                           flattenMap:^RACSignal *(RACTwoTuple<NSError *, NSNumber *> *retryCountTuple) {
+
                               // Emits the error on the last retry.
                               if ([retryCountTuple.second integerValue] == networkRetryCount) {
                                   return [RACSignal error:retryCountTuple.first];
@@ -493,9 +493,10 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 // OR if the user possibly has a valid subscription
 // OR if the extension is started after boot but before being unlocked.
 - (void)startTunnelWithErrorHandler:(void (^_Nonnull)(NSError *_Nonnull error))errorHandler {
-    
+
     __weak PacketTunnelProvider *weakSelf = self;
 
+    [[Notifier sharedInstance] registerObserver:self callbackQueue:dispatch_get_main_queue()];
 
     self.cachedSpondorIDs = [PsiphonConfigReader fromConfigFile].sponsorIds;
 
@@ -508,46 +509,6 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 
     if (self.extensionStartMethod == ExtensionStartMethodFromContainer
         || [self.subscriptionCheckState isSubscribedOrInProgress]) {
-
-        // Sets listener for notification from the container.
-        {
-            void (^notifierListenerBlock)(NSString *) = ^(NSString *key) {
-                // The notifier callbacks are made on the main thread.
-
-                if ([key isEqualToString:NOTIFIER_START_VPN]) {
-
-                    LOG_DEBUG(@"container signaled VPN to start");
-
-                    // If the tunnel is connected, starts the VPN.
-                    // Otherwise, should establish the VPN after onConnected has been called.
-                    self.shouldStartVPN = TRUE; // This should be set before calling tryStartVPN.
-                    [self tryStartVPN];
-
-                } else if ([key isEqualToString:NOTIFIER_APP_DID_ENTER_BACKGROUND]) {
-
-                    LOG_DEBUG(@"container entered background");
-
-                    // If the VPN start message ("M.startVPN") has not been received from the container,
-                    // and the container goes to the background, then alert the user to open the app.
-                    //
-                    // Note: We expect the value of shouldStartVPN to not be altered after it is set to TRUE.
-                    if (!self.shouldStartVPN) {
-                        [self displayMessage:NSLocalizedStringWithDefaultValue(@"OPEN_PSIPHON_APP", nil, [NSBundle mainBundle], @"Please open Psiphon app to finish connecting.", @"Alert message informing the user they should open the app to finish connecting to the VPN. DO NOT translate 'Psiphon'.")];
-                    }
-                    
-                } else if ([key isEqualToString:NOTIFIER_FORCE_SUBSCRIPTION_CHECK]) {
-
-                    // Container received a new subscription transaction.
-                    [PsiFeedbackLogger infoWithType:ExtensionNotificationLogType message:@"force subscription check"];
-                    [self scheduleSubscriptionCheckWithRemoteCheckForced:TRUE];
-                }
-
-            };
-
-            [notifier listenForNotification:NOTIFIER_START_VPN listener:notifierListenerBlock];
-            [notifier listenForNotification:NOTIFIER_APP_DID_ENTER_BACKGROUND listener:notifierListenerBlock];
-            [notifier listenForNotification:NOTIFIER_FORCE_SUBSCRIPTION_CHECK listener:notifierListenerBlock];
-        }
 
         if ([self.subscriptionCheckState isSubscribedOrInProgress]) {
             
@@ -610,7 +571,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
     [self.psiphonTunnel stop];
 }
 
-- (void)reconnectWithConfig:(NSString *)sponsorId {
+- (void)reconnectWithConfig:(NSString *_Nullable)sponsorId {
     dispatch_async(self->workQueue, ^{
         [self.psiphonTunnel reconnectWithConfig:sponsorId :[self getAllAuthorizations]];
     });
@@ -657,6 +618,51 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 
 - (BOOL)isTunnelConnected {
     return [self.psiphonTunnel getConnectionState] == PsiphonConnectionStateConnected;
+}
+
+#pragma mark - Notifier callback
+
+- (void)onMessageReceived:(NotifierMessageId)messageId withData:(NSData *)data {
+
+    if (NotifierStartVPN == messageId) {
+
+        LOG_DEBUG(@"container signaled VPN to start");
+
+        // If the tunnel is connected, starts the VPN.
+        // Otherwise, should establish the VPN after onConnected has been called.
+        self.shouldStartVPN = TRUE; // This should be set before calling tryStartVPN.
+        [self tryStartVPN];
+
+    } else if (NotifierAppEnteredBackground == messageId) {
+
+        LOG_DEBUG(@"container entered background");
+
+        // If the VPN start message ("M.startVPN") has not been received from the container,
+        // and the container goes to the background, then alert the user to open the app.
+        //
+        // Note: We expect the value of shouldStartVPN to not be altered after it is set to TRUE.
+        if (!self.shouldStartVPN) {
+            [self displayMessage:NSLocalizedStringWithDefaultValue(@"OPEN_PSIPHON_APP", nil, [NSBundle mainBundle], @"Please open Psiphon app to finish connecting.", @"Alert message informing the user they should open the app to finish connecting to the VPN. DO NOT translate 'Psiphon'.")];
+        }
+
+    } else if (NotifierForceSubscriptionCheck == messageId) {
+
+        // Container received a new subscription transaction.
+        [PsiFeedbackLogger infoWithType:ExtensionNotificationLogType message:@"force subscription check"];
+        [self scheduleSubscriptionCheckWithRemoteCheckForced:TRUE];
+
+    } else if (NotifierUpdatedAuthorizations == messageId) {
+
+        // Restarts the tunnel only if the persisted authorizations have changed from the
+        // last set of authorizations supplied to tunnel-core.
+        NSSet<NSString *> *nonMarkedAuths = [Authorization authorizationIDsFrom:[sharedDB getNonMarkedAuthorizations]];
+
+        if (![nonMarkedAuths isEqualToSet:self.suppliedContainerAuthorizationIDs]) {
+            [self reconnectWithConfig:nil];
+        }
+
+    }
+
 }
 
 #pragma mark -
@@ -760,16 +766,19 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 
 // Starts VPN and notifies the container of homepages (if any) when shouldStartVPN flag is TRUE.
 - (BOOL)tryStartVPN {
-
     // Don't start the VPN unless this flag has been due to subscription status, or from the container.
     if (!self.shouldStartVPN) {
         return FALSE;
     }
 
     if ([self.psiphonTunnel getConnectionState] == PsiphonConnectionStateConnected) {
+        // The container waits up to `kLandingPageTimeoutSecs` to see the tunnel connected
+        // status from when the Homepage notification is received by it.
         self.reasserting = FALSE;
         [self startVPN];
-        [notifier post:NOTIFIER_NEW_HOMEPAGES];
+        [[Notifier sharedInstance] post:NotifierNewHomepages completionHandler:^(BOOL success) {
+            // Do nothing.
+        }];
         return TRUE;
     }
 
@@ -782,13 +791,19 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 - (NSArray<NSString *> *_Nonnull)getAllAuthorizations {
 
     NSMutableArray *auths = [NSMutableArray arrayWithCapacity:1];
-
-    // Add subscription authorization
+    
+    // Add subscription authorization.
     Subscription *subscription = [Subscription fromPersistedDefaults];
     if (subscription.authorization) {
         [PsiFeedbackLogger infoWithType:PacketTunnelProviderLogType message:@"subscription authorization ID:%@", subscription.authorization.ID];
         [auths addObject:subscription.authorization.base64Representation];
     }
+    
+    // Adds authorizations persisted by the container (minus the authorizations already marked as expired).
+    NSSet<Authorization *> *_Nonnull nonMarkedAuths = [sharedDB getNonMarkedAuthorizations];
+    [auths addObjectsFromArray:[Authorization encodeAuthorizations:nonMarkedAuths]];
+    
+    self.suppliedContainerAuthorizationIDs = [Authorization authorizationIDsFrom:nonMarkedAuths];
 
     return auths;
 }
@@ -980,9 +995,26 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
             [strongSelf->subscriptionAuthorizationActiveSubject sendNext:@(SubscriptionAuthorizationStatusRejected)];
 
         } else {
-
             // Send value SubscriptionAuthorizationStatusActiveOrEmpty if subscription authorization was not invalid (i.e. authorization is non-existent or valid)
             [strongSelf->subscriptionAuthorizationActiveSubject sendNext:@(SubscriptionAuthorizationStatusActiveOrEmpty)];
+        }
+
+        // Marks container authorizations found to be invalid, and sends notification to the container.
+        if ([self.suppliedContainerAuthorizationIDs count] > 0) {
+
+            // Subtracts provided active authorizations from the the set of authorizations supplied in Psiphon config,
+            // to get the set of inactive authorizations.
+            NSMutableSet<NSString *> *inactiveAuthIDs = [NSMutableSet setWithSet:self.suppliedContainerAuthorizationIDs];
+            [inactiveAuthIDs minusSet:[NSSet setWithArray:authorizationIds]];
+
+            // Append inactive authorizations.
+            [sharedDB appendExpiredAuthorizationIDs:inactiveAuthIDs];
+
+            [[Notifier sharedInstance] post:NotifierMarkedAuthorizations
+                          completionHandler:^(BOOL success) {
+                              // Do nothing.
+                          }];
+
         }
 
         if ([strongSelf.subscriptionCheckState isSubscribedOrInProgress]) {
@@ -993,7 +1025,9 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 
 - (void)onConnected {
     LOG_DEBUG(@"connected with %@", [self.subscriptionCheckState textDescription]);
-    [notifier post:NOTIFIER_TUNNEL_CONNECTED];
+    [[Notifier sharedInstance] post:NotifierTunnelConnected completionHandler:^(BOOL success) {
+        // Do nothing.
+    }];
     [self tryStartVPN];
 }
 
@@ -1008,19 +1042,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
         // Check if user has an active subscription in the device's time
         // If NO - do nothing
         // If YES - proceed with checking the subscription against server timestamp
-        AuthorizationsDatabase *authorizations = [AuthorizationsDatabase fromPersistedDefaults];
         Subscription *subscription = [Subscription fromPersistedDefaults];
-        if ([authorizations hasActiveAuthorizationForDate:[NSDate date]]) {
-            // The following code adapted from
-            // https://developer.apple.com/library/content/documentation/Cocoa/Conceptual/DataFormatting/Articles/dfDateFormatting10_4.html
-            if (serverTimestamp != nil) {
-                if (![authorizations hasActiveAuthorizationForDate:serverTimestamp]) {
-                    // User is possibly cheating, terminate extension due to 'Bad Clock'.
-                    [self killExtensionForBadClock];
-                }
-            }
-        }
-
         if ([subscription hasActiveAuthorizationForDate:[NSDate date]]) {
             if (serverTimestamp != nil) {
                 if (![subscription hasActiveAuthorizationForDate:serverTimestamp]) {
@@ -1035,8 +1057,9 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 - (void)onAvailableEgressRegions:(NSArray *)regions {
     [sharedDB insertNewEgressRegions:regions];
 
-    // Notify container
-    [notifier post:NOTIFIER_ON_AVAILABLE_EGRESS_REGIONS];
+    [[Notifier sharedInstance] post:NotifierAvailableEgressRegions completionHandler:^(BOOL success) {
+        // Do nothing.
+    }];
 
     PsiphonConfigUserDefaults *userDefaults = [PsiphonConfigUserDefaults sharedInstance];
 

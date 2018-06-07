@@ -35,8 +35,12 @@
 @property (nonatomic, readonly, nonnull) NSString *accessType;
 @property (nonatomic, readonly, nonnull) NSDate *expires;
 
-+ (NSArray<Authorization *> *_Nonnull)createFromEncodedAuthorizations:(NSArray<NSString *> *)encodedAuthorizations;
++ (NSSet<Authorization *> *_Nonnull)createFromEncodedAuthorizations:(NSArray<NSString *> *_Nullable)encodedAuthorizations;
 
-- (instancetype _Nullable)initWithEncodedAuthorization:(NSString *)encodedAuthorization;
++ (NSArray<NSString *> *_Nonnull)encodeAuthorizations:(NSSet<Authorization *> *_Nullable)auths;
+
++ (NSSet<NSString *> *_Nonnull)authorizationIDsFrom:(NSSet<Authorization *> *_Nullable)authorizations;
+
+- (instancetype _Nullable)initWithEncodedAuthorization:(NSString *_Nullable)encodedAuthorization;
 
 @end
