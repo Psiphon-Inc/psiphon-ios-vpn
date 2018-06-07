@@ -38,6 +38,8 @@ transactionClass:(NSString*_Nonnull)transactionClass
    distinguisher:(NSString*_Nonnull)distinguisher
           expiry:(NSDate*_Nullable)expiry
    authorization:(NSString*_Nullable)authorization;
+
+- (NSDictionary<NSString*,NSObject*>*_Nonnull)toDictionary;
 @end
 
 

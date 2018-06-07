@@ -89,6 +89,10 @@ typedef NS_ENUM(NSInteger, PsiCashStatus) {
 - (NSError*_Nullable)modifyLandingPage:(NSString*_Nonnull)url
                            modifiedURL:(NSString*_Nullable*_Nonnull)modifiedURL;
 
+/*! Returns a dictionary suitable for JSON-serializing that can be including in
+    a feedback diagnostic data package. */
+-(NSDictionary<NSString*, NSObject*>*_Nonnull)getDiagnosticInfo;
+
 #pragma mark - RefreshState
 
 /*!
