@@ -18,10 +18,12 @@
  */
 
 #import <Foundation/Foundation.h>
+
 #if !(TARGET_IS_EXTENSION)
 #import "PsiphonData.h"
 #endif
 
+@class Authorization;
 
 @interface Homepage : NSObject
 
@@ -70,5 +72,21 @@
 #endif
 
 - (NSNumber *)getContainerEmptyReceiptFileSize;
+
+#pragma mark - Encoded Authorizations
+
+#if !(TARGET_IS_EXTENSION)
+- (void)setContainerAuthorizations:(NSSet<Authorization *> *)authorizations;
+#endif
+
+- (NSSet<Authorization *> *)getContainerAuthorizations;
+- (NSSet<Authorization *> *)getNonMarkedAuthorizations;
+
+#if TARGET_IS_EXTENSION
+- (void)markExpiredAuthorizationIDs:(NSSet<NSString *> *)authorizations;
+- (void)appendExpiredAuthorizationIDs:(NSSet<NSString *> *)authsToAppend;
+#endif
+
+- (NSSet<NSString *> *)getMarkedExpiredAuthorizationIDs;
 
 @end

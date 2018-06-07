@@ -20,5 +20,7 @@
 #import <UIKit/UIKit.h>
 
 @interface IAPViewController : UIViewController
+
 @property (nonatomic, assign)  BOOL openedFromSettings;
+
 @end
