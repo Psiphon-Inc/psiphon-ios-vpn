@@ -716,13 +716,8 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
         startButtonHeight.active = NO;
     }
 
-    if (size.width > size.height) {
-        startButtonHeight = [startStopButton.heightAnchor constraintEqualToAnchor:self.view.heightAnchor multiplier:.4f];
-        startButtonWidth = [startStopButton.widthAnchor constraintEqualToAnchor:startStopButton.heightAnchor];
-    } else {
-        startButtonWidth = [startStopButton.widthAnchor constraintEqualToAnchor:self.view.widthAnchor multiplier:.4f];
-        startButtonHeight = [startStopButton.heightAnchor constraintEqualToAnchor:startStopButton.widthAnchor];
-    }
+    startButtonWidth = [startStopButton.widthAnchor constraintEqualToConstant:MIN(size.width, size.height)*0.4];
+    startButtonHeight = [startStopButton.heightAnchor constraintEqualToAnchor:startStopButton.widthAnchor];
 
     startButtonWidth.active = YES;
     startButtonHeight.active = YES;
