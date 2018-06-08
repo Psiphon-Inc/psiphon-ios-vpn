@@ -18,25 +18,25 @@
  */
 
 #import <Foundation/Foundation.h>
-#import "PsiCashProduct.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface PsiCashSpeedBoostProductSKU : NSObject <PsiCashProductSKU>
-+ (PsiCashSpeedBoostProductSKU*)skuWitDistinguisher:(NSString*)distinguisher withHours:(NSNumber*)hours andPrice:(NSNumber*)price;
-- (NSNumber*)hours;
-- (double)priceInPsi;
-- (NSDictionary*)jsonDict;
-- (NSString*)json;
-@end
+@interface PsiCashLogger : NSObject
 
-@protocol PsiCashSpeedBoostPurchaseReceiver
-- (void)targetSpeedBoostProductSKUChanged:(PsiCashSpeedBoostProductSKU*_Nullable)sku;
-@end
+- (id)initWithClient:(PsiCash*)client;
 
-@interface PsiCashSpeedBoostProduct : NSObject <PsiCashProduct>
-+ (PsiCashSpeedBoostProduct*)productWithSKUs:(NSArray<PsiCashSpeedBoostProductSKU*>*)skus;
-@property (nonatomic, readonly) NSArray<PsiCashSpeedBoostProductSKU*> *skusOrderedByPriceAscending;
+- (void)logEvent:(NSString*)event includingDiagnosticInfo:(BOOL)diagnosticInfo;
+
+- (void)logEvent:(NSString*)event withInfo:(NSString*_Nullable)info includingDiagnosticInfo:(BOOL)diagnosticInfo;
+
+- (void)logEvent:(NSString*)event withInfoDictionary:(NSDictionary*_Nullable)infoDictionary includingDiagnosticInfo:(BOOL)diagnosticInfo;
+
+- (void)logErrorEvent:(NSString*)event withError:(NSError*_Nullable)error includingDiagnosticInfo:(BOOL)diagnosticInfo;
+
+- (void)logErrorEvent:(NSString*)event withInfo:(NSString*_Nullable)info includingDiagnosticInfo:(BOOL)diagnosticInfo;
+
+- (NSString*_Nullable)logForFeedback;
+
 @end
 
 NS_ASSUME_NONNULL_END

@@ -29,6 +29,7 @@
 #import "PsiCashAuthPackage.h"
 #import "PsiCashClientModel.h"
 #import "PsiCashErrorTypes.h"
+#import "PsiCashLogger.h"
 #import "PsiCashSpeedBoostProduct+PsiCashPurchasePrice.h"
 #import "PsiphonDataSharedDB.h"
 #import "RACSignal+Operations2.h"
@@ -47,6 +48,7 @@ NSErrorDomain _Nonnull const PsiCashClientLibraryErrorDomain = @"PsiCashClientLi
 
 @implementation PsiCashClient {
     PsiCash *psiCash;
+    PsiCashLogger *logger;
 
     // Offload work from PsiCashLib's internal completion queue
     dispatch_queue_t completionQueue;
@@ -73,12 +75,14 @@ NSErrorDomain _Nonnull const PsiCashClientLibraryErrorDomain = @"PsiCashClientLi
     self = [super init];
     if (self) {
         psiCash = [[PsiCash alloc] init];
+        logger = [[PsiCashLogger alloc] initWithClient:psiCash];
+
         sharedDB = [[PsiphonDataSharedDB alloc] initForAppGroupIdentifier:APP_GROUP_IDENTIFIER];
 
         // TODO: (1.0) notify the user about any purchases that expired while the app was backgrounded
         NSArray <PsiCashPurchase*>* expiredPurchases = [psiCash expirePurchases];
         if (expiredPurchases.count > 0) {
-            [PsiFeedbackLogger infoWithType:PsiCashLogType message:@"Purchases expired: %@", [self diagnosticInfo]];
+            [logger logEvent:@"PurchasesExpired" includingDiagnosticInfo:YES];
         }
 
         completionQueue = dispatch_queue_create("com.psiphon3.PsiCashClient.CompletionQueue", DISPATCH_QUEUE_SERIAL);
@@ -95,8 +99,7 @@ NSErrorDomain _Nonnull const PsiCashClientLibraryErrorDomain = @"PsiCashClientLi
 
     NSError *e = [psiCash modifyLandingPage:[url absoluteString] modifiedURL:&modifiedURL];
     if (e!= nil) {
-        // TODO: should never happen because landing page is hardcoded above
-        [PsiFeedbackLogger errorWithType:PsiCashLogType message:@"error constructing PsiCash landing page URL" object:e];
+        [logger logErrorEvent:@"ModifyURLFailed" withError:e includingDiagnosticInfo:YES];
         return url;
     }
 
@@ -170,13 +173,13 @@ NSErrorDomain _Nonnull const PsiCashClientLibraryErrorDomain = @"PsiCashClientLi
                 [speedBoostPurchasePrices addObject:price];
             }
         } else {
-            [PsiFeedbackLogger infoWithType:PsiCashLogType message:@"Ignored PsiCashPurchasePrice with transaction class %@", price.transactionClass];
+            [logger logEvent:@"IgnoredPurchasePrice" withInfoDictionary:[price toDictionary] includingDiagnosticInfo:NO];
         }
     }
 
     PsiCashSpeedBoostProduct *speedBoostProduct = nil;
     if ([speedBoostPurchasePrices count] == 0) {
-        [PsiFeedbackLogger errorWithType:PsiCashLogType message:@"No SpeedBoostProductSKUs found in purchase prices array %@", purchasePrices];
+        [logger logErrorEvent:@"NoSpeedBoostProductSKUsFound" withInfo:nil includingDiagnosticInfo:YES];
     } else {
         speedBoostProduct = [PsiCashSpeedBoostProduct productWithPurchasePrices:speedBoostPurchasePrices];
     }
@@ -245,21 +248,29 @@ NSErrorDomain _Nonnull const PsiCashClientLibraryErrorDomain = @"PsiCashClientLi
 
 - (void)refreshStateFromCache {
     [self updateContainerAuthTokens];
+
     PsiCashClientModelStagingArea *stagingArea = [[PsiCashClientModelStagingArea alloc] initWithModel:model];
+    [stagingArea updateRefreshPending:NO];
     [stagingArea updateBalance:psiCash.balance];
     [stagingArea updateActivePurchases:[self getActivePurchases]];
-    [stagingArea updateAuthPackage:[[PsiCashAuthPackage alloc] initWithValidTokens:psiCash.validTokenTypes]];
-    [stagingArea updateSpeedBoostProduct:[self speedBoostProductFromPurchasePrices:psiCash.purchasePrices withTargetProducts:[self targetProducts]]];
-    [stagingArea updateRefreshPending:NO];
-    [self commitModelStagingArea:stagingArea];
 
-    [PsiFeedbackLogger infoWithType:PsiCashLogType message:@"Refreshed state from cache: %@", [self diagnosticInfo]];
+    if (psiCash.validTokenTypes) {
+        [stagingArea updateAuthPackage:[[PsiCashAuthPackage alloc] initWithValidTokens:psiCash.validTokenTypes]];
+    } else {
+        [stagingArea updateAuthPackage:[[PsiCashAuthPackage alloc] init]];
+    }
+
+    if (psiCash.purchasePrices) {
+        [stagingArea updateSpeedBoostProduct:[self speedBoostProductFromPurchasePrices:psiCash.purchasePrices withTargetProducts:[self targetProducts]]];
+    }
+
+    [self commitModelStagingArea:stagingArea];
 }
 
 #pragma mark - Refresh Signal
 
 - (void)refreshState {
-    [PsiFeedbackLogger infoWithType:PsiCashLogType message:@"Refreshing state"];
+    [logger logEvent:@"RefreshingState" includingDiagnosticInfo:NO];
 
 #if DEBUG
     const int networkRetryCount = 3;
@@ -311,10 +322,10 @@ NSErrorDomain _Nonnull const PsiCashClientLibraryErrorDomain = @"PsiCashClientLi
         [stagingArea updateRefreshPending:NO];
         [self commitModelStagingArea:stagingArea];
 
-        [PsiFeedbackLogger errorWithType:PsiCashLogType message:@"Failed to refresh state %@", error.localizedDescription];
+        [logger logErrorEvent:@"RefreshStateFailed" withError:error includingDiagnosticInfo:NO];
         [self displayAlertWithMessage:NSLocalizedStringWithDefaultValue(@"PSICASH_REFRESH_STATE_FAILED_MESSAGE_TEXT", nil, [NSBundle mainBundle], @"Failed to update PsiCash state", @"Alert error message informing user that the app failed to retrieve their PsiCash information from the server")];
     } completed:^{
-        [PsiFeedbackLogger infoWithType:PsiCashLogType message:@"Refreshed state: %@", [self diagnosticInfo]];
+        [logger logEvent:@"RefreshedState" includingDiagnosticInfo:YES];
     }];
 }
 
@@ -358,7 +369,7 @@ NSErrorDomain _Nonnull const PsiCashClientLibraryErrorDomain = @"PsiCashClientLi
 #pragma mark - Purchase Signal
 
 - (void)purchaseSpeedBoostProduct:(PsiCashSpeedBoostProductSKU*)sku {
-    [PsiFeedbackLogger infoWithType:PsiCashLogType message:@"Attempting to purchase %@", [sku json]];
+    [logger logEvent:@"Purchase" withInfoDictionary:[sku jsonDict] includingDiagnosticInfo:NO];
 
     [purchaseDisposable dispose];
 
@@ -399,7 +410,7 @@ NSErrorDomain _Nonnull const PsiCashClientLibraryErrorDomain = @"PsiCashClientLi
             [stagingArea updateBalance:result.balance];
 
             if (e != nil) {
-                [PsiFeedbackLogger errorWithType:PsiCashLogType message:@"Received invalid purchase result" object:e];
+                [logger logErrorEvent:@"PurchaseResultInvalid" withError:e includingDiagnosticInfo:NO];
             } else {
                 [stagingArea updateActivePurchases:[self getActivePurchases]];
             }
@@ -443,7 +454,7 @@ NSErrorDomain _Nonnull const PsiCashClientLibraryErrorDomain = @"PsiCashClientLi
 
             if (e != nil) {
                 [self displayAlertWithMessage:e.localizedDescription];
-                [PsiFeedbackLogger errorWithType:PsiCashLogType message:@"Failed to purchase Speed Boost %@", e.localizedDescription];
+                [logger logErrorEvent:@"PurchaseFailed" withError:e includingDiagnosticInfo:YES];
             }
         }
 
@@ -454,10 +465,10 @@ NSErrorDomain _Nonnull const PsiCashClientLibraryErrorDomain = @"PsiCashClientLi
         [stagingArea updatePendingPurchases:nil];
         [self commitModelStagingArea:stagingArea];
 
-        [PsiFeedbackLogger errorWithType:PsiCashLogType message:@"Failed to purchase Speed Boost %@", error.localizedDescription];
+        [logger logErrorEvent:@"PurchaseFailed" withError:error includingDiagnosticInfo:YES];
         [self displayAlertWithMessage:NSLocalizedStringWithDefaultValue(@"PSICASH_SPEED_BOOST_PURCHASE_FAILED_MESSAGE_TEXT", nil, [NSBundle mainBundle], @"Purchase failed, please try again in a few minutes.", @"Alert message informing user that their Speed Boost purchase attempt unexpectedly failed and that they should try again in a few minutes.")];
     } completed:^{
-        [PsiFeedbackLogger infoWithType:PsiCashLogType message:@"Purchase successful: %@", [self diagnosticInfo]];
+        [logger logEvent:@"PurchaseSuccess" includingDiagnosticInfo:YES];
     }];
 }
 
@@ -489,20 +500,8 @@ NSErrorDomain _Nonnull const PsiCashClientLibraryErrorDomain = @"PsiCashClientLi
 
 #pragma mark - Logging
 
--(NSString*)diagnosticInfo {
-    NSDictionary <NSString*, NSObject*>* info = [psiCash getDiagnosticInfo];
-
-    if (![NSJSONSerialization isValidJSONObject:info]) {
-        return @"{\"error\": \"invalid JSON object\"}";
-    }
-
-    NSError *writeError = nil;
-    NSData *jsonData = [NSJSONSerialization dataWithJSONObject:info options:0 error:&writeError];
-    if (writeError) {
-        return [NSString stringWithFormat:@"{\"error\": \"%@\"}", writeError.localizedDescription];
-    }
-    NSString *jsonString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
-    return jsonString;
+- (NSString*)logForFeedback {
+    return [logger logForFeedback];
 }
 
 @end
