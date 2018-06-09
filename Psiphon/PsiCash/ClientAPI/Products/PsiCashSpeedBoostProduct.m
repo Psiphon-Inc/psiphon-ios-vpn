@@ -50,12 +50,16 @@ NS_ASSUME_NONNULL_BEGIN
     return [self.price doubleValue] / 1e9;
 }
 
+- (NSDictionary*)jsonDict {
+    return @{
+             @"distinguisher": self.distinguisher,
+             @"price": self.price,
+             @"variant": self.variant
+             };
+}
+
 - (NSString*)json {
-    NSDictionary *dict = @{
-                           @"distinguisher": self.distinguisher,
-                           @"price": self.price,
-                           @"variant": self.variant
-                           };
+    NSDictionary *dict = [self jsonDict];
 
     if (![NSJSONSerialization isValidJSONObject:dict]) {
         return @"{\"error\": \"invalid JSON object\"}";
