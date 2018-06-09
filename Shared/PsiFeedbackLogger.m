@@ -172,6 +172,17 @@ PsiFeedbackLogType const FeedbackInternalLogType = @"FeedbackLoggerInternal";
 
 }
 
++ (void)infoWithType:(PsiFeedbackLogType)sourceType json:(NSDictionary*_Nonnull)json {
+
+    NSDictionary *data = @{sourceType : json};
+    [[PsiFeedbackLogger sharedInstance] writeData:data noticeType:InfoNoticeType];
+
+#if DEBUG
+    NSLog(@"<INFO> %@", data);
+#endif
+
+}
+
 + (void)warnWithType:(PsiFeedbackLogType)sourceType message:(NSString *)format, ... {
 
     NSString *message;
@@ -213,6 +224,17 @@ PsiFeedbackLogType const FeedbackInternalLogType = @"FeedbackLoggerInternal";
     NSString *message;
     CONVERT_FORMAT_ARGS_TO_NSSTRING(message, format);
     NSDictionary *data = @{sourceType : message};
+    [[PsiFeedbackLogger sharedInstance] writeData:data noticeType:ErrorNoticeType];
+
+#if DEBUG
+    NSLog(@"<ERROR> %@", data);
+#endif
+
+}
+
++ (void)errorWithType:(PsiFeedbackLogType)sourceType json:(NSDictionary*_Nonnull)json {
+
+    NSDictionary *data = @{sourceType : json};
     [[PsiFeedbackLogger sharedInstance] writeData:data noticeType:ErrorNoticeType];
 
 #if DEBUG
