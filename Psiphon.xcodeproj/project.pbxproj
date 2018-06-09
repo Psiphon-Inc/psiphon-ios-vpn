@@ -43,6 +43,7 @@
 		4E5DAE6520A942A300E06342 /* UILabel+GetLabelHeight.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E5DAE6420A942A300E06342 /* UILabel+GetLabelHeight.m */; };
 		4E5E5F9320598092008D4375 /* PsiCashSpeedBoostProduct.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E5E5F9220598092008D4375 /* PsiCashSpeedBoostProduct.m */; };
 		4E5E5F9620598DC2008D4375 /* PsiCashSpeedBoostProduct+PsiCashPurchasePrice.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E5E5F9520598DC2008D4375 /* PsiCashSpeedBoostProduct+PsiCashPurchasePrice.m */; };
+		4E90C94420CB37F5003FC319 /* PsiCashLogger.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E90C94320CB37F5003FC319 /* PsiCashLogger.m */; };
 		4E99814220A64CC700253CE7 /* PsiCashBalanceWithSpeedBoostMeter.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E99814120A64CC700253CE7 /* PsiCashBalanceWithSpeedBoostMeter.m */; };
 		4E9B2E13204F463100E63784 /* PsiCashClientModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E9B2E12204F463000E63784 /* PsiCashClientModel.m */; };
 		4EC0356F2045179800EE9573 /* PsiCashTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4EC0356E2045179800EE9573 /* PsiCashTableViewController.m */; };
@@ -242,6 +243,8 @@
 		4E5E5F9420598DC2008D4375 /* PsiCashSpeedBoostProduct+PsiCashPurchasePrice.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "PsiCashSpeedBoostProduct+PsiCashPurchasePrice.h"; sourceTree = "<group>"; };
 		4E5E5F9520598DC2008D4375 /* PsiCashSpeedBoostProduct+PsiCashPurchasePrice.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "PsiCashSpeedBoostProduct+PsiCashPurchasePrice.m"; sourceTree = "<group>"; };
 		4E7B3EB5205215A6007F752C /* PsiCashProduct.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PsiCashProduct.h; sourceTree = "<group>"; };
+		4E90C94220CB37F5003FC319 /* PsiCashLogger.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PsiCashLogger.h; sourceTree = "<group>"; };
+		4E90C94320CB37F5003FC319 /* PsiCashLogger.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PsiCashLogger.m; sourceTree = "<group>"; };
 		4E99814020A64CC700253CE7 /* PsiCashBalanceWithSpeedBoostMeter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PsiCashBalanceWithSpeedBoostMeter.h; sourceTree = "<group>"; };
 		4E99814120A64CC700253CE7 /* PsiCashBalanceWithSpeedBoostMeter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PsiCashBalanceWithSpeedBoostMeter.m; sourceTree = "<group>"; };
 		4E9B2E11204F463000E63784 /* PsiCashClientModel.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PsiCashClientModel.h; sourceTree = "<group>"; };
@@ -586,6 +589,8 @@
 				4EFAAF282034CDC800EC0536 /* PsiCashClient.m */,
 				4EEB2F0020644769006E80EF /* PsiCashAPIModels.h */,
 				4EEB2F0120644769006E80EF /* PsiCashAPIModels.m */,
+				4E90C94220CB37F5003FC319 /* PsiCashLogger.h */,
+				4E90C94320CB37F5003FC319 /* PsiCashLogger.m */,
 			);
 			path = ClientWrapper;
 			sourceTree = "<group>";
@@ -1244,6 +1249,7 @@
 				197DABF11F54C0CA00DD5C3B /* MPInstanceProvider+Vungle.m in Sources */,
 				EF90D7A9204F22C900228A63 /* FileUtils.m in Sources */,
 				EF90D7A1204F22C900228A63 /* timestamp_valid.c in Sources */,
+				4E90C94420CB37F5003FC319 /* PsiCashLogger.m in Sources */,
 				EFC2F5C420226782007B52F9 /* RootContainerController.m in Sources */,
 				EF90D7A5204F22C900228A63 /* timestamp_parse.c in Sources */,
 				EF652CD11F352212002AFB48 /* main.m in Sources */,
