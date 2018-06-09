@@ -40,6 +40,8 @@ typedef NSString * PsiFeedbackLogType;
 
 + (void)infoWithType:(PsiFeedbackLogType)sourceType message:(NSString *)format, ... NS_FORMAT_FUNCTION(2,3);
 
++ (void)infoWithType:(PsiFeedbackLogType)sourceType json:(NSDictionary*_Nonnull)json;
+
 + (void)warnWithType:(PsiFeedbackLogType)sourceType message:(NSString *)format, ... NS_FORMAT_FUNCTION(2,3);
 
 + (void)warnWithType:(PsiFeedbackLogType)sourceType message:(NSString *)message object:(NSError *)error;
@@ -48,9 +50,13 @@ typedef NSString * PsiFeedbackLogType;
 
 + (void)errorWithType:(PsiFeedbackLogType)sourceType message:(NSString *)format, ... NS_FORMAT_FUNCTION(2,3);
 
++ (void)errorWithType:(PsiFeedbackLogType)sourceType json:(NSDictionary*_Nonnull)json;
+
 + (void)errorWithType:(PsiFeedbackLogType)sourceType message:(NSString *)message object:(NSError *)error;
 
 + (void)logNoticeWithType:(NSString *)noticeType message:(NSString *)message timestamp:(NSString *)timestamp;
+
++ (NSDictionary *_Nonnull)unpackError:(NSError *_Nullable)error;
 
 @end
 

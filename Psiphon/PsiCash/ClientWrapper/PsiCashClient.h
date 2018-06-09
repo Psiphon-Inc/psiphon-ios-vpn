@@ -28,13 +28,17 @@
 @property (nonatomic, readonly) RACReplaySubject<PsiCashClientModel *> *clientModelSignal;
 
 + (instancetype)sharedInstance;
+
 - (NSURL*)modifiedHomePageURL:(NSURL*)url;
+
 - (void)scheduleStateRefresh;
+
 - (void)purchaseSpeedBoostProduct:(PsiCashSpeedBoostProductSKU*)sku;
 /**
  * @brief Removes any purchases that the extension has marked as invalid from the client model.
  */
 - (void)authorizationsMarkedExpired;
 
+- (NSString*)logForFeedback;
 
 @end
