@@ -40,6 +40,7 @@
 #import "RACQueueScheduler+Subclass.h"
 #import "DispatchUtils.h"
 #import "RACTargetQueueScheduler.h"
+#import "UnionSerialQueue.h"
 
 /**
  * VPNStartSuccessCheckDelay is the delay interval for checking VPN status after starting it.
@@ -66,8 +67,7 @@ UserDefaultsKey const VPNManagerConnectOnDemandUntilNextStartBoolKey = @"VPNMana
 // Private properties
 @property (getter=tunnelProviderManager, setter=setTunnelProviderManager:) NETunnelProviderManager *tunnelProviderManager;
 
-@property (nonatomic) NSOperationQueue *serialOperationQueue;
-@property (nonatomic) RACTargetQueueScheduler *serialQueueScheduler;
+@property (nonatomic) UnionSerialQueue *serialQueue;
 
 @property (atomic) BOOL restartRequired;
 @property (atomic) BOOL extensionIsZombie;
@@ -106,14 +106,7 @@ UserDefaultsKey const VPNManagerConnectOnDemandUntilNextStartBoolKey = @"VPNMana
         _restartRequired = FALSE;
         _extensionIsZombie = FALSE;
 
-        NSString *queueName = @"ca.psiphon.Psiphon.VPNManagerSerialQueue";
-        serialDispatchQueue = dispatch_queue_create([queueName UTF8String], DISPATCH_QUEUE_SERIAL);
-        
-        _serialOperationQueue = [[NSOperationQueue alloc] init];
-        _serialOperationQueue.maxConcurrentOperationCount = 1;
-        _serialOperationQueue.underlyingQueue = serialDispatchQueue;
-
-        _serialQueueScheduler = [[RACTargetQueueScheduler alloc] initWithName:queueName targetQueue:serialDispatchQueue];
+        _serialQueue = [UnionSerialQueue createWithLabel:@"ca.psiphon.Psiphon.VPNManagerSerialQueue"];
 
         // Public properties.
         __weak VPNManager *weakSelf = self;
@@ -196,7 +189,7 @@ UserDefaultsKey const VPNManagerConnectOnDemandUntilNextStartBoolKey = @"VPNMana
                           weakSelf.restartRequired) {
 
                           // Schedule the tunnel to be restarted.
-                          [weakSelf.serialOperationQueue addOperationWithBlock:^{
+                          [weakSelf.serialQueue.operationQueue addOperationWithBlock:^{
                               weakSelf.restartRequired = FALSE;
                               [weakSelf startTunnel];
                           }];
@@ -219,7 +212,8 @@ UserDefaultsKey const VPNManagerConnectOnDemandUntilNextStartBoolKey = @"VPNMana
 
         // Adds loading VPN operation to `serialOperationQueue` before returning shared instance.
         __block RACDisposable *disposable = [[[VPNManager loadTunnelProviderManager]
-          unsafeSubscribeOnSerialQueue:instance.serialOperationQueue scheduler:instance.serialQueueScheduler]
+          unsafeSubscribeOnSerialQueue:instance.serialQueue
+                              withName:@"initOperation"]
           subscribeNext:^(NETunnelProviderManager *tunnelProvider) {
               if (tunnelProvider) {
                   instance.tunnelProviderManager = tunnelProvider;
@@ -391,7 +385,8 @@ UserDefaultsKey const VPNManagerConnectOnDemandUntilNextStartBoolKey = @"VPNMana
           }
 
       }]
-      unsafeSubscribeOnSerialQueue:self.serialOperationQueue scheduler:self.serialQueueScheduler]
+      unsafeSubscribeOnSerialQueue:self.serialQueue
+                          withName:@"startTunnelOperation"]
       subscribeError:^(NSError *error) {
           [PsiFeedbackLogger errorWithType:VPNManagerLogType message:@"failed to start" object:error];
 
@@ -420,7 +415,8 @@ UserDefaultsKey const VPNManagerConnectOnDemandUntilNextStartBoolKey = @"VPNMana
     __weak VPNManager *weakSelf = self;
 
     __block RACDisposable *disposable = [[[self deferredTunnelProviderManager]
-      unsafeSubscribeOnSerialQueue:self.serialOperationQueue scheduler:self.serialQueueScheduler]
+      unsafeSubscribeOnSerialQueue:self.serialQueue
+                          withName:@"startVPNOperation"]
       subscribeNext:^(NETunnelProviderManager *_Nullable providerManager) {
 
           if (!providerManager) {
@@ -447,7 +443,8 @@ UserDefaultsKey const VPNManagerConnectOnDemandUntilNextStartBoolKey = @"VPNMana
     __weak VPNManager *weakSelf = self;
 
     __block RACDisposable *disposable = [[[self deferredTunnelProviderManager]
-      unsafeSubscribeOnSerialQueue:self.serialOperationQueue scheduler:self.serialQueueScheduler]
+      unsafeSubscribeOnSerialQueue:self.serialQueue
+                          withName:@"stopVPNOperation"]
       subscribeNext:^(NETunnelProviderManager *_Nullable providerManager) {
 
           [providerManager.connection stopVPNTunnel];
@@ -469,7 +466,8 @@ UserDefaultsKey const VPNManagerConnectOnDemandUntilNextStartBoolKey = @"VPNMana
     __weak VPNManager *weakSelf = self;
 
     __block RACDisposable *disposable = [[[self deferredTunnelProviderManager]
-      unsafeSubscribeOnSerialQueue:self.serialOperationQueue scheduler:self.serialQueueScheduler]
+      unsafeSubscribeOnSerialQueue:self.serialQueue
+                          withName:@"restartVPNIfActiveOperation"]
       subscribeNext:^(NETunnelProviderManager *_Nullable providerManager) {
           if (!providerManager) {
               return;
@@ -529,7 +527,8 @@ UserDefaultsKey const VPNManagerConnectOnDemandUntilNextStartBoolKey = @"VPNMana
               return [NSNumber numberWithBool:FALSE];
           }
       }]
-      unsafeSubscribeOnSerialQueue:self.serialOperationQueue scheduler:self.serialQueueScheduler];
+      unsafeSubscribeOnSerialQueue:self.serialQueue
+                          withName:@"isConnectOnDemandEnabled"];
 }
 
 // setConnectOnDemandEnabled: returns a signal that when subscribed to updates tunnelProviderManager's
@@ -581,7 +580,8 @@ UserDefaultsKey const VPNManagerConnectOnDemandUntilNextStartBoolKey = @"VPNMana
           [PsiFeedbackLogger errorWithType:VPNManagerLogType message:@"error setting OnDemandEnabled" object:error];
           return [RACSignal return:[NSNumber numberWithBool:FALSE]];
       }]
-      unsafeSubscribeOnSerialQueue:self.serialOperationQueue scheduler:self.serialQueueScheduler];
+      unsafeSubscribeOnSerialQueue:self.serialQueue
+                          withName:@"setConnectOnDemandEnabledOperation"];
 }
 
 + (BOOL)mapIsVPNActive:(VPNStatus)s {
@@ -738,7 +738,8 @@ UserDefaultsKey const VPNManagerConnectOnDemandUntilNextStartBoolKey = @"VPNMana
 
           return nil;
       }]
-      unsafeSubscribeOnSerialQueue:self.serialOperationQueue scheduler:self.serialQueueScheduler];
+      unsafeSubscribeOnSerialQueue:self.serialQueue
+                          withName:[NSString stringWithFormat:@"queryActiveVPNOperation[%@]", query]];
 }
 
 // sendProviderSessionMessage:session: returns a signal that when subscribed to sends message to the tunnel provider

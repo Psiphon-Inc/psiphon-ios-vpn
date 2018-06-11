@@ -23,6 +23,7 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @class RACTargetQueueScheduler;
+@class UnionSerialQueue;
 
 /**
  * This category provides convenience operation methods not found
@@ -93,10 +94,6 @@ NS_ASSUME_NONNULL_BEGIN
  * "finished" after the source signal has emitted one of the terminal events.
  * Events emitted by the receiver are forwarded to subscribers to the returned signal on the `queueScheduler`.
  *
- * @note `operationQueue` and `queueScheduler` should have the same underlying dispatch queue.
- *       This is an optimization to avoid creating a RACScheduler from the `operationQueue`
- *       dispatch queue on every subscription.
- *
  * @attention As long as receiver signal has not terminated (i.e. has not emitted error or completed),
  *            the operation added `operationQueue` will remain the queue and not be removed.
  *            Therefore, two operations on the same serial queue that are waiting for the other to complete
@@ -104,6 +101,7 @@ NS_ASSUME_NONNULL_BEGIN
  *
  *            Example of a deadlock:
  *            @code
+ *            UnionSerialQueue *serialQueue = [UnionSerialQueue createWithLabel:@"ca.psiphon.Psiphon.VPNManagerSerialQueue"];
  *            dispatch_queue_t serialQueue;
  *            NSOperationQueue *operationQueue; // with serialQueue as underlying dispatch queue.
  *            RACTargetQueueScheduler *queueScheduler; // with serialQueue as underlying dispatch queue.
@@ -114,7 +112,7 @@ NS_ASSUME_NONNULL_BEGIN
  *            RACSignal *signal2= [[[[RACSignal return:@"first"] flattenMap:^RACSignal *(id value) {
  *                return signal1;
  *              }]
- *              unsafeSubscribeOnSerialQueue:operationQueue scheduler:queueScheduler]
+ *              unsafeSubscribeOnSerialQueue:serialQueue withName:@"serialQueueName"]
  *              subscribeNext:^(id x) {
  *                 // Never reached due to deadlock.
  *              }];
@@ -129,12 +127,12 @@ NS_ASSUME_NONNULL_BEGIN
  *            Since signal1 is waiting for signal2 to terminate, but signal2 is waiting for the result of
  *            signal1, a deadlock occurs.
  *
- * @param operationQueue NSOperationQueue with underlying serial dispatch queue to subscribe observers on.
- * @param queueScheduler RACTargetQueueScheduler with the same underlying dispatch queue and the `operationQueue`.
+ * @param serialQueue An instance of UnionSerialQueue.
+ * @param name Operation name.
  * @return The source observable modified so that its subscriptions happens on the specified NSOperationQueue.
  */
-- (RACSignal *)unsafeSubscribeOnSerialQueue:(NSOperationQueue *)operationQueue
-                                  scheduler:(RACTargetQueueScheduler *)queueScheduler;
+- (RACSignal *)unsafeSubscribeOnSerialQueue:(UnionSerialQueue *)serialQueue
+                                   withName:(NSString *)name;
 
 @end
 
