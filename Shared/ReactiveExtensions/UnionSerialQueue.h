@@ -18,20 +18,25 @@
  */
 
 #import <Foundation/Foundation.h>
-#import "RACSignal.h"
+
+@class RACTargetQueueScheduler;
 
 NS_ASSUME_NONNULL_BEGIN
 
-typedef void (^OperationBlockCompletionHandler)(void(^completionHandler)(NSError * error));
-
-@interface AsyncOperation : NSOperation
-
-@property (nonatomic, readonly) NSError *error;
-
 /**
- * completionHandler block is safe to be called more than once.
+ * Wrapper class for an NSOperationQueue and RACTargetQueueScheduler with the same
+ * underlying serial dispatch queue.
+ *
+ * This class implements `debugDescription` method for debugging purposes.
  */
-- (instancetype)initWithBlock:(OperationBlockCompletionHandler)block;
+@interface UnionSerialQueue : NSObject
+
+@property (nonatomic, readonly) NSString *label;
+@property (nonatomic, readonly) dispatch_queue_t dispatchQueue;
+@property (nonatomic, readonly) NSOperationQueue *operationQueue;
+@property (nonatomic, readonly) RACTargetQueueScheduler *racTargetQueueScheduler;
+
++ (instancetype)createWithLabel:(NSString *)label;
 
 @end
 

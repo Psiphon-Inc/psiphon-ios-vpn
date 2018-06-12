@@ -68,7 +68,9 @@
 		9BFEC4F02A47FF8265635803 /* Notifier.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC91ED4A1C511520E9948 /* Notifier.m */; };
 		9BFEC530849525066327C815 /* VPNManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFECBACAAF0FC84C7EA783E /* VPNManager.m */; };
 		9BFEC54DB169011DBB9A8FE5 /* SwoopView.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFECBF5A83176EA09316CB4 /* SwoopView.m */; };
+		9BFEC5C256EBC72398FAE8D8 /* UnionSerialQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC84F5DF6D2C3EF754962 /* UnionSerialQueue.m */; };
 		9BFEC5C3F8FFF1366FF19D0B /* AsyncOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC6DEB0BE772BE801A9E6 /* AsyncOperation.m */; };
+		9BFEC9C08697E4701A36A3B3 /* UnionSerialQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC84F5DF6D2C3EF754962 /* UnionSerialQueue.m */; };
 		9BFECB6BF077F45D491093F1 /* Authorization.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC31B61584FD2EAAF5DE6 /* Authorization.m */; };
 		9BFECC5AE8636FBEF73D85D3 /* AdManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFECE9247474C83FD8C2948 /* AdManager.m */; };
 		9BFECC62159FBEAA1A69F4F9 /* BasePacketTunnelProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFECC3FADE9C8A76A0913DE /* BasePacketTunnelProvider.m */; };
@@ -312,6 +314,7 @@
 		963708A81F65D4810038894E /* Bourbon-Oblique.otf */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Bourbon-Oblique.otf"; sourceTree = "<group>"; };
 		9BFEC0419AD3808370915E01 /* PsiphonConfigUserDefaults.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PsiphonConfigUserDefaults.h; sourceTree = "<group>"; };
 		9BFEC1C9F506CE1DF07306D2 /* NEBridge.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NEBridge.h; sourceTree = "<group>"; };
+		9BFEC1E485FB857A0358ED94 /* UnionSerialQueue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UnionSerialQueue.h; sourceTree = "<group>"; };
 		9BFEC220C067BBE75AF970C1 /* IAPHelpViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IAPHelpViewController.m; sourceTree = "<group>"; };
 		9BFEC3165745A5D14C8C3C08 /* Notifier.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Notifier.h; sourceTree = "<group>"; };
 		9BFEC31B61584FD2EAAF5DE6 /* Authorization.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Authorization.m; sourceTree = "<group>"; };
@@ -323,6 +326,7 @@
 		9BFEC673CE5EA236279F07BD /* Authorization.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Authorization.h; sourceTree = "<group>"; };
 		9BFEC6DEB0BE772BE801A9E6 /* AsyncOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AsyncOperation.m; sourceTree = "<group>"; };
 		9BFEC72C282F6060193B2E87 /* UIColor+Additions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIColor+Additions.m"; sourceTree = "<group>"; };
+		9BFEC84F5DF6D2C3EF754962 /* UnionSerialQueue.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UnionSerialQueue.m; sourceTree = "<group>"; };
 		9BFEC8783D4222F2272E50E7 /* BasePacketTunnelProvider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BasePacketTunnelProvider.h; sourceTree = "<group>"; };
 		9BFEC91ED4A1C511520E9948 /* Notifier.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Notifier.m; sourceTree = "<group>"; };
 		9BFECA9ADB17DC329DA64AA5 /* AsyncOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AsyncOperation.h; sourceTree = "<group>"; };
@@ -825,6 +829,8 @@
 			children = (
 				EF90D79F204F22C900228A63 /* RACSignal+Operations2.m */,
 				EF90D7A0204F22C900228A63 /* RACSignal+Operations2.h */,
+				9BFEC84F5DF6D2C3EF754962 /* UnionSerialQueue.m */,
+				9BFEC1E485FB857A0358ED94 /* UnionSerialQueue.h */,
 			);
 			path = ReactiveExtensions;
 			sourceTree = "<group>";
@@ -1302,6 +1308,7 @@
 				9BFECD2FAA1FCDA88A7D432E /* UIColor+Additions.m in Sources */,
 				9BFEC54DB169011DBB9A8FE5 /* SwoopView.m in Sources */,
 				9BFECD174E254989EC97A437 /* IAPHelpViewController.m in Sources */,
+				9BFEC9C08697E4701A36A3B3 /* UnionSerialQueue.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1332,6 +1339,7 @@
 				9BFECEA225F023F895CC8DA1 /* Authorization.m in Sources */,
 				9BFEC10661A7DC0402AF4B37 /* AsyncOperation.m in Sources */,
 				9BFECF9F760F1A93A8933089 /* Nullity.m in Sources */,
+				9BFEC5C256EBC72398FAE8D8 /* UnionSerialQueue.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
