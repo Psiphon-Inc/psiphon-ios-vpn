@@ -157,6 +157,13 @@ typedef NS_ENUM(NSInteger, VPNStartStatus) {
  */
 - (void)restartVPNIfActive;
 
+
+/**
+ * Removes currently installed VPN configuration.
+ * Does nothing if there are no VPN configurations installed.
+ */
+- (void)removeVPNConfiguartion;
+
 /**
  * Returns TRUE if VPNStatus is in an active state.
  *

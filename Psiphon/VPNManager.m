@@ -449,6 +449,29 @@ UserDefaultsKey const VPNManagerConnectOnDemandUntilNextStartBoolKey = @"VPNMana
     [self.compoundDisposable addDisposable:disposable];
 }
 
+// Removes installed VPN configuration. NO-OP if no VPN configuration is installed.
+- (void)removeVPNConfiguartion {
+
+    __weak VPNManager *weakSelf = self;
+
+    __block RACDisposable *disposable = [[[[VPNManager loadTunnelProviderManager]
+      flattenMap:^RACSignal *(NETunnelProviderManager *providerManager) {
+          if (providerManager) {
+              return [RACSignal defer:providerManager selectorWithErrorCallback:@selector(removeFromPreferencesWithCompletionHandler:)];
+          }
+          return [RACSignal return:nil];
+      }]
+      unsafeSubscribeOnSerialQueue:self.serialQueue withName:@"removeVPNConfigurationOperation"]
+      subscribeError:^(NSError *error) {
+          [PsiFeedbackLogger errorWithType:VPNManagerLogType message:@"failed to remove VPN configuration" object:error];
+          [weakSelf.compoundDisposable removeDisposable:disposable];
+      } completed:^{
+          [weakSelf.compoundDisposable removeDisposable:disposable];
+      }];
+
+    [self.compoundDisposable addDisposable:disposable];
+}
+
 // isVPNActive returns a signal that when subscribed to emits tuple (isActive, VPNStatus).
 // If tunnelProviderManager is nil emits (FALSE, VPNStatusInvalid)
 - (RACSignal<RACTwoTuple<NSNumber *, NSNumber *> *> *)isVPNActive {
