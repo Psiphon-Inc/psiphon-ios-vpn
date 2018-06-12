@@ -18,6 +18,7 @@
  */
 
 #import <Foundation/Foundation.h>
+#import "PsiFeedbackLogger.h"
 
 #if DEBUG
 
@@ -49,3 +50,6 @@
 
 #endif // DEBUG
 
+static inline NSString* NSStringFromBOOL(BOOL aBool) {
+    return aBool? @"YES" : @"NO";
+}
