@@ -42,12 +42,6 @@
 #import "RACTargetQueueScheduler.h"
 #import "UnionSerialQueue.h"
 
-/**
- * VPNStartSuccessCheckDelay is the delay interval for checking VPN status after starting it.
- * We expect the VPN to be in a connecting/connected/reasserting state within this short time period after starting it.
- */
-NSTimeInterval const VPNStartSuccessCheckDelay = 0.5;
-
 NSErrorDomain const VPNManagerErrorDomain = @"VPNManagerErrorDomain";
 
 PsiFeedbackLogType const VPNManagerLogType = @"VPNManager";
@@ -300,7 +294,7 @@ UserDefaultsKey const VPNManagerConnectOnDemandUntilNextStartBoolKey = @"VPNMana
 
     __weak VPNManager *weakSelf = self;
 
-    __block RACDisposable *disposable = [[[[[[[[[VPNManager loadTunnelProviderManager]
+    __block RACDisposable *disposable = [[[[[[[VPNManager loadTunnelProviderManager]
       map:^NETunnelProviderManager *(NETunnelProviderManager *providerManager) {
 
           if (!providerManager) {
@@ -338,7 +332,7 @@ UserDefaultsKey const VPNManagerConnectOnDemandUntilNextStartBoolKey = @"VPNMana
       flattenMap:^RACSignal *(NETunnelProviderManager *providerManager) {
           return [RACSignal defer:providerManager selectorWithErrorCallback:@selector(loadFromPreferencesWithCompletionHandler:)];
       }]
-      flattenMap:^RACSignal<NETunnelProviderManager *> *(NETunnelProviderManager *providerManager) {
+      flattenMap:^RACSignal<NSNumber *> *(NETunnelProviderManager *providerManager) {
 
           weakSelf.tunnelProviderManager = providerManager;
           NSError *error;
@@ -348,40 +342,7 @@ UserDefaultsKey const VPNManagerConnectOnDemandUntilNextStartBoolKey = @"VPNMana
           if (error) {
               return [RACSignal error:error];
           } else {
-              // The process of connecting to VPN started.
-              [weakSelf.internalStartStatus sendNext:@(VPNStartStatusFinished)];
-
-              return [RACSignal return:providerManager];
-          }
-
-      }]
-      delay:VPNStartSuccessCheckDelay]  // Delay before checking VPN status.
-      flattenMap:^RACSignal<RACUnit *> *(NETunnelProviderManager *providerManager) {
-
-          NEVPNStatus s = providerManager.connection.status;
-
-          // We expect the VPN to have started after the delay.
-
-          if (s == NEVPNStatusConnecting ||
-              s == NEVPNStatusConnected ||
-              s == NEVPNStatusReasserting) {
-
               return [RACSignal return:RACUnit.defaultUnit];
-
-          } else {
-
-              // The VPN is not in the expected connecting/connected state within VPNStartSuccessCheckDelay of starting.
-              // Due to the potential corruption of the VPN configuration, delete the VPN configuration.
-              //
-              // This bug has been observed in the system, and the only solution is to remove the VPN configuration.
-              //
-              return [[RACSignal defer:providerManager
-             selectorWithErrorCallback:@selector(removeFromPreferencesWithCompletionHandler:)]
-                flattenMap:^RACSignal *(id value) {
-                  // End the stream with an error.
-                    return [RACSignal error:[NSError errorWithDomain:VPNManagerErrorDomain code:VPNManagerConfigRemovedMaybeCorrupt]];
-                }];
-
           }
 
       }]
@@ -393,17 +354,16 @@ UserDefaultsKey const VPNManagerConnectOnDemandUntilNextStartBoolKey = @"VPNMana
           if ([error.domain isEqualToString:NEVPNErrorDomain] &&
                error.code == NEVPNErrorConfigurationReadWriteFailed &&
                [error.localizedDescription isEqualToString:@"permission denied"] ) {
-              // User denied permission.
+
               [weakSelf.internalStartStatus sendNext:@(VPNStartStatusFailedUserPermissionDenied)];
-
           } else {
-
               [weakSelf.internalStartStatus sendNext:@(VPNStartStatusFailedOther)];
           }
 
           [weakSelf.compoundDisposable removeDisposable:disposable];
-      }
-      completed:^{
+
+      } completed:^{
+          [weakSelf.internalStartStatus sendNext:@(VPNStartStatusFinished)];
           [weakSelf.compoundDisposable removeDisposable:disposable];
       }];
 
