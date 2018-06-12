@@ -37,8 +37,12 @@ FOUNDATION_EXPORT NSErrorDomain const VPNManagerErrorDomain;
 FOUNDATION_EXPORT UserDefaultsKey const VPNManagerConnectOnDemandUntilNextStartBoolKey;
 
 typedef NS_ERROR_ENUM(VPNManagerErrorDomain, VPNManagerConfigErrorCode) {
-    /*! @const VPNManagerConfigMaybeCorrupt VPN configuration removed since it might have been corrupt. */
-      VPNManagerConfigRemovedMaybeCorrupt = 103,
+    /*! @const VPNManagerStartErrorConfigLoadFailed Failed to load VPN configurations. */
+    VPNManagerConfigErrorLoadFailed = 100,
+    /*! @const VPNManagerStartErrorTooManyConfigsFounds More than expected VPN configurations found. */
+    VPNManagerConfigErrorTooManyConfigsFounds = 101,
+    /*! @const VPNManagerStartErrorConfigSaveFailed Failed to save VPN configuration. */
+    VPNManagerConfigErrorConfigSaveFailed = 102,
 };
 
 typedef NS_ERROR_ENUM(VPNManagerErrorDomain, VPNManagerQueryErrorCode) {
