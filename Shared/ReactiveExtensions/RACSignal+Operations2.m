@@ -29,6 +29,7 @@
 #import "Logging.h"
 #import "AsyncOperation.h"
 #import "RACTargetQueueScheduler.h"
+#import "UnionSerialQueue.h"
 
 @implementation RACSignal (Operations2)
 
@@ -162,10 +163,11 @@
     }];
 }
 
-- (RACSignal *)unsafeSubscribeOnSerialQueue:(NSOperationQueue *)operationQueue scheduler:(RACTargetQueueScheduler *)queueScheduler {
+- (RACSignal *)unsafeSubscribeOnSerialQueue:(UnionSerialQueue *)serialQueue
+                                   withName:(NSString *)name {
 
-    NSAssert(operationQueue.underlyingQueue != nil, @"operationQueue must have underlying dispatch operationQueue set");
-    NSAssert(operationQueue.maxConcurrentOperationCount == 1, @"operationQueue must be serial");
+    NSAssert(serialQueue.operationQueue.underlyingQueue != nil, @"operationQueue must have underlying dispatch operationQueue set");
+    NSAssert(serialQueue.operationQueue.maxConcurrentOperationCount == 1, @"operationQueue must be serial");
 
     return [RACSignal createSignal:^RACDisposable *(id <RACSubscriber> subscriber) {
 
@@ -183,7 +185,7 @@
         AsyncOperation *operation = [[AsyncOperation alloc] initWithBlock:^(void (^completionHandler)(NSError *)) {
 
             // Subscribes on the provided scheduler, and adds the scheduling disposable to `compoundDisposable`.
-            [compoundDisposable addDisposable:[queueScheduler schedule:^{
+            [compoundDisposable addDisposable:[serialQueue.racTargetQueueScheduler schedule:^{
 
                 // Adds subscription disposable to `compoundDisposable`.
                 [compoundDisposable addDisposable:[self subscribeNext:^(id x) {
@@ -191,7 +193,7 @@
                     // To prevent unbounded size increase of compoundDisposable,
                     // do not add the returned scheduling disposable to returned `compoundDisposable`.
                     // This doesn't carry a risk.
-                    [queueScheduler schedule:^{
+                    [serialQueue.racTargetQueueScheduler schedule:^{
                         [subscriber sendNext:x];
                     }];
 
@@ -201,7 +203,7 @@
 
                     // There is no risk of not adding returned subscription disposable
                     // to the returned `compoundDisposable`.
-                    [queueScheduler schedule:^{
+                    [serialQueue.racTargetQueueScheduler schedule:^{
                        [subscriber sendError:error];
                     }];
 
@@ -211,18 +213,24 @@
 
                     // There is no risk of not adding returned subscription disposable
                     // to the returned `compoundDisposable`.
-                    [queueScheduler schedule:^{
+                    [serialQueue.racTargetQueueScheduler schedule:^{
                         [subscriber sendCompleted];
                     }];
                 }]];
             }]];
+
+
         }];
 
         [compoundDisposable addDisposable:[RACDisposable disposableWithBlock:^{
-            [operation cancel];
+            if (![operation isFinished]) {
+                [operation cancel];
+            }
         }]];
 
-        [operationQueue addOperation:operation];
+        operation.name = name;
+
+        [serialQueue.operationQueue addOperation:operation];
 
         return compoundDisposable;
     }];
