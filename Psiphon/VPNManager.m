@@ -17,6 +17,18 @@
  *
  */
 
+/**
+ * Note on using `unsafeSubscribeOnSerialQueue` method of RACSignal+Operations2:
+ *
+ * - To avoid possible corruptions of the VPN configuration, the operations performed on the configurations
+ *   should be performed serially. (That is the sequence of sub-operations in two different larger operations
+ *   performed on the VPN configuration shouldn't interleave.)
+ *
+ *   `unsafeSubscribeOnSerialQueue` allows us to do that, with the caveat that when this signal is subscribed to,
+ *   no other signal that's also subscribed on with `unsafeSubscribeOnSerialQueue` should be subscribed to.
+ *
+ */
+
 #import <ReactiveObjC/RACScheduler.h>
 #import <ReactiveObjC/RACTuple.h>
 #import "VPNManager.h"
@@ -294,47 +306,14 @@ UserDefaultsKey const VPNManagerConnectOnDemandUntilNextStartBoolKey = @"VPNMana
 
     __weak VPNManager *weakSelf = self;
 
-    __block RACDisposable *disposable = [[[[[[[VPNManager loadTunnelProviderManager]
-      map:^NETunnelProviderManager *(NETunnelProviderManager *providerManager) {
-
-          if (!providerManager) {
-              NETunnelProviderProtocol *providerProtocol = [[NETunnelProviderProtocol alloc] init];
-              providerProtocol.providerBundleIdentifier = @"ca.psiphon.Psiphon.PsiphonVPN";
-              providerProtocol.serverAddress = @"localhost";
-
-              providerManager = [[NETunnelProviderManager alloc] init];
-              providerManager.protocolConfiguration = providerProtocol;
-          }
-
-          // setEnabled becomes false if the user changes the
-          // enabled VPN Configuration from the preferences.
-          providerManager.enabled = TRUE;
-
-          // Adds "always connect" Connect On Demand rule to the configuration.
-          if (!providerManager.onDemandRules || [providerManager.onDemandRules count] == 0) {
-              NEOnDemandRule *alwaysConnectRule = [NEOnDemandRuleConnect new];
-              providerManager.onDemandRules = @[alwaysConnectRule];
-          }
-
-          NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
-          if ([ud boolForKey:VPNManagerConnectOnDemandUntilNextStartBoolKey]) {
-              providerManager.onDemandEnabled = TRUE;
-
-              // Reset VPNManagerConnectOnDemandUntilNextStartBoolKey value.
-              [ud setBool:FALSE forKey:VPNManagerConnectOnDemandUntilNextStartBoolKey];
-          }
-
-          return providerManager;
-      }]
-      flattenMap:^RACSignal *(NETunnelProviderManager *providerManager) {
-          return [RACSignal defer:providerManager selectorWithErrorCallback:@selector(saveToPreferencesWithCompletionHandler:)];
-      }]
-      flattenMap:^RACSignal *(NETunnelProviderManager *providerManager) {
-          return [RACSignal defer:providerManager selectorWithErrorCallback:@selector(loadFromPreferencesWithCompletionHandler:)];
+    __block RACDisposable *disposable = [[[[[VPNManager loadTunnelProviderManager]
+      flattenMap:^RACSignal *(NETunnelProviderManager *_Nullable providerManager) {
+          // Updates VPN configuration parameters if it already exists,
+          // otherwise creates a new VPN configuration.
+          return [weakSelf updateOrCreateVPNConfigurationAndSave:providerManager];
       }]
       flattenMap:^RACSignal<NSNumber *> *(NETunnelProviderManager *providerManager) {
 
-          weakSelf.tunnelProviderManager = providerManager;
           NSError *error;
           NSDictionary *options = @{EXTENSION_OPTION_START_FROM_CONTAINER: EXTENSION_OPTION_TRUE};
           [weakSelf.tunnelProviderManager.connection startVPNTunnelWithOptions:options andReturnError:&error];
@@ -449,21 +428,28 @@ UserDefaultsKey const VPNManagerConnectOnDemandUntilNextStartBoolKey = @"VPNMana
     [self.compoundDisposable addDisposable:disposable];
 }
 
-// Removes installed VPN configuration. NO-OP if no VPN configuration is installed.
-- (void)removeVPNConfiguartion {
+// Removes and re-installs the VPN configuration.
+// TODO: signal the state of the operation to the UI world.
+- (void)reinstallVPNConfiguration {
 
     __weak VPNManager *weakSelf = self;
 
-    __block RACDisposable *disposable = [[[[VPNManager loadTunnelProviderManager]
+    __block RACDisposable *disposable = [[[[[VPNManager loadTunnelProviderManager]
       flattenMap:^RACSignal *(NETunnelProviderManager *providerManager) {
+          // Removes the VPN configuration (if already installed).
           if (providerManager) {
               return [RACSignal defer:providerManager selectorWithErrorCallback:@selector(removeFromPreferencesWithCompletionHandler:)];
           }
           return [RACSignal return:nil];
       }]
-      unsafeSubscribeOnSerialQueue:self.serialQueue withName:@"removeVPNConfigurationOperation"]
+      flattenMap:^RACSignal *(id x) {
+          // Installs the VPN configuration.
+          return [weakSelf updateOrCreateVPNConfigurationAndSave:nil];
+      }]
+      unsafeSubscribeOnSerialQueue:self.serialQueue
+                          withName:@"reinstallVPNConfigurationOperation"]
       subscribeError:^(NSError *error) {
-          [PsiFeedbackLogger errorWithType:VPNManagerLogType message:@"failed to remove VPN configuration" object:error];
+          [PsiFeedbackLogger errorWithType:VPNManagerLogType message:@"failed to reinstall VPN configuration" object:error];
           [weakSelf.compoundDisposable removeDisposable:disposable];
       } completed:^{
           [weakSelf.compoundDisposable removeDisposable:disposable];
@@ -656,6 +642,58 @@ UserDefaultsKey const VPNManagerConnectOnDemandUntilNextStartBoolKey = @"VPNMana
                   return nil;
               }];
           }
+      }];
+}
+
+// Returns a signal that when subscribed to, creates and saves VPN configuration if nil is passed.
+// Otherwise, updates appropriate properties in the provided VPN configuration and saves it.
+// NOTE: since this signal modifies the VPN configuration, the returned signal should be subscribed on using
+//       `unsafeSubscribeOnSerialQueue`.
+- (RACSignal<NETunnelProviderManager *> *)updateOrCreateVPNConfigurationAndSave:(NETunnelProviderManager *_Nullable)providerManager {
+
+    __weak VPNManager *weakSelf = self;
+
+    return [[[[[RACSignal return:providerManager]
+      map:^NETunnelProviderManager *(NETunnelProviderManager *providerManager) {
+
+          if (!providerManager) {
+              NETunnelProviderProtocol *providerProtocol = [[NETunnelProviderProtocol alloc] init];
+              providerProtocol.providerBundleIdentifier = @"ca.psiphon.Psiphon.PsiphonVPN";
+              providerProtocol.serverAddress = @"localhost";
+
+              providerManager = [[NETunnelProviderManager alloc] init];
+              providerManager.protocolConfiguration = providerProtocol;
+          }
+
+          // setEnabled becomes false if the user changes the
+          // enabled VPN Configuration from the preferences.
+          providerManager.enabled = TRUE;
+
+          // Adds "always connect" Connect On Demand rule to the configuration.
+          if (!providerManager.onDemandRules || [providerManager.onDemandRules count] == 0) {
+              NEOnDemandRule *alwaysConnectRule = [NEOnDemandRuleConnect new];
+              providerManager.onDemandRules = @[alwaysConnectRule];
+          }
+
+          NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
+          if ([ud boolForKey:VPNManagerConnectOnDemandUntilNextStartBoolKey]) {
+              providerManager.onDemandEnabled = TRUE;
+
+              // Reset VPNManagerConnectOnDemandUntilNextStartBoolKey value.
+              [ud setBool:FALSE forKey:VPNManagerConnectOnDemandUntilNextStartBoolKey];
+          }
+
+          return providerManager;
+      }]
+      flattenMap:^RACSignal *(NETunnelProviderManager *providerManager) {
+          return [RACSignal defer:providerManager selectorWithErrorCallback:@selector(saveToPreferencesWithCompletionHandler:)];
+      }]
+      flattenMap:^RACSignal *(NETunnelProviderManager *providerManager) {
+          return [RACSignal defer:providerManager selectorWithErrorCallback:@selector(loadFromPreferencesWithCompletionHandler:)];
+      }]
+      map:^id(NETunnelProviderManager *providerManager) {
+          weakSelf.tunnelProviderManager = providerManager;
+          return providerManager;
       }];
 }
 
