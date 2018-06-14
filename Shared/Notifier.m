@@ -146,7 +146,7 @@ static inline void AddDarwinNotifyObserver(CFNotificationCenterRef center, const
         if (center) {
             CFNotificationCenterPostNotification(center, (__bridge CFStringRef)message, NULL, NULL, 0);
 
-            [PsiFeedbackLogger infoWithType:@"Notifier<DEBUG>" message:@"sent [%@]", message];
+            [PsiFeedbackLogger infoWithType:NotifierLogType message:@"sent [%@]", message];
         }
     });
 
