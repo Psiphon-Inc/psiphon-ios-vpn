@@ -24,7 +24,7 @@
 @implementation PsiCashClientModel
 
 + (PsiCashClientModel*)clientModelWithAuthPackage:(PsiCashAuthPackage*)authPackage
-                                       andBalance:(NSNumber*)balance
+                                       andBalance:(NSNumber*_Nonnull)balance
                              andSpeedBoostProduct:(PsiCashSpeedBoostProduct*)speedBoostProduct
                               andPendingPurchases:(NSArray<id<PsiCashProductSKU>>*)pendingPurchases
                       andActiveSpeedBoostPurchase:(PsiCashPurchase* /* TODO: typing */)activeSpeedBoostPurchase
