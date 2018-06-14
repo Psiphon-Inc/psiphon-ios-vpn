@@ -56,6 +56,9 @@ PsiFeedbackLogType const AsyncOperationLogType = @"AsyncOperation";
     if (self) {
         _finished = FALSE;
         _executing = FALSE;
+
+        // KVO - listen to to "cancelled" value.
+        [self addObserver:self forKeyPath:@"cancelled" options:NSKeyValueObservingOptionNew context:nil];
     }
     return self;
 }
@@ -64,11 +67,12 @@ PsiFeedbackLogType const AsyncOperationLogType = @"AsyncOperation";
     self = [self init];
     if (self) {
         mainBlock = [block copy];
-
-        // KVO - listen to to "cancelled" value.
-        [self addObserver:self forKeyPath:@"cancelled" options:NSKeyValueObservingOptionNew context:nil];
     }
     return self;
+}
+
+- (void)dealloc {
+    [self removeObserver:self forKeyPath:@"cancelled"];
 }
 
 - (void)observeValueForKeyPath:(nullable NSString *)keyPath ofObject:(nullable id)object change:(nullable NSDictionary<NSKeyValueChangeKey, id> *)change context:(nullable void *)context {

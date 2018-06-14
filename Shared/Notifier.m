@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, Psiphon Inc.
+ * Copyright (c) 2018, Psiphon Inc.
  * All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -20,21 +20,33 @@
 #import <NetworkExtension/NetworkExtension.h>
 #import "Notifier.h"
 #import "Asserts.h"
+#import "DispatchUtils.h"
 
-#define SEND_TIMEOUT       10  // 10 seconds.
-#define RCV_TIMEOUT         0  // 0 seconds.
-
-#define PSIPHON_GROUP      "group.ca.psiphon.Psiphon"
-#define PSIPHON_VPN_GROUP  "group.ca.psiphon.Psiphon.PsiphonVPN"
+#define PSIPHON_GROUP      @"group.ca.psiphon.Psiphon"
+#define PSIPHON_VPN_GROUP  @"group.ca.psiphon.Psiphon.PsiphonVPN"
 
 PsiFeedbackLogType const NotifierLogType = @"Notifier";
+
+#pragma mark - NotiferMessage values
+
+// Messages sent by the extension.
+NotifierMessage const NotifierNewHomepages           = PSIPHON_VPN_GROUP @".NewHomepages";
+NotifierMessage const NotifierTunnelConnected        = PSIPHON_VPN_GROUP @".TunnelConnected";
+NotifierMessage const NotifierAvailableEgressRegions = PSIPHON_VPN_GROUP @".AvailableEgressRegions";
+NotifierMessage const NotifierMarkedAuthorizations   = PSIPHON_VPN_GROUP @".MarkedAuthorizations";
+
+// Messages sent by the container.
+NotifierMessage const NotifierStartVPN               = PSIPHON_GROUP @".StartVPN";
+NotifierMessage const NotifierForceSubscriptionCheck = PSIPHON_GROUP @".ForceSubscriptionCheck";
+NotifierMessage const NotifierAppEnteredBackground   = PSIPHON_GROUP @".AppEnteredBackground";
+NotifierMessage const NotifierUpdatedAuthorizations  = PSIPHON_GROUP @".UpdatedAuthorizations";
 
 #pragma mark - ObserverTuple data class
 
 // ObserverTuple is a tuple that holds a weak reference to a Notifier class delegate, along
 // with the dispatch queue that the delegate wants to be called on.
 @interface ObserverTuple : NSObject
-@property (nonatomic, weak) id<NotifierObserver> observer;
+@property (nonatomic, weak) NSValue<NotifierObserver> *observer;
 @property (nonatomic, assign) dispatch_queue_t callbackQueue;
 @end
 
@@ -44,82 +56,55 @@ PsiFeedbackLogType const NotifierLogType = @"Notifier";
 #pragma mark - Notifier
 
 @implementation Notifier {
-    CFStringRef remotePortName;
-    CFStringRef localPortName;
-
-    CFMessagePortRef remotePort;
-    CFMessagePortRef localPort;
-
-    // queue run off of the main thread for sending notifications.
-    dispatch_queue_t sendQueue;
-
     NSMutableArray<ObserverTuple *> *observers;
 }
 
 // Class variables accessible by C functions.
 static Notifier *sharedInstance;
 
-CFDataRef messageCallback(CFMessagePortRef local, SInt32 messageId, CFDataRef data, void *info) {
+static void cfNotificationCallback(CFNotificationCenterRef center, void *observer, CFStringRef name,
+  void const *object, CFDictionaryRef userInfo) {
 
-    [PsiFeedbackLogger infoWithType:NotifierLogType message:@"received messageId (%d)", messageId];
+    NSString *key = (__bridge NSString *)name;
+    Notifier *selfPtr = (__bridge Notifier *)observer;
+    [selfPtr notificationCallback:key];
+}
 
-    @synchronized(sharedInstance) {
-
-        NSMutableIndexSet *deallocatedDelegates = [NSMutableIndexSet indexSet];
-
-        // The contents of data will be deallocated after messageCallback exits.
-        NSData *copy = [(__bridge NSData *)data copy];
-
-        [sharedInstance->observers enumerateObjectsUsingBlock:^(ObserverTuple *obj, NSUInteger idx, BOOL *stop) {
-            // If delegate has been deallocated, add its index to deallocatedDelegates to be removed later.
-            if (!obj.observer) {
-                [deallocatedDelegates addIndex:idx];
-                return;
-            }
-
-            dispatch_async(obj.callbackQueue, ^{
-                [obj.observer onMessageReceived:(NotifierMessageId)messageId withData:copy];
-            });
-
-        }];
-
-        // Remove deallocated delegates.
-        [sharedInstance->observers removeObjectsAtIndexes:deallocatedDelegates];
-    };
-    return NULL;
+static inline void AddDarwinNotifyObserver(CFNotificationCenterRef center, const void *observer, CFStringRef key) {
+    CFNotificationCenterAddObserver(center,
+      observer,
+      cfNotificationCallback,
+      key,
+      NULL, // The object to observe should be NULL;
+      CFNotificationSuspensionBehaviorDeliverImmediately);
 }
 
 - (instancetype)init {
+    observers = [NSMutableArray arrayWithCapacity:1];
 
-#if TARGET_IS_EXTENSION
-    remotePortName = CFSTR(PSIPHON_GROUP);
-    localPortName = CFSTR(PSIPHON_VPN_GROUP);
-#else
-    remotePortName = CFSTR(PSIPHON_VPN_GROUP);
-    localPortName = CFSTR(PSIPHON_GROUP);
-#endif
+    // Add self to Darwin notify center for the given key.
+    CFNotificationCenterRef center = CFNotificationCenterGetDarwinNotifyCenter();
 
-    localPort = CFMessagePortCreateLocal(kCFAllocatorDefault, localPortName, &messageCallback, NULL, NULL);
-    if (!localPort) {
-        [PsiFeedbackLogger errorWithType:NotifierLogType message:@"failed to create local Mach port"];
+    if (!center) {
         abort();
     }
 
-    CFMessagePortSetDispatchQueue(localPort, dispatch_get_main_queue());
-
-    sendQueue = dispatch_queue_create("ca.psiphon.Psiphon.Notifier", DISPATCH_QUEUE_CONCURRENT);
-
-    observers = [NSMutableArray arrayWithCapacity:1];
+    // Notifier instances should add itself as observer for all notifications.
+#if TARGET_IS_EXTENSION
+    // Listens to all messages sent by the container.
+    AddDarwinNotifyObserver(center, (__bridge const void *)self, (__bridge CFStringRef)NotifierStartVPN);
+    AddDarwinNotifyObserver(center, (__bridge const void *)self, (__bridge CFStringRef)NotifierForceSubscriptionCheck);
+    AddDarwinNotifyObserver(center, (__bridge const void *)self, (__bridge CFStringRef)NotifierAppEnteredBackground);
+    AddDarwinNotifyObserver(center, (__bridge const void *)self, (__bridge CFStringRef)NotifierUpdatedAuthorizations);
+#else
+    // Listens to all messages sent by the extension.
+    AddDarwinNotifyObserver(center, (__bridge const void *)self, (__bridge CFStringRef)NotifierNewHomepages);
+    AddDarwinNotifyObserver(center, (__bridge const void *)self, (__bridge CFStringRef)NotifierTunnelConnected);
+    AddDarwinNotifyObserver(center, (__bridge const void *)self, (__bridge CFStringRef)NotifierAvailableEgressRegions);
+    AddDarwinNotifyObserver(center, (__bridge const void *)self, (__bridge CFStringRef)NotifierMarkedAuthorizations);
+#endif
 
     return self;
-}
-
-- (void)dealloc {
-    CFRelease(localPort);
-
-    if (remotePort != NULL) {
-        CFRelease(remotePort);
-    }
 }
 
 # pragma mark - Public
@@ -154,44 +139,47 @@ CFDataRef messageCallback(CFMessagePortRef local, SInt32 messageId, CFDataRef da
     }
 }
 
-- (void)post:(NotifierMessageId)messageId completionHandler:(void (^)(BOOL success))completion {
-    [self post:messageId withData:nil completionHandler:completion];
+- (void)post:(NotifierMessage)message {
+
+    dispatch_async_main(^{
+        CFNotificationCenterRef center = CFNotificationCenterGetDarwinNotifyCenter();
+        if (center) {
+            CFNotificationCenterPostNotification(center, (__bridge CFStringRef)message, NULL, NULL, 0);
+
+            [PsiFeedbackLogger infoWithType:@"Notifier<DEBUG>" message:@"sent [%@]", message];
+        }
+    });
+
 }
 
-- (void)post:(NotifierMessageId)messageId withData:(NSData *_Nullable)data completionHandler:(void (^_Nonnull)(BOOL success))completion {
+#pragma mark - Private
 
-    // Sanity check.
-#if TARGET_IS_EXTENSION
-    PSIAssert(messageId >= 100 && messageId < 200);
-#else
-    PSIAssert(messageId >= 200 && messageId < 300);
-#endif
+- (void)notificationCallback:(NSString *)message {
 
-    CFDataRef copy = (__bridge CFDataRef) [data copy];
+    [PsiFeedbackLogger infoWithType:NotifierLogType message:@"received [%@]", message];
 
-    dispatch_async(sendQueue, ^{
+    @synchronized (sharedInstance) {
 
-        CFDataRef ignored = NULL;
-        
-        remotePort = CFMessagePortCreateRemote(kCFAllocatorDefault, remotePortName);
-        if (remotePort == NULL) {
-            // If the extension is not running (did not create it's own local message port), remotePort will be NULL.
-            return;
-        }
+        NSMutableIndexSet *deallocatedDelegates = [NSMutableIndexSet indexSet];
 
-        SInt32 error = CFMessagePortSendRequest(remotePort, (SInt32)messageId, copy, SEND_TIMEOUT, RCV_TIMEOUT, NULL, &ignored);
+        [sharedInstance->observers enumerateObjectsUsingBlock:^(ObserverTuple *obj, NSUInteger idx, BOOL *stop) {
+            // If delegate has been deallocated, add its index to deallocatedDelegates to be removed later.
+            if (!obj.observer) {
+                [deallocatedDelegates addIndex:idx];
+                return;
+            }
 
-        completion(error == kCFMessagePortSuccess);
+            dispatch_async(obj.callbackQueue, ^{
+                [obj.observer onMessageReceived:(NotifierMessage)message];
+            });
 
-        if (error != kCFMessagePortSuccess) {
-            [PsiFeedbackLogger errorWithType:NotifierLogType message:@"failed to send messageId:%ld error:%d", (long)messageId, error];
-        } else {
-#if DEBUG
-            [PsiFeedbackLogger infoWithType:@"Notifier<DEBUG>" message:@"success to send messagedId %ld", (long)messageId];
-#endif
-        }
+        }];
 
-    });
+        // Remove deallocated delegates.
+        [sharedInstance->observers removeObjectsAtIndexes:deallocatedDelegates];
+
+    }
+
 }
 
 @end

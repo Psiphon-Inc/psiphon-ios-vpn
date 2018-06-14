@@ -23,9 +23,11 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+@class RACSubject<ValueType>;
 @class RACReplaySubject<ValueType>;
 @class RACSignal<__covariant ValueType>;
 @class RACTwoTuple<__covariant First, __covariant Second>;
+@class RACUnit;
 
 FOUNDATION_EXPORT NSErrorDomain const VPNManagerErrorDomain;
 
@@ -159,10 +161,9 @@ typedef NS_ENUM(NSInteger, VPNStartStatus) {
 
 
 /**
- * Removes currently installed VPN configuration.
- * Does nothing if there are no VPN configurations installed.
+ * Removes and installs the VPN configuration.
  */
-- (void)removeVPNConfiguartion;
+- (void)reinstallVPNConfiguration;
 
 /**
  * Returns TRUE if VPNStatus is in an active state.
