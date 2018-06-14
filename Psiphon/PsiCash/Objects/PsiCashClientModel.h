@@ -24,7 +24,7 @@
 
 @interface PsiCashClientModel : NSObject
 @property (strong, atomic) PsiCashAuthPackage *authPackage;
-@property (strong, atomic) NSNumber *balance;
+@property (strong, atomic) NSNumber *_Nonnull balance;
 @property (strong, atomic) PsiCashSpeedBoostProduct *speedBoostProduct;
 @property (strong, atomic) NSArray<id<PsiCashProductSKU>> *pendingPurchases;
 @property (strong, atomic) PsiCashPurchase *activeSpeedBoostPurchase;

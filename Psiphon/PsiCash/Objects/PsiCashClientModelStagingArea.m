@@ -50,6 +50,10 @@
 }
 
 - (void)updateBalance:(NSNumber*)balance {
+    if (!balance) {
+        self.stagedModel.balance = [NSNumber numberWithInteger:0];
+        return;
+    }
     self.stagedModel.balance = balance;
 }
 

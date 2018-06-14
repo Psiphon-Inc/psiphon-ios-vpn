@@ -42,12 +42,23 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)initWithModel:(PsiCashClientModel *_Nullable)model;
 
 - (void)updateAuthPackage:(PsiCashAuthPackage*_Nullable)authPackage;
-- (void)updateBalance:(NSNumber*)balance;
+
+/**
+ * Update balance of model in staging area.
+ * @note If balance is nil the inner client model's balance will be updated to an NSNumber of 0.
+ */
+- (void)updateBalance:(NSNumber*_Nullable)balance;
+
 - (void)updateSpeedBoostProduct:(PsiCashSpeedBoostProduct*)speedBoostProduct;
+
 - (void)updateSpeedBoostProductSKU:(PsiCashSpeedBoostProductSKU*)old withNewPrice:(NSNumber*)price;
+
 - (void)removeSpeedBoostProductSKU:(PsiCashSpeedBoostProductSKU*)sku;
+
 - (void)updatePendingPurchases:(NSArray<id<PsiCashProductSKU>>*_Nullable)purchases;
+
 - (void)updateActivePurchases:(NSArray<PsiCashPurchase*>*)activePurchases;
+
 - (void)updateRefreshPending:(BOOL)refreshPending;
 
 @end
