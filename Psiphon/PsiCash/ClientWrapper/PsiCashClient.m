@@ -403,9 +403,8 @@ NSErrorDomain _Nonnull const PsiCashClientLibraryErrorDomain = @"PsiCashClientLi
                 // Ensure homepage is shown when extension reconnects with new auth token
                 [AppDelegate sharedAppDelegate].shownLandingPageForCurrentSession = FALSE;
             });
-            [[Notifier sharedInstance] post:NotifierUpdatedAuthorizations completionHandler:^(BOOL success) {
-                // Do nothing.
-            }];
+
+            [[Notifier sharedInstance] post:NotifierUpdatedAuthorizations];
 
             [stagingArea updateBalance:result.balance];
 
