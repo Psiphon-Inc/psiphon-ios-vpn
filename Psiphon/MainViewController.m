@@ -1198,6 +1198,23 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
             [psiCashView bindWithModel:model];
         }
     }];
+
+#if DEBUG
+    if ([AppDelegate isRunningUITest]) {
+        [psiCashViewUpdates dispose];
+        [self onboardingEnded];
+
+        PsiCashSpeedBoostProductSKU *sku = [PsiCashSpeedBoostProductSKU skuWitDistinguisher:@"1h" withHours:[NSNumber numberWithInteger:1] andPrice:[NSNumber numberWithDouble:100e9]];
+
+        PsiCashClientModel *m = [PsiCashClientModel clientModelWithAuthPackage:[[PsiCashAuthPackage alloc] initWithValidTokens:@[@"indicator", @"earner", @"spender"]]
+                                                                    andBalance:[NSNumber numberWithDouble:70e9]
+                                                          andSpeedBoostProduct:[PsiCashSpeedBoostProduct productWithSKUs:@[sku]]
+                                                           andPendingPurchases:nil
+                                                   andActiveSpeedBoostPurchase:nil
+                                                             andRefreshPending:NO];
+        [psiCashView bindWithModel:m];
+    }
+#endif
 }
 
 - (void)setPsiCashContentHidden:(BOOL)hidden {
