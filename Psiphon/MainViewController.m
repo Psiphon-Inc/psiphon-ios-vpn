@@ -1135,7 +1135,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     }
 
     PsiCashSpeedBoostProductSKU *purchase = [model maxSpeedBoostPurchaseEarned];
-    if (![model hasActiveSpeedBoostPurchase] && purchase != nil) {
+    if (![model hasPendingPurchase] && ![model hasActiveSpeedBoostPurchase] && purchase != nil) {
         [PsiCashClient.sharedInstance purchaseSpeedBoostProduct:purchase];
     } else {
         [self showPsiCashAlertView];
