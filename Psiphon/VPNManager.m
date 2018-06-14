@@ -363,9 +363,7 @@ UserDefaultsKey const VPNManagerConnectOnDemandUntilNextStartBoolKey = @"VPNMana
           }
 
           if (providerManager.connection.status == NEVPNStatusConnecting) {
-              [[Notifier sharedInstance] post:NotifierStartVPN completionHandler:^(BOOL success) {
-                  // Do nothing.
-              }];
+              [[Notifier sharedInstance] post:NotifierStartVPN];
           }
 
       } error:^(NSError *error) {
