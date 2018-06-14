@@ -46,7 +46,7 @@ NotifierMessage const NotifierUpdatedAuthorizations  = PSIPHON_GROUP @".UpdatedA
 // ObserverTuple is a tuple that holds a weak reference to a Notifier class delegate, along
 // with the dispatch queue that the delegate wants to be called on.
 @interface ObserverTuple : NSObject
-@property (nonatomic, weak) NSValue<NotifierObserver> *observer;
+@property (nonatomic, weak) id<NotifierObserver> observer;
 @property (nonatomic, assign) dispatch_queue_t callbackQueue;
 @end
 
