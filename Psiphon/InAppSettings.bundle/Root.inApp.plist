@@ -5,7 +5,6 @@
 	<key>PreferenceSpecifiers</key>
 	<array>
 		<dict>
-			<!-- Untranslated -->
 			<key>Title</key>
 			<string>Psiphon</string>
 			<key>Type</key>
@@ -235,7 +234,7 @@
 				</dict>
 				<dict>
 					<key>Title</key>
-					<string>O'zbekcha</string>
+					<string>O&apos;zbekcha</string>
 				</dict>
 				<dict>
 					<key>Title</key>
@@ -382,8 +381,18 @@
 			<string>PSGroupSpecifier</string>
 		</dict>
 		<dict>
+			<key>Title</key>
+			<string>!!! Not in the Root.strings, this title is set from SettingsViewController!!!</string>
+			<key>Key</key>
+			<string>settingsReinstallVPNConfiguration</string>
+			<key>Type</key>
+			<string>IASKCustomViewSpecifier</string>
+			<key>DefaultValue</key>
+			<string></string>
+		</dict>
+		<dict>
 			<key>File</key>
-			<string>ConnectionHelp</string>
+			<string>ConnectionHelpVPN</string>
 			<key>BundleTable</key>
 			<string>PsiphonClientCommonLibrary</string>
 			<key>Title</key>
