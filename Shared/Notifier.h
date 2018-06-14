@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, Psiphon Inc.
+ * Copyright (c) 2018, Psiphon Inc.
  * All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -22,31 +22,31 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-typedef NS_ENUM(NSInteger, NotifierMessageId) {
+typedef NSString * NotifierMessage;
 
-    // Messages sent by the extension.
-    NotifierNewHomepages = 100,
-    NotifierTunnelConnected = 101,
-    NotifierAvailableEgressRegions = 102,
+// Messages sent by the extension.
+extern NotifierMessage const NotifierNewHomepages;
+extern NotifierMessage const NotifierTunnelConnected;
+extern NotifierMessage const NotifierAvailableEgressRegions;
+extern NotifierMessage const NotifierMarkedAuthorizations;
 
-    NotifierMarkedAuthorizations = 110,
+// Messages sent by the container.
+extern NotifierMessage const NotifierStartVPN;
+extern NotifierMessage const NotifierForceSubscriptionCheck;
+extern NotifierMessage const NotifierAppEnteredBackground;
+extern NotifierMessage const NotifierUpdatedAuthorizations;
 
-    // Messages sent by the container.
-    NotifierStartVPN = 200,
-    NotifierForceSubscriptionCheck = 201,
-    NotifierAppEnteredBackground = 202,
-
-    NotifierUpdatedAuthorizations = 210,
-
-};
+#pragma mark - NotifierObserver
 
 @protocol NotifierObserver <NSObject>
 
 @required
 
-- (void)onMessageReceived:(NotifierMessageId)messageId withData:(NSData *)data;
+- (void)onMessageReceived:(NotifierMessage)message;
 
 @end
+
+#pragma mark - Notifier
 
 @interface Notifier : NSObject
 
@@ -56,22 +56,9 @@ typedef NS_ENUM(NSInteger, NotifierMessageId) {
  * If called from the container, posts the message to the network extension.
  * If called from the extension, posts the message to the container.
  *
- * @param messageId NotifierMessageId of the message.
- * @param completionHandler Called after the message is sent, with the success parameter set.
- *                          Errors are logged.
+ * @param message NotifierMessage of the message.
  */
-- (void)post:(NotifierMessageId)messageId completionHandler:(void (^)(BOOL success))completion;
-
-/**
- * If called from the container, posts the message to the network extension.
- * If called from the extension, posts the message to the container.
- *
- * @param messageId NotifierMessageId of the message.
- * @param data Data to send.
- * @param completionHandler Called after the message is sent, with the success parameter set.
- *                          Errors are logged.
- */
-- (void)post:(NotifierMessageId)messageId withData:(NSData *_Nullable)data completionHandler:(void (^)(BOOL success))completion;
+- (void)post:(NotifierMessage)message;
 
 /**
  * Adds an observer to the Notifier.

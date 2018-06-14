@@ -327,9 +327,7 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
     // If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
 
     [[UIApplication sharedApplication] ignoreSnapshotOnNextApplicationLaunch];
-    [[Notifier sharedInstance] post:NotifierAppEnteredBackground completionHandler:^(BOOL success) {
-        // Do nothing.
-    }];
+    [[Notifier sharedInstance] post:NotifierAppEnteredBackground];
 }
 
 - (void)applicationWillEnterForeground:(UIApplication *)application {
@@ -413,11 +411,11 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
 
 #pragma mark - Notifier callback
 
-- (void)onMessageReceived:(NotifierMessageId)messageId withData:(NSData *)data {
+- (void)onMessageReceived:(NotifierMessage)message {
 
     __weak AppDelegate *weakSelf = self;
 
-    if (NotifierNewHomepages == messageId) {
+    if ([NotifierNewHomepages isEqualToString:message]) {
 
         LOG_DEBUG(@"Received notification NE.newHomepages");
 
@@ -519,7 +517,7 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
 
         });
 
-    } else if (NotifierTunnelConnected == messageId) {
+    } else if ([NotifierTunnelConnected isEqualToString:message]) {
         LOG_DEBUG(@"Received notification NE.tunnelConnected");
 
         // If we haven't had a chance to load an Ad, and the
@@ -530,7 +528,7 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
             [weakSelf.vpnManager startVPN];
         }
 
-    } else if (NotifierAvailableEgressRegions == messageId) {
+    } else if ([NotifierAvailableEgressRegions isEqualToString:message]) {
         LOG_DEBUG(@"Received notification NE.onAvailableEgressRegions");
         // Update available regions
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
@@ -538,7 +536,7 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
             [[RegionAdapter sharedInstance] onAvailableEgressRegions:regions];
         });
 
-    } else if (NotifierMarkedAuthorizations == messageId) {
+    } else if ([NotifierMarkedAuthorizations isEqualToString:message]) {
         [[PsiCashClient sharedInstance] authorizationsMarkedExpired];
     }
 }
@@ -606,9 +604,7 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
         BOOL isActive = [value.first boolValue];
 
         if (isActive) {
-            [[Notifier sharedInstance] post:NotifierForceSubscriptionCheck completionHandler:^(BOOL success) {
-                // Do nothing.
-            }];
+            [[Notifier sharedInstance] post:NotifierForceSubscriptionCheck];
         }
 
     } error:^(NSError *error) {
