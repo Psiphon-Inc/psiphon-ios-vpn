@@ -18,20 +18,21 @@
  */
 
 #import "SettingsViewController.h"
+#import "AppDelegate.h"
 #import "IAPStoreHelper.h"
 #import "IAPViewController.h"
-#import "VPNManager.h"
-#import "AppDelegate.h"
 #import "PsiCashOnboardingViewController.h"
 #import "RACSignal.h"
 #import "RACCompoundDisposable.h"
 #import "RACReplaySubject.h"
 #import "RACSignal+Operations.h"
+#import "VPNManager.h"
 
 // Specifier keys for cells in settings menu
 // These keys are defined in Psiphon/InAppSettings.bundle/Root.inApp.plist
 NSString * const SettingsSubscriptionCellSpecifierKey = @"settingsSubscription";
 NSString * const SettingsPsiCashCellSpecifierKey = @"settingsPsiCash";
+NSString * const SettingsReinstallVPNConfigurationKey = @"settingsReinstallVPNConfiguration";
 NSString * const ConnectOnDemandCellSpecifierKey = @"vpnOnDemand";
 
 @interface SettingsViewController ()
@@ -178,36 +179,22 @@ NSString * const ConnectOnDemandCellSpecifierKey = @"vpnOnDemand";
         [self openIAPViewController];
     } else if ([specifier.key isEqualToString:SettingsPsiCashCellSpecifierKey]) {
         [self openPsiCashViewController];
+    } else if ([specifier.key isEqualToString:SettingsReinstallVPNConfigurationKey]) {
+        [[VPNManager sharedInstance] reinstallVPNConfiguration];
     }
 }
 
 - (UITableViewCell*)tableView:(UITableView*)tableView cellForSpecifier:(IASKSpecifier*)specifier {
     UITableViewCell *cell = nil;
-    if (![specifier.key isEqualToString:SettingsSubscriptionCellSpecifierKey]
+    if (![specifier.key isEqualToString:ConnectOnDemandCellSpecifierKey]
         && ![specifier.key isEqualToString:SettingsPsiCashCellSpecifierKey]
-        && ![specifier.key isEqualToString:ConnectOnDemandCellSpecifierKey]) {
+        && ![specifier.key isEqualToString:SettingsReinstallVPNConfigurationKey]
+        && ![specifier.key isEqualToString:SettingsSubscriptionCellSpecifierKey]) {
         cell = [super tableView:tableView cellForSpecifier:specifier];
         return cell;
     }
 
-    if ([specifier.key isEqualToString:SettingsSubscriptionCellSpecifierKey]) {
-
-        cell = [super tableView:tableView cellForSpecifier:specifier];
-        [cell setAccessoryType:UITableViewCellAccessoryDisclosureIndicator];
-        subscriptionTableViewCell = cell;
-        [self updateSubscriptionCell];
-
-    } else if ([specifier.key isEqualToString:SettingsPsiCashCellSpecifierKey]) {
-
-        cell = [super tableView:tableView cellForSpecifier:specifier];
-        [cell setAccessoryType:UITableViewCellAccessoryDisclosureIndicator];
-        [cell.textLabel setText:NSLocalizedStringWithDefaultValue(@"SETTINGS_PSICASH_CELL_TITLE",
-                                                                  nil,
-                                                                  [NSBundle mainBundle],
-                                                                  @"PsiCash",
-                                                                  @"Title of cell in settings menu which, when pressed, launches the PsiCash onboarding")];
-
-    } else if ([specifier.key isEqualToString:ConnectOnDemandCellSpecifierKey]) {
+    if ([specifier.key isEqualToString:ConnectOnDemandCellSpecifierKey]) {
 
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:@"Cell"];
         cell.selectionStyle = UITableViewCellSelectionStyleNone;
@@ -222,6 +209,32 @@ NSString * const ConnectOnDemandCellSpecifierKey = @"vpnOnDemand";
                                                                 @"Automatically start VPN On demand settings toggle");
         connectOnDemandCell = cell;
         [self updateConnectOnDemandCell];
+    } else if ([specifier.key isEqualToString:SettingsSubscriptionCellSpecifierKey]) {
+
+        cell = [super tableView:tableView cellForSpecifier:specifier];
+        [cell setAccessoryType:UITableViewCellAccessoryDisclosureIndicator];
+        subscriptionTableViewCell = cell;
+        [self updateSubscriptionCell];
+
+    } else if ([specifier.key isEqualToString:SettingsReinstallVPNConfigurationKey]) {
+
+        cell = [super tableView:tableView cellForSpecifier:specifier];
+        [cell setAccessoryType:UITableViewCellAccessoryNone];
+        [cell.textLabel setText:NSLocalizedStringWithDefaultValue(@"SETTINGS_REINSTALL_VPN_CONFIGURATION_CELL_TITLE",
+                                                                  nil,
+                                                                  [NSBundle mainBundle],
+                                                                  @"Reinstall VPN profile",
+                                                                  @"Title of cell in settings menu which, when pressed, reinstalls the user's VPN profile for Psiphon")];
+    } else if ([specifier.key isEqualToString:SettingsPsiCashCellSpecifierKey]) {
+
+        cell = [super tableView:tableView cellForSpecifier:specifier];
+        [cell setAccessoryType:UITableViewCellAccessoryDisclosureIndicator];
+        [cell.textLabel setText:NSLocalizedStringWithDefaultValue(@"SETTINGS_PSICASH_CELL_TITLE",
+                                                                  nil,
+                                                                  [NSBundle mainBundle],
+                                                                  @"PsiCash",
+                                                                  @"Title of cell in settings menu which, when pressed, launches the PsiCash onboarding")];
+
     }
 
     assert(cell != nil);

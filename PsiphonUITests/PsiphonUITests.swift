@@ -55,10 +55,10 @@ class PsiphonUITests: XCTestCase {
         snapshot("main")
         XCUIApplication().buttons["settings"].tap()
         snapshot("settings")
-        XCUIApplication().cells.element(boundBy: 1).tap() // Region
+        XCUIApplication().cells.element(boundBy: 2).tap() // Region
         snapshot("settings-region")
         XCUIApplication().navigationBars.buttons.element(boundBy: 0).tap()
-        XCUIApplication().cells.element(boundBy: 2).tap() // Language
+        XCUIApplication().cells.element(boundBy: 3).tap() // Language
         snapshot("settings-language")
         XCUIApplication().navigationBars.buttons.element(boundBy: 0).tap()
     }
