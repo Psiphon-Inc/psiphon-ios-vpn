@@ -38,6 +38,7 @@ NSString * const ConnectOnDemandCellSpecifierKey = @"vpnOnDemand";
 @interface SettingsViewController ()
 
 @property (assign) BOOL hasActiveSubscription;
+@property (assign) VPNStatus vpnStatus;
 
 @property (nonatomic) RACCompoundDisposable *compoundDisposable;
 
@@ -51,6 +52,7 @@ NSString * const ConnectOnDemandCellSpecifierKey = @"vpnOnDemand";
     // Connect On Demand row
     UISwitch *connectOnDemandToggle;
     UITableViewCell *connectOnDemandCell;
+    UITableViewCell *reinstallVPNProfileCell;
 }
 
 - (instancetype)init {
@@ -70,7 +72,7 @@ NSString * const ConnectOnDemandCellSpecifierKey = @"vpnOnDemand";
 
     __weak SettingsViewController *weakSelf = self;
 
-    __block RACDisposable *disposable = [[AppDelegate sharedAppDelegate].subscriptionStatus
+    __block RACDisposable *subscriptionStatusDisposable = [[AppDelegate sharedAppDelegate].subscriptionStatus
       subscribeNext:^(NSNumber *value) {
           UserSubscriptionStatus s = (UserSubscriptionStatus) [value integerValue];
 
@@ -79,12 +81,20 @@ NSString * const ConnectOnDemandCellSpecifierKey = @"vpnOnDemand";
           [weakSelf updateHiddenKeys];
 
       } error:^(NSError *error) {
-          [weakSelf.compoundDisposable removeDisposable:disposable];
+          [weakSelf.compoundDisposable removeDisposable:subscriptionStatusDisposable];
       } completed:^{
-          [weakSelf.compoundDisposable removeDisposable:disposable];
+          [weakSelf.compoundDisposable removeDisposable:subscriptionStatusDisposable];
       }];
 
-    [self.compoundDisposable addDisposable:disposable];
+    [self.compoundDisposable addDisposable:subscriptionStatusDisposable];
+
+    __block RACDisposable *tunnelStatusDisposable = [[VPNManager sharedInstance].lastTunnelStatus
+                                                     subscribeNext:^(NSNumber *statusObject) {
+                                                         self.vpnStatus = (VPNStatus) [statusObject integerValue];
+                                                         [weakSelf updateUIConnectionState];
+                                                     }];
+
+    [self.compoundDisposable addDisposable:tunnelStatusDisposable];
 }
 
 - (void)updateHiddenKeys {
@@ -171,6 +181,19 @@ NSString * const ConnectOnDemandCellSpecifierKey = @"vpnOnDemand";
     connectOnDemandCell.detailTextLabel.text = subscriptionOnlySubtitle;
 }
 
+- (void)updateUIConnectionState {
+    [self updateReinstallVPNProfileCell];
+}
+
+- (void)updateReinstallVPNProfileCell {
+    if (reinstallVPNProfileCell) {
+        BOOL enableReinstallVPNProfileCell = self.vpnStatus == VPNStatusDisconnected || self.vpnStatus == VPNStatusInvalid;
+        reinstallVPNProfileCell.userInteractionEnabled = enableReinstallVPNProfileCell;
+        reinstallVPNProfileCell.textLabel.enabled = enableReinstallVPNProfileCell;
+        reinstallVPNProfileCell.detailTextLabel.enabled = enableReinstallVPNProfileCell;
+    }
+}
+
 #pragma mark - Table constuctor methods
 
 - (void)settingsViewController:(IASKAppSettingsViewController*)sender tableView:(UITableView *)tableView didSelectCustomViewSpecifier:(IASKSpecifier*)specifier {
@@ -181,6 +204,7 @@ NSString * const ConnectOnDemandCellSpecifierKey = @"vpnOnDemand";
         [self openPsiCashViewController];
     } else if ([specifier.key isEqualToString:SettingsReinstallVPNConfigurationKey]) {
         [[VPNManager sharedInstance] reinstallVPNConfiguration];
+        [self settingsViewControllerDidEnd:nil];
     }
 }
 
@@ -225,6 +249,9 @@ NSString * const ConnectOnDemandCellSpecifierKey = @"vpnOnDemand";
                                                                   [NSBundle mainBundle],
                                                                   @"Reinstall VPN profile",
                                                                   @"Title of cell in settings menu which, when pressed, reinstalls the user's VPN profile for Psiphon")];
+        reinstallVPNProfileCell = cell;
+        [self updateReinstallVPNProfileCell];
+
     } else if ([specifier.key isEqualToString:SettingsPsiCashCellSpecifierKey]) {
 
         cell = [super tableView:tableView cellForSpecifier:specifier];

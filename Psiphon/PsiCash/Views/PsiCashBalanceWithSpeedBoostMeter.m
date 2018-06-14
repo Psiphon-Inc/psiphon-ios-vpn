@@ -94,7 +94,7 @@
 
 #pragma mark - animation helpers
 
-+ (void)animateBalanceChangeOf:(NSNumber*)delta withPsiCashView:(PsiCashBalanceWithSpeedBoostMeter*)psiCashView inParentView:(UIView*)parentView {
++ (void)animateBalanceChangeOf:(NSNumber*_Nonnull)delta withPsiCashView:(PsiCashBalanceWithSpeedBoostMeter*)psiCashView inParentView:(UIView*)parentView {
     UILabel *changeLabel = [[UILabel alloc] init];
     changeLabel.textAlignment = NSTextAlignmentLeft;
     changeLabel.adjustsFontSizeToFitWidth = YES;
