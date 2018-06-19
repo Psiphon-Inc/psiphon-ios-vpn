@@ -64,20 +64,20 @@
     switch (self.index) {
         case PsiCashOnboardingPage1Index: {
             [self setGraphicAsCoin];
-            titleView.text = NSLocalizedStringWithDefaultValue(@"PSICASH_ONBOARDING_PAGE_1_TITLE", nil, [NSBundle mainBundle], @"Say hello to PsiCash", @"Title text on the first PsiCash onboarading screen");
-            textView.text = NSLocalizedStringWithDefaultValue(@"PSICASH_ONBOARDING_PAGE_1_TEXT", nil, [NSBundle mainBundle], @"A new way for you to enjoy maximum speeds, absolutely free.", @"Body text on the first PsiCash onboarding screen");
+            titleView.text = NSLocalizedStringWithDefaultValue(@"PSICASH_ONBOARDING_PAGE_1_TITLE", nil, [NSBundle mainBundle], @"Say hello to PsiCash", @"Title text on the first PsiCash onboarding screen. The word 'PsiCash' should not be translated or transliterated. PsiCash is a reward system within Psiphon where users can build up credit that they can then spend on 'Speed Boost' (unlimited connection speed) and, in the future, other rewards.");
+            textView.text = NSLocalizedStringWithDefaultValue(@"PSICASH_ONBOARDING_PAGE_1_TEXT", nil, [NSBundle mainBundle], @"A new way for you to enjoy maximum speeds, absolutely free.", @"Body text on the first PsiCash onboarding screen. This is in reference to the ability to use PsiCash to purchase 'Speed Boost', which grants unlimited network speed through Psiphon.");
             break;
         }
         case PsiCashOnboardingPage2Index: {
             [self setGraphicAsSpeedBoostMeter];
-            titleView.text = NSLocalizedStringWithDefaultValue(@"PSICASH_ONBOARDING_PAGE_2_TITLE", nil, [NSBundle mainBundle], @"Your PsiCash balance", @"Title text on the second PsiCash onboarading screen");
-            textView.text = NSLocalizedStringWithDefaultValue(@"PSICASH_ONBOARDING_PAGE_2_TEXT", nil, [NSBundle mainBundle], @"Connect and engage with our content to earn PsiCash.", @"Body text on the second PsiCash onboarding screen");
+            titleView.text = NSLocalizedStringWithDefaultValue(@"PSICASH_ONBOARDING_PAGE_2_TITLE", nil, [NSBundle mainBundle], @"Your PsiCash balance", @"Title text on the second PsiCash onboarding screen. This shows the user's PsiCash balance, which is the amount of credit they have. Note: 'PsiCash' should not be translated or transliterated.");
+            textView.text = NSLocalizedStringWithDefaultValue(@"PSICASH_ONBOARDING_PAGE_2_TEXT", nil, [NSBundle mainBundle], @"Connect and engage with our content to earn PsiCash.", @"Body text on the second PsiCash onboarding screen. This is telling the user how to earn PsiCash. The user will be rewared for visiting Psiphon-related websites and pages, browsing and interacting with active content. 'Connect' is in the 'Connect to Psiphon' sense; 'engage with our content' is in the sense of 'visit our sites, read our posts, interact and participate with our content'. The English is intentionally somewhat obtuse, but the translation can use whatever works best. Note: 'PsiCash' should not be translated or transliterated.");
             break;
         }
         case PsiCashOnboardingPage3Index: {
             [self setGraphicAsSpeedBoostMeter];
-            titleView.text = NSLocalizedStringWithDefaultValue(@"PSICASH_ONBOARDING_PAGE_3_TITLE", nil, [NSBundle mainBundle], @"Speed Boost", @"Title text on the third PsiCash onboarading screen");
-            textView.text = NSLocalizedStringWithDefaultValue(@"PSICASH_ONBOARDING_PAGE_3_TEXT", nil, [NSBundle mainBundle], @"When you've collected enough PsiCash, you can activate Speed Boost and enjoy Psiphon at max speed!", @"Body text on the third PsiCash onboarding screen");
+            titleView.text = NSLocalizedStringWithDefaultValue(@"PSICASH_ONBOARDING_PAGE_3_TITLE", nil, [NSBundle mainBundle], @"Speed Boost", @"Title text on the third PsiCash onboarding screen. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed.");
+            textView.text = NSLocalizedStringWithDefaultValue(@"PSICASH_ONBOARDING_PAGE_3_TEXT", nil, [NSBundle mainBundle], @"When you've collected enough PsiCash, you can activate Speed Boost and enjoy Psiphon at max speed!", @"Body text on the third PsiCash onboarding screen. This indicates that 'Speed Boost' can be purchased with PsiCash credit after earning a sufficient amount. Note: 'PsiCash' should not be translated or transliterated.");
             break;
         }
         default:

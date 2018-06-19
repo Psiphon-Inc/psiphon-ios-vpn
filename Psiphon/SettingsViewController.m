@@ -256,11 +256,7 @@ NSString * const ConnectOnDemandCellSpecifierKey = @"vpnOnDemand";
 
         cell = [super tableView:tableView cellForSpecifier:specifier];
         [cell setAccessoryType:UITableViewCellAccessoryDisclosureIndicator];
-        [cell.textLabel setText:NSLocalizedStringWithDefaultValue(@"SETTINGS_PSICASH_CELL_TITLE",
-                                                                  nil,
-                                                                  [NSBundle mainBundle],
-                                                                  @"PsiCash",
-                                                                  @"Title of cell in settings menu which, when pressed, launches the PsiCash onboarding")];
+        [cell.textLabel setText:@"PsiCash"];
 
     }
 
