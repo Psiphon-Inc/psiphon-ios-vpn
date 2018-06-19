@@ -17,6 +17,18 @@
  *
  */
 
+/**
+ * Note on using `unsafeSubscribeOnSerialQueue` method of RACSignal+Operations2:
+ *
+ * - To avoid possible corruptions of the VPN configuration, the operations performed on the configurations
+ *   should be performed serially. (That is the sequence of sub-operations in two different larger operations
+ *   performed on the VPN configuration shouldn't interleave.)
+ *
+ *   `unsafeSubscribeOnSerialQueue` allows us to do that, with the caveat that when this signal is subscribed to,
+ *   no other signal that's also subscribed on with `unsafeSubscribeOnSerialQueue` should be subscribed to.
+ *
+ */
+
 #import <ReactiveObjC/RACScheduler.h>
 #import <ReactiveObjC/RACTuple.h>
 #import "VPNManager.h"
@@ -40,10 +52,13 @@
 #import "RACQueueScheduler+Subclass.h"
 #import "DispatchUtils.h"
 #import "RACTargetQueueScheduler.h"
+#import "UnionSerialQueue.h"
 
 NSErrorDomain const VPNManagerErrorDomain = @"VPNManagerErrorDomain";
 
 PsiFeedbackLogType const VPNManagerLogType = @"VPNManager";
+
+UserDefaultsKey const VPNManagerConnectOnDemandUntilNextStartBoolKey = @"VPNManager.ConnectOnDemandUntilNextStartKey";
 
 @interface VPNManager ()
 
@@ -58,10 +73,7 @@ PsiFeedbackLogType const VPNManagerLogType = @"VPNManager";
 // Private properties
 @property (getter=tunnelProviderManager, setter=setTunnelProviderManager:) NETunnelProviderManager *tunnelProviderManager;
 
-@property (nonatomic) NSOperationQueue *serialOperationQueue;
-@property (nonatomic) RACTargetQueueScheduler *serialQueueScheduler;
-
-@property (nonatomic) Notifier *notifier;
+@property (nonatomic) UnionSerialQueue *serialQueue;
 
 @property (atomic) BOOL restartRequired;
 @property (atomic) BOOL extensionIsZombie;
@@ -96,19 +108,11 @@ PsiFeedbackLogType const VPNManagerLogType = @"VPNManager";
         [_internalTunnelStatus sendNext:@(VPNStatusInvalid)];
 
         _restartRequired = FALSE;
-        _notifier = [[Notifier alloc] initWithAppGroupIdentifier:APP_GROUP_IDENTIFIER];
 
         _restartRequired = FALSE;
         _extensionIsZombie = FALSE;
 
-        NSString *queueName = @"ca.psiphon.Psiphon.VPNManagerSerialQueue";
-        serialDispatchQueue = dispatch_queue_create([queueName UTF8String], DISPATCH_QUEUE_SERIAL);
-        
-        _serialOperationQueue = [[NSOperationQueue alloc] init];
-        _serialOperationQueue.maxConcurrentOperationCount = 1;
-        _serialOperationQueue.underlyingQueue = serialDispatchQueue;
-
-        _serialQueueScheduler = [[RACTargetQueueScheduler alloc] initWithName:queueName targetQueue:serialDispatchQueue];
+        _serialQueue = [UnionSerialQueue createWithLabel:@"ca.psiphon.Psiphon.VPNManagerSerialQueue"];
 
         // Public properties.
         __weak VPNManager *weakSelf = self;
@@ -191,7 +195,7 @@ PsiFeedbackLogType const VPNManagerLogType = @"VPNManager";
                           weakSelf.restartRequired) {
 
                           // Schedule the tunnel to be restarted.
-                          [weakSelf.serialOperationQueue addOperationWithBlock:^{
+                          [weakSelf.serialQueue.operationQueue addOperationWithBlock:^{
                               weakSelf.restartRequired = FALSE;
                               [weakSelf startTunnel];
                           }];
@@ -214,15 +218,11 @@ PsiFeedbackLogType const VPNManagerLogType = @"VPNManager";
 
         // Adds loading VPN operation to `serialOperationQueue` before returning shared instance.
         __block RACDisposable *disposable = [[[VPNManager loadTunnelProviderManager]
-          unsafeSubscribeOnSerialQueue:instance.serialOperationQueue scheduler:instance.serialQueueScheduler]
+          unsafeSubscribeOnSerialQueue:instance.serialQueue
+                              withName:@"initOperation"]
           subscribeNext:^(NETunnelProviderManager *tunnelProvider) {
               if (tunnelProvider) {
                   instance.tunnelProviderManager = tunnelProvider;
-
-                  // If Connect On Demand setting was changed since the last time the app was opened,
-                  // reset user's preference to the same state as the VPN Configuration.
-                  [[NSUserDefaults standardUserDefaults]
-                    setBool:instance.tunnelProviderManager.isOnDemandEnabled forKey:SettingsConnectOnDemandBoolKey];
               }
           }
           error:^(NSError *error) {
@@ -250,7 +250,7 @@ PsiFeedbackLogType const VPNManagerLogType = @"VPNManager";
         case VPNStatusRestarting: return @"restarting";
         case VPNStatusZombie: return @"zombie";
 
-        default: return [NSString stringWithFormat:@"invalid status (%d)", status];
+        default: return [NSString stringWithFormat:@"invalid status (%ld)", (long)status];
     }
 }
 
@@ -264,7 +264,7 @@ PsiFeedbackLogType const VPNManagerLogType = @"VPNManager";
         case NEVPNStatusReasserting: return @"reasserting";
         case NEVPNStatusDisconnecting: return @"disconnecting";
 
-        default: return [NSString stringWithFormat:@"invalid status (%d)", status];
+        default: return [NSString stringWithFormat:@"invalid status (%ld)", (long)status];
     }
 }
 
@@ -306,39 +306,14 @@ PsiFeedbackLogType const VPNManagerLogType = @"VPNManager";
 
     __weak VPNManager *weakSelf = self;
 
-    __block RACDisposable *disposable = [[[[[[[VPNManager loadTunnelProviderManager]
-      map:^NETunnelProviderManager *(NETunnelProviderManager *providerManager) {
-
-          if (!providerManager) {
-              NETunnelProviderProtocol *providerProtocol = [[NETunnelProviderProtocol alloc] init];
-              providerProtocol.providerBundleIdentifier = @"ca.psiphon.Psiphon.PsiphonVPN";
-              providerProtocol.serverAddress = @"localhost";
-
-              providerManager = [[NETunnelProviderManager alloc] init];
-              providerManager.protocolConfiguration = providerProtocol;
-          }
-
-          // setEnabled becomes false if the user changes the
-          // enabled VPN Configuration from the preferences.
-          providerManager.enabled = TRUE;
-
-          // Adds "always connect" Connect On Demand rule to the configuration.
-          if (!providerManager.onDemandRules || [providerManager.onDemandRules count] == 0) {
-              NEOnDemandRule *alwaysConnectRule = [NEOnDemandRuleConnect new];
-              providerManager.onDemandRules = @[alwaysConnectRule];
-          }
-
-          return providerManager;
-      }]
-      flattenMap:^RACSignal *(NETunnelProviderManager *providerManager) {
-          return [RACSignal defer:providerManager selectorWithErrorCallback:@selector(saveToPreferencesWithCompletionHandler:)];
-      }]
-      flattenMap:^RACSignal *(NETunnelProviderManager *providerManager) {
-          return [RACSignal defer:providerManager selectorWithErrorCallback:@selector(loadFromPreferencesWithCompletionHandler:)];
+    __block RACDisposable *disposable = [[[[[VPNManager loadTunnelProviderManager]
+      flattenMap:^RACSignal *(NETunnelProviderManager *_Nullable providerManager) {
+          // Updates VPN configuration parameters if it already exists,
+          // otherwise creates a new VPN configuration.
+          return [weakSelf updateOrCreateVPNConfigurationAndSave:providerManager];
       }]
       flattenMap:^RACSignal<NSNumber *> *(NETunnelProviderManager *providerManager) {
 
-          weakSelf.tunnelProviderManager = providerManager;
           NSError *error;
           NSDictionary *options = @{EXTENSION_OPTION_START_FROM_CONTAINER: EXTENSION_OPTION_TRUE};
           [weakSelf.tunnelProviderManager.connection startVPNTunnelWithOptions:options andReturnError:&error];
@@ -350,7 +325,8 @@ PsiFeedbackLogType const VPNManagerLogType = @"VPNManager";
           }
 
       }]
-      unsafeSubscribeOnSerialQueue:self.serialOperationQueue scheduler:self.serialQueueScheduler]
+      unsafeSubscribeOnSerialQueue:self.serialQueue
+                          withName:@"startTunnelOperation"]
       subscribeError:^(NSError *error) {
           [PsiFeedbackLogger errorWithType:VPNManagerLogType message:@"failed to start" object:error];
 
@@ -378,7 +354,8 @@ PsiFeedbackLogType const VPNManagerLogType = @"VPNManager";
     __weak VPNManager *weakSelf = self;
 
     __block RACDisposable *disposable = [[[self deferredTunnelProviderManager]
-      unsafeSubscribeOnSerialQueue:self.serialOperationQueue scheduler:self.serialQueueScheduler]
+      unsafeSubscribeOnSerialQueue:self.serialQueue
+                          withName:@"startVPNOperation"]
       subscribeNext:^(NETunnelProviderManager *_Nullable providerManager) {
 
           if (!providerManager) {
@@ -386,7 +363,7 @@ PsiFeedbackLogType const VPNManagerLogType = @"VPNManager";
           }
 
           if (providerManager.connection.status == NEVPNStatusConnecting) {
-              [weakSelf.notifier post:NOTIFIER_START_VPN];
+              [[Notifier sharedInstance] post:NotifierStartVPN];
           }
 
       } error:^(NSError *error) {
@@ -403,7 +380,8 @@ PsiFeedbackLogType const VPNManagerLogType = @"VPNManager";
     __weak VPNManager *weakSelf = self;
 
     __block RACDisposable *disposable = [[[self deferredTunnelProviderManager]
-      unsafeSubscribeOnSerialQueue:self.serialOperationQueue scheduler:self.serialQueueScheduler]
+      unsafeSubscribeOnSerialQueue:self.serialQueue
+                          withName:@"stopVPNOperation"]
       subscribeNext:^(NETunnelProviderManager *_Nullable providerManager) {
 
           [providerManager.connection stopVPNTunnel];
@@ -425,7 +403,8 @@ PsiFeedbackLogType const VPNManagerLogType = @"VPNManager";
     __weak VPNManager *weakSelf = self;
 
     __block RACDisposable *disposable = [[[self deferredTunnelProviderManager]
-      unsafeSubscribeOnSerialQueue:self.serialOperationQueue scheduler:self.serialQueueScheduler]
+      unsafeSubscribeOnSerialQueue:self.serialQueue
+                          withName:@"restartVPNIfActiveOperation"]
       subscribeNext:^(NETunnelProviderManager *_Nullable providerManager) {
           if (!providerManager) {
               return;
@@ -439,6 +418,36 @@ PsiFeedbackLogType const VPNManagerLogType = @"VPNManager";
           }
 
       } error:^(NSError *error) {
+          [weakSelf.compoundDisposable removeDisposable:disposable];
+      } completed:^{
+          [weakSelf.compoundDisposable removeDisposable:disposable];
+      }];
+
+    [self.compoundDisposable addDisposable:disposable];
+}
+
+// Removes and re-installs the VPN configuration.
+// TODO: signal the state of the operation to the UI world.
+- (void)reinstallVPNConfiguration {
+
+    __weak VPNManager *weakSelf = self;
+
+    __block RACDisposable *disposable = [[[[[VPNManager loadTunnelProviderManager]
+      flattenMap:^RACSignal *(NETunnelProviderManager *providerManager) {
+          // Removes the VPN configuration (if already installed).
+          if (providerManager) {
+              return [RACSignal defer:providerManager selectorWithErrorCallback:@selector(removeFromPreferencesWithCompletionHandler:)];
+          }
+          return [RACSignal return:nil];
+      }]
+      flattenMap:^RACSignal *(id x) {
+          // Installs the VPN configuration.
+          return [weakSelf updateOrCreateVPNConfigurationAndSave:nil];
+      }]
+      unsafeSubscribeOnSerialQueue:self.serialQueue
+                          withName:@"reinstallVPNConfigurationOperation"]
+      subscribeError:^(NSError *error) {
+          [PsiFeedbackLogger errorWithType:VPNManagerLogType message:@"failed to reinstall VPN configuration" object:error];
           [weakSelf.compoundDisposable removeDisposable:disposable];
       } completed:^{
           [weakSelf.compoundDisposable removeDisposable:disposable];
@@ -485,7 +494,8 @@ PsiFeedbackLogType const VPNManagerLogType = @"VPNManager";
               return [NSNumber numberWithBool:FALSE];
           }
       }]
-      unsafeSubscribeOnSerialQueue:self.serialOperationQueue scheduler:self.serialQueueScheduler];
+      unsafeSubscribeOnSerialQueue:self.serialQueue
+                          withName:@"isConnectOnDemandEnabled"];
 }
 
 // setConnectOnDemandEnabled: returns a signal that when subscribed to updates tunnelProviderManager's
@@ -537,7 +547,8 @@ PsiFeedbackLogType const VPNManagerLogType = @"VPNManager";
           [PsiFeedbackLogger errorWithType:VPNManagerLogType message:@"error setting OnDemandEnabled" object:error];
           return [RACSignal return:[NSNumber numberWithBool:FALSE]];
       }]
-      unsafeSubscribeOnSerialQueue:self.serialOperationQueue scheduler:self.serialQueueScheduler];
+      unsafeSubscribeOnSerialQueue:self.serialQueue
+                          withName:@"setConnectOnDemandEnabledOperation"];
 }
 
 + (BOOL)mapIsVPNActive:(VPNStatus)s {
@@ -632,6 +643,58 @@ PsiFeedbackLogType const VPNManagerLogType = @"VPNManager";
       }];
 }
 
+// Returns a signal that when subscribed to, creates and saves VPN configuration if nil is passed.
+// Otherwise, updates appropriate properties in the provided VPN configuration and saves it.
+// NOTE: since this signal modifies the VPN configuration, the returned signal should be subscribed on using
+//       `unsafeSubscribeOnSerialQueue`.
+- (RACSignal<NETunnelProviderManager *> *)updateOrCreateVPNConfigurationAndSave:(NETunnelProviderManager *_Nullable)providerManager {
+
+    __weak VPNManager *weakSelf = self;
+
+    return [[[[[RACSignal return:providerManager]
+      map:^NETunnelProviderManager *(NETunnelProviderManager *providerManager) {
+
+          if (!providerManager) {
+              NETunnelProviderProtocol *providerProtocol = [[NETunnelProviderProtocol alloc] init];
+              providerProtocol.providerBundleIdentifier = @"ca.psiphon.Psiphon.PsiphonVPN";
+              providerProtocol.serverAddress = @"localhost";
+
+              providerManager = [[NETunnelProviderManager alloc] init];
+              providerManager.protocolConfiguration = providerProtocol;
+          }
+
+          // setEnabled becomes false if the user changes the
+          // enabled VPN Configuration from the preferences.
+          providerManager.enabled = TRUE;
+
+          // Adds "always connect" Connect On Demand rule to the configuration.
+          if (!providerManager.onDemandRules || [providerManager.onDemandRules count] == 0) {
+              NEOnDemandRule *alwaysConnectRule = [NEOnDemandRuleConnect new];
+              providerManager.onDemandRules = @[alwaysConnectRule];
+          }
+
+          NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
+          if ([ud boolForKey:VPNManagerConnectOnDemandUntilNextStartBoolKey]) {
+              providerManager.onDemandEnabled = TRUE;
+
+              // Reset VPNManagerConnectOnDemandUntilNextStartBoolKey value.
+              [ud setBool:FALSE forKey:VPNManagerConnectOnDemandUntilNextStartBoolKey];
+          }
+
+          return providerManager;
+      }]
+      flattenMap:^RACSignal *(NETunnelProviderManager *providerManager) {
+          return [RACSignal defer:providerManager selectorWithErrorCallback:@selector(saveToPreferencesWithCompletionHandler:)];
+      }]
+      flattenMap:^RACSignal *(NETunnelProviderManager *providerManager) {
+          return [RACSignal defer:providerManager selectorWithErrorCallback:@selector(loadFromPreferencesWithCompletionHandler:)];
+      }]
+      map:^id(NETunnelProviderManager *providerManager) {
+          weakSelf.tunnelProviderManager = providerManager;
+          return providerManager;
+      }];
+}
+
 #pragma mark - Extension Query
 
 // isPsiphonTunnelConnected returns a signal that when subscribed to sends "isProviderZombie" query to the extension
@@ -694,7 +757,8 @@ PsiFeedbackLogType const VPNManagerLogType = @"VPNManager";
 
           return nil;
       }]
-      unsafeSubscribeOnSerialQueue:self.serialOperationQueue scheduler:self.serialQueueScheduler];
+      unsafeSubscribeOnSerialQueue:self.serialQueue
+                          withName:[NSString stringWithFormat:@"queryActiveVPNOperation[%@]", query]];
 }
 
 // sendProviderSessionMessage:session: returns a signal that when subscribed to sends message to the tunnel provider

@@ -18,31 +18,27 @@
  */
 
 #import "SettingsViewController.h"
+#import "AppDelegate.h"
 #import "IAPStoreHelper.h"
 #import "IAPViewController.h"
-#import "VPNManager.h"
-#import "AppDelegate.h"
+#import "PsiCashOnboardingViewController.h"
 #import "RACSignal.h"
 #import "RACCompoundDisposable.h"
 #import "RACReplaySubject.h"
 #import "RACSignal+Operations.h"
-
-// NSUserDefaults keys
-/**
- * SettingsConnectOnDemandBoolKey represents user's preference for Connect On Demand.
- * This preference should not be displayed to the user directly, and only the VPN configuration
- * saved Connect On Demand value should be displayed to user.
- */
-UserDefaultsKey const SettingsConnectOnDemandBoolKey = @"SettingsViewController.ConnectOnDemandKey";
+#import "VPNManager.h"
 
 // Specifier keys for cells in settings menu
 // These keys are defined in Psiphon/InAppSettings.bundle/Root.inApp.plist
 NSString * const SettingsSubscriptionCellSpecifierKey = @"settingsSubscription";
+NSString * const SettingsPsiCashCellSpecifierKey = @"settingsPsiCash";
+NSString * const SettingsReinstallVPNConfigurationKey = @"settingsReinstallVPNConfiguration";
 NSString * const ConnectOnDemandCellSpecifierKey = @"vpnOnDemand";
 
 @interface SettingsViewController ()
 
 @property (assign) BOOL hasActiveSubscription;
+@property (assign) VPNStatus vpnStatus;
 
 @property (nonatomic) RACCompoundDisposable *compoundDisposable;
 
@@ -56,6 +52,7 @@ NSString * const ConnectOnDemandCellSpecifierKey = @"vpnOnDemand";
     // Connect On Demand row
     UISwitch *connectOnDemandToggle;
     UITableViewCell *connectOnDemandCell;
+    UITableViewCell *reinstallVPNProfileCell;
 }
 
 - (instancetype)init {
@@ -75,30 +72,50 @@ NSString * const ConnectOnDemandCellSpecifierKey = @"vpnOnDemand";
 
     __weak SettingsViewController *weakSelf = self;
 
-    __block RACDisposable *disposable = [[AppDelegate sharedAppDelegate].subscriptionStatus
+    __block RACDisposable *subscriptionStatusDisposable = [[AppDelegate sharedAppDelegate].subscriptionStatus
       subscribeNext:^(NSNumber *value) {
           UserSubscriptionStatus s = (UserSubscriptionStatus) [value integerValue];
 
           weakSelf.hasActiveSubscription = (s == UserSubscriptionActive);
           [weakSelf updateSubscriptionUIElements];
+          [weakSelf updateHiddenKeys];
 
       } error:^(NSError *error) {
-          [weakSelf.compoundDisposable removeDisposable:disposable];
+          [weakSelf.compoundDisposable removeDisposable:subscriptionStatusDisposable];
       } completed:^{
-          [weakSelf.compoundDisposable removeDisposable:disposable];
+          [weakSelf.compoundDisposable removeDisposable:subscriptionStatusDisposable];
       }];
 
-    [self.compoundDisposable addDisposable:disposable];
+    [self.compoundDisposable addDisposable:subscriptionStatusDisposable];
 
+    __block RACDisposable *tunnelStatusDisposable = [[VPNManager sharedInstance].lastTunnelStatus
+                                                     subscribeNext:^(NSNumber *statusObject) {
+                                                         self.vpnStatus = (VPNStatus) [statusObject integerValue];
+                                                         [weakSelf updateUIConnectionState];
+                                                     }];
+
+    [self.compoundDisposable addDisposable:tunnelStatusDisposable];
 }
 
-- (void)viewWillAppear:(BOOL)animated {
+- (void)updateHiddenKeys {
+    NSMutableSet *hiddenKeys = [NSMutableSet setWithSet:self.hiddenKeys];
+     if(![IAPStoreHelper canMakePayments]) {
+         [hiddenKeys addObject:SettingsSubscriptionCellSpecifierKey];
+     }
 
-    if(![IAPStoreHelper canMakePayments]) {
-        self.hiddenKeys = [[NSSet alloc] initWithArray:@[SettingsSubscriptionCellSpecifierKey]];
+    if (self.hasActiveSubscription) {
+        [hiddenKeys addObject:SettingsPsiCashCellSpecifierKey];
     }
+    self.hiddenKeys = hiddenKeys;
+}
 
-    [super viewWillAppear:animated];
+- (void)viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];
+
+    // Navigation bar may have been customized, revert
+    self.navigationController.navigationBar.barTintColor = nil;
+    self.navigationController.navigationBar.tintColor = nil;
+    [self.navigationController.navigationBar setTitleTextAttributes:nil];
 }
 
 #pragma mark - UI update methods
@@ -164,30 +181,44 @@ NSString * const ConnectOnDemandCellSpecifierKey = @"vpnOnDemand";
     connectOnDemandCell.detailTextLabel.text = subscriptionOnlySubtitle;
 }
 
+- (void)updateUIConnectionState {
+    [self updateReinstallVPNProfileCell];
+}
+
+- (void)updateReinstallVPNProfileCell {
+    if (reinstallVPNProfileCell) {
+        BOOL enableReinstallVPNProfileCell = self.vpnStatus == VPNStatusDisconnected || self.vpnStatus == VPNStatusInvalid;
+        reinstallVPNProfileCell.userInteractionEnabled = enableReinstallVPNProfileCell;
+        reinstallVPNProfileCell.textLabel.enabled = enableReinstallVPNProfileCell;
+        reinstallVPNProfileCell.detailTextLabel.enabled = enableReinstallVPNProfileCell;
+    }
+}
+
 #pragma mark - Table constuctor methods
 
 - (void)settingsViewController:(IASKAppSettingsViewController*)sender tableView:(UITableView *)tableView didSelectCustomViewSpecifier:(IASKSpecifier*)specifier {
     [super settingsViewController:self tableView:tableView didSelectCustomViewSpecifier:specifier];
     if ([specifier.key isEqualToString:SettingsSubscriptionCellSpecifierKey]) {
         [self openIAPViewController];
+    } else if ([specifier.key isEqualToString:SettingsPsiCashCellSpecifierKey]) {
+        [self openPsiCashViewController];
+    } else if ([specifier.key isEqualToString:SettingsReinstallVPNConfigurationKey]) {
+        [[VPNManager sharedInstance] reinstallVPNConfiguration];
+        [self settingsViewControllerDidEnd:nil];
     }
 }
 
 - (UITableViewCell*)tableView:(UITableView*)tableView cellForSpecifier:(IASKSpecifier*)specifier {
     UITableViewCell *cell = nil;
-    if (![specifier.key isEqualToString:SettingsSubscriptionCellSpecifierKey] && ![specifier.key isEqualToString:ConnectOnDemandCellSpecifierKey]) {
+    if (![specifier.key isEqualToString:ConnectOnDemandCellSpecifierKey]
+        && ![specifier.key isEqualToString:SettingsPsiCashCellSpecifierKey]
+        && ![specifier.key isEqualToString:SettingsReinstallVPNConfigurationKey]
+        && ![specifier.key isEqualToString:SettingsSubscriptionCellSpecifierKey]) {
         cell = [super tableView:tableView cellForSpecifier:specifier];
         return cell;
     }
 
-    if ([specifier.key isEqualToString:SettingsSubscriptionCellSpecifierKey]) {
-
-        cell = [super tableView:tableView cellForSpecifier:specifier];
-        [cell setAccessoryType:UITableViewCellAccessoryDisclosureIndicator];
-        subscriptionTableViewCell = cell;
-        [self updateSubscriptionCell];
-
-    } else if ([specifier.key isEqualToString:ConnectOnDemandCellSpecifierKey]) {
+    if ([specifier.key isEqualToString:ConnectOnDemandCellSpecifierKey]) {
 
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:@"Cell"];
         cell.selectionStyle = UITableViewCellSelectionStyleNone;
@@ -196,12 +227,41 @@ NSString * const ConnectOnDemandCellSpecifierKey = @"vpnOnDemand";
         [connectOnDemandToggle addTarget:self action:@selector(toggledVpnOnDemandValue:) forControlEvents:UIControlEventValueChanged];
 
         cell.textLabel.text = NSLocalizedStringWithDefaultValue(@"SETTINGS_VPN_ON_DEMAND",
-                                                                     nil,
-                                                                     [NSBundle mainBundle],
-                                                                     @"Auto-start VPN on demand",
-                                                                     @"Automatically start VPN On demand settings toggle");
+                                                                nil,
+                                                                [NSBundle mainBundle],
+                                                                @"Auto-start VPN on demand",
+                                                                @"Automatically start VPN On demand settings toggle");
         connectOnDemandCell = cell;
         [self updateConnectOnDemandCell];
+    } else if ([specifier.key isEqualToString:SettingsSubscriptionCellSpecifierKey]) {
+
+        cell = [super tableView:tableView cellForSpecifier:specifier];
+        [cell setAccessoryType:UITableViewCellAccessoryDisclosureIndicator];
+        subscriptionTableViewCell = cell;
+        [self updateSubscriptionCell];
+
+    } else if ([specifier.key isEqualToString:SettingsReinstallVPNConfigurationKey]) {
+
+        cell = [super tableView:tableView cellForSpecifier:specifier];
+        [cell setAccessoryType:UITableViewCellAccessoryNone];
+        [cell.textLabel setText:NSLocalizedStringWithDefaultValue(@"SETTINGS_REINSTALL_VPN_CONFIGURATION_CELL_TITLE",
+                                                                  nil,
+                                                                  [NSBundle mainBundle],
+                                                                  @"Reinstall VPN profile",
+                                                                  @"Title of cell in settings menu which, when pressed, reinstalls the user's VPN profile for Psiphon")];
+        reinstallVPNProfileCell = cell;
+        [self updateReinstallVPNProfileCell];
+
+    } else if ([specifier.key isEqualToString:SettingsPsiCashCellSpecifierKey]) {
+
+        cell = [super tableView:tableView cellForSpecifier:specifier];
+        [cell setAccessoryType:UITableViewCellAccessoryDisclosureIndicator];
+        [cell.textLabel setText:NSLocalizedStringWithDefaultValue(@"SETTINGS_PSICASH_CELL_TITLE",
+                                                                  nil,
+                                                                  [NSBundle mainBundle],
+                                                                  @"PsiCash",
+                                                                  @"Title of cell in settings menu which, when pressed, launches the PsiCash onboarding")];
+
     }
 
     assert(cell != nil);
@@ -210,8 +270,6 @@ NSString * const ConnectOnDemandCellSpecifierKey = @"vpnOnDemand";
 
 - (void)toggledVpnOnDemandValue:(id)sender {
     UISwitch *toggle = (UISwitch*)sender;
-
-    [[NSUserDefaults standardUserDefaults] setBool:[toggle isOn] forKey:SettingsConnectOnDemandBoolKey];
 
     __weak SettingsViewController *weakSelf = self;
 
@@ -233,6 +291,13 @@ NSString * const ConnectOnDemandCellSpecifierKey = @"vpnOnDemand";
     IAPViewController *iapViewController = [[IAPViewController alloc]init];
     iapViewController.openedFromSettings = YES;
     [self.navigationController pushViewController:iapViewController animated:YES];
+}
+
+#pragma mark - PsiCash
+
+- (void)openPsiCashViewController {
+    PsiCashOnboardingViewController *onboarding = [[PsiCashOnboardingViewController alloc] init];
+    [self presentViewController:onboarding animated:NO completion:nil];
 }
 
 @end

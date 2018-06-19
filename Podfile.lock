@@ -1,4 +1,5 @@
 PODS:
+  - CustomIOSAlertView (0.9.5)
   - Google-Mobile-Ads-SDK (7.25.0)
   - InAppSettingsKit (2.9.4)
   - MBProgressHUD (1.1.0)
@@ -14,19 +15,20 @@ PODS:
     - mopub-ios-sdk/Core
     - mopub-ios-sdk/Moat
   - OpenSSL (1.0.210)
-  - PsiphonClientCommonLibrary (0.2.27):
+  - PsiphonClientCommonLibrary (1.1.0):
     - InAppSettingsKit
   - PureLayout (3.0.2)
   - ReactiveObjC (3.1.0)
   - VungleSDK-iOS (5.3.0)
 
 DEPENDENCIES:
+  - CustomIOSAlertView (~> 0.9.5)
   - Google-Mobile-Ads-SDK (= 7.25.0)
   - InAppSettingsKit (from `https://github.com/Psiphon-Inc/InAppSettingsKit.git`, commit `598c498`)
   - MBProgressHUD (~> 1.1.0)
   - mopub-ios-sdk (= 4.18.0)
   - OpenSSL (= 1.0.210)
-  - PsiphonClientCommonLibrary (from `https://github.com/Psiphon-Inc/psiphon-ios-client-common-library.git`, commit `d543828`)
+  - PsiphonClientCommonLibrary (from `https://github.com/Psiphon-Inc/psiphon-ios-client-common-library.git`, commit `9404b40`)
   - PureLayout (= 3.0.2)
   - ReactiveObjC (from `https://github.com/Psiphon-Inc/ReactiveObjC.git`, commit `b2ac770`)
   - VungleSDK-iOS (= 5.3.0)
@@ -36,7 +38,7 @@ EXTERNAL SOURCES:
     :commit: 598c498
     :git: https://github.com/Psiphon-Inc/InAppSettingsKit.git
   PsiphonClientCommonLibrary:
-    :commit: d543828
+    :commit: 9404b40
     :git: https://github.com/Psiphon-Inc/psiphon-ios-client-common-library.git
   ReactiveObjC:
     :commit: b2ac770
@@ -47,23 +49,24 @@ CHECKOUT OPTIONS:
     :commit: 598c498
     :git: https://github.com/Psiphon-Inc/InAppSettingsKit.git
   PsiphonClientCommonLibrary:
-    :commit: d543828
+    :commit: 9404b40
     :git: https://github.com/Psiphon-Inc/psiphon-ios-client-common-library.git
   ReactiveObjC:
     :commit: b2ac770
     :git: https://github.com/Psiphon-Inc/ReactiveObjC.git
 
 SPEC CHECKSUMS:
+  CustomIOSAlertView: cc4fa8e36219be3fd5ebcd40789f5b4aaae0f38e
   Google-Mobile-Ads-SDK: 113804f266381a30f982ad3c18063d4e0155414f
   InAppSettingsKit: 567ef538698cd6cf3afb9c5529b89a8936fdacb5
   MBProgressHUD: e7baa36a220447d8aeb12769bf0585582f3866d9
   mopub-ios-sdk: 043a81e7e3ccd2b888fec35880b13e2876c16ff3
   OpenSSL: 246ffb948e9d56466727fd318134af35f5aa764e
-  PsiphonClientCommonLibrary: cce096bcecbf7b8a833c7ca0216274e79f38c6c5
+  PsiphonClientCommonLibrary: e03d3547fc8208bdfc7718e4dd7f153665193927
   PureLayout: 4d550abe49a94f24c2808b9b95db9131685fe4cd
   ReactiveObjC: 2a38ea15335de4119d8b17caf1db1484f61db902
   VungleSDK-iOS: af3aa92d0f4a923505a9416646ffef5250592150
 
-PODFILE CHECKSUM: 807d91fd3fd6b9d97b00567d831ae30d5f4de02d
+PODFILE CHECKSUM: 6af6b2d28d2d6e812aee5079dc691bcbceee17a2
 
 COCOAPODS: 1.4.0

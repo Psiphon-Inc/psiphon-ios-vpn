@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, Psiphon Inc.
+ * Copyright (c) 2018, Psiphon Inc.
  * All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -19,95 +19,165 @@
 
 #import <NetworkExtension/NetworkExtension.h>
 #import "Notifier.h"
-#import "Logging.h"
-#import "DispatchUtils.h"
 #import "Asserts.h"
+#import "DispatchUtils.h"
+
+#define PSIPHON_GROUP      @"group.ca.psiphon.Psiphon"
+#define PSIPHON_VPN_GROUP  @"group.ca.psiphon.Psiphon.PsiphonVPN"
+
+PsiFeedbackLogType const NotifierLogType = @"Notifier";
+
+#pragma mark - NotiferMessage values
+
+// Messages sent by the extension.
+NotifierMessage const NotifierNewHomepages           = PSIPHON_VPN_GROUP @".NewHomepages";
+NotifierMessage const NotifierTunnelConnected        = PSIPHON_VPN_GROUP @".TunnelConnected";
+NotifierMessage const NotifierAvailableEgressRegions = PSIPHON_VPN_GROUP @".AvailableEgressRegions";
+NotifierMessage const NotifierMarkedAuthorizations   = PSIPHON_VPN_GROUP @".MarkedAuthorizations";
+
+// Messages sent by the container.
+NotifierMessage const NotifierStartVPN               = PSIPHON_GROUP @".StartVPN";
+NotifierMessage const NotifierForceSubscriptionCheck = PSIPHON_GROUP @".ForceSubscriptionCheck";
+NotifierMessage const NotifierAppEnteredBackground   = PSIPHON_GROUP @".AppEnteredBackground";
+NotifierMessage const NotifierUpdatedAuthorizations  = PSIPHON_GROUP @".UpdatedAuthorizations";
+
+#pragma mark - ObserverTuple data class
+
+// ObserverTuple is a tuple that holds a weak reference to a Notifier class delegate, along
+// with the dispatch queue that the delegate wants to be called on.
+@interface ObserverTuple : NSObject
+@property (nonatomic, weak) id<NotifierObserver> observer;
+@property (nonatomic, assign) dispatch_queue_t callbackQueue;
+@end
+
+@implementation ObserverTuple
+@end
+
+#pragma mark - Notifier
 
 @implementation Notifier {
-    NSMutableDictionary<NSString *, void(^)(NSString *)> *listeners;
-    NSString *appGroupIdentifier;
+    NSMutableArray<ObserverTuple *> *observers;
 }
+
+// Class variables accessible by C functions.
+static Notifier *sharedInstance;
 
 static void cfNotificationCallback(CFNotificationCenterRef center, void *observer, CFStringRef name,
   void const *object, CFDictionaryRef userInfo) {
 
-    NSString *key = (__bridge NSString *) name;
-    Notifier *selfPtr = (__bridge Notifier *) observer;
+    NSString *key = (__bridge NSString *)name;
+    Notifier *selfPtr = (__bridge Notifier *)observer;
     [selfPtr notificationCallback:key];
 }
 
-- (instancetype)initWithAppGroupIdentifier:(NSString *)identifier {
-    self = [super init];
-    if (self) {
-        appGroupIdentifier = identifier;
-        listeners = [[NSMutableDictionary alloc] init];
-    }
-    return self;
+static inline void AddDarwinNotifyObserver(CFNotificationCenterRef center, const void *observer, CFStringRef key) {
+    CFNotificationCenterAddObserver(center,
+      observer,
+      cfNotificationCallback,
+      key,
+      NULL, // The object to observe should be NULL;
+      CFNotificationSuspensionBehaviorDeliverImmediately);
 }
 
-- (void)dealloc {
+- (instancetype)init {
+    observers = [NSMutableArray arrayWithCapacity:1];
+
+    // Add self to Darwin notify center for the given key.
     CFNotificationCenterRef center = CFNotificationCenterGetDarwinNotifyCenter();
-    CFNotificationCenterRemoveEveryObserver(center, (__bridge const void *)self);
+
+    if (!center) {
+        abort();
+    }
+
+    // Notifier instances should add itself as observer for all notifications.
+#if TARGET_IS_EXTENSION
+    // Listens to all messages sent by the container.
+    AddDarwinNotifyObserver(center, (__bridge const void *)self, (__bridge CFStringRef)NotifierStartVPN);
+    AddDarwinNotifyObserver(center, (__bridge const void *)self, (__bridge CFStringRef)NotifierForceSubscriptionCheck);
+    AddDarwinNotifyObserver(center, (__bridge const void *)self, (__bridge CFStringRef)NotifierAppEnteredBackground);
+    AddDarwinNotifyObserver(center, (__bridge const void *)self, (__bridge CFStringRef)NotifierUpdatedAuthorizations);
+#else
+    // Listens to all messages sent by the extension.
+    AddDarwinNotifyObserver(center, (__bridge const void *)self, (__bridge CFStringRef)NotifierNewHomepages);
+    AddDarwinNotifyObserver(center, (__bridge const void *)self, (__bridge CFStringRef)NotifierTunnelConnected);
+    AddDarwinNotifyObserver(center, (__bridge const void *)self, (__bridge CFStringRef)NotifierAvailableEgressRegions);
+    AddDarwinNotifyObserver(center, (__bridge const void *)self, (__bridge CFStringRef)NotifierMarkedAuthorizations);
+#endif
+
+    return self;
 }
 
 # pragma mark - Public
 
-- (void)post:(NSString *)key {
-    CFNotificationCenterRef center = CFNotificationCenterGetDarwinNotifyCenter();
-    if (center) {
-        CFNotificationCenterPostNotification(center, (__bridge CFStringRef)key, NULL, NULL, YES);
++ (instancetype)sharedInstance {
+    static dispatch_once_t once;
+    dispatch_once(&once, ^{
+        sharedInstance = [[Notifier alloc] init];
+    });
+    return sharedInstance;
+}
+
+- (void)registerObserver:(id <NotifierObserver>)observer callbackQueue:(dispatch_queue_t)queue {
+
+    @synchronized (self) {
+
+        __block BOOL alreadyObserving = FALSE;
+
+        [observers enumerateObjectsUsingBlock:^(ObserverTuple *obj, NSUInteger idx, BOOL *stop) {
+            if (obj.observer == observer) {
+                (* stop) = alreadyObserving = TRUE;
+            }
+        }];
+
+        if (!alreadyObserving) {
+            ObserverTuple *tuple = [[ObserverTuple alloc] init];
+            tuple.observer = observer;
+            tuple.callbackQueue = queue;
+
+            [observers addObject:tuple];
+        }
     }
 }
 
-- (void)listenForNotification:(nonnull NSString *)key listener:(nonnull void(^)(NSString *))listener {
-    // Assert that no listener is setup on that key already.
-    PSIAssert(listeners[key] == nil);
+- (void)post:(NotifierMessage)message {
 
-    listeners[key] = listener;
+    dispatch_async_main(^{
+        CFNotificationCenterRef center = CFNotificationCenterGetDarwinNotifyCenter();
+        if (center) {
+            CFNotificationCenterPostNotification(center, (__bridge CFStringRef)message, NULL, NULL, 0);
 
-    // Add self to Darwin notify center for the given key.
-    CFNotificationCenterRef center = CFNotificationCenterGetDarwinNotifyCenter();
-    if (center) {
-        CFNotificationCenterAddObserver(center,
-          (__bridge const void *) self,
-          cfNotificationCallback,
-          (__bridge CFStringRef) key,
-          NULL, // The object to observe should be NULL;
-          CFNotificationSuspensionBehaviorDeliverImmediately);
-    }
-}
+            [PsiFeedbackLogger infoWithType:NotifierLogType message:@"sent [%@]", message];
+        }
+    });
 
-- (void)removeListenerForKey:(nonnull NSString *)key {
-    [listeners removeObjectForKey:key];
-
-    // Remove self from Darwin notify center for the given key.
-    CFNotificationCenterRef center = CFNotificationCenterGetDarwinNotifyCenter();
-    if (center) {
-        CFNotificationCenterRemoveObserver(center,
-          (__bridge const void *) self,
-          (__bridge CFStringRef) key,
-           NULL);
-    }
-}
-
-- (void)removeAllListeners {
-    CFNotificationCenterRef center = CFNotificationCenterGetDarwinNotifyCenter();
-    if (center) {
-        [listeners removeAllObjects];
-        CFNotificationCenterRemoveEveryObserver(center, (__bridge const void *) self);
-    }
 }
 
 #pragma mark - Private
 
-- (void)notificationCallback:(NSString *)key {
+- (void)notificationCallback:(NSString *)message {
 
-    void (^listenerBlock)(NSString *) = [listeners valueForKey:key];
+    [PsiFeedbackLogger infoWithType:NotifierLogType message:@"received [%@]", message];
 
-    if (listenerBlock) {
-        dispatch_async_main(^{
-            listenerBlock(key);
-        });
+    @synchronized (sharedInstance) {
+
+        NSMutableIndexSet *deallocatedDelegates = [NSMutableIndexSet indexSet];
+
+        [sharedInstance->observers enumerateObjectsUsingBlock:^(ObserverTuple *obj, NSUInteger idx, BOOL *stop) {
+            // If delegate has been deallocated, add its index to deallocatedDelegates to be removed later.
+            if (!obj.observer) {
+                [deallocatedDelegates addIndex:idx];
+                return;
+            }
+
+            dispatch_async(obj.callbackQueue, ^{
+                [obj.observer onMessageReceived:(NotifierMessage)message];
+            });
+
+        }];
+
+        // Remove deallocated delegates.
+        [sharedInstance->observers removeObjectsAtIndexes:deallocatedDelegates];
+
     }
 
 }

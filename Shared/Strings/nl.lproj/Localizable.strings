@@ -1,6 +1,3 @@
-/* Active subscription detail text, example: Expires on 2017-01-01 */
-"ACTIVE_SUBSCRIPTION_DETAIL_TEXT" = "Vervalt op %@";
-
 /* Title of the section in the subscription dialog that shows currently active subscription information. */
 "ACTIVE_SUBSCRIPTION_SECTION_TITLE" = "Huidig abonnement";
 
@@ -14,25 +11,22 @@
 "APP_VERSION" = "v.%@";
 
 /* Alert message informing user that the device clock needs to be updated with current time */
-"BAD_CLOCK_ALERT_MESSAGE" = "We hebben vastgesteld dat de tijd op uw apparaat niet is gesynchroniseerd met uw tijdzone. Werk uw klokinstellingen bij en herstart de app opnieuw";
+"BAD_CLOCK_ALERT_MESSAGE" = "We hebben ontdekt de tijd op het apparaat is niet gesynchroniseerd met uw tijdzone. Werk uw klokinstellingen bij en  de app opnieuw herstarten.";
 
 /* Alert message informing user that subscription receipt can not be verified */
-"BAD_RECEIPT_ALERT_MESSAGE" = "Uw abonnement ontvangst kan niet worden geverifieerd. Vernieuw deze en probeer het opnieuw.";
+"BAD_RECEIPT_ALERT_MESSAGE" = "Je abonnement ontvangst kan niet worden geverifieerd. Vernieuw deze en probeer het opnieuw.";
 
 /* Title of button on alert view which shows the progress of the user's buy request. Hitting this button dismisses the alert and the buy request continues processing in the background. */
 "BUY_REQUEST_PROGRESS_ALERT_DISMISS_BUTTON_TITLE" = "Afwijzen";
 
-/* Buy subscription dialog footer text */
-"BUY_SUBSCRIPTIONS_FOOTER_TEXT" = "Een abonnement wordt automatisch verlengd, wat betekent dat het eenmaal gekocht, automatisch wordt verlengd totdat u het 24 uur vóór het einde van de lopende periode annuleert.\n\nJe iTunes Account wordt binnen 24 uur vóór het einde van de huidige periode in rekening gebracht voor verlenging met de kosten van het abonnement.\n\nBeheer uw abonnement en automatische verlenging door naar uw accountinstellingen te gaan.";
-
 /* Premium subscriptions dialog header text */
 "BUY_SUBSCRIPTIONS_HEADER_TEXT" = "Verwijder advertenties en surf sneller met een premium abonnement op internet!";
 
-/* Alert Cancel button */
-"CANCEL_BUTTON" = "Annuleren";
+/* Buy subscription dialog footer text */
+"BUY_SUBSCRIPTIONS_NOTICES" = "Een abonnement wordt automatisch verlengd, wat betekent dat zodra het gekocht wordt automatisch verlengd tot u annuleer het 24 uur voorafgaand aan het einde van de huidige periode.\n\nUw iTunes-account wordt in rekening gebracht voor vernieuwing binnen 24 uur voor het einde van de lopende periode met de kosten van het abonnement.";
 
 /* Alert message informing user that their subscription has expired or that they're not a subscriber, therefore Psiphon can only be started from the Psiphon app. DO NOT translate 'Psiphon'. */
-"CANNOT_START_TUNNEL_DUE_TO_SUBSCRIPTION" = "Je Psiphon-abonnement is verlopen.\nOmdat u geen abonnee bent of uw abonnement is verlopen, kan Psiphon alleen worden gestart vanuit de Psiphon-app.\n";
+"CANNOT_START_TUNNEL_DUE_TO_SUBSCRIPTION" = "Je Psiphon-abonnement is verlopen.\nOmdat u geen abonnee bent of uw abonnement is verlopen, kan Psiphon alleen worden gestart vanuit de Psiphon-app.\n\nOpen alstublieft de Psiphon-app.";
 
 /* Text above change region button that allows user to select their desired server region */
 "CHANGE_REGION" = "Wijzigen regio";
@@ -40,8 +34,8 @@
 /* Main text in the 'Upstream Proxy Error' dialog box. This is shown when the user has directly altered these settings, and those settings are (probably) erroneous. DO NOT translate 'Psiphon'. */
 "CHECK_UPSTREAM_PROXY_SETTING" = "U hebt Psiphon geconfigureerd om een upstream-proxy te gebruiken.\nWe lijken echter geen verbinding te kunnen maken met een Psiphon-server via die proxy.\nCorrigeer de instellingen en probeer het opnieuw.";
 
-/* Alert dialog body informing the user that the 'Auto-start VPN on demand' feature is enabled and that the VPN cannot be stopped. Followed by asking the user if they would like to disable the 'Auto-start VPN on demand' feature, and stop the VPN. */
-"CONNECT_ON_DEMAND_ALERT_BODY" = "Kan de VPN niet stoppen terwijl \"Auto-start VPN\" is ingeschakeld.\nWilt u \"Auto-start VPN\" op aanvraag uitschakelen en de VPN stoppen?";
+/* Alert dialog body informing the user that the 'Auto-start VPN on demand' feature will be disabled and that the VPN cannot be stopped. */
+"CONNECT_ON_DEMAND_ALERT_BODY" = "\"Auto-start VPN\" zal tijdelijk worden uitgeschakeld tot de volgende keer dat Psiphon VPN is gestart.";
 
 /* Alert dialog title informing user that 'Auto-start VPN' feature is enabled */
 "CONNECT_ON_DEMAND_ALERT_TITLE" = "Auto-start VPN is ingeschakeld";
@@ -50,35 +44,38 @@
 "CORRUPT_SETTINGS_ALERT_TITLE" = "Corrupte Instellingen";
 
 /* Alert dialog message informing the user that the settings file in the app is corrupt, and that they can potentially fix this issue by re-installing the app. */
-"CORRUPT_SETTINGS_MESSAGE" = "Uw app-instellingen bestand lijkt corrupt. Probeer de app opnieuw te installeren om het bestand te herstellen.";
-
-/* Disable Auto-start VPN feature and Stop the VPN button label */
-"DISABLE_BUTTON" = "Uitschakelen Auto-Start VPN en stop";
+"CORRUPT_SETTINGS_MESSAGE" = "Je app-instellingen bestand lijkt corrupt. Probeer de app opnieuw te installeren om het bestand te herstellen.";
 
 /* Title of the button that dismisses region selection dialog
    Title of the button that dismisses the subscriptions menu */
 "DONE_ACTION" = "Klaar";
 
-/*[UNTRANSLATED] Alert dialog message indicating to the user that the app has failed to upload their feedback and that they should try again.  */
-"FEEDBACK_UPLOAD_FAILED_MESSAGE" = "An error occured while uploading your feedback. Please try again. Your feedback helps us improve the Psiphon network.";
+/* Alert dialog message indicating to the user that the app has failed to upload their feedback and that they should try again.  */
+"FEEDBACK_UPLOAD_FAILED_MESSAGE" = "Er is een fout opgetreden bij het uploaden van uw feedback. Probeer het opnieuw. Uw feedback helpt ons het Psiphon-netwerk te verbeteren.";
 
-/*[UNTRANSLATED] Alert dialog title indicating to the user that the app has failed to upload their feedback to Psiphon's servers. */
-"FEEDBACK_UPLOAD_FAILED_TITLE" = "Feedback upload failed";
+/* Alert dialog title indicating to the user that the app has failed to upload their feedback to Psiphon's servers. */
+"FEEDBACK_UPLOAD_FAILED_TITLE" = "Feedback upload mislukt";
 
 /* Title of button on alert view which shows the progress of the users feedback being uploaded to Psiphon's servers. Hitting this button dismisses the alert and the upload continues in the background. */
 "FEEDBACK_UPLOAD_IN_PROGRESS_BACKGROUND_BUTTON_TITLE" = "achtergrond";
 
-/*[UNTRANSLATED] Alert dialog title indicating to the user that their feedback is being encrypted and securely uploaded to Psiphon's servers. */
-"FEEDBACK_UPLOAD_IN_PROGRESS_MESSAGE" = "Sending feedback…";
+/* Alert dialog title indicating to the user that their feedback is being encrypted and securely uploaded to Psiphon's servers. */
+"FEEDBACK_UPLOAD_IN_PROGRESS_MESSAGE" = "Verstuur Feedback...";
 
-/*[UNTRANSLATED] Alert dialog message thanking the user for helping improve the Psiphon network by submitting their feedback. */
-"FEEDBACK_UPLOAD_SUCCESSFUL_MESSAGE" = "Thank you for helping improve Psiphon!";
+/* Alert dialog message thanking the user for helping improve the Psiphon network by submitting their feedback. */
+"FEEDBACK_UPLOAD_SUCCESSFUL_MESSAGE" = "Bedankt voor het helpen verbeteren van Psiphon!";
 
-/*[UNTRANSLATED] Alert dialog title indicating to the user that their feedback has been successfully uploaded to Psiphon's servers. */
-"FEEDBACK_UPLOAD_SUCCESSFUL_TITLE" = "Feedback uploaded successfully";
+/* Alert dialog title indicating to the user that their feedback has been successfully uploaded to Psiphon's servers. */
+"FEEDBACK_UPLOAD_SUCCESSFUL_TITLE" = "Feedback is succesvol geüpload";
+
+/*[UNTRANSLATED] External link to the license page. Please update this with the correct language specific link (if available) e.g. https://psiphon.ca/fr/license.html for french. */
+"LICENSE_PAGE_URL" = "https://psiphon.ca/en/license.html";
 
 /* Text displayed while app loads */
 "LOADING" = "Laden...";
+
+/* Manage subscription button */
+"MANAGE_SUBSCRIPTIONS_BUTTON" = "Beheer mijn abonnement";
 
 /* Alert title informing user there is no internet connection */
 "NO_INTERNET" = "Geen Internet Verbinding";
@@ -86,14 +83,72 @@
 /* Subscriptions view text that is visible when the list of subscriptions is not available */
 "NO_PRODUCTS_TEXT" = "Kan geen abonnementen ophalen uit de App Store. Haal om te vernieuwen of probeer het later opnieuw.";
 
-/*[UNTRANSLATED] Alert OK Button */
+/*[UNTRANSLATED] Alert OK Button
+   OK button title */
 "OK_BUTTON" = "OK";
 
 /* Alert message informing the user they should open the app to finish connecting to the VPN. DO NOT translate 'Psiphon'. */
 "OPEN_PSIPHON_APP" = "A.u.b open de Psiphon-app om de verbinding te voltooien.";
 
+/* Cancel button title. */
+"PRIVACY_POLICY_CANCEL_BUTTON" = "Annuleren";
+
 /*[UNTRANSLATED] External link to the privacy policy page. Please update this with the correct language specific link (if available) e.g. https://psiphon.ca/fr/privacy.html for french. */
 "PRIVACY_POLICY_URL" = "https://psiphon.ca/en/privacy.html";
+
+/* Paragraph text in the 'What does Psiphon do with your VPN data?' subsection of the 'User VPN Data' section of the Privacy page. */
+"PrivacyInformationCollectedVpndataWhatdoespsiphondowithPara1" = "Psiphon bekijkt uw gegevens slechts in de mate die nodig is om statistieken te verzamelen over het gebruik van ons systeem. We registreren de totale bytes die voor een gebruikersverbinding zijn overgedragen, evenals de bytes die voor sommige specifieke domeinen zijn overgedragen. Deze statistieken worden na 60 dagen weggegooid.";
+
+/* Paragraph text in the 'What does Psiphon do with your VPN data?' subsection of the 'User VPN Data' section of the Privacy page. */
+"PrivacyInformationCollectedVpndataWhatdoespsiphondowithPara2" = "Psiphon inspecteert of registreert geen volledige URL's (alleen domeinnamen) en inspecteert uw gegevens niet verder. Psiphon wijzigt uw gegevens niet terwijl deze door de VPN gaan.";
+
+/* Paragraph text in the 'What does Psiphon do with your VPN data?' subsection of the 'User VPN Data' section of the Privacy page. */
+"PrivacyInformationCollectedVpndataWhatdoespsiphondowithPara3" = "Zelfs deze ruwe gegevens zijn moeilijk terug te koppelen, omdat we uw IP-adres onmiddellijk omzetten in geografische informatie en vervolgens het IP-adres weggooien. Evenmin wordt enige andere identificerende informatie opgeslagen.";
+
+/* Sub-heading in the 'User VPN Data' section of the Privacy Policy page. The section describes what Psiphon does with the little bit of VPN data that it collects stats from. */
+"PrivacyInformationCollectedVpndataWhatdoespsiphondowithSubhead" = "Wat doet Psiphon met uw VPN-gegevens?";
+
+/* Paragraph text in the 'Who does Psiphon share these statistics with?' subsection of the 'User VPN Data' section of the Privacy page. */
+"PrivacyInformationCollectedVpndataWhopsiphonshareswithPara1" = "Bij het delen met derden levert Psiphon alleen grof, geaggregeerd domein-bytestatistieken. We delen nooit per sessie informatie of andere mogelijk identificeerbare informatie.";
+
+/* Paragraph text in the 'Who does Psiphon share these statistics with?' subsection of the 'User VPN Data' section of the Privacy page. */
+"PrivacyInformationCollectedVpndataWhopsiphonshareswithPara2" = "Dit delen gebeurt meestal met services of organisaties waarmee we samenwerken - zoals<a href=\"http://www.dw.com/en/psiphon-helps-dodge-the-online-trackers/a-16765092\" target=\"_blank\">die we een paar jaar geleden met DW </a> hebben gedaan. Deze statistieken helpen ons en zij beantwoorden vragen als \"Hoeveel bytes werden in april door Psiphon voor DW.com overgedragen aan alle gebruikers in Iran?\"";
+
+/* Paragraph text in the 'Who does Psiphon share these statistics with?' subsection of the 'User VPN Data' section of the Privacy page. */
+"PrivacyInformationCollectedVpndataWhopsiphonshareswithPara3" = "Nogmaals, we geven specifiek geen gedetailleerde of potentieel gebruikersidentificerende informatie aan partners of andere derden.";
+
+/* Sub-heading in the 'User VPN Data' section of the Privacy Policy page. The section describes who Psiphon shares VPN data stats. The answer will be organizations and not specific people, in case that makes a difference in your language. */
+"PrivacyInformationCollectedVpndataWhopsiphonshareswithSubhead" = "Met wie deelt Psiphon deze statistieken?";
+
+/* Paragraph text in the 'Why should you care?' subsection of the 'User VPN Data' section of the Privacy page. */
+"PrivacyInformationCollectedVpndataWhycarePara1" = "Wanneer u een VPN of proxy gebruikt, moet u zich zorgen maken over wat de provider in uw gegevens kan zien, er gegevens van verzamelen en doen. Voor sommige web- en e-mailverbindingen is het theoretisch mogelijk dat een VPN de inhoud kan zien, verzamelen en wijzigen.";
+
+/* Sub-heading in the 'User VPN Data' section of the Privacy Policy page. The section describes why it's important for users to consider what a VPN does with their traffic data. */
+"PrivacyInformationCollectedVpndataWhycareSubhead" = "Waarom zou je erom geven?";
+
+/* Bullet list text under 'Why does Psiphon need these statistics?' subsection of the 'User VPN Data' section of the Privacy page. */
+"PrivacyInformationCollectedVpndataWhydoespsiphonneedPara1Item1" = "Raming van toekomstige kosten: de enorme hoeveelheid gebruikersgegevens die we elke maand overbrengen, is een belangrijke factor in onze kosten. Het is van vitaal belang voor ons om gebruiksfluctuaties te zien en te begrijpen.";
+
+/* Bullet list text under 'Why does Psiphon need these statistics?' subsection of the 'User VPN Data' section of the Privacy page. */
+"PrivacyInformationCollectedVpndataWhydoespsiphonneedPara1Item2" = "Optimaliseren voor verkeerstypen: videostreaming heeft andere netwerkvereisten dan surfen op internet, wat anders is dan chatten, wat anders is dan spraak, enzovoort. Statistieken over het aantal overgedragen bytes voor enkele grote mediabureaus helpen ons te begrijpen hoe onze gebruikers de beste ervaring kunnen bieden.";
+
+/* Bullet list text under 'Why does Psiphon need these statistics?' subsection of the 'User VPN Data' section of the Privacy page. If available in your language, the blog post URLs should be updated to the localized post. */
+"PrivacyInformationCollectedVpndataWhydoespsiphonneedPara1Item3" = "Bepaal de aard van grote censuurgebeurtenissen: Sites en diensten worden vaak plotseling en zonder waarschuwing geblokkeerd, wat kan leiden tot enorme verschillen in regionaal gebruik van Psiphon. We hadden bijvoorbeeld tot 20x pieken in gebruik binnen 1 dag toen<a href=\"https://blog-en.psiphon.ca/2016/07/psiphon-usage-surges-as-brazil-blocks.html\" target=\"_blank\">Brazilië blokkeerde WhatsApp</a> of <a href=\"https://blog-en.psiphon.ca/2016/11/social-media-and-internet-ban-in-turkey.html\" target=\"_blank\">Turkije sociale media blokkeerde</a>.";
+
+/* Bullet list text under 'Why does Psiphon need these statistics?' subsection of the 'User VPN Data' section of the Privacy page. (English is using 'who' instead of 'whom' to reflect common idiom.) */
+"PrivacyInformationCollectedVpndataWhydoespsiphonneedPara1Item4" = "Begrijp wie we moeten helpen: sommige sites en services worden nergens geblokkeerd, sommige worden altijd geblokkeerd in bepaalde landen en sommige worden in sommige landen af en toe geblokkeerd. Om ervoor te zorgen dat onze gebruikers vrij kunnen communiceren en leren, moeten we deze patronen begrijpen, zien wie getroffen is en samenwerken met partners om ervoor te zorgen dat hun services het beste werken met Psiphon.";
+
+/* Paragraph text in the 'Why does Psiphon need these statistics?' subsection of the 'User VPN Data' section of the Privacy page. This paragraph serves as preamble for a detailed list, which is why it ends with a colon. */
+"PrivacyInformationCollectedVpndataWhydoespsiphonneedPara1ListStart" = "Deze gegevens worden door ons gebruikt om te bepalen hoe ons netwerk wordt gebruikt. Dit stelt ons in staat om dingen te doen zoals:";
+
+/* Sub-heading in the 'User VPN Data' section of the Privacy Policy page. The section describes why Psiphon needs VPN data stats. */
+"PrivacyInformationCollectedVpndataWhydoespsiphonneedSubhead" = "Waarom heeft Psiphon deze statistieken nodig?";
+
+/* Button label at the end of privacy policy screen, indication that when clicked user can start using Psiphon */
+"PrivacyPolicyGetStartedButtonTitle" = "Ga aan de slag met Psiphon";
+
+/* page title for the Privacy Policy page */
+"PrivacyTitle" = "privacybeleid";
 
 /* Refresh app receipt button title */
 "REFRESH_APP_RECEIPT_BUTTON_TITLE" = "Vernieuw app-ontvangst";
@@ -122,6 +177,12 @@
 /* Title of the dialog for available in-app paid subscriptions */
 "SUBSCRIPTIONS" = "Abonnementen";
 
+/* Title of button on subscriptions page which opens Psiphon's privacy policy webpage */
+"SUBSCRIPTIONS_PRIVACY_POLICY_BUTTON_TEXT" = "privacybeleid";
+
+/* Title of button on subscriptions page which opens Psiphon's terms of use webpage */
+"SUBSCRIPTIONS_TERMS_OF_USE_BUTTON_TEXT" = "Gebruiksvoorwaarden";
+
 /* Alert message informing user that Psiphon has been stopped automatically since the subscription has expired. Do not translate 'Psiphon'. */
 "TUNNEL_KILLED" = "Psiphon is automatisch gestopt, omdat uw abonnement is verlopen.";
 
@@ -131,20 +192,20 @@
 /* Alert dialog message informing the user that an error occurred while starting Psiphon (Do not translate 'Psiphon'). The user should try again, and if the problem persists, they should try reinstalling the app. */
 "VPN_START_FAIL_MESSAGE" = "Er is een fout opgetreden tijdens het opstarten van Psiphon. Probeer het opnieuw. Als dit probleem aanhoudt, probeert u de Psiphon-app opnieuw te installeren.";
 
-/*[UNTRANSLATED] Alert dialog message informing the user that an error occurred while starting Psiphon because they selected an egress region that is no longer available (Do not translate 'Psiphon'). The user should select a different region and try again. Note: the backslash before each quotation mark should be left as is for formatting. */
-"VPN_START_FAIL_REGION_INVALID_MESSAGE" = "The region you selected is no longer available. You must choose a new region or change to the default \"Best performance\" choice.";
-
-/* Alert dialog title indicating to the user that Psiphon was unable to start because they selected an egress region that is no longer available */
-"VPN_START_FAIL_REGION_INVALID_TITLE" = "Regio Server Niet Beschikbaar";
+/* Alert dialog message informing the user that an error occurred while starting Psiphon because they selected an egress region that is no longer available (Do not translate 'Psiphon'). The user should select a different region and try again. Note: the backslash before each quotation mark should be left as is for formatting. */
+"VPN_START_FAIL_REGION_INVALID_MESSAGE" = "De regio die u hebt geselecteerd, is niet langer beschikbaar. U moet een nieuwe regio kiezen of wijzigen naar de standaard keuze \"Beste uitvoering\".";
 
 /* Alert dialog title indicating to the user that Psiphon was unable to start (MainViewController) */
 "VPN_START_FAIL_TITLE" = "Kan niet starten";
 
-/*[UNTRANSLATED] ('Privacy Policy' should be the same translation as privacy policy button VPN_START_PRIVACY_POLICY_BUTTON), (Do not translate 'VPN profile'), (Do not translate 'Psiphon') */
-"VPN_START_PERMISSION_DENIED_MESSAGE" = "Psiphon needs your permission to install a VPN profile in order to connect.\n\nPsiphon is committed to protecting the privacy of our users. You can review our privacy policy by tapping \"Privacy Policy\".";
+/* ('Privacy Policy' should be the same translation as privacy policy button VPN_START_PRIVACY_POLICY_BUTTON), (Do not translate 'VPN profile'), (Do not translate 'Psiphon') */
+"VPN_START_PERMISSION_DENIED_MESSAGE" = "Psiphon heeft uw toestemming nodig om een VPN-profiel te installeren om verbinding te maken.\n\nPsiphon doet er alles aan om de privacy van onze gebruikers te beschermen. U kunt onze privacy beleid te herzien door te tikken \"Privacybeleid\".";
 
-/*[UNTRANSLATED] Alert dialog title indicating to the user that Psiphon needs their permission */
-"VPN_START_PERMISSION_REQUIRED_TITLE" = "Permission required";
+/* Dismiss button title. Dismisses pop-up alert when the user clicks on the button */
+"VPN_START_PERMISSION_DISMISS_BUTTON" = "Afwijzen";
+
+/* Alert dialog title indicating to the user that Psiphon needs their permission */
+"VPN_START_PERMISSION_REQUIRED_TITLE" = "Toestemming vereist";
 
 /* Button label taking user's to our Privacy Policy page */
 "VPN_START_PRIVACY_POLICY_BUTTON" = "privacybeleid";

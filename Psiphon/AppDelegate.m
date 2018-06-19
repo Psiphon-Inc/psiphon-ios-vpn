@@ -29,7 +29,7 @@
 #import "MPInterstitialAdController.h"
 #import "Notifier.h"
 #import "PsiphonClientCommonLibraryHelpers.h"
-#import "PsiphonConfigFiles.h"
+#import "PsiphonConfigReader.h"
 #import "PsiphonDataSharedDB.h"
 #import "RootContainerController.h"
 #import "SharedConstants.h"
@@ -48,22 +48,45 @@
 #import "RACSignal+Operations.h"
 #import "RACReplaySubject.h"
 #import "Asserts.h"
+#import "PsiCashClient.h"
+
+#if DEBUG
+#define kMaxAdLoadingTimeSecs 1.f
+#else
+#define kMaxAdLoadingTimeSecs 10.f
+#endif
 
 // Number of seconds to wait for tunnel status to become "Connected", after the landing page notification
 // is received from the extension.
 #define kLandingPageTimeoutSecs 1.0
 
+// Number of seconds to wait for PsiCashClient to emit an auth package with an earner token, after the
+// landing page notification is received from the extension.
+#define kPsiCashAuthPackageWithEarnerTokenTimeoutSecs 3.0
+
+/**
+ * adLoadingStatus RACSubject values.
+ */
+typedef NS_ENUM(NSInteger, AdLoadingStatus) {
+    AdLoadingStatusUnknown = 1,
+    AdLoadingStatusStarted,
+    AdLoadingStatusFinished
+};
+
 PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
 
-@interface AppDelegate ()
+@interface AppDelegate () <NotifierObserver>
 
 // Public properties
 
 // subscriptionStatus should only be sent events to from the main thread.
+// Emits type UserSubscriptionStatus
 @property (nonatomic, readwrite) RACReplaySubject<NSNumber *> *subscriptionStatus;
 
+// Emits one of AdLoadingStatus types.
+@property (nonatomic, readwrite) RACReplaySubject<NSNumber *> *adLoadingStatus;
+
 // Private properties
-@property (atomic) BOOL shownLandingPageForCurrentSession;
 @property (nonatomic) RACCompoundDisposable *compoundDisposable;
 
 @property (nonatomic) VPNManager *vpnManager;
@@ -74,7 +97,6 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
 
 @implementation AppDelegate {
     AdManager *adManager;
-    Notifier *notifier;
 
     RootContainerController *rootContainerController;
 }
@@ -83,10 +105,12 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
     self = [super init];
     if (self) {
         adManager = [AdManager sharedInstance];
-        notifier = [[Notifier alloc] initWithAppGroupIdentifier:APP_GROUP_IDENTIFIER];
 
         _subscriptionStatus = [RACReplaySubject replaySubjectWithCapacity:1];
         [_subscriptionStatus sendNext:@(UserSubscriptionUnknown)];
+
+        _adLoadingStatus = [RACReplaySubject replaySubjectWithCapacity:1];
+        [_adLoadingStatus sendNext:@(AdLoadingStatusUnknown)];
 
         _vpnManager = [VPNManager sharedInstance];
         _sharedDB = [[PsiphonDataSharedDB alloc] initForAppGroupIdentifier:APP_GROUP_IDENTIFIER];
@@ -140,9 +164,42 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
 #endif
 }
 
+#pragma mark - Reactive signals generators
+
+// Emits RACUnit.defaultUnit and completes immediately once all loading signals have completed.
+- (RACSignal<RACUnit *> *)createAppLoadingSignal {
+
+    // Emits a value when ads have loaded or kMaxAdLoadingTimeSecs has passed.
+    RACSignal *adsLoadingSignal = [[[self.adLoadingStatus
+      filter:^BOOL(NSNumber *value) {
+          AdLoadingStatus s = (AdLoadingStatus) [value integerValue];
+          return (s == AdLoadingStatusFinished);
+      }]
+      take:1]
+      merge:[RACSignal timer:kMaxAdLoadingTimeSecs]];
+
+    // Emits a value when the user subscription status becomes known.
+    RACSignal *subscriptionLoadingSignal = [[self.subscriptionStatus filter:^BOOL(NSNumber *value) {
+        UserSubscriptionStatus s = (UserSubscriptionStatus) [value integerValue];
+        return (s != UserSubscriptionUnknown);
+      }]
+      take:1];
+
+    // Zip all loading signals.
+    // All signals that are zipped are expected to only emit one item (type doesn't matter).
+    return [[RACSignal zip:@[adsLoadingSignal, subscriptionLoadingSignal]] map:^id(RACTuple *value) {
+        LOG_DEBUG(@"loading operations finished");
+        return RACUnit.defaultUnit;
+    }];
+}
+
 # pragma mark - Lifecycle methods
 
 - (BOOL)application:(UIApplication *)application willFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+
+    // Immediately register to receive notifications from the Network Extension process.
+    [[Notifier sharedInstance] registerObserver:self callbackQueue:dispatch_get_main_queue()];
+
     [self initializeDefaults];
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(onAdsLoaded)
@@ -173,11 +230,12 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
 
     rootContainerController = [[RootContainerController alloc] init];
     self.window.rootViewController = rootContainerController;
+
     // UIKit always waits for application:didFinishLaunchingWithOptions:
     // to return before making the window visible on the screen.
     [self.window makeKeyAndVisible];
 
-    [self loadAdsIfNeeded];
+    [self initializeAdsIfNeeded];
 
     // Listen for VPN status changes from VPNManager.
     __block RACDisposable *disposable = [self.vpnManager.lastTunnelStatus
@@ -197,8 +255,8 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
 
     [self.compoundDisposable addDisposable:disposable];
 
-    // Listen for the network extension messages.
-    [self listenForNEMessages];
+    // Start PsiCash lifecycle
+    [[PsiCashClient sharedInstance] scheduleStateRefresh];
 
     return YES;
 }
@@ -207,6 +265,21 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
     LOG_DEBUG();
 
     __weak AppDelegate *weakSelf = self;
+
+    // Resets status of the subjects whose state could be stale once the container is foregrounded.
+    [self.subscriptionStatus sendNext:@(UserSubscriptionUnknown)];
+    [self.adLoadingStatus sendNext:@(AdLoadingStatusUnknown)];
+
+    // Subscribes to the app loading signal, and removes the launch screen once all loading is done.
+    __block RACDisposable *disposable = [[self createAppLoadingSignal]
+      subscribeNext:^(RACUnit *x) {
+          [rootContainerController removeLaunchScreen];
+      } error:^(NSError *error) {
+          [weakSelf.compoundDisposable removeDisposable:disposable];
+      } completed:^{
+          [weakSelf.compoundDisposable removeDisposable:disposable];
+      }];
+    [self.compoundDisposable addDisposable:disposable];
 
     // Starts subscription expiry timer if there is an active subscription.
     [self subscriptionExpiryTimer];
@@ -244,6 +317,8 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
 
     // Cancel subscription expiry timer if active.
     [self.subscriptionCheckTimer invalidate];
+
+    [self.sharedDB updateAppForegroundState:NO];
 }
 
 - (void)applicationDidEnterBackground:(UIApplication *)application {
@@ -252,15 +327,16 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
     // If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
 
     [[UIApplication sharedApplication] ignoreSnapshotOnNextApplicationLaunch];
-    [notifier post:NOTIFIER_APP_DID_ENTER_BACKGROUND];
-    [self.sharedDB updateAppForegroundState:NO];
+    [[Notifier sharedInstance] post:NotifierAppEnteredBackground];
 }
 
 - (void)applicationWillEnterForeground:(UIApplication *)application {
     LOG_DEBUG();
     // Called as part of the transition from the background to the active state; here you can undo many of the changes made on entering the background.
 
-    [self loadAdsIfNeeded];
+    [[PsiCashClient sharedInstance] scheduleStateRefresh];
+
+    [self initializeAdsIfNeeded];
 }
 
 - (void)applicationWillTerminate:(UIApplication *)application {
@@ -282,17 +358,16 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
 
 #pragma mark - Ads
 
-- (void)loadAdsIfNeeded {
+- (void)initializeAdsIfNeeded {
 
     VPNStatus s = (VPNStatus) [[[self.vpnManager lastTunnelStatus] first] integerValue];
 
     if ([adManager shouldShowUntunneledAds] &&
         ![adManager untunneledInterstitialIsReady] &&
         ![adManager untunneledInterstitialHasShown] &&
-        (s == VPNStatusInvalid || s == VPNStatusDisconnected)
-      ){
+        (s == VPNStatusInvalid || s == VPNStatusDisconnected)){
 
-        [rootContainerController showLaunchScreen];
+        [self.adLoadingStatus sendNext:@(AdLoadingStatusStarted)];
 
         dispatch_async(dispatch_get_main_queue(), ^{
                 [adManager initializeAds];
@@ -300,7 +375,7 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
 
     } else {
         // Removes launch screen if already showing.
-        [rootContainerController removeLaunchScreen];
+        [self.adLoadingStatus sendNext:@(AdLoadingStatusFinished)];
     }
 }
 
@@ -311,12 +386,7 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
 
 - (void)onAdsLoaded {
     LOG_DEBUG();
-    [rootContainerController removeLaunchScreen];
-}
-
-- (void)launchScreenFinished {
-    LOG_DEBUG();
-    [rootContainerController removeLaunchScreen];
+    [self.adLoadingStatus sendNext:@(AdLoadingStatusFinished)];
 }
 
 #pragma mark - Embedded Server Entries
@@ -327,7 +397,7 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
  * This function should only be called once per app version on first launch.
  */
 - (void)updateAvailableEgressRegionsOnFirstRunOfAppVersion {
-    NSString *embeddedServerEntriesPath = [PsiphonConfigFiles embeddedServerEntriesPath];
+    NSString *embeddedServerEntriesPath = PsiphonConfigReader.embeddedServerEntriesPath;
     NSArray *embeddedEgressRegions = [EmbeddedServerEntries egressRegionsFromFile:embeddedServerEntriesPath];
 
     LOG_DEBUG("Available embedded egress regions: %@.", embeddedEgressRegions);
@@ -339,13 +409,14 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
     }
 }
 
-#pragma mark - Network Extension
+#pragma mark - Notifier callback
 
-- (void)listenForNEMessages {
+- (void)onMessageReceived:(NotifierMessage)message {
 
     __weak AppDelegate *weakSelf = self;
 
-    [notifier listenForNotification:NOTIFIER_NEW_HOMEPAGES listener:^(NSString *key){
+    if ([NotifierNewHomepages isEqualToString:message]) {
+
         LOG_DEBUG(@"Received notification NE.newHomepages");
 
         // Ignore the notification from the extension, since a landing page has
@@ -372,11 +443,30 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
             NSUInteger randIndex = arc4random() % [homepages count];
             Homepage *homepage = homepages[randIndex];
 
+            RACSignal <RACUnit*>*authPackageSignal = [[[[[PsiCashClient.sharedInstance.clientModelSignal
+              filter:^BOOL(PsiCashClientModel * _Nullable model) {
+                  if ([model.authPackage hasEarnerToken]) {
+                      return TRUE;
+                  }
+                  return FALSE;
+              }]
+              map:^id _Nullable(PsiCashClientModel * _Nullable model) {
+                  return RACUnit.defaultUnit;
+              }]
+              take:1]
+              timeout:kPsiCashAuthPackageWithEarnerTokenTimeoutSecs onScheduler:RACScheduler.mainThreadScheduler]
+              catch:^RACSignal * (NSError * error) {
+                  if ([error.domain isEqualToString:RACSignalErrorDomain] && error.code == RACSignalErrorTimedOut) {
+                      return [RACSignal return:RACUnit.defaultUnit];
+                  }
+                  return [RACSignal error:error];
+              }];
+
             // Only opens landing page if the VPN is active (or waits up to a maximum of kLandingPageTimeoutSecs
             // for the tunnel status to become "Connected" before opening the landing page).
             // Landing page should not be opened outside of the tunnel.
 
-            __block RACDisposable *disposable = [[[[[[[weakSelf.vpnManager isExtensionZombie]
+            __block RACDisposable *disposable = [[[[[[[[weakSelf.vpnManager isExtensionZombie]
               combineLatestWith:weakSelf.vpnManager.lastTunnelStatus]
               filter:^BOOL(RACTwoTuple<NSNumber *, NSNumber *> *tuple) {
 
@@ -386,9 +476,10 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
               }]
               take:1]  // Take 1 to terminate the infinite signal.
               timeout:kLandingPageTimeoutSecs onScheduler:RACScheduler.mainThreadScheduler]
+              zipWith:authPackageSignal]
               deliverOnMainThread]
-              subscribeNext:^(RACTwoTuple<NSNumber *, NSNumber *> *x) {
-                  BOOL isZombie = [x.first boolValue];
+              subscribeNext:^(RACTwoTuple<RACTwoTuple<NSNumber *, NSNumber *>*, RACUnit*> *x) {
+                  BOOL isZombie = [x.first.first boolValue];
 
                   if (isZombie) {
                       weakSelf.shownLandingPageForCurrentSession = FALSE;
@@ -403,7 +494,7 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
                       // Not officially documented by Apple, however a runtime warning is generated sometimes
                       // stating that [UIApplication openURL:options:completionHandler:] must be used from
                       // the main thread only.
-                      [[UIApplication sharedApplication] openURL:homepage.url
+                      [[UIApplication sharedApplication] openURL:[PsiCashClient.sharedInstance modifiedHomePageURL:homepage.url]
                                                          options:@{}
                                                completionHandler:^(BOOL success) {
                                                    weakSelf.shownLandingPageForCurrentSession = success;
@@ -425,9 +516,8 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
             [weakSelf.compoundDisposable addDisposable:disposable];
 
         });
-    }];
 
-    [notifier listenForNotification:NOTIFIER_TUNNEL_CONNECTED listener:^(NSString *key){
+    } else if ([NotifierTunnelConnected isEqualToString:message]) {
         LOG_DEBUG(@"Received notification NE.tunnelConnected");
 
         // If we haven't had a chance to load an Ad, and the
@@ -437,16 +527,18 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
         if (![adManager untunneledInterstitialIsShowing]) {
             [weakSelf.vpnManager startVPN];
         }
-    }];
 
-    [notifier listenForNotification:NOTIFIER_ON_AVAILABLE_EGRESS_REGIONS listener:^(NSString *key){
+    } else if ([NotifierAvailableEgressRegions isEqualToString:message]) {
         LOG_DEBUG(@"Received notification NE.onAvailableEgressRegions");
         // Update available regions
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
             NSArray<NSString *> *regions = [weakSelf.sharedDB emittedEgressRegions];
             [[RegionAdapter sharedInstance] onAvailableEgressRegions:regions];
         });
-    }];
+
+    } else if ([NotifierMarkedAuthorizations isEqualToString:message]) {
+        [[PsiCashClient sharedInstance] authorizationsMarkedExpired];
+    }
 }
 
 #pragma mark - Subscription
@@ -455,34 +547,30 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
 
     __weak AppDelegate *weakSelf = self;
 
-    dispatch_async_global(^{
-        NSDate *expiryDate;
-        BOOL activeSubscription = [IAPStoreHelper hasActiveSubscriptionForDate:[NSDate date] getExpiryDate:&expiryDate];
+    NSDate *expiryDate;
+    BOOL activeSubscription = [IAPStoreHelper hasActiveSubscriptionForDate:[NSDate date] getExpiryDate:&expiryDate];
 
-        dispatch_async_main(^{
-            if (activeSubscription) {
+    if (activeSubscription) {
 
-                // Also update the subscription status subject.
-                [weakSelf.subscriptionStatus sendNext:@(UserSubscriptionActive)];
+        // Also update the subscription status subject.
+        [weakSelf.subscriptionStatus sendNext:@(UserSubscriptionActive)];
 
-                NSTimeInterval interval = [expiryDate timeIntervalSinceNow];
-                
-                if (interval > 0) {
-                    // Checks if another timer is already running.
-                    if (![weakSelf.subscriptionCheckTimer isValid]) {
-                        weakSelf.subscriptionCheckTimer = [NSTimer scheduledTimerWithTimeInterval:interval
-                                                                                 repeats:NO
-                                                                                   block:^(NSTimer *timer) {
-                            [weakSelf subscriptionExpiryTimer];
-                        }];
-                    }
-                }
-            } else {
-                // Instead of subscribing to the notification in this class, calls the handler directly.
-                [weakSelf onSubscriptionExpired];
+        NSTimeInterval interval = [expiryDate timeIntervalSinceNow];
+
+        if (interval > 0) {
+            // Checks if another timer is already running.
+            if (![weakSelf.subscriptionCheckTimer isValid]) {
+                weakSelf.subscriptionCheckTimer = [NSTimer scheduledTimerWithTimeInterval:interval
+                                                                         repeats:NO
+                                                                           block:^(NSTimer *timer) {
+                    [weakSelf subscriptionExpiryTimer];
+                }];
             }
-        });
-    });
+        }
+    } else {
+        // Instead of subscribing to the notification in this class, calls the handler directly.
+        [weakSelf onSubscriptionExpired];
+    }
 }
 
 - (void)onSubscriptionExpired {
@@ -516,7 +604,7 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
         BOOL isActive = [value.first boolValue];
 
         if (isActive) {
-            [notifier post:NOTIFIER_FORCE_SUBSCRIPTION_CHECK];
+            [[Notifier sharedInstance] post:NotifierForceSubscriptionCheck];
         }
 
     } error:^(NSError *error) {
@@ -526,21 +614,6 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
     }];
 
     [self.compoundDisposable addDisposable:vpnActiveDisposable];
-
-    // Checks if user previously preferred to have Connect On Demand enabled,
-    // Re-enable it upon subscription since it may have been disabled if the previous subscription expired.
-    // Disables Connect On Demand setting of the VPN Configuration.
-    BOOL userPreferredOnDemandSetting = [[NSUserDefaults standardUserDefaults]
-      boolForKey:SettingsConnectOnDemandBoolKey];
-
-    __block RACDisposable *onDemandDisposable = [[self.vpnManager setConnectOnDemandEnabled:userPreferredOnDemandSetting]
-      subscribeError:^(NSError *error) {
-          [weakSelf.compoundDisposable removeDisposable:onDemandDisposable];
-    } completed:^{
-          [weakSelf.compoundDisposable removeDisposable:onDemandDisposable];
-    }];
-
-    [self.compoundDisposable addDisposable:onDemandDisposable];
 
 }
 

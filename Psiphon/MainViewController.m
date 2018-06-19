@@ -48,7 +48,23 @@
 #import "RACSignal+Operations.h"
 #import "RACSignal+Operations.h"
 #import "RACSignal.h"
+#import "RACUnit.h"
+#import "NSNotificationCenter+RACSupport.h"
 #import "Asserts.h"
+#import "PrivacyPolicyViewController.h"
+#import "UIColor+Additions.h"
+
+UserDefaultsKey const PrivacyPolicyAcceptedBookKey = @"PrivacyPolicy.AcceptedBoolKey";
+
+#import "PsiCashBalanceView.h"
+#import "PsiCashClient.h"
+#import "PsiCashSpeedBoostMeterView.h"
+#import "PsiCashTableViewController.h"
+#import "PsiCashBalanceWithSpeedBoostMeter.h"
+#import "UILabel+GetLabelHeight.h"
+#import "StarView.h"
+
+UserDefaultsKey const PsiCashHasBeenOnboardedBoolKey = @"PsiCash.HasBeenOnboarded";
 
 static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSString *b) {
     return (([a length] == 0) && ([b length] == 0)) || ([a isEqualToString:b]);
@@ -66,11 +82,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     
     PsiphonDataSharedDB *sharedDB;
     
-    // Notifier
-    Notifier *notifier;
-    
     // UI elements
-    //UIImageView *logoView;
     UILabel *appTitleLabel;
     UILabel *appSubTitleLabel;
     UILabel *statusLabel;
@@ -84,11 +96,10 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     BOOL isStartStopButtonHaloOn;
     
     // UI Constraint
-    NSLayoutConstraint *startButtonScreenWidth;
-    NSLayoutConstraint *startButtonScreenHeight;
     NSLayoutConstraint *startButtonWidth;
-    NSLayoutConstraint *bottomBarTop;
-    NSLayoutConstraint *subscriptionButtonTop;
+    NSLayoutConstraint *startButtonHeight;
+    NSLayoutConstraint *bottomBarTopConstraint;
+    NSLayoutConstraint *subscriptionButtonTopConstraint;
     
     // UI Layer
     CAGradientLayer *backgroundGradient;
@@ -105,6 +116,19 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     UIAlertController *alertControllerNoInternet;
     
     FeedbackManager *feedbackManager;
+
+    // PsiCash
+    PsiCashPurchaseAlertView *alertView;
+    PsiCashClientModel *model;
+    PsiCashBalanceWithSpeedBoostMeter *psiCashView;
+    NSLayoutConstraint *psiCashViewHeight;
+    RACDisposable *psiCashViewUpdates;
+    NSArray<StarView*> *stars;
+}
+
+// Force portrait orientation
+- (UIInterfaceOrientationMask)supportedInterfaceOrientations {
+    return (UIInterfaceOrientationMaskPortrait | UIInterfaceOrientationMaskPortraitUpsideDown);
 }
 
 // No heavy initialization should be done here, since RootContainerController
@@ -123,9 +147,6 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
         feedbackManager = [[FeedbackManager alloc] init];
         
         sharedDB = [[PsiphonDataSharedDB alloc] initForAppGroupIdentifier:APP_GROUP_IDENTIFIER];
-        
-        // Notifier
-        notifier = [[Notifier alloc] initWithAppGroupIdentifier:APP_GROUP_IDENTIFIER];
         
         [self persistSettingsToSharedUserDefaults];
         
@@ -161,14 +182,14 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     [self addAppTitleLabel];
     [self addAppSubTitleLabel];
     [self addSubscriptionButton];
+    [self addPsiCashView];
     [self addStatusLabel];
     [self addVersionLabel];
     [self setupLayoutGuides];
     
     if (([[UIDevice currentDevice].model hasPrefix:@"iPhone"] || [[UIDevice currentDevice].model hasPrefix:@"iPod"]) && (self.view.bounds.size.width > self.view.bounds.size.height)) {
-        //logoView.hidden = YES;
-        //appTitleLabel.hidden = YES;
-        //appSubTitleLabel.hidden = YES;
+        appTitleLabel.hidden = YES;
+        appSubTitleLabel.hidden = YES;
     }
     
     __weak MainViewController *weakSelf = self;
@@ -225,7 +246,8 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                                                                               }];
                                                                           }];
 
-              UIAlertAction *dismissAction = [UIAlertAction actionWithTitle:@"Dismiss" style:UIAlertActionStyleCancel
+              UIAlertAction *dismissAction = [UIAlertAction actionWithTitle:NSLocalizedStringWithDefaultValue(@"VPN_START_PERMISSION_DISMISS_BUTTON", nil, [NSBundle mainBundle], @"Dismiss", @"Dismiss button title. Dismisses pop-up alert when the user clicks on the button")
+                                                                      style:UIAlertActionStyleCancel
                                                                     handler:^(UIAlertAction *action) {
                                                                         // Do nothing.
                                                                     }];
@@ -246,37 +268,37 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     
     [self.compoundDisposable addDisposable:vpnStartStatusDisposable];
 
+
     // Subscribes to AppDelegate subscription signal.
-    __block RACDisposable *userSubscriptionDisposable = [[AppDelegate sharedAppDelegate].subscriptionStatus
+    __block RACDisposable *disposable = [[AppDelegate sharedAppDelegate].subscriptionStatus
       subscribeNext:^(NSNumber *value) {
           UserSubscriptionStatus s = (UserSubscriptionStatus) [value integerValue];
-
-          if(s == UserSubscriptionActive) {
-              subscriptionButton.hidden = YES;
-              adLabel.hidden = YES;
-              subscriptionButtonTop.active = NO;
-              bottomBarTop.active = YES;
-          } else {
-              subscriptionButton.hidden = NO;
-              adLabel.hidden = ![self.adManager untunneledInterstitialIsReady];
-              bottomBarTop.active = NO;
-              subscriptionButtonTop.active = YES;
+          
+          if (s == UserSubscriptionUnknown) {
+              return;
           }
 
+          subscriptionButton.hidden = (s == UserSubscriptionActive);
+          adLabel.hidden = (s == UserSubscriptionActive) || ![self.adManager untunneledInterstitialIsReady];
+          subscriptionButtonTopConstraint.active = !subscriptionButton.hidden;
+          bottomBarTopConstraint.active = subscriptionButton.hidden;
+
+          BOOL showPsiCashUI = (s == UserSubscriptionInactive);
+          [self setPsiCashContentHidden:!showPsiCashUI];
+
       } error:^(NSError *error) {
-          [weakSelf.compoundDisposable removeDisposable:userSubscriptionDisposable];
+          [self.compoundDisposable removeDisposable:disposable];
       } completed:^{
-          [weakSelf.compoundDisposable removeDisposable:userSubscriptionDisposable];
+          [self.compoundDisposable removeDisposable:disposable];
       }];
 
-    [self.compoundDisposable addDisposable:userSubscriptionDisposable];
+    [self.compoundDisposable addDisposable:disposable];
 
     // Observer AdManager notifications
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(onAdStatusDidChange)
                                                  name:AdManagerAdsDidLoadNotification
                                                object:self.adManager];
-
 }
 
 - (void)viewDidAppear:(BOOL)animated {
@@ -294,6 +316,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 
 - (void)viewDidLayoutSubviews {
     [super viewDidLayoutSubviews];
+
     backgroundGradient.frame = self.view.bounds;
     
     if (isStartStopButtonHaloOn && startStopButtonHalo != nil) {
@@ -315,8 +338,6 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 - (void)viewWillDisappear:(BOOL)animated {
     LOG_DEBUG();
     [super viewWillDisappear:animated];
-    // Stop listening for diagnostic messages (we don't want to hold the shared db lock while backgrounded)
-    [notifier removeAllListeners];
 }
 
 - (void)viewDidDisappear:(BOOL)animated {
@@ -337,25 +358,9 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 
 // Reload when rotate
 - (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator {
-    [self.view removeConstraint:startButtonWidth];
-    [self setRegionSelectionConstraints:size];
-    
-    if (size.width > size.height) {
-        [self.view removeConstraint:startButtonScreenWidth];
-        [self.view addConstraint:startButtonScreenHeight];
-        if ([[UIDevice currentDevice].model hasPrefix:@"iPhone"]) {
-            adLabel.hidden = YES;
-        }
-    } else {
-        [self.view removeConstraint:startButtonScreenHeight];
-        [self.view addConstraint:startButtonScreenWidth];
-        if ([[UIDevice currentDevice].model hasPrefix:@"iPhone"]) {
-            adLabel.hidden = ![self.adManager untunneledInterstitialIsReady];
-        }
-    }
-    
-    [self.view addConstraint:startButtonWidth];
-    
+
+    [self setStartButtonSizeConstraints:size];
+
     [coordinator animateAlongsideTransition:^(id<UIViewControllerTransitionCoordinatorContext> context) {
         if (isStartStopButtonHaloOn && startStopButtonHalo) {
             startStopButtonHalo.hidden = YES;
@@ -376,11 +381,37 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 }
 
 - (void)onStartStopTap:(UIButton *)sender {
-    
+
     __weak MainViewController *weakSelf = self;
-    
+
+    // Emits unit value if/when the privacy policy is accepted.
+    RACSignal *privacyPolicyAccepted = [[RACSignal return:@([NSUserDefaults.standardUserDefaults boolForKey:PrivacyPolicyAcceptedBookKey])]
+      flattenMap:^RACSignal<RACUnit *> *(NSNumber *ppAccepted) {
+
+        if ([ppAccepted boolValue]) {
+            return [RACSignal return:RACUnit.defaultUnit];
+        } else {
+
+            PrivacyPolicyViewController *c = [[PrivacyPolicyViewController alloc] init];
+            [self presentViewController:c animated:TRUE completion:nil];
+
+            return [[[[NSNotificationCenter defaultCenter]
+              rac_addObserverForName:PrivacyPolicyAcceptedNotification
+                              object:nil]
+              take:1]
+              map:^id(NSNotification *value) {
+                  [NSUserDefaults.standardUserDefaults setBool:TRUE forKey:PrivacyPolicyAcceptedBookKey];
+                  return RACUnit.defaultUnit;
+              }];
+        }
+
+    }];
+
     // signal emits a single two tuple (isVPNActive, connectOnDemandEnabled).
-    __block RACDisposable *disposable = [[[[self.vpnManager isVPNActive]
+    __block RACDisposable *disposable = [[[[privacyPolicyAccepted
+      flattenMap:^RACSignal *(RACUnit *x) {
+        return [weakSelf.vpnManager isVPNActive];
+      }]
       flattenMap:^RACSignal<NSNumber *> *(RACTwoTuple<NSNumber *, NSNumber *> *value) {
 
           // If VPN is already running, checks if ConnectOnDemand is enabled, otherwise returns the result immediately.
@@ -420,17 +451,18 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                   // Alert the user that Connect On Demand is enabled, and if they
                   // would like Connect On Demand to be disabled, and the extension to be stopped.
                   NSString *alertTitle = NSLocalizedStringWithDefaultValue(@"CONNECT_ON_DEMAND_ALERT_TITLE", nil, [NSBundle mainBundle], @"Auto-start VPN is enabled", @"Alert dialog title informing user that 'Auto-start VPN' feature is enabled");
-                  NSString *alertMessage = NSLocalizedStringWithDefaultValue(@"CONNECT_ON_DEMAND_ALERT_BODY", nil, [NSBundle mainBundle], @"Cannot stop the VPN while \"Auto-start VPN\" is enabled.\nWould you like to disable \"Auto-start VPN\" on demand and stop the VPN?", "Alert dialog body informing the user that the 'Auto-start VPN on demand' feature is enabled and that the VPN cannot be stopped. Followed by asking the user if they would like to disable the 'Auto-start VPN on demand' feature, and stop the VPN.");
+                  NSString *alertMessage = NSLocalizedStringWithDefaultValue(@"CONNECT_ON_DEMAND_ALERT_BODY", nil, [NSBundle mainBundle], @"\"Auto-start VPN\" will be temporarily disabled until the next time Psiphon VPN is started.", "Alert dialog body informing the user that the 'Auto-start VPN on demand' feature will be disabled and that the VPN cannot be stopped.");
 
                   UIAlertController *alert = [UIAlertController
                                               alertControllerWithTitle:alertTitle message:alertMessage preferredStyle:UIAlertControllerStyleAlert];
 
-                  UIAlertAction *disableAction = [UIAlertAction
-                    actionWithTitle:NSLocalizedStringWithDefaultValue(@"DISABLE_BUTTON", nil, [NSBundle mainBundle], @"Disable Auto-start VPN and Stop", @"Disable Auto-start VPN feature and Stop the VPN button label")
-                    style:UIAlertActionStyleDestructive
+                  UIAlertAction *stopUntilNextStartAction = [UIAlertAction
+                    actionWithTitle:NSLocalizedStringWithDefaultValue(@"OK_BUTTON", nil, [NSBundle mainBundle], @"OK", @"OK button title")
+                    style:UIAlertActionStyleDefault
                     handler:^(UIAlertAction *action) {
+
                         // Disable "Connect On Demand" and stop the VPN.
-                        [[NSUserDefaults standardUserDefaults] setBool:FALSE forKey:SettingsConnectOnDemandBoolKey];
+                        [[NSUserDefaults standardUserDefaults] setBool:TRUE forKey:VPNManagerConnectOnDemandUntilNextStartBoolKey];
 
                         __block RACDisposable *disposable = [[weakSelf.vpnManager setConnectOnDemandEnabled:FALSE]
                           subscribeNext:^(NSNumber *x) {
@@ -445,17 +477,8 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                         [weakSelf.compoundDisposable addDisposable:disposable];
                     }];
 
-                  UIAlertAction *cancelAction = [UIAlertAction
-                                                 actionWithTitle:NSLocalizedStringWithDefaultValue(@"CANCEL_BUTTON", nil, [NSBundle mainBundle], @"Cancel", @"Alert Cancel button")
-                                                 style:UIAlertActionStyleCancel
-                                                 handler:^(UIAlertAction *action) {
-                                                     // Do nothing
-                                                 }];
-
-                  [alert addAction:disableAction];
-                  [alert addAction:cancelAction];
+                  [alert addAction:stopUntilNextStartAction];
                   [self presentViewController:alert animated:TRUE completion:nil];
-
               }
 
               [self removePulsingHaloLayer];
@@ -537,7 +560,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 - (void)setBackgroundGradient {
     backgroundGradient = [CAGradientLayer layer];
     
-    backgroundGradient.colors = @[(id)[UIColor colorWithRed:0.17 green:0.17 blue:0.28 alpha:1.0].CGColor, (id)[UIColor colorWithRed:0.28 green:0.36 blue:0.46 alpha:1.0].CGColor];
+    backgroundGradient.colors = @[(id)[UIColor colorWithRed:0.57 green:0.62 blue:0.77 alpha:1.0].CGColor, (id)[UIColor colorWithRed:0.24 green:0.26 blue:0.33 alpha:1.0].CGColor];
     
     [self.view.layer insertSublayer:backgroundGradient atIndex:0];
 }
@@ -572,37 +595,15 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     return ([UIApplication sharedApplication].userInterfaceLayoutDirection == UIUserInterfaceLayoutDirectionRightToLeft);
 }
 
-/*- (void)addLogoImage {
- logoView = [[UIImageView alloc] init];
- [logoView setImage:[UIImage imageNamed:@"Logo"]];
- [logoView setTranslatesAutoresizingMaskIntoConstraints:NO];
- 
- [self.view addSubview:logoView];
- 
- // Setup autolayout
- [self.view addConstraint:[NSLayoutConstraint constraintWithItem:logoView
- attribute:NSLayoutAttributeTop
- relatedBy:NSLayoutRelationGreaterThanOrEqual
- toItem:self.topLayoutGuide
- attribute:NSLayoutAttributeBottom
- multiplier:1.0
- constant:30]];
- 
- [self.view addConstraint:[NSLayoutConstraint constraintWithItem:logoView
- attribute:NSLayoutAttributeCenterX
- relatedBy:NSLayoutRelationEqual
- toItem:self.view
- attribute:NSLayoutAttributeCenterX
- multiplier:1.0
- constant:0]];
- }*/
-
 - (void)addAppTitleLabel {
     appTitleLabel = [[UILabel alloc] init];
     appTitleLabel.translatesAutoresizingMaskIntoConstraints = NO;
     appTitleLabel.text = @"PSIPHON";
     appTitleLabel.textAlignment = NSTextAlignmentCenter;
     appTitleLabel.textColor = [UIColor whiteColor];
+    appTitleLabel.shadowColor = [UIColor colorWithWhite:0 alpha:0.06];
+    appTitleLabel.shadowOffset = CGSizeMake(1.f, 1.f);
+
     CGFloat narrowestWidth = self.view.frame.size.width;
     if (self.view.frame.size.height < self.view.frame.size.width) {
         narrowestWidth = self.view.frame.size.height;
@@ -611,45 +612,14 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     if ([PsiphonClientCommonLibraryHelpers unsupportedCharactersForFont:appTitleLabel.font.fontName withString:appTitleLabel.text]) {
         appTitleLabel.font = [UIFont systemFontOfSize:narrowestWidth * 0.075f];
     }
-    
+
     [self.view addSubview:appTitleLabel];
-    
+
     // Setup autolayout
-    CGFloat labelHeight = [self getLabelHeight:appTitleLabel];
-    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:appTitleLabel
-                                                          attribute:NSLayoutAttributeHeight
-                                                          relatedBy:NSLayoutRelationEqual
-                                                             toItem:nil
-                                                          attribute:NSLayoutAttributeNotAnAttribute
-                                                         multiplier:1.0
-                                                           constant:labelHeight]];
-    
-    NSLayoutConstraint *floatingVerticallyConstraint =[NSLayoutConstraint constraintWithItem:appTitleLabel
-                                                                                   attribute:NSLayoutAttributeBottom
-                                                                                   relatedBy:NSLayoutRelationEqual
-                                                                                      toItem:self.view
-                                                                                   attribute:NSLayoutAttributeBottom
-                                                                                  multiplier:.14
-                                                                                    constant:0];
-    // This constraint will be broken in case the next constraint can't be enforced
-    floatingVerticallyConstraint.priority = 999;
-    [self.view addConstraint:floatingVerticallyConstraint];
-    
-    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:appTitleLabel
-                                                          attribute:NSLayoutAttributeTop
-                                                          relatedBy:NSLayoutRelationGreaterThanOrEqual
-                                                             toItem:self.view
-                                                          attribute:NSLayoutAttributeTop
-                                                         multiplier:1.0
-                                                           constant:0.0]];
-    
-    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:appTitleLabel
-                                                          attribute:NSLayoutAttributeCenterX
-                                                          relatedBy:NSLayoutRelationEqual
-                                                             toItem:self.view
-                                                          attribute:NSLayoutAttributeCenterX
-                                                         multiplier:1.0
-                                                           constant:0.0]];
+    CGFloat labelHeight = [appTitleLabel getLabelHeight];
+    [appTitleLabel.heightAnchor constraintEqualToConstant:labelHeight].active = YES;
+    [appTitleLabel.topAnchor constraintEqualToAnchor:self.topLayoutGuide.bottomAnchor].active = YES;
+    [appTitleLabel.centerXAnchor constraintEqualToAnchor:self.view.centerXAnchor].active = YES;
 }
 
 - (void)addAppSubTitleLabel {
@@ -658,6 +628,8 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     appSubTitleLabel.text = NSLocalizedStringWithDefaultValue(@"APP_SUB_TITLE_MAIN_VIEW", nil, [NSBundle mainBundle], @"BEYOND BORDERS", @"Text for app subtitle on main view.");
     appSubTitleLabel.textAlignment = NSTextAlignmentCenter;
     appSubTitleLabel.textColor = [UIColor whiteColor];
+    appSubTitleLabel.shadowColor = [UIColor colorWithWhite:0 alpha:0.06];
+    appSubTitleLabel.shadowOffset = CGSizeMake(1.f, 1.f);
     CGFloat narrowestWidth = self.view.frame.size.width;
     if (self.view.frame.size.height < self.view.frame.size.width) {
         narrowestWidth = self.view.frame.size.height;
@@ -666,34 +638,14 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     if ([PsiphonClientCommonLibraryHelpers unsupportedCharactersForFont:appSubTitleLabel.font.fontName withString:appSubTitleLabel.text]) {
         appSubTitleLabel.font = [UIFont systemFontOfSize:narrowestWidth * 0.075f/2.0f];
     }
-    
+
     [self.view addSubview:appSubTitleLabel];
-    
+
     // Setup autolayout
-    CGFloat labelHeight = [self getLabelHeight:appSubTitleLabel];
-    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:appSubTitleLabel
-                                                          attribute:NSLayoutAttributeHeight
-                                                          relatedBy:NSLayoutRelationEqual
-                                                             toItem:nil
-                                                          attribute:NSLayoutAttributeNotAnAttribute
-                                                         multiplier:1.0
-                                                           constant:labelHeight]];
-    
-    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:appSubTitleLabel
-                                                          attribute:NSLayoutAttributeTop
-                                                          relatedBy:NSLayoutRelationEqual
-                                                             toItem:appTitleLabel
-                                                          attribute:NSLayoutAttributeBottom
-                                                         multiplier:1.0
-                                                           constant:0]];
-    
-    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:appSubTitleLabel
-                                                          attribute:NSLayoutAttributeCenterX
-                                                          relatedBy:NSLayoutRelationEqual
-                                                             toItem:self.view
-                                                          attribute:NSLayoutAttributeCenterX
-                                                         multiplier:1.0
-                                                           constant:0]];
+    CGFloat labelHeight = [appSubTitleLabel getLabelHeight];
+    [appSubTitleLabel.heightAnchor constraintEqualToConstant:labelHeight].active = YES;
+    [appSubTitleLabel.topAnchor constraintEqualToAnchor:appTitleLabel.bottomAnchor].active = YES;
+    [appSubTitleLabel.centerXAnchor constraintEqualToAnchor:self.view.centerXAnchor].active = YES;
 }
 
 - (void)addSettingsButton {
@@ -703,41 +655,13 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     [settingsButton setImage:gearTemplate forState:UIControlStateNormal];
     [settingsButton setTintColor:[UIColor whiteColor]];
     [self.view addSubview:settingsButton];
-    
+
     // Setup autolayout
-    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:settingsButton
-                                                          attribute:NSLayoutAttributeCenterY
-                                                          relatedBy:NSLayoutRelationEqual
-                                                             toItem:self.topLayoutGuide
-                                                          attribute:NSLayoutAttributeBottom
-                                                         multiplier:1.0
-                                                           constant:gearTemplate.size.height/2 + 8.f]];
-    
-    
-    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:settingsButton
-                                                          attribute:NSLayoutAttributeCenterX
-                                                          relatedBy:NSLayoutRelationEqual
-                                                             toItem:self.view
-                                                          attribute:NSLayoutAttributeTrailing
-                                                         multiplier:1.0
-                                                           constant:-gearTemplate.size.width/2 - 13.f]];
-    
-    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:settingsButton
-                                                          attribute:NSLayoutAttributeWidth
-                                                          relatedBy:NSLayoutRelationEqual
-                                                             toItem:nil
-                                                          attribute:NSLayoutAttributeNotAnAttribute
-                                                         multiplier:1.0
-                                                           constant:80]];
-    
-    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:settingsButton
-                                                          attribute:NSLayoutAttributeHeight
-                                                          relatedBy:NSLayoutRelationEqual
-                                                             toItem:settingsButton
-                                                          attribute:NSLayoutAttributeWidth
-                                                         multiplier:1.0
-                                                           constant:0.f]];
-    
+    [settingsButton.centerYAnchor constraintEqualToAnchor:self.topLayoutGuide.bottomAnchor constant:gearTemplate.size.height/2 + 8.f].active = YES;
+    [settingsButton.centerXAnchor constraintEqualToAnchor:self.view.trailingAnchor constant:-gearTemplate.size.width/2 - 15.f].active = YES;
+    [settingsButton.widthAnchor constraintEqualToConstant:80].active = YES;
+    [settingsButton.heightAnchor constraintEqualToAnchor:settingsButton.widthAnchor].active = YES;
+
     [settingsButton addTarget:self action:@selector(onSettingsButtonTap:) forControlEvents:UIControlEventTouchUpInside];
 }
 
@@ -778,47 +702,25 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     [self.view addSubview:startStopButton];
     
     // Setup autolayout
-    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:startStopButton
-                                                          attribute:NSLayoutAttributeCenterX
-                                                          relatedBy:NSLayoutRelationEqual
-                                                             toItem:self.view
-                                                          attribute:NSLayoutAttributeCenterX
-                                                         multiplier:1.0
-                                                           constant:0]];
-    
-    startButtonScreenHeight = [NSLayoutConstraint constraintWithItem:startStopButton
-                                                           attribute:NSLayoutAttributeHeight
-                                                           relatedBy:NSLayoutRelationEqual
-                                                              toItem:self.view
-                                                           attribute:NSLayoutAttributeHeight
-                                                          multiplier:0.33f
-                                                            constant:0];
-    
-    startButtonScreenWidth = [NSLayoutConstraint constraintWithItem:startStopButton
-                                                          attribute:NSLayoutAttributeWidth
-                                                          relatedBy:NSLayoutRelationEqual
-                                                             toItem:self.view
-                                                          attribute:NSLayoutAttributeWidth
-                                                         multiplier:0.33f
-                                                           constant:0];
-    
-    startButtonWidth = [NSLayoutConstraint constraintWithItem:startStopButton
-                                                    attribute:NSLayoutAttributeHeight
-                                                    relatedBy:NSLayoutRelationEqual
-                                                       toItem:startStopButton
-                                                    attribute:NSLayoutAttributeWidth
-                                                   multiplier:1.0
-                                                     constant:0];
-    
-    CGSize viewSize = self.view.bounds.size;
-    
-    if (viewSize.width > viewSize.height) {
-        [self.view addConstraint:startButtonScreenHeight];
-    } else {
-        [self.view addConstraint:startButtonScreenWidth];
+    [startStopButton.centerXAnchor constraintEqualToAnchor:self.view.centerXAnchor].active = YES;
+
+    [self setStartButtonSizeConstraints:self.view.bounds.size];
+}
+
+- (void)setStartButtonSizeConstraints:(CGSize)size {
+    if (startButtonWidth) {
+        startButtonWidth.active = NO;
     }
-    
-    [self.view addConstraint:startButtonWidth];
+
+    if (startButtonHeight) {
+        startButtonHeight.active = NO;
+    }
+
+    startButtonWidth = [startStopButton.widthAnchor constraintEqualToConstant:MIN(size.width, size.height)*0.4];
+    startButtonHeight = [startStopButton.heightAnchor constraintEqualToAnchor:startStopButton.widthAnchor];
+
+    startButtonWidth.active = YES;
+    startButtonHeight.active = YES;
 }
 
 - (void)addAdLabel {
@@ -838,37 +740,10 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     }
     
     // Setup autolayout
-    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:adLabel
-                                                          attribute:NSLayoutAttributeBottom
-                                                          relatedBy:NSLayoutRelationGreaterThanOrEqual
-                                                             toItem:startStopButton
-                                                          attribute:NSLayoutAttributeTop
-                                                         multiplier:1.0
-                                                           constant:-30.0]];
-    
-    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:adLabel
-                                                          attribute:NSLayoutAttributeBottom
-                                                          relatedBy:NSLayoutRelationLessThanOrEqual
-                                                             toItem:startStopButton
-                                                          attribute:NSLayoutAttributeTop
-                                                         multiplier:1.0
-                                                           constant:-10.0]];
-    
-    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:adLabel
-                                                          attribute:NSLayoutAttributeLeft
-                                                          relatedBy:NSLayoutRelationEqual
-                                                             toItem:self.view
-                                                          attribute:NSLayoutAttributeLeft
-                                                         multiplier:1.0
-                                                           constant:15.0]];
-    
-    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:adLabel
-                                                          attribute:NSLayoutAttributeRight
-                                                          relatedBy:NSLayoutRelationEqual
-                                                             toItem:self.view
-                                                          attribute:NSLayoutAttributeRight
-                                                         multiplier:1.0
-                                                           constant:-15.0]];
+    [adLabel.bottomAnchor constraintGreaterThanOrEqualToAnchor:startStopButton.topAnchor constant:-30].active = YES;
+    [adLabel.bottomAnchor constraintLessThanOrEqualToAnchor:startStopButton.topAnchor constant:-10.f].active = YES;
+    [adLabel.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor constant:15].active = YES;
+    [adLabel.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor constant:-15].active = YES;
 }
 
 - (void)addStatusLabel {
@@ -878,52 +753,17 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     statusLabel.text = [self getVPNStatusDescription:(VPNStatus) [[self.vpnManager.lastTunnelStatus first] integerValue]];
     statusLabel.textAlignment = NSTextAlignmentCenter;
     statusLabel.textColor = [UIColor whiteColor];
+    statusLabel.font = [UIFont boldSystemFontOfSize:18.f];
+    statusLabel.shadowColor = [UIColor colorWithWhite:0 alpha:0.06];
+    statusLabel.shadowOffset = CGSizeMake(1.f, 1.f);
     [self.view addSubview:statusLabel];
     
     // Setup autolayout
-    CGFloat labelHeight = [self getLabelHeight:statusLabel];
-    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:statusLabel
-                                                          attribute:NSLayoutAttributeHeight
-                                                          relatedBy:NSLayoutRelationEqual
-                                                             toItem:nil
-                                                          attribute:NSLayoutAttributeNotAnAttribute
-                                                         multiplier:1.0
-                                                           constant:labelHeight]];
-    
-    NSLayoutConstraint *floatingConstraint = [NSLayoutConstraint constraintWithItem:statusLabel
-                                                                          attribute:NSLayoutAttributeTop
-                                                                          relatedBy:NSLayoutRelationEqual
-                                                                             toItem:startStopButton
-                                                                          attribute:NSLayoutAttributeBottom
-                                                                         multiplier:1.07f
-                                                                           constant:-6];
-    // Allow it to break in favour of the next two constraint
-    floatingConstraint.priority = 999;
-    [self.view addConstraint:floatingConstraint];
-    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:statusLabel
-                                                          attribute:NSLayoutAttributeTop
-                                                          relatedBy:NSLayoutRelationGreaterThanOrEqual
-                                                             toItem:startStopButton
-                                                          attribute:NSLayoutAttributeBottom
-                                                         multiplier:1.0
-                                                           constant:1]];
-    
-    
-    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:statusLabel
-                                                          attribute:NSLayoutAttributeTop
-                                                          relatedBy:NSLayoutRelationLessThanOrEqual
-                                                             toItem:startStopButton
-                                                          attribute:NSLayoutAttributeBottom
-                                                         multiplier:1.0
-                                                           constant:15]];
-    
-    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:statusLabel
-                                                          attribute:NSLayoutAttributeCenterX
-                                                          relatedBy:NSLayoutRelationEqual
-                                                             toItem:self.view
-                                                          attribute:NSLayoutAttributeCenterX
-                                                         multiplier:1.0
-                                                           constant:0]];
+    CGFloat labelHeight = [statusLabel getLabelHeight];
+    [statusLabel.heightAnchor constraintEqualToConstant:labelHeight].active = YES;
+    [statusLabel.topAnchor constraintGreaterThanOrEqualToAnchor:startStopButton.bottomAnchor constant:1].active = YES;
+    [statusLabel.topAnchor constraintLessThanOrEqualToAnchor:startStopButton.bottomAnchor constant:5].active = YES;
+    [statusLabel.centerXAnchor constraintEqualToAnchor:self.view.centerXAnchor].active = YES;
 }
 
 - (void)addRegionSelectionBar {
@@ -935,87 +775,79 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     bottomBar = [[UIView alloc] init];
     bottomBar.translatesAutoresizingMaskIntoConstraints = NO;
     bottomBar.backgroundColor = [UIColor whiteColor];
-    
+
+    UITapGestureRecognizer *tapRecognizer = [[UITapGestureRecognizer alloc]
+                                             initWithTarget:self action:@selector(onRegionButtonTap:)];
+    tapRecognizer.numberOfTapsRequired = 1;
+    [bottomBar addGestureRecognizer:tapRecognizer];
+
     [self.view addSubview:bottomBar];
     
     // Setup autolayout
-    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:bottomBar
-                                                          attribute:NSLayoutAttributeBottom
-                                                          relatedBy:NSLayoutRelationEqual
-                                                             toItem:self.view
-                                                          attribute:NSLayoutAttributeBottom
-                                                         multiplier:1.0
-                                                           constant:0]];
-    
-    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:bottomBar
-                                                          attribute:NSLayoutAttributeLeading
-                                                          relatedBy:NSLayoutRelationEqual
-                                                             toItem:self.view
-                                                          attribute:NSLayoutAttributeLeading
-                                                         multiplier:1.0
-                                                           constant:0]];
-    
-    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:bottomBar
-                                                          attribute:NSLayoutAttributeTrailing
-                                                          relatedBy:NSLayoutRelationEqual
-                                                             toItem:self.view
-                                                          attribute:NSLayoutAttributeTrailing
-                                                         multiplier:1.0
-                                                           constant:0]];
+    [bottomBar.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor].active = YES;
+    [bottomBar.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor].active = YES;
+    [bottomBar.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor].active = YES;
 }
 
 - (void)addRegionButton {
     // Add text above region button first
     regionButtonHeader = [[UILabel alloc] init];
     regionButtonHeader.translatesAutoresizingMaskIntoConstraints = NO;
-    regionButtonHeader.text = NSLocalizedStringWithDefaultValue(@"CHANGE_REGION", nil, [NSBundle mainBundle], @"Change region", @"Text above change region button that allows user to select their desired server region");
-    regionButtonHeader.adjustsFontSizeToFitWidth = NO;
-    regionButtonHeader.font = [regionButtonHeader.font fontWithSize:14];
+    regionButtonHeader.text = NSLocalizedStringWithDefaultValue(@"CONNECT_VIA", nil, [NSBundle mainBundle], @"Connect via", @"Text above change region button that allows user to select their desired server region");
+    regionButtonHeader.adjustsFontSizeToFitWidth = YES;
+    regionButtonHeader.font = [UIFont systemFontOfSize:14];
+    regionButtonHeader.textColor = [UIColor colorWithRed:0.00 green:0.00 blue:0.00 alpha:.37f];
     [bottomBar addSubview:regionButtonHeader];
     
     // Restrict label's height to the actual size
-    CGFloat labelHeight = [self getLabelHeight:regionButtonHeader];
-    [regionButtonHeader addConstraint:[NSLayoutConstraint constraintWithItem:regionButtonHeader
-                                                                   attribute:NSLayoutAttributeHeight
-                                                                   relatedBy:NSLayoutRelationEqual
-                                                                      toItem:nil
-                                                                   attribute:NSLayoutAttributeNotAnAttribute
-                                                                  multiplier:1.0
-                                                                    constant:labelHeight]];
-    
+    CGFloat labelHeight = [regionButtonHeader getLabelHeight];
+    NSLayoutConstraint *labelHeightConstraint = [regionButtonHeader.heightAnchor constraintEqualToConstant:labelHeight];
+    [labelHeightConstraint setPriority:999];
+    [regionButtonHeader addConstraint:labelHeightConstraint];
     
     // Now the button
     regionButton = [[UIButton alloc] init];
     regionButton.translatesAutoresizingMaskIntoConstraints = NO;
     
     CGFloat buttonHeight = 45;
-    regionButton.layer.borderColor = [UIColor lightGrayColor].CGColor;
-    regionButton.layer.borderWidth = 1.f;
-    regionButton.layer.cornerRadius = buttonHeight / 2;
-    [regionButton setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
+    [regionButton setTitleColor:[UIColor colorWithWhite:0 alpha:.8] forState:UIControlStateNormal];
     [regionButton setTitleColor:[UIColor lightGrayColor] forState:UIControlStateHighlighted];
-    regionButton.titleLabel.font = [UIFont systemFontOfSize:regionButton.titleLabel.font.pointSize weight:UIFontWeightLight];
+    regionButton.titleLabel.font = [UIFont systemFontOfSize:16 weight:UIFontWeightLight];
     regionButton.titleLabel.adjustsFontSizeToFitWidth = YES;
     
     CGFloat spacing = 10; // the amount of spacing to appear between image and title
-    CGFloat spacingFromSides = 10.f;
-    
-    BOOL isRTL = [self isRightToLeft];
-    regionButton.imageEdgeInsets = UIEdgeInsetsMake(0, 0, 0, isRTL ? -spacing : spacing);
-    regionButton.titleEdgeInsets = UIEdgeInsetsMake(0, isRTL ? -spacing : spacing, 0, 0);
-    regionButton.contentEdgeInsets = UIEdgeInsetsMake(0, spacing + spacingFromSides, 0, spacing + spacingFromSides);
+    regionButton.titleEdgeInsets = UIEdgeInsetsMake(0, spacing, 0, spacing);
     [regionButton addTarget:self action:@selector(onRegionButtonTap:) forControlEvents:UIControlEventTouchUpInside];
+
     // Set button height
-    [regionButton addConstraint:[NSLayoutConstraint constraintWithItem:regionButton
-                                                             attribute:NSLayoutAttributeHeight
-                                                             relatedBy:NSLayoutRelationEqual
-                                                                toItem:nil
-                                                             attribute:NSLayoutAttributeNotAnAttribute
-                                                            multiplier:1.0
-                                                              constant:buttonHeight]];
+    [regionButton.heightAnchor constraintEqualToConstant:buttonHeight].active = YES;
     [bottomBar addSubview:regionButton];
+
+    if (@available(iOS 11.0, *)) {
+        [regionButton.bottomAnchor constraintEqualToAnchor:self.view.layoutMarginsGuide.bottomAnchor constant:-spacing].active = TRUE;
+    }
+
     [self updateRegionButton];
-    [self setRegionSelectionConstraints:self.view.frame.size];
+
+    // Add constraints
+    [regionButtonHeader.topAnchor constraintEqualToAnchor:bottomBar.topAnchor constant:7].active = YES;
+    [regionButtonHeader.centerXAnchor constraintEqualToAnchor:bottomBar.centerXAnchor].active = YES;
+    [regionButton.topAnchor constraintEqualToAnchor:regionButtonHeader.bottomAnchor constant:5].active = YES;
+    [regionButton.bottomAnchor constraintEqualToAnchor:bottomBar.bottomAnchor constant:-7].active = YES;
+    [regionButton.titleLabel.centerXAnchor constraintEqualToAnchor:regionButtonHeader.centerXAnchor].active = YES;
+    [regionButton.widthAnchor constraintEqualToAnchor:bottomBar.widthAnchor multiplier:.7f].active = YES;
+
+    // Add up arrow indicator
+    UIImage *arrowImage = [UIImage imageNamed:@"UpArrow"];
+    UIImageView *upArrow = [[UIImageView alloc] initWithImage:arrowImage];
+    upArrow.contentMode = UIViewContentModeScaleAspectFit;
+
+    [bottomBar addSubview:upArrow];
+    upArrow.translatesAutoresizingMaskIntoConstraints = NO;
+    [upArrow.leftAnchor constraintEqualToAnchor:regionButton.titleLabel.rightAnchor constant:spacing].active = YES;
+    [upArrow.centerYAnchor constraintEqualToAnchor:regionButton.centerYAnchor].active = YES;
+    [upArrow.widthAnchor constraintEqualToConstant:15].active = YES;
+    [upArrow.heightAnchor constraintEqualToAnchor:upArrow.widthAnchor].active = YES;
 }
 
 - (void)addVersionLabel {
@@ -1027,40 +859,20 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     versionLabel.userInteractionEnabled = YES;
     versionLabel.textColor = [UIColor whiteColor];
     versionLabel.font = [versionLabel.font fontWithSize:13];
-    
+
 #if DEBUG
     UITapGestureRecognizer *tapRecognizer = [[UITapGestureRecognizer alloc]
                                              initWithTarget:self action:@selector(onVersionLabelTap:)];
     tapRecognizer.numberOfTapsRequired = 1;
     [versionLabel addGestureRecognizer:tapRecognizer];
 #endif
-    
+
     [self.view addSubview:versionLabel];
-    
+
     // Setup autolayout
-    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:versionLabel
-                                                          attribute:NSLayoutAttributeLeading
-                                                          relatedBy:NSLayoutRelationEqual
-                                                             toItem:self.view
-                                                          attribute:NSLayoutAttributeLeading
-                                                         multiplier:1.0
-                                                           constant:10.0]];
-    
-    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:versionLabel
-                                                          attribute:NSLayoutAttributeCenterY
-                                                          relatedBy:NSLayoutRelationEqual
-                                                             toItem:settingsButton
-                                                          attribute:NSLayoutAttributeCenterY
-                                                         multiplier:1.0
-                                                           constant:0]];
-    
-    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:versionLabel
-                                                          attribute:NSLayoutAttributeHeight
-                                                          relatedBy:NSLayoutRelationEqual
-                                                             toItem:nil
-                                                          attribute:NSLayoutAttributeNotAnAttribute
-                                                         multiplier:1.0
-                                                           constant:50.0]];
+    [versionLabel.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor constant:12].active = YES;
+    [versionLabel.centerYAnchor constraintEqualToAnchor:settingsButton.centerYAnchor].active = YES;
+    [versionLabel.heightAnchor constraintEqualToConstant:50].active = YES;
 }
 
 - (void)addSubscriptionButton {
@@ -1069,7 +881,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     subscriptionButton.clipsToBounds = YES;
     [subscriptionButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
     subscriptionButton.titleLabel.font = [UIFont boldSystemFontOfSize:subscriptionButton.titleLabel.font.pointSize];
-    subscriptionButton.backgroundColor = [[UIColor alloc] initWithRed:42.0/255 green:157.0/255 blue:242.0/255 alpha:1];
+    subscriptionButton.backgroundColor = [UIColor colorWithRed:0.47 green:0.38 blue:1.00 alpha:1.0];
     
     subscriptionButton.contentEdgeInsets = UIEdgeInsetsMake(10.0f, 30.0f, 10.0f, 30.0f);
     
@@ -1084,28 +896,11 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     [self.view addSubview:subscriptionButton];
     
     // Setup autolayout
-    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:subscriptionButton
-                                                          attribute:NSLayoutAttributeHeight
-                                                          relatedBy:NSLayoutRelationEqual
-                                                             toItem:nil
-                                                          attribute:NSLayoutAttributeNotAnAttribute
-                                                         multiplier:1.0
-                                                           constant:40]];
-    
-    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:subscriptionButton
-                                                          attribute:NSLayoutAttributeCenterX
-                                                          relatedBy:NSLayoutRelationEqual
-                                                             toItem:self.view
-                                                          attribute:NSLayoutAttributeCenterX
-                                                         multiplier:1.0
-                                                           constant:0]];
-    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:subscriptionButton
-                                                          attribute:NSLayoutAttributeBottom
-                                                          relatedBy:NSLayoutRelationEqual
-                                                             toItem:bottomBar
-                                                          attribute:NSLayoutAttributeTop
-                                                         multiplier:1.0
-                                                           constant:-10]];
+    [subscriptionButton.heightAnchor constraintEqualToConstant:40].active = YES;
+    [subscriptionButton.centerXAnchor constraintEqualToAnchor:self.view.centerXAnchor].active = YES;
+    NSLayoutConstraint *idealBottomSpacing = [subscriptionButton.bottomAnchor constraintEqualToAnchor:bottomBar.topAnchor constant:-10.f];
+    [idealBottomSpacing setPriority:999];
+    idealBottomSpacing.active = YES;
 }
 
 #pragma mark - FeedbackViewControllerDelegate methods and helpers
@@ -1183,6 +978,10 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 
 #pragma mark - Psiphon Settings
 
+-(void)notice:(NSString *)noticeJSON {
+    NSLog(@"Got notice %@", noticeJSON);
+}
+
 - (void)openSettingsMenu {
     appSettingsViewController = [[SettingsViewController alloc] init];
     appSettingsViewController.delegate = appSettingsViewController;
@@ -1252,128 +1051,6 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     [regionButton setTitle:regionText forState:UIControlStateNormal];
 }
 
-- (void)setRegionSelectionConstraints:(CGSize) size {
-    [bottomBar removeConstraints:[bottomBar constraints]];
-    if (size.width > size.height && [[UIDevice currentDevice]userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
-        regionButtonHeader.hidden = YES;
-        [bottomBar addConstraint:[NSLayoutConstraint constraintWithItem:regionButton
-                                                              attribute:NSLayoutAttributeBottom
-                                                              relatedBy:NSLayoutRelationEqual
-                                                                 toItem:bottomBar
-                                                              attribute:NSLayoutAttributeBottom
-                                                             multiplier:1.0
-                                                               constant:-7]];
-        
-        [bottomBar addConstraint:[NSLayoutConstraint constraintWithItem:regionButton
-                                                              attribute:NSLayoutAttributeTop
-                                                              relatedBy:NSLayoutRelationEqual
-                                                                 toItem:bottomBar
-                                                              attribute:NSLayoutAttributeTop
-                                                             multiplier:1.0
-                                                               constant:7]];
-        
-        [bottomBar addConstraint:[NSLayoutConstraint constraintWithItem:regionButton
-                                                              attribute:NSLayoutAttributeCenterX
-                                                              relatedBy:NSLayoutRelationEqual
-                                                                 toItem:bottomBar
-                                                              attribute:NSLayoutAttributeCenterX
-                                                             multiplier:1.0
-                                                               constant:0]];
-        
-        [bottomBar addConstraint:[NSLayoutConstraint constraintWithItem:regionButtonHeader
-                                                              attribute:NSLayoutAttributeCenterY
-                                                              relatedBy:NSLayoutRelationEqual
-                                                                 toItem:regionButton
-                                                              attribute:NSLayoutAttributeCenterY
-                                                             multiplier:1.0
-                                                               constant:0]];
-        
-        [bottomBar addConstraint:[NSLayoutConstraint constraintWithItem:regionButtonHeader
-                                                              attribute:NSLayoutAttributeTrailing
-                                                              relatedBy:NSLayoutRelationEqual
-                                                                 toItem:regionButton
-                                                              attribute:NSLayoutAttributeLeading
-                                                             multiplier:1.0
-                                                               constant:-5]];
-    } else {
-        regionButtonHeader.hidden = NO;
-        [bottomBar addConstraint:[NSLayoutConstraint constraintWithItem:regionButtonHeader
-                                                              attribute:NSLayoutAttributeTop
-                                                              relatedBy:NSLayoutRelationEqual
-                                                                 toItem:bottomBar
-                                                              attribute:NSLayoutAttributeTop
-                                                             multiplier:1.0
-                                                               constant:5]];
-        
-        [bottomBar addConstraint:[NSLayoutConstraint constraintWithItem:regionButtonHeader
-                                                              attribute:NSLayoutAttributeCenterX
-                                                              relatedBy:NSLayoutRelationEqual
-                                                                 toItem:bottomBar
-                                                              attribute:NSLayoutAttributeCenterX
-                                                             multiplier:1.0
-                                                               constant:0]];
-        
-        
-        [bottomBar addConstraint:[NSLayoutConstraint constraintWithItem:regionButton
-                                                              attribute:NSLayoutAttributeBottom
-                                                              relatedBy:NSLayoutRelationEqual
-                                                                 toItem:bottomBar
-                                                              attribute:NSLayoutAttributeBottom
-                                                             multiplier:1.0
-                                                               constant:-7]];
-        
-        [bottomBar addConstraint:[NSLayoutConstraint constraintWithItem:regionButton
-                                                              attribute:NSLayoutAttributeTop
-                                                              relatedBy:NSLayoutRelationEqual
-                                                                 toItem:regionButtonHeader
-                                                              attribute:NSLayoutAttributeBottom
-                                                             multiplier:1.0
-                                                               constant:7]];
-        
-        [bottomBar addConstraint:[NSLayoutConstraint constraintWithItem:regionButton
-                                                              attribute:NSLayoutAttributeCenterX
-                                                              relatedBy:NSLayoutRelationEqual
-                                                                 toItem:bottomBar
-                                                              attribute:NSLayoutAttributeCenterX
-                                                             multiplier:1.0
-                                                               constant:0]];
-        
-        NSLayoutConstraint *widthConstraint = [NSLayoutConstraint constraintWithItem:regionButton
-                                                                           attribute:NSLayoutAttributeWidth
-                                                                           relatedBy:NSLayoutRelationEqual
-                                                                              toItem:bottomBar
-                                                                           attribute:NSLayoutAttributeWidth
-                                                                          multiplier:.7
-                                                                            constant:0];
-        widthConstraint.priority = 999; // allow constraint to be broken to enforce max width
-        [bottomBar addConstraint:widthConstraint];
-        
-        [bottomBar addConstraint:[NSLayoutConstraint constraintWithItem:regionButton
-                                                              attribute:NSLayoutAttributeWidth
-                                                              relatedBy:NSLayoutRelationLessThanOrEqual
-                                                                 toItem:nil
-                                                              attribute:NSLayoutAttributeNotAnAttribute
-                                                             multiplier:1.0
-                                                               constant:220]];
-    }
-}
-
-// From https://stackoverflow.com/questions/27374612/how-do-i-calculate-the-uilabel-height-dynamically
-- (CGFloat)getLabelHeight:(UILabel*)label {
-    CGSize constraint = CGSizeMake(label.frame.size.width, CGFLOAT_MAX);
-    CGSize size;
-    
-    NSStringDrawingContext *context = [[NSStringDrawingContext alloc] init];
-    CGSize boundingBox = [label.text boundingRectWithSize:constraint
-                                                  options:NSStringDrawingUsesLineFragmentOrigin
-                                               attributes:@{NSFontAttributeName:label.font}
-                                                  context:context].size;
-    
-    size = CGSizeMake(ceil(boundingBox.width), ceil(boundingBox.height));
-    
-    return size.height;
-}
-
 - (void)setupLayoutGuides {
     // setup layout equal distribution
     UILayoutGuide *topSpacerGuide = [UILayoutGuide new];
@@ -1384,13 +1061,12 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     
     [topSpacerGuide.heightAnchor constraintGreaterThanOrEqualToConstant:.1].active = YES;
     [bottomSpacerGuide.heightAnchor constraintEqualToAnchor:topSpacerGuide.heightAnchor].active = YES;
-    
-    [topSpacerGuide.topAnchor constraintEqualToAnchor:appSubTitleLabel.bottomAnchor].active = YES;
+    [topSpacerGuide.topAnchor constraintEqualToAnchor:psiCashView.bottomAnchor].active = YES;
     [topSpacerGuide.bottomAnchor constraintEqualToAnchor:startStopButton.topAnchor].active = YES;
     [bottomSpacerGuide.topAnchor constraintEqualToAnchor:statusLabel.bottomAnchor].active = YES;
     
-    bottomBarTop = [bottomSpacerGuide.bottomAnchor constraintEqualToAnchor:bottomBar.topAnchor];
-    subscriptionButtonTop = [bottomSpacerGuide.bottomAnchor constraintEqualToAnchor:subscriptionButton.topAnchor];
+    bottomBarTopConstraint = [bottomSpacerGuide.bottomAnchor constraintEqualToAnchor:bottomBar.topAnchor];
+    subscriptionButtonTopConstraint = [bottomSpacerGuide.bottomAnchor constraintEqualToAnchor:subscriptionButton.topAnchor];
 }
 
 #pragma mark - Subscription
@@ -1402,19 +1078,209 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     [self presentViewController:navController animated:YES completion:nil];
 }
 
+#pragma mark - PsiCash
+
+#pragma mark - PsiCashPurchaseAlertViewDelegate protocol
+
+- (void)stateBecameStale {
+    [alertView close];
+    alertView = nil;
+}
+
+- (void)showPsiCashAlertView {
+    if (alertView != nil) {
+        [alertView close];
+        alertView = nil;
+    }
+
+    if (![model hasAuthPackage] || ![model.authPackage hasSpenderToken]) {
+        return;
+    } else if ([model hasActiveSpeedBoostPurchase]) {
+        alertView = [PsiCashPurchaseAlertView alreadySpeedBoostingAlert];
+    } else  if ([model hasPendingPurchase]) {
+        // (PsiCash 1.0): Do nothing
+        //alertView = [PsiCashPurchaseAlertView pendingPurchaseAlert];
+        return;
+    } else {
+        // Insufficient balance animation
+        CABasicAnimation *animation =
+        [CABasicAnimation animationWithKeyPath:@"position"];
+        [animation setDuration:0.075];
+        [animation setRepeatCount:3];
+        [animation setAutoreverses:YES];
+        [animation setFromValue:[NSValue valueWithCGPoint:
+                                 CGPointMake([psiCashView center].x - 20.0f, [psiCashView center].y)]];
+        [animation setToValue:[NSValue valueWithCGPoint:
+                               CGPointMake([psiCashView center].x + 20.0f, [psiCashView center].y)]];
+        [[psiCashView layer] addAnimation:animation forKey:@"position"];
+        return;
+    }
+
+    alertView.controllerDelegate = self;
+    [alertView bindWithModel:model];
+    [alertView show];
+}
+
+/**
+* Buy max num hours of Speed Boost that the user can afford if possible
+*/
+- (void)instantMaxSpeedBoostPurchase {
+    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+
+    if (![userDefaults boolForKey:PsiCashHasBeenOnboardedBoolKey]) {
+        PsiCashOnboardingViewController *onboarding = [[PsiCashOnboardingViewController alloc] init];
+        onboarding.delegate = self;
+        [self presentViewController:onboarding animated:NO completion:nil];
+        return;
+    }
+
+    PsiCashSpeedBoostProductSKU *purchase = [model maxSpeedBoostPurchaseEarned];
+    if (![model hasPendingPurchase] && ![model hasActiveSpeedBoostPurchase] && purchase != nil) {
+        [PsiCashClient.sharedInstance purchaseSpeedBoostProduct:purchase];
+    } else {
+        [self showPsiCashAlertView];
+    }
+}
+
+- (void)addPsiCashView {
+    psiCashView = [[PsiCashBalanceWithSpeedBoostMeter alloc] init];
+    psiCashView.translatesAutoresizingMaskIntoConstraints = NO;
+    [self.view addSubview:psiCashView];
+
+    UITapGestureRecognizer *psiCashViewTap = [[UITapGestureRecognizer alloc]
+                                                  initWithTarget:self action:@selector(instantMaxSpeedBoostPurchase)];
+    psiCashViewTap.numberOfTapsRequired = 1;
+    [psiCashView addGestureRecognizer:psiCashViewTap];
+
+    [psiCashView.centerXAnchor constraintEqualToAnchor:appSubTitleLabel.centerXAnchor].active = YES;
+    [psiCashView.topAnchor constraintGreaterThanOrEqualToAnchor:appSubTitleLabel.bottomAnchor].active = YES;
+    NSLayoutConstraint *topSpacing = [psiCashView.topAnchor constraintEqualToAnchor:appSubTitleLabel.bottomAnchor constant:30.f];
+    [topSpacing setPriority:999];
+    topSpacing.active = YES;
+
+    CGFloat psiCashViewMaxWidth = 400;
+    CGFloat psiCashViewToParentViewWidthRatio = 0.95;
+    if (self.view.frame.size.width * psiCashViewToParentViewWidthRatio > psiCashViewMaxWidth) {
+        [psiCashView.widthAnchor constraintEqualToConstant:psiCashViewMaxWidth].active = YES;
+    } else {
+        [psiCashView.widthAnchor constraintEqualToAnchor:self.view.widthAnchor multiplier:0.95].active = YES;
+    }
+    psiCashViewHeight = [psiCashView.heightAnchor constraintEqualToConstant:100];
+    psiCashViewHeight.active = YES;
+
+    // Highlight PsiCashView
+    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+    if (![userDefaults boolForKey:PsiCashHasBeenOnboardedBoolKey]) {
+        [self highlightPsiCashViewWithStars];
+    }
+
+    __weak MainViewController *weakSelf = self;
+
+    [psiCashViewUpdates dispose];
+
+    psiCashViewUpdates = [[PsiCashClient.sharedInstance.clientModelSignal deliverOnMainThread] subscribeNext:^(PsiCashClientModel *newClientModel) {
+        __strong MainViewController *strongSelf = weakSelf;
+        if (strongSelf != nil) {
+
+            BOOL stateChanged = [model hasActiveSpeedBoostPurchase] ^ [newClientModel hasActiveSpeedBoostPurchase] || [model hasPendingPurchase] ^ [newClientModel hasPendingPurchase];
+
+            NSComparisonResult balanceChange = [model.balance compare:newClientModel.balance];
+            if (balanceChange != NSOrderedSame) {
+                [PsiCashBalanceWithSpeedBoostMeter animateBalanceChangeOf:[NSNumber numberWithDouble:newClientModel.balance.doubleValue - model.balance.doubleValue] withPsiCashView:psiCashView inParentView:self.view];
+            }
+
+            model = newClientModel;
+
+            if (stateChanged && alertView != nil) {
+                [self showPsiCashAlertView];
+            }
+
+            [psiCashView bindWithModel:model];
+        }
+    }];
+
+#if DEBUG
+    if ([AppDelegate isRunningUITest]) {
+        [psiCashViewUpdates dispose];
+        [self onboardingEnded];
+
+        PsiCashSpeedBoostProductSKU *sku = [PsiCashSpeedBoostProductSKU skuWitDistinguisher:@"1h" withHours:[NSNumber numberWithInteger:1] andPrice:[NSNumber numberWithDouble:100e9]];
+
+        PsiCashClientModel *m = [PsiCashClientModel clientModelWithAuthPackage:[[PsiCashAuthPackage alloc] initWithValidTokens:@[@"indicator", @"earner", @"spender"]]
+                                                                    andBalance:[NSNumber numberWithDouble:70e9]
+                                                          andSpeedBoostProduct:[PsiCashSpeedBoostProduct productWithSKUs:@[sku]]
+                                                           andPendingPurchases:nil
+                                                   andActiveSpeedBoostPurchase:nil
+                                                             andRefreshPending:NO];
+        [psiCashView bindWithModel:m];
+    }
+#endif
+}
+
+- (void)setPsiCashContentHidden:(BOOL)hidden {
+    [self setStarsHidden:hidden];
+    psiCashView.hidden = hidden;
+    psiCashViewHeight.constant = hidden ? 0 : 100;
+}
+
+- (void)setStarsHidden:(BOOL)hidden {
+    for (StarView *star in stars) {
+        star.hidden = hidden;
+    }
+}
+
+- (void)highlightPsiCashViewWithStars {
+    StarView *star1 = [[StarView alloc] init];
+    [self.view addSubview:star1];
+
+    star1.translatesAutoresizingMaskIntoConstraints = NO;
+    [star1.centerXAnchor constraintEqualToAnchor:psiCashView.balance.leadingAnchor constant:5].active = YES;
+    [star1.centerYAnchor constraintEqualToAnchor:psiCashView.meter.bottomAnchor constant:-2].active = YES;
+    [star1.widthAnchor constraintEqualToConstant:20].active = YES;
+    [star1.heightAnchor constraintEqualToAnchor:star1.widthAnchor].active = YES;
+
+    StarView *star2 = [[StarView alloc] init];
+    [self.view addSubview:star2];
+
+    star2.translatesAutoresizingMaskIntoConstraints = NO;
+    [star2.centerXAnchor constraintEqualToAnchor:psiCashView.balance.trailingAnchor constant:20].active = YES;
+    [star2.centerYAnchor constraintEqualToAnchor:psiCashView.meter.topAnchor constant:2].active = YES;
+    [star2.widthAnchor constraintEqualToConstant:25].active = YES;
+    [star2.heightAnchor constraintEqualToAnchor:star2.widthAnchor].active = YES;
+
+    StarView *star3 = [[StarView alloc] init];
+    [self.view addSubview:star3];
+
+    star3.translatesAutoresizingMaskIntoConstraints = NO;
+    [star3.centerXAnchor constraintEqualToAnchor:psiCashView.balance.leadingAnchor constant:-13].active = YES;
+    [star3.centerYAnchor constraintEqualToAnchor:psiCashView.balance.centerYAnchor constant:-5].active = YES;
+    [star3.widthAnchor constraintEqualToConstant:12].active = YES;
+    [star3.heightAnchor constraintEqualToAnchor:star3.widthAnchor].active = YES;
+
+    CGFloat minAlpha = 0.2;
+    [star1 blinkWithPeriod:2 andDelay:0 andMinAlpha:minAlpha];
+    [star2 blinkWithPeriod:3 andDelay:.25 andMinAlpha:minAlpha];
+    [star3 blinkWithPeriod:4 andDelay:.75 andMinAlpha:minAlpha];
+
+    stars = @[star1, star2, star3];
+}
+
+#pragma mark - PsiCashOnboardingViewControllerDelegate protocol implementation
+
+- (void)onboardingEnded {
+    [[NSUserDefaults standardUserDefaults] setBool:YES forKey:PsiCashHasBeenOnboardedBoolKey];
+    for (StarView *star in stars) {
+        [star removeFromSuperview];
+    }
+}
+
 #pragma mark - RegionAdapterDelegate protocol implementation
 
 - (void)selectedRegionDisappearedThenSwitchedToBestPerformance {
     dispatch_async_main(^{
-        // Alert the user that the VPN failed to start, and that they should try again.
-        [UIAlertController presentSimpleAlertWithTitle:NSLocalizedStringWithDefaultValue(@"VPN_START_FAIL_REGION_INVALID_TITLE", nil, [NSBundle mainBundle], @"Server Region Unavailable", @"Alert dialog title indicating to the user that Psiphon was unable to start because they selected an egress region that is no longer available")
-                                               message:NSLocalizedStringWithDefaultValue(@"VPN_START_FAIL_REGION_INVALID_MESSAGE", nil, [NSBundle mainBundle], @"The region you selected is no longer available. You must choose a new region or change to the default \"Best performance\" choice.", @"Alert dialog message informing the user that an error occurred while starting Psiphon because they selected an egress region that is no longer available (Do not translate 'Psiphon'). The user should select a different region and try again. Note: the backslash before each quotation mark should be left as is for formatting.")
-                                        preferredStyle:UIAlertControllerStyleAlert
-                                             okHandler:nil];
         [self updateRegionButton];
     });
     [self persistSelectedRegion];
-    [self.vpnManager stopVPN];
 }
 
 @end

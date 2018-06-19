@@ -22,6 +22,10 @@
 #import "RACSignal+Operations.h"
 #import "RACDisposable.h"
 #import "RACCompoundDisposable.h"
+#import "PsiFeedbackLogger.h"
+#import "NSError+Convenience.h"
+
+PsiFeedbackLogType const AsyncOperationLogType = @"AsyncOperation";
 
 @interface AsyncOperation ()
 
@@ -52,6 +56,9 @@
     if (self) {
         _finished = FALSE;
         _executing = FALSE;
+
+        // KVO - listen to to "cancelled" value.
+        [self addObserver:self forKeyPath:@"cancelled" options:NSKeyValueObservingOptionNew context:nil];
     }
     return self;
 }
@@ -62,6 +69,18 @@
         mainBlock = [block copy];
     }
     return self;
+}
+
+- (void)dealloc {
+    [self removeObserver:self forKeyPath:@"cancelled"];
+}
+
+- (void)observeValueForKeyPath:(nullable NSString *)keyPath ofObject:(nullable id)object change:(nullable NSDictionary<NSKeyValueChangeKey, id> *)change context:(nullable void *)context {
+    if ([keyPath isEqualToString:@"cancelled"]) {
+        [PsiFeedbackLogger warnWithType:AsyncOperationLogType message:@"[%@] cancelled", self.name];
+        self.executing = FALSE;
+        self.finished = TRUE;
+    }
 }
 
 // Must override since this operation is asynchronous (confusingly name concurrent in Apple documentation on NSOperation)
