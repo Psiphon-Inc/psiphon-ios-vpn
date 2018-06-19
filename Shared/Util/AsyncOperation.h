@@ -28,6 +28,9 @@ typedef void (^OperationBlockCompletionHandler)(void(^completionHandler)(NSError
 
 @property (nonatomic, readonly) NSError *error;
 
+/**
+ * completionHandler block is safe to be called more than once.
+ */
 - (instancetype)initWithBlock:(OperationBlockCompletionHandler)block;
 
 @end

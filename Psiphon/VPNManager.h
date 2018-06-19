@@ -19,14 +19,24 @@
 
 #import <Foundation/Foundation.h>
 #import <NetworkExtension/NetworkExtension.h>
+#import "UserDefaults.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
+@class RACSubject<ValueType>;
 @class RACReplaySubject<ValueType>;
 @class RACSignal<__covariant ValueType>;
 @class RACTwoTuple<__covariant First, __covariant Second>;
+@class RACUnit;
 
 FOUNDATION_EXPORT NSErrorDomain const VPNManagerErrorDomain;
+
+/**
+ * VPNManagerConnectOnDemandUntilNextStartBoolKey represents user's preference for Connect On Demand to be enabled
+ * for the next VPN start.
+ * This preference should not be displayed to the user directly.
+ */
+FOUNDATION_EXPORT UserDefaultsKey const VPNManagerConnectOnDemandUntilNextStartBoolKey;
 
 typedef NS_ERROR_ENUM(VPNManagerErrorDomain, VPNManagerConfigErrorCode) {
     /*! @const VPNManagerStartErrorConfigLoadFailed Failed to load VPN configurations. */
@@ -148,6 +158,12 @@ typedef NS_ENUM(NSInteger, VPNStartStatus) {
  * Note: If no network extension process is running nothing happens.
  */
 - (void)restartVPNIfActive;
+
+
+/**
+ * Removes and installs the VPN configuration.
+ */
+- (void)reinstallVPNConfiguration;
 
 /**
  * Returns TRUE if VPNStatus is in an active state.

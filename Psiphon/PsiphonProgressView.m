@@ -21,7 +21,6 @@
 #import "PsiphonProgressView.h"
 #import "PureLayout.h"
 
-#define kLogoRatioOfMinDimension 0.7f
 
 @implementation PsiphonProgressView {
     UIImage *logo;
@@ -88,7 +87,7 @@
 - (void)setupLayoutConstraints {
     logoView.translatesAutoresizingMaskIntoConstraints = NO;
 
-    CGSize size = [self size];
+    CGSize size = CGSizeMake(logoView.image.size.width, logoView.image.size.height);
     logoViewWidth = [logoView.widthAnchor constraintEqualToConstant:size.width];
     logoViewHeight = [logoView.heightAnchor constraintEqualToConstant:size.height];
     logoViewWidth.active = YES;
@@ -99,12 +98,7 @@
 }
 
 - (CGSize)size {
-    CGFloat len = kLogoRatioOfMinDimension * [self minDimensionLength];
-    return CGSizeMake(len, len);
-}
-
-- (CGFloat)minDimensionLength {
-    return MIN(self.frame.size.width, self.frame.size.height);
+    return CGSizeMake(logoView.image.size.width, logoView.image.size.height);
 }
 
 @end

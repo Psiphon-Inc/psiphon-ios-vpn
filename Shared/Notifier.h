@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, Psiphon Inc.
+ * Copyright (c) 2018, Psiphon Inc.
  * All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -22,35 +22,52 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+typedef NSString * NotifierMessage;
+
+// Messages sent by the extension.
+extern NotifierMessage const NotifierNewHomepages;
+extern NotifierMessage const NotifierTunnelConnected;
+extern NotifierMessage const NotifierAvailableEgressRegions;
+extern NotifierMessage const NotifierMarkedAuthorizations;
+
+// Messages sent by the container.
+extern NotifierMessage const NotifierStartVPN;
+extern NotifierMessage const NotifierForceSubscriptionCheck;
+extern NotifierMessage const NotifierAppEnteredBackground;
+extern NotifierMessage const NotifierUpdatedAuthorizations;
+
+#pragma mark - NotifierObserver
+
+@protocol NotifierObserver <NSObject>
+
+@required
+
+- (void)onMessageReceived:(NotifierMessage)message;
+
+@end
+
+#pragma mark - Notifier
+
 @interface Notifier : NSObject
 
-- (_Nullable instancetype)initWithAppGroupIdentifier:(NSString *)identifier;
++ (Notifier *)sharedInstance;
 
-/*!
- * @brief Sends Darwin notification with given key.
- * @param key Unique notification key.
+/**
+ * If called from the container, posts the message to the network extension.
+ * If called from the extension, posts the message to the container.
+ *
+ * @param message NotifierMessage of the message.
  */
-- (void)post:(NSString *)key;
+- (void)post:(NotifierMessage)message;
 
-/*!
- * @brief Registers provided listener with Darwin notifications
- *        for the given key.
- * @param key Unique notification key.
- * @param listener Listener to be called when a notification with given key is sent.
+/**
+ * Adds an observer to the Notifier.
+ * Nothing happens, if the observer has already been registered.
+ *
+ * @param observer The observer to add to the observers' queue.
+ * @param queue The dispatch queue tha the observer is called on.
  */
-- (void)listenForNotification:(NSString *)key listener:(void(^)(NSString *key))listener;
-
-/*!
- * @brief Unregisters listener associated with the given notification key.
- * @param key Unique notification key.
- */
-- (void)removeListenerForKey:(nonnull NSString *)key;
-
-/*!
- * @brief All listeners registered with this Notifier
- * will be unregistered.
- */
-- (void)removeAllListeners;
+- (void)registerObserver:(id <NotifierObserver>)observer callbackQueue:(dispatch_queue_t)queue;
 
 @end
 

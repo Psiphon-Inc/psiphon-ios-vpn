@@ -57,6 +57,11 @@
 
 @implementation RootContainerController
 
+// Force portrait orientation
+- (UIInterfaceOrientationMask)supportedInterfaceOrientations {
+    return (UIInterfaceOrientationMaskPortrait | UIInterfaceOrientationMaskPortraitUpsideDown);
+}
+
 - (instancetype)init {
     self = [super init];
     if (self) {
