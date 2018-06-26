@@ -18,7 +18,7 @@
  */
 
 #import "IAPStoreHelper.h"
-#import "RMAppReceipt.h"
+#import "PsiphonAppReceipt.h"
 #import "SharedConstants.h"
 #import "NSDate+Comparator.h"
 #import "DispatchUtils.h"
@@ -76,8 +76,8 @@ NSString *const kSubscriptionDictionary = @"kSubscriptionDictionary";
     }
 
     @autoreleasepool {
-        RMAppReceipt *receipt = [RMAppReceipt bundleReceipt];
-        if(receipt && [receipt verifyReceiptHash]) {
+        PsiphonAppReceipt *receipt = [PsiphonAppReceipt bundleReceipt];
+        if(receipt) {
             NSString *bundleIdentifier = [[NSBundle mainBundle] bundleIdentifier];
 
             if ([bundleIdentifier containsString:receipt.bundleIdentifier]) {
@@ -255,20 +255,16 @@ NSString *const kSubscriptionDictionary = @"kSubscriptionDictionary";
     return [[self class] hasActiveSubscriptionForDate:date inDict:dict getExpiryDate:expiryDate];
 }
 
-+ (BOOL)hasActiveSubscriptionForDate:(NSDate*)date inDict:(NSDictionary*)subscriptionDict getExpiryDate:(NSDate **)expiryDate{
-
++ (BOOL)hasActiveSubscriptionForDate:(NSDate*)date inDict:(NSDictionary*)subscriptionDict getExpiryDate:(NSDate **)expiryDate {
     if(!subscriptionDict) {
         return NO;
     }
 
     NSDate *latestExpirationDate = subscriptionDict[kLatestExpirationDate];
-
     if(latestExpirationDate && [date beforeOrEqualTo:latestExpirationDate]) {
-
         if (expiryDate) {
             (*expiryDate) = [latestExpirationDate copy];
         }
-
         return YES;
     }
     return NO;
