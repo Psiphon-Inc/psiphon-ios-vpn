@@ -170,6 +170,8 @@ typedef NS_ERROR_ENUM(SubscriptionResultErrorDomain, SubscriptionResultErrorCode
 
 - (BOOL)isSubscribedOrInProgress;
 
+- (BOOL)isSubscribed;
+
 - (BOOL)isInProgress;
 
 - (void)setStateSubscribed;
