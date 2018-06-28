@@ -426,6 +426,10 @@ typedef NS_ENUM(NSInteger, SubscriptionStateEnum) {
     return self.state != SubscriptionStateNotSubscribed;
 }
 
+- (BOOL)isSubscribed {
+    return self.state == SubscriptionStateSubscribed;
+}
+
 - (BOOL)isInProgress {
    return self.state == SubscriptionStateInProgress;
 }
