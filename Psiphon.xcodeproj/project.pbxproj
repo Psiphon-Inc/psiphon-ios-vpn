@@ -15,10 +15,39 @@
 		19CB75081F54ADB300F78219 /* MPGoogleAdMobInterstitialCustomEvent.m in Sources */ = {isa = PBXBuildFile; fileRef = 19CB75061F54ADB300F78219 /* MPGoogleAdMobInterstitialCustomEvent.m */; };
 		440D75BE1F59E041005C603B /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 440D75BD1F59E041005C603B /* StoreKit.framework */; };
 		4435CC271F70566000F3A809 /* SettingsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4435CC261F70566000F3A809 /* SettingsViewController.m */; };
+		445F239620E1817C00D004E9 /* PsiphonAppReceipt.m in Sources */ = {isa = PBXBuildFile; fileRef = 445F239520E1817C00D004E9 /* PsiphonAppReceipt.m */; };
+		445F24D420E1A5BA00D004E9 /* ReceiptAttributes.c in Sources */ = {isa = PBXBuildFile; fileRef = 445F249820E1A5BA00D004E9 /* ReceiptAttributes.c */; };
+		445F24D520E1A5BA00D004E9 /* constr_TYPE.c in Sources */ = {isa = PBXBuildFile; fileRef = 445F249920E1A5BA00D004E9 /* constr_TYPE.c */; };
+		445F24D620E1A5BA00D004E9 /* xer_decoder.c in Sources */ = {isa = PBXBuildFile; fileRef = 445F249E20E1A5BA00D004E9 /* xer_decoder.c */; };
+		445F24D720E1A5BA00D004E9 /* per_support.c in Sources */ = {isa = PBXBuildFile; fileRef = 445F249F20E1A5BA00D004E9 /* per_support.c */; };
+		445F24D820E1A5BA00D004E9 /* OBJECT_IDENTIFIER.c in Sources */ = {isa = PBXBuildFile; fileRef = 445F24A120E1A5BA00D004E9 /* OBJECT_IDENTIFIER.c */; };
+		445F24D920E1A5BA00D004E9 /* BIT_STRING.c in Sources */ = {isa = PBXBuildFile; fileRef = 445F24A620E1A5BA00D004E9 /* BIT_STRING.c */; };
+		445F24DA20E1A5BA00D004E9 /* constr_SET_OF.c in Sources */ = {isa = PBXBuildFile; fileRef = 445F24A820E1A5BA00D004E9 /* constr_SET_OF.c */; };
+		445F24DB20E1A5BA00D004E9 /* ber_decoder.c in Sources */ = {isa = PBXBuildFile; fileRef = 445F24A920E1A5BA00D004E9 /* ber_decoder.c */; };
+		445F24DC20E1A5BA00D004E9 /* NativeInteger.c in Sources */ = {isa = PBXBuildFile; fileRef = 445F24AA20E1A5BA00D004E9 /* NativeInteger.c */; };
+		445F24DD20E1A5BA00D004E9 /* per_encoder.c in Sources */ = {isa = PBXBuildFile; fileRef = 445F24AF20E1A5BA00D004E9 /* per_encoder.c */; };
+		445F24DE20E1A5BA00D004E9 /* pkcs7-signed-data-simplified.asn1 in Resources */ = {isa = PBXBuildFile; fileRef = 445F24B220E1A5BA00D004E9 /* pkcs7-signed-data-simplified.asn1 */; };
+		445F24DF20E1A5BA00D004E9 /* ANY.c in Sources */ = {isa = PBXBuildFile; fileRef = 445F24B520E1A5BA00D004E9 /* ANY.c */; };
+		445F24E020E1A5BA00D004E9 /* INTEGER.c in Sources */ = {isa = PBXBuildFile; fileRef = 445F24B620E1A5BA00D004E9 /* INTEGER.c */; };
+		445F24E120E1A5BA00D004E9 /* ReceiptAttribute.c in Sources */ = {isa = PBXBuildFile; fileRef = 445F24B820E1A5BA00D004E9 /* ReceiptAttribute.c */; };
+		445F24E220E1A5BA00D004E9 /* der_encoder.c in Sources */ = {isa = PBXBuildFile; fileRef = 445F24BC20E1A5BA00D004E9 /* der_encoder.c */; };
+		445F24E320E1A5BA00D004E9 /* OCTET_STRING.c in Sources */ = {isa = PBXBuildFile; fileRef = 445F24BD20E1A5BA00D004E9 /* OCTET_STRING.c */; };
+		445F24E420E1A5BA00D004E9 /* constr_SEQUENCE.c in Sources */ = {isa = PBXBuildFile; fileRef = 445F24BF20E1A5BA00D004E9 /* constr_SEQUENCE.c */; };
+		445F24E520E1A5BA00D004E9 /* asn_SET_OF.c in Sources */ = {isa = PBXBuildFile; fileRef = 445F24C020E1A5BA00D004E9 /* asn_SET_OF.c */; };
+		445F24E620E1A5BA00D004E9 /* per_opentype.c in Sources */ = {isa = PBXBuildFile; fileRef = 445F24C220E1A5BA00D004E9 /* per_opentype.c */; };
+		445F24E720E1A5BA00D004E9 /* pkcs7-signed-data.asn1 in Resources */ = {isa = PBXBuildFile; fileRef = 445F24C320E1A5BA00D004E9 /* pkcs7-signed-data.asn1 */; };
+		445F24E820E1A5BA00D004E9 /* NativeEnumerated.c in Sources */ = {isa = PBXBuildFile; fileRef = 445F24C420E1A5BA00D004E9 /* NativeEnumerated.c */; };
+		445F24E920E1A5BA00D004E9 /* ber_tlv_length.c in Sources */ = {isa = PBXBuildFile; fileRef = 445F24C620E1A5BA00D004E9 /* ber_tlv_length.c */; };
+		445F24EA20E1A5BA00D004E9 /* per_decoder.c in Sources */ = {isa = PBXBuildFile; fileRef = 445F24C920E1A5BA00D004E9 /* per_decoder.c */; };
+		445F24EB20E1A5BA00D004E9 /* xer_support.c in Sources */ = {isa = PBXBuildFile; fileRef = 445F24CA20E1A5BA00D004E9 /* xer_support.c */; };
+		445F24EC20E1A5BA00D004E9 /* SignedData.c in Sources */ = {isa = PBXBuildFile; fileRef = 445F24CC20E1A5BA00D004E9 /* SignedData.c */; };
+		445F24ED20E1A5BA00D004E9 /* ber_tlv_tag.c in Sources */ = {isa = PBXBuildFile; fileRef = 445F24CD20E1A5BA00D004E9 /* ber_tlv_tag.c */; };
+		445F24EE20E1A5BA00D004E9 /* asn_codecs_prim.c in Sources */ = {isa = PBXBuildFile; fileRef = 445F24CE20E1A5BA00D004E9 /* asn_codecs_prim.c */; };
+		445F24EF20E1A5BA00D004E9 /* constraints.c in Sources */ = {isa = PBXBuildFile; fileRef = 445F24CF20E1A5BA00D004E9 /* constraints.c */; };
+		445F24F020E1A5BA00D004E9 /* xer_encoder.c in Sources */ = {isa = PBXBuildFile; fileRef = 445F24D220E1A5BA00D004E9 /* xer_encoder.c */; };
+		445F24F520E1A85D00D004E9 /* IA5String.c in Sources */ = {isa = PBXBuildFile; fileRef = 445F24F220E1A85C00D004E9 /* IA5String.c */; };
+		445F24F620E1A85D00D004E9 /* UTF8String.c in Sources */ = {isa = PBXBuildFile; fileRef = 445F24F320E1A85C00D004E9 /* UTF8String.c */; };
 		44A0CAEE1FCCCDEC00859DB3 /* Subscription.m in Sources */ = {isa = PBXBuildFile; fileRef = 44E3CB6B1FCCA83200C80C82 /* Subscription.m */; };
-		44A0CAF21FE04A4500859DB3 /* AppleIncRootCertificate.cer in Resources */ = {isa = PBXBuildFile; fileRef = 44A0CAF01FE04A4500859DB3 /* AppleIncRootCertificate.cer */; };
-		44A0CAF31FE04A4500859DB3 /* RMAppReceipt.m in Sources */ = {isa = PBXBuildFile; fileRef = 44A0CAF11FE04A4500859DB3 /* RMAppReceipt.m */; };
-		44A0CAF41FE04A7400859DB3 /* AppleIncRootCertificate.cer in Resources */ = {isa = PBXBuildFile; fileRef = 44A0CAF01FE04A4500859DB3 /* AppleIncRootCertificate.cer */; };
 		4E04844820474831006C3D35 /* PsiCashPurchaseView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E04844720474831006C3D35 /* PsiCashPurchaseView.m */; };
 		4E04845A20487208006C3D35 /* PsiCashSpeedBoostSliderView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E04845920487208006C3D35 /* PsiCashSpeedBoostSliderView.m */; };
 		4E04846B2048A0B9006C3D35 /* PsiCashBalanceView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E0484692048A0B8006C3D35 /* PsiCashBalanceView.m */; };
@@ -52,11 +81,13 @@
 		4EC5526320AB8DBE000B4BEA /* Pastel.m in Sources */ = {isa = PBXBuildFile; fileRef = 4EC5526220AB8DBE000B4BEA /* Pastel.m */; };
 		4EC5526620AB8DCD000B4BEA /* PastelView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4EC5526520AB8DCD000B4BEA /* PastelView.m */; };
 		4EC5526E20ACED2E000B4BEA /* StarView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4EC5526D20ACED2E000B4BEA /* StarView.m */; };
+		4EC7CAD020E185580038B4E1 /* AppProfiler.m in Sources */ = {isa = PBXBuildFile; fileRef = 4EC7CACF20E185580038B4E1 /* AppProfiler.m */; };
 		4EEB2F0220644769006E80EF /* PsiCashAPIModels.m in Sources */ = {isa = PBXBuildFile; fileRef = 4EEB2F0120644769006E80EF /* PsiCashAPIModels.m */; };
 		4EEB2F0520644BD5006E80EF /* PsiCashClientModelStagingArea.m in Sources */ = {isa = PBXBuildFile; fileRef = 4EEB2F0420644BD5006E80EF /* PsiCashClientModelStagingArea.m */; };
 		4EF6D9CB20A8C7FE00AE9D44 /* PsiCashOnboardingInfoViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4EF6D9C720A8C7FE00AE9D44 /* PsiCashOnboardingInfoViewController.m */; };
 		4EF6D9CC20A8C7FE00AE9D44 /* PsiCashOnboardingViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4EF6D9C920A8C7FE00AE9D44 /* PsiCashOnboardingViewController.m */; };
 		4EFAAF2E2034CDC800EC0536 /* PsiCashClient.m in Sources */ = {isa = PBXBuildFile; fileRef = 4EFAAF282034CDC800EC0536 /* PsiCashClient.m */; };
+		4EFDFD7420DD829800A687FD /* AppStats.m in Sources */ = {isa = PBXBuildFile; fileRef = 4EFDFD7320DD829800A687FD /* AppStats.m */; };
 		66094F7A1E8067520069EC4E /* PsiphonTunnel.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 66094F781E8067520069EC4E /* PsiphonTunnel.framework */; };
 		6615A5EA1F58A95500026C98 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 6615A5E81F58A95500026C98 /* Localizable.strings */; };
 		6615A5EB1F58A95B00026C98 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 6615A5E81F58A95500026C98 /* Localizable.strings */; };
@@ -195,9 +226,72 @@
 		440D75BD1F59E041005C603B /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 		4435CC251F70566000F3A809 /* SettingsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SettingsViewController.h; sourceTree = "<group>"; };
 		4435CC261F70566000F3A809 /* SettingsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SettingsViewController.m; sourceTree = "<group>"; };
-		44A0CAEF1FE04A4500859DB3 /* RMAppReceipt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RMAppReceipt.h; sourceTree = "<group>"; };
-		44A0CAF01FE04A4500859DB3 /* AppleIncRootCertificate.cer */ = {isa = PBXFileReference; lastKnownFileType = file; path = AppleIncRootCertificate.cer; sourceTree = "<group>"; };
-		44A0CAF11FE04A4500859DB3 /* RMAppReceipt.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RMAppReceipt.m; sourceTree = "<group>"; };
+		445F239420E1817B00D004E9 /* PsiphonAppReceipt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PsiphonAppReceipt.h; sourceTree = "<group>"; };
+		445F239520E1817C00D004E9 /* PsiphonAppReceipt.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PsiphonAppReceipt.m; sourceTree = "<group>"; };
+		445F249820E1A5BA00D004E9 /* ReceiptAttributes.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ReceiptAttributes.c; sourceTree = "<group>"; };
+		445F249920E1A5BA00D004E9 /* constr_TYPE.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = constr_TYPE.c; sourceTree = "<group>"; };
+		445F249A20E1A5BA00D004E9 /* asn_SET_OF.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = asn_SET_OF.h; sourceTree = "<group>"; };
+		445F249B20E1A5BA00D004E9 /* constr_SEQUENCE.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = constr_SEQUENCE.h; sourceTree = "<group>"; };
+		445F249C20E1A5BA00D004E9 /* OCTET_STRING.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OCTET_STRING.h; sourceTree = "<group>"; };
+		445F249D20E1A5BA00D004E9 /* der_encoder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = der_encoder.h; sourceTree = "<group>"; };
+		445F249E20E1A5BA00D004E9 /* xer_decoder.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = xer_decoder.c; sourceTree = "<group>"; };
+		445F249F20E1A5BA00D004E9 /* per_support.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = per_support.c; sourceTree = "<group>"; };
+		445F24A020E1A5BA00D004E9 /* asn_internal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = asn_internal.h; sourceTree = "<group>"; };
+		445F24A120E1A5BA00D004E9 /* OBJECT_IDENTIFIER.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = OBJECT_IDENTIFIER.c; sourceTree = "<group>"; };
+		445F24A220E1A5BA00D004E9 /* ReceiptAttribute.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ReceiptAttribute.h; sourceTree = "<group>"; };
+		445F24A320E1A5BA00D004E9 /* asn_system.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = asn_system.h; sourceTree = "<group>"; };
+		445F24A420E1A5BA00D004E9 /* xer_support.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = xer_support.h; sourceTree = "<group>"; };
+		445F24A520E1A5BA00D004E9 /* per_decoder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = per_decoder.h; sourceTree = "<group>"; };
+		445F24A620E1A5BA00D004E9 /* BIT_STRING.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = BIT_STRING.c; sourceTree = "<group>"; };
+		445F24A720E1A5BA00D004E9 /* ber_tlv_length.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ber_tlv_length.h; sourceTree = "<group>"; };
+		445F24A820E1A5BA00D004E9 /* constr_SET_OF.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = constr_SET_OF.c; sourceTree = "<group>"; };
+		445F24A920E1A5BA00D004E9 /* ber_decoder.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ber_decoder.c; sourceTree = "<group>"; };
+		445F24AA20E1A5BA00D004E9 /* NativeInteger.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = NativeInteger.c; sourceTree = "<group>"; };
+		445F24AB20E1A5BA00D004E9 /* per_opentype.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = per_opentype.h; sourceTree = "<group>"; };
+		445F24AC20E1A5BA00D004E9 /* NativeEnumerated.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NativeEnumerated.h; sourceTree = "<group>"; };
+		445F24AD20E1A5BA00D004E9 /* constraints.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = constraints.h; sourceTree = "<group>"; };
+		445F24AE20E1A5BA00D004E9 /* asn_codecs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = asn_codecs.h; sourceTree = "<group>"; };
+		445F24AF20E1A5BA00D004E9 /* per_encoder.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = per_encoder.c; sourceTree = "<group>"; };
+		445F24B020E1A5BA00D004E9 /* asn_codecs_prim.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = asn_codecs_prim.h; sourceTree = "<group>"; };
+		445F24B120E1A5BA00D004E9 /* SignedData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SignedData.h; sourceTree = "<group>"; };
+		445F24B220E1A5BA00D004E9 /* pkcs7-signed-data-simplified.asn1 */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "pkcs7-signed-data-simplified.asn1"; sourceTree = "<group>"; };
+		445F24B320E1A5BA00D004E9 /* ber_tlv_tag.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ber_tlv_tag.h; sourceTree = "<group>"; };
+		445F24B420E1A5BA00D004E9 /* asn_application.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = asn_application.h; sourceTree = "<group>"; };
+		445F24B520E1A5BA00D004E9 /* ANY.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ANY.c; sourceTree = "<group>"; };
+		445F24B620E1A5BA00D004E9 /* INTEGER.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = INTEGER.c; sourceTree = "<group>"; };
+		445F24B720E1A5BA00D004E9 /* xer_encoder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = xer_encoder.h; sourceTree = "<group>"; };
+		445F24B820E1A5BA00D004E9 /* ReceiptAttribute.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ReceiptAttribute.c; sourceTree = "<group>"; };
+		445F24B920E1A5BA00D004E9 /* OBJECT_IDENTIFIER.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OBJECT_IDENTIFIER.h; sourceTree = "<group>"; };
+		445F24BA20E1A5BA00D004E9 /* per_support.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = per_support.h; sourceTree = "<group>"; };
+		445F24BB20E1A5BA00D004E9 /* xer_decoder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = xer_decoder.h; sourceTree = "<group>"; };
+		445F24BC20E1A5BA00D004E9 /* der_encoder.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = der_encoder.c; sourceTree = "<group>"; };
+		445F24BD20E1A5BA00D004E9 /* OCTET_STRING.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = OCTET_STRING.c; sourceTree = "<group>"; };
+		445F24BE20E1A5BA00D004E9 /* ReceiptAttributes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ReceiptAttributes.h; sourceTree = "<group>"; };
+		445F24BF20E1A5BA00D004E9 /* constr_SEQUENCE.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = constr_SEQUENCE.c; sourceTree = "<group>"; };
+		445F24C020E1A5BA00D004E9 /* asn_SET_OF.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = asn_SET_OF.c; sourceTree = "<group>"; };
+		445F24C120E1A5BA00D004E9 /* constr_TYPE.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = constr_TYPE.h; sourceTree = "<group>"; };
+		445F24C220E1A5BA00D004E9 /* per_opentype.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = per_opentype.c; sourceTree = "<group>"; };
+		445F24C320E1A5BA00D004E9 /* pkcs7-signed-data.asn1 */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "pkcs7-signed-data.asn1"; sourceTree = "<group>"; };
+		445F24C420E1A5BA00D004E9 /* NativeEnumerated.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = NativeEnumerated.c; sourceTree = "<group>"; };
+		445F24C520E1A5BA00D004E9 /* NativeInteger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NativeInteger.h; sourceTree = "<group>"; };
+		445F24C620E1A5BA00D004E9 /* ber_tlv_length.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ber_tlv_length.c; sourceTree = "<group>"; };
+		445F24C720E1A5BA00D004E9 /* ber_decoder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ber_decoder.h; sourceTree = "<group>"; };
+		445F24C820E1A5BA00D004E9 /* constr_SET_OF.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = constr_SET_OF.h; sourceTree = "<group>"; };
+		445F24C920E1A5BA00D004E9 /* per_decoder.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = per_decoder.c; sourceTree = "<group>"; };
+		445F24CA20E1A5BA00D004E9 /* xer_support.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = xer_support.c; sourceTree = "<group>"; };
+		445F24CB20E1A5BA00D004E9 /* BIT_STRING.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BIT_STRING.h; sourceTree = "<group>"; };
+		445F24CC20E1A5BA00D004E9 /* SignedData.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = SignedData.c; sourceTree = "<group>"; };
+		445F24CD20E1A5BA00D004E9 /* ber_tlv_tag.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ber_tlv_tag.c; sourceTree = "<group>"; };
+		445F24CE20E1A5BA00D004E9 /* asn_codecs_prim.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = asn_codecs_prim.c; sourceTree = "<group>"; };
+		445F24CF20E1A5BA00D004E9 /* constraints.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = constraints.c; sourceTree = "<group>"; };
+		445F24D020E1A5BA00D004E9 /* per_encoder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = per_encoder.h; sourceTree = "<group>"; };
+		445F24D120E1A5BA00D004E9 /* INTEGER.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = INTEGER.h; sourceTree = "<group>"; };
+		445F24D220E1A5BA00D004E9 /* xer_encoder.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = xer_encoder.c; sourceTree = "<group>"; };
+		445F24D320E1A5BA00D004E9 /* ANY.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ANY.h; sourceTree = "<group>"; };
+		445F24F120E1A85C00D004E9 /* UTF8String.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UTF8String.h; sourceTree = "<group>"; };
+		445F24F220E1A85C00D004E9 /* IA5String.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = IA5String.c; sourceTree = "<group>"; };
+		445F24F320E1A85C00D004E9 /* UTF8String.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = UTF8String.c; sourceTree = "<group>"; };
+		445F24F420E1A85C00D004E9 /* IA5String.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IA5String.h; sourceTree = "<group>"; };
 		44E3CB6A1FCCA83100C80C82 /* Subscription.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Subscription.h; sourceTree = "<group>"; };
 		44E3CB6B1FCCA83200C80C82 /* Subscription.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Subscription.m; sourceTree = "<group>"; };
 		4E0484462047482A006C3D35 /* PsiCashPurchaseView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PsiCashPurchaseView.h; sourceTree = "<group>"; };
@@ -263,6 +357,8 @@
 		4EC5526520AB8DCD000B4BEA /* PastelView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PastelView.m; sourceTree = "<group>"; };
 		4EC5526C20ACED2E000B4BEA /* StarView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = StarView.h; sourceTree = "<group>"; };
 		4EC5526D20ACED2E000B4BEA /* StarView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = StarView.m; sourceTree = "<group>"; };
+		4EC7CACE20E185580038B4E1 /* AppProfiler.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppProfiler.h; sourceTree = "<group>"; };
+		4EC7CACF20E185580038B4E1 /* AppProfiler.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppProfiler.m; sourceTree = "<group>"; };
 		4EC82F8E20C713DF004C2E9F /* hi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = hi; path = Strings/hi.lproj/Localizable.strings; sourceTree = "<group>"; };
 		4EEB2F0020644769006E80EF /* PsiCashAPIModels.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PsiCashAPIModels.h; sourceTree = "<group>"; };
 		4EEB2F0120644769006E80EF /* PsiCashAPIModels.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PsiCashAPIModels.m; sourceTree = "<group>"; };
@@ -274,6 +370,8 @@
 		4EF6D9CA20A8C7FE00AE9D44 /* PsiCashOnboardingInfoViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PsiCashOnboardingInfoViewController.h; sourceTree = "<group>"; };
 		4EFAAF242034CDC700EC0536 /* PsiCashClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PsiCashClient.h; path = Psiphon/PsiCash/ClientWrapper/PsiCashClient.h; sourceTree = SOURCE_ROOT; };
 		4EFAAF282034CDC800EC0536 /* PsiCashClient.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PsiCashClient.m; path = Psiphon/PsiCash/ClientWrapper/PsiCashClient.m; sourceTree = SOURCE_ROOT; };
+		4EFDFD7220DD829800A687FD /* AppStats.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppStats.h; sourceTree = "<group>"; };
+		4EFDFD7320DD829800A687FD /* AppStats.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppStats.m; sourceTree = "<group>"; };
 		571DC9418AF936E60179F07C /* Pods-Psiphon.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Psiphon.release.xcconfig"; path = "Pods/Target Support Files/Pods-Psiphon/Pods-Psiphon.release.xcconfig"; sourceTree = "<group>"; };
 		66094F781E8067520069EC4E /* PsiphonTunnel.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = PsiphonTunnel.framework; sourceTree = "<group>"; };
 		6615A5E91F58A95500026C98 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = Strings/en.lproj/Localizable.strings; sourceTree = "<group>"; };
@@ -451,13 +549,84 @@
 			name = "3rd Party Adapters";
 			sourceTree = "<group>";
 		};
+		445F249720E1A5BA00D004E9 /* asn1c */ = {
+			isa = PBXGroup;
+			children = (
+				445F24F220E1A85C00D004E9 /* IA5String.c */,
+				445F24F420E1A85C00D004E9 /* IA5String.h */,
+				445F24F320E1A85C00D004E9 /* UTF8String.c */,
+				445F24F120E1A85C00D004E9 /* UTF8String.h */,
+				445F249820E1A5BA00D004E9 /* ReceiptAttributes.c */,
+				445F249920E1A5BA00D004E9 /* constr_TYPE.c */,
+				445F249A20E1A5BA00D004E9 /* asn_SET_OF.h */,
+				445F249B20E1A5BA00D004E9 /* constr_SEQUENCE.h */,
+				445F249C20E1A5BA00D004E9 /* OCTET_STRING.h */,
+				445F249D20E1A5BA00D004E9 /* der_encoder.h */,
+				445F249E20E1A5BA00D004E9 /* xer_decoder.c */,
+				445F249F20E1A5BA00D004E9 /* per_support.c */,
+				445F24A020E1A5BA00D004E9 /* asn_internal.h */,
+				445F24A120E1A5BA00D004E9 /* OBJECT_IDENTIFIER.c */,
+				445F24A220E1A5BA00D004E9 /* ReceiptAttribute.h */,
+				445F24A320E1A5BA00D004E9 /* asn_system.h */,
+				445F24A420E1A5BA00D004E9 /* xer_support.h */,
+				445F24A520E1A5BA00D004E9 /* per_decoder.h */,
+				445F24A620E1A5BA00D004E9 /* BIT_STRING.c */,
+				445F24A720E1A5BA00D004E9 /* ber_tlv_length.h */,
+				445F24A820E1A5BA00D004E9 /* constr_SET_OF.c */,
+				445F24A920E1A5BA00D004E9 /* ber_decoder.c */,
+				445F24AA20E1A5BA00D004E9 /* NativeInteger.c */,
+				445F24AB20E1A5BA00D004E9 /* per_opentype.h */,
+				445F24AC20E1A5BA00D004E9 /* NativeEnumerated.h */,
+				445F24AD20E1A5BA00D004E9 /* constraints.h */,
+				445F24AE20E1A5BA00D004E9 /* asn_codecs.h */,
+				445F24AF20E1A5BA00D004E9 /* per_encoder.c */,
+				445F24B020E1A5BA00D004E9 /* asn_codecs_prim.h */,
+				445F24B120E1A5BA00D004E9 /* SignedData.h */,
+				445F24B220E1A5BA00D004E9 /* pkcs7-signed-data-simplified.asn1 */,
+				445F24B320E1A5BA00D004E9 /* ber_tlv_tag.h */,
+				445F24B420E1A5BA00D004E9 /* asn_application.h */,
+				445F24B520E1A5BA00D004E9 /* ANY.c */,
+				445F24B620E1A5BA00D004E9 /* INTEGER.c */,
+				445F24B720E1A5BA00D004E9 /* xer_encoder.h */,
+				445F24B820E1A5BA00D004E9 /* ReceiptAttribute.c */,
+				445F24B920E1A5BA00D004E9 /* OBJECT_IDENTIFIER.h */,
+				445F24BA20E1A5BA00D004E9 /* per_support.h */,
+				445F24BB20E1A5BA00D004E9 /* xer_decoder.h */,
+				445F24BC20E1A5BA00D004E9 /* der_encoder.c */,
+				445F24BD20E1A5BA00D004E9 /* OCTET_STRING.c */,
+				445F24BE20E1A5BA00D004E9 /* ReceiptAttributes.h */,
+				445F24BF20E1A5BA00D004E9 /* constr_SEQUENCE.c */,
+				445F24C020E1A5BA00D004E9 /* asn_SET_OF.c */,
+				445F24C120E1A5BA00D004E9 /* constr_TYPE.h */,
+				445F24C220E1A5BA00D004E9 /* per_opentype.c */,
+				445F24C320E1A5BA00D004E9 /* pkcs7-signed-data.asn1 */,
+				445F24C420E1A5BA00D004E9 /* NativeEnumerated.c */,
+				445F24C520E1A5BA00D004E9 /* NativeInteger.h */,
+				445F24C620E1A5BA00D004E9 /* ber_tlv_length.c */,
+				445F24C720E1A5BA00D004E9 /* ber_decoder.h */,
+				445F24C820E1A5BA00D004E9 /* constr_SET_OF.h */,
+				445F24C920E1A5BA00D004E9 /* per_decoder.c */,
+				445F24CA20E1A5BA00D004E9 /* xer_support.c */,
+				445F24CB20E1A5BA00D004E9 /* BIT_STRING.h */,
+				445F24CC20E1A5BA00D004E9 /* SignedData.c */,
+				445F24CD20E1A5BA00D004E9 /* ber_tlv_tag.c */,
+				445F24CE20E1A5BA00D004E9 /* asn_codecs_prim.c */,
+				445F24CF20E1A5BA00D004E9 /* constraints.c */,
+				445F24D020E1A5BA00D004E9 /* per_encoder.h */,
+				445F24D120E1A5BA00D004E9 /* INTEGER.h */,
+				445F24D220E1A5BA00D004E9 /* xer_encoder.c */,
+				445F24D320E1A5BA00D004E9 /* ANY.h */,
+			);
+			path = asn1c;
+			sourceTree = "<group>";
+		};
 		448AD86C1F5DC89000316BA9 /* IAP */ = {
 			isa = PBXGroup;
 			children = (
+				445F249720E1A5BA00D004E9 /* asn1c */,
+				445F239420E1817B00D004E9 /* PsiphonAppReceipt.h */,
+				445F239520E1817C00D004E9 /* PsiphonAppReceipt.m */,
 				EF743FC31F99549000AC89A2 /* productIDs.plist */,
-				44A0CAF01FE04A4500859DB3 /* AppleIncRootCertificate.cer */,
-				44A0CAEF1FE04A4500859DB3 /* RMAppReceipt.h */,
-				44A0CAF11FE04A4500859DB3 /* RMAppReceipt.m */,
 				4E5263C92072984C0021FEF5 /* IAPStoreHelper.h */,
 				4E5263CC2072984D0021FEF5 /* IAPStoreHelper.m */,
 				4E5263CB2072984D0021FEF5 /* IAPViewController.h */,
@@ -629,6 +798,17 @@
 			name = Stars;
 			sourceTree = "<group>";
 		};
+		4EC7CACD20E1844F0038B4E1 /* Profiling */ = {
+			isa = PBXGroup;
+			children = (
+				4EFDFD7220DD829800A687FD /* AppStats.h */,
+				4EFDFD7320DD829800A687FD /* AppStats.m */,
+				4EC7CACE20E185580038B4E1 /* AppProfiler.h */,
+				4EC7CACF20E185580038B4E1 /* AppProfiler.m */,
+			);
+			path = Profiling;
+			sourceTree = "<group>";
+		};
 		4EEB2EFF2064329C006E80EF /* ExpiringPurchases */ = {
 			isa = PBXGroup;
 			children = (
@@ -751,6 +931,7 @@
 		CE26FCA41BBDC85900B83375 /* PsiphonVPN */ = {
 			isa = PBXGroup;
 			children = (
+				4EC7CACD20E1844F0038B4E1 /* Profiling */,
 				EFC2F5B520226758007B52F9 /* PacketTunnelUtils.h */,
 				EFC2F5B420226757007B52F9 /* PacketTunnelUtils.m */,
 				EF743FC11F99546B00AC89A2 /* IAP */,
@@ -1051,10 +1232,11 @@
 				EF6C1F541F59E46500709554 /* psiphon_config in Resources */,
 				4E0774961F566B040097BC8C /* InAppSettings.bundle in Resources */,
 				CE26FC951BBDC7B800B83375 /* Assets.xcassets in Resources */,
+				445F24E720E1A5BA00D004E9 /* pkcs7-signed-data.asn1 in Resources */,
 				F136C2951F62E3E1000D3EAB /* LaunchScreen.xib in Resources */,
 				CE4E9BC01BBEECF30060FF8B /* Psiphon.entitlements in Resources */,
+				445F24DE20E1A5BA00D004E9 /* pkcs7-signed-data-simplified.asn1 in Resources */,
 				EF743FCA1F99549000AC89A2 /* productIDs.plist in Resources */,
-				44A0CAF21FE04A4500859DB3 /* AppleIncRootCertificate.cer in Resources */,
 				963708A91F65D4810038894E /* Bourbon-Oblique.otf in Resources */,
 				9BFECE5505C42426FC9627C8 /* UserDefaults.h in Resources */,
 			);
@@ -1064,7 +1246,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				44A0CAF41FE04A7400859DB3 /* AppleIncRootCertificate.cer in Resources */,
 				EF6C1F551F59E46500709554 /* psiphon_config in Resources */,
 				CE4E9BC21BBEECFC0060FF8B /* PsiphonVPN.entitlements in Resources */,
 				6615A5EB1F58A95B00026C98 /* Localizable.strings in Resources */,
@@ -1236,12 +1417,14 @@
 			files = (
 				4E5263D120732DDE0021FEF5 /* PsiCashAuthPackage.m in Sources */,
 				EF90D7A6204F22C900228A63 /* NSDate+Comparator.m in Sources */,
+				445F24D620E1A5BA00D004E9 /* xer_decoder.c in Sources */,
 				EF652CD71F35224C002AFB48 /* MainViewController.m in Sources */,
 				EF90D7A4204F22C900228A63 /* timestamp_format.c in Sources */,
 				F132D7E01F5739A800AF7F91 /* LaunchScreenViewController.m in Sources */,
 				19CB75081F54ADB300F78219 /* MPGoogleAdMobInterstitialCustomEvent.m in Sources */,
 				4EEB2F0220644769006E80EF /* PsiCashAPIModels.m in Sources */,
 				197DABEB1F54BEED00DD5C3B /* VungleInterstitialCustomEvent.m in Sources */,
+				445F24E920E1A5BA00D004E9 /* ber_tlv_length.c in Sources */,
 				EF184DAB20AD25E0006F6F5C /* PrivacyPolicyViewController.m in Sources */,
 				197DABF51F54C15400DD5C3B /* VungleInstanceMediationSettings.m in Sources */,
 				4E04846B2048A0B9006C3D35 /* PsiCashBalanceView.m in Sources */,
@@ -1252,21 +1435,28 @@
 				4435CC271F70566000F3A809 /* SettingsViewController.m in Sources */,
 				EFED7EBC1F55C8550078980F /* LogViewControllerFullScreen.m in Sources */,
 				EF4F1F3D206055F7006A40A1 /* RACSignal+Operations2.m in Sources */,
+				445F24F020E1A5BA00D004E9 /* xer_encoder.c in Sources */,
+				445F24D520E1A5BA00D004E9 /* constr_TYPE.c in Sources */,
+				445F24E220E1A5BA00D004E9 /* der_encoder.c in Sources */,
 				197DABF11F54C0CA00DD5C3B /* MPInstanceProvider+Vungle.m in Sources */,
+				445F24DC20E1A5BA00D004E9 /* NativeInteger.c in Sources */,
 				EF90D7A9204F22C900228A63 /* FileUtils.m in Sources */,
 				EF90D7A1204F22C900228A63 /* timestamp_valid.c in Sources */,
+				445F24DF20E1A5BA00D004E9 /* ANY.c in Sources */,
 				4E90C94420CB37F5003FC319 /* PsiCashLogger.m in Sources */,
 				EFC2F5C420226782007B52F9 /* RootContainerController.m in Sources */,
 				EF90D7A5204F22C900228A63 /* timestamp_parse.c in Sources */,
 				EF652CD11F352212002AFB48 /* main.m in Sources */,
+				445F24EB20E1A5BA00D004E9 /* xer_support.c in Sources */,
 				4E5DAE6520A942A300E06342 /* UILabel+GetLabelHeight.m in Sources */,
-				44A0CAF31FE04A4500859DB3 /* RMAppReceipt.m in Sources */,
 				EFC2F5CB202267B1007B52F9 /* PsiphonConfigReader.m in Sources */,
 				EF90D7A7204F22C900228A63 /* NSDate+PSIDateExtension.m in Sources */,
 				4E04845A20487208006C3D35 /* PsiCashSpeedBoostSliderView.m in Sources */,
 				4EC0357520451EBC00EE9573 /* PsiCashSpeedBoostTableViewCell.m in Sources */,
+				445F239620E1817C00D004E9 /* PsiphonAppReceipt.m in Sources */,
 				197DABF11F54C0CA00DD5C3B /* MPInstanceProvider+Vungle.m in Sources */,
 				4EC0356F2045179800EE9573 /* PsiCashTableViewController.m in Sources */,
+				445F24E420E1A5BA00D004E9 /* constr_SEQUENCE.c in Sources */,
 				4EFAAF2E2034CDC800EC0536 /* PsiCashClient.m in Sources */,
 				4EC035722045191C00EE9573 /* PsiCashBalanceTableViewCell.m in Sources */,
 				4E9B2E13204F463100E63784 /* PsiCashClientModel.m in Sources */,
@@ -1274,9 +1464,11 @@
 				EFB3E62C1F621111004AAE8C /* PulsingHaloLayer.m in Sources */,
 				EFC2F5C720226782007B52F9 /* UIAlertController+Delegate.m in Sources */,
 				EF639C2F1F8FCE37009D6B42 /* PsiFeedbackLogger.m in Sources */,
+				445F24DA20E1A5BA00D004E9 /* constr_SET_OF.c in Sources */,
 				4EF6D9CB20A8C7FE00AE9D44 /* PsiCashOnboardingInfoViewController.m in Sources */,
 				4E5E5F9320598092008D4375 /* PsiCashSpeedBoostProduct.m in Sources */,
 				4E99814220A64CC700253CE7 /* PsiCashBalanceWithSpeedBoostMeter.m in Sources */,
+				445F24E520E1A5BA00D004E9 /* asn_SET_OF.c in Sources */,
 				4E556D26204DD5A200345812 /* PsiCashPurchaseAlertView.m in Sources */,
 				9BFEC4F02A47FF8265635803 /* Notifier.m in Sources */,
 				4EC5526620AB8DCD000B4BEA /* PastelView.m in Sources */,
@@ -1284,6 +1476,7 @@
 				4E5263C8207294660021FEF5 /* LoadingCircleLayer.m in Sources */,
 				9BFECFEB3BC9F10542C1A416 /* PsiphonConfigUserDefaults.m in Sources */,
 				4E5263CD2072984D0021FEF5 /* IAPViewController.m in Sources */,
+				445F24D720E1A5BA00D004E9 /* per_support.c in Sources */,
 				4E25A8F4203F5F2200B5A1A4 /* PsiCashSpeedBoostMeterView.m in Sources */,
 				197DABEE1F54C09E00DD5C3B /* MPVungleRouter.m in Sources */,
 				19CB75071F54ADB300F78219 /* MPGoogleAdMobBannerCustomEvent.m in Sources */,
@@ -1292,23 +1485,40 @@
 				4EC5526E20ACED2E000B4BEA /* StarView.m in Sources */,
 				4E5BD4F52061982300AD4724 /* FeedbackManager.m in Sources */,
 				EF90D7A8204F22C900228A63 /* DispatchUtils.m in Sources */,
+				445F24D820E1A5BA00D004E9 /* OBJECT_IDENTIFIER.c in Sources */,
 				9BFECC5AE8636FBEF73D85D3 /* AdManager.m in Sources */,
+				445F24D920E1A5BA00D004E9 /* BIT_STRING.c in Sources */,
+				445F24E820E1A5BA00D004E9 /* NativeEnumerated.c in Sources */,
+				445F24E320E1A5BA00D004E9 /* OCTET_STRING.c in Sources */,
+				445F24E120E1A5BA00D004E9 /* ReceiptAttribute.c in Sources */,
 				EF90D7A2204F22C900228A63 /* timestamp_compare.c in Sources */,
 				9BFECB6BF077F45D491093F1 /* Authorization.m in Sources */,
 				EF90D7A3204F22C900228A63 /* timestamp_tm.c in Sources */,
+				445F24E020E1A5BA00D004E9 /* INTEGER.c in Sources */,
+				445F24DD20E1A5BA00D004E9 /* per_encoder.c in Sources */,
 				4EC5526320AB8DBE000B4BEA /* Pastel.m in Sources */,
 				9BFEC530849525066327C815 /* VPNManager.m in Sources */,
+				445F24F620E1A85D00D004E9 /* UTF8String.c in Sources */,
+				445F24ED20E1A5BA00D004E9 /* ber_tlv_tag.c in Sources */,
 				9BFEC5C3F8FFF1366FF19D0B /* AsyncOperation.m in Sources */,
 				4E5263B7207290360021FEF5 /* EmbeddedServerEntriesHelpers.c in Sources */,
 				4E2037A1207592A300B99A05 /* PsiCashErrorTypes.m in Sources */,
 				4E29DB5F20616DAC0070431F /* ExpiringPurchases.m in Sources */,
+				445F24EE20E1A5BA00D004E9 /* asn_codecs_prim.c in Sources */,
+				445F24E620E1A5BA00D004E9 /* per_opentype.c in Sources */,
 				4E04844820474831006C3D35 /* PsiCashPurchaseView.m in Sources */,
 				4E5E5F9620598DC2008D4375 /* PsiCashSpeedBoostProduct+PsiCashPurchasePrice.m in Sources */,
+				445F24EC20E1A5BA00D004E9 /* SignedData.c in Sources */,
 				9BFEC2458D1346F537E9089E /* Nullity.m in Sources */,
+				445F24D420E1A5BA00D004E9 /* ReceiptAttributes.c in Sources */,
+				445F24EA20E1A5BA00D004E9 /* per_decoder.c in Sources */,
+				445F24F520E1A85D00D004E9 /* IA5String.c in Sources */,
 				9BFECD2FAA1FCDA88A7D432E /* UIColor+Additions.m in Sources */,
 				9BFEC54DB169011DBB9A8FE5 /* SwoopView.m in Sources */,
 				9BFECD174E254989EC97A437 /* IAPHelpViewController.m in Sources */,
 				9BFEC9C08697E4701A36A3B3 /* UnionSerialQueue.m in Sources */,
+				445F24EF20E1A5BA00D004E9 /* constraints.c in Sources */,
+				445F24DB20E1A5BA00D004E9 /* ber_decoder.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1326,9 +1536,11 @@
 				EF652CDA1F352271002AFB48 /* PacketTunnelProvider.m in Sources */,
 				4E0DCB1E1F2855FC00495781 /* PsiphonDataSharedDB.m in Sources */,
 				9BFECD1880B51B0E2EAEFF1F /* Notifier.m in Sources */,
+				4EFDFD7420DD829800A687FD /* AppStats.m in Sources */,
 				EF90D7AF204F231900228A63 /* timestamp_valid.c in Sources */,
 				EF639C301F8FCE37009D6B42 /* PsiFeedbackLogger.m in Sources */,
 				EF90D7B6204F235100228A63 /* DispatchUtils.m in Sources */,
+				4EC7CAD020E185580038B4E1 /* AppProfiler.m in Sources */,
 				EF90D7B2204F232100228A63 /* timestamp_format.c in Sources */,
 				9BFECF8895D5FE1940A6F700 /* PsiphonConfigUserDefaults.m in Sources */,
 				EF90D7B7204F235800228A63 /* FileUtils.m in Sources */,
@@ -1568,6 +1780,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = EDB109A2FBFB32D821FF121D /* Pods-Psiphon.debug.xcconfig */;
 			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = Psiphon/Psiphon.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
@@ -1585,8 +1798,8 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				STRIP_BITCODE_FROM_COPIED_FILES = NO;
-				USER_HEADER_SEARCH_PATHS = "\"${PROJECT_DIR}/Pods\"/**";
+				STRIP_BITCODE_FROM_COPIED_FILES = YES;
+				USER_HEADER_SEARCH_PATHS = "\"${PROJECT_DIR}/Pods\"/** ${PROJECT_DIR}/Psiphon/asn1c";
 				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = Debug;
@@ -1595,6 +1808,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 571DC9418AF936E60179F07C /* Pods-Psiphon.release.xcconfig */;
 			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = Psiphon/Psiphon.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
@@ -1611,8 +1825,8 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				STRIP_BITCODE_FROM_COPIED_FILES = NO;
-				USER_HEADER_SEARCH_PATHS = "\"${PROJECT_DIR}/Pods\"/**";
+				STRIP_BITCODE_FROM_COPIED_FILES = YES;
+				USER_HEADER_SEARCH_PATHS = "\"${PROJECT_DIR}/Pods\"/** ${PROJECT_DIR}/Psiphon/asn1c";
 				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = Release;

@@ -26,6 +26,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, readonly) NSString *defaultSponsorId;
 @property (nonatomic, readonly) NSString *subscriptionSponsorId;
+@property (nonatomic, readonly) NSString *checkSubscriptionSponsorId;
 
 @end
 

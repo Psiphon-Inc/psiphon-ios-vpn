@@ -20,6 +20,7 @@
 #import <Foundation/Foundation.h>
 #import <ReactiveObjC/RACDisposable.h>
 #import <ReactiveObjC/RACScheduler.h>
+#import "AppProfiler.h"
 #import "Subscription.h"
 #import "NSDate+Comparator.h"
 #import "NSError+Convenience.h"
@@ -86,6 +87,8 @@ PsiFeedbackLogType const SubscriptionVerifierServiceLogType = @"SubscriptionVeri
 - (void)startWithCompletionHandler:(SubscriptionVerifierCompletionHandler _Nonnull)receiptUploadCompletionHandler {
     NSMutableURLRequest *request;
 
+    [AppProfiler logMemoryReportWithTag:@"SubscriptionVerifierSubmitAuthRequest"];
+
     // Open a connection for the URL, configured to POST the file.
 
     request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:kRemoteVerificationURL]];
@@ -104,6 +107,7 @@ PsiFeedbackLogType const SubscriptionVerifierServiceLogType = @"SubscriptionVeri
 
     NSURLSessionDataTask *postDataTask = [urlSession dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
 
+        [AppProfiler logMemoryReportWithTag:@"SubscriptionVerifierLoadRequestCompleted"];
         [PsiFeedbackLogger infoWithType:SubscriptionVerifierServiceLogType message:@"load request completed"];
 
         // Session is no longer needed, invalidates and cancels outstanding tasks.
@@ -147,6 +151,7 @@ PsiFeedbackLogType const SubscriptionVerifierServiceLogType = @"SubscriptionVeri
 
     [postDataTask resume];
 
+    [AppProfiler logMemoryReportWithTag:@"SubscriptionVerifierAuthRequestSubmitted"];
     [PsiFeedbackLogger infoWithType:SubscriptionVerifierServiceLogType message:@"authorization request submitted"];
 
 }
@@ -424,6 +429,10 @@ typedef NS_ENUM(NSInteger, SubscriptionStateEnum) {
 
 - (BOOL)isSubscribedOrInProgress {
     return self.state != SubscriptionStateNotSubscribed;
+}
+
+- (BOOL)isSubscribed {
+    return self.state == SubscriptionStateSubscribed;
 }
 
 - (BOOL)isInProgress {

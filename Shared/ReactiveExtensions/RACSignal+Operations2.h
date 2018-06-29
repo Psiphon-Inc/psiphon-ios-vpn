@@ -63,6 +63,17 @@ NS_ASSUME_NONNULL_BEGIN
 + (RACSignal *)timer:(NSTimeInterval)delay;
 
 /**
+ * Returns an observable that performs the following loop:
+ * - Get next delay from provided block
+ * - If retrieved delay < 0, complete
+ * - Otherwise, emit (0) after the specified delay and repeat
+ *
+ * @param nextDelay Returns delay before next 0 should be emitted. Observable will complete if delay < 0.
+ * @return An observable that emits one item after each delay provided. Will complete once a delay < 0 is provided.
+ */
++ (RACSignal*)timerRepeating:(NSTimeInterval(^)(void))nextDelay;
+
+/**
  * Returns an observable that emits a sequence of integers within a specified range.
  * @param start The value of the first integer in the sequence.
  * @param count The number of sequential integers to generate.
