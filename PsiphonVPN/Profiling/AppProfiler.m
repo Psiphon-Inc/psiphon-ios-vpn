@@ -92,7 +92,7 @@ PsiFeedbackLogType const ExtensionMemoryProfilingLogType = @"MemoryProfiling";
 - (void)logMemoryReportIfDelta {
     NSError *e;
 
-    float rss = (float)[AppStats residentSetSize:&e] / 1000000; // in MB
+    float rss = (float)[AppStats privateResidentSetSize:&e] / 1000000; // in MB
 
     if (e) {
         [PsiFeedbackLogger errorWithType:ExtensionMemoryProfilingLogType message:@"Failed to get RSS" object:e];
@@ -100,20 +100,20 @@ PsiFeedbackLogType const ExtensionMemoryProfilingLogType = @"MemoryProfiling";
         // Only log if RSS has delta greater than 0.01
         lastRSS = rss;
         NSString *msg = [NSString stringWithFormat:@"%.2fM", rss];
-        [PsiFeedbackLogger infoWithType:ExtensionMemoryProfilingLogType json:@{@"RSS":msg}];
+        [PsiFeedbackLogger infoWithType:ExtensionMemoryProfilingLogType json:@{@"rss":msg}];
     }
 }
 
 + (void)logMemoryReportWithTag:(NSString*_Nonnull)tag {
     NSError *e;
 
-    float rss = (float)[AppStats residentSetSize:&e] / 1000000; // in MB
+    float rss = (float)[AppStats privateResidentSetSize:&e] / 1000000; // in MB
 
     if (e) {
         [PsiFeedbackLogger errorWithType:ExtensionMemoryProfilingLogType message:@"Failed to get RSS" object:e];
     } else {
         NSString *msg = [NSString stringWithFormat:@"%.2fM", rss];
-        [PsiFeedbackLogger infoWithType:ExtensionMemoryProfilingLogType json:@{@"RSS":msg,@"tag":tag}];
+        [PsiFeedbackLogger infoWithType:ExtensionMemoryProfilingLogType json:@{@"rss":msg,@"tag":tag}];
     }
 }
 

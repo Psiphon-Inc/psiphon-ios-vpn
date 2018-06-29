@@ -25,13 +25,23 @@
 @interface AppStats : NSObject
 
 /**
- * Returns app's current resident set size.
+ * Returns current mach tasks's resident set size.
  *
  * @param e A pointer to an error object. If an error occures, it will be set to
  * an error object describing the error. Otherwise, set to nil.
  *
  * @return Resident set size.
  */
-+ (vm_size_t)residentSetSize:(NSError *_Nullable*_Nonnull)e;
++ (mach_vm_size_t)residentSetSize:(NSError *_Nullable*_Nonnull)e;
+
+/**
+ * Returns current mach task's private resident set size.
+ *
+ * @param e A pointer to an error object. If an error occures, it will be set to
+ * an error object describing the error. Otherwise, set to nil.
+ *
+ * @return Private resident set size.
+ */
++ (size_t)privateResidentSetSize:(NSError *_Nullable*_Nonnull)e;
 
 @end
