@@ -74,6 +74,45 @@
     return [[RACSignal return:@(0)] delay:delay];
 }
 
++ (RACSignal*)timerRepeating:(NSTimeInterval(^)(void))nextDelay {
+    return [RACSignal createSignal:^RACDisposable *(id<RACSubscriber> _Nonnull subscriber) {
+        return [RACSignal readDelayLoop:nextDelay withSubscriber:subscriber andCompoundDisposable:nil];
+    }];
+}
+
+/**
+ * Helper function for `+timerRepeating:`.
+ * Performs the following loop:
+ * - Read next delay from provided block
+ * - If provided delay < 0:
+ *   - Send completed to subscriber
+ * - Otherwise:
+ *   - Wait for provided delay
+ *   - Send next (0) to subscriber
+ *   - Repeat
+ */
++ (RACDisposable *)readDelayLoop:(NSTimeInterval(^)(void))nextDelay withSubscriber:(id<RACSubscriber> _Nonnull)subscriber andCompoundDisposable:(RACCompoundDisposable *)compoundDisposable {
+    if (!compoundDisposable) {
+        compoundDisposable = [RACCompoundDisposable compoundDisposable];
+    }
+
+    NSTimeInterval interval = nextDelay();
+
+    if (interval < 0) {
+        [subscriber sendCompleted];
+    } else {
+        __block RACDisposable *d = [[RACSignal timer:interval] subscribeCompleted:^{
+            [subscriber sendNext:@0];
+            [RACSignal readDelayLoop:nextDelay withSubscriber:subscriber andCompoundDisposable:compoundDisposable];
+            [compoundDisposable removeDisposable:d];
+        }];
+
+        [compoundDisposable addDisposable:d];
+    }
+
+    return compoundDisposable;
+}
+
 + (RACSignal *)rangeStartFrom:(int)start count:(int)count {
     return [RACSignal createSignal:^RACDisposable *(id <RACSubscriber> subscriber) {
 

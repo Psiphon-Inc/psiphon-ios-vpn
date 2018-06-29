@@ -26,6 +26,7 @@
 #import <arpa/inet.h>
 #import <net/if.h>
 #import <stdatomic.h>
+#import "AppProfiler.h"
 #import "PacketTunnelProvider.h"
 #import "PsiphonConfigReader.h"
 #import "PsiphonConfigUserDefaults.h"
@@ -137,11 +138,15 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
     RACReplaySubject<NSNumber *> *subscriptionAuthorizationActiveSubject;
 
     RACDisposable *subscriptionDisposable;
+
+    AppProfiler *appProfiler;
 }
 
 - (id)init {
     self = [super init];
     if (self) {
+        [AppProfiler logMemoryReportWithTag:@"PacketTunnelProviderInit"];
+
         sharedDB = [[PsiphonDataSharedDB alloc] initForAppGroupIdentifier:APP_GROUP_IDENTIFIER];
 
         atomic_init(&self->showUpstreamProxyErrorMessage, TRUE);
@@ -212,6 +217,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 // NOTE: This method be invoked only if a subscription check is necessary.
 //
 - (void)checkSubscriptionWithRemoteCheckForced:(BOOL)remoteCheckForced {
+    [AppProfiler logMemoryReportWithTag:@"SubscriptionCheckBegin"];
 
     PSIAssert(self.subscriptionCheckState != nil);
     PSIAssert(self->subscriptionScheduler == RACScheduler.currentScheduler);
@@ -466,6 +472,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 
       }
       error:^(NSError *error) {
+          [AppProfiler logMemoryReportWithTag:@"SubscriptionCheckAuthRequestFailed"];
           [PsiFeedbackLogger errorWithType:SubscriptionCheckLogType message:@"authorization request failed" object:error];
 
           // No need to retry if the tunnel is not connected.
@@ -484,6 +491,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
           subscriptionDisposable = nil;
       }
       completed:^{
+          [AppProfiler logMemoryReportWithTag:@"SubscriptionCheckCompleted"];
           [PsiFeedbackLogger infoWithType:SubscriptionCheckLogType message:@"finished"];
           subscriptionDisposable = nil;
       }];
@@ -493,6 +501,12 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 // OR if the user possibly has a valid subscription
 // OR if the extension is started after boot but before being unlocked.
 - (void)startTunnelWithErrorHandler:(void (^_Nonnull)(NSError *_Nonnull error))errorHandler {
+
+    // Start app profiling
+    if (!appProfiler) {
+        appProfiler = [[AppProfiler alloc] init];
+        [appProfiler startProfilingWithStartInterval:1 forNumLogs:10 andThenExponentialBackoffTo:60*30 withNumLogsAtEachBackOff:1];
+    }
 
     __weak PacketTunnelProvider *weakSelf = self;
 
@@ -573,6 +587,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 
 - (void)reconnectWithConfig:(NSString *_Nullable)sponsorId {
     dispatch_async(self->workQueue, ^{
+        [AppProfiler logMemoryReportWithTag:@"reconnectWithConfig"];
         [self.psiphonTunnel reconnectWithConfig:sponsorId :[self getAllAuthorizations]];
     });
 }
@@ -1021,6 +1036,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 }
 
 - (void)onConnected {
+    [AppProfiler logMemoryReportWithTag:@"onConnected"];
     LOG_DEBUG(@"connected with %@", [self.subscriptionCheckState textDescription]);
     [[Notifier sharedInstance] post:NotifierTunnelConnected];
     [self tryStartVPN];
