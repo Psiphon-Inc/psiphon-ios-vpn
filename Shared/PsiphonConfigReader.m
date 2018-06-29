@@ -31,6 +31,7 @@ PsiFeedbackLogType const PsiphonConfigLogType = @"PsiphonConfigReader";
 @interface PsiphonConfigSponsorIds ()
 @property (nonatomic, readwrite) NSString *defaultSponsorId;
 @property (nonatomic, readwrite) NSString *subscriptionSponsorId;
+@property (nonatomic, readwrite) NSString *checkSubscriptionSponsorId;
 @end
 
 @implementation PsiphonConfigSponsorIds
@@ -84,6 +85,7 @@ PsiFeedbackLogType const PsiphonConfigLogType = @"PsiphonConfigReader";
     instance.sponsorIds.defaultSponsorId = instance.configs[@"SponsorId"];
     NSDictionary *subscriptionConfig = instance.configs[@"subscriptionConfig"];
     instance.sponsorIds.subscriptionSponsorId = subscriptionConfig[@"SponsorId"];
+    instance.sponsorIds.checkSubscriptionSponsorId = subscriptionConfig[@"checkSponsorId"];
 
     return instance;
 }

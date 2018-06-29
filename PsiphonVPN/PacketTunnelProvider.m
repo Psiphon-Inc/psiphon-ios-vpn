@@ -948,8 +948,10 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
     }
 
     // SponsorId override
-    if ([self.subscriptionCheckState isSubscribedOrInProgress]) {
+    if ([self.subscriptionCheckState isSubscribed]) {
         mutableConfigCopy[@"SponsorId"] = [self.cachedSpondorIDs.subscriptionSponsorId copy];
+    } else if ([self.subscriptionCheckState isInProgress]) {
+        mutableConfigCopy[@"SponsorId"] = [self.cachedSpondorIDs.checkSubscriptionSponsorId copy];
     }
 
     return mutableConfigCopy;
