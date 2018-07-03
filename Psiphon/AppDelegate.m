@@ -268,10 +268,6 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
 
     __weak AppDelegate *weakSelf = self;
 
-    // Resets status of the subjects whose state could be stale once the container is foregrounded.
-    [self.subscriptionStatus sendNext:@(UserSubscriptionUnknown)];
-    [self.adLoadingStatus sendNext:@(AdLoadingStatusUnknown)];
-
     // Subscribes to the app loading signal, and removes the launch screen once all loading is done.
     __block RACDisposable *disposable = [[self createAppLoadingSignal]
       subscribeNext:^(RACUnit *x) {
@@ -335,6 +331,10 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
 - (void)applicationWillEnterForeground:(UIApplication *)application {
     LOG_DEBUG();
     // Called as part of the transition from the background to the active state; here you can undo many of the changes made on entering the background.
+
+    // Resets status of the subjects whose state could be stale once the container is foregrounded.
+    [self.subscriptionStatus sendNext:@(UserSubscriptionUnknown)];
+    [self.adLoadingStatus sendNext:@(AdLoadingStatusUnknown)];
 
     [[PsiCashClient sharedInstance] scheduleStateRefresh];
 
