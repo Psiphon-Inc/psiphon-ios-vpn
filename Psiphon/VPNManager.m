@@ -89,7 +89,6 @@ UserDefaultsKey const VPNManagerConnectOnDemandUntilNextStartBoolKey = @"VPNMana
 
 @implementation VPNManager {
     id localVPNStatusObserver;
-    dispatch_queue_t serialDispatchQueue;
 }
 
 @synthesize tunnelProviderManager = _tunnelProviderManager;
