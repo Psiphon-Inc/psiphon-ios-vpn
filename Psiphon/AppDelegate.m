@@ -293,18 +293,18 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
     // send the VPNManager startVPN message again.
     if (![adManager untunneledInterstitialIsShowing]) {
 
-        __block RACDisposable *disposable = [[self.vpnManager isPsiphonTunnelConnected]
+        __block RACDisposable *connectedDisposable = [[self.vpnManager isPsiphonTunnelConnected]
           subscribeNext:^(NSNumber *_Nullable connected) {
               if ([connected boolValue]) {
                   [weakSelf.vpnManager startVPN];
               }
           } error:^(NSError *error) {
-              [weakSelf.compoundDisposable removeDisposable:disposable];
+              [weakSelf.compoundDisposable removeDisposable:connectedDisposable];
           } completed:^{
-              [weakSelf.compoundDisposable removeDisposable:disposable];
+              [weakSelf.compoundDisposable removeDisposable:connectedDisposable];
           }];
 
-        [self.compoundDisposable addDisposable:disposable];
+        [self.compoundDisposable addDisposable:connectedDisposable];
 
     }
 }
