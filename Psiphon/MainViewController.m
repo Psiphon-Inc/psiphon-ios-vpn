@@ -178,11 +178,11 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     [self addSettingsButton];
     [self addRegionSelectionBar];
     [self addStartAndStopButton];
-    [self addAdLabel];
     [self addAppTitleLabel];
     [self addAppSubTitleLabel];
     [self addSubscriptionButton];
     [self addPsiCashView];
+    [self addAdLabel];
     [self addStatusLabel];
     [self addVersionLabel];
     [self setupLayoutGuides];
@@ -729,8 +729,8 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     adLabel.text = NSLocalizedStringWithDefaultValue(@"AD_LOADED", nil, [NSBundle mainBundle], @"Watch a short video while we get ready to connect you", @"Text for button that tell users there will by a short video ad.");
     adLabel.textAlignment = NSTextAlignmentCenter;
     adLabel.textColor = [UIColor lightGrayColor];
-    adLabel.lineBreakMode = NSLineBreakByWordWrapping;
     adLabel.numberOfLines = 0;
+    adLabel.adjustsFontSizeToFitWidth = YES;
     UIFontDescriptor * fontD = [adLabel.font.fontDescriptor
                                 fontDescriptorWithSymbolicTraits:UIFontDescriptorTraitItalic];
     adLabel.font = [UIFont fontWithDescriptor:fontD size:adLabel.font.pointSize - 1];
@@ -738,10 +738,10 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     if (![self.adManager untunneledInterstitialIsReady]){
         adLabel.hidden = true;
     }
-    
+
     // Setup autolayout
-    [adLabel.bottomAnchor constraintGreaterThanOrEqualToAnchor:startStopButton.topAnchor constant:-30].active = YES;
-    [adLabel.bottomAnchor constraintLessThanOrEqualToAnchor:startStopButton.topAnchor constant:-10.f].active = YES;
+    [adLabel.topAnchor constraintEqualToAnchor:psiCashView.bottomAnchor constant:0].active = YES;
+    [adLabel.bottomAnchor constraintEqualToAnchor:startStopButton.topAnchor constant:0].active = YES;
     [adLabel.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor constant:15].active = YES;
     [adLabel.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor constant:-15].active = YES;
 }
@@ -822,10 +822,6 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     // Set button height
     [regionButton.heightAnchor constraintEqualToConstant:buttonHeight].active = YES;
     [bottomBar addSubview:regionButton];
-
-    if (@available(iOS 11.0, *)) {
-        [regionButton.bottomAnchor constraintEqualToAnchor:self.view.layoutMarginsGuide.bottomAnchor constant:-spacing].active = TRUE;
-    }
 
     [self updateRegionButton];
 
