@@ -646,12 +646,24 @@ UserDefaultsKey const VPNManagerConnectOnDemandUntilNextStartBoolKey = @"VPNMana
 // Otherwise, updates appropriate properties in the provided VPN configuration and saves it.
 // NOTE: since this signal modifies the VPN configuration, the returned signal should be subscribed on using
 //       `unsafeSubscribeOnSerialQueue`.
-- (RACSignal<NETunnelProviderManager *> *)updateOrCreateVPNConfigurationAndSave:(NETunnelProviderManager *_Nullable)providerManager {
+- (RACSignal<NETunnelProviderManager *> *)updateOrCreateVPNConfigurationAndSave:
+  (NETunnelProviderManager *_Nullable)manager {
 
     __weak VPNManager *weakSelf = self;
 
-    return [[[[[RACSignal return:providerManager]
-      map:^NETunnelProviderManager *(NETunnelProviderManager *providerManager) {
+    // Emits a single item of type UserSubscriptionStatus whenever the subscription status is known.
+    RACSignal *knownSubStatus = [[AppDelegate.sharedAppDelegate.subscriptionStatus
+      filter:^BOOL(NSNumber *value) {
+          UserSubscriptionStatus s = (UserSubscriptionStatus) [value integerValue];
+          return (s != UserSubscriptionUnknown);
+      }]
+      take:1];
+
+    return [[[[[[RACSignal return:manager] zipWith:knownSubStatus]
+      map:^NETunnelProviderManager *(RACTwoTuple *tuple) {
+
+          NETunnelProviderManager *providerManager = tuple.first;
+          UserSubscriptionStatus subscriptionStatus = (UserSubscriptionStatus)[tuple.second integerValue];
 
           if (!providerManager) {
               NETunnelProviderProtocol *providerProtocol = [[NETunnelProviderProtocol alloc] init];
@@ -670,6 +682,11 @@ UserDefaultsKey const VPNManagerConnectOnDemandUntilNextStartBoolKey = @"VPNMana
           if (!providerManager.onDemandRules || [providerManager.onDemandRules count] == 0) {
               NEOnDemandRule *alwaysConnectRule = [NEOnDemandRuleConnect new];
               providerManager.onDemandRules = @[alwaysConnectRule];
+          }
+
+          // Enables Connect On Demand if the user has an active subscription.
+          if (subscriptionStatus == UserSubscriptionActive) {
+              providerManager.onDemandEnabled = TRUE;
           }
 
           NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
