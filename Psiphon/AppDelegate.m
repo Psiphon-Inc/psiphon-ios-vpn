@@ -166,10 +166,10 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
 
 #pragma mark - Reactive signals generators
 
-// Emits RACUnit.defaultUnit and completes immediately once all loading signals have completed.
+// createAppLoadingSignal emits RACUnit.defaultUnit and completes immediately once all loading signals have completed.
 - (RACSignal<RACUnit *> *)createAppLoadingSignal {
 
-    // Emits a value when ads have loaded or kMaxAdLoadingTimeSecs has passed.
+    // adsLoadingSignal emits a value when ads have loaded or kMaxAdLoadingTimeSecs has passed.
     RACSignal *adsLoadingSignal = [[[self.adLoadingStatus
       filter:^BOOL(NSNumber *value) {
           AdLoadingStatus s = (AdLoadingStatus) [value integerValue];
@@ -178,18 +178,20 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
       take:1]
       merge:[RACSignal timer:kMaxAdLoadingTimeSecs]];
 
-    // Emits a value when the user subscription status becomes known.
-    RACSignal *subscriptionLoadingSignal = [[self.subscriptionStatus filter:^BOOL(NSNumber *value) {
-        UserSubscriptionStatus s = (UserSubscriptionStatus) [value integerValue];
-        return (s != UserSubscriptionUnknown);
+    // subscriptionLoadingSignal emits a value when the user subscription status becomes known.
+    RACSignal *subscriptionLoadingSignal = [[self.subscriptionStatus
+      filter:^BOOL(NSNumber *value) {
+          UserSubscriptionStatus s = (UserSubscriptionStatus) [value integerValue];
+          return (s != UserSubscriptionUnknown);
       }]
       take:1];
 
     // Zip all loading signals.
     // All signals that are zipped are expected to only emit one item (type doesn't matter).
-    return [[RACSignal zip:@[adsLoadingSignal, subscriptionLoadingSignal]] map:^id(RACTuple *value) {
-        LOG_DEBUG(@"loading operations finished");
-        return RACUnit.defaultUnit;
+    return [[RACSignal zip:@[adsLoadingSignal, subscriptionLoadingSignal]]
+      map:^id(RACTuple *value) {
+          LOG_DEBUG(@"loading operations finished");
+          return RACUnit.defaultUnit;
     }];
 }
 
