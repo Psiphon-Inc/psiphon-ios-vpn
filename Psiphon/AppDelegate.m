@@ -170,13 +170,14 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
 - (RACSignal<RACUnit *> *)createAppLoadingSignal {
 
     // adsLoadingSignal emits a value when ads have loaded or kMaxAdLoadingTimeSecs has passed.
-    RACSignal *adsLoadingSignal = [[[self.adLoadingStatus
+    RACSignal *adsLoadingSignal = [[[[self.adLoadingStatus
       filter:^BOOL(NSNumber *value) {
           AdLoadingStatus s = (AdLoadingStatus) [value integerValue];
           return (s == AdLoadingStatusFinished);
       }]
       take:1]
-      merge:[RACSignal timer:kMaxAdLoadingTimeSecs]];
+      merge:[RACSignal timer:kMaxAdLoadingTimeSecs]]
+      take:1];
 
     // subscriptionLoadingSignal emits a value when the user subscription status becomes known.
     RACSignal *subscriptionLoadingSignal = [[self.subscriptionStatus
@@ -186,7 +187,7 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
       }]
       take:1];
 
-    // Zip all loading signals.
+    // Zip all loading signals (all the loading signals are expected to emit only one item and then complete).
     // All signals that are zipped are expected to only emit one item (type doesn't matter).
     return [[RACSignal zip:@[adsLoadingSignal, subscriptionLoadingSignal]]
       map:^id(RACTuple *value) {
