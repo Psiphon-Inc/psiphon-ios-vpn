@@ -22,8 +22,12 @@
 #import "PsiCashClientModel.h"
 #import "PsiCashSpeedBoostMeterView.h"
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface PsiCashBalanceWithSpeedBoostMeter : UIView <PsiCashClientModelReceiver>
 @property (strong, readonly, nonatomic) PsiCashBalanceView *balance;
 @property (strong, readonly, nonatomic) PsiCashSpeedBoostMeterView *meter;
-+ (void)animateBalanceChangeOf:(NSNumber*_Nonnull)delta withPsiCashView:(PsiCashBalanceWithSpeedBoostMeter*)psiCashView inParentView:(UIView*)parentView;
++ (void)animateBalanceChangeOf:(NSNumber*)delta withPsiCashView:(PsiCashBalanceWithSpeedBoostMeter*)psiCashView inParentView:(UIView*)parentView;
 @end
+
+NS_ASSUME_NONNULL_END
