@@ -48,8 +48,6 @@
 		445F24F520E1A85D00D004E9 /* IA5String.c in Sources */ = {isa = PBXBuildFile; fileRef = 445F24F220E1A85C00D004E9 /* IA5String.c */; };
 		445F24F620E1A85D00D004E9 /* UTF8String.c in Sources */ = {isa = PBXBuildFile; fileRef = 445F24F320E1A85C00D004E9 /* UTF8String.c */; };
 		44A0CAEE1FCCCDEC00859DB3 /* Subscription.m in Sources */ = {isa = PBXBuildFile; fileRef = 44E3CB6B1FCCA83200C80C82 /* Subscription.m */; };
-		4E04844820474831006C3D35 /* PsiCashPurchaseView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E04844720474831006C3D35 /* PsiCashPurchaseView.m */; };
-		4E04845A20487208006C3D35 /* PsiCashSpeedBoostSliderView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E04845920487208006C3D35 /* PsiCashSpeedBoostSliderView.m */; };
 		4E04846B2048A0B9006C3D35 /* PsiCashBalanceView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E0484692048A0B8006C3D35 /* PsiCashBalanceView.m */; };
 		4E0774961F566B040097BC8C /* InAppSettings.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 4E0774951F566ADA0097BC8C /* InAppSettings.bundle */; };
 		4E0D88241FA06B2400ADB61E /* PsiphonUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E0D88231FA06B2400ADB61E /* PsiphonUITests.swift */; };
@@ -58,7 +56,6 @@
 		4E1FE1CB1FB213860031211C /* SnapshotHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E1FE1CA1FB213860031211C /* SnapshotHelper.swift */; };
 		4E2037A1207592A300B99A05 /* PsiCashErrorTypes.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E2037A0207592A300B99A05 /* PsiCashErrorTypes.m */; };
 		4E25A8F4203F5F2200B5A1A4 /* PsiCashSpeedBoostMeterView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E25A8F3203F5F2200B5A1A4 /* PsiCashSpeedBoostMeterView.m */; };
-		4E29DB5F20616DAC0070431F /* ExpiringPurchases.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E29DB5E20616DAC0070431F /* ExpiringPurchases.m */; };
 		4E30745F2097922C00B6D2A3 /* PsiCashLib.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 4E30745D2097921B00B6D2A3 /* PsiCashLib.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		4E5263B7207290360021FEF5 /* EmbeddedServerEntriesHelpers.c in Sources */ = {isa = PBXBuildFile; fileRef = 4E5263B6207290360021FEF5 /* EmbeddedServerEntriesHelpers.c */; };
 		4E5263C4207293720021FEF5 /* PsiphonProgressView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E5263C2207293710021FEF5 /* PsiphonProgressView.m */; };
@@ -67,17 +64,16 @@
 		4E5263CD2072984D0021FEF5 /* IAPViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E5263CA2072984D0021FEF5 /* IAPViewController.m */; };
 		4E5263CE2072984D0021FEF5 /* IAPStoreHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E5263CC2072984D0021FEF5 /* IAPStoreHelper.m */; };
 		4E5263D120732DDE0021FEF5 /* PsiCashAuthPackage.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E5263D020732DDE0021FEF5 /* PsiCashAuthPackage.m */; };
-		4E556D26204DD5A200345812 /* PsiCashPurchaseAlertView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E556D25204DD5A200345812 /* PsiCashPurchaseAlertView.m */; };
 		4E5BD4F52061982300AD4724 /* FeedbackManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E5BD4F42061982300AD4724 /* FeedbackManager.m */; };
 		4E5DAE6520A942A300E06342 /* UILabel+GetLabelHeight.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E5DAE6420A942A300E06342 /* UILabel+GetLabelHeight.m */; };
-		4E5E5F9320598092008D4375 /* PsiCashSpeedBoostProduct.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E5E5F9220598092008D4375 /* PsiCashSpeedBoostProduct.m */; };
-		4E5E5F9620598DC2008D4375 /* PsiCashSpeedBoostProduct+PsiCashPurchasePrice.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E5E5F9520598DC2008D4375 /* PsiCashSpeedBoostProduct+PsiCashPurchasePrice.m */; };
+		4E5DCF9720EC11C6009D8D39 /* PsiCashSpeedBoostProduct+PsiCashPurchasePrice.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E5DCF9520EC11C6009D8D39 /* PsiCashSpeedBoostProduct+PsiCashPurchasePrice.m */; };
+		4E5DCF9820EC11C6009D8D39 /* PsiCashSpeedBoostProduct.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E5DCF9620EC11C6009D8D39 /* PsiCashSpeedBoostProduct.m */; };
+		4E5DCF9920EC1210009D8D39 /* PsiCashPurchaseAlertView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E556D25204DD5A200345812 /* PsiCashPurchaseAlertView.m */; };
+		4E5DCF9E20EC150D009D8D39 /* PsiCashSpeedBoostSliderView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E5DCF9B20EC150D009D8D39 /* PsiCashSpeedBoostSliderView.m */; };
+		4E5DCF9F20EC150D009D8D39 /* PsiCashPurchaseView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E5DCF9D20EC150D009D8D39 /* PsiCashPurchaseView.m */; };
 		4E90C94420CB37F5003FC319 /* PsiCashLogger.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E90C94320CB37F5003FC319 /* PsiCashLogger.m */; };
 		4E99814220A64CC700253CE7 /* PsiCashBalanceWithSpeedBoostMeter.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E99814120A64CC700253CE7 /* PsiCashBalanceWithSpeedBoostMeter.m */; };
 		4E9B2E13204F463100E63784 /* PsiCashClientModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E9B2E12204F463000E63784 /* PsiCashClientModel.m */; };
-		4EC0356F2045179800EE9573 /* PsiCashTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4EC0356E2045179800EE9573 /* PsiCashTableViewController.m */; };
-		4EC035722045191C00EE9573 /* PsiCashBalanceTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 4EC035712045191C00EE9573 /* PsiCashBalanceTableViewCell.m */; };
-		4EC0357520451EBC00EE9573 /* PsiCashSpeedBoostTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 4EC0357420451EBC00EE9573 /* PsiCashSpeedBoostTableViewCell.m */; };
 		4EC5526320AB8DBE000B4BEA /* Pastel.m in Sources */ = {isa = PBXBuildFile; fileRef = 4EC5526220AB8DBE000B4BEA /* Pastel.m */; };
 		4EC5526620AB8DCD000B4BEA /* PastelView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4EC5526520AB8DCD000B4BEA /* PastelView.m */; };
 		4EC5526E20ACED2E000B4BEA /* StarView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4EC5526D20ACED2E000B4BEA /* StarView.m */; };
@@ -294,10 +290,6 @@
 		445F24F420E1A85C00D004E9 /* IA5String.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IA5String.h; sourceTree = "<group>"; };
 		44E3CB6A1FCCA83100C80C82 /* Subscription.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Subscription.h; sourceTree = "<group>"; };
 		44E3CB6B1FCCA83200C80C82 /* Subscription.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Subscription.m; sourceTree = "<group>"; };
-		4E0484462047482A006C3D35 /* PsiCashPurchaseView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PsiCashPurchaseView.h; sourceTree = "<group>"; };
-		4E04844720474831006C3D35 /* PsiCashPurchaseView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PsiCashPurchaseView.m; sourceTree = "<group>"; };
-		4E04845820487208006C3D35 /* PsiCashSpeedBoostSliderView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PsiCashSpeedBoostSliderView.h; sourceTree = "<group>"; };
-		4E04845920487208006C3D35 /* PsiCashSpeedBoostSliderView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PsiCashSpeedBoostSliderView.m; sourceTree = "<group>"; };
 		4E0484692048A0B8006C3D35 /* PsiCashBalanceView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PsiCashBalanceView.m; sourceTree = "<group>"; };
 		4E04846A2048A0B9006C3D35 /* PsiCashBalanceView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PsiCashBalanceView.h; sourceTree = "<group>"; };
 		4E0774951F566ADA0097BC8C /* InAppSettings.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = InAppSettings.bundle; sourceTree = "<group>"; };
@@ -310,8 +302,6 @@
 		4E2037A0207592A300B99A05 /* PsiCashErrorTypes.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PsiCashErrorTypes.m; sourceTree = "<group>"; };
 		4E25A8F2203F5F2200B5A1A4 /* PsiCashSpeedBoostMeterView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PsiCashSpeedBoostMeterView.h; sourceTree = "<group>"; };
 		4E25A8F3203F5F2200B5A1A4 /* PsiCashSpeedBoostMeterView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PsiCashSpeedBoostMeterView.m; sourceTree = "<group>"; };
-		4E29DB5D20616DAC0070431F /* ExpiringPurchases.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ExpiringPurchases.h; sourceTree = "<group>"; };
-		4E29DB5E20616DAC0070431F /* ExpiringPurchases.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ExpiringPurchases.m; sourceTree = "<group>"; };
 		4E30745D2097921B00B6D2A3 /* PsiCashLib.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = PsiCashLib.framework; sourceTree = "<group>"; };
 		4E5263B120728FAB0021FEF5 /* LoadingCircleLayer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = LoadingCircleLayer.m; sourceTree = "<group>"; };
 		4E5263B5207290360021FEF5 /* EmbeddedServerEntriesHelpers.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EmbeddedServerEntriesHelpers.h; sourceTree = "<group>"; };
@@ -334,23 +324,21 @@
 		4E5BD4F42061982300AD4724 /* FeedbackManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FeedbackManager.m; sourceTree = "<group>"; };
 		4E5DAE6320A942A300E06342 /* UILabel+GetLabelHeight.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UILabel+GetLabelHeight.h"; sourceTree = "<group>"; };
 		4E5DAE6420A942A300E06342 /* UILabel+GetLabelHeight.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UILabel+GetLabelHeight.m"; sourceTree = "<group>"; };
-		4E5E5F9120598092008D4375 /* PsiCashSpeedBoostProduct.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PsiCashSpeedBoostProduct.h; sourceTree = "<group>"; };
-		4E5E5F9220598092008D4375 /* PsiCashSpeedBoostProduct.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PsiCashSpeedBoostProduct.m; sourceTree = "<group>"; };
-		4E5E5F9420598DC2008D4375 /* PsiCashSpeedBoostProduct+PsiCashPurchasePrice.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "PsiCashSpeedBoostProduct+PsiCashPurchasePrice.h"; sourceTree = "<group>"; };
-		4E5E5F9520598DC2008D4375 /* PsiCashSpeedBoostProduct+PsiCashPurchasePrice.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "PsiCashSpeedBoostProduct+PsiCashPurchasePrice.m"; sourceTree = "<group>"; };
-		4E7B3EB5205215A6007F752C /* PsiCashProduct.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PsiCashProduct.h; sourceTree = "<group>"; };
+		4E5DCF9220EC11C6009D8D39 /* PsiCashSpeedBoostProduct+PsiCashPurchasePrice.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "PsiCashSpeedBoostProduct+PsiCashPurchasePrice.h"; sourceTree = "<group>"; };
+		4E5DCF9320EC11C6009D8D39 /* PsiCashSpeedBoostProduct.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PsiCashSpeedBoostProduct.h; sourceTree = "<group>"; };
+		4E5DCF9420EC11C6009D8D39 /* PsiCashProduct.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PsiCashProduct.h; sourceTree = "<group>"; };
+		4E5DCF9520EC11C6009D8D39 /* PsiCashSpeedBoostProduct+PsiCashPurchasePrice.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "PsiCashSpeedBoostProduct+PsiCashPurchasePrice.m"; sourceTree = "<group>"; };
+		4E5DCF9620EC11C6009D8D39 /* PsiCashSpeedBoostProduct.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PsiCashSpeedBoostProduct.m; sourceTree = "<group>"; };
+		4E5DCF9A20EC150D009D8D39 /* PsiCashSpeedBoostSliderView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PsiCashSpeedBoostSliderView.h; sourceTree = "<group>"; };
+		4E5DCF9B20EC150D009D8D39 /* PsiCashSpeedBoostSliderView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PsiCashSpeedBoostSliderView.m; sourceTree = "<group>"; };
+		4E5DCF9C20EC150D009D8D39 /* PsiCashPurchaseView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PsiCashPurchaseView.h; sourceTree = "<group>"; };
+		4E5DCF9D20EC150D009D8D39 /* PsiCashPurchaseView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PsiCashPurchaseView.m; sourceTree = "<group>"; };
 		4E90C94220CB37F5003FC319 /* PsiCashLogger.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PsiCashLogger.h; sourceTree = "<group>"; };
 		4E90C94320CB37F5003FC319 /* PsiCashLogger.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PsiCashLogger.m; sourceTree = "<group>"; };
 		4E99814020A64CC700253CE7 /* PsiCashBalanceWithSpeedBoostMeter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PsiCashBalanceWithSpeedBoostMeter.h; sourceTree = "<group>"; };
 		4E99814120A64CC700253CE7 /* PsiCashBalanceWithSpeedBoostMeter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PsiCashBalanceWithSpeedBoostMeter.m; sourceTree = "<group>"; };
 		4E9B2E11204F463000E63784 /* PsiCashClientModel.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PsiCashClientModel.h; sourceTree = "<group>"; };
 		4E9B2E12204F463000E63784 /* PsiCashClientModel.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PsiCashClientModel.m; sourceTree = "<group>"; };
-		4EC0356D2045179800EE9573 /* PsiCashTableViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PsiCashTableViewController.h; sourceTree = "<group>"; };
-		4EC0356E2045179800EE9573 /* PsiCashTableViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PsiCashTableViewController.m; sourceTree = "<group>"; };
-		4EC035702045191C00EE9573 /* PsiCashBalanceTableViewCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PsiCashBalanceTableViewCell.h; sourceTree = "<group>"; };
-		4EC035712045191C00EE9573 /* PsiCashBalanceTableViewCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PsiCashBalanceTableViewCell.m; sourceTree = "<group>"; };
-		4EC0357320451EBC00EE9573 /* PsiCashSpeedBoostTableViewCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PsiCashSpeedBoostTableViewCell.h; sourceTree = "<group>"; };
-		4EC0357420451EBC00EE9573 /* PsiCashSpeedBoostTableViewCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PsiCashSpeedBoostTableViewCell.m; sourceTree = "<group>"; };
 		4EC5526120AB8DB9000B4BEA /* Pastel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Pastel.h; sourceTree = "<group>"; };
 		4EC5526220AB8DBE000B4BEA /* Pastel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Pastel.m; sourceTree = "<group>"; };
 		4EC5526420AB8DC7000B4BEA /* PastelView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PastelView.h; sourceTree = "<group>"; };
@@ -637,17 +625,6 @@
 			name = IAP;
 			sourceTree = "<group>";
 		};
-		4E04845220474BF6006C3D35 /* TableViewCells */ = {
-			isa = PBXGroup;
-			children = (
-				4EC035702045191C00EE9573 /* PsiCashBalanceTableViewCell.h */,
-				4EC035712045191C00EE9573 /* PsiCashBalanceTableViewCell.m */,
-				4EC0357320451EBC00EE9573 /* PsiCashSpeedBoostTableViewCell.h */,
-				4EC0357420451EBC00EE9573 /* PsiCashSpeedBoostTableViewCell.m */,
-			);
-			path = TableViewCells;
-			sourceTree = "<group>";
-		};
 		4E04845320474C17006C3D35 /* Views */ = {
 			isa = PBXGroup;
 			children = (
@@ -655,14 +632,14 @@
 				4E0484692048A0B8006C3D35 /* PsiCashBalanceView.m */,
 				4E99814020A64CC700253CE7 /* PsiCashBalanceWithSpeedBoostMeter.h */,
 				4E99814120A64CC700253CE7 /* PsiCashBalanceWithSpeedBoostMeter.m */,
+				4E5DCF9C20EC150D009D8D39 /* PsiCashPurchaseView.h */,
+				4E5DCF9D20EC150D009D8D39 /* PsiCashPurchaseView.m */,
 				4E556D24204DD5A200345812 /* PsiCashPurchaseAlertView.h */,
 				4E556D25204DD5A200345812 /* PsiCashPurchaseAlertView.m */,
-				4E0484462047482A006C3D35 /* PsiCashPurchaseView.h */,
-				4E04844720474831006C3D35 /* PsiCashPurchaseView.m */,
-				4E04845820487208006C3D35 /* PsiCashSpeedBoostSliderView.h */,
-				4E04845920487208006C3D35 /* PsiCashSpeedBoostSliderView.m */,
 				4E25A8F2203F5F2200B5A1A4 /* PsiCashSpeedBoostMeterView.h */,
 				4E25A8F3203F5F2200B5A1A4 /* PsiCashSpeedBoostMeterView.m */,
+				4E5DCF9A20EC150D009D8D39 /* PsiCashSpeedBoostSliderView.h */,
+				4E5DCF9B20EC150D009D8D39 /* PsiCashSpeedBoostSliderView.m */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -715,18 +692,17 @@
 			name = Feedback;
 			sourceTree = "<group>";
 		};
-		4E5E5F9020598047008D4375 /* Products */ = {
+		4E5DCF9120EC11C6009D8D39 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				4EEB2EFF2064329C006E80EF /* ExpiringPurchases */,
-				4E7B3EB5205215A6007F752C /* PsiCashProduct.h */,
-				4E5E5F9120598092008D4375 /* PsiCashSpeedBoostProduct.h */,
-				4E5E5F9220598092008D4375 /* PsiCashSpeedBoostProduct.m */,
-				4E5E5F9420598DC2008D4375 /* PsiCashSpeedBoostProduct+PsiCashPurchasePrice.h */,
-				4E5E5F9520598DC2008D4375 /* PsiCashSpeedBoostProduct+PsiCashPurchasePrice.m */,
+				4E5DCF9420EC11C6009D8D39 /* PsiCashProduct.h */,
+				4E5DCF9320EC11C6009D8D39 /* PsiCashSpeedBoostProduct.h */,
+				4E5DCF9620EC11C6009D8D39 /* PsiCashSpeedBoostProduct.m */,
+				4E5DCF9220EC11C6009D8D39 /* PsiCashSpeedBoostProduct+PsiCashPurchasePrice.h */,
+				4E5DCF9520EC11C6009D8D39 /* PsiCashSpeedBoostProduct+PsiCashPurchasePrice.m */,
 			);
 			name = Products;
-			path = ClientAPI/Products;
+			path = ClientWrapper/Products;
 			sourceTree = "<group>";
 		};
 		4E856D8F20A8C612007861A2 /* Onboarding */ = {
@@ -768,16 +744,6 @@
 			path = ClientWrapper;
 			sourceTree = "<group>";
 		};
-		4E9B2E0B204EFBA700E63784 /* ViewControllers */ = {
-			isa = PBXGroup;
-			children = (
-				4EC0356D2045179800EE9573 /* PsiCashTableViewController.h */,
-				4EC0356E2045179800EE9573 /* PsiCashTableViewController.m */,
-				4E04845220474BF6006C3D35 /* TableViewCells */,
-			);
-			path = ViewControllers;
-			sourceTree = "<group>";
-		};
 		4EC5526720AB8DF1000B4BEA /* Pastel */ = {
 			isa = PBXGroup;
 			children = (
@@ -809,23 +775,13 @@
 			path = Profiling;
 			sourceTree = "<group>";
 		};
-		4EEB2EFF2064329C006E80EF /* ExpiringPurchases */ = {
-			isa = PBXGroup;
-			children = (
-				4E29DB5D20616DAC0070431F /* ExpiringPurchases.h */,
-				4E29DB5E20616DAC0070431F /* ExpiringPurchases.m */,
-			);
-			path = ExpiringPurchases;
-			sourceTree = "<group>";
-		};
 		4EFAAF1C2034CDA600EC0536 /* PsiCash */ = {
 			isa = PBXGroup;
 			children = (
 				4E9B2E0A204EFB9400E63784 /* ClientWrapper */,
-				4E5E5F9020598047008D4375 /* Products */,
+				4E5DCF9120EC11C6009D8D39 /* Products */,
 				4E9B2E09204EFB7E00E63784 /* Objects */,
 				4E856D8F20A8C612007861A2 /* Onboarding */,
-				4E9B2E0B204EFBA700E63784 /* ViewControllers */,
 				4E04845320474C17006C3D35 /* Views */,
 			);
 			path = PsiCash;
@@ -1435,6 +1391,7 @@
 				4435CC271F70566000F3A809 /* SettingsViewController.m in Sources */,
 				EFED7EBC1F55C8550078980F /* LogViewControllerFullScreen.m in Sources */,
 				EF4F1F3D206055F7006A40A1 /* RACSignal+Operations2.m in Sources */,
+				4E5DCF9720EC11C6009D8D39 /* PsiCashSpeedBoostProduct+PsiCashPurchasePrice.m in Sources */,
 				445F24F020E1A5BA00D004E9 /* xer_encoder.c in Sources */,
 				445F24D520E1A5BA00D004E9 /* constr_TYPE.c in Sources */,
 				445F24E220E1A5BA00D004E9 /* der_encoder.c in Sources */,
@@ -1451,14 +1408,10 @@
 				4E5DAE6520A942A300E06342 /* UILabel+GetLabelHeight.m in Sources */,
 				EFC2F5CB202267B1007B52F9 /* PsiphonConfigReader.m in Sources */,
 				EF90D7A7204F22C900228A63 /* NSDate+PSIDateExtension.m in Sources */,
-				4E04845A20487208006C3D35 /* PsiCashSpeedBoostSliderView.m in Sources */,
-				4EC0357520451EBC00EE9573 /* PsiCashSpeedBoostTableViewCell.m in Sources */,
 				445F239620E1817C00D004E9 /* PsiphonAppReceipt.m in Sources */,
 				197DABF11F54C0CA00DD5C3B /* MPInstanceProvider+Vungle.m in Sources */,
-				4EC0356F2045179800EE9573 /* PsiCashTableViewController.m in Sources */,
 				445F24E420E1A5BA00D004E9 /* constr_SEQUENCE.c in Sources */,
 				4EFAAF2E2034CDC800EC0536 /* PsiCashClient.m in Sources */,
-				4EC035722045191C00EE9573 /* PsiCashBalanceTableViewCell.m in Sources */,
 				4E9B2E13204F463100E63784 /* PsiCashClientModel.m in Sources */,
 				EF652CD61F35224C002AFB48 /* AppDelegate.m in Sources */,
 				EFB3E62C1F621111004AAE8C /* PulsingHaloLayer.m in Sources */,
@@ -1466,10 +1419,9 @@
 				EF639C2F1F8FCE37009D6B42 /* PsiFeedbackLogger.m in Sources */,
 				445F24DA20E1A5BA00D004E9 /* constr_SET_OF.c in Sources */,
 				4EF6D9CB20A8C7FE00AE9D44 /* PsiCashOnboardingInfoViewController.m in Sources */,
-				4E5E5F9320598092008D4375 /* PsiCashSpeedBoostProduct.m in Sources */,
 				4E99814220A64CC700253CE7 /* PsiCashBalanceWithSpeedBoostMeter.m in Sources */,
+				4E5DCF9F20EC150D009D8D39 /* PsiCashPurchaseView.m in Sources */,
 				445F24E520E1A5BA00D004E9 /* asn_SET_OF.c in Sources */,
-				4E556D26204DD5A200345812 /* PsiCashPurchaseAlertView.m in Sources */,
 				9BFEC4F02A47FF8265635803 /* Notifier.m in Sources */,
 				4EC5526620AB8DCD000B4BEA /* PastelView.m in Sources */,
 				4E5263C7207294600021FEF5 /* EmbeddedServerEntries.m in Sources */,
@@ -1486,6 +1438,7 @@
 				4E5BD4F52061982300AD4724 /* FeedbackManager.m in Sources */,
 				EF90D7A8204F22C900228A63 /* DispatchUtils.m in Sources */,
 				445F24D820E1A5BA00D004E9 /* OBJECT_IDENTIFIER.c in Sources */,
+				4E5DCF9820EC11C6009D8D39 /* PsiCashSpeedBoostProduct.m in Sources */,
 				9BFECC5AE8636FBEF73D85D3 /* AdManager.m in Sources */,
 				445F24D920E1A5BA00D004E9 /* BIT_STRING.c in Sources */,
 				445F24E820E1A5BA00D004E9 /* NativeEnumerated.c in Sources */,
@@ -1495,19 +1448,18 @@
 				9BFECB6BF077F45D491093F1 /* Authorization.m in Sources */,
 				EF90D7A3204F22C900228A63 /* timestamp_tm.c in Sources */,
 				445F24E020E1A5BA00D004E9 /* INTEGER.c in Sources */,
+				4E5DCF9920EC1210009D8D39 /* PsiCashPurchaseAlertView.m in Sources */,
 				445F24DD20E1A5BA00D004E9 /* per_encoder.c in Sources */,
 				4EC5526320AB8DBE000B4BEA /* Pastel.m in Sources */,
 				9BFEC530849525066327C815 /* VPNManager.m in Sources */,
 				445F24F620E1A85D00D004E9 /* UTF8String.c in Sources */,
+				4E5DCF9E20EC150D009D8D39 /* PsiCashSpeedBoostSliderView.m in Sources */,
 				445F24ED20E1A5BA00D004E9 /* ber_tlv_tag.c in Sources */,
 				9BFEC5C3F8FFF1366FF19D0B /* AsyncOperation.m in Sources */,
 				4E5263B7207290360021FEF5 /* EmbeddedServerEntriesHelpers.c in Sources */,
 				4E2037A1207592A300B99A05 /* PsiCashErrorTypes.m in Sources */,
-				4E29DB5F20616DAC0070431F /* ExpiringPurchases.m in Sources */,
 				445F24EE20E1A5BA00D004E9 /* asn_codecs_prim.c in Sources */,
 				445F24E620E1A5BA00D004E9 /* per_opentype.c in Sources */,
-				4E04844820474831006C3D35 /* PsiCashPurchaseView.m in Sources */,
-				4E5E5F9620598DC2008D4375 /* PsiCashSpeedBoostProduct+PsiCashPurchasePrice.m in Sources */,
 				445F24EC20E1A5BA00D004E9 /* SignedData.c in Sources */,
 				9BFEC2458D1346F537E9089E /* Nullity.m in Sources */,
 				445F24D420E1A5BA00D004E9 /* ReceiptAttributes.c in Sources */,

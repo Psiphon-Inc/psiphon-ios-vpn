@@ -59,7 +59,6 @@ UserDefaultsKey const PrivacyPolicyAcceptedBookKey = @"PrivacyPolicy.AcceptedBoo
 #import "PsiCashBalanceView.h"
 #import "PsiCashClient.h"
 #import "PsiCashSpeedBoostMeterView.h"
-#import "PsiCashTableViewController.h"
 #import "PsiCashBalanceWithSpeedBoostMeter.h"
 #import "UILabel+GetLabelHeight.h"
 #import "StarView.h"
