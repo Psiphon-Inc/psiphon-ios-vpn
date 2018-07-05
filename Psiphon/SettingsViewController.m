@@ -77,7 +77,8 @@ NSString * const ConnectOnDemandCellSpecifierKey = @"vpnOnDemand";
           UserSubscriptionStatus s = (UserSubscriptionStatus) [value integerValue];
 
           weakSelf.hasActiveSubscription = (s == UserSubscriptionActive);
-          [weakSelf updateSubscriptionUIElements];
+          [self updateSubscriptionCell];
+          [self updateConnectOnDemandCell];
           [weakSelf updateHiddenKeys];
 
       } error:^(NSError *error) {
@@ -119,11 +120,6 @@ NSString * const ConnectOnDemandCellSpecifierKey = @"vpnOnDemand";
 }
 
 #pragma mark - UI update methods
-
-- (void)updateSubscriptionUIElements {
-    [self updateSubscriptionCell];
-    [self updateConnectOnDemandCell];
-}
 
 - (void)updateSubscriptionCell {
     NSString *subscriptionCellTitle;

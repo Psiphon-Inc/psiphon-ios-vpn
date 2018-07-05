@@ -198,7 +198,7 @@ typedef NS_ENUM(NSInteger, VPNStartStatus) {
 /**
  * Updates and saves VPN configuration Connect On Demand.
  *
- * The returned signal emits TRUE as NSNumber if succeeded, FALSE otherwise, and the completes.
+ * The returned signal emits @(TRUE) if succeeded, @(FALSE) otherwise, and then completes.
  * All internal errors are caught, and instead FALSE is emitted.
  *
  * @param onDemandEnabled Toggle VPN configuration Connect On Demand capability.
