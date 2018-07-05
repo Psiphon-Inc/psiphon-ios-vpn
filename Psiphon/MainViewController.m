@@ -844,7 +844,11 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     [regionButtonHeader.topAnchor constraintEqualToAnchor:bottomBar.topAnchor constant:7].active = YES;
     [regionButtonHeader.centerXAnchor constraintEqualToAnchor:bottomBar.centerXAnchor].active = YES;
     [regionButton.topAnchor constraintEqualToAnchor:regionButtonHeader.bottomAnchor constant:5].active = YES;
-    [regionButton.bottomAnchor constraintEqualToAnchor:bottomBar.bottomAnchor constant:-7].active = YES;
+    if (@available(iOS 11.0, *)) {
+        [regionButton.bottomAnchor constraintEqualToAnchor:self.view.layoutMarginsGuide.bottomAnchor constant:-7].active = TRUE;
+    } else {
+        [regionButton.bottomAnchor constraintEqualToAnchor:bottomBar.bottomAnchor constant:-7].active = YES;
+    }
     [regionButton.titleLabel.centerXAnchor constraintEqualToAnchor:regionButtonHeader.centerXAnchor].active = YES;
     [regionButton.widthAnchor constraintEqualToAnchor:bottomBar.widthAnchor multiplier:.7f].active = YES;
 
