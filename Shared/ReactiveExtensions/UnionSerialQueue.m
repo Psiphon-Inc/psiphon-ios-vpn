@@ -53,7 +53,7 @@
 
     NSMutableString *lines = [NSMutableString string];
 
-    [lines appendFormat:@"UnionSerialQueue %p OperationsCount=%d [\n", self, self.operationQueue.operationCount];
+    [lines appendFormat:@"UnionSerialQueue %p OperationsCount=%lu [\n", self, (unsigned long)self.operationQueue.operationCount];
 
     for (NSOperation *op in self.operationQueue.operations) {
         [lines appendFormat:@"<%@ %p Name=%@ isFinished=%@ isReady=%@ isCancelled=%@ isExecuting=%@>,\n",

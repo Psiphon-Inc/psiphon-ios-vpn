@@ -59,7 +59,6 @@ UserDefaultsKey const PrivacyPolicyAcceptedBookKey = @"PrivacyPolicy.AcceptedBoo
 #import "PsiCashBalanceView.h"
 #import "PsiCashClient.h"
 #import "PsiCashSpeedBoostMeterView.h"
-#import "PsiCashTableViewController.h"
 #import "PsiCashBalanceWithSpeedBoostMeter.h"
 #import "UILabel+GetLabelHeight.h"
 #import "StarView.h"
@@ -158,7 +157,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     return self;
 }
 
-- (void) dealloc {
+- (void)dealloc {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     [self.compoundDisposable dispose];
 }
@@ -178,16 +177,18 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     [self addSettingsButton];
     [self addRegionSelectionBar];
     [self addStartAndStopButton];
-    [self addAdLabel];
     [self addAppTitleLabel];
     [self addAppSubTitleLabel];
     [self addSubscriptionButton];
     [self addPsiCashView];
+    [self addAdLabel];
     [self addStatusLabel];
     [self addVersionLabel];
     [self setupLayoutGuides];
     
-    if (([[UIDevice currentDevice].model hasPrefix:@"iPhone"] || [[UIDevice currentDevice].model hasPrefix:@"iPod"]) && (self.view.bounds.size.width > self.view.bounds.size.height)) {
+    if (([[UIDevice currentDevice].model hasPrefix:@"iPhone"] ||
+         [[UIDevice currentDevice].model hasPrefix:@"iPod"]) &&
+        (self.view.bounds.size.width > self.view.bounds.size.height)) {
         appTitleLabel.hidden = YES;
         appSubTitleLabel.hidden = YES;
     }
@@ -238,13 +239,15 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                                                                       preferredStyle:UIAlertControllerStyleAlert];
 
               UIAlertAction *privacyPolicyAction = [UIAlertAction actionWithTitle:NSLocalizedStringWithDefaultValue(@"VPN_START_PRIVACY_POLICY_BUTTON", nil, [NSBundle mainBundle], @"Privacy Policy", @"Button label taking user's to our Privacy Policy page")
-                                                                            style:UIAlertActionStyleDefault
-                                                                          handler:^(UIAlertAction *action) {
-                                                                              NSString *urlString = NSLocalizedStringWithDefaultValue(@"PRIVACY_POLICY_URL", nil, [PsiphonClientCommonLibraryHelpers commonLibraryBundle], @"https://psiphon.ca/en/privacy.html", @"External link to the privacy policy page. Please update this with the correct language specific link (if available) e.g. https://psiphon.ca/fr/privacy.html for french.");
-                                                                              [[UIApplication sharedApplication] openURL:[NSURL URLWithString:urlString] options:@{} completionHandler:^(BOOL success) {
-                                                                                  // Do nothing.
-                                                                              }];
-                                                                          }];
+                  style:UIAlertActionStyleDefault
+                handler:^(UIAlertAction *action) {
+                    NSString *urlString = NSLocalizedStringWithDefaultValue(@"PRIVACY_POLICY_URL", nil, [PsiphonClientCommonLibraryHelpers commonLibraryBundle], @"https://psiphon.ca/en/privacy.html", @"External link to the privacy policy page. Please update this with the correct language specific link (if available) e.g. https://psiphon.ca/fr/privacy.html for french.");
+                    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:urlString]
+                       options:@{}
+                       completionHandler:^(BOOL success) {
+                        // Do nothing.
+                    }];
+                }];
 
               UIAlertAction *dismissAction = [UIAlertAction actionWithTitle:NSLocalizedStringWithDefaultValue(@"VPN_START_PERMISSION_DISMISS_BUTTON", nil, [NSBundle mainBundle], @"Dismiss", @"Dismiss button title. Dismisses pop-up alert when the user clicks on the button")
                                                                       style:UIAlertActionStyleCancel
@@ -357,7 +360,8 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 }
 
 // Reload when rotate
-- (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator {
+- (void)viewWillTransitionToSize:(CGSize)size
+       withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator {
 
     [self setStartButtonSizeConstraints:size];
 
@@ -385,7 +389,8 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     __weak MainViewController *weakSelf = self;
 
     // Emits unit value if/when the privacy policy is accepted.
-    RACSignal *privacyPolicyAccepted = [[RACSignal return:@([NSUserDefaults.standardUserDefaults boolForKey:PrivacyPolicyAcceptedBookKey])]
+    RACSignal *privacyPolicyAccepted =
+      [[RACSignal return:@([NSUserDefaults.standardUserDefaults boolForKey:PrivacyPolicyAcceptedBookKey])]
       flattenMap:^RACSignal<RACUnit *> *(NSNumber *ppAccepted) {
 
         if ([ppAccepted boolValue]) {
@@ -453,8 +458,9 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                   NSString *alertTitle = NSLocalizedStringWithDefaultValue(@"CONNECT_ON_DEMAND_ALERT_TITLE", nil, [NSBundle mainBundle], @"Auto-start VPN is enabled", @"Alert dialog title informing user that 'Auto-start VPN' feature is enabled");
                   NSString *alertMessage = NSLocalizedStringWithDefaultValue(@"CONNECT_ON_DEMAND_ALERT_BODY", nil, [NSBundle mainBundle], @"\"Auto-start VPN\" will be temporarily disabled until the next time Psiphon VPN is started.", "Alert dialog body informing the user that the 'Auto-start VPN on demand' feature will be disabled and that the VPN cannot be stopped.");
 
-                  UIAlertController *alert = [UIAlertController
-                                              alertControllerWithTitle:alertTitle message:alertMessage preferredStyle:UIAlertControllerStyleAlert];
+                  UIAlertController *alert = [UIAlertController alertControllerWithTitle:alertTitle
+                                                                                 message:alertMessage
+                                                                          preferredStyle:UIAlertControllerStyleAlert];
 
                   UIAlertAction *stopUntilNextStartAction = [UIAlertAction
                     actionWithTitle:NSLocalizedStringWithDefaultValue(@"OK_BUTTON", nil, [NSBundle mainBundle], @"OK", @"OK button title")
@@ -462,7 +468,8 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                     handler:^(UIAlertAction *action) {
 
                         // Disable "Connect On Demand" and stop the VPN.
-                        [[NSUserDefaults standardUserDefaults] setBool:TRUE forKey:VPNManagerConnectOnDemandUntilNextStartBoolKey];
+                        [[NSUserDefaults standardUserDefaults] setBool:TRUE
+                                                                forKey:VPNManagerConnectOnDemandUntilNextStartBoolKey];
 
                         __block RACDisposable *disposable = [[weakSelf.vpnManager setConnectOnDemandEnabled:FALSE]
                           subscribeNext:^(NSNumber *x) {
@@ -501,7 +508,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     [self openRegionSelection];
 }
 
-- (void) onSubscriptionTap {
+- (void)onSubscriptionTap {
     [self openIAPViewController];
 }
 
@@ -536,13 +543,15 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                                         }];
         
         [alertControllerNoInternet addAction:defaultAction];
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(dismissNoInternetAlert) name:@"UIApplicationWillResignActiveNotification" object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(dismissNoInternetAlert)
+                                                     name:@"UIApplicationWillResignActiveNotification" object:nil];
     }
     
     [alertControllerNoInternet presentFromTopController];
 }
 
-- (NSString *)getVPNStatusDescription:(VPNStatus) status {
+- (NSString *)getVPNStatusDescription:(VPNStatus)status {
     switch(status) {
         case VPNStatusDisconnected: return NSLocalizedStringWithDefaultValue(@"VPN_STATUS_DISCONNECTED", nil, [NSBundle mainBundle], @"Disconnected", @"Status when the VPN is not connected to a Psiphon server, not trying to connect, and not in an error state");
         case VPNStatusInvalid: return NSLocalizedStringWithDefaultValue(@"VPN_STATUS_INVALID", nil, [NSBundle mainBundle], @"Disconnected", @"Status when the VPN is in an invalid state. For example, if the user doesn't give permission for the VPN configuration to be installed, and therefore the Psiphon VPN can't even try to connect.");
@@ -560,7 +569,8 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 - (void)setBackgroundGradient {
     backgroundGradient = [CAGradientLayer layer];
     
-    backgroundGradient.colors = @[(id)[UIColor colorWithRed:0.57 green:0.62 blue:0.77 alpha:1.0].CGColor, (id)[UIColor colorWithRed:0.24 green:0.26 blue:0.33 alpha:1.0].CGColor];
+    backgroundGradient.colors = @[(id)[UIColor colorWithRed:0.57 green:0.62 blue:0.77 alpha:1.0].CGColor,
+                                  (id)[UIColor colorWithRed:0.24 green:0.26 blue:0.33 alpha:1.0].CGColor];
     
     [self.view.layer insertSublayer:backgroundGradient atIndex:0];
 }
@@ -609,7 +619,8 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
         narrowestWidth = self.view.frame.size.height;
     }
     appTitleLabel.font = [UIFont fontWithName:@"Bourbon-Oblique" size:narrowestWidth * 0.10625f];
-    if ([PsiphonClientCommonLibraryHelpers unsupportedCharactersForFont:appTitleLabel.font.fontName withString:appTitleLabel.text]) {
+    if ([PsiphonClientCommonLibraryHelpers unsupportedCharactersForFont:appTitleLabel.font.fontName
+                                                             withString:appTitleLabel.text]) {
         appTitleLabel.font = [UIFont systemFontOfSize:narrowestWidth * 0.075f];
     }
 
@@ -635,7 +646,8 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
         narrowestWidth = self.view.frame.size.height;
     }
     appSubTitleLabel.font = [UIFont fontWithName:@"Bourbon-Oblique" size:narrowestWidth * 0.10625f/2.0f];
-    if ([PsiphonClientCommonLibraryHelpers unsupportedCharactersForFont:appSubTitleLabel.font.fontName withString:appSubTitleLabel.text]) {
+    if ([PsiphonClientCommonLibraryHelpers unsupportedCharactersForFont:appSubTitleLabel.font.fontName
+                                                             withString:appSubTitleLabel.text]) {
         appSubTitleLabel.font = [UIFont systemFontOfSize:narrowestWidth * 0.075f/2.0f];
     }
 
@@ -650,15 +662,18 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 
 - (void)addSettingsButton {
     settingsButton = [[UIButton alloc] init];
-    UIImage *gearTemplate = [[UIImage imageNamed:@"settings"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
+    UIImage *gearTemplate = [[UIImage imageNamed:@"settings"]
+      imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
     settingsButton.translatesAutoresizingMaskIntoConstraints = NO;
     [settingsButton setImage:gearTemplate forState:UIControlStateNormal];
     [settingsButton setTintColor:[UIColor whiteColor]];
     [self.view addSubview:settingsButton];
 
     // Setup autolayout
-    [settingsButton.centerYAnchor constraintEqualToAnchor:self.topLayoutGuide.bottomAnchor constant:gearTemplate.size.height/2 + 8.f].active = YES;
-    [settingsButton.centerXAnchor constraintEqualToAnchor:self.view.trailingAnchor constant:-gearTemplate.size.width/2 - 15.f].active = YES;
+    [settingsButton.centerYAnchor
+      constraintEqualToAnchor:self.topLayoutGuide.bottomAnchor constant:gearTemplate.size.height/2 + 8.f].active = YES;
+    [settingsButton.centerXAnchor
+      constraintEqualToAnchor:self.view.trailingAnchor constant:-gearTemplate.size.width/2 - 15.f].active = YES;
     [settingsButton.widthAnchor constraintEqualToConstant:80].active = YES;
     [settingsButton.heightAnchor constraintEqualToAnchor:settingsButton.widthAnchor].active = YES;
 
@@ -729,8 +744,8 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     adLabel.text = NSLocalizedStringWithDefaultValue(@"AD_LOADED", nil, [NSBundle mainBundle], @"Watch a short video while we get ready to connect you", @"Text for button that tell users there will by a short video ad.");
     adLabel.textAlignment = NSTextAlignmentCenter;
     adLabel.textColor = [UIColor lightGrayColor];
-    adLabel.lineBreakMode = NSLineBreakByWordWrapping;
     adLabel.numberOfLines = 0;
+    adLabel.adjustsFontSizeToFitWidth = YES;
     UIFontDescriptor * fontD = [adLabel.font.fontDescriptor
                                 fontDescriptorWithSymbolicTraits:UIFontDescriptorTraitItalic];
     adLabel.font = [UIFont fontWithDescriptor:fontD size:adLabel.font.pointSize - 1];
@@ -738,10 +753,10 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     if (![self.adManager untunneledInterstitialIsReady]){
         adLabel.hidden = true;
     }
-    
+
     // Setup autolayout
-    [adLabel.bottomAnchor constraintGreaterThanOrEqualToAnchor:startStopButton.topAnchor constant:-30].active = YES;
-    [adLabel.bottomAnchor constraintLessThanOrEqualToAnchor:startStopButton.topAnchor constant:-10.f].active = YES;
+    [adLabel.topAnchor constraintEqualToAnchor:psiCashView.bottomAnchor constant:0].active = YES;
+    [adLabel.bottomAnchor constraintEqualToAnchor:startStopButton.topAnchor constant:0].active = YES;
     [adLabel.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor constant:15].active = YES;
     [adLabel.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor constant:-15].active = YES;
 }
@@ -750,7 +765,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     statusLabel = [[UILabel alloc] init];
     statusLabel.translatesAutoresizingMaskIntoConstraints = NO;
     statusLabel.adjustsFontSizeToFitWidth = YES;
-    statusLabel.text = [self getVPNStatusDescription:(VPNStatus) [[self.vpnManager.lastTunnelStatus first] integerValue]];
+    statusLabel.text = [self getVPNStatusDescription:(VPNStatus) self.vpnManager.lastTunnelStatus.first.integerValue];
     statusLabel.textAlignment = NSTextAlignmentCenter;
     statusLabel.textColor = [UIColor whiteColor];
     statusLabel.font = [UIFont boldSystemFontOfSize:18.f];
@@ -823,10 +838,6 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     [regionButton.heightAnchor constraintEqualToConstant:buttonHeight].active = YES;
     [bottomBar addSubview:regionButton];
 
-    if (@available(iOS 11.0, *)) {
-        [regionButton.bottomAnchor constraintEqualToAnchor:self.view.layoutMarginsGuide.bottomAnchor constant:-spacing].active = TRUE;
-    }
-
     [self updateRegionButton];
 
     // Add constraints
@@ -855,7 +866,6 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     versionLabel.translatesAutoresizingMaskIntoConstraints = NO;
     versionLabel.adjustsFontSizeToFitWidth = YES;
     versionLabel.text = [NSString stringWithFormat:NSLocalizedStringWithDefaultValue(@"APP_VERSION", nil, [NSBundle mainBundle], @"v.%@", @"Text showing the app version. The '%@' placeholder is the version number. So it will look like 'v.2'."),[[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"]];
-    ;
     versionLabel.userInteractionEnabled = YES;
     versionLabel.textColor = [UIColor whiteColor];
     versionLabel.font = [versionLabel.font fontWithSize:13];
@@ -891,22 +901,32 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                                                                           @"Go premium now!",
                                                                           @"Text for button that opens paid subscriptions manager UI. If “Premium” doesn't easily translate, please choose a term that conveys “Pro” or “Extra” or “Better” or “Elite”.");
     [subscriptionButton setTitle:subscriptionButtonTitle forState:UIControlStateNormal];
-    [subscriptionButton addTarget:self action:@selector(onSubscriptionTap) forControlEvents:UIControlEventTouchUpInside];
+    [subscriptionButton addTarget:self
+                           action:@selector(onSubscriptionTap)
+                 forControlEvents:UIControlEventTouchUpInside];
     subscriptionButton.translatesAutoresizingMaskIntoConstraints = NO;
     [self.view addSubview:subscriptionButton];
     
     // Setup autolayout
     [subscriptionButton.heightAnchor constraintEqualToConstant:40].active = YES;
     [subscriptionButton.centerXAnchor constraintEqualToAnchor:self.view.centerXAnchor].active = YES;
-    NSLayoutConstraint *idealBottomSpacing = [subscriptionButton.bottomAnchor constraintEqualToAnchor:bottomBar.topAnchor constant:-10.f];
+    NSLayoutConstraint *idealBottomSpacing =
+      [subscriptionButton.bottomAnchor constraintEqualToAnchor:bottomBar.topAnchor constant:-10.f];
     [idealBottomSpacing setPriority:999];
     idealBottomSpacing.active = YES;
 }
 
 #pragma mark - FeedbackViewControllerDelegate methods and helpers
 
-- (void)userSubmittedFeedback:(NSUInteger)selectedThumbIndex comments:(NSString *)comments email:(NSString *)email uploadDiagnostics:(BOOL)uploadDiagnostics {
-    [feedbackManager userSubmittedFeedback:selectedThumbIndex comments:comments email:email uploadDiagnostics:uploadDiagnostics];
+- (void)userSubmittedFeedback:(NSUInteger)selectedThumbIndex
+                     comments:(NSString *)comments
+                        email:(NSString *)email
+            uploadDiagnostics:(BOOL)uploadDiagnostics {
+
+    [feedbackManager userSubmittedFeedback:selectedThumbIndex
+                                  comments:comments
+                                     email:email
+                         uploadDiagnostics:uploadDiagnostics];
 }
 
 - (void)userPressedURL:(NSURL *)URL {
@@ -978,7 +998,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 
 #pragma mark - Psiphon Settings
 
--(void)notice:(NSString *)noticeJSON {
+- (void)notice:(NSString *)noticeJSON {
     NSLog(@"Got notice %@", noticeJSON);
 }
 
@@ -991,7 +1011,8 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     appSettingsViewController.settingsDelegate = self;
     appSettingsViewController.preferencesSnapshot = [[[NSUserDefaults standardUserDefaults] dictionaryRepresentation] copy];
     
-    UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:appSettingsViewController];
+    UINavigationController *navController = [[UINavigationController alloc]
+      initWithRootViewController:appSettingsViewController];
     [self presentViewController:navController animated:YES completion:nil];
 }
 
@@ -1000,7 +1021,8 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 - (void)openRegionSelection {
     selectedRegionSnapShot = [[RegionAdapter sharedInstance] getSelectedRegion].code;
     RegionSelectionViewController *regionSelectionViewController = [[RegionSelectionViewController alloc] init];
-    regionSelectionNavController = [[UINavigationController alloc] initWithRootViewController:regionSelectionViewController];
+    regionSelectionNavController = [[UINavigationController alloc]
+      initWithRootViewController:regionSelectionViewController];
     UIBarButtonItem *doneButton = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedStringWithDefaultValue(@"DONE_ACTION", nil, [NSBundle mainBundle], @"Done", @"Title of the button that dismisses region selection dialog")
                                                                    style:UIBarButtonItemStyleDone target:self
                                                                   action:@selector(regionSelectionDidEnd)];
@@ -1010,7 +1032,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 }
 
 - (void)regionSelectionDidEnd {
-    NSString *selectedRegion = [[RegionAdapter sharedInstance] getSelectedRegion].code;//[[[NSUserDefaults alloc] initWithSuiteName:APP_GROUP_IDENTIFIER] stringForKey:kRegionSelectionSpecifierKey];
+    NSString *selectedRegion = [[RegionAdapter sharedInstance] getSelectedRegion].code;
     if (!safeStringsEqual(selectedRegion, selectedRegionSnapShot)) {
         [self persistSelectedRegion];
         [self updateRegionButton];
@@ -1044,7 +1066,8 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 
 - (void)updateRegionButton {
     Region *selectedRegion = [[RegionAdapter sharedInstance] getSelectedRegion];
-    UIImage *flag = [[PsiphonClientCommonLibraryHelpers imageFromCommonLibraryNamed:selectedRegion.flagResourceId] countryFlag];
+    UIImage *flag = [[PsiphonClientCommonLibraryHelpers imageFromCommonLibraryNamed:selectedRegion.flagResourceId]
+      countryFlag];
     [regionButton setImage:flag forState:UIControlStateNormal];
     
     NSString *regionText = [[RegionAdapter sharedInstance] getLocalizedRegionTitle:selectedRegion.code];
@@ -1066,7 +1089,8 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     [bottomSpacerGuide.topAnchor constraintEqualToAnchor:statusLabel.bottomAnchor].active = YES;
     
     bottomBarTopConstraint = [bottomSpacerGuide.bottomAnchor constraintEqualToAnchor:bottomBar.topAnchor];
-    subscriptionButtonTopConstraint = [bottomSpacerGuide.bottomAnchor constraintEqualToAnchor:subscriptionButton.topAnchor];
+    subscriptionButtonTopConstraint = [bottomSpacerGuide.bottomAnchor
+      constraintEqualToAnchor:subscriptionButton.topAnchor];
 }
 
 #pragma mark - Subscription
@@ -1074,7 +1098,8 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 - (void)openIAPViewController {
     IAPViewController *iapViewController = [[IAPViewController alloc]init];
     iapViewController.openedFromSettings = NO;
-    UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:iapViewController];
+    UINavigationController *navController = [[UINavigationController alloc]
+      initWithRootViewController:iapViewController];
     [self presentViewController:navController animated:YES completion:nil];
 }
 
@@ -1154,7 +1179,8 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 
     [psiCashView.centerXAnchor constraintEqualToAnchor:appSubTitleLabel.centerXAnchor].active = YES;
     [psiCashView.topAnchor constraintGreaterThanOrEqualToAnchor:appSubTitleLabel.bottomAnchor].active = YES;
-    NSLayoutConstraint *topSpacing = [psiCashView.topAnchor constraintEqualToAnchor:appSubTitleLabel.bottomAnchor constant:30.f];
+    NSLayoutConstraint *topSpacing = [psiCashView.topAnchor constraintEqualToAnchor:appSubTitleLabel.bottomAnchor
+                                                                           constant:30.f];
     [topSpacing setPriority:999];
     topSpacing.active = YES;
 
@@ -1178,15 +1204,21 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 
     [psiCashViewUpdates dispose];
 
-    psiCashViewUpdates = [[PsiCashClient.sharedInstance.clientModelSignal deliverOnMainThread] subscribeNext:^(PsiCashClientModel *newClientModel) {
+    psiCashViewUpdates = [[PsiCashClient.sharedInstance.clientModelSignal deliverOnMainThread]
+      subscribeNext:^(PsiCashClientModel *newClientModel) {
         __strong MainViewController *strongSelf = weakSelf;
         if (strongSelf != nil) {
 
-            BOOL stateChanged = [model hasActiveSpeedBoostPurchase] ^ [newClientModel hasActiveSpeedBoostPurchase] || [model hasPendingPurchase] ^ [newClientModel hasPendingPurchase];
+            BOOL stateChanged = [model hasActiveSpeedBoostPurchase] ^ [newClientModel hasActiveSpeedBoostPurchase]
+              || [model hasPendingPurchase] ^ [newClientModel hasPendingPurchase];
 
             NSComparisonResult balanceChange = [model.balance compare:newClientModel.balance];
             if (balanceChange != NSOrderedSame) {
-                [PsiCashBalanceWithSpeedBoostMeter animateBalanceChangeOf:[NSNumber numberWithDouble:newClientModel.balance.doubleValue - model.balance.doubleValue] withPsiCashView:psiCashView inParentView:self.view];
+                NSNumber *balanceChange =
+                  [NSNumber numberWithDouble:newClientModel.balance.doubleValue - model.balance.doubleValue];
+                [PsiCashBalanceWithSpeedBoostMeter animateBalanceChangeOf:balanceChange
+                                                          withPsiCashView:psiCashView
+                                                             inParentView:self.view];
             }
 
             model = newClientModel;
@@ -1204,14 +1236,20 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
         [psiCashViewUpdates dispose];
         [self onboardingEnded];
 
-        PsiCashSpeedBoostProductSKU *sku = [PsiCashSpeedBoostProductSKU skuWitDistinguisher:@"1h" withHours:[NSNumber numberWithInteger:1] andPrice:[NSNumber numberWithDouble:100e9]];
+        PsiCashSpeedBoostProductSKU *sku =
+          [PsiCashSpeedBoostProductSKU skuWitDistinguisher:@"1h"
+                                                 withHours:[NSNumber numberWithInteger:1]
+                                                  andPrice:[NSNumber numberWithDouble:100e9]];
 
-        PsiCashClientModel *m = [PsiCashClientModel clientModelWithAuthPackage:[[PsiCashAuthPackage alloc] initWithValidTokens:@[@"indicator", @"earner", @"spender"]]
-                                                                    andBalance:[NSNumber numberWithDouble:70e9]
-                                                          andSpeedBoostProduct:[PsiCashSpeedBoostProduct productWithSKUs:@[sku]]
-                                                           andPendingPurchases:nil
-                                                   andActiveSpeedBoostPurchase:nil
-                                                             andRefreshPending:NO];
+        PsiCashClientModel *m = [PsiCashClientModel
+            clientModelWithAuthPackage:[[PsiCashAuthPackage alloc]
+                                         initWithValidTokens:@[@"indicator", @"earner", @"spender"]]
+                            andBalance:[NSNumber numberWithDouble:70e9]
+                  andSpeedBoostProduct:[PsiCashSpeedBoostProduct productWithSKUs:@[sku]]
+                   andPendingPurchases:nil
+           andActiveSpeedBoostPurchase:nil
+                     andRefreshPending:NO];
+
         [psiCashView bindWithModel:m];
     }
 #endif
