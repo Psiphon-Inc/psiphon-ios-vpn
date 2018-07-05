@@ -166,30 +166,33 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
 
 #pragma mark - Reactive signals generators
 
-// Emits RACUnit.defaultUnit and completes immediately once all loading signals have completed.
+// createAppLoadingSignal emits RACUnit.defaultUnit and completes immediately once all loading signals have completed.
 - (RACSignal<RACUnit *> *)createAppLoadingSignal {
 
-    // Emits a value when ads have loaded or kMaxAdLoadingTimeSecs has passed.
-    RACSignal *adsLoadingSignal = [[[self.adLoadingStatus
+    // adsLoadingSignal emits a value when ads have loaded or kMaxAdLoadingTimeSecs has passed.
+    RACSignal *adsLoadingSignal = [[[[self.adLoadingStatus
       filter:^BOOL(NSNumber *value) {
           AdLoadingStatus s = (AdLoadingStatus) [value integerValue];
           return (s == AdLoadingStatusFinished);
       }]
       take:1]
-      merge:[RACSignal timer:kMaxAdLoadingTimeSecs]];
+      merge:[RACSignal timer:kMaxAdLoadingTimeSecs]]
+      take:1];
 
-    // Emits a value when the user subscription status becomes known.
-    RACSignal *subscriptionLoadingSignal = [[self.subscriptionStatus filter:^BOOL(NSNumber *value) {
-        UserSubscriptionStatus s = (UserSubscriptionStatus) [value integerValue];
-        return (s != UserSubscriptionUnknown);
+    // subscriptionLoadingSignal emits a value when the user subscription status becomes known.
+    RACSignal *subscriptionLoadingSignal = [[self.subscriptionStatus
+      filter:^BOOL(NSNumber *value) {
+          UserSubscriptionStatus s = (UserSubscriptionStatus) [value integerValue];
+          return (s != UserSubscriptionUnknown);
       }]
       take:1];
 
-    // Zip all loading signals.
+    // Zip all loading signals (all the loading signals are expected to emit only one item and then complete).
     // All signals that are zipped are expected to only emit one item (type doesn't matter).
-    return [[RACSignal zip:@[adsLoadingSignal, subscriptionLoadingSignal]] map:^id(RACTuple *value) {
-        LOG_DEBUG(@"loading operations finished");
-        return RACUnit.defaultUnit;
+    return [[RACSignal zip:@[adsLoadingSignal, subscriptionLoadingSignal]]
+      map:^id(RACTuple *value) {
+          LOG_DEBUG(@"loading operations finished");
+          return RACUnit.defaultUnit;
     }];
 }
 
@@ -272,10 +275,6 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
 
     __weak AppDelegate *weakSelf = self;
 
-    // Resets status of the subjects whose state could be stale once the container is foregrounded.
-    [self.subscriptionStatus sendNext:@(UserSubscriptionUnknown)];
-    [self.adLoadingStatus sendNext:@(AdLoadingStatusUnknown)];
-
     // Subscribes to the app loading signal, and removes the launch screen once all loading is done.
     __block RACDisposable *disposable = [[self createAppLoadingSignal]
       subscribeNext:^(RACUnit *x) {
@@ -300,18 +299,18 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
     // send the VPNManager startVPN message again.
     if (![adManager untunneledInterstitialIsShowing]) {
 
-        __block RACDisposable *disposable = [[self.vpnManager isPsiphonTunnelConnected]
+        __block RACDisposable *connectedDisposable = [[self.vpnManager isPsiphonTunnelConnected]
           subscribeNext:^(NSNumber *_Nullable connected) {
               if ([connected boolValue]) {
                   [weakSelf.vpnManager startVPN];
               }
           } error:^(NSError *error) {
-              [weakSelf.compoundDisposable removeDisposable:disposable];
+              [weakSelf.compoundDisposable removeDisposable:connectedDisposable];
           } completed:^{
-              [weakSelf.compoundDisposable removeDisposable:disposable];
+              [weakSelf.compoundDisposable removeDisposable:connectedDisposable];
           }];
 
-        [self.compoundDisposable addDisposable:disposable];
+        [self.compoundDisposable addDisposable:connectedDisposable];
 
     }
 }
@@ -339,6 +338,10 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
 - (void)applicationWillEnterForeground:(UIApplication *)application {
     LOG_DEBUG();
     // Called as part of the transition from the background to the active state; here you can undo many of the changes made on entering the background.
+
+    // Resets status of the subjects whose state could be stale once the container is foregrounded.
+    [self.subscriptionStatus sendNext:@(UserSubscriptionUnknown)];
+    [self.adLoadingStatus sendNext:@(AdLoadingStatusUnknown)];
 
     [[PsiCashClient sharedInstance] scheduleStateRefresh];
 
