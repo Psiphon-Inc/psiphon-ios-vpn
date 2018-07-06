@@ -35,3 +35,4 @@ FOUNDATION_EXPORT const unsigned char PsiCashLibVersionString[];
 #import <PsiCashLib/PsiCash.h>
 #import <PsiCashLib/PurchasePrice.h>
 #import <PsiCashLib/Purchase.h>
+#import <PsiCashLib/PsiCashAPIModels.h>

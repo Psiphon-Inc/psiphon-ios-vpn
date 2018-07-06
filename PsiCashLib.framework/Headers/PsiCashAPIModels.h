@@ -17,9 +17,18 @@
  *
  */
 
+//
+//  PsiCashAPIModels.h
+//  PsiCashLib
+//
+
+#ifndef PsiCashAPIModels_h
+#define PsiCashAPIModels_h
+
 #import <Foundation/Foundation.h>
 #import <PsiCashLib/PsiCash.h>
 #import <PsiCashLib/PurchasePrice.h>
+
 
 #pragma mark - RefreshResultModel
 
@@ -29,19 +38,10 @@
 
 @property (nonatomic, readwrite) PsiCashStatus status;
 
-@property (nonatomic, readwrite) NSArray *validTokenTypes;
-
-@property (nonatomic, readwrite) BOOL isAccount;
-
-@property (nonatomic, readwrite) NSNumber *balance;
-
-@property (nonatomic, readwrite) NSArray<PsiCashPurchasePrice*> *purchasePrices;
-
-/** Error with domain PsiCashAuthenticationResultErrorDomain */
 @property (nonatomic, readwrite) NSError *error;
 
 + (PsiCashRefreshResultModel*)inProgress;
-+ (PsiCashRefreshResultModel*)successWithValidTokenTypes:(NSArray*)validTokenTypes balance:(NSNumber*)balance andPurchasePrices:(NSArray<PsiCashPurchasePrice*>*)purchasePrices;
++ (PsiCashRefreshResultModel*)success;
 
 @end
 
@@ -53,29 +53,18 @@
 
 @property (nonatomic, readwrite) PsiCashStatus status;
 
-@property (nonatomic, readwrite) NSNumber *price;
+@property (nonatomic, readwrite) PsiCashPurchase *purchase;
 
-@property (nonatomic, readwrite) NSNumber *balance;
-
-@property (nonatomic, readwrite) NSDate *expiry;
-
-@property (nonatomic, readwrite) NSString *authorization;
-
-/** Error with domain PsiCashAuthenticationResultErrorDomain */
 @property (nonatomic, readwrite) NSError *error;
 
 + (PsiCashMakePurchaseResultModel*)inProgress;
 + (PsiCashMakePurchaseResultModel*)failedWithStatus:(PsiCashStatus)status
-                                      andPrice:(NSNumber*)price
-                                    andBalance:(NSNumber*)balance
-                                     andExpiry:(NSDate*)expiry
-                              andAuthorization:(NSString*)authorization
-                                      andError:(NSError*)error;
+                                           andError:(NSError*)error;
 + (PsiCashMakePurchaseResultModel*)successWithStatus:(PsiCashStatus)status
-                                       andPrice:(NSNumber*)price
-                                     andBalance:(NSNumber*)balance
-                                      andExpiry:(NSDate*)expiry
-                               andAuthorization:(NSString*)authorization
-                                       andError:(NSError*)error;
+                                         andPurchase:(PsiCashPurchase*)purchase
+                                            andError:(NSError*)error;
 
 @end
+
+
+#endif /* PsiCashAPIModels_h */

@@ -80,7 +80,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface PsiCashSpeedBoostProduct ()
 @property (nonatomic, readwrite) NSArray<PsiCashSpeedBoostProductSKU*> *skusOrderedByPriceAscending;
-@property (nonatomic, readwrite) NSDictionary<NSNumber*, NSNumber*> *skuMap;
 @end
 
 #pragma mark -
@@ -109,6 +108,15 @@ NS_ASSUME_NONNULL_BEGIN
     }];
     product.skusOrderedByPriceAscending = orderedSkus;
     return product;
+}
+
+- (PsiCashSpeedBoostProductSKU*)productSKUWithDistinguisher:(NSString*_Nonnull)distinguisher {
+    for (PsiCashSpeedBoostProductSKU *sku in self.skusOrderedByPriceAscending) {
+        if ([sku.distinguisher isEqualToString:distinguisher]) {
+            return sku;
+        }
+    }
+    return nil;
 }
 
 @end

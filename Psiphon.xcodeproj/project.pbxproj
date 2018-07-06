@@ -78,7 +78,6 @@
 		4EC5526620AB8DCD000B4BEA /* PastelView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4EC5526520AB8DCD000B4BEA /* PastelView.m */; };
 		4EC5526E20ACED2E000B4BEA /* StarView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4EC5526D20ACED2E000B4BEA /* StarView.m */; };
 		4EC7CAD020E185580038B4E1 /* AppProfiler.m in Sources */ = {isa = PBXBuildFile; fileRef = 4EC7CACF20E185580038B4E1 /* AppProfiler.m */; };
-		4EEB2F0220644769006E80EF /* PsiCashAPIModels.m in Sources */ = {isa = PBXBuildFile; fileRef = 4EEB2F0120644769006E80EF /* PsiCashAPIModels.m */; };
 		4EEB2F0520644BD5006E80EF /* PsiCashClientModelStagingArea.m in Sources */ = {isa = PBXBuildFile; fileRef = 4EEB2F0420644BD5006E80EF /* PsiCashClientModelStagingArea.m */; };
 		4EF6D9CB20A8C7FE00AE9D44 /* PsiCashOnboardingInfoViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4EF6D9C720A8C7FE00AE9D44 /* PsiCashOnboardingInfoViewController.m */; };
 		4EF6D9CC20A8C7FE00AE9D44 /* PsiCashOnboardingViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4EF6D9C920A8C7FE00AE9D44 /* PsiCashOnboardingViewController.m */; };
@@ -348,8 +347,6 @@
 		4EC7CACE20E185580038B4E1 /* AppProfiler.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppProfiler.h; sourceTree = "<group>"; };
 		4EC7CACF20E185580038B4E1 /* AppProfiler.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppProfiler.m; sourceTree = "<group>"; };
 		4EC82F8E20C713DF004C2E9F /* hi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = hi; path = Strings/hi.lproj/Localizable.strings; sourceTree = "<group>"; };
-		4EEB2F0020644769006E80EF /* PsiCashAPIModels.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PsiCashAPIModels.h; sourceTree = "<group>"; };
-		4EEB2F0120644769006E80EF /* PsiCashAPIModels.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PsiCashAPIModels.m; sourceTree = "<group>"; };
 		4EEB2F0320644BD5006E80EF /* PsiCashClientModelStagingArea.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PsiCashClientModelStagingArea.h; sourceTree = "<group>"; };
 		4EEB2F0420644BD5006E80EF /* PsiCashClientModelStagingArea.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PsiCashClientModelStagingArea.m; sourceTree = "<group>"; };
 		4EF6D9C720A8C7FE00AE9D44 /* PsiCashOnboardingInfoViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PsiCashOnboardingInfoViewController.m; sourceTree = "<group>"; };
@@ -736,8 +733,6 @@
 			children = (
 				4EFAAF242034CDC700EC0536 /* PsiCashClient.h */,
 				4EFAAF282034CDC800EC0536 /* PsiCashClient.m */,
-				4EEB2F0020644769006E80EF /* PsiCashAPIModels.h */,
-				4EEB2F0120644769006E80EF /* PsiCashAPIModels.m */,
 				4E90C94220CB37F5003FC319 /* PsiCashLogger.h */,
 				4E90C94320CB37F5003FC319 /* PsiCashLogger.m */,
 			);
@@ -1378,7 +1373,6 @@
 				EF90D7A4204F22C900228A63 /* timestamp_format.c in Sources */,
 				F132D7E01F5739A800AF7F91 /* LaunchScreenViewController.m in Sources */,
 				19CB75081F54ADB300F78219 /* MPGoogleAdMobInterstitialCustomEvent.m in Sources */,
-				4EEB2F0220644769006E80EF /* PsiCashAPIModels.m in Sources */,
 				197DABEB1F54BEED00DD5C3B /* VungleInterstitialCustomEvent.m in Sources */,
 				445F24E920E1A5BA00D004E9 /* ber_tlv_length.c in Sources */,
 				EF184DAB20AD25E0006F6F5C /* PrivacyPolicyViewController.m in Sources */,
