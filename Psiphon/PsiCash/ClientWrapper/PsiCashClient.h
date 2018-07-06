@@ -31,9 +31,10 @@
 
 - (NSURL*)modifiedHomePageURL:(NSURL*)url;
 
-- (void)scheduleStateRefresh;
+- (void)scheduleRefreshState;
 
 - (void)purchaseSpeedBoostProduct:(PsiCashSpeedBoostProductSKU*)sku;
+
 /**
  * @brief Removes any purchases that the extension has marked as invalid from the client model.
  */
