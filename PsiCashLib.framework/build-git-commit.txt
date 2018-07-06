@@ -1,1 +1,1 @@
-release/v1.1.1-0-g0e55b15
+release/v1.2.0-0-g1a3e149
