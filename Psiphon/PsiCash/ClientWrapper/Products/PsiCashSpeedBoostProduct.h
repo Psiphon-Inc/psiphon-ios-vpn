@@ -36,6 +36,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface PsiCashSpeedBoostProduct : NSObject <PsiCashProduct>
 + (PsiCashSpeedBoostProduct*)productWithSKUs:(NSArray<PsiCashSpeedBoostProductSKU*>*)skus;
+- (PsiCashSpeedBoostProductSKU*)productSKUWithDistinguisher:(NSString*_Nonnull)distinguisher;
 @property (nonatomic, readonly) NSArray<PsiCashSpeedBoostProductSKU*> *skusOrderedByPriceAscending;
 @end
 
