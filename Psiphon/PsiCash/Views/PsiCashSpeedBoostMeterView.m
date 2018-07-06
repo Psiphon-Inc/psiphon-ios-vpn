@@ -209,7 +209,7 @@
 
     dispatch_async(dispatch_get_main_queue(), ^{
         countdownToSpeedBoostExpiry = [NSTimer scheduledTimerWithTimeInterval:1 repeats:YES block:^(NSTimer * _Nonnull timer) {
-            NSTimeInterval secondsToExpiry = self.model.activeSpeedBoostPurchase.expiry.timeIntervalSinceNow;
+            NSTimeInterval secondsToExpiry = self.model.activeSpeedBoostPurchase.localTimeExpiry.timeIntervalSinceNow;
 
             if (secondsToExpiry < 0) {
                 [timer invalidate];
@@ -281,7 +281,7 @@
 
     if ([self.model hasAuthPackage]) {
         if ([self.model hasActiveSpeedBoostPurchase]) {
-            [self activeSpeedBoostExpiringIn:self.model.activeSpeedBoostPurchase.expiry.timeIntervalSinceNow];
+            [self activeSpeedBoostExpiringIn:self.model.activeSpeedBoostPurchase.localTimeExpiry.timeIntervalSinceNow];
         } else if ([self.model hasPendingPurchase]){
             [self inPurchasePendingState];
         } else {

@@ -30,13 +30,15 @@
 @property (nonnull) NSString* ID;
 @property (nonnull) NSString* transactionClass;
 @property (nonnull) NSString* distinguisher;
-@property (nullable) NSDate* expiry;
+@property (nullable) NSDate* serverTimeExpiry;
+@property (nullable) NSDate* localTimeExpiry;
 @property (nullable) NSString* authorization;
 
 - (id)initWithID:(NSString*_Nonnull)ID
 transactionClass:(NSString*_Nonnull)transactionClass
    distinguisher:(NSString*_Nonnull)distinguisher
-          expiry:(NSDate*_Nullable)expiry
+serverTimeExpiry:(NSDate*_Nullable)serverTimeExpiry
+ localTimeExpiry:(NSDate*_Nullable)localTimeExpiry
    authorization:(NSString*_Nullable)authorization;
 
 - (NSDictionary<NSString*,NSObject*>*_Nonnull)toDictionary;

@@ -40,6 +40,9 @@
 }
 
 + (NSString*)formattedBalance:(NSNumber*)balance {
+    if (!balance) {
+        balance = [NSNumber numberWithInteger:0];
+    }
     NSNumberFormatter *formatter = [NSNumberFormatter new];
     [formatter setNumberStyle:NSNumberFormatterDecimalStyle];
     return [formatter stringFromNumber:[NSNumber numberWithDouble:balance.doubleValue/1e9]];
@@ -68,14 +71,14 @@
 }
 
 - (BOOL)hasActiveSpeedBoostPurchase {
-    if (self.activeSpeedBoostPurchase != nil && [[NSDate date] before:[self.activeSpeedBoostPurchase expiry]]) {
+    if (self.activeSpeedBoostPurchase != nil && [[NSDate date] before:self.activeSpeedBoostPurchase.localTimeExpiry]) {
         return TRUE;
     }
     return FALSE;
 }
 
 - (int)minutesOfSpeedBoostRemaining {
-    NSTimeInterval timeRemaing = [[self.activeSpeedBoostPurchase expiry] timeIntervalSinceNow];
+    NSTimeInterval timeRemaing = [self.activeSpeedBoostPurchase.localTimeExpiry timeIntervalSinceNow];
     return timeRemaing < 0 ? 0 : (int)(timeRemaing / 60);
 }
 
