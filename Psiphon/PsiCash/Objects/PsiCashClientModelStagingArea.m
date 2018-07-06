@@ -82,7 +82,7 @@
 
 - (void)updateActivePurchases:(NSArray<PsiCashPurchase*>*)activePurchases {
     for (PsiCashPurchase *p in activePurchases) {
-        if ([p.transactionClass isEqualToString:[PsiCashSpeedBoostProduct purchaseClass]] && [p.expiry after:[NSDate date]]) {
+        if ([p.transactionClass isEqualToString:[PsiCashSpeedBoostProduct purchaseClass]] && [p.localTimeExpiry after:[NSDate date]]) {
             self.stagedModel.activeSpeedBoostPurchase = p;
             return;
         }

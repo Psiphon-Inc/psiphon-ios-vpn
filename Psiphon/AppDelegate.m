@@ -265,7 +265,7 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
     [self.compoundDisposable addDisposable:disposable];
 
     // Start PsiCash lifecycle
-    [[PsiCashClient sharedInstance] scheduleStateRefresh];
+    [[PsiCashClient sharedInstance] scheduleRefreshState];
 
     return YES;
 }
@@ -343,7 +343,7 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
     [self.subscriptionStatus sendNext:@(UserSubscriptionUnknown)];
     [self.adLoadingStatus sendNext:@(AdLoadingStatusUnknown)];
 
-    [[PsiCashClient sharedInstance] scheduleStateRefresh];
+    [[PsiCashClient sharedInstance] scheduleRefreshState];
 
     [self initializeAdsIfNeeded];
 }
