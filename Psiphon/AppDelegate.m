@@ -23,6 +23,7 @@
 #import <ReactiveObjC/RACScheduler.h>
 #import "AppDelegate.h"
 #import "AdManager.h"
+#import "AppInfo.h"
 #import "EmbeddedServerEntries.h"
 #import "IAPViewController.h"
 #import "Logging.h"
@@ -73,6 +74,7 @@ typedef NS_ENUM(NSInteger, AdLoadingStatus) {
     AdLoadingStatusFinished
 };
 
+PsiFeedbackLogType const AppUpgradeLogType = @"AppUpgrade";
 PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
 
 @interface AppDelegate () <NotifierObserver>
@@ -133,11 +135,12 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
     static dispatch_once_t once;
     dispatch_once(&once, ^{
         NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
-        NSString *appVersion = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleVersion"];
+        NSString *appVersion = [AppInfo appVersion];
         NSString *lastLaunchAppVersion = [userDefaults stringForKey:@"LastCFBundleVersion"];
         if ([appVersion isEqualToString:lastLaunchAppVersion]) {
             firstRunOfVersion = FALSE;
         } else {
+            [PsiFeedbackLogger infoWithType:AppUpgradeLogType json:@{@"CFBundleVersion": @{@"old":lastLaunchAppVersion,@"new":appVersion}}];
             firstRunOfVersion = TRUE;
             [userDefaults setObject:appVersion forKey:@"LastCFBundleVersion"];
         }

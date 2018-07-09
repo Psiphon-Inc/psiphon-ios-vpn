@@ -52,6 +52,13 @@
 - (NSArray<NSString *> *)emittedEgressRegions;
 #endif
 
+#if TARGET_IS_EXTENSION
+- (BOOL)insertNewClientRegion:(NSString*)region;
+#else
+- (NSString*)emittedClientRegion;
+#endif
+
+
 - (NSString *)homepageNoticesPath;
 - (NSString *)rotatingLogNoticesPath;
 
@@ -61,6 +68,13 @@
 
 - (BOOL)updateAppForegroundState:(BOOL)foreground;
 - (BOOL)getAppForegroundState;
+
+// Tunnel config state
+#if TARGET_IS_EXTENSION
+- (BOOL)setCurrentSponsorId:(NSString *_Nullable)sponsorId;
+#else
+- (NSString *_Nullable)getCurrentSponsorId;
+#endif
 
 // Server timestamp
 - (void)updateServerTimestamp:(NSString*)timestamp;
