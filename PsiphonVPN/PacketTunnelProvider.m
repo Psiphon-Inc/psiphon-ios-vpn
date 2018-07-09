@@ -969,6 +969,9 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
         mutableConfigCopy[@"SponsorId"] = [self.cachedSpondorIDs.checkSubscriptionSponsorId copy];
     }
 
+    // Store current sponsor ID used for use by container.
+    [sharedDB setCurrentSponsorId:mutableConfigCopy[@"SponsorId"]];
+
     return mutableConfigCopy;
 }
 
