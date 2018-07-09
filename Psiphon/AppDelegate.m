@@ -74,6 +74,7 @@ typedef NS_ENUM(NSInteger, AdLoadingStatus) {
     AdLoadingStatusFinished
 };
 
+PsiFeedbackLogType const AppUpgradeLogType = @"AppUpgrade";
 PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
 
 @interface AppDelegate () <NotifierObserver>
@@ -139,6 +140,7 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
         if ([appVersion isEqualToString:lastLaunchAppVersion]) {
             firstRunOfVersion = FALSE;
         } else {
+            [PsiFeedbackLogger infoWithType:AppUpgradeLogType json:@{@"CFBundleVersion": @{@"old":lastLaunchAppVersion,@"new":appVersion}}];
             firstRunOfVersion = TRUE;
             [userDefaults setObject:appVersion forKey:@"LastCFBundleVersion"];
         }
