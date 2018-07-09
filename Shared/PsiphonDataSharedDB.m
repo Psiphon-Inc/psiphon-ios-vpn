@@ -30,6 +30,7 @@
 
 /* Shared NSUserDefaults keys */
 #define EGRESS_REGIONS_KEY @"egress_regions"
+#define CLIENT_REGION_KEY @"client_region"
 #define APP_FOREGROUND_KEY @"app_foreground"
 #define SERVER_TIMESTAMP_KEY @"server_timestamp"
 #define kContainerSubscriptionEmptyReceiptKey @"kContainerSubscriptionEmptyReceiptKey"
@@ -344,6 +345,22 @@
 }
 
 #endif
+
+#pragma mark - Client Region Methods
+
+/*!
+ * @brief Sets client region in shared NSUserDefaults
+ * @param region
+ * @return TRUE if data was saved to disk successfully, otherwise FALSE.
+ */
+- (BOOL)insertNewClientRegion:(NSString*)region {
+    [sharedDefaults setObject:region forKey:CLIENT_REGION_KEY];
+    return [sharedDefaults synchronize];
+}
+
+- (NSString*)emittedClientRegion {
+    return [sharedDefaults objectForKey:CLIENT_REGION_KEY];
+}
 
 #pragma mark - Logging
 
