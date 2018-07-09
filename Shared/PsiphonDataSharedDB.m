@@ -349,6 +349,8 @@
 
 #pragma mark - Client Region Methods
 
+#if TARGET_IS_EXTENSION
+
 /*!
  * @brief Sets client region in shared NSUserDefaults
  * @param region
@@ -359,9 +361,13 @@
     return [sharedDefaults synchronize];
 }
 
+#else
+
 - (NSString*)emittedClientRegion {
     return [sharedDefaults objectForKey:CLIENT_REGION_KEY];
 }
+
+#endif
 
 #pragma mark - Logging
 

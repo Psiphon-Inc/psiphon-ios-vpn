@@ -26,6 +26,7 @@
 #import <arpa/inet.h>
 #import <net/if.h>
 #import <stdatomic.h>
+#import "AppInfo.h"
 #import "AppProfiler.h"
 #import "PacketTunnelProvider.h"
 #import "PsiphonConfigReader.h"
@@ -955,7 +956,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 
     mutableConfigCopy[@"PacketTunnelTunFileDescriptor"] = fd;
 
-    mutableConfigCopy[@"ClientVersion"] = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleVersion"];
+    mutableConfigCopy[@"ClientVersion"] = [AppInfo appVersion];
 
     NSArray *authorizations = [self getAllAuthorizations];
     if ([authorizations count] > 0) {
