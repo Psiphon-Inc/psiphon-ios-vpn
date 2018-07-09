@@ -1118,4 +1118,8 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
     [self displayMessage:alertDisplayMessage];
 }
 
+- (void)onClientRegion:(NSString *)region {
+    [sharedDB insertNewClientRegion:region];
+}
+
 @end

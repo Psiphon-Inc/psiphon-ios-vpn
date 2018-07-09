@@ -52,6 +52,15 @@
 - (NSArray<NSString *> *)emittedEgressRegions;
 #endif
 
+#if TARGET_IS_EXTENSION
+- (BOOL)insertNewClientRegion:(NSString*)region;
+#endif
+
+#if !(TARGET_IS_EXTENSION)
+- (NSString*)emittedClientRegion;
+#endif
+
+
 - (NSString *)homepageNoticesPath;
 - (NSString *)rotatingLogNoticesPath;
 
