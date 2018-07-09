@@ -71,6 +71,13 @@
 - (BOOL)updateAppForegroundState:(BOOL)foreground;
 - (BOOL)getAppForegroundState;
 
+// Tunnel config state
+#if TARGET_IS_EXTENSION
+- (BOOL)setCurrentSponsorId:(NSString *_Nullable)sponsorId;
+#else
+- (NSString *_Nullable)getCurrentSponsorId;
+#endif
+
 // Server timestamp
 - (void)updateServerTimestamp:(NSString*)timestamp;
 - (NSString*)getServerTimestamp;
