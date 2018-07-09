@@ -53,6 +53,8 @@
 		4E0D88241FA06B2400ADB61E /* PsiphonUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E0D88231FA06B2400ADB61E /* PsiphonUITests.swift */; };
 		4E0DCB1A1F28481E00495781 /* PsiphonDataSharedDB.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E0DCB191F28481E00495781 /* PsiphonDataSharedDB.m */; };
 		4E0DCB1E1F2855FC00495781 /* PsiphonDataSharedDB.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E0DCB191F28481E00495781 /* PsiphonDataSharedDB.m */; };
+		4E10920820F3DA190033114B /* AppInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E10920720F3DA190033114B /* AppInfo.m */; };
+		4E10920920F3DC670033114B /* AppInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E10920720F3DA190033114B /* AppInfo.m */; };
 		4E1FE1CB1FB213860031211C /* SnapshotHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E1FE1CA1FB213860031211C /* SnapshotHelper.swift */; };
 		4E2037A1207592A300B99A05 /* PsiCashErrorTypes.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E2037A0207592A300B99A05 /* PsiCashErrorTypes.m */; };
 		4E25A8F4203F5F2200B5A1A4 /* PsiCashSpeedBoostMeterView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E25A8F3203F5F2200B5A1A4 /* PsiCashSpeedBoostMeterView.m */; };
@@ -297,6 +299,8 @@
 		4E0D88251FA06B2400ADB61E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		4E0DCB181F28481E00495781 /* PsiphonDataSharedDB.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PsiphonDataSharedDB.h; sourceTree = "<group>"; };
 		4E0DCB191F28481E00495781 /* PsiphonDataSharedDB.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PsiphonDataSharedDB.m; sourceTree = "<group>"; };
+		4E10920620F3DA190033114B /* AppInfo.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppInfo.h; sourceTree = "<group>"; };
+		4E10920720F3DA190033114B /* AppInfo.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppInfo.m; sourceTree = "<group>"; };
 		4E1FE1CA1FB213860031211C /* SnapshotHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SnapshotHelper.swift; sourceTree = "<group>"; };
 		4E2037A0207592A300B99A05 /* PsiCashErrorTypes.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PsiCashErrorTypes.m; sourceTree = "<group>"; };
 		4E25A8F2203F5F2200B5A1A4 /* PsiCashSpeedBoostMeterView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PsiCashSpeedBoostMeterView.h; sourceTree = "<group>"; };
@@ -829,6 +833,8 @@
 		CE26FC8C1BBDC7B800B83375 /* Psiphon */ = {
 			isa = PBXGroup;
 			children = (
+				4E10920620F3DA190033114B /* AppInfo.h */,
+				4E10920720F3DA190033114B /* AppInfo.m */,
 				4EC5526720AB8DF1000B4BEA /* Pastel */,
 				4E5263C6207294550021FEF5 /* EmbeddedServerEntries.h */,
 				4E5263BF207292920021FEF5 /* EmbeddedServerEntries.m */,
@@ -1451,6 +1457,7 @@
 				445F24ED20E1A5BA00D004E9 /* ber_tlv_tag.c in Sources */,
 				9BFEC5C3F8FFF1366FF19D0B /* AsyncOperation.m in Sources */,
 				4E5263B7207290360021FEF5 /* EmbeddedServerEntriesHelpers.c in Sources */,
+				4E10920820F3DA190033114B /* AppInfo.m in Sources */,
 				4E2037A1207592A300B99A05 /* PsiCashErrorTypes.m in Sources */,
 				445F24EE20E1A5BA00D004E9 /* asn_codecs_prim.c in Sources */,
 				445F24E620E1A5BA00D004E9 /* per_opentype.c in Sources */,
@@ -1481,6 +1488,7 @@
 				44A0CAEE1FCCCDEC00859DB3 /* Subscription.m in Sources */,
 				EF652CDA1F352271002AFB48 /* PacketTunnelProvider.m in Sources */,
 				4E0DCB1E1F2855FC00495781 /* PsiphonDataSharedDB.m in Sources */,
+				4E10920920F3DC670033114B /* AppInfo.m in Sources */,
 				9BFECD1880B51B0E2EAEFF1F /* Notifier.m in Sources */,
 				4EFDFD7420DD829800A687FD /* AppStats.m in Sources */,
 				EF90D7AF204F231900228A63 /* timestamp_valid.c in Sources */,

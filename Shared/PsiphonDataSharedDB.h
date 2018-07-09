@@ -54,9 +54,7 @@
 
 #if TARGET_IS_EXTENSION
 - (BOOL)insertNewClientRegion:(NSString*)region;
-#endif
-
-#if !(TARGET_IS_EXTENSION)
+#else
 - (NSString*)emittedClientRegion;
 #endif
 
