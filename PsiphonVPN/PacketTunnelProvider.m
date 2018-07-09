@@ -26,6 +26,7 @@
 #import <arpa/inet.h>
 #import <net/if.h>
 #import <stdatomic.h>
+#import "AppInfo.h"
 #import "AppProfiler.h"
 #import "PacketTunnelProvider.h"
 #import "PsiphonConfigReader.h"
@@ -955,7 +956,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 
     mutableConfigCopy[@"PacketTunnelTunFileDescriptor"] = fd;
 
-    mutableConfigCopy[@"ClientVersion"] = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleVersion"];
+    mutableConfigCopy[@"ClientVersion"] = [AppInfo appVersion];
 
     NSArray *authorizations = [self getAllAuthorizations];
     if ([authorizations count] > 0) {
@@ -968,6 +969,9 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
     } else if ([self.subscriptionCheckState isInProgress]) {
         mutableConfigCopy[@"SponsorId"] = [self.cachedSpondorIDs.checkSubscriptionSponsorId copy];
     }
+
+    // Store current sponsor ID used for use by container.
+    [sharedDB setCurrentSponsorId:mutableConfigCopy[@"SponsorId"]];
 
     return mutableConfigCopy;
 }
@@ -1116,6 +1120,10 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
             message];
 
     [self displayMessage:alertDisplayMessage];
+}
+
+- (void)onClientRegion:(NSString *)region {
+    [sharedDB insertNewClientRegion:region];
 }
 
 @end
