@@ -30,7 +30,9 @@
 
 /* Shared NSUserDefaults keys */
 #define EGRESS_REGIONS_KEY @"egress_regions"
+#define CLIENT_REGION_KEY @"client_region"
 #define APP_FOREGROUND_KEY @"app_foreground"
+#define TUNNEL_SPONSOR_ID @"current_sponsor_id"
 #define SERVER_TIMESTAMP_KEY @"server_timestamp"
 #define kContainerSubscriptionEmptyReceiptKey @"kContainerSubscriptionEmptyReceiptKey"
 #define kAuthorizationsContainerKey @"authorizations_container_key"
@@ -345,6 +347,28 @@
 
 #endif
 
+#pragma mark - Client Region Methods
+
+#if TARGET_IS_EXTENSION
+
+/*!
+ * @brief Sets client region in shared NSUserDefaults
+ * @param region
+ * @return TRUE if data was saved to disk successfully, otherwise FALSE.
+ */
+- (BOOL)insertNewClientRegion:(NSString*)region {
+    [sharedDefaults setObject:region forKey:CLIENT_REGION_KEY];
+    return [sharedDefaults synchronize];
+}
+
+#else
+
+- (NSString*)emittedClientRegion {
+    return [sharedDefaults objectForKey:CLIENT_REGION_KEY];
+}
+
+#endif
+
 #pragma mark - Logging
 
 - (NSString *)rotatingLogNoticesPath {
@@ -435,6 +459,19 @@
 - (BOOL)getAppForegroundState {
     return [sharedDefaults boolForKey:APP_FOREGROUND_KEY];
 }
+
+#pragma mark - Tunnel config state
+
+#if TARGET_IS_EXTENSION
+- (BOOL)setCurrentSponsorId:(NSString *_Nullable)sponsorId {
+    [sharedDefaults setObject:sponsorId forKey:TUNNEL_SPONSOR_ID];
+    return [sharedDefaults synchronize];
+}
+#else
+- (NSString *_Nullable)getCurrentSponsorId {
+    return [sharedDefaults stringForKey:TUNNEL_SPONSOR_ID];
+}
+#endif
 
 #pragma mark - Server timestamp methods
 

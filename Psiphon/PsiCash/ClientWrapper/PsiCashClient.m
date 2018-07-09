@@ -21,6 +21,7 @@
 #import <PsiCashLib/PsiCashAPIModels.h>
 #import "PsiCashClient.h"
 #import "AppDelegate.h"
+#import "AppInfo.h"
 #import "Asserts.h"
 #import "Authorization.h"
 #import "CustomIOSAlertView.h"
@@ -75,6 +76,9 @@ NSErrorDomain _Nonnull const PsiCashClientLibraryErrorDomain = @"PsiCashClientLi
     self = [super init];
     if (self) {
         psiCash = [[PsiCash alloc] init];
+
+        [self setStaticRequestMetadata];
+
         logger = [[PsiCashLogger alloc] initWithClient:psiCash];
 
         sharedDB = [[PsiphonDataSharedDB alloc] initForAppGroupIdentifier:APP_GROUP_IDENTIFIER];
@@ -92,18 +96,6 @@ NSErrorDomain _Nonnull const PsiCashClientLibraryErrorDomain = @"PsiCashClientLi
         vpnManager = [VPNManager sharedInstance];
     }
     return self;
-}
-
-- (NSURL*)modifiedHomePageURL:(NSURL*)url {
-    NSString *modifiedURL = nil;
-
-    NSError *e = [psiCash modifyLandingPage:[url absoluteString] modifiedURL:&modifiedURL];
-    if (e!= nil) {
-        [logger logErrorEvent:@"ModifyURLFailed" withError:e includingDiagnosticInfo:YES];
-        return url;
-    }
-
-    return [NSURL URLWithString:modifiedURL];
 }
 
 - (void)scheduleRefreshState {
@@ -276,6 +268,7 @@ NSErrorDomain _Nonnull const PsiCashClientLibraryErrorDomain = @"PsiCashClientLi
 
 - (void)refreshStateLibRemote {
     [logger logEvent:@"RefreshingState" includingDiagnosticInfo:NO];
+    [self setDynamicRequestMetadata];
 
 #if DEBUG
     const int networkRetryCount = 3;
@@ -364,6 +357,7 @@ NSErrorDomain _Nonnull const PsiCashClientLibraryErrorDomain = @"PsiCashClientLi
 
 - (void)purchaseSpeedBoostProduct:(PsiCashSpeedBoostProductSKU*)sku {
     [logger logEvent:@"Purchase" withInfoDictionary:[sku jsonDict] includingDiagnosticInfo:NO];
+    [self setDynamicRequestMetadata];
 
     [purchaseDisposable dispose];
 
@@ -501,6 +495,46 @@ NSErrorDomain _Nonnull const PsiCashClientLibraryErrorDomain = @"PsiCashClientLi
         }];
         return nil;
     }];
+}
+
+#pragma mark - Home Pages
+
+- (NSURL*)modifiedHomePageURL:(NSURL*)url {
+    NSString *modifiedURL = nil;
+
+    NSError *e = [psiCash modifyLandingPage:[url absoluteString] modifiedURL:&modifiedURL];
+    if (e!= nil) {
+        [logger logErrorEvent:@"ModifyURLFailed" withError:e includingDiagnosticInfo:YES];
+        return url;
+    }
+
+    return [NSURL URLWithString:modifiedURL];
+}
+
+#pragma mark - PsiCashLib request metadata
+
+- (void)setStaticRequestMetadata {
+    NSString *appVersion = [AppInfo appVersion];
+    if (appVersion) {
+        [psiCash setRequestMetadataAtKey:@"client_version" withValue:appVersion];
+    }
+
+    NSString *propagationChannelId = [AppInfo propagationChannelId];
+    if (propagationChannelId) {
+        [psiCash setRequestMetadataAtKey:@"propagation_channel_id" withValue:propagationChannelId];
+    }
+}
+
+- (void)setDynamicRequestMetadata {
+    NSString *clientRegion = [AppInfo clientRegion];
+    if (clientRegion) {
+        [psiCash setRequestMetadataAtKey:@"client_region" withValue:clientRegion];
+    }
+
+    NSString *sponsorId = [AppInfo sponsorId];
+    if (sponsorId) {
+        [psiCash setRequestMetadataAtKey:@"sponsor_id" withValue:sponsorId];
+    }
 }
 
 #pragma mark - Logging
