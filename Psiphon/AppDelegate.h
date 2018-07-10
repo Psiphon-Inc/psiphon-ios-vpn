@@ -50,8 +50,6 @@ typedef NS_ENUM(NSInteger, UserSubscriptionStatus) {
 @property (atomic) BOOL shownLandingPageForCurrentSession;
 
 + (AppDelegate *)sharedAppDelegate;
-+ (BOOL)isFirstRunOfAppVersion;
-+ (BOOL)isRunningUITest;
 
 /* Ads */
 - (UIViewController *)getAdsPresentingViewController;
