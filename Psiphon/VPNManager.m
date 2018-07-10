@@ -32,6 +32,7 @@
 #import <ReactiveObjC/RACScheduler.h>
 #import <ReactiveObjC/RACTuple.h>
 #import "VPNManager.h"
+#import "AppInfo.h"
 #import "AsyncOperation.h"
 #import "Asserts.h"
 #import "Notifier.h"
@@ -562,7 +563,7 @@ UserDefaultsKey const VPNManagerConnectOnDemandUntilNextStartBoolKey = @"VPNMana
 - (VPNStatus)mapVPNStatus:(NEVPNStatus)status {
 
 #if DEBUG
-    if ([AppDelegate isRunningUITest]) {
+    if ([AppInfo runningUITest]) {
         return VPNStatusConnected;
     }
 #endif
