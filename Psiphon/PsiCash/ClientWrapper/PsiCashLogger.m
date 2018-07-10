@@ -20,7 +20,7 @@
 #import <PsiCashLib/PsiCash.h>
 #import "PsiCashLogger.h"
 #import "PsiCashClient.h"
-#import "PsiCashErrorTypes.h"
+#import "PsiCashTypes.h"
 #import "PsiFeedbackLogger.h"
 
 NS_ASSUME_NONNULL_BEGIN
