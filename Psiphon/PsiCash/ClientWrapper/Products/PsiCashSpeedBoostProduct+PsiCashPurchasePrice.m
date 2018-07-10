@@ -18,7 +18,7 @@
  */
 
 #import "PsiCashSpeedBoostProduct+PsiCashPurchasePrice.h"
-#import "PsiCashErrorTypes.h"
+#import "PsiCashTypes.h"
 #import "PsiFeedbackLogger.h"
 
 NS_ASSUME_NONNULL_BEGIN
