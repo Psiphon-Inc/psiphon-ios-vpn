@@ -74,7 +74,6 @@ typedef NS_ENUM(NSInteger, AdLoadingStatus) {
     AdLoadingStatusFinished
 };
 
-PsiFeedbackLogType const AppUpgradeLogType = @"AppUpgrade";
 PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
 
 @interface AppDelegate () <NotifierObserver>
@@ -128,43 +127,6 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
 
 + (AppDelegate *)sharedAppDelegate {
     return (AppDelegate *)[UIApplication sharedApplication].delegate;
-}
-
-+ (BOOL)isFirstRunOfAppVersion {
-    static BOOL firstRunOfVersion;
-    static dispatch_once_t once;
-    dispatch_once(&once, ^{
-        NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
-        NSString *appVersion = [AppInfo appVersion];
-        NSString *lastLaunchAppVersion = [userDefaults stringForKey:@"LastCFBundleVersion"];
-        if ([appVersion isEqualToString:lastLaunchAppVersion]) {
-            firstRunOfVersion = FALSE;
-        } else {
-            [PsiFeedbackLogger infoWithType:AppUpgradeLogType json:@{@"CFBundleVersion": @{@"old":lastLaunchAppVersion,@"new":appVersion}}];
-            firstRunOfVersion = TRUE;
-            [userDefaults setObject:appVersion forKey:@"LastCFBundleVersion"];
-        }
-    });
-    return firstRunOfVersion;
-}
-
-+ (BOOL)isRunningUITest {
-#if DEBUG
-    static BOOL runningUITest;
-    static dispatch_once_t once;
-    dispatch_once(&once, ^{
-        if ([[NSUserDefaults standardUserDefaults] boolForKey:@"FASTLANE_SNAPSHOT"]) {
-            NSDictionary *environmentDictionary = [[NSProcessInfo processInfo] environment];
-            if (environmentDictionary[@"PsiphonUITestEnvironment"] != nil) {
-                runningUITest = TRUE;
-            }
-        }
-
-    });
-    return runningUITest;
-#else
-    return FALSE;
-#endif
 }
 
 #pragma mark - Reactive signals generators
@@ -225,7 +187,7 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
 
     [[IAPStoreHelper sharedInstance] startProductsRequest];
 
-    if ([AppDelegate isFirstRunOfAppVersion]) {
+    if ([AppInfo firstRunOfAppVersion]) {
         [self updateAvailableEgressRegionsOnFirstRunOfAppVersion];
     }
 

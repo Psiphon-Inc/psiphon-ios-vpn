@@ -21,6 +21,7 @@
 #import <PsiphonTunnel/PsiphonTunnel.h>
 #import "MainViewController.h"
 #import "AdManager.h"
+#import "AppInfo.h"
 #import "AppDelegate.h"
 #import "DispatchUtils.h"
 #import "FeedbackManager.h"
@@ -1055,7 +1056,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
         }
 
 #if DEBUG
-        if ([AppDelegate isRunningUITest]) {
+        if ([AppInfo runningUITest]) {
             // fake the availability of all regions in the UI for automated screenshots
             NSMutableArray *faked_regions = [[NSMutableArray alloc] init];
             for (Region *region in [[RegionAdapter sharedInstance] getRegions]) {
@@ -1236,7 +1237,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     }];
 
 #if DEBUG
-    if ([AppDelegate isRunningUITest]) {
+    if ([AppInfo runningUITest]) {
         [psiCashViewUpdates dispose];
         [self onboardingEnded];
 
