@@ -215,6 +215,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 
           // Notify SettingsViewController that the state has changed.
           // Note that this constant is used PsiphonClientCommonLibrary, and cannot simply be replaced by a RACSignal.
+          // TODO n: do we still need this?
           [[NSNotificationCenter defaultCenter] postNotificationName:kPsiphonConnectionStateNotification object:nil];
 
       }];
@@ -766,7 +767,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     statusLabel = [[UILabel alloc] init];
     statusLabel.translatesAutoresizingMaskIntoConstraints = NO;
     statusLabel.adjustsFontSizeToFitWidth = YES;
-    statusLabel.text = [self getVPNStatusDescription:(VPNStatus) self.vpnManager.lastTunnelStatus.first.integerValue];
+    statusLabel.text = [self getVPNStatusDescription:VPNStatusInvalid];
     statusLabel.textAlignment = NSTextAlignmentCenter;
     statusLabel.textColor = [UIColor whiteColor];
     statusLabel.font = [UIFont boldSystemFontOfSize:18.f];
@@ -986,19 +987,6 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 
 - (BOOL)shouldEnableSettingsLinks {
     return YES;
-}
-
-- (NSArray<NSString*>*)hiddenSpecifierKeys {
-    
-    VPNStatus s = (VPNStatus) [[self.vpnManager.lastTunnelStatus first] integerValue];
-    
-    if (s == VPNStatusInvalid ||
-        s == VPNStatusDisconnected ||
-        s == VPNStatusDisconnecting ) {
-        return @[kForceReconnect, kForceReconnectFooter];
-    }
-    
-    return nil;
 }
 
 #pragma mark - Psiphon Settings

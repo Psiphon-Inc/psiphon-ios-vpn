@@ -105,6 +105,9 @@ typedef NS_ENUM(NSInteger, VPNStartStatus) {
  * This replay subject is never empty and starts with `VPNStatusInvalid`,
  * until the VPN configuration is loaded (if any).
  *
+ * @note If the last tunnel status is unknown at the time of subscription (e.g. when the
+ *       app is recently foregrounded), the signal will not emit anything until the tunnel status is determined.
+ *
  * @attention This observable may not emit the latest VPN status when subscribed to.
  *
  * @scheduler lastTunnelStatus delivers its events on the main thread.
@@ -121,7 +124,7 @@ typedef NS_ENUM(NSInteger, VPNStartStatus) {
 /**
  * Returns text description of VPNStatus.
  */
-+ (NSString *)statusText:(VPNStatus)status;
++ (NSString *)statusText:(NSInteger)status;
 
 /**
  * Returns text description of NEVPNStatus.
