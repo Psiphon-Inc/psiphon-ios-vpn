@@ -89,11 +89,13 @@ NSString * const ConnectOnDemandCellSpecifierKey = @"vpnOnDemand";
 
     [self.compoundDisposable addDisposable:subscriptionStatusDisposable];
 
-    __block RACDisposable *tunnelStatusDisposable = [[VPNManager sharedInstance].lastTunnelStatus
-                                                     subscribeNext:^(NSNumber *statusObject) {
-                                                         self.vpnStatus = (VPNStatus) [statusObject integerValue];
-                                                         [weakSelf updateUIConnectionState];
-                                                     }];
+    __block RACDisposable *tunnelStatusDisposable =
+      [[VPNManager sharedInstance].lastTunnelStatus
+        subscribeNext:^(NSNumber *statusObject) {
+            weakSelf.vpnStatus = (VPNStatus) [statusObject integerValue];
+            [weakSelf updateReinstallVPNProfileCell];
+            [weakSelf updateHiddenKeys];
+        }];
 
     [self.compoundDisposable addDisposable:tunnelStatusDisposable];
 }
@@ -107,6 +109,16 @@ NSString * const ConnectOnDemandCellSpecifierKey = @"vpnOnDemand";
     if (self.hasActiveSubscription) {
         [hiddenKeys addObject:SettingsPsiCashCellSpecifierKey];
     }
+
+    // If the VPN is not active, don't show the force reconnect button.
+    if (![VPNManager mapIsVPNActive:self.vpnStatus]) {
+        [hiddenKeys addObject:kForceReconnect];
+        [hiddenKeys addObject:kForceReconnectFooter];
+    } else {
+        [hiddenKeys removeObject:kForceReconnect];
+        [hiddenKeys removeObject:kForceReconnectFooter];
+    }
+
     self.hiddenKeys = hiddenKeys;
 }
 
@@ -175,10 +187,6 @@ NSString * const ConnectOnDemandCellSpecifierKey = @"vpnOnDemand";
     }
 
     connectOnDemandCell.detailTextLabel.text = subscriptionOnlySubtitle;
-}
-
-- (void)updateUIConnectionState {
-    [self updateReinstallVPNProfileCell];
 }
 
 - (void)updateReinstallVPNProfileCell {

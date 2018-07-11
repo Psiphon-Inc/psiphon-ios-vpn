@@ -279,6 +279,10 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
         [self.compoundDisposable addDisposable:connectedDisposable];
 
     }
+
+    // DEBUG REMOVE
+//    [testDisposable dispose];
+
 }
 
 - (void)applicationWillResignActive:(UIApplication *)application {
@@ -335,6 +339,7 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
 
 - (void)initializeAdsIfNeeded {
 
+    // TODO n: remove first
     VPNStatus s = (VPNStatus) [[[self.vpnManager lastTunnelStatus] first] integerValue];
 
     if ([adManager shouldShowUntunneledAds] &&
@@ -441,9 +446,9 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
             // Only opens landing page if the VPN is active (or waits up to a maximum of kLandingPageTimeoutSecs
             // for the tunnel status to become "Connected" before opening the landing page).
             // Landing page should not be opened outside of the tunnel.
-
+            //
             __block RACDisposable *disposable = [[[[[[[[weakSelf.vpnManager isExtensionZombie]
-              combineLatestWith:weakSelf.vpnManager.lastTunnelStatus]
+              combineLatestWith:self.vpnManager.lastTunnelStatus]
               filter:^BOOL(RACTwoTuple<NSNumber *, NSNumber *> *tuple) {
 
                   // We're only interested in the Connected status.
