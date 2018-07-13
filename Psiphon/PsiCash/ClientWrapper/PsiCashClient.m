@@ -29,7 +29,7 @@
 #import "Notifier.h"
 #import "PsiCashAuthPackage.h"
 #import "PsiCashClientModel.h"
-#import "PsiCashErrorTypes.h"
+#import "PsiCashTypes.h"
 #import "PsiCashLogger.h"
 #import "PsiCashSpeedBoostProduct+PsiCashPurchasePrice.h"
 #import "PsiphonDataSharedDB.h"

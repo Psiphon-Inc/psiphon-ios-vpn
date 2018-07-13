@@ -50,6 +50,7 @@
 #import "RACReplaySubject.h"
 #import "Asserts.h"
 #import "PsiCashClient.h"
+#import "PsiCashTypes.h"
 
 #if DEBUG
 #define kMaxAdLoadingTimeSecs 1.f
@@ -431,6 +432,7 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
               timeout:kPsiCashAuthPackageWithEarnerTokenTimeoutSecs onScheduler:RACScheduler.mainThreadScheduler]
               catch:^RACSignal * (NSError * error) {
                   if ([error.domain isEqualToString:RACSignalErrorDomain] && error.code == RACSignalErrorTimedOut) {
+                      [PsiFeedbackLogger infoWithType:PsiCashLogType message:@"timeout waiting for earner token, waited %0.1fs", kPsiCashAuthPackageWithEarnerTokenTimeoutSecs];
                       return [RACSignal return:RACUnit.defaultUnit];
                   }
                   return [RACSignal error:error];
@@ -465,10 +467,11 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
 
                       [PsiFeedbackLogger infoWithType:LandingPageLogType message:@"open landing page"];
 
+                      NSURL *url = [PsiCashClient.sharedInstance modifiedHomePageURL:homepage.url];
                       // Not officially documented by Apple, however a runtime warning is generated sometimes
                       // stating that [UIApplication openURL:options:completionHandler:] must be used from
                       // the main thread only.
-                      [[UIApplication sharedApplication] openURL:[PsiCashClient.sharedInstance modifiedHomePageURL:homepage.url]
+                      [[UIApplication sharedApplication] openURL:url
                                                          options:@{}
                                                completionHandler:^(BOOL success) {
                                                    weakSelf.shownLandingPageForCurrentSession = success;
