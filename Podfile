@@ -15,9 +15,8 @@ target 'Psiphon' do
   #pod "PsiphonClientCommonLibrary", :path => "../psiphon-ios-client-common-library"
 
   pod 'ReactiveObjC', :git => "https://github.com/Psiphon-Inc/ReactiveObjC.git", :commit => 'b2ac770'
-  pod 'mopub-ios-sdk', '4.18.0'
-  pod 'Google-Mobile-Ads-SDK', '7.25.0'
-  pod 'VungleSDK-iOS', '5.3.0'
+  pod 'mopub-ios-sdk', '5.2.0'
+  pod 'MoPub-AdMob-Adapters'
   pod 'PureLayout', '3.0.2'
   pod 'MBProgressHUD', '~> 1.1.0'
   pod 'CustomIOSAlertView', '~> 0.9.5'

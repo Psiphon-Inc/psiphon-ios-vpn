@@ -102,9 +102,6 @@ UserDefaultsKey const VPNManagerConnectOnDemandUntilNextStartBoolKey = @"VPNMana
         _internalStartStatus = [RACReplaySubject replaySubjectWithCapacity:1];
         _internalTunnelStatus = [RACReplaySubject replaySubjectWithCapacity:1];
 
-        // Bootstrap connectionStatus with NEVPNStatusInvalid, until the actual status is determined.
-        [_internalTunnelStatus sendNext:@(NEVPNStatusInvalid)];
-
         _restartRequired = FALSE;
 
         _restartRequired = FALSE;
@@ -179,7 +176,7 @@ UserDefaultsKey const VPNManagerConnectOnDemandUntilNextStartBoolKey = @"VPNMana
     }
 }
 
-- (void)setTunnelProviderManager:(NETunnelProviderManager *)tunnelProviderManager {
+- (void)setTunnelProviderManager:(NETunnelProviderManager *_Nullable)tunnelProviderManager {
     @synchronized (self) {
         _tunnelProviderManager = tunnelProviderManager;
         if (localVPNStatusObserver) {
@@ -237,9 +234,7 @@ UserDefaultsKey const VPNManagerConnectOnDemandUntilNextStartBoolKey = @"VPNMana
           unsafeSubscribeOnSerialQueue:instance.serialQueue
                               withName:@"initOperation"]
           subscribeNext:^(NETunnelProviderManager *tunnelProvider) {
-              if (tunnelProvider) {
-                  instance.tunnelProviderManager = tunnelProvider;
-              }
+              instance.tunnelProviderManager = tunnelProvider;
           }
           error:^(NSError *error) {
               [PsiFeedbackLogger errorWithType:VPNManagerLogType message:@"failed to load initial VPN config" object:error];
