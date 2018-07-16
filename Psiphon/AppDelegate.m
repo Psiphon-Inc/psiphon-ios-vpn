@@ -66,14 +66,6 @@
 // landing page notification is received from the extension.
 #define kPsiCashAuthPackageWithEarnerTokenTimeoutSecs 3.0
 
-/**
- * adLoadingStatus RACSubject values.
- */
-typedef NS_ENUM(NSInteger, AdLoadingStatus) {
-    AdLoadingStatusUnknown = 1,
-    AdLoadingStatusStarted,
-    AdLoadingStatusFinished
-};
 
 PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
 
@@ -85,9 +77,6 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
 // Emits type UserSubscriptionStatus
 @property (nonatomic, readwrite) RACReplaySubject<NSNumber *> *subscriptionStatus;
 
-// Emits one of AdLoadingStatus types.
-@property (nonatomic, readwrite) RACReplaySubject<NSNumber *> *adLoadingStatus;
-
 // Private properties
 @property (nonatomic) RACCompoundDisposable *compoundDisposable;
 
@@ -98,21 +87,14 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
 @end
 
 @implementation AppDelegate {
-    AdManager *adManager;
-
     RootContainerController *rootContainerController;
 }
 
 - (instancetype)init {
     self = [super init];
     if (self) {
-        adManager = [AdManager sharedInstance];
-
         _subscriptionStatus = [RACReplaySubject replaySubjectWithCapacity:1];
         [_subscriptionStatus sendNext:@(UserSubscriptionUnknown)];
-
-        _adLoadingStatus = [RACReplaySubject replaySubjectWithCapacity:1];
-        [_adLoadingStatus sendNext:@(AdLoadingStatusUnknown)];
 
         _vpnManager = [VPNManager sharedInstance];
         _sharedDB = [[PsiphonDataSharedDB alloc] initForAppGroupIdentifier:APP_GROUP_IDENTIFIER];
@@ -135,13 +117,11 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
 // createAppLoadingSignal emits RACUnit.defaultUnit and completes immediately once all loading signals have completed.
 - (RACSignal<RACUnit *> *)createAppLoadingSignal {
 
-    // adsLoadingSignal emits a value when ads have loaded or kMaxAdLoadingTimeSecs has passed.
-    RACSignal *adsLoadingSignal = [[[[self.adLoadingStatus
-      filter:^BOOL(NSNumber *value) {
-          AdLoadingStatus s = (AdLoadingStatus) [value integerValue];
-          return (s == AdLoadingStatusFinished);
+    // adsLoadingSignal emits a value when untunneled interstitial ad has loaded or kMaxAdLoadingTimeSecs has passed.
+    RACSignal *adsLoadingSignal = [[[[AdManager sharedInstance].didLoadAd
+      filter:^BOOL(AdControllerTag tag) {
+          return [AdControllerTagUntunneledInterstitial isEqualToString:tag];
       }]
-      take:1]
       merge:[RACSignal timer:kMaxAdLoadingTimeSecs]]
       take:1];
 
@@ -166,16 +146,6 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
 
 - (BOOL)application:(UIApplication *)application willFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
 
-    // Immediately register to receive notifications from the Network Extension process.
-    [[Notifier sharedInstance] registerObserver:self callbackQueue:dispatch_get_main_queue()];
-
-    [self initializeDefaults];
-
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(onAdsLoaded)
-                                                 name:AdManagerAdsDidLoadNotification
-                                               object:adManager];
-
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(onUpdatedSubscriptionDictionary)
                                                  name:IAPHelperUpdatedSubscriptionDictionaryNotification
@@ -185,6 +155,13 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
                                              selector:@selector(onSubscriptionTransactionUpdate:)
                                                  name:IAPHelperPaymentTransactionUpdateNotification
                                                object:nil];
+
+    // Immediately register to receive notifications from the Network Extension process.
+    [[Notifier sharedInstance] registerObserver:self callbackQueue:dispatch_get_main_queue()];
+
+    // Initializes PsiphonClientCommonLibrary.
+    [PsiphonClientCommonLibraryHelpers initializeDefaultsForPlistsFromRoot:@"Root.inApp"];
+
 
     [[IAPStoreHelper sharedInstance] startProductsRequest];
 
@@ -210,7 +187,8 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
     // to return before making the window visible on the screen.
     [self.window makeKeyAndVisible];
 
-    [self initializeAdsIfNeeded];
+    // Initializes AdManager.
+    [[AdManager sharedInstance] initializeAdManager];
 
     // Listen for VPN status changes from VPNManager.
     __block RACDisposable *disposable = [self.vpnManager.lastTunnelStatus
@@ -263,26 +241,37 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
 
     // If the extension has been waiting for the app to come into foreground,
     // send the VPNManager startVPN message again.
-    if (![adManager untunneledInterstitialIsShowing]) {
+    __block RACDisposable *connectedDisposable = [[[RACSignal
+      zip:@[
+        [[AdManager sharedInstance].adIsShowing take:1],
+        [self.vpnManager isPsiphonTunnelConnected],
+        [self.vpnManager.lastTunnelStatus take:1],
+      ]]
+      flattenMap:^RACSignal<RACUnit *> *(RACTuple *tuple) {
+          BOOL adIsShowing = [(NSNumber *) tuple.first boolValue];
+          BOOL tunnelConnected = [(NSNumber *) tuple.second boolValue];
+          VPNStatus vpnStatus = (VPNStatus) [tuple.third integerValue];
 
-        __block RACDisposable *connectedDisposable = [[self.vpnManager isPsiphonTunnelConnected]
-          subscribeNext:^(NSNumber *_Nullable connected) {
-              if ([connected boolValue]) {
-                  [weakSelf.vpnManager startVPN];
-              }
-          } error:^(NSError *error) {
-              [weakSelf.compoundDisposable removeDisposable:connectedDisposable];
-          } completed:^{
-              [weakSelf.compoundDisposable removeDisposable:connectedDisposable];
-          }];
+          // App has recently been foregrounded.
+          // If an ad is not showing, and tunnel is connected, but the VPN status is connecting, then send the
+          // start VPN message to the extension.
+          if (!adIsShowing && tunnelConnected && vpnStatus == VPNStatusConnecting) {
+              return [RACSignal return:RACUnit.defaultUnit];
+          }
 
-        [self.compoundDisposable addDisposable:connectedDisposable];
+          return [RACSignal empty];
+      }]
+      subscribeNext:^(RACUnit *x) {
+          [weakSelf.vpnManager startVPN];
+      }
+      error:^(NSError *error) {
+          [weakSelf.compoundDisposable removeDisposable:connectedDisposable];
+      }
+      completed:^{
+          [weakSelf.compoundDisposable removeDisposable:connectedDisposable];
+      }];
 
-    }
-
-    // DEBUG REMOVE
-//    [testDisposable dispose];
-
+    [self.compoundDisposable addDisposable:connectedDisposable];
 }
 
 - (void)applicationWillResignActive:(UIApplication *)application {
@@ -311,11 +300,8 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
 
     // Resets status of the subjects whose state could be stale once the container is foregrounded.
     [self.subscriptionStatus sendNext:@(UserSubscriptionUnknown)];
-    [self.adLoadingStatus sendNext:@(AdLoadingStatusUnknown)];
 
     [[PsiCashClient sharedInstance] scheduleRefreshState];
-
-    [self initializeAdsIfNeeded];
 }
 
 - (void)applicationWillTerminate:(UIApplication *)application {
@@ -325,10 +311,6 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
 
 #pragma mark -
 
-- (void)initializeDefaults {
-    [PsiphonClientCommonLibraryHelpers initializeDefaultsForPlistsFromRoot:@"Root.inApp"];
-}
-
 - (void)reloadMainViewController {
     LOG_DEBUG();
     [rootContainerController reloadMainViewController];
@@ -337,36 +319,9 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
 
 #pragma mark - Ads
 
-- (void)initializeAdsIfNeeded {
-
-    // TODO n: remove first
-    VPNStatus s = (VPNStatus) [[[self.vpnManager lastTunnelStatus] first] integerValue];
-
-    if ([adManager shouldShowUntunneledAds] &&
-        ![adManager untunneledInterstitialIsReady] &&
-        ![adManager untunneledInterstitialHasShown] &&
-        (s == VPNStatusInvalid || s == VPNStatusDisconnected)){
-
-        [self.adLoadingStatus sendNext:@(AdLoadingStatusStarted)];
-
-        dispatch_async(dispatch_get_main_queue(), ^{
-                [adManager initializeAds];
-        });
-
-    } else {
-        // Removes launch screen if already showing.
-        [self.adLoadingStatus sendNext:@(AdLoadingStatusFinished)];
-    }
-}
-
 // Returns the ViewController responsible for presenting ads.
 - (UIViewController *)getAdsPresentingViewController {
     return rootContainerController.mainViewController;
-}
-
-- (void)onAdsLoaded {
-    LOG_DEBUG();
-    [self.adLoadingStatus sendNext:@(AdLoadingStatusFinished)];
 }
 
 #pragma mark - Embedded Server Entries
@@ -506,9 +461,21 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
         // tunnel is already connected, give up on the Ad and
         // start the VPN. Otherwise the startVPN message will be
         // sent after the Ad has disappeared.
-        if (![adManager untunneledInterstitialIsShowing]) {
-            [weakSelf.vpnManager startVPN];
-        }
+        __block RACDisposable *disposable = [[[AdManager sharedInstance].adIsShowing take:1]
+          subscribeNext:^(NSNumber *adIsShowing) {
+
+              if (![adIsShowing boolValue]) {
+                  [weakSelf.vpnManager startVPN];
+              }
+          }
+          error:^(NSError *error) {
+              [weakSelf.compoundDisposable removeDisposable:disposable];
+          }
+          completed:^{
+              [weakSelf.compoundDisposable removeDisposable:disposable];
+          }];
+
+        [self.compoundDisposable addDisposable:disposable];
 
     } else if ([NotifierAvailableEgressRegions isEqualToString:message]) {
         LOG_DEBUG(@"Received notification NE.onAvailableEgressRegions");
@@ -601,12 +568,6 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
 
 // Called on `IAPHelperUpdatedSubscriptionDictionaryNotification` notification.
 - (void)onUpdatedSubscriptionDictionary {
-
-    if (![adManager shouldShowUntunneledAds]) {
-        // if user subscription state has changed to valid
-        // try to deinit ads if currently not showing and hide adLabel
-        [adManager initializeAds];
-    }
 
     __weak AppDelegate *weakSelf = self;
 

@@ -215,7 +215,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 
           // Notify SettingsViewController that the state has changed.
           // Note that this constant is used PsiphonClientCommonLibrary, and cannot simply be replaced by a RACSignal.
-          // TODO n: do we still need this?
+          // TODO: replace this notification with the appropriate signal.
           [[NSNotificationCenter defaultCenter] postNotificationName:kPsiphonConnectionStateNotification object:nil];
 
       }];
@@ -278,13 +278,14 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     __block RACDisposable *disposable = [[AppDelegate sharedAppDelegate].subscriptionStatus
       subscribeNext:^(NSNumber *value) {
           UserSubscriptionStatus s = (UserSubscriptionStatus) [value integerValue];
-          
+
           if (s == UserSubscriptionUnknown) {
               return;
           }
 
           subscriptionButton.hidden = (s == UserSubscriptionActive);
-          adLabel.hidden = (s == UserSubscriptionActive) || ![self.adManager untunneledInterstitialIsReady];
+          // DEBUG REMOVE
+//          adLabel.hidden = (s == UserSubscriptionActive) || ![self.adManager untunneledInterstitialIsReady];
           subscriptionButtonTopConstraint.active = !subscriptionButton.hidden;
           bottomBarTopConstraint.active = subscriptionButton.hidden;
 
@@ -297,13 +298,12 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
           [self.compoundDisposable removeDisposable:disposable];
       }];
 
-    [self.compoundDisposable addDisposable:disposable];
+    RAC(adLabel, hidden) = [RACObserve(self.adManager, untunneledInterstitialIsReady) map:^NSNumber *(NSNumber *value) {
+        return @(!value.boolValue);
+    }];
 
-    // Observer AdManager notifications
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(onAdStatusDidChange)
-                                                 name:AdManagerAdsDidLoadNotification
-                                               object:self.adManager];
+
+    [self.compoundDisposable addDisposable:disposable];
 }
 
 - (void)viewDidAppear:(BOOL)animated {
@@ -333,11 +333,6 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 - (void)viewWillAppear:(BOOL)animated {
     LOG_DEBUG();
     [super viewWillAppear:animated];
-    
-    // Listen for VPN status changes from VPNManager.
-    
-    // Sync UI with the VPN state
-    [self onAdStatusDidChange];
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
@@ -382,10 +377,6 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 
 #pragma mark - UI callbacks
 
-- (void)onAdStatusDidChange{
-    adLabel.hidden = ![self.adManager untunneledInterstitialIsReady];
-}
-
 - (void)onStartStopTap:(UIButton *)sender {
 
     __weak MainViewController *weakSelf = self;
@@ -415,87 +406,101 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     }];
 
     // signal emits a single two tuple (isVPNActive, connectOnDemandEnabled).
-    __block RACDisposable *disposable = [[[[privacyPolicyAccepted
-      flattenMap:^RACSignal *(RACUnit *x) {
-        return [weakSelf.vpnManager isVPNActive];
+    __block RACDisposable *disposable = [[[[[privacyPolicyAccepted
+      flattenMap:^RACSignal<RACTwoTuple <NSNumber *, NSNumber *> *> *(RACUnit *x) {
+          return [weakSelf.vpnManager isVPNActive];
       }]
-      flattenMap:^RACSignal<NSNumber *> *(RACTwoTuple<NSNumber *, NSNumber *> *value) {
+      flattenMap:^RACSignal<RACTwoTuple<NSNumber *, NSNumber *> *> *(RACTwoTuple<NSNumber *, NSNumber *> *value) {
+          // Returned signal emits tuple (isActive, isConnectOnDemandEnabled).
 
           // If VPN is already running, checks if ConnectOnDemand is enabled, otherwise returns the result immediately.
           BOOL isActive = [value.first boolValue];
           if (isActive) {
               return [[weakSelf.vpnManager isConnectOnDemandEnabled]
-                      map:^id(NSNumber *connectOnDemandEnabled) {
+                      map:^RACTwoTuple<NSNumber *, NSNumber *> *(NSNumber *connectOnDemandEnabled) {
                           return [RACTwoTuple pack:@(TRUE) :connectOnDemandEnabled];
                       }];
           } else {
               return [RACSignal return:[RACTwoTuple pack:@(FALSE) :@(FALSE)]];
           }
       }]
-      deliverOnMainThread]
-      subscribeNext:^(RACTwoTuple<NSNumber *, NSNumber *> *result) {
+      flattenMap:^RACSignal<NSString *> *(RACTwoTuple<NSNumber *, NSNumber *> *value) {
+          BOOL vpnActive = [value.first boolValue];
+          BOOL connectOnDemandEnabled = [value.second boolValue];
 
-          // Unpacks the tuple.
-          BOOL isVPNActive = [result.first boolValue];
-          BOOL connectOnDemandEnabled = [result.second boolValue];
-
-          if (!isVPNActive) {
+          if (!vpnActive) {
               // Alerts the user if there is no internet connection.
               Reachability *reachability = [Reachability reachabilityForInternetConnection];
               if ([reachability currentReachabilityStatus] == NotReachable) {
                   [weakSelf displayAlertNoInternet];
+                  return [RACSignal empty];
               } else {
-                  [weakSelf.adManager showUntunneledInterstitial];
+                  return [[[weakSelf.adManager presentInterstitialOnViewController:weakSelf]
+                    filter:^BOOL(NSNumber *value) {
+                        AdPresentation ap = (AdPresentation) [value integerValue];
+                        return (ap != AdPresentationWillAppear) &&
+                          (ap != AdPresentationDidAppear) &&
+                          (ap != AdPresentationWillDisappear);
+                    }] mapReplace:@"startTunnel"];
               }
-
           } else {
-
-              if (!connectOnDemandEnabled) {
-
-                  [weakSelf.vpnManager stopVPN];
-
+              if (connectOnDemandEnabled) {
+                  return [RACSignal return:@"connectOnDemandAlert"];
               } else {
-                  // Alert the user that Connect On Demand is enabled, and if they
-                  // would like Connect On Demand to be disabled, and the extension to be stopped.
-                  NSString *alertTitle = NSLocalizedStringWithDefaultValue(@"CONNECT_ON_DEMAND_ALERT_TITLE", nil, [NSBundle mainBundle], @"Auto-start VPN is enabled", @"Alert dialog title informing user that 'Auto-start VPN' feature is enabled");
-                  NSString *alertMessage = NSLocalizedStringWithDefaultValue(@"CONNECT_ON_DEMAND_ALERT_BODY", nil, [NSBundle mainBundle], @"\"Auto-start VPN\" will be temporarily disabled until the next time Psiphon VPN is started.", "Alert dialog body informing the user that the 'Auto-start VPN on demand' feature will be disabled and that the VPN cannot be stopped.");
-
-                  UIAlertController *alert = [UIAlertController alertControllerWithTitle:alertTitle
-                                                                                 message:alertMessage
-                                                                          preferredStyle:UIAlertControllerStyleAlert];
-
-                  UIAlertAction *stopUntilNextStartAction = [UIAlertAction
-                    actionWithTitle:NSLocalizedStringWithDefaultValue(@"OK_BUTTON", nil, [NSBundle mainBundle], @"OK", @"OK button title")
-                    style:UIAlertActionStyleDefault
-                    handler:^(UIAlertAction *action) {
-
-                        // Disable "Connect On Demand" and stop the VPN.
-                        [[NSUserDefaults standardUserDefaults] setBool:TRUE
-                                                                forKey:VPNManagerConnectOnDemandUntilNextStartBoolKey];
-
-                        __block RACDisposable *disposable = [[weakSelf.vpnManager setConnectOnDemandEnabled:FALSE]
-                          subscribeNext:^(NSNumber *x) {
-                              // Stops the VPN only after ConnectOnDemand is disabled.
-                              [weakSelf.vpnManager stopVPN];
-                          } error:^(NSError *error) {
-                              [weakSelf.compoundDisposable removeDisposable:disposable];
-                          }   completed:^{
-                              [weakSelf.compoundDisposable removeDisposable:disposable];
-                          }];
-
-                        [weakSelf.compoundDisposable addDisposable:disposable];
-                    }];
-
-                  [alert addAction:stopUntilNextStartAction];
-                  [self presentViewController:alert animated:TRUE completion:nil];
+                  return [RACSignal return:@"stopVPN"];
               }
-
-              [self removePulsingHaloLayer];
           }
+
+      }]
+      deliverOnMainThread]
+      subscribeNext:^(NSString *command) {
+
+        if ([@"startTunnel" isEqualToString:command]) {
+            [weakSelf.vpnManager startTunnel];
+
+        } else if ([@"stopVPN" isEqualToString:command]) {
+           [weakSelf.vpnManager stopVPN];
+
+        } else if ([@"connectOnDemandAlert" isEqualToString:command]) {
+            // Alert the user that Connect On Demand is enabled, and if they
+            // would like Connect On Demand to be disabled, and the extension to be stopped.
+            NSString *alertTitle = NSLocalizedStringWithDefaultValue(@"CONNECT_ON_DEMAND_ALERT_TITLE", nil, [NSBundle mainBundle], @"Auto-start VPN is enabled", @"Alert dialog title informing user that 'Auto-start VPN' feature is enabled");
+            NSString *alertMessage = NSLocalizedStringWithDefaultValue(@"CONNECT_ON_DEMAND_ALERT_BODY", nil, [NSBundle mainBundle], @"\"Auto-start VPN\" will be temporarily disabled until the next time Psiphon VPN is started.", "Alert dialog body informing the user that the 'Auto-start VPN on demand' feature will be disabled and that the VPN cannot be stopped.");
+
+            UIAlertController *alert = [UIAlertController alertControllerWithTitle:alertTitle
+                                                                           message:alertMessage
+                                                                    preferredStyle:UIAlertControllerStyleAlert];
+
+            UIAlertAction *stopUntilNextStartAction = [UIAlertAction
+              actionWithTitle:NSLocalizedStringWithDefaultValue(@"OK_BUTTON", nil, [NSBundle mainBundle], @"OK", @"OK button title")
+                        style:UIAlertActionStyleDefault
+                      handler:^(UIAlertAction *action) {
+
+                          // Disable "Connect On Demand" and stop the VPN.
+                          [[NSUserDefaults standardUserDefaults] setBool:TRUE
+                                                                  forKey:VPNManagerConnectOnDemandUntilNextStartBoolKey];
+
+                          __block RACDisposable *disposable = [[weakSelf.vpnManager setConnectOnDemandEnabled:FALSE]
+                            subscribeNext:^(NSNumber *x) {
+                                // Stops the VPN only after ConnectOnDemand is disabled.
+                                [weakSelf.vpnManager stopVPN];
+                            } error:^(NSError *error) {
+                                [weakSelf.compoundDisposable removeDisposable:disposable];
+                            }   completed:^{
+                                [weakSelf.compoundDisposable removeDisposable:disposable];
+                            }];
+
+                          [weakSelf.compoundDisposable addDisposable:disposable];
+                      }];
+
+            [alert addAction:stopUntilNextStartAction];
+            [weakSelf presentViewController:alert animated:TRUE completion:nil];
+        }
 
     } error:^(NSError *error) {
         [weakSelf.compoundDisposable removeDisposable:disposable];
-    }   completed:^{
+    } completed:^{
+        [weakSelf removePulsingHaloLayer];
         [weakSelf.compoundDisposable removeDisposable:disposable];
     }];
     
@@ -752,9 +757,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                                 fontDescriptorWithSymbolicTraits:UIFontDescriptorTraitItalic];
     adLabel.font = [UIFont fontWithDescriptor:fontD size:adLabel.font.pointSize - 1];
     [self.view addSubview:adLabel];
-    if (![self.adManager untunneledInterstitialIsReady]){
-        adLabel.hidden = true;
-    }
+    adLabel.hidden = TRUE;  // Default to TRUE until an ad is loaded by AdManager.
 
     // Setup autolayout
     [adLabel.topAnchor constraintEqualToAnchor:psiCashView.bottomAnchor constant:0].active = YES;
@@ -1167,6 +1170,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 
     UITapGestureRecognizer *psiCashViewTap = [[UITapGestureRecognizer alloc]
                                                   initWithTarget:self action:@selector(instantMaxSpeedBoostPurchase)];
+
     psiCashViewTap.numberOfTapsRequired = 1;
     [psiCashView addGestureRecognizer:psiCashViewTap];
 
