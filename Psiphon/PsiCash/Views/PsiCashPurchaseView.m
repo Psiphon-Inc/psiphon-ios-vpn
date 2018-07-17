@@ -21,7 +21,7 @@
 #import "PsiCashBalanceView.h"
 #import "PsiCashClient.h"
 #import "PsiCashSpeedBoostSliderView.h"
-#import "PsiCashErrorTypes.h"
+#import "PsiCashTypes.h"
 #import "PsiFeedbackLogger.h"
 
 @interface PsiCashPurchaseView ()

@@ -17,7 +17,7 @@
  *
  */
 
-#import "PsiCashErrorTypes.h"
+#import "PsiCashTypes.h"
 
 PsiFeedbackLogType const PsiCashLogType = @"PsiCash";
 
