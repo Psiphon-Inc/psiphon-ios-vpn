@@ -506,7 +506,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
     // Start app profiling
     if (!appProfiler) {
         appProfiler = [[AppProfiler alloc] init];
-        [appProfiler startProfilingWithStartInterval:0.5 forNumLogs:40 andThenExponentialBackoffTo:5 withNumLogsAtEachBackOff:1];
+        [appProfiler startProfilingWithStartInterval:1 forNumLogs:10 andThenExponentialBackoffTo:60*30 withNumLogsAtEachBackOff:1];
     }
 
     __weak PacketTunnelProvider *weakSelf = self;
@@ -986,7 +986,6 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 }
 
 - (void)onConnecting {
-    [appProfiler startProfilingWithStartInterval:0.5 forNumLogs:40 andThenExponentialBackoffTo:1 withNumLogsAtEachBackOff:1];
     self.reasserting = TRUE;
 }
 
@@ -1042,7 +1041,6 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 
 - (void)onConnected {
     [AppProfiler logMemoryReportWithTag:@"onConnected"];
-    [appProfiler startProfilingWithInterval:5];
     LOG_DEBUG(@"connected with %@", [self.subscriptionCheckState textDescription]);
     [[Notifier sharedInstance] post:NotifierTunnelConnected];
     [self tryStartVPN];
