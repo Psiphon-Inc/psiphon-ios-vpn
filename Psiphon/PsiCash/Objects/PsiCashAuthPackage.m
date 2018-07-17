@@ -18,7 +18,7 @@
  */
 
 #import "PsiCashAuthPackage.h"
-#import "PsiCashErrorTypes.h"
+#import "PsiCashTypes.h"
 #import "PsiFeedbackLogger.h"
 
 @interface PsiCashAuthPackage ()
