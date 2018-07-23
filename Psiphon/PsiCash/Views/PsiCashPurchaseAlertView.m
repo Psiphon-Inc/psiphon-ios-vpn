@@ -41,7 +41,7 @@
     alertView.purchaseView = purchaseView;
     alertView.containerView = purchaseView;
 
-    alertView.buttonTitles = [NSMutableArray arrayWithObjects:NSLocalizedStringWithDefaultValue(@"BUY_BUTTON", nil, [NSBundle mainBundle], @"Buy", @"Alert buy button"), NSLocalizedStringWithDefaultValue(@"CANCEL_BUTTON", nil, [NSBundle mainBundle], @"Cancel", @"Alert Cancel button"), nil];
+    alertView.buttonTitles = [NSMutableArray arrayWithObjects:NSLocalizedStringWithDefaultValue(@"BUY_BUTTON", nil, [NSBundle mainBundle], @"Buy", @"Buy button on a pop-up alert where the user uses a slider to select how many hours of Speed Boost they want to purchase and then presses the buy button to make the purchase."), NSLocalizedStringWithDefaultValue(@"CANCEL_BUTTON", nil, [NSBundle mainBundle], @"Cancel", @"Cancel button on a pop-up alert. The alert will be dismissed if the user presses this button."), nil];
     alertView.closeOnTouchUpOutside = YES;
     alertView.onButtonTouchUpInside = ^(CustomIOSAlertView *alertView, int buttonIndex) {
         PsiCashPurchaseAlertView *purchaseAlertView = (PsiCashPurchaseAlertView*)alertView;
@@ -76,7 +76,7 @@
     alertView.purchaseView = nil;
     alertView.containerView = label;
 
-    alertView.buttonTitles = [NSMutableArray arrayWithObjects:NSLocalizedStringWithDefaultValue(@"OK_BUTTON", nil, [NSBundle mainBundle], @"OK", @"Alert OK Button"), nil];
+    alertView.buttonTitles = [NSMutableArray arrayWithObjects:NSLocalizedStringWithDefaultValue(@"OK_BUTTON", nil, [NSBundle mainBundle], @"OK", @"OK button on a pop-up alert. The alert will be dismissed when the user presses this button."), nil];
     alertView.closeOnTouchUpOutside = YES;
     alertView.onButtonTouchUpInside = ^(CustomIOSAlertView *alertView, int buttonIndex) {
         PsiCashPurchaseAlertView *purchaseAlertView = (PsiCashPurchaseAlertView*)alertView;
@@ -104,7 +104,7 @@
     alertView.purchaseView = nil;
     alertView.containerView = label;
 
-    alertView.buttonTitles = [NSMutableArray arrayWithObjects:NSLocalizedStringWithDefaultValue(@"OK_BUTTON", nil, [NSBundle mainBundle], @"OK", @"Alert OK Button"), nil];
+    alertView.buttonTitles = [NSMutableArray arrayWithObjects:NSLocalizedStringWithDefaultValue(@"OK_BUTTON", nil, [NSBundle mainBundle], @"OK", @"OK button on a pop-up alert. The alert will be dismissed when the user presses this button."), nil];
     alertView.closeOnTouchUpOutside = YES;
     alertView.onButtonTouchUpInside = ^(CustomIOSAlertView *alertView, int buttonIndex) {
         PsiCashPurchaseAlertView *purchaseAlertView = (PsiCashPurchaseAlertView*)alertView;
