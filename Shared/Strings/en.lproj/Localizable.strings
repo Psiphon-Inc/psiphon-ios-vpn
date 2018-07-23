@@ -21,7 +21,7 @@
 /* Alert message informing user that subscription receipt can not be verified */
 "BAD_RECEIPT_ALERT_MESSAGE" = "Your subscription receipt can not be verified, please refresh it and try again.";
 
-/* Alert buy button */
+/* Buy button on a pop-up alert where the user uses a slider to select how many hours of Speed Boost they want to purchase and then presses the buy button to make the purchase. */
 "BUY_BUTTON" = "Buy";
 
 /* Title of button on alert view which shows the progress of the user's buy request. Hitting this button dismisses the alert and the buy request continues processing in the background. */
@@ -30,7 +30,7 @@
 /* Buy subscription dialog footer text */
 "BUY_SUBSCRIPTIONS_FOOTER_TEXT" = "A subscription is auto-renewable which means that once purchased it will be automatically renewed until you cancel it 24 hours prior to the end of the current period.\n\nYour iTunes Account will be charged for renewal within 24-hours prior to the end of the current period with the cost of the subscription.";
 
-/* Alert Cancel button */
+/* Cancel button on a pop-up alert. The alert will be dismissed if the user presses this button. */
 "CANCEL_BUTTON" = "Cancel";
 
 /* Alert message informing user that their subscription has expired or that they're not a subscriber, therefore Psiphon can only be started from the Psiphon app. DO NOT translate 'Psiphon'. */
@@ -89,6 +89,7 @@
 "NO_PRODUCTS_TEXT" = "Could not retrieve subscriptions from the App Store. Pull to refresh or try again later.";
 
 /* Alert OK Button
+   OK button on a pop-up alert. The alert will be dismissed when the user presses this button.
    OK button title */
 "OK_BUTTON" = "OK";
 
