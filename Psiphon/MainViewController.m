@@ -87,7 +87,6 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     UILabel *appSubTitleLabel;
     UILabel *statusLabel;
     UILabel *versionLabel;
-    UILabel *adLabel;
     UIButton *subscriptionButton;
     UILabel *regionButtonHeader;
     UIButton *regionButton;
@@ -182,7 +181,6 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     [self addAppSubTitleLabel];
     [self addSubscriptionButton];
     [self addPsiCashView];
-    [self addAdLabel];
     [self addStatusLabel];
     [self addVersionLabel];
     [self setupLayoutGuides];
@@ -284,8 +282,6 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
           }
 
           subscriptionButton.hidden = (s == UserSubscriptionActive);
-          // DEBUG REMOVE
-//          adLabel.hidden = (s == UserSubscriptionActive) || ![self.adManager untunneledInterstitialIsReady];
           subscriptionButtonTopConstraint.active = !subscriptionButton.hidden;
           bottomBarTopConstraint.active = subscriptionButton.hidden;
 
@@ -297,11 +293,6 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
       } completed:^{
           [self.compoundDisposable removeDisposable:disposable];
       }];
-
-    RAC(adLabel, hidden) = [RACObserve(self.adManager, untunneledInterstitialIsReady) map:^NSNumber *(NSNumber *value) {
-        return @(!value.boolValue);
-    }];
-
 
     [self.compoundDisposable addDisposable:disposable];
 }
@@ -743,27 +734,6 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 
     startButtonWidth.active = YES;
     startButtonHeight.active = YES;
-}
-
-- (void)addAdLabel {
-    adLabel = [[UILabel alloc] init];
-    adLabel.translatesAutoresizingMaskIntoConstraints = NO;
-    adLabel.text = NSLocalizedStringWithDefaultValue(@"AD_LOADED", nil, [NSBundle mainBundle], @"Watch a short video while we get ready to connect you", @"Text for button that tell users there will by a short video ad.");
-    adLabel.textAlignment = NSTextAlignmentCenter;
-    adLabel.textColor = [UIColor lightGrayColor];
-    adLabel.numberOfLines = 0;
-    adLabel.adjustsFontSizeToFitWidth = YES;
-    UIFontDescriptor * fontD = [adLabel.font.fontDescriptor
-                                fontDescriptorWithSymbolicTraits:UIFontDescriptorTraitItalic];
-    adLabel.font = [UIFont fontWithDescriptor:fontD size:adLabel.font.pointSize - 1];
-    [self.view addSubview:adLabel];
-    adLabel.hidden = TRUE;  // Default to TRUE until an ad is loaded by AdManager.
-
-    // Setup autolayout
-    [adLabel.topAnchor constraintEqualToAnchor:psiCashView.bottomAnchor constant:0].active = YES;
-    [adLabel.bottomAnchor constraintEqualToAnchor:startStopButton.topAnchor constant:0].active = YES;
-    [adLabel.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor constant:15].active = YES;
-    [adLabel.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor constant:-15].active = YES;
 }
 
 - (void)addStatusLabel {
