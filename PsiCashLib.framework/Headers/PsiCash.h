@@ -92,7 +92,20 @@ typedef NS_ENUM(NSInteger, PsiCashStatus) {
 - (NSError*_Nullable)modifyLandingPage:(NSString*_Nonnull)url
                            modifiedURL:(NSString*_Nullable*_Nonnull)modifiedURL;
 
-/*! Returns a dictionary suitable for JSON-serializing that can be including in
+/*! Creates a data package that should be included with a webhook for a user
+    action that should be rewarded (such as watching a rewarded video).
+    NOTE: The resulting string will still need to be encoded for use in a URL.
+    Returns an error if there is no earner token available and therefore the
+    reward cannot possibly succeed. (Error may also result from a JSON
+    serialization problem, but that's very improbable.)
+    So, the library user may want to call this _before_ showing the rewarded
+    activity, to perhaps decide _not_ to show that activity. An exception may be
+    if the Psiphon connection attempt and subsequent RefreshClientState may
+    occur _during_ the rewarded activity, so an earner token may be obtained
+    before it's complete. */
+- (NSError*_Nullable)getRewardedActivityData:(NSString*_Nullable*_Nonnull)dataString;
+
+/*! Returns a dictionary suitable for JSON-serializing that can be included in
     a feedback diagnostic data package. */
 -(NSDictionary<NSString*, NSObject*>*_Nonnull)getDiagnosticInfo;
 
