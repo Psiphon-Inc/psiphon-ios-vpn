@@ -14,7 +14,7 @@ target 'Psiphon' do
   pod 'PsiphonClientCommonLibrary', :git => "https://github.com/Psiphon-Inc/psiphon-ios-client-common-library.git", :commit => '9404b40'
   #pod "PsiphonClientCommonLibrary", :path => "../psiphon-ios-client-common-library"
 
-  pod 'ReactiveObjC', :git => "https://github.com/Psiphon-Inc/ReactiveObjC.git", :commit => 'b2ac770'
+  pod 'ReactiveObjC', :git => "https://github.com/Psiphon-Inc/ReactiveObjC.git", :commit => '97d6af3'
   pod 'mopub-ios-sdk', '5.2.0'
   pod 'MoPub-AdMob-Adapters'
   pod 'PureLayout', '3.0.2'
@@ -26,6 +26,6 @@ target 'PsiphonVPN' do
   # Comment the next line if you're not using Swift and don't want to use dynamic frameworks
   #use_frameworks!
 
-  pod 'ReactiveObjC', :git => "https://github.com/Psiphon-Inc/ReactiveObjC.git", :commit => 'b2ac770'
+  pod 'ReactiveObjC', :git => "https://github.com/Psiphon-Inc/ReactiveObjC.git", :commit => '97d6af3'
 
 end
