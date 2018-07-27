@@ -30,7 +30,7 @@ DEPENDENCIES:
   - mopub-ios-sdk (= 5.2.0)
   - PsiphonClientCommonLibrary (from `https://github.com/Psiphon-Inc/psiphon-ios-client-common-library.git`, commit `9404b40`)
   - PureLayout (= 3.0.2)
-  - ReactiveObjC (from `https://github.com/Psiphon-Inc/ReactiveObjC.git`, commit `b2ac770`)
+  - ReactiveObjC (from `https://github.com/Psiphon-Inc/ReactiveObjC.git`, commit `97d6af3`)
 
 EXTERNAL SOURCES:
   InAppSettingsKit:
@@ -40,7 +40,7 @@ EXTERNAL SOURCES:
     :commit: 9404b40
     :git: https://github.com/Psiphon-Inc/psiphon-ios-client-common-library.git
   ReactiveObjC:
-    :commit: b2ac770
+    :commit: 97d6af3
     :git: https://github.com/Psiphon-Inc/ReactiveObjC.git
 
 CHECKOUT OPTIONS:
@@ -51,7 +51,7 @@ CHECKOUT OPTIONS:
     :commit: 9404b40
     :git: https://github.com/Psiphon-Inc/psiphon-ios-client-common-library.git
   ReactiveObjC:
-    :commit: b2ac770
+    :commit: 97d6af3
     :git: https://github.com/Psiphon-Inc/ReactiveObjC.git
 
 SPEC CHECKSUMS:
@@ -65,6 +65,6 @@ SPEC CHECKSUMS:
   PureLayout: 4d550abe49a94f24c2808b9b95db9131685fe4cd
   ReactiveObjC: 2a38ea15335de4119d8b17caf1db1484f61db902
 
-PODFILE CHECKSUM: bc3074473e839ca6264aca6ab11f3f3b0c2882dd
+PODFILE CHECKSUM: 5dd7687e2d57bf029a18f7e4d877b7b1eac8b60f
 
 COCOAPODS: 1.4.0
