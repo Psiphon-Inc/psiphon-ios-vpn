@@ -727,6 +727,7 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
       subscribeNext:^(NSString *_Nullable adTag) {
           if (adTag != nil) {
               LOG_DEBUG(@"Finished loading ad (%@)", adTag);
+              [PsiFeedbackLogger infoWithType:AdManagerLogType json:@{@"event": @"adDidLoad", @"tag": adTag}];
           }
       }
       error:^(NSError *error) {

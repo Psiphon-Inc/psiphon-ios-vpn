@@ -27,6 +27,8 @@
 #import "Nullity.h"
 
 
+PsiFeedbackLogType const RewardedAdControllerWrapperLogType = @"RewardedAdControllerWrapper";
+
 @interface RewardedAdControllerWrapper () <MPRewardedVideoDelegate>
 
 @property (nonatomic, readwrite, assign) BOOL ready;
@@ -210,6 +212,9 @@
     }
     [self.presentationStatus sendNext:@(AdPresentationDidDisappear)];
     [self.adPresented sendNext:RACUnit.defaultUnit];
+
+    [PsiFeedbackLogger infoWithType:RewardedAdControllerWrapperLogType json:
+      @{@"event": @"adDidDisappear", @"tag": self.tag}];
 }
 
 //- (void)rewardedVideoAdDidReceiveTapEventForAdUnitID:(NSString *)adUnitID {
@@ -232,7 +237,7 @@
         return;
     }
     // DO NOT rely on this callback.
-    LOG_DEBUG(@"Rewarded video for ad unit (%@)", adUnitID);
+    LOG_DEBUG(@"User rewarded for ad unit (%@)", adUnitID);
 }
 
 @end
