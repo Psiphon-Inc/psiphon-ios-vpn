@@ -55,6 +55,8 @@
 #import "PrivacyPolicyViewController.h"
 #import "UIColor+Additions.h"
 
+#import "PsiCashRewardedVideoBar.h"
+
 UserDefaultsKey const PrivacyPolicyAcceptedBookKey = @"PrivacyPolicy.AcceptedBoolKey";
 
 #import "PsiCashBalanceView.h"
@@ -181,6 +183,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     [self addAppSubTitleLabel];
     [self addSubscriptionButton];
     [self addPsiCashView];
+    [self addPsiCashRewardedVideoBar];
     [self addStatusLabel];
     [self addVersionLabel];
     [self setupLayoutGuides];
@@ -1220,6 +1223,24 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
         [psiCashView bindWithModel:m];
     }
 #endif
+}
+
+- (void)addPsiCashRewardedVideoBar {
+    PsiCashRewardedVideoBar * psiCashRewardedVideoBar = [[PsiCashRewardedVideoBar alloc] init];
+    psiCashRewardedVideoBar.translatesAutoresizingMaskIntoConstraints = NO;
+    [self.view addSubview:psiCashRewardedVideoBar];
+
+//    UITapGestureRecognizer *psiCashViewTap = [[UITapGestureRecognizer alloc]
+//                                              initWithTarget:self action:@selector(showRewardedVideo)];
+//
+//    psiCashViewTap.numberOfTapsRequired = 1;
+//    [psiCashView addGestureRecognizer:psiCashViewTap];
+
+    [psiCashRewardedVideoBar.centerXAnchor constraintEqualToAnchor:appSubTitleLabel.centerXAnchor].active = YES;
+    [psiCashRewardedVideoBar.topAnchor constraintEqualToAnchor:psiCashView.bottomAnchor].active = YES;
+    [psiCashRewardedVideoBar.widthAnchor constraintEqualToAnchor:self.view.widthAnchor multiplier:0.7].active = YES;
+    NSLayoutConstraint *psiCashRewardedVideoBarHeight = [psiCashView.heightAnchor constraintEqualToConstant:100];
+    psiCashRewardedVideoBarHeight.active = YES;
 }
 
 - (void)setPsiCashContentHidden:(BOOL)hidden {

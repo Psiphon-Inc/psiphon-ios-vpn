@@ -112,6 +112,7 @@
 		CE26FCAC1BBDC85900B83375 /* PsiphonVPN.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = CE26FCA31BBDC85900B83375 /* PsiphonVPN.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		CE4E9BC01BBEECF30060FF8B /* Psiphon.entitlements in Resources */ = {isa = PBXBuildFile; fileRef = CE4E9BBF1BBEECF30060FF8B /* Psiphon.entitlements */; };
 		CE4E9BC21BBEECFC0060FF8B /* PsiphonVPN.entitlements in Resources */ = {isa = PBXBuildFile; fileRef = CE4E9BC11BBEECFC0060FF8B /* PsiphonVPN.entitlements */; };
+		CE57BBA52108DDC800402248 /* PsiCashRewardedVideoBar.m in Sources */ = {isa = PBXBuildFile; fileRef = CE57BBA42108DDC800402248 /* PsiCashRewardedVideoBar.m */; };
 		CE7B76431F54881F00EA44BD /* PsiphonTunnel.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 66094F781E8067520069EC4E /* PsiphonTunnel.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		D672BC574F14042B4D77AB28 /* libPods-Psiphon.a in Frameworks */ = {isa = PBXBuildFile; fileRef = CB8BB19F016330264C4DCB80 /* libPods-Psiphon.a */; };
 		EF184DAB20AD25E0006F6F5C /* PrivacyPolicyViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = EF2EDD8120AD21B6008B17A3 /* PrivacyPolicyViewController.m */; };
@@ -422,6 +423,8 @@
 		CE26FCA91BBDC85900B83375 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		CE4E9BBF1BBEECF30060FF8B /* Psiphon.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = Psiphon.entitlements; sourceTree = "<group>"; };
 		CE4E9BC11BBEECFC0060FF8B /* PsiphonVPN.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = PsiphonVPN.entitlements; sourceTree = "<group>"; };
+		CE57BBA32108DDC800402248 /* PsiCashRewardedVideoBar.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PsiCashRewardedVideoBar.h; sourceTree = "<group>"; };
+		CE57BBA42108DDC800402248 /* PsiCashRewardedVideoBar.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PsiCashRewardedVideoBar.m; sourceTree = "<group>"; };
 		DD100E19194B9A79F5D7DF55 /* Pods-PsiphonVPN.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PsiphonVPN.debug.xcconfig"; path = "Pods/Target Support Files/Pods-PsiphonVPN/Pods-PsiphonVPN.debug.xcconfig"; sourceTree = "<group>"; };
 		EDB109A2FBFB32D821FF121D /* Pods-Psiphon.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Psiphon.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Psiphon/Pods-Psiphon.debug.xcconfig"; sourceTree = "<group>"; };
 		EF2EDD8120AD21B6008B17A3 /* PrivacyPolicyViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PrivacyPolicyViewController.m; sourceTree = "<group>"; };
@@ -598,6 +601,8 @@
 		4E04845320474C17006C3D35 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				CE57BBA32108DDC800402248 /* PsiCashRewardedVideoBar.h */,
+				CE57BBA42108DDC800402248 /* PsiCashRewardedVideoBar.m */,
 				4E04846A2048A0B9006C3D35 /* PsiCashBalanceView.h */,
 				4E0484692048A0B8006C3D35 /* PsiCashBalanceView.m */,
 				4E99814020A64CC700253CE7 /* PsiCashBalanceWithSpeedBoostMeter.h */,
@@ -1415,6 +1420,7 @@
 				445F24D920E1A5BA00D004E9 /* BIT_STRING.c in Sources */,
 				445F24E820E1A5BA00D004E9 /* NativeEnumerated.c in Sources */,
 				445F24E320E1A5BA00D004E9 /* OCTET_STRING.c in Sources */,
+				CE57BBA52108DDC800402248 /* PsiCashRewardedVideoBar.m in Sources */,
 				445F24E120E1A5BA00D004E9 /* ReceiptAttribute.c in Sources */,
 				EF90D7A2204F22C900228A63 /* timestamp_compare.c in Sources */,
 				9BFECB6BF077F45D491093F1 /* Authorization.m in Sources */,
