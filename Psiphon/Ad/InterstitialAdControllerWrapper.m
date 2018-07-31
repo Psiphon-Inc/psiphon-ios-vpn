@@ -27,6 +27,8 @@
 #import "Logging.h"
 
 
+PsiFeedbackLogType const InterstitialAdControllerWrapperLogType = @"InterstitialAdControllerWrapper";
+
 @interface InterstitialAdControllerWrapper () <MPInterstitialAdControllerDelegate>
 
 @property (nonatomic, readwrite, assign) BOOL ready;
@@ -171,6 +173,9 @@
     }
     [self.presentationStatus sendNext:@(AdPresentationDidDisappear)];
     [self.adPresented sendNext:RACUnit.defaultUnit];
+
+    [PsiFeedbackLogger infoWithType:InterstitialAdControllerWrapperLogType json:
+      @{@"event": @"adDidDisappear", @"tag": self.tag}];
 }
 
 //- (void)interstitialDidReceiveTapEvent:(MPInterstitialAdController *)interstitial {
