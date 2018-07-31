@@ -107,11 +107,6 @@ FOUNDATION_EXPORT AdControllerTag const AdControllerTagTunneledRewardedVideo;
 @interface AdManager : NSObject
 
 /**
- * Infinite signal that emits type AdControllerTag whenever an ad finishes loading.
- */
-@property (nonatomic, readonly) RACReplaySubject<AdControllerTag> *didLoadAd;
-
-/**
  * Infinite signal that emits @(TRUE) if an is currently being displayed, @(FALSE) otherwise.
  * The subject may emit duplicate state.
  */

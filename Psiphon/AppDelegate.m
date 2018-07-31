@@ -118,11 +118,27 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
 - (RACSignal<RACUnit *> *)createAppLoadingSignal {
 
     // adsLoadingSignal emits a value when untunneled interstitial ad has loaded or kMaxAdLoadingTimeSecs has passed.
-    RACSignal *adsLoadingSignal = [[[[AdManager sharedInstance].didLoadAd
-      filter:^BOOL(AdControllerTag tag) {
-          return [AdControllerTagUntunneledInterstitial isEqualToString:tag];
+    // If the device in not in untunneled state, this signal makes an emission and then completes immediately, without
+    // checking the untunneled interstitial status.
+    RACSignal *adsLoadingSignal = [[[VPNManager sharedInstance].lastTunnelStatus
+      flattenMap:^RACSignal *(NSNumber *statusObject) {
+          VPNStatus s = (VPNStatus) [statusObject integerValue];
+
+          if (s == VPNStatusDisconnected || s == VPNStatusInvalid) {
+              // Device is untunneled.
+
+              return [[[RACObserve([AdManager sharedInstance], untunneledInterstitialIsReady)
+                filter:^BOOL(NSNumber *adIsReady) {
+                    return [adIsReady boolValue];
+                }]
+                merge:[RACSignal timer:kMaxAdLoadingTimeSecs]]
+                take:1];
+
+          } else {
+              // Device in _not_ untunneled, there is no point in checking the untunneled interstitial load status.
+              return [RACSignal return:RACUnit.defaultUnit];
+          }
       }]
-      merge:[RACSignal timer:kMaxAdLoadingTimeSecs]]
       take:1];
 
     // subscriptionLoadingSignal emits a value when the user subscription status becomes known.
@@ -137,7 +153,7 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
     // All signals that are zipped are expected to only emit one item (type doesn't matter).
     return [[RACSignal zip:@[adsLoadingSignal, subscriptionLoadingSignal]]
       map:^id(RACTuple *value) {
-          LOG_DEBUG(@"loading operations finished");
+          LOG_DEBUG(@"All loading signals completed.");
           return RACUnit.defaultUnit;
     }];
 }

@@ -194,7 +194,6 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
 
 @interface AdManager ()
 
-@property (nonatomic, readwrite, nonnull) RACReplaySubject<NSString *> *didLoadAd;
 @property (nonatomic, readwrite, nonnull) RACReplaySubject<NSNumber *> *adIsShowing;
 @property (nonatomic, readwrite, assign) BOOL untunneledInterstitialIsReady;
 @property (nonatomic, readwrite, assign) BOOL rewardedVideoIsReady;
@@ -220,8 +219,6 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
 - (instancetype)init {
     self = [super init];
     if (self) {
-
-        _didLoadAd = [RACReplaySubject replaySubjectWithCapacity:1];
 
         _adIsShowing = [RACReplaySubject replaySubjectWithCapacity:1];
 
@@ -730,7 +727,6 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
       subscribeNext:^(NSString *_Nullable adTag) {
           if (adTag != nil) {
               LOG_DEBUG(@"Finished loading ad (%@)", adTag);
-              [self.didLoadAd sendNext:adTag];
           }
       }
       error:^(NSError *error) {
