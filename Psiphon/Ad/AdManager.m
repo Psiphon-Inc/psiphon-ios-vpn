@@ -545,27 +545,33 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
 
 #pragma mark - Helper methods
 
-// Emits items of type @(AdPresentation). Completes immediately if app state is not appropriate for displaying ad.
+// Emits items of type @(AdPresentation). Emits `AdPresentationErrorInappropriateState` if app is not in the appropriate
+// state to present the ad.
+// Note: `adControllerBlock` should return `nil` if the TunnelState is not in the appropriate state.
 - (RACSignal<NSNumber *> *)presentAdOnViewController:(UIViewController *)viewController
               withAdController:(id <AdControllerWrapperProtocol>(^_Nonnull)(TunnelState tunnelState))adControllerBlock {
 
     return [[[self.appEvents.signal take:1]
       flattenMap:^RACSignal *(AppEvent *event) {
 
-        if (!event.subscriptionIsActive && event.networkIsReachable) {
+          // Ads are loaded based on app event condition at the time of load, and unloaded during certain app events
+          // like when the user buys a subscription. Still necessary conditions (like network reachability)
+          // should be checked again before presenting the ad.
+          if (event.networkIsReachable) {
 
-            id <AdControllerWrapperProtocol> adController = nil;
-            if (event.tunnelState != TunnelStateNeither) {
-                adController = adControllerBlock(event.tunnelState);
-            }
+              id <AdControllerWrapperProtocol> adController = nil;
+              if (event.tunnelState != TunnelStateNeither) {
+                  adController = adControllerBlock(event.tunnelState);
+              }
 
-            if (adController) {
-                return [adController presentAdFromViewController:viewController];
-            }
-        }
+              if (adController) {
+                  return [adController presentAdFromViewController:viewController];
+              }
+          }
 
-        return [RACSignal empty];
-    }] subscribeOn:RACScheduler.mainThreadScheduler];
+          return [RACSignal return:@(AdPresentationErrorInappropriateState)];
+      }]
+      subscribeOn:RACScheduler.mainThreadScheduler];
 }
 
 - (RACDisposable *)subscribeToAdSignalForAd:(id <AdControllerWrapperProtocol>)adController

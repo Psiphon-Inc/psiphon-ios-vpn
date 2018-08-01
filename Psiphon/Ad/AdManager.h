@@ -44,15 +44,25 @@ typedef NSString * AdControllerTag NS_STRING_ENUM;
  * Represents the status of the ad being presented.
  */
 typedef NS_ENUM(NSInteger, AdPresentation) {
+    /*! @const AdPresentationWillAppear Ad view controller will appear. This is not a terminal state. */
     AdPresentationWillAppear = 1,
+    /*! @const AdPresentationDidAppear Ad view controller did appear. This is not a terminal state. */
     AdPresentationDidAppear,
+    /*! @const AdPresentationWillDisappear Ad view controller will disappear. This is not a terminal state. */
     AdPresentationWillDisappear,
+    /*! @const AdPresentationDidDisappear Ad view controller did disappear. This is a terminal state. */
     AdPresentationDidDisappear,
 
     // Ad presentation error states:
+    /*! @const AdPresentationErrorInappropriateState The app is not in the appropriate state to present t
+     * a particular ad. This is a terminal state.*/
+    AdPresentationErrorInappropriateState,
+    /*! @const AdPresentationErrorNoAdsLoaded No ads are loaded. This is a terminal state. */
     AdPresentationErrorNoAdsLoaded,
-    AdPresentationErrorFailedToPlay,  // Used only for rewarded videos.
-    AdPresentationErrorCustomDataNotSet  // Used only for rewarded videos.
+    /*! @const AdPresentationErrorFailedToPlay Rewarded video ad failed to play. This is a terminal state. */
+    AdPresentationErrorFailedToPlay,
+    /*! @const AdPresentationErrorCustomDataNotSet Rewarded video ad custom data not set. This is a terminal state. */
+    AdPresentationErrorCustomDataNotSet
 };
 
 FOUNDATION_EXPORT NSErrorDomain const AdControllerWrapperErrorDomain;
@@ -84,9 +94,12 @@ typedef NS_ERROR_ENUM(AdControllerWrapperErrorDomain, AdControllerWrapperErrorCo
 // presentationStatus is hot infinite signal - emits items of type @(AdPresentation).
 @property (nonatomic, readonly) RACSubject<NSNumber *> *presentationStatus;
 
+// Loads ad if none is already loaded. Property `ready` should be TRUE after ad has been loaded (whether or not it
+// has already been pre-fetched by the SDK).
 // Implementations should handle multiple subscriptions to the returned signal, even if the ad has already been loaded.
 - (RACSignal<NSString *> *)loadAd;
 
+// Unloads ad if one is loaded. `ready` should be FALSE after the unloading is done.
 // Implementations should emit the wrapper's tag after ad is unloaded and then complete.
 - (RACSignal<NSString *> *)unloadAd;
 

@@ -117,7 +117,7 @@ PsiFeedbackLogType const InterstitialAdControllerWrapperLogType = @"Interstitial
 
     return [RACSignal createSignal:^RACDisposable *(id <RACSubscriber> subscriber) {
 
-        if (!weakSelf.interstitial.ready) {
+        if (!weakSelf.ready) {
             [subscriber sendNext:@(AdPresentationErrorNoAdsLoaded)];
             [subscriber sendCompleted];
             return nil;

@@ -111,7 +111,7 @@ PsiFeedbackLogType const RewardedAdControllerWrapperLogType = @"RewardedAdContro
 
     return [RACSignal createSignal:^RACDisposable *(id <RACSubscriber> subscriber) {
 
-        if (![MPRewardedVideo hasAdAvailableForAdUnitID:self.adUnitID]) {
+        if (!weakSelf.ready) {
             [subscriber sendNext:@(AdPresentationErrorNoAdsLoaded)];
             [subscriber sendCompleted];
             return nil;
