@@ -127,7 +127,7 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
           if (s == VPNStatusDisconnected || s == VPNStatusInvalid) {
               // Device is untunneled.
 
-              return [[[[AdManager sharedInstance].untunneledInterstitialIsReady
+              return [[[[AdManager sharedInstance].untunneledInterstitialCanPresent
                 filter:^BOOL(NSNumber *adIsReady) {
                     return [adIsReady boolValue];
                 }]

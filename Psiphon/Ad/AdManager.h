@@ -80,10 +80,11 @@ typedef NS_ERROR_ENUM(AdControllerWrapperErrorDomain, AdControllerWrapperErrorCo
 
 @required
 
-// Debugging meta-data.
 @property (nonatomic, readonly) AdControllerTag tag;
 
 // Should be TRUE if ad is ready to be displayed, FALSE otherwise.
+// The value should not change while the ad is being presented, and should only be set to FALSE after
+// the ad has been dismissed.
 // To avoid unnecessary computation for observers of this property, implementations of this protocol
 // should check the current value before setting it.
 @property (nonatomic, readonly) BOOL ready;
@@ -131,15 +132,21 @@ FOUNDATION_EXPORT AdControllerTag const AdControllerTagTunneledRewardedVideo;
 
 /**
  * Emits @(TRUE) when the untunneled interstitial is ready to be presented.
+ * Emits @(FALSE) when app conditions are such that the ad cannot be presented, this is regardless of whether the
+ * ad has been loaded.
  * Subject initially has default value @(FALSE).
+ * @scheduler Events are delivered on the main thread.
  */
-@property (nonatomic, readonly) RACReplaySubject<NSNumber *> *untunneledInterstitialIsReady;
+@property (nonatomic, readonly) RACReplaySubject<NSNumber *> *untunneledInterstitialCanPresent;
 
 /**
  * Emits @(TRUE) when tunneled or untunneled rewarded video is ready to be presented.
+ * Emits @(FALSE) when app conditions are such that the ad cannot be presented, this is regardless of whether the
+ * ad has been loaded.
  * Subject initially has default value @(FALSE).
+ * @scheduler Events are delivered on the main thread.
  */
-@property (nonatomic, readonly) RACReplaySubject<NSNumber *> *rewardedVideoIsReady;
+@property (nonatomic, readonly) RACReplaySubject<NSNumber *> *rewardedVideoCanPresent;
 
 + (instancetype)sharedInstance;
 
