@@ -26,9 +26,7 @@
 
 - (instancetype)initWithAdUnitID:(NSString *)adUnitID withTag:(AdControllerTag)tag;
 
-/**
- * Sets the custom data
- */
-- (void)setCustomData:(NSString *)customData;
+- (RACSignal<NSNumber *> *)presentAdFromViewController:(UIViewController *)viewController
+                                        withCustomData:(NSString *_Nullable)customData;
 
 @end

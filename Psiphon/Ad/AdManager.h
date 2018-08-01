@@ -103,6 +103,10 @@ typedef NS_ERROR_ENUM(AdControllerWrapperErrorDomain, AdControllerWrapperErrorCo
 // Implementations should emit the wrapper's tag after ad is unloaded and then complete.
 - (RACSignal<NSString *> *)unloadAd;
 
+@optional
+
+// For classes that conform to this protocol but don't implement this method, they should implement a similar
+// method, but the same expected behaviour of the returned signal.
 // Implementations should emit items of type @(AdPresentation), and complete when the ad has been dismissed.
 // If there are no ads loaded, returned signal emits @(AdPresentationErrorNoAdsLoaded) and then completes.
 - (RACSignal<NSNumber *> *)presentAdFromViewController:(UIViewController *)viewController;
@@ -144,13 +148,6 @@ FOUNDATION_EXPORT AdControllerTag const AdControllerTagTunneledRewardedVideo;
 - (void)initializeAdManager;
 
 /**
- * Sets the custom data for the rewarded video ads to include in the server-to-server callback.
- * If custom data is not set, rewarded video ads will not present the pre-fetched ad.
- * This method can be called at anytime to set or change the custom data sent.
- */
-- (void)setRewardedVideoCustomData:(NSString *)data;
-
-/**
  * Presents untunneled interstitial if app is in the appropriate state, and an interstitial ad has already been loaded.
  *
  * If ad cannot be presented due to inappropriate app state, returned signal completes immediately.
@@ -178,8 +175,12 @@ FOUNDATION_EXPORT AdControllerTag const AdControllerTagTunneledRewardedVideo;
  * If the add is ready to be presented, the signal will start by emitting the following states in order:
  *  AdPresentationWillAppear -> AdPresentationDidAppear -> AdPresentationWillDisappear -> AdPresentationDidDisappear
  * after which the signal will complete.
+ *
+ * @param viewController View controller to display ad on top of.
+ * @param customData Optional custom data to include in the ad service server-to-server callback.
  */
-- (RACSignal<NSNumber *> *)presentRewardedVideoOnViewController:(UIViewController *)viewController;
+- (RACSignal<NSNumber *> *)presentRewardedVideoOnViewController:(UIViewController *)viewController
+                                                 withCustomData:(NSString *_Nullable)customData;
 
 @end
 
