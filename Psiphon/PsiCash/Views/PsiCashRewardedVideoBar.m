@@ -28,8 +28,8 @@
 #pragma mark -
 
 @implementation PsiCashRewardedVideoBar {
+    UIImageView *playButton;
     UIImageView *coinBundle;
-    UIImageView *playSymbol;
     UILabel *status;
 }
 
@@ -63,14 +63,14 @@
     self.contentEdgeInsets = UIEdgeInsetsMake(10.0f, 30.0f, 10.0f, 30.0f);
     
     // Setup coin bundle image view
-    coinBundle = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"PsiCash_PlayButton"]];
-    coinBundle.contentMode = UIViewContentModeScaleAspectFit;
-    coinBundle.layer.minificationFilter = kCAFilterTrilinear;
+    playButton = [[UIImageView alloc] initWithImage:[[UIImage imageNamed:@"PsiCash_PlayButton"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate]];
+    playButton.contentMode = UIViewContentModeScaleAspectFit;
+    playButton.layer.minificationFilter = kCAFilterTrilinear;
     
     // Setup coin play symbol image view
-    playSymbol = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"PsiCash_CoinBundle"]];
-    playSymbol.contentMode = UIViewContentModeScaleAspectFit;
-    playSymbol.layer.minificationFilter = kCAFilterTrilinear;
+    coinBundle = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"PsiCash_CoinBundle"]];
+    coinBundle.contentMode = UIViewContentModeScaleAspectFit;
+    coinBundle.layer.minificationFilter = kCAFilterTrilinear;
     
     // Setup status label
     status = [[UILabel alloc] init];
@@ -82,33 +82,45 @@
     status.userInteractionEnabled = NO;
     
     status.text = @"Watch a video to earn PsiCash!";
-    status.textColor = [UIColor colorWithRed:1.00 green:0.91 blue:0.55 alpha:1.0];
+
+    // Assume at first that a video has not been loaded
+    [self videoReady:NO];
 }
 
 - (void)addViews {
+    [self addSubview:playButton];
     [self addSubview:coinBundle];
-    [self addSubview:playSymbol];
     [self addSubview:status];
 }
 
 - (void)setupLayoutConstraints {
-    coinBundle.translatesAutoresizingMaskIntoConstraints = NO;
-    [coinBundle.leadingAnchor constraintEqualToAnchor:self.leadingAnchor constant:10].active = YES;
-    [coinBundle.centerYAnchor constraintEqualToAnchor:self.centerYAnchor].active = YES;
-    [coinBundle.widthAnchor constraintEqualToConstant:17].active = YES;
-    [coinBundle.heightAnchor constraintEqualToConstant:17].active = YES;
+    playButton.translatesAutoresizingMaskIntoConstraints = NO;
+    [playButton.leadingAnchor constraintEqualToAnchor:self.leadingAnchor constant:10].active = YES;
+    [playButton.centerYAnchor constraintEqualToAnchor:self.centerYAnchor].active = YES;
+    [playButton.widthAnchor constraintEqualToConstant:17].active = YES;
+    [playButton.heightAnchor constraintEqualToConstant:17].active = YES;
     
-    playSymbol.translatesAutoresizingMaskIntoConstraints = NO;
-    [playSymbol.trailingAnchor constraintEqualToAnchor:self.trailingAnchor constant:0].active = YES;
-    [playSymbol.centerYAnchor constraintEqualToAnchor:self.centerYAnchor].active = YES;
-    [playSymbol.widthAnchor constraintEqualToConstant:40].active = YES;
-    [playSymbol.heightAnchor constraintEqualToConstant:20].active = YES;
+    coinBundle.translatesAutoresizingMaskIntoConstraints = NO;
+    [coinBundle.trailingAnchor constraintEqualToAnchor:self.trailingAnchor constant:0].active = YES;
+    [coinBundle.centerYAnchor constraintEqualToAnchor:self.centerYAnchor].active = YES;
+    [coinBundle.widthAnchor constraintEqualToConstant:40].active = YES;
+    [coinBundle.heightAnchor constraintEqualToConstant:20].active = YES;
     
     status.translatesAutoresizingMaskIntoConstraints = NO;
-    [status.leadingAnchor constraintEqualToAnchor:coinBundle.trailingAnchor constant:5].active = YES;
-    [status.trailingAnchor constraintEqualToAnchor:playSymbol.leadingAnchor constant:0].active = YES;
+    [status.leadingAnchor constraintEqualToAnchor:playButton.trailingAnchor constant:5].active = YES;
+    [status.trailingAnchor constraintEqualToAnchor:coinBundle.leadingAnchor constant:0].active = YES;
     [status.centerYAnchor constraintEqualToAnchor:self.centerYAnchor constant:0].active = YES;
     [status.heightAnchor constraintEqualToAnchor:self.heightAnchor constant:0].active = YES;
+}
+
+- (void)videoReady:(BOOL)ready {
+    if (ready) {
+        playButton.tintColor = [UIColor whiteColor];
+        status.textColor = [UIColor whiteColor];
+    } else {
+        playButton.tintColor = [UIColor grayColor];
+        status.textColor = [UIColor grayColor];
+    }
 }
 
 @end

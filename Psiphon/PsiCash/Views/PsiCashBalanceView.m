@@ -18,7 +18,6 @@
  */
 
 #import "PsiCashBalanceView.h"
-#import "PsiCashBalanceView.h"
 #import "PsiCashClient.h"
 #import "PsiCashSpeedBoostMeterView.h"
 #import "ReactiveObjC.h"

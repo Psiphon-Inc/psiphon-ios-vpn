@@ -29,17 +29,27 @@
 
 + (instancetype)sharedInstance;
 
+#pragma mark - Data
+
 - (NSURL*)modifiedHomePageURL:(NSURL*)url;
+
+- (NSString*)rewardedVideoCustomData;
+
+- (NSString*)logForFeedback;
+
+#pragma mark - Network requests
 
 - (void)scheduleRefreshState;
 
+- (void)pollForBalanceDeltaWithMaxRetries:(int)maxRetries andTimeBetweenRetries:(NSTimeInterval)timeBetweenRetries;
+
 - (void)purchaseSpeedBoostProduct:(PsiCashSpeedBoostProductSKU*)sku;
+
+#pragma mark - IPC
 
 /**
  * @brief Removes any purchases that the extension has marked as invalid from the client model.
  */
 - (void)authorizationsMarkedExpired;
-
-- (NSString*)logForFeedback;
 
 @end
