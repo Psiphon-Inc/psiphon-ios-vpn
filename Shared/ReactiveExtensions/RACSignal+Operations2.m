@@ -33,6 +33,13 @@
 
 @implementation RACSignal (Operations2)
 
++ (RACSignal *)emitOnly:(id)object {
+    return [RACSignal createSignal:^RACDisposable *(id <RACSubscriber> subscriber) {
+        [subscriber sendNext:object];
+        return nil;
+    }];
+}
+
 + (RACSignal *)defer:(id)object selectorWithErrorCallback:(SEL)aSelector {
 
     PSIAssert(object != nil);

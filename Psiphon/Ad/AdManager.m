@@ -195,8 +195,8 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
 @interface AdManager ()
 
 @property (nonatomic, readwrite, nonnull) RACReplaySubject<NSNumber *> *adIsShowing;
-@property (nonatomic, readwrite, nonnull) RACReplaySubject<NSNumber *> *untunneledInterstitialIsReady;
-@property (nonatomic, readwrite, nonnull) RACReplaySubject<NSNumber *> *rewardedVideoIsReady;
+@property (nonatomic, readwrite, nonnull) RACReplaySubject<NSNumber *> *untunneledInterstitialCanPresent;
+@property (nonatomic, readwrite, nonnull) RACReplaySubject<NSNumber *> *rewardedVideoCanPresent;
 
 // Private properties
 @property (nonatomic, readwrite, nonnull) InterstitialAdControllerWrapper *untunneledInterstitial;
@@ -222,11 +222,11 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
 
         _adIsShowing = [RACReplaySubject replaySubjectWithCapacity:1];
 
-        _untunneledInterstitialIsReady = [RACReplaySubject replaySubjectWithCapacity:1];
-        [_untunneledInterstitialIsReady sendNext:@(FALSE)];
+        _untunneledInterstitialCanPresent = [RACReplaySubject replaySubjectWithCapacity:1];
+        [_untunneledInterstitialCanPresent sendNext:@(FALSE)];
 
-        _rewardedVideoIsReady = [RACReplaySubject replaySubjectWithCapacity:1];
-        [_rewardedVideoIsReady sendNext:@(FALSE)];
+        _rewardedVideoCanPresent = [RACReplaySubject replaySubjectWithCapacity:1];
+        [_rewardedVideoCanPresent sendNext:@(FALSE)];
 
         _compoundDisposable = [RACCompoundDisposable compoundDisposable];
 
@@ -475,30 +475,34 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
         [self.compoundDisposable addDisposable:[adPresentationMultiCast connect]];
     }
 
-    // Updating AdManager "ad is ready" (untunneledInterstitialIsReady, rewardedVideoIsReady) properties.
+    // Updating AdManager "ad is ready" (untunneledInterstitialCanPresent, rewardedVideoCanPresent) properties.
     {
         [self.compoundDisposable addDisposable:
-          [[self.appEvents.signal flattenMap:^RACSignal<NSNumber *> *(AppEvent *appEvent) {
+          [[[self.appEvents.signal map:^RACSignal<NSNumber *> *(AppEvent *appEvent) {
 
-              if (appEvent.tunnelState == TunnelStateUntunneled) {
+              if (appEvent.networkIsReachable && appEvent.tunnelState == TunnelStateUntunneled) {
                   return RACObserve(self.untunneledInterstitial, ready);
               }
-              return [RACSignal return:@(FALSE)];
+              return [RACSignal emitOnly:@(FALSE)];
           }]
-          subscribe:self.untunneledInterstitialIsReady]];
+          switchToLatest]
+          subscribe:self.untunneledInterstitialCanPresent]];
 
         [self.compoundDisposable addDisposable:
-          [[self.appEvents.signal flattenMap:^RACSignal<NSNumber *> *(AppEvent *appEvent) {
+          [[[self.appEvents.signal map:^RACSignal<NSNumber *> *(AppEvent *appEvent) {
 
-              if (appEvent.tunnelState == TunnelStateUntunneled) {
-                  return RACObserve(self.untunneledRewardVideo, ready);
-              } else if (appEvent.tunnelState == TunnelStateTunneled) {
-                  return RACObserve(self.tunneledRewardVideo, ready);
+              if (appEvent.networkIsReachable) {
+                  if (appEvent.tunnelState == TunnelStateUntunneled) {
+                      return RACObserve(self.untunneledRewardVideo, ready);
+                  } else if (appEvent.tunnelState == TunnelStateTunneled) {
+                      return RACObserve(self.tunneledRewardVideo, ready);
+                  }
               }
 
-              return [RACSignal return:@(FALSE)];
+              return [RACSignal emitOnly:@(FALSE)];
           }]
-          subscribe:self.rewardedVideoIsReady]];
+          switchToLatest]
+          subscribe:self.rewardedVideoCanPresent]];
     }
 
     // Calls connect on the multicast connection object to start the subscription to the underlying signal.

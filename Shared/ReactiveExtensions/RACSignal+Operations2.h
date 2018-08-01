@@ -32,6 +32,12 @@ NS_ASSUME_NONNULL_BEGIN
 @interface RACSignal<__covariant ValueType> (Operations2)
 
 /**
+ * emitOnly only emits `object` when subscribed to and does not terminate.
+ * This has the same effect as `[[RACSignal return:object] concat:[RACSignal never]]`.
+ */
++ (RACSignal *)emitOnly:(id)object;
+
+/**
  * Returns a signal that calls provided selector on the given object when subscribed to and passes a callback block
  * to the selector's first parameter.
  *
