@@ -512,35 +512,30 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
 
 }
 
-- (void)setRewardedVideoCustomData:(NSString *)data {
-    [self.untunneledRewardVideo setCustomData:data];
-    [self.tunneledRewardVideo setCustomData:data];
-}
-
 - (RACSignal<NSNumber *> *)presentInterstitialOnViewController:(UIViewController *)viewController {
 
-    return [self presentAdOnViewController:viewController
-                          withAdController:^id <AdControllerWrapperProtocol>(TunnelState tunnelState) {
+    return [self presentAdHelper:^RACSignal<NSNumber *> *(TunnelState tunnelState) {
 
                               if (TunnelStateUntunneled == tunnelState) {
-                                  return self.untunneledInterstitial;
+                                  return [self.untunneledInterstitial presentAdFromViewController:viewController];
                               }
                               return nil;
                           }];
 }
 
-- (RACSignal<NSNumber *> *)presentRewardedVideoOnViewController:(UIViewController *)viewController {
+- (RACSignal<NSNumber *> *)presentRewardedVideoOnViewController:(UIViewController *)viewController
+                                                 withCustomData:(NSString *_Nullable)customData{
 
-    return [self presentAdOnViewController:viewController
-                          withAdController:^id <AdControllerWrapperProtocol>(TunnelState tunnelState) {
-
-                              if (TunnelStateUntunneled == tunnelState) {
-                                  return self.untunneledRewardVideo;
-                              } else if (TunnelStateTunneled == tunnelState) {
-                                  return self.tunneledRewardVideo;
-                              }
-                              return nil;
-                          }];
+    return [self presentAdHelper:^RACSignal<NSNumber *> *(TunnelState tunnelState) {
+        if (TunnelStateUntunneled == tunnelState) {
+            return [self.untunneledRewardVideo presentAdFromViewController:viewController
+                                                            withCustomData:customData];
+        } else if (TunnelStateTunneled == tunnelState) {
+            return [self.tunneledRewardVideo presentAdFromViewController:viewController
+                                                          withCustomData:customData];
+        }
+        return nil;
+    }];
 }
 
 #pragma mark - Helper methods
@@ -548,25 +543,24 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
 // Emits items of type @(AdPresentation). Emits `AdPresentationErrorInappropriateState` if app is not in the appropriate
 // state to present the ad.
 // Note: `adControllerBlock` should return `nil` if the TunnelState is not in the appropriate state.
-- (RACSignal<NSNumber *> *)presentAdOnViewController:(UIViewController *)viewController
-              withAdController:(id <AdControllerWrapperProtocol>(^_Nonnull)(TunnelState tunnelState))adControllerBlock {
+- (RACSignal<NSNumber *> *)presentAdHelper:(RACSignal<NSNumber *> *(^_Nonnull)(TunnelState tunnelState))adControllerBlock {
 
     return [[[self.appEvents.signal take:1]
-      flattenMap:^RACSignal *(AppEvent *event) {
+      flattenMap:^RACSignal<NSNumber *> *(AppEvent *event) {
 
           // Ads are loaded based on app event condition at the time of load, and unloaded during certain app events
           // like when the user buys a subscription. Still necessary conditions (like network reachability)
           // should be checked again before presenting the ad.
           if (event.networkIsReachable) {
 
-              id <AdControllerWrapperProtocol> adController = nil;
               if (event.tunnelState != TunnelStateNeither) {
-                  adController = adControllerBlock(event.tunnelState);
+                  RACSignal<NSNumber *> *_Nullable presentationSignal = adControllerBlock(event.tunnelState);
+
+                  if (presentationSignal) {
+                      return presentationSignal;
+                  }
               }
 
-              if (adController) {
-                  return [adController presentAdFromViewController:viewController];
-              }
           }
 
           return [RACSignal return:@(AdPresentationErrorInappropriateState)];

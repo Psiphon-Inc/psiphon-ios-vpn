@@ -47,9 +47,7 @@ PsiFeedbackLogType const RewardedAdControllerWrapperLogType = @"RewardedAdContro
 
 @end
 
-@implementation RewardedAdControllerWrapper {
-    NSString *customData;
-}
+@implementation RewardedAdControllerWrapper
 
 @synthesize tag = _tag;
 
@@ -65,10 +63,6 @@ PsiFeedbackLogType const RewardedAdControllerWrapperLogType = @"RewardedAdContro
 
 - (void)dealloc {
     [MPRewardedVideo removeDelegate:self];
-}
-
-- (void)setCustomData:(NSString *)data {
-    self->customData = data;
 }
 
 - (RACSignal<NSString *> *)loadAd {
@@ -105,7 +99,8 @@ PsiFeedbackLogType const RewardedAdControllerWrapperLogType = @"RewardedAdContro
     }];
 }
 
-- (RACSignal<NSNumber *> *)presentAdFromViewController:(UIViewController *)viewController {
+- (RACSignal<NSNumber *> *)presentAdFromViewController:(UIViewController *)viewController
+                                        withCustomData:(NSString *_Nullable)customData {
 
     RewardedAdControllerWrapper *__weak weakSelf = self;
 
@@ -117,7 +112,7 @@ PsiFeedbackLogType const RewardedAdControllerWrapperLogType = @"RewardedAdContro
             return nil;
         }
 
-        if ([Nullity isEmpty:self->customData]) {
+        if ([Nullity isEmpty:customData]) {
             [subscriber sendNext:@(AdPresentationErrorCustomDataNotSet)];
             [subscriber sendCompleted];
             return nil;
@@ -135,7 +130,7 @@ PsiFeedbackLogType const RewardedAdControllerWrapperLogType = @"RewardedAdContro
         [MPRewardedVideo presentRewardedVideoAdForAdUnitID:self.adUnitID
                                         fromViewController:viewController
                                                 withReward:rewards[0]
-                                                customData:self->customData];
+                                                customData:customData];
 
         return disposable;
     }];
