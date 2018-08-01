@@ -701,19 +701,19 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
                           }];
                       } else {
                           return [[groupedErrors zipWith:[RACSignal rangeStartFrom:0 count:(AD_LOAD_RETRY_COUNT+1)]]
-                              flattenMap:^RACSignal *(RACTwoTuple *value) {
+                            flattenMap:^RACSignal *(RACTwoTuple *value) {
 
-                                  NSError *error = value.first;
-                                  NSInteger retryCount = [(NSNumber *)value.second integerValue];
+                                NSError *error = value.first;
+                                NSInteger retryCount = [(NSNumber *)value.second integerValue];
 
-                                  if (retryCount == AD_LOAD_RETRY_COUNT) {
-                                      // Reached max retry.
-                                      return [RACSignal error:error];
-                                  } else {
-                                      // Try to load ad again after `MIN_AD_RELOAD_TIMER` second after a failure.
-                                      return [RACSignal timer:MIN_AD_RELOAD_TIMER];
-                                  }
-                              }];
+                                if (retryCount == AD_LOAD_RETRY_COUNT) {
+                                    // Reached max retry.
+                                    return [RACSignal error:error];
+                                } else {
+                                    // Try to load ad again after `MIN_AD_RELOAD_TIMER` second after a failure.
+                                    return [RACSignal timer:MIN_AD_RELOAD_TIMER];
+                                }
+                            }];
                       }
                   }];
             }]
