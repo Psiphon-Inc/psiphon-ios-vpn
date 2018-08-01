@@ -100,6 +100,10 @@ PsiFeedbackLogType const InterstitialAdControllerWrapperLogType = @"Interstitial
         [MPInterstitialAdController removeSharedInterstitialAdController:weakSelf.interstitial];
         weakSelf.interstitial = nil;
 
+        if (weakSelf.ready) {
+            weakSelf.ready = FALSE;
+        }
+
         [subscriber sendNext:weakSelf.tag];
         [subscriber sendCompleted];
 

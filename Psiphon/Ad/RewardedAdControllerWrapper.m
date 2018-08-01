@@ -95,6 +95,10 @@ PsiFeedbackLogType const RewardedAdControllerWrapperLogType = @"RewardedAdContro
         // For now we are just going to remove delegate. This should not affect the behaviour of the app.
         [MPRewardedVideo removeDelegate:weakSelf];
 
+        if (weakSelf.ready) {
+            weakSelf.ready = FALSE;
+        }
+
         [subscriber sendNext:weakSelf.tag];
         [subscriber sendCompleted];
         return nil;
