@@ -21,4 +21,5 @@
 #import "PsiCashClientModel.h"
 
 @interface PsiCashRewardedVideoBar : UIButton
+- (void)videoReady:(BOOL)ready;
 @end

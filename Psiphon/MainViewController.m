@@ -54,11 +54,7 @@
 #import "Asserts.h"
 #import "PrivacyPolicyViewController.h"
 #import "UIColor+Additions.h"
-
 #import "PsiCashRewardedVideoBar.h"
-
-UserDefaultsKey const PrivacyPolicyAcceptedBookKey = @"PrivacyPolicy.AcceptedBoolKey";
-
 #import "PsiCashBalanceView.h"
 #import "PsiCashClient.h"
 #import "PsiCashSpeedBoostMeterView.h"
@@ -66,6 +62,9 @@ UserDefaultsKey const PrivacyPolicyAcceptedBookKey = @"PrivacyPolicy.AcceptedBoo
 #import "UILabel+GetLabelHeight.h"
 #import "StarView.h"
 
+PsiFeedbackLogType const RewardedVideoLogType = @"RewardedVideo";
+
+UserDefaultsKey const PrivacyPolicyAcceptedBookKey = @"PrivacyPolicy.AcceptedBoolKey";
 UserDefaultsKey const PsiCashHasBeenOnboardedBoolKey = @"PsiCash.HasBeenOnboarded";
 
 static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSString *b) {
@@ -119,12 +118,17 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     FeedbackManager *feedbackManager;
 
     // PsiCash
+    NSArray<StarView*> *stars;
+    NSLayoutConstraint *psiCashViewHeight;
+    NSLayoutConstraint *psiCashRewardedVideoBarHeight;
     PsiCashPurchaseAlertView *alertView;
     PsiCashClientModel *model;
     PsiCashBalanceWithSpeedBoostMeter *psiCashView;
-    NSLayoutConstraint *psiCashViewHeight;
+    PsiCashRewardedVideoBar * psiCashRewardedVideoBar;
     RACDisposable *psiCashViewUpdates;
-    NSArray<StarView*> *stars;
+    RACDisposable *rewardedVideoIsReadyDisposable;
+    RACDisposable *showRewardedVideoDisposable;
+
 }
 
 // Force portrait orientation
@@ -1074,50 +1078,11 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 
 #pragma mark - PsiCash
 
-#pragma mark - PsiCashPurchaseAlertViewDelegate protocol
-
-- (void)stateBecameStale {
-    [alertView close];
-    alertView = nil;
-}
-
-- (void)showPsiCashAlertView {
-    if (alertView != nil) {
-        [alertView close];
-        alertView = nil;
-    }
-
-    if (![model hasAuthPackage] || ![model.authPackage hasSpenderToken]) {
-        return;
-    } else if ([model hasActiveSpeedBoostPurchase]) {
-        alertView = [PsiCashPurchaseAlertView alreadySpeedBoostingAlert];
-    } else  if ([model hasPendingPurchase]) {
-        // (PsiCash 1.0): Do nothing
-        //alertView = [PsiCashPurchaseAlertView pendingPurchaseAlert];
-        return;
-    } else {
-        // Insufficient balance animation
-        CABasicAnimation *animation =
-        [CABasicAnimation animationWithKeyPath:@"position"];
-        [animation setDuration:0.075];
-        [animation setRepeatCount:3];
-        [animation setAutoreverses:YES];
-        [animation setFromValue:[NSValue valueWithCGPoint:
-                                 CGPointMake([psiCashView center].x - 20.0f, [psiCashView center].y)]];
-        [animation setToValue:[NSValue valueWithCGPoint:
-                               CGPointMake([psiCashView center].x + 20.0f, [psiCashView center].y)]];
-        [[psiCashView layer] addAnimation:animation forKey:@"position"];
-        return;
-    }
-
-    alertView.controllerDelegate = self;
-    [alertView bindWithModel:model];
-    [alertView show];
-}
+#pragma mark - PsiCash UI actions
 
 /**
-* Buy max num hours of Speed Boost that the user can afford if possible
-*/
+ * Buy max num hours of Speed Boost that the user can afford if possible
+ */
 - (void)instantMaxSpeedBoostPurchase {
     NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
 
@@ -1135,6 +1100,8 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
         [self showPsiCashAlertView];
     }
 }
+
+#pragma mark - PsiCash UI
 
 - (void)addPsiCashView {
     psiCashView = [[PsiCashBalanceWithSpeedBoostMeter alloc] init];
@@ -1225,36 +1192,6 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 #endif
 }
 
-- (void)addPsiCashRewardedVideoBar {
-    PsiCashRewardedVideoBar * psiCashRewardedVideoBar = [[PsiCashRewardedVideoBar alloc] init];
-    psiCashRewardedVideoBar.translatesAutoresizingMaskIntoConstraints = NO;
-    [self.view addSubview:psiCashRewardedVideoBar];
-
-//    UITapGestureRecognizer *psiCashViewTap = [[UITapGestureRecognizer alloc]
-//                                              initWithTarget:self action:@selector(showRewardedVideo)];
-//
-//    psiCashViewTap.numberOfTapsRequired = 1;
-//    [psiCashView addGestureRecognizer:psiCashViewTap];
-
-    [psiCashRewardedVideoBar.centerXAnchor constraintEqualToAnchor:appSubTitleLabel.centerXAnchor].active = YES;
-    [psiCashRewardedVideoBar.topAnchor constraintEqualToAnchor:psiCashView.bottomAnchor].active = YES;
-    [psiCashRewardedVideoBar.widthAnchor constraintEqualToAnchor:self.view.widthAnchor multiplier:0.7].active = YES;
-    NSLayoutConstraint *psiCashRewardedVideoBarHeight = [psiCashView.heightAnchor constraintEqualToConstant:100];
-    psiCashRewardedVideoBarHeight.active = YES;
-}
-
-- (void)setPsiCashContentHidden:(BOOL)hidden {
-    [self setStarsHidden:hidden];
-    psiCashView.hidden = hidden;
-    psiCashViewHeight.constant = hidden ? 0 : 100;
-}
-
-- (void)setStarsHidden:(BOOL)hidden {
-    for (StarView *star in stars) {
-        star.hidden = hidden;
-    }
-}
-
 - (void)highlightPsiCashViewWithStars {
     StarView *star1 = [[StarView alloc] init];
     [self.view addSubview:star1];
@@ -1290,6 +1227,150 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 
     stars = @[star1, star2, star3];
 }
+
+- (void)setPsiCashContentHidden:(BOOL)hidden {
+    [self setStarsHidden:hidden];
+    psiCashView.hidden = hidden;
+    psiCashViewHeight.constant = hidden ? 0 : 100;
+    psiCashRewardedVideoBar.hidden = hidden;
+    psiCashRewardedVideoBarHeight.constant = hidden ? 0 : 100;
+}
+
+- (void)setStarsHidden:(BOOL)hidden {
+    for (StarView *star in stars) {
+        star.hidden = hidden;
+    }
+}
+
+#pragma mark - PsiCash rewarded videos
+
+- (void)addPsiCashRewardedVideoBar {
+    psiCashRewardedVideoBar = [[PsiCashRewardedVideoBar alloc] init];
+    psiCashRewardedVideoBar.translatesAutoresizingMaskIntoConstraints = NO;
+    [self.view addSubview:psiCashRewardedVideoBar];
+
+    UITapGestureRecognizer *rewardedVideoBarTap = [[UITapGestureRecognizer alloc]
+                                                   initWithTarget:self action:@selector(showRewardedVideo)];
+
+    rewardedVideoBarTap.numberOfTapsRequired = 1;
+    [psiCashRewardedVideoBar addGestureRecognizer:rewardedVideoBarTap];
+
+    [psiCashRewardedVideoBar.centerXAnchor constraintEqualToAnchor:appSubTitleLabel.centerXAnchor].active = YES;
+    [psiCashRewardedVideoBar.topAnchor constraintEqualToAnchor:psiCashView.bottomAnchor].active = YES;
+    [psiCashRewardedVideoBar.widthAnchor constraintEqualToAnchor:self.view.widthAnchor multiplier:0.7].active = YES;
+    psiCashRewardedVideoBarHeight = [psiCashView.heightAnchor constraintEqualToConstant:100];
+    psiCashRewardedVideoBarHeight.active = YES;
+
+    // Signals
+
+    rewardedVideoIsReadyDisposable = [[[AdManager sharedInstance].rewardedVideoCanPresent
+        combineLatestWith:PsiCashClient.sharedInstance.clientModelSignal]
+        subscribeNext:^(RACTwoTuple<NSNumber *, PsiCashClientModel *> *x) {
+            BOOL ready = [[x first] boolValue];
+            PsiCashClientModel *model = [x second];
+
+            psiCashRewardedVideoBar.userInteractionEnabled = ready && [model.authPackage hasEarnerToken];
+            [psiCashRewardedVideoBar videoReady:ready && [model.authPackage hasEarnerToken]];
+    }];
+}
+
+- (void)showRewardedVideo {
+
+    LOG_DEBUG(@"rewarded video started");
+    [PsiFeedbackLogger infoWithType:RewardedVideoLogType message:@"started"];
+
+    [showRewardedVideoDisposable dispose];
+
+    RACSignal *showVideo = [self.adManager presentRewardedVideoOnViewController:self withCustomData:[[PsiCashClient sharedInstance] rewardedVideoCustomData]];
+
+    showRewardedVideoDisposable = [showVideo subscribeNext:^(NSNumber *x) {
+        AdPresentation ap = (AdPresentation) [x integerValue];
+
+        switch (ap) {
+            case AdPresentationWillAppear:
+                LOG_DEBUG(@"rewarded video AdPresentationWillAppear");
+                break;
+            case AdPresentationDidAppear:
+                LOG_DEBUG(@"rewarded video AdPresentationDidAppear");
+                break;
+            case AdPresentationWillDisappear:
+                LOG_DEBUG(@"rewarded video AdPresentationWillDisappear");
+                break;
+            case AdPresentationDidDisappear:
+                LOG_DEBUG(@"rewarded video AdPresentationDidDisappear");
+#if DEBUG
+                const int networkRetryCount = 3;
+#else
+                const int networkRetryCount = 6;
+#endif
+                [[PsiCashClient sharedInstance] pollForBalanceDeltaWithMaxRetries:networkRetryCount andTimeBetweenRetries:5];
+                break;
+            case AdPresentationErrorCustomDataNotSet:
+                LOG_DEBUG(@"rewarded video AdPresentationErrorCustomDataNotSet");
+                break;
+            case AdPresentationErrorInappropriateState:
+                LOG_DEBUG(@"rewarded video AdPresentationErrorInappropriateState");
+                [PsiFeedbackLogger errorWithType:RewardedVideoLogType message:@"AdPresentationErrorInappropriateState"];
+                break;
+            case AdPresentationErrorNoAdsLoaded:
+                LOG_DEBUG(@"rewarded video AdPresentationErrorNoAdsLoaded");
+                [PsiFeedbackLogger errorWithType:RewardedVideoLogType message:@"AdPresentationErrorNoAdsLoaded"];
+                break;
+            case AdPresentationErrorFailedToPlay:
+                LOG_DEBUG(@"rewarded video AdPresentationErrorFailedToPlay");
+                [PsiFeedbackLogger errorWithType:RewardedVideoLogType message:@"AdPresentationErrorFailedToPlay"];
+                break;
+        }
+
+    } error:^(NSError *error) {
+        [PsiFeedbackLogger errorWithType:RewardedVideoLogType message:@"Error with rewarded video" object:error];
+    } completed:^{
+        LOG_DEBUG(@"rewarded video completed");
+        [PsiFeedbackLogger infoWithType:RewardedVideoLogType message:@"completed"];
+    }];
+}
+
+#pragma mark - PsiCashPurchaseAlertViewDelegate protocol
+
+- (void)stateBecameStale {
+    [alertView close];
+    alertView = nil;
+}
+
+- (void)showPsiCashAlertView {
+    if (alertView != nil) {
+        [alertView close];
+        alertView = nil;
+    }
+
+    if (![model hasAuthPackage] || ![model.authPackage hasSpenderToken]) {
+        return;
+    } else if ([model hasActiveSpeedBoostPurchase]) {
+        alertView = [PsiCashPurchaseAlertView alreadySpeedBoostingAlert];
+    } else  if ([model hasPendingPurchase]) {
+        // (PsiCash 1.0): Do nothing
+        //alertView = [PsiCashPurchaseAlertView pendingPurchaseAlert];
+        return;
+    } else {
+        // Insufficient balance animation
+        CABasicAnimation *animation =
+        [CABasicAnimation animationWithKeyPath:@"position"];
+        [animation setDuration:0.075];
+        [animation setRepeatCount:3];
+        [animation setAutoreverses:YES];
+        [animation setFromValue:[NSValue valueWithCGPoint:
+                                 CGPointMake([psiCashView center].x - 20.0f, [psiCashView center].y)]];
+        [animation setToValue:[NSValue valueWithCGPoint:
+                               CGPointMake([psiCashView center].x + 20.0f, [psiCashView center].y)]];
+        [[psiCashView layer] addAnimation:animation forKey:@"position"];
+        return;
+    }
+
+    alertView.controllerDelegate = self;
+    [alertView bindWithModel:model];
+    [alertView show];
+}
+
 
 #pragma mark - PsiCashOnboardingViewControllerDelegate protocol implementation
 

@@ -46,6 +46,11 @@
 @end
 
 NSErrorDomain _Nonnull const PsiCashClientLibraryErrorDomain = @"PsiCashClientLibraryErrorDomain";
+NSErrorDomain _Nonnull const PsiCashClientRefreshStateErrorDomain = @"PsiCashClientRefreshStateErrorDomain";
+
+typedef NS_ERROR_ENUM(PsiCashClientRefreshStateErrorDomain, PsiCashClientRefreshStateErrorCode) {
+    PsiCashClientRefreshStateErrorSuccessButPredicateFalse = -1,
+};
 
 @implementation PsiCashClient {
     PsiCash *psiCash;
@@ -60,6 +65,7 @@ NSErrorDomain _Nonnull const PsiCashClientLibraryErrorDomain = @"PsiCashClientLi
     VPNManager *vpnManager;
     RACDisposable *tunnelStatusDisposable;
     RACDisposable *refreshDisposable;
+    RACDisposable *pollForBalanceDeltaDisposable;
     RACDisposable *purchaseDisposable;
 }
 
@@ -98,6 +104,8 @@ NSErrorDomain _Nonnull const PsiCashClientLibraryErrorDomain = @"PsiCashClientLi
     return self;
 }
 
+#pragma mark - Refresh state
+
 - (void)scheduleRefreshState {
     __weak PsiCashClient *weakSelf = self;
     [tunnelStatusDisposable dispose];
@@ -108,137 +116,17 @@ NSErrorDomain _Nonnull const PsiCashClientLibraryErrorDomain = @"PsiCashClientLi
                                   VPNStatus s = (VPNStatus) [statusObject integerValue];
 
                                   if (s == VPNStatusConnected) {
-                                      [weakSelf refreshStateLibRemote]; // refresh state from server with lib
+                                      [weakSelf refreshStateRemote]; // refresh state from server with lib
                                   } else {
                                       [refreshDisposable dispose]; // cancel the request in flight
-                                      [weakSelf refreshStateLibLocal]; // refresh state locally from lib
+                                      [weakSelf refreshStateLocal]; // refresh state locally from lib
                                   }
                               }];
 }
 
-#pragma mark - Helpers
-
-- (void)commitModelStagingArea:(PsiCashClientModelStagingArea *)stagingArea {
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [self.clientModelSignal sendNext:stagingArea.stagedModel];
-    });
-    model = stagingArea.stagedModel;
-}
-
-- (void)displayAlertWithMessage:(NSString*)msg {
-    dispatch_async(dispatch_get_main_queue(), ^{
-        CustomIOSAlertView *alert = [[CustomIOSAlertView alloc] init];
-        UILabel *l = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, 250, 150)];
-        l.adjustsFontSizeToFitWidth = YES;
-        l.font = [UIFont systemFontOfSize:12.f];
-        l.numberOfLines = 0;
-        l.text = msg;
-        l.textAlignment = NSTextAlignmentCenter;
-
-        alert.containerView = l;
-        [alert show];
-    });
-}
-
-/**
- * Hardcode SpeedBoost product to only 1h option for PsiCash 1.0
- */
-- (NSDictionary<NSString*,NSArray<NSString*>*>*)targetProducts {
-    return @{[PsiCashSpeedBoostProduct purchaseClass]: @[@"1hr"]};
-}
-
-/**
- * Helper function to parse an array of PsiCashPurchasePrice objects
- * into a more completely typed PsiCashSpeedBoostProduct object.
- */
-- (PsiCashSpeedBoostProduct*)speedBoostProductFromPurchasePrices:(NSArray<PsiCashPurchasePrice*>*)purchasePrices withTargetProducts:(NSDictionary<NSString*,NSArray<NSString*>*>*)targets {
-    NSMutableArray<PsiCashPurchasePrice*> *speedBoostPurchasePrices = [[NSMutableArray alloc] init];
-    NSArray <NSString*>* targetDistinguishersForSpeedBoost = nil;
-    if (targets != nil) {
-        targetDistinguishersForSpeedBoost = [targets objectForKey:[PsiCashSpeedBoostProduct purchaseClass]];
-    }
-
-    for (PsiCashPurchasePrice *price in purchasePrices) {
-        if ([price.transactionClass isEqualToString:[PsiCashSpeedBoostProduct purchaseClass]]) {
-            if (targetDistinguishersForSpeedBoost == nil
-                || (targetDistinguishersForSpeedBoost != nil && [targetDistinguishersForSpeedBoost containsObject:price.distinguisher])) {
-                [speedBoostPurchasePrices addObject:price];
-            }
-        } else {
-            [logger logEvent:@"IgnoredPurchasePrice" withInfoDictionary:[price toDictionary] includingDiagnosticInfo:NO];
-        }
-    }
-
-    PsiCashSpeedBoostProduct *speedBoostProduct = nil;
-    if ([speedBoostPurchasePrices count] == 0) {
-        [logger logErrorEvent:@"NoSpeedBoostProductSKUsFound" withInfo:nil includingDiagnosticInfo:YES];
-    } else {
-        speedBoostProduct = [PsiCashSpeedBoostProduct productWithPurchasePrices:speedBoostPurchasePrices];
-    }
-
-    return speedBoostProduct;
-}
-
-- (void)updateContainerAuthTokens {
-    [sharedDB setContainerAuthorizations:[self validAuthorizations]];
-}
-
-- (NSSet<Authorization*>*)validAuthorizations {
-    NSMutableSet <Authorization*>*validAuthorizations = [[NSMutableSet alloc] init];
-
-    NSArray <PsiCashPurchase*>* purchases = psiCash.validPurchases;
-    for (PsiCashPurchase *purchase in purchases) {
-        if ([purchase.transactionClass isEqualToString:[PsiCashSpeedBoostProduct purchaseClass]]) {
-            [validAuthorizations addObject:[[Authorization alloc] initWithEncodedAuthorization:purchase.authorization]];
-        }
-    }
-
-    return validAuthorizations;
-}
-
-#pragma mark - Authorization expiries
-
-// See comment in header
-- (void)authorizationsMarkedExpired {
-    PsiCashClientModelStagingArea *stagingArea = [self stagingAreaFromLib];
-    [stagingArea updateActivePurchases:[self activePurchases]];
-    [self commitModelStagingArea:stagingArea];
-}
-
-/**
- * Returns the set of active purchases from the PsiCash library subtracted by the set
- * of purchases marked as expired by the extension. This handles the scenario where
- * the server has decided a purchase is expired before the library. In this scenario
- * the server should be treated as the ultimate source of truth and these expired
- * purchases will be removed from the library.
- *
- * @return Returns {setActivePurchaseLib | x is not marked expired by the extension}
- */
-- (NSArray<PsiCashPurchase*>*)activePurchases {
-    NSMutableArray <PsiCashPurchase*>* purchases = [[NSMutableArray alloc] initWithArray:[[psiCash validPurchases] copy]];
-    NSSet<NSString *> *markedAuthIDs = [sharedDB getMarkedExpiredAuthorizationIDs];
-    NSMutableArray *purchasesToRemove = [[NSMutableArray alloc] init];
-
-    NSPredicate *predicate = [NSPredicate predicateWithBlock:^BOOL(PsiCashPurchase *evaluatedObject, NSDictionary<NSString *,id> * _Nullable bindings) {
-        Authorization *auth = [[Authorization alloc] initWithEncodedAuthorization:evaluatedObject.authorization];
-        if ([markedAuthIDs containsObject:auth.ID]) {
-            [purchasesToRemove addObject:evaluatedObject.ID];
-            return FALSE;
-        }
-        return TRUE;
-    }];
-    [purchases filterUsingPredicate:predicate];
-
-    // Remove purchases indicated as expired by the Psiphon server, but not yet by the PsiCash lib.
-    // This will occur if the local clock is out of sync with that of the PsiCash server.
-    [psiCash removePurchases:purchasesToRemove];
-
-    return purchases;
-}
-
 #pragma mark - Cached Refresh
 
-- (void)refreshStateLibLocal {
+- (void)refreshStateLocal {
     [self updateContainerAuthTokens];
 
     PsiCashClientModelStagingArea *stagingArea = [self stagingAreaFromLib];
@@ -266,58 +154,112 @@ NSErrorDomain _Nonnull const PsiCashClientLibraryErrorDomain = @"PsiCashClientLi
 
 #pragma mark - Refresh Signal
 
-- (void)refreshStateLibRemote {
-    [logger logEvent:@"RefreshingState" includingDiagnosticInfo:NO];
-    [self setDynamicRequestMetadata];
+/*
+ *  ********************************** NOTE **********************************
+ *  refreshStateRemote and pollForBalanceDelta will make redundant network
+ *  requests if used in parallel. Since both signals have different predicates
+ *  and retry times (exponential vs. fixed) there is not an simple solution to
+ *  mitigate this redundancy. In the future these signals could be serialized
+ *  or merged if this becomes an issue. One idea would be to combine retry
+ *  times and sort them in ascending order and combine predicates.
+ *  **************************************************************************
+ */
 
+- (void)refreshStateRemote {
 #if DEBUG
     const int networkRetryCount = 3;
 #else
     const int networkRetryCount = 6;
 #endif
 
+    BOOL (^predicate)(void) = ^BOOL(void) {
+        return YES;
+    };
+
+    NSTimeInterval (^nextRetryTime)(long) = ^NSTimeInterval(long retryNum) {
+        return pow(4, retryNum);
+    };
+
     [refreshDisposable dispose];
+    refreshDisposable = [self refreshStateWithMaxRetries:networkRetryCount andTimeBetweenRetries:nextRetryTime andPredicate:predicate andTagForLogging:@"RefreshState"];
+}
 
-    RACSignal *refresh = [[[[self refreshStateFromServer] retryWhen:^RACSignal * _Nonnull(RACSignal * _Nonnull errors) {
-        return [[errors
-                 zipWith:[RACSignal rangeStartFrom:1 count:networkRetryCount]]
+- (void)pollForBalanceDeltaWithMaxRetries:(int)maxRetries andTimeBetweenRetries:(NSTimeInterval)timeBetweenRetries {
+
+    NSNumber *startingBalance = [psiCash.balance copy];
+
+    BOOL (^predicate)(void) = ^BOOL(void) {
+        return [psiCash.balance compare:startingBalance] != NSOrderedSame;
+    };
+
+    NSTimeInterval (^nextRetryTime)(long) = ^NSTimeInterval(long retryNum) {
+        return timeBetweenRetries;
+    };
+
+    [pollForBalanceDeltaDisposable dispose];
+    pollForBalanceDeltaDisposable = [self refreshStateWithMaxRetries:maxRetries andTimeBetweenRetries:nextRetryTime andPredicate:predicate andTagForLogging:@"PollForBalanceDelta"];
+}
+
+- (RACDisposable*)refreshStateWithMaxRetries:(int)maxRetries
+                       andTimeBetweenRetries:(NSTimeInterval (^)(long))timeBetweenRetries
+                                andPredicate:(BOOL (^)(void))predicate
+                            andTagForLogging:(NSString*)tag {
+    [logger logEvent:[tag stringByAppendingString:@"Started"] includingDiagnosticInfo:YES];
+    [self setDynamicRequestMetadata];
+
+    RACSignal *refresh = [[[[[self refreshStateFromServer]
+        startWith:[PsiCashRefreshResultModel inProgress]]
+        flattenMap:^__kindof RACSignal * _Nullable(PsiCashRefreshResultModel * _Nullable r) {
+
+            if (r.inProgress) {
+                PsiCashClientModelStagingArea *stagingArea = [self stagingAreaFromLib];
+                [stagingArea updateRefreshPending:YES];
+                [stagingArea updateActivePurchases:[self activePurchases]];
+                [self commitModelStagingArea:stagingArea];
+            } else {
+                // Lib has been updated with results from server
+                [self refreshStateLocal];
+            }
+
+            if (predicate()) {
+                return [RACSignal return:[RACUnit defaultUnit]];
+            } else {
+                return [RACSignal error:[NSError errorWithDomain:PsiCashClientRefreshStateErrorDomain code:PsiCashClientRefreshStateErrorSuccessButPredicateFalse andLocalizedDescription:@"PredicateFalse"]];
+            }
+        }]
+        retryWhen:^RACSignal * _Nonnull(RACSignal * _Nonnull errors) {
+            return [[errors
+                zipWith:[RACSignal rangeStartFrom:1 count:maxRetries]]
                 flattenMap:^RACSignal *(RACTwoTuple<NSError *, NSNumber *> *retryCountTuple) {
+                // NOTE: errors from refreshStateFromServer forwarded here as well
 
-                    // Emits the error on the last retry.
-                    if ([retryCountTuple.second integerValue] == networkRetryCount) {
-                        return [RACSignal error:retryCountTuple.first];
-                    }
-                    // Exponential backoff.
-                    return [RACSignal timer:pow(4, [retryCountTuple.second integerValue])];
-                }];
-    }] catch:^RACSignal * _Nonnull(NSError * _Nonnull error) {
-        // Else re-emit the error.
-        return [RACSignal error:error];
-    }] startWith:[PsiCashRefreshResultModel inProgress]];
+                // Emits the error on the last retry.
+                if ([retryCountTuple.second integerValue] == maxRetries) {
+                    return [RACSignal error:retryCountTuple.first];
+                }
+                // Wait before retrying again.
+                return [RACSignal timer:timeBetweenRetries([retryCountTuple.second integerValue])];
+            }];
+        }]
+        catch:^RACSignal * _Nonnull(NSError * _Nonnull error) {
+            // Else re-emit the error.
+            return [RACSignal error:error];
+    }];
 
-    refreshDisposable = [refresh subscribeNext:^(PsiCashRefreshResultModel *_Nullable r) {
-
-        if (r.inProgress) {
-            PsiCashClientModelStagingArea *stagingArea = [self stagingAreaFromLib];
-            [stagingArea updateRefreshPending:YES];
-            [stagingArea updateActivePurchases:[self activePurchases]];
-            [self commitModelStagingArea:stagingArea];
-        } else {
-            // Lib has been updated with results from server
-            [self refreshStateLibLocal];
-        }
-
+    refreshDisposable = [refresh subscribeNext:^(id  _Nullable x) {
+        // Nothing to handle here
     } error:^(NSError * _Nullable error) {
-
         PsiCashClientModelStagingArea *stagingArea = [self stagingAreaFromLib];
         [stagingArea updateRefreshPending:NO];
         [self commitModelStagingArea:stagingArea];
 
-        [logger logErrorEvent:@"RefreshStateFailed" withError:error includingDiagnosticInfo:NO];
+        [logger logErrorEvent:[tag stringByAppendingString:@"Failed"] withError:error includingDiagnosticInfo:NO];
         [self displayAlertWithMessage:NSLocalizedStringWithDefaultValue(@"PSICASH_REFRESH_STATE_FAILED_MESSAGE_TEXT", nil, [NSBundle mainBundle], @"Failed to update PsiCash state", @"Alert error message informing user that the app failed to retrieve their PsiCash information from the server. Note: 'PsiCash' should not be translated or transliterated.")];
     } completed:^{
-        [logger logEvent:@"RefreshedState" includingDiagnosticInfo:YES];
+        [logger logEvent:[tag stringByAppendingString:@"Completed"] includingDiagnosticInfo:YES];
     }];
+
+    return refreshDisposable;
 }
 
 - (RACSignal<PsiCashRefreshResultModel*>*)refreshStateFromServer {
@@ -431,7 +373,7 @@ NSErrorDomain _Nonnull const PsiCashClientLibraryErrorDomain = @"PsiCashClientLi
                         e = [NSError errorWithDomain:PsiCashClientLibraryErrorDomain code:result.status andLocalizedDescription:s];
 
                         // Attempt to sync new products from the server
-                        [self refreshStateLibRemote];
+                        [self refreshStateRemote];
 
                     } else if ([updatedSKU.price compare:sku.price] == NSOrderedSame) {
                         // Product price has not changed
@@ -439,7 +381,7 @@ NSErrorDomain _Nonnull const PsiCashClientLibraryErrorDomain = @"PsiCashClientLi
                         e = [NSError errorWithDomain:PsiCashClientLibraryErrorDomain code:result.status andLocalizedDescription:s];
 
                         // Attempt to sync new products from the server
-                        [self refreshStateLibRemote];
+                        [self refreshStateRemote];
 
                     } else {
                         // Product price has changed
@@ -511,6 +453,18 @@ NSErrorDomain _Nonnull const PsiCashClientLibraryErrorDomain = @"PsiCashClientLi
     return [NSURL URLWithString:modifiedURL];
 }
 
+#pragma mark - Rewarded videos
+
+- (NSString*)rewardedVideoCustomData {
+    NSString *s;
+    NSError *e = [psiCash getRewardedActivityData:&s];
+    if (e) {
+        [logger logErrorEvent:@"GetRewardedActivityDataFailed" withError:e includingDiagnosticInfo:YES];
+        return nil;
+    }
+    return s;
+}
+
 #pragma mark - PsiCashLib request metadata
 
 - (void)setStaticRequestMetadata {
@@ -541,6 +495,126 @@ NSErrorDomain _Nonnull const PsiCashClientLibraryErrorDomain = @"PsiCashClientLi
 
 - (NSString*)logForFeedback {
     return [logger logForFeedback];
+}
+
+#pragma mark - Authorization expiries
+
+// See comment in header
+- (void)authorizationsMarkedExpired {
+    PsiCashClientModelStagingArea *stagingArea = [self stagingAreaFromLib];
+    [stagingArea updateActivePurchases:[self activePurchases]];
+    [self commitModelStagingArea:stagingArea];
+}
+
+/**
+ * Returns the set of active purchases from the PsiCash library subtracted by the set
+ * of purchases marked as expired by the extension. This handles the scenario where
+ * the server has decided a purchase is expired before the library. In this scenario
+ * the server should be treated as the ultimate source of truth and these expired
+ * purchases will be removed from the library.
+ *
+ * @return Returns {setActivePurchaseLib | x is not marked expired by the extension}
+ */
+- (NSArray<PsiCashPurchase*>*)activePurchases {
+    NSMutableArray <PsiCashPurchase*>* purchases = [[NSMutableArray alloc] initWithArray:[[psiCash validPurchases] copy]];
+    NSSet<NSString *> *markedAuthIDs = [sharedDB getMarkedExpiredAuthorizationIDs];
+    NSMutableArray *purchasesToRemove = [[NSMutableArray alloc] init];
+
+    NSPredicate *predicate = [NSPredicate predicateWithBlock:^BOOL(PsiCashPurchase *evaluatedObject, NSDictionary<NSString *,id> * _Nullable bindings) {
+        Authorization *auth = [[Authorization alloc] initWithEncodedAuthorization:evaluatedObject.authorization];
+        if ([markedAuthIDs containsObject:auth.ID]) {
+            [purchasesToRemove addObject:evaluatedObject.ID];
+            return FALSE;
+        }
+        return TRUE;
+    }];
+    [purchases filterUsingPredicate:predicate];
+
+    // Remove purchases indicated as expired by the Psiphon server, but not yet by the PsiCash lib.
+    // This will occur if the local clock is out of sync with that of the PsiCash server.
+    [psiCash removePurchases:purchasesToRemove];
+
+    return purchases;
+}
+
+#pragma mark - Helpers
+
+- (void)commitModelStagingArea:(PsiCashClientModelStagingArea *)stagingArea {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self.clientModelSignal sendNext:stagingArea.stagedModel];
+    });
+    model = stagingArea.stagedModel;
+}
+
+- (void)displayAlertWithMessage:(NSString*)msg {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        CustomIOSAlertView *alert = [[CustomIOSAlertView alloc] init];
+        UILabel *l = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, 250, 150)];
+        l.adjustsFontSizeToFitWidth = YES;
+        l.font = [UIFont systemFontOfSize:12.f];
+        l.numberOfLines = 0;
+        l.text = msg;
+        l.textAlignment = NSTextAlignmentCenter;
+
+        alert.containerView = l;
+        [alert show];
+    });
+}
+
+/**
+ * Hardcode SpeedBoost product to only 1h option for PsiCash 1.0
+ */
+- (NSDictionary<NSString*,NSArray<NSString*>*>*)targetProducts {
+    return @{[PsiCashSpeedBoostProduct purchaseClass]: @[@"1hr"]};
+}
+
+/**
+ * Helper function to parse an array of PsiCashPurchasePrice objects
+ * into a more completely typed PsiCashSpeedBoostProduct object.
+ */
+- (PsiCashSpeedBoostProduct*)speedBoostProductFromPurchasePrices:(NSArray<PsiCashPurchasePrice*>*)purchasePrices withTargetProducts:(NSDictionary<NSString*,NSArray<NSString*>*>*)targets {
+    NSMutableArray<PsiCashPurchasePrice*> *speedBoostPurchasePrices = [[NSMutableArray alloc] init];
+    NSArray <NSString*>* targetDistinguishersForSpeedBoost = nil;
+    if (targets != nil) {
+        targetDistinguishersForSpeedBoost = [targets objectForKey:[PsiCashSpeedBoostProduct purchaseClass]];
+    }
+
+    for (PsiCashPurchasePrice *price in purchasePrices) {
+        if ([price.transactionClass isEqualToString:[PsiCashSpeedBoostProduct purchaseClass]]) {
+            if (targetDistinguishersForSpeedBoost == nil
+                || (targetDistinguishersForSpeedBoost != nil && [targetDistinguishersForSpeedBoost containsObject:price.distinguisher])) {
+                [speedBoostPurchasePrices addObject:price];
+            }
+        } else {
+            [logger logEvent:@"IgnoredPurchasePrice" withInfoDictionary:[price toDictionary] includingDiagnosticInfo:NO];
+        }
+    }
+
+    PsiCashSpeedBoostProduct *speedBoostProduct = nil;
+    if ([speedBoostPurchasePrices count] == 0) {
+        [logger logErrorEvent:@"NoSpeedBoostProductSKUsFound" withInfo:nil includingDiagnosticInfo:YES];
+    } else {
+        speedBoostProduct = [PsiCashSpeedBoostProduct productWithPurchasePrices:speedBoostPurchasePrices];
+    }
+
+    return speedBoostProduct;
+}
+
+- (void)updateContainerAuthTokens {
+    [sharedDB setContainerAuthorizations:[self validAuthorizations]];
+}
+
+- (NSSet<Authorization*>*)validAuthorizations {
+    NSMutableSet <Authorization*>*validAuthorizations = [[NSMutableSet alloc] init];
+
+    NSArray <PsiCashPurchase*>* purchases = psiCash.validPurchases;
+    for (PsiCashPurchase *purchase in purchases) {
+        if ([purchase.transactionClass isEqualToString:[PsiCashSpeedBoostProduct purchaseClass]]) {
+            [validAuthorizations addObject:[[Authorization alloc] initWithEncodedAuthorization:purchase.authorization]];
+        }
+    }
+
+    return validAuthorizations;
 }
 
 @end
