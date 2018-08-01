@@ -130,14 +130,16 @@ FOUNDATION_EXPORT AdControllerTag const AdControllerTagTunneledRewardedVideo;
 @property (nonatomic, readonly) RACReplaySubject<NSNumber *> *adIsShowing;
 
 /**
- * TRUE when the untunneled interstitial is ready to be presented.
+ * Emits @(TRUE) when the untunneled interstitial is ready to be presented.
+ * Subject initially has default value @(FALSE).
  */
-@property (nonatomic, readonly) BOOL untunneledInterstitialIsReady;
+@property (nonatomic, readonly) RACReplaySubject<NSNumber *> *untunneledInterstitialIsReady;
 
 /**
- * TRUE when tunneled or untunneled rewarded video is ready to be presented.
+ * Emits @(TRUE) when tunneled or untunneled rewarded video is ready to be presented.
+ * Subject initially has default value @(FALSE).
  */
-@property (nonatomic, readonly) BOOL rewardedVideoIsReady;
+@property (nonatomic, readonly) RACReplaySubject<NSNumber *> *rewardedVideoIsReady;
 
 + (instancetype)sharedInstance;
 
