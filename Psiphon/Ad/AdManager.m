@@ -195,8 +195,8 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
 @interface AdManager ()
 
 @property (nonatomic, readwrite, nonnull) RACReplaySubject<NSNumber *> *adIsShowing;
-@property (nonatomic, readwrite, assign) BOOL untunneledInterstitialIsReady;
-@property (nonatomic, readwrite, assign) BOOL rewardedVideoIsReady;
+@property (nonatomic, readwrite, nonnull) RACReplaySubject<NSNumber *> *untunneledInterstitialIsReady;
+@property (nonatomic, readwrite, nonnull) RACReplaySubject<NSNumber *> *rewardedVideoIsReady;
 
 // Private properties
 @property (nonatomic, readwrite, nonnull) InterstitialAdControllerWrapper *untunneledInterstitial;
@@ -221,6 +221,12 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
     if (self) {
 
         _adIsShowing = [RACReplaySubject replaySubjectWithCapacity:1];
+
+        _untunneledInterstitialIsReady = [RACReplaySubject replaySubjectWithCapacity:1];
+        [_untunneledInterstitialIsReady sendNext:@(FALSE)];
+
+        _rewardedVideoIsReady = [RACReplaySubject replaySubjectWithCapacity:1];
+        [_rewardedVideoIsReady sendNext:@(FALSE)];
 
         _compoundDisposable = [RACCompoundDisposable compoundDisposable];
 
@@ -479,30 +485,20 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
               }
               return [RACSignal return:@(FALSE)];
           }]
-          subscribeNext:^(NSNumber *readyObj) {
-              BOOL ready = [readyObj boolValue];
-              if (self.untunneledInterstitialIsReady != ready) {
-                  self.untunneledInterstitialIsReady = ready;
-              }
-          }]];
+          subscribe:self.untunneledInterstitialIsReady]];
 
         [self.compoundDisposable addDisposable:
           [[self.appEvents.signal flattenMap:^RACSignal<NSNumber *> *(AppEvent *appEvent) {
 
               if (appEvent.tunnelState == TunnelStateUntunneled) {
                   return RACObserve(self.untunneledRewardVideo, ready);
-              } else if (appEvent.tunnelState == TunnelStateUntunneled) {
+              } else if (appEvent.tunnelState == TunnelStateTunneled) {
                   return RACObserve(self.tunneledRewardVideo, ready);
               }
 
               return [RACSignal return:@(FALSE)];
           }]
-          subscribeNext:^(NSNumber *readyObj) {
-              BOOL ready = [readyObj boolValue];
-              if (self.rewardedVideoIsReady != ready) {
-                  self.rewardedVideoIsReady = ready;
-              }
-          }]];
+          subscribe:self.rewardedVideoIsReady]];
     }
 
     // Calls connect on the multicast connection object to start the subscription to the underlying signal.
