@@ -24,8 +24,8 @@
  *   should be performed serially. (That is the sequence of sub-operations in two different larger operations
  *   performed on the VPN configuration shouldn't interleave.)
  *
- *   `unsafeSubscribeOnSerialQueue` allows us to do that, with the caveat that when this signal is subscribed to,
- *   no other signal that's also subscribed on with `unsafeSubscribeOnSerialQueue` should be subscribed to.
+ *   `unsafeSubscribeOnSerialQueue` allows us to do that, with the caveat that if used improperly can easily
+ *   result in dead-locks. Check the operator's documentation for more details.
  *
  */
 
