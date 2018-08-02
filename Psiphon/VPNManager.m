@@ -714,7 +714,7 @@ UserDefaultsKey const VPNManagerConnectOnDemandUntilNextStartBoolKey = @"VPNMana
 
 #pragma mark - Extension Query
 
-// isPsiphonTunnelConnected returns a signal that when subscribed to sends "isProviderZombie" query to the extension
+// isExtensionZombie returns a signal that when subscribed to sends "isProviderZombie" query to the extension
 // and then emits boolean response as NSNumber, or the signal completes immediately if extension is not active.
 // Note: the returned signal emits FALSE if the extension returns empty response.
 - (RACSignal<NSNumber *> *)isExtensionZombie {
