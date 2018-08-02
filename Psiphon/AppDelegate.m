@@ -122,11 +122,14 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
     // checking the untunneled interstitial status.
     RACSignal *adsLoadingSignal = [[[VPNManager sharedInstance].lastTunnelStatus
       flattenMap:^RACSignal *(NSNumber *statusObject) {
+
           VPNStatus s = (VPNStatus) [statusObject integerValue];
+          BOOL needAdConsent = [MoPub sharedInstance].shouldShowConsentDialog;
 
-          if (s == VPNStatusDisconnected || s == VPNStatusInvalid) {
-              // Device is untunneled.
+          if (!needAdConsent && (s == VPNStatusDisconnected || s == VPNStatusInvalid)) {
 
+              // Device is untunneled and ad consent is given or not needed,
+              // we therefore wait for the ad to load.
               return [[[[AdManager sharedInstance].untunneledInterstitialCanPresent
                 filter:^BOOL(NSNumber *adIsReady) {
                     return [adIsReady boolValue];
@@ -135,7 +138,8 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
                 take:1];
 
           } else {
-              // Device in _not_ untunneled, there is no point in checking the untunneled interstitial load status.
+              // Device in _not_ untunneled or we need to show the Ad consent modal screen,
+              // wo we will emit RACUnit immediately since no ads will be loaded here.
               return [RACSignal return:RACUnit.defaultUnit];
           }
       }]

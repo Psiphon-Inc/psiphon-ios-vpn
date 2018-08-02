@@ -42,6 +42,7 @@
 #import "RACSignal+Operations2.h"
 #import "Asserts.h"
 #import "NSError+Convenience.h"
+#import <mopub-ios-sdk/MPConsentManager.h>
 @import GoogleMobileAds;
 
 
@@ -208,6 +209,8 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
 
 @property (nonatomic, nonnull) RACCompoundDisposable *compoundDisposable;
 
+// mopubSDKInitialized is non-terminating signal that emits RACUnit only once the MoPub SDK has been
+// initialized (and in accordance with GDPR if user consent has been given).
 @property (nonatomic, nonnull) RACReplaySubject<RACUnit *> *mopubSDKInitialized;
 
 @end
@@ -272,8 +275,6 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
         //  - https://developers.mopub.com/docs/ios/initialization/
         //  - https://developers.mopub.com/docs/mediation/networks/google/
 
-        [GADMobileAds configureWithApplicationID:@"ca-app-pub-1072041961750291~2085686375"];
-
         MPGoogleGlobalMediationSettings *googleMediationSettings = [[MPGoogleGlobalMediationSettings alloc] init];
 
         // MPMoPubConfiguration should be instantiated with any valid ad unit ID from the app.
@@ -282,9 +283,37 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
 
         sdkConfig.globalMediationSettings = @[googleMediationSettings];
 
+        // Initializes the MoPub SDK and then checks GDPR applicability and show the consent modal screen
+        // if necessary.
         [[MoPub sharedInstance] initializeSdkWithConfiguration:sdkConfig completion:^{
             LOG_DEBUG(@"MoPub SDK initialized");
-            [self.mopubSDKInitialized sendNext:RACUnit.defaultUnit];
+
+            if ([MoPub sharedInstance].shouldShowConsentDialog) {
+                [[MoPub sharedInstance] loadConsentDialogWithCompletion:^(NSError *error) {
+                    if (error == nil) {
+                        [[MoPub sharedInstance]
+                          showConsentDialogFromViewController:[AppDelegate getTopMostViewController]
+                                                      didShow:nil
+                                                   didDismiss:^{
+
+                            // MoPub consent dialog was presented successfully and dismissed.
+                            // We can start loading ads.
+                            [self.mopubSDKInitialized sendNext:RACUnit.defaultUnit];
+
+                          }];
+
+                    } else {
+                        [PsiFeedbackLogger errorWithType:AdManagerLogType
+                                                 message:@"mopubSDKConsentDialogLoadFailed"
+                                                         object:error];
+                    }
+                }];
+            } else {
+
+                // MoPub consent is already given or is not needed.
+                // We can start loading ads.
+                [self.mopubSDKInitialized sendNext:RACUnit.defaultUnit];
+            }
         }];
     }
 
@@ -356,51 +385,57 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
           distinctUntilChanged];
 
         // The underlying multicast signal emits AppEvent objects. The objects are not necessarily unique.
-        self.appEvents = [[[[RACSignal
-          // Merge all "trigger" signals that cause the last AppEvent from `combinedEventSignals` to be emitted again.
-          // NOTE: - It should be guaranteed that SourceEventStarted is always the first emission and that it will
-          //         be always after the Ad SDKs have been initialized.
-          //       - It should also be guaranteed that signals in the merge below are not the same as the signals
-          //         in the `combinedEventSignals`. Otherwise we would have subscribed to the same signal twice,
-          //         and since we're using the -combineLatestWith: operator, we will get the same emission repeated.
-          merge:@[
-            [self.mopubSDKInitialized mapReplace:@(SourceEventStarted)],
-            [appWillEnterForegroundSignal mapReplace:@(SourceEventAppForegrounded)]
-          ]]
-          combineLatestWith:combinedEventSignals]
-          combinePreviousWithStart:nil reduce:^AppEvent *(RACTwoTuple<NSNumber *, AppEvent *> *_Nullable prev,
-            RACTwoTuple<NSNumber *, AppEvent *> *_Nonnull curr) {
+        // NOTE: mopubSDKInitialized should only emit RACUnit once.
+        self.appEvents = [[self.mopubSDKInitialized flattenMap:^RACSignal *(RACUnit *x) {
 
-              // Infers the source signal of the current emission.
-              //
-              // Events emitted by the signal that we combine with (`combinedEventSignals`) are unique,
-              // and therefore the AppEvent state that is different between `prev` and `curr` is also the source.
-              // If `prev` and `curr` AppEvent are the same, then the "trigger" signal is one of the merged signals
-              // upstream.
+            // MoPub SDK has been initialized.
+            [GADMobileAds configureWithApplicationID:@"ca-app-pub-1072041961750291~2085686375"];
 
-              AppEvent *_Nullable pe = prev.second;
-              AppEvent *_Nonnull ce = curr.second;
+            return [[[RACSignal
+              // Merge all "trigger" signals that cause the last AppEvent from `combinedEventSignals` to be emitted again.
+              // NOTE: - It should be guaranteed that SourceEventStarted is always the first emission and that it will
+              //         be always after the Ad SDKs have been initialized.
+              //       - It should also be guaranteed that signals in the merge below are not the same as the signals
+              //         in the `combinedEventSignals`. Otherwise we would have subscribed to the same signal twice,
+              //         and since we're using the -combineLatestWith: operator, we will get the same emission repeated.
+              merge:@[
+                [RACSignal return:@(SourceEventStarted)],
+                [appWillEnterForegroundSignal mapReplace:@(SourceEventAppForegrounded)]
+              ]]
+              combineLatestWith:combinedEventSignals]
+              combinePreviousWithStart:nil reduce:^AppEvent *(RACTwoTuple<NSNumber *, AppEvent *> *_Nullable prev, RACTwoTuple<NSNumber *, AppEvent *> *_Nonnull curr) {
 
-              if (pe == nil || [pe isEqual:ce]) {
-                  // Event source is not from the change in AppEvent properties.
-                  ce.source = (SourceEvent) [curr.first integerValue];
-              } else {
+                  // Infers the source signal of the current emission.
+                  //
+                  // Events emitted by the signal that we combine with (`combinedEventSignals`) are unique,
+                  // and therefore the AppEvent state that is different between `prev` and `curr` is also the source.
+                  // If `prev` and `curr` AppEvent are the same, then the "trigger" signal is one of the merged signals
+                  // upstream.
 
-                  // Infer event source based on changes in values.
-                  if (pe.networkIsReachable != ce.networkIsReachable) {
-                      ce.source = SourceEventReachability;
+                  AppEvent *_Nullable pe = prev.second;
+                  AppEvent *_Nonnull ce = curr.second;
 
-                  } else if (pe.subscriptionIsActive != ce.subscriptionIsActive) {
-                      ce.source = SourceEventSubscription;
+                  if (pe == nil || [pe isEqual:ce]) {
+                      // Event source is not from the change in AppEvent properties.
+                      ce.source = (SourceEvent) [curr.first integerValue];
+                  } else {
 
-                  } else if (pe.tunnelState != ce.tunnelState) {
-                      ce.source = SourceEventTunneled;
+                      // Infer event source based on changes in values.
+                      if (pe.networkIsReachable != ce.networkIsReachable) {
+                          ce.source = SourceEventReachability;
+
+                      } else if (pe.subscriptionIsActive != ce.subscriptionIsActive) {
+                          ce.source = SourceEventSubscription;
+
+                      } else if (pe.tunnelState != ce.tunnelState) {
+                          ce.source = SourceEventTunneled;
+                      }
                   }
-              }
 
-              return ce;
-          }]
-          multicast:[RACReplaySubject replaySubjectWithCapacity:1]];
+                  return ce;
+            }];
+        }]
+        multicast:[RACReplaySubject replaySubjectWithCapacity:1]];
 
 #if DEBUG
         [self.compoundDisposable addDisposable:[self.appEvents.signal subscribeNext:^(AppEvent * _Nullable x) {
