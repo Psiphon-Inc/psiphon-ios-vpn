@@ -256,16 +256,15 @@
                         [subscriber sendCompleted];
                     }];
                 }]];
+
+                [compoundDisposable addDisposable:[RACDisposable disposableWithBlock:^{
+                    // Subscription has been disposed of, call completionHandler to remove AsyncOperation
+                    // from `operationQueue`.
+                    completionHandler(nil);
+                }]];
+
             }]];
-
-
         }];
-
-        [compoundDisposable addDisposable:[RACDisposable disposableWithBlock:^{
-            if (![operation isFinished]) {
-                [operation cancel];
-            }
-        }]];
 
         operation.name = name;
 
