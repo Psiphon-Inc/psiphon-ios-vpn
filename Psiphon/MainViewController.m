@@ -1298,12 +1298,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                 break;
             case AdPresentationDidDisappear:
                 LOG_DEBUG(@"rewarded video AdPresentationDidDisappear");
-#if DEBUG
-                const int networkRetryCount = 3;
-#else
-                const int networkRetryCount = 6;
-#endif
-                [[PsiCashClient sharedInstance] pollForBalanceDeltaWithMaxRetries:networkRetryCount andTimeBetweenRetries:5];
+                [[PsiCashClient sharedInstance] pollForBalanceDeltaWithMaxRetries:30 andTimeBetweenRetries:1.0];
                 break;
             case AdPresentationErrorCustomDataNotSet:
                 LOG_DEBUG(@"rewarded video AdPresentationErrorCustomDataNotSet");
