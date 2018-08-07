@@ -24,8 +24,8 @@
  *   should be performed serially. (That is the sequence of sub-operations in two different larger operations
  *   performed on the VPN configuration shouldn't interleave.)
  *
- *   `unsafeSubscribeOnSerialQueue` allows us to do that, with the caveat that when this signal is subscribed to,
- *   no other signal that's also subscribed on with `unsafeSubscribeOnSerialQueue` should be subscribed to.
+ *   `unsafeSubscribeOnSerialQueue` allows us to do that, with the caveat that if used improperly can easily
+ *   result in dead-locks. Check the operator's documentation for more details.
  *
  */
 
@@ -757,7 +757,7 @@ UserDefaultsKey const VPNManagerConnectOnDemandUntilNextStartBoolKey = @"VPNMana
 
 #pragma mark - Extension Query
 
-// isPsiphonTunnelConnected returns a signal that when subscribed to sends "isProviderZombie" query to the extension
+// isExtensionZombie returns a signal that when subscribed to sends "isProviderZombie" query to the extension
 // and then emits boolean response as NSNumber, or the signal completes immediately if extension is not active.
 // Note: the returned signal emits FALSE if the extension returns empty response.
 - (RACSignal<NSNumber *> *)isExtensionZombie {

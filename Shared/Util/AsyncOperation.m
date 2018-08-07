@@ -159,4 +159,9 @@ PsiFeedbackLogType const AsyncOperationLogType = @"AsyncOperation";
     self.finished = TRUE;
 }
 
+- (void)cancel {
+    NSString *reason = @"AsyncOperation does not support cancel.";
+    @throw [NSException exceptionWithName:NSInternalInconsistencyException reason:reason userInfo:nil];
+}
+
 @end
