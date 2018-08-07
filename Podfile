@@ -17,6 +17,7 @@ target 'Psiphon' do
   pod 'ReactiveObjC', :git => "https://github.com/Psiphon-Inc/ReactiveObjC.git", :commit => '97d6af3'
   pod 'mopub-ios-sdk', '5.2.0'
   pod 'MoPub-AdMob-Adapters'
+  pod 'PersonalizedAdConsent'
   pod 'PureLayout', '3.0.2'
   pod 'MBProgressHUD', '~> 1.1.0'
   pod 'CustomIOSAlertView', '~> 0.9.5'
