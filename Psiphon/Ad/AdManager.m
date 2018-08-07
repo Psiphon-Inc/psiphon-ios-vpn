@@ -41,8 +41,10 @@
 #import "RACSubscriptingAssignmentTrampoline.h"
 #import "RACSignal+Operations2.h"
 #import "Asserts.h"
+#import "AdMobConsent.h"
 #import "NSError+Convenience.h"
-#import <mopub-ios-sdk/MPConsentManager.h>
+#import "MoPubConsent.h"
+#import <PersonalizedAdConsent/PersonalizedAdConsent.h>
 @import GoogleMobileAds;
 
 
@@ -271,53 +273,51 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
 
     // Initializes the Ads SDKs.
     {
-        // Implementation follows these guides:
-        //  - https://developers.mopub.com/docs/ios/initialization/
-        //  - https://developers.mopub.com/docs/mediation/networks/google/
+        [AdMobConsent collectConsentForPublisherID:@"pub-1072041961750291"
+           withCompletionHandler:^(NSError *error, PACConsentStatus consentStatus) {
 
-        MPGoogleGlobalMediationSettings *googleMediationSettings = [[MPGoogleGlobalMediationSettings alloc] init];
+            if (error) {
+                // Stop ad initialization and don't load any ads.
+                 return;
+            }
 
-        // MPMoPubConfiguration should be instantiated with any valid ad unit ID from the app.
-        MPMoPubConfiguration *sdkConfig = [[MPMoPubConfiguration alloc]
-          initWithAdUnitIdForAppInitialization:UntunneledInterstitialAdUnitID];
+            // Implementation follows these guides:
+            //  - https://developers.mopub.com/docs/ios/initialization/
+            //  - https://developers.mopub.com/docs/mediation/networks/google/
 
-        sdkConfig.globalMediationSettings = @[googleMediationSettings];
+            // Forwards user's ad preference to AdMob.
+            MPGoogleGlobalMediationSettings *googleMediationSettings = [[MPGoogleGlobalMediationSettings alloc] init];
+            googleMediationSettings.npa = (consentStatus == PACConsentStatusNonPersonalized) ? @"1" : @"0";
 
-        // Initializes the MoPub SDK and then checks GDPR applicability and show the consent modal screen
-        // if necessary.
-        [[MoPub sharedInstance] initializeSdkWithConfiguration:sdkConfig completion:^{
-            LOG_DEBUG(@"MoPub SDK initialized");
+            // MPMoPubConfiguration should be instantiated with any valid ad unit ID from the app.
+            MPMoPubConfiguration *sdkConfig = [[MPMoPubConfiguration alloc]
+              initWithAdUnitIdForAppInitialization:UntunneledInterstitialAdUnitID];
 
-            // Concurrency Note: MoPub invokes the completion handler on a concurrent background queue.
-            dispatch_async_main(^{
-                if ([MoPub sharedInstance].shouldShowConsentDialog) {
-                    [[MoPub sharedInstance] loadConsentDialogWithCompletion:^(NSError *error) {
-                        if (error == nil) {
-                            [[MoPub sharedInstance]
-                              showConsentDialogFromViewController:[AppDelegate getTopMostViewController]
-                                                          didShow:nil
-                                                       didDismiss:^{
+            sdkConfig.globalMediationSettings = @[googleMediationSettings];
 
-                                                           // MoPub consent dialog was presented successfully and dismissed.
-                                                           // We can start loading ads.
-                                                           [self.mopubSDKInitialized sendNext:RACUnit.defaultUnit];
+            // Initializes the MoPub SDK and then checks GDPR applicability and show the consent modal screen
+            // if necessary.
+            [[MoPub sharedInstance] initializeSdkWithConfiguration:sdkConfig completion:^{
+                LOG_DEBUG(@"MoPub SDK initialized");
 
-                                                       }];
-
-                        } else {
-                            [PsiFeedbackLogger errorWithType:AdManagerLogType
-                                                     message:@"mopubSDKConsentDialogLoadFailed"
-                                                      object:error];
+                // Concurrency Note: MoPub invokes the completion handler on a concurrent background queue.
+                dispatch_async_main(^{
+                    [MoPubConsent collectConsentWithCompletionHandler:^(NSError *error) {
+                        if (error) {
+                            // Stop ad initialization and don't load any ads.
+                            return;
                         }
-                    }];
-                } else {
 
-                    // MoPub consent is already given or is not needed.
-                    // We can start loading ads.
-                    [self.mopubSDKInitialized sendNext:RACUnit.defaultUnit];
-                }
-            });
+                        // MoPub consent dialog was presented successfully and dismissed
+                        // or consent is already given or is not needed.
+                        // We can start loading ads.
+                        [self.mopubSDKInitialized sendNext:RACUnit.defaultUnit];
+                    }];
+                });
+
+            }];
         }];
+
     }
 
     // Main signals and subscription.
