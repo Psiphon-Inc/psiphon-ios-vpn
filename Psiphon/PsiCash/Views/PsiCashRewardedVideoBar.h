@@ -17,14 +17,9 @@
  *
  */
 
-#import <Foundation/Foundation.h>
+#import <UIKit/UIKit.h>
+#import "PsiCashClientModel.h"
 
-@interface NSError (Convenience)
-
-+ (instancetype)errorWithDomain:(NSErrorDomain)domain code:(NSInteger)code;
-
-+ (instancetype)errorWithDomain:(NSErrorDomain)domain code:(NSInteger)code andLocalizedDescription:(NSString*)localizedDescription;
-
-+ (instancetype)errorWithDomain:(NSErrorDomain)domain code:(NSInteger)code withUnderlyingError:(NSError *)error;
-
+@interface PsiCashRewardedVideoBar : UIButton
+- (void)videoReady:(BOOL)ready;
 @end

@@ -29,7 +29,13 @@ NS_ASSUME_NONNULL_BEGIN
  * This category provides convenience operation methods not found
  * in the ReactiveObjC library.
  */
-@interface RACSignal (Operations2)
+@interface RACSignal<__covariant ValueType> (Operations2)
+
+/**
+ * emitOnly only emits `object` when subscribed to and does not terminate.
+ * This has the same effect as `[[RACSignal return:object] concat:[RACSignal never]]`.
+ */
++ (RACSignal *)emitOnly:(id)object;
 
 /**
  * Returns a signal that calls provided selector on the given object when subscribed to and passes a callback block
@@ -144,6 +150,14 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (RACSignal *)unsafeSubscribeOnSerialQueue:(UnionSerialQueue *)serialQueue
                                    withName:(NSString *)name;
+
+/**
+ * Combines the emission from receiving signal with the latest emission from provided `signal`.
+ * Emissions from the receiving signal are dropped as long as `signal` has not emitted any values.
+ *
+ * @note This operator subscribes to `signal` first before subscribing to the receiving signal.
+ */
+- (RACSignal<RACTwoTuple<ValueType, id> *> *)withLatestFrom:(RACSignal *)signal;
 
 @end
 

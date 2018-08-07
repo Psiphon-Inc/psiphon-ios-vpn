@@ -3,9 +3,6 @@
 /* Title of the section in the subscription dialog that shows currently active subscription information. */
 "ACTIVE_SUBSCRIPTION_SECTION_TITLE" = "You're subscribed!";
 
-/* Text for button that tell users there will by a short video ad. */
-"AD_LOADED" = "Watch a short video while we get ready to connect you";
-
 /* Text for app subtitle on main view. */
 "APP_SUB_TITLE_MAIN_VIEW" = "BEYOND BORDERS";
 

@@ -26,12 +26,19 @@
 #import "RACCompoundDisposable.h"
 #import "RACSequence.h"
 #import "Asserts.h"
-#import "Logging.h"
 #import "AsyncOperation.h"
 #import "RACTargetQueueScheduler.h"
+#import "RACTuple.h"
 #import "UnionSerialQueue.h"
 
 @implementation RACSignal (Operations2)
+
++ (RACSignal *)emitOnly:(id)object {
+    return [RACSignal createSignal:^RACDisposable *(id <RACSubscriber> subscriber) {
+        [subscriber sendNext:object];
+        return nil;
+    }];
+}
 
 + (RACSignal *)defer:(id)object selectorWithErrorCallback:(SEL)aSelector {
 
@@ -272,6 +279,48 @@
         [serialQueue.operationQueue addOperation:operation];
 
         return compoundDisposable;
+    }];
+}
+
+// `self` is the active signal, and `signal` is the passive signal.
+- (RACSignal *)withLatestFrom:(RACSignal *)signal {
+    NSCParameterAssert(signal != nil);
+
+    return [RACSignal createSignal:^RACDisposable *(id <RACSubscriber> subscriber) {
+        RACCompoundDisposable *disposable = [RACCompoundDisposable compoundDisposable];
+
+        __block id lastOtherValue = nil;
+
+        // The passive signal.
+        RACDisposable *otherDisposable = [signal subscribeNext:^(id x) {
+            @synchronized (disposable) {
+                lastOtherValue = x ?: RACTupleNil.tupleNil;
+            }
+        } error:^(NSError *error) {
+            [subscriber sendError:error];
+        } completed:^{
+            // Ignore completed event from the passive signal.
+        }];
+
+        [disposable addDisposable:otherDisposable];
+
+        // The active signal.
+        RACDisposable *selfDisposable = [self subscribeNext:^(id x) {
+            @synchronized (disposable) {
+                if (lastOtherValue == nil) return;
+                [subscriber sendNext:[RACTwoTuple pack:x :lastOtherValue]];
+            }
+        } error:^(NSError *error) {
+            [subscriber sendError:error];
+        } completed:^{
+            @synchronized (disposable) {
+                [subscriber sendCompleted];
+            }
+        }];
+
+        [disposable addDisposable:selfDisposable];
+
+        return disposable;
     }];
 }
 

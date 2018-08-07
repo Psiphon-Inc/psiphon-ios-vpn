@@ -54,9 +54,7 @@
 #import "Asserts.h"
 #import "PrivacyPolicyViewController.h"
 #import "UIColor+Additions.h"
-
-UserDefaultsKey const PrivacyPolicyAcceptedBookKey = @"PrivacyPolicy.AcceptedBoolKey";
-
+#import "PsiCashRewardedVideoBar.h"
 #import "PsiCashBalanceView.h"
 #import "PsiCashClient.h"
 #import "PsiCashSpeedBoostMeterView.h"
@@ -64,6 +62,9 @@ UserDefaultsKey const PrivacyPolicyAcceptedBookKey = @"PrivacyPolicy.AcceptedBoo
 #import "UILabel+GetLabelHeight.h"
 #import "StarView.h"
 
+PsiFeedbackLogType const RewardedVideoLogType = @"RewardedVideo";
+
+UserDefaultsKey const PrivacyPolicyAcceptedBookKey = @"PrivacyPolicy.AcceptedBoolKey";
 UserDefaultsKey const PsiCashHasBeenOnboardedBoolKey = @"PsiCash.HasBeenOnboarded";
 
 static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSString *b) {
@@ -87,7 +88,6 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     UILabel *appSubTitleLabel;
     UILabel *statusLabel;
     UILabel *versionLabel;
-    UILabel *adLabel;
     UIButton *subscriptionButton;
     UILabel *regionButtonHeader;
     UIButton *regionButton;
@@ -118,12 +118,17 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     FeedbackManager *feedbackManager;
 
     // PsiCash
+    NSArray<StarView*> *stars;
+    NSLayoutConstraint *psiCashViewHeight;
+    NSLayoutConstraint *psiCashRewardedVideoBarHeight;
     PsiCashPurchaseAlertView *alertView;
     PsiCashClientModel *model;
     PsiCashBalanceWithSpeedBoostMeter *psiCashView;
-    NSLayoutConstraint *psiCashViewHeight;
+    PsiCashRewardedVideoBar * psiCashRewardedVideoBar;
     RACDisposable *psiCashViewUpdates;
-    NSArray<StarView*> *stars;
+    RACDisposable *rewardedVideoIsReadyDisposable;
+    RACDisposable *showRewardedVideoDisposable;
+
 }
 
 // Force portrait orientation
@@ -182,7 +187,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     [self addAppSubTitleLabel];
     [self addSubscriptionButton];
     [self addPsiCashView];
-    [self addAdLabel];
+    [self addPsiCashRewardedVideoBar];
     [self addStatusLabel];
     [self addVersionLabel];
     [self setupLayoutGuides];
@@ -215,6 +220,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 
           // Notify SettingsViewController that the state has changed.
           // Note that this constant is used PsiphonClientCommonLibrary, and cannot simply be replaced by a RACSignal.
+          // TODO: replace this notification with the appropriate signal.
           [[NSNotificationCenter defaultCenter] postNotificationName:kPsiphonConnectionStateNotification object:nil];
 
       }];
@@ -277,13 +283,12 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     __block RACDisposable *disposable = [[AppDelegate sharedAppDelegate].subscriptionStatus
       subscribeNext:^(NSNumber *value) {
           UserSubscriptionStatus s = (UserSubscriptionStatus) [value integerValue];
-          
+
           if (s == UserSubscriptionUnknown) {
               return;
           }
 
           subscriptionButton.hidden = (s == UserSubscriptionActive);
-          adLabel.hidden = (s == UserSubscriptionActive) || ![self.adManager untunneledInterstitialIsReady];
           subscriptionButtonTopConstraint.active = !subscriptionButton.hidden;
           bottomBarTopConstraint.active = subscriptionButton.hidden;
 
@@ -297,12 +302,6 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
       }];
 
     [self.compoundDisposable addDisposable:disposable];
-
-    // Observer AdManager notifications
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(onAdStatusDidChange)
-                                                 name:AdManagerAdsDidLoadNotification
-                                               object:self.adManager];
 }
 
 - (void)viewDidAppear:(BOOL)animated {
@@ -332,11 +331,6 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 - (void)viewWillAppear:(BOOL)animated {
     LOG_DEBUG();
     [super viewWillAppear:animated];
-    
-    // Listen for VPN status changes from VPNManager.
-    
-    // Sync UI with the VPN state
-    [self onAdStatusDidChange];
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
@@ -381,10 +375,6 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 
 #pragma mark - UI callbacks
 
-- (void)onAdStatusDidChange{
-    adLabel.hidden = ![self.adManager untunneledInterstitialIsReady];
-}
-
 - (void)onStartStopTap:(UIButton *)sender {
 
     __weak MainViewController *weakSelf = self;
@@ -414,87 +404,101 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     }];
 
     // signal emits a single two tuple (isVPNActive, connectOnDemandEnabled).
-    __block RACDisposable *disposable = [[[[privacyPolicyAccepted
-      flattenMap:^RACSignal *(RACUnit *x) {
-        return [weakSelf.vpnManager isVPNActive];
+    __block RACDisposable *disposable = [[[[[privacyPolicyAccepted
+      flattenMap:^RACSignal<RACTwoTuple <NSNumber *, NSNumber *> *> *(RACUnit *x) {
+          return [weakSelf.vpnManager isVPNActive];
       }]
-      flattenMap:^RACSignal<NSNumber *> *(RACTwoTuple<NSNumber *, NSNumber *> *value) {
+      flattenMap:^RACSignal<RACTwoTuple<NSNumber *, NSNumber *> *> *(RACTwoTuple<NSNumber *, NSNumber *> *value) {
+          // Returned signal emits tuple (isActive, isConnectOnDemandEnabled).
 
           // If VPN is already running, checks if ConnectOnDemand is enabled, otherwise returns the result immediately.
           BOOL isActive = [value.first boolValue];
           if (isActive) {
               return [[weakSelf.vpnManager isConnectOnDemandEnabled]
-                      map:^id(NSNumber *connectOnDemandEnabled) {
+                      map:^RACTwoTuple<NSNumber *, NSNumber *> *(NSNumber *connectOnDemandEnabled) {
                           return [RACTwoTuple pack:@(TRUE) :connectOnDemandEnabled];
                       }];
           } else {
               return [RACSignal return:[RACTwoTuple pack:@(FALSE) :@(FALSE)]];
           }
       }]
-      deliverOnMainThread]
-      subscribeNext:^(RACTwoTuple<NSNumber *, NSNumber *> *result) {
+      flattenMap:^RACSignal<NSString *> *(RACTwoTuple<NSNumber *, NSNumber *> *value) {
+          BOOL vpnActive = [value.first boolValue];
+          BOOL connectOnDemandEnabled = [value.second boolValue];
 
-          // Unpacks the tuple.
-          BOOL isVPNActive = [result.first boolValue];
-          BOOL connectOnDemandEnabled = [result.second boolValue];
-
-          if (!isVPNActive) {
+          if (!vpnActive) {
               // Alerts the user if there is no internet connection.
               Reachability *reachability = [Reachability reachabilityForInternetConnection];
               if ([reachability currentReachabilityStatus] == NotReachable) {
                   [weakSelf displayAlertNoInternet];
+                  return [RACSignal empty];
               } else {
-                  [weakSelf.adManager showUntunneledInterstitial];
+                  return [[[weakSelf.adManager presentInterstitialOnViewController:weakSelf]
+                    filter:^BOOL(NSNumber *value) {
+                        AdPresentation ap = (AdPresentation) [value integerValue];
+                        return (ap != AdPresentationWillAppear) &&
+                          (ap != AdPresentationDidAppear) &&
+                          (ap != AdPresentationWillDisappear);
+                    }] mapReplace:@"startTunnel"];
               }
-
           } else {
-
-              if (!connectOnDemandEnabled) {
-
-                  [weakSelf.vpnManager stopVPN];
-
+              if (connectOnDemandEnabled) {
+                  return [RACSignal return:@"connectOnDemandAlert"];
               } else {
-                  // Alert the user that Connect On Demand is enabled, and if they
-                  // would like Connect On Demand to be disabled, and the extension to be stopped.
-                  NSString *alertTitle = NSLocalizedStringWithDefaultValue(@"CONNECT_ON_DEMAND_ALERT_TITLE", nil, [NSBundle mainBundle], @"Auto-start VPN is enabled", @"Alert dialog title informing user that 'Auto-start VPN' feature is enabled");
-                  NSString *alertMessage = NSLocalizedStringWithDefaultValue(@"CONNECT_ON_DEMAND_ALERT_BODY", nil, [NSBundle mainBundle], @"\"Auto-start VPN\" will be temporarily disabled until the next time Psiphon VPN is started.", "Alert dialog body informing the user that the 'Auto-start VPN on demand' feature will be disabled and that the VPN cannot be stopped.");
-
-                  UIAlertController *alert = [UIAlertController alertControllerWithTitle:alertTitle
-                                                                                 message:alertMessage
-                                                                          preferredStyle:UIAlertControllerStyleAlert];
-
-                  UIAlertAction *stopUntilNextStartAction = [UIAlertAction
-                    actionWithTitle:NSLocalizedStringWithDefaultValue(@"OK_BUTTON", nil, [NSBundle mainBundle], @"OK", @"OK button title")
-                    style:UIAlertActionStyleDefault
-                    handler:^(UIAlertAction *action) {
-
-                        // Disable "Connect On Demand" and stop the VPN.
-                        [[NSUserDefaults standardUserDefaults] setBool:TRUE
-                                                                forKey:VPNManagerConnectOnDemandUntilNextStartBoolKey];
-
-                        __block RACDisposable *disposable = [[weakSelf.vpnManager setConnectOnDemandEnabled:FALSE]
-                          subscribeNext:^(NSNumber *x) {
-                              // Stops the VPN only after ConnectOnDemand is disabled.
-                              [weakSelf.vpnManager stopVPN];
-                          } error:^(NSError *error) {
-                              [weakSelf.compoundDisposable removeDisposable:disposable];
-                          }   completed:^{
-                              [weakSelf.compoundDisposable removeDisposable:disposable];
-                          }];
-
-                        [weakSelf.compoundDisposable addDisposable:disposable];
-                    }];
-
-                  [alert addAction:stopUntilNextStartAction];
-                  [self presentViewController:alert animated:TRUE completion:nil];
+                  return [RACSignal return:@"stopVPN"];
               }
-
-              [self removePulsingHaloLayer];
           }
+
+      }]
+      deliverOnMainThread]
+      subscribeNext:^(NSString *command) {
+
+        if ([@"startTunnel" isEqualToString:command]) {
+            [weakSelf.vpnManager startTunnel];
+
+        } else if ([@"stopVPN" isEqualToString:command]) {
+           [weakSelf.vpnManager stopVPN];
+
+        } else if ([@"connectOnDemandAlert" isEqualToString:command]) {
+            // Alert the user that Connect On Demand is enabled, and if they
+            // would like Connect On Demand to be disabled, and the extension to be stopped.
+            NSString *alertTitle = NSLocalizedStringWithDefaultValue(@"CONNECT_ON_DEMAND_ALERT_TITLE", nil, [NSBundle mainBundle], @"Auto-start VPN is enabled", @"Alert dialog title informing user that 'Auto-start VPN' feature is enabled");
+            NSString *alertMessage = NSLocalizedStringWithDefaultValue(@"CONNECT_ON_DEMAND_ALERT_BODY", nil, [NSBundle mainBundle], @"\"Auto-start VPN\" will be temporarily disabled until the next time Psiphon VPN is started.", "Alert dialog body informing the user that the 'Auto-start VPN on demand' feature will be disabled and that the VPN cannot be stopped.");
+
+            UIAlertController *alert = [UIAlertController alertControllerWithTitle:alertTitle
+                                                                           message:alertMessage
+                                                                    preferredStyle:UIAlertControllerStyleAlert];
+
+            UIAlertAction *stopUntilNextStartAction = [UIAlertAction
+              actionWithTitle:NSLocalizedStringWithDefaultValue(@"OK_BUTTON", nil, [NSBundle mainBundle], @"OK", @"OK button title")
+                        style:UIAlertActionStyleDefault
+                      handler:^(UIAlertAction *action) {
+
+                          // Disable "Connect On Demand" and stop the VPN.
+                          [[NSUserDefaults standardUserDefaults] setBool:TRUE
+                                                                  forKey:VPNManagerConnectOnDemandUntilNextStartBoolKey];
+
+                          __block RACDisposable *disposable = [[weakSelf.vpnManager setConnectOnDemandEnabled:FALSE]
+                            subscribeNext:^(NSNumber *x) {
+                                // Stops the VPN only after ConnectOnDemand is disabled.
+                                [weakSelf.vpnManager stopVPN];
+                            } error:^(NSError *error) {
+                                [weakSelf.compoundDisposable removeDisposable:disposable];
+                            }   completed:^{
+                                [weakSelf.compoundDisposable removeDisposable:disposable];
+                            }];
+
+                          [weakSelf.compoundDisposable addDisposable:disposable];
+                      }];
+
+            [alert addAction:stopUntilNextStartAction];
+            [weakSelf presentViewController:alert animated:TRUE completion:nil];
+        }
 
     } error:^(NSError *error) {
         [weakSelf.compoundDisposable removeDisposable:disposable];
-    }   completed:^{
+    } completed:^{
+        [weakSelf removePulsingHaloLayer];
         [weakSelf.compoundDisposable removeDisposable:disposable];
     }];
     
@@ -739,34 +743,11 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     startButtonHeight.active = YES;
 }
 
-- (void)addAdLabel {
-    adLabel = [[UILabel alloc] init];
-    adLabel.translatesAutoresizingMaskIntoConstraints = NO;
-    adLabel.text = NSLocalizedStringWithDefaultValue(@"AD_LOADED", nil, [NSBundle mainBundle], @"Watch a short video while we get ready to connect you", @"Text for button that tell users there will by a short video ad.");
-    adLabel.textAlignment = NSTextAlignmentCenter;
-    adLabel.textColor = [UIColor lightGrayColor];
-    adLabel.numberOfLines = 0;
-    adLabel.adjustsFontSizeToFitWidth = YES;
-    UIFontDescriptor * fontD = [adLabel.font.fontDescriptor
-                                fontDescriptorWithSymbolicTraits:UIFontDescriptorTraitItalic];
-    adLabel.font = [UIFont fontWithDescriptor:fontD size:adLabel.font.pointSize - 1];
-    [self.view addSubview:adLabel];
-    if (![self.adManager untunneledInterstitialIsReady]){
-        adLabel.hidden = true;
-    }
-
-    // Setup autolayout
-    [adLabel.topAnchor constraintEqualToAnchor:psiCashView.bottomAnchor constant:0].active = YES;
-    [adLabel.bottomAnchor constraintEqualToAnchor:startStopButton.topAnchor constant:0].active = YES;
-    [adLabel.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor constant:15].active = YES;
-    [adLabel.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor constant:-15].active = YES;
-}
-
 - (void)addStatusLabel {
     statusLabel = [[UILabel alloc] init];
     statusLabel.translatesAutoresizingMaskIntoConstraints = NO;
     statusLabel.adjustsFontSizeToFitWidth = YES;
-    statusLabel.text = [self getVPNStatusDescription:(VPNStatus) self.vpnManager.lastTunnelStatus.first.integerValue];
+    statusLabel.text = [self getVPNStatusDescription:VPNStatusInvalid];
     statusLabel.textAlignment = NSTextAlignmentCenter;
     statusLabel.textColor = [UIColor whiteColor];
     statusLabel.font = [UIFont boldSystemFontOfSize:18.f];
@@ -988,19 +969,6 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     return YES;
 }
 
-- (NSArray<NSString*>*)hiddenSpecifierKeys {
-    
-    VPNStatus s = (VPNStatus) [[self.vpnManager.lastTunnelStatus first] integerValue];
-    
-    if (s == VPNStatusInvalid ||
-        s == VPNStatusDisconnected ||
-        s == VPNStatusDisconnecting ) {
-        return @[kForceReconnect, kForceReconnectFooter];
-    }
-    
-    return nil;
-}
-
 #pragma mark - Psiphon Settings
 
 - (void)notice:(NSString *)noticeJSON {
@@ -1110,50 +1078,11 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 
 #pragma mark - PsiCash
 
-#pragma mark - PsiCashPurchaseAlertViewDelegate protocol
-
-- (void)stateBecameStale {
-    [alertView close];
-    alertView = nil;
-}
-
-- (void)showPsiCashAlertView {
-    if (alertView != nil) {
-        [alertView close];
-        alertView = nil;
-    }
-
-    if (![model hasAuthPackage] || ![model.authPackage hasSpenderToken]) {
-        return;
-    } else if ([model hasActiveSpeedBoostPurchase]) {
-        alertView = [PsiCashPurchaseAlertView alreadySpeedBoostingAlert];
-    } else  if ([model hasPendingPurchase]) {
-        // (PsiCash 1.0): Do nothing
-        //alertView = [PsiCashPurchaseAlertView pendingPurchaseAlert];
-        return;
-    } else {
-        // Insufficient balance animation
-        CABasicAnimation *animation =
-        [CABasicAnimation animationWithKeyPath:@"position"];
-        [animation setDuration:0.075];
-        [animation setRepeatCount:3];
-        [animation setAutoreverses:YES];
-        [animation setFromValue:[NSValue valueWithCGPoint:
-                                 CGPointMake([psiCashView center].x - 20.0f, [psiCashView center].y)]];
-        [animation setToValue:[NSValue valueWithCGPoint:
-                               CGPointMake([psiCashView center].x + 20.0f, [psiCashView center].y)]];
-        [[psiCashView layer] addAnimation:animation forKey:@"position"];
-        return;
-    }
-
-    alertView.controllerDelegate = self;
-    [alertView bindWithModel:model];
-    [alertView show];
-}
+#pragma mark - PsiCash UI actions
 
 /**
-* Buy max num hours of Speed Boost that the user can afford if possible
-*/
+ * Buy max num hours of Speed Boost that the user can afford if possible
+ */
 - (void)instantMaxSpeedBoostPurchase {
     NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
 
@@ -1172,6 +1101,8 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     }
 }
 
+#pragma mark - PsiCash UI
+
 - (void)addPsiCashView {
     psiCashView = [[PsiCashBalanceWithSpeedBoostMeter alloc] init];
     psiCashView.translatesAutoresizingMaskIntoConstraints = NO;
@@ -1179,6 +1110,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 
     UITapGestureRecognizer *psiCashViewTap = [[UITapGestureRecognizer alloc]
                                                   initWithTarget:self action:@selector(instantMaxSpeedBoostPurchase)];
+
     psiCashViewTap.numberOfTapsRequired = 1;
     [psiCashView addGestureRecognizer:psiCashViewTap];
 
@@ -1260,18 +1192,6 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 #endif
 }
 
-- (void)setPsiCashContentHidden:(BOOL)hidden {
-    [self setStarsHidden:hidden];
-    psiCashView.hidden = hidden;
-    psiCashViewHeight.constant = hidden ? 0 : 100;
-}
-
-- (void)setStarsHidden:(BOOL)hidden {
-    for (StarView *star in stars) {
-        star.hidden = hidden;
-    }
-}
-
 - (void)highlightPsiCashViewWithStars {
     StarView *star1 = [[StarView alloc] init];
     [self.view addSubview:star1];
@@ -1307,6 +1227,145 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 
     stars = @[star1, star2, star3];
 }
+
+- (void)setPsiCashContentHidden:(BOOL)hidden {
+    [self setStarsHidden:hidden];
+    psiCashView.hidden = hidden;
+    psiCashViewHeight.constant = hidden ? 0 : 100;
+    psiCashRewardedVideoBar.hidden = hidden;
+    psiCashRewardedVideoBarHeight.constant = hidden ? 0 : 100;
+}
+
+- (void)setStarsHidden:(BOOL)hidden {
+    for (StarView *star in stars) {
+        star.hidden = hidden;
+    }
+}
+
+#pragma mark - PsiCash rewarded videos
+
+- (void)addPsiCashRewardedVideoBar {
+    psiCashRewardedVideoBar = [[PsiCashRewardedVideoBar alloc] init];
+    psiCashRewardedVideoBar.translatesAutoresizingMaskIntoConstraints = NO;
+    [self.view addSubview:psiCashRewardedVideoBar];
+
+    UITapGestureRecognizer *rewardedVideoBarTap = [[UITapGestureRecognizer alloc]
+                                                   initWithTarget:self action:@selector(showRewardedVideo)];
+
+    rewardedVideoBarTap.numberOfTapsRequired = 1;
+    [psiCashRewardedVideoBar addGestureRecognizer:rewardedVideoBarTap];
+
+    [psiCashRewardedVideoBar.centerXAnchor constraintEqualToAnchor:appSubTitleLabel.centerXAnchor].active = YES;
+    [psiCashRewardedVideoBar.topAnchor constraintEqualToAnchor:psiCashView.bottomAnchor].active = YES;
+    [psiCashRewardedVideoBar.widthAnchor constraintEqualToAnchor:self.view.widthAnchor multiplier:0.7].active = YES;
+    psiCashRewardedVideoBarHeight = [psiCashView.heightAnchor constraintEqualToConstant:100];
+    psiCashRewardedVideoBarHeight.active = YES;
+
+    // Signals
+
+    rewardedVideoIsReadyDisposable = [[[AdManager sharedInstance].rewardedVideoCanPresent
+        combineLatestWith:PsiCashClient.sharedInstance.clientModelSignal]
+        subscribeNext:^(RACTwoTuple<NSNumber *, PsiCashClientModel *> *x) {
+            BOOL ready = [[x first] boolValue];
+            PsiCashClientModel *model = [x second];
+
+            psiCashRewardedVideoBar.userInteractionEnabled = ready && [model.authPackage hasEarnerToken];
+            [psiCashRewardedVideoBar videoReady:ready && [model.authPackage hasEarnerToken]];
+    }];
+}
+
+- (void)showRewardedVideo {
+
+    LOG_DEBUG(@"rewarded video started");
+    [PsiFeedbackLogger infoWithType:RewardedVideoLogType message:@"started"];
+
+    [showRewardedVideoDisposable dispose];
+
+    RACSignal *showVideo = [self.adManager presentRewardedVideoOnViewController:self withCustomData:[[PsiCashClient sharedInstance] rewardedVideoCustomData]];
+
+    showRewardedVideoDisposable = [showVideo subscribeNext:^(NSNumber *x) {
+        AdPresentation ap = (AdPresentation) [x integerValue];
+
+        switch (ap) {
+            case AdPresentationWillAppear:
+                LOG_DEBUG(@"rewarded video AdPresentationWillAppear");
+                break;
+            case AdPresentationDidAppear:
+                LOG_DEBUG(@"rewarded video AdPresentationDidAppear");
+                break;
+            case AdPresentationWillDisappear:
+                LOG_DEBUG(@"rewarded video AdPresentationWillDisappear");
+                break;
+            case AdPresentationDidDisappear:
+                LOG_DEBUG(@"rewarded video AdPresentationDidDisappear");
+                [[PsiCashClient sharedInstance] pollForBalanceDeltaWithMaxRetries:30 andTimeBetweenRetries:1.0];
+                break;
+            case AdPresentationErrorCustomDataNotSet:
+                LOG_DEBUG(@"rewarded video AdPresentationErrorCustomDataNotSet");
+                break;
+            case AdPresentationErrorInappropriateState:
+                LOG_DEBUG(@"rewarded video AdPresentationErrorInappropriateState");
+                [PsiFeedbackLogger errorWithType:RewardedVideoLogType message:@"AdPresentationErrorInappropriateState"];
+                break;
+            case AdPresentationErrorNoAdsLoaded:
+                LOG_DEBUG(@"rewarded video AdPresentationErrorNoAdsLoaded");
+                [PsiFeedbackLogger errorWithType:RewardedVideoLogType message:@"AdPresentationErrorNoAdsLoaded"];
+                break;
+            case AdPresentationErrorFailedToPlay:
+                LOG_DEBUG(@"rewarded video AdPresentationErrorFailedToPlay");
+                [PsiFeedbackLogger errorWithType:RewardedVideoLogType message:@"AdPresentationErrorFailedToPlay"];
+                break;
+        }
+
+    } error:^(NSError *error) {
+        [PsiFeedbackLogger errorWithType:RewardedVideoLogType message:@"Error with rewarded video" object:error];
+    } completed:^{
+        LOG_DEBUG(@"rewarded video completed");
+        [PsiFeedbackLogger infoWithType:RewardedVideoLogType message:@"completed"];
+    }];
+}
+
+#pragma mark - PsiCashPurchaseAlertViewDelegate protocol
+
+- (void)stateBecameStale {
+    [alertView close];
+    alertView = nil;
+}
+
+- (void)showPsiCashAlertView {
+    if (alertView != nil) {
+        [alertView close];
+        alertView = nil;
+    }
+
+    if (![model hasAuthPackage] || ![model.authPackage hasSpenderToken]) {
+        return;
+    } else if ([model hasActiveSpeedBoostPurchase]) {
+        alertView = [PsiCashPurchaseAlertView alreadySpeedBoostingAlert];
+    } else  if ([model hasPendingPurchase]) {
+        // (PsiCash 1.0): Do nothing
+        //alertView = [PsiCashPurchaseAlertView pendingPurchaseAlert];
+        return;
+    } else {
+        // Insufficient balance animation
+        CABasicAnimation *animation =
+        [CABasicAnimation animationWithKeyPath:@"position"];
+        [animation setDuration:0.075];
+        [animation setRepeatCount:3];
+        [animation setAutoreverses:YES];
+        [animation setFromValue:[NSValue valueWithCGPoint:
+                                 CGPointMake([psiCashView center].x - 20.0f, [psiCashView center].y)]];
+        [animation setToValue:[NSValue valueWithCGPoint:
+                               CGPointMake([psiCashView center].x + 20.0f, [psiCashView center].y)]];
+        [[psiCashView layer] addAnimation:animation forKey:@"position"];
+        return;
+    }
+
+    alertView.controllerDelegate = self;
+    [alertView bindWithModel:model];
+    [alertView show];
+}
+
 
 #pragma mark - PsiCashOnboardingViewControllerDelegate protocol implementation
 
