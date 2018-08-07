@@ -1,16 +1,19 @@
 PODS:
   - CustomIOSAlertView (0.9.5)
-  - Google-Mobile-Ads-SDK (7.25.0)
+  - Google-Mobile-Ads-SDK (7.31.0)
   - InAppSettingsKit (2.9.4)
   - MBProgressHUD (1.1.0)
-  - mopub-ios-sdk (4.18.0):
-    - mopub-ios-sdk/MoPubSDK (= 4.18.0)
-  - mopub-ios-sdk/Avid (4.18.0):
+  - MoPub-AdMob-Adapters (7.31.0.0):
+    - Google-Mobile-Ads-SDK (= 7.31.0)
+    - mopub-ios-sdk (~> 5.0)
+  - mopub-ios-sdk (5.2.0):
+    - mopub-ios-sdk/MoPubSDK (= 5.2.0)
+  - mopub-ios-sdk/Avid (5.2.0):
     - mopub-ios-sdk/Core
-  - mopub-ios-sdk/Core (4.18.0)
-  - mopub-ios-sdk/Moat (4.18.0):
+  - mopub-ios-sdk/Core (5.2.0)
+  - mopub-ios-sdk/Moat (5.2.0):
     - mopub-ios-sdk/Core
-  - mopub-ios-sdk/MoPubSDK (4.18.0):
+  - mopub-ios-sdk/MoPubSDK (5.2.0):
     - mopub-ios-sdk/Avid
     - mopub-ios-sdk/Core
     - mopub-ios-sdk/Moat
@@ -18,18 +21,16 @@ PODS:
     - InAppSettingsKit
   - PureLayout (3.0.2)
   - ReactiveObjC (3.1.0)
-  - VungleSDK-iOS (5.3.0)
 
 DEPENDENCIES:
   - CustomIOSAlertView (~> 0.9.5)
-  - Google-Mobile-Ads-SDK (= 7.25.0)
   - InAppSettingsKit (from `https://github.com/Psiphon-Inc/InAppSettingsKit.git`, commit `598c498`)
   - MBProgressHUD (~> 1.1.0)
-  - mopub-ios-sdk (= 4.18.0)
+  - MoPub-AdMob-Adapters
+  - mopub-ios-sdk (= 5.2.0)
   - PsiphonClientCommonLibrary (from `https://github.com/Psiphon-Inc/psiphon-ios-client-common-library.git`, commit `9404b40`)
   - PureLayout (= 3.0.2)
-  - ReactiveObjC (from `https://github.com/Psiphon-Inc/ReactiveObjC.git`, commit `b2ac770`)
-  - VungleSDK-iOS (= 5.3.0)
+  - ReactiveObjC (from `https://github.com/Psiphon-Inc/ReactiveObjC.git`, commit `97d6af3`)
 
 EXTERNAL SOURCES:
   InAppSettingsKit:
@@ -39,7 +40,7 @@ EXTERNAL SOURCES:
     :commit: 9404b40
     :git: https://github.com/Psiphon-Inc/psiphon-ios-client-common-library.git
   ReactiveObjC:
-    :commit: b2ac770
+    :commit: 97d6af3
     :git: https://github.com/Psiphon-Inc/ReactiveObjC.git
 
 CHECKOUT OPTIONS:
@@ -50,20 +51,20 @@ CHECKOUT OPTIONS:
     :commit: 9404b40
     :git: https://github.com/Psiphon-Inc/psiphon-ios-client-common-library.git
   ReactiveObjC:
-    :commit: b2ac770
+    :commit: 97d6af3
     :git: https://github.com/Psiphon-Inc/ReactiveObjC.git
 
 SPEC CHECKSUMS:
   CustomIOSAlertView: cc4fa8e36219be3fd5ebcd40789f5b4aaae0f38e
-  Google-Mobile-Ads-SDK: 113804f266381a30f982ad3c18063d4e0155414f
+  Google-Mobile-Ads-SDK: 6e529e748b45507a2ca904e0b5a52669ba3920c4
   InAppSettingsKit: 567ef538698cd6cf3afb9c5529b89a8936fdacb5
   MBProgressHUD: e7baa36a220447d8aeb12769bf0585582f3866d9
-  mopub-ios-sdk: 043a81e7e3ccd2b888fec35880b13e2876c16ff3
+  MoPub-AdMob-Adapters: a395cc1a96d4aa826ba76963a102cbcd4150e1ae
+  mopub-ios-sdk: 2b14db9b687a8052fdc42f727f9553baac13507b
   PsiphonClientCommonLibrary: e03d3547fc8208bdfc7718e4dd7f153665193927
   PureLayout: 4d550abe49a94f24c2808b9b95db9131685fe4cd
   ReactiveObjC: 2a38ea15335de4119d8b17caf1db1484f61db902
-  VungleSDK-iOS: af3aa92d0f4a923505a9416646ffef5250592150
 
-PODFILE CHECKSUM: d6bc376cff3724df0fea726051c628481131740a
+PODFILE CHECKSUM: 5dd7687e2d57bf029a18f7e4d877b7b1eac8b60f
 
 COCOAPODS: 1.4.0

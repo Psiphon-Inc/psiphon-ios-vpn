@@ -18,13 +18,16 @@
  */
 
 #import <Foundation/Foundation.h>
+#import "AdManager.h"
 
-@interface NSError (Convenience)
+@class RACReplaySubject<ValueType>;
 
-+ (instancetype)errorWithDomain:(NSErrorDomain)domain code:(NSInteger)code;
+NS_ASSUME_NONNULL_BEGIN
 
-+ (instancetype)errorWithDomain:(NSErrorDomain)domain code:(NSInteger)code andLocalizedDescription:(NSString*)localizedDescription;
+@interface InterstitialAdControllerWrapper : NSObject <AdControllerWrapperProtocol>
 
-+ (instancetype)errorWithDomain:(NSErrorDomain)domain code:(NSInteger)code withUnderlyingError:(NSError *)error;
+- (instancetype)initWithAdUnitID:(NSString *)adUnitID withTag:(AdControllerTag)tag;
 
 @end
+
+NS_ASSUME_NONNULL_END

@@ -84,7 +84,7 @@ UserDefaultsKey const VPNManagerConnectOnDemandUntilNextStartBoolKey = @"VPNMana
 // Replay subjects are wrapped in signals that deliver only on the main thread.
 @property (nonatomic) RACReplaySubject<NSNumber *> *internalStartStatus;
 
-@property (nonatomic) RACReplaySubject<NSNumber *> *internalTunnelStatus;
+@property (nonatomic) RACReplaySubject *internalTunnelStatus;
 
 @end
 
@@ -102,11 +102,6 @@ UserDefaultsKey const VPNManagerConnectOnDemandUntilNextStartBoolKey = @"VPNMana
         _internalStartStatus = [RACReplaySubject replaySubjectWithCapacity:1];
         _internalTunnelStatus = [RACReplaySubject replaySubjectWithCapacity:1];
 
-        // Bootstrap connectionStatus with NEVPNStatusInvalid.
-        //       and the imperative code that requires a VPN status immediately.
-        //       This way, we don't risk blocking the main thread.
-        [_internalTunnelStatus sendNext:@(VPNStatusInvalid)];
-
         _restartRequired = FALSE;
 
         _restartRequired = FALSE;
@@ -119,13 +114,30 @@ UserDefaultsKey const VPNManagerConnectOnDemandUntilNextStartBoolKey = @"VPNMana
 
         _vpnStartStatus = [_internalStartStatus deliverOnMainThread];
 
-        _lastTunnelStatus = [[_internalTunnelStatus map:^NSNumber *(NSNumber *connectionStatus) {
-            NEVPNStatus s = (NEVPNStatus) [connectionStatus integerValue];
-            return @([weakSelf mapVPNStatus:s]);
-        }]
-        deliverOnMainThread];
+        _lastTunnelStatus = [[[_internalTunnelStatus
+          filter:^BOOL(id value) {
+              // RACUnit.defaultUnit is used as a special value indicating that last tunnel status
+              // may no longer be valid.
+              return (value != RACUnit.defaultUnit);
+          }]
+          map:^NSNumber *(NSNumber *connectionStatus) {
+              NEVPNStatus s = (NEVPNStatus) [connectionStatus integerValue];
+              return @([weakSelf mapVPNStatus:s]);
+          }]
+          deliverOnMainThread];
 
         _compoundDisposable = [RACCompoundDisposable compoundDisposable];
+
+        // Listen to applicationDidEnterBackground notification.
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(onApplicationDidEnterBackground)
+                                                     name:UIApplicationDidEnterBackgroundNotification
+                                                   object:nil];
+
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(onApplicationWillEnterForeground)
+                                                     name:UIApplicationWillEnterForegroundNotification
+                                                   object:nil];
 
     }
     return self;
@@ -164,7 +176,7 @@ UserDefaultsKey const VPNManagerConnectOnDemandUntilNextStartBoolKey = @"VPNMana
     }
 }
 
-- (void)setTunnelProviderManager:(NETunnelProviderManager *)tunnelProviderManager {
+- (void)setTunnelProviderManager:(NETunnelProviderManager *_Nullable)tunnelProviderManager {
     @synchronized (self) {
         _tunnelProviderManager = tunnelProviderManager;
         if (localVPNStatusObserver) {
@@ -183,7 +195,8 @@ UserDefaultsKey const VPNManagerConnectOnDemandUntilNextStartBoolKey = @"VPNMana
         // Listening to NEVPNManager status change notifications on the main thread.
         localVPNStatusObserver = [[NSNotificationCenter defaultCenter]
           addObserverForName:NEVPNStatusDidChangeNotification
-                      object:_tunnelProviderManager.connection queue:NSOperationQueue.mainQueue
+                      object:_tunnelProviderManager.connection
+                       queue:NSOperationQueue.mainQueue
                   usingBlock:^(NSNotification *_Nonnull note) {
 
                       // Observers of VPNManagerStatusDidChangeNotification will be notified at the same time.
@@ -221,9 +234,7 @@ UserDefaultsKey const VPNManagerConnectOnDemandUntilNextStartBoolKey = @"VPNMana
           unsafeSubscribeOnSerialQueue:instance.serialQueue
                               withName:@"initOperation"]
           subscribeNext:^(NETunnelProviderManager *tunnelProvider) {
-              if (tunnelProvider) {
-                  instance.tunnelProviderManager = tunnelProvider;
-              }
+              instance.tunnelProviderManager = tunnelProvider;
           }
           error:^(NSError *error) {
               [PsiFeedbackLogger errorWithType:VPNManagerLogType message:@"failed to load initial VPN config" object:error];
@@ -238,7 +249,7 @@ UserDefaultsKey const VPNManagerConnectOnDemandUntilNextStartBoolKey = @"VPNMana
     return instance;
 }
 
-+ (NSString *)statusText:(VPNStatus)status {
++ (NSString *)statusText:(NSInteger)status {
     switch (status) {
 
         case VPNStatusInvalid: return @"invalid";
@@ -556,6 +567,38 @@ UserDefaultsKey const VPNManagerConnectOnDemandUntilNextStartBoolKey = @"VPNMana
             s == VPNStatusConnected ||
             s == VPNStatusReasserting ||
             s == VPNStatusRestarting );
+}
+
+#pragma mark - System event callbacks
+
+- (void)onApplicationDidEnterBackground {
+
+    // Resets states to a default value if they're state would be potentially invalid
+    // after the app enters the background.
+
+    [self.internalTunnelStatus sendNext:RACUnit.defaultUnit];
+}
+
+- (void)onApplicationWillEnterForeground {
+
+    __weak VPNManager *weakSelf = self;
+
+    __block RACDisposable *disposable = [[self deferredTunnelProviderManager]
+      subscribeNext:^(NETunnelProviderManager *_Nullable tunnelProvider) {
+
+        if (tunnelProvider.connection) {
+            [weakSelf.internalTunnelStatus sendNext:@(tunnelProvider.connection.status)];
+        }
+
+      }
+      error:^(NSError *error) {
+          [weakSelf.compoundDisposable removeDisposable:disposable];
+      }
+      completed:^{
+          [weakSelf.compoundDisposable removeDisposable:disposable];
+      }];
+
+    [self.compoundDisposable addDisposable:disposable];
 }
 
 #pragma mark - Private methods

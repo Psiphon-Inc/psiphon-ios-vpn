@@ -30,4 +30,12 @@
     return [NSError errorWithDomain:domain code:code userInfo:@{NSLocalizedDescriptionKey:localizedDescription}];
 }
 
++ (instancetype)errorWithDomain:(NSErrorDomain)domain code:(NSInteger)code withUnderlyingError:(NSError *)error {
+    NSDictionary *errorDict = nil;
+    if (error) {
+        errorDict = @{NSUnderlyingErrorKey: error};
+    }
+    return [NSError errorWithDomain:domain code:code userInfo:errorDict];
+}
+
 @end
