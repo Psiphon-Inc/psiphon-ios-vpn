@@ -67,8 +67,15 @@ typedef NS_ENUM(NSInteger, AdPresentation) {
 
 FOUNDATION_EXPORT NSErrorDomain const AdControllerWrapperErrorDomain;
 
+/**
+ * AdControllerWrapperErrorCode are terminating error emissions from signal returned by ad controller `-loadAd` method.
+ */
 typedef NS_ERROR_ENUM(AdControllerWrapperErrorDomain, AdControllerWrapperErrorCode) {
+    /*! @const AdControllerWrapperErrorAdExpired Ad controller's pre-fetched ad has expired. Once emitted by `-loadAd`,
+     * AdManager will load a new ad. */
     AdControllerWrapperErrorAdExpired = 1000,
+    /*! @const AdControllerWrapperErrorAdFailedToLoad Ad controller failed to load ad. Once emitted by `-loadAd`,
+     * AdManager will load a new ad `AD_LOAD_RETRY_COUNT` times. */
     AdControllerWrapperErrorAdFailedToLoad,
 };
 
@@ -97,7 +104,10 @@ typedef NS_ERROR_ENUM(AdControllerWrapperErrorDomain, AdControllerWrapperErrorCo
 
 // Loads ad if none is already loaded. Property `ready` should be TRUE after ad has been loaded (whether or not it
 // has already been pre-fetched by the SDK).
-// Implementations should handle multiple subscriptions to the returned signal, even if the ad has already been loaded.
+// Implementations should handle multiple subscriptions to the returned signal without
+// side-effects (even if the ad has already been loaded).
+// Returned signal is expected to terminate with an error when an ad expires or fails to load, with the appropriate
+// `AdControllerWrapperErrorCode` error code.
 - (RACSignal<NSString *> *)loadAd;
 
 // Unloads ad if one is loaded. `ready` should be FALSE after the unloading is done.

@@ -719,10 +719,21 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
                 // - For errors that are due expired ads, always reload and get a new ad.
                 // - For other types of errors, try to reload only one more time after a delay.
                 return [[errors groupBy:^NSString *(NSError *error) {
+
                       if ([AdControllerWrapperErrorDomain isEqualToString:error.domain]) {
                           if (AdControllerWrapperErrorAdExpired == error.code) {
                               // Always get a new ad for expired ads.
+                              [PsiFeedbackLogger warnWithType:AdManagerLogType
+                                                      message:@"adDidExpire"
+                                                       object:error];
                               return @"retryForever";
+
+                          } else if (AdControllerWrapperErrorAdFailedToLoad == error.code) {
+                              // Get a new ad `AD_LOAD_RETRY_COUNT` times.
+                              [PsiFeedbackLogger errorWithType:AdManagerLogType
+                                                       message:@"adDidFailToLoad"
+                                                        object:error];
+                              return @"retryOther";
                           }
                       }
                       return @"otherError";
