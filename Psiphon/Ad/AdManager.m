@@ -288,32 +288,35 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
         [[MoPub sharedInstance] initializeSdkWithConfiguration:sdkConfig completion:^{
             LOG_DEBUG(@"MoPub SDK initialized");
 
-            if ([MoPub sharedInstance].shouldShowConsentDialog) {
-                [[MoPub sharedInstance] loadConsentDialogWithCompletion:^(NSError *error) {
-                    if (error == nil) {
-                        [[MoPub sharedInstance]
-                          showConsentDialogFromViewController:[AppDelegate getTopMostViewController]
-                                                      didShow:nil
-                                                   didDismiss:^{
+            // Concurrency Note: MoPub invokes the completion handler on a concurrent background queue.
+            dispatch_async_main(^{
+                if ([MoPub sharedInstance].shouldShowConsentDialog) {
+                    [[MoPub sharedInstance] loadConsentDialogWithCompletion:^(NSError *error) {
+                        if (error == nil) {
+                            [[MoPub sharedInstance]
+                              showConsentDialogFromViewController:[AppDelegate getTopMostViewController]
+                                                          didShow:nil
+                                                       didDismiss:^{
 
-                            // MoPub consent dialog was presented successfully and dismissed.
-                            // We can start loading ads.
-                            [self.mopubSDKInitialized sendNext:RACUnit.defaultUnit];
+                                                           // MoPub consent dialog was presented successfully and dismissed.
+                                                           // We can start loading ads.
+                                                           [self.mopubSDKInitialized sendNext:RACUnit.defaultUnit];
 
-                          }];
+                                                       }];
 
-                    } else {
-                        [PsiFeedbackLogger errorWithType:AdManagerLogType
-                                                 message:@"mopubSDKConsentDialogLoadFailed"
-                                                         object:error];
-                    }
-                }];
-            } else {
+                        } else {
+                            [PsiFeedbackLogger errorWithType:AdManagerLogType
+                                                     message:@"mopubSDKConsentDialogLoadFailed"
+                                                      object:error];
+                        }
+                    }];
+                } else {
 
-                // MoPub consent is already given or is not needed.
-                // We can start loading ads.
-                [self.mopubSDKInitialized sendNext:RACUnit.defaultUnit];
-            }
+                    // MoPub consent is already given or is not needed.
+                    // We can start loading ads.
+                    [self.mopubSDKInitialized sendNext:RACUnit.defaultUnit];
+                }
+            });
         }];
     }
 
