@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, Psiphon Inc.
+ * Copyright (c) 2018, Psiphon Inc.
  * All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,23 +18,15 @@
  */
 
 #import <Foundation/Foundation.h>
-#import <mopub-ios-sdk/MPInterstitialAdController.h>
+#import <mopub-ios-sdk/MoPub.h>
+#import <mopub-ios-sdk/MPRewardedVideo.h>
+#import "AdManager.h"
 
-FOUNDATION_EXPORT NSNotificationName const AdManagerAdsDidLoadNotification;
+@interface RewardedAdControllerWrapper : NSObject <AdControllerWrapperProtocol>
 
-@interface AdManager : NSObject <MPInterstitialAdControllerDelegate>
+- (instancetype)initWithAdUnitID:(NSString *)adUnitID withTag:(AdControllerTag)tag;
 
-@property BOOL untunneledInterstitialIsShowing;
-@property BOOL untunneledInterstitialHasShown;
-
-+ (instancetype)sharedInstance;
-
-- (void)initializeAds;
-
-- (BOOL)untunneledInterstitialIsReady;
-
-- (void)showUntunneledInterstitial;
-
-- (BOOL)shouldShowUntunneledAds;
+- (RACSignal<NSNumber *> *)presentAdFromViewController:(UIViewController *)viewController
+                                        withCustomData:(NSString *_Nullable)customData;
 
 @end

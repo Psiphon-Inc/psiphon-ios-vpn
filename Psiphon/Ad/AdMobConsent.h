@@ -18,13 +18,18 @@
  */
 
 #import <Foundation/Foundation.h>
+#import <PersonalizedAdConsent/PersonalizedAdConsent.h>
 
-@interface NSError (Convenience)
+@interface AdMobConsent : NSObject
 
-+ (instancetype)errorWithDomain:(NSErrorDomain)domain code:(NSInteger)code;
-
-+ (instancetype)errorWithDomain:(NSErrorDomain)domain code:(NSInteger)code andLocalizedDescription:(NSString*)localizedDescription;
-
-+ (instancetype)errorWithDomain:(NSErrorDomain)domain code:(NSInteger)code withUnderlyingError:(NSError *)error;
+/**
+ * Loads AdMob consent status if already given, or collects consent from the user if needed.
+ * Once consent has been collected, or is already collected or is not needed, completion will be called with nil error,
+ * and user's ad preference is passed in.
+ * If an error occurs while loading or presenting the consent screen,
+ * completion is called with the underlying error passed in.
+ */
++ (void)collectConsentForPublisherID:(NSString *)publisherID
+               withCompletionHandler:(void (^_Nonnull)(NSError *_Nullable error, PACConsentStatus s))completion;
 
 @end
