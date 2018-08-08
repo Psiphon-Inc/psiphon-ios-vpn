@@ -19,12 +19,14 @@
 
 #import <Foundation/Foundation.h>
 
-@interface NSError (Convenience)
 
-+ (instancetype)errorWithDomain:(NSErrorDomain)domain code:(NSInteger)code;
+@interface MoPubConsent : NSObject
 
-+ (instancetype)errorWithDomain:(NSErrorDomain)domain code:(NSInteger)code andLocalizedDescription:(NSString*)localizedDescription;
-
-+ (instancetype)errorWithDomain:(NSErrorDomain)domain code:(NSInteger)code withUnderlyingError:(NSError *)error;
+/**
+ * Loads MoPub consent status if already given, or collects consent from the user if needed.
+ * Once consent has been collected, or is already collected or is not needed, completion will be called with nil error.
+ * If an error happens while collecting consent, completion is called with the underlying error passed in.
+ */
++ (void)collectConsentWithCompletionHandler:(void (^)(NSError *_Nullable error))completion;
 
 @end
