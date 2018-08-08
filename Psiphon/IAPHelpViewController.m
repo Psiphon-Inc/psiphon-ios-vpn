@@ -228,8 +228,6 @@
 - (void)onPaymentTransactionUpdate:(NSNotification *)notification {
     SKPaymentTransactionState transactionState = (SKPaymentTransactionState) [notification.userInfo[IAPHelperPaymentTransactionUpdateKey] integerValue];
 
-    LOG_DEBUG(@"test transaction state %ld", (long)transactionState);
-    
     if (SKPaymentTransactionStatePurchasing == transactionState) {
         [self showProgressSpinnerAndBlockUI];
     } else {

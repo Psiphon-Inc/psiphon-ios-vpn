@@ -72,9 +72,6 @@ typedef NS_ENUM(NSInteger, TunnelState) {
 };
 
 typedef NS_ENUM(NSInteger, SourceEvent) {
-    // Waiting for Ad SDKs to be initialized.
-    SourceEventStarting = 100,
-    // Ad SDKs have been initialized successfully.
     SourceEventStarted = 101,
     SourceEventAppForegrounded = 102,
     SourceEventSubscription = 103,
@@ -109,8 +106,6 @@ typedef NS_ENUM(NSInteger, SourceEvent) {
 
     NSString *sourceText;
     switch (self.source) {
-        case SourceEventStarting:
-            return @"<AppEvent source=SourceEventStarting>";
         case SourceEventAppForegrounded:
             sourceText = @"SourceEventAppForegrounded";
             break;
@@ -216,9 +211,9 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
 
 @property (nonatomic, nonnull) RACCompoundDisposable *compoundDisposable;
 
-// mopubSDKInitialized is non-terminating signal that emits RACUnit only once the MoPub SDK has been
-// initialized (and in accordance with GDPR if user consent has been given).
-@property (nonatomic, nonnull) RACReplaySubject<RACUnit *> *mopubSDKInitialized;
+// adSDKInitMultiCast is a terminating multicasted signal that emits RACUnit only once and
+// completes immediately when all the Ad SDKs have been initialized (and user consent is collected if necessary).
+@property (nonatomic, nullable) RACMulticastConnection<RACUnit *> *adSDKInitMultiCast;
 
 @end
 
@@ -249,8 +244,6 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
         _tunneledRewardVideo = [[RewardedAdControllerWrapper alloc]
           initWithAdUnitID:TunneledRewardVideoAdUnitID withTag:AdControllerTagTunneledRewardedVideo];
 
-        _mopubSDKInitialized = [RACReplaySubject replaySubjectWithCapacity:1];
-
         reachability = [Reachability reachabilityForInternetConnection];
 
     }
@@ -276,54 +269,65 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
 
     [reachability startNotifier];
 
-    // Initializes the Ads SDKs.
-    {
-        [AdMobConsent collectConsentForPublisherID:@"pub-1072041961750291"
-           withCompletionHandler:^(NSError *error, PACConsentStatus consentStatus) {
+    // adSDKInitConsent is cold terminating signal - Emits RACUnit and completes if all Ad SDKs are initialized and
+    // consent is collected. Otherwise terminates with an error.
+    RACSignal<RACUnit *> *adSDKInitConsent = [RACSignal createSignal:^RACDisposable *(id <RACSubscriber> subscriber) {
+        dispatch_async_main(^{
+          [AdMobConsent collectConsentForPublisherID:@"pub-1072041961750291"
+            withCompletionHandler:^(NSError *error, PACConsentStatus consentStatus) {
 
-            if (error) {
-                // Stop ad initialization and don't load any ads.
-                 return;
-            }
+                if (error) {
+                    // Stop ad initialization and don't load any ads.
+                    [subscriber sendError:error];
+                    return;
+                }
 
-            // Implementation follows these guides:
-            //  - https://developers.mopub.com/docs/ios/initialization/
-            //  - https://developers.mopub.com/docs/mediation/networks/google/
+                // Implementation follows these guides:
+                //  - https://developers.mopub.com/docs/ios/initialization/
+                //  - https://developers.mopub.com/docs/mediation/networks/google/
 
-            // Forwards user's ad preference to AdMob.
-            MPGoogleGlobalMediationSettings *googleMediationSettings = [[MPGoogleGlobalMediationSettings alloc] init];
-            googleMediationSettings.npa = (consentStatus == PACConsentStatusNonPersonalized) ? @"1" : @"0";
+                // Forwards user's ad preference to AdMob.
+                MPGoogleGlobalMediationSettings *googleMediationSettings =
+                  [[MPGoogleGlobalMediationSettings alloc] init];
 
-            // MPMoPubConfiguration should be instantiated with any valid ad unit ID from the app.
-            MPMoPubConfiguration *sdkConfig = [[MPMoPubConfiguration alloc]
-              initWithAdUnitIdForAppInitialization:UntunneledInterstitialAdUnitID];
+                googleMediationSettings.npa = (consentStatus == PACConsentStatusNonPersonalized) ? @"1" : @"0";
 
-            sdkConfig.globalMediationSettings = @[googleMediationSettings];
+                // MPMoPubConfiguration should be instantiated with any valid ad unit ID from the app.
+                MPMoPubConfiguration *sdkConfig = [[MPMoPubConfiguration alloc]
+                  initWithAdUnitIdForAppInitialization:UntunneledInterstitialAdUnitID];
 
-            // Initializes the MoPub SDK and then checks GDPR applicability and show the consent modal screen
-            // if necessary.
-            [[MoPub sharedInstance] initializeSdkWithConfiguration:sdkConfig completion:^{
-                LOG_DEBUG(@"MoPub SDK initialized");
+                sdkConfig.globalMediationSettings = @[googleMediationSettings];
 
-                // Concurrency Note: MoPub invokes the completion handler on a concurrent background queue.
-                dispatch_async_main(^{
-                    [MoPubConsent collectConsentWithCompletionHandler:^(NSError *error) {
-                        if (error) {
-                            // Stop ad initialization and don't load any ads.
-                            return;
-                        }
+                // Initializes the MoPub SDK and then checks GDPR applicability and show the consent modal screen
+                // if necessary.
+                [[MoPub sharedInstance] initializeSdkWithConfiguration:sdkConfig completion:^{
+                    LOG_DEBUG(@"MoPub SDK initialized");
 
-                        // MoPub consent dialog was presented successfully and dismissed
-                        // or consent is already given or is not needed.
-                        // We can start loading ads.
-                        [self.mopubSDKInitialized sendNext:RACUnit.defaultUnit];
-                    }];
-                });
+                    // Concurrency Note: MoPub invokes the completion handler on a concurrent background queue.
+                    dispatch_async_main(^{
+                        [MoPubConsent collectConsentWithCompletionHandler:^(NSError *error) {
+                            if (error) {
+                                // Stop ad initialization and don't load any ads.
+                                [subscriber sendError:error];
+                                return;
+                            }
 
+                            [GADMobileAds configureWithApplicationID:@"ca-app-pub-1072041961750291~2085686375"];
+
+                            // MoPub consent dialog was presented successfully and dismissed
+                            // or consent is already given or is not needed.
+                            // We can start loading ads.
+                            [subscriber sendNext:RACUnit.defaultUnit];
+                            [subscriber sendCompleted];
+                        }];
+                    });
+
+                }];
             }];
-        }];
+        });
 
-    }
+        return nil;
+    }];
 
     // Main signals and subscription.
     {
@@ -337,7 +341,6 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
         RACSignal<NSNumber *> *reachabilitySignal = [[[[[NSNotificationCenter defaultCenter]
           rac_addObserverForName:kReachabilityChangedNotification object:reachability]
           map:^NSNumber *(NSNotification *note) {
-              //
               return @(((Reachability *) note.object).currentReachabilityStatus);
           }]
           startWith:@([reachability currentReachabilityStatus])]
@@ -376,6 +379,8 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
         // NOTE: We have to be careful that ads are requested,
         //       loaded and the impression is registered all from the same tunneled/untunneled state.
 
+        // combinedEventSignal is infinite cold signal - Combines all app event signals,
+        // and create AppEvent object. The AppEvent emissions are as unique as `[AppEvent isEqual:]` determines.
         RACSignal<AppEvent *> *combinedEventSignals = [[[RACSignal
           combineLatest:@[
             reachabilitySignal,
@@ -392,65 +397,53 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
           }]
           distinctUntilChanged];
 
+        // The underlying multicast signal emits AppEvent objects. The emissions are repeated if a "trigger" event
+        // such as "appWillForeground" happens with source set to appropriate value.
+        self.appEvents = [[[[RACSignal
+          // Merge all "trigger" signals that cause the last AppEvent from `combinedEventSignals` to be emitted again.
+          // NOTE: - It should be guaranteed that SourceEventStarted is always the first emission and that it will
+          //         be always after the Ad SDKs have been initialized.
+          //       - It should also be guaranteed that signals in the merge below are not the same as the signals
+          //         in the `combinedEventSignals`. Otherwise we would have subscribed to the same signal twice,
+          //         and since we're using the -combineLatestWith: operator, we will get the same emission repeated.
+          merge:@[
+            [RACSignal return:@(SourceEventStarted)],
+            [appWillEnterForegroundSignal mapReplace:@(SourceEventAppForegrounded)]
+          ]]
+          combineLatestWith:combinedEventSignals]
+          combinePreviousWithStart:nil reduce:^AppEvent *(RACTwoTuple<NSNumber *, AppEvent *> *_Nullable prev,
+            RACTwoTuple<NSNumber *, AppEvent *> *_Nonnull curr) {
 
-        // The underlying multicast signal emits AppEvent objects. The objects are not necessarily unique.
-        // NOTE: mopubSDKInitialized should only emit RACUnit once.
+              // Infers the source signal of the current emission.
+              //
+              // Events emitted by the signal that we combine with (`combinedEventSignals`) are unique,
+              // and therefore the AppEvent state that is different between `prev` and `curr` is also the source.
+              // If `prev` and `curr` AppEvent are the same, then the "trigger" signal is one of the merged signals
+              // upstream.
 
-        // Starting value
-        AppEvent *startingAppEvent = [[AppEvent alloc] init];
-        startingAppEvent.source = SourceEventStarting;
+              AppEvent *_Nullable pe = prev.second;
+              AppEvent *_Nonnull ce = curr.second;
 
-        self.appEvents = [[[self.mopubSDKInitialized flattenMap:^RACSignal *(RACUnit *x) {
+              if (pe == nil || [pe isEqual:ce]) {
+                  // Event source is not from the change in AppEvent properties and so not from `combinedEventSignals`.
+                  ce.source = (SourceEvent) [curr.first integerValue];
+              } else {
 
-            // MoPub SDK has been initialized.
-            [GADMobileAds configureWithApplicationID:@"ca-app-pub-1072041961750291~2085686375"];
+                  // Infer event source based on changes in values.
+                  if (pe.networkIsReachable != ce.networkIsReachable) {
+                      ce.source = SourceEventReachability;
 
-            return [[[RACSignal
-              // Merge all "trigger" signals that cause the last AppEvent from `combinedEventSignals` to be emitted again.
-              // NOTE: - It should be guaranteed that SourceEventStarted is always the first emission and that it will
-              //         be always after the Ad SDKs have been initialized.
-              //       - It should also be guaranteed that signals in the merge below are not the same as the signals
-              //         in the `combinedEventSignals`. Otherwise we would have subscribed to the same signal twice,
-              //         and since we're using the -combineLatestWith: operator, we will get the same emission repeated.
-              merge:@[
-                [RACSignal return:@(SourceEventStarted)],
-                [appWillEnterForegroundSignal mapReplace:@(SourceEventAppForegrounded)]
-              ]]
-              combineLatestWith:combinedEventSignals]
-              combinePreviousWithStart:nil reduce:^AppEvent *(RACTwoTuple<NSNumber *, AppEvent *> *_Nullable prev, RACTwoTuple<NSNumber *, AppEvent *> *_Nonnull curr) {
+                  } else if (pe.subscriptionIsActive != ce.subscriptionIsActive) {
+                      ce.source = SourceEventSubscription;
 
-                  // Infers the source signal of the current emission.
-                  //
-                  // Events emitted by the signal that we combine with (`combinedEventSignals`) are unique,
-                  // and therefore the AppEvent state that is different between `prev` and `curr` is also the source.
-                  // If `prev` and `curr` AppEvent are the same, then the "trigger" signal is one of the merged signals
-                  // upstream.
-
-                  AppEvent *_Nullable pe = prev.second;
-                  AppEvent *_Nonnull ce = curr.second;
-
-                  if (pe == nil || [pe isEqual:ce]) {
-                      // Event source is not from the change in AppEvent properties.
-                      ce.source = (SourceEvent) [curr.first integerValue];
-                  } else {
-
-                      // Infer event source based on changes in values.
-                      if (pe.networkIsReachable != ce.networkIsReachable) {
-                          ce.source = SourceEventReachability;
-
-                      } else if (pe.subscriptionIsActive != ce.subscriptionIsActive) {
-                          ce.source = SourceEventSubscription;
-
-                      } else if (pe.tunnelState != ce.tunnelState) {
-                          ce.source = SourceEventTunneled;
-                      }
+                  } else if (pe.tunnelState != ce.tunnelState) {
+                      ce.source = SourceEventTunneled;
                   }
+              }
 
-                  return ce;
-            }];
-        }]
-        startWith:startingAppEvent]
-        multicast:[RACReplaySubject replaySubjectWithCapacity:1]];
+              return ce;
+          }]
+          multicast:[RACReplaySubject replaySubjectWithCapacity:1]];
 
 #if DEBUG
         [self.compoundDisposable addDisposable:[self.appEvents.signal subscribeNext:^(AppEvent * _Nullable x) {
@@ -458,6 +451,28 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
         }]];
 #endif
 
+    }
+
+    // Ad SDK initialization
+    {
+        self.adSDKInitMultiCast = [[[[[[[self.appEvents.signal filter:^BOOL(AppEvent *event) {
+              // Initialize Ads SDK if network is reachable, and device is either tunneled or untunneled, and the
+              // user is not a subscriber.
+              return (event.networkIsReachable &&
+                event.tunnelState != TunnelStateNeither &&
+                !event.subscriptionIsActive);
+          }]
+          take:1]
+          flattenMap:^RACSignal<RACUnit *> *(AppEvent *value) {
+            // Retry 3 time by resubscribing to adSDKInitConsent before giving up for the current AppEvent emission.
+            return [adSDKInitConsent retry:3];
+          }]
+          retry]   // If still failed after retrying 3 times, retry again by resubscribing to the `appEvents.signal`.
+          take:1]
+          deliverOnMainThread]
+          multicast:[RACReplaySubject replaySubjectWithCapacity:1]];
+
+        [self.compoundDisposable addDisposable:[self.adSDKInitMultiCast connect]];
     }
 
     // Ad controller signals:
@@ -509,9 +524,9 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
               // AdPresentationWillAppear -> AdPresentationDidAppear -> AdPresentationWillDisappear
               //   -> AdPresentationDidDisappear
 
-              if (ap == AdPresentationWillAppear) {
+              if (ap == AdPresentationWillAppear || ap == AdPresentationDidAppear || ap == AdPresentationWillDisappear) {
                   return @(TRUE);
-              } else if (ap != AdPresentationDidAppear || ap != AdPresentationWillDisappear) {
+              } else {
                   // In this branch `ap` is either AdPresentationDidDisappear or one of the error states.
                   return @(FALSE);
               }
@@ -530,9 +545,7 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
         [self.compoundDisposable addDisposable:
           [[[self.appEvents.signal map:^RACSignal<NSNumber *> *(AppEvent *appEvent) {
 
-              if (appEvent.source != SourceEventStarting &&
-                  appEvent.tunnelState == TunnelStateUntunneled &&
-                  appEvent.networkIsReachable) {
+              if (appEvent.tunnelState == TunnelStateUntunneled && appEvent.networkIsReachable) {
 
                   return RACObserve(self.untunneledInterstitial, ready);
               }
@@ -544,7 +557,7 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
         [self.compoundDisposable addDisposable:
           [[[self.appEvents.signal map:^RACSignal<NSNumber *> *(AppEvent *appEvent) {
 
-              if (appEvent.source != SourceEventStarting &&appEvent.networkIsReachable) {
+              if (appEvent.networkIsReachable) {
                   if (appEvent.tunnelState == TunnelStateUntunneled) {
                       return RACObserve(self.untunneledRewardVideo, ready);
                   } else if (appEvent.tunnelState == TunnelStateTunneled) {
@@ -605,10 +618,6 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
           // like when the user buys a subscription. Still necessary conditions (like network reachability)
           // should be checked again before presenting the ad.
 
-          if (event.source == SourceEventStarting) {
-              return [RACSignal return:@(AdPresentationErrorNoAdsLoaded)];
-          }
-
           if (event.networkIsReachable) {
 
               if (event.tunnelState != TunnelStateNeither) {
@@ -659,7 +668,7 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
         return [RACTwoTuple pack:TriggerAppEvent :event];
     }];
 
-    RACSignal<AppEventActionTuple *> *adActionSignal = [[[RACSignal
+    RACSignal<AdControllerTag> *adLoadSignal = [[[[[RACSignal
       merge:@[adPresentedAppEvent, appEventWithSource]]
       map:^AppEventActionTuple *(RACTwoTuple<NSString*,AppEvent*> *tuple) {
 
@@ -672,11 +681,7 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
           // Default value if no decision has been reached.
           sa.action = AdLoadActionNone;
 
-          if (event.source == SourceEventStarting) {
-              // Ad SDKs have not been initialized yet, so we take no action.
-              return sa;
-
-          } else if (event.subscriptionIsActive) {
+          if (event.subscriptionIsActive) {
               sa.stopCondition = [RACSignal never];
               sa.action = AdLoadActionUnload;
 
@@ -711,15 +716,13 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
       filter:^BOOL(AppEventActionTuple *v) {
           // Removes "no actions" from the stream again, since no action should be taken.
           return (v.action != AdLoadActionNone);
-      }];
-    
-    
-      return [[[adActionSignal map:^RACSignal<NSNumber *> *(AppEventActionTuple *v) {
+      }]
+      map:^RACSignal<AdControllerTag> *(AppEventActionTuple *v) {
 
           // Transforms the load signal by adding retry logic.
           // The returned signal does not throw any errors.
           return [[[[[RACSignal return:v]
-            flattenMap:^RACSignal<NSString *> *(AppEventActionTuple *sourceAction) {
+            flattenMap:^RACSignal<AdControllerTag> *(AppEventActionTuple *sourceAction) {
 
                 switch (sourceAction.action) {
 
@@ -796,8 +799,13 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
             }];
 
       }]
-      switchToLatest]
-      subscribeNext:^(NSString *_Nullable adTag) {
+      switchToLatest];
+
+    return [[self.adSDKInitMultiCast.signal
+      then:^RACSignal<AdControllerTag> * {
+          return adLoadSignal;
+      }]
+      subscribeNext:^(AdControllerTag _Nullable adTag) {
           if (adTag != nil) {
               LOG_DEBUG(@"Finished loading ad (%@)", adTag);
               [PsiFeedbackLogger infoWithType:AdManagerLogType json:@{@"event": @"adDidLoad", @"tag": adTag}];

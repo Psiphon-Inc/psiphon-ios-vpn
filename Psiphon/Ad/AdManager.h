@@ -108,11 +108,11 @@ typedef NS_ERROR_ENUM(AdControllerWrapperErrorDomain, AdControllerWrapperErrorCo
 // side-effects (even if the ad has already been loaded).
 // Returned signal is expected to terminate with an error when an ad expires or fails to load, with the appropriate
 // `AdControllerWrapperErrorCode` error code.
-- (RACSignal<NSString *> *)loadAd;
+- (RACSignal<AdControllerTag> *)loadAd;
 
 // Unloads ad if one is loaded. `ready` should be FALSE after the unloading is done.
 // Implementations should emit the wrapper's tag after ad is unloaded and then complete.
-- (RACSignal<NSString *> *)unloadAd;
+- (RACSignal<AdControllerTag> *)unloadAd;
 
 @optional
 
