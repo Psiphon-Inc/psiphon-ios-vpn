@@ -72,11 +72,14 @@ typedef NS_ENUM(NSInteger, TunnelState) {
 };
 
 typedef NS_ENUM(NSInteger, SourceEvent) {
-    SourceEventStarted = 100,
-    SourceEventAppForegrounded = 101,
-    SourceEventSubscription = 102,
-    SourceEventTunneled = 103,
-    SourceEventReachability = 104
+    // Waiting for Ad SDKs to be initialized.
+    SourceEventStarting = 100,
+    // Ad SDKs have been initialized successfully.
+    SourceEventStarted = 101,
+    SourceEventAppForegrounded = 102,
+    SourceEventSubscription = 103,
+    SourceEventTunneled = 104,
+    SourceEventReachability = 105
 };
 
 @interface AppEvent : NSObject
@@ -106,6 +109,8 @@ typedef NS_ENUM(NSInteger, SourceEvent) {
 
     NSString *sourceText;
     switch (self.source) {
+        case SourceEventStarting:
+            return @"<AppEvent source=SourceEventStarting>";
         case SourceEventAppForegrounded:
             sourceText = @"SourceEventAppForegrounded";
             break;
@@ -387,9 +392,15 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
           }]
           distinctUntilChanged];
 
+
         // The underlying multicast signal emits AppEvent objects. The objects are not necessarily unique.
         // NOTE: mopubSDKInitialized should only emit RACUnit once.
-        self.appEvents = [[self.mopubSDKInitialized flattenMap:^RACSignal *(RACUnit *x) {
+
+        // Starting value
+        AppEvent *startingAppEvent = [[AppEvent alloc] init];
+        startingAppEvent.source = SourceEventStarting;
+
+        self.appEvents = [[[self.mopubSDKInitialized flattenMap:^RACSignal *(RACUnit *x) {
 
             // MoPub SDK has been initialized.
             [GADMobileAds configureWithApplicationID:@"ca-app-pub-1072041961750291~2085686375"];
@@ -438,6 +449,7 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
                   return ce;
             }];
         }]
+        startWith:startingAppEvent]
         multicast:[RACReplaySubject replaySubjectWithCapacity:1]];
 
 #if DEBUG
@@ -518,7 +530,10 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
         [self.compoundDisposable addDisposable:
           [[[self.appEvents.signal map:^RACSignal<NSNumber *> *(AppEvent *appEvent) {
 
-              if (appEvent.networkIsReachable && appEvent.tunnelState == TunnelStateUntunneled) {
+              if (appEvent.source != SourceEventStarting &&
+                  appEvent.tunnelState == TunnelStateUntunneled &&
+                  appEvent.networkIsReachable) {
+
                   return RACObserve(self.untunneledInterstitial, ready);
               }
               return [RACSignal emitOnly:@(FALSE)];
@@ -529,7 +544,7 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
         [self.compoundDisposable addDisposable:
           [[[self.appEvents.signal map:^RACSignal<NSNumber *> *(AppEvent *appEvent) {
 
-              if (appEvent.networkIsReachable) {
+              if (appEvent.source != SourceEventStarting &&appEvent.networkIsReachable) {
                   if (appEvent.tunnelState == TunnelStateUntunneled) {
                       return RACObserve(self.untunneledRewardVideo, ready);
                   } else if (appEvent.tunnelState == TunnelStateTunneled) {
@@ -589,6 +604,11 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
           // Ads are loaded based on app event condition at the time of load, and unloaded during certain app events
           // like when the user buys a subscription. Still necessary conditions (like network reachability)
           // should be checked again before presenting the ad.
+
+          if (event.source == SourceEventStarting) {
+              return [RACSignal return:@(AdPresentationErrorNoAdsLoaded)];
+          }
+
           if (event.networkIsReachable) {
 
               if (event.tunnelState != TunnelStateNeither) {
@@ -652,7 +672,11 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
           // Default value if no decision has been reached.
           sa.action = AdLoadActionNone;
 
-          if (event.subscriptionIsActive) {
+          if (event.source == SourceEventStarting) {
+              // Ad SDKs have not been initialized yet, so we take no action.
+              return sa;
+
+          } else if (event.subscriptionIsActive) {
               sa.stopCondition = [RACSignal never];
               sa.action = AdLoadActionUnload;
 
