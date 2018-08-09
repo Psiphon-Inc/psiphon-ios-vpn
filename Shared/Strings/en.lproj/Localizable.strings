@@ -250,6 +250,9 @@
 /* Title of button which triggers an attempt to restore the user's existing subscription */
 "RESTORE_SUBSCRIPTION_BUTTON_TITLE" = "Restore my subscription";
 
+/* Button label indicating to the user that they will earn PsiCash if they watch a video advertisement. The word 'PsiCash' should not be translated or transliterated. */
+"REWARDED_VIDEO_EARN_PSICASH" = "Watch a video to earn PsiCash!";
+
 /* Title of cell in settings menu which, when pressed, reinstalls the user's VPN profile for Psiphon */
 "SETTINGS_REINSTALL_VPN_CONFIGURATION_CELL_TITLE" = "Reinstall VPN profile";
 
