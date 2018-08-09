@@ -80,8 +80,11 @@
     status.textAlignment = NSTextAlignmentCenter;
     status.textColor = [UIColor whiteColor];
     status.userInteractionEnabled = NO;
-    
-    status.text = @"Watch a video to earn PsiCash!";
+
+    status.text = NSLocalizedStringWithDefaultValue(@"REWARDED_VIDEO_EARN_PSICASH", nil, [NSBundle mainBundle],
+      @"Watch a video to earn PsiCash!",
+      @"Button label indicating to the user that they will earn PsiCash if they watch a video advertisement."
+      " The word 'PsiCash' should not be translated or transliterated.");
 
     // Assume at first that a video has not been loaded
     [self videoReady:NO];
