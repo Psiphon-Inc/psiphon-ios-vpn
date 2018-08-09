@@ -19,6 +19,7 @@
 
 #import <Foundation/Foundation.h>
 
+NS_ASSUME_NONNULL_BEGIN
 
 @interface MoPubConsent : NSObject
 
@@ -30,3 +31,5 @@
 + (void)collectConsentWithCompletionHandler:(void (^)(NSError *_Nullable error))completion;
 
 @end
+
+NS_ASSUME_NONNULL_END
