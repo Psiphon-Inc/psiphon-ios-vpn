@@ -20,6 +20,8 @@
 #import <Foundation/Foundation.h>
 #import <PersonalizedAdConsent/PersonalizedAdConsent.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface AdMobConsent : NSObject
 
 /**
@@ -33,3 +35,5 @@
                withCompletionHandler:(void (^_Nonnull)(NSError *_Nullable error, PACConsentStatus s))completion;
 
 @end
+
+NS_ASSUME_NONNULL_END
