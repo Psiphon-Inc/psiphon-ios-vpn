@@ -688,13 +688,21 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
 
           } else if (event.networkIsReachable) {
 
+              AppEventActionTuple *__weak weakSa = sa;
+
               sa.stopCondition = [self.appEvents.signal filter:^BOOL(AppEvent *current) {
-                  BOOL condition = ![sa.actionCondition isEqual:current];
-                  if (condition) LOG_DEBUG(@"Ad stopCondition for %@", sa.tag);
-                  return condition;
+                  // Since `sa` already holds a strong reference to this block, the block
+                  // should only hold a weak reference to `sa`.
+                  AppEventActionTuple *__strong strongSa = weakSa;
+                  BOOL pass = FALSE;
+                  if (strongSa) {
+                      pass = ![weakSa.actionCondition isEqual:current];
+                      if (pass) LOG_DEBUG(@"Ad stopCondition for %@", weakSa.tag);
+                  }
+                  return pass;
               }];
 
-              // If the current tunnel state is the same as the ads tunnel state, then load ad.
+              // If the current tunnel state is the same as the ads required tunnel state, then load ad.
               if (event.tunnelState == loadTunnelState && !adController.ready) {
 
                   if ([TriggerAdPresented isEqualToString:triggerSignal]) {
