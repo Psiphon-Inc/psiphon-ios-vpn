@@ -36,7 +36,7 @@ if [[ $? != 0 ]]; then
     exit 1
 fi
 
-command -v iTMSTransporter
+command -v "${iTMSTransporter}"
 if [[ $? != 0 ]]; then
     echo "iTMSTransporter could not be found. Exiting..."
     exit 1
