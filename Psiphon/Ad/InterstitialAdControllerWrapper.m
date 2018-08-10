@@ -43,7 +43,7 @@ PsiFeedbackLogType const InterstitialAdControllerWrapperLogType = @"Interstitial
 @property (nonatomic, readwrite, nullable) MPInterstitialAdController *interstitial;
 
 /** loadStatus is hot non-completing signal - emits the wrapper tag when the ad has been loaded. */
-@property (nonatomic, readwrite, nonnull) RACSubject<NSString *> *loadStatus;
+@property (nonatomic, readwrite, nonnull) RACSubject<AdControllerTag> *loadStatus;
 
 @property (nonatomic, readonly) NSString *adUnitID;
 
@@ -67,7 +67,7 @@ PsiFeedbackLogType const InterstitialAdControllerWrapperLogType = @"Interstitial
     [MPInterstitialAdController removeSharedInterstitialAdController:self.interstitial];
 }
 
-- (RACSignal<NSString *> *)loadAd {
+- (RACSignal<AdControllerTag> *)loadAd {
 
     InterstitialAdControllerWrapper *__weak weakSelf = self;
 
@@ -91,7 +91,7 @@ PsiFeedbackLogType const InterstitialAdControllerWrapperLogType = @"Interstitial
     }];
 }
 
-- (RACSignal<NSString *> *)unloadAd {
+- (RACSignal<AdControllerTag> *)unloadAd {
 
     InterstitialAdControllerWrapper *__weak weakSelf = self;
 

@@ -38,7 +38,7 @@ PsiFeedbackLogType const RewardedAdControllerWrapperLogType = @"RewardedAdContro
 
 // Private Properties.
 /** loadStatus is hot non-completing signal - emits the wrapper tag when the ad has been loaded. */
-@property (nonatomic, readwrite, nonnull) RACSubject<NSString *> *loadStatus;
+@property (nonatomic, readwrite, nonnull) RACSubject<AdControllerTag> *loadStatus;
 
 /** Hot terminating signal - emits items of type @(AdPresentation). */
 @property (nonatomic, nullable) RACSubject<NSNumber *> *presentationStatus;
@@ -65,7 +65,7 @@ PsiFeedbackLogType const RewardedAdControllerWrapperLogType = @"RewardedAdContro
     [MPRewardedVideo removeDelegate:self];
 }
 
-- (RACSignal<NSString *> *)loadAd {
+- (RACSignal<AdControllerTag> *)loadAd {
 
     RewardedAdControllerWrapper *__weak weakSelf = self;
 
@@ -80,7 +80,7 @@ PsiFeedbackLogType const RewardedAdControllerWrapperLogType = @"RewardedAdContro
     }];
 }
 
-- (RACSignal<NSString *> *)unloadAd {
+- (RACSignal<AdControllerTag> *)unloadAd {
 
     RewardedAdControllerWrapper *__weak weakSelf = self;
 

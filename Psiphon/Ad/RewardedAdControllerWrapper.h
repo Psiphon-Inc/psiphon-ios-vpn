@@ -22,6 +22,8 @@
 #import <mopub-ios-sdk/MPRewardedVideo.h>
 #import "AdManager.h"
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface RewardedAdControllerWrapper : NSObject <AdControllerWrapperProtocol>
 
 - (instancetype)initWithAdUnitID:(NSString *)adUnitID withTag:(AdControllerTag)tag;
@@ -30,3 +32,5 @@
                                         withCustomData:(NSString *_Nullable)customData;
 
 @end
+
+NS_ASSUME_NONNULL_END
