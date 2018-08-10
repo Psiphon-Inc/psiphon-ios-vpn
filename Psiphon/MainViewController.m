@@ -1271,6 +1271,13 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 
             psiCashRewardedVideoBar.userInteractionEnabled = ready && [model.authPackage hasEarnerToken];
             [psiCashRewardedVideoBar videoReady:ready && [model.authPackage hasEarnerToken]];
+
+#if DEBUG
+            if ([AppInfo runningUITest]) {
+                // Fake the rewarded video bar enabled status for automated screenshots.
+                [psiCashRewardedVideoBar videoReady:TRUE];
+            }
+#endif
     }];
 }
 
