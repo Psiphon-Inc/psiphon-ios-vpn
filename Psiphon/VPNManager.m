@@ -279,6 +279,14 @@ UserDefaultsKey const VPNManagerConnectOnDemandUntilNextStartBoolKey = @"VPNMana
     }
 }
 
+- (RACSignal<NSNumber *> *)vpnConfigurationInstalled {
+    return [[[self deferredTunnelProviderManager]
+      map:^NSNumber *(NETunnelProviderManager *providerManager) {
+          return @(providerManager != nil);
+      }]
+      unsafeSubscribeOnSerialQueue:self.serialQueue withName:@"vpnConfigurationInstalled"];
+}
+
 // fix as in fix the zombie state
 - (void)checkOrFixVPNStatus {
 
