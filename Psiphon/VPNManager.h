@@ -132,6 +132,11 @@ typedef NS_ENUM(NSInteger, VPNStartStatus) {
 + (NSString *)statusTextSystem:(NEVPNStatus)status;
 
 /**
+ * Returned signal emits @(TRUE) if VPN configuration is already installed, @(FALSE) otherwise.
+ */
+- (RACSignal<NSNumber *> *)vpnConfigurationInstalled;
+
+/**
  * Must be called whenever the application becomes active for VPNManager to update its status.
  */
 - (void)checkOrFixVPNStatus;

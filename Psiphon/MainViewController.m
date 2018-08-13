@@ -64,7 +64,7 @@
 
 PsiFeedbackLogType const RewardedVideoLogType = @"RewardedVideo";
 
-UserDefaultsKey const PrivacyPolicyAcceptedBookKey = @"PrivacyPolicy.AcceptedBoolKey";
+UserDefaultsKey const PrivacyPolicyAcceptedBoolKey = @"PrivacyPolicy.AcceptedBoolKey";
 UserDefaultsKey const PsiCashHasBeenOnboardedBoolKey = @"PsiCash.HasBeenOnboarded";
 
 static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSString *b) {
@@ -381,7 +381,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 
     // Emits unit value if/when the privacy policy is accepted.
     RACSignal *privacyPolicyAccepted =
-      [[RACSignal return:@([NSUserDefaults.standardUserDefaults boolForKey:PrivacyPolicyAcceptedBookKey])]
+      [[RACSignal return:@([NSUserDefaults.standardUserDefaults boolForKey:PrivacyPolicyAcceptedBoolKey])]
       flattenMap:^RACSignal<RACUnit *> *(NSNumber *ppAccepted) {
 
         if ([ppAccepted boolValue]) {
@@ -396,7 +396,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                               object:nil]
               take:1]
               map:^id(NSNotification *value) {
-                  [NSUserDefaults.standardUserDefaults setBool:TRUE forKey:PrivacyPolicyAcceptedBookKey];
+                  [NSUserDefaults.standardUserDefaults setBool:TRUE forKey:PrivacyPolicyAcceptedBoolKey];
                   return RACUnit.defaultUnit;
               }];
         }
@@ -432,14 +432,29 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
               if ([reachability currentReachabilityStatus] == NotReachable) {
                   [weakSelf displayAlertNoInternet];
                   return [RACSignal empty];
+
               } else {
-                  return [[[weakSelf.adManager presentInterstitialOnViewController:weakSelf]
-                    filter:^BOOL(NSNumber *value) {
-                        AdPresentation ap = (AdPresentation) [value integerValue];
-                        return (ap != AdPresentationWillAppear) &&
-                          (ap != AdPresentationDidAppear) &&
-                          (ap != AdPresentationWillDisappear);
-                    }] mapReplace:@"startTunnel"];
+
+                  // Returned signal checks whether or not VPN configuration is already installed.
+                  // Skips presenting ads if there is not VPN configuration installed.
+                  return [[weakSelf.vpnManager vpnConfigurationInstalled]
+                    flattenMap:^RACSignal *(NSNumber *value) {
+                        BOOL vpnInstalled = [value boolValue];
+
+                        if (!vpnInstalled) {
+                            return [RACSignal return:@"startTunnel"];
+                        } else {
+                            return [[[[weakSelf.adManager presentInterstitialOnViewController:weakSelf]
+                              filter:^BOOL(NSNumber *value) {
+                                  AdPresentation ap = (AdPresentation) [value integerValue];
+                                  return (ap != AdPresentationWillAppear) &&
+                                    (ap != AdPresentationDidAppear) &&
+                                    (ap != AdPresentationWillDisappear);
+                              }]
+                              take:1]
+                              mapReplace:@"startTunnel"];
+                        }
+                    }];
               }
           } else {
               if (connectOnDemandEnabled) {
