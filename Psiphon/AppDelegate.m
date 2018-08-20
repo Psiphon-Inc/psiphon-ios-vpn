@@ -154,8 +154,8 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
       take:1];
 
     // Returned signal emits RACUnit and completes immediately after all loading operations are done.
-    return [subscriptionLoadingSignal flattenMap:^RACSignal *(id value) {
-        BOOL subscribed = [value integerValue] == UserSubscriptionActive;
+    return [subscriptionLoadingSignal flattenMap:^RACSignal *(NSNumber *value) {
+        BOOL subscribed = ([value integerValue] == UserSubscriptionActive);
 
         if (subscribed) {
             // User is subscribed, dismiss the loading screen immediately.
