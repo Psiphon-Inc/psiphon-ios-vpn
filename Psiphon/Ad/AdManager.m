@@ -161,8 +161,7 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
 @property (nonatomic, readwrite, nonnull) AppEvent *actionCondition;
 /** Stop taking this action if stop condition emits anything. */
 @property (nonatomic, readwrite, nonnull) RACSignal *stopCondition;
-
-// Keep ad controller tag for debugging purposes.
+/** Ad controller associated with this AppEventActionTuple. */
 @property (nonatomic, readwrite, nonnull) AdControllerTag tag;
 
 @end
@@ -669,7 +668,7 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
         return [RACTwoTuple pack:TriggerAppEvent :event];
     }];
 
-    RACSignal<AdControllerTag> *adLoadSignal = [[[[[RACSignal
+    RACSignal<RACTwoTuple<AdControllerTag, AppEventActionTuple *> *> *adLoadUnloadSignal = [[[[[RACSignal
       merge:@[adPresentedAppEvent, appEventWithSource]]
       map:^AppEventActionTuple *(RACTwoTuple<NSString*,AppEvent*> *tuple) {
 
@@ -726,31 +725,43 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
           // Removes "no actions" from the stream again, since no action should be taken.
           return (v.action != AdLoadActionNone);
       }]
-      map:^RACSignal<AdControllerTag> *(AppEventActionTuple *v) {
+      map:^RACSignal<RACTwoTuple<AdControllerTag, AppEventActionTuple *> *> *(AppEventActionTuple *v) {
 
           // Transforms the load signal by adding retry logic.
           // The returned signal does not throw any errors.
           return [[[[[RACSignal return:v]
-            flattenMap:^RACSignal<AdControllerTag> *(AppEventActionTuple *sourceAction) {
+            flattenMap:^RACSignal<RACTwoTuple<AdControllerTag, AppEventActionTuple *> *> *
+              (AppEventActionTuple *sourceAction) {
+
+                RACSignal<AdControllerTag> *returnedSignal;
 
                 switch (sourceAction.action) {
 
-                    case AdLoadActionImmediate:
-                        return [adController loadAd];
-
-                    case AdLoadActionDelayed:
-                        return [[RACSignal timer:delayedAdLoadDelay]
+                    case AdLoadActionImmediate: {
+                        returnedSignal = [adController loadAd];
+                        break;
+                    }
+                    case AdLoadActionDelayed: {
+                        returnedSignal = [[RACSignal timer:delayedAdLoadDelay]
                           flattenMap:^RACSignal *(id x) {
                               return [adController loadAd];
                           }];
-
-                    case AdLoadActionUnload:
-                        return [adController unloadAd];
-
-                    default:
+                        break;
+                    }
+                    case AdLoadActionUnload: {
+                        returnedSignal = [adController unloadAd];
+                        break;
+                    }
+                    default: {
                         PSIAssert(FALSE);
                         return [RACSignal empty];
+                    }
                 }
+
+                return [returnedSignal map:^id(AdControllerTag tag) {
+                    // Pack the source action with emission of `returnedSignal`.
+                    return [RACTwoTuple pack:tag :sourceAction];
+                }];
             }]
             takeUntil:v.stopCondition]
             retryWhen:^RACSignal *(RACSignal<NSError *> *errors) {
@@ -763,15 +774,18 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
                           if (AdControllerWrapperErrorAdExpired == error.code) {
                               // Always get a new ad for expired ads.
                               [PsiFeedbackLogger warnWithType:AdManagerLogType
-                                                      message:@"adDidExpire"
-                                                       object:error];
+                                                         json:@{@"event": @"adDidExpire",
+                                                           @"tag": v.tag,
+                                                           @"NSError": [PsiFeedbackLogger unpackError:error]}];
+
                               return @"retryForever";
 
                           } else if (AdControllerWrapperErrorAdFailedToLoad == error.code) {
                               // Get a new ad `AD_LOAD_RETRY_COUNT` times.
                               [PsiFeedbackLogger errorWithType:AdManagerLogType
-                                                       message:@"adDidFailToLoad"
-                                                        object:error];
+                                                          json:@{@"event": @"adDidFailToLoad",
+                                                            @"tag": v.tag,
+                                                            @"NSError": [PsiFeedbackLogger unpackError:error]}];
                               return @"retryOther";
                           }
                       }
@@ -811,13 +825,27 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
       switchToLatest];
 
     return [[self.adSDKInitMultiCast.signal
-      then:^RACSignal<AdControllerTag> * {
-          return adLoadSignal;
+      then:^RACSignal<RACTwoTuple<AdControllerTag, AppEventActionTuple *> *> * {
+          return adLoadUnloadSignal;
       }]
-      subscribeNext:^(AdControllerTag _Nullable adTag) {
-          if (adTag != nil) {
-              LOG_DEBUG(@"Finished loading ad (%@)", adTag);
-              [PsiFeedbackLogger infoWithType:AdManagerLogType json:@{@"event": @"adDidLoad", @"tag": adTag}];
+      subscribeNext:^(RACTwoTuple<AdControllerTag, AppEventActionTuple *> *_Nullable tuple) {
+
+          if (tuple != nil) {
+
+              AppEventActionTuple *appEventCommand = tuple.second;
+
+              if (appEventCommand.action != AdLoadActionNone) {
+
+                  if (appEventCommand.action == AdLoadActionUnload) {
+                      // Unload action.
+                      [PsiFeedbackLogger infoWithType:AdManagerLogType
+                                                 json:@{@"event": @"adDidUnload", @"tag": appEventCommand.tag}];
+                  } else {
+                      // Load actions.
+                      [PsiFeedbackLogger infoWithType:AdManagerLogType
+                                                 json:@{@"event": @"adDidLoad", @"tag": appEventCommand.tag}];
+                  }
+              }
           }
       }
       error:^(NSError *error) {
