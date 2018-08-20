@@ -153,12 +153,17 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
       }]
       take:1];
 
-    // Zip all loading signals (all the loading signals are expected to emit only one item and then complete).
-    // All signals that are zipped are expected to only emit one item (type doesn't matter).
-    return [[RACSignal zip:@[adsLoadingSignal, subscriptionLoadingSignal]]
-      map:^id(RACTuple *value) {
-          LOG_DEBUG(@"All loading signals completed.");
-          return RACUnit.defaultUnit;
+    // Returned signal emits RACUnit and completes immediately after all loading operations are done.
+    return [subscriptionLoadingSignal flattenMap:^RACSignal *(id value) {
+        BOOL subscribed = [value integerValue] == UserSubscriptionActive;
+
+        if (subscribed) {
+            // User is subscribed, dismiss the loading screen immediately.
+            return [RACSignal return:RACUnit.defaultUnit];
+        } else {
+            // User is not subscribed, wait for the adsLoadingSignal.
+            return [adsLoadingSignal mapReplace:RACUnit.defaultUnit];
+        }
     }];
 }
 
