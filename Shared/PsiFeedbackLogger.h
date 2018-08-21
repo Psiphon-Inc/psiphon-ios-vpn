@@ -46,6 +46,8 @@ typedef NSString * PsiFeedbackLogType;
 
 + (void)warnWithType:(PsiFeedbackLogType)sourceType message:(NSString *)message object:(NSError *)error;
 
++ (void)warnWithType:(PsiFeedbackLogType)sourceType json:(NSDictionary*_Nonnull)json;
+
 + (void)error:(NSString *)format, ... NS_FORMAT_FUNCTION(1,2);
 
 + (void)errorWithType:(PsiFeedbackLogType)sourceType message:(NSString *)format, ... NS_FORMAT_FUNCTION(2,3);
