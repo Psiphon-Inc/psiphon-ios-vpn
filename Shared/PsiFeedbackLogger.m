@@ -207,6 +207,15 @@ PsiFeedbackLogType const FeedbackInternalLogType = @"FeedbackLoggerInternal";
 
 }
 
++ (void)warnWithType:(PsiFeedbackLogType)sourceType json:(NSDictionary *_Nonnull)json {
+    NSDictionary *data = @{sourceType : json};
+    [[PsiFeedbackLogger sharedInstance] writeData:data noticeType:ErrorNoticeType];
+
+#if DEBUG
+    NSLog(@"<WARN> %@", data);
+#endif
+}
+
 + (void)error:(NSString *)format, ... {
 
     NSString *message;
