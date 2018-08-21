@@ -126,7 +126,6 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     PsiCashBalanceWithSpeedBoostMeter *psiCashView;
     PsiCashRewardedVideoBar * psiCashRewardedVideoBar;
     RACDisposable *psiCashViewUpdates;
-    RACDisposable *rewardedVideoIsReadyDisposable;
     RACDisposable *showRewardedVideoDisposable;
 
 }
@@ -1108,12 +1107,41 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
         return;
     }
 
-    PsiCashSpeedBoostProductSKU *purchase = [model maxSpeedBoostPurchaseEarned];
-    if (![model hasPendingPurchase] && ![model hasActiveSpeedBoostPurchase] && purchase != nil) {
-        [PsiCashClient.sharedInstance purchaseSpeedBoostProduct:purchase];
-    } else {
-        [self showPsiCashAlertView];
-    }
+    // Checks the latest tunnel status before going ahead with the purchase request.
+     __block RACDisposable *disposable = [[[VPNManager sharedInstance].lastTunnelStatus
+       take:1]
+       subscribeNext:^(NSNumber *value) {
+           VPNStatus s = (VPNStatus) [value integerValue];
+
+           if (s == VPNStatusConnected || s == VPNStatusDisconnected || s == VPNStatusInvalid) {
+               // Device is either tunneled or untunneled, we can go ahead with the purchase request.
+               PsiCashSpeedBoostProductSKU *purchase = [model maxSpeedBoostPurchaseEarned];
+               if (![model hasPendingPurchase] && ![model hasActiveSpeedBoostPurchase] && purchase != nil) {
+                   [PsiCashClient.sharedInstance purchaseSpeedBoostProduct:purchase];
+               } else {
+                   [self showPsiCashAlertView];
+               }
+           } else {
+               // Device is in a connecting or disconnecting state, we shouldn't do any purchase requests.
+               // Informs the user through an alert.
+               NSString *alertBody = NSLocalizedStringWithDefaultValue(@"PSICASH_CONNECTED_OR_DISCONNECTED",
+                 nil,
+                 [NSBundle mainBundle],
+                 @"Speed Boost purchase unavailable while Psiphon is connecting.",
+                 @"Alert message indicating to the user that they can't purchase Speed Boost while the app is connecting."
+                 " Do not translate 'Psiphon'.");
+
+               [UIAlertController presentSimpleAlertWithTitle:@"PsiCash"  // The word PsiCash is not translated.
+                                                      message:alertBody
+                                               preferredStyle:UIAlertControllerStyleAlert
+                                                    okHandler:nil];
+           }
+       }
+       completed:^{
+           [self.compoundDisposable removeDisposable:disposable];
+       }];
+
+    [self.compoundDisposable addDisposable:disposable];
 }
 
 #pragma mark - PsiCash UI
@@ -1278,22 +1306,22 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 
     // Signals
 
-    rewardedVideoIsReadyDisposable = [[[AdManager sharedInstance].rewardedVideoCanPresent
-        combineLatestWith:PsiCashClient.sharedInstance.clientModelSignal]
-        subscribeNext:^(RACTwoTuple<NSNumber *, PsiCashClientModel *> *x) {
-            BOOL ready = [[x first] boolValue];
-            PsiCashClientModel *model = [x second];
+    [self.compoundDisposable addDisposable:[[[AdManager sharedInstance].rewardedVideoCanPresent
+      combineLatestWith:PsiCashClient.sharedInstance.clientModelSignal]
+      subscribeNext:^(RACTwoTuple<NSNumber *, PsiCashClientModel *> *x) {
+          BOOL ready = [[x first] boolValue];
+          PsiCashClientModel *model = [x second];
 
-            psiCashRewardedVideoBar.userInteractionEnabled = ready && [model.authPackage hasEarnerToken];
-            [psiCashRewardedVideoBar videoReady:ready && [model.authPackage hasEarnerToken]];
+          psiCashRewardedVideoBar.userInteractionEnabled = ready && [model.authPackage hasEarnerToken];
+          [psiCashRewardedVideoBar videoReady:ready && [model.authPackage hasEarnerToken]];
 
 #if DEBUG
-            if ([AppInfo runningUITest]) {
-                // Fake the rewarded video bar enabled status for automated screenshots.
-                [psiCashRewardedVideoBar videoReady:TRUE];
-            }
+          if ([AppInfo runningUITest]) {
+              // Fake the rewarded video bar enabled status for automated screenshots.
+              [psiCashRewardedVideoBar videoReady:TRUE];
+          }
 #endif
-    }];
+      }]];
 }
 
 - (void)showRewardedVideo {
