@@ -17,19 +17,21 @@
  *
  */
 
+#import "AdMobInterstitialAdControllerWrapper.h"
 #import <ReactiveObjC/NSObject+RACPropertySubscribing.h>
 #import <ReactiveObjC/RACDisposable.h>
 #import <ReactiveObjC/RACSignal+Operations.h>
-#import "InterstitialAdControllerWrapper.h"
 #import "RACReplaySubject.h"
 #import "NSError+Convenience.h"
 #import "RACUnit.h"
 #import "Logging.h"
+@import GoogleMobileAds;
+#import <Google-Mobile-Ads-SDK/GoogleMobileAds/GADInterstitial.h>
 
 
-PsiFeedbackLogType const InterstitialAdControllerWrapperLogType = @"InterstitialAdControllerWrapper";
+PsiFeedbackLogType const AdMobInterstitialAdControllerWrapperLogType = @"AdMobInterstitialAdControllerWrapper";
 
-@interface InterstitialAdControllerWrapper () <MPInterstitialAdControllerDelegate>
+@interface AdMobInterstitialAdControllerWrapper () <GADInterstitialDelegate>
 
 @property (nonatomic, readwrite, assign) BOOL ready;
 
@@ -40,16 +42,22 @@ PsiFeedbackLogType const InterstitialAdControllerWrapperLogType = @"Interstitial
 @property (nonatomic, readwrite, nonnull) RACSubject<NSNumber *> *presentationStatus;
 
 // Private properties
-@property (nonatomic, readwrite, nullable) MPInterstitialAdController *interstitial;
+
+// GADInterstitial is a single use object per interstitial shown.
+@property (nonatomic, readwrite, nullable) GADInterstitial *interstitial;
 
 /** loadStatus is hot non-completing signal - emits the wrapper tag when the ad has been loaded. */
 @property (nonatomic, readwrite, nonnull) RACSubject<AdControllerTag> *loadStatus;
 
 @property (nonatomic, readonly) NSString *adUnitID;
 
+// Set whenever the interstitial failed to load.
+// Value is set to nil immediately before submitting a new ad request.
+@property (nonatomic, readwrite, nullable) NSError *lastError;
+
 @end
 
-@implementation InterstitialAdControllerWrapper
+@implementation AdMobInterstitialAdControllerWrapper
 
 @synthesize tag = _tag;
 
@@ -63,42 +71,51 @@ PsiFeedbackLogType const InterstitialAdControllerWrapperLogType = @"Interstitial
     return self;
 }
 
-- (void)dealloc {
-    [MPInterstitialAdController removeSharedInterstitialAdController:self.interstitial];
-}
-
 - (RACSignal<AdControllerTag> *)loadAd {
 
-    InterstitialAdControllerWrapper *__weak weakSelf = self;
+    AdMobInterstitialAdControllerWrapper *__weak weakSelf = self;
 
     return [RACSignal createSignal:^RACDisposable *(id <RACSubscriber> subscriber) {
 
+        // Subscribe to load status before loading an ad to prevent race-condition with "adDidLoad" delegate callback.
         RACDisposable *disposable = [weakSelf.loadStatus subscribe:subscriber];
 
-        if (!weakSelf.interstitial) {
-            // From MoPub Docs: Subsequent calls for the same ad unit ID will return that object, unless you have disposed
-            // of the object using `removeSharedInterstitialAdController:`.
-            weakSelf.interstitial = [MPInterstitialAdController interstitialAdControllerForAdUnitId:weakSelf.adUnitID];
+        // if no interstitial is initialized, or ad has already been displayed, or last load request failed,
+        // initialize interstitial and start loading ad.
+        if (!weakSelf.interstitial || weakSelf.interstitial.hasBeenUsed || weakSelf.lastError) {
 
-            // Sets the new delegate object as the interstitials delegate.
+            // Reset last error status.
+            weakSelf.lastError = nil;
+
+            weakSelf.interstitial = [[GADInterstitial alloc] initWithAdUnitID:self.adUnitID];
             weakSelf.interstitial.delegate = weakSelf;
+
+            GADRequest *request = [GADRequest request];
+#if DEBUG
+            request.testDevices = @[ @"4a907b319b37ceee4d9970dbb0231ef0" ];
+#endif
+            [weakSelf.interstitial loadRequest:request];
+
+        } else if (weakSelf.interstitial.isReady) {
+
+            // Manually call the delegate method to re-execute the logic for when an ad is loaded.
+            [weakSelf interstitialDidReceiveAd:weakSelf.interstitial];
         }
 
-        // If the interstitial has already been loaded, `interstitialDidLoadAd:` delegate method will be called.
-        [weakSelf.interstitial loadAd];
-        
         return disposable;
     }];
 }
 
 - (RACSignal<AdControllerTag> *)unloadAd {
 
-    InterstitialAdControllerWrapper *__weak weakSelf = self;
+    AdMobInterstitialAdControllerWrapper *__weak weakSelf = self;
 
     return [RACSignal createSignal:^RACDisposable *(id <RACSubscriber> subscriber) {
 
-        [MPInterstitialAdController removeSharedInterstitialAdController:weakSelf.interstitial];
-        weakSelf.interstitial = nil;
+        if (weakSelf.interstitial) {
+            weakSelf.interstitial.delegate = nil;
+            weakSelf.interstitial = nil;
+        }
 
         if (weakSelf.ready) {
             weakSelf.ready = FALSE;
@@ -113,76 +130,68 @@ PsiFeedbackLogType const InterstitialAdControllerWrapperLogType = @"Interstitial
 
 - (RACSignal<NSNumber *> *)presentAdFromViewController:(UIViewController *)viewController {
 
-    InterstitialAdControllerWrapper *__weak weakSelf = self;
+    AdMobInterstitialAdControllerWrapper *__weak weakSelf = self;
 
     return [RACSignal createSignal:^RACDisposable *(id <RACSubscriber> subscriber) {
 
-        if (!weakSelf.ready) {
+        if (!weakSelf.ready || !weakSelf.interstitial.isReady) {
+            // The `self.interstitial.isReady` check should be unnecessary, but we will leave it there.
             [subscriber sendNext:@(AdPresentationErrorNoAdsLoaded)];
             [subscriber sendCompleted];
             return nil;
         }
 
         RACDisposable *disposable = [weakSelf.presentationStatus subscribe:subscriber];
-        [weakSelf.interstitial showFromViewController:viewController];
+        [weakSelf.interstitial presentFromRootViewController:viewController];
 
         return disposable;
     }];
 }
 
-#pragma mark - <MPInterstitialAdControllerDelegate> status relay
+#pragma mark - <GADInterstitialDelegate> status relay
 
-- (void)interstitialDidLoadAd:(MPInterstitialAdController *)interstitial {
+- (void)interstitialDidReceiveAd:(GADInterstitial *)ad {
     if (!self.ready) {
         self.ready = TRUE;
     }
     [self.loadStatus sendNext:self.tag];
 }
 
-- (void)interstitialDidFailToLoadAd:(MPInterstitialAdController *)interstitial withError:(NSError *)error {
-
+- (void)interstitial:(GADInterstitial *)ad didFailToReceiveAdWithError:(GADRequestError *)error {
     if (self.ready) {
         self.ready = FALSE;
     }
-
+    self.lastError = error;
     [self.loadStatus sendError:[NSError errorWithDomain:AdControllerWrapperErrorDomain
                                                    code:AdControllerWrapperErrorAdFailedToLoad
                                     withUnderlyingError:error]];
 }
 
-- (void)interstitialDidExpire:(MPInterstitialAdController *)interstitial {
-    if (self.ready) {
-        self.ready = FALSE;
-    }
-
-    [self.loadStatus sendError:[NSError errorWithDomain:AdControllerWrapperErrorDomain
-                                                   code:AdControllerWrapperErrorAdExpired]];
-}
-
-- (void)interstitialWillAppear:(MPInterstitialAdController *)interstitial {
+- (void)interstitialWillPresentScreen:(GADInterstitial *)ad {
     [self.presentationStatus sendNext:@(AdPresentationWillAppear)];
 }
 
-- (void)interstitialDidAppear:(MPInterstitialAdController *)interstitial {
-    [self.presentationStatus sendNext:@(AdPresentationDidAppear)];
+- (void)interstitialDidFailToPresentScreen:(GADInterstitial *)ad {
+    [self.presentationStatus sendNext:@(AdPresentationErrorFailedToPlay)];
 }
 
-- (void)interstitialWillDisappear:(MPInterstitialAdController *)interstitial {
+- (void)interstitialWillDismissScreen:(GADInterstitial *)ad {
     [self.presentationStatus sendNext:@(AdPresentationWillDisappear)];
 }
 
-- (void)interstitialDidDisappear:(MPInterstitialAdController *)interstitial {
+- (void)interstitialDidDismissScreen:(GADInterstitial *)ad {
     if (self.ready) {
         self.ready = FALSE;
     }
     [self.presentationStatus sendNext:@(AdPresentationDidDisappear)];
     [self.adPresented sendNext:RACUnit.defaultUnit];
 
-    [PsiFeedbackLogger infoWithType:InterstitialAdControllerWrapperLogType json:
+    [PsiFeedbackLogger infoWithType:AdMobInterstitialAdControllerWrapperLogType json:
       @{@"event": @"adDidDisappear", @"tag": self.tag}];
 }
 
-//- (void)interstitialDidReceiveTapEvent:(MPInterstitialAdController *)interstitial {
-//}
+- (void)interstitialWillLeaveApplication:(GADInterstitial *)ad {
+  // Do nothing.
+}
 
 @end
