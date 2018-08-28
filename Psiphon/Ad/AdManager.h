@@ -26,8 +26,8 @@
 @class RACSignal<__covariant ValueType>;
 @class RACSubject<ValueType>;
 @class RACReplaySubject<ValueType>;
-@class InterstitialAdControllerWrapper;
-@class RewardedAdControllerWrapper;
+@class MoPubInterstitialAdControllerWrapper;
+@class MoPubRewardedAdControllerWrapper;
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -50,8 +50,10 @@ typedef NS_ENUM(NSInteger, AdPresentation) {
     AdPresentationDidAppear,
     /*! @const AdPresentationWillDisappear Ad view controller will disappear. This is not a terminal state. */
     AdPresentationWillDisappear,
-    /*! @const AdPresentationDidDisappear Ad view controller did disappear. This is a terminal state. */
+    /*! @const AdPresentationDidDisappear Ad view controller did disappear. This is a terminal state. */ // TODO !!! this is not a terminal state.
     AdPresentationDidDisappear,
+    /*! @const AdPresentationDidRewardUser For rewarded video ads only. Emitted once the user has been rewarded. */
+    AdPresentationDidRewardUser, // TODO !!! this is dangerous if the signal to listen to this is lost.
 
     // Ad presentation error states:
     /*! @const AdPresentationErrorInappropriateState The app is not in the appropriate state to present t
@@ -59,7 +61,7 @@ typedef NS_ENUM(NSInteger, AdPresentation) {
     AdPresentationErrorInappropriateState,
     /*! @const AdPresentationErrorNoAdsLoaded No ads are loaded. This is a terminal state. */
     AdPresentationErrorNoAdsLoaded,
-    /*! @const AdPresentationErrorFailedToPlay Rewarded video ad failed to play. This is a terminal state. */
+    /*! @const AdPresentationErrorFailedToPlay Ad failed to play or show. This is a terminal state. */
     AdPresentationErrorFailedToPlay,
     /*! @const AdPresentationErrorCustomDataNotSet Rewarded video ad custom data not set. This is a terminal state. */
     AdPresentationErrorCustomDataNotSet
@@ -105,9 +107,11 @@ typedef NS_ERROR_ENUM(AdControllerWrapperErrorDomain, AdControllerWrapperErrorCo
 // Loads ad if none is already loaded. Property `ready` should be TRUE after ad has been loaded (whether or not it
 // has already been pre-fetched by the SDK).
 // Implementations should handle multiple subscriptions to the returned signal without
-// side-effects (even if the ad has already been loaded).
+// side-effects (even if the ad has already been loaded or is loading).
 // Returned signal is expected to terminate with an error when an ad expires or fails to load, with the appropriate
 // `AdControllerWrapperErrorCode` error code.
+//
+// e.g. If the ad has already been loaded, the returned signal should emit AdControllerTag immediately.
 - (RACSignal<AdControllerTag> *)loadAd;
 
 // Unloads ad if one is loaded. `ready` should be FALSE after the unloading is done.

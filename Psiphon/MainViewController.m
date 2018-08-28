@@ -1310,7 +1310,8 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 
     [showRewardedVideoDisposable dispose];
 
-    RACSignal *showVideo = [self.adManager presentRewardedVideoOnViewController:self withCustomData:[[PsiCashClient sharedInstance] rewardedVideoCustomData]];
+    RACSignal *showVideo = [self.adManager presentRewardedVideoOnViewController:self
+      withCustomData:[[PsiCashClient sharedInstance] rewardedVideoCustomData]];
 
     showRewardedVideoDisposable = [showVideo subscribeNext:^(NSNumber *x) {
         AdPresentation ap = (AdPresentation) [x integerValue];
@@ -1327,6 +1328,9 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                 break;
             case AdPresentationDidDisappear:
                 LOG_DEBUG(@"rewarded video AdPresentationDidDisappear");
+                break;
+            case AdPresentationDidRewardUser:
+                LOG_DEBUG(@"rewarded video AdPresentationDidRewardUser");
                 [[PsiCashClient sharedInstance] pollForBalanceDeltaWithMaxRetries:30 andTimeBetweenRetries:1.0];
                 break;
             case AdPresentationErrorCustomDataNotSet:

@@ -1,10 +1,10 @@
 PODS:
   - CustomIOSAlertView (0.9.5)
-  - Google-Mobile-Ads-SDK (7.31.0)
+  - Google-Mobile-Ads-SDK (7.32.0)
   - InAppSettingsKit (2.9.4)
   - MBProgressHUD (1.1.0)
-  - MoPub-AdMob-Adapters (7.31.0.0):
-    - Google-Mobile-Ads-SDK (= 7.31.0)
+  - MoPub-AdMob-Adapters (7.32.0.1):
+    - Google-Mobile-Ads-SDK (= 7.32.0)
     - mopub-ios-sdk (~> 5.0)
   - mopub-ios-sdk (5.2.0):
     - mopub-ios-sdk/MoPubSDK (= 5.2.0)
@@ -25,10 +25,11 @@ PODS:
 
 DEPENDENCIES:
   - CustomIOSAlertView (~> 0.9.5)
+  - Google-Mobile-Ads-SDK (~> 7.32.0)
   - InAppSettingsKit (from `https://github.com/Psiphon-Inc/InAppSettingsKit.git`, commit `598c498`)
   - MBProgressHUD (~> 1.1.0)
   - MoPub-AdMob-Adapters
-  - mopub-ios-sdk (= 5.2.0)
+  - mopub-ios-sdk (~> 5.2.0)
   - PersonalizedAdConsent
   - PsiphonClientCommonLibrary (from `https://github.com/Psiphon-Inc/psiphon-ios-client-common-library.git`, commit `2e53a34`)
   - PureLayout (= 3.0.2)
@@ -58,16 +59,16 @@ CHECKOUT OPTIONS:
 
 SPEC CHECKSUMS:
   CustomIOSAlertView: cc4fa8e36219be3fd5ebcd40789f5b4aaae0f38e
-  Google-Mobile-Ads-SDK: 6e529e748b45507a2ca904e0b5a52669ba3920c4
+  Google-Mobile-Ads-SDK: 2aca87e46e860f1e1fc0fdc1201dd9caa4be9ba6
   InAppSettingsKit: 567ef538698cd6cf3afb9c5529b89a8936fdacb5
   MBProgressHUD: e7baa36a220447d8aeb12769bf0585582f3866d9
-  MoPub-AdMob-Adapters: a395cc1a96d4aa826ba76963a102cbcd4150e1ae
+  MoPub-AdMob-Adapters: 211d4435893d0e27ceb4c958c83a347a5017eb47
   mopub-ios-sdk: 2b14db9b687a8052fdc42f727f9553baac13507b
   PersonalizedAdConsent: b50a8a5d6065b6db23121e8fcc0dce2ae983f6ea
   PsiphonClientCommonLibrary: bc9d6f5656e557d6c4395d34196a98825e39479b
   PureLayout: 4d550abe49a94f24c2808b9b95db9131685fe4cd
   ReactiveObjC: 2a38ea15335de4119d8b17caf1db1484f61db902
 
-PODFILE CHECKSUM: 9f810e318c95d7963f48886b1c51ed8d8067c5d6
+PODFILE CHECKSUM: bc41de475cd2f1b4e756c1ee600533dc07654f0d
 
 COCOAPODS: 1.4.0

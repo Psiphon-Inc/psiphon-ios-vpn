@@ -18,18 +18,13 @@
  */
 
 #import <Foundation/Foundation.h>
-#import <mopub-ios-sdk/MoPub.h>
-#import <mopub-ios-sdk/MPRewardedVideo.h>
 #import "AdManager.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface RewardedAdControllerWrapper : NSObject <AdControllerWrapperProtocol>
+@interface AdMobInterstitialAdControllerWrapper : NSObject <AdControllerWrapperProtocol>
 
 - (instancetype)initWithAdUnitID:(NSString *)adUnitID withTag:(AdControllerTag)tag;
-
-- (RACSignal<NSNumber *> *)presentAdFromViewController:(UIViewController *)viewController
-                                        withCustomData:(NSString *_Nullable)customData;
 
 @end
 

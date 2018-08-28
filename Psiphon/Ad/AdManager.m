@@ -29,8 +29,8 @@
 #import "RACReplaySubject.h"
 #import "DispatchUtils.h"
 #import "MPGoogleGlobalMediationSettings.h"
-#import "InterstitialAdControllerWrapper.h"
-#import "RewardedAdControllerWrapper.h"
+#import "MoPubInterstitialAdControllerWrapper.h"
+#import "MoPubRewardedAdControllerWrapper.h"
 #import <ReactiveObjC/NSNotificationCenter+RACSupport.h>
 #import <ReactiveObjC/RACUnit.h>
 #import <ReactiveObjC/RACTuple.h>
@@ -44,6 +44,8 @@
 #import "AdMobConsent.h"
 #import "NSError+Convenience.h"
 #import "MoPubConsent.h"
+#import "AdMobInterstitialAdControllerWrapper.h"
+#import "AdMobRewardedAdControllerWrapper.h"
 #import <PersonalizedAdConsent/PersonalizedAdConsent.h>
 @import GoogleMobileAds;
 
@@ -52,11 +54,21 @@ NSErrorDomain const AdControllerWrapperErrorDomain = @"AdControllerWrapperErrorD
 
 PsiFeedbackLogType const AdManagerLogType = @"AdManager";
 
-#pragma mark - Ad Unit IDs
+#pragma mark - Ad IDs
 
-NSString * const UntunneledInterstitialAdUnitID = @"4250ebf7b28043e08ddbe04d444d79e4";
-NSString * const UntunneledRewardVideoAdUnitID  = @"00638d8c82b34f9e8fe56b51cc704c87";
-NSString * const TunneledRewardVideoAdUnitID    = @"b9440504384740a2a3913a3d1b6db80e";
+NSString * const GoogleAdMobAppID = @"ca-app-pub-1072041961750291~2085686375";
+
+// Always use test ad unit id when building or debugging the app.
+//NSString * const UntunneledAdMobInterstitialAdUnitID = @"ca-app-pub-3940256099942544/4411468910";
+//NSString * const UntunneledAdMobRewardedVideoAdUnitID = @"ca-app-pub-3940256099942544/1712485313";
+
+NSString * const UntunneledAdMobInterstitialAdUnitID = @"ca-app-pub-1072041961750291/8751062454";
+NSString * const UntunneledAdMobRewardedVideoAdUnitID = @"ca-app-pub-1072041961750291/8356247142";
+
+//NSString * const MoPubUntunneledInterstitialAdUnitID = @"4250ebf7b28043e08ddbe04d444d79e4";
+//NSString * const MoPubUntunneledRewardVideoAdUnitID  = @"00638d8c82b34f9e8fe56b51cc704c87";
+NSString * const MoPubTunneledRewardVideoAdUnitID    = @"b9440504384740a2a3913a3d1b6db80e";
+
 
 // AdControllerTag values must be unique.
 AdControllerTag const AdControllerTagUntunneledInterstitial = @"UntunneledInterstitial";
@@ -201,9 +213,9 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
 @property (nonatomic, readwrite, nonnull) RACReplaySubject<NSNumber *> *rewardedVideoCanPresent;
 
 // Private properties
-@property (nonatomic, readwrite, nonnull) InterstitialAdControllerWrapper *untunneledInterstitial;
-@property (nonatomic, readwrite, nonnull) RewardedAdControllerWrapper *untunneledRewardVideo;
-@property (nonatomic, readwrite, nonnull) RewardedAdControllerWrapper *tunneledRewardVideo;
+@property (nonatomic, readwrite, nonnull) AdMobInterstitialAdControllerWrapper *untunneledInterstitial;
+@property (nonatomic, readwrite, nonnull) AdMobRewardedAdControllerWrapper *untunneledRewardVideo;
+@property (nonatomic, readwrite, nonnull) MoPubRewardedAdControllerWrapper *tunneledRewardVideo;
 
 // appEvents is hot infinite multicasted signal with underlying replay subject.
 @property (nonatomic, nullable) RACMulticastConnection<AppEvent *> *appEvents;
@@ -234,14 +246,21 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
 
         _compoundDisposable = [RACCompoundDisposable compoundDisposable];
 
-        _untunneledInterstitial = [[InterstitialAdControllerWrapper alloc]
-          initWithAdUnitID:UntunneledInterstitialAdUnitID withTag:AdControllerTagUntunneledInterstitial];
+        // TODO ! remove
+//        _untunneledInterstitial = [[MoPubInterstitialAdControllerWrapper alloc]
+//          initWithAdUnitID:MoPubUntunneledInterstitialAdUnitID withTag:AdControllerTagUntunneledInterstitial];
 
-        _untunneledRewardVideo = [[RewardedAdControllerWrapper alloc]
-          initWithAdUnitID:UntunneledRewardVideoAdUnitID withTag:AdControllerTagUntunneledRewardedVideo];
+        _untunneledInterstitial = [[AdMobInterstitialAdControllerWrapper alloc]
+          initWithAdUnitID:UntunneledAdMobInterstitialAdUnitID withTag:AdControllerTagUntunneledInterstitial];
 
-        _tunneledRewardVideo = [[RewardedAdControllerWrapper alloc]
-          initWithAdUnitID:TunneledRewardVideoAdUnitID withTag:AdControllerTagTunneledRewardedVideo];
+        // TODO ! remove
+//        _untunneledRewardVideo = [[MoPubRewardedAdControllerWrapper alloc]
+//          initWithAdUnitID:MoPubUntunneledRewardVideoAdUnitID withTag:AdControllerTagUntunneledRewardedVideo];
+        _untunneledRewardVideo = [[AdMobRewardedAdControllerWrapper alloc]
+          initWithAdUnitID:UntunneledAdMobRewardedVideoAdUnitID withTag:AdControllerTagUntunneledRewardedVideo];
+
+        _tunneledRewardVideo = [[MoPubRewardedAdControllerWrapper alloc]
+          initWithAdUnitID:MoPubTunneledRewardVideoAdUnitID withTag:AdControllerTagTunneledRewardedVideo];
 
         reachability = [Reachability reachabilityForInternetConnection];
 
@@ -293,7 +312,7 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
 
                 // MPMoPubConfiguration should be instantiated with any valid ad unit ID from the app.
                 MPMoPubConfiguration *sdkConfig = [[MPMoPubConfiguration alloc]
-                  initWithAdUnitIdForAppInitialization:UntunneledInterstitialAdUnitID];
+                  initWithAdUnitIdForAppInitialization:MoPubTunneledRewardVideoAdUnitID];
 
                 sdkConfig.globalMediationSettings = @[googleMediationSettings];
 
@@ -311,7 +330,7 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
                                 return;
                             }
 
-                            [GADMobileAds configureWithApplicationID:@"ca-app-pub-1072041961750291~2085686375"];
+                            [GADMobileAds configureWithApplicationID:GoogleAdMobAppID];
 
                             // MoPub consent dialog was presented successfully and dismissed
                             // or consent is already given or is not needed.

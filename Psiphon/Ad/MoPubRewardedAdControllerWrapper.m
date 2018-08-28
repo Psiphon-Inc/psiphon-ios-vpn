@@ -20,16 +20,16 @@
 #import <ReactiveObjC/RACReplaySubject.h>
 #import <ReactiveObjC/RACUnit.h>
 #import <ReactiveObjC/RACCompoundDisposable.h>
-#import "RewardedAdControllerWrapper.h"
+#import "MoPubRewardedAdControllerWrapper.h"
 #import "Asserts.h"
 #import "NSError+Convenience.h"
 #import "Logging.h"
 #import "Nullity.h"
 
 
-PsiFeedbackLogType const RewardedAdControllerWrapperLogType = @"RewardedAdControllerWrapper";
+PsiFeedbackLogType const MoPubRewardedAdControllerWrapperLogType = @"MoPubRewardedAdControllerWrapper";
 
-@interface RewardedAdControllerWrapper () <MPRewardedVideoDelegate>
+@interface MoPubRewardedAdControllerWrapper () <MPRewardedVideoDelegate>
 
 @property (nonatomic, readwrite, assign) BOOL ready;
 
@@ -47,7 +47,7 @@ PsiFeedbackLogType const RewardedAdControllerWrapperLogType = @"RewardedAdContro
 
 @end
 
-@implementation RewardedAdControllerWrapper
+@implementation MoPubRewardedAdControllerWrapper
 
 @synthesize tag = _tag;
 
@@ -67,7 +67,7 @@ PsiFeedbackLogType const RewardedAdControllerWrapperLogType = @"RewardedAdContro
 
 - (RACSignal<AdControllerTag> *)loadAd {
 
-    RewardedAdControllerWrapper *__weak weakSelf = self;
+    MoPubRewardedAdControllerWrapper *__weak weakSelf = self;
 
     return [RACSignal createSignal:^RACDisposable *(id <RACSubscriber> subscriber) {
 
@@ -82,7 +82,7 @@ PsiFeedbackLogType const RewardedAdControllerWrapperLogType = @"RewardedAdContro
 
 - (RACSignal<AdControllerTag> *)unloadAd {
 
-    RewardedAdControllerWrapper *__weak weakSelf = self;
+    MoPubRewardedAdControllerWrapper *__weak weakSelf = self;
 
     return [RACSignal createSignal:^RACDisposable *(id <RACSubscriber> subscriber) {
         // Unlike interstitials, MoPub SDK doesn't provide a way to destroy the pre-fetched rewarded video ads.
@@ -102,7 +102,7 @@ PsiFeedbackLogType const RewardedAdControllerWrapperLogType = @"RewardedAdContro
 - (RACSignal<NSNumber *> *)presentAdFromViewController:(UIViewController *)viewController
                                         withCustomData:(NSString *_Nullable)customData {
 
-    RewardedAdControllerWrapper *__weak weakSelf = self;
+    MoPubRewardedAdControllerWrapper *__weak weakSelf = self;
 
     return [RACSignal createSignal:^RACDisposable *(id <RACSubscriber> subscriber) {
 
@@ -210,9 +210,13 @@ PsiFeedbackLogType const RewardedAdControllerWrapperLogType = @"RewardedAdContro
         self.ready = FALSE;
     }
     [self.presentationStatus sendNext:@(AdPresentationDidDisappear)];
+
+    // Since MoPub SDK states that `rewardedVideoAdShouldRewardForAdUnitID:reward:` delegate callback will not be
+    // called if server-side rewarding is enabled, we will emit `AdPresentationDidRewardUser` here immediately.
+    [self.presentationStatus sendNext:@(AdPresentationDidRewardUser)];
     [self.adPresented sendNext:RACUnit.defaultUnit];
 
-    [PsiFeedbackLogger infoWithType:RewardedAdControllerWrapperLogType json:
+    [PsiFeedbackLogger infoWithType:MoPubRewardedAdControllerWrapperLogType json:
       @{@"event": @"adDidDisappear", @"tag": self.tag}];
 }
 
