@@ -33,15 +33,16 @@ PsiFeedbackLogType const MoPubRewardedAdControllerWrapperLogType = @"MoPubReward
 
 @property (nonatomic, readwrite, assign) BOOL ready;
 
-/** Hot infinite signal - emits RACUnit whenever an ad is presented. */
+/** adPresented is hot infinite signal - emits RACUnit whenever an ad is presented. */
 @property (nonatomic, readwrite, nonnull) RACSubject<RACUnit *> *adPresented;
 
+/** presentationStatus is hot infinite signal - emits items of type @(AdPresentation). */
+@property (nonatomic, readwrite, nonnull) RACSubject<NSNumber *> *presentationStatus;
+
 // Private Properties.
+
 /** loadStatus is hot non-completing signal - emits the wrapper tag when the ad has been loaded. */
 @property (nonatomic, readwrite, nonnull) RACSubject<AdControllerTag> *loadStatus;
-
-/** Hot terminating signal - emits items of type @(AdPresentation). */
-@property (nonatomic, nullable) RACSubject<NSNumber *> *presentationStatus;
 
 @property (nonatomic, readonly) NSString *adUnitID;
 
@@ -123,8 +124,11 @@ PsiFeedbackLogType const MoPubRewardedAdControllerWrapperLogType = @"MoPubReward
         // We're only expecting one reward.
         PSIAssert(rewards.count == 1);
 
-        RACDisposable *disposable = [weakSelf.presentationStatus subscribe:subscriber];
-
+        // Subscribe to presentationStatus before presenting the ad.
+        RACDisposable *disposable = [[AdControllerWrapperHelper
+          transformAdPresentationToTerminatingSignal:weakSelf.presentationStatus
+                         allowOutOfOrderRewardStatus:FALSE]
+          subscribe:subscriber];
 
         // Selects the first reward only, since we're only expecting one type of reward for now.
         [MPRewardedVideo presentRewardedVideoAdForAdUnitID:self.adUnitID
@@ -209,11 +213,13 @@ PsiFeedbackLogType const MoPubRewardedAdControllerWrapperLogType = @"MoPubReward
     if (self.ready) {
         self.ready = FALSE;
     }
-    [self.presentationStatus sendNext:@(AdPresentationDidDisappear)];
 
     // Since MoPub SDK states that `rewardedVideoAdShouldRewardForAdUnitID:reward:` delegate callback will not be
     // called if server-side rewarding is enabled, we will emit `AdPresentationDidRewardUser` here immediately.
     [self.presentationStatus sendNext:@(AdPresentationDidRewardUser)];
+
+    [self.presentationStatus sendNext:@(AdPresentationDidDisappear)];
+
     [self.adPresented sendNext:RACUnit.defaultUnit];
 
     [PsiFeedbackLogger infoWithType:MoPubRewardedAdControllerWrapperLogType json:

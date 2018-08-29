@@ -124,7 +124,6 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     PsiCashBalanceWithSpeedBoostMeter *psiCashView;
     PsiCashRewardedVideoBar * psiCashRewardedVideoBar;
     RACDisposable *psiCashViewUpdates;
-    RACDisposable *showRewardedVideoDisposable;
 
 }
 
@@ -1308,13 +1307,11 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     LOG_DEBUG(@"rewarded video started");
     [PsiFeedbackLogger infoWithType:RewardedVideoLogType message:@"started"];
 
-    [showRewardedVideoDisposable dispose];
-
     RACSignal *showVideo = [self.adManager presentRewardedVideoOnViewController:self
       withCustomData:[[PsiCashClient sharedInstance] rewardedVideoCustomData]];
 
-    showRewardedVideoDisposable = [showVideo subscribeNext:^(NSNumber *x) {
-        AdPresentation ap = (AdPresentation) [x integerValue];
+    [self.compoundDisposable addDisposable:[showVideo subscribeNext:^(NSNumber *value) {
+        AdPresentation ap = (AdPresentation) [value integerValue];
 
         switch (ap) {
             case AdPresentationWillAppear:
@@ -1355,7 +1352,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     } completed:^{
         LOG_DEBUG(@"rewarded video completed");
         [PsiFeedbackLogger infoWithType:RewardedVideoLogType message:@"completed"];
-    }];
+    }]];
 }
 
 #pragma mark - PsiCashPurchaseAlertViewDelegate protocol

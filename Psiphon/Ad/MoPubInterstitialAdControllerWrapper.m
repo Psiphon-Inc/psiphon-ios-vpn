@@ -25,6 +25,7 @@
 #import "NSError+Convenience.h"
 #import "RACUnit.h"
 #import "Logging.h"
+#import "Asserts.h"
 
 
 PsiFeedbackLogType const MoPubInterstitialAdControllerWrapperLogType = @"MoPubInterstitialAdControllerWrapper";
@@ -124,7 +125,11 @@ PsiFeedbackLogType const MoPubInterstitialAdControllerWrapperLogType = @"MoPubIn
             return nil;
         }
 
-        RACDisposable *disposable = [weakSelf.presentationStatus subscribe:subscriber];
+        // Subscribe to presentationStatus before presenting the ad.
+        RACDisposable *disposable = [[AdControllerWrapperHelper
+          transformAdPresentationToTerminatingSignal:weakSelf.presentationStatus]
+          subscribe:subscriber];
+
         [weakSelf.interstitial showFromViewController:viewController];
 
         return disposable;

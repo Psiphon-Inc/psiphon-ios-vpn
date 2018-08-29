@@ -25,6 +25,7 @@
 #import "NSError+Convenience.h"
 #import "RACUnit.h"
 #import "Logging.h"
+#import "Asserts.h"
 @import GoogleMobileAds;
 #import <Google-Mobile-Ads-SDK/GoogleMobileAds/GADInterstitial.h>
 
@@ -141,7 +142,11 @@ PsiFeedbackLogType const AdMobInterstitialAdControllerWrapperLogType = @"AdMobIn
             return nil;
         }
 
-        RACDisposable *disposable = [weakSelf.presentationStatus subscribe:subscriber];
+        // Subscribe to presentationStatus before presenting the ad.
+        RACDisposable *disposable = [[AdControllerWrapperHelper
+          transformAdPresentationToTerminatingSignal:weakSelf.presentationStatus]
+          subscribe:subscriber];
+
         [weakSelf.interstitial presentFromRootViewController:viewController];
 
         return disposable;
