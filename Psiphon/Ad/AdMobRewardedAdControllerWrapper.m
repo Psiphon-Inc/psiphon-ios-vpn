@@ -24,6 +24,7 @@
 #import "Logging.h"
 #import "Nullity.h"
 #import "NSError+Convenience.h"
+#import "Asserts.h"
 @import GoogleMobileAds;
 
 PsiFeedbackLogType const AdMobRewardedAdControllerWrapperLogType = @"AdMobRewardedAdControllerWrapper";
@@ -59,11 +60,6 @@ PsiFeedbackLogType const AdMobRewardedAdControllerWrapperLogType = @"AdMobReward
     _adPresented = [RACSubject subject];
     _presentationStatus = [RACSubject subject];
     return self;
-}
-
-// TODO ! do we need this?
-- (void)dealloc {
-
 }
 
 - (RACSignal<AdControllerTag> *)loadAd {
@@ -124,8 +120,11 @@ PsiFeedbackLogType const AdMobRewardedAdControllerWrapperLogType = @"AdMobReward
             return nil;
         }
 
-        RACDisposable *disposable = [weakSelf.presentationStatus subscribe:subscriber];
-
+        // Subscribe to presentationStatus before presenting the ad.
+        RACDisposable *disposable = [[AdControllerWrapperHelper
+          transformAdPresentationToTerminatingSignal:weakSelf.presentationStatus
+                         allowOutOfOrderRewardStatus:TRUE]
+          subscribe:subscriber];
 
         // TODO ! is this the appropriate time to set the custom data?
         // There is also a user identifier string which must be set before ad is
