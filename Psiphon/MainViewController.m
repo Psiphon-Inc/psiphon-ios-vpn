@@ -454,15 +454,11 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                         if (!vpnInstalled) {
                             return [RACSignal return:CommandStartTunnel];
                         } else {
-                            return [[[[weakSelf.adManager presentInterstitialOnViewController:weakSelf]
-                              filter:^BOOL(NSNumber *value) {
-                                  AdPresentation ap = (AdPresentation) [value integerValue];
-                                  return (ap != AdPresentationWillAppear) &&
-                                    (ap != AdPresentationDidAppear) &&
-                                    (ap != AdPresentationWillDisappear);
-                              }]
-                              take:1]
-                              mapReplace:CommandStartTunnel];
+                            // Start tunnel after ad presentation signal completes.
+                            return [[weakSelf.adManager presentInterstitialOnViewController:weakSelf]
+                              then:^RACSignal * {
+                                  return [RACSignal return:CommandStartTunnel];
+                              }];
                         }
                     }];
               }

@@ -39,7 +39,9 @@ FOUNDATION_EXPORT AdControllerTag const AdControllerTagTunneledRewardedVideo;
 
 /**
  * Infinite signal that emits @(TRUE) if an is currently being displayed, @(FALSE) otherwise.
- * The subject may emit duplicate state.
+ * Replay subject starts with initial value of @(FALSE) during `-initializeAdManager`.
+ * The subject may emit non-unique states.
+ * @scheduler Events are delivered on the main thread.
  */
 @property (nonatomic, readonly) RACReplaySubject<NSNumber *> *adIsShowing;
 
@@ -70,7 +72,9 @@ FOUNDATION_EXPORT AdControllerTag const AdControllerTagTunneledRewardedVideo;
 - (void)initializeAdManager;
 
 /**
- * Presents untunneled interstitial if app is in the appropriate state, and an interstitial ad has already been loaded.
+ * Returns a signal that upon subscriptions presents ad (if one is already loaded).
+ * Returned signal emits items of type @(AdPresentation), and completes immediately after the presented ad is dismissed,
+ * or after emission of an AdPresentation error state.
  *
  * If ad cannot be presented due to inappropriate app state, returned signal completes immediately.
  *
@@ -78,9 +82,6 @@ FOUNDATION_EXPORT AdControllerTag const AdControllerTagTunneledRewardedVideo;
  * one of the errors states of @(AdPresentation) will be emitted (enums starting with AdPresentationError_)
  * and then the signal will complete.
  *
- * If the add is ready to be presented, the signal will start by emitting the following states in order:
- *  AdPresentationWillAppear -> AdPresentationDidAppear -> AdPresentationWillDisappear -> AdPresentationDidDisappear
- * after which the signal will complete.
  */
 - (RACSignal<NSNumber *> *)presentInterstitialOnViewController:(UIViewController *)viewController;
 
@@ -93,10 +94,6 @@ FOUNDATION_EXPORT AdControllerTag const AdControllerTagTunneledRewardedVideo;
  * If the app state is appropriate for displaying an ad, but there's an underlying error,
  * one of the errors states of @(AdPresentation) will be emitted (enums starting with AdPresentationError_)
  * and then the signal will complete.
- *
- * If the add is ready to be presented, the signal will start by emitting the following states in order:
- *  AdPresentationWillAppear -> AdPresentationDidAppear -> AdPresentationWillDisappear -> AdPresentationDidDisappear
- * after which the signal will complete.
  *
  * @param viewController View controller to display ad on top of.
  * @param customData Optional custom data to include in the ad service server-to-server callback.
