@@ -177,6 +177,9 @@ PsiFeedbackLogType const AdMobInterstitialAdControllerWrapperLogType = @"AdMobIn
 }
 
 - (void)interstitialDidFailToPresentScreen:(GADInterstitial *)ad {
+    if (self.ready) {
+        self.ready = FALSE;
+    }
     [self.presentationStatus sendNext:@(AdPresentationErrorFailedToPlay)];
 }
 
