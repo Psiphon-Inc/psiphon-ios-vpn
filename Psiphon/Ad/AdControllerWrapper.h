@@ -127,10 +127,12 @@ typedef NS_ERROR_ENUM(AdControllerWrapperErrorDomain, AdControllerWrapperErrorCo
 // `AdControllerWrapperErrorCode` error code.
 //
 // e.g. If the ad has already been loaded, the returned signal should emit AdControllerTag immediately.
+// Scheduler: should be subscribed on the main thread.
 - (RACSignal<AdControllerTag> *)loadAd;
 
 // Unloads ad if one is loaded. `ready` should be FALSE after the unloading is done.
 // Implementations should emit the wrapper's tag after ad is unloaded and then complete.
+// Scheduler: should be subscribed on the main thread.
 - (RACSignal<AdControllerTag> *)unloadAd;
 
 @optional
