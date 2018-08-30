@@ -44,6 +44,9 @@ PsiFeedbackLogType const AdMobRewardedAdControllerWrapperLogType = @"AdMobReward
 /** loadStatus is hot non-completing signal - emits the wrapper tag when the ad has been loaded. */
 @property (nonatomic, readwrite, nonnull) RACSubject<AdControllerTag> *loadStatus;
 
+/** TRUE if an ad request has been placed and has not finished yet (either failed or succeeded), FALSE otherwise. */
+@property (nonatomic, readwrite, assign) BOOL loading;
+
 @property (nonatomic, readonly) NSString *adUnitID;
 
 @end
@@ -59,6 +62,7 @@ PsiFeedbackLogType const AdMobRewardedAdControllerWrapperLogType = @"AdMobReward
     _ready = FALSE;
     _presentedAdDismissed = [RACSubject subject];
     _presentationStatus = [RACSubject subject];
+    _loading = FALSE;
     return self;
 }
 
@@ -71,13 +75,26 @@ PsiFeedbackLogType const AdMobRewardedAdControllerWrapperLogType = @"AdMobReward
         // Subscribe to load status before loading an ad to prevent race-condition with "adDidLoad" delegate callback.
         RACDisposable *disposable = [weakSelf.loadStatus subscribe:subscriber];
 
-        [GADRewardBasedVideoAd sharedInstance].delegate = weakSelf;
-        // TODO ! what if an ad request has already been placed.
-        GADRequest *request = [GADRequest request];
-#if DEBUG
-        request.testDevices = @[ @"4a907b319b37ceee4d9970dbb0231ef0" ];
-#endif
-        [[GADRewardBasedVideoAd sharedInstance] loadRequest:request withAdUnitID:self.adUnitID];
+        GADRewardBasedVideoAd *videoAd = [GADRewardBasedVideoAd sharedInstance];
+
+        // Create ad request only if one is not ready or is not loading.
+        if (videoAd.isReady) {
+            // Manually call the delegate method to re-execute the logic for when an ad is loaded.
+            [weakSelf rewardBasedVideoAdDidReceiveAd:videoAd];
+
+        } else if (!weakSelf.loading) {
+
+            weakSelf.loading = TRUE;
+
+            videoAd.delegate = weakSelf;
+
+            GADRequest *request = [GADRequest request];
+
+    #if DEBUG
+            request.testDevices = @[@"4a907b319b37ceee4d9970dbb0231ef0"];
+    #endif
+            [videoAd loadRequest:request withAdUnitID:self.adUnitID];
+        }
 
         return disposable;
     }];
@@ -144,6 +161,9 @@ PsiFeedbackLogType const AdMobRewardedAdControllerWrapperLogType = @"AdMobReward
 }
 
 - (void)rewardBasedVideoAdDidReceiveAd:(GADRewardBasedVideoAd *)rewardBasedVideoAd {
+
+    self.loading = FALSE;
+
     if (!self.ready) {
         self.ready = TRUE;
     }
@@ -151,6 +171,9 @@ PsiFeedbackLogType const AdMobRewardedAdControllerWrapperLogType = @"AdMobReward
 }
 
 - (void)rewardBasedVideoAd:(GADRewardBasedVideoAd *)rewardBasedVideoAd didFailToLoadWithError:(NSError *)error {
+
+    self.loading = FALSE;
+
     if (self.ready) {
         self.ready = FALSE;
     }
