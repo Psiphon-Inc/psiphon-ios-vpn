@@ -34,8 +34,8 @@ PsiFeedbackLogType const MoPubInterstitialAdControllerWrapperLogType = @"MoPubIn
 
 @property (nonatomic, readwrite, assign) BOOL ready;
 
-/** adPresented is hot infinite signal - emits RACUnit whenever an ad is presented. */
-@property (nonatomic, readwrite, nonnull) RACSubject<RACUnit *> *adPresented;
+/** presentedAdDismissed is hot infinite signal - emits RACUnit whenever an ad is presented. */
+@property (nonatomic, readwrite, nonnull) RACSubject<RACUnit *> *presentedAdDismissed;
 
 /** presentationStatus is hot infinite signal - emits items of type @(AdPresentation). */
 @property (nonatomic, readwrite, nonnull) RACSubject<NSNumber *> *presentationStatus;
@@ -59,7 +59,7 @@ PsiFeedbackLogType const MoPubInterstitialAdControllerWrapperLogType = @"MoPubIn
     _loadStatus = [RACSubject subject];
     _adUnitID = adUnitID;
     _ready = FALSE;
-    _adPresented = [RACSubject subject];
+    _presentedAdDismissed = [RACSubject subject];
     _presentationStatus = [RACSubject subject];
     return self;
 }
@@ -182,7 +182,7 @@ PsiFeedbackLogType const MoPubInterstitialAdControllerWrapperLogType = @"MoPubIn
         self.ready = FALSE;
     }
     [self.presentationStatus sendNext:@(AdPresentationDidDisappear)];
-    [self.adPresented sendNext:RACUnit.defaultUnit];
+    [self.presentedAdDismissed sendNext:RACUnit.defaultUnit];
 
     [PsiFeedbackLogger infoWithType:MoPubInterstitialAdControllerWrapperLogType json:
       @{@"event": @"adDidDisappear", @"tag": self.tag}];
