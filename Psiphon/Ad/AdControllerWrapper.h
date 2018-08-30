@@ -113,8 +113,9 @@ typedef NS_ERROR_ENUM(AdControllerWrapperErrorDomain, AdControllerWrapperErrorCo
 // should check the current value before setting it.
 @property (nonatomic, readonly) BOOL ready;
 
-// adPresented is hot infinite signal - emits RACUnit whenever an ad is shown.
-@property (nonatomic, readonly) RACSubject<RACUnit *> *adPresented;
+// presentedAdDismissed is hot infinite signal - emits RACUnit whenever an ad is shown.
+// Note: It is assumed that after an emission from this signal, it is safe to load another ad.
+@property (nonatomic, readonly) RACSubject<RACUnit *> *presentedAdDismissed;
 
 // presentationStatus is hot infinite signal - emits items of type @(AdPresentation).
 @property (nonatomic, readonly) RACSubject<NSNumber *> *presentationStatus;

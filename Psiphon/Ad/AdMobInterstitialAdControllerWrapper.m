@@ -36,8 +36,8 @@ PsiFeedbackLogType const AdMobInterstitialAdControllerWrapperLogType = @"AdMobIn
 
 @property (nonatomic, readwrite, assign) BOOL ready;
 
-/** adPresented is hot infinite signal - emits RACUnit whenever an ad is presented. */
-@property (nonatomic, readwrite, nonnull) RACSubject<RACUnit *> *adPresented;
+/** presentedAdDismissed is hot infinite signal - emits RACUnit whenever an ad is presented. */
+@property (nonatomic, readwrite, nonnull) RACSubject<RACUnit *> *presentedAdDismissed;
 
 /** presentationStatus is hot infinite signal - emits items of type @(AdPresentation). */
 @property (nonatomic, readwrite, nonnull) RACSubject<NSNumber *> *presentationStatus;
@@ -67,7 +67,7 @@ PsiFeedbackLogType const AdMobInterstitialAdControllerWrapperLogType = @"AdMobIn
     _loadStatus = [RACSubject subject];
     _adUnitID = adUnitID;
     _ready = FALSE;
-    _adPresented = [RACSubject subject];
+    _presentedAdDismissed = [RACSubject subject];
     _presentationStatus = [RACSubject subject];
     return self;
 }
@@ -81,7 +81,7 @@ PsiFeedbackLogType const AdMobInterstitialAdControllerWrapperLogType = @"AdMobIn
         // Subscribe to load status before loading an ad to prevent race-condition with "adDidLoad" delegate callback.
         RACDisposable *disposable = [weakSelf.loadStatus subscribe:subscriber];
 
-        // if no interstitial is initialized, or ad has already been displayed, or last load request failed,
+        // If interstitial is not initialized, or ad has already been displayed, or last load request failed,
         // initialize interstitial and start loading ad.
         if (!weakSelf.interstitial || weakSelf.interstitial.hasBeenUsed || weakSelf.lastError) {
 
@@ -189,7 +189,7 @@ PsiFeedbackLogType const AdMobInterstitialAdControllerWrapperLogType = @"AdMobIn
         self.ready = FALSE;
     }
     [self.presentationStatus sendNext:@(AdPresentationDidDisappear)];
-    [self.adPresented sendNext:RACUnit.defaultUnit];
+    [self.presentedAdDismissed sendNext:RACUnit.defaultUnit];
 
     [PsiFeedbackLogger infoWithType:AdMobInterstitialAdControllerWrapperLogType json:
       @{@"event": @"adDidDisappear", @"tag": self.tag}];

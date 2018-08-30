@@ -653,16 +653,17 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
     NSInteger const AD_LOAD_RETRY_COUNT = 1;
     NSTimeInterval const MIN_AD_RELOAD_TIMER = 1.0;
 
-    NSString * const TriggerAdPresented = @"adPresented";
+    // List of "trigger"s.
+    NSString * const TriggerPresentedAdDismissed = @"presentedAdDismissed";
     NSString * const TriggerAppEvent = @"appEvent";
 
-    // adPresentedAppEvent is hot infinite signal - emits tuple (TriggerAdPresented, AppEvent*) whenever the ad
-    // from `adController` is dismissed and no longer presented.
-    RACSignal<RACTwoTuple<NSString*,AppEvent*>*> *adPresentedAppEvent =
-      [adController.adPresented flattenMap:^RACSignal<AppEvent *> *(RACUnit *value) {
+    // presentedAdDismissedWithAppEvent is hot infinite signal - emits tuple (TriggerPresentedAdDismissed, AppEvent*)
+    // whenever the ad from `adController` is dismissed and no longer presented.
+    RACSignal<RACTwoTuple<NSString*,AppEvent*>*> *presentedAdDismissedWithAppEvent =
+      [adController.presentedAdDismissed flattenMap:^RACSignal<AppEvent *> *(RACUnit *value) {
         // Return the cached value of `appEvents`.
         return [[self.appEvents.signal take:1] map:^RACTwoTuple<NSString*,AppEvent*>*(AppEvent *event) {
-            return [RACTwoTuple pack:TriggerAdPresented :event];
+            return [RACTwoTuple pack:TriggerPresentedAdDismissed :event];
         }];
     }];
 
@@ -673,7 +674,7 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
     }];
 
     RACSignal<RACTwoTuple<AdControllerTag, AppEventActionTuple *> *> *adLoadUnloadSignal = [[[[[RACSignal
-      merge:@[adPresentedAppEvent, appEventWithSource]]
+      merge:@[presentedAdDismissedWithAppEvent, appEventWithSource]]
       map:^AppEventActionTuple *(RACTwoTuple<NSString*,AppEvent*> *tuple) {
 
           NSString *triggerSignal = tuple.first;
@@ -708,7 +709,7 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
               // If the current tunnel state is the same as the ads required tunnel state, then load ad.
               if (event.tunnelState == loadTunnelState && !adController.ready) {
 
-                  if ([TriggerAdPresented isEqualToString:triggerSignal]) {
+                  if ([TriggerPresentedAdDismissed isEqualToString:triggerSignal]) {
                       // The user has just finished viewing the ad.
                       sa.action = afterPresentationLoadAction;
 
