@@ -26,13 +26,13 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-#pragma mark - AdControllerWrapperProtocol definition
-
 /**
  * Ad controller tag type.
  * @note Values must be unique.
  */
 typedef NSString * AdControllerTag NS_STRING_ENUM;
+
+# pragma mark - Ad presentation enum and helper functions
 
 /**
  * AdPresentationStatus used by implementors of `AdControllerWrapperProtocol`.
@@ -71,6 +71,15 @@ static inline BOOL adPresentationError(AdPresentation ap) {
     return (ap >= AdPresentationErrorStateStartingValue);
 };
 
+/**
+ * Returns TRUE if `ap` has a value that indicates ad is present on the screen.
+ */
+static inline BOOL adBeingPresented(AdPresentation ap) {
+    return (ap == AdPresentationWillAppear || ap == AdPresentationDidAppear || ap == AdPresentationWillDisappear);
+};
+
+#pragma mark -
+
 FOUNDATION_EXPORT NSErrorDomain const AdControllerWrapperErrorDomain;
 
 /**
@@ -84,6 +93,8 @@ typedef NS_ERROR_ENUM(AdControllerWrapperErrorDomain, AdControllerWrapperErrorCo
      * AdManager will load a new ad `AD_LOAD_RETRY_COUNT` times. */
       AdControllerWrapperErrorAdFailedToLoad,
 };
+
+#pragma mark -
 
 /**
  * AdControllerWrapperProtocol is the protocol used by AdManager to interface with different Ad SDKs or types.
@@ -132,6 +143,8 @@ typedef NS_ERROR_ENUM(AdControllerWrapperErrorDomain, AdControllerWrapperErrorCo
 - (RACSignal<NSNumber *> *)presentAdFromViewController:(UIViewController *)viewController;
 
 @end
+
+#pragma mark -
 
 @interface AdControllerWrapperHelper : NSObject
 

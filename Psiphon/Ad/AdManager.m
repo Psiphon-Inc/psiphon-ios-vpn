@@ -523,33 +523,19 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
     // NOTE: It is assumed here that only one ad is shown at a time, and once an ad is presenting none of the
     //       other ad controllers will change their presentation status.
     {
-        // Underlying signal will emit @(TRUE) if an ad is presenting, and @(FALSE) otherwise.
-        RACMulticastConnection<NSNumber *> *adPresentationMultiCast = [[[[[[RACSignal
+
+        // Underlying signal emits @(TRUE) if an ad is presenting, and @(FALSE) otherwise.
+        RACMulticastConnection<NSNumber *> *adPresentationMultiCast = [[[[[RACSignal
           merge:@[
             self.untunneledInterstitial.presentationStatus,
             self.untunneledRewardVideo.presentationStatus,
             self.tunneledRewardVideo.presentationStatus
           ]]
-          filter:^BOOL(NSNumber *presentationStatus) {
-              AdPresentation ap = (AdPresentation) [presentationStatus integerValue];
-
-              // Filter out all states that are not related to an ad view controller being presented.
-              return (ap != AdPresentationErrorNoAdsLoaded);
-          }]
           map:^NSNumber *(NSNumber *presentationStatus) {
               AdPresentation ap = (AdPresentation) [presentationStatus integerValue];
 
-              // Normal ad presentation chain with no errors:
-              // AdPresentationWillAppear -> AdPresentationDidAppear -> AdPresentationWillDisappear
-              //   -> AdPresentationDidDisappear
-
-              if (ap == AdPresentationWillAppear || ap == AdPresentationDidAppear || ap == AdPresentationWillDisappear) {
-                  return @(TRUE);
-              } else {
-                  // In this branch `ap` is either AdPresentationDidDisappear or one of the error states.
-                  return @(FALSE);
-              }
-
+              // Returns @(TRUE) if ad is being presented, and `ap` is not one of the error states.
+              return @(adBeingPresented(ap));
           }]
           startWith:@(FALSE)]  // No ads are being shown when the app is launched.
                                // This initializes the adIsShowing signal.
@@ -600,12 +586,11 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
 - (RACSignal<NSNumber *> *)presentInterstitialOnViewController:(UIViewController *)viewController {
 
     return [self presentAdHelper:^RACSignal<NSNumber *> *(TunnelState tunnelState) {
-
-                              if (TunnelStateUntunneled == tunnelState) {
-                                  return [self.untunneledInterstitial presentAdFromViewController:viewController];
-                              }
-                              return nil;
-                          }];
+        if (TunnelStateUntunneled == tunnelState) {
+            return [self.untunneledInterstitial presentAdFromViewController:viewController];
+        }
+        return nil;
+    }];
 }
 
 - (RACSignal<NSNumber *> *)presentRewardedVideoOnViewController:(UIViewController *)viewController
