@@ -400,6 +400,11 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 
     }];
 
+
+    NSString * const CommandNoInternetAlert = @"NoInternetAlert";
+    NSString * const CommandStartTunnel = @"StartTunnel";
+    NSString * const CommandStopVPN = @"StopVPN";
+
     // signal emits a single two tuple (isVPNActive, connectOnDemandEnabled).
     __block RACDisposable *disposable = [[[[privacyPolicyAccepted
       flattenMap:^RACSignal<RACTwoTuple <NSNumber *, NSNumber *> *> *(RACUnit *x) {
@@ -408,12 +413,16 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
       flattenMap:^RACSignal<NSString *> *(RACTwoTuple<NSNumber *, NSNumber *> *twoTuple) {
           BOOL vpnActive = [twoTuple.first boolValue];
 
-          if (!vpnActive) {
+          // Emits command to stop VPN if it has already started. Otherwise, it checks for internet connectivity
+          // and emits one of CommandNoInternetAlert or CommandStartTunnel.
+          if (vpnActive) {
+              return [RACSignal return:CommandStopVPN];
+
+          } else {
               // Alerts the user if there is no internet connection.
               Reachability *reachability = [Reachability reachabilityForInternetConnection];
               if ([reachability currentReachabilityStatus] == NotReachable) {
-                  [[AppDelegate sharedAppDelegate] displayAlertNoInternet];
-                  return [RACSignal empty];
+                  return [RACSignal return:CommandNoInternetAlert];
 
               } else {
 
@@ -424,7 +433,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                         BOOL vpnInstalled = [value boolValue];
 
                         if (!vpnInstalled) {
-                            return [RACSignal return:@"startTunnel"];
+                            return [RACSignal return:CommandStartTunnel];
                         } else {
                             return [[[[weakSelf.adManager presentInterstitialOnViewController:weakSelf]
                               filter:^BOOL(NSNumber *value) {
@@ -434,22 +443,20 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                                     (ap != AdPresentationWillDisappear);
                               }]
                               take:1]
-                              mapReplace:@"startTunnel"];
+                              mapReplace:CommandStartTunnel];
                         }
                     }];
               }
-          } else {
-              return [RACSignal return:@"stopVPN"];
           }
 
       }]
       deliverOnMainThread]
       subscribeNext:^(NSString *command) {
 
-        if ([@"startTunnel" isEqualToString:command]) {
+        if ([CommandStartTunnel isEqualToString:command]) {
             [weakSelf.vpnManager startTunnel];
 
-        } else if ([@"stopVPN" isEqualToString:command]) {
+        } else if ([CommandStopVPN isEqualToString:command]) {
 
             // TODO: we shouldn't create a Rx subscription inside of a subscription, this should all be part of the
             // same reactive chain.
@@ -464,6 +471,9 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
               }];
 
             [weakSelf.compoundDisposable addDisposable:disposable];
+
+        } else if ([CommandNoInternetAlert isEqualToString:command]) {
+            [[AppDelegate sharedAppDelegate] displayAlertNoInternet];
         }
 
     } error:^(NSError *error) {
