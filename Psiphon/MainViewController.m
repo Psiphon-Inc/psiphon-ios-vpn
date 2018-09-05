@@ -113,8 +113,6 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     UIView *bottomBar;
     NSString *selectedRegionSnapShot;
     
-    UIAlertController *alertControllerNoInternet;
-    
     FeedbackManager *feedbackManager;
 
     // PsiCash
@@ -414,7 +412,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
               // Alerts the user if there is no internet connection.
               Reachability *reachability = [Reachability reachabilityForInternetConnection];
               if ([reachability currentReachabilityStatus] == NotReachable) {
-                  [weakSelf displayAlertNoInternet];
+                  [[AppDelegate sharedAppDelegate] displayAlertNoInternet];
                   return [RACSignal empty];
 
               } else {
@@ -498,36 +496,6 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 #endif
 
 # pragma mark - UI helper functions
-
-- (void)dismissNoInternetAlert {
-    LOG_DEBUG();
-    if (alertControllerNoInternet != nil){
-        [alertControllerNoInternet dismissViewControllerAnimated:YES completion:nil];
-        alertControllerNoInternet = nil;
-    }
-}
-
-- (void)displayAlertNoInternet {
-    if (alertControllerNoInternet == nil){
-        alertControllerNoInternet = [UIAlertController
-                                     alertControllerWithTitle:NSLocalizedStringWithDefaultValue(@"NO_INTERNET", nil, [NSBundle mainBundle], @"No Internet Connection", @"Alert title informing user there is no internet connection")
-                                     message:NSLocalizedStringWithDefaultValue(@"TURN_ON_DATE", nil, [NSBundle mainBundle], @"Turn on cellular data or use Wi-Fi to access data.", @"Alert message informing user to turn on their cellular data or wifi to connect to the internet")
-                                     preferredStyle:UIAlertControllerStyleAlert];
-        
-        UIAlertAction *defaultAction = [UIAlertAction
-                                        actionWithTitle:NSLocalizedStringWithDefaultValue(@"OK_BUTTON", nil, [NSBundle mainBundle], @"OK", @"Alert OK Button")
-                                        style:UIAlertActionStyleDefault
-                                        handler:^(UIAlertAction *action) {
-                                        }];
-        
-        [alertControllerNoInternet addAction:defaultAction];
-        [[NSNotificationCenter defaultCenter] addObserver:self
-                                                 selector:@selector(dismissNoInternetAlert)
-                                                     name:@"UIApplicationWillResignActiveNotification" object:nil];
-    }
-    
-    [alertControllerNoInternet presentFromTopController];
-}
 
 - (NSString *)getVPNStatusDescription:(VPNStatus)status {
     switch(status) {

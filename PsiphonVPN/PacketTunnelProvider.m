@@ -991,6 +991,10 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
     self.reasserting = TRUE;
 }
 
+- (void)onStartedWaitingForNetworkConnectivity {
+    [[Notifier sharedInstance] post:NotifierWaitingForNetworkConnectivity];
+}
+
 - (void)onActiveAuthorizationIDs:(NSArray * _Nonnull)authorizationIds {
 
     __weak PacketTunnelProvider *weakSelf = self;
