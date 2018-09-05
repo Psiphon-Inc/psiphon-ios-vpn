@@ -507,6 +507,34 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
 
     } else if ([NotifierMarkedAuthorizations isEqualToString:message]) {
         [[PsiCashClient sharedInstance] authorizationsMarkedExpired];
+
+    } else if ([NotifierWaitingForNetworkConnectivity isEqualToString:message]) {
+
+        // To ensure that we don't show the notification for a condition that no longer exists, we need
+        // to double-check the VPN status.
+        //
+        // And due to the race condition present between when this notification is received from the extension
+        // and when the tunnel status changes, the signal below waits for maximum of 1 second for tunnel status
+        // to be in one of the expected connecting or reasserting states.
+        __block RACDisposable *disposable = [[[[[self.vpnManager lastTunnelStatus] filter:^BOOL(NSNumber *value) {
+
+            // If the VPN state is not connecting or reconnecting, then we should not show the no internet alert.
+            VPNStatus s = (VPNStatus) [value integerValue];
+            return (s == VPNStatusConnecting || s == VPNStatusReasserting);
+          }]
+          take:1]
+          timeout:1.0 onScheduler:RACScheduler.mainThreadScheduler]
+          subscribeNext:^(NSNumber *x) {
+              [weakSelf displayAlertNoInternet];
+          }
+          error:^(NSError *error) {
+              [weakSelf.compoundDisposable removeDisposable:disposable];
+          }
+          completed:^{
+              [weakSelf.compoundDisposable removeDisposable:disposable];
+          }];
+
+        [self.compoundDisposable addDisposable:disposable];
     }
 }
 
@@ -590,6 +618,28 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
             }
         });
     });
+}
+
+#pragma mark - Global alerts
+
+- (void)displayAlertNoInternet {
+
+    UIAlertController *alert = [UIAlertController
+                                alertControllerWithTitle:NSLocalizedStringWithDefaultValue(@"NO_INTERNET", nil, [NSBundle mainBundle], @"No Internet Connection", @"Alert title informing user there is no internet connection")
+                                message:NSLocalizedStringWithDefaultValue(@"TURN_ON_DATE", nil, [NSBundle mainBundle], @"Turn on cellular data or use Wi-Fi to access data.", @"Alert message informing user to turn on their cellular data or wifi to connect to the internet")
+                                preferredStyle:UIAlertControllerStyleAlert];
+
+    UIAlertAction *defaultAction = [UIAlertAction
+                                    actionWithTitle:NSLocalizedStringWithDefaultValue(@"OK_BUTTON", nil, [NSBundle mainBundle], @"OK", @"Alert OK Button")
+                                    style:UIAlertActionStyleDefault
+                                    handler:^(UIAlertAction *action) {
+                                        // Do nothing.
+                                    }];
+
+    [alert addAction:defaultAction];
+
+    [alert presentFromTopController];
+
 }
 
 #pragma mark -
