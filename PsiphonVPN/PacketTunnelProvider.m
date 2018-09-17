@@ -684,10 +684,12 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 #pragma mark -
 
 - (void)sleepWithCompletionHandler:(void (^)(void))completionHandler {
+    [self.psiphonTunnel setSleeping:TRUE];
     completionHandler();
 }
 
 - (void)wake {
+    [self.psiphonTunnel setSleeping:FALSE];
 }
 
 - (NSArray *)getNetworkInterfacesIPv4Addresses {
