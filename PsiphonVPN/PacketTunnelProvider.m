@@ -522,8 +522,8 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
     [PsiFeedbackLogger info:@"start tunnel method:%@ subscription state:%@",
         [self extensionStartMethodTextDescription], [self.subscriptionCheckState textDescription]];
 
-    if (self.extensionStartMethod == ExtensionStartMethodFromContainer
-        || [self.subscriptionCheckState isSubscribedOrInProgress]) {
+    if (self.extensionStartMethod == ExtensionStartMethodFromContainer ||
+        self.subscriptionCheckState.isSubscribedOrInProgress) {
 
         if ([self.subscriptionCheckState isSubscribedOrInProgress]) {
             
