@@ -323,7 +323,7 @@ PsiFeedbackLogType const VPNManagerLogType = @"VPNManager";
 
     __weak VPNManager *weakSelf = self;
 
-    __block RACDisposable *disposable = [[[[[VPNManager loadTunnelProviderManager]
+    __block RACDisposable *disposable = [[[[[[VPNManager loadTunnelProviderManager]
       flattenMap:^RACSignal *(NETunnelProviderManager *_Nullable providerManager) {
           // Updates VPN configuration parameters if it already exists,
           // otherwise creates a new VPN configuration.
@@ -341,6 +341,15 @@ PsiFeedbackLogType const VPNManagerLogType = @"VPNManager";
               return [RACSignal return:RACUnit.defaultUnit];
           }
 
+      }]
+      flattenMap:^RACSignal *(RACUnit *x) {
+
+          // Enables connect on demand for all users after starting the tunnel.
+          //
+          // Setting onDemandEnabled flag to TRUE before starting the VPN tunnel, can start the extension process
+          // without the appropriate options dictionary above being passed in.
+          //
+          return [weakSelf setConnectOnDemandEnabled:TRUE];
       }]
       unsafeSubscribeOnSerialQueue:self.serialQueue
                           withName:@"startTunnelOperation"]
@@ -396,11 +405,15 @@ PsiFeedbackLogType const VPNManagerLogType = @"VPNManager";
 
     __weak VPNManager *weakSelf = self;
 
-    __block RACDisposable *disposable = [[[self deferredTunnelProviderManager]
+    // Connect On Demand should be disabled first before stopping the VPN.
+
+    __block RACDisposable *disposable = [[[[self setConnectOnDemandEnabled:FALSE]
+      flattenMap:^RACSignal *(NSNumber *x) {
+          return [weakSelf deferredTunnelProviderManager];
+      }]
       unsafeSubscribeOnSerialQueue:self.serialQueue
                           withName:@"stopVPNOperation"]
       subscribeNext:^(NETunnelProviderManager *_Nullable providerManager) {
-
           [providerManager.connection stopVPNTunnel];
 
           // Tunnel is being stopped, and previous zombie status can be reset.
@@ -526,7 +539,7 @@ PsiFeedbackLogType const VPNManagerLogType = @"VPNManager";
 - (RACSignal<NSNumber *> *)setConnectOnDemandEnabled:(BOOL)onDemandEnabled {
     __weak VPNManager *weakSelf = self;
 
-    return [[[[VPNManager loadTunnelProviderManager]
+    return [[[VPNManager loadTunnelProviderManager]
       flattenMap:^RACSignal<NETunnelProviderManager *> *(NETunnelProviderManager *providerManager) {
 
           if (!providerManager) {
@@ -539,13 +552,6 @@ PsiFeedbackLogType const VPNManagerLogType = @"VPNManager";
           }
 
           providerManager.onDemandEnabled = onDemandEnabled;
-
-          if (onDemandEnabled) {
-              // Auto-start VPN on demand has been turned on by the user.
-              // To avoid unexpected conflict with other VPN configurations,
-              // re-enable Psiphon's VPN configuration.
-              providerManager.enabled = TRUE;
-          }
 
           // Returned signal, saves and loads the tunnel provider manager.
           return [[[[RACSignal defer:providerManager selectorWithErrorCallback:@selector(saveToPreferencesWithCompletionHandler:)]
@@ -563,9 +569,7 @@ PsiFeedbackLogType const VPNManagerLogType = @"VPNManager";
       catch:^RACSignal *(NSError *error) {
           [PsiFeedbackLogger errorWithType:VPNManagerLogType message:@"error setting OnDemandEnabled" object:error];
           return [RACSignal return:[NSNumber numberWithBool:FALSE]];
-      }]
-      unsafeSubscribeOnSerialQueue:self.serialQueue
-                          withName:@"setConnectOnDemandEnabledOperation"];
+      }];
 }
 
 + (BOOL)mapIsVPNActive:(VPNStatus)s {
@@ -713,7 +717,6 @@ PsiFeedbackLogType const VPNManagerLogType = @"VPNManager";
       map:^NETunnelProviderManager *(RACTwoTuple *tuple) {
 
           NETunnelProviderManager *providerManager = tuple.first;
-          UserSubscriptionStatus subscriptionStatus = (UserSubscriptionStatus)[tuple.second integerValue];
 
           if (!providerManager) {
               NETunnelProviderProtocol *providerProtocol = [[NETunnelProviderProtocol alloc] init];
@@ -733,9 +736,6 @@ PsiFeedbackLogType const VPNManagerLogType = @"VPNManager";
               NEOnDemandRule *alwaysConnectRule = [NEOnDemandRuleConnect new];
               providerManager.onDemandRules = @[alwaysConnectRule];
           }
-
-          // Enables Connect On Demand for all users.
-          providerManager.onDemandEnabled = TRUE;
 
           return providerManager;
       }]
