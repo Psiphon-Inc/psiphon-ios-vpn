@@ -522,8 +522,8 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
     [PsiFeedbackLogger info:@"start tunnel method:%@ subscription state:%@",
         [self extensionStartMethodTextDescription], [self.subscriptionCheckState textDescription]];
 
-    if (self.extensionStartMethod == ExtensionStartMethodFromContainer
-        || [self.subscriptionCheckState isSubscribedOrInProgress]) {
+    if (self.extensionStartMethod == ExtensionStartMethodFromContainer ||
+        self.subscriptionCheckState.isSubscribedOrInProgress) {
 
         if ([self.subscriptionCheckState isSubscribedOrInProgress]) {
             
@@ -684,10 +684,12 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 #pragma mark -
 
 - (void)sleepWithCompletionHandler:(void (^)(void))completionHandler {
+    [self.psiphonTunnel setSleeping:TRUE];
     completionHandler();
 }
 
 - (void)wake {
+    [self.psiphonTunnel setSleeping:FALSE];
 }
 
 - (NSArray *)getNetworkInterfacesIPv4Addresses {
@@ -987,6 +989,10 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 
 - (void)onConnecting {
     self.reasserting = TRUE;
+}
+
+- (void)onStartedWaitingForNetworkConnectivity {
+    [[Notifier sharedInstance] post:NotifierWaitingForNetworkConnectivity];
 }
 
 - (void)onActiveAuthorizationIDs:(NSArray * _Nonnull)authorizationIds {
