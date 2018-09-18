@@ -18,7 +18,7 @@ PODS:
     - mopub-ios-sdk/Core
     - mopub-ios-sdk/Moat
   - PersonalizedAdConsent (1.0.3)
-  - PsiphonClientCommonLibrary (1.1.0):
+  - PsiphonClientCommonLibrary (1.2.0):
     - InAppSettingsKit
   - PureLayout (3.0.2)
   - ReactiveObjC (3.1.0)
@@ -30,7 +30,7 @@ DEPENDENCIES:
   - MoPub-AdMob-Adapters
   - mopub-ios-sdk (= 5.2.0)
   - PersonalizedAdConsent
-  - PsiphonClientCommonLibrary (from `https://github.com/Psiphon-Inc/psiphon-ios-client-common-library.git`, commit `9404b40`)
+  - PsiphonClientCommonLibrary (from `https://github.com/Psiphon-Inc/psiphon-ios-client-common-library.git`, commit `2e53a34`)
   - PureLayout (= 3.0.2)
   - ReactiveObjC (from `https://github.com/Psiphon-Inc/ReactiveObjC.git`, commit `97d6af3`)
 
@@ -39,7 +39,7 @@ EXTERNAL SOURCES:
     :commit: 598c498
     :git: https://github.com/Psiphon-Inc/InAppSettingsKit.git
   PsiphonClientCommonLibrary:
-    :commit: 9404b40
+    :commit: 2e53a34
     :git: https://github.com/Psiphon-Inc/psiphon-ios-client-common-library.git
   ReactiveObjC:
     :commit: 97d6af3
@@ -50,7 +50,7 @@ CHECKOUT OPTIONS:
     :commit: 598c498
     :git: https://github.com/Psiphon-Inc/InAppSettingsKit.git
   PsiphonClientCommonLibrary:
-    :commit: 9404b40
+    :commit: 2e53a34
     :git: https://github.com/Psiphon-Inc/psiphon-ios-client-common-library.git
   ReactiveObjC:
     :commit: 97d6af3
@@ -64,10 +64,10 @@ SPEC CHECKSUMS:
   MoPub-AdMob-Adapters: a395cc1a96d4aa826ba76963a102cbcd4150e1ae
   mopub-ios-sdk: 2b14db9b687a8052fdc42f727f9553baac13507b
   PersonalizedAdConsent: b50a8a5d6065b6db23121e8fcc0dce2ae983f6ea
-  PsiphonClientCommonLibrary: e03d3547fc8208bdfc7718e4dd7f153665193927
+  PsiphonClientCommonLibrary: bc9d6f5656e557d6c4395d34196a98825e39479b
   PureLayout: 4d550abe49a94f24c2808b9b95db9131685fe4cd
   ReactiveObjC: 2a38ea15335de4119d8b17caf1db1484f61db902
 
-PODFILE CHECKSUM: 9eb5ba03be8ef76dc5298f097ee2f8777b5981fa
+PODFILE CHECKSUM: 9f810e318c95d7963f48886b1c51ed8d8067c5d6
 
 COCOAPODS: 1.4.0
