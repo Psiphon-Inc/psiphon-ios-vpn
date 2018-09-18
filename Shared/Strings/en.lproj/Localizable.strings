@@ -36,12 +36,6 @@
 /* Main text in the 'Upstream Proxy Error' dialog box. This is shown when the user has directly altered these settings, and those settings are (probably) erroneous. DO NOT translate 'Psiphon'. */
 "CHECK_UPSTREAM_PROXY_SETTING" = "You have configured Psiphon to use an upstream proxy.\nHowever, we seem to be unable to connect to a Psiphon server through that proxy.\nPlease fix the settings and try again.";
 
-/* Alert dialog body informing the user that the 'Auto-start VPN on demand' feature will be disabled and that the VPN cannot be stopped. */
-"CONNECT_ON_DEMAND_ALERT_BODY" = "\"Auto-start VPN\" will be temporarily disabled until the next time Psiphon VPN is started.";
-
-/* Alert dialog title informing user that 'Auto-start VPN' feature is enabled */
-"CONNECT_ON_DEMAND_ALERT_TITLE" = "Auto-start VPN is enabled";
-
 /* Text above change region button that allows user to select their desired server region */
 "CONNECT_VIA" = "Connect via";
 
@@ -86,8 +80,7 @@
 "NO_PRODUCTS_TEXT" = "Could not retrieve subscriptions from the App Store. Pull to refresh or try again later.";
 
 /* Alert OK Button
-   OK button on a pop-up alert. The alert will be dismissed when the user presses this button.
-   OK button title */
+   OK button on a pop-up alert. The alert will be dismissed when the user presses this button. */
 "OK_BUTTON" = "OK";
 
 /* Text of button at the bottom right or left (depending on rtl) of the last onboarding screen which allows the user to finish the onboarding sequence. Note: should be all uppercase (capitalized) when possible. */
@@ -264,12 +257,6 @@
 
 /* Subscriptions item title in the app settings when user does not have an active subscription. Clicking this item opens subscriptions view. If “Premium” doesn't easily translate, please choose a term that conveys “Pro” or “Extra” or “Better” or “Elite”. */
 "SETTINGS_SUBSCRIPTION_NOT_ACTIVE" = "Go premium!";
-
-/* Automatically start VPN On demand settings toggle */
-"SETTINGS_VPN_ON_DEMAND" = "Auto-start VPN on demand";
-
-/* VPN On demand setting detail text showing when user doesn't have an active subscription and the item is disabled. */
-"SETTINGS_VPN_ON_DEMAND_DETAIL" = "Subscription only";
 
 /* Text for button that opens paid subscriptions manager UI. If “Premium” doesn't easily translate, please choose a term that conveys “Pro” or “Extra” or “Better” or “Elite”. */
 "SUBSCRIPTION_BUTTON_TITLE" = "Go premium now!";

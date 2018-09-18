@@ -176,11 +176,6 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
                                                  name:IAPHelperUpdatedSubscriptionDictionaryNotification
                                                object:nil];
 
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(onSubscriptionTransactionUpdate:)
-                                                 name:IAPHelperPaymentTransactionUpdateNotification
-                                               object:nil];
-
     // Immediately register to receive notifications from the Network Extension process.
     [[Notifier sharedInstance] registerObserver:self callbackQueue:dispatch_get_main_queue()];
 
@@ -512,6 +507,34 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
 
     } else if ([NotifierMarkedAuthorizations isEqualToString:message]) {
         [[PsiCashClient sharedInstance] authorizationsMarkedExpired];
+
+    } else if ([NotifierWaitingForNetworkConnectivity isEqualToString:message]) {
+
+        // To ensure that we don't show the notification for a condition that no longer exists, we need
+        // to double-check the VPN status.
+        //
+        // And due to the race condition present between when this notification is received from the extension
+        // and when the tunnel status changes, the signal below waits for maximum of 1 second for tunnel status
+        // to be in one of the expected connecting or reasserting states.
+        __block RACDisposable *disposable = [[[[[self.vpnManager lastTunnelStatus] filter:^BOOL(NSNumber *value) {
+
+            // If the VPN state is not connecting or reconnecting, then we should not show the no internet alert.
+            VPNStatus s = (VPNStatus) [value integerValue];
+            return (s == VPNStatusConnecting || s == VPNStatusReasserting);
+          }]
+          take:1]
+          timeout:1.0 onScheduler:RACScheduler.mainThreadScheduler]
+          subscribeNext:^(NSNumber *x) {
+              [weakSelf displayAlertNoInternet];
+          }
+          error:^(NSError *error) {
+              [weakSelf.compoundDisposable removeDisposable:disposable];
+          }
+          completed:^{
+              [weakSelf.compoundDisposable removeDisposable:disposable];
+          }];
+
+        [self.compoundDisposable addDisposable:disposable];
     }
 }
 
@@ -548,20 +571,7 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
 }
 
 - (void)onSubscriptionExpired {
-
-    __weak AppDelegate *weakSelf = self;
-
     [self.subscriptionStatus sendNext:@(UserSubscriptionInactive)];
-
-    // Disables Connect On Demand setting of the VPN Configuration.
-    __block RACDisposable *disposable = [[self.vpnManager setConnectOnDemandEnabled:FALSE]
-      subscribeError:^(NSError *error) {
-          [weakSelf.compoundDisposable removeDisposable:disposable];
-      } completed:^{
-          [weakSelf.compoundDisposable removeDisposable:disposable];
-      }];
-
-    [self.compoundDisposable addDisposable:disposable];
 }
 
 - (void)onSubscriptionActivated {
@@ -610,51 +620,26 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
     });
 }
 
-- (void)onSubscriptionTransactionUpdate:(NSNotification *)notification {
+#pragma mark - Global alerts
 
-    __weak AppDelegate *weakSelf = self;
+- (void)displayAlertNoInternet {
 
-    SKPaymentTransactionState transactionState = (SKPaymentTransactionState)
-      [notification.userInfo[IAPHelperPaymentTransactionUpdateKey] integerValue];
+    UIAlertController *alert = [UIAlertController
+                                alertControllerWithTitle:NSLocalizedStringWithDefaultValue(@"NO_INTERNET", nil, [NSBundle mainBundle], @"No Internet Connection", @"Alert title informing user there is no internet connection")
+                                message:NSLocalizedStringWithDefaultValue(@"TURN_ON_DATE", nil, [NSBundle mainBundle], @"Turn on cellular data or use Wi-Fi to access data.", @"Alert message informing user to turn on their cellular data or wifi to connect to the internet")
+                                preferredStyle:UIAlertControllerStyleAlert];
 
-    // Enables Connect On Demand for users who bought a subscription.
-    if (SKPaymentTransactionStatePurchased == transactionState ||
-        SKPaymentTransactionStateRestored == transactionState) {
+    UIAlertAction *defaultAction = [UIAlertAction
+                                    actionWithTitle:NSLocalizedStringWithDefaultValue(@"OK_BUTTON", nil, [NSBundle mainBundle], @"OK", @"Alert OK Button")
+                                    style:UIAlertActionStyleDefault
+                                    handler:^(UIAlertAction *action) {
+                                        // Do nothing.
+                                    }];
 
-        __block RACDisposable *disposable = [[[[[self.vpnManager.lastTunnelStatus
-          take:1]
-          map:^NSNumber *(NSNumber *value) {
-              // Returns @(TRUE) if the extension is running (we don't care about zombie state).
-              BOOL isActive = [VPNManager mapIsVPNActive:(VPNStatus)[value integerValue]];
-              return [NSNumber numberWithBool:isActive];
-          }]
-          flattenMap:^RACSignal *(NSNumber *isActive) {
+    [alert addAction:defaultAction];
 
-              // Enables Connect On Demand if the extension is running and
-              // the user has recently bought an active subscription.
-              if ([isActive boolValue] && [IAPStoreHelper hasActiveSubscriptionForNow]) {
-                  return [weakSelf.vpnManager setConnectOnDemandEnabled:TRUE];
-              }
+    [alert presentFromTopController];
 
-              return [RACSignal return:nil];
-          }]
-          doNext:^(id x) {
-              // x is either nil or a bool.
-              if (x == nil) {
-                  LOG_DEBUG(@"VPN is not active or the user is not subscribed");
-              } else {
-                  BOOL success = [((NSNumber *) x) boolValue];
-                  LOG_DEBUG(@"VPN is active and Connect On Demand was set: %@", NSStringFromBOOL(success));
-              }
-          }]
-          subscribeError:^(NSError *error) {
-              [weakSelf.compoundDisposable removeDisposable:disposable];
-          } completed:^{
-              [weakSelf.compoundDisposable removeDisposable:disposable];
-          }];
-
-          [self.compoundDisposable addDisposable:disposable];
-    }
 }
 
 #pragma mark -

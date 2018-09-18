@@ -59,8 +59,6 @@ NSErrorDomain const VPNManagerErrorDomain = @"VPNManagerErrorDomain";
 
 PsiFeedbackLogType const VPNManagerLogType = @"VPNManager";
 
-UserDefaultsKey const VPNManagerConnectOnDemandUntilNextStartBoolKey = @"VPNManager.ConnectOnDemandUntilNextStartKey";
-
 @interface VPNManager ()
 
 // Public properties
@@ -535,7 +533,7 @@ UserDefaultsKey const VPNManagerConnectOnDemandUntilNextStartBoolKey = @"VPNMana
               return [RACSignal empty];
           }
 
-          // return empty signal as NO-OP if there is not change in status.
+          // If the on demand state doesn't need to change, emit @(TRUE) immediately.
           if (providerManager.onDemandEnabled == onDemandEnabled) {
               return [RACSignal return:[NSNumber numberWithBool:TRUE]];
           }
@@ -736,18 +734,8 @@ UserDefaultsKey const VPNManagerConnectOnDemandUntilNextStartBoolKey = @"VPNMana
               providerManager.onDemandRules = @[alwaysConnectRule];
           }
 
-          // Enables Connect On Demand if the user has an active subscription.
-          if (subscriptionStatus == UserSubscriptionActive) {
-              providerManager.onDemandEnabled = TRUE;
-          }
-
-          NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
-          if ([ud boolForKey:VPNManagerConnectOnDemandUntilNextStartBoolKey]) {
-              providerManager.onDemandEnabled = TRUE;
-
-              // Reset VPNManagerConnectOnDemandUntilNextStartBoolKey value.
-              [ud setBool:FALSE forKey:VPNManagerConnectOnDemandUntilNextStartBoolKey];
-          }
+          // Enables Connect On Demand for all users.
+          providerManager.onDemandEnabled = TRUE;
 
           return providerManager;
       }]

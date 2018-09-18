@@ -29,6 +29,7 @@ extern NotifierMessage const NotifierNewHomepages;
 extern NotifierMessage const NotifierTunnelConnected;
 extern NotifierMessage const NotifierAvailableEgressRegions;
 extern NotifierMessage const NotifierMarkedAuthorizations;
+extern NotifierMessage const NotifierWaitingForNetworkConnectivity;
 
 // Messages sent by the container.
 extern NotifierMessage const NotifierStartVPN;
