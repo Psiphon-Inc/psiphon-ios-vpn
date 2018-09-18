@@ -31,13 +31,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 FOUNDATION_EXPORT NSErrorDomain const VPNManagerErrorDomain;
 
-/**
- * VPNManagerConnectOnDemandUntilNextStartBoolKey represents user's preference for Connect On Demand to be enabled
- * for the next VPN start.
- * This preference should not be displayed to the user directly.
- */
-FOUNDATION_EXPORT UserDefaultsKey const VPNManagerConnectOnDemandUntilNextStartBoolKey;
-
 typedef NS_ERROR_ENUM(VPNManagerErrorDomain, VPNManagerConfigErrorCode) {
     /*! @const VPNManagerStartErrorConfigLoadFailed Failed to load VPN configurations. */
     VPNManagerConfigErrorLoadFailed = 100,

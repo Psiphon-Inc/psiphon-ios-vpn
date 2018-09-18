@@ -176,11 +176,6 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
                                                  name:IAPHelperUpdatedSubscriptionDictionaryNotification
                                                object:nil];
 
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(onSubscriptionTransactionUpdate:)
-                                                 name:IAPHelperPaymentTransactionUpdateNotification
-                                               object:nil];
-
     // Immediately register to receive notifications from the Network Extension process.
     [[Notifier sharedInstance] registerObserver:self callbackQueue:dispatch_get_main_queue()];
 
@@ -548,20 +543,7 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
 }
 
 - (void)onSubscriptionExpired {
-
-    __weak AppDelegate *weakSelf = self;
-
     [self.subscriptionStatus sendNext:@(UserSubscriptionInactive)];
-
-    // Disables Connect On Demand setting of the VPN Configuration.
-    __block RACDisposable *disposable = [[self.vpnManager setConnectOnDemandEnabled:FALSE]
-      subscribeError:^(NSError *error) {
-          [weakSelf.compoundDisposable removeDisposable:disposable];
-      } completed:^{
-          [weakSelf.compoundDisposable removeDisposable:disposable];
-      }];
-
-    [self.compoundDisposable addDisposable:disposable];
 }
 
 - (void)onSubscriptionActivated {
@@ -608,53 +590,6 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
             }
         });
     });
-}
-
-- (void)onSubscriptionTransactionUpdate:(NSNotification *)notification {
-
-    __weak AppDelegate *weakSelf = self;
-
-    SKPaymentTransactionState transactionState = (SKPaymentTransactionState)
-      [notification.userInfo[IAPHelperPaymentTransactionUpdateKey] integerValue];
-
-    // Enables Connect On Demand for users who bought a subscription.
-    if (SKPaymentTransactionStatePurchased == transactionState ||
-        SKPaymentTransactionStateRestored == transactionState) {
-
-        __block RACDisposable *disposable = [[[[[self.vpnManager.lastTunnelStatus
-          take:1]
-          map:^NSNumber *(NSNumber *value) {
-              // Returns @(TRUE) if the extension is running (we don't care about zombie state).
-              BOOL isActive = [VPNManager mapIsVPNActive:(VPNStatus)[value integerValue]];
-              return [NSNumber numberWithBool:isActive];
-          }]
-          flattenMap:^RACSignal *(NSNumber *isActive) {
-
-              // Enables Connect On Demand if the extension is running and
-              // the user has recently bought an active subscription.
-              if ([isActive boolValue] && [IAPStoreHelper hasActiveSubscriptionForNow]) {
-                  return [weakSelf.vpnManager setConnectOnDemandEnabled:TRUE];
-              }
-
-              return [RACSignal return:nil];
-          }]
-          doNext:^(id x) {
-              // x is either nil or a bool.
-              if (x == nil) {
-                  LOG_DEBUG(@"VPN is not active or the user is not subscribed");
-              } else {
-                  BOOL success = [((NSNumber *) x) boolValue];
-                  LOG_DEBUG(@"VPN is active and Connect On Demand was set: %@", NSStringFromBOOL(success));
-              }
-          }]
-          subscribeError:^(NSError *error) {
-              [weakSelf.compoundDisposable removeDisposable:disposable];
-          } completed:^{
-              [weakSelf.compoundDisposable removeDisposable:disposable];
-          }];
-
-          [self.compoundDisposable addDisposable:disposable];
-    }
 }
 
 #pragma mark -
