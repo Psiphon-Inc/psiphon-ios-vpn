@@ -71,7 +71,7 @@
 
 #if !(TARGET_IS_EXTENSION)
 
-+ (NSString *)tryReadingFile:(NSString *)filePath {
++ (NSString *_Nullable)tryReadingFile:(NSString *_Nonnull)filePath {
     NSFileHandle *fileHandle;
     // NSFileHandle will close automatically when deallocated.
     return [PsiphonDataSharedDB tryReadingFile:filePath
@@ -93,10 +93,10 @@
  * @param readToOffset Populated with the file offset that was read to.
  * @return UTF8 string of read file content.
  */
-+ (NSString *)tryReadingFile:(NSString *_Nonnull)filePath
-             usingFileHandle:(NSFileHandle *__strong *_Nonnull)fileHandlePtr
-              readFromOffset:(unsigned long long)bytesOffset
-                readToOffset:(unsigned long long *)readToOffset {
++ (NSString *_Nullable)tryReadingFile:(NSString *_Nonnull)filePath
+                      usingFileHandle:(NSFileHandle *_Nullable __strong *_Nonnull)fileHandlePtr
+                       readFromOffset:(unsigned long long)bytesOffset
+                         readToOffset:(unsigned long long *)readToOffset {
 
     NSData *fileData;
     NSError *err;
@@ -153,54 +153,52 @@
 - (void)readLogsData:(NSString *)logLines intoArray:(NSMutableArray<DiagnosticEntry *> *)entries {
     NSError *err;
 
-    if (logLines) {
-        for (NSString *logLine in [logLines componentsSeparatedByString:@"\n"]) {
+    for (NSString *logLine in [logLines componentsSeparatedByString:@"\n"]) {
 
-            if (!logLine || [logLine length] == 0) {
-                continue;
+        if (!logLine || [logLine length] == 0) {
+            continue;
+        }
+
+        NSDictionary *dict = [NSJSONSerialization JSONObjectWithData:[logLine dataUsingEncoding:NSUTF8StringEncoding]
+                                                             options:0 error:&err];
+        if (err) {
+            [PsiFeedbackLogger error:@"Failed to parse log line (%@). Error: %@", logLine, err];
+        }
+
+        if (dict) {
+            // data key of dict dictionary, could either contains a dictionary, or another simple object.
+            // In case the value is a dictionary, cannot rely on description method of dictionary, since it adds new-line characters
+            // and semicolons to make it human-readable, but is unsuitable for our purposes.
+            NSString *data = nil;
+            if (![dict[@"data"] isKindOfClass:[NSDictionary class]]) {
+                data = [dict[@"data"] description];
+            } else {
+                NSData *serializedDictionary = [NSJSONSerialization dataWithJSONObject:dict[@"data"] options:kNilOptions error:&err];
+                data = [[NSString alloc] initWithData:serializedDictionary encoding:NSUTF8StringEncoding];
             }
 
-            NSDictionary *dict = [NSJSONSerialization JSONObjectWithData:[logLine dataUsingEncoding:NSUTF8StringEncoding]
-                                                                 options:0 error:&err];
+            NSString *msg = nil;
             if (err) {
-                [PsiFeedbackLogger error:@"Failed to parse log line (%@). Error: %@", logLine, err];
+                [PsiFeedbackLogger error:@"Failed to serialize dictionary as JSON (%@)", dict[@"noticeType"]];
+            } else {
+                msg = [NSString stringWithFormat:@"%@: %@", dict[@"noticeType"], data];
             }
 
-            if (dict) {
-                // data key of dict dictionary, could either contains a dictionary, or another simple object.
-                // In case the value is a dictionary, cannot rely on description method of dictionary, since it adds new-line characters
-                // and semicolons to make it human-readable, but is unsuitable for our purposes.
-                NSString *data = nil;
-                if (![dict[@"data"] isKindOfClass:[NSDictionary class]]) {
-                    data = [dict[@"data"] description];
-                } else {
-                    NSData *serializedDictionary = [NSJSONSerialization dataWithJSONObject:dict[@"data"] options:kNilOptions error:&err];
-                    data = [[NSString alloc] initWithData:serializedDictionary encoding:NSUTF8StringEncoding];
-                }
-                
-                NSString *msg = nil;
-                if (err) {
-                    [PsiFeedbackLogger error:@"Failed to serialize dictionary as JSON (%@)", dict[@"noticeType"]];
-                } else {
-                    msg = [NSString stringWithFormat:@"%@: %@", dict[@"noticeType"], data];
-                }
+            NSDate *timestamp = [NSDate fromRFC3339String:dict[@"timestamp"]];
 
-                NSDate *timestamp = [NSDate fromRFC3339String:dict[@"timestamp"]];
-
-                if (!msg) {
-                    [PsiFeedbackLogger error:@"Failed to read notice message for log line (%@).", logLine];
-                    // Puts place holder value for message.
-                    msg = @"Failed to read notice message.";
-                }
-
-                if (!timestamp) {
-                    [PsiFeedbackLogger error:@"Failed to parse timestamp: (%@) for log line (%@)", dict[@"timestamp"], logLine];
-                    // Puts placeholder value for timestamp.
-                    timestamp = [NSDate dateWithTimeIntervalSince1970:0];
-                }
-
-                [entries addObject:[[DiagnosticEntry alloc] init:msg andTimestamp:timestamp]];
+            if (!msg) {
+                [PsiFeedbackLogger error:@"Failed to read notice message for log line (%@).", logLine];
+                // Puts place holder value for message.
+                msg = @"Failed to read notice message.";
             }
+
+            if (!timestamp) {
+                [PsiFeedbackLogger error:@"Failed to parse timestamp: (%@) for log line (%@)", dict[@"timestamp"], logLine];
+                // Puts placeholder value for timestamp.
+                timestamp = [NSDate dateWithTimeIntervalSince1970:0];
+            }
+
+            [entries addObject:[[DiagnosticEntry alloc] init:msg andTimestamp:timestamp]];
         }
     }
 }
@@ -225,7 +223,7 @@
  * Reads shared homepages file.
  * @return NSArray of Homepages.
  */
-- (NSArray<Homepage *> *)getHomepages {
+- (NSArray<Homepage *> *_Nullable)getHomepages {
     NSMutableArray<Homepage *> *homepages = nil;
     NSError *err;
 
@@ -325,9 +323,8 @@
 /*!
  * @brief Sets set of egress regions in standard NSUserDefaults
  * @param regions
-
  */
-- (void)insertNewEmbeddedEgressRegions:(NSArray<NSString *> *)regions {
+- (void)setEmbeddedEgressRegions:(NSArray<NSString *> *_Nullable)regions {
     [[NSUserDefaults standardUserDefaults] setObject:regions forKey:EMBEDDED_EGRESS_REGIONS_KEY];
 }
 
@@ -363,7 +360,7 @@
 
 #else
 
-- (NSString*)emittedClientRegion {
+- (NSString *)emittedClientRegion {
     return [sharedDefaults objectForKey:CLIENT_REGION_KEY];
 }
 
@@ -385,7 +382,7 @@
 
 // Reads all log files and tries parses the json lines contained in each.
 // This method is not meant to handle large files.
-- (NSArray<DiagnosticEntry*>*)getAllLogs {
+- (NSArray<DiagnosticEntry*> *_Nonnull)getAllLogs {
 
     LOG_DEBUG(@"Log filesize:%@", [self getFileSize:[self rotatingLogNoticesPath]]);
     LOG_DEBUG(@"Log backup filesize:%@", [self getFileSize:[self rotatingOlderLogNoticesPath]]);
@@ -553,9 +550,9 @@
     [sharedDefaults synchronize];
 }
 
-- (void)appendExpiredAuthorizationIDs:(NSSet<NSString *> *_Nullable)idsToAppend {
+- (void)appendExpiredAuthorizationIDs:(NSSet<NSString *> *_Nullable)authsIDsToAppend {
     // Combines previous marked authorizations with the authorization IDs to append.
-    NSSet<NSString *> *newMarkedAuthIDs = [[self getMarkedExpiredAuthorizationIDs] setByAddingObjectsFromSet:idsToAppend];
+    NSSet<NSString *> *newMarkedAuthIDs = [[self getMarkedExpiredAuthorizationIDs] setByAddingObjectsFromSet:authsIDsToAppend];
 
     // Don't mark authorization IDs not seen in authorizations persisted by the container.
     NSMutableSet<NSString *> *markedAuthIDs = [NSMutableSet set];  // Marked IDs to persist.

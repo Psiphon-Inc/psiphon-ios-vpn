@@ -23,39 +23,49 @@
 #import "PsiphonData.h"
 #endif
 
+NS_ASSUME_NONNULL_BEGIN
+
 @class Authorization;
 
-@interface Homepage : NSObject
+#pragma mark - Homepage data object
 
+@interface Homepage : NSObject
 @property (nonatomic) NSURL *url;
 @property (nonatomic) NSDate *timestamp;
-
 @end
 
+#pragma mark - Psiphon shared DB with the extension
 
 @interface PsiphonDataSharedDB : NSObject
 
 - (id)initForAppGroupIdentifier:(NSString*)identifier;
 
 #if !(TARGET_IS_EXTENSION)
-+ (NSString *)tryReadingFile:(NSString *)filePath;
-+ (NSString *)tryReadingFile:(NSString *)filePath usingFileHandle:(NSFileHandle *__strong *)fileHandlePtr readFromOffset:(unsigned long long)bytesOffset readToOffset:(unsigned long long *)readToOffset;
++ (NSString *_Nullable)tryReadingFile:(NSString *)filePath;
+
++ (NSString *_Nullable)tryReadingFile:(NSString *)filePath
+                      usingFileHandle:(NSFileHandle *_Nullable __strong *_Nonnull)fileHandlePtr
+                       readFromOffset:(unsigned long long)bytesOffset
+                         readToOffset:(unsigned long long *)readToOffset;
+
 - (void)readLogsData:(NSString *)logLines intoArray:(NSMutableArray<DiagnosticEntry *> *)entries;
-- (NSArray<Homepage *> *)getHomepages;
+
+- (NSArray<Homepage *> *_Nullable)getHomepages;
 #endif
 
 - (BOOL)insertNewEgressRegions:(NSArray<NSString *> *)regions;
+
 #if !(TARGET_IS_EXTENSION)
-- (NSArray<NSString *> *)embeddedAndEmittedEgressRegions;
-- (void)insertNewEmbeddedEgressRegions:(NSArray<NSString *> *)regions;
-- (NSArray<NSString *> *)embeddedEgressRegions;
-- (NSArray<NSString *> *)emittedEgressRegions;
+- (NSArray<NSString *> *_Nullable)embeddedAndEmittedEgressRegions;
+- (void)setEmbeddedEgressRegions:(NSArray<NSString *> *_Nullable)regions;
+- (NSArray<NSString *> *_Nullable)embeddedEgressRegions;
+- (NSArray<NSString *> *_Nullable)emittedEgressRegions;
 #endif
 
 #if TARGET_IS_EXTENSION
-- (BOOL)insertNewClientRegion:(NSString*)region;
+- (BOOL)insertNewClientRegion:(NSString *_Nullable)region;
 #else
-- (NSString*)emittedClientRegion;
+- (NSString *_Nullable)emittedClientRegion;
 #endif
 
 
@@ -77,30 +87,32 @@
 #endif
 
 // Server timestamp
-- (void)updateServerTimestamp:(NSString*)timestamp;
-- (NSString*)getServerTimestamp;
+- (void)updateServerTimestamp:(NSString *)timestamp;
+- (NSString *_Nullable)getServerTimestamp;
 
 // Receipt read by the container
 #if !(TARGET_IS_EXTENSION)
-- (void)setContainerEmptyReceiptFileSize:(NSNumber *)receiptFileSize;
+- (void)setContainerEmptyReceiptFileSize:(NSNumber *_Nullable)receiptFileSize;
 #endif
 
-- (NSNumber *)getContainerEmptyReceiptFileSize;
+- (NSNumber *_Nullable)getContainerEmptyReceiptFileSize;
 
 #pragma mark - Encoded Authorizations
 
 #if !(TARGET_IS_EXTENSION)
-- (void)setContainerAuthorizations:(NSSet<Authorization *> *)authorizations;
+- (void)setContainerAuthorizations:(NSSet<Authorization *> *_Nullable)authorizations;
 #endif
 
 - (NSSet<Authorization *> *)getContainerAuthorizations;
 - (NSSet<Authorization *> *)getNonMarkedAuthorizations;
 
 #if TARGET_IS_EXTENSION
-- (void)markExpiredAuthorizationIDs:(NSSet<NSString *> *)authorizations;
-- (void)appendExpiredAuthorizationIDs:(NSSet<NSString *> *)authsToAppend;
+- (void)markExpiredAuthorizationIDs:(NSSet<NSString *> *_Nullable)authorizations;
+- (void)appendExpiredAuthorizationIDs:(NSSet<NSString *> *_Nullable)authsIDsToAppend;
 #endif
 
 - (NSSet<NSString *> *)getMarkedExpiredAuthorizationIDs;
 
 @end
+
+NS_ASSUME_NONNULL_END
