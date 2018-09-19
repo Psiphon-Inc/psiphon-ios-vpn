@@ -457,20 +457,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
             [weakSelf.vpnManager startTunnel];
 
         } else if ([CommandStopVPN isEqualToString:command]) {
-
-            // TODO: we shouldn't create a Rx subscription inside of a subscription, this should all be part of the
-            // same reactive chain.
-            __block RACDisposable *disposable = [[weakSelf.vpnManager setConnectOnDemandEnabled:FALSE]
-              subscribeNext:^(NSNumber *x) {
-                  // Stops the VPN only after ConnectOnDemand is disabled.
-                  [weakSelf.vpnManager stopVPN];
-              } error:^(NSError *error) {
-                  [weakSelf.compoundDisposable removeDisposable:disposable];
-              }   completed:^{
-                  [weakSelf.compoundDisposable removeDisposable:disposable];
-              }];
-
-            [weakSelf.compoundDisposable addDisposable:disposable];
+            [weakSelf.vpnManager stopVPN];
 
         } else if ([CommandNoInternetAlert isEqualToString:command]) {
             [[AppDelegate sharedAppDelegate] displayAlertNoInternet];

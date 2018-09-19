@@ -38,6 +38,7 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @class RACReplaySubject;
+@class PsiphonDataSharedDB;
 
 // BasePacketTunnelProvider Errors
 FOUNDATION_EXTERN NSErrorDomain const BasePsiphonTunnelErrorDomain;
@@ -52,10 +53,15 @@ typedef NS_ERROR_ENUM(BasePsiphonTunnelErrorDomain, ABCPsiphonTunnelErrorCode) {
 
 typedef NS_ENUM(NSInteger, ExtensionStartMethodEnum) {
     /*! @const ExtensionStartMethodFromContainer The Network Extension process was started by the container app. */
-    ExtensionStartMethodFromContainer,
-    /*! @const ExtensionStartMethodFromBoot The Network Extension process was started by "Connect On Demand" rules at boot time. */
+    ExtensionStartMethodFromContainer = 1,
+    /*! @const ExtensionStartMethodFromBoot The Network Extension process was started by "Connect On Demand" rules
+        at boot time. */
     ExtensionStartMethodFromBoot,
-    /*! @const ExtensionStartMethodOther The Network Extension process was either started by "Connect On Demand" rules, or by the user from system settings. */
+    /*! @const ExtensionStartMethodFromCrash The extension has been started due to Connect On Demand rules or
+        by the user from system Settings, but the extension had previously crashed. */
+    ExtensionStartMethodFromCrash,
+    /*! @const ExtensionStartMethodOther The Network Extension process was either started by "Connect On Demand" rules,
+        or by the user from system settings. */
     ExtensionStartMethodOther,
 };
 
@@ -81,6 +87,8 @@ typedef NS_ENUM(NSInteger, ExtensionStartMethodEnum) {
 @property (nonatomic, readonly) ExtensionStartMethodEnum extensionStartMethod;
 
 @property (nonatomic, readonly) BOOL VPNStarted;
+
+@property (nonatomic, readonly) PsiphonDataSharedDB *sharedDB;
 
 /**
  * vpnStartedSignal is a finite signal that emits an item when the VPN is started and completes immediately.
