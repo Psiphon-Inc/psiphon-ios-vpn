@@ -28,24 +28,23 @@
  */
 + (NSString *)textStopReason:(NEProviderStopReason)stopReason {
     switch (stopReason) {
-        case NEProviderStopReasonNone: return @"no specific reason";
-        case NEProviderStopReasonUserInitiated: return @"user initiated";
-        case NEProviderStopReasonProviderFailed: return @"provider failed to function correctly";
-        case NEProviderStopReasonNoNetworkAvailable: return @"no network connectivity is currently available";
-        case NEProviderStopReasonUnrecoverableNetworkChange: return @"device network connectivity changed";
-        case NEProviderStopReasonProviderDisabled: return @"provider was disabled";
-        case NEProviderStopReasonAuthenticationCanceled: return @"authentication process was cancelled";
-        case NEProviderStopReasonConfigurationFailed: return @"the configuration is invalid";
-        case NEProviderStopReasonIdleTimeout: return @"the session timed out";
-        case NEProviderStopReasonConfigurationDisabled: return @"the configuration was disabled";
-        case NEProviderStopReasonConfigurationRemoved: return @"the configuration was removed";
-        case NEProviderStopReasonSuperceded: return @"the configuration was superceded by a higher-priority configuration";
-        case NEProviderStopReasonUserLogout: return @"user logged out";
-        case NEProviderStopReasonUserSwitch: return @"current console user changed";
-        case NEProviderStopReasonConnectionFailed: return @"the connection failed";
+        case NEProviderStopReasonNone : return @"None";
+        case NEProviderStopReasonUserInitiated :return @"UserInitiated";
+        case NEProviderStopReasonProviderFailed :return @"ProviderFailed";
+        case NEProviderStopReasonNoNetworkAvailable :return @"NoNetworkAvailable";
+        case NEProviderStopReasonUnrecoverableNetworkChange :return @"UnrecoverableNetworkChange";
+        case NEProviderStopReasonProviderDisabled :return @"ProviderDisabled";
+        case NEProviderStopReasonAuthenticationCanceled :return @"AuthenticationCanceled";
+        case NEProviderStopReasonConfigurationFailed :return @"ConfigurationFailed";
+        case NEProviderStopReasonIdleTimeout :return @"IdleTimeout";
+        case NEProviderStopReasonConfigurationDisabled :return @"ConfigurationDisabled";
+        case NEProviderStopReasonConfigurationRemoved :return @"ConfigurationRemoved";
+        case NEProviderStopReasonSuperceded :return @"Superceded";
+        case NEProviderStopReasonUserLogout :return @"UserLogout";
+        case NEProviderStopReasonUserSwitch :return @"UserSwitch";
+        case NEProviderStopReasonConnectionFailed :return @"ConnectionFailed";
+        default: return @"Unknown";
     }
-
-    return [NSString stringWithFormat:@"unknown stop reason (%ld)", (long)stopReason];
 }
 
 @end

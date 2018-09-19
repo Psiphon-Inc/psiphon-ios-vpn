@@ -116,8 +116,6 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 
 @implementation PacketTunnelProvider {
 
-    PsiphonDataSharedDB *sharedDB;
-
     _Atomic BOOL showUpstreamProxyErrorMessage;
 
     // Serial queue of work to be done following callbacks from PsiphonTunnel.
@@ -147,8 +145,6 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
     self = [super init];
     if (self) {
         [AppProfiler logMemoryReportWithTag:@"PacketTunnelProviderInit"];
-
-        sharedDB = [[PsiphonDataSharedDB alloc] initForAppGroupIdentifier:APP_GROUP_IDENTIFIER];
 
         atomic_init(&self->showUpstreamProxyErrorMessage, TRUE);
 
@@ -498,9 +494,6 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
       }];
 }
 
-// VPN should only start if it is started from the container app directly,
-// OR if the user possibly has a valid subscription
-// OR if the extension is started after boot but before being unlocked.
 - (void)startTunnelWithErrorHandler:(void (^_Nonnull)(NSError *_Nonnull error))errorHandler {
 
     // Start app profiling
@@ -519,10 +512,17 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
     Subscription *subscription = [Subscription fromPersistedDefaults];
     self.subscriptionCheckState = [SubscriptionState initialStateFromSubscription:subscription];
 
-    [PsiFeedbackLogger info:@"start tunnel method:%@ subscription state:%@",
-        [self extensionStartMethodTextDescription], [self.subscriptionCheckState textDescription]];
+    [PsiFeedbackLogger infoWithType:PacketTunnelProviderLogType
+                               json:@{@"StartMethod": [self extensionStartMethodTextDescription],
+                                      @"SubscriptionState": [self.subscriptionCheckState textDescription]}];
 
+    // VPN should only start if it is started from the container app directly,
+    // or if the user possibly has a valid subscription,
+    // or if started due to Connect On Demand rules (or by the user from system Settings) from a crash,
+    // or if the extension is started after boot but before being unlocked.
+    //
     if (self.extensionStartMethod == ExtensionStartMethodFromContainer ||
+        self.extensionStartMethod == ExtensionStartMethodFromCrash ||
         self.subscriptionCheckState.isSubscribedOrInProgress) {
 
         if ([self.subscriptionCheckState isSubscribedOrInProgress]) {
@@ -578,7 +578,9 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 
 - (void)stopTunnelWithReason:(NEProviderStopReason)reason {
     // Always log the stop reason.
-    [PsiFeedbackLogger info:@"tunnel stopped reason %ld %@", (long)reason, [PacketTunnelUtils textStopReason:reason]];
+    [PsiFeedbackLogger infoWithType:PacketTunnelProviderLogType
+                               json:@{@"StopReason": [PacketTunnelUtils textStopReason:reason],
+                                      @"StopCode": @(reason)}];
 
     // Cleanup.
     [subscriptionDisposable dispose];
@@ -671,7 +673,8 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 
         // Restarts the tunnel only if the persisted authorizations have changed from the
         // last set of authorizations supplied to tunnel-core.
-        NSSet<NSString *> *nonMarkedAuths = [Authorization authorizationIDsFrom:[sharedDB getNonMarkedAuthorizations]];
+        NSSet<NSString *> *nonMarkedAuths = [Authorization authorizationIDsFrom:[
+          self.sharedDB getNonMarkedAuthorizations]];
 
         if (![nonMarkedAuths isEqualToSet:self.suppliedContainerAuthorizationIDs]) {
             [self reconnectWithConfig:nil];
@@ -816,7 +819,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
     }
     
     // Adds authorizations persisted by the container (minus the authorizations already marked as expired).
-    NSSet<Authorization *> *_Nonnull nonMarkedAuths = [sharedDB getNonMarkedAuthorizations];
+    NSSet<Authorization *> *_Nonnull nonMarkedAuths = [self.sharedDB getNonMarkedAuthorizations];
     [auths addObjectsFromArray:[Authorization encodeAuthorizations:nonMarkedAuths]];
     
     self.suppliedContainerAuthorizationIDs = [Authorization authorizationIDsFrom:nonMarkedAuths];
@@ -973,7 +976,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
     }
 
     // Store current sponsor ID used for use by container.
-    [sharedDB setCurrentSponsorId:mutableConfigCopy[@"SponsorId"]];
+    [self.sharedDB setCurrentSponsorId:mutableConfigCopy[@"SponsorId"]];
 
     return mutableConfigCopy;
 }
@@ -1033,7 +1036,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
             [inactiveAuthIDs minusSet:[NSSet setWithArray:authorizationIds]];
 
             // Append inactive authorizations.
-            [sharedDB appendExpiredAuthorizationIDs:inactiveAuthIDs];
+            [self.sharedDB appendExpiredAuthorizationIDs:inactiveAuthIDs];
 
             [[Notifier sharedInstance] post:NotifierMarkedAuthorizations];
 
@@ -1056,7 +1059,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 
     dispatch_async(self->workQueue, ^{
         
-        [sharedDB updateServerTimestamp:timestamp];
+        [self.sharedDB updateServerTimestamp:timestamp];
 
         NSDate *serverTimestamp = [NSDate fromRFC3339String:timestamp];
 
@@ -1076,7 +1079,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 }
 
 - (void)onAvailableEgressRegions:(NSArray *)regions {
-    [sharedDB insertNewEgressRegions:regions];
+    [self.sharedDB insertNewEgressRegions:regions];
 
     [[Notifier sharedInstance] post:NotifierAvailableEgressRegions];
 
@@ -1096,11 +1099,11 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 }
 
 - (NSString * _Nullable)getHomepageNoticesPath {
-    return [sharedDB homepageNoticesPath];
+    return [self.sharedDB homepageNoticesPath];
 }
 
 - (NSString * _Nullable)getRotatingNoticesPath {
-    return [sharedDB rotatingLogNoticesPath];
+    return [self.sharedDB rotatingLogNoticesPath];
 }
 
 - (void)onDiagnosticMessage:(NSString *_Nonnull)message withTimestamp:(NSString *_Nonnull)timestamp {
@@ -1127,7 +1130,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 }
 
 - (void)onClientRegion:(NSString *)region {
-    [sharedDB insertNewClientRegion:region];
+    [self.sharedDB insertNewClientRegion:region];
 }
 
 @end

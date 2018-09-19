@@ -38,6 +38,21 @@
 #define kAuthorizationsContainerKey @"authorizations_container_key"
 #define kMarkedAuthorizationIDsExtensionKey @"marked_authorization_ids_extension_key"
 
+/**
+ * Key for boolean value that when TRUE indicates that the extension crashed before stop was called.
+ * This value is only valid if the extension is not currently running.
+ *
+ * @note This does not indicate whether the extension crashed after the stop was called.
+ * @attention This flag is set after the extension is started/stopped.
+ */
+UserDefaultsKey const SharedDataExtensionCrashedBeforeStopBoolKey = @"PsiphonDataSharedDB.ExtensionCrashedBeforeStopBoolKey";
+
+/**
+ * Key for Jetsam counter.
+ *
+ * @note This counter is reset on every app version upgrade.
+ */
+UserDefaultsKey const SharedDataExtensionJetsamCounterIntegerKey = @"PsiphonDataSharedDB.ExtensionJetsamCounterIntKey";
 
 #if !(TARGET_IS_EXTENSION)
 #define EMBEDDED_EGRESS_REGIONS_KEY @"embedded_server_entries_egress_regions"
@@ -542,6 +557,23 @@
     return auths;
 }
 
+- (NSSet<NSString *> *_Nonnull)getMarkedExpiredAuthorizationIDs {
+    return [NSMutableSet setWithArray:[sharedDefaults stringArrayForKey:kMarkedAuthorizationIDsExtensionKey]];
+}
+
+- (BOOL)getExtensionJetsammedBeforeStopFlag {
+    return [sharedDefaults boolForKey:SharedDataExtensionCrashedBeforeStopBoolKey];
+}
+
+- (void)resetJetsamCounter {
+    [sharedDefaults setInteger:0 forKey:SharedDataExtensionJetsamCounterIntegerKey];
+}
+
+- (void)incrementJetsamCounter {
+    NSInteger count = [sharedDefaults integerForKey:SharedDataExtensionJetsamCounterIntegerKey];
+    [sharedDefaults setInteger:(count + 1) forKey:SharedDataExtensionJetsamCounterIntegerKey];
+}
+
 #if TARGET_IS_EXTENSION
 
 - (void)markExpiredAuthorizationIDs:(NSSet<NSString *> *_Nullable)authorizationIDs {
@@ -566,10 +598,14 @@
     [self markExpiredAuthorizationIDs:markedAuthIDs];
 }
 
-#endif
-
-- (NSSet<NSString *> *_Nonnull)getMarkedExpiredAuthorizationIDs {
-    return [NSMutableSet setWithArray:[sharedDefaults stringArrayForKey:kMarkedAuthorizationIDsExtensionKey]];
+- (void)setExtensionJetsammedBeforeStopFlag:(BOOL)crashed {
+    [sharedDefaults setBool:crashed forKey:SharedDataExtensionCrashedBeforeStopBoolKey];
 }
+
+- (NSInteger)getJetsamCounter {
+    return [sharedDefaults integerForKey:SharedDataExtensionJetsamCounterIntegerKey];
+}
+
+#endif
 
 @end
