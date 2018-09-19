@@ -187,6 +187,9 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
 
     if ([AppInfo firstRunOfAppVersion]) {
         [self updateAvailableEgressRegionsOnFirstRunOfAppVersion];
+
+        // Reset Jetsam counter.
+        [self.sharedDB resetJetsamCounter];
     }
 
     return YES;

@@ -105,13 +105,21 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSSet<Authorization *> *)getContainerAuthorizations;
 - (NSSet<Authorization *> *)getNonMarkedAuthorizations;
+- (NSSet<NSString *> *)getMarkedExpiredAuthorizationIDs;
+
+- (void)resetJetsamCounter;
+- (void)incrementJetsamCounter;
+/**
+ * If TRUE and the extension is not running, the extension has crashed.
+ */
+- (BOOL)getExtensionJetsammedBeforeStopFlag;
 
 #if TARGET_IS_EXTENSION
 - (void)markExpiredAuthorizationIDs:(NSSet<NSString *> *_Nullable)authorizations;
 - (void)appendExpiredAuthorizationIDs:(NSSet<NSString *> *_Nullable)authsIDsToAppend;
+- (void)setExtensionJetsammedBeforeStopFlag:(BOOL)crashed;
+- (NSInteger)getJetsamCounter;
 #endif
-
-- (NSSet<NSString *> *)getMarkedExpiredAuthorizationIDs;
 
 @end
 

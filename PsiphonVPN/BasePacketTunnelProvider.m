@@ -25,8 +25,11 @@
 #import "RACReplaySubject.h"
 #import "NSError+Convenience.h"
 #import "Asserts.h"
+#import "PsiphonDataSharedDB.h"
 
 NSErrorDomain _Nonnull const BasePsiphonTunnelErrorDomain = @"BasePsiphonTunnelErrorDomain";
+
+PsiFeedbackLogType const BasePacketTunnelProviderLogType = @"BasePacketTunnelProvider";
 
 @interface BasePacketTunnelProvider ()
 
@@ -34,28 +37,44 @@ NSErrorDomain _Nonnull const BasePsiphonTunnelErrorDomain = @"BasePsiphonTunnelE
 
 @property (nonatomic, readwrite) BOOL VPNStarted;
 
-@end
+@property (nonatomic, readwrite) PsiphonDataSharedDB *sharedDB;
 
+@end
 
 @implementation BasePacketTunnelProvider {
     // Pointer to startTunnelWithOptions completion handler.
     // NOTE: value is expected to be nil after completion handler has been called.
     void (^vpnStartCompletionHandler)(NSError *__nullable error);
+
+    PsiphonDataSharedDB *sharedDB;
 }
 
 - (instancetype)init {
     self = [super init];
     if (self) {
-        self.vpnStartedSignal = [RACReplaySubject replaySubjectWithCapacity:1];
+       _vpnStartedSignal = [RACReplaySubject replaySubjectWithCapacity:1];
+       _sharedDB = [[PsiphonDataSharedDB alloc] initForAppGroupIdentifier:APP_GROUP_IDENTIFIER];
     }
     return self;
 }
 
-
 /**
  * Subclasses should not override this function.
  */
-- (void)startTunnelWithOptions:(nullable NSDictionary<NSString *, NSObject *> *)options completionHandler:(void (^)(NSError *__nullable error))completionHandler {
+- (void)startTunnelWithOptions:(nullable NSDictionary<NSString *, NSObject *> *)options
+             completionHandler:(void (^)(NSError *__nullable error))completionHandler {
+
+    // Determine if the extension jetsammed previously to this start and,
+    // Sets the crash flag, in case the extension crashes since this start.
+    BOOL previouslyJetsammed = [self.sharedDB getExtensionJetsammedBeforeStopFlag];
+    [self.sharedDB setExtensionJetsammedBeforeStopFlag:TRUE];
+
+    if (previouslyJetsammed) {
+        [self.sharedDB incrementJetsamCounter];
+        [PsiFeedbackLogger errorWithType:BasePacketTunnelProviderLogType
+                                    json:@{@"JetsamCount": @([self.sharedDB getJetsamCounter])}];
+    }
+
     // Creates boot test file used for testing if device is unlocked since boot.
     // A boot test file is a file with protection type NSFileProtectionCompleteUntilFirstUserAuthentication.
     // NOTE: it is assumed that this file is first created while the device is in an unlocked state,
@@ -86,10 +105,14 @@ NSErrorDomain _Nonnull const BasePsiphonTunnelErrorDomain = @"BasePsiphonTunnelE
 #endif
 
     // Determine how the extension was started.
+    // ExtensionStartMethodFromCrash priority should be after _FromBoot and _FromContainer.
+    //
     if ([self isStartBootTestFileLocked]) {
         self.extensionStartMethod = ExtensionStartMethodFromBoot;
     } else if ([((NSString *)options[EXTENSION_OPTION_START_FROM_CONTAINER]) isEqualToString:EXTENSION_OPTION_TRUE]) {
         self.extensionStartMethod = ExtensionStartMethodFromContainer;
+    } else if (previouslyJetsammed) {
+        self.extensionStartMethod = ExtensionStartMethodFromCrash;
     } else {
         self.extensionStartMethod = ExtensionStartMethodOther;
     }
@@ -110,6 +133,10 @@ NSErrorDomain _Nonnull const BasePsiphonTunnelErrorDomain = @"BasePsiphonTunnelE
  * Subclasses should not override this method.
  */
 - (void)stopTunnelWithReason:(NEProviderStopReason)reason completionHandler:(void (^)(void))completionHandler {
+
+    // Resets the extension crash flag, since the extension hasn't crashed yet.
+    [self.sharedDB setExtensionJetsammedBeforeStopFlag:FALSE];
+
     // Assumes stopTunnelWithReason called exactly once only after startTunnelWithOptions.completionHandler(nil)
     if (vpnStartCompletionHandler) {
         vpnStartCompletionHandler([NSError errorWithDomain:BasePsiphonTunnelErrorDomain
@@ -225,13 +252,14 @@ NSErrorDomain _Nonnull const BasePsiphonTunnelErrorDomain = @"BasePsiphonTunnelE
 
 - (NSString *)extensionStartMethodTextDescription {
     switch (self.extensionStartMethod) {
-        case ExtensionStartMethodFromContainer: return @"container";
-        case ExtensionStartMethodFromBoot: return @"boot";
-        case ExtensionStartMethodOther: return @"other";
+        case ExtensionStartMethodFromContainer: return @"Container";
+        case ExtensionStartMethodFromBoot: return @"Boot";
+        case ExtensionStartMethodFromCrash: return @"Crash";
+        case ExtensionStartMethodOther: return @"Other";
         default: PSIAssert(FALSE);
     }
 
-    return @"";
+    return @"Unknown";
 }
 
 @end
