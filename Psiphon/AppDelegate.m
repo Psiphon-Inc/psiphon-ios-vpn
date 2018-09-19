@@ -358,7 +358,7 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
     LOG_DEBUG("Available embedded egress regions: %@.", embeddedEgressRegions);
 
     if ([embeddedEgressRegions count] > 0) {
-        [self.sharedDB insertNewEmbeddedEgressRegions:embeddedEgressRegions];
+        [self.sharedDB setEmbeddedEgressRegions:embeddedEgressRegions];
     } else {
         [PsiFeedbackLogger error:@"Error no egress regions found in %@.", embeddedServerEntriesPath];
     }
