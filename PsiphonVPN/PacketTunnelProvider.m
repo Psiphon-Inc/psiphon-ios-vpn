@@ -358,7 +358,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 
               default:
                   [PsiFeedbackLogger errorWithType:SubscriptionCheckLogType message:@"unhandled check value %@", subscriptionCheckObject];
-                  abort();
+                  [weakSelf exitGracefully];
           }
       }]
       startWith:[SubscriptionResultModel inProgress]];
@@ -400,7 +400,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 
                   default:
                       [PsiFeedbackLogger errorWithType:SubscriptionCheckLogType message:@"unhandled error code %ld", (long) result.error.code];
-                      abort();
+                      [weakSelf exitGracefully];
                       break;
               }
               return;
@@ -615,7 +615,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
             }
 
             // Exit only after the user has dismissed the message.
-            exit(1);
+            [self exitGracefully];
         }];
     };
 
@@ -944,7 +944,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
     NSDictionary *configs = [PsiphonConfigReader fromConfigFile].configs;
     if (!configs) {
         [self displayCorruptSettingsFileMessage];
-        abort();
+        [self exitGracefully];
     }
 
     // Get a mutable copy of the Psiphon configs.
