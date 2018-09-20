@@ -45,8 +45,6 @@ PsiFeedbackLogType const BasePacketTunnelProviderLogType = @"BasePacketTunnelPro
     // Pointer to startTunnelWithOptions completion handler.
     // NOTE: value is expected to be nil after completion handler has been called.
     void (^vpnStartCompletionHandler)(NSError *__nullable error);
-
-    PsiphonDataSharedDB *sharedDB;
 }
 
 - (instancetype)init {
@@ -161,6 +159,23 @@ PsiFeedbackLogType const BasePacketTunnelProviderLogType = @"BasePacketTunnelPro
         return TRUE;
     }
     return FALSE;
+}
+
+- (void)exitGracefully {
+
+    // This is a manual exit and not a jetsam.
+    [self.sharedDB setExtensionJetsammedBeforeStopFlag:FALSE];
+
+    // We want to only wait for a maximum of 5 seconds for the tunnel to stop.
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 5 * NSEC_PER_SEC),
+      dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
+        exit(1);
+    });
+
+    // Try to gracefully shutdown the tunnel to free up server resources quicker.
+    [(id <BasePacketTunnelProviderProtocol>)self stopTunnelWithReason:NEProviderStopReasonNone];
+
+    exit(1);
 }
 
 #pragma mark - Handling app messages
