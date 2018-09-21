@@ -47,7 +47,6 @@
 #import "Asserts.h"
 #import "NSDate+PSIDateExtension.h"
 #import "DispatchUtils.h"
-#import "RACSignal.h"
 #import "RACUnit.h"
 #import <ReactiveObjC/RACSubject.h>
 #import <ReactiveObjC/RACReplaySubject.h>
@@ -98,9 +97,9 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 
 @property (nonatomic) SubscriptionState *subscriptionCheckState;
 
-// Start vpn decision. If FALSE, VPN should not be activated, even though Psiphon tunnel might be connected.
-// shouldStartVPN SHOULD NOT be altered after it is set to TRUE.
-@property (atomic) BOOL shouldStartVPN;
+// waitForContainerStartVPNCommand signals that the extension should wait for the container
+// before starting the VPN.
+@property (atomic) BOOL waitForContainerStartVPNCommand;
 
 @property (nonatomic) GracePeriodState gracePeriodState;
 
@@ -110,7 +109,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 // NOTE: Does not include subscription authorization ID.
 @property (atomic) NSSet<NSString *> *suppliedContainerAuthorizationIDs;
 
-@property (nonatomic) PsiphonConfigSponsorIds *cachedSpondorIDs;
+@property (nonatomic) PsiphonConfigSponsorIds *cachedSponsorIDs;
 
 @end
 
@@ -154,7 +153,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 
         _tunnelProviderState = TunnelProviderStateInit;
         _subscriptionCheckState = nil;
-        _shouldStartVPN = FALSE;
+        _waitForContainerStartVPNCommand = FALSE;
         _gracePeriodState = GracePeriodStateInactive;
     }
     return self;
@@ -233,7 +232,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 
             // Restarts the tunnel to re-connect with the correct sponsor ID.
             [weakSelf.subscriptionCheckState setStateNotSubscribed];
-            [weakSelf reconnectWithConfig:weakSelf.cachedSpondorIDs.defaultSponsorId];
+            [weakSelf reconnectWithConfig:weakSelf.cachedSponsorIDs.defaultSponsorId];
 
         } else {
 
@@ -301,7 +300,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
           // of type SubscriptionCheckEnum.
           return subscriptionCheckSignal;
       }]
-      flattenMap:^RACSignal *(NSNumber *subscriptionCheckObject) {
+      flattenMap:^RACSignal<SubscriptionResultModel *> *(NSNumber *subscriptionCheckObject) {
 
           switch ((SubscriptionCheckEnum) [subscriptionCheckObject integerValue]) {
               case SubscriptionCheckAuthorizationExpired:
@@ -359,6 +358,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
               default:
                   [PsiFeedbackLogger errorWithType:SubscriptionCheckLogType message:@"unhandled check value %@", subscriptionCheckObject];
                   [weakSelf exitGracefully];
+                  return [RACSignal empty];
           }
       }]
       startWith:[SubscriptionResultModel inProgress]];
@@ -459,7 +459,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
                       }
 
                       [weakSelf.subscriptionCheckState setStateSubscribed];
-                      [weakSelf reconnectWithConfig:weakSelf.cachedSpondorIDs.subscriptionSponsorId];
+                      [weakSelf reconnectWithConfig:weakSelf.cachedSponsorIDs.subscriptionSponsorId];
                   }
               } else {
                   // Server returned no authorization, treats this as if subscription was expired.
@@ -506,7 +506,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 
     [[Notifier sharedInstance] registerObserver:self callbackQueue:dispatch_get_main_queue()];
 
-    self.cachedSpondorIDs = [PsiphonConfigReader fromConfigFile].sponsorIds;
+    self.cachedSponsorIDs = [PsiphonConfigReader fromConfigFile].sponsorIds;
 
     // Initializes uninitialized properties.
     Subscription *subscription = [Subscription fromPersistedDefaults];
@@ -525,13 +525,12 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
         self.extensionStartMethod == ExtensionStartMethodFromCrash ||
         self.subscriptionCheckState.isSubscribedOrInProgress) {
 
-        if ([self.subscriptionCheckState isSubscribedOrInProgress]) {
-            
-            [self initSubscriptionCheckObjects];
+        if (self.extensionStartMethod == ExtensionStartMethodFromContainer) {
+            self.waitForContainerStartVPNCommand = TRUE;
+        }
 
-            // If there maybe a valid subscription, there is no need to wait
-            // for the container to send "M.startVPN" signal.
-            self.shouldStartVPN = TRUE;
+        if ([self.subscriptionCheckState isSubscribedOrInProgress]) {
+            [self initSubscriptionCheckObjects];
         }
 
         [self setTunnelNetworkSettings:[self getTunnelSettings] completionHandler:^(NSError *_Nullable error) {
@@ -646,20 +645,16 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 
         LOG_DEBUG(@"container signaled VPN to start");
 
-        // If the tunnel is connected, starts the VPN.
-        // Otherwise, should establish the VPN after onConnected has been called.
-        self.shouldStartVPN = TRUE; // This should be set before calling tryStartVPN.
+        self.waitForContainerStartVPNCommand = FALSE;
         [self tryStartVPN];
 
     } else if ([NotifierAppEnteredBackground isEqualToString:message]) {
 
         LOG_DEBUG(@"container entered background");
 
-        // If the VPN start message ("M.startVPN") has not been received from the container,
+        // If the container StartVPN command has not been received from the container,
         // and the container goes to the background, then alert the user to open the app.
-        //
-        // Note: We expect the value of shouldStartVPN to not be altered after it is set to TRUE.
-        if (!self.shouldStartVPN) {
+        if (!self.waitForContainerStartVPNCommand) {
             [self displayMessage:NSLocalizedStringWithDefaultValue(@"OPEN_PSIPHON_APP", nil, [NSBundle mainBundle], @"Please open Psiphon app to finish connecting.", @"Alert message informing the user they should open the app to finish connecting to the VPN. DO NOT translate 'Psiphon'.")];
         }
 
@@ -785,18 +780,19 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
     return newSettings;
 }
 
-// Starts VPN and notifies the container of homepages (if any) when shouldStartVPN flag is TRUE.
+// Starts VPN and notifies the container of homepages (if any)
+// when `self.waitForContainerStartVPNCommand` is FALSE.
 - (BOOL)tryStartVPN {
-    // Don't start the VPN unless this flag has been due to subscription status, or from the container.
-    if (!self.shouldStartVPN) {
+
+    if (self.waitForContainerStartVPNCommand) {
         return FALSE;
     }
 
     if ([self.psiphonTunnel getConnectionState] == PsiphonConnectionStateConnected) {
         // The container waits up to `kLandingPageTimeoutSecs` to see the tunnel connected
         // status from when the Homepage notification is received by it.
-        self.reasserting = FALSE;
         [self startVPN];
+        self.reasserting = FALSE;
         [[Notifier sharedInstance] post:NotifierNewHomepages];
         return TRUE;
     }
@@ -970,9 +966,9 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 
     // SponsorId override
     if ([self.subscriptionCheckState isSubscribed]) {
-        mutableConfigCopy[@"SponsorId"] = [self.cachedSpondorIDs.subscriptionSponsorId copy];
+        mutableConfigCopy[@"SponsorId"] = [self.cachedSponsorIDs.subscriptionSponsorId copy];
     } else if ([self.subscriptionCheckState isInProgress]) {
-        mutableConfigCopy[@"SponsorId"] = [self.cachedSpondorIDs.checkSubscriptionSponsorId copy];
+        mutableConfigCopy[@"SponsorId"] = [self.cachedSponsorIDs.checkSubscriptionSponsorId copy];
     }
 
     // Store current sponsor ID used for use by container.
