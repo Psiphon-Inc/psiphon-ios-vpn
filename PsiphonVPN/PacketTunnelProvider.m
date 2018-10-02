@@ -513,7 +513,8 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
     self.subscriptionCheckState = [SubscriptionState initialStateFromSubscription:subscription];
 
     [PsiFeedbackLogger infoWithType:PacketTunnelProviderLogType
-                               json:@{@"StartMethod": [self extensionStartMethodTextDescription],
+                               json:@{@"Event":@"Start",
+                                      @"StartMethod": [self extensionStartMethodTextDescription],
                                       @"SubscriptionState": [self.subscriptionCheckState textDescription]}];
 
     // VPN should only start if it is started from the container app directly,
@@ -578,7 +579,8 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 - (void)stopTunnelWithReason:(NEProviderStopReason)reason {
     // Always log the stop reason.
     [PsiFeedbackLogger infoWithType:PacketTunnelProviderLogType
-                               json:@{@"StopReason": [PacketTunnelUtils textStopReason:reason],
+                               json:@{@"Event":@"Stop",
+                                      @"StopReason": [PacketTunnelUtils textStopReason:reason],
                                       @"StopCode": @(reason)}];
 
     // Cleanup.
@@ -682,12 +684,12 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 #pragma mark -
 
 - (void)sleepWithCompletionHandler:(void (^)(void))completionHandler {
-    [self.psiphonTunnel setSleeping:TRUE];
+    [PsiFeedbackLogger infoWithType:PacketTunnelProviderLogType json:@{@"Event":@"Sleep"}];
     completionHandler();
 }
 
 - (void)wake {
-    [self.psiphonTunnel setSleeping:FALSE];
+    [PsiFeedbackLogger infoWithType:PacketTunnelProviderLogType json:@{@"Event":@"Wake"}];
 }
 
 - (NSArray *)getNetworkInterfacesIPv4Addresses {
