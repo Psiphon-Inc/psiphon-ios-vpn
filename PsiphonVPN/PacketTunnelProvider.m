@@ -653,7 +653,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 
         // If the container StartVPN command has not been received from the container,
         // and the container goes to the background, then alert the user to open the app.
-        if (!self.waitForContainerStartVPNCommand) {
+        if (self.waitForContainerStartVPNCommand) {
             [self displayMessage:NSLocalizedStringWithDefaultValue(@"OPEN_PSIPHON_APP", nil, [NSBundle mainBundle], @"Please open Psiphon app to finish connecting.", @"Alert message informing the user they should open the app to finish connecting to the VPN. DO NOT translate 'Psiphon'.")];
         }
 
