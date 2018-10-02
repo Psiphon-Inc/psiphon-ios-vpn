@@ -404,19 +404,39 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     NSString * const CommandNoInternetAlert = @"NoInternetAlert";
     NSString * const CommandStartTunnel = @"StartTunnel";
     NSString * const CommandStopVPN = @"StopVPN";
+    NSString * const CommandConnectOnDemandAlert = @"ConnectOnDemandAlert";
 
     // signal emits a single two tuple (isVPNActive, connectOnDemandEnabled).
-    __block RACDisposable *disposable = [[[[privacyPolicyAccepted
+    __block RACDisposable *disposable = [[[[[privacyPolicyAccepted
       flattenMap:^RACSignal<RACTwoTuple <NSNumber *, NSNumber *> *> *(RACUnit *x) {
           return [weakSelf.vpnManager isVPNActive];
       }]
-      flattenMap:^RACSignal<NSString *> *(RACTwoTuple<NSNumber *, NSNumber *> *twoTuple) {
-          BOOL vpnActive = [twoTuple.first boolValue];
+      flattenMap:^RACSignal<RACTwoTuple<NSNumber *, NSNumber *> *> *(RACTwoTuple<NSNumber *, NSNumber *> *value) {
+          // Returned signal emits tuple (isActive, isConnectOnDemandEnabled).
+
+          // If VPN is already running, checks if ConnectOnDemand is enabled, otherwise returns the result immediately.
+          BOOL isActive = [value.first boolValue];
+          if (isActive) {
+              return [[weakSelf.vpnManager isConnectOnDemandEnabled]
+                      map:^RACTwoTuple<NSNumber *, NSNumber *> *(NSNumber *connectOnDemandEnabled) {
+                          return [RACTwoTuple pack:@(TRUE) :connectOnDemandEnabled];
+                      }];
+          } else {
+              return [RACSignal return:[RACTwoTuple pack:@(FALSE) :@(FALSE)]];
+          }
+      }]
+      flattenMap:^RACSignal<NSString *> *(RACTwoTuple<NSNumber *, NSNumber *> *value) {
+          BOOL vpnActive = [value.first boolValue];
+          BOOL connectOnDemandEnabled = [value.second boolValue];
 
           // Emits command to stop VPN if it has already started. Otherwise, it checks for internet connectivity
           // and emits one of CommandNoInternetAlert or CommandStartTunnel.
           if (vpnActive) {
-              return [RACSignal return:CommandStopVPN];
+              if (connectOnDemandEnabled) {
+                  return [RACSignal return:CommandConnectOnDemandAlert];
+              } else {
+                  return [RACSignal return:CommandStopVPN];
+              }
 
           } else {
               // Alerts the user if there is no internet connection.
@@ -461,6 +481,41 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 
         } else if ([CommandNoInternetAlert isEqualToString:command]) {
             [[AppDelegate sharedAppDelegate] displayAlertNoInternet];
+
+        } else if ([CommandConnectOnDemandAlert isEqualToString:command]) {
+            // Alert the user that Connect On Demand is enabled, and if they
+            // would like Connect On Demand to be disabled, and the extension to be stopped.
+            NSString *alertTitle = NSLocalizedStringWithDefaultValue(@"CONNECT_ON_DEMAND_ALERT_TITLE", nil, [NSBundle mainBundle], @"Auto-start VPN is enabled", @"Alert dialog title informing user that 'Auto-start VPN' feature is enabled");
+            NSString *alertMessage = NSLocalizedStringWithDefaultValue(@"CONNECT_ON_DEMAND_ALERT_BODY", nil, [NSBundle mainBundle], @"\"Auto-start VPN\" will be temporarily disabled until the next time Psiphon VPN is started.", "Alert dialog body informing the user that the 'Auto-start VPN on demand' feature will be disabled and that the VPN cannot be stopped.");
+
+            UIAlertController *alert = [UIAlertController alertControllerWithTitle:alertTitle
+                                                                           message:alertMessage
+                                                                    preferredStyle:UIAlertControllerStyleAlert];
+
+            UIAlertAction *stopUntilNextStartAction = [UIAlertAction
+              actionWithTitle:NSLocalizedStringWithDefaultValue(@"OK_BUTTON", nil, [NSBundle mainBundle], @"OK", @"OK button title")
+                        style:UIAlertActionStyleDefault
+                      handler:^(UIAlertAction *action) {
+
+                          // Disable "Connect On Demand" and stop the VPN.
+                          [[NSUserDefaults standardUserDefaults] setBool:TRUE
+                                                                  forKey:VPNManagerConnectOnDemandUntilNextStartBoolKey];
+
+                          __block RACDisposable *disposable = [[weakSelf.vpnManager setConnectOnDemandEnabled:FALSE]
+                            subscribeNext:^(NSNumber *x) {
+                                // Stops the VPN only after ConnectOnDemand is disabled.
+                                [weakSelf.vpnManager stopVPN];
+                            } error:^(NSError *error) {
+                                [weakSelf.compoundDisposable removeDisposable:disposable];
+                            }   completed:^{
+                                [weakSelf.compoundDisposable removeDisposable:disposable];
+                            }];
+
+                          [weakSelf.compoundDisposable addDisposable:disposable];
+                      }];
+
+            [alert addAction:stopUntilNextStartAction];
+            [weakSelf presentViewController:alert animated:TRUE completion:nil];
         }
 
     } error:^(NSError *error) {
