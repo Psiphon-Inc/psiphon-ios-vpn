@@ -494,6 +494,9 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
       }];
 }
 
+// VPN should only start if it is started from the container app directly,
+// OR if the user possibly has a valid subscription
+// OR if the extension is started after boot but before being unlocked.
 - (void)startTunnelWithErrorHandler:(void (^_Nonnull)(NSError *_Nonnull error))errorHandler {
 
     // Start app profiling
@@ -513,17 +516,12 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
     self.subscriptionCheckState = [SubscriptionState initialStateFromSubscription:subscription];
 
     [PsiFeedbackLogger infoWithType:PacketTunnelProviderLogType
-                               json:@{@"StartMethod": [self extensionStartMethodTextDescription],
+                               json:@{@"Event":@"Start",
+                                      @"StartMethod": [self extensionStartMethodTextDescription],
                                       @"SubscriptionState": [self.subscriptionCheckState textDescription]}];
 
-    // VPN should only start if it is started from the container app directly,
-    // or if the user possibly has a valid subscription,
-    // or if started due to Connect On Demand rules (or by the user from system Settings) from a crash,
-    // or if the extension is started after boot but before being unlocked.
-    //
-    if (self.extensionStartMethod == ExtensionStartMethodFromContainer ||
-        self.extensionStartMethod == ExtensionStartMethodFromCrash ||
-        self.subscriptionCheckState.isSubscribedOrInProgress) {
+    if (self.extensionStartMethod == ExtensionStartMethodFromContainer
+        || [self.subscriptionCheckState isSubscribedOrInProgress]) {
 
         if (self.extensionStartMethod == ExtensionStartMethodFromContainer) {
             self.waitForContainerStartVPNCommand = TRUE;
@@ -578,7 +576,8 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 - (void)stopTunnelWithReason:(NEProviderStopReason)reason {
     // Always log the stop reason.
     [PsiFeedbackLogger infoWithType:PacketTunnelProviderLogType
-                               json:@{@"StopReason": [PacketTunnelUtils textStopReason:reason],
+                               json:@{@"Event":@"Stop",
+                                      @"StopReason": [PacketTunnelUtils textStopReason:reason],
                                       @"StopCode": @(reason)}];
 
     // Cleanup.
@@ -654,7 +653,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 
         // If the container StartVPN command has not been received from the container,
         // and the container goes to the background, then alert the user to open the app.
-        if (!self.waitForContainerStartVPNCommand) {
+        if (self.waitForContainerStartVPNCommand) {
             [self displayMessage:NSLocalizedStringWithDefaultValue(@"OPEN_PSIPHON_APP", nil, [NSBundle mainBundle], @"Please open Psiphon app to finish connecting.", @"Alert message informing the user they should open the app to finish connecting to the VPN. DO NOT translate 'Psiphon'.")];
         }
 
@@ -682,12 +681,12 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 #pragma mark -
 
 - (void)sleepWithCompletionHandler:(void (^)(void))completionHandler {
-    [self.psiphonTunnel setSleeping:TRUE];
+    [PsiFeedbackLogger infoWithType:PacketTunnelProviderLogType json:@{@"Event":@"Sleep"}];
     completionHandler();
 }
 
 - (void)wake {
-    [self.psiphonTunnel setSleeping:FALSE];
+    [PsiFeedbackLogger infoWithType:PacketTunnelProviderLogType json:@{@"Event":@"Wake"}];
 }
 
 - (NSArray *)getNetworkInterfacesIPv4Addresses {

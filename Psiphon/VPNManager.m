@@ -59,6 +59,8 @@ NSErrorDomain const VPNManagerErrorDomain = @"VPNManagerErrorDomain";
 
 PsiFeedbackLogType const VPNManagerLogType = @"VPNManager";
 
+UserDefaultsKey const VPNManagerConnectOnDemandUntilNextStartBoolKey = @"VPNManager.ConnectOnDemandUntilNextStartKey";
+
 @interface VPNManager ()
 
 // Public properties
@@ -546,7 +548,7 @@ PsiFeedbackLogType const VPNManagerLogType = @"VPNManager";
               return [RACSignal empty];
           }
 
-          // If the on demand state doesn't need to change, emit @(TRUE) immediately.
+          // return empty signal as NO-OP if there is not change in status.
           if (providerManager.onDemandEnabled == onDemandEnabled) {
               return [RACSignal return:[NSNumber numberWithBool:TRUE]];
           }
@@ -717,6 +719,7 @@ PsiFeedbackLogType const VPNManagerLogType = @"VPNManager";
       map:^NETunnelProviderManager *(RACTwoTuple *tuple) {
 
           NETunnelProviderManager *providerManager = tuple.first;
+          UserSubscriptionStatus subscriptionStatus = (UserSubscriptionStatus)[tuple.second integerValue];
 
           if (!providerManager) {
               NETunnelProviderProtocol *providerProtocol = [[NETunnelProviderProtocol alloc] init];
@@ -735,6 +738,19 @@ PsiFeedbackLogType const VPNManagerLogType = @"VPNManager";
           if (!providerManager.onDemandRules || [providerManager.onDemandRules count] == 0) {
               NEOnDemandRule *alwaysConnectRule = [NEOnDemandRuleConnect new];
               providerManager.onDemandRules = @[alwaysConnectRule];
+          }
+
+          // Enables Connect On Demand if the user has an active subscription.
+          if (subscriptionStatus == UserSubscriptionActive) {
+              providerManager.onDemandEnabled = TRUE;
+          }
+
+          NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
+          if ([ud boolForKey:VPNManagerConnectOnDemandUntilNextStartBoolKey]) {
+              providerManager.onDemandEnabled = TRUE;
+
+              // Reset VPNManagerConnectOnDemandUntilNextStartBoolKey value.
+              [ud setBool:FALSE forKey:VPNManagerConnectOnDemandUntilNextStartBoolKey];
           }
 
           return providerManager;
