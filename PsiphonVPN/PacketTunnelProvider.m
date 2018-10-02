@@ -494,6 +494,9 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
       }];
 }
 
+// VPN should only start if it is started from the container app directly,
+// OR if the user possibly has a valid subscription
+// OR if the extension is started after boot but before being unlocked.
 - (void)startTunnelWithErrorHandler:(void (^_Nonnull)(NSError *_Nonnull error))errorHandler {
 
     // Start app profiling
@@ -517,14 +520,8 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
                                       @"StartMethod": [self extensionStartMethodTextDescription],
                                       @"SubscriptionState": [self.subscriptionCheckState textDescription]}];
 
-    // VPN should only start if it is started from the container app directly,
-    // or if the user possibly has a valid subscription,
-    // or if started due to Connect On Demand rules (or by the user from system Settings) from a crash,
-    // or if the extension is started after boot but before being unlocked.
-    //
-    if (self.extensionStartMethod == ExtensionStartMethodFromContainer ||
-        self.extensionStartMethod == ExtensionStartMethodFromCrash ||
-        self.subscriptionCheckState.isSubscribedOrInProgress) {
+    if (self.extensionStartMethod == ExtensionStartMethodFromContainer
+        || [self.subscriptionCheckState isSubscribedOrInProgress]) {
 
         if (self.extensionStartMethod == ExtensionStartMethodFromContainer) {
             self.waitForContainerStartVPNCommand = TRUE;
