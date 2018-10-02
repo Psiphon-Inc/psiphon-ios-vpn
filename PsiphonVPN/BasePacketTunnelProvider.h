@@ -101,6 +101,14 @@ typedef NS_ENUM(NSInteger, ExtensionStartMethodEnum) {
  */
 - (BOOL)startVPN;
 
+/**
+ * Exits the extension process gracefully by resetting internal flags and shutting down the tunnel.
+ * Once called the tunnel is given a maximum of 5 seconds to shutdown, after which exit is called.
+ *
+ * @note This method should always be preferred over `abort()` and `exit()` syscalls.
+ */
+- (void)exitGracefully;
+
 - (BOOL)isDeviceLocked;
 
 - (void)displayMessage:(NSString *)message;
