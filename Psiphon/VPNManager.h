@@ -31,6 +31,13 @@ NS_ASSUME_NONNULL_BEGIN
 
 FOUNDATION_EXPORT NSErrorDomain const VPNManagerErrorDomain;
 
+/**
+ * VPNManagerConnectOnDemandUntilNextStartBoolKey represents user's preference for Connect On Demand to be enabled
+ * for the next VPN start.
+ * This preference should not be displayed to the user directly.
+ */
+FOUNDATION_EXPORT UserDefaultsKey const VPNManagerConnectOnDemandUntilNextStartBoolKey;
+
 typedef NS_ERROR_ENUM(VPNManagerErrorDomain, VPNManagerConfigErrorCode) {
     /*! @const VPNManagerStartErrorConfigLoadFailed Failed to load VPN configurations. */
     VPNManagerConfigErrorLoadFailed = 100,
@@ -187,6 +194,26 @@ typedef NS_ENUM(NSInteger, VPNStartStatus) {
  *
  */
 - (RACSignal<RACTwoTuple<NSNumber *, NSNumber *> *> *)isVPNActive;
+
+/**
+ * isConnectOnDemandEnabled signal when subscribed to emits TRUE as NSNumber
+ * if the VPN configuration's Connect On Demand is enabled, emits FALSE otherwise.
+ *
+ * @scheduler isConnectOnDemandEnabled delivers its events on a background thread.
+ */
+- (RACSignal<NSNumber *> *)isConnectOnDemandEnabled;
+
+/**
+ * Updates and saves VPN configuration Connect On Demand.
+ *
+ * The returned signal emits @(TRUE) if succeeded, @(FALSE) otherwise, and then completes.
+ * All internal errors are caught, and instead FALSE is emitted.
+ *
+ * @param onDemandEnabled Toggle VPN configuration Connect On Demand capability.
+ *
+ * @scheduler setConnectOnDemandEnabled: delivers its events on a background thread.
+ */
+- (RACSignal<NSNumber *> *)setConnectOnDemandEnabled:(BOOL)onDemandEnabled;
 
 /**
  * Queries the Network Extension whether it is in the zombie state.
