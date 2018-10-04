@@ -58,17 +58,9 @@ PsiFeedbackLogType const AdManagerLogType = @"AdManager";
 
 NSString * const GoogleAdMobAppID = @"ca-app-pub-1072041961750291~2085686375";
 
-// Always use test ad unit id when building or debugging the app.
-//NSString * const UntunneledAdMobInterstitialAdUnitID = @"ca-app-pub-3940256099942544/4411468910";
-//NSString * const UntunneledAdMobRewardedVideoAdUnitID = @"ca-app-pub-3940256099942544/1712485313";
-
 NSString * const UntunneledAdMobInterstitialAdUnitID = @"ca-app-pub-1072041961750291/8751062454";
 NSString * const UntunneledAdMobRewardedVideoAdUnitID = @"ca-app-pub-1072041961750291/8356247142";
-
-//NSString * const MoPubUntunneledInterstitialAdUnitID = @"4250ebf7b28043e08ddbe04d444d79e4";
-//NSString * const MoPubUntunneledRewardVideoAdUnitID  = @"00638d8c82b34f9e8fe56b51cc704c87";
 NSString * const MoPubTunneledRewardVideoAdUnitID    = @"b9440504384740a2a3913a3d1b6db80e";
-
 
 // AdControllerTag values must be unique.
 AdControllerTag const AdControllerTagUntunneledInterstitial = @"UntunneledInterstitial";
@@ -246,16 +238,9 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
 
         _compoundDisposable = [RACCompoundDisposable compoundDisposable];
 
-        // TODO ! remove
-//        _untunneledInterstitial = [[MoPubInterstitialAdControllerWrapper alloc]
-//          initWithAdUnitID:MoPubUntunneledInterstitialAdUnitID withTag:AdControllerTagUntunneledInterstitial];
-
         _untunneledInterstitial = [[AdMobInterstitialAdControllerWrapper alloc]
           initWithAdUnitID:UntunneledAdMobInterstitialAdUnitID withTag:AdControllerTagUntunneledInterstitial];
 
-        // TODO ! remove
-//        _untunneledRewardVideo = [[MoPubRewardedAdControllerWrapper alloc]
-//          initWithAdUnitID:MoPubUntunneledRewardVideoAdUnitID withTag:AdControllerTagUntunneledRewardedVideo];
         _untunneledRewardVideo = [[AdMobRewardedAdControllerWrapper alloc]
           initWithAdUnitID:UntunneledAdMobRewardedVideoAdUnitID withTag:AdControllerTagUntunneledRewardedVideo];
 

@@ -25,6 +25,7 @@
 #import "Nullity.h"
 #import "NSError+Convenience.h"
 #import "Asserts.h"
+#import "PsiCashClient.h"
 @import GoogleMobileAds;
 
 PsiFeedbackLogType const AdMobRewardedAdControllerWrapperLogType = @"AdMobRewardedAdControllerWrapper";
@@ -125,7 +126,9 @@ PsiFeedbackLogType const AdMobRewardedAdControllerWrapperLogType = @"AdMobReward
 
     return [RACSignal createSignal:^RACDisposable *(id <RACSubscriber> subscriber) {
 
-        if (!weakSelf.ready || ![GADRewardBasedVideoAd sharedInstance].isReady) {
+        GADRewardBasedVideoAd *videoAd = [GADRewardBasedVideoAd sharedInstance];
+
+        if (!weakSelf.ready || !videoAd.isReady) {
             [subscriber sendNext:@(AdPresentationErrorNoAdsLoaded)];
             [subscriber sendCompleted];
             return nil;
@@ -143,11 +146,8 @@ PsiFeedbackLogType const AdMobRewardedAdControllerWrapperLogType = @"AdMobReward
                          allowOutOfOrderRewardStatus:TRUE]
           subscribe:subscriber];
 
-        // TODO ! is this the appropriate time to set the custom data?
-        // There is also a user identifier string which must be set before ad is
-        // loaded according to AdMob documentation.
-        [GADRewardBasedVideoAd sharedInstance].customRewardString = customData;
-        [[GADRewardBasedVideoAd sharedInstance] presentFromRootViewController:viewController];
+        [videoAd setCustomRewardString:customData];
+        [videoAd presentFromRootViewController:viewController];
 
         return disposable;
     }];
