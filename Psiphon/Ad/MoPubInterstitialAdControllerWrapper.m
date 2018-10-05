@@ -20,21 +20,22 @@
 #import <ReactiveObjC/NSObject+RACPropertySubscribing.h>
 #import <ReactiveObjC/RACDisposable.h>
 #import <ReactiveObjC/RACSignal+Operations.h>
-#import "InterstitialAdControllerWrapper.h"
+#import "MoPubInterstitialAdControllerWrapper.h"
 #import "RACReplaySubject.h"
 #import "NSError+Convenience.h"
 #import "RACUnit.h"
 #import "Logging.h"
+#import "Asserts.h"
 
 
-PsiFeedbackLogType const InterstitialAdControllerWrapperLogType = @"InterstitialAdControllerWrapper";
+PsiFeedbackLogType const MoPubInterstitialAdControllerWrapperLogType = @"MoPubInterstitialAdControllerWrapper";
 
-@interface InterstitialAdControllerWrapper () <MPInterstitialAdControllerDelegate>
+@interface MoPubInterstitialAdControllerWrapper () <MPInterstitialAdControllerDelegate>
 
 @property (nonatomic, readwrite, assign) BOOL ready;
 
-/** adPresented is hot infinite signal - emits RACUnit whenever an ad is presented. */
-@property (nonatomic, readwrite, nonnull) RACSubject<RACUnit *> *adPresented;
+/** presentedAdDismissed is hot infinite signal - emits RACUnit whenever an ad is presented. */
+@property (nonatomic, readwrite, nonnull) RACSubject<RACUnit *> *presentedAdDismissed;
 
 /** presentationStatus is hot infinite signal - emits items of type @(AdPresentation). */
 @property (nonatomic, readwrite, nonnull) RACSubject<NSNumber *> *presentationStatus;
@@ -49,7 +50,7 @@ PsiFeedbackLogType const InterstitialAdControllerWrapperLogType = @"Interstitial
 
 @end
 
-@implementation InterstitialAdControllerWrapper
+@implementation MoPubInterstitialAdControllerWrapper
 
 @synthesize tag = _tag;
 
@@ -58,7 +59,7 @@ PsiFeedbackLogType const InterstitialAdControllerWrapperLogType = @"Interstitial
     _loadStatus = [RACSubject subject];
     _adUnitID = adUnitID;
     _ready = FALSE;
-    _adPresented = [RACSubject subject];
+    _presentedAdDismissed = [RACSubject subject];
     _presentationStatus = [RACSubject subject];
     return self;
 }
@@ -69,10 +70,11 @@ PsiFeedbackLogType const InterstitialAdControllerWrapperLogType = @"Interstitial
 
 - (RACSignal<AdControllerTag> *)loadAd {
 
-    InterstitialAdControllerWrapper *__weak weakSelf = self;
+    MoPubInterstitialAdControllerWrapper *__weak weakSelf = self;
 
     return [RACSignal createSignal:^RACDisposable *(id <RACSubscriber> subscriber) {
 
+        // Subscribe to load status before loading an ad to prevent race-condition with "adDidLoad" delegate callback.
         RACDisposable *disposable = [weakSelf.loadStatus subscribe:subscriber];
 
         if (!weakSelf.interstitial) {
@@ -86,14 +88,14 @@ PsiFeedbackLogType const InterstitialAdControllerWrapperLogType = @"Interstitial
 
         // If the interstitial has already been loaded, `interstitialDidLoadAd:` delegate method will be called.
         [weakSelf.interstitial loadAd];
-        
+
         return disposable;
     }];
 }
 
 - (RACSignal<AdControllerTag> *)unloadAd {
 
-    InterstitialAdControllerWrapper *__weak weakSelf = self;
+    MoPubInterstitialAdControllerWrapper *__weak weakSelf = self;
 
     return [RACSignal createSignal:^RACDisposable *(id <RACSubscriber> subscriber) {
 
@@ -113,7 +115,7 @@ PsiFeedbackLogType const InterstitialAdControllerWrapperLogType = @"Interstitial
 
 - (RACSignal<NSNumber *> *)presentAdFromViewController:(UIViewController *)viewController {
 
-    InterstitialAdControllerWrapper *__weak weakSelf = self;
+    MoPubInterstitialAdControllerWrapper *__weak weakSelf = self;
 
     return [RACSignal createSignal:^RACDisposable *(id <RACSubscriber> subscriber) {
 
@@ -123,7 +125,11 @@ PsiFeedbackLogType const InterstitialAdControllerWrapperLogType = @"Interstitial
             return nil;
         }
 
-        RACDisposable *disposable = [weakSelf.presentationStatus subscribe:subscriber];
+        // Subscribe to presentationStatus before presenting the ad.
+        RACDisposable *disposable = [[AdControllerWrapperHelper
+          transformAdPresentationToTerminatingSignal:weakSelf.presentationStatus]
+          subscribe:subscriber];
+
         [weakSelf.interstitial showFromViewController:viewController];
 
         return disposable;
@@ -176,9 +182,9 @@ PsiFeedbackLogType const InterstitialAdControllerWrapperLogType = @"Interstitial
         self.ready = FALSE;
     }
     [self.presentationStatus sendNext:@(AdPresentationDidDisappear)];
-    [self.adPresented sendNext:RACUnit.defaultUnit];
+    [self.presentedAdDismissed sendNext:RACUnit.defaultUnit];
 
-    [PsiFeedbackLogger infoWithType:InterstitialAdControllerWrapperLogType json:
+    [PsiFeedbackLogger infoWithType:MoPubInterstitialAdControllerWrapperLogType json:
       @{@"event": @"adDidDisappear", @"tag": self.tag}];
 }
 

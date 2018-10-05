@@ -20,34 +20,35 @@
 #import <ReactiveObjC/RACReplaySubject.h>
 #import <ReactiveObjC/RACUnit.h>
 #import <ReactiveObjC/RACCompoundDisposable.h>
-#import "RewardedAdControllerWrapper.h"
+#import "MoPubRewardedAdControllerWrapper.h"
 #import "Asserts.h"
 #import "NSError+Convenience.h"
 #import "Logging.h"
 #import "Nullity.h"
 
 
-PsiFeedbackLogType const RewardedAdControllerWrapperLogType = @"RewardedAdControllerWrapper";
+PsiFeedbackLogType const MoPubRewardedAdControllerWrapperLogType = @"MoPubRewardedAdControllerWrapper";
 
-@interface RewardedAdControllerWrapper () <MPRewardedVideoDelegate>
+@interface MoPubRewardedAdControllerWrapper () <MPRewardedVideoDelegate>
 
 @property (nonatomic, readwrite, assign) BOOL ready;
 
-/** Hot infinite signal - emits RACUnit whenever an ad is presented. */
-@property (nonatomic, readwrite, nonnull) RACSubject<RACUnit *> *adPresented;
+/** presentedAdDismissed is hot infinite signal - emits RACUnit whenever an ad is presented. */
+@property (nonatomic, readwrite, nonnull) RACSubject<RACUnit *> *presentedAdDismissed;
+
+/** presentationStatus is hot infinite signal - emits items of type @(AdPresentation). */
+@property (nonatomic, readwrite, nonnull) RACSubject<NSNumber *> *presentationStatus;
 
 // Private Properties.
+
 /** loadStatus is hot non-completing signal - emits the wrapper tag when the ad has been loaded. */
 @property (nonatomic, readwrite, nonnull) RACSubject<AdControllerTag> *loadStatus;
-
-/** Hot terminating signal - emits items of type @(AdPresentation). */
-@property (nonatomic, nullable) RACSubject<NSNumber *> *presentationStatus;
 
 @property (nonatomic, readonly) NSString *adUnitID;
 
 @end
 
-@implementation RewardedAdControllerWrapper
+@implementation MoPubRewardedAdControllerWrapper
 
 @synthesize tag = _tag;
 
@@ -56,7 +57,7 @@ PsiFeedbackLogType const RewardedAdControllerWrapperLogType = @"RewardedAdContro
     _loadStatus = [RACSubject subject];
     _adUnitID = adUnitID;
     _ready = FALSE;
-    _adPresented = [RACSubject subject];
+    _presentedAdDismissed = [RACSubject subject];
     _presentationStatus = [RACSubject subject];
     return self;
 }
@@ -67,7 +68,7 @@ PsiFeedbackLogType const RewardedAdControllerWrapperLogType = @"RewardedAdContro
 
 - (RACSignal<AdControllerTag> *)loadAd {
 
-    RewardedAdControllerWrapper *__weak weakSelf = self;
+    MoPubRewardedAdControllerWrapper *__weak weakSelf = self;
 
     return [RACSignal createSignal:^RACDisposable *(id <RACSubscriber> subscriber) {
 
@@ -82,7 +83,7 @@ PsiFeedbackLogType const RewardedAdControllerWrapperLogType = @"RewardedAdContro
 
 - (RACSignal<AdControllerTag> *)unloadAd {
 
-    RewardedAdControllerWrapper *__weak weakSelf = self;
+    MoPubRewardedAdControllerWrapper *__weak weakSelf = self;
 
     return [RACSignal createSignal:^RACDisposable *(id <RACSubscriber> subscriber) {
         // Unlike interstitials, MoPub SDK doesn't provide a way to destroy the pre-fetched rewarded video ads.
@@ -102,7 +103,7 @@ PsiFeedbackLogType const RewardedAdControllerWrapperLogType = @"RewardedAdContro
 - (RACSignal<NSNumber *> *)presentAdFromViewController:(UIViewController *)viewController
                                         withCustomData:(NSString *_Nullable)customData {
 
-    RewardedAdControllerWrapper *__weak weakSelf = self;
+    MoPubRewardedAdControllerWrapper *__weak weakSelf = self;
 
     return [RACSignal createSignal:^RACDisposable *(id <RACSubscriber> subscriber) {
 
@@ -123,8 +124,11 @@ PsiFeedbackLogType const RewardedAdControllerWrapperLogType = @"RewardedAdContro
         // We're only expecting one reward.
         PSIAssert(rewards.count == 1);
 
-        RACDisposable *disposable = [weakSelf.presentationStatus subscribe:subscriber];
-
+        // Subscribe to presentationStatus before presenting the ad.
+        RACDisposable *disposable = [[AdControllerWrapperHelper
+          transformAdPresentationToTerminatingSignal:weakSelf.presentationStatus
+                         allowOutOfOrderRewardStatus:FALSE]
+          subscribe:subscriber];
 
         // Selects the first reward only, since we're only expecting one type of reward for now.
         [MPRewardedVideo presentRewardedVideoAdForAdUnitID:self.adUnitID
@@ -209,10 +213,16 @@ PsiFeedbackLogType const RewardedAdControllerWrapperLogType = @"RewardedAdContro
     if (self.ready) {
         self.ready = FALSE;
     }
-    [self.presentationStatus sendNext:@(AdPresentationDidDisappear)];
-    [self.adPresented sendNext:RACUnit.defaultUnit];
 
-    [PsiFeedbackLogger infoWithType:RewardedAdControllerWrapperLogType json:
+    // Since MoPub SDK states that `rewardedVideoAdShouldRewardForAdUnitID:reward:` delegate callback will not be
+    // called if server-side rewarding is enabled, we will emit `AdPresentationDidRewardUser` here immediately.
+    [self.presentationStatus sendNext:@(AdPresentationDidRewardUser)];
+
+    [self.presentationStatus sendNext:@(AdPresentationDidDisappear)];
+
+    [self.presentedAdDismissed sendNext:RACUnit.defaultUnit];
+
+    [PsiFeedbackLogger infoWithType:MoPubRewardedAdControllerWrapperLogType json:
       @{@"event": @"adDidDisappear", @"tag": self.tag}];
 }
 

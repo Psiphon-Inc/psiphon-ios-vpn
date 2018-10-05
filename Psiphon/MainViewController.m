@@ -124,7 +124,6 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     PsiCashBalanceWithSpeedBoostMeter *psiCashView;
     PsiCashRewardedVideoBar * psiCashRewardedVideoBar;
     RACDisposable *psiCashViewUpdates;
-    RACDisposable *showRewardedVideoDisposable;
 
 }
 
@@ -455,15 +454,11 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                         if (!vpnInstalled) {
                             return [RACSignal return:CommandStartTunnel];
                         } else {
-                            return [[[[weakSelf.adManager presentInterstitialOnViewController:weakSelf]
-                              filter:^BOOL(NSNumber *value) {
-                                  AdPresentation ap = (AdPresentation) [value integerValue];
-                                  return (ap != AdPresentationWillAppear) &&
-                                    (ap != AdPresentationDidAppear) &&
-                                    (ap != AdPresentationWillDisappear);
-                              }]
-                              take:1]
-                              mapReplace:CommandStartTunnel];
+                            // Start tunnel after ad presentation signal completes.
+                            return [[weakSelf.adManager presentInterstitialOnViewController:weakSelf]
+                              then:^RACSignal * {
+                                  return [RACSignal return:CommandStartTunnel];
+                              }];
                         }
                     }];
               }
@@ -1308,12 +1303,11 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     LOG_DEBUG(@"rewarded video started");
     [PsiFeedbackLogger infoWithType:RewardedVideoLogType message:@"started"];
 
-    [showRewardedVideoDisposable dispose];
+    RACSignal *showVideo = [self.adManager presentRewardedVideoOnViewController:self
+      withCustomData:[[PsiCashClient sharedInstance] rewardedVideoCustomData]];
 
-    RACSignal *showVideo = [self.adManager presentRewardedVideoOnViewController:self withCustomData:[[PsiCashClient sharedInstance] rewardedVideoCustomData]];
-
-    showRewardedVideoDisposable = [showVideo subscribeNext:^(NSNumber *x) {
-        AdPresentation ap = (AdPresentation) [x integerValue];
+    [self.compoundDisposable addDisposable:[showVideo subscribeNext:^(NSNumber *value) {
+        AdPresentation ap = (AdPresentation) [value integerValue];
 
         switch (ap) {
             case AdPresentationWillAppear:
@@ -1328,6 +1322,9 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
             case AdPresentationDidDisappear:
                 LOG_DEBUG(@"rewarded video AdPresentationDidDisappear");
                 [[PsiCashClient sharedInstance] pollForBalanceDeltaWithMaxRetries:30 andTimeBetweenRetries:1.0];
+                break;
+            case AdPresentationDidRewardUser:
+                LOG_DEBUG(@"rewarded video AdPresentationDidRewardUser");
                 break;
             case AdPresentationErrorCustomDataNotSet:
                 LOG_DEBUG(@"rewarded video AdPresentationErrorCustomDataNotSet");
@@ -1351,7 +1348,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     } completed:^{
         LOG_DEBUG(@"rewarded video completed");
         [PsiFeedbackLogger infoWithType:RewardedVideoLogType message:@"completed"];
-    }];
+    }]];
 }
 
 #pragma mark - PsiCashPurchaseAlertViewDelegate protocol

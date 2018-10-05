@@ -86,15 +86,17 @@
 		668AF9C01E92CBE0008CAAAA /* NetworkExtension.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 668AF9BE1E92CBD3008CAAAA /* NetworkExtension.framework */; };
 		963708A91F65D4810038894E /* Bourbon-Oblique.otf in Resources */ = {isa = PBXBuildFile; fileRef = 963708A81F65D4810038894E /* Bourbon-Oblique.otf */; };
 		9BFEC10661A7DC0402AF4B37 /* AsyncOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC6DEB0BE772BE801A9E6 /* AsyncOperation.m */; };
-		9BFEC1F0DA87B4E66C8CC4AA /* InterstitialAdControllerWrapper.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFECF45CA0CAF6997411D22 /* InterstitialAdControllerWrapper.m */; };
+		9BFEC1F0DA87B4E66C8CC4AA /* MoPubInterstitialAdControllerWrapper.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFECF45CA0CAF6997411D22 /* MoPubInterstitialAdControllerWrapper.m */; };
 		9BFEC2458D1346F537E9089E /* Nullity.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFECCCF429898FD903B69A6 /* Nullity.m */; };
 		9BFEC3D66910918A0C8954E1 /* AdMobConsent.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC5F8D8BB828703CCCC2F /* AdMobConsent.m */; };
+		9BFEC459666697D89B09A492 /* AdMobRewardedAdControllerWrapper.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFECF6BF16767758F28D1A0 /* AdMobRewardedAdControllerWrapper.m */; };
 		9BFEC4F02A47FF8265635803 /* Notifier.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC91ED4A1C511520E9948 /* Notifier.m */; };
 		9BFEC530849525066327C815 /* VPNManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFECBACAAF0FC84C7EA783E /* VPNManager.m */; };
 		9BFEC54DB169011DBB9A8FE5 /* SwoopView.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFECBF5A83176EA09316CB4 /* SwoopView.m */; };
 		9BFEC5C256EBC72398FAE8D8 /* UnionSerialQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC84F5DF6D2C3EF754962 /* UnionSerialQueue.m */; };
 		9BFEC5C3F8FFF1366FF19D0B /* AsyncOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC6DEB0BE772BE801A9E6 /* AsyncOperation.m */; };
 		9BFEC8058885B68B2822E2B8 /* AdManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC3CE64925E5984AAA9BE /* AdManager.m */; };
+		9BFEC8A2F99380655E853F81 /* AdControllerWrapper.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC460CD29B3A0667FE9A2 /* AdControllerWrapper.m */; };
 		9BFEC9C08697E4701A36A3B3 /* UnionSerialQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC84F5DF6D2C3EF754962 /* UnionSerialQueue.m */; };
 		9BFECA152514A7739551AA70 /* MoPubConsent.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFECACF5093B4C4EE5D3592 /* MoPubConsent.m */; };
 		9BFECB6BF077F45D491093F1 /* Authorization.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC31B61584FD2EAAF5DE6 /* Authorization.m */; };
@@ -104,10 +106,11 @@
 		9BFECD2FAA1FCDA88A7D432E /* UIColor+Additions.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC72C282F6060193B2E87 /* UIColor+Additions.m */; };
 		9BFECE5505C42426FC9627C8 /* UserDefaults.h in Resources */ = {isa = PBXBuildFile; fileRef = 9BFECC9B2B9F2BFBD4F8A47B /* UserDefaults.h */; };
 		9BFECEA225F023F895CC8DA1 /* Authorization.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC31B61584FD2EAAF5DE6 /* Authorization.m */; };
+		9BFECF61970F215F32E76280 /* AdMobInterstitialAdControllerWrapper.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC4F42A7FC2F11FF43636 /* AdMobInterstitialAdControllerWrapper.m */; };
 		9BFECF65871BB6B522C33F1E /* UserDefaults.h in Resources */ = {isa = PBXBuildFile; fileRef = 9BFECC9B2B9F2BFBD4F8A47B /* UserDefaults.h */; };
 		9BFECF8895D5FE1940A6F700 /* PsiphonConfigUserDefaults.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC584519C408D9D6D3FF1 /* PsiphonConfigUserDefaults.m */; };
 		9BFECF9F760F1A93A8933089 /* Nullity.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFECCCF429898FD903B69A6 /* Nullity.m */; };
-		9BFECFE618966005B01CF582 /* RewardedAdControllerWrapper.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC970B3CC179C3B9DE44D /* RewardedAdControllerWrapper.m */; };
+		9BFECFE618966005B01CF582 /* MoPubRewardedAdControllerWrapper.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC970B3CC179C3B9DE44D /* MoPubRewardedAdControllerWrapper.m */; };
 		9BFECFEB3BC9F10542C1A416 /* PsiphonConfigUserDefaults.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC584519C408D9D6D3FF1 /* PsiphonConfigUserDefaults.m */; };
 		B1D9FF416DDCA97A40A325AA /* libPods-PsiphonVPN.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 01122727D6CE50B340C55DBE /* libPods-PsiphonVPN.a */; };
 		CE26FC951BBDC7B800B83375 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = CE26FC941BBDC7B800B83375 /* Assets.xcassets */; };
@@ -392,12 +395,17 @@
 		9BFEC220C067BBE75AF970C1 /* IAPHelpViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IAPHelpViewController.m; sourceTree = "<group>"; };
 		9BFEC3165745A5D14C8C3C08 /* Notifier.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Notifier.h; sourceTree = "<group>"; };
 		9BFEC31B61584FD2EAAF5DE6 /* Authorization.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Authorization.m; sourceTree = "<group>"; };
-		9BFEC327A0BE7E5243CCB2E0 /* InterstitialAdControllerWrapper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = InterstitialAdControllerWrapper.h; sourceTree = "<group>"; };
+		9BFEC327A0BE7E5243CCB2E0 /* MoPubInterstitialAdControllerWrapper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MoPubInterstitialAdControllerWrapper.h; sourceTree = "<group>"; };
 		9BFEC33236183B2DA0000D5B /* VPNManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VPNManager.h; sourceTree = "<group>"; };
 		9BFEC355C70611AF985FB4D9 /* SwoopView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SwoopView.h; sourceTree = "<group>"; };
+		9BFEC356373DB0938069FBA8 /* AdControllerWrapper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AdControllerWrapper.h; sourceTree = "<group>"; };
+		9BFEC365D314919C8FA4C1DE /* AdMobInterstitialAdControllerWrapper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AdMobInterstitialAdControllerWrapper.h; sourceTree = "<group>"; };
 		9BFEC3CE64925E5984AAA9BE /* AdManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AdManager.m; sourceTree = "<group>"; };
+		9BFEC460CD29B3A0667FE9A2 /* AdControllerWrapper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AdControllerWrapper.m; sourceTree = "<group>"; };
 		9BFEC4D609BFCD0DC812BDB3 /* Asserts.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Asserts.h; sourceTree = "<group>"; };
+		9BFEC4F42A7FC2F11FF43636 /* AdMobInterstitialAdControllerWrapper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AdMobInterstitialAdControllerWrapper.m; sourceTree = "<group>"; };
 		9BFEC556918CCEF2B28DDA8D /* MoPubConsent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MoPubConsent.h; sourceTree = "<group>"; };
+		9BFEC5603ADEFD6BA23F8F74 /* AdMobRewardedAdControllerWrapper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AdMobRewardedAdControllerWrapper.h; sourceTree = "<group>"; };
 		9BFEC584519C408D9D6D3FF1 /* PsiphonConfigUserDefaults.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PsiphonConfigUserDefaults.m; sourceTree = "<group>"; };
 		9BFEC5F8D8BB828703CCCC2F /* AdMobConsent.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AdMobConsent.m; sourceTree = "<group>"; };
 		9BFEC673CE5EA236279F07BD /* Authorization.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Authorization.h; sourceTree = "<group>"; };
@@ -406,9 +414,9 @@
 		9BFEC72C282F6060193B2E87 /* UIColor+Additions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIColor+Additions.m"; sourceTree = "<group>"; };
 		9BFEC84F5DF6D2C3EF754962 /* UnionSerialQueue.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UnionSerialQueue.m; sourceTree = "<group>"; };
 		9BFEC8783D4222F2272E50E7 /* BasePacketTunnelProvider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BasePacketTunnelProvider.h; sourceTree = "<group>"; };
-		9BFEC8FDCD80DACA0D851A06 /* RewardedAdControllerWrapper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RewardedAdControllerWrapper.h; sourceTree = "<group>"; };
+		9BFEC8FDCD80DACA0D851A06 /* MoPubRewardedAdControllerWrapper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MoPubRewardedAdControllerWrapper.h; sourceTree = "<group>"; };
 		9BFEC91ED4A1C511520E9948 /* Notifier.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Notifier.m; sourceTree = "<group>"; };
-		9BFEC970B3CC179C3B9DE44D /* RewardedAdControllerWrapper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RewardedAdControllerWrapper.m; sourceTree = "<group>"; };
+		9BFEC970B3CC179C3B9DE44D /* MoPubRewardedAdControllerWrapper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MoPubRewardedAdControllerWrapper.m; sourceTree = "<group>"; };
 		9BFECA9ADB17DC329DA64AA5 /* AsyncOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AsyncOperation.h; sourceTree = "<group>"; };
 		9BFECACF5093B4C4EE5D3592 /* MoPubConsent.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MoPubConsent.m; sourceTree = "<group>"; };
 		9BFECB09D7F866F34551DBD4 /* IAPHelpViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IAPHelpViewController.h; sourceTree = "<group>"; };
@@ -419,7 +427,8 @@
 		9BFECCCF429898FD903B69A6 /* Nullity.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Nullity.m; sourceTree = "<group>"; };
 		9BFECE69F71F11C7B3A2D67E /* UIColor+Additions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIColor+Additions.h"; sourceTree = "<group>"; };
 		9BFECEEB971749A4E9705B15 /* Nullity.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Nullity.h; sourceTree = "<group>"; };
-		9BFECF45CA0CAF6997411D22 /* InterstitialAdControllerWrapper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = InterstitialAdControllerWrapper.m; sourceTree = "<group>"; };
+		9BFECF45CA0CAF6997411D22 /* MoPubInterstitialAdControllerWrapper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MoPubInterstitialAdControllerWrapper.m; sourceTree = "<group>"; };
+		9BFECF6BF16767758F28D1A0 /* AdMobRewardedAdControllerWrapper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AdMobRewardedAdControllerWrapper.m; sourceTree = "<group>"; };
 		9BFECF74881B6C4227813A63 /* AdMobConsent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AdMobConsent.h; sourceTree = "<group>"; };
 		CB8BB19F016330264C4DCB80 /* libPods-Psiphon.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Psiphon.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		CE26FC8A1BBDC7B800B83375 /* Psiphon.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Psiphon.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -964,16 +973,22 @@
 		EFFA4AB620F68CE100E35E8E /* Ad */ = {
 			isa = PBXGroup;
 			children = (
-				9BFECF45CA0CAF6997411D22 /* InterstitialAdControllerWrapper.m */,
-				9BFEC327A0BE7E5243CCB2E0 /* InterstitialAdControllerWrapper.h */,
-				9BFEC970B3CC179C3B9DE44D /* RewardedAdControllerWrapper.m */,
-				9BFEC8FDCD80DACA0D851A06 /* RewardedAdControllerWrapper.h */,
+				9BFECF45CA0CAF6997411D22 /* MoPubInterstitialAdControllerWrapper.m */,
+				9BFEC327A0BE7E5243CCB2E0 /* MoPubInterstitialAdControllerWrapper.h */,
+				9BFEC970B3CC179C3B9DE44D /* MoPubRewardedAdControllerWrapper.m */,
+				9BFEC8FDCD80DACA0D851A06 /* MoPubRewardedAdControllerWrapper.h */,
 				9BFEC717F36D5A071D14AFFA /* AdManager.h */,
 				9BFEC3CE64925E5984AAA9BE /* AdManager.m */,
 				9BFEC5F8D8BB828703CCCC2F /* AdMobConsent.m */,
 				9BFECF74881B6C4227813A63 /* AdMobConsent.h */,
 				9BFECACF5093B4C4EE5D3592 /* MoPubConsent.m */,
 				9BFEC556918CCEF2B28DDA8D /* MoPubConsent.h */,
+				9BFEC4F42A7FC2F11FF43636 /* AdMobInterstitialAdControllerWrapper.m */,
+				9BFEC365D314919C8FA4C1DE /* AdMobInterstitialAdControllerWrapper.h */,
+				9BFECF6BF16767758F28D1A0 /* AdMobRewardedAdControllerWrapper.m */,
+				9BFEC5603ADEFD6BA23F8F74 /* AdMobRewardedAdControllerWrapper.h */,
+				9BFEC460CD29B3A0667FE9A2 /* AdControllerWrapper.m */,
+				9BFEC356373DB0938069FBA8 /* AdControllerWrapper.h */,
 			);
 			path = Ad;
 			sourceTree = "<group>";
@@ -1462,11 +1477,14 @@
 				9BFEC9C08697E4701A36A3B3 /* UnionSerialQueue.m in Sources */,
 				445F24EF20E1A5BA00D004E9 /* constraints.c in Sources */,
 				445F24DB20E1A5BA00D004E9 /* ber_decoder.c in Sources */,
-				9BFEC1F0DA87B4E66C8CC4AA /* InterstitialAdControllerWrapper.m in Sources */,
-				9BFECFE618966005B01CF582 /* RewardedAdControllerWrapper.m in Sources */,
+				9BFEC1F0DA87B4E66C8CC4AA /* MoPubInterstitialAdControllerWrapper.m in Sources */,
+				9BFECFE618966005B01CF582 /* MoPubRewardedAdControllerWrapper.m in Sources */,
 				9BFEC8058885B68B2822E2B8 /* AdManager.m in Sources */,
 				9BFEC3D66910918A0C8954E1 /* AdMobConsent.m in Sources */,
 				9BFECA152514A7739551AA70 /* MoPubConsent.m in Sources */,
+				9BFECF61970F215F32E76280 /* AdMobInterstitialAdControllerWrapper.m in Sources */,
+				9BFEC459666697D89B09A492 /* AdMobRewardedAdControllerWrapper.m in Sources */,
+				9BFEC8A2F99380655E853F81 /* AdControllerWrapper.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
