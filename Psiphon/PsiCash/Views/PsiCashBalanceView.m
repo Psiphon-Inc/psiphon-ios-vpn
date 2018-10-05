@@ -64,7 +64,8 @@
 
 - (void)setupViews {
     self.clipsToBounds = YES;
-    self.backgroundColor = [UIColor colorWithWhite:0 alpha:.12];
+    self.layer.borderColor = [UIColor colorWithRed:0.94 green:0.96 blue:0.99 alpha:1.0].CGColor;
+    self.layer.borderWidth = 2.f;
     self.contentEdgeInsets = UIEdgeInsetsMake(10.0f, 30.0f, 10.0f, 30.0f);
 
     // Setup container view
@@ -76,7 +77,7 @@
     _balance.adjustsFontSizeToFitWidth = YES;
     _balance.font = [UIFont boldSystemFontOfSize:20];
     _balance.textAlignment = isRTL ? NSTextAlignmentRight : NSTextAlignmentLeft;
-    _balance.textColor = [UIColor whiteColor];
+    _balance.textColor = [UIColor colorWithRed:0.30 green:0.31 blue:1.00 alpha:1.0];
     _balance.userInteractionEnabled = NO;
 
     // Setup coin graphic
@@ -92,24 +93,23 @@
 }
 
 - (void)setupLayoutConstraints {
-    CGFloat coinSize = 30.f;
-
     containerView.translatesAutoresizingMaskIntoConstraints = NO;
     [containerView.centerXAnchor constraintEqualToAnchor:self.centerXAnchor].active = YES;
     [containerView.centerYAnchor constraintEqualToAnchor:self.centerYAnchor].active = YES;
-    [containerView.widthAnchor constraintLessThanOrEqualToAnchor:self.widthAnchor constant:-10].active = YES;
-    [containerView.heightAnchor constraintLessThanOrEqualToAnchor:self.heightAnchor].active = YES;
+    [containerView.leadingAnchor constraintEqualToAnchor:_coin.leadingAnchor].active = YES;
+    [containerView.trailingAnchor constraintEqualToAnchor:_balance.trailingAnchor].active = YES;
+    [containerView.heightAnchor constraintEqualToAnchor:self.heightAnchor].active = YES;
 
     _balance.translatesAutoresizingMaskIntoConstraints = NO;
-    [_balance.widthAnchor constraintGreaterThanOrEqualToConstant:coinSize].active = YES;
+    [_balance.widthAnchor constraintGreaterThanOrEqualToAnchor:_coin.widthAnchor].active = YES;
     [_balance.leadingAnchor constraintEqualToAnchor:_coin.trailingAnchor constant:10].active = YES;
     [_balance.trailingAnchor constraintLessThanOrEqualToAnchor:containerView.trailingAnchor].active = YES;
-    [_balance.centerYAnchor constraintEqualToAnchor:self.centerYAnchor constant:2].active = YES;
+    [_balance.centerYAnchor constraintEqualToAnchor:_coin.centerYAnchor].active = YES;
 
     _coin.translatesAutoresizingMaskIntoConstraints = NO;
-    [_coin.heightAnchor constraintEqualToConstant:coinSize].active = YES;
-    [_coin.widthAnchor constraintEqualToConstant:coinSize].active = YES;
-    [_coin.centerYAnchor constraintEqualToAnchor:_balance.centerYAnchor].active = YES;
+    [_coin.heightAnchor constraintEqualToAnchor:self.heightAnchor multiplier:0.9].active = YES;
+    [_coin.widthAnchor constraintEqualToAnchor:self.heightAnchor].active = YES;
+    [_coin.bottomAnchor constraintEqualToAnchor:self.bottomAnchor].active = YES;
     [_coin.leadingAnchor constraintEqualToAnchor:containerView.leadingAnchor].active = YES;
     [_coin.trailingAnchor constraintEqualToAnchor:_balance.leadingAnchor constant:-10].active = YES;
 }
