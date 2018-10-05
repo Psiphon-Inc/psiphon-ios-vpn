@@ -22,9 +22,11 @@
 #import "PastelView.h"
 #import "PsiCashClient.h"
 #import "ReactiveObjC.h"
+#import "UIColor+Additions.h"
+#import "UIFont+Additions.h"
 
-#define kCornerRadius 25.f
-#define kBorderWidth 4.f
+#define kBorderWidth 2.f
+#define kDistanceFromOuterToInnerMeter 6.f
 
 @interface InnerMeterView : UIView
 @property (nonatomic, assign) CGFloat progress;
@@ -62,20 +64,17 @@
 
     progressBar = [CAShapeLayer layer];
 
-    CGFloat progressBarRadius = kCornerRadius;
+    CGFloat progressBarRadius = self.frame.size.height / 2;
     CGFloat progressBarWidth = self.frame.size.width * progress;
 
     UIRectCorner corners = kCALayerMinXMinYCorner | kCALayerMinXMaxYCorner;
     if (progress == 0 || progress >= 1) {
         corners |= kCALayerMaxXMaxYCorner | kCALayerMaxXMinYCorner;
     }
-
     if (progress >= 1) {
         animatedGradientView = [[PastelView alloc] init];
-        if (_speedBoosting) {
-            animatedGradientView.colors = @[[UIColor colorWithRed:0.50 green:0.49 blue:1.00 alpha:1.0],
-                                            [UIColor colorWithRed:0.62 green:0.38 blue:1.00 alpha:1.0]];
-        }
+        animatedGradientView.colors = @[[UIColor robinEggBlue],
+                                        [UIColor lightSeafoam]];
         [self addSubview:animatedGradientView];
         animatedGradientView.frame = self.bounds;
 
@@ -89,7 +88,8 @@
         gradient.endPoint = CGPointMake(1.0, 0.5);
         gradient.mask = progressBar;
 
-        gradient.colors = @[(id)[UIColor colorWithRed:0.16 green:0.38 blue:1.00 alpha:1.0].CGColor, (id)[UIColor colorWithRed:0.55 green:0.72 blue:1.00 alpha:1.0].CGColor];
+        gradient.colors = @[(id)[UIColor darkCream].CGColor,
+                            (id)[UIColor peachyPink].CGColor];
         progressBar.path = [UIBezierPath bezierPathWithRoundedRect:CGRectMake(0, 0, progressBarWidth, self.frame.size.height) byRoundingCorners:corners cornerRadii:CGSizeMake(progressBarRadius, progressBarRadius)].CGPath;
         gradient.frame = CGRectMake(0, 0, self.frame.size.width, self.frame.size.height);
     }
@@ -116,7 +116,10 @@
     NSTimer *countdownToSpeedBoostExpiry;
     UIImageView *instantBuyButton;
     InnerMeterView *innerBackground;
+    NSLayoutConstraint *instantBuyButtonCenterXConstraint;
 }
+
+#pragma mark - Init
 
 - (id)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
@@ -131,11 +134,10 @@
 }
 
 - (void)setupViews {
-    self.layer.cornerRadius = kCornerRadius;
-    self.backgroundColor = [UIColor clearColor];
+    self.backgroundColor = [UIColor whiteColor];
     self.clipsToBounds = YES;
+    self.layer.borderColor = [UIColor duckEggBlue].CGColor;
     self.layer.borderWidth = kBorderWidth;
-    self.layer.borderColor = [UIColor colorWithWhite:0 alpha:.12].CGColor;
 
     instantBuyButton = [[UIImageView alloc] initWithFrame:CGRectMake(60, 95, 90, 90)];
     instantBuyButton.image = [UIImage imageNamed:@"PsiCash_InstantPurchaseButton"];
@@ -143,13 +145,12 @@
 
     title = [[UILabel alloc] init];
     title.adjustsFontSizeToFitWidth = YES;
-    title.font = [UIFont boldSystemFontOfSize:14];
     title.textAlignment = NSTextAlignmentCenter;
-    title.textColor = [UIColor colorWithRed:0.98 green:0.99 blue:1.00 alpha:1.0];
+    title.textColor = [UIColor whiteColor];
+    title.font = [UIFont avenirNextBold:12.f];
 
     innerBackground = [[InnerMeterView alloc] init];
-    innerBackground.backgroundColor = [UIColor colorWithWhite:0 alpha:.24];
-    innerBackground.layer.cornerRadius = kCornerRadius - kBorderWidth;
+    innerBackground.backgroundColor = [UIColor colorWithRed:0.87 green:0.87 blue:0.92 alpha:1.0];
 }
 
 - (void)addViews {
@@ -160,17 +161,17 @@
 
 - (void)setupLayoutConstraints {
     innerBackground.translatesAutoresizingMaskIntoConstraints = NO;
-    [innerBackground.widthAnchor constraintEqualToAnchor:self.widthAnchor constant:-kBorderWidth*2].active = YES;
-    [innerBackground.heightAnchor constraintEqualToAnchor:self.heightAnchor constant:-kBorderWidth*2].active = YES;
+    CGFloat distanceFromOuterMeterBorderToInnerMeter = kBorderWidth + kDistanceFromOuterToInnerMeter;
+    [innerBackground.widthAnchor constraintEqualToAnchor:self.widthAnchor constant:-distanceFromOuterMeterBorderToInnerMeter*2].active = YES;
+    [innerBackground.heightAnchor constraintEqualToAnchor:self.heightAnchor constant:-distanceFromOuterMeterBorderToInnerMeter*2].active = YES;
     [innerBackground.centerXAnchor constraintEqualToAnchor:self.centerXAnchor].active = YES;
     [innerBackground.centerYAnchor constraintEqualToAnchor:self.centerYAnchor].active = YES;
 
-    CGFloat instantBuyButtonSize = 20.f;
     instantBuyButton.translatesAutoresizingMaskIntoConstraints = NO;
-    [instantBuyButton.heightAnchor constraintEqualToConstant:instantBuyButtonSize].active = YES;
-    [instantBuyButton.widthAnchor constraintEqualToConstant:instantBuyButtonSize].active = YES;
+    [instantBuyButton.widthAnchor constraintEqualToAnchor:instantBuyButton.heightAnchor].active = YES;
+    [instantBuyButton.heightAnchor constraintEqualToAnchor:innerBackground.heightAnchor multiplier:.5].active = YES;
+    [self updateInstantBuyButtonCenterXConstraint];
     [instantBuyButton.centerYAnchor constraintEqualToAnchor:self.centerYAnchor].active = YES;
-    [instantBuyButton.leadingAnchor constraintEqualToAnchor:self.leadingAnchor constant:16.f].active = YES;
     instantBuyButton.contentMode = UIViewContentModeScaleAspectFit;
 
     title.translatesAutoresizingMaskIntoConstraints = NO;
@@ -179,7 +180,29 @@
     [title.leadingAnchor constraintEqualToAnchor:instantBuyButton.trailingAnchor].active = YES;
 }
 
-# pragma mark - State Changes
+#pragma mark - View sizing
+
+- (void)setBounds:(CGRect)bounds {
+    [super setBounds:bounds];
+    self.layer.cornerRadius = bounds.size.height / 2;
+    innerBackground.layer.cornerRadius = [self innerCornerRadius];
+    [self updateInstantBuyButtonCenterXConstraint];
+}
+
+- (CGFloat)innerCornerRadius {
+    return self.layer.cornerRadius - kBorderWidth - kDistanceFromOuterToInnerMeter;
+}
+
+- (void)updateInstantBuyButtonCenterXConstraint {
+    if (instantBuyButtonCenterXConstraint) {
+        instantBuyButtonCenterXConstraint.active = NO;
+    }
+    CGFloat offset = self.layer.cornerRadius - kBorderWidth - kDistanceFromOuterToInnerMeter;
+    instantBuyButtonCenterXConstraint = [instantBuyButton.centerXAnchor constraintEqualToAnchor:innerBackground.leadingAnchor constant:offset];
+    instantBuyButtonCenterXConstraint.active = YES;
+}
+
+#pragma mark - State Changes
 
 - (void)inPurchasePendingState {
     title.text = NSLocalizedStringWithDefaultValue(@"PSICASH_BUYING_SPEED_BOOST_TEXT", nil, [NSBundle mainBundle], @"Buying Speed Boost...", @"Text which appears in the Speed Boost meter when the user's buy request for Speed Boost is being processed. Please keep this text concise as the width of the text box is restricted in size.");

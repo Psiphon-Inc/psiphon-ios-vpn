@@ -18,7 +18,7 @@
  */
 
 #import "PsiCashOnboardingInfoViewController.h"
-#import "PsiCashBalanceWithSpeedBoostMeter.h"
+#import "PsiCashView.h"
 #import "StarView.h"
 
 #define k5sScreenWidth 320.f
@@ -151,7 +151,7 @@
 
 - (void)setGraphicAsSpeedBoostMeter {
     PsiCashSpeedBoostProductSKU *sku = [PsiCashSpeedBoostProductSKU skuWitDistinguisher:@"1h" withHours:[NSNumber numberWithInteger:1] andPrice:[NSNumber numberWithDouble:100e9]];
-    PsiCashBalanceWithSpeedBoostMeter *meter = [[PsiCashBalanceWithSpeedBoostMeter alloc] init];
+    PsiCashView *meter = [[PsiCashView alloc] init];
 
     PsiCashClientModel *m = [PsiCashClientModel clientModelWithAuthPackage:[[PsiCashAuthPackage alloc] initWithValidTokens:@[@"indicator", @"earner", @"spender"]]
                                                                 andBalance:[NSNumber numberWithInteger:0]
@@ -169,7 +169,7 @@
                     m.balance = [NSNumber numberWithInteger:0];
                 } else {
                     double increment = 10e9;
-                    [PsiCashBalanceWithSpeedBoostMeter animateBalanceChangeOf:[NSNumber numberWithDouble:increment] withPsiCashView:meter inParentView:self.view];
+                    [PsiCashView animateBalanceChangeOf:[NSNumber numberWithDouble:increment] withPsiCashView:meter inParentView:self.view];
                     m.balance = [NSNumber numberWithDouble:m.balance.doubleValue + increment];;
                 }
 

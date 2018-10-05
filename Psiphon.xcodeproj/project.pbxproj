@@ -44,6 +44,8 @@
 		44A0CAEE1FCCCDEC00859DB3 /* Subscription.m in Sources */ = {isa = PBXBuildFile; fileRef = 44E3CB6B1FCCA83200C80C82 /* Subscription.m */; };
 		4E04846B2048A0B9006C3D35 /* PsiCashBalanceView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E0484692048A0B8006C3D35 /* PsiCashBalanceView.m */; };
 		4E0774961F566B040097BC8C /* InAppSettings.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 4E0774951F566ADA0097BC8C /* InAppSettings.bundle */; };
+		4E0A3669215AB7EE008A3D7B /* UIFont+Additions.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E0A3668215AB7EE008A3D7B /* UIFont+Additions.m */; };
+		4E0A366C21666B99008A3D7B /* NSString+Additions.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E0A366B21666B99008A3D7B /* NSString+Additions.m */; };
 		4E0D88241FA06B2400ADB61E /* PsiphonUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E0D88231FA06B2400ADB61E /* PsiphonUITests.swift */; };
 		4E0DCB1A1F28481E00495781 /* PsiphonDataSharedDB.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E0DCB191F28481E00495781 /* PsiphonDataSharedDB.m */; };
 		4E0DCB1E1F2855FC00495781 /* PsiphonDataSharedDB.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E0DCB191F28481E00495781 /* PsiphonDataSharedDB.m */; };
@@ -68,11 +70,18 @@
 		4E5DCF9E20EC150D009D8D39 /* PsiCashSpeedBoostSliderView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E5DCF9B20EC150D009D8D39 /* PsiCashSpeedBoostSliderView.m */; };
 		4E5DCF9F20EC150D009D8D39 /* PsiCashPurchaseView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E5DCF9D20EC150D009D8D39 /* PsiCashPurchaseView.m */; };
 		4E90C94420CB37F5003FC319 /* PsiCashLogger.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E90C94320CB37F5003FC319 /* PsiCashLogger.m */; };
-		4E99814220A64CC700253CE7 /* PsiCashBalanceWithSpeedBoostMeter.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E99814120A64CC700253CE7 /* PsiCashBalanceWithSpeedBoostMeter.m */; };
+		4E99814220A64CC700253CE7 /* PsiCashView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E99814120A64CC700253CE7 /* PsiCashView.m */; };
 		4E9B2E13204F463100E63784 /* PsiCashClientModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E9B2E12204F463000E63784 /* PsiCashClientModel.m */; };
+		4EB84632215173EB00687344 /* ManageSubscriptionsButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 4EB84631215173EB00687344 /* ManageSubscriptionsButton.m */; };
+		4EB84635215176ED00687344 /* RegionSelectionButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 4EB84634215176ED00687344 /* RegionSelectionButton.m */; };
+		4EB846422151830600687344 /* AvailableServerRegions.m in Sources */ = {isa = PBXBuildFile; fileRef = 4EB846412151830600687344 /* AvailableServerRegions.m */; };
+		4EB846452151864C00687344 /* VPNStartAndStopButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 4EB846442151864C00687344 /* VPNStartAndStopButton.m */; };
+		4EB8464821518B9C00687344 /* ConnectionStatusView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4EB8464721518B9C00687344 /* ConnectionStatusView.m */; };
+		4EB8464B21518C4B00687344 /* AppVersionNumberView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4EB8464A21518C4B00687344 /* AppVersionNumberView.m */; };
+		4EB8464E2152E7E100687344 /* SubscriptionsBar.m in Sources */ = {isa = PBXBuildFile; fileRef = 4EB8464D2152E7E100687344 /* SubscriptionsBar.m */; };
+		4EB846512152EB6500687344 /* SubscriptionStatusView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4EB846502152EB6500687344 /* SubscriptionStatusView.m */; };
 		4EC5526320AB8DBE000B4BEA /* Pastel.m in Sources */ = {isa = PBXBuildFile; fileRef = 4EC5526220AB8DBE000B4BEA /* Pastel.m */; };
 		4EC5526620AB8DCD000B4BEA /* PastelView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4EC5526520AB8DCD000B4BEA /* PastelView.m */; };
-		4EC5526E20ACED2E000B4BEA /* StarView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4EC5526D20ACED2E000B4BEA /* StarView.m */; };
 		4EC7CAD020E185580038B4E1 /* AppProfiler.m in Sources */ = {isa = PBXBuildFile; fileRef = 4EC7CACF20E185580038B4E1 /* AppProfiler.m */; };
 		4EEB2F0520644BD5006E80EF /* PsiCashClientModelStagingArea.m in Sources */ = {isa = PBXBuildFile; fileRef = 4EEB2F0420644BD5006E80EF /* PsiCashClientModelStagingArea.m */; };
 		4EF6D9CB20A8C7FE00AE9D44 /* PsiCashOnboardingInfoViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4EF6D9C720A8C7FE00AE9D44 /* PsiCashOnboardingInfoViewController.m */; };
@@ -115,9 +124,10 @@
 		B1D9FF416DDCA97A40A325AA /* libPods-PsiphonVPN.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 01122727D6CE50B340C55DBE /* libPods-PsiphonVPN.a */; };
 		CE26FC951BBDC7B800B83375 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = CE26FC941BBDC7B800B83375 /* Assets.xcassets */; };
 		CE26FCAC1BBDC85900B83375 /* PsiphonVPN.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = CE26FCA31BBDC85900B83375 /* PsiphonVPN.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		CE425D1F2159485600B7893D /* StarView.m in Sources */ = {isa = PBXBuildFile; fileRef = CE425D1E2159485500B7893D /* StarView.m */; };
 		CE4E9BC01BBEECF30060FF8B /* Psiphon.entitlements in Resources */ = {isa = PBXBuildFile; fileRef = CE4E9BBF1BBEECF30060FF8B /* Psiphon.entitlements */; };
 		CE4E9BC21BBEECFC0060FF8B /* PsiphonVPN.entitlements in Resources */ = {isa = PBXBuildFile; fileRef = CE4E9BC11BBEECFC0060FF8B /* PsiphonVPN.entitlements */; };
-		CE57BBA52108DDC800402248 /* PsiCashRewardedVideoBar.m in Sources */ = {isa = PBXBuildFile; fileRef = CE57BBA42108DDC800402248 /* PsiCashRewardedVideoBar.m */; };
+		CE57BBA52108DDC800402248 /* PsiCashRewardedVideoButton.m in Sources */ = {isa = PBXBuildFile; fileRef = CE57BBA42108DDC800402248 /* PsiCashRewardedVideoButton.m */; };
 		CE7B76431F54881F00EA44BD /* PsiphonTunnel.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 66094F781E8067520069EC4E /* PsiphonTunnel.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		D672BC574F14042B4D77AB28 /* libPods-Psiphon.a in Frameworks */ = {isa = PBXBuildFile; fileRef = CB8BB19F016330264C4DCB80 /* libPods-Psiphon.a */; };
 		EF184DAB20AD25E0006F6F5C /* PrivacyPolicyViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = EF2EDD8120AD21B6008B17A3 /* PrivacyPolicyViewController.m */; };
@@ -155,7 +165,6 @@
 		EF90D7B6204F235100228A63 /* DispatchUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = EF90D798204F22C900228A63 /* DispatchUtils.m */; };
 		EF90D7B7204F235800228A63 /* FileUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = EF90D799204F22C900228A63 /* FileUtils.m */; };
 		EF90D7B8204F236400228A63 /* NSError+Convenience.m in Sources */ = {isa = PBXBuildFile; fileRef = EF90D79A204F22C900228A63 /* NSError+Convenience.m */; };
-		EFB3E62C1F621111004AAE8C /* PulsingHaloLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = EFB3E6291F621111004AAE8C /* PulsingHaloLayer.m */; };
 		EFC2F5B620226758007B52F9 /* PacketTunnelUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = EFC2F5B420226757007B52F9 /* PacketTunnelUtils.m */; };
 		EFC2F5C420226782007B52F9 /* RootContainerController.m in Sources */ = {isa = PBXBuildFile; fileRef = EFC2F5BB20226781007B52F9 /* RootContainerController.m */; };
 		EFC2F5C720226782007B52F9 /* UIAlertController+Delegate.m in Sources */ = {isa = PBXBuildFile; fileRef = EFC2F5C020226782007B52F9 /* UIAlertController+Delegate.m */; };
@@ -284,6 +293,10 @@
 		4E0484692048A0B8006C3D35 /* PsiCashBalanceView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PsiCashBalanceView.m; sourceTree = "<group>"; };
 		4E04846A2048A0B9006C3D35 /* PsiCashBalanceView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PsiCashBalanceView.h; sourceTree = "<group>"; };
 		4E0774951F566ADA0097BC8C /* InAppSettings.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = InAppSettings.bundle; sourceTree = "<group>"; };
+		4E0A3667215AB7EE008A3D7B /* UIFont+Additions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "UIFont+Additions.h"; sourceTree = "<group>"; };
+		4E0A3668215AB7EE008A3D7B /* UIFont+Additions.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "UIFont+Additions.m"; sourceTree = "<group>"; };
+		4E0A366A21666B99008A3D7B /* NSString+Additions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSString+Additions.h"; sourceTree = "<group>"; };
+		4E0A366B21666B99008A3D7B /* NSString+Additions.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "NSString+Additions.m"; sourceTree = "<group>"; };
 		4E0D88211FA06B2400ADB61E /* PsiphonUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PsiphonUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		4E0D88231FA06B2400ADB61E /* PsiphonUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PsiphonUITests.swift; sourceTree = "<group>"; };
 		4E0D88251FA06B2400ADB61E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -328,16 +341,30 @@
 		4E5DCF9D20EC150D009D8D39 /* PsiCashPurchaseView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PsiCashPurchaseView.m; sourceTree = "<group>"; };
 		4E90C94220CB37F5003FC319 /* PsiCashLogger.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PsiCashLogger.h; sourceTree = "<group>"; };
 		4E90C94320CB37F5003FC319 /* PsiCashLogger.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PsiCashLogger.m; sourceTree = "<group>"; };
-		4E99814020A64CC700253CE7 /* PsiCashBalanceWithSpeedBoostMeter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PsiCashBalanceWithSpeedBoostMeter.h; sourceTree = "<group>"; };
-		4E99814120A64CC700253CE7 /* PsiCashBalanceWithSpeedBoostMeter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PsiCashBalanceWithSpeedBoostMeter.m; sourceTree = "<group>"; };
+		4E99814020A64CC700253CE7 /* PsiCashView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PsiCashView.h; sourceTree = "<group>"; };
+		4E99814120A64CC700253CE7 /* PsiCashView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PsiCashView.m; sourceTree = "<group>"; };
 		4E9B2E11204F463000E63784 /* PsiCashClientModel.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PsiCashClientModel.h; sourceTree = "<group>"; };
 		4E9B2E12204F463000E63784 /* PsiCashClientModel.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PsiCashClientModel.m; sourceTree = "<group>"; };
+		4EB84630215173EB00687344 /* ManageSubscriptionsButton.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ManageSubscriptionsButton.h; sourceTree = "<group>"; };
+		4EB84631215173EB00687344 /* ManageSubscriptionsButton.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ManageSubscriptionsButton.m; sourceTree = "<group>"; };
+		4EB84633215176ED00687344 /* RegionSelectionButton.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RegionSelectionButton.h; sourceTree = "<group>"; };
+		4EB84634215176ED00687344 /* RegionSelectionButton.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RegionSelectionButton.m; sourceTree = "<group>"; };
+		4EB846402151830600687344 /* AvailableServerRegions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AvailableServerRegions.h; sourceTree = "<group>"; };
+		4EB846412151830600687344 /* AvailableServerRegions.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AvailableServerRegions.m; sourceTree = "<group>"; };
+		4EB846432151864C00687344 /* VPNStartAndStopButton.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VPNStartAndStopButton.h; sourceTree = "<group>"; };
+		4EB846442151864C00687344 /* VPNStartAndStopButton.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VPNStartAndStopButton.m; sourceTree = "<group>"; };
+		4EB8464621518B9C00687344 /* ConnectionStatusView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ConnectionStatusView.h; sourceTree = "<group>"; };
+		4EB8464721518B9C00687344 /* ConnectionStatusView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ConnectionStatusView.m; sourceTree = "<group>"; };
+		4EB8464921518C4B00687344 /* AppVersionNumberView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppVersionNumberView.h; sourceTree = "<group>"; };
+		4EB8464A21518C4B00687344 /* AppVersionNumberView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppVersionNumberView.m; sourceTree = "<group>"; };
+		4EB8464C2152E7E100687344 /* SubscriptionsBar.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SubscriptionsBar.h; sourceTree = "<group>"; };
+		4EB8464D2152E7E100687344 /* SubscriptionsBar.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SubscriptionsBar.m; sourceTree = "<group>"; };
+		4EB8464F2152EB6500687344 /* SubscriptionStatusView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SubscriptionStatusView.h; sourceTree = "<group>"; };
+		4EB846502152EB6500687344 /* SubscriptionStatusView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SubscriptionStatusView.m; sourceTree = "<group>"; };
 		4EC5526120AB8DB9000B4BEA /* Pastel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Pastel.h; sourceTree = "<group>"; };
 		4EC5526220AB8DBE000B4BEA /* Pastel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Pastel.m; sourceTree = "<group>"; };
 		4EC5526420AB8DC7000B4BEA /* PastelView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PastelView.h; sourceTree = "<group>"; };
 		4EC5526520AB8DCD000B4BEA /* PastelView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PastelView.m; sourceTree = "<group>"; };
-		4EC5526C20ACED2E000B4BEA /* StarView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = StarView.h; sourceTree = "<group>"; };
-		4EC5526D20ACED2E000B4BEA /* StarView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = StarView.m; sourceTree = "<group>"; };
 		4EC7CACE20E185580038B4E1 /* AppProfiler.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppProfiler.h; sourceTree = "<group>"; };
 		4EC7CACF20E185580038B4E1 /* AppProfiler.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppProfiler.m; sourceTree = "<group>"; };
 		4EC82F8E20C713DF004C2E9F /* hi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = hi; path = Strings/hi.lproj/Localizable.strings; sourceTree = "<group>"; };
@@ -436,10 +463,12 @@
 		CE26FC991BBDC7B800B83375 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		CE26FCA31BBDC85900B83375 /* PsiphonVPN.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = PsiphonVPN.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		CE26FCA91BBDC85900B83375 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		CE425D1D2159485500B7893D /* StarView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StarView.h; sourceTree = "<group>"; };
+		CE425D1E2159485500B7893D /* StarView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = StarView.m; sourceTree = "<group>"; };
 		CE4E9BBF1BBEECF30060FF8B /* Psiphon.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = Psiphon.entitlements; sourceTree = "<group>"; };
-		CE4E9BC11BBEECFC0060FF8B /* PsiphonVPN.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = PsiphonVPN.entitlements; sourceTree = "<group>"; };
-		CE57BBA32108DDC800402248 /* PsiCashRewardedVideoBar.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PsiCashRewardedVideoBar.h; sourceTree = "<group>"; };
-		CE57BBA42108DDC800402248 /* PsiCashRewardedVideoBar.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PsiCashRewardedVideoBar.m; sourceTree = "<group>"; };
+		CE4E9BC11BBEECFC0060FF8B /* PsiphonVPN.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.entitlements; path = PsiphonVPN.entitlements; sourceTree = "<group>"; };
+		CE57BBA32108DDC800402248 /* PsiCashRewardedVideoButton.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PsiCashRewardedVideoButton.h; sourceTree = "<group>"; };
+		CE57BBA42108DDC800402248 /* PsiCashRewardedVideoButton.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PsiCashRewardedVideoButton.m; sourceTree = "<group>"; };
 		DD100E19194B9A79F5D7DF55 /* Pods-PsiphonVPN.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PsiphonVPN.debug.xcconfig"; path = "Pods/Target Support Files/Pods-PsiphonVPN/Pods-PsiphonVPN.debug.xcconfig"; sourceTree = "<group>"; };
 		EDB109A2FBFB32D821FF121D /* Pods-Psiphon.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Psiphon.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Psiphon/Pods-Psiphon.debug.xcconfig"; sourceTree = "<group>"; };
 		EF2EDD8120AD21B6008B17A3 /* PrivacyPolicyViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PrivacyPolicyViewController.m; sourceTree = "<group>"; };
@@ -475,9 +504,6 @@
 		EF90D79D204F22C900228A63 /* NSDate+Comparator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSDate+Comparator.h"; sourceTree = "<group>"; };
 		EF90D79F204F22C900228A63 /* RACSignal+Operations2.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "RACSignal+Operations2.m"; sourceTree = "<group>"; };
 		EF90D7A0204F22C900228A63 /* RACSignal+Operations2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "RACSignal+Operations2.h"; sourceTree = "<group>"; };
-		EFB3E6291F621111004AAE8C /* PulsingHaloLayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PulsingHaloLayer.m; sourceTree = "<group>"; };
-		EFB3E62A1F621111004AAE8C /* PulsingHaloLayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PulsingHaloLayer.h; sourceTree = "<group>"; };
-		EFB3E62B1F621111004AAE8C /* PulsingHalo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PulsingHalo.h; sourceTree = "<group>"; };
 		EFB3E62D1F66F23F004AAE8C /* Logging.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Logging.h; sourceTree = "<group>"; };
 		EFC2F5B420226757007B52F9 /* PacketTunnelUtils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PacketTunnelUtils.m; sourceTree = "<group>"; };
 		EFC2F5B520226758007B52F9 /* PacketTunnelUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PacketTunnelUtils.h; sourceTree = "<group>"; };
@@ -616,20 +642,20 @@
 		4E04845320474C17006C3D35 /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				CE57BBA32108DDC800402248 /* PsiCashRewardedVideoBar.h */,
-				CE57BBA42108DDC800402248 /* PsiCashRewardedVideoBar.m */,
 				4E04846A2048A0B9006C3D35 /* PsiCashBalanceView.h */,
 				4E0484692048A0B8006C3D35 /* PsiCashBalanceView.m */,
-				4E99814020A64CC700253CE7 /* PsiCashBalanceWithSpeedBoostMeter.h */,
-				4E99814120A64CC700253CE7 /* PsiCashBalanceWithSpeedBoostMeter.m */,
 				4E5DCF9C20EC150D009D8D39 /* PsiCashPurchaseView.h */,
 				4E5DCF9D20EC150D009D8D39 /* PsiCashPurchaseView.m */,
 				4E556D24204DD5A200345812 /* PsiCashPurchaseAlertView.h */,
 				4E556D25204DD5A200345812 /* PsiCashPurchaseAlertView.m */,
+				CE57BBA32108DDC800402248 /* PsiCashRewardedVideoButton.h */,
+				CE57BBA42108DDC800402248 /* PsiCashRewardedVideoButton.m */,
 				4E25A8F2203F5F2200B5A1A4 /* PsiCashSpeedBoostMeterView.h */,
 				4E25A8F3203F5F2200B5A1A4 /* PsiCashSpeedBoostMeterView.m */,
 				4E5DCF9A20EC150D009D8D39 /* PsiCashSpeedBoostSliderView.h */,
 				4E5DCF9B20EC150D009D8D39 /* PsiCashSpeedBoostSliderView.m */,
+				4E99814020A64CC700253CE7 /* PsiCashView.h */,
+				4E99814120A64CC700253CE7 /* PsiCashView.m */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -647,28 +673,28 @@
 		4E0DCB101F28458100495781 /* Shared */ = {
 			isa = PBXGroup;
 			children = (
+				EF6C1F501F59E46500709554 /* embedded_server_entries */,
+				EF6C1F511F59E46500709554 /* psiphon_config */,
 				EF90D78B204F22C900228A63 /* External */,
 				EF90D79E204F22C900228A63 /* ReactiveExtensions */,
+				669A10B61F58A74E00EE831F /* Strings */,
 				EF90D793204F22C900228A63 /* Util */,
+				9BFEC4D609BFCD0DC812BDB3 /* Asserts.h */,
+				9BFEC673CE5EA236279F07BD /* Authorization.h */,
+				9BFEC31B61584FD2EAAF5DE6 /* Authorization.m */,
+				EFB3E62D1F66F23F004AAE8C /* Logging.h */,
+				9BFEC3165745A5D14C8C3C08 /* Notifier.h */,
+				9BFEC91ED4A1C511520E9948 /* Notifier.m */,
+				EF639C2D1F8FCE2A009D6B42 /* PsiFeedbackLogger.h */,
+				EF639C2E1F8FCE2A009D6B42 /* PsiFeedbackLogger.m */,
 				EFC2F5C9202267B0007B52F9 /* PsiphonConfigReader.h */,
 				EFC2F5CA202267B0007B52F9 /* PsiphonConfigReader.m */,
-				669A10B61F58A74E00EE831F /* Strings */,
+				9BFEC0419AD3808370915E01 /* PsiphonConfigUserDefaults.h */,
+				9BFEC584519C408D9D6D3FF1 /* PsiphonConfigUserDefaults.m */,
 				4E0DCB181F28481E00495781 /* PsiphonDataSharedDB.h */,
 				4E0DCB191F28481E00495781 /* PsiphonDataSharedDB.m */,
 				EF652CDB1F365B8C002AFB48 /* SharedConstants.h */,
-				9BFEC3165745A5D14C8C3C08 /* Notifier.h */,
-				9BFEC91ED4A1C511520E9948 /* Notifier.m */,
-				9BFEC0419AD3808370915E01 /* PsiphonConfigUserDefaults.h */,
-				9BFEC584519C408D9D6D3FF1 /* PsiphonConfigUserDefaults.m */,
-				EFB3E62D1F66F23F004AAE8C /* Logging.h */,
-				EF6C1F501F59E46500709554 /* embedded_server_entries */,
-				EF6C1F511F59E46500709554 /* psiphon_config */,
-				EF639C2D1F8FCE2A009D6B42 /* PsiFeedbackLogger.h */,
-				EF639C2E1F8FCE2A009D6B42 /* PsiFeedbackLogger.m */,
 				9BFECC9B2B9F2BFBD4F8A47B /* UserDefaults.h */,
-				9BFEC31B61584FD2EAAF5DE6 /* Authorization.m */,
-				9BFEC673CE5EA236279F07BD /* Authorization.h */,
-				9BFEC4D609BFCD0DC812BDB3 /* Asserts.h */,
 			);
 			path = Shared;
 			sourceTree = "<group>";
@@ -732,6 +758,15 @@
 			path = ClientWrapper;
 			sourceTree = "<group>";
 		};
+		4EB8463A2151808F00687344 /* Stars */ = {
+			isa = PBXGroup;
+			children = (
+				CE425D1D2159485500B7893D /* StarView.h */,
+				CE425D1E2159485500B7893D /* StarView.m */,
+			);
+			path = Stars;
+			sourceTree = "<group>";
+		};
 		4EC5526720AB8DF1000B4BEA /* Pastel */ = {
 			isa = PBXGroup;
 			children = (
@@ -743,15 +778,6 @@
 			name = Pastel;
 			sourceTree = "<group>";
 		};
-		4EC5526F20ACED34000B4BEA /* Stars */ = {
-			isa = PBXGroup;
-			children = (
-				4EC5526C20ACED2E000B4BEA /* StarView.h */,
-				4EC5526D20ACED2E000B4BEA /* StarView.m */,
-			);
-			name = Stars;
-			sourceTree = "<group>";
-		};
 		4EC7CACD20E1844F0038B4E1 /* Profiling */ = {
 			isa = PBXGroup;
 			children = (
@@ -761,6 +787,69 @@
 				4EC7CACF20E185580038B4E1 /* AppProfiler.m */,
 			);
 			path = Profiling;
+			sourceTree = "<group>";
+		};
+		4ED48C042150560B00B1A9A5 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				4EB8464921518C4B00687344 /* AppVersionNumberView.h */,
+				4EB8464A21518C4B00687344 /* AppVersionNumberView.m */,
+				4EB8464621518B9C00687344 /* ConnectionStatusView.h */,
+				4EB8464721518B9C00687344 /* ConnectionStatusView.m */,
+				4E5263C52072938F0021FEF5 /* LoadingCircleLayer.h */,
+				4E5263B120728FAB0021FEF5 /* LoadingCircleLayer.m */,
+				4EB84630215173EB00687344 /* ManageSubscriptionsButton.h */,
+				4EB84631215173EB00687344 /* ManageSubscriptionsButton.m */,
+				4E5263C3207293710021FEF5 /* PsiphonProgressView.h */,
+				4E5263C2207293710021FEF5 /* PsiphonProgressView.m */,
+				4EB84633215176ED00687344 /* RegionSelectionButton.h */,
+				4EB84634215176ED00687344 /* RegionSelectionButton.m */,
+				4EB8464C2152E7E100687344 /* SubscriptionsBar.h */,
+				4EB8464D2152E7E100687344 /* SubscriptionsBar.m */,
+				4EB8464F2152EB6500687344 /* SubscriptionStatusView.h */,
+				4EB846502152EB6500687344 /* SubscriptionStatusView.m */,
+				9BFEC355C70611AF985FB4D9 /* SwoopView.h */,
+				9BFECBF5A83176EA09316CB4 /* SwoopView.m */,
+				4EB846432151864C00687344 /* VPNStartAndStopButton.h */,
+				4EB846442151864C00687344 /* VPNStartAndStopButton.m */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		4ED48C05215056E800B1A9A5 /* ViewControllers */ = {
+			isa = PBXGroup;
+			children = (
+				F132D7DE1F5739A800AF7F91 /* LaunchScreenViewController.h */,
+				F132D7DF1F5739A800AF7F91 /* LaunchScreenViewController.m */,
+				EFED7EBA1F55C8550078980F /* LogViewControllerFullScreen.h */,
+				EFED7EBB1F55C8550078980F /* LogViewControllerFullScreen.m */,
+				EF652CD41F35224C002AFB48 /* MainViewController.h */,
+				EF652CD51F35224C002AFB48 /* MainViewController.m */,
+				EF2EDD8220AD21B6008B17A3 /* PrivacyPolicyViewController.h */,
+				EF2EDD8120AD21B6008B17A3 /* PrivacyPolicyViewController.m */,
+				EFC2F5C120226782007B52F9 /* RootContainerController.h */,
+				EFC2F5BB20226781007B52F9 /* RootContainerController.m */,
+				4435CC251F70566000F3A809 /* SettingsViewController.h */,
+				4435CC261F70566000F3A809 /* SettingsViewController.m */,
+				EFC2F5B720226780007B52F9 /* UIAlertController+Delegate.h */,
+				EFC2F5C020226782007B52F9 /* UIAlertController+Delegate.m */,
+			);
+			path = ViewControllers;
+			sourceTree = "<group>";
+		};
+		4ED48C06215058C900B1A9A5 /* Util */ = {
+			isa = PBXGroup;
+			children = (
+				9BFECE69F71F11C7B3A2D67E /* UIColor+Additions.h */,
+				9BFEC72C282F6060193B2E87 /* UIColor+Additions.m */,
+				4E0A3667215AB7EE008A3D7B /* UIFont+Additions.h */,
+				4E0A3668215AB7EE008A3D7B /* UIFont+Additions.m */,
+				4E5DAE6320A942A300E06342 /* UILabel+GetLabelHeight.h */,
+				4E5DAE6420A942A300E06342 /* UILabel+GetLabelHeight.m */,
+				4E0A366A21666B99008A3D7B /* NSString+Additions.h */,
+				4E0A366B21666B99008A3D7B /* NSString+Additions.m */,
+			);
+			path = Util;
 			sourceTree = "<group>";
 		};
 		4EFAAF1C2034CDA600EC0536 /* PsiCash */ = {
@@ -822,52 +911,32 @@
 		CE26FC8C1BBDC7B800B83375 /* Psiphon */ = {
 			isa = PBXGroup;
 			children = (
+				CE4E9BBF1BBEECF30060FF8B /* Psiphon.entitlements */,
+				CE26FC991BBDC7B800B83375 /* Info.plist */,
+				4E0774951F566ADA0097BC8C /* InAppSettings.bundle */,
+				EFFA4AB620F68CE100E35E8E /* Ad */,
+				4E5BD4F62061982C00AD4724 /* Feedback */,
+				448AD86C1F5DC89000316BA9 /* IAP */,
+				4EC5526720AB8DF1000B4BEA /* Pastel */,
+				4EFAAF1C2034CDA600EC0536 /* PsiCash */,
+				F136C2981F62E81F000D3EAB /* Resource */,
+				4EB8463A2151808F00687344 /* Stars */,
+				EF652CCF1F3521F8002AFB48 /* Supporting Files */,
+				4ED48C06215058C900B1A9A5 /* Util */,
+				4ED48C042150560B00B1A9A5 /* Views */,
+				4ED48C05215056E800B1A9A5 /* ViewControllers */,
 				4E10920620F3DA190033114B /* AppInfo.h */,
 				4E10920720F3DA190033114B /* AppInfo.m */,
-				EFFA4AB620F68CE100E35E8E /* Ad */,
-				4EC5526720AB8DF1000B4BEA /* Pastel */,
+				4EB846402151830600687344 /* AvailableServerRegions.h */,
+				4EB846412151830600687344 /* AvailableServerRegions.m */,
+				EF652CD21F35224C002AFB48 /* AppDelegate.h */,
+				EF652CD31F35224C002AFB48 /* AppDelegate.m */,
 				4E5263C6207294550021FEF5 /* EmbeddedServerEntries.h */,
 				4E5263BF207292920021FEF5 /* EmbeddedServerEntries.m */,
 				4E5263B5207290360021FEF5 /* EmbeddedServerEntriesHelpers.h */,
 				4E5263B6207290360021FEF5 /* EmbeddedServerEntriesHelpers.c */,
-				4E5263C52072938F0021FEF5 /* LoadingCircleLayer.h */,
-				4E5263B120728FAB0021FEF5 /* LoadingCircleLayer.m */,
-				4E5263C3207293710021FEF5 /* PsiphonProgressView.h */,
-				4E5263C2207293710021FEF5 /* PsiphonProgressView.m */,
-				EF2EDD8220AD21B6008B17A3 /* PrivacyPolicyViewController.h */,
-				EF2EDD8120AD21B6008B17A3 /* PrivacyPolicyViewController.m */,
-				EFC2F5C120226782007B52F9 /* RootContainerController.h */,
-				EFC2F5BB20226781007B52F9 /* RootContainerController.m */,
-				EFC2F5B720226780007B52F9 /* UIAlertController+Delegate.h */,
-				EFC2F5C020226782007B52F9 /* UIAlertController+Delegate.m */,
-				4E5DAE6320A942A300E06342 /* UILabel+GetLabelHeight.h */,
-				4E5DAE6420A942A300E06342 /* UILabel+GetLabelHeight.m */,
-				EF652CCF1F3521F8002AFB48 /* Supporting Files */,
-				F136C2981F62E81F000D3EAB /* Resource */,
-				EFB3E6281F621100004AAE8C /* External */,
-				F132D7DE1F5739A800AF7F91 /* LaunchScreenViewController.h */,
-				F132D7DF1F5739A800AF7F91 /* LaunchScreenViewController.m */,
-				EFED7EBA1F55C8550078980F /* LogViewControllerFullScreen.h */,
-				EFED7EBB1F55C8550078980F /* LogViewControllerFullScreen.m */,
-				4EFAAF1C2034CDA600EC0536 /* PsiCash */,
-				CE4E9BBF1BBEECF30060FF8B /* Psiphon.entitlements */,
-				CE26FC991BBDC7B800B83375 /* Info.plist */,
-				EF652CD21F35224C002AFB48 /* AppDelegate.h */,
-				EF652CD31F35224C002AFB48 /* AppDelegate.m */,
-				EF652CD41F35224C002AFB48 /* MainViewController.h */,
-				EF652CD51F35224C002AFB48 /* MainViewController.m */,
-				4E5BD4F62061982C00AD4724 /* Feedback */,
-				4E0774951F566ADA0097BC8C /* InAppSettings.bundle */,
-				448AD86C1F5DC89000316BA9 /* IAP */,
-				4435CC251F70566000F3A809 /* SettingsViewController.h */,
-				4435CC261F70566000F3A809 /* SettingsViewController.m */,
 				9BFEC33236183B2DA0000D5B /* VPNManager.h */,
 				9BFECBACAAF0FC84C7EA783E /* VPNManager.m */,
-				4EC5526F20ACED34000B4BEA /* Stars */,
-				9BFEC72C282F6060193B2E87 /* UIColor+Additions.m */,
-				9BFECE69F71F11C7B3A2D67E /* UIColor+Additions.h */,
-				9BFECBF5A83176EA09316CB4 /* SwoopView.m */,
-				9BFEC355C70611AF985FB4D9 /* SwoopView.h */,
 			);
 			path = Psiphon;
 			sourceTree = "<group>";
@@ -875,16 +944,16 @@
 		CE26FCA41BBDC85900B83375 /* PsiphonVPN */ = {
 			isa = PBXGroup;
 			children = (
-				4EC7CACD20E1844F0038B4E1 /* Profiling */,
-				EFC2F5B520226758007B52F9 /* PacketTunnelUtils.h */,
-				EFC2F5B420226757007B52F9 /* PacketTunnelUtils.m */,
-				EF743FC11F99546B00AC89A2 /* IAP */,
 				CE4E9BC11BBEECFC0060FF8B /* PsiphonVPN.entitlements */,
 				CE26FCA91BBDC85900B83375 /* Info.plist */,
-				EF652CD81F352271002AFB48 /* PacketTunnelProvider.h */,
-				EF652CD91F352271002AFB48 /* PacketTunnelProvider.m */,
+				EF743FC11F99546B00AC89A2 /* IAP */,
+				4EC7CACD20E1844F0038B4E1 /* Profiling */,
 				9BFECC3FADE9C8A76A0913DE /* BasePacketTunnelProvider.m */,
 				9BFEC8783D4222F2272E50E7 /* BasePacketTunnelProvider.h */,
+				EF652CD81F352271002AFB48 /* PacketTunnelProvider.h */,
+				EF652CD91F352271002AFB48 /* PacketTunnelProvider.m */,
+				EFC2F5B520226758007B52F9 /* PacketTunnelUtils.h */,
+				EFC2F5B420226757007B52F9 /* PacketTunnelUtils.m */,
 				9BFEC1C9F506CE1DF07306D2 /* NEBridge.h */,
 			);
 			path = PsiphonVPN;
@@ -958,16 +1027,6 @@
 				9BFEC1E485FB857A0358ED94 /* UnionSerialQueue.h */,
 			);
 			path = ReactiveExtensions;
-			sourceTree = "<group>";
-		};
-		EFB3E6281F621100004AAE8C /* External */ = {
-			isa = PBXGroup;
-			children = (
-				EFB3E6291F621111004AAE8C /* PulsingHaloLayer.m */,
-				EFB3E62A1F621111004AAE8C /* PulsingHaloLayer.h */,
-				EFB3E62B1F621111004AAE8C /* PulsingHalo.h */,
-			);
-			name = External;
 			sourceTree = "<group>";
 		};
 		EFFA4AB620F68CE100E35E8E /* Ad */ = {
@@ -1235,6 +1294,7 @@
 				"${PODS_CONFIGURATION_BUILD_DIR}/InAppSettingsKit/InAppSettingsKit.bundle",
 				"${PODS_CONFIGURATION_BUILD_DIR}/PersonalizedAdConsent/PersonalizedAdConsent.bundle",
 				"${PODS_CONFIGURATION_BUILD_DIR}/PsiphonClientCommonLibrary/PsiphonClientCommonLibrary.bundle",
+				"${PODS_ROOT}/SVProgressHUD/SVProgressHUD/SVProgressHUD.bundle",
 				"${PODS_ROOT}/mopub-ios-sdk/MoPubSDK/Internal/Common/MPAdBrowserController.xib",
 				"${PODS_ROOT}/mopub-ios-sdk/MoPubSDK/Resources/MPCloseBtn.png",
 				"${PODS_ROOT}/mopub-ios-sdk/MoPubSDK/Resources/MPCloseBtn@2x.png",
@@ -1262,6 +1322,7 @@
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/InAppSettingsKit.bundle",
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/PersonalizedAdConsent.bundle",
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/PsiphonClientCommonLibrary.bundle",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/SVProgressHUD.bundle",
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/MPAdBrowserController.nib",
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/MPCloseBtn.png",
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/MPCloseBtn@2x.png",
@@ -1386,6 +1447,7 @@
 			files = (
 				4E5263D120732DDE0021FEF5 /* PsiCashAuthPackage.m in Sources */,
 				EF90D7A6204F22C900228A63 /* NSDate+Comparator.m in Sources */,
+				4EB846422151830600687344 /* AvailableServerRegions.m in Sources */,
 				445F24D620E1A5BA00D004E9 /* xer_decoder.c in Sources */,
 				EF652CD71F35224C002AFB48 /* MainViewController.m in Sources */,
 				EF90D7A4204F22C900228A63 /* timestamp_format.c in Sources */,
@@ -1401,11 +1463,13 @@
 				EFED7EBC1F55C8550078980F /* LogViewControllerFullScreen.m in Sources */,
 				EF4F1F3D206055F7006A40A1 /* RACSignal+Operations2.m in Sources */,
 				4E5DCF9720EC11C6009D8D39 /* PsiCashSpeedBoostProduct+PsiCashPurchasePrice.m in Sources */,
+				4EB8464B21518C4B00687344 /* AppVersionNumberView.m in Sources */,
 				445F24F020E1A5BA00D004E9 /* xer_encoder.c in Sources */,
 				445F24D520E1A5BA00D004E9 /* constr_TYPE.c in Sources */,
 				445F24E220E1A5BA00D004E9 /* der_encoder.c in Sources */,
 				445F24DC20E1A5BA00D004E9 /* NativeInteger.c in Sources */,
 				EF90D7A9204F22C900228A63 /* FileUtils.m in Sources */,
+				4EB8464821518B9C00687344 /* ConnectionStatusView.m in Sources */,
 				EF90D7A1204F22C900228A63 /* timestamp_valid.c in Sources */,
 				445F24DF20E1A5BA00D004E9 /* ANY.c in Sources */,
 				4E90C94420CB37F5003FC319 /* PsiCashLogger.m in Sources */,
@@ -1421,13 +1485,15 @@
 				4EFAAF2E2034CDC800EC0536 /* PsiCashClient.m in Sources */,
 				4E9B2E13204F463100E63784 /* PsiCashClientModel.m in Sources */,
 				EF652CD61F35224C002AFB48 /* AppDelegate.m in Sources */,
-				EFB3E62C1F621111004AAE8C /* PulsingHaloLayer.m in Sources */,
+				4EB84632215173EB00687344 /* ManageSubscriptionsButton.m in Sources */,
 				EFC2F5C720226782007B52F9 /* UIAlertController+Delegate.m in Sources */,
+				4E0A366C21666B99008A3D7B /* NSString+Additions.m in Sources */,
 				EF639C2F1F8FCE37009D6B42 /* PsiFeedbackLogger.m in Sources */,
 				445F24DA20E1A5BA00D004E9 /* constr_SET_OF.c in Sources */,
 				4EF6D9CB20A8C7FE00AE9D44 /* PsiCashOnboardingInfoViewController.m in Sources */,
-				4E99814220A64CC700253CE7 /* PsiCashBalanceWithSpeedBoostMeter.m in Sources */,
+				4E99814220A64CC700253CE7 /* PsiCashView.m in Sources */,
 				4E5DCF9F20EC150D009D8D39 /* PsiCashPurchaseView.m in Sources */,
+				4EB84635215176ED00687344 /* RegionSelectionButton.m in Sources */,
 				445F24E520E1A5BA00D004E9 /* asn_SET_OF.c in Sources */,
 				9BFEC4F02A47FF8265635803 /* Notifier.m in Sources */,
 				4EC5526620AB8DCD000B4BEA /* PastelView.m in Sources */,
@@ -1439,15 +1505,16 @@
 				4E25A8F4203F5F2200B5A1A4 /* PsiCashSpeedBoostMeterView.m in Sources */,
 				4E5263CE2072984D0021FEF5 /* IAPStoreHelper.m in Sources */,
 				EF90D7AA204F22C900228A63 /* NSError+Convenience.m in Sources */,
-				4EC5526E20ACED2E000B4BEA /* StarView.m in Sources */,
 				4E5BD4F52061982300AD4724 /* FeedbackManager.m in Sources */,
+				4E0A3669215AB7EE008A3D7B /* UIFont+Additions.m in Sources */,
 				EF90D7A8204F22C900228A63 /* DispatchUtils.m in Sources */,
 				445F24D820E1A5BA00D004E9 /* OBJECT_IDENTIFIER.c in Sources */,
 				4E5DCF9820EC11C6009D8D39 /* PsiCashSpeedBoostProduct.m in Sources */,
 				445F24D920E1A5BA00D004E9 /* BIT_STRING.c in Sources */,
 				445F24E820E1A5BA00D004E9 /* NativeEnumerated.c in Sources */,
+				4EB8464E2152E7E100687344 /* SubscriptionsBar.m in Sources */,
 				445F24E320E1A5BA00D004E9 /* OCTET_STRING.c in Sources */,
-				CE57BBA52108DDC800402248 /* PsiCashRewardedVideoBar.m in Sources */,
+				CE57BBA52108DDC800402248 /* PsiCashRewardedVideoButton.m in Sources */,
 				445F24E120E1A5BA00D004E9 /* ReceiptAttribute.c in Sources */,
 				EF90D7A2204F22C900228A63 /* timestamp_compare.c in Sources */,
 				9BFECB6BF077F45D491093F1 /* Authorization.m in Sources */,
@@ -1465,6 +1532,7 @@
 				4E10920820F3DA190033114B /* AppInfo.m in Sources */,
 				4E2037A1207592A300B99A05 /* PsiCashTypes.m in Sources */,
 				445F24EE20E1A5BA00D004E9 /* asn_codecs_prim.c in Sources */,
+				4EB846512152EB6500687344 /* SubscriptionStatusView.m in Sources */,
 				445F24E620E1A5BA00D004E9 /* per_opentype.c in Sources */,
 				445F24EC20E1A5BA00D004E9 /* SignedData.c in Sources */,
 				9BFEC2458D1346F537E9089E /* Nullity.m in Sources */,
@@ -1479,6 +1547,8 @@
 				445F24DB20E1A5BA00D004E9 /* ber_decoder.c in Sources */,
 				9BFEC1F0DA87B4E66C8CC4AA /* MoPubInterstitialAdControllerWrapper.m in Sources */,
 				9BFECFE618966005B01CF582 /* MoPubRewardedAdControllerWrapper.m in Sources */,
+				CE425D1F2159485600B7893D /* StarView.m in Sources */,
+				4EB846452151864C00687344 /* VPNStartAndStopButton.m in Sources */,
 				9BFEC8058885B68B2822E2B8 /* AdManager.m in Sources */,
 				9BFEC3D66910918A0C8954E1 /* AdMobConsent.m in Sources */,
 				9BFECA152514A7739551AA70 /* MoPubConsent.m in Sources */,

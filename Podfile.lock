@@ -22,6 +22,7 @@ PODS:
     - InAppSettingsKit
   - PureLayout (3.0.2)
   - ReactiveObjC (3.1.0)
+  - SVProgressHUD (2.2.5)
 
 DEPENDENCIES:
   - CustomIOSAlertView (~> 0.9.5)
@@ -34,6 +35,7 @@ DEPENDENCIES:
   - PsiphonClientCommonLibrary (from `https://github.com/Psiphon-Inc/psiphon-ios-client-common-library.git`, commit `2e53a34`)
   - PureLayout (= 3.0.2)
   - ReactiveObjC (from `https://github.com/Psiphon-Inc/ReactiveObjC.git`, commit `97d6af3`)
+  - SVProgressHUD
 
 EXTERNAL SOURCES:
   InAppSettingsKit:
@@ -68,7 +70,8 @@ SPEC CHECKSUMS:
   PsiphonClientCommonLibrary: bc9d6f5656e557d6c4395d34196a98825e39479b
   PureLayout: 4d550abe49a94f24c2808b9b95db9131685fe4cd
   ReactiveObjC: 2a38ea15335de4119d8b17caf1db1484f61db902
+  SVProgressHUD: 1428aafac632c1f86f62aa4243ec12008d7a51d6
 
-PODFILE CHECKSUM: bc41de475cd2f1b4e756c1ee600533dc07654f0d
+PODFILE CHECKSUM: a54ce7b935458f7bec7f6410f056d1c093bb57b0
 
 COCOAPODS: 1.4.0

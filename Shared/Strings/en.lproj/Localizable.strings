@@ -42,9 +42,6 @@
 /* Alert dialog title informing user that 'Auto-start VPN' feature is enabled */
 "CONNECT_ON_DEMAND_ALERT_TITLE" = "Auto-start VPN is enabled";
 
-/* Text above change region button that allows user to select their desired server region */
-"CONNECT_VIA" = "Connect via";
-
 /* Alert dialog title of alert which informs the user that the settings file in the app is corrupt. */
 "CORRUPT_SETTINGS_ALERT_TITLE" = "Corrupt Settings";
 
@@ -256,6 +253,9 @@
 /* Button label indicating to the user that they will earn PsiCash if they watch a video advertisement. The word 'PsiCash' should not be translated or transliterated. */
 "REWARDED_VIDEO_EARN_PSICASH" = "Watch a video to earn PsiCash!";
 
+/* Button label indicating to the user that there are no videos available for them to watch. */
+"REWARDED_VIDEO_NO_VIDEOS_AVAILABLE" = "No Videos Available";
+
 /* Title of cell in settings menu which, when pressed, reinstalls the user's VPN profile for Psiphon */
 "SETTINGS_REINSTALL_VPN_CONFIGURATION_CELL_TITLE" = "Reinstall VPN profile";
 
@@ -271,14 +271,14 @@
 /* VPN On demand setting detail text showing when user doesn't have an active subscription and the item is disabled. */
 "SETTINGS_VPN_ON_DEMAND_DETAIL" = "Subscription only";
 
-/* Text for button that opens paid subscriptions manager UI. If “Premium” doesn't easily translate, please choose a term that conveys “Pro” or “Extra” or “Better” or “Elite”. */
-"SUBSCRIPTION_BUTTON_TITLE" = "Go premium now!";
-
 /* Alert message informing user that their subscription has expired, and that Psiphon will stop in an hour if subscription is not renewed. Do not translate 'Psiphon'. */
 "SUBSCRIPTION_EXPIRED_WILL_KILL_TUNNEL" = "Your Psiphon subscription has expired. Psiphon will stop automatically in an hour if subscription is not renewed. Open the Psiphon app to review your subscription to continue using premium features.";
 
 /* Title of the dialog for available in-app paid subscriptions */
 "SUBSCRIPTIONS" = "Subscriptions";
+
+/* Label on a button which, when pressed, opens a screen where the user can manage their currently active subscription. */
+"SUBSCRIPTIONS_MANAGE_SUBSCRIPTION_BUTTON" = "Manage";
 
 /* Title of the banner on the subscriptions page that tells the user how many initial free days they get once subscribed */
 "SUBSCRIPTIONS_PAGE_BANNER_TITLE" = "Get 3 days of premium FREE when subscribing to any plan";
@@ -291,6 +291,9 @@
 
 /* Title of button on subscriptions page which opens Psiphon's privacy policy webpage */
 "SUBSCRIPTIONS_PRIVACY_POLICY_BUTTON_TEXT" = "Privacy Policy";
+
+/* Label on a button which, when pressed, opens a screen where the user can choose from multiple subscription plans. */
+"SUBSCRIPTIONS_SUBSCRIBE_BUTTON" = "Subscribe";
 
 /* Title of button on subscriptions page which opens Psiphon's terms of use webpage */
 "SUBSCRIPTIONS_TERMS_OF_USE_BUTTON_TEXT" = "Terms of Use";
