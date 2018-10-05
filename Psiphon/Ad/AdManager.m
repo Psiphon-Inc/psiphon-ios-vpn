@@ -29,8 +29,8 @@
 #import "RACReplaySubject.h"
 #import "DispatchUtils.h"
 #import "MPGoogleGlobalMediationSettings.h"
-#import "InterstitialAdControllerWrapper.h"
-#import "RewardedAdControllerWrapper.h"
+#import "MoPubInterstitialAdControllerWrapper.h"
+#import "MoPubRewardedAdControllerWrapper.h"
 #import <ReactiveObjC/NSNotificationCenter+RACSupport.h>
 #import <ReactiveObjC/RACUnit.h>
 #import <ReactiveObjC/RACTuple.h>
@@ -44,6 +44,8 @@
 #import "AdMobConsent.h"
 #import "NSError+Convenience.h"
 #import "MoPubConsent.h"
+#import "AdMobInterstitialAdControllerWrapper.h"
+#import "AdMobRewardedAdControllerWrapper.h"
 #import <PersonalizedAdConsent/PersonalizedAdConsent.h>
 @import GoogleMobileAds;
 
@@ -52,11 +54,13 @@ NSErrorDomain const AdControllerWrapperErrorDomain = @"AdControllerWrapperErrorD
 
 PsiFeedbackLogType const AdManagerLogType = @"AdManager";
 
-#pragma mark - Ad Unit IDs
+#pragma mark - Ad IDs
 
-NSString * const UntunneledInterstitialAdUnitID = @"4250ebf7b28043e08ddbe04d444d79e4";
-NSString * const UntunneledRewardVideoAdUnitID  = @"00638d8c82b34f9e8fe56b51cc704c87";
-NSString * const TunneledRewardVideoAdUnitID    = @"b9440504384740a2a3913a3d1b6db80e";
+NSString * const GoogleAdMobAppID = @"ca-app-pub-1072041961750291~2085686375";
+
+NSString * const UntunneledAdMobInterstitialAdUnitID = @"ca-app-pub-1072041961750291/8751062454";
+NSString * const UntunneledAdMobRewardedVideoAdUnitID = @"ca-app-pub-1072041961750291/8356247142";
+NSString * const MoPubTunneledRewardVideoAdUnitID    = @"b9440504384740a2a3913a3d1b6db80e";
 
 // AdControllerTag values must be unique.
 AdControllerTag const AdControllerTagUntunneledInterstitial = @"UntunneledInterstitial";
@@ -201,9 +205,9 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
 @property (nonatomic, readwrite, nonnull) RACReplaySubject<NSNumber *> *rewardedVideoCanPresent;
 
 // Private properties
-@property (nonatomic, readwrite, nonnull) InterstitialAdControllerWrapper *untunneledInterstitial;
-@property (nonatomic, readwrite, nonnull) RewardedAdControllerWrapper *untunneledRewardVideo;
-@property (nonatomic, readwrite, nonnull) RewardedAdControllerWrapper *tunneledRewardVideo;
+@property (nonatomic, readwrite, nonnull) AdMobInterstitialAdControllerWrapper *untunneledInterstitial;
+@property (nonatomic, readwrite, nonnull) AdMobRewardedAdControllerWrapper *untunneledRewardVideo;
+@property (nonatomic, readwrite, nonnull) MoPubRewardedAdControllerWrapper *tunneledRewardVideo;
 
 // appEvents is hot infinite multicasted signal with underlying replay subject.
 @property (nonatomic, nullable) RACMulticastConnection<AppEvent *> *appEvents;
@@ -234,14 +238,14 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
 
         _compoundDisposable = [RACCompoundDisposable compoundDisposable];
 
-        _untunneledInterstitial = [[InterstitialAdControllerWrapper alloc]
-          initWithAdUnitID:UntunneledInterstitialAdUnitID withTag:AdControllerTagUntunneledInterstitial];
+        _untunneledInterstitial = [[AdMobInterstitialAdControllerWrapper alloc]
+          initWithAdUnitID:UntunneledAdMobInterstitialAdUnitID withTag:AdControllerTagUntunneledInterstitial];
 
-        _untunneledRewardVideo = [[RewardedAdControllerWrapper alloc]
-          initWithAdUnitID:UntunneledRewardVideoAdUnitID withTag:AdControllerTagUntunneledRewardedVideo];
+        _untunneledRewardVideo = [[AdMobRewardedAdControllerWrapper alloc]
+          initWithAdUnitID:UntunneledAdMobRewardedVideoAdUnitID withTag:AdControllerTagUntunneledRewardedVideo];
 
-        _tunneledRewardVideo = [[RewardedAdControllerWrapper alloc]
-          initWithAdUnitID:TunneledRewardVideoAdUnitID withTag:AdControllerTagTunneledRewardedVideo];
+        _tunneledRewardVideo = [[MoPubRewardedAdControllerWrapper alloc]
+          initWithAdUnitID:MoPubTunneledRewardVideoAdUnitID withTag:AdControllerTagTunneledRewardedVideo];
 
         reachability = [Reachability reachabilityForInternetConnection];
 
@@ -293,7 +297,7 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
 
                 // MPMoPubConfiguration should be instantiated with any valid ad unit ID from the app.
                 MPMoPubConfiguration *sdkConfig = [[MPMoPubConfiguration alloc]
-                  initWithAdUnitIdForAppInitialization:UntunneledInterstitialAdUnitID];
+                  initWithAdUnitIdForAppInitialization:MoPubTunneledRewardVideoAdUnitID];
 
                 sdkConfig.globalMediationSettings = @[googleMediationSettings];
 
@@ -311,7 +315,7 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
                                 return;
                             }
 
-                            [GADMobileAds configureWithApplicationID:@"ca-app-pub-1072041961750291~2085686375"];
+                            [GADMobileAds configureWithApplicationID:GoogleAdMobAppID];
 
                             // MoPub consent dialog was presented successfully and dismissed
                             // or consent is already given or is not needed.
@@ -504,33 +508,19 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
     // NOTE: It is assumed here that only one ad is shown at a time, and once an ad is presenting none of the
     //       other ad controllers will change their presentation status.
     {
-        // Underlying signal will emit @(TRUE) if an ad is presenting, and @(FALSE) otherwise.
-        RACMulticastConnection<NSNumber *> *adPresentationMultiCast = [[[[[[RACSignal
+
+        // Underlying signal emits @(TRUE) if an ad is presenting, and @(FALSE) otherwise.
+        RACMulticastConnection<NSNumber *> *adPresentationMultiCast = [[[[[RACSignal
           merge:@[
             self.untunneledInterstitial.presentationStatus,
             self.untunneledRewardVideo.presentationStatus,
             self.tunneledRewardVideo.presentationStatus
           ]]
-          filter:^BOOL(NSNumber *presentationStatus) {
-              AdPresentation ap = (AdPresentation) [presentationStatus integerValue];
-
-              // Filter out all states that are not related to an ad view controller being presented.
-              return (ap != AdPresentationErrorNoAdsLoaded);
-          }]
           map:^NSNumber *(NSNumber *presentationStatus) {
               AdPresentation ap = (AdPresentation) [presentationStatus integerValue];
 
-              // Normal ad presentation chain with no errors:
-              // AdPresentationWillAppear -> AdPresentationDidAppear -> AdPresentationWillDisappear
-              //   -> AdPresentationDidDisappear
-
-              if (ap == AdPresentationWillAppear || ap == AdPresentationDidAppear || ap == AdPresentationWillDisappear) {
-                  return @(TRUE);
-              } else {
-                  // In this branch `ap` is either AdPresentationDidDisappear or one of the error states.
-                  return @(FALSE);
-              }
-
+              // Returns @(TRUE) if ad is being presented, and `ap` is not one of the error states.
+              return @(adBeingPresented(ap));
           }]
           startWith:@(FALSE)]  // No ads are being shown when the app is launched.
                                // This initializes the adIsShowing signal.
@@ -581,12 +571,11 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
 - (RACSignal<NSNumber *> *)presentInterstitialOnViewController:(UIViewController *)viewController {
 
     return [self presentAdHelper:^RACSignal<NSNumber *> *(TunnelState tunnelState) {
-
-                              if (TunnelStateUntunneled == tunnelState) {
-                                  return [self.untunneledInterstitial presentAdFromViewController:viewController];
-                              }
-                              return nil;
-                          }];
+        if (TunnelStateUntunneled == tunnelState) {
+            return [self.untunneledInterstitial presentAdFromViewController:viewController];
+        }
+        return nil;
+    }];
 }
 
 - (RACSignal<NSNumber *> *)presentRewardedVideoOnViewController:(UIViewController *)viewController
@@ -649,16 +638,17 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
     NSInteger const AD_LOAD_RETRY_COUNT = 1;
     NSTimeInterval const MIN_AD_RELOAD_TIMER = 1.0;
 
-    NSString * const TriggerAdPresented = @"adPresented";
+    // List of "trigger"s.
+    NSString * const TriggerPresentedAdDismissed = @"presentedAdDismissed";
     NSString * const TriggerAppEvent = @"appEvent";
 
-    // adPresentedAppEvent is hot infinite signal - emits tuple (TriggerAdPresented, AppEvent*) whenever the ad
-    // from `adController` is dismissed and no longer presented.
-    RACSignal<RACTwoTuple<NSString*,AppEvent*>*> *adPresentedAppEvent =
-      [adController.adPresented flattenMap:^RACSignal<AppEvent *> *(RACUnit *value) {
+    // presentedAdDismissedWithAppEvent is hot infinite signal - emits tuple (TriggerPresentedAdDismissed, AppEvent*)
+    // whenever the ad from `adController` is dismissed and no longer presented.
+    RACSignal<RACTwoTuple<NSString*,AppEvent*>*> *presentedAdDismissedWithAppEvent =
+      [adController.presentedAdDismissed flattenMap:^RACSignal<AppEvent *> *(RACUnit *value) {
         // Return the cached value of `appEvents`.
         return [[self.appEvents.signal take:1] map:^RACTwoTuple<NSString*,AppEvent*>*(AppEvent *event) {
-            return [RACTwoTuple pack:TriggerAdPresented :event];
+            return [RACTwoTuple pack:TriggerPresentedAdDismissed :event];
         }];
     }];
 
@@ -669,7 +659,7 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
     }];
 
     RACSignal<RACTwoTuple<AdControllerTag, AppEventActionTuple *> *> *adLoadUnloadSignal = [[[[[RACSignal
-      merge:@[adPresentedAppEvent, appEventWithSource]]
+      merge:@[presentedAdDismissedWithAppEvent, appEventWithSource]]
       map:^AppEventActionTuple *(RACTwoTuple<NSString*,AppEvent*> *tuple) {
 
           NSString *triggerSignal = tuple.first;
@@ -704,7 +694,7 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
               // If the current tunnel state is the same as the ads required tunnel state, then load ad.
               if (event.tunnelState == loadTunnelState && !adController.ready) {
 
-                  if ([TriggerAdPresented isEqualToString:triggerSignal]) {
+                  if ([TriggerPresentedAdDismissed isEqualToString:triggerSignal]) {
                       // The user has just finished viewing the ad.
                       sa.action = afterPresentationLoadAction;
 
