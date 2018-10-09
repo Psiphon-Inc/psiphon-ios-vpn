@@ -27,12 +27,14 @@
     UIImageView *flagImageView;
     UILabel *regionNameLabel;
     UIImageView *rightArrow;
+    BOOL isRTL;
 }
 
 - (id)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
 
     if (self) {
+        isRTL = ([UIApplication sharedApplication].userInterfaceLayoutDirection == UIUserInterfaceLayoutDirectionRightToLeft);
 
         [self setBackgroundColor:[UIColor clearColor]];
         self.layer.cornerRadius = 8;
@@ -82,6 +84,10 @@
     [rightArrow.centerYAnchor constraintEqualToAnchor:self.centerYAnchor].active = YES;
     [rightArrow.widthAnchor constraintEqualToConstant:rightArrowImage.size.width].active = YES;
     [rightArrow.heightAnchor constraintEqualToConstant:rightArrowImage.size.height].active = YES;
+
+    if (isRTL) {
+        rightArrow.transform = CGAffineTransformMakeRotation((CGFloat)M_PI);
+    }
 }
 
 - (void)update {
