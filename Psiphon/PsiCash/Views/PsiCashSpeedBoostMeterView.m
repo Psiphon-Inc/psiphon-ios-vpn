@@ -90,8 +90,15 @@
 
         gradient.colors = @[(id)[UIColor darkCream].CGColor,
                             (id)[UIColor peachyPink].CGColor];
+
+        if (progress == 0) {
+            // Make a bubble over the speed boost icon
+            progressBarWidth = progressBarRadius * 2;
+        }
         progressBar.path = [UIBezierPath bezierPathWithRoundedRect:CGRectMake(0, 0, progressBarWidth, self.frame.size.height) byRoundingCorners:corners cornerRadii:CGSizeMake(progressBarRadius, progressBarRadius)].CGPath;
-        gradient.frame = CGRectMake(0, 0, self.frame.size.width, self.frame.size.height);
+
+        CGFloat gradientWidth = progress == 0 ? progressBarWidth : self.frame.size.width;
+        gradient.frame = CGRectMake(0, 0, gradientWidth, self.frame.size.height);
     }
 }
 
