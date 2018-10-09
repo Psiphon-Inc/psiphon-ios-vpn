@@ -111,6 +111,13 @@ UserDefaultsKey const PsiCashHasBeenOnboardedBoolKey = @"PsiCash.HasBeenOnboarde
     PsiCashView *psiCashView;
     RACDisposable *psiCashViewUpdates;
 
+    // Clouds
+    UIImageView *cloudMiddleLeft;
+    UIImageView *cloudTopRight;
+    UIImageView *cloudBottomRight;
+    NSLayoutConstraint *cloudMiddleLeftHorizontalConstraint;
+    NSLayoutConstraint *cloudTopRightHorizontalConstraint;
+    NSLayoutConstraint *cloudBottomRightHorizontalConstraint;
 }
 
 // Force portrait orientation
@@ -529,6 +536,8 @@ UserDefaultsKey const PsiCashHasBeenOnboardedBoolKey = @"PsiCash.HasBeenOnboarde
 }
 
 - (void)updateUIConnectionState:(VPNStatus)s {
+    [self positionClouds:s];
+
     [startAndStopButton setHighlighted:FALSE];
     
     if ([VPNManager mapIsVPNActive:s] && s != VPNStatusConnected) {
@@ -547,6 +556,10 @@ UserDefaultsKey const PsiCashHasBeenOnboardedBoolKey = @"PsiCash.HasBeenOnboarde
 // Add all views at the same time so there are no crashes while
 // adding and activating autolayout constraints.
 - (void)addViews {
+    UIImage *cloud = [UIImage imageNamed:@"cloud"];
+    cloudMiddleLeft = [[UIImageView alloc] initWithImage:cloud];
+    cloudTopRight = [[UIImageView alloc] initWithImage:cloud];
+    cloudBottomRight = [[UIImageView alloc] initWithImage:cloud];
     versionLabel = [[UILabel alloc] init];
     settingsButton = [[UIButton alloc] init];
     psiCashView = [[PsiCashView alloc] init];
@@ -555,10 +568,12 @@ UserDefaultsKey const PsiCashHasBeenOnboardedBoolKey = @"PsiCash.HasBeenOnboarde
     regionSelectionButton = [[RegionSelectionButton alloc] init];
     bottomBar = [[UIView alloc] init];
     subscriptionsBar = [[SubscriptionsBar alloc] init];
-    
 
     // NOTE: some views overlap so the order they are added
     //       is important for user interaction.
+    [self.view addSubview:cloudMiddleLeft];
+    [self.view addSubview:cloudTopRight];
+    [self.view addSubview:cloudBottomRight];
     [self.view addSubview:psiCashView];
     [self.view addSubview:versionLabel];
     [self.view addSubview:settingsButton];
@@ -570,35 +585,134 @@ UserDefaultsKey const PsiCashHasBeenOnboardedBoolKey = @"PsiCash.HasBeenOnboarde
 }
 
 - (void)setupClouds {
-    UIImage *cloudMiddleLeft = [UIImage imageNamed:@"CloudMiddleLeft"];
-    UIImageView *cloudLeft1 = [[UIImageView alloc] initWithImage:cloudMiddleLeft];
 
-    [self.view addSubview:cloudLeft1];
-    cloudLeft1.translatesAutoresizingMaskIntoConstraints = NO;
-    [cloudLeft1.centerYAnchor constraintEqualToAnchor:self.view.centerYAnchor].active = YES;
-    [cloudLeft1.leftAnchor constraintEqualToAnchor:self.view.leftAnchor].active = YES;
-    [cloudLeft1.heightAnchor constraintEqualToConstant:cloudMiddleLeft.size.height].active = YES;
-    [cloudLeft1.widthAnchor constraintEqualToConstant:cloudMiddleLeft.size.width].active = YES;
+    UIImage *cloud = [UIImage imageNamed:@"cloud"];
 
-    UIImage *cloudTopRightImage = [UIImage imageNamed:@"CloudTopRight"];
-    UIImageView *cloudTopRight = [[UIImageView alloc] initWithImage:cloudTopRightImage];
+    cloudMiddleLeft.translatesAutoresizingMaskIntoConstraints = NO;
+    [cloudMiddleLeft.centerYAnchor constraintEqualToAnchor:self.view.centerYAnchor].active = YES;
+    [cloudMiddleLeft.heightAnchor constraintEqualToConstant:cloud.size.height].active = YES;
+    [cloudMiddleLeft.widthAnchor constraintEqualToConstant:cloud.size.width].active = YES;
 
-    [self.view insertSubview:cloudTopRight belowSubview:psiCashView];
     cloudTopRight.translatesAutoresizingMaskIntoConstraints = NO;
-    [cloudTopRight.topAnchor constraintEqualToAnchor:psiCashView.bottomAnchor constant:4.f].active = YES;
-    [cloudTopRight.rightAnchor constraintEqualToAnchor:self.view.rightAnchor constant:10].active = YES;
-    [cloudTopRight.heightAnchor constraintEqualToConstant:cloudTopRightImage.size.height].active = YES;
-    [cloudTopRight.widthAnchor constraintEqualToConstant:cloudTopRightImage.size.width].active = YES;
+    [cloudTopRight.topAnchor constraintEqualToAnchor:psiCashView.bottomAnchor constant:-20].active = YES;
+    [cloudTopRight.heightAnchor constraintEqualToConstant:cloud.size.height].active = YES;
+    [cloudTopRight.widthAnchor constraintEqualToConstant:cloud.size.width].active = YES;
 
-    UIImage *cloudBottomRightImage = [UIImage imageNamed:@"CloudBottomRight"];
-    UIImageView *cloudBottomRight = [[UIImageView alloc] initWithImage:cloudBottomRightImage];
-
-    [self.view insertSubview:cloudBottomRight belowSubview:regionSelectionButton];
     cloudBottomRight.translatesAutoresizingMaskIntoConstraints = NO;
     [cloudBottomRight.centerYAnchor constraintEqualToAnchor:regionSelectionButton.topAnchor constant:-24].active = YES;
-    [cloudBottomRight.rightAnchor constraintEqualToAnchor:self.view.rightAnchor].active = YES;
-    [cloudBottomRight.heightAnchor constraintEqualToConstant:cloudBottomRightImage.size.height].active = YES;
-    [cloudBottomRight.widthAnchor constraintEqualToConstant:cloudBottomRightImage.size.width].active = YES;
+    [cloudBottomRight.heightAnchor constraintEqualToConstant:cloud.size.height].active = YES;
+    [cloudBottomRight.widthAnchor constraintEqualToConstant:cloud.size.width].active = YES;
+
+    // Default horizontal positioning for clouds
+    cloudMiddleLeftHorizontalConstraint = [cloudMiddleLeft.centerXAnchor constraintEqualToAnchor:self.view.leftAnchor constant:0];
+    cloudTopRightHorizontalConstraint = [cloudTopRight.centerXAnchor constraintEqualToAnchor:self.view.rightAnchor constant:0];
+    cloudBottomRightHorizontalConstraint = [cloudBottomRight.centerXAnchor constraintEqualToAnchor:self.view.rightAnchor constant:0];
+
+    cloudMiddleLeftHorizontalConstraint.active = YES;
+    cloudTopRightHorizontalConstraint.active = YES;
+    cloudBottomRightHorizontalConstraint.active = YES;
+}
+
+- (void)positionClouds:(VPNStatus)s {
+
+    // DEBUG: use to debug animations in slow motion (e.g. 20)
+    CGFloat animationTimeStretchFactor = 1;
+
+    static VPNStatus previousState = VPNStatusInvalid;
+
+    CGFloat cloudWidth = [UIImage imageNamed:@"cloud"].size.width;
+
+    // All clouds are centered on their respective side.
+    // Use these variables to make slight adjustments to
+    // each cloud's position.
+    CGFloat cloudMiddleLeftOffset = 0;
+    CGFloat cloudTopRightOffset = -cloudWidth/8;
+    CGFloat cloudBottomRightOffset = 15;
+
+    // Remove all on-going cloud animations
+    void (^removeAllCloudAnimations)(void) = ^void(void) {
+        [cloudMiddleLeft.layer removeAllAnimations];
+        [cloudTopRight.layer removeAllAnimations];
+        [cloudBottomRight.layer removeAllAnimations];
+    };
+
+    // Position clouds in their default positions
+    void (^disconnectedAndConnectedLayout)(void) = ^void(void) {
+        cloudMiddleLeftHorizontalConstraint.constant = cloudMiddleLeftOffset;
+        cloudTopRightHorizontalConstraint.constant = cloudTopRightOffset;
+        cloudBottomRightHorizontalConstraint.constant = cloudBottomRightOffset;
+        [self.view layoutIfNeeded];
+    };
+
+    if ([VPNManager mapIsVPNActive:s] && s != VPNStatusConnected) {
+        // Connecting
+
+        void (^connectingLayout)(void) = ^void(void) {
+            cloudMiddleLeftHorizontalConstraint.constant = self.view.frame.size.width + cloudMiddleLeftOffset + 1.f/6*cloudWidth;
+            cloudTopRightHorizontalConstraint.constant = -3.f/4 * self.view.frame.size.width + cloudTopRightOffset;
+            cloudBottomRightHorizontalConstraint.constant = -3.f/4 * self.view.frame.size.width + cloudBottomRightOffset;
+            [self.view layoutIfNeeded];
+        };
+
+        if (!([VPNManager mapIsVPNActive:previousState] && previousState != VPNStatusConnected)
+            && previousState != VPNStatusInvalid /* don't animate if the app was just opened */ ) {
+
+            removeAllCloudAnimations();
+
+            // Move middle left cloud to the right so it can animate in from the right side.
+            cloudMiddleLeftHorizontalConstraint.constant = self.view.frame.size.width * 2;
+            [self.view layoutIfNeeded];
+
+            [UIView animateWithDuration:0.5 * animationTimeStretchFactor delay:0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
+                connectingLayout();
+            } completion:nil];
+        } else {
+            connectingLayout();
+        }
+    }
+    else if (s == VPNStatusConnected) {
+
+        if (previousState != VPNStatusConnected
+            && previousState != VPNStatusInvalid /* don't animate if the app was just opened */ ) {
+
+            // Connected
+
+            removeAllCloudAnimations();
+
+            [UIView animateWithDuration:0.25 * animationTimeStretchFactor delay:0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
+
+                cloudMiddleLeftHorizontalConstraint.constant = self.view.frame.size.width + cloudWidth/2 + cloudMiddleLeftOffset;
+                cloudTopRightHorizontalConstraint.constant = -self.view.frame.size.width - cloudWidth/2 + cloudTopRightOffset;
+                cloudBottomRightHorizontalConstraint.constant = -self.view.frame.size.width - cloudWidth/2 + cloudBottomRightOffset;
+                [self.view layoutIfNeeded];
+
+            } completion:^(BOOL finished) {
+
+                if (finished) {
+                    // We want all the clouds to animate at the same speed so we put them all at the
+                    // same distance from their final point.
+                    CGFloat maxOffset = MAX(MAX(ABS(cloudMiddleLeftOffset), ABS(cloudTopRightOffset)), ABS(cloudBottomRightOffset));
+                    cloudMiddleLeftHorizontalConstraint.constant = -cloudWidth/2 - (maxOffset + cloudMiddleLeftOffset);
+                    cloudTopRightHorizontalConstraint.constant = cloudWidth/2 + (maxOffset + cloudTopRightOffset);
+                    cloudBottomRightHorizontalConstraint.constant = cloudWidth/2 + (maxOffset + cloudBottomRightOffset);
+                    [self.view layoutIfNeeded];
+
+                    [UIView animateWithDuration:0.25 * animationTimeStretchFactor delay:0 options:UIViewAnimationOptionCurveEaseOut animations:^{
+                        disconnectedAndConnectedLayout();
+                    } completion:nil];
+                }
+            }];
+        }
+    }
+    else {
+        // Disconnected
+
+        removeAllCloudAnimations();
+
+        disconnectedAndConnectedLayout();
+    }
+
+    previousState = s;
 }
 
 - (void)setupStartAndStopButton {
