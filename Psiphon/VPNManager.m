@@ -77,7 +77,6 @@ UserDefaultsKey const VPNManagerConnectOnDemandUntilNextStartBoolKey = @"VPNMana
 @property (nonatomic) UnionSerialQueue *serialQueue;
 
 @property (atomic) BOOL restartRequired;
-@property (atomic) BOOL extensionIsZombie;
 
 @property (nonatomic) RACCompoundDisposable *compoundDisposable;
 
@@ -105,7 +104,6 @@ UserDefaultsKey const VPNManagerConnectOnDemandUntilNextStartBoolKey = @"VPNMana
         _restartRequired = FALSE;
 
         _restartRequired = FALSE;
-        _extensionIsZombie = FALSE;
 
         _serialQueue = [UnionSerialQueue createWithLabel:@"ca.psiphon.Psiphon.VPNManagerSerialQueue"];
 
@@ -296,7 +294,6 @@ UserDefaultsKey const VPNManagerConnectOnDemandUntilNextStartBoolKey = @"VPNMana
       flattenMap:^RACSignal<NSNumber *> *(NSNumber *isZombie) {
 
           if ([isZombie boolValue]) {
-              weakSelf.extensionIsZombie = TRUE;
               return [weakSelf setConnectOnDemandEnabled:FALSE];
           } else {
               return [RACSignal empty];
@@ -325,7 +322,7 @@ UserDefaultsKey const VPNManagerConnectOnDemandUntilNextStartBoolKey = @"VPNMana
 
     __weak VPNManager *weakSelf = self;
 
-    __block RACDisposable *disposable = [[[[[[VPNManager loadTunnelProviderManager]
+    __block RACDisposable *disposable = [[[[[VPNManager loadTunnelProviderManager]
       flattenMap:^RACSignal *(NETunnelProviderManager *_Nullable providerManager) {
           // Updates VPN configuration parameters if it already exists,
           // otherwise creates a new VPN configuration.
@@ -343,15 +340,6 @@ UserDefaultsKey const VPNManagerConnectOnDemandUntilNextStartBoolKey = @"VPNMana
               return [RACSignal return:RACUnit.defaultUnit];
           }
 
-      }]
-      flattenMap:^RACSignal *(RACUnit *x) {
-
-          // Enables connect on demand for all users after starting the tunnel.
-          //
-          // Setting onDemandEnabled flag to TRUE before starting the VPN tunnel, can start the extension process
-          // without the appropriate options dictionary above being passed in.
-          //
-          return [weakSelf setConnectOnDemandEnabled:TRUE];
       }]
       unsafeSubscribeOnSerialQueue:self.serialQueue
                           withName:@"startTunnelOperation"]
@@ -417,9 +405,6 @@ UserDefaultsKey const VPNManagerConnectOnDemandUntilNextStartBoolKey = @"VPNMana
                           withName:@"stopVPNOperation"]
       subscribeNext:^(NETunnelProviderManager *_Nullable providerManager) {
           [providerManager.connection stopVPNTunnel];
-
-          // Tunnel is being stopped, and previous zombie status can be reset.
-          weakSelf.extensionIsZombie = FALSE;
 
       } error:^(NSError *error) {
           [weakSelf.compoundDisposable removeDisposable:disposable];
@@ -497,7 +482,6 @@ UserDefaultsKey const VPNManagerConnectOnDemandUntilNextStartBoolKey = @"VPNMana
     return [[self isExtensionZombie]
       flattenMap:^RACSignal *(NSNumber *_Nullable isZombie) {
           if ([isZombie boolValue]) {
-              weakSelf.extensionIsZombie = TRUE;
               return [RACSignal return:[RACTwoTuple pack:[NSNumber numberWithBool:FALSE] :@(VPNStatusZombie)]];
           } else {
               return [[self deferredTunnelProviderManager]
@@ -629,10 +613,6 @@ UserDefaultsKey const VPNManagerConnectOnDemandUntilNextStartBoolKey = @"VPNMana
         // to the observers, and instead simply notify them that the
         // extension is restarting.
         return VPNStatusRestarting;
-    }
-
-    if (self.extensionIsZombie) {
-        return VPNStatusZombie;
     }
 
     switch (status) {
