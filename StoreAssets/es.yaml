@@ -1,6 +1,17 @@
 es:
   app_name: Psiphon
   subtitle: Cruzando fronteras
+  keywords: Psiphon, proxy
+  subscriptions:
+    weekly:
+      title: Premium 1 semana
+      description: Suscripción auto-renovable
+    monthly:
+      title: Premium 1 mes
+      description: Suscripción auto-renovable
+    yearly:
+      title: Premium 1 año
+      description: Suscripción auto-renovable
   description: |
     Tras ayudar a decenas de millones de usuarios a obtener acceso a las aplicaciones y sitios que aman, ¡Psiphon ha lanzado su primera app para iOS! Nuestra nueva app integra armónicamente el acceso a la red Psiphon, conectándole de forma segura a sus aplicaciones y sitios.
 
@@ -25,14 +36,3 @@ es:
 
     Política de privacidad: https://psiphon.ca/es/privacy.html
     Condiciones de uso: https://psiphon.ca/es/license.html
-  keywords: Psiphon, proxy
-  subscriptions:
-    weekly:
-      title: Premium 1 semana
-      description: Suscripción auto-renovable
-    monthly:
-      title: Premium 1 mes
-      description: Suscripción auto-renovable
-    yearly:
-      title: Premium 1 año
-      description: Suscripción auto-renovable

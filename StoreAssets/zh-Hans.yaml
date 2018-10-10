@@ -1,6 +1,17 @@
 zh-Hans:
   app_name: 赛风
   subtitle: 超越国界
+  keywords: 赛风, 代理
+  subscriptions:
+    weekly:
+      title: 使用1周的高级版
+      description: 自动续订
+    monthly:
+      title: 使用1个月的高级版
+      description: 自动续订
+    yearly:
+      title: 使用1年的高级版
+      description: 自动续订
   description: |
     一直以来，赛风帮助了上千万的用户访问他们喜爱的网站，现在，赛风推出了第一款 iOS 应用！我们的新应用无缝集成了赛风网络，可安全地将您连接到应用和网站。
 
@@ -25,14 +36,3 @@ zh-Hans:
 
     隐私政策：https://psiphon.ca/en/privacy.html
     使用条款：https://psiphon.ca/en/license.html
-  keywords: 赛风, 代理
-  subscriptions:
-    weekly:
-      title: 使用1周的高级版
-      description: 自动续订
-    monthly:
-      title: 使用1个月的高级版
-      description: 自动续订
-    yearly:
-      title: 使用1年的高级版
-      description: 自动续订
