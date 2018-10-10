@@ -62,9 +62,10 @@ PsiFeedbackLogType const BasePacketTunnelProviderLogType = @"BasePacketTunnelPro
 - (void)startTunnelWithOptions:(nullable NSDictionary<NSString *, NSObject *> *)options
              completionHandler:(void (^)(NSError *__nullable error))completionHandler {
 
-    // Determine if the extension jetsammed previously to this start and,
-    // Sets the crash flag, in case the extension crashes since this start.
+    // Determine if the extension jetsammed previously to this start.
     BOOL previouslyJetsammed = [self.sharedDB getExtensionJetsammedBeforeStopFlag];
+
+     // Sets the crash flag. This flag is reset when `stopTunnelWithReason:completionHandler:` is called.
     [self.sharedDB setExtensionJetsammedBeforeStopFlag:TRUE];
 
     if (previouslyJetsammed) {
@@ -132,7 +133,7 @@ PsiFeedbackLogType const BasePacketTunnelProviderLogType = @"BasePacketTunnelPro
  */
 - (void)stopTunnelWithReason:(NEProviderStopReason)reason completionHandler:(void (^)(void))completionHandler {
 
-    // Resets the extension crash flag, since the extension hasn't crashed yet.
+    // Resets the extension crash flag, since the extension hasn't crashed until stop is called.
     [self.sharedDB setExtensionJetsammedBeforeStopFlag:FALSE];
 
     // Assumes stopTunnelWithReason called exactly once only after startTunnelWithOptions.completionHandler(nil)
