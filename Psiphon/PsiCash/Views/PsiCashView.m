@@ -84,7 +84,7 @@
     _balance.translatesAutoresizingMaskIntoConstraints = NO;
     [_balance.centerXAnchor constraintEqualToAnchor:self.centerXAnchor].active = YES;
     [_balance.topAnchor constraintEqualToAnchor:self.topAnchor].active = YES;
-    [_balance.widthAnchor constraintEqualToAnchor:self.widthAnchor multiplier:0.6].active = YES;
+    [_balance.widthAnchor constraintEqualToAnchor:self.widthAnchor multiplier:0.5498].active = YES;
     [_balance.heightAnchor constraintEqualToAnchor:self.heightAnchor multiplier:40.0/152].active = YES;
 
     _meter.translatesAutoresizingMaskIntoConstraints = NO;
@@ -101,7 +101,7 @@
 
     [_rewardedVideoButton.centerXAnchor constraintEqualToAnchor:self.centerXAnchor].active = YES;
     [_rewardedVideoButton.topAnchor constraintEqualToAnchor:_meter.bottomAnchor constant:-2].active = YES;
-    [_rewardedVideoButton.widthAnchor constraintEqualToAnchor:_meter.widthAnchor constant:-60.f].active = YES;
+    [_rewardedVideoButton.widthAnchor constraintEqualToAnchor:_meter.widthAnchor multiplier:0.80687].active = YES;
     [_rewardedVideoButton.heightAnchor constraintEqualToAnchor:self.heightAnchor multiplier:52.0/152].active = YES;
 
     topBorderBlocker.translatesAutoresizingMaskIntoConstraints = NO;

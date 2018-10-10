@@ -127,18 +127,28 @@
 }
 
 - (void)videoReady:(BOOL)ready {
+    NSString *text;
     if (ready) {
-        status.text = NSLocalizedStringWithDefaultValue(@"REWARDED_VIDEO_EARN_PSICASH", nil, [NSBundle mainBundle],
+        text = NSLocalizedStringWithDefaultValue(@"REWARDED_VIDEO_EARN_PSICASH", nil, [NSBundle mainBundle],
                                                         @"Watch a video to earn PsiCash!",
                                                         @"Button label indicating to the user that they will earn PsiCash if they watch a video advertisement."
                                                         " The word 'PsiCash' should not be translated or transliterated.");
         statusGradient.colors = @[(id)UIColor.lightRoyalBlueTwo.CGColor, (id)UIColor.lightishBlue.CGColor];
     } else {
-        status.text = NSLocalizedStringWithDefaultValue(@"REWARDED_VIDEO_NO_VIDEOS_AVAILABLE", nil, [NSBundle mainBundle],
+        text = NSLocalizedStringWithDefaultValue(@"REWARDED_VIDEO_NO_VIDEOS_AVAILABLE", nil, [NSBundle mainBundle],
                                                         @"No Videos Available",
                                                         @"Button label indicating to the user that there are no videos available for them to watch.");
         statusGradient.colors = @[(id)UIColor.lightBlueGrey.CGColor, (id)UIColor.lightBlueGrey.CGColor];
     }
+    status.attributedText = [self styleStatusLabelText:text];
+}
+
+- (NSAttributedString*)styleStatusLabelText:(NSString*)s {
+    NSMutableAttributedString *mutableStr = [[NSMutableAttributedString alloc] initWithString:s];
+    [mutableStr addAttribute:NSKernAttributeName
+                       value:@-0.2
+                       range:NSMakeRange(0, mutableStr.length)];
+    return mutableStr;
 }
 
 @end

@@ -527,9 +527,10 @@ UserDefaultsKey const PsiCashHasBeenOnboardedBoolKey = @"PsiCash.HasBeenOnboarde
     [settingsButton setImage:gearTemplate forState:UIControlStateNormal];
 
     // Setup autolayout
-    [settingsButton.topAnchor constraintEqualToAnchor:psiCashView.topAnchor constant:-(80 - gearTemplate.size.height)/2].active = YES;
-    [settingsButton.centerXAnchor constraintEqualToAnchor:self.view.trailingAnchor constant:-gearTemplate.size.width/2 - 15.f].active = YES;
-    [settingsButton.widthAnchor constraintEqualToConstant:80].active = YES;
+    CGFloat buttonTouchAreaSize = 80.f;
+    [settingsButton.topAnchor constraintEqualToAnchor:psiCashView.topAnchor constant:-(buttonTouchAreaSize - gearTemplate.size.height)/2].active = YES;
+    [settingsButton.trailingAnchor constraintEqualToAnchor:psiCashView.trailingAnchor constant:(buttonTouchAreaSize/2 - gearTemplate.size.width/2)].active = YES;
+    [settingsButton.widthAnchor constraintEqualToConstant:buttonTouchAreaSize].active = YES;
     [settingsButton.heightAnchor constraintEqualToAnchor:settingsButton.widthAnchor].active = YES;
 
     [settingsButton addTarget:self action:@selector(onSettingsButtonTap:) forControlEvents:UIControlEventTouchUpInside];
@@ -550,7 +551,7 @@ UserDefaultsKey const PsiCashHasBeenOnboardedBoolKey = @"PsiCash.HasBeenOnboarde
         [startAndStopButton setDisconnected];
     }
     
-    statusLabel.text = [self getVPNStatusDescription:s];
+    [self setStatusLabelText:[self getVPNStatusDescription:s]];
 }
 
 // Add all views at the same time so there are no crashes while
@@ -626,7 +627,7 @@ UserDefaultsKey const PsiCashHasBeenOnboardedBoolKey = @"PsiCash.HasBeenOnboarde
     // Use these variables to make slight adjustments to
     // each cloud's position.
     CGFloat cloudMiddleLeftOffset = 0;
-    CGFloat cloudTopRightOffset = -cloudWidth/8;
+    CGFloat cloudTopRightOffset = 0;
     CGFloat cloudBottomRightOffset = 15;
 
     // Remove all on-going cloud animations
@@ -735,7 +736,9 @@ UserDefaultsKey const PsiCashHasBeenOnboardedBoolKey = @"PsiCash.HasBeenOnboarde
         startButtonHeight.active = NO;
     }
 
-    startButtonWidth = [startAndStopButton.widthAnchor constraintEqualToConstant:MIN(size.width, size.height)*0.4];
+    CGFloat startButtonMaxSize = 200;
+    CGFloat startButtonSize = MIN(MIN(size.width, size.height)*0.388, startButtonMaxSize);
+    startButtonWidth = [startAndStopButton.widthAnchor constraintEqualToConstant:startButtonSize];
     startButtonHeight = [startAndStopButton.heightAnchor constraintEqualToAnchor:startAndStopButton.widthAnchor];
 
     startButtonWidth.active = YES;
@@ -745,16 +748,24 @@ UserDefaultsKey const PsiCashHasBeenOnboardedBoolKey = @"PsiCash.HasBeenOnboarde
 - (void)setupStatusLabel {
     statusLabel.translatesAutoresizingMaskIntoConstraints = NO;
     statusLabel.adjustsFontSizeToFitWidth = YES;
-    statusLabel.text = [self getVPNStatusDescription:VPNStatusInvalid];
+    [self setStatusLabelText:[self getVPNStatusDescription:VPNStatusInvalid]];
     statusLabel.textAlignment = NSTextAlignmentCenter;
     statusLabel.textColor = [UIColor colorWithRed:0.88 green:0.87 blue:0.87 alpha:1.0];
     statusLabel.font = [UIFont avenirNextBold:14.5];
     
     // Setup autolayout
     CGFloat labelHeight = [statusLabel getLabelHeight];
-//    [statusLabel.heightAnchor constraintEqualToConstant:labelHeight].active = YES;
+    [statusLabel.heightAnchor constraintEqualToConstant:labelHeight].active = YES;
     [statusLabel.topAnchor constraintEqualToAnchor:startAndStopButton.bottomAnchor constant:5].active = YES;
     [statusLabel.centerXAnchor constraintEqualToAnchor:self.view.centerXAnchor].active = YES;
+}
+
+- (void)setStatusLabelText:(NSString*)s {
+    NSMutableAttributedString *mutableStr = [[NSMutableAttributedString alloc] initWithString:s];
+    [mutableStr addAttribute:NSKernAttributeName
+                       value:@1.1
+                       range:NSMakeRange(0, mutableStr.length)];
+    statusLabel.attributedText = mutableStr;
 }
 
 - (void)setupBottomBar {
@@ -795,7 +806,7 @@ UserDefaultsKey const PsiCashHasBeenOnboardedBoolKey = @"PsiCash.HasBeenOnboarde
     [idealBottomSpacing setPriority:999];
     idealBottomSpacing.active = YES;
     [regionSelectionButton.centerXAnchor constraintEqualToAnchor:self.view.centerXAnchor].active = YES;
-    [regionSelectionButton.widthAnchor constraintEqualToAnchor:bottomBar.widthAnchor multiplier:.85625].active = YES;
+    [regionSelectionButton.widthAnchor constraintEqualToAnchor:bottomBar.widthAnchor multiplier:.856].active = YES;
 }
 
 - (void)setupVersionLabel {
@@ -814,7 +825,7 @@ UserDefaultsKey const PsiCashHasBeenOnboardedBoolKey = @"PsiCash.HasBeenOnboarde
 #endif
 
     // Setup autolayout
-    [versionLabel.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor constant:12].active = YES;
+    [versionLabel.leadingAnchor constraintEqualToAnchor:psiCashView.leadingAnchor constant:0].active = YES;
     [versionLabel.trailingAnchor constraintLessThanOrEqualToAnchor:psiCashView.balance.leadingAnchor constant:-2].active = YES;
     [versionLabel.topAnchor constraintEqualToAnchor:psiCashView.topAnchor].active = YES;
 }
@@ -1025,16 +1036,16 @@ UserDefaultsKey const PsiCashHasBeenOnboardedBoolKey = @"PsiCash.HasBeenOnboarde
     [psiCashView.meter addGestureRecognizer:psiCashViewTap];
 
     [psiCashView.centerXAnchor constraintEqualToAnchor:self.view.centerXAnchor].active = YES;
-    [psiCashView.topAnchor constraintEqualToAnchor:self.topLayoutGuide.bottomAnchor constant:20].active = YES;
+    [psiCashView.topAnchor constraintEqualToAnchor:self.topLayoutGuide.bottomAnchor constant:26].active = YES;
 
     CGFloat psiCashViewMaxWidth = 400;
-    CGFloat psiCashViewToParentViewWidthRatio = 0.95;
+    CGFloat psiCashViewToParentViewWidthRatio = 0.909;
     if (self.view.frame.size.width * psiCashViewToParentViewWidthRatio > psiCashViewMaxWidth) {
         [psiCashView.widthAnchor constraintEqualToConstant:psiCashViewMaxWidth].active = YES;
     } else {
-        [psiCashView.widthAnchor constraintEqualToAnchor:self.view.widthAnchor multiplier:0.95].active = YES;
+        [psiCashView.widthAnchor constraintEqualToAnchor:self.view.widthAnchor multiplier:psiCashViewToParentViewWidthRatio].active = YES;
     }
-    psiCashViewHeight = [psiCashView.heightAnchor constraintEqualToConstant:150];
+    psiCashViewHeight = [psiCashView.heightAnchor constraintEqualToConstant:146.9];
     psiCashViewHeight.active = YES;
 
     __weak MainViewController *weakSelf = self;
