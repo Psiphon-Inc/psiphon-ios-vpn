@@ -20,8 +20,9 @@
 #import "RegionSelectionButton.h"
 #import "PsiphonClientCommonLibraryHelpers.h"
 #import "RegionAdapter.h"
-#import "UIImage+CountryFlag.h"
+#import "UIColor+Additions.h"
 #import "UIFont+Additions.h"
+#import "UIImage+CountryFlag.h"
 
 @implementation RegionSelectionButton {
     UIImageView *flagImageView;
@@ -46,6 +47,7 @@
         regionNameLabel = [[UILabel alloc] init];
         regionNameLabel.adjustsFontSizeToFitWidth = YES;
         regionNameLabel.font = [UIFont avenirNextMedium:16.f];
+        regionNameLabel.textColor = [UIColor greyishBrown];
 
         rightArrow = [[UIImageView alloc] init];
 
@@ -66,16 +68,16 @@
 
 - (void)setupAutoLayoutConstraints {
     flagImageView.translatesAutoresizingMaskIntoConstraints = NO;
-    [flagImageView.leadingAnchor constraintEqualToAnchor:self.leadingAnchor constant:30.f].active = YES;
-    [flagImageView.centerYAnchor constraintEqualToAnchor:self.centerYAnchor].active = YES;
+    [flagImageView.leadingAnchor constraintEqualToAnchor:self.leadingAnchor constant:22.f].active = YES;
+    [flagImageView.centerYAnchor constraintEqualToAnchor:self.centerYAnchor constant:1].active = YES;
     [flagImageView.widthAnchor constraintEqualToConstant:41.f].active = YES;
     [flagImageView.heightAnchor constraintEqualToConstant:29.f].active = YES;
 
     regionNameLabel.translatesAutoresizingMaskIntoConstraints = NO;
-    [regionNameLabel.leadingAnchor constraintEqualToAnchor:flagImageView.trailingAnchor constant:10.f].active = YES;
-    [regionNameLabel.centerYAnchor constraintEqualToAnchor:self.centerYAnchor].active = YES;
+    [regionNameLabel.leadingAnchor constraintEqualToAnchor:flagImageView.trailingAnchor constant:14.f].active = YES;
+    [regionNameLabel.centerYAnchor constraintEqualToAnchor:self.centerYAnchor constant:1].active = YES;
     [regionNameLabel.heightAnchor constraintEqualToAnchor:self.heightAnchor multiplier:.5].active = YES;
-    [regionNameLabel.trailingAnchor constraintEqualToAnchor:rightArrow.leadingAnchor].active = YES;
+    [regionNameLabel.trailingAnchor constraintEqualToAnchor:rightArrow.leadingAnchor constant:-14.f].active = YES;
 
     UIImage *rightArrowImage = [UIImage imageNamed:@"chevron"];
     rightArrow.image = rightArrowImage;
@@ -97,7 +99,15 @@
     flagImageView.image = flag;
 
     NSString *regionText = [[RegionAdapter sharedInstance] getLocalizedRegionTitle:selectedRegion.code];
-    regionNameLabel.text = regionText;
+    regionNameLabel.attributedText = [self styleRegionLabelText:regionText];
+}
+
+- (NSAttributedString*)styleRegionLabelText:(NSString*)s {
+    NSMutableAttributedString *mutableStr = [[NSMutableAttributedString alloc] initWithString:s];
+    [mutableStr addAttribute:NSKernAttributeName
+                       value:@-0.3
+                       range:NSMakeRange(0, mutableStr.length)];
+    return mutableStr;
 }
 
 @end

@@ -36,6 +36,7 @@
 @implementation InnerMeterView {
     CAShapeLayer *progressBar;
     CAGradientLayer *gradient;
+    CAGradientLayer *backgroundGradient;
     PastelView *animatedGradientView;
 }
 
@@ -44,6 +45,13 @@
 
     if (self) {
         self.clipsToBounds = YES;
+
+        // Add background gradient
+        backgroundGradient = [CAGradientLayer layer];
+        backgroundGradient.startPoint = CGPointMake(0, 0.5);
+        backgroundGradient.endPoint = CGPointMake(1.0, 0.5);
+        backgroundGradient.colors = @[(id)[UIColor lightBlueGreyTwo].CGColor, (id)[UIColor paleGreyTwo].CGColor];
+        [self.layer addSublayer:backgroundGradient];
     }
 
     return self;
@@ -51,6 +59,7 @@
 
 - (void)setBounds:(CGRect)bounds {
     [super setBounds:bounds];
+    backgroundGradient.frame = bounds;
     [self updateProgressBarWithProgress:_progress];
 }
 
@@ -83,7 +92,7 @@
         [animatedGradientView startAnimation];
     } else {
         gradient = [CAGradientLayer layer];
-        [self.layer insertSublayer:gradient atIndex:0];
+        [self.layer insertSublayer:gradient above:backgroundGradient];
         gradient.startPoint = CGPointMake(0, 0.5);
         gradient.endPoint = CGPointMake(1.0, 0.5);
         gradient.mask = progressBar;
@@ -157,7 +166,7 @@
     title.font = [UIFont avenirNextBold:12.f];
 
     innerBackground = [[InnerMeterView alloc] init];
-    innerBackground.backgroundColor = [UIColor colorWithRed:0.87 green:0.87 blue:0.92 alpha:1.0];
+    innerBackground.backgroundColor = [UIColor paleGreyTwo];
 }
 
 - (void)addViews {
@@ -184,7 +193,7 @@
     title.translatesAutoresizingMaskIntoConstraints = NO;
     [title.centerXAnchor constraintEqualToAnchor:self.centerXAnchor].active = YES;
     [title.centerYAnchor constraintEqualToAnchor:self.centerYAnchor].active = YES;
-    [title.leadingAnchor constraintEqualToAnchor:instantBuyButton.trailingAnchor].active = YES;
+    [title.leadingAnchor constraintEqualToAnchor:instantBuyButton.trailingAnchor constant:20].active = YES;
 }
 
 #pragma mark - View sizing
@@ -212,7 +221,24 @@
 #pragma mark - State Changes
 
 - (void)inPurchasePendingState {
-    title.text = NSLocalizedStringWithDefaultValue(@"PSICASH_BUYING_SPEED_BOOST_TEXT", nil, [NSBundle mainBundle], @"Buying Speed Boost...", @"Text which appears in the Speed Boost meter when the user's buy request for Speed Boost is being processed. Please keep this text concise as the width of the text box is restricted in size.");
+    NSString *text = NSLocalizedStringWithDefaultValue(@"PSICASH_BUYING_SPEED_BOOST_TEXT", nil, [NSBundle mainBundle], @"Buying Speed Boost...", @"Text which appears in the Speed Boost meter when the user's buy request for Speed Boost is being processed. Please keep this text concise as the width of the text box is restricted in size.");
+    title.attributedText = [self styleTitleText:text];
+}
+
+- (NSAttributedString*)styleTitleText:(NSString*)s {
+    NSMutableAttributedString *mutableStr = [[NSMutableAttributedString alloc] initWithString:s];
+    NSShadow *shadow = [[NSShadow alloc] init];
+    shadow.shadowColor = [UIColor colorWithWhite:0 alpha:.12];
+    shadow.shadowBlurRadius = 8.0;
+    shadow.shadowOffset = CGSizeMake(0, 2);
+    NSDictionary *attr = @{NSShadowAttributeName:shadow};
+    [mutableStr setAttributes:attr range:NSMakeRange(0, mutableStr.length)];
+
+    [mutableStr addAttribute:NSKernAttributeName
+                       value:@1.1
+                       range:NSMakeRange(0, mutableStr.length)];
+
+    return mutableStr;
 }
 
 - (void)speedBoostChargingWithHoursEarned:(NSNumber*)hoursEarned {
@@ -220,17 +246,20 @@
     [innerBackground setSpeedBoosting:NO];
     [innerBackground setProgress:progress];
 
+    NSString *text;
     if (progress >= 1) {
         NSString *speedBoostAvailable = NSLocalizedStringWithDefaultValue(@"PSICASH_SPEED_BOOST_AVAILABLE_TEXT", nil, [NSBundle mainBundle], @"Speed Boost Available", @"Text which appears in the Speed Boost meter when the user has earned enough PsiCash to buy Speed Boost. Please keep this text concise as the width of the text box is restricted in size. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed.");
         if ([self.model.maxSpeedBoostPurchaseEarned.hours floatValue] < 1) {
-            title.text = [NSString stringWithFormat:@"%.0fm %@", ([hoursEarned floatValue] * 60), speedBoostAvailable];
+            text = [NSString stringWithFormat:@"%.0fm %@", ([hoursEarned floatValue] * 60), speedBoostAvailable];
+
         } else {
-            title.text = [NSString stringWithFormat:@"%luh %@", (unsigned long)[hoursEarned unsignedIntegerValue], speedBoostAvailable];
+            text = [NSString stringWithFormat:@"%luh %@", (unsigned long)[hoursEarned unsignedIntegerValue], speedBoostAvailable];
         }
     } else {
         NSString *speedBoostCharging = NSLocalizedStringWithDefaultValue(@"PSICASH_SPEED_BOOST_CHARGING_TEXT", nil, [NSBundle mainBundle], @"Speed Boost Charging", @"Text which appears in the Speed Boost meter when the user has not yet earned enough PsiCash to Speed Boost. This text will be accompanied with a percentage indicating to the user how close they are to earning enough PsiCash to buy a minimum amount of Speed Boost. Please keep this text concise as the width of the text box is restricted in size. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed.");
-        title.text = [NSString stringWithFormat:@"%@ %.0f%%", speedBoostCharging, [self progressToMinSpeedBoostPurchase]*100];
+        text = [NSString stringWithFormat:@"%@ %.0f%%", speedBoostCharging, [self progressToMinSpeedBoostPurchase]*100];
     }
+    title.attributedText = [self styleTitleText:text];
 }
 
 - (void)activeSpeedBoostExpiringIn:(NSTimeInterval)seconds {
@@ -275,7 +304,8 @@
 #pragma mark - Helpers
 
 - (void)noSpenderToken {
-    title.text = NSLocalizedStringWithDefaultValue(@"PSICASH_SPEED_BOOST_NOAUTH_TEXT", nil, [NSBundle mainBundle], @"Earn PsiCash to buy Speed Boost", @"Text which appears in the Speed Boost meter when the user has not earned any PsiCash yet. Please keep this text concise as the width of the text box is restricted in size. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. Note: 'PsiCash' should not be translated or transliterated.");
+    NSString *text = NSLocalizedStringWithDefaultValue(@"PSICASH_SPEED_BOOST_NOAUTH_TEXT", nil, [NSBundle mainBundle], @"Earn PsiCash to buy Speed Boost", @"Text which appears in the Speed Boost meter when the user has not earned any PsiCash yet. Please keep this text concise as the width of the text box is restricted in size. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. Note: 'PsiCash' should not be translated or transliterated.");
+    [self styleTitleText:text];
 }
 
 - (NSTimeInterval)timeToNextHourExpired:(NSTimeInterval)seconds {
