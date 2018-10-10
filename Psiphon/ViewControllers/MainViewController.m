@@ -728,6 +728,8 @@ UserDefaultsKey const PsiCashHasBeenOnboardedBoolKey = @"PsiCash.HasBeenOnboarde
                     } completion:nil];
                 }
             }];
+        } else {
+            disconnectedAndConnectedLayout();
         }
     }
     else {
