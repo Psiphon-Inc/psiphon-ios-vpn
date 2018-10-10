@@ -113,9 +113,11 @@ UserDefaultsKey const PsiCashHasBeenOnboardedBoolKey = @"PsiCash.HasBeenOnboarde
 
     // Clouds
     UIImageView *cloudMiddleLeft;
+    UIImageView *cloudMiddleRight;
     UIImageView *cloudTopRight;
     UIImageView *cloudBottomRight;
     NSLayoutConstraint *cloudMiddleLeftHorizontalConstraint;
+    NSLayoutConstraint *cloudMiddleRightHorizontalConstraint;
     NSLayoutConstraint *cloudTopRightHorizontalConstraint;
     NSLayoutConstraint *cloudBottomRightHorizontalConstraint;
 }
@@ -559,6 +561,7 @@ UserDefaultsKey const PsiCashHasBeenOnboardedBoolKey = @"PsiCash.HasBeenOnboarde
 - (void)addViews {
     UIImage *cloud = [UIImage imageNamed:@"cloud"];
     cloudMiddleLeft = [[UIImageView alloc] initWithImage:cloud];
+    cloudMiddleRight = [[UIImageView alloc] initWithImage:cloud];
     cloudTopRight = [[UIImageView alloc] initWithImage:cloud];
     cloudBottomRight = [[UIImageView alloc] initWithImage:cloud];
     versionLabel = [[UILabel alloc] init];
@@ -573,6 +576,7 @@ UserDefaultsKey const PsiCashHasBeenOnboardedBoolKey = @"PsiCash.HasBeenOnboarde
     // NOTE: some views overlap so the order they are added
     //       is important for user interaction.
     [self.view addSubview:cloudMiddleLeft];
+    [self.view addSubview:cloudMiddleRight];
     [self.view addSubview:cloudTopRight];
     [self.view addSubview:cloudBottomRight];
     [self.view addSubview:psiCashView];
@@ -594,6 +598,11 @@ UserDefaultsKey const PsiCashHasBeenOnboardedBoolKey = @"PsiCash.HasBeenOnboarde
     [cloudMiddleLeft.heightAnchor constraintEqualToConstant:cloud.size.height].active = YES;
     [cloudMiddleLeft.widthAnchor constraintEqualToConstant:cloud.size.width].active = YES;
 
+    cloudMiddleRight.translatesAutoresizingMaskIntoConstraints = NO;
+    [cloudMiddleRight.centerYAnchor constraintEqualToAnchor:cloudMiddleLeft.centerYAnchor].active = YES;
+    [cloudMiddleRight.heightAnchor constraintEqualToConstant:cloud.size.height].active = YES;
+    [cloudMiddleRight.widthAnchor constraintEqualToConstant:cloud.size.width].active = YES;
+
     cloudTopRight.translatesAutoresizingMaskIntoConstraints = NO;
     [cloudTopRight.topAnchor constraintEqualToAnchor:psiCashView.bottomAnchor constant:-20].active = YES;
     [cloudTopRight.heightAnchor constraintEqualToConstant:cloud.size.height].active = YES;
@@ -606,10 +615,12 @@ UserDefaultsKey const PsiCashHasBeenOnboardedBoolKey = @"PsiCash.HasBeenOnboarde
 
     // Default horizontal positioning for clouds
     cloudMiddleLeftHorizontalConstraint = [cloudMiddleLeft.centerXAnchor constraintEqualToAnchor:self.view.leftAnchor constant:0];
+    cloudMiddleRightHorizontalConstraint = [cloudMiddleRight.centerXAnchor constraintEqualToAnchor:self.view.rightAnchor constant:0]; // hide at first
     cloudTopRightHorizontalConstraint = [cloudTopRight.centerXAnchor constraintEqualToAnchor:self.view.rightAnchor constant:0];
     cloudBottomRightHorizontalConstraint = [cloudBottomRight.centerXAnchor constraintEqualToAnchor:self.view.rightAnchor constant:0];
 
     cloudMiddleLeftHorizontalConstraint.active = YES;
+    cloudMiddleRightHorizontalConstraint.active = YES;
     cloudTopRightHorizontalConstraint.active = YES;
     cloudBottomRightHorizontalConstraint.active = YES;
 }
@@ -633,6 +644,7 @@ UserDefaultsKey const PsiCashHasBeenOnboardedBoolKey = @"PsiCash.HasBeenOnboarde
     // Remove all on-going cloud animations
     void (^removeAllCloudAnimations)(void) = ^void(void) {
         [cloudMiddleLeft.layer removeAllAnimations];
+        [cloudMiddleRight.layer removeAllAnimations];
         [cloudTopRight.layer removeAllAnimations];
         [cloudBottomRight.layer removeAllAnimations];
     };
@@ -640,29 +652,40 @@ UserDefaultsKey const PsiCashHasBeenOnboardedBoolKey = @"PsiCash.HasBeenOnboarde
     // Position clouds in their default positions
     void (^disconnectedAndConnectedLayout)(void) = ^void(void) {
         cloudMiddleLeftHorizontalConstraint.constant = cloudMiddleLeftOffset;
+        cloudMiddleRightHorizontalConstraint.constant = cloudWidth/2; // hidden
         cloudTopRightHorizontalConstraint.constant = cloudTopRightOffset;
         cloudBottomRightHorizontalConstraint.constant = cloudBottomRightOffset;
         [self.view layoutIfNeeded];
     };
 
-    if ([VPNManager mapIsVPNActive:s] && s != VPNStatusConnected) {
+    if ([VPNManager mapIsVPNActive:s] && s != VPNStatusConnected
+        && s != VPNStatusRestarting) {
         // Connecting
 
+        CGFloat cloudMiddleLeftHorizontalTranslation = -cloudWidth; // hidden
+        CGFloat cloudMiddleRightHorizontalTranslation = -1.f/6 * cloudWidth + cloudMiddleLeftOffset;
+        CGFloat cloudTopRightHorizontalTranslation = -3.f/4 * self.view.frame.size.width + cloudTopRightOffset;
+        CGFloat cloudBottomRightHorizontalTranslation = -3.f/4 * self.view.frame.size.width + cloudBottomRightOffset;
+
+        CGFloat maxTranslation = MAX(ABS(cloudMiddleLeftHorizontalTranslation), ABS(cloudMiddleRightHorizontalTranslation));
+        maxTranslation = MAX(maxTranslation, MAX(ABS(cloudTopRightHorizontalTranslation),ABS(cloudBottomRightHorizontalTranslation)));
+
         void (^connectingLayout)(void) = ^void(void) {
-            cloudMiddleLeftHorizontalConstraint.constant = self.view.frame.size.width + cloudMiddleLeftOffset + 1.f/6*cloudWidth;
-            cloudTopRightHorizontalConstraint.constant = -3.f/4 * self.view.frame.size.width + cloudTopRightOffset;
-            cloudBottomRightHorizontalConstraint.constant = -3.f/4 * self.view.frame.size.width + cloudBottomRightOffset;
+            cloudMiddleLeftHorizontalConstraint.constant = cloudMiddleLeftHorizontalTranslation;
+            cloudMiddleRightHorizontalConstraint.constant = cloudMiddleRightHorizontalTranslation;
+            cloudTopRightHorizontalConstraint.constant = cloudTopRightHorizontalTranslation;
+            cloudBottomRightHorizontalConstraint.constant = cloudBottomRightHorizontalTranslation;
             [self.view layoutIfNeeded];
         };
 
-        if (!([VPNManager mapIsVPNActive:previousState] && previousState != VPNStatusConnected)
-            && previousState != VPNStatusInvalid /* don't animate if the app was just opened */ ) {
+        cloudMiddleRightHorizontalConstraint.constant = maxTranslation - cloudWidth/2;
+        [self.view layoutIfNeeded];
+
+        if (!([VPNManager mapIsVPNActive:previousState]
+              && previousState != VPNStatusConnected)
+              && previousState != VPNStatusInvalid /* don't animate if the app was just opened */ ) {
 
             removeAllCloudAnimations();
-
-            // Move middle left cloud to the right so it can animate in from the right side.
-            cloudMiddleLeftHorizontalConstraint.constant = self.view.frame.size.width * 2;
-            [self.view layoutIfNeeded];
 
             [UIView animateWithDuration:0.5 * animationTimeStretchFactor delay:0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
                 connectingLayout();
@@ -682,7 +705,8 @@ UserDefaultsKey const PsiCashHasBeenOnboardedBoolKey = @"PsiCash.HasBeenOnboarde
 
             [UIView animateWithDuration:0.25 * animationTimeStretchFactor delay:0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
 
-                cloudMiddleLeftHorizontalConstraint.constant = self.view.frame.size.width + cloudWidth/2 + cloudMiddleLeftOffset;
+                cloudMiddleLeftHorizontalConstraint.constant = -cloudWidth; // hidden
+                cloudMiddleRightHorizontalConstraint.constant = cloudWidth/2 + cloudMiddleLeftOffset;
                 cloudTopRightHorizontalConstraint.constant = -self.view.frame.size.width - cloudWidth/2 + cloudTopRightOffset;
                 cloudBottomRightHorizontalConstraint.constant = -self.view.frame.size.width - cloudWidth/2 + cloudBottomRightOffset;
                 [self.view layoutIfNeeded];
@@ -694,6 +718,7 @@ UserDefaultsKey const PsiCashHasBeenOnboardedBoolKey = @"PsiCash.HasBeenOnboarde
                     // same distance from their final point.
                     CGFloat maxOffset = MAX(MAX(ABS(cloudMiddleLeftOffset), ABS(cloudTopRightOffset)), ABS(cloudBottomRightOffset));
                     cloudMiddleLeftHorizontalConstraint.constant = -cloudWidth/2 - (maxOffset + cloudMiddleLeftOffset);
+                    cloudMiddleRightHorizontalConstraint.constant = cloudWidth/2 - (maxOffset + cloudMiddleLeftOffset);
                     cloudTopRightHorizontalConstraint.constant = cloudWidth/2 + (maxOffset + cloudTopRightOffset);
                     cloudBottomRightHorizontalConstraint.constant = cloudWidth/2 + (maxOffset + cloudBottomRightOffset);
                     [self.view layoutIfNeeded];
