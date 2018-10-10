@@ -1,6 +1,17 @@
 nb:
   app_name: Psiphon
   subtitle: Grenseløs
+  keywords: Psiphon, mellomtjener
+  subscriptions:
+    weekly:
+      title: Premium 1 uke
+      description: Automatisk fornybart abonnement
+    monthly:
+      title: Premium 1 måned
+      description: Automatisk fornybart abonnement
+    yearly:
+      title: Premium 1 år
+      description: Automatisk fornybart abonnement
   description: |
     Etter å ha hjulpet millioner av brukere med hente programmene og nå sidene de elsker, har vi lansert den første Psiphon-appen for iOS. Vårt nye program gir sømløs tilgang til Psiphons omgåelsesnettverk, og kobler deg sikkert til programmene og sidene dine.
 
@@ -25,14 +36,3 @@ nb:
 
     Personvernspraksis: https://psiphon.ca/en/privacy.html
     Bruksvilkår: https://psiphon.ca/en/license.html
-  keywords: Psiphon, mellomtjener
-  subscriptions:
-    weekly:
-      title: Premium 1 uke
-      description: Automatisk fornybart abonnement
-    monthly:
-      title: Premium 1 måned
-      description: Automatisk fornybart abonnement
-    yearly:
-      title: Premium 1 år
-      description: Automatisk fornybart abonnement

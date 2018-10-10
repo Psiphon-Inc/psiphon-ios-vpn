@@ -1,94 +1,101 @@
 /* Title of the section in the subscription dialog that shows currently active subscription information. */
-"ACTIVE_SUBSCRIPTION_SECTION_TITLE" = "Current subscription";
+"ACTIVE_SUBSCRIPTION_SECTION_TITLE" = "Anda sudah berlangganan!";
 
-/*[UNTRANSLATED] Text for button that tell users there will by a short video ad. */
-"AD_LOADED" = "Watch a short video while we get ready to connect you";
+/* Text for app subtitle on main view. */
+"APP_SUB_TITLE_MAIN_VIEW" = "MELAMPAUI BATAS";
 
-/*[UNTRANSLATED] Text for app subtitle on main view. */
-"APP_SUB_TITLE_MAIN_VIEW" = "BEYOND BORDERS";
+/* Text showing the app version. The '%@' placeholder is the version number. So it will look like 'v.2'. */
+"APP_VERSION" = "v.1%@";
 
-/*[UNTRANSLATED] Text showing the app version. The '%@' placeholder is the version number. So it will look like 'v.2'. */
-"APP_VERSION" = "v.%@";
+/* Title of the button which takes the user to the previous screen. Text should be short and one word when possible. */
+"BACK_BUTTON" = "Kembali";
 
-/*[UNTRANSLATED] Alert message informing user that the device clock needs to be updated with current time */
-"BAD_CLOCK_ALERT_MESSAGE" = "We've detected the time on your device is out of sync with your time zone. Please update your clock settings and restart the app";
+/* Alert message informing user that the device clock needs to be updated with current time */
+"BAD_CLOCK_ALERT_MESSAGE" = "Kami mendeteksi waktu di perangkat Anda tidak sinkron dengan zona waktu Anda. Silakan perbarui pengaturan waktu Anda dan hidupkan ulang aplikasi.";
 
-/*[UNTRANSLATED] Alert message informing user that subscription receipt can not be verified */
-"BAD_RECEIPT_ALERT_MESSAGE" = "Your subscription receipt can not be verified, please refresh it and try again.";
+/* Alert message informing user that subscription receipt can not be verified */
+"BAD_RECEIPT_ALERT_MESSAGE" = "Bukti pembayaran langganan Anda tidak bisa diverifikasi, silakan segarkan ulang dan coba lagi.";
+
+/* Buy button on a pop-up alert where the user uses a slider to select how many hours of Speed Boost they want to purchase and then presses the buy button to make the purchase. */
+"BUY_BUTTON" = "Beli";
 
 /* Title of button on alert view which shows the progress of the user's buy request. Hitting this button dismisses the alert and the buy request continues processing in the background. */
 "BUY_REQUEST_PROGRESS_ALERT_DISMISS_BUTTON_TITLE" = "Abaikan";
 
-/* Premium subscriptions dialog header text */
-"BUY_SUBSCRIPTIONS_HEADER_TEXT" = "Remove ads and surf the Internet faster with a premium subscription!";
-
 /* Buy subscription dialog footer text */
-"BUY_SUBSCRIPTIONS_NOTICES" = "A subscription is auto-renewable which means that once purchased it will be automatically renewed until you cancel it 24 hours prior to the end of the current period.\n\nYour iTunes Account will be charged for renewal within 24-hours prior to the end of the current period with the cost of subscription.";
+"BUY_SUBSCRIPTIONS_FOOTER_TEXT" = "Langganan akan automatis diperbarui, yang berarti sekali pembelian dilakukan automatis akan diperbarui, kecuali jika Anda batal dalam 24 jam sebelum berakhirnya masa berlaku\nAkun iTunes Anda akan dikenakan biaya untuk pembaruan dalam 24 jam sebelum berakhirnya masa berlaku saat ini dengan harga saat langganan.";
 
-/*[UNTRANSLATED] Alert message informing user that their subscription has expired or that they're not a subscriber, therefore Psiphon can only be started from the Psiphon app. DO NOT translate 'Psiphon'. */
-"CANNOT_START_TUNNEL_DUE_TO_SUBSCRIPTION" = "Your Psiphon subscription has expired.\nSince you're not a subscriber or your subscription has expired, Psiphon can only be started from the Psiphon app.\n\nPlease open the Psiphon app.";
+/* Cancel button on a pop-up alert. The alert will be dismissed if the user presses this button. */
+"CANCEL_BUTTON" = "Batal";
+
+/* Alert message informing user that their subscription has expired or that they're not a subscriber, therefore Psiphon can only be started from the Psiphon app. DO NOT translate 'Psiphon'. */
+"CANNOT_START_TUNNEL_DUE_TO_SUBSCRIPTION" = "Langganan Psiphon Anda telah kedaluwarsa.\nKarena Anda bukan lagi pelanggan atau langganan Anda telah kedaluwarsa, Psiphon hanya akan dijalankan ulang dari aplikasi Psiphon.\n\nSilakan buka aplikasi Psiphon.";
+
+/* Main text in the 'Upstream Proxy Error' dialog box. This is shown when the user has directly altered these settings, and those settings are (probably) erroneous. DO NOT translate 'Psiphon'. */
+"CHECK_UPSTREAM_PROXY_SETTING" = "Anda telah menyetel Psiphon untuk menggunakan proksi hulu.\nNamun, kami sepertinya tidak dapat terhubung dengan peladen Psiphon melalui proksi tersebut.\nSilakan perbaiki pengaturan dan ulangi lagi.";
+
+/* Alert dialog body informing the user that the 'Auto-start VPN on demand' feature will be disabled and that the VPN cannot be stopped. */
+"CONNECT_ON_DEMAND_ALERT_BODY" = "\"Auto-star VPN\" akan dinonaktifkan sementara sampai Psiphon VPN dihidupkan ulang.";
+
+/* Alert dialog title informing user that 'Auto-start VPN' feature is enabled */
+"CONNECT_ON_DEMAND_ALERT_TITLE" = "Auto-start VPN diaktifkan";
 
 /* Text above change region button that allows user to select their desired server region */
-"CHANGE_REGION" = "Change region";
+"CONNECT_VIA" = "Sambungkan lewat";
 
-/*[UNTRANSLATED] Main text in the 'Upstream Proxy Error' dialog box. This is shown when the user has directly altered these settings, and those settings are (probably) erroneous. DO NOT translate 'Psiphon'. */
-"CHECK_UPSTREAM_PROXY_SETTING" = "You have configured Psiphon to use an upstream proxy.\nHowever, we seem to be unable to connect to a Psiphon server through that proxy.\nPlease fix the settings and try again.";
+/* Alert dialog title of alert which informs the user that the settings file in the app is corrupt. */
+"CORRUPT_SETTINGS_ALERT_TITLE" = "Pengaturan Rusak";
 
-/*[UNTRANSLATED] Alert dialog body informing the user that the 'Auto-start VPN on demand' feature will be disabled and that the VPN cannot be stopped. */
-"CONNECT_ON_DEMAND_ALERT_BODY" = "\"Auto-start VPN\" will be temporarily disabled until the next time Psiphon VPN is started.";
-
-/*[UNTRANSLATED] Alert dialog title informing user that 'Auto-start VPN' feature is enabled */
-"CONNECT_ON_DEMAND_ALERT_TITLE" = "Auto-start VPN is enabled";
-
-/*[UNTRANSLATED] Alert dialog title of alert which informs the user that the settings file in the app is corrupt. */
-"CORRUPT_SETTINGS_ALERT_TITLE" = "Corrupt Settings";
-
-/*[UNTRANSLATED] Alert dialog message informing the user that the settings file in the app is corrupt, and that they can potentially fix this issue by re-installing the app. */
-"CORRUPT_SETTINGS_MESSAGE" = "Your app settings file appears to be corrupt. Try reinstalling the app to repair the file.";
+/* Alert dialog message informing the user that the settings file in the app is corrupt, and that they can potentially fix this issue by re-installing the app. */
+"CORRUPT_SETTINGS_MESSAGE" = "Pengaturan aplikasi Anda sepertinya rusak. Coba pasang ulang aplikasi untuk memperbaiki berkas.";
 
 /* Title of the button that dismisses region selection dialog
    Title of the button that dismisses the subscriptions menu */
 "DONE_ACTION" = "Selesai";
 
-/*[UNTRANSLATED] Alert dialog message indicating to the user that the app has failed to upload their feedback and that they should try again.  */
-"FEEDBACK_UPLOAD_FAILED_MESSAGE" = "An error occured while uploading your feedback. Please try again. Your feedback helps us improve the Psiphon network.";
+/* Alert dialog message indicating to the user that the app has failed to upload their feedback and that they should try again.  */
+"FEEDBACK_UPLOAD_FAILED_MESSAGE" = "Sebuah kegagalan muncul ketika mengunggah umpan balik Anda. Silakan coba lagi. Umpan balik Anda akan membantu kami meningkatkan jaringan Psiphon.";
 
-/*[UNTRANSLATED] Alert dialog title indicating to the user that the app has failed to upload their feedback to Psiphon's servers. */
-"FEEDBACK_UPLOAD_FAILED_TITLE" = "Feedback upload failed";
+/* Alert dialog title indicating to the user that the app has failed to upload their feedback to Psiphon's servers. */
+"FEEDBACK_UPLOAD_FAILED_TITLE" = "Unggah umpan balik gagal";
 
-/*[UNTRANSLATED] Title of button on alert view which shows the progress of the users feedback being uploaded to Psiphon's servers. Hitting this button dismisses the alert and the upload continues in the background. */
-"FEEDBACK_UPLOAD_IN_PROGRESS_BACKGROUND_BUTTON_TITLE" = "Background";
+/* Title of button on alert view which shows the progress of the users feedback being uploaded to Psiphon's servers. Hitting this button dismisses the alert and the upload continues in the background. */
+"FEEDBACK_UPLOAD_IN_PROGRESS_BACKGROUND_BUTTON_TITLE" = "Latar belakang";
 
-/*[UNTRANSLATED] Alert dialog title indicating to the user that their feedback is being encrypted and securely uploaded to Psiphon's servers. */
-"FEEDBACK_UPLOAD_IN_PROGRESS_MESSAGE" = "Sending feedback…";
+/* Alert dialog title indicating to the user that their feedback is being encrypted and securely uploaded to Psiphon's servers. */
+"FEEDBACK_UPLOAD_IN_PROGRESS_MESSAGE" = "Mengirimkan umpan balik...";
 
-/*[UNTRANSLATED] Alert dialog message thanking the user for helping improve the Psiphon network by submitting their feedback. */
-"FEEDBACK_UPLOAD_SUCCESSFUL_MESSAGE" = "Thank you for helping improve Psiphon!";
+/* Alert dialog message thanking the user for helping improve the Psiphon network by submitting their feedback. */
+"FEEDBACK_UPLOAD_SUCCESSFUL_MESSAGE" = "Terima kasih sudah membantu meningkatkan Psiphon!";
 
-/*[UNTRANSLATED] Alert dialog title indicating to the user that their feedback has been successfully uploaded to Psiphon's servers. */
-"FEEDBACK_UPLOAD_SUCCESSFUL_TITLE" = "Feedback uploaded successfully";
+/* Alert dialog title indicating to the user that their feedback has been successfully uploaded to Psiphon's servers. */
+"FEEDBACK_UPLOAD_SUCCESSFUL_TITLE" = "Umpan balik berhasil diunggah";
 
 /* External link to the license page. Please update this with the correct language specific link (if available) e.g. https://psiphon.ca/fr/license.html for french. */
 "LICENSE_PAGE_URL" = "https://psiphon.ca/id/license.html";
 
-/*[UNTRANSLATED] Text displayed while app loads */
-"LOADING" = "Loading...";
+/* Text displayed while app loads */
+"LOADING" = "Memuat...";
 
-/* Manage subscription button */
-"MANAGE_SUBSCRIPTIONS_BUTTON" = "Manage my subscription";
+/* Alert title informing user there is no internet connection */
+"NO_INTERNET" = "Tidak Ada Jaringan Internet";
 
-/*[UNTRANSLATED] Alert title informing user there is no internet connection */
-"NO_INTERNET" = "No Internet Connection";
-
-/*[UNTRANSLATED] Subscriptions view text that is visible when the list of subscriptions is not available */
-"NO_PRODUCTS_TEXT" = "Could not retrieve subscriptions from the App Store. Pull to refresh or try again later.";
+/* Subscriptions view text that is visible when the list of subscriptions is not available */
+"NO_PRODUCTS_TEXT" = "Tidak bisa mengambil kembali langganan dari App Store. Tarik untuk menyegarkan ulang atau coba kembali nanti.";
 
 /* Alert OK Button
+   OK button on a pop-up alert. The alert will be dismissed when the user presses this button.
    OK button title */
 "OK_BUTTON" = "OKE";
 
-/*[UNTRANSLATED] Alert message informing the user they should open the app to finish connecting to the VPN. DO NOT translate 'Psiphon'. */
-"OPEN_PSIPHON_APP" = "Please open Psiphon app to finish connecting.";
+/* Text of button at the bottom right or left (depending on rtl) of the last onboarding screen which allows the user to finish the onboarding sequence. Note: should be all uppercase (capitalized) when possible. */
+"ONBOARDING_DONE_BUTTON" = "SELESAI";
+
+/* Text of button at the bottom right or left (depending on rtl) of the onboarding screens which allows the user to move on to the next onboarding screen. Note: should be all uppercase (capitalized) when possible. */
+"ONBOARDING_NEXT_BUTTON" = "SELANJUTNYA";
+
+/* Alert message informing the user they should open the app to finish connecting to the VPN. DO NOT translate 'Psiphon'. */
+"OPEN_PSIPHON_APP" = "Silakan buka aplikasi Psiphon untuk mengakhiri sambungan.";
 
 /* Cancel button title. */
 "PRIVACY_POLICY_CANCEL_BUTTON" = "Batal";
@@ -96,86 +103,189 @@
 /* External link to the privacy policy page. Please update this with the correct language specific link (if available) e.g. https://psiphon.ca/fr/privacy.html for french. */
 "PRIVACY_POLICY_URL" = "https://psiphon.ca/id/privacy.html";
 
-/*[UNTRANSLATED] Paragraph text in the 'What does Psiphon do with your VPN data?' subsection of the 'User VPN Data' section of the Privacy page. */
-"PrivacyInformationCollectedVpndataWhatdoespsiphondowithPara1" = "Psiphon looks at your data only to the degree necessary to collect statistics about the usage of our system. We record the total bytes transferred for a user connection, as well as the bytes transferred for some specific domains. These statistics are discarded after 60 days.";
+/* Paragraph text in the 'What does Psiphon do with your VPN data?' subsection of the 'User VPN Data' section of the Privacy page. */
+"PrivacyInformationCollectedVpndataWhatdoespsiphondowithPara1" = "Psiphon melihat data Anda hanya sampai pada tingkat seperlunya saja untuk mengumpulkan staistik mengenai penggunaan sistem kami. Kami merekam total jumlah bit yang ditransfer untuk koneksi pgguna, juga bit yang ditransfer untuk domain-domain tertentu. Statistik ini dibuang setelah 60 hari. ";
 
-/*[UNTRANSLATED] Paragraph text in the 'What does Psiphon do with your VPN data?' subsection of the 'User VPN Data' section of the Privacy page. */
-"PrivacyInformationCollectedVpndataWhatdoespsiphondowithPara2" = "Psiphon does not inspect or record full URLs (only domain names), and does not further inspect your data. Psiphon does not modify your data as it passes through the VPN.";
+/* Paragraph text in the 'What does Psiphon do with your VPN data?' subsection of the 'User VPN Data' section of the Privacy page. */
+"PrivacyInformationCollectedVpndataWhatdoespsiphondowithPara2" = "Psiphon tidak memeriksa atau merekam URL lengkap (hanya nama domain), dan tidak memeriksa lebih lanjut data Anda. Psiphon tidak mengubah data Anda saat melewati VPN.";
 
-/*[UNTRANSLATED] Paragraph text in the 'What does Psiphon do with your VPN data?' subsection of the 'User VPN Data' section of the Privacy page. */
-"PrivacyInformationCollectedVpndataWhatdoespsiphondowithPara3" = "Even this coarse data would be difficult to link back to you, since we immediately convert your IP address to geographical info and then discard the IP. Nor is any other identifying information stored.";
+/* Paragraph text in the 'What does Psiphon do with your VPN data?' subsection of the 'User VPN Data' section of the Privacy page. */
+"PrivacyInformationCollectedVpndataWhatdoespsiphondowithPara3" = "Bahkan data kasar ini akan sulit untuk dihubungkan kembali kepada Anda, karena kami segera mengubah alamat IP Anda ke info geografis dan kemudian membuang informasi IP. Juga tidak ada informasi identitas lain yang disimpan.";
 
-/*[UNTRANSLATED] Sub-heading in the 'User VPN Data' section of the Privacy Policy page. The section describes what Psiphon does with the little bit of VPN data that it collects stats from. */
-"PrivacyInformationCollectedVpndataWhatdoespsiphondowithSubhead" = "What does Psiphon do with your VPN data?";
+/* Sub-heading in the 'User VPN Data' section of the Privacy Policy page. The section describes what Psiphon does with the little bit of VPN data that it collects stats from. */
+"PrivacyInformationCollectedVpndataWhatdoespsiphondowithSubhead" = "Apa yang Psiphon lakukan kepada data VPN Anda?";
 
-/*[UNTRANSLATED] Paragraph text in the 'Who does Psiphon share these statistics with?' subsection of the 'User VPN Data' section of the Privacy page. */
-"PrivacyInformationCollectedVpndataWhopsiphonshareswithPara1" = "When sharing with third parties, Psiphon only ever provides coarse, aggregate domain-bytes statistics. We never share per-session information or any other possibly-identifying information.";
+/* Paragraph text in the 'Who does Psiphon share these statistics with?' subsection of the 'User VPN Data' section of the Privacy page. */
+"PrivacyInformationCollectedVpndataWhopsiphonshareswithPara1" = "Ketika berbagi dengan pihak ketiga, Psiphon hanya menyediakan statistik rata-rat yang kasar. Kami tidak pernah membagikan informasi tiap sesi ataupun informasi lainnya yang dapat mengidentifikasi. ";
 
-/*[UNTRANSLATED] Paragraph text in the 'Who does Psiphon share these statistics with?' subsection of the 'User VPN Data' section of the Privacy page. */
-"PrivacyInformationCollectedVpndataWhopsiphonshareswithPara2" = "This sharing is typically done with services or organizations we collaborate with — as <a href=\"http://www.dw.com/en/psiphon-helps-dodge-the-online-trackers/a-16765092\" target=\"_blank\">we did with DW</a> a few years ago. These statistics help us and them answer questions like, “how many bytes were transferred through Psiphon for DW.com to all users in Iran in April?”";
+/* Paragraph text in the 'Who does Psiphon share these statistics with?' subsection of the 'User VPN Data' section of the Privacy page. */
+"PrivacyInformationCollectedVpndataWhopsiphonshareswithPara2" = "Proses berbagi ini biasanya dilakukan dengan layanan atau organisasi yang kami bekerjasama -- seperti yang kami lakukan dengan DW beberapa tahun yang lalu. Statistik ini membantu kami dan mereka menjawab pertanyaan seperti, \"berapa bit ditransfer melalui Psiphon ke DW.com untuk semua penggna di Iran pada bulan Aprl?\"";
 
-/*[UNTRANSLATED] Paragraph text in the 'Who does Psiphon share these statistics with?' subsection of the 'User VPN Data' section of the Privacy page. */
-"PrivacyInformationCollectedVpndataWhopsiphonshareswithPara3" = "Again, we specifically do not give detailed or potentially user-identifying information to partners or any other third parties.";
+/* Paragraph text in the 'Who does Psiphon share these statistics with?' subsection of the 'User VPN Data' section of the Privacy page. */
+"PrivacyInformationCollectedVpndataWhopsiphonshareswithPara3" = "Sekali lagi, kami secara khusus tidak memberi informasi rinci atau yang berpotensi mengidentifikasi pengguna kepada rekan ataupun pihak ketiga.";
 
-/*[UNTRANSLATED] Sub-heading in the 'User VPN Data' section of the Privacy Policy page. The section describes who Psiphon shares VPN data stats. The answer will be organizations and not specific people, in case that makes a difference in your language. */
-"PrivacyInformationCollectedVpndataWhopsiphonshareswithSubhead" = "Who does Psiphon share these statistics with?";
+/* Sub-heading in the 'User VPN Data' section of the Privacy Policy page. The section describes who Psiphon shares VPN data stats. The answer will be organizations and not specific people, in case that makes a difference in your language. */
+"PrivacyInformationCollectedVpndataWhopsiphonshareswithSubhead" = "Kepada siapa Psiphon membagikan statistik ini?";
 
-/*[UNTRANSLATED] Paragraph text in the 'Why should you care?' subsection of the 'User VPN Data' section of the Privacy page. */
-"PrivacyInformationCollectedVpndataWhycarePara1" = "When using a VPN or proxy you should be concerned about what the provider can see in your data, collect from it, and do to it. For some web and email connections, it is theoretically possible for a VPN to see, collect, and modify the contents.";
+/* Paragraph text in the 'Why should you care?' subsection of the 'User VPN Data' section of the Privacy page. */
+"PrivacyInformationCollectedVpndataWhycarePara1" = "Ketika menggunakan VPN atau proxy Anda perlu mewaspadai apa yang provider dapat lihat, kumpulkan, dan lakukan pada data Anda. Untuk koneksi web dan surel, secara teori VPN dapat melihat, mengumpulkan, dan mengubah isinya.  ";
 
-/*[UNTRANSLATED] Sub-heading in the 'User VPN Data' section of the Privacy Policy page. The section describes why it's important for users to consider what a VPN does with their traffic data. */
-"PrivacyInformationCollectedVpndataWhycareSubhead" = "Why should you care?";
+/* Sub-heading in the 'User VPN Data' section of the Privacy Policy page. The section describes why it's important for users to consider what a VPN does with their traffic data. */
+"PrivacyInformationCollectedVpndataWhycareSubhead" = "Mengapa anda perlu peduli?";
 
-/*[UNTRANSLATED] Bullet list text under 'Why does Psiphon need these statistics?' subsection of the 'User VPN Data' section of the Privacy page. */
-"PrivacyInformationCollectedVpndataWhydoespsiphonneedPara1Item1" = "Estimate future costs: The huge amount of user data we transfer each month is a major factor in our costs. It is vital for us to see and understand usage fluctuations.";
+/* Bullet list text under 'Why does Psiphon need these statistics?' subsection of the 'User VPN Data' section of the Privacy page. */
+"PrivacyInformationCollectedVpndataWhydoespsiphonneedPara1Item1" = "Memperkirakan biaya masa depan: Besarnya jumlah data pengguna yang kami transfer setiap bulan merupakan faktor utama dalam biaya kami. Sangat penting bagi kami untuk melihat dan memahami naik turunnya penggunaan.";
 
-/*[UNTRANSLATED] Bullet list text under 'Why does Psiphon need these statistics?' subsection of the 'User VPN Data' section of the Privacy page. */
-"PrivacyInformationCollectedVpndataWhydoespsiphonneedPara1Item2" = "Optimize for traffic types: Video streaming has different network requirements than web browsing does, which is different than chat, which is different than voice, and so on. Statistics about the number of bytes transferred for some major media providers helps us to understand how to provide the best experience to our users.";
+/* Bullet list text under 'Why does Psiphon need these statistics?' subsection of the 'User VPN Data' section of the Privacy page. */
+"PrivacyInformationCollectedVpndataWhydoespsiphonneedPara1Item2" = "Mengoptimalkan untuk tipe lalu lintas: Video streaming punya persyaratan jaringan berbeda ketimbang peramban web, yang sangat berbeda ketimbang percakapan, yang berbeda dengan suara dan demikian demikian. Statistik about the number of bytes transferred for some major media providers helps us to untuk memahami bagaimana cara terbaik menyediakan pengalaman terbaik bagi para pengguna kami. ";
 
-/*[UNTRANSLATED] Bullet list text under 'Why does Psiphon need these statistics?' subsection of the 'User VPN Data' section of the Privacy page. If available in your language, the blog post URLs should be updated to the localized post. */
-"PrivacyInformationCollectedVpndataWhydoespsiphonneedPara1Item3" = "Determine the nature of major censorship events: Sites and services often get blocked suddenly and without warning, which can lead to huge variations in regional usage of Psiphon. For example, we had up to 20x surges in usage within a day when <a href=\"https://blog-en.psiphon.ca/2016/07/psiphon-usage-surges-as-brazil-blocks.html\" target=\"_blank\">Brazil blocked WhatsApp</a> or <a href=\"https://blog-en.psiphon.ca/2016/11/social-media-and-internet-ban-in-turkey.html\" target=\"_blank\">Turkey blocked social media</a>.";
+/* Bullet list text under 'Why does Psiphon need these statistics?' subsection of the 'User VPN Data' section of the Privacy page. If available in your language, the blog post URLs should be updated to the localized post. */
+"PrivacyInformationCollectedVpndataWhydoespsiphonneedPara1Item3" = "Menentukan sifat dari peristiwa penyensoran besar: Ssitus dan layanan seringkali terkena blok tiba-tiba dan tanpa peringatan, yang dapat menuntun pada variasi besar penggunaan regional Psiphon. Sebagai contoh, kami memproleh 20x peningkatan pengguna dalam beberapa hari saat <a href=\"https://blog-en.psiphon.ca/2016/07/psiphon-usage-surges-as-brazil-blocks.html\" target=\"_blank\">Brasil memblok WhatsApp</a> atau <a href=\"https://blog-en.psiphon.ca/2016/11/social-media-and-internet-ban-in-turkey.html\" target=\"_blank\">Turki memblok media sosial</a>.";
 
-/*[UNTRANSLATED] Bullet list text under 'Why does Psiphon need these statistics?' subsection of the 'User VPN Data' section of the Privacy page. (English is using 'who' instead of 'whom' to reflect common idiom.) */
-"PrivacyInformationCollectedVpndataWhydoespsiphonneedPara1Item4" = "Understand who we need to help: Some sites and services will never get blocked anywhere, some will always be blocked in certain countries, and some will occasionally be blocked in some countries. To make sure that our users are able to communicate and learn freely, we need to understand these patterns, see who is affected, and work with partners to make sure their services work best with Psiphon.";
+/* Bullet list text under 'Why does Psiphon need these statistics?' subsection of the 'User VPN Data' section of the Privacy page. (English is using 'who' instead of 'whom' to reflect common idiom.) */
+"PrivacyInformationCollectedVpndataWhydoespsiphonneedPara1Item4" = "Pahami siapa yang perlu kami bantu: Beberapa situs dan layanan tidak akan pernah diblokir di mana pun, beberapa akan selalu diblokir di negara-negara tertentu, dan beberapa terkadang akan diblokir di beberapa negara. Untuk memastikan bahwa pengguna kami dapat berkomunikasi dan belajar dengan bebas, kami perlu memahami pola-pola ini, melihat siapa yang terpengaruh, dan bekerja dengan rekan kami untuk memastikan layanan mereka bekerja paling baik dengan Psiphon.";
 
-/*[UNTRANSLATED] Paragraph text in the 'Why does Psiphon need these statistics?' subsection of the 'User VPN Data' section of the Privacy page. This paragraph serves as preamble for a detailed list, which is why it ends with a colon. */
-"PrivacyInformationCollectedVpndataWhydoespsiphonneedPara1ListStart" = "This data is used by us to determine how our network is being used. This allows us to do things like:";
+/* Paragraph text in the 'Why does Psiphon need these statistics?' subsection of the 'User VPN Data' section of the Privacy page. This paragraph serves as preamble for a detailed list, which is why it ends with a colon. */
+"PrivacyInformationCollectedVpndataWhydoespsiphonneedPara1ListStart" = "Data ini kami gunakan untuk menentukan bagaimana jaringan kami digunakan. Ini membantu kami untuk melakukan hal seperti:";
 
-/*[UNTRANSLATED] Sub-heading in the 'User VPN Data' section of the Privacy Policy page. The section describes why Psiphon needs VPN data stats. */
-"PrivacyInformationCollectedVpndataWhydoespsiphonneedSubhead" = "Why does Psiphon need these statistics?";
+/* Sub-heading in the 'User VPN Data' section of the Privacy Policy page. The section describes why Psiphon needs VPN data stats. */
+"PrivacyInformationCollectedVpndataWhydoespsiphonneedSubhead" = "Kenapa Psiphon membutuhkan statistik ini?";
 
-/*[UNTRANSLATED] Button label at the end of privacy policy screen, indication that when clicked user can start using Psiphon */
-"PrivacyPolicyGetStartedButtonTitle" = "Get started with Psiphon";
+/* Button label at the end of privacy policy screen, indication that when clicked user can start using Psiphon */
+"PrivacyPolicyGetStartedButtonTitle" = "Memulai dengan Psiphon";
 
 /* page title for the Privacy Policy page */
 "PrivacyTitle" = "Kebjiakan Privasi";
 
-/*[UNTRANSLATED] Refresh app receipt button title */
-"REFRESH_APP_RECEIPT_BUTTON_TITLE" = "Refresh app receipt";
+/* Text which appears in the Speed Boost meter when the user's buy request for Speed Boost is being processed. Please keep this text concise as the width of the text box is restricted in size.
+   Text which appears in the Speed Boost meter when the user's buy request for Speed Boost is being processed. Please keep this text concise as the width of the text box is restricted in size. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
+"PSICASH_BUYING_SPEED_BOOST_TEXT" = "Membeli Pendorong Kecepatan...";
 
-/* Restore my subscription button title */
-"RESTORE_SUBSCRIPTION_BUTTON_TITLE" = "Restore my existing subscription";
+/*[UNTRANSLATED] Alert message indicating to the user that they can't purchase Speed Boost while the app is connecting. Do not translate 'Psiphon'. */
+"PSICASH_CONNECTED_OR_DISCONNECTED" = "Speed Boost purchase unavailable while Psiphon is connecting.";
+
+/* Text conveying to the user how much the displayed number of hours of Speed Boost costs. %@ should be not be removed but placed in the appropriate location because it will be replaced with the number of hours programmatically. After this sentence the cost of the Speed Boost item will be displayed. For example '1 hour of Speed Boost at 50'. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
+"PSICASH_CONVERSION_HOUR_MESSAGE" = "%@ jam Speed Boost di";
+
+/* Text conveying to the user how much the displayed number of hours of Speed Boost costs. %@ should be not be removed but placed in the appropriate location because it will be replaced with the number of hours programmatically. After this sentence the cost of the Speed Boost item will be displayed. For example '2 hours of Speed Boost at 100'. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
+"PSICASH_CONVERSION_HOURS_MESSAGE" = "%@ jam Speed Boost di";
+
+/* Text conveying to the user how much the displayed number of hours of Speed Boost costs. %@ should be not be removed but placed in the appropriate location because it will be replaced with the number of hours programmatically. After this sentence the cost of the Speed Boost item will be displayed. For example '5 mins of Speed Boost at 25'. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
+"PSICASH_CONVERSION_MINS_MESSAGE" = "%d menit Speed Boost di";
+
+/* Text conveying to the user that the target Speed Boost product is being loaded. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
+"PSICASH_LOADING_SPEED_BOOST_PRODUCTS_MESSAGE" = "Memuat produk Speed Boost...";
+
+/* Body text on the first PsiCash onboarding screen. This is in reference to the ability to use PsiCash to purchase 'Speed Boost', which grants unlimited network speed through Psiphon. */
+"PSICASH_ONBOARDING_PAGE_1_TEXT" = "Cara baru bagi Anda untuk menikmati kecepatan maksimum, sepenuhnya gratis.";
+
+/* Title text on the first PsiCash onboarding screen. The word 'PsiCash' should not be translated or transliterated. PsiCash is a reward system within Psiphon where users can build up credit that they can then spend on 'Speed Boost' (unlimited connection speed) and, in the future, other rewards. */
+"PSICASH_ONBOARDING_PAGE_1_TITLE" = "Katakan halo pada PsiCash";
+
+/* Body text on the second PsiCash onboarding screen. This is telling the user how to earn PsiCash. The user will be rewared for visiting Psiphon-related websites and pages, browsing and interacting with active content. 'Connect' is in the 'Connect to Psiphon' sense; 'engage with our content' is in the sense of 'visit our sites, read our posts, interact and participate with our content'. The English is intentionally somewhat obtuse, but the translation can use whatever works best. Note: 'PsiCash' should not be translated or transliterated. */
+"PSICASH_ONBOARDING_PAGE_2_TEXT" = "Terhubung dan terlibat dengan isi kami untuk mendapatkan PsiCash.";
+
+/* Title text on the second PsiCash onboarding screen. This shows the user's PsiCash balance, which is the amount of credit they have. Note: 'PsiCash' should not be translated or transliterated. */
+"PSICASH_ONBOARDING_PAGE_2_TITLE" = "Saldo PsiCash Anda";
+
+/* Body text on the third PsiCash onboarding screen. This indicates that 'Speed Boost' can be purchased with PsiCash credit after earning a sufficient amount. Note: 'PsiCash' should not be translated or transliterated. */
+"PSICASH_ONBOARDING_PAGE_3_TEXT" = "Ketika Anda mengumpulkan cukup PsiCash, Anda bisa mengaktifkan Speed Boost dan menikmati Psiphon dalam kecepatan maksimal!";
+
+/*[UNTRANSLATED] Title text on the third PsiCash onboarding screen. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
+"PSICASH_ONBOARDING_PAGE_3_TITLE" = "Speed Boost";
+
+/* Alert error message informing user that the app failed to retrieve their PsiCash information from the server. Note: 'PsiCash' should not be translated or transliterated. */
+"PSICASH_REFRESH_STATE_FAILED_MESSAGE_TEXT" = "Gagal memperbarui status PsiCash";
+
+/* Text which appears in the Speed Boost meter when the user has activated Speed Boost. Please keep this text concise as the width of the text box is restricted in size. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
+"PSICASH_SPEED_BOOST_ACTIVE_TEXT" = "Speed Boost Aktif";
+
+/* Text which appears in the Speed Boost meter when the user has earned enough PsiCash to buy Speed Boost. Please keep this text concise as the width of the text box is restricted in size. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
+"PSICASH_SPEED_BOOST_AVAILABLE_TEXT" = "Speed Boost Tersedia";
+
+/* Text which appears in the Speed Boost meter when the user has not yet earned enough PsiCash to Speed Boost. This text will be accompanied with a percentage indicating to the user how close they are to earning enough PsiCash to buy a minimum amount of Speed Boost. Please keep this text concise as the width of the text box is restricted in size. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
+"PSICASH_SPEED_BOOST_CHARGING_TEXT" = "Speed Boost Mengisi Daya";
+
+/* Text which appears in the Speed Boost meter when the user has not earned any PsiCash yet. Please keep this text concise as the width of the text box is restricted in size. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. Note: 'PsiCash' should not be translated or transliterated. */
+"PSICASH_SPEED_BOOST_NOAUTH_TEXT" = "Dapatkan PsiCash untuk membeli Speed Boost";
+
+/* Alert error message informing user that their Speed Boost purchase request failed because they already have an active Speed Boost purchase. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
+"PSICASH_SPEED_BOOST_PURCHASE_FAILED_ALREADY_ACTIVE_PURCHASE" = "Gagal: Anda sudah memiliki pembelian aktif Speed Boost\n ";
+
+/* Alert error message informing user that their Speed Boost purchase request failed because they have an insufficient balance. Required price in PsiCash will be appended after the colon. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
+"PSICASH_SPEED_BOOST_PURCHASE_FAILED_INSUFFICIENT_FUNDS" = "Saldo tidak cukup untuk membeli Speed Boost. Harga:";
+
+/* Alert error message informing user that their Speed Boost purchase request failed because their app has entered an invalid state and that they should try updating or reinstalling the app. Note: 'PsiCash' should not be translated or transliterated. */
+"PSICASH_SPEED_BOOST_PURCHASE_FAILED_INVALID_TOKENS" = "Token Tidak Sah: aplikasi masuk status tidak sah. Silakan pasang ulang aplikasi untuk terus menggunakan PsiCash.";
+
+/* Alert message informing user that their Speed Boost purchase attempt unexpectedly failed and that they should try again in a few minutes. */
+"PSICASH_SPEED_BOOST_PURCHASE_FAILED_MESSAGE_TEXT" = "Pembelian gagal, silakan ulangi lagi dalam beberapa menit.";
+
+/* Alert error message informing user that their Speed Boost purchase request failed because they tried to make the purchase with an out of date product price. Updated price will be appended after the colon. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
+"PSICASH_SPEED_BOOST_PURCHASE_FAILED_PRICE_OUT_OF_DATE" = "Gagal: harga Speed Boost sudah tidak berlaku. Harga:";
+
+/* Alert error message informing user that their Speed Boost purchase request failed because they tried to make the purchase with an out of date product price and that the price is being updated. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
+"PSICASH_SPEED_BOOST_PURCHASE_FAILED_PRICE_OUT_OF_DATE_NO_MISMATCH" = "Gagal: harga Speed Boost sudah tidak berlaku. Perbarui produk lokal.";
+
+/* Alert error message informing user that their Speed Boost purchase request failed because they attempted to buy a product that is no longer available and that they should try updating or reinstalling the app. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
+"PSICASH_SPEED_BOOST_PURCHASE_FAILED_PRODUCT_NOT_FOUND" = "Gagal: produk Speed Boost tidak ditemukan. Produk lokal diperbarui. Aplikasi Anda mungkin kedaluwarsa. Silakan cek untuk pembaruan.";
+
+/* Alert error message informing user that their Speed Boost purchase request failed due to a server error and that they should try again in a few minutes */
+"PSICASH_SPEED_BOOST_PURCHASE_FAILED_SERVER_ERROR" = "Peladen gagal. Silakan coba beberapa menit lagi.";
+
+/* Alert error message informing user that their Speed Boost purchase request failed because of an unknown error. Note: 'PsiCash' should not be translated or transliterated. */
+"PSICASH_SPEED_BOOST_PURCHASE_FAILED_UNEXPECTED_CODE" = "Kode status tidak sah atau tak terduga dikembalikan dari perpustakaan PsiCash.";
+
+/* Description text above a list of scenarios where the user should try refreshing their app receipt to restore an existing subscription */
+"REFRESH_APP_RECEIPT_BUTTON_DESCRIPTION_LIST_HEADER" = "Segarkan kembali tanda terima aplikasi Anda jika:";
+
+/* Point in a list of scenarios where the user should try refreshing their app receipt to restore an existing subscription */
+"REFRESH_APP_RECEIPT_BUTTON_DESCRIPTION_POINT_1" = "Anda perlu untuk mengulangi langganan di akun Anda dengan ponsel baru.";
+
+/* Point in a list of scenarios where the user should try refreshing their app receipt to restore an existing subscription */
+"REFRESH_APP_RECEIPT_BUTTON_DESCRIPTION_POINT_2" = "Anda tidak bisa melihat langganan yang Anda beli di perangkat ini.";
+
+/* Button which, when pressed, attempts to restore any existing subscriptions the user has purchased */
+"RESTORE_SUBSCRIPTION_BUTTON" = "Kembalikan Berlangganan";
+
+/* Title of button which triggers an attempt to restore the user's existing subscription */
+"RESTORE_SUBSCRIPTION_BUTTON_TITLE" = "Kembalikan berlangganan saya";
+
+/*[UNTRANSLATED] Button label indicating to the user that they will earn PsiCash if they watch a video advertisement. The word 'PsiCash' should not be translated or transliterated. */
+"REWARDED_VIDEO_EARN_PSICASH" = "Watch a video to earn PsiCash!";
+
+/* Title of cell in settings menu which, when pressed, reinstalls the user's VPN profile for Psiphon */
+"SETTINGS_REINSTALL_VPN_CONFIGURATION_CELL_TITLE" = "Pasang ulang profil VPN";
 
 /* Subscriptions item title in the app settings when user has an active subscription. Clicking this item opens subscriptions view */
 "SETTINGS_SUBSCRIPTION_ACTIVE" = "Subskripsi";
 
-/*[UNTRANSLATED] Subscriptions item title in the app settings when user does not have an active subscription. Clicking this item opens subscriptions view. If “Premium” doesn't easily translate, please choose a term that conveys “Pro” or “Extra” or “Better” or “Elite”. */
-"SETTINGS_SUBSCRIPTION_NOT_ACTIVE" = "Go premium!";
+/* Subscriptions item title in the app settings when user does not have an active subscription. Clicking this item opens subscriptions view. If “Premium” doesn't easily translate, please choose a term that conveys “Pro” or “Extra” or “Better” or “Elite”. */
+"SETTINGS_SUBSCRIPTION_NOT_ACTIVE" = "Pilih premium!";
 
-/*[UNTRANSLATED] Automatically start VPN On demand settings toggle */
-"SETTINGS_VPN_ON_DEMAND" = "Auto-start VPN on demand";
+/* Automatically start VPN On demand settings toggle */
+"SETTINGS_VPN_ON_DEMAND" = "Memulai-sendiri VPN dalam permintaan";
 
-/*[UNTRANSLATED] VPN On demand setting detail text showing when user doesn't have an active subscription and the item is disabled. */
-"SETTINGS_VPN_ON_DEMAND_DETAIL" = "Subscription only";
+/* VPN On demand setting detail text showing when user doesn't have an active subscription and the item is disabled. */
+"SETTINGS_VPN_ON_DEMAND_DETAIL" = "Hanya berlangganan";
 
-/*[UNTRANSLATED] Text for button that opens paid subscriptions manager UI. If “Premium” doesn't easily translate, please choose a term that conveys “Pro” or “Extra” or “Better” or “Elite”. */
-"SUBSCRIPTION_BUTTON_TITLE" = "Go premium now!";
+/* Text for button that opens paid subscriptions manager UI. If “Premium” doesn't easily translate, please choose a term that conveys “Pro” or “Extra” or “Better” or “Elite”. */
+"SUBSCRIPTION_BUTTON_TITLE" = "Pilih premium sekarang!";
 
-/*[UNTRANSLATED] Alert message informing user that their subscription has expired, and that Psiphon will stop in an hour if subscription is not renewed. Do not translate 'Psiphon'. */
-"SUBSCRIPTION_EXPIRED_WILL_KILL_TUNNEL" = "Your Psiphon subscription has expired. Psiphon will stop automatically in an hour if subscription is not renewed. Open the Psiphon app to review your subscription to continue using premium features.";
+/* Alert message informing user that their subscription has expired, and that Psiphon will stop in an hour if subscription is not renewed. Do not translate 'Psiphon'. */
+"SUBSCRIPTION_EXPIRED_WILL_KILL_TUNNEL" = "Langganan Psiphon Anda telah kedaluwarsa. Psiphon akan otomatis berhenti dalam satu jam jika berlangganan tidak diperbarui. Buka aplikasi Psiphon untuk meninjau berlangganan Anda untuk lanjut menggunakan fitur premium.";
 
 /* Title of the dialog for available in-app paid subscriptions */
 "SUBSCRIPTIONS" = "Subskripsi";
+
+/* Title of the banner on the subscriptions page that tells the user how many initial free days they get once subscribed */
+"SUBSCRIPTIONS_PAGE_BANNER_TITLE" = "Dapatkan 3 hari GRATIS premium ketika berlangganan untuk rencana apapun";
+
+/* Title of the button on the subscriptions page which takes the user of of the app to iTunes where they can view detailed information about their subscription */
+"SUBSCRIPTIONS_PAGE_MANAGE_SUBSCRIPTION_BUTTON" = "Kelola langganan Anda";
+
+/* Title of the button on the subscriptions page which, when pressed, navigates the user to the page where they can restore their existing subscription */
+"SUBSCRIPTIONS_PAGE_RESTORE_SUBSCRIPTION_BUTTON" = "Saya tidak menemukan langganan saya";
 
 /* Title of button on subscriptions page which opens Psiphon's privacy policy webpage */
 "SUBSCRIPTIONS_PRIVACY_POLICY_BUTTON_TEXT" = "Kebjiakan Privasi";
@@ -183,29 +293,29 @@
 /* Title of button on subscriptions page which opens Psiphon's terms of use webpage */
 "SUBSCRIPTIONS_TERMS_OF_USE_BUTTON_TEXT" = "Ketentuan Penggunaan";
 
-/*[UNTRANSLATED] Alert message informing user that Psiphon has been stopped automatically since the subscription has expired. Do not translate 'Psiphon'. */
-"TUNNEL_KILLED" = "Psiphon has been stopped automatically since your subscription has expired.";
+/* Alert message informing user that Psiphon has been stopped automatically since the subscription has expired. Do not translate 'Psiphon'. */
+"TUNNEL_KILLED" = "Psiphon telah berhenti otomatis sejak berlangganan Anda telah kedaluwarsa.";
 
-/*[UNTRANSLATED] Alert message informing user to turn on their cellular data or wifi to connect to the internet */
-"TURN_ON_DATE" = "Turn on cellular data or use Wi-Fi to access data.";
+/* Alert message informing user to turn on their cellular data or wifi to connect to the internet */
+"TURN_ON_DATE" = "Hidupkan paket data atau gunakan Wi-Fi untuk mengakses data.";
 
-/*[UNTRANSLATED] Alert dialog message informing the user that an error occurred while starting Psiphon (Do not translate 'Psiphon'). The user should try again, and if the problem persists, they should try reinstalling the app. */
-"VPN_START_FAIL_MESSAGE" = "An error occurred while starting Psiphon. Please try again. If this problem persists, try reinstalling the Psiphon app.";
+/* Alert dialog message informing the user that an error occurred while starting Psiphon (Do not translate 'Psiphon'). The user should try again, and if the problem persists, they should try reinstalling the app. */
+"VPN_START_FAIL_MESSAGE" = "Kegagalan terjadi ketika memulai Psiphon. Silakan coba lagi. Jika masalah masih terjadi, coba pasang ulang aplikasi Psiphon.";
 
-/*[UNTRANSLATED] Alert dialog message informing the user that an error occurred while starting Psiphon because they selected an egress region that is no longer available (Do not translate 'Psiphon'). The user should select a different region and try again. Note: the backslash before each quotation mark should be left as is for formatting. */
-"VPN_START_FAIL_REGION_INVALID_MESSAGE" = "The region you selected is no longer available. You must choose a new region or change to the default \"Best performance\" choice.";
+/* Alert dialog message informing the user that an error occurred while starting Psiphon because they selected an egress region that is no longer available (Do not translate 'Psiphon'). The user should select a different region and try again. Note: the backslash before each quotation mark should be left as is for formatting. */
+"VPN_START_FAIL_REGION_INVALID_MESSAGE" = "Daerah yang Anda pilih tidak lagi tersedia. Anda harus memilih daerah baru atau ubah ke pilihan bawaan \"Kinerja terbaik\".";
 
-/*[UNTRANSLATED] Alert dialog title indicating to the user that Psiphon was unable to start (MainViewController) */
-"VPN_START_FAIL_TITLE" = "Unable to start";
+/* Alert dialog title indicating to the user that Psiphon was unable to start (MainViewController) */
+"VPN_START_FAIL_TITLE" = "Tidak bisa memulai";
 
-/*[UNTRANSLATED] ('Privacy Policy' should be the same translation as privacy policy button VPN_START_PRIVACY_POLICY_BUTTON), (Do not translate 'VPN profile'), (Do not translate 'Psiphon') */
-"VPN_START_PERMISSION_DENIED_MESSAGE" = "Psiphon needs your permission to install a VPN profile in order to connect.\n\nPsiphon is committed to protecting the privacy of our users. You can review our privacy policy by tapping \"Privacy Policy\".";
+/* ('Privacy Policy' should be the same translation as privacy policy button VPN_START_PRIVACY_POLICY_BUTTON), (Do not translate 'VPN profile'), (Do not translate 'Psiphon') */
+"VPN_START_PERMISSION_DENIED_MESSAGE" = "Psiphon memerlukan izin Anda untuk pasang profil VPN agar terhubung.\n\nPsiphon berkomitmen untuk melindungi privasi para penggunanya. Anda bisa meninjau kebijakan privasi kami dengan mengetuk \"Kebijakan Privasi\".";
 
 /* Dismiss button title. Dismisses pop-up alert when the user clicks on the button */
 "VPN_START_PERMISSION_DISMISS_BUTTON" = "Abaikan";
 
-/*[UNTRANSLATED] Alert dialog title indicating to the user that Psiphon needs their permission */
-"VPN_START_PERMISSION_REQUIRED_TITLE" = "Permission required";
+/* Alert dialog title indicating to the user that Psiphon needs their permission */
+"VPN_START_PERMISSION_REQUIRED_TITLE" = "Memerlukan izin";
 
 /* Button label taking user's to our Privacy Policy page */
 "VPN_START_PRIVACY_POLICY_BUTTON" = "Kebjiakan Privasi";
@@ -225,8 +335,8 @@
 /* Status when the VPN is in an invalid state. For example, if the user doesn't give permission for the VPN configuration to be installed, and therefore the Psiphon VPN can't even try to connect. */
 "VPN_STATUS_INVALID" = "Terputus";
 
-/*[UNTRANSLATED] Status when the VPN was connected to a Psiphon server, got disconnected unexpectedly, and is currently trying to reconnect */
-"VPN_STATUS_RECONNECTING" = "Reconnecting";
+/* Status when the VPN was connected to a Psiphon server, got disconnected unexpectedly, and is currently trying to reconnect */
+"VPN_STATUS_RECONNECTING" = "Menyambung kembali";
 
 /* Status when the VPN is restarting. */
 "VPN_STATUS_RESTARTING" = "Sedang restart";

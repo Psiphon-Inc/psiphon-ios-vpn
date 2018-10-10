@@ -5,7 +5,10 @@ de:
   subscriptions:
     weekly:
       title: Premium 1 Woche
+      description: Automatisch verlängerbares Abonnement
     monthly:
       title: Premium 1 Monat
+      description: Automatisch verlängerbares Abonnement
     yearly:
       title: Premium 1 Jahr
+      description: Automatisch verlängerbares Abonnement
