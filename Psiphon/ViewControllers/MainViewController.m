@@ -184,7 +184,7 @@ UserDefaultsKey const PsiCashHasBeenOnboardedBoolKey = @"PsiCash.HasBeenOnboarde
     __weak MainViewController *weakSelf = self;
     
     // Observe VPN status for updating UI state
-    RACDisposable *tunnelStatusDisposable = [self.vpnManager.lastTunnelStatus
+    RACDisposable *tunnelStatusDisposable = [[self.vpnManager.lastTunnelStatus distinctUntilChanged]
       subscribeNext:^(NSNumber *statusObject) {
           VPNStatus s = (VPNStatus) [statusObject integerValue];
 
