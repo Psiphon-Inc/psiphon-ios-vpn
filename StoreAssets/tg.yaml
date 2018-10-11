@@ -1,6 +1,17 @@
 tg:
   app_name: Psiphon
   subtitle: Берун аз сарҳадҳо
+  keywords: Psiphon, прокси
+  subscriptions:
+    weekly:
+      title: Аъло 1 ҳафта
+      description: Аъзогии авто-навшаванда
+    monthly:
+      title: Аъло 1 моҳ
+      description: Аъзогии авто-навшаванда
+    yearly:
+      title: Аъло 1 сол
+      description: Аъзогии авто-навшаванда
   description: |
     Пас аз кӯмак ба даҳҳо миллион истифодабарандагон барои дастрасӣ ба нармафзор ва сомонаҳои дӯстдоштаашон, Psiphon якумин нармафзори худро барои iOS ба истифода дод! Нармафзори нави мо ба таври осон алоқаро ба шабакаи Psiphon таъмин намуда, бе мамоният шуморо ба нармафзор ва сомонаҳо пайваст месозад.
 
@@ -26,14 +37,3 @@ tg:
 
     Сиёсати Махфият: https://psiphon.ca/en/privacy.html
     Шарти Истифодабарӣ: https://psiphon.ca/en/license.html
-  keywords: Psiphon, прокси
-  subscriptions:
-    weekly:
-      title: Аъло 1 ҳафта
-      description: Аъзогии авто-навшаванда
-    monthly:
-      title: Аъло 1 моҳ
-      description: Аъзогии авто-навшаванда
-    yearly:
-      title: Аъло 1 сол
-      description: Аъзогии авто-навшаванда

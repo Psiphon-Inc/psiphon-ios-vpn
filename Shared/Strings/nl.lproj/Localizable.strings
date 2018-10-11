@@ -1,8 +1,5 @@
 /* Title of the section in the subscription dialog that shows currently active subscription information. */
-"ACTIVE_SUBSCRIPTION_SECTION_TITLE" = "Huidig abonnement";
-
-/* Text for button that tell users there will by a short video ad. */
-"AD_LOADED" = "Bekijk een korte video terwijl we ons voorbereiden om u te verbinden";
+"ACTIVE_SUBSCRIPTION_SECTION_TITLE" = "U bent ingeschreven!";
 
 /* Text for app subtitle on main view. */
 "APP_SUB_TITLE_MAIN_VIEW" = "VOORBIJ GRENZEN";
@@ -10,26 +7,29 @@
 /*[UNTRANSLATED] Text showing the app version. The '%@' placeholder is the version number. So it will look like 'v.2'. */
 "APP_VERSION" = "v.%@";
 
+/* Title of the button which takes the user to the previous screen. Text should be short and one word when possible. */
+"BACK_BUTTON" = "Terug";
+
 /* Alert message informing user that the device clock needs to be updated with current time */
 "BAD_CLOCK_ALERT_MESSAGE" = "We hebben ontdekt de tijd op het apparaat is niet gesynchroniseerd met uw tijdzone. Werk uw klokinstellingen bij en  de app opnieuw herstarten.";
 
 /* Alert message informing user that subscription receipt can not be verified */
 "BAD_RECEIPT_ALERT_MESSAGE" = "Je abonnement ontvangst kan niet worden geverifieerd. Vernieuw deze en probeer het opnieuw.";
 
+/* Buy button on a pop-up alert where the user uses a slider to select how many hours of Speed Boost they want to purchase and then presses the buy button to make the purchase. */
+"BUY_BUTTON" = "Koop";
+
 /* Title of button on alert view which shows the progress of the user's buy request. Hitting this button dismisses the alert and the buy request continues processing in the background. */
 "BUY_REQUEST_PROGRESS_ALERT_DISMISS_BUTTON_TITLE" = "Afwijzen";
 
-/* Premium subscriptions dialog header text */
-"BUY_SUBSCRIPTIONS_HEADER_TEXT" = "Verwijder advertenties en surf sneller met een premium abonnement op internet!";
-
 /* Buy subscription dialog footer text */
-"BUY_SUBSCRIPTIONS_NOTICES" = "Een abonnement wordt automatisch verlengd, wat betekent dat zodra het gekocht wordt automatisch verlengd tot u annuleer het 24 uur voorafgaand aan het einde van de huidige periode.\n\nUw iTunes-account wordt in rekening gebracht voor vernieuwing binnen 24 uur voor het einde van de lopende periode met de kosten van het abonnement.";
+"BUY_SUBSCRIPTIONS_FOOTER_TEXT" = "en abonnement wordt automatisch verlengd, wat betekent dat zodra het gekocht wordt automatisch verlengd totdat jij gaat annuleren 24 uur voorafgaand aan het einde van de huidige periode.\n\nJou iTunes  Account wordt in rekening gebracht voor vernieuwing binnen 24 uur voor het einde van de lopende periode met de kosten van het abonnement.";
+
+/* Cancel button on a pop-up alert. The alert will be dismissed if the user presses this button. */
+"CANCEL_BUTTON" = "Annuleren";
 
 /* Alert message informing user that their subscription has expired or that they're not a subscriber, therefore Psiphon can only be started from the Psiphon app. DO NOT translate 'Psiphon'. */
 "CANNOT_START_TUNNEL_DUE_TO_SUBSCRIPTION" = "Je Psiphon-abonnement is verlopen.\nOmdat u geen abonnee bent of uw abonnement is verlopen, kan Psiphon alleen worden gestart vanuit de Psiphon-app.\n\nOpen alstublieft de Psiphon-app.";
-
-/* Text above change region button that allows user to select their desired server region */
-"CHANGE_REGION" = "Wijzigen regio";
 
 /* Main text in the 'Upstream Proxy Error' dialog box. This is shown when the user has directly altered these settings, and those settings are (probably) erroneous. DO NOT translate 'Psiphon'. */
 "CHECK_UPSTREAM_PROXY_SETTING" = "U hebt Psiphon geconfigureerd om een upstream-proxy te gebruiken.\nWe lijken echter geen verbinding te kunnen maken met een Psiphon-server via die proxy.\nCorrigeer de instellingen en probeer het opnieuw.";
@@ -39,6 +39,9 @@
 
 /* Alert dialog title informing user that 'Auto-start VPN' feature is enabled */
 "CONNECT_ON_DEMAND_ALERT_TITLE" = "Auto-start VPN is ingeschakeld";
+
+/* Text above change region button that allows user to select their desired server region */
+"CONNECT_VIA" = "Verbinden via";
 
 /* Alert dialog title of alert which informs the user that the settings file in the app is corrupt. */
 "CORRUPT_SETTINGS_ALERT_TITLE" = "Corrupte Instellingen";
@@ -74,9 +77,6 @@
 /* Text displayed while app loads */
 "LOADING" = "Laden...";
 
-/* Manage subscription button */
-"MANAGE_SUBSCRIPTIONS_BUTTON" = "Beheer mijn abonnement";
-
 /* Alert title informing user there is no internet connection */
 "NO_INTERNET" = "Geen Internet Verbinding";
 
@@ -84,8 +84,15 @@
 "NO_PRODUCTS_TEXT" = "Kan geen abonnementen ophalen uit de App Store. Haal om te vernieuwen of probeer het later opnieuw.";
 
 /*[UNTRANSLATED] Alert OK Button
+   OK button on a pop-up alert. The alert will be dismissed when the user presses this button.
    OK button title */
 "OK_BUTTON" = "OK";
+
+/* Text of button at the bottom right or left (depending on rtl) of the last onboarding screen which allows the user to finish the onboarding sequence. Note: should be all uppercase (capitalized) when possible. */
+"ONBOARDING_DONE_BUTTON" = "KLAAR";
+
+/* Text of button at the bottom right or left (depending on rtl) of the onboarding screens which allows the user to move on to the next onboarding screen. Note: should be all uppercase (capitalized) when possible. */
+"ONBOARDING_NEXT_BUTTON" = "VOLGENDE";
 
 /* Alert message informing the user they should open the app to finish connecting to the VPN. DO NOT translate 'Psiphon'. */
 "OPEN_PSIPHON_APP" = "A.u.b open de Psiphon-app om de verbinding te voltooien.";
@@ -150,11 +157,105 @@
 /* page title for the Privacy Policy page */
 "PrivacyTitle" = "privacybeleid";
 
-/* Refresh app receipt button title */
-"REFRESH_APP_RECEIPT_BUTTON_TITLE" = "Vernieuw app-ontvangst";
+/* Text which appears in the Speed Boost meter when the user's buy request for Speed Boost is being processed. Please keep this text concise as the width of the text box is restricted in size.
+   Text which appears in the Speed Boost meter when the user's buy request for Speed Boost is being processed. Please keep this text concise as the width of the text box is restricted in size. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
+"PSICASH_BUYING_SPEED_BOOST_TEXT" = "Speed Boost kopen ...";
 
-/* Restore my subscription button title */
-"RESTORE_SUBSCRIPTION_BUTTON_TITLE" = "Herstel mijn bestaand abonnement";
+/* Alert message indicating to the user that they can't purchase Speed Boost while the app is connecting. Do not translate 'Psiphon'. */
+"PSICASH_CONNECTED_OR_DISCONNECTED" = "Speed Boost-aankoop niet beschikbaar terwijl Psiphon verbinding maakt.";
+
+/* Text conveying to the user how much the displayed number of hours of Speed Boost costs. %@ should be not be removed but placed in the appropriate location because it will be replaced with the number of hours programmatically. After this sentence the cost of the Speed Boost item will be displayed. For example '1 hour of Speed Boost at 50'. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
+"PSICASH_CONVERSION_HOUR_MESSAGE" = "%@uur van Speed Boost om";
+
+/* Text conveying to the user how much the displayed number of hours of Speed Boost costs. %@ should be not be removed but placed in the appropriate location because it will be replaced with the number of hours programmatically. After this sentence the cost of the Speed Boost item will be displayed. For example '2 hours of Speed Boost at 100'. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
+"PSICASH_CONVERSION_HOURS_MESSAGE" = "%@uren van Speed Boost om";
+
+/* Text conveying to the user how much the displayed number of hours of Speed Boost costs. %@ should be not be removed but placed in the appropriate location because it will be replaced with the number of hours programmatically. After this sentence the cost of the Speed Boost item will be displayed. For example '5 mins of Speed Boost at 25'. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
+"PSICASH_CONVERSION_MINS_MESSAGE" = "%dminuten van Speed Boost om";
+
+/* Text conveying to the user that the target Speed Boost product is being loaded. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
+"PSICASH_LOADING_SPEED_BOOST_PRODUCTS_MESSAGE" = "Speed Boost product laden ...";
+
+/* Body text on the first PsiCash onboarding screen. This is in reference to the ability to use PsiCash to purchase 'Speed Boost', which grants unlimited network speed through Psiphon. */
+"PSICASH_ONBOARDING_PAGE_1_TEXT" = "Een nieuwe manier om van maximale snelheden te genieten, helemaal vrij.";
+
+/* Title text on the first PsiCash onboarding screen. The word 'PsiCash' should not be translated or transliterated. PsiCash is a reward system within Psiphon where users can build up credit that they can then spend on 'Speed Boost' (unlimited connection speed) and, in the future, other rewards. */
+"PSICASH_ONBOARDING_PAGE_1_TITLE" = "Zeg Hallo naar PsiCash";
+
+/* Body text on the second PsiCash onboarding screen. This is telling the user how to earn PsiCash. The user will be rewared for visiting Psiphon-related websites and pages, browsing and interacting with active content. 'Connect' is in the 'Connect to Psiphon' sense; 'engage with our content' is in the sense of 'visit our sites, read our posts, interact and participate with our content'. The English is intentionally somewhat obtuse, but the translation can use whatever works best. Note: 'PsiCash' should not be translated or transliterated. */
+"PSICASH_ONBOARDING_PAGE_2_TEXT" = "Contact maken en gaan met onze content aan PsiCash verdienen.";
+
+/* Title text on the second PsiCash onboarding screen. This shows the user's PsiCash balance, which is the amount of credit they have. Note: 'PsiCash' should not be translated or transliterated. */
+"PSICASH_ONBOARDING_PAGE_2_TITLE" = "Jou PsiCash balans";
+
+/* Body text on the third PsiCash onboarding screen. This indicates that 'Speed Boost' can be purchased with PsiCash credit after earning a sufficient amount. Note: 'PsiCash' should not be translated or transliterated. */
+"PSICASH_ONBOARDING_PAGE_3_TEXT" = "Als je genoeg PsiCash hebt verzameld, kun je Speed Boost activeren en op maximale snelheid van Psiphon genieten!";
+
+/*[UNTRANSLATED] Title text on the third PsiCash onboarding screen. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
+"PSICASH_ONBOARDING_PAGE_3_TITLE" = "Speed Boost";
+
+/* Alert error message informing user that the app failed to retrieve their PsiCash information from the server. Note: 'PsiCash' should not be translated or transliterated. */
+"PSICASH_REFRESH_STATE_FAILED_MESSAGE_TEXT" = "Update mislukt  bij PsiCash staat";
+
+/* Text which appears in the Speed Boost meter when the user has activated Speed Boost. Please keep this text concise as the width of the text box is restricted in size. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
+"PSICASH_SPEED_BOOST_ACTIVE_TEXT" = "Speed Boost Actief";
+
+/* Text which appears in the Speed Boost meter when the user has earned enough PsiCash to buy Speed Boost. Please keep this text concise as the width of the text box is restricted in size. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
+"PSICASH_SPEED_BOOST_AVAILABLE_TEXT" = "Speed Boost Beschikbaar";
+
+/* Text which appears in the Speed Boost meter when the user has not yet earned enough PsiCash to Speed Boost. This text will be accompanied with a percentage indicating to the user how close they are to earning enough PsiCash to buy a minimum amount of Speed Boost. Please keep this text concise as the width of the text box is restricted in size. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
+"PSICASH_SPEED_BOOST_CHARGING_TEXT" = "Speed Boost Laden";
+
+/* Text which appears in the Speed Boost meter when the user has not earned any PsiCash yet. Please keep this text concise as the width of the text box is restricted in size. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. Note: 'PsiCash' should not be translated or transliterated. */
+"PSICASH_SPEED_BOOST_NOAUTH_TEXT" = "Verdien PsiCash om Speed Boost te kopen";
+
+/* Alert error message informing user that their Speed Boost purchase request failed because they already have an active Speed Boost purchase. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
+"PSICASH_SPEED_BOOST_PURCHASE_FAILED_ALREADY_ACTIVE_PURCHASE" = "Fout: je hebt al een actief Speed Boost aankoop.";
+
+/* Alert error message informing user that their Speed Boost purchase request failed because they have an insufficient balance. Required price in PsiCash will be appended after the colon. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
+"PSICASH_SPEED_BOOST_PURCHASE_FAILED_INSUFFICIENT_FUNDS" = "Onvoldoende saldo voor aankoop van Speed Boost.";
+
+/* Alert error message informing user that their Speed Boost purchase request failed because their app has entered an invalid state and that they should try updating or reinstalling the app. Note: 'PsiCash' should not be translated or transliterated. */
+"PSICASH_SPEED_BOOST_PURCHASE_FAILED_INVALID_TOKENS" = "Ongeldige Tokens: de app heeft een ongeldig staat ingevoerd. Installeer de app opnieuw om PsiCash te blijven gebruiken.";
+
+/* Alert message informing user that their Speed Boost purchase attempt unexpectedly failed and that they should try again in a few minutes. */
+"PSICASH_SPEED_BOOST_PURCHASE_FAILED_MESSAGE_TEXT" = "Aankoop mislukt, probeer het over een paar minuten opnieuw.";
+
+/* Alert error message informing user that their Speed Boost purchase request failed because they tried to make the purchase with an out of date product price. Updated price will be appended after the colon. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
+"PSICASH_SPEED_BOOST_PURCHASE_FAILED_PRICE_OUT_OF_DATE" = "Fout: prijs van Speed Boost is verouderd. Prijs:";
+
+/* Alert error message informing user that their Speed Boost purchase request failed because they tried to make the purchase with an out of date product price and that the price is being updated. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
+"PSICASH_SPEED_BOOST_PURCHASE_FAILED_PRICE_OUT_OF_DATE_NO_MISMATCH" = "Fout: prijs van Speed Boost is verouderd. Lokale producten bijwerken.";
+
+/* Alert error message informing user that their Speed Boost purchase request failed because they attempted to buy a product that is no longer available and that they should try updating or reinstalling the app. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
+"PSICASH_SPEED_BOOST_PURCHASE_FAILED_PRODUCT_NOT_FOUND" = "Fout: Speed Boost product niet gevonden. Lokale producten bijgewerkt. Je app is mogelijk verouderd. Controleer alstublieft op updates.";
+
+/* Alert error message informing user that their Speed Boost purchase request failed due to a server error and that they should try again in a few minutes */
+"PSICASH_SPEED_BOOST_PURCHASE_FAILED_SERVER_ERROR" = "Server fout. Probeer het over een paar minuten opnieuw.";
+
+/* Alert error message informing user that their Speed Boost purchase request failed because of an unknown error. Note: 'PsiCash' should not be translated or transliterated. */
+"PSICASH_SPEED_BOOST_PURCHASE_FAILED_UNEXPECTED_CODE" = "Ongeldige of onverwacht status code geretourneerd door PsiCash bibliotheek.";
+
+/* Description text above a list of scenarios where the user should try refreshing their app receipt to restore an existing subscription */
+"REFRESH_APP_RECEIPT_BUTTON_DESCRIPTION_LIST_HEADER" = "Vernieuw je app kwitantie wanneer:";
+
+/* Point in a list of scenarios where the user should try refreshing their app receipt to restore an existing subscription */
+"REFRESH_APP_RECEIPT_BUTTON_DESCRIPTION_POINT_1" = "U moet een abonnement op uw account herstellen met een nieuwe telefoon";
+
+/* Point in a list of scenarios where the user should try refreshing their app receipt to restore an existing subscription */
+"REFRESH_APP_RECEIPT_BUTTON_DESCRIPTION_POINT_2" = "Je kunt een abonnement dat je op dit apparaat hebt gekocht niet zien";
+
+/* Button which, when pressed, attempts to restore any existing subscriptions the user has purchased */
+"RESTORE_SUBSCRIPTION_BUTTON" = "Herstel Abonnement";
+
+/* Title of button which triggers an attempt to restore the user's existing subscription */
+"RESTORE_SUBSCRIPTION_BUTTON_TITLE" = "Herstel mijn abonnement";
+
+/* Button label indicating to the user that they will earn PsiCash if they watch a video advertisement. The word 'PsiCash' should not be translated or transliterated. */
+"REWARDED_VIDEO_EARN_PSICASH" = "Bekijk een video om PsiCash! te verdienen.";
+
+/* Title of cell in settings menu which, when pressed, reinstalls the user's VPN profile for Psiphon */
+"SETTINGS_REINSTALL_VPN_CONFIGURATION_CELL_TITLE" = "Installeer VPN-profiel";
 
 /* Subscriptions item title in the app settings when user has an active subscription. Clicking this item opens subscriptions view */
 "SETTINGS_SUBSCRIPTION_ACTIVE" = "Abonnementen";
@@ -176,6 +277,15 @@
 
 /* Title of the dialog for available in-app paid subscriptions */
 "SUBSCRIPTIONS" = "Abonnementen";
+
+/* Title of the banner on the subscriptions page that tells the user how many initial free days they get once subscribed */
+"SUBSCRIPTIONS_PAGE_BANNER_TITLE" = "Krijg 3 dagen premium vrij wanneer abonneren op elk plan";
+
+/* Title of the button on the subscriptions page which takes the user of of the app to iTunes where they can view detailed information about their subscription */
+"SUBSCRIPTIONS_PAGE_MANAGE_SUBSCRIPTION_BUTTON" = "Beheer je abonnement";
+
+/* Title of the button on the subscriptions page which, when pressed, navigates the user to the page where they can restore their existing subscription */
+"SUBSCRIPTIONS_PAGE_RESTORE_SUBSCRIPTION_BUTTON" = "Ik zie mijn abonnement niet";
 
 /* Title of button on subscriptions page which opens Psiphon's privacy policy webpage */
 "SUBSCRIPTIONS_PRIVACY_POLICY_BUTTON_TEXT" = "privacybeleid";
