@@ -82,6 +82,7 @@
 
     // Setup coin graphic
     _coin = [[UIImageView alloc] init];
+    _coin.contentMode = UIViewContentModeScaleAspectFit;
     _coin.image = [UIImage imageNamed:@"PsiCash_Coin"];
     [_coin.layer setMinificationFilter:kCAFilterTrilinear];
 }
