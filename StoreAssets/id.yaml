@@ -1,1 +1,35 @@
-id: {app_name: Psiphon, subtitle: Melintas Batas}
+id:
+  app_name: Psiphon
+  subtitle: Melintas Batas
+  description: |
+    Setelah membantu belasan juta pengguna agar dapat mengakses aplikasi dan situs yang mereka inginkan, Psiphon telah meluncurkan aplikasi pertama untuk iOS! Aplikasi baru kami berhasil dengan lancar mengintergrasikan akses dengan jaringan Psiphon, mengamankan koneksi Anda dengan aplikasi atau situs-situs. Di manapun Anda berada, aplikasi Psiphon akan menghubungkan Anda dengan situs dan aplikasi favorit Anda.
+    Aplikasi ini juga menyediakan proteksi tambahan ketika Anda menggunakan layanan WI-FI publik atau jaringan lain yang bisa jadi tidak aman.  Fitur utama termasuk:
+    * Gratis pemakaian pribadi tanpa batas
+    * Mudah mengakses, unduh dan menggunakan. Tidak memerlukan pendaftaran atau konfigurasi khusus.
+    * Protokol pilihan otomatis untuk akses yang cepat, dan dapat diandalkan setiap saat.
+    * Didukung dengan beragam pilihan bahasa dan lokasi peladen dapat dikonfigurasi
+
+    Tentang berlangganan
+    * Jika Anda berlangganan akan bersih dari iklan dan memberikan akses internet yang lebih cepat.
+    * Masa percobaan gratis 3 hari
+    * Harga: US$2.99 untuk satu minggu, US$9.99 untuk satu bulan, atau US$99.99 untuk satu tahun
+    * Pembayaran akan dibebankan ke akun iTunes Anda dengan konfirmasi pembelian.
+    * Fitur berlangganan automatis akan diperbarui kecuali fitur berlangganan automatis dimatikan 24 jam sebelum masa berakhir periode berlangganan.
+    * Akun Anda akan dibebankan pembaruan masa berlangganan dalam 24 jam sebelum masa berakhir langganan dan akan ditampilkan biaya berlangganan.
+    * Pembatalan berlangganan tidak dapat dilakukan selama periode aktif.
+    * Berlangganan dapat diatur dengan mematikan autopembaruan langganan pada penganturan akun Anda setelah pembelian.
+    * Periode gratis percobaan akan hangus jika Anda memutuskan membayar berlangganan.
+
+    Kebijakan privasi: https://psiphon.ca/en/privacy.html
+    Syarat dan ketentuan: https://psiphon.ca/en/license.html
+  keywords: Psiphon, proksi
+  subscriptions:
+    weekly:
+      title: Premium 1 minggu
+      description: Pembaruan berlangganan automatis
+    monthly:
+      title: Premium 1 bulan
+      description: Pembaruan berlangganan automatis
+    yearly:
+      title: Premium 1 tahun
+      description: Pembaruan berlangganan automatis

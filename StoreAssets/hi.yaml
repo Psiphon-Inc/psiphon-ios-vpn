@@ -1,6 +1,17 @@
 hi:
   app_name: साइफॉन
   subtitle: सीमाओं के पार
+  keywords: साइफॉन, प्रॉक्सी
+  subscriptions:
+    weekly:
+      title: प्रीमियम 1 सप्ताह
+      description: ऑटो नवीकरणीय सदस्यता
+    monthly:
+      title: प्रीमियम 1 माह
+      description: ऑटो नवीकरणीय सदस्यता
+    yearly:
+      title: प्रीमियम 1 वर्ष
+      description: ऑटो नवीकरणीय सदस्यता
   description: |
     लाखों उपयोगकर्ताओं के दसियों उपयोगकर्ताओं को उनकी पसंद के ऐप्स और साइटों तक पहुंचने में मदद करने के बाद, साइफ़ोन ने आईओएस के लिए अपना पहला ऐप लॉन्च किया है! हमारा नया ऐप आसानी से आपके ऐप्स और साइटों से सुरक्षित रूप से कनेक्ट करने, साइफ़ोन नेटवर्क तक पहुंच को एकीकृत करता है।
 
@@ -25,14 +36,3 @@ hi:
 
     गोपनीयता नीति: https://psiphon.ca/en/privacy.html
     उपयोग की शर्तें: https://psiphon.ca/en/license.html
-  keywords: साइफॉन, प्रॉक्सी
-  subscriptions:
-    weekly:
-      title: प्रीमियम 1 सप्ताह
-      description: ऑटो नवीकरणीय सदस्यता
-    monthly:
-      title: प्रीमियम 1 माह
-      description: ऑटो नवीकरणीय सदस्यता
-    yearly:
-      title: प्रीमियम 1 वर्ष
-      description: ऑटो नवीकरणीय सदस्यता
