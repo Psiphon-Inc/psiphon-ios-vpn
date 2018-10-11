@@ -1246,55 +1246,80 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 
 - (void)showRewardedVideo {
 
+    MainViewController *__weak weakSelf = self;
+
     LOG_DEBUG(@"rewarded video started");
     [PsiFeedbackLogger infoWithType:RewardedVideoLogType message:@"started"];
 
-    RACSignal *showVideo = [self.adManager presentRewardedVideoOnViewController:self
-      withCustomData:[[PsiCashClient sharedInstance] rewardedVideoCustomData]];
+    RACDisposable *__block disposable = [[[[self.adManager
+        presentRewardedVideoOnViewController:self
+                              withCustomData:[[PsiCashClient sharedInstance] rewardedVideoCustomData]]
+        doNext:^(NSNumber *adPresentationEnum) {
+            // Logs current AdPresentation enum value.
+            AdPresentation ap = (AdPresentation) [adPresentationEnum integerValue];
+            switch (ap) {
+                case AdPresentationWillAppear:
+                    LOG_DEBUG(@"rewarded video AdPresentationWillAppear");
+                    break;
+                case AdPresentationDidAppear:
+                    LOG_DEBUG(@"rewarded video AdPresentationDidAppear");
+                    break;
+                case AdPresentationWillDisappear:
+                    LOG_DEBUG(@"rewarded video AdPresentationWillDisappear");
+                    break;
+                case AdPresentationDidDisappear:
+                    LOG_DEBUG(@"rewarded video AdPresentationDidDisappear");
+                    break;
+                case AdPresentationDidRewardUser:
+                    LOG_DEBUG(@"rewarded video AdPresentationDidRewardUser");
+                    break;
+                case AdPresentationErrorCustomDataNotSet:
+                    LOG_DEBUG(@"rewarded video AdPresentationErrorCustomDataNotSet");
+                    break;
+                case AdPresentationErrorInappropriateState:
+                    LOG_DEBUG(@"rewarded video AdPresentationErrorInappropriateState");
+                    [PsiFeedbackLogger errorWithType:RewardedVideoLogType message:@"AdPresentationErrorInappropriateState"];
+                    break;
+                case AdPresentationErrorNoAdsLoaded:
+                    LOG_DEBUG(@"rewarded video AdPresentationErrorNoAdsLoaded");
+                    [PsiFeedbackLogger errorWithType:RewardedVideoLogType message:@"AdPresentationErrorNoAdsLoaded"];
+                    break;
+                case AdPresentationErrorFailedToPlay:
+                    LOG_DEBUG(@"rewarded video AdPresentationErrorFailedToPlay");
+                    [PsiFeedbackLogger errorWithType:RewardedVideoLogType message:@"AdPresentationErrorFailedToPlay"];
+                    break;
+            }
+        }]
+        scanWithStart:[RACTwoTuple pack:@(FALSE) :@(FALSE)]
+               reduce:^RACTwoTuple<NSNumber *, NSNumber *> *(RACTwoTuple *running, NSNumber *adPresentationEnum) {
 
-    [self.compoundDisposable addDisposable:[showVideo subscribeNext:^(NSNumber *value) {
-        AdPresentation ap = (AdPresentation) [value integerValue];
-
-        switch (ap) {
-            case AdPresentationWillAppear:
-                LOG_DEBUG(@"rewarded video AdPresentationWillAppear");
-                break;
-            case AdPresentationDidAppear:
-                LOG_DEBUG(@"rewarded video AdPresentationDidAppear");
-                break;
-            case AdPresentationWillDisappear:
-                LOG_DEBUG(@"rewarded video AdPresentationWillDisappear");
-                break;
-            case AdPresentationDidDisappear:
-                LOG_DEBUG(@"rewarded video AdPresentationDidDisappear");
+            // Scan operator running value is tuple with first element being true when next element is _DidRewardUser,
+            // and the second element is true when next element is _DidDisappear.
+            // Note that we don't want to make any assumptions about the order of these two events.
+            if ([adPresentationEnum integerValue] == AdPresentationDidRewardUser) {
+                return [RACTwoTuple pack:@(TRUE) :running.second];
+            } else if ([adPresentationEnum integerValue] == AdPresentationDidDisappear) {
+                return [RACTwoTuple pack:running.first :@(TRUE)];
+            }
+            return running;
+        }]
+        subscribeNext:^(RACTwoTuple<NSNumber *, NSNumber *> *tuple) {
+            // Calls to update PsiCash balance after
+            BOOL didReward = [tuple.first boolValue];
+            BOOL didDisappear = [tuple.second boolValue];
+            if (didReward && didDisappear) {
                 [[PsiCashClient sharedInstance] pollForBalanceDeltaWithMaxRetries:30 andTimeBetweenRetries:1.0];
-                break;
-            case AdPresentationDidRewardUser:
-                LOG_DEBUG(@"rewarded video AdPresentationDidRewardUser");
-                break;
-            case AdPresentationErrorCustomDataNotSet:
-                LOG_DEBUG(@"rewarded video AdPresentationErrorCustomDataNotSet");
-                break;
-            case AdPresentationErrorInappropriateState:
-                LOG_DEBUG(@"rewarded video AdPresentationErrorInappropriateState");
-                [PsiFeedbackLogger errorWithType:RewardedVideoLogType message:@"AdPresentationErrorInappropriateState"];
-                break;
-            case AdPresentationErrorNoAdsLoaded:
-                LOG_DEBUG(@"rewarded video AdPresentationErrorNoAdsLoaded");
-                [PsiFeedbackLogger errorWithType:RewardedVideoLogType message:@"AdPresentationErrorNoAdsLoaded"];
-                break;
-            case AdPresentationErrorFailedToPlay:
-                LOG_DEBUG(@"rewarded video AdPresentationErrorFailedToPlay");
-                [PsiFeedbackLogger errorWithType:RewardedVideoLogType message:@"AdPresentationErrorFailedToPlay"];
-                break;
-        }
+            }
+        } error:^(NSError *error) {
+            [PsiFeedbackLogger errorWithType:RewardedVideoLogType message:@"Error with rewarded video" object:error];
+            [weakSelf.compoundDisposable removeDisposable:disposable];
+        } completed:^{
+            LOG_DEBUG(@"rewarded video completed");
+            [PsiFeedbackLogger infoWithType:RewardedVideoLogType message:@"completed"];
+            [weakSelf.compoundDisposable removeDisposable:disposable];
+        }];
 
-    } error:^(NSError *error) {
-        [PsiFeedbackLogger errorWithType:RewardedVideoLogType message:@"Error with rewarded video" object:error];
-    } completed:^{
-        LOG_DEBUG(@"rewarded video completed");
-        [PsiFeedbackLogger infoWithType:RewardedVideoLogType message:@"completed"];
-    }]];
+        [self.compoundDisposable addDisposable:disposable];
 }
 
 #pragma mark - PsiCashPurchaseAlertViewDelegate protocol
