@@ -435,6 +435,8 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                             return [RACSignal return:CommandStartTunnel];
                         } else {
                             // Start tunnel after ad presentation signal completes.
+                            // We always want to start the tunnel after the presentation signal is completed,
+                            // no matter if it presented an ad or it failed.
                             return [[weakSelf.adManager presentInterstitialOnViewController:weakSelf]
                               then:^RACSignal * {
                                   return [RACSignal return:CommandStartTunnel];
@@ -1293,8 +1295,9 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
         scanWithStart:[RACTwoTuple pack:@(FALSE) :@(FALSE)]
                reduce:^RACTwoTuple<NSNumber *, NSNumber *> *(RACTwoTuple *running, NSNumber *adPresentationEnum) {
 
-            // Scan operator running value is tuple with first element being true when next element is _DidRewardUser,
-            // and the second element is true when next element is _DidDisappear.
+            // Scan operator's `running` value is a 2-tuple of booleans. First element represents when
+            // AdPresentationDidRewardUser is emitted upstream, and the second element represents when
+            // AdPresentationDidDisappear is emitted upstream.
             // Note that we don't want to make any assumptions about the order of these two events.
             if ([adPresentationEnum integerValue] == AdPresentationDidRewardUser) {
                 return [RACTwoTuple pack:@(TRUE) :running.second];

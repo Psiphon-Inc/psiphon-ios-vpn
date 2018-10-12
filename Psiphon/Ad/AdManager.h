@@ -82,6 +82,8 @@ FOUNDATION_EXPORT AdControllerTag const AdControllerTagTunneledRewardedVideo;
  * one of the errors states of @(AdPresentation) will be emitted (enums starting with AdPresentationError_)
  * and then the signal will complete.
  *
+ * @return Returned signal emits items of @(AdPresentation) or nothing. Always completes.
+ *
  */
 - (RACSignal<NSNumber *> *)presentInterstitialOnViewController:(UIViewController *)viewController;
 
@@ -97,6 +99,8 @@ FOUNDATION_EXPORT AdControllerTag const AdControllerTagTunneledRewardedVideo;
  *
  * @param viewController View controller to display ad on top of.
  * @param customData Optional custom data to include in the ad service server-to-server callback.
+ *
+ * @return Returned signal emits items of type @(AdPresentation) or nothing. Always completes.
  */
 - (RACSignal<NSNumber *> *)presentRewardedVideoOnViewController:(UIViewController *)viewController
                                                  withCustomData:(NSString *_Nullable)customData;
