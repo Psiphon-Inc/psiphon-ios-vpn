@@ -574,7 +574,7 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
         if (TunnelStateUntunneled == tunnelState) {
             return [self.untunneledInterstitial presentAdFromViewController:viewController];
         }
-        return nil;
+        return [RACSignal empty];
     }];
 }
 
@@ -582,14 +582,19 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
                                                  withCustomData:(NSString *_Nullable)customData{
 
     return [self presentAdHelper:^RACSignal<NSNumber *> *(TunnelState tunnelState) {
-        if (TunnelStateUntunneled == tunnelState) {
-            return [self.untunneledRewardVideo presentAdFromViewController:viewController
-                                                            withCustomData:customData];
-        } else if (TunnelStateTunneled == tunnelState) {
-            return [self.tunneledRewardVideo presentAdFromViewController:viewController
-                                                          withCustomData:customData];
+        switch (tunnelState) {
+            case TunnelStateTunneled:
+                return [self.tunneledRewardVideo presentAdFromViewController:viewController
+                                                              withCustomData:customData];
+            case TunnelStateUntunneled:
+                return [self.untunneledRewardVideo presentAdFromViewController:viewController
+                                                                withCustomData:customData];
+            case TunnelStateNeither:
+                return [RACSignal empty];
+
+            default:
+                abort();
         }
-        return nil;
     }];
 }
 
