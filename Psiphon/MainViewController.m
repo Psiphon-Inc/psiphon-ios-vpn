@@ -454,7 +454,6 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
             [weakSelf.vpnManager startTunnel];
 
         } else if ([CommandStopVPN isEqualToString:command]) {
-            // TODO! what if the connect on demand is enabled
             [weakSelf.vpnManager stopVPN];
 
         } else if ([CommandNoInternetAlert isEqualToString:command]) {

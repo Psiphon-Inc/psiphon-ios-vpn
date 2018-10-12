@@ -394,7 +394,6 @@ PsiFeedbackLogType const VPNManagerLogType = @"VPNManager";
     __weak VPNManager *weakSelf = self;
 
     // Connect On Demand should be disabled first before stopping the VPN.
-
     __block RACDisposable *disposable = [[[[self setConnectOnDemandEnabled:FALSE]
       flattenMap:^RACSignal *(NSNumber *x) {
           return [weakSelf deferredTunnelProviderManager];
