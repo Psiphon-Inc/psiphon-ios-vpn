@@ -79,6 +79,8 @@
 		4EF6D9CC20A8C7FE00AE9D44 /* PsiCashOnboardingViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4EF6D9C920A8C7FE00AE9D44 /* PsiCashOnboardingViewController.m */; };
 		4EFAAF2E2034CDC800EC0536 /* PsiCashClient.m in Sources */ = {isa = PBXBuildFile; fileRef = 4EFAAF282034CDC800EC0536 /* PsiCashClient.m */; };
 		4EFDFD7420DD829800A687FD /* AppStats.m in Sources */ = {isa = PBXBuildFile; fileRef = 4EFDFD7320DD829800A687FD /* AppStats.m */; };
+		521481CC21713A600020C885 /* AppStats.m in Sources */ = {isa = PBXBuildFile; fileRef = 4EFDFD7320DD829800A687FD /* AppStats.m */; };
+		521481CD217146290020C885 /* AppProfiler.m in Sources */ = {isa = PBXBuildFile; fileRef = 4EC7CACF20E185580038B4E1 /* AppProfiler.m */; };
 		66094F7A1E8067520069EC4E /* PsiphonTunnel.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 66094F781E8067520069EC4E /* PsiphonTunnel.framework */; };
 		6615A5EA1F58A95500026C98 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 6615A5E81F58A95500026C98 /* Localizable.strings */; };
 		6615A5EB1F58A95B00026C98 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 6615A5E81F58A95500026C98 /* Localizable.strings */; };
@@ -112,6 +114,8 @@
 		9BFECF9F760F1A93A8933089 /* Nullity.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFECCCF429898FD903B69A6 /* Nullity.m */; };
 		9BFECFE618966005B01CF582 /* MoPubRewardedAdControllerWrapper.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC970B3CC179C3B9DE44D /* MoPubRewardedAdControllerWrapper.m */; };
 		9BFECFEB3BC9F10542C1A416 /* PsiphonConfigUserDefaults.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC584519C408D9D6D3FF1 /* PsiphonConfigUserDefaults.m */; };
+		A84085DD50355AEE9A6C016A /* DebugUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = A84082F8553E6F7EB5C7DB2F /* DebugUtils.m */; };
+		A8408A1B42DB02449F6F492E /* DebugUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = A84082F8553E6F7EB5C7DB2F /* DebugUtils.m */; };
 		B1D9FF416DDCA97A40A325AA /* libPods-PsiphonVPN.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 01122727D6CE50B340C55DBE /* libPods-PsiphonVPN.a */; };
 		CE26FC951BBDC7B800B83375 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = CE26FC941BBDC7B800B83375 /* Assets.xcassets */; };
 		CE26FCAC1BBDC85900B83375 /* PsiphonVPN.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = CE26FCA31BBDC85900B83375 /* PsiphonVPN.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
@@ -430,6 +434,8 @@
 		9BFECF45CA0CAF6997411D22 /* MoPubInterstitialAdControllerWrapper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MoPubInterstitialAdControllerWrapper.m; sourceTree = "<group>"; };
 		9BFECF6BF16767758F28D1A0 /* AdMobRewardedAdControllerWrapper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AdMobRewardedAdControllerWrapper.m; sourceTree = "<group>"; };
 		9BFECF74881B6C4227813A63 /* AdMobConsent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AdMobConsent.h; sourceTree = "<group>"; };
+		A84082F8553E6F7EB5C7DB2F /* DebugUtils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DebugUtils.m; sourceTree = "<group>"; };
+		A8408840E64F256751DE98A6 /* DebugUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DebugUtils.h; sourceTree = "<group>"; };
 		CB8BB19F016330264C4DCB80 /* libPods-Psiphon.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Psiphon.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		CE26FC8A1BBDC7B800B83375 /* Psiphon.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Psiphon.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		CE26FC941BBDC7B800B83375 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -647,6 +653,7 @@
 		4E0DCB101F28458100495781 /* Shared */ = {
 			isa = PBXGroup;
 			children = (
+				4EC7CACD20E1844F0038B4E1 /* Profiling */,
 				EF90D78B204F22C900228A63 /* External */,
 				EF90D79E204F22C900228A63 /* ReactiveExtensions */,
 				EF90D793204F22C900228A63 /* Util */,
@@ -875,7 +882,6 @@
 		CE26FCA41BBDC85900B83375 /* PsiphonVPN */ = {
 			isa = PBXGroup;
 			children = (
-				4EC7CACD20E1844F0038B4E1 /* Profiling */,
 				EFC2F5B520226758007B52F9 /* PacketTunnelUtils.h */,
 				EFC2F5B420226757007B52F9 /* PacketTunnelUtils.m */,
 				EF743FC11F99546B00AC89A2 /* IAP */,
@@ -945,6 +951,8 @@
 				9BFECA9ADB17DC329DA64AA5 /* AsyncOperation.h */,
 				9BFECCCF429898FD903B69A6 /* Nullity.m */,
 				9BFECEEB971749A4E9705B15 /* Nullity.h */,
+				A84082F8553E6F7EB5C7DB2F /* DebugUtils.m */,
+				A8408840E64F256751DE98A6 /* DebugUtils.h */,
 			);
 			path = Util;
 			sourceTree = "<group>";
@@ -1400,9 +1408,11 @@
 				4435CC271F70566000F3A809 /* SettingsViewController.m in Sources */,
 				EFED7EBC1F55C8550078980F /* LogViewControllerFullScreen.m in Sources */,
 				EF4F1F3D206055F7006A40A1 /* RACSignal+Operations2.m in Sources */,
+				521481CC21713A600020C885 /* AppStats.m in Sources */,
 				4E5DCF9720EC11C6009D8D39 /* PsiCashSpeedBoostProduct+PsiCashPurchasePrice.m in Sources */,
 				445F24F020E1A5BA00D004E9 /* xer_encoder.c in Sources */,
 				445F24D520E1A5BA00D004E9 /* constr_TYPE.c in Sources */,
+				521481CD217146290020C885 /* AppProfiler.m in Sources */,
 				445F24E220E1A5BA00D004E9 /* der_encoder.c in Sources */,
 				445F24DC20E1A5BA00D004E9 /* NativeInteger.c in Sources */,
 				EF90D7A9204F22C900228A63 /* FileUtils.m in Sources */,
@@ -1485,6 +1495,7 @@
 				9BFECF61970F215F32E76280 /* AdMobInterstitialAdControllerWrapper.m in Sources */,
 				9BFEC459666697D89B09A492 /* AdMobRewardedAdControllerWrapper.m in Sources */,
 				9BFEC8A2F99380655E853F81 /* AdControllerWrapper.m in Sources */,
+				A8408A1B42DB02449F6F492E /* DebugUtils.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1519,6 +1530,7 @@
 				9BFEC10661A7DC0402AF4B37 /* AsyncOperation.m in Sources */,
 				9BFECF9F760F1A93A8933089 /* Nullity.m in Sources */,
 				9BFEC5C256EBC72398FAE8D8 /* UnionSerialQueue.m in Sources */,
+				A84085DD50355AEE9A6C016A /* DebugUtils.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

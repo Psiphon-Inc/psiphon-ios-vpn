@@ -33,7 +33,6 @@
 NSString * const SettingsSubscriptionCellSpecifierKey = @"settingsSubscription";
 NSString * const SettingsPsiCashCellSpecifierKey = @"settingsPsiCash";
 NSString * const SettingsReinstallVPNConfigurationKey = @"settingsReinstallVPNConfiguration";
-NSString * const ConnectOnDemandCellSpecifierKey = @"vpnOnDemand";
 
 @interface SettingsViewController ()
 
@@ -45,13 +44,7 @@ NSString * const ConnectOnDemandCellSpecifierKey = @"vpnOnDemand";
 @end
 
 @implementation SettingsViewController {
-
-    // Subscription row
     UITableViewCell *subscriptionTableViewCell;
-
-    // Connect On Demand row
-    UISwitch *connectOnDemandToggle;
-    UITableViewCell *connectOnDemandCell;
     UITableViewCell *reinstallVPNProfileCell;
 }
 
@@ -78,7 +71,6 @@ NSString * const ConnectOnDemandCellSpecifierKey = @"vpnOnDemand";
 
           weakSelf.hasActiveSubscription = (s == UserSubscriptionActive);
           [self updateSubscriptionCell];
-          [self updateConnectOnDemandCell];
           [weakSelf updateHiddenKeys];
 
       } error:^(NSError *error) {
@@ -152,43 +144,6 @@ NSString * const ConnectOnDemandCellSpecifierKey = @"vpnOnDemand";
     [subscriptionTableViewCell.textLabel setText:subscriptionCellTitle];
 }
 
-- (void)updateConnectOnDemandCell {
-    NSString *subscriptionOnlySubtitle;
-    if(!self.hasActiveSubscription) {
-        connectOnDemandToggle.on = NO;
-        connectOnDemandCell.userInteractionEnabled = NO;
-        connectOnDemandCell.textLabel.enabled = NO;
-        connectOnDemandCell.detailTextLabel.enabled = NO;
-        subscriptionOnlySubtitle = NSLocalizedStringWithDefaultValue(@"SETTINGS_VPN_ON_DEMAND_DETAIL",
-          nil,
-          [NSBundle mainBundle],
-          @"Subscription only",
-          @"VPN On demand setting detail text showing when user doesn't have an active subscription and the item is disabled.");
-    } else {
-
-        __weak SettingsViewController *weakSelf = self;
-
-        __block RACDisposable *disposable = [[[[VPNManager sharedInstance] isConnectOnDemandEnabled]
-          deliverOnMainThread]
-          subscribeNext:^(NSNumber *enabled) {
-              connectOnDemandToggle.on = [enabled boolValue];
-          } error:^(NSError *error) {
-              [weakSelf.compoundDisposable removeDisposable:disposable];
-          } completed:^{
-              [weakSelf.compoundDisposable removeDisposable:disposable];
-          }];
-
-        [self.compoundDisposable addDisposable:disposable];
-
-
-        connectOnDemandCell.userInteractionEnabled = YES;
-        connectOnDemandCell.textLabel.enabled = YES;
-        subscriptionOnlySubtitle = @"";
-    }
-
-    connectOnDemandCell.detailTextLabel.text = subscriptionOnlySubtitle;
-}
-
 - (void)updateReinstallVPNProfileCell {
     if (reinstallVPNProfileCell) {
         BOOL enableReinstallVPNProfileCell = self.vpnStatus == VPNStatusDisconnected || self.vpnStatus == VPNStatusInvalid;
@@ -214,30 +169,14 @@ NSString * const ConnectOnDemandCellSpecifierKey = @"vpnOnDemand";
 
 - (UITableViewCell*)tableView:(UITableView*)tableView cellForSpecifier:(IASKSpecifier*)specifier {
     UITableViewCell *cell = nil;
-    if (![specifier.key isEqualToString:ConnectOnDemandCellSpecifierKey]
-        && ![specifier.key isEqualToString:SettingsPsiCashCellSpecifierKey]
+    if (![specifier.key isEqualToString:SettingsPsiCashCellSpecifierKey]
         && ![specifier.key isEqualToString:SettingsReinstallVPNConfigurationKey]
         && ![specifier.key isEqualToString:SettingsSubscriptionCellSpecifierKey]) {
         cell = [super tableView:tableView cellForSpecifier:specifier];
         return cell;
     }
 
-    if ([specifier.key isEqualToString:ConnectOnDemandCellSpecifierKey]) {
-
-        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:@"Cell"];
-        cell.selectionStyle = UITableViewCellSelectionStyleNone;
-        cell.accessoryView = [[UISwitch alloc] initWithFrame:CGRectMake(0, 0, 79, 27)];
-        connectOnDemandToggle = (UISwitch*)cell.accessoryView;
-        [connectOnDemandToggle addTarget:self action:@selector(toggledVpnOnDemandValue:) forControlEvents:UIControlEventValueChanged];
-
-        cell.textLabel.text = NSLocalizedStringWithDefaultValue(@"SETTINGS_VPN_ON_DEMAND",
-                                                                nil,
-                                                                [NSBundle mainBundle],
-                                                                @"Auto-start VPN on demand",
-                                                                @"Automatically start VPN On demand settings toggle");
-        connectOnDemandCell = cell;
-        [self updateConnectOnDemandCell];
-    } else if ([specifier.key isEqualToString:SettingsSubscriptionCellSpecifierKey]) {
+    if ([specifier.key isEqualToString:SettingsSubscriptionCellSpecifierKey]) {
 
         cell = [super tableView:tableView cellForSpecifier:specifier];
         [cell setAccessoryType:UITableViewCellAccessoryDisclosureIndicator];
@@ -266,25 +205,6 @@ NSString * const ConnectOnDemandCellSpecifierKey = @"vpnOnDemand";
 
     assert(cell != nil);
     return cell;
-}
-
-- (void)toggledVpnOnDemandValue:(id)sender {
-    UISwitch *toggle = (UISwitch*)sender;
-
-    __weak SettingsViewController *weakSelf = self;
-
-    __block RACDisposable *disposable = [[[[VPNManager sharedInstance]
-      setConnectOnDemandEnabled:[toggle isOn]]
-      deliverOnMainThread]
-      subscribeNext:^(NSNumber *success) {
-          [weakSelf updateConnectOnDemandCell];
-      } error:^(NSError *error) {
-          [weakSelf.compoundDisposable removeDisposable:disposable];
-      }   completed:^{
-          [weakSelf.compoundDisposable removeDisposable:disposable];
-      }];
-
-    [self.compoundDisposable addDisposable:disposable];
 }
 
 - (void)openIAPViewController {

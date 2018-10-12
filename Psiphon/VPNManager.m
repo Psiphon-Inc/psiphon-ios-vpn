@@ -59,8 +59,6 @@ NSErrorDomain const VPNManagerErrorDomain = @"VPNManagerErrorDomain";
 
 PsiFeedbackLogType const VPNManagerLogType = @"VPNManager";
 
-UserDefaultsKey const VPNManagerConnectOnDemandUntilNextStartBoolKey = @"VPNManager.ConnectOnDemandUntilNextStartKey";
-
 @interface VPNManager ()
 
 // Public properties
@@ -396,7 +394,6 @@ UserDefaultsKey const VPNManagerConnectOnDemandUntilNextStartBoolKey = @"VPNMana
     __weak VPNManager *weakSelf = self;
 
     // Connect On Demand should be disabled first before stopping the VPN.
-
     __block RACDisposable *disposable = [[[[self setConnectOnDemandEnabled:FALSE]
       flattenMap:^RACSignal *(NSNumber *x) {
           return [weakSelf deferredTunnelProviderManager];
@@ -498,22 +495,6 @@ UserDefaultsKey const VPNManagerConnectOnDemandUntilNextStartBoolKey = @"VPNMana
       }];
 }
 
-// isConnectOnDemandEnabled returns a signal that when subscribed to emits boolean value as NSNumber,
-// if tunnelProviderManager is nil emits false.
-- (RACSignal<NSNumber *> *)isConnectOnDemandEnabled {
-
-    return [[[self deferredTunnelProviderManager]
-      map:^NSNumber *(NETunnelProviderManager *_Nullable providerManager) {
-          if (providerManager) {
-              return [NSNumber numberWithBool:providerManager.isOnDemandEnabled];
-          } else {
-              return [NSNumber numberWithBool:FALSE];
-          }
-      }]
-      unsafeSubscribeOnSerialQueue:self.serialQueue
-                          withName:@"isConnectOnDemandEnabled"];
-}
-
 // setConnectOnDemandEnabled: returns a signal that when subscribed to updates tunnelProviderManager's
 // onDemandEnabled property with the provided parameter if different and then emits TRUE as NSNumber on success
 // and FALSE on failure. If provided parameter is not different, then the returned signal
@@ -532,7 +513,7 @@ UserDefaultsKey const VPNManagerConnectOnDemandUntilNextStartBoolKey = @"VPNMana
               return [RACSignal empty];
           }
 
-          // return empty signal as NO-OP if there is not change in status.
+          // If the on demand state doesn't need to change, emit @(TRUE) immediately.
           if (providerManager.onDemandEnabled == onDemandEnabled) {
               return [RACSignal return:[NSNumber numberWithBool:TRUE]];
           }
@@ -699,7 +680,6 @@ UserDefaultsKey const VPNManagerConnectOnDemandUntilNextStartBoolKey = @"VPNMana
       map:^NETunnelProviderManager *(RACTwoTuple *tuple) {
 
           NETunnelProviderManager *providerManager = tuple.first;
-          UserSubscriptionStatus subscriptionStatus = (UserSubscriptionStatus)[tuple.second integerValue];
 
           if (!providerManager) {
               NETunnelProviderProtocol *providerProtocol = [[NETunnelProviderProtocol alloc] init];
@@ -720,18 +700,8 @@ UserDefaultsKey const VPNManagerConnectOnDemandUntilNextStartBoolKey = @"VPNMana
               providerManager.onDemandRules = @[alwaysConnectRule];
           }
 
-          // Enables Connect On Demand if the user has an active subscription.
-          if (subscriptionStatus == UserSubscriptionActive) {
-              providerManager.onDemandEnabled = TRUE;
-          }
-
-          NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
-          if ([ud boolForKey:VPNManagerConnectOnDemandUntilNextStartBoolKey]) {
-              providerManager.onDemandEnabled = TRUE;
-
-              // Reset VPNManagerConnectOnDemandUntilNextStartBoolKey value.
-              [ud setBool:FALSE forKey:VPNManagerConnectOnDemandUntilNextStartBoolKey];
-          }
+          // Enables Connect On Demand for all users.
+          providerManager.onDemandEnabled = TRUE;
 
           return providerManager;
       }]

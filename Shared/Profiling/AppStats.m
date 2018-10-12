@@ -31,6 +31,20 @@ typedef NS_ERROR_ENUM(AppStatsErrorDomain, AppStatsErrorCode) {
 
 @implementation AppStats
 
++ (vm_size_t)pageSize:(NSError *_Nullable *_Nullable)error {
+    vm_size_t page_size;
+
+    kern_return_t kerr = host_page_size(mach_host_self(), &page_size);
+    if (kerr != KERN_SUCCESS) {
+        if (*error) {
+            *error = [NSError errorWithDomain:AppStatsErrorDomain code:AppStatsErrorCodeKernError andLocalizedDescription:[NSString stringWithFormat:@"host_page_size: %s", mach_error_string(kerr)]];
+        }
+        return 0;
+    }
+
+    return page_size;
+}
+
 + (mach_vm_size_t)residentSetSize:(NSError *_Nullable*_Nonnull)e {
     *e = nil;
 
@@ -46,7 +60,7 @@ typedef NS_ERROR_ENUM(AppStatsErrorDomain, AppStatsErrorCode) {
 
     *e = [NSError errorWithDomain:AppStatsErrorDomain code:AppStatsErrorCodeKernError andLocalizedDescription:[NSString stringWithFormat:@"task_info: %s", mach_error_string(kerr)]];
 
-    return -1;
+    return 0;
 }
 
 // Inspired by:
@@ -59,7 +73,7 @@ typedef NS_ERROR_ENUM(AppStatsErrorDomain, AppStatsErrorCode) {
     mach_port_t task = mach_task_self_;
     if (task == MACH_PORT_NULL) {
         *e = [NSError errorWithDomain:AppStatsErrorDomain code:AppStatsErrorCodeKernError andLocalizedDescription:@"mach_task_self_ returned MACH_PORT_NULL"];
-        return -1;
+        return 0;
     }
 
     // Scan the current task's address space and count the pages that
@@ -77,7 +91,7 @@ typedef NS_ERROR_ENUM(AppStatsErrorDomain, AppStatsErrorCode) {
             break;
         } else if (kerr != KERN_SUCCESS) {
             *e = [NSError errorWithDomain:AppStatsErrorDomain code:AppStatsErrorCodeKernError andLocalizedDescription:[NSString stringWithFormat:@"vm_region: %s", mach_error_string(kerr)]];
-            return -1;
+            return 0;
         }
 
         vm_region_extended_info_data_t extended_info;
@@ -90,7 +104,7 @@ typedef NS_ERROR_ENUM(AppStatsErrorDomain, AppStatsErrorCode) {
             break;
         } else if (kerr != KERN_SUCCESS) {
             *e = [NSError errorWithDomain:AppStatsErrorDomain code:AppStatsErrorCodeKernError andLocalizedDescription:[NSString stringWithFormat:@"vm_region: %s", mach_error_string(kerr)]];
-            return -1;
+            return 0;
         }
 
         mach_port_deallocate(mach_task_self(), object_name);
@@ -105,12 +119,9 @@ typedef NS_ERROR_ENUM(AppStatsErrorDomain, AppStatsErrorCode) {
         }
     }
 
-    vm_size_t page_size;
-
-    kern_return_t kerr = host_page_size(mach_host_self(), &page_size);
-    if ( kerr != KERN_SUCCESS ) {
-        *e = [NSError errorWithDomain:AppStatsErrorDomain code:AppStatsErrorCodeKernError andLocalizedDescription:[NSString stringWithFormat:@"host_page_size: %s", mach_error_string(kerr)]];
-        return -1;
+    vm_size_t page_size = [AppStats pageSize:e];
+    if (page_size == 0) {
+        return 0;
     }
 
     size_t private_bytes = private_pages_count * page_size;
