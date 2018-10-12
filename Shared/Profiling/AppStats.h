@@ -24,6 +24,13 @@
  */
 @interface AppStats : NSObject
 
+
+/**
+ * Gets size of each memory page in bytes.
+ * @return Memory page size.
+ */
++ (vm_size_t)pageSize:(NSError **)error;
+
 /**
  * Returns current mach tasks's resident set size.
  *

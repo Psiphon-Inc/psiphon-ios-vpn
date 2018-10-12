@@ -151,6 +151,7 @@ typedef NS_ENUM(NSInteger, VPNStartStatus) {
 
 /**
  * Stops the tunnel and stops the network extension process.
+ * @note Connect On Demand is disabled before the tunnel is stopped.
  */
 - (void)stopVPN;
 
