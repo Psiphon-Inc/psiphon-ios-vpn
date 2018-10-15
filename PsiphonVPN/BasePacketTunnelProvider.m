@@ -53,6 +53,11 @@ PsiFeedbackLogType const BasePacketTunnelProviderLogType = @"BasePacketTunnelPro
 - (instancetype)init {
     self = [super init];
     if (self) {
+
+        int pid = [[NSProcessInfo processInfo] processIdentifier];
+        [PsiFeedbackLogger infoWithType:BasePacketTunnelProviderLogType json:@{@"Event": @"Init",
+                                                                               @"PID":@(pid)}];
+
         workQueue = dispatch_queue_create("ca.psiphon.PsiphonVPN.baseWorkQueue", DISPATCH_QUEUE_SERIAL);
        _vpnStartedSignal = [RACReplaySubject replaySubjectWithCapacity:1];
        _sharedDB = [[PsiphonDataSharedDB alloc] initForAppGroupIdentifier:APP_GROUP_IDENTIFIER];
