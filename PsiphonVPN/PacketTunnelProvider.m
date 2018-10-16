@@ -103,11 +103,11 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 
 @property (nonatomic) GracePeriodState gracePeriodState;
 
-@property (nonatomic) PsiphonTunnel *psiphonTunnel;
+@property (nonatomic, nonnull) PsiphonTunnel *psiphonTunnel;
 
 // Authorization IDs supplied to tunnel-core from the container.
 // NOTE: Does not include subscription authorization ID.
-@property (atomic) NSSet<NSString *> *suppliedContainerAuthorizationIDs;
+@property (atomic, nonnull) NSSet<NSString *> *suppliedContainerAuthorizationIDs;
 
 @property (nonatomic) PsiphonConfigSponsorIds *cachedSponsorIDs;
 
@@ -123,19 +123,19 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
     // Scheduler to be used by AppStore subscription check code.
     // NOTE: RACScheduler objects are all serial schedulers and cheap to create.
     //       The underlying implementation creates a GCD dispatch queues.
-    RACScheduler *subscriptionScheduler;
+    RACScheduler *_Nullable subscriptionScheduler;
 
     // An infinite signal that emits Psiphon tunnel connection state.
     // When subscribed, replays the last known connection state.
     // @scheduler Events are delivered on some background system thread.
-    RACReplaySubject<NSNumber *> *tunnelConnectionStateSubject;
+    RACReplaySubject<NSNumber *> *_Nullable tunnelConnectionStateSubject;
 
     // An infinite signal that emits @(SubscriptionAuthorizationStatusRejected) if the subscription authorization
     // was invalid, and @(SubscriptionAuthorizationStatusActiveOrEmpty) if it was valid (or non-existent).
     // When subscribed, replays the last item this subject was sent by onActiveAuthorizationIDs callback.
-    RACReplaySubject<NSNumber *> *subscriptionAuthorizationActiveSubject;
+    RACReplaySubject<NSNumber *> *_Nullable subscriptionAuthorizationActiveSubject;
 
-    RACDisposable *subscriptionDisposable;
+    RACDisposable *_Nullable subscriptionDisposable;
 
     AppProfiler *appProfiler;
 }
@@ -155,6 +155,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
         _subscriptionCheckState = nil;
         _waitForContainerStartVPNCommand = FALSE;
         _gracePeriodState = GracePeriodStateInactive;
+        _suppliedContainerAuthorizationIDs = [NSSet set];
     }
     return self;
 }
