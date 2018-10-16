@@ -723,25 +723,39 @@ PsiFeedbackLogType const VPNManagerLogType = @"VPNManager";
 // and then emits boolean response as NSNumber, or the signal completes immediately if extension is not active.
 // Note: the returned signal emits FALSE if the extension returns empty response.
 - (RACSignal<NSNumber *> *)isExtensionZombie {
-    return [[self queryActiveVPN:EXTENSION_QUERY_IS_PROVIDER_ZOMBIE]
-      catch:^RACSignal<NSNumber *> *(NSError *error) {
-          [PsiFeedbackLogger warnWithType:VPNManagerLogType message:@"isProviderZombie extension query failed" object:error];
-          return [RACSignal return:[NSNumber numberWithBool:FALSE]];
-      }];
+    return [[[self queryActiveVPN:EXTENSION_QUERY_IS_PROVIDER_ZOMBIE]
+            map:^NSNumber *(NSNumber *_Nullable value) {
+                // Value is nil if extension is not running. We default to FALSE as the is zombie query response.
+                if (value == nil) {
+                    return @(FALSE);
+                }
+                return value;
+            }]
+            catch:^RACSignal<NSNumber *> *(NSError *error) {
+                [PsiFeedbackLogger warnWithType:VPNManagerLogType message:@"isProviderZombie extension query failed" object:error];
+                return [RACSignal return:[NSNumber numberWithBool:FALSE]];
+            }];
 }
 
 // isPsiphonTunnelConnected returns a signal that when subscribed to sends "isTunnelConnected" query to the extension
 // and then emits boolean response as NSNumber, or nil if extension is not active.
 // Note: the returned signal emits FALSE if the extension returns empty response.
 - (RACSignal<NSNumber *> *)isPsiphonTunnelConnected {
-    return [[self queryActiveVPN:EXTENSION_QUERY_IS_TUNNEL_CONNECTED]
-      catch:^RACSignal<NSNumber *> *(NSError *error) {
-          [PsiFeedbackLogger warnWithType:VPNManagerLogType message:@"isTunnelConnected extension query failed" object:error];
-          return [RACSignal return:[NSNumber numberWithBool:FALSE]];
-      }];
+    return [[[self queryActiveVPN:EXTENSION_QUERY_IS_TUNNEL_CONNECTED]
+            map:^NSNumber *(NSNumber *_Nullable value) {
+                // Value is nil if extension is not running. We default to FALSE as the tunnel connected query response.
+                if (value == nil) {
+                    return @(FALSE);
+                }
+                return value;
+            }]
+            catch:^RACSignal<NSNumber *> *(NSError *error) {
+                [PsiFeedbackLogger warnWithType:VPNManagerLogType message:@"isTunnelConnected extension query failed" object:error];
+                return [RACSignal return:[NSNumber numberWithBool:FALSE]];
+            }];
 }
 
-// queryActiveVPN returns a signal that when subscribed to emits nil if the extension is not running,
+// queryActiveVPN returns a signal that when subscribed to, emits nil if the extension is not running,
 // otherwise emits boolean value as NSNumber as the query response.
 // Returned signal terminates with an error if the extension returns empty response.
 - (RACSignal<NSNumber *> *)queryActiveVPN:(NSString *)query {
@@ -765,7 +779,7 @@ PsiFeedbackLogType const VPNManagerLogType = @"VPNManager";
               return [VPNManager sendProviderSessionMessage:query session:session];
 
           } else {
-              // Tunnel is not active, immediately completes the signal.
+              // Tunnel is not active, emit nil and then complete.
               return [RACSignal return:nil];
           }
       }]
