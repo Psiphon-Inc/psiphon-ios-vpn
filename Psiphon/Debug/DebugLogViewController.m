@@ -17,7 +17,7 @@
  *
  */
 
-#import "LogViewControllerFullScreen.h"
+#import "DebugLogViewController.h"
 #import "PsiphonDataSharedDB.h"
 #import "SharedConstants.h"
 #import "Logging.h"
@@ -33,8 +33,7 @@
  *      - File change monitoring fails if file the log file has not been created yet.
  *      - Log file truncation is not handled.
  */
-@implementation LogViewControllerFullScreen {
-
+@implementation DebugLogViewController {
     UIActivityIndicatorView *activityIndicator;
 
     PsiphonDataSharedDB *sharedDB;
@@ -47,7 +46,7 @@
     dispatch_source_t dispatchSource;
 }
 
-- (instancetype)initWithLogPath:(NSString *)logPath title:(NSString *)title{
+- (instancetype)initWithLogPath:(NSString *)logPath title:(NSString *)title {
     self = [super init];
     if (self) {
 
@@ -241,43 +240,5 @@
 
 @end
 
-@implementation TabbedLogViewController {
-    PsiphonDataSharedDB *sharedDB;
-}
+#pragma 
 
-- (instancetype)initWithCoder:(NSCoder *)coder {
-    self = [super initWithCoder:coder];
-    if (self) {
-        sharedDB = [[PsiphonDataSharedDB alloc] initForAppGroupIdentifier:APP_GROUP_IDENTIFIER];
-    }
-
-    return self;
-}
-
-- (void)viewDidLoad {
-    [super viewDidLoad];
-
-    LogViewControllerFullScreen *tunnelCore = [[LogViewControllerFullScreen alloc] initWithLogPath:[sharedDB rotatingLogNoticesPath] title:@"Tunnel Core"];
-    LogViewControllerFullScreen *networkExtension = [[LogViewControllerFullScreen alloc] initWithLogPath:PsiFeedbackLogger.extensionRotatingLogNoticesPath title:@"Extension"];
-    LogViewControllerFullScreen *container = [[LogViewControllerFullScreen alloc] initWithLogPath:PsiFeedbackLogger.containerRotatingLogNoticesPath title:@"Container"];
-
-    UINavigationController *nav1 = [[UINavigationController alloc] initWithRootViewController:tunnelCore];
-    nav1.modalPresentationStyle = UIModalPresentationFullScreen;
-    nav1.modalTransitionStyle = UIModalTransitionStyleCoverVertical;
-    UINavigationController *nav2 = [[UINavigationController alloc] initWithRootViewController:networkExtension];
-    nav2.modalPresentationStyle = UIModalPresentationFullScreen;
-    nav2.modalTransitionStyle = UIModalTransitionStyleCoverVertical;
-    UINavigationController *nav3 = [[UINavigationController alloc] initWithRootViewController:container];
-    nav3.modalPresentationStyle = UIModalPresentationFullScreen;
-    nav3.modalTransitionStyle = UIModalTransitionStyleCoverVertical;
-
-
-    nav1.tabBarItem = [[UITabBarItem alloc] initWithTitle:@"Tunnel Core" image:nil tag:0];
-    nav2.tabBarItem =  [[UITabBarItem alloc] initWithTitle:@"Extension" image:nil tag:1];
-    nav3.tabBarItem = [[UITabBarItem alloc] initWithTitle:@"Container" image:nil tag:2];
-
-    NSArray *viewControllers = @[nav1, nav2, nav3];
-    [self setViewControllers:viewControllers animated:FALSE];
-}
-
-@end

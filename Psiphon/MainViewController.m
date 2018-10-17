@@ -29,7 +29,7 @@
 #import "IAPViewController.h"
 #import "LaunchScreenViewController.h"
 #import "Logging.h"
-#import "LogViewControllerFullScreen.h"
+#import "DebugViewController.h"
 #import "PsiFeedbackLogger.h"
 #import "PsiphonClientCommonLibraryHelpers.h"
 #import "PsiphonConfigUserDefaults.h"
@@ -484,7 +484,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 
 #if DEBUG
 - (void)onVersionLabelTap:(UILabel *)sender {
-    TabbedLogViewController *viewController = [[TabbedLogViewController alloc] initWithCoder:nil];
+    DebugViewController *viewController = [[DebugViewController alloc] initWithCoder:nil];
     [self presentViewController:viewController animated:YES completion:nil];
 }
 #endif
