@@ -45,9 +45,6 @@ PsiFeedbackLogType const BasePacketTunnelProviderLogType = @"BasePacketTunnelPro
     // Pointer to startTunnelWithOptions completion handler.
     // NOTE: value is expected to be nil after completion handler has been called.
     void (^vpnStartCompletionHandler)(NSError *__nullable error);
-
-    // Serial queue.
-    dispatch_queue_t workQueue;
 }
 
 - (instancetype)init {
@@ -58,7 +55,6 @@ PsiFeedbackLogType const BasePacketTunnelProviderLogType = @"BasePacketTunnelPro
         [PsiFeedbackLogger infoWithType:BasePacketTunnelProviderLogType json:@{@"Event": @"Init",
                                                                                @"PID":@(pid)}];
 
-        workQueue = dispatch_queue_create("ca.psiphon.PsiphonVPN.baseWorkQueue", DISPATCH_QUEUE_SERIAL);
        _vpnStartedSignal = [RACReplaySubject replaySubjectWithCapacity:1];
        _sharedDB = [[PsiphonDataSharedDB alloc] initForAppGroupIdentifier:APP_GROUP_IDENTIFIER];
     }
@@ -71,7 +67,7 @@ PsiFeedbackLogType const BasePacketTunnelProviderLogType = @"BasePacketTunnelPro
 - (void)startTunnelWithOptions:(nullable NSDictionary<NSString *, NSObject *> *)options
              completionHandler:(void (^)(NSError *__nullable error))completionHandler {
 
-    dispatch_sync(workQueue, ^{
+    @synchronized (self) {
 
         // Determine if the extension jetsammed previously to this start.
         BOOL previouslyJetsammed = [self.sharedDB getExtensionJetsammedBeforeStopFlag];
@@ -138,14 +134,14 @@ PsiFeedbackLogType const BasePacketTunnelProviderLogType = @"BasePacketTunnelPro
             }
         }];
 
-    });
+    }
 }
 
 /**
  * Subclasses should not override this method.
  */
 - (void)stopTunnelWithReason:(NEProviderStopReason)reason completionHandler:(void (^)(void))completionHandler {
-    dispatch_sync(workQueue, ^{
+    @synchronized (self) {
 
         // Resets the extension crash flag, since the extension hasn't crashed until stop is called.
         [self.sharedDB setExtensionJetsammedBeforeStopFlag:FALSE];
@@ -160,14 +156,12 @@ PsiFeedbackLogType const BasePacketTunnelProviderLogType = @"BasePacketTunnelPro
         [(id <BasePacketTunnelProviderProtocol>)self stopTunnelWithReason:reason];
 
         completionHandler();
-    });
+    }
 }
 
 - (BOOL)startVPN {
 
-    __block BOOL retValue;
-
-    dispatch_sync(workQueue, ^{
+    @synchronized (self) {
         if (vpnStartCompletionHandler) {
             vpnStartCompletionHandler(nil);
             vpnStartCompletionHandler = nil;
@@ -176,17 +170,15 @@ PsiFeedbackLogType const BasePacketTunnelProviderLogType = @"BasePacketTunnelPro
             [self.vpnStartedSignal sendNext:nil];
             [self.vpnStartedSignal sendCompleted];
 
-            retValue = TRUE;
+            return TRUE;
         }
-        retValue = FALSE;
-    });
-
-    return retValue;
+        return FALSE;
+    }
 }
 
 - (void)exitGracefully {
 
-    dispatch_sync(workQueue, ^{
+    @synchronized (self) {
 
         // This is a manual exit and not a jetsam.
         [self.sharedDB setExtensionJetsammedBeforeStopFlag:FALSE];
@@ -201,7 +193,7 @@ PsiFeedbackLogType const BasePacketTunnelProviderLogType = @"BasePacketTunnelPro
         [(id <BasePacketTunnelProviderProtocol>)self stopTunnelWithReason:NEProviderStopReasonNone];
 
         exit(1);
-    });
+    }
 }
 
 #pragma mark - Handling app messages
@@ -210,7 +202,7 @@ PsiFeedbackLogType const BasePacketTunnelProviderLogType = @"BasePacketTunnelPro
 #define EXTENSION_RESP_FALSE_DATA [EXTENSION_RESP_FALSE dataUsingEncoding:NSUTF8StringEncoding]
 
 - (void)handleAppMessage:(NSData *)messageData completionHandler:(nullable void (^)(NSData *__nullable responseData))completionHandler {
-    dispatch_sync(workQueue, ^{
+    @synchronized (self) {
 
         if (!completionHandler) {
             return;
@@ -235,7 +227,7 @@ PsiFeedbackLogType const BasePacketTunnelProviderLogType = @"BasePacketTunnelPro
 
         // If completionHandler is not nil, iOS expects it to always be executed.
         completionHandler(messageData);
-    });
+    }
 }
 
 #pragma mark - Boot test
