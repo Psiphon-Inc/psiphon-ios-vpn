@@ -24,6 +24,8 @@
 #import "PsiFeedbackLogger.h"
 #import "DebugToolboxViewController.h"
 
+#if DEBUG
+
 @implementation DebugViewController {
     PsiphonDataSharedDB *sharedDB;
 }
@@ -79,3 +81,5 @@
 }
 
 @end
+
+#endif

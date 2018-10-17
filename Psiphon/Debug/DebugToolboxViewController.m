@@ -21,7 +21,9 @@
 #import "DebugToolboxViewController.h"
 #import "Asserts.h"
 #import "DispatchUtils.h"
+#import "Notifier.h"
 
+#if DEBUG
 
 NSString * const ActionCellIdentifier = @"ActionCell";
 
@@ -60,31 +62,71 @@ NSString * const ActionCellIdentifier = @"ActionCell";
 
 #pragma mark - UITableViewDataSource delegate methods
 
-- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
     return 2;
+}
+
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
+    switch (section) {
+        case 0: return 2;
+        case 1: return 1;
+        default:
+            PSIAssert(FALSE)
+            return 0;
+    }
+}
+
+- (nullable NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
+    switch (section) {
+        case 0: return @"PPROF";
+        case 1: return @"EXTENION";
+        default:
+            PSIAssert(FALSE);
+            return @"";
+    }
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:ActionCellIdentifier
             forIndexPath:indexPath];
-    switch (indexPath.row) {
-        case 0: {
-            cell.textLabel.text = @"Full goroutine stack dump";
-            UITapGestureRecognizer *gr = [[UITapGestureRecognizer alloc]
-                    initWithTarget:self action:@selector(onFullGoRoutineStackDump)];
-            [cell addGestureRecognizer:gr];
-            break;
+
+    // PPROF section
+    if (indexPath.section == 0) {
+
+        switch (indexPath.row) {
+            case 0: {
+                cell.textLabel.text = @"All Profiles";
+                UITapGestureRecognizer *gr = [[UITapGestureRecognizer alloc]
+                        initWithTarget:self action:@selector(onPprofAllProfiles)];
+                [cell addGestureRecognizer:gr];
+                break;
+            }
+            case 1: {
+                cell.textLabel.text = @"Full Goroutine Stack Dump";
+                UITapGestureRecognizer *gr = [[UITapGestureRecognizer alloc]
+                        initWithTarget:self action:@selector(onFullGoRoutineStackDump)];
+                [cell addGestureRecognizer:gr];
+                break;
+            }
+            default:
+                PSIAssert(FALSE);
         }
-        case 1: {
-            cell.textLabel.text = @"Stack traces of all goroutines";
-            UITapGestureRecognizer *gr = [[UITapGestureRecognizer alloc]
-                    initWithTarget:self action:@selector(onGoRoutineStackTrace)];
-            [cell addGestureRecognizer:gr];
-            break;
+
+    // EXTENSION section
+    } else if (indexPath.section == 1) {
+
+        switch (indexPath.row) {
+            case 0: {
+                cell.textLabel.text = @"Force Jetsam";
+                UITapGestureRecognizer *gr = [[UITapGestureRecognizer alloc]
+                        initWithTarget:self action:@selector(onForceJetsam)];
+                [cell addGestureRecognizer:gr];
+                break;
+            }
         }
-        default:
-            PSIAssert(FALSE);
+
     }
+
     return cell;
 }
 
@@ -93,7 +135,7 @@ NSString * const ActionCellIdentifier = @"ActionCell";
 + (NSURLComponents *)pprofURL {
     NSURLComponents *c = [[NSURLComponents alloc] init];
     c.scheme = @"http";
-    c.host = [UIDevice.currentDevice.name.lowercaseString stringByAppendingString:@".local"];
+    c.host = @"localhost";
     c.port = @(6060);
     return c;
 }
@@ -104,17 +146,17 @@ NSString * const ActionCellIdentifier = @"ActionCell";
     NSURLComponents *components = [[self class] pprofURL];
     components.path = @"/debug/pprof/goroutine";
     components.query = @"debug=2";
-//    [self fetchURL:[components URL] andPresentWithTitle:@"/pprof/goroutine?debug=2"];
-
     [self presentWithSafari:[components URL]];
 }
 
-- (void)onGoRoutineStackTrace {
+- (void)onPprofAllProfiles {
     NSURLComponents *components = [[self class] pprofURL];
-    components.path = @"/debug/pprof/goroutine";
-    components.query = @"debug=1";
-//    [self fetchURL:[components URL] andPresentWithTitle:@"/pprof/goroutine?debug=1"];
+    components.path = @"/debug/pprof/";
     [self presentWithSafari:[components URL]];
+}
+
+- (void)onForceJetsam {
+    [[Notifier sharedInstance] post:NotifierDebugForceJetsam];
 }
 
 #pragma mark - DebugTextViewController presentation
@@ -125,3 +167,5 @@ NSString * const ActionCellIdentifier = @"ActionCell";
 }
 
 @end
+
+#endif

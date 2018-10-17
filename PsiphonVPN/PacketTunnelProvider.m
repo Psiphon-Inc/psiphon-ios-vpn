@@ -48,6 +48,7 @@
 #import "NSDate+PSIDateExtension.h"
 #import "DispatchUtils.h"
 #import "RACUnit.h"
+#import "DebugUtils.h"
 #import <ReactiveObjC/RACSubject.h>
 #import <ReactiveObjC/RACReplaySubject.h>
 
@@ -584,7 +585,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 
     // Cleanup.
     [subscriptionDisposable dispose];
-    
+
     [self.psiphonTunnel stop];
 }
 
@@ -677,6 +678,14 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
         }
 
     }
+
+#if DEBUG
+
+    if ([NotifierDebugForceJetsam isEqualToString:message]) {
+        [DebugUtils jetsamWithAllocationInterval:1 withNumberOfPages:15];
+    }
+
+#endif
 
 }
 
