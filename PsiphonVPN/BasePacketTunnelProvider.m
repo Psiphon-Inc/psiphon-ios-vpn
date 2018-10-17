@@ -26,6 +26,7 @@
 #import "NSError+Convenience.h"
 #import "Asserts.h"
 #import "PsiphonDataSharedDB.h"
+#import "Logging.h"
 
 NSErrorDomain _Nonnull const BasePsiphonTunnelErrorDomain = @"BasePsiphonTunnelErrorDomain";
 
@@ -122,6 +123,8 @@ PsiFeedbackLogType const BasePacketTunnelProviderLogType = @"BasePacketTunnelPro
         } else {
             self.extensionStartMethod = ExtensionStartMethodOther;
         }
+
+        LOG_DEBUG(@"startTunnel options: %@", [options descriptionInStringsFileFormat]);
 
         // Hold a reference to the completionHandler
         vpnStartCompletionHandler = completionHandler;
