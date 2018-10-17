@@ -320,13 +320,26 @@ PsiFeedbackLogType const VPNManagerLogType = @"VPNManager";
 
     __weak VPNManager *weakSelf = self;
 
-    __block RACDisposable *disposable = [[[[[VPNManager loadTunnelProviderManager]
-      flattenMap:^RACSignal *(NETunnelProviderManager *_Nullable providerManager) {
+    __block RACDisposable *disposable = [[[[[[[[[VPNManager loadTunnelProviderManager]
+      flattenMap:^RACSignal<NETunnelProviderManager *> *(NETunnelProviderManager *_Nullable providerManager) {
           // Updates VPN configuration parameters if it already exists,
           // otherwise creates a new VPN configuration.
           return [weakSelf updateOrCreateVPNConfigurationAndSave:providerManager];
       }]
-      flattenMap:^RACSignal<NSNumber *> *(NETunnelProviderManager *providerManager) {
+      doNext:^(NETunnelProviderManager *_Nonnull providerManager) {
+          // Enable Connect On Demand before starting the tunnel.
+          providerManager.onDemandEnabled = TRUE;
+      }]
+      flattenMap:^RACSignal *(NETunnelProviderManager *providerManager) {
+          return [RACSignal defer:providerManager selectorWithErrorCallback:@selector(saveToPreferencesWithCompletionHandler:)];
+      }]
+      flattenMap:^RACSignal *(NETunnelProviderManager *providerManager) {
+          return [RACSignal defer:providerManager selectorWithErrorCallback:@selector(loadFromPreferencesWithCompletionHandler:)];
+      }]
+      doNext:^(NETunnelProviderManager *_Nonnull providerManager) {
+          weakSelf.tunnelProviderManager = providerManager;
+      }]
+      flattenMap:^RACSignal<NSNumber *> *(NETunnelProviderManager *_Nonnull providerManager) {
 
           NSError *error;
           NSDictionary *options = @{EXTENSION_OPTION_START_FROM_CONTAINER: EXTENSION_OPTION_TRUE};
@@ -700,8 +713,10 @@ PsiFeedbackLogType const VPNManagerLogType = @"VPNManager";
               providerManager.onDemandRules = @[alwaysConnectRule];
           }
 
-          // Enables Connect On Demand for all users.
-          providerManager.onDemandEnabled = TRUE;
+          // Reset Connect On Demand state.
+          // To enable Connect On Demand for all, it should be enabled right before startTunnel is called
+          // on the NETunnelProviderManager object.
+          providerManager.onDemandEnabled = FALSE;
 
           return providerManager;
       }]
