@@ -411,10 +411,12 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
       }]
       flattenMap:^RACSignal<NSString *> *(RACTwoTuple<NSNumber *, NSNumber *> *value) {
           BOOL vpnActive = [value.first boolValue];
+          BOOL isZombie = (VPNStatusZombie == (VPNStatus)[value.second integerValue]);
 
-          // Emits command to stop VPN if it has already started. Otherwise, it checks for internet connectivity
-          // and emits one of CommandNoInternetAlert or CommandStartTunnel.
-          if (vpnActive) {
+          // Emits command to stop VPN if it has already started or is in zombie mode.
+          // Otherwise, it checks for internet connectivity and emits
+          // one of CommandNoInternetAlert or CommandStartTunnel.
+          if (vpnActive || isZombie) {
               return [RACSignal return:CommandStopVPN];
 
           } else {
