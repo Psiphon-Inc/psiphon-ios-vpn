@@ -426,7 +426,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
               } else {
 
                   // Returned signal checks whether or not VPN configuration is already installed.
-                  // Skips presenting ads if there is not VPN configuration installed.
+                  // Skips presenting ads if the VPN configuration is not installed.
                   return [[weakSelf.vpnManager vpnConfigurationInstalled]
                     flattenMap:^RACSignal *(NSNumber *value) {
                         BOOL vpnInstalled = [value boolValue];
