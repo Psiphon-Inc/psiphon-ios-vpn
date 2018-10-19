@@ -17,12 +17,14 @@
  *
  */
 
-#import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface DebugToolboxViewController : UIViewController <UITableViewDelegate, UITableViewDataSource>
+@interface DebugDirectoryViewerViewController : UIViewController <UITableViewDelegate, UITableViewDataSource>
+
++ (instancetype)createAndLoadDirectory:(NSURL *)directory withTitle:(NSString *)title;
+
 @end
 
 NS_ASSUME_NONNULL_END

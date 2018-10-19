@@ -383,6 +383,12 @@ UserDefaultsKey const SharedDataExtensionJetsamCounterIntegerKey = @"PsiphonData
 
 #pragma mark - Logging
 
+- (NSString *)goProfileDirectory {
+    return [[[[NSFileManager defaultManager]
+            containerURLForSecurityApplicationGroupIdentifier:appGroupIdentifier] path]
+            stringByAppendingPathComponent:@"go_profile"];
+}
+
 - (NSString *)rotatingLogNoticesPath {
     return [[[[NSFileManager defaultManager]
       containerURLForSecurityApplicationGroupIdentifier:appGroupIdentifier] path]

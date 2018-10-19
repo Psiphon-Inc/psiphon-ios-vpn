@@ -83,6 +83,16 @@
     return TRUE;
 }
 
+/**
+ * Creates directory at dirURL if it doesn't exist.
+ */
++ (NSError *)createDir:(NSURL *)dirURL {
+    NSError *e = nil;
+    NSFileManager *fm = [NSFileManager defaultManager];
+    [fm createDirectoryAtURL:dirURL withIntermediateDirectories:TRUE attributes:nil error:&e];
+    return e;
+}
+
 #if DEBUG
 + (void)listDirectory:(NSString *)dir resource:(NSString *)resource{
     NSError *err;

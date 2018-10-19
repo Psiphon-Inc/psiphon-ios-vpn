@@ -17,12 +17,15 @@
  *
  */
 
-#import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
+#import <WebKit/WebKit.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface DebugToolboxViewController : UIViewController <UITableViewDelegate, UITableViewDataSource>
+@interface DebugTextViewController : UIViewController
+
++ (instancetype)createAndLoadFileURL:(NSURL *)url;
+
 @end
 
 NS_ASSUME_NONNULL_END

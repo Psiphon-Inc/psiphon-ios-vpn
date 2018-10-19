@@ -21,8 +21,9 @@
 
 @interface FileUtils : NSObject
 
-
 + (BOOL)downgradeFileProtectionToNone:(NSArray<NSString *> *)paths withExceptions:(NSArray<NSString *> *)exceptions;
+
++ (NSError *)createDir:(NSURL *)dirURL;
 
 #if DEBUG
 + (void)listDirectory:(NSString *)dir resource:(NSString *)resource;
