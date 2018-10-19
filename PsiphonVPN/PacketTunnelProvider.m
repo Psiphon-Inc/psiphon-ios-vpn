@@ -49,6 +49,7 @@
 #import "DispatchUtils.h"
 #import "RACUnit.h"
 #import "DebugUtils.h"
+#import "FileUtils.h"
 #import <ReactiveObjC/RACSubject.h>
 #import <ReactiveObjC/RACReplaySubject.h>
 
@@ -683,6 +684,22 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 
     if ([NotifierDebugForceJetsam isEqualToString:message]) {
         [DebugUtils jetsamWithAllocationInterval:1 withNumberOfPages:15];
+
+    } else if ([NotifierDebugGoProfile isEqualToString:message]) {
+
+        NSError *e = [FileUtils createDir:[NSURL fileURLWithPath:self.sharedDB.goProfileDirectory isDirectory:TRUE]];
+        if (e != nil) {
+            [PsiFeedbackLogger errorWithType:ExtensionNotificationLogType
+                                     message:@"FailedToCreateProfileDir"
+                                      object:e];
+            return;
+        }
+
+        [self.psiphonTunnel writeRuntimeProfilesTo:self.sharedDB.goProfileDirectory
+                      withCPUSampleDurationSeconds:0
+                    withBlockSampleDurationSeconds:0];
+
+        [self displayMessage:@"DEBUG: Finished writing runtime profiles."];
     }
 
 #endif

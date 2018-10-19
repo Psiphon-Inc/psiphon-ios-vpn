@@ -37,9 +37,10 @@ extern NotifierMessage const NotifierForceSubscriptionCheck;
 extern NotifierMessage const NotifierAppEnteredBackground;
 extern NotifierMessage const NotifierUpdatedAuthorizations;
 
-// Messages allowed only in debug mode.
+// Messages allowed only in debug build.
 #if DEBUG
 extern NotifierMessage const NotifierDebugForceJetsam;
+extern NotifierMessage const NotifierDebugGoProfile;
 #endif
 
 #pragma mark - NotifierObserver

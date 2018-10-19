@@ -118,7 +118,9 @@
 		A84085DD50355AEE9A6C016A /* DebugUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = A84082F8553E6F7EB5C7DB2F /* DebugUtils.m */; };
 		A84087C7B0CEF1E897A8512B /* DebugToolboxViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A84088E4A992974BE32D5B1C /* DebugToolboxViewController.m */; };
 		A8408A1B42DB02449F6F492E /* DebugUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = A84082F8553E6F7EB5C7DB2F /* DebugUtils.m */; };
+		A8408A7F643A2EBA867EFE50 /* DebugTextViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A84082EE1030DB6CE5662E0C /* DebugTextViewController.m */; };
 		A8408C06F380C57021E126CF /* DebugLogViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A84088E6DD5857BF87A012FF /* DebugLogViewController.m */; };
+		A8408EA5F70A164F019D1354 /* DebugDirectoryViewerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A8408182417BD6BE2C67E5AB /* DebugDirectoryViewerViewController.m */; };
 		B1D9FF416DDCA97A40A325AA /* libPods-PsiphonVPN.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 01122727D6CE50B340C55DBE /* libPods-PsiphonVPN.a */; };
 		CE26FC951BBDC7B800B83375 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = CE26FC941BBDC7B800B83375 /* Assets.xcassets */; };
 		CE26FCAC1BBDC85900B83375 /* PsiphonVPN.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = CE26FCA31BBDC85900B83375 /* PsiphonVPN.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
@@ -436,14 +438,18 @@
 		9BFECF45CA0CAF6997411D22 /* MoPubInterstitialAdControllerWrapper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MoPubInterstitialAdControllerWrapper.m; sourceTree = "<group>"; };
 		9BFECF6BF16767758F28D1A0 /* AdMobRewardedAdControllerWrapper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AdMobRewardedAdControllerWrapper.m; sourceTree = "<group>"; };
 		9BFECF74881B6C4227813A63 /* AdMobConsent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AdMobConsent.h; sourceTree = "<group>"; };
+		A8408182417BD6BE2C67E5AB /* DebugDirectoryViewerViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DebugDirectoryViewerViewController.m; sourceTree = "<group>"; };
+		A84082EE1030DB6CE5662E0C /* DebugTextViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DebugTextViewController.m; sourceTree = "<group>"; };
 		A84082F8553E6F7EB5C7DB2F /* DebugUtils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DebugUtils.m; sourceTree = "<group>"; };
 		A8408485646C405AA88F1FAC /* DebugLogViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DebugLogViewController.h; sourceTree = "<group>"; };
+		A84087583F512F9B0E218A9E /* DebugDirectoryViewerViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DebugDirectoryViewerViewController.h; sourceTree = "<group>"; };
 		A8408760300FDF33FB753E80 /* DebugViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DebugViewController.m; sourceTree = "<group>"; };
 		A8408840E64F256751DE98A6 /* DebugUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DebugUtils.h; sourceTree = "<group>"; };
 		A84088E4A992974BE32D5B1C /* DebugToolboxViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DebugToolboxViewController.m; sourceTree = "<group>"; };
 		A84088E6DD5857BF87A012FF /* DebugLogViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DebugLogViewController.m; sourceTree = "<group>"; };
 		A840894010814875EF026FBC /* DebugViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DebugViewController.h; sourceTree = "<group>"; };
 		A8408C5E4750DF87D82287E4 /* DebugToolboxViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DebugToolboxViewController.h; sourceTree = "<group>"; };
+		A8408F3D8324968FAE8B7DBC /* DebugTextViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DebugTextViewController.h; sourceTree = "<group>"; };
 		CB8BB19F016330264C4DCB80 /* libPods-Psiphon.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Psiphon.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		CE26FC8A1BBDC7B800B83375 /* Psiphon.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Psiphon.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		CE26FC941BBDC7B800B83375 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -816,6 +822,10 @@
 				A840894010814875EF026FBC /* DebugViewController.h */,
 				A84088E4A992974BE32D5B1C /* DebugToolboxViewController.m */,
 				A8408C5E4750DF87D82287E4 /* DebugToolboxViewController.h */,
+				A84082EE1030DB6CE5662E0C /* DebugTextViewController.m */,
+				A8408F3D8324968FAE8B7DBC /* DebugTextViewController.h */,
+				A8408182417BD6BE2C67E5AB /* DebugDirectoryViewerViewController.m */,
+				A84087583F512F9B0E218A9E /* DebugDirectoryViewerViewController.h */,
 			);
 			path = Debug;
 			sourceTree = "<group>";
@@ -1516,6 +1526,8 @@
 				A8408C06F380C57021E126CF /* DebugLogViewController.m in Sources */,
 				A84082CC51042C9412527064 /* DebugViewController.m in Sources */,
 				A84087C7B0CEF1E897A8512B /* DebugToolboxViewController.m in Sources */,
+				A8408A7F643A2EBA867EFE50 /* DebugTextViewController.m in Sources */,
+				A8408EA5F70A164F019D1354 /* DebugDirectoryViewerViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

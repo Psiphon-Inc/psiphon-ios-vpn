@@ -18,10 +18,15 @@
  */
 
 #import <SafariServices/SafariServices.h>
+#import <WebKit/WebKit.h>
 #import "DebugToolboxViewController.h"
 #import "Asserts.h"
 #import "DispatchUtils.h"
 #import "Notifier.h"
+#import "PsiphonDataSharedDB.h"
+#import "SharedConstants.h"
+#import "DebugTextViewController.h"
+#import "DebugDirectoryViewerViewController.h"
 
 #if DEBUG
 
@@ -68,8 +73,8 @@ NSString * const ActionCellIdentifier = @"ActionCell";
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     switch (section) {
-        case 0: return 2;
-        case 1: return 1;
+        case 0: return 2; // PPROF
+        case 1: return 1; // EXTENSION
         default:
             PSIAssert(FALSE)
             return 0;
@@ -79,7 +84,7 @@ NSString * const ActionCellIdentifier = @"ActionCell";
 - (nullable NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
     switch (section) {
         case 0: return @"PPROF";
-        case 1: return @"EXTENION";
+        case 1: return @"EXTENSION";
         default:
             PSIAssert(FALSE);
             return @"";
@@ -90,26 +95,22 @@ NSString * const ActionCellIdentifier = @"ActionCell";
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:ActionCellIdentifier
             forIndexPath:indexPath];
 
+    SEL action;
+
     // PPROF section
     if (indexPath.section == 0) {
 
         switch (indexPath.row) {
             case 0: {
-                cell.textLabel.text = @"All Profiles";
-                UITapGestureRecognizer *gr = [[UITapGestureRecognizer alloc]
-                        initWithTarget:self action:@selector(onPprofAllProfiles)];
-                [cell addGestureRecognizer:gr];
+                cell.textLabel.text = @"Write Go Profiles";
+                action = @selector(onWriteGoProfiles);
                 break;
             }
             case 1: {
-                cell.textLabel.text = @"Full Goroutine Stack Dump";
-                UITapGestureRecognizer *gr = [[UITapGestureRecognizer alloc]
-                        initWithTarget:self action:@selector(onFullGoRoutineStackDump)];
-                [cell addGestureRecognizer:gr];
+                cell.textLabel.text = @"Show Go Profiles";
+                action = @selector(onGoProfiles);
                 break;
             }
-            default:
-                PSIAssert(FALSE);
         }
 
     // EXTENSION section
@@ -118,52 +119,36 @@ NSString * const ActionCellIdentifier = @"ActionCell";
         switch (indexPath.row) {
             case 0: {
                 cell.textLabel.text = @"Force Jetsam";
-                UITapGestureRecognizer *gr = [[UITapGestureRecognizer alloc]
-                        initWithTarget:self action:@selector(onForceJetsam)];
-                [cell addGestureRecognizer:gr];
+                action = @selector(onForceJetsam);
                 break;
             }
         }
-
     }
+
+    UITapGestureRecognizer *gr = [[UITapGestureRecognizer alloc]
+            initWithTarget:self action:action];
+    [cell addGestureRecognizer:gr];
 
     return cell;
 }
 
-#pragma mark - PProf
-
-+ (NSURLComponents *)pprofURL {
-    NSURLComponents *c = [[NSURLComponents alloc] init];
-    c.scheme = @"http";
-    c.host = @"localhost";
-    c.port = @(6060);
-    return c;
-}
-
 #pragma mark - Action cell tap delegates
-
-- (void)onFullGoRoutineStackDump {
-    NSURLComponents *components = [[self class] pprofURL];
-    components.path = @"/debug/pprof/goroutine";
-    components.query = @"debug=2";
-    [self presentWithSafari:[components URL]];
-}
-
-- (void)onPprofAllProfiles {
-    NSURLComponents *components = [[self class] pprofURL];
-    components.path = @"/debug/pprof/";
-    [self presentWithSafari:[components URL]];
-}
 
 - (void)onForceJetsam {
     [[Notifier sharedInstance] post:NotifierDebugForceJetsam];
 }
 
-#pragma mark - DebugTextViewController presentation
+- (void)onWriteGoProfiles {
+    [[Notifier sharedInstance] post:NotifierDebugGoProfile];
+}
 
-- (void)presentWithSafari:(NSURL *)url {
-    SFSafariViewController *safari = [[SFSafariViewController alloc]initWithURL:url entersReaderIfAvailable:NO];
-    [self presentViewController:safari animated:TRUE completion:nil];
+- (void)onGoProfiles {
+    PsiphonDataSharedDB *sharedDB = [[PsiphonDataSharedDB alloc] initForAppGroupIdentifier:APP_GROUP_IDENTIFIER];
+    NSURL *dirURL = [NSURL fileURLWithPath:sharedDB.goProfileDirectory];
+
+    DebugDirectoryViewerViewController *wvc = [DebugDirectoryViewerViewController createAndLoadDirectory:dirURL
+            withTitle:@"Go Profiles"];
+    [self.navigationController pushViewController:wvc animated:TRUE];
 }
 
 @end

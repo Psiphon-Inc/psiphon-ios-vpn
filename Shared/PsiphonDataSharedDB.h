@@ -68,7 +68,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString *_Nullable)emittedClientRegion;
 #endif
 
-
+- (NSString *)goProfileDirectory;
 - (NSString *)homepageNoticesPath;
 - (NSString *)rotatingLogNoticesPath;
 
