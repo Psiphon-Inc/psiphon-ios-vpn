@@ -121,6 +121,11 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSInteger)getJetsamCounter;
 #endif
 
+#pragma mark - Debug Utils Prefernces
+
+- (void)setDebugMemoryProfiler:(BOOL)enabled;
+- (BOOL)getDebugMemoryProfiler;
+
 @end
 
 NS_ASSUME_NONNULL_END

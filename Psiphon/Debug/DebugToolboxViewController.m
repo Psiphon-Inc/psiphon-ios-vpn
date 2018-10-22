@@ -18,22 +18,34 @@
  */
 
 #import <SafariServices/SafariServices.h>
-#import <WebKit/WebKit.h>
 #import "DebugToolboxViewController.h"
 #import "Asserts.h"
-#import "DispatchUtils.h"
 #import "Notifier.h"
 #import "PsiphonDataSharedDB.h"
 #import "SharedConstants.h"
-#import "DebugTextViewController.h"
 #import "DebugDirectoryViewerViewController.h"
 
 #if DEBUG
 
 NSString * const ActionCellIdentifier = @"ActionCell";
+NSString * const SwitchCellIdentifier = @"SwitchCell";
+
+@interface DebugToolboxViewController ()
+
+@property (nonatomic) PsiphonDataSharedDB *sharedDB;
+
+@end
 
 @implementation DebugToolboxViewController {
     UITableView *actionsTableView;
+}
+
+- (instancetype)init {
+    self = [super init];
+    if (self) {
+        _sharedDB = [[PsiphonDataSharedDB alloc] initForAppGroupIdentifier:APP_GROUP_IDENTIFIER];
+    }
+    return self;
 }
 
 - (void)viewDidLoad {
@@ -50,6 +62,7 @@ NSString * const ActionCellIdentifier = @"ActionCell";
     actionsTableView.dataSource = self;
     actionsTableView.delegate = self;
     [actionsTableView registerClass:UITableViewCell.class forCellReuseIdentifier:ActionCellIdentifier];
+    [actionsTableView registerClass:UITableViewCell.class forCellReuseIdentifier:SwitchCellIdentifier];
     actionsTableView.backgroundColor = [UIColor whiteColor];
     [self.view addSubview:actionsTableView];
 
@@ -74,7 +87,7 @@ NSString * const ActionCellIdentifier = @"ActionCell";
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     switch (section) {
         case 0: return 2; // PPROF
-        case 1: return 1; // EXTENSION
+        case 1: return 2; // EXTENSION
         default:
             PSIAssert(FALSE)
             return 0;
@@ -91,15 +104,16 @@ NSString * const ActionCellIdentifier = @"ActionCell";
     }
 }
 
-- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:ActionCellIdentifier
-            forIndexPath:indexPath];
 
-    SEL action;
+
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+    UITableViewCell *cell;
+    SEL action = nil;
 
     // PPROF section
     if (indexPath.section == 0) {
 
+        cell = [tableView dequeueReusableCellWithIdentifier:ActionCellIdentifier forIndexPath:indexPath];
         switch (indexPath.row) {
             case 0: {
                 cell.textLabel.text = @"Write Go Profiles";
@@ -107,6 +121,7 @@ NSString * const ActionCellIdentifier = @"ActionCell";
                 break;
             }
             case 1: {
+                cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
                 cell.textLabel.text = @"Show Go Profiles";
                 action = @selector(onGoProfiles);
                 break;
@@ -118,16 +133,31 @@ NSString * const ActionCellIdentifier = @"ActionCell";
 
         switch (indexPath.row) {
             case 0: {
+                cell = [tableView dequeueReusableCellWithIdentifier:ActionCellIdentifier forIndexPath:indexPath];
                 cell.textLabel.text = @"Force Jetsam";
                 action = @selector(onForceJetsam);
+                break;
+            }
+            case 1: {
+                cell = [tableView dequeueReusableCellWithIdentifier:ActionCellIdentifier forIndexPath:indexPath];
+                cell.selectionStyle = UITableViewCellSelectionStyleNone;
+                cell.textLabel.text = @"Memory Profiler";
+                UISwitch *switchView = [[UISwitch alloc] initWithFrame:CGRectZero];
+                [switchView setOn:self.sharedDB.getDebugMemoryProfiler];
+                [switchView addTarget:self
+                               action:@selector(onMemoryProfilerSwitch:)
+                     forControlEvents:UIControlEventValueChanged];
+                cell.accessoryView = switchView;
                 break;
             }
         }
     }
 
-    UITapGestureRecognizer *gr = [[UITapGestureRecognizer alloc]
-            initWithTarget:self action:action];
-    [cell addGestureRecognizer:gr];
+    if (action != nil) {
+        UITapGestureRecognizer *gr = [[UITapGestureRecognizer alloc]
+                initWithTarget:self action:action];
+        [cell addGestureRecognizer:gr];
+    }
 
     return cell;
 }
@@ -143,12 +173,16 @@ NSString * const ActionCellIdentifier = @"ActionCell";
 }
 
 - (void)onGoProfiles {
-    PsiphonDataSharedDB *sharedDB = [[PsiphonDataSharedDB alloc] initForAppGroupIdentifier:APP_GROUP_IDENTIFIER];
-    NSURL *dirURL = [NSURL fileURLWithPath:sharedDB.goProfileDirectory];
+    NSURL *dirURL = [NSURL fileURLWithPath:self.sharedDB.goProfileDirectory];
 
     DebugDirectoryViewerViewController *wvc = [DebugDirectoryViewerViewController createAndLoadDirectory:dirURL
             withTitle:@"Go Profiles"];
     [self.navigationController pushViewController:wvc animated:TRUE];
+}
+
+- (void)onMemoryProfilerSwitch:(UISwitch *)view {
+    [self.sharedDB setDebugMemoryProfiler:view.isOn];
+    [[Notifier sharedInstance] post:NotifierDebugMemoryProfiler];
 }
 
 @end
