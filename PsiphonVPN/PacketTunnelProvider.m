@@ -139,7 +139,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 
     RACDisposable *_Nullable subscriptionDisposable;
 
-    AppProfiler *appProfiler;
+    AppProfiler *_Nullable appProfiler;
 }
 
 - (id)init {
@@ -497,18 +497,36 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
       }];
 }
 
+// For debug builds starts or stops app profiler based on `sharedDB` state.
+// For prod builds only starts app profiler.
+- (void)updateAppProfiling {
+#if DEBUG
+    BOOL start = self.sharedDB.getDebugMemoryProfiler;
+#else
+    BOOL start = TRUE;
+#endif
+
+    if (!appProfiler && start) {
+        appProfiler = [[AppProfiler alloc] init];
+        [appProfiler startProfilingWithStartInterval:1
+                                          forNumLogs:10
+                         andThenExponentialBackoffTo:60*30
+                            withNumLogsAtEachBackOff:1];
+
+    } else if (!start) {
+        [appProfiler stopProfiling];
+    }
+}
+
 // VPN should only start if it is started from the container app directly,
 // OR if the user possibly has a valid subscription
 // OR if the extension is started after boot but before being unlocked.
 - (void)startTunnelWithErrorHandler:(void (^_Nonnull)(NSError *_Nonnull error))errorHandler {
 
-    // Start app profiling
-    if (!appProfiler) {
-        appProfiler = [[AppProfiler alloc] init];
-        [appProfiler startProfilingWithStartInterval:1 forNumLogs:10 andThenExponentialBackoffTo:60*30 withNumLogsAtEachBackOff:1];
-    }
-
     __weak PacketTunnelProvider *weakSelf = self;
+
+    // In prod starts app profiling.
+    [self updateAppProfiling];
 
     [[Notifier sharedInstance] registerObserver:self callbackQueue:dispatch_get_main_queue()];
 
@@ -700,6 +718,9 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
                     withBlockSampleDurationSeconds:0];
 
         [self displayMessage:@"DEBUG: Finished writing runtime profiles."];
+
+    } else if ([NotifierDebugMemoryProfiler isEqualToString:message]) {
+        [self updateAppProfiling];
     }
 
 #endif

@@ -41,6 +41,7 @@ extern NotifierMessage const NotifierUpdatedAuthorizations;
 #if DEBUG
 extern NotifierMessage const NotifierDebugForceJetsam;
 extern NotifierMessage const NotifierDebugGoProfile;
+extern NotifierMessage const NotifierDebugMemoryProfiler;
 #endif
 
 #pragma mark - NotifierObserver

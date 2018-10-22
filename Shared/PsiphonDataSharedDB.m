@@ -54,6 +54,10 @@ UserDefaultsKey const SharedDataExtensionCrashedBeforeStopBoolKey = @"PsiphonDat
  */
 UserDefaultsKey const SharedDataExtensionJetsamCounterIntegerKey = @"PsiphonDataSharedDB.ExtensionJetsamCounterIntKey";
 
+#if DEBUG
+UserDefaultsKey const DebugMemoryProfileBoolKey = @"PsiphonDataSharedDB.DebugMemoryProfilerBoolKey";
+#endif
+
 #if !(TARGET_IS_EXTENSION)
 #define EMBEDDED_EGRESS_REGIONS_KEY @"embedded_server_entries_egress_regions"
 #endif
@@ -613,5 +617,15 @@ UserDefaultsKey const SharedDataExtensionJetsamCounterIntegerKey = @"PsiphonData
 }
 
 #endif
+
+#pragma mark - Debug Utils Preferences
+
+- (void)setDebugMemoryProfiler:(BOOL)enabled {
+    [sharedDefaults setBool:enabled forKey:DebugMemoryProfileBoolKey];
+}
+
+- (BOOL)getDebugMemoryProfiler {
+    return [sharedDefaults boolForKey:DebugMemoryProfileBoolKey];
+}
 
 @end
