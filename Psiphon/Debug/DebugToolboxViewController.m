@@ -173,9 +173,8 @@ NSString * const SwitchCellIdentifier = @"SwitchCell";
 }
 
 - (void)onGoProfiles {
-    NSURL *dirURL = [NSURL fileURLWithPath:self.sharedDB.goProfileDirectory];
-
-    DebugDirectoryViewerViewController *wvc = [DebugDirectoryViewerViewController createAndLoadDirectory:dirURL
+    DebugDirectoryViewerViewController *wvc = [DebugDirectoryViewerViewController
+            createAndLoadDirectory:self.sharedDB.goProfileDirectory
             withTitle:@"Go Profiles"];
     [self.navigationController pushViewController:wvc animated:TRUE];
 }
