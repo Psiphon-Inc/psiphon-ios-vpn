@@ -664,7 +664,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 
     } else if ([NotifierDebugGoProfile isEqualToString:message]) {
 
-        NSError *e = [FileUtils createDir:[NSURL fileURLWithPath:self.sharedDB.goProfileDirectory isDirectory:TRUE]];
+        NSError *e = [FileUtils createDir:self.sharedDB.goProfileDirectory];
         if (e != nil) {
             [PsiFeedbackLogger errorWithType:ExtensionNotificationLogType
                                      message:@"FailedToCreateProfileDir"
@@ -672,7 +672,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
             return;
         }
 
-        [self.psiphonTunnel writeRuntimeProfilesTo:self.sharedDB.goProfileDirectory
+        [self.psiphonTunnel writeRuntimeProfilesTo:self.sharedDB.goProfileDirectory.path
                       withCPUSampleDurationSeconds:0
                     withBlockSampleDurationSeconds:0];
 
@@ -1044,7 +1044,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 }
 
 - (void)onAvailableEgressRegions:(NSArray *)regions {
-    [self.sharedDB insertNewEgressRegions:regions];
+    [self.sharedDB setEmittedEgressRegions:regions];
 
     [[Notifier sharedInstance] post:NotifierAvailableEgressRegions];
 
