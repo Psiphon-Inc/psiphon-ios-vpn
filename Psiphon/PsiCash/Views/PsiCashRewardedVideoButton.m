@@ -23,6 +23,7 @@
 #import "ReactiveObjC.h"
 #import "UIColor+Additions.h"
 #import "UIFont+Additions.h"
+#import "UIView+AutoLayoutViewGroup.h"
 
 @interface PsiCashRewardedVideoButton ()
 @end
@@ -33,18 +34,6 @@
     CAGradientLayer* statusGradient;
     UILabel *status;
     UIView *statusGradientLabel;
-}
-
--(id)initWithFrame:(CGRect)frame {
-    self = [super initWithFrame:frame];
-    
-    if (self) {
-        [self setupViews];
-        [self addViews];
-        [self setupLayoutConstraints];
-    }
-    
-    return self;
 }
 
 - (void)dealloc {
@@ -107,12 +96,12 @@
     [self videoReady:NO];
 }
 
-- (void)addViews {
+- (void)addSubviews {
     [self addSubview:statusGradientLabel];
     [statusGradientLabel addSubview:status];
 }
 
-- (void)setupLayoutConstraints {
+- (void)setupSubviewsLayoutConstraints {
     statusGradientLabel.translatesAutoresizingMaskIntoConstraints = NO;
     [statusGradientLabel.centerXAnchor constraintEqualToAnchor:self.centerXAnchor].active = YES;
     [statusGradientLabel.topAnchor constraintEqualToAnchor:self.topAnchor constant:2.f /* don't overlap top border */].active = YES;

@@ -21,6 +21,7 @@
 #import "PsiCashClient.h"
 #import "PsiCashSpeedBoostMeterView.h"
 #import "ReactiveObjC.h"
+#import "UIView+AutoLayoutViewGroup.h"
 
 @interface PsiCashBalanceView ()
 @property (atomic, readwrite) PsiCashClientModel *model;
@@ -33,21 +34,6 @@
 @implementation PsiCashBalanceView {
     UIView *containerView;
     NSTimer *animationTimer;
-    BOOL isRTL;
-}
-
--(id)initWithFrame:(CGRect)frame {
-    self = [super initWithFrame:frame];
-
-    if (self) {
-        isRTL = ([UIApplication sharedApplication].userInterfaceLayoutDirection == UIUserInterfaceLayoutDirectionRightToLeft);
-
-        [self setupViews];
-        [self addViews];
-        [self setupLayoutConstraints];
-    }
-
-    return self;
 }
 
 -(void)setBounds:(CGRect)bounds{
@@ -76,7 +62,7 @@
     _balance.backgroundColor = [UIColor clearColor];
     _balance.adjustsFontSizeToFitWidth = YES;
     _balance.font = [UIFont boldSystemFontOfSize:20];
-    _balance.textAlignment = isRTL ? NSTextAlignmentRight : NSTextAlignmentLeft;
+    _balance.textAlignment = self.isRTL ? NSTextAlignmentRight : NSTextAlignmentLeft;
     _balance.textColor = [UIColor colorWithRed:0.30 green:0.31 blue:1.00 alpha:1.0];
     _balance.userInteractionEnabled = NO;
 
@@ -87,13 +73,13 @@
     [_coin.layer setMinificationFilter:kCAFilterTrilinear];
 }
 
-- (void)addViews {
+- (void)addSubviews {
     [self addSubview:containerView];
     [self addSubview:_balance];
     [self addSubview:_coin];
 }
 
-- (void)setupLayoutConstraints {
+- (void)setupSubviewsLayoutConstraints {
     containerView.translatesAutoresizingMaskIntoConstraints = NO;
     [containerView.centerXAnchor constraintEqualToAnchor:self.centerXAnchor].active = YES;
     [containerView.centerYAnchor constraintEqualToAnchor:self.centerYAnchor].active = YES;

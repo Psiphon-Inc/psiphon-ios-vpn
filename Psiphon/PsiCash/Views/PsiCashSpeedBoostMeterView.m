@@ -24,6 +24,7 @@
 #import "ReactiveObjC.h"
 #import "UIColor+Additions.h"
 #import "UIFont+Additions.h"
+#import "UIView+AutoLayoutViewGroup.h"
 
 #define kBorderWidth 2.f
 #define kDistanceFromOuterToInnerMeter 6.f
@@ -137,18 +138,6 @@
 
 #pragma mark - Init
 
-- (id)initWithFrame:(CGRect)frame {
-    self = [super initWithFrame:frame];
-
-    if (self) {
-        [self setupViews];
-        [self addViews];
-        [self setupLayoutConstraints];
-    }
-
-    return self;
-}
-
 - (void)setupViews {
     self.backgroundColor = [UIColor whiteColor];
     self.clipsToBounds = YES;
@@ -169,13 +158,13 @@
     innerBackground.backgroundColor = [UIColor paleGreyTwo];
 }
 
-- (void)addViews {
+- (void)addSubviews {
     [self addSubview:innerBackground];
     [self addSubview:instantBuyButton];
     [self addSubview:title];
 }
 
-- (void)setupLayoutConstraints {
+- (void)setupSubviewsLayoutConstraints {
     innerBackground.translatesAutoresizingMaskIntoConstraints = NO;
     CGFloat distanceFromOuterMeterBorderToInnerMeter = kBorderWidth + kDistanceFromOuterToInnerMeter;
     [innerBackground.widthAnchor constraintEqualToAnchor:self.widthAnchor constant:-distanceFromOuterMeterBorderToInnerMeter*2].active = YES;

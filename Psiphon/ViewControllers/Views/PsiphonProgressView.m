@@ -19,8 +19,7 @@
 
 #import "LoadingCircleLayer.h"
 #import "PsiphonProgressView.h"
-#import "PureLayout.h"
-
+#import "UIView+AutoLayoutViewGroup.h"
 
 @implementation PsiphonProgressView {
     UIImage *logo;
@@ -30,18 +29,6 @@
 
     LoadingCircleLayer *loadingCircle;
 
-}
-
--(id)initWithFrame:(CGRect)frame {
-    self = [super initWithFrame:frame];
-
-    if (self) {
-        [self setBackgroundColor:[UIColor clearColor]];
-        [self setupViews];
-        [self setupLayoutConstraints];
-    }
-
-    return self;
 }
 
 - (void)layoutSubviews {
@@ -72,10 +59,11 @@
 #pragma mark - helpers
 
 - (void)setupViews {
+    [self setBackgroundColor:[UIColor clearColor]];
+
     logo = [UIImage imageNamed:@"LaunchScreen"];
     logoView = [[UIImageView alloc] initWithImage:logo];
     logoView.contentMode = UIViewContentModeScaleAspectFill;
-    [self addSubview:logoView];
 
     loadingCircle = [[LoadingCircleLayer alloc] init];
     loadingCircle.lineWidth = 5.f;
@@ -84,7 +72,11 @@
     [self.layer addSublayer:loadingCircle];
 }
 
-- (void)setupLayoutConstraints {
+- (void)addSubviews {
+    [self addSubview:logoView];
+}
+
+- (void)setupSubviewsLayoutConstraints {
     logoView.translatesAutoresizingMaskIntoConstraints = NO;
 
     CGSize size = CGSizeMake(logoView.image.size.width, logoView.image.size.height);

@@ -25,6 +25,7 @@
 #import "PureLayout.h"
 #import "RootContainerController.h"
 #import "Asserts.h"
+#import "UIView+AutoLayoutViewGroup.h"
 
 #define kTimerInterval 1.f
 
@@ -80,7 +81,7 @@ static const NSString *ItemStatusContext;
 #pragma mark - helpers
 
 - (void)addProgressView {
-    progressView = [[PsiphonProgressView alloc] init];
+    progressView = [[PsiphonProgressView alloc] initWithAutoLayout];
     progressView.translatesAutoresizingMaskIntoConstraints = NO;
     [self.view addSubview:progressView];
 

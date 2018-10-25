@@ -22,6 +22,7 @@
 #import "ReactiveObjC.h"
 #import "UIColor+Additions.h"
 #import "UIFont+Additions.h"
+#import "UIView+AutoLayoutViewGroup.h"
 
 @interface PsiCashView ()
 @property (atomic, readwrite) PsiCashClientModel *model;
@@ -36,32 +37,20 @@
     UIView *bottomBorderBlocker;
 }
 
--(id)initWithFrame:(CGRect)frame {
-    self = [super initWithFrame:frame];
-
-    if (self) {
-        [self setupViews];
-        [self addViews];
-        [self setupLayoutConstraints];
-    }
-
-    return self;
-}
-
 - (void)setupViews {
     [self setBackgroundColor:[UIColor clearColor]];
 
     // Setup balance View
-    _balance = [[PsiCashBalanceView alloc] init];
+    _balance = [[PsiCashBalanceView alloc] initWithAutoLayout];
 
     // Setup Speed Boost meter
-    _meter = [[PsiCashSpeedBoostMeterView alloc] init];
+    _meter = [[PsiCashSpeedBoostMeterView alloc] initWithAutoLayout];
 
     // Setup activity indicator
     activityIndicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
 
     // Setup rewarded video button
-    _rewardedVideoButton = [[PsiCashRewardedVideoButton alloc] init];
+    _rewardedVideoButton = [[PsiCashRewardedVideoButton alloc] initWithAutoLayout];
 
     topBorderBlocker = [[UIView alloc] init];
     topBorderBlocker.backgroundColor = [UIColor whiteColor];
@@ -70,7 +59,7 @@
     bottomBorderBlocker.backgroundColor = [UIColor whiteColor];
 }
 
-- (void)addViews {
+- (void)addSubviews {
     [self addSubview:coin];
     [self addSubview:_balance];
     [self addSubview:_meter];
@@ -80,7 +69,7 @@
     [self addSubview:bottomBorderBlocker];
 }
 
-- (void)setupLayoutConstraints {
+- (void)setupSubviewsLayoutConstraints {
     _balance.translatesAutoresizingMaskIntoConstraints = NO;
     [_balance.centerXAnchor constraintEqualToAnchor:self.centerXAnchor].active = YES;
     [_balance.topAnchor constraintEqualToAnchor:self.topAnchor].active = YES;
