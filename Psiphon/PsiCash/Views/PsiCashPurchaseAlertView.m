@@ -19,6 +19,7 @@
 
 #import "PsiCashPurchaseAlertView.h"
 #import "PsiCashClient.h"
+#import "UIView+AutoLayoutViewGroup.h"
 
 @interface PsiCashPurchaseAlertView ()
 @property (atomic, readwrite) PsiCashClientModel *model;
@@ -36,7 +37,7 @@
     PsiCashPurchaseAlertView *alertView = [[PsiCashPurchaseAlertView alloc] init];
     alertView->alreadySpeedBoosting = NO;
 
-    PsiCashPurchaseView *purchaseView = [[PsiCashPurchaseView alloc] initWithFrame:CGRectMake(0, 0, 250, 150)];
+    PsiCashPurchaseView *purchaseView = [[PsiCashPurchaseView alloc] initWithAutoLayoutFrame:CGRectMake(0, 0, 250, 150)];
     purchaseView.delegate = alertView;
     alertView.purchaseView = purchaseView;
     alertView.containerView = purchaseView;

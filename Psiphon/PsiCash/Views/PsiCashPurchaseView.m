@@ -23,6 +23,7 @@
 #import "PsiCashSpeedBoostSliderView.h"
 #import "PsiCashTypes.h"
 #import "PsiFeedbackLogger.h"
+#import "UIView+AutoLayoutViewGroup.h"
 
 @interface PsiCashPurchaseView ()
 @property (atomic, readwrite) PsiCashClientModel *model;
@@ -36,33 +37,21 @@
     PsiCashSpeedBoostProductSKU *lastSKUEmitted;
 }
 
-- (id)initWithFrame:(CGRect)frame {
-    self = [super initWithFrame:frame];
-
-    if (self) {
-        [self setupViews];
-        [self addViews];
-        [self setupLayoutConstraints];
-    }
-
-    return self;
-}
-
 - (void)setupViews {
     conversionView = [[UILabel alloc] init];
     conversionView.adjustsFontSizeToFitWidth = YES;
     conversionView.textAlignment = NSTextAlignmentCenter;
 
-    sliderView = [[PsiCashSpeedBoostSliderView alloc] init];
+    sliderView = [[PsiCashSpeedBoostSliderView alloc] initWithAutoLayout];
     sliderView.delegate = self;
 }
 
-- (void)addViews {
+- (void)addSubviews {
     [self addSubview:conversionView];
     [self addSubview:sliderView];
 }
 
-- (void)setupLayoutConstraints {
+- (void)setupSubviewsLayoutConstraints {
     conversionView.translatesAutoresizingMaskIntoConstraints = NO;
     [conversionView.centerXAnchor constraintEqualToAnchor:self.centerXAnchor].active = YES;
     [conversionView.bottomAnchor constraintEqualToAnchor:self.centerYAnchor].active = YES;

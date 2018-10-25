@@ -63,6 +63,7 @@
 #import "UILabel+GetLabelHeight.h"
 #import "VPNManager.h"
 #import "VPNStartAndStopButton.h"
+#import "UIView+AutoLayoutViewGroup.h"
 
 PsiFeedbackLogType const RewardedVideoLogType = @"RewardedVideo";
 
@@ -566,7 +567,7 @@ UserDefaultsKey const PsiCashHasBeenOnboardedBoolKey = @"PsiCash.HasBeenOnboarde
     cloudBottomRight = [[UIImageView alloc] initWithImage:cloud];
     versionLabel = [[UILabel alloc] init];
     settingsButton = [[UIButton alloc] init];
-    psiCashView = [[PsiCashView alloc] init];
+    psiCashView = [[PsiCashView alloc] initWithAutoLayout];
     startAndStopButton = [VPNStartAndStopButton buttonWithType:UIButtonTypeCustom];
     statusLabel = [[UILabel alloc] init];
     regionSelectionButton = [[RegionSelectionButton alloc] init];

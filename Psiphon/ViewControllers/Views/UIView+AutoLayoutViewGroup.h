@@ -17,11 +17,27 @@
  *
  */
 
+#import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
-#import "PsiCashClientModel.h"
 
-@interface PsiCashRewardedVideoButton : UIButton
+NS_ASSUME_NONNULL_BEGIN
 
-- (void)videoReady:(BOOL)ready;
+@interface UIView (AutoLayoutViewGroup)
+
+- (instancetype)initWithAutoLayout;
+
+- (instancetype)initWithAutoLayoutFrame:(CGRect)frame;
+
+- (void)setupViews;
+
+- (void)addSubviews;
+
+- (void)setupSubviewsLayoutConstraints;
+
+#pragma mark - Utility functions
+
+- (BOOL)isRTL;
 
 @end
+
+NS_ASSUME_NONNULL_END

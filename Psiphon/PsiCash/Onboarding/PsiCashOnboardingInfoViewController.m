@@ -20,6 +20,7 @@
 #import "PsiCashOnboardingInfoViewController.h"
 #import "PsiCashView.h"
 #import "StarView.h"
+#import "UIView+AutoLayoutViewGroup.h"
 
 #define k5sScreenWidth 320.f
 
@@ -151,7 +152,7 @@
 
 - (void)setGraphicAsSpeedBoostMeter {
     PsiCashSpeedBoostProductSKU *sku = [PsiCashSpeedBoostProductSKU skuWitDistinguisher:@"1h" withHours:[NSNumber numberWithInteger:1] andPrice:[NSNumber numberWithDouble:100e9]];
-    PsiCashView *meter = [[PsiCashView alloc] init];
+    PsiCashView *meter = [[PsiCashView alloc] initWithAutoLayout];
 
     PsiCashClientModel *m = [PsiCashClientModel clientModelWithAuthPackage:[[PsiCashAuthPackage alloc] initWithValidTokens:@[@"indicator", @"earner", @"spender"]]
                                                                 andBalance:[NSNumber numberWithInteger:0]

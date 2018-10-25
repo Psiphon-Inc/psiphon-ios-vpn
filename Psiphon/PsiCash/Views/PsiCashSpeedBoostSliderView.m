@@ -19,7 +19,7 @@
 
 #import "PsiCashSpeedBoostSliderView.h"
 #import "Logging.h"
-#import <math.h>
+#import "UIView+AutoLayoutViewGroup.h"
 
 @interface PsiCashSpeedBoostSliderView ()
 @property (atomic, readwrite) PsiCashClientModel *model;
@@ -32,16 +32,11 @@
     PsiCashSpeedBoostProductSKU *lastSKUEmitted;
 }
 
-- (id)initWithFrame:(CGRect)frame {
-    self = [super initWithFrame:frame];
-
+- (instancetype)initWithAutoLayout {
+    self = [super initWithAutoLayout];
     if (self) {
-        [self setupViews];
-        [self addViews];
-        [self setupLayoutConstraints];
         [self startObserving];
     }
-
     return self;
 }
 
@@ -52,11 +47,11 @@
     slider.value = 0;
 }
 
-- (void)addViews {
+- (void)addSubviews {
     [self addSubview:slider];
 }
 
-- (void)setupLayoutConstraints {
+- (void)setupSubviewsLayoutConstraints {
     slider.translatesAutoresizingMaskIntoConstraints = NO;
     [slider.centerXAnchor constraintEqualToAnchor:self.centerXAnchor].active = YES;
     [slider.centerYAnchor constraintEqualToAnchor:self.centerYAnchor].active = YES;
