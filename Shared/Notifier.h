@@ -37,6 +37,13 @@ extern NotifierMessage const NotifierForceSubscriptionCheck;
 extern NotifierMessage const NotifierAppEnteredBackground;
 extern NotifierMessage const NotifierUpdatedAuthorizations;
 
+// Messages allowed only in debug build.
+#if DEBUG
+extern NotifierMessage const NotifierDebugForceJetsam;
+extern NotifierMessage const NotifierDebugGoProfile;
+extern NotifierMessage const NotifierDebugMemoryProfiler;
+#endif
+
 #pragma mark - NotifierObserver
 
 @protocol NotifierObserver <NSObject>
