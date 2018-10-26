@@ -478,6 +478,8 @@ UserDefaultsKey const DebugMemoryProfileBoolKey = @"PsiphonDataSharedDB.DebugMem
 
 #pragma mark - Debug Preferences
 
+#if DEBUG
+
 - (NSString *)getFileSize:(NSString *)filePath {
     NSError *err;
     unsigned long long byteCount = [[[NSFileManager defaultManager] attributesOfItemAtPath:filePath error:&err] fileSize];
@@ -499,5 +501,7 @@ UserDefaultsKey const DebugMemoryProfileBoolKey = @"PsiphonDataSharedDB.DebugMem
     return [[[NSFileManager defaultManager] containerURLForSecurityApplicationGroupIdentifier:appGroupIdentifier]
             URLByAppendingPathComponent:@"go_profile" isDirectory:TRUE];
 }
+
+#endif
 
 @end
