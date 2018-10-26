@@ -29,7 +29,7 @@
 #import "IAPViewController.h"
 #import "LaunchScreenViewController.h"
 #import "Logging.h"
-#import "LogViewControllerFullScreen.h"
+#import "DebugViewController.h"
 #import "PsiFeedbackLogger.h"
 #import "PsiphonClientCommonLibraryHelpers.h"
 #import "PsiphonConfigUserDefaults.h"
@@ -411,10 +411,12 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
       }]
       flattenMap:^RACSignal<NSString *> *(RACTwoTuple<NSNumber *, NSNumber *> *value) {
           BOOL vpnActive = [value.first boolValue];
+          BOOL isZombie = (VPNStatusZombie == (VPNStatus)[value.second integerValue]);
 
-          // Emits command to stop VPN if it has already started. Otherwise, it checks for internet connectivity
-          // and emits one of CommandNoInternetAlert or CommandStartTunnel.
-          if (vpnActive) {
+          // Emits command to stop VPN if it has already started or is in zombie mode.
+          // Otherwise, it checks for internet connectivity and emits
+          // one of CommandNoInternetAlert or CommandStartTunnel.
+          if (vpnActive || isZombie) {
               return [RACSignal return:CommandStopVPN];
 
           } else {
@@ -426,7 +428,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
               } else {
 
                   // Returned signal checks whether or not VPN configuration is already installed.
-                  // Skips presenting ads if there is not VPN configuration installed.
+                  // Skips presenting ads if the VPN configuration is not installed.
                   return [[weakSelf.vpnManager vpnConfigurationInstalled]
                     flattenMap:^RACSignal *(NSNumber *value) {
                         BOOL vpnInstalled = [value boolValue];
@@ -484,7 +486,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 
 #if DEBUG
 - (void)onVersionLabelTap:(UILabel *)sender {
-    TabbedLogViewController *viewController = [[TabbedLogViewController alloc] initWithCoder:nil];
+    DebugViewController *viewController = [[DebugViewController alloc] initWithCoder:nil];
     [self presentViewController:viewController animated:YES completion:nil];
 }
 #endif

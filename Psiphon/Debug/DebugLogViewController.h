@@ -18,15 +18,14 @@
  */
 
 #import <Foundation/Foundation.h>
+#import "LogViewController.h"
 
-@interface FileUtils : NSObject
+NS_ASSUME_NONNULL_BEGIN
 
-+ (BOOL)downgradeFileProtectionToNone:(NSArray<NSString *> *)paths withExceptions:(NSArray<NSString *> *)exceptions;
+@interface DebugLogViewController : LogViewController
 
-+ (NSError *)createDir:(NSURL *)dirURL;
-
-#if DEBUG
-+ (void)listDirectory:(NSString *)dir resource:(NSString *)resource;
-#endif
+- (instancetype)initWithLogPath:(NSString *)logPath title:(NSString *)title;
 
 @end
+
+NS_ASSUME_NONNULL_END

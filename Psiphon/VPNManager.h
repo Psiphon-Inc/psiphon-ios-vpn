@@ -191,7 +191,7 @@ typedef NS_ENUM(NSInteger, VPNStartStatus) {
 
 /**
  * Queries the Network Extension whether it is in the zombie state.
- * @attention Returned signal emits nil if there is no active session.
+ * @attention Returned signal emits nil @(FALSE) there is no active session.
  *
  * @scheduler isExtensionZombie delivers its events on a background thread.
  */
@@ -199,7 +199,7 @@ typedef NS_ENUM(NSInteger, VPNStartStatus) {
 
 /**
  * Queries the Network Extension whether Psiphon tunnel is in connected state or not.
- * @attention Returned signal emits nil if there is no active session.
+ * @attention Returned signal emits @(FALSE) if there is no active session.
  *
  * @scheduler isPsiphonTunnelConnected delivers its events on a background thread.
  */

@@ -19,7 +19,6 @@
 
 #import "PsiphonDataSharedDB.h"
 #import "Logging.h"
-#import "PsiFeedbackLogger.h"
 #import "NSDate+PSIDateExtension.h"
 #import "UserDefaults.h"
 #import "Authorization.h"
@@ -28,15 +27,25 @@
 #define MAX_RETRIES 3
 #define RETRY_SLEEP_TIME 0.1f  // Sleep for 100 milliseconds.
 
-/* Shared NSUserDefaults keys */
-#define EGRESS_REGIONS_KEY @"egress_regions"
-#define CLIENT_REGION_KEY @"client_region"
-#define APP_FOREGROUND_KEY @"app_foreground"
-#define TUNNEL_SPONSOR_ID @"current_sponsor_id"
-#define SERVER_TIMESTAMP_KEY @"server_timestamp"
-#define kContainerSubscriptionEmptyReceiptKey @"kContainerSubscriptionEmptyReceiptKey"
-#define kAuthorizationsContainerKey @"authorizations_container_key"
-#define kMarkedAuthorizationIDsExtensionKey @"marked_authorization_ids_extension_key"
+#pragma mark - NSUserDefaults Keys
+
+UserDefaultsKey const EgressRegionsStringArrayKey = @"egress_regions";
+
+UserDefaultsKey const ClientRegionStringKey = @"client_region";
+
+UserDefaultsKey const AppForegroundBoolKey = @"app_foreground";
+
+UserDefaultsKey const TunnelSponsorIDStringKey = @"current_sponsor_id";
+
+UserDefaultsKey const ServerTimestampStringKey = @"server_timestamp";
+
+UserDefaultsKey const ContainerSubscriptionEmptyReceiptNumberKey = @"kContainerSubscriptionEmptyReceiptKey";
+
+UserDefaultsKey const ContainerAuthorizationSetKey = @"authorizations_container_key";
+
+UserDefaultsKey const MarkedAuthIDsExtensionStringSetKey = @"marked_authorization_ids_extension_key";
+
+UserDefaultsKey const EmbeddedEgressRegionsStringArrayKey = @"embedded_server_entries_egress_regions";
 
 /**
  * Key for boolean value that when TRUE indicates that the extension crashed before stop was called.
@@ -49,14 +58,18 @@ UserDefaultsKey const SharedDataExtensionCrashedBeforeStopBoolKey = @"PsiphonDat
 
 /**
  * Key for Jetsam counter.
- *
  * @note This counter is reset on every app version upgrade.
  */
 UserDefaultsKey const SharedDataExtensionJetsamCounterIntegerKey = @"PsiphonDataSharedDB.ExtensionJetsamCounterIntKey";
 
-#if !(TARGET_IS_EXTENSION)
-#define EMBEDDED_EGRESS_REGIONS_KEY @"embedded_server_entries_egress_regions"
+#if DEBUG
+
+UserDefaultsKey const DebugMemoryProfileBoolKey = @"PsiphonDataSharedDB.DebugMemoryProfilerBoolKey";
+
 #endif
+
+
+#pragma mark -
 
 @implementation Homepage
 @end
@@ -82,9 +95,23 @@ UserDefaultsKey const SharedDataExtensionJetsamCounterIntegerKey = @"PsiphonData
     return self;
 }
 
-#pragma mark - File operations
+#pragma mark - Logging
 
-#if !(TARGET_IS_EXTENSION)
+- (NSString *)homepageNoticesPath {
+    return [[[[NSFileManager defaultManager]
+            containerURLForSecurityApplicationGroupIdentifier:appGroupIdentifier] path]
+            stringByAppendingPathComponent:@"homepage_notices"];
+}
+
+- (NSString *)rotatingLogNoticesPath {
+    return [[[[NSFileManager defaultManager]
+            containerURLForSecurityApplicationGroupIdentifier:appGroupIdentifier] path]
+            stringByAppendingPathComponent:@"rotating_notices"];
+}
+
+- (NSString *)rotatingOlderLogNoticesPath {
+    return [[self rotatingLogNoticesPath] stringByAppendingString:@".1"];
+}
 
 + (NSString *_Nullable)tryReadingFile:(NSString *_Nonnull)filePath {
     NSFileHandle *fileHandle;
@@ -95,23 +122,10 @@ UserDefaultsKey const SharedDataExtensionJetsamCounterIntegerKey = @"PsiphonData
                                   readToOffset:nil];
 }
 
-/*!
- * If fileHandlePtr points to nil, then a new NSFileHandle for
- * reading filePath is created and fileHandlePtr is set to point to the new object.
- * If fileHandlePtr points to a NSFileHandle, it will be used for reading.
- * Reading operation is retried MAX_RETRIES more times if it fails for any reason,
- * while putting the thread to sleep for an amount of time defined by RETRY_SLEEP_TIME.
- * No errors are thrown if opening the file/reading operations fail.
- * @param filePath Path used to create a NSFileHandle if fileHandlePtr points to nil.
- * @param fileHandlePtr Pointer to existing NSFileHandle or nil.
- * @param bytesOffset The byte offset to seek to before reading.
- * @param readToOffset Populated with the file offset that was read to.
- * @return UTF8 string of read file content.
- */
 + (NSString *_Nullable)tryReadingFile:(NSString *_Nonnull)filePath
                       usingFileHandle:(NSFileHandle *_Nullable __strong *_Nonnull)fileHandlePtr
                        readFromOffset:(unsigned long long)bytesOffset
-                         readToOffset:(unsigned long long *)readToOffset {
+                         readToOffset:(unsigned long long *_Nullable)readToOffset {
 
     NSData *fileData;
     NSError *err;
@@ -165,6 +179,7 @@ UserDefaultsKey const SharedDataExtensionJetsamCounterIntegerKey = @"PsiphonData
 // readLogsData tries to parse logLines, and for each JSON formatted line creates
 // a DiagnosticEntry which is appended to entries.
 // This method doesn't throw any errors on failure, and will log errors encountered.
+#if !(TARGET_IS_EXTENSION)
 - (void)readLogsData:(NSString *)logLines intoArray:(NSMutableArray<DiagnosticEntry *> *)entries {
     NSError *err;
 
@@ -217,27 +232,103 @@ UserDefaultsKey const SharedDataExtensionJetsamCounterIntegerKey = @"PsiphonData
         }
     }
 }
+#endif
 
-#if DEBUG
-- (NSString *)getFileSize:(NSString *)filePath {
-    NSError *err;
-    unsigned long long byteCount = [[[NSFileManager defaultManager] attributesOfItemAtPath:filePath error:&err] fileSize];
-    if (err) {
-        return nil;
+// Reads all log files and tries parses the json lines contained in each.
+// This method is not meant to handle large files.
+#if !(TARGET_IS_EXTENSION)
+- (NSArray<DiagnosticEntry*> *_Nonnull)getAllLogs {
+
+    LOG_DEBUG(@"Log filesize:%@", [self getFileSize:[self rotatingLogNoticesPath]]);
+    LOG_DEBUG(@"Log backup filesize:%@", [self getFileSize:[self rotatingOlderLogNoticesPath]]);
+
+    NSMutableArray<NSArray<DiagnosticEntry *> *> *entriesArray = [[NSMutableArray alloc] initWithCapacity:3];
+
+    // Reads both tunnel-core log files all at once (max of 2MB) into memory,
+    // and defers any processing after the read in order to reduce
+    // the chance of a log rotation happening midway.
+
+   NSArray<DiagnosticEntry *> *(^readRotatedLogs)(NSString *, NSString *) = ^(NSString *olderPath, NSString *newPath){
+       NSMutableArray<DiagnosticEntry *> *entries = [[NSMutableArray alloc] init];
+       NSString *tunnelCoreOlderLogs = [PsiphonDataSharedDB tryReadingFile:olderPath];
+       NSString *tunnelCoreLogs = [PsiphonDataSharedDB tryReadingFile:newPath];
+       [self readLogsData:tunnelCoreOlderLogs intoArray:entries];
+       [self readLogsData:tunnelCoreLogs intoArray:entries];
+       return entries;
+   };
+
+    entriesArray[0] = readRotatedLogs(self.rotatingOlderLogNoticesPath, self.rotatingLogNoticesPath);
+    entriesArray[1] = readRotatedLogs(PsiFeedbackLogger.containerRotatingOlderLogNoticesPath,
+            PsiFeedbackLogger.containerRotatingLogNoticesPath);
+    entriesArray[2] = readRotatedLogs(PsiFeedbackLogger.extensionRotatingOlderLogNoticesPath,
+            PsiFeedbackLogger.extensionRotatingLogNoticesPath);
+
+    // Sorts classes of logs in entriesArray based on the timestamp of the last log in each class.
+    NSArray *sortedEntriesArray = [entriesArray sortedArrayUsingComparator:^NSComparisonResult(id obj1, id obj2) {
+        NSDate *obj1LastTimestamp = [[(NSArray<DiagnosticEntry *> *) obj1 lastObject] timestamp];
+        NSDate *obj2LastTimestamp = [[(NSArray<DiagnosticEntry *> *) obj2 lastObject] timestamp];
+        return [obj2LastTimestamp compare:obj1LastTimestamp];
+    }];
+
+    // Calculates total number of logs and initializes an array of that size.
+    NSUInteger totalNumLogs = 0;
+    for (NSUInteger i = 0; i < [entriesArray count]; ++i) {
+        totalNumLogs += [entriesArray[i] count];
     }
-    return [NSByteCountFormatter stringFromByteCount:byteCount countStyle:NSByteCountFormatterCountStyleBinary];
+
+    NSMutableArray<DiagnosticEntry *> *allEntries = [[NSMutableArray alloc] initWithCapacity:totalNumLogs];
+
+    for (NSUInteger j = 0; j < [sortedEntriesArray count]; ++j) {
+        [allEntries addObjectsFromArray:sortedEntriesArray[j]];
+    }
+
+    return allEntries;
 }
 #endif
 
-#endif
+#pragma mark - Container Data (Data originating in the container)
 
-#pragma mark - Homepage methods
+- (BOOL)getAppForegroundState {
+    return [sharedDefaults boolForKey:AppForegroundBoolKey];
+}
 
-#if !(TARGET_IS_EXTENSION)
-/*!
- * Reads shared homepages file.
- * @return NSArray of Homepages.
- */
+- (BOOL)updateAppForegroundState:(BOOL)foreground {
+    [sharedDefaults setBool:foreground forKey:AppForegroundBoolKey];
+    return [sharedDefaults synchronize];
+}
+
+- (void)setEmbeddedEgressRegions:(NSArray<NSString *> *_Nullable)regions {
+    [[NSUserDefaults standardUserDefaults] setObject:regions forKey:EmbeddedEgressRegionsStringArrayKey];
+}
+
+- (NSArray<NSString *> *)embeddedEgressRegions {
+    return [[NSUserDefaults standardUserDefaults] objectForKey:EmbeddedEgressRegionsStringArrayKey];
+}
+
+
+#pragma mark - Extension Data (Data originating in the extension)
+
+// TODO: is timestamp needed? Maybe we can use this to detect staleness later
+- (BOOL)setEmittedEgressRegions:(NSArray<NSString *> *)regions {
+    [sharedDefaults setObject:regions forKey:EgressRegionsStringArrayKey];
+    return [sharedDefaults synchronize];
+}
+
+- (BOOL)insertNewClientRegion:(NSString*)region {
+    [sharedDefaults setObject:region forKey:ClientRegionStringKey];
+    return [sharedDefaults synchronize];
+}
+
+- (BOOL)setCurrentSponsorId:(NSString *_Nullable)sponsorId {
+    [sharedDefaults setObject:sponsorId forKey:TunnelSponsorIDStringKey];
+    return [sharedDefaults synchronize];
+}
+
+- (void)updateServerTimestamp:(NSString*) timestamp {
+    [sharedDefaults setObject:timestamp forKey:ServerTimestampStringKey];
+    [sharedDefaults synchronize];
+}
+
 - (NSArray<Homepage *> *_Nullable)getHomepages {
     NSMutableArray<Homepage *> *homepages = nil;
     NSError *err;
@@ -276,270 +367,69 @@ UserDefaultsKey const SharedDataExtensionJetsamCounterIntegerKey = @"PsiphonData
 
     return homepages;
 }
-#endif
 
-- (NSString *)homepageNoticesPath {
-    return [[[[NSFileManager defaultManager]
-      containerURLForSecurityApplicationGroupIdentifier:appGroupIdentifier] path]
-      stringByAppendingPathComponent:@"homepage_notices"];
-}
-
-#pragma mark - Egress Regions Table methods
-
-/*!
- * @brief Sets set of egress regions in shared NSUserDefaults
- * @param regions
- * @return TRUE if data was saved to disk successfully, otherwise FALSE.
- */
-// TODO: is timestamp needed? Maybe we can use this to detect staleness later
-- (BOOL)insertNewEgressRegions:(NSArray<NSString *> *)regions {
-    [sharedDefaults setObject:regions forKey:EGRESS_REGIONS_KEY];
-    return [sharedDefaults synchronize];
-}
-
-#if !(TARGET_IS_EXTENSION)
-
-/*!
- * @brief Merges egress regions in shared and standard user defaults.
- * Egress regions in shared user defaults are updated by the extension.
- * Egress regions in standard user defaults are updated by parsing egress
- * regions in embedded server entries.
- * @return NSArray of region codes.
- */
-- (NSArray<NSString *> *)embeddedAndEmittedEgressRegions {
-    NSMutableOrderedSet *egressRegions = [[NSMutableOrderedSet alloc] init];
-
-    id sharedDBEgressRegions = [sharedDefaults objectForKey:EGRESS_REGIONS_KEY];
-    if (sharedDBEgressRegions == nil) {
-        LOG_DEBUG(@"No egress regions found in shared user defaults.");
-    } else if ([sharedDBEgressRegions isKindOfClass:[NSArray<NSString*> class]]) {
-        [egressRegions addObjectsFromArray:(NSArray<NSString*>*)sharedDBEgressRegions];
-    } else {
-        [PsiFeedbackLogger error:@"Error egress regions for key (%@) in shared defaults are not NSArray<NSString*>* but %@", EGRESS_REGIONS_KEY, [sharedDBEgressRegions class]];
-    }
-
-    id embeddedEgressRegions = [[NSUserDefaults standardUserDefaults] objectForKey:EMBEDDED_EGRESS_REGIONS_KEY];
-    if (embeddedEgressRegions == nil) {
-        LOG_DEBUG(@"No embedded egress regions found in standard user defaults.");
-    } else if ([embeddedEgressRegions isKindOfClass:[NSArray<NSString*> class]]) {
-        [egressRegions addObjectsFromArray:(NSArray<NSString*>*)embeddedEgressRegions];
-    } else {
-        [PsiFeedbackLogger error:@"Error egress regions for key (%@) in standard user defaults are not NSArray<NSString*>* but %@", EMBEDDED_EGRESS_REGIONS_KEY, [embeddedEgressRegions class]];
-    }
-
-    if ([egressRegions count] == 0) {
-        [PsiFeedbackLogger error:@"No egress regions found in shared or standard user defaults."];
-        return nil;
-    }
-
-    return [egressRegions array];
-}
-
-/*!
- * @brief Sets set of egress regions in standard NSUserDefaults
- * @param regions
- */
-- (void)setEmbeddedEgressRegions:(NSArray<NSString *> *_Nullable)regions {
-    [[NSUserDefaults standardUserDefaults] setObject:regions forKey:EMBEDDED_EGRESS_REGIONS_KEY];
-}
-
-/*!
- * @return NSArray of region codes.
- */
-- (NSArray<NSString *> *)embeddedEgressRegions {
-    return [[NSUserDefaults standardUserDefaults] objectForKey:EMBEDDED_EGRESS_REGIONS_KEY];
-}
-
-/*!
- * @return NSArray of region codes.
- */
 - (NSArray<NSString *> *)emittedEgressRegions {
-    return [sharedDefaults objectForKey:EGRESS_REGIONS_KEY];
+    return [sharedDefaults objectForKey:EgressRegionsStringArrayKey];
 }
-
-#endif
-
-#pragma mark - Client Region Methods
-
-#if TARGET_IS_EXTENSION
-
-/*!
- * @brief Sets client region in shared NSUserDefaults
- * @param region
- * @return TRUE if data was saved to disk successfully, otherwise FALSE.
- */
-- (BOOL)insertNewClientRegion:(NSString*)region {
-    [sharedDefaults setObject:region forKey:CLIENT_REGION_KEY];
-    return [sharedDefaults synchronize];
-}
-
-#else
 
 - (NSString *)emittedClientRegion {
-    return [sharedDefaults objectForKey:CLIENT_REGION_KEY];
+    return [sharedDefaults objectForKey:ClientRegionStringKey];
 }
 
-#endif
-
-#pragma mark - Logging
-
-- (NSString *)rotatingLogNoticesPath {
-    return [[[[NSFileManager defaultManager]
-      containerURLForSecurityApplicationGroupIdentifier:appGroupIdentifier] path]
-            stringByAppendingPathComponent:@"rotating_notices"];
-}
-
-- (NSString *)rotatingOlderLogNoticesPath {
-    return [[self rotatingLogNoticesPath] stringByAppendingString:@".1"];
-}
-
-#if !(TARGET_IS_EXTENSION)
-
-// Reads all log files and tries parses the json lines contained in each.
-// This method is not meant to handle large files.
-- (NSArray<DiagnosticEntry*> *_Nonnull)getAllLogs {
-
-    LOG_DEBUG(@"Log filesize:%@", [self getFileSize:[self rotatingLogNoticesPath]]);
-    LOG_DEBUG(@"Log backup filesize:%@", [self getFileSize:[self rotatingOlderLogNoticesPath]]);
-
-    NSMutableArray<NSMutableArray<DiagnosticEntry *> *> *entriesArray = [[NSMutableArray alloc] initWithCapacity:3];
-
-    // Reads both tunnel-core log files all at once (max of 2MB) into memory,
-    // and defers any processing after the read in order to reduce
-    // the chance of a log rotation happening midway.
-    entriesArray[0] = [[NSMutableArray alloc] init];
-    NSString *tunnelCoreOlderLogs = [PsiphonDataSharedDB tryReadingFile:[self rotatingOlderLogNoticesPath]];
-    NSString *tunnelCoreLogs = [PsiphonDataSharedDB tryReadingFile:[self rotatingLogNoticesPath]];
-    [self readLogsData:tunnelCoreOlderLogs intoArray:entriesArray[0]];
-    [self readLogsData:tunnelCoreLogs intoArray:entriesArray[0]];
-
-    entriesArray[1] = [[NSMutableArray alloc] init];
-    NSString *containerOlderLogs = [PsiphonDataSharedDB tryReadingFile:[PsiFeedbackLogger containerRotatingOlderLogNoticesPath]];
-    NSString *containerLogs = [PsiphonDataSharedDB tryReadingFile:[PsiFeedbackLogger containerRotatingLogNoticesPath]];
-    [self readLogsData:containerOlderLogs intoArray:entriesArray[1]];
-    [self readLogsData:containerLogs intoArray:entriesArray[1]];
-
-    entriesArray[2] = [[NSMutableArray alloc] init];
-    NSString *extensionOlderLogs = [PsiphonDataSharedDB tryReadingFile:[PsiFeedbackLogger extensionRotatingOlderLogNoticesPath]];
-    NSString *extensionLogs = [PsiphonDataSharedDB tryReadingFile:[PsiFeedbackLogger extensionRotatingLogNoticesPath]];
-    [self readLogsData:extensionOlderLogs intoArray:entriesArray[2]];
-    [self readLogsData:extensionLogs intoArray:entriesArray[2]];
-
-
-    // Sorts classes of logs in entriesArray based on the timestamp of the last log in each class.
-    NSArray *sortedEntriesArray = [entriesArray sortedArrayUsingComparator:^NSComparisonResult(id obj1, id obj2) {
-        NSDate *obj1LastTimestamp = [[(NSArray<DiagnosticEntry *> *) obj1 lastObject] timestamp];
-        NSDate *obj2LastTimestamp = [[(NSArray<DiagnosticEntry *> *) obj2 lastObject] timestamp];
-        return [obj2LastTimestamp compare:obj1LastTimestamp];
-    }];
-
-    // Calculates total number of logs and initializes an array of that size.
-    NSUInteger totalNumLogs = 0;
-    for (NSUInteger i = 0; i < [entriesArray count]; ++i) {
-        totalNumLogs += [entriesArray[i] count];
-    }
-
-    NSMutableArray<DiagnosticEntry *> *allEntries = [[NSMutableArray alloc] initWithCapacity:totalNumLogs];
-
-    for (NSUInteger j = 0; j < [sortedEntriesArray count]; ++j) {
-        [allEntries addObjectsFromArray:sortedEntriesArray[j]];
-    }
-
-    return allEntries;
-}
-
-#endif
-
-# pragma mark - App State table methods
-
-/**
- * @brief Sets app foreground state in shared NSSUserDefaults dictionary.
- *        NOTE: this method blocks until changes are written to disk.
- * @param foreground Whether app is on the foreground or not.
- * @return TRUE if change was persisted to disk successfully, FALSE otherwise.
- */
-- (BOOL)updateAppForegroundState:(BOOL)foreground {
-    [sharedDefaults setBool:foreground forKey:APP_FOREGROUND_KEY];
-    return [sharedDefaults synchronize];
-}
-
-/**
- * @brief Returns previously persisted app foreground state from the shared NSUserDefaults
- *        NOTE: returns FALSE if no previous value was set using updateAppForegroundState:
- * @return TRUE if app if on the foreground, FALSE otherwise.
- */
-- (BOOL)getAppForegroundState {
-    return [sharedDefaults boolForKey:APP_FOREGROUND_KEY];
-}
-
-#pragma mark - Tunnel config state
-
-#if TARGET_IS_EXTENSION
-- (BOOL)setCurrentSponsorId:(NSString *_Nullable)sponsorId {
-    [sharedDefaults setObject:sponsorId forKey:TUNNEL_SPONSOR_ID];
-    return [sharedDefaults synchronize];
-}
-#else
 - (NSString *_Nullable)getCurrentSponsorId {
-    return [sharedDefaults stringForKey:TUNNEL_SPONSOR_ID];
-}
-#endif
-
-#pragma mark - Server timestamp methods
-
-/**
- * @brief Sets server timestamp in shared NSSUserDefaults dictionary.
- * @param timestamp from the handshake in RFC3339 format.
- * @return TRUE if change was persisted to disk successfully, FALSE otherwise.
- */
-- (void)updateServerTimestamp:(NSString*) timestamp {
-	[sharedDefaults setObject:timestamp forKey:SERVER_TIMESTAMP_KEY];
-	[sharedDefaults synchronize];
+    return [sharedDefaults stringForKey:TunnelSponsorIDStringKey];
 }
 
-/**
- * @brief Returns previously persisted server timestamp from the shared NSUserDefaults
- * @return NSString* timestamp in RFC3339 format.
- */
 - (NSString*)getServerTimestamp {
-	return [sharedDefaults stringForKey:SERVER_TIMESTAMP_KEY];
+    return [sharedDefaults stringForKey:ServerTimestampStringKey];
 }
 
-/**
- * If the receipt is empty (contains to transactions), the container should use
- * this method to set the receipt file size to be read by the network extension.
- * @param receiptFileSize File size of the empty receipt.
- */
-#if !(TARGET_IS_EXTENSION)
+
+#pragma mark - Subscription Receipt
+
+- (NSNumber *_Nullable)getContainerEmptyReceiptFileSize {
+    return [sharedDefaults objectForKey:ContainerSubscriptionEmptyReceiptNumberKey];
+}
+
 - (void)setContainerEmptyReceiptFileSize:(NSNumber *_Nullable)receiptFileSize {
-    [sharedDefaults setObject:receiptFileSize forKey:kContainerSubscriptionEmptyReceiptKey];
+    [sharedDefaults setObject:receiptFileSize forKey:ContainerSubscriptionEmptyReceiptNumberKey];
     [sharedDefaults synchronize];
 }
-#endif
 
-/**
- * Returns the file size of previously recorded empty receipt by the container (if any).
- * @return Nil or file size recorded by the container.
- */
-- (NSNumber *_Nullable)getContainerEmptyReceiptFileSize {
-    return [sharedDefaults objectForKey:kContainerSubscriptionEmptyReceiptKey];
-}
 
 #pragma mark - Authorizations
 
-#if !TARGET_IS_EXTENSION
+- (void)appendExpiredAuthorizationIDs:(NSSet<NSString *> *_Nullable)authsIDsToAppend {
+    // Combines previous marked authorizations with the authorization IDs to append.
+    NSSet<NSString *> *newMarkedAuthIDs = [[self getMarkedExpiredAuthorizationIDs] setByAddingObjectsFromSet:authsIDsToAppend];
+
+    // Don't mark authorization IDs not seen in authorizations persisted by the container.
+    NSMutableSet<NSString *> *markedAuthIDs = [NSMutableSet set];  // Marked IDs to persist.
+    NSSet<NSString *> *containerAuthIDs =[Authorization authorizationIDsFrom:[self getContainerAuthorizations]];
+    [newMarkedAuthIDs enumerateObjectsUsingBlock:^(NSString *authID, BOOL *stop) {
+        if ([containerAuthIDs containsObject:authID]) {
+            [markedAuthIDs addObject:authID];
+        }
+    }];
+
+    [self markExpiredAuthorizationIDs:markedAuthIDs];
+}
+
+- (void)markExpiredAuthorizationIDs:(NSSet<NSString *> *_Nullable)authorizationIDs {
+    [sharedDefaults setObject:[authorizationIDs allObjects]
+                       forKey:MarkedAuthIDsExtensionStringSetKey];
+    [sharedDefaults synchronize];
+}
 
 - (void)setContainerAuthorizations:(NSSet<Authorization *> *_Nullable)authorizations {
     // Persists Base64 representation of the Authorizations.
     [sharedDefaults setObject:[Authorization encodeAuthorizations:authorizations]
-                       forKey:kAuthorizationsContainerKey];
+                       forKey:ContainerAuthorizationSetKey];
     [sharedDefaults synchronize];
 }
 
-#endif
-
 - (NSSet<Authorization *> *_Nonnull)getContainerAuthorizations {
-    NSArray<NSString *> *_Nullable encodedAuths = [sharedDefaults stringArrayForKey:kAuthorizationsContainerKey];
+    NSArray<NSString *> *_Nullable encodedAuths = [sharedDefaults stringArrayForKey:ContainerAuthorizationSetKey];
     return [Authorization createFromEncodedAuthorizations:encodedAuths];
 }
 
@@ -558,54 +448,56 @@ UserDefaultsKey const SharedDataExtensionJetsamCounterIntegerKey = @"PsiphonData
 }
 
 - (NSSet<NSString *> *_Nonnull)getMarkedExpiredAuthorizationIDs {
-    return [NSMutableSet setWithArray:[sharedDefaults stringArrayForKey:kMarkedAuthorizationIDsExtensionKey]];
+    return [NSMutableSet setWithArray:[sharedDefaults stringArrayForKey:MarkedAuthIDsExtensionStringSetKey]];
 }
 
-- (BOOL)getExtensionJetsammedBeforeStopFlag {
-    return [sharedDefaults boolForKey:SharedDataExtensionCrashedBeforeStopBoolKey];
-}
 
-- (void)resetJetsamCounter {
-    [sharedDefaults setInteger:0 forKey:SharedDataExtensionJetsamCounterIntegerKey];
-}
+#pragma mark - Jetsam counter
 
 - (void)incrementJetsamCounter {
     NSInteger count = [sharedDefaults integerForKey:SharedDataExtensionJetsamCounterIntegerKey];
     [sharedDefaults setInteger:(count + 1) forKey:SharedDataExtensionJetsamCounterIntegerKey];
 }
 
-#if TARGET_IS_EXTENSION
-
-- (void)markExpiredAuthorizationIDs:(NSSet<NSString *> *_Nullable)authorizationIDs {
-    [sharedDefaults setObject:[authorizationIDs allObjects]
-                       forKey:kMarkedAuthorizationIDsExtensionKey];
-    [sharedDefaults synchronize];
-}
-
-- (void)appendExpiredAuthorizationIDs:(NSSet<NSString *> *_Nullable)authsIDsToAppend {
-    // Combines previous marked authorizations with the authorization IDs to append.
-    NSSet<NSString *> *newMarkedAuthIDs = [[self getMarkedExpiredAuthorizationIDs] setByAddingObjectsFromSet:authsIDsToAppend];
-
-    // Don't mark authorization IDs not seen in authorizations persisted by the container.
-    NSMutableSet<NSString *> *markedAuthIDs = [NSMutableSet set];  // Marked IDs to persist.
-    NSSet<NSString *> *containerAuthIDs =[Authorization authorizationIDsFrom:[self getContainerAuthorizations]];
-    [newMarkedAuthIDs enumerateObjectsUsingBlock:^(NSString *authID, BOOL *stop) {
-        if ([containerAuthIDs containsObject:authID]) {
-            [markedAuthIDs addObject:authID];
-        }
-    }];
-
-    [self markExpiredAuthorizationIDs:markedAuthIDs];
-}
-
 - (void)setExtensionJetsammedBeforeStopFlag:(BOOL)crashed {
     [sharedDefaults setBool:crashed forKey:SharedDataExtensionCrashedBeforeStopBoolKey];
+}
+
+- (BOOL)getExtensionJetsammedBeforeStopFlag {
+    return [sharedDefaults boolForKey:SharedDataExtensionCrashedBeforeStopBoolKey];
 }
 
 - (NSInteger)getJetsamCounter {
     return [sharedDefaults integerForKey:SharedDataExtensionJetsamCounterIntegerKey];
 }
 
-#endif
+- (void)resetJetsamCounter {
+    [sharedDefaults setInteger:0 forKey:SharedDataExtensionJetsamCounterIntegerKey];
+}
+
+
+#pragma mark - Debug Preferences
+
+- (NSString *)getFileSize:(NSString *)filePath {
+    NSError *err;
+    unsigned long long byteCount = [[[NSFileManager defaultManager] attributesOfItemAtPath:filePath error:&err] fileSize];
+    if (err) {
+        return nil;
+    }
+    return [NSByteCountFormatter stringFromByteCount:byteCount countStyle:NSByteCountFormatterCountStyleBinary];
+}
+
+- (void)setDebugMemoryProfiler:(BOOL)enabled {
+    [sharedDefaults setBool:enabled forKey:DebugMemoryProfileBoolKey];
+}
+
+- (BOOL)getDebugMemoryProfiler {
+    return [sharedDefaults boolForKey:DebugMemoryProfileBoolKey];
+}
+
+- (NSURL *)goProfileDirectory {
+    return [[[NSFileManager defaultManager] containerURLForSecurityApplicationGroupIdentifier:appGroupIdentifier]
+            URLByAppendingPathComponent:@"go_profile" isDirectory:TRUE];
+}
 
 @end
