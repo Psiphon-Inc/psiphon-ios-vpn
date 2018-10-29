@@ -46,6 +46,7 @@ NotifierMessage const NotifierUpdatedAuthorizations  = PSIPHON_GROUP @".UpdatedA
 NotifierMessage const NotifierDebugForceJetsam    = PSIPHON_GROUP @".DebugForceJetsam";
 NotifierMessage const NotifierDebugGoProfile      = PSIPHON_GROUP @".DebugGoProfile";
 NotifierMessage const NotifierDebugMemoryProfiler = PSIPHON_GROUP @".DebugMemoryProfiler";
+NotifierMessage const NotifierDebugPsiphonTunnelState = PSIPHON_GROUP @".DebugPsiphonTunnelState";
 #endif
 
 #pragma mark - ObserverTuple data class
@@ -116,6 +117,11 @@ static inline void AddDarwinNotifyObserver(CFNotificationCenterRef center, const
     AddDarwinNotifyObserver(center, (__bridge const void *)self, (__bridge CFStringRef)NotifierAvailableEgressRegions);
     AddDarwinNotifyObserver(center, (__bridge const void *)self, (__bridge CFStringRef)NotifierMarkedAuthorizations);
     AddDarwinNotifyObserver(center, (__bridge const void *)self, (__bridge CFStringRef)NotifierWaitingForNetworkConnectivity);
+
+#if DEBUG
+    AddDarwinNotifyObserver(center, (__bridge const void *)self, (__bridge CFStringRef)NotifierDebugPsiphonTunnelState);
+#endif
+
 #endif
 
     return self;

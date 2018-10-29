@@ -950,9 +950,23 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
     // Do not block PsiphonTunnel callback queue.
     // Note: ReactiveObjC subjects block until all subscribers have received to the events,
     //       and also ReactiveObjC `subscribeOn` operator does not behave similar to RxJava counterpart for example.
+    PacketTunnelProvider *__weak weakSelf = self;
+
     dispatch_async_global(^{
-        [self->tunnelConnectionStateSubject sendNext:@(newState)];
+        PacketTunnelProvider *__strong strongSelf = self;
+        if (strongSelf) {
+            [strongSelf->tunnelConnectionStateSubject sendNext:@(newState)];
+        }
     });
+
+#if DEBUG
+    dispatch_async_global(^{
+        NSString *stateStr = [PacketTunnelUtils textPsiphonConnectionState:newState];
+        [weakSelf.sharedDB setDebugPsiphonConnectionState:stateStr];
+        [[Notifier sharedInstance] post:NotifierDebugPsiphonTunnelState];
+    });
+#endif
+
 }
 
 - (void)onConnecting {

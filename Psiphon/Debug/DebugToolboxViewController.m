@@ -29,8 +29,9 @@
 
 NSString * const ActionCellIdentifier = @"ActionCell";
 NSString * const SwitchCellIdentifier = @"SwitchCell";
+NSString * const StateCellIdentifier = @"StateCell";
 
-@interface DebugToolboxViewController ()
+@interface DebugToolboxViewController () <NotifierObserver>
 
 @property (nonatomic) PsiphonDataSharedDB *sharedDB;
 
@@ -38,6 +39,7 @@ NSString * const SwitchCellIdentifier = @"SwitchCell";
 
 @implementation DebugToolboxViewController {
     UITableView *actionsTableView;
+    UILabel *psiphonTunnelConnectionStateLabel;
 }
 
 - (instancetype)init {
@@ -63,6 +65,7 @@ NSString * const SwitchCellIdentifier = @"SwitchCell";
     actionsTableView.delegate = self;
     [actionsTableView registerClass:UITableViewCell.class forCellReuseIdentifier:ActionCellIdentifier];
     [actionsTableView registerClass:UITableViewCell.class forCellReuseIdentifier:SwitchCellIdentifier];
+    [actionsTableView registerClass:UITableViewCell.class forCellReuseIdentifier:StateCellIdentifier];
     actionsTableView.backgroundColor = [UIColor whiteColor];
     [self.view addSubview:actionsTableView];
 
@@ -72,6 +75,9 @@ NSString * const SwitchCellIdentifier = @"SwitchCell";
     [actionsTableView.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor].active = TRUE;
     [actionsTableView.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor].active = TRUE;
     [actionsTableView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor].active = TRUE;
+
+    // Register to Notifier messages.
+    [[Notifier sharedInstance] registerObserver:self callbackQueue:dispatch_get_main_queue()];
 }
 
 - (void)dismiss {
@@ -81,13 +87,14 @@ NSString * const SwitchCellIdentifier = @"SwitchCell";
 #pragma mark - UITableViewDataSource delegate methods
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-    return 2;
+    return 3;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     switch (section) {
         case 0: return 2; // PPROF
         case 1: return 2; // EXTENSION
+        case 2: return 1; // PSIPHON TUNNEL
         default:
             PSIAssert(FALSE)
             return 0;
@@ -98,13 +105,12 @@ NSString * const SwitchCellIdentifier = @"SwitchCell";
     switch (section) {
         case 0: return @"PPROF";
         case 1: return @"EXTENSION";
+        case 2: return @"PSIPHON TUNNEL";
         default:
             PSIAssert(FALSE);
             return @"";
     }
 }
-
-
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     UITableViewCell *cell;
@@ -151,6 +157,20 @@ NSString * const SwitchCellIdentifier = @"SwitchCell";
                 break;
             }
         }
+    } else if (indexPath.section == 2) {
+
+        cell = [tableView dequeueReusableCellWithIdentifier:ActionCellIdentifier forIndexPath:indexPath];
+        cell.selectionStyle = UITableViewCellSelectionStyleNone;
+        switch (indexPath.row) {
+            case 0: {
+                psiphonTunnelConnectionStateLabel = [[UILabel alloc] init];
+                psiphonTunnelConnectionStateLabel.textColor = UIColor.brownColor;
+                cell.textLabel.text = @"Connection State";
+                cell.accessoryView = psiphonTunnelConnectionStateLabel;
+                [self updateConnectionStateLabel];
+                break;
+            }
+        }
     }
 
     if (action != nil) {
@@ -182,6 +202,21 @@ NSString * const SwitchCellIdentifier = @"SwitchCell";
 - (void)onMemoryProfilerSwitch:(UISwitch *)view {
     [self.sharedDB setDebugMemoryProfiler:view.isOn];
     [[Notifier sharedInstance] post:NotifierDebugMemoryProfiler];
+}
+
+#pragma mark - Connection state
+
+- (void)updateConnectionStateLabel {
+    psiphonTunnelConnectionStateLabel.text = [self.sharedDB getDebugPsiphonConnectionState];
+    [psiphonTunnelConnectionStateLabel sizeToFit];
+}
+
+- (void)onMessageReceived:(NotifierMessage)message {
+
+    if ([NotifierDebugPsiphonTunnelState isEqualToString:message]) {
+        [self updateConnectionStateLabel];
+    }
+
 }
 
 @end
