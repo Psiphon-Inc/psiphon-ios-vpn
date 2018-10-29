@@ -20,8 +20,14 @@
 #import <Foundation/Foundation.h>
 #import <NetworkExtension/NetworkExtension.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface PacketTunnelUtils : NSObject
 
 + (NSString *)textStopReason:(NEProviderStopReason)stopReason;
 
++ (NSString *)textPsiphonConnectionState:(PsiphonConnectionState)state;
+
 @end
+
+NS_ASSUME_NONNULL_END

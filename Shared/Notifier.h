@@ -42,6 +42,7 @@ extern NotifierMessage const NotifierUpdatedAuthorizations;
 extern NotifierMessage const NotifierDebugForceJetsam;
 extern NotifierMessage const NotifierDebugGoProfile;
 extern NotifierMessage const NotifierDebugMemoryProfiler;
+extern NotifierMessage const NotifierDebugPsiphonTunnelState;
 #endif
 
 #pragma mark - NotifierObserver
