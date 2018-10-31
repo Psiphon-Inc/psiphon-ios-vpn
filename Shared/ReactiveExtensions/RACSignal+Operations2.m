@@ -30,6 +30,7 @@
 #import "RACTargetQueueScheduler.h"
 #import "RACTuple.h"
 #import "UnionSerialQueue.h"
+#import "Logging.h"
 
 @implementation RACSignal (Operations2)
 
@@ -276,6 +277,8 @@
         operation.name = name;
 
         [serialQueue.operationQueue addOperation:operation];
+
+        LOG_DEBUG(@"%@", [serialQueue debugDescription]);
 
         return compoundDisposable;
     }];
