@@ -69,7 +69,9 @@ NotifierMessage const NotifierDebugPsiphonTunnelState = PSIPHON_GROUP @".DebugPs
 @implementation Notifier {
     NSMutableArray<ObserverTuple *> *observers;
 
+#if !(TARGET_IS_EXTENSION)
     RACSubject<NotifierMessage> *messagesSubject;
+#endif
 }
 
 // Class variables accessible by C functions.
@@ -95,7 +97,9 @@ static inline void AddDarwinNotifyObserver(CFNotificationCenterRef center, const
 - (instancetype)init {
     observers = [NSMutableArray arrayWithCapacity:1];
 
+#if !(TARGET_IS_EXTENSION)
     messagesSubject = [RACSubject subject];
+#endif
 
     // Add self to Darwin notify center for the given key.
     CFNotificationCenterRef center = CFNotificationCenterGetDarwinNotifyCenter();
@@ -182,11 +186,13 @@ static inline void AddDarwinNotifyObserver(CFNotificationCenterRef center, const
     }
 }
 
+#if !(TARGET_IS_EXTENSION)
 - (RACSignal<NotifierMessage> *)listenForMessages:(NSArray<NotifierMessage> *)messages {
     return [messagesSubject filter:^BOOL(NotifierMessage received) {
         return [messages containsObject:received];
     }];
 }
+#endif
 
 #pragma mark - Private
 
@@ -197,9 +203,11 @@ static inline void AddDarwinNotifyObserver(CFNotificationCenterRef center, const
 
     // Since subscribers could potentially block the main thread, we will not block the main
     // thread to send the message to `messageSubject`.
+#if !(TARGET_IS_EXTENSION)
     dispatch_async_global(^{
         [messagesSubject sendNext:message];
     });
+#endif
 
     @synchronized (sharedInstance) {
 
