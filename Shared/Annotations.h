@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, Psiphon Inc.
+ * Copyright (c) 2018, Psiphon Inc.
  * All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,19 +17,7 @@
  *
  */
 
-/**
- * Bridge header file between the extension and the container.
- */
 
-// Network Extension options
-#define EXTENSION_OPTION_START_FROM_CONTAINER @"startFromContainer"
-#define EXTENSION_OPTION_TRUE @"true"
-
-// Network Extension queries
-#define EXTENSION_QUERY_IS_PROVIDER_ZOMBIE @"queryIsExtensionZombie"
-#define EXTENSION_QUERY_IS_TUNNEL_CONNECTED @"queryIsPsiphonTunnelConnected"
-#define EXTENSION_QUERY_IS_NETWORK_REACHABLE @"queryIsNetworkReachable"
-
-// Network Extension boolean query responses
-#define EXTENSION_RESP_TRUE @"true"
-#define EXTENSION_RESP_FALSE @"false"
+#ifndef WARN_UNUSED_RESULT
+#define WARN_UNUSED_RESULT __attribute__((warn_unused_result))
+#endif
