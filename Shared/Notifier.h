@@ -83,6 +83,9 @@ extern NotifierMessage const NotifierDebugPsiphonTunnelState;
  */
 - (void)registerObserver:(id <NotifierObserver>)observer callbackQueue:(dispatch_queue_t)queue;
 
+// Methods not available in the extension due to memory pressure.
+#if !(TARGET_IS_EXTENSION)
+
 /**
  * The returned signal delivers messages received by the Notifier if it matches
  * one of the `messages` provided.
@@ -90,6 +93,8 @@ extern NotifierMessage const NotifierDebugPsiphonTunnelState;
  * @scheduler listenForMessages: delivers its events on a background scheduler.
  */
 - (RACSignal<NotifierMessage> *)listenForMessages:(NSArray<NotifierMessage> *)messages;
+
+#endif
 
 @end
 
