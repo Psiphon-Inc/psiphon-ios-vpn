@@ -284,32 +284,33 @@ PsiFeedbackLogType const VPNManagerLogType = @"VPNManager";
 }
 
 // fix as in fix the zombie state
-- (void)checkOrFixVPNStatus {
-
+- (RACSignal<NSNumber *> *)checkOrFixVPN {
     __weak VPNManager *weakSelf = self;
 
-    __block RACDisposable *disposable = [[[self isExtensionZombie]
-      flattenMap:^RACSignal<NSNumber *> *(NSNumber *isZombie) {
+    return [[[[[self unsafeBooleanQueryActiveVPN:EXTENSION_QUERY_IS_PROVIDER_ZOMBIE
+                                        throwError:FALSE]
+      flattenMap:^RACSignal<NETunnelProviderManager *> *(NSNumber *_Nullable isZombie) {
 
           if ([isZombie boolValue]) {
-              return [weakSelf setConnectOnDemandEnabled:FALSE];
+              return [weakSelf unsafeStopVPN];
           } else {
-              return [RACSignal empty];
+              return [weakSelf deferredTunnelProviderManager];
           }
       }]
-      subscribeNext:^(NSNumber *x) {
-          // Whether or not VPN configuration update succeeded or not, stop the VPN.
-          [weakSelf stopVPN];
-      }
-      error:^(NSError *error) {
-          [PsiFeedbackLogger errorWithType:VPNManagerLogType message:@"error killing zombie extension" object:error];
-          [weakSelf.compoundDisposable removeDisposable:disposable];
-      }
-      completed:^{
-          [weakSelf.compoundDisposable removeDisposable:disposable];
-      }];
-
-    [self.compoundDisposable addDisposable:disposable];
+      map:^NSNumber *(NETunnelProviderManager *_Nullable providerManager) {
+          BOOL extensionProcessRunning = FALSE;
+          if (providerManager) {
+              NEVPNStatus st = providerManager.connection.status;
+              if (st != NEVPNStatusInvalid &&
+                st != NEVPNStatusDisconnecting &&
+                st != NEVPNStatusDisconnected) {
+                  extensionProcessRunning = TRUE;
+              }
+          }
+          return @(extensionProcessRunning);
+      }]
+      unsafeSubscribeOnSerialQueue:self.serialQueue withName:@"checkOrFixVPN"]
+      deliverOnMainThread];
 }
 
 - (void)startTunnel {
@@ -402,21 +403,28 @@ PsiFeedbackLogType const VPNManagerLogType = @"VPNManager";
     [self.compoundDisposable addDisposable:disposable];
 }
 
-- (void)stopVPN {
-
+// Emits type `NETunnelProviderManager *_Nullable`.
+- (RACSignal<NETunnelProviderManager *> *)unsafeStopVPN {
     __weak VPNManager *weakSelf = self;
 
     // Connect On Demand should be disabled first before stopping the VPN.
-    __block RACDisposable *disposable = [[[[self setConnectOnDemandEnabled:FALSE]
+    return [[[self setConnectOnDemandEnabled:FALSE]
       flattenMap:^RACSignal *(NSNumber *x) {
           return [weakSelf deferredTunnelProviderManager];
       }]
+      doNext:^(NETunnelProviderManager *_Nullable providerManager) {
+          [providerManager.connection stopVPNTunnel];
+      }];
+}
+
+- (void)stopVPN {
+    __weak VPNManager *weakSelf = self;
+
+    // Connect On Demand should be disabled first before stopping the VPN.
+    __block RACDisposable *disposable = [[[self unsafeStopVPN]
       unsafeSubscribeOnSerialQueue:self.serialQueue
                           withName:@"stopVPNOperation"]
-      subscribeNext:^(NETunnelProviderManager *_Nullable providerManager) {
-          [providerManager.connection stopVPNTunnel];
-
-      } error:^(NSError *error) {
+      subscribeError:^(NSError *error) {
           [weakSelf.compoundDisposable removeDisposable:disposable];
       } completed:^{
           [weakSelf.compoundDisposable removeDisposable:disposable];
@@ -454,7 +462,6 @@ PsiFeedbackLogType const VPNManagerLogType = @"VPNManager";
 }
 
 // Removes and re-installs the VPN configuration.
-// TODO: signal the state of the operation to the UI world.
 - (void)reinstallVPNConfiguration {
 
     __weak VPNManager *weakSelf = self;
@@ -486,10 +493,9 @@ PsiFeedbackLogType const VPNManagerLogType = @"VPNManager";
 // isVPNActive returns a signal that when subscribed to emits tuple (isActive, VPNStatus).
 // If tunnelProviderManager is nil emits (FALSE, VPNStatusInvalid)
 - (RACSignal<RACTwoTuple<NSNumber *, NSNumber *> *> *)isVPNActive {
-
     __weak VPNManager *weakSelf = self;
 
-    return [[self isExtensionZombie]
+    return [[self queryIsExtensionZombie]
       flattenMap:^RACSignal *(NSNumber *_Nullable isZombie) {
           if ([isZombie boolValue]) {
               return [RACSignal return:[RACTwoTuple pack:[NSNumber numberWithBool:FALSE] :@(VPNStatusZombie)]];
@@ -508,14 +514,16 @@ PsiFeedbackLogType const VPNManagerLogType = @"VPNManager";
       }];
 }
 
-// setConnectOnDemandEnabled: returns a signal that when subscribed to updates tunnelProviderManager's
-// onDemandEnabled property with the provided parameter if different and then emits TRUE as NSNumber on success
-// and FALSE on failure. If provided parameter is not different, then the returned signal
-// emits TRUE and completes immediately.
+// setConnectOnDemandEnabled: returns a signal that when subscribed to updates
+// `self.tunnelProviderManager.onDemandEnabled` property with the provided onDemandEnabled
+// if different and then emits @TRUE on success and @FALSE on failure.
+//
+// If onDemandEnabled is not different from `self.tunnelProviderManager`, then the returned signal
+// emits @TRUE and completes.
 // All errors are caught and logged, and FALSE is emitted in their place.
 //
-// If tunnelProviderManager is nil, returned signal completes immediately.
-//
+// If `self.tunnelProviderManager` is nil, returned signal emits @FALSE ane completes.
+// Returned signal never terminates with an error.
 - (RACSignal<NSNumber *> *)setConnectOnDemandEnabled:(BOOL)onDemandEnabled {
     __weak VPNManager *weakSelf = self;
 
@@ -523,32 +531,34 @@ PsiFeedbackLogType const VPNManagerLogType = @"VPNManager";
       flattenMap:^RACSignal<NETunnelProviderManager *> *(NETunnelProviderManager *providerManager) {
 
           if (!providerManager) {
-              return [RACSignal empty];
+              return [RACSignal return:@FALSE];
           }
 
           // If the on demand state doesn't need to change, emit @(TRUE) immediately.
           if (providerManager.onDemandEnabled == onDemandEnabled) {
-              return [RACSignal return:[NSNumber numberWithBool:TRUE]];
+              return [RACSignal return:@TRUE];
           }
 
           providerManager.onDemandEnabled = onDemandEnabled;
 
           // Returned signal, saves and loads the tunnel provider manager.
-          return [[[[RACSignal defer:providerManager selectorWithErrorCallback:@selector(saveToPreferencesWithCompletionHandler:)]
+          return [[[[RACSignal defer:providerManager
+                    selectorWithErrorCallback:@selector(saveToPreferencesWithCompletionHandler:)]
             flattenMap:^RACSignal<NETunnelProviderManager *> *(NETunnelProviderManager *manager) {
-                return [RACSignal defer:manager selectorWithErrorCallback:@selector(loadFromPreferencesWithCompletionHandler:)];
+                return [RACSignal defer:manager
+                    selectorWithErrorCallback:@selector(loadFromPreferencesWithCompletionHandler:)];
             }]
             doNext:^(NETunnelProviderManager *manager) {
                 weakSelf.tunnelProviderManager = manager;
             }]
-            map:^NSNumber *(NETunnelProviderManager *x) {
-                return [NSNumber numberWithBool:TRUE];
-          }];
-
+            mapReplace:@TRUE];
       }]
       catch:^RACSignal *(NSError *error) {
-          [PsiFeedbackLogger errorWithType:VPNManagerLogType message:@"error setting OnDemandEnabled" object:error];
-          return [RACSignal return:[NSNumber numberWithBool:FALSE]];
+          [PsiFeedbackLogger errorWithType:VPNManagerLogType
+                                   message:@"error setting OnDemandEnabled"
+                                    object:error];
+
+          return [RACSignal return:@FALSE];
       }];
 }
 
@@ -734,57 +744,48 @@ PsiFeedbackLogType const VPNManagerLogType = @"VPNManager";
 
 #pragma mark - Extension Query
 
-// isExtensionZombie returns a signal that when subscribed to sends "isProviderZombie" query to the extension
-// and then emits boolean response as NSNumber, or the signal completes immediately if extension is not active.
-// Note: the returned signal emits FALSE if the extension returns empty response.
-- (RACSignal<NSNumber *> *)isExtensionZombie {
-    return [[[self booleanQueryActiveVPN:EXTENSION_QUERY_IS_PROVIDER_ZOMBIE]
+- (RACSignal<NSNumber *> *)queryIsExtensionZombie {
+    return [[[self unsafeBooleanQueryActiveVPN:EXTENSION_QUERY_IS_PROVIDER_ZOMBIE
+                                       throwError:FALSE]
             map:^NSNumber *(NSNumber *_Nullable value) {
-                // Value is nil if extension is not running. We default to FALSE as the is zombie query response.
+                // Value is nil if extension is not running, or there was an error sending message.
+                // We default to FALSE as the tunnel connected query response.
                 if (value == nil) {
-                    return @(FALSE);
+                    return @FALSE;
                 }
                 return value;
             }]
-            catch:^RACSignal<NSNumber *> *(NSError *error) {
-                [PsiFeedbackLogger warnWithType:VPNManagerLogType message:@"isProviderZombie extension query failed" object:error];
-                return [RACSignal return:[NSNumber numberWithBool:FALSE]];
-            }];
+            unsafeSubscribeOnSerialQueue:self.serialQueue withName:@"queryIsExtensionZombie"];
 }
 
-// isPsiphonTunnelConnected returns a signal that when subscribed to sends "isTunnelConnected" query to the extension
-// and then emits boolean response as NSNumber, or nil if extension is not active.
-// Note: the returned signal emits FALSE if the extension returns empty response.
-- (RACSignal<NSNumber *> *)isPsiphonTunnelConnected {
-    return [[[self booleanQueryActiveVPN:EXTENSION_QUERY_IS_TUNNEL_CONNECTED]
+- (RACSignal<NSNumber *> *)queryIsPsiphonTunnelConnected {
+    return [[[self unsafeBooleanQueryActiveVPN:EXTENSION_QUERY_IS_TUNNEL_CONNECTED
+                                       throwError:FALSE]
             map:^NSNumber *(NSNumber *_Nullable value) {
-                // Value is nil if extension is not running. We default to FALSE as the tunnel connected query response.
+                // Value is nil if extension is not running, or there was an error sending message.
+                // We default to FALSE as the tunnel connected query response.
                 if (value == nil) {
-                    return @(FALSE);
+                    return @FALSE;
                 }
                 return value;
             }]
-            catch:^RACSignal<NSNumber *> *(NSError *error) {
-                [PsiFeedbackLogger warnWithType:VPNManagerLogType message:@"isTunnelConnected extension query failed" object:error];
-                return [RACSignal return:[NSNumber numberWithBool:FALSE]];
-            }];
+           unsafeSubscribeOnSerialQueue:self.serialQueue withName:@"isPsiphonTunnelConnectedQuery"];
 }
 
-- (RACSignal<NSNumber *> *)isNetworkReachable {
-    return [[self booleanQueryActiveVPN:EXTENSION_QUERY_IS_NETWORK_REACHABLE]
-            catch:^RACSignal *(NSError *error) {
-                [PsiFeedbackLogger
-                        warnWithType:VPNManagerLogType
-                             message:@"isNetworkReachable extension query failed"
-                              object:error];
-                return [RACSignal return:@(FALSE)];
-            }];
+// Emits type `NSNumber *_Nullable`.
+- (RACSignal<NSNumber *> *)queryIsNetworkReachable {
+    return [[self unsafeBooleanQueryActiveVPN:EXTENSION_QUERY_IS_NETWORK_REACHABLE
+                                      throwError:FALSE]
+      unsafeSubscribeOnSerialQueue:self.serialQueue withName:@"isNetworkReachableQuery"];
 }
 
-// queryActiveVPN returns a signal that when subscribed to, emits nil if the extension is not running,
-// otherwise emits boolean value as NSNumber as the query response.
+// queryActiveVPN returns a signal that when subscribed to sends query to the extension
+// and emits boolean result.
+//
+// If the extension is not running, the nil is emitted.
 // Returned signal terminates with an error if the extension returns empty response.
-- (RACSignal<NSNumber *> *)booleanQueryActiveVPN:(NSString *)query {
+- (RACSignal<NSNumber *> *)unsafeBooleanQueryActiveVPN:(NSString *)query
+                                            throwError:(BOOL)throwError {
 
     return [[[[self deferredTunnelProviderManager]
       flattenMap:^RACSignal<NSString *> *(NETunnelProviderManager *providerManager) {
@@ -800,9 +801,16 @@ PsiFeedbackLogType const VPNManagerLogType = @"VPNManager";
 
           if (s == NEVPNStatusConnected ||
               s == NEVPNStatusConnecting ||
-              s == NEVPNStatusReasserting ) {
+              s == NEVPNStatusReasserting) {
 
-              return [VPNManager sendProviderSessionMessage:query session:session];
+              // Catch all errors if throwError is FALSE.
+              RACSignal *retSignal = [VPNManager sendProviderSessionMessage:query session:session];
+              if (!throwError) {
+                  retSignal = [retSignal catch:^RACSignal *(NSError *error) {
+                      return [RACSignal return:nil];
+                  }];
+              }
+              return retSignal;
 
           } else {
               // Tunnel is not active, emit nil and then complete.
@@ -810,17 +818,18 @@ PsiFeedbackLogType const VPNManagerLogType = @"VPNManager";
           }
       }]
       map:^NSNumber *(NSString *response) {
-
           if ([response isEqualToString:EXTENSION_RESP_TRUE]) {
-              return [NSNumber numberWithBool:TRUE];
+              return @TRUE;
           } else if ([response isEqualToString:EXTENSION_RESP_FALSE]) {
-              return [NSNumber numberWithBool:FALSE];
+              return @FALSE;
           }
-
           return nil;
       }]
-      unsafeSubscribeOnSerialQueue:self.serialQueue
-                          withName:[NSString stringWithFormat:@"queryActiveVPNOperation[%@]", query]];
+      doError:^(NSError *error) {
+          [PsiFeedbackLogger warnWithType:VPNManagerLogType
+                message:[NSString stringWithFormat:@"unsafeBooleanQueryActiveVPN[%@] Failed", query]
+                 object:error];
+      }];
 }
 
 // sendProviderSessionMessage:session: returns a signal that when subscribed to sends message to the tunnel provider
@@ -828,6 +837,7 @@ PsiFeedbackLogType const VPNManagerLogType = @"VPNManager";
 // If the response is empty, signal terminates with error code VPNManagerQueryNilResponse.
 + (RACSignal<NSString *> *)sendProviderSessionMessage:(NSString *_Nonnull)message session:(NETunnelProviderSession *_Nonnull)session {
     return [RACSignal createSignal:^RACDisposable *(id <RACSubscriber> subscriber) {
+
         NSError *error;
 
         [session sendProviderMessage:[message dataUsingEncoding:NSUTF8StringEncoding]
@@ -841,12 +851,14 @@ PsiFeedbackLogType const VPNManagerLogType = @"VPNManager";
                              [subscriber sendCompleted];
                          } else {
                              [subscriber sendError:[NSError errorWithDomain:VPNManagerErrorDomain
-                                                                       code:VPNManagerQueryNilResponse]];
+                                                                  code:VPNManagerQueryNilResponse]];
                          }
                      }];
 
         if (error) {
-            [PsiFeedbackLogger warnWithType:VPNManagerLogType message:@"failed to send tunnel provider message" object:error];
+            [PsiFeedbackLogger warnWithType:VPNManagerLogType
+                                    message:@"failed to send tunnel provider message"
+                                     object:error];
             [subscriber sendError:error];
         }
 

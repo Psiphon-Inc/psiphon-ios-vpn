@@ -88,6 +88,9 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
 @property (nonatomic) PsiphonDataSharedDB *sharedDB;
 @property (nonatomic) NSTimer *subscriptionCheckTimer;
 
+// Private state subjects
+@property (nonatomic) RACSubject<RACUnit *> *checkExtensionNetworkConnectivityFailedSubject;
+
 @end
 
 @implementation AppDelegate {
@@ -104,6 +107,8 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
         _sharedDB = [[PsiphonDataSharedDB alloc] initForAppGroupIdentifier:APP_GROUP_IDENTIFIER];
         _shownLandingPageForCurrentSession = FALSE;
         _compoundDisposable = [RACCompoundDisposable compoundDisposable];
+
+        _checkExtensionNetworkConnectivityFailedSubject = [RACSubject subject];
     }
     return self;
 }
@@ -264,7 +269,11 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
     [self subscriptionExpiryTimer];
 
     // Before submitting any other work to the VPNManager, update its status.
-    [self.vpnManager checkOrFixVPNStatus];
+    [[self.vpnManager checkOrFixVPN] subscribeNext:^(NSNumber *extensionProcessRunning) {
+        if ([extensionProcessRunning boolValue]) {
+            [weakSelf.checkExtensionNetworkConnectivityFailedSubject sendNext:RACUnit.defaultUnit];
+        }
+    }];
 
     // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
     [self.sharedDB updateAppForegroundState:YES];
@@ -274,7 +283,7 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
     __block RACDisposable *connectedDisposable = [[[RACSignal
       zip:@[
         [[AdManager sharedInstance].adIsShowing take:1],
-        [self.vpnManager isPsiphonTunnelConnected],
+        [self.vpnManager queryIsPsiphonTunnelConnected],
         [self.vpnManager.lastTunnelStatus take:1],
       ]]
       flattenMap:^RACSignal<RACUnit *> *(RACTuple *tuple) {
@@ -432,7 +441,7 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
             // for the tunnel status to become "Connected" before opening the landing page).
             // Landing page should not be opened outside of the tunnel.
             //
-            __block RACDisposable *disposable = [[[[[[[[weakSelf.vpnManager isExtensionZombie]
+            __block RACDisposable *disposable = [[[[[[[[weakSelf.vpnManager queryIsExtensionZombie]
               combineLatestWith:self.vpnManager.lastTunnelStatus]
               filter:^BOOL(RACTwoTuple<NSNumber *, NSNumber *> *tuple) {
 
@@ -517,6 +526,9 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
 
     } else if ([NotifierMarkedAuthorizations isEqualToString:message]) {
         [[PsiCashClient sharedInstance] authorizationsMarkedExpired];
+
+    } else if ([NotifierNetworkConnectivityFailed isEqualToString:message]) {
+        [self.checkExtensionNetworkConnectivityFailedSubject sendNext:RACUnit.defaultUnit];
     }
 }
 
@@ -641,13 +653,12 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
     __block _Atomic BOOL ongoing;
     atomic_init(&ongoing, FALSE);
 
-    return [[[[[[Notifier sharedInstance]
-      listenForMessages:@[NotifierNetworkConnectivityFailed]]
-      filter:^BOOL(NotifierMessage x) {
+    return [[[[self.checkExtensionNetworkConnectivityFailedSubject
+      filter:^BOOL(RACUnit *x) {
           // Prevent creation of another alert if one is already ongoing.
           return !atomic_load(&ongoing);
       }]
-      flattenMap:^RACSignal<NSNumber *> *(NotifierMessage msg) {
+      flattenMap:^RACSignal<NSNumber *> *(RACUnit *x) {
           atomic_store(&ongoing, TRUE);
 
           // resolvedSignal is a hot terminating signal that emits @(TRUE) followed
@@ -656,8 +667,9 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
           RACSignal *resolvedSignal = [[[[[[Notifier sharedInstance]
             listenForMessages:@[NotifierNetworkConnectivityResolved]]
             merge:[weakSelf.vpnManager.lastTunnelStatus filter:^BOOL(NSNumber *v) {
+                // Assumed resolved if VPN is connected, or not running.
                 VPNStatus s = (VPNStatus) [v integerValue];
-                return (s == VPNStatusConnected);
+                return (s == VPNStatusConnected || s == VPNStatusDisconnected);
             }]]
             mapReplace:@(TRUE)]
             take:1]
@@ -671,7 +683,7 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
             }]
             flattenMap:^RACSignal<NSNumber *> *(id x) {
                 // Timer done. We now check extension internet reachability.
-                return [weakSelf.vpnManager isNetworkReachable];
+                return [weakSelf.vpnManager queryIsNetworkReachable];
             }];
 
           // The returned signal is a hot terminating signal that in effect unsubscribes
@@ -687,7 +699,7 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
       }]
       deliverOnMainThread]
       subscribeNext:^(NSNumber *_Nullable networkReachability) {
-          // networkReachability is nil whenever VPNManager `-isNetworkReachable` emits nil.
+          // networkReachability is nil whenever VPNManager `-queryIsNetworkReachable` emits nil.
 
           if (![networkReachability boolValue]) {
               if (!noInternetAlert) {
