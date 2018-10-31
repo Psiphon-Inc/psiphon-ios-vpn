@@ -738,7 +738,7 @@ PsiFeedbackLogType const VPNManagerLogType = @"VPNManager";
 // and then emits boolean response as NSNumber, or the signal completes immediately if extension is not active.
 // Note: the returned signal emits FALSE if the extension returns empty response.
 - (RACSignal<NSNumber *> *)isExtensionZombie {
-    return [[[self queryActiveVPN:EXTENSION_QUERY_IS_PROVIDER_ZOMBIE]
+    return [[[self booleanQueryActiveVPN:EXTENSION_QUERY_IS_PROVIDER_ZOMBIE]
             map:^NSNumber *(NSNumber *_Nullable value) {
                 // Value is nil if extension is not running. We default to FALSE as the is zombie query response.
                 if (value == nil) {
@@ -756,7 +756,7 @@ PsiFeedbackLogType const VPNManagerLogType = @"VPNManager";
 // and then emits boolean response as NSNumber, or nil if extension is not active.
 // Note: the returned signal emits FALSE if the extension returns empty response.
 - (RACSignal<NSNumber *> *)isPsiphonTunnelConnected {
-    return [[[self queryActiveVPN:EXTENSION_QUERY_IS_TUNNEL_CONNECTED]
+    return [[[self booleanQueryActiveVPN:EXTENSION_QUERY_IS_TUNNEL_CONNECTED]
             map:^NSNumber *(NSNumber *_Nullable value) {
                 // Value is nil if extension is not running. We default to FALSE as the tunnel connected query response.
                 if (value == nil) {
@@ -770,10 +770,21 @@ PsiFeedbackLogType const VPNManagerLogType = @"VPNManager";
             }];
 }
 
+- (RACSignal<NSNumber *> *)isNetworkReachable {
+    return [[self booleanQueryActiveVPN:EXTENSION_QUERY_IS_NETWORK_REACHABLE]
+            catch:^RACSignal *(NSError *error) {
+                [PsiFeedbackLogger
+                        warnWithType:VPNManagerLogType
+                             message:@"isNetworkReachable extension query failed"
+                              object:error];
+                return [RACSignal return:@(FALSE)];
+            }];
+}
+
 // queryActiveVPN returns a signal that when subscribed to, emits nil if the extension is not running,
 // otherwise emits boolean value as NSNumber as the query response.
 // Returned signal terminates with an error if the extension returns empty response.
-- (RACSignal<NSNumber *> *)queryActiveVPN:(NSString *)query {
+- (RACSignal<NSNumber *> *)booleanQueryActiveVPN:(NSString *)query {
 
     return [[[[self deferredTunnelProviderManager]
       flattenMap:^RACSignal<NSString *> *(NETunnelProviderManager *providerManager) {
