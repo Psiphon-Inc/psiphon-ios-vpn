@@ -459,7 +459,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
             [weakSelf.vpnManager stopVPN];
 
         } else if ([CommandNoInternetAlert isEqualToString:command]) {
-            [[AppDelegate sharedAppDelegate] displayAlertNoInternet];
+            [[AppDelegate sharedAppDelegate] displayAlertNoInternet:nil];
         }
 
     } error:^(NSError *error) {

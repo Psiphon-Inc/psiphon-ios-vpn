@@ -17,6 +17,7 @@
  *
  */
 
+#import <PsiphonTunnel/PsiphonTunnel.h>
 #import "PacketTunnelUtils.h"
 
 
@@ -44,6 +45,20 @@
         case NEProviderStopReasonUserSwitch :return @"UserSwitch";
         case NEProviderStopReasonConnectionFailed :return @"ConnectionFailed";
         default: return @"Unknown";
+    }
+}
+
++ (NSString *)textPsiphonConnectionState:(PsiphonConnectionState)state {
+    switch (state) {
+        case PsiphonConnectionStateDisconnected:
+            return @"Disconnected";
+        case PsiphonConnectionStateConnecting:
+            return @"Connecting";
+        case PsiphonConnectionStateConnected:
+            return @"Connected";
+        case PsiphonConnectionStateWaitingForNetwork:
+            return @"WaitingForNetwork";
+        default: return @"None";
     }
 }
 

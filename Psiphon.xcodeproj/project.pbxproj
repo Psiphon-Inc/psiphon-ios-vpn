@@ -438,6 +438,7 @@
 		9BFECF45CA0CAF6997411D22 /* MoPubInterstitialAdControllerWrapper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MoPubInterstitialAdControllerWrapper.m; sourceTree = "<group>"; };
 		9BFECF6BF16767758F28D1A0 /* AdMobRewardedAdControllerWrapper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AdMobRewardedAdControllerWrapper.m; sourceTree = "<group>"; };
 		9BFECF74881B6C4227813A63 /* AdMobConsent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AdMobConsent.h; sourceTree = "<group>"; };
+		A84081052659F2D019218A89 /* Annotations.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Annotations.h; sourceTree = "<group>"; };
 		A8408182417BD6BE2C67E5AB /* DebugDirectoryViewerViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DebugDirectoryViewerViewController.m; sourceTree = "<group>"; };
 		A84082EE1030DB6CE5662E0C /* DebugTextViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DebugTextViewController.m; sourceTree = "<group>"; };
 		A84082F8553E6F7EB5C7DB2F /* DebugUtils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DebugUtils.m; sourceTree = "<group>"; };
@@ -688,6 +689,7 @@
 				9BFEC31B61584FD2EAAF5DE6 /* Authorization.m */,
 				9BFEC673CE5EA236279F07BD /* Authorization.h */,
 				9BFEC4D609BFCD0DC812BDB3 /* Asserts.h */,
+				A84081052659F2D019218A89 /* Annotations.h */,
 			);
 			path = Shared;
 			sourceTree = "<group>";
@@ -1402,7 +1404,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "bash \"${BUILT_PRODUCTS_DIR}/${FRAMEWORKS_FOLDER_PATH}/PsiphonTunnel.framework/strip-frameworks.sh\"\n\n/usr/bin/env python \"./genstrings.py\"\nif [ $? != 0 ] ; then\n    exit 1\nfi\n";
+			shellScript = "bash \"${BUILT_PRODUCTS_DIR}/${FRAMEWORKS_FOLDER_PATH}/PsiphonTunnel.framework/strip-frameworks.sh\"\n\n/usr/bin/env python \"./genstrings.py\"\nif [ $? != 0 ] ; then\n    exit 1\nfi\n\nAPP_PATH=\"${TARGET_BUILD_DIR}/${WRAPPER_NAME}\"\n\n# This script loops through the frameworks embedded in the application and\n# removes unused architectures.\nfind \"$APP_PATH\" -name '*.framework' -type d | while read -r FRAMEWORK\ndo\nFRAMEWORK_EXECUTABLE_NAME=$(defaults read \"$FRAMEWORK/Info.plist\" CFBundleExecutable)\nFRAMEWORK_EXECUTABLE_PATH=\"$FRAMEWORK/$FRAMEWORK_EXECUTABLE_NAME\"\necho \"Executable is $FRAMEWORK_EXECUTABLE_PATH\"\n\nEXTRACTED_ARCHS=()\n\nfor ARCH in $ARCHS\ndo\necho \"Extracting $ARCH from $FRAMEWORK_EXECUTABLE_NAME\"\nlipo -extract \"$ARCH\" \"$FRAMEWORK_EXECUTABLE_PATH\" -o \"$FRAMEWORK_EXECUTABLE_PATH-$ARCH\"\nEXTRACTED_ARCHS+=(\"$FRAMEWORK_EXECUTABLE_PATH-$ARCH\")\ndone\n\necho \"Merging extracted architectures: ${ARCHS}\"\nlipo -o \"$FRAMEWORK_EXECUTABLE_PATH-merged\" -create \"${EXTRACTED_ARCHS[@]}\"\nrm \"${EXTRACTED_ARCHS[@]}\"\n\necho \"Replacing original executable with thinned version\"\nrm \"$FRAMEWORK_EXECUTABLE_PATH\"\nmv \"$FRAMEWORK_EXECUTABLE_PATH-merged\" \"$FRAMEWORK_EXECUTABLE_PATH\"\n\ndone\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -1706,6 +1708,7 @@
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_BITCODE = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -1764,6 +1767,7 @@
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_BITCODE = NO;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -1866,7 +1870,7 @@
 				PROVISIONING_PROFILE = "";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;
-				STRIP_BITCODE_FROM_COPIED_FILES = NO;
+				STRIP_BITCODE_FROM_COPIED_FILES = YES;
 				SWIFT_OBJC_BRIDGING_HEADER = "Psiphon-Bridging-Header.h";
 				SWIFT_VERSION = 3.0;
 			};
@@ -1895,7 +1899,7 @@
 				PROVISIONING_PROFILE = "";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;
-				STRIP_BITCODE_FROM_COPIED_FILES = NO;
+				STRIP_BITCODE_FROM_COPIED_FILES = YES;
 				SWIFT_OBJC_BRIDGING_HEADER = "Psiphon-Bridging-Header.h";
 				SWIFT_VERSION = 3.0;
 			};
