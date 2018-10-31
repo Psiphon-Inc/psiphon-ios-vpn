@@ -93,7 +93,7 @@ NSString * const StateCellIdentifier = @"StateCell";
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     switch (section) {
         case 0: return 2; // PPROF
-        case 1: return 2; // EXTENSION
+        case 1: return 3; // EXTENSION
         case 2: return 1; // PSIPHON TUNNEL
         default:
             PSIAssert(FALSE)
@@ -136,16 +136,21 @@ NSString * const StateCellIdentifier = @"StateCell";
 
     // EXTENSION section
     } else if (indexPath.section == 1) {
+        cell = [tableView dequeueReusableCellWithIdentifier:ActionCellIdentifier
+          forIndexPath:indexPath];
 
         switch (indexPath.row) {
             case 0: {
-                cell = [tableView dequeueReusableCellWithIdentifier:ActionCellIdentifier forIndexPath:indexPath];
+                cell.textLabel.text = @"Custom Function";
+                action = @selector(onCustomFunction);
+                break;
+            }
+            case 1: {
                 cell.textLabel.text = @"Force Jetsam";
                 action = @selector(onForceJetsam);
                 break;
             }
-            case 1: {
-                cell = [tableView dequeueReusableCellWithIdentifier:ActionCellIdentifier forIndexPath:indexPath];
+            case 2: {
                 cell.selectionStyle = UITableViewCellSelectionStyleNone;
                 cell.textLabel.text = @"Memory Profiler";
                 UISwitch *switchView = [[UISwitch alloc] initWithFrame:CGRectZero];
@@ -157,6 +162,8 @@ NSString * const StateCellIdentifier = @"StateCell";
                 break;
             }
         }
+
+    // PSIPHON TUNNEL section
     } else if (indexPath.section == 2) {
 
         cell = [tableView dequeueReusableCellWithIdentifier:ActionCellIdentifier forIndexPath:indexPath];
@@ -183,6 +190,10 @@ NSString * const StateCellIdentifier = @"StateCell";
 }
 
 #pragma mark - Action cell tap delegates
+
+- (void)onCustomFunction {
+    [[Notifier sharedInstance] post:NotifierDebugCustomFunction];
+}
 
 - (void)onForceJetsam {
     [[Notifier sharedInstance] post:NotifierDebugForceJetsam];

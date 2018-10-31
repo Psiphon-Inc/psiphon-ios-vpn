@@ -43,6 +43,7 @@ extern NotifierMessage const NotifierUpdatedAuthorizations;
 
 // Messages allowed only in debug build.
 #if DEBUG
+extern NotifierMessage const NotifierDebugCustomFunction;
 extern NotifierMessage const NotifierDebugForceJetsam;
 extern NotifierMessage const NotifierDebugGoProfile;
 extern NotifierMessage const NotifierDebugMemoryProfiler;
