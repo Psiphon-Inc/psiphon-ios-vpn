@@ -20,6 +20,8 @@
 #import <Foundation/Foundation.h>
 #import <notify.h>
 
+@class RACSignal<__covariant ValueType>;
+
 NS_ASSUME_NONNULL_BEGIN
 
 typedef NSString * NotifierMessage;
@@ -29,7 +31,9 @@ extern NotifierMessage const NotifierNewHomepages;
 extern NotifierMessage const NotifierTunnelConnected;
 extern NotifierMessage const NotifierAvailableEgressRegions;
 extern NotifierMessage const NotifierMarkedAuthorizations;
-extern NotifierMessage const NotifierWaitingForNetworkConnectivity;
+extern NotifierMessage const NotifierNetworkConnectivityFailed;
+/** Emitted only if network connectivity failed was previously posted. */
+extern NotifierMessage const NotifierNetworkConnectivityResolved;
 
 // Messages sent by the container.
 extern NotifierMessage const NotifierStartVPN;
@@ -77,6 +81,14 @@ extern NotifierMessage const NotifierDebugPsiphonTunnelState;
  * @param queue The dispatch queue tha the observer is called on.
  */
 - (void)registerObserver:(id <NotifierObserver>)observer callbackQueue:(dispatch_queue_t)queue;
+
+/**
+ * The returned signal delivers messages received by the Notifier if it matches
+ * one of the `messages` provided.
+ *
+ * @scheduler listenForMessages: delivers its events on a background scheduler.
+ */
+- (RACSignal<NotifierMessage> *)listenForMessages:(NSArray<NotifierMessage> *)messages;
 
 @end
 
