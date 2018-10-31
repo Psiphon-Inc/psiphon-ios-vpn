@@ -835,24 +835,36 @@ PsiFeedbackLogType const VPNManagerLogType = @"VPNManager";
 // sendProviderSessionMessage:session: returns a signal that when subscribed to sends message to the tunnel provider
 // and emits the response as NSString.
 // If the response is empty, signal terminates with error code VPNManagerQueryNilResponse.
-+ (RACSignal<NSString *> *)sendProviderSessionMessage:(NSString *_Nonnull)message session:(NETunnelProviderSession *_Nonnull)session {
++ (RACSignal<NSString *> *)sendProviderSessionMessage:(NSString *_Nonnull)message
+                                              session:(NETunnelProviderSession *_Nonnull)session {
+
     return [RACSignal createSignal:^RACDisposable *(id <RACSubscriber> subscriber) {
+
+        PSIAssert(RACScheduler.currentScheduler != nil);
+        RACScheduler *scheduler = RACScheduler.currentScheduler;
+        RACCompoundDisposable *compoundDisposable = [RACCompoundDisposable compoundDisposable];
 
         NSError *error;
 
         [session sendProviderMessage:[message dataUsingEncoding:NSUTF8StringEncoding]
                          returnError:&error
                      responseHandler:^(NSData *responseData) {
-                         NSString *response = [[NSString alloc] initWithData:responseData
-                                                                    encoding:NSUTF8StringEncoding];
-                         LOG_DEBUG(@"extension query response: %@", response);
-                         if (response && [response length] != 0) {
-                             [subscriber sendNext:response];
-                             [subscriber sendCompleted];
-                         } else {
-                             [subscriber sendError:[NSError errorWithDomain:VPNManagerErrorDomain
-                                                                  code:VPNManagerQueryNilResponse]];
-                         }
+
+                         // Schedule events on the same subscription scheduler.
+                         [compoundDisposable addDisposable:[scheduler schedule:^{
+                             NSString *response = [[NSString alloc] initWithData:responseData
+                                                                     encoding:NSUTF8StringEncoding];
+
+                             LOG_DEBUG(@"extension query response: %@", response);
+                             if (response && [response length] != 0) {
+                                 [subscriber sendNext:response];
+                                 [subscriber sendCompleted];
+                             } else {
+                                 [subscriber sendError:
+                                   [NSError errorWithDomain:VPNManagerErrorDomain
+                                                       code:VPNManagerQueryNilResponse]];
+                             }
+                         }]];
                      }];
 
         if (error) {
@@ -862,7 +874,7 @@ PsiFeedbackLogType const VPNManagerLogType = @"VPNManager";
             [subscriber sendError:error];
         }
 
-        return nil;
+        return compoundDisposable;
     }];
 }
 
