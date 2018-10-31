@@ -101,6 +101,9 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 
 @property (nonatomic) PsiphonConfigSponsorIds *cachedSponsorIDs;
 
+// Notifier message state management.
+@property (atomic) BOOL postedNetworkConnectivityFailed;
+
 @end
 
 @implementation PacketTunnelProvider {
@@ -145,6 +148,8 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
         _subscriptionCheckState = nil;
         _waitForContainerStartVPNCommand = FALSE;
         _suppliedContainerAuthorizationIDs = [NSSet set];
+
+        _postedNetworkConnectivityFailed = FALSE;
     }
     return self;
 }
@@ -609,12 +614,20 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 
 #pragma mark - Query methods
 
-- (BOOL)isNEZombie {
-    return self.tunnelProviderState == TunnelProviderStateZombie;
+- (NSNumber *)isNEZombie {
+    return @(self.tunnelProviderState == TunnelProviderStateZombie);
 }
 
-- (BOOL)isTunnelConnected {
-    return [self.psiphonTunnel getConnectionState] == PsiphonConnectionStateConnected;
+- (NSNumber *)isTunnelConnected {
+    return @([self.psiphonTunnel getConnectionState] == PsiphonConnectionStateConnected);
+}
+
+- (NSNumber *)isNetworkReachable {
+    NetworkStatus status;
+    if ([self.psiphonTunnel getNetworkReachabilityStatus:&status]) {
+        return @(status != NotReachable);
+    }
+    return nil;
 }
 
 #pragma mark - Notifier callback
@@ -680,6 +693,9 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 
     } else if ([NotifierDebugMemoryProfiler isEqualToString:message]) {
         [self updateAppProfiling];
+
+    } else if ([NotifierDebugCustomFunction isEqualToString:message]) {
+        // Custom function.
     }
 
 #endif
@@ -950,17 +966,27 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
     // Do not block PsiphonTunnel callback queue.
     // Note: ReactiveObjC subjects block until all subscribers have received to the events,
     //       and also ReactiveObjC `subscribeOn` operator does not behave similar to RxJava counterpart for example.
+    PacketTunnelProvider *__weak weakSelf = self;
+
     dispatch_async_global(^{
-        [self->tunnelConnectionStateSubject sendNext:@(newState)];
+        PacketTunnelProvider *__strong strongSelf = self;
+        if (strongSelf) {
+            [strongSelf->tunnelConnectionStateSubject sendNext:@(newState)];
+        }
     });
+
+#if DEBUG
+    dispatch_async_global(^{
+        NSString *stateStr = [PacketTunnelUtils textPsiphonConnectionState:newState];
+        [weakSelf.sharedDB setDebugPsiphonConnectionState:stateStr];
+        [[Notifier sharedInstance] post:NotifierDebugPsiphonTunnelState];
+    });
+#endif
+
 }
 
 - (void)onConnecting {
     self.reasserting = TRUE;
-}
-
-- (void)onStartedWaitingForNetworkConnectivity {
-    [[Notifier sharedInstance] post:NotifierWaitingForNetworkConnectivity];
 }
 
 - (void)onActiveAuthorizationIDs:(NSArray * _Nonnull)authorizationIds {
@@ -1059,6 +1085,15 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 }
 
 - (void)onInternetReachabilityChanged:(Reachability* _Nonnull)reachability {
+    NetworkStatus s = [reachability currentReachabilityStatus];
+    if (s == NotReachable) {
+        self.postedNetworkConnectivityFailed = TRUE;
+        [[Notifier sharedInstance] post:NotifierNetworkConnectivityFailed];
+
+    } else if (self.postedNetworkConnectivityFailed) {
+        self.postedNetworkConnectivityFailed = FALSE;
+        [[Notifier sharedInstance] post:NotifierNetworkConnectivityResolved];
+    }
     NSString *strReachabilityFlags = [reachability currentReachabilityFlagsToString];
     LOG_DEBUG(@"onInternetReachabilityChanged: %@", strReachabilityFlags);
 }
