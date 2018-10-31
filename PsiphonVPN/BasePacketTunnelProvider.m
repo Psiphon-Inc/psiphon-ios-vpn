@@ -201,9 +201,6 @@ PsiFeedbackLogType const BasePacketTunnelProviderLogType = @"BasePacketTunnelPro
 
 #pragma mark - Handling app messages
 
-#define EXTENSION_RESP_TRUE_DATA [EXTENSION_RESP_TRUE dataUsingEncoding:NSUTF8StringEncoding]
-#define EXTENSION_RESP_FALSE_DATA [EXTENSION_RESP_FALSE dataUsingEncoding:NSUTF8StringEncoding]
-
 - (void)handleAppMessage:(NSData *)messageData completionHandler:(nullable void (^)(NSData *__nullable responseData))completionHandler {
     @synchronized (self) {
 
@@ -211,25 +208,30 @@ PsiFeedbackLogType const BasePacketTunnelProviderLogType = @"BasePacketTunnelPro
             return;
         }
 
-        NSData *respData = nil;
         NSString *query = [[NSString alloc] initWithData:messageData encoding:NSUTF8StringEncoding];
+        NSNumber *respValue;
 
         if ([EXTENSION_QUERY_IS_PROVIDER_ZOMBIE isEqualToString:query]) {
             // If the Psiphon tunnel has been started when the extension was started
             // responds with EXTENSION_RESP_TRUE, otherwise responds with EXTENSION_RESP_FALSE
-            respData = [(id <BasePacketTunnelProviderProtocol>) self isNEZombie] ? EXTENSION_RESP_TRUE_DATA : EXTENSION_RESP_FALSE_DATA;
+            respValue = [(id <BasePacketTunnelProviderProtocol>)self isNEZombie];
 
         } else if ([EXTENSION_QUERY_IS_TUNNEL_CONNECTED isEqualToString:query]) {
-            respData = ([(id <BasePacketTunnelProviderProtocol>) self isTunnelConnected]) ? EXTENSION_RESP_TRUE_DATA : EXTENSION_RESP_FALSE_DATA;
+            respValue = [(id <BasePacketTunnelProviderProtocol>) self isTunnelConnected];
+
+        } else if ([EXTENSION_QUERY_IS_NETWORK_REACHABLE isEqualToString:query]) {
+            respValue = [(id <BasePacketTunnelProviderProtocol>) self isNetworkReachable];
         }
 
-        if (respData) {
-            completionHandler(respData);
-            return;
+        NSData *respData = nil;
+        if ([respValue boolValue]) {
+            respData = [EXTENSION_RESP_TRUE dataUsingEncoding:NSUTF8StringEncoding];
+        } else {
+            respData = [EXTENSION_RESP_FALSE dataUsingEncoding:NSUTF8StringEncoding];
         }
 
-        // If completionHandler is not nil, iOS expects it to always be executed.
-        completionHandler(messageData);
+        // iOS always expects completionHandler to be called.
+        completionHandler(respData);
     }
 }
 

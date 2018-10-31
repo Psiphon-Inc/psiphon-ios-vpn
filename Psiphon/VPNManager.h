@@ -205,6 +205,14 @@ typedef NS_ENUM(NSInteger, VPNStartStatus) {
  */
 - (RACSignal<NSNumber *> *)isPsiphonTunnelConnected;
 
+/**
+ * Queries the Network Extension to check whether psiphon tunnel is waiting for
+ * internet reachability or not.
+ * @attention Returned signal emits nil if the extension is not running.
+ * @scheduler isPsiphonTunnelWaitingForNetwork its events on a background thread.
+ */
+- (RACSignal<NSNumber *> *)isNetworkReachable;
+
 @end
 
 NS_ASSUME_NONNULL_END

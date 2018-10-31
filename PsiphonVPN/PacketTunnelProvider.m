@@ -101,6 +101,9 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 
 @property (nonatomic) PsiphonConfigSponsorIds *cachedSponsorIDs;
 
+// Notifier message state management.
+@property (atomic) BOOL postedNetworkConnectivityFailed;
+
 @end
 
 @implementation PacketTunnelProvider {
@@ -145,6 +148,8 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
         _subscriptionCheckState = nil;
         _waitForContainerStartVPNCommand = FALSE;
         _suppliedContainerAuthorizationIDs = [NSSet set];
+
+        _postedNetworkConnectivityFailed = FALSE;
     }
     return self;
 }
@@ -609,12 +614,20 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 
 #pragma mark - Query methods
 
-- (BOOL)isNEZombie {
-    return self.tunnelProviderState == TunnelProviderStateZombie;
+- (NSNumber *)isNEZombie {
+    return @(self.tunnelProviderState == TunnelProviderStateZombie);
 }
 
-- (BOOL)isTunnelConnected {
-    return [self.psiphonTunnel getConnectionState] == PsiphonConnectionStateConnected;
+- (NSNumber *)isTunnelConnected {
+    return @([self.psiphonTunnel getConnectionState] == PsiphonConnectionStateConnected);
+}
+
+- (NSNumber *)isNetworkReachable {
+    NetworkStatus status;
+    if ([self.psiphonTunnel getNetworkReachabilityStatus:&status]) {
+        return @(status != NotReachable);
+    }
+    return nil;
 }
 
 #pragma mark - Notifier callback
@@ -973,10 +986,6 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
     self.reasserting = TRUE;
 }
 
-- (void)onStartedWaitingForNetworkConnectivity {
-    [[Notifier sharedInstance] post:NotifierWaitingForNetworkConnectivity];
-}
-
 - (void)onActiveAuthorizationIDs:(NSArray * _Nonnull)authorizationIds {
 
     __weak PacketTunnelProvider *weakSelf = self;
@@ -1073,6 +1082,15 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 }
 
 - (void)onInternetReachabilityChanged:(Reachability* _Nonnull)reachability {
+    NetworkStatus s = [reachability currentReachabilityStatus];
+    if (s == NotReachable) {
+        self.postedNetworkConnectivityFailed = TRUE;
+        [[Notifier sharedInstance] post:NotifierNetworkConnectivityFailed];
+
+    } else if (self.postedNetworkConnectivityFailed) {
+        self.postedNetworkConnectivityFailed = FALSE;
+        [[Notifier sharedInstance] post:NotifierNetworkConnectivityResolved];
+    }
     NSString *strReachabilityFlags = [reachability currentReachabilityFlagsToString];
     LOG_DEBUG(@"onInternetReachabilityChanged: %@", strReachabilityFlags);
 }
