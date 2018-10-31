@@ -62,7 +62,7 @@ typedef NS_ENUM(NSInteger, UserSubscriptionStatus) {
  */
 - (void)reloadMainViewController;
 
-- (void)displayAlertNoInternet;
+- (UIAlertController *)displayAlertNoInternet:(void (^_Nullable)(UIAlertAction *))handler;
 
 + (UIViewController *)getTopMostViewController;
 
