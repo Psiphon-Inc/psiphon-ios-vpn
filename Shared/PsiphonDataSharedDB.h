@@ -228,6 +228,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSURL *)goProfileDirectory;
 
+- (void)setDebugPsiphonConnectionState:(NSString *)state;
+
+- (NSString *)getDebugPsiphonConnectionState;
+
 #endif
 
 @end

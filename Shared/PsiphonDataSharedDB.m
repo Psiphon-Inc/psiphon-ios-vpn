@@ -65,6 +65,7 @@ UserDefaultsKey const SharedDataExtensionJetsamCounterIntegerKey = @"PsiphonData
 #if DEBUG
 
 UserDefaultsKey const DebugMemoryProfileBoolKey = @"PsiphonDataSharedDB.DebugMemoryProfilerBoolKey";
+UserDefaultsKey const DebugPsiphonConnectionStateStringKey = @"PsiphonDataSharedDB.DebugPsiphonConnectionStateStringKey";
 
 #endif
 
@@ -483,8 +484,7 @@ UserDefaultsKey const DebugMemoryProfileBoolKey = @"PsiphonDataSharedDB.DebugMem
 - (NSString *)getFileSize:(NSString *)filePath {
     NSError *err;
     unsigned long long byteCount = [[[NSFileManager defaultManager] attributesOfItemAtPath:filePath error:&err] fileSize];
-    if (err) {
-        return nil;
+    if (err) { return nil;
     }
     return [NSByteCountFormatter stringFromByteCount:byteCount countStyle:NSByteCountFormatterCountStyleBinary];
 }
@@ -500,6 +500,18 @@ UserDefaultsKey const DebugMemoryProfileBoolKey = @"PsiphonDataSharedDB.DebugMem
 - (NSURL *)goProfileDirectory {
     return [[[NSFileManager defaultManager] containerURLForSecurityApplicationGroupIdentifier:appGroupIdentifier]
             URLByAppendingPathComponent:@"go_profile" isDirectory:TRUE];
+}
+
+- (void)setDebugPsiphonConnectionState:(NSString *)state {
+    [sharedDefaults setObject:state forKey:DebugPsiphonConnectionStateStringKey];
+}
+
+- (NSString *_Nonnull)getDebugPsiphonConnectionState {
+    NSString *state = [sharedDefaults stringForKey:DebugPsiphonConnectionStateStringKey];
+    if (state == nil) {
+        state = @"None";
+    }
+    return state;
 }
 
 #endif
