@@ -45,6 +45,7 @@ NotifierMessage const NotifierAppEnteredBackground   = PSIPHON_GROUP @".AppEnter
 NotifierMessage const NotifierUpdatedAuthorizations  = PSIPHON_GROUP @".UpdatedAuthorizations";
 
 #if DEBUG
+NotifierMessage const NotifierDebugCustomFunction    = PSIPHON_GROUP @".DebugCustomFunction";
 NotifierMessage const NotifierDebugForceJetsam    = PSIPHON_GROUP @".DebugForceJetsam";
 NotifierMessage const NotifierDebugGoProfile      = PSIPHON_GROUP @".DebugGoProfile";
 NotifierMessage const NotifierDebugMemoryProfiler = PSIPHON_GROUP @".DebugMemoryProfiler";
@@ -110,7 +111,9 @@ static inline void AddDarwinNotifyObserver(CFNotificationCenterRef center, const
     AddDarwinNotifyObserver(center, (__bridge const void *)self, (__bridge CFStringRef)NotifierForceSubscriptionCheck);
     AddDarwinNotifyObserver(center, (__bridge const void *)self, (__bridge CFStringRef)NotifierAppEnteredBackground);
     AddDarwinNotifyObserver(center, (__bridge const void *)self, (__bridge CFStringRef)NotifierUpdatedAuthorizations);
+
 #if DEBUG
+    AddDarwinNotifyObserver(center, (__bridge const void *)self, (__bridge CFStringRef)NotifierDebugCustomFunction);
     AddDarwinNotifyObserver(center, (__bridge const void *)self, (__bridge CFStringRef)NotifierDebugForceJetsam);
     AddDarwinNotifyObserver(center, (__bridge const void *)self, (__bridge CFStringRef)NotifierDebugGoProfile);
     AddDarwinNotifyObserver(center, (__bridge const void *)self, (__bridge CFStringRef)NotifierDebugMemoryProfiler);

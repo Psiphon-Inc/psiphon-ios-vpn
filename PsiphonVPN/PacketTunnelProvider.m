@@ -693,6 +693,9 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 
     } else if ([NotifierDebugMemoryProfiler isEqualToString:message]) {
         [self updateAppProfiling];
+
+    } else if ([NotifierDebugCustomFunction isEqualToString:message]) {
+        // Custom function.
     }
 
 #endif
