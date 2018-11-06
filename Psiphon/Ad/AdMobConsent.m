@@ -20,15 +20,16 @@
 #import "AdMobConsent.h"
 #import "PsiFeedbackLogger.h"
 #import "Logging.h"
-#import "AppDelegate.h"
 #import "PsiphonClientCommonLibraryHelpers.h"
+#import "AppDelegate.h"
+@import GoogleMobileAds;
 
 PsiFeedbackLogType const AdMobConsentLogType = @"AdMobConsent";
 
 @implementation AdMobConsent
 
 + (void)collectConsentForPublisherID:(NSString *)publisherID
-               withCompletionHandler:(void (^_Nonnull)(NSError *_Nullable error, PACConsentStatus s))completion {
+  withCompletionHandler:(void (^_Nonnull)(NSError *_Nullable error, PACConsentStatus s))completion {
 
     // AdMob consent
     [PACConsentInformation.sharedInstance
@@ -98,6 +99,24 @@ PsiFeedbackLogType const AdMobConsentLogType = @"AdMobConsent";
               completion(nil, PACConsentInformation.sharedInstance.consentStatus);
           }
       }];
+}
+
++ (void)resetConsent {
+    PACConsentInformation.sharedInstance.consentStatus = PACConsentStatusUnknown;
+}
+
++ (NSString *)NPAStringforConsentStatus:(PACConsentStatus)consent {
+    return (consent == PACConsentStatusNonPersonalized) ? @"1" : @"0";
+}
+
++ (GADRequest *)createGADRequestWithUserConsentStatus {
+    PACConsentStatus consent = PACConsentInformation.sharedInstance.consentStatus;
+    GADExtras *extras = [[GADExtras alloc] init];
+    extras.additionalParameters = @{@"npa" : [AdMobConsent NPAStringforConsentStatus:consent]};
+
+    GADRequest *request = [GADRequest request];
+    [request registerAdNetworkExtras:extras];
+    return request;
 }
 
 @end
