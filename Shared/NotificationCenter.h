@@ -18,25 +18,18 @@
  */
 
 #import <Foundation/Foundation.h>
-#import <UIKit/UIKit.h>
-#import "NotificationCenter.h"
-
-NS_ASSUME_NONNULL_BEGIN
 
 /**
- * Notification is posted when the privacy policy view controller is dismissed by the user.
- * Whether the user accepted the PP or not is stored as a boolean in user info with key
- * PrivacyPolicyDismissedActionBoolKey.
+ * NSNotification user info dictionary key type.
+ *
+ * NotificationUserInfoKey identifier should be composed in this way:
+ * "[UniquePartOfName] + Notification + [Type] + Key"
+ *
+ * Value should be the same as the identifier.
+ *
+ * Example:
+ * NotificationUserInfoKey const PrivacyPolicyAcceptedNotificationBoolKey =
+ *     @"PrivacyPolicyAcceptedNotificationBoolKey";
+ *
  */
-extern NSNotificationName const PrivacyPolicyDismissedNotification;
-
-/**
- * User info key with bool value for PrivacyPolicyDismissedNotification.
- */
-extern NotificationUserInfoKey const PrivacyPolicyAcceptedNotificationBoolKey;
-
-@interface PrivacyPolicyViewController : UIViewController
-
-@end
-
-NS_ASSUME_NONNULL_END
+typedef NSString * NotificationUserInfoKey;
