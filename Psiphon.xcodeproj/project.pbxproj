@@ -81,8 +81,6 @@
 		4EFDFD7420DD829800A687FD /* AppStats.m in Sources */ = {isa = PBXBuildFile; fileRef = 4EFDFD7320DD829800A687FD /* AppStats.m */; };
 		521481CC21713A600020C885 /* AppStats.m in Sources */ = {isa = PBXBuildFile; fileRef = 4EFDFD7320DD829800A687FD /* AppStats.m */; };
 		521481CD217146290020C885 /* AppProfiler.m in Sources */ = {isa = PBXBuildFile; fileRef = 4EC7CACF20E185580038B4E1 /* AppProfiler.m */; };
-		52A38CB82192340200E45ADA /* NotificationCenter.h in Resources */ = {isa = PBXBuildFile; fileRef = A840836B132308CCB94B9275 /* NotificationCenter.h */; };
-		52A38CB92192342500E45ADA /* NotificationCenter.h in Resources */ = {isa = PBXBuildFile; fileRef = A840836B132308CCB94B9275 /* NotificationCenter.h */; };
 		66094F7A1E8067520069EC4E /* PsiphonTunnel.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 66094F781E8067520069EC4E /* PsiphonTunnel.framework */; };
 		6615A5EA1F58A95500026C98 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 6615A5E81F58A95500026C98 /* Localizable.strings */; };
 		6615A5EB1F58A95B00026C98 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 6615A5E81F58A95500026C98 /* Localizable.strings */; };
@@ -108,10 +106,8 @@
 		9BFECD174E254989EC97A437 /* IAPHelpViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC220C067BBE75AF970C1 /* IAPHelpViewController.m */; };
 		9BFECD1880B51B0E2EAEFF1F /* Notifier.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC91ED4A1C511520E9948 /* Notifier.m */; };
 		9BFECD2FAA1FCDA88A7D432E /* UIColor+Additions.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC72C282F6060193B2E87 /* UIColor+Additions.m */; };
-		9BFECE5505C42426FC9627C8 /* UserDefaults.h in Resources */ = {isa = PBXBuildFile; fileRef = 9BFECC9B2B9F2BFBD4F8A47B /* UserDefaults.h */; };
 		9BFECEA225F023F895CC8DA1 /* Authorization.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC31B61584FD2EAAF5DE6 /* Authorization.m */; };
 		9BFECF61970F215F32E76280 /* AdMobInterstitialAdControllerWrapper.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC4F42A7FC2F11FF43636 /* AdMobInterstitialAdControllerWrapper.m */; };
-		9BFECF65871BB6B522C33F1E /* UserDefaults.h in Resources */ = {isa = PBXBuildFile; fileRef = 9BFECC9B2B9F2BFBD4F8A47B /* UserDefaults.h */; };
 		9BFECF8895D5FE1940A6F700 /* PsiphonConfigUserDefaults.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC584519C408D9D6D3FF1 /* PsiphonConfigUserDefaults.m */; };
 		9BFECF9F760F1A93A8933089 /* Nullity.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFECCCF429898FD903B69A6 /* Nullity.m */; };
 		9BFECFE618966005B01CF582 /* MoPubRewardedAdControllerWrapper.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC970B3CC179C3B9DE44D /* MoPubRewardedAdControllerWrapper.m */; };
@@ -1247,8 +1243,6 @@
 				445F24DE20E1A5BA00D004E9 /* pkcs7-signed-data-simplified.asn1 in Resources */,
 				EF743FCA1F99549000AC89A2 /* productIDs.plist in Resources */,
 				963708A91F65D4810038894E /* Bourbon-Oblique.otf in Resources */,
-				9BFECE5505C42426FC9627C8 /* UserDefaults.h in Resources */,
-				52A38CB82192340200E45ADA /* NotificationCenter.h in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1261,8 +1255,6 @@
 				6615A5EB1F58A95B00026C98 /* Localizable.strings in Resources */,
 				EF6C1F531F59E46500709554 /* embedded_server_entries in Resources */,
 				EF743FCB1F99549000AC89A2 /* productIDs.plist in Resources */,
-				9BFECF65871BB6B522C33F1E /* UserDefaults.h in Resources */,
-				52A38CB92192342500E45ADA /* NotificationCenter.h in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
