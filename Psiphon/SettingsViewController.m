@@ -27,12 +27,15 @@
 #import "RACReplaySubject.h"
 #import "RACSignal+Operations.h"
 #import "VPNManager.h"
+#import "Asserts.h"
+#import "AdManager.h"
 
 // Specifier keys for cells in settings menu
 // These keys are defined in Psiphon/InAppSettings.bundle/Root.inApp.plist
 NSString * const SettingsSubscriptionCellSpecifierKey = @"settingsSubscription";
 NSString * const SettingsPsiCashCellSpecifierKey = @"settingsPsiCash";
 NSString * const SettingsReinstallVPNConfigurationKey = @"settingsReinstallVPNConfiguration";
+NSString * const SettingsResetAdConsentCellSpecifierKey = @"settingsResetAdConsent";
 
 @interface SettingsViewController ()
 
@@ -46,6 +49,7 @@ NSString * const SettingsReinstallVPNConfigurationKey = @"settingsReinstallVPNCo
 @implementation SettingsViewController {
     UITableViewCell *subscriptionTableViewCell;
     UITableViewCell *reinstallVPNProfileCell;
+    UITableViewCell *resetConsentCell;
 }
 
 - (instancetype)init {
@@ -155,23 +159,40 @@ NSString * const SettingsReinstallVPNConfigurationKey = @"settingsReinstallVPNCo
 
 #pragma mark - Table constuctor methods
 
-- (void)settingsViewController:(IASKAppSettingsViewController*)sender tableView:(UITableView *)tableView didSelectCustomViewSpecifier:(IASKSpecifier*)specifier {
+- (void)settingsViewController:(IASKAppSettingsViewController*)sender
+                     tableView:(UITableView *)tableView
+    didSelectCustomViewSpecifier:(IASKSpecifier*)specifier {
+
     [super settingsViewController:self tableView:tableView didSelectCustomViewSpecifier:specifier];
+
     if ([specifier.key isEqualToString:SettingsSubscriptionCellSpecifierKey]) {
         [self openIAPViewController];
+
     } else if ([specifier.key isEqualToString:SettingsPsiCashCellSpecifierKey]) {
         [self openPsiCashViewController];
+
     } else if ([specifier.key isEqualToString:SettingsReinstallVPNConfigurationKey]) {
         [[VPNManager sharedInstance] reinstallVPNConfiguration];
         [self settingsViewControllerDidEnd:nil];
+
+    } else if ([specifier.key isEqualToString:SettingsResetAdConsentCellSpecifierKey]) {
+        [self onResetConsent];
+        NSIndexPath *path = [tableView indexPathForCell:resetConsentCell];
+        [tableView deselectRowAtIndexPath:path animated:TRUE];
     }
 }
 
 - (UITableViewCell*)tableView:(UITableView*)tableView cellForSpecifier:(IASKSpecifier*)specifier {
     UITableViewCell *cell = nil;
-    if (![specifier.key isEqualToString:SettingsPsiCashCellSpecifierKey]
-        && ![specifier.key isEqualToString:SettingsReinstallVPNConfigurationKey]
-        && ![specifier.key isEqualToString:SettingsSubscriptionCellSpecifierKey]) {
+
+    NSArray<NSString *> *customKeys = @[
+      SettingsSubscriptionCellSpecifierKey,
+      SettingsPsiCashCellSpecifierKey,
+      SettingsReinstallVPNConfigurationKey,
+      SettingsResetAdConsentCellSpecifierKey
+    ];
+
+    if (![customKeys containsObject:specifier.key]) {
         cell = [super tableView:tableView cellForSpecifier:specifier];
         return cell;
     }
@@ -201,11 +222,24 @@ NSString * const SettingsReinstallVPNConfigurationKey = @"settingsReinstallVPNCo
         [cell setAccessoryType:UITableViewCellAccessoryDisclosureIndicator];
         [cell.textLabel setText:@"PsiCash"];
 
+    } else if ([specifier.key isEqualToString:SettingsResetAdConsentCellSpecifierKey]) {
+        cell = [super tableView:tableView cellForSpecifier:specifier];
+        cell.textLabel.textAlignment = NSTextAlignmentCenter;
+        cell.textLabel.textColor = self.view.tintColor;
+        cell.textLabel.text = NSLocalizedStringWithDefaultValue(@"SETTINGS_RESET_ADMOB_CONSENT",
+          nil,
+          [NSBundle mainBundle],
+          @"Reset AdMob Consent",
+          @"(Do not translate 'AdMob') Title of cell in settings menu which indicates the user can change or revoke the consent they've given to admob");
+
+        resetConsentCell = cell;
     }
 
-    assert(cell != nil);
+    PSIAssert(cell != nil);
     return cell;
 }
+
+#pragma mark - Callbacks
 
 - (void)openIAPViewController {
     IAPViewController *iapViewController = [[IAPViewController alloc]init];
@@ -213,11 +247,13 @@ NSString * const SettingsReinstallVPNConfigurationKey = @"settingsReinstallVPNCo
     [self.navigationController pushViewController:iapViewController animated:YES];
 }
 
-#pragma mark - PsiCash
-
 - (void)openPsiCashViewController {
     PsiCashOnboardingViewController *onboarding = [[PsiCashOnboardingViewController alloc] init];
     [self presentViewController:onboarding animated:NO completion:nil];
+}
+
+- (void)onResetConsent {
+    [[AdManager sharedInstance] resetUserConsent];
 }
 
 @end
