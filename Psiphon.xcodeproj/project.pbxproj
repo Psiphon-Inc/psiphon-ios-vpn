@@ -81,6 +81,8 @@
 		4EFDFD7420DD829800A687FD /* AppStats.m in Sources */ = {isa = PBXBuildFile; fileRef = 4EFDFD7320DD829800A687FD /* AppStats.m */; };
 		521481CC21713A600020C885 /* AppStats.m in Sources */ = {isa = PBXBuildFile; fileRef = 4EFDFD7320DD829800A687FD /* AppStats.m */; };
 		521481CD217146290020C885 /* AppProfiler.m in Sources */ = {isa = PBXBuildFile; fileRef = 4EC7CACF20E185580038B4E1 /* AppProfiler.m */; };
+		52A38CB82192340200E45ADA /* NotificationCenter.h in Resources */ = {isa = PBXBuildFile; fileRef = A840836B132308CCB94B9275 /* NotificationCenter.h */; };
+		52A38CB92192342500E45ADA /* NotificationCenter.h in Resources */ = {isa = PBXBuildFile; fileRef = A840836B132308CCB94B9275 /* NotificationCenter.h */; };
 		66094F7A1E8067520069EC4E /* PsiphonTunnel.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 66094F781E8067520069EC4E /* PsiphonTunnel.framework */; };
 		6615A5EA1F58A95500026C98 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 6615A5E81F58A95500026C98 /* Localizable.strings */; };
 		6615A5EB1F58A95B00026C98 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 6615A5E81F58A95500026C98 /* Localizable.strings */; };
@@ -442,6 +444,7 @@
 		A8408182417BD6BE2C67E5AB /* DebugDirectoryViewerViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DebugDirectoryViewerViewController.m; sourceTree = "<group>"; };
 		A84082EE1030DB6CE5662E0C /* DebugTextViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DebugTextViewController.m; sourceTree = "<group>"; };
 		A84082F8553E6F7EB5C7DB2F /* DebugUtils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DebugUtils.m; sourceTree = "<group>"; };
+		A840836B132308CCB94B9275 /* NotificationCenter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NotificationCenter.h; sourceTree = "<group>"; };
 		A8408485646C405AA88F1FAC /* DebugLogViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DebugLogViewController.h; sourceTree = "<group>"; };
 		A84087583F512F9B0E218A9E /* DebugDirectoryViewerViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DebugDirectoryViewerViewController.h; sourceTree = "<group>"; };
 		A8408760300FDF33FB753E80 /* DebugViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DebugViewController.m; sourceTree = "<group>"; };
@@ -690,6 +693,7 @@
 				9BFEC673CE5EA236279F07BD /* Authorization.h */,
 				9BFEC4D609BFCD0DC812BDB3 /* Asserts.h */,
 				A84081052659F2D019218A89 /* Annotations.h */,
+				A840836B132308CCB94B9275 /* NotificationCenter.h */,
 			);
 			path = Shared;
 			sourceTree = "<group>";
@@ -1244,6 +1248,7 @@
 				EF743FCA1F99549000AC89A2 /* productIDs.plist in Resources */,
 				963708A91F65D4810038894E /* Bourbon-Oblique.otf in Resources */,
 				9BFECE5505C42426FC9627C8 /* UserDefaults.h in Resources */,
+				52A38CB82192340200E45ADA /* NotificationCenter.h in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1257,6 +1262,7 @@
 				EF6C1F531F59E46500709554 /* embedded_server_entries in Resources */,
 				EF743FCB1F99549000AC89A2 /* productIDs.plist in Resources */,
 				9BFECF65871BB6B522C33F1E /* UserDefaults.h in Resources */,
+				52A38CB92192342500E45ADA /* NotificationCenter.h in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
