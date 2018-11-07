@@ -34,12 +34,6 @@
 /* Main text in the 'Upstream Proxy Error' dialog box. This is shown when the user has directly altered these settings, and those settings are (probably) erroneous. DO NOT translate 'Psiphon'. */
 "CHECK_UPSTREAM_PROXY_SETTING" = "আপনি একটি আপস্ট্রিম প্রক্সি ব্যবহার করার জন্য সাইফন কনফিগার করেছেন। \nযাইহোক, আমরা সে প্রক্সির মাধ্যমে একটি সাইফন সার্ভারে সংযোগ করতে অক্ষম বলে মনে হচ্ছে। \nঅনুগ্রহ করে সেটিংস ঠিক করুন এবং আবার চেষ্টা করুন।";
 
-/* Alert dialog body informing the user that the 'Auto-start VPN on demand' feature will be disabled and that the VPN cannot be stopped. */
-"CONNECT_ON_DEMAND_ALERT_BODY" = "\"ভিপিএন সয়ংক্রিয়ভাবে চালু\" সক্রিয় থাকলে ভিপিএন বন্ধ করা যাবে না।\nআপনি কি \"ভিপিএন সয়ংক্রিয়ভাবে চালু\" বাতিল করতে চান এবং ভিপিএন থামাতে চান?";
-
-/* Alert dialog title informing user that 'Auto-start VPN' feature is enabled */
-"CONNECT_ON_DEMAND_ALERT_TITLE" = "ভিপিএন স্বয়ংক্রিয়ভাবে চালু হবে";
-
 /* Text above change region button that allows user to select their desired server region */
 "CONNECT_VIA" = "মাধ্যমে সংযোগ করুন";
 
@@ -84,8 +78,7 @@
 "NO_PRODUCTS_TEXT" = "অ্যাপ স্টোর থেকে সাবস্ক্রিপশন পুনরুদ্ধার করা যায়নি। রিফ্রেশ করুন অথবা পরে আবার চেষ্টা করুন।";
 
 /* Alert OK Button
-   OK button on a pop-up alert. The alert will be dismissed when the user presses this button.
-   OK button title */
+   OK button on a pop-up alert. The alert will be dismissed when the user presses this button. */
 "OK_BUTTON" = "ঠিক আছে";
 
 /*[UNTRANSLATED] Text of button at the bottom right or left (depending on rtl) of the last onboarding screen which allows the user to finish the onboarding sequence. Note: should be all uppercase (capitalized) when possible. */
@@ -263,17 +256,8 @@
 /* Subscriptions item title in the app settings when user does not have an active subscription. Clicking this item opens subscriptions view. If “Premium” doesn't easily translate, please choose a term that conveys “Pro” or “Extra” or “Better” or “Elite”. */
 "SETTINGS_SUBSCRIPTION_NOT_ACTIVE" = "প্রিমিয়াম-এ যান!";
 
-/* Automatically start VPN On demand settings toggle */
-"SETTINGS_VPN_ON_DEMAND" = "ইচ্ছামাফিক স্বয়ংক্রিয়ভাবে ভিপিএন চালু করুন";
-
-/* VPN On demand setting detail text showing when user doesn't have an active subscription and the item is disabled. */
-"SETTINGS_VPN_ON_DEMAND_DETAIL" = "সদস্যদের জন্য";
-
 /* Text for button that opens paid subscriptions manager UI. If “Premium” doesn't easily translate, please choose a term that conveys “Pro” or “Extra” or “Better” or “Elite”. */
 "SUBSCRIPTION_BUTTON_TITLE" = "এখন প্রিমিয়াম-এ যান!";
-
-/* Alert message informing user that their subscription has expired, and that Psiphon will stop in an hour if subscription is not renewed. Do not translate 'Psiphon'. */
-"SUBSCRIPTION_EXPIRED_WILL_KILL_TUNNEL" = "আপনার সাইফন সাবস্ক্রিপশন মেয়াদ শেষ হয়ে গেছে। সাবস্ক্রিপশন নবায়ন না করা হলে সাইফন স্বয়ংক্রিয়ভাবে এক ঘন্টা পরে বন্ধ হয়ে যাবে। প্রিমিয়াম বৈশিষ্ট্যগুলির ব্যবহার চালিয়ে যেতে আপনার সদস্যতা পর্যালোচনা করার জন্য সাইফন অ্যাপ্লিকেশন খুলুন।";
 
 /* Title of the dialog for available in-app paid subscriptions */
 "SUBSCRIPTIONS" = "সাবস্ক্রিপশনস";
@@ -292,9 +276,6 @@
 
 /* Title of button on subscriptions page which opens Psiphon's terms of use webpage */
 "SUBSCRIPTIONS_TERMS_OF_USE_BUTTON_TEXT" = "ব্যবহারের শর্তাবলী";
-
-/* Alert message informing user that Psiphon has been stopped automatically since the subscription has expired. Do not translate 'Psiphon'. */
-"TUNNEL_KILLED" = "আপনার সদস্যতার মেয়াদ শেষ হয়ে গেলে সাইফন স্বয়ংক্রিয়ভাবে বন্ধ হয়ে গেছে।";
 
 /* Alert message informing user to turn on their cellular data or wifi to connect to the internet */
 "TURN_ON_DATE" = "ডেটা অ্যাক্সেস করার জন্য সেলুলার ডেটা চালু করুন বা ওয়াইফাই ব্যবহার করুন।";
