@@ -87,7 +87,7 @@ NSString * const StateCellIdentifier = @"StateCell";
 #pragma mark - UITableViewDataSource delegate methods
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-    return 3;
+    return 4;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
@@ -95,6 +95,7 @@ NSString * const StateCellIdentifier = @"StateCell";
         case 0: return 2; // PPROF
         case 1: return 3; // EXTENSION
         case 2: return 1; // PSIPHON TUNNEL
+        case 3: return 2; // CONTAINER
         default:
             PSIAssert(FALSE)
             return 0;
@@ -106,6 +107,7 @@ NSString * const StateCellIdentifier = @"StateCell";
         case 0: return @"PPROF";
         case 1: return @"EXTENSION";
         case 2: return @"PSIPHON TUNNEL";
+        case 3: return @"CONTAINER";
         default:
             PSIAssert(FALSE);
             return @"";
@@ -166,7 +168,8 @@ NSString * const StateCellIdentifier = @"StateCell";
     // PSIPHON TUNNEL section
     } else if (indexPath.section == 2) {
 
-        cell = [tableView dequeueReusableCellWithIdentifier:ActionCellIdentifier forIndexPath:indexPath];
+        cell = [tableView dequeueReusableCellWithIdentifier:ActionCellIdentifier
+                                               forIndexPath:indexPath];
         cell.selectionStyle = UITableViewCellSelectionStyleNone;
         switch (indexPath.row) {
             case 0: {
@@ -175,6 +178,24 @@ NSString * const StateCellIdentifier = @"StateCell";
                 cell.textLabel.text = @"Connection State";
                 cell.accessoryView = psiphonTunnelConnectionStateLabel;
                 [self updateConnectionStateLabel];
+                break;
+            }
+        }
+
+    // CONTAINER section
+    } else if (indexPath.section == 3) {
+        cell = [tableView dequeueReusableCellWithIdentifier:ActionCellIdentifier
+                                               forIndexPath:indexPath];
+        cell.selectionStyle = UITableViewCellSelectionStyleDefault;
+        switch (indexPath.row) {
+            case 0: {
+                cell.textLabel.text = @"Reset Standard UserDefaults";
+                action = @selector(onResetStandardUserDefaults);
+                break;
+            }
+            case 1: {
+                cell.textLabel.text = @"Reset PsiphonDataSharedDB";
+                action = @selector(onResetPsiphonDataSharedDB);
                 break;
             }
         }
@@ -215,6 +236,15 @@ NSString * const StateCellIdentifier = @"StateCell";
     [[Notifier sharedInstance] post:NotifierDebugMemoryProfiler];
 }
 
+- (void)onResetStandardUserDefaults {
+    [self clearUserDefaults:[NSUserDefaults standardUserDefaults]];
+}
+
+- (void)onResetPsiphonDataSharedDB {
+    NSUserDefaults *sharedDB = [[NSUserDefaults alloc] initWithSuiteName:APP_GROUP_IDENTIFIER];
+    [self clearUserDefaults:sharedDB];
+}
+
 #pragma mark - Connection state
 
 - (void)updateConnectionStateLabel {
@@ -228,6 +258,15 @@ NSString * const StateCellIdentifier = @"StateCell";
         [self updateConnectionStateLabel];
     }
 
+}
+
+#pragma mark - Helper methods
+
+- (void)clearUserDefaults:(NSUserDefaults *)userDefaults {
+    NSDictionary<NSString *, id> *dictRepr = [userDefaults dictionaryRepresentation];
+    for (NSString *key in dictRepr) {
+        [userDefaults removeObjectForKey:key];
+    }
 }
 
 @end
