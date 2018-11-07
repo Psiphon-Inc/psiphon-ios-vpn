@@ -29,16 +29,10 @@
 "CANCEL_BUTTON" = "Annuleren";
 
 /* Alert message informing user that their subscription has expired or that they're not a subscriber, therefore Psiphon can only be started from the Psiphon app. DO NOT translate 'Psiphon'. */
-"CANNOT_START_TUNNEL_DUE_TO_SUBSCRIPTION" = "Je Psiphon-abonnement is verlopen.\nOmdat u geen abonnee bent of uw abonnement is verlopen, kan Psiphon alleen worden gestart vanuit de Psiphon-app.\n\nOpen alstublieft de Psiphon-app.";
+"CANNOT_START_TUNNEL_DUE_TO_SUBSCRIPTION" = "U hebt geen actief abonnement.\nOmdat u geen abonnee bent of uw abonnement is verlopen, kan Psiphon alleen worden gestart vanuit de Psiphon-app.\n\nOpen de Psiphon-app om te starten.";
 
 /* Main text in the 'Upstream Proxy Error' dialog box. This is shown when the user has directly altered these settings, and those settings are (probably) erroneous. DO NOT translate 'Psiphon'. */
 "CHECK_UPSTREAM_PROXY_SETTING" = "U hebt Psiphon geconfigureerd om een upstream-proxy te gebruiken.\nWe lijken echter geen verbinding te kunnen maken met een Psiphon-server via die proxy.\nCorrigeer de instellingen en probeer het opnieuw.";
-
-/* Alert dialog body informing the user that the 'Auto-start VPN on demand' feature will be disabled and that the VPN cannot be stopped. */
-"CONNECT_ON_DEMAND_ALERT_BODY" = "\"Auto-start VPN\" zal tijdelijk worden uitgeschakeld tot de volgende keer dat Psiphon VPN is gestart.";
-
-/* Alert dialog title informing user that 'Auto-start VPN' feature is enabled */
-"CONNECT_ON_DEMAND_ALERT_TITLE" = "Auto-start VPN is ingeschakeld";
 
 /* Text above change region button that allows user to select their desired server region */
 "CONNECT_VIA" = "Verbinden via";
@@ -84,8 +78,7 @@
 "NO_PRODUCTS_TEXT" = "Kan geen abonnementen ophalen uit de App Store. Haal om te vernieuwen of probeer het later opnieuw.";
 
 /*[UNTRANSLATED] Alert OK Button
-   OK button on a pop-up alert. The alert will be dismissed when the user presses this button.
-   OK button title */
+   OK button on a pop-up alert. The alert will be dismissed when the user presses this button. */
 "OK_BUTTON" = "OK";
 
 /* Text of button at the bottom right or left (depending on rtl) of the last onboarding screen which allows the user to finish the onboarding sequence. Note: should be all uppercase (capitalized) when possible. */
@@ -263,17 +256,8 @@
 /* Subscriptions item title in the app settings when user does not have an active subscription. Clicking this item opens subscriptions view. If “Premium” doesn't easily translate, please choose a term that conveys “Pro” or “Extra” or “Better” or “Elite”. */
 "SETTINGS_SUBSCRIPTION_NOT_ACTIVE" = "Ga premium!";
 
-/* Automatically start VPN On demand settings toggle */
-"SETTINGS_VPN_ON_DEMAND" = "Start VPN automatisch op aanvraag";
-
-/* VPN On demand setting detail text showing when user doesn't have an active subscription and the item is disabled. */
-"SETTINGS_VPN_ON_DEMAND_DETAIL" = "Abonnement alleen";
-
 /* Text for button that opens paid subscriptions manager UI. If “Premium” doesn't easily translate, please choose a term that conveys “Pro” or “Extra” or “Better” or “Elite”. */
 "SUBSCRIPTION_BUTTON_TITLE" = "Ga premium nu!";
-
-/* Alert message informing user that their subscription has expired, and that Psiphon will stop in an hour if subscription is not renewed. Do not translate 'Psiphon'. */
-"SUBSCRIPTION_EXPIRED_WILL_KILL_TUNNEL" = "Je Psiphon-abonnement is verlopen. Psiphon stopt automatisch binnen een uur als het abonnement niet wordt verlengd. Open de Psiphon-app om uw abonnement te bekijken om gebruik te blijven maken van premiumfuncties.";
 
 /* Title of the dialog for available in-app paid subscriptions */
 "SUBSCRIPTIONS" = "Abonnementen";
@@ -292,9 +276,6 @@
 
 /* Title of button on subscriptions page which opens Psiphon's terms of use webpage */
 "SUBSCRIPTIONS_TERMS_OF_USE_BUTTON_TEXT" = "Gebruiksvoorwaarden";
-
-/* Alert message informing user that Psiphon has been stopped automatically since the subscription has expired. Do not translate 'Psiphon'. */
-"TUNNEL_KILLED" = "Psiphon is automatisch gestopt, omdat uw abonnement is verlopen.";
 
 /* Alert message informing user to turn on their cellular data or wifi to connect to the internet */
 "TURN_ON_DATE" = "Inschakelen mobiele gegevens of gebruik Wi-Fi om toegang tot gegevens.";

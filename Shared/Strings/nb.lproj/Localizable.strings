@@ -34,12 +34,6 @@
 /* Main text in the 'Upstream Proxy Error' dialog box. This is shown when the user has directly altered these settings, and those settings are (probably) erroneous. DO NOT translate 'Psiphon'. */
 "CHECK_UPSTREAM_PROXY_SETTING" = "Du har satt opp Psiphon til å bruke en oppstrømstjener.\nDog, lar det seg ikke gjøre å koble til noen Psiphon-tjener på den mellomtjeneren.\nFiks innstillingene og prøv igjen.";
 
-/* Alert dialog body informing the user that the 'Auto-start VPN on demand' feature will be disabled and that the VPN cannot be stopped. */
-"CONNECT_ON_DEMAND_ALERT_BODY" = "Kan ikke stoppe VPN når \"Automatisk VPN-start\" er skrudd på.\nØnsker du å skru av \"Automatisk VPN-start\" ved etterspørsel og stoppe VPN-funksjonen?";
-
-/* Alert dialog title informing user that 'Auto-start VPN' feature is enabled */
-"CONNECT_ON_DEMAND_ALERT_TITLE" = "Automatisk VPN-start er påskrudd";
-
 /* Text above change region button that allows user to select their desired server region */
 "CONNECT_VIA" = "Koble til via";
 
@@ -84,8 +78,7 @@
 "NO_PRODUCTS_TEXT" = "Kan ikke hente abonnementer fra programbutikk. Dra for å gjenoppfriske og prøv igjen senere.";
 
 /*[UNTRANSLATED] Alert OK Button
-   OK button on a pop-up alert. The alert will be dismissed when the user presses this button.
-   OK button title */
+   OK button on a pop-up alert. The alert will be dismissed when the user presses this button. */
 "OK_BUTTON" = "OK";
 
 /*[UNTRANSLATED] Text of button at the bottom right or left (depending on rtl) of the last onboarding screen which allows the user to finish the onboarding sequence. Note: should be all uppercase (capitalized) when possible. */
@@ -263,17 +256,8 @@
 /* Subscriptions item title in the app settings when user does not have an active subscription. Clicking this item opens subscriptions view. If “Premium” doesn't easily translate, please choose a term that conveys “Pro” or “Extra” or “Better” or “Elite”. */
 "SETTINGS_SUBSCRIPTION_NOT_ACTIVE" = "Kjøp premium.";
 
-/* Automatically start VPN On demand settings toggle */
-"SETTINGS_VPN_ON_DEMAND" = "Automatisk VPN-start ved etterspørsel";
-
-/* VPN On demand setting detail text showing when user doesn't have an active subscription and the item is disabled. */
-"SETTINGS_VPN_ON_DEMAND_DETAIL" = "Kun abonnement";
-
 /* Text for button that opens paid subscriptions manager UI. If “Premium” doesn't easily translate, please choose a term that conveys “Pro” or “Extra” or “Better” or “Elite”. */
 "SUBSCRIPTION_BUTTON_TITLE" = "Kjøp premium nå.";
-
-/* Alert message informing user that their subscription has expired, and that Psiphon will stop in an hour if subscription is not renewed. Do not translate 'Psiphon'. */
-"SUBSCRIPTION_EXPIRED_WILL_KILL_TUNNEL" = "Ditt Psiphon-abonnement har utløpt. Psiphon vil stoppe automatisk om en time hvis det ikke fornyes. Åpne Psiphon-programmet for å gjennomse ditt abonnement for å fortsette å bruke premiumfunksjoner.";
 
 /* Title of the dialog for available in-app paid subscriptions */
 "SUBSCRIPTIONS" = "Abonnementer";
@@ -292,9 +276,6 @@
 
 /* Title of button on subscriptions page which opens Psiphon's terms of use webpage */
 "SUBSCRIPTIONS_TERMS_OF_USE_BUTTON_TEXT" = "Bruksvilkår";
-
-/* Alert message informing user that Psiphon has been stopped automatically since the subscription has expired. Do not translate 'Psiphon'. */
-"TUNNEL_KILLED" = "Psiphon har blitt stoppet automatisk siden abonnementet ditt har utløpt.";
 
 /* Alert message informing user to turn on their cellular data or wifi to connect to the internet */
 "TURN_ON_DATE" = "Skru på mobildata eller bruk Wi-Fi for å få tilgang.";

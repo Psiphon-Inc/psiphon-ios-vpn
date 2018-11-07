@@ -22,6 +22,7 @@
 #import <mopub-ios-sdk/MoPub.h>
 #import <mopub-ios-sdk/MPRewardedVideo.h>
 #import "AdControllerWrapper.h"
+@import GoogleMobileAds;
 
 @class RACSignal<__covariant ValueType>;
 @class RACReplaySubject<ValueType>;
@@ -70,6 +71,11 @@ FOUNDATION_EXPORT AdControllerTag const AdControllerTagTunneledRewardedVideo;
  * This should be called during the apps difFinishLaunchingWithOptions: delegate callback.
  */
 - (void)initializeAdManager;
+
+/**
+ * Reset user consent for all networks.
+ */
+- (void)resetUserConsent;
 
 /**
  * Returns a signal that upon subscriptions presents ad (if one is already loaded).

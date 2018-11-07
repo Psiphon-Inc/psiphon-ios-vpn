@@ -29,16 +29,10 @@
 "CANCEL_BUTTON" = "Annuler";
 
 /* Alert message informing user that their subscription has expired or that they're not a subscriber, therefore Psiphon can only be started from the Psiphon app. DO NOT translate 'Psiphon'. */
-"CANNOT_START_TUNNEL_DUE_TO_SUBSCRIPTION" = "Votre abonnement Psiphon est arrivé à expiration.\nComme vous n’êtes pas abonné ou que votre abonnement est expiré, Psiphon ne peut être démarré qu’à partir de l’appli Psiphon.\n\nVeuillez ouvrir l’appli Psiphon.";
+"CANNOT_START_TUNNEL_DUE_TO_SUBSCRIPTION" = "Vous n’avez pas d’abonnement en cours.\nComme vous n’êtes pas abonné ou que votre abonnement est expiré, Psiphon ne peut être démarré qu’à partir de l’appli Psiphon.\n\nVeuillez ouvrir l’appli Psiphon pour démarrer.";
 
 /* Main text in the 'Upstream Proxy Error' dialog box. This is shown when the user has directly altered these settings, and those settings are (probably) erroneous. DO NOT translate 'Psiphon'. */
 "CHECK_UPSTREAM_PROXY_SETTING" = "Vous avez configuré Psiphon pour qu’il utilise un serveur mandataire ascendant.\nCependant, il semble que nous ne soyons pas en mesure de nous connecter à un serveur Psiphon par ce mandataire.\nVeuillez corriger les paramètres et ressayer.";
-
-/* Alert dialog body informing the user that the 'Auto-start VPN on demand' feature will be disabled and that the VPN cannot be stopped. */
-"CONNECT_ON_DEMAND_ALERT_BODY" = "« Démarrage automatique du RPV » sera désactivé temporairement jusqu’à ce que le prochain RPV Psiphon soit démarré.";
-
-/* Alert dialog title informing user that 'Auto-start VPN' feature is enabled */
-"CONNECT_ON_DEMAND_ALERT_TITLE" = "Le démarrage automatique du RPV est activé";
 
 /* Text above change region button that allows user to select their desired server region */
 "CONNECT_VIA" = "Se connecté avec";
@@ -84,8 +78,7 @@
 "NO_PRODUCTS_TEXT" = "Impossible de récupérer les abonnements de la logithèque App Store. Tirez vers le bas pour actualiser ou ressayez ultérieurement.";
 
 /*[UNTRANSLATED] Alert OK Button
-   OK button on a pop-up alert. The alert will be dismissed when the user presses this button.
-   OK button title */
+   OK button on a pop-up alert. The alert will be dismissed when the user presses this button. */
 "OK_BUTTON" = "OK";
 
 /* Text of button at the bottom right or left (depending on rtl) of the last onboarding screen which allows the user to finish the onboarding sequence. Note: should be all uppercase (capitalized) when possible. */
@@ -263,17 +256,8 @@
 /* Subscriptions item title in the app settings when user does not have an active subscription. Clicking this item opens subscriptions view. If “Premium” doesn't easily translate, please choose a term that conveys “Pro” or “Extra” or “Better” or “Elite”. */
 "SETTINGS_SUBSCRIPTION_NOT_ACTIVE" = "Passez Pro !";
 
-/* Automatically start VPN On demand settings toggle */
-"SETTINGS_VPN_ON_DEMAND" = "Démarrage automatique du RPV à la demande";
-
-/* VPN On demand setting detail text showing when user doesn't have an active subscription and the item is disabled. */
-"SETTINGS_VPN_ON_DEMAND_DETAIL" = "Abonnement seulement";
-
 /* Text for button that opens paid subscriptions manager UI. If “Premium” doesn't easily translate, please choose a term that conveys “Pro” or “Extra” or “Better” or “Elite”. */
 "SUBSCRIPTION_BUTTON_TITLE" = "Passez Pro maintenant !";
-
-/* Alert message informing user that their subscription has expired, and that Psiphon will stop in an hour if subscription is not renewed. Do not translate 'Psiphon'. */
-"SUBSCRIPTION_EXPIRED_WILL_KILL_TUNNEL" = "Votre abonnement Psiphon est arrivé à expiration. Psiphon s’arrêtera automatiquement dans une heure si l’abonnement n’est pas renouvelé. Ouvrez l’appli Psiphon pour réviser votre abonnement afin de continuer à utiliser les fonctions Pro.";
 
 /* Title of the dialog for available in-app paid subscriptions */
 "SUBSCRIPTIONS" = "Abonnements";
@@ -292,9 +276,6 @@
 
 /* Title of button on subscriptions page which opens Psiphon's terms of use webpage */
 "SUBSCRIPTIONS_TERMS_OF_USE_BUTTON_TEXT" = "Conditions générales d’utilisation ";
-
-/* Alert message informing user that Psiphon has been stopped automatically since the subscription has expired. Do not translate 'Psiphon'. */
-"TUNNEL_KILLED" = "Psiphon a été arrêté automatiquement, car votre abonnement est expiré.";
 
 /* Alert message informing user to turn on their cellular data or wifi to connect to the internet */
 "TURN_ON_DATE" = "Activez les données cellulaires ou utilisez le Wi-Fi pour accéder aux données.";

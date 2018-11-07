@@ -252,6 +252,9 @@
 /* Title of cell in settings menu which, when pressed, reinstalls the user's VPN profile for Psiphon */
 "SETTINGS_REINSTALL_VPN_CONFIGURATION_CELL_TITLE" = "Reinstall VPN profile";
 
+/* (Do not translate 'AdMob') Title of cell in settings menu which indicates the user can change or revoke the consent they've given to admob */
+"SETTINGS_RESET_ADMOB_CONSENT" = "Reset AdMob Consent";
+
 /* Subscriptions item title in the app settings when user has an active subscription. Clicking this item opens subscriptions view */
 "SETTINGS_SUBSCRIPTION_ACTIVE" = "Subscriptions";
 
