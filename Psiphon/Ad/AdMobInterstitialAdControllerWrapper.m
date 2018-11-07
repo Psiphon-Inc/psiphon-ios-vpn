@@ -26,9 +26,8 @@
 #import "RACUnit.h"
 #import "Logging.h"
 #import "Asserts.h"
-@import GoogleMobileAds;
-#import <Google-Mobile-Ads-SDK/GoogleMobileAds/GADInterstitial.h>
-
+#import "AdMobConsent.h"
+#import "GADInterstitialDelegate.h"
 
 PsiFeedbackLogType const AdMobInterstitialAdControllerWrapperLogType = @"AdMobInterstitialAdControllerWrapper";
 
@@ -91,7 +90,8 @@ PsiFeedbackLogType const AdMobInterstitialAdControllerWrapperLogType = @"AdMobIn
             weakSelf.interstitial = [[GADInterstitial alloc] initWithAdUnitID:self.adUnitID];
             weakSelf.interstitial.delegate = weakSelf;
 
-            GADRequest *request = [GADRequest request];
+            GADRequest *request = [AdMobConsent createGADRequestWithUserConsentStatus];
+
 #if DEBUG
             request.testDevices = @[ @"4a907b319b37ceee4d9970dbb0231ef0" ];
 #endif
