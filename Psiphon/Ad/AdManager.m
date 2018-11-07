@@ -41,13 +41,12 @@
 #import "RACSubscriptingAssignmentTrampoline.h"
 #import "RACSignal+Operations2.h"
 #import "Asserts.h"
-#import "AdMobConsent.h"
 #import "NSError+Convenience.h"
 #import "MoPubConsent.h"
 #import "AdMobInterstitialAdControllerWrapper.h"
 #import "AdMobRewardedAdControllerWrapper.h"
 #import <PersonalizedAdConsent/PersonalizedAdConsent.h>
-@import GoogleMobileAds;
+#import "AdMobConsent.h"
 
 
 NSErrorDomain const AdControllerWrapperErrorDomain = @"AdControllerWrapperErrorDomain";
@@ -57,6 +56,7 @@ PsiFeedbackLogType const AdManagerLogType = @"AdManager";
 #pragma mark - Ad IDs
 
 NSString * const GoogleAdMobAppID = @"ca-app-pub-1072041961750291~2085686375";
+NSString * const AdMobPublisherID = @"pub-1072041961750291";
 
 NSString * const UntunneledAdMobInterstitialAdUnitID = @"ca-app-pub-1072041961750291/8751062454";
 NSString * const UntunneledAdMobRewardedVideoAdUnitID = @"ca-app-pub-1072041961750291/8356247142";
@@ -276,8 +276,8 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
     // consent is collected. Otherwise terminates with an error.
     RACSignal<RACUnit *> *adSDKInitConsent = [RACSignal createSignal:^RACDisposable *(id <RACSubscriber> subscriber) {
         dispatch_async_main(^{
-          [AdMobConsent collectConsentForPublisherID:@"pub-1072041961750291"
-            withCompletionHandler:^(NSError *error, PACConsentStatus consentStatus) {
+          [AdMobConsent collectConsentForPublisherID:AdMobPublisherID
+                           withCompletionHandler:^(NSError *error, PACConsentStatus consentStatus) {
 
                 if (error) {
                     // Stop ad initialization and don't load any ads.
@@ -293,7 +293,7 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
                 MPGoogleGlobalMediationSettings *googleMediationSettings =
                   [[MPGoogleGlobalMediationSettings alloc] init];
 
-                googleMediationSettings.npa = (consentStatus == PACConsentStatusNonPersonalized) ? @"1" : @"0";
+                googleMediationSettings.npa = [AdMobConsent NPAStringforConsentStatus:consentStatus];
 
                 // MPMoPubConfiguration should be instantiated with any valid ad unit ID from the app.
                 MPMoPubConfiguration *sdkConfig = [[MPMoPubConfiguration alloc]
@@ -566,6 +566,10 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
     // the underlying signal turns into a hot signal.
     [self.compoundDisposable addDisposable:[self.appEvents connect]];
 
+}
+
+- (void)resetUserConsent {
+    [AdMobConsent resetConsent];
 }
 
 - (RACSignal<NSNumber *> *)presentInterstitialOnViewController:(UIViewController *)viewController {
