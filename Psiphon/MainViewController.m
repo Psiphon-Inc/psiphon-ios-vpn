@@ -375,28 +375,32 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 
     __weak MainViewController *weakSelf = self;
 
-    // Emits unit value if/when the privacy policy is accepted.
-    RACSignal *privacyPolicyAccepted =
-      [[RACSignal return:@([NSUserDefaults.standardUserDefaults boolForKey:PrivacyPolicyAcceptedBoolKey])]
-      flattenMap:^RACSignal<RACUnit *> *(NSNumber *ppAccepted) {
+    // privacyPolicyDismissed is a cold terminating signal that emits @TRUE if the PP was accepted,
+    // otherwise emits @FALSE.
+    RACSignal<NSNumber *> *privacyPolicyDismissed = [[RACSignal return:
+                   @([NSUserDefaults.standardUserDefaults boolForKey:PrivacyPolicyAcceptedBoolKey])]
+      flattenMap:^RACSignal<RACUnit *> *(NSNumber *alreadyAccepted) {
 
-        if ([ppAccepted boolValue]) {
-            return [RACSignal return:RACUnit.defaultUnit];
+        if ([alreadyAccepted boolValue]) {
+            return [RACSignal return:alreadyAccepted];
         } else {
 
             PrivacyPolicyViewController *c = [[PrivacyPolicyViewController alloc] init];
             [self presentViewController:c animated:TRUE completion:nil];
 
-            return [[[[NSNotificationCenter defaultCenter]
-              rac_addObserverForName:PrivacyPolicyAcceptedNotification
+            return [[[[[NSNotificationCenter defaultCenter]
+              rac_addObserverForName:PrivacyPolicyDismissedNotification
                               object:nil]
               take:1]
-              map:^id(NSNotification *value) {
-                  [NSUserDefaults.standardUserDefaults setBool:TRUE forKey:PrivacyPolicyAcceptedBoolKey];
-                  return RACUnit.defaultUnit;
+              map:^NSNumber *(NSNotification *notification) {
+                  return notification.userInfo[PrivacyPolicyAcceptedNotificationBoolKey];
+              }]
+              doNext:^(NSNumber *accepted) {
+                  // Update user defaults value.
+                  [NSUserDefaults.standardUserDefaults setBool:[accepted boolValue]
+                                                        forKey:PrivacyPolicyAcceptedBoolKey];
               }];
         }
-
     }];
 
 
@@ -405,9 +409,15 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     NSString * const CommandStopVPN = @"StopVPN";
 
     // signal emits a single two tuple (isVPNActive, connectOnDemandEnabled).
-    __block RACDisposable *disposable = [[[[privacyPolicyAccepted
-      flattenMap:^RACSignal<RACTwoTuple <NSNumber *, NSNumber *> *> *(RACUnit *x) {
-          return [weakSelf.vpnManager isVPNActive];
+    __block RACDisposable *disposable = [[[[privacyPolicyDismissed
+      flattenMap:^RACSignal<RACTwoTuple <NSNumber *, NSNumber *> *> *(NSNumber *accepted) {
+          // If the user has accepted the privacy policy continue with starting the VPN,
+          // otherwise terminate the subscription.
+          if ([accepted boolValue]) {
+              return [weakSelf.vpnManager isVPNActive];
+          } else {
+              return [RACSignal empty];
+          }
       }]
       flattenMap:^RACSignal<NSString *> *(RACTwoTuple<NSNumber *, NSNumber *> *value) {
           BOOL vpnActive = [value.first boolValue];
