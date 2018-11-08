@@ -64,6 +64,7 @@
 #import "VPNManager.h"
 #import "VPNStartAndStopButton.h"
 #import "UIView+AutoLayoutViewGroup.h"
+#import "OnboardingViewController.h"
 
 PsiFeedbackLogType const RewardedVideoLogType = @"RewardedVideo";
 
@@ -281,6 +282,8 @@ UserDefaultsKey const PsiCashHasBeenOnboardedBoolKey = @"PsiCash.HasBeenOnboarde
       }];
 
     [self.compoundDisposable addDisposable:disposable];
+
+
 }
 
 - (void)viewDidAppear:(BOOL)animated {
