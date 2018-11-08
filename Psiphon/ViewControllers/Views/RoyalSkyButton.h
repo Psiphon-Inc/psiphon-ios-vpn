@@ -17,24 +17,12 @@
  *
  */
 
-#import <UIKit/UIKit.h>
-#import "PsiCashBalanceView.h"
-#import "PsiCashClientModel.h"
-#import "PsiCashSpeedBoostMeterView.h"
-#import "RoyalSkyButton.h"
+#import <Foundation/Foundation.h>
+#import "UIView+AutoLayoutViewGroup.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface PsiCashView : UIView <PsiCashClientModelReceiver>
-
-@property (nonatomic, readonly) PsiCashBalanceView *balance;
-@property (nonatomic, readonly) PsiCashSpeedBoostMeterView *meter;
-@property (nonatomic, readonly) RoyalSkyButton *rewardedVideoButton;
-
-+ (void)animateBalanceChangeOf:(NSNumber*)delta
-               withPsiCashView:(PsiCashView*)psiCashView
-                  inParentView:(UIView*)parentView;
-
+@interface RoyalSkyButton : UIButton
 @end
 
 NS_ASSUME_NONNULL_END

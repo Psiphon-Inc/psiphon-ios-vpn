@@ -52,7 +52,6 @@
 #import "RegionSelectionButton.h"
 #import "NSNotificationCenter+RACSupport.h"
 #import "PrivacyPolicyViewController.h"
-#import "PsiCashRewardedVideoButton.h"
 #import "PsiCashBalanceView.h"
 #import "PsiCashClient.h"
 #import "PsiCashSpeedBoostMeterView.h"
@@ -1111,27 +1110,26 @@ UserDefaultsKey const PsiCashHasBeenOnboardedBoolKey = @"PsiCash.HasBeenOnboarde
     }];
 
     [self.compoundDisposable addDisposable:[[[AdManager sharedInstance].rewardedVideoCanPresent
-                                             combineLatestWith:PsiCashClient.sharedInstance.clientModelSignal]
-                                            subscribeNext:^(RACTwoTuple<NSNumber *, PsiCashClientModel *> *x) {
-                                                BOOL ready = [[x first] boolValue];
-                                                PsiCashClientModel *model = [x second];
+      combineLatestWith:PsiCashClient.sharedInstance.clientModelSignal]
+      subscribeNext:^(RACTwoTuple<NSNumber *, PsiCashClientModel *> *tuple) {
+          BOOL ready = [tuple.first boolValue];
+          PsiCashClientModel *model = tuple.second;
 
-                                                psiCashView.rewardedVideoButton.userInteractionEnabled = ready && [model.authPackage hasEarnerToken];
-                                                [psiCashView.rewardedVideoButton videoReady:ready && [model.authPackage hasEarnerToken]];
+          BOOL shouldEnable = ready && [model.authPackage hasEarnerToken];
+          psiCashView.rewardedVideoButton.userInteractionEnabled = shouldEnable;
+          psiCashView.rewardedVideoButton.enabled = shouldEnable;
 
 #if DEBUG
-                                                if ([AppInfo runningUITest]) {
-                                                    // Fake the rewarded video bar enabled status for automated screenshots.
-                                                    [psiCashView.rewardedVideoButton videoReady:TRUE];
-                                                }
+          if ([AppInfo runningUITest]) {
+              // Fake the rewarded video bar enabled status for automated screenshots.
+              psiCashView.rewardedVideoButton.enabled = TRUE;
+          }
 #endif
-                                            }]];
+    }]];
 
-        UITapGestureRecognizer *rewardedVideoButtonTap = [[UITapGestureRecognizer alloc]
-                                                       initWithTarget:self action:@selector(showRewardedVideo)];
-
-        rewardedVideoButtonTap.numberOfTapsRequired = 1;
-        [psiCashView.rewardedVideoButton addGestureRecognizer:rewardedVideoButtonTap];
+    [psiCashView.rewardedVideoButton addTarget:self
+                                        action:@selector(showRewardedVideo)
+                              forControlEvents:UIControlEventTouchUpInside];
 
 #if DEBUG
     if ([AppInfo runningUITest]) {
