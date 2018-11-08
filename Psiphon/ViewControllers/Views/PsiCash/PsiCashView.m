@@ -23,6 +23,7 @@
 #import "UIColor+Additions.h"
 #import "UIFont+Additions.h"
 #import "UIView+AutoLayoutViewGroup.h"
+#import "RoyalSkyButton.h"
 
 @interface PsiCashView ()
 @property (atomic, readwrite) PsiCashClientModel *model;
@@ -35,6 +36,21 @@
     UIImageView *coin;
     UIView *topBorderBlocker;
     UIView *bottomBorderBlocker;
+}
+
++ (NSString *)videoReadyTitleText {
+    return NSLocalizedStringWithDefaultValue(@"REWARDED_VIDEO_EARN_PSICASH", nil,
+      [NSBundle mainBundle],
+      @"Watch a video to earn PsiCash!",
+      @"Button label indicating to the user that they will earn PsiCash if they watch a video "
+      "advertisement. The word 'PsiCash' should not be translated or transliterated.");
+}
+
++ (NSString *)videoUnavailableTitleText {
+    return NSLocalizedStringWithDefaultValue(@"REWARDED_VIDEO_NO_VIDEOS_AVAILABLE", nil,
+      [NSBundle mainBundle],
+      @"No Videos Available",
+      @"Button label indicating to the user that there are no videos available for them to watch.");
 }
 
 - (void)setupViews {
@@ -50,7 +66,12 @@
     activityIndicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
 
     // Setup rewarded video button
-    _rewardedVideoButton = [[PsiCashRewardedVideoButton alloc] initWithAutoLayout];
+    _rewardedVideoButton = [[RoyalSkyButton alloc] initWithAutoLayout];
+    [_rewardedVideoButton setTitle:[PsiCashView videoReadyTitleText]
+                          forState:UIControlStateNormal];
+    [_rewardedVideoButton setTitle:[PsiCashView videoUnavailableTitleText]
+                          forState:UIControlStateDisabled];
+    _rewardedVideoButton.enabled = FALSE;
 
     topBorderBlocker = [[UIView alloc] init];
     topBorderBlocker.backgroundColor = [UIColor whiteColor];

@@ -17,11 +17,22 @@
  *
  */
 
-#import <UIKit/UIKit.h>
-#import "PsiCashClientModel.h"
+#import "LayerAutoResizeUIView.h"
 
-@interface PsiCashRewardedVideoButton : UIButton
 
-- (void)videoReady:(BOOL)ready;
+@implementation LayerAutoResizeUIView
+
+
+- (void)addSublayerToMainLayer:(CALayer *)sublayer {
+    [self.layer addSublayer:sublayer];
+}
+
+- (void)layoutSublayersOfLayer:(CALayer *)layer {
+    [super layoutSublayersOfLayer:layer];
+
+    [layer.sublayers enumerateObjectsUsingBlock:^(CALayer *obj, NSUInteger idx, BOOL *stop) {
+        obj.frame = self.bounds;
+    }];
+}
 
 @end

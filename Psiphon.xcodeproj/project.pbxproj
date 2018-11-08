@@ -106,13 +106,14 @@
 		9BFECFEB3BC9F10542C1A416 /* PsiphonConfigUserDefaults.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC584519C408D9D6D3FF1 /* PsiphonConfigUserDefaults.m */; };
 		A8408008B18277F93286799F /* PsiphonProgressView.m in Sources */ = {isa = PBXBuildFile; fileRef = A84087FA4B1BC2C725D900D9 /* PsiphonProgressView.m */; };
 		A84080838645BD1023136C3B /* PsiCashPurchaseView.m in Sources */ = {isa = PBXBuildFile; fileRef = A8408183BCB31ED8F0855E90 /* PsiCashPurchaseView.m */; };
-		A840809124FA6C93D6355D28 /* PsiCashRewardedVideoButton.m in Sources */ = {isa = PBXBuildFile; fileRef = A8408BA69C644FEC9442C297 /* PsiCashRewardedVideoButton.m */; };
 		A84080E163F24876A1476544 /* VPNStartAndStopButton.m in Sources */ = {isa = PBXBuildFile; fileRef = A8408F6123BCC98725932A59 /* VPNStartAndStopButton.m */; };
+		A8408161701C8F50F52866FC /* LayerAutoResizeUIView.m in Sources */ = {isa = PBXBuildFile; fileRef = A8408DBEEDCF56EC798536BF /* LayerAutoResizeUIView.m */; };
 		A84082122C339F45E630F610 /* PsiCashView.m in Sources */ = {isa = PBXBuildFile; fileRef = A8408DA63B0B641B765A1E4D /* PsiCashView.m */; };
 		A84082260CE7662A93697CFF /* LoadingCircleLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = A840845849B24AAA0E714664 /* LoadingCircleLayer.m */; };
 		A8408424387C3E0CE5694B5A /* PsiCashSpeedBoostMeterView.m in Sources */ = {isa = PBXBuildFile; fileRef = A84083F358BD2CC1440107B8 /* PsiCashSpeedBoostMeterView.m */; };
 		A84087459E9F796B1954D049 /* SubscriptionsBar.m in Sources */ = {isa = PBXBuildFile; fileRef = A84081C4600325A12F9C3413 /* SubscriptionsBar.m */; };
 		A840875B190F7666A1BD98E5 /* UIView+AutoLayoutViewGroup.m in Sources */ = {isa = PBXBuildFile; fileRef = A840867F8062E477F0B355DD /* UIView+AutoLayoutViewGroup.m */; };
+		A84088BD3CFC8C511F22182C /* RoyalSkyButton.m in Sources */ = {isa = PBXBuildFile; fileRef = A8408F08BFF80A05CF46C00A /* RoyalSkyButton.m */; };
 		A84088DD7FBB838689BC1FCC /* OnboardingViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A8408D96EC06ED36F86C690D /* OnboardingViewController.m */; };
 		A8408AACE30F860F2C961A04 /* ManageSubscriptionsButton.m in Sources */ = {isa = PBXBuildFile; fileRef = A8408FA077C517546DF6033C /* ManageSubscriptionsButton.m */; };
 		A8408B83167EBE21E215C471 /* OnboardingView.m in Sources */ = {isa = PBXBuildFile; fileRef = A84088889983161FB859D8A9 /* OnboardingView.m */; };
@@ -429,6 +430,7 @@
 		9BFECF74881B6C4227813A63 /* AdMobConsent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AdMobConsent.h; sourceTree = "<group>"; };
 		A840802C7AEFA7F375205DCB /* VPNStartAndStopButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VPNStartAndStopButton.h; sourceTree = "<group>"; };
 		A84080C0D2CACFAE42D3810E /* PsiCashPurchaseView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PsiCashPurchaseView.h; sourceTree = "<group>"; };
+		A84080E2A20C786DDAD17D48 /* RoyalSkyButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RoyalSkyButton.h; sourceTree = "<group>"; };
 		A84080F32E861482A476250F /* PsiCashView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PsiCashView.h; sourceTree = "<group>"; };
 		A840812E38D27BF4328678E0 /* OnboardingViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OnboardingViewController.h; sourceTree = "<group>"; };
 		A840816C0C9B0658776A8B91 /* RegionSelectionButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RegionSelectionButton.h; sourceTree = "<group>"; };
@@ -441,6 +443,7 @@
 		A840854913F6165FB0B97A6A /* PsiCashSpeedBoostSliderView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PsiCashSpeedBoostSliderView.m; sourceTree = "<group>"; };
 		A840856AD6865619ACF78509 /* PsiphonProgressView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PsiphonProgressView.h; sourceTree = "<group>"; };
 		A840867F8062E477F0B355DD /* UIView+AutoLayoutViewGroup.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIView+AutoLayoutViewGroup.m"; sourceTree = "<group>"; };
+		A84086A6BF880CC20E5C57B4 /* LayerAutoResizeUIView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LayerAutoResizeUIView.h; sourceTree = "<group>"; };
 		A84086D173C51DB8C7B7E62C /* PsiCashSpeedBoostSliderView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PsiCashSpeedBoostSliderView.h; sourceTree = "<group>"; };
 		A84087B4F756C5DA76723EFC /* LoadingCircleLayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LoadingCircleLayer.h; sourceTree = "<group>"; };
 		A84087C37CFC6977102EB09D /* AppVersionNumberView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppVersionNumberView.m; sourceTree = "<group>"; };
@@ -457,14 +460,14 @@
 		A8408B98D73EB239C92FB450 /* ManageSubscriptionsButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ManageSubscriptionsButton.h; sourceTree = "<group>"; };
 		A8408B9A66413A25FC1A2BE1 /* SwoopView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SwoopView.m; sourceTree = "<group>"; };
 		A8408BA05DC0D983E6740558 /* SubscriptionStatusView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SubscriptionStatusView.m; sourceTree = "<group>"; };
-		A8408BA69C644FEC9442C297 /* PsiCashRewardedVideoButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PsiCashRewardedVideoButton.m; sourceTree = "<group>"; };
 		A8408C84138113DE79F0DCD0 /* RegionSelectionButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RegionSelectionButton.m; sourceTree = "<group>"; };
-		A8408C86D9C0203A66A0F13E /* PsiCashRewardedVideoButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PsiCashRewardedVideoButton.h; sourceTree = "<group>"; };
 		A8408D462EEE90AA7F2A8AFA /* SwoopView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SwoopView.h; sourceTree = "<group>"; };
 		A8408D96EC06ED36F86C690D /* OnboardingViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OnboardingViewController.m; sourceTree = "<group>"; };
 		A8408DA63B0B641B765A1E4D /* PsiCashView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PsiCashView.m; sourceTree = "<group>"; };
+		A8408DBEEDCF56EC798536BF /* LayerAutoResizeUIView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LayerAutoResizeUIView.m; sourceTree = "<group>"; };
 		A8408E0115540B5B2B305EAE /* ConnectionStatusView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ConnectionStatusView.m; sourceTree = "<group>"; };
 		A8408EF0378D6C5C22CC3FE2 /* OnboardingView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OnboardingView.h; sourceTree = "<group>"; };
+		A8408F08BFF80A05CF46C00A /* RoyalSkyButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RoyalSkyButton.m; sourceTree = "<group>"; };
 		A8408F6123BCC98725932A59 /* VPNStartAndStopButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VPNStartAndStopButton.m; sourceTree = "<group>"; };
 		A8408FA077C517546DF6033C /* ManageSubscriptionsButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ManageSubscriptionsButton.m; sourceTree = "<group>"; };
 		CB8BB19F016330264C4DCB80 /* libPods-Psiphon.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Psiphon.a"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -863,10 +866,8 @@
 				A840893B138A37A795FFFAB2 /* PsiCashBalanceView.m */,
 				A84080F32E861482A476250F /* PsiCashView.h */,
 				A84083B0CB962827E7C93024 /* PsiCashPurchaseAlertView.m */,
-				A8408BA69C644FEC9442C297 /* PsiCashRewardedVideoButton.m */,
 				A8408183BCB31ED8F0855E90 /* PsiCashPurchaseView.m */,
 				A84082D71B55E73D2883F645 /* PsiCashPurchaseAlertView.h */,
-				A8408C86D9C0203A66A0F13E /* PsiCashRewardedVideoButton.h */,
 				A8408A1B786B9F6679539FCD /* PsiCashSpeedBoostMeterView.h */,
 				A8408DA63B0B641B765A1E4D /* PsiCashView.m */,
 				A84086D173C51DB8C7B7E62C /* PsiCashSpeedBoostSliderView.h */,
@@ -901,7 +902,11 @@
 				A84087C82AF3A54E6695EE60 /* UIView+AutoLayoutViewGroup.h */,
 				A84088889983161FB859D8A9 /* OnboardingView.m */,
 				A8408EF0378D6C5C22CC3FE2 /* OnboardingView.h */,
+				A8408F08BFF80A05CF46C00A /* RoyalSkyButton.m */,
+				A84080E2A20C786DDAD17D48 /* RoyalSkyButton.h */,
 				A84089FDEDA01677951D34C4 /* PsiCash */,
+				A8408DBEEDCF56EC798536BF /* LayerAutoResizeUIView.m */,
+				A84086A6BF880CC20E5C57B4 /* LayerAutoResizeUIView.h */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -1572,13 +1577,14 @@
 				A840875B190F7666A1BD98E5 /* UIView+AutoLayoutViewGroup.m in Sources */,
 				A84088DD7FBB838689BC1FCC /* OnboardingViewController.m in Sources */,
 				A8408B83167EBE21E215C471 /* OnboardingView.m in Sources */,
+				A84088BD3CFC8C511F22182C /* RoyalSkyButton.m in Sources */,
 				A8408C5A98017E7074D00CEC /* PsiCashSpeedBoostSliderView.m in Sources */,
 				A8408424387C3E0CE5694B5A /* PsiCashSpeedBoostMeterView.m in Sources */,
 				A8408EF4582A3DB3FC378ACB /* PsiCashBalanceView.m in Sources */,
 				A8408F965BE2726531F4A215 /* PsiCashPurchaseAlertView.m in Sources */,
-				A840809124FA6C93D6355D28 /* PsiCashRewardedVideoButton.m in Sources */,
 				A84080838645BD1023136C3B /* PsiCashPurchaseView.m in Sources */,
 				A84082122C339F45E630F610 /* PsiCashView.m in Sources */,
+				A8408161701C8F50F52866FC /* LayerAutoResizeUIView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
