@@ -29,11 +29,15 @@
 - (instancetype)initWithAutoLayoutFrame:(CGRect)frame {
     self = [self initWithFrame:frame];
     if (self) {
-        [self setupViews];
-        [self addSubviews];
-        [self setupSubviewsLayoutConstraints];
+        [self customSetup];
     }
     return self;
+}
+
+- (void)customSetup {
+    [self setupViews];
+    [self addSubviews];
+    [self setupSubviewsLayoutConstraints];
 }
 
 - (void)setupViews {

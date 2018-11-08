@@ -22,33 +22,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface UIView (AutoLayoutViewGroup)
-
-- (instancetype)initWithAutoLayout;
-
-- (instancetype)initWithAutoLayoutFrame:(CGRect)frame;
-
-- (void)customSetup;
-
-/**
- * Use direct access for subclass properties, since this UIView is partially constructred.
- */
-- (void)setupViews;
-
-/**
- * Use direct access for subclass properties, since this UIView is partially constructred.
- */
-- (void)addSubviews;
-
-/**
- * Use direct access for subclass properties, since this UIView is partially constructred.
- */
-- (void)setupSubviewsLayoutConstraints;
-
-#pragma mark - Utility functions
-
-- (BOOL)isRTL;
-
+@interface OnboardingViewController : UIViewController
 @end
 
 NS_ASSUME_NONNULL_END
