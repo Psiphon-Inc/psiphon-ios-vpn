@@ -101,6 +101,13 @@ UserDefaultsKey const VPNManagerConnectOnDemandUntilNextStartBoolKey = @"VPNMana
         _internalStartStatus = [RACReplaySubject replaySubjectWithCapacity:1];
         _internalTunnelStatus = [RACReplaySubject replaySubjectWithCapacity:1];
 
+
+#if DEBUG && TARGET_IPHONE_SIMULATOR
+        // Since the extension doesn't run in the simulator, we will populate `internalTunnelStatus`
+        // with a fake value.
+        [_internalTunnelStatus sendNext:@(NEVPNStatusDisconnected)];
+#endif
+
         _restartRequired = FALSE;
 
         _restartRequired = FALSE;
