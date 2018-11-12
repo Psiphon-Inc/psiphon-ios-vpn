@@ -18,13 +18,15 @@
  */
 
 #import <Foundation/Foundation.h>
-#import "UIView+AutoLayoutViewGroup.h"
-#import "SkyButton.h"
 
-NS_ASSUME_NONNULL_BEGIN
+@protocol AutoLayoutProtocol <NSObject>
 
-@interface RoyalSkyButton : SkyButton
+- (instancetype)initForAutoLayout;
+
+- (void)autoLayoutSetupViews;
+
+- (void)autoLayoutAddSubviews;
+
+- (void)autoLayoutSetupSubviewsLayoutConstraints;
 
 @end
-
-NS_ASSUME_NONNULL_END

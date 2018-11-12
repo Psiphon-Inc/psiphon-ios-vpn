@@ -17,13 +17,22 @@
  *
  */
 
-#import <Foundation/Foundation.h>
-#import "UIView+AutoLayoutViewGroup.h"
-#import "SkyButton.h"
+#import <UIKit/UIKit.h>
+#import "AutoLayoutProtocol.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface RoyalSkyButton : SkyButton
+@interface SkyButton : UIControl <AutoLayoutProtocol>
+
+@property (nonatomic, readonly) UILabel *titleLabel;
+
+@property (nonatomic, readonly) NSString *currentTitle;
+
+- (void)setTitle:(NSString *)title;
+
+- (void)setTitle:(NSString *)title forState:(UIControlState)controlState;
+
+
 
 @end
 
