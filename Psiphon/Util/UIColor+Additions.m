@@ -97,4 +97,8 @@
     return [UIColor colorWithRed:236.0f / 255.0f green:241.0f / 255.0f blue:247.0f / 255.0f alpha:1.0f];
 }
 
++ (UIColor * _Nonnull)periwinkleColor {
+    return [UIColor colorWithRed:115.0f / 255.0f green:146.0f / 255.0f blue:1.0f alpha:1.0f];
+}
+
 @end
