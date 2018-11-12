@@ -22,7 +22,14 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface RoyalSkyButton : UIButton
+@interface RoyalSkyButton : UIControl
+
+@property (nonatomic, readonly) NSString *currentTitle;
+
+- (void)setTitle:(NSString *)title;
+
+- (void)setTitle:(NSString *)title forState:(UIControlState)controlState;
+
 @end
 
 NS_ASSUME_NONNULL_END

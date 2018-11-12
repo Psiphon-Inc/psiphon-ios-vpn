@@ -26,11 +26,36 @@
 @implementation RoyalSkyButton {
     CAGradientLayer* statusGradientLayer;
     LayerAutoResizeUIView *statusGradientView;
+    UILabel *titleLabel;
+
+    NSString *normalTitle;
+    NSString *disabledTitle;
+}
+
+- (void)setTitle:(NSString *)title {
+    normalTitle = title;
+    disabledTitle = title;
+}
+
+- (void)setTitle:(NSString *)title forState:(UIControlState)controlState {
+    if (controlState == UIControlStateNormal) {
+        normalTitle = title;
+    } else if (controlState == UIControlStateDisabled) {
+        disabledTitle = title;
+    }
+}
+
+- (NSString *)currentTitle {
+    if (self.enabled) {
+        return normalTitle;
+    } else {
+        return disabledTitle;
+    }
 }
 
 - (void)setEnabled:(BOOL)enabled {
     [super setEnabled:enabled];
-    self.titleLabel.attributedText = [RoyalSkyButton styleLabelText:self.currentTitle];
+    titleLabel.attributedText = [RoyalSkyButton styleLabelText:self.currentTitle];
 
     if (enabled) {
         statusGradientLayer.colors = @[(id)UIColor.lightRoyalBlueTwo.CGColor,
@@ -60,23 +85,25 @@
     self.backgroundColor = [UIColor clearColor];
     self.layer.borderWidth = 2.f;
     self.layer.borderColor = [UIColor colorWithRed:0.94 green:0.96 blue:0.99 alpha:1.0].CGColor;
-    self.contentEdgeInsets = UIEdgeInsetsMake(10.0f, 30.0f, 10.0f, 30.0f);
 
     statusGradientView = [[LayerAutoResizeUIView alloc] init];
     statusGradientView.layer.cornerRadius = 4.f;
 
     CGFloat cornerRadius = 8.f;
 
-    self.titleLabel.backgroundColor = [UIColor clearColor];
-    self.titleLabel.adjustsFontSizeToFitWidth = YES;
-    self.titleLabel.font = [UIFont avenirNextDemiBold:16.f];
-    self.titleLabel.textAlignment = NSTextAlignmentCenter;
-    self.titleLabel.textColor = [UIColor whiteColor];
-    self.titleLabel.userInteractionEnabled = NO;
-    self.titleLabel.layer.cornerRadius = cornerRadius;
-    self.titleLabel.clipsToBounds = YES;
-    self.titleLabel.backgroundColor = [UIColor clearColor];
-    self.titleLabel.minimumScaleFactor = 0.8;
+    titleLabel = [[UILabel alloc] init];
+    titleLabel.backgroundColor = [UIColor clearColor];
+
+    titleLabel.adjustsFontSizeToFitWidth = YES;
+    titleLabel.minimumScaleFactor = 0.8;
+    titleLabel.font = [UIFont avenirNextDemiBold:16.f];
+
+    titleLabel.textAlignment = NSTextAlignmentCenter;
+    titleLabel.textColor = [UIColor whiteColor];
+    titleLabel.userInteractionEnabled = NO;
+    titleLabel.layer.cornerRadius = cornerRadius;
+    titleLabel.clipsToBounds = YES;
+    titleLabel.backgroundColor = [UIColor clearColor];
 
     statusGradientLayer = [CAGradientLayer layer];
     statusGradientLayer.colors = @[(id)UIColor.lightRoyalBlueTwo.CGColor,
@@ -86,7 +113,8 @@
 }
 
 - (void)addSubviews {
-    [self insertSubview:statusGradientView belowSubview:self.titleLabel];
+    [self addSubview:statusGradientView];
+    [self addSubview:titleLabel];
 }
 
 - (void)setupSubviewsLayoutConstraints {
@@ -101,16 +129,15 @@
     [statusGradientView.heightAnchor constraintEqualToAnchor:self.heightAnchor
                                                      constant:-9.f].active = YES;
 
-    self.titleLabel.translatesAutoresizingMaskIntoConstraints = NO;
-    [self.titleLabel.centerXAnchor constraintEqualToAnchor:statusGradientView.centerXAnchor]
-      .active = YES;
-    [self.titleLabel.centerYAnchor constraintEqualToAnchor:statusGradientView.centerYAnchor]
-      .active = YES;
+    titleLabel.translatesAutoresizingMaskIntoConstraints = NO;
+    [titleLabel.centerXAnchor constraintEqualToAnchor:self.centerXAnchor].active = YES;
 
-    [self.titleLabel.widthAnchor constraintEqualToAnchor:statusGradientView.widthAnchor
-                                       constant:-20.f].active = TRUE;
-    [self.titleLabel.heightAnchor constraintEqualToAnchor:statusGradientView.heightAnchor
-                                        constant:0.f].active = TRUE;
+    [titleLabel.centerYAnchor
+      constraintEqualToAnchor:statusGradientView.centerYAnchor].active = YES;
+
+    [titleLabel.widthAnchor
+      constraintEqualToAnchor:statusGradientView.widthAnchor
+                     constant:-20.f].active = TRUE;
 }
 
 #pragma mark - helper methods
