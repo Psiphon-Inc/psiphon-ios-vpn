@@ -17,6 +17,7 @@
  *
  */
 
+#import <PureLayout/ALView+PureLayout.h>
 #import "PsiCashView.h"
 #import "PsiCashClient.h"
 #import "ReactiveObjC.h"
@@ -34,6 +35,7 @@
 @implementation PsiCashView {
     UIActivityIndicatorView *activityIndicator;
     UIImageView *coin;
+    UIView *rewardedVideoButtonContainer;
     UIView *topBorderBlocker;
     UIView *bottomBorderBlocker;
 }
@@ -53,8 +55,24 @@
       @"Button label indicating to the user that there are no videos available for them to watch.");
 }
 
+- (void)layoutSubviews {
+    [super layoutSubviews];
+
+    UIBezierPath* rounded = [UIBezierPath
+      bezierPathWithRoundedRect:rewardedVideoButtonContainer.bounds
+              byRoundingCorners:UIRectCornerBottomLeft|UIRectCornerBottomRight
+                    cornerRadii:CGSizeMake(8, 8)];
+
+    CAShapeLayer *shape = [CAShapeLayer layer];
+    shape.path = rounded.CGPath;
+    shape.lineWidth = 2.f;
+    shape.fillColor = UIColor.clearColor.CGColor;
+    shape.strokeColor = UIColor.duckEggBlue.CGColor;
+    [rewardedVideoButtonContainer.layer addSublayer:shape];
+}
+
 - (void)setupViews {
-    [self setBackgroundColor:[UIColor clearColor]];
+    self.backgroundColor = UIColor.clearColor;
 
     // Setup balance View
     _balance = [[PsiCashBalanceView alloc] initWithAutoLayout];
@@ -63,10 +81,14 @@
     _meter = [[PsiCashSpeedBoostMeterView alloc] initWithAutoLayout];
 
     // Setup activity indicator
-    activityIndicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
+    activityIndicator = [[UIActivityIndicatorView alloc]
+      initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
+
+    rewardedVideoButtonContainer = [[UIView alloc] init];
+    rewardedVideoButtonContainer.backgroundColor = UIColor.whiteColor;
 
     // Setup rewarded video button
-    _rewardedVideoButton = [[RoyalSkyButton alloc] initWithAutoLayout];
+    _rewardedVideoButton = [[RoyalSkyButton alloc] initForAutoLayout];
     [_rewardedVideoButton setTitle:[PsiCashView videoReadyTitleText]
                           forState:UIControlStateNormal];
     [_rewardedVideoButton setTitle:[PsiCashView videoUnavailableTitleText]
@@ -74,10 +96,10 @@
     _rewardedVideoButton.enabled = FALSE;
 
     topBorderBlocker = [[UIView alloc] init];
-    topBorderBlocker.backgroundColor = [UIColor whiteColor];
+    topBorderBlocker.backgroundColor = UIColor.whiteColor;
 
     bottomBorderBlocker = [[UIView alloc] init];
-    bottomBorderBlocker.backgroundColor = [UIColor whiteColor];
+    bottomBorderBlocker.backgroundColor = UIColor.whiteColor;
 }
 
 - (void)addSubviews {
@@ -85,7 +107,8 @@
     [self addSubview:_balance];
     [self addSubview:_meter];
     [self addSubview:activityIndicator];
-    [self addSubview:_rewardedVideoButton];
+    [self addSubview:rewardedVideoButtonContainer];
+    [rewardedVideoButtonContainer addSubview:_rewardedVideoButton];
     [self addSubview:topBorderBlocker];
     [self addSubview:bottomBorderBlocker];
 }
@@ -107,12 +130,30 @@
     [activityIndicator.leadingAnchor constraintEqualToAnchor:_balance.balance.trailingAnchor constant:0].active = YES;
     [activityIndicator.centerYAnchor constraintEqualToAnchor:_balance.centerYAnchor constant:2].active = YES;
 
-    _rewardedVideoButton.translatesAutoresizingMaskIntoConstraints = NO;
+    rewardedVideoButtonContainer.translatesAutoresizingMaskIntoConstraints = FALSE;
+    [rewardedVideoButtonContainer.centerXAnchor
+      constraintEqualToAnchor:self.centerXAnchor].active = YES;
+    [rewardedVideoButtonContainer.topAnchor
+      constraintEqualToAnchor:_meter.bottomAnchor].active = YES;
+    [rewardedVideoButtonContainer.widthAnchor
+      constraintEqualToAnchor:_meter.widthAnchor
+                   multiplier:0.80687].active = YES;
+    [rewardedVideoButtonContainer.heightAnchor
+      constraintEqualToAnchor:self.heightAnchor
+                   multiplier:(CGFloat) (52.0 / 152)].active = YES;
 
-    [_rewardedVideoButton.centerXAnchor constraintEqualToAnchor:self.centerXAnchor].active = YES;
-    [_rewardedVideoButton.topAnchor constraintEqualToAnchor:_meter.bottomAnchor constant:-2].active = YES;
-    [_rewardedVideoButton.widthAnchor constraintEqualToAnchor:_meter.widthAnchor multiplier:0.80687].active = YES;
-    [_rewardedVideoButton.heightAnchor constraintEqualToAnchor:self.heightAnchor multiplier:52.0/152].active = YES;
+    _rewardedVideoButton.translatesAutoresizingMaskIntoConstraints = NO;
+    [_rewardedVideoButton.centerXAnchor
+      constraintEqualToAnchor:self.centerXAnchor].active = YES;
+    [_rewardedVideoButton.topAnchor
+      constraintEqualToAnchor:rewardedVideoButtonContainer.topAnchor
+                     constant:2.f].active = YES;
+    [_rewardedVideoButton.widthAnchor
+      constraintEqualToAnchor:rewardedVideoButtonContainer.widthAnchor
+                     constant:-18.f].active = YES;
+    [_rewardedVideoButton.heightAnchor
+      constraintEqualToAnchor:rewardedVideoButtonContainer.heightAnchor
+                     constant:-10.f].active = YES;
 
     topBorderBlocker.translatesAutoresizingMaskIntoConstraints = NO;
     [topBorderBlocker.centerXAnchor constraintEqualToAnchor:self.centerXAnchor].active = YES;
@@ -122,9 +163,13 @@
 
     bottomBorderBlocker.translatesAutoresizingMaskIntoConstraints = NO;
     [bottomBorderBlocker.centerXAnchor constraintEqualToAnchor:self.centerXAnchor].active = YES;
-    [bottomBorderBlocker.topAnchor constraintEqualToAnchor:_rewardedVideoButton.topAnchor].active = YES;
-    [bottomBorderBlocker.widthAnchor constraintEqualToAnchor:_rewardedVideoButton.widthAnchor constant:-4.f].active = YES;
-    [bottomBorderBlocker.heightAnchor constraintEqualToConstant:2.f].active = YES;
+    [bottomBorderBlocker.topAnchor
+      constraintEqualToAnchor:rewardedVideoButtonContainer.topAnchor
+                     constant:-2.f].active = YES;
+    [bottomBorderBlocker.widthAnchor
+      constraintEqualToAnchor:rewardedVideoButtonContainer.widthAnchor
+                     constant:-2.f].active = YES;
+    [bottomBorderBlocker.heightAnchor constraintEqualToConstant:4.f].active = YES;
 }
 
 - (void)bindWithModel:(PsiCashClientModel *)clientModel {
