@@ -59,4 +59,6 @@
 
 + (UIColor * _Nonnull)paleGreyTwo;
 
++ (UIColor * _Nonnull)periwinkleColor;
+
 @end
