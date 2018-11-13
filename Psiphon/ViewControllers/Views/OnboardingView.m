@@ -118,6 +118,19 @@
 
     if (accessoryView) {
         accessoryView.translatesAutoresizingMaskIntoConstraints = FALSE;
+
+        [accessoryView.topAnchor
+          constraintEqualToAnchor:bodyLabel.bottomAnchor
+                         constant:20.f].active = TRUE;
+
+        [accessoryView.centerXAnchor
+          constraintEqualToAnchor:self.centerXAnchor].active = TRUE;
+
+        [accessoryView.leadingAnchor
+          constraintEqualToAnchor:bodyLabel.leadingAnchor].active = TRUE;
+
+        [accessoryView.trailingAnchor
+          constraintEqualToAnchor:bodyLabel.trailingAnchor].active = TRUE;
     }
 }
 
