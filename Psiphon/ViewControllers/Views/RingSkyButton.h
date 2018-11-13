@@ -17,27 +17,11 @@
  *
  */
 
-#import <UIKit/UIKit.h>
-#import "AutoLayoutProtocol.h"
+#import "SkyButton.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface SkyButton : UIControl <AutoLayoutProtocol>
-
-@property (nonatomic, readonly) UILabel *titleLabel;
-
-@property (nonatomic, readonly, nullable) NSString *currentTitle;
-
-@property (nonatomic, assign) BOOL shadow;
-@property (nonatomic, assign) CGFloat fontSize;
-
-- (instancetype)initForAutoLayout;
-
-- (void)autoLayoutInit;
-
-- (void)setTitle:(NSString *)title;
-
-- (void)setTitle:(NSString *)title forState:(UIControlState)controlState;
+@interface RingSkyButton : SkyButton
 
 @end
 
