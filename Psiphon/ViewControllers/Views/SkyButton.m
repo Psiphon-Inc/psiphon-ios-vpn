@@ -19,16 +19,50 @@
 
 #import "SkyButton.h"
 #import "UIFont+Additions.h"
+#import "Logging.h"
 
 @implementation SkyButton {
-    UILabel *titleLabel;
     NSString *normalTitle;
     NSString *disabledTitle;
+}
+
+@synthesize titleLabel = _titleLabel;
+
+- (instancetype)initWithFrame:(CGRect)frame {
+    self = [super initWithFrame:frame];
+    if (self) {
+        _titleLabel = [[UILabel alloc] init];
+        _fontSize = 15.f;
+        _shadow = FALSE;
+    }
+    return self;
+}
+
+- (void)layoutSubviews {
+    [super layoutSubviews];
+
+    if (self.shadow) {
+        UIBezierPath *shadowPath = [UIBezierPath bezierPathWithRect:self.bounds];
+        self.layer.shadowColor = UIColor.blackColor.CGColor;
+        self.layer.shadowOffset = CGSizeMake(0.f, 1.5f);
+        self.layer.shadowOpacity = 0.15f;
+        self.layer.shadowPath = shadowPath.CGPath;
+        self.layer.shadowRadius = 3.f;
+    } else {
+        self.layer.shadowOpacity = 0.f;
+    }
+}
+
+- (void)setEnabled:(BOOL)enabled {
+    [super setEnabled:enabled];
+    _titleLabel.text = self.currentTitle;
 }
 
 - (void)setTitle:(NSString *)title {
     normalTitle = title;
     disabledTitle = title;
+    _titleLabel.text = title;
+    LOG_DEBUG(@"*** text: %@", _titleLabel.text);
 }
 
 - (void)setTitle:(NSString *)title forState:(UIControlState)controlState {
@@ -47,43 +81,40 @@
     }
 }
 
-#pragma mark - Getter
-
-- (UILabel *)titleLabel {
-    return titleLabel;
-}
-
 #pragma mark - AutoLayoutProtocol
 
 - (instancetype)initForAutoLayout {
     self = [self initWithFrame:CGRectZero];
     if (self) {
-        self.translatesAutoresizingMaskIntoConstraints = FALSE;
-        [self autoLayoutSetupViews];
-        [self autoLayoutAddSubviews];
-        [self autoLayoutSetupSubviewsLayoutConstraints];
+        [self autoLayoutInit];
     }
     return self;
 }
 
-- (void)autoLayoutSetupViews {
-    self.clipsToBounds = YES;
+- (void)autoLayoutInit {
+    self.translatesAutoresizingMaskIntoConstraints = FALSE;
+    [self autoLayoutSetupViews];
+    [self autoLayoutAddSubviews];
+    [self autoLayoutSetupSubviewsLayoutConstraints];
+}
 
+- (void)autoLayoutSetupViews {
     CGFloat cornerRadius = 8.f;
 
-    titleLabel = [[UILabel alloc] init];
-    titleLabel.backgroundColor = [UIColor clearColor];
+    self.layer.masksToBounds = FALSE;
+    self.layer.cornerRadius = cornerRadius;
 
-    titleLabel.adjustsFontSizeToFitWidth = YES;
-    titleLabel.minimumScaleFactor = 0.8;
-    titleLabel.font = [UIFont avenirNextDemiBold:16.f];
+    _titleLabel.backgroundColor = UIColor.clearColor;
 
-    titleLabel.textAlignment = NSTextAlignmentCenter;
-    titleLabel.textColor = [UIColor whiteColor];
-    titleLabel.userInteractionEnabled = NO;
-    titleLabel.layer.cornerRadius = cornerRadius;
-    titleLabel.clipsToBounds = YES;
-    titleLabel.backgroundColor = [UIColor clearColor];
+    _titleLabel.adjustsFontSizeToFitWidth = TRUE;
+    _titleLabel.minimumScaleFactor = 0.8;
+    _titleLabel.font = [UIFont avenirNextDemiBold:self.fontSize];
+
+    _titleLabel.textAlignment = NSTextAlignmentCenter;
+    _titleLabel.textColor = UIColor.whiteColor;
+    _titleLabel.userInteractionEnabled = FALSE;
+    _titleLabel.clipsToBounds = TRUE;
+    _titleLabel.backgroundColor = UIColor.clearColor;
 }
 
 - (void)autoLayoutAddSubviews {
@@ -91,10 +122,29 @@
 }
 
 - (void)autoLayoutSetupSubviewsLayoutConstraints {
-    titleLabel.translatesAutoresizingMaskIntoConstraints = NO;
-    [titleLabel.centerXAnchor constraintEqualToAnchor:self.centerXAnchor].active = YES;
-    [titleLabel.centerYAnchor constraintEqualToAnchor:self.centerYAnchor].active = YES;
-    [titleLabel.widthAnchor constraintEqualToAnchor:self.widthAnchor constant:-20.f].active = TRUE;
+    _titleLabel.translatesAutoresizingMaskIntoConstraints = FALSE;
+    [_titleLabel.centerYAnchor constraintEqualToAnchor:self.centerYAnchor].active = TRUE;
+
+    [_titleLabel.topAnchor
+      constraintGreaterThanOrEqualToAnchor:self.topAnchor
+                                  constant:self.fontSize].active = TRUE;
+
+    [_titleLabel.bottomAnchor
+      constraintGreaterThanOrEqualToAnchor:self.topAnchor
+                                  constant:self.fontSize].active = TRUE;
+
+    UIControlContentHorizontalAlignment alignment = self.contentHorizontalAlignment;
+    if (alignment == UIControlContentHorizontalAlignmentCenter) {
+        [_titleLabel.widthAnchor
+          constraintEqualToAnchor:self.widthAnchor
+                         constant:-(self.fontSize + 5.f)].active = TRUE;
+        [_titleLabel.centerXAnchor constraintEqualToAnchor:self.centerXAnchor].active = TRUE;
+
+    } else if (alignment == UIControlContentHorizontalAlignmentLeft) {
+        // We take left to mean leading.
+        [_titleLabel.leadingAnchor constraintEqualToAnchor:self.leadingAnchor
+                                                 constant:self.fontSize + 5.f].active = TRUE;
+    }
 }
 
 @end
