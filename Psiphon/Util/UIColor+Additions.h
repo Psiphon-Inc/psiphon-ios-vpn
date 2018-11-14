@@ -61,4 +61,6 @@
 
 + (UIColor * _Nonnull)periwinkleColor;
 
++ (UIColor * _Nonnull)paleGreyThreeColor;
+
 @end
