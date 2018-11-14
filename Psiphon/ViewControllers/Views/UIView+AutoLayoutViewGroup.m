@@ -29,6 +29,7 @@
 - (instancetype)initWithAutoLayoutFrame:(CGRect)frame {
     self = [self initWithFrame:frame];
     if (self) {
+        self.translatesAutoresizingMaskIntoConstraints = FALSE;
         [self customSetup];
     }
     return self;
