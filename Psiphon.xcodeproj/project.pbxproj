@@ -73,6 +73,7 @@
 		4EF6D9CC20A8C7FE00AE9D44 /* PsiCashOnboardingViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4EF6D9C920A8C7FE00AE9D44 /* PsiCashOnboardingViewController.m */; };
 		4EFAAF2E2034CDC800EC0536 /* PsiCashClient.m in Sources */ = {isa = PBXBuildFile; fileRef = 4EFAAF282034CDC800EC0536 /* PsiCashClient.m */; };
 		4EFDFD7420DD829800A687FD /* AppStats.m in Sources */ = {isa = PBXBuildFile; fileRef = 4EFDFD7320DD829800A687FD /* AppStats.m */; };
+		522C2062219CAE8500AB7543 /* UIViewController+Additions.m in Sources */ = {isa = PBXBuildFile; fileRef = 522C2060219CAE8500AB7543 /* UIViewController+Additions.m */; };
 		66094F7A1E8067520069EC4E /* PsiphonTunnel.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 66094F781E8067520069EC4E /* PsiphonTunnel.framework */; };
 		6615A5EA1F58A95500026C98 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 6615A5E81F58A95500026C98 /* Localizable.strings */; };
 		6615A5EB1F58A95B00026C98 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 6615A5E81F58A95500026C98 /* Localizable.strings */; };
@@ -354,6 +355,8 @@
 		4EFAAF282034CDC800EC0536 /* PsiCashClient.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PsiCashClient.m; path = Psiphon/PsiCash/ClientWrapper/PsiCashClient.m; sourceTree = SOURCE_ROOT; };
 		4EFDFD7220DD829800A687FD /* AppStats.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppStats.h; sourceTree = "<group>"; };
 		4EFDFD7320DD829800A687FD /* AppStats.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppStats.m; sourceTree = "<group>"; };
+		522C2060219CAE8500AB7543 /* UIViewController+Additions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIViewController+Additions.m"; sourceTree = "<group>"; };
+		522C2061219CAE8500AB7543 /* UIViewController+Additions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIViewController+Additions.h"; sourceTree = "<group>"; };
 		571DC9418AF936E60179F07C /* Pods-Psiphon.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Psiphon.release.xcconfig"; path = "Pods/Target Support Files/Pods-Psiphon/Pods-Psiphon.release.xcconfig"; sourceTree = "<group>"; };
 		66094F781E8067520069EC4E /* PsiphonTunnel.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = PsiphonTunnel.framework; sourceTree = "<group>"; };
 		6615A5E91F58A95500026C98 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = Strings/en.lproj/Localizable.strings; sourceTree = "<group>"; };
@@ -799,6 +802,8 @@
 		4ED48C05215056E800B1A9A5 /* ViewControllers */ = {
 			isa = PBXGroup;
 			children = (
+				522C2061219CAE8500AB7543 /* UIViewController+Additions.h */,
+				522C2060219CAE8500AB7543 /* UIViewController+Additions.m */,
 				F132D7DE1F5739A800AF7F91 /* LaunchScreenViewController.h */,
 				F132D7DF1F5739A800AF7F91 /* LaunchScreenViewController.m */,
 				EFED7EBA1F55C8550078980F /* LogViewControllerFullScreen.h */,
@@ -1546,6 +1551,7 @@
 				445F24D920E1A5BA00D004E9 /* BIT_STRING.c in Sources */,
 				445F24E820E1A5BA00D004E9 /* NativeEnumerated.c in Sources */,
 				445F24E320E1A5BA00D004E9 /* OCTET_STRING.c in Sources */,
+				522C2062219CAE8500AB7543 /* UIViewController+Additions.m in Sources */,
 				445F24E120E1A5BA00D004E9 /* ReceiptAttribute.c in Sources */,
 				EF90D7A2204F22C900228A63 /* timestamp_compare.c in Sources */,
 				9BFECB6BF077F45D491093F1 /* Authorization.m in Sources */,
