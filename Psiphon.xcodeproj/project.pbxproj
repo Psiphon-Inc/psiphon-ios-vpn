@@ -663,13 +663,6 @@
 			name = IAP;
 			sourceTree = "<group>";
 		};
-		4E04845320474C17006C3D35 /* Views */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Views;
-			sourceTree = "<group>";
-		};
 		4E0D88221FA06B2400ADB61E /* PsiphonUITests */ = {
 			isa = PBXGroup;
 			children = (
@@ -847,7 +840,6 @@
 				4E5DCF9120EC11C6009D8D39 /* Products */,
 				4E9B2E09204EFB7E00E63784 /* Objects */,
 				4E856D8F20A8C612007861A2 /* Onboarding */,
-				4E04845320474C17006C3D35 /* Views */,
 			);
 			path = PsiCash;
 			sourceTree = "<group>";
