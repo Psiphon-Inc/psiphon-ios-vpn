@@ -77,11 +77,11 @@
     return [UIColor colorWithRed:145.0f / 255.0f green:232.0f / 255.0f blue:255.0f / 255.0f alpha:1.0f];
 }
 
-+ (UIColor * _Nonnull)peachyPink {
++ (UIColor * _Nonnull)darkCream {
     return [UIColor colorWithRed:255.0f / 255.0f green:237.0f / 255.0f blue:158.0f / 255.0f alpha:1.0f];
 }
 
-+ (UIColor * _Nonnull)darkCream {
++ (UIColor * _Nonnull)peachyPink {
     return [UIColor colorWithRed:250.0f / 255.0f green:145.0f / 255.0f blue:145.0f / 255.0f alpha:1.0f];
 }
 
@@ -99,6 +99,10 @@
 
 + (UIColor * _Nonnull)periwinkleColor {
     return [UIColor colorWithRed:115.0f / 255.0f green:146.0f / 255.0f blue:1.0f alpha:1.0f];
+}
+
++ (UIColor * _Nonnull)paleGreyThreeColor {
+    return [UIColor colorWithRed:216.0f / 255.0f green:222.0f / 255.0f blue:230.0f / 255.0f alpha:1.0f];
 }
 
 @end
