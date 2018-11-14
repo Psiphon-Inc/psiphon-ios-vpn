@@ -54,6 +54,7 @@
     imageView = [[UIImageView alloc] init];
     imageView.image = image;
     imageView.contentMode = UIViewContentModeScaleAspectFit;
+    imageView.clipsToBounds = TRUE;
 
     titleLabel = [[UILabel alloc] init];
     titleLabel.text = title;
@@ -88,10 +89,8 @@
     imageView.translatesAutoresizingMaskIntoConstraints = FALSE;
     [imageView.topAnchor constraintEqualToAnchor:self.topAnchor constant:25.f].active = TRUE;
     [imageView.centerXAnchor constraintEqualToAnchor:self.centerXAnchor].active = TRUE;
-    [imageView.leadingAnchor constraintEqualToAnchor:self.leadingAnchor constant:48.f]
-            .active = TRUE;
-    [imageView.trailingAnchor constraintEqualToAnchor:self.trailingAnchor constant:-48.f]
-            .active = TRUE;
+    [imageView.leadingAnchor constraintEqualToAnchor:self.leadingAnchor].active = TRUE;
+    [imageView.trailingAnchor constraintEqualToAnchor:self.trailingAnchor].active = TRUE;
     [imageView.heightAnchor constraintEqualToAnchor:imageView.widthAnchor multiplier:invAspectRatio]
             .active = TRUE;
 
@@ -109,12 +108,9 @@
     [bodyLabel.heightAnchor constraintLessThanOrEqualToConstant:4.f * bodyLabel.font.lineHeight]
             .active = TRUE;
 
-    // Body label optional maximum leading and trailing anchor for larger screens (priority 900).
-    [bodyLabel.leadingAnchor constraintGreaterThanOrEqualToAnchor:self.leadingAnchor
-                                                         constant:32.f].active = TRUE;
+    [bodyLabel.leadingAnchor constraintGreaterThanOrEqualToAnchor:self.leadingAnchor].active = TRUE;
 
-    [bodyLabel.trailingAnchor constraintLessThanOrEqualToAnchor:self.trailingAnchor
-                                                       constant:-32.f].active = TRUE;
+    [bodyLabel.trailingAnchor constraintLessThanOrEqualToAnchor:self.trailingAnchor].active = TRUE;
 
     if (accessoryView) {
         accessoryView.translatesAutoresizingMaskIntoConstraints = FALSE;
