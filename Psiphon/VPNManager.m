@@ -469,15 +469,15 @@ PsiFeedbackLogType const VPNManagerLogType = @"VPNManager";
 }
 
 // Removes and re-installs the VPN configuration.
-- (void)reinstallVPNConfiguration {
+- (RACSignal<RACUnit *> *)reinstallVPNConfiguration {
+    VPNManager *__weak weakSelf = self;
 
-    __weak VPNManager *weakSelf = self;
-
-    __block RACDisposable *disposable = [[[[[VPNManager loadTunnelProviderManager]
+    return [[[[[[[VPNManager loadTunnelProviderManager]
       flattenMap:^RACSignal *(NETunnelProviderManager *providerManager) {
           // Removes the VPN configuration (if already installed).
           if (providerManager) {
-              return [RACSignal defer:providerManager selectorWithErrorCallback:@selector(removeFromPreferencesWithCompletionHandler:)];
+              return [RACSignal defer:providerManager
+            selectorWithErrorCallback:@selector(removeFromPreferencesWithCompletionHandler:)];
           }
           return [RACSignal return:nil];
       }]
@@ -485,16 +485,14 @@ PsiFeedbackLogType const VPNManagerLogType = @"VPNManager";
           // Installs the VPN configuration.
           return [weakSelf updateOrCreateVPNConfigurationAndSave:nil];
       }]
+      mapReplace:RACUnit.defaultUnit]
+      doError:^(NSError *error) {
+          [PsiFeedbackLogger errorWithType:VPNManagerLogType
+                                   message:@"failed to reinstall VPN configuration" object:error];
+      }]
       unsafeSubscribeOnSerialQueue:self.serialQueue
                           withName:@"reinstallVPNConfigurationOperation"]
-      subscribeError:^(NSError *error) {
-          [PsiFeedbackLogger errorWithType:VPNManagerLogType message:@"failed to reinstall VPN configuration" object:error];
-          [weakSelf.compoundDisposable removeDisposable:disposable];
-      } completed:^{
-          [weakSelf.compoundDisposable removeDisposable:disposable];
-      }];
-
-    [self.compoundDisposable addDisposable:disposable];
+      deliverOnMainThread];
 }
 
 // isVPNActive returns a signal that when subscribed to emits tuple (isActive, VPNStatus).
@@ -691,8 +689,8 @@ PsiFeedbackLogType const VPNManagerLogType = @"VPNManager";
 
 // Returns a signal that when subscribed to, creates and saves VPN configuration if nil is passed.
 // Otherwise, updates appropriate properties in the provided VPN configuration and saves it.
-// NOTE: since this signal modifies the VPN configuration, the returned signal should be subscribed on using
-//       `unsafeSubscribeOnSerialQueue`.
+// NOTE: since this signal modifies the VPN configuration, the returned signal should be
+//       subscribed on using `unsafeSubscribeOnSerialQueue`.
 - (RACSignal<NETunnelProviderManager *> *)updateOrCreateVPNConfigurationAndSave:
   (NETunnelProviderManager *_Nullable)manager {
 
@@ -731,21 +729,22 @@ PsiFeedbackLogType const VPNManagerLogType = @"VPNManager";
           }
 
           // Reset Connect On Demand state.
-          // To enable Connect On Demand for all, it should be enabled right before startTunnel is called
-          // on the NETunnelProviderManager object.
+          // To enable Connect On Demand for all, it should be enabled right before startTunnel
+          // is called on the NETunnelProviderManager object.
           providerManager.onDemandEnabled = FALSE;
 
           return providerManager;
       }]
       flattenMap:^RACSignal *(NETunnelProviderManager *providerManager) {
-          return [RACSignal defer:providerManager selectorWithErrorCallback:@selector(saveToPreferencesWithCompletionHandler:)];
+          return [RACSignal defer:providerManager
+        selectorWithErrorCallback:@selector(saveToPreferencesWithCompletionHandler:)];
       }]
       flattenMap:^RACSignal *(NETunnelProviderManager *providerManager) {
-          return [RACSignal defer:providerManager selectorWithErrorCallback:@selector(loadFromPreferencesWithCompletionHandler:)];
+          return [RACSignal defer:providerManager
+        selectorWithErrorCallback:@selector(loadFromPreferencesWithCompletionHandler:)];
       }]
-      map:^id(NETunnelProviderManager *providerManager) {
+      doNext:^(NETunnelProviderManager *providerManager) {
           weakSelf.tunnelProviderManager = providerManager;
-          return providerManager;
       }];
 }
 

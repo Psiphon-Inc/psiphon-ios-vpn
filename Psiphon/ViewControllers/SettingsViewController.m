@@ -163,6 +163,8 @@ NSString * const SettingsResetAdConsentCellSpecifierKey = @"settingsResetAdConse
                      tableView:(UITableView *)tableView
     didSelectCustomViewSpecifier:(IASKSpecifier*)specifier {
 
+    SettingsViewController *__weak weakSelf = self;
+
     [super settingsViewController:self tableView:tableView didSelectCustomViewSpecifier:specifier];
 
     if ([specifier.key isEqualToString:SettingsSubscriptionCellSpecifierKey]) {
@@ -172,8 +174,16 @@ NSString * const SettingsResetAdConsentCellSpecifierKey = @"settingsResetAdConse
         [self openPsiCashViewController];
 
     } else if ([specifier.key isEqualToString:SettingsReinstallVPNConfigurationKey]) {
-        [[VPNManager sharedInstance] reinstallVPNConfiguration];
-        [self settingsViewControllerDidEnd:nil];
+        __block RACDisposable *disposable = [[[VPNManager sharedInstance] reinstallVPNConfiguration]
+          subscribeError:^(NSError *error) {
+              [weakSelf.compoundDisposable removeDisposable:disposable];
+              [weakSelf settingsViewControllerDidEnd:nil];
+          }
+          completed:^{
+              [weakSelf.compoundDisposable removeDisposable:disposable];
+              [weakSelf settingsViewControllerDidEnd:nil];
+          }];
+        [self.compoundDisposable addDisposable:disposable];
 
     } else if ([specifier.key isEqualToString:SettingsResetAdConsentCellSpecifierKey]) {
         [self onResetConsent];
