@@ -31,7 +31,7 @@
 #import "IAPViewController.h"
 #import "LaunchScreenViewController.h"
 #import "Logging.h"
-#import "LogViewControllerFullScreen.h"
+#import "DebugViewController.h"
 #import "PsiFeedbackLogger.h"
 #import "PsiphonClientCommonLibraryHelpers.h"
 #import "PsiphonConfigUserDefaults.h"
@@ -339,67 +339,59 @@ UserDefaultsKey const PsiCashHasBeenOnboardedBoolKey = @"PsiCash.HasBeenOnboarde
 
     __weak MainViewController *weakSelf = self;
 
-    // Emits unit value if/when the privacy policy is accepted.
-    RACSignal *privacyPolicyAccepted =
-      [[RACSignal return:@([NSUserDefaults.standardUserDefaults boolForKey:PrivacyPolicyAcceptedBoolKey])]
-      flattenMap:^RACSignal<RACUnit *> *(NSNumber *ppAccepted) {
+    // privacyPolicyDismissed is a cold terminating signal that emits @TRUE if the PP was accepted,
+    // otherwise emits @FALSE.
+    RACSignal<NSNumber *> *privacyPolicyDismissed = [[RACSignal return:
+                   @([NSUserDefaults.standardUserDefaults boolForKey:PrivacyPolicyAcceptedBoolKey])]
+      flattenMap:^RACSignal<RACUnit *> *(NSNumber *alreadyAccepted) {
 
-        if ([ppAccepted boolValue]) {
-            return [RACSignal return:RACUnit.defaultUnit];
+        if ([alreadyAccepted boolValue]) {
+            return [RACSignal return:alreadyAccepted];
         } else {
 
             PrivacyPolicyViewController *c = [[PrivacyPolicyViewController alloc] init];
             [self presentViewController:c animated:TRUE completion:nil];
 
-            return [[[[NSNotificationCenter defaultCenter]
-              rac_addObserverForName:PrivacyPolicyAcceptedNotification
+            return [[[[[NSNotificationCenter defaultCenter]
+              rac_addObserverForName:PrivacyPolicyDismissedNotification
                               object:nil]
               take:1]
-              map:^id(NSNotification *value) {
-                  [NSUserDefaults.standardUserDefaults setBool:TRUE forKey:PrivacyPolicyAcceptedBoolKey];
-                  return RACUnit.defaultUnit;
+              map:^NSNumber *(NSNotification *notification) {
+                  return notification.userInfo[PrivacyPolicyAcceptedNotificationBoolKey];
+              }]
+              doNext:^(NSNumber *accepted) {
+                  // Update user defaults value.
+                  [NSUserDefaults.standardUserDefaults setBool:[accepted boolValue]
+                                                        forKey:PrivacyPolicyAcceptedBoolKey];
               }];
         }
-
     }];
 
 
     NSString * const CommandNoInternetAlert = @"NoInternetAlert";
     NSString * const CommandStartTunnel = @"StartTunnel";
     NSString * const CommandStopVPN = @"StopVPN";
-    NSString * const CommandConnectOnDemandAlert = @"ConnectOnDemandAlert";
 
     // signal emits a single two tuple (isVPNActive, connectOnDemandEnabled).
-    __block RACDisposable *disposable = [[[[[privacyPolicyAccepted
-      flattenMap:^RACSignal<RACTwoTuple <NSNumber *, NSNumber *> *> *(RACUnit *x) {
-          return [weakSelf.vpnManager isVPNActive];
-      }]
-      flattenMap:^RACSignal<RACTwoTuple<NSNumber *, NSNumber *> *> *(RACTwoTuple<NSNumber *, NSNumber *> *value) {
-          // Returned signal emits tuple (isActive, isConnectOnDemandEnabled).
-
-          // If VPN is already running, checks if ConnectOnDemand is enabled, otherwise returns the result immediately.
-          BOOL isActive = [value.first boolValue];
-          if (isActive) {
-              return [[weakSelf.vpnManager isConnectOnDemandEnabled]
-                      map:^RACTwoTuple<NSNumber *, NSNumber *> *(NSNumber *connectOnDemandEnabled) {
-                          return [RACTwoTuple pack:@(TRUE) :connectOnDemandEnabled];
-                      }];
+    __block RACDisposable *disposable = [[[[privacyPolicyDismissed
+      flattenMap:^RACSignal<RACTwoTuple <NSNumber *, NSNumber *> *> *(NSNumber *accepted) {
+          // If the user has accepted the privacy policy continue with starting the VPN,
+          // otherwise terminate the subscription.
+          if ([accepted boolValue]) {
+              return [weakSelf.vpnManager isVPNActive];
           } else {
-              return [RACSignal return:[RACTwoTuple pack:@(FALSE) :@(FALSE)]];
+              return [RACSignal empty];
           }
       }]
       flattenMap:^RACSignal<NSString *> *(RACTwoTuple<NSNumber *, NSNumber *> *value) {
           BOOL vpnActive = [value.first boolValue];
-          BOOL connectOnDemandEnabled = [value.second boolValue];
+          BOOL isZombie = (VPNStatusZombie == (VPNStatus)[value.second integerValue]);
 
-          // Emits command to stop VPN if it has already started. Otherwise, it checks for internet connectivity
-          // and emits one of CommandNoInternetAlert or CommandStartTunnel.
-          if (vpnActive) {
-              if (connectOnDemandEnabled) {
-                  return [RACSignal return:CommandConnectOnDemandAlert];
-              } else {
-                  return [RACSignal return:CommandStopVPN];
-              }
+          // Emits command to stop VPN if it has already started or is in zombie mode.
+          // Otherwise, it checks for internet connectivity and emits
+          // one of CommandNoInternetAlert or CommandStartTunnel.
+          if (vpnActive || isZombie) {
+              return [RACSignal return:CommandStopVPN];
 
           } else {
               // Alerts the user if there is no internet connection.
@@ -410,7 +402,7 @@ UserDefaultsKey const PsiCashHasBeenOnboardedBoolKey = @"PsiCash.HasBeenOnboarde
               } else {
 
                   // Returned signal checks whether or not VPN configuration is already installed.
-                  // Skips presenting ads if there is not VPN configuration installed.
+                  // Skips presenting ads if the VPN configuration is not installed.
                   return [[weakSelf.vpnManager vpnConfigurationInstalled]
                     flattenMap:^RACSignal *(NSNumber *value) {
                         BOOL vpnInstalled = [value boolValue];
@@ -419,6 +411,8 @@ UserDefaultsKey const PsiCashHasBeenOnboardedBoolKey = @"PsiCash.HasBeenOnboarde
                             return [RACSignal return:CommandStartTunnel];
                         } else {
                             // Start tunnel after ad presentation signal completes.
+                            // We always want to start the tunnel after the presentation signal is completed,
+                            // no matter if it presented an ad or it failed.
                             return [[weakSelf.adManager presentInterstitialOnViewController:weakSelf]
                               then:^RACSignal * {
                                   return [RACSignal return:CommandStartTunnel];
@@ -439,42 +433,7 @@ UserDefaultsKey const PsiCashHasBeenOnboardedBoolKey = @"PsiCash.HasBeenOnboarde
             [weakSelf.vpnManager stopVPN];
 
         } else if ([CommandNoInternetAlert isEqualToString:command]) {
-            [[AppDelegate sharedAppDelegate] displayAlertNoInternet];
-
-        } else if ([CommandConnectOnDemandAlert isEqualToString:command]) {
-            // Alert the user that Connect On Demand is enabled, and if they
-            // would like Connect On Demand to be disabled, and the extension to be stopped.
-            NSString *alertTitle = NSLocalizedStringWithDefaultValue(@"CONNECT_ON_DEMAND_ALERT_TITLE", nil, [NSBundle mainBundle], @"Auto-start VPN is enabled", @"Alert dialog title informing user that 'Auto-start VPN' feature is enabled");
-            NSString *alertMessage = NSLocalizedStringWithDefaultValue(@"CONNECT_ON_DEMAND_ALERT_BODY", nil, [NSBundle mainBundle], @"\"Auto-start VPN\" will be temporarily disabled until the next time Psiphon VPN is started.", "Alert dialog body informing the user that the 'Auto-start VPN on demand' feature will be disabled and that the VPN cannot be stopped.");
-
-            UIAlertController *alert = [UIAlertController alertControllerWithTitle:alertTitle
-                                                                           message:alertMessage
-                                                                    preferredStyle:UIAlertControllerStyleAlert];
-
-            UIAlertAction *stopUntilNextStartAction = [UIAlertAction
-              actionWithTitle:NSLocalizedStringWithDefaultValue(@"OK_BUTTON", nil, [NSBundle mainBundle], @"OK", @"OK button title")
-                        style:UIAlertActionStyleDefault
-                      handler:^(UIAlertAction *action) {
-
-                          // Disable "Connect On Demand" and stop the VPN.
-                          [[NSUserDefaults standardUserDefaults] setBool:TRUE
-                                                                  forKey:VPNManagerConnectOnDemandUntilNextStartBoolKey];
-
-                          __block RACDisposable *disposable = [[weakSelf.vpnManager setConnectOnDemandEnabled:FALSE]
-                            subscribeNext:^(NSNumber *x) {
-                                // Stops the VPN only after ConnectOnDemand is disabled.
-                                [weakSelf.vpnManager stopVPN];
-                            } error:^(NSError *error) {
-                                [weakSelf.compoundDisposable removeDisposable:disposable];
-                            }   completed:^{
-                                [weakSelf.compoundDisposable removeDisposable:disposable];
-                            }];
-
-                          [weakSelf.compoundDisposable addDisposable:disposable];
-                      }];
-
-            [alert addAction:stopUntilNextStartAction];
-            [weakSelf presentViewController:alert animated:TRUE completion:nil];
+            [[AppDelegate sharedAppDelegate] displayAlertNoInternet:nil];
         }
 
     } error:^(NSError *error) {
@@ -500,7 +459,7 @@ UserDefaultsKey const PsiCashHasBeenOnboardedBoolKey = @"PsiCash.HasBeenOnboarde
 
 #if DEBUG
 - (void)onVersionLabelTap:(UILabel *)sender {
-    TabbedLogViewController *viewController = [[TabbedLogViewController alloc] initWithCoder:nil];
+    DebugViewController *viewController = [[DebugViewController alloc] initWithCoder:nil];
     [self presentViewController:viewController animated:YES completion:nil];
 }
 #endif
@@ -1162,55 +1121,81 @@ UserDefaultsKey const PsiCashHasBeenOnboardedBoolKey = @"PsiCash.HasBeenOnboarde
 
 - (void)showRewardedVideo {
 
+    MainViewController *__weak weakSelf = self;
+
     LOG_DEBUG(@"rewarded video started");
     [PsiFeedbackLogger infoWithType:RewardedVideoLogType message:@"started"];
 
-    RACSignal *showVideo = [self.adManager presentRewardedVideoOnViewController:self
-      withCustomData:[[PsiCashClient sharedInstance] rewardedVideoCustomData]];
+    RACDisposable *__block disposable = [[[[self.adManager
+        presentRewardedVideoOnViewController:self
+                              withCustomData:[[PsiCashClient sharedInstance] rewardedVideoCustomData]]
+        doNext:^(NSNumber *adPresentationEnum) {
+            // Logs current AdPresentation enum value.
+            AdPresentation ap = (AdPresentation) [adPresentationEnum integerValue];
+            switch (ap) {
+                case AdPresentationWillAppear:
+                    LOG_DEBUG(@"rewarded video AdPresentationWillAppear");
+                    break;
+                case AdPresentationDidAppear:
+                    LOG_DEBUG(@"rewarded video AdPresentationDidAppear");
+                    break;
+                case AdPresentationWillDisappear:
+                    LOG_DEBUG(@"rewarded video AdPresentationWillDisappear");
+                    break;
+                case AdPresentationDidDisappear:
+                    LOG_DEBUG(@"rewarded video AdPresentationDidDisappear");
+                    break;
+                case AdPresentationDidRewardUser:
+                    LOG_DEBUG(@"rewarded video AdPresentationDidRewardUser");
+                    break;
+                case AdPresentationErrorCustomDataNotSet:
+                    LOG_DEBUG(@"rewarded video AdPresentationErrorCustomDataNotSet");
+                    break;
+                case AdPresentationErrorInappropriateState:
+                    LOG_DEBUG(@"rewarded video AdPresentationErrorInappropriateState");
+                    [PsiFeedbackLogger errorWithType:RewardedVideoLogType message:@"AdPresentationErrorInappropriateState"];
+                    break;
+                case AdPresentationErrorNoAdsLoaded:
+                    LOG_DEBUG(@"rewarded video AdPresentationErrorNoAdsLoaded");
+                    [PsiFeedbackLogger errorWithType:RewardedVideoLogType message:@"AdPresentationErrorNoAdsLoaded"];
+                    break;
+                case AdPresentationErrorFailedToPlay:
+                    LOG_DEBUG(@"rewarded video AdPresentationErrorFailedToPlay");
+                    [PsiFeedbackLogger errorWithType:RewardedVideoLogType message:@"AdPresentationErrorFailedToPlay"];
+                    break;
+            }
+        }]
+        scanWithStart:[RACTwoTuple pack:@(FALSE) :@(FALSE)]
+               reduce:^RACTwoTuple<NSNumber *, NSNumber *> *(RACTwoTuple *running, NSNumber *adPresentationEnum) {
 
-    [self.compoundDisposable addDisposable:[showVideo subscribeNext:^(NSNumber *value) {
-        AdPresentation ap = (AdPresentation) [value integerValue];
-
-        switch (ap) {
-            case AdPresentationWillAppear:
-                LOG_DEBUG(@"rewarded video AdPresentationWillAppear");
-                break;
-            case AdPresentationDidAppear:
-                LOG_DEBUG(@"rewarded video AdPresentationDidAppear");
-                break;
-            case AdPresentationWillDisappear:
-                LOG_DEBUG(@"rewarded video AdPresentationWillDisappear");
-                break;
-            case AdPresentationDidDisappear:
-                LOG_DEBUG(@"rewarded video AdPresentationDidDisappear");
+            // Scan operator's `running` value is a 2-tuple of booleans. First element represents when
+            // AdPresentationDidRewardUser is emitted upstream, and the second element represents when
+            // AdPresentationDidDisappear is emitted upstream.
+            // Note that we don't want to make any assumptions about the order of these two events.
+            if ([adPresentationEnum integerValue] == AdPresentationDidRewardUser) {
+                return [RACTwoTuple pack:@(TRUE) :running.second];
+            } else if ([adPresentationEnum integerValue] == AdPresentationDidDisappear) {
+                return [RACTwoTuple pack:running.first :@(TRUE)];
+            }
+            return running;
+        }]
+        subscribeNext:^(RACTwoTuple<NSNumber *, NSNumber *> *tuple) {
+            // Calls to update PsiCash balance after
+            BOOL didReward = [tuple.first boolValue];
+            BOOL didDisappear = [tuple.second boolValue];
+            if (didReward && didDisappear) {
                 [[PsiCashClient sharedInstance] pollForBalanceDeltaWithMaxRetries:30 andTimeBetweenRetries:1.0];
-                break;
-            case AdPresentationDidRewardUser:
-                LOG_DEBUG(@"rewarded video AdPresentationDidRewardUser");
-                break;
-            case AdPresentationErrorCustomDataNotSet:
-                LOG_DEBUG(@"rewarded video AdPresentationErrorCustomDataNotSet");
-                break;
-            case AdPresentationErrorInappropriateState:
-                LOG_DEBUG(@"rewarded video AdPresentationErrorInappropriateState");
-                [PsiFeedbackLogger errorWithType:RewardedVideoLogType message:@"AdPresentationErrorInappropriateState"];
-                break;
-            case AdPresentationErrorNoAdsLoaded:
-                LOG_DEBUG(@"rewarded video AdPresentationErrorNoAdsLoaded");
-                [PsiFeedbackLogger errorWithType:RewardedVideoLogType message:@"AdPresentationErrorNoAdsLoaded"];
-                break;
-            case AdPresentationErrorFailedToPlay:
-                LOG_DEBUG(@"rewarded video AdPresentationErrorFailedToPlay");
-                [PsiFeedbackLogger errorWithType:RewardedVideoLogType message:@"AdPresentationErrorFailedToPlay"];
-                break;
-        }
+            }
+        } error:^(NSError *error) {
+            [PsiFeedbackLogger errorWithType:RewardedVideoLogType message:@"Error with rewarded video" object:error];
+            [weakSelf.compoundDisposable removeDisposable:disposable];
+        } completed:^{
+            LOG_DEBUG(@"rewarded video completed");
+            [PsiFeedbackLogger infoWithType:RewardedVideoLogType message:@"completed"];
+            [weakSelf.compoundDisposable removeDisposable:disposable];
+        }];
 
-    } error:^(NSError *error) {
-        [PsiFeedbackLogger errorWithType:RewardedVideoLogType message:@"Error with rewarded video" object:error];
-    } completed:^{
-        LOG_DEBUG(@"rewarded video completed");
-        [PsiFeedbackLogger infoWithType:RewardedVideoLogType message:@"completed"];
-    }]];
+        [self.compoundDisposable addDisposable:disposable];
 }
 
 #pragma mark - PsiCashPurchaseAlertViewDelegate protocol

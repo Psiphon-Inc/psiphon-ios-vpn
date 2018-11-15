@@ -21,6 +21,7 @@
 #import "Notifier.h"
 #import "Asserts.h"
 #import "DispatchUtils.h"
+#import "RACSubject.h"
 
 #define PSIPHON_GROUP      @"group.ca.psiphon.Psiphon"
 #define PSIPHON_VPN_GROUP  @"group.ca.psiphon.Psiphon.PsiphonVPN"
@@ -34,13 +35,22 @@ NotifierMessage const NotifierNewHomepages           = PSIPHON_VPN_GROUP @".NewH
 NotifierMessage const NotifierTunnelConnected        = PSIPHON_VPN_GROUP @".TunnelConnected";
 NotifierMessage const NotifierAvailableEgressRegions = PSIPHON_VPN_GROUP @".AvailableEgressRegions";
 NotifierMessage const NotifierMarkedAuthorizations   = PSIPHON_VPN_GROUP @".MarkedAuthorizations";
-NotifierMessage const NotifierWaitingForNetworkConnectivity = PSIPHON_VPN_GROUP @".WaitingForNetworkConnectivity";
+NotifierMessage const NotifierNetworkConnectivityFailed = PSIPHON_VPN_GROUP @".NetworkConnectivityFailed";
+NotifierMessage const NotifierNetworkConnectivityResolved = PSIPHON_VPN_GROUP @".NetworkConnectivityResolved";
 
 // Messages sent by the container.
 NotifierMessage const NotifierStartVPN               = PSIPHON_GROUP @".StartVPN";
 NotifierMessage const NotifierForceSubscriptionCheck = PSIPHON_GROUP @".ForceSubscriptionCheck";
 NotifierMessage const NotifierAppEnteredBackground   = PSIPHON_GROUP @".AppEnteredBackground";
 NotifierMessage const NotifierUpdatedAuthorizations  = PSIPHON_GROUP @".UpdatedAuthorizations";
+
+#if DEBUG
+NotifierMessage const NotifierDebugCustomFunction    = PSIPHON_GROUP @".DebugCustomFunction";
+NotifierMessage const NotifierDebugForceJetsam    = PSIPHON_GROUP @".DebugForceJetsam";
+NotifierMessage const NotifierDebugGoProfile      = PSIPHON_GROUP @".DebugGoProfile";
+NotifierMessage const NotifierDebugMemoryProfiler = PSIPHON_GROUP @".DebugMemoryProfiler";
+NotifierMessage const NotifierDebugPsiphonTunnelState = PSIPHON_GROUP @".DebugPsiphonTunnelState";
+#endif
 
 #pragma mark - ObserverTuple data class
 
@@ -58,6 +68,10 @@ NotifierMessage const NotifierUpdatedAuthorizations  = PSIPHON_GROUP @".UpdatedA
 
 @implementation Notifier {
     NSMutableArray<ObserverTuple *> *observers;
+
+#if !(TARGET_IS_EXTENSION)
+    RACSubject<NotifierMessage> *messagesSubject;
+#endif
 }
 
 // Class variables accessible by C functions.
@@ -68,7 +82,7 @@ static void cfNotificationCallback(CFNotificationCenterRef center, void *observe
 
     NSString *key = (__bridge NSString *)name;
     Notifier *selfPtr = (__bridge Notifier *)observer;
-    [selfPtr notificationCallback:key];
+    [selfPtr notificationCallback:(NotifierMessage)key];
 }
 
 static inline void AddDarwinNotifyObserver(CFNotificationCenterRef center, const void *observer, CFStringRef key) {
@@ -82,6 +96,10 @@ static inline void AddDarwinNotifyObserver(CFNotificationCenterRef center, const
 
 - (instancetype)init {
     observers = [NSMutableArray arrayWithCapacity:1];
+
+#if !(TARGET_IS_EXTENSION)
+    messagesSubject = [RACSubject subject];
+#endif
 
     // Add self to Darwin notify center for the given key.
     CFNotificationCenterRef center = CFNotificationCenterGetDarwinNotifyCenter();
@@ -97,13 +115,27 @@ static inline void AddDarwinNotifyObserver(CFNotificationCenterRef center, const
     AddDarwinNotifyObserver(center, (__bridge const void *)self, (__bridge CFStringRef)NotifierForceSubscriptionCheck);
     AddDarwinNotifyObserver(center, (__bridge const void *)self, (__bridge CFStringRef)NotifierAppEnteredBackground);
     AddDarwinNotifyObserver(center, (__bridge const void *)self, (__bridge CFStringRef)NotifierUpdatedAuthorizations);
+
+#if DEBUG
+    AddDarwinNotifyObserver(center, (__bridge const void *)self, (__bridge CFStringRef)NotifierDebugCustomFunction);
+    AddDarwinNotifyObserver(center, (__bridge const void *)self, (__bridge CFStringRef)NotifierDebugForceJetsam);
+    AddDarwinNotifyObserver(center, (__bridge const void *)self, (__bridge CFStringRef)NotifierDebugGoProfile);
+    AddDarwinNotifyObserver(center, (__bridge const void *)self, (__bridge CFStringRef)NotifierDebugMemoryProfiler);
+#endif
+
 #else
     // Listens to all messages sent by the extension.
     AddDarwinNotifyObserver(center, (__bridge const void *)self, (__bridge CFStringRef)NotifierNewHomepages);
     AddDarwinNotifyObserver(center, (__bridge const void *)self, (__bridge CFStringRef)NotifierTunnelConnected);
     AddDarwinNotifyObserver(center, (__bridge const void *)self, (__bridge CFStringRef)NotifierAvailableEgressRegions);
     AddDarwinNotifyObserver(center, (__bridge const void *)self, (__bridge CFStringRef)NotifierMarkedAuthorizations);
-    AddDarwinNotifyObserver(center, (__bridge const void *)self, (__bridge CFStringRef)NotifierWaitingForNetworkConnectivity);
+    AddDarwinNotifyObserver(center, (__bridge const void *)self, (__bridge CFStringRef)NotifierNetworkConnectivityFailed);
+    AddDarwinNotifyObserver(center, (__bridge const void *)self, (__bridge CFStringRef)NotifierNetworkConnectivityResolved);
+
+#if DEBUG
+    AddDarwinNotifyObserver(center, (__bridge const void *)self, (__bridge CFStringRef)NotifierDebugPsiphonTunnelState);
+#endif
+
 #endif
 
     return self;
@@ -117,6 +149,19 @@ static inline void AddDarwinNotifyObserver(CFNotificationCenterRef center, const
         sharedInstance = [[Notifier alloc] init];
     });
     return sharedInstance;
+}
+
+- (void)post:(NotifierMessage)message {
+
+    dispatch_async_main(^{
+        CFNotificationCenterRef center = CFNotificationCenterGetDarwinNotifyCenter();
+        if (center) {
+            CFNotificationCenterPostNotification(center, (__bridge CFStringRef)message, NULL, NULL, 0);
+
+            [PsiFeedbackLogger infoWithType:NotifierLogType message:@"sent [%@]", message];
+        }
+    });
+
 }
 
 - (void)registerObserver:(id <NotifierObserver>)observer callbackQueue:(dispatch_queue_t)queue {
@@ -141,26 +186,31 @@ static inline void AddDarwinNotifyObserver(CFNotificationCenterRef center, const
     }
 }
 
-- (void)post:(NotifierMessage)message {
-
-    dispatch_async_main(^{
-        CFNotificationCenterRef center = CFNotificationCenterGetDarwinNotifyCenter();
-        if (center) {
-            CFNotificationCenterPostNotification(center, (__bridge CFStringRef)message, NULL, NULL, 0);
-
-            [PsiFeedbackLogger infoWithType:NotifierLogType message:@"sent [%@]", message];
-        }
-    });
-
+#if !(TARGET_IS_EXTENSION)
+- (RACSignal<NotifierMessage> *)listenForMessages:(NSArray<NotifierMessage> *)messages {
+    return [messagesSubject filter:^BOOL(NotifierMessage received) {
+        return [messages containsObject:received];
+    }];
 }
+#endif
 
 #pragma mark - Private
 
-- (void)notificationCallback:(NSString *)message {
+// Called on the main thread.
+- (void)notificationCallback:(NotifierMessage)message {
 
     [PsiFeedbackLogger infoWithType:NotifierLogType message:@"received [%@]", message];
 
+    // Since subscribers could potentially block the main thread, we will not block the main
+    // thread to send the message to `messageSubject`.
+#if !(TARGET_IS_EXTENSION)
+    dispatch_async_global(^{
+        [messagesSubject sendNext:message];
+    });
+#endif
+
     @synchronized (sharedInstance) {
+
 
         NSMutableIndexSet *deallocatedDelegates = [NSMutableIndexSet indexSet];
 

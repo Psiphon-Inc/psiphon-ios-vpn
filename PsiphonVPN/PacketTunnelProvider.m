@@ -48,6 +48,8 @@
 #import "NSDate+PSIDateExtension.h"
 #import "DispatchUtils.h"
 #import "RACUnit.h"
+#import "DebugUtils.h"
+#import "FileUtils.h"
 #import <ReactiveObjC/RACSubject.h>
 #import <ReactiveObjC/RACReplaySubject.h>
 
@@ -64,16 +66,6 @@ typedef NS_ENUM(NSInteger, SubscriptionAuthorizationStatus) {
     SubscriptionAuthorizationStatusRejected,
     /** @const SubscriptionAuthorizationStatusActiveOrEmpty Authorization was either accepted by Psiphon, or no authorization was sent. */
     SubscriptionAuthorizationStatusActiveOrEmpty
-};
-
-/** Extension's grace period state. */
-typedef NS_ENUM(NSInteger, GracePeriodState) {
-    /** @const GracePeriodStateInactive The extension is not in grace period. */
-    GracePeriodStateInactive,
-    /** @const GracePeriodActive Grace period is active, and the grace period timer will start after user presses Done on the grace period message shown to them. */
-    GracePeriodStateActive,
-    /** @const GracePeriodDone Grace period timer is done, subscription check needs to be performed to reset grace period state. */
-    GracePeriodStateDone
 };
 
 /** PacketTunnelProvider state */
@@ -101,15 +93,16 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 // before starting the VPN.
 @property (atomic) BOOL waitForContainerStartVPNCommand;
 
-@property (nonatomic) GracePeriodState gracePeriodState;
-
-@property (nonatomic) PsiphonTunnel *psiphonTunnel;
+@property (nonatomic, nonnull) PsiphonTunnel *psiphonTunnel;
 
 // Authorization IDs supplied to tunnel-core from the container.
 // NOTE: Does not include subscription authorization ID.
-@property (atomic) NSSet<NSString *> *suppliedContainerAuthorizationIDs;
+@property (atomic, nonnull) NSSet<NSString *> *suppliedContainerAuthorizationIDs;
 
 @property (nonatomic) PsiphonConfigSponsorIds *cachedSponsorIDs;
+
+// Notifier message state management.
+@property (atomic) BOOL postedNetworkConnectivityFailed;
 
 @end
 
@@ -123,21 +116,21 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
     // Scheduler to be used by AppStore subscription check code.
     // NOTE: RACScheduler objects are all serial schedulers and cheap to create.
     //       The underlying implementation creates a GCD dispatch queues.
-    RACScheduler *subscriptionScheduler;
+    RACScheduler *_Nullable subscriptionScheduler;
 
     // An infinite signal that emits Psiphon tunnel connection state.
     // When subscribed, replays the last known connection state.
     // @scheduler Events are delivered on some background system thread.
-    RACReplaySubject<NSNumber *> *tunnelConnectionStateSubject;
+    RACReplaySubject<NSNumber *> *_Nullable tunnelConnectionStateSubject;
 
     // An infinite signal that emits @(SubscriptionAuthorizationStatusRejected) if the subscription authorization
     // was invalid, and @(SubscriptionAuthorizationStatusActiveOrEmpty) if it was valid (or non-existent).
     // When subscribed, replays the last item this subject was sent by onActiveAuthorizationIDs callback.
-    RACReplaySubject<NSNumber *> *subscriptionAuthorizationActiveSubject;
+    RACReplaySubject<NSNumber *> *_Nullable subscriptionAuthorizationActiveSubject;
 
-    RACDisposable *subscriptionDisposable;
+    RACDisposable *_Nullable subscriptionDisposable;
 
-    AppProfiler *appProfiler;
+    AppProfiler *_Nullable appProfiler;
 }
 
 - (id)init {
@@ -154,7 +147,9 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
         _tunnelProviderState = TunnelProviderStateInit;
         _subscriptionCheckState = nil;
         _waitForContainerStartVPNCommand = FALSE;
-        _gracePeriodState = GracePeriodStateInactive;
+        _suppliedContainerAuthorizationIDs = [NSSet set];
+
+        _postedNetworkConnectivityFailed = FALSE;
     }
     return self;
 }
@@ -223,31 +218,12 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
     __weak PacketTunnelProvider *weakSelf = self;
 
     void (^handleExpiredSubscription)(void) = ^{
-
         PSIAssert([weakSelf.subscriptionCheckState isInProgress]);
+        [PsiFeedbackLogger infoWithType:SubscriptionCheckLogType message:@"authorization expired restarting tunnel"];
 
-        if (weakSelf.extensionStartMethod == ExtensionStartMethodFromContainer) {
-
-            [PsiFeedbackLogger infoWithType:SubscriptionCheckLogType message:@"authorization expired restarting tunnel"];
-
-            // Restarts the tunnel to re-connect with the correct sponsor ID.
-            [weakSelf.subscriptionCheckState setStateNotSubscribed];
-            [weakSelf reconnectWithConfig:weakSelf.cachedSponsorIDs.defaultSponsorId];
-
-        } else {
-
-            // subscriptionCheckState should not be changed from inProgress, until the grace period expires
-            // and another subscription check happens.
-
-            if (self.gracePeriodState == GracePeriodStateDone) {
-                [PsiFeedbackLogger infoWithType:SubscriptionCheckLogType message:@"grace period finished killing extension"];
-
-                [self killExtensionForExpiredSubscription];
-            } else {
-                [PsiFeedbackLogger infoWithType:SubscriptionCheckLogType message:@"authorization expired starting grace period"];
-                [self startGracePeriod];
-            }
-        }
+        // Restarts the tunnel to re-connect with the correct sponsor ID.
+        [weakSelf.subscriptionCheckState setStateNotSubscribed];
+        [weakSelf reconnectWithConfig:weakSelf.cachedSponsorIDs.defaultSponsorId];
     };
 
     // tunnelConnectedSignal is an infinite signal that emits an item whenever Psiphon tunnel is connected.
@@ -391,7 +367,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 
               switch (result.error.code) {
                   case SubscriptionResultErrorInvalidReceipt:
-                      [weakSelf killExtensionForInvalidReceipt];
+                      [weakSelf exitForInvalidReceipt];
                       break;
 
                   case SubscriptionResultErrorExpired:
@@ -439,25 +415,16 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
               if (requestDate) {
                   if ([subscription hasActiveAuthorizationForDate:requestDate]
                     && ![subscription hasActiveAuthorizationForDate:[NSDate date]]) {
-                      [self killExtensionForBadClock];
+                      [self exitForBadClock];
                       return;
                   }
               }
 
               if (subscription.authorization) {
-
                   // New authorization was received from the subscription verifier server.
                   // Restarts the tunnel to connect with the new authorization only if it is different from
                   // the authorization in use by the tunnel.
                   if (![subscription.authorization.ID isEqualToString:currentActiveAuthorization]) {
-
-                      if (self.gracePeriodState == GracePeriodStateDone) {
-                          // Grace period has finished, and subscription check finished successfully
-                          // with a new authorization.
-                          // Resets grace period state.
-                          self.gracePeriodState = GracePeriodStateInactive;
-                      }
-
                       [weakSelf.subscriptionCheckState setStateSubscribed];
                       [weakSelf reconnectWithConfig:weakSelf.cachedSponsorIDs.subscriptionSponsorId];
                   }
@@ -494,18 +461,36 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
       }];
 }
 
+// For debug builds starts or stops app profiler based on `sharedDB` state.
+// For prod builds only starts app profiler.
+- (void)updateAppProfiling {
+#if DEBUG
+    BOOL start = self.sharedDB.getDebugMemoryProfiler;
+#else
+    BOOL start = TRUE;
+#endif
+
+    if (!appProfiler && start) {
+        appProfiler = [[AppProfiler alloc] init];
+        [appProfiler startProfilingWithStartInterval:1
+                                          forNumLogs:10
+                         andThenExponentialBackoffTo:60*30
+                            withNumLogsAtEachBackOff:1];
+
+    } else if (!start) {
+        [appProfiler stopProfiling];
+    }
+}
+
 // VPN should only start if it is started from the container app directly,
 // OR if the user possibly has a valid subscription
 // OR if the extension is started after boot but before being unlocked.
 - (void)startTunnelWithErrorHandler:(void (^_Nonnull)(NSError *_Nonnull error))errorHandler {
 
-    // Start app profiling
-    if (!appProfiler) {
-        appProfiler = [[AppProfiler alloc] init];
-        [appProfiler startProfilingWithStartInterval:1 forNumLogs:10 andThenExponentialBackoffTo:60*30 withNumLogsAtEachBackOff:1];
-    }
-
     __weak PacketTunnelProvider *weakSelf = self;
+
+    // In prod starts app profiling.
+    [self updateAppProfiling];
 
     [[Notifier sharedInstance] registerObserver:self callbackQueue:dispatch_get_main_queue()];
 
@@ -521,6 +506,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
                                       @"SubscriptionState": [self.subscriptionCheckState textDescription]}];
 
     if (self.extensionStartMethod == ExtensionStartMethodFromContainer
+        || self.extensionStartMethod == ExtensionStartMethodFromCrash
         || [self.subscriptionCheckState isSubscribedOrInProgress]) {
 
         if (self.extensionStartMethod == ExtensionStartMethodFromContainer) {
@@ -582,7 +568,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 
     // Cleanup.
     [subscriptionDisposable dispose];
-    
+
     [self.psiphonTunnel stop];
 }
 
@@ -593,7 +579,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
     });
 }
 
-- (void)displayMessageAndKillExtension:(NSString *)message {
+- (void)displayMessageAndExitGracefully:(NSString *)message {
 
     // If failed to display, retry in 60 seconds.
     const int64_t retryInterval = 60;
@@ -628,12 +614,20 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 
 #pragma mark - Query methods
 
-- (BOOL)isNEZombie {
-    return self.tunnelProviderState == TunnelProviderStateZombie;
+- (NSNumber *)isNEZombie {
+    return @(self.tunnelProviderState == TunnelProviderStateZombie);
 }
 
-- (BOOL)isTunnelConnected {
-    return [self.psiphonTunnel getConnectionState] == PsiphonConnectionStateConnected;
+- (NSNumber *)isTunnelConnected {
+    return @([self.psiphonTunnel getConnectionState] == PsiphonConnectionStateConnected);
+}
+
+- (NSNumber *)isNetworkReachable {
+    NetworkStatus status;
+    if ([self.psiphonTunnel getNetworkReachabilityStatus:&status]) {
+        return @(status != NotReachable);
+    }
+    return nil;
 }
 
 #pragma mark - Notifier callback
@@ -675,6 +669,36 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
         }
 
     }
+
+#if DEBUG
+
+    if ([NotifierDebugForceJetsam isEqualToString:message]) {
+        [DebugUtils jetsamWithAllocationInterval:1 withNumberOfPages:15];
+
+    } else if ([NotifierDebugGoProfile isEqualToString:message]) {
+
+        NSError *e = [FileUtils createDir:self.sharedDB.goProfileDirectory];
+        if (e != nil) {
+            [PsiFeedbackLogger errorWithType:ExtensionNotificationLogType
+                                     message:@"FailedToCreateProfileDir"
+                                      object:e];
+            return;
+        }
+
+        [self.psiphonTunnel writeRuntimeProfilesTo:self.sharedDB.goProfileDirectory.path
+                      withCPUSampleDurationSeconds:0
+                    withBlockSampleDurationSeconds:0];
+
+        [self displayMessage:@"DEBUG: Finished writing runtime profiles."];
+
+    } else if ([NotifierDebugMemoryProfiler isEqualToString:message]) {
+        [self updateAppProfiling];
+
+    } else if ([NotifierDebugCustomFunction isEqualToString:message]) {
+        // Custom function.
+    }
+
+#endif
 
 }
 
@@ -853,7 +877,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
     const int64_t intervalSec = 60; // Every minute.
 
     [self displayMessage:
-        NSLocalizedStringWithDefaultValue(@"CANNOT_START_TUNNEL_DUE_TO_SUBSCRIPTION", nil, [NSBundle mainBundle], @"Your Psiphon subscription has expired.\nSince you're not a subscriber or your subscription has expired, Psiphon can only be started from the Psiphon app.\n\nPlease open the Psiphon app.", @"Alert message informing user that their subscription has expired or that they're not a subscriber, therefore Psiphon can only be started from the Psiphon app. DO NOT translate 'Psiphon'.")
+        NSLocalizedStringWithDefaultValue(@"CANNOT_START_TUNNEL_DUE_TO_SUBSCRIPTION", nil, [NSBundle mainBundle], @"You don't have an active subscription.\nSince you're not a subscriber or your subscription has expired, Psiphon can only be started from the Psiphon app.\n\nPlease open the Psiphon app to start.", @"Alert message informing user that their subscription has expired or that they're not a subscriber, therefore Psiphon can only be started from the Psiphon app. DO NOT translate 'Psiphon'.")
        completionHandler:^(BOOL success) {
            // If the user dismisses the message, show the alert again in intervalSec seconds.
            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, intervalSec * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
@@ -862,54 +886,16 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
        }];
 }
 
-- (void)startGracePeriod {
-
-    if (self.gracePeriodState != GracePeriodStateInactive) {
-        return;
-    }
-
-    self.gracePeriodState = GracePeriodStateActive;
-
-#if DEBUG
-    int64_t gracePeriodSec = 2 * 60; // 2 minutes.
-#else
-    int64_t gracePeriodSec = 1 * 60 * 60;  // 1 hour.
-#endif
-    __weak PacketTunnelProvider *weakSelf = self;
-
-    // User doesn't have an active subscription. Notify them, after making sure they've checked
-    // the notification we will start an hour of extra grace period.
-    // NOTE: Waits for the user to acknowledge the message before starting the extra grace period.
-    [self displayMessage:NSLocalizedStringWithDefaultValue(@"SUBSCRIPTION_EXPIRED_WILL_KILL_TUNNEL", nil, [NSBundle mainBundle], @"Your Psiphon subscription has expired. Psiphon will stop automatically in an hour if subscription is not renewed. Open the Psiphon app to review your subscription to continue using premium features.", @"Alert message informing user that their subscription has expired, and that Psiphon will stop in an hour if subscription is not renewed. Do not translate 'Psiphon'.")
-       completionHandler:^(BOOL success) {
-
-           if (!success) {
-               [PsiFeedbackLogger error:@"iOS was unable to display subscription grace period starting message"];
-               return;
-           }
-
-           dispatch_after(dispatch_walltime(NULL, gracePeriodSec * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
-               weakSelf.gracePeriodState = GracePeriodStateDone;
-               [self scheduleSubscriptionCheckWithRemoteCheckForced:FALSE];
-           });
-       }];
-}
-
-- (void)killExtensionForExpiredSubscription {
-    NSString *message = NSLocalizedStringWithDefaultValue(@"TUNNEL_KILLED", nil, [NSBundle mainBundle], @"Psiphon has been stopped automatically since your subscription has expired.", @"Alert message informing user that Psiphon has been stopped automatically since the subscription has expired. Do not translate 'Psiphon'.");
-    [self displayMessageAndKillExtension:message];
-}
-
-- (void)killExtensionForBadClock {
+- (void)exitForBadClock {
     [PsiFeedbackLogger errorWithType:ExitReasonLogType message:@"bad clock"];
     NSString *message = NSLocalizedStringWithDefaultValue(@"BAD_CLOCK_ALERT_MESSAGE", nil, [NSBundle mainBundle], @"We've detected the time on your device is out of sync with your time zone. Please update your clock settings and restart the app", @"Alert message informing user that the device clock needs to be updated with current time");
-    [self displayMessageAndKillExtension:message];
+    [self displayMessageAndExitGracefully:message];
 }
 
-- (void)killExtensionForInvalidReceipt {
+- (void)exitForInvalidReceipt {
     [PsiFeedbackLogger errorWithType:ExitReasonLogType message:@"invalid subscription receipt"];
     NSString *message = NSLocalizedStringWithDefaultValue(@"BAD_RECEIPT_ALERT_MESSAGE", nil, [NSBundle mainBundle], @"Your subscription receipt can not be verified, please refresh it and try again.", @"Alert message informing user that subscription receipt can not be verified");
-    [self displayMessageAndKillExtension:message];
+    [self displayMessageAndExitGracefully:message];
 }
 
 - (void)displayCorruptSettingsFileMessage {
@@ -980,17 +966,27 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
     // Do not block PsiphonTunnel callback queue.
     // Note: ReactiveObjC subjects block until all subscribers have received to the events,
     //       and also ReactiveObjC `subscribeOn` operator does not behave similar to RxJava counterpart for example.
+    PacketTunnelProvider *__weak weakSelf = self;
+
     dispatch_async_global(^{
-        [self->tunnelConnectionStateSubject sendNext:@(newState)];
+        PacketTunnelProvider *__strong strongSelf = self;
+        if (strongSelf) {
+            [strongSelf->tunnelConnectionStateSubject sendNext:@(newState)];
+        }
     });
+
+#if DEBUG
+    dispatch_async_global(^{
+        NSString *stateStr = [PacketTunnelUtils textPsiphonConnectionState:newState];
+        [weakSelf.sharedDB setDebugPsiphonConnectionState:stateStr];
+        [[Notifier sharedInstance] post:NotifierDebugPsiphonTunnelState];
+    });
+#endif
+
 }
 
 - (void)onConnecting {
     self.reasserting = TRUE;
-}
-
-- (void)onStartedWaitingForNetworkConnectivity {
-    [[Notifier sharedInstance] post:NotifierWaitingForNetworkConnectivity];
 }
 
 - (void)onActiveAuthorizationIDs:(NSArray * _Nonnull)authorizationIds {
@@ -1066,7 +1062,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
             if (serverTimestamp != nil) {
                 if (![subscription hasActiveAuthorizationForDate:serverTimestamp]) {
                     // User is possibly cheating, terminate extension due to 'Bad Clock'.
-                    [self killExtensionForBadClock];
+                    [self exitForBadClock];
                 }
             }
         }
@@ -1074,7 +1070,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 }
 
 - (void)onAvailableEgressRegions:(NSArray *)regions {
-    [self.sharedDB insertNewEgressRegions:regions];
+    [self.sharedDB setEmittedEgressRegions:regions];
 
     [[Notifier sharedInstance] post:NotifierAvailableEgressRegions];
 
@@ -1084,11 +1080,20 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
     if (selectedRegion && ![selectedRegion isEqualToString:kPsiphonRegionBestPerformance] && ![regions containsObject:selectedRegion]) {
         [[PsiphonConfigUserDefaults sharedInstance] setEgressRegion:kPsiphonRegionBestPerformance];
 
-        [self displayMessageAndKillExtension:NSLocalizedStringWithDefaultValue(@"VPN_START_FAIL_REGION_INVALID_MESSAGE", nil, [NSBundle mainBundle], @"The region you selected is no longer available. You must choose a new region or change to the default \"Best performance\" choice.", @"Alert dialog message informing the user that an error occurred while starting Psiphon because they selected an egress region that is no longer available (Do not translate 'Psiphon'). The user should select a different region and try again. Note: the backslash before each quotation mark should be left as is for formatting.")];
+        [self displayMessageAndExitGracefully:NSLocalizedStringWithDefaultValue(@"VPN_START_FAIL_REGION_INVALID_MESSAGE", nil, [NSBundle mainBundle], @"The region you selected is no longer available. You must choose a new region or change to the default \"Best performance\" choice.", @"Alert dialog message informing the user that an error occurred while starting Psiphon because they selected an egress region that is no longer available (Do not translate 'Psiphon'). The user should select a different region and try again. Note: the backslash before each quotation mark should be left as is for formatting.")];
     }
 }
 
 - (void)onInternetReachabilityChanged:(Reachability* _Nonnull)reachability {
+    NetworkStatus s = [reachability currentReachabilityStatus];
+    if (s == NotReachable) {
+        self.postedNetworkConnectivityFailed = TRUE;
+        [[Notifier sharedInstance] post:NotifierNetworkConnectivityFailed];
+
+    } else if (self.postedNetworkConnectivityFailed) {
+        self.postedNetworkConnectivityFailed = FALSE;
+        [[Notifier sharedInstance] post:NotifierNetworkConnectivityResolved];
+    }
     NSString *strReachabilityFlags = [reachability currentReachabilityFlagsToString];
     LOG_DEBUG(@"onInternetReachabilityChanged: %@", strReachabilityFlags);
 }

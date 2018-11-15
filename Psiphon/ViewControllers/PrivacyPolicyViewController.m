@@ -23,7 +23,9 @@
 #import "PsiFeedbackLogger.h"
 #import "SwoopView.h"
 
-NSNotificationName const PrivacyPolicyAcceptedNotification = @"PrivacyPoicyAcceptedNotification";
+NSNotificationName const PrivacyPolicyDismissedNotification = @"PrivacyPolicyDismissedNotification";
+NotificationUserInfoKey const PrivacyPolicyAcceptedNotificationBoolKey =
+    @"PrivacyPolicyAcceptedNotificationBoolKey";
 
 NSErrorDomain _Nonnull const PrivacyPolicyErrorDomain = @"PrivacyPolicyErrorDomain";
 
@@ -364,11 +366,18 @@ typedef NS_ERROR_ENUM(PrivacyPolicyErrorDomain, PrivacyPolicyLinkGenerationError
 # pragma mark - UI Callbacks
 
 - (void)onGetStartedTap {
-    [[NSNotificationCenter defaultCenter] postNotificationName:PrivacyPolicyAcceptedNotification object:nil];
+    [[NSNotificationCenter defaultCenter] postNotificationName:PrivacyPolicyDismissedNotification
+                                                        object:nil
+                                      userInfo:@{PrivacyPolicyAcceptedNotificationBoolKey : @TRUE}];
+
     [self dismissViewControllerAnimated:TRUE completion:nil];
 }
 
 - (void)onCancelTap {
+    [[NSNotificationCenter defaultCenter] postNotificationName:PrivacyPolicyDismissedNotification
+                                                        object:nil
+                                     userInfo:@{PrivacyPolicyAcceptedNotificationBoolKey : @FALSE}];
+
     [self dismissViewControllerAnimated:TRUE completion:nil];
 }
 

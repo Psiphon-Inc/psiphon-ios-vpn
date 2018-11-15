@@ -21,6 +21,7 @@
 #import <ReactiveObjC/RACTuple.h>
 #import <NetworkExtension/NetworkExtension.h>
 #import <ReactiveObjC/RACScheduler.h>
+#import <stdatomic.h>
 #import "AppDelegate.h"
 #import "AdManager.h"
 #import "AppInfo.h"
@@ -66,6 +67,9 @@
 // landing page notification is received from the extension.
 #define kPsiCashAuthPackageWithEarnerTokenTimeoutSecs 3.0
 
+/** Number of seconds to wait before checking reachability status after receiving
+ * NotifierNetworkConnectivityFailed from the extension */
+NSTimeInterval const InternetReachabilityCheckTimeout = 10.0;
 
 PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
 
@@ -84,6 +88,9 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
 @property (nonatomic) PsiphonDataSharedDB *sharedDB;
 @property (nonatomic) NSTimer *subscriptionCheckTimer;
 
+// Private state subjects
+@property (nonatomic) RACSubject<RACUnit *> *checkExtensionNetworkConnectivityFailedSubject;
+
 @end
 
 @implementation AppDelegate {
@@ -100,6 +107,8 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
         _sharedDB = [[PsiphonDataSharedDB alloc] initForAppGroupIdentifier:APP_GROUP_IDENTIFIER];
         _shownLandingPageForCurrentSession = FALSE;
         _compoundDisposable = [RACCompoundDisposable compoundDisposable];
+
+        _checkExtensionNetworkConnectivityFailedSubject = [RACSubject subject];
     }
     return self;
 }
@@ -176,11 +185,6 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
                                                  name:IAPHelperUpdatedSubscriptionDictionaryNotification
                                                object:nil];
 
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(onSubscriptionTransactionUpdate:)
-                                                 name:IAPHelperPaymentTransactionUpdateNotification
-                                               object:nil];
-
     // Immediately register to receive notifications from the Network Extension process.
     [[Notifier sharedInstance] registerObserver:self callbackQueue:dispatch_get_main_queue()];
 
@@ -239,6 +243,9 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
     // Start PsiCash lifecycle
     [[PsiCashClient sharedInstance] scheduleRefreshState];
 
+    // Observe internet reachability status.
+    [self.compoundDisposable addDisposable:[self observeNetworkExtensionReachabilityStatus]];
+
     return YES;
 }
 
@@ -262,7 +269,11 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
     [self subscriptionExpiryTimer];
 
     // Before submitting any other work to the VPNManager, update its status.
-    [self.vpnManager checkOrFixVPNStatus];
+    [[self.vpnManager checkOrFixVPN] subscribeNext:^(NSNumber *extensionProcessRunning) {
+        if ([extensionProcessRunning boolValue]) {
+            [weakSelf.checkExtensionNetworkConnectivityFailedSubject sendNext:RACUnit.defaultUnit];
+        }
+    }];
 
     // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
     [self.sharedDB updateAppForegroundState:YES];
@@ -272,7 +283,7 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
     __block RACDisposable *connectedDisposable = [[[RACSignal
       zip:@[
         [[AdManager sharedInstance].adIsShowing take:1],
-        [self.vpnManager isPsiphonTunnelConnected],
+        [self.vpnManager queryIsPsiphonTunnelConnected],
         [self.vpnManager.lastTunnelStatus take:1],
       ]]
       flattenMap:^RACSignal<RACUnit *> *(RACTuple *tuple) {
@@ -430,7 +441,7 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
             // for the tunnel status to become "Connected" before opening the landing page).
             // Landing page should not be opened outside of the tunnel.
             //
-            __block RACDisposable *disposable = [[[[[[[[weakSelf.vpnManager isExtensionZombie]
+            __block RACDisposable *disposable = [[[[[[[[weakSelf.vpnManager queryIsExtensionZombie]
               combineLatestWith:self.vpnManager.lastTunnelStatus]
               filter:^BOOL(RACTwoTuple<NSNumber *, NSNumber *> *tuple) {
 
@@ -516,33 +527,8 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
     } else if ([NotifierMarkedAuthorizations isEqualToString:message]) {
         [[PsiCashClient sharedInstance] authorizationsMarkedExpired];
 
-    } else if ([NotifierWaitingForNetworkConnectivity isEqualToString:message]) {
-
-        // To ensure that we don't show the notification for a condition that no longer exists, we need
-        // to double-check the VPN status.
-        //
-        // And due to the race condition present between when this notification is received from the extension
-        // and when the tunnel status changes, the signal below waits for maximum of 1 second for tunnel status
-        // to be in one of the expected connecting or reasserting states.
-        __block RACDisposable *disposable = [[[[[self.vpnManager lastTunnelStatus] filter:^BOOL(NSNumber *value) {
-
-            // If the VPN state is not connecting or reconnecting, then we should not show the no internet alert.
-            VPNStatus s = (VPNStatus) [value integerValue];
-            return (s == VPNStatusConnecting || s == VPNStatusReasserting);
-          }]
-          take:1]
-          timeout:1.0 onScheduler:RACScheduler.mainThreadScheduler]
-          subscribeNext:^(NSNumber *x) {
-              [weakSelf displayAlertNoInternet];
-          }
-          error:^(NSError *error) {
-              [weakSelf.compoundDisposable removeDisposable:disposable];
-          }
-          completed:^{
-              [weakSelf.compoundDisposable removeDisposable:disposable];
-          }];
-
-        [self.compoundDisposable addDisposable:disposable];
+    } else if ([NotifierNetworkConnectivityFailed isEqualToString:message]) {
+        [self.checkExtensionNetworkConnectivityFailedSubject sendNext:RACUnit.defaultUnit];
     }
 }
 
@@ -573,26 +559,8 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
             }
         }
     } else {
-        // Instead of subscribing to the notification in this class, calls the handler directly.
-        [weakSelf onSubscriptionExpired];
+        [self.subscriptionStatus sendNext:@(UserSubscriptionInactive)];
     }
-}
-
-- (void)onSubscriptionExpired {
-
-    __weak AppDelegate *weakSelf = self;
-
-    [self.subscriptionStatus sendNext:@(UserSubscriptionInactive)];
-
-    // Disables Connect On Demand setting of the VPN Configuration.
-    __block RACDisposable *disposable = [[self.vpnManager setConnectOnDemandEnabled:FALSE]
-      subscribeError:^(NSError *error) {
-          [weakSelf.compoundDisposable removeDisposable:disposable];
-      } completed:^{
-          [weakSelf.compoundDisposable removeDisposable:disposable];
-      }];
-
-    [self.compoundDisposable addDisposable:disposable];
 }
 
 - (void)onSubscriptionActivated {
@@ -643,7 +611,7 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
 
 #pragma mark - Global alerts
 
-- (void)displayAlertNoInternet {
+- (UIAlertController *)displayAlertNoInternet:(void (^_Nullable)(UIAlertAction *))handler {
 
     UIAlertController *alert = [UIAlertController
       alertControllerWithTitle:NSLocalizedStringWithDefaultValue(@"NO_INTERNET", nil, [NSBundle mainBundle], @"No Internet Connection", @"Alert title informing user there is no internet connection")
@@ -654,59 +622,16 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
       actionWithTitle:NSLocalizedStringWithDefaultValue(@"OK_BUTTON", nil, [NSBundle mainBundle], @"OK", @"Alert OK Button")
                 style:UIAlertActionStyleDefault
               handler:^(UIAlertAction *action) {
-                  // Do nothing.
+                  if (handler) {
+                      handler(action);
+                  }
               }];
 
     [alert addAction:defaultAction];
 
     [alert presentFromTopController];
-}
 
-- (void)onSubscriptionTransactionUpdate:(NSNotification *)notification {
-
-    __weak AppDelegate *weakSelf = self;
-
-    SKPaymentTransactionState transactionState = (SKPaymentTransactionState)
-      [notification.userInfo[IAPHelperPaymentTransactionUpdateKey] integerValue];
-
-    // Enables Connect On Demand for users who bought a subscription.
-    if (SKPaymentTransactionStatePurchased == transactionState ||
-        SKPaymentTransactionStateRestored == transactionState) {
-
-        __block RACDisposable *disposable = [[[[[self.vpnManager.lastTunnelStatus
-          take:1]
-          map:^NSNumber *(NSNumber *value) {
-              // Returns @(TRUE) if the extension is running (we don't care about zombie state).
-              BOOL isActive = [VPNManager mapIsVPNActive:(VPNStatus)[value integerValue]];
-              return [NSNumber numberWithBool:isActive];
-          }]
-          flattenMap:^RACSignal *(NSNumber *isActive) {
-
-              // Enables Connect On Demand if the extension is running and
-              // the user has recently bought an active subscription.
-              if ([isActive boolValue] && [IAPStoreHelper hasActiveSubscriptionForNow]) {
-                  return [weakSelf.vpnManager setConnectOnDemandEnabled:TRUE];
-              }
-
-              return [RACSignal return:nil];
-          }]
-          doNext:^(id x) {
-              // x is either nil or a bool.
-              if (x == nil) {
-                  LOG_DEBUG(@"VPN is not active or the user is not subscribed");
-              } else {
-                  BOOL success = [((NSNumber *) x) boolValue];
-                  LOG_DEBUG(@"VPN is active and Connect On Demand was set: %@", NSStringFromBOOL(success));
-              }
-          }]
-          subscribeError:^(NSError *error) {
-              [weakSelf.compoundDisposable removeDisposable:disposable];
-          } completed:^{
-              [weakSelf.compoundDisposable removeDisposable:disposable];
-          }];
-
-          [self.compoundDisposable addDisposable:disposable];
-    }
+    return alert;
 }
 
 #pragma mark -
@@ -717,6 +642,78 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
         topController = topController.presentedViewController;
     }
     return topController;
+}
+
+#pragma mark - Private helper methods
+
+- (RACDisposable *)observeNetworkExtensionReachabilityStatus {
+    AppDelegate *__weak weakSelf = self;
+
+    __block UIAlertController *noInternetAlert;
+    __block _Atomic BOOL ongoing;
+    atomic_init(&ongoing, FALSE);
+
+    return [[[[self.checkExtensionNetworkConnectivityFailedSubject
+      filter:^BOOL(RACUnit *x) {
+          // Prevent creation of another alert if one is already ongoing.
+          return !atomic_load(&ongoing);
+      }]
+      flattenMap:^RACSignal<NSNumber *> *(RACUnit *x) {
+          atomic_store(&ongoing, TRUE);
+
+          // resolvedSignal is a hot terminating signal that emits @(TRUE) followed
+          // by RACUnit if the extension posts that connectivity has been resolved
+          // or that tunnel status changes to connected.
+          RACSignal *resolvedSignal = [[[[[[Notifier sharedInstance]
+            listenForMessages:@[NotifierNetworkConnectivityResolved]]
+            merge:[weakSelf.vpnManager.lastTunnelStatus filter:^BOOL(NSNumber *v) {
+                // Assumed resolved if VPN is connected, or not running.
+                VPNStatus s = (VPNStatus) [v integerValue];
+                return (s == VPNStatusConnected || s == VPNStatusDisconnected);
+            }]]
+            mapReplace:@(TRUE)]
+            take:1]
+            concat:[RACSignal return:RACUnit.defaultUnit]];
+
+          // timerSignal is a cold terminating signal.
+          RACSignal *timerSignal = [[[RACSignal timer:InternetReachabilityCheckTimeout]
+            doNext:^(id x) {
+                // Reset ongoing flag.
+                atomic_store(&ongoing, FALSE);
+            }]
+            flattenMap:^RACSignal<NSNumber *> *(id x) {
+                // Timer done. We now check extension internet reachability.
+                return [weakSelf.vpnManager queryIsNetworkReachable];
+            }];
+
+          // The returned signal is a hot terminating signal that in effect unsubscribes
+          // from the merged sources once `resolvedSignal` emits RACUnit.
+          return [[[RACSignal merge:@[timerSignal, resolvedSignal]]
+            takeUntilBlock:^BOOL(id emission) {
+                return RACUnit.defaultUnit == emission;
+            }]
+            doCompleted:^{
+                // Reset ongoing flag in case timer was cancelled by the resolvedSignal.
+                atomic_store(&ongoing, FALSE);
+            }];
+      }]
+      deliverOnMainThread]
+      subscribeNext:^(NSNumber *_Nullable networkReachability) {
+          // networkReachability is nil whenever VPNManager `-queryIsNetworkReachable` emits nil.
+
+          if (![networkReachability boolValue]) {
+              if (!noInternetAlert) {
+                  noInternetAlert = [weakSelf displayAlertNoInternet:^(UIAlertAction *action) {
+                      // Alert dismissed by user.
+                      noInternetAlert = nil;
+                  }];
+              }
+          } else {
+              [noInternetAlert dismissViewControllerAnimated:TRUE completion:nil];
+              noInternetAlert = nil;
+          }
+
+      }];
 }
 
 @end
