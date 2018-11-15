@@ -123,6 +123,7 @@
 		A840835FAC7F18A6A7021415 /* RingSkyButton.m in Sources */ = {isa = PBXBuildFile; fileRef = A84086B04CBC1A6A5481EDD4 /* RingSkyButton.m */; };
 		A84083E76E518050B65E523A /* SkyButton.m in Sources */ = {isa = PBXBuildFile; fileRef = A8408672FB2E1CD144A2BE7C /* SkyButton.m */; };
 		A8408424387C3E0CE5694B5A /* PsiCashSpeedBoostMeterView.m in Sources */ = {isa = PBXBuildFile; fileRef = A84083F358BD2CC1440107B8 /* PsiCashSpeedBoostMeterView.m */; };
+		A84086D3F4BD2D551CA67611 /* AlertDialogs.m in Sources */ = {isa = PBXBuildFile; fileRef = A840841151FC43C5E1658677 /* AlertDialogs.m */; };
 		A84087459E9F796B1954D049 /* SubscriptionsBar.m in Sources */ = {isa = PBXBuildFile; fileRef = A84081C4600325A12F9C3413 /* SubscriptionsBar.m */; };
 		A840875B190F7666A1BD98E5 /* UIView+AutoLayoutViewGroup.m in Sources */ = {isa = PBXBuildFile; fileRef = A840867F8062E477F0B355DD /* UIView+AutoLayoutViewGroup.m */; };
 		A840875DDFEA2A535EA0959E /* ArrowView.m in Sources */ = {isa = PBXBuildFile; fileRef = A84086E5D9137E6EFE239656 /* ArrowView.m */; };
@@ -470,6 +471,7 @@
 		A84083119A599C815D2D80F5 /* SkyButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SkyButton.h; sourceTree = "<group>"; };
 		A84083B0CB962827E7C93024 /* PsiCashPurchaseAlertView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PsiCashPurchaseAlertView.m; sourceTree = "<group>"; };
 		A84083F358BD2CC1440107B8 /* PsiCashSpeedBoostMeterView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PsiCashSpeedBoostMeterView.m; sourceTree = "<group>"; };
+		A840841151FC43C5E1658677 /* AlertDialogs.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AlertDialogs.m; sourceTree = "<group>"; };
 		A840845849B24AAA0E714664 /* LoadingCircleLayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LoadingCircleLayer.m; sourceTree = "<group>"; };
 		A840854913F6165FB0B97A6A /* PsiCashSpeedBoostSliderView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PsiCashSpeedBoostSliderView.m; sourceTree = "<group>"; };
 		A840856AD6865619ACF78509 /* PsiphonProgressView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PsiphonProgressView.h; sourceTree = "<group>"; };
@@ -495,6 +497,7 @@
 		A8408B98D73EB239C92FB450 /* ManageSubscriptionsButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ManageSubscriptionsButton.h; sourceTree = "<group>"; };
 		A8408B9A66413A25FC1A2BE1 /* SwoopView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SwoopView.m; sourceTree = "<group>"; };
 		A8408BA05DC0D983E6740558 /* SubscriptionStatusView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SubscriptionStatusView.m; sourceTree = "<group>"; };
+		A8408BAC196A108FFE3A5957 /* AlertDialogs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AlertDialogs.h; sourceTree = "<group>"; };
 		A8408C84138113DE79F0DCD0 /* RegionSelectionButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RegionSelectionButton.m; sourceTree = "<group>"; };
 		A8408D462EEE90AA7F2A8AFA /* SwoopView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SwoopView.h; sourceTree = "<group>"; };
 		A8408D96EC06ED36F86C690D /* OnboardingViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OnboardingViewController.m; sourceTree = "<group>"; };
@@ -824,6 +827,8 @@
 				A8408C3BCEFC35B4744B684E /* Views */,
 				A8408D96EC06ED36F86C690D /* OnboardingViewController.m */,
 				A840812E38D27BF4328678E0 /* OnboardingViewController.h */,
+				A840841151FC43C5E1658677 /* AlertDialogs.m */,
+				A8408BAC196A108FFE3A5957 /* AlertDialogs.h */,
 			);
 			path = ViewControllers;
 			sourceTree = "<group>";
@@ -1652,6 +1657,7 @@
 				A84083E76E518050B65E523A /* SkyButton.m in Sources */,
 				A840835FAC7F18A6A7021415 /* RingSkyButton.m in Sources */,
 				A840875DDFEA2A535EA0959E /* ArrowView.m in Sources */,
+				A84086D3F4BD2D551CA67611 /* AlertDialogs.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
