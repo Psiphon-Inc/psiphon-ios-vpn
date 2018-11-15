@@ -29,6 +29,11 @@ NS_ASSUME_NONNULL_BEGIN
  */
 + (UIAlertController *)vpnPermissionDeniedAlert;
 
+/**
+ * Generic alert for when an operation fails and the user is asked to the operation try again.
+ */
++ (UIAlertController *)genericOperationFailedTryAgain;
+
 @end
 
 NS_ASSUME_NONNULL_END
