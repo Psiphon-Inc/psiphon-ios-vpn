@@ -62,7 +62,6 @@
     normalTitle = title;
     disabledTitle = title;
     _titleLabel.text = title;
-    LOG_DEBUG(@"*** text: %@", _titleLabel.text);
 }
 
 - (void)setTitle:(NSString *)title forState:(UIControlState)controlState {
