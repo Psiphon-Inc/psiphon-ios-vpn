@@ -34,12 +34,6 @@
 /* Main text in the 'Upstream Proxy Error' dialog box. This is shown when the user has directly altered these settings, and those settings are (probably) erroneous. DO NOT translate 'Psiphon'. */
 "CHECK_UPSTREAM_PROXY_SETTING" = "អ្នកបានកំណត់ Psiphon ដើម្បីប្រើជា ប្រូហ្ស៊ី​ខាងលើ។\nទោះយ៉ាងណា, យើងហាក់ដូចជាមិនអាចតភ្ជាប់ទៅកាន់ម៉ាស៊ីនមេ Psiphon តាមរយៈ​ប្រូហ្ស៊ី​នោះទេ។\nសូមកែសំរួលការកំណត់ និងសាកល្បងម្តងទៀត។";
 
-/* Alert dialog body informing the user that the 'Auto-start VPN on demand' feature will be disabled and that the VPN cannot be stopped. */
-"CONNECT_ON_DEMAND_ALERT_BODY" = "\"VPN ចាប់ផ្តើមស្វ័យប្រវត្តិ\" នឹងត្រូវ​បានបិទចោល​ជាបណ្តោះអាសន្នរហូតដល់ពេលដែល Psiphon VPN ត្រូវបានចាប់ផ្តើម។";
-
-/* Alert dialog title informing user that 'Auto-start VPN' feature is enabled */
-"CONNECT_ON_DEMAND_ALERT_TITLE" = "VPN ដំណើរការស្វ័យប្រត្តិ បានបើក";
-
 /* Text above change region button that allows user to select their desired server region */
 "CONNECT_VIA" = "តភ្ជាប់តាម";
 
@@ -84,8 +78,7 @@
 "NO_PRODUCTS_TEXT" = "មិនអាចទាញយកការតភ្ជាប់ពី App Store។ ទាញដើម្បីបើក និងសាកល្បងម្តងទៀត ពេលក្រោយ។";
 
 /* Alert OK Button
-   OK button on a pop-up alert. The alert will be dismissed when the user presses this button.
-   OK button title */
+   OK button on a pop-up alert. The alert will be dismissed when the user presses this button. */
 "OK_BUTTON" = "យល់ព្រម";
 
 /* Text of button at the bottom right or left (depending on rtl) of the last onboarding screen which allows the user to finish the onboarding sequence. Note: should be all uppercase (capitalized) when possible. */
@@ -263,17 +256,8 @@
 /* Subscriptions item title in the app settings when user does not have an active subscription. Clicking this item opens subscriptions view. If “Premium” doesn't easily translate, please choose a term that conveys “Pro” or “Extra” or “Better” or “Elite”. */
 "SETTINGS_SUBSCRIPTION_NOT_ACTIVE" = "ប្តូរទៅកញ្ចប់ខ្ពស់!";
 
-/* Automatically start VPN On demand settings toggle */
-"SETTINGS_VPN_ON_DEMAND" = "ចាប់ផ្ដើម VPN ដោយស្វ័យប្រវត្តិតាមតម្រូវការ";
-
-/* VPN On demand setting detail text showing when user doesn't have an active subscription and the item is disabled. */
-"SETTINGS_VPN_ON_DEMAND_DETAIL" = "សម្រាប់ការភ្ជាប់ប៉ុណ្ណោះ";
-
 /* Text for button that opens paid subscriptions manager UI. If “Premium” doesn't easily translate, please choose a term that conveys “Pro” or “Extra” or “Better” or “Elite”. */
 "SUBSCRIPTION_BUTTON_TITLE" = "ប្តូរទៅកញ្ចប់ខ្ពស់ឥលូវនេះ!";
-
-/* Alert message informing user that their subscription has expired, and that Psiphon will stop in an hour if subscription is not renewed. Do not translate 'Psiphon'. */
-"SUBSCRIPTION_EXPIRED_WILL_KILL_TUNNEL" = "ការចុះឈ្មោះ Psiphon របស់អ្នកបានផុតកំណត់ហើយ។ Psiphon នឹងបញ្ឈប់ដោយស្វ័យប្រវត្តិក្នុងរយៈពេលមួយម៉ោងប្រសិនបើការជាវមិនត្រូវបានបន្ត។ បើកកម្មវិធី Psiphon ដើម្បីពិនិត្យឡើងវិញនូវការជាវប្រចាំរបស់អ្នកដើម្បីបន្តប្រើប្រាស់លក្ខណពិសេស។";
 
 /* Title of the dialog for available in-app paid subscriptions */
 "SUBSCRIPTIONS" = "ការភ្ជាប់​";
@@ -292,9 +276,6 @@
 
 /* Title of button on subscriptions page which opens Psiphon's terms of use webpage */
 "SUBSCRIPTIONS_TERMS_OF_USE_BUTTON_TEXT" = "លក្ខខណ្ឌនៃការប្រើប្រាស់";
-
-/* Alert message informing user that Psiphon has been stopped automatically since the subscription has expired. Do not translate 'Psiphon'. */
-"TUNNEL_KILLED" = "Psiphon ត្រូវបានបញ្ឈប់ដោយស្វ័យប្រវត្តិចាប់តាំងពីការជាវរបស់អ្នកបានផុតកំណត់ហើយ។";
 
 /* Alert message informing user to turn on their cellular data or wifi to connect to the internet */
 "TURN_ON_DATE" = "បើក អ៊ីនធឺណែតទូរស័ព្ទ ឬប្រើប្រាស់Wi-Fi ដើម្បីតភ្ជាប់។";

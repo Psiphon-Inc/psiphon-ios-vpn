@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, Psiphon Inc.
+ * Copyright (c) 2018, Psiphon Inc.
  * All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,16 +17,13 @@
  *
  */
 
-#import <Foundation/Foundation.h>
-#import <NetworkExtension/NetworkExtension.h>
+#import <UIKit/UIKit.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface PacketTunnelUtils : NSObject
+@interface DebugDirectoryViewerViewController : UIViewController <UITableViewDelegate, UITableViewDataSource>
 
-+ (NSString *)textStopReason:(NEProviderStopReason)stopReason;
-
-+ (NSString *)textPsiphonConnectionState:(PsiphonConnectionState)state;
++ (instancetype)createAndLoadDirectory:(NSURL *)directory withTitle:(NSString *)title;
 
 @end
 

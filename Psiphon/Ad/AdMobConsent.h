@@ -20,6 +20,8 @@
 #import <Foundation/Foundation.h>
 #import <PersonalizedAdConsent/PersonalizedAdConsent.h>
 
+@class GADRequest;
+
 NS_ASSUME_NONNULL_BEGIN
 
 @interface AdMobConsent : NSObject
@@ -32,7 +34,25 @@ NS_ASSUME_NONNULL_BEGIN
  * completion is called with the underlying error passed in.
  */
 + (void)collectConsentForPublisherID:(NSString *)publisherID
-               withCompletionHandler:(void (^_Nonnull)(NSError *_Nullable error, PACConsentStatus s))completion;
+   withCompletionHandler:(void (^_Nonnull)(NSError *_Nullable error, PACConsentStatus s))completion;
+
+/**
+ * Resets AdMob-managed user consent status to unknown.
+ */
++ (void)resetConsent;
+
+/**
+ * Returns "1" if the consent is PACConsentStatusNonPersonalized, and "0" otherwise.
+ * @param consent User's consent status value.
+ * @return "1" or "0".
+ */
++ (NSString *)NPAStringforConsentStatus:(PACConsentStatus)consent;
+
+/**
+ * Creates and returns a new default instance of GADRequest with NPA value set to user
+ * provided consent status.
+ */
++ (GADRequest *)createGADRequestWithUserConsentStatus;
 
 @end
 

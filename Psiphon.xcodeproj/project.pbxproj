@@ -67,12 +67,21 @@
 		4EB846422151830600687344 /* AvailableServerRegions.m in Sources */ = {isa = PBXBuildFile; fileRef = 4EB846412151830600687344 /* AvailableServerRegions.m */; };
 		4EC5526320AB8DBE000B4BEA /* Pastel.m in Sources */ = {isa = PBXBuildFile; fileRef = 4EC5526220AB8DBE000B4BEA /* Pastel.m */; };
 		4EC5526620AB8DCD000B4BEA /* PastelView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4EC5526520AB8DCD000B4BEA /* PastelView.m */; };
-		4EC7CAD020E185580038B4E1 /* AppProfiler.m in Sources */ = {isa = PBXBuildFile; fileRef = 4EC7CACF20E185580038B4E1 /* AppProfiler.m */; };
 		4EEB2F0520644BD5006E80EF /* PsiCashClientModelStagingArea.m in Sources */ = {isa = PBXBuildFile; fileRef = 4EEB2F0420644BD5006E80EF /* PsiCashClientModelStagingArea.m */; };
 		4EF6D9CB20A8C7FE00AE9D44 /* PsiCashOnboardingInfoViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4EF6D9C720A8C7FE00AE9D44 /* PsiCashOnboardingInfoViewController.m */; };
 		4EF6D9CC20A8C7FE00AE9D44 /* PsiCashOnboardingViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4EF6D9C920A8C7FE00AE9D44 /* PsiCashOnboardingViewController.m */; };
 		4EFAAF2E2034CDC800EC0536 /* PsiCashClient.m in Sources */ = {isa = PBXBuildFile; fileRef = 4EFAAF282034CDC800EC0536 /* PsiCashClient.m */; };
-		4EFDFD7420DD829800A687FD /* AppStats.m in Sources */ = {isa = PBXBuildFile; fileRef = 4EFDFD7320DD829800A687FD /* AppStats.m */; };
+		521FD0EF219E0D5600F748EC /* DebugDirectoryViewerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 521FD0E5219E0D5500F748EC /* DebugDirectoryViewerViewController.m */; };
+		521FD0F0219E0D5600F748EC /* DebugLogViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 521FD0E6219E0D5500F748EC /* DebugLogViewController.m */; };
+		521FD0F1219E0D5600F748EC /* DebugToolboxViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 521FD0E7219E0D5600F748EC /* DebugToolboxViewController.m */; };
+		521FD0F2219E0D5600F748EC /* DebugViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 521FD0EA219E0D5600F748EC /* DebugViewController.m */; };
+		521FD0F3219E0D5600F748EC /* DebugTextViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 521FD0EC219E0D5600F748EC /* DebugTextViewController.m */; };
+		521FD0F9219E0DDF00F748EC /* AppStats.m in Sources */ = {isa = PBXBuildFile; fileRef = 521FD0F6219E0DDF00F748EC /* AppStats.m */; };
+		521FD0FA219E0DDF00F748EC /* AppProfiler.m in Sources */ = {isa = PBXBuildFile; fileRef = 521FD0F8219E0DDF00F748EC /* AppProfiler.m */; };
+		521FD0FD219E0E0F00F748EC /* DebugUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 521FD0FB219E0E0E00F748EC /* DebugUtils.m */; };
+		521FD0FE219E0E1900F748EC /* AppProfiler.m in Sources */ = {isa = PBXBuildFile; fileRef = 521FD0F8219E0DDF00F748EC /* AppProfiler.m */; };
+		521FD0FF219E0E2600F748EC /* AppStats.m in Sources */ = {isa = PBXBuildFile; fileRef = 521FD0F6219E0DDF00F748EC /* AppStats.m */; };
+		521FD100219E0E3800F748EC /* DebugUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 521FD0FB219E0E0E00F748EC /* DebugUtils.m */; };
 		522C2062219CAE8500AB7543 /* UIViewController+Additions.m in Sources */ = {isa = PBXBuildFile; fileRef = 522C2060219CAE8500AB7543 /* UIViewController+Additions.m */; };
 		66094F7A1E8067520069EC4E /* PsiphonTunnel.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 66094F781E8067520069EC4E /* PsiphonTunnel.framework */; };
 		6615A5EA1F58A95500026C98 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 6615A5E81F58A95500026C98 /* Localizable.strings */; };
@@ -177,7 +186,6 @@
 		EFC2F5C720226782007B52F9 /* UIAlertController+Delegate.m in Sources */ = {isa = PBXBuildFile; fileRef = EFC2F5C020226782007B52F9 /* UIAlertController+Delegate.m */; };
 		EFC2F5CB202267B1007B52F9 /* PsiphonConfigReader.m in Sources */ = {isa = PBXBuildFile; fileRef = EFC2F5CA202267B0007B52F9 /* PsiphonConfigReader.m */; };
 		EFC2F5CC20226835007B52F9 /* PsiphonConfigReader.m in Sources */ = {isa = PBXBuildFile; fileRef = EFC2F5CA202267B0007B52F9 /* PsiphonConfigReader.m */; };
-		EFED7EBC1F55C8550078980F /* LogViewControllerFullScreen.m in Sources */ = {isa = PBXBuildFile; fileRef = EFED7EBB1F55C8550078980F /* LogViewControllerFullScreen.m */; };
 		F132D7E01F5739A800AF7F91 /* LaunchScreenViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = F132D7DF1F5739A800AF7F91 /* LaunchScreenViewController.m */; };
 		F136C2951F62E3E1000D3EAB /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = F136C2941F62E3E1000D3EAB /* LaunchScreen.xib */; };
 /* End PBXBuildFile section */
@@ -342,8 +350,6 @@
 		4EC5526220AB8DBE000B4BEA /* Pastel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Pastel.m; sourceTree = "<group>"; };
 		4EC5526420AB8DC7000B4BEA /* PastelView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PastelView.h; sourceTree = "<group>"; };
 		4EC5526520AB8DCD000B4BEA /* PastelView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PastelView.m; sourceTree = "<group>"; };
-		4EC7CACE20E185580038B4E1 /* AppProfiler.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppProfiler.h; sourceTree = "<group>"; };
-		4EC7CACF20E185580038B4E1 /* AppProfiler.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppProfiler.m; sourceTree = "<group>"; };
 		4EC82F8E20C713DF004C2E9F /* hi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = hi; path = Strings/hi.lproj/Localizable.strings; sourceTree = "<group>"; };
 		4EEB2F0320644BD5006E80EF /* PsiCashClientModelStagingArea.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PsiCashClientModelStagingArea.h; sourceTree = "<group>"; };
 		4EEB2F0420644BD5006E80EF /* PsiCashClientModelStagingArea.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PsiCashClientModelStagingArea.m; sourceTree = "<group>"; };
@@ -353,8 +359,24 @@
 		4EF6D9CA20A8C7FE00AE9D44 /* PsiCashOnboardingInfoViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PsiCashOnboardingInfoViewController.h; sourceTree = "<group>"; };
 		4EFAAF242034CDC700EC0536 /* PsiCashClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PsiCashClient.h; path = Psiphon/PsiCash/ClientWrapper/PsiCashClient.h; sourceTree = SOURCE_ROOT; };
 		4EFAAF282034CDC800EC0536 /* PsiCashClient.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PsiCashClient.m; path = Psiphon/PsiCash/ClientWrapper/PsiCashClient.m; sourceTree = SOURCE_ROOT; };
-		4EFDFD7220DD829800A687FD /* AppStats.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppStats.h; sourceTree = "<group>"; };
-		4EFDFD7320DD829800A687FD /* AppStats.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppStats.m; sourceTree = "<group>"; };
+		521FD0E5219E0D5500F748EC /* DebugDirectoryViewerViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DebugDirectoryViewerViewController.m; path = Psiphon/Debug/DebugDirectoryViewerViewController.m; sourceTree = SOURCE_ROOT; };
+		521FD0E6219E0D5500F748EC /* DebugLogViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DebugLogViewController.m; path = Psiphon/Debug/DebugLogViewController.m; sourceTree = SOURCE_ROOT; };
+		521FD0E7219E0D5600F748EC /* DebugToolboxViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DebugToolboxViewController.m; path = Psiphon/Debug/DebugToolboxViewController.m; sourceTree = SOURCE_ROOT; };
+		521FD0E8219E0D5600F748EC /* DebugToolboxViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DebugToolboxViewController.h; path = Psiphon/Debug/DebugToolboxViewController.h; sourceTree = SOURCE_ROOT; };
+		521FD0E9219E0D5600F748EC /* DebugTextViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DebugTextViewController.h; path = Psiphon/Debug/DebugTextViewController.h; sourceTree = SOURCE_ROOT; };
+		521FD0EA219E0D5600F748EC /* DebugViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DebugViewController.m; path = Psiphon/Debug/DebugViewController.m; sourceTree = SOURCE_ROOT; };
+		521FD0EB219E0D5600F748EC /* DebugDirectoryViewerViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DebugDirectoryViewerViewController.h; path = Psiphon/Debug/DebugDirectoryViewerViewController.h; sourceTree = SOURCE_ROOT; };
+		521FD0EC219E0D5600F748EC /* DebugTextViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DebugTextViewController.m; path = Psiphon/Debug/DebugTextViewController.m; sourceTree = SOURCE_ROOT; };
+		521FD0ED219E0D5600F748EC /* DebugViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DebugViewController.h; path = Psiphon/Debug/DebugViewController.h; sourceTree = SOURCE_ROOT; };
+		521FD0EE219E0D5600F748EC /* DebugLogViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DebugLogViewController.h; path = Psiphon/Debug/DebugLogViewController.h; sourceTree = SOURCE_ROOT; };
+		521FD0F5219E0DDF00F748EC /* AppProfiler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppProfiler.h; path = Shared/Profiling/AppProfiler.h; sourceTree = SOURCE_ROOT; };
+		521FD0F6219E0DDF00F748EC /* AppStats.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AppStats.m; path = Shared/Profiling/AppStats.m; sourceTree = SOURCE_ROOT; };
+		521FD0F7219E0DDF00F748EC /* AppStats.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppStats.h; path = Shared/Profiling/AppStats.h; sourceTree = SOURCE_ROOT; };
+		521FD0F8219E0DDF00F748EC /* AppProfiler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AppProfiler.m; path = Shared/Profiling/AppProfiler.m; sourceTree = SOURCE_ROOT; };
+		521FD0FB219E0E0E00F748EC /* DebugUtils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DebugUtils.m; sourceTree = "<group>"; };
+		521FD0FC219E0E0E00F748EC /* DebugUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DebugUtils.h; sourceTree = "<group>"; };
+		521FD101219E0E6300F748EC /* NotificationCenter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NotificationCenter.h; sourceTree = "<group>"; };
+		521FD102219E0E8400F748EC /* Annotations.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Annotations.h; sourceTree = "<group>"; };
 		522C2060219CAE8500AB7543 /* UIViewController+Additions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIViewController+Additions.m"; sourceTree = "<group>"; };
 		522C2061219CAE8500AB7543 /* UIViewController+Additions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIViewController+Additions.h"; sourceTree = "<group>"; };
 		571DC9418AF936E60179F07C /* Pods-Psiphon.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Psiphon.release.xcconfig"; path = "Pods/Target Support Files/Pods-Psiphon/Pods-Psiphon.release.xcconfig"; sourceTree = "<group>"; };
@@ -537,8 +559,6 @@
 		EFC2F5C120226782007B52F9 /* RootContainerController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RootContainerController.h; sourceTree = "<group>"; };
 		EFC2F5C9202267B0007B52F9 /* PsiphonConfigReader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PsiphonConfigReader.h; sourceTree = "<group>"; };
 		EFC2F5CA202267B0007B52F9 /* PsiphonConfigReader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PsiphonConfigReader.m; sourceTree = "<group>"; };
-		EFED7EBA1F55C8550078980F /* LogViewControllerFullScreen.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LogViewControllerFullScreen.h; sourceTree = "<group>"; };
-		EFED7EBB1F55C8550078980F /* LogViewControllerFullScreen.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LogViewControllerFullScreen.m; sourceTree = "<group>"; };
 		F132D7DE1F5739A800AF7F91 /* LaunchScreenViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LaunchScreenViewController.h; sourceTree = "<group>"; };
 		F132D7DF1F5739A800AF7F91 /* LaunchScreenViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LaunchScreenViewController.m; sourceTree = "<group>"; };
 		F136C2941F62E3E1000D3EAB /* LaunchScreen.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = LaunchScreen.xib; sourceTree = "<group>"; };
@@ -676,6 +696,9 @@
 		4E0DCB101F28458100495781 /* Shared */ = {
 			isa = PBXGroup;
 			children = (
+				521FD102219E0E8400F748EC /* Annotations.h */,
+				521FD101219E0E6300F748EC /* NotificationCenter.h */,
+				521FD0F4219E0DC300F748EC /* Profiling */,
 				EF6C1F501F59E46500709554 /* embedded_server_entries */,
 				EF6C1F511F59E46500709554 /* psiphon_config */,
 				EF90D78B204F22C900228A63 /* External */,
@@ -781,17 +804,6 @@
 			name = Pastel;
 			sourceTree = "<group>";
 		};
-		4EC7CACD20E1844F0038B4E1 /* Profiling */ = {
-			isa = PBXGroup;
-			children = (
-				4EFDFD7220DD829800A687FD /* AppStats.h */,
-				4EFDFD7320DD829800A687FD /* AppStats.m */,
-				4EC7CACE20E185580038B4E1 /* AppProfiler.h */,
-				4EC7CACF20E185580038B4E1 /* AppProfiler.m */,
-			);
-			path = Profiling;
-			sourceTree = "<group>";
-		};
 		4ED48C05215056E800B1A9A5 /* ViewControllers */ = {
 			isa = PBXGroup;
 			children = (
@@ -799,8 +811,6 @@
 				522C2060219CAE8500AB7543 /* UIViewController+Additions.m */,
 				F132D7DE1F5739A800AF7F91 /* LaunchScreenViewController.h */,
 				F132D7DF1F5739A800AF7F91 /* LaunchScreenViewController.m */,
-				EFED7EBA1F55C8550078980F /* LogViewControllerFullScreen.h */,
-				EFED7EBB1F55C8550078980F /* LogViewControllerFullScreen.m */,
 				EF652CD41F35224C002AFB48 /* MainViewController.h */,
 				EF652CD51F35224C002AFB48 /* MainViewController.m */,
 				EF2EDD8220AD21B6008B17A3 /* PrivacyPolicyViewController.h */,
@@ -842,6 +852,36 @@
 				4E856D8F20A8C612007861A2 /* Onboarding */,
 			);
 			path = PsiCash;
+			sourceTree = "<group>";
+		};
+		521FD0E4219E0D4500F748EC /* Debug */ = {
+			isa = PBXGroup;
+			children = (
+				521FD0EB219E0D5600F748EC /* DebugDirectoryViewerViewController.h */,
+				521FD0E5219E0D5500F748EC /* DebugDirectoryViewerViewController.m */,
+				521FD0EE219E0D5600F748EC /* DebugLogViewController.h */,
+				521FD0E6219E0D5500F748EC /* DebugLogViewController.m */,
+				521FD0E9219E0D5600F748EC /* DebugTextViewController.h */,
+				521FD0EC219E0D5600F748EC /* DebugTextViewController.m */,
+				521FD0E8219E0D5600F748EC /* DebugToolboxViewController.h */,
+				521FD0E7219E0D5600F748EC /* DebugToolboxViewController.m */,
+				521FD0ED219E0D5600F748EC /* DebugViewController.h */,
+				521FD0EA219E0D5600F748EC /* DebugViewController.m */,
+			);
+			name = Debug;
+			path = "New Group";
+			sourceTree = "<group>";
+		};
+		521FD0F4219E0DC300F748EC /* Profiling */ = {
+			isa = PBXGroup;
+			children = (
+				521FD0F5219E0DDF00F748EC /* AppProfiler.h */,
+				521FD0F8219E0DDF00F748EC /* AppProfiler.m */,
+				521FD0F7219E0DDF00F748EC /* AppStats.h */,
+				521FD0F6219E0DDF00F748EC /* AppStats.m */,
+			);
+			name = Profiling;
+			path = "New Group";
 			sourceTree = "<group>";
 		};
 		668AF9B81E92CB60008CAAAA /* Frameworks */ = {
@@ -953,6 +993,7 @@
 		CE26FC8C1BBDC7B800B83375 /* Psiphon */ = {
 			isa = PBXGroup;
 			children = (
+				521FD0E4219E0D4500F748EC /* Debug */,
 				CE4E9BBF1BBEECF30060FF8B /* Psiphon.entitlements */,
 				CE26FC991BBDC7B800B83375 /* Info.plist */,
 				4E0774951F566ADA0097BC8C /* InAppSettings.bundle */,
@@ -988,7 +1029,6 @@
 				CE4E9BC11BBEECFC0060FF8B /* PsiphonVPN.entitlements */,
 				CE26FCA91BBDC85900B83375 /* Info.plist */,
 				EF743FC11F99546B00AC89A2 /* IAP */,
-				4EC7CACD20E1844F0038B4E1 /* Profiling */,
 				9BFECC3FADE9C8A76A0913DE /* BasePacketTunnelProvider.m */,
 				9BFEC8783D4222F2272E50E7 /* BasePacketTunnelProvider.h */,
 				EF652CD81F352271002AFB48 /* PacketTunnelProvider.h */,
@@ -1041,6 +1081,8 @@
 		EF90D793204F22C900228A63 /* Util */ = {
 			isa = PBXGroup;
 			children = (
+				521FD0FC219E0E0E00F748EC /* DebugUtils.h */,
+				521FD0FB219E0E0E00F748EC /* DebugUtils.m */,
 				EF90D794204F22C900228A63 /* FileUtils.h */,
 				EF90D799204F22C900228A63 /* FileUtils.m */,
 				EF90D795204F22C900228A63 /* NSError+Convenience.h */,
@@ -1498,13 +1540,13 @@
 				4E0DCB1A1F28481E00495781 /* PsiphonDataSharedDB.m in Sources */,
 				4EF6D9CC20A8C7FE00AE9D44 /* PsiCashOnboardingViewController.m in Sources */,
 				4435CC271F70566000F3A809 /* SettingsViewController.m in Sources */,
-				EFED7EBC1F55C8550078980F /* LogViewControllerFullScreen.m in Sources */,
 				EF4F1F3D206055F7006A40A1 /* RACSignal+Operations2.m in Sources */,
 				4E5DCF9720EC11C6009D8D39 /* PsiCashSpeedBoostProduct+PsiCashPurchasePrice.m in Sources */,
 				445F24F020E1A5BA00D004E9 /* xer_encoder.c in Sources */,
 				445F24D520E1A5BA00D004E9 /* constr_TYPE.c in Sources */,
 				445F24E220E1A5BA00D004E9 /* der_encoder.c in Sources */,
 				445F24DC20E1A5BA00D004E9 /* NativeInteger.c in Sources */,
+				521FD0F3219E0D5600F748EC /* DebugTextViewController.m in Sources */,
 				EF90D7A9204F22C900228A63 /* FileUtils.m in Sources */,
 				EF90D7A1204F22C900228A63 /* timestamp_valid.c in Sources */,
 				445F24DF20E1A5BA00D004E9 /* ANY.c in Sources */,
@@ -1553,12 +1595,15 @@
 				4EC5526320AB8DBE000B4BEA /* Pastel.m in Sources */,
 				9BFEC530849525066327C815 /* VPNManager.m in Sources */,
 				445F24F620E1A85D00D004E9 /* UTF8String.c in Sources */,
+				521FD0F0219E0D5600F748EC /* DebugLogViewController.m in Sources */,
+				521FD0F1219E0D5600F748EC /* DebugToolboxViewController.m in Sources */,
 				445F24ED20E1A5BA00D004E9 /* ber_tlv_tag.c in Sources */,
 				9BFEC5C3F8FFF1366FF19D0B /* AsyncOperation.m in Sources */,
 				4E5263B7207290360021FEF5 /* EmbeddedServerEntriesHelpers.c in Sources */,
 				4E10920820F3DA190033114B /* AppInfo.m in Sources */,
 				4E2037A1207592A300B99A05 /* PsiCashTypes.m in Sources */,
 				445F24EE20E1A5BA00D004E9 /* asn_codecs_prim.c in Sources */,
+				521FD0FA219E0DDF00F748EC /* AppProfiler.m in Sources */,
 				445F24E620E1A5BA00D004E9 /* per_opentype.c in Sources */,
 				445F24EC20E1A5BA00D004E9 /* SignedData.c in Sources */,
 				9BFEC2458D1346F537E9089E /* Nullity.m in Sources */,
@@ -1566,7 +1611,9 @@
 				445F24EA20E1A5BA00D004E9 /* per_decoder.c in Sources */,
 				445F24F520E1A85D00D004E9 /* IA5String.c in Sources */,
 				9BFECD2FAA1FCDA88A7D432E /* UIColor+Additions.m in Sources */,
+				521FD0F9219E0DDF00F748EC /* AppStats.m in Sources */,
 				9BFECD174E254989EC97A437 /* IAPHelpViewController.m in Sources */,
+				521FD0F2219E0D5600F748EC /* DebugViewController.m in Sources */,
 				9BFEC9C08697E4701A36A3B3 /* UnionSerialQueue.m in Sources */,
 				445F24EF20E1A5BA00D004E9 /* constraints.c in Sources */,
 				445F24DB20E1A5BA00D004E9 /* ber_decoder.c in Sources */,
@@ -1576,8 +1623,10 @@
 				9BFEC8058885B68B2822E2B8 /* AdManager.m in Sources */,
 				9BFEC3D66910918A0C8954E1 /* AdMobConsent.m in Sources */,
 				9BFECA152514A7739551AA70 /* MoPubConsent.m in Sources */,
+				521FD0EF219E0D5600F748EC /* DebugDirectoryViewerViewController.m in Sources */,
 				9BFECF61970F215F32E76280 /* AdMobInterstitialAdControllerWrapper.m in Sources */,
 				9BFEC459666697D89B09A492 /* AdMobRewardedAdControllerWrapper.m in Sources */,
+				521FD0FD219E0E0F00F748EC /* DebugUtils.m in Sources */,
 				9BFEC8A2F99380655E853F81 /* AdControllerWrapper.m in Sources */,
 				A8408E281270691F61F9C20C /* AppVersionNumberView.m in Sources */,
 				A8408C424E64BF3D70273464 /* ConnectionStatusView.m in Sources */,
@@ -1618,25 +1667,26 @@
 				EF90D7B5204F234700228A63 /* NSDate+PSIDateExtension.m in Sources */,
 				44A0CAEE1FCCCDEC00859DB3 /* Subscription.m in Sources */,
 				EF652CDA1F352271002AFB48 /* PacketTunnelProvider.m in Sources */,
+				521FD0FF219E0E2600F748EC /* AppStats.m in Sources */,
 				4E0DCB1E1F2855FC00495781 /* PsiphonDataSharedDB.m in Sources */,
 				4E10920920F3DC670033114B /* AppInfo.m in Sources */,
 				9BFECD1880B51B0E2EAEFF1F /* Notifier.m in Sources */,
-				4EFDFD7420DD829800A687FD /* AppStats.m in Sources */,
 				EF90D7AF204F231900228A63 /* timestamp_valid.c in Sources */,
 				EF639C301F8FCE37009D6B42 /* PsiFeedbackLogger.m in Sources */,
 				EF90D7B6204F235100228A63 /* DispatchUtils.m in Sources */,
-				4EC7CAD020E185580038B4E1 /* AppProfiler.m in Sources */,
 				EF90D7B2204F232100228A63 /* timestamp_format.c in Sources */,
 				9BFECF8895D5FE1940A6F700 /* PsiphonConfigUserDefaults.m in Sources */,
 				EF90D7B7204F235800228A63 /* FileUtils.m in Sources */,
 				EFC2F5B620226758007B52F9 /* PacketTunnelUtils.m in Sources */,
 				EF90D7B0204F231B00228A63 /* timestamp_compare.c in Sources */,
 				9BFECC62159FBEAA1A69F4F9 /* BasePacketTunnelProvider.m in Sources */,
+				521FD0FE219E0E1900F748EC /* AppProfiler.m in Sources */,
 				EF90D7B4204F234100228A63 /* NSDate+Comparator.m in Sources */,
 				9BFECEA225F023F895CC8DA1 /* Authorization.m in Sources */,
 				9BFEC10661A7DC0402AF4B37 /* AsyncOperation.m in Sources */,
 				9BFECF9F760F1A93A8933089 /* Nullity.m in Sources */,
 				9BFEC5C256EBC72398FAE8D8 /* UnionSerialQueue.m in Sources */,
+				521FD100219E0E3800F748EC /* DebugUtils.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

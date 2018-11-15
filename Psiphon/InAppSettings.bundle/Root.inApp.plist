@@ -134,11 +134,11 @@
 				</dict>
 				<dict>
 					<key>Title</key>
-					<string>বাংলা</string>
+					<string>བོད་ཡིག</string>
 				</dict>
 				<dict>
 					<key>Title</key>
-					<string>བོད་ཡིག</string>
+					<string>বাংলা</string>
 				</dict>
 				<dict>
 					<key>Title</key>
@@ -365,14 +365,6 @@
 			<string>PSChildPaneSpecifier</string>
 		</dict>
 		<dict>
-			<key>Key</key>
-			<string>vpnOnDemand</string>
-			<key>Title</key>
-			<string>!!! Not in the Root.strings, this title is set from SettingVewController!!!</string>
-			<key>Type</key>
-			<string>IASKCustomViewSpecifier</string>
-		</dict>
-		<dict>
 			<key>Title</key>
 			<string>SETTINGS_HELP_SECTION</string>
 			<key>BundleTable</key>
@@ -451,6 +443,20 @@
 			<string>IASKCustomViewSpecifier</string>
 			<key>Key</key>
 			<string>about</string>
+		</dict>
+		<dict>
+			<key>Type</key>
+			<string>PSGroupSpecifier</string>
+		</dict>
+		<dict>
+			<key>Title</key>
+			<string>!!! Not in the Root.strings, this title is set from SettingsViewController!!!</string>
+			<key>Type</key>
+			<string>IASKCustomViewSpecifier</string>
+			<key>Key</key>
+			<string>settingsResetAdConsent</string>
+			<key>DefaultValue</key>
+			<string></string>
 		</dict>
 	</array>
 	<key>StringsTable</key>

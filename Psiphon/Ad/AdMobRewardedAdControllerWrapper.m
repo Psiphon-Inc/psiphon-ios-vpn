@@ -26,7 +26,8 @@
 #import "NSError+Convenience.h"
 #import "Asserts.h"
 #import "PsiCashClient.h"
-@import GoogleMobileAds;
+#import "GADRewardBasedVideoAdDelegate.h"
+#import "AdMobConsent.h"
 
 PsiFeedbackLogType const AdMobRewardedAdControllerWrapperLogType = @"AdMobRewardedAdControllerWrapper";
 
@@ -89,7 +90,7 @@ PsiFeedbackLogType const AdMobRewardedAdControllerWrapperLogType = @"AdMobReward
 
             videoAd.delegate = weakSelf;
 
-            GADRequest *request = [GADRequest request];
+            GADRequest *request = [AdMobConsent createGADRequestWithUserConsentStatus];
 
     #if DEBUG
             request.testDevices = @[@"4a907b319b37ceee4d9970dbb0231ef0"];

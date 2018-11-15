@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, Psiphon Inc.
+ * Copyright (c) 2018, Psiphon Inc.
  * All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,17 +17,7 @@
  *
  */
 
-#import <Foundation/Foundation.h>
-#import <NetworkExtension/NetworkExtension.h>
 
-NS_ASSUME_NONNULL_BEGIN
-
-@interface PacketTunnelUtils : NSObject
-
-+ (NSString *)textStopReason:(NEProviderStopReason)stopReason;
-
-+ (NSString *)textPsiphonConnectionState:(PsiphonConnectionState)state;
-
-@end
-
-NS_ASSUME_NONNULL_END
+#ifndef WARN_UNUSED_RESULT
+#define WARN_UNUSED_RESULT __attribute__((warn_unused_result))
+#endif

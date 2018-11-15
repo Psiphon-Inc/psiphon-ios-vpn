@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, Psiphon Inc.
+ * Copyright (c) 2018, Psiphon Inc.
  * All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,16 +18,20 @@
  */
 
 #import <Foundation/Foundation.h>
-#import <NetworkExtension/NetworkExtension.h>
 
-NS_ASSUME_NONNULL_BEGIN
 
-@interface PacketTunnelUtils : NSObject
+@interface DebugUtils : NSObject
 
-+ (NSString *)textStopReason:(NEProviderStopReason)stopReason;
+#if DEBUG
 
-+ (NSString *)textPsiphonConnectionState:(PsiphonConnectionState)state;
+/**
+ * At every allocationInterval allocates pageNum number of pages.
+ * @param allocationInterval Length of each interval.
+ * @param pageNum Number of pages to allocate at each interval.
+ * @return Running NSTimer.
+ */
++ (NSTimer *)jetsamWithAllocationInterval:(NSTimeInterval)allocationInterval withNumberOfPages:(unsigned int)pageNum;
+
+#endif
 
 @end
-
-NS_ASSUME_NONNULL_END

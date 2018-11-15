@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, Psiphon Inc.
+ * Copyright (c) 2018, Psiphon Inc.
  * All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,17 +17,25 @@
  *
  */
 
-#import <Foundation/Foundation.h>
-#import <NetworkExtension/NetworkExtension.h>
+#import "DebugUtils.h"
+#import "AppStats.h"
 
-NS_ASSUME_NONNULL_BEGIN
 
-@interface PacketTunnelUtils : NSObject
+@implementation DebugUtils
 
-+ (NSString *)textStopReason:(NEProviderStopReason)stopReason;
++ (NSTimer *)jetsamWithAllocationInterval:(NSTimeInterval)allocationInterval withNumberOfPages:(unsigned int)pageNum {
+    vm_size_t pageSize = [AppStats pageSize:nil];
 
-+ (NSString *)textPsiphonConnectionState:(PsiphonConnectionState)state;
+    NSTimer *t = [NSTimer timerWithTimeInterval:allocationInterval repeats:TRUE block:^(NSTimer *timer) {
+        char * array = (char *) malloc(sizeof(char) * pageSize * pageNum);
+        for (int i = 1; i <= pageNum; i++) {
+            array[i * pageSize - 1] = '0';
+        }
+    }];
+
+    [[NSRunLoop mainRunLoop] addTimer:t forMode:NSDefaultRunLoopMode];
+
+    return t;
+}
 
 @end
-
-NS_ASSUME_NONNULL_END

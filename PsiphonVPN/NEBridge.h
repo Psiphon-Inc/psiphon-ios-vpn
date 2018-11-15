@@ -26,8 +26,9 @@
 #define EXTENSION_OPTION_TRUE @"true"
 
 // Network Extension queries
-#define EXTENSION_QUERY_IS_PROVIDER_ZOMBIE @"isProviderZombie"
-#define EXTENSION_QUERY_IS_TUNNEL_CONNECTED @"isTunnelConnected"
+#define EXTENSION_QUERY_IS_PROVIDER_ZOMBIE @"queryIsExtensionZombie"
+#define EXTENSION_QUERY_IS_TUNNEL_CONNECTED @"queryIsPsiphonTunnelConnected"
+#define EXTENSION_QUERY_IS_NETWORK_REACHABLE @"queryIsNetworkReachable"
 
 // Network Extension boolean query responses
 #define EXTENSION_RESP_TRUE @"true"

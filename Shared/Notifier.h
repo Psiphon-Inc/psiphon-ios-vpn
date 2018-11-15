@@ -20,6 +20,8 @@
 #import <Foundation/Foundation.h>
 #import <notify.h>
 
+@class RACSignal<__covariant ValueType>;
+
 NS_ASSUME_NONNULL_BEGIN
 
 typedef NSString * NotifierMessage;
@@ -29,13 +31,24 @@ extern NotifierMessage const NotifierNewHomepages;
 extern NotifierMessage const NotifierTunnelConnected;
 extern NotifierMessage const NotifierAvailableEgressRegions;
 extern NotifierMessage const NotifierMarkedAuthorizations;
-extern NotifierMessage const NotifierWaitingForNetworkConnectivity;
+extern NotifierMessage const NotifierNetworkConnectivityFailed;
+/** Emitted only if network connectivity failed was previously posted. */
+extern NotifierMessage const NotifierNetworkConnectivityResolved;
 
 // Messages sent by the container.
 extern NotifierMessage const NotifierStartVPN;
 extern NotifierMessage const NotifierForceSubscriptionCheck;
 extern NotifierMessage const NotifierAppEnteredBackground;
 extern NotifierMessage const NotifierUpdatedAuthorizations;
+
+// Messages allowed only in debug build.
+#if DEBUG
+extern NotifierMessage const NotifierDebugCustomFunction;
+extern NotifierMessage const NotifierDebugForceJetsam;
+extern NotifierMessage const NotifierDebugGoProfile;
+extern NotifierMessage const NotifierDebugMemoryProfiler;
+extern NotifierMessage const NotifierDebugPsiphonTunnelState;
+#endif
 
 #pragma mark - NotifierObserver
 
@@ -69,6 +82,19 @@ extern NotifierMessage const NotifierUpdatedAuthorizations;
  * @param queue The dispatch queue tha the observer is called on.
  */
 - (void)registerObserver:(id <NotifierObserver>)observer callbackQueue:(dispatch_queue_t)queue;
+
+// Methods not available in the extension due to memory pressure.
+#if !(TARGET_IS_EXTENSION)
+
+/**
+ * The returned signal delivers messages received by the Notifier if it matches
+ * one of the `messages` provided.
+ *
+ * @scheduler listenForMessages: delivers its events on a background scheduler.
+ */
+- (RACSignal<NotifierMessage> *)listenForMessages:(NSArray<NotifierMessage> *)messages;
+
+#endif
 
 @end
 

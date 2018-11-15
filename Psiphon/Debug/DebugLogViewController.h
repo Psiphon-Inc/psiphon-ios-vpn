@@ -18,15 +18,13 @@
  */
 
 #import <Foundation/Foundation.h>
-#import <NetworkExtension/NetworkExtension.h>
+#import "LogViewController.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface PacketTunnelUtils : NSObject
+@interface DebugLogViewController : LogViewController
 
-+ (NSString *)textStopReason:(NEProviderStopReason)stopReason;
-
-+ (NSString *)textPsiphonConnectionState:(PsiphonConnectionState)state;
+- (instancetype)initWithLogPath:(NSString *)logPath title:(NSString *)title;
 
 @end
 

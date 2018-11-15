@@ -18,6 +18,7 @@
  */
 
 #import <NetworkExtension/NEPacketTunnelProvider.h>
+#import <PsiphonTunnel/PsiphonTunnel.h>
 #import "NEBridge.h"
 
 // Notes on file protection:
@@ -74,9 +75,11 @@ typedef NS_ENUM(NSInteger, ExtensionStartMethodEnum) {
 
 - (void)stopTunnelWithReason:(NEProviderStopReason)reason;
 
-- (BOOL)isNEZombie;
+- (NSNumber *)isNEZombie;
 
-- (BOOL)isTunnelConnected;
+- (NSNumber *)isTunnelConnected;
+
+- (NSNumber *)isNetworkReachable;
 
 @end
 

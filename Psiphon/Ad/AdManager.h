@@ -22,6 +22,7 @@
 #import <mopub-ios-sdk/MoPub.h>
 #import <mopub-ios-sdk/MPRewardedVideo.h>
 #import "AdControllerWrapper.h"
+@import GoogleMobileAds;
 
 @class RACSignal<__covariant ValueType>;
 @class RACReplaySubject<ValueType>;
@@ -72,6 +73,11 @@ FOUNDATION_EXPORT AdControllerTag const AdControllerTagTunneledRewardedVideo;
 - (void)initializeAdManager;
 
 /**
+ * Reset user consent for all networks.
+ */
+- (void)resetUserConsent;
+
+/**
  * Returns a signal that upon subscriptions presents ad (if one is already loaded).
  * Returned signal emits items of type @(AdPresentation), and completes immediately after the presented ad is dismissed,
  * or after emission of an AdPresentation error state.
@@ -81,6 +87,8 @@ FOUNDATION_EXPORT AdControllerTag const AdControllerTagTunneledRewardedVideo;
  * If the app state is appropriate for displaying an ad, but there's an underlying error,
  * one of the errors states of @(AdPresentation) will be emitted (enums starting with AdPresentationError_)
  * and then the signal will complete.
+ *
+ * @return Returned signal emits items of @(AdPresentation) or nothing. Always completes.
  *
  */
 - (RACSignal<NSNumber *> *)presentInterstitialOnViewController:(UIViewController *)viewController;
@@ -97,6 +105,8 @@ FOUNDATION_EXPORT AdControllerTag const AdControllerTagTunneledRewardedVideo;
  *
  * @param viewController View controller to display ad on top of.
  * @param customData Optional custom data to include in the ad service server-to-server callback.
+ *
+ * @return Returned signal emits items of type @(AdPresentation) or nothing. Always completes.
  */
 - (RACSignal<NSNumber *> *)presentRewardedVideoOnViewController:(UIViewController *)viewController
                                                  withCustomData:(NSString *_Nullable)customData;

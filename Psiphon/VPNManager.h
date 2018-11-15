@@ -20,6 +20,7 @@
 #import <Foundation/Foundation.h>
 #import <NetworkExtension/NetworkExtension.h>
 #import "UserDefaults.h"
+#import "Annotations.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -30,13 +31,6 @@ NS_ASSUME_NONNULL_BEGIN
 @class RACUnit;
 
 FOUNDATION_EXPORT NSErrorDomain const VPNManagerErrorDomain;
-
-/**
- * VPNManagerConnectOnDemandUntilNextStartBoolKey represents user's preference for Connect On Demand to be enabled
- * for the next VPN start.
- * This preference should not be displayed to the user directly.
- */
-FOUNDATION_EXPORT UserDefaultsKey const VPNManagerConnectOnDemandUntilNextStartBoolKey;
 
 typedef NS_ERROR_ENUM(VPNManagerErrorDomain, VPNManagerConfigErrorCode) {
     /*! @const VPNManagerStartErrorConfigLoadFailed Failed to load VPN configurations. */
@@ -138,8 +132,11 @@ typedef NS_ENUM(NSInteger, VPNStartStatus) {
 
 /**
  * Must be called whenever the application becomes active for VPNManager to update its status.
+ * Emits TRUE is the extension process is running, FALSE otherwise.
+ *
+ * @scheduler delivers its event on the main thread.
  */
-- (void)checkOrFixVPNStatus;
+- (RACSignal<NSNumber *> *)checkOrFixVPN WARN_UNUSED_RESULT;
 
 /**
  * Starts the Network Extension process and also the tunnel.
@@ -158,6 +155,7 @@ typedef NS_ENUM(NSInteger, VPNStartStatus) {
 
 /**
  * Stops the tunnel and stops the network extension process.
+ * @note Connect On Demand is disabled before the tunnel is stopped.
  */
 - (void)stopVPN;
 
@@ -195,41 +193,32 @@ typedef NS_ENUM(NSInteger, VPNStartStatus) {
  */
 - (RACSignal<RACTwoTuple<NSNumber *, NSNumber *> *> *)isVPNActive;
 
-/**
- * isConnectOnDemandEnabled signal when subscribed to emits TRUE as NSNumber
- * if the VPN configuration's Connect On Demand is enabled, emits FALSE otherwise.
- *
- * @scheduler isConnectOnDemandEnabled delivers its events on a background thread.
- */
-- (RACSignal<NSNumber *> *)isConnectOnDemandEnabled;
-
-/**
- * Updates and saves VPN configuration Connect On Demand.
- *
- * The returned signal emits @(TRUE) if succeeded, @(FALSE) otherwise, and then completes.
- * All internal errors are caught, and instead FALSE is emitted.
- *
- * @param onDemandEnabled Toggle VPN configuration Connect On Demand capability.
- *
- * @scheduler setConnectOnDemandEnabled: delivers its events on a background thread.
- */
-- (RACSignal<NSNumber *> *)setConnectOnDemandEnabled:(BOOL)onDemandEnabled;
+#pragma mark - Extension Query
 
 /**
  * Queries the Network Extension whether it is in the zombie state.
- * @attention Returned signal emits nil if there is no active session.
+ * @attention Returned signal emits nil @(FALSE) there is no active session.
  *
  * @scheduler isExtensionZombie delivers its events on a background thread.
  */
-- (RACSignal<NSNumber *> *)isExtensionZombie;
+- (RACSignal<NSNumber *> *)queryIsExtensionZombie WARN_UNUSED_RESULT;
 
 /**
  * Queries the Network Extension whether Psiphon tunnel is in connected state or not.
- * @attention Returned signal emits nil if there is no active session.
+ * @attention Returned signal emits @(FALSE) if there is no active session.
  *
  * @scheduler isPsiphonTunnelConnected delivers its events on a background thread.
  */
-- (RACSignal<NSNumber *> *)isPsiphonTunnelConnected;
+- (RACSignal<NSNumber *> *)queryIsPsiphonTunnelConnected WARN_UNUSED_RESULT;
+
+/**
+ * Queries the Network Extension to check whether psiphon tunnel is waiting for
+ * internet reachability or not.
+ * @attention Returned signal emits nil if the extension is not running.
+ *
+ * @scheduler isPsiphonTunnelWaitingForNetwork its events on a background thread.
+ */
+- (RACSignal<NSNumber *> *)queryIsNetworkReachable WARN_UNUSED_RESULT;
 
 @end
 
