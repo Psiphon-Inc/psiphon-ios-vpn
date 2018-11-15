@@ -54,4 +54,13 @@
     return alert;
 }
 
++ (UIAlertController *)genericOperationFailedTryAgain {
+    UIAlertController *alert = [UIAlertController
+      alertControllerWithTitle:NSLocalizedStringWithDefaultValue(@"ALERT_TITLE_OPERATION_FAILED", nil, [NSBundle mainBundle], @"Operation Failed", @"Alert dialog title.")
+                       message:NSLocalizedStringWithDefaultValue(@"ALERT_BODY_OPERATION_FAILED", nil, [NSBundle mainBundle], @"Operation Failed, please try again.", @"Alert dialog body.")
+                preferredStyle:UIAlertControllerStyleAlert];
+
+    return alert;
+}
+
 @end

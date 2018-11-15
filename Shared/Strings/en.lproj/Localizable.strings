@@ -3,6 +3,12 @@
 /* Title of the section in the subscription dialog that shows currently active subscription information. */
 "ACTIVE_SUBSCRIPTION_SECTION_TITLE" = "You're subscribed!";
 
+/* Alert dialog body. */
+"ALERT_BODY_OPERATION_FAILED" = "Operation Failed, please try again.";
+
+/* Alert dialog title. */
+"ALERT_TITLE_OPERATION_FAILED" = "Operation Failed";
+
 /* Text for app subtitle on main view. */
 "APP_SUB_TITLE_MAIN_VIEW" = "BEYOND BORDERS";
 
