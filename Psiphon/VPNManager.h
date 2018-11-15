@@ -167,9 +167,17 @@ typedef NS_ENUM(NSInteger, VPNStartStatus) {
 
 
 /**
- * Removes and installs the VPN configuration.
+ * Removes any installed VPN configuration if any and (re-)installs the VPN configuration.
+ * If the operation succeeds, the returned signal emits RACUnit, otherwise
+ * it terminates with an error.
+ *
+ * If the user denies permission to install VPN configuration, the emitted error
+ * will have code `NEVPNErrorConfigurationReadWriteFailed` with domain `NEVPNErrorDomain`,
+ * and description set to "permission denied".
+ *
+ * @scheduler delivers its even on the main thread.
  */
-- (void)reinstallVPNConfiguration;
+- (RACSignal<RACUnit *> *)reinstallVPNConfiguration WARN_UNUSED_RESULT;
 
 /**
  * Returns TRUE if VPNStatus is in an active state.
