@@ -375,41 +375,12 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 
     __weak MainViewController *weakSelf = self;
 
-    // privacyPolicyDismissed is a cold terminating signal that emits @TRUE if the PP was accepted,
-    // otherwise emits @FALSE.
-    RACSignal<NSNumber *> *privacyPolicyDismissed = [[RACSignal return:
-                   @([NSUserDefaults.standardUserDefaults boolForKey:PrivacyPolicyAcceptedBoolKey])]
-      flattenMap:^RACSignal<RACUnit *> *(NSNumber *alreadyAccepted) {
-
-        if ([alreadyAccepted boolValue]) {
-            return [RACSignal return:alreadyAccepted];
-        } else {
-
-            PrivacyPolicyViewController *c = [[PrivacyPolicyViewController alloc] init];
-            [self presentViewController:c animated:TRUE completion:nil];
-
-            return [[[[[NSNotificationCenter defaultCenter]
-              rac_addObserverForName:PrivacyPolicyDismissedNotification
-                              object:nil]
-              take:1]
-              map:^NSNumber *(NSNotification *notification) {
-                  return notification.userInfo[PrivacyPolicyAcceptedNotificationBoolKey];
-              }]
-              doNext:^(NSNumber *accepted) {
-                  // Update user defaults value.
-                  [NSUserDefaults.standardUserDefaults setBool:[accepted boolValue]
-                                                        forKey:PrivacyPolicyAcceptedBoolKey];
-              }];
-        }
-    }];
-
-
     NSString * const CommandNoInternetAlert = @"NoInternetAlert";
     NSString * const CommandStartTunnel = @"StartTunnel";
     NSString * const CommandStopVPN = @"StopVPN";
 
     // signal emits a single two tuple (isVPNActive, connectOnDemandEnabled).
-    __block RACDisposable *disposable = [[[[privacyPolicyDismissed
+    __block RACDisposable *disposable = [[[[[self privacyPolicyDismissed]
       flattenMap:^RACSignal<RACTwoTuple <NSNumber *, NSNumber *> *> *(NSNumber *accepted) {
           // If the user has accepted the privacy policy continue with starting the VPN,
           // otherwise terminate the subscription.
@@ -939,16 +910,37 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 #pragma mark - Region Selection
 
 - (void)openRegionSelection {
-    selectedRegionSnapShot = [[RegionAdapter sharedInstance] getSelectedRegion].code;
-    RegionSelectionViewController *regionSelectionViewController = [[RegionSelectionViewController alloc] init];
-    regionSelectionNavController = [[UINavigationController alloc]
-      initWithRootViewController:regionSelectionViewController];
-    UIBarButtonItem *doneButton = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedStringWithDefaultValue(@"DONE_ACTION", nil, [NSBundle mainBundle], @"Done", @"Title of the button that dismisses region selection dialog")
-                                                                   style:UIBarButtonItemStyleDone target:self
-                                                                  action:@selector(regionSelectionDidEnd)];
-    regionSelectionViewController.navigationItem.rightBarButtonItem = doneButton;
-    
-    [self presentViewController:regionSelectionNavController animated:YES completion:nil];
+    __weak MainViewController *weakSelf = self;
+
+    __block RACDisposable *disposable =
+    [[[self privacyPolicyDismissed] deliverOnMainThread]
+     subscribeNext:^(NSNumber * accepted) {
+
+         if ([accepted boolValue]) {
+
+             selectedRegionSnapShot = [[RegionAdapter sharedInstance] getSelectedRegion].code;
+             RegionSelectionViewController *regionSelectionViewController = [[RegionSelectionViewController alloc] init];
+             regionSelectionNavController = [[UINavigationController alloc]
+                                             initWithRootViewController:regionSelectionViewController];
+             UIBarButtonItem *doneButton = [[UIBarButtonItem alloc] initWithTitle:
+                                            NSLocalizedStringWithDefaultValue(@"DONE_ACTION",
+                                                                              nil,
+                                                                              [NSBundle mainBundle],
+                                                                              @"Done",
+                                                                              @"Title of the button that dismisses region selection dialog")
+                                                                            style:UIBarButtonItemStyleDone target:self
+                                                                           action:@selector(regionSelectionDidEnd)];
+             regionSelectionViewController.navigationItem.rightBarButtonItem = doneButton;
+
+             [self presentViewController:regionSelectionNavController animated:YES completion:nil];
+         }
+     } error:^(NSError *error) {
+         [weakSelf.compoundDisposable removeDisposable:disposable];
+     } completed:^{
+         [weakSelf.compoundDisposable removeDisposable:disposable];
+     }];
+
+    [self.compoundDisposable addDisposable:disposable];
 }
 
 - (void)regionSelectionDidEnd {
@@ -1016,11 +1008,57 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 #pragma mark - Subscription
 
 - (void)openIAPViewController {
-    IAPViewController *iapViewController = [[IAPViewController alloc]init];
-    iapViewController.openedFromSettings = NO;
-    UINavigationController *navController = [[UINavigationController alloc]
-      initWithRootViewController:iapViewController];
-    [self presentViewController:navController animated:YES completion:nil];
+    __weak MainViewController *weakSelf = self;
+
+    __block RACDisposable *disposable =
+        [[[self privacyPolicyDismissed] deliverOnMainThread]
+          subscribeNext:^(NSNumber * accepted) {
+
+              if ([accepted boolValue]) {
+
+                  IAPViewController *iapViewController = [[IAPViewController alloc]init];
+                  iapViewController.openedFromSettings = NO;
+                  UINavigationController *navController = [[UINavigationController alloc]
+                                                      initWithRootViewController:iapViewController];
+                  [self presentViewController:navController animated:YES completion:nil];
+              }
+        } error:^(NSError *error) {
+            [weakSelf.compoundDisposable removeDisposable:disposable];
+        } completed:^{
+            [weakSelf.compoundDisposable removeDisposable:disposable];
+        }];
+
+    [self.compoundDisposable addDisposable:disposable];
+}
+
+// privacyPolicyDismissed is a cold terminating signal that emits @TRUE if the PP was accepted,
+// otherwise emits @FALSE.
+- (RACSignal<NSNumber *>*)privacyPolicyDismissed {
+    return [[RACSignal return:
+             @([NSUserDefaults.standardUserDefaults boolForKey:PrivacyPolicyAcceptedBoolKey])]
+             flattenMap:^RACSignal<RACUnit *> *(NSNumber *alreadyAccepted) {
+
+                if ([alreadyAccepted boolValue]) {
+                    return [RACSignal return:alreadyAccepted];
+                } else {
+
+                    PrivacyPolicyViewController *c = [[PrivacyPolicyViewController alloc] init];
+                    [self presentViewController:c animated:TRUE completion:nil];
+
+                    return [[[[[NSNotificationCenter defaultCenter]
+                             rac_addObserverForName:PrivacyPolicyDismissedNotification object:nil]
+                             take:1]
+                             map:^NSNumber *(NSNotification *notification) {
+                                 return
+                                    notification.userInfo[PrivacyPolicyAcceptedNotificationBoolKey];
+                             }]
+                             doNext:^(NSNumber *accepted) {
+                                 // Update user defaults value.
+                                 [NSUserDefaults.standardUserDefaults setBool:[accepted boolValue]
+                                                               forKey:PrivacyPolicyAcceptedBoolKey];
+                             }];
+                }
+           }];
 }
 
 #pragma mark - PsiCash
@@ -1028,51 +1066,67 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
 #pragma mark - PsiCash UI actions
 
 /**
- * Buy max num hours of Speed Boost that the user can afford if possible
+ * Buy max num hours of Speed Boost that the user can afford if possible, or:
+ * - Display privacy policy if the user hasn't accepted it yet
+ * - If the privacy policy has been accepted:
+ *     - Display PsiCash onboarding if the user hasn't been onboarded yet
  */
-- (void)instantMaxSpeedBoostPurchase {
-    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+- (void)onPsiCashViewTap {
 
-    if (![userDefaults boolForKey:PsiCashHasBeenOnboardedBoolKey]) {
-        PsiCashOnboardingViewController *onboarding = [[PsiCashOnboardingViewController alloc] init];
-        onboarding.delegate = self;
-        [self presentViewController:onboarding animated:NO completion:nil];
-        return;
-    }
+    __weak MainViewController *weakSelf = self;
 
-    // Checks the latest tunnel status before going ahead with the purchase request.
-     __block RACDisposable *disposable = [[[VPNManager sharedInstance].lastTunnelStatus
-       take:1]
-       subscribeNext:^(NSNumber *value) {
-           VPNStatus s = (VPNStatus) [value integerValue];
+    __block RACDisposable *disposable =
+        [[[self privacyPolicyDismissed]
+          flattenMap:^RACSignal<NSNumber *> *(NSNumber *accepted) {
 
-           if (s == VPNStatusConnected || s == VPNStatusDisconnected || s == VPNStatusInvalid) {
-               // Device is either tunneled or untunneled, we can go ahead with the purchase request.
-               PsiCashSpeedBoostProductSKU *purchase = [model maxSpeedBoostPurchaseEarned];
-               if (![model hasPendingPurchase] && ![model hasActiveSpeedBoostPurchase] && purchase != nil) {
-                   [PsiCashClient.sharedInstance purchaseSpeedBoostProduct:purchase];
-               } else {
-                   [self showPsiCashAlertView];
-               }
-           } else {
-               // Device is in a connecting or disconnecting state, we shouldn't do any purchase requests.
-               // Informs the user through an alert.
-               NSString *alertBody = NSLocalizedStringWithDefaultValue(@"PSICASH_CONNECTED_OR_DISCONNECTED",
-                 nil,
-                 [NSBundle mainBundle],
-                 @"Speed Boost purchase unavailable while Psiphon is connecting.",
-                 @"Alert message indicating to the user that they can't purchase Speed Boost while the app is connecting."
-                 " Do not translate 'Psiphon'.");
+              NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
 
-               [UIAlertController presentSimpleAlertWithTitle:@"PsiCash"  // The word PsiCash is not translated.
-                                                      message:alertBody
-                                               preferredStyle:UIAlertControllerStyleAlert
-                                                    okHandler:nil];
-           }
-       }
-       completed:^{
-           [self.compoundDisposable removeDisposable:disposable];
-       }];
+              // If the user has accepted the privacy policy continue with starting the VPN,
+              // otherwise terminate the subscription.
+              if ([accepted boolValue]) {
+                  if (![userDefaults boolForKey:PsiCashHasBeenOnboardedBoolKey]) {
+
+                      PsiCashOnboardingViewController *onboarding = [[PsiCashOnboardingViewController alloc] init];
+                      onboarding.delegate = self;
+                      [self presentViewController:onboarding animated:NO completion:nil];
+                      return [RACSignal empty];
+                  } else {
+                      return [[VPNManager sharedInstance].lastTunnelStatus take:1];
+                  }
+              } else {
+                  return [RACSignal empty];
+              }
+          }]
+          subscribeNext:^(NSNumber *value) {
+                 VPNStatus s = (VPNStatus) [value integerValue];
+
+                 if (s == VPNStatusConnected || s == VPNStatusDisconnected || s == VPNStatusInvalid) {
+                     // Device is either tunneled or untunneled, we can go ahead with the purchase request.
+                     PsiCashSpeedBoostProductSKU *purchase = [model maxSpeedBoostPurchaseEarned];
+                     if (![model hasPendingPurchase] && ![model hasActiveSpeedBoostPurchase] && purchase != nil) {
+                         [PsiCashClient.sharedInstance purchaseSpeedBoostProduct:purchase];
+                     } else {
+                         [self showPsiCashAlertView];
+                     }
+                 } else {
+                     // Device is in a connecting or disconnecting state, we shouldn't do any purchase requests.
+                     // Informs the user through an alert.
+                     NSString *alertBody = NSLocalizedStringWithDefaultValue(@"PSICASH_CONNECTED_OR_DISCONNECTED",
+                                                                             nil,
+                                                                             [NSBundle mainBundle],
+                                                                             @"Speed Boost purchase unavailable while Psiphon is connecting.",
+                                                                             @"Alert message indicating to the user that they can't purchase Speed Boost while the app is connecting."
+                                                                             " Do not translate 'Psiphon'.");
+
+                     [UIAlertController presentSimpleAlertWithTitle:@"PsiCash"  // The word PsiCash is not translated.
+                                                            message:alertBody
+                                                     preferredStyle:UIAlertControllerStyleAlert
+                                                          okHandler:nil];
+                 }
+         }
+         completed:^{
+             [weakSelf.compoundDisposable removeDisposable:disposable];
+         }];
 
     [self.compoundDisposable addDisposable:disposable];
 }
@@ -1085,7 +1139,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
     [self.view addSubview:psiCashView];
 
     UITapGestureRecognizer *psiCashViewTap = [[UITapGestureRecognizer alloc]
-                                                  initWithTarget:self action:@selector(instantMaxSpeedBoostPurchase)];
+                                                  initWithTarget:self action:@selector(onPsiCashViewTap)];
 
     psiCashViewTap.numberOfTapsRequired = 1;
     [psiCashView addGestureRecognizer:psiCashViewTap];
