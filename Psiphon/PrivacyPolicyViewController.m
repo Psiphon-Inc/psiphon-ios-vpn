@@ -366,19 +366,19 @@ typedef NS_ERROR_ENUM(PrivacyPolicyErrorDomain, PrivacyPolicyLinkGenerationError
 # pragma mark - UI Callbacks
 
 - (void)onGetStartedTap {
-    [[NSNotificationCenter defaultCenter] postNotificationName:PrivacyPolicyDismissedNotification
-                                                        object:nil
-                                      userInfo:@{PrivacyPolicyAcceptedNotificationBoolKey : @TRUE}];
-
-    [self dismissViewControllerAnimated:TRUE completion:nil];
+    [self dismissViewControllerAnimated:TRUE completion:^{
+        [[NSNotificationCenter defaultCenter] postNotificationName:PrivacyPolicyDismissedNotification
+                                                            object:nil
+                                                          userInfo:@{PrivacyPolicyAcceptedNotificationBoolKey : @TRUE}];
+    }];
 }
 
 - (void)onCancelTap {
-    [[NSNotificationCenter defaultCenter] postNotificationName:PrivacyPolicyDismissedNotification
-                                                        object:nil
-                                     userInfo:@{PrivacyPolicyAcceptedNotificationBoolKey : @FALSE}];
-
-    [self dismissViewControllerAnimated:TRUE completion:nil];
+    [self dismissViewControllerAnimated:TRUE completion:^{
+        [[NSNotificationCenter defaultCenter] postNotificationName:PrivacyPolicyDismissedNotification
+                                                            object:nil
+                                                          userInfo:@{PrivacyPolicyAcceptedNotificationBoolKey : @FALSE}];
+    }];
 }
 
 /***
