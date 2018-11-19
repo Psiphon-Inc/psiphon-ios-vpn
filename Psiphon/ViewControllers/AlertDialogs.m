@@ -57,8 +57,15 @@
 + (UIAlertController *)genericOperationFailedTryAgain {
     UIAlertController *alert = [UIAlertController
       alertControllerWithTitle:NSLocalizedStringWithDefaultValue(@"ALERT_TITLE_OPERATION_FAILED", nil, [NSBundle mainBundle], @"Operation Failed", @"Alert dialog title.")
-                       message:NSLocalizedStringWithDefaultValue(@"ALERT_BODY_OPERATION_FAILED", nil, [NSBundle mainBundle], @"Operation Failed, please try again.", @"Alert dialog body.")
+                       message:NSLocalizedStringWithDefaultValue(@"ALERT_BODY_OPERATION_FAILED", nil, [NSBundle mainBundle], @"Operation failed, please try again.", @"Alert dialog body.")
                 preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertAction *dismissAction = [UIAlertAction actionWithTitle:NSLocalizedStringWithDefaultValue(@"VPN_START_PERMISSION_DISMISS_BUTTON", nil, [NSBundle mainBundle], @"Dismiss", @"Dismiss button title. Dismisses pop-up alert when the user clicks on the button")
+                                                            style:UIAlertActionStyleCancel
+                                                          handler:^(UIAlertAction *action) {
+                                                              // Do nothing.
+                                                          }];
+
+    [alert addAction:dismissAction];
 
     return alert;
 }
