@@ -118,6 +118,7 @@
 		A84080838645BD1023136C3B /* PsiCashPurchaseView.m in Sources */ = {isa = PBXBuildFile; fileRef = A8408183BCB31ED8F0855E90 /* PsiCashPurchaseView.m */; };
 		A84080E163F24876A1476544 /* VPNStartAndStopButton.m in Sources */ = {isa = PBXBuildFile; fileRef = A8408F6123BCC98725932A59 /* VPNStartAndStopButton.m */; };
 		A8408161701C8F50F52866FC /* LayerAutoResizeUIView.m in Sources */ = {isa = PBXBuildFile; fileRef = A8408DBEEDCF56EC798536BF /* LayerAutoResizeUIView.m */; };
+		A840817EBF7B1A9EA3F3FADC /* UITextView+Additions.m in Sources */ = {isa = PBXBuildFile; fileRef = A840824F3994A962D006CED2 /* UITextView+Additions.m */; };
 		A84082122C339F45E630F610 /* PsiCashView.m in Sources */ = {isa = PBXBuildFile; fileRef = A8408DA63B0B641B765A1E4D /* PsiCashView.m */; };
 		A84082260CE7662A93697CFF /* LoadingCircleLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = A840845849B24AAA0E714664 /* LoadingCircleLayer.m */; };
 		A840835FAC7F18A6A7021415 /* RingSkyButton.m in Sources */ = {isa = PBXBuildFile; fileRef = A84086B04CBC1A6A5481EDD4 /* RingSkyButton.m */; };
@@ -466,6 +467,7 @@
 		A8408183BCB31ED8F0855E90 /* PsiCashPurchaseView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PsiCashPurchaseView.m; sourceTree = "<group>"; };
 		A84081B66B02DF8283448409 /* AutoLayoutProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AutoLayoutProtocol.h; sourceTree = "<group>"; };
 		A84081C4600325A12F9C3413 /* SubscriptionsBar.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SubscriptionsBar.m; sourceTree = "<group>"; };
+		A840824F3994A962D006CED2 /* UITextView+Additions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UITextView+Additions.m"; sourceTree = "<group>"; };
 		A84082D71B55E73D2883F645 /* PsiCashPurchaseAlertView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PsiCashPurchaseAlertView.h; sourceTree = "<group>"; };
 		A84082DC699A58110496DB56 /* ArrowView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ArrowView.h; sourceTree = "<group>"; };
 		A84083119A599C815D2D80F5 /* SkyButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SkyButton.h; sourceTree = "<group>"; };
@@ -504,6 +506,7 @@
 		A8408DA63B0B641B765A1E4D /* PsiCashView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PsiCashView.m; sourceTree = "<group>"; };
 		A8408DBEEDCF56EC798536BF /* LayerAutoResizeUIView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LayerAutoResizeUIView.m; sourceTree = "<group>"; };
 		A8408E0115540B5B2B305EAE /* ConnectionStatusView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ConnectionStatusView.m; sourceTree = "<group>"; };
+		A8408E495B532BF3773CD1BD /* UITextView+Additions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UITextView+Additions.h"; sourceTree = "<group>"; };
 		A8408EF0378D6C5C22CC3FE2 /* OnboardingView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OnboardingView.h; sourceTree = "<group>"; };
 		A8408F08BFF80A05CF46C00A /* RoyalSkyButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RoyalSkyButton.m; sourceTree = "<group>"; };
 		A8408F6123BCC98725932A59 /* VPNStartAndStopButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VPNStartAndStopButton.m; sourceTree = "<group>"; };
@@ -966,6 +969,8 @@
 				A84086A9E122059FADA6F411 /* RingSkyButton.h */,
 				A84086E5D9137E6EFE239656 /* ArrowView.m */,
 				A84082DC699A58110496DB56 /* ArrowView.h */,
+				A840824F3994A962D006CED2 /* UITextView+Additions.m */,
+				A8408E495B532BF3773CD1BD /* UITextView+Additions.h */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -1658,6 +1663,7 @@
 				A840835FAC7F18A6A7021415 /* RingSkyButton.m in Sources */,
 				A840875DDFEA2A535EA0959E /* ArrowView.m in Sources */,
 				A84086D3F4BD2D551CA67611 /* AlertDialogs.m in Sources */,
+				A840817EBF7B1A9EA3F3FADC /* UITextView+Additions.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
