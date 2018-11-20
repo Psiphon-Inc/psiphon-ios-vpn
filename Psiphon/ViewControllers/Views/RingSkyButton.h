@@ -23,6 +23,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface RingSkyButton : SkyButton
 
+@property (nonatomic) BOOL includeChevron;
+
 @end
 
 NS_ASSUME_NONNULL_END

@@ -21,35 +21,52 @@
 #import "UIColor+Additions.h"
 
 @implementation RingSkyButton {
-    UIImageView *chevron;
+    UIImageView *_Nullable chevron;
+}
+
+- (instancetype)initWithFrame:(CGRect)frame {
+    self = [super initWithFrame:frame];
+    if (self) {
+        _includeChevron = FALSE;
+        self.contentHorizontalAlignment = UIControlContentHorizontalAlignmentCenter;
+    }
+    return self;
+}
+
+- (void)setIncludeChevron:(BOOL)includeChevron {
+    _includeChevron = includeChevron;
+    if (includeChevron) {
+        self.contentHorizontalAlignment = UIControlContentHorizontalAlignmentCenter;
+    } else {
+        self.contentHorizontalAlignment = UIControlContentHorizontalAlignmentLeft;
+    }
+    [self needsUpdateConstraints];
+}
+
+- (void)layoutSubviews {
+    [super layoutSubviews];
+
+    if (self.includeChevron && !chevron) {
+        chevron = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"chevron"]];
+        [self addSubview:chevron];
+
+        chevron.translatesAutoresizingMaskIntoConstraints = FALSE;
+        [chevron.centerYAnchor constraintEqualToAnchor:self.centerYAnchor
+                                              constant:2.f].active = TRUE;
+        [chevron.trailingAnchor
+          constraintEqualToAnchor:self.trailingAnchor
+                         constant:-25.f].active = TRUE;
+    }
 }
 
 - (void)autoLayoutSetupViews {
     [super autoLayoutSetupViews];
 
     self.backgroundColor = UIColor.whiteColor;
-    self.shadow = TRUE;
-    self.contentHorizontalAlignment = UIControlContentHorizontalAlignmentLeft;
+    self.titleLabel.textColor = UIColor.lightishBlue;
 
     self.layer.borderWidth = 1.5f;
     self.layer.borderColor = UIColor.periwinkleColor.CGColor;
-
-    chevron = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"chevron"]];
-}
-
-- (void)autoLayoutAddSubviews {
-    [super autoLayoutAddSubviews];
-    [self addSubview:chevron];
-}
-
-- (void)autoLayoutSetupSubviewsLayoutConstraints {
-    [super autoLayoutSetupSubviewsLayoutConstraints];
-
-    chevron.translatesAutoresizingMaskIntoConstraints = FALSE;
-    [chevron.centerYAnchor constraintEqualToAnchor:self.centerYAnchor constant:2.f].active = TRUE;
-    [chevron.trailingAnchor
-      constraintEqualToAnchor:self.trailingAnchor
-                     constant:-25.f].active = TRUE;
 }
 
 @end
