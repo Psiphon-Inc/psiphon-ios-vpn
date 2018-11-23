@@ -108,8 +108,6 @@ PsiFeedbackLogType const VPNManagerLogType = @"VPNManager";
 
         _restartRequired = FALSE;
 
-        _restartRequired = FALSE;
-
         _serialQueue = [UnionSerialQueue createWithLabel:@"ca.psiphon.Psiphon.VPNManagerSerialQueue"];
 
         // Public properties.
