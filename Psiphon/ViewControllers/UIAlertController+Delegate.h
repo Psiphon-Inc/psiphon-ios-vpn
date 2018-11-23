@@ -25,4 +25,10 @@
 
 - (void)presentFromTopController;
 
+/**
+ * Adds "Dismiss" button to the receiver alert controller.
+ * @param handler Callback action.
+ */
+- (void)addDismissAction:(void (^)(UIAlertAction *action))handler;
+
 @end
