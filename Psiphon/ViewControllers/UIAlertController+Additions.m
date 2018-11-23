@@ -18,9 +18,9 @@
  */
 
 #import "AppDelegate.h"
-#import "UIAlertController+Delegate.h"
+#import "UIAlertController+Additions.h"
 
-@implementation UIAlertController (Delegate)
+@implementation UIAlertController (Additions)
 
 + (void)presentSimpleAlertWithTitle:(NSString *_Nonnull)title message:(NSString *_Nonnull)message preferredStyle:(UIAlertControllerStyle)preferredStyle okHandler:(void (^ _Nullable)(UIAlertAction *action))okHandler {
     UIAlertController *ac = [UIAlertController alertControllerWithTitle:title message:message preferredStyle:preferredStyle];
@@ -29,11 +29,9 @@
     [ac presentFromTopController];
 }
 
-/**
- * Presents this instance from application's key window top most view controller.
- */
 - (void)presentFromTopController {
-    [[AppDelegate getTopMostViewController] presentViewController:self animated:TRUE completion:nil];
+    [[AppDelegate getTopMostViewController]
+      presentViewController:self animated:TRUE completion:nil];
 }
 
 - (void)addDismissAction:(void (^)(UIAlertAction *action))handler {

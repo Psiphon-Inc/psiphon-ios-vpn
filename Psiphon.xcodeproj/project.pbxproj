@@ -184,7 +184,7 @@
 		EF90D7B8204F236400228A63 /* NSError+Convenience.m in Sources */ = {isa = PBXBuildFile; fileRef = EF90D79A204F22C900228A63 /* NSError+Convenience.m */; };
 		EFC2F5B620226758007B52F9 /* PacketTunnelUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = EFC2F5B420226757007B52F9 /* PacketTunnelUtils.m */; };
 		EFC2F5C420226782007B52F9 /* RootContainerController.m in Sources */ = {isa = PBXBuildFile; fileRef = EFC2F5BB20226781007B52F9 /* RootContainerController.m */; };
-		EFC2F5C720226782007B52F9 /* UIAlertController+Delegate.m in Sources */ = {isa = PBXBuildFile; fileRef = EFC2F5C020226782007B52F9 /* UIAlertController+Delegate.m */; };
+		EFC2F5C720226782007B52F9 /* UIAlertController+Additions.m in Sources */ = {isa = PBXBuildFile; fileRef = EFC2F5C020226782007B52F9 /* UIAlertController+Additions.m */; };
 		EFC2F5CB202267B1007B52F9 /* PsiphonConfigReader.m in Sources */ = {isa = PBXBuildFile; fileRef = EFC2F5CA202267B0007B52F9 /* PsiphonConfigReader.m */; };
 		EFC2F5CC20226835007B52F9 /* PsiphonConfigReader.m in Sources */ = {isa = PBXBuildFile; fileRef = EFC2F5CA202267B0007B52F9 /* PsiphonConfigReader.m */; };
 		F132D7E01F5739A800AF7F91 /* LaunchScreenViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = F132D7DF1F5739A800AF7F91 /* LaunchScreenViewController.m */; };
@@ -556,9 +556,9 @@
 		EFB3E62D1F66F23F004AAE8C /* Logging.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Logging.h; sourceTree = "<group>"; };
 		EFC2F5B420226757007B52F9 /* PacketTunnelUtils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PacketTunnelUtils.m; sourceTree = "<group>"; };
 		EFC2F5B520226758007B52F9 /* PacketTunnelUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PacketTunnelUtils.h; sourceTree = "<group>"; };
-		EFC2F5B720226780007B52F9 /* UIAlertController+Delegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIAlertController+Delegate.h"; sourceTree = "<group>"; };
+		EFC2F5B720226780007B52F9 /* UIAlertController+Additions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIAlertController+Additions.h"; sourceTree = "<group>"; };
 		EFC2F5BB20226781007B52F9 /* RootContainerController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RootContainerController.m; sourceTree = "<group>"; };
-		EFC2F5C020226782007B52F9 /* UIAlertController+Delegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIAlertController+Delegate.m"; sourceTree = "<group>"; };
+		EFC2F5C020226782007B52F9 /* UIAlertController+Additions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIAlertController+Additions.m"; sourceTree = "<group>"; };
 		EFC2F5C120226782007B52F9 /* RootContainerController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RootContainerController.h; sourceTree = "<group>"; };
 		EFC2F5C9202267B0007B52F9 /* PsiphonConfigReader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PsiphonConfigReader.h; sourceTree = "<group>"; };
 		EFC2F5CA202267B0007B52F9 /* PsiphonConfigReader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PsiphonConfigReader.m; sourceTree = "<group>"; };
@@ -822,8 +822,8 @@
 				EFC2F5BB20226781007B52F9 /* RootContainerController.m */,
 				4435CC251F70566000F3A809 /* SettingsViewController.h */,
 				4435CC261F70566000F3A809 /* SettingsViewController.m */,
-				EFC2F5B720226780007B52F9 /* UIAlertController+Delegate.h */,
-				EFC2F5C020226782007B52F9 /* UIAlertController+Delegate.m */,
+				EFC2F5B720226780007B52F9 /* UIAlertController+Additions.h */,
+				EFC2F5C020226782007B52F9 /* UIAlertController+Additions.m */,
 				A8408C3BCEFC35B4744B684E /* Views */,
 				A8408D96EC06ED36F86C690D /* OnboardingViewController.m */,
 				A840812E38D27BF4328678E0 /* OnboardingViewController.h */,
@@ -1568,7 +1568,7 @@
 				4EFAAF2E2034CDC800EC0536 /* PsiCashClient.m in Sources */,
 				4E9B2E13204F463100E63784 /* PsiCashClientModel.m in Sources */,
 				EF652CD61F35224C002AFB48 /* AppDelegate.m in Sources */,
-				EFC2F5C720226782007B52F9 /* UIAlertController+Delegate.m in Sources */,
+				EFC2F5C720226782007B52F9 /* UIAlertController+Additions.m in Sources */,
 				4E0A366C21666B99008A3D7B /* NSString+Additions.m in Sources */,
 				EF639C2F1F8FCE37009D6B42 /* PsiFeedbackLogger.m in Sources */,
 				445F24DA20E1A5BA00D004E9 /* constr_SET_OF.c in Sources */,

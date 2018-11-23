@@ -19,10 +19,16 @@
 
 #import <UIKit/UIKit.h>
 
-@interface UIAlertController (Delegate)
+@interface UIAlertController (Additions)
 
-+ (void)presentSimpleAlertWithTitle:(NSString *_Nonnull)title message:(NSString *_Nonnull)message preferredStyle:(UIAlertControllerStyle)preferredStyle okHandler:(void (^ _Nullable)(UIAlertAction *_Nonnull action))okHandler;
++ (void)presentSimpleAlertWithTitle:(NSString *_Nonnull)title
+                            message:(NSString *_Nonnull)message
+                     preferredStyle:(UIAlertControllerStyle)preferredStyle
+                          okHandler:(void (^ _Nullable)(UIAlertAction *_Nonnull action))okHandler;
 
+/**
+ * Presents receiver alert controller from application's key window top most view controller.
+ */
 - (void)presentFromTopController;
 
 /**
