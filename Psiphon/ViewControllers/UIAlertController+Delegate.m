@@ -36,4 +36,11 @@
     [[AppDelegate getTopMostViewController] presentViewController:self animated:TRUE completion:nil];
 }
 
+- (void)addDismissAction:(void (^)(UIAlertAction *action))handler {
+    UIAlertAction *dismissAction = [UIAlertAction actionWithTitle:NSLocalizedStringWithDefaultValue(@"VPN_START_PERMISSION_DISMISS_BUTTON", nil, [NSBundle mainBundle], @"Dismiss", @"Dismiss button title. Dismisses pop-up alert when the user clicks on the button")
+                                                            style:UIAlertActionStyleCancel
+                                                          handler:handler];
+    [self addAction:dismissAction];
+}
+
 @end
