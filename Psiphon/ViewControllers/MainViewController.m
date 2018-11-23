@@ -40,7 +40,7 @@
 #import "NEBridge.h"
 #import "NSString+Additions.h"
 #import "Notifier.h"
-#import "UIAlertController+Delegate.h"
+#import "UIAlertController+Additions.h"
 #import "UpstreamProxySettings.h"
 #import "RACCompoundDisposable.h"
 #import "RACTuple.h"

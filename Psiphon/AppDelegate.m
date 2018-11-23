@@ -35,7 +35,7 @@
 #import "PsiphonDataSharedDB.h"
 #import "RootContainerController.h"
 #import "SharedConstants.h"
-#import "UIAlertController+Delegate.h"
+#import "UIAlertController+Additions.h"
 #import "VPNManager.h"
 #import "AdManager.h"
 #import "Logging.h"
