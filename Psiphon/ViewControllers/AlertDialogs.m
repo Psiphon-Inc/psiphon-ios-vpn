@@ -18,7 +18,7 @@
  */
 
 #import "AlertDialogs.h"
-#import "PsiphonClientCommonLibraryHelpers.h"
+#import "Strings.h"
 
 
 @implementation AlertDialogs
@@ -26,15 +26,16 @@
 + (UIAlertController *)vpnPermissionDeniedAlert {
     // Alert the user that their permission is required in order to install the VPN configuration.
     UIAlertController *alert = [UIAlertController
-      alertControllerWithTitle:NSLocalizedStringWithDefaultValue(@"VPN_START_PERMISSION_REQUIRED_TITLE", nil, [NSBundle mainBundle], @"Permission required", @"Alert dialog title indicating to the user that Psiphon needs their permission")
-                       message:NSLocalizedStringWithDefaultValue(@"VPN_START_PERMISSION_DENIED_MESSAGE", nil, [NSBundle mainBundle], @"Psiphon needs your permission to install a VPN profile in order to connect.\n\nPsiphon is committed to protecting the privacy of our users. You can review our privacy policy by tapping \"Privacy Policy\".", @"('Privacy Policy' should be the same translation as privacy policy button VPN_START_PRIVACY_POLICY_BUTTON), (Do not translate 'VPN profile'), (Do not translate 'Psiphon')")
+      alertControllerWithTitle:[Strings permissionRequiredAlertTitle]
+                       message:[Strings vpnPermissionDeniedAlertMessage]
                 preferredStyle:UIAlertControllerStyleAlert];
 
     UIAlertAction *privacyPolicyAction = [UIAlertAction
-      actionWithTitle:NSLocalizedStringWithDefaultValue(@"VPN_START_PRIVACY_POLICY_BUTTON", nil, [NSBundle mainBundle], @"Privacy Policy", @"Button label taking user's to our Privacy Policy page")
+      actionWithTitle:[Strings privacyPolicyButtonTitle]
                 style:UIAlertActionStyleDefault
               handler:^(UIAlertAction *action) {
-         NSString *urlString = NSLocalizedStringWithDefaultValue(@"PRIVACY_POLICY_URL", nil, [PsiphonClientCommonLibraryHelpers commonLibraryBundle], @"https://psiphon.ca/en/privacy.html", @"External link to the privacy policy page. Please update this with the correct language specific link (if available) e.g. https://psiphon.ca/fr/privacy.html for french.");
+
+         NSString *urlString = [Strings privacyPolicyURLString];
          [[UIApplication sharedApplication] openURL:[NSURL URLWithString:urlString]
                                             options:@{}
                                   completionHandler:^(BOOL success) {
@@ -42,7 +43,7 @@
                                   }];
      }];
 
-    UIAlertAction *dismissAction = [UIAlertAction actionWithTitle:NSLocalizedStringWithDefaultValue(@"VPN_START_PERMISSION_DISMISS_BUTTON", nil, [NSBundle mainBundle], @"Dismiss", @"Dismiss button title. Dismisses pop-up alert when the user clicks on the button")
+    UIAlertAction *dismissAction = [UIAlertAction actionWithTitle:[Strings dismissButtonTitle]
                                                             style:UIAlertActionStyleCancel
                                                           handler:^(UIAlertAction *action) {
                                                               // Do nothing.
@@ -56,10 +57,10 @@
 
 + (UIAlertController *)genericOperationFailedTryAgain {
     UIAlertController *alert = [UIAlertController
-      alertControllerWithTitle:NSLocalizedStringWithDefaultValue(@"ALERT_TITLE_OPERATION_FAILED", nil, [NSBundle mainBundle], @"Operation Failed", @"Alert dialog title.")
-                       message:NSLocalizedStringWithDefaultValue(@"ALERT_BODY_OPERATION_FAILED", nil, [NSBundle mainBundle], @"Operation failed, please try again.", @"Alert dialog body.")
+      alertControllerWithTitle:[Strings operationFailedAlertTitle]
+                       message:[Strings operationFailedAlertMessage]
                 preferredStyle:UIAlertControllerStyleAlert];
-    UIAlertAction *dismissAction = [UIAlertAction actionWithTitle:NSLocalizedStringWithDefaultValue(@"VPN_START_PERMISSION_DISMISS_BUTTON", nil, [NSBundle mainBundle], @"Dismiss", @"Dismiss button title. Dismisses pop-up alert when the user clicks on the button")
+    UIAlertAction *dismissAction = [UIAlertAction actionWithTitle:[Strings dismissButtonTitle]
                                                             style:UIAlertActionStyleCancel
                                                           handler:^(UIAlertAction *action) {
                                                               // Do nothing.
