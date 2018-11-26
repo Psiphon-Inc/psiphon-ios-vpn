@@ -33,6 +33,11 @@ NS_ASSUME_NONNULL_BEGIN
 + (NSDate *_Nullable)fromRFC3339String:(NSString *)timestamp;
 
 /**
+ * Formats date in RFC3339.
+ */
+- (NSString *)RFC3339String;
+
+/**
  * Formats current date with precision of 3 decimal points on the second.
  * @return RFC3339 timestamp.
  */

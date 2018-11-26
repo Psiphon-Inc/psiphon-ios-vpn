@@ -24,6 +24,7 @@
 // 10^9
 #define POW_10_9 1000000000.0
 
+#define SECOND_PRECISION 0
 #define MILLISECOND_PRECISION 3
 
 #define TIME_ZONE_OFFSET_UTC_MINUTES 0
@@ -50,11 +51,27 @@
     return [NSDate dateWithTimeIntervalSince1970:intervalSince1970];
 }
 
+- (NSString *)RFC3339String {
+    NSTimeInterval interval = [self timeIntervalSince1970];
+
+    double sec_integral, sec_fraction;
+    sec_fraction = modf(interval, &sec_integral);
+
+    const timestamp_t ts = {.sec = (int64_t) sec_integral,
+                            .offset = TIME_ZONE_OFFSET_UTC_MINUTES};
+
+    char buf[40];
+    size_t length = timestamp_format_precision(buf, sizeof(buf), &ts, SECOND_PRECISION);
+
+    PSIAssert(length > 0);
+
+    return [[NSString alloc] initWithBytes:buf length:length encoding:NSUTF8StringEncoding];
+}
+
 - (NSString *)RFC3339MilliString {
 
     NSTimeInterval interval = [self timeIntervalSince1970];
 
-//    int64_t sec_integral = (int64_t) interval;
     double sec_integral, sec_fraction;
     sec_fraction = modf(interval, &sec_integral);
 
