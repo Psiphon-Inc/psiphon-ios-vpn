@@ -45,10 +45,6 @@ UserDefaultsKey const ContainerAuthorizationSetKey = @"authorizations_container_
 
 UserDefaultsKey const MarkedAuthIDsExtensionStringSetKey = @"marked_authorization_ids_extension_key";
 
-UserDefaultsKey const EmbeddedEgressRegionsStringArrayKey = @"embedded_server_entries_egress_regions";
-
-UserDefaultsKey const ContainerPrivacyPolicyAcceptedRFC3339StringKey = @"PsiphonDataSharedDB.ContainerPrivacyPolicyAcceptedRFC3339StringKey";
-
 /**
  * Key for boolean value that when TRUE indicates that the extension crashed before stop was called.
  * This value is only valid if the extension is not currently running.
@@ -300,29 +296,6 @@ UserDefaultsKey const DebugPsiphonConnectionStateStringKey = @"PsiphonDataShared
     return [sharedDefaults synchronize];
 }
 
-- (void)setEmbeddedEgressRegions:(NSArray<NSString *> *_Nullable)regions {
-    [[NSUserDefaults standardUserDefaults] setObject:regions forKey:EmbeddedEgressRegionsStringArrayKey];
-}
-
-- (NSArray<NSString *> *)embeddedEgressRegions {
-    return [[NSUserDefaults standardUserDefaults] objectForKey:EmbeddedEgressRegionsStringArrayKey];
-}
-
-- (NSDate *)lastPrivacyPolicyUpdate {
-    return [NSDate fromRFC3339String:@"2018-05-15T19:39:57+00:00"];
-}
-
-- (NSDate *_Nullable)lastAcceptedPrivacyPolicy {
-    NSString *dateString = [sharedDefaults
-      stringForKey:ContainerPrivacyPolicyAcceptedRFC3339StringKey];
-
-    return [NSDate fromRFC3339String:dateString];
-}
-
-- (void)setAcceptedCurrentPrivacyPolicy {
-    NSString *dateString = [[self lastPrivacyPolicyUpdate] RFC3339String];
-    [sharedDefaults setObject:dateString forKey:ContainerPrivacyPolicyAcceptedRFC3339StringKey];
-}
 
 #pragma mark - Extension Data (Data originating in the extension)
 
