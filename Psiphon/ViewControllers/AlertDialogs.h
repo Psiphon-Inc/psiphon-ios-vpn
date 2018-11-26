@@ -30,6 +30,11 @@ NS_ASSUME_NONNULL_BEGIN
 + (UIAlertController *)vpnPermissionDeniedAlert;
 
 /**
+ * Alert dialog to be shown during onboarding when the user declines the privacy policy.
+ */
++ (UIAlertController *)privacyPolicyDeclinedAlert;
+
+/**
  * Generic alert for when an operation fails and the user is asked to the operation try again.
  */
 + (UIAlertController *)genericOperationFailedTryAgain;

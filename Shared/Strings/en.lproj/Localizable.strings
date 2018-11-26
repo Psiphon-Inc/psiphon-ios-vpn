@@ -104,6 +104,9 @@
 /* Cancel button title. */
 "PRIVACY_POLICY_CANCEL_BUTTON" = "Cancel";
 
+/* Alert message when the user declined privacy policy. They will not be able ot use the app until the user accepts the privacy policy (Do not translate 'Psiphon') */
+"PRIVACY_POLICY_DECLINED_ALERT_BODY" = "You must accept our Privacy Policy before continuing to use Psiphon.";
+
 /* External link to the privacy policy page. Please update this with the correct language specific link (if available) e.g. https://psiphon.ca/fr/privacy.html for french. */
 "PRIVACY_POLICY_URL" = "https://psiphon.ca/en/privacy.html";
 
