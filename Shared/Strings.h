@@ -49,6 +49,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (NSString *)privacyPolicyHTMLText;
 
++ (NSString *)privacyPolicyDeclinedAlertBody;
+
 #if !(TARGET_IS_EXTENSION)
 + (NSString *)privacyPolicyURLString;
 #endif
