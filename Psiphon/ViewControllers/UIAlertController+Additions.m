@@ -19,12 +19,22 @@
 
 #import "AppDelegate.h"
 #import "UIAlertController+Additions.h"
+#import "Strings.h"
 
 @implementation UIAlertController (Additions)
 
-+ (void)presentSimpleAlertWithTitle:(NSString *_Nonnull)title message:(NSString *_Nonnull)message preferredStyle:(UIAlertControllerStyle)preferredStyle okHandler:(void (^ _Nullable)(UIAlertAction *action))okHandler {
-    UIAlertController *ac = [UIAlertController alertControllerWithTitle:title message:message preferredStyle:preferredStyle];
-    UIAlertAction *okAction = [UIAlertAction actionWithTitle:NSLocalizedStringWithDefaultValue(@"OK_BUTTON", nil, [NSBundle mainBundle], @"OK", @"Alert OK Button") style:UIAlertActionStyleDefault handler:okHandler];
++ (void)presentSimpleAlertWithTitle:(NSString *_Nonnull)title
+                            message:(NSString *_Nonnull)message
+                     preferredStyle:(UIAlertControllerStyle)preferredStyle
+                          okHandler:(void (^ _Nullable)(UIAlertAction *action))okHandler {
+
+    UIAlertController *ac = [UIAlertController alertControllerWithTitle:title
+                                                                message:message
+                                                         preferredStyle:preferredStyle];
+
+    UIAlertAction *okAction = [UIAlertAction actionWithTitle:[Strings okButtonTitle]
+                                                       style:UIAlertActionStyleDefault
+                                                     handler:okHandler];
     [ac addAction:okAction];
     [ac presentFromTopController];
 }
@@ -35,7 +45,7 @@
 }
 
 - (void)addDismissAction:(void (^)(UIAlertAction *action))handler {
-    UIAlertAction *dismissAction = [UIAlertAction actionWithTitle:NSLocalizedStringWithDefaultValue(@"VPN_START_PERMISSION_DISMISS_BUTTON", nil, [NSBundle mainBundle], @"Dismiss", @"Dismiss button title. Dismisses pop-up alert when the user clicks on the button")
+    UIAlertAction *dismissAction = [UIAlertAction actionWithTitle:[Strings dismissButtonTitle]
                                                             style:UIAlertActionStyleCancel
                                                           handler:handler];
     [self addAction:dismissAction];

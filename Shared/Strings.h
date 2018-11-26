@@ -23,9 +23,35 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface Strings : NSObject
 
+#pragma mark - Generic Alert Strings
+
++ (NSString *)permissionRequiredAlertTitle;
+
++ (NSString *)operationFailedAlertTitle;
+
++ (NSString *)operationFailedAlertMessage;
+
+#pragma mark - Generic Button Titles
+
++ (NSString *)okButtonTitle;
+
++ (NSString *)dismissButtonTitle;
+
+#pragma mark - VPN
+
++ (NSString *)vpnPermissionDeniedAlertMessage;
+
+#pragma mark - Privacy Policy
+
 + (NSString *)privacyPolicyTitle;
 
++ (NSString *)privacyPolicyButtonTitle;
+
 + (NSString *)privacyPolicyHTMLText;
+
+#if !(TARGET_IS_EXTENSION)
++ (NSString *)privacyPolicyURLString;
+#endif
 
 @end
 
