@@ -107,6 +107,21 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (NSArray<NSString *> *_Nullable)embeddedEgressRegions;
 
+/**
+ * Returns date of last update to Psiphon's Privacy Policy for iOS.
+ */
+- (NSDate *)lastPrivacyPolicyUpdate;
+
+/**
+ * Returns the date of the privacy policy that was last accepted by the user.
+ */
+- (NSDate *_Nullable)lastAcceptedPrivacyPolicy;
+
+/**
+ * Stores the date of currency privacy policy as the accepted version of the privacy policy.
+ */
+- (void)setAcceptedCurrentPrivacyPolicy;
+
 #endif
 
 
