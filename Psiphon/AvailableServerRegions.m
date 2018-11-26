@@ -22,6 +22,7 @@
 #import "PsiphonDataSharedDB.h"
 #import "RegionAdapter.h"
 #import "SharedConstants.h"
+#import "ContainerDB.h"
 
 @implementation AvailableServerRegions {
     PsiphonDataSharedDB *sharedDB;
@@ -42,7 +43,7 @@
         NSArray<NSString *> *regions = [sharedDB emittedEgressRegions];
 
         if (regions == nil) {
-            regions = [sharedDB embeddedEgressRegions];
+            regions = [[[ContainerDB alloc] init] embeddedEgressRegions];
         }
 
 #if DEBUG

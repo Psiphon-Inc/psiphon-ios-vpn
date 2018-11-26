@@ -52,6 +52,7 @@
 #import "Asserts.h"
 #import "PsiCashClient.h"
 #import "PsiCashTypes.h"
+#import "ContainerDB.h"
 
 #if DEBUG
 #define kMaxAdLoadingTimeSecs 1.f
@@ -377,7 +378,7 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
     LOG_DEBUG("Available embedded egress regions: %@.", embeddedEgressRegions);
 
     if ([embeddedEgressRegions count] > 0) {
-        [self.sharedDB setEmbeddedEgressRegions:embeddedEgressRegions];
+        [[[ContainerDB alloc] init] setEmbeddedEgressRegions:embeddedEgressRegions];
     } else {
         [PsiFeedbackLogger error:@"Error no egress regions found in %@.", embeddedServerEntriesPath];
     }
