@@ -19,7 +19,6 @@
 
 #import <UIKit/UIKit.h>
 #import "RoyalSkyButton.h"
-#import "UIFont+Additions.h"
 #import "UIColor+Additions.h"
 #import "LayerAutoResizeUIView.h"
 
@@ -41,23 +40,12 @@
     }
 }
 
-#pragma mark - Resize events
-
-- (void)layoutSubviews {
-    [super layoutSubviews];
-    UIBezierPath* rounded = [UIBezierPath bezierPathWithRoundedRect:self.bounds
-                                    byRoundingCorners:UIRectCornerBottomLeft|UIRectCornerBottomRight
-                                          cornerRadii:CGSizeMake(5, 5)];
-    CAShapeLayer* shape = [CAShapeLayer layer];
-    [shape setPath:rounded.CGPath];
-    self.layer.mask = shape;
-}
-
 #pragma mark - AutoLayoutViewGroup
 
 - (void)autoLayoutSetupViews {
     [super autoLayoutSetupViews];
     statusGradientView = [[LayerAutoResizeUIView alloc] init];
+    statusGradientView.userInteractionEnabled = FALSE;  // Pass events through to parent view.
     statusGradientView.layer.cornerRadius = 4.f;
 
     CGFloat cornerRadius = 8.f;
