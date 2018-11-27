@@ -17,41 +17,38 @@
  *
  */
 
-/*
- * RootContainerController is the application's main window's root view controller.
- *
- * RootContainerController provides facility to show and hide the launch screen when needed by calling
- * showLaunchScreen and removeLaunchScreen respectively.
- * Each time showLaunchScreen is called, a new instance of LaunchScreenViewController is created,
- * however only one instance of MainViewController is created for the entire lifetime of this container.
- *
- * This class is designed to be the root view controller of AppDelegate.
- *
- * Notes on view controllers lifecycle methods:
- *  - viewWillAppear is called before the view is added to the window's hierarchy.
- *  - It will also get called before [viewController.view layoutSubViews]
- *
- *  - viewDidAppear is called after the view added to the window's view hierarchy.
- *  - It will also get called after [viewController.view layoutSubViews]
- *
- *  - viewWillDisappear is called before the view is removed from the window's view hierarchy.
- *  - viewDidDisappear is called after the views is removed from the windows's view hierarchy.
- */
+// RootContainerController is the application's main window's root view controller.
+//
+// RootContainerController handles presenting onboarding screen when needed, and switching
+// to the main UI when the onboarding is finished.
+// It handles showing a loading screen on top of the MainViewController when requested.
+//
+// Notes on view controllers lifecycle methods:
+//  - viewWillAppear is called before the view is added to the window's hierarchy.
+//  - It will also get called before [viewController.view layoutSubViews]
+//
+//  - viewDidAppear is called after the view added to the window's view hierarchy.
+//  - It will also get called after [viewController.view layoutSubViews]
+//
+//  - viewWillDisappear is called before the view is removed from the window's view hierarchy.
+//  - viewDidDisappear is called after the views is removed from the windows's view hierarchy.
 
+#import <ReactiveObjC/RACSignal.h>
 #import "RootContainerController.h"
 #import "LaunchScreenViewController.h"
 #import "Logging.h"
+#import "ContainerDB.h"
+#import "NSDate+Comparator.h"
+#import "OnboardingViewController.h"
+#import "RACCompoundDisposable.h"
 
 // Apple documentation for creating custom container view controllers:
 // https://developer.apple.com/library/content/featuredarticles/ViewControllerPGforiPhoneOS/ImplementingaContainerViewController.html
 // https://developer.apple.com/videos/play/wwdc2011/102/
 
-@interface RootContainerController ()
+@interface RootContainerController () <OnboardingViewControllerDelegate>
 
-@property (nonatomic, strong, readwrite) MainViewController *mainViewController;
-
-/* launchScreenViewController should always be private. */
-@property (nonatomic, strong, readwrite) LaunchScreenViewController *launchScreenViewController;
+@property (nonatomic) RACCompoundDisposable *compoundDisposable;
 
 @end
 
@@ -65,33 +62,79 @@
 - (instancetype)init {
     self = [super init];
     if (self) {
-        self.launchScreenViewController = nil;
-        self.mainViewController = nil;
+        _compoundDisposable = [RACCompoundDisposable compoundDisposable];
     }
     return self;
 }
 
-- (void)viewDidLoad {
-    LOG_DEBUG();
-    [super viewDidLoad];
-
-    [self.view setBackgroundColor:[UIColor blackColor]];
-
-    // As an optimization, MainViewController will not be loaded into memory (MainViewController's viewDidLoad will
-    // not be called) unless removeLaunchScreen has been called before viewDidLoad.
-    // This prevents the launch screen from taking too long to show up on the screen.
-
-    // Note that addChildViewController: has nothing to do with
-    // ViewController lifecycle methods.
-    self.mainViewController = [[MainViewController alloc] init];
-    [self displayChildVC:self.mainViewController];
-
-    self.launchScreenViewController = [[LaunchScreenViewController alloc] init];
-    [self displayChildVC:self.launchScreenViewController];
+- (void)dealloc {
+    [self.compoundDisposable dispose];
 }
 
-- (void)displayChildVC:(UIViewController *)viewController {
-    LOG_DEBUG();
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    [self.view setBackgroundColor:[UIColor blackColor]];
+
+    // If has accepted the latest privacy policy and vpn configuration has been installed,
+    // then show this
+    ContainerDB *containerDB = [[ContainerDB alloc] init];
+    NSDate *_Nullable privacyPolicyAcceptedDate = [containerDB lastAcceptedPrivacyPolicy];
+
+    if (!privacyPolicyAcceptedDate ||
+        [privacyPolicyAcceptedDate before:[containerDB lastPrivacyPolicyUpdate]]) {
+        [self switchToOnboarding];
+    } else {
+        [self switchToMainScreenAndStartVPN:FALSE];
+    }
+}
+
+- (void)switchToOnboarding {
+    // onboarding view controller should always be the first view controller.
+    assert([self.childViewControllers count] == 0);
+    OnboardingViewController *onboardingViewController = [[OnboardingViewController alloc] init];
+    onboardingViewController.delegate = self;
+    [self addAndDisplayChildVC:onboardingViewController];
+}
+
+- (void)switchToMainScreenAndStartVPN:(BOOL)startVPN {
+    assert([self.childViewControllers count] == 0);
+    RootContainerController *__weak weakSelf = self;
+
+    MainViewController *mainViewController = [[MainViewController alloc]
+      initWithStartingVPN:startVPN];
+    [self addAndDisplayChildVC:mainViewController];
+
+    LaunchScreenViewController *loadingViewController = [[LaunchScreenViewController alloc] init];
+    [self addAndDisplayChildVC:loadingViewController];
+
+    // Subscribes to the MainViewController's loading signal, to remove the launch screen
+    // once the loading is done.
+    __block RACDisposable *disposable = [mainViewController.activeStateLoadingSignal
+      subscribeNext:^(RACUnit *x) {
+          [weakSelf removeLaunchScreen];
+      } error:^(NSError *error) {
+          [weakSelf.compoundDisposable removeDisposable:disposable];
+      } completed:^{
+          [weakSelf.compoundDisposable removeDisposable:disposable];
+      }];
+
+    [self.compoundDisposable addDisposable:disposable];
+}
+
+- (void)removeLaunchScreen {
+    assert([self.childViewControllers count] == 2);
+
+    // LaunchScreenViewController should be the last child view controller.
+    LaunchScreenViewController *loadingViewController = self.childViewControllers[1];
+
+    [UIView animateWithDuration:0.8 animations:^{
+        loadingViewController.view.alpha = 0.0;
+    } completion:^(BOOL finished) {
+        [self removeChildVC:loadingViewController];
+    }];
+}
+
+- (void)addAndDisplayChildVC:(UIViewController *)viewController {
     // The order of method calls is what UIKit expects, and should not be changed.
     [self addChildViewController:viewController];
     viewController.view.frame = self.view.bounds;
@@ -100,7 +143,6 @@
     [self setNeedsStatusBarAppearanceUpdate];
 }
 
-// removeChildVC removes the given view controller from the container's children.
 - (void)removeChildVC:(UIViewController *)viewController {
     // The order of method calls is what UIKit expects, and should not be changed.
     [viewController willMoveToParentViewController:nil];
@@ -111,81 +153,39 @@
 
 #pragma mark - Status bar delegation
 
-/**
- * The last child view controller added, is the one currently being displayed full-screen.
- * @sa displayChildVC
- * @return the child view controller whose status bar appearance that will be used.
- */
+// The last child view controller added, is the one currently being displayed full-screen.
 - (UIViewController *)childViewControllerForStatusBarStyle {
     return [self.childViewControllers lastObject];
 }
 
-/**
- * The last child view controller added, is the one currently being displayed full-screen.
- * @sa displayChildVC
- * @return the child view controller whose status bar appearance that will be used.
- */
+// The last child view controller added, is the one currently being displayed full-screen.
 - (UIViewController *)childViewControllerForStatusBarHidden {
     return [self.childViewControllers lastObject];
 }
 
+#pragma mark - OnboardingViewController delegate methods
+
+- (void)onboardingFinished:(OnboardingViewController *)onboardingViewController {
+    assert([self.childViewControllers count] == 1);
+    [self removeChildVC:onboardingViewController];
+    [self switchToMainScreenAndStartVPN:TRUE];
+}
+
 #pragma mark - Public methods
 
-/**
- * Destroys the current mainViewController, and creates a new one and loads it.
- */
-- (void)reloadMainViewController {
-    if ([self.childViewControllers containsObject:self.mainViewController]) {
-        // Removes current child.
-        [self removeChildVC:self.mainViewController];
+// reloadMainViewControllerAndImmediatelyOpenSettings destroys the current MainViewController,
+// and creates a new one and loads it.
+- (void)reloadMainViewControllerAndImmediatelyOpenSettings {
+    assert([self.childViewControllers count] == 1);
+    MainViewController *mainViewController = self.childViewControllers[0];
 
-        // Creates new child MainViewController, and adds its view to current root view hierarchy.
-        self.mainViewController = [[MainViewController alloc] init];
-        [self displayChildVC:self.mainViewController];
-    }
-}
+    // Removes current child.
+    [self removeChildVC:mainViewController];
 
-/**
- * Adds LaunchScreenViewController as a child of the container.
- * NO-OP if the view controller was already added.
- */
-- (void)showLaunchScreen {
-    LOG_DEBUG();
-    if (!self.viewLoaded) {
-        // Launch screen will load sometime after viewDidLoad returns. Return immediately.
-        return;
-    }
-
-    if ([self.childViewControllers containsObject:self.launchScreenViewController]) {
-        // Launch screen is not previously removed. Return immediately.
-        return;
-    }
-
-    self.launchScreenViewController = [[LaunchScreenViewController alloc] init];
-    [self displayChildVC:self.launchScreenViewController];
-}
-
-/**
- * Removes the LaunchScreenViewController from the container.
- * If the container hasn't been loaded yet, calling this method will prevent
- * the launch screen from being launched when the container loads.
- *
- * If this is the first time launch screen is being removed, MainViewController's view
- * will be added to the container's root view.
- * NO-OP if the view controller was already removed.
- */
-- (void)removeLaunchScreen {
-    LOG_DEBUG();
-    if ([self.childViewControllers containsObject:self.launchScreenViewController]) {
-
-        [UIView animateWithDuration:0.8 animations:^{
-            self.launchScreenViewController.view.alpha = 0.0;
-        } completion:^(BOOL finished) {
-            [self removeChildVC:self.launchScreenViewController];
-            self.launchScreenViewController = nil;
-        }];
-
-    }
+    // Creates new child MainViewController, and adds its view to current root view hierarchy.
+    mainViewController = [[MainViewController alloc] initWithStartingVPN:FALSE];
+    mainViewController.openSettingImmediatelyOnViewDidAppear = TRUE;
+    [self addAndDisplayChildVC:mainViewController];
 }
 
 @end

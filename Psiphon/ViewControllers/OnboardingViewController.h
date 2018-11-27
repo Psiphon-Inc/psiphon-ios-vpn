@@ -20,9 +20,21 @@
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
 
+@protocol OnboardingViewControllerDelegate;
+
 NS_ASSUME_NONNULL_BEGIN
 
 @interface OnboardingViewController : UIViewController
+
+@property (nonatomic, nullable) id<OnboardingViewControllerDelegate> delegate;
+
+@end
+
+
+@protocol OnboardingViewControllerDelegate
+
+- (void)onboardingFinished:(OnboardingViewController *)onboardingViewController;
+
 @end
 
 NS_ASSUME_NONNULL_END

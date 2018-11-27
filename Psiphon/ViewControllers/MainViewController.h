@@ -23,8 +23,28 @@
 #import "PsiCashOnboardingViewController.h"
 #import "SettingsViewController.h"
 
-@interface MainViewController : UIViewController <PsiphonSettingsViewControllerDelegate, RegionAdapterDelegate, PsiCashPurchaseAlertViewDelegate, PsiCashOnboardingViewControllerDelegate>
+@class RACSignal<__covariant ValueType>;
+@class RACUnit;
+
+NS_ASSUME_NONNULL_BEGIN
+
+@interface MainViewController : UIViewController <PsiphonSettingsViewControllerDelegate,
+                                                  RegionAdapterDelegate,
+                                                  PsiCashPurchaseAlertViewDelegate,
+                                                  PsiCashOnboardingViewControllerDelegate>
 
 @property (nonatomic) BOOL openSettingImmediatelyOnViewDidAppear;
 
+- (instancetype)initWithStartingVPN:(BOOL)startVPN;
+
+/**
+ * Cold terminating signal that emits RACUnit and then completes when all necessary
+ * loading operations before showing the MainViewController UI are finished.
+ *
+ * This signal should ideally be subscribed to after first initializing the MainViewController.
+ */
+@property (nonatomic, readonly) RACSignal<RACUnit *> *activeStateLoadingSignal;
+
 @end
+
+NS_ASSUME_NONNULL_END

@@ -41,6 +41,7 @@
 
     self = [super init];
     if (self) {
+        _anchorAccessoryViewToBottom = FALSE;
         self->image = image;
         self->title = title;
         self->body = body;
@@ -48,6 +49,23 @@
         [self customSetup];
     }
     return self;
+}
+
+- (void)setAnchorAccessoryViewToBottom:(BOOL)anchorAccessoryViewToBottom {
+    _anchorAccessoryViewToBottom = anchorAccessoryViewToBottom;
+    [self needsUpdateConstraints];
+}
+
+- (void)layoutSubviews {
+    [super layoutSubviews];
+
+    if (self.anchorAccessoryViewToBottom) {
+        [accessoryView.bottomAnchor constraintEqualToAnchor:self.bottomAnchor].active = TRUE;
+    } else {
+        [accessoryView.topAnchor
+          constraintEqualToAnchor:bodyLabel.bottomAnchor
+                         constant:20.f].active = TRUE;
+    }
 }
 
 - (void)setupViews {
@@ -85,14 +103,14 @@
 }
 
 - (void)setupSubviewsLayoutConstraints {
-    CGFloat invAspectRatio = imageView.image.size.height / imageView.image.size.width;
+    CGFloat invAspectRatio = 0.8f * (imageView.image.size.height / imageView.image.size.width);
     imageView.translatesAutoresizingMaskIntoConstraints = FALSE;
     [imageView.topAnchor constraintEqualToAnchor:self.topAnchor constant:25.f].active = TRUE;
     [imageView.centerXAnchor constraintEqualToAnchor:self.centerXAnchor].active = TRUE;
     [imageView.leadingAnchor constraintEqualToAnchor:self.leadingAnchor].active = TRUE;
     [imageView.trailingAnchor constraintEqualToAnchor:self.trailingAnchor].active = TRUE;
-    [imageView.heightAnchor constraintEqualToAnchor:imageView.widthAnchor multiplier:invAspectRatio]
-            .active = TRUE;
+    [imageView.heightAnchor constraintEqualToAnchor:imageView.widthAnchor
+                                         multiplier:invAspectRatio].active = TRUE;
 
     titleLabel.translatesAutoresizingMaskIntoConstraints = FALSE;
     [titleLabel.topAnchor constraintEqualToAnchor:imageView.bottomAnchor constant:10.f]
@@ -114,10 +132,6 @@
 
     if (accessoryView) {
         accessoryView.translatesAutoresizingMaskIntoConstraints = FALSE;
-
-        [accessoryView.topAnchor
-          constraintEqualToAnchor:bodyLabel.bottomAnchor
-                         constant:20.f].active = TRUE;
 
         [accessoryView.centerXAnchor
           constraintEqualToAnchor:self.centerXAnchor].active = TRUE;
