@@ -28,7 +28,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, readonly, nullable) NSString *currentTitle;
 
+/**
+ * Default value is FALSE.
+ */
 @property (nonatomic, assign) BOOL shadow;
+
 @property (nonatomic, assign) CGFloat fontSize;
 
 - (instancetype)initForAutoLayout;
