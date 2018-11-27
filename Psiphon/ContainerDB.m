@@ -24,10 +24,10 @@
 #pragma mark - NSUserDefaultsKey
 
 UserDefaultsKey const PrivacyPolicyAcceptedRFC3339StringKey =
-  @"ContainerDB.PrivacyPolicyAcceptedRFC3339StringKey";
+    @"ContainerDB.PrivacyPolicyAcceptedRFC3339StringKey";
 
 UserDefaultsKey const EmbeddedEgressRegionsStringArrayKey =
-  @"embedded_server_entries_egress_regions";  // legacy key
+    @"embedded_server_entries_egress_regions";  // legacy key
 
 #pragma mark -
 
@@ -38,9 +38,13 @@ UserDefaultsKey const EmbeddedEgressRegionsStringArrayKey =
 }
 
 - (NSDate *_Nullable)lastAcceptedPrivacyPolicy {
-    NSString *dateString = [NSUserDefaults.standardUserDefaults
+    NSString *_Nullable dateString = [NSUserDefaults.standardUserDefaults
       stringForKey:PrivacyPolicyAcceptedRFC3339StringKey];
 
+    if (!dateString) {
+        return nil;
+    }
+    
     return [NSDate fromRFC3339String:dateString];
 }
 
