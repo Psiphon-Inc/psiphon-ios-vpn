@@ -33,9 +33,29 @@ NS_ASSUME_NONNULL_BEGIN
 
 #pragma mark - Generic Button Titles
 
++ (NSString *)acceptButtonTitle;
+
++ (NSString *)declineButtonTitle;
+
 + (NSString *)okButtonTitle;
 
 + (NSString *)dismissButtonTitle;
+
+#pragma mark - Onboarding
+
++ (NSString *)onboardingSelectLanguageButtonTitle;
+
++ (NSString *)onboardingBeyondBordersHeaderText;
+
++ (NSString *)onboardingBeyondBordersBodyText;
+
++ (NSString *)onboardingGettingStartedHeaderText;
+
++ (NSString *)onboardingGettingStartedBodyText;
+
++ (NSString *)vpnInstallGuideText;
+
++ (NSString *)nextPageButtonTitle;
 
 #pragma mark - VPN
 

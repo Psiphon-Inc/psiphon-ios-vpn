@@ -22,14 +22,10 @@
 
 @interface RootContainerController : UIViewController
 
-/* Only RootContainerController should manager MainViewController.
- * Value is nil until RootContainerController is loaded into memory.*/
-@property (nonatomic, strong, readonly) MainViewController *mainViewController;
-
-- (void)reloadMainViewController;
-
-- (void)showLaunchScreen;
-
-- (void)removeLaunchScreen;
+/**
+ * Destroys current MainViewController and creates a new open, opening the Settings immediately
+ * after it has loaded.
+ */
+- (void)reloadMainViewControllerAndImmediatelyOpenSettings;
 
 @end

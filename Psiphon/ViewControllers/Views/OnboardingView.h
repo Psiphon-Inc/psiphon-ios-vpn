@@ -25,6 +25,12 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface OnboardingView : UIView
 
+/**
+ * Anchors the bottom of accessory view to bottom of this view.
+ * Default value is FALSE.
+ */
+@property (nonatomic) BOOL anchorAccessoryViewToBottom;
+
 - (instancetype)initWithImage:(UIImage *)image
                     withTitle:(NSString *)title
                      withBody:(NSString *)body

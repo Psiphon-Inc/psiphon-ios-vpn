@@ -26,7 +26,6 @@
 
 @implementation Strings
 
-
 + (NSString *)permissionRequiredAlertTitle {
     return NSLocalizedStringWithDefaultValue(@"PERMISSION_REQUIRED_ALERT__TITLE", nil, [NSBundle mainBundle], @"Permission required", @"Alert dialog title indicating to the user that Psiphon needs their permission");
 }
@@ -39,12 +38,48 @@
     return NSLocalizedStringWithDefaultValue(@"ALERT_BODY_OPERATION_FAILED", nil, [NSBundle mainBundle], @"Operation failed, please try again.", @"Alert dialog body.");
 }
 
++ (NSString *)acceptButtonTitle {
+    return  NSLocalizedStringWithDefaultValue(@"ACCEPT_BUTTON_TITLE", nil, [NSBundle mainBundle], @"Accept", @"Accept button title");
+}
+
++ (NSString *)declineButtonTitle {
+    return  NSLocalizedStringWithDefaultValue(@"DECLINE_BUTTON_TITLE", nil, [NSBundle mainBundle], @"Decline", @"Decline button title");
+}
+
 + (NSString *)okButtonTitle {
     return NSLocalizedStringWithDefaultValue(@"OK_BUTTON", nil, [NSBundle mainBundle], @"OK", @"Alert OK Button");
 }
 
 + (NSString *)dismissButtonTitle {
     return NSLocalizedStringWithDefaultValue(@"DISMISS_BUTTON_TITLE", nil, [NSBundle mainBundle], @"Dismiss", @"Dismiss button title. Dismisses pop-up alert when the user clicks on the button");
+}
+
++ (NSString *)onboardingSelectLanguageButtonTitle {
+    return  NSLocalizedStringWithDefaultValue(@"SELECT_LANG_BUTTON_TITLE", nil, [NSBundle mainBundle], @"Select Language", @"Select language button title.");
+}
+
++ (NSString *)onboardingBeyondBordersHeaderText {
+    return  NSLocalizedStringWithDefaultValue(@"ONBOARDING_BEYOND_BORDERS_HEADER", nil, [NSBundle mainBundle], @"Beyond Borders", @"Beyond Borders title");
+}
+
++ (NSString *)onboardingBeyondBordersBodyText {
+    return  NSLocalizedStringWithDefaultValue(@"ONBOARDING_BEYOND_BORDERS_BODY", nil, [NSBundle mainBundle], @"Censored by your country, corporation, or campus? Psiphon is uniquely suited to help you get to the content you want, whenever and wherever you want it.", @"Onboarding screen text. (Do not translate 'Psiphon').");
+}
+
++ (NSString *)onboardingGettingStartedHeaderText {
+    return  NSLocalizedStringWithDefaultValue(@"ONBOARDING_GETTING_STARTED_HEADER", nil, [NSBundle mainBundle], @"Getting Started", @"Onboarding header");
+}
+
++ (NSString *)onboardingGettingStartedBodyText {
+    return  NSLocalizedStringWithDefaultValue(@"ONBOARDING_GETTING_STARTED_BODY", nil, [NSBundle mainBundle], @"Psiphon uses VPN technology to provide you with uncensored access to internet content. You’ll need to allow Psiphon to add VPN configurations to your phone in order to connect with a safe path to the internet.", @"Onboarding screen 'getting started' body.");
+}
+
++ (NSString *)vpnInstallGuideText {
+    return  NSLocalizedStringWithDefaultValue(@"ONBARDING_VPN_INSTALL_GUIDE_TEXT", nil, [NSBundle mainBundle], @"You’ll need to allow Psiphon to add VPN configurations in order to connect.", @"Onboarding text for install VPN configuration. (Do not translate 'Psiphon').");
+}
+
++ (NSString *)nextPageButtonTitle {
+    return  NSLocalizedStringWithDefaultValue(@"NEXT_PAGE_BUTTON_TITLE", nil, [NSBundle mainBundle], @"Next", @"Button title that takes user to the next page");
 }
 
 + (NSString *)vpnPermissionDeniedAlertMessage {

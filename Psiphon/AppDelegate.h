@@ -51,16 +51,7 @@ typedef NS_ENUM(NSInteger, UserSubscriptionStatus) {
 
 + (AppDelegate *)sharedAppDelegate;
 
-/* Ads */
-- (UIViewController *)getAdsPresentingViewController;
-
-/**
- * Reloads the MainViewController.
- *
- * @details
- * reloadMainViewController is meant to be used after a settings change (e.g. default language).
- */
-- (void)reloadMainViewController;
+- (void)reloadMainViewControllerAndImmediatelyOpenSettings;
 
 - (UIAlertController *)displayAlertNoInternet:(void (^_Nullable)(UIAlertAction *))handler;
 

@@ -51,7 +51,6 @@
 #import "RACUnit.h"
 #import "RegionSelectionButton.h"
 #import "NSNotificationCenter+RACSupport.h"
-#import "PrivacyPolicyViewController.h"
 #import "PsiCashBalanceView.h"
 #import "PsiCashClient.h"
 #import "PsiCashSpeedBoostMeterView.h"
@@ -65,17 +64,34 @@
 #import "UIView+AutoLayoutViewGroup.h"
 #import "OnboardingViewController.h"
 #import "AlertDialogs.h"
+#import "RACSignal+Operations2.h"
+#import "ContainerDB.h"
+#import "NSDate+Comparator.h"
+
 
 PsiFeedbackLogType const RewardedVideoLogType = @"RewardedVideo";
 
-UserDefaultsKey const PrivacyPolicyAcceptedBoolKey = @"PrivacyPolicy.AcceptedBoolKey";
 UserDefaultsKey const PsiCashHasBeenOnboardedBoolKey = @"PsiCash.HasBeenOnboarded";
+
+#if DEBUG
+NSTimeInterval const MaxAdLoadingTime = 1.f;
+#else
+NSTimeInterval const MaxAdLoadingTime = 10.f;
+#endif
+
+// TODO: turn this into an enum.
+NSString * const CommandNoInternetAlert = @"NoInternetAlert";
+NSString * const CommandStartTunnel = @"StartTunnel";
+NSString * const CommandStopVPN = @"StopVPN";
+
 
 @interface MainViewController ()
 
 @property (nonatomic) RACCompoundDisposable *compoundDisposable;
 @property (nonatomic) AdManager *adManager;
 @property (nonatomic) VPNManager *vpnManager;
+
+@property (nonatomic, readonly) BOOL startVPNOnFirstLoad;
 
 @end
 
@@ -132,7 +148,7 @@ UserDefaultsKey const PsiCashHasBeenOnboardedBoolKey = @"PsiCash.HasBeenOnboarde
 // No heavy initialization should be done here, since RootContainerController
 // expects this method to return immediately.
 // All such initialization could be deferred to viewDidLoad callback.
-- (id)init {
+- (id)initWithStartingVPN:(BOOL)startVPN {
     self = [super init];
     if (self) {
         
@@ -143,11 +159,13 @@ UserDefaultsKey const PsiCashHasBeenOnboardedBoolKey = @"PsiCash.HasBeenOnboarde
         _adManager = [AdManager sharedInstance];
         
         feedbackManager = [[FeedbackManager alloc] init];
-        
+
+        // TODO: remove persistance form init function.
         [self persistSettingsToSharedUserDefaults];
         
-        // Open Setting after change it
-        self.openSettingImmediatelyOnViewDidAppear = NO;
+        _openSettingImmediatelyOnViewDidAppear = FALSE;
+
+        _startVPNOnFirstLoad = startVPN;
 
         [RegionAdapter sharedInstance].delegate = self;
     }
@@ -163,6 +181,14 @@ UserDefaultsKey const PsiCashHasBeenOnboardedBoolKey = @"PsiCash.HasBeenOnboarde
 - (void)viewDidLoad {
     LOG_DEBUG();
     [super viewDidLoad];
+
+    // Note: Don't load MainViewController unless the user has accepted the privacy policy.
+    // PsiCash and AdManager unless the user has accepted
+    // the privacy policy.
+    ContainerDB *containerDB = [[ContainerDB alloc] init];
+    NSDate *_Nullable privacyPolicyAcceptedDate = [containerDB lastAcceptedPrivacyPolicy];
+    assert(privacyPolicyAcceptedDate != nil);
+    assert([privacyPolicyAcceptedDate afterOrEqualTo:[containerDB lastPrivacyPolicyUpdate]]);
 
     availableServerRegions = [[AvailableServerRegions alloc] init];
     [availableServerRegions sync];
@@ -191,14 +217,6 @@ UserDefaultsKey const PsiCashHasBeenOnboardedBoolKey = @"PsiCash.HasBeenOnboarde
           VPNStatus s = (VPNStatus) [statusObject integerValue];
 
           [weakSelf updateUIConnectionState:s];
-
-          if (s == VPNStatusConnecting ||
-              s == VPNStatusRestarting ||
-              s == VPNStatusReasserting) {
-              // TODO: start connection animation
-          } else {
-              // TODO: remove connection animation
-          }
 
           // Notify SettingsViewController that the state has changed.
           // Note that this constant is used PsiphonClientCommonLibrary, and cannot simply be replaced by a RACSignal.
@@ -261,7 +279,37 @@ UserDefaultsKey const PsiCashHasBeenOnboardedBoolKey = @"PsiCash.HasBeenOnboarde
 
     [self.compoundDisposable addDisposable:disposable];
 
+    // If MainViewController is asked to start VPN first, then initialize dependencies
+    // only after starting the VPN. Otherwise, we initialize the dependencies immediately.
+    {
+        __block RACDisposable *startDisposable = [[[[RACSignal return:@(self.startVPNOnFirstLoad)]
+          flattenMap:^RACSignal<RACUnit *> *(NSNumber *startVPNFirst) {
 
+              if ([startVPNFirst boolValue]) {
+                  return [[weakSelf startOrStopVPNSignalWithAd:FALSE]
+                    mapReplace:RACUnit.defaultUnit];
+              } else {
+                  return [RACSignal return:RACUnit.defaultUnit];
+              }
+          }]
+          doNext:^(RACUnit *x) {
+              // Start PsiCash and AdManager lifecycle.
+              // Important: dependencies might be initialized while the tunnel is connecting or
+              // when there is no active internet connection.
+
+              // TODO: Add custom initialization method to PsiCash
+              [[PsiCashClient sharedInstance] scheduleRefreshState];
+              [[AdManager sharedInstance] initializeAdManager];
+          }]
+          subscribeError:^(NSError *error) {
+              [weakSelf.compoundDisposable removeDisposable:startDisposable];
+          }
+          completed:^{
+              [weakSelf.compoundDisposable removeDisposable:startDisposable];
+          }];
+
+        [self.compoundDisposable addDisposable:startDisposable];
+    }
 }
 
 - (void)viewDidAppear:(BOOL)animated {
@@ -274,7 +322,7 @@ UserDefaultsKey const PsiCashHasBeenOnboardedBoolKey = @"PsiCash.HasBeenOnboarde
     
     if (self.openSettingImmediatelyOnViewDidAppear) {
         [self openSettingsMenu];
-        self.openSettingImmediatelyOnViewDidAppear = NO;
+        self.openSettingImmediatelyOnViewDidAppear = FALSE;
     }
 }
 
@@ -312,56 +360,67 @@ UserDefaultsKey const PsiCashHasBeenOnboardedBoolKey = @"PsiCash.HasBeenOnboarde
     [super viewWillTransitionToSize:size withTransitionCoordinator:coordinator];
 }
 
-#pragma mark - UI callbacks
+#pragma mark - Public properties
 
-- (void)onStartStopTap:(UIButton *)sender {
+- (RACSignal<RACUnit *> *)activeStateLoadingSignal {
 
-    __weak MainViewController *weakSelf = self;
+    // adsLoadingSignal emits a value when untunnelled interstitial ad has loaded or
+    // when MaxAdLoadingTime has passed.
+    // If the device in not in untunneled state, this signal makes an emission and
+    // then completes immediately, without checking the untunneled interstitial status.
+    RACSignal *adsLoadingSignal = [[[VPNManager sharedInstance].lastTunnelStatus
+      flattenMap:^RACSignal *(NSNumber *statusObject) {
 
-    // privacyPolicyDismissed is a cold terminating signal that emits @TRUE if the PP was accepted,
-    // otherwise emits @FALSE.
-    RACSignal<NSNumber *> *privacyPolicyDismissed = [[RACSignal return:
-                   @([NSUserDefaults.standardUserDefaults boolForKey:PrivacyPolicyAcceptedBoolKey])]
-      flattenMap:^RACSignal<RACUnit *> *(NSNumber *alreadyAccepted) {
+          VPNStatus s = (VPNStatus) [statusObject integerValue];
+          BOOL needAdConsent = [MoPub sharedInstance].shouldShowConsentDialog;
 
-        if ([alreadyAccepted boolValue]) {
-            return [RACSignal return:alreadyAccepted];
-        } else {
+          if (!needAdConsent && (s == VPNStatusDisconnected || s == VPNStatusInvalid)) {
 
-            PrivacyPolicyViewController *c = [[PrivacyPolicyViewController alloc] init];
-            [self presentViewController:c animated:TRUE completion:nil];
+              // Device is untunneled and ad consent is given or not needed,
+              // we therefore wait for the ad to load.
+              return [[[[AdManager sharedInstance].untunneledInterstitialCanPresent
+                filter:^BOOL(NSNumber *adIsReady) {
+                    return [adIsReady boolValue];
+                }]
+                merge:[RACSignal timer:MaxAdLoadingTime]]
+                take:1];
 
-            return [[[[[NSNotificationCenter defaultCenter]
-              rac_addObserverForName:PrivacyPolicyDismissedNotification
-                              object:nil]
-              take:1]
-              map:^NSNumber *(NSNotification *notification) {
-                  return notification.userInfo[PrivacyPolicyAcceptedNotificationBoolKey];
-              }]
-              doNext:^(NSNumber *accepted) {
-                  // Update user defaults value.
-                  [NSUserDefaults.standardUserDefaults setBool:[accepted boolValue]
-                                                        forKey:PrivacyPolicyAcceptedBoolKey];
-              }];
-        }
-    }];
-
-
-    NSString * const CommandNoInternetAlert = @"NoInternetAlert";
-    NSString * const CommandStartTunnel = @"StartTunnel";
-    NSString * const CommandStopVPN = @"StopVPN";
-
-    // signal emits a single two tuple (isVPNActive, connectOnDemandEnabled).
-    __block RACDisposable *disposable = [[[[privacyPolicyDismissed
-      flattenMap:^RACSignal<RACTwoTuple <NSNumber *, NSNumber *> *> *(NSNumber *accepted) {
-          // If the user has accepted the privacy policy continue with starting the VPN,
-          // otherwise terminate the subscription.
-          if ([accepted boolValue]) {
-              return [weakSelf.vpnManager isVPNActive];
           } else {
-              return [RACSignal empty];
+              // Device in _not_ untunneled or we need to show the Ad consent modal screen,
+              // wo we will emit RACUnit immediately since no ads will be loaded here.
+              return [RACSignal return:RACUnit.defaultUnit];
           }
       }]
+      take:1];
+
+    // subscriptionLoadingSignal emits a value when the user subscription status becomes known.
+    RACSignal *subscriptionLoadingSignal = [[[AppDelegate sharedAppDelegate].subscriptionStatus
+      filter:^BOOL(NSNumber *value) {
+          UserSubscriptionStatus s = (UserSubscriptionStatus) [value integerValue];
+          return (s != UserSubscriptionUnknown);
+      }]
+      take:1];
+
+    // Returned signal emits RACUnit and completes immediately after all loading operations
+    // are done.
+    return [subscriptionLoadingSignal flattenMap:^RACSignal *(NSNumber *value) {
+        BOOL subscribed = ([value integerValue] == UserSubscriptionActive);
+
+        if (subscribed) {
+            // User is subscribed, dismiss the loading screen immediately.
+            return [RACSignal return:RACUnit.defaultUnit];
+        } else {
+            // User is not subscribed, wait for the adsLoadingSignal.
+            return [adsLoadingSignal mapReplace:RACUnit.defaultUnit];
+        }
+    }];
+}
+
+// Emits one of the `Command_` strings.
+- (RACSignal<NSString *> *)startOrStopVPNSignalWithAd:(BOOL)showAd {
+    __weak MainViewController *weakSelf = self;
+
+    return [[[[self.vpnManager isVPNActive]
       flattenMap:^RACSignal<NSString *> *(RACTwoTuple<NSNumber *, NSNumber *> *value) {
           BOOL vpnActive = [value.first boolValue];
           BOOL isZombie = (VPNStatusZombie == (VPNStatus)[value.second integerValue]);
@@ -381,18 +440,20 @@ UserDefaultsKey const PsiCashHasBeenOnboardedBoolKey = @"PsiCash.HasBeenOnboarde
               } else {
 
                   // Returned signal checks whether or not VPN configuration is already installed.
-                  // Skips presenting ads if the VPN configuration is not installed.
+                  // Skips presenting ads if the VPN configuration is not installed, or
+                  // we're asked to not show ads.
                   return [[weakSelf.vpnManager vpnConfigurationInstalled]
                     flattenMap:^RACSignal *(NSNumber *value) {
                         BOOL vpnInstalled = [value boolValue];
 
-                        if (!vpnInstalled) {
+                        if (!vpnInstalled || !showAd) {
                             return [RACSignal return:CommandStartTunnel];
                         } else {
                             // Start tunnel after ad presentation signal completes.
-                            // We always want to start the tunnel after the presentation signal is completed,
-                            // no matter if it presented an ad or it failed.
-                            return [[weakSelf.adManager presentInterstitialOnViewController:weakSelf]
+                            // We always want to start the tunnel after the presentation signal
+                            // is completed, no matter if it presented an ad or it failed.
+                            return [[weakSelf.adManager
+                              presentInterstitialOnViewController:weakSelf]
                               then:^RACSignal * {
                                   return [RACSignal return:CommandStartTunnel];
                               }];
@@ -402,25 +463,35 @@ UserDefaultsKey const PsiCashHasBeenOnboardedBoolKey = @"PsiCash.HasBeenOnboarde
           }
 
       }]
-      deliverOnMainThread]
-      subscribeNext:^(NSString *command) {
+      doNext:^(NSString *command) {
+          dispatch_async_main(^{
+              if ([CommandStartTunnel isEqualToString:command]) {
+                  [weakSelf.vpnManager startTunnel];
 
-        if ([CommandStartTunnel isEqualToString:command]) {
-            [weakSelf.vpnManager startTunnel];
+              } else if ([CommandStopVPN isEqualToString:command]) {
+                  [weakSelf.vpnManager stopVPN];
 
-        } else if ([CommandStopVPN isEqualToString:command]) {
-            [weakSelf.vpnManager stopVPN];
+              } else if ([CommandNoInternetAlert isEqualToString:command]) {
+                  [[AppDelegate sharedAppDelegate] displayAlertNoInternet:nil];
+              }
+          });
+      }]
+      deliverOnMainThread];
+}
 
-        } else if ([CommandNoInternetAlert isEqualToString:command]) {
-            [[AppDelegate sharedAppDelegate] displayAlertNoInternet:nil];
-        }
+#pragma mark - UI callbacks
 
-    } error:^(NSError *error) {
+- (void)onStartStopTap:(UIButton *)sender {
+    MainViewController *__weak weakSelf = self;
+
+    __block RACDisposable *disposable = [[self startOrStopVPNSignalWithAd:TRUE]
+      subscribeError:^(NSError *error) {
         [weakSelf.compoundDisposable removeDisposable:disposable];
-    } completed:^{
+      }
+      completed:^{
         [weakSelf.compoundDisposable removeDisposable:disposable];
-    }];
-    
+      }];
+
     [self.compoundDisposable addDisposable:disposable];
 }
 
@@ -844,7 +915,7 @@ UserDefaultsKey const PsiCashHasBeenOnboardedBoolKey = @"PsiCash.HasBeenOnboarde
     if (appSettingsViewController != nil) {
         [appSettingsViewController dismissViewControllerAnimated:NO completion:^{
             [[RegionAdapter sharedInstance] reloadTitlesForNewLocalization];
-            [[AppDelegate sharedAppDelegate] reloadMainViewController];
+            [[AppDelegate sharedAppDelegate] reloadMainViewControllerAndImmediatelyOpenSettings];
         }];
     }
 }

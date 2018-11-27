@@ -1,5 +1,8 @@
 /* THIS FILE IS GENERATED. DO NOT EDIT. */
 
+/* Accept button title */
+"ACCEPT_BUTTON_TITLE" = "Accept";
+
 /* Title of the section in the subscription dialog that shows currently active subscription information. */
 "ACTIVE_SUBSCRIPTION_SECTION_TITLE" = "You're subscribed!";
 
@@ -48,6 +51,9 @@
 /* Alert dialog message informing the user that the settings file in the app is corrupt, and that they can potentially fix this issue by re-installing the app. */
 "CORRUPT_SETTINGS_MESSAGE" = "Your app settings file appears to be corrupt. Try reinstalling the app to repair the file.";
 
+/* Decline button title */
+"DECLINE_BUTTON_TITLE" = "Decline";
+
 /* Dismiss button title. Dismisses pop-up alert when the user clicks on the button */
 "DISMISS_BUTTON_TITLE" = "Dismiss";
 
@@ -79,6 +85,9 @@
 /* Text displayed while app loads */
 "LOADING" = "Loading...";
 
+/* Button title that takes user to the next page */
+"NEXT_PAGE_BUTTON_TITLE" = "Next";
+
 /* Alert title informing user there is no internet connection */
 "NO_INTERNET" = "No Internet Connection";
 
@@ -89,8 +98,23 @@
    OK button on a pop-up alert. The alert will be dismissed when the user presses this button. */
 "OK_BUTTON" = "OK";
 
+/* Onboarding text for install VPN configuration. (Do not translate 'Psiphon'). */
+"ONBARDING_VPN_INSTALL_GUIDE_TEXT" = "You’ll need to allow Psiphon to add VPN configurations in order to connect.";
+
+/* Onboarding screen text. (Do not translate 'Psiphon'). */
+"ONBOARDING_BEYOND_BORDERS_BODY" = "Censored by your country, corporation, or campus? Psiphon is uniquely suited to help you get to the content you want, whenever and wherever you want it.";
+
+/* Beyond Borders title */
+"ONBOARDING_BEYOND_BORDERS_HEADER" = "Beyond Borders";
+
 /* Text of button at the bottom right or left (depending on rtl) of the last onboarding screen which allows the user to finish the onboarding sequence. Note: should be all uppercase (capitalized) when possible. */
 "ONBOARDING_DONE_BUTTON" = "DONE";
+
+/* Onboarding screen 'getting started' body. */
+"ONBOARDING_GETTING_STARTED_BODY" = "Psiphon uses VPN technology to provide you with uncensored access to internet content. You’ll need to allow Psiphon to add VPN configurations to your phone in order to connect with a safe path to the internet.";
+
+/* Onboarding header */
+"ONBOARDING_GETTING_STARTED_HEADER" = "Getting Started";
 
 /* Text of button at the bottom right or left (depending on rtl) of the onboarding screens which allows the user to move on to the next onboarding screen. Note: should be all uppercase (capitalized) when possible. */
 "ONBOARDING_NEXT_BUTTON" = "NEXT";
@@ -100,9 +124,6 @@
 
 /* Alert dialog title indicating to the user that Psiphon needs their permission */
 "PERMISSION_REQUIRED_ALERT__TITLE" = "Permission required";
-
-/* Cancel button title. */
-"PRIVACY_POLICY_CANCEL_BUTTON" = "Cancel";
 
 /* Alert message when the user declined privacy policy. They will not be able ot use the app until the user accepts the privacy policy (Do not translate 'Psiphon') */
 "PRIVACY_POLICY_DECLINED_ALERT_BODY" = "You must accept our Privacy Policy before continuing to use Psiphon.";
@@ -157,9 +178,6 @@
 
 /* Sub-heading in the 'User VPN Data' section of the Privacy Policy page. The section describes why Psiphon needs VPN data stats. */
 "PrivacyInformationCollectedVpndataWhydoespsiphonneedSubhead" = "Why does Psiphon need these statistics?";
-
-/* Button label at the end of privacy policy screen, indication that when clicked user can start using Psiphon */
-"PrivacyPolicyGetStartedButtonTitle" = "Get started with Psiphon";
 
 /* page title for the Privacy Policy page */
 "PrivacyTitle" = "Privacy Policy";
@@ -263,6 +281,9 @@
 
 /* Button label indicating to the user that there are no videos available for them to watch. */
 "REWARDED_VIDEO_NO_VIDEOS_AVAILABLE" = "No Videos Available";
+
+/* Select language button title. */
+"SELECT_LANG_BUTTON_TITLE" = "Select Language";
 
 /* Title of cell in settings menu which, when pressed, reinstalls the user's VPN profile for Psiphon */
 "SETTINGS_REINSTALL_VPN_CONFIGURATION_CELL_TITLE" = "Reinstall VPN profile";
