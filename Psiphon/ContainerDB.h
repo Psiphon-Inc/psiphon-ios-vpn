@@ -23,6 +23,20 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface ContainerDB : NSObject
 
+#pragma mark - App Info
+
+/**
+ * App string version from last lunch.
+ * @return String version or nil if it doesn't exist.
+ */
+- (NSString *_Nullable)storedAppVersion;
+
+/**
+ * Stores current app version.
+ * @param appVersion App version string should not be nil.
+ */
+- (void)storeCurrentAppVersion:(NSString *)appVersion;
+
 #pragma mark - Privacy Policy
 
 /**
