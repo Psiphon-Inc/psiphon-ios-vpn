@@ -29,11 +29,22 @@ UserDefaultsKey const PrivacyPolicyAcceptedRFC3339StringKey =
 UserDefaultsKey const EmbeddedEgressRegionsStringArrayKey =
     @"embedded_server_entries_egress_regions";  // legacy key
 
+UserDefaultsKey const AppInfoLastCFBundleVersionStringKey = @"LastCFBundleVersion"; // legacy key
+
 #pragma mark -
 
 @implementation ContainerDB
 
-- (NSDate *)lastPrivacyPolicyUpdate {
+- (NSString *_Nullable)storedAppVersion {
+    return [NSUserDefaults.standardUserDefaults stringForKey:AppInfoLastCFBundleVersionStringKey];
+}
+
+- (void)storeCurrentAppVersion:(NSString *)appVersion {
+    [NSUserDefaults.standardUserDefaults setObject:appVersion
+                                            forKey:AppInfoLastCFBundleVersionStringKey];
+}
+
+- (NSDate *)privacyPolicyUpdateDate {
     return [NSDate fromRFC3339String:@"2018-05-15T19:39:57+00:00"];
 }
 

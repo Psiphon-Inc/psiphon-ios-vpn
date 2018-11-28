@@ -53,6 +53,7 @@
 #import "PsiCashClient.h"
 #import "PsiCashTypes.h"
 #import "ContainerDB.h"
+#import "AppUpgrade.h"
 
 // Number of seconds to wait for tunnel status to become "Connected", after the landing page notification
 // is received from the extension.
@@ -118,7 +119,15 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
 
 # pragma mark - Lifecycle methods
 
-- (BOOL)application:(UIApplication *)application willFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+- (BOOL)application:(UIApplication *)application
+    willFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+
+    if ([AppUpgrade firstRunOfAppVersion]) {
+        [self updateAvailableEgressRegionsOnFirstRunOfAppVersion];
+
+        // Reset Jetsam counter.
+        [self.sharedDB resetJetsamCounter];
+    }
 
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(onUpdatedSubscriptionDictionary)
@@ -133,13 +142,6 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
 
 
     [[IAPStoreHelper sharedInstance] startProductsRequest];
-
-    if ([AppInfo firstRunOfAppVersion]) {
-        [self updateAvailableEgressRegionsOnFirstRunOfAppVersion];
-
-        // Reset Jetsam counter.
-        [self.sharedDB resetJetsamCounter];
-    }
 
     return YES;
 }

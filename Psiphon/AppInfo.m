@@ -19,52 +19,19 @@
 
 #import "AppInfo.h"
 #import "Asserts.h"
-#import "PsiFeedbackLogger.h"
 #import "PsiphonConfigReader.h"
 #import "PsiphonDataSharedDB.h"
 #import "SharedConstants.h"
 #import "UserDefaults.h"
 
 PsiFeedbackLogType const AppInfoLogType = @"AppInfo";
-PsiFeedbackLogType const AppUpgradeLogType = @"AppUpgrade";
 
-UserDefaultsKey const AppInfoLastCFBundleVersionStringKey = @"LastCFBundleVersion";
 UserDefaultsKey const AppInfoFastLaneSnapShotBoolKey = @"FASTLANE_SNAPSHOT";
 
 @implementation AppInfo
 
 + (NSString*)appVersion {
     return [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleVersion"];
-}
-
-+ (BOOL)firstRunOfAppVersion {
-    static BOOL firstRunOfVersion;
-    static dispatch_once_t once;
-    dispatch_once(&once, ^{
-        NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
-        
-        NSString *appVersion = [AppInfo appVersion];
-        PSIAssert(appVersion != nil);
-        NSString *lastLaunchAppVersion = [userDefaults stringForKey:AppInfoLastCFBundleVersionStringKey];
-        
-        if ([appVersion isEqualToString:lastLaunchAppVersion]) {
-            firstRunOfVersion = FALSE;
-        } else {
-            firstRunOfVersion = TRUE;
-            
-            NSMutableDictionary *versions = [[NSMutableDictionary alloc] init];
-            if (lastLaunchAppVersion) {
-                [versions setObject:lastLaunchAppVersion forKey:@"old"];
-            }
-            if (appVersion) {
-                [versions setObject:appVersion forKey:@"new"];
-                [userDefaults setObject:appVersion forKey:AppInfoLastCFBundleVersionStringKey];
-            }
-            
-            [PsiFeedbackLogger infoWithType:AppUpgradeLogType json:@{@"CFBundleVersion":versions}];
-        }
-    });
-    return firstRunOfVersion;
 }
 
 #if !(TARGET_IS_EXTENSION)

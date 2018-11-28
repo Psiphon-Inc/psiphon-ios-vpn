@@ -19,18 +19,23 @@
 
 #import <Foundation/Foundation.h>
 
-@interface AppInfo : NSObject
 
-+ (NSString*_Nullable)appVersion;
+NS_ASSUME_NONNULL_BEGIN
 
-#if !(TARGET_IS_EXTENSION)
-+ (NSString*_Nullable)clientRegion;
+@interface AppUpgrade : NSObject
 
-+ (NSString*_Nullable)propagationChannelId;
-
-+ (NSString*_Nullable)sponsorId;
-#endif
-
-+ (BOOL)runningUITest;
+/**
+ * Handles app upgrade.
+ * If this is an app upgrade, blocks until necessary app upgrade steps are done.
+ *
+ * This should be called in AppDelegate `-application:willFinishLaunchingWithOptions:` as the first
+ * operation performed by the app, since the upgrade procedure is allowed to change any of the data
+ * stored in the app.
+ *
+ * @return TRUE if this is the first run of current app version, FALSE otherwise.
+ */
++ (BOOL)firstRunOfAppVersion;
 
 @end
+
+NS_ASSUME_NONNULL_END
