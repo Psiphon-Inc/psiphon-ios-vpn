@@ -48,8 +48,8 @@ UserDefaultsKey const EmbeddedEgressRegionsStringArrayKey =
     return [NSDate fromRFC3339String:dateString];
 }
 
-- (void)setAcceptedCurrentPrivacyPolicy {
-    NSString *dateString = [[self lastPrivacyPolicyUpdate] RFC3339String];
+- (void)setAcceptedPrivacyPolicy:(NSDate *)privacyPolicyDate {
+    NSString *dateString = [privacyPolicyDate RFC3339String];
     [NSUserDefaults.standardUserDefaults setObject:dateString
                                             forKey:PrivacyPolicyAcceptedRFC3339StringKey];
 }
