@@ -23,15 +23,9 @@
 #import "PsiphonProgressView.h"
 #import "UIView+AutoLayoutViewGroup.h"
 
+
 #define kProgressViewToScreenRatio 0.9f
 #define kProgressViewMaxDimensionLength 500.f
-
-
-@interface LaunchScreenViewController ()
-
-@end
-
-static const NSString *ItemStatusContext;
 
 @implementation LaunchScreenViewController {
     // Loading Text
@@ -62,14 +56,6 @@ static const NSString *ItemStatusContext;
     [self addLoadingLabel];
 
     [self setNeedsStatusBarAppearanceUpdate];
-}
-
-- (void)willMoveToParentViewController:(nullable UIViewController *)parent {
-    [super willMoveToParentViewController:parent];
-
-    if (parent == nil) {
-        // no more parenting.
-    }
 }
 
 #pragma mark - helpers
