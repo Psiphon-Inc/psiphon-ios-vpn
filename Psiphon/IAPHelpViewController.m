@@ -18,7 +18,6 @@
  */
 
 #import "IAPHelpViewController.h"
-#import "Logging.h"
 #import "UIFont+Additions.h"
 
 @interface IAPHelpViewController () <UITableViewDataSource, UITableViewDelegate>
@@ -147,9 +146,12 @@
     // Help label constraints
     label.translatesAutoresizingMaskIntoConstraints = NO;
     [label.centerXAnchor constraintEqualToAnchor:cell.contentView.centerXAnchor].active = TRUE;
-    [label autoPinEdgeToSuperviewEdge:ALEdgeLeading withInset:16.0].active = TRUE;
-    [label autoPinEdgeToSuperviewEdge:ALEdgeTop withInset:16.0].active = TRUE;
-    [label autoPinEdgeToSuperviewEdge:ALEdgeTrailing withInset:16.0].active = TRUE;
+    [label.topAnchor constraintEqualToAnchor:cell.contentView.topAnchor
+                                    constant:16.f].active = TRUE;
+    [label.leadingAnchor constraintEqualToAnchor:cell.contentView.leadingAnchor
+                                        constant:16.f].active = TRUE;
+    [label.trailingAnchor constraintEqualToAnchor:cell.contentView.trailingAnchor
+                                         constant:-16.f].active = TRUE;
 
     // Help button constraints
     button.translatesAutoresizingMaskIntoConstraints = FALSE;
@@ -157,7 +159,9 @@
     [button.widthAnchor constraintEqualToConstant:250].active = TRUE;
     [button.heightAnchor constraintEqualToConstant:50].active = TRUE;
     [button.topAnchor constraintEqualToAnchor:label.bottomAnchor constant:16.0].active = TRUE;
-    [button autoPinEdgeToSuperviewEdge:ALEdgeBottom withInset:16.0].active = TRUE;
+
+    [button.bottomAnchor constraintEqualToAnchor:cell.contentView.bottomAnchor
+                                        constant:-16.f].active = TRUE;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {

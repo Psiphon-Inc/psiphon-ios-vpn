@@ -20,14 +20,8 @@
 #import <Foundation/Foundation.h>
 #import "AppDelegate.h"
 #import "LaunchScreenViewController.h"
-#import "Logging.h"
 #import "PsiphonProgressView.h"
-#import "PureLayout.h"
-#import "RootContainerController.h"
-#import "Asserts.h"
 #import "UIView+AutoLayoutViewGroup.h"
-
-#define kTimerInterval 1.f
 
 #define kProgressViewToScreenRatio 0.9f
 #define kProgressViewMaxDimensionLength 500.f
@@ -91,7 +85,12 @@ static const NSString *ItemStatusContext;
     centerYAnchor.priority = UILayoutPriorityDefaultHigh;
     centerYAnchor.active = YES;
 
-    [progressView autoSetDimensionsToSize:[self progressViewSize]];
+    CGFloat len = kProgressViewToScreenRatio * [self minDimensionLength];
+    if (len > kProgressViewMaxDimensionLength) {
+        len = kProgressViewMaxDimensionLength;
+    }
+    [progressView.widthAnchor constraintEqualToConstant:len].active = TRUE;
+    [progressView.heightAnchor constraintEqualToConstant:len].active = TRUE;
 }
 
 - (void)addLoadingLabel {
@@ -110,14 +109,6 @@ static const NSString *ItemStatusContext;
     [loadingLabel.centerXAnchor constraintEqualToAnchor:self.view.centerXAnchor].active = YES;
     [loadingLabel.topAnchor constraintGreaterThanOrEqualToAnchor:progressView.bottomAnchor].active = YES;
     [loadingLabel.bottomAnchor constraintEqualToAnchor:self.bottomLayoutGuide.bottomAnchor constant:-15].active = YES;
-}
-
-- (CGSize)progressViewSize {
-    CGFloat len = kProgressViewToScreenRatio * [self minDimensionLength];
-    if (len > kProgressViewMaxDimensionLength) {
-        len = kProgressViewMaxDimensionLength;
-    }
-    return CGSizeMake(len, len);
 }
 
 - (CGFloat)minDimensionLength {

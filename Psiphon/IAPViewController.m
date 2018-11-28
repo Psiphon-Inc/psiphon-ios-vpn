@@ -17,7 +17,6 @@
  *
  */
 
-#import <PureLayout/ALView+PureLayout.h>
 #import "IAPViewController.h"
 #import "AppDelegate.h"
 #import "IAPStoreHelper.h"
@@ -290,10 +289,13 @@ static NSString *iapCellID = @"IAPTableCellID";
     [manageSubsButton.centerXAnchor constraintEqualToAnchor:cell.contentView.centerXAnchor].active = TRUE;
     [manageSubsButton.widthAnchor constraintEqualToConstant:250].active = TRUE;
     [manageSubsButton.heightAnchor constraintEqualToConstant:50].active = TRUE;
-    [manageSubsButton autoPinEdgeToSuperviewEdge:ALEdgeTop withInset:16.0].active = TRUE;
+
+    [manageSubsButton.topAnchor constraintEqualToAnchor:cell.contentView.topAnchor
+                                               constant:16.f].active = TRUE;
     if (self.hasActiveSubscription) {
         // Pins manageSubsButton to cell's bottom, since restoreSubsButton will no longer be displayed.
-        [manageSubsButton autoPinEdgeToSuperviewEdge:ALEdgeBottom withInset:16.0].active = TRUE;
+        [manageSubsButton.bottomAnchor constraintEqualToAnchor:cell.contentView.bottomAnchor
+                                                      constant:-16.f].active = TRUE;
     }
 
     // Add background gradient
@@ -307,9 +309,6 @@ static NSString *iapCellID = @"IAPTableCellID";
         UIButton *restoreSubsButton = [UIButton buttonWithType:UIButtonTypeSystem];
         [restoreSubsButton setTitle:NSLocalizedStringWithDefaultValue(@"SUBSCRIPTIONS_PAGE_RESTORE_SUBSCRIPTION_BUTTON",
                                                                       nil,
-                               
-                                                                      
-                                                                      
                                                                       [NSBundle mainBundle],
                                                                       @"I don't see my subscription",
                                                                       @"Title of the button on the subscriptions page which, when pressed, navigates the user to the page where they can restore their existing subscription")
@@ -325,7 +324,8 @@ static NSString *iapCellID = @"IAPTableCellID";
         [restoreSubsButton.widthAnchor constraintEqualToConstant:250].active = TRUE;
         [restoreSubsButton.heightAnchor constraintEqualToConstant:30].active = TRUE;
         [restoreSubsButton.topAnchor constraintEqualToAnchor:manageSubsButton.bottomAnchor constant:16.0].active = TRUE;
-        [restoreSubsButton autoPinEdgeToSuperviewEdge:ALEdgeBottom withInset:16.0].active = TRUE;
+        [restoreSubsButton.bottomAnchor constraintEqualToAnchor:cell.contentView.bottomAnchor
+                                                       constant:-16.f].active = TRUE;
     }
 }
 
@@ -350,10 +350,14 @@ static NSString *iapCellID = @"IAPTableCellID";
     // label constraints
     label.translatesAutoresizingMaskIntoConstraints = NO;
     [label.centerXAnchor constraintEqualToAnchor:cell.contentView.centerXAnchor].active = TRUE;
-    [label autoPinEdgeToSuperviewEdge:ALEdgeLeading withInset:16.0].active = TRUE;
-    [label autoPinEdgeToSuperviewEdge:ALEdgeTop withInset:16.0].active = TRUE;
-    [label autoPinEdgeToSuperviewEdge:ALEdgeTrailing withInset:16.0].active = TRUE;
-    [label autoPinEdgeToSuperviewEdge:ALEdgeBottom withInset:16.0].active = TRUE;
+    [label.topAnchor constraintEqualToAnchor:cell.contentView.topAnchor
+                                    constant:16.f].active = TRUE;
+    [label.bottomAnchor constraintEqualToAnchor:cell.contentView.bottomAnchor
+                                       constant:-16.f].active = TRUE;
+    [label.leadingAnchor constraintEqualToAnchor:cell.contentView.leadingAnchor
+                                        constant:16.f].active = TRUE;
+    [label.trailingAnchor constraintEqualToAnchor:cell.contentView.trailingAnchor
+                                         constant:-16.f].active = TRUE;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -459,10 +463,14 @@ static NSString *iapCellID = @"IAPTableCellID";
     privacyPolicyButton.translatesAutoresizingMaskIntoConstraints = NO;
 
     [terms.centerXAnchor constraintEqualToAnchor:cell.centerXAnchor].active = TRUE;
-    [terms autoPinEdgeToSuperviewEdge:ALEdgeLeading withInset:16.0].active = TRUE;
-    [terms autoPinEdgeToSuperviewEdge:ALEdgeTop withInset:20.0].active = TRUE;
-    [terms autoPinEdgeToSuperviewEdge:ALEdgeTrailing withInset:16.0].active = TRUE;
-    [terms autoPinEdgeToSuperviewEdge:ALEdgeBottom withInset:16.0].active = TRUE;
+    [terms.topAnchor constraintEqualToAnchor:cell.topAnchor
+                                    constant:20.f].active = TRUE;
+    [terms.bottomAnchor constraintEqualToAnchor:cell.bottomAnchor
+                                       constant:-16.f].active = TRUE;
+    [terms.leadingAnchor constraintEqualToAnchor:cell.leadingAnchor
+                                        constant:16.f].active = TRUE;
+    [terms.trailingAnchor constraintEqualToAnchor:cell.trailingAnchor
+                                         constant:-16.f].active = TRUE;
 
     [privacyPolicyButton.heightAnchor constraintEqualToAnchor:terms.heightAnchor].active = YES;
     [privacyPolicyButton.centerYAnchor constraintEqualToAnchor:terms.centerYAnchor].active = YES;
