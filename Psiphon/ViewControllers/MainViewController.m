@@ -188,7 +188,7 @@ NSString * const CommandStopVPN = @"StopVPN";
     ContainerDB *containerDB = [[ContainerDB alloc] init];
     NSDate *_Nullable privacyPolicyAcceptedDate = [containerDB lastAcceptedPrivacyPolicy];
     assert(privacyPolicyAcceptedDate != nil);
-    assert([privacyPolicyAcceptedDate afterOrEqualTo:[containerDB lastPrivacyPolicyUpdate]]);
+    assert([privacyPolicyAcceptedDate afterOrEqualTo:[containerDB privacyPolicyUpdateDate]]);
 
     availableServerRegions = [[AvailableServerRegions alloc] init];
     [availableServerRegions sync];

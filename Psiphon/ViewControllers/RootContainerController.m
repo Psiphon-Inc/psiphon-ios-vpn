@@ -81,7 +81,7 @@
     NSDate *_Nullable privacyPolicyAcceptedDate = [containerDB lastAcceptedPrivacyPolicy];
 
     if (!privacyPolicyAcceptedDate ||
-        [privacyPolicyAcceptedDate before:[containerDB lastPrivacyPolicyUpdate]]) {
+        [privacyPolicyAcceptedDate before:[containerDB privacyPolicyUpdateDate]]) {
         [self switchToOnboarding];
     } else {
         [self switchToMainScreenAndStartVPN:FALSE];

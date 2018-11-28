@@ -265,7 +265,9 @@ const int NumPages = 4;
 }
 
 - (void)onPrivacyPolicyAccepted {
-    [[[ContainerDB alloc] init] setAcceptedCurrentPrivacyPolicy];
+    // Stores the privacy policy date that the user accepted.
+    ContainerDB *containerDB = [[ContainerDB alloc] init];
+    [containerDB setAcceptedPrivacyPolicy:[containerDB privacyPolicyUpdateDate]];
 
     // Go to next page;
     [self gotoNextPage];
