@@ -17,7 +17,6 @@
  *
  */
 
-#import <PureLayout/ALView+PureLayout.h>
 #import <ReactiveObjC/RACSignal.h>
 #import "OnboardingViewController.h"
 #import "OnboardingView.h"
