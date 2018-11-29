@@ -39,6 +39,7 @@
 #import "ContainerDB.h"
 
 const int NumPages = 4;
+const CGFloat NextButtonExtraPadding = 20.f;
 
 @interface OnboardingViewController ()
 
@@ -91,6 +92,9 @@ const int NumPages = 4;
     // Next button
     {
         nextPageButton = [UIButton buttonWithType:UIButtonTypeCustom];
+        // Make the tap area larger.
+        CGFloat p = NextButtonExtraPadding;
+        nextPageButton.contentEdgeInsets = UIEdgeInsetsMake(p, p, p, p);
         [self.view addSubview:nextPageButton];
         [nextPageButton setTitle:[Strings nextPageButtonTitle] forState:UIControlStateNormal];
         [nextPageButton setTitleColor:UIColor.paleGreyThreeColor forState:UIControlStateNormal];
@@ -104,7 +108,7 @@ const int NumPages = 4;
                                           constant:-20.f].active = TRUE;
         [nextPageButton.trailingAnchor
           constraintEqualToAnchor:self.safeAreaLayoutGuide.trailingAnchor
-                         constant:-40.f].active = TRUE;
+                         constant:(-40.f + NextButtonExtraPadding)].active = TRUE;
     }
 
     UIView *firstPage = [self getOnboardingViewForPage:currentPage];
@@ -319,7 +323,8 @@ const int NumPages = 4;
 - (void)applyOnboardingViewConstraintsToView:(UIView *)view {
     view.translatesAutoresizingMaskIntoConstraints = FALSE;
     [view.topAnchor constraintEqualToAnchor:self.safeAreaLayoutGuide.topAnchor].active = TRUE;
-    [view.bottomAnchor constraintEqualToAnchor:nextPageButton.topAnchor].active = TRUE;
+    [view.bottomAnchor constraintEqualToAnchor:nextPageButton.topAnchor
+                                      constant:NextButtonExtraPadding].active = TRUE;
     [view.leadingAnchor constraintEqualToAnchor:self.safeAreaLayoutGuide.leadingAnchor
                                        constant:20.f].active = TRUE;
     [view.trailingAnchor constraintEqualToAnchor:self.safeAreaLayoutGuide.trailingAnchor
