@@ -17,6 +17,7 @@
  *
  */
 
+#import <ImageIO/ImageIO.h>
 #import "SkyButton.h"
 #import "UIFont+Additions.h"
 #import "Logging.h"
@@ -125,18 +126,19 @@
     [_titleLabel.centerYAnchor constraintEqualToAnchor:self.centerYAnchor].active = TRUE;
 
     [_titleLabel.topAnchor
-      constraintGreaterThanOrEqualToAnchor:self.topAnchor
-                                  constant:self.fontSize].active = TRUE;
+      constraintEqualToAnchor:self.topAnchor
+                     constant:self.fontSize].active = TRUE;
 
     [_titleLabel.bottomAnchor
-      constraintGreaterThanOrEqualToAnchor:self.topAnchor
-                                  constant:self.fontSize].active = TRUE;
+      constraintEqualToAnchor:self.bottomAnchor
+                       constant:-self.fontSize].active = TRUE;
 
     UIControlContentHorizontalAlignment alignment = self.contentHorizontalAlignment;
     if (alignment == UIControlContentHorizontalAlignmentCenter) {
         [_titleLabel.widthAnchor
           constraintEqualToAnchor:self.widthAnchor
                          constant:-(self.fontSize + 5.f)].active = TRUE;
+
         [_titleLabel.centerXAnchor constraintEqualToAnchor:self.centerXAnchor].active = TRUE;
 
     } else if (alignment == UIControlContentHorizontalAlignmentLeft) {
