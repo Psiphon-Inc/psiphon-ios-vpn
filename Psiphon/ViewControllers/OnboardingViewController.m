@@ -322,13 +322,22 @@ const CGFloat NextButtonExtraPadding = 20.f;
 
 - (void)applyOnboardingViewConstraintsToView:(UIView *)view {
     view.translatesAutoresizingMaskIntoConstraints = FALSE;
+
     [view.topAnchor constraintEqualToAnchor:self.safeAreaLayoutGuide.topAnchor].active = TRUE;
+
     [view.bottomAnchor constraintEqualToAnchor:nextPageButton.topAnchor
                                       constant:NextButtonExtraPadding].active = TRUE;
-    [view.leadingAnchor constraintEqualToAnchor:self.safeAreaLayoutGuide.leadingAnchor
-                                       constant:20.f].active = TRUE;
-    [view.trailingAnchor constraintEqualToAnchor:self.safeAreaLayoutGuide.trailingAnchor
-                                        constant:-20.f].active = TRUE;
+
+    [view.centerXAnchor constraintEqualToAnchor:self.view.centerXAnchor].active = TRUE;
+
+    [view.leadingAnchor constraintGreaterThanOrEqualToAnchor:self.safeAreaLayoutGuide.leadingAnchor
+                                                    constant:20.f].active = TRUE;
+
+    [view.trailingAnchor constraintLessThanOrEqualToAnchor:self.safeAreaLayoutGuide.trailingAnchor
+                                                  constant:-20.f].active = TRUE;
+
+    // Max width for large screens.
+    [view.widthAnchor constraintLessThanOrEqualToConstant:500.f].active = TRUE;
 }
 
 @end
