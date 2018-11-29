@@ -40,7 +40,7 @@
     } else {
         self.contentHorizontalAlignment = UIControlContentHorizontalAlignmentLeft;
     }
-    [self needsUpdateConstraints];
+    [self setNeedsUpdateConstraints];
 }
 
 - (void)layoutSubviews {
