@@ -53,7 +53,7 @@
 
 - (void)setAnchorAccessoryViewToBottom:(BOOL)anchorAccessoryViewToBottom {
     _anchorAccessoryViewToBottom = anchorAccessoryViewToBottom;
-    [self needsUpdateConstraints];
+    [self setNeedsUpdateConstraints];
 }
 
 - (void)layoutSubviews {
