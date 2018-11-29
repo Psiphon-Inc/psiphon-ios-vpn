@@ -86,7 +86,7 @@
     bodyLabel.backgroundColor = UIColor.clearColor;
     bodyLabel.font = [UIFont avenirNextMedium:16.f];
     bodyLabel.textColor = UIColor.greyishBrown;
-    bodyLabel.numberOfLines = 5;
+    bodyLabel.numberOfLines = 0;
     bodyLabel.lineBreakMode = NSLineBreakByClipping;
     bodyLabel.textAlignment = NSTextAlignmentCenter;
     bodyLabel.adjustsFontSizeToFitWidth = TRUE;
@@ -103,32 +103,41 @@
 }
 
 - (void)setupSubviewsLayoutConstraints {
-    CGFloat invAspectRatio = 0.8f * (imageView.image.size.height / imageView.image.size.width);
-    imageView.translatesAutoresizingMaskIntoConstraints = FALSE;
-    [imageView.topAnchor constraintEqualToAnchor:self.topAnchor constant:25.f].active = TRUE;
-    [imageView.centerXAnchor constraintEqualToAnchor:self.centerXAnchor].active = TRUE;
-    [imageView.leadingAnchor constraintEqualToAnchor:self.leadingAnchor].active = TRUE;
-    [imageView.trailingAnchor constraintEqualToAnchor:self.trailingAnchor].active = TRUE;
-    [imageView.heightAnchor constraintEqualToAnchor:imageView.widthAnchor
-                                         multiplier:invAspectRatio].active = TRUE;
+    {
+        CGFloat invAspectRatio = 0.8f * (imageView.image.size.height / imageView.image.size.width);
+        imageView.translatesAutoresizingMaskIntoConstraints = FALSE;
+        [imageView.topAnchor constraintEqualToAnchor:self.topAnchor constant:25.f].active = TRUE;
+        [imageView.centerXAnchor constraintEqualToAnchor:self.centerXAnchor].active = TRUE;
+        [imageView.leadingAnchor constraintEqualToAnchor:self.leadingAnchor].active = TRUE;
+        [imageView.trailingAnchor constraintEqualToAnchor:self.trailingAnchor].active = TRUE;
+        [imageView.heightAnchor constraintEqualToAnchor:imageView.widthAnchor
+                                             multiplier:invAspectRatio].active = TRUE;
+    }
 
-    titleLabel.translatesAutoresizingMaskIntoConstraints = FALSE;
-    [titleLabel.topAnchor constraintEqualToAnchor:imageView.bottomAnchor constant:10.f]
-            .active = TRUE;
-    [titleLabel.centerXAnchor constraintEqualToAnchor:self.centerXAnchor].active = TRUE;
+    {
+        [titleLabel setContentHuggingPriority:1000
+                                      forAxis:UILayoutConstraintAxisVertical];
 
-    bodyLabel.translatesAutoresizingMaskIntoConstraints = FALSE;
-    [bodyLabel.topAnchor constraintEqualToAnchor:titleLabel.bottomAnchor
-                                        constant:15.f].active = TRUE;
-    [bodyLabel.centerXAnchor constraintEqualToAnchor:self.centerXAnchor].active = TRUE;
+        titleLabel.translatesAutoresizingMaskIntoConstraints = FALSE;
+        [titleLabel.topAnchor constraintEqualToAnchor:imageView.bottomAnchor constant:10.f]
+          .active = TRUE;
+        [titleLabel.centerXAnchor constraintEqualToAnchor:self.centerXAnchor].active = TRUE;
+    }
 
-    // Constraint the body to be no longer than 5 lines at max font size.
-    [bodyLabel.heightAnchor constraintLessThanOrEqualToConstant:4.f * bodyLabel.font.lineHeight]
-            .active = TRUE;
+    {
+        bodyLabel.translatesAutoresizingMaskIntoConstraints = FALSE;
 
-    [bodyLabel.leadingAnchor constraintGreaterThanOrEqualToAnchor:self.leadingAnchor].active = TRUE;
+        [bodyLabel.topAnchor constraintEqualToAnchor:titleLabel.bottomAnchor
+                                            constant:15.f].active = TRUE;
 
-    [bodyLabel.trailingAnchor constraintLessThanOrEqualToAnchor:self.trailingAnchor].active = TRUE;
+        [bodyLabel.centerXAnchor constraintEqualToAnchor:self.centerXAnchor].active = TRUE;
+
+        [bodyLabel.leadingAnchor
+          constraintGreaterThanOrEqualToAnchor:self.leadingAnchor].active = TRUE;
+
+        [bodyLabel.trailingAnchor
+          constraintLessThanOrEqualToAnchor:self.trailingAnchor].active = TRUE;
+    }
 
     if (accessoryView) {
         accessoryView.translatesAutoresizingMaskIntoConstraints = FALSE;
@@ -137,10 +146,10 @@
           constraintEqualToAnchor:self.centerXAnchor].active = TRUE;
 
         [accessoryView.leadingAnchor
-          constraintEqualToAnchor:bodyLabel.leadingAnchor].active = TRUE;
+          constraintEqualToAnchor:self.leadingAnchor].active = TRUE;
 
         [accessoryView.trailingAnchor
-          constraintEqualToAnchor:bodyLabel.trailingAnchor].active = TRUE;
+          constraintEqualToAnchor:self.trailingAnchor].active = TRUE;
     }
 }
 
