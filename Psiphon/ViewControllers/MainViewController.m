@@ -101,7 +101,7 @@ NSString * const CommandStopVPN = @"StopVPN";
 
     // UI elements
     UILabel *statusLabel;
-    UILabel *versionLabel;
+    UIButton *versionLabel;
     SubscriptionsBar *subscriptionsBar;
     RegionSelectionButton *regionSelectionButton;
     VPNStartAndStopButton *startAndStopButton;
@@ -508,7 +508,7 @@ NSString * const CommandStopVPN = @"StopVPN";
 }
 
 #if DEBUG
-- (void)onVersionLabelTap:(UILabel *)sender {
+- (void)onVersionLabelTap:(UIButton *)sender {
     DebugViewController *viewController = [[DebugViewController alloc] initWithCoder:nil];
     [self presentViewController:viewController animated:YES completion:nil];
 }
@@ -576,7 +576,7 @@ NSString * const CommandStopVPN = @"StopVPN";
     cloudMiddleRight = [[UIImageView alloc] initWithImage:cloud];
     cloudTopRight = [[UIImageView alloc] initWithImage:cloud];
     cloudBottomRight = [[UIImageView alloc] initWithImage:cloud];
-    versionLabel = [[UILabel alloc] init];
+    versionLabel = [[UIButton alloc] init];
     settingsButton = [[UIButton alloc] init];
     psiCashView = [[PsiCashView alloc] initWithAutoLayout];
     startAndStopButton = [VPNStartAndStopButton buttonWithType:UIButtonTypeCustom];
@@ -850,23 +850,31 @@ NSString * const CommandStopVPN = @"StopVPN";
 
 - (void)setupVersionLabel {
     versionLabel.translatesAutoresizingMaskIntoConstraints = NO;
-    versionLabel.adjustsFontSizeToFitWidth = YES;
-    versionLabel.text = [NSString stringWithFormat:NSLocalizedStringWithDefaultValue(@"APP_VERSION", nil, [NSBundle mainBundle], @"v.%@", @"Text showing the app version. The '%@' placeholder is the version number. So it will look like 'v.2'."),[[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"]];
-    versionLabel.userInteractionEnabled = YES;
-    versionLabel.textColor = UIColor.offWhiteTwo;
-    versionLabel.font = [UIFont avenirNextBold:10.5f];
+    [versionLabel setTitle:[NSString stringWithFormat:NSLocalizedStringWithDefaultValue(@"APP_VERSION", nil, [NSBundle mainBundle], @"v.%@", @"Text showing the app version. The '%@' placeholder is the version number. So it will look like 'v.2'."),[[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"]]
+                  forState:UIControlStateNormal];
+    [versionLabel setTitleColor:UIColor.offWhiteTwo forState:UIControlStateNormal];
+    versionLabel.titleLabel.adjustsFontSizeToFitWidth = YES;
+    versionLabel.titleLabel.font = [UIFont avenirNextBold:10.5f];
+    versionLabel.userInteractionEnabled = FALSE;
 
 #if DEBUG
-    UITapGestureRecognizer *tapRecognizer = [[UITapGestureRecognizer alloc]
-                                             initWithTarget:self action:@selector(onVersionLabelTap:)];
-    tapRecognizer.numberOfTapsRequired = 1;
-    [versionLabel addGestureRecognizer:tapRecognizer];
+    versionLabel.contentEdgeInsets = UIEdgeInsetsMake(10.f, 10.f, 10.f, 10.f);
+    versionLabel.userInteractionEnabled = TRUE;
+    [versionLabel addTarget:self
+                     action:@selector(onVersionLabelTap:)
+           forControlEvents:UIControlEventTouchUpInside];
 #endif
 
     // Setup autolayout
-    [versionLabel.leadingAnchor constraintEqualToAnchor:psiCashView.leadingAnchor constant:0].active = YES;
-    [versionLabel.trailingAnchor constraintLessThanOrEqualToAnchor:psiCashView.balance.leadingAnchor constant:-2].active = YES;
-    [versionLabel.topAnchor constraintEqualToAnchor:psiCashView.topAnchor].active = YES;
+    [NSLayoutConstraint activateConstraints:@[
+      [versionLabel.leadingAnchor constraintEqualToAnchor:psiCashView.leadingAnchor constant:0],
+
+      [versionLabel.trailingAnchor
+        constraintLessThanOrEqualToAnchor:psiCashView.balance.leadingAnchor
+                                 constant:-2],
+
+      [versionLabel.topAnchor constraintEqualToAnchor:psiCashView.topAnchor]
+    ]];
 }
 
 - (void)setupAddSubscriptionsBar {
