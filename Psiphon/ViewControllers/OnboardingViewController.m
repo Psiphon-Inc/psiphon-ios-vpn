@@ -25,12 +25,12 @@
 #import "SkyButton.h"
 #import "RingSkyButton.h"
 #import "UIFont+Additions.h"
-#import "UIViewController+Additions.h"
 #import "RoyalSkyButton.h"
 #import "VPNManager.h"
 #import "ArrowView.h"
 #import "RACCompoundDisposable.h"
 #import "AlertDialogs.h"
+#import "UIView+Additions.h"
 #import "UIAlertController+Additions.h"
 #import "OnboardingScrollableView.h"
 #import "Strings.h"
@@ -81,11 +81,11 @@ const CGFloat NextButtonExtraPadding = 20.f;
 
         progressView.translatesAutoresizingMaskIntoConstraints = FALSE;
         [progressView.bottomAnchor
-          constraintEqualToAnchor:self.safeAreaLayoutGuide.bottomAnchor].active = TRUE;
+          constraintEqualToAnchor:self.view.safeBottomAnchor].active = TRUE;
         [progressView.leadingAnchor
-          constraintEqualToAnchor:self.safeAreaLayoutGuide.leadingAnchor].active = TRUE;
+          constraintEqualToAnchor:self.view.safeLeadingAnchor].active = TRUE;
         [progressView.trailingAnchor
-          constraintEqualToAnchor:self.safeAreaLayoutGuide.trailingAnchor].active = TRUE;
+          constraintEqualToAnchor:self.view.safeTrailingAnchor].active = TRUE;
         [progressView.heightAnchor constraintEqualToConstant:6.f].active = TRUE;
     }
 
@@ -107,7 +107,7 @@ const CGFloat NextButtonExtraPadding = 20.f;
         [nextPageButton.bottomAnchor constraintEqualToAnchor:progressView.topAnchor
                                           constant:-20.f].active = TRUE;
         [nextPageButton.trailingAnchor
-          constraintEqualToAnchor:self.safeAreaLayoutGuide.trailingAnchor
+          constraintEqualToAnchor:self.view.safeTrailingAnchor
                          constant:(-40.f + NextButtonExtraPadding)].active = TRUE;
     }
 
@@ -323,17 +323,17 @@ const CGFloat NextButtonExtraPadding = 20.f;
 - (void)applyOnboardingViewConstraintsToView:(UIView *)view {
     view.translatesAutoresizingMaskIntoConstraints = FALSE;
 
-    [view.topAnchor constraintEqualToAnchor:self.safeAreaLayoutGuide.topAnchor].active = TRUE;
+    [view.topAnchor constraintEqualToAnchor:self.view.safeTopAnchor].active = TRUE;
 
     [view.bottomAnchor constraintEqualToAnchor:nextPageButton.topAnchor
                                       constant:NextButtonExtraPadding].active = TRUE;
 
     [view.centerXAnchor constraintEqualToAnchor:self.view.centerXAnchor].active = TRUE;
 
-    [view.leadingAnchor constraintGreaterThanOrEqualToAnchor:self.safeAreaLayoutGuide.leadingAnchor
-                                                    constant:20.f].active = TRUE;
+    [view.leadingAnchor constraintGreaterThanOrEqualToAnchor:self.view.safeLeadingAnchor
+                                                    constant:20.f].active =TRUE;
 
-    [view.trailingAnchor constraintLessThanOrEqualToAnchor:self.safeAreaLayoutGuide.trailingAnchor
+    [view.trailingAnchor constraintLessThanOrEqualToAnchor:self.view.safeTrailingAnchor
                                                   constant:-20.f].active = TRUE;
 
     // Max width for large screens.
