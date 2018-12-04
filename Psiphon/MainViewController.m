@@ -1342,6 +1342,7 @@ static BOOL (^safeStringsEqual)(NSString *, NSString *) = ^BOOL(NSString *a, NSS
                     break;
                 case AdPresentationErrorCustomDataNotSet:
                     LOG_DEBUG(@"rewarded video AdPresentationErrorCustomDataNotSet");
+                    [PsiFeedbackLogger errorWithType:RewardedVideoLogType message:@"AdPresentationErrorCustomDataNotSet"];
                     break;
                 case AdPresentationErrorInappropriateState:
                     LOG_DEBUG(@"rewarded video AdPresentationErrorInappropriateState");
