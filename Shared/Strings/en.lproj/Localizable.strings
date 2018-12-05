@@ -45,6 +45,9 @@
 /* Main text in the 'Upstream Proxy Error' dialog box. This is shown when the user has directly altered these settings, and those settings are (probably) erroneous. DO NOT translate 'Psiphon'. */
 "CHECK_UPSTREAM_PROXY_SETTING" = "You have configured Psiphon to use an upstream proxy.\nHowever, we seem to be unable to connect to a Psiphon server through that proxy.\nPlease fix the settings and try again.";
 
+/* Title for screen that allows user to select their desired server region. Use all capital letters in the translation only if it makes sense. */
+"CONNECT_VIA" = "CONNECT VIA";
+
 /* Alert dialog title of alert which informs the user that the settings file in the app is corrupt. */
 "CORRUPT_SETTINGS_ALERT_TITLE" = "Corrupt Settings";
 
@@ -57,9 +60,11 @@
 /* Dismiss button title. Dismisses pop-up alert when the user clicks on the button */
 "DISMISS_BUTTON_TITLE" = "Dismiss";
 
-/* Title of the button that dismisses region selection dialog
-   Title of the button that dismisses the subscriptions menu */
+/* Title of the button that dismisses the subscriptions menu */
 "DONE_ACTION" = "Done";
+
+/* Title of the button that dismisses a screen or a dialog */
+"DONE_BUTTON_TITLE" = "Done";
 
 /* Alert dialog message indicating to the user that the app has failed to upload their feedback and that they should try again.  */
 "FEEDBACK_UPLOAD_FAILED_MESSAGE" = "An error occured while uploading your feedback. Please try again. Your feedback helps us improve the Psiphon network.";

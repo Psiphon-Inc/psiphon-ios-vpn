@@ -41,6 +41,12 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (NSString *)dismissButtonTitle;
 
++ (NSString *)doneButtonTitle;
+
+#pragma mark - Misc
+
++ (NSString *)connectVia;
+
 #pragma mark - Onboarding
 
 + (NSString *)onboardingSelectLanguageButtonTitle;

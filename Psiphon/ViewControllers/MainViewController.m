@@ -35,7 +35,6 @@
 #import "PsiFeedbackLogger.h"
 #import "PsiphonClientCommonLibraryHelpers.h"
 #import "PsiphonConfigUserDefaults.h"
-#import "RegionSelectionViewController.h"
 #import "SharedConstants.h"
 #import "NEBridge.h"
 #import "NSString+Additions.h"
@@ -67,6 +66,8 @@
 #import "RACSignal+Operations2.h"
 #import "ContainerDB.h"
 #import "NSDate+Comparator.h"
+#import "PickerViewController.h"
+#import "Strings.h"
 
 
 PsiFeedbackLogType const RewardedVideoLogType = @"RewardedVideo";
@@ -115,11 +116,9 @@ NSString * const CommandStopVPN = @"StopVPN";
     UIButton *settingsButton;
     
     // Region Selection
-    UINavigationController *regionSelectionNavController;
     UIView *bottomBar;
     CAGradientLayer *bottomBarGradient;
-    NSString *selectedRegionSnapShot;
-    
+
     FeedbackManager *feedbackManager;
 
     // PsiCash
@@ -500,7 +499,48 @@ NSString * const CommandStopVPN = @"StopVPN";
 }
 
 - (void)onRegionSelectionButtonTap:(UIButton *)sender {
-    [self openRegionSelection];
+    // Prepares data.
+    NSString *selectedRegionCodeSnapshot = [[RegionAdapter sharedInstance] getSelectedRegion].code;
+    NSArray<Region *> *regions = [[RegionAdapter sharedInstance] getRegions];
+    NSMutableArray <NSString *> *labels = [NSMutableArray arrayWithCapacity:[regions count]];
+    NSMutableArray <UIImage *> *images = [NSMutableArray arrayWithCapacity:[regions count]];
+    __block NSUInteger selectedRegionIndex = 0;
+
+    [regions enumerateObjectsUsingBlock:^(Region *r, NSUInteger idx, BOOL *stop) {
+        labels[idx] = [[RegionAdapter sharedInstance] getLocalizedRegionTitle:r.code];
+
+        images[idx] = [PsiphonClientCommonLibraryHelpers
+          imageFromCommonLibraryNamed:r.flagResourceId];
+
+        if ([r.code isEqualToString:selectedRegionCodeSnapshot]) {
+            selectedRegionIndex = idx;
+        }
+    }];
+
+    // Sets up and displays region selection view controller.
+    PickerViewController *regionSelectionViewController = [[PickerViewController alloc]
+      initWithLabels:labels andImages:images];
+    regionSelectionViewController.selectedIndex = selectedRegionIndex;
+    regionSelectionViewController.title = [Strings connectVia];
+
+    regionSelectionViewController.selectionHandler =
+      ^(NSUInteger selectedIndex, PickerViewController *viewController) {
+
+          Region *selectedRegion = regions[selectedIndex];
+          [[RegionAdapter sharedInstance] setSelectedRegion:selectedRegion.code];
+
+          if (![NSString stringsBothEqualOrNil:selectedRegion.code b:selectedRegionCodeSnapshot]) {
+              [self persistSelectedRegion];
+              [regionSelectionButton update];
+              [self.vpnManager restartVPNIfActive];
+          }
+
+          [viewController dismissViewControllerAnimated:TRUE completion:nil];
+      };
+
+    UINavigationController *navController = [[UINavigationController alloc]
+      initWithRootViewController:regionSelectionViewController];
+    [self presentViewController:navController animated:YES completion:nil];
 }
 
 - (void)onSubscriptionTap {
@@ -981,33 +1021,6 @@ NSString * const CommandStopVPN = @"StopVPN";
     UINavigationController *navController = [[UINavigationController alloc]
       initWithRootViewController:appSettingsViewController];
     [self presentViewController:navController animated:YES completion:nil];
-}
-
-#pragma mark - Region Selection
-
-- (void)openRegionSelection {
-    selectedRegionSnapShot = [[RegionAdapter sharedInstance] getSelectedRegion].code;
-    RegionSelectionViewController *regionSelectionViewController = [[RegionSelectionViewController alloc] init];
-    regionSelectionNavController = [[UINavigationController alloc]
-      initWithRootViewController:regionSelectionViewController];
-    UIBarButtonItem *doneButton = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedStringWithDefaultValue(@"DONE_ACTION", nil, [NSBundle mainBundle], @"Done", @"Title of the button that dismisses region selection dialog")
-                                                                   style:UIBarButtonItemStyleDone target:self
-                                                                  action:@selector(regionSelectionDidEnd)];
-    regionSelectionViewController.navigationItem.rightBarButtonItem = doneButton;
-    
-    [self presentViewController:regionSelectionNavController animated:YES completion:nil];
-}
-
-- (void)regionSelectionDidEnd {
-    NSString *selectedRegion = [[RegionAdapter sharedInstance] getSelectedRegion].code;
-
-    if (![NSString stringsBothEqualOrNil:selectedRegion b:selectedRegionSnapShot]) {
-        [self persistSelectedRegion];
-        [regionSelectionButton update];
-        [self.vpnManager restartVPNIfActive];
-    }
-    [regionSelectionNavController dismissViewControllerAnimated:YES completion:nil];
-    regionSelectionNavController = nil;
 }
 
 #pragma mark - Subscription

@@ -23,6 +23,7 @@
 #import "UIColor+Additions.h"
 #import "UIFont+Additions.h"
 #import "UIImage+CountryFlag.h"
+#import "ImageUtils.h"
 
 @implementation RegionSelectionButton {
     UIImageView *flagImageView;
@@ -94,9 +95,9 @@
 
 - (void)update {
     Region *selectedRegion = [[RegionAdapter sharedInstance] getSelectedRegion];
-    UIImage *flag = [[PsiphonClientCommonLibraryHelpers imageFromCommonLibraryNamed:selectedRegion.flagResourceId]
-                     countryFlag];
-    flagImageView.image = flag;
+    UIImage *flag = [PsiphonClientCommonLibraryHelpers
+      imageFromCommonLibraryNamed:selectedRegion.flagResourceId];
+    flagImageView.image = [ImageUtils highlightImageWithRoundedCorners:flag];
 
     NSString *regionText = [[RegionAdapter sharedInstance] getLocalizedRegionTitle:selectedRegion.code];
     regionNameLabel.attributedText = [self styleRegionLabelText:regionText];
