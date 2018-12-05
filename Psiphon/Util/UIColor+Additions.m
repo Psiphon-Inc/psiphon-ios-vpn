@@ -89,8 +89,16 @@
     return [UIColor colorWithRed:240.0f / 255.0f green:246.0f / 255.0f blue:253.0f / 255.0f alpha:1.0f];
 }
 
++ (UIColor * _Nonnull)duckEggBlueTwoColor {
+    return [UIColor colorWithRed:226.0f / 255.0f green:243.0f / 255.0f blue:251.0f / 255.0f alpha:1.0f];
+}
+
 + (UIColor * _Nonnull)lightBlueGreyTwo {
     return [UIColor colorWithRed:211.0f / 255.0f green:222.0f / 255.0f blue:235.0f / 255.0f alpha:1.0f];
+}
+
++ (UIColor * _Nonnull)paleGrey {
+    return [UIColor colorWithRed:243.0f / 255.0f green:247.0f / 255.0f blue:252.0f / 255.0f alpha:1.0f];
 }
 
 + (UIColor * _Nonnull)paleGreyTwo {

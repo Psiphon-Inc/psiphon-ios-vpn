@@ -54,6 +54,14 @@
     return NSLocalizedStringWithDefaultValue(@"DISMISS_BUTTON_TITLE", nil, [NSBundle mainBundle], @"Dismiss", @"Dismiss button title. Dismisses pop-up alert when the user clicks on the button");
 }
 
++ (NSString *)doneButtonTitle {
+    return NSLocalizedStringWithDefaultValue(@"DONE_BUTTON_TITLE", nil, [NSBundle mainBundle], @"Done", @"Title of the button that dismisses a screen or a dialog");
+}
+
++ (NSString *)connectVia {
+    return  NSLocalizedStringWithDefaultValue(@"CONNECT_VIA", nil, [NSBundle mainBundle], @"CONNECT VIA", @"Title for screen that allows user to select their desired server region. Use all capital letters in the translation only if it makes sense.");
+}
+
 + (NSString *)onboardingSelectLanguageButtonTitle {
     return  NSLocalizedStringWithDefaultValue(@"SELECT_LANG_BUTTON_TITLE", nil, [NSBundle mainBundle], @"Select Language", @"Select language button title.");
 }

@@ -55,7 +55,11 @@
 
 + (UIColor * _Nonnull)duckEggBlue;
 
++ (UIColor * _Nonnull)duckEggBlueTwoColor;
+
 + (UIColor * _Nonnull)lightBlueGreyTwo;
+
++ (UIColor * _Nonnull)paleGrey;
 
 + (UIColor * _Nonnull)paleGreyTwo;
 
