@@ -99,10 +99,29 @@ NSString * const CellIdentifier = @"cell";
     }
 }
 
+#pragma mark - Methods to be used by subclasses
+
+- (NSUInteger)numberOfRows {
+    return [labels count];
+}
+
+- (void)bindDataToCell:(UITableViewCell *)cell atRow:(NSUInteger)rowIndex {
+    cell.textLabel.text = labels[rowIndex];
+    if (images) {
+        cell.imageView.image = images[rowIndex];
+    }
+}
+
+- (void)onSelectedRow:(NSUInteger)rowIndex {
+    if (self.selectionHandler) {
+        self.selectionHandler(rowIndex, nil, self);
+    }
+}
+
 #pragma mark - UITableViewDataSource delegate methods
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return [labels count];
+    return [self numberOfRows];
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView
@@ -131,10 +150,7 @@ NSString * const CellIdentifier = @"cell";
         cell.selectionStyle = UITableViewCellSelectionStyleDefault;
     }
 
-    cell.textLabel.text = labels[row];
-    if (images) {
-        cell.imageView.image = [ImageUtils highlightImageWithRoundedCorners:images[row]];
-    }
+    [self bindDataToCell:cell atRow:row];
 
     return cell;
 }
@@ -161,10 +177,7 @@ NSString * const CellIdentifier = @"cell";
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     NSUInteger row = (NSUInteger) indexPath.row;
     self.selectedIndex = row;
-
-    if (self.selectionHandler) {
-        self.selectionHandler(row, self);
-    }
+    [self onSelectedRow:row];
 }
 
 #pragma mark - UI callback

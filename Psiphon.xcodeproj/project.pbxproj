@@ -134,6 +134,7 @@
 		A84088DD7FBB838689BC1FCC /* OnboardingViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A8408D96EC06ED36F86C690D /* OnboardingViewController.m */; };
 		A8408AACE30F860F2C961A04 /* ManageSubscriptionsButton.m in Sources */ = {isa = PBXBuildFile; fileRef = A8408FA077C517546DF6033C /* ManageSubscriptionsButton.m */; };
 		A8408B83167EBE21E215C471 /* OnboardingView.m in Sources */ = {isa = PBXBuildFile; fileRef = A84088889983161FB859D8A9 /* OnboardingView.m */; };
+		A8408BC29B903A6C0A32F32C /* SkyRegionSelectionViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A8408C8A7CA3C009F01FDA3B /* SkyRegionSelectionViewController.m */; };
 		A8408C424E64BF3D70273464 /* ConnectionStatusView.m in Sources */ = {isa = PBXBuildFile; fileRef = A8408E0115540B5B2B305EAE /* ConnectionStatusView.m */; };
 		A8408C5A98017E7074D00CEC /* PsiCashSpeedBoostSliderView.m in Sources */ = {isa = PBXBuildFile; fileRef = A840854913F6165FB0B97A6A /* PsiCashSpeedBoostSliderView.m */; };
 		A8408D8C16D136075590193C /* AppUpgrade.m in Sources */ = {isa = PBXBuildFile; fileRef = A84089CB9E8B0DF1D88D0500 /* AppUpgrade.m */; };
@@ -506,6 +507,7 @@
 		A8408A1B786B9F6679539FCD /* PsiCashSpeedBoostMeterView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PsiCashSpeedBoostMeterView.h; sourceTree = "<group>"; };
 		A8408A83F0E1DDE55E30E406 /* SubscriptionsBar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SubscriptionsBar.h; sourceTree = "<group>"; };
 		A8408AAD421C096147E3FC8B /* Strings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Strings.h; sourceTree = "<group>"; };
+		A8408ABFCA9BBDD281E8A4FD /* SkyRegionSelectionViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SkyRegionSelectionViewController.h; sourceTree = "<group>"; };
 		A8408AD78B4EB15E3C8F33B2 /* AppVersionNumberView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppVersionNumberView.h; sourceTree = "<group>"; };
 		A8408AEA2174955E85247913 /* ConnectionStatusView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ConnectionStatusView.h; sourceTree = "<group>"; };
 		A8408B98D73EB239C92FB450 /* ManageSubscriptionsButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ManageSubscriptionsButton.h; sourceTree = "<group>"; };
@@ -513,6 +515,7 @@
 		A8408BA05DC0D983E6740558 /* SubscriptionStatusView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SubscriptionStatusView.m; sourceTree = "<group>"; };
 		A8408BAC196A108FFE3A5957 /* AlertDialogs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AlertDialogs.h; sourceTree = "<group>"; };
 		A8408C84138113DE79F0DCD0 /* RegionSelectionButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RegionSelectionButton.m; sourceTree = "<group>"; };
+		A8408C8A7CA3C009F01FDA3B /* SkyRegionSelectionViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SkyRegionSelectionViewController.m; sourceTree = "<group>"; };
 		A8408CEB0E34BC897F3FA7D6 /* OnboardingScrollableView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OnboardingScrollableView.m; sourceTree = "<group>"; };
 		A8408D462EEE90AA7F2A8AFA /* SwoopView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SwoopView.h; sourceTree = "<group>"; };
 		A8408D96EC06ED36F86C690D /* OnboardingViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OnboardingViewController.m; sourceTree = "<group>"; };
@@ -845,6 +848,8 @@
 				A8408BAC196A108FFE3A5957 /* AlertDialogs.h */,
 				A8408390A766C7C2C246797C /* PickerViewController.m */,
 				A840864BAA38AA3E4620EC35 /* PickerViewController.h */,
+				A8408C8A7CA3C009F01FDA3B /* SkyRegionSelectionViewController.m */,
+				A8408ABFCA9BBDD281E8A4FD /* SkyRegionSelectionViewController.h */,
 			);
 			path = ViewControllers;
 			sourceTree = "<group>";
@@ -1689,6 +1694,7 @@
 				A8408692D005E8599267522E /* UIView+Additions.m in Sources */,
 				A84087AFA5806D689C3BF6D2 /* PickerViewController.m in Sources */,
 				A8408EB1E9DABE35016580A7 /* ImageUtils.m in Sources */,
+				A8408BC29B903A6C0A32F32C /* SkyRegionSelectionViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

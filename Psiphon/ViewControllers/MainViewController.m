@@ -68,6 +68,7 @@
 #import "NSDate+Comparator.h"
 #import "PickerViewController.h"
 #import "Strings.h"
+#import "SkyRegionSelectionViewController.h"
 
 
 PsiFeedbackLogType const RewardedVideoLogType = @"RewardedVideo";
@@ -499,41 +500,16 @@ NSString * const CommandStopVPN = @"StopVPN";
 }
 
 - (void)onRegionSelectionButtonTap:(UIButton *)sender {
-    // Prepares data.
     NSString *selectedRegionCodeSnapshot = [[RegionAdapter sharedInstance] getSelectedRegion].code;
 
-    // Filter out regions that don't exist.
-    NSArray<Region *> *regions = [[[RegionAdapter sharedInstance] getRegions]
-      filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(Region *evaluatedObject,
-        NSDictionary<NSString *, id> *bindings) {
-            return evaluatedObject.serverExists;
-      }]];
+    SkyRegionSelectionViewController *regionViewController =
+      [[SkyRegionSelectionViewController alloc]
+        initWithCurrentlySelectedRegionCode:selectedRegionCodeSnapshot];
 
-    NSMutableArray <NSString *> *labels = [NSMutableArray arrayWithCapacity:[regions count]];
-    NSMutableArray <UIImage *> *images = [NSMutableArray arrayWithCapacity:[regions count]];
-    __block NSUInteger selectedRegionIndex = 0;
+    regionViewController.selectionHandler =
+      ^(NSUInteger selectedIndex, id selectedItem, PickerViewController *viewController) {
+          Region *selectedRegion = (Region *)selectedItem;
 
-    [regions enumerateObjectsUsingBlock:^(Region *r, NSUInteger idx, BOOL *stop) {
-        labels[idx] = [[RegionAdapter sharedInstance] getLocalizedRegionTitle:r.code];
-
-        images[idx] = [PsiphonClientCommonLibraryHelpers
-          imageFromCommonLibraryNamed:r.flagResourceId];
-
-        if ([r.code isEqualToString:selectedRegionCodeSnapshot]) {
-            selectedRegionIndex = idx;
-        }
-    }];
-
-    // Sets up and displays region selection view controller.
-    PickerViewController *regionSelectionViewController = [[PickerViewController alloc]
-      initWithLabels:labels andImages:images];
-    regionSelectionViewController.selectedIndex = selectedRegionIndex;
-    regionSelectionViewController.title = [Strings connectVia];
-
-    regionSelectionViewController.selectionHandler =
-      ^(NSUInteger selectedIndex, PickerViewController *viewController) {
-
-          Region *selectedRegion = regions[selectedIndex];
           [[RegionAdapter sharedInstance] setSelectedRegion:selectedRegion.code];
 
           if (![NSString stringsBothEqualOrNil:selectedRegion.code b:selectedRegionCodeSnapshot]) {
@@ -546,7 +522,7 @@ NSString * const CommandStopVPN = @"StopVPN";
       };
 
     UINavigationController *navController = [[UINavigationController alloc]
-      initWithRootViewController:regionSelectionViewController];
+      initWithRootViewController:regionViewController];
     [self presentViewController:navController animated:YES completion:nil];
 }
 
