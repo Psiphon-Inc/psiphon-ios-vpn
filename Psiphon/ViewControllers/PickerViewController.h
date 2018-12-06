@@ -22,7 +22,8 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface PickerViewController : UIViewController <UITableViewDelegate, UITableViewDataSource>
+@interface PickerViewController : UIViewController
+  <UITableViewDelegate, UITableViewDataSource>
 
 /**
  * Index of item that is currently selected. Default value is 0.
@@ -30,10 +31,34 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic) NSUInteger selectedIndex;
 
 @property (nonatomic, copy, nullable) void (^selectionHandler)(NSUInteger selectedIndex,
+                                                              id _Nullable selectedItem,
                                                               PickerViewController *viewController);
 
+/**
+ * Default constructor for PickerViewController.
+ * Subclasses should provide their own init methods, and not use this method.
+ */
 - (instancetype)initWithLabels:(NSArray<NSString *> *)pickerLabels
                      andImages:(NSArray<UIImage *> *_Nullable)pickerImages;
+
+/**
+ * To be implemented by subclasses to tell number of rows to the internal table view.
+ * @note Subclasses should not call this method on super.
+ */
+- (NSUInteger)numberOfRows;
+
+/**
+ * To be implemented by subclasses to bind data to the cell that is going to be displayed
+ * sometime soon.
+ * @note Subclasses should not call this method on super.
+ */
+- (void)bindDataToCell:(UITableViewCell *)cell atRow:(NSUInteger)rowIndex;
+
+/**
+ * To be implemented by subclasses when a cell gets selected.
+ * @note Subclasses should not call this method on super.
+ */
+- (void)onSelectedRow:(NSUInteger)rowIndex;
 
 @end
 
