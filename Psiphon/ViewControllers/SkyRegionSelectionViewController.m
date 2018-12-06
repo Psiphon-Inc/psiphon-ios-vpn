@@ -32,7 +32,7 @@
     self = [super init];
     if (self) {
 
-        self.title = [Strings connectVia];
+        self.title = [Strings connectViaTitle];
 
         regions = [[[RegionAdapter sharedInstance] getRegions]
       filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(Region *evaluatedObject,

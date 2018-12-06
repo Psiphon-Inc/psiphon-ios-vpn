@@ -56,6 +56,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * To be implemented by subclasses when a cell gets selected.
+ * This delegate is called regardless of whether the selected row is different from current value
+ * (i.e. `selectedIndex`).
  * @note Subclasses should not call this method on super.
  */
 - (void)onSelectedRow:(NSUInteger)rowIndex;

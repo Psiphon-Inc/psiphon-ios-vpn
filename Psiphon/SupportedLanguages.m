@@ -18,7 +18,9 @@
  */
 
 #import "SupportedLanguages.h"
+#import "PsiphonSettingsViewController.h"
 
+#define EnglishLangIndex 0
 
 #pragma mark - Lang data object
 
@@ -31,6 +33,37 @@
     return i;
 }
 
++ (Language *)currentLang {
+
+    NSArray<Language *> *langs = [SupportedLanguages languageList];
+
+    // This is bit of a hack for compatibility with PsiphonClientCommonLibrary
+    NSString *_Nullable storedLangCode = [[NSUserDefaults standardUserDefaults]
+      objectForKey:appLanguage];
+
+    __block Language *_Nullable currentLang;
+
+    [langs enumerateObjectsUsingBlock:^(Language *lang, NSUInteger idx, BOOL *stop) {
+        if ([storedLangCode isEqualToString:lang.code]) {
+            currentLang = lang;
+            *stop = TRUE;
+        }
+    }];
+
+    // If previously selected lang is empty, or it is no longer supported, return English.
+    if (!currentLang) {
+        currentLang = langs[EnglishLangIndex];
+    }
+
+    return currentLang;
+}
+
++ (void)setCurrentLang:(Language *)lang {
+    // This is bit of a hack to make the language selection compatible with
+    // PsiphonClientCommonLibrary.
+    [[NSUserDefaults standardUserDefaults] setObject:lang.code forKey:appLanguage];
+}
+
 @end
 
 #pragma mark -
@@ -39,6 +72,9 @@
 
 + (NSArray<Language *> *)languageList {
     return @[
+
+      // English language is assumed to always be index 0.
+      // Check `EnglishLangIndex`.
       [Language createWithCode:@"en"
            andLocalDescription:@"English"],
 

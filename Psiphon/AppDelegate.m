@@ -280,6 +280,11 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
     [rootContainerController reloadMainViewControllerAndImmediatelyOpenSettings];
 }
 
+- (void)reloadOnboardingViewController {
+    LOG_DEBUG();
+    [rootContainerController reloadOnboardingViewController];
+}
+
 #pragma mark - Embedded Server Entries
 
 /*!

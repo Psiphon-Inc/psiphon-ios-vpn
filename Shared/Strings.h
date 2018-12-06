@@ -45,7 +45,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 #pragma mark - Misc
 
-+ (NSString *)connectVia;
++ (NSString *)connectViaTitle;
+
++ (NSString *)selectLanguageTitle;
 
 #pragma mark - Onboarding
 
