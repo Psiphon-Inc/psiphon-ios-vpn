@@ -501,7 +501,14 @@ NSString * const CommandStopVPN = @"StopVPN";
 - (void)onRegionSelectionButtonTap:(UIButton *)sender {
     // Prepares data.
     NSString *selectedRegionCodeSnapshot = [[RegionAdapter sharedInstance] getSelectedRegion].code;
-    NSArray<Region *> *regions = [[RegionAdapter sharedInstance] getRegions];
+
+    // Filter out regions that don't exist.
+    NSArray<Region *> *regions = [[[RegionAdapter sharedInstance] getRegions]
+      filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(Region *evaluatedObject,
+        NSDictionary<NSString *, id> *bindings) {
+            return evaluatedObject.serverExists;
+      }]];
+
     NSMutableArray <NSString *> *labels = [NSMutableArray arrayWithCapacity:[regions count]];
     NSMutableArray <UIImage *> *images = [NSMutableArray arrayWithCapacity:[regions count]];
     __block NSUInteger selectedRegionIndex = 0;
