@@ -17,38 +17,14 @@
  *
  */
 
-#import <Foundation/Foundation.h>
-
+#import <UIKit/UIKit.h>
+#import "PickerViewController.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface Language : NSObject
+@interface LanguageSelectionViewController : PickerViewController
 
-@property (nonatomic, readonly) NSString *code;
-@property (nonatomic, readonly) NSString *localDescription;
-
-+ (instancetype)createWithCode:(NSString *)code andLocalDescription:(NSString *)localDescription;
-
-/**
- * Returns currently selected language.
- * It defaults to English if no language was previously selected,
- * or if the previous language is no longer supported.
- */
-+ (Language *)currentLang;
-
-/**
- * Stores currently selected language.
- */
-+ (void)setCurrentLang:(Language *)lang;
-
-@end
-
-@interface SupportedLanguages : NSObject
-
-/**
- * Returns list of supported languages.
- */
-+ (NSArray<Language *> *)languageList;
+- (instancetype)initWithSupportedLanguages;
 
 @end
 

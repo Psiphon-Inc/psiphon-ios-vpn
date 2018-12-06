@@ -188,4 +188,11 @@
     [self addAndDisplayChildVC:mainViewController];
 }
 
+- (void)reloadOnboardingViewController {
+    assert([self.childViewControllers count] == 1);
+    OnboardingViewController *onboardingViewController = self.childViewControllers[0];
+    [self removeChildVC:onboardingViewController];
+    [self switchToOnboarding];
+}
+
 @end

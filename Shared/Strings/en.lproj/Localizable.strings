@@ -287,6 +287,9 @@
 /* Button label indicating to the user that there are no videos available for them to watch. */
 "REWARDED_VIDEO_NO_VIDEOS_AVAILABLE" = "No Videos Available";
 
+/* Title for screen that allows user to select language. Use all capital letters in the translation only if it makes sense. */
+"SELECT_LANG" = "SELECT LANGUAGE";
+
 /* Select language button title. */
 "SELECT_LANG_BUTTON_TITLE" = "Select Language";
 

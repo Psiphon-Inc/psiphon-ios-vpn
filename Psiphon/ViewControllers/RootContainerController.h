@@ -28,4 +28,9 @@
  */
 - (void)reloadMainViewControllerAndImmediatelyOpenSettings;
 
+/**
+ * Destroys current Onboarding view controller and create a new one.
+ */
+- (void)reloadOnboardingViewController;
+
 @end

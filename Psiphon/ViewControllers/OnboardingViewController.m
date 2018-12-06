@@ -37,6 +37,9 @@
 #import "PsiphonDataSharedDB.h"
 #import "SharedConstants.h"
 #import "ContainerDB.h"
+#import "LanguageSelectionViewController.h"
+#import "SupportedLanguages.h"
+#import "AppDelegate.h"
 
 const int NumPages = 4;
 const CGFloat NextButtonExtraPadding = 20.f;
@@ -266,6 +269,20 @@ const CGFloat NextButtonExtraPadding = 20.f;
 #pragma mark - UI callbacks
 
 - (void)onLanguageSelectionButton {
+
+    LanguageSelectionViewController *vc = [[LanguageSelectionViewController alloc]
+      initWithSupportedLanguages];
+
+    vc.selectionHandler = ^(NSUInteger selectedIndex, id selectedItem,
+      PickerViewController *viewController) {
+        [viewController dismissViewControllerAnimated:TRUE completion:nil];
+        // Reload the onboarding to reflect the newly selected language.
+        [[AppDelegate sharedAppDelegate] reloadOnboardingViewController];
+    };
+
+    UINavigationController *nav = [[UINavigationController alloc] initWithRootViewController:vc];
+
+    [self presentViewController:nav animated:TRUE completion:nil];
 }
 
 - (void)onPrivacyPolicyAccepted {

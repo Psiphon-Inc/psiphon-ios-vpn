@@ -53,6 +53,8 @@ typedef NS_ENUM(NSInteger, UserSubscriptionStatus) {
 
 - (void)reloadMainViewControllerAndImmediatelyOpenSettings;
 
+- (void)reloadOnboardingViewController;
+
 - (UIAlertController *)displayAlertNoInternet:(void (^_Nullable)(UIAlertAction *))handler;
 
 + (UIViewController *)getTopMostViewController;
