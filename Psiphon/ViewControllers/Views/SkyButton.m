@@ -148,4 +148,24 @@
     }
 }
 
+#pragma mark - Touch animation
+
+- (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(nullable UIEvent *)event {
+    [super touchesBegan:touches withEvent:event];
+    [UIView animateWithDuration:0.1
+                     animations:^{
+                        self.transform = CGAffineTransformMakeScale(0.98f, 0.98f);
+                        self.alpha = 0.8;
+                     }];
+}
+
+- (void)touchesEnded:(NSSet<UITouch *> *)touches withEvent:(nullable UIEvent *)event {
+    [super touchesEnded:touches withEvent:event];
+    [UIView animateWithDuration:0.1
+                     animations:^{
+                         self.transform = CGAffineTransformMakeScale(1.f, 1.f);
+                         self.alpha = 1.0;
+                     }];
+}
+
 @end
