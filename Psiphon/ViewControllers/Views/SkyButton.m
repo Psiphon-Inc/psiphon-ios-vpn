@@ -123,15 +123,13 @@
 
 - (void)autoLayoutSetupSubviewsLayoutConstraints {
     _titleLabel.translatesAutoresizingMaskIntoConstraints = FALSE;
-    [_titleLabel.centerYAnchor constraintEqualToAnchor:self.centerYAnchor].active = TRUE;
 
-    [_titleLabel.topAnchor
-      constraintEqualToAnchor:self.topAnchor
-                     constant:self.fontSize].active = TRUE;
-
-    [_titleLabel.bottomAnchor
-      constraintEqualToAnchor:self.bottomAnchor
-                       constant:-self.fontSize].active = TRUE;
+    [NSLayoutConstraint activateConstraints:@[
+      [_titleLabel.heightAnchor constraintEqualToConstant:(3.f * self.fontSize)],
+      [_titleLabel.centerYAnchor constraintEqualToAnchor:self.centerYAnchor],
+      [_titleLabel.topAnchor constraintEqualToAnchor:self.topAnchor],
+      [_titleLabel.bottomAnchor constraintEqualToAnchor:self.bottomAnchor]
+    ]];
 
     UIControlContentHorizontalAlignment alignment = self.contentHorizontalAlignment;
     if (alignment == UIControlContentHorizontalAlignmentCenter) {
