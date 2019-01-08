@@ -116,6 +116,7 @@
 		A8408008B18277F93286799F /* PsiphonProgressView.m in Sources */ = {isa = PBXBuildFile; fileRef = A84087FA4B1BC2C725D900D9 /* PsiphonProgressView.m */; };
 		A84080838645BD1023136C3B /* PsiCashPurchaseView.m in Sources */ = {isa = PBXBuildFile; fileRef = A8408183BCB31ED8F0855E90 /* PsiCashPurchaseView.m */; };
 		A84080E163F24876A1476544 /* VPNStartAndStopButton.m in Sources */ = {isa = PBXBuildFile; fileRef = A8408F6123BCC98725932A59 /* VPNStartAndStopButton.m */; };
+		A84081194DA12328ABB5A43E /* UIImageView+Additions.m in Sources */ = {isa = PBXBuildFile; fileRef = A840886E2E6D8EA82B0EC427 /* UIImageView+Additions.m */; };
 		A8408161701C8F50F52866FC /* LayerAutoResizeUIView.m in Sources */ = {isa = PBXBuildFile; fileRef = A8408DBEEDCF56EC798536BF /* LayerAutoResizeUIView.m */; };
 		A84082122C339F45E630F610 /* PsiCashView.m in Sources */ = {isa = PBXBuildFile; fileRef = A8408DA63B0B641B765A1E4D /* PsiCashView.m */; };
 		A84082260CE7662A93697CFF /* LoadingCircleLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = A840845849B24AAA0E714664 /* LoadingCircleLayer.m */; };
@@ -133,6 +134,7 @@
 		A84088BD3CFC8C511F22182C /* RoyalSkyButton.m in Sources */ = {isa = PBXBuildFile; fileRef = A8408F08BFF80A05CF46C00A /* RoyalSkyButton.m */; };
 		A84088D3FD4B01A7D14CCC53 /* SupportedLanguages.m in Sources */ = {isa = PBXBuildFile; fileRef = A84080B68F307C79F3BCCC59 /* SupportedLanguages.m */; };
 		A84088DD7FBB838689BC1FCC /* OnboardingViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A8408D96EC06ED36F86C690D /* OnboardingViewController.m */; };
+		A8408A3A478ECD6E3562CDF4 /* CloudsView.m in Sources */ = {isa = PBXBuildFile; fileRef = A84081E39C751846A6009BEC /* CloudsView.m */; };
 		A8408AACE30F860F2C961A04 /* ManageSubscriptionsButton.m in Sources */ = {isa = PBXBuildFile; fileRef = A8408FA077C517546DF6033C /* ManageSubscriptionsButton.m */; };
 		A8408B83167EBE21E215C471 /* OnboardingView.m in Sources */ = {isa = PBXBuildFile; fileRef = A84088889983161FB859D8A9 /* OnboardingView.m */; };
 		A8408BC29B903A6C0A32F32C /* SkyRegionSelectionViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A8408C8A7CA3C009F01FDA3B /* SkyRegionSelectionViewController.m */; };
@@ -474,6 +476,7 @@
 		A8408183BCB31ED8F0855E90 /* PsiCashPurchaseView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PsiCashPurchaseView.m; sourceTree = "<group>"; };
 		A84081B66B02DF8283448409 /* AutoLayoutProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AutoLayoutProtocol.h; sourceTree = "<group>"; };
 		A84081C4600325A12F9C3413 /* SubscriptionsBar.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SubscriptionsBar.m; sourceTree = "<group>"; };
+		A84081E39C751846A6009BEC /* CloudsView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CloudsView.m; sourceTree = "<group>"; };
 		A84082D71B55E73D2883F645 /* PsiCashPurchaseAlertView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PsiCashPurchaseAlertView.h; sourceTree = "<group>"; };
 		A84082DC699A58110496DB56 /* ArrowView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ArrowView.h; sourceTree = "<group>"; };
 		A840830557814D4234CFD86D /* ImageUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ImageUtils.h; sourceTree = "<group>"; };
@@ -484,6 +487,7 @@
 		A84083B0CB962827E7C93024 /* PsiCashPurchaseAlertView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PsiCashPurchaseAlertView.m; sourceTree = "<group>"; };
 		A84083F358BD2CC1440107B8 /* PsiCashSpeedBoostMeterView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PsiCashSpeedBoostMeterView.m; sourceTree = "<group>"; };
 		A840841151FC43C5E1658677 /* AlertDialogs.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AlertDialogs.m; sourceTree = "<group>"; };
+		A8408454F205262BF90B55C1 /* UIImageView+Additions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImageView+Additions.h"; sourceTree = "<group>"; };
 		A840845849B24AAA0E714664 /* LoadingCircleLayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LoadingCircleLayer.m; sourceTree = "<group>"; };
 		A84084C5C538AC8171021D2C /* UIView+Additions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIView+Additions.m"; sourceTree = "<group>"; };
 		A840854913F6165FB0B97A6A /* PsiCashSpeedBoostSliderView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PsiCashSpeedBoostSliderView.m; sourceTree = "<group>"; };
@@ -502,8 +506,10 @@
 		A84087C82AF3A54E6695EE60 /* UIView+AutoLayoutViewGroup.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIView+AutoLayoutViewGroup.h"; sourceTree = "<group>"; };
 		A84087D31D8D9A1FD30337E4 /* SubscriptionStatusView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SubscriptionStatusView.h; sourceTree = "<group>"; };
 		A84087FA4B1BC2C725D900D9 /* PsiphonProgressView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PsiphonProgressView.m; sourceTree = "<group>"; };
+		A840886E2E6D8EA82B0EC427 /* UIImageView+Additions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImageView+Additions.m"; sourceTree = "<group>"; };
 		A84088779C0DA0B8A46BCC1A /* LanguageSelectionViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LanguageSelectionViewController.h; sourceTree = "<group>"; };
 		A84088889983161FB859D8A9 /* OnboardingView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OnboardingView.m; sourceTree = "<group>"; };
+		A8408902709B9D562B559532 /* CloudsView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CloudsView.h; sourceTree = "<group>"; };
 		A840893B138A37A795FFFAB2 /* PsiCashBalanceView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PsiCashBalanceView.m; sourceTree = "<group>"; };
 		A840896A2A9959280DAE2DA1 /* LanguageSelectionViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LanguageSelectionViewController.m; sourceTree = "<group>"; };
 		A840898FA26840E5AEA71BF5 /* PsiCashBalanceView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PsiCashBalanceView.h; sourceTree = "<group>"; };
@@ -1001,6 +1007,10 @@
 				A8408E812B209E39BE1A36DF /* OnboardingScrollableView.h */,
 				A84084C5C538AC8171021D2C /* UIView+Additions.m */,
 				A8408DB71B7BE2CF13F9CD04 /* UIView+Additions.h */,
+				A84081E39C751846A6009BEC /* CloudsView.m */,
+				A8408902709B9D562B559532 /* CloudsView.h */,
+				A840886E2E6D8EA82B0EC427 /* UIImageView+Additions.m */,
+				A8408454F205262BF90B55C1 /* UIImageView+Additions.h */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -1707,6 +1717,8 @@
 				A8408BC29B903A6C0A32F32C /* SkyRegionSelectionViewController.m in Sources */,
 				A84088D3FD4B01A7D14CCC53 /* SupportedLanguages.m in Sources */,
 				A8408F99941C9664E3E7C48A /* LanguageSelectionViewController.m in Sources */,
+				A8408A3A478ECD6E3562CDF4 /* CloudsView.m in Sources */,
+				A84081194DA12328ABB5A43E /* UIImageView+Additions.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -40,6 +40,7 @@
 #import "LanguageSelectionViewController.h"
 #import "SupportedLanguages.h"
 #import "AppDelegate.h"
+#import "CloudsView.h"
 
 const int NumPages = 4;
 const CGFloat NextButtonExtraPadding = 20.f;
@@ -51,6 +52,7 @@ const CGFloat NextButtonExtraPadding = 20.f;
 @end
 
 @implementation OnboardingViewController {
+    CloudsView *cloudsView;
     UIProgressView *progressView;
     UIButton *nextPageButton;
     int currentPage;
@@ -75,6 +77,18 @@ const CGFloat NextButtonExtraPadding = 20.f;
     [super viewDidLoad];
 
     self.view.backgroundColor = UIColor.whiteColor;
+
+    // Clouds view
+    {
+        cloudsView = [[CloudsView alloc] initForAutoLayout];
+        [self.view addSubview:cloudsView];
+        [NSLayoutConstraint activateConstraints:@[
+          [cloudsView.topAnchor constraintEqualToAnchor:self.view.safeTopAnchor],
+          [cloudsView.leadingAnchor constraintEqualToAnchor:self.view.safeLeadingAnchor],
+          [cloudsView.trailingAnchor constraintEqualToAnchor:self.view.safeTrailingAnchor],
+          [cloudsView.bottomAnchor constraintEqualToAnchor:self.view.safeBottomAnchor]
+        ]];
+    }
 
     // Progress view
     {
