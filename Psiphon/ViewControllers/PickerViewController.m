@@ -50,6 +50,8 @@ NSString * const CellIdentifier = @"cell";
 - (void)viewDidLoad {
     [super viewDidLoad];
 
+    self.view.backgroundColor = UIColor.whiteColor;
+
     // Navigation bar
     {
         self.navigationController.navigationBar.backgroundColor = UIColor.whiteColor;
