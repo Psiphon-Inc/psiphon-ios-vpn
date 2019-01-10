@@ -65,9 +65,9 @@
     CAShapeLayer *shape = [CAShapeLayer layer];
     shape.path = rounded.CGPath;
     shape.lineWidth = 2.f;
-    shape.fillColor = UIColor.clearColor.CGColor;
+    shape.fillColor = UIColor.whiteColor.CGColor;
     shape.strokeColor = UIColor.duckEggBlue.CGColor;
-    [rewardedVideoButtonContainer.layer addSublayer:shape];
+    [rewardedVideoButtonContainer.layer insertSublayer:shape below:_rewardedVideoButton.layer];
 }
 
 - (void)setupViews {
@@ -84,7 +84,6 @@
       initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
 
     rewardedVideoButtonContainer = [[UIView alloc] init];
-    rewardedVideoButtonContainer.backgroundColor = UIColor.whiteColor;
 
     // Setup rewarded video button
     _rewardedVideoButton = [[RoyalSkyButton alloc] initForAutoLayout];
@@ -93,6 +92,7 @@
     [_rewardedVideoButton setTitle:[PsiCashView videoUnavailableTitleText]
                           forState:UIControlStateDisabled];
     _rewardedVideoButton.enabled = FALSE;
+    _rewardedVideoButton.backgroundColor = UIColor.whiteColor;
 
     topBorderBlocker = [[UIView alloc] init];
     topBorderBlocker.backgroundColor = UIColor.whiteColor;
@@ -179,6 +179,14 @@
     }
     [_balance bindWithModel:clientModel];
     [_meter bindWithModel:clientModel];
+}
+
+#pragma mark - setters
+
+- (void)setHideRewardedVideoButton:(BOOL)hideRewardedVideoButton {
+    _rewardedVideoButton.hidden = hideRewardedVideoButton;
+    rewardedVideoButtonContainer.hidden = hideRewardedVideoButton;
+    bottomBorderBlocker.hidden = hideRewardedVideoButton;
 }
 
 #pragma mark - animation helpers
