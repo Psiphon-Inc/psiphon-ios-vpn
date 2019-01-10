@@ -54,6 +54,16 @@
     }
 }
 
+- (void)setShadow:(BOOL)shadow {
+    _shadow = shadow;
+    [self setNeedsLayout];
+}
+
+- (void)setFontSize:(CGFloat)fontSize {
+    _fontSize = fontSize;
+    _titleLabel.font = [UIFont avenirNextDemiBold:fontSize];
+}
+
 - (void)setEnabled:(BOOL)enabled {
     [super setEnabled:enabled];
     _titleLabel.text = self.currentTitle;
