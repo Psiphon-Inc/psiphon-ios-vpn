@@ -54,6 +54,10 @@
     return NSLocalizedStringWithDefaultValue(@"DISMISS_BUTTON_TITLE", nil, [NSBundle mainBundle], @"Dismiss", @"Dismiss button title. Dismisses pop-up alert when the user clicks on the button");
 }
 
++ (NSString *)cancelButtonTitle {
+    return  NSLocalizedStringWithDefaultValue(@"CANCEL_BUTTON_TITLE", nil, [NSBundle mainBundle], @"Cancel", @"Title for a button that cancels an action. This should be generic enough to make sense whenever a cancel button is used.");
+}
+
 + (NSString *)doneButtonTitle {
     return NSLocalizedStringWithDefaultValue(@"DONE_BUTTON_TITLE", nil, [NSBundle mainBundle], @"Done", @"Title of the button that dismisses a screen or a dialog");
 }
@@ -64,6 +68,10 @@
 
 + (NSString *)selectLanguageTitle {
     return  NSLocalizedStringWithDefaultValue(@"SELECT_LANG", nil, [NSBundle mainBundle], @"SELECT LANGUAGE", @"Title for screen that allows user to select language. Use all capital letters in the translation only if it makes sense.");
+}
+
++ (NSString *)resetConsentButtonTitle {
+    return  NSLocalizedStringWithDefaultValue(@"RESET_IDENTIFIER_BUTTON_TITLE", nil, [NSBundle mainBundle], @"Reset Consent", @"Title for a confirmation button that resets a user's previous consent.");
 }
 
 + (NSString *)onboardingSelectLanguageButtonTitle {

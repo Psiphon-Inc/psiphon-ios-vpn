@@ -25,10 +25,11 @@
 #import "RACSignal.h"
 #import "RACCompoundDisposable.h"
 #import "RACReplaySubject.h"
-#import "RACSignal+Operations.h"
 #import "VPNManager.h"
 #import "Asserts.h"
 #import "AdManager.h"
+#import "Strings.h"
+#import "UIAlertController+Additions.h"
 
 // Specifier keys for cells in settings menu
 // These keys are defined in Psiphon/InAppSettings.bundle/Root.inApp.plist
@@ -263,7 +264,19 @@ NSString * const SettingsResetAdConsentCellSpecifierKey = @"settingsResetAdConse
 }
 
 - (void)onResetConsent {
-    [[AdManager sharedInstance] resetUserConsent];
+    UIAlertController *options = [UIAlertController alertControllerWithTitle:nil
+                                                                     message:nil
+                                                  preferredStyle:UIAlertControllerStyleActionSheet];
+
+    UIAlertAction *resetAction = [UIAlertAction actionWithTitle:[Strings resetConsentButtonTitle]
+        style:UIAlertActionStyleDestructive
+      handler:^(UIAlertAction *action) {
+          [[AdManager sharedInstance] resetUserConsent];
+      }];
+
+    [options addAction:resetAction];
+    [options addCancelAction:nil];
+    [options presentFromTopController];
 }
 
 @end
