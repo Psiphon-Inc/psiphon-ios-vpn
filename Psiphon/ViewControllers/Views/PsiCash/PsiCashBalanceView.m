@@ -52,7 +52,7 @@
     self.clipsToBounds = YES;
     self.layer.borderColor = [UIColor colorWithRed:0.94 green:0.96 blue:0.99 alpha:1.0].CGColor;
     self.layer.borderWidth = 2.f;
-    self.contentEdgeInsets = UIEdgeInsetsMake(10.0f, 30.0f, 10.0f, 30.0f);
+    self.backgroundColor = UIColor.whiteColor;
 
     // Setup container view
     containerView = [[UIView alloc] init];

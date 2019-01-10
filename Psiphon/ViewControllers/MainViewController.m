@@ -1000,7 +1000,7 @@ NSString * const CommandStopVPN = @"StopVPN";
     appSettingsViewController.neverShowPrivacySettings = YES;
     appSettingsViewController.settingsDelegate = self;
     appSettingsViewController.preferencesSnapshot = [[[NSUserDefaults standardUserDefaults] dictionaryRepresentation] copy];
-    
+
     UINavigationController *navController = [[UINavigationController alloc]
       initWithRootViewController:appSettingsViewController];
     [self presentViewController:navController animated:YES completion:nil];
@@ -1027,7 +1027,10 @@ NSString * const CommandStopVPN = @"StopVPN";
     NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
 
     if (![userDefaults boolForKey:PsiCashHasBeenOnboardedBoolKey]) {
-        // TODO: onboarding fitting ui-3
+        PsiCashOnboardingViewController *onboarding = [[PsiCashOnboardingViewController alloc] init];
+        onboarding.delegate = self;
+        [self presentViewController:onboarding animated:NO completion:nil];
+        return;
     }
 
     // Checks the latest tunnel status before going ahead with the purchase request.

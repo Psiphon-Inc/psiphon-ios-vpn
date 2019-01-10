@@ -30,6 +30,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly) PsiCashBalanceView *balance;
 @property (nonatomic, readonly) PsiCashSpeedBoostMeterView *meter;
 @property (nonatomic, readonly) RoyalSkyButton *rewardedVideoButton;
+@property (nonatomic, assign) BOOL hideRewardedVideoButton;
 
 + (void)animateBalanceChangeOf:(NSNumber*)delta
                withPsiCashView:(PsiCashView*)psiCashView
