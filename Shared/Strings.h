@@ -45,6 +45,12 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (NSString *)doneButtonTitle;
 
+#pragma mark - Subscriptions
+
++ (NSString *)manageSubscriptionButtonTitle;
+
++ (NSString *)subscribeButtonTitle;
+
 #pragma mark - Misc
 
 + (NSString *)connectViaTitle;

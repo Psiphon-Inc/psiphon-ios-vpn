@@ -135,7 +135,7 @@
 		A84088D3FD4B01A7D14CCC53 /* SupportedLanguages.m in Sources */ = {isa = PBXBuildFile; fileRef = A84080B68F307C79F3BCCC59 /* SupportedLanguages.m */; };
 		A84088DD7FBB838689BC1FCC /* OnboardingViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A8408D96EC06ED36F86C690D /* OnboardingViewController.m */; };
 		A8408A3A478ECD6E3562CDF4 /* CloudsView.m in Sources */ = {isa = PBXBuildFile; fileRef = A84081E39C751846A6009BEC /* CloudsView.m */; };
-		A8408AACE30F860F2C961A04 /* ManageSubscriptionsButton.m in Sources */ = {isa = PBXBuildFile; fileRef = A8408FA077C517546DF6033C /* ManageSubscriptionsButton.m */; };
+		A8408AACE30F860F2C961A04 /* WhiteSkyButton.m in Sources */ = {isa = PBXBuildFile; fileRef = A8408FA077C517546DF6033C /* WhiteSkyButton.m */; };
 		A8408B83167EBE21E215C471 /* OnboardingView.m in Sources */ = {isa = PBXBuildFile; fileRef = A84088889983161FB859D8A9 /* OnboardingView.m */; };
 		A8408BC29B903A6C0A32F32C /* SkyRegionSelectionViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A8408C8A7CA3C009F01FDA3B /* SkyRegionSelectionViewController.m */; };
 		A8408C424E64BF3D70273464 /* ConnectionStatusView.m in Sources */ = {isa = PBXBuildFile; fileRef = A8408E0115540B5B2B305EAE /* ConnectionStatusView.m */; };
@@ -521,7 +521,7 @@
 		A8408ABFCA9BBDD281E8A4FD /* SkyRegionSelectionViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SkyRegionSelectionViewController.h; sourceTree = "<group>"; };
 		A8408AD78B4EB15E3C8F33B2 /* AppVersionNumberView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppVersionNumberView.h; sourceTree = "<group>"; };
 		A8408AEA2174955E85247913 /* ConnectionStatusView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ConnectionStatusView.h; sourceTree = "<group>"; };
-		A8408B98D73EB239C92FB450 /* ManageSubscriptionsButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ManageSubscriptionsButton.h; sourceTree = "<group>"; };
+		A8408B98D73EB239C92FB450 /* WhiteSkyButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WhiteSkyButton.h; sourceTree = "<group>"; };
 		A8408B9A66413A25FC1A2BE1 /* SwoopView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SwoopView.m; sourceTree = "<group>"; };
 		A8408BA05DC0D983E6740558 /* SubscriptionStatusView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SubscriptionStatusView.m; sourceTree = "<group>"; };
 		A8408BAC196A108FFE3A5957 /* AlertDialogs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AlertDialogs.h; sourceTree = "<group>"; };
@@ -540,7 +540,7 @@
 		A8408EF0378D6C5C22CC3FE2 /* OnboardingView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OnboardingView.h; sourceTree = "<group>"; };
 		A8408F08BFF80A05CF46C00A /* RoyalSkyButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RoyalSkyButton.m; sourceTree = "<group>"; };
 		A8408F6123BCC98725932A59 /* VPNStartAndStopButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VPNStartAndStopButton.m; sourceTree = "<group>"; };
-		A8408FA077C517546DF6033C /* ManageSubscriptionsButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ManageSubscriptionsButton.m; sourceTree = "<group>"; };
+		A8408FA077C517546DF6033C /* WhiteSkyButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WhiteSkyButton.m; sourceTree = "<group>"; };
 		CB8BB19F016330264C4DCB80 /* libPods-Psiphon.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Psiphon.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		CE26FC8A1BBDC7B800B83375 /* Psiphon.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Psiphon.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		CE26FC941BBDC7B800B83375 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -973,8 +973,8 @@
 				A8408E0115540B5B2B305EAE /* ConnectionStatusView.m */,
 				A84087B4F756C5DA76723EFC /* LoadingCircleLayer.h */,
 				A840845849B24AAA0E714664 /* LoadingCircleLayer.m */,
-				A8408B98D73EB239C92FB450 /* ManageSubscriptionsButton.h */,
-				A8408FA077C517546DF6033C /* ManageSubscriptionsButton.m */,
+				A8408B98D73EB239C92FB450 /* WhiteSkyButton.h */,
+				A8408FA077C517546DF6033C /* WhiteSkyButton.m */,
 				A840856AD6865619ACF78509 /* PsiphonProgressView.h */,
 				A84087FA4B1BC2C725D900D9 /* PsiphonProgressView.m */,
 				A840816C0C9B0658776A8B91 /* RegionSelectionButton.h */,
@@ -1685,7 +1685,7 @@
 				A8408E281270691F61F9C20C /* AppVersionNumberView.m in Sources */,
 				A8408C424E64BF3D70273464 /* ConnectionStatusView.m in Sources */,
 				A84082260CE7662A93697CFF /* LoadingCircleLayer.m in Sources */,
-				A8408AACE30F860F2C961A04 /* ManageSubscriptionsButton.m in Sources */,
+				A8408AACE30F860F2C961A04 /* WhiteSkyButton.m in Sources */,
 				A8408008B18277F93286799F /* PsiphonProgressView.m in Sources */,
 				A8408FA13890CD67154033C6 /* RegionSelectionButton.m in Sources */,
 				A84087459E9F796B1954D049 /* SubscriptionsBar.m in Sources */,

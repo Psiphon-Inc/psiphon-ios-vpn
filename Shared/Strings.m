@@ -62,6 +62,14 @@
     return NSLocalizedStringWithDefaultValue(@"DONE_BUTTON_TITLE", nil, [NSBundle mainBundle], @"Done", @"Title of the button that dismisses a screen or a dialog");
 }
 
++ (NSString *)manageSubscriptionButtonTitle {
+    return NSLocalizedStringWithDefaultValue(@"SUBSCRIPTIONS_MANAGE_SUBSCRIPTION_BUTTON", nil, [NSBundle mainBundle], @"Manage", @"Label on a button which, when pressed, opens a screen where the user can manage their currently active subscription.");
+}
+
++ (NSString *)subscribeButtonTitle {
+    return NSLocalizedStringWithDefaultValue(@"SUBSCRIPTIONS_SUBSCRIBE_BUTTON", nil, [NSBundle mainBundle], @"Subscribe", @"Label on a button which, when pressed, opens a screen where the user can choose from multiple subscription plans.");
+}
+
 + (NSString *)connectViaTitle {
     return  NSLocalizedStringWithDefaultValue(@"CONNECT_VIA", nil, [NSBundle mainBundle], @"CONNECT VIA", @"Title for screen that allows user to select their desired server region. Use all capital letters in the translation only if it makes sense.");
 }

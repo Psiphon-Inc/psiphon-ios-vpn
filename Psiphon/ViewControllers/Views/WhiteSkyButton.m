@@ -17,14 +17,15 @@
  *
  */
 
-#import <UIKit/UIKit.h>
+#import "WhiteSkyButton.h"
+#import "UIColor+Additions.h"
 
-NS_ASSUME_NONNULL_BEGIN
+@implementation WhiteSkyButton
 
-@interface ManageSubscriptionsButton : UIButton
-
-- (void)subscriptionActive:(BOOL)subscriptionActive;
+- (void)autoLayoutSetupViews {
+    [super autoLayoutSetupViews];
+    self.backgroundColor = UIColor.whiteColor;
+    self.titleLabel.textColor = UIColor.lightRoyalBlue;
+}
 
 @end
-
-NS_ASSUME_NONNULL_END
