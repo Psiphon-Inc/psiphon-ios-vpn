@@ -44,8 +44,8 @@
       presentViewController:self animated:TRUE completion:nil];
 }
 
-- (void)addDismissAction:(void (^)(UIAlertAction *action))handler {
-    UIAlertAction *dismissAction = [UIAlertAction actionWithTitle:[Strings dismissButtonTitle]
+- (void)addCancelAction:(void (^_Nullable)(UIAlertAction *action))handler {
+    UIAlertAction *dismissAction = [UIAlertAction actionWithTitle:[Strings cancelButtonTitle]
                                                             style:UIAlertActionStyleCancel
                                                           handler:handler];
     [self addAction:dismissAction];

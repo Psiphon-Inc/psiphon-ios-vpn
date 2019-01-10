@@ -41,6 +41,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (NSString *)dismissButtonTitle;
 
++ (NSString *)cancelButtonTitle;
+
 + (NSString *)doneButtonTitle;
 
 #pragma mark - Misc
@@ -48,6 +50,8 @@ NS_ASSUME_NONNULL_BEGIN
 + (NSString *)connectViaTitle;
 
 + (NSString *)selectLanguageTitle;
+
++ (NSString *)resetConsentButtonTitle;
 
 #pragma mark - Onboarding
 

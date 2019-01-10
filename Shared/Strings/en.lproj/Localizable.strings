@@ -39,6 +39,9 @@
 /* Cancel button on a pop-up alert. The alert will be dismissed if the user presses this button. */
 "CANCEL_BUTTON" = "Cancel";
 
+/* Title for a button that cancels an action. This should be generic enough to make sense whenever a cancel button is used. */
+"CANCEL_BUTTON_TITLE" = "Cancel";
+
 /* Alert message informing user that their subscription has expired or that they're not a subscriber, therefore Psiphon can only be started from the Psiphon app. DO NOT translate 'Psiphon'. */
 "CANNOT_START_TUNNEL_DUE_TO_SUBSCRIPTION" = "You don't have an active subscription.\nSince you're not a subscriber or your subscription has expired, Psiphon can only be started from the Psiphon app.\n\nPlease open the Psiphon app to start.";
 
@@ -274,6 +277,9 @@
 
 /* Point in a list of scenarios where the user should try refreshing their app receipt to restore an existing subscription */
 "REFRESH_APP_RECEIPT_BUTTON_DESCRIPTION_POINT_2" = "You cannot see a subscription you purchased on this device";
+
+/* Title for a confirmation button that resets a user's previous consent. */
+"RESET_IDENTIFIER_BUTTON_TITLE" = "Reset Consent";
 
 /* Button which, when pressed, attempts to restore any existing subscriptions the user has purchased */
 "RESTORE_SUBSCRIPTION_BUTTON" = "Restore Subscription";
