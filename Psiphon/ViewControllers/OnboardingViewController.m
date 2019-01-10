@@ -21,7 +21,6 @@
 #import "OnboardingViewController.h"
 #import "OnboardingView.h"
 #import "UIColor+Additions.h"
-#import "Asserts.h"
 #import "SkyButton.h"
 #import "RingSkyButton.h"
 #import "UIFont+Additions.h"
@@ -31,19 +30,14 @@
 #import "RACCompoundDisposable.h"
 #import "AlertDialogs.h"
 #import "UIView+Additions.h"
-#import "UIAlertController+Additions.h"
 #import "OnboardingScrollableView.h"
 #import "Strings.h"
-#import "PsiphonDataSharedDB.h"
-#import "SharedConstants.h"
 #import "ContainerDB.h"
 #import "LanguageSelectionViewController.h"
-#import "SupportedLanguages.h"
 #import "AppDelegate.h"
 #import "CloudsView.h"
 
 const int NumPages = 4;
-const CGFloat NextButtonExtraPadding = 20.f;
 
 @interface OnboardingViewController ()
 
@@ -55,7 +49,6 @@ const CGFloat NextButtonExtraPadding = 20.f;
     CloudsView *cloudsView;
     UIProgressView *progressView;
     UIButton *nextPageButton;
-    int currentPage;
 
     UIView *currentOnboardingView;
 }
@@ -63,7 +56,6 @@ const CGFloat NextButtonExtraPadding = 20.f;
 - (instancetype)init {
     self = [super init];
     if (self) {
-        currentPage = 0;
         _compoundDisposable = [RACCompoundDisposable compoundDisposable];
     }
     return self;
@@ -97,45 +89,52 @@ const CGFloat NextButtonExtraPadding = 20.f;
         progressView.progressTintColor = UIColor.lightishBlue;
 
         progressView.translatesAutoresizingMaskIntoConstraints = FALSE;
-        [progressView.bottomAnchor
-          constraintEqualToAnchor:self.view.safeBottomAnchor].active = TRUE;
-        [progressView.leadingAnchor
-          constraintEqualToAnchor:self.view.safeLeadingAnchor].active = TRUE;
-        [progressView.trailingAnchor
-          constraintEqualToAnchor:self.view.safeTrailingAnchor].active = TRUE;
-        [progressView.heightAnchor constraintEqualToConstant:6.f].active = TRUE;
+        [NSLayoutConstraint activateConstraints:@[
+          [progressView.bottomAnchor constraintEqualToAnchor:self.view.safeBottomAnchor],
+          [progressView.leadingAnchor constraintEqualToAnchor:self.view.safeLeadingAnchor],
+          [progressView.trailingAnchor constraintEqualToAnchor:self.view.safeTrailingAnchor],
+          [progressView.heightAnchor constraintEqualToConstant:6.f]
+        ]];
     }
 
     // Next button
     {
         nextPageButton = [UIButton buttonWithType:UIButtonTypeCustom];
-        // Make the tap area larger.
-        CGFloat p = NextButtonExtraPadding;
-        nextPageButton.contentEdgeInsets = UIEdgeInsetsMake(p, p, p, p);
-        [self.view addSubview:nextPageButton];
+        CGFloat p = 20.f; // Margin around the next button.
+        nextPageButton.contentEdgeInsets = UIEdgeInsetsMake(p, 2.f * p, p, p);
+
         [nextPageButton setTitle:[Strings nextPageButtonTitle] forState:UIControlStateNormal];
         [nextPageButton setTitleColor:UIColor.paleGreyThreeColor forState:UIControlStateNormal];
         nextPageButton.titleLabel.font = [UIFont avenirNextDemiBold:14.f];
         [nextPageButton addTarget:self
                  action:@selector(gotoNextPage)
        forControlEvents:UIControlEventTouchUpInside];
+        [self.view addSubview:nextPageButton];
 
         nextPageButton.translatesAutoresizingMaskIntoConstraints = FALSE;
-        [nextPageButton.bottomAnchor constraintEqualToAnchor:progressView.topAnchor
-                                          constant:-20.f].active = TRUE;
-        [nextPageButton.trailingAnchor
-          constraintEqualToAnchor:self.view.safeTrailingAnchor
-                         constant:(-40.f + NextButtonExtraPadding)].active = TRUE;
+        [NSLayoutConstraint activateConstraints:@[
+          [nextPageButton.bottomAnchor constraintEqualToAnchor:progressView.topAnchor
+                                                      constant:-20.f],
+          [nextPageButton.trailingAnchor constraintEqualToAnchor:self.view.safeTrailingAnchor
+                                                        constant:-20.f],
+        ]];
     }
 
-    UIView *firstPage = [self getOnboardingViewForPage:currentPage];
+    UIView *firstPage = [self createOnboardingViewForPage:1];
     [self setCurrentOnboardingPage:firstPage];
 }
 
 #pragma mark - Page update methods
 
 - (void)setCurrentOnboardingPage:(UIView *_Nonnull)onboardingPage {
-    progressView.progress = (CGFloat) (currentPage + 1) / (CGFloat) NumPages;
+    progressView.progress = (CGFloat) (onboardingPage.tag) / (CGFloat) NumPages;
+
+    if (onboardingPage.tag == 1 ||
+        onboardingPage.tag == NumPages - 1) {
+        nextPageButton.hidden = FALSE;
+    } else {
+        nextPageButton.hidden = TRUE;
+    }
 
     if (currentOnboardingView) {
         [currentOnboardingView removeFromSuperview];
@@ -143,14 +142,15 @@ const CGFloat NextButtonExtraPadding = 20.f;
 
     currentOnboardingView = onboardingPage;
     [self.view addSubview:currentOnboardingView];
-    [self applyOnboardingViewConstraintsToView:currentOnboardingView];
+    [self applyOnboardingViewConstraintsToView:currentOnboardingView
+                  anchorBottomToNextPageButton:!nextPageButton.hidden];
 }
 
-- (UIView *_Nullable)getOnboardingViewForPage:(int)page {
+- (UIView *_Nullable)createOnboardingViewForPage:(NSInteger)page {
     UIView *v;
 
     switch (page) {
-        case 0: {
+        case 1: {
             // Language selection page
             RingSkyButton *selectLangButton = [[RingSkyButton alloc] initForAutoLayout];
             selectLangButton.includeChevron = TRUE;
@@ -166,7 +166,7 @@ const CGFloat NextButtonExtraPadding = 20.f;
           withAccessoryView:selectLangButton];
             break;
         }
-        case 1: {
+        case 2: {
             // Privacy Policy page
             RoyalSkyButton *acceptButton = [[RoyalSkyButton alloc] initForAutoLayout];
             [acceptButton setTitle:[Strings acceptButtonTitle]];
@@ -194,7 +194,7 @@ const CGFloat NextButtonExtraPadding = 20.f;
 
             break;
         }
-        case 2: {
+        case 3: {
             // "Getting Started" page
             v = [[OnboardingView alloc]
               initWithImage:[UIImage imageNamed:@"OnboardingPermission"]
@@ -204,7 +204,7 @@ const CGFloat NextButtonExtraPadding = 20.f;
             break;
         }
         //
-        case 3: {
+        case 4: {
             v = [self createInstallGuideVPNOnboardingView];
             break;
         }
@@ -213,23 +213,16 @@ const CGFloat NextButtonExtraPadding = 20.f;
             return nil;
     }
 
+    v.tag = page;
     return v;
 }
 
 - (void)gotoNextPage {
     OnboardingViewController *__weak weakSelf = self;
 
-    currentPage++;
-
-    if (currentPage == 1 || currentPage == NumPages - 1) {
-        nextPageButton.hidden = TRUE;
-    } else {
-        nextPageButton.hidden = FALSE;
-    }
-
     // Present the next onboarding page. If none is available notify the delegate
     // that the onboarding has finished.
-    UIView *_Nullable newPage = [self getOnboardingViewForPage:currentPage];
+    UIView *_Nullable newPage = [self createOnboardingViewForPage:currentOnboardingView.tag + 1];
     if (newPage) {
         [self setCurrentOnboardingPage:newPage];
     } else {
@@ -239,10 +232,8 @@ const CGFloat NextButtonExtraPadding = 20.f;
         return;
     }
 
-    // Prompt user for VPN configuration permission on page2.
-    if (currentPage == 3) {
-        // Hide next button for second page.
-        nextPageButton.hidden = TRUE;
+    // Prompt user for VPN configuration permission on page 4.
+    if (newPage.tag == 4) {
 
         __block RACDisposable *disposable = [[[VPNManager sharedInstance] reinstallVPNConfiguration]
           subscribeNext:^(RACUnit *x) {
@@ -251,9 +242,7 @@ const CGFloat NextButtonExtraPadding = 20.f;
           }
           error:^(NSError *error) {
               // Go to previous page.
-              nextPageButton.hidden = FALSE;
-              currentPage--;
-              UIView *prvPage = [weakSelf getOnboardingViewForPage:currentPage];
+              UIView *prvPage = [weakSelf createOnboardingViewForPage:3];
               [weakSelf setCurrentOnboardingPage:prvPage];
 
               // If the error was due to user denying permission to install VPN configuration,
@@ -337,38 +326,48 @@ const CGFloat NextButtonExtraPadding = 20.f;
     label.textAlignment = NSTextAlignmentCenter;
 
     arrow.translatesAutoresizingMaskIntoConstraints = FALSE;
-    [arrow.heightAnchor constraintEqualToConstant:54.f].active = TRUE;
-    [arrow.widthAnchor constraintEqualToConstant:30.f].active = TRUE;
-    [arrow.centerXAnchor constraintEqualToAnchor:view.centerXAnchor constant:-60.f].active = TRUE;
-    [arrow.centerYAnchor constraintEqualToAnchor:view.centerYAnchor constant:160.f].active = TRUE;
+    [NSLayoutConstraint activateConstraints:@[
+      [arrow.heightAnchor constraintEqualToConstant:54.f],
+      [arrow.widthAnchor constraintEqualToConstant:30.f],
+      [arrow.centerXAnchor constraintEqualToAnchor:view.centerXAnchor constant:-60.f],
+      [arrow.centerYAnchor constraintEqualToAnchor:view.centerYAnchor constant:160.f]
+    ]];
 
     label.translatesAutoresizingMaskIntoConstraints = FALSE;
-    [label.topAnchor constraintEqualToAnchor:arrow.bottomAnchor constant:10.f].active = TRUE;
-    [label.centerXAnchor constraintEqualToAnchor:view.centerXAnchor].active = TRUE;
-    [label.leadingAnchor constraintEqualToAnchor:view.leadingAnchor].active = TRUE;
-    [label.trailingAnchor constraintEqualToAnchor:view.trailingAnchor].active = TRUE;
+    [NSLayoutConstraint activateConstraints:@[
+      [label.topAnchor constraintEqualToAnchor:arrow.bottomAnchor constant:10.f],
+      [label.centerXAnchor constraintEqualToAnchor:view.centerXAnchor],
+      [label.leadingAnchor constraintEqualToAnchor:view.leadingAnchor],
+      [label.trailingAnchor constraintEqualToAnchor:view.trailingAnchor]
+    ]];
 
     return view;
 }
 
-- (void)applyOnboardingViewConstraintsToView:(UIView *)view {
+- (void)applyOnboardingViewConstraintsToView:(UIView *)view
+                anchorBottomToNextPageButton:(BOOL)anchorToNextPageButton {
+
     view.translatesAutoresizingMaskIntoConstraints = FALSE;
 
-    [view.topAnchor constraintEqualToAnchor:self.view.safeTopAnchor].active = TRUE;
+    NSLayoutConstraint *bottomConstraint;
 
-    [view.bottomAnchor constraintEqualToAnchor:nextPageButton.topAnchor
-                                      constant:NextButtonExtraPadding].active = TRUE;
+    if (anchorToNextPageButton) {
+        bottomConstraint = [view.bottomAnchor constraintEqualToAnchor:nextPageButton.topAnchor];
+    } else {
+        bottomConstraint = [view.bottomAnchor constraintEqualToAnchor:progressView.topAnchor
+                                                             constant:-20.f];
+    }
 
-    [view.centerXAnchor constraintEqualToAnchor:self.view.centerXAnchor].active = TRUE;
-
-    [view.leadingAnchor constraintGreaterThanOrEqualToAnchor:self.view.safeLeadingAnchor
-                                                    constant:20.f].active =TRUE;
-
-    [view.trailingAnchor constraintLessThanOrEqualToAnchor:self.view.safeTrailingAnchor
-                                                  constant:-20.f].active = TRUE;
-
-    // Max width for large screens.
-    [view.widthAnchor constraintLessThanOrEqualToConstant:500.f].active = TRUE;
+    [NSLayoutConstraint activateConstraints:@[
+      bottomConstraint,
+      [view.topAnchor constraintEqualToAnchor:self.view.safeTopAnchor],
+      [view.centerXAnchor constraintEqualToAnchor:self.view.centerXAnchor],
+      [view.leadingAnchor constraintGreaterThanOrEqualToAnchor:self.view.safeLeadingAnchor
+                                                      constant:20.f],
+      [view.trailingAnchor constraintLessThanOrEqualToAnchor:self.view.safeTrailingAnchor
+                                                    constant:-20.f],
+      [view.widthAnchor constraintLessThanOrEqualToConstant:500.f]  // Max width for large screens.
+    ]];
 }
 
 @end
