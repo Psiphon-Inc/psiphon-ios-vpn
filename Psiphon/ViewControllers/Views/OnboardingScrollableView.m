@@ -70,28 +70,28 @@
     bodyLabel.numberOfLines = 0;
 
     NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc]
-      initWithData:[body dataUsingEncoding:NSUnicodeStringEncoding]
-           options:@{NSDocumentTypeDocumentAttribute: NSHTMLTextDocumentType}
-documentAttributes:nil
-             error:nil];
+            initWithData:[body dataUsingEncoding:NSUnicodeStringEncoding]
+                 options:@{NSDocumentTypeDocumentAttribute: NSHTMLTextDocumentType}
+      documentAttributes:nil
+                   error:nil];
 
     // Enumerate font attributes and updates to desired font.
     [attributedString enumerateAttribute:NSFontAttributeName
-                                 inRange:NSMakeRange(0, [attributedString length])
-                                 options:NSAttributedStringEnumerationLongestEffectiveRangeNotRequired
-                              usingBlock:^(UIFont *currentFont, NSRange range, BOOL *stop) {
+         inRange:NSMakeRange(0, [attributedString length])
+         options:NSAttributedStringEnumerationLongestEffectiveRangeNotRequired
+      usingBlock:^(UIFont *currentFont, NSRange range, BOOL *stop) {
 
-                                  NSRange boldRange = [currentFont.fontName rangeOfString:@"bold"
-                                                                                  options:NSCaseInsensitiveSearch];
-                                  UIFont *newFont;
-                                  if (boldRange.location != NSNotFound) {
-                                      newFont = [UIFont avenirNextDemiBold:currentFont.pointSize];
-                                  } else {
-                                      newFont = [UIFont avenirNextMedium:currentFont.pointSize];
-                                  }
+          NSRange boldRange = [currentFont.fontName rangeOfString:@"bold"
+                                                          options:NSCaseInsensitiveSearch];
+          UIFont *newFont;
+          if (boldRange.location != NSNotFound) {
+              newFont = [UIFont avenirNextDemiBold:currentFont.pointSize];
+          } else {
+              newFont = [UIFont avenirNextMedium:currentFont.pointSize];
+          }
 
-                                  [attributedString addAttribute:NSFontAttributeName value:newFont range:range];
-                              }];
+          [attributedString addAttribute:NSFontAttributeName value:newFont range:range];
+      }];
 
     bodyLabel.attributedText = attributedString;
 }
@@ -111,61 +111,67 @@ documentAttributes:nil
 
     // scrollView
     scrollView.translatesAutoresizingMaskIntoConstraints = FALSE;
-    [scrollView.leadingAnchor constraintEqualToAnchor:self.leadingAnchor].active = TRUE;
-    [scrollView.trailingAnchor constraintEqualToAnchor:self.trailingAnchor].active = TRUE;
-    [scrollView.topAnchor constraintEqualToAnchor:self.topAnchor].active = TRUE;
+
+
+    NSLayoutConstraint *scrollViewBottomAnchor;
     if (accessoryView) {
-        [scrollView.bottomAnchor constraintEqualToAnchor:accessoryView.topAnchor].active = TRUE;
+        scrollViewBottomAnchor = [scrollView.bottomAnchor
+          constraintEqualToAnchor:accessoryView.topAnchor];
     } else {
-        [scrollView.bottomAnchor constraintEqualToAnchor:self.bottomAnchor].active = TRUE;
+        scrollViewBottomAnchor = [scrollView.bottomAnchor
+          constraintEqualToAnchor:self.bottomAnchor];
     }
+
+    [NSLayoutConstraint activateConstraints:@[
+      [scrollView.leadingAnchor constraintEqualToAnchor:self.leadingAnchor],
+      [scrollView.trailingAnchor constraintEqualToAnchor:self.trailingAnchor],
+      [scrollView.topAnchor constraintEqualToAnchor:self.topAnchor],
+      scrollViewBottomAnchor
+    ]];
+
 
     // imageView
     CGFloat invAspectRatio = 0.8f * (imageView.image.size.height / imageView.image.size.width);
     imageView.translatesAutoresizingMaskIntoConstraints = FALSE;
-    [imageView.topAnchor constraintEqualToAnchor:scrollView.topAnchor constant:25.f].active = TRUE;
-    [imageView.centerXAnchor constraintEqualToAnchor:scrollView.centerXAnchor].active = TRUE;
-    [imageView.leadingAnchor constraintEqualToAnchor:scrollView.leadingAnchor].active = TRUE;
-    [imageView.trailingAnchor constraintEqualToAnchor:scrollView.trailingAnchor].active = TRUE;
-    [imageView.heightAnchor constraintEqualToAnchor:imageView.widthAnchor
-                                         multiplier:invAspectRatio].active = TRUE;
+
+    [NSLayoutConstraint activateConstraints:@[
+      [imageView.topAnchor constraintEqualToAnchor:scrollView.topAnchor constant:25.f],
+      [imageView.centerXAnchor constraintEqualToAnchor:scrollView.centerXAnchor],
+      [imageView.leadingAnchor constraintEqualToAnchor:scrollView.leadingAnchor],
+      [imageView.trailingAnchor constraintEqualToAnchor:scrollView.trailingAnchor],
+      [imageView.heightAnchor constraintEqualToAnchor:imageView.widthAnchor
+                                           multiplier:invAspectRatio]
+    ]];
 
     // titleLabel
     titleLabel.translatesAutoresizingMaskIntoConstraints = FALSE;
-    [titleLabel.topAnchor constraintEqualToAnchor:imageView.bottomAnchor constant:10.f]
-      .active = TRUE;
-    [titleLabel.centerXAnchor constraintEqualToAnchor:scrollView.centerXAnchor].active = TRUE;
+    [NSLayoutConstraint activateConstraints:@[
+      [titleLabel.topAnchor constraintEqualToAnchor:imageView.bottomAnchor constant:10.f],
+      [titleLabel.centerXAnchor constraintEqualToAnchor:scrollView.centerXAnchor]
+    ]];
 
     // bodyLabel
     bodyLabel.translatesAutoresizingMaskIntoConstraints = FALSE;
-    [bodyLabel.topAnchor constraintEqualToAnchor:titleLabel.bottomAnchor
-                                        constant:15.f].active = TRUE;
-
-    [bodyLabel.bottomAnchor constraintEqualToAnchor:scrollView.bottomAnchor
-                                           constant:15.f].active = TRUE;
-
-    [bodyLabel.centerXAnchor constraintEqualToAnchor:scrollView.centerXAnchor].active = TRUE;
-
-    [bodyLabel.leadingAnchor
-      constraintGreaterThanOrEqualToAnchor:scrollView.leadingAnchor].active = TRUE;
-
-    [bodyLabel.trailingAnchor
-      constraintLessThanOrEqualToAnchor:scrollView.trailingAnchor].active = TRUE;
+    [NSLayoutConstraint activateConstraints:@[
+      [bodyLabel.topAnchor constraintEqualToAnchor:titleLabel.bottomAnchor constant:15.f],
+      [bodyLabel.bottomAnchor constraintEqualToAnchor:scrollView.bottomAnchor constant:15.f],
+      [bodyLabel.centerXAnchor constraintEqualToAnchor:scrollView.centerXAnchor],
+      [bodyLabel.leadingAnchor constraintGreaterThanOrEqualToAnchor:scrollView.leadingAnchor
+                                                           constant:20.f],
+      [bodyLabel.trailingAnchor constraintLessThanOrEqualToAnchor:scrollView.trailingAnchor
+                                                         constant:-20.f]
+    ]];
 
     // accessoryView
     if (accessoryView) {
         accessoryView.translatesAutoresizingMaskIntoConstraints = FALSE;
 
-        [accessoryView.centerXAnchor
-          constraintEqualToAnchor:self.centerXAnchor].active = TRUE;
-
-        [accessoryView.leadingAnchor
-          constraintEqualToAnchor:self.leadingAnchor].active = TRUE;
-
-        [accessoryView.trailingAnchor
-          constraintEqualToAnchor:self.trailingAnchor].active = TRUE;
-
-        [accessoryView.bottomAnchor constraintEqualToAnchor:self.bottomAnchor].active = TRUE;
+        [NSLayoutConstraint activateConstraints:@[
+          [accessoryView.centerXAnchor constraintEqualToAnchor:self.centerXAnchor],
+          [accessoryView.bottomAnchor constraintEqualToAnchor:self.bottomAnchor],
+          [accessoryView.leadingAnchor constraintEqualToAnchor:self.leadingAnchor constant:20.f],
+          [accessoryView.trailingAnchor constraintEqualToAnchor:self.trailingAnchor constant:-20.f]
+        ]];
     }
 }
 

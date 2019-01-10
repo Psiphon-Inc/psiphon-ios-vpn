@@ -20,6 +20,7 @@
 #import "OnboardingView.h"
 #import "UIColor+Additions.h"
 #import "UIFont+Additions.h"
+#import "Logging.h"
 
 @implementation OnboardingView {
     // Set in init.
@@ -62,9 +63,8 @@
     if (self.anchorAccessoryViewToBottom) {
         [accessoryView.bottomAnchor constraintEqualToAnchor:self.bottomAnchor].active = TRUE;
     } else {
-        [accessoryView.topAnchor
-          constraintEqualToAnchor:bodyLabel.bottomAnchor
-                         constant:20.f].active = TRUE;
+        [accessoryView.topAnchor constraintEqualToAnchor:bodyLabel.bottomAnchor
+                                                constant:20.f].active = TRUE;
     }
 }
 
@@ -103,53 +103,46 @@
 }
 
 - (void)setupSubviewsLayoutConstraints {
-    {
-        CGFloat invAspectRatio = 0.8f * (imageView.image.size.height / imageView.image.size.width);
-        imageView.translatesAutoresizingMaskIntoConstraints = FALSE;
-        [imageView.topAnchor constraintEqualToAnchor:self.topAnchor constant:25.f].active = TRUE;
-        [imageView.centerXAnchor constraintEqualToAnchor:self.centerXAnchor].active = TRUE;
-        [imageView.leadingAnchor constraintEqualToAnchor:self.leadingAnchor].active = TRUE;
-        [imageView.trailingAnchor constraintEqualToAnchor:self.trailingAnchor].active = TRUE;
-        [imageView.heightAnchor constraintEqualToAnchor:imageView.widthAnchor
-                                             multiplier:invAspectRatio].active = TRUE;
-    }
 
-    {
-        [titleLabel setContentHuggingPriority:1000
-                                      forAxis:UILayoutConstraintAxisVertical];
+    CGFloat invAspectRatio = 0.8f * (imageView.image.size.height / imageView.image.size.width);
+    imageView.translatesAutoresizingMaskIntoConstraints = FALSE;
+    [NSLayoutConstraint activateConstraints:@[
+      [imageView.topAnchor constraintEqualToAnchor:self.topAnchor],
+      [imageView.centerXAnchor constraintEqualToAnchor:self.centerXAnchor],
+      [imageView.leadingAnchor constraintEqualToAnchor:self.leadingAnchor],
+      [imageView.trailingAnchor constraintEqualToAnchor:self.trailingAnchor],
+      [imageView.heightAnchor constraintEqualToAnchor:imageView.widthAnchor
+                                           multiplier:invAspectRatio]
+    ]];
 
-        titleLabel.translatesAutoresizingMaskIntoConstraints = FALSE;
-        [titleLabel.topAnchor constraintEqualToAnchor:imageView.bottomAnchor constant:10.f]
-          .active = TRUE;
-        [titleLabel.centerXAnchor constraintEqualToAnchor:self.centerXAnchor].active = TRUE;
-    }
+    titleLabel.translatesAutoresizingMaskIntoConstraints = FALSE;
+    [titleLabel setContentHuggingPriority:1000
+                                  forAxis:UILayoutConstraintAxisVertical];
+    [NSLayoutConstraint activateConstraints:@[
+      [titleLabel.topAnchor constraintEqualToAnchor:imageView.bottomAnchor constant:10.f],
+      [titleLabel.centerXAnchor constraintEqualToAnchor:self.centerXAnchor]
+    ]];
 
-    {
-        bodyLabel.translatesAutoresizingMaskIntoConstraints = FALSE;
+    bodyLabel.translatesAutoresizingMaskIntoConstraints = FALSE;
+    [NSLayoutConstraint activateConstraints:@[
+      [bodyLabel.topAnchor constraintEqualToAnchor:titleLabel.bottomAnchor constant:15.f],
+      [bodyLabel.centerXAnchor constraintEqualToAnchor:self.centerXAnchor],
 
-        [bodyLabel.topAnchor constraintEqualToAnchor:titleLabel.bottomAnchor
-                                            constant:15.f].active = TRUE;
+      [bodyLabel.leadingAnchor constraintGreaterThanOrEqualToAnchor:self.leadingAnchor
+                                                           constant:20.f],
 
-        [bodyLabel.centerXAnchor constraintEqualToAnchor:self.centerXAnchor].active = TRUE;
-
-        [bodyLabel.leadingAnchor
-          constraintGreaterThanOrEqualToAnchor:self.leadingAnchor].active = TRUE;
-
-        [bodyLabel.trailingAnchor
-          constraintLessThanOrEqualToAnchor:self.trailingAnchor].active = TRUE;
-    }
+      [bodyLabel.trailingAnchor constraintLessThanOrEqualToAnchor:self.trailingAnchor
+                                                         constant:-20.f]
+    ]];
 
     if (accessoryView) {
         accessoryView.translatesAutoresizingMaskIntoConstraints = FALSE;
 
-        [accessoryView.centerXAnchor
-          constraintEqualToAnchor:self.centerXAnchor].active = TRUE;
-
-        [accessoryView.leadingAnchor
-          constraintEqualToAnchor:self.leadingAnchor].active = TRUE;
-
-        [accessoryView.trailingAnchor
-          constraintEqualToAnchor:self.trailingAnchor].active = TRUE;
+        [NSLayoutConstraint activateConstraints:@[
+          [accessoryView.centerXAnchor constraintEqualToAnchor:self.centerXAnchor],
+          [accessoryView.leadingAnchor constraintEqualToAnchor:self.leadingAnchor constant:20.f],
+          [accessoryView.trailingAnchor constraintEqualToAnchor:self.trailingAnchor constant:-20.f],
+        ]];
     }
 }
 
