@@ -58,6 +58,7 @@
 #import "PickerViewController.h"
 #import "Strings.h"
 #import "SkyRegionSelectionViewController.h"
+#import "UIView+Additions.h"
 
 
 PsiFeedbackLogType const RewardedVideoLogType = @"RewardedVideo";
@@ -868,7 +869,7 @@ NSString * const CommandStopVPN = @"StopVPN";
     [idealBottomSpacing setPriority:999];
     idealBottomSpacing.active = YES;
     [regionSelectionButton.centerXAnchor constraintEqualToAnchor:self.view.centerXAnchor].active = YES;
-    [regionSelectionButton.widthAnchor constraintEqualToAnchor:bottomBar.widthAnchor multiplier:.856].active = YES;
+    [regionSelectionButton.widthAnchor constraintEqualToAnchor:bottomBar.widthAnchor multiplier:0.9f].active = YES;
 }
 
 - (void)setupVersionLabel {
@@ -904,15 +905,10 @@ NSString * const CommandStopVPN = @"StopVPN";
     // Setup autolayout
     subscriptionsBar.translatesAutoresizingMaskIntoConstraints = NO;
 
-    [subscriptionsBar.heightAnchor constraintEqualToConstant:79].active = YES;
     [subscriptionsBar.centerXAnchor constraintEqualToAnchor:self.view.centerXAnchor].active = YES;
-    [subscriptionsBar.centerYAnchor constraintEqualToAnchor:bottomBar.centerYAnchor constant:0].active = YES;
-    if (@available(iOS 11.0, *)) {
-        [subscriptionsBar.bottomAnchor constraintEqualToAnchor:self.view.layoutMarginsGuide.bottomAnchor constant:-7].active = TRUE;
-    } else {
-        [subscriptionsBar.bottomAnchor constraintEqualToAnchor:bottomBar.bottomAnchor constant:-7].active = YES;
-    }
-    [subscriptionsBar.widthAnchor constraintEqualToAnchor:self.view.widthAnchor multiplier:1.f constant:0].active = YES;
+    [subscriptionsBar.centerYAnchor constraintEqualToAnchor:bottomBar.centerYAnchor].active = YES;
+    [subscriptionsBar.bottomAnchor constraintEqualToAnchor:self.view.safeBottomAnchor constant:-7.f].active = TRUE;
+    [subscriptionsBar.widthAnchor constraintEqualToAnchor:self.view.widthAnchor].active = YES;
 
     [subscriptionsBar addTarget:self
                          action:@selector(onSubscriptionTap)
@@ -1086,8 +1082,8 @@ NSString * const CommandStopVPN = @"StopVPN";
     [psiCashView.centerXAnchor constraintEqualToAnchor:self.view.centerXAnchor].active = YES;
     [psiCashView.topAnchor constraintEqualToAnchor:self.topLayoutGuide.bottomAnchor constant:26].active = YES;
 
-    CGFloat psiCashViewMaxWidth = 400;
-    CGFloat psiCashViewToParentViewWidthRatio = 0.909;
+    CGFloat psiCashViewMaxWidth = 600;
+    CGFloat psiCashViewToParentViewWidthRatio = 0.95;
     if (self.view.frame.size.width * psiCashViewToParentViewWidthRatio > psiCashViewMaxWidth) {
         [psiCashView.widthAnchor constraintEqualToConstant:psiCashViewMaxWidth].active = YES;
     } else {

@@ -104,8 +104,8 @@ const int NumPages = 4;
         nextPageButton.contentEdgeInsets = UIEdgeInsetsMake(p, 2.f * p, p, p);
 
         [nextPageButton setTitle:[Strings nextPageButtonTitle] forState:UIControlStateNormal];
-        [nextPageButton setTitleColor:UIColor.paleGreyThreeColor forState:UIControlStateNormal];
-        nextPageButton.titleLabel.font = [UIFont avenirNextDemiBold:14.f];
+        [nextPageButton setTitleColor:UIColor.lightRoyalBlue forState:UIControlStateNormal];
+        nextPageButton.titleLabel.font = [UIFont avenirNextDemiBold:16.f];
         [nextPageButton addTarget:self
                  action:@selector(gotoNextPage)
        forControlEvents:UIControlEventTouchUpInside];
@@ -113,8 +113,7 @@ const int NumPages = 4;
 
         nextPageButton.translatesAutoresizingMaskIntoConstraints = FALSE;
         [NSLayoutConstraint activateConstraints:@[
-          [nextPageButton.bottomAnchor constraintEqualToAnchor:progressView.topAnchor
-                                                      constant:-20.f],
+          [nextPageButton.bottomAnchor constraintEqualToAnchor:progressView.topAnchor],
           [nextPageButton.trailingAnchor constraintEqualToAnchor:self.view.safeTrailingAnchor
                                                         constant:-20.f],
         ]];
@@ -360,12 +359,10 @@ const int NumPages = 4;
 
     [NSLayoutConstraint activateConstraints:@[
       bottomConstraint,
-      [view.topAnchor constraintEqualToAnchor:self.view.safeTopAnchor],
+      [view.topAnchor constraintEqualToAnchor:self.view.safeTopAnchor constant:15.f],
       [view.centerXAnchor constraintEqualToAnchor:self.view.centerXAnchor],
-      [view.leadingAnchor constraintGreaterThanOrEqualToAnchor:self.view.safeLeadingAnchor
-                                                      constant:20.f],
-      [view.trailingAnchor constraintLessThanOrEqualToAnchor:self.view.safeTrailingAnchor
-                                                    constant:-20.f],
+      [view.leadingAnchor constraintGreaterThanOrEqualToAnchor:self.view.safeLeadingAnchor],
+      [view.trailingAnchor constraintLessThanOrEqualToAnchor:self.view.safeTrailingAnchor],
       [view.widthAnchor constraintLessThanOrEqualToConstant:500.f]  // Max width for large screens.
     ]];
 }
