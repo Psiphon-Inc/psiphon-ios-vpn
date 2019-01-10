@@ -103,7 +103,7 @@ NSString * const SettingsResetAdConsentCellSpecifierKey = @"settingsResetAdConse
          [hiddenKeys addObject:SettingsSubscriptionCellSpecifierKey];
      }
 
-    if (TRUE /* TODO: ui-3 onboarding */ || self.hasActiveSubscription) {
+    if (self.hasActiveSubscription) {
         [hiddenKeys addObject:SettingsPsiCashCellSpecifierKey];
     }
 

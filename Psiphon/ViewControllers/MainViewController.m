@@ -127,7 +127,6 @@ NSString * const CommandStopVPN = @"StopVPN";
     PsiCashPurchaseAlertView *alertView;
     PsiCashClientModel *model;
     PsiCashView *psiCashView;
-    RACDisposable *psiCashViewUpdates;
 
     // Clouds
     UIImageView *cloudMiddleLeft;
@@ -214,15 +213,19 @@ NSString * const CommandStopVPN = @"StopVPN";
     // Observe VPN status for updating UI state
     RACDisposable *tunnelStatusDisposable = [[self.vpnManager.lastTunnelStatus distinctUntilChanged]
       subscribeNext:^(NSNumber *statusObject) {
-          VPNStatus s = (VPNStatus) [statusObject integerValue];
+          MainViewController __strong *strongSelf = weakSelf;
+          if (strongSelf != nil) {
 
-          [weakSelf updateUIConnectionState:s];
+              VPNStatus s = (VPNStatus) [statusObject integerValue];
 
-          // Notify SettingsViewController that the state has changed.
-          // Note that this constant is used PsiphonClientCommonLibrary, and cannot simply be replaced by a RACSignal.
-          // TODO: replace this notification with the appropriate signal.
-          [[NSNotificationCenter defaultCenter] postNotificationName:kPsiphonConnectionStateNotification object:nil];
 
+              [weakSelf updateUIConnectionState:s];
+
+              // Notify SettingsViewController that the state has changed.
+              // Note that this constant is used PsiphonClientCommonLibrary, and cannot simply be replaced by a RACSignal.
+              // TODO: replace this notification with the appropriate signal.
+              [[NSNotificationCenter defaultCenter] postNotificationName:kPsiphonConnectionStateNotification object:nil];
+          }
       }];
     
     [self.compoundDisposable addDisposable:tunnelStatusDisposable];
@@ -230,27 +233,31 @@ NSString * const CommandStopVPN = @"StopVPN";
     RACDisposable *vpnStartStatusDisposable = [[self.vpnManager.vpnStartStatus
       deliverOnMainThread]
       subscribeNext:^(NSNumber *statusObject) {
-          VPNStartStatus startStatus = (VPNStartStatus) [statusObject integerValue];
+          MainViewController __strong *strongSelf = weakSelf;
+          if (strongSelf != nil) {
 
-          if (startStatus == VPNStartStatusStart) {
-              [startAndStopButton setHighlighted:TRUE];
-          } else {
-              [startAndStopButton setHighlighted:FALSE];
-          }
+              VPNStartStatus startStatus = (VPNStartStatus) [statusObject integerValue];
 
-          if (startStatus == VPNStartStatusFailedUserPermissionDenied) {
+              if (startStatus == VPNStartStatusStart) {
+                  [strongSelf->startAndStopButton setHighlighted:TRUE];
+              } else {
+                  [strongSelf->startAndStopButton setHighlighted:FALSE];
+              }
 
-              // Present the VPN permission denied alert.
-              UIAlertController *alert = [AlertDialogs vpnPermissionDeniedAlert];
-              [alert presentFromTopController];
+              if (startStatus == VPNStartStatusFailedUserPermissionDenied) {
 
-          } else if (startStatus == VPNStartStatusFailedOther) {
+                  // Present the VPN permission denied alert.
+                  UIAlertController *alert = [AlertDialogs vpnPermissionDeniedAlert];
+                  [alert presentFromTopController];
 
-              // Alert the user that the VPN failed to start, and that they should try again.
-              [UIAlertController presentSimpleAlertWithTitle:NSLocalizedStringWithDefaultValue(@"VPN_START_FAIL_TITLE", nil, [NSBundle mainBundle], @"Unable to start", @"Alert dialog title indicating to the user that Psiphon was unable to start (MainViewController)")
-                                                     message:NSLocalizedStringWithDefaultValue(@"VPN_START_FAIL_MESSAGE", nil, [NSBundle mainBundle], @"An error occurred while starting Psiphon. Please try again. If this problem persists, try reinstalling the Psiphon app.", @"Alert dialog message informing the user that an error occurred while starting Psiphon (Do not translate 'Psiphon'). The user should try again, and if the problem persists, they should try reinstalling the app.")
-                                              preferredStyle:UIAlertControllerStyleAlert
-                                                   okHandler:nil];
+              } else if (startStatus == VPNStartStatusFailedOther) {
+
+                  // Alert the user that the VPN failed to start, and that they should try again.
+                  [UIAlertController presentSimpleAlertWithTitle:NSLocalizedStringWithDefaultValue(@"VPN_START_FAIL_TITLE", nil, [NSBundle mainBundle], @"Unable to start", @"Alert dialog title indicating to the user that Psiphon was unable to start (MainViewController)")
+                                                         message:NSLocalizedStringWithDefaultValue(@"VPN_START_FAIL_MESSAGE", nil, [NSBundle mainBundle], @"An error occurred while starting Psiphon. Please try again. If this problem persists, try reinstalling the Psiphon app.", @"Alert dialog message informing the user that an error occurred while starting Psiphon (Do not translate 'Psiphon'). The user should try again, and if the problem persists, they should try reinstalling the app.")
+                                                  preferredStyle:UIAlertControllerStyleAlert
+                                                       okHandler:nil];
+              }
           }
       }];
     
@@ -260,21 +267,23 @@ NSString * const CommandStopVPN = @"StopVPN";
     // Subscribes to AppDelegate subscription signal.
     __block RACDisposable *disposable = [[AppDelegate sharedAppDelegate].subscriptionStatus
       subscribeNext:^(NSNumber *value) {
-          UserSubscriptionStatus s = (UserSubscriptionStatus) [value integerValue];
+          MainViewController __strong *strongSelf = weakSelf;
+          if (strongSelf != nil) {
+              UserSubscriptionStatus s = (UserSubscriptionStatus) [value integerValue];
 
-          if (s == UserSubscriptionUnknown) {
-              return;
+              if (s == UserSubscriptionUnknown) {
+                  return;
+              }
+
+              [strongSelf->subscriptionsBar subscriptionActive:(s == UserSubscriptionActive)];
+
+              BOOL showPsiCashUI = (s == UserSubscriptionInactive);
+              [strongSelf setPsiCashContentHidden:!showPsiCashUI];
           }
-
-          [subscriptionsBar subscriptionActive:(s == UserSubscriptionActive)];
-
-          BOOL showPsiCashUI = (s == UserSubscriptionInactive);
-          [self setPsiCashContentHidden:!showPsiCashUI];
-
       } error:^(NSError *error) {
-          [self.compoundDisposable removeDisposable:disposable];
+          [weakSelf.compoundDisposable removeDisposable:disposable];
       } completed:^{
-          [self.compoundDisposable removeDisposable:disposable];
+          [weakSelf.compoundDisposable removeDisposable:disposable];
       }];
 
     [self.compoundDisposable addDisposable:disposable];
@@ -506,19 +515,25 @@ NSString * const CommandStopVPN = @"StopVPN";
       [[SkyRegionSelectionViewController alloc]
         initWithCurrentlySelectedRegionCode:selectedRegionCodeSnapshot];
 
+    MainViewController *__weak weakSelf = self;
+
     regionViewController.selectionHandler =
       ^(NSUInteger selectedIndex, id selectedItem, PickerViewController *viewController) {
-          Region *selectedRegion = (Region *)selectedItem;
+          MainViewController __strong *strongSelf = weakSelf;
+          if (strongSelf != nil) {
 
-          [[RegionAdapter sharedInstance] setSelectedRegion:selectedRegion.code];
+              Region *selectedRegion = (Region *)selectedItem;
 
-          if (![NSString stringsBothEqualOrNil:selectedRegion.code b:selectedRegionCodeSnapshot]) {
-              [self persistSelectedRegion];
-              [regionSelectionButton update];
-              [self.vpnManager restartVPNIfActive];
+              [[RegionAdapter sharedInstance] setSelectedRegion:selectedRegion.code];
+
+              if (![NSString stringsBothEqualOrNil:selectedRegion.code b:selectedRegionCodeSnapshot]) {
+                  [strongSelf persistSelectedRegion];
+                  [strongSelf->regionSelectionButton update];
+                  [weakSelf.vpnManager restartVPNIfActive];
+              }
+
+              [viewController dismissViewControllerAnimated:TRUE completion:nil];
           }
-
-          [viewController dismissViewControllerAnimated:TRUE completion:nil];
       };
 
     UINavigationController *navController = [[UINavigationController alloc]
@@ -1000,7 +1015,7 @@ NSString * const CommandStopVPN = @"StopVPN";
     appSettingsViewController.neverShowPrivacySettings = YES;
     appSettingsViewController.settingsDelegate = self;
     appSettingsViewController.preferencesSnapshot = [[[NSUserDefaults standardUserDefaults] dictionaryRepresentation] copy];
-    
+
     UINavigationController *navController = [[UINavigationController alloc]
       initWithRootViewController:appSettingsViewController];
     [self presentViewController:navController animated:YES completion:nil];
@@ -1027,8 +1042,13 @@ NSString * const CommandStopVPN = @"StopVPN";
     NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
 
     if (![userDefaults boolForKey:PsiCashHasBeenOnboardedBoolKey]) {
-        // TODO: onboarding fitting ui-3
+        PsiCashOnboardingViewController *onboarding = [[PsiCashOnboardingViewController alloc] init];
+        onboarding.delegate = self;
+        [self presentViewController:onboarding animated:NO completion:nil];
+        return;
     }
+
+    __weak MainViewController *weakSelf = self;
 
     // Checks the latest tunnel status before going ahead with the purchase request.
      __block RACDisposable *disposable = [[[VPNManager sharedInstance].lastTunnelStatus
@@ -1042,7 +1062,7 @@ NSString * const CommandStopVPN = @"StopVPN";
                if (![model hasPendingPurchase] && ![model hasActiveSpeedBoostPurchase] && purchase != nil) {
                    [PsiCashClient.sharedInstance purchaseSpeedBoostProduct:purchase];
                } else {
-                   [self showPsiCashAlertView];
+                   [weakSelf showPsiCashAlertView];
                }
            } else {
                // Device is in a connecting or disconnecting state, we shouldn't do any purchase requests.
@@ -1061,7 +1081,7 @@ NSString * const CommandStopVPN = @"StopVPN";
            }
        }
        completed:^{
-           [self.compoundDisposable removeDisposable:disposable];
+           [weakSelf.compoundDisposable removeDisposable:disposable];
        }];
 
     [self.compoundDisposable addDisposable:disposable];
@@ -1093,51 +1113,55 @@ NSString * const CommandStopVPN = @"StopVPN";
 
     __weak MainViewController *weakSelf = self;
 
-    [psiCashViewUpdates dispose];
-
-    psiCashViewUpdates = [[PsiCashClient.sharedInstance.clientModelSignal deliverOnMainThread]
+    RACDisposable *psiCashViewUpdates = [[PsiCashClient.sharedInstance.clientModelSignal deliverOnMainThread]
       subscribeNext:^(PsiCashClientModel *newClientModel) {
         __strong MainViewController *strongSelf = weakSelf;
         if (strongSelf != nil) {
 
-            BOOL stateChanged = [model hasActiveSpeedBoostPurchase] ^ [newClientModel hasActiveSpeedBoostPurchase]
-              || [model hasPendingPurchase] ^ [newClientModel hasPendingPurchase];
+            BOOL stateChanged = [strongSelf->model hasActiveSpeedBoostPurchase] ^ [newClientModel hasActiveSpeedBoostPurchase]
+              || [strongSelf->model hasPendingPurchase] ^ [newClientModel hasPendingPurchase];
 
-            NSComparisonResult balanceChange = [model.balance compare:newClientModel.balance];
+            NSComparisonResult balanceChange = [strongSelf->model.balance compare:newClientModel.balance];
             if (balanceChange != NSOrderedSame) {
                 NSNumber *balanceChange =
-                  [NSNumber numberWithDouble:newClientModel.balance.doubleValue - model.balance.doubleValue];
+                  [NSNumber numberWithDouble:newClientModel.balance.doubleValue - strongSelf->model.balance.doubleValue];
                 [PsiCashView animateBalanceChangeOf:balanceChange
-                                                          withPsiCashView:psiCashView
-                                                             inParentView:self.view];
+                                                          withPsiCashView:strongSelf->psiCashView
+                                                             inParentView:strongSelf.view];
             }
 
-            model = newClientModel;
+            strongSelf->model = newClientModel;
 
-            if (stateChanged && alertView != nil) {
-                [self showPsiCashAlertView];
+            if (stateChanged && strongSelf->alertView != nil) {
+                [strongSelf showPsiCashAlertView];
             }
 
-            [psiCashView bindWithModel:model];
+            [strongSelf->psiCashView bindWithModel:strongSelf->model];
         }
     }];
+
+    [self.compoundDisposable addDisposable:psiCashViewUpdates];
 
     [self.compoundDisposable addDisposable:[[[AdManager sharedInstance].rewardedVideoCanPresent
       combineLatestWith:PsiCashClient.sharedInstance.clientModelSignal]
       subscribeNext:^(RACTwoTuple<NSNumber *, PsiCashClientModel *> *tuple) {
-          BOOL ready = [tuple.first boolValue];
-          PsiCashClientModel *model = tuple.second;
+          MainViewController __strong *strongSelf = weakSelf;
+          if (strongSelf != nil) {
 
-          BOOL shouldEnable = ready && [model.authPackage hasEarnerToken];
-          psiCashView.rewardedVideoButton.userInteractionEnabled = shouldEnable;
-          psiCashView.rewardedVideoButton.enabled = shouldEnable;
+              BOOL ready = [tuple.first boolValue];
+              PsiCashClientModel *model = tuple.second;
+
+              BOOL shouldEnable = ready && [model.authPackage hasEarnerToken];
+              strongSelf->psiCashView.rewardedVideoButton.userInteractionEnabled = shouldEnable;
+              strongSelf->psiCashView.rewardedVideoButton.enabled = shouldEnable;
 
 #if DEBUG
-          if ([AppInfo runningUITest]) {
-              // Fake the rewarded video bar enabled status for automated screenshots.
-              psiCashView.rewardedVideoButton.enabled = TRUE;
-          }
+              if ([AppInfo runningUITest]) {
+                  // Fake the rewarded video bar enabled status for automated screenshots.
+                  strongSelf->psiCashView.rewardedVideoButton.enabled = TRUE;
+              }
 #endif
+          }
     }]];
 
     [psiCashView.rewardedVideoButton addTarget:self
