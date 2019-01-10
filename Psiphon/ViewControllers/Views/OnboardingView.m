@@ -33,6 +33,9 @@
     UIImageView *imageView;
     UILabel *titleLabel;
     UILabel *bodyLabel;
+
+    NSLayoutConstraint *accessoryViewBottomConstraint;
+    NSLayoutConstraint *accessoryViewTopConstraint;
 }
 
 - (instancetype)initWithImage:(UIImage *)image
@@ -54,18 +57,8 @@
 
 - (void)setAnchorAccessoryViewToBottom:(BOOL)anchorAccessoryViewToBottom {
     _anchorAccessoryViewToBottom = anchorAccessoryViewToBottom;
-    [self setNeedsUpdateConstraints];
-}
-
-- (void)layoutSubviews {
-    [super layoutSubviews];
-
-    if (self.anchorAccessoryViewToBottom) {
-        [accessoryView.bottomAnchor constraintEqualToAnchor:self.bottomAnchor].active = TRUE;
-    } else {
-        [accessoryView.topAnchor constraintEqualToAnchor:bodyLabel.bottomAnchor
-                                                constant:20.f].active = TRUE;
-    }
+    accessoryViewBottomConstraint.active = _anchorAccessoryViewToBottom;
+    accessoryViewTopConstraint.active = !_anchorAccessoryViewToBottom;
 }
 
 - (void)setupViews {
@@ -143,6 +136,16 @@
           [accessoryView.leadingAnchor constraintEqualToAnchor:self.leadingAnchor constant:20.f],
           [accessoryView.trailingAnchor constraintEqualToAnchor:self.trailingAnchor constant:-20.f],
         ]];
+
+        accessoryViewBottomConstraint = [accessoryView.bottomAnchor
+          constraintEqualToAnchor:self.bottomAnchor];
+
+        accessoryViewTopConstraint = [accessoryView.topAnchor
+          constraintEqualToAnchor:bodyLabel.bottomAnchor
+                         constant:20.f];
+
+        accessoryViewBottomConstraint.active = _anchorAccessoryViewToBottom;
+        accessoryViewTopConstraint.active = !_anchorAccessoryViewToBottom;
     }
 }
 
