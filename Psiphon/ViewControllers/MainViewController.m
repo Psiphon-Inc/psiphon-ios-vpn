@@ -27,29 +27,20 @@
 #import "AvailableServerRegions.h"
 #import "DispatchUtils.h"
 #import "FeedbackManager.h"
-#import "IAPStoreHelper.h"
 #import "IAPViewController.h"
-#import "LaunchScreenViewController.h"
 #import "Logging.h"
 #import "DebugViewController.h"
-#import "PsiFeedbackLogger.h"
-#import "PsiphonClientCommonLibraryHelpers.h"
 #import "PsiphonConfigUserDefaults.h"
 #import "SharedConstants.h"
-#import "NEBridge.h"
 #import "NSString+Additions.h"
-#import "Notifier.h"
 #import "UIAlertController+Additions.h"
 #import "UpstreamProxySettings.h"
 #import "RACCompoundDisposable.h"
 #import "RACTuple.h"
 #import "RACReplaySubject.h"
 #import "RACSignal+Operations.h"
-#import "RACSignal+Operations.h"
-#import "RACSignal.h"
 #import "RACUnit.h"
 #import "RegionSelectionButton.h"
-#import "NSNotificationCenter+RACSupport.h"
 #import "PsiCashBalanceView.h"
 #import "PsiCashClient.h"
 #import "PsiCashSpeedBoostMeterView.h"
@@ -60,8 +51,6 @@
 #import "UILabel+GetLabelHeight.h"
 #import "VPNManager.h"
 #import "VPNStartAndStopButton.h"
-#import "UIView+AutoLayoutViewGroup.h"
-#import "OnboardingViewController.h"
 #import "AlertDialogs.h"
 #import "RACSignal+Operations2.h"
 #import "ContainerDB.h"
@@ -567,10 +556,6 @@ NSString * const CommandStopVPN = @"StopVPN";
     }
     [PsiFeedbackLogger error:@"MainViewController unhandled VPNStatus (%ld)", status];
     return nil;
-}
-
-- (BOOL)isRightToLeft {
-    return ([UIApplication sharedApplication].userInterfaceLayoutDirection == UIUserInterfaceLayoutDirectionRightToLeft);
 }
 
 - (void)setupSettingsButton {
