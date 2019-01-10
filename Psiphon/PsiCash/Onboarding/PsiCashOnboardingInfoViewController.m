@@ -19,7 +19,6 @@
 
 #import "PsiCashOnboardingInfoViewController.h"
 #import "PsiCashView.h"
-#import "StarView.h"
 #import "UIView+AutoLayoutViewGroup.h"
 
 #define k5sScreenWidth 320.f
@@ -87,12 +86,6 @@
     }
 }
 
-- (void)startAnimations {
-    if (animations != nil) {
-        animations();
-    }
-}
-
 - (void)setGraphicAsCoin {
     /* setup graphic view */
     UIImageView *imageView = [[UIImageView alloc] init];
@@ -107,52 +100,17 @@
     [self.view addSubview:graphic];
 
     // Setup layout constraints
-    CGFloat coinSize = 120.f;
+    CGFloat coinSize = MIN(120, 1.5 * graphicImage.size.width);
     [graphic.bottomAnchor constraintEqualToAnchor:self.view.centerYAnchor constant:coinSize/4].active = YES;
     [graphic.widthAnchor constraintEqualToConstant:coinSize].active = YES;
     [graphic.heightAnchor constraintEqualToConstant:coinSize].active = YES;
     [graphic.centerXAnchor constraintEqualToAnchor:self.view.centerXAnchor].active = YES;
-
-    // Add blinking stars
-
-    StarView *star1 = [[StarView alloc] init];
-    [self.view addSubview:star1];
-
-    star1.translatesAutoresizingMaskIntoConstraints = NO;
-    [star1.centerXAnchor constraintEqualToAnchor:graphic.trailingAnchor constant:0].active = YES;
-    [star1.topAnchor constraintEqualToAnchor:graphic.topAnchor constant:0].active = YES;
-    [star1.widthAnchor constraintEqualToConstant:20].active = YES;
-    [star1.heightAnchor constraintEqualToAnchor:star1.widthAnchor].active = YES;
-
-    StarView *star2 = [[StarView alloc] init];
-    [self.view addSubview:star2];
-
-    star2.translatesAutoresizingMaskIntoConstraints = NO;
-    [star2.centerXAnchor constraintEqualToAnchor:graphic.leadingAnchor constant:10].active = YES;
-    [star2.topAnchor constraintEqualToAnchor:graphic.topAnchor constant:0].active = YES;
-    [star2.widthAnchor constraintEqualToConstant:10].active = YES;
-    [star2.heightAnchor constraintEqualToAnchor:star2.widthAnchor].active = YES;
-
-    StarView *star3 = [[StarView alloc] init];
-    [self.view addSubview:star3];
-
-    star3.translatesAutoresizingMaskIntoConstraints = NO;
-    [star3.centerXAnchor constraintEqualToAnchor:graphic.leadingAnchor constant:0].active = YES;
-    [star3.topAnchor constraintEqualToAnchor:graphic.bottomAnchor constant:-10].active = YES;
-    [star3.widthAnchor constraintEqualToConstant:15].active = YES;
-    [star3.heightAnchor constraintEqualToAnchor:star3.widthAnchor].active = YES;
-
-    animations = ^(void) {
-        CGFloat minAlpha = 0.2;
-        [star1 blinkWithPeriod:2 andDelay:0 andMinAlpha:minAlpha];
-        [star2 blinkWithPeriod:3 andDelay:.25 andMinAlpha:minAlpha];
-        [star3 blinkWithPeriod:4 andDelay:.75 andMinAlpha:minAlpha];
-    };
 }
 
 - (void)setGraphicAsSpeedBoostMeter {
     PsiCashSpeedBoostProductSKU *sku = [PsiCashSpeedBoostProductSKU skuWitDistinguisher:@"1h" withHours:[NSNumber numberWithInteger:1] andPrice:[NSNumber numberWithDouble:100e9]];
     PsiCashView *meter = [[PsiCashView alloc] initWithAutoLayout];
+    meter.hideRewardedVideoButton = YES;
 
     PsiCashClientModel *m = [PsiCashClientModel clientModelWithAuthPackage:[[PsiCashAuthPackage alloc] initWithValidTokens:@[@"indicator", @"earner", @"spender"]]
                                                                 andBalance:[NSNumber numberWithInteger:0]
@@ -190,14 +148,14 @@
     [graphic.bottomAnchor constraintEqualToAnchor:self.view.centerYAnchor constant:0].active = YES;
 
     CGFloat psiCashViewMaxWidth = 400;
-    CGFloat psiCashViewToParentViewWidthRatio = 0.95;
+    CGFloat psiCashViewToParentViewWidthRatio = 0.909;
     if (self.view.frame.size.width * psiCashViewToParentViewWidthRatio > psiCashViewMaxWidth) {
         [graphic.widthAnchor constraintEqualToConstant:psiCashViewMaxWidth].active = YES;
     } else {
-        [graphic.widthAnchor constraintEqualToAnchor:self.view.widthAnchor multiplier:0.95].active = YES;
+        [graphic.widthAnchor constraintEqualToAnchor:self.view.widthAnchor multiplier:psiCashViewToParentViewWidthRatio].active = YES;
     }
 
-    [graphic.heightAnchor constraintEqualToConstant:100].active = YES;
+    [graphic.heightAnchor constraintEqualToConstant:146.9].active = YES;
 }
 
 - (void)addTitleView {
