@@ -1,17 +1,29 @@
-//
-//  SubscriptionsBar.m
-//  Psiphon
-//
-//  Created by Miro Kuratczyk on 2018-09-19.
-//  Copyright © 2018 Psiphon Inc. All rights reserved.
-//
+/*
+ * Copyright (c) 2018, Psiphon Inc.
+ * All rights reserved.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
 
 #import "SubscriptionsBar.h"
-#import "ManageSubscriptionsButton.h"
+#import "WhiteSkyButton.h"
 #import "SubscriptionStatusView.h"
+#import "Strings.h"
 
 @implementation SubscriptionsBar {
-    ManageSubscriptionsButton *manageSubscriptionsButton;
+    WhiteSkyButton *manageSubscriptionsButton;
     SubscriptionStatusView *subscriptionStatusView;
     UIStackView *stackView;
     UIView *subscriptionStatusViewContainer;
@@ -25,7 +37,7 @@
         stackView = [[UIStackView alloc] init];
         stackView.axis = UILayoutConstraintAxisHorizontal;
         stackView.distribution = UIStackViewDistributionFillEqually;
-        stackView.userInteractionEnabled = NO;
+        stackView.userInteractionEnabled = FALSE;
 
         subscriptionStatusViewContainer = [[UIView alloc] init];
 
@@ -33,12 +45,8 @@
 
         manageSubscriptionButtonContainer = [[UIView alloc] init];
 
-        manageSubscriptionsButton = [[ManageSubscriptionsButton alloc] init];
-
-        manageSubscriptionsButton.layer.masksToBounds = NO;
-        manageSubscriptionsButton.layer.shadowOffset = CGSizeMake(0, 2);
-        manageSubscriptionsButton.layer.shadowOpacity = 0.2;
-        manageSubscriptionsButton.layer.shadowRadius = 8;
+        manageSubscriptionsButton = [[WhiteSkyButton alloc] initForAutoLayout];
+        manageSubscriptionsButton.shadow = TRUE;
 
         [self addViews];
         [self setupAutoLayoutConstraints];
@@ -78,8 +86,28 @@
 }
 
 - (void)subscriptionActive:(BOOL)subscriptionActive {
-    [manageSubscriptionsButton subscriptionActive:subscriptionActive];
+    if (subscriptionActive) {
+        [manageSubscriptionsButton setTitle:[Strings manageSubscriptionButtonTitle]];
+    } else {
+        [manageSubscriptionsButton setTitle:[Strings subscribeButtonTitle]];
+    }
+
     [subscriptionStatusView subscriptionActive:subscriptionActive];
+}
+
+- (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(nullable UIEvent *)event {
+    [super touchesBegan:touches withEvent:event];
+    [manageSubscriptionsButton touchesBegan:touches withEvent:event];
+}
+
+- (void)touchesEnded:(NSSet<UITouch *> *)touches withEvent:(nullable UIEvent *)event {
+    [super touchesEnded:touches withEvent:event];
+    [manageSubscriptionsButton touchesEnded:touches withEvent:event];
+}
+
+- (void)touchesCancelled:(NSSet<UITouch *> *)touches withEvent:(nullable UIEvent *)event {
+    [super touchesCancelled:touches withEvent:event];
+    [manageSubscriptionsButton touchesCancelled:touches withEvent:event];
 }
 
 @end
