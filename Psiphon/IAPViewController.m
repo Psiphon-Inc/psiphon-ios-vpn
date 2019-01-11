@@ -695,11 +695,4 @@ static NSString *iapCellID = @"IAPTableCellID";
     return self;
 }
 
-- (void)layoutSubviews {
-    [super layoutSubviews];
-    [self.contentView setNeedsLayout];
-    [self.contentView layoutIfNeeded];
-    self.textLabel.preferredMaxLayoutWidth = CGRectGetWidth(self.textLabel.frame);
-}
-
 @end
