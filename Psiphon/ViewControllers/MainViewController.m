@@ -198,12 +198,12 @@ NSString * const CommandStopVPN = @"StopVPN";
     [self setupBottomBar];
     [self setupAddSubscriptionsBar];
 
-    __weak MainViewController *weakSelf = self;
+    MainViewController *__weak weakSelf = self;
     
     // Observe VPN status for updating UI state
     RACDisposable *tunnelStatusDisposable = [[self.vpnManager.lastTunnelStatus distinctUntilChanged]
       subscribeNext:^(NSNumber *statusObject) {
-          MainViewController __strong *strongSelf = weakSelf;
+          MainViewController *__strong strongSelf = weakSelf;
           if (strongSelf != nil) {
 
               VPNStatus s = (VPNStatus) [statusObject integerValue];
@@ -223,7 +223,7 @@ NSString * const CommandStopVPN = @"StopVPN";
     RACDisposable *vpnStartStatusDisposable = [[self.vpnManager.vpnStartStatus
       deliverOnMainThread]
       subscribeNext:^(NSNumber *statusObject) {
-          MainViewController __strong *strongSelf = weakSelf;
+          MainViewController *__strong strongSelf = weakSelf;
           if (strongSelf != nil) {
 
               VPNStartStatus startStatus = (VPNStartStatus) [statusObject integerValue];
@@ -257,7 +257,7 @@ NSString * const CommandStopVPN = @"StopVPN";
     // Subscribes to AppDelegate subscription signal.
     __block RACDisposable *disposable = [[AppDelegate sharedAppDelegate].subscriptionStatus
       subscribeNext:^(NSNumber *value) {
-          MainViewController __strong *strongSelf = weakSelf;
+          MainViewController *__strong strongSelf = weakSelf;
           if (strongSelf != nil) {
               UserSubscriptionStatus s = (UserSubscriptionStatus) [value integerValue];
 
@@ -417,7 +417,7 @@ NSString * const CommandStopVPN = @"StopVPN";
 
 // Emits one of the `Command_` strings.
 - (RACSignal<NSString *> *)startOrStopVPNSignalWithAd:(BOOL)showAd {
-    __weak MainViewController *weakSelf = self;
+    MainViewController *__weak weakSelf = self;
 
     return [[[[self.vpnManager isVPNActive]
       flattenMap:^RACSignal<NSString *> *(RACTwoTuple<NSNumber *, NSNumber *> *value) {
@@ -509,7 +509,7 @@ NSString * const CommandStopVPN = @"StopVPN";
 
     regionViewController.selectionHandler =
       ^(NSUInteger selectedIndex, id selectedItem, PickerViewController *viewController) {
-          MainViewController __strong *strongSelf = weakSelf;
+          MainViewController *__strong strongSelf = weakSelf;
           if (strongSelf != nil) {
 
               Region *selectedRegion = (Region *)selectedItem;
@@ -1029,7 +1029,7 @@ NSString * const CommandStopVPN = @"StopVPN";
         return;
     }
 
-    __weak MainViewController *weakSelf = self;
+    MainViewController *__weak weakSelf = self;
 
     // Checks the latest tunnel status before going ahead with the purchase request.
      __block RACDisposable *disposable = [[[VPNManager sharedInstance].lastTunnelStatus
@@ -1092,11 +1092,11 @@ NSString * const CommandStopVPN = @"StopVPN";
     psiCashViewHeight = [psiCashView.heightAnchor constraintEqualToConstant:146.9];
     psiCashViewHeight.active = YES;
 
-    __weak MainViewController *weakSelf = self;
+    MainViewController *__weak weakSelf = self;
 
     RACDisposable *psiCashViewUpdates = [[PsiCashClient.sharedInstance.clientModelSignal deliverOnMainThread]
       subscribeNext:^(PsiCashClientModel *newClientModel) {
-        __strong MainViewController *strongSelf = weakSelf;
+        MainViewController *__strong strongSelf = weakSelf;
         if (strongSelf != nil) {
 
             BOOL stateChanged = [strongSelf->model hasActiveSpeedBoostPurchase] ^ [newClientModel hasActiveSpeedBoostPurchase]
@@ -1126,7 +1126,7 @@ NSString * const CommandStopVPN = @"StopVPN";
     [self.compoundDisposable addDisposable:[[[AdManager sharedInstance].rewardedVideoCanPresent
       combineLatestWith:PsiCashClient.sharedInstance.clientModelSignal]
       subscribeNext:^(RACTwoTuple<NSNumber *, PsiCashClientModel *> *tuple) {
-          MainViewController __strong *strongSelf = weakSelf;
+          MainViewController *__strong strongSelf = weakSelf;
           if (strongSelf != nil) {
 
               BOOL ready = [tuple.first boolValue];
@@ -1308,9 +1308,9 @@ NSString * const CommandStopVPN = @"StopVPN";
 #pragma mark - RegionAdapterDelegate protocol implementation
 
 - (void)selectedRegionDisappearedThenSwitchedToBestPerformance {
-    MainViewController __weak *weakSelf = self;
+    MainViewController *__weak weakSelf = self;
     dispatch_async_main(^{
-        MainViewController __strong *strongSelf = weakSelf;
+        MainViewController *__strong strongSelf = weakSelf;
         [strongSelf->regionSelectionButton update];
     });
     [self persistSelectedRegion];
