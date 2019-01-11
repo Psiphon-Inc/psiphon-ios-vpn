@@ -24,36 +24,18 @@
 @implementation PsiphonProgressView {
     UIImage *logo;
     UIImageView *logoView;
-    NSLayoutConstraint *logoViewWidth;
-    NSLayoutConstraint *logoViewHeight;
-
     LoadingCircleLayer *loadingCircle;
-
 }
 
 - (void)layoutSubviews {
     [super layoutSubviews];
-
     [loadingCircle setFrame:self.bounds];
-
-    // Only trigger constraint updates if bounds have changed
-    CGSize size = [self size];
-    if (logoViewWidth.constant != size.width || logoViewHeight.constant != size.height) {
-        [self setNeedsUpdateConstraints];
-    }
 }
 
 - (void)setProgress:(CGFloat)progress {
     if (loadingCircle) {
         loadingCircle.progress = progress;
     }
-}
-
-- (void)updateConstraints {
-    CGSize size = [self size];
-    logoViewWidth.constant = size.width;
-    logoViewHeight.constant = size.height;
-    [super updateConstraints];
 }
 
 #pragma mark - helpers
@@ -78,19 +60,8 @@
 
 - (void)setupSubviewsLayoutConstraints {
     logoView.translatesAutoresizingMaskIntoConstraints = NO;
-
-    CGSize size = CGSizeMake(logoView.image.size.width, logoView.image.size.height);
-    logoViewWidth = [logoView.widthAnchor constraintEqualToConstant:size.width];
-    logoViewHeight = [logoView.heightAnchor constraintEqualToConstant:size.height];
-    logoViewWidth.active = YES;
-    logoViewHeight.active = YES;
-
     [logoView.centerXAnchor constraintEqualToAnchor:self.centerXAnchor].active = YES;
     [logoView.centerYAnchor constraintEqualToAnchor:self.centerYAnchor].active = YES;
-}
-
-- (CGSize)size {
-    return CGSizeMake(logoView.image.size.width, logoView.image.size.height);
 }
 
 @end
