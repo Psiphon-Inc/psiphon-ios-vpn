@@ -31,17 +31,17 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)customSetup;
 
 /**
- * Use direct access for subclass properties, since this UIView is partially constructred.
+ * Use direct access for subclass properties, since this UIView is partially constructed.
  */
 - (void)setupViews;
 
 /**
- * Use direct access for subclass properties, since this UIView is partially constructred.
+ * Use direct access for subclass properties, since this UIView is partially constructed.
  */
 - (void)addSubviews;
 
 /**
- * Use direct access for subclass properties, since this UIView is partially constructred.
+ * Use direct access for subclass properties, since this UIView is partially constructed.
  */
 - (void)setupSubviewsLayoutConstraints;
 

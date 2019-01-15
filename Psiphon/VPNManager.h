@@ -175,7 +175,7 @@ typedef NS_ENUM(NSInteger, VPNStartStatus) {
  * will have code `NEVPNErrorConfigurationReadWriteFailed` with domain `NEVPNErrorDomain`,
  * and description set to "permission denied".
  *
- * @scheduler delivers its even on the main thread.
+ * @scheduler delivers its events on the main thread.
  */
 - (RACSignal<RACUnit *> *)reinstallVPNConfiguration WARN_UNUSED_RESULT;
 
