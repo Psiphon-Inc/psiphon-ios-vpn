@@ -841,12 +841,14 @@ NSString * const CommandStopVPN = @"StopVPN";
     [bottomBar addGestureRecognizer:tapRecognizer];
     
     // Setup autolayout
-    [bottomBar.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor].active = YES;
-    [bottomBar.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor].active = YES;
-    [bottomBar.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor].active = YES;
+    [NSLayoutConstraint activateConstraints:@[
+      [bottomBar.topAnchor constraintEqualToAnchor:subscriptionsBar.topAnchor],
+      [bottomBar.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor],
+      [bottomBar.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor],
+      [bottomBar.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor]
+    ]];
 
     bottomBarGradient = [CAGradientLayer layer];
-
     bottomBarGradient.frame = bottomBar.bounds; // frame reset in viewDidLayoutSubviews
     bottomBarGradient.colors = @[(id)UIColor.lightRoyalBlueTwo.CGColor, (id)UIColor.lightishBlue.CGColor];
 
@@ -902,17 +904,21 @@ NSString * const CommandStopVPN = @"StopVPN";
 }
 
 - (void)setupAddSubscriptionsBar {
-    // Setup autolayout
-    subscriptionsBar.translatesAutoresizingMaskIntoConstraints = NO;
-
-    [subscriptionsBar.centerXAnchor constraintEqualToAnchor:self.view.centerXAnchor].active = YES;
-    [subscriptionsBar.centerYAnchor constraintEqualToAnchor:bottomBar.centerYAnchor].active = YES;
-    [subscriptionsBar.bottomAnchor constraintEqualToAnchor:self.view.safeBottomAnchor constant:-7.f].active = TRUE;
-    [subscriptionsBar.widthAnchor constraintEqualToAnchor:self.view.widthAnchor].active = YES;
-
     [subscriptionsBar addTarget:self
                          action:@selector(onSubscriptionTap)
                forControlEvents:UIControlEventTouchUpInside];
+
+    // Setup autolayout
+    subscriptionsBar.translatesAutoresizingMaskIntoConstraints = FALSE;
+
+    [NSLayoutConstraint activateConstraints:@[
+      [subscriptionsBar.centerXAnchor constraintEqualToAnchor:bottomBar.centerXAnchor],
+      [subscriptionsBar.centerYAnchor constraintEqualToAnchor:bottomBar.safeCenterYAnchor],
+      [subscriptionsBar.widthAnchor constraintEqualToAnchor:self.view.widthAnchor],
+      [subscriptionsBar.heightAnchor constraintEqualToAnchor:self.view.safeHeightAnchor
+                                                  multiplier:0.11]
+    ]];
+
 }
 
 #pragma mark - FeedbackViewControllerDelegate methods and helpers

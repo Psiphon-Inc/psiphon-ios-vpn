@@ -67,22 +67,36 @@
 
 - (void)setupAutoLayoutConstraints {
     stackView.translatesAutoresizingMaskIntoConstraints = NO;
-    [stackView.widthAnchor constraintEqualToAnchor:self.widthAnchor multiplier:0.9].active = YES;
-    [stackView.heightAnchor constraintEqualToAnchor:self.heightAnchor].active = YES;
-    [stackView.centerXAnchor constraintEqualToAnchor:self.centerXAnchor].active = YES;
-    [stackView.centerYAnchor constraintEqualToAnchor:self.centerYAnchor].active = YES;
+    [NSLayoutConstraint activateConstraints:@[
+      [stackView.widthAnchor constraintEqualToAnchor:self.widthAnchor multiplier:0.9],
+      [stackView.heightAnchor constraintEqualToAnchor:self.heightAnchor],
+      [stackView.centerXAnchor constraintEqualToAnchor:self.centerXAnchor],
+      [stackView.centerYAnchor constraintEqualToAnchor:self.centerYAnchor]
+    ]];
 
     subscriptionStatusView.translatesAutoresizingMaskIntoConstraints = NO;
-    [subscriptionStatusView.centerXAnchor constraintEqualToAnchor:subscriptionStatusViewContainer.centerXAnchor].active = YES;
-    [subscriptionStatusView.centerYAnchor constraintEqualToAnchor:subscriptionStatusViewContainer.centerYAnchor].active = YES;
-    [subscriptionStatusView.widthAnchor constraintEqualToAnchor:subscriptionStatusViewContainer.widthAnchor multiplier:0.712].active = YES;
-    [subscriptionStatusView.heightAnchor constraintEqualToAnchor:subscriptionStatusViewContainer.heightAnchor multiplier:0.456].active = YES;
+    [NSLayoutConstraint activateConstraints:@[
+      [subscriptionStatusView.centerXAnchor
+        constraintEqualToAnchor:subscriptionStatusViewContainer.centerXAnchor],
+      [subscriptionStatusView.centerYAnchor
+        constraintEqualToAnchor:subscriptionStatusViewContainer.centerYAnchor],
+      [subscriptionStatusView.widthAnchor
+        constraintEqualToAnchor:subscriptionStatusViewContainer.widthAnchor multiplier:0.712],
+      [subscriptionStatusView.heightAnchor
+        constraintEqualToAnchor:subscriptionStatusViewContainer.heightAnchor multiplier:0.456]
+    ]];
 
     manageSubscriptionsButton.translatesAutoresizingMaskIntoConstraints = NO;
-    [manageSubscriptionsButton.centerXAnchor constraintEqualToAnchor:manageSubscriptionButtonContainer.centerXAnchor].active = YES;
-    [manageSubscriptionsButton.centerYAnchor constraintEqualToAnchor:manageSubscriptionButtonContainer.centerYAnchor].active = YES;
-    [manageSubscriptionsButton.widthAnchor constraintEqualToAnchor:manageSubscriptionButtonContainer.widthAnchor multiplier:0.732].active = YES;
-    [manageSubscriptionsButton.heightAnchor constraintEqualToAnchor:manageSubscriptionButtonContainer.heightAnchor multiplier:0.481].active = YES;
+    [NSLayoutConstraint activateConstraints:@[
+      [manageSubscriptionsButton.centerXAnchor
+        constraintEqualToAnchor:manageSubscriptionButtonContainer.centerXAnchor],
+      [manageSubscriptionsButton.centerYAnchor
+        constraintEqualToAnchor:manageSubscriptionButtonContainer.centerYAnchor],
+      [manageSubscriptionsButton.widthAnchor
+        constraintEqualToAnchor:manageSubscriptionButtonContainer.widthAnchor multiplier:0.732],
+      [manageSubscriptionsButton.heightAnchor
+        constraintEqualToAnchor:manageSubscriptionButtonContainer.heightAnchor multiplier:0.5]
+    ]];
 }
 
 - (void)subscriptionActive:(BOOL)subscriptionActive {
