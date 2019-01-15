@@ -62,6 +62,11 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (void)onSelectedRow:(NSUInteger)rowIndex;
 
+/**
+ * Table construction methods are called again to construct the table.
+ */
+- (void)reloadData;
+
 @end
 
 NS_ASSUME_NONNULL_END
