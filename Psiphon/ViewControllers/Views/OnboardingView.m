@@ -21,6 +21,7 @@
 #import "UIColor+Additions.h"
 #import "UIFont+Additions.h"
 #import "Logging.h"
+#import "UIView+Additions.h"
 
 @implementation OnboardingView {
     // Set in init.
@@ -97,10 +98,30 @@
 
 - (void)setupSubviewsLayoutConstraints {
 
+    // Top spacer layout guide.
+    UILayoutGuide *topSpaceGuide = [[UILayoutGuide alloc] init];
+    [self addLayoutGuide:topSpaceGuide];
+
+    // The less-than-or-equal constraint on height is required, whereas the max height should
+    // be optional (hence given lower priority).
+    NSLayoutConstraint *heightAnchor = [topSpaceGuide.heightAnchor
+      constraintEqualToAnchor:self.safeHeightAnchor
+                   multiplier:0.05];
+    heightAnchor.priority = UILayoutPriorityDefaultLow;
+
+    [NSLayoutConstraint activateConstraints:@[
+      [topSpaceGuide.widthAnchor constraintEqualToAnchor:self.widthAnchor],
+      [topSpaceGuide.leadingAnchor constraintEqualToAnchor:self.leadingAnchor],
+      [topSpaceGuide.trailingAnchor constraintEqualToAnchor:self.trailingAnchor],
+      [topSpaceGuide.topAnchor constraintEqualToAnchor:self.topAnchor],
+      [topSpaceGuide.heightAnchor constraintLessThanOrEqualToConstant:100.f],
+      heightAnchor
+    ]];
+
     CGFloat invAspectRatio = 0.8f * (imageView.image.size.height / imageView.image.size.width);
     imageView.translatesAutoresizingMaskIntoConstraints = FALSE;
     [NSLayoutConstraint activateConstraints:@[
-      [imageView.topAnchor constraintEqualToAnchor:self.topAnchor],
+      [imageView.topAnchor constraintEqualToAnchor:topSpaceGuide.bottomAnchor],
       [imageView.centerXAnchor constraintEqualToAnchor:self.centerXAnchor],
       [imageView.leadingAnchor constraintEqualToAnchor:self.leadingAnchor],
       [imageView.trailingAnchor constraintEqualToAnchor:self.trailingAnchor],
@@ -109,23 +130,27 @@
     ]];
 
     titleLabel.translatesAutoresizingMaskIntoConstraints = FALSE;
-    [titleLabel setContentHuggingPriority:1000
-                                  forAxis:UILayoutConstraintAxisVertical];
     [NSLayoutConstraint activateConstraints:@[
       [titleLabel.topAnchor constraintEqualToAnchor:imageView.bottomAnchor constant:10.f],
       [titleLabel.centerXAnchor constraintEqualToAnchor:self.centerXAnchor]
     ]];
 
     bodyLabel.translatesAutoresizingMaskIntoConstraints = FALSE;
+
+    // We don't want body label to stretch beyond its intrinsic height, so we set it's hugging
+    // priority to be higher than the other views here.
+    [bodyLabel setContentHuggingPriority:UILayoutPriorityDefaultLow + 1
+                                 forAxis:UILayoutConstraintAxisVertical];
+
     [NSLayoutConstraint activateConstraints:@[
       [bodyLabel.topAnchor constraintEqualToAnchor:titleLabel.bottomAnchor constant:15.f],
       [bodyLabel.centerXAnchor constraintEqualToAnchor:self.centerXAnchor],
+      [bodyLabel.leadingAnchor constraintEqualToAnchor:self.leadingAnchor constant:20.f],
+      [bodyLabel.trailingAnchor constraintEqualToAnchor:self.trailingAnchor constant:-20.f],
 
-      [bodyLabel.leadingAnchor constraintGreaterThanOrEqualToAnchor:self.leadingAnchor
-                                                           constant:20.f],
-
-      [bodyLabel.trailingAnchor constraintLessThanOrEqualToAnchor:self.trailingAnchor
-                                                         constant:-20.f]
+      // If there is no accessory view, this constraint is required to keep bodyLabel within
+      // the bounds of its parent.
+      [bodyLabel.bottomAnchor constraintLessThanOrEqualToAnchor:self.bottomAnchor]
     ]];
 
     if (accessoryView) {
@@ -135,6 +160,7 @@
           [accessoryView.centerXAnchor constraintEqualToAnchor:self.centerXAnchor],
           [accessoryView.leadingAnchor constraintEqualToAnchor:self.leadingAnchor constant:20.f],
           [accessoryView.trailingAnchor constraintEqualToAnchor:self.trailingAnchor constant:-20.f],
+          [accessoryView.bottomAnchor constraintLessThanOrEqualToAnchor:self.bottomAnchor]
         ]];
 
         accessoryViewBottomConstraint = [accessoryView.bottomAnchor
