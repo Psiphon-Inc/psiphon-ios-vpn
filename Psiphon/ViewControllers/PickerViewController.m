@@ -120,6 +120,10 @@ NSString * const CellIdentifier = @"cell";
     }
 }
 
+- (void)reloadData {
+    [pickerTableView reloadData];
+}
+
 #pragma mark - UITableViewDataSource delegate methods
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
