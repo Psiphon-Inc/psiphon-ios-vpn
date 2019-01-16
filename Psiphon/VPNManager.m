@@ -106,7 +106,7 @@ PsiFeedbackLogType const VPNManagerLogType = @"VPNManager";
         _serialQueue = [UnionSerialQueue createWithLabel:@"ca.psiphon.Psiphon.VPNManagerSerialQueue"];
 
         // Public properties.
-        __weak VPNManager *weakSelf = self;
+        VPNManager *__weak weakSelf = self;
 
         _vpnStartStatus = [_internalStartStatus deliverOnMainThread];
 
@@ -146,7 +146,7 @@ PsiFeedbackLogType const VPNManagerLogType = @"VPNManager";
 
 // when subscribed to, emits nullable `tunnelProviderManager`.
 - (RACSignal<NETunnelProviderManager *> *)deferredTunnelProviderManager {
-    __weak VPNManager *weakSelf = self;
+    VPNManager *__weak weakSelf = self;
 
     return [RACSignal defer:^RACSignal * {
         return [RACSignal return:weakSelf.tunnelProviderManager];
@@ -186,7 +186,7 @@ PsiFeedbackLogType const VPNManagerLogType = @"VPNManager";
 
         [self.internalTunnelStatus sendNext:@(_tunnelProviderManager.connection.status)];
 
-        __weak VPNManager *weakSelf = self;
+        VPNManager *__weak weakSelf = self;
 
         // Listening to NEVPNManager status change notifications on the main thread.
         localVPNStatusObserver = [[NSNotificationCenter defaultCenter]
@@ -223,7 +223,7 @@ PsiFeedbackLogType const VPNManagerLogType = @"VPNManager";
     dispatch_once(&once, ^{
         instance = [[VPNManager alloc] init];
 
-        __weak VPNManager *weakInstance = instance;
+        VPNManager *__weak weakInstance = instance;
 
         // Adds loading VPN operation to `serialOperationQueue` before returning shared instance.
         __block RACDisposable *disposable = [[[VPNManager loadTunnelProviderManager]
@@ -285,7 +285,7 @@ PsiFeedbackLogType const VPNManagerLogType = @"VPNManager";
 
 // fix as in fix the zombie state
 - (RACSignal<NSNumber *> *)checkOrFixVPN {
-    __weak VPNManager *weakSelf = self;
+    VPNManager *__weak weakSelf = self;
 
     return [[[[[self unsafeBooleanQueryActiveVPN:EXTENSION_QUERY_IS_PROVIDER_ZOMBIE
                                         throwError:FALSE]
@@ -319,7 +319,7 @@ PsiFeedbackLogType const VPNManagerLogType = @"VPNManager";
     // and would only be updated at some indeterminate time in the future.
     [self.internalStartStatus sendNext:@(VPNStartStatusStart)];
 
-    __weak VPNManager *weakSelf = self;
+    VPNManager *__weak weakSelf = self;
 
     __block RACDisposable *disposable = [[[[[[[[VPNManager loadTunnelProviderManager]
       flattenMap:^RACSignal<NETunnelProviderManager *> *(NETunnelProviderManager *_Nullable pm) {
@@ -380,7 +380,7 @@ PsiFeedbackLogType const VPNManagerLogType = @"VPNManager";
 
 - (void)startVPN {
 
-    __weak VPNManager *weakSelf = self;
+    VPNManager *__weak weakSelf = self;
 
     __block RACDisposable *disposable = [[[self deferredTunnelProviderManager]
       unsafeSubscribeOnSerialQueue:self.serialQueue
@@ -406,7 +406,7 @@ PsiFeedbackLogType const VPNManagerLogType = @"VPNManager";
 
 // Emits type `NETunnelProviderManager *_Nullable`.
 - (RACSignal<NETunnelProviderManager *> *)unsafeStopVPN {
-    __weak VPNManager *weakSelf = self;
+    VPNManager *__weak weakSelf = self;
 
     // Connect On Demand should be disabled first before stopping the VPN.
     return [[[self setConnectOnDemandEnabled:FALSE]
@@ -419,7 +419,7 @@ PsiFeedbackLogType const VPNManagerLogType = @"VPNManager";
 }
 
 - (void)stopVPN {
-    __weak VPNManager *weakSelf = self;
+    VPNManager *__weak weakSelf = self;
 
     // Connect On Demand should be disabled first before stopping the VPN.
     __block RACDisposable *disposable = [[[self unsafeStopVPN]
@@ -436,7 +436,7 @@ PsiFeedbackLogType const VPNManagerLogType = @"VPNManager";
 
 - (void)restartVPNIfActive {
 
-    __weak VPNManager *weakSelf = self;
+    VPNManager *__weak weakSelf = self;
 
     __block RACDisposable *disposable = [[[self deferredTunnelProviderManager]
       unsafeSubscribeOnSerialQueue:self.serialQueue
@@ -465,7 +465,7 @@ PsiFeedbackLogType const VPNManagerLogType = @"VPNManager";
 // Removes and re-installs the VPN configuration.
 - (void)reinstallVPNConfiguration {
 
-    __weak VPNManager *weakSelf = self;
+    VPNManager *__weak weakSelf = self;
 
     __block RACDisposable *disposable = [[[[[VPNManager loadTunnelProviderManager]
       flattenMap:^RACSignal *(NETunnelProviderManager *providerManager) {
@@ -494,7 +494,7 @@ PsiFeedbackLogType const VPNManagerLogType = @"VPNManager";
 // isVPNActive returns a signal that when subscribed to emits tuple (isActive, VPNStatus).
 // If tunnelProviderManager is nil emits (FALSE, VPNStatusInvalid)
 - (RACSignal<RACTwoTuple<NSNumber *, NSNumber *> *> *)isVPNActive {
-    __weak VPNManager *weakSelf = self;
+    VPNManager *__weak weakSelf = self;
 
     return [[self queryIsExtensionZombie]
       flattenMap:^RACSignal *(NSNumber *_Nullable isZombie) {
@@ -526,7 +526,7 @@ PsiFeedbackLogType const VPNManagerLogType = @"VPNManager";
 // If `self.tunnelProviderManager` is nil, returned signal emits @FALSE ane completes.
 // Returned signal never terminates with an error.
 - (RACSignal<NSNumber *> *)setConnectOnDemandEnabled:(BOOL)onDemandEnabled {
-    __weak VPNManager *weakSelf = self;
+    VPNManager *__weak weakSelf = self;
 
     return [[[VPNManager loadTunnelProviderManager]
       flattenMap:^RACSignal<NETunnelProviderManager *> *(NETunnelProviderManager *providerManager) {
@@ -582,7 +582,7 @@ PsiFeedbackLogType const VPNManagerLogType = @"VPNManager";
 
 - (void)onApplicationWillEnterForeground {
 
-    __weak VPNManager *weakSelf = self;
+    VPNManager *__weak weakSelf = self;
 
     __block RACDisposable *disposable = [[self deferredTunnelProviderManager]
       subscribeNext:^(NETunnelProviderManager *_Nullable tunnelProvider) {
@@ -690,7 +690,7 @@ PsiFeedbackLogType const VPNManagerLogType = @"VPNManager";
 - (RACSignal<NETunnelProviderManager *> *)updateOrCreateVPNConfigurationAndSave:
   (NETunnelProviderManager *_Nullable)manager {
 
-    __weak VPNManager *weakSelf = self;
+    VPNManager *__weak weakSelf = self;
 
     // Emits a single item of type UserSubscriptionStatus whenever the subscription status is known.
     RACSignal *knownSubStatus = [[AppDelegate.sharedAppDelegate.subscriptionStatus
