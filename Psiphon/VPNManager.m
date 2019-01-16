@@ -302,9 +302,9 @@ PsiFeedbackLogType const VPNManagerLogType = @"VPNManager";
           if (providerManager) {
               NEVPNStatus st = providerManager.connection.status;
               if (st != NEVPNStatusInvalid &&
-                st != NEVPNStatusDisconnecting &&
-                st != NEVPNStatusDisconnected) {
-                  extensionProcessRunning = TRUE;
+                  st != NEVPNStatusDisconnecting &&
+                  st != NEVPNStatusDisconnected) {
+                      extensionProcessRunning = TRUE;
               }
           }
           return @(extensionProcessRunning);
@@ -321,42 +321,43 @@ PsiFeedbackLogType const VPNManagerLogType = @"VPNManager";
 
     __weak VPNManager *weakSelf = self;
 
-    __block RACDisposable *disposable = [[[[[[[[[VPNManager loadTunnelProviderManager]
-      flattenMap:^RACSignal<NETunnelProviderManager *> *(NETunnelProviderManager *_Nullable providerManager) {
+    __block RACDisposable *disposable = [[[[[[[[VPNManager loadTunnelProviderManager]
+      flattenMap:^RACSignal<NETunnelProviderManager *> *(NETunnelProviderManager *_Nullable pm) {
           // Updates VPN configuration parameters if it already exists,
           // otherwise creates a new VPN configuration.
-          return [weakSelf updateOrCreateVPNConfigurationAndSave:providerManager];
+          return [weakSelf updateOrCreateVPNConfigurationAndSave:pm];
       }]
-      doNext:^(NETunnelProviderManager *_Nonnull providerManager) {
-          // Enable Connect On Demand before starting the tunnel.
-          providerManager.onDemandEnabled = TRUE;
+      flattenMap:^RACSignal<NETunnelProviderManager *> *(NETunnelProviderManager *_Nonnull pm) {
+
+          NSError *error;
+          NSDictionary *options = @{EXTENSION_OPTION_START_FROM_CONTAINER: EXTENSION_OPTION_TRUE};
+          [pm.connection startVPNTunnelWithOptions:options andReturnError:&error];
+
+          // Terminate subscription early if an error occurred.
+          if (error) {
+              return [RACSignal error:error];
+          }
+
+          // Enabling Connect On Demand only after starting the tunnel. Otherwise, a race
+          // condition is created between call to `startVPNTunnelWithOptions` and Connect On Demand.
+          pm.onDemandEnabled = TRUE;
+          return [RACSignal return:pm];
       }]
-      flattenMap:^RACSignal *(NETunnelProviderManager *providerManager) {
-          return [RACSignal defer:providerManager selectorWithErrorCallback:@selector(saveToPreferencesWithCompletionHandler:)];
+      flattenMap:^RACSignal *(NETunnelProviderManager *_Nonnull providerManager) {
+          return [RACSignal defer:providerManager
+                    selectorWithErrorCallback:@selector(saveToPreferencesWithCompletionHandler:)];
       }]
-      flattenMap:^RACSignal *(NETunnelProviderManager *providerManager) {
-          return [RACSignal defer:providerManager selectorWithErrorCallback:@selector(loadFromPreferencesWithCompletionHandler:)];
+      flattenMap:^RACSignal *(NETunnelProviderManager *_Nonnull providerManager) {
+          return [RACSignal defer:providerManager
+                    selectorWithErrorCallback:@selector(loadFromPreferencesWithCompletionHandler:)];
       }]
       doNext:^(NETunnelProviderManager *_Nonnull providerManager) {
           weakSelf.tunnelProviderManager = providerManager;
       }]
-      flattenMap:^RACSignal<NSNumber *> *(NETunnelProviderManager *_Nonnull providerManager) {
-
-          NSError *error;
-          NSDictionary *options = @{EXTENSION_OPTION_START_FROM_CONTAINER: EXTENSION_OPTION_TRUE};
-          [weakSelf.tunnelProviderManager.connection startVPNTunnelWithOptions:options andReturnError:&error];
-
-          if (error) {
-              return [RACSignal error:error];
-          } else {
-              return [RACSignal return:RACUnit.defaultUnit];
-          }
-
-      }]
-      unsafeSubscribeOnSerialQueue:self.serialQueue
-                          withName:@"startTunnelOperation"]
+      unsafeSubscribeOnSerialQueue:self.serialQueue withName:@"startTunnelOperation"]
       subscribeError:^(NSError *error) {
-          [PsiFeedbackLogger errorWithType:VPNManagerLogType message:@"failed to start" object:error];
+          [PsiFeedbackLogger errorWithType:VPNManagerLogType message:@"failed to start"
+                                    object:error];
 
           if ([error.domain isEqualToString:NEVPNErrorDomain] &&
                error.code == NEVPNErrorConfigurationReadWriteFailed &&
