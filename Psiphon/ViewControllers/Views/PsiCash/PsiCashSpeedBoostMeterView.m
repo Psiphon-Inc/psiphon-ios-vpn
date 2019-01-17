@@ -131,8 +131,13 @@
             progressBarWidth = progressBarRadius * 2;
         }
 
+        CGFloat progressBarOffset = isRTL ? self.frame.size.width  - progressBarWidth : 0;
+        if (progress == 0) {
+            progressBarOffset = 0;
+        }
+
         progressBar.path = [UIBezierPath
-                    bezierPathWithRoundedRect:CGRectMake(0,
+                    bezierPathWithRoundedRect:CGRectMake(progressBarOffset,
                                                          0,
                                                          progressBarWidth,
                                                          self.frame.size.height)
@@ -141,7 +146,10 @@
                                                          progressBarRadius)].CGPath;
 
         CGFloat gradientWidth = progress == 0 ? progressBarWidth : self.frame.size.width;
-        CGFloat gradientOffset = isRTL ? self.frame.size.width - progressBarWidth : 0;
+        CGFloat gradientOffset = 0;
+        if (progress == 0) {
+            gradientOffset = isRTL ? self.frame.size.width - progressBarWidth : 0;
+        }
 
         gradient.frame = CGRectMake(gradientOffset, 0, gradientWidth, self.frame.size.height);
     }
