@@ -25,8 +25,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface SkyRegionSelectionViewController : PickerViewController
 
-- (instancetype)initWithCurrentlySelectedRegionCode:(NSString *)currentRegionCode;
-
 @end
 
 NS_ASSUME_NONNULL_END

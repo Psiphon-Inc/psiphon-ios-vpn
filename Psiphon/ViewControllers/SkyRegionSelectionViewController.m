@@ -22,32 +22,41 @@
 #import "ImageUtils.h"
 #import "PsiphonClientCommonLibraryHelpers.h"
 #import "Strings.h"
+#import "DispatchUtils.h"
 
 
 @implementation SkyRegionSelectionViewController {
     NSArray<Region *> *regions;
 }
 
-- (instancetype)initWithCurrentlySelectedRegionCode:(NSString *)currentRegionCode {
-    self = [super init];
-    if (self) {
+- (void)viewDidLoad {
+    [super viewDidLoad];
 
-        self.title = [Strings connectViaTitle];
+    self.title = [Strings connectViaTitle];
+    [self populateRegionsArray];
 
-        regions = [[[RegionAdapter sharedInstance] getRegions]
-      filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(Region *evaluatedObject,
-        NSDictionary<NSString *, id> *bindings) {
+    // Listen to notification from client common library for when regions are updated.
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(onUpdateAvailableRegions)
+                                                 name:kPsiphonAvailableRegionsNotification
+                                               object:nil];
+}
+
+- (void)populateRegionsArray {
+    NSString *currentRegionCode = [[RegionAdapter sharedInstance] getSelectedRegion].code;
+
+    regions = [[[RegionAdapter sharedInstance] getRegions]
+        filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(Region *evaluatedObject,
+          NSDictionary<NSString *, id> *bindings) {
             return evaluatedObject.serverExists;
-      }]];
+        }]];
 
-        [regions enumerateObjectsUsingBlock:^(Region *r, NSUInteger idx, BOOL *stop) {
-            if ([r.code isEqualToString:currentRegionCode]) {
-                self.selectedIndex = idx;
-                *stop = TRUE;
-            }
-        }];
-    }
-    return self;
+    [regions enumerateObjectsUsingBlock:^(Region *r, NSUInteger idx, BOOL *stop) {
+        if ([r.code isEqualToString:currentRegionCode]) {
+            self.selectedIndex = idx;
+            *stop = TRUE;
+        }
+    }];
 }
 
 - (NSUInteger)numberOfRows {
@@ -70,6 +79,15 @@
     if (self.selectionHandler) {
         self.selectionHandler(rowIndex, regions[rowIndex], self);
     }
+}
+
+#pragma mark -
+
+- (void)onUpdateAvailableRegions {
+    dispatch_async_main(^{
+        [self populateRegionsArray];
+        [self reloadData];
+    });
 }
 
 @end

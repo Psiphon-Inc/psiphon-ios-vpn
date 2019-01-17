@@ -502,8 +502,7 @@ NSString * const CommandStopVPN = @"StopVPN";
     NSString *selectedRegionCodeSnapshot = [[RegionAdapter sharedInstance] getSelectedRegion].code;
 
     SkyRegionSelectionViewController *regionViewController =
-      [[SkyRegionSelectionViewController alloc]
-        initWithCurrentlySelectedRegionCode:selectedRegionCodeSnapshot];
+      [[SkyRegionSelectionViewController alloc] init];
 
     MainViewController *__weak weakSelf = self;
 
