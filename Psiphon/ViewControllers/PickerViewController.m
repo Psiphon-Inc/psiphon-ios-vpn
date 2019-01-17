@@ -120,7 +120,7 @@ NSString * const CellIdentifier = @"cell";
     }
 }
 
-- (void)reloadData {
+- (void)reloadTableRows {
     [pickerTableView reloadData];
 }
 

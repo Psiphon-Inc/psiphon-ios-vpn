@@ -86,7 +86,7 @@
 - (void)onUpdateAvailableRegions {
     dispatch_async_main(^{
         [self populateRegionsArray];
-        [self reloadData];
+        [self reloadTableRows];
     });
 }
 
