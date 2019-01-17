@@ -39,19 +39,26 @@
     CAGradientLayer *gradient;
     CAGradientLayer *backgroundGradient;
     PastelView *animatedGradientView;
+    BOOL isRTL;
 }
 
 - (id)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
 
     if (self) {
+        isRTL = [UIApplication sharedApplication]
+                  .userInterfaceLayoutDirection == UIUserInterfaceLayoutDirectionRightToLeft;
+
         self.clipsToBounds = YES;
 
         // Add background gradient
         backgroundGradient = [CAGradientLayer layer];
         backgroundGradient.startPoint = CGPointMake(0, 0.5);
         backgroundGradient.endPoint = CGPointMake(1.0, 0.5);
-        backgroundGradient.colors = @[(id)[UIColor lightBlueGreyTwo].CGColor, (id)[UIColor paleGreyTwo].CGColor];
+        backgroundGradient.colors = isRTL ? @[(id)[UIColor paleGreyTwo].CGColor,
+                                              (id)[UIColor lightBlueGreyTwo].CGColor]
+                                          : @[(id)[UIColor lightBlueGreyTwo].CGColor,
+                                             (id)[UIColor paleGreyTwo].CGColor];
         [self.layer addSublayer:backgroundGradient];
     }
 
@@ -77,38 +84,66 @@
     CGFloat progressBarRadius = self.frame.size.height / 2;
     CGFloat progressBarWidth = self.frame.size.width * progress;
 
-    UIRectCorner corners = kCALayerMinXMinYCorner | kCALayerMinXMaxYCorner;
+    UIRectCorner corners = isRTL ?
+                                   kCALayerMaxXMinYCorner|kCALayerMaxXMaxYCorner
+                                 : kCALayerMinXMinYCorner|kCALayerMinXMaxYCorner;
     if (progress == 0 || progress >= 1) {
-        corners |= kCALayerMaxXMaxYCorner | kCALayerMaxXMinYCorner;
+        corners |= isRTL ?
+                           kCALayerMinXMinYCorner|kCALayerMinXMaxYCorner
+                         : kCALayerMaxXMaxYCorner|kCALayerMaxXMinYCorner;
     }
+
     if (progress >= 1) {
         animatedGradientView = [[PastelView alloc] init];
-        animatedGradientView.colors = @[[UIColor robinEggBlue],
-                                        [UIColor lightSeafoam]];
+        animatedGradientView.colors = isRTL ? @[[UIColor lightSeafoam],
+                                                [UIColor robinEggBlue]]
+                                            : @[[UIColor robinEggBlue],
+                                                [UIColor lightSeafoam]];
         [self addSubview:animatedGradientView];
         animatedGradientView.frame = self.bounds;
 
-        progressBar.path = [UIBezierPath bezierPathWithRoundedRect:CGRectMake(0, 0, progressBarWidth, self.frame.size.height) byRoundingCorners:corners cornerRadii:CGSizeMake(progressBarRadius, progressBarRadius)].CGPath;
+        progressBar.path = [UIBezierPath
+                    bezierPathWithRoundedRect:CGRectMake(0,
+                                                         0,
+                                                         progressBarWidth,
+                                                         self.frame.size.height)
+                           byRoundingCorners:corners
+                                 cornerRadii:CGSizeMake(progressBarRadius,
+                                                        progressBarRadius)].CGPath;
+
         animatedGradientView.frame = CGRectMake(0, 0, self.frame.size.width, self.frame.size.height);
         [animatedGradientView startAnimation];
     } else {
         gradient = [CAGradientLayer layer];
         [self.layer insertSublayer:gradient above:backgroundGradient];
+
         gradient.startPoint = CGPointMake(0, 0.5);
         gradient.endPoint = CGPointMake(1.0, 0.5);
         gradient.mask = progressBar;
 
-        gradient.colors = @[(id)[UIColor darkCream].CGColor,
-                            (id)[UIColor peachyPink].CGColor];
+        gradient.colors = isRTL ? @[(id)[UIColor darkCream].CGColor,
+                                    (id)[UIColor peachyPink].CGColor]
+                                : @[(id)[UIColor peachyPink].CGColor,
+                                    (id)[UIColor darkCream].CGColor];
 
         if (progress == 0) {
             // Make a bubble over the speed boost icon
             progressBarWidth = progressBarRadius * 2;
         }
-        progressBar.path = [UIBezierPath bezierPathWithRoundedRect:CGRectMake(0, 0, progressBarWidth, self.frame.size.height) byRoundingCorners:corners cornerRadii:CGSizeMake(progressBarRadius, progressBarRadius)].CGPath;
+
+        progressBar.path = [UIBezierPath
+                    bezierPathWithRoundedRect:CGRectMake(0,
+                                                         0,
+                                                         progressBarWidth,
+                                                         self.frame.size.height)
+                            byRoundingCorners:corners
+                                  cornerRadii:CGSizeMake(progressBarRadius,
+                                                         progressBarRadius)].CGPath;
 
         CGFloat gradientWidth = progress == 0 ? progressBarWidth : self.frame.size.width;
-        gradient.frame = CGRectMake(0, 0, gradientWidth, self.frame.size.height);
+        CGFloat gradientOffset = isRTL ? self.frame.size.width - progressBarWidth : 0;
+
+        gradient.frame = CGRectMake(gradientOffset, 0, gradientWidth, self.frame.size.height);
     }
 }
 
