@@ -65,7 +65,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Table construction methods are called again to construct the table.
  */
-- (void)reloadData;
+- (void)reloadTableRows;
 
 @end
 
