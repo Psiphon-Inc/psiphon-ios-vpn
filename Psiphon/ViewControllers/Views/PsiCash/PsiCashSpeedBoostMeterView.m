@@ -85,12 +85,10 @@
     CGFloat progressBarWidth = self.frame.size.width * progress;
 
     UIRectCorner corners = isRTL ?
-                                   kCALayerMaxXMinYCorner|kCALayerMaxXMaxYCorner
-                                 : kCALayerMinXMinYCorner|kCALayerMinXMaxYCorner;
+                                   UIRectCornerBottomRight|UIRectCornerTopRight
+                                 : UIRectCornerBottomLeft|UIRectCornerTopLeft;
     if (progress == 0 || progress >= 1) {
-        corners |= isRTL ?
-                           kCALayerMinXMinYCorner|kCALayerMinXMaxYCorner
-                         : kCALayerMaxXMaxYCorner|kCALayerMaxXMinYCorner;
+        corners = UIRectCornerAllCorners;
     }
 
     if (progress >= 1) {
