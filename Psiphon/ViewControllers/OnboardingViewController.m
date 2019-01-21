@@ -26,7 +26,6 @@
 #import "UIFont+Additions.h"
 #import "RoyalSkyButton.h"
 #import "VPNManager.h"
-#import "ArrowView.h"
 #import "RACCompoundDisposable.h"
 #import "AlertDialogs.h"
 #import "UIView+Additions.h"
@@ -309,8 +308,9 @@ const int NumPages = 4;
 - (UIView *)createInstallGuideVPNOnboardingView {
     UIView *view = [[UIView alloc] init];
 
-    ArrowView *arrow = [[ArrowView alloc] initWithFrame:CGRectZero];
-    [view addSubview:arrow];
+    UIImage *arrowImage = [UIImage imageNamed:@"PermissionArrow"];
+    UIImageView *arrowView = [[UIImageView alloc] initWithImage:arrowImage];
+    [view addSubview:arrowView];
 
     UILabel *label = [[UILabel alloc] initWithFrame:CGRectZero];
     label.text = [Strings vpnInstallGuideText];
@@ -324,17 +324,18 @@ const int NumPages = 4;
     label.lineBreakMode = NSLineBreakByWordWrapping;
     label.textAlignment = NSTextAlignmentCenter;
 
-    arrow.translatesAutoresizingMaskIntoConstraints = FALSE;
+    CGFloat aspectRatio = (arrowImage.size.width / arrowImage.size.height);
+    arrowView.translatesAutoresizingMaskIntoConstraints = FALSE;
     [NSLayoutConstraint activateConstraints:@[
-      [arrow.heightAnchor constraintEqualToConstant:54.f],
-      [arrow.widthAnchor constraintEqualToConstant:30.f],
-      [arrow.centerXAnchor constraintEqualToAnchor:view.centerXAnchor constant:-60.f],
-      [arrow.centerYAnchor constraintEqualToAnchor:view.centerYAnchor constant:160.f]
+      [arrowView.heightAnchor constraintEqualToConstant:84.f],
+      [arrowView.widthAnchor constraintEqualToAnchor:arrowView.heightAnchor multiplier:aspectRatio],
+      [arrowView.centerXAnchor constraintEqualToAnchor:view.centerXAnchor constant:-60.f],
+      [arrowView.centerYAnchor constraintEqualToAnchor:view.centerYAnchor constant:160.f]
     ]];
 
     label.translatesAutoresizingMaskIntoConstraints = FALSE;
     [NSLayoutConstraint activateConstraints:@[
-      [label.topAnchor constraintEqualToAnchor:arrow.bottomAnchor constant:10.f],
+      [label.topAnchor constraintEqualToAnchor:arrowView.bottomAnchor constant:10.f],
       [label.centerXAnchor constraintEqualToAnchor:view.centerXAnchor],
       [label.leadingAnchor constraintEqualToAnchor:view.leadingAnchor],
       [label.trailingAnchor constraintEqualToAnchor:view.trailingAnchor]
