@@ -95,9 +95,7 @@
 
 - (void)update {
     Region *selectedRegion = [[RegionAdapter sharedInstance] getSelectedRegion];
-    UIImage *flag = [PsiphonClientCommonLibraryHelpers
-      imageFromCommonLibraryNamed:selectedRegion.flagResourceId];
-    flagImageView.image = [ImageUtils highlightImageWithRoundedCorners:flag];
+    flagImageView.image = [ImageUtils regionFlagForResourceId:selectedRegion.flagResourceId];
 
     NSString *regionText = [[RegionAdapter sharedInstance] getLocalizedRegionTitle:selectedRegion.code];
     regionNameLabel.attributedText = [self styleRegionLabelText:regionText];

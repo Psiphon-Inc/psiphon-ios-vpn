@@ -26,6 +26,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (UIImage *)highlightImageWithRoundedCorners:(UIImage *)image;
 
+/**
+ * Returns the image object that matches the flagResourceId, or nil if no matching image was found.
+ */
++ (UIImage *_Nullable)regionFlagForResourceId:(NSString *)flagResourceId;
+
 @end
 
 NS_ASSUME_NONNULL_END

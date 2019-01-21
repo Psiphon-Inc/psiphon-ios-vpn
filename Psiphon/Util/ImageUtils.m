@@ -19,7 +19,10 @@
 
 #import <UIKit/UIKit.h>
 #import "ImageUtils.h"
+#import "PsiphonClientCommonLibraryHelpers.h"
 
+
+NSString * const FlagBestPerformanceResourceId = @"flag-best-performance";
 
 @implementation ImageUtils
 
@@ -45,6 +48,22 @@
     return [[UIImage alloc] initWithCIImage:ciImage
                                       scale:[UIScreen mainScreen].scale
                                 orientation:UIImageOrientationUp];
+}
+
++ (UIImage *_Nullable)regionFlagForResourceId:(NSString *)flagResourceId {
+
+    if ([FlagBestPerformanceResourceId isEqualToString:flagResourceId]) {
+        return [UIImage imageNamed:@"FastestCountry"];
+
+    }
+
+    UIImage *_Nullable flag = [PsiphonClientCommonLibraryHelpers
+      imageFromCommonLibraryNamed:flagResourceId];
+
+    if (flag) {
+        return [ImageUtils highlightImageWithRoundedCorners:flag];
+    }
+    return nil;
 }
 
 @end
