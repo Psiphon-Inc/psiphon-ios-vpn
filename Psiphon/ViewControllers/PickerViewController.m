@@ -148,7 +148,7 @@ NSString * const CellIdentifier = @"cell";
         cell.layer.borderColor = UIColor.paleGrey.CGColor;
 
         UIImageView *chevronView = [[UIImageView alloc]
-          initWithImage:[UIImage imageNamed:@"chevron"]];
+          initWithImage:[UIImage imageNamed:@"Checkmark"]];
         cell.accessoryView = chevronView;
 
         UIView *backgroundView = [[UIView alloc] initWithFrame:cell.frame];
@@ -170,9 +170,11 @@ NSString * const CellIdentifier = @"cell";
     if (row == self.selectedIndex) {
         cell.selected = TRUE;
         cell.selectedBackgroundView.backgroundColor = UIColor.duckEggBlueTwoColor;
+        cell.accessoryView.hidden = FALSE;
     } else {
         cell.selected = FALSE;
         cell.selectedBackgroundView.backgroundColor = UIColor.whiteColor;
+        cell.accessoryView.hidden = TRUE;
     }
 }
 
