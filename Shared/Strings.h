@@ -89,6 +89,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (NSString *)privacyPolicyDeclinedAlertBody;
 
+#pragma mark - Extension
+
++ (NSString *)selectedRegionUnavailableAlertBody;
+
 #if !(TARGET_IS_EXTENSION)
 + (NSString *)privacyPolicyURLString;
 #endif
