@@ -66,13 +66,8 @@
 - (void)bindDataToCell:(UITableViewCell *)cell atRow:(NSUInteger)rowIndex {
     Region *r = regions[rowIndex];
 
-    cell.textLabel.text = [[RegionAdapter sharedInstance]
-      getLocalizedRegionTitle:r.code];
-
-    UIImage *flag = [PsiphonClientCommonLibraryHelpers
-      imageFromCommonLibraryNamed:r.flagResourceId];
-
-    cell.imageView.image = [ImageUtils highlightImageWithRoundedCorners:flag];
+    cell.textLabel.text = [[RegionAdapter sharedInstance] getLocalizedRegionTitle:r.code];
+    cell.imageView.image = [ImageUtils regionFlagForResourceId:r.flagResourceId];
 }
 
 - (void)onSelectedRow:(NSUInteger)rowIndex {
