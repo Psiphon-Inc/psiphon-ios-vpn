@@ -99,4 +99,3 @@ Psiphon iOS VPN client uses:
  - [futuretap/InAppSettingsKit](https://github.com/futuretap/InAppSettingsKit)
  - [ReactiveCocoa/ReactiveObjC](https://github.com/ReactiveCocoa/ReactiveObjC)
  - [chansen/c-timestamp](https://github.com/chansen/c-timestamp)
- - [PureLayout](https://github.com/PureLayout/PureLayout)

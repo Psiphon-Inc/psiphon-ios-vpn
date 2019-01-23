@@ -50,6 +50,7 @@
 #import "RACUnit.h"
 #import "DebugUtils.h"
 #import "FileUtils.h"
+#import "Strings.h"
 #import <ReactiveObjC/RACSubject.h>
 #import <ReactiveObjC/RACReplaySubject.h>
 
@@ -482,6 +483,20 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
     }
 }
 
+- (NSError *_Nullable)startPsiphonTunnel {
+
+    BOOL success = [self.psiphonTunnel start:FALSE];
+
+    if (!success) {
+        [PsiFeedbackLogger error:@"tunnel start failed"];
+        return [NSError errorWithDomain:PsiphonTunnelErrorDomain
+                                   code:PsiphonTunnelErrorInternalError];
+    }
+
+    self.tunnelProviderState = TunnelProviderStateStarted;
+    return nil;
+}
+
 // VPN should only start if it is started from the container app directly,
 // OR if the user possibly has a valid subscription
 // OR if the extension is started after boot but before being unlocked.
@@ -526,16 +541,10 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
                 return;
             }
 
-            // Starts Psiphon tunnel.
-            BOOL success = [weakSelf.psiphonTunnel start:FALSE];
-
-            if (!success) {
-                [PsiFeedbackLogger error:@"tunnel start failed"];
-                errorHandler([NSError errorWithDomain:PsiphonTunnelErrorDomain code:PsiphonTunnelErrorInternalError]);
-                return;
+            error = [weakSelf startPsiphonTunnel];
+            if (error) {
+                errorHandler(error);
             }
-
-            weakSelf.tunnelProviderState = TunnelProviderStateStarted;
 
         }];
 
@@ -1078,10 +1087,17 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
     PsiphonConfigUserDefaults *userDefaults = [PsiphonConfigUserDefaults sharedInstance];
 
     NSString *selectedRegion = [userDefaults egressRegion];
-    if (selectedRegion && ![selectedRegion isEqualToString:kPsiphonRegionBestPerformance] && ![regions containsObject:selectedRegion]) {
+    if (selectedRegion &&
+        ![selectedRegion isEqualToString:kPsiphonRegionBestPerformance] &&
+        ![regions containsObject:selectedRegion]) {
+
         [[PsiphonConfigUserDefaults sharedInstance] setEgressRegion:kPsiphonRegionBestPerformance];
 
-        [self displayMessageAndExitGracefully:NSLocalizedStringWithDefaultValue(@"VPN_START_FAIL_REGION_INVALID_MESSAGE", nil, [NSBundle mainBundle], @"The region you selected is no longer available. You must choose a new region or change to the default \"Best performance\" choice.", @"Alert dialog message informing the user that an error occurred while starting Psiphon because they selected an egress region that is no longer available (Do not translate 'Psiphon'). The user should select a different region and try again. Note: the backslash before each quotation mark should be left as is for formatting.")];
+        dispatch_async(self->workQueue, ^{
+            [self displayMessage:[Strings selectedRegionUnavailableAlertBody]];
+            // Starting the tunnel with "Best Performance" region.
+            [self startPsiphonTunnel];
+        });
     }
 }
 

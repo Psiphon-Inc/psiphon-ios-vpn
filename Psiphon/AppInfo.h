@@ -23,8 +23,6 @@
 
 + (NSString*_Nullable)appVersion;
 
-+ (BOOL)firstRunOfAppVersion;
-
 #if !(TARGET_IS_EXTENSION)
 + (NSString*_Nullable)clientRegion;
 

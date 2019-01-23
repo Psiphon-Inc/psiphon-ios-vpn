@@ -99,7 +99,12 @@ PsiFeedbackLogType const VPNManagerLogType = @"VPNManager";
         _internalStartStatus = [RACReplaySubject replaySubjectWithCapacity:1];
         _internalTunnelStatus = [RACReplaySubject replaySubjectWithCapacity:1];
 
-        _restartRequired = FALSE;
+
+#if DEBUG && TARGET_IPHONE_SIMULATOR
+        // Since the extension doesn't run in the simulator, we will populate `internalTunnelStatus`
+        // with a fake value.
+        [_internalTunnelStatus sendNext:@(NEVPNStatusDisconnected)];
+#endif
 
         _restartRequired = FALSE;
 
@@ -471,16 +476,15 @@ PsiFeedbackLogType const VPNManagerLogType = @"VPNManager";
 }
 
 // Removes and re-installs the VPN configuration.
-- (void)reinstallVPNConfiguration {
-
+- (RACSignal<RACUnit *> *)reinstallVPNConfiguration {
     VPNManager *__weak weakSelf = self;
 
-    __block RACDisposable *disposable = [[[[[VPNManager loadTunnelProviderManager]
+    return [[[[[[[VPNManager loadTunnelProviderManager]
       flattenMap:^RACSignal *(NETunnelProviderManager *pm) {
           // Removes the VPN configuration (if already installed).
           if (pm) {
               return [RACSignal defer:pm
-                  selectorWithErrorCallback:@selector(removeFromPreferencesWithCompletionHandler:)];
+            selectorWithErrorCallback:@selector(removeFromPreferencesWithCompletionHandler:)];
           }
           return [RACSignal return:nil];
       }]
@@ -488,17 +492,14 @@ PsiFeedbackLogType const VPNManagerLogType = @"VPNManager";
           // Installs the VPN configuration.
           return [weakSelf updateOrCreateVPNConfigurationAndSave:nil];
       }]
-      unsafeSubscribeOnSerialQueue:self.serialQueue
-                          withName:@"reinstallVPNConfigurationOperation"]
-      subscribeError:^(NSError *error) {
+      mapReplace:RACUnit.defaultUnit]
+      doError:^(NSError *error) {
           [PsiFeedbackLogger errorWithType:VPNManagerLogType
                                    message:@"failed to reinstall VPN configuration" object:error];
-          [weakSelf.compoundDisposable removeDisposable:disposable];
-      } completed:^{
-          [weakSelf.compoundDisposable removeDisposable:disposable];
-      }];
-
-    [self.compoundDisposable addDisposable:disposable];
+      }]
+      unsafeSubscribeOnSerialQueue:self.serialQueue
+                          withName:@"reinstallVPNConfigurationOperation"]
+      deliverOnMainThread];
 }
 
 // isVPNActive returns a signal that when subscribed to emits tuple (isActive, VPNStatus).

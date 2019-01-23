@@ -17,7 +17,6 @@
  *
  */
 
-#import <PureLayout/ALView+PureLayout.h>
 #import "IAPViewController.h"
 #import "AppDelegate.h"
 #import "IAPStoreHelper.h"
@@ -26,8 +25,9 @@
 #import "PsiphonClientCommonLibraryHelpers.h"
 #import "PsiphonDataSharedDB.h"
 #import "SharedConstants.h"
-#import "UIColor+Additions.h"
 #import "IAPHelpViewController.h"
+#import "UIColor+Additions.h"
+#import "UIFont+Additions.h"
 
 static NSString *iapCellID = @"IAPTableCellID";
 
@@ -40,8 +40,6 @@ static NSString *iapCellID = @"IAPTableCellID";
 @property (nonatomic) NSNumberFormatter *priceFormatter;
 @property (nonatomic) UIRefreshControl *refreshControl;
 
-@property (nonatomic) UIImage *headerBannerImage;
-
 @property (nonatomic) BOOL hasActiveSubscription;
 @property (nonatomic) SKProduct *latestSubscriptionProduct;
 @property (nonatomic) NSDate *latestSubscriptionExpirationDate;
@@ -51,6 +49,8 @@ static NSString *iapCellID = @"IAPTableCellID";
 @implementation IAPViewController {
     MBProgressHUD *buyProgressAlert;
     NSTimer *buyProgressAlertTimer;
+    CAGradientLayer *bannerGradient;
+    CAGradientLayer *manageSubsButtonGradient;
 }
 
 - (UIStatusBarStyle)preferredStatusBarStyle {
@@ -91,10 +91,9 @@ static NSString *iapCellID = @"IAPTableCellID";
     [super viewDidLoad];
 
     // Sets screen background and navigation bar colours.
-    self.view.backgroundColor = UIColor.charcoalGreyColor;
-    self.navigationController.navigationBar.barTintColor = UIColor.charcoalGreyColor;  // Navigation bar background color
-    self.navigationController.navigationBar.tintColor = UIColor.purpleButtonColor;  // Navigation bar items color
-    self.navigationController.navigationBar.titleTextAttributes = @{NSForegroundColorAttributeName: UIColor.whiteColor};
+    self.view.backgroundColor = UIColor.whiteColor;
+    self.navigationController.navigationBar.tintColor = UIColor.lightishBlueTwo;  // Navigation bar items color
+    self.navigationController.navigationBar.titleTextAttributes = @{NSForegroundColorAttributeName:UIColor.offWhite, NSFontAttributeName:[UIFont avenirNextBold:18.f]};
 
     // Sets navigation bar title.
     self.title = NSLocalizedStringWithDefaultValue(@"SUBSCRIPTIONS", nil, [NSBundle mainBundle], @"Subscriptions", @"Title of the dialog for available in-app paid subscriptions");
@@ -138,13 +137,6 @@ static NSString *iapCellID = @"IAPTableCellID";
                                                object:nil];
 
     [self updateHasActiveSubscription];
-
-    // Initializations based on subscription state.
-    if (self.hasActiveSubscription) {
-        self.headerBannerImage = [UIImage imageNamed:@"SubscribedBanner"];
-    } else {
-        self.headerBannerImage = [UIImage imageNamed:@"SubscriptionBanner"];
-    }
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -175,14 +167,14 @@ static NSString *iapCellID = @"IAPTableCellID";
 
     } else {
         UITextView *noProductsTextView = [[UITextView alloc] initWithFrame:CGRectMake(0, 0, tableView.bounds.size.width, tableView.bounds.size.height)];
-        noProductsTextView.backgroundColor = UIColor.charcoalGreyColor;
+        noProductsTextView.backgroundColor = UIColor.whiteColor;
         noProductsTextView.editable = NO;
         noProductsTextView.font =  [UIFont fontWithName:@"Helvetica" size:15.0f];
         noProductsTextView.textContainerInset = UIEdgeInsetsMake(60, 10, 0, 10);
         noProductsTextView.text = NSLocalizedStringWithDefaultValue(@"NO_PRODUCTS_TEXT", nil, [NSBundle mainBundle],
                                                                     @"Could not retrieve subscriptions from the App Store. Pull to refresh or try again later.",
                                                                     @"Subscriptions view text that is visible when the list of subscriptions is not available");
-        noProductsTextView.textColor = UIColor.whiteColor;
+        noProductsTextView.textColor = [UIColor colorWithRed:0.29 green:0.29 blue:0.29 alpha:1.0];
         noProductsTextView.textAlignment = NSTextAlignmentCenter;
         tableView.tableHeaderView = noProductsTextView;
         tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
@@ -204,18 +196,23 @@ static NSString *iapCellID = @"IAPTableCellID";
 
 #pragma mark - TableView header
 
+- (void)viewDidLayoutSubviews {
+    [super viewDidLayoutSubviews];
+    bannerGradient.frame = bannerGradient.superlayer.bounds;
+    manageSubsButtonGradient.frame = manageSubsButtonGradient.superlayer.bounds;
+}
+
 - (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section {
-    return self.headerBannerImage.size.height;
+    return 103;
 }
 
 - (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section {
     UIView *cellView = [[UIView alloc] initWithFrame:CGRectZero];
 
     // Banner image
-    UIImageView *banner = [[UIImageView alloc] init];
+    UIView *banner = [[UIView alloc] init];
+    banner.backgroundColor = UIColor.clearColor;
     banner.translatesAutoresizingMaskIntoConstraints = FALSE;
-    banner.contentMode = UIViewContentModeScaleToFill;
-    banner.image = self.headerBannerImage;
     [cellView addSubview:banner];
 
     // Banner label
@@ -225,7 +222,7 @@ static NSString *iapCellID = @"IAPTableCellID";
     label.textColor = UIColor.whiteColor;
     label.translatesAutoresizingMaskIntoConstraints = NO;
     label.textAlignment = NSTextAlignmentCenter;
-    label.font = [label.font fontWithSize:18];
+    label.font = [UIFont avenirNextDemiBold:label.font.pointSize];
 
     if(self.hasActiveSubscription) {
 
@@ -248,10 +245,16 @@ static NSString *iapCellID = @"IAPTableCellID";
     // Header layout constraints
     [banner.leadingAnchor constraintEqualToAnchor:cellView.leadingAnchor].active = TRUE;
     [banner.trailingAnchor constraintEqualToAnchor:cellView.trailingAnchor].active = TRUE;
+    [banner.heightAnchor constraintGreaterThanOrEqualToAnchor:cellView.heightAnchor].active = TRUE;
 
-    [label.leadingAnchor constraintEqualToAnchor:cellView.leadingAnchor constant:10.0].active = TRUE;
-    [label.trailingAnchor constraintEqualToAnchor:cellView.trailingAnchor constant:10.0].active = TRUE;
-    [label.centerYAnchor constraintEqualToAnchor:cellView.centerYAnchor].active = TRUE;
+    [label.leadingAnchor constraintEqualToAnchor:banner.leadingAnchor constant:10.0].active = TRUE;
+    [label.trailingAnchor constraintEqualToAnchor:banner.trailingAnchor constant:-10.0].active = TRUE;
+    [label.centerYAnchor constraintEqualToAnchor:banner.centerYAnchor].active = TRUE;
+
+    // Add background gradient
+    bannerGradient = [CAGradientLayer layer];
+    bannerGradient.colors = @[(id)UIColor.lightRoyalBlueTwo.CGColor, (id)UIColor.lightishBlue.CGColor];
+    [cellView.layer insertSublayer:bannerGradient atIndex:0];
 
     return cellView;
 }
@@ -260,13 +263,14 @@ static NSString *iapCellID = @"IAPTableCellID";
 
 // Helper method that creates views to add to manage subscription cell.
 - (void)createManageSubscriptionCellContent:(UITableViewCell *)cell {
+
     cell.backgroundColor = UIColor.clearColor;
     cell.selectionStyle = UITableViewCellSelectionStyleNone;
 
     // "Manage your subscription" button
     UIButton *manageSubsButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
-    manageSubsButton.backgroundColor = UIColor.purpleButtonColor;
-    manageSubsButton.layer.cornerRadius = 5.0;
+    manageSubsButton.backgroundColor = UIColor.clearColor;
+    manageSubsButton.layer.cornerRadius = 8;
     manageSubsButton.layer.masksToBounds = FALSE;
     manageSubsButton.titleEdgeInsets = UIEdgeInsetsMake(0.0, 24.0, 0.0, 24.0);
     [manageSubsButton setTitle:NSLocalizedStringWithDefaultValue(@"SUBSCRIPTIONS_PAGE_MANAGE_SUBSCRIPTION_BUTTON",
@@ -276,6 +280,7 @@ static NSString *iapCellID = @"IAPTableCellID";
                                                                  @"Title of the button on the subscriptions page which takes the user of of the app to iTunes where they can view detailed information about their subscription")
                       forState:UIControlStateNormal];
     [manageSubsButton setTitleColor:UIColor.whiteColor forState:UIControlStateNormal];
+    manageSubsButton.titleLabel.font = [UIFont avenirNextDemiBold:16.f];
     [manageSubsButton addTarget:self action:@selector(onManageSubscriptionTap) forControlEvents:UIControlEventTouchUpInside];
     [cell.contentView addSubview:manageSubsButton];
 
@@ -284,11 +289,20 @@ static NSString *iapCellID = @"IAPTableCellID";
     [manageSubsButton.centerXAnchor constraintEqualToAnchor:cell.contentView.centerXAnchor].active = TRUE;
     [manageSubsButton.widthAnchor constraintEqualToConstant:250].active = TRUE;
     [manageSubsButton.heightAnchor constraintEqualToConstant:50].active = TRUE;
-    [manageSubsButton autoPinEdgeToSuperviewEdge:ALEdgeTop withInset:16.0].active = TRUE;
+
+    [manageSubsButton.topAnchor constraintEqualToAnchor:cell.contentView.topAnchor
+                                               constant:16.f].active = TRUE;
     if (self.hasActiveSubscription) {
         // Pins manageSubsButton to cell's bottom, since restoreSubsButton will no longer be displayed.
-        [manageSubsButton autoPinEdgeToSuperviewEdge:ALEdgeBottom withInset:16.0].active = TRUE;
+        [manageSubsButton.bottomAnchor constraintEqualToAnchor:cell.contentView.bottomAnchor
+                                                      constant:-16.f].active = TRUE;
     }
+
+    // Add background gradient
+    manageSubsButtonGradient = [CAGradientLayer layer];
+    manageSubsButtonGradient.colors = @[(id)UIColor.lightRoyalBlueTwo.CGColor, (id)UIColor.lightishBlue.CGColor];
+    manageSubsButtonGradient.cornerRadius = manageSubsButton.layer.cornerRadius;
+    [manageSubsButton.layer insertSublayer:manageSubsButtonGradient atIndex:0];
 
     // Restore subscription button is added if there is no active subscription.
     if (!self.hasActiveSubscription) {
@@ -299,7 +313,8 @@ static NSString *iapCellID = @"IAPTableCellID";
                                                                       @"I don't see my subscription",
                                                                       @"Title of the button on the subscriptions page which, when pressed, navigates the user to the page where they can restore their existing subscription")
                            forState:UIControlStateNormal];
-        [restoreSubsButton setTitleColor:UIColor.weirdGreenColor forState:UIControlStateNormal];
+        [restoreSubsButton setTitleColor:UIColor.lightishBlueTwo forState:UIControlStateNormal];
+        restoreSubsButton.titleLabel.font = [UIFont avenirNextDemiBold:16.f];
         [restoreSubsButton addTarget:self action:@selector(onSubscriptionHelpTap) forControlEvents:UIControlEventTouchUpInside];
         [cell.contentView addSubview:restoreSubsButton];
 
@@ -309,7 +324,8 @@ static NSString *iapCellID = @"IAPTableCellID";
         [restoreSubsButton.widthAnchor constraintEqualToConstant:250].active = TRUE;
         [restoreSubsButton.heightAnchor constraintEqualToConstant:30].active = TRUE;
         [restoreSubsButton.topAnchor constraintEqualToAnchor:manageSubsButton.bottomAnchor constant:16.0].active = TRUE;
-        [restoreSubsButton autoPinEdgeToSuperviewEdge:ALEdgeBottom withInset:16.0].active = TRUE;
+        [restoreSubsButton.bottomAnchor constraintEqualToAnchor:cell.contentView.bottomAnchor
+                                                       constant:-16.f].active = TRUE;
     }
 }
 
@@ -320,8 +336,8 @@ static NSString *iapCellID = @"IAPTableCellID";
 
     UILabel *label = [[UILabel alloc] initWithFrame:CGRectZero];
     label.numberOfLines = 0;
-    label.font = [label.font fontWithSize:15];
-    label.textColor = UIColor.whiteColor;
+    label.font = [UIFont avenirNextMedium:15.f];
+    label.textColor = UIColor.greyishBrown;
 
     NSString *footerText = NSLocalizedStringWithDefaultValue(@"BUY_SUBSCRIPTIONS_FOOTER_TEXT",
                                                    nil,
@@ -343,10 +359,14 @@ static NSString *iapCellID = @"IAPTableCellID";
     // label constraints
     label.translatesAutoresizingMaskIntoConstraints = NO;
     [label.centerXAnchor constraintEqualToAnchor:cell.contentView.centerXAnchor].active = TRUE;
-    [label autoPinEdgeToSuperviewEdge:ALEdgeLeading withInset:16.0].active = TRUE;
-    [label autoPinEdgeToSuperviewEdge:ALEdgeTop withInset:16.0].active = TRUE;
-    [label autoPinEdgeToSuperviewEdge:ALEdgeTrailing withInset:16.0].active = TRUE;
-    [label autoPinEdgeToSuperviewEdge:ALEdgeBottom withInset:16.0].active = TRUE;
+    [label.topAnchor constraintEqualToAnchor:cell.contentView.topAnchor
+                                    constant:16.f].active = TRUE;
+    [label.bottomAnchor constraintEqualToAnchor:cell.contentView.bottomAnchor
+                                       constant:-16.f].active = TRUE;
+    [label.leadingAnchor constraintEqualToAnchor:cell.contentView.leadingAnchor
+                                        constant:16.f].active = TRUE;
+    [label.trailingAnchor constraintEqualToAnchor:cell.contentView.trailingAnchor
+                                         constant:-16.f].active = TRUE;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -377,10 +397,15 @@ static NSString *iapCellID = @"IAPTableCellID";
     SKProduct * product = (SKProduct *) [IAPStoreHelper sharedInstance].storeProducts[indexPath.row];
     [self.priceFormatter setLocale:product.priceLocale];
     NSString *localizedPrice = [self.priceFormatter stringFromNumber:product.price];
+
     cell.textLabel.text = product.localizedTitle;
-    cell.textLabel.textColor = UIColor.whiteColor;
+    cell.textLabel.textColor = UIColor.greyishBrown;
+    cell.textLabel.font = [UIFont avenirNextDemiBold:cell.textLabel.font.pointSize];
+
     cell.detailTextLabel.text = product.localizedDescription;
-    cell.detailTextLabel.textColor = UIColor.whiteColor;
+    cell.detailTextLabel.textColor = UIColor.greyishBrown;
+    cell.detailTextLabel.font = [UIFont avenirNextMedium:cell.detailTextLabel.font.pointSize];
+    cell.detailTextLabel.textColor = [UIColor colorWithRed:0.29 green:0.29 blue:0.29 alpha:1.0];
 
     if(self.hasActiveSubscription) {
         cell.accessoryType = UITableViewCellAccessoryCheckmark;
@@ -388,7 +413,8 @@ static NSString *iapCellID = @"IAPTableCellID";
         cell.textLabel.text = self.latestSubscriptionProduct.localizedTitle;
         cell.detailTextLabel.text = @"";
     } else {
-        UISegmentedControl *buyButton = [[UISegmentedControl alloc]initWithItems:[NSArray arrayWithObject:localizedPrice]];
+        UISegmentedControl *buyButton = [[UISegmentedControl alloc] initWithItems:[NSArray arrayWithObject:localizedPrice]];
+        buyButton.tintColor = UIColor.lightishBlue;
         buyButton.momentary = YES;
         buyButton.tag = indexPath.row;
         [buyButton addTarget:self
@@ -420,9 +446,9 @@ static NSString *iapCellID = @"IAPTableCellID";
         @"Title of button on subscriptions page which opens Psiphon's privacy policy webpage")
                          forState:UIControlStateNormal];
     privacyPolicyButton.titleLabel.adjustsFontSizeToFitWidth = YES;
-    privacyPolicyButton.titleLabel.font = [UIFont systemFontOfSize:14];
+    privacyPolicyButton.titleLabel.font = [UIFont avenirNextDemiBold:14.f];
     privacyPolicyButton.titleLabel.numberOfLines = 0;
-    [privacyPolicyButton setTitleColor:UIColor.weirdGreenColor forState:UIControlStateNormal];
+    [privacyPolicyButton setTitleColor:UIColor.lightishBlueTwo forState:UIControlStateNormal];
     [terms addSubview:privacyPolicyButton];
 
     UIButton *tosButton = [UIButton buttonWithType:UIButtonTypeSystem];
@@ -435,11 +461,10 @@ static NSString *iapCellID = @"IAPTableCellID";
         @"Title of button on subscriptions page which opens Psiphon's terms of use webpage")
                forState:UIControlStateNormal];
     tosButton.titleLabel.adjustsFontSizeToFitWidth = YES;
-    tosButton.titleLabel.font = [UIFont systemFontOfSize:14];
+    tosButton.titleLabel.font = [UIFont avenirNextDemiBold:14.f];
     tosButton.titleLabel.numberOfLines = 0;
-    [tosButton setTitleColor:UIColor.weirdGreenColor forState:UIControlStateNormal];
+    [tosButton setTitleColor:UIColor.lightishBlueTwo forState:UIControlStateNormal];
     [terms addSubview:tosButton];
-
 
     // Layout constraints
     terms.translatesAutoresizingMaskIntoConstraints = NO;
@@ -447,10 +472,14 @@ static NSString *iapCellID = @"IAPTableCellID";
     privacyPolicyButton.translatesAutoresizingMaskIntoConstraints = NO;
 
     [terms.centerXAnchor constraintEqualToAnchor:cell.centerXAnchor].active = TRUE;
-    [terms autoPinEdgeToSuperviewEdge:ALEdgeLeading withInset:16.0].active = TRUE;
-    [terms autoPinEdgeToSuperviewEdge:ALEdgeTop withInset:16.0].active = TRUE;
-    [terms autoPinEdgeToSuperviewEdge:ALEdgeTrailing withInset:16.0].active = TRUE;
-    [terms autoPinEdgeToSuperviewEdge:ALEdgeBottom withInset:16.0].active = TRUE;
+    [terms.topAnchor constraintEqualToAnchor:cell.topAnchor
+                                    constant:20.f].active = TRUE;
+    [terms.bottomAnchor constraintEqualToAnchor:cell.bottomAnchor
+                                       constant:-16.f].active = TRUE;
+    [terms.leadingAnchor constraintEqualToAnchor:cell.leadingAnchor
+                                        constant:16.f].active = TRUE;
+    [terms.trailingAnchor constraintEqualToAnchor:cell.trailingAnchor
+                                         constant:-16.f].active = TRUE;
 
     [privacyPolicyButton.heightAnchor constraintEqualToAnchor:terms.heightAnchor].active = YES;
     [privacyPolicyButton.centerYAnchor constraintEqualToAnchor:terms.centerYAnchor].active = YES;
@@ -665,7 +694,7 @@ static NSString *iapCellID = @"IAPTableCellID";
         self.detailTextLabel.lineBreakMode = NSLineBreakByWordWrapping;
         self.detailTextLabel.numberOfLines = 0;
         self.detailTextLabel.translatesAutoresizingMaskIntoConstraints = NO;
-        self.detailTextLabel.textColor = [UIColor colorWithWhite:1.0 alpha:0.3];
+        self.detailTextLabel.textColor = [UIColor colorWithRed:0.29 green:0.29 blue:0.29 alpha:.3];
         
         [self.contentView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|-[textLabel]-|" options:0 metrics:nil views:@{ @"textLabel": self.textLabel}]];
         [self.contentView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|-[detailTextLabel]-|" options:0 metrics:nil views:@{ @"detailTextLabel": self.detailTextLabel}]];
@@ -673,13 +702,6 @@ static NSString *iapCellID = @"IAPTableCellID";
     }
     
     return self;
-}
-
-- (void)layoutSubviews {
-    [super layoutSubviews];
-    [self.contentView setNeedsLayout];
-    [self.contentView layoutIfNeeded];
-    self.textLabel.preferredMaxLayoutWidth = CGRectGetWidth(self.textLabel.frame);
 }
 
 @end

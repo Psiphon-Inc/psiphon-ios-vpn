@@ -45,8 +45,6 @@ UserDefaultsKey const ContainerAuthorizationSetKey = @"authorizations_container_
 
 UserDefaultsKey const MarkedAuthIDsExtensionStringSetKey = @"marked_authorization_ids_extension_key";
 
-UserDefaultsKey const EmbeddedEgressRegionsStringArrayKey = @"embedded_server_entries_egress_regions";
-
 /**
  * Key for boolean value that when TRUE indicates that the extension crashed before stop was called.
  * This value is only valid if the extension is not currently running.
@@ -296,14 +294,6 @@ UserDefaultsKey const DebugPsiphonConnectionStateStringKey = @"PsiphonDataShared
 - (BOOL)updateAppForegroundState:(BOOL)foreground {
     [sharedDefaults setBool:foreground forKey:AppForegroundBoolKey];
     return [sharedDefaults synchronize];
-}
-
-- (void)setEmbeddedEgressRegions:(NSArray<NSString *> *_Nullable)regions {
-    [[NSUserDefaults standardUserDefaults] setObject:regions forKey:EmbeddedEgressRegionsStringArrayKey];
-}
-
-- (NSArray<NSString *> *)embeddedEgressRegions {
-    return [[NSUserDefaults standardUserDefaults] objectForKey:EmbeddedEgressRegionsStringArrayKey];
 }
 
 

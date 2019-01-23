@@ -28,7 +28,7 @@
 #import "PsiphonClientCommonLibraryHelpers.h"
 #import "PsiphonDataSharedDB.h"
 #import "SharedConstants.h"
-#import "UIAlertController+Delegate.h"
+#import "UIAlertController+Additions.h"
 #import <stdatomic.h>
 
 @implementation FeedbackManager {

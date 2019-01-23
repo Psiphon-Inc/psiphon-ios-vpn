@@ -20,8 +20,8 @@ PODS:
   - PersonalizedAdConsent (1.0.3)
   - PsiphonClientCommonLibrary (1.2.0):
     - InAppSettingsKit
-  - PureLayout (3.0.2)
   - ReactiveObjC (3.1.0)
+  - SVProgressHUD (2.2.5)
 
 DEPENDENCIES:
   - CustomIOSAlertView (~> 0.9.5)
@@ -32,8 +32,8 @@ DEPENDENCIES:
   - mopub-ios-sdk (~> 5.2.0)
   - PersonalizedAdConsent
   - PsiphonClientCommonLibrary (from `https://github.com/Psiphon-Inc/psiphon-ios-client-common-library.git`, commit `2e53a34`)
-  - PureLayout (= 3.0.2)
   - ReactiveObjC (from `https://github.com/Psiphon-Inc/ReactiveObjC.git`, commit `97d6af3`)
+  - SVProgressHUD
 
 EXTERNAL SOURCES:
   InAppSettingsKit:
@@ -66,9 +66,9 @@ SPEC CHECKSUMS:
   mopub-ios-sdk: 2b14db9b687a8052fdc42f727f9553baac13507b
   PersonalizedAdConsent: b50a8a5d6065b6db23121e8fcc0dce2ae983f6ea
   PsiphonClientCommonLibrary: bc9d6f5656e557d6c4395d34196a98825e39479b
-  PureLayout: 4d550abe49a94f24c2808b9b95db9131685fe4cd
   ReactiveObjC: 2a38ea15335de4119d8b17caf1db1484f61db902
+  SVProgressHUD: 1428aafac632c1f86f62aa4243ec12008d7a51d6
 
-PODFILE CHECKSUM: bc41de475cd2f1b4e756c1ee600533dc07654f0d
+PODFILE CHECKSUM: cf0c5d4e66aa4eeed15aa8268dbf859b3f314d63
 
 COCOAPODS: 1.4.0
