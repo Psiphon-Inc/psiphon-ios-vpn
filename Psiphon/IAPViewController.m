@@ -338,11 +338,20 @@ static NSString *iapCellID = @"IAPTableCellID";
     label.numberOfLines = 0;
     label.font = [UIFont avenirNextMedium:15.f];
     label.textColor = UIColor.greyishBrown;
-    label.text = NSLocalizedStringWithDefaultValue(@"BUY_SUBSCRIPTIONS_FOOTER_TEXT",
+
+    NSString *footerText = NSLocalizedStringWithDefaultValue(@"BUY_SUBSCRIPTIONS_FOOTER_TEXT",
                                                    nil,
                                                    [NSBundle mainBundle],
                                                    @"A subscription is auto-renewable which means that once purchased it will be automatically renewed until you cancel it 24 hours prior to the end of the current period.\n\nYour iTunes Account will be charged for renewal within 24-hours prior to the end of the current period with the cost of the subscription.",
                                                    @"Buy subscription dialog footer text");
+
+    NSString * cancelInstructions = NSLocalizedStringWithDefaultValue(@"BUY_SUBSCRIPTIONS_FOOTER_CANCEL_INSTRUCTIONS_TEXT",
+                                                                      nil,
+                                                                      [NSBundle mainBundle],
+                                                                      @"You can cancel an active subscription in your iTunes Account Settings.",
+                                                                      @"Buy subscription dialog footer text explaining where the user can cancel an active subscription");
+
+    label.text = [NSString stringWithFormat:@"%@\n\n%@", footerText, cancelInstructions];
 
     label.textAlignment = NSTextAlignmentLeft;
     [cell.contentView addSubview:label];

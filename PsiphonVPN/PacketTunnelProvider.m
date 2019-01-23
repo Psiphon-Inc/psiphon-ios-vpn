@@ -524,7 +524,8 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
         || self.extensionStartMethod == ExtensionStartMethodFromCrash
         || [self.subscriptionCheckState isSubscribedOrInProgress]) {
 
-        if (self.extensionStartMethod == ExtensionStartMethodFromContainer) {
+        if (![self.subscriptionCheckState isSubscribedOrInProgress] &&
+            self.extensionStartMethod == ExtensionStartMethodFromContainer) {
             self.waitForContainerStartVPNCommand = TRUE;
         }
 
