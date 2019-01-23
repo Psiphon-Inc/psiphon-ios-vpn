@@ -823,7 +823,10 @@ NSString * const CommandStopVPN = @"StopVPN";
 }
 
 - (void)setStatusLabelText:(NSString*)s {
-    NSMutableAttributedString *mutableStr = [[NSMutableAttributedString alloc] initWithString:s];
+    NSString *upperCased = [s localizedUppercaseString];
+    NSMutableAttributedString *mutableStr = [[NSMutableAttributedString alloc]
+      initWithString:upperCased];
+
     [mutableStr addAttribute:NSKernAttributeName
                        value:@1.1
                        range:NSMakeRange(0, mutableStr.length)];

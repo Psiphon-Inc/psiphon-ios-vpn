@@ -256,7 +256,9 @@
 }
 
 - (NSAttributedString*)styleTitleText:(NSString*)s {
-    NSMutableAttributedString *mutableStr = [[NSMutableAttributedString alloc] initWithString:s];
+    NSString *upperCased = [s localizedUppercaseString];
+    NSMutableAttributedString *mutableStr = [[NSMutableAttributedString alloc]
+      initWithString:upperCased];
     NSShadow *shadow = [[NSShadow alloc] init];
     shadow.shadowColor = [UIColor colorWithWhite:0 alpha:.12];
     shadow.shadowBlurRadius = 8.0;
