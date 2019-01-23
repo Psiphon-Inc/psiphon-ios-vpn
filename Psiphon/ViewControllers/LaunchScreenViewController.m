@@ -22,6 +22,7 @@
 #import "LaunchScreenViewController.h"
 #import "PsiphonProgressView.h"
 #import "UIView+AutoLayoutViewGroup.h"
+#import "UIFont+Additions.h"
 
 
 #define kProgressViewToScreenRatio 0.9f
@@ -44,58 +45,36 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
 
-    // Adds background blur effect.
-    self.view.backgroundColor = [UIColor clearColor];
-    UIBlurEffect *bgBlurEffect = [UIBlurEffect effectWithStyle:UIBlurEffectStyleDark];
-    UIVisualEffectView *bgBlurEffectView = [[UIVisualEffectView alloc] initWithEffect:bgBlurEffect];
-    bgBlurEffectView.frame = self.view.bounds;
-    bgBlurEffectView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-    [self.view addSubview:bgBlurEffectView];
+    // Background
 
-    [self addProgressView];
-    [self addLoadingLabel];
+    UIView *launchScreenView = [[[NSBundle mainBundle] loadNibNamed:@"LaunchScreen" owner:self options:nil] objectAtIndex:0];
+    [self.view addSubview:launchScreenView];
 
-    [self setNeedsStatusBarAppearanceUpdate];
-}
+    launchScreenView.translatesAutoresizingMaskIntoConstraints = NO;
+    [launchScreenView.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor].active = YES;
+    [launchScreenView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor].active = YES;
+    [launchScreenView.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor].active = YES;
+    [launchScreenView.topAnchor constraintEqualToAnchor:self.view.topAnchor].active = YES;
 
-#pragma mark - helpers
+    // Loading label
 
-- (void)addProgressView {
-    progressView = [[PsiphonProgressView alloc] initWithAutoLayout];
-    progressView.translatesAutoresizingMaskIntoConstraints = NO;
-    [self.view addSubview:progressView];
-
-    [progressView.centerXAnchor constraintEqualToAnchor:self.view.centerXAnchor].active = YES;
-    NSLayoutConstraint *centerYAnchor = [progressView.centerYAnchor constraintEqualToAnchor:self.view.centerYAnchor];
-    // Allow constraint to be broken
-    centerYAnchor.priority = UILayoutPriorityDefaultHigh;
-    centerYAnchor.active = YES;
-
-    CGFloat len = kProgressViewToScreenRatio * [self minDimensionLength];
-    if (len > kProgressViewMaxDimensionLength) {
-        len = kProgressViewMaxDimensionLength;
-    }
-    [progressView.widthAnchor constraintEqualToConstant:len].active = TRUE;
-    [progressView.heightAnchor constraintEqualToConstant:len].active = TRUE;
-}
-
-- (void)addLoadingLabel {
     loadingLabel = [[UILabel alloc] init];
     loadingLabel.translatesAutoresizingMaskIntoConstraints = NO;
 
     loadingLabel.adjustsFontSizeToFitWidth = YES;
     loadingLabel.text = NSLocalizedStringWithDefaultValue(@"LOADING", nil, [NSBundle mainBundle], @"Loading...", @"Text displayed while app loads");
     loadingLabel.textAlignment = NSTextAlignmentCenter;
-    loadingLabel.textColor = [[UIColor whiteColor] colorWithAlphaComponent:0.6];
-    loadingLabel.font = [UIFont systemFontOfSize:20 weight:UIFontWeightThin];
+    loadingLabel.textColor = [[UIColor blackColor] colorWithAlphaComponent:0.6];
+    loadingLabel.font = [UIFont avenirNextMedium:20.f];
 
     [self.view addSubview:loadingLabel];
-    [loadingLabel.heightAnchor constraintEqualToConstant:30.f].active = YES;
-    [loadingLabel.widthAnchor constraintEqualToAnchor:progressView.widthAnchor].active = YES;
     [loadingLabel.centerXAnchor constraintEqualToAnchor:self.view.centerXAnchor].active = YES;
-    [loadingLabel.topAnchor constraintGreaterThanOrEqualToAnchor:progressView.bottomAnchor].active = YES;
-    [loadingLabel.bottomAnchor constraintEqualToAnchor:self.bottomLayoutGuide.bottomAnchor constant:-15].active = YES;
+    [loadingLabel.centerYAnchor constraintEqualToAnchor:self.bottomLayoutGuide.bottomAnchor constant:-50].active = YES;
+
+    [self setNeedsStatusBarAppearanceUpdate];
 }
+
+#pragma mark - helpers
 
 - (CGFloat)minDimensionLength {
     return MIN(self.view.frame.size.width, self.view.frame.size.height);
