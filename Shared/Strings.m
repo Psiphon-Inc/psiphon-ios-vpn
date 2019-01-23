@@ -110,6 +110,26 @@
     return  NSLocalizedStringWithDefaultValue(@"NEXT_PAGE_BUTTON_TITLE", nil, [NSBundle mainBundle], @"Next", @"Button title that takes user to the next page");
 }
 
++ (NSString *)psiCashSpeedBoostMeterActiveTitle {
+    return NSLocalizedStringWithDefaultValue(@"PSICASH_SPEED_BOOST_ACTIVE_TEXT", nil, [NSBundle mainBundle], @"Speed Boost Active", @"Text which appears in the Speed Boost meter when the user has activated Speed Boost. Please keep this text concise as the width of the text box is restricted in size. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed.");
+}
+
++ (NSString *)psiCashSpeedBoostMeterChargingTitle {
+    return NSLocalizedStringWithDefaultValue(@"PSICASH_SPEED_BOOST_CHARGING_TEXT", nil, [NSBundle mainBundle], @"Speed Boost Charging", @"Text which appears in the Speed Boost meter when the user has not yet earned enough PsiCash to Speed Boost. This text will be accompanied with a percentage indicating to the user how close they are to earning enough PsiCash to buy a minimum amount of Speed Boost. Please keep this text concise as the width of the text box is restricted in size. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed.");
+}
+
++ (NSString *)psiCashSpeedBoostMeterAvailableTitle {
+    return NSLocalizedStringWithDefaultValue(@"PSICASH_SPEED_BOOST_AVAILABLE_TEXT", nil, [NSBundle mainBundle], @"Speed Boost Available", @"Text which appears in the Speed Boost meter when the user has earned enough PsiCash to buy Speed Boost. Please keep this text concise as the width of the text box is restricted in size. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed.");
+}
+
++ (NSString *)psiCashSpeedBoostMeterBuyingTitle {
+    return NSLocalizedStringWithDefaultValue(@"PSICASH_BUYING_SPEED_BOOST_TEXT", nil, [NSBundle mainBundle], @"Buying Speed Boost...", @"Text which appears in the Speed Boost meter when the user's buy request for Speed Boost is being processed. Please keep this text concise as the width of the text box is restricted in size.");
+}
+
++ (NSString *)psiCashSpeedBoostMeterNoAuthTitle {
+    return NSLocalizedStringWithDefaultValue(@"PSICASH_SPEED_BOOST_NOAUTH_TEXT", nil, [NSBundle mainBundle], @"Earn PsiCash to buy Speed Boost", @"Text which appears in the Speed Boost meter when the user has not earned any PsiCash yet. Please keep this text concise as the width of the text box is restricted in size. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. Note: 'PsiCash' should not be translated or transliterated.");
+}
+
 + (NSString *)vpnPermissionDeniedAlertMessage {
     return NSLocalizedStringWithDefaultValue(@"VPN_START_PERMISSION_DENIED_MESSAGE", nil, [NSBundle mainBundle], @"Psiphon needs your permission to install a VPN profile in order to connect.\n\nPsiphon is committed to protecting the privacy of our users. You can review our privacy policy by tapping \"Privacy Policy\".", @"('Privacy Policy' should be the same translation as privacy policy button VPN_START_PRIVACY_POLICY_BUTTON), (Do not translate 'VPN profile'), (Do not translate 'Psiphon')");
 }
