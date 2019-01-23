@@ -25,6 +25,7 @@
 #import "UIColor+Additions.h"
 #import "UIFont+Additions.h"
 #import "UIView+AutoLayoutViewGroup.h"
+#import "Strings.h"
 
 #define kBorderWidth 2.f
 #define kDistanceFromOuterToInnerMeter 6.f
@@ -251,8 +252,7 @@
 #pragma mark - State Changes
 
 - (void)inPurchasePendingState {
-    NSString *text = NSLocalizedStringWithDefaultValue(@"PSICASH_BUYING_SPEED_BOOST_TEXT", nil, [NSBundle mainBundle], @"Buying Speed Boost...", @"Text which appears in the Speed Boost meter when the user's buy request for Speed Boost is being processed. Please keep this text concise as the width of the text box is restricted in size.");
-    title.attributedText = [self styleTitleText:text];
+    title.attributedText = [self styleTitleText:[Strings psiCashSpeedBoostMeterBuyingTitle]];
 }
 
 - (NSAttributedString*)styleTitleText:(NSString*)s {
@@ -280,7 +280,7 @@
 
     NSString *text;
     if (progress >= 1) {
-        NSString *speedBoostAvailable = NSLocalizedStringWithDefaultValue(@"PSICASH_SPEED_BOOST_AVAILABLE_TEXT", nil, [NSBundle mainBundle], @"Speed Boost Available", @"Text which appears in the Speed Boost meter when the user has earned enough PsiCash to buy Speed Boost. Please keep this text concise as the width of the text box is restricted in size. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed.");
+        NSString *speedBoostAvailable = [Strings psiCashSpeedBoostMeterAvailableTitle];
         if ([self.model.maxSpeedBoostPurchaseEarned.hours floatValue] < 1) {
             text = [NSString stringWithFormat:@"%.0fm %@", ([hoursEarned floatValue] * 60), speedBoostAvailable];
 
@@ -288,8 +288,9 @@
             text = [NSString stringWithFormat:@"%luh %@", (unsigned long)[hoursEarned unsignedIntegerValue], speedBoostAvailable];
         }
     } else {
-        NSString *speedBoostCharging = NSLocalizedStringWithDefaultValue(@"PSICASH_SPEED_BOOST_CHARGING_TEXT", nil, [NSBundle mainBundle], @"Speed Boost Charging", @"Text which appears in the Speed Boost meter when the user has not yet earned enough PsiCash to Speed Boost. This text will be accompanied with a percentage indicating to the user how close they are to earning enough PsiCash to buy a minimum amount of Speed Boost. Please keep this text concise as the width of the text box is restricted in size. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed.");
-        text = [NSString stringWithFormat:@"%@ %.0f%%", speedBoostCharging, [self progressToMinSpeedBoostPurchase]*100];
+        text = [NSString stringWithFormat:@"%@ %.0f%%",
+          [Strings psiCashSpeedBoostMeterChargingTitle],
+          [self progressToMinSpeedBoostPurchase]*100];
     }
     title.attributedText = [self styleTitleText:text];
 }
@@ -312,22 +313,19 @@
             int m = (int)secondsToExpiry / 60 % 60;
             int s = (int)secondsToExpiry % 60;
 
-            NSMutableAttributedString *attr = [[NSMutableAttributedString alloc] initWithString:NSLocalizedStringWithDefaultValue(@"PSICASH_SPEED_BOOST_ACTIVE_TEXT", nil, [NSBundle mainBundle], @"Speed Boost Active", @"Text which appears in the Speed Boost meter when the user has activated Speed Boost. Please keep this text concise as the width of the text box is restricted in size. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed.")
-                                                                                     attributes:@{NSFontAttributeName:[UIFont boldSystemFontOfSize:14]}];
-            NSAttributedString *timeRemaining;
-
-            [attr appendAttributedString:[[NSAttributedString alloc] initWithString:@" - "]];
-            NSDictionary *timeRemainingAttributes = @{NSFontAttributeName:[UIFont boldSystemFontOfSize:14]};
+            NSString *timeRemaining;
             if (h > 0) {
-                timeRemaining = [[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@"%ih %im", h, m] attributes:timeRemainingAttributes];
+                timeRemaining = [NSString stringWithFormat:@"%ih %im", h, m];
             } else if (m > 0) {
-                timeRemaining = [[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@"%im %is", m, s] attributes:timeRemainingAttributes];
+                timeRemaining = [NSString stringWithFormat:@"%im %is", m, s];
             } else {
-                timeRemaining = [[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@"%is", s] attributes:timeRemainingAttributes];
+                timeRemaining = [NSString stringWithFormat:@"%is", s];
             }
 
-            [attr appendAttributedString:timeRemaining];
-            title.attributedText = attr;
+            NSString *speedBoostActive = [NSString stringWithFormat:@"%@ - %@",
+                                                   [Strings psiCashSpeedBoostMeterActiveTitle], timeRemaining];
+
+            title.attributedText = [self styleTitleText:speedBoostActive];
         }];
         [countdownToSpeedBoostExpiry fire];
     });
@@ -336,8 +334,7 @@
 #pragma mark - Helpers
 
 - (void)noSpenderToken {
-    NSString *text = NSLocalizedStringWithDefaultValue(@"PSICASH_SPEED_BOOST_NOAUTH_TEXT", nil, [NSBundle mainBundle], @"Earn PsiCash to buy Speed Boost", @"Text which appears in the Speed Boost meter when the user has not earned any PsiCash yet. Please keep this text concise as the width of the text box is restricted in size. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. Note: 'PsiCash' should not be translated or transliterated.");
-    title.attributedText = [self styleTitleText:text];
+    title.attributedText = [self styleTitleText:[Strings psiCashSpeedBoostMeterNoAuthTitle]];
 }
 
 - (NSTimeInterval)timeToNextHourExpired:(NSTimeInterval)seconds {

@@ -75,6 +75,18 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (NSString *)nextPageButtonTitle;
 
+#pragma mark - PsiCash
+
++ (NSString *)psiCashSpeedBoostMeterActiveTitle;
+
++ (NSString *)psiCashSpeedBoostMeterChargingTitle;
+
++ (NSString *)psiCashSpeedBoostMeterAvailableTitle;
+
++ (NSString *)psiCashSpeedBoostMeterBuyingTitle;
+
++ (NSString *)psiCashSpeedBoostMeterNoAuthTitle;
+
 #pragma mark - VPN
 
 + (NSString *)vpnPermissionDeniedAlertMessage;
