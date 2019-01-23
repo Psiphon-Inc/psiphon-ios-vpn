@@ -33,6 +33,9 @@
 /* Title of button on alert view which shows the progress of the user's buy request. Hitting this button dismisses the alert and the buy request continues processing in the background. */
 "BUY_REQUEST_PROGRESS_ALERT_DISMISS_BUTTON_TITLE" = "Dismiss";
 
+/* Buy subscription dialog footer text explaining where the user can cancel an active subscription */
+"BUY_SUBSCRIPTIONS_FOOTER_CANCEL_INSTRUCTIONS_TEXT" = "You can cancel an active subscription in your iTunes Account Settings.";
+
 /* Buy subscription dialog footer text */
 "BUY_SUBSCRIPTIONS_FOOTER_TEXT" = "A subscription is auto-renewable which means that once purchased it will be automatically renewed until you cancel it 24 hours prior to the end of the current period.\n\nYour iTunes Account will be charged for renewal within 24-hours prior to the end of the current period with the cost of the subscription.";
 
@@ -48,8 +51,9 @@
 /* Main text in the 'Upstream Proxy Error' dialog box. This is shown when the user has directly altered these settings, and those settings are (probably) erroneous. DO NOT translate 'Psiphon'. */
 "CHECK_UPSTREAM_PROXY_SETTING" = "You have configured Psiphon to use an upstream proxy.\nHowever, we seem to be unable to connect to a Psiphon server through that proxy.\nPlease fix the settings and try again.";
 
-/* Title for screen that allows user to select their desired server region. Use all capital letters in the translation only if it makes sense. */
-"CONNECT_VIA" = "CONNECT VIA";
+/* Text above change region button that allows user to select their desired server region
+   Title for screen that allows user to select their desired server region. Use all capital letters in the translation only if it makes sense. */
+"CONNECT_VIA" = "Connect via";
 
 /* Alert dialog title of alert which informs the user that the settings file in the app is corrupt. */
 "CORRUPT_SETTINGS_ALERT_TITLE" = "Corrupt Settings";
@@ -63,7 +67,8 @@
 /* Dismiss button title. Dismisses pop-up alert when the user clicks on the button */
 "DISMISS_BUTTON_TITLE" = "Dismiss";
 
-/* Title of the button that dismisses the subscriptions menu */
+/* Title of the button that dismisses region selection dialog
+   Title of the button that dismisses the subscriptions menu */
 "DONE_ACTION" = "Done";
 
 /* Title of the button that dismisses a screen or a dialog */
@@ -133,6 +138,9 @@
 /* Alert dialog title indicating to the user that Psiphon needs their permission */
 "PERMISSION_REQUIRED_ALERT__TITLE" = "Permission required";
 
+/* Cancel button title. */
+"PRIVACY_POLICY_CANCEL_BUTTON" = "Cancel";
+
 /* Alert message when the user declined privacy policy. They will not be able ot use the app until the user accepts the privacy policy (Do not translate 'Psiphon') */
 "PRIVACY_POLICY_DECLINED_ALERT_BODY" = "You must accept our Privacy Policy before continuing to use Psiphon.";
 
@@ -186,6 +194,9 @@
 
 /* Sub-heading in the 'User VPN Data' section of the Privacy Policy page. The section describes why Psiphon needs VPN data stats. */
 "PrivacyInformationCollectedVpndataWhydoespsiphonneedSubhead" = "Why does Psiphon need these statistics?";
+
+/* Button label at the end of privacy policy screen, indication that when clicked user can start using Psiphon */
+"PrivacyPolicyGetStartedButtonTitle" = "Get started with Psiphon";
 
 /* page title for the Privacy Policy page */
 "PrivacyTitle" = "Privacy Policy";
@@ -323,6 +334,9 @@
 /* Header text beside button that opens paid subscriptions manager UI. At this point the user is subscribed. Please keep this text concise as the width of the text box is restricted in size. */
 "SUBSCRIPTION_BAR_HEADER_TEXT_SUBSCRIBED" = "SUBSCRIPTION";
 
+/* Text for button that opens paid subscriptions manager UI. If “Premium” doesn't easily translate, please choose a term that conveys “Pro” or “Extra” or “Better” or “Elite”. */
+"SUBSCRIPTION_BUTTON_TITLE" = "Go premium now!";
+
 /* Title of the dialog for available in-app paid subscriptions */
 "SUBSCRIPTIONS" = "Subscriptions";
 
@@ -361,6 +375,12 @@
 
 /* ('Privacy Policy' should be the same translation as privacy policy button VPN_START_PRIVACY_POLICY_BUTTON), (Do not translate 'VPN profile'), (Do not translate 'Psiphon') */
 "VPN_START_PERMISSION_DENIED_MESSAGE" = "Psiphon needs your permission to install a VPN profile in order to connect.\n\nPsiphon is committed to protecting the privacy of our users. You can review our privacy policy by tapping \"Privacy Policy\".";
+
+/* Dismiss button title. Dismisses pop-up alert when the user clicks on the button */
+"VPN_START_PERMISSION_DISMISS_BUTTON" = "Dismiss";
+
+/* Alert dialog title indicating to the user that Psiphon needs their permission */
+"VPN_START_PERMISSION_REQUIRED_TITLE" = "Permission required";
 
 /* Button label taking user's to our Privacy Policy page */
 "VPN_START_PRIVACY_POLICY_BUTTON" = "Privacy Policy";
