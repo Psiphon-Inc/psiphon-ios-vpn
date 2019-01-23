@@ -97,16 +97,6 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (BOOL)updateAppForegroundState:(BOOL)foreground;
 
-/*!
- * @brief Sets set of egress regions in standard NSUserDefaults
- */
-- (void)setEmbeddedEgressRegions:(NSArray<NSString *> *_Nullable)regions;
-
-/*!
- * @return NSArray of region codes.
- */
-- (NSArray<NSString *> *_Nullable)embeddedEgressRegions;
-
 #endif
 
 

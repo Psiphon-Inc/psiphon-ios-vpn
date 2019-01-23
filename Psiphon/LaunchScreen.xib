@@ -1,42 +1,88 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="14109" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" launchScreen="YES" useTraitCollections="YES" colorMatched="YES">
-    <device id="ipad10_5" orientation="portrait">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="14460.31" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" launchScreen="YES" useTraitCollections="YES" colorMatched="YES">
+    <device id="retina6_5" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14088"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14460.20"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
         <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
         <view contentMode="scaleToFill" id="iN0-l3-epB">
-            <rect key="frame" x="0.0" y="0.0" width="834" height="1112"/>
+            <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
-                <imageView opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleAspectFill" insetsLayoutMarginsFromSafeArea="NO" image="LaunchScreenBackground" translatesAutoresizingMaskIntoConstraints="NO" id="Oah-du-p03">
-                    <rect key="frame" x="0.0" y="0.0" width="834" height="1112"/>
-                </imageView>
-                <imageView opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" image="LaunchScreen" translatesAutoresizingMaskIntoConstraints="NO" id="Nhg-hz-FsP">
-                    <rect key="frame" x="353.5" y="485.5" width="116" height="130"/>
-                </imageView>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="VBr-xc-W1q">
+                    <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+                    <subviews>
+                        <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="PsiphonLogo" translatesAutoresizingMaskIntoConstraints="NO" id="o8f-hz-tIN">
+                            <rect key="frame" x="113" y="354" width="188" height="188"/>
+                        </imageView>
+                        <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="cloud" translatesAutoresizingMaskIntoConstraints="NO" id="cC7-dm-GyP">
+                            <rect key="frame" x="-78.666666666666671" y="501.66666666666669" width="157.33333333333334" height="98.333333333333314"/>
+                        </imageView>
+                        <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="cloud" translatesAutoresizingMaskIntoConstraints="NO" id="L3x-Na-J8U">
+                            <rect key="frame" x="277.33333333333331" y="672" width="157.33333333333331" height="98.666666666666629"/>
+                        </imageView>
+                        <imageView userInteractionEnabled="NO" alpha="0.40000000000000002" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="cloud" translatesAutoresizingMaskIntoConstraints="NO" id="lig-XY-NNh">
+                            <rect key="frame" x="0.0" y="88.666666666666671" width="99.333333333333329" height="50.000000000000014"/>
+                            <constraints>
+                                <constraint firstAttribute="width" secondItem="lig-XY-NNh" secondAttribute="height" multiplier="99.3:50" id="ejG-SC-2FU"/>
+                            </constraints>
+                        </imageView>
+                        <imageView userInteractionEnabled="NO" alpha="0.40000000596046448" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="cloud" translatesAutoresizingMaskIntoConstraints="NO" id="ozj-ee-51W">
+                            <rect key="frame" x="32.999999999999993" y="761.66666666666663" width="99.333333333333314" height="50"/>
+                            <constraints>
+                                <constraint firstAttribute="width" secondItem="ozj-ee-51W" secondAttribute="height" multiplier="99.3:50" id="IbF-0e-rjW"/>
+                            </constraints>
+                        </imageView>
+                        <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="cloud" translatesAutoresizingMaskIntoConstraints="NO" id="Wyr-rD-lmL">
+                            <rect key="frame" x="306.33333333333331" y="98.666666666666686" width="157.33333333333331" height="98.333333333333314"/>
+                        </imageView>
+                    </subviews>
+                    <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                    <constraints>
+                        <constraint firstItem="lig-XY-NNh" firstAttribute="leading" secondItem="VBr-xc-W1q" secondAttribute="leading" multiplier="0.79" id="01A-8R-ZD5"/>
+                        <constraint firstItem="o8f-hz-tIN" firstAttribute="centerY" secondItem="VBr-xc-W1q" secondAttribute="centerY" id="0b1-nn-BSS"/>
+                        <constraint firstItem="Wyr-rD-lmL" firstAttribute="leading" secondItem="VBr-xc-W1q" secondAttribute="trailing" multiplier="0.74" id="3jP-He-SpI"/>
+                        <constraint firstItem="o8f-hz-tIN" firstAttribute="height" secondItem="VBr-xc-W1q" secondAttribute="height" multiplier="0.21" id="7W0-5X-MjW"/>
+                        <constraint firstItem="ozj-ee-51W" firstAttribute="top" secondItem="VBr-xc-W1q" secondAttribute="bottom" multiplier="0.85" id="8Pc-sa-YkK"/>
+                        <constraint firstItem="L3x-Na-J8U" firstAttribute="topMargin" secondItem="VBr-xc-W1q" secondAttribute="bottom" multiplier="0.75" constant="8" id="EUo-zb-g3a"/>
+                        <constraint firstItem="o8f-hz-tIN" firstAttribute="centerX" secondItem="VBr-xc-W1q" secondAttribute="centerX" id="EsB-YU-A7f"/>
+                        <constraint firstItem="ozj-ee-51W" firstAttribute="width" secondItem="VBr-xc-W1q" secondAttribute="width" multiplier="0.24" id="Gql-0j-bnh"/>
+                        <constraint firstItem="o8f-hz-tIN" firstAttribute="width" secondItem="VBr-xc-W1q" secondAttribute="height" multiplier="0.21" id="KdE-65-8Db"/>
+                        <constraint firstItem="cC7-dm-GyP" firstAttribute="width" secondItem="VBr-xc-W1q" secondAttribute="width" multiplier="0.38" id="MTH-Ez-FdX"/>
+                        <constraint firstItem="lig-XY-NNh" firstAttribute="top" secondItem="VBr-xc-W1q" secondAttribute="bottom" multiplier="0.038" constant="54.666666666666657" id="QYT-Cl-Eqh"/>
+                        <constraint firstItem="cC7-dm-GyP" firstAttribute="topMargin" secondItem="VBr-xc-W1q" secondAttribute="bottom" multiplier="0.56" constant="7.839999999999975" id="UZY-AJ-ADb"/>
+                        <constraint firstItem="ozj-ee-51W" firstAttribute="leading" secondItem="VBr-xc-W1q" secondAttribute="trailing" multiplier="0.08" id="Zh5-lB-QDr"/>
+                        <constraint firstItem="Wyr-rD-lmL" firstAttribute="topMargin" secondItem="VBr-xc-W1q" secondAttribute="bottom" multiplier="0.11" constant="8.0400000000000063" id="aaJ-40-6nm"/>
+                        <constraint firstItem="L3x-Na-J8U" firstAttribute="height" secondItem="VBr-xc-W1q" secondAttribute="height" multiplier="0.11" id="jHu-TR-n99"/>
+                        <constraint firstItem="cC7-dm-GyP" firstAttribute="height" secondItem="VBr-xc-W1q" secondAttribute="height" multiplier="0.11" id="jWN-xy-Ib0"/>
+                        <constraint firstItem="lig-XY-NNh" firstAttribute="width" secondItem="VBr-xc-W1q" secondAttribute="width" multiplier="0.24" id="nfR-e6-UZH"/>
+                        <constraint firstItem="cC7-dm-GyP" firstAttribute="centerX" secondItem="VBr-xc-W1q" secondAttribute="leading" id="owC-96-0kH"/>
+                        <constraint firstItem="L3x-Na-J8U" firstAttribute="width" secondItem="VBr-xc-W1q" secondAttribute="width" multiplier="0.38" id="t4S-Te-1hR"/>
+                        <constraint firstItem="Wyr-rD-lmL" firstAttribute="height" secondItem="VBr-xc-W1q" secondAttribute="height" multiplier="0.11" id="yAK-xd-eHL"/>
+                        <constraint firstItem="Wyr-rD-lmL" firstAttribute="width" secondItem="VBr-xc-W1q" secondAttribute="width" multiplier="0.38" id="zKz-yc-E7N"/>
+                        <constraint firstItem="L3x-Na-J8U" firstAttribute="leading" secondItem="VBr-xc-W1q" secondAttribute="trailing" multiplier="0.67" id="zkV-xY-oBO"/>
+                    </constraints>
+                </view>
             </subviews>
             <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="0.0" colorSpace="custom" customColorSpace="displayP3"/>
             <constraints>
-                <constraint firstItem="Nhg-hz-FsP" firstAttribute="centerX" secondItem="iN0-l3-epB" secondAttribute="centerX" constant="-5.5" id="1T4-Tv-8Ps"/>
-                <constraint firstAttribute="trailing" secondItem="Oah-du-p03" secondAttribute="trailing" id="4cj-V7-p9C"/>
-                <constraint firstItem="Oah-du-p03" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" id="5Cj-Wf-lf3"/>
-                <constraint firstItem="Oah-du-p03" firstAttribute="centerY" secondItem="iN0-l3-epB" secondAttribute="centerY" id="CGo-GJ-qV5"/>
-                <constraint firstItem="Nhg-hz-FsP" firstAttribute="centerY" secondItem="iN0-l3-epB" secondAttribute="centerY" constant="-5.5" id="DnG-m9-3r4"/>
-                <constraint firstItem="Oah-du-p03" firstAttribute="centerX" secondItem="iN0-l3-epB" secondAttribute="centerX" id="x1O-WC-3dJ"/>
+                <constraint firstAttribute="trailing" secondItem="VBr-xc-W1q" secondAttribute="trailing" id="C6h-fR-hem"/>
+                <constraint firstItem="VBr-xc-W1q" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" id="P0i-AE-X3s"/>
+                <constraint firstAttribute="bottom" secondItem="VBr-xc-W1q" secondAttribute="bottom" id="qGl-kM-Fda"/>
+                <constraint firstItem="VBr-xc-W1q" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" id="tUh-PE-ZSw"/>
             </constraints>
             <nil key="simulatedStatusBarMetrics"/>
-            <point key="canvasLocation" x="403.5" y="444.5"/>
+            <point key="canvasLocation" x="401.25" y="443.75"/>
         </view>
     </objects>
     <resources>
-        <image name="LaunchScreen" width="116" height="130"/>
-        <image name="LaunchScreenBackground" width="375" height="667"/>
+        <image name="PsiphonLogo" width="156" height="156"/>
+        <image name="cloud" width="155" height="79"/>
     </resources>
 </document>

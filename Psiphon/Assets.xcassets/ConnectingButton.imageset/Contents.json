@@ -2,17 +2,17 @@
   "images" : [
     {
       "idiom" : "universal",
-      "filename" : "Connecting.png",
+      "filename" : "ConnectingButton.png",
       "scale" : "1x"
     },
     {
       "idiom" : "universal",
-      "filename" : "Connecting@2x.png",
+      "filename" : "ConnectingButton@2x.png",
       "scale" : "2x"
     },
     {
       "idiom" : "universal",
-      "filename" : "Connecting@3x.png",
+      "filename" : "ConnectingButton@3x.png",
       "scale" : "3x"
     }
   ],

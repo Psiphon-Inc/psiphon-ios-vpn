@@ -18,7 +18,6 @@
  */
 
 #import <Foundation/Foundation.h>
-#import <PureLayout/ALView+PureLayout.h>
 #import "IAPViewController.h"
 #import "AppDelegate.h"
 #import "IAPStoreHelper.h"

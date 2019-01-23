@@ -18,7 +18,7 @@
  */
 
 #import "IAPHelpViewController.h"
-#import "Logging.h"
+#import "UIFont+Additions.h"
 
 @interface IAPHelpViewController () <UITableViewDataSource, UITableViewDelegate>
 
@@ -29,6 +29,7 @@
 @implementation IAPHelpViewController {
     MBProgressHUD *buyProgressAlert;
     NSTimer *buyProgressAlertTimer;
+    NSMutableArray <CAGradientLayer*> *buttonGradients;
 }
 
 - (void)loadView {
@@ -45,10 +46,9 @@
     [super viewDidLoad];
 
     // Sets screen background and navigation bar colours.
-    self.view.backgroundColor = UIColor.charcoalGreyColor;
-    self.navigationController.navigationBar.barTintColor = UIColor.charcoalGreyColor;  // Navigation bar background color
-    self.navigationController.navigationBar.tintColor = UIColor.purpleButtonColor;  // Navigation bar items color
-    [self.navigationController.navigationBar setTitleTextAttributes:@{NSForegroundColorAttributeName: UIColor.whiteColor}];
+    self.view.backgroundColor = UIColor.whiteColor;
+    self.navigationController.navigationBar.tintColor = UIColor.lightishBlueTwo;  // Navigation bar items color
+    self.navigationController.navigationBar.titleTextAttributes = @{NSForegroundColorAttributeName:UIColor.offWhite, NSFontAttributeName:[UIFont avenirNextBold:18.f]};
 
     // Sets navigation bar title.
     self.title = NSLocalizedStringWithDefaultValue(@"RESTORE_SUBSCRIPTION_BUTTON", nil, [NSBundle mainBundle], @"Restore Subscription", @"Button which, when pressed, attempts to restore any existing subscriptions the user has purchased");
@@ -81,6 +81,15 @@
 
 }
 
+- (void)viewDidLayoutSubviews {
+    [super viewDidLayoutSubviews];
+    for (CAGradientLayer *buttonGradient in buttonGradients) {
+        if (buttonGradient.superlayer) {
+            buttonGradient.frame = buttonGradient.superlayer.bounds;
+        }
+    }
+}
+
 #pragma mark - Table view data source
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
@@ -104,29 +113,45 @@
     // Help label
     UILabel *label = [[UILabel alloc] initWithFrame:CGRectZero];
     label.numberOfLines = 0;
-    label.font = [label.font fontWithSize:15];
-    label.textColor = UIColor.whiteColor;
+    label.font = [UIFont avenirNextMedium:15.f];
+    label.textColor = UIColor.greyishBrown;
     label.text = helpDescription;
     label.textAlignment = NSTextAlignmentLeft;
     [cell.contentView addSubview:label];
 
     // Help button
     UIButton *button = [UIButton buttonWithType:UIButtonTypeRoundedRect];
-    button.backgroundColor = UIColor.purpleButtonColor;
-    button.layer.cornerRadius = 5.0;
+    button.backgroundColor = UIColor.lightishBlueTwo;
+    button.layer.cornerRadius = 8;
     button.layer.masksToBounds = FALSE;
     button.titleEdgeInsets = UIEdgeInsetsMake(0.0, 24.0, 0.0, 24.0);
     [button setTitle:buttonTitle forState:UIControlStateNormal];
     [button setTitleColor:UIColor.whiteColor forState:UIControlStateNormal];
+    button.titleLabel.font = [UIFont avenirNextDemiBold:button.titleLabel.font.pointSize];
     [button addTarget:self action:action forControlEvents:UIControlEventTouchUpInside];
     [cell.contentView addSubview:button];
+
+    // Add background gradient to button
+    CAGradientLayer *buttonGradient = [CAGradientLayer layer];
+    buttonGradient.colors = @[(id)UIColor.lightRoyalBlueTwo.CGColor, (id)UIColor.lightishBlue.CGColor];
+    buttonGradient.cornerRadius = button.layer.cornerRadius;
+    [button.layer insertSublayer:buttonGradient atIndex:0];
+
+    if (!buttonGradients) {
+        buttonGradients = [[NSMutableArray alloc] init];
+    }
+
+    [buttonGradients addObject:buttonGradient];
 
     // Help label constraints
     label.translatesAutoresizingMaskIntoConstraints = NO;
     [label.centerXAnchor constraintEqualToAnchor:cell.contentView.centerXAnchor].active = TRUE;
-    [label autoPinEdgeToSuperviewEdge:ALEdgeLeading withInset:16.0].active = TRUE;
-    [label autoPinEdgeToSuperviewEdge:ALEdgeTop withInset:16.0].active = TRUE;
-    [label autoPinEdgeToSuperviewEdge:ALEdgeTrailing withInset:16.0].active = TRUE;
+    [label.topAnchor constraintEqualToAnchor:cell.contentView.topAnchor
+                                    constant:16.f].active = TRUE;
+    [label.leadingAnchor constraintEqualToAnchor:cell.contentView.leadingAnchor
+                                        constant:16.f].active = TRUE;
+    [label.trailingAnchor constraintEqualToAnchor:cell.contentView.trailingAnchor
+                                         constant:-16.f].active = TRUE;
 
     // Help button constraints
     button.translatesAutoresizingMaskIntoConstraints = FALSE;
@@ -134,7 +159,9 @@
     [button.widthAnchor constraintEqualToConstant:250].active = TRUE;
     [button.heightAnchor constraintEqualToConstant:50].active = TRUE;
     [button.topAnchor constraintEqualToAnchor:label.bottomAnchor constant:16.0].active = TRUE;
-    [button autoPinEdgeToSuperviewEdge:ALEdgeBottom withInset:16.0].active = TRUE;
+
+    [button.bottomAnchor constraintEqualToAnchor:cell.contentView.bottomAnchor
+                                        constant:-16.f].active = TRUE;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {

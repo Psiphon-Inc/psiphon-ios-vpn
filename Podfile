@@ -19,9 +19,9 @@ target 'Psiphon' do
   pod 'MoPub-AdMob-Adapters'
   pod 'Google-Mobile-Ads-SDK', '~> 7.32.0'
   pod 'PersonalizedAdConsent'  # Google Mobile Ads Consent SDK
-  pod 'PureLayout', '3.0.2'
   pod 'MBProgressHUD', '~> 1.1.0'
   pod 'CustomIOSAlertView', '~> 0.9.5'
+  pod 'SVProgressHUD'
 end
 
 target 'PsiphonVPN' do
