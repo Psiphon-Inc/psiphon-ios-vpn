@@ -1,1 +1,14 @@
-tr: {app_name: Psiphon, subtitle: Sınırlar Ötesinde}
+tr:
+  app_name: Psiphon
+  subtitle: Sınırları Aşın
+  keywords: Psiphon, vekil sunucu
+  subscriptions:
+    weekly:
+      title: 1 haftalık Premium
+      description: Otomatik yenilenen abonelik
+    monthly:
+      title: 1 aylık Premium
+      description: Otomatik yenilenen abonelik
+    yearly:
+      title: 1 yıllık Premium
+      description: Otomatik yenilenen abonelik
