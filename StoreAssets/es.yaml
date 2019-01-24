@@ -1,6 +1,30 @@
 es:
   app_name: Psiphon
   subtitle: Cruzando fronteras
+  description: |
+    Luego de haber ayudado a decenas de millones de usuarios a tener acceso a las aplicaciones y sitios web que aman, ¡Psiphon ha lanzado su primera aplicación para iOS!, la cual integra coherentemente el acceso a la red Psiphon, conectándolo en forma segura a sus aplicaciones y sitios web.
+
+    No importa en dónde esté en el mundo, la aplicación Psiphon lo conectará a sus aplicaciones y sitios web favoritos. También lo proveerá con una capa de protección extra cuando esté usando servicios públicos de Wi-Fi, u otras redes que pueden ser no confiables.
+
+    Las características clave incluyen:
+    • Uso personal libre e ilimitado.
+    • Fácil de descargar, instalar y usar. No se requiere registro o configuración.
+    • Selección automática de protocolos para proveer acceso rápido y confiable, siempre.
+    • Soporte para múltiples lenguajes y ubicación del servidor configurable.
+
+    Acerca de las suscripciones:
+    • ¡Una suscripción remueve publicidades y le permite navegar Internet más rápido!
+    • Periodo de prueba gratuito por 3 días.
+    • Precios: 2,99 USD por una semana, 9,99 USD por un mes, o 99,99 USD por un año.
+    • El pago se cargará a su cuenta iTunes tras confirmación de la compra.
+    • La suscripciones se renuevan automáticamente a menos que se desactive auto-renovación por lo menos 24 horas antes del final del periodo actual.
+    • Su cuenta se cargará para la renovación dentro de las 24 horas previas al final del periodo actual, y se identificará el costo de la suscripción.
+    • No se permite la cancelación de la suscripción durante el periodo en que la misma está activa.
+    • Las suscripciones pueden ser gestionadas y la auto-renovación desactivada yendo a los Ajustes de Cuenta luego de la compra.
+    Cualquier porción no usada de un periodo de prueba gratuito se perderá cuando compre una suscripción.
+
+    Política de Privacidad: https://psiphon.ca/en/privacy.html
+    Condiciones de Uso: https://psiphon.ca/en/license.html
   keywords: Psiphon, proxy
   subscriptions:
     weekly:
@@ -12,27 +36,3 @@ es:
     yearly:
       title: Premium 1 año
       description: Suscripción auto-renovable
-  description: |
-    Tras ayudar a decenas de millones de usuarios a obtener acceso a las aplicaciones y sitios que aman, ¡Psiphon ha lanzado su primera app para iOS! Nuestra nueva app integra armónicamente el acceso a la red Psiphon, conectándole de forma segura a sus aplicaciones y sitios.
-
-    No importa en qué parte del mundo esté, la app de Psiphon le conectará a sus aplicaciones y sitios favoritos. La app también le proporciona una capa extra de protección al usar servicios Wi-Fi públicos u otras redes que podrían no ser de confianza.
-
-    Las características clave incluyen:
-    • Uso personal ilimitado y gratuito.
-    • Fácil descarga, instalación, y uso. No requiere registro o configuración.
-    • Selección automática de protocolos para proporcionar acceso rápido y fiable en todo momento.
-    • Soporte en varios idiomas y ubicación configurable del servidor.
-
-    Acerca de las suscripciones:
-    • ¡Una suscripción elimina la publicidad y le permite surfear Internet más rápido!
-    • Periodo de prueba gratuito de 3 días.
-    • Precios: 2,99 US$ para una semana, 9,99 US$ para un mes, o 99,99 US$ para un año.
-    • El importe se cargará en su cuenta de iTunes a la confirmación de la compra.
-    • Las suscripciones se renuevan automáticamente a menos que la auto-renovación esté desactivada al menos 24 horas antes del final del periodo de vigencia.
-    • Su cuenta será cargada para la renovación dentro de las 24 horas previas al final del periodo de vigencia, y se identificará el coste de la suscripción.
-    • No se permite cancelación alguna de una suscripción vigente durante el periodo activo de suscripción.
-    • Las suscripciones se pueden administrar y la auto-renovación se puede desactivar yendo a la Configuración de su cuenta tras la compra.
-    • Cualquier porción no usada del periodo de prueba gratuito se extinguirá cuando compre una suscripción
-
-    Política de privacidad: https://psiphon.ca/es/privacy.html
-    Condiciones de uso: https://psiphon.ca/es/license.html
