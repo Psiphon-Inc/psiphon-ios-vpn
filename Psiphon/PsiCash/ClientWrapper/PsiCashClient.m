@@ -38,10 +38,13 @@
 #import "SharedConstants.h"
 #import "NSError+Convenience.h"
 #import "VPNManager.h"
+#import "NSString+Additions.h"
 
 @interface PsiCashClient ()
 
 @property (nonatomic, readwrite) RACReplaySubject<PsiCashClientModel *> *clientModelSignal;
+
+@property (nonatomic, readwrite) RACBehaviorSubject<NSString *> *rewardedActivityDataSignal;
 
 @end
 
@@ -99,6 +102,8 @@ typedef NS_ERROR_ENUM(PsiCashClientRefreshStateErrorDomain, PsiCashClientRefresh
                                                 DISPATCH_QUEUE_SERIAL);
 
         _clientModelSignal = [RACReplaySubject replaySubjectWithCapacity:1];
+
+        _rewardedActivityDataSignal = [RACBehaviorSubject behaviorSubjectWithDefaultValue:nil];
 
         vpnManager = [VPNManager sharedInstance];
     }
@@ -647,8 +652,19 @@ typedef NS_ERROR_ENUM(PsiCashClientRefreshStateErrorDomain, PsiCashClientRefresh
 #pragma mark - Helpers
 
 - (void)commitModelStagingArea:(PsiCashClientModelStagingArea *)stagingArea {
+
     dispatch_async(dispatch_get_main_queue(), ^{
+
         [self.clientModelSignal sendNext:stagingArea.stagedModel];
+
+        // We take this opportunity to set the value of the custom data signal.
+        // To prevent unnecessary computation, custom data is checked for change.
+        NSString *_Nullable prvCustomData = [self.rewardedActivityDataSignal first];
+        NSString *_Nullable curCustomData = [self rewardedVideoCustomData];
+
+        if (![NSString stringsBothEqualOrNil:prvCustomData b:curCustomData]) {
+            [self.rewardedActivityDataSignal sendNext:curCustomData];
+        }
     });
     model = stagingArea.stagedModel;
 }
