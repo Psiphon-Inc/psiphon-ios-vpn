@@ -27,6 +27,12 @@
 
 @property (nonatomic, readonly) RACReplaySubject<PsiCashClientModel *> *clientModelSignal;
 
+/**
+ * Hot infinite stream of rewarded activity data package.
+ * Emits nil if no data has been set yet by the PsiCash library, otherwise emits the data package as a string.
+ */
+@property (nonatomic, readonly) RACBehaviorSubject<NSString *> *rewardedActivityDataSignal;
+
 + (instancetype)sharedInstance;
 
 #pragma mark - Data
