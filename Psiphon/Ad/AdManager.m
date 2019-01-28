@@ -566,29 +566,23 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
     NSInteger const AD_LOAD_RETRY_COUNT = 1;
     NSTimeInterval const MIN_AD_RELOAD_TIMER = 1.0;
 
-    // List of "trigger"s.
-    NSString * const TriggerPresentedAdDismissed = @"presentedAdDismissed";
-    NSString * const TriggerAppEvent = @"appEvent";
+    // "Trigger" signals.
+    NSString * const TriggerPresentedAdDismissed = @"TriggerPresentedAdDismissed";
+    NSString * const TriggerAppEvent = @"TriggerAppEvent";
 
-    // presentedAdDismissedWithAppEvent is hot infinite signal - emits tuple (TriggerPresentedAdDismissed, AppEvent*)
-    // whenever the ad from `adController` is dismissed and no longer presented.
-    RACSignal<RACTwoTuple<NSString*,AppEvent*>*> *presentedAdDismissedWithAppEvent =
-      [adController.presentedAdDismissed flattenMap:^RACSignal<AppEvent *> *(RACUnit *value) {
-        // Return the cached value of `appEvents`.
-        return [[self.appEvents.signal take:1] map:^RACTwoTuple<NSString*,AppEvent*>*(AppEvent *event) {
-            return [RACTwoTuple pack:TriggerPresentedAdDismissed :event];
-        }];
-    }];
+    RACSignal<NSString *> *triggers = [RACSignal merge:@[
+      [self.appEvents.signal mapReplace:TriggerAppEvent],
+      [adController.presentedAdDismissed mapReplace:TriggerPresentedAdDismissed],
+    ]];
 
-    // appEventWithSource is the same as `appEvents.signal`, mapped to the tuple (TriggerAppEvent, AppEvent*).
-    RACSignal<RACTwoTuple<NSString*,AppEvent*>*> *appEventWithSource =
-      [self.appEvents.signal map:^id(AppEvent *event) {
-        return [RACTwoTuple pack:TriggerAppEvent :event];
-    }];
+    RACSignal<RACTwoTuple<AdControllerTag, AppEventActionTuple *> *> *adLoadUnloadSignal =
+      [[[[[triggers withLatestFrom:self.appEvents.signal]
+      map:^AppEventActionTuple *(RACTwoTuple<NSString *, AppEvent *> *tuple) {
 
-    RACSignal<RACTwoTuple<AdControllerTag, AppEventActionTuple *> *> *adLoadUnloadSignal = [[[[[RACSignal
-      merge:@[presentedAdDismissedWithAppEvent, appEventWithSource]]
-      map:^AppEventActionTuple *(RACTwoTuple<NSString*,AppEvent*> *tuple) {
+          // In disambiguating the source of the event emission:
+          //  - If `triggerSignal` string below is "TriggerAppEvent", then
+          //    the source is defined in `event.source` below.
+          //  - Otherwise, the trigger signal is the source as defined in one of the Trigger_ constants above.
 
           NSString *triggerSignal = tuple.first;
           AppEvent *event = tuple.second;
