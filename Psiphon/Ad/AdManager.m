@@ -48,6 +48,7 @@
 #import <PersonalizedAdConsent/PersonalizedAdConsent.h>
 #import "AdMobConsent.h"
 #import "AppEvent.h"
+#import "PsiCashClient.h"
 
 
 NSErrorDomain const AdControllerWrapperErrorDomain = @"AdControllerWrapperErrorDomain";
@@ -406,19 +407,22 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
         [self.compoundDisposable addDisposable:[self subscribeToAdSignalForAd:self.untunneledInterstitial
                                                 withActionLoadDelayedInterval:5.0
                                                         withLoadInTunnelState:TunnelStateUntunneled
-                                                      reloadAdAfterPresenting:AdLoadActionDelayed]];
+                                                      reloadAdAfterPresenting:AdLoadActionDelayed
+                                        andWaitForPsiCashRewardedActivityData:FALSE]];
 
         // Untunneled rewarded video
         [self.compoundDisposable addDisposable:[self subscribeToAdSignalForAd:self.untunneledRewardVideo
                                                 withActionLoadDelayedInterval:1.0
                                                         withLoadInTunnelState:TunnelStateUntunneled
-                                                      reloadAdAfterPresenting:AdLoadActionImmediate]];
+                                                      reloadAdAfterPresenting:AdLoadActionImmediate
+                                        andWaitForPsiCashRewardedActivityData:TRUE]];
 
         // Tunneled rewarded video
         [self.compoundDisposable addDisposable:[self subscribeToAdSignalForAd:self.tunneledRewardVideo
                                                 withActionLoadDelayedInterval:1.0
                                                         withLoadInTunnelState:TunnelStateTunneled
-                                                      reloadAdAfterPresenting:AdLoadActionImmediate]];
+                                                      reloadAdAfterPresenting:AdLoadActionImmediate
+                                        andWaitForPsiCashRewardedActivityData:TRUE]];
     }
 
     // Ad presentation signals:
@@ -507,11 +511,9 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
     return [self presentAdHelper:^RACSignal<NSNumber *> *(TunnelState tunnelState) {
         switch (tunnelState) {
             case TunnelStateTunneled:
-                return [self.tunneledRewardVideo presentAdFromViewController:viewController
-                                                              withCustomData:customData];
+                return [self.tunneledRewardVideo presentAdFromViewController:viewController];
             case TunnelStateUntunneled:
-                return [self.untunneledRewardVideo presentAdFromViewController:viewController
-                                                                withCustomData:customData];
+                return [self.untunneledRewardVideo presentAdFromViewController:viewController];
             case TunnelStateNeither:
                 return [RACSignal empty];
 
@@ -555,7 +557,8 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
 - (RACDisposable *)subscribeToAdSignalForAd:(id <AdControllerWrapperProtocol>)adController
               withActionLoadDelayedInterval:(NSTimeInterval)delayedAdLoadDelay
                       withLoadInTunnelState:(TunnelState)loadTunnelState
-                    reloadAdAfterPresenting:(AdLoadAction)afterPresentationLoadAction {
+                    reloadAdAfterPresenting:(AdLoadAction)afterPresentationLoadAction
+      andWaitForPsiCashRewardedActivityData:(BOOL)waitForPsiCashRewardedActivityData {
 
     PSIAssert(loadTunnelState != TunnelStateNeither);
 
@@ -569,11 +572,18 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
     // "Trigger" signals.
     NSString * const TriggerPresentedAdDismissed = @"TriggerPresentedAdDismissed";
     NSString * const TriggerAppEvent = @"TriggerAppEvent";
+    NSString * const TriggerPsiCashRewardedActivityDataUpdated = @"TriggerPsiCashRewardedActivityDataUpdated";
 
     RACSignal<NSString *> *triggers = [RACSignal merge:@[
       [self.appEvents.signal mapReplace:TriggerAppEvent],
       [adController.presentedAdDismissed mapReplace:TriggerPresentedAdDismissed],
     ]];
+
+    if (waitForPsiCashRewardedActivityData) {
+       triggers = [triggers merge:[[PsiCashClient sharedInstance].rewardedActivityDataSignal
+                                    mapReplace:TriggerPsiCashRewardedActivityDataUpdated]];
+    }
+
 
     RACSignal<RACTwoTuple<AdControllerTag, AppEventActionTuple *> *> *adLoadUnloadSignal =
       [[[[[triggers withLatestFrom:self.appEvents.signal]
@@ -615,6 +625,16 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
 
               // If the current tunnel state is the same as the ads required tunnel state, then load ad.
               if (event.tunnelState == loadTunnelState && !adController.ready) {
+
+                  // Take no loading action if custom data is missing.
+                  if (waitForPsiCashRewardedActivityData) {
+                      NSString *_Nullable customData = [[PsiCashClient sharedInstance]
+                                                         rewardedVideoCustomData];
+                      if (!customData) {
+                          sa.action = AdLoadActionNone;
+                          return sa;
+                      }
+                  }
 
                   if ([TriggerPresentedAdDismissed isEqualToString:triggerSignal]) {
                       // The user has just finished viewing the ad.
@@ -699,17 +719,28 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
                                                             @"tag": v.tag,
                                                             @"NSError": [PsiFeedbackLogger unpackError:error]}];
                               return @"retryOther";
+
+                          } else if (AdControllerWrapperErrorCustomDataNotSet == error.code) {
+                              [PsiFeedbackLogger errorWithType:AdManagerLogType
+                                                          json:@{@"event": @"customDataNotSet",
+                                                            @"tag": v.tag,
+                                                            @"NSError": [PsiFeedbackLogger unpackError:error]}];
+                              return @"doNotRetry";
                           }
                       }
                       return @"otherError";
                   }]
                   flattenMap:^RACSignal *(RACGroupedSignal *groupedErrors) {
                       NSString *groupKey = (NSString *) groupedErrors.key;
-                      
-                      if ([@"retryForever" isEqualToString:groupKey]) {
+
+                      if ([@"doNotRetry" isEqualToString:groupKey]) {
+                        return [RACSignal empty];
+
+                      } else if ([@"retryForever" isEqualToString:groupKey]) {
                           return [groupedErrors flattenMap:^RACSignal *(id x) {
                               return [RACSignal timer:MIN_AD_RELOAD_TIMER];
                           }];
+
                       } else {
                           return [[groupedErrors zipWith:[RACSignal rangeStartFrom:0 count:(AD_LOAD_RETRY_COUNT+1)]]
                             flattenMap:^RACSignal *(RACTwoTuple *value) {
