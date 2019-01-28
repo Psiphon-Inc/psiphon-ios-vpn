@@ -47,6 +47,7 @@
 #import "AdMobRewardedAdControllerWrapper.h"
 #import <PersonalizedAdConsent/PersonalizedAdConsent.h>
 #import "AdMobConsent.h"
+#import "AppEvent.h"
 
 
 NSErrorDomain const AdControllerWrapperErrorDomain = @"AdControllerWrapperErrorDomain";
@@ -66,88 +67,6 @@ NSString * const MoPubTunneledRewardVideoAdUnitID    = @"b9440504384740a2a3913a3
 AdControllerTag const AdControllerTagUntunneledInterstitial = @"UntunneledInterstitial";
 AdControllerTag const AdControllerTagUntunneledRewardedVideo = @"UntunneledRewardedVideo";
 AdControllerTag const AdControllerTagTunneledRewardedVideo = @"TunneledRewardedVideo";
-
-#pragma mark - App event type
-
-typedef NS_ENUM(NSInteger, TunnelState) {
-    TunnelStateTunneled = 1,
-    TunnelStateUntunneled,
-    TunnelStateNeither
-};
-
-typedef NS_ENUM(NSInteger, SourceEvent) {
-    SourceEventStarted = 101,
-    SourceEventAppForegrounded = 102,
-    SourceEventSubscription = 103,
-    SourceEventTunneled = 104,
-    SourceEventReachability = 105
-};
-
-@interface AppEvent : NSObject
-// AppEvent source
-@property (nonatomic, readwrite) SourceEvent source;
-
-// AppEvent states
-@property (nonatomic, readwrite) BOOL networkIsReachable;
-@property (nonatomic, readwrite) BOOL subscriptionIsActive;
-@property (nonatomic, readwrite) TunnelState tunnelState;
-@end
-
-@implementation AppEvent
-
-// Two app events are equal only if all properties except the `source` are equal.
-- (BOOL)isEqual:(AppEvent *)other {
-    if (other == self)
-        return TRUE;
-    if (!other || ![[other class] isEqual:[self class]])
-        return FALSE;
-    return (self.networkIsReachable == other.networkIsReachable &&
-            self.subscriptionIsActive == other.subscriptionIsActive &&
-            self.tunnelState == other.tunnelState);
-}
-
-- (NSString *)debugDescription {
-
-    NSString *sourceText;
-    switch (self.source) {
-        case SourceEventAppForegrounded:
-            sourceText = @"SourceEventAppForegrounded";
-            break;
-        case SourceEventSubscription:
-            sourceText = @"SourceEventSubscription";
-            break;
-        case SourceEventTunneled:
-            sourceText = @"SourceEventTunneled";
-            break;
-        case SourceEventStarted:
-            sourceText = @"SourceEventStarted";
-            break;
-        case SourceEventReachability:
-            sourceText = @"SourceEventReachability";
-            break;
-        default: abort();
-    }
-
-    NSString *tunnelStateText;
-    switch (self.tunnelState) {
-        case TunnelStateTunneled:
-            tunnelStateText = @"TunnelStateTunneled";
-            break;
-        case TunnelStateUntunneled:
-            tunnelStateText = @"TunnelStateUntunneled";
-            break;
-        case TunnelStateNeither:
-            tunnelStateText = @"TunnelStateNeither";
-            break;
-        default: abort();
-    }
-
-    return [NSString stringWithFormat:@"<AppEvent source=%@ networkIsReachable=%@ subscriptionIsActive=%@ "
-                                       "tunnelState=%@>", sourceText, NSStringFromBOOL(self.networkIsReachable),
-        NSStringFromBOOL(self.subscriptionIsActive), tunnelStateText];
-}
-
-@end
 
 #pragma mark - SourceAction type
 
