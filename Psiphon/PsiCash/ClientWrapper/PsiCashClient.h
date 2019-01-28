@@ -39,7 +39,10 @@
 
 - (NSURL*)modifiedHomePageURL:(NSURL*)url;
 
-- (NSString*)rewardedVideoCustomData;
+/**
+ * Emits nil if rewarded video activity data package is missing.
+ */
+- (NSString *_Nullable)rewardedVideoCustomData;
 
 - (NSString*)logForFeedback;
 
