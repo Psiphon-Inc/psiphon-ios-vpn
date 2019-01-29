@@ -1217,18 +1217,23 @@ NSString * const CommandStopVPN = @"StopVPN";
                     break;
                 case AdPresentationErrorCustomDataNotSet:
                     LOG_DEBUG(@"rewarded video AdPresentationErrorCustomDataNotSet");
+                    [PsiFeedbackLogger errorWithType:RewardedVideoLogType
+                                             message:@"AdPresentationErrorCustomDataNotSet"];
                     break;
                 case AdPresentationErrorInappropriateState:
                     LOG_DEBUG(@"rewarded video AdPresentationErrorInappropriateState");
-                    [PsiFeedbackLogger errorWithType:RewardedVideoLogType message:@"AdPresentationErrorInappropriateState"];
+                    [PsiFeedbackLogger errorWithType:RewardedVideoLogType
+                                             message:@"AdPresentationErrorInappropriateState"];
                     break;
                 case AdPresentationErrorNoAdsLoaded:
                     LOG_DEBUG(@"rewarded video AdPresentationErrorNoAdsLoaded");
-                    [PsiFeedbackLogger errorWithType:RewardedVideoLogType message:@"AdPresentationErrorNoAdsLoaded"];
+                    [PsiFeedbackLogger errorWithType:RewardedVideoLogType
+                                             message:@"AdPresentationErrorNoAdsLoaded"];
                     break;
                 case AdPresentationErrorFailedToPlay:
                     LOG_DEBUG(@"rewarded video AdPresentationErrorFailedToPlay");
-                    [PsiFeedbackLogger errorWithType:RewardedVideoLogType message:@"AdPresentationErrorFailedToPlay"];
+                    [PsiFeedbackLogger errorWithType:RewardedVideoLogType
+                                             message:@"AdPresentationErrorFailedToPlay"];
                     break;
             }
         }]
