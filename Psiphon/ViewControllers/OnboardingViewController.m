@@ -98,7 +98,7 @@ const int NumPages = 4;
 
     // Next button
     {
-        nextPageButton = [UIButton buttonWithType:UIButtonTypeCustom];
+        nextPageButton = [UIButton buttonWithType:UIButtonTypeSystem];
         CGFloat p = 20.f; // Margin around the next button.
         nextPageButton.contentEdgeInsets = UIEdgeInsetsMake(p, 2.f * p, p, p);
 

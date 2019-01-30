@@ -91,7 +91,7 @@
 }
 
 + (NSString *)onboardingBeyondBordersBodyText {
-    return  NSLocalizedStringWithDefaultValue(@"ONBOARDING_BEYOND_BORDERS_BODY", nil, [NSBundle mainBundle], @"Censored by your country, corporation, or campus? Psiphon is uniquely suited to help you get to the content you want, whenever and wherever you want it.", @"Onboarding screen text. (Do not translate 'Psiphon').");
+    return  NSLocalizedStringWithDefaultValue(@"ONBOARDING_BEYOND_BORDERS_BODY_2", nil, [NSBundle mainBundle], @"Psiphon connects you to the content you want, no matter where you are.", @"Onboarding screen text. (Do not translate 'Psiphon').");
 }
 
 + (NSString *)onboardingGettingStartedHeaderText {
@@ -99,7 +99,7 @@
 }
 
 + (NSString *)onboardingGettingStartedBodyText {
-    return  NSLocalizedStringWithDefaultValue(@"ONBOARDING_GETTING_STARTED_BODY", nil, [NSBundle mainBundle], @"Psiphon uses VPN technology to provide you with uncensored access to internet content. You’ll need to allow Psiphon to add VPN configurations to your phone in order to connect with a safe path to the internet.", @"Onboarding screen 'getting started' body.");
+    return  NSLocalizedStringWithDefaultValue(@"ONBOARDING_GETTING_STARTED_BODY_2", nil, [NSBundle mainBundle], @"In order to connect, Psiphon needs the ability to add VPN configurations.", @"Onboarding screen 'getting started' body. (Do not translate 'Psiphon').");
 }
 
 + (NSString *)vpnInstallGuideText {
