@@ -155,6 +155,8 @@ NS_ASSUME_NONNULL_BEGIN
  * Combines the emission from receiving signal with the latest emission from provided `signal`.
  * Emissions from the receiving signal are dropped as long as `signal` has not emitted any values.
  *
+ * Receiving signal is the active signal, and `signal` is the passive signal.
+ *
  * @note This operator subscribes to `signal` first before subscribing to the receiving signal.
  */
 - (RACSignal<RACTwoTuple<ValueType, id> *> *)withLatestFrom:(RACSignal *)signal;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, Psiphon Inc.
+ * Copyright (c) 2019, Psiphon Inc.
  * All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,15 +18,32 @@
  */
 
 #import <Foundation/Foundation.h>
-#import <mopub-ios-sdk/MoPub.h>
-#import <mopub-ios-sdk/MPRewardedVideo.h>
-#import "AdManager.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface MoPubRewardedAdControllerWrapper : NSObject <AdControllerWrapperProtocol>
+typedef NS_ENUM(NSInteger, TunnelState) {
+    TunnelStateTunneled = 1,
+    TunnelStateUntunneled,
+    TunnelStateNeither
+};
 
-- (instancetype)initWithAdUnitID:(NSString *)adUnitID withTag:(AdControllerTag)tag;
+typedef NS_ENUM(NSInteger, SourceEvent) {
+    SourceEventStarted = 101,
+    SourceEventAppForegrounded = 102,
+    SourceEventSubscription = 103,
+    SourceEventTunneled = 104,
+    SourceEventReachability = 105
+};
+
+@interface AppEvent : NSObject
+
+// AppEvent source
+@property (nonatomic, readwrite) SourceEvent source;
+
+// AppEvent states
+@property (nonatomic, readwrite) BOOL networkIsReachable;
+@property (nonatomic, readwrite) BOOL subscriptionIsActive;
+@property (nonatomic, readwrite) TunnelState tunnelState;
 
 @end
 
