@@ -14,10 +14,10 @@ target 'Psiphon' do
   pod 'PsiphonClientCommonLibrary', :git => "https://github.com/Psiphon-Inc/psiphon-ios-client-common-library.git", :commit => '2e53a34'
   #pod "PsiphonClientCommonLibrary", :path => "../psiphon-ios-client-common-library"
 
-  pod 'ReactiveObjC', :git => "https://github.com/Psiphon-Inc/ReactiveObjC.git", :commit => '97d6af3'
-  pod 'mopub-ios-sdk', '~> 5.2.0'
-  pod 'MoPub-AdMob-Adapters'
-  pod 'Google-Mobile-Ads-SDK', '~> 7.32.0'
+  pod 'ReactiveObjC', :git => "https://github.com/Psiphon-Inc/ReactiveObjC.git", :commit => '8bbf9dd'
+  pod 'mopub-ios-sdk', '~> 5.4'
+  pod 'MoPub-AdMob-Adapters', '~> 7.37'
+  pod 'Google-Mobile-Ads-SDK', '~> 7.37'
   pod 'PersonalizedAdConsent'  # Google Mobile Ads Consent SDK
   pod 'MBProgressHUD', '~> 1.1.0'
   pod 'CustomIOSAlertView', '~> 0.9.5'
@@ -28,6 +28,6 @@ target 'PsiphonVPN' do
   # Comment the next line if you're not using Swift and don't want to use dynamic frameworks
   #use_frameworks!
 
-  pod 'ReactiveObjC', :git => "https://github.com/Psiphon-Inc/ReactiveObjC.git", :commit => '97d6af3'
+  pod 'ReactiveObjC', :git => "https://github.com/Psiphon-Inc/ReactiveObjC.git", :commit => '8bbf9dd'
 
 end

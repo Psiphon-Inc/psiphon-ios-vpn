@@ -26,9 +26,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (instancetype)initWithAdUnitID:(NSString *)adUnitID withTag:(AdControllerTag)tag;
 
-- (RACSignal<NSNumber *> *)presentAdFromViewController:(UIViewController *)viewController
-                                        withCustomData:(NSString *_Nullable)customData;
-
 @end
 
 NS_ASSUME_NONNULL_END

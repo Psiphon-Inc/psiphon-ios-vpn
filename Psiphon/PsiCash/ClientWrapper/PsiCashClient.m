@@ -38,15 +38,18 @@
 #import "SharedConstants.h"
 #import "NSError+Convenience.h"
 #import "VPNManager.h"
+#import "NSString+Additions.h"
 
 @interface PsiCashClient ()
 
 @property (nonatomic, readwrite) RACReplaySubject<PsiCashClientModel *> *clientModelSignal;
 
+@property (nonatomic, readwrite) RACBehaviorSubject<NSString *> *rewardedActivityDataSignal;
+
 @end
 
-NSErrorDomain _Nonnull const PsiCashClientLibraryErrorDomain = @"PsiCashClientLibraryErrorDomain";
-NSErrorDomain _Nonnull const PsiCashClientRefreshStateErrorDomain = @"PsiCashClientRefreshStateErrorDomain";
+NSErrorDomain const PsiCashClientLibraryErrorDomain = @"PsiCashClientLibraryErrorDomain";
+NSErrorDomain const PsiCashClientRefreshStateErrorDomain = @"PsiCashClientRefreshStateErrorDomain";
 
 typedef NS_ERROR_ENUM(PsiCashClientRefreshStateErrorDomain, PsiCashClientRefreshStateErrorCode) {
     PsiCashClientRefreshStateErrorSuccessButPredicateFalse = -1,
@@ -95,9 +98,12 @@ typedef NS_ERROR_ENUM(PsiCashClientRefreshStateErrorDomain, PsiCashClientRefresh
             [logger logEvent:@"PurchasesExpired" includingDiagnosticInfo:YES];
         }
 
-        completionQueue = dispatch_queue_create("com.psiphon3.PsiCashClient.CompletionQueue", DISPATCH_QUEUE_SERIAL);
+        completionQueue = dispatch_queue_create("com.psiphon3.PsiCashClient.CompletionQueue",
+                                                DISPATCH_QUEUE_SERIAL);
 
         _clientModelSignal = [RACReplaySubject replaySubjectWithCapacity:1];
+
+        _rewardedActivityDataSignal = [RACBehaviorSubject behaviorSubjectWithDefaultValue:nil];
 
         vpnManager = [VPNManager sharedInstance];
     }
@@ -116,10 +122,14 @@ typedef NS_ERROR_ENUM(PsiCashClientRefreshStateErrorDomain, PsiCashClientRefresh
                                   VPNStatus s = (VPNStatus) [statusObject integerValue];
 
                                   if (s == VPNStatusConnected) {
-                                      [weakSelf refreshStateRemote]; // refresh state from server with lib
+                                      // refresh state from server with lib
+                                      [weakSelf refreshStateRemote];
                                   } else {
-                                      [refreshDisposable dispose]; // cancel the request in flight
-                                      [weakSelf refreshStateLocal]; // refresh state locally from lib
+                                      // cancel the request in flight
+                                      [refreshDisposable dispose];
+
+                                       // refresh state locally from lib
+                                      [weakSelf refreshStateLocal];
                                   }
                               }];
 }
@@ -134,19 +144,24 @@ typedef NS_ERROR_ENUM(PsiCashClientRefreshStateErrorDomain, PsiCashClientRefresh
 }
 
 - (PsiCashClientModelStagingArea*)stagingAreaFromLib {
-    PsiCashClientModelStagingArea *stagingArea = [[PsiCashClientModelStagingArea alloc] initWithModel:model];
+    PsiCashClientModelStagingArea *stagingArea = [[PsiCashClientModelStagingArea alloc]
+      initWithModel:model];
+
     [stagingArea updateRefreshPending:NO];
     [stagingArea updateBalance:psiCash.balance];
     [stagingArea updateActivePurchases:[self activePurchases]];
 
     if (psiCash.validTokenTypes) {
-        [stagingArea updateAuthPackage:[[PsiCashAuthPackage alloc] initWithValidTokens:psiCash.validTokenTypes]];
+        [stagingArea updateAuthPackage:[[PsiCashAuthPackage alloc]
+          initWithValidTokens:psiCash.validTokenTypes]];
     } else {
         [stagingArea updateAuthPackage:[[PsiCashAuthPackage alloc] init]];
     }
 
     if (psiCash.purchasePrices) {
-        [stagingArea updateSpeedBoostProduct:[self speedBoostProductFromPurchasePrices:psiCash.purchasePrices withTargetProducts:[self targetProducts]]];
+        [stagingArea updateSpeedBoostProduct:
+                       [self speedBoostProductFromPurchasePrices:psiCash.purchasePrices
+                                              withTargetProducts:[self targetProducts]]];
     }
 
     return stagingArea;
@@ -181,10 +196,14 @@ typedef NS_ERROR_ENUM(PsiCashClientRefreshStateErrorDomain, PsiCashClientRefresh
     };
 
     [refreshDisposable dispose];
-    refreshDisposable = [self refreshStateWithMaxRetries:networkRetryCount andTimeBetweenRetries:nextRetryTime andPredicate:predicate andTagForLogging:@"RefreshState"];
+    refreshDisposable = [self refreshStateWithMaxRetries:networkRetryCount
+                                   andTimeBetweenRetries:nextRetryTime
+                                            andPredicate:predicate
+                                        andTagForLogging:@"RefreshState"];
 }
 
-- (void)pollForBalanceDeltaWithMaxRetries:(int)maxRetries andTimeBetweenRetries:(NSTimeInterval)timeBetweenRetries {
+- (void)pollForBalanceDeltaWithMaxRetries:(int)maxRetries
+                    andTimeBetweenRetries:(NSTimeInterval)timeBetweenRetries {
 
     NSNumber *startingBalance = [psiCash.balance copy];
 
@@ -197,19 +216,23 @@ typedef NS_ERROR_ENUM(PsiCashClientRefreshStateErrorDomain, PsiCashClientRefresh
     };
 
     [pollForBalanceDeltaDisposable dispose];
-    pollForBalanceDeltaDisposable = [self refreshStateWithMaxRetries:maxRetries andTimeBetweenRetries:nextRetryTime andPredicate:predicate andTagForLogging:@"PollForBalanceDelta"];
+    pollForBalanceDeltaDisposable = [self refreshStateWithMaxRetries:maxRetries
+                                               andTimeBetweenRetries:nextRetryTime
+                                                        andPredicate:predicate
+                                                    andTagForLogging:@"PollForBalanceDelta"];
 }
 
 - (RACDisposable*)refreshStateWithMaxRetries:(int)maxRetries
                        andTimeBetweenRetries:(NSTimeInterval (^)(long))timeBetweenRetries
                                 andPredicate:(BOOL (^)(void))predicate
                             andTagForLogging:(NSString*)tag {
+
     [logger logEvent:[tag stringByAppendingString:@"Started"] includingDiagnosticInfo:YES];
     [self setDynamicRequestMetadata];
 
     RACSignal *refresh = [[[[[self refreshStateFromServer]
         startWith:[PsiCashRefreshResultModel inProgress]]
-        flattenMap:^__kindof RACSignal * _Nullable(PsiCashRefreshResultModel * _Nullable r) {
+        flattenMap:^RACSignal *(PsiCashRefreshResultModel * _Nullable r) {
 
             if (r.inProgress) {
                 PsiCashClientModelStagingArea *stagingArea = [self stagingAreaFromLib];
@@ -224,10 +247,14 @@ typedef NS_ERROR_ENUM(PsiCashClientRefreshStateErrorDomain, PsiCashClientRefresh
             if (predicate()) {
                 return [RACSignal return:[RACUnit defaultUnit]];
             } else {
-                return [RACSignal error:[NSError errorWithDomain:PsiCashClientRefreshStateErrorDomain code:PsiCashClientRefreshStateErrorSuccessButPredicateFalse andLocalizedDescription:@"PredicateFalse"]];
+                NSError *err = [NSError errorWithDomain:PsiCashClientRefreshStateErrorDomain
+                                         code:PsiCashClientRefreshStateErrorSuccessButPredicateFalse
+                      andLocalizedDescription:@"PredicateFalse"];
+
+                return [RACSignal error:err];
             }
         }]
-        retryWhen:^RACSignal * _Nonnull(RACSignal * _Nonnull errors) {
+        retryWhen:^RACSignal *(RACSignal *_Nonnull errors) {
             return [[errors
                 zipWith:[RACSignal rangeStartFrom:1 count:maxRetries]]
                 flattenMap:^RACSignal *(RACTwoTuple<NSError *, NSNumber *> *retryCountTuple) {
@@ -241,7 +268,7 @@ typedef NS_ERROR_ENUM(PsiCashClientRefreshStateErrorDomain, PsiCashClientRefresh
                 return [RACSignal timer:timeBetweenRetries([retryCountTuple.second integerValue])];
             }];
         }]
-        catch:^RACSignal * _Nonnull(NSError * _Nonnull error) {
+        catch:^RACSignal *(NSError *_Nonnull error) {
             // Else re-emit the error.
             return [RACSignal error:error];
     }];
@@ -253,7 +280,10 @@ typedef NS_ERROR_ENUM(PsiCashClientRefreshStateErrorDomain, PsiCashClientRefresh
         [stagingArea updateRefreshPending:NO];
         [self commitModelStagingArea:stagingArea];
 
-        [logger logErrorEvent:[tag stringByAppendingString:@"Failed"] withError:error includingDiagnosticInfo:NO];
+        [logger logErrorEvent:[tag stringByAppendingString:@"Failed"]
+                        withError:error
+          includingDiagnosticInfo:NO];
+
         [self displayAlertWithMessage:NSLocalizedStringWithDefaultValue(@"PSICASH_REFRESH_STATE_FAILED_MESSAGE_TEXT", nil, [NSBundle mainBundle], @"Failed to update PsiCash state", @"Alert error message informing user that the app failed to retrieve their PsiCash information from the server. Note: 'PsiCash' should not be translated or transliterated.")];
     } completed:^{
         [logger logEvent:[tag stringByAppendingString:@"Completed"] includingDiagnosticInfo:YES];
@@ -263,8 +293,12 @@ typedef NS_ERROR_ENUM(PsiCashClientRefreshStateErrorDomain, PsiCashClientRefresh
 }
 
 - (RACSignal<PsiCashRefreshResultModel*>*)refreshStateFromServer {
+
     return [RACSignal createSignal:^RACDisposable *(id<RACSubscriber>  _Nonnull subscriber) {
-        [psiCash refreshState:@[[PsiCashSpeedBoostProduct purchaseClass]] withCompletion:^(PsiCashStatus status, NSError * _Nullable error) {
+
+        [psiCash refreshState:@[[PsiCashSpeedBoostProduct purchaseClass]]
+               withCompletion:^(PsiCashStatus status, NSError * _Nullable error) {
+
                 if (error != nil) {
                     // If error non-nil, the request failed utterly and no other params are valid.
                     dispatch_async(self->completionQueue, ^{
@@ -278,13 +312,27 @@ typedef NS_ERROR_ENUM(PsiCashClientRefreshStateErrorDomain, PsiCashClientRefresh
                 } else {
                     NSError *e;
                     if (status == PsiCashStatus_ServerError) {
-                        e = [NSError errorWithDomain:PsiCashClientLibraryErrorDomain code:status andLocalizedDescription:@"Server error"];
+                        e = [NSError errorWithDomain:PsiCashClientLibraryErrorDomain
+                                                code:status
+                             andLocalizedDescription:@"Server error"];
+
                     } else if (status == PsiCashStatus_Invalid) {
-                        e = [NSError errorWithDomain:PsiCashClientLibraryErrorDomain code:status andLocalizedDescription:@"Invalid response"];
+                        e = [NSError errorWithDomain:PsiCashClientLibraryErrorDomain
+                                                code:status
+                             andLocalizedDescription:@"Invalid response"];
+
                     } else if (status == PsiCashStatus_InvalidTokens) {
-                        e = [NSError errorWithDomain:PsiCashClientLibraryErrorDomain code:status andLocalizedDescription:@"Invalid Tokens: the app has entered an invalid state. Please reinstall the app to continue using PsiCash."];
+                        e = [NSError errorWithDomain:PsiCashClientLibraryErrorDomain
+                                                code:status
+                             andLocalizedDescription:@"Invalid Tokens: the app has entered an"
+                                                     " invalid state. Please reinstall the app"
+                                                     " to continue using PsiCash."];
+
                     } else {
-                        e = [NSError errorWithDomain:PsiCashClientLibraryErrorDomain code:status andLocalizedDescription:@"Invalid or unexpected status code returned from PsiCash library"];
+                        e = [NSError errorWithDomain:PsiCashClientLibraryErrorDomain
+                                                code:status
+                             andLocalizedDescription:@"Invalid or unexpected status code returned"
+                                                     " from PsiCash library"];
                     }
                     dispatch_async(self->completionQueue, ^{
                         [subscriber sendError:e];
@@ -303,11 +351,14 @@ typedef NS_ERROR_ENUM(PsiCashClientRefreshStateErrorDomain, PsiCashClientRefresh
 
     [purchaseDisposable dispose];
 
-    RACSignal *makePurchase = [[self makeExpiringPurchaseTransactionForClass:[PsiCashSpeedBoostProduct purchaseClass]
-                                                            andDistinguisher:sku.distinguisher
-                                                           withExpectedPrice:sku.price] startWith:[PsiCashMakePurchaseResultModel inProgress]];
+    RACSignal *makePurchase = [
+      [self makeExpiringPurchaseTransactionForClass:[PsiCashSpeedBoostProduct purchaseClass]
+                                   andDistinguisher:sku.distinguisher
+                                  withExpectedPrice:sku.price]
+            startWith:[PsiCashMakePurchaseResultModel inProgress]];
 
-    purchaseDisposable = [makePurchase subscribeNext:^(PsiCashMakePurchaseResultModel *_Nullable result) {
+    purchaseDisposable = [makePurchase
+      subscribeNext:^(PsiCashMakePurchaseResultModel *_Nullable result) {
 
         if (result.inProgress) {
 
@@ -325,16 +376,26 @@ typedef NS_ERROR_ENUM(PsiCashClientRefreshStateErrorDomain, PsiCashClientRefresh
 
                 // Validate the new authorization
 
-                Authorization *authorization = [[Authorization alloc] initWithEncodedAuthorization:result.purchase.authorization];
+                Authorization *authorization = [[Authorization alloc]
+                  initWithEncodedAuthorization:result.purchase.authorization];
                 NSError *e = nil;
 
                 if (authorization == nil) {
-                    e = [NSError errorWithDomain:PsiCashClientLibraryErrorDomain code:result.status andLocalizedDescription:@"Got nil auth token from PsiCash library"];
+                    e = [NSError errorWithDomain:PsiCashClientLibraryErrorDomain
+                                            code:result.status
+                         andLocalizedDescription:@"Got nil auth token from PsiCash library"];
                 }
 
-                if (![authorization.accessType isEqualToString:[PsiCashSpeedBoostProduct purchaseClass]] ) {
-                    NSString *s = [NSString stringWithFormat:@"Got auth token from PsiCash library with wrong purchase class of %@", authorization.accessType];
-                    e = [NSError errorWithDomain:PsiCashClientLibraryErrorDomain code:result.status andLocalizedDescription:s];
+                if (![authorization.accessType
+                       isEqualToString:[PsiCashSpeedBoostProduct purchaseClass]]) {
+
+                    NSString *s = [NSString stringWithFormat:@"Got auth token from PsiCash library"
+                                                             " with wrong purchase class of %@",
+                                                             authorization.accessType];
+
+                    e = [NSError errorWithDomain:PsiCashClientLibraryErrorDomain
+                                            code:result.status
+                         andLocalizedDescription:s];
                 }
 
                 [self updateContainerAuthTokens];
@@ -346,31 +407,42 @@ typedef NS_ERROR_ENUM(PsiCashClientRefreshStateErrorDomain, PsiCashClientRefresh
                 [[Notifier sharedInstance] post:NotifierUpdatedAuthorizations];
 
                 if (e != nil) {
-                    [logger logErrorEvent:@"PurchaseResultInvalid" withError:e includingDiagnosticInfo:NO];
+                    [logger logErrorEvent:@"PurchaseResultInvalid"
+                                    withError:e
+                      includingDiagnosticInfo:NO];
                 }
 
             } else {
 
                 NSError *e = nil;
                 if (result.status == PsiCashStatus_ExistingTransaction) {
-
-                    e = [NSError errorWithDomain:PsiCashClientLibraryErrorDomain code:result.status andLocalizedDescription:NSLocalizedStringWithDefaultValue(@"PSICASH_SPEED_BOOST_PURCHASE_FAILED_ALREADY_ACTIVE_PURCHASE", nil, [NSBundle mainBundle], @"Error: you already have an active Speed Boost purchase.", @"Alert error message informing user that their Speed Boost purchase request failed because they already have an active Speed Boost purchase. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed.")];
+                    e = [NSError errorWithDomain:PsiCashClientLibraryErrorDomain
+                                            code:result.status
+                         andLocalizedDescription:NSLocalizedStringWithDefaultValue(@"PSICASH_SPEED_BOOST_PURCHASE_FAILED_ALREADY_ACTIVE_PURCHASE", nil, [NSBundle mainBundle], @"Error: you already have an active Speed Boost purchase.", @"Alert error message informing user that their Speed Boost purchase request failed because they already have an active Speed Boost purchase. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed.")];
 
                 } else if (result.status == PsiCashStatus_InsufficientBalance) {
 
                     NSString *s = NSLocalizedStringWithDefaultValue(@"PSICASH_SPEED_BOOST_PURCHASE_FAILED_INSUFFICIENT_FUNDS", nil, [NSBundle mainBundle], @"Insufficient balance for Speed Boost purchase. Price:", @"Alert error message informing user that their Speed Boost purchase request failed because they have an insufficient balance. Required price in PsiCash will be appended after the colon. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed.");
-                    s = [s stringByAppendingString:[NSString stringWithFormat:@" %@", [PsiCashClientModel formattedBalance:psiCash.balance]]];
-                    e = [NSError errorWithDomain:PsiCashClientLibraryErrorDomain code:result.status andLocalizedDescription:s];
+                    s = [s stringByAppendingString:[NSString stringWithFormat:@" %@",
+                                            [PsiCashClientModel formattedBalance:psiCash.balance]]];
+
+                    e = [NSError errorWithDomain:PsiCashClientLibraryErrorDomain
+                                            code:result.status
+                         andLocalizedDescription:s];
 
                 } else if (result.status == PsiCashStatus_TransactionAmountMismatch) {
 
                     // Check if local products have been updated
-                    PsiCashSpeedBoostProductSKU *updatedSKU = [stagingArea.stagedModel.speedBoostProduct productSKUWithDistinguisher:sku.distinguisher];
+                    PsiCashSpeedBoostProductSKU *updatedSKU =
+                      [stagingArea.stagedModel.speedBoostProduct
+                        productSKUWithDistinguisher:sku.distinguisher];
 
                     if (!updatedSKU) {
                         // Product no longer exists
                         NSString *s = NSLocalizedStringWithDefaultValue(@"PSICASH_SPEED_BOOST_PURCHASE_FAILED_PRODUCT_NOT_FOUND", nil, [NSBundle mainBundle], @"Error: Speed Boost product not found. Local products updated. Your app may be out of date. Please check for updates.", @"Alert error message informing user that their Speed Boost purchase request failed because they attempted to buy a product that is no longer available and that they should try updating or reinstalling the app. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed.");
-                        e = [NSError errorWithDomain:PsiCashClientLibraryErrorDomain code:result.status andLocalizedDescription:s];
+                        e = [NSError errorWithDomain:PsiCashClientLibraryErrorDomain
+                                                code:result.status
+                             andLocalizedDescription:s];
 
                         // Attempt to sync new products from the server
                         [self refreshStateRemote];
@@ -378,7 +450,9 @@ typedef NS_ERROR_ENUM(PsiCashClientRefreshStateErrorDomain, PsiCashClientRefresh
                     } else if ([updatedSKU.price compare:sku.price] == NSOrderedSame) {
                         // Product price has not changed
                         NSString *s = NSLocalizedStringWithDefaultValue(@"PSICASH_SPEED_BOOST_PURCHASE_FAILED_PRICE_OUT_OF_DATE_NO_MISMATCH", nil, [NSBundle mainBundle], @"Error: price of Speed Boost is out of date. Updating local products.", @"Alert error message informing user that their Speed Boost purchase request failed because they tried to make the purchase with an out of date product price and that the price is being updated. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed.");
-                        e = [NSError errorWithDomain:PsiCashClientLibraryErrorDomain code:result.status andLocalizedDescription:s];
+                        e = [NSError errorWithDomain:PsiCashClientLibraryErrorDomain
+                                                code:result.status
+                             andLocalizedDescription:s];
 
                         // Attempt to sync new products from the server
                         [self refreshStateRemote];
@@ -386,26 +460,44 @@ typedef NS_ERROR_ENUM(PsiCashClientRefreshStateErrorDomain, PsiCashClientRefresh
                     } else {
                         // Product price has changed
                         NSString *s = NSLocalizedStringWithDefaultValue(@"PSICASH_SPEED_BOOST_PURCHASE_FAILED_PRICE_OUT_OF_DATE", nil, [NSBundle mainBundle], @"Error: price of Speed Boost is out of date. Price:", @"Alert error message informing user that their Speed Boost purchase request failed because they tried to make the purchase with an out of date product price. Updated price will be appended after the colon. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed.");
-                        s = [s stringByAppendingString:[NSString stringWithFormat:@" %@", [PsiCashClientModel formattedBalance:updatedSKU.price]]];
-                        e = [NSError errorWithDomain:PsiCashClientLibraryErrorDomain code:result.status andLocalizedDescription:s];
+                        s = [s stringByAppendingString:
+                          [NSString stringWithFormat:@" %@", [PsiCashClientModel
+                            formattedBalance:updatedSKU.price]]];
+
+                        e = [NSError errorWithDomain:PsiCashClientLibraryErrorDomain
+                                                code:result.status
+                             andLocalizedDescription:s];
                     }
 
                 } else if (result.status == PsiCashStatus_TransactionTypeNotFound) {
                     NSString *s = NSLocalizedStringWithDefaultValue(@"PSICASH_SPEED_BOOST_PURCHASE_FAILED_PRODUCT_NOT_FOUND", nil, [NSBundle mainBundle], @"Error: Speed Boost product not found. Local products updated. Your app may be out of date. Please check for updates.", @"Alert error message informing user that their Speed Boost purchase request failed because they attempted to buy a product that is no longer available and that they should try updating or reinstalling the app. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed.");
-                    e = [NSError errorWithDomain:PsiCashClientLibraryErrorDomain code:result.status andLocalizedDescription:s];
+                    e = [NSError errorWithDomain:PsiCashClientLibraryErrorDomain
+                                            code:result.status
+                         andLocalizedDescription:s];
 
                     [stagingArea removeSpeedBoostProductSKU:sku];
+
                 } else if (result.status == PsiCashStatus_InvalidTokens) {
-                    e = [NSError errorWithDomain:PsiCashClientLibraryErrorDomain code:result.status andLocalizedDescription:NSLocalizedStringWithDefaultValue(@"PSICASH_SPEED_BOOST_PURCHASE_FAILED_INVALID_TOKENS", nil, [NSBundle mainBundle], @"Invalid Tokens: the app has entered an invalid state. Please reinstall the app to continue using PsiCash.", @"Alert error message informing user that their Speed Boost purchase request failed because their app has entered an invalid state and that they should try updating or reinstalling the app. Note: 'PsiCash' should not be translated or transliterated.")];
+                    e = [NSError errorWithDomain:PsiCashClientLibraryErrorDomain
+                                            code:result.status
+                         andLocalizedDescription:NSLocalizedStringWithDefaultValue(@"PSICASH_SPEED_BOOST_PURCHASE_FAILED_INVALID_TOKENS", nil, [NSBundle mainBundle], @"Invalid Tokens: the app has entered an invalid state. Please reinstall the app to continue using PsiCash.", @"Alert error message informing user that their Speed Boost purchase request failed because their app has entered an invalid state and that they should try updating or reinstalling the app. Note: 'PsiCash' should not be translated or transliterated.")];
+
                 } else if (result.status == PsiCashStatus_ServerError) {
-                    e = [NSError errorWithDomain:PsiCashClientLibraryErrorDomain code:result.status andLocalizedDescription:NSLocalizedStringWithDefaultValue(@"PSICASH_SPEED_BOOST_PURCHASE_FAILED_SERVER_ERROR", nil, [NSBundle mainBundle], @"Server error. Please try again in a few minutes.", @"Alert error message informing user that their Speed Boost purchase request failed due to a server error and that they should try again in a few minutes")];
+                    e = [NSError errorWithDomain:PsiCashClientLibraryErrorDomain
+                                            code:result.status
+                         andLocalizedDescription:NSLocalizedStringWithDefaultValue(@"PSICASH_SPEED_BOOST_PURCHASE_FAILED_SERVER_ERROR", nil, [NSBundle mainBundle], @"Server error. Please try again in a few minutes.", @"Alert error message informing user that their Speed Boost purchase request failed due to a server error and that they should try again in a few minutes")];
+
                 } else {
-                    e = [NSError errorWithDomain:PsiCashClientLibraryErrorDomain code:result.status andLocalizedDescription:NSLocalizedStringWithDefaultValue(@"PSICASH_SPEED_BOOST_PURCHASE_FAILED_UNEXPECTED_CODE", nil, [NSBundle mainBundle], @"Invalid or unexpected status code returned from PsiCash library.", @"Alert error message informing user that their Speed Boost purchase request failed because of an unknown error. Note: 'PsiCash' should not be translated or transliterated.")];
+                    e = [NSError errorWithDomain:PsiCashClientLibraryErrorDomain
+                                            code:result.status
+                         andLocalizedDescription:NSLocalizedStringWithDefaultValue(@"PSICASH_SPEED_BOOST_PURCHASE_FAILED_UNEXPECTED_CODE", nil, [NSBundle mainBundle], @"Invalid or unexpected status code returned from PsiCash library.", @"Alert error message informing user that their Speed Boost purchase request failed because of an unknown error. Note: 'PsiCash' should not be translated or transliterated.")];
                 }
 
                 if (e != nil) {
                     [self displayAlertWithMessage:e.localizedDescription];
-                    [logger logErrorEvent:@"PurchaseFailed" withError:e includingDiagnosticInfo:YES];
+                    [logger logErrorEvent:@"PurchaseFailed"
+                                    withError:e
+                      includingDiagnosticInfo:YES];
                 }
             }
         }
@@ -422,15 +514,27 @@ typedef NS_ERROR_ENUM(PsiCashClientRefreshStateErrorDomain, PsiCashClientRefresh
     }];
 }
 
-- (RACSignal<PsiCashMakePurchaseResultModel*>*)makeExpiringPurchaseTransactionForClass:(NSString*)transactionClass andDistinguisher:(NSString*)distinguisher withExpectedPrice:(NSNumber*)expectedPrice {
+- (RACSignal<PsiCashMakePurchaseResultModel*>*)makeExpiringPurchaseTransactionForClass:
+                                                                         (NSString*)transactionClass
+                                                         andDistinguisher:(NSString*)distinguisher
+                                                        withExpectedPrice:(NSNumber*)expectedPrice {
+
     return [RACSignal createSignal:^RACDisposable *(id<RACSubscriber>  _Nonnull subscriber) {
-        [psiCash newExpiringPurchaseTransactionForClass:transactionClass withDistinguisher:distinguisher withExpectedPrice:expectedPrice withCompletion:^(PsiCashStatus status, PsiCashPurchase * _Nullable purchase, NSError * _Nullable error) {
+        [psiCash newExpiringPurchaseTransactionForClass:transactionClass
+                                      withDistinguisher:distinguisher
+                                      withExpectedPrice:expectedPrice
+                                         withCompletion:^(PsiCashStatus status,
+                                                          PsiCashPurchase * _Nullable purchase,
+                                                          NSError * _Nullable error) {
+
             dispatch_async(self->completionQueue, ^{
                 if (error != nil) {
                     // If error non-nil, the request failed utterly and no other params are valid.
                     [subscriber sendError:error];
                 } else {
-                    [subscriber sendNext:[PsiCashMakePurchaseResultModel successWithStatus:status andPurchase:purchase andError:nil]];
+                    [subscriber sendNext:[PsiCashMakePurchaseResultModel successWithStatus:status
+                                                                               andPurchase:purchase
+                                                                                  andError:nil]];
                     [subscriber sendCompleted];
                 }
             });
@@ -459,7 +563,9 @@ typedef NS_ERROR_ENUM(PsiCashClientRefreshStateErrorDomain, PsiCashClientRefresh
     NSString *s;
     NSError *e = [psiCash getRewardedActivityData:&s];
     if (e) {
-        [logger logErrorEvent:@"GetRewardedActivityDataFailed" withError:e includingDiagnosticInfo:YES];
+        [logger logErrorEvent:@"GetRewardedActivityDataFailed"
+                        withError:e
+          includingDiagnosticInfo:YES];
         return nil;
     }
     return s;
@@ -516,12 +622,18 @@ typedef NS_ERROR_ENUM(PsiCashClientRefreshStateErrorDomain, PsiCashClientRefresh
  * @return Returns {setActivePurchaseLib | x is not marked expired by the extension}
  */
 - (NSArray<PsiCashPurchase*>*)activePurchases {
-    NSMutableArray <PsiCashPurchase*>* purchases = [[NSMutableArray alloc] initWithArray:[[psiCash validPurchases] copy]];
+    NSMutableArray <PsiCashPurchase*>* purchases = [[NSMutableArray alloc]
+      initWithArray:[[psiCash validPurchases] copy]];
+
     NSSet<NSString *> *markedAuthIDs = [sharedDB getMarkedExpiredAuthorizationIDs];
     NSMutableArray *purchasesToRemove = [[NSMutableArray alloc] init];
 
-    NSPredicate *predicate = [NSPredicate predicateWithBlock:^BOOL(PsiCashPurchase *evaluatedObject, NSDictionary<NSString *,id> * _Nullable bindings) {
-        Authorization *auth = [[Authorization alloc] initWithEncodedAuthorization:evaluatedObject.authorization];
+    NSPredicate *predicate = [NSPredicate predicateWithBlock:^BOOL(PsiCashPurchase *evaluatedObject,
+                                                 NSDictionary<NSString *,id> * _Nullable bindings) {
+
+        Authorization *auth = [[Authorization alloc]
+          initWithEncodedAuthorization:evaluatedObject.authorization];
+
         if ([markedAuthIDs containsObject:auth.ID]) {
             [purchasesToRemove addObject:evaluatedObject.ID];
             return FALSE;
@@ -540,8 +652,19 @@ typedef NS_ERROR_ENUM(PsiCashClientRefreshStateErrorDomain, PsiCashClientRefresh
 #pragma mark - Helpers
 
 - (void)commitModelStagingArea:(PsiCashClientModelStagingArea *)stagingArea {
+
     dispatch_async(dispatch_get_main_queue(), ^{
+
         [self.clientModelSignal sendNext:stagingArea.stagedModel];
+
+        // We take this opportunity to set the value of the custom data signal.
+        // To prevent unnecessary computation, custom data is checked for change.
+        NSString *_Nullable prvCustomData = [self.rewardedActivityDataSignal first];
+        NSString *_Nullable curCustomData = [self rewardedVideoCustomData];
+
+        if (![NSString stringsBothEqualOrNil:prvCustomData b:curCustomData]) {
+            [self.rewardedActivityDataSignal sendNext:curCustomData];
+        }
     });
     model = stagingArea.stagedModel;
 }
@@ -572,29 +695,38 @@ typedef NS_ERROR_ENUM(PsiCashClientRefreshStateErrorDomain, PsiCashClientRefresh
  * Helper function to parse an array of PsiCashPurchasePrice objects
  * into a more completely typed PsiCashSpeedBoostProduct object.
  */
-- (PsiCashSpeedBoostProduct*)speedBoostProductFromPurchasePrices:(NSArray<PsiCashPurchasePrice*>*)purchasePrices withTargetProducts:(NSDictionary<NSString*,NSArray<NSString*>*>*)targets {
+- (PsiCashSpeedBoostProduct*)speedBoostProductFromPurchasePrices:(NSArray<PsiCashPurchasePrice*>*)
+  purchasePrices withTargetProducts:(NSDictionary<NSString*,NSArray<NSString*>*>*)targets {
+
     NSMutableArray<PsiCashPurchasePrice*> *speedBoostPurchasePrices = [[NSMutableArray alloc] init];
     NSArray <NSString*>* targetDistinguishersForSpeedBoost = nil;
     if (targets != nil) {
-        targetDistinguishersForSpeedBoost = [targets objectForKey:[PsiCashSpeedBoostProduct purchaseClass]];
+        targetDistinguishersForSpeedBoost = targets[[PsiCashSpeedBoostProduct purchaseClass]];
     }
 
     for (PsiCashPurchasePrice *price in purchasePrices) {
         if ([price.transactionClass isEqualToString:[PsiCashSpeedBoostProduct purchaseClass]]) {
-            if (targetDistinguishersForSpeedBoost == nil
-                || (targetDistinguishersForSpeedBoost != nil && [targetDistinguishersForSpeedBoost containsObject:price.distinguisher])) {
+            if (targetDistinguishersForSpeedBoost == nil ||
+                [targetDistinguishersForSpeedBoost containsObject:price.distinguisher]) {
+
                 [speedBoostPurchasePrices addObject:price];
             }
         } else {
-            [logger logEvent:@"IgnoredPurchasePrice" withInfoDictionary:[price toDictionary] includingDiagnosticInfo:NO];
+            [logger logEvent:@"IgnoredPurchasePrice"
+                   withInfoDictionary:[price toDictionary]
+              includingDiagnosticInfo:NO];
         }
     }
 
     PsiCashSpeedBoostProduct *speedBoostProduct = nil;
     if ([speedBoostPurchasePrices count] == 0) {
-        [logger logErrorEvent:@"NoSpeedBoostProductSKUsFound" withInfo:nil includingDiagnosticInfo:YES];
+        [logger logErrorEvent:@"NoSpeedBoostProductSKUsFound"
+                         withInfo:nil
+          includingDiagnosticInfo:YES];
+
     } else {
-        speedBoostProduct = [PsiCashSpeedBoostProduct productWithPurchasePrices:speedBoostPurchasePrices];
+        speedBoostProduct = [PsiCashSpeedBoostProduct
+          productWithPurchasePrices:speedBoostPurchasePrices];
     }
 
     return speedBoostProduct;
@@ -610,7 +742,8 @@ typedef NS_ERROR_ENUM(PsiCashClientRefreshStateErrorDomain, PsiCashClientRefresh
     NSArray <PsiCashPurchase*>* purchases = psiCash.validPurchases;
     for (PsiCashPurchase *purchase in purchases) {
         if ([purchase.transactionClass isEqualToString:[PsiCashSpeedBoostProduct purchaseClass]]) {
-            [validAuthorizations addObject:[[Authorization alloc] initWithEncodedAuthorization:purchase.authorization]];
+            [validAuthorizations addObject:[[Authorization alloc]
+              initWithEncodedAuthorization:purchase.authorization]];
         }
     }
 

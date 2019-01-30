@@ -60,7 +60,8 @@ typedef NS_ENUM(NSInteger, AdPresentation) {
       AdPresentationErrorNoAdsLoaded,
       /*! @const AdPresentationErrorFailedToPlay Ad failed to play or show. This is a terminal state. */
       AdPresentationErrorFailedToPlay,
-      /*! @const AdPresentationErrorCustomDataNotSet Rewarded video ad custom data not set. This is a terminal state. */
+      /*! @const AdPresentationErrorCustomDataNotSet Rewarded video ad custom data not set. This is a terminal state.
+       *  This is to be emitted by rewareded video ads that set custom data during presentation.*/
       AdPresentationErrorCustomDataNotSet,
 };
 
@@ -92,6 +93,9 @@ typedef NS_ERROR_ENUM(AdControllerWrapperErrorDomain, AdControllerWrapperErrorCo
     /*! @const AdControllerWrapperErrorAdFailedToLoad Ad controller failed to load ad. Once emitted by `-loadAd`,
      * AdManager will load a new ad `AD_LOAD_RETRY_COUNT` times. */
       AdControllerWrapperErrorAdFailedToLoad,
+    /*! @const AdControllerWrapperErrorCustomDataNotSet Ad controller failed to load an ad since custom data was
+     * missing. Note that this is only emitted by rewarded video ads.*/
+      AdControllerWrapperErrorCustomDataNotSet,
 };
 
 #pragma mark -
@@ -136,11 +140,6 @@ typedef NS_ERROR_ENUM(AdControllerWrapperErrorDomain, AdControllerWrapperErrorCo
 // Scheduler: should be subscribed on the main thread.
 - (RACSignal<AdControllerTag> *)unloadAd;
 
-@optional
-
-// For classes that conform to this protocol but don't implement this method, they should implement a similar
-// method, but the same expected behaviour of the returned signal.
-//
 // Implementations should emit items of type @(AdPresentation), and then complete.
 // If there are no ads loaded, returned signal emits @(AdPresentationErrorNoAdsLoaded) and then completes.
 - (RACSignal<NSNumber *> *)presentAdFromViewController:(UIViewController *)viewController;
