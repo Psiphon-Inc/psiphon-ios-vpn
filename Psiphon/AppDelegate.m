@@ -57,14 +57,14 @@
 
 // Number of seconds to wait for tunnel status to become "Connected", after the landing page notification
 // is received from the extension.
-#define kLandingPageTimeoutSecs 1.0
+NSTimeInterval const LandingPageTimeout = 1.0;
 
 // Number of seconds to wait for PsiCashClient to emit an auth package with an earner token, after the
 // landing page notification is received from the extension.
-#define kPsiCashAuthPackageWithEarnerTokenTimeoutSecs 3.0
+NSTimeInterval const PsiCashAuthPackageWithEarnerTokenTimeout = 3.0;
 
-/** Number of seconds to wait before checking reachability status after receiving
- * NotifierNetworkConnectivityFailed from the extension */
+// Number of seconds to wait before checking reachability status after receiving
+// `NotifierNetworkConnectivityFailed` from the extension.
 NSTimeInterval const InternetReachabilityCheckTimeout = 10.0;
 
 PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
@@ -350,16 +350,16 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
                   return RACUnit.defaultUnit;
               }]
               take:1]
-              timeout:kPsiCashAuthPackageWithEarnerTokenTimeoutSecs onScheduler:RACScheduler.mainThreadScheduler]
+              timeout:PsiCashAuthPackageWithEarnerTokenTimeout onScheduler:RACScheduler.mainThreadScheduler]
               catch:^RACSignal * (NSError * error) {
                   if ([error.domain isEqualToString:RACSignalErrorDomain] && error.code == RACSignalErrorTimedOut) {
-                      [PsiFeedbackLogger infoWithType:PsiCashLogType message:@"timeout waiting for earner token, waited %0.1fs", kPsiCashAuthPackageWithEarnerTokenTimeoutSecs];
+                      [PsiFeedbackLogger infoWithType:PsiCashLogType message:@"timeout waiting for earner token, waited %0.1fs", PsiCashAuthPackageWithEarnerTokenTimeout];
                       return [RACSignal return:RACUnit.defaultUnit];
                   }
                   return [RACSignal error:error];
               }];
 
-            // Only opens landing page if the VPN is active (or waits up to a maximum of kLandingPageTimeoutSecs
+            // Only opens landing page if the VPN is active (or waits up to a maximum of LandingPageTimeout
             // for the tunnel status to become "Connected" before opening the landing page).
             // Landing page should not be opened outside of the tunnel.
             //
@@ -372,7 +372,7 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
                   return (s == VPNStatusConnected);
               }]
               take:1]  // Take 1 to terminate the infinite signal.
-              timeout:kLandingPageTimeoutSecs onScheduler:RACScheduler.mainThreadScheduler]
+              timeout:LandingPageTimeout onScheduler:RACScheduler.mainThreadScheduler]
               zipWith:authPackageSignal]
               deliverOnMainThread]
               subscribeNext:^(RACTwoTuple<RACTwoTuple<NSNumber *, NSNumber *>*, RACUnit*> *x) {

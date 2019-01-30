@@ -1,5 +1,14 @@
+/*[UNTRANSLATED] Accept button title */
+"ACCEPT_BUTTON_TITLE" = "Accept";
+
 /* Title of the section in the subscription dialog that shows currently active subscription information. */
 "ACTIVE_SUBSCRIPTION_SECTION_TITLE" = "Current subscription";
+
+/*[UNTRANSLATED] Alert dialog body. */
+"ALERT_BODY_OPERATION_FAILED" = "Operation failed, please try again.";
+
+/*[UNTRANSLATED] Alert dialog title. */
+"ALERT_TITLE_OPERATION_FAILED" = "Operation Failed";
 
 /* Text for app subtitle on main view. */
 "APP_SUB_TITLE_MAIN_VIEW" = "ÇÄKLERDEN DAŞARY";
@@ -22,11 +31,17 @@
 /*[UNTRANSLATED] Title of button on alert view which shows the progress of the user's buy request. Hitting this button dismisses the alert and the buy request continues processing in the background. */
 "BUY_REQUEST_PROGRESS_ALERT_DISMISS_BUTTON_TITLE" = "Dismiss";
 
+/*[UNTRANSLATED] Buy subscription dialog footer text explaining where the user can cancel an active subscription */
+"BUY_SUBSCRIPTIONS_FOOTER_CANCEL_INSTRUCTIONS_TEXT" = "You can cancel an active subscription in your iTunes Account Settings.";
+
 /*[UNTRANSLATED] Buy subscription dialog footer text */
 "BUY_SUBSCRIPTIONS_FOOTER_TEXT" = "A subscription is auto-renewable which means that once purchased it will be automatically renewed until you cancel it 24 hours prior to the end of the current period.\n\nYour iTunes Account will be charged for renewal within 24-hours prior to the end of the current period with the cost of the subscription.";
 
 /* Cancel button on a pop-up alert. The alert will be dismissed if the user presses this button. */
 "CANCEL_BUTTON" = "Goýbolsun et";
+
+/* Title for a button that cancels an action. This should be generic enough to make sense whenever a cancel button is used. */
+"CANCEL_BUTTON_TITLE" = "Goýbolsun et";
 
 /*[UNTRANSLATED] Alert message informing user that their subscription has expired or that they're not a subscriber, therefore Psiphon can only be started from the Psiphon app. DO NOT translate 'Psiphon'. */
 "CANNOT_START_TUNNEL_DUE_TO_SUBSCRIPTION" = "You don't have an active subscription.\nSince you're not a subscriber or your subscription has expired, Psiphon can only be started from the Psiphon app.\n\nPlease open the Psiphon app to start.";
@@ -34,7 +49,8 @@
 /*[UNTRANSLATED] Main text in the 'Upstream Proxy Error' dialog box. This is shown when the user has directly altered these settings, and those settings are (probably) erroneous. DO NOT translate 'Psiphon'. */
 "CHECK_UPSTREAM_PROXY_SETTING" = "You have configured Psiphon to use an upstream proxy.\nHowever, we seem to be unable to connect to a Psiphon server through that proxy.\nPlease fix the settings and try again.";
 
-/* Text above change region button that allows user to select their desired server region */
+/* Text above change region button that allows user to select their desired server region
+   Title for screen that allows user to select their desired server region. Use all capital letters in the translation only if it makes sense. */
 "CONNECT_VIA" = "bilen baglan";
 
 /*[UNTRANSLATED] Alert dialog title of alert which informs the user that the settings file in the app is corrupt. */
@@ -43,9 +59,18 @@
 /*[UNTRANSLATED] Alert dialog message informing the user that the settings file in the app is corrupt, and that they can potentially fix this issue by re-installing the app. */
 "CORRUPT_SETTINGS_MESSAGE" = "Your app settings file appears to be corrupt. Try reinstalling the app to repair the file.";
 
+/*[UNTRANSLATED] Decline button title */
+"DECLINE_BUTTON_TITLE" = "Decline";
+
+/*[UNTRANSLATED] Dismiss button title. Dismisses pop-up alert when the user clicks on the button */
+"DISMISS_BUTTON_TITLE" = "Dismiss";
+
 /* Title of the button that dismisses region selection dialog
    Title of the button that dismisses the subscriptions menu */
 "DONE_ACTION" = "Boldy";
+
+/* Title of the button that dismisses a screen or a dialog */
+"DONE_BUTTON_TITLE" = "Boldy";
 
 /*[UNTRANSLATED] Alert dialog message indicating to the user that the app has failed to upload their feedback and that they should try again.  */
 "FEEDBACK_UPLOAD_FAILED_MESSAGE" = "An error occured while uploading your feedback. Please try again. Your feedback helps us improve the Psiphon network.";
@@ -71,6 +96,9 @@
 /* Text displayed while app loads */
 "LOADING" = "Ýüklenýär...";
 
+/* Button title that takes user to the next page */
+"NEXT_PAGE_BUTTON_TITLE" = "Indiki";
+
 /* Alert title informing user there is no internet connection */
 "NO_INTERNET" = "Internet baglanşygy ýok";
 
@@ -81,8 +109,23 @@
    OK button on a pop-up alert. The alert will be dismissed when the user presses this button. */
 "OK_BUTTON" = "Bolýar";
 
+/*[UNTRANSLATED] Onboarding text for install VPN configuration. (Do not translate 'Psiphon'). */
+"ONBARDING_VPN_INSTALL_GUIDE_TEXT" = "You’ll need to allow Psiphon to add VPN configurations in order to connect.";
+
+/*[UNTRANSLATED] Onboarding screen text. (Do not translate 'Psiphon'). */
+"ONBOARDING_BEYOND_BORDERS_BODY" = "Censored by your country, corporation, or campus? Psiphon is uniquely suited to help you get to the content you want, whenever and wherever you want it.";
+
+/* Beyond Borders title */
+"ONBOARDING_BEYOND_BORDERS_HEADER" = "Çäklerinden daşarda";
+
 /*[UNTRANSLATED] Text of button at the bottom right or left (depending on rtl) of the last onboarding screen which allows the user to finish the onboarding sequence. Note: should be all uppercase (capitalized) when possible. */
 "ONBOARDING_DONE_BUTTON" = "DONE";
+
+/*[UNTRANSLATED] Onboarding screen 'getting started' body. */
+"ONBOARDING_GETTING_STARTED_BODY" = "Psiphon uses VPN technology to provide you with uncensored access to internet content. You’ll need to allow Psiphon to add VPN configurations to your phone in order to connect with a safe path to the internet.";
+
+/*[UNTRANSLATED] Onboarding header */
+"ONBOARDING_GETTING_STARTED_HEADER" = "Getting Started";
 
 /*[UNTRANSLATED] Text of button at the bottom right or left (depending on rtl) of the onboarding screens which allows the user to move on to the next onboarding screen. Note: should be all uppercase (capitalized) when possible. */
 "ONBOARDING_NEXT_BUTTON" = "NEXT";
@@ -90,8 +133,14 @@
 /* Alert message informing the user they should open the app to finish connecting to the VPN. DO NOT translate 'Psiphon'. */
 "OPEN_PSIPHON_APP" = "Birikme tamamlamak üçin, haýys Psiphon programmasyny işlediň.";
 
+/*[UNTRANSLATED] Alert dialog title indicating to the user that Psiphon needs their permission */
+"PERMISSION_REQUIRED_ALERT__TITLE" = "Permission required";
+
 /* Cancel button title. */
 "PRIVACY_POLICY_CANCEL_BUTTON" = "Goýbolsun et";
+
+/*[UNTRANSLATED] Alert message when the user declined privacy policy. They will not be able ot use the app until the user accepts the privacy policy (Do not translate 'Psiphon') */
+"PRIVACY_POLICY_DECLINED_ALERT_BODY" = "You must accept our Privacy Policy before continuing to use Psiphon.";
 
 /* External link to the privacy policy page. Please update this with the correct language specific link (if available) e.g. https://psiphon.ca/fr/privacy.html for french. */
 "PRIVACY_POLICY_URL" = "https://psiphon.ca/tk/privacy.html";
@@ -238,6 +287,9 @@
 /*[UNTRANSLATED] Point in a list of scenarios where the user should try refreshing their app receipt to restore an existing subscription */
 "REFRESH_APP_RECEIPT_BUTTON_DESCRIPTION_POINT_2" = "You cannot see a subscription you purchased on this device";
 
+/*[UNTRANSLATED] Title for a confirmation button that resets a user's previous consent. */
+"RESET_IDENTIFIER_BUTTON_TITLE" = "Reset Consent";
+
 /*[UNTRANSLATED] Button which, when pressed, attempts to restore any existing subscriptions the user has purchased */
 "RESTORE_SUBSCRIPTION_BUTTON" = "Restore Subscription";
 
@@ -247,8 +299,20 @@
 /*[UNTRANSLATED] Button label indicating to the user that they will earn PsiCash if they watch a video advertisement. The word 'PsiCash' should not be translated or transliterated. */
 "REWARDED_VIDEO_EARN_PSICASH" = "Watch a video to earn PsiCash!";
 
+/*[UNTRANSLATED] Button label indicating to the user that there are no videos available for them to watch. */
+"REWARDED_VIDEO_NO_VIDEOS_AVAILABLE" = "No Videos Available";
+
+/*[UNTRANSLATED] Title for screen that allows user to select language. Use all capital letters in the translation only if it makes sense. */
+"SELECT_LANG" = "SELECT LANGUAGE";
+
+/*[UNTRANSLATED] Select language button title. */
+"SELECT_LANG_BUTTON_TITLE" = "Select Language";
+
 /*[UNTRANSLATED] Title of cell in settings menu which, when pressed, reinstalls the user's VPN profile for Psiphon */
 "SETTINGS_REINSTALL_VPN_CONFIGURATION_CELL_TITLE" = "Reinstall VPN profile";
+
+/*[UNTRANSLATED] (Do not translate 'AdMob') Title of cell in settings menu which indicates the user can change or revoke the consent they've given to admob */
+"SETTINGS_RESET_ADMOB_CONSENT" = "Reset AdMob Consent";
 
 /*[UNTRANSLATED] Subscriptions item title in the app settings when user has an active subscription. Clicking this item opens subscriptions view */
 "SETTINGS_SUBSCRIPTION_ACTIVE" = "Subscriptions";
@@ -256,11 +320,26 @@
 /*[UNTRANSLATED] Subscriptions item title in the app settings when user does not have an active subscription. Clicking this item opens subscriptions view. If “Premium” doesn't easily translate, please choose a term that conveys “Pro” or “Extra” or “Better” or “Elite”. */
 "SETTINGS_SUBSCRIPTION_NOT_ACTIVE" = "Go premium!";
 
+/*[UNTRANSLATED] Footer text beside button that opens paid subscriptions manager UI. At this point the user is not subscribed. Please keep this text concise as the width of the text box is restricted in size. */
+"SUBSCRIPTION_BAR_FOOTER_TEXT_NOT_SUBSCRIBED" = "Remove ads";
+
+/*[UNTRANSLATED] Footer text beside button that opens paid subscriptions manager UI. At this point the user is subscribed. If “Premium” doesn't easily translate, please choose a term that conveys “Pro” or “Extra” or “Better” or “Elite”. Please keep this text concise as the width of the text box is restricted in size. */
+"SUBSCRIPTION_BAR_FOOTER_TEXT_SUBSCRIBED" = "Premium - Max Speed";
+
+/*[UNTRANSLATED] Header text beside button that opens paid subscriptions manager UI. At this point the user is not subscribed. If “Premium” doesn't easily translate, please choose a term that conveys “Pro” or “Extra” or “Better” or “Elite”. Please keep this text concise as the width of the text box is restricted in size. */
+"SUBSCRIPTION_BAR_HEADER_TEXT_NOT_SUBSCRIBED" = "GET PREMIUM";
+
+/*[UNTRANSLATED] Header text beside button that opens paid subscriptions manager UI. At this point the user is subscribed. Please keep this text concise as the width of the text box is restricted in size. */
+"SUBSCRIPTION_BAR_HEADER_TEXT_SUBSCRIBED" = "SUBSCRIPTION";
+
 /*[UNTRANSLATED] Text for button that opens paid subscriptions manager UI. If “Premium” doesn't easily translate, please choose a term that conveys “Pro” or “Extra” or “Better” or “Elite”. */
 "SUBSCRIPTION_BUTTON_TITLE" = "Go premium now!";
 
 /*[UNTRANSLATED] Title of the dialog for available in-app paid subscriptions */
 "SUBSCRIPTIONS" = "Subscriptions";
+
+/*[UNTRANSLATED] Label on a button which, when pressed, opens a screen where the user can manage their currently active subscription. */
+"SUBSCRIPTIONS_MANAGE_SUBSCRIPTION_BUTTON" = "Manage";
 
 /*[UNTRANSLATED] Title of the banner on the subscriptions page that tells the user how many initial free days they get once subscribed */
 "SUBSCRIPTIONS_PAGE_BANNER_TITLE" = "Get 3 days of premium FREE when subscribing to any plan";
@@ -274,6 +353,9 @@
 /* Title of button on subscriptions page which opens Psiphon's privacy policy webpage */
 "SUBSCRIPTIONS_PRIVACY_POLICY_BUTTON_TEXT" = "Gizlinlik Ugry";
 
+/* Label on a button which, when pressed, opens a screen where the user can choose from multiple subscription plans. */
+"SUBSCRIPTIONS_SUBSCRIBE_BUTTON" = "Abuna ýazyl";
+
 /* Title of button on subscriptions page which opens Psiphon's terms of use webpage */
 "SUBSCRIPTIONS_TERMS_OF_USE_BUTTON_TEXT" = "Ulanma Razyçylygy";
 
@@ -283,8 +365,8 @@
 /*[UNTRANSLATED] Alert dialog message informing the user that an error occurred while starting Psiphon (Do not translate 'Psiphon'). The user should try again, and if the problem persists, they should try reinstalling the app. */
 "VPN_START_FAIL_MESSAGE" = "An error occurred while starting Psiphon. Please try again. If this problem persists, try reinstalling the Psiphon app.";
 
-/*[UNTRANSLATED] Alert dialog message informing the user that an error occurred while starting Psiphon because they selected an egress region that is no longer available (Do not translate 'Psiphon'). The user should select a different region and try again. Note: the backslash before each quotation mark should be left as is for formatting. */
-"VPN_START_FAIL_REGION_INVALID_MESSAGE" = "The region you selected is no longer available. You must choose a new region or change to the default \"Best performance\" choice.";
+/*[UNTRANSLATED] Alert dialog message informing the user that an error occurred while starting Psiphon because they selected an egress region that is no longer available (Do not translate 'Psiphon'). The user has been automatically switched to to 'Fastest Country', but they can also open the Psiphon app to choose another country. Note: the backslash before each quotation mark should be left as is for formatting. */
+"VPN_START_FAIL_REGION_INVALID_MESSAGE_2" = "The region you selected is no longer available. You have automatically been switched to \"Fastest Country\".\n\n You can also select a new region from the Psiphon app.";
 
 /*[UNTRANSLATED] Alert dialog title indicating to the user that Psiphon was unable to start (MainViewController) */
 "VPN_START_FAIL_TITLE" = "Unable to start";

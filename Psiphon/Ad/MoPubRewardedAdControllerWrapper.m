@@ -25,6 +25,7 @@
 #import "NSError+Convenience.h"
 #import "Logging.h"
 #import "Nullity.h"
+#import "PsiCashClient.h"
 
 
 PsiFeedbackLogType const MoPubRewardedAdControllerWrapperLogType = @"MoPubRewardedAdControllerWrapper";
@@ -100,8 +101,7 @@ PsiFeedbackLogType const MoPubRewardedAdControllerWrapperLogType = @"MoPubReward
     }];
 }
 
-- (RACSignal<NSNumber *> *)presentAdFromViewController:(UIViewController *)viewController
-                                        withCustomData:(NSString *_Nullable)customData {
+- (RACSignal<NSNumber *> *)presentAdFromViewController:(UIViewController *)viewController {
 
     MoPubRewardedAdControllerWrapper *__weak weakSelf = self;
 
@@ -113,6 +113,7 @@ PsiFeedbackLogType const MoPubRewardedAdControllerWrapperLogType = @"MoPubReward
             return nil;
         }
 
+        NSString *_Nullable customData = [[PsiCashClient sharedInstance] rewardedVideoCustomData];
         if ([Nullity isEmpty:customData]) {
             [subscriber sendNext:@(AdPresentationErrorCustomDataNotSet)];
             [subscriber sendCompleted];

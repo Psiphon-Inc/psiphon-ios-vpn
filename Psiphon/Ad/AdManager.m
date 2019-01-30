@@ -47,6 +47,8 @@
 #import "AdMobRewardedAdControllerWrapper.h"
 #import <PersonalizedAdConsent/PersonalizedAdConsent.h>
 #import "AdMobConsent.h"
+#import "AppEvent.h"
+#import "PsiCashClient.h"
 
 
 NSErrorDomain const AdControllerWrapperErrorDomain = @"AdControllerWrapperErrorDomain";
@@ -66,88 +68,6 @@ NSString * const MoPubTunneledRewardVideoAdUnitID    = @"b9440504384740a2a3913a3
 AdControllerTag const AdControllerTagUntunneledInterstitial = @"UntunneledInterstitial";
 AdControllerTag const AdControllerTagUntunneledRewardedVideo = @"UntunneledRewardedVideo";
 AdControllerTag const AdControllerTagTunneledRewardedVideo = @"TunneledRewardedVideo";
-
-#pragma mark - App event type
-
-typedef NS_ENUM(NSInteger, TunnelState) {
-    TunnelStateTunneled = 1,
-    TunnelStateUntunneled,
-    TunnelStateNeither
-};
-
-typedef NS_ENUM(NSInteger, SourceEvent) {
-    SourceEventStarted = 101,
-    SourceEventAppForegrounded = 102,
-    SourceEventSubscription = 103,
-    SourceEventTunneled = 104,
-    SourceEventReachability = 105
-};
-
-@interface AppEvent : NSObject
-// AppEvent source
-@property (nonatomic, readwrite) SourceEvent source;
-
-// AppEvent states
-@property (nonatomic, readwrite) BOOL networkIsReachable;
-@property (nonatomic, readwrite) BOOL subscriptionIsActive;
-@property (nonatomic, readwrite) TunnelState tunnelState;
-@end
-
-@implementation AppEvent
-
-// Two app events are equal only if all properties except the `source` are equal.
-- (BOOL)isEqual:(AppEvent *)other {
-    if (other == self)
-        return TRUE;
-    if (!other || ![[other class] isEqual:[self class]])
-        return FALSE;
-    return (self.networkIsReachable == other.networkIsReachable &&
-            self.subscriptionIsActive == other.subscriptionIsActive &&
-            self.tunnelState == other.tunnelState);
-}
-
-- (NSString *)debugDescription {
-
-    NSString *sourceText;
-    switch (self.source) {
-        case SourceEventAppForegrounded:
-            sourceText = @"SourceEventAppForegrounded";
-            break;
-        case SourceEventSubscription:
-            sourceText = @"SourceEventSubscription";
-            break;
-        case SourceEventTunneled:
-            sourceText = @"SourceEventTunneled";
-            break;
-        case SourceEventStarted:
-            sourceText = @"SourceEventStarted";
-            break;
-        case SourceEventReachability:
-            sourceText = @"SourceEventReachability";
-            break;
-        default: abort();
-    }
-
-    NSString *tunnelStateText;
-    switch (self.tunnelState) {
-        case TunnelStateTunneled:
-            tunnelStateText = @"TunnelStateTunneled";
-            break;
-        case TunnelStateUntunneled:
-            tunnelStateText = @"TunnelStateUntunneled";
-            break;
-        case TunnelStateNeither:
-            tunnelStateText = @"TunnelStateNeither";
-            break;
-        default: abort();
-    }
-
-    return [NSString stringWithFormat:@"<AppEvent source=%@ networkIsReachable=%@ subscriptionIsActive=%@ "
-                                       "tunnelState=%@>", sourceText, NSStringFromBOOL(self.networkIsReachable),
-        NSStringFromBOOL(self.subscriptionIsActive), tunnelStateText];
-}
-
-@end
 
 #pragma mark - SourceAction type
 
@@ -487,19 +407,22 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
         [self.compoundDisposable addDisposable:[self subscribeToAdSignalForAd:self.untunneledInterstitial
                                                 withActionLoadDelayedInterval:5.0
                                                         withLoadInTunnelState:TunnelStateUntunneled
-                                                      reloadAdAfterPresenting:AdLoadActionDelayed]];
+                                                      reloadAdAfterPresenting:AdLoadActionDelayed
+                                        andWaitForPsiCashRewardedActivityData:FALSE]];
 
         // Untunneled rewarded video
         [self.compoundDisposable addDisposable:[self subscribeToAdSignalForAd:self.untunneledRewardVideo
                                                 withActionLoadDelayedInterval:1.0
                                                         withLoadInTunnelState:TunnelStateUntunneled
-                                                      reloadAdAfterPresenting:AdLoadActionImmediate]];
+                                                      reloadAdAfterPresenting:AdLoadActionImmediate
+                                        andWaitForPsiCashRewardedActivityData:TRUE]];
 
         // Tunneled rewarded video
         [self.compoundDisposable addDisposable:[self subscribeToAdSignalForAd:self.tunneledRewardVideo
                                                 withActionLoadDelayedInterval:1.0
                                                         withLoadInTunnelState:TunnelStateTunneled
-                                                      reloadAdAfterPresenting:AdLoadActionImmediate]];
+                                                      reloadAdAfterPresenting:AdLoadActionImmediate
+                                        andWaitForPsiCashRewardedActivityData:TRUE]];
     }
 
     // Ad presentation signals:
@@ -588,11 +511,9 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
     return [self presentAdHelper:^RACSignal<NSNumber *> *(TunnelState tunnelState) {
         switch (tunnelState) {
             case TunnelStateTunneled:
-                return [self.tunneledRewardVideo presentAdFromViewController:viewController
-                                                              withCustomData:customData];
+                return [self.tunneledRewardVideo presentAdFromViewController:viewController];
             case TunnelStateUntunneled:
-                return [self.untunneledRewardVideo presentAdFromViewController:viewController
-                                                                withCustomData:customData];
+                return [self.untunneledRewardVideo presentAdFromViewController:viewController];
             case TunnelStateNeither:
                 return [RACSignal empty];
 
@@ -636,7 +557,8 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
 - (RACDisposable *)subscribeToAdSignalForAd:(id <AdControllerWrapperProtocol>)adController
               withActionLoadDelayedInterval:(NSTimeInterval)delayedAdLoadDelay
                       withLoadInTunnelState:(TunnelState)loadTunnelState
-                    reloadAdAfterPresenting:(AdLoadAction)afterPresentationLoadAction {
+                    reloadAdAfterPresenting:(AdLoadAction)afterPresentationLoadAction
+      andWaitForPsiCashRewardedActivityData:(BOOL)waitForPsiCashRewardedActivityData {
 
     PSIAssert(loadTunnelState != TunnelStateNeither);
 
@@ -647,29 +569,30 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
     NSInteger const AD_LOAD_RETRY_COUNT = 1;
     NSTimeInterval const MIN_AD_RELOAD_TIMER = 1.0;
 
-    // List of "trigger"s.
-    NSString * const TriggerPresentedAdDismissed = @"presentedAdDismissed";
-    NSString * const TriggerAppEvent = @"appEvent";
+    // "Trigger" signals.
+    NSString * const TriggerPresentedAdDismissed = @"TriggerPresentedAdDismissed";
+    NSString * const TriggerAppEvent = @"TriggerAppEvent";
+    NSString * const TriggerPsiCashRewardedActivityDataUpdated = @"TriggerPsiCashRewardedActivityDataUpdated";
 
-    // presentedAdDismissedWithAppEvent is hot infinite signal - emits tuple (TriggerPresentedAdDismissed, AppEvent*)
-    // whenever the ad from `adController` is dismissed and no longer presented.
-    RACSignal<RACTwoTuple<NSString*,AppEvent*>*> *presentedAdDismissedWithAppEvent =
-      [adController.presentedAdDismissed flattenMap:^RACSignal<AppEvent *> *(RACUnit *value) {
-        // Return the cached value of `appEvents`.
-        return [[self.appEvents.signal take:1] map:^RACTwoTuple<NSString*,AppEvent*>*(AppEvent *event) {
-            return [RACTwoTuple pack:TriggerPresentedAdDismissed :event];
-        }];
-    }];
+    RACSignal<NSString *> *triggers = [RACSignal merge:@[
+      [self.appEvents.signal mapReplace:TriggerAppEvent],
+      [adController.presentedAdDismissed mapReplace:TriggerPresentedAdDismissed],
+    ]];
 
-    // appEventWithSource is the same as `appEvents.signal`, mapped to the tuple (TriggerAppEvent, AppEvent*).
-    RACSignal<RACTwoTuple<NSString*,AppEvent*>*> *appEventWithSource =
-      [self.appEvents.signal map:^id(AppEvent *event) {
-        return [RACTwoTuple pack:TriggerAppEvent :event];
-    }];
+    if (waitForPsiCashRewardedActivityData) {
+       triggers = [triggers merge:[[PsiCashClient sharedInstance].rewardedActivityDataSignal
+                                    mapReplace:TriggerPsiCashRewardedActivityDataUpdated]];
+    }
 
-    RACSignal<RACTwoTuple<AdControllerTag, AppEventActionTuple *> *> *adLoadUnloadSignal = [[[[[RACSignal
-      merge:@[presentedAdDismissedWithAppEvent, appEventWithSource]]
-      map:^AppEventActionTuple *(RACTwoTuple<NSString*,AppEvent*> *tuple) {
+
+    RACSignal<RACTwoTuple<AdControllerTag, AppEventActionTuple *> *> *adLoadUnloadSignal =
+      [[[[[triggers withLatestFrom:self.appEvents.signal]
+      map:^AppEventActionTuple *(RACTwoTuple<NSString *, AppEvent *> *tuple) {
+
+          // In disambiguating the source of the event emission:
+          //  - If `triggerSignal` string below is "TriggerAppEvent", then
+          //    the source is defined in `event.source` below.
+          //  - Otherwise, the trigger signal is the source as defined in one of the Trigger_ constants above.
 
           NSString *triggerSignal = tuple.first;
           AppEvent *event = tuple.second;
@@ -702,6 +625,16 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
 
               // If the current tunnel state is the same as the ads required tunnel state, then load ad.
               if (event.tunnelState == loadTunnelState && !adController.ready) {
+
+                  // Take no loading action if custom data is missing.
+                  if (waitForPsiCashRewardedActivityData) {
+                      NSString *_Nullable customData = [[PsiCashClient sharedInstance]
+                                                         rewardedVideoCustomData];
+                      if (!customData) {
+                          sa.action = AdLoadActionNone;
+                          return sa;
+                      }
+                  }
 
                   if ([TriggerPresentedAdDismissed isEqualToString:triggerSignal]) {
                       // The user has just finished viewing the ad.
@@ -786,17 +719,28 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
                                                             @"tag": v.tag,
                                                             @"NSError": [PsiFeedbackLogger unpackError:error]}];
                               return @"retryOther";
+
+                          } else if (AdControllerWrapperErrorCustomDataNotSet == error.code) {
+                              [PsiFeedbackLogger errorWithType:AdManagerLogType
+                                                          json:@{@"event": @"customDataNotSet",
+                                                            @"tag": v.tag,
+                                                            @"NSError": [PsiFeedbackLogger unpackError:error]}];
+                              return @"doNotRetry";
                           }
                       }
                       return @"otherError";
                   }]
                   flattenMap:^RACSignal *(RACGroupedSignal *groupedErrors) {
                       NSString *groupKey = (NSString *) groupedErrors.key;
-                      
-                      if ([@"retryForever" isEqualToString:groupKey]) {
+
+                      if ([@"doNotRetry" isEqualToString:groupKey]) {
+                        return [RACSignal empty];
+
+                      } else if ([@"retryForever" isEqualToString:groupKey]) {
                           return [groupedErrors flattenMap:^RACSignal *(id x) {
                               return [RACSignal timer:MIN_AD_RELOAD_TIMER];
                           }];
+
                       } else {
                           return [[groupedErrors zipWith:[RACSignal rangeStartFrom:0 count:(AD_LOAD_RETRY_COUNT+1)]]
                             flattenMap:^RACSignal *(RACTwoTuple *value) {

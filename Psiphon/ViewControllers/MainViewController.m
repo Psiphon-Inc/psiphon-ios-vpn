@@ -112,6 +112,10 @@ NSString * const CommandStopVPN = @"StopVPN";
 
     FeedbackManager *feedbackManager;
 
+    // Psiphon Logo
+    // Replaces the PsiCash UI when the user is subscribed
+    UIImageView *psiphonLogoView;
+
     // PsiCash
     NSLayoutConstraint *psiCashViewHeight;
     PsiCashPurchaseAlertView *alertView;
@@ -191,6 +195,7 @@ NSString * const CommandStopVPN = @"StopVPN";
     [self setupClouds];
     [self setupVersionLabel];
     [self setupSettingsButton];
+    [self setupPsiphonLogoView];
     [self setupPsiCashView];
     [self setupStartAndStopButton];
     [self setupStatusLabel];
@@ -601,6 +606,7 @@ NSString * const CommandStopVPN = @"StopVPN";
     cloudBottomRight = [[UIImageView alloc] initWithImage:cloud];
     versionLabel = [[UIButton alloc] init];
     settingsButton = [[UIButton alloc] init];
+    psiphonLogoView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"PsiphonLogo"]];
     psiCashView = [[PsiCashView alloc] initWithAutoLayout];
     startAndStopButton = [VPNStartAndStopButton buttonWithType:UIButtonTypeCustom];
     statusLabel = [[UILabel alloc] init];
@@ -614,6 +620,7 @@ NSString * const CommandStopVPN = @"StopVPN";
     [self.view addSubview:cloudMiddleRight];
     [self.view addSubview:cloudTopRight];
     [self.view addSubview:cloudBottomRight];
+    [self.view addSubview:psiphonLogoView];
     [self.view addSubview:psiCashView];
     [self.view addSubview:versionLabel];
     [self.view addSubview:settingsButton];
@@ -1078,6 +1085,15 @@ NSString * const CommandStopVPN = @"StopVPN";
 
 #pragma mark - PsiCash UI
 
+- (void)setupPsiphonLogoView {
+    psiphonLogoView.translatesAutoresizingMaskIntoConstraints = NO;
+
+    psiphonLogoView.contentMode = UIViewContentModeScaleAspectFill;
+
+    [psiphonLogoView.centerYAnchor constraintEqualToAnchor:versionLabel.centerYAnchor].active = YES;
+    [psiphonLogoView.centerXAnchor constraintEqualToAnchor:self.view.centerXAnchor].active = YES;
+}
+
 - (void)setupPsiCashView {
     psiCashView.translatesAutoresizingMaskIntoConstraints = NO;
 
@@ -1184,6 +1200,9 @@ NSString * const CommandStopVPN = @"StopVPN";
 - (void)setPsiCashContentHidden:(BOOL)hidden {
     psiCashView.hidden = hidden;
     psiCashView.userInteractionEnabled = !hidden;
+
+    // Show Psiphon logo when PsiCash view is hidden
+    psiphonLogoView.hidden = !hidden;
 }
 
 - (void)showRewardedVideo {
@@ -1217,18 +1236,23 @@ NSString * const CommandStopVPN = @"StopVPN";
                     break;
                 case AdPresentationErrorCustomDataNotSet:
                     LOG_DEBUG(@"rewarded video AdPresentationErrorCustomDataNotSet");
+                    [PsiFeedbackLogger errorWithType:RewardedVideoLogType
+                                             message:@"AdPresentationErrorCustomDataNotSet"];
                     break;
                 case AdPresentationErrorInappropriateState:
                     LOG_DEBUG(@"rewarded video AdPresentationErrorInappropriateState");
-                    [PsiFeedbackLogger errorWithType:RewardedVideoLogType message:@"AdPresentationErrorInappropriateState"];
+                    [PsiFeedbackLogger errorWithType:RewardedVideoLogType
+                                             message:@"AdPresentationErrorInappropriateState"];
                     break;
                 case AdPresentationErrorNoAdsLoaded:
                     LOG_DEBUG(@"rewarded video AdPresentationErrorNoAdsLoaded");
-                    [PsiFeedbackLogger errorWithType:RewardedVideoLogType message:@"AdPresentationErrorNoAdsLoaded"];
+                    [PsiFeedbackLogger errorWithType:RewardedVideoLogType
+                                             message:@"AdPresentationErrorNoAdsLoaded"];
                     break;
                 case AdPresentationErrorFailedToPlay:
                     LOG_DEBUG(@"rewarded video AdPresentationErrorFailedToPlay");
-                    [PsiFeedbackLogger errorWithType:RewardedVideoLogType message:@"AdPresentationErrorFailedToPlay"];
+                    [PsiFeedbackLogger errorWithType:RewardedVideoLogType
+                                             message:@"AdPresentationErrorFailedToPlay"];
                     break;
             }
         }]
