@@ -822,7 +822,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
     }
 
     if ([self.psiphonTunnel getConnectionState] == PsiphonConnectionStateConnected) {
-        // The container waits up to `kLandingPageTimeoutSecs` to see the tunnel connected
+        // The container waits up to `LandingPageTimeout` to see the tunnel connected
         // status from when the Homepage notification is received by it.
         [self startVPN];
         self.reasserting = FALSE;

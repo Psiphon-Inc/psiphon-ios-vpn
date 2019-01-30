@@ -74,6 +74,14 @@ PsiFeedbackLogType const AdMobRewardedAdControllerWrapperLogType = @"AdMobReward
 
     return [RACSignal createSignal:^RACDisposable *(id <RACSubscriber> subscriber) {
 
+        NSString *_Nullable customData = [[PsiCashClient sharedInstance] rewardedVideoCustomData];
+        if ([Nullity isEmpty:customData]) {
+            NSError *e = [NSError errorWithDomain:AdControllerWrapperErrorDomain
+                                             code:AdControllerWrapperErrorCustomDataNotSet];
+            [subscriber sendError:e];
+            return nil;
+        }
+
         // Subscribe to load status before loading an ad to prevent race-condition with "adDidLoad" delegate callback.
         RACDisposable *disposable = [weakSelf.loadStatus subscribe:subscriber];
 
@@ -95,6 +103,7 @@ PsiFeedbackLogType const AdMobRewardedAdControllerWrapperLogType = @"AdMobReward
     #if DEBUG
             request.testDevices = @[@"4a907b319b37ceee4d9970dbb0231ef0"];
     #endif
+            [videoAd setCustomRewardString:customData];
             [videoAd loadRequest:request withAdUnitID:self.adUnitID];
         }
 
@@ -120,8 +129,7 @@ PsiFeedbackLogType const AdMobRewardedAdControllerWrapperLogType = @"AdMobReward
     }];
 }
 
-- (RACSignal<NSNumber *> *)presentAdFromViewController:(UIViewController *)viewController
-                                        withCustomData:(NSString *_Nullable)customData {
+- (RACSignal<NSNumber *> *)presentAdFromViewController:(UIViewController *)viewController {
 
     AdMobRewardedAdControllerWrapper *__weak weakSelf = self;
 
@@ -135,19 +143,12 @@ PsiFeedbackLogType const AdMobRewardedAdControllerWrapperLogType = @"AdMobReward
             return nil;
         }
 
-        if ([Nullity isEmpty:customData]) {
-            [subscriber sendNext:@(AdPresentationErrorCustomDataNotSet)];
-            [subscriber sendCompleted];
-            return nil;
-        }
-
         // Subscribe to presentationStatus before presenting the ad.
         RACDisposable *disposable = [[AdControllerWrapperHelper
           transformAdPresentationToTerminatingSignal:weakSelf.presentationStatus
                          allowOutOfOrderRewardStatus:TRUE]
           subscribe:subscriber];
 
-        [videoAd setCustomRewardString:customData];
         [videoAd presentFromRootViewController:viewController];
 
         return disposable;
