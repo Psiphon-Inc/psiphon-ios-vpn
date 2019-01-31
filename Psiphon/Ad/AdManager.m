@@ -563,6 +563,11 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
     // It is assumed that `adController` objects live as long as the AdManager class.
     // Therefore reactive declaration below holds a strong references to the `adController` object.
 
+    // Retry `groupBy` types.
+    NSString * const RetryTypeForever = @"RetryTypeForever";
+    NSString * const RetryTypeDoNotRetry = @"RetryTypeDoNotRetry";
+    NSString * const RetryTypeOther = @"RetryTypeOther";
+
     // Retry count for ads that failed to load (doesn't apply for expired ads).
     NSInteger const AD_LOAD_RETRY_COUNT = 1;
     NSTimeInterval const MIN_AD_RELOAD_TIMER = 1.0;
@@ -708,7 +713,7 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
                                                            @"tag": v.tag,
                                                            @"NSError": [PsiFeedbackLogger unpackError:error]}];
 
-                              return @"retryForever";
+                              return RetryTypeForever;
 
                           } else if (AdControllerWrapperErrorAdFailedToLoad == error.code) {
                               // Get a new ad `AD_LOAD_RETRY_COUNT` times.
@@ -716,25 +721,25 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
                                                           json:@{@"event": @"adDidFailToLoad",
                                                             @"tag": v.tag,
                                                             @"NSError": [PsiFeedbackLogger unpackError:error]}];
-                              return @"retryOther";
+                              return RetryTypeOther;
 
                           } else if (AdControllerWrapperErrorCustomDataNotSet == error.code) {
                               [PsiFeedbackLogger errorWithType:AdManagerLogType
                                                           json:@{@"event": @"customDataNotSet",
                                                             @"tag": v.tag,
                                                             @"NSError": [PsiFeedbackLogger unpackError:error]}];
-                              return @"doNotRetry";
+                              return RetryTypeDoNotRetry;
                           }
                       }
-                      return @"otherError";
+                      return RetryTypeOther;
                   }]
                   flattenMap:^RACSignal *(RACGroupedSignal *groupedErrors) {
                       NSString *groupKey = (NSString *) groupedErrors.key;
 
-                      if ([@"doNotRetry" isEqualToString:groupKey]) {
+                      if ([RetryTypeDoNotRetry isEqualToString:groupKey]) {
                         return [RACSignal empty];
 
-                      } else if ([@"retryForever" isEqualToString:groupKey]) {
+                      } else if ([RetryTypeForever isEqualToString:groupKey]) {
                           return [groupedErrors flattenMap:^RACSignal *(id x) {
                               return [RACSignal timer:MIN_AD_RELOAD_TIMER];
                           }];
