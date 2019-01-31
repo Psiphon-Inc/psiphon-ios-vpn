@@ -46,9 +46,6 @@ PsiFeedbackLogType const AdMobRewardedAdControllerWrapperLogType = @"AdMobReward
 /** loadStatus is hot non-completing signal - emits the wrapper tag when the ad has been loaded. */
 @property (nonatomic, readwrite, nonnull) RACSubject<AdControllerTag> *loadStatus;
 
-/** TRUE if an ad request has been placed and has not finished yet (either failed or succeeded), FALSE otherwise. */
-@property (nonatomic, readwrite, assign) BOOL loading;
-
 @property (nonatomic, readonly) NSString *adUnitID;
 
 @end
@@ -64,7 +61,6 @@ PsiFeedbackLogType const AdMobRewardedAdControllerWrapperLogType = @"AdMobReward
     _ready = FALSE;
     _presentedAdDismissed = [RACSubject subject];
     _presentationStatus = [RACSubject subject];
-    _loading = FALSE;
     return self;
 }
 
@@ -92,10 +88,7 @@ PsiFeedbackLogType const AdMobRewardedAdControllerWrapperLogType = @"AdMobReward
             // Manually call the delegate method to re-execute the logic for when an ad is loaded.
             [weakSelf rewardBasedVideoAdDidReceiveAd:videoAd];
 
-        } else if (!weakSelf.loading) {
-
-            weakSelf.loading = TRUE;
-
+        } else {
             videoAd.delegate = weakSelf;
 
             GADRequest *request = [AdMobConsent createGADRequestWithUserConsentStatus];
@@ -163,9 +156,6 @@ PsiFeedbackLogType const AdMobRewardedAdControllerWrapperLogType = @"AdMobReward
 }
 
 - (void)rewardBasedVideoAdDidReceiveAd:(GADRewardBasedVideoAd *)rewardBasedVideoAd {
-
-    self.loading = FALSE;
-
     if (!self.ready) {
         self.ready = TRUE;
     }
@@ -173,9 +163,6 @@ PsiFeedbackLogType const AdMobRewardedAdControllerWrapperLogType = @"AdMobReward
 }
 
 - (void)rewardBasedVideoAd:(GADRewardBasedVideoAd *)rewardBasedVideoAd didFailToLoadWithError:(NSError *)error {
-
-    self.loading = FALSE;
-
     if (self.ready) {
         self.ready = FALSE;
     }
