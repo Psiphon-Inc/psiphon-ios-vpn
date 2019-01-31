@@ -18,9 +18,16 @@
  */
 
 #import <ReactiveObjC/RACSubject.h>
+#import <ReactiveObjC/RACBehaviorSubject.h>
 
 /**
  * Same as a subject, but without the ability to `sendError` or `sendCompleted`.
  */
 @interface RelaySubject<ValueType> : RACSubject<ValueType>
+@end
+
+/**
+ * Same as a behavior subject, but without the ability to `sendError` or `sendCompleted`.
+ */
+@interface BehaviorRelay<ValueType> : RACBehaviorSubject<ValueType>
 @end

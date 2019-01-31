@@ -35,3 +35,19 @@
 }
 
 @end
+
+@implementation BehaviorRelay
+
+- (void)sendError:(nullable NSError *)error {
+    @throw [NSException exceptionWithName:@"InvalidMethodCalled"
+                                   reason:@"Can't send error on relay subject."
+                                 userInfo:nil];
+}
+
+- (void)sendCompleted {
+    @throw [NSException exceptionWithName:@"InvalidMethodCalled"
+                                   reason:@"Can't send completed on relay subject."
+                                 userInfo:nil];
+}
+
+@end
