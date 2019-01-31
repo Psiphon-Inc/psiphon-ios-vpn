@@ -116,8 +116,10 @@
 		A8408008B18277F93286799F /* PsiphonProgressView.m in Sources */ = {isa = PBXBuildFile; fileRef = A84087FA4B1BC2C725D900D9 /* PsiphonProgressView.m */; };
 		A84080838645BD1023136C3B /* PsiCashPurchaseView.m in Sources */ = {isa = PBXBuildFile; fileRef = A8408183BCB31ED8F0855E90 /* PsiCashPurchaseView.m */; };
 		A84080E163F24876A1476544 /* VPNStartAndStopButton.m in Sources */ = {isa = PBXBuildFile; fileRef = A8408F6123BCC98725932A59 /* VPNStartAndStopButton.m */; };
+		A84080E9FC63E29F71A79A63 /* RelaySubject.m in Sources */ = {isa = PBXBuildFile; fileRef = A84086DF1DDA5CC90C437009 /* RelaySubject.m */; };
 		A84081194DA12328ABB5A43E /* UIImageView+Additions.m in Sources */ = {isa = PBXBuildFile; fileRef = A840886E2E6D8EA82B0EC427 /* UIImageView+Additions.m */; };
 		A8408161701C8F50F52866FC /* LayerAutoResizeUIView.m in Sources */ = {isa = PBXBuildFile; fileRef = A8408DBEEDCF56EC798536BF /* LayerAutoResizeUIView.m */; };
+		A84081FD0C1339DE954DAB7D /* RelaySubject.m in Sources */ = {isa = PBXBuildFile; fileRef = A84086DF1DDA5CC90C437009 /* RelaySubject.m */; };
 		A84082122C339F45E630F610 /* PsiCashView.m in Sources */ = {isa = PBXBuildFile; fileRef = A8408DA63B0B641B765A1E4D /* PsiCashView.m */; };
 		A84082260CE7662A93697CFF /* LoadingCircleLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = A840845849B24AAA0E714664 /* LoadingCircleLayer.m */; };
 		A840835FAC7F18A6A7021415 /* RingSkyButton.m in Sources */ = {isa = PBXBuildFile; fileRef = A84086B04CBC1A6A5481EDD4 /* RingSkyButton.m */; };
@@ -500,6 +502,7 @@
 		A84086A9E122059FADA6F411 /* RingSkyButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RingSkyButton.h; sourceTree = "<group>"; };
 		A84086B04CBC1A6A5481EDD4 /* RingSkyButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RingSkyButton.m; sourceTree = "<group>"; };
 		A84086D173C51DB8C7B7E62C /* PsiCashSpeedBoostSliderView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PsiCashSpeedBoostSliderView.h; sourceTree = "<group>"; };
+		A84086DF1DDA5CC90C437009 /* RelaySubject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RelaySubject.m; sourceTree = "<group>"; };
 		A8408710CC81EFA1CB22CAEC /* AppEvent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppEvent.h; sourceTree = "<group>"; };
 		A84087B4F756C5DA76723EFC /* LoadingCircleLayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LoadingCircleLayer.h; sourceTree = "<group>"; };
 		A84087C37CFC6977102EB09D /* AppVersionNumberView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppVersionNumberView.m; sourceTree = "<group>"; };
@@ -525,6 +528,7 @@
 		A8408B9A66413A25FC1A2BE1 /* SwoopView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SwoopView.m; sourceTree = "<group>"; };
 		A8408BA05DC0D983E6740558 /* SubscriptionStatusView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SubscriptionStatusView.m; sourceTree = "<group>"; };
 		A8408BAC196A108FFE3A5957 /* AlertDialogs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AlertDialogs.h; sourceTree = "<group>"; };
+		A8408C3C21E6934EAE9C0977 /* RelaySubject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RelaySubject.h; sourceTree = "<group>"; };
 		A8408C79DD812741E678AB94 /* SupportedLanguages.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SupportedLanguages.h; sourceTree = "<group>"; };
 		A8408C84138113DE79F0DCD0 /* RegionSelectionButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RegionSelectionButton.m; sourceTree = "<group>"; };
 		A8408C8A7CA3C009F01FDA3B /* SkyRegionSelectionViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SkyRegionSelectionViewController.m; sourceTree = "<group>"; };
@@ -1164,6 +1168,8 @@
 				EF90D7A0204F22C900228A63 /* RACSignal+Operations2.h */,
 				9BFEC84F5DF6D2C3EF754962 /* UnionSerialQueue.m */,
 				9BFEC1E485FB857A0358ED94 /* UnionSerialQueue.h */,
+				A84086DF1DDA5CC90C437009 /* RelaySubject.m */,
+				A8408C3C21E6934EAE9C0977 /* RelaySubject.h */,
 			);
 			path = ReactiveExtensions;
 			sourceTree = "<group>";
@@ -1719,6 +1725,7 @@
 				A8408A3A478ECD6E3562CDF4 /* CloudsView.m in Sources */,
 				A84081194DA12328ABB5A43E /* UIImageView+Additions.m in Sources */,
 				A840849074861D633B3EB4D1 /* AppEvent.m in Sources */,
+				A84080E9FC63E29F71A79A63 /* RelaySubject.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1755,6 +1762,7 @@
 				9BFEC5C256EBC72398FAE8D8 /* UnionSerialQueue.m in Sources */,
 				521FD100219E0E3800F748EC /* DebugUtils.m in Sources */,
 				A8408F5F45CDBDF42701063E /* Strings.m in Sources */,
+				A84081FD0C1339DE954DAB7D /* RelaySubject.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

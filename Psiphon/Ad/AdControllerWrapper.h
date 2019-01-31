@@ -22,6 +22,7 @@
 @class RACUnit;
 @class RACSignal<__covariant ValueType>;
 @class RACSubject<ValueType>;
+@class RACTwoTuple<__covariant First, __covariant Second>;
 @class UIViewController;
 
 NS_ASSUME_NONNULL_BEGIN
@@ -133,12 +134,12 @@ typedef NS_ERROR_ENUM(AdControllerWrapperErrorDomain, AdControllerWrapperErrorCo
 //
 // e.g. If the ad has already been loaded, the returned signal should emit AdControllerTag immediately.
 // Scheduler: should be subscribed on the main thread.
-- (RACSignal<AdControllerTag> *)loadAd;
+- (RACSignal<RACTwoTuple<AdControllerTag, NSError *> *> *)loadAd;
 
 // Unloads ad if one is loaded. `ready` should be FALSE after the unloading is done.
 // Implementations should emit the wrapper's tag after ad is unloaded and then complete.
 // Scheduler: should be subscribed on the main thread.
-- (RACSignal<AdControllerTag> *)unloadAd;
+- (RACSignal<RACTwoTuple<AdControllerTag, NSError *> *> *)unloadAd;
 
 // Implementations should emit items of type @(AdPresentation), and then complete.
 // If there are no ads loaded, returned signal emits @(AdPresentationErrorNoAdsLoaded) and then completes.
