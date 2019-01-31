@@ -668,23 +668,23 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
             flattenMap:^RACSignal<RACTwoTuple<AdControllerTag, AppEventActionTuple *> *> *
               (AppEventActionTuple *sourceAction) {
 
-                RACSignal<AdControllerTag> *returnedSignal;
+                RACSignal<RACTwoTuple<AdControllerTag, NSError *> *> *loadOrUnload;
 
                 switch (sourceAction.action) {
 
                     case AdLoadActionImmediate: {
-                        returnedSignal = [adController loadAd];
+                        loadOrUnload = [adController loadAd];
                         break;
                     }
                     case AdLoadActionDelayed: {
-                        returnedSignal = [[RACSignal timer:delayedAdLoadDelay]
+                        loadOrUnload = [[RACSignal timer:delayedAdLoadDelay]
                           flattenMap:^RACSignal *(id x) {
                               return [adController loadAd];
                           }];
                         break;
                     }
                     case AdLoadActionUnload: {
-                        returnedSignal = [adController unloadAd];
+                        loadOrUnload = [adController unloadAd];
                         break;
                     }
                     default: {
@@ -693,10 +693,17 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
                     }
                 }
 
-                return [returnedSignal map:^id(AdControllerTag tag) {
-                    // Pack the source action with emission of `returnedSignal`.
-                    return [RACTwoTuple pack:tag :sourceAction];
-                }];
+                return [loadOrUnload flattenMap:^RACSignal *(RACTwoTuple<AdControllerTag, NSError *> *maybeTuple) {
+                           NSError *_Nullable error = maybeTuple.second;
+
+                           // Raise the error if it has been emitted.
+                           if (error) {
+                               return [RACSignal error:error];
+                           } else {
+                               // Pack the source action with the ad controller's tag.
+                               return [RACSignal return:[RACTwoTuple pack:maybeTuple.first :sourceAction]];
+                           }
+                       }];
             }]
             takeUntil:v.stopCondition]
             retryWhen:^RACSignal *(RACSignal<NSError *> *errors) {

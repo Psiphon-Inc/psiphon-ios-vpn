@@ -28,6 +28,7 @@
 #import "PsiCashClient.h"
 #import "GADRewardBasedVideoAdDelegate.h"
 #import "AdMobConsent.h"
+#import "RelaySubject.h"
 
 PsiFeedbackLogType const AdMobRewardedAdControllerWrapperLogType = @"AdMobRewardedAdControllerWrapper";
 
@@ -43,8 +44,8 @@ PsiFeedbackLogType const AdMobRewardedAdControllerWrapperLogType = @"AdMobReward
 
 // Private Properties.
 
-/** loadStatus is hot non-completing signal - emits the wrapper tag when the ad has been loaded. */
-@property (nonatomic, readwrite, nonnull) RACSubject<AdControllerTag> *loadStatus;
+/** loadStatus is hot relay subject - emits the wrapper tag when the ad has been loaded. */
+@property (nonatomic, readwrite, nonnull) RelaySubject<RACTwoTuple<AdControllerTag, NSError *> *> *loadStatusRelay;
 
 @property (nonatomic, readonly) NSString *adUnitID;
 
@@ -56,7 +57,7 @@ PsiFeedbackLogType const AdMobRewardedAdControllerWrapperLogType = @"AdMobReward
 
 - (instancetype)initWithAdUnitID:(NSString *)adUnitID withTag:(AdControllerTag)tag {
     _tag = tag;
-    _loadStatus = [RACSubject subject];
+    _loadStatusRelay = [RelaySubject subject];
     _adUnitID = adUnitID;
     _ready = FALSE;
     _presentedAdDismissed = [RACSubject subject];
@@ -64,7 +65,7 @@ PsiFeedbackLogType const AdMobRewardedAdControllerWrapperLogType = @"AdMobReward
     return self;
 }
 
-- (RACSignal<AdControllerTag> *)loadAd {
+- (RACSignal<RACTwoTuple<AdControllerTag, NSError *> *> *)loadAd {
 
     AdMobRewardedAdControllerWrapper *__weak weakSelf = self;
 
@@ -74,12 +75,12 @@ PsiFeedbackLogType const AdMobRewardedAdControllerWrapperLogType = @"AdMobReward
         if ([Nullity isEmpty:customData]) {
             NSError *e = [NSError errorWithDomain:AdControllerWrapperErrorDomain
                                              code:AdControllerWrapperErrorCustomDataNotSet];
-            [subscriber sendError:e];
+            [subscriber sendNext:[RACTwoTuple pack:self.tag :e]];
             return nil;
         }
 
         // Subscribe to load status before loading an ad to prevent race-condition with "adDidLoad" delegate callback.
-        RACDisposable *disposable = [weakSelf.loadStatus subscribe:subscriber];
+        RACDisposable *disposable = [weakSelf.loadStatusRelay subscribe:subscriber];
 
         GADRewardBasedVideoAd *videoAd = [GADRewardBasedVideoAd sharedInstance];
 
@@ -104,7 +105,7 @@ PsiFeedbackLogType const AdMobRewardedAdControllerWrapperLogType = @"AdMobReward
     }];
 }
 
-- (RACSignal<AdControllerTag> *)unloadAd {
+- (RACSignal<RACTwoTuple<AdControllerTag, NSError *> *> *)unloadAd {
 
     AdMobRewardedAdControllerWrapper *__weak weakSelf = self;
 
@@ -116,7 +117,7 @@ PsiFeedbackLogType const AdMobRewardedAdControllerWrapperLogType = @"AdMobReward
             weakSelf.ready = FALSE;
         }
 
-        [subscriber sendNext:weakSelf.tag];
+        [subscriber sendNext:[RACTwoTuple pack:weakSelf.tag :nil]];
         [subscriber sendCompleted];
         return nil;
     }];
@@ -159,18 +160,19 @@ PsiFeedbackLogType const AdMobRewardedAdControllerWrapperLogType = @"AdMobReward
     if (!self.ready) {
         self.ready = TRUE;
     }
-    [self.loadStatus sendNext:self.tag];
+    [self.loadStatusRelay sendNext:[RACTwoTuple pack:self.tag :nil]];
 }
 
 - (void)rewardBasedVideoAd:(GADRewardBasedVideoAd *)rewardBasedVideoAd didFailToLoadWithError:(NSError *)error {
     if (self.ready) {
         self.ready = FALSE;
     }
-    [self.loadStatus sendError:[NSError errorWithDomain:AdControllerWrapperErrorDomain
-                                                   code:AdControllerWrapperErrorAdFailedToLoad
-                                    withUnderlyingError:error]];
-}
 
+    NSError *e = [NSError errorWithDomain:AdControllerWrapperErrorDomain
+                                     code:AdControllerWrapperErrorAdFailedToLoad
+                      withUnderlyingError:error];
+    [self.loadStatusRelay sendNext:[RACTwoTuple pack:self.tag :e]];
+}
 
 - (void)rewardBasedVideoAdDidOpen:(GADRewardBasedVideoAd *)rewardBasedVideoAd {
     [self.presentationStatus sendNext:@(AdPresentationWillAppear)];

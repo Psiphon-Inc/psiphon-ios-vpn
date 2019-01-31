@@ -28,6 +28,8 @@
 #import "Asserts.h"
 #import "AdMobConsent.h"
 #import "GADInterstitialDelegate.h"
+#import "RACTuple.h"
+#import "RelaySubject.h"
 
 PsiFeedbackLogType const AdMobInterstitialAdControllerWrapperLogType = @"AdMobInterstitialAdControllerWrapper";
 
@@ -46,8 +48,8 @@ PsiFeedbackLogType const AdMobInterstitialAdControllerWrapperLogType = @"AdMobIn
 // GADInterstitial is a single use object per interstitial shown.
 @property (nonatomic, readwrite, nullable) GADInterstitial *interstitial;
 
-/** loadStatus is hot non-completing signal - emits the wrapper tag when the ad has been loaded. */
-@property (nonatomic, readwrite, nonnull) RACSubject<AdControllerTag> *loadStatus;
+/** loadStatus is hot relay subject - emits the wrapper tag when the ad has been loaded. */
+@property (nonatomic, readwrite, nonnull) RelaySubject<RACTwoTuple <AdControllerTag, NSError *> *> *loadStatusRelay;
 
 @property (nonatomic, readonly) NSString *adUnitID;
 
@@ -63,7 +65,7 @@ PsiFeedbackLogType const AdMobInterstitialAdControllerWrapperLogType = @"AdMobIn
 
 - (instancetype)initWithAdUnitID:(NSString *)adUnitID withTag:(AdControllerTag)tag{
     _tag = tag;
-    _loadStatus = [RACSubject subject];
+    _loadStatusRelay = [RelaySubject subject];
     _adUnitID = adUnitID;
     _ready = FALSE;
     _presentedAdDismissed = [RACSubject subject];
@@ -71,14 +73,14 @@ PsiFeedbackLogType const AdMobInterstitialAdControllerWrapperLogType = @"AdMobIn
     return self;
 }
 
-- (RACSignal<AdControllerTag> *)loadAd {
+- (RACSignal<RACTwoTuple<AdControllerTag, NSError *> *> *)loadAd {
 
     AdMobInterstitialAdControllerWrapper *__weak weakSelf = self;
 
     return [RACSignal createSignal:^RACDisposable *(id <RACSubscriber> subscriber) {
 
         // Subscribe to load status before loading an ad to prevent race-condition with "adDidLoad" delegate callback.
-        RACDisposable *disposable = [weakSelf.loadStatus subscribe:subscriber];
+        RACDisposable *disposable = [weakSelf.loadStatusRelay subscribe:subscriber];
 
         // If interstitial is not initialized, or ad has already been displayed, or last load request failed,
         // initialize interstitial and start loading ad.
@@ -107,7 +109,7 @@ PsiFeedbackLogType const AdMobInterstitialAdControllerWrapperLogType = @"AdMobIn
     }];
 }
 
-- (RACSignal<AdControllerTag> *)unloadAd {
+- (RACSignal<RACTwoTuple<AdControllerTag, NSError *> *> *)unloadAd {
 
     AdMobInterstitialAdControllerWrapper *__weak weakSelf = self;
 
@@ -122,7 +124,7 @@ PsiFeedbackLogType const AdMobInterstitialAdControllerWrapperLogType = @"AdMobIn
             weakSelf.ready = FALSE;
         }
 
-        [subscriber sendNext:weakSelf.tag];
+        [subscriber sendNext:[RACTwoTuple pack:weakSelf.tag :nil]];
         [subscriber sendCompleted];
 
         return nil;
@@ -158,7 +160,7 @@ PsiFeedbackLogType const AdMobInterstitialAdControllerWrapperLogType = @"AdMobIn
     if (!self.ready) {
         self.ready = TRUE;
     }
-    [self.loadStatus sendNext:self.tag];
+    [self.loadStatusRelay sendNext:[RACTwoTuple pack:self.tag :nil]];
 }
 
 - (void)interstitial:(GADInterstitial *)ad didFailToReceiveAdWithError:(GADRequestError *)error {
@@ -166,9 +168,11 @@ PsiFeedbackLogType const AdMobInterstitialAdControllerWrapperLogType = @"AdMobIn
         self.ready = FALSE;
     }
     self.lastError = error;
-    [self.loadStatus sendError:[NSError errorWithDomain:AdControllerWrapperErrorDomain
-                                                   code:AdControllerWrapperErrorAdFailedToLoad
-                                    withUnderlyingError:error]];
+    NSError *e = [NSError errorWithDomain:AdControllerWrapperErrorDomain
+                                     code:AdControllerWrapperErrorAdFailedToLoad
+                      withUnderlyingError:error];
+
+    [self.loadStatusRelay sendNext:[RACTwoTuple pack:self.tag :e]];
 }
 
 - (void)interstitialWillPresentScreen:(GADInterstitial *)ad {

@@ -26,6 +26,7 @@
 #import "Logging.h"
 #import "Nullity.h"
 #import "PsiCashClient.h"
+#import "RelaySubject.h"
 
 
 PsiFeedbackLogType const MoPubRewardedAdControllerWrapperLogType = @"MoPubRewardedAdControllerWrapper";
@@ -42,8 +43,8 @@ PsiFeedbackLogType const MoPubRewardedAdControllerWrapperLogType = @"MoPubReward
 
 // Private Properties.
 
-/** loadStatus is hot non-completing signal - emits the wrapper tag when the ad has been loaded. */
-@property (nonatomic, readwrite, nonnull) RACSubject<AdControllerTag> *loadStatus;
+/** loadStatus is hot relay subject - emits the wrapper tag when the ad has been loaded. */
+@property (nonatomic, readwrite, nonnull) RelaySubject<RACTwoTuple<AdControllerTag, NSError *> *> *loadStatusRelay;
 
 @property (nonatomic, readonly) NSString *adUnitID;
 
@@ -55,7 +56,7 @@ PsiFeedbackLogType const MoPubRewardedAdControllerWrapperLogType = @"MoPubReward
 
 - (instancetype)initWithAdUnitID:(NSString *)adUnitID withTag:(AdControllerTag)tag {
     _tag = tag;
-    _loadStatus = [RACSubject subject];
+    _loadStatusRelay = [RelaySubject subject];
     _adUnitID = adUnitID;
     _ready = FALSE;
     _presentedAdDismissed = [RACSubject subject];
@@ -67,13 +68,13 @@ PsiFeedbackLogType const MoPubRewardedAdControllerWrapperLogType = @"MoPubReward
     [MPRewardedVideo removeDelegate:self];
 }
 
-- (RACSignal<AdControllerTag> *)loadAd {
+- (RACSignal<RACTwoTuple<AdControllerTag, NSError *> *> *)loadAd {
 
     MoPubRewardedAdControllerWrapper *__weak weakSelf = self;
 
     return [RACSignal createSignal:^RACDisposable *(id <RACSubscriber> subscriber) {
 
-        RACDisposable *disposable = [weakSelf.loadStatus subscribe:subscriber];
+        RACDisposable *disposable = [weakSelf.loadStatusRelay subscribe:subscriber];
 
         [MPRewardedVideo setDelegate:weakSelf forAdUnitId:weakSelf.adUnitID];
         [MPRewardedVideo loadRewardedVideoAdWithAdUnitID:weakSelf.adUnitID withMediationSettings:nil];
@@ -82,7 +83,7 @@ PsiFeedbackLogType const MoPubRewardedAdControllerWrapperLogType = @"MoPubReward
     }];
 }
 
-- (RACSignal<AdControllerTag> *)unloadAd {
+- (RACSignal<RACTwoTuple<AdControllerTag, NSError *> *> *)unloadAd {
 
     MoPubRewardedAdControllerWrapper *__weak weakSelf = self;
 
@@ -95,7 +96,7 @@ PsiFeedbackLogType const MoPubRewardedAdControllerWrapperLogType = @"MoPubReward
             weakSelf.ready = FALSE;
         }
 
-        [subscriber sendNext:weakSelf.tag];
+        [subscriber sendNext:[RACTwoTuple pack:weakSelf.tag :nil]];
         [subscriber sendCompleted];
         return nil;
     }];
@@ -151,7 +152,7 @@ PsiFeedbackLogType const MoPubRewardedAdControllerWrapperLogType = @"MoPubReward
     if (!self.ready) {
         self.ready = TRUE;
     }
-    [self.loadStatus sendNext:self.tag];
+    [self.loadStatusRelay sendNext:[RACTwoTuple pack:self.tag :nil]];
 }
 
 - (void)rewardedVideoAdDidFailToLoadForAdUnitID:(NSString *)adUnitID error:(NSError *)error {
@@ -161,9 +162,12 @@ PsiFeedbackLogType const MoPubRewardedAdControllerWrapperLogType = @"MoPubReward
     if (self.ready) {
         self.ready = FALSE;
     }
-    [self.loadStatus sendError:[NSError errorWithDomain:AdControllerWrapperErrorDomain
-                                                   code:AdControllerWrapperErrorAdFailedToLoad
-                                    withUnderlyingError:error]];
+
+    NSError *e = [NSError errorWithDomain:AdControllerWrapperErrorDomain
+                                     code:AdControllerWrapperErrorAdFailedToLoad
+                      withUnderlyingError:error];
+
+    [self.loadStatusRelay sendNext:[RACTwoTuple pack:self.tag :e]];
 }
 
 - (void)rewardedVideoAdDidExpireForAdUnitID:(NSString *)adUnitID {
@@ -173,8 +177,12 @@ PsiFeedbackLogType const MoPubRewardedAdControllerWrapperLogType = @"MoPubReward
     if (self.ready) {
         self.ready = FALSE;
     }
-    [self.loadStatus sendError:[NSError errorWithDomain:AdControllerWrapperErrorDomain
-                                                   code:AdControllerWrapperErrorAdExpired]];
+
+
+    NSError *e = [NSError errorWithDomain:AdControllerWrapperErrorDomain
+                                     code:AdControllerWrapperErrorAdExpired];
+
+    [self.loadStatusRelay sendNext:[RACTwoTuple pack:self.tag :e]];
 }
 
 - (void)rewardedVideoAdDidFailToPlayForAdUnitID:(NSString *)adUnitID error:(NSError *)error {

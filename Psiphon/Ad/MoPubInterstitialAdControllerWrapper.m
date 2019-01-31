@@ -26,6 +26,8 @@
 #import "RACUnit.h"
 #import "Logging.h"
 #import "Asserts.h"
+#import "RACTuple.h"
+#import "RelaySubject.h"
 
 
 PsiFeedbackLogType const MoPubInterstitialAdControllerWrapperLogType = @"MoPubInterstitialAdControllerWrapper";
@@ -43,8 +45,8 @@ PsiFeedbackLogType const MoPubInterstitialAdControllerWrapperLogType = @"MoPubIn
 // Private properties
 @property (nonatomic, readwrite, nullable) MPInterstitialAdController *interstitial;
 
-/** loadStatus is hot non-completing signal - emits the wrapper tag when the ad has been loaded. */
-@property (nonatomic, readwrite, nonnull) RACSubject<AdControllerTag> *loadStatus;
+/** loadStatus is hot non-completing relay subject - emits the wrapper tag when the ad has been loaded. */
+@property (nonatomic, readwrite, nonnull) RelaySubject<RACTwoTuple<AdControllerTag, NSError *> *> *loadStatusRelay;
 
 @property (nonatomic, readonly) NSString *adUnitID;
 
@@ -56,7 +58,7 @@ PsiFeedbackLogType const MoPubInterstitialAdControllerWrapperLogType = @"MoPubIn
 
 - (instancetype)initWithAdUnitID:(NSString *)adUnitID withTag:(AdControllerTag)tag{
     _tag = tag;
-    _loadStatus = [RACSubject subject];
+    _loadStatusRelay = [RelaySubject subject];
     _adUnitID = adUnitID;
     _ready = FALSE;
     _presentedAdDismissed = [RACSubject subject];
@@ -68,14 +70,14 @@ PsiFeedbackLogType const MoPubInterstitialAdControllerWrapperLogType = @"MoPubIn
     [MPInterstitialAdController removeSharedInterstitialAdController:self.interstitial];
 }
 
-- (RACSignal<AdControllerTag> *)loadAd {
+- (RACSignal<RACTwoTuple<AdControllerTag, NSError *> *> *)loadAd {
 
     MoPubInterstitialAdControllerWrapper *__weak weakSelf = self;
 
     return [RACSignal createSignal:^RACDisposable *(id <RACSubscriber> subscriber) {
 
         // Subscribe to load status before loading an ad to prevent race-condition with "adDidLoad" delegate callback.
-        RACDisposable *disposable = [weakSelf.loadStatus subscribe:subscriber];
+        RACDisposable *disposable = [weakSelf.loadStatusRelay subscribe:subscriber];
 
         if (!weakSelf.interstitial) {
             // From MoPub Docs: Subsequent calls for the same ad unit ID will return that object, unless you have disposed
@@ -93,7 +95,7 @@ PsiFeedbackLogType const MoPubInterstitialAdControllerWrapperLogType = @"MoPubIn
     }];
 }
 
-- (RACSignal<AdControllerTag> *)unloadAd {
+- (RACSignal<RACTwoTuple<AdControllerTag, NSError *> *> *)unloadAd {
 
     MoPubInterstitialAdControllerWrapper *__weak weakSelf = self;
 
@@ -106,7 +108,7 @@ PsiFeedbackLogType const MoPubInterstitialAdControllerWrapperLogType = @"MoPubIn
             weakSelf.ready = FALSE;
         }
 
-        [subscriber sendNext:weakSelf.tag];
+        [subscriber sendNext:[RACTwoTuple pack:weakSelf.tag :nil]];
         [subscriber sendCompleted];
 
         return nil;
@@ -142,7 +144,7 @@ PsiFeedbackLogType const MoPubInterstitialAdControllerWrapperLogType = @"MoPubIn
     if (!self.ready) {
         self.ready = TRUE;
     }
-    [self.loadStatus sendNext:self.tag];
+    [self.loadStatusRelay sendNext:[RACTwoTuple pack:self.tag :nil]];
 }
 
 - (void)interstitialDidFailToLoadAd:(MPInterstitialAdController *)interstitial withError:(NSError *)error {
@@ -151,9 +153,11 @@ PsiFeedbackLogType const MoPubInterstitialAdControllerWrapperLogType = @"MoPubIn
         self.ready = FALSE;
     }
 
-    [self.loadStatus sendError:[NSError errorWithDomain:AdControllerWrapperErrorDomain
-                                                   code:AdControllerWrapperErrorAdFailedToLoad
-                                    withUnderlyingError:error]];
+    NSError *e = [NSError errorWithDomain:AdControllerWrapperErrorDomain
+                                     code:AdControllerWrapperErrorAdFailedToLoad
+                      withUnderlyingError:error];
+
+    [self.loadStatusRelay sendNext:[RACTwoTuple pack:self.tag :e]];
 }
 
 - (void)interstitialDidExpire:(MPInterstitialAdController *)interstitial {
@@ -161,8 +165,10 @@ PsiFeedbackLogType const MoPubInterstitialAdControllerWrapperLogType = @"MoPubIn
         self.ready = FALSE;
     }
 
-    [self.loadStatus sendError:[NSError errorWithDomain:AdControllerWrapperErrorDomain
-                                                   code:AdControllerWrapperErrorAdExpired]];
+    NSError *e = [NSError errorWithDomain:AdControllerWrapperErrorDomain
+                                     code:AdControllerWrapperErrorAdExpired];
+
+    [self.loadStatusRelay sendNext:[RACTwoTuple pack:self.tag :e]];
 }
 
 - (void)interstitialWillAppear:(MPInterstitialAdController *)interstitial {
