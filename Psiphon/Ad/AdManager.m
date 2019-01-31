@@ -759,6 +759,10 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
             }]
             catch:^RACSignal *(NSError *error) {
                 // Catch all errors.
+                [PsiFeedbackLogger errorWithType:AdManagerLogType
+                                            json:@{@"event": @"adLoadErrorPostRetryCaught",
+                                              @"tag": v.tag,
+                                              @"NSError": [PsiFeedbackLogger unpackError:error]}];
                 return [RACSignal return:nil];
             }];
 
