@@ -120,9 +120,9 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
 
 @interface AdManager ()
 
-@property (nonatomic, readwrite, nonnull) RACReplaySubject<NSNumber *> *adIsShowing;
-@property (nonatomic, readwrite, nonnull) RACReplaySubject<NSNumber *> *untunneledInterstitialCanPresent;
-@property (nonatomic, readwrite, nonnull) RACReplaySubject<NSNumber *> *rewardedVideoCanPresent;
+@property (nonatomic, readwrite, nonnull) RACBehaviorSubject<NSNumber *> *adIsShowing;
+@property (nonatomic, readwrite, nonnull) RACBehaviorSubject<NSNumber *> *untunneledInterstitialCanPresent;
+@property (nonatomic, readwrite, nonnull) RACBehaviorSubject<NSNumber *> *rewardedVideoCanPresent;
 
 // Private properties
 @property (nonatomic, readwrite, nonnull) AdMobInterstitialAdControllerWrapper *untunneledInterstitial;
@@ -148,13 +148,11 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
     self = [super init];
     if (self) {
 
-        _adIsShowing = [RACReplaySubject replaySubjectWithCapacity:1];
+        _adIsShowing = [RACBehaviorSubject behaviorSubjectWithDefaultValue:@(FALSE)];
 
-        _untunneledInterstitialCanPresent = [RACReplaySubject replaySubjectWithCapacity:1];
-        [_untunneledInterstitialCanPresent sendNext:@(FALSE)];
+        _untunneledInterstitialCanPresent = [RACBehaviorSubject behaviorSubjectWithDefaultValue:@(FALSE)];
 
-        _rewardedVideoCanPresent = [RACReplaySubject replaySubjectWithCapacity:1];
-        [_rewardedVideoCanPresent sendNext:@(FALSE)];
+        _rewardedVideoCanPresent = [RACBehaviorSubject behaviorSubjectWithDefaultValue:@(FALSE)];
 
         _compoundDisposable = [RACCompoundDisposable compoundDisposable];
 
@@ -478,7 +476,7 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
                   }
               }
 
-              return [RACSignal emitOnly:@(FALSE)];
+              return [RACSignal return:@(FALSE)];
           }]
           switchToLatest]
           subscribe:self.rewardedVideoCanPresent]];
