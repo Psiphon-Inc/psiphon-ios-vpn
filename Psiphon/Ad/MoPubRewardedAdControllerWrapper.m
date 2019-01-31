@@ -107,7 +107,8 @@ PsiFeedbackLogType const MoPubRewardedAdControllerWrapperLogType = @"MoPubReward
 
     return [RACSignal createSignal:^RACDisposable *(id <RACSubscriber> subscriber) {
 
-        if (!weakSelf.ready) {
+        // Should not try to present an ad, unless `hasAdAvailableForAdUnitID:` returns True.
+        if (![MPRewardedVideo hasAdAvailableForAdUnitID:self.adUnitID]) {
             [subscriber sendNext:@(AdPresentationErrorNoAdsLoaded)];
             [subscriber sendCompleted];
             return nil;

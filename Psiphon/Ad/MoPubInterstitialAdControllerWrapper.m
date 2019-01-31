@@ -119,7 +119,7 @@ PsiFeedbackLogType const MoPubInterstitialAdControllerWrapperLogType = @"MoPubIn
 
     return [RACSignal createSignal:^RACDisposable *(id <RACSubscriber> subscriber) {
 
-        if (!weakSelf.ready) {
+        if (!weakSelf.interstitial.ready) {
             [subscriber sendNext:@(AdPresentationErrorNoAdsLoaded)];
             [subscriber sendCompleted];
             return nil;

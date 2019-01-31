@@ -83,7 +83,7 @@ PsiFeedbackLogType const AdMobRewardedAdControllerWrapperLogType = @"AdMobReward
 
         GADRewardBasedVideoAd *videoAd = [GADRewardBasedVideoAd sharedInstance];
 
-        // Create ad request only if one is not ready or is not loading.
+        // Create ad request only if one is not ready.
         if (videoAd.isReady) {
             // Manually call the delegate method to re-execute the logic for when an ad is loaded.
             [weakSelf rewardBasedVideoAdDidReceiveAd:videoAd];
@@ -130,7 +130,7 @@ PsiFeedbackLogType const AdMobRewardedAdControllerWrapperLogType = @"AdMobReward
 
         GADRewardBasedVideoAd *videoAd = [GADRewardBasedVideoAd sharedInstance];
 
-        if (!weakSelf.ready || !videoAd.isReady) {
+        if (!videoAd.isReady) {
             [subscriber sendNext:@(AdPresentationErrorNoAdsLoaded)];
             [subscriber sendCompleted];
             return nil;
