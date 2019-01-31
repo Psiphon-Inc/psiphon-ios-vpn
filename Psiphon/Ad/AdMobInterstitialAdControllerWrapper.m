@@ -135,8 +135,7 @@ PsiFeedbackLogType const AdMobInterstitialAdControllerWrapperLogType = @"AdMobIn
 
     return [RACSignal createSignal:^RACDisposable *(id <RACSubscriber> subscriber) {
 
-        if (!weakSelf.ready || !weakSelf.interstitial.isReady) {
-            // The `self.interstitial.isReady` check should be unnecessary, but we will leave it there.
+        if (!weakSelf.interstitial.isReady) {
             [subscriber sendNext:@(AdPresentationErrorNoAdsLoaded)];
             [subscriber sendCompleted];
             return nil;
