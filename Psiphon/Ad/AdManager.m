@@ -109,8 +109,8 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
             break;
     }
     
-    return [NSString stringWithFormat:@"<AppEventActionTuple action=%@ actionCondition=%@ stopCondition=%p>",
-                                      actionText, [self.actionCondition debugDescription], self.stopCondition];
+    return [NSString stringWithFormat:@"<AppEventActionTuple tag=%@ action=%@ actionCondition=%@ stopCondition=%p>",
+                                      self.tag, actionText, [self.actionCondition debugDescription], self.stopCondition];
 }
 
 @end
