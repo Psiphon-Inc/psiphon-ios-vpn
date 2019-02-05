@@ -32,9 +32,9 @@ NS_ASSUME_NONNULL_BEGIN
 #pragma mark - AdManager class
 
 // List of all AdControllerTag objects.
-FOUNDATION_EXPORT AdControllerTag const AdControllerTagUntunneledInterstitial;
-FOUNDATION_EXPORT AdControllerTag const AdControllerTagUntunneledRewardedVideo;
-FOUNDATION_EXPORT AdControllerTag const AdControllerTagTunneledRewardedVideo;
+FOUNDATION_EXPORT AdControllerTag const AdControllerTagAdMobUntunneledInterstitial;
+FOUNDATION_EXPORT AdControllerTag const AdControllerTagAdMobUntunneledRewardedVideo;
+FOUNDATION_EXPORT AdControllerTag const AdControllerTagMoPubTunneledRewardedVideo;
 
 @interface AdManager : NSObject
 
