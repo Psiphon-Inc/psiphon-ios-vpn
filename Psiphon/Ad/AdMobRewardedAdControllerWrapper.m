@@ -114,7 +114,7 @@ PsiFeedbackLogType const AdMobRewardedAdControllerWrapperLogType = @"AdMobReward
     return [RACSignal createSignal:^RACDisposable *(id <RACSubscriber> subscriber) {
 
         if ([[weakSelf.canPresentOrPresenting first] boolValue]) {
-            [weakSelf.canPresentOrPresenting sendNext:@(FALSE)];
+            [weakSelf.canPresentOrPresenting accept:@(FALSE)];
         }
 
         [subscriber sendNext:[RACTwoTuple pack:weakSelf.tag :nil]];
@@ -158,20 +158,20 @@ PsiFeedbackLogType const AdMobRewardedAdControllerWrapperLogType = @"AdMobReward
 
 - (void)rewardBasedVideoAdDidReceiveAd:(GADRewardBasedVideoAd *)rewardBasedVideoAd {
     if (![[self.canPresentOrPresenting first] boolValue]) {
-        [self.canPresentOrPresenting sendNext:@(TRUE)];
+        [self.canPresentOrPresenting accept:@(TRUE)];
     }
-    [self.loadStatusRelay sendNext:[RACTwoTuple pack:self.tag :nil]];
+    [self.loadStatusRelay accept:[RACTwoTuple pack:self.tag :nil]];
 }
 
 - (void)rewardBasedVideoAd:(GADRewardBasedVideoAd *)rewardBasedVideoAd didFailToLoadWithError:(NSError *)error {
     if ([[self.canPresentOrPresenting first] boolValue]) {
-        [self.canPresentOrPresenting sendNext:@(FALSE)];
+        [self.canPresentOrPresenting accept:@(FALSE)];
     }
 
     NSError *e = [NSError errorWithDomain:AdControllerWrapperErrorDomain
                                      code:AdControllerWrapperErrorAdFailedToLoad
                       withUnderlyingError:error];
-    [self.loadStatusRelay sendNext:[RACTwoTuple pack:self.tag :e]];
+    [self.loadStatusRelay accept:[RACTwoTuple pack:self.tag :e]];
 }
 
 - (void)rewardBasedVideoAdDidOpen:(GADRewardBasedVideoAd *)rewardBasedVideoAd {
@@ -189,7 +189,7 @@ PsiFeedbackLogType const AdMobRewardedAdControllerWrapperLogType = @"AdMobReward
 
 - (void)rewardBasedVideoAdDidClose:(GADRewardBasedVideoAd *)rewardBasedVideoAd {
     if ([[self.canPresentOrPresenting first] boolValue]) {
-        [self.canPresentOrPresenting sendNext:@(FALSE)];
+        [self.canPresentOrPresenting accept:@(FALSE)];
     }
 
     [self.presentationStatus sendNext:@(AdPresentationWillDisappear)];

@@ -22,6 +22,16 @@
 
 @implementation RelaySubject
 
+- (void)accept:(id)value {
+    [super sendNext:value];
+}
+
+- (void)sendNext:(id)value {
+    @throw [NSException exceptionWithName:@"InvalidMethodCalled"
+                                   reason:@"sendNext not allowed on relay. Use -accept:"
+                                 userInfo:nil];
+}
+
 - (void)sendError:(nullable NSError *)error {
     @throw [NSException exceptionWithName:@"InvalidMethodCalled"
                                    reason:@"Can't send error on relay subject."
@@ -37,6 +47,16 @@
 @end
 
 @implementation BehaviorRelay
+
+- (void)accept:(id)value {
+    [super sendNext:value];
+}
+
+- (void)sendNext:(id)value {
+    @throw [NSException exceptionWithName:@"InvalidMethodCalled"
+                                   reason:@"sendNext not allowed on relay. Use -accept:"
+                                 userInfo:nil];
+}
 
 - (void)sendError:(nullable NSError *)error {
     @throw [NSException exceptionWithName:@"InvalidMethodCalled"
