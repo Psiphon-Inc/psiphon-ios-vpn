@@ -90,7 +90,10 @@ PsiFeedbackLogType const AdMobInterstitialAdControllerWrapperLogType = @"AdMobIn
             weakSelf.lastError = nil;
 
             weakSelf.interstitial = [[GADInterstitial alloc] initWithAdUnitID:self.adUnitID];
-            weakSelf.interstitial.delegate = weakSelf;
+
+            if (!weakSelf.interstitial.delegate) {
+                weakSelf.interstitial.delegate = weakSelf;
+            }
 
             GADRequest *request = [AdMobConsent createGADRequestWithUserConsentStatus];
 
@@ -114,11 +117,6 @@ PsiFeedbackLogType const AdMobInterstitialAdControllerWrapperLogType = @"AdMobIn
     AdMobInterstitialAdControllerWrapper *__weak weakSelf = self;
 
     return [RACSignal createSignal:^RACDisposable *(id <RACSubscriber> subscriber) {
-
-        if (weakSelf.interstitial) {
-            weakSelf.interstitial.delegate = nil;
-            weakSelf.interstitial = nil;
-        }
 
         if ([[weakSelf.canPresentOrPresenting first] boolValue]) {
             [weakSelf.canPresentOrPresenting sendNext:@(FALSE)];

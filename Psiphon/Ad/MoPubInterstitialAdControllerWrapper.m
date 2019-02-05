@@ -85,7 +85,10 @@ PsiFeedbackLogType const MoPubInterstitialAdControllerWrapperLogType = @"MoPubIn
             weakSelf.interstitial = [MPInterstitialAdController interstitialAdControllerForAdUnitId:weakSelf.adUnitID];
 
             // Sets the new delegate object as the interstitials delegate.
-            weakSelf.interstitial.delegate = weakSelf;
+
+            if (!weakSelf.interstitial.delegate) {
+                weakSelf.interstitial.delegate = weakSelf;
+            }
         }
 
         // If the interstitial has already been loaded, `interstitialDidLoadAd:` delegate method will be called.
@@ -102,7 +105,6 @@ PsiFeedbackLogType const MoPubInterstitialAdControllerWrapperLogType = @"MoPubIn
     return [RACSignal createSignal:^RACDisposable *(id <RACSubscriber> subscriber) {
 
         [MPInterstitialAdController removeSharedInterstitialAdController:weakSelf.interstitial];
-        weakSelf.interstitial = nil;
 
         if ([[weakSelf.canPresentOrPresenting first] boolValue]) {
             [weakSelf.canPresentOrPresenting sendNext:@(FALSE)];

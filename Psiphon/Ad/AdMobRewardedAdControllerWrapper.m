@@ -83,6 +83,9 @@ PsiFeedbackLogType const AdMobRewardedAdControllerWrapperLogType = @"AdMobReward
         RACDisposable *disposable = [weakSelf.loadStatusRelay subscribe:subscriber];
 
         GADRewardBasedVideoAd *videoAd = [GADRewardBasedVideoAd sharedInstance];
+        if (!videoAd.delegate) {
+            videoAd.delegate = weakSelf;
+        }
 
         // Create ad request only if one is not ready.
         if (videoAd.isReady) {
@@ -90,7 +93,6 @@ PsiFeedbackLogType const AdMobRewardedAdControllerWrapperLogType = @"AdMobReward
             [weakSelf rewardBasedVideoAdDidReceiveAd:videoAd];
 
         } else {
-            videoAd.delegate = weakSelf;
 
             GADRequest *request = [AdMobConsent createGADRequestWithUserConsentStatus];
 
@@ -110,8 +112,6 @@ PsiFeedbackLogType const AdMobRewardedAdControllerWrapperLogType = @"AdMobReward
     AdMobRewardedAdControllerWrapper *__weak weakSelf = self;
 
     return [RACSignal createSignal:^RACDisposable *(id <RACSubscriber> subscriber) {
-
-        [GADRewardBasedVideoAd sharedInstance].delegate = nil;
 
         if ([[weakSelf.canPresentOrPresenting first] boolValue]) {
             [weakSelf.canPresentOrPresenting sendNext:@(FALSE)];
