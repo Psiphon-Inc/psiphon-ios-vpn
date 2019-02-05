@@ -35,7 +35,7 @@ PsiFeedbackLogType const AdMobInterstitialAdControllerWrapperLogType = @"AdMobIn
 
 @interface AdMobInterstitialAdControllerWrapper () <GADInterstitialDelegate>
 
-@property (nonatomic, readwrite, assign) BOOL ready;
+@property (nonatomic, readwrite, nonnull) BehaviorRelay<NSNumber *> *canPresentOrPresenting;
 
 /** presentedAdDismissed is hot infinite signal - emits RACUnit whenever an ad is presented. */
 @property (nonatomic, readwrite, nonnull) RACSubject<RACUnit *> *presentedAdDismissed;
@@ -67,7 +67,7 @@ PsiFeedbackLogType const AdMobInterstitialAdControllerWrapperLogType = @"AdMobIn
     _tag = tag;
     _loadStatusRelay = [RelaySubject subject];
     _adUnitID = adUnitID;
-    _ready = FALSE;
+    _canPresentOrPresenting = [BehaviorRelay behaviorSubjectWithDefaultValue:@(FALSE)];
     _presentedAdDismissed = [RACSubject subject];
     _presentationStatus = [RACSubject subject];
     return self;
@@ -120,8 +120,8 @@ PsiFeedbackLogType const AdMobInterstitialAdControllerWrapperLogType = @"AdMobIn
             weakSelf.interstitial = nil;
         }
 
-        if (weakSelf.ready) {
-            weakSelf.ready = FALSE;
+        if ([[weakSelf.canPresentOrPresenting first] boolValue]) {
+            [weakSelf.canPresentOrPresenting sendNext:@(FALSE)];
         }
 
         [subscriber sendNext:[RACTwoTuple pack:weakSelf.tag :nil]];
@@ -157,15 +157,15 @@ PsiFeedbackLogType const AdMobInterstitialAdControllerWrapperLogType = @"AdMobIn
 #pragma mark - <GADInterstitialDelegate> status relay
 
 - (void)interstitialDidReceiveAd:(GADInterstitial *)ad {
-    if (!self.ready) {
-        self.ready = TRUE;
+    if (![[self.canPresentOrPresenting first] boolValue]) {
+        [self.canPresentOrPresenting sendNext:@(TRUE)];
     }
     [self.loadStatusRelay sendNext:[RACTwoTuple pack:self.tag :nil]];
 }
 
 - (void)interstitial:(GADInterstitial *)ad didFailToReceiveAdWithError:(GADRequestError *)error {
-    if (self.ready) {
-        self.ready = FALSE;
+    if ([[self.canPresentOrPresenting first] boolValue]) {
+        [self.canPresentOrPresenting sendNext:@(FALSE)];
     }
     self.lastError = error;
     NSError *e = [NSError errorWithDomain:AdControllerWrapperErrorDomain
@@ -180,8 +180,8 @@ PsiFeedbackLogType const AdMobInterstitialAdControllerWrapperLogType = @"AdMobIn
 }
 
 - (void)interstitialDidFailToPresentScreen:(GADInterstitial *)ad {
-    if (self.ready) {
-        self.ready = FALSE;
+    if ([[self.canPresentOrPresenting first] boolValue]) {
+        [self.canPresentOrPresenting sendNext:@(FALSE)];
     }
     [self.presentationStatus sendNext:@(AdPresentationErrorFailedToPlay)];
 }
@@ -191,8 +191,8 @@ PsiFeedbackLogType const AdMobInterstitialAdControllerWrapperLogType = @"AdMobIn
 }
 
 - (void)interstitialDidDismissScreen:(GADInterstitial *)ad {
-    if (self.ready) {
-        self.ready = FALSE;
+    if ([[self.canPresentOrPresenting first] boolValue]) {
+        [self.canPresentOrPresenting sendNext:@(FALSE)];
     }
     [self.presentationStatus sendNext:@(AdPresentationDidDisappear)];
     [self.presentedAdDismissed sendNext:RACUnit.defaultUnit];
