@@ -20,14 +20,24 @@
 #import <ReactiveObjC/RACSubject.h>
 #import <ReactiveObjC/RACBehaviorSubject.h>
 
+@protocol Relay
+- (void)accept:(id)value;
+@end
+
 /**
  * Same as a subject, but without the ability to `sendError` or `sendCompleted`.
  */
-@interface RelaySubject<ValueType> : RACSubject<ValueType>
+@interface RelaySubject<ValueType> : RACSubject<ValueType> <Relay>
+
+- (void)accept:(ValueType)value;
+
 @end
 
 /**
  * Same as a behavior subject, but without the ability to `sendError` or `sendCompleted`.
  */
-@interface BehaviorRelay<ValueType> : RACBehaviorSubject<ValueType>
+@interface BehaviorRelay<ValueType> : RACBehaviorSubject<ValueType> <Relay>
+
+- (void)accept:(ValueType)value;
+
 @end
