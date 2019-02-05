@@ -65,9 +65,9 @@ NSString * const UntunneledAdMobRewardedVideoAdUnitID = @"ca-app-pub-10720419617
 NSString * const MoPubTunneledRewardVideoAdUnitID    = @"b9440504384740a2a3913a3d1b6db80e";
 
 // AdControllerTag values must be unique.
-AdControllerTag const AdControllerTagUntunneledInterstitial = @"UntunneledInterstitial";
-AdControllerTag const AdControllerTagUntunneledRewardedVideo = @"UntunneledRewardedVideo";
-AdControllerTag const AdControllerTagTunneledRewardedVideo = @"TunneledRewardedVideo";
+AdControllerTag const AdControllerTagAdMobUntunneledInterstitial = @"AdMobUntunneledInterstitial";
+AdControllerTag const AdControllerTagAdMobUntunneledRewardedVideo = @"AdMobUntunneledRewardedVideo";
+AdControllerTag const AdControllerTagMoPubTunneledRewardedVideo = @"MoPubTunneledRewardedVideo";
 
 #pragma mark - SourceAction type
 
@@ -157,13 +157,16 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
         _compoundDisposable = [RACCompoundDisposable compoundDisposable];
 
         _untunneledInterstitial = [[AdMobInterstitialAdControllerWrapper alloc]
-          initWithAdUnitID:UntunneledAdMobInterstitialAdUnitID withTag:AdControllerTagUntunneledInterstitial];
+          initWithAdUnitID:UntunneledAdMobInterstitialAdUnitID
+                   withTag:AdControllerTagAdMobUntunneledInterstitial];
 
         _untunneledRewardVideo = [[AdMobRewardedAdControllerWrapper alloc]
-          initWithAdUnitID:UntunneledAdMobRewardedVideoAdUnitID withTag:AdControllerTagUntunneledRewardedVideo];
+          initWithAdUnitID:UntunneledAdMobRewardedVideoAdUnitID
+                   withTag:AdControllerTagAdMobUntunneledRewardedVideo];
 
         _tunneledRewardVideo = [[MoPubRewardedAdControllerWrapper alloc]
-          initWithAdUnitID:MoPubTunneledRewardVideoAdUnitID withTag:AdControllerTagTunneledRewardedVideo];
+          initWithAdUnitID:MoPubTunneledRewardVideoAdUnitID
+                   withTag:AdControllerTagMoPubTunneledRewardedVideo];
 
         reachability = [Reachability reachabilityForInternetConnection];
 
