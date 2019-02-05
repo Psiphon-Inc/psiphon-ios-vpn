@@ -18,6 +18,7 @@
  */
 
 #import <Foundation/Foundation.h>
+#import "RelaySubject.h"
 
 @class RACUnit;
 @class RACSignal<__covariant ValueType>;
@@ -111,12 +112,12 @@ typedef NS_ERROR_ENUM(AdControllerWrapperErrorDomain, AdControllerWrapperErrorCo
 
 @property (nonatomic, readonly) AdControllerTag tag;
 
-// Should be TRUE if ad is ready to be displayed, FALSE otherwise.
-// The value should not change while the ad is being presented, and should only be set to FALSE after
+// Hot relay subject. Emits @(TRUE) if ad is ready to be displayed, @(FALSE) otherwise.
+// The value should not change while the ad is being presented, and should only emit @(FALSE) after
 // the ad has been dismissed.
 // To avoid unnecessary computation for observers of this property, implementations of this protocol
-// should check the current value before setting it.
-@property (nonatomic, readonly) BOOL ready;
+// should check the current value before emitting new value.
+@property (nonatomic, readonly) BehaviorRelay<NSNumber *> *canPresentOrPresenting;
 
 // presentedAdDismissed is hot infinite signal - emits RACUnit whenever an ad is shown.
 // Note: It is assumed that after an emission from this signal, it is safe to load another ad.

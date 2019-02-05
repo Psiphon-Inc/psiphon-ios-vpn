@@ -34,7 +34,7 @@ PsiFeedbackLogType const MoPubInterstitialAdControllerWrapperLogType = @"MoPubIn
 
 @interface MoPubInterstitialAdControllerWrapper () <MPInterstitialAdControllerDelegate>
 
-@property (nonatomic, readwrite, assign) BOOL ready;
+@property (nonatomic, readwrite, nonnull) BehaviorRelay<NSNumber *> *canPresentOrPresenting;
 
 /** presentedAdDismissed is hot infinite signal - emits RACUnit whenever an ad is presented. */
 @property (nonatomic, readwrite, nonnull) RACSubject<RACUnit *> *presentedAdDismissed;
@@ -60,7 +60,7 @@ PsiFeedbackLogType const MoPubInterstitialAdControllerWrapperLogType = @"MoPubIn
     _tag = tag;
     _loadStatusRelay = [RelaySubject subject];
     _adUnitID = adUnitID;
-    _ready = FALSE;
+    _canPresentOrPresenting = [BehaviorRelay behaviorSubjectWithDefaultValue:@(FALSE)];
     _presentedAdDismissed = [RACSubject subject];
     _presentationStatus = [RACSubject subject];
     return self;
@@ -104,8 +104,8 @@ PsiFeedbackLogType const MoPubInterstitialAdControllerWrapperLogType = @"MoPubIn
         [MPInterstitialAdController removeSharedInterstitialAdController:weakSelf.interstitial];
         weakSelf.interstitial = nil;
 
-        if (weakSelf.ready) {
-            weakSelf.ready = FALSE;
+        if ([[weakSelf.canPresentOrPresenting first] boolValue]) {
+            [weakSelf.canPresentOrPresenting sendNext:@(FALSE)];
         }
 
         [subscriber sendNext:[RACTwoTuple pack:weakSelf.tag :nil]];
@@ -141,16 +141,16 @@ PsiFeedbackLogType const MoPubInterstitialAdControllerWrapperLogType = @"MoPubIn
 #pragma mark - <MPInterstitialAdControllerDelegate> status relay
 
 - (void)interstitialDidLoadAd:(MPInterstitialAdController *)interstitial {
-    if (!self.ready) {
-        self.ready = TRUE;
+    if (![[self.canPresentOrPresenting first] boolValue]) {
+        [self.canPresentOrPresenting sendNext:@(TRUE)];
     }
     [self.loadStatusRelay sendNext:[RACTwoTuple pack:self.tag :nil]];
 }
 
 - (void)interstitialDidFailToLoadAd:(MPInterstitialAdController *)interstitial withError:(NSError *)error {
 
-    if (self.ready) {
-        self.ready = FALSE;
+    if ([[self.canPresentOrPresenting first] boolValue]) {
+        [self.canPresentOrPresenting sendNext:@(FALSE)];
     }
 
     NSError *e = [NSError errorWithDomain:AdControllerWrapperErrorDomain
@@ -161,8 +161,8 @@ PsiFeedbackLogType const MoPubInterstitialAdControllerWrapperLogType = @"MoPubIn
 }
 
 - (void)interstitialDidExpire:(MPInterstitialAdController *)interstitial {
-    if (self.ready) {
-        self.ready = FALSE;
+    if ([[self.canPresentOrPresenting first] boolValue]) {
+        [self.canPresentOrPresenting sendNext:@(FALSE)];
     }
 
     NSError *e = [NSError errorWithDomain:AdControllerWrapperErrorDomain
@@ -184,9 +184,11 @@ PsiFeedbackLogType const MoPubInterstitialAdControllerWrapperLogType = @"MoPubIn
 }
 
 - (void)interstitialDidDisappear:(MPInterstitialAdController *)interstitial {
-    if (self.ready) {
-        self.ready = FALSE;
+    
+    if ([[self.canPresentOrPresenting first] boolValue]) {
+        [self.canPresentOrPresenting sendNext:@(FALSE)];
     }
+
     [self.presentationStatus sendNext:@(AdPresentationDidDisappear)];
     [self.presentedAdDismissed sendNext:RACUnit.defaultUnit];
 

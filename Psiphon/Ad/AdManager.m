@@ -188,6 +188,8 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
 // This should be called only once during application at application load time
 - (void)initializeAdManager {
 
+    AdManager *__weak weakSelf = self;
+
     [reachability startNotifier];
 
     // adSDKInitConsent is cold terminating signal - Emits RACUnit and completes if all Ad SDKs are initialized and
@@ -458,9 +460,9 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
 
               if (appEvent.tunnelState == TunnelStateUntunneled && appEvent.networkIsReachable) {
 
-                  return RACObserve(self.untunneledInterstitial, ready);
+                  return weakSelf.untunneledInterstitial.canPresentOrPresenting;
               }
-              return [RACSignal emitOnly:@(FALSE)];
+              return [RACSignal return:@(FALSE)];
           }]
           switchToLatest]
           subscribe:self.untunneledInterstitialCanPresent]];
@@ -469,10 +471,12 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
           [[[self.appEvents.signal map:^RACSignal<NSNumber *> *(AppEvent *appEvent) {
 
               if (appEvent.networkIsReachable) {
+
                   if (appEvent.tunnelState == TunnelStateUntunneled) {
-                      return RACObserve(self.untunneledRewardVideo, ready);
+                      return weakSelf.untunneledRewardVideo.canPresentOrPresenting;
+
                   } else if (appEvent.tunnelState == TunnelStateTunneled) {
-                      return RACObserve(self.tunneledRewardVideo, ready);
+                      return weakSelf.tunneledRewardVideo.canPresentOrPresenting;
                   }
               }
 
@@ -627,7 +631,7 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
               }];
 
               // If the current tunnel state is the same as the ads required tunnel state, then load ad.
-              if (event.tunnelState == loadTunnelState && !adController.ready) {
+              if (event.tunnelState == loadTunnelState) {
 
                   // Take no loading action if custom data is missing.
                   if (waitForPsiCashRewardedActivityData) {
