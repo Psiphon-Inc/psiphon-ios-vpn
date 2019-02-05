@@ -89,8 +89,6 @@ PsiFeedbackLogType const MoPubRewardedAdControllerWrapperLogType = @"MoPubReward
 
     return [RACSignal createSignal:^RACDisposable *(id <RACSubscriber> subscriber) {
         // Unlike interstitials, MoPub SDK doesn't provide a way to destroy the pre-fetched rewarded video ads.
-        // For now we are just going to remove delegate. This should not affect the behaviour of the app.
-        [MPRewardedVideo removeDelegate:weakSelf];
 
         if ([[weakSelf.canPresentOrPresenting first] boolValue]) {
             [weakSelf.canPresentOrPresenting sendNext:@(FALSE)];
