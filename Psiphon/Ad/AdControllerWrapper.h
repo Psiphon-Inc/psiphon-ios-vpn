@@ -110,40 +110,67 @@ typedef NS_ERROR_ENUM(AdControllerWrapperErrorDomain, AdControllerWrapperErrorCo
 
 @required
 
+/**
+ * AdController's tag. This is mostly used for debugging purposes.
+ * This property should be set only when a new instance of the object adhering to this protocol is created.
+ */
 @property (nonatomic, readonly) AdControllerTag tag;
 
-// Hot relay subject. Emits @(TRUE) if ad is ready to be displayed, @(FALSE) otherwise.
-// The value should not change while the ad is being presented, and should only emit @(FALSE) after
-// the ad has been dismissed.
-// To avoid unnecessary computation for observers of this property, implementations of this protocol
-// should check the current value before emitting new value.
+/**
+ * Hot relay subject. Emits @(TRUE) if ad is ready to be displayed, @(FALSE) otherwise.
+ * The value should not change while the ad is being presented, and should only emit @(FALSE) after
+ * the ad has been dismissed.
+ * To avoid unnecessary computation for observers of this property, implementations of this protocol
+ * should check the current value before emitting new value.
+ */
 @property (nonatomic, readonly) BehaviorRelay<NSNumber *> *canPresentOrPresenting;
 
-// presentedAdDismissed is hot infinite signal - emits RACUnit whenever an ad is shown.
-// Note: It is assumed that after an emission from this signal, it is safe to load another ad.
+/**
+ * presentedAdDismissed is hot infinite signal - emits RACUnit whenever an ad is shown.
+ * Note: It is assumed that after an emission from this signal, it is safe to load another ad.
+ */
 @property (nonatomic, readonly) RACSubject<RACUnit *> *presentedAdDismissed;
 
-// presentationStatus is hot infinite signal - emits items of type @(AdPresentation).
+/**
+ * presentationStatus is hot infinite signal - emits items of type @(AdPresentation).
+ */
 @property (nonatomic, readonly) RACSubject<NSNumber *> *presentationStatus;
 
-// Loads ad if none is already loaded. Property `ready` should be TRUE after ad has been loaded (whether or not it
-// has already been pre-fetched by the SDK).
-// Implementations should handle multiple subscriptions to the returned signal without
-// side-effects (even if the ad has already been loaded or is loading).
-// Returned signal is expected to terminate with an error when an ad expires or fails to load, with the appropriate
-// `AdControllerWrapperErrorCode` error code.
-//
-// e.g. If the ad has already been loaded, the returned signal should emit AdControllerTag immediately.
-// Scheduler: should be subscribed on the main thread.
+/**
+ * Loads ad if none is already loaded. `canPresentOrPresenting` will emit @(TRUE) once ad has finished loading
+ * successfully and is ready to be presented.
+ *
+ * Implementations should handle multiple subscriptions to the returned signal without
+ * side-effects (even if the ad has already been loaded or is loading).
+ *
+ * Returned signal is expected to terminate with an error when an ad expires or fails to load, with the appropriate
+ * `AdControllerWrapperErrorCode` error code.
+ *
+ * e.g. If the ad has already been loaded, the returned signal should emit AdControllerTag immediately.
+ * Scheduler: should be subscribed on the main thread.
+ *
+ * @return Signal that emits a tuple (AdControllerTag, NSError *_Nullable). Error is set if there was an error,
+ * otherwise it is nil if an ad was successfully loaded. This signal doesn't terminate.
+ */
 - (RACSignal<RACTwoTuple<AdControllerTag, NSError *> *> *)loadAd;
 
-// Unloads ad if one is loaded. `ready` should be FALSE after the unloading is done.
-// Implementations should emit the wrapper's tag after ad is unloaded and then complete.
-// Scheduler: should be subscribed on the main thread.
+/**
+ * Unloads ad if one is loaded. `canPresentOrPresenting` will emit @(FALSE) after unloading is done.
+ * Implementations should emit the wrapper's tag after ad is unloaded and then complete.
+ *
+ * @scheduler: should be subscribed on the main thread.
+ *
+ * @return Signal that emits a tuple (AdControllerTag, NSError *_Nullable) and then complets.
+ * Error is set if there was an error, otherwise it is nil.
+ */
 - (RACSignal<RACTwoTuple<AdControllerTag, NSError *> *> *)unloadAd;
 
-// Implementations should emit items of type @(AdPresentation), and then complete.
-// If there are no ads loaded, returned signal emits @(AdPresentationErrorNoAdsLoaded) and then completes.
+/**
+ * Implementations should emit items of type @(AdPresentation), and then complete.
+ * If there are no ads loaded, returned signal emits @(AdPresentationErrorNoAdsLoaded) and then completes.
+ *
+ * @return Signal that emits items of type @(AdPresentation)
+ */
 - (RACSignal<NSNumber *> *)presentAdFromViewController:(UIViewController *)viewController;
 
 @end
