@@ -561,11 +561,11 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
 
 - (RACDisposable *)subscribeToAdSignalForAd:(id <AdControllerWrapperProtocol>)adController
               withActionLoadDelayedInterval:(NSTimeInterval)delayedAdLoadDelay
-                      withLoadInTunnelState:(TunnelState)loadTunnelState
+                      withLoadInTunnelState:(TunnelState)loadInTunnelState
                     reloadAdAfterPresenting:(AdLoadAction)afterPresentationLoadAction
       andWaitForPsiCashRewardedActivityData:(BOOL)waitForPsiCashRewardedActivityData {
 
-    PSIAssert(loadTunnelState != TunnelStateNeither);
+    PSIAssert(loadInTunnelState != TunnelStateNeither);
 
     // It is assumed that `adController` objects live as long as the AdManager class.
     // Therefore reactive declaration below holds a strong references to the `adController` object.
@@ -634,7 +634,7 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
               }];
 
               // If the current tunnel state is the same as the ads required tunnel state, then load ad.
-              if (event.tunnelState == loadTunnelState) {
+              if (event.tunnelState == loadInTunnelState) {
 
                   // Take no loading action if custom data is missing.
                   if (waitForPsiCashRewardedActivityData) {
