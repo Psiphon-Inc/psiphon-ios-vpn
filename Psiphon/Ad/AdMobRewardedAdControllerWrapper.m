@@ -28,12 +28,13 @@
 #import "PsiCashClient.h"
 #import "GADRewardBasedVideoAdDelegate.h"
 #import "AdMobConsent.h"
+#import "RelaySubject.h"
 
 PsiFeedbackLogType const AdMobRewardedAdControllerWrapperLogType = @"AdMobRewardedAdControllerWrapper";
 
 @interface AdMobRewardedAdControllerWrapper () <GADRewardBasedVideoAdDelegate>
 
-@property (nonatomic, readwrite, assign) BOOL ready;
+@property (nonatomic, readwrite, nonnull) BehaviorRelay<NSNumber *> *canPresentOrPresenting;
 
 /** presentedAdDismissed is hot infinite signal - emits RACUnit whenever an ad is presented. */
 @property (nonatomic, readwrite, nonnull) RACSubject<RACUnit *> *presentedAdDismissed;
@@ -43,11 +44,8 @@ PsiFeedbackLogType const AdMobRewardedAdControllerWrapperLogType = @"AdMobReward
 
 // Private Properties.
 
-/** loadStatus is hot non-completing signal - emits the wrapper tag when the ad has been loaded. */
-@property (nonatomic, readwrite, nonnull) RACSubject<AdControllerTag> *loadStatus;
-
-/** TRUE if an ad request has been placed and has not finished yet (either failed or succeeded), FALSE otherwise. */
-@property (nonatomic, readwrite, assign) BOOL loading;
+/** loadStatus is hot relay subject - emits the wrapper tag when the ad has been loaded. */
+@property (nonatomic, readwrite, nonnull) RelaySubject<RACTwoTuple<AdControllerTag, NSError *> *> *loadStatusRelay;
 
 @property (nonatomic, readonly) NSString *adUnitID;
 
@@ -59,16 +57,15 @@ PsiFeedbackLogType const AdMobRewardedAdControllerWrapperLogType = @"AdMobReward
 
 - (instancetype)initWithAdUnitID:(NSString *)adUnitID withTag:(AdControllerTag)tag {
     _tag = tag;
-    _loadStatus = [RACSubject subject];
+    _loadStatusRelay = [RelaySubject subject];
     _adUnitID = adUnitID;
-    _ready = FALSE;
+    _canPresentOrPresenting = [BehaviorRelay behaviorSubjectWithDefaultValue:@(FALSE)];
     _presentedAdDismissed = [RACSubject subject];
     _presentationStatus = [RACSubject subject];
-    _loading = FALSE;
     return self;
 }
 
-- (RACSignal<AdControllerTag> *)loadAd {
+- (RACSignal<RACTwoTuple<AdControllerTag, NSError *> *> *)loadAd {
 
     AdMobRewardedAdControllerWrapper *__weak weakSelf = self;
 
@@ -78,25 +75,24 @@ PsiFeedbackLogType const AdMobRewardedAdControllerWrapperLogType = @"AdMobReward
         if ([Nullity isEmpty:customData]) {
             NSError *e = [NSError errorWithDomain:AdControllerWrapperErrorDomain
                                              code:AdControllerWrapperErrorCustomDataNotSet];
-            [subscriber sendError:e];
+            [subscriber sendNext:[RACTwoTuple pack:self.tag :e]];
             return nil;
         }
 
         // Subscribe to load status before loading an ad to prevent race-condition with "adDidLoad" delegate callback.
-        RACDisposable *disposable = [weakSelf.loadStatus subscribe:subscriber];
+        RACDisposable *disposable = [weakSelf.loadStatusRelay subscribe:subscriber];
 
         GADRewardBasedVideoAd *videoAd = [GADRewardBasedVideoAd sharedInstance];
+        if (!videoAd.delegate) {
+            videoAd.delegate = weakSelf;
+        }
 
-        // Create ad request only if one is not ready or is not loading.
+        // Create ad request only if one is not ready.
         if (videoAd.isReady) {
             // Manually call the delegate method to re-execute the logic for when an ad is loaded.
             [weakSelf rewardBasedVideoAdDidReceiveAd:videoAd];
 
-        } else if (!weakSelf.loading) {
-
-            weakSelf.loading = TRUE;
-
-            videoAd.delegate = weakSelf;
+        } else {
 
             GADRequest *request = [AdMobConsent createGADRequestWithUserConsentStatus];
 
@@ -111,19 +107,17 @@ PsiFeedbackLogType const AdMobRewardedAdControllerWrapperLogType = @"AdMobReward
     }];
 }
 
-- (RACSignal<AdControllerTag> *)unloadAd {
+- (RACSignal<RACTwoTuple<AdControllerTag, NSError *> *> *)unloadAd {
 
     AdMobRewardedAdControllerWrapper *__weak weakSelf = self;
 
     return [RACSignal createSignal:^RACDisposable *(id <RACSubscriber> subscriber) {
 
-        [GADRewardBasedVideoAd sharedInstance].delegate = nil;
-
-        if (weakSelf.ready) {
-            weakSelf.ready = FALSE;
+        if ([[weakSelf.canPresentOrPresenting first] boolValue]) {
+            [weakSelf.canPresentOrPresenting accept:@(FALSE)];
         }
 
-        [subscriber sendNext:weakSelf.tag];
+        [subscriber sendNext:[RACTwoTuple pack:weakSelf.tag :nil]];
         [subscriber sendCompleted];
         return nil;
     }];
@@ -137,7 +131,7 @@ PsiFeedbackLogType const AdMobRewardedAdControllerWrapperLogType = @"AdMobReward
 
         GADRewardBasedVideoAd *videoAd = [GADRewardBasedVideoAd sharedInstance];
 
-        if (!weakSelf.ready || !videoAd.isReady) {
+        if (!videoAd.isReady) {
             [subscriber sendNext:@(AdPresentationErrorNoAdsLoaded)];
             [subscriber sendCompleted];
             return nil;
@@ -163,27 +157,22 @@ PsiFeedbackLogType const AdMobRewardedAdControllerWrapperLogType = @"AdMobReward
 }
 
 - (void)rewardBasedVideoAdDidReceiveAd:(GADRewardBasedVideoAd *)rewardBasedVideoAd {
-
-    self.loading = FALSE;
-
-    if (!self.ready) {
-        self.ready = TRUE;
+    if (![[self.canPresentOrPresenting first] boolValue]) {
+        [self.canPresentOrPresenting accept:@(TRUE)];
     }
-    [self.loadStatus sendNext:self.tag];
+    [self.loadStatusRelay accept:[RACTwoTuple pack:self.tag :nil]];
 }
 
 - (void)rewardBasedVideoAd:(GADRewardBasedVideoAd *)rewardBasedVideoAd didFailToLoadWithError:(NSError *)error {
-
-    self.loading = FALSE;
-
-    if (self.ready) {
-        self.ready = FALSE;
+    if ([[self.canPresentOrPresenting first] boolValue]) {
+        [self.canPresentOrPresenting accept:@(FALSE)];
     }
-    [self.loadStatus sendError:[NSError errorWithDomain:AdControllerWrapperErrorDomain
-                                                   code:AdControllerWrapperErrorAdFailedToLoad
-                                    withUnderlyingError:error]];
-}
 
+    NSError *e = [NSError errorWithDomain:AdControllerWrapperErrorDomain
+                                     code:AdControllerWrapperErrorAdFailedToLoad
+                      withUnderlyingError:error];
+    [self.loadStatusRelay accept:[RACTwoTuple pack:self.tag :e]];
+}
 
 - (void)rewardBasedVideoAdDidOpen:(GADRewardBasedVideoAd *)rewardBasedVideoAd {
     [self.presentationStatus sendNext:@(AdPresentationWillAppear)];
@@ -191,18 +180,17 @@ PsiFeedbackLogType const AdMobRewardedAdControllerWrapperLogType = @"AdMobReward
 }
 
 - (void)rewardBasedVideoAdDidStartPlaying:(GADRewardBasedVideoAd *)rewardBasedVideoAd {
-    // Do nothing.
+    PSIAssert([[self.canPresentOrPresenting first] boolValue] == TRUE);
 }
 
 - (void)rewardBasedVideoAdDidCompletePlaying:(GADRewardBasedVideoAd *)rewardBasedVideoAd {
-    // Do nothing.
+    PSIAssert([[self.canPresentOrPresenting first] boolValue] == TRUE);
 }
 
 - (void)rewardBasedVideoAdDidClose:(GADRewardBasedVideoAd *)rewardBasedVideoAd {
-    if (self.ready) {
-        self.ready = FALSE;
+    if ([[self.canPresentOrPresenting first] boolValue]) {
+        [self.canPresentOrPresenting accept:@(FALSE)];
     }
-
 
     [self.presentationStatus sendNext:@(AdPresentationWillDisappear)];
     [self.presentationStatus sendNext:@(AdPresentationDidDisappear)];
