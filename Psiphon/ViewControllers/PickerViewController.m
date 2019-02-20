@@ -50,12 +50,13 @@ NSString * const CellIdentifier = @"cell";
 - (void)viewDidLoad {
     [super viewDidLoad];
 
-    self.view.backgroundColor = UIColor.whiteColor;
+    self.view.backgroundColor = UIColor.darkBlueColor;
 
     // Navigation bar
     {
-        self.navigationController.navigationBar.backgroundColor = UIColor.whiteColor;
-        self.navigationController.navigationBar.barTintColor = UIColor.whiteColor;
+        self.navigationController.navigationBar.barStyle = UIBarStyleBlack;
+        self.navigationController.navigationBar.barTintColor = UIColor.darkBlueColor;
+        self.navigationController.navigationBar.translucent = FALSE;
 
         // Removes the default iOS bottom border.
         [self.navigationController.navigationBar setValue:@(TRUE) forKeyPath:@"hidesShadow"];
@@ -65,18 +66,20 @@ NSString * const CellIdentifier = @"cell";
                   style:UIBarButtonItemStyleDone
                  target:self
                  action:@selector(onDone)];
-        doneButton.tintColor = UIColor.lightishBlue;
+        doneButton.tintColor = UIColor.whiteColor;
         self.navigationItem.rightBarButtonItem = doneButton;
 
         self.navigationController.navigationBar.titleTextAttributes = @{
-            NSFontAttributeName: [UIFont avenirNextDemiBold:14.f],
-            NSForegroundColorAttributeName: UIColor.offWhite
+            NSFontAttributeName: [UIFont avenirNextBold:14.f],
+            NSForegroundColorAttributeName: UIColor.blueGreyColor
         };
     }
 
     {
         pickerTableView = [[UITableView alloc] initWithFrame:CGRectZero];
-        pickerTableView.separatorStyle = UITableViewCellSeparatorStyleNone;
+        pickerTableView.backgroundColor = UIColor.clearColor;
+        pickerTableView.separatorStyle = UITableViewCellSeparatorStyleSingleLine;
+        pickerTableView.separatorColor = UIColor.denimBlueColor;
 
         pickerTableView.translatesAutoresizingMaskIntoConstraints = FALSE;
         pickerTableView.dataSource = self;
@@ -141,11 +144,12 @@ NSString * const CellIdentifier = @"cell";
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault
                                       reuseIdentifier:CellIdentifier];
 
+        cell.backgroundColor = UIColor.clearColor;
+
         cell.textLabel.font = [UIFont avenirNextMedium:16.f];
         cell.textLabel.textColor = UIColor.greyishBrown;
 
-        cell.layer.borderWidth = 1.f;
-        cell.layer.borderColor = UIColor.paleGrey.CGColor;
+        cell.separatorInset = UIEdgeInsetsZero;
 
         UIImageView *chevronView = [[UIImageView alloc]
           initWithImage:[UIImage imageNamed:@"Checkmark"]];
@@ -169,11 +173,13 @@ NSString * const CellIdentifier = @"cell";
 
     if (row == self.selectedIndex) {
         cell.selected = TRUE;
+        cell.textLabel.textColor = UIColor.greyishBrown;
         cell.selectedBackgroundView.backgroundColor = UIColor.duckEggBlueTwoColor;
         cell.accessoryView.hidden = FALSE;
     } else {
         cell.selected = FALSE;
-        cell.selectedBackgroundView.backgroundColor = UIColor.whiteColor;
+        cell.textLabel.textColor = UIColor.whiteColor;
+        cell.selectedBackgroundView.backgroundColor = UIColor.clearColor;
         cell.accessoryView.hidden = TRUE;
     }
 }

@@ -40,7 +40,7 @@
 
         [self setBackgroundColor:[UIColor clearColor]];
         self.layer.cornerRadius = 8;
-        self.layer.borderColor = [UIColor colorWithRed:0.94 green:0.96 blue:0.99 alpha:1.0].CGColor;
+        self.layer.borderColor = UIColor.denimBlueColor.CGColor;
         self.layer.borderWidth = 2.f;
 
         flagImageView = [[UIImageView alloc] init];
@@ -48,7 +48,7 @@
         regionNameLabel = [[UILabel alloc] init];
         regionNameLabel.adjustsFontSizeToFitWidth = YES;
         regionNameLabel.font = [UIFont avenirNextMedium:16.f];
-        regionNameLabel.textColor = [UIColor greyishBrown];
+        regionNameLabel.textColor = UIColor.whiteColor;
 
         rightArrow = [[UIImageView alloc] init];
 
@@ -80,7 +80,7 @@
     [regionNameLabel.heightAnchor constraintEqualToAnchor:self.heightAnchor multiplier:.5].active = YES;
     [regionNameLabel.trailingAnchor constraintEqualToAnchor:rightArrow.leadingAnchor constant:-14.f].active = YES;
 
-    UIImage *rightArrowImage = [UIImage imageNamed:@"chevron"];
+    UIImage *rightArrowImage = [UIImage imageNamed:@"ChevronWhite"];
     rightArrow.image = rightArrowImage;
     rightArrow.translatesAutoresizingMaskIntoConstraints = NO;
     [rightArrow.trailingAnchor constraintEqualToAnchor:self.trailingAnchor constant:-20.f].active = YES;

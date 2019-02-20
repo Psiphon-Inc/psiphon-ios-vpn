@@ -69,12 +69,12 @@
     return [UIColor colorWithRed:218.0f / 255.0f green:227.0f / 255.0f blue:238.0f / 255.0f alpha:1.0f];
 }
 
-+ (UIColor * _Nonnull)lightSeafoam {
-    return [UIColor colorWithRed:163.0f / 255.0f green:255.0f / 255.0f blue:197.0f / 255.0f alpha:1.0f];
++ (UIColor * _Nonnull)lightSeafoamColor {
+    return [UIColor colorWithRed:81.0f / 255.0f green:233.0f / 255.0f blue:235.0f / 255.0f alpha:1.0f];
 }
 
-+ (UIColor * _Nonnull)robinEggBlue {
-    return [UIColor colorWithRed:145.0f / 255.0f green:232.0f / 255.0f blue:255.0f / 255.0f alpha:1.0f];
++ (UIColor * _Nonnull)robinEggBlueColor {
+    return [UIColor colorWithRed:81.0f / 255.0f green:198.0f / 255.0f blue:232.0f / 255.0f alpha:1.0f];
 }
 
 + (UIColor * _Nonnull)darkCream {
@@ -111,6 +111,26 @@
 
 + (UIColor * _Nonnull)paleGreyThreeColor {
     return [UIColor colorWithRed:216.0f / 255.0f green:222.0f / 255.0f blue:230.0f / 255.0f alpha:1.0f];
+}
+
++ (UIColor * _Nonnull)denimBlueColor {
+    return [UIColor colorWithRed:52.0f / 255.0f green:66.0f / 255.0f blue:133.0f / 255.0f alpha:1.0f];
+}
+
++ (UIColor * _Nonnull)darkBlueColor {
+    return [UIColor colorWithRed:30.0f / 255.0f green:31.0f / 255.0f blue:67.0f / 255.0f alpha:1.0f];
+}
+
++ (UIColor * _Nonnull)blueGreyColor {
+    return [UIColor colorWithRed:123.0f / 255.0f green:145.0f / 255.0f blue:174.0f / 255.0f alpha:1.0f];
+}
+
++ (UIColor * _Nonnull)regentGrey {
+    return [UIColor colorWithRed:125.0f / 255.0f green:142.0f / 255.0f blue:162.0f / 255.0f alpha:1.0f];
+}
+
++ (UIColor * _Nonnull)nepalGreyBlueColor {
+    return [UIColor colorWithRed:137.0f / 255.0f green:161.0f / 255.0f blue:194.0f / 255.0f alpha:1.0f];
 }
 
 @end
