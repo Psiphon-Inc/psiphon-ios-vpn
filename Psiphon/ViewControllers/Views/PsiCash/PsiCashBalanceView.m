@@ -22,6 +22,7 @@
 #import "PsiCashSpeedBoostMeterView.h"
 #import "ReactiveObjC.h"
 #import "UIView+AutoLayoutViewGroup.h"
+#import "UIColor+Additions.h"
 
 @interface PsiCashBalanceView ()
 @property (atomic, readwrite) PsiCashClientModel *model;
@@ -50,9 +51,9 @@
 
 - (void)setupViews {
     self.clipsToBounds = YES;
-    self.layer.borderColor = [UIColor colorWithRed:0.94 green:0.96 blue:0.99 alpha:1.0].CGColor;
+    self.layer.borderColor = UIColor.denimBlueColor.CGColor;
     self.layer.borderWidth = 2.f;
-    self.backgroundColor = UIColor.whiteColor;
+    self.backgroundColor = UIColor.clearColor;
 
     // Setup container view
     containerView = [[UIView alloc] init];
@@ -63,7 +64,7 @@
     _balance.adjustsFontSizeToFitWidth = YES;
     _balance.font = [UIFont boldSystemFontOfSize:20];
     _balance.textAlignment = self.isRTL ? NSTextAlignmentRight : NSTextAlignmentLeft;
-    _balance.textColor = [UIColor colorWithRed:0.30 green:0.31 blue:1.00 alpha:1.0];
+    _balance.textColor = UIColor.whiteColor;
     _balance.userInteractionEnabled = NO;
 
     // Setup coin graphic
@@ -94,9 +95,9 @@
     [_balance.centerYAnchor constraintEqualToAnchor:_coin.centerYAnchor].active = YES;
 
     _coin.translatesAutoresizingMaskIntoConstraints = NO;
-    [_coin.heightAnchor constraintEqualToAnchor:self.heightAnchor multiplier:0.9].active = YES;
+    [_coin.heightAnchor constraintEqualToAnchor:self.heightAnchor multiplier:0.8].active = YES;
     [_coin.widthAnchor constraintEqualToAnchor:self.heightAnchor].active = YES;
-    [_coin.bottomAnchor constraintEqualToAnchor:self.bottomAnchor].active = YES;
+    [_coin.bottomAnchor constraintEqualToAnchor:self.bottomAnchor constant:-self.layer.borderWidth].active = YES;
     [_coin.leadingAnchor constraintEqualToAnchor:containerView.leadingAnchor].active = YES;
     [_coin.trailingAnchor constraintEqualToAnchor:_balance.leadingAnchor constant:-10].active = YES;
 }

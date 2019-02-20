@@ -2,17 +2,17 @@
   "images" : [
     {
       "idiom" : "universal",
-      "filename" : "group.png",
+      "filename" : "Dark-Gear.png",
       "scale" : "1x"
     },
     {
       "idiom" : "universal",
-      "filename" : "group@2x.png",
+      "filename" : "Dark-Gear@2x.png",
       "scale" : "2x"
     },
     {
       "idiom" : "universal",
-      "filename" : "group@3x.png",
+      "filename" : "Dark-Gear@3x.png",
       "scale" : "3x"
     }
   ],

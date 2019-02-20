@@ -188,7 +188,7 @@ NSString * const CommandStopVPN = @"StopVPN";
     
     // Setting up the UI
     // calls them in the right order
-    [self.view setBackgroundColor:[UIColor whiteColor]];
+    [self.view setBackgroundColor:UIColor.darkBlueColor];
     [self setNeedsStatusBarAppearanceUpdate];
     [self addViews];
 
@@ -352,7 +352,7 @@ NSString * const CommandStopVPN = @"StopVPN";
 }
 
 - (UIStatusBarStyle)preferredStatusBarStyle {
-    return UIStatusBarStyleDefault;
+    return UIStatusBarStyleLightContent;
 }
 
 // Reload when rotate
@@ -564,7 +564,7 @@ NSString * const CommandStopVPN = @"StopVPN";
 }
 
 - (void)setupSettingsButton {
-    UIImage *gearTemplate = [UIImage imageNamed:@"settings"];
+    UIImage *gearTemplate = [UIImage imageNamed:@"GearDark"];
     settingsButton.translatesAutoresizingMaskIntoConstraints = NO;
     [settingsButton setImage:gearTemplate forState:UIControlStateNormal];
 
@@ -606,7 +606,7 @@ NSString * const CommandStopVPN = @"StopVPN";
     cloudBottomRight = [[UIImageView alloc] initWithImage:cloud];
     versionLabel = [[UIButton alloc] init];
     settingsButton = [[UIButton alloc] init];
-    psiphonLogoView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"PsiphonLogo"]];
+    psiphonLogoView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"PsiphonLogoWhite"]];
     psiCashView = [[PsiCashView alloc] initWithAutoLayout];
     startAndStopButton = [VPNStartAndStopButton buttonWithType:UIButtonTypeCustom];
     statusLabel = [[UILabel alloc] init];
@@ -819,13 +819,13 @@ NSString * const CommandStopVPN = @"StopVPN";
     statusLabel.adjustsFontSizeToFitWidth = YES;
     [self setStatusLabelText:[self getVPNStatusDescription:VPNStatusInvalid]];
     statusLabel.textAlignment = NSTextAlignmentCenter;
-    statusLabel.textColor = [UIColor colorWithRed:0.88 green:0.87 blue:0.87 alpha:1.0];
+    statusLabel.textColor = UIColor.blueGreyColor;
     statusLabel.font = [UIFont avenirNextBold:14.5];
     
     // Setup autolayout
     CGFloat labelHeight = [statusLabel getLabelHeight];
     [statusLabel.heightAnchor constraintEqualToConstant:labelHeight].active = YES;
-    [statusLabel.topAnchor constraintEqualToAnchor:startAndStopButton.bottomAnchor constant:5].active = YES;
+    [statusLabel.topAnchor constraintEqualToAnchor:startAndStopButton.bottomAnchor constant:20].active = YES;
     [statusLabel.centerXAnchor constraintEqualToAnchor:self.view.centerXAnchor].active = YES;
 }
 
@@ -887,7 +887,7 @@ NSString * const CommandStopVPN = @"StopVPN";
     versionLabel.translatesAutoresizingMaskIntoConstraints = NO;
     [versionLabel setTitle:[NSString stringWithFormat:NSLocalizedStringWithDefaultValue(@"APP_VERSION", nil, [NSBundle mainBundle], @"v.%@", @"Text showing the app version. The '%@' placeholder is the version number. So it will look like 'v.2'."),[[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"]]
                   forState:UIControlStateNormal];
-    [versionLabel setTitleColor:UIColor.offWhiteTwo forState:UIControlStateNormal];
+    [versionLabel setTitleColor:UIColor.nepalGreyBlueColor forState:UIControlStateNormal];
     versionLabel.titleLabel.adjustsFontSizeToFitWidth = YES;
     versionLabel.titleLabel.font = [UIFont avenirNextBold:10.5f];
     versionLabel.userInteractionEnabled = FALSE;
