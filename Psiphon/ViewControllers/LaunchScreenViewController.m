@@ -23,6 +23,7 @@
 #import "PsiphonProgressView.h"
 #import "UIView+AutoLayoutViewGroup.h"
 #import "UIFont+Additions.h"
+#import "UIColor+Additions.h"
 
 
 #define kProgressViewToScreenRatio 0.9f
@@ -46,6 +47,7 @@
     [super viewDidLoad];
 
     // Background
+    self.view.backgroundColor = UIColor.darkBlueColor;
 
     UIView *launchScreenView = [[[NSBundle mainBundle] loadNibNamed:@"LaunchScreen" owner:self options:nil] objectAtIndex:0];
     [self.view addSubview:launchScreenView];
@@ -64,7 +66,7 @@
     loadingLabel.adjustsFontSizeToFitWidth = YES;
     loadingLabel.text = NSLocalizedStringWithDefaultValue(@"LOADING", nil, [NSBundle mainBundle], @"Loading...", @"Text displayed while app loads");
     loadingLabel.textAlignment = NSTextAlignmentCenter;
-    loadingLabel.textColor = [[UIColor blackColor] colorWithAlphaComponent:0.6];
+    loadingLabel.textColor = UIColor.whiteColor;
     loadingLabel.font = [UIFont avenirNextMedium:20.f];
 
     [self.view addSubview:loadingLabel];

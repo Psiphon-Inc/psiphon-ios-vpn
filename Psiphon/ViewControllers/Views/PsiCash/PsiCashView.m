@@ -65,8 +65,8 @@
     CAShapeLayer *shape = [CAShapeLayer layer];
     shape.path = rounded.CGPath;
     shape.lineWidth = 2.f;
-    shape.fillColor = UIColor.whiteColor.CGColor;
-    shape.strokeColor = UIColor.duckEggBlue.CGColor;
+    shape.fillColor = UIColor.clearColor.CGColor;
+    shape.strokeColor = UIColor.denimBlueColor.CGColor;
     [rewardedVideoButtonContainer.layer insertSublayer:shape below:_rewardedVideoButton.layer];
 }
 
@@ -92,13 +92,13 @@
     [_rewardedVideoButton setTitle:[PsiCashView videoUnavailableTitleText]
                           forState:UIControlStateDisabled];
     _rewardedVideoButton.enabled = FALSE;
-    _rewardedVideoButton.backgroundColor = UIColor.whiteColor;
+    _rewardedVideoButton.backgroundColor = UIColor.clearColor;
 
     topBorderBlocker = [[UIView alloc] init];
-    topBorderBlocker.backgroundColor = UIColor.whiteColor;
+    topBorderBlocker.backgroundColor = UIColor.darkBlueColor;
 
     bottomBorderBlocker = [[UIView alloc] init];
-    bottomBorderBlocker.backgroundColor = UIColor.whiteColor;
+    bottomBorderBlocker.backgroundColor = UIColor.darkBlueColor;
 }
 
 - (void)addSubviews {

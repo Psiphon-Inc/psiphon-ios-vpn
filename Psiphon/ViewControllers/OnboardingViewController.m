@@ -64,10 +64,16 @@ const int NumPages = 4;
     [self.compoundDisposable dispose];
 }
 
+- (UIStatusBarStyle)preferredStatusBarStyle {
+    return UIStatusBarStyleLightContent;
+}
+
 - (void)viewDidLoad {
     [super viewDidLoad];
 
-    self.view.backgroundColor = UIColor.whiteColor;
+    [self setNeedsStatusBarAppearanceUpdate];
+
+    self.view.backgroundColor = UIColor.darkBlueColor;
 
     // Clouds view
     {
@@ -103,7 +109,7 @@ const int NumPages = 4;
         nextPageButton.contentEdgeInsets = UIEdgeInsetsMake(p, 2.f * p, p, p);
 
         [nextPageButton setTitle:[Strings nextPageButtonTitle] forState:UIControlStateNormal];
-        [nextPageButton setTitleColor:UIColor.lightRoyalBlue forState:UIControlStateNormal];
+        [nextPageButton setTitleColor:UIColor.whiteColor forState:UIControlStateNormal];
         nextPageButton.titleLabel.font = [UIFont avenirNextDemiBold:16.f];
         [nextPageButton addTarget:self
                  action:@selector(gotoNextPage)
@@ -319,7 +325,7 @@ const int NumPages = 4;
     label.adjustsFontSizeToFitWidth = TRUE;
     label.minimumScaleFactor = 0.8;
     label.font = [UIFont avenirNextMedium:16.f];
-    label.textColor = UIColor.greyishBrown;
+    label.textColor = UIColor.whiteColor;
     label.numberOfLines = 0;
     label.lineBreakMode = NSLineBreakByWordWrapping;
     label.textAlignment = NSTextAlignmentCenter;
