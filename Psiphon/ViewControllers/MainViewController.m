@@ -114,7 +114,8 @@ NSString * const CommandStopVPN = @"StopVPN";
 
     // Psiphon Logo
     // Replaces the PsiCash UI when the user is subscribed
-    UIImageView *psiphonLogoView;
+    UIImageView *psiphonSmallLogo;
+    UIImageView *psiphonLargeLogo;
 
     // PsiCash
     NSLayoutConstraint *psiCashViewHeight;
@@ -193,7 +194,7 @@ NSString * const CommandStopVPN = @"StopVPN";
     [self addViews];
 
     [self setupClouds];
-    [self setupVersionLabel];
+    [self setupSmallPsiphonLogoAndVersionLabel];
     [self setupSettingsButton];
     [self setupPsiphonLogoView];
     [self setupPsiCashView];
@@ -606,7 +607,8 @@ NSString * const CommandStopVPN = @"StopVPN";
     cloudBottomRight = [[UIImageView alloc] initWithImage:cloud];
     versionLabel = [[UIButton alloc] init];
     settingsButton = [[UIButton alloc] init];
-    psiphonLogoView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"PsiphonLogoWhite"]];
+    psiphonSmallLogo = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"PsiphonSmallLogoWhite"]];
+    psiphonLargeLogo = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"PsiphonLogoWhite"]];
     psiCashView = [[PsiCashView alloc] initWithAutoLayout];
     startAndStopButton = [VPNStartAndStopButton buttonWithType:UIButtonTypeCustom];
     statusLabel = [[UILabel alloc] init];
@@ -620,7 +622,8 @@ NSString * const CommandStopVPN = @"StopVPN";
     [self.view addSubview:cloudMiddleRight];
     [self.view addSubview:cloudTopRight];
     [self.view addSubview:cloudBottomRight];
-    [self.view addSubview:psiphonLogoView];
+    [self.view addSubview:psiphonSmallLogo];
+    [self.view addSubview:psiphonLargeLogo];
     [self.view addSubview:psiCashView];
     [self.view addSubview:versionLabel];
     [self.view addSubview:settingsButton];
@@ -883,7 +886,23 @@ NSString * const CommandStopVPN = @"StopVPN";
     [regionSelectionButton.widthAnchor constraintEqualToAnchor:bottomBar.widthAnchor multiplier:0.9f].active = YES;
 }
 
-- (void)setupVersionLabel {
+- (void)setupSmallPsiphonLogoAndVersionLabel {
+
+    psiphonSmallLogo.translatesAutoresizingMaskIntoConstraints = FALSE;
+    psiphonSmallLogo.userInteractionEnabled = FALSE;
+
+    // Setup autolayout
+    [NSLayoutConstraint activateConstraints:@[
+      [psiphonSmallLogo.leadingAnchor constraintEqualToAnchor:psiCashView.leadingAnchor],
+
+      [psiphonSmallLogo.trailingAnchor
+        constraintLessThanOrEqualToAnchor:psiCashView.balance.leadingAnchor
+                                 constant:-2],
+
+      [psiphonSmallLogo.topAnchor constraintEqualToAnchor:psiCashView.topAnchor]
+    ]];
+
+
     versionLabel.translatesAutoresizingMaskIntoConstraints = NO;
     [versionLabel setTitle:[NSString stringWithFormat:NSLocalizedStringWithDefaultValue(@"APP_VERSION", nil, [NSBundle mainBundle], @"v.%@", @"Text showing the app version. The '%@' placeholder is the version number. So it will look like 'v.2'."),[[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"]]
                   forState:UIControlStateNormal];
@@ -902,13 +921,8 @@ NSString * const CommandStopVPN = @"StopVPN";
 
     // Setup autolayout
     [NSLayoutConstraint activateConstraints:@[
-      [versionLabel.leadingAnchor constraintEqualToAnchor:psiCashView.leadingAnchor constant:0],
-
-      [versionLabel.trailingAnchor
-        constraintLessThanOrEqualToAnchor:psiCashView.balance.leadingAnchor
-                                 constant:-2],
-
-      [versionLabel.topAnchor constraintEqualToAnchor:psiCashView.topAnchor]
+      [versionLabel.leadingAnchor constraintEqualToAnchor:psiphonSmallLogo.leadingAnchor constant:-10.f],
+      [versionLabel.topAnchor constraintEqualToAnchor:psiphonSmallLogo.bottomAnchor constant:-10.f]
     ]];
 }
 
@@ -1086,12 +1100,12 @@ NSString * const CommandStopVPN = @"StopVPN";
 #pragma mark - PsiCash UI
 
 - (void)setupPsiphonLogoView {
-    psiphonLogoView.translatesAutoresizingMaskIntoConstraints = NO;
+    psiphonLargeLogo.translatesAutoresizingMaskIntoConstraints = NO;
 
-    psiphonLogoView.contentMode = UIViewContentModeScaleAspectFill;
+    psiphonLargeLogo.contentMode = UIViewContentModeScaleAspectFill;
 
-    [psiphonLogoView.centerYAnchor constraintEqualToAnchor:versionLabel.centerYAnchor].active = YES;
-    [psiphonLogoView.centerXAnchor constraintEqualToAnchor:self.view.centerXAnchor].active = YES;
+    [psiphonLargeLogo.centerYAnchor constraintEqualToAnchor:versionLabel.centerYAnchor].active = YES;
+    [psiphonLargeLogo.centerXAnchor constraintEqualToAnchor:self.view.centerXAnchor].active = YES;
 }
 
 - (void)setupPsiCashView {
@@ -1201,8 +1215,9 @@ NSString * const CommandStopVPN = @"StopVPN";
     psiCashView.hidden = hidden;
     psiCashView.userInteractionEnabled = !hidden;
 
-    // Show Psiphon logo when PsiCash view is hidden
-    psiphonLogoView.hidden = !hidden;
+    // Show Psiphon large logo and hide Psiphon small logo when PsiCash is hidden.
+    psiphonLargeLogo.hidden = !hidden;
+    psiphonSmallLogo.hidden = hidden;
 }
 
 - (void)showRewardedVideo {
