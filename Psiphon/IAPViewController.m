@@ -178,14 +178,14 @@ static NSString *iapCellID = @"IAPTableCellID";
 
     } else {
         UITextView *noProductsTextView = [[UITextView alloc] initWithFrame:CGRectMake(0, 0, tableView.bounds.size.width, tableView.bounds.size.height)];
-        noProductsTextView.backgroundColor = UIColor.whiteColor;
+        noProductsTextView.backgroundColor = UIColor.darkBlueColor;
         noProductsTextView.editable = NO;
         noProductsTextView.font =  [UIFont fontWithName:@"Helvetica" size:15.0f];
         noProductsTextView.textContainerInset = UIEdgeInsetsMake(60, 10, 0, 10);
         noProductsTextView.text = NSLocalizedStringWithDefaultValue(@"NO_PRODUCTS_TEXT", nil, [NSBundle mainBundle],
                                                                     @"Could not retrieve subscriptions from the App Store. Pull to refresh or try again later.",
                                                                     @"Subscriptions view text that is visible when the list of subscriptions is not available");
-        noProductsTextView.textColor = [UIColor colorWithRed:0.29 green:0.29 blue:0.29 alpha:1.0];
+        noProductsTextView.textColor = UIColor.whiteColor;
         noProductsTextView.textAlignment = NSTextAlignmentCenter;
         tableView.tableHeaderView = noProductsTextView;
         tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
