@@ -305,6 +305,10 @@
     title.attributedText = [self styleTitleText:[Strings psiCashSpeedBoostMeterNoAuthTitle]];
 }
 
+- (void)userNotOnboarded {
+    title.attributedText = [self styleTitleText:[Strings psiCashSpeedBoostMeterUserNotOnboardedTitle]];
+}
+
 - (NSTimeInterval)timeToNextHourExpired:(NSTimeInterval)seconds {
     NSTimeInterval secondsRemaining = seconds;
     NSInteger hoursRemaining = secondsRemaining / (60 * 60);
@@ -342,7 +346,9 @@
         } else if ([self.model hasPendingPurchase]){
             [self inPurchasePendingState];
         } else {
-            if ([self.model.authPackage hasSpenderToken]) {
+            if (!self.model.onboarded) {
+                [self userNotOnboarded];
+            } else if ([self.model.authPackage hasSpenderToken]) {
                 [self speedBoostChargingWithHoursEarned:[self.model maxSpeedBoostPurchaseEarned].hours];
             } else {
                 [self noSpenderToken];

@@ -23,6 +23,7 @@
 #import "PsiCashAuthPackage.h"
 
 @interface PsiCashClientModel : NSObject
+@property (nonatomic, assign) BOOL onboarded;
 @property (strong, atomic) PsiCashAuthPackage *authPackage;
 @property (strong, atomic) NSNumber *_Nonnull balance;
 @property (strong, atomic) PsiCashSpeedBoostProduct *speedBoostProduct;

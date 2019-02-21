@@ -118,6 +118,7 @@
                                                        andPendingPurchases:nil
                                                andActiveSpeedBoostPurchase:nil
                                                          andRefreshPending:NO];
+    m.onboarded = TRUE;
 
     if (self.index == PsiCashOnboardingPage2Index) {
         [meter bindWithModel:[m copy]];
