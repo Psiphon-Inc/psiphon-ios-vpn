@@ -118,6 +118,7 @@ NSString * const CommandStopVPN = @"StopVPN";
     UIImageView *psiphonLargeLogo;
 
     // PsiCash
+    RACBehaviorSubject<NSNumber*> *psiCashOnboardingCompleted;
     NSLayoutConstraint *psiCashViewHeight;
     PsiCashPurchaseAlertView *alertView;
     PsiCashClientModel *model;
@@ -186,6 +187,10 @@ NSString * const CommandStopVPN = @"StopVPN";
 
     availableServerRegions = [[AvailableServerRegions alloc] init];
     [availableServerRegions sync];
+
+    psiCashOnboardingCompleted = [[RACBehaviorSubject alloc] init];
+    BOOL onboarded = [[NSUserDefaults standardUserDefaults] boolForKey:PsiCashHasBeenOnboardedBoolKey];
+    [psiCashOnboardingCompleted sendNext:[NSNumber numberWithBool:onboarded]];
     
     // Setting up the UI
     // calls them in the right order
@@ -1043,15 +1048,13 @@ NSString * const CommandStopVPN = @"StopVPN";
 
 #pragma mark - PsiCash
 
-#pragma mark - PsiCash UI actions
+#pragma mark - PsiCash UI callbacks
 
 /**
  * Buy max num hours of Speed Boost that the user can afford if possible
  */
 - (void)instantMaxSpeedBoostPurchase {
-    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
-
-    if (![userDefaults boolForKey:PsiCashHasBeenOnboardedBoolKey]) {
+    if (![[psiCashOnboardingCompleted first] boolValue]) {
         PsiCashOnboardingViewController *onboarding = [[PsiCashOnboardingViewController alloc] init];
         onboarding.delegate = self;
         [self presentViewController:onboarding animated:NO completion:nil];
@@ -1132,31 +1135,42 @@ NSString * const CommandStopVPN = @"StopVPN";
 
     MainViewController *__weak weakSelf = self;
 
-    RACDisposable *psiCashViewUpdates = [[PsiCashClient.sharedInstance.clientModelSignal deliverOnMainThread]
-      subscribeNext:^(PsiCashClientModel *newClientModel) {
-        MainViewController *__strong strongSelf = weakSelf;
-        if (strongSelf != nil) {
 
-            BOOL stateChanged = [strongSelf->model hasActiveSpeedBoostPurchase] ^ [newClientModel hasActiveSpeedBoostPurchase]
-              || [strongSelf->model hasPendingPurchase] ^ [newClientModel hasPendingPurchase];
+    RACDisposable *psiCashViewUpdates =
+        [[[PsiCashClient.sharedInstance.clientModelSignal
+        combineLatestWith:psiCashOnboardingCompleted]
+        deliverOnMainThread]
+        subscribeNext:^(RACTwoTuple<PsiCashClientModel *, NSNumber *> * _Nullable x) {
 
-            NSComparisonResult balanceChange = [strongSelf->model.balance compare:newClientModel.balance];
-            if (balanceChange != NSOrderedSame) {
-                NSNumber *balanceChange =
-                  [NSNumber numberWithDouble:newClientModel.balance.doubleValue - strongSelf->model.balance.doubleValue];
-                [PsiCashView animateBalanceChangeOf:balanceChange
-                                                          withPsiCashView:strongSelf->psiCashView
-                                                             inParentView:strongSelf.view];
+            PsiCashClientModel *newClientModel = [x first];
+            newClientModel.onboarded = [[x second] boolValue];
+
+            MainViewController *__strong strongSelf = weakSelf;
+
+            if (strongSelf != nil) {
+                BOOL stateChanged =    [strongSelf->model hasActiveSpeedBoostPurchase] ^
+                                       [newClientModel hasActiveSpeedBoostPurchase]
+                                    ||
+                                       [strongSelf->model hasPendingPurchase] ^
+                                       [newClientModel hasPendingPurchase];
+                NSComparisonResult balanceChange = [strongSelf->model.balance compare:newClientModel.balance];
+
+                if (balanceChange != NSOrderedSame) {
+                    NSNumber *balanceChange = [NSNumber numberWithDouble:newClientModel.balance.doubleValue
+                                              - strongSelf->model.balance.doubleValue];
+                    [PsiCashView animateBalanceChangeOf:balanceChange
+                                        withPsiCashView:strongSelf->psiCashView
+                                           inParentView:strongSelf.view];
+                }
+
+                strongSelf->model = newClientModel;
+
+                if (stateChanged && strongSelf->alertView != nil) {
+                    [strongSelf showPsiCashAlertView];
+                }
+
+                [strongSelf->psiCashView bindWithModel:strongSelf->model];
             }
-
-            strongSelf->model = newClientModel;
-
-            if (stateChanged && strongSelf->alertView != nil) {
-                [strongSelf showPsiCashAlertView];
-            }
-
-            [strongSelf->psiCashView bindWithModel:strongSelf->model];
-        }
     }];
 
     [self.compoundDisposable addDisposable:psiCashViewUpdates];
@@ -1350,6 +1364,7 @@ NSString * const CommandStopVPN = @"StopVPN";
 
 - (void)onboardingEnded {
     [[NSUserDefaults standardUserDefaults] setBool:YES forKey:PsiCashHasBeenOnboardedBoolKey];
+    [psiCashOnboardingCompleted sendNext:[NSNumber numberWithBool:YES]];
 }
 
 #pragma mark - RegionAdapterDelegate protocol implementation
