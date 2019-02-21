@@ -35,8 +35,8 @@
         statusGradientLayer.colors = @[(id)UIColor.lightRoyalBlueTwo.CGColor,
                                        (id)UIColor.lightishBlue.CGColor];
     } else {
-        statusGradientLayer.colors = @[(id)UIColor.lightBlueGrey.CGColor,
-                                       (id)UIColor.lightBlueGrey.CGColor];
+        statusGradientLayer.colors = @[(id)UIColor.regentGrey.CGColor,
+                                       (id)UIColor.regentGrey.CGColor];
     }
 }
 

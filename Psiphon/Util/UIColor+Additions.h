@@ -45,9 +45,9 @@
 
 + (UIColor * _Nonnull)lightBlueGrey;
 
-+ (UIColor * _Nonnull)lightSeafoam;
++ (UIColor * _Nonnull)lightSeafoamColor;
 
-+ (UIColor * _Nonnull)robinEggBlue;
++ (UIColor * _Nonnull)robinEggBlueColor;
 
 + (UIColor * _Nonnull)peachyPink;
 
@@ -66,5 +66,15 @@
 + (UIColor * _Nonnull)periwinkleColor;
 
 + (UIColor * _Nonnull)paleGreyThreeColor;
+
++ (UIColor * _Nonnull)denimBlueColor;
+
++ (UIColor * _Nonnull)darkBlueColor;
+
++ (UIColor * _Nonnull)blueGreyColor;
+
++ (UIColor * _Nonnull)regentGrey;
+
++ (UIColor * _Nonnull)nepalGreyBlueColor;
 
 @end
