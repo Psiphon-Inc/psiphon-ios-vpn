@@ -15,9 +15,6 @@
 /* Text for app subtitle on main view. */
 "APP_SUB_TITLE_MAIN_VIEW" = "BEYOND BORDERS";
 
-/* Text showing the app version. The '%@' placeholder is the version number. So it will look like 'v.2'. */
-"APP_VERSION" = "v.%@";
-
 /* Title of the button which takes the user to the previous screen. Text should be short and one word when possible. */
 "BACK_BUTTON" = "Back";
 
