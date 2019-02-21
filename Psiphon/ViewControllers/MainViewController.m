@@ -909,15 +909,15 @@ NSString * const CommandStopVPN = @"StopVPN";
 
 
     versionLabel.translatesAutoresizingMaskIntoConstraints = NO;
-    [versionLabel setTitle:[NSString stringWithFormat:NSLocalizedStringWithDefaultValue(@"APP_VERSION", nil, [NSBundle mainBundle], @"v.%@", @"Text showing the app version. The '%@' placeholder is the version number. So it will look like 'v.2'."),[[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"]]
+    [versionLabel setTitle:[NSString stringWithFormat:@"v%@",[[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"]]
                   forState:UIControlStateNormal];
     [versionLabel setTitleColor:UIColor.nepalGreyBlueColor forState:UIControlStateNormal];
     versionLabel.titleLabel.adjustsFontSizeToFitWidth = YES;
     versionLabel.titleLabel.font = [UIFont avenirNextBold:10.5f];
     versionLabel.userInteractionEnabled = FALSE;
+    versionLabel.contentEdgeInsets = UIEdgeInsetsMake(10.f, 10.f, 10.f, 10.f);
 
 #if DEBUG
-    versionLabel.contentEdgeInsets = UIEdgeInsetsMake(10.f, 10.f, 10.f, 10.f);
     versionLabel.userInteractionEnabled = TRUE;
     [versionLabel addTarget:self
                      action:@selector(onVersionLabelTap:)
