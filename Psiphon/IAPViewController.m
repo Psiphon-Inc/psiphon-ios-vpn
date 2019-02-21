@@ -53,10 +53,6 @@ static NSString *iapCellID = @"IAPTableCellID";
     CAGradientLayer *manageSubsButtonGradient;
 }
 
-- (UIStatusBarStyle)preferredStatusBarStyle {
-    return UIStatusBarStyleLightContent;
-}
-
 - (instancetype)init {
     self = [super init];
     if (self) {
@@ -87,13 +83,22 @@ static NSString *iapCellID = @"IAPTableCellID";
     [self.tableView sendSubviewToBack:self.refreshControl];
 }
 
+
+
 - (void)viewDidLoad {
     [super viewDidLoad];
 
     // Sets screen background and navigation bar colours.
-    self.view.backgroundColor = UIColor.whiteColor;
-    self.navigationController.navigationBar.tintColor = UIColor.lightishBlueTwo;  // Navigation bar items color
-    self.navigationController.navigationBar.titleTextAttributes = @{NSForegroundColorAttributeName:UIColor.offWhite, NSFontAttributeName:[UIFont avenirNextBold:18.f]};
+    self.view.backgroundColor = UIColor.darkBlueColor;
+
+    self.navigationController.navigationBar.barStyle = UIBarStyleBlack;
+    self.navigationController.navigationBar.barTintColor = UIColor.darkBlueColor;
+    self.navigationController.navigationBar.translucent = FALSE;
+
+    self.navigationController.navigationBar.titleTextAttributes = @{
+      NSForegroundColorAttributeName:UIColor.blueGreyColor,
+      NSFontAttributeName:[UIFont avenirNextBold:18.f]
+    };
 
     // Sets navigation bar title.
     self.title = NSLocalizedStringWithDefaultValue(@"SUBSCRIPTIONS", nil, [NSBundle mainBundle], @"Subscriptions", @"Title of the dialog for available in-app paid subscriptions");
@@ -103,11 +108,15 @@ static NSString *iapCellID = @"IAPTableCellID";
 
     // Adds "Done" button (dismiss action) to the navigation bar if it is not opened from Setting menu.
     if (!self.openedFromSettings) {
-        self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc]
-                                                  initWithTitle:NSLocalizedStringWithDefaultValue(@"DONE_ACTION", nil, [NSBundle mainBundle], @"Done", @"Title of the button that dismisses the subscriptions menu")
-                                                  style:UIBarButtonItemStyleDone
-                                                  target:self
-                                                  action:@selector(dismissViewController)];
+        UIBarButtonItem *doneButton = [[UIBarButtonItem alloc]
+          initWithTitle:NSLocalizedStringWithDefaultValue(@"DONE_ACTION", nil, [NSBundle mainBundle], @"Done", @"Title of the button that dismisses the subscriptions menu")
+                  style:UIBarButtonItemStyleDone
+                 target:self
+                 action:@selector(dismissViewController)];
+        doneButton.tintColor = UIColor.whiteColor;
+
+        self.navigationItem.rightBarButtonItem = doneButton;
+
     }
 
     // Listens to IAPStoreHelper transaction states.
@@ -151,7 +160,9 @@ static NSString *iapCellID = @"IAPTableCellID";
 - (void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
 
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
+    if ([self isMovingFromParentViewController]) {
+        self.navigationController.navigationBar.barStyle = UIBarStyleDefault;
+    }
 }
 
 #pragma mark - Table view data source
@@ -167,14 +178,14 @@ static NSString *iapCellID = @"IAPTableCellID";
 
     } else {
         UITextView *noProductsTextView = [[UITextView alloc] initWithFrame:CGRectMake(0, 0, tableView.bounds.size.width, tableView.bounds.size.height)];
-        noProductsTextView.backgroundColor = UIColor.whiteColor;
+        noProductsTextView.backgroundColor = UIColor.darkBlueColor;
         noProductsTextView.editable = NO;
         noProductsTextView.font =  [UIFont fontWithName:@"Helvetica" size:15.0f];
         noProductsTextView.textContainerInset = UIEdgeInsetsMake(60, 10, 0, 10);
         noProductsTextView.text = NSLocalizedStringWithDefaultValue(@"NO_PRODUCTS_TEXT", nil, [NSBundle mainBundle],
                                                                     @"Could not retrieve subscriptions from the App Store. Pull to refresh or try again later.",
                                                                     @"Subscriptions view text that is visible when the list of subscriptions is not available");
-        noProductsTextView.textColor = [UIColor colorWithRed:0.29 green:0.29 blue:0.29 alpha:1.0];
+        noProductsTextView.textColor = UIColor.whiteColor;
         noProductsTextView.textAlignment = NSTextAlignmentCenter;
         tableView.tableHeaderView = noProductsTextView;
         tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
@@ -313,7 +324,7 @@ static NSString *iapCellID = @"IAPTableCellID";
                                                                       @"I don't see my subscription",
                                                                       @"Title of the button on the subscriptions page which, when pressed, navigates the user to the page where they can restore their existing subscription")
                            forState:UIControlStateNormal];
-        [restoreSubsButton setTitleColor:UIColor.lightishBlueTwo forState:UIControlStateNormal];
+        [restoreSubsButton setTitleColor:UIColor.whiteColor forState:UIControlStateNormal];
         restoreSubsButton.titleLabel.font = [UIFont avenirNextDemiBold:16.f];
         [restoreSubsButton addTarget:self action:@selector(onSubscriptionHelpTap) forControlEvents:UIControlEventTouchUpInside];
         [cell.contentView addSubview:restoreSubsButton];
@@ -337,7 +348,7 @@ static NSString *iapCellID = @"IAPTableCellID";
     UILabel *label = [[UILabel alloc] initWithFrame:CGRectZero];
     label.numberOfLines = 0;
     label.font = [UIFont avenirNextMedium:15.f];
-    label.textColor = UIColor.greyishBrown;
+    label.textColor = UIColor.whiteColor;
 
     NSString *footerText = NSLocalizedStringWithDefaultValue(@"BUY_SUBSCRIPTIONS_FOOTER_TEXT",
                                                    nil,
@@ -399,13 +410,12 @@ static NSString *iapCellID = @"IAPTableCellID";
     NSString *localizedPrice = [self.priceFormatter stringFromNumber:product.price];
 
     cell.textLabel.text = product.localizedTitle;
-    cell.textLabel.textColor = UIColor.greyishBrown;
+    cell.textLabel.textColor = UIColor.whiteColor;
     cell.textLabel.font = [UIFont avenirNextDemiBold:cell.textLabel.font.pointSize];
 
     cell.detailTextLabel.text = product.localizedDescription;
-    cell.detailTextLabel.textColor = UIColor.greyishBrown;
+    cell.detailTextLabel.textColor = UIColor.whiteColor;
     cell.detailTextLabel.font = [UIFont avenirNextMedium:cell.detailTextLabel.font.pointSize];
-    cell.detailTextLabel.textColor = [UIColor colorWithRed:0.29 green:0.29 blue:0.29 alpha:1.0];
 
     if(self.hasActiveSubscription) {
         cell.accessoryType = UITableViewCellAccessoryCheckmark;
@@ -414,7 +424,7 @@ static NSString *iapCellID = @"IAPTableCellID";
         cell.detailTextLabel.text = @"";
     } else {
         UISegmentedControl *buyButton = [[UISegmentedControl alloc] initWithItems:[NSArray arrayWithObject:localizedPrice]];
-        buyButton.tintColor = UIColor.lightishBlue;
+        buyButton.tintColor = UIColor.whiteColor;
         buyButton.momentary = YES;
         buyButton.tag = indexPath.row;
         [buyButton addTarget:self
@@ -448,7 +458,7 @@ static NSString *iapCellID = @"IAPTableCellID";
     privacyPolicyButton.titleLabel.adjustsFontSizeToFitWidth = YES;
     privacyPolicyButton.titleLabel.font = [UIFont avenirNextDemiBold:14.f];
     privacyPolicyButton.titleLabel.numberOfLines = 0;
-    [privacyPolicyButton setTitleColor:UIColor.lightishBlueTwo forState:UIControlStateNormal];
+    [privacyPolicyButton setTitleColor:UIColor.whiteColor forState:UIControlStateNormal];
     [terms addSubview:privacyPolicyButton];
 
     UIButton *tosButton = [UIButton buttonWithType:UIButtonTypeSystem];
@@ -463,7 +473,7 @@ static NSString *iapCellID = @"IAPTableCellID";
     tosButton.titleLabel.adjustsFontSizeToFitWidth = YES;
     tosButton.titleLabel.font = [UIFont avenirNextDemiBold:14.f];
     tosButton.titleLabel.numberOfLines = 0;
-    [tosButton setTitleColor:UIColor.lightishBlueTwo forState:UIControlStateNormal];
+    [tosButton setTitleColor:UIColor.whiteColor forState:UIControlStateNormal];
     [terms addSubview:tosButton];
 
     // Layout constraints

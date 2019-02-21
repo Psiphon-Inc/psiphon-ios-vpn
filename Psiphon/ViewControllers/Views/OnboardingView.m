@@ -73,13 +73,13 @@
     titleLabel.backgroundColor = UIColor.clearColor;
     titleLabel.adjustsFontSizeToFitWidth = TRUE;
     titleLabel.font = [UIFont avenirNextDemiBold:22.f];
-    titleLabel.textColor = [UIColor colorWithRed:26.f/256.f green:26.f/256.f blue:26.f/256.f alpha:1];
+    titleLabel.textColor = UIColor.whiteColor;
 
     bodyLabel = [[UILabel alloc] init];
     bodyLabel.text = body;
     bodyLabel.backgroundColor = UIColor.clearColor;
     bodyLabel.font = [UIFont avenirNextMedium:16.f];
-    bodyLabel.textColor = UIColor.greyishBrown;
+    bodyLabel.textColor = UIColor.whiteColor;
     bodyLabel.numberOfLines = 0;
     bodyLabel.lineBreakMode = NSLineBreakByClipping;
     bodyLabel.textAlignment = NSTextAlignmentCenter;

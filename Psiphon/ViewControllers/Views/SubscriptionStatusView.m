@@ -48,7 +48,7 @@
         subStatusLabel = [[UILabel alloc] init];
         subStatusLabel.adjustsFontSizeToFitWidth = YES;
         subStatusLabel.textAlignment = NSTextAlignmentLeft;
-        subStatusLabel.textColor = [UIColor colorWithWhite:1 alpha:.51f];
+        subStatusLabel.textColor = UIColor.whiteColor;
         subStatusLabel.font = [UIFont avenirNextDemiBold:13.f];
 
         [self addViews];

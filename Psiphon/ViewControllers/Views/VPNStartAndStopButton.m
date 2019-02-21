@@ -61,7 +61,7 @@
 - (void)setBounds:(CGRect)bounds {
     [super setBounds:bounds];
     connectingSpinner.bounds = bounds;
-    connectingSpinner.radius = bounds.size.width / 2 - 5;
+    connectingSpinner.radius = bounds.size.width / 2 - 2.5;
 }
 
 - (void)addConnectingSpinner {

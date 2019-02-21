@@ -47,7 +47,7 @@
     [super layoutSubviews];
 
     if (self.includeChevron && !chevron) {
-        chevron = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"chevron"]];
+        chevron = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"ChevronBlue"]];
         [self addSubview:chevron];
 
         chevron.translatesAutoresizingMaskIntoConstraints = FALSE;

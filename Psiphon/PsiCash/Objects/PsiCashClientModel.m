@@ -93,12 +93,15 @@
 #pragma mark - NSCopying protocol
 
 - (id)copyWithZone:(NSZone *)zone {
-    return [PsiCashClientModel clientModelWithAuthPackage:self.authPackage
-                                               andBalance:self.balance
-                                     andSpeedBoostProduct:self.speedBoostProduct /* TODO: copy this? */
-                                      andPendingPurchases:self.pendingPurchases /* TODO: copy this? */
-                              andActiveSpeedBoostPurchase:self.activeSpeedBoostPurchase
-                                        andRefreshPending:self.refreshPending];
+    PsiCashClientModel *copy = [PsiCashClientModel
+                                clientModelWithAuthPackage:self.authPackage
+                                                andBalance:self.balance
+                                      andSpeedBoostProduct:self.speedBoostProduct /* TODO: copy this? */
+                                       andPendingPurchases:self.pendingPurchases /* TODO: copy this? */
+                               andActiveSpeedBoostPurchase:self.activeSpeedBoostPurchase
+                                         andRefreshPending:self.refreshPending];
+    copy.onboarded = self.onboarded;
+    return copy;
 }
 
 @end
