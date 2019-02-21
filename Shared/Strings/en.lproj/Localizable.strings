@@ -272,6 +272,9 @@
 /* Alert error message informing user that their Speed Boost purchase request failed because of an unknown error. Note: 'PsiCash' should not be translated or transliterated. */
 "PSICASH_SPEED_BOOST_PURCHASE_FAILED_UNEXPECTED_CODE" = "Invalid or unexpected status code returned from PsiCash library.";
 
+/* Text which appears in the Speed Boost meter when the user has not gone through the PsiCash onboarding. Please keep this text concise as the width of the text box is restricted in size. 'PsiCash' should not be translated or transliterated. */
+"PSICASH_SPEED_BOOST_USER_NOT_ONBOARDED_TEXT" = "Learn about PsiCash";
+
 /* Description text above a list of scenarios where the user should try refreshing their app receipt to restore an existing subscription */
 "REFRESH_APP_RECEIPT_BUTTON_DESCRIPTION_LIST_HEADER" = "Refresh your app receipt when:";
 

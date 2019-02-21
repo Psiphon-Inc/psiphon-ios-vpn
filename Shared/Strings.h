@@ -87,6 +87,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (NSString *)psiCashSpeedBoostMeterNoAuthTitle;
 
++ (NSString *)psiCashSpeedBoostMeterUserNotOnboardedTitle;
+
 #pragma mark - VPN
 
 + (NSString *)vpnPermissionDeniedAlertMessage;

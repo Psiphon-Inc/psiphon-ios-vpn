@@ -26,13 +26,14 @@
 #import "Logging.h"
 #import "Nullity.h"
 #import "PsiCashClient.h"
+#import "RelaySubject.h"
 
 
 PsiFeedbackLogType const MoPubRewardedAdControllerWrapperLogType = @"MoPubRewardedAdControllerWrapper";
 
 @interface MoPubRewardedAdControllerWrapper () <MPRewardedVideoDelegate>
 
-@property (nonatomic, readwrite, assign) BOOL ready;
+@property (nonatomic, readwrite, nonnull) BehaviorRelay<NSNumber *> *canPresentOrPresenting;
 
 /** presentedAdDismissed is hot infinite signal - emits RACUnit whenever an ad is presented. */
 @property (nonatomic, readwrite, nonnull) RACSubject<RACUnit *> *presentedAdDismissed;
@@ -42,8 +43,8 @@ PsiFeedbackLogType const MoPubRewardedAdControllerWrapperLogType = @"MoPubReward
 
 // Private Properties.
 
-/** loadStatus is hot non-completing signal - emits the wrapper tag when the ad has been loaded. */
-@property (nonatomic, readwrite, nonnull) RACSubject<AdControllerTag> *loadStatus;
+/** loadStatus is hot relay subject - emits the wrapper tag when the ad has been loaded. */
+@property (nonatomic, readwrite, nonnull) RelaySubject<RACTwoTuple<AdControllerTag, NSError *> *> *loadStatusRelay;
 
 @property (nonatomic, readonly) NSString *adUnitID;
 
@@ -55,9 +56,9 @@ PsiFeedbackLogType const MoPubRewardedAdControllerWrapperLogType = @"MoPubReward
 
 - (instancetype)initWithAdUnitID:(NSString *)adUnitID withTag:(AdControllerTag)tag {
     _tag = tag;
-    _loadStatus = [RACSubject subject];
+    _loadStatusRelay = [RelaySubject subject];
     _adUnitID = adUnitID;
-    _ready = FALSE;
+    _canPresentOrPresenting = [BehaviorRelay behaviorSubjectWithDefaultValue:@(FALSE)];
     _presentedAdDismissed = [RACSubject subject];
     _presentationStatus = [RACSubject subject];
     return self;
@@ -67,13 +68,13 @@ PsiFeedbackLogType const MoPubRewardedAdControllerWrapperLogType = @"MoPubReward
     [MPRewardedVideo removeDelegate:self];
 }
 
-- (RACSignal<AdControllerTag> *)loadAd {
+- (RACSignal<RACTwoTuple<AdControllerTag, NSError *> *> *)loadAd {
 
     MoPubRewardedAdControllerWrapper *__weak weakSelf = self;
 
     return [RACSignal createSignal:^RACDisposable *(id <RACSubscriber> subscriber) {
 
-        RACDisposable *disposable = [weakSelf.loadStatus subscribe:subscriber];
+        RACDisposable *disposable = [weakSelf.loadStatusRelay subscribe:subscriber];
 
         [MPRewardedVideo setDelegate:weakSelf forAdUnitId:weakSelf.adUnitID];
         [MPRewardedVideo loadRewardedVideoAdWithAdUnitID:weakSelf.adUnitID withMediationSettings:nil];
@@ -82,20 +83,18 @@ PsiFeedbackLogType const MoPubRewardedAdControllerWrapperLogType = @"MoPubReward
     }];
 }
 
-- (RACSignal<AdControllerTag> *)unloadAd {
+- (RACSignal<RACTwoTuple<AdControllerTag, NSError *> *> *)unloadAd {
 
     MoPubRewardedAdControllerWrapper *__weak weakSelf = self;
 
     return [RACSignal createSignal:^RACDisposable *(id <RACSubscriber> subscriber) {
         // Unlike interstitials, MoPub SDK doesn't provide a way to destroy the pre-fetched rewarded video ads.
-        // For now we are just going to remove delegate. This should not affect the behaviour of the app.
-        [MPRewardedVideo removeDelegate:weakSelf];
 
-        if (weakSelf.ready) {
-            weakSelf.ready = FALSE;
+        if ([[weakSelf.canPresentOrPresenting first] boolValue]) {
+            [weakSelf.canPresentOrPresenting accept:@(FALSE)];
         }
 
-        [subscriber sendNext:weakSelf.tag];
+        [subscriber sendNext:[RACTwoTuple pack:weakSelf.tag :nil]];
         [subscriber sendCompleted];
         return nil;
     }];
@@ -107,7 +106,8 @@ PsiFeedbackLogType const MoPubRewardedAdControllerWrapperLogType = @"MoPubReward
 
     return [RACSignal createSignal:^RACDisposable *(id <RACSubscriber> subscriber) {
 
-        if (!weakSelf.ready) {
+        // Should not try to present an ad, unless `hasAdAvailableForAdUnitID:` returns True.
+        if (![MPRewardedVideo hasAdAvailableForAdUnitID:self.adUnitID]) {
             [subscriber sendNext:@(AdPresentationErrorNoAdsLoaded)];
             [subscriber sendCompleted];
             return nil;
@@ -147,42 +147,50 @@ PsiFeedbackLogType const MoPubRewardedAdControllerWrapperLogType = @"MoPubReward
     if (self.adUnitID != adUnitID) {
         return;
     }
-    if (!self.ready) {
-        self.ready = TRUE;
+    if (![[self.canPresentOrPresenting first] boolValue]) {
+        [self.canPresentOrPresenting accept:@(TRUE)];
     }
-    [self.loadStatus sendNext:self.tag];
+    [self.loadStatusRelay accept:[RACTwoTuple pack:self.tag :nil]];
 }
 
 - (void)rewardedVideoAdDidFailToLoadForAdUnitID:(NSString *)adUnitID error:(NSError *)error {
     if (self.adUnitID != adUnitID) {
         return;
     }
-    if (self.ready) {
-        self.ready = FALSE;
+    if ([[self.canPresentOrPresenting first] boolValue]) {
+        [self.canPresentOrPresenting accept:@(FALSE)];
     }
-    [self.loadStatus sendError:[NSError errorWithDomain:AdControllerWrapperErrorDomain
-                                                   code:AdControllerWrapperErrorAdFailedToLoad
-                                    withUnderlyingError:error]];
+
+    NSError *e = [NSError errorWithDomain:AdControllerWrapperErrorDomain
+                                     code:AdControllerWrapperErrorAdFailedToLoad
+                      withUnderlyingError:error];
+
+    [self.loadStatusRelay accept:[RACTwoTuple pack:self.tag :e]];
 }
 
 - (void)rewardedVideoAdDidExpireForAdUnitID:(NSString *)adUnitID {
     if (self.adUnitID != adUnitID) {
         return;
     }
-    if (self.ready) {
-        self.ready = FALSE;
+    if ([[self.canPresentOrPresenting first] boolValue]) {
+        [self.canPresentOrPresenting accept:@(FALSE)];
     }
-    [self.loadStatus sendError:[NSError errorWithDomain:AdControllerWrapperErrorDomain
-                                                   code:AdControllerWrapperErrorAdExpired]];
+
+    NSError *e = [NSError errorWithDomain:AdControllerWrapperErrorDomain
+                                     code:AdControllerWrapperErrorAdExpired];
+
+    [self.loadStatusRelay accept:[RACTwoTuple pack:self.tag :e]];
 }
 
 - (void)rewardedVideoAdDidFailToPlayForAdUnitID:(NSString *)adUnitID error:(NSError *)error {
     if (self.adUnitID != adUnitID) {
         return;
     }
-    if (self.ready) {
-        self.ready = FALSE;
+
+    if ([[self.canPresentOrPresenting first] boolValue]) {
+        [self.canPresentOrPresenting accept:@(FALSE)];
     }
+
     [self.presentationStatus sendNext:@(AdPresentationErrorFailedToPlay)];
 }
 
@@ -211,8 +219,9 @@ PsiFeedbackLogType const MoPubRewardedAdControllerWrapperLogType = @"MoPubReward
     if (self.adUnitID != adUnitID) {
         return;
     }
-    if (self.ready) {
-        self.ready = FALSE;
+
+    if ([[self.canPresentOrPresenting first] boolValue]) {
+        [self.canPresentOrPresenting accept:@(FALSE)];
     }
 
     // Since MoPub SDK states that `rewardedVideoAdShouldRewardForAdUnitID:reward:` delegate callback will not be

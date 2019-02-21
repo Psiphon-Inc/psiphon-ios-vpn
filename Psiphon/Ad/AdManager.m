@@ -65,9 +65,9 @@ NSString * const UntunneledAdMobRewardedVideoAdUnitID = @"ca-app-pub-10720419617
 NSString * const MoPubTunneledRewardVideoAdUnitID    = @"b9440504384740a2a3913a3d1b6db80e";
 
 // AdControllerTag values must be unique.
-AdControllerTag const AdControllerTagUntunneledInterstitial = @"UntunneledInterstitial";
-AdControllerTag const AdControllerTagUntunneledRewardedVideo = @"UntunneledRewardedVideo";
-AdControllerTag const AdControllerTagTunneledRewardedVideo = @"TunneledRewardedVideo";
+AdControllerTag const AdControllerTagAdMobUntunneledInterstitial = @"AdMobUntunneledInterstitial";
+AdControllerTag const AdControllerTagAdMobUntunneledRewardedVideo = @"AdMobUntunneledRewardedVideo";
+AdControllerTag const AdControllerTagMoPubTunneledRewardedVideo = @"MoPubTunneledRewardedVideo";
 
 #pragma mark - SourceAction type
 
@@ -109,8 +109,8 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
             break;
     }
     
-    return [NSString stringWithFormat:@"<AppEventActionTuple action=%@ actionCondition=%@ stopCondition=%p>",
-                                      actionText, [self.actionCondition debugDescription], self.stopCondition];
+    return [NSString stringWithFormat:@"<AppEventActionTuple tag=%@ action=%@ actionCondition=%@ stopCondition=%p>",
+                                      self.tag, actionText, [self.actionCondition debugDescription], self.stopCondition];
 }
 
 @end
@@ -120,9 +120,9 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
 
 @interface AdManager ()
 
-@property (nonatomic, readwrite, nonnull) RACReplaySubject<NSNumber *> *adIsShowing;
-@property (nonatomic, readwrite, nonnull) RACReplaySubject<NSNumber *> *untunneledInterstitialCanPresent;
-@property (nonatomic, readwrite, nonnull) RACReplaySubject<NSNumber *> *rewardedVideoCanPresent;
+@property (nonatomic, readwrite, nonnull) RACBehaviorSubject<NSNumber *> *adIsShowing;
+@property (nonatomic, readwrite, nonnull) RACBehaviorSubject<NSNumber *> *untunneledInterstitialCanPresent;
+@property (nonatomic, readwrite, nonnull) RACBehaviorSubject<NSNumber *> *rewardedVideoCanPresent;
 
 // Private properties
 @property (nonatomic, readwrite, nonnull) AdMobInterstitialAdControllerWrapper *untunneledInterstitial;
@@ -148,24 +148,25 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
     self = [super init];
     if (self) {
 
-        _adIsShowing = [RACReplaySubject replaySubjectWithCapacity:1];
+        _adIsShowing = [RACBehaviorSubject behaviorSubjectWithDefaultValue:@(FALSE)];
 
-        _untunneledInterstitialCanPresent = [RACReplaySubject replaySubjectWithCapacity:1];
-        [_untunneledInterstitialCanPresent sendNext:@(FALSE)];
+        _untunneledInterstitialCanPresent = [RACBehaviorSubject behaviorSubjectWithDefaultValue:@(FALSE)];
 
-        _rewardedVideoCanPresent = [RACReplaySubject replaySubjectWithCapacity:1];
-        [_rewardedVideoCanPresent sendNext:@(FALSE)];
+        _rewardedVideoCanPresent = [RACBehaviorSubject behaviorSubjectWithDefaultValue:@(FALSE)];
 
         _compoundDisposable = [RACCompoundDisposable compoundDisposable];
 
         _untunneledInterstitial = [[AdMobInterstitialAdControllerWrapper alloc]
-          initWithAdUnitID:UntunneledAdMobInterstitialAdUnitID withTag:AdControllerTagUntunneledInterstitial];
+          initWithAdUnitID:UntunneledAdMobInterstitialAdUnitID
+                   withTag:AdControllerTagAdMobUntunneledInterstitial];
 
         _untunneledRewardVideo = [[AdMobRewardedAdControllerWrapper alloc]
-          initWithAdUnitID:UntunneledAdMobRewardedVideoAdUnitID withTag:AdControllerTagUntunneledRewardedVideo];
+          initWithAdUnitID:UntunneledAdMobRewardedVideoAdUnitID
+                   withTag:AdControllerTagAdMobUntunneledRewardedVideo];
 
         _tunneledRewardVideo = [[MoPubRewardedAdControllerWrapper alloc]
-          initWithAdUnitID:MoPubTunneledRewardVideoAdUnitID withTag:AdControllerTagTunneledRewardedVideo];
+          initWithAdUnitID:MoPubTunneledRewardVideoAdUnitID
+                   withTag:AdControllerTagMoPubTunneledRewardedVideo];
 
         reachability = [Reachability reachabilityForInternetConnection];
 
@@ -189,6 +190,8 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
 
 // This should be called only once during application at application load time
 - (void)initializeAdManager {
+
+    AdManager *__weak weakSelf = self;
 
     [reachability startNotifier];
 
@@ -460,9 +463,9 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
 
               if (appEvent.tunnelState == TunnelStateUntunneled && appEvent.networkIsReachable) {
 
-                  return RACObserve(self.untunneledInterstitial, ready);
+                  return weakSelf.untunneledInterstitial.canPresentOrPresenting;
               }
-              return [RACSignal emitOnly:@(FALSE)];
+              return [RACSignal return:@(FALSE)];
           }]
           switchToLatest]
           subscribe:self.untunneledInterstitialCanPresent]];
@@ -471,14 +474,16 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
           [[[self.appEvents.signal map:^RACSignal<NSNumber *> *(AppEvent *appEvent) {
 
               if (appEvent.networkIsReachable) {
+
                   if (appEvent.tunnelState == TunnelStateUntunneled) {
-                      return RACObserve(self.untunneledRewardVideo, ready);
+                      return weakSelf.untunneledRewardVideo.canPresentOrPresenting;
+
                   } else if (appEvent.tunnelState == TunnelStateTunneled) {
-                      return RACObserve(self.tunneledRewardVideo, ready);
+                      return weakSelf.tunneledRewardVideo.canPresentOrPresenting;
                   }
               }
 
-              return [RACSignal emitOnly:@(FALSE)];
+              return [RACSignal return:@(FALSE)];
           }]
           switchToLatest]
           subscribe:self.rewardedVideoCanPresent]];
@@ -556,14 +561,19 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
 
 - (RACDisposable *)subscribeToAdSignalForAd:(id <AdControllerWrapperProtocol>)adController
               withActionLoadDelayedInterval:(NSTimeInterval)delayedAdLoadDelay
-                      withLoadInTunnelState:(TunnelState)loadTunnelState
+                      withLoadInTunnelState:(TunnelState)loadInTunnelState
                     reloadAdAfterPresenting:(AdLoadAction)afterPresentationLoadAction
       andWaitForPsiCashRewardedActivityData:(BOOL)waitForPsiCashRewardedActivityData {
 
-    PSIAssert(loadTunnelState != TunnelStateNeither);
+    PSIAssert(loadInTunnelState != TunnelStateNeither);
 
     // It is assumed that `adController` objects live as long as the AdManager class.
     // Therefore reactive declaration below holds a strong references to the `adController` object.
+
+    // Retry `groupBy` types.
+    NSString * const RetryTypeForever = @"RetryTypeForever";
+    NSString * const RetryTypeDoNotRetry = @"RetryTypeDoNotRetry";
+    NSString * const RetryTypeOther = @"RetryTypeOther";
 
     // Retry count for ads that failed to load (doesn't apply for expired ads).
     NSInteger const AD_LOAD_RETRY_COUNT = 1;
@@ -624,7 +634,7 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
               }];
 
               // If the current tunnel state is the same as the ads required tunnel state, then load ad.
-              if (event.tunnelState == loadTunnelState && !adController.ready) {
+              if (event.tunnelState == loadInTunnelState) {
 
                   // Take no loading action if custom data is missing.
                   if (waitForPsiCashRewardedActivityData) {
@@ -665,23 +675,23 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
             flattenMap:^RACSignal<RACTwoTuple<AdControllerTag, AppEventActionTuple *> *> *
               (AppEventActionTuple *sourceAction) {
 
-                RACSignal<AdControllerTag> *returnedSignal;
+                RACSignal<RACTwoTuple<AdControllerTag, NSError *> *> *loadOrUnload;
 
                 switch (sourceAction.action) {
 
                     case AdLoadActionImmediate: {
-                        returnedSignal = [adController loadAd];
+                        loadOrUnload = [adController loadAd];
                         break;
                     }
                     case AdLoadActionDelayed: {
-                        returnedSignal = [[RACSignal timer:delayedAdLoadDelay]
+                        loadOrUnload = [[RACSignal timer:delayedAdLoadDelay]
                           flattenMap:^RACSignal *(id x) {
                               return [adController loadAd];
                           }];
                         break;
                     }
                     case AdLoadActionUnload: {
-                        returnedSignal = [adController unloadAd];
+                        loadOrUnload = [adController unloadAd];
                         break;
                     }
                     default: {
@@ -690,10 +700,17 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
                     }
                 }
 
-                return [returnedSignal map:^id(AdControllerTag tag) {
-                    // Pack the source action with emission of `returnedSignal`.
-                    return [RACTwoTuple pack:tag :sourceAction];
-                }];
+                return [loadOrUnload flattenMap:^RACSignal *(RACTwoTuple<AdControllerTag, NSError *> *maybeTuple) {
+                           NSError *_Nullable error = maybeTuple.second;
+
+                           // Raise the error if it has been emitted.
+                           if (error) {
+                               return [RACSignal error:error];
+                           } else {
+                               // Pack the source action with the ad controller's tag.
+                               return [RACSignal return:[RACTwoTuple pack:maybeTuple.first :sourceAction]];
+                           }
+                       }];
             }]
             takeUntil:v.stopCondition]
             retryWhen:^RACSignal *(RACSignal<NSError *> *errors) {
@@ -710,7 +727,7 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
                                                            @"tag": v.tag,
                                                            @"NSError": [PsiFeedbackLogger unpackError:error]}];
 
-                              return @"retryForever";
+                              return RetryTypeForever;
 
                           } else if (AdControllerWrapperErrorAdFailedToLoad == error.code) {
                               // Get a new ad `AD_LOAD_RETRY_COUNT` times.
@@ -718,25 +735,25 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
                                                           json:@{@"event": @"adDidFailToLoad",
                                                             @"tag": v.tag,
                                                             @"NSError": [PsiFeedbackLogger unpackError:error]}];
-                              return @"retryOther";
+                              return RetryTypeOther;
 
                           } else if (AdControllerWrapperErrorCustomDataNotSet == error.code) {
                               [PsiFeedbackLogger errorWithType:AdManagerLogType
                                                           json:@{@"event": @"customDataNotSet",
                                                             @"tag": v.tag,
                                                             @"NSError": [PsiFeedbackLogger unpackError:error]}];
-                              return @"doNotRetry";
+                              return RetryTypeDoNotRetry;
                           }
                       }
-                      return @"otherError";
+                      return RetryTypeOther;
                   }]
                   flattenMap:^RACSignal *(RACGroupedSignal *groupedErrors) {
                       NSString *groupKey = (NSString *) groupedErrors.key;
 
-                      if ([@"doNotRetry" isEqualToString:groupKey]) {
+                      if ([RetryTypeDoNotRetry isEqualToString:groupKey]) {
                         return [RACSignal empty];
 
-                      } else if ([@"retryForever" isEqualToString:groupKey]) {
+                      } else if ([RetryTypeForever isEqualToString:groupKey]) {
                           return [groupedErrors flattenMap:^RACSignal *(id x) {
                               return [RACSignal timer:MIN_AD_RELOAD_TIMER];
                           }];
@@ -761,6 +778,10 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
             }]
             catch:^RACSignal *(NSError *error) {
                 // Catch all errors.
+                [PsiFeedbackLogger errorWithType:AdManagerLogType
+                                            json:@{@"event": @"adLoadErrorPostRetryCaught",
+                                              @"tag": v.tag,
+                                              @"NSError": [PsiFeedbackLogger unpackError:error]}];
                 return [RACSignal return:nil];
             }];
 

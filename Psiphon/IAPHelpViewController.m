@@ -45,10 +45,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
 
-    // Sets screen background and navigation bar colours.
-    self.view.backgroundColor = UIColor.whiteColor;
-    self.navigationController.navigationBar.tintColor = UIColor.lightishBlueTwo;  // Navigation bar items color
-    self.navigationController.navigationBar.titleTextAttributes = @{NSForegroundColorAttributeName:UIColor.offWhite, NSFontAttributeName:[UIFont avenirNextBold:18.f]};
+    self.view.backgroundColor = UIColor.darkBlueColor;
 
     // Sets navigation bar title.
     self.title = NSLocalizedStringWithDefaultValue(@"RESTORE_SUBSCRIPTION_BUTTON", nil, [NSBundle mainBundle], @"Restore Subscription", @"Button which, when pressed, attempts to restore any existing subscriptions the user has purchased");
@@ -114,7 +111,7 @@
     UILabel *label = [[UILabel alloc] initWithFrame:CGRectZero];
     label.numberOfLines = 0;
     label.font = [UIFont avenirNextMedium:15.f];
-    label.textColor = UIColor.greyishBrown;
+    label.textColor = UIColor.whiteColor;
     label.text = helpDescription;
     label.textAlignment = NSTextAlignmentLeft;
     [cell.contentView addSubview:label];

@@ -21,6 +21,7 @@
 #import "PsiCashOnboardingViewController.h"
 #import "PsiCashOnboardingInfoViewController.h"
 #import "PsiphonClientCommonLibraryHelpers.h"
+#import "UIColor+Additions.h"
 #import "UILabel+GetLabelHeight.h"
 
 
@@ -51,6 +52,8 @@
 
     isRTL = ([UIApplication sharedApplication].userInterfaceLayoutDirection == UIUserInterfaceLayoutDirectionRightToLeft);
 
+    [self.view setBackgroundColor:UIColor.darkBlueColor];
+
     [self addAppTitleLabel];
     [self addAppSubTitleLabel];
 
@@ -69,7 +72,6 @@
     /* Setup and present initial PsiCashOnboardingChildViewController */
     UIViewController<PsiCashOnboardingChildViewController> *initialViewController = [self viewControllerAtIndex:0];
     NSArray *viewControllers = [NSArray arrayWithObject:initialViewController];
-    [self setBackgroundColourForIndex:0];
 
     [self.view addSubview:self.pageController.view];
     [self.pageController didMoveToParentViewController:self];
@@ -189,25 +191,11 @@
 
 #pragma mark - UIPageViewControllerDelegate methods and helper functions
 
-- (void)setBackgroundColourForIndex:(NSInteger)index {
-    if (index == PsiCashOnboardingPage1Index) {
-        self.view.layer.contents = (id)[UIImage imageNamed:@"PsiCash_Onboarding_Background_1"].CGImage;
-    } else if (index == PsiCashOnboardingPage2Index) {
-        self.view.layer.contents = (id)[UIImage imageNamed:@"PsiCash_Onboarding_Background_2"].CGImage;
-    } else if (index == PsiCashOnboardingPage3Index) {
-        self.view.layer.contents = (id)[UIImage imageNamed:@"PsiCash_Onboarding_Background_3"].CGImage;
-    }
-}
-
 - (void)pageViewController:(UIPageViewController *)pageViewController didFinishAnimating:(BOOL)finished previousViewControllers:(NSArray<UIViewController *> *)previousViewControllers transitionCompleted:(BOOL)completed {
     [self setNavButtonTitle];
-    UIViewController <PsiCashOnboardingChildViewController>*presentedViewController = [_pageController.viewControllers objectAtIndex:0];
-    [self setBackgroundColourForIndex:presentedViewController.index];
 }
 
 - (void)pageViewController:(UIPageViewController *)pageViewController willTransitionToViewControllers:(NSArray<UIViewController *> *)pendingViewControllers {
-    UIViewController <PsiCashOnboardingChildViewController>*pendingViewController = (UIViewController <PsiCashOnboardingChildViewController> *)[pendingViewControllers objectAtIndex:0];
-    [self setBackgroundColourForIndex:pendingViewController.index];
 }
 
 
@@ -284,8 +272,6 @@
         __weak PsiCashOnboardingViewController *weakSelf = self;
         [self.pageController setViewControllers:@[[self viewControllerAtIndex:index]] direction:isRTL ? UIPageViewControllerNavigationDirectionReverse : UIPageViewControllerNavigationDirectionForward animated:NO completion:^(BOOL finished) {
             [weakSelf setNavButtonTitle];
-            UIViewController <PsiCashOnboardingChildViewController>*presentedViewController = [weakSelf.pageController.viewControllers objectAtIndex:0];
-            [weakSelf setBackgroundColourForIndex:presentedViewController.index];
         }];
     }
 }

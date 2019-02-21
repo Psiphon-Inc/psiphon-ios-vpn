@@ -114,9 +114,11 @@ NSString * const CommandStopVPN = @"StopVPN";
 
     // Psiphon Logo
     // Replaces the PsiCash UI when the user is subscribed
-    UIImageView *psiphonLogoView;
+    UIImageView *psiphonSmallLogo;
+    UIImageView *psiphonLargeLogo;
 
     // PsiCash
+    RACBehaviorSubject<NSNumber*> *psiCashOnboardingCompleted;
     NSLayoutConstraint *psiCashViewHeight;
     PsiCashPurchaseAlertView *alertView;
     PsiCashClientModel *model;
@@ -185,15 +187,19 @@ NSString * const CommandStopVPN = @"StopVPN";
 
     availableServerRegions = [[AvailableServerRegions alloc] init];
     [availableServerRegions sync];
+
+    psiCashOnboardingCompleted = [[RACBehaviorSubject alloc] init];
+    BOOL onboarded = [[NSUserDefaults standardUserDefaults] boolForKey:PsiCashHasBeenOnboardedBoolKey];
+    [psiCashOnboardingCompleted sendNext:[NSNumber numberWithBool:onboarded]];
     
     // Setting up the UI
     // calls them in the right order
-    [self.view setBackgroundColor:[UIColor whiteColor]];
+    [self.view setBackgroundColor:UIColor.darkBlueColor];
     [self setNeedsStatusBarAppearanceUpdate];
     [self addViews];
 
     [self setupClouds];
-    [self setupVersionLabel];
+    [self setupSmallPsiphonLogoAndVersionLabel];
     [self setupSettingsButton];
     [self setupPsiphonLogoView];
     [self setupPsiCashView];
@@ -352,7 +358,7 @@ NSString * const CommandStopVPN = @"StopVPN";
 }
 
 - (UIStatusBarStyle)preferredStatusBarStyle {
-    return UIStatusBarStyleDefault;
+    return UIStatusBarStyleLightContent;
 }
 
 // Reload when rotate
@@ -564,7 +570,7 @@ NSString * const CommandStopVPN = @"StopVPN";
 }
 
 - (void)setupSettingsButton {
-    UIImage *gearTemplate = [UIImage imageNamed:@"settings"];
+    UIImage *gearTemplate = [UIImage imageNamed:@"GearDark"];
     settingsButton.translatesAutoresizingMaskIntoConstraints = NO;
     [settingsButton setImage:gearTemplate forState:UIControlStateNormal];
 
@@ -606,7 +612,8 @@ NSString * const CommandStopVPN = @"StopVPN";
     cloudBottomRight = [[UIImageView alloc] initWithImage:cloud];
     versionLabel = [[UIButton alloc] init];
     settingsButton = [[UIButton alloc] init];
-    psiphonLogoView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"PsiphonLogo"]];
+    psiphonSmallLogo = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"PsiphonSmallLogoWhite"]];
+    psiphonLargeLogo = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"PsiphonLogoWhite"]];
     psiCashView = [[PsiCashView alloc] initWithAutoLayout];
     startAndStopButton = [VPNStartAndStopButton buttonWithType:UIButtonTypeCustom];
     statusLabel = [[UILabel alloc] init];
@@ -620,7 +627,8 @@ NSString * const CommandStopVPN = @"StopVPN";
     [self.view addSubview:cloudMiddleRight];
     [self.view addSubview:cloudTopRight];
     [self.view addSubview:cloudBottomRight];
-    [self.view addSubview:psiphonLogoView];
+    [self.view addSubview:psiphonSmallLogo];
+    [self.view addSubview:psiphonLargeLogo];
     [self.view addSubview:psiCashView];
     [self.view addSubview:versionLabel];
     [self.view addSubview:settingsButton];
@@ -819,13 +827,13 @@ NSString * const CommandStopVPN = @"StopVPN";
     statusLabel.adjustsFontSizeToFitWidth = YES;
     [self setStatusLabelText:[self getVPNStatusDescription:VPNStatusInvalid]];
     statusLabel.textAlignment = NSTextAlignmentCenter;
-    statusLabel.textColor = [UIColor colorWithRed:0.88 green:0.87 blue:0.87 alpha:1.0];
+    statusLabel.textColor = UIColor.blueGreyColor;
     statusLabel.font = [UIFont avenirNextBold:14.5];
     
     // Setup autolayout
     CGFloat labelHeight = [statusLabel getLabelHeight];
     [statusLabel.heightAnchor constraintEqualToConstant:labelHeight].active = YES;
-    [statusLabel.topAnchor constraintEqualToAnchor:startAndStopButton.bottomAnchor constant:5].active = YES;
+    [statusLabel.topAnchor constraintEqualToAnchor:startAndStopButton.bottomAnchor constant:20].active = YES;
     [statusLabel.centerXAnchor constraintEqualToAnchor:self.view.centerXAnchor].active = YES;
 }
 
@@ -883,11 +891,27 @@ NSString * const CommandStopVPN = @"StopVPN";
     [regionSelectionButton.widthAnchor constraintEqualToAnchor:bottomBar.widthAnchor multiplier:0.9f].active = YES;
 }
 
-- (void)setupVersionLabel {
+- (void)setupSmallPsiphonLogoAndVersionLabel {
+
+    psiphonSmallLogo.translatesAutoresizingMaskIntoConstraints = FALSE;
+    psiphonSmallLogo.userInteractionEnabled = FALSE;
+
+    // Setup autolayout
+    [NSLayoutConstraint activateConstraints:@[
+      [psiphonSmallLogo.leadingAnchor constraintEqualToAnchor:psiCashView.leadingAnchor],
+
+      [psiphonSmallLogo.trailingAnchor
+        constraintLessThanOrEqualToAnchor:psiCashView.balance.leadingAnchor
+                                 constant:-2],
+
+      [psiphonSmallLogo.topAnchor constraintEqualToAnchor:psiCashView.topAnchor]
+    ]];
+
+
     versionLabel.translatesAutoresizingMaskIntoConstraints = NO;
     [versionLabel setTitle:[NSString stringWithFormat:NSLocalizedStringWithDefaultValue(@"APP_VERSION", nil, [NSBundle mainBundle], @"v.%@", @"Text showing the app version. The '%@' placeholder is the version number. So it will look like 'v.2'."),[[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"]]
                   forState:UIControlStateNormal];
-    [versionLabel setTitleColor:UIColor.offWhiteTwo forState:UIControlStateNormal];
+    [versionLabel setTitleColor:UIColor.nepalGreyBlueColor forState:UIControlStateNormal];
     versionLabel.titleLabel.adjustsFontSizeToFitWidth = YES;
     versionLabel.titleLabel.font = [UIFont avenirNextBold:10.5f];
     versionLabel.userInteractionEnabled = FALSE;
@@ -902,13 +926,8 @@ NSString * const CommandStopVPN = @"StopVPN";
 
     // Setup autolayout
     [NSLayoutConstraint activateConstraints:@[
-      [versionLabel.leadingAnchor constraintEqualToAnchor:psiCashView.leadingAnchor constant:0],
-
-      [versionLabel.trailingAnchor
-        constraintLessThanOrEqualToAnchor:psiCashView.balance.leadingAnchor
-                                 constant:-2],
-
-      [versionLabel.topAnchor constraintEqualToAnchor:psiCashView.topAnchor]
+      [versionLabel.leadingAnchor constraintEqualToAnchor:psiphonSmallLogo.leadingAnchor constant:-10.f],
+      [versionLabel.topAnchor constraintEqualToAnchor:psiphonSmallLogo.bottomAnchor constant:-10.f]
     ]];
 }
 
@@ -1029,15 +1048,13 @@ NSString * const CommandStopVPN = @"StopVPN";
 
 #pragma mark - PsiCash
 
-#pragma mark - PsiCash UI actions
+#pragma mark - PsiCash UI callbacks
 
 /**
  * Buy max num hours of Speed Boost that the user can afford if possible
  */
 - (void)instantMaxSpeedBoostPurchase {
-    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
-
-    if (![userDefaults boolForKey:PsiCashHasBeenOnboardedBoolKey]) {
+    if (![[psiCashOnboardingCompleted first] boolValue]) {
         PsiCashOnboardingViewController *onboarding = [[PsiCashOnboardingViewController alloc] init];
         onboarding.delegate = self;
         [self presentViewController:onboarding animated:NO completion:nil];
@@ -1086,12 +1103,12 @@ NSString * const CommandStopVPN = @"StopVPN";
 #pragma mark - PsiCash UI
 
 - (void)setupPsiphonLogoView {
-    psiphonLogoView.translatesAutoresizingMaskIntoConstraints = NO;
+    psiphonLargeLogo.translatesAutoresizingMaskIntoConstraints = NO;
 
-    psiphonLogoView.contentMode = UIViewContentModeScaleAspectFill;
+    psiphonLargeLogo.contentMode = UIViewContentModeScaleAspectFill;
 
-    [psiphonLogoView.centerYAnchor constraintEqualToAnchor:versionLabel.centerYAnchor].active = YES;
-    [psiphonLogoView.centerXAnchor constraintEqualToAnchor:self.view.centerXAnchor].active = YES;
+    [psiphonLargeLogo.centerYAnchor constraintEqualToAnchor:versionLabel.centerYAnchor].active = YES;
+    [psiphonLargeLogo.centerXAnchor constraintEqualToAnchor:self.view.centerXAnchor].active = YES;
 }
 
 - (void)setupPsiCashView {
@@ -1118,31 +1135,42 @@ NSString * const CommandStopVPN = @"StopVPN";
 
     MainViewController *__weak weakSelf = self;
 
-    RACDisposable *psiCashViewUpdates = [[PsiCashClient.sharedInstance.clientModelSignal deliverOnMainThread]
-      subscribeNext:^(PsiCashClientModel *newClientModel) {
-        MainViewController *__strong strongSelf = weakSelf;
-        if (strongSelf != nil) {
 
-            BOOL stateChanged = [strongSelf->model hasActiveSpeedBoostPurchase] ^ [newClientModel hasActiveSpeedBoostPurchase]
-              || [strongSelf->model hasPendingPurchase] ^ [newClientModel hasPendingPurchase];
+    RACDisposable *psiCashViewUpdates =
+        [[[PsiCashClient.sharedInstance.clientModelSignal
+        combineLatestWith:psiCashOnboardingCompleted]
+        deliverOnMainThread]
+        subscribeNext:^(RACTwoTuple<PsiCashClientModel *, NSNumber *> * _Nullable x) {
 
-            NSComparisonResult balanceChange = [strongSelf->model.balance compare:newClientModel.balance];
-            if (balanceChange != NSOrderedSame) {
-                NSNumber *balanceChange =
-                  [NSNumber numberWithDouble:newClientModel.balance.doubleValue - strongSelf->model.balance.doubleValue];
-                [PsiCashView animateBalanceChangeOf:balanceChange
-                                                          withPsiCashView:strongSelf->psiCashView
-                                                             inParentView:strongSelf.view];
+            PsiCashClientModel *newClientModel = [x first];
+            newClientModel.onboarded = [[x second] boolValue];
+
+            MainViewController *__strong strongSelf = weakSelf;
+
+            if (strongSelf != nil) {
+                BOOL stateChanged =    [strongSelf->model hasActiveSpeedBoostPurchase] ^
+                                       [newClientModel hasActiveSpeedBoostPurchase]
+                                    ||
+                                       [strongSelf->model hasPendingPurchase] ^
+                                       [newClientModel hasPendingPurchase];
+                NSComparisonResult balanceChange = [strongSelf->model.balance compare:newClientModel.balance];
+
+                if (balanceChange != NSOrderedSame) {
+                    NSNumber *balanceChange = [NSNumber numberWithDouble:newClientModel.balance.doubleValue
+                                              - strongSelf->model.balance.doubleValue];
+                    [PsiCashView animateBalanceChangeOf:balanceChange
+                                        withPsiCashView:strongSelf->psiCashView
+                                           inParentView:strongSelf.view];
+                }
+
+                strongSelf->model = newClientModel;
+
+                if (stateChanged && strongSelf->alertView != nil) {
+                    [strongSelf showPsiCashAlertView];
+                }
+
+                [strongSelf->psiCashView bindWithModel:strongSelf->model];
             }
-
-            strongSelf->model = newClientModel;
-
-            if (stateChanged && strongSelf->alertView != nil) {
-                [strongSelf showPsiCashAlertView];
-            }
-
-            [strongSelf->psiCashView bindWithModel:strongSelf->model];
-        }
     }];
 
     [self.compoundDisposable addDisposable:psiCashViewUpdates];
@@ -1201,8 +1229,9 @@ NSString * const CommandStopVPN = @"StopVPN";
     psiCashView.hidden = hidden;
     psiCashView.userInteractionEnabled = !hidden;
 
-    // Show Psiphon logo when PsiCash view is hidden
-    psiphonLogoView.hidden = !hidden;
+    // Show Psiphon large logo and hide Psiphon small logo when PsiCash is hidden.
+    psiphonLargeLogo.hidden = !hidden;
+    psiphonSmallLogo.hidden = hidden;
 }
 
 - (void)showRewardedVideo {
@@ -1335,6 +1364,7 @@ NSString * const CommandStopVPN = @"StopVPN";
 
 - (void)onboardingEnded {
     [[NSUserDefaults standardUserDefaults] setBool:YES forKey:PsiCashHasBeenOnboardedBoolKey];
+    [psiCashOnboardingCompleted sendNext:[NSNumber numberWithBool:YES]];
 }
 
 #pragma mark - RegionAdapterDelegate protocol implementation
