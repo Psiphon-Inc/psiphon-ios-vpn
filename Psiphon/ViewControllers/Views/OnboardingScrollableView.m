@@ -64,7 +64,7 @@
     titleLabel.backgroundColor = UIColor.clearColor;
     titleLabel.adjustsFontSizeToFitWidth = TRUE;
     titleLabel.font = [UIFont avenirNextDemiBold:22.f];
-    titleLabel.textColor = UIColor.lightishBlue;
+    titleLabel.textColor = UIColor.whiteColor;
 
     bodyLabel = [[UILabel alloc] initWithFrame:CGRectZero];
     bodyLabel.numberOfLines = 0;
@@ -91,6 +91,9 @@
           }
 
           [attributedString addAttribute:NSFontAttributeName value:newFont range:range];
+
+          // Set color
+          [attributedString addAttribute:NSForegroundColorAttributeName value:UIColor.whiteColor range:range];
       }];
 
     bodyLabel.attributedText = attributedString;

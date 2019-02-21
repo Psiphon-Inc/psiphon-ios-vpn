@@ -25,16 +25,16 @@
 @import GoogleMobileAds;
 
 @class RACSignal<__covariant ValueType>;
-@class RACReplaySubject<ValueType>;
+@class RACBehaviorSubject<ValueType>;
 
 NS_ASSUME_NONNULL_BEGIN
 
 #pragma mark - AdManager class
 
 // List of all AdControllerTag objects.
-FOUNDATION_EXPORT AdControllerTag const AdControllerTagUntunneledInterstitial;
-FOUNDATION_EXPORT AdControllerTag const AdControllerTagUntunneledRewardedVideo;
-FOUNDATION_EXPORT AdControllerTag const AdControllerTagTunneledRewardedVideo;
+FOUNDATION_EXPORT AdControllerTag const AdControllerTagAdMobUntunneledInterstitial;
+FOUNDATION_EXPORT AdControllerTag const AdControllerTagAdMobUntunneledRewardedVideo;
+FOUNDATION_EXPORT AdControllerTag const AdControllerTagMoPubTunneledRewardedVideo;
 
 @interface AdManager : NSObject
 
@@ -44,7 +44,7 @@ FOUNDATION_EXPORT AdControllerTag const AdControllerTagTunneledRewardedVideo;
  * The subject may emit non-unique states.
  * @scheduler Events are delivered on the main thread.
  */
-@property (nonatomic, readonly) RACReplaySubject<NSNumber *> *adIsShowing;
+@property (nonatomic, readonly) RACBehaviorSubject<NSNumber *> *adIsShowing;
 
 /**
  * Emits @(TRUE) when the untunneled interstitial is ready to be presented.
@@ -53,7 +53,7 @@ FOUNDATION_EXPORT AdControllerTag const AdControllerTagTunneledRewardedVideo;
  * Subject initially has default value @(FALSE).
  * @scheduler Events are delivered on the main thread.
  */
-@property (nonatomic, readonly) RACReplaySubject<NSNumber *> *untunneledInterstitialCanPresent;
+@property (nonatomic, readonly) RACBehaviorSubject<NSNumber *> *untunneledInterstitialCanPresent;
 
 /**
  * Emits @(TRUE) when tunneled or untunneled rewarded video is ready to be presented.
@@ -62,7 +62,7 @@ FOUNDATION_EXPORT AdControllerTag const AdControllerTagTunneledRewardedVideo;
  * Subject initially has default value @(FALSE).
  * @scheduler Events are delivered on the main thread.
  */
-@property (nonatomic, readonly) RACReplaySubject<NSNumber *> *rewardedVideoCanPresent;
+@property (nonatomic, readonly) RACBehaviorSubject<NSNumber *> *rewardedVideoCanPresent;
 
 + (instancetype)sharedInstance;
 
