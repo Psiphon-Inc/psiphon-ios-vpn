@@ -1072,7 +1072,9 @@ NSString * const CommandStopVPN = @"StopVPN";
            if (s == VPNStatusConnected || s == VPNStatusDisconnected || s == VPNStatusInvalid) {
                // Device is either tunneled or untunneled, we can go ahead with the purchase request.
                PsiCashSpeedBoostProductSKU *purchase = [model maxSpeedBoostPurchaseEarned];
+
                if (![model hasPendingPurchase] && ![model hasActiveSpeedBoostPurchase] && purchase != nil) {
+                   [[[UINotificationFeedbackGenerator alloc] init] notificationOccurred:UINotificationFeedbackTypeSuccess];
                    [PsiCashClient.sharedInstance purchaseSpeedBoostProduct:purchase];
                } else {
                    [weakSelf showPsiCashAlertView];
@@ -1128,7 +1130,8 @@ NSString * const CommandStopVPN = @"StopVPN";
     if (self.view.frame.size.width * psiCashViewToParentViewWidthRatio > psiCashViewMaxWidth) {
         [psiCashView.widthAnchor constraintEqualToConstant:psiCashViewMaxWidth].active = YES;
     } else {
-        [psiCashView.widthAnchor constraintEqualToAnchor:self.view.widthAnchor multiplier:psiCashViewToParentViewWidthRatio].active = YES;
+        [psiCashView.widthAnchor constraintEqualToAnchor:self.view.widthAnchor
+                                              multiplier:psiCashViewToParentViewWidthRatio].active = YES;
     }
     psiCashViewHeight = [psiCashView.heightAnchor constraintEqualToConstant:146.9];
     psiCashViewHeight.active = YES;
@@ -1153,9 +1156,21 @@ NSString * const CommandStopVPN = @"StopVPN";
                                     ||
                                        [strongSelf->model hasPendingPurchase] ^
                                        [newClientModel hasPendingPurchase];
+                if (   strongSelf->model
+                    && [strongSelf->model hasActiveSpeedBoostPurchase] == FALSE
+                    && [newClientModel hasActiveSpeedBoostPurchase] == TRUE) {
+                    // Speed Boost has activated
+                    [[[UINotificationFeedbackGenerator alloc] init]
+                     notificationOccurred:UINotificationFeedbackTypeSuccess];
+                }
+
                 NSComparisonResult balanceChange = [strongSelf->model.balance compare:newClientModel.balance];
 
                 if (balanceChange != NSOrderedSame) {
+
+                    [[[UINotificationFeedbackGenerator alloc] init]
+                     notificationOccurred:UINotificationFeedbackTypeSuccess];
+
                     NSNumber *balanceChange = [NSNumber numberWithDouble:newClientModel.balance.doubleValue
                                               - strongSelf->model.balance.doubleValue];
                     [PsiCashView animateBalanceChangeOf:balanceChange
@@ -1304,6 +1319,7 @@ NSString * const CommandStopVPN = @"StopVPN";
             BOOL didReward = [tuple.first boolValue];
             BOOL didDisappear = [tuple.second boolValue];
             if (didReward && didDisappear) {
+                [[[UIImpactFeedbackGenerator alloc] initWithStyle:UIImpactFeedbackStyleLight] impactOccurred];
                 [[PsiCashClient sharedInstance] pollForBalanceDeltaWithMaxRetries:30 andTimeBetweenRetries:1.0];
             }
         } error:^(NSError *error) {
