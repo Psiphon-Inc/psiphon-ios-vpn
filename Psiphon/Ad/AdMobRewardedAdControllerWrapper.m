@@ -34,7 +34,7 @@ PsiFeedbackLogType const AdMobRewardedAdControllerWrapperLogType = @"AdMobReward
 
 @interface AdMobRewardedAdControllerWrapper () <GADRewardBasedVideoAdDelegate>
 
-@property (nonatomic, readwrite, nonnull) BehaviorRelay<NSNumber *> *canPresentOrPresenting;
+@property (nonatomic, readwrite, nonnull) BehaviorRelay<NSNumber *> *canPresent;
 
 /** presentedAdDismissed is hot infinite signal - emits RACUnit whenever an ad is presented. */
 @property (nonatomic, readwrite, nonnull) RACSubject<RACUnit *> *presentedAdDismissed;
@@ -59,7 +59,7 @@ PsiFeedbackLogType const AdMobRewardedAdControllerWrapperLogType = @"AdMobReward
     _tag = tag;
     _loadStatusRelay = [RelaySubject subject];
     _adUnitID = adUnitID;
-    _canPresentOrPresenting = [BehaviorRelay behaviorSubjectWithDefaultValue:@(FALSE)];
+    _canPresent = [BehaviorRelay behaviorSubjectWithDefaultValue:@(FALSE)];
     _presentedAdDismissed = [RACSubject subject];
     _presentationStatus = [RACSubject subject];
     return self;
@@ -113,8 +113,8 @@ PsiFeedbackLogType const AdMobRewardedAdControllerWrapperLogType = @"AdMobReward
 
     return [RACSignal createSignal:^RACDisposable *(id <RACSubscriber> subscriber) {
 
-        if ([[weakSelf.canPresentOrPresenting first] boolValue]) {
-            [weakSelf.canPresentOrPresenting accept:@(FALSE)];
+        if ([[weakSelf.canPresent first] boolValue]) {
+            [weakSelf.canPresent accept:@(FALSE)];
         }
 
         [subscriber sendNext:[RACTwoTuple pack:weakSelf.tag :nil]];
@@ -157,15 +157,15 @@ PsiFeedbackLogType const AdMobRewardedAdControllerWrapperLogType = @"AdMobReward
 }
 
 - (void)rewardBasedVideoAdDidReceiveAd:(GADRewardBasedVideoAd *)rewardBasedVideoAd {
-    if (![[self.canPresentOrPresenting first] boolValue]) {
-        [self.canPresentOrPresenting accept:@(TRUE)];
+    if (![[self.canPresent first] boolValue]) {
+        [self.canPresent accept:@(TRUE)];
     }
     [self.loadStatusRelay accept:[RACTwoTuple pack:self.tag :nil]];
 }
 
 - (void)rewardBasedVideoAd:(GADRewardBasedVideoAd *)rewardBasedVideoAd didFailToLoadWithError:(NSError *)error {
-    if ([[self.canPresentOrPresenting first] boolValue]) {
-        [self.canPresentOrPresenting accept:@(FALSE)];
+    if ([[self.canPresent first] boolValue]) {
+        [self.canPresent accept:@(FALSE)];
     }
 
     NSError *e = [NSError errorWithDomain:AdControllerWrapperErrorDomain
@@ -175,22 +175,21 @@ PsiFeedbackLogType const AdMobRewardedAdControllerWrapperLogType = @"AdMobReward
 }
 
 - (void)rewardBasedVideoAdDidOpen:(GADRewardBasedVideoAd *)rewardBasedVideoAd {
+    [self.canPresent accept:@(FALSE)];
     [self.presentationStatus sendNext:@(AdPresentationWillAppear)];
     [self.presentationStatus sendNext:@(AdPresentationDidAppear)];
 }
 
 - (void)rewardBasedVideoAdDidStartPlaying:(GADRewardBasedVideoAd *)rewardBasedVideoAd {
-    PSIAssert([[self.canPresentOrPresenting first] boolValue] == TRUE);
+    // Do nothing.
 }
 
 - (void)rewardBasedVideoAdDidCompletePlaying:(GADRewardBasedVideoAd *)rewardBasedVideoAd {
-    PSIAssert([[self.canPresentOrPresenting first] boolValue] == TRUE);
+    // Do nothing.
 }
 
 - (void)rewardBasedVideoAdDidClose:(GADRewardBasedVideoAd *)rewardBasedVideoAd {
-    if ([[self.canPresentOrPresenting first] boolValue]) {
-        [self.canPresentOrPresenting accept:@(FALSE)];
-    }
+    // Do nothing.
 
     [self.presentationStatus sendNext:@(AdPresentationWillDisappear)];
     [self.presentationStatus sendNext:@(AdPresentationDidDisappear)];
