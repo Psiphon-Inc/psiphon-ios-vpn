@@ -12,9 +12,6 @@
 /* Alert dialog title. */
 "ALERT_TITLE_OPERATION_FAILED" = "Operation Failed";
 
-/* Text for app subtitle on main view. */
-"APP_SUB_TITLE_MAIN_VIEW" = "BEYOND BORDERS";
-
 /* Title of the button which takes the user to the previous screen. Text should be short and one word when possible. */
 "BACK_BUTTON" = "Back";
 
