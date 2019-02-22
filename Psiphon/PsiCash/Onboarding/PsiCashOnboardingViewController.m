@@ -31,8 +31,7 @@
 
 @implementation PsiCashOnboardingViewController {
     // UI elements
-    UILabel *appTitleLabel;
-    UILabel *appSubTitleLabel;
+    UIImageView *psiphonLargeLogo;
     UIButton *nextButton;
 
     BOOL isRTL;
@@ -54,8 +53,7 @@
 
     [self.view setBackgroundColor:UIColor.darkBlueColor];
 
-    [self addAppTitleLabel];
-    [self addAppSubTitleLabel];
+    [self addPsiphonLargeLogo];
 
     /* Customize UIPageControl */
     UIPageControl *pageControl = [UIPageControl appearance];
@@ -118,64 +116,24 @@
 }
 
 
-- (void)addAppTitleLabel {
-    appTitleLabel = [[UILabel alloc] init];
-    appTitleLabel.translatesAutoresizingMaskIntoConstraints = NO;
-    appTitleLabel.text = @"PSIPHON";
-    appTitleLabel.textAlignment = NSTextAlignmentCenter;
-    appTitleLabel.textColor = [UIColor whiteColor];
-    CGFloat narrowestWidth = self.view.frame.size.width;
-    if (self.view.frame.size.height < self.view.frame.size.width) {
-        narrowestWidth = self.view.frame.size.height;
-    }
-    appTitleLabel.font = [UIFont fontWithName:@"Bourbon-Oblique" size:narrowestWidth * 0.10625f];
-    if ([PsiphonClientCommonLibraryHelpers unsupportedCharactersForFont:appTitleLabel.font.fontName withString:appTitleLabel.text]) {
-        appTitleLabel.font = [UIFont systemFontOfSize:narrowestWidth * 0.075f];
-    }
+- (void)addPsiphonLargeLogo {
+    psiphonLargeLogo = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"PsiphonLogoWhite"]];
+    psiphonLargeLogo.contentMode = UIViewContentModeScaleAspectFit;
+    psiphonLargeLogo.translatesAutoresizingMaskIntoConstraints = NO;
 
-    [self.view addSubview:appTitleLabel];
+    [self.view addSubview:psiphonLargeLogo];
 
     // Setup autolayout
-    CGFloat labelHeight = [appTitleLabel getLabelHeight];
-    [appTitleLabel.heightAnchor constraintEqualToConstant:labelHeight].active = YES;
-
-    NSLayoutConstraint *floatingVerticallyConstraint =[NSLayoutConstraint constraintWithItem:appTitleLabel
-                                                                                   attribute:NSLayoutAttributeBottom
-                                                                                   relatedBy:NSLayoutRelationEqual
-                                                                                      toItem:self.view
-                                                                                   attribute:NSLayoutAttributeBottom
-                                                                                  multiplier:.14
-                                                                                    constant:0];
-    // This constraint will be broken in case the next constraint can't be enforced
-    floatingVerticallyConstraint.priority = 999;
-    [self.view addConstraint:floatingVerticallyConstraint];
-
-    [appTitleLabel.topAnchor constraintGreaterThanOrEqualToAnchor:self.view.topAnchor].active = YES;
-    [appTitleLabel.centerXAnchor constraintEqualToAnchor:self.view.centerXAnchor].active = YES;
-}
-
-- (void)addAppSubTitleLabel {
-    appSubTitleLabel = [[UILabel alloc] init];
-    appSubTitleLabel.translatesAutoresizingMaskIntoConstraints = NO;
-    appSubTitleLabel.text = NSLocalizedStringWithDefaultValue(@"APP_SUB_TITLE_MAIN_VIEW", nil, [NSBundle mainBundle], @"BEYOND BORDERS", @"Text for app subtitle on main view.");
-    appSubTitleLabel.textAlignment = NSTextAlignmentCenter;
-    appSubTitleLabel.textColor = [UIColor whiteColor];
-    CGFloat narrowestWidth = self.view.frame.size.width;
-    if (self.view.frame.size.height < self.view.frame.size.width) {
-        narrowestWidth = self.view.frame.size.height;
-    }
-    appSubTitleLabel.font = [UIFont fontWithName:@"Bourbon-Oblique" size:narrowestWidth * 0.10625f/2.0f];
-    if ([PsiphonClientCommonLibraryHelpers unsupportedCharactersForFont:appSubTitleLabel.font.fontName withString:appSubTitleLabel.text]) {
-        appSubTitleLabel.font = [UIFont systemFontOfSize:narrowestWidth * 0.075f/2.0f];
-    }
-
-    [self.view addSubview:appSubTitleLabel];
-
-    // Setup autolayout
-    CGFloat labelHeight = [appSubTitleLabel getLabelHeight];
-    [appSubTitleLabel.heightAnchor constraintEqualToConstant:labelHeight].active = YES;
-    [appSubTitleLabel.topAnchor constraintEqualToAnchor:appTitleLabel.bottomAnchor].active = YES;
-    [appSubTitleLabel.centerXAnchor constraintEqualToAnchor:self.view.centerXAnchor].active = YES;
+    [NSLayoutConstraint activateConstraints:@[
+        [psiphonLargeLogo.centerXAnchor constraintEqualToAnchor:self.view.centerXAnchor],
+        [NSLayoutConstraint constraintWithItem:psiphonLargeLogo
+                                     attribute:NSLayoutAttributeBottom
+                                     relatedBy:NSLayoutRelationEqual
+                                        toItem:self.view
+                                     attribute:NSLayoutAttributeBottom
+                                    multiplier:.14
+                                      constant:0]
+    ]];
 }
 
 - (void)setNavButtonTitle {
@@ -258,7 +216,7 @@
 #pragma mark - PsiCashOnboardingChildViewController delegate methods
 
 - (CGFloat)getTitleOffset {
-    return appSubTitleLabel.frame.origin.y + appSubTitleLabel.frame.size.height;
+    return psiphonLargeLogo.frame.origin.y + psiphonLargeLogo.frame.size.height;
 }
 
 - (void)moveToNextPage {
