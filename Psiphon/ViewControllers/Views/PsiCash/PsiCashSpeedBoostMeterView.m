@@ -247,7 +247,9 @@
     [innerBackground setProgress:progress];
 
     NSString *text;
-    if (progress >= 1) {
+    if (!self.model.onboarded) {
+        text = [Strings psiCashSpeedBoostMeterUserNotOnboardedTitle];
+    } else if (progress >= 1) {
         NSString *speedBoostAvailable = [Strings psiCashSpeedBoostMeterAvailableTitle];
         if ([self.model.maxSpeedBoostPurchaseEarned.hours floatValue] < 1) {
             text = [NSString stringWithFormat:@"%.0fm %@", ([hoursEarned floatValue] * 60), speedBoostAvailable];
@@ -302,12 +304,13 @@
 #pragma mark - Helpers
 
 - (void)noSpenderToken {
-    title.attributedText = [self styleTitleText:[Strings psiCashSpeedBoostMeterNoAuthTitle]];
+    if (self.model.onboarded) {
+        title.attributedText = [self styleTitleText:[Strings psiCashSpeedBoostMeterNoAuthTitle]];
+    } else {
+        title.attributedText = [self styleTitleText:[Strings psiCashSpeedBoostMeterUserNotOnboardedTitle]];
+    }
 }
 
-- (void)userNotOnboarded {
-    title.attributedText = [self styleTitleText:[Strings psiCashSpeedBoostMeterUserNotOnboardedTitle]];
-}
 
 - (NSTimeInterval)timeToNextHourExpired:(NSTimeInterval)seconds {
     NSTimeInterval secondsRemaining = seconds;
@@ -341,20 +344,23 @@
     }
 
     if ([self.model hasAuthPackage]) {
+
         if ([self.model hasActiveSpeedBoostPurchase]) {
+            // Active state
             [self activeSpeedBoostExpiringIn:self.model.activeSpeedBoostPurchase.localTimeExpiry.timeIntervalSinceNow];
         } else if ([self.model hasPendingPurchase]){
+            // Active state
             [self inPurchasePendingState];
         } else {
-            if (!self.model.onboarded) {
-                [self userNotOnboarded];
-            } else if ([self.model.authPackage hasSpenderToken]) {
+            // Passive state
+            if ([self.model.authPackage hasSpenderToken]) {
                 [self speedBoostChargingWithHoursEarned:[self.model maxSpeedBoostPurchaseEarned].hours];
             } else {
                 [self noSpenderToken];
             }
         }
     } else {
+        // Disabled state
         [self noSpenderToken];
     }
 }
