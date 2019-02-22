@@ -283,8 +283,6 @@ typedef NS_ERROR_ENUM(PsiCashClientRefreshStateErrorDomain, PsiCashClientRefresh
         [logger logErrorEvent:[tag stringByAppendingString:@"Failed"]
                         withError:error
           includingDiagnosticInfo:NO];
-
-        [self displayAlertWithMessage:NSLocalizedStringWithDefaultValue(@"PSICASH_REFRESH_STATE_FAILED_MESSAGE_TEXT", nil, [NSBundle mainBundle], @"Failed to update PsiCash state", @"Alert error message informing user that the app failed to retrieve their PsiCash information from the server. Note: 'PsiCash' should not be translated or transliterated.")];
     } completed:^{
         [logger logEvent:[tag stringByAppendingString:@"Completed"] includingDiagnosticInfo:YES];
     }];
