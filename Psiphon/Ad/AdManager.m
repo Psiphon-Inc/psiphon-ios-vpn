@@ -463,7 +463,7 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
 
               if (appEvent.tunnelState == TunnelStateUntunneled && appEvent.networkIsReachable) {
 
-                  return weakSelf.untunneledInterstitial.canPresentOrPresenting;
+                  return weakSelf.untunneledInterstitial.canPresent;
               }
               return [RACSignal return:@(FALSE)];
           }]
@@ -476,10 +476,10 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
               if (appEvent.networkIsReachable) {
 
                   if (appEvent.tunnelState == TunnelStateUntunneled) {
-                      return weakSelf.untunneledRewardVideo.canPresentOrPresenting;
+                      return weakSelf.untunneledRewardVideo.canPresent;
 
                   } else if (appEvent.tunnelState == TunnelStateTunneled) {
-                      return weakSelf.tunneledRewardVideo.canPresentOrPresenting;
+                      return weakSelf.tunneledRewardVideo.canPresent;
                   }
               }
 

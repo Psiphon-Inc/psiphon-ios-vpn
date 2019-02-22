@@ -81,7 +81,7 @@
 
     // Setup activity indicator
     activityIndicator = [[UIActivityIndicatorView alloc]
-      initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
+      initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhite];
 
     rewardedVideoButtonContainer = [[UIView alloc] init];
 

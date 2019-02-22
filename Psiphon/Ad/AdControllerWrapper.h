@@ -118,12 +118,11 @@ typedef NS_ERROR_ENUM(AdControllerWrapperErrorDomain, AdControllerWrapperErrorCo
 
 /**
  * Hot relay subject. Emits @(TRUE) if ad is ready to be displayed, @(FALSE) otherwise.
- * The value should not change while the ad is being presented, and should only emit @(FALSE) after
- * the ad has been dismissed.
+ * The value is expected to change after the ad has started presenting.
  * To avoid unnecessary computation for observers of this property, implementations of this protocol
  * should check the current value before emitting new value.
  */
-@property (nonatomic, readonly) BehaviorRelay<NSNumber *> *canPresentOrPresenting;
+@property (nonatomic, readonly) BehaviorRelay<NSNumber *> *canPresent;
 
 /**
  * presentedAdDismissed is hot infinite signal - emits RACUnit whenever an ad is shown.
@@ -137,7 +136,7 @@ typedef NS_ERROR_ENUM(AdControllerWrapperErrorDomain, AdControllerWrapperErrorCo
 @property (nonatomic, readonly) RACSubject<NSNumber *> *presentationStatus;
 
 /**
- * Loads ad if none is already loaded. `canPresentOrPresenting` will emit @(TRUE) once ad has finished loading
+ * Loads ad if none is already loaded. `canPresent` will relay @(TRUE) once ad has finished loading
  * successfully and is ready to be presented.
  *
  * Implementations should handle multiple subscriptions to the returned signal without
@@ -155,7 +154,7 @@ typedef NS_ERROR_ENUM(AdControllerWrapperErrorDomain, AdControllerWrapperErrorCo
 - (RACSignal<RACTwoTuple<AdControllerTag, NSError *> *> *)loadAd;
 
 /**
- * Unloads ad if one is loaded. `canPresentOrPresenting` will emit @(FALSE) after unloading is done.
+ * Unloads ad if one is loaded. `canPresent` will relay @(FALSE) after unloading is done.
  * Implementations should emit the wrapper's tag after ad is unloaded and then complete.
  *
  * @scheduler: should be subscribed on the main thread.
