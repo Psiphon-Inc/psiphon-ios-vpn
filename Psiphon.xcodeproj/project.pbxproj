@@ -87,7 +87,6 @@
 		6615A5EB1F58A95B00026C98 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 6615A5E81F58A95500026C98 /* Localizable.strings */; };
 		668AF9BF1E92CBD3008CAAAA /* NetworkExtension.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 668AF9BE1E92CBD3008CAAAA /* NetworkExtension.framework */; };
 		668AF9C01E92CBE0008CAAAA /* NetworkExtension.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 668AF9BE1E92CBD3008CAAAA /* NetworkExtension.framework */; };
-		963708A91F65D4810038894E /* Bourbon-Oblique.otf in Resources */ = {isa = PBXBuildFile; fileRef = 963708A81F65D4810038894E /* Bourbon-Oblique.otf */; };
 		9BFEC10661A7DC0402AF4B37 /* AsyncOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC6DEB0BE772BE801A9E6 /* AsyncOperation.m */; };
 		9BFEC1F0DA87B4E66C8CC4AA /* MoPubInterstitialAdControllerWrapper.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFECF45CA0CAF6997411D22 /* MoPubInterstitialAdControllerWrapper.m */; };
 		9BFEC2458D1346F537E9089E /* Nullity.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFECCCF429898FD903B69A6 /* Nullity.m */; };
@@ -428,7 +427,6 @@
 		6651BE051F6B177000D65633 /* my */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = my; path = Strings/my.lproj/Localizable.strings; sourceTree = "<group>"; };
 		668AF9BE1E92CBD3008CAAAA /* NetworkExtension.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = NetworkExtension.framework; path = System/Library/Frameworks/NetworkExtension.framework; sourceTree = SDKROOT; };
 		6B2646D9B515A2990796D972 /* Pods-PsiphonVPN.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PsiphonVPN.release.xcconfig"; path = "Pods/Target Support Files/Pods-PsiphonVPN/Pods-PsiphonVPN.release.xcconfig"; sourceTree = "<group>"; };
-		963708A81F65D4810038894E /* Bourbon-Oblique.otf */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Bourbon-Oblique.otf"; sourceTree = "<group>"; };
 		9BFEC0419AD3808370915E01 /* PsiphonConfigUserDefaults.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PsiphonConfigUserDefaults.h; sourceTree = "<group>"; };
 		9BFEC1C9F506CE1DF07306D2 /* NEBridge.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NEBridge.h; sourceTree = "<group>"; };
 		9BFEC1E485FB857A0358ED94 /* UnionSerialQueue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UnionSerialQueue.h; sourceTree = "<group>"; };
@@ -1200,7 +1198,6 @@
 		F136C2981F62E81F000D3EAB /* Resource */ = {
 			isa = PBXGroup;
 			children = (
-				963708A81F65D4810038894E /* Bourbon-Oblique.otf */,
 				CE26FC941BBDC7B800B83375 /* Assets.xcassets */,
 				F136C2941F62E3E1000D3EAB /* LaunchScreen.xib */,
 			);
@@ -1408,7 +1405,6 @@
 				CE4E9BC01BBEECF30060FF8B /* Psiphon.entitlements in Resources */,
 				445F24DE20E1A5BA00D004E9 /* pkcs7-signed-data-simplified.asn1 in Resources */,
 				EF743FCA1F99549000AC89A2 /* productIDs.plist in Resources */,
-				963708A91F65D4810038894E /* Bourbon-Oblique.otf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
