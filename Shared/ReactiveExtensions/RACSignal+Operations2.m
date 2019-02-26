@@ -280,6 +280,10 @@
 
         LOG_DEBUG(@"%@", [serialQueue debugDescription]);
 
+        if ([serialQueue.operationQueue operationCount] > 2) {
+            [PsiFeedbackLogger warnWithType:@"SerialQueueHighCount" json:[serialQueue feedbackInfo]];
+        }
+
         return compoundDisposable;
     }];
 }
