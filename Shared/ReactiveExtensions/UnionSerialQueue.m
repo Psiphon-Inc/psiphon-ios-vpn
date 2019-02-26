@@ -72,4 +72,26 @@
     return lines;
 }
 
+- (NSDictionary *)feedbackInfo {
+
+    NSUInteger count = self.operationQueue.operationCount;
+    NSMutableArray<NSDictionary<NSString *, NSNumber *> *> *operations = [NSMutableArray arrayWithCapacity:count];
+
+    [self.operationQueue.operations enumerateObjectsUsingBlock:^(__kindof NSOperation *op, NSUInteger idx, BOOL *stop) {
+        operations[idx] = @{
+          @"Class": NSStringFromClass([op class]),
+          @"Name": op.name,
+          @"Finished": NSStringFromBOOL(op.finished),
+          @"Ready": NSStringFromBOOL(op.ready),
+          @"Cancelled": NSStringFromBOOL(op.cancelled),
+          @"Executing": NSStringFromBOOL(op.executing)
+        };
+    }];
+
+    return @{
+      @"Count": @(count),
+      @"Operations": operations
+    };
+}
+
 @end

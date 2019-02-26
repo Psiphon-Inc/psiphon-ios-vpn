@@ -54,6 +54,7 @@
 #import "DispatchUtils.h"
 #import "RACTargetQueueScheduler.h"
 #import "UnionSerialQueue.h"
+#import "PsiphonDataSharedDB.h"
 
 NSErrorDomain const VPNManagerErrorDomain = @"VPNManagerErrorDomain";
 
@@ -333,7 +334,12 @@ PsiFeedbackLogType const VPNManagerLogType = @"VPNManager";
 
     VPNManager *__weak weakSelf = self;
 
-    __block RACDisposable *disposable = [[[[[[[[VPNManager loadTunnelProviderManager]
+    __block RACDisposable *disposable = [[[[[[[[[VPNManager loadTunnelProviderManager]
+      doNext:^(NETunnelProviderManager *x) {
+          // Store the time where tunnel start is called in shared defaults.
+          PsiphonDataSharedDB *sharedDB = [[PsiphonDataSharedDB alloc] initForAppGroupIdentifier:APP_GROUP_IDENTIFIER];
+          [sharedDB setContainerTunnelStartTime:[NSDate date]];
+      }]
       flattenMap:^RACSignal<NETunnelProviderManager *> *(NETunnelProviderManager *_Nullable pm) {
           // Updates VPN configuration parameters if it already exists,
           // otherwise creates a new VPN configuration.
