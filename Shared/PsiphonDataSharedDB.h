@@ -87,6 +87,14 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (BOOL)getAppForegroundState;
 
+/**
+ * Last date/time immediately before the extension was last started from the container.
+ * Check where `setContainerTunnelStartTime:` is called to set the last tunnel start time.
+ *
+ * @return NSDate of when tunnel was started by the container. Null if no value is set.
+ */
+- (NSDate *_Nullable)getContainerTunnelStartTime;
+
 #if !(TARGET_IS_EXTENSION)
 
 /**
@@ -96,6 +104,11 @@ NS_ASSUME_NONNULL_BEGIN
  * @return TRUE if change was persisted to disk successfully, FALSE otherwise.
  */
 - (BOOL)updateAppForegroundState:(BOOL)foreground;
+
+/**
+ * Time immediately before the extension is started from the tunnel.
+ */
+- (void)setContainerTunnelStartTime:(NSDate *)startTime;
 
 #endif
 

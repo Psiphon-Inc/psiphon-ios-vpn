@@ -111,15 +111,26 @@ PsiFeedbackLogType const BasePacketTunnelProviderLogType = @"BasePacketTunnelPro
         [FileUtils listDirectory:paths[1] resource:@"Shared container"];
     #endif
 
+        BOOL tunnelStartedFromContainerRecently = FALSE;
+        NSDate *_Nullable lastTunnelStartTime = [self.sharedDB getContainerTunnelStartTime];
+        if (lastTunnelStartTime) {
+            NSTimeInterval time = [[NSDate date] timeIntervalSinceDate:[self.sharedDB getContainerTunnelStartTime]];
+            tunnelStartedFromContainerRecently = (time < 5.0);
+        }
+
         // Determine how the extension was started.
         // ExtensionStartMethodFromCrash priority should be after _FromBoot and _FromContainer.
         //
         if ([self isStartBootTestFileLocked]) {
             self.extensionStartMethod = ExtensionStartMethodFromBoot;
-        } else if ([((NSString *)options[EXTENSION_OPTION_START_FROM_CONTAINER]) isEqualToString:EXTENSION_OPTION_TRUE]) {
+
+        } else if (tunnelStartedFromContainerRecently ||
+                 [((NSString *)options[EXTENSION_OPTION_START_FROM_CONTAINER]) isEqualToString:EXTENSION_OPTION_TRUE]) {
             self.extensionStartMethod = ExtensionStartMethodFromContainer;
+
         } else if (previouslyJetsammed) {
             self.extensionStartMethod = ExtensionStartMethodFromCrash;
+
         } else {
             self.extensionStartMethod = ExtensionStartMethodOther;
         }
