@@ -35,6 +35,8 @@ UserDefaultsKey const ClientRegionStringKey = @"client_region";
 
 UserDefaultsKey const AppForegroundBoolKey = @"app_foreground";
 
+UserDefaultsKey const TunnelStartTimeStringKey = @"tunnel_start_time";
+
 UserDefaultsKey const TunnelSponsorIDStringKey = @"current_sponsor_id";
 
 UserDefaultsKey const ServerTimestampStringKey = @"server_timestamp";
@@ -291,11 +293,24 @@ UserDefaultsKey const DebugPsiphonConnectionStateStringKey = @"PsiphonDataShared
     return [sharedDefaults boolForKey:AppForegroundBoolKey];
 }
 
+- (NSDate *_Nullable)getContainerTunnelStartTime {
+    NSString *_Nullable rfc3339Date = [sharedDefaults stringForKey:TunnelStartTimeStringKey];
+    if (!rfc3339Date) {
+        return nil;
+    }
+
+    return [NSDate fromRFC3339String:rfc3339Date];
+}
+
 - (BOOL)updateAppForegroundState:(BOOL)foreground {
     [sharedDefaults setBool:foreground forKey:AppForegroundBoolKey];
     return [sharedDefaults synchronize];
 }
 
+- (void)setContainerTunnelStartTime:(NSDate *)startTime {
+    NSString *rfc3339Date = [startTime RFC3339String];
+    [sharedDefaults setObject:rfc3339Date forKey:TunnelStartTimeStringKey];
+}
 
 #pragma mark - Extension Data (Data originating in the extension)
 
