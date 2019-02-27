@@ -92,12 +92,6 @@ typedef NS_ERROR_ENUM(PsiCashClientRefreshStateErrorDomain, PsiCashClientRefresh
 
         sharedDB = [[PsiphonDataSharedDB alloc] initForAppGroupIdentifier:APP_GROUP_IDENTIFIER];
 
-        // TODO: notify the user about any purchases that expired while the app was not foregrounded
-        NSArray <PsiCashPurchase*>* expiredPurchases = [psiCash expirePurchases];
-        if (expiredPurchases.count > 0) {
-            [logger logEvent:@"PurchasesExpired" includingDiagnosticInfo:YES];
-        }
-
         completionQueue = dispatch_queue_create("com.psiphon3.PsiCashClient.CompletionQueue",
                                                 DISPATCH_QUEUE_SERIAL);
 
