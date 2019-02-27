@@ -92,12 +92,6 @@ typedef NS_ERROR_ENUM(PsiCashClientRefreshStateErrorDomain, PsiCashClientRefresh
 
         sharedDB = [[PsiphonDataSharedDB alloc] initForAppGroupIdentifier:APP_GROUP_IDENTIFIER];
 
-        // TODO: notify the user about any purchases that expired while the app was not foregrounded
-        NSArray <PsiCashPurchase*>* expiredPurchases = [psiCash expirePurchases];
-        if (expiredPurchases.count > 0) {
-            [logger logEvent:@"PurchasesExpired" includingDiagnosticInfo:YES];
-        }
-
         completionQueue = dispatch_queue_create("com.psiphon3.PsiCashClient.CompletionQueue",
                                                 DISPATCH_QUEUE_SERIAL);
 
@@ -621,7 +615,7 @@ typedef NS_ERROR_ENUM(PsiCashClientRefreshStateErrorDomain, PsiCashClientRefresh
  */
 - (NSArray<PsiCashPurchase*>*)activePurchases {
     NSMutableArray <PsiCashPurchase*>* purchases = [[NSMutableArray alloc]
-      initWithArray:[[psiCash validPurchases] copy]];
+      initWithArray:[[psiCash purchases] copy]];
 
     NSSet<NSString *> *markedAuthIDs = [sharedDB getMarkedExpiredAuthorizationIDs];
     NSMutableArray *purchasesToRemove = [[NSMutableArray alloc] init];
@@ -731,13 +725,13 @@ typedef NS_ERROR_ENUM(PsiCashClientRefreshStateErrorDomain, PsiCashClientRefresh
 }
 
 - (void)updateContainerAuthTokens {
-    [sharedDB setContainerAuthorizations:[self validAuthorizations]];
+    [sharedDB setContainerAuthorizations:[self speedBoostAuthorizations]];
 }
 
-- (NSSet<Authorization*>*)validAuthorizations {
+- (NSSet<Authorization*>*)speedBoostAuthorizations {
     NSMutableSet <Authorization*>*validAuthorizations = [[NSMutableSet alloc] init];
 
-    NSArray <PsiCashPurchase*>* purchases = psiCash.validPurchases;
+    NSArray <PsiCashPurchase*>* purchases = psiCash.purchases;
     for (PsiCashPurchase *purchase in purchases) {
         if ([purchase.transactionClass isEqualToString:[PsiCashSpeedBoostProduct purchaseClass]]) {
             [validAuthorizations addObject:[[Authorization alloc]
