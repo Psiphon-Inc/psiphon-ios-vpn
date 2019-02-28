@@ -40,21 +40,21 @@ NS_ASSUME_NONNULL_BEGIN
 #pragma mark - Privacy Policy
 
 /**
- * Returns date of last update to Psiphon's Privacy Policy for iOS.
+ * Returns time as Unix time of last update to Psiphon's Privacy Policy for iOS.
  */
-- (NSDate *)privacyPolicyUpdateDate;
+- (NSNumber *)privacyPolicyLastUpdateTime;
 
 /**
- * Returns the date of the privacy policy that was last accepted by the user.
+ * Returns time as Unix time of the privacy policy that was last accepted by the user.
  */
-- (NSDate *_Nullable)lastAcceptedPrivacyPolicy;
+- (NSNumber *_Nullable)lastAcceptedPrivacyPolicy;
 
 /**
- * Stores privacyPolicyDate as the date of the privacy policy that was accepted.
- * Note that this is not the date that the user accepted the privacy policy, but rather,
- * the date that the privacy policy was updated.
+ * Stores privacyPolicyUnixTime as the time that the privacy policy that was accepted.
+ * Note that this is not the time that the user accepted the privacy policy, but rather,
+ * the time that the privacy policy was updated.
  */
-- (void)setAcceptedPrivacyPolicy:(NSDate *)privacyPolicyDate;
+- (void)setAcceptedPrivacyPolicyUnixTime:(NSNumber *)privacyPolicyUnixTime;
 
 /**
  * Sets set of egress regions in standard NSUserDefaults
