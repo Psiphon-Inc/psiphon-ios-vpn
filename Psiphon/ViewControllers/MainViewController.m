@@ -181,9 +181,9 @@ NSString * const CommandStopVPN = @"StopVPN";
     // PsiCash and AdManager unless the user has accepted
     // the privacy policy.
     ContainerDB *containerDB = [[ContainerDB alloc] init];
-    NSDate *_Nullable privacyPolicyAcceptedDate = [containerDB lastAcceptedPrivacyPolicy];
-    assert(privacyPolicyAcceptedDate != nil);
-    assert([privacyPolicyAcceptedDate afterOrEqualTo:[containerDB privacyPolicyUpdateDate]]);
+    NSNumber *_Nullable privacyPolicyUnixTime = [containerDB lastAcceptedPrivacyPolicy];
+    assert(privacyPolicyUnixTime != nil);
+    assert([privacyPolicyUnixTime compare:[containerDB privacyPolicyLastUpdateTime]] == NSOrderedSame);
 
     availableServerRegions = [[AvailableServerRegions alloc] init];
     [availableServerRegions sync];
