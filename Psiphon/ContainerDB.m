@@ -44,24 +44,20 @@ UserDefaultsKey const AppInfoLastCFBundleVersionStringKey = @"LastCFBundleVersio
                                             forKey:AppInfoLastCFBundleVersionStringKey];
 }
 
-- (NSDate *)privacyPolicyUpdateDate {
-    return [NSDate fromRFC3339String:@"2018-05-15T19:39:57+00:00"];
+- (NSNumber *)privacyPolicyLastUpdateTime {
+    // Time corresponding to 2018-05-15T19:39:57+00:00
+    return [NSNumber numberWithLongLong:1526413197];
 }
 
-- (NSDate *_Nullable)lastAcceptedPrivacyPolicy {
-    NSString *_Nullable dateString = [NSUserDefaults.standardUserDefaults
-      stringForKey:PrivacyPolicyAcceptedRFC3339StringKey];
+- (NSNumber *_Nullable)lastAcceptedPrivacyPolicy {
+    NSNumber *_Nullable unixTime = [NSUserDefaults.standardUserDefaults
+      objectForKey:PrivacyPolicyAcceptedRFC3339StringKey];
 
-    if (!dateString) {
-        return nil;
-    }
-    
-    return [NSDate fromRFC3339String:dateString];
+    return unixTime;
 }
 
-- (void)setAcceptedPrivacyPolicy:(NSDate *)privacyPolicyDate {
-    NSString *dateString = [privacyPolicyDate RFC3339String];
-    [NSUserDefaults.standardUserDefaults setObject:dateString
+- (void)setAcceptedPrivacyPolicyUnixTime:(NSNumber *)privacyPolicyUnixTime {
+    [NSUserDefaults.standardUserDefaults setObject:privacyPolicyUnixTime
                                             forKey:PrivacyPolicyAcceptedRFC3339StringKey];
 }
 

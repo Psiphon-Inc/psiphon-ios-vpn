@@ -35,6 +35,7 @@
 #import "LanguageSelectionViewController.h"
 #import "AppDelegate.h"
 #import "CloudsView.h"
+#import "Logging.h"
 
 const int NumPages = 4;
 
@@ -295,8 +296,7 @@ const int NumPages = 4;
 - (void)onPrivacyPolicyAccepted {
     // Stores the privacy policy date that the user accepted.
     ContainerDB *containerDB = [[ContainerDB alloc] init];
-    [containerDB setAcceptedPrivacyPolicy:[containerDB privacyPolicyUpdateDate]];
-
+    [containerDB setAcceptedPrivacyPolicyUnixTime:[containerDB privacyPolicyLastUpdateTime]];
     // Go to next page;
     [self gotoNextPage];
 }

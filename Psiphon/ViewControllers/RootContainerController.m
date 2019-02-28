@@ -78,10 +78,10 @@
     // If has accepted the latest privacy policy and vpn configuration has been installed,
     // then show this
     ContainerDB *containerDB = [[ContainerDB alloc] init];
-    NSDate *_Nullable privacyPolicyAcceptedDate = [containerDB lastAcceptedPrivacyPolicy];
+    NSNumber *_Nullable lastAcceptedPrivacyUnixTime = [containerDB lastAcceptedPrivacyPolicy];
 
-    if (!privacyPolicyAcceptedDate ||
-        [privacyPolicyAcceptedDate before:[containerDB privacyPolicyUpdateDate]]) {
+    if (!lastAcceptedPrivacyUnixTime ||
+        ([lastAcceptedPrivacyUnixTime compare:[containerDB privacyPolicyLastUpdateTime]] == NSOrderedAscending)) {
         [self switchToOnboarding];
     } else {
         [self switchToMainScreenAndStartVPN:FALSE];
