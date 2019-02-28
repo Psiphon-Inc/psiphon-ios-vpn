@@ -79,7 +79,7 @@ PsiFeedbackLogType const AppUpgradeLogType = @"AppUpgrade";
     if (oldVersion <= 98 && newVersion >= 99) {
 
         // Privacy policy that that would have been accepted by versions 98 and below.
-        NSDate *pre99PrivacyPolicyDate = [NSDate fromRFC3339String:@"2018-05-15T19:39:57+00:00"];
+        NSNumber *pre99PrivacyPolicyTime = [NSNumber numberWithLongLong:1526413197];
         NSString *pre99LegacyKey = @"PrivacyPolicy.AcceptedBoolKey";
 
         // Check if the legacy keys exist first.
@@ -88,12 +88,33 @@ PsiFeedbackLogType const AppUpgradeLogType = @"AppUpgrade";
 
         if (pre99PrivacyPolicyAccepted) {
             if ([pre99PrivacyPolicyAccepted boolValue]) {
-                [containerDB setAcceptedPrivacyPolicy:pre99PrivacyPolicyDate];
+                [containerDB setAcceptedPrivacyPolicyUnixTime:pre99PrivacyPolicyTime];
             }
 
             // Remove old key.
             [NSUserDefaults.standardUserDefaults removeObjectForKey:pre99LegacyKey];
         }
+    }
+
+    // Upgrade from 105 to 106 and above:
+    // - In 105 Privacy policy dates were stored as NSDates, which caused numerical imprecision when parsed
+    //   using `[NSDate dateWithTimeIntervalSince1970:]` methods.
+    // - In 106 we move towards storing privacy policy update dates as Unix timestamps.
+    // - Convert stored RFC3339 format in build 105 to the new format only if it is not nil.
+    if (oldVersion == 105 && newVersion >= 106) {
+
+        NSNumber *pre106PrivacyPolicyTime = [NSNumber numberWithLongLong:1526413197];
+        NSString *ppKey = @"ContainerDB.PrivacyPolicyAcceptedRFC3339StringKey";
+        id _Nullable lastAcceptedPP = [NSUserDefaults.standardUserDefaults objectForKey:ppKey];
+
+        // Don't do anything if `lastAcceptedPP` doesn't have any stored value.
+        if (!lastAcceptedPP) {
+            return;
+        }
+
+        // Overwrite current value if `lastAcceptedPP` is set, since if `lastAcceptedPP` is not nil,
+        // it must the same as `pre106PrivacyPolicyTime` in RFC3339 format.
+        [containerDB setAcceptedPrivacyPolicyUnixTime:pre106PrivacyPolicyTime];
     }
 
 }
