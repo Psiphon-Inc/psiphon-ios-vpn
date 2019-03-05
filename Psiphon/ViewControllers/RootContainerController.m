@@ -75,13 +75,9 @@
     [super viewDidLoad];
     [self.view setBackgroundColor:[UIColor blackColor]];
 
-    // If has accepted the latest privacy policy and vpn configuration has been installed,
-    // then show this
     ContainerDB *containerDB = [[ContainerDB alloc] init];
-    NSNumber *_Nullable lastAcceptedPrivacyUnixTime = [containerDB lastAcceptedPrivacyPolicy];
 
-    if (!lastAcceptedPrivacyUnixTime ||
-        ([lastAcceptedPrivacyUnixTime compare:[containerDB privacyPolicyLastUpdateTime]] == NSOrderedAscending)) {
+    if (![containerDB hasFinishedOnboarding]) {
         [self switchToOnboarding];
     } else {
         [self switchToMainScreenAndStartVPN:FALSE];

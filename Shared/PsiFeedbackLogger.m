@@ -498,4 +498,8 @@ PsiFeedbackLogType const FeedbackInternalLogType = @"FeedbackLoggerInternal";
 
 }
 
++ (id _Nonnull)safeValue:(id _Nullable)value {
+    return value ? value : NSNull.null;
+}
+
 @end

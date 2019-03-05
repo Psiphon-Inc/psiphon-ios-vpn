@@ -20,16 +20,18 @@
 #import "ContainerDB.h"
 #import "NSDate+PSIDateExtension.h"
 #import "UserDefaults.h"
+#import "Logging.h"
 
 #pragma mark - NSUserDefaultsKey
-
-UserDefaultsKey const PrivacyPolicyAcceptedRFC3339StringKey =
-    @"ContainerDB.PrivacyPolicyAcceptedRFC3339StringKey";
 
 UserDefaultsKey const EmbeddedEgressRegionsStringArrayKey =
     @"embedded_server_entries_egress_regions";  // legacy key
 
 UserDefaultsKey const AppInfoLastCFBundleVersionStringKey = @"LastCFBundleVersion"; // legacy key
+
+UserDefaultsKey const FinishedOnboardingBoolKey = @"ContainerDB.FinishedOnboardingBoolKey";
+
+UserDefaultsKey const PrivacyPolicyAcceptedStringTimeKey = @"ContainerDB.PrivacyPolicyAcceptedStringTimeKey2";
 
 #pragma mark -
 
@@ -44,22 +46,45 @@ UserDefaultsKey const AppInfoLastCFBundleVersionStringKey = @"LastCFBundleVersio
                                             forKey:AppInfoLastCFBundleVersionStringKey];
 }
 
-- (NSNumber *)privacyPolicyLastUpdateTime {
-    // Time corresponding to 2018-05-15T19:39:57+00:00
-    return [NSNumber numberWithLongLong:1526413197];
+#pragma mark -
+
+- (BOOL)hasFinishedOnboarding {
+    return [NSUserDefaults.standardUserDefaults boolForKey:FinishedOnboardingBoolKey];
 }
 
-- (NSNumber *_Nullable)lastAcceptedPrivacyPolicy {
-    NSNumber *_Nullable unixTime = [NSUserDefaults.standardUserDefaults
-      objectForKey:PrivacyPolicyAcceptedRFC3339StringKey];
+- (void)setHasFinishedOnboarding {
+    [NSUserDefaults.standardUserDefaults setBool:TRUE forKey:FinishedOnboardingBoolKey];
+}
+
+#pragma mark -
+
+- (NSString *)privacyPolicyLastUpdateTime {
+    return @"2018-05-15T19:39:57+00:00";
+}
+
+- (NSString *_Nullable)lastAcceptedPrivacyPolicy {
+    NSString *_Nullable unixTime = [NSUserDefaults.standardUserDefaults
+      stringForKey:PrivacyPolicyAcceptedStringTimeKey];
 
     return unixTime;
 }
 
-- (void)setAcceptedPrivacyPolicyUnixTime:(NSNumber *)privacyPolicyUnixTime {
-    [NSUserDefaults.standardUserDefaults setObject:privacyPolicyUnixTime
-                                            forKey:PrivacyPolicyAcceptedRFC3339StringKey];
+- (BOOL)hasAcceptedLatestPrivacyPolicy {
+    NSString *_Nullable lastAccepted = [self lastAcceptedPrivacyPolicy];
+    return [[self privacyPolicyLastUpdateTime] isEqualToString:lastAccepted];
 }
+
+- (void)setAcceptedPrivacyPolicy:(NSString *)privacyPolicyTimestamp {
+    [NSUserDefaults.standardUserDefaults setObject:privacyPolicyTimestamp
+                                            forKey:PrivacyPolicyAcceptedStringTimeKey];
+}
+
+- (void)setAcceptedLatestPrivacyPolicy {
+    [NSUserDefaults.standardUserDefaults setObject:[self privacyPolicyLastUpdateTime]
+                                            forKey:PrivacyPolicyAcceptedStringTimeKey];
+}
+
+#pragma mark -
 
 - (void)setEmbeddedEgressRegions:(NSArray<NSString *> *_Nullable)regions {
     [NSUserDefaults.standardUserDefaults setObject:regions

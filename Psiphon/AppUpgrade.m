@@ -56,65 +56,42 @@ PsiFeedbackLogType const AppUpgradeLogType = @"AppUpgrade";
 
             // Handle app upgrade.
             if (lastLaunchAppVersion) {
-                [AppUpgrade handleAppUpgradeFromVersion:lastLaunchAppVersion toVersion:appVersion];
+                [AppUpgrade handleAppUpgradeFromVersion:lastLaunchAppVersion];
             }
         }
     });
     return firstRunOfVersion;
 }
 
-+ (void)handleAppUpgradeFromVersion:(NSString *)oldVersionString
-                          toVersion:(NSString *)newVersionString {
++ (void)handleAppUpgradeFromVersion:(NSString *)oldVersionString {
 
     assert(oldVersionString != nil);
-    assert(newVersionString != nil);
-
     NSInteger oldVersion = [oldVersionString integerValue];
-    NSInteger newVersion = [newVersionString integerValue];
 
-    ContainerDB *containerDB = [[ContainerDB alloc] init];
+    // Remove legacy privacy-policy related keys
+    if (oldVersion <= 106) {
+        ContainerDB *containerDB = [[ContainerDB alloc] init];
 
-    // Upgrade from 98 and below to 99 and above:
-    // - Privacy policy has changed from stored bool value, to storing privacy policy update date.
-    if (oldVersion <= 98 && newVersion >= 99) {
+        NSUserDefaults *containerDBUserDefaults = NSUserDefaults.standardUserDefaults;
+        NSArray<NSString *> *keysSnapshot = [[containerDBUserDefaults dictionaryRepresentation] allKeys];
 
-        // Privacy policy that that would have been accepted by versions 98 and below.
-        NSNumber *pre99PrivacyPolicyTime = [NSNumber numberWithLongLong:1526413197];
-        NSString *pre99LegacyKey = @"PrivacyPolicy.AcceptedBoolKey";
+        NSString *pre100LegacyKey = @"PrivacyPolicy.AcceptedBoolKey";
+        NSString *legacyPPAcceptedKey = @"ContainerDB.PrivacyPolicyAcceptedRFC3339StringKey";
 
-        // Check if the legacy keys exist first.
-        NSNumber *_Nullable pre99PrivacyPolicyAccepted = [NSUserDefaults.standardUserDefaults
-          objectForKey:pre99LegacyKey];
+        if ([keysSnapshot containsObject:pre100LegacyKey] ||
+            [keysSnapshot containsObject:legacyPPAcceptedKey]) {
 
-        if (pre99PrivacyPolicyAccepted) {
-            if ([pre99PrivacyPolicyAccepted boolValue]) {
-                [containerDB setAcceptedPrivacyPolicyUnixTime:pre99PrivacyPolicyTime];
-            }
+            [containerDBUserDefaults removeObjectForKey:pre100LegacyKey];
+            [containerDBUserDefaults removeObjectForKey:legacyPPAcceptedKey];
 
-            // Remove old key.
-            [NSUserDefaults.standardUserDefaults removeObjectForKey:pre99LegacyKey];
-        }
-    }
+            // Assume that the user has finished onboarding.
+            [containerDB setHasFinishedOnboarding];
 
-    // Upgrade from 105 to 106 and above:
-    // - In 105 Privacy policy dates were stored as NSDates, which caused numerical imprecision when parsed
-    //   using `[NSDate dateWithTimeIntervalSince1970:]` methods.
-    // - In 106 we move towards storing privacy policy update dates as Unix timestamps.
-    // - Convert stored RFC3339 format in build 105 to the new format only if it is not nil.
-    if (oldVersion == 105 && newVersion >= 106) {
-
-        NSNumber *pre106PrivacyPolicyTime = [NSNumber numberWithLongLong:1526413197];
-        NSString *ppKey = @"ContainerDB.PrivacyPolicyAcceptedRFC3339StringKey";
-        id _Nullable lastAcceptedPP = [NSUserDefaults.standardUserDefaults objectForKey:ppKey];
-
-        // Don't do anything if `lastAcceptedPP` doesn't have any stored value.
-        if (!lastAcceptedPP) {
-            return;
+            // If these keys have non-nil value, then the user has accepted the
+            // privacy policy version 2018-05-15T19:39:57+00:00.
+            [containerDB setAcceptedPrivacyPolicy:@"2018-05-15T19:39:57+00:00"];
         }
 
-        // Overwrite current value if `lastAcceptedPP` is set, since if `lastAcceptedPP` is not nil,
-        // it must the same as `pre106PrivacyPolicyTime` in RFC3339 format.
-        [containerDB setAcceptedPrivacyPolicyUnixTime:pre106PrivacyPolicyTime];
     }
 
 }
