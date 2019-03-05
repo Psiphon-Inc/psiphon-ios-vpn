@@ -63,6 +63,8 @@ PsiFeedbackLogType const AppUpgradeLogType = @"AppUpgrade";
     return firstRunOfVersion;
 }
 
+// For safety and simplicity, only `oldVersionString` is provided here.
+// Should not rely on the current build number, as that build number is not specified yet.
 + (void)handleAppUpgradeFromVersion:(NSString *)oldVersionString {
 
     assert(oldVersionString != nil);
