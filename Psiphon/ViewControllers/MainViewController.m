@@ -61,6 +61,7 @@
 #import "UIView+Additions.h"
 
 
+PsiFeedbackLogType const MainViewControllerLogType = @"MainViewController";
 PsiFeedbackLogType const RewardedVideoLogType = @"RewardedVideo";
 
 UserDefaultsKey const PsiCashHasBeenOnboardedBoolKey = @"PsiCash.HasBeenOnboarded";
@@ -177,13 +178,20 @@ NSString * const CommandStopVPN = @"StopVPN";
     LOG_DEBUG();
     [super viewDidLoad];
 
-    // Note: Don't load MainViewController unless the user has accepted the privacy policy.
-    // PsiCash and AdManager unless the user has accepted
-    // the privacy policy.
-    ContainerDB *containerDB = [[ContainerDB alloc] init];
-    NSNumber *_Nullable privacyPolicyUnixTime = [containerDB lastAcceptedPrivacyPolicy];
-    assert(privacyPolicyUnixTime != nil);
-    assert([privacyPolicyUnixTime compare:[containerDB privacyPolicyLastUpdateTime]] == NSOrderedSame);
+    // Check privacy policy accepted date.
+    {
+        // `[ContainerDB privacyPolicyLastUpdateTime]` should be equal to `[ContainerDB lastAcceptedPrivacyPolicy]`.
+        // Log error if this is not the case.
+        ContainerDB *containerDB = [[ContainerDB alloc] init];
+
+        if (![containerDB hasAcceptedLatestPrivacyPolicy]) {
+            NSDictionary *jsonDescription = @{@"event": @"PrivacyPolicyDateMismatch",
+              @"got": [PsiFeedbackLogger safeValue:[containerDB lastAcceptedPrivacyPolicy]],
+              @"expected": [containerDB privacyPolicyLastUpdateTime]};
+
+            [PsiFeedbackLogger errorWithType:MainViewControllerLogType json:jsonDescription];
+        }
+    }
 
     availableServerRegions = [[AvailableServerRegions alloc] init];
     [availableServerRegions sync];
