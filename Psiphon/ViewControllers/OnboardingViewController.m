@@ -232,6 +232,8 @@ const int NumPages = 4;
         [self setCurrentOnboardingPage:newPage];
     } else {
         if (self.delegate) {
+            ContainerDB *containerDB = [[ContainerDB alloc] init];
+            [containerDB setHasFinishedOnboarding];
             [self.delegate onboardingFinished:self];
         }
         return;
@@ -296,7 +298,7 @@ const int NumPages = 4;
 - (void)onPrivacyPolicyAccepted {
     // Stores the privacy policy date that the user accepted.
     ContainerDB *containerDB = [[ContainerDB alloc] init];
-    [containerDB setAcceptedPrivacyPolicyUnixTime:[containerDB privacyPolicyLastUpdateTime]];
+    [containerDB setAcceptedLatestPrivacyPolicy];
     // Go to next page;
     [self gotoNextPage];
 }

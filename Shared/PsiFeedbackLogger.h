@@ -60,6 +60,8 @@ typedef NSString * PsiFeedbackLogType;
 
 + (NSDictionary *_Nonnull)unpackError:(NSError *_Nullable)error;
 
++ (id _Nonnull)safeValue:(id _Nullable)value;
+
 @end
 
 NS_ASSUME_NONNULL_END

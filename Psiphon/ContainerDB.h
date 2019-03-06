@@ -37,24 +37,53 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (void)storeCurrentAppVersion:(NSString *)appVersion;
 
+#pragma mark - Onboarding
+
+/**
+ * Returns TRUE if user has finished onboarding, FALSE otherwise.
+ */
+- (BOOL)hasFinishedOnboarding;
+
+/**
+ * Sets internal flag that the user has finished onboarding. `- hasFinishedOnboarding` will return TRUE from now on.
+ */
+- (void)setHasFinishedOnboarding;
+
 #pragma mark - Privacy Policy
 
 /**
- * Returns time as Unix time of last update to Psiphon's Privacy Policy for iOS.
+ * Returns RFC3339 formatted time of last update to Psiphon's Privacy Policy for iOS.
  */
-- (NSNumber *)privacyPolicyLastUpdateTime;
+- (NSString *)privacyPolicyLastUpdateTime;
 
 /**
- * Returns time as Unix time of the privacy policy that was last accepted by the user.
+ * Returns RFC3339 formatted time of the privacy policy that was last accepted by the user.
  */
-- (NSNumber *_Nullable)lastAcceptedPrivacyPolicy;
+- (NSString *_Nullable)lastAcceptedPrivacyPolicy;
 
 /**
- * Stores privacyPolicyUnixTime as the time that the privacy policy that was accepted.
- * Note that this is not the time that the user accepted the privacy policy, but rather,
+ * Returns TRUE if the user has accepted the latest privacy policy, FALSE otherwise.
+ */
+- (BOOL)hasAcceptedLatestPrivacyPolicy;
+
+/**
+ * Stores privacyPolicyTimestamp as the privacy policy that was accepted.
+ *
+ * @note This is not the time that the user accepted the privacy policy, but rather,
+ * the time that the privacy policy was updated.
+ *
+ * @param privacyPolicyTimestamp
+ */
+- (void)setAcceptedPrivacyPolicy:(NSString *)privacyPolicyTimestamp;
+
+/**
+ *
+ * Stores `-privacyPolicyLastUpdateTime` as the privacy policy that was accepted.
+ *
+ * @note This is not the time that the user accepted the privacy policy, but rather,
  * the time that the privacy policy was updated.
  */
-- (void)setAcceptedPrivacyPolicyUnixTime:(NSNumber *)privacyPolicyUnixTime;
+- (void)setAcceptedLatestPrivacyPolicy;
 
 /**
  * Sets set of egress regions in standard NSUserDefaults
