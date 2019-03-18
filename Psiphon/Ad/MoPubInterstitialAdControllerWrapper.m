@@ -79,6 +79,8 @@ PsiFeedbackLogType const MoPubInterstitialAdControllerWrapperLogType = @"MoPubIn
         // Subscribe to load status before loading an ad to prevent race-condition with "adDidLoad" delegate callback.
         RACDisposable *disposable = [weakSelf.loadStatusRelay subscribe:subscriber];
 
+        [self.adLoadStatus accept:@(AdLoadStatusInProgress)];
+
         if (!weakSelf.interstitial) {
             // From MoPub Docs: Subsequent calls for the same ad unit ID will return that object, unless you have disposed
             // of the object using `removeSharedInterstitialAdController:`.
@@ -93,8 +95,6 @@ PsiFeedbackLogType const MoPubInterstitialAdControllerWrapperLogType = @"MoPubIn
 
         // If the interstitial has already been loaded, `interstitialDidLoadAd:` delegate method will be called.
         [weakSelf.interstitial loadAd];
-
-        [self.adLoadStatus accept:@(AdLoadStatusInProgress)];
 
         return disposable;
     }];
