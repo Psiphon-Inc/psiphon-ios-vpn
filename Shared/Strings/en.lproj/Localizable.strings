@@ -224,6 +224,9 @@
 /* Title text on the third PsiCash onboarding screen. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
 "PSICASH_ONBOARDING_PAGE_3_TITLE" = "Speed Boost";
 
+/* Button title when loading. */
+"PSICASH_REWARDED_VIDEO_LOADING_TITLE" = "Loading";
+
 /* Text which appears in the Speed Boost meter when the user has activated Speed Boost. Please keep this text concise as the width of the text box is restricted in size. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
 "PSICASH_SPEED_BOOST_ACTIVE_TEXT" = "Speed Boost Active";
 

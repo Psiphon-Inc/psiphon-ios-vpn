@@ -34,7 +34,7 @@ PsiFeedbackLogType const MoPubInterstitialAdControllerWrapperLogType = @"MoPubIn
 
 @interface MoPubInterstitialAdControllerWrapper () <MPInterstitialAdControllerDelegate>
 
-@property (nonatomic, readwrite, nonnull) BehaviorRelay<NSNumber *> *canPresent;
+@property (nonatomic, readwrite, nonnull) BehaviorRelay<NSNumber *> *adLoadStatus;
 
 /** presentedAdDismissed is hot infinite signal - emits RACUnit whenever an ad is presented. */
 @property (nonatomic, readwrite, nonnull) RACSubject<RACUnit *> *presentedAdDismissed;
@@ -60,7 +60,7 @@ PsiFeedbackLogType const MoPubInterstitialAdControllerWrapperLogType = @"MoPubIn
     _tag = tag;
     _loadStatusRelay = [RelaySubject subject];
     _adUnitID = adUnitID;
-    _canPresent = [BehaviorRelay behaviorSubjectWithDefaultValue:@(FALSE)];
+    _adLoadStatus = [BehaviorRelay behaviorSubjectWithDefaultValue:@(AdLoadStatusNone)];
     _presentedAdDismissed = [RACSubject subject];
     _presentationStatus = [RACSubject subject];
     return self;
@@ -94,6 +94,8 @@ PsiFeedbackLogType const MoPubInterstitialAdControllerWrapperLogType = @"MoPubIn
         // If the interstitial has already been loaded, `interstitialDidLoadAd:` delegate method will be called.
         [weakSelf.interstitial loadAd];
 
+        [self.adLoadStatus accept:@(AdLoadStatusInProgress)];
+
         return disposable;
     }];
 }
@@ -106,9 +108,7 @@ PsiFeedbackLogType const MoPubInterstitialAdControllerWrapperLogType = @"MoPubIn
 
         [MPInterstitialAdController removeSharedInterstitialAdController:weakSelf.interstitial];
 
-        if ([[weakSelf.canPresent first] boolValue]) {
-            [weakSelf.canPresent accept:@(FALSE)];
-        }
+        [weakSelf.adLoadStatus accept:@(AdLoadStatusNone)];
 
         [subscriber sendNext:[RACTwoTuple pack:weakSelf.tag :nil]];
         [subscriber sendCompleted];
@@ -143,17 +143,13 @@ PsiFeedbackLogType const MoPubInterstitialAdControllerWrapperLogType = @"MoPubIn
 #pragma mark - <MPInterstitialAdControllerDelegate> status relay
 
 - (void)interstitialDidLoadAd:(MPInterstitialAdController *)interstitial {
-    if (![[self.canPresent first] boolValue]) {
-        [self.canPresent accept:@(TRUE)];
-    }
+    [self.adLoadStatus accept:@(AdLoadStatusDone)];
     [self.loadStatusRelay accept:[RACTwoTuple pack:self.tag :nil]];
 }
 
 - (void)interstitialDidFailToLoadAd:(MPInterstitialAdController *)interstitial withError:(NSError *)error {
 
-    if ([[self.canPresent first] boolValue]) {
-        [self.canPresent accept:@(FALSE)];
-    }
+    [self.adLoadStatus accept:@(AdLoadStatusError)];
 
     NSError *e = [NSError errorWithDomain:AdControllerWrapperErrorDomain
                                      code:AdControllerWrapperErrorAdFailedToLoad
@@ -163,9 +159,7 @@ PsiFeedbackLogType const MoPubInterstitialAdControllerWrapperLogType = @"MoPubIn
 }
 
 - (void)interstitialDidExpire:(MPInterstitialAdController *)interstitial {
-    if ([[self.canPresent first] boolValue]) {
-        [self.canPresent accept:@(FALSE)];
-    }
+    [self.adLoadStatus accept:@(AdLoadStatusNone)];
 
     NSError *e = [NSError errorWithDomain:AdControllerWrapperErrorDomain
                                      code:AdControllerWrapperErrorAdExpired];
@@ -174,7 +168,7 @@ PsiFeedbackLogType const MoPubInterstitialAdControllerWrapperLogType = @"MoPubIn
 }
 
 - (void)interstitialWillAppear:(MPInterstitialAdController *)interstitial {
-    [self.canPresent accept:@(FALSE)];
+    [self.adLoadStatus accept:@(AdLoadStatusNone)];
     [self.presentationStatus sendNext:@(AdPresentationWillAppear)];
 }
 

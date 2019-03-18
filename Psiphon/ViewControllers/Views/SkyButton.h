@@ -43,6 +43,18 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)setTitle:(NSString *)title forState:(UIControlState)controlState;
 
+/**
+ * Subclasses can override this method to customize the title style.
+ */
+- (NSAttributedString *_Nullable)styleTitleText:(NSString *)title;
+
+/**
+ * Updates title to reflect current view state.
+ *
+ * Subclasses should override `-currentTitle` and call this method to update title.
+ */
+- (void)updateTitle;
+
 @end
 
 NS_ASSUME_NONNULL_END

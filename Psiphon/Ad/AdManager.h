@@ -47,22 +47,18 @@ FOUNDATION_EXPORT AdControllerTag const AdControllerTagMoPubTunneledRewardedVide
 @property (nonatomic, readonly) RACBehaviorSubject<NSNumber *> *adIsShowing;
 
 /**
- * Emits @(TRUE) when the untunneled interstitial is ready to be presented.
- * Emits @(FALSE) when app conditions are such that the ad cannot be presented, this is regardless of whether the
- * ad has been loaded.
- * Subject initially has default value @(FALSE).
+ * Hot relay - emits items of type @(AdLoadStatus).
+ * Subject has initial value of `AdLoadStatusNone`.
  * @scheduler Events are delivered on the main thread.
  */
-@property (nonatomic, readonly) RACBehaviorSubject<NSNumber *> *untunneledInterstitialCanPresent;
+@property (nonatomic, readonly) RACBehaviorSubject<NSNumber *> *untunneledInterstitialLoadStatus;
 
 /**
- * Emits @(TRUE) when tunneled or untunneled rewarded video is ready to be presented.
- * Emits @(FALSE) when app conditions are such that the ad cannot be presented, this is regardless of whether the
- * ad has been loaded.
- * Subject initially has default value @(FALSE).
+ * Hot relay - emits items of type @(AdLoadStatus).
+ * Subject has initial value of `AdLoadStatusNone`.
  * @scheduler Events are delivered on the main thread.
  */
-@property (nonatomic, readonly) RACBehaviorSubject<NSNumber *> *rewardedVideoCanPresent;
+@property (nonatomic, readonly) RACBehaviorSubject<NSNumber *> *rewardedVideoLoadStatus;
 
 + (instancetype)sharedInstance;
 
@@ -71,6 +67,11 @@ FOUNDATION_EXPORT AdControllerTag const AdControllerTagMoPubTunneledRewardedVide
  * This should be called during the apps difFinishLaunchingWithOptions: delegate callback.
  */
 - (void)initializeAdManager;
+
+/**
+ * Initializes observables that handle loading of rewarded videos.
+ */
+- (void)initializeRewardedVideos;
 
 /**
  * Reset user consent for all networks.
