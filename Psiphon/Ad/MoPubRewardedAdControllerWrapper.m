@@ -190,8 +190,6 @@ PsiFeedbackLogType const MoPubRewardedAdControllerWrapperLogType = @"MoPubReward
     if (self.adUnitID != adUnitID) {
         return;
     }
-    [self.adLoadStatus accept:@(AdLoadStatusNone)];
-
     [self.presentationStatus sendNext:@(AdPresentationWillAppear)];
 }
 
@@ -199,6 +197,7 @@ PsiFeedbackLogType const MoPubRewardedAdControllerWrapperLogType = @"MoPubReward
     if (self.adUnitID != adUnitID) {
         return;
     }
+    [self.adLoadStatus accept:@(AdLoadStatusNone)];
     [self.presentationStatus sendNext:@(AdPresentationDidAppear)];
 }
 

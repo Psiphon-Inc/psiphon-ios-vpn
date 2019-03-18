@@ -170,13 +170,12 @@ PsiFeedbackLogType const AdMobRewardedAdControllerWrapperLogType = @"AdMobReward
 }
 
 - (void)rewardBasedVideoAdDidOpen:(GADRewardBasedVideoAd *)rewardBasedVideoAd {
-    [self.adLoadStatus accept:@(AdLoadStatusNone)];
-
     [self.presentationStatus sendNext:@(AdPresentationWillAppear)];
     [self.presentationStatus sendNext:@(AdPresentationDidAppear)];
 }
 
 - (void)rewardBasedVideoAdDidStartPlaying:(GADRewardBasedVideoAd *)rewardBasedVideoAd {
+    [self.adLoadStatus accept:@(AdLoadStatusNone)];
     // Do nothing.
 }
 
