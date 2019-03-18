@@ -1293,7 +1293,7 @@ NSString * const CommandStopVPN = @"StopVPN";
     LOG_DEBUG(@"rewarded video started");
     [PsiFeedbackLogger infoWithType:RewardedVideoLogType message:@"started"];
 
-    RACDisposable *__block disposable = [[[[[[RACSignal return:@(psiCashView.rewardedVideoButtonTappedOnce)]
+    RACDisposable *__block disposable = [[[[[[[[RACSignal return:@(psiCashView.rewardedVideoButtonTappedOnce)]
       doNext:^(NSNumber *tappedOnce) {
           MainViewController *__strong strongSelf = weakSelf;
           if (strongSelf != nil) {
@@ -1391,14 +1391,16 @@ NSString * const CommandStopVPN = @"StopVPN";
           }
           return running;
       }]
-      subscribeNext:^(RACTwoTuple<NSNumber *, NSNumber *> *tuple) {
-          // Calls to update PsiCash balance after
+      filter:^BOOL(RACTwoTuple<NSNumber *, NSNumber *> *tuple) {
           BOOL didReward = [tuple.first boolValue];
           BOOL didDisappear = [tuple.second boolValue];
-          if (didReward && didDisappear) {
-              [[[UIImpactFeedbackGenerator alloc] initWithStyle:UIImpactFeedbackStyleLight] impactOccurred];
-              [[PsiCashClient sharedInstance] pollForBalanceDeltaWithMaxRetries:30 andTimeBetweenRetries:1.0];
-          }
+          return didReward && didDisappear;
+      }]
+      take:1]
+      subscribeNext:^(RACTwoTuple<NSNumber *, NSNumber *> *tuple) {
+          // Calls to update PsiCash balance after
+          [[[UIImpactFeedbackGenerator alloc] initWithStyle:UIImpactFeedbackStyleLight] impactOccurred];
+          [[PsiCashClient sharedInstance] pollForBalanceDeltaWithMaxRetries:30 andTimeBetweenRetries:1.0];
       } error:^(NSError *error) {
           [PsiFeedbackLogger errorWithType:RewardedVideoLogType message:@"Error with rewarded video" object:error];
           [weakSelf.compoundDisposable removeDisposable:disposable];
