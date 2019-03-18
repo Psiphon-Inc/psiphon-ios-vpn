@@ -121,8 +121,8 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
 @interface AdManager ()
 
 @property (nonatomic, readwrite, nonnull) RACBehaviorSubject<NSNumber *> *adIsShowing;
-@property (nonatomic, readwrite, nonnull) RACBehaviorSubject<NSNumber *> *untunneledInterstitialCanPresent;
-@property (nonatomic, readwrite, nonnull) RACBehaviorSubject<NSNumber *> *rewardedVideoCanPresent;
+@property (nonatomic, readwrite, nonnull) RACBehaviorSubject<NSNumber *> *untunneledInterstitialLoadStatus;
+@property (nonatomic, readwrite, nonnull) RACBehaviorSubject<NSNumber *> *rewardedVideoLoadStatus;
 
 // Private properties
 @property (nonatomic, readwrite, nonnull) AdMobInterstitialAdControllerWrapper *untunneledInterstitial;
@@ -150,9 +150,9 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
 
         _adIsShowing = [RACBehaviorSubject behaviorSubjectWithDefaultValue:@(FALSE)];
 
-        _untunneledInterstitialCanPresent = [RACBehaviorSubject behaviorSubjectWithDefaultValue:@(FALSE)];
+        _untunneledInterstitialLoadStatus = [RACBehaviorSubject behaviorSubjectWithDefaultValue:@(AdLoadStatusNone)];
 
-        _rewardedVideoCanPresent = [RACBehaviorSubject behaviorSubjectWithDefaultValue:@(FALSE)];
+        _rewardedVideoLoadStatus = [RACBehaviorSubject behaviorSubjectWithDefaultValue:@(AdLoadStatusNone)];
 
         _compoundDisposable = [RACCompoundDisposable compoundDisposable];
 
@@ -188,8 +188,22 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
     return sharedInstance;
 }
 
-// This should be called only once during application at application load time
 - (void)initializeAdManager {
+    static dispatch_once_t once;
+    dispatch_once(&once, ^{
+        [self _initializeAdManager];
+    });
+}
+
+- (void)initializeRewardedVideos {
+    static dispatch_once_t once;
+    dispatch_once(&once, ^{
+        [self _initializeRewardedVideos];
+    });
+}
+
+// This should be called only once during application at application load time
+- (void)_initializeAdManager {
 
     AdManager *__weak weakSelf = self;
 
@@ -412,20 +426,6 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
                                                         withLoadInTunnelState:TunnelStateUntunneled
                                                       reloadAdAfterPresenting:AdLoadActionDelayed
                                         andWaitForPsiCashRewardedActivityData:FALSE]];
-
-        // Untunneled rewarded video
-        [self.compoundDisposable addDisposable:[self subscribeToAdSignalForAd:self.untunneledRewardVideo
-                                                withActionLoadDelayedInterval:1.0
-                                                        withLoadInTunnelState:TunnelStateUntunneled
-                                                      reloadAdAfterPresenting:AdLoadActionImmediate
-                                        andWaitForPsiCashRewardedActivityData:TRUE]];
-
-        // Tunneled rewarded video
-        [self.compoundDisposable addDisposable:[self subscribeToAdSignalForAd:self.tunneledRewardVideo
-                                                withActionLoadDelayedInterval:1.0
-                                                        withLoadInTunnelState:TunnelStateTunneled
-                                                      reloadAdAfterPresenting:AdLoadActionImmediate
-                                        andWaitForPsiCashRewardedActivityData:TRUE]];
     }
 
     // Ad presentation signals:
@@ -463,12 +463,12 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
 
               if (appEvent.tunnelState == TunnelStateUntunneled && appEvent.networkIsReachable) {
 
-                  return weakSelf.untunneledInterstitial.canPresent;
+                  return weakSelf.untunneledInterstitial.adLoadStatus;
               }
-              return [RACSignal return:@(FALSE)];
+              return [RACSignal return:@(AdLoadStatusNone)];
           }]
           switchToLatest]
-          subscribe:self.untunneledInterstitialCanPresent]];
+          subscribe:self.untunneledInterstitialLoadStatus]];
 
         [self.compoundDisposable addDisposable:
           [[[self.appEvents.signal map:^RACSignal<NSNumber *> *(AppEvent *appEvent) {
@@ -476,17 +476,17 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
               if (appEvent.networkIsReachable) {
 
                   if (appEvent.tunnelState == TunnelStateUntunneled) {
-                      return weakSelf.untunneledRewardVideo.canPresent;
+                      return weakSelf.untunneledRewardVideo.adLoadStatus;
 
                   } else if (appEvent.tunnelState == TunnelStateTunneled) {
-                      return weakSelf.tunneledRewardVideo.canPresent;
+                      return weakSelf.tunneledRewardVideo.adLoadStatus;
                   }
               }
 
-              return [RACSignal return:@(FALSE)];
+              return [RACSignal return:@(AdLoadStatusNone)];
           }]
           switchToLatest]
-          subscribe:self.rewardedVideoCanPresent]];
+          subscribe:self.rewardedVideoLoadStatus]];
     }
 
     // Calls connect on the multicast connection object to start the subscription to the underlying signal.
@@ -494,6 +494,24 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
     // the underlying signal turns into a hot signal.
     [self.compoundDisposable addDisposable:[self.appEvents connect]];
 
+}
+
+// This should be called only once during application at application load time
+- (void)_initializeRewardedVideos {
+
+    // Untunneled rewarded video
+    [self.compoundDisposable addDisposable:[self subscribeToAdSignalForAd:self.untunneledRewardVideo
+                                            withActionLoadDelayedInterval:1.0
+                                                    withLoadInTunnelState:TunnelStateUntunneled
+                                                  reloadAdAfterPresenting:AdLoadActionImmediate
+                                    andWaitForPsiCashRewardedActivityData:TRUE]];
+
+    // Tunneled rewarded video
+    [self.compoundDisposable addDisposable:[self subscribeToAdSignalForAd:self.tunneledRewardVideo
+                                            withActionLoadDelayedInterval:1.0
+                                                    withLoadInTunnelState:TunnelStateTunneled
+                                                  reloadAdAfterPresenting:AdLoadActionImmediate
+                                    andWaitForPsiCashRewardedActivityData:TRUE]];
 }
 
 - (void)resetUserConsent {

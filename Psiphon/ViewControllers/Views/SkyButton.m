@@ -66,13 +66,13 @@
 
 - (void)setEnabled:(BOOL)enabled {
     [super setEnabled:enabled];
-    _titleLabel.text = self.currentTitle;
+    [self updateTitle];
 }
 
 - (void)setTitle:(NSString *)title {
     normalTitle = title;
     disabledTitle = title;
-    _titleLabel.text = title;
+    [self updateTitle];
 }
 
 - (void)setTitle:(NSString *)title forState:(UIControlState)controlState {
@@ -89,6 +89,14 @@
     } else {
         return disabledTitle;
     }
+}
+
+- (NSAttributedString *_Nullable)styleTitleText:(NSString *)title {
+   return [[NSAttributedString alloc] initWithString:title];
+}
+
+- (void)updateTitle {
+    _titleLabel.attributedText = [self styleTitleText:[self currentTitle]];
 }
 
 #pragma mark - AutoLayoutProtocol
