@@ -86,6 +86,8 @@ PsiFeedbackLogType const AdMobInterstitialAdControllerWrapperLogType = @"AdMobIn
         // initialize interstitial and start loading ad.
         if (!weakSelf.interstitial || weakSelf.interstitial.hasBeenUsed || weakSelf.lastError) {
 
+            [self.adLoadStatus accept:@(AdLoadStatusInProgress)];
+
             // Reset last error status.
             weakSelf.lastError = nil;
 
@@ -101,8 +103,6 @@ PsiFeedbackLogType const AdMobInterstitialAdControllerWrapperLogType = @"AdMobIn
             request.testDevices = @[ @"4a907b319b37ceee4d9970dbb0231ef0" ];
 #endif
             [weakSelf.interstitial loadRequest:request];
-
-            [self.adLoadStatus accept:@(AdLoadStatusInProgress)];
 
         } else if (weakSelf.interstitial.isReady) {
 

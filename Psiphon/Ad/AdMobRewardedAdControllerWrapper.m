@@ -93,6 +93,7 @@ PsiFeedbackLogType const AdMobRewardedAdControllerWrapperLogType = @"AdMobReward
             [weakSelf rewardBasedVideoAdDidReceiveAd:videoAd];
 
         } else {
+            [self.adLoadStatus accept:@(AdLoadStatusInProgress)];
 
             GADRequest *request = [AdMobConsent createGADRequestWithUserConsentStatus];
 
@@ -101,8 +102,6 @@ PsiFeedbackLogType const AdMobRewardedAdControllerWrapperLogType = @"AdMobReward
     #endif
             [videoAd setCustomRewardString:customData];
             [videoAd loadRequest:request withAdUnitID:self.adUnitID];
-
-            [self.adLoadStatus accept:@(AdLoadStatusInProgress)];
         }
 
         return disposable;
@@ -171,13 +170,12 @@ PsiFeedbackLogType const AdMobRewardedAdControllerWrapperLogType = @"AdMobReward
 }
 
 - (void)rewardBasedVideoAdDidOpen:(GADRewardBasedVideoAd *)rewardBasedVideoAd {
-    [self.adLoadStatus accept:@(AdLoadStatusNone)];
-
     [self.presentationStatus sendNext:@(AdPresentationWillAppear)];
     [self.presentationStatus sendNext:@(AdPresentationDidAppear)];
 }
 
 - (void)rewardBasedVideoAdDidStartPlaying:(GADRewardBasedVideoAd *)rewardBasedVideoAd {
+    [self.adLoadStatus accept:@(AdLoadStatusNone)];
     // Do nothing.
 }
 
