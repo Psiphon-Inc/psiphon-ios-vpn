@@ -27,17 +27,20 @@
     LayerAutoResizeUIView *statusGradientView;
 }
 
-- (void)setEnabled:(BOOL)enabled {
-    [super setEnabled:enabled];
-    self.titleLabel.attributedText = [RoyalSkyButton styleLabelText:self.currentTitle];
+- (void)setBackgroundGradient:(BOOL)enableGradient {
 
-    if (enabled) {
+    if (enableGradient) {
         statusGradientLayer.colors = @[(id)UIColor.lightRoyalBlueTwo.CGColor,
                                        (id)UIColor.lightishBlue.CGColor];
     } else {
         statusGradientLayer.colors = @[(id)UIColor.regentGrey.CGColor,
                                        (id)UIColor.regentGrey.CGColor];
     }
+}
+
+- (void)setEnabled:(BOOL)enabled {
+    [super setEnabled:enabled];
+    [self setBackgroundGradient:enabled];
 }
 
 #pragma mark - AutoLayoutViewGroup

@@ -24,6 +24,7 @@
 #import "UIFont+Additions.h"
 #import "UIView+AutoLayoutViewGroup.h"
 #import "RoyalSkyButton.h"
+#import "Strings.h"
 
 @interface PsiCashView ()
 @property (atomic, readwrite) PsiCashClientModel *model;
@@ -37,6 +38,14 @@
     UIView *rewardedVideoButtonContainer;
     UIView *topBorderBlocker;
     UIView *bottomBorderBlocker;
+}
+
+- (instancetype)init {
+    self = [super init];
+    if (self) {
+        _rewardedVideoButtonTappedOnce = FALSE;
+    }
+    return self;
 }
 
 + (NSString *)videoReadyTitleText {
@@ -86,12 +95,16 @@
     rewardedVideoButtonContainer = [[UIView alloc] init];
 
     // Setup rewarded video button
-    _rewardedVideoButton = [[RoyalSkyButton alloc] initForAutoLayout];
+    _rewardedVideoButton = [[ActivityIndicatorRoyalSkyButton alloc] initForAutoLayout];
     [_rewardedVideoButton setTitle:[PsiCashView videoReadyTitleText]
                           forState:UIControlStateNormal];
     [_rewardedVideoButton setTitle:[PsiCashView videoUnavailableTitleText]
                           forState:UIControlStateDisabled];
-    _rewardedVideoButton.enabled = FALSE;
+    [_rewardedVideoButton setTitleForIndicatorAnimating:[Strings psiCashRewardedVideoButtonLoadingTitle]];
+
+    _rewardedVideoButton.enabled = TRUE;  // Enable button click regardless of rewarded video load state.
+    _rewardedVideoButton.userInteractionEnabled = TRUE;
+
     _rewardedVideoButton.backgroundColor = UIColor.clearColor;
 
     topBorderBlocker = [[UIView alloc] init];
