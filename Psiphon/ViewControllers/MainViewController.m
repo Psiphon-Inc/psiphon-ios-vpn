@@ -396,9 +396,10 @@ NSString * const CommandStopVPN = @"StopVPN";
 
               // Device is untunneled and ad consent is given or not needed,
               // we therefore wait for the ad to load.
-              return [[[[AdManager sharedInstance].untunneledInterstitialCanPresent
-                filter:^BOOL(NSNumber *adIsReady) {
-                    return [adIsReady boolValue];
+              return [[[[AdManager sharedInstance].untunneledInterstitialLoadStatus
+                filter:^BOOL(NSNumber *loadStatus) {
+                    AdLoadStatus status = (AdLoadStatus) [loadStatus integerValue];
+                    return status == AdLoadStatusDone;
                 }]
                 merge:[RACSignal timer:MaxAdLoadingTime]]
                 take:1];
@@ -1198,18 +1199,46 @@ NSString * const CommandStopVPN = @"StopVPN";
 
     [self.compoundDisposable addDisposable:psiCashViewUpdates];
 
-    [self.compoundDisposable addDisposable:[[[AdManager sharedInstance].rewardedVideoCanPresent
+    [self.compoundDisposable addDisposable:[[[AdManager sharedInstance].rewardedVideoLoadStatus
       combineLatestWith:PsiCashClient.sharedInstance.clientModelSignal]
       subscribeNext:^(RACTwoTuple<NSNumber *, PsiCashClientModel *> *tuple) {
           MainViewController *__strong strongSelf = weakSelf;
           if (strongSelf != nil) {
 
-              BOOL ready = [tuple.first boolValue];
+              AdLoadStatus adStatus = (AdLoadStatus) [tuple.first integerValue];
               PsiCashClientModel *model = tuple.second;
 
-              BOOL shouldEnable = ready && [model.authPackage hasEarnerToken];
-              strongSelf->psiCashView.rewardedVideoButton.userInteractionEnabled = shouldEnable;
-              strongSelf->psiCashView.rewardedVideoButton.enabled = shouldEnable;
+              // Disable rewarded video button if the user has no earner token,
+              // otherwise enable the button if the button has not been tapped yet,
+              // else, enable the button only if an ad is loaded.
+              if (![model.authPackage hasEarnerToken]) {
+                  strongSelf->psiCashView.rewardedVideoButton.userInteractionEnabled = FALSE;
+                  strongSelf->psiCashView.rewardedVideoButton.enabled = FALSE;
+                  
+              // The user has an earner token.
+              } else {
+                  
+                  if (!strongSelf->psiCashView.rewardedVideoButtonTappedOnce) {
+                      [strongSelf->psiCashView.rewardedVideoButton stopAnimating];
+                      strongSelf->psiCashView.rewardedVideoButton.userInteractionEnabled = TRUE;
+                      strongSelf->psiCashView.rewardedVideoButton.enabled = TRUE;
+                      
+                  } else {
+                      
+                      // Sets enabled state.
+                      BOOL adLoaded = (adStatus == AdLoadStatusDone);
+                      strongSelf->psiCashView.rewardedVideoButton.userInteractionEnabled = adLoaded;
+                      strongSelf->psiCashView.rewardedVideoButton.enabled = adLoaded;
+                      
+                      // Sets animation state.
+                      if (adStatus == AdLoadStatusInProgress) {
+                          [strongSelf->psiCashView.rewardedVideoButton startAnimating];
+                      } else {
+                          [strongSelf->psiCashView.rewardedVideoButton stopAnimating];
+                      }
+                  }
+
+              }
 
 #if DEBUG
               if ([AppInfo runningUITest]) {
@@ -1264,82 +1293,122 @@ NSString * const CommandStopVPN = @"StopVPN";
     LOG_DEBUG(@"rewarded video started");
     [PsiFeedbackLogger infoWithType:RewardedVideoLogType message:@"started"];
 
-    RACDisposable *__block disposable = [[[[self.adManager
-        presentRewardedVideoOnViewController:self
-                              withCustomData:[[PsiCashClient sharedInstance] rewardedVideoCustomData]]
-        doNext:^(NSNumber *adPresentationEnum) {
-            // Logs current AdPresentation enum value.
-            AdPresentation ap = (AdPresentation) [adPresentationEnum integerValue];
-            switch (ap) {
-                case AdPresentationWillAppear:
-                    LOG_DEBUG(@"rewarded video AdPresentationWillAppear");
-                    break;
-                case AdPresentationDidAppear:
-                    LOG_DEBUG(@"rewarded video AdPresentationDidAppear");
-                    break;
-                case AdPresentationWillDisappear:
-                    LOG_DEBUG(@"rewarded video AdPresentationWillDisappear");
-                    break;
-                case AdPresentationDidDisappear:
-                    LOG_DEBUG(@"rewarded video AdPresentationDidDisappear");
-                    break;
-                case AdPresentationDidRewardUser:
-                    LOG_DEBUG(@"rewarded video AdPresentationDidRewardUser");
-                    break;
-                case AdPresentationErrorCustomDataNotSet:
-                    LOG_DEBUG(@"rewarded video AdPresentationErrorCustomDataNotSet");
-                    [PsiFeedbackLogger errorWithType:RewardedVideoLogType
-                                             message:@"AdPresentationErrorCustomDataNotSet"];
-                    break;
-                case AdPresentationErrorInappropriateState:
-                    LOG_DEBUG(@"rewarded video AdPresentationErrorInappropriateState");
-                    [PsiFeedbackLogger errorWithType:RewardedVideoLogType
-                                             message:@"AdPresentationErrorInappropriateState"];
-                    break;
-                case AdPresentationErrorNoAdsLoaded:
-                    LOG_DEBUG(@"rewarded video AdPresentationErrorNoAdsLoaded");
-                    [PsiFeedbackLogger errorWithType:RewardedVideoLogType
-                                             message:@"AdPresentationErrorNoAdsLoaded"];
-                    break;
-                case AdPresentationErrorFailedToPlay:
-                    LOG_DEBUG(@"rewarded video AdPresentationErrorFailedToPlay");
-                    [PsiFeedbackLogger errorWithType:RewardedVideoLogType
-                                             message:@"AdPresentationErrorFailedToPlay"];
-                    break;
-            }
-        }]
-        scanWithStart:[RACTwoTuple pack:@(FALSE) :@(FALSE)]
-               reduce:^RACTwoTuple<NSNumber *, NSNumber *> *(RACTwoTuple *running, NSNumber *adPresentationEnum) {
+    RACDisposable *__block disposable = [[[[[[RACSignal return:@(psiCashView.rewardedVideoButtonTappedOnce)]
+      doNext:^(NSNumber *tappedOnce) {
+          MainViewController *__strong strongSelf = weakSelf;
+          if (strongSelf != nil) {
 
-            // Scan operator's `running` value is a 2-tuple of booleans. First element represents when
-            // AdPresentationDidRewardUser is emitted upstream, and the second element represents when
-            // AdPresentationDidDisappear is emitted upstream.
-            // Note that we don't want to make any assumptions about the order of these two events.
-            if ([adPresentationEnum integerValue] == AdPresentationDidRewardUser) {
-                return [RACTwoTuple pack:@(TRUE) :running.second];
-            } else if ([adPresentationEnum integerValue] == AdPresentationDidDisappear) {
-                return [RACTwoTuple pack:running.first :@(TRUE)];
-            }
-            return running;
-        }]
-        subscribeNext:^(RACTwoTuple<NSNumber *, NSNumber *> *tuple) {
-            // Calls to update PsiCash balance after
-            BOOL didReward = [tuple.first boolValue];
-            BOOL didDisappear = [tuple.second boolValue];
-            if (didReward && didDisappear) {
-                [[[UIImpactFeedbackGenerator alloc] initWithStyle:UIImpactFeedbackStyleLight] impactOccurred];
-                [[PsiCashClient sharedInstance] pollForBalanceDeltaWithMaxRetries:30 andTimeBetweenRetries:1.0];
-            }
-        } error:^(NSError *error) {
-            [PsiFeedbackLogger errorWithType:RewardedVideoLogType message:@"Error with rewarded video" object:error];
-            [weakSelf.compoundDisposable removeDisposable:disposable];
-        } completed:^{
-            LOG_DEBUG(@"rewarded video completed");
-            [PsiFeedbackLogger infoWithType:RewardedVideoLogType message:@"completed"];
-            [weakSelf.compoundDisposable removeDisposable:disposable];
-        }];
+              // Set that rewarded video button has been tapped once.
+              if (![tappedOnce boolValue]) {
+                  strongSelf->psiCashView.rewardedVideoButtonTappedOnce = TRUE;
+                  [strongSelf.adManager initializeRewardedVideos];
+              }
+          }
+      }]
+      flattenMap:^RACSignal<NSNumber *> *(NSNumber *tappedOnce) {
 
-        [self.compoundDisposable addDisposable:disposable];
+          MainViewController *__strong strongSelf = weakSelf;
+          if (strongSelf != nil) {
+
+              NSString *customData = [[PsiCashClient sharedInstance] rewardedVideoCustomData];
+
+              // If first tap.
+              if (![tappedOnce boolValue]) {
+
+                  return [[[[AdManager sharedInstance].rewardedVideoLoadStatus
+                    filter:^BOOL(NSNumber *adLoadStatusObj) {
+                        AdLoadStatus s = (AdLoadStatus) [adLoadStatusObj integerValue];
+                        return (s==AdLoadStatusDone) || (s==AdLoadStatusError);
+                    }]
+                    take:1]
+                    then:^RACSignal * {
+                        return [[AdManager sharedInstance] presentRewardedVideoOnViewController:strongSelf
+                                                                                 withCustomData:customData];
+                    }];
+
+              // Subsequent taps.
+              } else {
+                  return [[AdManager sharedInstance] presentRewardedVideoOnViewController:strongSelf
+                                                                           withCustomData:customData];
+
+              }
+          }
+
+          return [RACSignal empty];
+      }]
+      doNext:^(NSNumber *adPresentationEnum) {
+          // Logs current AdPresentation enum value.
+          AdPresentation ap = (AdPresentation) [adPresentationEnum integerValue];
+          switch (ap) {
+              case AdPresentationWillAppear:
+                  LOG_DEBUG(@"rewarded video AdPresentationWillAppear");
+                  break;
+              case AdPresentationDidAppear:
+                  LOG_DEBUG(@"rewarded video AdPresentationDidAppear");
+                  break;
+              case AdPresentationWillDisappear:
+                  LOG_DEBUG(@"rewarded video AdPresentationWillDisappear");
+                  break;
+              case AdPresentationDidDisappear:
+                  LOG_DEBUG(@"rewarded video AdPresentationDidDisappear");
+                  break;
+              case AdPresentationDidRewardUser:
+                  LOG_DEBUG(@"rewarded video AdPresentationDidRewardUser");
+                  break;
+              case AdPresentationErrorCustomDataNotSet:
+                  LOG_DEBUG(@"rewarded video AdPresentationErrorCustomDataNotSet");
+                  [PsiFeedbackLogger errorWithType:RewardedVideoLogType
+                                           message:@"AdPresentationErrorCustomDataNotSet"];
+                  break;
+              case AdPresentationErrorInappropriateState:
+                  LOG_DEBUG(@"rewarded video AdPresentationErrorInappropriateState");
+                  [PsiFeedbackLogger errorWithType:RewardedVideoLogType
+                                           message:@"AdPresentationErrorInappropriateState"];
+                  break;
+              case AdPresentationErrorNoAdsLoaded:
+                  LOG_DEBUG(@"rewarded video AdPresentationErrorNoAdsLoaded");
+                  [PsiFeedbackLogger errorWithType:RewardedVideoLogType
+                                           message:@"AdPresentationErrorNoAdsLoaded"];
+                  break;
+              case AdPresentationErrorFailedToPlay:
+                  LOG_DEBUG(@"rewarded video AdPresentationErrorFailedToPlay");
+                  [PsiFeedbackLogger errorWithType:RewardedVideoLogType
+                                           message:@"AdPresentationErrorFailedToPlay"];
+                  break;
+          }
+      }]
+      scanWithStart:[RACTwoTuple pack:@(FALSE) :@(FALSE)]
+             reduce:^RACTwoTuple<NSNumber *, NSNumber *> *(RACTwoTuple *running, NSNumber *adPresentationEnum) {
+
+          // Scan operator's `running` value is a 2-tuple of booleans. First element represents when
+          // AdPresentationDidRewardUser is emitted upstream, and the second element represents when
+          // AdPresentationDidDisappear is emitted upstream.
+          // Note that we don't want to make any assumptions about the order of these two events.
+          if ([adPresentationEnum integerValue] == AdPresentationDidRewardUser) {
+              return [RACTwoTuple pack:@(TRUE) :running.second];
+          } else if ([adPresentationEnum integerValue] == AdPresentationDidDisappear) {
+              return [RACTwoTuple pack:running.first :@(TRUE)];
+          }
+          return running;
+      }]
+      subscribeNext:^(RACTwoTuple<NSNumber *, NSNumber *> *tuple) {
+          // Calls to update PsiCash balance after
+          BOOL didReward = [tuple.first boolValue];
+          BOOL didDisappear = [tuple.second boolValue];
+          if (didReward && didDisappear) {
+              [[[UIImpactFeedbackGenerator alloc] initWithStyle:UIImpactFeedbackStyleLight] impactOccurred];
+              [[PsiCashClient sharedInstance] pollForBalanceDeltaWithMaxRetries:30 andTimeBetweenRetries:1.0];
+          }
+      } error:^(NSError *error) {
+          [PsiFeedbackLogger errorWithType:RewardedVideoLogType message:@"Error with rewarded video" object:error];
+          [weakSelf.compoundDisposable removeDisposable:disposable];
+      } completed:^{
+          LOG_DEBUG(@"rewarded video completed");
+          [PsiFeedbackLogger infoWithType:RewardedVideoLogType message:@"completed"];
+          [weakSelf.compoundDisposable removeDisposable:disposable];
+      }];
+
+    [self.compoundDisposable addDisposable:disposable];
 }
 
 #pragma mark - PsiCashPurchaseAlertViewDelegate protocol

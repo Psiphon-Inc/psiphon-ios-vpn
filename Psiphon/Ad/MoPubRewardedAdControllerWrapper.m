@@ -33,8 +33,7 @@ PsiFeedbackLogType const MoPubRewardedAdControllerWrapperLogType = @"MoPubReward
 
 @interface MoPubRewardedAdControllerWrapper () <MPRewardedVideoDelegate>
 
-@property (nonatomic, readwrite, nonnull) BehaviorRelay<NSNumber *> *canPresent;
-
+@property (nonatomic, readwrite, nonnull) BehaviorRelay<NSNumber *> *adLoadStatus;
 /** presentedAdDismissed is hot infinite signal - emits RACUnit whenever an ad is presented. */
 @property (nonatomic, readwrite, nonnull) RACSubject<RACUnit *> *presentedAdDismissed;
 
@@ -58,7 +57,7 @@ PsiFeedbackLogType const MoPubRewardedAdControllerWrapperLogType = @"MoPubReward
     _tag = tag;
     _loadStatusRelay = [RelaySubject subject];
     _adUnitID = adUnitID;
-    _canPresent = [BehaviorRelay behaviorSubjectWithDefaultValue:@(FALSE)];
+    _adLoadStatus = [BehaviorRelay behaviorSubjectWithDefaultValue:@(AdLoadStatusNone)];
     _presentedAdDismissed = [RACSubject subject];
     _presentationStatus = [RACSubject subject];
     return self;
@@ -79,6 +78,8 @@ PsiFeedbackLogType const MoPubRewardedAdControllerWrapperLogType = @"MoPubReward
         [MPRewardedVideo setDelegate:weakSelf forAdUnitId:weakSelf.adUnitID];
         [MPRewardedVideo loadRewardedVideoAdWithAdUnitID:weakSelf.adUnitID withMediationSettings:nil];
 
+        [self.adLoadStatus accept:@(AdLoadStatusInProgress)];
+
         return disposable;
     }];
 }
@@ -90,9 +91,7 @@ PsiFeedbackLogType const MoPubRewardedAdControllerWrapperLogType = @"MoPubReward
     return [RACSignal createSignal:^RACDisposable *(id <RACSubscriber> subscriber) {
         // Unlike interstitials, MoPub SDK doesn't provide a way to destroy the pre-fetched rewarded video ads.
 
-        if ([[weakSelf.canPresent first] boolValue]) {
-            [weakSelf.canPresent accept:@(FALSE)];
-        }
+        [weakSelf.adLoadStatus accept:@(AdLoadStatusNone)];
 
         [subscriber sendNext:[RACTwoTuple pack:weakSelf.tag :nil]];
         [subscriber sendCompleted];
@@ -147,9 +146,8 @@ PsiFeedbackLogType const MoPubRewardedAdControllerWrapperLogType = @"MoPubReward
     if (self.adUnitID != adUnitID) {
         return;
     }
-    if (![[self.canPresent first] boolValue]) {
-        [self.canPresent accept:@(TRUE)];
-    }
+
+    [self.adLoadStatus accept:@(AdLoadStatusDone)];
     [self.loadStatusRelay accept:[RACTwoTuple pack:self.tag :nil]];
 }
 
@@ -157,9 +155,7 @@ PsiFeedbackLogType const MoPubRewardedAdControllerWrapperLogType = @"MoPubReward
     if (self.adUnitID != adUnitID) {
         return;
     }
-    if ([[self.canPresent first] boolValue]) {
-        [self.canPresent accept:@(FALSE)];
-    }
+    [self.adLoadStatus accept:@(AdLoadStatusError)];
 
     NSError *e = [NSError errorWithDomain:AdControllerWrapperErrorDomain
                                      code:AdControllerWrapperErrorAdFailedToLoad
@@ -172,9 +168,7 @@ PsiFeedbackLogType const MoPubRewardedAdControllerWrapperLogType = @"MoPubReward
     if (self.adUnitID != adUnitID) {
         return;
     }
-    if ([[self.canPresent first] boolValue]) {
-        [self.canPresent accept:@(FALSE)];
-    }
+    [self.adLoadStatus accept:@(AdLoadStatusNone)];
 
     NSError *e = [NSError errorWithDomain:AdControllerWrapperErrorDomain
                                      code:AdControllerWrapperErrorAdExpired];
@@ -187,9 +181,7 @@ PsiFeedbackLogType const MoPubRewardedAdControllerWrapperLogType = @"MoPubReward
         return;
     }
 
-    if ([[self.canPresent first] boolValue]) {
-        [self.canPresent accept:@(FALSE)];
-    }
+    [self.adLoadStatus accept:@(AdLoadStatusNone)];
 
     [self.presentationStatus sendNext:@(AdPresentationErrorFailedToPlay)];
 }
@@ -198,7 +190,7 @@ PsiFeedbackLogType const MoPubRewardedAdControllerWrapperLogType = @"MoPubReward
     if (self.adUnitID != adUnitID) {
         return;
     }
-    [self.canPresent accept:@(FALSE)];
+    [self.adLoadStatus accept:@(AdLoadStatusNone)];
 
     [self.presentationStatus sendNext:@(AdPresentationWillAppear)];
 }
