@@ -75,10 +75,10 @@ PsiFeedbackLogType const MoPubRewardedAdControllerWrapperLogType = @"MoPubReward
 
         RACDisposable *disposable = [weakSelf.loadStatusRelay subscribe:subscriber];
 
+        [self.adLoadStatus accept:@(AdLoadStatusInProgress)];
+
         [MPRewardedVideo setDelegate:weakSelf forAdUnitId:weakSelf.adUnitID];
         [MPRewardedVideo loadRewardedVideoAdWithAdUnitID:weakSelf.adUnitID withMediationSettings:nil];
-
-        [self.adLoadStatus accept:@(AdLoadStatusInProgress)];
 
         return disposable;
     }];
