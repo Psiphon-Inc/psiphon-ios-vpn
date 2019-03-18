@@ -81,6 +81,13 @@ static inline BOOL adBeingPresented(AdPresentation ap) {
     return (ap == AdPresentationWillAppear || ap == AdPresentationDidAppear || ap == AdPresentationWillDisappear);
 };
 
+typedef NS_ENUM(NSInteger, AdLoadStatus) {
+    AdLoadStatusNone = 1,
+    AdLoadStatusInProgress,
+    AdLoadStatusDone,
+    AdLoadStatusError
+};
+
 #pragma mark -
 
 FOUNDATION_EXPORT NSErrorDomain const AdControllerWrapperErrorDomain;
@@ -117,12 +124,11 @@ typedef NS_ERROR_ENUM(AdControllerWrapperErrorDomain, AdControllerWrapperErrorCo
 @property (nonatomic, readonly) AdControllerTag tag;
 
 /**
- * Hot relay subject. Emits @(TRUE) if ad is ready to be displayed, @(FALSE) otherwise.
- * The value is expected to change after the ad has started presenting.
- * To avoid unnecessary computation for observers of this property, implementations of this protocol
- * should check the current value before emitting new value.
+ * Hot relay subject. Emits items of type @(AdLoadedStatus).
+ *
+ * Default value is `AdLoadStatusNone`.
  */
-@property (nonatomic, readonly) BehaviorRelay<NSNumber *> *canPresent;
+@property (nonatomic, readonly) BehaviorRelay<NSNumber *> *adLoadStatus;
 
 /**
  * presentedAdDismissed is hot infinite signal - emits RACUnit whenever an ad is shown.
