@@ -1217,12 +1217,14 @@ NSString * const CommandStopVPN = @"StopVPN";
                   
               // The user has an earner token.
               } else {
-                  
+
+                  // User hasn't tapped the rewarded video button yet.
                   if (!strongSelf->psiCashView.rewardedVideoButtonTappedOnce) {
                       [strongSelf->psiCashView.rewardedVideoButton stopAnimating];
                       strongSelf->psiCashView.rewardedVideoButton.userInteractionEnabled = TRUE;
                       strongSelf->psiCashView.rewardedVideoButton.enabled = TRUE;
-                      
+
+                  // User has tapped the rewarded video button before.
                   } else {
                       
                       // Sets enabled state.
@@ -1290,8 +1292,15 @@ NSString * const CommandStopVPN = @"StopVPN";
 
     MainViewController *__weak weakSelf = self;
 
+    // Disable rewarded video button interaction, to prevent double-subscription to the same signal.
+    // TODO: This should ideally be prevented by debounce.
+    // Disabling the button is safe since the button status will be reset when the `rewardedVideoLoadStatus`
+    // emits new values. Check `setupPsiCashView` for implementation of that observable.
+    psiCashView.rewardedVideoButton.userInteractionEnabled = FALSE;
+    psiCashView.rewardedVideoButton.enabled = FALSE;
+    [psiCashView.rewardedVideoButton startAnimating];
+
     LOG_DEBUG(@"rewarded video started");
-    [PsiFeedbackLogger infoWithType:RewardedVideoLogType message:@"started"];
 
     RACDisposable *__block disposable = [[[[[[[[RACSignal return:@(psiCashView.rewardedVideoButtonTappedOnce)]
       doNext:^(NSNumber *tappedOnce) {
@@ -1341,6 +1350,7 @@ NSString * const CommandStopVPN = @"StopVPN";
           AdPresentation ap = (AdPresentation) [adPresentationEnum integerValue];
           switch (ap) {
               case AdPresentationWillAppear:
+                  [PsiFeedbackLogger infoWithType:RewardedVideoLogType message:@"AdPresentationWillAppear"];
                   LOG_DEBUG(@"rewarded video AdPresentationWillAppear");
                   break;
               case AdPresentationDidAppear:
