@@ -123,6 +123,7 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
 @property (nonatomic, readwrite, nonnull) RACBehaviorSubject<NSNumber *> *adIsShowing;
 @property (nonatomic, readwrite, nonnull) RACBehaviorSubject<NSNumber *> *untunneledInterstitialLoadStatus;
 @property (nonatomic, readwrite, nonnull) RACBehaviorSubject<NSNumber *> *rewardedVideoLoadStatus;
+@property (nonatomic, readwrite, nonnull) RACSubject<RACUnit *> *forceRewardedVideoLoad;
 
 // Private properties
 @property (nonatomic, readwrite, nonnull) AdMobInterstitialAdControllerWrapper *untunneledInterstitial;
@@ -153,6 +154,8 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
         _untunneledInterstitialLoadStatus = [RACBehaviorSubject behaviorSubjectWithDefaultValue:@(AdLoadStatusNone)];
 
         _rewardedVideoLoadStatus = [RACBehaviorSubject behaviorSubjectWithDefaultValue:@(AdLoadStatusNone)];
+
+        _forceRewardedVideoLoad = [RACSubject subject];
 
         _compoundDisposable = [RACCompoundDisposable compoundDisposable];
 
@@ -593,25 +596,40 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
     NSString * const RetryTypeDoNotRetry = @"RetryTypeDoNotRetry";
     NSString * const RetryTypeOther = @"RetryTypeOther";
 
-    // Retry count for ads that failed to load (doesn't apply for expired ads).
-    NSInteger const AD_LOAD_RETRY_COUNT = 1;
+    // Delay time between reloads.
     NSTimeInterval const MIN_AD_RELOAD_TIMER = 1.0;
 
     // "Trigger" signals.
     NSString * const TriggerPresentedAdDismissed = @"TriggerPresentedAdDismissed";
     NSString * const TriggerAppEvent = @"TriggerAppEvent";
     NSString * const TriggerPsiCashRewardedActivityDataUpdated = @"TriggerPsiCashRewardedActivityDataUpdated";
+    NSString * const TriggerForceRewardedVideoLoad = @"TriggerForceRewardedVideoLoad";
 
     RACSignal<NSString *> *triggers = [RACSignal merge:@[
       [self.appEvents.signal mapReplace:TriggerAppEvent],
       [adController.presentedAdDismissed mapReplace:TriggerPresentedAdDismissed],
     ]];
 
-    if (waitForPsiCashRewardedActivityData) {
-       triggers = [triggers merge:[[PsiCashClient sharedInstance].rewardedActivityDataSignal
-                                    mapReplace:TriggerPsiCashRewardedActivityDataUpdated]];
-    }
+    // Max number of ad load retries.
+    NSInteger adLoadMaxRetries;
 
+    if (AdFormatRewardedVideo == adController.adFormat) {
+
+        adLoadMaxRetries = 0;
+
+        // Rewarded video ads have an additional force rewarded video load trigger.
+        triggers = [triggers merge:[self.forceRewardedVideoLoad mapReplace:TriggerForceRewardedVideoLoad]];
+
+        if (waitForPsiCashRewardedActivityData) {
+            triggers = [triggers merge:[[PsiCashClient sharedInstance].rewardedActivityDataSignal
+              mapReplace:TriggerPsiCashRewardedActivityDataUpdated]];
+        }
+    } else if (AdFormatInterstitial == adController.adFormat) {
+        adLoadMaxRetries = 1;
+
+    } else {
+        PSIAssert(FALSE);
+    }
 
     RACSignal<RACTwoTuple<AdControllerTag, AppEventActionTuple *> *> *adLoadUnloadSignal =
       [[[[[triggers withLatestFrom:self.appEvents.signal]
@@ -622,7 +640,7 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
           //    the source is defined in `event.source` below.
           //  - Otherwise, the trigger signal is the source as defined in one of the Trigger_ constants above.
 
-          NSString *triggerSignal = tuple.first;
+          NSString *triggerSignalName = tuple.first;
           AppEvent *event = tuple.second;
 
           AppEventActionTuple *sa = [[AppEventActionTuple alloc] init];
@@ -654,8 +672,8 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
               // If the current tunnel state is the same as the ads required tunnel state, then load ad.
               if (event.tunnelState == loadInTunnelState) {
 
-                  // Take no loading action if custom data is missing.
-                  if (waitForPsiCashRewardedActivityData) {
+                  // For rewarded video take no loading action if custom data is missing.
+                  if (adController.adFormat == AdFormatRewardedVideo && waitForPsiCashRewardedActivityData) {
                       NSString *_Nullable customData = [[PsiCashClient sharedInstance]
                                                          rewardedVideoCustomData];
                       if (!customData) {
@@ -664,12 +682,16 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
                       }
                   }
 
-                  if ([TriggerPresentedAdDismissed isEqualToString:triggerSignal]) {
+                  if ([TriggerPresentedAdDismissed isEqualToString:triggerSignalName]) {
                       // The user has just finished viewing the ad.
                       sa.action = afterPresentationLoadAction;
 
                   } else if (event.source == SourceEventStarted) {
                       // The app has just been launched, don't delay the ad load.
+                      sa.action = AdLoadActionImmediate;
+
+                  } else if ([TriggerForceRewardedVideoLoad isEqualToString:triggerSignalName]) {
+                      // This is a forced load.
                       sa.action = AdLoadActionImmediate;
 
                   } else {
@@ -777,13 +799,13 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
                           }];
 
                       } else {
-                          return [[groupedErrors zipWith:[RACSignal rangeStartFrom:0 count:(AD_LOAD_RETRY_COUNT+1)]]
+                          return [[groupedErrors zipWith:[RACSignal rangeStartFrom:0 count:(adLoadMaxRetries+1)]]
                             flattenMap:^RACSignal *(RACTwoTuple *value) {
 
                                 NSError *error = value.first;
                                 NSInteger retryCount = [(NSNumber *)value.second integerValue];
 
-                                if (retryCount == AD_LOAD_RETRY_COUNT) {
+                                if (retryCount == adLoadMaxRetries) {
                                     // Reached max retry.
                                     return [RACSignal error:error];
                                 } else {

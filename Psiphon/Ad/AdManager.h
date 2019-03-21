@@ -60,6 +60,11 @@ FOUNDATION_EXPORT AdControllerTag const AdControllerTagMoPubTunneledRewardedVide
  */
 @property (nonatomic, readonly) RACBehaviorSubject<NSNumber *> *rewardedVideoLoadStatus;
 
+/**
+ * Interested parties can submit a value to this subject for a rewarded video to be reloaded.
+ */
+@property (nonatomic, readonly) RACSubject<RACUnit *> *forceRewardedVideoLoad;
+
 + (instancetype)sharedInstance;
 
 /**

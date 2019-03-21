@@ -40,6 +40,9 @@
 
 - (void)setEnabled:(BOOL)enabled {
     [super setEnabled:enabled];
+
+    // TODO: Each View class should have a state mutating method.
+    //       Take this out once `-setState` methods are implemented.
     [self setBackgroundGradient:enabled];
 }
 

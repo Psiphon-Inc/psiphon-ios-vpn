@@ -22,49 +22,88 @@
 
 @implementation ActivityIndicatorRoyalSkyButton {
     UIActivityIndicatorView *activityIndicator;
-    NSString *titleIndicatorAnimating;
+
+    AIRSBState buttonState;
+    NSMutableDictionary<NSNumber *, NSString *> *titles;
 }
 
 - (instancetype)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:CGRectZero];
     if (self) {
+        buttonState = AIRSBStateNormal;
+        titles = [NSMutableDictionary dictionaryWithCapacity:ENUM_COUNT_AIRSBState];
         activityIndicator = [[UIActivityIndicatorView alloc]
           initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhite];
     }
     return self;
 }
 
-- (void)setTitleForIndicatorAnimating:(NSString *)title {
-    titleIndicatorAnimating = title;
-}
+- (void)setTitle:(NSString *)title forButtonState:(AIRSBState)s {
+    titles[@(s)] = title;
 
-- (void)startAnimating {
-    if (!activityIndicator.animating) {
-        [activityIndicator startAnimating];
+    // Update title of current active state title changes.
+    if (buttonState == s) {
         [self updateTitle];
     }
 }
 
-- (void)stopAnimating {
-    if (activityIndicator.animating) {
-        [activityIndicator stopAnimating];
-        [self updateTitle];
+- (void)setState:(AIRSBState)s {
+    if (buttonState == s) {
+        return;
     }
+
+    buttonState = s;
+    switch (s) {
+        case AIRSBStateNormal: {
+            self.userInteractionEnabled = TRUE;
+            self.enabled = TRUE;
+            [self setBackgroundGradient:TRUE];
+            [activityIndicator stopAnimating];
+            break;
+        }
+        case AIRSBStateDisabled: {
+            self.userInteractionEnabled = FALSE;
+            self.enabled = FALSE;
+            [self setBackgroundGradient:FALSE];
+            [activityIndicator stopAnimating];
+            break;
+        }
+        case AIRSBStateAnimating: {
+            self.userInteractionEnabled = FALSE;
+            self.enabled = FALSE;
+            [self setBackgroundGradient:FALSE];
+            [activityIndicator startAnimating];
+            break;
+        }
+        case AIRSBStateRetry: {
+            self.userInteractionEnabled = TRUE;
+            self.enabled = TRUE;
+            [self setBackgroundGradient:TRUE];
+            [activityIndicator stopAnimating];
+            break;
+        }
+    }
+
+    [self updateTitle];
 }
 
 #pragma mark -
 
 - (NSString *)currentTitle {
-    if (activityIndicator.animating) {
-        return titleIndicatorAnimating;
-    } else {
-        return [super currentTitle];
-    }
+    return titles[@(buttonState)];
 }
 
 #pragma mark - AutoLayoutProtocol init
 
- - (void)autoLayoutAddSubviews {
+- (void)autoLayoutSetupViews {
+    [super autoLayoutSetupViews];
+
+    self.userInteractionEnabled = TRUE;
+    [self setBackgroundGradient:TRUE];
+    [activityIndicator stopAnimating];
+}
+
+- (void)autoLayoutAddSubviews {
     [super autoLayoutAddSubviews];
     [self addSubview:activityIndicator];
 }
