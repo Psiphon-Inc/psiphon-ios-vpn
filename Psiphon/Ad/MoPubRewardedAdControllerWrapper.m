@@ -67,6 +67,10 @@ PsiFeedbackLogType const MoPubRewardedAdControllerWrapperLogType = @"MoPubReward
     [MPRewardedVideo removeDelegate:self];
 }
 
+- (AdFormat)adFormat {
+    return AdFormatRewardedVideo;
+}
+
 - (RACSignal<RACTwoTuple<AdControllerTag, NSError *> *> *)loadAd {
 
     MoPubRewardedAdControllerWrapper *__weak weakSelf = self;

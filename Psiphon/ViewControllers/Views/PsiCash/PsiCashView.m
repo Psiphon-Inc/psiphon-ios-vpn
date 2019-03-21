@@ -97,13 +97,13 @@
     // Setup rewarded video button
     _rewardedVideoButton = [[ActivityIndicatorRoyalSkyButton alloc] initForAutoLayout];
     [_rewardedVideoButton setTitle:[PsiCashView videoReadyTitleText]
-                          forState:UIControlStateNormal];
+                    forButtonState:AIRSBStateNormal];
     [_rewardedVideoButton setTitle:[PsiCashView videoUnavailableTitleText]
-                          forState:UIControlStateDisabled];
-    [_rewardedVideoButton setTitleForIndicatorAnimating:[Strings psiCashRewardedVideoButtonLoadingTitle]];
-
-    _rewardedVideoButton.enabled = TRUE;  // Enable button click regardless of rewarded video load state.
-    _rewardedVideoButton.userInteractionEnabled = TRUE;
+                    forButtonState:AIRSBStateDisabled];
+    [_rewardedVideoButton setTitle:[Strings psiCashRewardedVideoButtonLoadingTitle]
+                    forButtonState:AIRSBStateAnimating];
+    [_rewardedVideoButton setTitle:[Strings psiCashRewardedVideoButtonRetryTitle]
+                    forButtonState:AIRSBStateRetry];
 
     _rewardedVideoButton.backgroundColor = UIColor.clearColor;
 
