@@ -596,8 +596,7 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
     NSString * const RetryTypeDoNotRetry = @"RetryTypeDoNotRetry";
     NSString * const RetryTypeOther = @"RetryTypeOther";
 
-    // Retry count for ads that failed to load (doesn't apply for expired ads).
-    NSInteger const AD_LOAD_RETRY_COUNT = 1;
+    // Delay time between reloads.
     NSTimeInterval const MIN_AD_RELOAD_TIMER = 1.0;
 
     // "Trigger" signals.
@@ -611,16 +610,26 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
       [adController.presentedAdDismissed mapReplace:TriggerPresentedAdDismissed],
     ]];
 
+    // Max number of ad load retries.
+    NSInteger adLoadMaxRetries;
+
     if (AdFormatRewardedVideo == adController.adFormat) {
+
+        adLoadMaxRetries = 0;
+
         // Rewarded video ads have an additional force rewarded video load trigger.
         triggers = [triggers merge:[self.forceRewardedVideoLoad mapReplace:TriggerForceRewardedVideoLoad]];
-    }
 
-    if (waitForPsiCashRewardedActivityData) {
-       triggers = [triggers merge:[[PsiCashClient sharedInstance].rewardedActivityDataSignal
-                                    mapReplace:TriggerPsiCashRewardedActivityDataUpdated]];
-    }
+        if (waitForPsiCashRewardedActivityData) {
+            triggers = [triggers merge:[[PsiCashClient sharedInstance].rewardedActivityDataSignal
+              mapReplace:TriggerPsiCashRewardedActivityDataUpdated]];
+        }
+    } else if (AdFormatInterstitial == adController.adFormat) {
+        adLoadMaxRetries = 1;
 
+    } else {
+        PSIAssert(FALSE);
+    }
 
     RACSignal<RACTwoTuple<AdControllerTag, AppEventActionTuple *> *> *adLoadUnloadSignal =
       [[[[[triggers withLatestFrom:self.appEvents.signal]
@@ -790,13 +799,13 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
                           }];
 
                       } else {
-                          return [[groupedErrors zipWith:[RACSignal rangeStartFrom:0 count:(AD_LOAD_RETRY_COUNT+1)]]
+                          return [[groupedErrors zipWith:[RACSignal rangeStartFrom:0 count:(adLoadMaxRetries+1)]]
                             flattenMap:^RACSignal *(RACTwoTuple *value) {
 
                                 NSError *error = value.first;
                                 NSInteger retryCount = [(NSNumber *)value.second integerValue];
 
-                                if (retryCount == AD_LOAD_RETRY_COUNT) {
+                                if (retryCount == adLoadMaxRetries) {
                                     // Reached max retry.
                                     return [RACSignal error:error];
                                 } else {
