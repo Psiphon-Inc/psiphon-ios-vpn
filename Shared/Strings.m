@@ -138,6 +138,10 @@
     return  NSLocalizedStringWithDefaultValue(@"PSICASH_REWARDED_VIDEO_LOADING_TITLE", nil, [NSBundle mainBundle], @"Loading", @"Button title when loading.");
 }
 
++ (NSString *)psiCashRewardedVideoButtonRetryTitle {
+    return  NSLocalizedStringWithDefaultValue(@"PSICASH_REWARDED_VIDEO_RETRY_TITLE", nil, [NSBundle mainBundle], @"Try again to watch a video", @"Button title for rewarded video ads button after failure to load ad. We want to let the user know that their previous attempt to watch a rewarded video ad failed and that they can try again by tapping the button.");
+}
+
 + (NSString *)vpnPermissionDeniedAlertMessage {
     return NSLocalizedStringWithDefaultValue(@"VPN_START_PERMISSION_DENIED_MESSAGE", nil, [NSBundle mainBundle], @"Psiphon needs your permission to install a VPN profile in order to connect.\n\nPsiphon is committed to protecting the privacy of our users. You can review our privacy policy by tapping \"Privacy Policy\".", @"('Privacy Policy' should be the same translation as privacy policy button VPN_START_PRIVACY_POLICY_BUTTON), (Do not translate 'VPN profile'), (Do not translate 'Psiphon')");
 }
