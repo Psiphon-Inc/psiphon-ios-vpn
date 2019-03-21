@@ -663,8 +663,8 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
               // If the current tunnel state is the same as the ads required tunnel state, then load ad.
               if (event.tunnelState == loadInTunnelState) {
 
-                  // Take no loading action if custom data is missing.
-                  if (waitForPsiCashRewardedActivityData) {
+                  // For rewarded video take no loading action if custom data is missing.
+                  if (adController.adFormat == AdFormatRewardedVideo && waitForPsiCashRewardedActivityData) {
                       NSString *_Nullable customData = [[PsiCashClient sharedInstance]
                                                          rewardedVideoCustomData];
                       if (!customData) {
