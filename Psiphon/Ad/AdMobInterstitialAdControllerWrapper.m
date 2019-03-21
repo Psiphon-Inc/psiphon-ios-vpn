@@ -73,6 +73,10 @@ PsiFeedbackLogType const AdMobInterstitialAdControllerWrapperLogType = @"AdMobIn
     return self;
 }
 
+- (AdFormat)adFormat {
+    return AdFormatInterstitial;
+}
+
 - (RACSignal<RACTwoTuple<AdControllerTag, NSError *> *> *)loadAd {
 
     AdMobInterstitialAdControllerWrapper *__weak weakSelf = self;

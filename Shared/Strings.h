@@ -91,6 +91,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (NSString *)psiCashRewardedVideoButtonLoadingTitle;
 
++ (NSString *)psiCashRewardedVideoButtonRetryTitle;
+
 #pragma mark - VPN
 
 + (NSString *)vpnPermissionDeniedAlertMessage;
