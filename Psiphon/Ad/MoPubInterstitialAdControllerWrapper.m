@@ -70,6 +70,10 @@ PsiFeedbackLogType const MoPubInterstitialAdControllerWrapperLogType = @"MoPubIn
     [MPInterstitialAdController removeSharedInterstitialAdController:self.interstitial];
 }
 
+- (AdFormat)adFormat {
+    return AdFormatInterstitial;
+}
+
 - (RACSignal<RACTwoTuple<AdControllerTag, NSError *> *> *)loadAd {
 
     MoPubInterstitialAdControllerWrapper *__weak weakSelf = self;

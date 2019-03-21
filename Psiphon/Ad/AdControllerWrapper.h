@@ -88,6 +88,11 @@ typedef NS_ENUM(NSInteger, AdLoadStatus) {
     AdLoadStatusError
 };
 
+typedef NS_ENUM(NSInteger, AdFormat) {
+    AdFormatInterstitial = 1,
+    AdFormatRewardedVideo = 2,
+};
+
 #pragma mark -
 
 FOUNDATION_EXPORT NSErrorDomain const AdControllerWrapperErrorDomain;
@@ -122,6 +127,8 @@ typedef NS_ERROR_ENUM(AdControllerWrapperErrorDomain, AdControllerWrapperErrorCo
  * This property should be set only when a new instance of the object adhering to this protocol is created.
  */
 @property (nonatomic, readonly) AdControllerTag tag;
+
+@property (nonatomic, readonly) AdFormat adFormat;
 
 /**
  * Hot relay subject. Emits items of type @(AdLoadedStatus).

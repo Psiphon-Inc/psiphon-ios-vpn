@@ -123,6 +123,7 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
 @property (nonatomic, readwrite, nonnull) RACBehaviorSubject<NSNumber *> *adIsShowing;
 @property (nonatomic, readwrite, nonnull) RACBehaviorSubject<NSNumber *> *untunneledInterstitialLoadStatus;
 @property (nonatomic, readwrite, nonnull) RACBehaviorSubject<NSNumber *> *rewardedVideoLoadStatus;
+@property (nonatomic, readwrite, nonnull) RACSubject<RACUnit *> *forceRewardedVideoLoad;
 
 // Private properties
 @property (nonatomic, readwrite, nonnull) AdMobInterstitialAdControllerWrapper *untunneledInterstitial;
@@ -153,6 +154,8 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
         _untunneledInterstitialLoadStatus = [RACBehaviorSubject behaviorSubjectWithDefaultValue:@(AdLoadStatusNone)];
 
         _rewardedVideoLoadStatus = [RACBehaviorSubject behaviorSubjectWithDefaultValue:@(AdLoadStatusNone)];
+
+        _forceRewardedVideoLoad = [RACSubject subject];
 
         _compoundDisposable = [RACCompoundDisposable compoundDisposable];
 
@@ -601,11 +604,17 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
     NSString * const TriggerPresentedAdDismissed = @"TriggerPresentedAdDismissed";
     NSString * const TriggerAppEvent = @"TriggerAppEvent";
     NSString * const TriggerPsiCashRewardedActivityDataUpdated = @"TriggerPsiCashRewardedActivityDataUpdated";
+    NSString * const TriggerForceRewardedVideoLoad = @"TriggerForceRewardedVideoLoad";
 
     RACSignal<NSString *> *triggers = [RACSignal merge:@[
       [self.appEvents.signal mapReplace:TriggerAppEvent],
       [adController.presentedAdDismissed mapReplace:TriggerPresentedAdDismissed],
     ]];
+
+    if (AdFormatRewardedVideo == adController.adFormat) {
+        // Rewarded video ads have an additional force rewarded video load trigger.
+        triggers = [triggers merge:[self.forceRewardedVideoLoad mapReplace:TriggerForceRewardedVideoLoad]];
+    }
 
     if (waitForPsiCashRewardedActivityData) {
        triggers = [triggers merge:[[PsiCashClient sharedInstance].rewardedActivityDataSignal
@@ -622,7 +631,7 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
           //    the source is defined in `event.source` below.
           //  - Otherwise, the trigger signal is the source as defined in one of the Trigger_ constants above.
 
-          NSString *triggerSignal = tuple.first;
+          NSString *triggerSignalName = tuple.first;
           AppEvent *event = tuple.second;
 
           AppEventActionTuple *sa = [[AppEventActionTuple alloc] init];
@@ -664,12 +673,16 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
                       }
                   }
 
-                  if ([TriggerPresentedAdDismissed isEqualToString:triggerSignal]) {
+                  if ([TriggerPresentedAdDismissed isEqualToString:triggerSignalName]) {
                       // The user has just finished viewing the ad.
                       sa.action = afterPresentationLoadAction;
 
                   } else if (event.source == SourceEventStarted) {
                       // The app has just been launched, don't delay the ad load.
+                      sa.action = AdLoadActionImmediate;
+
+                  } else if ([TriggerForceRewardedVideoLoad isEqualToString:triggerSignalName]) {
+                      // This is a forced load.
                       sa.action = AdLoadActionImmediate;
 
                   } else {

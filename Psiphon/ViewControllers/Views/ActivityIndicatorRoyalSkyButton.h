@@ -19,15 +19,22 @@
 
 #import "RoyalSkyButton.h"
 
+
+#define ENUM_COUNT_AIRSBState 4
+typedef NS_ENUM(NSInteger, AIRSBState) {
+    AIRSBStateNormal = 0,
+    AIRSBStateDisabled = 1,
+    AIRSBStateAnimating = 2,
+    AIRSBStateRetry = 3
+};
+
 NS_ASSUME_NONNULL_BEGIN
 
 @interface ActivityIndicatorRoyalSkyButton : RoyalSkyButton
 
-- (void)setTitleForIndicatorAnimating:(NSString *)title;
+- (void)setTitle:(NSString *)title forButtonState:(AIRSBState)state;
 
-- (void)startAnimating;
-
-- (void)stopAnimating;
+- (void)setState:(AIRSBState)state;
 
 @end
 
