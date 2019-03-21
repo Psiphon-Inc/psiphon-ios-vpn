@@ -65,6 +65,10 @@ PsiFeedbackLogType const AdMobRewardedAdControllerWrapperLogType = @"AdMobReward
     return self;
 }
 
+- (AdFormat)adFormat {
+    return AdFormatRewardedVideo;
+}
+
 - (RACSignal<RACTwoTuple<AdControllerTag, NSError *> *> *)loadAd {
 
     AdMobRewardedAdControllerWrapper *__weak weakSelf = self;
