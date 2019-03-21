@@ -1338,12 +1338,18 @@ NSString * const CommandStopVPN = @"StopVPN";
                 }]
                 filter:^BOOL(NSNumber *adLoadStatusObj) {
                     AdLoadStatus s = (AdLoadStatus) [adLoadStatusObj integerValue];
+                    // Filter terminating states.
                     return (AdLoadStatusDone == s) || (AdLoadStatusError == s);
                 }]
                 take:1]
-                then:^RACSignal * {
-                    return [[AdManager sharedInstance] presentRewardedVideoOnViewController:strongSelf
-                                                                             withCustomData:customData];
+                flattenMap:^RACSignal *(NSNumber *adLoadStatusObj) {
+                    AdLoadStatus s = (AdLoadStatus) [adLoadStatusObj integerValue];
+                    if (AdLoadStatusDone == s) {
+                        return [[AdManager sharedInstance] presentRewardedVideoOnViewController:strongSelf
+                                                                                 withCustomData:customData];
+                    } else {
+                        return [RACSignal empty];
+                    }
                 }];
           }
 
