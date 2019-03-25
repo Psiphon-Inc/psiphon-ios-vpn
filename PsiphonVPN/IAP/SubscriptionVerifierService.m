@@ -234,10 +234,10 @@ PsiFeedbackLogType const SubscriptionVerifierServiceLogType = @"SubscriptionVeri
 
     NSNumber *currentReceiptFileSize;
     [appReceiptURL getResourceValue:&currentReceiptFileSize forKey:NSURLFileSizeKey error:nil];
+    NSNumber *containerEmptyReceiptSize = [sharedDB getContainerEmptyReceiptFileSize];
 
-    NSNumber *containerReceiptSize = [sharedDB getContainerEmptyReceiptFileSize];
-
-    if ([containerReceiptSize unsignedIntValue] == [currentReceiptFileSize unsignedIntValue]) {
+    // The receipt has no transaction data on it - NO
+    if ([containerEmptyReceiptSize unsignedIntValue] == [currentReceiptFileSize unsignedIntValue]) {
         // Treats as expired receipt.
         [self setAppReceiptFileSize: currentReceiptFileSize];
         [self setAuthorization:nil];
