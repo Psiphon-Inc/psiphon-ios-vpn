@@ -125,18 +125,20 @@
 }
 
 - (void)updateWithRemoteAuthDict:(NSDictionary *_Nullable)remoteAuthDict
-        submittedReceiptFilesize:(NSNumber *)receiptFilesize {
-
-    if (!remoteAuthDict) {
-        return;
-    }
+        submittedReceiptFilesize:(NSNumber *_Nonnull)receiptFilesize {
 
     // Updates subscription dictionary.
+    // Sets pending renewal info and authorization to nil if the server sends an empty response.
+
     [self setAppReceiptFileSize:receiptFilesize];
+
     [self setPendingRenewalInfo:remoteAuthDict[kRemoteSubscriptionVerifierPendingRenewalInfo]];
-    Authorization *authorization = [[Authorization alloc]
-                                                   initWithEncodedAuthorization:remoteAuthDict[kRemoteSubscriptionVerifierSignedAuthorization]];
+
+    Authorization *_Nullable authorization = [[Authorization alloc]
+      initWithEncodedAuthorization:remoteAuthDict[kRemoteSubscriptionVerifierSignedAuthorization]];
+
     [self setAuthorization:authorization];
+
     [self persistChanges];
 }
 
