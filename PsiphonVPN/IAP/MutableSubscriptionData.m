@@ -78,7 +78,7 @@ PsiFeedbackLogType const MutableSubscriptionDataLogType = @"SubscriptionData";
                                    json:@{@"event": @"shouldUpdateAuth",
                                          @"result": @(YES),
                                          @"reason": @"containerHasReceiptWithExpiry",
-                                         @"expiry": containerReceiptExpiry}];
+                                         @"expiry": [PsiFeedbackLogger safeValue:containerReceiptExpiry]}];
         return YES;
     }
 
@@ -115,8 +115,8 @@ PsiFeedbackLogType const MutableSubscriptionDataLogType = @"SubscriptionData";
                                    json:@{@"event": @"shouldUpdateAuth",
                                            @"result": @(YES),
                                            @"reason": @"fileSizeChanged",
-                                           @"oldFileSize": self.appReceiptFileSize,
-                                           @"newFileSize": currentReceiptFileSize}];
+                                           @"oldFileSize": [PsiFeedbackLogger safeValue:self.appReceiptFileSize],
+                                           @"newFileSize": [PsiFeedbackLogger safeValue:currentReceiptFileSize]}];
         return YES;
     }
 
@@ -153,8 +153,8 @@ PsiFeedbackLogType const MutableSubscriptionDataLogType = @"SubscriptionData";
     LOG_DEBUG(@"authorization update not needed");
     [PsiFeedbackLogger infoWithType:MutableSubscriptionDataLogType
                                json:@{@"event": @"shouldUpdateAuth",
-                                 @"result": @(NO),
-                                 @"reason": @"noUpdateNeeded"}];
+                                       @"result": @(NO),
+                                       @"reason": @"noUpdateNeeded"}];
 
     return NO;
 }

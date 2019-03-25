@@ -104,7 +104,7 @@ NSString *const kSubscriptionDictionary = @"kSubscriptionDictionary";
                         [PsiFeedbackLogger infoWithType:IAPStoreHelperLogType
                                                    json:@{@"event": @"readReceipt",
                                                           @"fileSize": receiptFileSize,
-                                                          @"expiry": nil}];
+                                                          @"expiry": NSNull.null}];
 
                     } else {
                         // The receipt contains purchase data, reset value in the shared DB.
@@ -117,7 +117,7 @@ NSString *const kSubscriptionDictionary = @"kSubscriptionDictionary";
                         [PsiFeedbackLogger infoWithType:IAPStoreHelperLogType
                                                    json:@{@"event": @"readReceipt",
                                                           @"fileSize": receiptFileSize,
-                                                          @"expiry": expiry}];
+                                                          @"expiry": [PsiFeedbackLogger safeValue:expiry]}];
                     }
                 }
 
