@@ -177,6 +177,11 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (void)setContainerEmptyReceiptFileSize:(NSNumber *_Nullable)receiptFileSize;
 
+/**
+ * Sets the expiry date as found in the subscription receipt by the container.
+ */
+- (void)setContainerLastSubscriptionReceiptExpiryDate:(NSDate *_Nullable)expiryDate;
+
 #endif
 
 /**
@@ -184,6 +189,11 @@ NS_ASSUME_NONNULL_BEGIN
  * @return Nil or file size recorded by the container.
  */
 - (NSNumber *_Nullable)getContainerEmptyReceiptFileSize;
+
+/**
+ * @return Nil or latest subscription expiry date that was read from the receipt file.
+ */
+- (NSDate *_Nullable)getContainerLastSubscriptionReceiptExpiryDate;
 
 /**
  * Returns subscription verification dictionary previously stored by the extension.

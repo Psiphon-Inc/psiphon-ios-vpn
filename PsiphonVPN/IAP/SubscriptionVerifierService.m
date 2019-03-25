@@ -224,10 +224,17 @@ PsiFeedbackLogType const SubscriptionVerifierServiceLogType = @"SubscriptionVeri
         return NO;
     }
 
+    PsiphonDataSharedDB *sharedDB = [[PsiphonDataSharedDB alloc] initForAppGroupIdentifier:APP_GROUP_IDENTIFIER];
+
+    // Last expiry date recorded by the container still has time left - YES
+    NSDate *_Nullable containerReceiptExpiry = [sharedDB getContainerLastSubscriptionReceiptExpiryDate];
+    if (containerReceiptExpiry && [containerReceiptExpiry afterOrEqualTo:[NSDate date]]) {
+        return YES;
+    }
+
     NSNumber *currentReceiptFileSize;
     [appReceiptURL getResourceValue:&currentReceiptFileSize forKey:NSURLFileSizeKey error:nil];
 
-    PsiphonDataSharedDB *sharedDB = [[PsiphonDataSharedDB alloc] initForAppGroupIdentifier:APP_GROUP_IDENTIFIER];
     NSNumber *containerReceiptSize = [sharedDB getContainerEmptyReceiptFileSize];
 
     if ([containerReceiptSize unsignedIntValue] == [currentReceiptFileSize unsignedIntValue]) {

@@ -43,11 +43,14 @@ UserDefaultsKey const ServerTimestampStringKey = @"server_timestamp";
 
 UserDefaultsKey const ContainerSubscriptionEmptyReceiptNumberKey = @"kContainerSubscriptionEmptyReceiptKey";
 
+UserDefaultsKey const ContainerSubscriptionReceiptExpiryDate = @"container_subscription_receipt_expiry_date";
+
 UserDefaultsKey const ContainerAuthorizationSetKey = @"authorizations_container_key";
 
 UserDefaultsKey const MarkedAuthIDsExtensionStringSetKey = @"marked_authorization_ids_extension_key";
 
 UserDefaultsKey const SubscriptionVerificationDictionaryKey = @"subscription_verification_dictionary_key";
+
 
 /**
  * Key for boolean value that when TRUE indicates that the extension crashed before stop was called.
@@ -410,6 +413,14 @@ UserDefaultsKey const DebugPsiphonConnectionStateStringKey = @"PsiphonDataShared
 - (void)setContainerEmptyReceiptFileSize:(NSNumber *_Nullable)receiptFileSize {
     [sharedDefaults setObject:receiptFileSize forKey:ContainerSubscriptionEmptyReceiptNumberKey];
     [sharedDefaults synchronize];
+}
+
+- (void)setContainerLastSubscriptionReceiptExpiryDate:(NSDate *_Nullable)expiryDate {
+    [sharedDefaults setObject:expiryDate forKey:ContainerSubscriptionReceiptExpiryDate];
+}
+
+- (NSDate *_Nullable)getContainerLastSubscriptionReceiptExpiryDate {
+    return [sharedDefaults objectForKey:ContainerSubscriptionReceiptExpiryDate];
 }
 
 
