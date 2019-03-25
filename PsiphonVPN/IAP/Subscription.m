@@ -168,6 +168,14 @@ PsiFeedbackLogType const SubscriptionVerifierServiceLogType = @"SubscriptionVeri
 #define kPendingRenewalInfo             @"kPendingRenewalInfo"
 #define kSubscriptionAuthorization      @"kSubscriptionAuthorization"
 
+@interface Subscription ()
+
+@property (nonatomic, nullable, readwrite) NSNumber *appReceiptFileSize;
+@property (nonatomic, nullable, readwrite) NSArray * pendingRenewalInfo;
+@property (nonatomic, nullable, readwrite) Authorization * authorization;
+
+@end
+
 @implementation Subscription {
     NSMutableDictionary *dictionaryRepresentation;
 }
@@ -398,8 +406,9 @@ typedef NS_ENUM(NSInteger, SubscriptionStateEnum) {
     SubscriptionState *instance = [[SubscriptionState alloc] init];
     instance.state = SubscriptionStateNotSubscribed;
 
-    if ([subscription hasActiveAuthorizationForDate:[NSDate date]]) {
+    if ([subscription hasActiveSubscriptionForNow]) {
         instance.state = SubscriptionStateSubscribed;
+
     } else if ([subscription shouldUpdateAuthorization]) {
         instance.state = SubscriptionStateInProgress;
     }

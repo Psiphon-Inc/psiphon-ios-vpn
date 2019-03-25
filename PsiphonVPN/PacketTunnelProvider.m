@@ -1015,9 +1015,6 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
         Subscription *subscription = [Subscription fromPersistedDefaults];
         if (subscription.authorization && ![authorizationIds containsObject:subscription.authorization.ID]) {
 
-            // Remove persisted authorization.
-            subscription.authorization = nil;
-
             // Send value SubscriptionAuthorizationStatusRejected if subscription authorization was invalid.
             [strongSelf->subscriptionAuthorizationActiveSubject sendNext:@(SubscriptionAuthorizationStatusRejected)];
 

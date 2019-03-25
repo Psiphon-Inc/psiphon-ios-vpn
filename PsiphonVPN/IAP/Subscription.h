@@ -60,15 +60,18 @@ typedef NS_ENUM(NSInteger, SubscriptionCheckEnum) {
 @interface Subscription : NSObject <UserDefaultsModelProtocol>
 
 /** App Store subscription receipt file size. */
-@property (nonatomic, nullable, readwrite) NSNumber *appReceiptFileSize;
+@property (nonatomic, nullable, readonly) NSNumber *appReceiptFileSize;
 
 /**
  * App Store subscription pending renewal info details.
  * https://developer.apple.com/library/content/releasenotes/General/ValidateAppStoreReceipt/Chapters/ValidateRemotely.html#//apple_ref/doc/uid/TP40010573-CH104-SW2
  */
-@property (nonatomic, nullable, readwrite) NSArray * pendingRenewalInfo;
+@property (nonatomic, nullable, readonly) NSArray * pendingRenewalInfo;
 
-@property (nonatomic, nullable, readwrite) Authorization * authorization;
+/**
+ * The current active authorization, or nil if persisted authorization was rejected by the server.
+ */
+@property (nonatomic, nullable, readonly) Authorization * authorization;
 
 /**
  * Create a signal that returns an item of type SubscriptionCheckEnum.
