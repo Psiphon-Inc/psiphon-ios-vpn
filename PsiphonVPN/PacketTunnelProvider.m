@@ -36,7 +36,7 @@
 #import "Notifier.h"
 #import "Logging.h"
 #import "RegionAdapter.h"
-#import "Subscription.h"
+#import "SubscriptionVerifierService.h"
 #import "PacketTunnelUtils.h"
 #import "NSError+Convenience.h"
 #import "RACSignal+Operations.h"
@@ -53,6 +53,7 @@
 #import "Strings.h"
 #import <ReactiveObjC/RACSubject.h>
 #import <ReactiveObjC/RACReplaySubject.h>
+#import "SubscriptionData.h"
 
 NSErrorDomain _Nonnull const PsiphonTunnelErrorDomain = @"PsiphonTunnelErrorDomain";
 
@@ -251,7 +252,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
                         return [RACSignal return:@(SubscriptionCheckShouldUpdateAuthorization)];
                     } else {
                         // Either no subscription authorization was passed or it was valid.
-                        return [Subscription localSubscriptionCheck];
+                        return [SubscriptionVerifierService localSubscriptionCheck];
                     }
                 }];
           }
@@ -391,7 +392,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
               NSString *currentActiveAuthorization;
 
               // Updates subscription and persists subscription.
-              Subscription *subscription = [Subscription fromPersistedDefaults];
+              MutableSubscriptionData *subscription = [MutableSubscriptionData fromPersistedDefaults];
 
               // Keep a copy of the authorization passed to the tunnel previously.
               // This represents the authorization accepted by the Psiphon server,
@@ -511,7 +512,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
     self.cachedSponsorIDs = [PsiphonConfigReader fromConfigFile].sponsorIds;
 
     // Initializes uninitialized properties.
-    Subscription *subscription = [Subscription fromPersistedDefaults];
+    MutableSubscriptionData *subscription = [MutableSubscriptionData fromPersistedDefaults];
     self.subscriptionCheckState = [SubscriptionState initialStateFromSubscription:subscription];
 
     [PsiFeedbackLogger infoWithType:PacketTunnelProviderLogType
@@ -840,7 +841,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
     NSMutableArray *auths = [NSMutableArray arrayWithCapacity:1];
     
     // Add subscription authorization.
-    Subscription *subscription = [Subscription fromPersistedDefaults];
+    SubscriptionData *subscription = [SubscriptionData fromPersistedDefaults];
     if (subscription.authorization) {
         [PsiFeedbackLogger infoWithType:PacketTunnelProviderLogType message:@"subscription authorization ID:%@", subscription.authorization.ID];
         [auths addObject:subscription.authorization.base64Representation];
@@ -1012,7 +1013,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 
         // It is assumed that the subscription info at this point is the same as the subscription info
         // passed in getPsiphonConfig callback.
-        Subscription *subscription = [Subscription fromPersistedDefaults];
+        SubscriptionData *subscription = [SubscriptionData fromPersistedDefaults];
         if (subscription.authorization && ![authorizationIds containsObject:subscription.authorization.ID]) {
 
             // Send value SubscriptionAuthorizationStatusRejected if subscription authorization was invalid.
@@ -1062,7 +1063,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
         // Check if user has an active subscription in the device's time
         // If NO - do nothing
         // If YES - proceed with checking the subscription against server timestamp
-        Subscription *subscription = [Subscription fromPersistedDefaults];
+        SubscriptionData *subscription = [SubscriptionData fromPersistedDefaults];
         if ([subscription hasActiveAuthorizationForDate:[NSDate date]]) {
             if (serverTimestamp != nil) {
                 if (![subscription hasActiveAuthorizationForDate:serverTimestamp]) {

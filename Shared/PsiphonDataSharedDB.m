@@ -47,6 +47,8 @@ UserDefaultsKey const ContainerAuthorizationSetKey = @"authorizations_container_
 
 UserDefaultsKey const MarkedAuthIDsExtensionStringSetKey = @"marked_authorization_ids_extension_key";
 
+UserDefaultsKey const SubscriptionVerificationDictionaryKey = @"subscription_verification_dictionary_key";
+
 /**
  * Key for boolean value that when TRUE indicates that the extension crashed before stop was called.
  * This value is only valid if the extension is not currently running.
@@ -391,7 +393,15 @@ UserDefaultsKey const DebugPsiphonConnectionStateStringKey = @"PsiphonDataShared
 }
 
 
-#pragma mark - Subscription Receipt
+#pragma mark - Subscription
+
+- (NSDictionary *_Nullable)getSubscriptionVerificationDictionary {
+    return [sharedDefaults objectForKey:SubscriptionVerificationDictionaryKey];
+}
+
+- (void)setSubscriptionVerificationDictionary:(NSDictionary *_Nullable)dict {
+    [sharedDefaults setObject:dict forKey:SubscriptionVerificationDictionaryKey];
+}
 
 - (NSNumber *_Nullable)getContainerEmptyReceiptFileSize {
     return [sharedDefaults objectForKey:ContainerSubscriptionEmptyReceiptNumberKey];

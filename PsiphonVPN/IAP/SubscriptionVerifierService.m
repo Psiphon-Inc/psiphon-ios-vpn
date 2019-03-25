@@ -21,7 +21,7 @@
 #import <ReactiveObjC/RACDisposable.h>
 #import <ReactiveObjC/RACScheduler.h>
 #import "AppProfiler.h"
-#import "Subscription.h"
+#import "SubscriptionVerifierService.h"
 #import "NSDate+Comparator.h"
 #import "NSError+Convenience.h"
 #import "RACTuple.h"
@@ -31,6 +31,7 @@
 #import "RACCompoundDisposable.h"
 #import "PsiphonDataSharedDB.h"
 #import "SharedConstants.h"
+#import "SubscriptionData.h"
 
 NSErrorDomain _Nonnull const ReceiptValidationErrorDomain = @"PsiphonReceiptValidationErrorDomain";
 
@@ -38,6 +39,30 @@ PsiFeedbackLogType const SubscriptionVerifierServiceLogType = @"SubscriptionVeri
 
 @implementation SubscriptionVerifierService {
     NSURLSession *urlSession;
+}
+
++ (RACSignal<NSNumber *> *_Nonnull)localSubscriptionCheck {
+    return [RACSignal createSignal:^RACDisposable *(id <RACSubscriber> subscriber) {
+        MutableSubscriptionData *subscription = [MutableSubscriptionData fromPersistedDefaults];
+        if ([subscription shouldUpdateAuthorization]) {
+            // subscription server needs to be contacted.
+            [subscriber sendNext:@(SubscriptionCheckShouldUpdateAuthorization)];
+            [subscriber sendCompleted];
+        } else {
+            // subscription server doesn't need to be contacted.
+            // Checks if subscription is active compared to device's clock.
+            if ([subscription hasActiveAuthorizationForDate:[NSDate date]]) {
+                [subscriber sendNext:@(SubscriptionCheckHasActiveAuthorization)];
+                [subscriber sendCompleted];
+            } else {
+                // Send error, subscription has expired.
+                [subscriber sendNext:@(SubscriptionCheckAuthorizationExpired)];
+                [subscriber sendCompleted];
+            }
+        }
+
+        return nil;
+    }];
 }
 
 + (RACSignal<RACTwoTuple<NSDictionary *, NSNumber *> *> *)updateAuthorizationFromRemote {
@@ -162,102 +187,31 @@ PsiFeedbackLogType const SubscriptionVerifierServiceLogType = @"SubscriptionVeri
 
 @end
 
-// Subscription dictionary keys
-#define kSubscriptionDictionary         @"kSubscriptionDictionary"
-#define kAppReceiptFileSize             @"kAppReceiptFileSize"
-#define kPendingRenewalInfo             @"kPendingRenewalInfo"
-#define kSubscriptionAuthorization      @"kSubscriptionAuthorization"
 
-@interface Subscription ()
+#pragma mark - SubscriptionData additions
 
-@property (nonatomic, nullable, readwrite) NSNumber *appReceiptFileSize;
-@property (nonatomic, nullable, readwrite) NSArray * pendingRenewalInfo;
-@property (nonatomic, nullable, readwrite) Authorization * authorization;
+@implementation MutableSubscriptionData
 
-@end
-
-@implementation Subscription {
-    NSMutableDictionary *dictionaryRepresentation;
-}
-
-+ (RACSignal<NSNumber *> *_Nonnull)localSubscriptionCheck {
-    return [RACSignal createSignal:^RACDisposable *(id <RACSubscriber> subscriber) {
-        Subscription *subscription = [Subscription fromPersistedDefaults];
-        if ([subscription shouldUpdateAuthorization]) {
-            // subscription server needs to be contacted.
-            [subscriber sendNext:@(SubscriptionCheckShouldUpdateAuthorization)];
-            [subscriber sendCompleted];
-        } else {
-            // subscription server doesn't need to be contacted.
-            // Checks if subscription is active compared to device's clock.
-            if ([subscription hasActiveAuthorizationForDate:[NSDate date]]) {
-                [subscriber sendNext:@(SubscriptionCheckHasActiveAuthorization)];
-                [subscriber sendCompleted];
-            } else {
-                // Send error, subscription has expired.
-                [subscriber sendNext:@(SubscriptionCheckAuthorizationExpired)];
-                [subscriber sendCompleted];
-            }
-        }
-
-        return nil;
-    }];
-}
-
-+ (Subscription *_Nonnull)fromPersistedDefaults {
-    Subscription *instance = [[Subscription alloc] init];
-    NSDictionary *persistedDic = [[NSUserDefaults standardUserDefaults] dictionaryForKey:kSubscriptionDictionary];
-    instance->dictionaryRepresentation = [[NSMutableDictionary alloc] initWithDictionary:persistedDic];
++ (MutableSubscriptionData *_Nonnull)fromPersistedDefaults {
+    MutableSubscriptionData *instance = [[self alloc] init];
     return instance;
 }
 
-- (BOOL)isEmpty {
-    return (self->dictionaryRepresentation == nil) || ([self->dictionaryRepresentation count] == 0);
-}
-
-- (BOOL)persistChanges {
-    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
-    [userDefaults setObject:self->dictionaryRepresentation forKey:kSubscriptionDictionary];
-    // TODO: synchronize will be deprecated.
-    return [userDefaults synchronize];
-}
-
-- (NSNumber *_Nullable)appReceiptFileSize {
-    return self->dictionaryRepresentation[kAppReceiptFileSize];
-}
-
 - (void)setAppReceiptFileSize:(NSNumber *_Nullable)fileSize {
-    self->dictionaryRepresentation[kAppReceiptFileSize] = fileSize;
-}
-
-- (NSArray *_Nullable)pendingRenewalInfo {
-    return self->dictionaryRepresentation[kPendingRenewalInfo];
+   dictionaryRepresentation[kAppReceiptFileSize] = fileSize;
 }
 
 - (void)setPendingRenewalInfo:(NSArray *)pendingRenewalInfo {
-    self->dictionaryRepresentation[kPendingRenewalInfo] = pendingRenewalInfo;
-}
-
-- (Authorization *)authorization {
-    return [[Authorization alloc] initWithEncodedAuthorization:self->dictionaryRepresentation[kSubscriptionAuthorization]];
+    dictionaryRepresentation[kPendingRenewalInfo] = pendingRenewalInfo;
 }
 
 - (void)setAuthorization:(Authorization *)authorization {
-    self->dictionaryRepresentation[kSubscriptionAuthorization] = authorization.base64Representation;
+    dictionaryRepresentation[kSubscriptionAuthorization] = authorization.base64Representation;
 }
 
-- (BOOL)hasActiveSubscriptionForNow {
-    return [self hasActiveAuthorizationForDate:[NSDate date]];
-}
-
-- (BOOL)hasActiveAuthorizationForDate:(NSDate *)date {
-    if ([self isEmpty]) {
-        return FALSE;
-    }
-    if (!self.authorization) {
-        return FALSE;
-    }
-    return [self.authorization.expires afterOrEqualTo:date];
+- (void)persistChanges {
+    PsiphonDataSharedDB *sharedDB = [[PsiphonDataSharedDB alloc] initForAppGroupIdentifier:APP_GROUP_IDENTIFIER];
+    [sharedDB setSubscriptionVerificationDictionary:dictionaryRepresentation];
 }
 
 - (BOOL)shouldUpdateAuthorization {
@@ -278,8 +232,8 @@ PsiFeedbackLogType const SubscriptionVerifierServiceLogType = @"SubscriptionVeri
 
     if ([containerReceiptSize unsignedIntValue] == [currentReceiptFileSize unsignedIntValue]) {
         // Treats as expired receipt.
-        self.appReceiptFileSize = currentReceiptFileSize;
-        self.authorization = nil;
+        [self setAppReceiptFileSize: currentReceiptFileSize];
+        [self setAuthorization:nil];
         [self persistChanges];
 
         return NO;
@@ -293,7 +247,8 @@ PsiFeedbackLogType const SubscriptionVerifierServiceLogType = @"SubscriptionVeri
 
     // Receipt file size has changed since last check - YES
     if ([currentReceiptFileSize unsignedIntValue] != [self.appReceiptFileSize unsignedIntValue]) {
-        LOG_DEBUG(@"receipt file size changed (%@) since last check (%@)", currentReceiptFileSize, self.appReceiptFileSize);
+        LOG_DEBUG(@"receipt file size changed (%@) since last check (%@)",
+          currentReceiptFileSize, self.appReceiptFileSize);
         return YES;
     }
 
@@ -313,7 +268,9 @@ PsiFeedbackLogType const SubscriptionVerifierServiceLogType = @"SubscriptionVeri
     if([self.pendingRenewalInfo count] == 1
       && [self.pendingRenewalInfo[0] isKindOfClass:[NSDictionary class]]) {
 
-        NSString *autoRenewStatus = [self.pendingRenewalInfo[0] objectForKey:kRemoteSubscriptionVerifierPendingRenewalInfoAutoRenewStatus];
+        NSString *autoRenewStatus = [self.pendingRenewalInfo[0]
+          objectForKey:kRemoteSubscriptionVerifierPendingRenewalInfoAutoRenewStatus];
+
         if (autoRenewStatus && [autoRenewStatus isEqualToString:@"1"]) {
             LOG_DEBUG(@"subscription expired but user's last known intention is to auto-renew");
             return YES;
@@ -324,7 +281,8 @@ PsiFeedbackLogType const SubscriptionVerifierServiceLogType = @"SubscriptionVeri
     return NO;
 }
 
-- (void)updateWithRemoteAuthDict:(NSDictionary *_Nullable)remoteAuthDict submittedReceiptFilesize:(NSNumber *)receiptFilesize {
+- (void)updateWithRemoteAuthDict:(NSDictionary *_Nullable)remoteAuthDict
+        submittedReceiptFilesize:(NSNumber *)receiptFilesize {
 
     if (!remoteAuthDict) {
         return;
@@ -402,7 +360,7 @@ typedef NS_ENUM(NSInteger, SubscriptionStateEnum) {
     SubscriptionStateEnum _state;
 }
 
-+ (SubscriptionState *_Nonnull)initialStateFromSubscription:(Subscription *)subscription {
++ (SubscriptionState *_Nonnull)initialStateFromSubscription:(MutableSubscriptionData *)subscription {
     SubscriptionState *instance = [[SubscriptionState alloc] init];
     instance.state = SubscriptionStateNotSubscribed;
 

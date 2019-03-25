@@ -21,6 +21,7 @@
 #import "Authorization.h"
 #import "RACSignal.h"
 #import "RACSubscriber.h"
+#import "SubscriptionData.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -46,6 +47,15 @@ typedef NS_ERROR_ENUM(ReceiptValidationErrorDomain, PsiphonReceiptValidationErro
 
 @interface SubscriptionVerifierService : NSObject
 
+/**
+ * Create a signal that returns an item of type SubscriptionCheckEnum.
+ * The value returned only reflects subscription information available locally, and should be combined
+ * with other sources of information regarding subscription authorization validity to determine
+ * if the authorization is valid or whether the subscription verifier server needs to contacted.
+ * @return Returns a signal that emits one of SubscriptionCheckEnum enums and then completes immediately.
+ */
++ (RACSignal<NSNumber *> *)localSubscriptionCheck;
+
 + (RACSignal<RACTwoTuple<NSDictionary *, NSNumber *> *> *)updateAuthorizationFromRemote;
 
 @end
@@ -57,56 +67,12 @@ typedef NS_ENUM(NSInteger, SubscriptionCheckEnum) {
     SubscriptionCheckAuthorizationExpired,
 };
 
-@interface Subscription : NSObject <UserDefaultsModelProtocol>
 
-/** App Store subscription receipt file size. */
-@property (nonatomic, nullable, readonly) NSNumber *appReceiptFileSize;
+#pragma mark - MutableSubscriptionData
 
-/**
- * App Store subscription pending renewal info details.
- * https://developer.apple.com/library/content/releasenotes/General/ValidateAppStoreReceipt/Chapters/ValidateRemotely.html#//apple_ref/doc/uid/TP40010573-CH104-SW2
- */
-@property (nonatomic, nullable, readonly) NSArray * pendingRenewalInfo;
+@interface MutableSubscriptionData : SubscriptionData
 
-/**
- * The current active authorization, or nil if persisted authorization was rejected by the server.
- */
-@property (nonatomic, nullable, readonly) Authorization * authorization;
-
-/**
- * Create a signal that returns an item of type SubscriptionCheckEnum.
- * The value returned only reflects subscription information available locally, and should be combined
- * with other sources of information regarding subscription authorization validity to determine
- * if the authorization is valid or whether the subscription verifier server needs to contacted.
- * @return Returns a signal that emits one of SubscriptionCheckEnum enums and then completes immediately.
- */
-+ (RACSignal<NSNumber *> *)localSubscriptionCheck;
-
-/**
- * Reads NSUserDefaults and wraps the result in an Authorizations instance.
- * The underlying dictionary can only be manipulated by changing the properties of this instance.
- * @attention -persistChanges should be called to persist any changes made to the returned instance to disk.
- * @return An instance of Authorizations class.
- */
-+ (Subscription *)fromPersistedDefaults;
-
-/**
- * @return TRUE if underlying dictionary is empty.
- */
-- (BOOL)isEmpty;
-
-/**
- * Checks whether there is active subscription against current time.
- * @return TRUE if subscription is active, FALSE otherwise.
- */
-- (BOOL)hasActiveSubscriptionForNow;
-
-/**
- * Returns TRUE if subscription authorization is active compared to provided date.
- * @param date Date to compare the authorization expiration to.
- * @return TRUE if subscription is active, FALSE otherwise.
- */
-- (BOOL)hasActiveAuthorizationForDate:(NSDate *)date;
++ (MutableSubscriptionData *_Nonnull)fromPersistedDefaults;
 
 /**
  * Returns TRUE if Subscription info is missing, the App Store receipt has changed, or we expect
@@ -132,6 +98,7 @@ typedef NS_ENUM(NSInteger, SubscriptionCheckEnum) {
 - (void)updateWithRemoteAuthDict:(NSDictionary *_Nullable)remoteAuthDict submittedReceiptFilesize:(NSNumber *)receiptFilesize;
 
 @end
+
 
 #pragma mark - Subscription Result Model
 
@@ -168,7 +135,7 @@ typedef NS_ERROR_ENUM(SubscriptionResultErrorDomain, SubscriptionResultErrorCode
  */
 @interface SubscriptionState : NSObject
 
-+ (SubscriptionState *)initialStateFromSubscription:(Subscription *)subscription;
++ (SubscriptionState *)initialStateFromSubscription:(MutableSubscriptionData *)subscription;
 
 - (BOOL)isSubscribedOrInProgress;
 
