@@ -21,7 +21,7 @@
 #import "Authorization.h"
 #import "RACSignal.h"
 #import "RACSubscriber.h"
-#import "SubscriptionData.h"
+#import "MutableSubscriptionData.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -66,38 +66,6 @@ typedef NS_ENUM(NSInteger, SubscriptionCheckEnum) {
     SubscriptionCheckHasActiveAuthorization,
     SubscriptionCheckAuthorizationExpired,
 };
-
-
-#pragma mark - MutableSubscriptionData
-
-@interface MutableSubscriptionData : SubscriptionData
-
-+ (MutableSubscriptionData *_Nonnull)fromPersistedDefaults;
-
-/**
- * Returns TRUE if Subscription info is missing, the App Store receipt has changed, or we expect
- * the subscription to be renewed.
- * If this method returns TRUE, current subscription information should be deemed stale, and
- * subscription verifier server should be contacted to get latest subscription information.
- *
- * @note This is a blocking function until the new state is persisted.
- *
- * @return TRUE if subscription verification server should be contacted, FALSE otherwise.
- */
-- (BOOL)shouldUpdateAuthorization;
-
-/**
- * Convenience method for updating current subscription instance from the dictionary
- * returned by the subscription verifier server.
- *
- * @note This is a blocking function until the new state is persisted.
- *
- * @param remoteAuthDict Dictionary returned from the subscription verifier server.
- * @param receiptFilesize File size of the receipt submitted to the subscription verifier server.
- */
-- (void)updateWithRemoteAuthDict:(NSDictionary *_Nullable)remoteAuthDict submittedReceiptFilesize:(NSNumber *)receiptFilesize;
-
-@end
 
 
 #pragma mark - Subscription Result Model
