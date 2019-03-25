@@ -24,6 +24,10 @@
 #import "DispatchUtils.h"
 #import "PsiphonDataSharedDB.h"
 #import "Nullity.h"
+#import "PsiFeedbackLogger.h"
+
+
+PsiFeedbackLogType const IAPStoreHelperLogType = @"IAPStore";
 
 NSNotificationName const IAPSKProductsRequestDidReceiveResponseNotification = @"IAPSKProductsRequestDidReceiveResponseNotification";
 NSNotificationName const IAPSKProductsRequestDidFailWithErrorNotification = @"IAPSKProductsRequestDidFailWithErrorNotification";
@@ -88,12 +92,20 @@ NSString *const kSubscriptionDictionary = @"kSubscriptionDictionary";
 
                 if (receipt.inAppSubscriptions) {
 
+                    NSNumber *receiptFileSize = receipt.inAppSubscriptions[kAppReceiptFileSize];
+
                     // If inAppSubscriptions dictionary is missing expiration date or product id,
                     // then this receipt has no transactions, and is empty.
                     if ([Nullity isNil:receipt.inAppSubscriptions[kLatestExpirationDate]] &&
                         [Nullity isEmpty:receipt.inAppSubscriptions[kProductId]]) {
 
-                        [sharedDB setContainerEmptyReceiptFileSize:receipt.inAppSubscriptions[kAppReceiptFileSize]];
+                        [sharedDB setContainerEmptyReceiptFileSize:receiptFileSize];
+
+                        [PsiFeedbackLogger infoWithType:IAPStoreHelperLogType
+                                                   json:@{@"event": @"readReceipt",
+                                                          @"fileSize": receiptFileSize,
+                                                          @"expiry": nil}];
+
                     } else {
                         // The receipt contains purchase data, reset value in the shared DB.
                         [sharedDB setContainerEmptyReceiptFileSize:nil];
@@ -101,6 +113,11 @@ NSString *const kSubscriptionDictionary = @"kSubscriptionDictionary";
                         // Store the expiry date (for extension's use).
                         NSDate *expiry = receipt.inAppSubscriptions[kLatestExpirationDate];
                         [sharedDB setContainerLastSubscriptionReceiptExpiryDate:expiry];
+
+                        [PsiFeedbackLogger infoWithType:IAPStoreHelperLogType
+                                                   json:@{@"event": @"readReceipt",
+                                                          @"fileSize": receiptFileSize,
+                                                          @"expiry": expiry}];
                     }
                 }
 
@@ -203,11 +220,19 @@ NSString *const kSubscriptionDictionary = @"kSubscriptionDictionary";
     NSString *path = URL.path;
     const BOOL exists = [[NSFileManager defaultManager] fileExistsAtPath:path isDirectory:nil];
     if (!exists) {
+        [PsiFeedbackLogger infoWithType:IAPStoreHelperLogType
+                                   json:@{@"event": @"shouldUpdate",
+                                          @"result": @(NO),
+                                          @"reason": @"noReceipt"}];
         return NO;
     }
 
     // There's receipt but no subscriptionDictionary - YES
     if(!subscriptionDict) {
+        [PsiFeedbackLogger infoWithType:IAPStoreHelperLogType
+                                   json:@{@"event": @"shouldUpdate",
+                                         @"result": @(YES),
+                                         @"reason": @"noLocalData"}];
         return YES;
     }
 
@@ -216,11 +241,20 @@ NSString *const kSubscriptionDictionary = @"kSubscriptionDictionary";
     [[NSBundle mainBundle].appStoreReceiptURL getResourceValue:&appReceiptFileSize forKey:NSURLFileSizeKey error:nil];
     NSNumber* dictAppReceiptFileSize = subscriptionDict[kAppReceiptFileSize];
     if ([appReceiptFileSize unsignedIntValue] != [dictAppReceiptFileSize unsignedIntValue]) {
+
+        [PsiFeedbackLogger infoWithType:IAPStoreHelperLogType
+                                   json:@{@"event": @"shouldUpdate",
+                                         @"result": @(YES),
+                                         @"reason": @"fileSizeChange"}];
         return YES;
     }
 
     // If user has an active subscription for date - NO
     if ([[self class] hasActiveSubscriptionForDate:[NSDate date] inDict:subscriptionDict getExpiryDate:nil]) {
+        [PsiFeedbackLogger infoWithType:IAPStoreHelperLogType
+                                   json:@{@"event": @"shouldUpdate",
+                                         @"result": @(NO),
+                                         @"reason": @"subscriptionActive"}];
         return NO;
     }
 
