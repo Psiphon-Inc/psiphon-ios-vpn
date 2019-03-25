@@ -129,6 +129,7 @@
 		A840849074861D633B3EB4D1 /* AppEvent.m in Sources */ = {isa = PBXBuildFile; fileRef = A8408058458E7BFC4C3DFDDE /* AppEvent.m */; };
 		A84084C8B5C16F0EB80364FA /* Strings.m in Sources */ = {isa = PBXBuildFile; fileRef = A84083974C8CF9DDFE7A341D /* Strings.m */; };
 		A84084F47D4EA8D2B91E6609 /* SubscriptionData.m in Sources */ = {isa = PBXBuildFile; fileRef = A84081E6B9D2FF5986AA1BF0 /* SubscriptionData.m */; };
+		A84084F82AEF06CC1B8037DD /* MutableSubscriptionData.m in Sources */ = {isa = PBXBuildFile; fileRef = A8408BA51A715A7C022A7900 /* MutableSubscriptionData.m */; };
 		A840854A7ACA14A7D891EC16 /* OnboardingScrollableView.m in Sources */ = {isa = PBXBuildFile; fileRef = A8408CEB0E34BC897F3FA7D6 /* OnboardingScrollableView.m */; };
 		A8408692D005E8599267522E /* UIView+Additions.m in Sources */ = {isa = PBXBuildFile; fileRef = A84084C5C538AC8171021D2C /* UIView+Additions.m */; };
 		A84086D3F4BD2D551CA67611 /* AlertDialogs.m in Sources */ = {isa = PBXBuildFile; fileRef = A840841151FC43C5E1658677 /* AlertDialogs.m */; };
@@ -531,6 +532,7 @@
 		A8408B98D73EB239C92FB450 /* WhiteSkyButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WhiteSkyButton.h; sourceTree = "<group>"; };
 		A8408B9A66413A25FC1A2BE1 /* SwoopView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SwoopView.m; sourceTree = "<group>"; };
 		A8408BA05DC0D983E6740558 /* SubscriptionStatusView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SubscriptionStatusView.m; sourceTree = "<group>"; };
+		A8408BA51A715A7C022A7900 /* MutableSubscriptionData.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MutableSubscriptionData.m; sourceTree = "<group>"; };
 		A8408BAC196A108FFE3A5957 /* AlertDialogs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AlertDialogs.h; sourceTree = "<group>"; };
 		A8408C3C21E6934EAE9C0977 /* RelaySubject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RelaySubject.h; sourceTree = "<group>"; };
 		A8408C79DD812741E678AB94 /* SupportedLanguages.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SupportedLanguages.h; sourceTree = "<group>"; };
@@ -539,6 +541,7 @@
 		A8408CEB0E34BC897F3FA7D6 /* OnboardingScrollableView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OnboardingScrollableView.m; sourceTree = "<group>"; };
 		A8408D462EEE90AA7F2A8AFA /* SwoopView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SwoopView.h; sourceTree = "<group>"; };
 		A8408D7A1D96FE89B4FB49C1 /* ActivityIndicatorRoyalSkyButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ActivityIndicatorRoyalSkyButton.h; sourceTree = "<group>"; };
+		A8408D7A83250AE5DA42B445 /* MutableSubscriptionData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MutableSubscriptionData.h; sourceTree = "<group>"; };
 		A8408D96EC06ED36F86C690D /* OnboardingViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OnboardingViewController.m; sourceTree = "<group>"; };
 		A8408DA63B0B641B765A1E4D /* PsiCashView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PsiCashView.m; sourceTree = "<group>"; };
 		A8408DB71B7BE2CF13F9CD04 /* UIView+Additions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIView+Additions.h"; sourceTree = "<group>"; };
@@ -1122,6 +1125,8 @@
 			children = (
 				44E3CB6A1FCCA83100C80C82 /* SubscriptionVerifierService.h */,
 				44E3CB6B1FCCA83200C80C82 /* SubscriptionVerifierService.m */,
+				A8408BA51A715A7C022A7900 /* MutableSubscriptionData.m */,
+				A8408D7A83250AE5DA42B445 /* MutableSubscriptionData.h */,
 			);
 			path = IAP;
 			sourceTree = "<group>";
@@ -1773,6 +1778,7 @@
 				A8408F5F45CDBDF42701063E /* Strings.m in Sources */,
 				A84081FD0C1339DE954DAB7D /* RelaySubject.m in Sources */,
 				A84082D8D7BF55D509C4E5C5 /* SubscriptionData.m in Sources */,
+				A84084F82AEF06CC1B8037DD /* MutableSubscriptionData.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
