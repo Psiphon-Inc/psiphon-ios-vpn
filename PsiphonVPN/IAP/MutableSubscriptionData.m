@@ -130,20 +130,10 @@ PsiFeedbackLogType const MutableSubscriptionDataLogType = @"SubscriptionData";
         return NO;
     }
 
-    // If expired and pending renewal info is missing - YES
-    if(!self.pendingRenewalInfo) {
-        LOG_DEBUG(@"pending renewal info is missing");
-        [PsiFeedbackLogger infoWithType:MutableSubscriptionDataLogType
-                                   json:@{@"event": @"shouldUpdateAuth",
-                                         @"result": @(YES),
-                                         @"reason": @"pendingRenewalInfoMissing"}];
-
-        return YES;
-    }
-
     // If expired but user's last known intention was to auto-renew - YES
-    if([self.pendingRenewalInfo count] == 1
-      && [self.pendingRenewalInfo[0] isKindOfClass:[NSDictionary class]]) {
+    if(self.pendingRenewalInfo &&
+       [self.pendingRenewalInfo count] == 1 &&
+       [self.pendingRenewalInfo[0] isKindOfClass:[NSDictionary class]]) {
 
         NSString *autoRenewStatus = [self.pendingRenewalInfo[0]
           objectForKey:kRemoteSubscriptionVerifierPendingRenewalInfoAutoRenewStatus];
@@ -165,7 +155,7 @@ PsiFeedbackLogType const MutableSubscriptionDataLogType = @"SubscriptionData";
                                json:@{@"event": @"shouldUpdateAuth",
                                  @"result": @(NO),
                                  @"reason": @"noUpdateNeeded"}];
-    
+
     return NO;
 }
 
