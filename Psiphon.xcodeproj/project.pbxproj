@@ -41,7 +41,7 @@
 		445F24F020E1A5BA00D004E9 /* xer_encoder.c in Sources */ = {isa = PBXBuildFile; fileRef = 445F24D220E1A5BA00D004E9 /* xer_encoder.c */; };
 		445F24F520E1A85D00D004E9 /* IA5String.c in Sources */ = {isa = PBXBuildFile; fileRef = 445F24F220E1A85C00D004E9 /* IA5String.c */; };
 		445F24F620E1A85D00D004E9 /* UTF8String.c in Sources */ = {isa = PBXBuildFile; fileRef = 445F24F320E1A85C00D004E9 /* UTF8String.c */; };
-		44A0CAEE1FCCCDEC00859DB3 /* Subscription.m in Sources */ = {isa = PBXBuildFile; fileRef = 44E3CB6B1FCCA83200C80C82 /* Subscription.m */; };
+		44A0CAEE1FCCCDEC00859DB3 /* SubscriptionVerifierService.m in Sources */ = {isa = PBXBuildFile; fileRef = 44E3CB6B1FCCA83200C80C82 /* SubscriptionVerifierService.m */; };
 		4E0774961F566B040097BC8C /* InAppSettings.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 4E0774951F566ADA0097BC8C /* InAppSettings.bundle */; };
 		4E0A3669215AB7EE008A3D7B /* UIFont+Additions.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E0A3668215AB7EE008A3D7B /* UIFont+Additions.m */; };
 		4E0A366C21666B99008A3D7B /* NSString+Additions.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E0A366B21666B99008A3D7B /* NSString+Additions.m */; };
@@ -122,11 +122,13 @@
 		A84081FD0C1339DE954DAB7D /* RelaySubject.m in Sources */ = {isa = PBXBuildFile; fileRef = A84086DF1DDA5CC90C437009 /* RelaySubject.m */; };
 		A84082122C339F45E630F610 /* PsiCashView.m in Sources */ = {isa = PBXBuildFile; fileRef = A8408DA63B0B641B765A1E4D /* PsiCashView.m */; };
 		A84082260CE7662A93697CFF /* LoadingCircleLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = A840845849B24AAA0E714664 /* LoadingCircleLayer.m */; };
+		A84082D8D7BF55D509C4E5C5 /* SubscriptionData.m in Sources */ = {isa = PBXBuildFile; fileRef = A84081E6B9D2FF5986AA1BF0 /* SubscriptionData.m */; };
 		A840835FAC7F18A6A7021415 /* RingSkyButton.m in Sources */ = {isa = PBXBuildFile; fileRef = A84086B04CBC1A6A5481EDD4 /* RingSkyButton.m */; };
 		A84083E76E518050B65E523A /* SkyButton.m in Sources */ = {isa = PBXBuildFile; fileRef = A8408672FB2E1CD144A2BE7C /* SkyButton.m */; };
 		A8408424387C3E0CE5694B5A /* PsiCashSpeedBoostMeterView.m in Sources */ = {isa = PBXBuildFile; fileRef = A84083F358BD2CC1440107B8 /* PsiCashSpeedBoostMeterView.m */; };
 		A840849074861D633B3EB4D1 /* AppEvent.m in Sources */ = {isa = PBXBuildFile; fileRef = A8408058458E7BFC4C3DFDDE /* AppEvent.m */; };
 		A84084C8B5C16F0EB80364FA /* Strings.m in Sources */ = {isa = PBXBuildFile; fileRef = A84083974C8CF9DDFE7A341D /* Strings.m */; };
+		A84084F47D4EA8D2B91E6609 /* SubscriptionData.m in Sources */ = {isa = PBXBuildFile; fileRef = A84081E6B9D2FF5986AA1BF0 /* SubscriptionData.m */; };
 		A840854A7ACA14A7D891EC16 /* OnboardingScrollableView.m in Sources */ = {isa = PBXBuildFile; fileRef = A8408CEB0E34BC897F3FA7D6 /* OnboardingScrollableView.m */; };
 		A8408692D005E8599267522E /* UIView+Additions.m in Sources */ = {isa = PBXBuildFile; fileRef = A84084C5C538AC8171021D2C /* UIView+Additions.m */; };
 		A84086D3F4BD2D551CA67611 /* AlertDialogs.m in Sources */ = {isa = PBXBuildFile; fileRef = A840841151FC43C5E1658677 /* AlertDialogs.m */; };
@@ -317,8 +319,8 @@
 		445F24F220E1A85C00D004E9 /* IA5String.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = IA5String.c; sourceTree = "<group>"; };
 		445F24F320E1A85C00D004E9 /* UTF8String.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = UTF8String.c; sourceTree = "<group>"; };
 		445F24F420E1A85C00D004E9 /* IA5String.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IA5String.h; sourceTree = "<group>"; };
-		44E3CB6A1FCCA83100C80C82 /* Subscription.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Subscription.h; sourceTree = "<group>"; };
-		44E3CB6B1FCCA83200C80C82 /* Subscription.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Subscription.m; sourceTree = "<group>"; };
+		44E3CB6A1FCCA83100C80C82 /* SubscriptionVerifierService.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SubscriptionVerifierService.h; sourceTree = "<group>"; };
+		44E3CB6B1FCCA83200C80C82 /* SubscriptionVerifierService.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SubscriptionVerifierService.m; sourceTree = "<group>"; };
 		4E0774951F566ADA0097BC8C /* InAppSettings.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = InAppSettings.bundle; sourceTree = "<group>"; };
 		4E0A3667215AB7EE008A3D7B /* UIFont+Additions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "UIFont+Additions.h"; sourceTree = "<group>"; };
 		4E0A3668215AB7EE008A3D7B /* UIFont+Additions.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "UIFont+Additions.m"; sourceTree = "<group>"; };
@@ -479,6 +481,7 @@
 		A84081B66B02DF8283448409 /* AutoLayoutProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AutoLayoutProtocol.h; sourceTree = "<group>"; };
 		A84081C4600325A12F9C3413 /* SubscriptionsBar.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SubscriptionsBar.m; sourceTree = "<group>"; };
 		A84081E39C751846A6009BEC /* CloudsView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CloudsView.m; sourceTree = "<group>"; };
+		A84081E6B9D2FF5986AA1BF0 /* SubscriptionData.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SubscriptionData.m; sourceTree = "<group>"; };
 		A84082D71B55E73D2883F645 /* PsiCashPurchaseAlertView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PsiCashPurchaseAlertView.h; sourceTree = "<group>"; };
 		A840830557814D4234CFD86D /* ImageUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ImageUtils.h; sourceTree = "<group>"; };
 		A84083119A599C815D2D80F5 /* SkyButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SkyButton.h; sourceTree = "<group>"; };
@@ -486,6 +489,7 @@
 		A8408390A766C7C2C246797C /* PickerViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PickerViewController.m; sourceTree = "<group>"; };
 		A84083974C8CF9DDFE7A341D /* Strings.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Strings.m; sourceTree = "<group>"; };
 		A84083B0CB962827E7C93024 /* PsiCashPurchaseAlertView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PsiCashPurchaseAlertView.m; sourceTree = "<group>"; };
+		A84083E1E11F50B1DFC100CD /* SubscriptionData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SubscriptionData.h; sourceTree = "<group>"; };
 		A84083F358BD2CC1440107B8 /* PsiCashSpeedBoostMeterView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PsiCashSpeedBoostMeterView.m; sourceTree = "<group>"; };
 		A840841151FC43C5E1658677 /* AlertDialogs.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AlertDialogs.m; sourceTree = "<group>"; };
 		A840842CECC0146241243488 /* ActivityIndicatorRoyalSkyButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ActivityIndicatorRoyalSkyButton.m; sourceTree = "<group>"; };
@@ -762,6 +766,8 @@
 				9BFECC9B2B9F2BFBD4F8A47B /* UserDefaults.h */,
 				A84083974C8CF9DDFE7A341D /* Strings.m */,
 				A8408AAD421C096147E3FC8B /* Strings.h */,
+				A84081E6B9D2FF5986AA1BF0 /* SubscriptionData.m */,
+				A84083E1E11F50B1DFC100CD /* SubscriptionData.h */,
 			);
 			path = Shared;
 			sourceTree = "<group>";
@@ -1114,8 +1120,8 @@
 		EF743FC11F99546B00AC89A2 /* IAP */ = {
 			isa = PBXGroup;
 			children = (
-				44E3CB6A1FCCA83100C80C82 /* Subscription.h */,
-				44E3CB6B1FCCA83200C80C82 /* Subscription.m */,
+				44E3CB6A1FCCA83100C80C82 /* SubscriptionVerifierService.h */,
+				44E3CB6B1FCCA83200C80C82 /* SubscriptionVerifierService.m */,
 			);
 			path = IAP;
 			sourceTree = "<group>";
@@ -1728,6 +1734,7 @@
 				A840849074861D633B3EB4D1 /* AppEvent.m in Sources */,
 				A84080E9FC63E29F71A79A63 /* RelaySubject.m in Sources */,
 				A840803A0733D9FCA5410796 /* ActivityIndicatorRoyalSkyButton.m in Sources */,
+				A84084F47D4EA8D2B91E6609 /* SubscriptionData.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1741,7 +1748,7 @@
 				EF90D7B3204F232300228A63 /* timestamp_parse.c in Sources */,
 				EF90D7B8204F236400228A63 /* NSError+Convenience.m in Sources */,
 				EF90D7B5204F234700228A63 /* NSDate+PSIDateExtension.m in Sources */,
-				44A0CAEE1FCCCDEC00859DB3 /* Subscription.m in Sources */,
+				44A0CAEE1FCCCDEC00859DB3 /* SubscriptionVerifierService.m in Sources */,
 				EF652CDA1F352271002AFB48 /* PacketTunnelProvider.m in Sources */,
 				521FD0FF219E0E2600F748EC /* AppStats.m in Sources */,
 				4E0DCB1E1F2855FC00495781 /* PsiphonDataSharedDB.m in Sources */,
@@ -1765,6 +1772,7 @@
 				521FD100219E0E3800F748EC /* DebugUtils.m in Sources */,
 				A8408F5F45CDBDF42701063E /* Strings.m in Sources */,
 				A84081FD0C1339DE954DAB7D /* RelaySubject.m in Sources */,
+				A84082D8D7BF55D509C4E5C5 /* SubscriptionData.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
