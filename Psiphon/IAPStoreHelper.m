@@ -97,6 +97,10 @@ NSString *const kSubscriptionDictionary = @"kSubscriptionDictionary";
                     } else {
                         // The receipt contains purchase data, reset value in the shared DB.
                         [sharedDB setContainerEmptyReceiptFileSize:nil];
+
+                        // Store the expiry date (for extension's use).
+                        NSDate *expiry = receipt.inAppSubscriptions[kLatestExpirationDate];
+                        [sharedDB setContainerLastSubscriptionReceiptExpiryDate:expiry];
                     }
                 }
 
