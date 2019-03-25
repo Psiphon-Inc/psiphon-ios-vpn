@@ -93,13 +93,6 @@ typedef NS_ENUM(NSInteger, SubscriptionCheckEnum) {
 - (BOOL)isEmpty;
 
 /**
- * Persists changes made to this instance to NSUserDefaults.
- * This is a blocking function.
- * @return TRUE if data was saved to disk successfully, FALSE otherwise.
- */
-- (BOOL)persistChanges;
-
-/**
  * Checks whether there is active subscription against current time.
  * @return TRUE if subscription is active, FALSE otherwise.
  */
@@ -117,6 +110,9 @@ typedef NS_ENUM(NSInteger, SubscriptionCheckEnum) {
  * the subscription to be renewed.
  * If this method returns TRUE, current subscription information should be deemed stale, and
  * subscription verifier server should be contacted to get latest subscription information.
+ *
+ * @note This is a blocking function until the new state is persisted.
+ *
  * @return TRUE if subscription verification server should be contacted, FALSE otherwise.
  */
 - (BOOL)shouldUpdateAuthorization;
@@ -124,6 +120,9 @@ typedef NS_ENUM(NSInteger, SubscriptionCheckEnum) {
 /**
  * Convenience method for updating current subscription instance from the dictionary
  * returned by the subscription verifier server.
+ *
+ * @note This is a blocking function until the new state is persisted.
+ *
  * @param remoteAuthDict Dictionary returned from the subscription verifier server.
  * @param receiptFilesize File size of the receipt submitted to the subscription verifier server.
  */

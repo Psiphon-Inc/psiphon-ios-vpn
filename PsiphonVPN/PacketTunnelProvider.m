@@ -399,7 +399,6 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
               currentActiveAuthorization = [subscription.authorization.ID copy];
 
               [subscription updateWithRemoteAuthDict:result.remoteAuthDict submittedReceiptFilesize:result.submittedReceiptFileSize];
-              [subscription persistChanges];
 
               [PsiFeedbackLogger infoWithType:SubscriptionCheckLogType message:@"received authorization %@ expiring on %@", subscription.authorization.ID,
                   subscription.authorization.expires];
@@ -1018,7 +1017,6 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 
             // Remove persisted authorization.
             subscription.authorization = nil;
-            [subscription persistChanges];
 
             // Send value SubscriptionAuthorizationStatusRejected if subscription authorization was invalid.
             [strongSelf->subscriptionAuthorizationActiveSubject sendNext:@(SubscriptionAuthorizationStatusRejected)];

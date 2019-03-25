@@ -328,6 +328,7 @@ PsiFeedbackLogType const SubscriptionVerifierServiceLogType = @"SubscriptionVeri
     Authorization *authorization = [[Authorization alloc]
       initWithEncodedAuthorization:remoteAuthDict[kRemoteSubscriptionVerifierSignedAuthorization]];
     [self setAuthorization:authorization];
+    [self persistChanges];
 }
 
 @end
