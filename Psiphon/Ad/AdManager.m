@@ -130,9 +130,6 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
 @property (nonatomic, readwrite, nonnull) AdMobRewardedAdControllerWrapper *untunneledRewardVideo;
 @property (nonatomic, readwrite, nonnull) MoPubRewardedAdControllerWrapper *tunneledRewardVideo;
 
-// appEvents is hot infinite multicasted signal with underlying replay subject.
-@property (nonatomic, nullable) RACMulticastConnection<AppEvent *> *appEvents;
-
 @property (nonatomic, nonnull) RACCompoundDisposable *compoundDisposable;
 
 // adSDKInitMultiCast is a terminating multicasted signal that emits RACUnit only once and
@@ -141,9 +138,7 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
 
 @end
 
-@implementation AdManager {
-    Reachability *reachability;
-}
+@implementation AdManager
 
 - (instancetype)init {
     self = [super init];
@@ -171,14 +166,11 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
           initWithAdUnitID:MoPubTunneledRewardVideoAdUnitID
                    withTag:AdControllerTagMoPubTunneledRewardedVideo];
 
-        reachability = [Reachability reachabilityForInternetConnection];
-
     }
     return self;
 }
 
 - (void)dealloc {
-    [reachability stopNotifier];
     [self.compoundDisposable dispose];
 }
 
@@ -209,8 +201,6 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
 - (void)_initializeAdManager {
 
     AdManager *__weak weakSelf = self;
-
-    [reachability startNotifier];
 
     // adSDKInitConsent is cold terminating signal - Emits RACUnit and completes if all Ad SDKs are initialized and
     // consent is collected. Otherwise terminates with an error.
@@ -273,133 +263,9 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
         return nil;
     }];
 
-    // Main signals and subscription.
-    {
-        // Infinite hot signal - emits an item after the app delegate applicationWillEnterForeground: is called.
-        RACSignal *appWillEnterForegroundSignal = [[NSNotificationCenter defaultCenter]
-          rac_addObserverForName:UIApplicationWillEnterForegroundNotification object:nil];
-
-        // Infinite cold signal - emits @(TRUE) when network is reachable, @(FALSE) otherwise.
-        // Once subscribed to, starts with the current network reachability status.
-        //
-        RACSignal<NSNumber *> *reachabilitySignal = [[[[[NSNotificationCenter defaultCenter]
-          rac_addObserverForName:kReachabilityChangedNotification object:reachability]
-          map:^NSNumber *(NSNotification *note) {
-              return @(((Reachability *) note.object).currentReachabilityStatus);
-          }]
-          startWith:@([reachability currentReachabilityStatus])]
-          map:^NSNumber *(NSNumber *value) {
-              NetworkStatus s = (NetworkStatus) [value integerValue];
-              return @(s != NotReachable);
-          }];
-
-        // Infinite cold signal - emits @(TRUE) if user has an active subscription, @(FALSE) otherwise.
-        // Note: Nothing is emitted if the subscription status is unknown.
-        RACSignal<NSNumber *> *activeSubscriptionSignal = [[[AppDelegate sharedAppDelegate].subscriptionStatus
-          filter:^BOOL(NSNumber *value) {
-              UserSubscriptionStatus s = (UserSubscriptionStatus) [value integerValue];
-              return s != UserSubscriptionUnknown;
-          }]
-          map:^NSNumber *(NSNumber *value) {
-              UserSubscriptionStatus s = (UserSubscriptionStatus) [value integerValue];
-              return @(s == UserSubscriptionActive);
-          }];
-
-        // Infinite cold signal - emits events of type @(TunnelState) for various tunnel events.
-        // While the tunnel is being established or destroyed, this signal emits @(TunnelStateNeither).
-        RACSignal<NSNumber *> *tunnelConnectedSignal = [[VPNManager sharedInstance].lastTunnelStatus
-          map:^NSNumber *(NSNumber *value) {
-              VPNStatus s = (VPNStatus) [value integerValue];
-
-              if (s == VPNStatusConnected) {
-                  return @(TunnelStateTunneled);
-              } else if (s == VPNStatusDisconnected || s == VPNStatusInvalid) {
-                  return @(TunnelStateUntunneled);
-              } else {
-                  return @(TunnelStateNeither);
-              }
-          }];
-
-        // NOTE: We have to be careful that ads are requested,
-        //       loaded and the impression is registered all from the same tunneled/untunneled state.
-
-        // combinedEventSignal is infinite cold signal - Combines all app event signals,
-        // and create AppEvent object. The AppEvent emissions are as unique as `[AppEvent isEqual:]` determines.
-        RACSignal<AppEvent *> *combinedEventSignals = [[[RACSignal
-          combineLatest:@[
-            reachabilitySignal,
-            activeSubscriptionSignal,
-            tunnelConnectedSignal
-          ]]
-          map:^AppEvent *(RACTuple *eventsTuple) {
-
-              AppEvent *e = [[AppEvent alloc] init];
-              e.networkIsReachable = [((NSNumber *) eventsTuple.first) boolValue];
-              e.subscriptionIsActive = [((NSNumber *) eventsTuple.second) boolValue];
-              e.tunnelState = (TunnelState) [((NSNumber *) eventsTuple.third) integerValue];
-              return e;
-          }]
-          distinctUntilChanged];
-
-        // The underlying multicast signal emits AppEvent objects. The emissions are repeated if a "trigger" event
-        // such as "appWillForeground" happens with source set to appropriate value.
-        self.appEvents = [[[[RACSignal
-          // Merge all "trigger" signals that cause the last AppEvent from `combinedEventSignals` to be emitted again.
-          // NOTE: - It should be guaranteed that SourceEventStarted is always the first emission and that it will
-          //         be always after the Ad SDKs have been initialized.
-          //       - It should also be guaranteed that signals in the merge below are not the same as the signals
-          //         in the `combinedEventSignals`. Otherwise we would have subscribed to the same signal twice,
-          //         and since we're using the -combineLatestWith: operator, we will get the same emission repeated.
-          merge:@[
-            [RACSignal return:@(SourceEventStarted)],
-            [appWillEnterForegroundSignal mapReplace:@(SourceEventAppForegrounded)]
-          ]]
-          combineLatestWith:combinedEventSignals]
-          combinePreviousWithStart:nil reduce:^AppEvent *(RACTwoTuple<NSNumber *, AppEvent *> *_Nullable prev,
-            RACTwoTuple<NSNumber *, AppEvent *> *_Nonnull curr) {
-
-              // Infers the source signal of the current emission.
-              //
-              // Events emitted by the signal that we combine with (`combinedEventSignals`) are unique,
-              // and therefore the AppEvent state that is different between `prev` and `curr` is also the source.
-              // If `prev` and `curr` AppEvent are the same, then the "trigger" signal is one of the merged signals
-              // upstream.
-
-              AppEvent *_Nullable pe = prev.second;
-              AppEvent *_Nonnull ce = curr.second;
-
-              if (pe == nil || [pe isEqual:ce]) {
-                  // Event source is not from the change in AppEvent properties and so not from `combinedEventSignals`.
-                  ce.source = (SourceEvent) [curr.first integerValue];
-              } else {
-
-                  // Infer event source based on changes in values.
-                  if (pe.networkIsReachable != ce.networkIsReachable) {
-                      ce.source = SourceEventReachability;
-
-                  } else if (pe.subscriptionIsActive != ce.subscriptionIsActive) {
-                      ce.source = SourceEventSubscription;
-
-                  } else if (pe.tunnelState != ce.tunnelState) {
-                      ce.source = SourceEventTunneled;
-                  }
-              }
-
-              return ce;
-          }]
-          multicast:[RACReplaySubject replaySubjectWithCapacity:1]];
-
-#if DEBUG
-        [self.compoundDisposable addDisposable:[self.appEvents.signal subscribeNext:^(AppEvent * _Nullable x) {
-            LOG_DEBUG(@"\n%@", [x debugDescription]);
-        }]];
-#endif
-
-    }
-
     // Ad SDK initialization
     {
-        self.adSDKInitMultiCast = [[[[[[[self.appEvents.signal filter:^BOOL(AppEvent *event) {
+        self.adSDKInitMultiCast = [[[[[[[[AppDelegate sharedAppDelegate].appEvents.signal filter:^BOOL(AppEvent *event) {
               // Initialize Ads SDK if network is reachable, and device is either tunneled or untunneled, and the
               // user is not a subscriber.
               return (event.networkIsReachable &&
@@ -462,7 +328,7 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
     // Updating AdManager "ad is ready" (untunneledInterstitialCanPresent, rewardedVideoCanPresent) properties.
     {
         [self.compoundDisposable addDisposable:
-          [[[self.appEvents.signal map:^RACSignal<NSNumber *> *(AppEvent *appEvent) {
+          [[[[AppDelegate sharedAppDelegate].appEvents.signal map:^RACSignal<NSNumber *> *(AppEvent *appEvent) {
 
               if (appEvent.tunnelState == TunnelStateUntunneled && appEvent.networkIsReachable) {
 
@@ -474,7 +340,7 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
           subscribe:self.untunneledInterstitialLoadStatus]];
 
         [self.compoundDisposable addDisposable:
-          [[[self.appEvents.signal map:^RACSignal<NSNumber *> *(AppEvent *appEvent) {
+          [[[[AppDelegate sharedAppDelegate].appEvents.signal map:^RACSignal<NSNumber *> *(AppEvent *appEvent) {
 
               if (appEvent.networkIsReachable) {
 
@@ -495,7 +361,7 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
     // Calls connect on the multicast connection object to start the subscription to the underlying signal.
     // This call is made after all subscriptions to the underlying signal are made, since once connected to,
     // the underlying signal turns into a hot signal.
-    [self.compoundDisposable addDisposable:[self.appEvents connect]];
+    [self.compoundDisposable addDisposable:[[AppDelegate sharedAppDelegate].appEvents connect]];
 
 }
 
@@ -556,7 +422,7 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
 // Note: `adControllerBlock` should return `nil` if the TunnelState is not in the appropriate state.
 - (RACSignal<NSNumber *> *)presentAdHelper:(RACSignal<NSNumber *> *(^_Nonnull)(TunnelState tunnelState))adControllerBlock {
 
-    return [[[self.appEvents.signal take:1]
+    return [[[[AppDelegate sharedAppDelegate].appEvents.signal take:1]
       flattenMap:^RACSignal<NSNumber *> *(AppEvent *event) {
 
           // Ads are loaded based on app event condition at the time of load, and unloaded during certain app events
@@ -606,12 +472,12 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
     NSString * const TriggerForceRewardedVideoLoad = @"TriggerForceRewardedVideoLoad";
 
     RACSignal<NSString *> *triggers = [RACSignal merge:@[
-      [self.appEvents.signal mapReplace:TriggerAppEvent],
+      [[AppDelegate sharedAppDelegate].appEvents.signal mapReplace:TriggerAppEvent],
       [adController.presentedAdDismissed mapReplace:TriggerPresentedAdDismissed],
     ]];
 
     // Max number of ad load retries.
-    NSInteger adLoadMaxRetries;
+    NSInteger adLoadMaxRetries = 0;
 
     if (AdFormatRewardedVideo == adController.adFormat) {
 
@@ -632,7 +498,7 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
     }
 
     RACSignal<RACTwoTuple<AdControllerTag, AppEventActionTuple *> *> *adLoadUnloadSignal =
-      [[[[[triggers withLatestFrom:self.appEvents.signal]
+      [[[[[triggers withLatestFrom:[AppDelegate sharedAppDelegate].appEvents.signal]
       map:^AppEventActionTuple *(RACTwoTuple<NSString *, AppEvent *> *tuple) {
 
           // In disambiguating the source of the event emission:
@@ -657,7 +523,7 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
 
               AppEventActionTuple *__weak weakSa = sa;
 
-              sa.stopCondition = [self.appEvents.signal filter:^BOOL(AppEvent *current) {
+              sa.stopCondition = [[AppDelegate sharedAppDelegate].appEvents.signal filter:^BOOL(AppEvent *current) {
                   // Since `sa` already holds a strong reference to this block, the block
                   // should only hold a weak reference to `sa`.
                   AppEventActionTuple *__strong strongSa = weakSa;
