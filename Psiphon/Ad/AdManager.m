@@ -357,12 +357,6 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
           switchToLatest]
           subscribe:self.rewardedVideoLoadStatus]];
     }
-
-    // Calls connect on the multicast connection object to start the subscription to the underlying signal.
-    // This call is made after all subscriptions to the underlying signal are made, since once connected to,
-    // the underlying signal turns into a hot signal.
-    [self.compoundDisposable addDisposable:[[AppDelegate sharedAppDelegate].appEvents connect]];
-
 }
 
 // This should be called only once during application at application load time
@@ -471,27 +465,30 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
     NSString * const TriggerPsiCashRewardedActivityDataUpdated = @"TriggerPsiCashRewardedActivityDataUpdated";
     NSString * const TriggerForceRewardedVideoLoad = @"TriggerForceRewardedVideoLoad";
 
-    RACSignal<NSString *> *triggers = [RACSignal merge:@[
-      [[AppDelegate sharedAppDelegate].appEvents.signal mapReplace:TriggerAppEvent],
-      [adController.presentedAdDismissed mapReplace:TriggerPresentedAdDismissed],
-    ]];
+    RACSignal<NSString *> *triggers;
 
     // Max number of ad load retries.
     NSInteger adLoadMaxRetries = 0;
 
     if (AdFormatRewardedVideo == adController.adFormat) {
-
         adLoadMaxRetries = 0;
 
-        // Rewarded video ads have an additional force rewarded video load trigger.
-        triggers = [triggers merge:[self.forceRewardedVideoLoad mapReplace:TriggerForceRewardedVideoLoad]];
+        // Setup triggers for rewarded video ads.
+        triggers = [self.forceRewardedVideoLoad mapReplace:TriggerForceRewardedVideoLoad];
 
         if (waitForPsiCashRewardedActivityData) {
             triggers = [triggers merge:[[PsiCashClient sharedInstance].rewardedActivityDataSignal
               mapReplace:TriggerPsiCashRewardedActivityDataUpdated]];
         }
+
     } else if (AdFormatInterstitial == adController.adFormat) {
         adLoadMaxRetries = 1;
+
+        // Setup triggers for interstitial ads.
+        triggers = [RACSignal merge:@[
+          [[AppDelegate sharedAppDelegate].appEvents.signal mapReplace:TriggerAppEvent],
+          [adController.presentedAdDismissed mapReplace:TriggerPresentedAdDismissed],
+        ]];
 
     } else {
         PSIAssert(FALSE);
@@ -541,28 +538,40 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
                   // For rewarded video take no loading action if custom data is missing.
                   if (adController.adFormat == AdFormatRewardedVideo && waitForPsiCashRewardedActivityData) {
                       NSString *_Nullable customData = [[PsiCashClient sharedInstance]
-                                                         rewardedVideoCustomData];
+                                                                       rewardedVideoCustomData];
                       if (!customData) {
                           sa.action = AdLoadActionNone;
                           return sa;
                       }
                   }
 
-                  if ([TriggerPresentedAdDismissed isEqualToString:triggerSignalName]) {
-                      // The user has just finished viewing the ad.
-                      sa.action = afterPresentationLoadAction;
+                  // Decide action for interstitial ad.
+                  if (adController.adFormat == AdFormatInterstitial) {
 
-                  } else if (event.source == SourceEventStarted) {
-                      // The app has just been launched, don't delay the ad load.
-                      sa.action = AdLoadActionImmediate;
+                      if (event.source == SourceEventStarted) {
+                          // The app has just been launched, don't delay the ad load.
+                          sa.action = AdLoadActionImmediate;
 
-                  } else if ([TriggerForceRewardedVideoLoad isEqualToString:triggerSignalName]) {
-                      // This is a forced load.
-                      sa.action = AdLoadActionImmediate;
+                      } else if ([TriggerForceRewardedVideoLoad isEqualToString:triggerSignalName]) {
+                          // This is a forced load.
+                          sa.action = AdLoadActionImmediate;
+
+                      } else {
+                          // For all the other event sources, load the ad after a delay.
+                          sa.action = AdLoadActionDelayed;
+                      }
+
+                      // Decide action for rewarded video ad.
+                  } else if (adController.adFormat == AdFormatRewardedVideo) {
+
+                      if ([TriggerForceRewardedVideoLoad isEqualToString:triggerSignalName]) {
+                          // This is a forced load.
+                          sa.action = AdLoadActionImmediate;
+
+                      }
 
                   } else {
-                      // For all the other event sources, load the ad after a delay.
-                      sa.action = AdLoadActionDelayed;
+                      PSIAssert(FALSE);
                   }
               }
           }
