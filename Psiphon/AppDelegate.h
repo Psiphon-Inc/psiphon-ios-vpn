@@ -18,8 +18,10 @@
  */
 
 #import <UIKit/UIKit.h>
+#import "AppEvent.h"
 
 @class RACReplaySubject<ValueType>;
+@class RACMulticastConnection<__covariant ValueType>;
 
 /**
  * User's subscription status.
@@ -36,6 +38,9 @@ typedef NS_ENUM(NSInteger, UserSubscriptionStatus) {
 @interface AppDelegate : UIResponder <UIApplicationDelegate>
 
 @property (strong, nonatomic) UIWindow *window;
+
+// appEvents is hot infinite multicasted signal with underlying replay subject.
+@property (nonatomic, nullable, readonly) RACMulticastConnection<AppEvent *> *appEvents;
 
 /**
  * subscriptionStatus emits an item of type `UserSubscriptionStatus` wrapped in NSNumber.
