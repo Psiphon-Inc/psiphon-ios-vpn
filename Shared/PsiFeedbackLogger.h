@@ -60,6 +60,13 @@ typedef NSString * PsiFeedbackLogType;
 
 + (NSDictionary *_Nonnull)unpackError:(NSError *_Nullable)error;
 
+/**
+ * Converts object to a type that's valid for JSON.
+ *
+ * - Converts nil to NSNull.null.
+ * - Converts NSDate to RFC3339 NSString.
+ *
+ */
 + (id _Nonnull)safeValue:(id _Nullable)value;
 
 @end
