@@ -21,6 +21,7 @@
 #import "Authorization.h"
 #import "RACSignal.h"
 #import "RACSubscriber.h"
+#import "MutableSubscriptionData.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -46,6 +47,15 @@ typedef NS_ERROR_ENUM(ReceiptValidationErrorDomain, PsiphonReceiptValidationErro
 
 @interface SubscriptionVerifierService : NSObject
 
+/**
+ * Create a signal that returns an item of type SubscriptionCheckEnum.
+ * The value returned only reflects subscription information available locally, and should be combined
+ * with other sources of information regarding subscription authorization validity to determine
+ * if the authorization is valid or whether the subscription verifier server needs to contacted.
+ * @return Returns a signal that emits one of SubscriptionCheckEnum enums and then completes immediately.
+ */
++ (RACSignal<NSNumber *> *)localSubscriptionCheck;
+
 + (RACSignal<RACTwoTuple<NSDictionary *, NSNumber *> *> *)updateAuthorizationFromRemote;
 
 @end
@@ -57,79 +67,6 @@ typedef NS_ENUM(NSInteger, SubscriptionCheckEnum) {
     SubscriptionCheckAuthorizationExpired,
 };
 
-@interface Subscription : NSObject <UserDefaultsModelProtocol>
-
-/** App Store subscription receipt file size. */
-@property (nonatomic, nullable, readwrite) NSNumber *appReceiptFileSize;
-
-/**
- * App Store subscription pending renewal info details.
- * https://developer.apple.com/library/content/releasenotes/General/ValidateAppStoreReceipt/Chapters/ValidateRemotely.html#//apple_ref/doc/uid/TP40010573-CH104-SW2
- */
-@property (nonatomic, nullable, readwrite) NSArray * pendingRenewalInfo;
-
-@property (nonatomic, nullable, readwrite) Authorization * authorization;
-
-/**
- * Create a signal that returns an item of type SubscriptionCheckEnum.
- * The value returned only reflects subscription information available locally, and should be combined
- * with other sources of information regarding subscription authorization validity to determine
- * if the authorization is valid or whether the subscription verifier server needs to contacted.
- * @return Returns a signal that emits one of SubscriptionCheckEnum enums and then completes immediately.
- */
-+ (RACSignal<NSNumber *> *)localSubscriptionCheck;
-
-/**
- * Reads NSUserDefaults and wraps the result in an Authorizations instance.
- * The underlying dictionary can only be manipulated by changing the properties of this instance.
- * @attention -persistChanges should be called to persist any changes made to the returned instance to disk.
- * @return An instance of Authorizations class.
- */
-+ (Subscription *)fromPersistedDefaults;
-
-/**
- * @return TRUE if underlying dictionary is empty.
- */
-- (BOOL)isEmpty;
-
-/**
- * Persists changes made to this instance to NSUserDefaults.
- * This is a blocking function.
- * @return TRUE if data was saved to disk successfully, FALSE otherwise.
- */
-- (BOOL)persistChanges;
-
-/**
- * Checks whether there is active subscription against current time.
- * @return TRUE if subscription is active, FALSE otherwise.
- */
-- (BOOL)hasActiveSubscriptionForNow;
-
-/**
- * Returns TRUE if subscription authorization is active compared to provided date.
- * @param date Date to compare the authorization expiration to.
- * @return TRUE if subscription is active, FALSE otherwise.
- */
-- (BOOL)hasActiveAuthorizationForDate:(NSDate *)date;
-
-/**
- * Returns TRUE if Subscription info is missing, the App Store receipt has changed, or we expect
- * the subscription to be renewed.
- * If this method returns TRUE, current subscription information should be deemed stale, and
- * subscription verifier server should be contacted to get latest subscription information.
- * @return TRUE if subscription verification server should be contacted, FALSE otherwise.
- */
-- (BOOL)shouldUpdateAuthorization;
-
-/**
- * Convenience method for updating current subscription instance from the dictionary
- * returned by the subscription verifier server.
- * @param remoteAuthDict Dictionary returned from the subscription verifier server.
- * @param receiptFilesize File size of the receipt submitted to the subscription verifier server.
- */
-- (void)updateWithRemoteAuthDict:(NSDictionary *_Nullable)remoteAuthDict submittedReceiptFilesize:(NSNumber *)receiptFilesize;
-
-@end
 
 #pragma mark - Subscription Result Model
 
@@ -166,7 +103,7 @@ typedef NS_ERROR_ENUM(SubscriptionResultErrorDomain, SubscriptionResultErrorCode
  */
 @interface SubscriptionState : NSObject
 
-+ (SubscriptionState *)initialStateFromSubscription:(Subscription *)subscription;
++ (SubscriptionState *)initialStateFromSubscription:(MutableSubscriptionData *)subscription;
 
 - (BOOL)isSubscribedOrInProgress;
 
