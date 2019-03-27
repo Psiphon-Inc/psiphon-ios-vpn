@@ -33,19 +33,3 @@
  *
  */
 typedef NSString * UserDefaultsKey;
-
-
-/**
- * Protocol for model objects that store their data using NSUserDefaults.
- */
-@protocol UserDefaultsModelProtocol
-
-@required
-
-+ (id _Nonnull)fromPersistedDefaults;
-
-- (BOOL)isEmpty;
-
-- (BOOL)persistChanges;
-
-@end
