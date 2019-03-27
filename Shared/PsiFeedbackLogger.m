@@ -499,7 +499,12 @@ PsiFeedbackLogType const FeedbackInternalLogType = @"FeedbackLoggerInternal";
 }
 
 + (id _Nonnull)safeValue:(id _Nullable)value {
-    return value ? value : NSNull.null;
+    if (value == nil) {
+        return NSNull.null;
+    } else if ([value isKindOfClass:[NSDate class]]) {
+        return [value RFC3339String];
+    }
+    return value;
 }
 
 @end
