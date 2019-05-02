@@ -53,13 +53,18 @@ class PsiphonUITests: XCTestCase {
         // Use recording to get started writing UI tests.
         // Use XCTAssert and related functions to verify your tests produce the correct results.
         snapshot("main")
-        XCUIApplication().buttons["settings"].tap()
-        snapshot("settings")
-        XCUIApplication().cells.element(boundBy: 2).tap() // Region
+
+        XCUIApplication().buttons["regionSelectionButton"].tap() // Go to region selection
         snapshot("settings-region")
-        XCUIApplication().navigationBars.buttons.element(boundBy: 0).tap()
-        XCUIApplication().cells.element(boundBy: 3).tap() // Language
+        XCUIApplication().navigationBars.buttons.element(boundBy: 0).tap() // Back to main screen
+
+
+        XCUIApplication().buttons["settings"].tap() // Go to settings
+        snapshot("settings")
+
+        XCUIApplication().cells.element(boundBy: 3).tap() // Go to language selection screen
         snapshot("settings-language")
-        XCUIApplication().navigationBars.buttons.element(boundBy: 0).tap()
+
+        XCUIApplication().navigationBars.buttons.element(boundBy: 0).tap() // Back to main screen
     }
 }
