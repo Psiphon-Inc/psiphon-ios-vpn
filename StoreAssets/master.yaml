@@ -6,7 +6,7 @@ en:
   # The name of the app, as it appears in the App Store
   app_name: Psiphon
 
-  # The "subtitle" for the app, which appears under the app name in the App Store
+  # The "subtitle" for the app, which appears under the app name in the App Store. Due to App Store restrictions, this cannot be longer than 30 characters.
   subtitle: Beyond Borders
 
   # The description of the App, as it appears in the App Store. Note that the "bullets" must be the character -- • -- and not an HTML entity like &bull;.
