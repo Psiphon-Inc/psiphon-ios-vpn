@@ -267,7 +267,7 @@
 "PSICASH_SPEED_BOOST_PURCHASE_FAILED_SERVER_ERROR" = "Server error. Please try again in a few minutes.";
 
 /* Alert error message informing user that their Speed Boost purchase request failed because of an unknown error. Note: 'PsiCash' should not be translated or transliterated. */
-"PSICASH_SPEED_BOOST_PURCHASE_FAILED_UNEXPECTED_CODE" = "Invalid or unexpected status code returned from PsiCash library.";
+"PSICASH_SPEED_BOOST_PURCHASE_FAILED_UNEXPECTED_CODE_2" = "PsiCash error. Please try updating or reinstalling the app.";
 
 /* Text which appears in the Speed Boost meter when the user has not gone through the PsiCash onboarding. Please keep this text concise as the width of the text box is restricted in size. 'PsiCash' should not be translated or transliterated. */
 "PSICASH_SPEED_BOOST_USER_NOT_ONBOARDED_TEXT" = "Learn about PsiCash";
