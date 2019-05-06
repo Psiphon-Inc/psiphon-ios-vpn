@@ -414,9 +414,7 @@ typedef NS_ERROR_ENUM(PsiCashClientRefreshStateErrorDomain, PsiCashClientRefresh
 
                 } else if (result.status == PsiCashStatus_InsufficientBalance) {
 
-                    NSString *s = NSLocalizedStringWithDefaultValue(@"PSICASH_SPEED_BOOST_PURCHASE_FAILED_INSUFFICIENT_FUNDS", nil, [NSBundle mainBundle], @"Insufficient balance for Speed Boost purchase. Price:", @"Alert error message informing user that their Speed Boost purchase request failed because they have an insufficient balance. Required price in PsiCash will be appended after the colon. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed.");
-                    s = [s stringByAppendingString:[NSString stringWithFormat:@" %@",
-                                            [PsiCashClientModel formattedBalance:psiCash.balance]]];
+                    NSString *s = NSLocalizedStringWithDefaultValue(@"PSICASH_SPEED_BOOST_PURCHASE_FAILED_INSUFFICIENT_FUNDS_2", nil, [NSBundle mainBundle], @"Insufficient balance for Speed Boost purchase.", @"Alert error message informing user that their Speed Boost purchase request failed because they have an insufficient balance. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed.");
 
                     e = [NSError errorWithDomain:PsiCashClientLibraryErrorDomain
                                             code:result.status
@@ -482,7 +480,7 @@ typedef NS_ERROR_ENUM(PsiCashClientRefreshStateErrorDomain, PsiCashClientRefresh
                 } else {
                     e = [NSError errorWithDomain:PsiCashClientLibraryErrorDomain
                                             code:result.status
-                         andLocalizedDescription:NSLocalizedStringWithDefaultValue(@"PSICASH_SPEED_BOOST_PURCHASE_FAILED_UNEXPECTED_CODE", nil, [NSBundle mainBundle], @"Invalid or unexpected status code returned from PsiCash library.", @"Alert error message informing user that their Speed Boost purchase request failed because of an unknown error. Note: 'PsiCash' should not be translated or transliterated.")];
+                         andLocalizedDescription:NSLocalizedStringWithDefaultValue(@"PSICASH_SPEED_BOOST_PURCHASE_FAILED_UNEXPECTED_CODE_2", nil, [NSBundle mainBundle], @"PsiCash error. Please try updating or reinstalling the app.", @"Alert error message informing user that their Speed Boost purchase request failed because of an unknown error. Note: 'PsiCash' should not be translated or transliterated.")];
                 }
 
                 if (e != nil) {
