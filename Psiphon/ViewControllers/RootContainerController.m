@@ -35,6 +35,7 @@
 
 #import <ReactiveObjC/RACSignal.h>
 #import "RootContainerController.h"
+#import "AppInfo.h"
 #import "LaunchScreenViewController.h"
 #import "Logging.h"
 #import "ContainerDB.h"
@@ -77,7 +78,14 @@
 
     ContainerDB *containerDB = [[ContainerDB alloc] init];
 
-    if (![containerDB hasFinishedOnboarding]) {
+#if DEBUG
+    if ([AppInfo runningUITest]) {
+        [self switchToMainScreenAndStartVPN:FALSE];
+        return;
+    }
+#endif
+    
+    if (FALSE && ![containerDB hasFinishedOnboarding]) {
         [self switchToOnboarding];
     } else {
         [self switchToMainScreenAndStartVPN:FALSE];
