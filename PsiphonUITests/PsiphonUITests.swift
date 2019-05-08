@@ -33,7 +33,9 @@ class PsiphonUITests: XCTestCase {
         let app = XCUIApplication()
 
         var launchEnv = app.launchEnvironment
-        launchEnv["PsiphonUITestEnvironment"] = "State:Connected"
+        launchEnv["PsiphonUITestEnvironment.runningUITest"] = "1"
+        launchEnv["PsiphonUITestEnvironment.disableAnimations"] = "1"
+
         app.launchEnvironment = launchEnv
 
         setupSnapshot(app)
