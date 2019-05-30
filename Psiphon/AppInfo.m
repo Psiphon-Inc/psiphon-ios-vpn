@@ -17,6 +17,8 @@
  *
  */
 
+#import <UIKit/UIKit.h>
+
 #import "AppInfo.h"
 #import "Asserts.h"
 #import "PsiphonConfigReader.h"
@@ -69,8 +71,13 @@ UserDefaultsKey const AppInfoFastLaneSnapShotBoolKey = @"FASTLANE_SNAPSHOT";
     dispatch_once(&once, ^{
         if ([[NSUserDefaults standardUserDefaults] boolForKey:AppInfoFastLaneSnapShotBoolKey]) {
             NSDictionary *environmentDictionary = [[NSProcessInfo processInfo] environment];
-            if (environmentDictionary[@"PsiphonUITestEnvironment"] != nil) {
+
+            if ([environmentDictionary[@"PsiphonUITestEnvironment.runningUITest"] isEqualToString:@"1"]) {
                 runningUITest = TRUE;
+            }
+
+            if ([environmentDictionary[@"PsiphonUITestEnvironment.disableAnimations"] isEqualToString:@"1"]) {
+                [UIView setAnimationsEnabled:FALSE];
             }
         }
     });

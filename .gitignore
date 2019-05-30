@@ -48,6 +48,8 @@ Pods
 
 # fastlane screenshots
 screenshots
+report.xml
+Preview.html
 
 psiphon_config
 embedded_server_entries
