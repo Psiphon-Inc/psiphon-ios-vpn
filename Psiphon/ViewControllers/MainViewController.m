@@ -317,7 +317,9 @@ NSString * const CommandStopVPN = @"StopVPN";
 
               // TODO: Add custom initialization method to PsiCash
               [[PsiCashClient sharedInstance] scheduleRefreshState];
+
               [[AdManager sharedInstance] initializeAdManager];
+              [[AdManager sharedInstance] initializeRewardedVideos];
           }]
           subscribeError:^(NSError *error) {
               [weakSelf.compoundDisposable removeDisposable:startDisposable];
@@ -1201,14 +1203,18 @@ NSString * const CommandStopVPN = @"StopVPN";
 
     [self.compoundDisposable addDisposable:psiCashViewUpdates];
 
-    [self.compoundDisposable addDisposable:[[[AdManager sharedInstance].rewardedVideoLoadStatus
-      combineLatestWith:PsiCashClient.sharedInstance.clientModelSignal]
-      subscribeNext:^(RACTwoTuple<NSNumber *, PsiCashClientModel *> *tuple) {
+    [self.compoundDisposable addDisposable:[[RACSignal combineLatest:@[
+        [AppDelegate sharedAppDelegate].appEvents.signal,
+        [AdManager sharedInstance].rewardedVideoLoadStatus,
+        PsiCashClient.sharedInstance.clientModelSignal
+      ]]
+      subscribeNext:^(RACTuple *tuple) {
           MainViewController *__strong strongSelf = weakSelf;
           if (strongSelf != nil) {
 
-              AdLoadStatus adStatus = (AdLoadStatus) [tuple.first integerValue];
-              PsiCashClientModel *model = tuple.second;
+              AppEvent *appEvent = tuple.first;
+              AdLoadStatus adStatus = (AdLoadStatus) [tuple.second integerValue];
+              PsiCashClientModel *model = tuple.third;
 
               // Disable rewarded video button if the user has no earner token,
               // otherwise enable the button if the button has not been tapped yet,
@@ -1216,37 +1222,34 @@ NSString * const CommandStopVPN = @"StopVPN";
               if (![model.authPackage hasEarnerToken]) {
                   [strongSelf->psiCashView.rewardedVideoButton setState:AIRSBStateDisabled];
 
-              // The user has an earner token.
+                  // The user has an earner token.
               } else {
 
-                  // User hasn't tapped the rewarded video button yet.
-                  if (!strongSelf->psiCashView.rewardedVideoButtonTappedOnce) {
-                      [strongSelf->psiCashView.rewardedVideoButton setState:AIRSBStateNormal];
+                  AIRSBState newState = AIRSBStateDisabled;
 
-                  // User has tapped the rewarded video button before.
-                  } else {
+                  switch (adStatus) {
+                      case AdLoadStatusNone:
 
-                      AIRSBState newState = AIRSBStateDisabled;
-
-                      switch (adStatus) {
-                          case AdLoadStatusNone:
-                              newState = AIRSBStateDisabled;
-                              break;
-                          case AdLoadStatusInProgress:
-                              newState = AIRSBStateAnimating;
-                              break;
-                          case AdLoadStatusDone:
+                          // The button should be in normal state in order to load an ad.
+                          // We will set the button state to disable only when tunnel state is being switched.
+                          if (appEvent.tunnelState != TunnelStateNeither) {
                               newState = AIRSBStateNormal;
-                              break;
-                          case AdLoadStatusError:
-                              newState = AIRSBStateRetry;
-                              break;
-                          default:
-                              PSIAssert(FALSE);
-                      }
-
-                      [strongSelf->psiCashView.rewardedVideoButton setState:newState];
+                          }
+                          break;
+                      case AdLoadStatusInProgress:
+                          newState = AIRSBStateAnimating;
+                          break;
+                      case AdLoadStatusDone:
+                          newState = AIRSBStateNormal;
+                          break;
+                      case AdLoadStatusError:
+                          newState = AIRSBStateRetry;
+                          break;
+                      default:
+                          PSIAssert(FALSE);
                   }
+
+                  [strongSelf->psiCashView.rewardedVideoButton setState:newState];
               }
 
 #if DEBUG
@@ -1256,7 +1259,7 @@ NSString * const CommandStopVPN = @"StopVPN";
               }
 #endif
           }
-    }]];
+      }]];
 
     [psiCashView.rewardedVideoButton addTarget:self
                                         action:@selector(showRewardedVideo)
@@ -1309,55 +1312,36 @@ NSString * const CommandStopVPN = @"StopVPN";
 
     LOG_DEBUG(@"rewarded video started");
 
-    RACDisposable *__block disposable = [[[[[[[[RACSignal return:@(psiCashView.rewardedVideoButtonTappedOnce)]
-      doNext:^(NSNumber *tappedOnce) {
-          MainViewController *__strong strongSelf = weakSelf;
-          if (strongSelf != nil) {
+    RACDisposable *__block disposable = [[[[[[[[[[AdManager sharedInstance].rewardedVideoLoadStatus
+      scanWithStart:nil reduce:^id(NSNumber *_Nullable running, NSNumber *next) {
 
-              // Set that rewarded video button has been tapped once.
-              if (![tappedOnce boolValue]) {
-                  strongSelf->psiCashView.rewardedVideoButtonTappedOnce = TRUE;
-                  [strongSelf.adManager initializeRewardedVideos];
-              }
+          // If the observable chain starts with an error, force load an ad.
+          // Pretend the load status is `AdLoadStatusInProgress` after force loading an ad.
+          if (!running) {
+              dispatch_async_main(^{
+                 [[AdManager sharedInstance].forceRewardedVideoLoad sendNext:RACUnit.defaultUnit];
+              });
+              return @(AdLoadStatusInProgress);
           }
+          return next;
       }]
-      flattenMap:^RACSignal<NSNumber *> *(NSNumber *tappedOnce) {
-
+      filter:^BOOL(NSNumber *adLoadStatusObj) {
+          AdLoadStatus s = (AdLoadStatus) [adLoadStatusObj integerValue];
+          // Filter terminating states.
+          return (AdLoadStatusDone == s) || (AdLoadStatusError == s);
+      }]
+      take:1]
+      flattenMap:^RACSignal *(NSNumber *adLoadStatusObj) {
           MainViewController *__strong strongSelf = weakSelf;
-          if (strongSelf != nil) {
 
+          AdLoadStatus s = (AdLoadStatus) [adLoadStatusObj integerValue];
+          if (strongSelf && AdLoadStatusDone == s) {
               NSString *customData = [[PsiCashClient sharedInstance] rewardedVideoCustomData];
-
-              return [[[[[AdManager sharedInstance].rewardedVideoLoadStatus
-                scanWithStart:nil reduce:^id(NSNumber *_Nullable running, NSNumber *next) {
-                    AdLoadStatus s = (AdLoadStatus) [next integerValue];
-
-                    // If the observable chain starts with an error, force load an ad.
-                    // Pretend the load status is `AdLoadStatusInProgress` after force loading an ad.
-                    if (!running && s == AdLoadStatusError) {
-                        [[AdManager sharedInstance].forceRewardedVideoLoad sendNext:RACUnit.defaultUnit];
-                        return @(AdLoadStatusInProgress);
-                    }
-                    return next;
-                }]
-                filter:^BOOL(NSNumber *adLoadStatusObj) {
-                    AdLoadStatus s = (AdLoadStatus) [adLoadStatusObj integerValue];
-                    // Filter terminating states.
-                    return (AdLoadStatusDone == s) || (AdLoadStatusError == s);
-                }]
-                take:1]
-                flattenMap:^RACSignal *(NSNumber *adLoadStatusObj) {
-                    AdLoadStatus s = (AdLoadStatus) [adLoadStatusObj integerValue];
-                    if (AdLoadStatusDone == s) {
-                        return [[AdManager sharedInstance] presentRewardedVideoOnViewController:strongSelf
-                                                                                 withCustomData:customData];
-                    } else {
-                        return [RACSignal empty];
-                    }
-                }];
+              return [[AdManager sharedInstance] presentRewardedVideoOnViewController:strongSelf
+                                                                       withCustomData:customData];
+          } else {
+              return [RACSignal empty];
           }
-
-          return [RACSignal empty];
       }]
       doNext:^(NSNumber *adPresentationEnum) {
           // Logs current AdPresentation enum value.
