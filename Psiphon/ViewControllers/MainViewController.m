@@ -579,6 +579,8 @@ NSString * const CommandStopVPN = @"StopVPN";
 }
 
 - (void)setupSettingsButton {
+    settingsButton.accessibilityIdentifier = @"settings"; // identifier for UI Tests
+
     UIImage *gearTemplate = [UIImage imageNamed:@"GearDark"];
     settingsButton.translatesAutoresizingMaskIntoConstraints = NO;
     [settingsButton setImage:gearTemplate forState:UIControlStateNormal];
@@ -1278,6 +1280,8 @@ NSString * const CommandStopVPN = @"StopVPN";
                    andPendingPurchases:nil
            andActiveSpeedBoostPurchase:nil
                      andRefreshPending:NO];
+
+        m.onboarded = TRUE;
 
         [psiCashView bindWithModel:m];
     }
