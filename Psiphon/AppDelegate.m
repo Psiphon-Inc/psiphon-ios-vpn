@@ -43,6 +43,8 @@
 #import "NEBridge.h"
 #import "DispatchUtils.h"
 #import "PsiFeedbackLogger.h"
+#import "RACMulticastConnection.h"
+#import "AppEvent.h"
 #import "RACSignal.h"
 #import "RACSignal+Operations2.h"
 #import "NSError+Convenience.h"
@@ -54,6 +56,7 @@
 #import "PsiCashTypes.h"
 #import "ContainerDB.h"
 #import "AppUpgrade.h"
+#import "AppEvent.h"
 
 // Number of seconds to wait for tunnel status to become "Connected", after the landing page notification
 // is received from the extension.
@@ -73,6 +76,8 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
 
 // Public properties
 
+@property (nonatomic, nullable, readwrite) RACMulticastConnection<AppEvent *> *appEvents;
+
 // subscriptionStatus should only be sent events to from the main thread.
 // Emits type UserSubscriptionStatus
 @property (nonatomic, readwrite) RACReplaySubject<NSNumber *> *subscriptionStatus;
@@ -91,6 +96,7 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
 
 @implementation AppDelegate {
     RootContainerController *rootContainerController;
+    Reachability *reachability;
 }
 
 - (instancetype)init {
@@ -105,11 +111,14 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
         _compoundDisposable = [RACCompoundDisposable compoundDisposable];
 
         _checkExtensionNetworkConnectivityFailedSubject = [RACSubject subject];
+
+        reachability = [Reachability reachabilityForInternetConnection];
     }
     return self;
 }
 
 - (void)dealloc {
+    [reachability stopNotifier];
     [self.compoundDisposable dispose];
 }
 
@@ -150,6 +159,135 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
     LOG_DEBUG();
 
     __weak AppDelegate *weakSelf = self;
+
+    // App events signal.
+    {
+
+        [reachability startNotifier];
+
+        // Infinite hot signal - emits an item after the app delegate applicationWillEnterForeground: is called.
+        RACSignal *appWillEnterForegroundSignal = [[NSNotificationCenter defaultCenter]
+                                                                         rac_addObserverForName:UIApplicationWillEnterForegroundNotification object:nil];
+
+        // Infinite cold signal - emits @(TRUE) when network is reachable, @(FALSE) otherwise.
+        // Once subscribed to, starts with the current network reachability status.
+        //
+        RACSignal<NSNumber *> *reachabilitySignal = [[[[[NSNotificationCenter defaultCenter]
+                                                                              rac_addObserverForName:kReachabilityChangedNotification object:reachability]
+                                                                              map:^NSNumber *(NSNotification *note) {
+                                                                                  return @(((Reachability *) note.object).currentReachabilityStatus);
+                                                                              }]
+                                                                              startWith:@([reachability currentReachabilityStatus])]
+                                                                              map:^NSNumber *(NSNumber *value) {
+                                                                                  NetworkStatus s = (NetworkStatus) [value integerValue];
+                                                                                  return @(s != NotReachable);
+                                                                              }];
+
+        // Infinite cold signal - emits @(TRUE) if user has an active subscription, @(FALSE) otherwise.
+        // Note: Nothing is emitted if the subscription status is unknown.
+        RACSignal<NSNumber *> *activeSubscriptionSignal = [[[AppDelegate sharedAppDelegate].subscriptionStatus
+          filter:^BOOL(NSNumber *value) {
+              UserSubscriptionStatus s = (UserSubscriptionStatus) [value integerValue];
+              return s != UserSubscriptionUnknown;
+          }]
+          map:^NSNumber *(NSNumber *value) {
+              UserSubscriptionStatus s = (UserSubscriptionStatus) [value integerValue];
+              return @(s == UserSubscriptionActive);
+          }];
+
+        // Infinite cold signal - emits events of type @(TunnelState) for various tunnel events.
+        // While the tunnel is being established or destroyed, this signal emits @(TunnelStateNeither).
+        RACSignal<NSNumber *> *tunnelConnectedSignal = [[VPNManager sharedInstance].lastTunnelStatus
+          map:^NSNumber *(NSNumber *value) {
+              VPNStatus s = (VPNStatus) [value integerValue];
+
+              if (s == VPNStatusConnected) {
+                  return @(TunnelStateTunneled);
+              } else if (s == VPNStatusDisconnected || s == VPNStatusInvalid) {
+                  return @(TunnelStateUntunneled);
+              } else {
+                  return @(TunnelStateNeither);
+              }
+          }];
+
+        // NOTE: We have to be careful that ads are requested,
+        //       loaded and the impression is registered all from the same tunneled/untunneled state.
+
+        // combinedEventSignal is infinite cold signal - Combines all app event signals,
+        // and create AppEvent object. The AppEvent emissions are as unique as `[AppEvent isEqual:]` determines.
+        RACSignal<AppEvent *> *combinedEventSignals = [[[RACSignal
+          combineLatest:@[
+            reachabilitySignal,
+            activeSubscriptionSignal,
+            tunnelConnectedSignal
+          ]]
+          map:^AppEvent *(RACTuple *eventsTuple) {
+
+              AppEvent *e = [[AppEvent alloc] init];
+              e.networkIsReachable = [((NSNumber *) eventsTuple.first) boolValue];
+              e.subscriptionIsActive = [((NSNumber *) eventsTuple.second) boolValue];
+              e.tunnelState = (TunnelState) [((NSNumber *) eventsTuple.third) integerValue];
+              return e;
+          }]
+          distinctUntilChanged];
+
+        // The underlying multicast signal emits AppEvent objects. The emissions are repeated if a "trigger" event
+        // such as "appWillForeground" happens with source set to appropriate value.
+        self.appEvents = [[[[RACSignal
+          // Merge all "trigger" signals that cause the last AppEvent from `combinedEventSignals` to be emitted again.
+          // NOTE: - It should be guaranteed that SourceEventStarted is always the first emission and that it will
+          //         be always after the Ad SDKs have been initialized.
+          //       - It should also be guaranteed that signals in the merge below are not the same as the signals
+          //         in the `combinedEventSignals`. Otherwise we would have subscribed to the same signal twice,
+          //         and since we're using the -combineLatestWith: operator, we will get the same emission repeated.
+          merge:@[
+            [RACSignal return:@(SourceEventStarted)],
+            [appWillEnterForegroundSignal mapReplace:@(SourceEventAppForegrounded)]
+          ]]
+          combineLatestWith:combinedEventSignals]
+          combinePreviousWithStart:nil reduce:^AppEvent *(RACTwoTuple<NSNumber *, AppEvent *> *_Nullable prev,
+            RACTwoTuple<NSNumber *, AppEvent *> *_Nonnull curr) {
+
+              // Infers the source signal of the current emission.
+              //
+              // Events emitted by the signal that we combine with (`combinedEventSignals`) are unique,
+              // and therefore the AppEvent state that is different between `prev` and `curr` is also the source.
+              // If `prev` and `curr` AppEvent are the same, then the "trigger" signal is one of the merged signals
+              // upstream.
+
+              AppEvent *_Nullable pe = prev.second;
+              AppEvent *_Nonnull ce = curr.second;
+
+              if (pe == nil || [pe isEqual:ce]) {
+                  // Event source is not from the change in AppEvent properties and so not from `combinedEventSignals`.
+                  ce.source = (SourceEvent) [curr.first integerValue];
+              } else {
+
+                  // Infer event source based on changes in values.
+                  if (pe.networkIsReachable != ce.networkIsReachable) {
+                      ce.source = SourceEventReachability;
+
+                  } else if (pe.subscriptionIsActive != ce.subscriptionIsActive) {
+                      ce.source = SourceEventSubscription;
+
+                  } else if (pe.tunnelState != ce.tunnelState) {
+                      ce.source = SourceEventTunneled;
+                  }
+              }
+
+              return ce;
+          }]
+          multicast:[RACReplaySubject replaySubjectWithCapacity:1]];
+
+#if DEBUG
+        [self.compoundDisposable addDisposable:[self.appEvents.signal subscribeNext:^(AppEvent * _Nullable x) {
+            LOG_DEBUG(@"\n%@", [x debugDescription]);
+        }]];
+#endif
+
+        [self.compoundDisposable addDisposable:[[AppDelegate sharedAppDelegate].appEvents connect]];
+
+    }
 
     // Override point for customization after application launch.
     self.window = [[UIWindow alloc] initWithFrame:UIScreen.mainScreen.bounds];

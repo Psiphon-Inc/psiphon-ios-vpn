@@ -40,14 +40,6 @@
     UIView *bottomBorderBlocker;
 }
 
-- (instancetype)init {
-    self = [super init];
-    if (self) {
-        _rewardedVideoButtonTappedOnce = FALSE;
-    }
-    return self;
-}
-
 + (NSString *)videoReadyTitleText {
     return NSLocalizedStringWithDefaultValue(@"REWARDED_VIDEO_EARN_PSICASH", nil,
       [NSBundle mainBundle],

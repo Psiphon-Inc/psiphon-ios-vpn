@@ -33,13 +33,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly) ActivityIndicatorRoyalSkyButton *rewardedVideoButton;
 @property (nonatomic, assign) BOOL hideRewardedVideoButton;
 
-/**
- * Should be set to TRUE by the target object of rewarded video button if it is the first
- * time the button is being tapped.
- * Default value is FALSE.
- */
-@property (nonatomic, readwrite) BOOL rewardedVideoButtonTappedOnce;
-
 + (void)animateBalanceChangeOf:(NSNumber*)delta
                withPsiCashView:(PsiCashView*)psiCashView
                   inParentView:(UIView*)parentView;
