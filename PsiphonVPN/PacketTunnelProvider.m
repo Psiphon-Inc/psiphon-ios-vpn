@@ -103,7 +103,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 
 // Authorization IDs supplied to tunnel-core from the container.
 // NOTE: Does not include subscription authorization ID.
-@property (atomic, nonnull) NSSet<NSString *> *suppliedContainerAuthorizationIDs;
+@property (atomic, nonnull) NSSet<NSString *> *nonSubscriptionAuthIdSnapshot;
 
 @property (nonatomic) PsiphonConfigSponsorIds *cachedSponsorIDs;
 
@@ -153,7 +153,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
         _tunnelProviderState = TunnelProviderStateInit;
         _subscriptionCheckState = nil;
         _waitForContainerStartVPNCommand = FALSE;
-        _suppliedContainerAuthorizationIDs = [NSSet set];
+        _nonSubscriptionAuthIdSnapshot = [NSSet set];
 
         _postedNetworkConnectivityFailed = FALSE;
     }
@@ -610,7 +610,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 - (void)reconnectWithConfig:(NSString *_Nullable)sponsorId {
     dispatch_async(self->workQueue, ^{
         [AppProfiler logMemoryReportWithTag:@"reconnectWithConfig"];
-        [self.psiphonTunnel reconnectWithConfig:sponsorId :[self getAllAuthorizations]];
+        [self.psiphonTunnel reconnectWithConfig:sponsorId :[self getAllAuthorizationsAndSetSnapshot]];
     });
 }
 
@@ -692,14 +692,14 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
         [PsiFeedbackLogger infoWithType:ExtensionNotificationLogType message:@"force subscription check"];
         [self scheduleSubscriptionCheckWithRemoteCheckForced:TRUE];
 
-    } else if ([NotifierUpdatedAuthorizations isEqualToString:message]) {
+    } else if ([NotifierUpdatedNonSubscriptionAuths isEqualToString:message]) {
 
         // Restarts the tunnel only if the persisted authorizations have changed from the
         // last set of authorizations supplied to tunnel-core.
-        NSSet<NSString *> *nonMarkedAuths = [Authorization authorizationIDsFrom:[
-          self.sharedDB getNonMarkedAuthorizations]];
+        NSSet<NSString *> *newAuthIds = [Authorization authorizationIDsFrom:
+                                             [self.sharedDB getNonSubscriptionAuthorizations]];
 
-        if (![nonMarkedAuths isEqualToSet:self.suppliedContainerAuthorizationIDs]) {
+        if (![newAuthIds isEqualToSet:self.nonSubscriptionAuthIdSnapshot]) {
             [self reconnectWithConfig:nil];
         }
 
@@ -861,7 +861,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 #pragma mark - Subscription and authorizations
 
 // Returns possibly empty array of authorizations.
-- (NSArray<NSString *> *_Nonnull)getAllAuthorizations {
+- (NSArray<NSString *> *_Nonnull)getAllAuthorizationsAndSetSnapshot {
 
     NSMutableArray *auths = [NSMutableArray arrayWithCapacity:1];
     
@@ -873,10 +873,10 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
     }
     
     // Adds authorizations persisted by the container (minus the authorizations already marked as expired).
-    NSSet<Authorization *> *_Nonnull nonMarkedAuths = [self.sharedDB getNonMarkedAuthorizations];
-    [auths addObjectsFromArray:[Authorization encodeAuthorizations:nonMarkedAuths]];
+    NSSet<Authorization *> *_Nonnull snapshot = [self.sharedDB getNonSubscriptionAuthorizations];
+    [auths addObjectsFromArray:[Authorization encodeAuthorizations:snapshot]];
     
-    self.suppliedContainerAuthorizationIDs = [Authorization authorizationIDsFrom:nonMarkedAuths];
+    self.nonSubscriptionAuthIdSnapshot = [Authorization authorizationIDsFrom:snapshot];
 
     return auths;
 }
@@ -981,58 +981,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 
     mutableConfigCopy[@"ClientVersion"] = [AppInfo appVersion];
 
-    // Configure data root directory.
-    // PsiphonTunnel will store all of its files under this directory.
-
-    NSError *err;
-
-    NSURL *dataRootDirectory = [PsiphonDataSharedDB dataRootDirectory];
-    if (dataRootDirectory == nil) {
-        [PsiFeedbackLogger errorWithType:PsiphonTunnelDelegateLogType
-                                 message:@"Failed to get data root directory"];
-        [self displayCorruptSettingsFileMessage];
-        [self exitGracefully];
-    }
-
-    NSFileManager *fileManager = [NSFileManager defaultManager];
-    [fileManager createDirectoryAtURL:dataRootDirectory withIntermediateDirectories:YES attributes:nil error:&err];
-    if (err != nil) {
-        [PsiFeedbackLogger errorWithType:PsiphonTunnelDelegateLogType
-                                 message:@"Failed to create data root directory"
-                                  object:err];
-        [self displayCorruptSettingsFileMessage];
-        [self exitGracefully];
-    }
-
-    mutableConfigCopy[@"DataRootDirectory"] = dataRootDirectory.path;
-
-    // Ensure homepage and notice files are migrated
-    NSString *oldRotatingLogNoticesPath = [self.sharedDB oldRotatingLogNoticesPath];
-    if (oldRotatingLogNoticesPath) {
-        mutableConfigCopy[@"MigrateRotatingNoticesFilename"] = oldRotatingLogNoticesPath;
-    } else {
-        [PsiFeedbackLogger infoWithType:PsiphonTunnelDelegateLogType
-                                message:@"Failed to get old rotating notices log path"];
-    }
-
-    NSString *oldHomepageNoticesPath = [self.sharedDB oldHomepageNoticesPath];
-    if (oldHomepageNoticesPath) {
-        mutableConfigCopy[@"MigrateHompageNoticesFilename"] = oldHomepageNoticesPath;
-    } else {
-        [PsiFeedbackLogger infoWithType:PsiphonTunnelDelegateLogType
-                                message:@"Failed to get old homepage notices path"];
-    }
-
-    // Use default rotation rules for homepage and notice files.
-    // Note: homepage and notice files are only used if this field is set.
-    NSMutableDictionary *noticeFiles = [[NSMutableDictionary alloc] init];
-    [noticeFiles setObject:@0 forKey:@"RotatingFileSize"];
-    [noticeFiles setObject:@0 forKey:@"RotatingSyncFrequency"];
-
-    mutableConfigCopy[@"UseNoticeFiles"] = noticeFiles;
-
-    // Provide auth tokens
-    NSArray *authorizations = [self getAllAuthorizations];
+    NSArray *authorizations = [self getAllAuthorizationsAndSetSnapshot];
     if ([authorizations count] > 0) {
         mutableConfigCopy[@"Authorizations"] = [authorizations copy];
     }
@@ -1103,17 +1052,16 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
         }
 
         // Marks container authorizations found to be invalid, and sends notification to the container.
-        if ([self.suppliedContainerAuthorizationIDs count] > 0) {
-
+        if ([self.nonSubscriptionAuthIdSnapshot count] > 0) {
+            LOG_DEBUG(@"Supplied Auth Ids: %@", self.nonSubscriptionAuthIdSnapshot.description);
+            
             // Subtracts provided active authorizations from the the set of authorizations supplied in Psiphon config,
             // to get the set of inactive authorizations.
-            NSMutableSet<NSString *> *inactiveAuthIDs = [NSMutableSet setWithSet:self.suppliedContainerAuthorizationIDs];
-            [inactiveAuthIDs minusSet:[NSSet setWithArray:authorizationIds]];
+            NSMutableSet<NSString *> *noAcceptedAuthIds = [NSMutableSet setWithSet:self.nonSubscriptionAuthIdSnapshot];
+            [noAcceptedAuthIds minusSet:[NSSet setWithArray:authorizationIds]];
 
-            // Append inactive authorizations.
-            [self.sharedDB appendExpiredAuthorizationIDs:inactiveAuthIDs];
-
-            [[Notifier sharedInstance] post:NotifierMarkedAuthorizations];
+            // Immediately delete authorization ids not accepted.
+            [self.sharedDB removeNonSubscriptionAuthorizationsNotAccepted:noAcceptedAuthIds];
 
         }
 

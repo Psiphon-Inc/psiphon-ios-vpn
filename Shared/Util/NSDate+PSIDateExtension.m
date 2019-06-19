@@ -20,6 +20,7 @@
 #import "NSDate+PSIDateExtension.h"
 #import "timestamp.h"
 #import "Asserts.h"
+#import "Nullity.h"
 
 // 10^9
 #define POW_10_9 1000000000.0
@@ -36,6 +37,10 @@
 }
 
 + (NSDate *_Nullable)fromRFC3339String:(NSString *)timestamp {
+
+    if ([Nullity isEmpty:timestamp]) {
+        return nil;
+    }
 
     timestamp_t ts;
 

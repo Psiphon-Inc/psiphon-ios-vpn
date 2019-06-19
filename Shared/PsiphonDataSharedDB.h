@@ -233,22 +233,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 #if TARGET_IS_EXTENSION
 
-- (void)appendExpiredAuthorizationIDs:(NSSet<NSString *> *_Nullable)authsIDsToAppend;
-
-- (void)markExpiredAuthorizationIDs:(NSSet<NSString *> *_Nullable)authorizations;
+- (void)removeNonSubscriptionAuthorizationsNotAccepted:(NSSet<NSString *> *_Nullable)authIdsToRemove;
 
 #else
 
-- (void)setContainerAuthorizations:(NSSet<Authorization *> *_Nullable)authorizations;
+- (void)setNonSubscriptionAuthorizations:(NSSet<Authorization *> *_Nullable)authorizations;
+
+- (void)appendNonSubscriptionAuthorization:(Authorization *_Nonnull)authorization;
 
 #endif
 
-- (NSSet<Authorization *> *)getContainerAuthorizations;
-
-- (NSSet<Authorization *> *)getNonMarkedAuthorizations;
-
-- (NSSet<NSString *> *)getMarkedExpiredAuthorizationIDs;
-
+- (NSSet<Authorization *> *)getNonSubscriptionAuthorizations;
 
 #pragma mark - Jetsam counter
 

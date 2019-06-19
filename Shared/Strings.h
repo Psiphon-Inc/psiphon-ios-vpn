@@ -53,22 +53,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (NSString *)operationFailedAlertTitle;
 
-+ (NSString *)operationFailedAlertMessage;
-
-#pragma mark - Generic Button Titles
-
-+ (NSString *)acceptButtonTitle;
-
-+ (NSString *)declineButtonTitle;
-
-+ (NSString *)okButtonTitle;
-
-+ (NSString *)dismissButtonTitle;
-
-+ (NSString *)cancelButtonTitle;
-
-+ (NSString *)doneButtonTitle;
-
 #pragma mark - Subscriptions
 
 + (NSString *)manageSubscriptionButtonTitle;

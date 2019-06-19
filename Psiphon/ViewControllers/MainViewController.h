@@ -18,9 +18,7 @@
  */
 
 #import <UIKit/UIKit.h>
-#import "PsiCashPurchaseAlertView.h"
 #import "RegionAdapter.h"
-#import "PsiCashOnboardingViewController.h"
 #import "SettingsViewController.h"
 
 @class RACSignal<__covariant ValueType>;
@@ -29,9 +27,7 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @interface MainViewController : UIViewController <PsiphonSettingsViewControllerDelegate,
-                                                  RegionAdapterDelegate,
-                                                  PsiCashPurchaseAlertViewDelegate,
-                                                  PsiCashOnboardingViewControllerDelegate>
+                                                  RegionAdapterDelegate>
 
 @property (nonatomic) BOOL openSettingImmediatelyOnViewDidAppear;
 
