@@ -19,11 +19,13 @@
 
 #import <PsiCashLib/PsiCash.h>
 #import "PsiCashLogger.h"
-#import "PsiCashClient.h"
-#import "PsiCashTypes.h"
 #import "PsiFeedbackLogger.h"
 
 NS_ASSUME_NONNULL_BEGIN
+
+PsiFeedbackLogType const PsiCashLogType = @"PsiCash";
+
+NSErrorDomain const PsiCashClientErrorDomain = @"PsiCashClientErrorDomain";
 
 @implementation PsiCashLogger {
     PsiCash *psiCash;

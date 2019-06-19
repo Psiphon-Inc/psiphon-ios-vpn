@@ -20,13 +20,14 @@
 #import <ReactiveObjC/RACReplaySubject.h>
 #import <ReactiveObjC/RACUnit.h>
 #import <ReactiveObjC/RACCompoundDisposable.h>
+#import <ReactiveObjC/RACTuple.h>
 #import "MoPubRewardedAdControllerWrapper.h"
 #import "Asserts.h"
 #import "NSError+Convenience.h"
 #import "Logging.h"
 #import "Nullity.h"
-#import "PsiCashClient.h"
 #import "RelaySubject.h"
+#import "Psiphon-Swift.h"
 
 
 PsiFeedbackLogType const MoPubRewardedAdControllerWrapperLogType = @"MoPubRewardedAdControllerWrapper";
@@ -116,31 +117,38 @@ PsiFeedbackLogType const MoPubRewardedAdControllerWrapperLogType = @"MoPubReward
             return nil;
         }
 
-        NSString *_Nullable customData = [[PsiCashClient sharedInstance] rewardedVideoCustomData];
-        if ([Nullity isEmpty:customData]) {
-            [subscriber sendNext:@(AdPresentationErrorCustomDataNotSet)];
-            [subscriber sendCompleted];
-            return nil;
-        }
+        RACCompoundDisposable *compoundDisposable = [[RACCompoundDisposable alloc] init];
 
-        NSArray<MPRewardedVideoReward *> *rewards = [MPRewardedVideo availableRewardsForAdUnitID:self.adUnitID];
+        [SwiftDelegate.bridge getCustomRewardData:^(NSString * _Nullable customData) {
 
-        // We're only expecting one reward.
-        PSIAssert(rewards.count == 1);
+            if ([Nullity isEmpty:customData]) {
+                [subscriber sendNext:@(AdPresentationErrorCustomDataNotSet)];
+                [subscriber sendCompleted];
+                return;
+            }
 
-        // Subscribe to presentationStatus before presenting the ad.
-        RACDisposable *disposable = [[AdControllerWrapperHelper
-          transformAdPresentationToTerminatingSignal:weakSelf.presentationStatus
-                         allowOutOfOrderRewardStatus:FALSE]
-          subscribe:subscriber];
+            NSArray<MPRewardedVideoReward *> *rewards =
+                [MPRewardedVideo availableRewardsForAdUnitID:self.adUnitID];
 
-        // Selects the first reward only, since we're only expecting one type of reward for now.
-        [MPRewardedVideo presentRewardedVideoAdForAdUnitID:self.adUnitID
-                                        fromViewController:viewController
-                                                withReward:rewards[0]
-                                                customData:customData];
+            // We're only expecting one reward.
+            PSIAssert(rewards.count == 1);
 
-        return disposable;
+            // Subscribe to presentationStatus before presenting the ad.
+            RACDisposable *disposable = [[AdControllerWrapperHelper
+                              transformAdPresentationToTerminatingSignal:weakSelf.presentationStatus
+                                             allowOutOfOrderRewardStatus:FALSE]
+                                                               subscribe:subscriber];
+            [compoundDisposable addDisposable:disposable];
+
+            // Selects the first reward only, since we're only expecting one type of reward for now.
+            [MPRewardedVideo presentRewardedVideoAdForAdUnitID:self.adUnitID
+                                            fromViewController:viewController
+                                                    withReward:rewards[0]
+                                                    customData:customData];
+
+        }];
+
+        return compoundDisposable;
     }];
 }
 

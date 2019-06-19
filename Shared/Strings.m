@@ -115,34 +115,6 @@
     return NSLocalizedStringWithDefaultValue(@"ALERT_TITLE_OPERATION_FAILED", nil, [NSBundle mainBundle], @"Operation Failed", @"Alert dialog title.");
 }
 
-+ (NSString *)operationFailedAlertMessage {
-    return NSLocalizedStringWithDefaultValue(@"ALERT_BODY_OPERATION_FAILED", nil, [NSBundle mainBundle], @"Operation failed, please try again.", @"Alert dialog body.");
-}
-
-+ (NSString *)acceptButtonTitle {
-    return  NSLocalizedStringWithDefaultValue(@"ACCEPT_BUTTON_TITLE", nil, [NSBundle mainBundle], @"Accept", @"Accept button title");
-}
-
-+ (NSString *)declineButtonTitle {
-    return  NSLocalizedStringWithDefaultValue(@"DECLINE_BUTTON_TITLE", nil, [NSBundle mainBundle], @"Decline", @"Decline button title");
-}
-
-+ (NSString *)okButtonTitle {
-    return NSLocalizedStringWithDefaultValue(@"OK_BUTTON", nil, [NSBundle mainBundle], @"OK", @"Alert OK Button");
-}
-
-+ (NSString *)dismissButtonTitle {
-    return NSLocalizedStringWithDefaultValue(@"DISMISS_BUTTON_TITLE", nil, [NSBundle mainBundle], @"Dismiss", @"Dismiss button title. Dismisses pop-up alert when the user clicks on the button");
-}
-
-+ (NSString *)cancelButtonTitle {
-    return  NSLocalizedStringWithDefaultValue(@"CANCEL_BUTTON_TITLE", nil, [NSBundle mainBundle], @"Cancel", @"Title for a button that cancels an action. This should be generic enough to make sense whenever a cancel button is used.");
-}
-
-+ (NSString *)doneButtonTitle {
-    return NSLocalizedStringWithDefaultValue(@"DONE_BUTTON_TITLE", nil, [NSBundle mainBundle], @"Done", @"Title of the button that dismisses a screen or a dialog");
-}
-
 + (NSString *)manageSubscriptionButtonTitle {
     return NSLocalizedStringWithDefaultValue(@"SUBSCRIPTIONS_MANAGE_SUBSCRIPTION_BUTTON", nil, [NSBundle mainBundle], @"Manage", @"Label on a button which, when pressed, opens a screen where the user can manage their currently active subscription.");
 }

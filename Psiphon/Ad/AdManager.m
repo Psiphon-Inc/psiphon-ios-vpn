@@ -22,7 +22,6 @@
 #import "VPNManager.h"
 #import "AppDelegate.h"
 #import "Logging.h"
-#import "IAPStoreHelper.h"
 #import "RACCompoundDisposable.h"
 #import "RACSignal.h"
 #import "RACSignal+Operations.h"
@@ -48,7 +47,7 @@
 #import <PersonalizedAdConsent/PersonalizedAdConsent.h>
 #import "AdMobConsent.h"
 #import "AppEvent.h"
-#import "PsiCashClient.h"
+#import "AppObservables.h"
 
 
 NSErrorDomain const AdControllerWrapperErrorDomain = @"AdControllerWrapperErrorDomain";
@@ -265,7 +264,7 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
 
     // Ad SDK initialization
     {
-        self.adSDKInitMultiCast = [[[[[[[[AppDelegate sharedAppDelegate].appEvents.signal filter:^BOOL(AppEvent *event) {
+        self.adSDKInitMultiCast = [[[[[[[[AppObservables shared].appEvents.signal filter:^BOOL(AppEvent *event) {
               // Initialize Ads SDK if network is reachable, and device is either tunneled or untunneled, and the
               // user is not a subscriber.
               return (event.networkIsReachable &&
@@ -328,7 +327,7 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
     // Updating AdManager "ad is ready" (untunneledInterstitialCanPresent, rewardedVideoCanPresent) properties.
     {
         [self.compoundDisposable addDisposable:
-          [[[[AppDelegate sharedAppDelegate].appEvents.signal map:^RACSignal<NSNumber *> *(AppEvent *appEvent) {
+          [[[AppObservables.shared.appEvents.signal map:^RACSignal<NSNumber *> *(AppEvent *appEvent) {
 
               if (appEvent.tunnelState == TunnelStateUntunneled && appEvent.networkIsReachable) {
 
@@ -340,7 +339,7 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
           subscribe:self.untunneledInterstitialLoadStatus]];
 
         [self.compoundDisposable addDisposable:
-          [[[[AppDelegate sharedAppDelegate].appEvents.signal map:^RACSignal<NSNumber *> *(AppEvent *appEvent) {
+          [[[AppObservables.shared.appEvents.signal map:^RACSignal<NSNumber *> *(AppEvent *appEvent) {
 
               if (appEvent.networkIsReachable) {
 
@@ -416,7 +415,7 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
 // Note: `adControllerBlock` should return `nil` if the TunnelState is not in the appropriate state.
 - (RACSignal<NSNumber *> *)presentAdHelper:(RACSignal<NSNumber *> *(^_Nonnull)(TunnelState tunnelState))adControllerBlock {
 
-    return [[[[AppDelegate sharedAppDelegate].appEvents.signal take:1]
+    return [[[AppObservables.shared.appEvents.signal take:1]
       flattenMap:^RACSignal<NSNumber *> *(AppEvent *event) {
 
           // Ads are loaded based on app event condition at the time of load, and unloaded during certain app events
@@ -476,17 +475,12 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
         // Setup triggers for rewarded video ads.
         triggers = [self.forceRewardedVideoLoad mapReplace:TriggerForceRewardedVideoLoad];
 
-        if (waitForPsiCashRewardedActivityData) {
-            triggers = [triggers merge:[[PsiCashClient sharedInstance].rewardedActivityDataSignal
-              mapReplace:TriggerPsiCashRewardedActivityDataUpdated]];
-        }
-
     } else if (AdFormatInterstitial == adController.adFormat) {
         adLoadMaxRetries = 1;
 
         // Setup triggers for interstitial ads.
         triggers = [RACSignal merge:@[
-          [[AppDelegate sharedAppDelegate].appEvents.signal mapReplace:TriggerAppEvent],
+          [AppObservables.shared.appEvents.signal mapReplace:TriggerAppEvent],
           [adController.presentedAdDismissed mapReplace:TriggerPresentedAdDismissed],
         ]];
 
@@ -495,7 +489,7 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
     }
 
     RACSignal<RACTwoTuple<AdControllerTag, AppEventActionTuple *> *> *adLoadUnloadSignal =
-      [[[[[triggers withLatestFrom:[AppDelegate sharedAppDelegate].appEvents.signal]
+      [[[[[triggers withLatestFrom:AppObservables.shared.appEvents.signal]
       map:^AppEventActionTuple *(RACTwoTuple<NSString *, AppEvent *> *tuple) {
 
           // In disambiguating the source of the event emission:
@@ -520,7 +514,7 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
 
               AppEventActionTuple *__weak weakSa = sa;
 
-              sa.stopCondition = [[AppDelegate sharedAppDelegate].appEvents.signal filter:^BOOL(AppEvent *current) {
+              sa.stopCondition = [AppObservables.shared.appEvents.signal filter:^BOOL(AppEvent *current) {
                   // Since `sa` already holds a strong reference to this block, the block
                   // should only hold a weak reference to `sa`.
                   AppEventActionTuple *__strong strongSa = weakSa;
@@ -534,16 +528,6 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
 
               // If the current tunnel state is the same as the ads required tunnel state, then load ad.
               if (event.tunnelState == loadInTunnelState) {
-
-                  // For rewarded video take no loading action if custom data is missing.
-                  if (adController.adFormat == AdFormatRewardedVideo && waitForPsiCashRewardedActivityData) {
-                      NSString *_Nullable customData = [[PsiCashClient sharedInstance]
-                                                                       rewardedVideoCustomData];
-                      if (!customData) {
-                          sa.action = AdLoadActionNone;
-                          return sa;
-                      }
-                  }
 
                   // Decide action for interstitial ad.
                   if (adController.adFormat == AdFormatInterstitial) {
