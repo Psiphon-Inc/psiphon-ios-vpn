@@ -47,8 +47,6 @@ UserDefaultsKey const ContainerSubscriptionReceiptExpiryDate = @"container_subsc
 
 UserDefaultsKey const ContainerAuthorizationSetKey = @"authorizations_container_key";
 
-UserDefaultsKey const MarkedAuthIDsExtensionStringSetKey = @"marked_authorization_ids_extension_key";
-
 UserDefaultsKey const SubscriptionVerificationDictionaryKey = @"subscription_verification_dictionary_key";
 
 
@@ -426,58 +424,39 @@ UserDefaultsKey const DebugPsiphonConnectionStateStringKey = @"PsiphonDataShared
 
 #pragma mark - Authorizations
 
-- (void)appendExpiredAuthorizationIDs:(NSSet<NSString *> *_Nullable)authsIDsToAppend {
-    // Combines previous marked authorizations with the authorization IDs to append.
-    NSSet<NSString *> *newMarkedAuthIDs = [[self getMarkedExpiredAuthorizationIDs] setByAddingObjectsFromSet:authsIDsToAppend];
+- (void)removeNonSubscriptionAuthorizationsNotAccepted:(NSSet<NSString *> *_Nullable)authIdsToRemove {
 
-    // Don't mark authorization IDs not seen in authorizations persisted by the container.
-    NSMutableSet<NSString *> *markedAuthIDs = [NSMutableSet set];  // Marked IDs to persist.
-    NSSet<NSString *> *containerAuthIDs =[Authorization authorizationIDsFrom:[self getContainerAuthorizations]];
-    [newMarkedAuthIDs enumerateObjectsUsingBlock:^(NSString *authID, BOOL *stop) {
-        if ([containerAuthIDs containsObject:authID]) {
-            [markedAuthIDs addObject:authID];
+    NSMutableSet<Authorization *> *newAuths = [NSMutableSet set];
+
+    [[self getNonSubscriptionAuthorizations] enumerateObjectsUsingBlock:^(Authorization * _Nonnull storedAuthorization, BOOL * _Nonnull stop) {
+        if (![authIdsToRemove containsObject:storedAuthorization.ID]) {
+            // storedAuthorization.ID doesn't match any of `authIdsToRemove`.
+            [newAuths addObject:storedAuthorization];
         }
+
     }];
 
-    [self markExpiredAuthorizationIDs:markedAuthIDs];
+    [self setNonSubscriptionAuthorizations:newAuths];
 }
 
-- (void)markExpiredAuthorizationIDs:(NSSet<NSString *> *_Nullable)authorizationIDs {
-    [sharedDefaults setObject:[authorizationIDs allObjects]
-                       forKey:MarkedAuthIDsExtensionStringSetKey];
-    [sharedDefaults synchronize];
-}
-
-- (void)setContainerAuthorizations:(NSSet<Authorization *> *_Nullable)authorizations {
+- (void)setNonSubscriptionAuthorizations:(NSSet<Authorization *> *_Nullable)authorizations {
     // Persists Base64 representation of the Authorizations.
     [sharedDefaults setObject:[Authorization encodeAuthorizations:authorizations]
                        forKey:ContainerAuthorizationSetKey];
     [sharedDefaults synchronize];
 }
 
-- (NSSet<Authorization *> *_Nonnull)getContainerAuthorizations {
+- (void)appendNonSubscriptionAuthorization:(Authorization *_Nonnull)authorization {
+    NSMutableSet<Authorization *> *newSet = [NSMutableSet setWithSet:
+                                             [self getNonSubscriptionAuthorizations]];
+    [newSet addObject:authorization];
+    [self setNonSubscriptionAuthorizations:newSet];
+}
+
+- (NSSet<Authorization *> *_Nonnull)getNonSubscriptionAuthorizations {
     NSArray<NSString *> *_Nullable encodedAuths = [sharedDefaults stringArrayForKey:ContainerAuthorizationSetKey];
     return [Authorization createFromEncodedAuthorizations:encodedAuths];
 }
-
-- (NSSet<Authorization *> *_Nonnull)getNonMarkedAuthorizations {
-    // Adds authorizations persisted by the container (minus the authorizations already marked as expired).
-    NSMutableSet<Authorization *> *auths = [NSMutableSet set];
-    NSSet<NSString *> *markedAuthIDs = [self getMarkedExpiredAuthorizationIDs];
-
-    [[self getContainerAuthorizations] enumerateObjectsUsingBlock:^(Authorization *obj, BOOL *stop) {
-        if (![markedAuthIDs containsObject:obj.ID]) {
-            [auths addObject:obj];
-        }
-    }];
-
-    return auths;
-}
-
-- (NSSet<NSString *> *_Nonnull)getMarkedExpiredAuthorizationIDs {
-    return [NSMutableSet setWithArray:[sharedDefaults stringArrayForKey:MarkedAuthIDsExtensionStringSetKey]];
-}
-
 
 #pragma mark - Jetsam counter
 

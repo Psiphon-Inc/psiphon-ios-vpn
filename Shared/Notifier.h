@@ -30,7 +30,6 @@ typedef NSString * NotifierMessage;
 extern NotifierMessage const NotifierNewHomepages;
 extern NotifierMessage const NotifierTunnelConnected;
 extern NotifierMessage const NotifierAvailableEgressRegions;
-extern NotifierMessage const NotifierMarkedAuthorizations;
 extern NotifierMessage const NotifierNetworkConnectivityFailed;
 /** Emitted only if network connectivity failed was previously posted. */
 extern NotifierMessage const NotifierNetworkConnectivityResolved;
@@ -39,7 +38,7 @@ extern NotifierMessage const NotifierNetworkConnectivityResolved;
 extern NotifierMessage const NotifierStartVPN;
 extern NotifierMessage const NotifierForceSubscriptionCheck;
 extern NotifierMessage const NotifierAppEnteredBackground;
-extern NotifierMessage const NotifierUpdatedAuthorizations;
+extern NotifierMessage const NotifierUpdatedNonSubscriptionAuths;
 
 // Messages allowed only in debug build.
 #if DEBUG
@@ -71,6 +70,8 @@ extern NotifierMessage const NotifierDebugPsiphonTunnelState;
  * If called from the extension, posts the message to the container.
  *
  * @param message NotifierMessage of the message.
+ *
+ * @note This function is thread-safe.
  */
 - (void)post:(NotifierMessage)message;
 

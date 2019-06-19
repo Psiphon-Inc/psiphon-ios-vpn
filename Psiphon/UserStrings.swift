@@ -1,0 +1,248 @@
+/*
+ * Copyright (c) 2020, Psiphon Inc.
+ * All rights reserved.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
+
+import Foundation
+
+// Swift counterpart to ObjC `Strings.m`.
+//
+// Translation notes:
+// - Ensure uniqueness of the localized string keys.
+// - Windows client translations can be found here:
+//   https://github.com/Psiphon-Inc/psiphon-windows/blob/master/src/webui/_locales/en/messages.json
+
+@objc final class UserStrings: NSObject {
+
+    static func PsiCash_balance() -> String {
+        return NSLocalizedString("PSICASH_BALANCE", tableName: nil, bundle: Bundle.main,
+                                 value: "PsiCash Balance:",
+                                 comment: "PsiCash is a type of credit. Do not translate or transliterate 'PsiCash'. Text shown next to the user's PsiCash balance (a numerical value). Keep colon if appropriate.")
+    }
+
+    static func PsiCash_balance_out_of_date() -> String {
+        return NSLocalizedString("PSICASH_BALANCE_OUT_OF_DATE_ALERT_TITLE", tableName: nil, bundle: Bundle.main,
+                                 value: "PsiCash Balance Out of Date",
+                                 comment: "User's PsiCash balance is not up to date. PsiCash is a type of credit. Do not translate or transliterate 'PsiCash'. Text is shown on an alert pop up title")
+    }
+
+    static func Connect_to_psiphon_to_update_psiCash() -> String {
+        return NSLocalizedString("PSICASH_BALANCE_OUT_OF_DATE_ALERT_BODY", tableName: nil, bundle: Bundle.main,
+                                 value: "Connect to Psiphon to update your PsiCash balance.",
+                                 comment: "User's PsiCash balance is not up to date. PsiCash is a type of credit. Do not translate or transliterate 'Psiphon'. Do not translate or transliterate 'PsiCash'. Text is shown on an alert pop up title")
+    }
+
+    static func PsiCash_unavailable() -> String {
+        return NSLocalizedString("PSICASH_UNAVAILABLE", tableName: nil, bundle: Bundle.main,
+                                 value: "PsiCash Unavailable",
+                                 comment: "PsiCash currently unavailable. PsiCash is a type of credit. Do not translate or transliterate 'PsiCash'.")
+    }
+
+    static func Purchasing_psiCash() -> String {
+        return NSLocalizedString("PURCHASING_PSICASH", tableName: nil, bundle: Bundle.main,
+                                 value: "Purchasing PsiCash…",
+                                 comment: "Shown when the user is purchasing PsiCash. PsiCash is a type of credit. Do not translate or transliterate 'PsiCash'. Including ellipses '…' if appropriate.")
+    }
+
+    static func Purchasing_speed_boost() -> String {
+        return NSLocalizedString("PURCHASING_SPEED_BOOST", tableName: nil, bundle: Bundle.main,
+                                 value: "Purchasing Speed Boost…",
+                                 comment: "Purchasing 'Speed Boost' product. Including ellipses '…' if appropriate. Do not transliterate 'Speed Boost'. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed.")
+    }
+
+    static func Speed_boost_already_active() -> String {
+        return NSLocalizedString("SPEED_BOOST_ALREADY_ACTIVE", tableName: nil, bundle: Bundle.main,
+                                 value: "Speed Boost Already Active",
+                                 comment: "Do not transliterate 'Speed Boost'. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed.")
+    }
+
+    static func Speed_boost_active(time: String) -> String {
+        let format = NSLocalizedString("SPEED_BOOST_IS_ACTIVE", tableName: nil, bundle: Bundle.main,
+                                       value: "Speed Boost Active %@",
+                                       comment: "'%@' is going to be replace by a timer (e.g. '02:12'). Place the exact string '%@' at the appropriate place. This string is shown when the user's 'Speed Boost' is active. Do not transliterate 'Speed Boost'. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed.")
+        return String(format: format, time)
+    }
+
+    static func Add_psiCash() -> String {
+        return NSLocalizedString("ADD_PSICASH", tableName: nil, bundle: Bundle.main,
+                                 value: "Add PsiCash",
+                                 comment: "Button title to add to user's PsiCash balance. PsiCash is a type of credit. Do not translate or transliterate 'PsiCash'.")
+    }
+
+    static func Speed_boost() -> String {
+        return NSLocalizedString("SPEED_BOOST", tableName: nil, bundle: Bundle.main,
+                                 value: "Speed Boost",
+                                 comment: "Do not transliterate 'Speed Boost'. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed.")
+    }
+
+    static func Speed_boost_unavailable() -> String {
+        return NSLocalizedString("SPEED_BOOST_UNAVAILABLE", tableName: nil, bundle: Bundle.main,
+                                 value: "Speed Boost Unavailable",
+                                 comment: "'Speed Boost' product is currently unavailable. Do not transliterate 'Speed Boost'. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed.")
+    }
+
+    static func Connect_to_psiphon_to_use_speed_boost() -> String {
+        return NSLocalizedString("CONENCT_TO_USE_SPEED_BOOST", tableName: nil, bundle: Bundle.main,
+                                 value: "Connect to Psiphon to use Speed Boost",
+                                 comment: "User must connect to 'Psiphon' in order to use 'Speed Boost' product. Do not translate or transliterate 'Psiphon'. Do not transliterate 'Speed Boost'. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed.")
+    }
+
+    static func Insufficient_psiCash_balance() -> String {
+        return NSLocalizedString("INSUFFICIENT_PSICASH_BALANCE", tableName: nil, bundle: Bundle.main,
+                                 value: "Insuffiecient PsiCash balance",
+                                 comment: "User does not have suffiecient 'PsiCash' balance. PsiCash is a type of credit. Do not translate or transliterate 'PsiCash'.")
+
+    }
+
+    static func PsiCash_is_unavailable_while_connecting_to_psiphon() -> String {
+        return NSLocalizedString("PSICASH_UNAVAILABLE_WHILE_CONNECTING", tableName: nil, bundle: Bundle.main,
+                                 value: "PsiCash is unavailable while connecting to Psiphon",
+                                 comment: "'PsiCash' features are unavailable while the app the connecting to 'Psiphon'. PsiCash is a type of credit. Do not translate or transliterate 'Psiphon'. Do not translate or transliterate 'PsiCash'")
+    }
+
+    static func Connect_to_psiphon_button() -> String {
+        return NSLocalizedString("CONNECT_TO_PSIPHON", tableName: nil, bundle: Bundle.main,
+                                 value: "Connect to Psiphon",
+                                 comment: "Button title that lets the user to connec to the Psiphon network. Do not translate or transliterate 'Psiphon'")
+    }
+
+    static func Psiphon_is_not_connected() -> String {
+        return NSLocalizedString("PSIPHON_IS_NOT_CONNECTED", tableName: nil, bundle: Bundle.main,
+                                 value: "Psiphon is not connected",
+                                 comment: "Shown when user is not connected to Psiphon network. Do not translate or transliterate 'Psiphon'")
+    }
+
+    static func Watch_rewarded_video_and_earn() -> String {
+        return NSLocalizedString("WATCH_REWARDED_VIDEO_AND_EARN", tableName: nil, bundle: Bundle.main,
+                                 value: "Watch Video & Earn",
+                                 comment: "Button subtitle informing the user that if pressed a rewarded video ad will be displayed and they will earn credit.")
+    }
+
+    static func Free() -> String {
+        return NSLocalizedString("FREE_PSICASH_COIN", tableName: nil, bundle: Bundle.main,
+                                 value: "Free",
+                                 comment: "Button title for a product that is free. There is no cost or payment associated.")
+    }
+
+}
+
+// MARK: General Strings
+extension UserStrings {
+    @objc static func Operation_failed_alert_message() -> String {
+        return NSLocalizedString("ALERT_BODY_OPERATION_FAILED", tableName: nil, bundle: Bundle.main,
+                                 value: "Operation failed, please try again.",
+                                 comment: "Alert dialog body when requested operation by the user failed.")
+    }
+
+    static func Please_try_again_later() -> String {
+        return NSLocalizedString("PLEASE_TRY_AGAIN_LATER", tableName: nil, bundle: Bundle.main,
+                                 value: "Please try again later.",
+                                 comment: "Subtitle shown when the current operation failed, asking the user to try again at a later time.")
+    }
+}
+
+// MARK: Generic values
+extension UserStrings {
+
+    static func Error_title() -> String {
+            return  NSLocalizedString("ERROR_TITLE", tableName: nil, bundle: Bundle.main,
+                                      value: "Error",
+                                      comment: "Error alert title")
+    }
+
+    @objc static func Accept_button_title() -> String {
+        return  NSLocalizedString("ACCEPT_BUTTON_TITLE", tableName: nil, bundle: Bundle.main,
+                                  value: "Accept",
+                                  comment: "Accept button title")
+    }
+
+    @objc static func Decline_button_title() -> String {
+        return  NSLocalizedString("DECLINE_BUTTON_TITLE", tableName: nil, bundle: Bundle.main,
+                                  value: "Decline",
+                                  comment: "Decline button title")
+    }
+
+    @objc static func OK_button_title() -> String {
+        return NSLocalizedString("OK_BUTTON", tableName: nil, bundle: Bundle.main,
+                                 value: "OK",
+                                 comment: "Alert OK Button")
+    }
+
+    @objc static func Dismiss_button_title() -> String {
+        return NSLocalizedString("DISMISS_BUTTON_TITLE", tableName: nil, bundle: Bundle.main,
+                                 value: "Dismiss",
+                                 comment: "Dismiss button title. Dismisses pop-up alert when the user clicks on the button")
+    }
+
+    @objc static func Cancel_button_title() -> String {
+        return  NSLocalizedString("CANCEL_BUTTON_TITLE", tableName: nil, bundle: Bundle.main,
+                                  value: "Cancel",
+                                  comment: "Title for a button that cancels an action. This should be generic enough to make sense whenever a cancel button is used.")
+    }
+
+    @objc static func Done_button_title() -> String {
+        return NSLocalizedString("DONE_BUTTON_TITLE", tableName: nil, bundle: Bundle.main,
+                                 value: "Done",
+                                 comment: "Title of the button that dismisses a screen or a dialog")
+    }
+}
+
+// MARK: VPN Status strings
+extension UserStrings {
+    @objc static func Vpn_status_disconnected() -> String {
+        return NSLocalizedString("VPN_STATUS_DISCONNECTED", tableName: nil, bundle: Bundle.main,
+                                 value: "Disconnected",
+                                 comment: "Status when the VPN is not connected to a Psiphon server, not trying to connect, and not in an error state")
+    }
+
+    @objc static func Vpn_status_invalid() -> String {
+        return NSLocalizedString("VPN_STATUS_INVALID", tableName: nil, bundle: Bundle.main,
+                                 value: "Disconnected",
+                                 comment: "Status when the VPN is in an invalid state. For example, if the user doesn't give permission for the VPN configuration to be installed, and therefore the Psiphon VPN can't even try to connect.")
+    }
+
+    @objc static func Vpn_status_connected() -> String {
+        return NSLocalizedString("VPN_STATUS_CONNECTED", tableName: nil, bundle: Bundle.main,
+                                 value: "Connected",
+                                 comment: "Status when the VPN is connected to a Psiphon server")
+    }
+
+    @objc static func Vpn_status_connecting() -> String {
+        return NSLocalizedString("VPN_STATUS_CONNECTING", tableName: nil, bundle: Bundle.main,
+                                 value: "Connecting",
+                                 comment: "Status when the VPN is connecting; that is, trying to connect to a Psiphon server")
+    }
+
+    @objc static func Vpn_status_disconnecting() -> String {
+        return NSLocalizedString("VPN_STATUS_DISCONNECTING", tableName: nil, bundle: Bundle.main,
+                                 value: "Disconnecting",
+                                 comment: "Status when the VPN is disconnecting. Sometimes going from connected to disconnected can take some time, and this is that state.")
+    }
+
+    @objc static func Vpn_status_reconnecting() -> String {
+        return NSLocalizedString("VPN_STATUS_RECONNECTING", tableName: nil, bundle: Bundle.main,
+                                 value: "Reconnecting",
+                                 comment: "Status when the VPN was connected to a Psiphon server, got disconnected unexpectedly, and is currently trying to reconnect")
+    }
+
+    @objc static func Vpn_status_restarting() -> String {
+        return NSLocalizedString("VPN_STATUS_RESTARTING", tableName: nil, bundle: Bundle.main,
+                                 value: "Restarting",
+                                 comment: "Status when the VPN is restarting.")
+    }
+
+}

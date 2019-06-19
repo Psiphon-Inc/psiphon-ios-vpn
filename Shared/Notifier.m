@@ -34,7 +34,6 @@ PsiFeedbackLogType const NotifierLogType = @"Notifier";
 NotifierMessage const NotifierNewHomepages           = PSIPHON_VPN_GROUP @".NewHomepages";
 NotifierMessage const NotifierTunnelConnected        = PSIPHON_VPN_GROUP @".TunnelConnected";
 NotifierMessage const NotifierAvailableEgressRegions = PSIPHON_VPN_GROUP @".AvailableEgressRegions";
-NotifierMessage const NotifierMarkedAuthorizations   = PSIPHON_VPN_GROUP @".MarkedAuthorizations";
 NotifierMessage const NotifierNetworkConnectivityFailed = PSIPHON_VPN_GROUP @".NetworkConnectivityFailed";
 NotifierMessage const NotifierNetworkConnectivityResolved = PSIPHON_VPN_GROUP @".NetworkConnectivityResolved";
 
@@ -42,7 +41,7 @@ NotifierMessage const NotifierNetworkConnectivityResolved = PSIPHON_VPN_GROUP @"
 NotifierMessage const NotifierStartVPN               = PSIPHON_GROUP @".StartVPN";
 NotifierMessage const NotifierForceSubscriptionCheck = PSIPHON_GROUP @".ForceSubscriptionCheck";
 NotifierMessage const NotifierAppEnteredBackground   = PSIPHON_GROUP @".AppEnteredBackground";
-NotifierMessage const NotifierUpdatedAuthorizations  = PSIPHON_GROUP @".UpdatedAuthorizations";
+NotifierMessage const NotifierUpdatedNonSubscriptionAuths  = PSIPHON_GROUP @".UpdatedNonSubscriptionAuths";
 
 #if DEBUG
 NotifierMessage const NotifierDebugCustomFunction    = PSIPHON_GROUP @".DebugCustomFunction";
@@ -114,7 +113,7 @@ static inline void AddDarwinNotifyObserver(CFNotificationCenterRef center, const
     AddDarwinNotifyObserver(center, (__bridge const void *)self, (__bridge CFStringRef)NotifierStartVPN);
     AddDarwinNotifyObserver(center, (__bridge const void *)self, (__bridge CFStringRef)NotifierForceSubscriptionCheck);
     AddDarwinNotifyObserver(center, (__bridge const void *)self, (__bridge CFStringRef)NotifierAppEnteredBackground);
-    AddDarwinNotifyObserver(center, (__bridge const void *)self, (__bridge CFStringRef)NotifierUpdatedAuthorizations);
+    AddDarwinNotifyObserver(center, (__bridge const void *)self, (__bridge CFStringRef)NotifierUpdatedNonSubscriptionAuths);
 
 #if DEBUG
     AddDarwinNotifyObserver(center, (__bridge const void *)self, (__bridge CFStringRef)NotifierDebugCustomFunction);
@@ -128,7 +127,6 @@ static inline void AddDarwinNotifyObserver(CFNotificationCenterRef center, const
     AddDarwinNotifyObserver(center, (__bridge const void *)self, (__bridge CFStringRef)NotifierNewHomepages);
     AddDarwinNotifyObserver(center, (__bridge const void *)self, (__bridge CFStringRef)NotifierTunnelConnected);
     AddDarwinNotifyObserver(center, (__bridge const void *)self, (__bridge CFStringRef)NotifierAvailableEgressRegions);
-    AddDarwinNotifyObserver(center, (__bridge const void *)self, (__bridge CFStringRef)NotifierMarkedAuthorizations);
     AddDarwinNotifyObserver(center, (__bridge const void *)self, (__bridge CFStringRef)NotifierNetworkConnectivityFailed);
     AddDarwinNotifyObserver(center, (__bridge const void *)self, (__bridge CFStringRef)NotifierNetworkConnectivityResolved);
 

@@ -19,6 +19,8 @@
 
 #import "IAPHelpViewController.h"
 #import "UIFont+Additions.h"
+#import <FBLPromises.h>
+#import "Psiphon-Swift.h"
 
 @interface IAPHelpViewController () <UITableViewDataSource, UITableViewDelegate>
 
@@ -27,6 +29,7 @@
 @end
 
 @implementation IAPHelpViewController {
+    FBLPromise<NSError *> *_Nullable pendingRefreshReceipt;
     MBProgressHUD *buyProgressAlert;
     NSTimer *buyProgressAlertTimer;
     NSMutableArray <CAGradientLayer*> *buttonGradients;
@@ -49,32 +52,6 @@
 
     // Sets navigation bar title.
     self.title = NSLocalizedStringWithDefaultValue(@"RESTORE_SUBSCRIPTION_BUTTON", nil, [NSBundle mainBundle], @"Restore Subscription", @"Button which, when pressed, attempts to restore any existing subscriptions the user has purchased");
-
-    // Listens to IAPStoreHelper transaction states.
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(onPaymentTransactionUpdate:)
-                                                 name:IAPHelperPaymentTransactionUpdateNotification
-                                               object:nil];
-
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(reloadProducts)
-                                                 name:IAPSKProductsRequestDidFailWithErrorNotification
-                                               object:nil];
-
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(reloadProducts)
-                                                 name:IAPSKProductsRequestDidReceiveResponseNotification
-                                               object:nil];
-
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(reloadProducts)
-                                                 name:IAPSKRequestRequestDidFinishNotification
-                                               object:nil];
-
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(reloadProducts)
-                                                 name:IAPHelperUpdatedSubscriptionDictionaryNotification
-                                               object:nil];
 
 }
 
@@ -206,19 +183,33 @@
 
 #pragma mark -
 
-- (void)restoreAction {
-    [self showProgressSpinnerAndBlockUI];
-    [[IAPStoreHelper sharedInstance] restoreSubscriptions];
-}
-
 - (void)refreshReceiptAction {
-    [self showProgressSpinnerAndBlockUI];
-    [[IAPStoreHelper sharedInstance] refreshReceipt];
+    IAPHelpViewController *__weak weakSelf = self;
+
+    void (^handlePromise)(void) = ^{
+        IAPHelpViewController *__strong strongSelf = weakSelf;
+        if (strongSelf) {
+            [strongSelf dismissProgressSpinnerAndUnblockUI];
+            strongSelf->pendingRefreshReceipt = nil;
+        }
+    };
+
+    if (!pendingRefreshReceipt) {
+        [self showProgressSpinnerAndBlockUI];
+
+        pendingRefreshReceipt = [[[SwiftDelegate.bridge refreshAppStoreReceipt] onQueue:dispatch_get_main_queue() then:^id _Nullable(NSError * _Nullable value) {
+            handlePromise();
+            return nil;
+        }] catch:^(NSError * _Nonnull error) {
+            handlePromise();
+        }];
+    }
 }
 
 - (void)dismissViewController {
     [self.navigationController popViewControllerAnimated:YES];
 }
+
 - (void)showProgressSpinnerAndBlockUI {
     if (buyProgressAlert != nil) {
         [buyProgressAlert hideAnimated:YES];
@@ -241,22 +232,6 @@
     if (buyProgressAlert != nil) {
         [buyProgressAlert hideAnimated:YES];
         buyProgressAlert = nil;
-    }
-}
-
-- (void)reloadProducts {
-    [self dismissProgressSpinnerAndUnblockUI];
-    [self.navigationController popViewControllerAnimated:YES];
-}
-
-- (void)onPaymentTransactionUpdate:(NSNotification *)notification {
-    SKPaymentTransactionState transactionState = (SKPaymentTransactionState) [notification.userInfo[IAPHelperPaymentTransactionUpdateKey] integerValue];
-
-    if (SKPaymentTransactionStatePurchasing == transactionState) {
-        [self showProgressSpinnerAndBlockUI];
-    } else {
-        [self dismissProgressSpinnerAndUnblockUI];
-        [self.navigationController popViewControllerAnimated:YES];
     }
 }
 
