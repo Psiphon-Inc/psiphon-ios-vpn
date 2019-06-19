@@ -18,10 +18,15 @@ PODS:
     - mopub-ios-sdk/Core
     - mopub-ios-sdk/Moat
   - PersonalizedAdConsent (1.0.3)
+  - PromisesObjC (1.2.8)
+  - PromisesSwift (1.2.8):
+    - PromisesObjC (= 1.2.8)
   - PsiphonClientCommonLibrary (1.2.1):
     - InAppSettingsKit
   - ReactiveObjC (3.1.0)
   - SVProgressHUD (2.2.5)
+  - SwiftActors (1.1.1):
+    - PromisesSwift (~> 1.2)
 
 DEPENDENCIES:
   - CustomIOSAlertView (~> 0.9.5)
@@ -34,6 +39,19 @@ DEPENDENCIES:
   - PsiphonClientCommonLibrary (from `https://github.com/Psiphon-Inc/psiphon-ios-client-common-library.git`, commit `0fd8d41`)
   - ReactiveObjC (from `https://github.com/Psiphon-Inc/ReactiveObjC.git`, commit `8bbf9dd`)
   - SVProgressHUD
+  - SwiftActors (from `https://github.com/Psiphon-Inc/swift-actors.git`, commit `cce87b8`)
+
+SPEC REPOS:
+  https://github.com/cocoapods/specs.git:
+    - CustomIOSAlertView
+    - Google-Mobile-Ads-SDK
+    - MBProgressHUD
+    - MoPub-AdMob-Adapters
+    - mopub-ios-sdk
+    - PersonalizedAdConsent
+    - PromisesObjC
+    - PromisesSwift
+    - SVProgressHUD
 
 EXTERNAL SOURCES:
   InAppSettingsKit:
@@ -45,6 +63,9 @@ EXTERNAL SOURCES:
   ReactiveObjC:
     :commit: 8bbf9dd
     :git: https://github.com/Psiphon-Inc/ReactiveObjC.git
+  SwiftActors:
+    :commit: cce87b8
+    :git: https://github.com/Psiphon-Inc/swift-actors.git
 
 CHECKOUT OPTIONS:
   InAppSettingsKit:
@@ -56,6 +77,9 @@ CHECKOUT OPTIONS:
   ReactiveObjC:
     :commit: 8bbf9dd
     :git: https://github.com/Psiphon-Inc/ReactiveObjC.git
+  SwiftActors:
+    :commit: cce87b8
+    :git: https://github.com/Psiphon-Inc/swift-actors.git
 
 SPEC CHECKSUMS:
   CustomIOSAlertView: cc4fa8e36219be3fd5ebcd40789f5b4aaae0f38e
@@ -65,10 +89,13 @@ SPEC CHECKSUMS:
   MoPub-AdMob-Adapters: 73cae2c6753fffa21d591e109582effec6422990
   mopub-ios-sdk: 320de49dd0a352ac58d33104a23853e749a84a78
   PersonalizedAdConsent: b50a8a5d6065b6db23121e8fcc0dce2ae983f6ea
+  PromisesObjC: c119f3cd559f50b7ae681fa59dc1acd19173b7e6
+  PromisesSwift: 37bad6f4daddb02f7c9c531efe91e8b21c13ee2f
   PsiphonClientCommonLibrary: da44de9be38f5bddd404f46e4d8a1d23d7810c21
   ReactiveObjC: 2a38ea15335de4119d8b17caf1db1484f61db902
   SVProgressHUD: 1428aafac632c1f86f62aa4243ec12008d7a51d6
+  SwiftActors: c892b23186d0133fdbf5f0681a292ee2509476f6
 
-PODFILE CHECKSUM: 457f27572c2b5710b53d41347b86f8314cdf6749
+PODFILE CHECKSUM: 2fc1fdf26f0c975b8cb6e4af3a3426d191cb7a6d
 
-COCOAPODS: 1.4.0
+COCOAPODS: 1.6.1
