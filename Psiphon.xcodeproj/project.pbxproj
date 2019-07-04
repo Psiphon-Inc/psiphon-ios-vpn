@@ -84,6 +84,15 @@
 		521FD100219E0E3800F748EC /* DebugUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 521FD0FB219E0E0E00F748EC /* DebugUtils.m */; };
 		524B4E6B2316F0E3004E9891 /* BorderedSubtitleButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 524B4E6A2316F0E3004E9891 /* BorderedSubtitleButton.m */; };
 		524B4E6E2316F27F004E9891 /* AnimatedControl.m in Sources */ = {isa = PBXBuildFile; fileRef = 524B4E6D2316F27F004E9891 /* AnimatedControl.m */; };
+		52467FE122C2A704009AEC6E /* PsiCashModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52467FE022C2A704009AEC6E /* PsiCashModels.swift */; };
+		52467FEC22CCFA8C009AEC6E /* Encodable+JSON.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52467FEB22CCFA8C009AEC6E /* Encodable+JSON.swift */; };
+		52467FEE22CD21FA009AEC6E /* MessageExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52467FED22CD21FA009AEC6E /* MessageExtensions.swift */; };
+		52467FF722CD6C0A009AEC6E /* SwiftActorsExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52467FF622CD6C0A009AEC6E /* SwiftActorsExtension.swift */; };
+		52467FF922CE77A1009AEC6E /* SwiftExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52467FF822CE77A1009AEC6E /* SwiftExtensions.swift */; };
+		52467FFB22CE9196009AEC6E /* PsiCashService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52467FFA22CE9196009AEC6E /* PsiCashService.swift */; };
+		52D2581122BADE1900CA956A /* ActorSystemInterface.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D2581022BADE1900CA956A /* ActorSystemInterface.swift */; };
+		52D2581322BADF4000CA956A /* SwiftInterface.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D2581222BADF4000CA956A /* SwiftInterface.swift */; };
+		52D2582522C2864A00CA956A /* Publisher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D2582422C2864900CA956A /* Publisher.swift */; };
 		66094F7A1E8067520069EC4E /* PsiphonTunnel.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 66094F781E8067520069EC4E /* PsiphonTunnel.framework */; };
 		6615A5EA1F58A95500026C98 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 6615A5E81F58A95500026C98 /* Localizable.strings */; };
 		6615A5EB1F58A95B00026C98 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 6615A5E81F58A95500026C98 /* Localizable.strings */; };
@@ -400,6 +409,16 @@
 		524B4E6A2316F0E3004E9891 /* BorderedSubtitleButton.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = BorderedSubtitleButton.m; sourceTree = "<group>"; };
 		524B4E6C2316F27F004E9891 /* AnimatedControl.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AnimatedControl.h; sourceTree = "<group>"; };
 		524B4E6D2316F27F004E9891 /* AnimatedControl.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AnimatedControl.m; sourceTree = "<group>"; };
+		52467FE022C2A704009AEC6E /* PsiCashModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PsiCashModels.swift; sourceTree = "<group>"; };
+		52467FEB22CCFA8C009AEC6E /* Encodable+JSON.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Encodable+JSON.swift"; sourceTree = "<group>"; };
+		52467FED22CD21FA009AEC6E /* MessageExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageExtensions.swift; sourceTree = "<group>"; };
+		52467FF622CD6C0A009AEC6E /* SwiftActorsExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftActorsExtension.swift; sourceTree = "<group>"; };
+		52467FF822CE77A1009AEC6E /* SwiftExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftExtensions.swift; sourceTree = "<group>"; };
+		52467FFA22CE9196009AEC6E /* PsiCashService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PsiCashService.swift; sourceTree = "<group>"; };
+		52D2580F22BADE1900CA956A /* Psiphon-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Psiphon-Bridging-Header.h"; sourceTree = "<group>"; };
+		52D2581022BADE1900CA956A /* ActorSystemInterface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActorSystemInterface.swift; sourceTree = "<group>"; };
+		52D2581222BADF4000CA956A /* SwiftInterface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftInterface.swift; sourceTree = "<group>"; };
+		52D2582422C2864900CA956A /* Publisher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Publisher.swift; sourceTree = "<group>"; };
 		571DC9418AF936E60179F07C /* Pods-Psiphon.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Psiphon.release.xcconfig"; path = "Pods/Target Support Files/Pods-Psiphon/Pods-Psiphon.release.xcconfig"; sourceTree = "<group>"; };
 		66094F781E8067520069EC4E /* PsiphonTunnel.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = PsiphonTunnel.framework; sourceTree = "<group>"; };
 		6615A5E91F58A95500026C98 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = Strings/en.lproj/Localizable.strings; sourceTree = "<group>"; };
@@ -912,6 +931,14 @@
 				4E5DCF9120EC11C6009D8D39 /* Products */,
 				4E9B2E09204EFB7E00E63784 /* Objects */,
 				4E856D8F20A8C612007861A2 /* Onboarding */,
+				52D2581222BADF4000CA956A /* SwiftInterface.swift */,
+				52D2582422C2864900CA956A /* Publisher.swift */,
+				52467FE022C2A704009AEC6E /* PsiCashModels.swift */,
+				52467FEB22CCFA8C009AEC6E /* Encodable+JSON.swift */,
+				52467FED22CD21FA009AEC6E /* MessageExtensions.swift */,
+				52467FF622CD6C0A009AEC6E /* SwiftActorsExtension.swift */,
+				52467FF822CE77A1009AEC6E /* SwiftExtensions.swift */,
+				52467FFA22CE9196009AEC6E /* PsiCashService.swift */,
 			);
 			path = PsiCash;
 			sourceTree = "<group>";
@@ -1101,6 +1128,8 @@
 				A8408C79DD812741E678AB94 /* SupportedLanguages.h */,
 				A8408058458E7BFC4C3DFDDE /* AppEvent.m */,
 				A8408710CC81EFA1CB22CAEC /* AppEvent.h */,
+				52D2581022BADE1900CA956A /* ActorSystemInterface.swift */,
+				52D2580F22BADE1900CA956A /* Psiphon-Bridging-Header.h */,
 			);
 			path = Psiphon;
 			sourceTree = "<group>";
@@ -1324,7 +1353,7 @@
 					CE26FC891BBDC7B800B83375 = {
 						CreatedOnToolsVersion = 7.0;
 						DevelopmentTeam = Q6HLNEX92A;
-						LastSwiftMigration = 0820;
+						LastSwiftMigration = 1100;
 						ProvisioningStyle = Automatic;
 						SystemCapabilities = {
 							com.apple.ApplicationGroups.iOS = {
@@ -1663,9 +1692,12 @@
 				445F24E520E1A5BA00D004E9 /* asn_SET_OF.c in Sources */,
 				9BFEC4F02A47FF8265635803 /* Notifier.m in Sources */,
 				4EC5526620AB8DCD000B4BEA /* PastelView.m in Sources */,
+				52467FFB22CE9196009AEC6E /* PsiCashService.swift in Sources */,
 				4E5263C7207294600021FEF5 /* EmbeddedServerEntries.m in Sources */,
 				9BFECFEB3BC9F10542C1A416 /* PsiphonConfigUserDefaults.m in Sources */,
+				52467FF722CD6C0A009AEC6E /* SwiftActorsExtension.swift in Sources */,
 				4E5263CD2072984D0021FEF5 /* IAPViewController.m in Sources */,
+				52D2581322BADF4000CA956A /* SwiftInterface.swift in Sources */,
 				445F24D720E1A5BA00D004E9 /* per_support.c in Sources */,
 				4E5263CE2072984D0021FEF5 /* IAPStoreHelper.m in Sources */,
 				EF90D7AA204F22C900228A63 /* NSError+Convenience.m in Sources */,
@@ -1684,6 +1716,7 @@
 				445F24E020E1A5BA00D004E9 /* INTEGER.c in Sources */,
 				445F24DD20E1A5BA00D004E9 /* per_encoder.c in Sources */,
 				4EC5526320AB8DBE000B4BEA /* Pastel.m in Sources */,
+				52467FE122C2A704009AEC6E /* PsiCashModels.swift in Sources */,
 				9BFEC530849525066327C815 /* VPNManager.m in Sources */,
 				445F24F620E1A85D00D004E9 /* UTF8String.c in Sources */,
 				521FD0F0219E0D5600F748EC /* DebugLogViewController.m in Sources */,
@@ -1709,6 +1742,7 @@
 				9BFEC9C08697E4701A36A3B3 /* UnionSerialQueue.m in Sources */,
 				445F24EF20E1A5BA00D004E9 /* constraints.c in Sources */,
 				445F24DB20E1A5BA00D004E9 /* ber_decoder.c in Sources */,
+				52D2581122BADE1900CA956A /* ActorSystemInterface.swift in Sources */,
 				9BFEC1F0DA87B4E66C8CC4AA /* MoPubInterstitialAdControllerWrapper.m in Sources */,
 				9BFECFE618966005B01CF582 /* MoPubRewardedAdControllerWrapper.m in Sources */,
 				CE425D1F2159485600B7893D /* StarView.m in Sources */,
@@ -1745,12 +1779,15 @@
 				A84083E76E518050B65E523A /* SkyButton.m in Sources */,
 				A840835FAC7F18A6A7021415 /* RingSkyButton.m in Sources */,
 				A84086D3F4BD2D551CA67611 /* AlertDialogs.m in Sources */,
+				52467FEC22CCFA8C009AEC6E /* Encodable+JSON.swift in Sources */,
 				A840854A7ACA14A7D891EC16 /* OnboardingScrollableView.m in Sources */,
 				A84084C8B5C16F0EB80364FA /* Strings.m in Sources */,
 				A8408FF45D08D31E102FA41F /* ContainerDB.m in Sources */,
+				52D2582522C2864A00CA956A /* Publisher.swift in Sources */,
 				A8408D8C16D136075590193C /* AppUpgrade.m in Sources */,
 				A8408692D005E8599267522E /* UIView+Additions.m in Sources */,
 				A84087AFA5806D689C3BF6D2 /* PickerViewController.m in Sources */,
+				52467FEE22CD21FA009AEC6E /* MessageExtensions.swift in Sources */,
 				A8408EB1E9DABE35016580A7 /* ImageUtils.m in Sources */,
 				A8408BC29B903A6C0A32F32C /* SkyRegionSelectionViewController.m in Sources */,
 				A84088D3FD4B01A7D14CCC53 /* SupportedLanguages.m in Sources */,
@@ -1761,6 +1798,7 @@
 				A84080E9FC63E29F71A79A63 /* RelaySubject.m in Sources */,
 				A840803A0733D9FCA5410796 /* ActivityIndicatorRoyalSkyButton.m in Sources */,
 				A84084F47D4EA8D2B91E6609 /* SubscriptionData.m in Sources */,
+				52467FF922CE77A1009AEC6E /* SwiftExtensions.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1866,6 +1904,7 @@
 		4E0D88281FA06B2400ADB61E /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
@@ -1894,6 +1933,7 @@
 		4E0D88291FA06B2400ADB61E /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
@@ -2030,6 +2070,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = Psiphon/Psiphon.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
@@ -2047,6 +2088,9 @@
 				PROVISIONING_PROFILE = "";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				STRIP_BITCODE_FROM_COPIED_FILES = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "Psiphon/Psiphon-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
 				USER_HEADER_SEARCH_PATHS = "\"${PROJECT_DIR}/Pods\"/** ${PROJECT_DIR}/Psiphon/asn1c";
 				VERSIONING_SYSTEM = "apple-generic";
 			};
@@ -2058,6 +2102,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = Psiphon/Psiphon.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
@@ -2074,6 +2119,8 @@
 				PROVISIONING_PROFILE = "";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				STRIP_BITCODE_FROM_COPIED_FILES = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "Psiphon/Psiphon-Bridging-Header.h";
+				SWIFT_VERSION = 5.0;
 				USER_HEADER_SEARCH_PATHS = "\"${PROJECT_DIR}/Pods\"/** ${PROJECT_DIR}/Psiphon/asn1c";
 				VERSIONING_SYSTEM = "apple-generic";
 			};

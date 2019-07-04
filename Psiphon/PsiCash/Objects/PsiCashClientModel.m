@@ -29,6 +29,7 @@
                               andPendingPurchases:(NSArray<id<PsiCashProductSKU>>*)pendingPurchases
                       andActiveSpeedBoostPurchase:(PsiCashPurchase* /* TODO: typing */)activeSpeedBoostPurchase
                                 andRefreshPending:(BOOL)refreshPending {
+
     PsiCashClientModel *clientModel = [[PsiCashClientModel alloc] init];
     clientModel.authPackage = authPackage;
     clientModel.balance = balance;

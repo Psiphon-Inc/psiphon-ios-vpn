@@ -23,26 +23,48 @@
 #import "PsiCashAuthPackage.h"
 
 @interface PsiCashClientModel : NSObject
+
+// TODO! we should do onboarding differently. PsiCashService actor is the "backend" service only.
 @property (nonatomic, assign) BOOL onboarded;
-@property (strong, atomic) PsiCashAuthPackage *authPackage;
-@property (strong, atomic) NSNumber *_Nonnull balance;
-@property (strong, atomic) PsiCashSpeedBoostProduct *speedBoostProduct;
+
+// Already implemented
+@property (strong, atomic) PsiCashAuthPackage *authPackage;           // `authPackage`
+@property (strong, atomic) NSNumber *_Nonnull balance;                // `balance`
+@property (strong, atomic) PsiCashPurchase *activeSpeedBoostPurchase; // `activePurchases`
+@property (strong, atomic) PsiCashSpeedBoostProduct *speedBoostProduct; // TODO! this is all the speed boosts you can buy
+
+
+// TODO! PsiCashService actor should probably emit this
 @property (strong, atomic) NSArray<id<PsiCashProductSKU>> *pendingPurchases;
-@property (strong, atomic) PsiCashPurchase *activeSpeedBoostPurchase;
+
+// TODO! PsiCashService actor should probably emit something of this kind.
+//       maybe not exactly a bool.
 @property (nonatomic, assign) BOOL refreshPending;
+
+
+
+
+
 + (PsiCashClientModel*)clientModelWithAuthPackage:(PsiCashAuthPackage*)authPackage
                                        andBalance:(NSNumber*)balance
                              andSpeedBoostProduct:(PsiCashSpeedBoostProduct*)speedBoostProduct
                               andPendingPurchases:(NSArray<id<PsiCashProductSKU>>*)pendingPurchases
                       andActiveSpeedBoostPurchase:(PsiCashPurchase*)activeSpeedBoostPurchase
                                 andRefreshPending:(BOOL)refreshPending;
+
+
+
 + (NSString*)formattedBalance:(NSNumber*)balance;
+
+// TODO! how are these used in the wild
 - (PsiCashSpeedBoostProductSKU*)maxSpeedBoostPurchaseEarned;
 - (PsiCashSpeedBoostProductSKU*)minSpeedBoostPurchaseAvailable;
+
 - (BOOL)hasActiveSpeedBoostPurchase;
 - (int)minutesOfSpeedBoostRemaining;
 - (BOOL)hasPendingPurchase;
 - (BOOL)hasAuthPackage;
+
 @end
 
 @protocol PsiCashClientModelReceiver

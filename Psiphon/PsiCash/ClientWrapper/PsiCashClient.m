@@ -678,7 +678,7 @@ typedef NS_ERROR_ENUM(PsiCashClientRefreshStateErrorDomain, PsiCashClientRefresh
  * Hardcode SpeedBoost product to only 1h option for PsiCash 1.0
  */
 - (NSDictionary<NSString*,NSArray<NSString*>*>*)targetProducts {
-    return @{[PsiCashSpeedBoostProduct purchaseClass]: @[@"1hr"]};
+    return @{[PsiCashSpeedBoostProduct purchaseClass]: @[@"1hr", @"2hr", @"3hr", @"4hr", @"5hr"]};
 }
 
 /**
