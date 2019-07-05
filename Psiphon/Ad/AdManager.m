@@ -48,7 +48,6 @@
 #import <PersonalizedAdConsent/PersonalizedAdConsent.h>
 #import "AdMobConsent.h"
 #import "AppEvent.h"
-#import "PsiCashClient.h"
 
 
 NSErrorDomain const AdControllerWrapperErrorDomain = @"AdControllerWrapperErrorDomain";
@@ -476,10 +475,11 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
         // Setup triggers for rewarded video ads.
         triggers = [self.forceRewardedVideoLoad mapReplace:TriggerForceRewardedVideoLoad];
 
-        if (waitForPsiCashRewardedActivityData) {
-            triggers = [triggers merge:[[PsiCashClient sharedInstance].rewardedActivityDataSignal
-              mapReplace:TriggerPsiCashRewardedActivityDataUpdated]];
-        }
+        // TODO! PsiCash: what do to when `waitForPsiCashRewardedActivityData` is active.
+//        if (waitForPsiCashRewardedActivityData) {
+//            triggers = [triggers merge:[[PsiCashClient sharedInstance].rewardedActivityDataSignal
+//              mapReplace:TriggerPsiCashRewardedActivityDataUpdated]];
+//        }
 
     } else if (AdFormatInterstitial == adController.adFormat) {
         adLoadMaxRetries = 1;
@@ -537,8 +537,11 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
 
                   // For rewarded video take no loading action if custom data is missing.
                   if (adController.adFormat == AdFormatRewardedVideo && waitForPsiCashRewardedActivityData) {
-                      NSString *_Nullable customData = [[PsiCashClient sharedInstance]
-                                                                       rewardedVideoCustomData];
+
+                      // TODO! PsiCash: get rewarded custom data
+//                      NSString *_Nullable customData = [[PsiCashClient sharedInstance]
+//                                                                       rewardedVideoCustomData];
+                      NSString *_Nullable customData = nil; // TODO! compile workaround for now.
                       if (!customData) {
                           sa.action = AdLoadActionNone;
                           return sa;

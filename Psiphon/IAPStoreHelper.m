@@ -138,6 +138,7 @@ NSString *const kSubscriptionDictionary = @"kSubscriptionDictionary";
     [self updateSubscriptionDictionaryFromLocalReceipt];
 }
 
+
 - (void)paymentQueue:(SKPaymentQueue *)queue updatedTransactions:(NSArray *)transactions {
     for (SKPaymentTransaction *transaction in transactions) {
 

@@ -55,6 +55,7 @@
 #import "RACTargetQueueScheduler.h"
 #import "UnionSerialQueue.h"
 #import "PsiphonDataSharedDB.h"
+#import "Psiphon-Swift.h"
 
 NSErrorDomain const VPNManagerErrorDomain = @"VPNManagerErrorDomain";
 
@@ -205,6 +206,9 @@ PsiFeedbackLogType const VPNManagerLogType = @"VPNManager";
 
                       // Observers of VPNManagerStatusDidChangeNotification will be notified
                       // at the same time.
+
+                      /// Pass tunnel status into Swift delegate.
+                      [VPNStatusBridge.instance next:_tunnelProviderManager.connection.status];
 
                       [self.internalTunnelStatus
                         sendNext:@(_tunnelProviderManager.connection.status)];

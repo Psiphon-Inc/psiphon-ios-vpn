@@ -41,10 +41,6 @@
 #import "RACSignal+Operations.h"
 #import "RACUnit.h"
 #import "RegionSelectionButton.h"
-#import "PsiCashBalanceView.h"
-#import "PsiCashClient.h"
-#import "PsiCashSpeedBoostMeterView.h"
-#import "PsiCashView.h"
 #import "SubscriptionsBar.h"
 #import "UIColor+Additions.h"
 #import "UIFont+Additions.h"
@@ -59,12 +55,11 @@
 #import "Strings.h"
 #import "SkyRegionSelectionViewController.h"
 #import "UIView+Additions.h"
+#import "Psiphon-Swift.h"
 
 
 PsiFeedbackLogType const MainViewControllerLogType = @"MainViewController";
 PsiFeedbackLogType const RewardedVideoLogType = @"RewardedVideo";
-
-UserDefaultsKey const PsiCashHasBeenOnboardedBoolKey = @"PsiCash.HasBeenOnboarded";
 
 #if DEBUG
 NSTimeInterval const MaxAdLoadingTime = 1.f;
@@ -94,7 +89,9 @@ NSString * const CommandStopVPN = @"StopVPN";
 
     // UI elements
     UILabel *statusLabel;
-    UIButton *versionLabel;
+
+    // TODO! version label removed temporarily
+//    UIButton *versionLabel;
     SubscriptionsBar *subscriptionsBar;
     RegionSelectionButton *regionSelectionButton;
     VPNStartAndStopButton *startAndStopButton;
@@ -119,11 +116,7 @@ NSString * const CommandStopVPN = @"StopVPN";
     UIImageView *psiphonLargeLogo;
 
     // PsiCash
-    RACBehaviorSubject<NSNumber*> *psiCashOnboardingCompleted;
-    NSLayoutConstraint *psiCashViewHeight;
-    PsiCashPurchaseAlertView *alertView;
-    PsiCashClientModel *model;
-    PsiCashView *psiCashView;
+    PsiCashWidgetView *psiCashWidget;
 
     // Clouds
     UIImageView *cloudMiddleLeft;
@@ -195,27 +188,23 @@ NSString * const CommandStopVPN = @"StopVPN";
 
     availableServerRegions = [[AvailableServerRegions alloc] init];
     [availableServerRegions sync];
-
-    psiCashOnboardingCompleted = [[RACBehaviorSubject alloc] init];
-    BOOL onboarded = [[NSUserDefaults standardUserDefaults] boolForKey:PsiCashHasBeenOnboardedBoolKey];
-    [psiCashOnboardingCompleted sendNext:[NSNumber numberWithBool:onboarded]];
     
     // Setting up the UI
     // calls them in the right order
     [self.view setBackgroundColor:UIColor.darkBlueColor];
     [self setNeedsStatusBarAppearanceUpdate];
     [self addViews];
-
     [self setupClouds];
     [self setupSmallPsiphonLogoAndVersionLabel];
-    [self setupSettingsButton];
+    // TODO! settings button deactivated for testing
+//    [self setupSettingsButton];
     [self setupPsiphonLogoView];
-    [self setupPsiCashView];
     [self setupStartAndStopButton];
     [self setupStatusLabel];
     [self setupRegionSelectionButton];
     [self setupBottomBar];
-    [self setupAddSubscriptionsBar];
+    [self setupSubscriptionsBar];
+    [self setupPsiCashWidgetView];
 
     MainViewController *__weak weakSelf = self;
     
@@ -316,7 +305,7 @@ NSString * const CommandStopVPN = @"StopVPN";
               // when there is no active internet connection.
 
               // TODO: Add custom initialization method to PsiCash
-              [[PsiCashClient sharedInstance] scheduleRefreshState];
+              // TODO: [[PsiCashClient sharedInstance] scheduleRefreshState];
 
               [[AdManager sharedInstance] initializeAdManager];
               [[AdManager sharedInstance] initializeRewardedVideos];
@@ -589,8 +578,8 @@ NSString * const CommandStopVPN = @"StopVPN";
 
     // Setup autolayout
     CGFloat buttonTouchAreaSize = 80.f;
-    [settingsButton.topAnchor constraintEqualToAnchor:psiCashView.topAnchor constant:-(buttonTouchAreaSize - gearTemplate.size.height)/2].active = YES;
-    [settingsButton.trailingAnchor constraintEqualToAnchor:psiCashView.trailingAnchor constant:(buttonTouchAreaSize/2 - gearTemplate.size.width/2)].active = YES;
+    [settingsButton.topAnchor constraintEqualToAnchor:psiCashWidget.topAnchor constant:-(buttonTouchAreaSize - gearTemplate.size.height)/2].active = YES;
+    [settingsButton.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor constant:10.f].active = YES;
     [settingsButton.widthAnchor constraintEqualToConstant:buttonTouchAreaSize].active = YES;
     [settingsButton.heightAnchor constraintEqualToAnchor:settingsButton.widthAnchor].active = YES;
 
@@ -623,11 +612,11 @@ NSString * const CommandStopVPN = @"StopVPN";
     cloudMiddleRight = [[UIImageView alloc] initWithImage:cloud];
     cloudTopRight = [[UIImageView alloc] initWithImage:cloud];
     cloudBottomRight = [[UIImageView alloc] initWithImage:cloud];
-    versionLabel = [[UIButton alloc] init];
-    settingsButton = [[UIButton alloc] init];
+//    versionLabel = [[UIButton alloc] init];
+//    settingsButton = [[UIButton alloc] init];
     psiphonSmallLogo = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"PsiphonSmallLogoWhite"]];
     psiphonLargeLogo = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"PsiphonLogoWhite"]];
-    psiCashView = [[PsiCashView alloc] initWithAutoLayout];
+    psiCashWidget = [[PsiCashWidgetView alloc] initWithFrame:CGRectZero];
     startAndStopButton = [VPNStartAndStopButton buttonWithType:UIButtonTypeCustom];
     statusLabel = [[UILabel alloc] init];
     regionSelectionButton = [[RegionSelectionButton alloc] init];
@@ -642,9 +631,9 @@ NSString * const CommandStopVPN = @"StopVPN";
     [self.view addSubview:cloudBottomRight];
     [self.view addSubview:psiphonSmallLogo];
     [self.view addSubview:psiphonLargeLogo];
-    [self.view addSubview:psiCashView];
-    [self.view addSubview:versionLabel];
-    [self.view addSubview:settingsButton];
+    [self.view addSubview:psiCashWidget];
+//    [self.view addSubview:versionLabel];
+//    [self.view addSubview:settingsButton];
     [self.view addSubview:startAndStopButton];
     [self.view addSubview:statusLabel];
     [self.view addSubview:regionSelectionButton];
@@ -667,7 +656,7 @@ NSString * const CommandStopVPN = @"StopVPN";
     [cloudMiddleRight.widthAnchor constraintEqualToConstant:cloud.size.width].active = YES;
 
     cloudTopRight.translatesAutoresizingMaskIntoConstraints = NO;
-    [cloudTopRight.topAnchor constraintEqualToAnchor:psiCashView.bottomAnchor constant:-20].active = YES;
+    [cloudTopRight.topAnchor constraintEqualToAnchor:psiCashWidget.bottomAnchor constant:-20].active = YES;
     [cloudTopRight.heightAnchor constraintEqualToConstant:cloud.size.height].active = YES;
     [cloudTopRight.widthAnchor constraintEqualToConstant:cloud.size.width].active = YES;
 
@@ -861,6 +850,7 @@ NSString * const CommandStopVPN = @"StopVPN";
     statusLabel.attributedText = mutableStr;
 }
 
+// TODO! should be moved into SubscriptionBar class
 - (void)setupBottomBar {
     bottomBar.translatesAutoresizingMaskIntoConstraints = NO;
     bottomBar.backgroundColor = [UIColor clearColor];
@@ -880,7 +870,8 @@ NSString * const CommandStopVPN = @"StopVPN";
 
     bottomBarGradient = [CAGradientLayer layer];
     bottomBarGradient.frame = bottomBar.bounds; // frame reset in viewDidLayoutSubviews
-    bottomBarGradient.colors = @[(id)UIColor.lightRoyalBlueTwo.CGColor, (id)UIColor.lightishBlue.CGColor];
+    bottomBarGradient.colors = @[(id)UIColor.lightishBlue.CGColor,
+                                 (id)UIColor.lightRoyalBlueTwo.CGColor];
 
     [bottomBar.layer insertSublayer:bottomBarGradient atIndex:0];
 }
@@ -911,40 +902,40 @@ NSString * const CommandStopVPN = @"StopVPN";
 
     // Setup autolayout
     [NSLayoutConstraint activateConstraints:@[
-      [psiphonSmallLogo.leadingAnchor constraintEqualToAnchor:psiCashView.leadingAnchor],
+      [psiphonSmallLogo.leadingAnchor constraintEqualToAnchor:psiCashWidget.leadingAnchor],
 
       [psiphonSmallLogo.trailingAnchor
-        constraintLessThanOrEqualToAnchor:psiCashView.balance.leadingAnchor
+        constraintLessThanOrEqualToAnchor:psiCashWidget.leadingAnchor
                                  constant:-2],
 
-      [psiphonSmallLogo.topAnchor constraintEqualToAnchor:psiCashView.topAnchor]
+      [psiphonSmallLogo.topAnchor constraintEqualToAnchor:psiCashWidget.topAnchor]
     ]];
 
 
-    versionLabel.translatesAutoresizingMaskIntoConstraints = NO;
-    [versionLabel setTitle:[NSString stringWithFormat:@"v%@",[[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"]]
-                  forState:UIControlStateNormal];
-    [versionLabel setTitleColor:UIColor.nepalGreyBlueColor forState:UIControlStateNormal];
-    versionLabel.titleLabel.adjustsFontSizeToFitWidth = YES;
-    versionLabel.titleLabel.font = [UIFont avenirNextBold:10.5f];
-    versionLabel.userInteractionEnabled = FALSE;
-    versionLabel.contentEdgeInsets = UIEdgeInsetsMake(10.f, 10.f, 10.f, 10.f);
-
-#if DEBUG
-    versionLabel.userInteractionEnabled = TRUE;
-    [versionLabel addTarget:self
-                     action:@selector(onVersionLabelTap:)
-           forControlEvents:UIControlEventTouchUpInside];
-#endif
-
-    // Setup autolayout
-    [NSLayoutConstraint activateConstraints:@[
-      [versionLabel.leadingAnchor constraintEqualToAnchor:psiphonSmallLogo.leadingAnchor constant:-10.f],
-      [versionLabel.topAnchor constraintEqualToAnchor:psiphonSmallLogo.bottomAnchor constant:-10.f]
-    ]];
+//    versionLabel.translatesAutoresizingMaskIntoConstraints = NO;
+//    [versionLabel setTitle:[NSString stringWithFormat:@"v%@",[[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"]]
+//                  forState:UIControlStateNormal];
+//    [versionLabel setTitleColor:UIColor.nepalGreyBlueColor forState:UIControlStateNormal];
+//    versionLabel.titleLabel.adjustsFontSizeToFitWidth = YES;
+//    versionLabel.titleLabel.font = [UIFont avenirNextBold:10.5f];
+//    versionLabel.userInteractionEnabled = FALSE;
+//    versionLabel.contentEdgeInsets = UIEdgeInsetsMake(10.f, 10.f, 10.f, 10.f);
+//
+//#if DEBUG
+//    versionLabel.userInteractionEnabled = TRUE;
+//    [versionLabel addTarget:self
+//                     action:@selector(onVersionLabelTap:)
+//           forControlEvents:UIControlEventTouchUpInside];
+//#endif
+//
+//    // Setup autolayout
+//    [NSLayoutConstraint activateConstraints:@[
+//      [versionLabel.trailingAnchor constraintEqualToAnchor:psiphonSmallLogo.leadingAnchor constant:-10.f],
+//      [versionLabel.topAnchor constraintEqualToAnchor:psiphonSmallLogo.bottomAnchor constant:-10.f]
+//    ]];
 }
 
-- (void)setupAddSubscriptionsBar {
+- (void)setupSubscriptionsBar {
     [subscriptionsBar addTarget:self
                          action:@selector(onSubscriptionTap)
                forControlEvents:UIControlEventTouchUpInside];
@@ -956,8 +947,9 @@ NSString * const CommandStopVPN = @"StopVPN";
       [subscriptionsBar.centerXAnchor constraintEqualToAnchor:bottomBar.centerXAnchor],
       [subscriptionsBar.centerYAnchor constraintEqualToAnchor:bottomBar.safeCenterYAnchor],
       [subscriptionsBar.widthAnchor constraintEqualToAnchor:self.view.widthAnchor],
-      [subscriptionsBar.heightAnchor constraintEqualToAnchor:self.view.safeHeightAnchor
-                                                  multiplier:0.11]
+      [subscriptionsBar.heightAnchor constraintGreaterThanOrEqualToConstant:100.0],
+      [subscriptionsBar.heightAnchor constraintLessThanOrEqualToAnchor:self.view.safeHeightAnchor
+                                                  multiplier:0.13],
     ]];
 
 }
@@ -1061,414 +1053,371 @@ NSString * const CommandStopVPN = @"StopVPN";
 
 #pragma mark - PsiCash
 
-#pragma mark - PsiCash UI callbacks
-
-/**
- * Buy max num hours of Speed Boost that the user can afford if possible
- */
-- (void)instantMaxSpeedBoostPurchase {
-    if (![[psiCashOnboardingCompleted first] boolValue]) {
-        PsiCashOnboardingViewController *onboarding = [[PsiCashOnboardingViewController alloc] init];
-        onboarding.delegate = self;
-        [self presentViewController:onboarding animated:NO completion:nil];
-        return;
-    }
-
-    MainViewController *__weak weakSelf = self;
-
-    // Checks the latest tunnel status before going ahead with the purchase request.
-     __block RACDisposable *disposable = [[[VPNManager sharedInstance].lastTunnelStatus
-       take:1]
-       subscribeNext:^(NSNumber *value) {
-           VPNStatus s = (VPNStatus) [value integerValue];
-
-           if (s == VPNStatusConnected || s == VPNStatusDisconnected || s == VPNStatusInvalid) {
-               // Device is either tunneled or untunneled, we can go ahead with the purchase request.
-               PsiCashSpeedBoostProductSKU *purchase = [model maxSpeedBoostPurchaseEarned];
-
-               if (![model hasPendingPurchase] && ![model hasActiveSpeedBoostPurchase] && purchase != nil) {
-                   [[[UINotificationFeedbackGenerator alloc] init] notificationOccurred:UINotificationFeedbackTypeSuccess];
-                   [PsiCashClient.sharedInstance purchaseSpeedBoostProduct:purchase];
-               } else {
-                   [weakSelf showPsiCashAlertView];
-               }
-           } else {
-               // Device is in a connecting or disconnecting state, we shouldn't do any purchase requests.
-               // Informs the user through an alert.
-               NSString *alertBody = NSLocalizedStringWithDefaultValue(@"PSICASH_CONNECTED_OR_DISCONNECTED",
-                 nil,
-                 [NSBundle mainBundle],
-                 @"Speed Boost purchase unavailable while Psiphon is connecting.",
-                 @"Alert message indicating to the user that they can't purchase Speed Boost while the app is connecting."
-                 " Do not translate 'Psiphon'.");
-
-               [UIAlertController presentSimpleAlertWithTitle:@"PsiCash"  // The word PsiCash is not translated.
-                                                      message:alertBody
-                                               preferredStyle:UIAlertControllerStyleAlert
-                                                    okHandler:nil];
-           }
-       }
-       completed:^{
-           [weakSelf.compoundDisposable removeDisposable:disposable];
-       }];
-
-    [self.compoundDisposable addDisposable:disposable];
-}
-
 #pragma mark - PsiCash UI
+
+- (void)speedBoostButton {
+    // TODO! use SwiftAppDelegate interface
+    UIViewController *psiCashViewController = [SwiftAppDelegate.instance createPsiCashViewController];
+    [self presentViewController:psiCashViewController animated:YES completion:nil];
+}
 
 - (void)setupPsiphonLogoView {
     psiphonLargeLogo.translatesAutoresizingMaskIntoConstraints = NO;
 
     psiphonLargeLogo.contentMode = UIViewContentModeScaleAspectFill;
 
-    [psiphonLargeLogo.centerYAnchor constraintEqualToAnchor:versionLabel.centerYAnchor].active = YES;
+//    [psiphonLargeLogo.centerYAnchor constraintEqualToAnchor:versionLabel.centerYAnchor].active = YES;
     [psiphonLargeLogo.centerXAnchor constraintEqualToAnchor:self.view.centerXAnchor].active = YES;
 }
 
-- (void)setupPsiCashView {
-    psiCashView.translatesAutoresizingMaskIntoConstraints = NO;
+- (void)setupPsiCashWidgetView {
+    // debug remove
+    [psiCashWidget.balanceView setAmountWithNanoPsi:0];
+    psiCashWidget.translatesAutoresizingMaskIntoConstraints = NO;
 
-    UITapGestureRecognizer *psiCashViewTap = [[UITapGestureRecognizer alloc]
-                                                  initWithTarget:self action:@selector(instantMaxSpeedBoostPurchase)];
+    [NSLayoutConstraint activateConstraints:@[
+        [psiCashWidget.centerXAnchor constraintEqualToAnchor:self.view.centerXAnchor],
+        [psiCashWidget.topAnchor constraintEqualToAnchor:self.topLayoutGuide.bottomAnchor
+                                                constant:26]
+    ]];
+    
 
-    psiCashViewTap.numberOfTapsRequired = 1;
-    [psiCashView.meter addGestureRecognizer:psiCashViewTap];
-
-    [psiCashView.centerXAnchor constraintEqualToAnchor:self.view.centerXAnchor].active = YES;
-    [psiCashView.topAnchor constraintEqualToAnchor:self.topLayoutGuide.bottomAnchor constant:26].active = YES;
-
-    CGFloat psiCashViewMaxWidth = 600;
-    CGFloat psiCashViewToParentViewWidthRatio = 0.95;
+    CGFloat psiCashViewMaxWidth = 360;
+    CGFloat psiCashViewToParentViewWidthRatio = 0.87;
     if (self.view.frame.size.width * psiCashViewToParentViewWidthRatio > psiCashViewMaxWidth) {
-        [psiCashView.widthAnchor constraintEqualToConstant:psiCashViewMaxWidth].active = YES;
+        [psiCashWidget.widthAnchor constraintEqualToConstant:psiCashViewMaxWidth].active = YES;
     } else {
-        [psiCashView.widthAnchor constraintEqualToAnchor:self.view.widthAnchor
+        [psiCashWidget.widthAnchor constraintEqualToAnchor:self.view.widthAnchor
                                               multiplier:psiCashViewToParentViewWidthRatio].active = YES;
     }
-    psiCashViewHeight = [psiCashView.heightAnchor constraintEqualToConstant:146.9];
-    psiCashViewHeight.active = YES;
 
-    MainViewController *__weak weakSelf = self;
+    // Sets button action
+    [psiCashWidget.speedBoostButton addTarget:self action:@selector(speedBoostButton) forControlEvents:UIControlEventTouchUpInside];
 
-
-    RACDisposable *psiCashViewUpdates =
-        [[[PsiCashClient.sharedInstance.clientModelSignal
-        combineLatestWith:psiCashOnboardingCompleted]
-        deliverOnMainThread]
-        subscribeNext:^(RACTwoTuple<PsiCashClientModel *, NSNumber *> * _Nullable x) {
-
-            PsiCashClientModel *newClientModel = [x first];
-            newClientModel.onboarded = [[x second] boolValue];
-
-            MainViewController *__strong strongSelf = weakSelf;
-
-            if (strongSelf != nil) {
-                BOOL stateChanged =    [strongSelf->model hasActiveSpeedBoostPurchase] ^
-                                       [newClientModel hasActiveSpeedBoostPurchase]
-                                    ||
-                                       [strongSelf->model hasPendingPurchase] ^
-                                       [newClientModel hasPendingPurchase];
-                if (   strongSelf->model
-                    && [strongSelf->model hasActiveSpeedBoostPurchase] == FALSE
-                    && [newClientModel hasActiveSpeedBoostPurchase] == TRUE) {
-                    // Speed Boost has activated
-                    [[[UINotificationFeedbackGenerator alloc] init]
-                     notificationOccurred:UINotificationFeedbackTypeSuccess];
-                }
-
-                NSComparisonResult balanceChange = [strongSelf->model.balance compare:newClientModel.balance];
-
-                if (balanceChange != NSOrderedSame) {
-
-                    [[[UINotificationFeedbackGenerator alloc] init]
-                     notificationOccurred:UINotificationFeedbackTypeSuccess];
-
-                    NSNumber *balanceChange = [NSNumber numberWithDouble:newClientModel.balance.doubleValue
-                                              - strongSelf->model.balance.doubleValue];
-                    [PsiCashView animateBalanceChangeOf:balanceChange
-                                        withPsiCashView:strongSelf->psiCashView
-                                           inParentView:strongSelf.view];
-                }
-
-                strongSelf->model = newClientModel;
-
-                if (stateChanged && strongSelf->alertView != nil) {
-                    [strongSelf showPsiCashAlertView];
-                }
-
-                [strongSelf->psiCashView bindWithModel:strongSelf->model];
-            }
-    }];
-
-    [self.compoundDisposable addDisposable:psiCashViewUpdates];
-
-    [self.compoundDisposable addDisposable:[[RACSignal combineLatest:@[
-        [AppDelegate sharedAppDelegate].appEvents.signal,
-        [AdManager sharedInstance].rewardedVideoLoadStatus,
-        PsiCashClient.sharedInstance.clientModelSignal
-      ]]
-      subscribeNext:^(RACTuple *tuple) {
-          MainViewController *__strong strongSelf = weakSelf;
-          if (strongSelf != nil) {
-
-              AppEvent *appEvent = tuple.first;
-              AdLoadStatus adStatus = (AdLoadStatus) [tuple.second integerValue];
-              PsiCashClientModel *model = tuple.third;
-
-              // Disable rewarded video button if the user has no earner token,
-              // otherwise enable the button if the button has not been tapped yet,
-              // else, enable the button only if an ad is loaded.
-              if (![model.authPackage hasEarnerToken]) {
-                  [strongSelf->psiCashView.rewardedVideoButton setState:AIRSBStateDisabled];
-
-                  // The user has an earner token.
-              } else {
-
-                  AIRSBState newState = AIRSBStateDisabled;
-
-                  switch (adStatus) {
-                      case AdLoadStatusNone:
-
-                          // The button should be in normal state in order to load an ad.
-                          // We will set the button state to disable only when tunnel state is being switched.
-                          if (appEvent.tunnelState != TunnelStateNeither) {
-                              newState = AIRSBStateNormal;
-                          }
-                          break;
-                      case AdLoadStatusInProgress:
-                          newState = AIRSBStateAnimating;
-                          break;
-                      case AdLoadStatusDone:
-                          newState = AIRSBStateNormal;
-                          break;
-                      case AdLoadStatusError:
-                          newState = AIRSBStateRetry;
-                          break;
-                      default:
-                          PSIAssert(FALSE);
-                  }
-
-                  [strongSelf->psiCashView.rewardedVideoButton setState:newState];
-              }
-
-#if DEBUG
-              if ([AppInfo runningUITest]) {
-                  // Fake the rewarded video bar enabled status for automated screenshots.
-                  strongSelf->psiCashView.rewardedVideoButton.enabled = TRUE;
-              }
-#endif
-          }
-      }]];
-
-    [psiCashView.rewardedVideoButton addTarget:self
-                                        action:@selector(showRewardedVideo)
-                              forControlEvents:UIControlEventTouchUpInside];
-
-#if DEBUG
-    if ([AppInfo runningUITest]) {
-        [psiCashViewUpdates dispose];
-        [self onboardingEnded];
-
-        PsiCashSpeedBoostProductSKU *sku =
-          [PsiCashSpeedBoostProductSKU skuWitDistinguisher:@"1h"
-                                                 withHours:[NSNumber numberWithInteger:1]
-                                                  andPrice:[NSNumber numberWithDouble:100e9]];
-
-        PsiCashClientModel *m = [PsiCashClientModel
-            clientModelWithAuthPackage:[[PsiCashAuthPackage alloc]
-                                         initWithValidTokens:@[@"indicator", @"earner", @"spender"]]
-                            andBalance:[NSNumber numberWithDouble:70e9]
-                  andSpeedBoostProduct:[PsiCashSpeedBoostProduct productWithSKUs:@[sku]]
-                   andPendingPurchases:nil
-           andActiveSpeedBoostPurchase:nil
-                     andRefreshPending:NO];
-
-        m.onboarded = TRUE;
-
-        [psiCashView bindWithModel:m];
-    }
-#endif
+    // TODO! PsiCash: deactivated to compiler for now.
+//    psiCashViewHeight = [psiCashView.heightAnchor constraintEqualToConstant:146.9];
+//    psiCashViewHeight.active = YES;
+//
+//    MainViewController *__weak weakSelf = self;
+//
+//
+//    RACDisposable *psiCashViewUpdates =
+//        [[[PsiCashClient.sharedInstance.clientModelSignal
+//        combineLatestWith:psiCashOnboardingCompleted]
+//        deliverOnMainThread]
+//        subscribeNext:^(RACTwoTuple<PsiCashClientModel *, NSNumber *> * _Nullable x) {
+//
+//            PsiCashClientModel *newClientModel = [x first];
+//            newClientModel.onboarded = [[x second] boolValue];
+//
+//            MainViewController *__strong strongSelf = weakSelf;
+//
+//            if (strongSelf != nil) {
+//                BOOL stateChanged =    [strongSelf->model hasActiveSpeedBoostPurchase] ^
+//                                       [newClientModel hasActiveSpeedBoostPurchase]
+//                                    ||
+//                                       [strongSelf->model hasPendingPurchase] ^
+//                                       [newClientModel hasPendingPurchase];
+//                if (   strongSelf->model
+//                    && [strongSelf->model hasActiveSpeedBoostPurchase] == FALSE
+//                    && [newClientModel hasActiveSpeedBoostPurchase] == TRUE) {
+//                    // Speed Boost has activated
+//                    [[[UINotificationFeedbackGenerator alloc] init]
+//                     notificationOccurred:UINotificationFeedbackTypeSuccess];
+//                }
+//
+//                NSComparisonResult balanceChange = [strongSelf->model.balance compare:newClientModel.balance];
+//
+//                if (balanceChange != NSOrderedSame) {
+//
+//                    [[[UINotificationFeedbackGenerator alloc] init]
+//                     notificationOccurred:UINotificationFeedbackTypeSuccess];
+//
+//                    NSNumber *balanceChange = [NSNumber numberWithDouble:newClientModel.balance.doubleValue
+//                                              - strongSelf->model.balance.doubleValue];
+//                    [PsiCashView animateBalanceChangeOf:balanceChange
+//                                        withPsiCashView:strongSelf->psiCashView
+//                                           inParentView:strongSelf.view];
+//                }
+//
+//                strongSelf->model = newClientModel;
+//
+//                if (stateChanged && strongSelf->alertView != nil) {
+//                    [strongSelf showPsiCashAlertView];
+//                }
+//
+//                [strongSelf->psiCashView bindWithModel:strongSelf->model];
+//            }
+//    }];
+//
+//    [self.compoundDisposable addDisposable:psiCashViewUpdates];
+//
+//    [self.compoundDisposable addDisposable:[[RACSignal combineLatest:@[
+//        [AppDelegate sharedAppDelegate].appEvents.signal,
+//        [AdManager sharedInstance].rewardedVideoLoadStatus,
+//        PsiCashClient.sharedInstance.clientModelSignal
+//      ]]
+//      subscribeNext:^(RACTuple *tuple) {
+//          MainViewController *__strong strongSelf = weakSelf;
+//          if (strongSelf != nil) {
+//
+//              AppEvent *appEvent = tuple.first;
+//              AdLoadStatus adStatus = (AdLoadStatus) [tuple.second integerValue];
+//              PsiCashClientModel *model = tuple.third;
+//
+//              // Disable rewarded video button if the user has no earner token,
+//              // otherwise enable the button if the button has not been tapped yet,
+//              // else, enable the button only if an ad is loaded.
+//              if (![model.authPackage hasEarnerToken]) {
+//                  [strongSelf->psiCashView.rewardedVideoButton setState:AIRSBStateDisabled];
+//
+//                  // The user has an earner token.
+//              } else {
+//
+//                  AIRSBState newState = AIRSBStateDisabled;
+//
+//                  switch (adStatus) {
+//                      case AdLoadStatusNone:
+//
+//                          // The button should be in normal state in order to load an ad.
+//                          // We will set the button state to disable only when tunnel state is being switched.
+//                          if (appEvent.tunnelState != TunnelStateNeither) {
+//                              newState = AIRSBStateNormal;
+//                          }
+//                          break;
+//                      case AdLoadStatusInProgress:
+//                          newState = AIRSBStateAnimating;
+//                          break;
+//                      case AdLoadStatusDone:
+//                          newState = AIRSBStateNormal;
+//                          break;
+//                      case AdLoadStatusError:
+//                          newState = AIRSBStateRetry;
+//                          break;
+//                      default:
+//                          PSIAssert(FALSE);
+//                  }
+//
+//                  [strongSelf->psiCashView.rewardedVideoButton setState:newState];
+//              }
+//
+//#if DEBUG
+//              if ([AppInfo runningUITest]) {
+//                  // Fake the rewarded video bar enabled status for automated screenshots.
+//                  strongSelf->psiCashView.rewardedVideoButton.enabled = TRUE;
+//              }
+//#endif
+//          }
+//      }]];
+//
+//    [psiCashView.rewardedVideoButton addTarget:self
+//                                        action:@selector(showRewardedVideo)
+//                              forControlEvents:UIControlEventTouchUpInside];
+//
+//#if DEBUG
+//    if ([AppInfo runningUITest]) {
+//        [psiCashViewUpdates dispose];
+//        [self onboardingEnded];
+//
+//        PsiCashSpeedBoostProductSKU *sku =
+//          [PsiCashSpeedBoostProductSKU skuWitDistinguisher:@"1h"
+//                                                 withHours:[NSNumber numberWithInteger:1]
+//                                                  andPrice:[NSNumber numberWithDouble:100e9]];
+//
+//        PsiCashClientModel *m = [PsiCashClientModel
+//            clientModelWithAuthPackage:[[PsiCashAuthPackage alloc]
+//                                         initWithValidTokens:@[@"indicator", @"earner", @"spender"]]
+//                            andBalance:[NSNumber numberWithDouble:70e9]
+//                  andSpeedBoostProduct:[PsiCashSpeedBoostProduct productWithSKUs:@[sku]]
+//                   andPendingPurchases:nil
+//           andActiveSpeedBoostPurchase:nil
+//                     andRefreshPending:NO];
+//
+//        m.onboarded = TRUE;
+//
+//        [psiCashView bindWithModel:m];
+//    }
+//#endif
 }
 
 - (void)setPsiCashContentHidden:(BOOL)hidden {
-    psiCashView.hidden = hidden;
-    psiCashView.userInteractionEnabled = !hidden;
+    psiCashWidget.hidden = hidden;
+    psiCashWidget.userInteractionEnabled = !hidden;
 
     // Show Psiphon large logo and hide Psiphon small logo when PsiCash is hidden.
     psiphonLargeLogo.hidden = !hidden;
     psiphonSmallLogo.hidden = hidden;
 }
 
-- (void)showRewardedVideo {
+//- (void)showRewardedVideo {
+//
+//    MainViewController *__weak weakSelf = self;
+//
+//    // Disable rewarded video button interaction, to prevent double-subscription to the same signal.
+//    // TODO: This should ideally be prevented by debounce.
+//    // Disabling the button is safe since the button status will be reset when the `rewardedVideoLoadStatus`
+//    // emits new values. Check `setupPsiCashView` for implementation of that observable.
+//    [psiCashView.rewardedVideoButton setState:AIRSBStateAnimating];
+//
+//    LOG_DEBUG(@"rewarded video started");
+//
+//    RACDisposable *__block disposable = [[[[[[[[[[AdManager sharedInstance].rewardedVideoLoadStatus
+//      scanWithStart:nil reduce:^id(NSNumber *_Nullable running, NSNumber *next) {
+//
+//          // If the observable chain starts with an error, force load an ad.
+//          // Pretend the load status is `AdLoadStatusInProgress` after force loading an ad.
+//          if (!running) {
+//              dispatch_async_main(^{
+//                 [[AdManager sharedInstance].forceRewardedVideoLoad sendNext:RACUnit.defaultUnit];
+//              });
+//              return @(AdLoadStatusInProgress);
+//          }
+//          return next;
+//      }]
+//      filter:^BOOL(NSNumber *adLoadStatusObj) {
+//          AdLoadStatus s = (AdLoadStatus) [adLoadStatusObj integerValue];
+//          // Filter terminating states.
+//          return (AdLoadStatusDone == s) || (AdLoadStatusError == s);
+//      }]
+//      take:1]
+//      flattenMap:^RACSignal *(NSNumber *adLoadStatusObj) {
+//          MainViewController *__strong strongSelf = weakSelf;
+//
+//          AdLoadStatus s = (AdLoadStatus) [adLoadStatusObj integerValue];
+//          if (strongSelf && AdLoadStatusDone == s) {
+//              NSString *customData = [[PsiCashClient sharedInstance] rewardedVideoCustomData];
+//              return [[AdManager sharedInstance] presentRewardedVideoOnViewController:strongSelf
+//                                                                       withCustomData:customData];
+//          } else {
+//              return [RACSignal empty];
+//          }
+//      }]
+//      doNext:^(NSNumber *adPresentationEnum) {
+//          // Logs current AdPresentation enum value.
+//          AdPresentation ap = (AdPresentation) [adPresentationEnum integerValue];
+//          switch (ap) {
+//              case AdPresentationWillAppear:
+//                  [PsiFeedbackLogger infoWithType:RewardedVideoLogType message:@"AdPresentationWillAppear"];
+//                  LOG_DEBUG(@"rewarded video AdPresentationWillAppear");
+//                  break;
+//              case AdPresentationDidAppear:
+//                  LOG_DEBUG(@"rewarded video AdPresentationDidAppear");
+//                  break;
+//              case AdPresentationWillDisappear:
+//                  LOG_DEBUG(@"rewarded video AdPresentationWillDisappear");
+//                  break;
+//              case AdPresentationDidDisappear:
+//                  LOG_DEBUG(@"rewarded video AdPresentationDidDisappear");
+//                  break;
+//              case AdPresentationDidRewardUser:
+//                  LOG_DEBUG(@"rewarded video AdPresentationDidRewardUser");
+//                  break;
+//              case AdPresentationErrorCustomDataNotSet:
+//                  LOG_DEBUG(@"rewarded video AdPresentationErrorCustomDataNotSet");
+//                  [PsiFeedbackLogger errorWithType:RewardedVideoLogType
+//                                           message:@"AdPresentationErrorCustomDataNotSet"];
+//                  break;
+//              case AdPresentationErrorInappropriateState:
+//                  LOG_DEBUG(@"rewarded video AdPresentationErrorInappropriateState");
+//                  [PsiFeedbackLogger errorWithType:RewardedVideoLogType
+//                                           message:@"AdPresentationErrorInappropriateState"];
+//                  break;
+//              case AdPresentationErrorNoAdsLoaded:
+//                  LOG_DEBUG(@"rewarded video AdPresentationErrorNoAdsLoaded");
+//                  [PsiFeedbackLogger errorWithType:RewardedVideoLogType
+//                                           message:@"AdPresentationErrorNoAdsLoaded"];
+//                  break;
+//              case AdPresentationErrorFailedToPlay:
+//                  LOG_DEBUG(@"rewarded video AdPresentationErrorFailedToPlay");
+//                  [PsiFeedbackLogger errorWithType:RewardedVideoLogType
+//                                           message:@"AdPresentationErrorFailedToPlay"];
+//                  break;
+//          }
+//      }]
+//      scanWithStart:[RACTwoTuple pack:@(FALSE) :@(FALSE)]
+//             reduce:^RACTwoTuple<NSNumber *, NSNumber *> *(RACTwoTuple *running, NSNumber *adPresentationEnum) {
+//
+//          // Scan operator's `running` value is a 2-tuple of booleans. First element represents when
+//          // AdPresentationDidRewardUser is emitted upstream, and the second element represents when
+//          // AdPresentationDidDisappear is emitted upstream.
+//          // Note that we don't want to make any assumptions about the order of these two events.
+//          if ([adPresentationEnum integerValue] == AdPresentationDidRewardUser) {
+//              return [RACTwoTuple pack:@(TRUE) :running.second];
+//          } else if ([adPresentationEnum integerValue] == AdPresentationDidDisappear) {
+//              return [RACTwoTuple pack:running.first :@(TRUE)];
+//          }
+//          return running;
+//      }]
+//      filter:^BOOL(RACTwoTuple<NSNumber *, NSNumber *> *tuple) {
+//          BOOL didReward = [tuple.first boolValue];
+//          BOOL didDisappear = [tuple.second boolValue];
+//          return didReward && didDisappear;
+//      }]
+//      take:1]
+//      subscribeNext:^(RACTwoTuple<NSNumber *, NSNumber *> *tuple) {
+//          // Calls to update PsiCash balance after
+//          [[[UIImpactFeedbackGenerator alloc] initWithStyle:UIImpactFeedbackStyleLight] impactOccurred];
+//          [[PsiCashClient sharedInstance] pollForBalanceDeltaWithMaxRetries:30 andTimeBetweenRetries:1.0];
+//      } error:^(NSError *error) {
+//          [PsiFeedbackLogger errorWithType:RewardedVideoLogType message:@"Error with rewarded video" object:error];
+//          [weakSelf.compoundDisposable removeDisposable:disposable];
+//      } completed:^{
+//          LOG_DEBUG(@"rewarded video completed");
+//          [PsiFeedbackLogger infoWithType:RewardedVideoLogType message:@"completed"];
+//          [weakSelf.compoundDisposable removeDisposable:disposable];
+//      }];
+//
+//    [self.compoundDisposable addDisposable:disposable];
+//}
 
-    MainViewController *__weak weakSelf = self;
+//#pragma mark - PsiCashPurchaseAlertViewDelegate protocol
+//
+//- (void)stateBecameStale {
+//    [alertView close];
+//    alertView = nil;
+//}
+//
+//- (void)showPsiCashAlertView {
+//    if (alertView != nil) {
+//        [alertView close];
+//        alertView = nil;
+//    }
+//
+//    if (![model hasAuthPackage] || ![model.authPackage hasSpenderToken]) {
+//        return;
+//    } else if ([model hasActiveSpeedBoostPurchase]) {
+//        alertView = [PsiCashPurchaseAlertView alreadySpeedBoostingAlert];
+//    } else  if ([model hasPendingPurchase]) {
+//        // (PsiCash 1.0): Do nothing
+//        //alertView = [PsiCashPurchaseAlertView pendingPurchaseAlert];
+//        return;
+//    } else {
+//        // Insufficient balance animation
+//        CABasicAnimation *animation =
+//        [CABasicAnimation animationWithKeyPath:@"position"];
+//        [animation setDuration:0.075];
+//        [animation setRepeatCount:3];
+//        [animation setAutoreverses:YES];
+//        [animation setFromValue:[NSValue valueWithCGPoint:
+//                                 CGPointMake([psiCashView center].x - 20.0f, [psiCashView center].y)]];
+//        [animation setToValue:[NSValue valueWithCGPoint:
+//                               CGPointMake([psiCashView center].x + 20.0f, [psiCashView center].y)]];
+//        [[psiCashView layer] addAnimation:animation forKey:@"position"];
+//        return;
+//    }
+//
+//    alertView.controllerDelegate = self;
+//    [alertView bindWithModel:model];
+//    [alertView show];
+//}
 
-    // Disable rewarded video button interaction, to prevent double-subscription to the same signal.
-    // TODO: This should ideally be prevented by debounce.
-    // Disabling the button is safe since the button status will be reset when the `rewardedVideoLoadStatus`
-    // emits new values. Check `setupPsiCashView` for implementation of that observable.
-    [psiCashView.rewardedVideoButton setState:AIRSBStateAnimating];
-
-    LOG_DEBUG(@"rewarded video started");
-
-    RACDisposable *__block disposable = [[[[[[[[[[AdManager sharedInstance].rewardedVideoLoadStatus
-      scanWithStart:nil reduce:^id(NSNumber *_Nullable running, NSNumber *next) {
-
-          // If the observable chain starts with an error, force load an ad.
-          // Pretend the load status is `AdLoadStatusInProgress` after force loading an ad.
-          if (!running) {
-              dispatch_async_main(^{
-                 [[AdManager sharedInstance].forceRewardedVideoLoad sendNext:RACUnit.defaultUnit];
-              });
-              return @(AdLoadStatusInProgress);
-          }
-          return next;
-      }]
-      filter:^BOOL(NSNumber *adLoadStatusObj) {
-          AdLoadStatus s = (AdLoadStatus) [adLoadStatusObj integerValue];
-          // Filter terminating states.
-          return (AdLoadStatusDone == s) || (AdLoadStatusError == s);
-      }]
-      take:1]
-      flattenMap:^RACSignal *(NSNumber *adLoadStatusObj) {
-          MainViewController *__strong strongSelf = weakSelf;
-
-          AdLoadStatus s = (AdLoadStatus) [adLoadStatusObj integerValue];
-          if (strongSelf && AdLoadStatusDone == s) {
-              NSString *customData = [[PsiCashClient sharedInstance] rewardedVideoCustomData];
-              return [[AdManager sharedInstance] presentRewardedVideoOnViewController:strongSelf
-                                                                       withCustomData:customData];
-          } else {
-              return [RACSignal empty];
-          }
-      }]
-      doNext:^(NSNumber *adPresentationEnum) {
-          // Logs current AdPresentation enum value.
-          AdPresentation ap = (AdPresentation) [adPresentationEnum integerValue];
-          switch (ap) {
-              case AdPresentationWillAppear:
-                  [PsiFeedbackLogger infoWithType:RewardedVideoLogType message:@"AdPresentationWillAppear"];
-                  LOG_DEBUG(@"rewarded video AdPresentationWillAppear");
-                  break;
-              case AdPresentationDidAppear:
-                  LOG_DEBUG(@"rewarded video AdPresentationDidAppear");
-                  break;
-              case AdPresentationWillDisappear:
-                  LOG_DEBUG(@"rewarded video AdPresentationWillDisappear");
-                  break;
-              case AdPresentationDidDisappear:
-                  LOG_DEBUG(@"rewarded video AdPresentationDidDisappear");
-                  break;
-              case AdPresentationDidRewardUser:
-                  LOG_DEBUG(@"rewarded video AdPresentationDidRewardUser");
-                  break;
-              case AdPresentationErrorCustomDataNotSet:
-                  LOG_DEBUG(@"rewarded video AdPresentationErrorCustomDataNotSet");
-                  [PsiFeedbackLogger errorWithType:RewardedVideoLogType
-                                           message:@"AdPresentationErrorCustomDataNotSet"];
-                  break;
-              case AdPresentationErrorInappropriateState:
-                  LOG_DEBUG(@"rewarded video AdPresentationErrorInappropriateState");
-                  [PsiFeedbackLogger errorWithType:RewardedVideoLogType
-                                           message:@"AdPresentationErrorInappropriateState"];
-                  break;
-              case AdPresentationErrorNoAdsLoaded:
-                  LOG_DEBUG(@"rewarded video AdPresentationErrorNoAdsLoaded");
-                  [PsiFeedbackLogger errorWithType:RewardedVideoLogType
-                                           message:@"AdPresentationErrorNoAdsLoaded"];
-                  break;
-              case AdPresentationErrorFailedToPlay:
-                  LOG_DEBUG(@"rewarded video AdPresentationErrorFailedToPlay");
-                  [PsiFeedbackLogger errorWithType:RewardedVideoLogType
-                                           message:@"AdPresentationErrorFailedToPlay"];
-                  break;
-          }
-      }]
-      scanWithStart:[RACTwoTuple pack:@(FALSE) :@(FALSE)]
-             reduce:^RACTwoTuple<NSNumber *, NSNumber *> *(RACTwoTuple *running, NSNumber *adPresentationEnum) {
-
-          // Scan operator's `running` value is a 2-tuple of booleans. First element represents when
-          // AdPresentationDidRewardUser is emitted upstream, and the second element represents when
-          // AdPresentationDidDisappear is emitted upstream.
-          // Note that we don't want to make any assumptions about the order of these two events.
-          if ([adPresentationEnum integerValue] == AdPresentationDidRewardUser) {
-              return [RACTwoTuple pack:@(TRUE) :running.second];
-          } else if ([adPresentationEnum integerValue] == AdPresentationDidDisappear) {
-              return [RACTwoTuple pack:running.first :@(TRUE)];
-          }
-          return running;
-      }]
-      filter:^BOOL(RACTwoTuple<NSNumber *, NSNumber *> *tuple) {
-          BOOL didReward = [tuple.first boolValue];
-          BOOL didDisappear = [tuple.second boolValue];
-          return didReward && didDisappear;
-      }]
-      take:1]
-      subscribeNext:^(RACTwoTuple<NSNumber *, NSNumber *> *tuple) {
-          // Calls to update PsiCash balance after
-          [[[UIImpactFeedbackGenerator alloc] initWithStyle:UIImpactFeedbackStyleLight] impactOccurred];
-          [[PsiCashClient sharedInstance] pollForBalanceDeltaWithMaxRetries:30 andTimeBetweenRetries:1.0];
-      } error:^(NSError *error) {
-          [PsiFeedbackLogger errorWithType:RewardedVideoLogType message:@"Error with rewarded video" object:error];
-          [weakSelf.compoundDisposable removeDisposable:disposable];
-      } completed:^{
-          LOG_DEBUG(@"rewarded video completed");
-          [PsiFeedbackLogger infoWithType:RewardedVideoLogType message:@"completed"];
-          [weakSelf.compoundDisposable removeDisposable:disposable];
-      }];
-
-    [self.compoundDisposable addDisposable:disposable];
-}
-
-#pragma mark - PsiCashPurchaseAlertViewDelegate protocol
-
-- (void)stateBecameStale {
-    [alertView close];
-    alertView = nil;
-}
-
-- (void)showPsiCashAlertView {
-    if (alertView != nil) {
-        [alertView close];
-        alertView = nil;
-    }
-
-    if (![model hasAuthPackage] || ![model.authPackage hasSpenderToken]) {
-        return;
-    } else if ([model hasActiveSpeedBoostPurchase]) {
-        alertView = [PsiCashPurchaseAlertView alreadySpeedBoostingAlert];
-    } else  if ([model hasPendingPurchase]) {
-        // (PsiCash 1.0): Do nothing
-        //alertView = [PsiCashPurchaseAlertView pendingPurchaseAlert];
-        return;
-    } else {
-        // Insufficient balance animation
-        CABasicAnimation *animation =
-        [CABasicAnimation animationWithKeyPath:@"position"];
-        [animation setDuration:0.075];
-        [animation setRepeatCount:3];
-        [animation setAutoreverses:YES];
-        [animation setFromValue:[NSValue valueWithCGPoint:
-                                 CGPointMake([psiCashView center].x - 20.0f, [psiCashView center].y)]];
-        [animation setToValue:[NSValue valueWithCGPoint:
-                               CGPointMake([psiCashView center].x + 20.0f, [psiCashView center].y)]];
-        [[psiCashView layer] addAnimation:animation forKey:@"position"];
-        return;
-    }
-
-    alertView.controllerDelegate = self;
-    [alertView bindWithModel:model];
-    [alertView show];
-}
-
-
-#pragma mark - PsiCashOnboardingViewControllerDelegate protocol implementation
-
-- (void)onboardingEnded {
-    [[NSUserDefaults standardUserDefaults] setBool:YES forKey:PsiCashHasBeenOnboardedBoolKey];
-    [psiCashOnboardingCompleted sendNext:[NSNumber numberWithBool:YES]];
-}
+//
+//#pragma mark - PsiCashOnboardingViewControllerDelegate protocol implementation
+//
+//- (void)onboardingEnded {
+//    [[NSUserDefaults standardUserDefaults] setBool:YES forKey:PsiCashHasBeenOnboardedBoolKey];
+//    [psiCashOnboardingCompleted sendNext:[NSNumber numberWithBool:YES]];
+//}
 
 #pragma mark - RegionAdapterDelegate protocol implementation
 

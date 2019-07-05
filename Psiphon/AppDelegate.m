@@ -21,6 +21,8 @@
 #import <ReactiveObjC/RACTuple.h>
 #import <NetworkExtension/NetworkExtension.h>
 #import <ReactiveObjC/RACScheduler.h>
+#import <ReactiveObjC/RACUnit.h>
+#import <ReactiveObjC/NSNotificationCenter+RACSupport.h>
 #import <stdatomic.h>
 #import "AppDelegate.h"
 #import "AdManager.h"
@@ -52,19 +54,11 @@
 #import "RACSignal+Operations.h"
 #import "RACReplaySubject.h"
 #import "Asserts.h"
-#import "PsiCashClient.h"
-#import "PsiCashTypes.h"
 #import "ContainerDB.h"
 #import "AppUpgrade.h"
 #import "AppEvent.h"
+#import "Psiphon-Swift.h"
 
-// Number of seconds to wait for tunnel status to become "Connected", after the landing page notification
-// is received from the extension.
-NSTimeInterval const LandingPageTimeout = 1.0;
-
-// Number of seconds to wait for PsiCashClient to emit an auth package with an earner token, after the
-// landing page notification is received from the extension.
-NSTimeInterval const PsiCashAuthPackageWithEarnerTokenTimeout = 3.0;
 
 // Number of seconds to wait before checking reachability status after receiving
 // `NotifierNetworkConnectivityFailed` from the extension.
@@ -107,7 +101,6 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
 
         _vpnManager = [VPNManager sharedInstance];
         _sharedDB = [[PsiphonDataSharedDB alloc] initForAppGroupIdentifier:APP_GROUP_IDENTIFIER];
-        _shownLandingPageForCurrentSession = FALSE;
         _compoundDisposable = [RACCompoundDisposable compoundDisposable];
 
         _checkExtensionNetworkConnectivityFailedSubject = [RACSubject subject];
@@ -287,6 +280,8 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
 
         [self.compoundDisposable addDisposable:[[AppDelegate sharedAppDelegate].appEvents connect]];
 
+        [SwiftAppDelegate.instance setVPNManager:VPNManager.sharedInstance];
+        [SwiftAppDelegate.instance applicationDidFinishLaunching:application];
     }
 
     // Override point for customization after application launch.
@@ -306,7 +301,7 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
 
           if (s == VPNStatusDisconnected || s == VPNStatusRestarting ) {
               // Resets the homepage flag if the VPN has disconnected or is restarting.
-              weakSelf.shownLandingPageForCurrentSession = FALSE;
+              [SwiftAppDelegate.instance resetLandingPage];
           }
 
       } error:^(NSError *error) {
@@ -403,7 +398,7 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
     // Resets status of the subjects whose state could be stale once the container is foregrounded.
     [self.subscriptionStatus sendNext:@(UserSubscriptionUnknown)];
 
-    [[PsiCashClient sharedInstance] scheduleRefreshState];
+    [SwiftAppDelegate.instance applicationWillEnterForeground:application];
 }
 
 - (void)applicationWillTerminate:(UIApplication *)application {
@@ -452,106 +447,8 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
     if ([NotifierNewHomepages isEqualToString:message]) {
 
         LOG_DEBUG(@"Received notification NE.newHomepages");
+        [SwiftAppDelegate.instance showLandingPage];
 
-        // Ignore the notification from the extension, since a landing page has
-        // already been shown for the current session.
-        if (weakSelf.shownLandingPageForCurrentSession) {
-            return;
-        }
-
-        // Eagerly set the value to TRUE.
-        weakSelf.shownLandingPageForCurrentSession = TRUE;
-        
-        dispatch_async_global(^{
-
-            // If a landing page is not already shown for the current session, randomly choose
-            // a landing page from the list supplied by Psiphon tunnel.
-
-            NSArray<Homepage *> *homepages = [weakSelf.sharedDB getHomepages];
-
-            if (!homepages || [homepages count] == 0) {
-                weakSelf.shownLandingPageForCurrentSession = FALSE;
-                return;
-            }
-
-            NSUInteger randIndex = arc4random() % [homepages count];
-            Homepage *homepage = homepages[randIndex];
-
-            RACSignal <RACUnit*>*authPackageSignal = [[[[[PsiCashClient.sharedInstance.clientModelSignal
-              filter:^BOOL(PsiCashClientModel * _Nullable model) {
-                  if ([model.authPackage hasEarnerToken]) {
-                      return TRUE;
-                  }
-                  return FALSE;
-              }]
-              map:^id _Nullable(PsiCashClientModel * _Nullable model) {
-                  return RACUnit.defaultUnit;
-              }]
-              take:1]
-              timeout:PsiCashAuthPackageWithEarnerTokenTimeout onScheduler:RACScheduler.mainThreadScheduler]
-              catch:^RACSignal * (NSError * error) {
-                  if ([error.domain isEqualToString:RACSignalErrorDomain] && error.code == RACSignalErrorTimedOut) {
-                      [PsiFeedbackLogger infoWithType:PsiCashLogType message:@"timeout waiting for earner token, waited %0.1fs", PsiCashAuthPackageWithEarnerTokenTimeout];
-                      return [RACSignal return:RACUnit.defaultUnit];
-                  }
-                  return [RACSignal error:error];
-              }];
-
-            // Only opens landing page if the VPN is active (or waits up to a maximum of LandingPageTimeout
-            // for the tunnel status to become "Connected" before opening the landing page).
-            // Landing page should not be opened outside of the tunnel.
-            //
-            __block RACDisposable *disposable = [[[[[[[[weakSelf.vpnManager queryIsExtensionZombie]
-              combineLatestWith:self.vpnManager.lastTunnelStatus]
-              filter:^BOOL(RACTwoTuple<NSNumber *, NSNumber *> *tuple) {
-
-                  // We're only interested in the Connected status.
-                  VPNStatus s = (VPNStatus) [tuple.second integerValue];
-                  return (s == VPNStatusConnected);
-              }]
-              take:1]  // Take 1 to terminate the infinite signal.
-              timeout:LandingPageTimeout onScheduler:RACScheduler.mainThreadScheduler]
-              zipWith:authPackageSignal]
-              deliverOnMainThread]
-              subscribeNext:^(RACTwoTuple<RACTwoTuple<NSNumber *, NSNumber *>*, RACUnit*> *x) {
-                  BOOL isZombie = [x.first.first boolValue];
-
-                  if (isZombie) {
-                      weakSelf.shownLandingPageForCurrentSession = FALSE;
-                      return;
-                  }
-
-                  NEVPNStatus s = weakSelf.vpnManager.tunnelProviderStatus;
-                  if (NEVPNStatusConnected == s) {
-
-                      [PsiFeedbackLogger infoWithType:LandingPageLogType message:@"open landing page"];
-
-                      NSURL *url = [PsiCashClient.sharedInstance modifiedHomePageURL:homepage.url];
-                      // Not officially documented by Apple, however a runtime warning is generated sometimes
-                      // stating that [UIApplication openURL:options:completionHandler:] must be used from
-                      // the main thread only.
-                      [[UIApplication sharedApplication] openURL:url
-                                                         options:@{}
-                                               completionHandler:^(BOOL success) {
-                                                   weakSelf.shownLandingPageForCurrentSession = success;
-                                               }];
-                  } else {
-
-                      [PsiFeedbackLogger warnWithType:LandingPageLogType
-                                              message:@"fail open with connection status %@", [VPNManager statusTextSystem:s]];
-                      weakSelf.shownLandingPageForCurrentSession = FALSE;
-                  }
-
-              } error:^(NSError *error) {
-                  [PsiFeedbackLogger warnWithType:LandingPageLogType message:@"timeout expired" object:error];
-                  [weakSelf.compoundDisposable removeDisposable:disposable];
-              } completed:^{
-                  [weakSelf.compoundDisposable removeDisposable:disposable];
-              }];
-
-            [weakSelf.compoundDisposable addDisposable:disposable];
-
-        });
 
     } else if ([NotifierTunnelConnected isEqualToString:message]) {
         LOG_DEBUG(@"Received notification NE.tunnelConnected");
@@ -585,7 +482,8 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
         });
 
     } else if ([NotifierMarkedAuthorizations isEqualToString:message]) {
-        [[PsiCashClient sharedInstance] authorizationsMarkedExpired];
+        // TODO! PsiCash: tell psicash of authorizations marked as expired.
+//        [[PsiCashClient sharedInstance] authorizationsMarkedExpired];
 
     } else if ([NotifierNetworkConnectivityFailed isEqualToString:message]) {
         [self.checkExtensionNetworkConnectivityFailedSubject sendNext:RACUnit.defaultUnit];

@@ -22,3 +22,4 @@ import SwiftActors
 
 extension NSURL: AnyMessage {}
 extension Optional: AnyMessage where Wrapped == String {}
+extension Bindable: AnyMessage where Value == URL {}

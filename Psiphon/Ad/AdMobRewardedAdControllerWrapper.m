@@ -21,14 +21,15 @@
 #import <ReactiveObjC/RACReplaySubject.h>
 #import <ReactiveObjC/RACUnit.h>
 #import <ReactiveObjC/RACCompoundDisposable.h>
+#import <ReactiveObjC/RACTuple.h>
 #import "Logging.h"
 #import "Nullity.h"
 #import "NSError+Convenience.h"
 #import "Asserts.h"
-#import "PsiCashClient.h"
 #import <GoogleMobileAds/GADRewardBasedVideoAdDelegate.h>
 #import "AdMobConsent.h"
 #import "RelaySubject.h"
+#import "Psiphon-Swift.h"
 
 PsiFeedbackLogType const AdMobRewardedAdControllerWrapperLogType = @"AdMobRewardedAdControllerWrapper";
 
@@ -75,40 +76,44 @@ PsiFeedbackLogType const AdMobRewardedAdControllerWrapperLogType = @"AdMobReward
 
     return [RACSignal createSignal:^RACDisposable *(id <RACSubscriber> subscriber) {
 
-        NSString *_Nullable customData = [[PsiCashClient sharedInstance] rewardedVideoCustomData];
-        if ([Nullity isEmpty:customData]) {
-            NSError *e = [NSError errorWithDomain:AdControllerWrapperErrorDomain
-                                             code:AdControllerWrapperErrorCustomDataNotSet];
-            [subscriber sendNext:[RACTwoTuple pack:self.tag :e]];
-            return nil;
-        }
+        RACCompoundDisposable *compoundDisposable = [[RACCompoundDisposable alloc] init];
 
-        // Subscribe to load status before loading an ad to prevent race-condition with "adDidLoad" delegate callback.
-        RACDisposable *disposable = [weakSelf.loadStatusRelay subscribe:subscriber];
+        [SwiftAppDelegate.instance getCustomRewardData:^(NSString * _Nullable customData) {
+            if ([Nullity isEmpty:customData]) {
+                NSError *e = [NSError errorWithDomain:AdControllerWrapperErrorDomain
+                                                 code:AdControllerWrapperErrorCustomDataNotSet];
+                [subscriber sendNext:[RACTwoTuple pack:self.tag :e]];
+                return;
+            }
 
-        GADRewardBasedVideoAd *videoAd = [GADRewardBasedVideoAd sharedInstance];
-        if (!videoAd.delegate) {
-            videoAd.delegate = weakSelf;
-        }
+            // Subscribe to load status before loading an ad to prevent
+            // race-condition with "adDidLoad" delegate callback.
+            [compoundDisposable addDisposable:[weakSelf.loadStatusRelay subscribe:subscriber]];
 
-        // Create ad request only if one is not ready.
-        if (videoAd.isReady) {
-            // Manually call the delegate method to re-execute the logic for when an ad is loaded.
-            [weakSelf rewardBasedVideoAdDidReceiveAd:videoAd];
+            GADRewardBasedVideoAd *videoAd = [GADRewardBasedVideoAd sharedInstance];
+            if (!videoAd.delegate) {
+                videoAd.delegate = weakSelf;
+            }
 
-        } else {
-            [self.adLoadStatus accept:@(AdLoadStatusInProgress)];
+            // Create ad request only if one is not ready.
+            if (videoAd.isReady) {
+                // Manually call the delegate method to re-execute the logic
+                // for when an ad is loaded.
+                [weakSelf rewardBasedVideoAdDidReceiveAd:videoAd];
 
-            GADRequest *request = [AdMobConsent createGADRequestWithUserConsentStatus];
+            } else {
+                [self.adLoadStatus accept:@(AdLoadStatusInProgress)];
 
-    #if DEBUG
-            request.testDevices = @[@"4a907b319b37ceee4d9970dbb0231ef0"];
-    #endif
-            [videoAd setCustomRewardString:customData];
-            [videoAd loadRequest:request withAdUnitID:self.adUnitID];
-        }
+                GADRequest *request = [AdMobConsent createGADRequestWithUserConsentStatus];
+#if DEBUG
+                request.testDevices = @[@"4a907b319b37ceee4d9970dbb0231ef0"];
+#endif
+                [videoAd setCustomRewardString:customData];
+                [videoAd loadRequest:request withAdUnitID:self.adUnitID];
+            }
+        }];
 
-        return disposable;
+        return compoundDisposable;
     }];
 }
 

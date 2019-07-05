@@ -23,7 +23,6 @@
 #import "FeedbackUpload.h"
 #import "IAPStoreHelper.h"
 #import "MBProgressHUD.h"
-#import "PsiCashClient.h"
 #import "PsiFeedbackLogger.h"
 #import "PsiphonClientCommonLibraryHelpers.h"
 #import "PsiphonDataSharedDB.h"
@@ -121,10 +120,11 @@
         
         NSMutableArray<DiagnosticEntry *> *diagnosticEntries = [[NSMutableArray alloc] initWithArray:[[[PsiphonDataSharedDB alloc] initForAppGroupIdentifier:APP_GROUP_IDENTIFIER] getAllLogs]];
 
-        NSString *psiCashLog = [[PsiCashClient sharedInstance] logForFeedback];
-        if (psiCashLog != nil) {
-            [diagnosticEntries addObject:[[DiagnosticEntry alloc] init:psiCashLog andTimestamp:[NSDate date]]];
-        }
+        // TODO! modernize this.
+//        NSString *psiCashLog = [[PsiCashClient sharedInstance] logForFeedback];
+//        if (psiCashLog != nil) {
+//            [diagnosticEntries addObject:[[DiagnosticEntry alloc] init:psiCashLog andTimestamp:[NSDate date]]];
+//        }
 
         __weak FeedbackManager *weakSelf = self;
         SendFeedbackHandler sendFeedbackHandler = ^(NSString *jsonString, NSString *pubKey, NSString *uploadServer, NSString *uploadServerHeaders) {

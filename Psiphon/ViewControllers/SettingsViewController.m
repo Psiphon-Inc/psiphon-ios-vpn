@@ -21,7 +21,6 @@
 #import "AppDelegate.h"
 #import "IAPStoreHelper.h"
 #import "IAPViewController.h"
-#import "PsiCashOnboardingViewController.h"
 #import "RACSignal.h"
 #import "RACCompoundDisposable.h"
 #import "RACReplaySubject.h"
@@ -34,7 +33,6 @@
 // Specifier keys for cells in settings menu
 // These keys are defined in Psiphon/InAppSettings.bundle/Root.inApp.plist
 NSString * const SettingsSubscriptionCellSpecifierKey = @"settingsSubscription";
-NSString * const SettingsPsiCashCellSpecifierKey = @"settingsPsiCash";
 NSString * const SettingsReinstallVPNConfigurationKey = @"settingsReinstallVPNConfiguration";
 NSString * const SettingsResetAdConsentCellSpecifierKey = @"settingsResetAdConsent";
 
@@ -103,10 +101,6 @@ NSString * const SettingsResetAdConsentCellSpecifierKey = @"settingsResetAdConse
          [hiddenKeys addObject:SettingsSubscriptionCellSpecifierKey];
      }
 
-    if (self.hasActiveSubscription) {
-        [hiddenKeys addObject:SettingsPsiCashCellSpecifierKey];
-    }
-
     // If the VPN is not active, don't show the force reconnect button.
     if (![VPNManager mapIsVPNActive:self.vpnStatus]) {
         [hiddenKeys addObject:kForceReconnect];
@@ -171,9 +165,6 @@ NSString * const SettingsResetAdConsentCellSpecifierKey = @"settingsResetAdConse
     if ([specifier.key isEqualToString:SettingsSubscriptionCellSpecifierKey]) {
         [self openIAPViewController];
 
-    } else if ([specifier.key isEqualToString:SettingsPsiCashCellSpecifierKey]) {
-        [self openPsiCashViewController];
-
     } else if ([specifier.key isEqualToString:SettingsReinstallVPNConfigurationKey]) {
         __block RACDisposable *disposable = [[[VPNManager sharedInstance] reinstallVPNConfiguration]
           subscribeError:^(NSError *error) {
@@ -198,7 +189,6 @@ NSString * const SettingsResetAdConsentCellSpecifierKey = @"settingsResetAdConse
 
     NSArray<NSString *> *customKeys = @[
       SettingsSubscriptionCellSpecifierKey,
-      SettingsPsiCashCellSpecifierKey,
       SettingsReinstallVPNConfigurationKey,
       SettingsResetAdConsentCellSpecifierKey
     ];
@@ -227,12 +217,6 @@ NSString * const SettingsResetAdConsentCellSpecifierKey = @"settingsResetAdConse
         reinstallVPNProfileCell = cell;
         [self updateReinstallVPNProfileCell];
 
-    } else if ([specifier.key isEqualToString:SettingsPsiCashCellSpecifierKey]) {
-
-        cell = [super tableView:tableView cellForSpecifier:specifier];
-        [cell setAccessoryType:UITableViewCellAccessoryDisclosureIndicator];
-        [cell.textLabel setText:@"PsiCash"];
-
     } else if ([specifier.key isEqualToString:SettingsResetAdConsentCellSpecifierKey]) {
         cell = [super tableView:tableView cellForSpecifier:specifier];
         cell.textLabel.textAlignment = NSTextAlignmentCenter;
@@ -256,11 +240,6 @@ NSString * const SettingsResetAdConsentCellSpecifierKey = @"settingsResetAdConse
     IAPViewController *iapViewController = [[IAPViewController alloc]init];
     iapViewController.openedFromSettings = YES;
     [self.navigationController pushViewController:iapViewController animated:YES];
-}
-
-- (void)openPsiCashViewController {
-    PsiCashOnboardingViewController *onboarding = [[PsiCashOnboardingViewController alloc] init];
-    [self presentViewController:onboarding animated:NO completion:nil];
 }
 
 - (void)onResetConsent {

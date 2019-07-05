@@ -30,9 +30,6 @@ enum PsiCashRequestMetadataKey: String {
 typealias AuthIDs = Set<String>
 
 // MARK: PsiCash data model
-// TODO! WIP: seperating psicash lib data, from actor state data
-
-// TODO! this model combines PsiCash specific
 struct PsiCashLibData: Equatable {
     let authPackage: PsiCashAuthPackage
     let balance: PsiCashAmount
@@ -91,7 +88,6 @@ extension PsiCash {
         return self.validPurchases()?.map { $0.mapToPurchase() } ?? [Purchase]()
     }
 
-    // TODO! WIP
     /// Creates a fully typed representation of the PsiCash data managed by the PsiCash lib.
     func dataModel(markedPurchaseAuthIDs: AuthIDs) -> PsiCashLibData {
         PsiCashLibData(

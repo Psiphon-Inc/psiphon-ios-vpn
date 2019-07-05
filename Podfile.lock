@@ -39,9 +39,9 @@ DEPENDENCIES:
   - PersonalizedAdConsent
   - PsiphonClientCommonLibrary (from `https://github.com/Psiphon-Inc/psiphon-ios-client-common-library.git`, commit `0fd8d41`)
   - ReactiveObjC (from `https://github.com/Psiphon-Inc/ReactiveObjC.git`, commit `8bbf9dd`)
-  - RxSwift (~> 5)
+  - RxSwift (~> 5.0)
   - SVProgressHUD
-  - SwiftActors (from `https://github.com/Psiphon-Inc/swift-actors.git`, commit `7420752`)
+  - SwiftActors (from `https://github.com/Psiphon-Inc/swift-actors.git`, commit `c39448e`)
 
 SPEC REPOS:
   https://github.com/cocoapods/specs.git:
@@ -67,7 +67,7 @@ EXTERNAL SOURCES:
     :commit: 8bbf9dd
     :git: https://github.com/Psiphon-Inc/ReactiveObjC.git
   SwiftActors:
-    :commit: '7420752'
+    :commit: c39448e
     :git: https://github.com/Psiphon-Inc/swift-actors.git
 
 CHECKOUT OPTIONS:
@@ -81,7 +81,7 @@ CHECKOUT OPTIONS:
     :commit: 8bbf9dd
     :git: https://github.com/Psiphon-Inc/ReactiveObjC.git
   SwiftActors:
-    :commit: '7420752'
+    :commit: c39448e
     :git: https://github.com/Psiphon-Inc/swift-actors.git
 
 SPEC CHECKSUMS:
@@ -98,8 +98,8 @@ SPEC CHECKSUMS:
   ReactiveObjC: 2a38ea15335de4119d8b17caf1db1484f61db902
   RxSwift: 8b0671caa829a763bbce7271095859121cbd895f
   SVProgressHUD: 1428aafac632c1f86f62aa4243ec12008d7a51d6
-  SwiftActors: c892b23186d0133fdbf5f0681a292ee2509476f6
+  SwiftActors: 75f57bd66413a5a2f2bd1e0d3e8a54984d8e2c18
 
-PODFILE CHECKSUM: f67c08e0f875c5d0fc055556e2c52f503cae6532
+PODFILE CHECKSUM: 81a181343e2422455e9874a26568467b0fbe8abd
 
-COCOAPODS: 1.7.3
+COCOAPODS: 1.7.5

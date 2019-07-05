@@ -17,8 +17,8 @@ target 'Psiphon' do
   #pod "PsiphonClientCommonLibrary", :path => "../psiphon-ios-client-common-library"
 
   # Swift dependencies
-  pod 'SwiftActors', :git => "https://github.com/Psiphon-Inc/swift-actors.git", :commit => '7420752'
-  pod 'RxSwift', '~> 5'
+  pod 'SwiftActors', :git => "https://github.com/Psiphon-Inc/swift-actors.git", :commit => 'c39448e'
+  pod 'RxSwift', '~> 5.0'
 
   pod 'ReactiveObjC', :git => "https://github.com/Psiphon-Inc/ReactiveObjC.git", :commit => '8bbf9dd'
   pod 'mopub-ios-sdk', '~> 5.4'

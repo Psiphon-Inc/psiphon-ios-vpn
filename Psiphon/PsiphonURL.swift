@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, Psiphon Inc.
+ * Copyright (c) 2019, Psiphon Inc.
  * All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,9 +17,31 @@
  *
  */
 
-#import "PsiphonSettingsViewController.h"
+import Foundation
 
+struct Bindable<Value> {
+    private let value: Value
 
-@interface SettingsViewController : PsiphonSettingsViewController
+    init(_ value: Value) {
+        self.value = value
+    }
 
-@end
+    func map(_ transformer: (Value) -> Bindable<Value>) -> Bindable<Value> {
+        return transformer(value)
+    }
+}
+
+extension Bindable where Value == URL {
+
+    func getURL(_ vpnState: NEVPNStatus?) -> URL? {
+        switch vpnState {
+        case .connected:
+            return value
+        default:
+            return nil
+        }
+    }
+
+}
+
+typealias RestrictedURL = Bindable<URL>
