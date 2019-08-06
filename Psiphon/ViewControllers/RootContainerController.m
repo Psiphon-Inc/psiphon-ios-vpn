@@ -85,7 +85,7 @@
     }
 #endif
     
-    if (FALSE && ![containerDB hasFinishedOnboarding]) {
+    if (![containerDB hasFinishedOnboarding]) {
         [self switchToOnboarding];
     } else {
         [self switchToMainScreenAndStartVPN:FALSE];
