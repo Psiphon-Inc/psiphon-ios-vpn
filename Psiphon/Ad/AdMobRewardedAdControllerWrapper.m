@@ -26,7 +26,7 @@
 #import "NSError+Convenience.h"
 #import "Asserts.h"
 #import "PsiCashClient.h"
-#import "GADRewardBasedVideoAdDelegate.h"
+#import <GoogleMobileAds/GADRewardBasedVideoAdDelegate.h>
 #import "AdMobConsent.h"
 #import "RelaySubject.h"
 

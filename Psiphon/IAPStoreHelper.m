@@ -74,7 +74,7 @@ NSString *const kSubscriptionDictionary = @"kSubscriptionDictionary";
 - (void)updateSubscriptionDictionaryFromLocalReceipt {
 
     NSDictionary *subscriptionDict = [[self class] subscriptionDictionary];
-    
+
     if(![[self class] shouldUpdateSubscriptionDictionary:subscriptionDict]) {
         return;
     }

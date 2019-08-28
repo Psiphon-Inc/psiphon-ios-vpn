@@ -27,7 +27,7 @@
 #import "Logging.h"
 #import "Asserts.h"
 #import "AdMobConsent.h"
-#import "GADInterstitialDelegate.h"
+#import <GoogleMobileAds/GADInterstitialDelegate.h>
 #import "RACTuple.h"
 #import "RelaySubject.h"
 
