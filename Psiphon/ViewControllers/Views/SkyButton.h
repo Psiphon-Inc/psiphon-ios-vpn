@@ -19,10 +19,11 @@
 
 #import <UIKit/UIKit.h>
 #import "AutoLayoutProtocol.h"
+#import "AnimatedControl.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface SkyButton : UIControl <AutoLayoutProtocol>
+@interface SkyButton : AnimatedControl <AutoLayoutProtocol>
 
 @property (nonatomic, readonly) UILabel *titleLabel;
 
@@ -54,6 +55,11 @@ NS_ASSUME_NONNULL_BEGIN
  * Subclasses should override `-currentTitle` and call this method to update title.
  */
 - (void)updateTitle;
+
+#pragma mark -
+
+- (void)setLabelProperties:(UILabel *)label withFontSize:(CGFloat)fontSize;
+
 
 @end
 
