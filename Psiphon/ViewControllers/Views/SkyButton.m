@@ -133,7 +133,6 @@
     _titleLabel.translatesAutoresizingMaskIntoConstraints = FALSE;
 
     [NSLayoutConstraint activateConstraints:@[
-      [_titleLabel.heightAnchor constraintEqualToConstant:(3.f * self.fontSize)],
       [_titleLabel.centerYAnchor constraintEqualToAnchor:self.centerYAnchor],
       [_titleLabel.topAnchor constraintEqualToAnchor:self.topAnchor],
       [_titleLabel.bottomAnchor constraintEqualToAnchor:self.bottomAnchor]
@@ -160,6 +159,7 @@
     label.adjustsFontSizeToFitWidth = TRUE;
     label.minimumScaleFactor = 0.8;
     label.font = [UIFont avenirNextDemiBold:fontSize];
+    label.numberOfLines = 1;
 
     label.textAlignment = NSTextAlignmentCenter;
     label.textColor = UIColor.whiteColor;
