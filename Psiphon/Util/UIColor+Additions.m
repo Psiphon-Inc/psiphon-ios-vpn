@@ -133,4 +133,8 @@
     return [UIColor colorWithRed:137.0f / 255.0f green:161.0f / 255.0f blue:194.0f / 255.0f alpha:1.0f];
 }
 
++ (UIColor * _Nonnull)black19Color {
+    return [UIColor colorWithWhite:0.0f alpha:0.19f];
+}
+
 @end

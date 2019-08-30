@@ -24,6 +24,87 @@
 #endif
 
 
+@implementation StringUtils : NSObject
+
++ (NSString *)stringForPeriodUnit:(SKProductPeriodUnit)unit
+                 pluralGivenUnits:(NSUInteger)numUnits
+                    andAbbreviate:(BOOL)abbreviate API_AVAILABLE(ios(11.2)) {
+    NSMutableString *string = [[NSMutableString alloc] init];
+
+    switch (unit) {
+        case SKProductPeriodUnitDay:
+            [string appendString: @"Day"];
+            break;
+        case SKProductPeriodUnitWeek:
+            if (abbreviate) {
+                [string appendString:@"wk"];
+            } else {
+                [string appendString: @"Week"];
+            }
+            break;
+        case SKProductPeriodUnitMonth:
+            if (abbreviate) {
+                [string appendString:@"mo"];
+            } else {
+                [string appendString: @"Month"];
+            }
+            break;
+        case SKProductPeriodUnitYear:
+            if (abbreviate) {
+                [string appendString:@"yr"];
+            } else {
+                [string appendString: @"Year"];
+            }
+            break;
+        default:
+            [NSException raise:NSGenericException format:@"Unknown period unit %lu", unit];
+    }
+
+    if (numUnits > 1) {
+        [string appendString: @"s"];
+    }
+
+    if (abbreviate) {
+        [string appendString:@"."];
+    }
+
+    return string;
+}
+
++ (NSString *)stringForSubscriptionPeriod:(SKProductSubscriptionPeriod *)subscription
+                      dropNumOfUnitsIfOne:(BOOL)dropNumOfUnitsIfOne
+                            andAbbreviate:(BOOL)abbreviate API_AVAILABLE(ios(11.2)) {
+
+    NSMutableString *string = [[NSMutableString alloc] init];
+
+    // Since Apple sets 1 week as 7 days, we will explicitely return "1 Week".
+    if (subscription.numberOfUnits == 7 &&
+        subscription.unit == SKProductPeriodUnitDay) {
+
+        if (!dropNumOfUnitsIfOne) {
+            [string appendString:@"1 "];
+        }
+
+        [string appendString:[StringUtils stringForPeriodUnit:SKProductPeriodUnitWeek
+                                             pluralGivenUnits:1
+                                                andAbbreviate:abbreviate]];
+        return string;
+    }
+
+    if (!dropNumOfUnitsIfOne || subscription.numberOfUnits != 1) {
+        [string appendFormat:@"%lu ", subscription.numberOfUnits];
+    }
+
+    [string appendString:[StringUtils stringForPeriodUnit:subscription.unit
+                                         pluralGivenUnits:subscription.numberOfUnits
+                                            andAbbreviate:abbreviate]];
+
+    return string;
+}
+
+@end
+
+
 @implementation Strings
 
 + (NSString *)permissionRequiredAlertTitle {
@@ -199,6 +280,64 @@
 
 + (NSString *)privacyPolicyDeclinedAlertBody {
     return  NSLocalizedStringWithDefaultValue(@"PRIVACY_POLICY_DECLINED_ALERT_BODY", nil, [NSBundle mainBundle], @"You must accept our Privacy Policy before continuing to use Psiphon.", @"Alert message when the user declined privacy policy. They will not be able ot use the app until the user accepts the privacy policy (Do not translate 'Psiphon')");
+}
+
++ (NSString *)activeSubscriptionBannerTitle {
+    return NSLocalizedStringWithDefaultValue(@"ACTIVE_SUBSCRIPTION_SECTION_TITLE",
+    nil,
+    [NSBundle mainBundle],
+    @"You're subscribed!",
+    @"Title of the section in the subscription dialog that shows currently active subscription information.");
+}
+
++ (NSString *)inactiveSubscriptionBannerTitle {
+    return NSLocalizedStringWithDefaultValue(@"SUBSCRIPTIONS_PAGE_BANNER_TITLE_2",
+    nil,
+    [NSBundle mainBundle],
+    @"No ads & maximum speed.",
+    @"Title of the banner on the subscriptions page advertising that subscriptions enable no ads and maximum speed.");
+}
+
++ (NSString *)inactiveSubscriptionBannerSubtitle {
+    return NSLocalizedStringWithDefaultValue(@"SUBSCRIPTIONS_PAGE_BANNER_SUBTITLE", nil, [NSBundle mainBundle], @"No commitment, cancel anytime.", @"Subtitle of the banner on the subscriptions page informing the user that the subscriptions require no commitment, and can be cancelled anytime");
+}
+
++ (NSString *)manageYourSubscriptionButtonTitle {
+    return NSLocalizedStringWithDefaultValue(@"SUBSCRIPTIONS_PAGE_MANAGE_SUBSCRIPTION_BUTTON",
+    nil,
+    [NSBundle mainBundle],
+    @"Manage your subscription",
+                                             @"Title of the button on the subscriptions page which takes the user of of the app to iTunes where they can view detailed information about their subscription");
+}
+
++ (NSString *)iDontSeeMySubscriptionButtonTitle {
+    return NSLocalizedStringWithDefaultValue(@"SUBSCRIPTIONS_PAGE_RESTORE_SUBSCRIPTION_BUTTON",
+    nil,
+    [NSBundle mainBundle],
+    @"I don't see my subscription",
+                                             @"Title of the button on the subscriptions page which, when pressed, navigates the user to the page where they can restore their existing subscription");
+}
+
++ (NSString *)subscriptionScreenNoticeText {
+    return NSLocalizedStringWithDefaultValue(@"BUY_SUBSCRIPTIONS_FOOTER_TEXT",
+    nil,
+    [NSBundle mainBundle],
+    @"A subscription is auto-renewable which means that once purchased it will be automatically renewed until you cancel it 24 hours prior to the end of the current period.\n\nYour iTunes Account will be charged for renewal within 24-hours prior to the end of the current period with the cost of the subscription.",
+    @"Buy subscription dialog footer text");
+}
+
++ (NSString *)subscriptionScreenCancelNoticeText {
+    return NSLocalizedStringWithDefaultValue(@"BUY_SUBSCRIPTIONS_FOOTER_CANCEL_INSTRUCTIONS_TEXT",
+    nil,
+    [NSBundle mainBundle],
+    @"You can cancel an active subscription in your iTunes Account Settings.",
+    @"Buy subscription dialog footer text explaining where the user can cancel an active subscription");
+}
+
++ (NSString *)productRequestFailedNoticeText {
+    return NSLocalizedStringWithDefaultValue(@"NO_PRODUCTS_TEXT_2", nil, [NSBundle mainBundle],
+    @"Could not retrieve subscriptions from the App Store. Please try again later.",
+    @"Subscriptions view text that is visible when the list of subscriptions is not available");
 }
 
 + (NSString *)selectedRegionUnavailableAlertBody {

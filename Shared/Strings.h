@@ -18,8 +18,32 @@
  */
 
 #import <Foundation/Foundation.h>
+#import <StoreKit/StoreKit.h>
 
 NS_ASSUME_NONNULL_BEGIN
+
+@interface StringUtils : NSObject
+
+/**
+ Converts `unit` to natural language (English only for now). `numUnits` determines if the output is pluralized or not.
+ Examples: "Day", "Weeks", "mo.", "mos."
+ */
++ (NSString *)stringForPeriodUnit:(SKProductPeriodUnit)unit
+                 pluralGivenUnits:(NSUInteger)numUnits
+                    andAbbreviate:(BOOL)abbreviate API_AVAILABLE(ios(11.2));
+
+/**
+ Converts `subscription` period to natural language (English onlyu for now). Examples: "1 Week", "Week", "2 mos.", ...
+ @note 7 days is converted to 1 week.
+
+ @param dropNumOfUnitsIfOne: drops prefixed number of units if its 1. E.g. 1 week -> "Week", but 2 weeks -> "2 Weeks".
+ */
++ (NSString *)stringForSubscriptionPeriod:(SKProductSubscriptionPeriod *)subscription
+                      dropNumOfUnitsIfOne:(BOOL)dropNumOfUnitsIfOne
+                            andAbbreviate:(BOOL)abbreviate API_AVAILABLE(ios(11.2));
+
+@end
+
 
 @interface Strings : NSObject
 
@@ -106,6 +130,24 @@ NS_ASSUME_NONNULL_BEGIN
 + (NSString *)privacyPolicyHTMLText;
 
 + (NSString *)privacyPolicyDeclinedAlertBody;
+
+#pragma mark - Subscription
+
++ (NSString *)activeSubscriptionBannerTitle;
+
++ (NSString *)inactiveSubscriptionBannerTitle;
+
++ (NSString *)inactiveSubscriptionBannerSubtitle;
+
++ (NSString *)manageYourSubscriptionButtonTitle;
+
++ (NSString *)iDontSeeMySubscriptionButtonTitle;
+
++ (NSString *)subscriptionScreenNoticeText;
+
++ (NSString *)subscriptionScreenCancelNoticeText;
+
++ (NSString *)productRequestFailedNoticeText;
 
 #pragma mark - Extension
 

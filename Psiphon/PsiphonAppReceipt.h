@@ -72,6 +72,10 @@
  */
 @property (nonatomic, strong, readonly) NSDate *cancellationDate;
 
+/** True if this transaction is in intro period, False otherwise.
+ */
+@property (nonatomic) BOOL isInIntroPreiod;
+
 /** Returns an initialized in-app purchase from the given data.
  @param asn1Data ASN1 data
  @return An initialized in-app purchase from the given data.
