@@ -134,8 +134,8 @@
 
     [NSLayoutConstraint activateConstraints:@[
       [_titleLabel.centerYAnchor constraintEqualToAnchor:self.centerYAnchor],
-      [_titleLabel.topAnchor constraintEqualToAnchor:self.topAnchor],
-      [_titleLabel.bottomAnchor constraintEqualToAnchor:self.bottomAnchor]
+      [_titleLabel.topAnchor constraintEqualToAnchor:self.topAnchor constant:10.0],
+      [_titleLabel.bottomAnchor constraintEqualToAnchor:self.bottomAnchor constant:-10.0]
     ]];
 
     UIControlContentHorizontalAlignment alignment = self.contentHorizontalAlignment;
