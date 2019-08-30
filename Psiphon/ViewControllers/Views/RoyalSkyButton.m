@@ -71,12 +71,13 @@
 - (void)autoLayoutSetupSubviewsLayoutConstraints {
     [super autoLayoutSetupSubviewsLayoutConstraints];
     statusGradientView.translatesAutoresizingMaskIntoConstraints = NO;
-    [statusGradientView.centerXAnchor constraintEqualToAnchor:self.centerXAnchor].active = YES;
 
-    [statusGradientView.topAnchor constraintEqualToAnchor:self.topAnchor].active = TRUE;
-
-    [statusGradientView.widthAnchor constraintEqualToAnchor:self.widthAnchor].active = YES;
-    [statusGradientView.heightAnchor constraintEqualToAnchor:self.heightAnchor].active = YES;
+    [NSLayoutConstraint activateConstraints:@[
+        [statusGradientView.centerXAnchor constraintEqualToAnchor:self.centerXAnchor],
+        [statusGradientView.topAnchor constraintEqualToAnchor:self.topAnchor],
+        [statusGradientView.widthAnchor constraintEqualToAnchor:self.widthAnchor],
+        [statusGradientView.heightAnchor constraintEqualToAnchor:self.heightAnchor],
+    ]];
 }
 
 #pragma mark - helper methods

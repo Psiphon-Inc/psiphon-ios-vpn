@@ -22,13 +22,18 @@
 #import "SharedConstants.h"
 #import "NSDate+Comparator.h"
 #import "IAPStoreHelper.h"
-
+#import "Logging.h"
 
 // From https://developer.apple.com/library/ios/releasenotes/General/ValidateAppStoreReceipt/Chapters/ReceiptFields.html#//apple_ref/doc/uid/TP40010573-CH106-SW1
+// Note: If a previous subscription period in the receipt has the value “true” for either
+//       the is_trial_period or the is_in_intro_offer_period key, the user is not eligible
+//       for a free trial or introductory price within that subscription group.
+
 NSInteger const PsiphonAppReceiptASN1TypeBundleIdentifier = 2;
 NSInteger const PsiphonAppReceiptASN1TypeInAppPurchaseReceipt = 17;
 NSInteger const PsiphonAppReceiptASN1TypeProductIdentifier = 1702;
 NSInteger const PsiphonAppReceiptASN1TypeSubscriptionExpirationDate = 1708;
+NSInteger const PsiphonAppReceiptASN1TypeIsInIntroOfferPeriod = 1719;
 NSInteger const PsiphonAppReceiptASN1TypeCancellationDate = 1712;
 
 static NSString* PsiphonASN1ReadUTF8String(const uint8_t *bytes, long length) {
@@ -65,11 +70,33 @@ static NSString* PsiphonASN1ReadIA5SString(const uint8_t *bytes, long length) {
     return retString;
 }
 
+static long PsiphonASN1ReadInteger(const uint8_t *bytes, long length) {
+    long parsed = 0;
+    INTEGER_t *asn1Integer = NULL;
+
+    asn_dec_rval_t rval = ber_decode(0, &asn_DEF_INTEGER, (void **)&asn1Integer, bytes, length);
+
+    int result = asn_INTEGER2long(asn1Integer, &parsed);
+
+    if (result != 0) {
+        [NSException raise:NSGenericException format:@"Failed to parse ASN1 Integer"];
+        exit(1);
+    }
+
+    if (rval.code == RC_OK) {
+        ASN_STRUCT_FREE(asn_DEF_INTEGER, asn1Integer);
+    }
+
+    return parsed;
+}
+
 @implementation PsiphonAppReceipt
 
 - (instancetype)initWithASN1Data:(NSData*)asn1Data {
     if (self = [super init]) {
         NSMutableDictionary *subscriptions = [[NSMutableDictionary alloc] init];
+        __block BOOL hasBeenInIntroPeriod = FALSE;
+
         // Explicit casting to avoid errors when compiling as Objective-C++
         [PsiphonAppReceipt enumerateReceiptAttributes:(const uint8_t*)asn1Data.bytes length:asn1Data.length usingBlock:^(NSData *data, long type) {
             switch (type) {
@@ -88,7 +115,9 @@ static NSString* PsiphonASN1ReadIA5SString(const uint8_t *bytes, long length) {
                             iapReceipt = nil;
                             break;
                         }
-                        
+
+                        hasBeenInIntroPeriod = hasBeenInIntroPeriod || iapReceipt.isInIntroPreiod;
+
                         NSDate *latestExpirationDate = subscriptions[kLatestExpirationDate];
                         
                         if (!latestExpirationDate || [latestExpirationDate before:iapReceipt.subscriptionExpirationDate]) {
@@ -102,12 +131,15 @@ static NSString* PsiphonASN1ReadIA5SString(const uint8_t *bytes, long length) {
                     break;
             }
         }];
-        
-        if (subscriptions) {
-            NSNumber *appReceiptFileSize;
-            [[NSBundle mainBundle].appStoreReceiptURL getResourceValue:&appReceiptFileSize forKey:NSURLFileSizeKey error:nil];
-            [subscriptions setObject:appReceiptFileSize forKey:kAppReceiptFileSize];
-        }
+
+        subscriptions[kHasBeenInIntroPeriod] = [NSNumber numberWithBool:hasBeenInIntroPeriod];
+
+        NSNumber *appReceiptFileSize;
+        [[NSBundle mainBundle].appStoreReceiptURL getResourceValue:&appReceiptFileSize
+                                                            forKey:NSURLFileSizeKey
+                                                             error:nil];
+        subscriptions[kAppReceiptFileSize] = appReceiptFileSize;
+
         _inAppSubscriptions = (NSDictionary*)subscriptions;
     }
     return self;
@@ -180,6 +212,7 @@ static NSString* PsiphonASN1ReadIA5SString(const uint8_t *bytes, long length) {
 
 @end
 
+
 @implementation PsiphonAppReceiptIAP
 
 - (instancetype)initWithASN1Data:(NSData*)asn1Data {
@@ -199,6 +232,11 @@ static NSString* PsiphonASN1ReadIA5SString(const uint8_t *bytes, long length) {
                 case PsiphonAppReceiptASN1TypeCancellationDate: {
                     NSString *string = PsiphonASN1ReadIA5SString(p, length);
                     _cancellationDate = [PsiphonAppReceipt formatRFC3339String:string];
+                    break;
+                }
+                case PsiphonAppReceiptASN1TypeIsInIntroOfferPeriod: {
+                    long is_in_intro_period = PsiphonASN1ReadInteger(p, length);
+                    _isInIntroPreiod = [[NSNumber numberWithLong: is_in_intro_period] boolValue];
                     break;
                 }
             }

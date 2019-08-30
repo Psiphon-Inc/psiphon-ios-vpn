@@ -77,4 +77,6 @@
 
 + (UIColor * _Nonnull)nepalGreyBlueColor;
 
++ (UIColor * _Nonnull)black19Color;
+
 @end
