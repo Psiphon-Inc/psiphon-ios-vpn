@@ -122,17 +122,7 @@
     self.layer.masksToBounds = FALSE;
     self.layer.cornerRadius = cornerRadius;
 
-    _titleLabel.backgroundColor = UIColor.clearColor;
-
-    _titleLabel.adjustsFontSizeToFitWidth = TRUE;
-    _titleLabel.minimumScaleFactor = 0.8;
-    _titleLabel.font = [UIFont avenirNextDemiBold:self.fontSize];
-
-    _titleLabel.textAlignment = NSTextAlignmentCenter;
-    _titleLabel.textColor = UIColor.whiteColor;
-    _titleLabel.userInteractionEnabled = FALSE;
-    _titleLabel.clipsToBounds = TRUE;
-    _titleLabel.backgroundColor = UIColor.clearColor;
+    [self setLabelProperties:_titleLabel withFontSize:self.fontSize];
 }
 
 - (void)autoLayoutAddSubviews {
@@ -143,7 +133,6 @@
     _titleLabel.translatesAutoresizingMaskIntoConstraints = FALSE;
 
     [NSLayoutConstraint activateConstraints:@[
-      [_titleLabel.heightAnchor constraintEqualToConstant:(3.f * self.fontSize)],
       [_titleLabel.centerYAnchor constraintEqualToAnchor:self.centerYAnchor],
       [_titleLabel.topAnchor constraintEqualToAnchor:self.topAnchor],
       [_titleLabel.bottomAnchor constraintEqualToAnchor:self.bottomAnchor]
@@ -164,6 +153,21 @@
     }
 }
 
+#pragma mark -
+
+- (void)setLabelProperties:(UILabel *)label withFontSize:(CGFloat)fontSize{
+    label.adjustsFontSizeToFitWidth = TRUE;
+    label.minimumScaleFactor = 0.8;
+    label.font = [UIFont avenirNextDemiBold:fontSize];
+    label.numberOfLines = 1;
+
+    label.textAlignment = NSTextAlignmentCenter;
+    label.textColor = UIColor.whiteColor;
+    label.userInteractionEnabled = FALSE;
+    label.clipsToBounds = TRUE;
+    label.backgroundColor = UIColor.clearColor;
+}
+
 #pragma mark - Touch animation
 
 - (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(nullable UIEvent *)event {
@@ -172,6 +176,15 @@
                      animations:^{
                         self.transform = CGAffineTransformMakeScale(0.98f, 0.98f);
                         self.alpha = 0.8;
+                     }];
+}
+
+- (void)touchesCancelled:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
+    [super touchesCancelled:touches withEvent:event];
+    [UIView animateWithDuration:0.1
+                     animations:^{
+                         self.transform = CGAffineTransformMakeScale(1.f, 1.f);
+                         self.alpha = 1.0;
                      }];
 }
 

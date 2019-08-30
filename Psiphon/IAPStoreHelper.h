@@ -25,6 +25,7 @@
 #define kAppReceiptFileSize                             @"app_receipt_file_size"
 #define kLatestExpirationDate                           @"latest_expiration_date"
 #define kProductId                                      @"product_id"
+#define kHasBeenInIntroPeriod                           @"has_been_in_intro_period"
 
 
 NS_ASSUME_NONNULL_BEGIN
@@ -40,7 +41,7 @@ FOUNDATION_EXPORT NSString * const IAPHelperPaymentTransactionUpdateKey;
 
 @interface IAPStoreHelper : NSObject
 
-@property (nonatomic,strong) NSArray *storeProducts;
+@property (nonatomic,strong) NSArray<SKProduct *> *storeProducts;
 @property (nonatomic,strong) NSArray *bundledProductIDS;
 
 + (instancetype)sharedInstance;
