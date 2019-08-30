@@ -81,7 +81,7 @@
       [subscriptionStatusView.centerYAnchor
         constraintEqualToAnchor:subscriptionStatusViewContainer.centerYAnchor],
       [subscriptionStatusView.widthAnchor
-        constraintEqualToAnchor:subscriptionStatusViewContainer.widthAnchor multiplier:0.712],
+        constraintEqualToAnchor:subscriptionStatusViewContainer.widthAnchor multiplier:0.9],
       [subscriptionStatusView.heightAnchor
         constraintEqualToAnchor:subscriptionStatusViewContainer.heightAnchor multiplier:0.456]
     ]];

@@ -100,10 +100,10 @@
                                                                  @"GET PREMIUM",
                                                                  @"Header text beside button that opens paid subscriptions manager UI. At this point the user is not subscribed. If “Premium” doesn't easily translate, please choose a term that conveys “Pro” or “Extra” or “Better” or “Elite”. Please keep this text concise as the width of the text box is restricted in size.");
         statusLabel.attributedText = [self styleHeaderText:headerText];
-        subStatusLabel.text = NSLocalizedStringWithDefaultValue(@"SUBSCRIPTION_BAR_FOOTER_TEXT_NOT_SUBSCRIBED",
+        subStatusLabel.text = NSLocalizedStringWithDefaultValue(@"SUBSCRIPTION_BAR_FOOTER_TEXT_NOT_SUBSCRIBED_2",
                                                                 nil,
                                                                 [PsiphonClientCommonLibraryHelpers commonLibraryBundle],
-                                                                @"Remove ads",
+                                                                @"Remove ads • Max speed",
                                                                 @"Footer text beside button that opens paid subscriptions manager UI. At this point the user is not subscribed. Please keep this text concise as the width of the text box is restricted in size.");
     }
 }
