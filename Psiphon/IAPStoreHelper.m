@@ -236,6 +236,18 @@ NSString *const kSubscriptionDictionary = @"kSubscriptionDictionary";
         return YES;
     }
 
+    // If subscription dictionary doesn't have exepcted fields - YES
+    if (![[subscriptionDict allKeys] containsObject:kHasBeenInIntroPeriod]) {
+        [PsiFeedbackLogger infoWithType:IAPStoreHelperLogType
+        json:@{@"event": @"shouldUpdate",
+              @"result": @(YES),
+              @"reason": @"keyNotFound",
+               @"key": kHasBeenInIntroPeriod
+        }];
+
+        return YES;
+    }
+
     // Receipt file size has changed since last check - YES
     NSNumber* appReceiptFileSize = nil;
     [[NSBundle mainBundle].appStoreReceiptURL getResourceValue:&appReceiptFileSize forKey:NSURLFileSizeKey error:nil];
