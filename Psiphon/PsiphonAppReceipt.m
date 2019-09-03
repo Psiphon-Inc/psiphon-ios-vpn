@@ -23,6 +23,9 @@
 #import "NSDate+Comparator.h"
 #import "IAPStoreHelper.h"
 #import "Logging.h"
+#import "PsiFeedbackLogger.h"
+
+PsiFeedbackLogType const AppReceipt = @"AppReceipt";
 
 // From https://developer.apple.com/library/ios/releasenotes/General/ValidateAppStoreReceipt/Chapters/ReceiptFields.html#//apple_ref/doc/uid/TP40010573-CH106-SW1
 // Note: If a previous subscription period in the receipt has the value “true” for either
@@ -132,7 +135,11 @@ static long PsiphonASN1ReadInteger(const uint8_t *bytes, long length) {
             }
         }];
 
-        subscriptions[kHasBeenInIntroPeriod] = [NSNumber numberWithBool:hasBeenInIntroPeriod];
+
+        NSNumber *boolHasBeenInIntroPeriod = [NSNumber numberWithBool:hasBeenInIntroPeriod];
+        subscriptions[kHasBeenInIntroPeriod] = boolHasBeenInIntroPeriod;
+
+        [PsiFeedbackLogger infoWithType:AppReceipt json:@{@"HasBeenInIntroPeriod": boolHasBeenInIntroPeriod}];
 
         NSNumber *appReceiptFileSize;
         [[NSBundle mainBundle].appStoreReceiptURL getResourceValue:&appReceiptFileSize
