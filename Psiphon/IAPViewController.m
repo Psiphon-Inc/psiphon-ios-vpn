@@ -777,6 +777,12 @@ static NSString *iapCellID = @"IAPTableCellID";
     if (buyProgressAlert != nil) {
         return;
     }
+
+    // Disable iOS 13 swipe-down dismiss while the progress bar is showing.
+    if (@available(iOS 13.0, *)) {
+        [self setModalInPresentation:TRUE];
+    }
+
     buyProgressAlert = [MBProgressHUD showHUDAddedTo:AppDelegate.getTopMostViewController.view animated:YES];
 
     buyProgressAlertTimer = [NSTimer scheduledTimerWithTimeInterval:60 repeats:NO block:^(NSTimer * _Nonnull timer) {
@@ -788,6 +794,11 @@ static NSString *iapCellID = @"IAPTableCellID";
 }
 
 - (void)dismissProgressSpinnerAndUnblockUI {
+    // Re-enable iOS 13 swipe-down dismiss while the progress bar is showing.
+    if (@available(iOS 13.0, *)) {
+        [self setModalInPresentation:FALSE];
+    }
+
     if (buyProgressAlertTimer != nil) {
         [buyProgressAlertTimer invalidate];
         buyProgressAlertTimer = nil;
