@@ -53,7 +53,7 @@ FOUNDATION_EXPORT NSString * const IAPHelperPaymentTransactionUpdateKey;
 
 #pragma mark - Subscription
 
-+ (NSDictionary*)subscriptionDictionary;
++ (NSDictionary *_Nullable)subscriptionDictionary;
 
 + (void)storeSubscriptionDictionary:(NSDictionary*)dict;
 
@@ -84,6 +84,8 @@ FOUNDATION_EXPORT NSString * const IAPHelperPaymentTransactionUpdateKey;
  * @return TRUE if subscription is active, FALSE otherwise.
  */
 + (BOOL)hasActiveSubscriptionForDate:(NSDate *)date getExpiryDate:(NSDate *_Nullable *_Nullable)expiryDate;
+
++ (BOOL)hasActiveSubscriptionForDate:(NSDate*)date inDict:(NSDictionary*)subscriptionDict getExpiryDate:(NSDate **)expiryDate;
 
 + (BOOL)shouldUpdateSubscriptionDictionary:(NSDictionary*)subscriptionDict;
 
