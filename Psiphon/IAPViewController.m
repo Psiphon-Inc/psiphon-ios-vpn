@@ -799,21 +799,30 @@ static NSString *iapCellID = @"IAPTableCellID";
 }
 
 - (void)updateHasActiveSubscription {
-    // Load subscription information.
-    if ([IAPStoreHelper hasActiveSubscriptionForNow]) {
 
-        // Store latest product expiration date.
-        self.latestSubscriptionExpirationDate = IAPStoreHelper.subscriptionDictionary[kLatestExpirationDate];
-        self.hasBeenInIntroPeriod = [IAPStoreHelper.subscriptionDictionary[kHasBeenInIntroPeriod] boolValue];
+    NSDictionary *_Nullable subscriptionDict = [IAPStoreHelper subscriptionDictionary];
 
-        NSString *productId = IAPStoreHelper.subscriptionDictionary[kProductId];
+    if (subscriptionDict) {
 
-        for (SKProduct *product in [IAPStoreHelper sharedInstance].storeProducts) {
-            if ([product.productIdentifier isEqualToString:productId]) {
-                self.latestSubscriptionProduct = product;
-                self.hasActiveSubscription = TRUE;
+        self.hasBeenInIntroPeriod = [subscriptionDict[kHasBeenInIntroPeriod] boolValue];
 
-                break;
+        // Load subscription information.
+        if ([IAPStoreHelper hasActiveSubscriptionForDate:[NSDate date]
+                                                  inDict:subscriptionDict
+                                           getExpiryDate:nil]) {
+
+            // Store latest product expiration date.
+            self.latestSubscriptionExpirationDate = subscriptionDict[kLatestExpirationDate];
+
+            NSString *productId = subscriptionDict[kProductId];
+
+            for (SKProduct *product in [IAPStoreHelper sharedInstance].storeProducts) {
+                if ([product.productIdentifier isEqualToString:productId]) {
+                    self.latestSubscriptionProduct = product;
+                    self.hasActiveSubscription = TRUE;
+
+                    break;
+                }
             }
         }
     }
