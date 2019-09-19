@@ -84,11 +84,12 @@
 		5246800722D51AA3009AEC6E /* PsiCashWidgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5246800622D51AA3009AEC6E /* PsiCashWidgetView.swift */; };
 		5246800922D51CE4009AEC6E /* PsiCashBalanceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5246800822D51CE4009AEC6E /* PsiCashBalanceView.swift */; };
 		5246800D22D65926009AEC6E /* UIUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5246800C22D65926009AEC6E /* UIUtils.swift */; };
-		5248B4CE23203781008C00D4 /* SwiftUIButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5248B4CD23203781008C00D4 /* SwiftUIButton.swift */; };
+		5248B4CE23203781008C00D4 /* SwiftObjCBridges.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5248B4CD23203781008C00D4 /* SwiftObjCBridges.swift */; };
 		5248B4D223219EE8008C00D4 /* SwiftActors+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5248B4D123219EE8008C00D4 /* SwiftActors+Additions.swift */; };
 		5248B4D42326B66B008C00D4 /* AppRoot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5248B4D32326B66B008C00D4 /* AppRoot.swift */; };
 		524B4E6B2316F0E3004E9891 /* BorderedSubtitleButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 524B4E6A2316F0E3004E9891 /* BorderedSubtitleButton.m */; };
 		524B4E6E2316F27F004E9891 /* AnimatedControl.m in Sources */ = {isa = PBXBuildFile; fileRef = 524B4E6D2316F27F004E9891 /* AnimatedControl.m */; };
+		5254093D2332AA0E001E7B12 /* SubscriptionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5254093C2332AA0E001E7B12 /* SubscriptionService.swift */; };
 		525E1E2F22F0E22A0079DB49 /* LandingPageService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 525E1E2E22F0E22A0079DB49 /* LandingPageService.swift */; };
 		52805BA122DD1EB8006B205B /* RxSwift+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52805BA022DD1EB8006B205B /* RxSwift+Additions.swift */; };
 		52D2581122BADE1900CA956A /* ActorSystemInterface.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D2581022BADE1900CA956A /* ActorSystemInterface.swift */; };
@@ -393,13 +394,14 @@
 		5246800622D51AA3009AEC6E /* PsiCashWidgetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PsiCashWidgetView.swift; sourceTree = "<group>"; };
 		5246800822D51CE4009AEC6E /* PsiCashBalanceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PsiCashBalanceView.swift; sourceTree = "<group>"; };
 		5246800C22D65926009AEC6E /* UIUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIUtils.swift; sourceTree = "<group>"; };
-		5248B4CD23203781008C00D4 /* SwiftUIButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftUIButton.swift; sourceTree = "<group>"; };
+		5248B4CD23203781008C00D4 /* SwiftObjCBridges.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftObjCBridges.swift; sourceTree = "<group>"; };
 		5248B4D123219EE8008C00D4 /* SwiftActors+Additions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SwiftActors+Additions.swift"; sourceTree = "<group>"; };
 		5248B4D32326B66B008C00D4 /* AppRoot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppRoot.swift; sourceTree = "<group>"; };
 		524B4E692316F0E3004E9891 /* BorderedSubtitleButton.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BorderedSubtitleButton.h; sourceTree = "<group>"; };
 		524B4E6A2316F0E3004E9891 /* BorderedSubtitleButton.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = BorderedSubtitleButton.m; sourceTree = "<group>"; };
 		524B4E6C2316F27F004E9891 /* AnimatedControl.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AnimatedControl.h; sourceTree = "<group>"; };
 		524B4E6D2316F27F004E9891 /* AnimatedControl.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AnimatedControl.m; sourceTree = "<group>"; };
+		5254093C2332AA0E001E7B12 /* SubscriptionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionService.swift; sourceTree = "<group>"; };
 		525E1E2E22F0E22A0079DB49 /* LandingPageService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LandingPageService.swift; sourceTree = "<group>"; };
 		52805BA022DD1EB8006B205B /* RxSwift+Additions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RxSwift+Additions.swift"; sourceTree = "<group>"; };
 		52D2580F22BADE1900CA956A /* Psiphon-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Psiphon-Bridging-Header.h"; sourceTree = "<group>"; };
@@ -836,6 +838,7 @@
 		4ED48C06215058C900B1A9A5 /* Util */ = {
 			isa = PBXGroup;
 			children = (
+				5248B4CD23203781008C00D4 /* SwiftObjCBridges.swift */,
 				52805BA022DD1EB8006B205B /* RxSwift+Additions.swift */,
 				52467FF822CE77A1009AEC6E /* SwiftExtensions.swift */,
 				9BFECE69F71F11C7B3A2D67E /* UIColor+Additions.h */,
@@ -872,7 +875,6 @@
 				52D363CA230DEBED002C2221 /* CloseButton.swift */,
 				52D363CC230EEBAC002C2221 /* AnimatedUIButton.swift */,
 				52D363CE230F112E002C2221 /* TabControlView.swift */,
-				5248B4CD23203781008C00D4 /* SwiftUIButton.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -1059,6 +1061,7 @@
 				52467FFC22D3CEE7009AEC6E /* PsiphonURL.swift */,
 				525E1E2E22F0E22A0079DB49 /* LandingPageService.swift */,
 				5248B4D32326B66B008C00D4 /* AppRoot.swift */,
+				5254093C2332AA0E001E7B12 /* SubscriptionService.swift */,
 			);
 			path = Psiphon;
 			sourceTree = "<group>";
@@ -1558,6 +1561,7 @@
 				EF90D7A9204F22C900228A63 /* FileUtils.m in Sources */,
 				EF90D7A1204F22C900228A63 /* timestamp_valid.c in Sources */,
 				445F24DF20E1A5BA00D004E9 /* ANY.c in Sources */,
+				5254093D2332AA0E001E7B12 /* SubscriptionService.swift in Sources */,
 				4E90C94420CB37F5003FC319 /* PsiCashLogger.m in Sources */,
 				EFC2F5C420226782007B52F9 /* RootContainerController.m in Sources */,
 				5248B4D223219EE8008C00D4 /* SwiftActors+Additions.swift in Sources */,
@@ -1629,7 +1633,7 @@
 				521FD0F2219E0D5600F748EC /* DebugViewController.m in Sources */,
 				9BFEC9C08697E4701A36A3B3 /* UnionSerialQueue.m in Sources */,
 				445F24EF20E1A5BA00D004E9 /* constraints.c in Sources */,
-				5248B4CE23203781008C00D4 /* SwiftUIButton.swift in Sources */,
+				5248B4CE23203781008C00D4 /* SwiftObjCBridges.swift in Sources */,
 				52D363CB230DEBED002C2221 /* CloseButton.swift in Sources */,
 				445F24DB20E1A5BA00D004E9 /* ber_decoder.c in Sources */,
 				52D2581122BADE1900CA956A /* ActorSystemInterface.swift in Sources */,

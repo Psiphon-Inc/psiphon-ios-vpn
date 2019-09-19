@@ -72,8 +72,9 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
 
 @property (nonatomic, nullable, readwrite) RACMulticastConnection<AppEvent *> *appEvents;
 
-// subscriptionStatus should only be sent events to from the main thread.
-// Emits type UserSubscriptionStatus
+// TODO!! re-enable for backwards compatibility
+//// subscriptionStatus should only be sent events to from the main thread.
+//// Emits type UserSubscriptionStatus
 @property (nonatomic, readwrite) RACReplaySubject<NSNumber *> *subscriptionStatus;
 
 // Private properties
@@ -395,8 +396,9 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
     LOG_DEBUG();
     // Called as part of the transition from the background to the active state; here you can undo many of the changes made on entering the background.
 
-    // Resets status of the subjects whose state could be stale once the container is foregrounded.
-    [self.subscriptionStatus sendNext:@(UserSubscriptionUnknown)];
+    // TODO!!
+//     Resets status of the subjects whose state could be stale once the container is foregrounded.
+//    [self.subscriptionStatus sendNext:@(UserSubscriptionUnknown)];
 
     [SwiftAppDelegate.instance applicationWillEnterForeground:application];
 }

@@ -53,8 +53,15 @@ protocol AppState: AnyMessage, Equatable {}
 
 struct Services {
 
+    fileprivate let subscriptionSubject = BehaviorSubject<SubscriptionActorPublisher?>(value: .none)
+
     fileprivate let psiCashRelay = BehaviorSubject<PsiCashActorPublisher?>(value: .none)
+
     fileprivate let landingPageRelay = BehaviorSubject<ActorRef?>(value: .none)
+
+    var subscription: Observable<SubscriptionActorPublisher?> {
+        subscriptionSubject
+    }
 
     var psiCash: Observable<PsiCashActorPublisher?> {
         psiCashRelay
@@ -77,16 +84,25 @@ class AppRoot: Actor {
         let initServices: Services
     }
 
+    // TODO!! remove the AnyMessage type.
     enum ServiceType: String, AnyMessage {
         case psiCash
         case landingPage
+        case subscription
+    }
+
+    enum Action: AnyMessage {
+        case subscribed(Bool)
     }
 
     var context: ActorContext!
     let param: Params
 
     // Services
+    private var subscriptionCtx: ServiceContext<SubscriptionActorPublisher>
+
     private var psiCashCtx: ServiceContext<PsiCashActorPublisher>
+
     private var landingPageCtx: ServiceContext<ActorRef>
 
     lazy var receive = behavior { [unowned self] in
@@ -101,6 +117,7 @@ class AppRoot: Actor {
 
             switch msg {
             case .psiCash:
+                // TODO!! this publisher should comlete if the actor dies
                 let publisher = ReplaySubject<PsiCashActor.PublishedType>.create(bufferSize: 1)
                 let props = Props(PsiCashActor.self,
                                   param: PsiCashActor.Params(publisher: publisher,
@@ -109,13 +126,14 @@ class AppRoot: Actor {
 
                 self.context.watch(actor)
 
-                self.psiCashCtx.new(PsiCashActorPublisher(actor: actor, publisher: publisher))
-                { psiCashActorPublisher -> Disposable in
-                    self.param.vpnStatus.filter { $0 == .connected }
-                    .subscribe(onNext: { _ in
-                        psiCashActorPublisher.actor ! PsiCashActor.Action.refreshState
-                    })
-                }
+                self.psiCashCtx = self.psiCashCtx.new(
+                    PsiCashActorPublisher(actor: actor, publisher: publisher),
+                    dispose: { psiCashActorPublisher -> Disposable in
+                        self.param.vpnStatus.filter { $0 == .connected }
+                            .subscribe(onNext: { _ in
+                                psiCashActorPublisher.actor ! PsiCashActor.Action.refreshState
+                            })
+                })
 
             case .landingPage:
                 let params = LandingPageActor.Params(psiCash: self.psiCashCtx.service,
@@ -131,8 +149,20 @@ class AppRoot: Actor {
                                                               serviceType: .landingPage)
 
                 self.context.watch(actor)
-                self.landingPageCtx.new(actor)
+                self.landingPageCtx = self.landingPageCtx.new(actor)
 
+            case .subscription:
+                let publisher = ReplaySubject<SubscriptionActor.State>.create(bufferSize: 1)
+                let props = Props(SubscriptionActor.self,
+                                  param: SubscriptionActor.Param(publisher: publisher))
+
+                let actor = self.param.actorBuilder.makeActor(self, props,
+                                                              serviceType: .subscription)
+
+                let actorPublisher = SubscriptionActorPublisher(actor: actor, publisher: publisher)
+
+                self.context.watch(actor)
+                self.subscriptionCtx = self.subscriptionCtx.new(actorPublisher)
             }
 
             // TODO! Separate this as a thing
@@ -147,9 +177,11 @@ class AppRoot: Actor {
 
                 switch serviceType {
                 case .psiCash:
-                    self.psiCashCtx.terminate()
+                    self.psiCashCtx = self.psiCashCtx.new(.none)
                 case .landingPage:
-                    self.landingPageCtx.terminate()
+                    self.landingPageCtx = self.landingPageCtx.new(.none)
+                case .subscription:
+                    fatalError("Subscription actor terminated")
                 }
             }
 
@@ -161,8 +193,13 @@ class AppRoot: Actor {
 
     required init(_ param: Params) {
         self.param = param
-        psiCashCtx = ServiceContext<PsiCashActorPublisher>(relay: param.initServices.psiCashRelay)
-        landingPageCtx = ServiceContext<ActorRef>(relay: param.initServices.landingPageRelay)
+        subscriptionCtx = .init(relay: param.initServices.subscriptionSubject)
+        psiCashCtx = .init(relay: param.initServices.psiCashRelay)
+        landingPageCtx = .init(relay: param.initServices.landingPageRelay)
+    }
+
+    func preStart() {
+        self ! ServiceType.subscription
     }
 
 }
@@ -172,35 +209,31 @@ fileprivate struct ServiceContext<Service> {
     /// - Important: RxSwift doesn't have a relay type such as https://github.com/JakeWharton/RxRelay
     ///              It's an error to call `onCompleted` and `onError` on this object.
     private let relay: BehaviorSubject<Service?>
-    private var disposable: Disposable? {
-        didSet {
-            oldValue?.dispose()
-        }
-    }
+    private let disposable: Disposable?
+    private let value: Service?
 
     var service: Observable<Service?> {
         return relay
     }
 
-    init(relay: BehaviorSubject<Service?>) {
+    init(relay: BehaviorSubject<Service?>, value: Service? = .none,
+         dispose: ((Service) -> Disposable)? = .none) {
+
         self.relay = relay
-        disposable = .none
-    }
+        self.value = value
 
-    mutating func new(_ value: Service, dispose: ((Service) -> Disposable)? = .none) {
-        relay.onNext(value)
-
-        if let dispose = dispose {
-            disposable = dispose(value)
+        if let value = value {
+            self.disposable = dispose?(value)
         } else {
-            disposable = .none
+            self.disposable = .none
         }
     }
 
-    mutating func terminate() {
-        relay.onNext(.none)
+    func new(_ value: Service?, dispose: ((Service) -> Disposable)? = .none) -> ServiceContext<Service> {
+        relay.onNext(value)
         disposable?.dispose()
-        disposable = .none
+
+        return ServiceContext(relay: relay, value: value, dispose: dispose)
     }
 
 }

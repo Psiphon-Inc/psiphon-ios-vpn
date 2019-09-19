@@ -109,13 +109,13 @@ class PsiCashActor: Actor, Publisher {
     var context: ActorContext!
     let publisher: ReplaySubject<PublishedType>
 
-    private let vpnManager: VPNManager
-    private let sharedDB =
+    let vpnManager: VPNManager
+    let sharedDB =
         PsiphonDataSharedDB(forAppGroupIdentifier: APP_GROUP_IDENTIFIER)
-    private let psiCashLib = PsiCash()
-    private lazy var logger = PsiCashLogger(client: psiCashLib)
+    let psiCashLib = PsiCash()
+    lazy var logger = PsiCashLogger(client: psiCashLib)
 
-    private var state: State {
+    var state: State {
         didSet { publisher.onNext(state) }
     }
 
@@ -217,7 +217,8 @@ class PsiCashActor: Actor, Publisher {
     }
 
     func postStop() {
-
+        // TODO! this is error-prone
+        publisher.onCompleted()
     }
 }
 

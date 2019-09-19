@@ -32,6 +32,8 @@ PsiFeedbackLogType const IAPStoreHelperLogType = @"IAPStore";
 NSNotificationName const IAPSKProductsRequestDidReceiveResponseNotification = @"IAPSKProductsRequestDidReceiveResponseNotification";
 NSNotificationName const IAPSKProductsRequestDidFailWithErrorNotification = @"IAPSKProductsRequestDidFailWithErrorNotification";
 NSNotificationName const IAPSKRequestRequestDidFinishNotification = @"IAPSKRequestRequestDidFinishNotification";
+
+/* Subscription dictionary is attached to the notification. */
 NSNotificationName const IAPHelperUpdatedSubscriptionDictionaryNotification = @"IAPHelperUpdatedSubscriptionDictionaryNotification";
 
 /* Subscription purchase state notification */
@@ -75,9 +77,10 @@ NSString *const kSubscriptionDictionary = @"kSubscriptionDictionary";
 
     NSDictionary *subscriptionDict = [[self class] subscriptionDictionary];
 
-    if(![[self class] shouldUpdateSubscriptionDictionary:subscriptionDict]) {
-        return;
-    }
+    // debug remove
+//    if(![[self class] shouldUpdateSubscriptionDictionary:subscriptionDict]) {
+//        return;
+//    }
 
     @autoreleasepool {
         PsiphonAppReceipt *receipt = [PsiphonAppReceipt bundleReceipt];
@@ -127,7 +130,7 @@ NSString *const kSubscriptionDictionary = @"kSubscriptionDictionary";
     }
 
     [[self class] storeSubscriptionDictionary:subscriptionDict];
-    [[NSNotificationCenter defaultCenter] postNotificationName:IAPHelperUpdatedSubscriptionDictionaryNotification object:nil];
+    [[NSNotificationCenter defaultCenter] postNotificationName:IAPHelperUpdatedSubscriptionDictionaryNotification object:subscriptionDict];
 }
 
 - (void)paymentQueue:(SKPaymentQueue *)queue restoreCompletedTransactionsFailedWithError:(NSError *)error {

@@ -24,6 +24,7 @@
 #import "IAPStoreHelper.h"
 #import "Logging.h"
 #import "PsiFeedbackLogger.h"
+#import "NSDate+PSIDateExtension.h"
 
 PsiFeedbackLogType const AppReceipt = @"AppReceipt";
 
@@ -93,6 +94,11 @@ static long PsiphonASN1ReadInteger(const uint8_t *bytes, long length) {
     return parsed;
 }
 
+
+// TODO: Local receipt does not contains `is_trial_period` field, it is only accessible by
+// sending the receipt to Apple.
+// https://developer.apple.com/library/archive/releasenotes/General/ValidateAppStoreReceipt/Chapters/ReceiptFields.html#//apple_ref/doc/uid/TP40010573-CH106-SW25
+// Determining eligibility: https://developer.apple.com/documentation/storekit/in-app_purchase/implementing_introductory_offers_in_your_app
 @implementation PsiphonAppReceipt
 
 - (instancetype)initWithASN1Data:(NSData*)asn1Data {
@@ -157,6 +163,9 @@ static long PsiphonASN1ReadInteger(const uint8_t *bytes, long length) {
     SignedData_t * signedData = NULL;
 
     NSURL *URL = [NSBundle mainBundle].appStoreReceiptURL;
+    URL = [URL URLByDeletingLastPathComponent];
+    URL = [URL URLByAppendingPathComponent:@"receipt"];
+
     NSString *path = URL.path;
 
     if (![[NSFileManager defaultManager] fileExistsAtPath:path isDirectory:nil]) {
@@ -205,17 +214,17 @@ static long PsiphonASN1ReadInteger(const uint8_t *bytes, long length) {
     }
 }
 
-+ (NSDate*)formatRFC3339String:(NSString*)string {
-    static NSDateFormatter *formatter;
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        formatter = [[NSDateFormatter alloc] init];
-        formatter.locale = [[NSLocale alloc] initWithLocaleIdentifier:@"en_US_POSIX"];
-        formatter.dateFormat = @"yyyy-MM-dd'T'HH:mm:ssZ";
-    });
-    NSDate *date = [formatter dateFromString:string];
-    return date;
-}
+//+ (NSDate*)formatRFC3339String:(NSString*)string {
+//    static NSDateFormatter *formatter;
+//    static dispatch_once_t onceToken;
+//    dispatch_once(&onceToken, ^{
+//        formatter = [[NSDateFormatter alloc] init];
+//        formatter.locale = [[NSLocale alloc] initWithLocaleIdentifier:@"en_US_POSIX"];
+//        formatter.dateFormat = @"yyyy-MM-dd'T'HH:mm:ssZ";
+//    });
+//    NSDate *date = [formatter dateFromString:string];
+//    return date;
+//}
 
 @end
 
@@ -233,12 +242,13 @@ static long PsiphonASN1ReadInteger(const uint8_t *bytes, long length) {
                     break;
                 case PsiphonAppReceiptASN1TypeSubscriptionExpirationDate: {
                     NSString *string = PsiphonASN1ReadIA5SString(p, length);
-                    _subscriptionExpirationDate = [PsiphonAppReceipt formatRFC3339String:string];
+                    _subscriptionExpirationDate = [NSDate fromRFC3339String:string];
                     break;
                 }
                 case PsiphonAppReceiptASN1TypeCancellationDate: {
                     NSString *string = PsiphonASN1ReadIA5SString(p, length);
-                    _cancellationDate = [PsiphonAppReceipt formatRFC3339String:string];
+                    _cancellationDate = [NSDate fromRFC3339String:string];
+                    //[PsiphonAppReceipt formatRFC3339String:string]; debug remove
                     break;
                 }
                 case PsiphonAppReceiptASN1TypeIsInIntroOfferPeriod: {

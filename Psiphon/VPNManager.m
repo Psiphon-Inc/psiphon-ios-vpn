@@ -716,18 +716,8 @@ PsiFeedbackLogType const VPNManagerLogType = @"VPNManager";
 
     VPNManager *__weak weakSelf = self;
 
-    // Emits a single item of type UserSubscriptionStatus whenever the subscription status is known.
-    RACSignal *knownSubStatus = [[AppDelegate.sharedAppDelegate.subscriptionStatus
-      filter:^BOOL(NSNumber *value) {
-          UserSubscriptionStatus s = (UserSubscriptionStatus) [value integerValue];
-          return (s != UserSubscriptionUnknown);
-      }]
-      take:1];
-
-    return [[[[[[RACSignal return:manager] zipWith:knownSubStatus]
-      map:^NETunnelProviderManager *(RACTwoTuple *tuple) {
-
-          NETunnelProviderManager *pm = tuple.first;
+    return [[[[[RACSignal return:manager]
+      map:^NETunnelProviderManager *(NETunnelProviderManager *_Nullable pm) {
 
           if (!pm) {
               NETunnelProviderProtocol *providerProtocol = [[NETunnelProviderProtocol alloc] init];

@@ -19,6 +19,8 @@
 
 import UIKit
 
+// MARK: UIControl Swift Brdige
+
 @objc class EventHandler: NSObject {
 
     private let handler: () -> Void
@@ -47,4 +49,47 @@ class SwiftUIButton: UIButton {
 
 }
 
+// MARK: NSNotification Bridge
+
+typealias NotificationCallback = (Notification.Name, Any?) -> Void
+
+struct NotificationObserver {
+
+    private let observers: [ObjCNotificationObserver]
+
+    init(_ names: [Notification.Name], _ callback: @escaping NotificationCallback) {
+        observers = names.map {
+            ObjCNotificationObserver.create(name: $0, callback: callback)
+        }
+    }
+
+}
+
+
+@objc class ObjCNotificationObserver: NSObject {
+
+    private let callback: NotificationCallback
+
+    private init(callback: @escaping NotificationCallback) {
+        self.callback = callback
+    }
+
+    static func create(name: Notification.Name,
+                      callback: @escaping NotificationCallback) -> ObjCNotificationObserver {
+
+        let observer = ObjCNotificationObserver(callback: callback)
+        NotificationCenter.default.addObserver(observer,
+                                               selector: #selector(
+                                                ObjCNotificationObserver.notify(notification:)),
+                                               name: name,
+                                               object: nil)
+
+        return observer
+    }
+
+    @objc private func notify(notification: NSNotification) {
+        callback(notification.name, notification.object)
+    }
+
+}
 
