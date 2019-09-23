@@ -324,8 +324,9 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
 
     __weak AppDelegate *weakSelf = self;
 
+    // TODO! initialize the SubscriptionActor when it first starts
     // Starts subscription expiry timer if there is an active subscription.
-    [self subscriptionExpiryTimer];
+//    [self subscriptionExpiryTimer];
 
     // Before submitting any other work to the VPNManager, update its status.
     [[self.vpnManager checkOrFixVPN] subscribeNext:^(NSNumber *extensionProcessRunning) {
@@ -494,79 +495,16 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
 
 #pragma mark - Subscription
 
-- (void)subscriptionExpiryTimer {
-
-    __weak AppDelegate *weakSelf = self;
-
-    NSDate *expiryDate;
-    BOOL activeSubscription = [IAPStoreHelper hasActiveSubscriptionForDate:[NSDate date] getExpiryDate:&expiryDate];
-
-    if (activeSubscription) {
-
-        // Also update the subscription status subject.
-        [weakSelf.subscriptionStatus sendNext:@(UserSubscriptionActive)];
-
-        NSTimeInterval interval = [expiryDate timeIntervalSinceNow];
-
-        if (interval > 0) {
-            // Checks if another timer is already running.
-            if (![weakSelf.subscriptionCheckTimer isValid]) {
-                weakSelf.subscriptionCheckTimer = [NSTimer scheduledTimerWithTimeInterval:interval
-                                                                         repeats:NO
-                                                                           block:^(NSTimer *timer) {
-                    [weakSelf subscriptionExpiryTimer];
-                }];
-            }
-        }
-    } else {
-        [self.subscriptionStatus sendNext:@(UserSubscriptionInactive)];
-    }
-}
-
-- (void)onSubscriptionActivated {
-
-    __weak AppDelegate *weakSelf = self;
-
-    [self.subscriptionStatus sendNext:@(UserSubscriptionActive)];
-
-    [self subscriptionExpiryTimer];
-
-    // Asks the extension to perform a subscription check if it is running currently.
-    __block RACDisposable *vpnActiveDisposable = [[self.vpnManager isVPNActive]
-      subscribeNext:^(RACTwoTuple<NSNumber *, NSNumber *> *value) {
-        BOOL isActive = [value.first boolValue];
-
-        if (isActive) {
-            [[Notifier sharedInstance] post:NotifierForceSubscriptionCheck];
-        }
-
-    } error:^(NSError *error) {
-        [weakSelf.compoundDisposable removeDisposable:vpnActiveDisposable];
-    } completed:^{
-        [weakSelf.compoundDisposable removeDisposable:vpnActiveDisposable];
-    }];
-
-    [self.compoundDisposable addDisposable:vpnActiveDisposable];
-
-}
 
 // Called on `IAPHelperUpdatedSubscriptionDictionaryNotification` notification.
 - (void)onUpdatedSubscriptionDictionary {
 
-    __weak AppDelegate *weakSelf = self;
+    NSDictionary *_Nullable subscription = IAPStoreHelper.subscriptionDictionary;
 
-    dispatch_async_global(^{
+    if (subscription) {
+        // TODO! send message to SubscriptionActor
+    }
 
-        BOOL isSubscribed = [IAPStoreHelper hasActiveSubscriptionForNow];
-
-        dispatch_async_main(^{
-
-            if (isSubscribed) {
-                [weakSelf onSubscriptionActivated];
-
-            }
-        });
-    });
 }
 
 #pragma mark - Global alerts

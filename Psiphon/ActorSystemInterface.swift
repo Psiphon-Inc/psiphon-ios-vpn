@@ -42,21 +42,28 @@ import Promises
 
     @objc static let instance = SwiftAppDelegate()
 
+    // AppRoot dependencies
     let system = ActorSystem(name: "system")
     let sharedDB = PsiphonDataSharedDB(forAppGroupIdentifier: APP_GROUP_IDENTIFIER)
-    let disposeBag = DisposeBag()
-
+    let appStoreHelperSubscriptionDict = {
+        SubscriptionData.fromSubsriptionDictionary(
+            IAPStoreHelper.subscriptionDictionary() as! [String : Any])
+    }
+    let notifier = Notifier.sharedInstance()
     var vpnManager: VPNManager!
+
+    let disposeBag = DisposeBag()
     var appRoot: ActorRef?
     let services = Services()
 
     /// Spawns app root actor `AppRoot`.
     func makeAppRootActor() -> ActorRef {
-
         let props = Props(AppRoot.self,
                           param: AppRoot.Params(
                             actorBuilder: DefaultActorBuilder(),
                             sharedDB: self.sharedDB,
+                            appStoreHelperSubscriptionDict: self.appStoreHelperSubscriptionDict,
+                            notifier: self.notifier,
                             vpnManager: self.vpnManager,
                             vpnStatus: VPNStatusBridge.instance.status,
                             initServices: self.services),

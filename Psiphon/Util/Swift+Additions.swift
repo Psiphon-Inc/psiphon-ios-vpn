@@ -67,3 +67,46 @@ extension Dictionary where Key: ExpressibleByStringLiteral {
     }
 
 }
+
+/// Create a DispatchSourceTimer that on
+class SingleFireTimer {
+
+    private let timer: DispatchSourceTimer
+
+    /// - Parameter handler: Uses default `DispatchSourceTimer` dispatch queue.
+    init(deadline: TimeInterval, leeway: DispatchTimeInterval = .seconds(1),
+         _ handler: @escaping () -> Void) {
+
+        timer = DispatchSource.makeTimerSource()
+        timer.schedule(deadline: .intervalFromNow(deadline),
+                       repeating: .never,
+                       leeway: leeway)
+        timer.setEventHandler(handler: handler)
+        timer.resume()
+    }
+
+    deinit {
+        timer.setEventHandler(handler: {})
+
+        // It's an error on call cancel on a suspended timer.
+        // Details here: https://forums.developer.apple.com/thread/15902
+        timer.cancel()
+    }
+
+}
+
+extension DispatchTime {
+
+    /// Creats DispatchTime by adding `interval` to `DispatchTime.now()`.
+    /// - Important: Sub-millisecond precision is lost in the current implementation.
+    static func intervalFromNow(_ interval: TimeInterval) -> DispatchTime {
+        let intervalInMilliseconds = 1000 * interval
+
+        if intervalInMilliseconds == Double.infinity {
+            fatalError("interval '\(interval)' is too large")
+        }
+
+        return DispatchTime.now() + DispatchTimeInterval.milliseconds(Int(intervalInMilliseconds))
+    }
+
+}

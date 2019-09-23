@@ -79,6 +79,8 @@ class AppRoot: Actor {
     struct Params {
         let actorBuilder: ActorBuilder
         let sharedDB: PsiphonDataSharedDB
+        let appStoreHelperSubscriptionDict: () -> SubscriptionData?
+        let notifier: Notifier
         let vpnManager: VPNManager
         let vpnStatus: BehaviorSubject<NEVPNStatus>
         let initServices: Services
@@ -121,7 +123,8 @@ class AppRoot: Actor {
                 let publisher = ReplaySubject<PsiCashActor.PublishedType>.create(bufferSize: 1)
                 let props = Props(PsiCashActor.self,
                                   param: PsiCashActor.Params(publisher: publisher,
-                                                             vpnManager: self.param.vpnManager))
+                                                             vpnManager: self.param.vpnManager),
+                                  qos: .userInteractive)
                 let actor = self.param.actorBuilder.makeActor(self, props, serviceType: .psiCash)
 
                 self.context.watch(actor)
@@ -154,7 +157,11 @@ class AppRoot: Actor {
             case .subscription:
                 let publisher = ReplaySubject<SubscriptionActor.State>.create(bufferSize: 1)
                 let props = Props(SubscriptionActor.self,
-                                  param: SubscriptionActor.Param(publisher: publisher))
+                                  param: SubscriptionActor.Param(publisher: publisher,
+                                                                 notifier: self.param.notifier,
+                                                                 appStoreHelperSubscriptionDict:
+                                    self.param.appStoreHelperSubscriptionDict),
+                                  qos: .userInteractive)
 
                 let actor = self.param.actorBuilder.makeActor(self, props,
                                                               serviceType: .subscription)

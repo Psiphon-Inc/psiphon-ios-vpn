@@ -29,11 +29,16 @@ class SubscriptionActor: Actor, Publisher {
 
     struct Param {
         let publisher: ReplaySubject<PublishedType>
+        let notifier: Notifier
+
+        // TODO: This is a temporary workaround,
+        // SubscriptionActor should be able to replace all the logic in the IAPStoreHelper.
+        let appStoreHelperSubscriptionDict: () -> SubscriptionData?
     }
 
     enum Action: AnyMessage {
         case updatedSubscription(SubscriptionData)
-        case timerFinished
+        case timerFinishedWithExpiry(Date)
     }
 
     enum State: Equatable {
@@ -42,10 +47,17 @@ class SubscriptionActor: Actor, Publisher {
         case unknown
     }
 
+    /// Timer leeway.
+    static let leeway: DispatchTimeInterval = .seconds(10)
+
+    /// Minimum time interval in seconds before the subscription expires
+    /// that will trigger a forced subscription check in the network extension.
+    static let notifierMinSubDuration: TimeInterval = 60.0
+
     var context: ActorContext!
     let param: Param
 
-    var expiryTimer: DispatchSourceTimer?
+    var expiryTimer: SingleFireTimer?
 
     var notifObserver: NotificationObserver!
     var subscriptionData: SubscriptionData?
@@ -59,34 +71,44 @@ class SubscriptionActor: Actor, Publisher {
         }
 
         switch msg {
-        case .updatedSubscription(let subscriptionData):
-            self.subscriptionData = subscriptionData
+        case .updatedSubscription(let newData):
 
-            // TODO! cancel previous timer if any
-
-            // The timer can have a very large tolerance value.
-            let intervalToExpired = subscriptionData.latestExpiry.timeIntervalSinceNow
-            if intervalToExpired > 5 {
-                self.state = .subscribed(subscriptionData)
-
-                // Asks the extension to perform a forced subscription check.
-                Notifier.sharedInstance().post(NotifierForceSubscriptionCheck)
-
-                self.expiryTimer = DispatchSource.makeTimerSource()
-
-                let deadline = DispatchTime.now() + DispatchTimeInterval.seconds(Int(intervalToExpired))
-
-                self.expiryTimer?.schedule(deadline: deadline, repeating: .never, leeway: DispatchTimeInterval.seconds(60 * 10))
-
-                self.expiryTimer?.setEventHandler(handler: {
-                    self ! Action.timerFinished
-                })
-
-
+            guard self.subscriptionData != newData else {
+                return .same
             }
 
-        case .timerFinished:
-            break
+            self.subscriptionData = newData
+
+            (self.state, self.expiryTimer) = Self.timerFrom(
+                subscriptionData: newData,
+                extensionForcedCheck: { (intervalToExpired: TimeInterval) in
+                    // Asks the extension to perform a subscription check,
+                    // only if at least `notifierMinSubDuration` is remaining.
+                    if intervalToExpired > Self.notifierMinSubDuration {
+                        self.param.notifier.post(NotifierForceSubscriptionCheck)
+                    }
+                },
+                timerFinished: { [unowned self] in
+                    self ! Action.timerFinishedWithExpiry(newData.latestExpiry)
+
+                })
+
+        case .timerFinishedWithExpiry(let expiry):
+
+            /// In case of a race condition where an `.updateSubscription` message is received
+            /// immediately before a `.timerFinishedWithExpiry`, the expiration dates
+            /// are compared.
+            /// If the current subscription data has a later expiry date than the expiry date in
+            /// `.timerFinishedWithExpiry` associated value, then we ignore the message.
+
+            guard let subscriptionData = self.subscriptionData else {
+                return .unhandled(msg)
+            }
+
+            if expiry <= subscriptionData.latestExpiry {
+                self.expiryTimer = .none
+                self.state = .notSubscribed
+            }
         }
 
         return .same
@@ -122,19 +144,41 @@ class SubscriptionActor: Actor, Publisher {
 
         }
 
-        let data = SubscriptionData.fromSubsriptionDictionary(
-            IAPStoreHelper.subscriptionDictionary() as! [String : Any])
-
-        if let data = data {
+        // Updates actor's internal subscription data after subscribing to
+        // `IAPHelperUpdatedSubscriptionDictionary`.
+        if let data = param.appStoreHelperSubscriptionDict() {
             self ! Action.updatedSubscription(data)
         }
 
     }
 
     func postStop() {
-        // TODO! invalidate the timer somehow
-//        self.expiryTimer?.invalidate()
+        self.expiryTimer = .none
     }
+
+}
+
+fileprivate extension SubscriptionActor {
+
+    /// - Parameter timerFinished: Called when the timer finishes
+    static func timerFrom(subscriptionData: SubscriptionData,
+                          extensionForcedCheck: (TimeInterval) -> Void,
+                          timerFinished: @escaping () -> Void) -> (State, SingleFireTimer?) {
+
+        // Since subscriptions are in days/months/years,
+        // the timer can have a large tolerance value.
+        let intervalToExpired = subscriptionData.latestExpiry.timeIntervalSinceNow
+
+        guard intervalToExpired > 1 else {
+            return (.notSubscribed, .none)
+        }
+
+        extensionForcedCheck(intervalToExpired)
+
+        let timer = SingleFireTimer(deadline: intervalToExpired, leeway: self.leeway, timerFinished)
+        return (.subscribed(subscriptionData), timer)
+    }
+
 }
 
 struct SubscriptionData: Equatable {
