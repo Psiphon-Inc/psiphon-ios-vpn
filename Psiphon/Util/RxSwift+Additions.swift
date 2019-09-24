@@ -35,6 +35,11 @@ extension ObservableType {
             .asSingle()
     }
 
+}
+
+/// TODO: this is ideally an extension on 
+extension ObservableType where Element: ExpressibleByNilLiteral {
+
     /// Same as `take(1).asSingle()`
     /// Returns current state of the observable.
     func currentState() -> Single<Element> {
@@ -79,7 +84,7 @@ extension ObservableType {
 extension PrimitiveSequenceType where Self.Trait == RxSwift.SingleTrait {
 
     // Fix: duplicated implementation of `mapAsync` for ObservableType
-    func mapAsync<Result>(as resultType: Result.Type, _ transform: @escaping (Element) throws -> Promise<Any>)
+    func mapAsync<Result>(_ transform: @escaping (Element) throws -> Promise<Result>)
            -> Single<Result> {
 
             self.flatMap { element -> Single<Result> in
@@ -91,7 +96,7 @@ extension PrimitiveSequenceType where Self.Trait == RxSwift.SingleTrait {
                         guard disposable.isDisposed == false else {
                             return
                         }
-                        observer(.success(result as! Result))
+                        observer(.success(result))
                     }
                     .catch { error in
                         guard disposable.isDisposed == false else {

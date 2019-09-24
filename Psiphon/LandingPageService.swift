@@ -170,8 +170,10 @@ fileprivate func modifyLandingPageWithPsicash(psiCash: Observable<PsiCashActorPu
 
             case .some(let psiCashActor):
                 return Single.just(unmodifiedLandingPage)
-                    .mapAsync(as: RestrictedURL?.self) {
-                        psiCashActor ?! PsiCashActor.Action.modifyLandingPage($0)
+                    .mapAsync {
+                        let promise = Promise<RestrictedURL?>.pending()
+                        psiCashActor ! PsiCashActor.Action.modifyLandingPage($0, promise)
+                        return promise
                     }
             }
     }

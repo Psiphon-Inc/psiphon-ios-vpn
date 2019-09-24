@@ -20,11 +20,12 @@
 import Foundation
 import SwiftActors
 import RxSwift
+import Promises
 
 infix operator < : ComparisonPrecedence
 infix operator | : TernaryPrecedence
 
-enum PsiCashActorError: AnyMessage, Error {
+enum PsiCashActorError: Error {
     case tunnelNotConnected
 }
 
@@ -59,12 +60,12 @@ fileprivate struct PsiCashRemoteRefreshError: Error {
     let errorStatus: PsiCashStatus
 }
 
-fileprivate struct PsiCashError: Error {
+struct PsiCashError: Error {
     let status: PsiCashStatus
     let error: Error?
 }
 
-fileprivate struct PsiCashPurchaseResult: AnyMessage {
+struct PsiCashPurchaseResult: AnyMessage {
     let purchase: PsiCashPurchasable
     let result: Result<Purchase, PsiCashError>
 }
@@ -87,18 +88,17 @@ class PsiCashActor: Actor, Publisher {
 
         /// Refreshes PsiCash state by syncing with the server.
         /// If not tunneled, sends `PsiCashActorError.tunnelNotConnected` messege to the sender (if any).
-        case refreshState
+        case refreshState(Promise<Result<Void, PsiCashActorError>>?)
 
         /// Sends a purchase request for the given purchasable item.
         /// If not tunneled, sends `PsiCashActorError.tunnelNotConnected` messege to the sender (if any).
-        case purchase(PsiCashPurchasable)
+        case purchase(PsiCashPurchasable, Promise<Result<PsiCashPurchaseResult, PsiCashActorError>>)
 
-        /// Replies to sedner with the PsiCash modified URL.
-        case modifyLandingPage(RestrictedURL)
+        /// Fulfills the promise with the PsiCash modified URL.
+        case modifyLandingPage(RestrictedURL, Promise<RestrictedURL?>)
 
-        /// Replies to sender with rewarded video custom data as `String?`
-        /// Sends nil if there is no custom data at the moment of processing.
-        case rewardedVideoCustomData
+        /// Fulfills the promise with rewarded video custom data, if any.
+        case rewardedVideoCustomData(Promise<String?>)
     }
 
     struct State: Equatable {
@@ -138,7 +138,15 @@ class PsiCashActor: Actor, Publisher {
         /// If tunnel is not connected, sends error message `tunnelNotConnected`
         /// to sender (if any).
         guard case .connected = self.vpnManager.tunnelProviderStatus else {
-            self.context.sender()? ! PsiCashActorError.tunnelNotConnected
+
+            switch action {
+            case .refreshState(let promise):
+                promise?.fulfill(.failure(.tunnelNotConnected))
+            case .purchase(_, let promise):
+                promise.fulfill(.failure(.tunnelNotConnected))
+            default: return .unhandled(action)
+            }
+
             return .same
         }
 
@@ -149,15 +157,15 @@ class PsiCashActor: Actor, Publisher {
                                replyTo: self)
             return .new(self.untunneledBehavior)
 
-        case .purchase(let purchasable):
+        case .purchase(let purchasable, let promise):
             self.state = map(self.state) {
                 return State(lib: $0.lib, pendingPurchase: purchasable)
             }
             purchaseProduct(purchasable,
-                            replyTo: self.context.sender()!,
                             psiCashActor: self,
                             psicash: self.psiCashLib,
-                            logger: self.logger)
+                            logger: self.logger,
+                            fulfill: promise)
             return .new(self.untunneledBehavior)
 
         default: return .unhandled(action)
@@ -176,12 +184,12 @@ class PsiCashActor: Actor, Publisher {
                 // messages are received.
                 return .same
 
-            case .modifyLandingPage(let url):
-                self.context.sender()! ! addPsiCashToLandingPage(url, psicash: self.psiCashLib,
-                                                                 logger: self.logger)
-            case .rewardedVideoCustomData:
-                self.context.sender()! ! rewardedVideoCustomData(psicash: self.psiCashLib,
-                                                                 logger: self.logger)
+            case .modifyLandingPage(let url, let promise):
+                promise.fulfill(addPsiCashToLandingPage(url, psicash: self.psiCashLib,
+                                                        logger: self.logger))
+            case .rewardedVideoCustomData(let promise):
+                promise.fulfill(rewardedVideoCustomData(psicash: self.psiCashLib,
+                                                        logger: self.logger))
             }
 
         case let msg as PsiCashRefreshResult:
@@ -288,11 +296,10 @@ fileprivate func refreshStateRemote(psicash: PsiCash,
 }
 
 fileprivate func purchaseProduct(_ purchasable: PsiCashPurchasable,
-                                 replyTo: ActorRef,
                                  psiCashActor: ActorRef,
                                  psicash: PsiCash,
-                                 logger: PsiCashLogger) {
-    precondition(replyTo !== psiCashActor)
+                                 logger: PsiCashLogger,
+                                 fulfill promise: Promise<Result<PsiCashPurchaseResult, PsiCashActorError>>) {
 
     logger.logEvent("Purchase",
                     withInfo: String(describing: purchasable),
@@ -317,9 +324,9 @@ fileprivate func purchaseProduct(_ purchasable: PsiCashPurchasable,
                                         result: .failure(err))
         }
 
-        // Send the message to self and the actor that requested the purchase.
+        // Send the message to self and fulfill the promise.
         psiCashActor ! msg
-        replyTo ! msg
+        promise.fulfill(.success(msg))
     }
 }
 

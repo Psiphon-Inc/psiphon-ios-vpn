@@ -80,13 +80,13 @@ extension SwiftAppDelegate: UIApplicationDelegate {
         self.appRoot = makeAppRootActor()
 
         self.services.psiCash.currentState().subscribe(onSuccess: {
-            $0?.actor ! PsiCashActor.Action.refreshState
+            $0?.actor ! PsiCashActor.Action.refreshState(.none)
         }).disposed(by: self.disposeBag)
     }
 
     @objc func applicationWillEnterForeground(_ application: UIApplication) {
         self.services.psiCash.currentState().subscribe(onSuccess: {
-            $0?.actor ! PsiCashActor.Action.refreshState
+            $0?.actor ! PsiCashActor.Action.refreshState(.none)
         }).disposed(by: self.disposeBag)
     }
 

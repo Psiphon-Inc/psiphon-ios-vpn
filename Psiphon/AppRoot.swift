@@ -53,23 +53,16 @@ protocol AppState: AnyMessage, Equatable {}
 
 struct Services {
 
-    fileprivate let subscriptionSubject = BehaviorSubject<SubscriptionActorPublisher?>(value: .none)
+    fileprivate let subscriptionRelay =
+        BehaviorSubject<SubscriptionActorPublisher?>(value: .none)
 
     fileprivate let psiCashRelay = BehaviorSubject<PsiCashActorPublisher?>(value: .none)
 
     fileprivate let landingPageRelay = BehaviorSubject<ActorRef?>(value: .none)
 
-    var subscription: Observable<SubscriptionActorPublisher?> {
-        subscriptionSubject
-    }
-
-    var psiCash: Observable<PsiCashActorPublisher?> {
-        psiCashRelay
-    }
-
-    var landingPage: Observable<ActorRef?> {
-        landingPageRelay
-    }
+    var subscription: Observable<SubscriptionActorPublisher?> { subscriptionRelay }
+    var psiCash: Observable<PsiCashActorPublisher?> { psiCashRelay }
+    var landingPage: Observable<ActorRef?> { landingPageRelay }
 
 }
 
@@ -101,11 +94,9 @@ class AppRoot: Actor {
     let param: Params
 
     // Services
-    private var subscriptionCtx: ServiceContext<SubscriptionActorPublisher>
-
-    private var psiCashCtx: ServiceContext<PsiCashActorPublisher>
-
-    private var landingPageCtx: ServiceContext<ActorRef>
+    private var subscriptionCtx: ServiceContext<SubscriptionActorPublisher?>
+    private var psiCashCtx: ServiceContext<PsiCashActorPublisher?>
+    private var landingPageCtx: ServiceContext<ActorRef?>
 
     lazy var receive = behavior { [unowned self] in
 
@@ -131,10 +122,10 @@ class AppRoot: Actor {
 
                 self.psiCashCtx = self.psiCashCtx.new(
                     PsiCashActorPublisher(actor: actor, publisher: publisher),
-                    dispose: { psiCashActorPublisher -> Disposable in
+                    dispose: { actorPublisher -> Disposable in
                         self.param.vpnStatus.filter { $0 == .connected }
-                            .subscribe(onNext: { _ in
-                                psiCashActorPublisher.actor ! PsiCashActor.Action.refreshState
+                            .subscribe({ _ in
+                                actorPublisher?.actor ! PsiCashActor.Action.refreshState(.none)
                             })
                 })
 
@@ -200,9 +191,9 @@ class AppRoot: Actor {
 
     required init(_ param: Params) {
         self.param = param
-        subscriptionCtx = .init(relay: param.initServices.subscriptionSubject)
-        psiCashCtx = .init(relay: param.initServices.psiCashRelay)
-        landingPageCtx = .init(relay: param.initServices.landingPageRelay)
+        subscriptionCtx = .init(subject: param.initServices.subscriptionRelay, value: .none)
+        psiCashCtx = .init(subject: param.initServices.psiCashRelay, value: .none)
+        landingPageCtx = .init(subject: param.initServices.landingPageRelay, value: .none)
     }
 
     func preStart() {
@@ -215,32 +206,25 @@ fileprivate struct ServiceContext<Service> {
 
     /// - Important: RxSwift doesn't have a relay type such as https://github.com/JakeWharton/RxRelay
     ///              It's an error to call `onCompleted` and `onError` on this object.
-    private let relay: BehaviorSubject<Service?>
+    private let subject: BehaviorSubject<Service>
     private let disposable: Disposable?
-    private let value: Service?
+    private let value: Service
 
-    var service: Observable<Service?> {
-        return relay
-    }
+    var service: Observable<Service> { subject }
 
-    init(relay: BehaviorSubject<Service?>, value: Service? = .none,
+    init(subject: BehaviorSubject<Service>, value: Service,
          dispose: ((Service) -> Disposable)? = .none) {
 
-        self.relay = relay
+        self.subject = subject
         self.value = value
-
-        if let value = value {
-            self.disposable = dispose?(value)
-        } else {
-            self.disposable = .none
-        }
+        self.disposable = dispose?(value)
     }
 
-    func new(_ value: Service?, dispose: ((Service) -> Disposable)? = .none) -> ServiceContext<Service> {
-        relay.onNext(value)
+    func new(_ value: Service, dispose: ((Service) -> Disposable)? = .none) -> ServiceContext<Service> {
+        subject.onNext(value)
         disposable?.dispose()
 
-        return ServiceContext(relay: relay, value: value, dispose: dispose)
+        return ServiceContext(subject: subject, value: value, dispose: dispose)
     }
 
 }

@@ -39,7 +39,7 @@ DEPENDENCIES:
   - PersonalizedAdConsent
   - PsiphonClientCommonLibrary (from `https://github.com/Psiphon-Inc/psiphon-ios-client-common-library.git`, commit `0fd8d41`)
   - ReactiveObjC (from `https://github.com/Psiphon-Inc/ReactiveObjC.git`, commit `8bbf9dd`)
-  - RxSwift (~> 5.0)
+  - RxSwift (= 5.0.0)
   - SVProgressHUD
   - SwiftActors (from `https://github.com/Psiphon-Inc/swift-actors.git`, commit `c39448e`)
 
@@ -100,6 +100,6 @@ SPEC CHECKSUMS:
   SVProgressHUD: 1428aafac632c1f86f62aa4243ec12008d7a51d6
   SwiftActors: 75f57bd66413a5a2f2bd1e0d3e8a54984d8e2c18
 
-PODFILE CHECKSUM: 81a181343e2422455e9874a26568467b0fbe8abd
+PODFILE CHECKSUM: 927e50b625456357a25b3228985f4021c319f4f6
 
 COCOAPODS: 1.7.5

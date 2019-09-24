@@ -192,6 +192,8 @@ NSString *const kSubscriptionDictionary = @"kSubscriptionDictionary";
     [productsRequest start];
 }
 
+// TODO!! implemented except for the NSNotification.
+// do we even need that?
 - (void)productsRequest:(SKProductsRequest *)request didReceiveResponse:(SKProductsResponse *)response {
     // Sort products by price
     NSSortDescriptor *mySortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"price" ascending:YES];

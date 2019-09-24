@@ -21,6 +21,15 @@ import Foundation
 import SwiftActors
 import RxSwift
 
+struct SubscriptionProductIds {
+    let ids: [String]
+
+    init(plistKey: String) {
+        // TODO! validate the strings
+        ids = try! plistReader(key: plistKey)
+    }
+}
+
 typealias SubscriptionActorPublisher = ActorPublisher<SubscriptionActor>
 
 class SubscriptionActor: Actor, Publisher {
@@ -37,8 +46,14 @@ class SubscriptionActor: Actor, Publisher {
     }
 
     enum Action: AnyMessage {
+        case productRequest(forProducts: SubscriptionProductIds)
+        case readLocalReceipt
         case updatedSubscription(SubscriptionData)
         case timerFinishedWithExpiry(Date)
+    }
+
+    fileprivate enum StoreKitDelegate: AnyMessage {
+        case productRequestResponse(SKProductsResponse)
     }
 
     enum State: Equatable {
@@ -65,50 +80,69 @@ class SubscriptionActor: Actor, Publisher {
         didSet { param.publisher.onNext(state) }
     }
 
+    var storeProducts = [SKProduct]()
+
     lazy var receive = behavior { [unowned self] in
-        guard let msg = $0 as? Action else {
-            return .unhandled($0)
-        }
 
-        switch msg {
-        case .updatedSubscription(let newData):
+        switch $0 {
 
-            guard self.subscriptionData != newData else {
-                return .same
+        case let msg as StoreKitDelegate:
+
+            switch msg {
+
+            case .productRequestResponse(let response):
+                self.storeProducts = sortedByPrice(response.products)
+
             }
 
-            self.subscriptionData = newData
+        case let msg as Action:
 
-            (self.state, self.expiryTimer) = Self.timerFrom(
-                subscriptionData: newData,
-                extensionForcedCheck: { (intervalToExpired: TimeInterval) in
-                    // Asks the extension to perform a subscription check,
-                    // only if at least `notifierMinSubDuration` is remaining.
-                    if intervalToExpired > Self.notifierMinSubDuration {
-                        self.param.notifier.post(NotifierForceSubscriptionCheck)
-                    }
-                },
-                timerFinished: { [unowned self] in
-                    self ! Action.timerFinishedWithExpiry(newData.latestExpiry)
+            switch msg {
+            case .productRequest(forProducts: let productList):
 
-                })
+                break
 
-        case .timerFinishedWithExpiry(let expiry):
+            case .updatedSubscription(let newData):
 
-            /// In case of a race condition where an `.updateSubscription` message is received
-            /// immediately before a `.timerFinishedWithExpiry`, the expiration dates
-            /// are compared.
-            /// If the current subscription data has a later expiry date than the expiry date in
-            /// `.timerFinishedWithExpiry` associated value, then we ignore the message.
+                guard self.subscriptionData != newData else {
+                    return .same
+                }
 
-            guard let subscriptionData = self.subscriptionData else {
-                return .unhandled(msg)
+                self.subscriptionData = newData
+
+                (self.state, self.expiryTimer) = timerFrom(
+                    subscriptionData: newData,
+                    extensionForcedCheck: { (intervalToExpired: TimeInterval) in
+                        // Asks the extension to perform a subscription check,
+                        // only if at least `notifierMinSubDuration` is remaining.
+                        if intervalToExpired > Self.notifierMinSubDuration {
+                            self.param.notifier.post(NotifierForceSubscriptionCheck)
+                        }
+                    },
+                    timerFinished: { [unowned self] in
+                        self ! Action.timerFinishedWithExpiry(newData.latestExpiry)
+
+                    })
+
+            case .timerFinishedWithExpiry(let expiry):
+
+                /// In case of a race condition where an `.updateSubscription` message is received
+                /// immediately before a `.timerFinishedWithExpiry`, the expiration dates
+                /// are compared.
+                /// If the current subscription data has a later expiry date than the expiry date in
+                /// `.timerFinishedWithExpiry` associated value, then we ignore the message.
+
+                guard let subscriptionData = self.subscriptionData else {
+                    return .unhandled(msg)
+                }
+
+                if expiry <= subscriptionData.latestExpiry {
+                    self.expiryTimer = .none
+                    self.state = .notSubscribed
+                }
             }
 
-            if expiry <= subscriptionData.latestExpiry {
-                self.expiryTimer = .none
-                self.state = .notSubscribed
-            }
+        default: return .unhandled($0)
         }
 
         return .same
@@ -158,25 +192,42 @@ class SubscriptionActor: Actor, Publisher {
 
 }
 
-fileprivate extension SubscriptionActor {
+/// - Parameter timerFinished: Called when the timer finishes
+func timerFrom(subscriptionData: SubscriptionData,
+                      extensionForcedCheck: (TimeInterval) -> Void,
+                      timerFinished: @escaping () -> Void) -> (SubscriptionActor.State, SingleFireTimer?) {
 
-    /// - Parameter timerFinished: Called when the timer finishes
-    static func timerFrom(subscriptionData: SubscriptionData,
-                          extensionForcedCheck: (TimeInterval) -> Void,
-                          timerFinished: @escaping () -> Void) -> (State, SingleFireTimer?) {
+    // Since subscriptions are in days/months/years,
+    // the timer can have a large tolerance value.
+    let intervalToExpired = subscriptionData.latestExpiry.timeIntervalSinceNow
 
-        // Since subscriptions are in days/months/years,
-        // the timer can have a large tolerance value.
-        let intervalToExpired = subscriptionData.latestExpiry.timeIntervalSinceNow
+    guard intervalToExpired > 1 else {
+        return (.notSubscribed, .none)
+    }
 
-        guard intervalToExpired > 1 else {
-            return (.notSubscribed, .none)
-        }
+    extensionForcedCheck(intervalToExpired)
 
-        extensionForcedCheck(intervalToExpired)
+    let timer = SingleFireTimer(deadline: intervalToExpired, leeway: SubscriptionActor.leeway, timerFinished)
+    return (.subscribed(subscriptionData), timer)
+}
 
-        let timer = SingleFireTimer(deadline: intervalToExpired, leeway: self.leeway, timerFinished)
-        return (.subscribed(subscriptionData), timer)
+/// Sorts `products` in ascending order by price.
+func sortedByPrice(_ products: [SKProduct]) -> [SKProduct] {
+    return products.sorted {
+        $0.price.compare($1.price) == .orderedAscending
+    }
+}
+
+fileprivate class SubscriptionActorProductRequestDelegate: NSObject, SKProductsRequestDelegate {
+
+    private unowned let actor: ActorRef
+
+    init(_ actor: ActorRef) {
+        self.actor = actor
+    }
+
+    func productsRequest(_ request: SKProductsRequest, didReceive response: SKProductsResponse) {
+        actor ! SubscriptionActor.StoreKitDelegate.productRequestResponse(response)
     }
 
 }

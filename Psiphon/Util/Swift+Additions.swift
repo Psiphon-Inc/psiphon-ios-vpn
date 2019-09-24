@@ -110,3 +110,15 @@ extension DispatchTime {
     }
 
 }
+
+// MARK: File operations
+
+func plistReader(key: String) throws -> [String] {
+    guard let url = Bundle.main.url(forResource: key, withExtension: "plist") else {
+        fatalError("'\(key).plist' is not valid")
+    }
+
+    let data = try Data(contentsOf: url)
+    let decoder = PropertyListDecoder()
+    return try decoder.decode([String].self, from: data)
+}
