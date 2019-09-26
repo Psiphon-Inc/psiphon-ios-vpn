@@ -23,6 +23,8 @@ import RxSwift
 import Promises
 
 infix operator < : ComparisonPrecedence
+
+// TODO!! remove these infix operator redifinitions
 infix operator | : TernaryPrecedence
 
 enum PsiCashActorError: Error {

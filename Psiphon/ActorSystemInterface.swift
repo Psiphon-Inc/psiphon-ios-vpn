@@ -45,10 +45,15 @@ import Promises
     // AppRoot dependencies
     let system = ActorSystem(name: "system")
     let sharedDB = PsiphonDataSharedDB(forAppGroupIdentifier: APP_GROUP_IDENTIFIER)
-    let appStoreHelperSubscriptionDict = {
-        SubscriptionData.fromSubsriptionDictionary(
-            IAPStoreHelper.subscriptionDictionary() as! [String : Any])
+
+    let appStoreHelperSubscriptionDict: () -> SubscriptionData? = {
+        guard let dict = IAPStoreHelper.subscriptionDictionary() else {
+            return .none
+        }
+
+        return SubscriptionData.fromSubsriptionDictionary(dict as! [String : Any])
     }
+
     let notifier = Notifier.sharedInstance()
     var vpnManager: VPNManager!
 

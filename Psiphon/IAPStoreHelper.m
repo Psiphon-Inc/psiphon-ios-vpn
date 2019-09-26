@@ -65,10 +65,13 @@ NSString *const kSubscriptionDictionary = @"kSubscriptionDictionary";
     [[SKPaymentQueue defaultQueue]removeTransactionObserver:self];
 }
 
+// TODO!!! where is this even used?
+// Probably should make use of it everywhere.
 + (BOOL)canMakePayments {
     return [SKPaymentQueue canMakePayments];
 }
 
+// TODO!!! when is this even used?
 - (void)restoreSubscriptions {
     [[SKPaymentQueue defaultQueue]restoreCompletedTransactions];
 }
@@ -133,15 +136,17 @@ NSString *const kSubscriptionDictionary = @"kSubscriptionDictionary";
     [[NSNotificationCenter defaultCenter] postNotificationName:IAPHelperUpdatedSubscriptionDictionaryNotification object:subscriptionDict];
 }
 
+// ADDED AS COMMENT
 - (void)paymentQueue:(SKPaymentQueue *)queue restoreCompletedTransactionsFailedWithError:(NSError *)error {
     [self updateSubscriptionDictionaryFromLocalReceipt];
 }
 
+// ADDED AS COMMENT
 - (void)paymentQueueRestoreCompletedTransactionsFinished:(SKPaymentQueue *)queue {
     [self updateSubscriptionDictionaryFromLocalReceipt];
 }
 
-
+// IMPLEMENTED (kind of check again)
 - (void)paymentQueue:(SKPaymentQueue *)queue updatedTransactions:(NSArray *)transactions {
     for (SKPaymentTransaction *transaction in transactions) {
 
@@ -179,12 +184,14 @@ NSString *const kSubscriptionDictionary = @"kSubscriptionDictionary";
     }
 }
 
+// IMPLEMENTED
 - (void)refreshReceipt {
     SKReceiptRefreshRequest *receiptRefreshRequest = [[SKReceiptRefreshRequest alloc] initWithReceiptProperties:nil];
     receiptRefreshRequest.delegate = self;
     [receiptRefreshRequest start];
 }
 
+// IMPLEMENTED
 - (void)startProductsRequest {
     NSSet* subscriptionIDs = [NSSet setWithArray:self.bundledProductIDS];
     SKProductsRequest *productsRequest = [[SKProductsRequest alloc]initWithProductIdentifiers:subscriptionIDs];
@@ -194,6 +201,8 @@ NSString *const kSubscriptionDictionary = @"kSubscriptionDictionary";
 
 // TODO!! implemented except for the NSNotification.
 // do we even need that?
+//
+// IMPLEMENTED
 - (void)productsRequest:(SKProductsRequest *)request didReceiveResponse:(SKProductsResponse *)response {
     // Sort products by price
     NSSortDescriptor *mySortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"price" ascending:YES];
@@ -207,14 +216,17 @@ NSString *const kSubscriptionDictionary = @"kSubscriptionDictionary";
     [[NSNotificationCenter defaultCenter]postNotificationName:IAPSKProductsRequestDidFailWithErrorNotification object:nil];
 }
 
+// PARTIAL IMPLEMENTED
 - (void)requestDidFinish:(SKRequest *)request {
     if ([request isKindOfClass:[SKReceiptRefreshRequest class]]) {
         [self updateSubscriptionDictionaryFromLocalReceipt];
     } else {
+        // TODO!! this part is not implemented, and whoever listens to this notification
         [[NSNotificationCenter defaultCenter]postNotificationName:IAPSKRequestRequestDidFinishNotification object:nil];
     }
 }
 
+// IMPLEMENTED
 - (void)buyProduct:(SKProduct *)product {
     SKPayment * payment = [SKPayment paymentWithProduct:product];
     [[SKPaymentQueue defaultQueue] addPayment:payment];

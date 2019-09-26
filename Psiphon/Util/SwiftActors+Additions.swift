@@ -31,3 +31,14 @@ struct ActorPublisher<P: Publisher> {
     let actor: ActorRef
     let publisher: Observable<P.PublishedType>
 }
+
+
+class ActorDelegate: NSObject {
+
+    internal unowned let actor: ActorRef
+
+    init(replyTo: ActorRef) {
+        actor = replyTo
+    }
+
+}

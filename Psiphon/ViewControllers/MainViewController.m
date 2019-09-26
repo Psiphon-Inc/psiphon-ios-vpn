@@ -373,6 +373,8 @@ NSString * const CommandStopVPN = @"StopVPN";
 
 - (RACSignal<RACUnit *> *)activeStateLoadingSignal {
 
+    return [RACSignal return:RACUnit.defaultUnit];
+
     // adsLoadingSignal emits a value when untunnelled interstitial ad has loaded or
     // when MaxAdLoadingTime has passed.
     // If the device in not in untunneled state, this signal makes an emission and
