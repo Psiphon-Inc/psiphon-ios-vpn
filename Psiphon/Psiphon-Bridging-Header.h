@@ -10,8 +10,8 @@
 // VPNManager
 #import "VPNManager.h" // TODO! what should we do about this?
 
-// Subscriptions
-#import "IAPStoreHelper.h"
+// AppStore receipt
+#import "AppStoreReceiptData.h"
 
 // Utilities
 #import "AppInfo.h"

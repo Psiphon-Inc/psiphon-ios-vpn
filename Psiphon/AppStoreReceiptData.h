@@ -25,15 +25,17 @@
 #import "IA5String.h"
 
 
-@class PsiphonAppReceipt;
+@class AppStoreReceiptData;
 
-@interface PsiphonAppReceipt : NSObject
+@interface AppStoreReceiptData : NSObject
 
 /** The app’s bundle identifier.
  
  This corresponds to the value of CFBundleIdentifier in the Info.plist file.
  */
 @property (nonatomic, strong, readonly) NSString *bundleIdentifier;
+
+@property (nonatomic, strong, readonly) NSNumber *fileSize;
 
 @property (nonatomic, strong, readonly) NSDictionary *inAppSubscriptions;
 
@@ -47,15 +49,15 @@
 
 
 /**
- Returns the app receipt contained in the bundle, if any and valid. Extracts the receipt in ASN1 from the PKCS #7 container, and then parses the ASN1 data into a RMAppReceipt instance.
+ Parses receipt pointed to by `receiptURL` and returns  `AppStoreReceiptData` object created from the parsed data.
  */
-+ (PsiphonAppReceipt*)bundleReceipt;
++ (AppStoreReceiptData *_Nullable)parseReceipt:(NSURL *_Nullable)receiptURL;
 
 @end
 
 /** Represents an in-app purchase in the app receipt.
  */
-@interface PsiphonAppReceiptIAP : NSObject
+@interface AppStoreReceiptIAP : NSObject
 
 /** The product identifier of the item that was purchased. This value corresponds to the productIdentifier property of the SKPayment object stored in the transaction’s payment property.
  */

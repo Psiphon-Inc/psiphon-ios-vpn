@@ -72,7 +72,7 @@ class AppRoot: Actor {
     struct Params {
         let actorBuilder: ActorBuilder
         let sharedDB: PsiphonDataSharedDB
-        let appStoreHelperSubscriptionDict: () -> SubscriptionData?
+        let appBundle: Bundle
         let notifier: Notifier
         let vpnManager: VPNManager
         let vpnStatus: BehaviorSubject<NEVPNStatus>
@@ -150,8 +150,9 @@ class AppRoot: Actor {
                 let props = Props(SubscriptionActor.self,
                                   param: SubscriptionActor.Param(publisher: publisher,
                                                                  notifier: self.param.notifier,
-                                                                 appStoreHelperSubscriptionDict:
-                                    self.param.appStoreHelperSubscriptionDict),
+                                                                 appStoreReceipt: self.param.appBundle.appStoreReceiptURL!,
+                                                                 appBundleIdentifier: self.param.appBundle.bundleIdentifier!,
+                                                                 sharedDB: self.param.sharedDB),
                                   qos: .userInteractive)
 
                 let actor = self.param.actorBuilder.makeActor(self, props,

@@ -45,15 +45,6 @@ import Promises
     // AppRoot dependencies
     let system = ActorSystem(name: "system")
     let sharedDB = PsiphonDataSharedDB(forAppGroupIdentifier: APP_GROUP_IDENTIFIER)
-
-    let appStoreHelperSubscriptionDict: () -> SubscriptionData? = {
-        guard let dict = IAPStoreHelper.subscriptionDictionary() else {
-            return .none
-        }
-
-        return SubscriptionData.fromSubsriptionDictionary(dict as! [String : Any])
-    }
-
     let notifier = Notifier.sharedInstance()
     var vpnManager: VPNManager!
 
@@ -63,11 +54,12 @@ import Promises
 
     /// Spawns app root actor `AppRoot`.
     func makeAppRootActor() -> ActorRef {
+        
         let props = Props(AppRoot.self,
                           param: AppRoot.Params(
                             actorBuilder: DefaultActorBuilder(),
                             sharedDB: self.sharedDB,
-                            appStoreHelperSubscriptionDict: self.appStoreHelperSubscriptionDict,
+                            appBundle: Bundle.main,
                             notifier: self.notifier,
                             vpnManager: self.vpnManager,
                             vpnStatus: VPNStatusBridge.instance.status,

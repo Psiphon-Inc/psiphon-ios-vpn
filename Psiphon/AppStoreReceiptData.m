@@ -18,7 +18,7 @@
  */
 
 #import <UIKit/UIKit.h>
-#import "PsiphonAppReceipt.h"
+#import "AppStoreReceiptData.h"
 #import "SharedConstants.h"
 #import "NSDate+Comparator.h"
 #import "IAPStoreHelper.h"
@@ -99,7 +99,7 @@ static long PsiphonASN1ReadInteger(const uint8_t *bytes, long length) {
 // sending the receipt to Apple.
 // https://developer.apple.com/library/archive/releasenotes/General/ValidateAppStoreReceipt/Chapters/ReceiptFields.html#//apple_ref/doc/uid/TP40010573-CH106-SW25
 // Determining eligibility: https://developer.apple.com/documentation/storekit/in-app_purchase/implementing_introductory_offers_in_your_app
-@implementation PsiphonAppReceipt
+@implementation AppStoreReceiptData
 
 - (instancetype)initWithASN1Data:(NSData*)asn1Data {
     if (self = [super init]) {
@@ -107,14 +107,14 @@ static long PsiphonASN1ReadInteger(const uint8_t *bytes, long length) {
         __block BOOL hasBeenInIntroPeriod = FALSE;
 
         // Explicit casting to avoid errors when compiling as Objective-C++
-        [PsiphonAppReceipt enumerateReceiptAttributes:(const uint8_t*)asn1Data.bytes length:asn1Data.length usingBlock:^(NSData *data, long type) {
+        [AppStoreReceiptData enumerateReceiptAttributes:(const uint8_t*)asn1Data.bytes length:asn1Data.length usingBlock:^(NSData *data, long type) {
             switch (type) {
                 case PsiphonAppReceiptASN1TypeBundleIdentifier:
                     _bundleIdentifier = PsiphonASN1ReadUTF8String(data.bytes, data.length);
                     break;
                 case PsiphonAppReceiptASN1TypeInAppPurchaseReceipt: {
                     @autoreleasepool {
-                        PsiphonAppReceiptIAP *iapReceipt = [[PsiphonAppReceiptIAP alloc] initWithASN1Data:data];
+                        AppStoreReceiptIAP *iapReceipt = [[AppStoreReceiptIAP alloc] initWithASN1Data:data];
                         if(iapReceipt.cancellationDate) {
                             iapReceipt = nil;
                             break;
@@ -151,6 +151,8 @@ static long PsiphonASN1ReadInteger(const uint8_t *bytes, long length) {
         [[NSBundle mainBundle].appStoreReceiptURL getResourceValue:&appReceiptFileSize
                                                             forKey:NSURLFileSizeKey
                                                              error:nil];
+
+        _fileSize = appReceiptFileSize;
         subscriptions[kAppReceiptFileSize] = appReceiptFileSize;
 
         _inAppSubscriptions = (NSDictionary*)subscriptions;
@@ -158,21 +160,17 @@ static long PsiphonASN1ReadInteger(const uint8_t *bytes, long length) {
     return self;
 }
 
-+ (PsiphonAppReceipt*)bundleReceipt {
-    PsiphonAppReceipt *receipt = nil;
++ (AppStoreReceiptData *_Nullable)parseReceipt:(NSURL *_Nullable)receiptURL {
+    AppStoreReceiptData *receipt = nil;
     SignedData_t * signedData = NULL;
 
-    NSURL *URL = [NSBundle mainBundle].appStoreReceiptURL;
-    URL = [URL URLByDeletingLastPathComponent];
-    URL = [URL URLByAppendingPathComponent:@"receipt"];
-
-    NSString *path = URL.path;
+    NSString *path = receiptURL.path;
 
     if (![[NSFileManager defaultManager] fileExistsAtPath:path isDirectory:nil]) {
         return nil;
     }
     
-    NSData *data = [NSData dataWithContentsOfURL:URL];
+    NSData *data = [NSData dataWithContentsOfURL:receiptURL];
     
     void *bytes = (void*) [data bytes];
     size_t length = (size_t)[data length];
@@ -187,7 +185,7 @@ static long PsiphonASN1ReadInteger(const uint8_t *bytes, long length) {
         int signedDataSize = signedData->content.contentInfo.contentData.size;
         uint8_t* signedDataBuf = signedData->content.contentInfo.contentData.buf;
 
-       receipt = [[PsiphonAppReceipt alloc] initWithASN1Data:[NSData dataWithBytesNoCopy:signedDataBuf length:signedDataSize freeWhenDone:NO ]];
+       receipt = [[AppStoreReceiptData alloc] initWithASN1Data:[NSData dataWithBytesNoCopy:signedDataBuf length:signedDataSize freeWhenDone:NO ]];
     }
     
     if (signedData != NULL) {
@@ -214,26 +212,14 @@ static long PsiphonASN1ReadInteger(const uint8_t *bytes, long length) {
     }
 }
 
-//+ (NSDate*)formatRFC3339String:(NSString*)string {
-//    static NSDateFormatter *formatter;
-//    static dispatch_once_t onceToken;
-//    dispatch_once(&onceToken, ^{
-//        formatter = [[NSDateFormatter alloc] init];
-//        formatter.locale = [[NSLocale alloc] initWithLocaleIdentifier:@"en_US_POSIX"];
-//        formatter.dateFormat = @"yyyy-MM-dd'T'HH:mm:ssZ";
-//    });
-//    NSDate *date = [formatter dateFromString:string];
-//    return date;
-//}
-
 @end
 
 
-@implementation PsiphonAppReceiptIAP
+@implementation AppStoreReceiptIAP
 
 - (instancetype)initWithASN1Data:(NSData*)asn1Data {
     if (self = [super init]) {
-        [PsiphonAppReceipt enumerateReceiptAttributes:(const uint8_t*)asn1Data.bytes length:asn1Data.length usingBlock:^(NSData *data, long type) {
+        [AppStoreReceiptData enumerateReceiptAttributes:(const uint8_t*)asn1Data.bytes length:asn1Data.length usingBlock:^(NSData *data, long type) {
             const uint8_t *p = (const uint8_t*)data.bytes;
             const NSUInteger length = data.length;
             switch (type) {

@@ -18,7 +18,7 @@
  */
 
 #import "IAPStoreHelper.h"
-#import "PsiphonAppReceipt.h"
+#import "AppStoreReceiptData.h"
 #import "SharedConstants.h"
 #import "NSDate+Comparator.h"
 #import "DispatchUtils.h"
@@ -76,17 +76,19 @@ NSString *const kSubscriptionDictionary = @"kSubscriptionDictionary";
     [[SKPaymentQueue defaultQueue]restoreCompletedTransactions];
 }
 
+// PARTIAL IMPLEMENTED - EXCEPT NOTIFICATION
 - (void)updateSubscriptionDictionaryFromLocalReceipt {
 
     NSDictionary *subscriptionDict = [[self class] subscriptionDictionary];
 
     // debug remove
-//    if(![[self class] shouldUpdateSubscriptionDictionary:subscriptionDict]) {
-//        return;
-//    }
+    if(![[self class] shouldUpdateSubscriptionDictionary:subscriptionDict]) {
+        return;
+    }
 
     @autoreleasepool {
-        PsiphonAppReceipt *receipt = [PsiphonAppReceipt bundleReceipt];
+        // debug remove
+        AppStoreReceiptData *receipt = nil;
         if(receipt) {
             NSString *bundleIdentifier = [[NSBundle mainBundle] bundleIdentifier];
 
@@ -212,11 +214,12 @@ NSString *const kSubscriptionDictionary = @"kSubscriptionDictionary";
     [[NSNotificationCenter defaultCenter]postNotificationName:IAPSKProductsRequestDidReceiveResponseNotification object:nil];
 }
 
+// IMPLEMENTED
 - (void)request:(SKRequest *)request didFailWithError:(NSError *)error {
     [[NSNotificationCenter defaultCenter]postNotificationName:IAPSKProductsRequestDidFailWithErrorNotification object:nil];
 }
 
-// PARTIAL IMPLEMENTED
+// PARTIAL IMPLEMENTED - doens't implement the NSNotification sending
 - (void)requestDidFinish:(SKRequest *)request {
     if ([request isKindOfClass:[SKReceiptRefreshRequest class]]) {
         [self updateSubscriptionDictionaryFromLocalReceipt];
@@ -232,6 +235,8 @@ NSString *const kSubscriptionDictionary = @"kSubscriptionDictionary";
     [[SKPaymentQueue defaultQueue] addPayment:payment];
 }
 
+// NOT NEEDED? - Parsing the receipt is cheap,
+//               do we really need to check for such conditions.
 + (BOOL)shouldUpdateSubscriptionDictionary:(NSDictionary*)subscriptionDict {
     // If no receipt - NO
     NSURL *URL = [NSBundle mainBundle].appStoreReceiptURL;
@@ -291,6 +296,8 @@ NSString *const kSubscriptionDictionary = @"kSubscriptionDictionary";
     return NO;
 }
 
+// TODO!! remove this key on app upgrade.
+// TODO!! how is this dictionay shared with the extension anyways? or is it?
 + (NSDictionary*)subscriptionDictionary {
     return (NSDictionary*)[[NSUserDefaults standardUserDefaults] dictionaryForKey:kSubscriptionDictionary];
 }

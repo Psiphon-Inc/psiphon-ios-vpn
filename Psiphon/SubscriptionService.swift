@@ -20,9 +20,9 @@
 import Foundation
 import SwiftActors
 import RxSwift
+import StoreKit
 
 infix operator | : TernaryPrecedence
-
 
 typealias SubscriptionActorPublisher = ActorPublisher<SubscriptionActor>
 
@@ -33,10 +33,9 @@ class SubscriptionActor: Actor, Publisher {
     struct Param {
         let publisher: ReplaySubject<PublishedType>
         let notifier: Notifier
-
-        // TODO: This is a temporary workaround,
-        // SubscriptionActor should be able to replace all the logic in the IAPStoreHelper.
-        let appStoreHelperSubscriptionDict: () -> SubscriptionData?
+        let appStoreReceipt: URL
+        let appBundleIdentifier: String
+        let sharedDB: PsiphonDataSharedDB
     }
 
     enum Action: AnyMessage {
@@ -51,8 +50,16 @@ class SubscriptionActor: Actor, Publisher {
 
     fileprivate enum StoreKitResult: AnyMessage {
         case productRequestResult(Result<SKProductsResponse, Error>)
-        case paymentUpdatedTransaction([SKPaymentTransaction])
         case receiptRefreshResult(Result<Void, Error>)
+    }
+
+    fileprivate enum StoreKitTransaction: AnyMessage {
+        case updatedTransaction(Result<[SKPaymentTransaction], Error>)
+
+        // TODO!! see which one of these is needed?
+        case didChangeStoreFront
+        case completedTransactionsFinished
+        case removedTransactions([SKPaymentTransaction])
     }
 
     enum State: Equatable {
@@ -68,15 +75,15 @@ class SubscriptionActor: Actor, Publisher {
     /// that will trigger a forced subscription check in the network extension.
     static let notifierMinSubDuration: TimeInterval = 60.0
 
+    /// Legacy subscription dictionary
+    static let userDefaultsSubscriptionDictionary = "kSubscriptionDictionary"
+
     var context: ActorContext!
-    let param: Param
+    private let param: Param
     private var paymentTransactionDelegate: PaymentTransactionDelegate!
-
-    var expiryTimer: SingleFireTimer?
-
-    var notifObserver: NotificationObserver!
-    var subscriptionData: SubscriptionData?
-    var state: State {
+    private var expiryTimer: SingleFireTimer?
+    private var subscriptionData: SubscriptionData?
+    private var state: State {
         didSet { param.publisher.onNext(state) }
     }
 
@@ -122,9 +129,13 @@ class SubscriptionActor: Actor, Publisher {
         }
     }
 
+    // TODO! should this thing ever return .same? or .waitingForResult(.none)
     fileprivate lazy var waitingForRequest =
     { [unowned self] (delegate: ActorDelegate?, msg: AnyMessage) -> Receive in
         switch msg {
+
+        case let msg as StoreKitTransaction:
+            self.handleStoreKitTransaction(msg)
 
         case let msg as StoreKitResult:
             switch msg {
@@ -135,9 +146,6 @@ class SubscriptionActor: Actor, Publisher {
                 case .failure(let error):
                     break
                 }
-
-            case .paymentUpdatedTransaction(let transactions):
-                self.handleUpdatedTransaction(transactions)
 
             case .receiptRefreshResult(let result):
                 switch result {
@@ -227,30 +235,29 @@ class SubscriptionActor: Actor, Publisher {
 
         // TODO!! remove this one IAPStoreHelper has been ported over.
         // Observes NSNotifications from IAPStoreHelper
-        self.notifObserver = NotificationObserver([.IAPHelperUpdatedSubscriptionDictionary])
-        { (name: Notification.Name, obj: Any?) in
-            switch name {
+//        self.notifObserver = NotificationObserver([.IAPHelperUpdatedSubscriptionDictionary])
+//        { (name: Notification.Name, obj: Any?) in
+//            switch name {
+//
+//            case .IAPHelperUpdatedSubscriptionDictionary:
+//                guard let dict = obj as? [String: Any]? else {
+//                    fatalError("failed to cast dictionary '\(String(describing: obj))'")
+//                }
+//
+//                if let dict = dict {
+//                    let data = SubscriptionData.fromSubsriptionDictionary(dict)!
+//                    self ! Action.updatedSubscription(data)
+//                }
+//
+//            default:
+//                fatalError("Unhandled notification \(name)")
+//            }
+//
+//        }
 
-            case .IAPHelperUpdatedSubscriptionDictionary:
-                guard let dict = obj as? [String: Any]? else {
-                    fatalError("failed to cast dictionary '\(String(describing: obj))'")
-                }
-
-                if let dict = dict {
-                    let data = SubscriptionData.fromSubsriptionDictionary(dict)!
-                    self ! Action.updatedSubscription(data)
-                }
-
-            default:
-                fatalError("Unhandled notification \(name)")
-            }
-
-        }
-
-        // Updates actor's internal subscription data after subscribing to
-        // `IAPHelperUpdatedSubscriptionDictionary`.
-        if let data = param.appStoreHelperSubscriptionDict() {
-            self ! Action.updatedSubscription(data)
+        // Updates actor's internal subscription data from persisted UserDefaultsConfig.
+        if let subscriptionData = UserDefaultsConfig.subscriptionData {
+            self ! Action.updatedSubscription(subscriptionData)
         }
 
     }
@@ -261,7 +268,28 @@ class SubscriptionActor: Actor, Publisher {
         SKPaymentQueue.default().remove(self.paymentTransactionDelegate)
     }
 
-    func handleUpdatedTransaction(_ transactions: [SKPaymentTransaction]) {
+    private func handleStoreKitTransaction(_ msg: StoreKitTransaction) {
+        switch msg {
+
+        case .updatedTransaction(let result):
+            switch result {
+            case .success(let transactions):
+                self.handleUpdatedTransaction(transactions)
+            case .failure(let error):
+                print(#file, "failed updated transactions: \(error)")
+            }
+
+        case .didChangeStoreFront:
+            print(#file, "did change store front")
+        case .completedTransactionsFinished:
+            print(#file, "completed transactions finished")
+        case .removedTransactions(let transactions):
+            print(#file, "removed transactions: \(transactions)")
+
+        }
+    }
+
+    private func handleUpdatedTransaction(_ transactions: [SKPaymentTransaction]) {
 
         // TODO!! is this necessary here?
         //        looks like we're doing it a bit too much
@@ -288,8 +316,47 @@ class SubscriptionActor: Actor, Publisher {
 
     }
 
-    func updateSubscriptionDictionaryFromLocalReceipt() {
-        // TODO!! implement this
+    private func updateSubscriptionDictionaryFromLocalReceipt() {
+
+        guard FileManager.default.fileExists(atPath: param.appStoreReceipt.path) else {
+            // TODO!! do something? receipt file doesn't exist. Why was this function called at all?
+            return
+        }
+        guard let receiptData = AppStoreReceiptData.parseReceipt(param.appStoreReceipt) else {
+            // TODO!! maybe do something if the parsing fails.
+            return
+        }
+        // Validate bundle identifier.
+        guard receiptData.bundleIdentifier == param.appBundleIdentifier else {
+            // TODO!! maybe do something if the bundle identifiers don't match
+            return
+        }
+        guard let inAppSubscription = receiptData.inAppSubscriptions else {
+            return
+        }
+        guard let castedInAppSubscription = inAppSubscription as? [String: Any] else {
+            return
+        }
+
+        let subscriptionData =
+            SubscriptionData.fromSubsriptionDictionary(castedInAppSubscription)
+
+        UserDefaultsConfig.subscriptionData = subscriptionData
+
+        if let subscriptionData = subscriptionData {
+            // The receipt contains purchase data, reset value in the shared DB.
+            param.sharedDB.setContainerEmptyReceiptFileSize(.none)
+            param.sharedDB
+                .setContainerLastSubscriptionReceiptExpiryDate(subscriptionData.latestExpiry)
+        } else {
+            // There's no subscription data in the app receipt.
+            param.sharedDB.setContainerEmptyReceiptFileSize(receiptData.fileSize)
+            // TODO!!
+//            [PsiFeedbackLogger infoWithType:IAPStoreHelperLogType
+//                                       json:@{@"event": @"readReceipt",
+//                                              @"fileSize": receiptFileSize,
+//                                              @"expiry": NSNull.null}];
+        }
     }
 }
 
@@ -326,46 +393,46 @@ func sortedByPrice(_ products: [SKProduct]) -> [SKProduct] {
 fileprivate class PaymentTransactionDelegate: ActorDelegate, SKPaymentTransactionObserver {
 
     // Sent when transactions are removed from the queue (via finishTransaction:).
-    func paymentQueue(_ queue: SKPaymentQueue, removedTransactions transactions: [SKPaymentTransaction]) {
+    func paymentQueue(_ queue: SKPaymentQueue, removedTransactions
+        transactions: [SKPaymentTransaction]) {
+
         // TODO!! IAPStoreHelper didn't implement this callback.
+        actor ! SubscriptionActor.StoreKitTransaction.removedTransactions(transactions)
     }
 
-
     // Sent when an error is encountered while adding transactions from the user's purchase history back to the queue.
-    func paymentQueue(_ queue: SKPaymentQueue, restoreCompletedTransactionsFailedWithError error: Error) {
+    func paymentQueue(_ queue: SKPaymentQueue,
+                      restoreCompletedTransactionsFailedWithError error: Error) {
+
         // TODO!!
         // [self updateSubscriptionDictionaryFromLocalReceipt];
+        actor ! SubscriptionActor.StoreKitTransaction.updatedTransaction(.failure(error))
     }
 
     // Sent when all transactions from the user's purchase history have successfully been added back to the queue.
     func paymentQueueRestoreCompletedTransactionsFinished(_ queue: SKPaymentQueue) {
         // TODO!!
         // [self updateSubscriptionDictionaryFromLocalReceipt];
-    }
-
-    // Sent when the download state has changed.
-    @available(iOS 6.0, *)
-    func paymentQueue(_ queue: SKPaymentQueue, updatedDownloads downloads: [SKDownload]) {
-        // TODO!! this function is not even interesting to us.
+        actor ! SubscriptionActor.StoreKitTransaction.completedTransactionsFinished
     }
 
     // Sent when a user initiates an IAP buy from the App Store
     @available(iOS 11.0, *)
     func paymentQueue(_ queue: SKPaymentQueue, shouldAddStorePayment payment: SKPayment, for product: SKProduct) -> Bool {
-
-        // TODO! although we don't allow buying directly from the AppStore anyways
-        return true
+        // TODO!! do we even want to keep this around?
+        return false
     }
 
     // Sent when the transaction array has changed (additions or state changes).  Client should check state of transactions and finish as appropriate.
     func paymentQueue(_ queue: SKPaymentQueue,
                       updatedTransactions transactions: [SKPaymentTransaction]) {
-        actor ! SubscriptionActor.StoreKitResult.paymentUpdatedTransaction(transactions)
+        actor ! SubscriptionActor.StoreKitTransaction.updatedTransaction(.success(transactions))
     }
 
     @available(iOS 13.0, *)
     func paymentQueueDidChangeStorefront(_ queue: SKPaymentQueue) {
         // TODO! check what this does and how we need to react
+        actor ! SubscriptionActor.StoreKitTransaction.didChangeStoreFront
     }
 
 }
@@ -438,9 +505,7 @@ struct SubscriptionData: Equatable, Codable {
         guard let introPeriod = dict[ReceiptFields.hasBeenInIntroPeriod] as? Bool else {
             return .none
         }
-
         return SubscriptionData(receiptSize: size, latestExpiry: expiration,
                                    productId: productId, hasBeenInIntroPeriod: introPeriod)
     }
-
 }

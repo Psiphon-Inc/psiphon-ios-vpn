@@ -18,25 +18,32 @@
 */
 
 import Foundation
-import SwiftActors
-import RxSwift
 
+// TODO! Consider using ZippyJSON
 
-protocol Publisher {
-    associatedtype PublishedType: Equatable
-}
+@propertyWrapper
+struct UserDefault<T: Codable> {
+    let key: String
+    let defaultValue: T
 
-
-struct ActorPublisher<P: Publisher> {
-    let actor: ActorRef
-    let publisher: Observable<P.PublishedType>
-}
-
-
-class ActorDelegate: NSObject {
-    internal unowned let actor: ActorRef
-
-    init(replyTo: ActorRef) {
-        actor = replyTo
+    init(_ key: String, defaultValue: T) {
+        self.key = key
+        self.defaultValue = defaultValue
     }
+
+    var wrappedValue: T {
+        get {
+            return UserDefaults.standard.object(forKey: key) as? T ?? defaultValue
+        }
+        set {
+            UserDefaults.standard.set(newValue, forKey: key)
+        }
+    }
+}
+
+struct UserDefaultsConfig {
+
+    @UserDefault("subscription_data_v1", defaultValue: .none)
+    static var subscriptionData: SubscriptionData?
+
 }

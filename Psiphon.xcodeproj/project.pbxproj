@@ -9,7 +9,7 @@
 /* Begin PBXBuildFile section */
 		440D75BE1F59E041005C603B /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 440D75BD1F59E041005C603B /* StoreKit.framework */; };
 		4435CC271F70566000F3A809 /* SettingsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4435CC261F70566000F3A809 /* SettingsViewController.m */; };
-		445F239620E1817C00D004E9 /* PsiphonAppReceipt.m in Sources */ = {isa = PBXBuildFile; fileRef = 445F239520E1817C00D004E9 /* PsiphonAppReceipt.m */; };
+		445F239620E1817C00D004E9 /* AppStoreReceiptData.m in Sources */ = {isa = PBXBuildFile; fileRef = 445F239520E1817C00D004E9 /* AppStoreReceiptData.m */; };
 		445F24D420E1A5BA00D004E9 /* ReceiptAttributes.c in Sources */ = {isa = PBXBuildFile; fileRef = 445F249820E1A5BA00D004E9 /* ReceiptAttributes.c */; };
 		445F24D520E1A5BA00D004E9 /* constr_TYPE.c in Sources */ = {isa = PBXBuildFile; fileRef = 445F249920E1A5BA00D004E9 /* constr_TYPE.c */; };
 		445F24D620E1A5BA00D004E9 /* xer_decoder.c in Sources */ = {isa = PBXBuildFile; fileRef = 445F249E20E1A5BA00D004E9 /* xer_decoder.c */; };
@@ -75,6 +75,7 @@
 		521FD0FE219E0E1900F748EC /* AppProfiler.m in Sources */ = {isa = PBXBuildFile; fileRef = 521FD0F8219E0DDF00F748EC /* AppProfiler.m */; };
 		521FD0FF219E0E2600F748EC /* AppStats.m in Sources */ = {isa = PBXBuildFile; fileRef = 521FD0F6219E0DDF00F748EC /* AppStats.m */; };
 		521FD100219E0E3800F748EC /* DebugUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 521FD0FB219E0E0E00F748EC /* DebugUtils.m */; };
+		5245C5C92342A6840033EE13 /* UserDefaults.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5245C5C82342A6840033EE13 /* UserDefaults.swift */; };
 		52467FE122C2A704009AEC6E /* PsiCashModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52467FE022C2A704009AEC6E /* PsiCashModels.swift */; };
 		52467FEC22CCFA8C009AEC6E /* Encodable+JSON.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52467FEB22CCFA8C009AEC6E /* Encodable+JSON.swift */; };
 		52467FEE22CD21FA009AEC6E /* MessageExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52467FED22CD21FA009AEC6E /* MessageExtensions.swift */; };
@@ -262,8 +263,8 @@
 		440D75BD1F59E041005C603B /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 		4435CC251F70566000F3A809 /* SettingsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SettingsViewController.h; sourceTree = "<group>"; };
 		4435CC261F70566000F3A809 /* SettingsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SettingsViewController.m; sourceTree = "<group>"; };
-		445F239420E1817B00D004E9 /* PsiphonAppReceipt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PsiphonAppReceipt.h; sourceTree = "<group>"; };
-		445F239520E1817C00D004E9 /* PsiphonAppReceipt.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PsiphonAppReceipt.m; sourceTree = "<group>"; };
+		445F239420E1817B00D004E9 /* AppStoreReceiptData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppStoreReceiptData.h; sourceTree = "<group>"; };
+		445F239520E1817C00D004E9 /* AppStoreReceiptData.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppStoreReceiptData.m; sourceTree = "<group>"; };
 		445F249820E1A5BA00D004E9 /* ReceiptAttributes.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ReceiptAttributes.c; sourceTree = "<group>"; };
 		445F249920E1A5BA00D004E9 /* constr_TYPE.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = constr_TYPE.c; sourceTree = "<group>"; };
 		445F249A20E1A5BA00D004E9 /* asn_SET_OF.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = asn_SET_OF.h; sourceTree = "<group>"; };
@@ -385,6 +386,7 @@
 		521FD0FC219E0E0E00F748EC /* DebugUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DebugUtils.h; sourceTree = "<group>"; };
 		521FD101219E0E6300F748EC /* NotificationCenter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NotificationCenter.h; sourceTree = "<group>"; };
 		521FD102219E0E8400F748EC /* Annotations.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Annotations.h; sourceTree = "<group>"; };
+		5245C5C82342A6840033EE13 /* UserDefaults.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaults.swift; sourceTree = "<group>"; };
 		52467FE022C2A704009AEC6E /* PsiCashModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PsiCashModels.swift; sourceTree = "<group>"; };
 		52467FEB22CCFA8C009AEC6E /* Encodable+JSON.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Encodable+JSON.swift"; sourceTree = "<group>"; };
 		52467FED22CD21FA009AEC6E /* MessageExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageExtensions.swift; sourceTree = "<group>"; };
@@ -718,8 +720,8 @@
 			isa = PBXGroup;
 			children = (
 				445F249720E1A5BA00D004E9 /* asn1c */,
-				445F239420E1817B00D004E9 /* PsiphonAppReceipt.h */,
-				445F239520E1817C00D004E9 /* PsiphonAppReceipt.m */,
+				445F239420E1817B00D004E9 /* AppStoreReceiptData.h */,
+				445F239520E1817C00D004E9 /* AppStoreReceiptData.m */,
 				EF743FC31F99549000AC89A2 /* productIDs.plist */,
 				4E5263C92072984C0021FEF5 /* IAPStoreHelper.h */,
 				4E5263CC2072984D0021FEF5 /* IAPStoreHelper.m */,
@@ -1062,6 +1064,7 @@
 				525E1E2E22F0E22A0079DB49 /* LandingPageService.swift */,
 				5248B4D32326B66B008C00D4 /* AppRoot.swift */,
 				5254093C2332AA0E001E7B12 /* SubscriptionService.swift */,
+				5245C5C82342A6840033EE13 /* UserDefaults.swift */,
 			);
 			path = Psiphon;
 			sourceTree = "<group>";
@@ -1571,7 +1574,7 @@
 				4E5DAE6520A942A300E06342 /* UILabel+GetLabelHeight.m in Sources */,
 				EFC2F5CB202267B1007B52F9 /* PsiphonConfigReader.m in Sources */,
 				EF90D7A7204F22C900228A63 /* NSDate+PSIDateExtension.m in Sources */,
-				445F239620E1817C00D004E9 /* PsiphonAppReceipt.m in Sources */,
+				445F239620E1817C00D004E9 /* AppStoreReceiptData.m in Sources */,
 				445F24E420E1A5BA00D004E9 /* constr_SEQUENCE.c in Sources */,
 				EF652CD61F35224C002AFB48 /* AppDelegate.m in Sources */,
 				EFC2F5C720226782007B52F9 /* UIAlertController+Additions.m in Sources */,
@@ -1673,6 +1676,7 @@
 				A840854A7ACA14A7D891EC16 /* OnboardingScrollableView.m in Sources */,
 				A84084C8B5C16F0EB80364FA /* Strings.m in Sources */,
 				A8408FF45D08D31E102FA41F /* ContainerDB.m in Sources */,
+				5245C5C92342A6840033EE13 /* UserDefaults.swift in Sources */,
 				A8408D8C16D136075590193C /* AppUpgrade.m in Sources */,
 				A8408692D005E8599267522E /* UIView+Additions.m in Sources */,
 				A84087AFA5806D689C3BF6D2 /* PickerViewController.m in Sources */,
