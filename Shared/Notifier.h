@@ -71,6 +71,8 @@ extern NotifierMessage const NotifierDebugPsiphonTunnelState;
  * If called from the extension, posts the message to the container.
  *
  * @param message NotifierMessage of the message.
+ *
+ * @note This function is thread-safe.
  */
 - (void)post:(NotifierMessage)message;
 

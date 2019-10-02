@@ -25,31 +25,8 @@ fileprivate enum AppRootErrors: Error {
     case alreadyRegistered
 }
 
-protocol AppState: AnyMessage, Equatable {}
-
-/// TODO! maybe the actual state is not held by the AppRoot, but the VC's still hold the state.
-/// and AppRoot receives these states as messages and reacts accordingly.
-///
-/// Or maybe the AppRoot actor holds the actual state, and is the one able to react properly.
-/// SwiftAppDelegate listen to these state changes and somehow propagates that state down.
-///
-///
-// debug remove
-//struct RootState: AppState {
-//    let onboarded: OnboardedState?
-//}
-//
-//struct OnboardedState: AppState {
-//    let subscribed: SubscribedState?
-//}
-//
-//struct SubscribedState: AppState {
-//    let psiCash: PsiCashState?
-//}
-//
-//struct PsiCashState: AppState {
-//    let hasEarnerToken: Bool
-//}
+// TODO!! remove this after done with AppRoot actor.
+extension AppActorType: AnyMessage {}
 
 struct Services {
 
@@ -79,13 +56,6 @@ class AppRoot: Actor {
         let initServices: Services
     }
 
-    // TODO!! remove the AnyMessage type.
-    enum ServiceType: String, AnyMessage {
-        case psiCash
-        case landingPage
-        case subscription
-    }
-
     enum Action: AnyMessage {
         case subscribed(Bool)
     }
@@ -102,7 +72,7 @@ class AppRoot: Actor {
 
         switch $0 {
 
-        case let msg as ServiceType:
+        case let msg as AppActorType:
 
             guard case .none = self.context.children[msg] else {
                 throw AppRootErrors.alreadyRegistered
@@ -116,7 +86,7 @@ class AppRoot: Actor {
                                   param: PsiCashActor.Params(publisher: publisher,
                                                              vpnManager: self.param.vpnManager),
                                   qos: .userInteractive)
-                let actor = self.param.actorBuilder.makeActor(self, props, serviceType: .psiCash)
+                let actor = self.param.actorBuilder.makeActor(self, props, type: .psiCash)
 
                 self.context.watch(actor)
 
@@ -140,28 +110,31 @@ class AppRoot: Actor {
                                   qos: .userInteractive)
 
                 let actor = self.param.actorBuilder.makeActor(self, props,
-                                                              serviceType: .landingPage)
+                                                              type: .landingPage)
 
                 self.context.watch(actor)
                 self.landingPageCtx = self.landingPageCtx.new(actor)
 
             case .subscription:
-                let publisher = ReplaySubject<SubscriptionActor.State>.create(bufferSize: 1)
-                let props = Props(SubscriptionActor.self,
-                                  param: SubscriptionActor.Param(publisher: publisher,
-                                                                 notifier: self.param.notifier,
-                                                                 appStoreReceipt: self.param.appBundle.appStoreReceiptURL!,
-                                                                 appBundleIdentifier: self.param.appBundle.bundleIdentifier!,
-                                                                 sharedDB: self.param.sharedDB),
-                                  qos: .userInteractive)
-
-                let actor = self.param.actorBuilder.makeActor(self, props,
-                                                              serviceType: .subscription)
-
-                let actorPublisher = SubscriptionActorPublisher(actor: actor, publisher: publisher)
-
-                self.context.watch(actor)
-                self.subscriptionCtx = self.subscriptionCtx.new(actorPublisher)
+                break // TODO!! fix the mess
+//                let publisher = ReplaySubject<SubscriptionActor.State>.create(bufferSize: 1)
+//                let props = Props(SubscriptionActor.self,
+//                                  param: SubscriptionActor.Param(publisher: publisher,
+//                                                                 notifier: self.param.notifier,
+//                                                                 appStoreReceipt: self.param.appBundle.appStoreReceiptURL!,
+//                                                                 appBundleIdentifier: self.param.appBundle.bundleIdentifier!,
+//                                                                 sharedDB: self.param.sharedDB),
+//                                  qos: .userInteractive)
+//
+//                let actor = self.param.actorBuilder.makeActor(self, props,
+//                                                              serviceType: .subscription)
+//
+//                let actorPublisher = SubscriptionActorPublisher(actor: actor, publisher: publisher)
+//
+//                self.context.watch(actor)
+//                self.subscriptionCtx = self.subscriptionCtx.new(actorPublisher)
+            default:
+                fatalError("not implemented")
             }
 
             // TODO! Separate this as a thing
@@ -170,7 +143,7 @@ class AppRoot: Actor {
             switch msg {
             case .terminated(let actor):
                 // TODO! match by reference, not by name
-                guard let serviceType = ServiceType(rawValue: actor.name) else {
+                guard let serviceType = AppActorType(rawValue: actor.name) else {
                     return .unhandled(msg)
                 }
 
@@ -181,6 +154,7 @@ class AppRoot: Actor {
                     self.landingPageCtx = self.landingPageCtx.new(.none)
                 case .subscription:
                     fatalError("Subscription actor terminated")
+                default: fatalError("not implemented")
                 }
             }
 
@@ -198,7 +172,7 @@ class AppRoot: Actor {
     }
 
     func preStart() {
-        self ! ServiceType.subscription
+        self ! AppActorType.subscription
     }
 
 }
@@ -226,20 +200,6 @@ fileprivate struct ServiceContext<Service> {
         disposable?.dispose()
 
         return ServiceContext(subject: subject, value: value, dispose: dispose)
-    }
-
-}
-
-protocol ActorBuilder {
-    func makeActor<A>(_ parent: ActorRefFactory, _ props: Props<A>,
-                      serviceType: AppRoot.ServiceType) -> ActorRef
-}
-
-struct DefaultActorBuilder: ActorBuilder {
-
-    func makeActor<A>(_ parent: ActorRefFactory, _ props: Props<A>,
-                      serviceType: AppRoot.ServiceType) -> ActorRef {
-        return parent.spawn(props, name: serviceType.rawValue)
     }
 
 }

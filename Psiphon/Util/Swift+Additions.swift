@@ -75,9 +75,9 @@ class SingleFireTimer {
 
     /// - Parameter handler: Uses default `DispatchSourceTimer` dispatch queue.
     init(deadline: TimeInterval, leeway: DispatchTimeInterval = .seconds(1),
-         _ handler: @escaping () -> Void) {
+         queue: DispatchQueue? = .none, _ handler: @escaping () -> Void) {
 
-        timer = DispatchSource.makeTimerSource()
+        timer = DispatchSource.makeTimerSource(flags: [], queue: queue)
         timer.schedule(deadline: .intervalFromNow(deadline),
                        repeating: .never,
                        leeway: leeway)

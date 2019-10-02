@@ -76,6 +76,8 @@
 		521FD0FF219E0E2600F748EC /* AppStats.m in Sources */ = {isa = PBXBuildFile; fileRef = 521FD0F6219E0DDF00F748EC /* AppStats.m */; };
 		521FD100219E0E3800F748EC /* DebugUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 521FD0FB219E0E0E00F748EC /* DebugUtils.m */; };
 		5245C5C92342A6840033EE13 /* UserDefaults.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5245C5C82342A6840033EE13 /* UserDefaults.swift */; };
+		5245C5D22344F8880033EE13 /* StoreKitActor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5245C5D12344F8880033EE13 /* StoreKitActor.swift */; };
+		5245C5D423452DF30033EE13 /* ActorBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5245C5D323452DF30033EE13 /* ActorBuilder.swift */; };
 		52467FE122C2A704009AEC6E /* PsiCashModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52467FE022C2A704009AEC6E /* PsiCashModels.swift */; };
 		52467FEC22CCFA8C009AEC6E /* Encodable+JSON.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52467FEB22CCFA8C009AEC6E /* Encodable+JSON.swift */; };
 		52467FEE22CD21FA009AEC6E /* MessageExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52467FED22CD21FA009AEC6E /* MessageExtensions.swift */; };
@@ -387,6 +389,8 @@
 		521FD101219E0E6300F748EC /* NotificationCenter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NotificationCenter.h; sourceTree = "<group>"; };
 		521FD102219E0E8400F748EC /* Annotations.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Annotations.h; sourceTree = "<group>"; };
 		5245C5C82342A6840033EE13 /* UserDefaults.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaults.swift; sourceTree = "<group>"; };
+		5245C5D12344F8880033EE13 /* StoreKitActor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoreKitActor.swift; sourceTree = "<group>"; };
+		5245C5D323452DF30033EE13 /* ActorBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActorBuilder.swift; sourceTree = "<group>"; };
 		52467FE022C2A704009AEC6E /* PsiCashModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PsiCashModels.swift; sourceTree = "<group>"; };
 		52467FEB22CCFA8C009AEC6E /* Encodable+JSON.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Encodable+JSON.swift"; sourceTree = "<group>"; };
 		52467FED22CD21FA009AEC6E /* MessageExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageExtensions.swift; sourceTree = "<group>"; };
@@ -1065,6 +1069,8 @@
 				5248B4D32326B66B008C00D4 /* AppRoot.swift */,
 				5254093C2332AA0E001E7B12 /* SubscriptionService.swift */,
 				5245C5C82342A6840033EE13 /* UserDefaults.swift */,
+				5245C5D12344F8880033EE13 /* StoreKitActor.swift */,
+				5245C5D323452DF30033EE13 /* ActorBuilder.swift */,
 			);
 			path = Psiphon;
 			sourceTree = "<group>";
@@ -1589,6 +1595,7 @@
 				5246800D22D65926009AEC6E /* UIUtils.swift in Sources */,
 				9BFECFEB3BC9F10542C1A416 /* PsiphonConfigUserDefaults.m in Sources */,
 				4E5263CD2072984D0021FEF5 /* IAPViewController.m in Sources */,
+				5245C5D423452DF30033EE13 /* ActorBuilder.swift in Sources */,
 				445F24D720E1A5BA00D004E9 /* per_support.c in Sources */,
 				4E5263CE2072984D0021FEF5 /* IAPStoreHelper.m in Sources */,
 				EF90D7AA204F22C900228A63 /* NSError+Convenience.m in Sources */,
@@ -1604,6 +1611,7 @@
 				445F24E320E1A5BA00D004E9 /* OCTET_STRING.c in Sources */,
 				445F24E120E1A5BA00D004E9 /* ReceiptAttribute.c in Sources */,
 				EF90D7A2204F22C900228A63 /* timestamp_compare.c in Sources */,
+				5245C5D22344F8880033EE13 /* StoreKitActor.swift in Sources */,
 				9BFECB6BF077F45D491093F1 /* Authorization.m in Sources */,
 				EF90D7A3204F22C900228A63 /* timestamp_tm.c in Sources */,
 				52D363CD230EEBAC002C2221 /* AnimatedUIButton.swift in Sources */,
