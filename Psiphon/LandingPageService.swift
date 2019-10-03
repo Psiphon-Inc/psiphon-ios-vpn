@@ -24,7 +24,6 @@ import Promises
 
 
 class LandingPageActor: Actor {
-    typealias ParamType = Params
 
     struct Params {
         let psiCash: Observable<PsiCashActorPublisher?>

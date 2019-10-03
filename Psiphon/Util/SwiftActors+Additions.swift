@@ -20,6 +20,7 @@
 import Foundation
 import SwiftActors
 import RxSwift
+import Promises
 
 
 protocol Publisher {
@@ -33,10 +34,23 @@ struct ActorPublisher<P: Publisher> {
 }
 
 
-class ActorDelegate: NSObject {
+class ObjCDelegate: NSObject {}
+
+
+class ActorDelegate: ObjCDelegate {
     internal unowned let actor: ActorRef
 
     init(replyTo: ActorRef) {
         actor = replyTo
+    }
+}
+
+
+class PromiseDelegate<T>: ObjCDelegate {
+
+    let promise: Promise<T>
+
+    override init() {
+        self.promise = Promise<T>.pending()
     }
 }

@@ -77,7 +77,6 @@ struct PsiCashPurchaseResult: AnyMessage {
 typealias PsiCashActorPublisher = ActorPublisher<PsiCashActor>
 
 class PsiCashActor: Actor, Publisher {
-    typealias ParamType = Params
     typealias PublishedType = State
 
     struct Params {

@@ -44,7 +44,6 @@ struct Services {
 }
 
 class AppRoot: Actor {
-    typealias ParamType = Params
 
     struct Params {
         let actorBuilder: ActorBuilder

@@ -74,6 +74,9 @@ import Promises
 extension SwiftAppDelegate: UIApplicationDelegate {
 
     @objc func applicationDidFinishLaunching(_ application: UIApplication) {
+        /// Validates the assumptions about the enviroment made by the app.
+        validateEnvironment(Bundle.main)
+
         self.appRoot = makeAppRootActor()
 
         self.services.psiCash.currentState().subscribe(onSuccess: {
@@ -149,3 +152,10 @@ extension SwiftAppDelegate {
 
 }
 
+
+/// Validates app's environment give the assumptions made in the app for certain invariants to hold true.
+/// - Note: Crashes the app if any of the vaidations fail.
+func validateEnvironment(_ bundle: Bundle) {
+    precondition(bundle.bundleIdentifier != nil, "Bundle 'bundleIdentifier' is nil")
+    precondition(bundle.appStoreReceiptURL != nil, "Bundle 'appStoreReceiptURL' is nil'")
+}

@@ -46,6 +46,7 @@ class SubscriptionActor: Actor, Publisher {
         let publisher: ReplaySubject<PublishedType>
         let notifier: Notifier
         let sharedDB: PsiphonDataSharedDB
+        let userDefaultsConfig: UserDefaultsConfig
     }
 
     enum Action: AnyMessage {
@@ -89,7 +90,8 @@ class SubscriptionActor: Actor, Publisher {
             }
 
             self.subscriptionData = data.subscription
-            updatePersistedData(forSubscription: data, self.param.sharedDB)
+            updatePersistedData(forSubscription: data, self.param.sharedDB,
+                                self.param.userDefaultsConfig)
 
             (self.state, self.expiryTimer) = timerFrom(
                 subscriptionData: data.subscription,
@@ -126,16 +128,6 @@ class SubscriptionActor: Actor, Publisher {
         return .same
     }
 
-    func preStart() {
-
-        // TODO! initialize first subscription data properly.
-        // Updates actor's internal subscription data from persisted UserDefaultsConfig.
-//        if let subscriptionData = UserDefaultsConfig.subscriptionData {
-//            self ! Action.updatedSubscription(subscriptionData)
-//        }
-
-    }
-
     func postStop() {
         // Cleanup
         self.expiryTimer = .none
@@ -144,15 +136,17 @@ class SubscriptionActor: Actor, Publisher {
 }
 
 
+/// Updates `UserDefaultsConfig` and `PsiphonDataSharedDB` based on the data 
 func updatePersistedData(forSubscription data: ReceiptData,
-                         _ sharedDB: PsiphonDataSharedDB) {
+                         _ sharedDB: PsiphonDataSharedDB,
+                         _ userDefaultsConfig: UserDefaultsConfig) {
 
     guard let subscription = data.subscription else {
         sharedDB.setContainerEmptyReceiptFileSize(data.fileSize as NSNumber)
         return
     }
 
-    UserDefaultsConfig.subscriptionData = subscription
+    userDefaultsConfig.subscriptionData = subscription
 
     // The receipt contains purchase data, reset value in the shared DB.
     sharedDB.setContainerEmptyReceiptFileSize(.none)

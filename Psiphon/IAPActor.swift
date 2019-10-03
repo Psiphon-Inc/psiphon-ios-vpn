@@ -21,44 +21,33 @@ import Foundation
 import StoreKit
 import SwiftActors
 import RxSwift
+import Promises
 
 infix operator | : TernaryPrecedence
 
 
-struct StoreProductIds {
-    let ids: Set<String>
+class IAPActor: Actor {
 
-    enum ProductIdType: String {
-        case subscription = "subscriptionProductIds"
-        case psiCash = "psiCashProductIds"
-    }
-
-    init(for type: ProductIdType) {
-        ids = try! plistReader(key: type.rawValue)
-        // TODO! validate the type
-    }
-}
-
-
-class StoreKitActor: Actor {
-    typealias ParamType = Param
-
-    struct Param {
+    struct Params {
+        let actorBuilder: ActorBuilder
+        let appBundle: Bundle
         let subscriptonActorParam: SubscriptionActor.Param
     }
 
     enum Action: AnyMessage {
-        case productListRequest(for: StoreProductIds)
+        /// Adds `SKProduct` to the StoerKit's payment queue.
         case buyProduct(SKProduct)
+        /// Sends a receipt refresh request to StoreKit.
         case refreshReceipt // TODO!! this is the appStore refresh kind
     }
 
-    fileprivate enum StoreKitResult: AnyMessage {
-        case productRequestResult(Result<SKProductsResponse, Error>)
+    /// StoreKit request results
+    fileprivate enum RequestResult: AnyMessage {
         case receiptRefreshResult(Result<Void, Error>)
     }
 
-    fileprivate enum Transaction: AnyMessage {
+    /// StoreKit transaction obersver
+    fileprivate enum TransactionMessage: AnyMessage {
         case updatedTransaction(Result<[SKPaymentTransaction], Error>)
 
         // TODO!! see which one of these is needed?
@@ -68,18 +57,19 @@ class StoreKitActor: Actor {
     }
 
     var context: ActorContext!
-    let param: Param
+    let param: Params
     var subscriptionActor: ActorRef!
-
-
-    // TODO! where should this thing go?
-    /// Products available for purchase.
-    /// - Note: Products are sorted by price.
-    var storeProducts = [SKProduct]()
+    var receiptData: ReceiptData? = .none {
+        didSet {
+            if let data = receiptData {
+                self.subscriptionActor ! SubscriptionActor.Action.updatedReceiptData(data)
+            }
+        }
+    }
 
     private var paymentTransactionDelegate: PaymentTransactionDelegate!
 
-    required init(_ param: Param) {
+    required init(_ param: Params) {
         self.param = param
     }
 
@@ -90,13 +80,6 @@ class StoreKitActor: Actor {
         }
 
         switch msg {
-        case .productListRequest(for: let storeProductIds):
-            let responseDelegate = ProductRequestDelegate(replyTo: self)
-            let request = SKProductsRequest(productIdentifiers: storeProductIds.ids)
-            request.delegate = responseDelegate
-            request.start()
-            return .new(self.waitingBehavior(responseDelegate))
-
         case .buyProduct(let product):
             let payment = SKPayment(product: product)
             SKPaymentQueue.default().add(payment)
@@ -113,34 +96,21 @@ class StoreKitActor: Actor {
 
     /// Behavior for handling responses from StoreKit requests.
     fileprivate lazy var waitingForRequest =
-    { [unowned self] (delegate: ActorDelegate?, msg: AnyMessage) -> Receive in
+    { [unowned self] (delegate: ObjCDelegate?, msg: AnyMessage) -> Receive in
         switch msg {
-        case let msg as Transaction:
+        case let msg as TransactionMessage:
             self.handleStoreKitTransaction(msg)
 
-        case let msg as StoreKitResult:
+        case let msg as RequestResult:
             switch msg {
-            case .productRequestResult(let result):
-                break
-                // TODO! do something with the result.
-                //                switch result {
-                //                case .success(let response):
-                //                    self.storeProducts = sortedByPrice(response.products)
-                //                case .failure(let error):
-                //                    break
-                //                }
-
             case .receiptRefreshResult(let result):
-                break
-                // TODO!! do something with the result
-                //                switch result {
-                //                case .success:
-                //                    // TODO! is this necessary here?
-                //                    self.updateSubscriptionDictionaryFromLocalReceipt()
-                //                case .failure(let error):
-                //                    // TODO!! maybe show an error message to the user
-                //                    break
-                //                }
+                switch result {
+                case .success:
+                    self.receiptData = .fromLocalReceipt(self.param.appBundle)
+                case .failure(let error):
+                    // TODO!! maybe show an error message to the user
+                    break
+                }
             }
         default: return .unhandled(msg)
             // TODO!!! this is incorrect, should be .new(self.requestsEnabledBehavior)
@@ -150,7 +120,7 @@ class StoreKitActor: Actor {
         return .same
     }
 
-    lazy var waitingBehavior = { (delegate: ActorDelegate?) -> Behavior in
+    lazy var waitingBehavior = { (delegate: ObjCDelegate?) -> Behavior in
         behavior { [unowned self] in
             self.waitingForRequest(delegate, $0)
         }
@@ -159,7 +129,7 @@ class StoreKitActor: Actor {
     lazy var requestEnabledBehavior = self.waitingBehavior(.none) | self.requestsBehavior
     lazy var receive = self.requestEnabledBehavior
 
-    private func handleStoreKitTransaction(_ msg: Transaction) {
+    private func handleStoreKitTransaction(_ msg: TransactionMessage) {
         switch msg {
 
         case .updatedTransaction(let result):
@@ -167,15 +137,15 @@ class StoreKitActor: Actor {
             case .success(let transactions):
                 self.handleUpdatedTransaction(transactions)
             case .failure(let error):
-                print(#file, "failed updated transactions: \(error)")
+                print(#file, #line, "failed updated transactions: \(error)")
             }
 
         case .didChangeStoreFront:
-            print(#file, "did change store front")
+            print(#file, #line, "did change store front")
         case .completedTransactionsFinished:
-            print(#file, "completed transactions finished")
+            print(#file, #line, "completed transactions finished")
         case .removedTransactions(let transactions):
-            print(#file, "removed transactions: \(transactions)")
+            print(#file, #line, "removed transactions: \(transactions)")
 
         }
     }
@@ -213,13 +183,14 @@ class StoreKitActor: Actor {
         self.paymentTransactionDelegate = PaymentTransactionDelegate(replyTo: self)
         SKPaymentQueue.default().add(self.paymentTransactionDelegate)
 
-        // Create the subscription actor.
+        // Creates the subscription actor.
         let props = Props(SubscriptionActor.self,
                           param: self.param.subscriptonActorParam,
                           qos: .userInteractive)
+        self.subscriptionActor = self.param.actorBuilder.makeActor(self, props, type: .subscription)
 
-        self.subscriptionActor = context.spawn(props, name: AppActorType.subscription.rawValue)
-
+        // TODO!! subscription actor needs to be notificed whenever the receipt data chagnes.
+        self.receiptData = .fromLocalReceipt(self.param.appBundle)
     }
 
     func postStop() {
@@ -245,7 +216,7 @@ fileprivate class PaymentTransactionDelegate: ActorDelegate, SKPaymentTransactio
         transactions: [SKPaymentTransaction]) {
 
         // TODO!! IAPStoreHelper didn't implement this callback.
-        actor ! StoreKitActor.Transaction.removedTransactions(transactions)
+        actor ! IAPActor.TransactionMessage.removedTransactions(transactions)
     }
 
     // Sent when an error is encountered while adding transactions from the user's purchase history back to the queue.
@@ -254,14 +225,14 @@ fileprivate class PaymentTransactionDelegate: ActorDelegate, SKPaymentTransactio
 
         // TODO!!
         // [self updateSubscriptionDictionaryFromLocalReceipt];
-        actor ! StoreKitActor.Transaction.updatedTransaction(.failure(error))
+        actor ! IAPActor.TransactionMessage.updatedTransaction(.failure(error))
     }
 
     // Sent when all transactions from the user's purchase history have successfully been added back to the queue.
     func paymentQueueRestoreCompletedTransactionsFinished(_ queue: SKPaymentQueue) {
         // TODO!!
         // [self updateSubscriptionDictionaryFromLocalReceipt];
-        actor ! StoreKitActor.Transaction.completedTransactionsFinished
+        actor ! IAPActor.TransactionMessage.completedTransactionsFinished
     }
 
     // Sent when a user initiates an IAP buy from the App Store
@@ -274,27 +245,13 @@ fileprivate class PaymentTransactionDelegate: ActorDelegate, SKPaymentTransactio
     // Sent when the transaction array has changed (additions or state changes).  Client should check state of transactions and finish as appropriate.
     func paymentQueue(_ queue: SKPaymentQueue,
                       updatedTransactions transactions: [SKPaymentTransaction]) {
-        actor ! StoreKitActor.Transaction.updatedTransaction(.success(transactions))
+        actor ! IAPActor.TransactionMessage.updatedTransaction(.success(transactions))
     }
 
     @available(iOS 13.0, *)
     func paymentQueueDidChangeStorefront(_ queue: SKPaymentQueue) {
         // TODO! check what this does and how we need to react
-        actor ! StoreKitActor.Transaction.didChangeStoreFront
-    }
-
-}
-
-
-/// ActorDelegate for StoreKit product request object:`SKProductsRequest`.
-fileprivate class ProductRequestDelegate: ActorDelegate, SKProductsRequestDelegate {
-
-    func productsRequest(_ request: SKProductsRequest, didReceive response: SKProductsResponse) {
-        actor ! StoreKitActor.StoreKitResult.productRequestResult(.success(response))
-    }
-
-    func request(_ request: SKRequest, didFailWithError error: Error) {
-        actor ! StoreKitActor.StoreKitResult.productRequestResult(.failure(error))
+        actor ! IAPActor.TransactionMessage.didChangeStoreFront
     }
 
 }
@@ -304,11 +261,11 @@ fileprivate class ProductRequestDelegate: ActorDelegate, SKProductsRequestDelega
 fileprivate class ReceiptRefreshRequestDelegate: ActorDelegate, SKRequestDelegate {
 
     func requestDidFinish(_ request: SKRequest) {
-        actor ! StoreKitActor.StoreKitResult.receiptRefreshResult(.success(()))
+        actor ! IAPActor.RequestResult.receiptRefreshResult(.success(()))
     }
 
     func request(_ request: SKRequest, didFailWithError error: Error) {
-        actor ! StoreKitActor.StoreKitResult.receiptRefreshResult(.failure(error))
+        actor ! IAPActor.RequestResult.receiptRefreshResult(.failure(error))
     }
 
 }

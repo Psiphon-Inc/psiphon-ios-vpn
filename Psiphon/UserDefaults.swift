@@ -25,25 +25,29 @@ import Foundation
 struct UserDefault<T: Codable> {
     let key: String
     let defaultValue: T
+    let store: UserDefaults
 
-    init(_ key: String, defaultValue: T) {
+    init(_ store: UserDefaults, _ key: String, defaultValue: T) {
         self.key = key
         self.defaultValue = defaultValue
+        self.store = store
     }
 
     var wrappedValue: T {
         get {
-            return UserDefaults.standard.object(forKey: key) as? T ?? defaultValue
+            return store.object(forKey: key) as? T ?? defaultValue
         }
         set {
-            UserDefaults.standard.set(newValue, forKey: key)
+            store.set(newValue, forKey: key)
         }
     }
+
 }
 
-struct UserDefaultsConfig {
 
-    @UserDefault("subscription_data_v1", defaultValue: .none)
-    static var subscriptionData: SubscriptionData?
+class UserDefaultsConfig {
+
+    @UserDefault(.standard, "subscription_data_v1", defaultValue: .none)
+    var subscriptionData: SubscriptionData?
 
 }
