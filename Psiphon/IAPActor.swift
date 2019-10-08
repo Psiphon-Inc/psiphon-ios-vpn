@@ -37,8 +37,15 @@ class IAPActor: Actor {
     enum Action: AnyMessage {
         /// Adds `SKProduct` to the StoerKit's payment queue.
         case buyProduct(SKProduct)
+
         /// Sends a receipt refresh request to StoreKit.
-        case refreshReceipt // TODO!! this is the appStore refresh kind
+        case refreshReceipt  // TODO! this shouldn't be exposed to the clientsl.
+
+        /// Restores previously completed purchases.
+        case restoreTransactions
+
+        /// Removes pending PsiCash transactions from the payment queue.
+        case completePsiCashTransactions
     }
 
     /// StoreKit request results
@@ -49,16 +56,17 @@ class IAPActor: Actor {
     /// StoreKit transaction obersver
     fileprivate enum TransactionMessage: AnyMessage {
         case updatedTransaction(Result<[SKPaymentTransaction], Error>)
-
-        // TODO!! see which one of these is needed?
         case didChangeStoreFront
-        case completedTransactionsFinished
-        case removedTransactions([SKPaymentTransaction])
+        case restoredCompletedTransactions(error: Error?)
     }
 
     var context: ActorContext!
     let param: Params
     var subscriptionActor: ActorRef!
+    var psiCashPendingTransactions = [SKPaymentTransaction]()
+    private var paymentTransactionDelegate: PaymentTransactionDelegate!
+
+    /// Notifies `subscriptionActor` of the updated receipt data (if any).
     var receiptData: ReceiptData? = .none {
         didSet {
             if let data = receiptData {
@@ -67,112 +75,118 @@ class IAPActor: Actor {
         }
     }
 
-    private var paymentTransactionDelegate: PaymentTransactionDelegate!
+    lazy var receive = behavior { [unowned self] in
+        switch $0 {
+        case let msg as Action:
+            switch msg {
+            case .buyProduct(let product): self.buyProduct(product)
+            // TODO!!! this shouldn't be exposed to the user.
+            case .refreshReceipt: self.refreshReceipt()
+            case .restoreTransactions: self.restoreTransactions()
+            case .completePsiCashTransactions: self.completePsiCashTransactions()
+            }
+
+        case let msg as TransactionMessage: self.handleStoreKitTransaction(msg)
+        case let msg as RequestResult: self.handleRequestResult(msg)
+        default: return .unhandled($0)
+        }
+
+        return .same
+    }
+
+
+    // MARK: -
 
     required init(_ param: Params) {
         self.param = param
     }
 
-    /// Behavior for handling requests to StoreKit.
-    lazy var requestsBehavior = behavior { [unowned self] in
-        guard let msg = $0 as? Action else {
-            return .unhandled($0)
-        }
-
-        switch msg {
-        case .buyProduct(let product):
-            let payment = SKPayment(product: product)
-            SKPaymentQueue.default().add(payment)
-            return .new(self.waitingBehavior(.none))
-
-        case .refreshReceipt:
-            let responseDelegate = ReceiptRefreshRequestDelegate(replyTo: self)
-            let request = SKReceiptRefreshRequest()
-            request.delegate = responseDelegate
-            request.start()
-            return .new(self.waitingBehavior(responseDelegate))
-        }
+    func buyProduct(_ product: SKProduct) {
+        SKPaymentQueue.default().add(SKPayment(product: product))
     }
 
-    /// Behavior for handling responses from StoreKit requests.
-    fileprivate lazy var waitingForRequest =
-    { [unowned self] (delegate: ObjCDelegate?, msg: AnyMessage) -> Receive in
-        switch msg {
-        case let msg as TransactionMessage:
-            self.handleStoreKitTransaction(msg)
+    func refreshReceipt() {
+        let responseDelegate = ReceiptRefreshRequestDelegate(replyTo: self)
+        let request = SKReceiptRefreshRequest()
+        request.delegate = responseDelegate
+        request.start()
+    }
 
-        case let msg as RequestResult:
-            switch msg {
-            case .receiptRefreshResult(let result):
-                switch result {
-                case .success:
-                    self.receiptData = .fromLocalReceipt(self.param.appBundle)
-                case .failure(let error):
-                    // TODO!! maybe show an error message to the user
-                    break
-                }
+    func restoreTransactions() {
+        SKPaymentQueue.default().restoreCompletedTransactions()
+    }
+
+    func completePsiCashTransactions() {
+        // Completes all pending PsiCash transactions.
+        for tx in self.psiCashPendingTransactions {
+            SKPaymentQueue.default().finishTransaction(tx)
+        }
+        self.psiCashPendingTransactions.removeAll()
+    }
+
+    private func handleRequestResult(_ msg: RequestResult) {
+        switch msg {
+        case .receiptRefreshResult(let result):
+            switch result {
+            case .success:
+                self.receiptData = .fromLocalReceipt(self.param.appBundle)
+            case .failure(_):
+                // TODO!! maybe show an error message to the user
+                break
             }
-        default: return .unhandled(msg)
-            // TODO!!! this is incorrect, should be .new(self.requestsEnabledBehavior)
-        }
 
-        // TODO!! is this correct?
-        return .same
-    }
-
-    lazy var waitingBehavior = { (delegate: ObjCDelegate?) -> Behavior in
-        behavior { [unowned self] in
-            self.waitingForRequest(delegate, $0)
         }
     }
-
-    lazy var requestEnabledBehavior = self.waitingBehavior(.none) | self.requestsBehavior
-    lazy var receive = self.requestEnabledBehavior
 
     private func handleStoreKitTransaction(_ msg: TransactionMessage) {
         switch msg {
 
         case .updatedTransaction(let result):
             switch result {
+
             case .success(let transactions):
-                self.handleUpdatedTransaction(transactions)
+                var updateReceiptData = false
+                for transaction in transactions {
+
+                    switch transaction.transactionState {
+                    case .purchasing, .deferred:
+                        break
+
+                    case .failed:
+                        break // TODO!!! report error to the user.
+
+                    case .purchased:
+                        switch try! ProductIdType.type(of: transaction) {
+                        case .psiCash:
+                            self.psiCashPendingTransactions.append(transaction)
+                        case .subscription:
+                            SKPaymentQueue.default().finishTransaction(transaction)
+                        }
+                        updateReceiptData = true
+
+                    case .restored:
+                        SKPaymentQueue.default().finishTransaction(transaction)
+                        updateReceiptData = true
+
+                    @unknown default:
+                        assertionFailure("unknown transaction state \(transaction.transactionState)")
+                    }
+                }
+                if updateReceiptData {
+                    self.receiptData = .fromLocalReceipt(self.param.appBundle)
+                }
+
             case .failure(let error):
                 print(#file, #line, "failed updated transactions: \(error)")
             }
 
         case .didChangeStoreFront:
             print(#file, #line, "did change store front")
-        case .completedTransactionsFinished:
+
+        case .restoredCompletedTransactions:
             print(#file, #line, "completed transactions finished")
-        case .removedTransactions(let transactions):
-            print(#file, #line, "removed transactions: \(transactions)")
+            self.receiptData = .fromLocalReceipt(self.param.appBundle)
 
-        }
-    }
-
-    private func handleUpdatedTransaction(_ transactions: [SKPaymentTransaction]) {
-
-        // TODO!! is this necessary here?
-        //        looks like we're doing it a bit too much
-        //        updateSubscriptionDictionaryFromLocalReceipt()
-
-        for transaction in transactions {
-            switch transaction.transactionState {
-            case .purchasing:
-                break
-            case .deferred:
-                break
-            case .purchased:
-                SKPaymentQueue.default().finishTransaction(transaction)
-            case .failed:
-                // TODO!! use the error property to present a message to the user.
-                //                let error = transaction.error
-                SKPaymentQueue.default().finishTransaction(transaction)
-            case .restored:
-                SKPaymentQueue.default().finishTransaction(transaction)
-            @unknown default:
-                assertionFailure("unknown transaction state \(transaction.transactionState)")
-            }
         }
     }
 
@@ -188,8 +202,6 @@ class IAPActor: Actor {
                           param: self.param.subscriptonActorParam,
                           qos: .userInteractive)
         self.subscriptionActor = self.param.actorBuilder.makeActor(self, props, type: .subscription)
-
-        // TODO!! subscription actor needs to be notificed whenever the receipt data chagnes.
         self.receiptData = .fromLocalReceipt(self.param.appBundle)
     }
 
@@ -198,7 +210,6 @@ class IAPActor: Actor {
     }
 
 }
-
 
 /// Sorts `products` in ascending order by price.
 func sortedByPrice(_ products: [SKProduct]) -> [SKProduct] {
@@ -214,35 +225,29 @@ fileprivate class PaymentTransactionDelegate: ActorDelegate, SKPaymentTransactio
     // Sent when transactions are removed from the queue (via finishTransaction:).
     func paymentQueue(_ queue: SKPaymentQueue, removedTransactions
         transactions: [SKPaymentTransaction]) {
-
-        // TODO!! IAPStoreHelper didn't implement this callback.
-        actor ! IAPActor.TransactionMessage.removedTransactions(transactions)
+        // NO-OP
     }
 
     // Sent when an error is encountered while adding transactions from the user's purchase history back to the queue.
     func paymentQueue(_ queue: SKPaymentQueue,
                       restoreCompletedTransactionsFailedWithError error: Error) {
-
-        // TODO!!
-        // [self updateSubscriptionDictionaryFromLocalReceipt];
-        actor ! IAPActor.TransactionMessage.updatedTransaction(.failure(error))
+        actor ! IAPActor.TransactionMessage.restoredCompletedTransactions(error: error)
     }
 
     // Sent when all transactions from the user's purchase history have successfully been added back to the queue.
     func paymentQueueRestoreCompletedTransactionsFinished(_ queue: SKPaymentQueue) {
-        // TODO!!
-        // [self updateSubscriptionDictionaryFromLocalReceipt];
-        actor ! IAPActor.TransactionMessage.completedTransactionsFinished
+        actor ! IAPActor.TransactionMessage.restoredCompletedTransactions(error: .none)
     }
 
     // Sent when a user initiates an IAP buy from the App Store
     @available(iOS 11.0, *)
-    func paymentQueue(_ queue: SKPaymentQueue, shouldAddStorePayment payment: SKPayment, for product: SKProduct) -> Bool {
-        // TODO!! do we even want to keep this around?
+    func paymentQueue(_ queue: SKPaymentQueue, shouldAddStorePayment payment: SKPayment,
+                      for product: SKProduct) -> Bool {
         return false
     }
 
-    // Sent when the transaction array has changed (additions or state changes).  Client should check state of transactions and finish as appropriate.
+    // Sent when the transaction array has changed (additions or state changes).
+    // Client should check state of transactions and finish as appropriate.
     func paymentQueue(_ queue: SKPaymentQueue,
                       updatedTransactions transactions: [SKPaymentTransaction]) {
         actor ! IAPActor.TransactionMessage.updatedTransaction(.success(transactions))
@@ -268,82 +273,4 @@ fileprivate class ReceiptRefreshRequestDelegate: ActorDelegate, SKRequestDelegat
         actor ! IAPActor.RequestResult.receiptRefreshResult(.failure(error))
     }
 
-}
-
-
-struct ReceiptData: Equatable, Codable {
-    let fileSize: Int
-
-    /// Subscription data stored in the receipt.
-    /// Nil if no subscription data is found in the receipt.
-    let subscription: SubscriptionData?
-    // TODO! add consumables here
-    // let consumable: Array<Something>
-
-    /// Parses local app receipt and returns a `RceiptData` object.
-    /// If no receipt file is found at path pointed to by the `Bundle` `.none` is returned.
-    /// - Note: It is expected for the `Bundle` object to have a valid 
-    static func fromLocalReceipt(_ appBundle: Bundle) -> ReceiptData? {
-
-        // TODO!! what are the cases where this is nil?
-        let receiptURL = appBundle.appStoreReceiptURL!
-        let appBundleIdentifier = appBundle.bundleIdentifier!
-
-        guard FileManager.default.fileExists(atPath: receiptURL.path) else {
-            // TODO!! do something? receipt file doesn't exist. Why was this function called at all?
-            return .none
-        }
-        guard let receiptData = AppStoreReceiptData.parseReceipt(receiptURL) else {
-            // TODO!! maybe do something if the parsing fails.
-            return .none
-        }
-        // Validate bundle identifier.
-        guard receiptData.bundleIdentifier == appBundleIdentifier else {
-            // TODO!! maybe do something if the bundle identifiers don't match
-            return .none
-        }
-        guard let inAppSubscription = receiptData.inAppSubscriptions else {
-            return .none
-        }
-        guard let castedInAppSubscription = inAppSubscription as? [String: Any] else {
-            return .none
-        }
-
-        let subscriptionData =
-            SubscriptionData.fromSubsriptionDictionary(castedInAppSubscription)
-
-        return ReceiptData(fileSize: receiptData.fileSize as! Int,
-                           subscription: subscriptionData)
-    }
-
-}
-
-
-// TODO! store and recover this struct instead of the subscription dictionary
-struct SubscriptionData: Equatable, Codable {
-    let latestExpiry: Date
-    let productId: String
-    let hasBeenInIntroPeriod: Bool
-
-    // Enum values match dictionary keys defined in "IAPStoreHelper.h"
-    private enum ReceiptFields: String {
-        case appReceiptFileSize = "app_receipt_file_size"
-        case latestExpirationDate = "latest_expiration_date"
-        case productId = "product_id"
-        case hasBeenInIntroPeriod = "has_been_in_intro_period"
-    }
-
-    static func fromSubsriptionDictionary(_ dict: [String: Any]) -> SubscriptionData? {
-        guard let expiration = dict[ReceiptFields.latestExpirationDate] as? Date else {
-            return .none
-        }
-        guard let productId = dict[ReceiptFields.productId] as? String else {
-            return .none
-        }
-        guard let introPeriod = dict[ReceiptFields.hasBeenInIntroPeriod] as? Bool else {
-            return .none
-        }
-        return SubscriptionData(latestExpiry: expiration, productId: productId,
-                                hasBeenInIntroPeriod: introPeriod)
-    }
 }

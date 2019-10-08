@@ -136,10 +136,9 @@ class PsiCashActor: Actor, Publisher {
             return .unhandled($0)
         }
 
-        /// If tunnel is not connected, sends error message `tunnelNotConnected`
-        /// to sender (if any).
+        /// If tunnel is not connected, fulfills the promises with failure.
+        /// Next behavior does not change and is still `tunneledBehavior`.
         guard case .connected = self.vpnManager.tunnelProviderStatus else {
-
             switch action {
             case .refreshState(let promise):
                 promise?.fulfill(.failure(.tunnelNotConnected))
@@ -147,7 +146,6 @@ class PsiCashActor: Actor, Publisher {
                 promise.fulfill(.failure(.tunnelNotConnected))
             default: return .unhandled(action)
             }
-
             return .same
         }
 

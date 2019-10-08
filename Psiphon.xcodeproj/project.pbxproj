@@ -64,7 +64,7 @@
 		4EC5526620AB8DCD000B4BEA /* PastelView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4EC5526520AB8DCD000B4BEA /* PastelView.m */; };
 		52055D04230C823100244F9E /* GradientButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52055D03230C823100244F9E /* GradientButton.swift */; };
 		52055D06230C833700244F9E /* SpeedBoostButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52055D05230C833700244F9E /* SpeedBoostButton.swift */; };
-		521D084E2346A75700403B48 /* IAPStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 521D084D2346A75700403B48 /* IAPStore.swift */; };
+		521D084E2346A75700403B48 /* InAppPurchase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 521D084D2346A75700403B48 /* InAppPurchase.swift */; };
 		521FD0EF219E0D5600F748EC /* DebugDirectoryViewerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 521FD0E5219E0D5500F748EC /* DebugDirectoryViewerViewController.m */; };
 		521FD0F0219E0D5600F748EC /* DebugLogViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 521FD0E6219E0D5500F748EC /* DebugLogViewController.m */; };
 		521FD0F1219E0D5600F748EC /* DebugToolboxViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 521FD0E7219E0D5600F748EC /* DebugToolboxViewController.m */; };
@@ -371,7 +371,7 @@
 		4EC82F8E20C713DF004C2E9F /* hi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = hi; path = Strings/hi.lproj/Localizable.strings; sourceTree = "<group>"; };
 		52055D03230C823100244F9E /* GradientButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GradientButton.swift; sourceTree = "<group>"; };
 		52055D05230C833700244F9E /* SpeedBoostButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeedBoostButton.swift; sourceTree = "<group>"; };
-		521D084D2346A75700403B48 /* IAPStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IAPStore.swift; sourceTree = "<group>"; };
+		521D084D2346A75700403B48 /* InAppPurchase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InAppPurchase.swift; sourceTree = "<group>"; };
 		521FD0E5219E0D5500F748EC /* DebugDirectoryViewerViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DebugDirectoryViewerViewController.m; path = Psiphon/Debug/DebugDirectoryViewerViewController.m; sourceTree = SOURCE_ROOT; };
 		521FD0E6219E0D5500F748EC /* DebugLogViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DebugLogViewController.m; path = Psiphon/Debug/DebugLogViewController.m; sourceTree = SOURCE_ROOT; };
 		521FD0E7219E0D5600F748EC /* DebugToolboxViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DebugToolboxViewController.m; path = Psiphon/Debug/DebugToolboxViewController.m; sourceTree = SOURCE_ROOT; };
@@ -1073,7 +1073,7 @@
 				5245C5C82342A6840033EE13 /* UserDefaults.swift */,
 				5245C5D12344F8880033EE13 /* IAPActor.swift */,
 				5245C5D323452DF30033EE13 /* ActorBuilder.swift */,
-				521D084D2346A75700403B48 /* IAPStore.swift */,
+				521D084D2346A75700403B48 /* InAppPurchase.swift */,
 			);
 			path = Psiphon;
 			sourceTree = "<group>";
@@ -1621,7 +1621,7 @@
 				445F24E020E1A5BA00D004E9 /* INTEGER.c in Sources */,
 				445F24DD20E1A5BA00D004E9 /* per_encoder.c in Sources */,
 				4EC5526320AB8DBE000B4BEA /* Pastel.m in Sources */,
-				521D084E2346A75700403B48 /* IAPStore.swift in Sources */,
+				521D084E2346A75700403B48 /* InAppPurchase.swift in Sources */,
 				52467FE122C2A704009AEC6E /* PsiCashModels.swift in Sources */,
 				9BFEC530849525066327C815 /* VPNManager.m in Sources */,
 				445F24F620E1A85D00D004E9 /* UTF8String.c in Sources */,
