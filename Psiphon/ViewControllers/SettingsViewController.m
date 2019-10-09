@@ -29,6 +29,7 @@
 #import "AdManager.h"
 #import "Strings.h"
 #import "UIAlertController+Additions.h"
+#import "Psiphon-Swift.h"
 
 // Specifier keys for cells in settings menu
 // These keys are defined in Psiphon/InAppSettings.bundle/Root.inApp.plist
@@ -69,10 +70,8 @@ NSString * const SettingsResetAdConsentCellSpecifierKey = @"settingsResetAdConse
     __weak SettingsViewController *weakSelf = self;
 
     __block RACDisposable *subscriptionStatusDisposable = [[AppDelegate sharedAppDelegate].subscriptionStatus
-      subscribeNext:^(NSNumber *value) {
-          UserSubscriptionStatus s = (UserSubscriptionStatus) [value integerValue];
-
-          weakSelf.hasActiveSubscription = (s == UserSubscriptionActive);
+      subscribeNext:^(ObjcUserSubscription *status) {
+          weakSelf.hasActiveSubscription = (status.state == ObjcSubscriptionStateActive);
           [self updateSubscriptionCell];
           [weakSelf updateHiddenKeys];
 

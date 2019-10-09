@@ -36,6 +36,7 @@
 #import "RoyalSkyButton.h"
 #import "DispatchUtils.h"
 #import "Nullity.h"
+#import "Psiphon-Swift.h"
 
 // Ratio of the width of table view cell's content to the cell.
 #define CellContentWithMultiplier 0.88
@@ -682,10 +683,16 @@ static NSString *iapCellID = @"IAPTableCellID";
 
     [self showProgressSpinnerAndBlockUI];
 
-    if([IAPStoreHelper sharedInstance].storeProducts.count > productID) {
-        SKProduct* product = [IAPStoreHelper sharedInstance].storeProducts[productID];
-        [[IAPStoreHelper sharedInstance] buyProduct:product];
-    }
+    // TODO!! remove the entire IAPStoreHelper class, except cases where you can't.
+//
+//
+//    if([IAPStoreHelper sharedInstance].storeProducts.count > productID) {
+//        [[IAPStoreHelper sharedInstance] buyProduct:product];
+//    }
+
+    // debug remove
+    SKProduct* product = [IAPStoreHelper sharedInstance].storeProducts[productID];
+    [SwiftAppDelegate.instance buyProdcut:product];
 }
 
 - (void)openURL:(NSURL*)url {

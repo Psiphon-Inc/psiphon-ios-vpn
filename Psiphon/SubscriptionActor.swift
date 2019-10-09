@@ -30,20 +30,17 @@ let userDefaultsSubscriptionDictionary = "kSubscriptionDictionary"
 
 infix operator | : TernaryPrecedence
 
-typealias SubscriptionActorPublisher = ActorPublisher<SubscriptionActor>
-
 enum SubscriptionState: Equatable {
     case subscribed(SubscriptionData)
     case notSubscribed
     case unknown
 }
 
-class SubscriptionActor: Actor, Publisher {
-    typealias PublishedType = SubscriptionState
+class SubscriptionActor: Actor {
     typealias ParamType = Param
 
     struct Param {
-        let publisher: ReplaySubject<PublishedType>
+        let publisher: ReplaySubject<SubscriptionState>
         let notifier: Notifier
         let sharedDB: PsiphonDataSharedDB
         let userDefaultsConfig: UserDefaultsConfig
@@ -51,6 +48,9 @@ class SubscriptionActor: Actor, Publisher {
 
     enum Action: AnyMessage {
         case updatedReceiptData(ReceiptData)
+    }
+
+    private enum ResultAction: AnyMessage {
         case timerFinishedWithExpiry(Date)
     }
 
@@ -79,53 +79,61 @@ class SubscriptionActor: Actor, Publisher {
     }
 
     lazy var receive = behavior { [unowned self] in
-        guard let msg = $0 as? Action else {
-            return .unhandled($0)
-        }
 
-        switch msg {
-        case .updatedReceiptData(let data):
-            guard data.subscription != self.subscriptionData else {
+        switch $0 {
+        case let msg as Action:
+            switch msg {
+
+            case .updatedReceiptData(let data):
+                guard data.subscription != self.subscriptionData else {
+                    return .same
+                }
+
+                self.subscriptionData = data.subscription
+                updatePersistedData(forSubscription: data, self.param.sharedDB,
+                                    self.param.userDefaultsConfig)
+
+                (self.state, self.expiryTimer) = timerFrom(
+                    subscriptionData: data.subscription,
+                    leeway: Self.leeway,
+                    notImmediatleyExpiring: { [unowned self] (intervalToExpired: TimeInterval) in
+                        // Asks the extension to perform a subscription check,
+                        // only if at least `notifierMinSubDuration` is remaining.
+                        if intervalToExpired > Self.notifierMinSubDuration {
+                            self.param.notifier.post(NotifierForceSubscriptionCheck)
+                        }
+                    }, timerFinished: { [unowned self] expiry in
+                        self ! ResultAction.timerFinishedWithExpiry(expiry)
+                })
+
                 return .same
             }
 
-            self.subscriptionData = data.subscription
-            updatePersistedData(forSubscription: data, self.param.sharedDB,
-                                self.param.userDefaultsConfig)
+        case let msg as ResultAction:
 
-            (self.state, self.expiryTimer) = timerFrom(
-                subscriptionData: data.subscription,
-                leeway: Self.leeway,
-                notImmediatleyExpiring: { [unowned self] (intervalToExpired: TimeInterval) in
-                    // Asks the extension to perform a subscription check,
-                    // only if at least `notifierMinSubDuration` is remaining.
-                    if intervalToExpired > Self.notifierMinSubDuration {
-                        self.param.notifier.post(NotifierForceSubscriptionCheck)
-                    }
-                }, timerFinished: { [unowned self] expiry in
-                    self ! Action.timerFinishedWithExpiry(expiry)
-            })
+            switch msg {
+            case .timerFinishedWithExpiry(let expiry):
 
-        case .timerFinishedWithExpiry(let expiry):
+                /// In case of a race condition where an `.updateSubscription` message is received
+                /// immediately before a `.timerFinishedWithExpiry`, the expiration dates
+                /// are compared.
+                /// If the current subscription data has a later expiry date than the expiry date in
+                /// `.timerFinishedWithExpiry` associated value, then we ignore the message.
 
-            /// In case of a race condition where an `.updateSubscription` message is received
-            /// immediately before a `.timerFinishedWithExpiry`, the expiration dates
-            /// are compared.
-            /// If the current subscription data has a later expiry date than the expiry date in
-            /// `.timerFinishedWithExpiry` associated value, then we ignore the message.
+                guard let subscriptionData = self.subscriptionData else {
+                    return .unhandled(msg)
+                }
 
-            guard let subscriptionData = self.subscriptionData else {
-                return .unhandled(msg)
+                /// If the current expiry is different from the expiry that the message was sent with.
+                if expiry <= subscriptionData.latestExpiry {
+                    self.expiryTimer = .none
+                    self.state = .notSubscribed
+                }
+                return .same
             }
 
-            /// If the current expiry is different from the expiry that the message was sent with.
-            if expiry <= subscriptionData.latestExpiry {
-                self.expiryTimer = .none
-                self.state = .notSubscribed
-            }
-
+        default: return .unhandled($0)
         }
-        return .same
     }
 
     func postStop() {

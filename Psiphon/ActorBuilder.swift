@@ -23,7 +23,7 @@ import SwiftActors
 enum AppActorType: String {
     case psiCash
     case landingPage
-    case storeKit
+    case inAppPurchase
     case subscription
 }
 

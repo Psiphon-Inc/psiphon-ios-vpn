@@ -66,16 +66,15 @@ NSTimeInterval const InternetReachabilityCheckTimeout = 10.0;
 
 PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
 
-@interface AppDelegate () <NotifierObserver>
+@interface AppDelegate () <NotifierObserver, SwiftToObjBridge>
 
 // Public properties
 
 @property (nonatomic, nullable, readwrite) RACMulticastConnection<AppEvent *> *appEvents;
 
-// TODO!! re-enable for backwards compatibility
 //// subscriptionStatus should only be sent events to from the main thread.
-//// Emits type UserSubscriptionStatus
-@property (nonatomic, readwrite) RACReplaySubject<NSNumber *> *subscriptionStatus;
+//// Emits type ObjcUserSubscription
+@property (nonatomic, readwrite) RACReplaySubject<ObjcUserSubscription *> *subscriptionStatus;
 
 // Private properties
 @property (nonatomic) RACCompoundDisposable *compoundDisposable;
@@ -98,7 +97,6 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
     self = [super init];
     if (self) {
         _subscriptionStatus = [RACReplaySubject replaySubjectWithCapacity:1];
-        [_subscriptionStatus sendNext:@(UserSubscriptionUnknown)];
 
         _vpnManager = [VPNManager sharedInstance];
         _sharedDB = [[PsiphonDataSharedDB alloc] initForAppGroupIdentifier:APP_GROUP_IDENTIFIER];
@@ -152,6 +150,8 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     LOG_DEBUG();
 
+    [SwiftAppDelegate.instance setWithBridge:self];
+
     __weak AppDelegate *weakSelf = self;
 
     // App events signal.
@@ -180,13 +180,11 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
         // Infinite cold signal - emits @(TRUE) if user has an active subscription, @(FALSE) otherwise.
         // Note: Nothing is emitted if the subscription status is unknown.
         RACSignal<NSNumber *> *activeSubscriptionSignal = [[[AppDelegate sharedAppDelegate].subscriptionStatus
-          filter:^BOOL(NSNumber *value) {
-              UserSubscriptionStatus s = (UserSubscriptionStatus) [value integerValue];
-              return s != UserSubscriptionUnknown;
+          filter:^BOOL(ObjcUserSubscription *status) {
+            return status.state != ObjcSubscriptionStateUnknown;
           }]
-          map:^NSNumber *(NSNumber *value) {
-              UserSubscriptionStatus s = (UserSubscriptionStatus) [value integerValue];
-              return @(s == UserSubscriptionActive);
+          map:^NSNumber *(ObjcUserSubscription *status) {
+              return @(status.state == ObjcSubscriptionStateActive);
           }];
 
         // Infinite cold signal - emits events of type @(TunnelState) for various tunnel events.
@@ -281,7 +279,7 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
 
         [self.compoundDisposable addDisposable:[[AppDelegate sharedAppDelegate].appEvents connect]];
 
-        [SwiftAppDelegate.instance setVPNManager:VPNManager.sharedInstance];
+        [SwiftAppDelegate.instance setWithVpnManager:VPNManager.sharedInstance];
         [SwiftAppDelegate.instance applicationDidFinishLaunching:application];
     }
 
@@ -612,6 +610,10 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
           }
 
       }];
+}
+
+- (void)onSubscriptionStatus:(ObjcUserSubscription *)status {
+    [self.subscriptionStatus sendNext:status];
 }
 
 @end

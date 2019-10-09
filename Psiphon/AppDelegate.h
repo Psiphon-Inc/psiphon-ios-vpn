@@ -22,18 +22,19 @@
 
 @class RACReplaySubject<ValueType>;
 @class RACMulticastConnection<__covariant ValueType>;
+@class ObjcUserSubscription;
 
-/**
- * User's subscription status.
- */
-typedef NS_ENUM(NSInteger, UserSubscriptionStatus) {
-    /** @const UserSubscriptionUnknown User's subscription status is not known yet (pending). */
-    UserSubscriptionUnknown = 1,
-    /** @const UserSubscriptionInActive User does not have an active subscription. */
-    UserSubscriptionInactive,
-    /** @const UserSubscriptionActive User has an active subscription. */
-    UserSubscriptionActive
-};
+///**
+// * User's subscription status.
+// */
+//typedef NS_ENUM(NSInteger, UserSubscriptionStatus) {
+//    /** @const UserSubscriptionUnknown User's subscription status is not known yet (pending). */
+//    UserSubscriptionUnknown = 1,
+//    /** @const UserSubscriptionInActive User does not have an active subscription. */
+//    UserSubscriptionInactive,
+//    /** @const UserSubscriptionActive User has an active subscription. */
+//    UserSubscriptionActive
+//};
 
 @interface AppDelegate : UIResponder <UIApplicationDelegate>
 
@@ -50,7 +51,7 @@ typedef NS_ENUM(NSInteger, UserSubscriptionStatus) {
  *
  * @scheduler vpnStartStatus delivers its events on the main thread.
  */
-@property (nonatomic, readonly) RACReplaySubject<NSNumber *> *subscriptionStatus;
+@property (nonatomic, readonly) RACReplaySubject<ObjcUserSubscription *> *subscriptionStatus;
 
 + (AppDelegate *)sharedAppDelegate;
 

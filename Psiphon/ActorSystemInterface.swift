@@ -21,7 +21,7 @@ import Foundation
 import SwiftActors
 import RxSwift
 import Promises
-
+import StoreKit
 
 /// Bridges VPN status observable to Swift.
 @objc class VPNStatusBridge: NSObject {
@@ -36,6 +36,19 @@ import Promises
 
 }
 
+@objc protocol SwiftToObjBridge {
+    @objc func onSubscriptionStatus(_ status: ObjcUserSubscription)
+}
+
+
+@objc protocol LandingPageMessages {
+    @objc func resetLandingPage()
+    @objc func showLandingPage()
+}
+
+@objc protocol IAPMessages {
+    @objc func buyProdcut(_ prouct: SKProduct)
+}
 
 // MARK: SwiftAppDelegate
 @objc class SwiftAppDelegate: NSObject {
@@ -46,10 +59,13 @@ import Promises
     let system = ActorSystem(name: "system")
     let sharedDB = PsiphonDataSharedDB(forAppGroupIdentifier: APP_GROUP_IDENTIFIER)
     let notifier = Notifier.sharedInstance()
+    let userConfigs = UserDefaultsConfig()
     var vpnManager: VPNManager!
 
-    let disposeBag = DisposeBag()
     var appRoot: ActorRef?
+    var bridge: SwiftToObjBridge!
+
+    let disposeBag = DisposeBag()
     let services = Services()
 
     /// Spawns app root actor `AppRoot`.
@@ -59,6 +75,7 @@ import Promises
                           param: AppRoot.Params(
                             actorBuilder: DefaultActorBuilder(),
                             sharedDB: self.sharedDB,
+                            userConfigs: self.userConfigs,
                             appBundle: Bundle.main,
                             notifier: self.notifier,
                             vpnManager: self.vpnManager,
@@ -68,7 +85,6 @@ import Promises
 
         return system.spawn(props, name: "AppRoot")
     }
-
 }
 
 extension SwiftAppDelegate: UIApplicationDelegate {
@@ -79,12 +95,21 @@ extension SwiftAppDelegate: UIApplicationDelegate {
 
         self.appRoot = makeAppRootActor()
 
+        self.services.subscriptionState.map { state -> ObjcUserSubscription in
+            .from(state: state)
+        }.subscribe(onNext: {
+            self.bridge.onSubscriptionStatus($0)
+        }).disposed(by: self.disposeBag)
+
+        /// Tells PsiCashActor to refresh state when the app is first launched.
         self.services.psiCash.currentState().subscribe(onSuccess: {
             $0?.actor ! PsiCashActor.Action.refreshState(.none)
-        }).disposed(by: self.disposeBag)
+        }) .disposed(by: self.disposeBag)
     }
 
     @objc func applicationWillEnterForeground(_ application: UIApplication) {
+        // TODO!!! This is duplicate of applicationDidFinishLaunching.
+        /// Tells PsiCashActor to refresh state when the app is first launched.
         self.services.psiCash.currentState().subscribe(onSuccess: {
             $0?.actor ! PsiCashActor.Action.refreshState(.none)
         }).disposed(by: self.disposeBag)
@@ -93,11 +118,17 @@ extension SwiftAppDelegate: UIApplicationDelegate {
 }
 
 
+
 // MARK: ObjC functions
 
 extension SwiftAppDelegate {
 
-    @objc func setVPNManager(_ vpnManager: VPNManager) {
+
+    @objc func set(bridge: SwiftToObjBridge) {
+        self.bridge = bridge
+    }
+
+    @objc func set(vpnManager: VPNManager) {
         self.vpnManager = vpnManager
     }
 
@@ -138,7 +169,7 @@ extension SwiftAppDelegate {
 }
 
 // MARK: LandingPageService interface
-extension SwiftAppDelegate {
+extension SwiftAppDelegate: LandingPageMessages {
 
     @objc func resetLandingPage() {
         // TODO! fix this
@@ -152,6 +183,17 @@ extension SwiftAppDelegate {
 
 }
 
+extension SwiftAppDelegate: IAPMessages {
+
+    func buyProdcut(_ product: SKProduct) {
+        services.iapActor.currentState().subscribe(onSuccess: {
+            $0? ! IAPActor.Action.buyProduct(product)
+            }).disposed(by: disposeBag)
+    }
+
+
+}
+
 
 /// Validates app's environment give the assumptions made in the app for certain invariants to hold true.
 /// - Note: Crashes the app if any of the vaidations fail.
@@ -159,3 +201,39 @@ func validateEnvironment(_ bundle: Bundle) {
     precondition(bundle.bundleIdentifier != nil, "Bundle 'bundleIdentifier' is nil")
     precondition(bundle.appStoreReceiptURL != nil, "Bundle 'appStoreReceiptURL' is nil'")
 }
+
+
+// MARK: User subscription status
+
+@objc enum ObjcSubscriptionState: Int {
+    case unknown
+    case active
+    case inactive
+}
+
+@objc class ObjcUserSubscription: NSObject {
+    @objc let state: ObjcSubscriptionState
+    @objc let latestExpiry: Date?
+    @objc let productId: String?
+    @objc let hasBeenInIntroPeriod: Bool
+
+    init(_ state: ObjcSubscriptionState, _ data: SubscriptionData?) {
+        self.state = state
+        self.latestExpiry = data?.latestExpiry
+        self.productId = data?.productId
+        self.hasBeenInIntroPeriod = data?.hasBeenInIntroPeriod ?? false
+    }
+
+    static func from(state: SubscriptionState) -> ObjcUserSubscription {
+        switch state {
+        case .subscribed(let data):
+            return .init(.active, data)
+        case .notSubscribed:
+            return .init(.inactive, .none)
+        case .unknown:
+            return .init(.unknown, .none)
+        }
+    }
+
+}
+

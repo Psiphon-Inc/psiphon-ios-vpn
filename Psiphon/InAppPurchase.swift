@@ -56,19 +56,17 @@ enum ProductIdType: String {
     case psiCash = "psiCashProductIds"
 
     static func type(of transaction: SKPaymentTransaction) throws -> ProductIdType {
-        guard let txIdentifier = transaction.transactionIdentifier else {
-            fatalError("transaction has no identifier: '\(String(describing: transaction))'")
-        }
+        let productIdentifier = transaction.payment.productIdentifier
 
-        if txIdentifier.hasPrefix("ca.psiphon.Psiphon.psicash.") {
+        if productIdentifier.hasPrefix("ca.psiphon.Psiphon.psicash.") {
             return .psiCash
         }
 
-        if txIdentifier.hasPrefix("ca.psiphon.Psiphon.") {
+        if productIdentifier.hasPrefix("ca.psiphon.Psiphon.") {
             return .subscription
         }
 
-        throw ProductIdError.invalidString(txIdentifier)
+        throw ProductIdError.invalidString(productIdentifier)
     }
 }
 

@@ -263,19 +263,20 @@ NSString * const CommandStopVPN = @"StopVPN";
 
 
     // Subscribes to AppDelegate subscription signal.
-    __block RACDisposable *disposable = [[AppDelegate sharedAppDelegate].subscriptionStatus
-      subscribeNext:^(NSNumber *value) {
+    __block RACDisposable *disposable = [[[AppDelegate sharedAppDelegate].subscriptionStatus
+      deliverOnMainThread]
+      subscribeNext:^(ObjcUserSubscription *status) {
           MainViewController *__strong strongSelf = weakSelf;
           if (strongSelf != nil) {
-              UserSubscriptionStatus s = (UserSubscriptionStatus) [value integerValue];
 
-              if (s == UserSubscriptionUnknown) {
+
+              if (status.state == ObjcSubscriptionStateUnknown) {
                   return;
               }
 
-              [strongSelf->subscriptionsBar subscriptionActive:(s == UserSubscriptionActive)];
+              [strongSelf->subscriptionsBar subscriptionActive:(status.state == ObjcSubscriptionStateActive)];
 
-              BOOL showPsiCashUI = (s == UserSubscriptionInactive);
+              BOOL showPsiCashUI = (status.state == ObjcSubscriptionStateInactive);
               [strongSelf setPsiCashContentHidden:!showPsiCashUI];
           }
       } error:^(NSError *error) {
@@ -373,8 +374,6 @@ NSString * const CommandStopVPN = @"StopVPN";
 
 - (RACSignal<RACUnit *> *)activeStateLoadingSignal {
 
-    return [RACSignal return:RACUnit.defaultUnit];
-
     // adsLoadingSignal emits a value when untunnelled interstitial ad has loaded or
     // when MaxAdLoadingTime has passed.
     // If the device in not in untunneled state, this signal makes an emission and
@@ -407,16 +406,15 @@ NSString * const CommandStopVPN = @"StopVPN";
 
     // subscriptionLoadingSignal emits a value when the user subscription status becomes known.
     RACSignal *subscriptionLoadingSignal = [[[AppDelegate sharedAppDelegate].subscriptionStatus
-      filter:^BOOL(NSNumber *value) {
-          UserSubscriptionStatus s = (UserSubscriptionStatus) [value integerValue];
-          return (s != UserSubscriptionUnknown);
+      filter:^BOOL(ObjcUserSubscription *status) {
+        return status.state != ObjcSubscriptionStateUnknown;
       }]
       take:1];
 
     // Returned signal emits RACUnit and completes immediately after all loading operations
     // are done.
-    return [subscriptionLoadingSignal flattenMap:^RACSignal *(NSNumber *value) {
-        BOOL subscribed = ([value integerValue] == UserSubscriptionActive);
+    return [subscriptionLoadingSignal flattenMap:^RACSignal *(ObjcUserSubscription *status) {
+        BOOL subscribed = (status.state == ObjcSubscriptionStateActive);
 
         if (subscribed) {
             // User is subscribed, dismiss the loading screen immediately.
@@ -1096,7 +1094,7 @@ NSString * const CommandStopVPN = @"StopVPN";
     // Sets button action
     [psiCashWidget.speedBoostButton addTarget:self action:@selector(speedBoostButton) forControlEvents:UIControlEventTouchUpInside];
 
-    // TODO! PsiCash: deactivated to compiler for now.
+    // TODO! PsiCash: deactivated to compile for now.
 //    psiCashViewHeight = [psiCashView.heightAnchor constraintEqualToConstant:146.9];
 //    psiCashViewHeight.active = YES;
 //

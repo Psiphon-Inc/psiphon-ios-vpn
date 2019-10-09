@@ -22,7 +22,7 @@ import Foundation
 // TODO! Consider using ZippyJSON
 
 @propertyWrapper
-struct UserDefault<T: Codable> {
+struct UserDefault<T> {
     let key: String
     let defaultValue: T
     let store: UserDefaults
@@ -41,13 +41,37 @@ struct UserDefault<T: Codable> {
             store.set(newValue, forKey: key)
         }
     }
-
 }
 
+@propertyWrapper
+struct JSONUserDefault<T: Codable> {
+    let key: String
+    let defaultValue: T
+    let store: UserDefaults
+
+    init(_ store: UserDefaults, _ key: String, defaultValue: T) {
+        self.key = key
+        self.defaultValue = defaultValue
+        self.store = store
+    }
+
+    var wrappedValue: T {
+        get {
+            guard let data = store.data(forKey: key) else {
+                return defaultValue
+            }
+            return try! JSONDecoder().decode(T.self, from: data)
+        }
+        set {
+            let data = try! JSONEncoder().encode(newValue)
+            store.set(data, forKey: key)
+        }
+    }
+}
 
 class UserDefaultsConfig {
 
-    @UserDefault(.standard, "subscription_data_v1", defaultValue: .none)
+    @JSONUserDefault(.standard, "subscription_data_v1", defaultValue: .none)
     var subscriptionData: SubscriptionData?
 
 }

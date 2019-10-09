@@ -19,6 +19,7 @@
 #import "PsiphonDataSharedDB.h"
 #import "SharedConstants.h"
 #import "Notifier.h"
+#import "AppDelegate.h"
 
 // UI
 #import "UIColor+Additions.h"
