@@ -112,7 +112,6 @@ struct ReceiptData: Equatable, Codable {
         let appBundleIdentifier = appBundle.bundleIdentifier!
 
         guard FileManager.default.fileExists(atPath: receiptURL.path) else {
-            // TODO!! do something? receipt file doesn't exist. Why was this function called at all?
             return .none
         }
         guard let receiptData = AppStoreReceiptData.parseReceipt(receiptURL) else {

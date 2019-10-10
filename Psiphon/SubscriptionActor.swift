@@ -47,7 +47,7 @@ class SubscriptionActor: Actor {
     }
 
     enum Action: AnyMessage {
-        case updatedReceiptData(ReceiptData)
+        case updatedReceiptData(ReceiptData?)
     }
 
     private enum ResultAction: AnyMessage {
@@ -85,16 +85,17 @@ class SubscriptionActor: Actor {
             switch msg {
 
             case .updatedReceiptData(let data):
-                guard data.subscription != self.subscriptionData else {
+
+                updatePersistedData(receipt: data, self.param.sharedDB,
+                                    self.param.userDefaultsConfig)
+
+                guard data?.subscription != self.subscriptionData else {
                     return .same
                 }
 
-                self.subscriptionData = data.subscription
-                updatePersistedData(forSubscription: data, self.param.sharedDB,
-                                    self.param.userDefaultsConfig)
-
-                (self.state, self.expiryTimer) = timerFrom(
-                    subscriptionData: data.subscription,
+                self.subscriptionData = data?.subscription
+                (self.state, self.expiryTimer) = stateGiven(
+                    receiptData: data,
                     leeway: Self.leeway,
                     notImmediatleyExpiring: { [unowned self] (intervalToExpired: TimeInterval) in
                         // Asks the extension to perform a subscription check,
@@ -143,32 +144,16 @@ class SubscriptionActor: Actor {
 
 }
 
+func stateGiven(receiptData: ReceiptData?,
+                leeway: DispatchTimeInterval,
+                notImmediatleyExpiring: (TimeInterval) -> Void,
+                timerFinished: @escaping (Date) -> Void)-> (SubscriptionState, SingleFireTimer?) {
 
-/// Updates `UserDefaultsConfig` and `PsiphonDataSharedDB` based on the data 
-func updatePersistedData(forSubscription data: ReceiptData,
-                         _ sharedDB: PsiphonDataSharedDB,
-                         _ userDefaultsConfig: UserDefaultsConfig) {
-
-    guard let subscription = data.subscription else {
-        sharedDB.setContainerEmptyReceiptFileSize(data.fileSize as NSNumber)
-        return
-    }
-
-    userDefaultsConfig.subscriptionData = subscription
-
-    // The receipt contains purchase data, reset value in the shared DB.
-    sharedDB.setContainerEmptyReceiptFileSize(.none)
-    sharedDB.setContainerLastSubscriptionReceiptExpiryDate(subscription.latestExpiry)
-}
-
-/// Since subscriptions are in days, months and years, the timer can have a large leeway.
-func timerFrom(subscriptionData: SubscriptionData?,
-               leeway: DispatchTimeInterval,
-               notImmediatleyExpiring: (TimeInterval) -> Void,
-               timerFinished: @escaping (Date) -> Void) -> (SubscriptionState, SingleFireTimer?) {
-
-    guard let subscriptionData = subscriptionData else {
-        return (.notSubscribed, .none)
+    guard
+        let receiptData = receiptData,
+        let subscriptionData = receiptData.subscription
+        else {
+            return (.notSubscribed, .none)
     }
 
     let intervalToExpired = subscriptionData.latestExpiry.timeIntervalSinceNow
@@ -186,3 +171,24 @@ func timerFrom(subscriptionData: SubscriptionData?,
     return (.subscribed(subscriptionData), timer)
 }
 
+/// Updates `UserDefaultsConfig` and `PsiphonDataSharedDB` based on the data
+func updatePersistedData(receipt data: ReceiptData?,
+                         _ sharedDB: PsiphonDataSharedDB,
+                         _ userDefaultsConfig: UserDefaultsConfig) {
+
+    guard let data = data else {
+        sharedDB.setContainerEmptyReceiptFileSize(NSNumber(integerLiteral: 0))
+        return
+    }
+
+    guard let subscription = data.subscription else {
+        sharedDB.setContainerEmptyReceiptFileSize(data.fileSize as NSNumber)
+        return
+    }
+
+    userDefaultsConfig.subscriptionData = subscription
+
+    // The receipt contains purchase data, reset value in the shared DB.
+    sharedDB.setContainerEmptyReceiptFileSize(.none)
+    sharedDB.setContainerLastSubscriptionReceiptExpiryDate(subscription.latestExpiry)
+}
