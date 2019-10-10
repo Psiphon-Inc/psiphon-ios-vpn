@@ -85,13 +85,8 @@ class SubscriptionActor: Actor {
             switch msg {
 
             case .updatedReceiptData(let data):
-
                 updatePersistedData(receipt: data, self.param.sharedDB,
                                     self.param.userDefaultsConfig)
-
-                guard data?.subscription != self.subscriptionData else {
-                    return .same
-                }
 
                 self.subscriptionData = data?.subscription
                 (self.state, self.expiryTimer) = stateGiven(
