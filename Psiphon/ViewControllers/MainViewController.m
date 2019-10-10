@@ -265,18 +265,18 @@ NSString * const CommandStopVPN = @"StopVPN";
     // Subscribes to AppDelegate subscription signal.
     __block RACDisposable *disposable = [[[AppDelegate sharedAppDelegate].subscriptionStatus
       deliverOnMainThread]
-      subscribeNext:^(ObjcUserSubscription *status) {
+      subscribeNext:^(BridgedUserSubscription *status) {
           MainViewController *__strong strongSelf = weakSelf;
           if (strongSelf != nil) {
 
 
-              if (status.state == ObjcSubscriptionStateUnknown) {
+              if (status.state == BridgedSubscriptionStateUnknown) {
                   return;
               }
 
-              [strongSelf->subscriptionsBar subscriptionActive:(status.state == ObjcSubscriptionStateActive)];
+              [strongSelf->subscriptionsBar subscriptionActive:(status.state == BridgedSubscriptionStateActive)];
 
-              BOOL showPsiCashUI = (status.state == ObjcSubscriptionStateInactive);
+              BOOL showPsiCashUI = (status.state == BridgedSubscriptionStateInactive);
               [strongSelf setPsiCashContentHidden:!showPsiCashUI];
           }
       } error:^(NSError *error) {
@@ -406,15 +406,15 @@ NSString * const CommandStopVPN = @"StopVPN";
 
     // subscriptionLoadingSignal emits a value when the user subscription status becomes known.
     RACSignal *subscriptionLoadingSignal = [[[AppDelegate sharedAppDelegate].subscriptionStatus
-      filter:^BOOL(ObjcUserSubscription *status) {
-        return status.state != ObjcSubscriptionStateUnknown;
+      filter:^BOOL(BridgedUserSubscription *status) {
+        return status.state != BridgedSubscriptionStateUnknown;
       }]
       take:1];
 
     // Returned signal emits RACUnit and completes immediately after all loading operations
     // are done.
-    return [subscriptionLoadingSignal flattenMap:^RACSignal *(ObjcUserSubscription *status) {
-        BOOL subscribed = (status.state == ObjcSubscriptionStateActive);
+    return [subscriptionLoadingSignal flattenMap:^RACSignal *(BridgedUserSubscription *status) {
+        BOOL subscribed = (status.state == BridgedSubscriptionStateActive);
 
         if (subscribed) {
             // User is subscribed, dismiss the loading screen immediately.

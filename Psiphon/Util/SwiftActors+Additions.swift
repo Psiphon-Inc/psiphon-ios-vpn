@@ -37,20 +37,20 @@ struct ActorPublisher<P: Publisher> {
 class ObjCDelegate: NSObject {}
 
 
-class ActorDelegate: ObjCDelegate {
-    internal unowned let actor: ActorRef
-
-    init(replyTo: ActorRef) {
-        actor = replyTo
-    }
-}
-
-
 class PromiseDelegate<T>: ObjCDelegate {
 
     let promise: Promise<T>
 
     override init() {
         self.promise = Promise<T>.pending()
+    }
+}
+
+
+class ActorDelegate: ObjCDelegate {
+    internal unowned let actor: ActorRef
+
+    init(replyTo: ActorRef) {
+        actor = replyTo
     }
 }

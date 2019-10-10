@@ -22,7 +22,7 @@
 
 @class RACReplaySubject<ValueType>;
 @class RACMulticastConnection<__covariant ValueType>;
-@class ObjcUserSubscription;
+@class BridgedUserSubscription;
 
 ///**
 // * User's subscription status.
@@ -51,7 +51,7 @@
  *
  * @scheduler vpnStartStatus delivers its events on the main thread.
  */
-@property (nonatomic, readonly) RACReplaySubject<ObjcUserSubscription *> *subscriptionStatus;
+@property (nonatomic, readonly) RACReplaySubject<BridgedUserSubscription *> *subscriptionStatus;
 
 + (AppDelegate *)sharedAppDelegate;
 

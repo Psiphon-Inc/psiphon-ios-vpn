@@ -74,7 +74,7 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
 
 //// subscriptionStatus should only be sent events to from the main thread.
 //// Emits type ObjcUserSubscription
-@property (nonatomic, readwrite) RACReplaySubject<ObjcUserSubscription *> *subscriptionStatus;
+@property (nonatomic, readwrite) RACReplaySubject<BridgedUserSubscription *> *subscriptionStatus;
 
 // Private properties
 @property (nonatomic) RACCompoundDisposable *compoundDisposable;
@@ -141,9 +141,6 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
     // Initializes PsiphonClientCommonLibrary.
     [PsiphonClientCommonLibraryHelpers initializeDefaultsForPlistsFromRoot:@"Root.inApp"];
 
-
-    [[IAPStoreHelper sharedInstance] startProductsRequest];
-
     return YES;
 }
 
@@ -180,11 +177,11 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
         // Infinite cold signal - emits @(TRUE) if user has an active subscription, @(FALSE) otherwise.
         // Note: Nothing is emitted if the subscription status is unknown.
         RACSignal<NSNumber *> *activeSubscriptionSignal = [[[AppDelegate sharedAppDelegate].subscriptionStatus
-          filter:^BOOL(ObjcUserSubscription *status) {
-            return status.state != ObjcSubscriptionStateUnknown;
+          filter:^BOOL(BridgedUserSubscription *status) {
+            return status.state != BridgedSubscriptionStateUnknown;
           }]
-          map:^NSNumber *(ObjcUserSubscription *status) {
-              return @(status.state == ObjcSubscriptionStateActive);
+          map:^NSNumber *(BridgedUserSubscription *status) {
+              return @(status.state == BridgedSubscriptionStateActive);
           }];
 
         // Infinite cold signal - emits events of type @(TunnelState) for various tunnel events.
@@ -612,7 +609,7 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
       }];
 }
 
-- (void)onSubscriptionStatus:(ObjcUserSubscription *)status {
+- (void)onSubscriptionStatus:(BridgedUserSubscription *)status {
     [self.subscriptionStatus sendNext:status];
 }
 

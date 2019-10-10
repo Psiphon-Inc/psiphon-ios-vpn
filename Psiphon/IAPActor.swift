@@ -149,7 +149,6 @@ class IAPActor: Actor {
                     switch transaction.transactionState {
                     case .purchasing, .deferred:
                         break
-
                     case .failed:
                         break // TODO!!! report error to the user.
 

@@ -20,7 +20,6 @@
 #import <Foundation/Foundation.h>
 #import "IAPViewController.h"
 #import "AppDelegate.h"
-#import "IAPStoreHelper.h"
 #import "MBProgressHUD.h"
 #import "NSDate+Comparator.h"
 #import "PsiphonClientCommonLibraryHelpers.h"

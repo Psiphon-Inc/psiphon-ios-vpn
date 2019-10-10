@@ -37,7 +37,7 @@ import StoreKit
 }
 
 @objc protocol SwiftToObjBridge {
-    @objc func onSubscriptionStatus(_ status: ObjcUserSubscription)
+    @objc func onSubscriptionStatus(_ status: BridgedUserSubscription)
 }
 
 
@@ -47,7 +47,7 @@ import StoreKit
 }
 
 @objc protocol IAPMessages {
-    @objc func buyProdcut(_ prouct: SKProduct)
+    @objc func buyProduct(_ prouct: SKProduct)
 }
 
 // MARK: SwiftAppDelegate
@@ -95,7 +95,7 @@ extension SwiftAppDelegate: UIApplicationDelegate {
 
         self.appRoot = makeAppRootActor()
 
-        self.services.subscriptionState.map { state -> ObjcUserSubscription in
+        self.services.subscriptionState.map { state -> BridgedUserSubscription in
             .from(state: state)
         }.subscribe(onNext: {
             self.bridge.onSubscriptionStatus($0)
@@ -185,12 +185,11 @@ extension SwiftAppDelegate: LandingPageMessages {
 
 extension SwiftAppDelegate: IAPMessages {
 
-    func buyProdcut(_ product: SKProduct) {
+    func buyProduct(_ product: SKProduct) {
         services.iapActor.currentState().subscribe(onSuccess: {
             $0? ! IAPActor.Action.buyProduct(product)
             }).disposed(by: disposeBag)
     }
-
 
 }
 
@@ -205,26 +204,26 @@ func validateEnvironment(_ bundle: Bundle) {
 
 // MARK: User subscription status
 
-@objc enum ObjcSubscriptionState: Int {
+@objc enum BridgedSubscriptionState: Int {
     case unknown
     case active
     case inactive
 }
 
-@objc class ObjcUserSubscription: NSObject {
-    @objc let state: ObjcSubscriptionState
+@objc class BridgedUserSubscription: NSObject {
+    @objc let state: BridgedSubscriptionState
     @objc let latestExpiry: Date?
     @objc let productId: String?
     @objc let hasBeenInIntroPeriod: Bool
 
-    init(_ state: ObjcSubscriptionState, _ data: SubscriptionData?) {
+    init(_ state: BridgedSubscriptionState, _ data: SubscriptionData?) {
         self.state = state
         self.latestExpiry = data?.latestExpiry
         self.productId = data?.productId
         self.hasBeenInIntroPeriod = data?.hasBeenInIntroPeriod ?? false
     }
 
-    static func from(state: SubscriptionState) -> ObjcUserSubscription {
+    static func from(state: SubscriptionState) -> BridgedUserSubscription {
         switch state {
         case .subscribed(let data):
             return .init(.active, data)
@@ -236,4 +235,3 @@ func validateEnvironment(_ bundle: Bundle) {
     }
 
 }
-

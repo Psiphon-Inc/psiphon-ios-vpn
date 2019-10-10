@@ -19,6 +19,8 @@
 
 #import "IAPHelpViewController.h"
 #import "UIFont+Additions.h"
+#import "IAPStoreHelper.h"
+
 
 @interface IAPHelpViewController () <UITableViewDataSource, UITableViewDelegate>
 
@@ -57,22 +59,22 @@
                                                object:nil];
 
     [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(reloadProducts)
+                                             selector:@selector(reloadTableData)
                                                  name:IAPSKProductsRequestDidFailWithErrorNotification
                                                object:nil];
 
     [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(reloadProducts)
+                                             selector:@selector(reloadTableData)
                                                  name:IAPSKProductsRequestDidReceiveResponseNotification
                                                object:nil];
 
     [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(reloadProducts)
+                                             selector:@selector(reloadTableData)
                                                  name:IAPSKRequestRequestDidFinishNotification
                                                object:nil];
 
     [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(reloadProducts)
+                                             selector:@selector(reloadTableData)
                                                  name:IAPHelperUpdatedSubscriptionDictionaryNotification
                                                object:nil];
 

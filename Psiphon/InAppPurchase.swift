@@ -37,7 +37,7 @@ SKProductsRequestDelegate {
 
     /// Sends a product request to StoreKit for the provided product ids.
     /// - Note: caller must hold a strong reference to the returned `ProductRequest` object.
-    static func request(for storeProductIds: StoreProductIds) -> ProductRequest {
+    static func request(storeProductIds: StoreProductIds) -> ProductRequest {
         let responseDelegate = ProductRequest()
         let request = SKProductsRequest(productIdentifiers: storeProductIds.ids)
         request.delegate = responseDelegate

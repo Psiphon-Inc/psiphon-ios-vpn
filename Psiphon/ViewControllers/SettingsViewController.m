@@ -19,7 +19,6 @@
 
 #import "SettingsViewController.h"
 #import "AppDelegate.h"
-#import "IAPStoreHelper.h"
 #import "IAPViewController.h"
 #import "RACSignal.h"
 #import "RACCompoundDisposable.h"
@@ -70,8 +69,8 @@ NSString * const SettingsResetAdConsentCellSpecifierKey = @"settingsResetAdConse
     __weak SettingsViewController *weakSelf = self;
 
     __block RACDisposable *subscriptionStatusDisposable = [[AppDelegate sharedAppDelegate].subscriptionStatus
-      subscribeNext:^(ObjcUserSubscription *status) {
-          weakSelf.hasActiveSubscription = (status.state == ObjcSubscriptionStateActive);
+      subscribeNext:^(BridgedUserSubscription *status) {
+          weakSelf.hasActiveSubscription = (status.state == BridgedSubscriptionStateActive);
           [self updateSubscriptionCell];
           [weakSelf updateHiddenKeys];
 
@@ -96,9 +95,6 @@ NSString * const SettingsResetAdConsentCellSpecifierKey = @"settingsResetAdConse
 
 - (void)updateHiddenKeys {
     NSMutableSet *hiddenKeys = [NSMutableSet setWithSet:self.hiddenKeys];
-     if(![IAPStoreHelper canMakePayments]) {
-         [hiddenKeys addObject:SettingsSubscriptionCellSpecifierKey];
-     }
 
     // If the VPN is not active, don't show the force reconnect button.
     if (![VPNManager mapIsVPNActive:self.vpnStatus]) {
