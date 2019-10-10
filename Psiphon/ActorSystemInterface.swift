@@ -48,6 +48,7 @@ import StoreKit
 
 @objc protocol IAPMessages {
     @objc func buyProduct(_ prouct: SKProduct)
+    @objc func refreshReceipt()
 }
 
 // MARK: SwiftAppDelegate
@@ -168,7 +169,6 @@ extension SwiftAppDelegate {
 
 }
 
-// MARK: LandingPageService interface
 extension SwiftAppDelegate: LandingPageMessages {
 
     @objc func resetLandingPage() {
@@ -191,8 +191,13 @@ extension SwiftAppDelegate: IAPMessages {
             }).disposed(by: disposeBag)
     }
 
-}
+    func refreshReceipt() {
+        services.iapActor.currentState().subscribe(onSuccess: {
+            $0? ! IAPActor.Action.refreshReceipt
+        }).disposed(by: disposeBag)
+    }
 
+}
 
 /// Validates app's environment give the assumptions made in the app for certain invariants to hold true.
 /// - Note: Crashes the app if any of the vaidations fail.

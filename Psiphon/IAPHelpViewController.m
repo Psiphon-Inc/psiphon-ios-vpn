@@ -20,7 +20,7 @@
 #import "IAPHelpViewController.h"
 #import "UIFont+Additions.h"
 #import "IAPStoreHelper.h"
-
+#import "Psiphon-Swift.h"
 
 @interface IAPHelpViewController () <UITableViewDataSource, UITableViewDelegate>
 
@@ -208,14 +208,11 @@
 
 #pragma mark -
 
-- (void)restoreAction {
-    [self showProgressSpinnerAndBlockUI];
-    [[IAPStoreHelper sharedInstance] restoreSubscriptions];
-}
-
 - (void)refreshReceiptAction {
     [self showProgressSpinnerAndBlockUI];
-    [[IAPStoreHelper sharedInstance] refreshReceipt];
+
+    // TODO!!! maybe add a promise to the refresh receipt thing.
+    [SwiftAppDelegate.instance refreshReceipt];
 }
 
 - (void)dismissViewController {

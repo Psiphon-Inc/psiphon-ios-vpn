@@ -39,10 +39,7 @@ class IAPActor: Actor {
         case buyProduct(SKProduct)
 
         /// Sends a receipt refresh request to StoreKit.
-        case refreshReceipt  // TODO! this shouldn't be exposed to the clientsl.
-
-        /// Restores previously completed purchases.
-        case restoreTransactions
+        case refreshReceipt
 
         /// Removes pending PsiCash transactions from the payment queue.
         case completePsiCashTransactions
@@ -80,7 +77,6 @@ class IAPActor: Actor {
             case .buyProduct(let product): self.buyProduct(product)
             // TODO!!! this shouldn't be exposed to the user.
             case .refreshReceipt: self.refreshReceipt()
-            case .restoreTransactions: self.restoreTransactions()
             case .completePsiCashTransactions: self.completePsiCashTransactions()
             }
 
@@ -108,10 +104,6 @@ class IAPActor: Actor {
         let request = SKReceiptRefreshRequest()
         request.delegate = responseDelegate
         request.start()
-    }
-
-    func restoreTransactions() {
-        SKPaymentQueue.default().restoreCompletedTransactions()
     }
 
     func completePsiCashTransactions() {
