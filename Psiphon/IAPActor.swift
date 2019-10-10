@@ -69,9 +69,7 @@ class IAPActor: Actor {
     /// Notifies `subscriptionActor` of the updated receipt data (if any).
     var receiptData: ReceiptData? = .none {
         didSet {
-            if let data = receiptData {
-                self.subscriptionActor ! SubscriptionActor.Action.updatedReceiptData(data)
-            }
+            self.subscriptionActor ! SubscriptionActor.Action.updatedReceiptData(data)
         }
     }
 
