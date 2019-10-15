@@ -40,6 +40,19 @@ extension Set {
 
 }
 
+extension Result where Success == Void, Failure: Error {
+
+    func mapToError() -> Error? {
+        switch self {
+        case .success:
+            return .none
+        case .failure(let error):
+            return error
+        }
+    }
+
+}
+
 /// A result that is progressing towards completion. It can either be inProgress, or completed with `Result` associated value.
 enum ProgressiveResult<Success, Failure> where Failure: Error {
     /// Result is in progress.

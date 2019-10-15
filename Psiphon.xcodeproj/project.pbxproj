@@ -55,7 +55,6 @@
 		4E5263B7207290360021FEF5 /* EmbeddedServerEntriesHelpers.c in Sources */ = {isa = PBXBuildFile; fileRef = 4E5263B6207290360021FEF5 /* EmbeddedServerEntriesHelpers.c */; };
 		4E5263C7207294600021FEF5 /* EmbeddedServerEntries.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E5263BF207292920021FEF5 /* EmbeddedServerEntries.m */; };
 		4E5263CD2072984D0021FEF5 /* IAPViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E5263CA2072984D0021FEF5 /* IAPViewController.m */; };
-		4E5263CE2072984D0021FEF5 /* IAPStoreHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E5263CC2072984D0021FEF5 /* IAPStoreHelper.m */; };
 		4E5BD4F52061982300AD4724 /* FeedbackManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E5BD4F42061982300AD4724 /* FeedbackManager.m */; };
 		4E5DAE6520A942A300E06342 /* UILabel+GetLabelHeight.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E5DAE6420A942A300E06342 /* UILabel+GetLabelHeight.m */; };
 		4E90C94420CB37F5003FC319 /* PsiCashLogger.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E90C94320CB37F5003FC319 /* PsiCashLogger.m */; };
@@ -352,10 +351,8 @@
 		4E5263B6207290360021FEF5 /* EmbeddedServerEntriesHelpers.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = EmbeddedServerEntriesHelpers.c; sourceTree = "<group>"; };
 		4E5263BF207292920021FEF5 /* EmbeddedServerEntries.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = EmbeddedServerEntries.m; sourceTree = "<group>"; };
 		4E5263C6207294550021FEF5 /* EmbeddedServerEntries.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = EmbeddedServerEntries.h; sourceTree = "<group>"; };
-		4E5263C92072984C0021FEF5 /* IAPStoreHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IAPStoreHelper.h; sourceTree = "<group>"; };
 		4E5263CA2072984D0021FEF5 /* IAPViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IAPViewController.m; sourceTree = "<group>"; };
 		4E5263CB2072984D0021FEF5 /* IAPViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IAPViewController.h; sourceTree = "<group>"; };
-		4E5263CC2072984D0021FEF5 /* IAPStoreHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IAPStoreHelper.m; sourceTree = "<group>"; };
 		4E5BD4F32061982300AD4724 /* FeedbackManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FeedbackManager.h; sourceTree = "<group>"; };
 		4E5BD4F42061982300AD4724 /* FeedbackManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FeedbackManager.m; sourceTree = "<group>"; };
 		4E5DAE6320A942A300E06342 /* UILabel+GetLabelHeight.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UILabel+GetLabelHeight.h"; sourceTree = "<group>"; };
@@ -729,8 +726,6 @@
 				445F239420E1817B00D004E9 /* AppStoreReceiptData.h */,
 				445F239520E1817C00D004E9 /* AppStoreReceiptData.m */,
 				EF743FC31F99549000AC89A2 /* productIDs.plist */,
-				4E5263C92072984C0021FEF5 /* IAPStoreHelper.h */,
-				4E5263CC2072984D0021FEF5 /* IAPStoreHelper.m */,
 				4E5263CB2072984D0021FEF5 /* IAPViewController.h */,
 				4E5263CA2072984D0021FEF5 /* IAPViewController.m */,
 				9BFEC220C067BBE75AF970C1 /* IAPHelpViewController.m */,
@@ -1600,7 +1595,6 @@
 				4E5263CD2072984D0021FEF5 /* IAPViewController.m in Sources */,
 				5245C5D423452DF30033EE13 /* ActorBuilder.swift in Sources */,
 				445F24D720E1A5BA00D004E9 /* per_support.c in Sources */,
-				4E5263CE2072984D0021FEF5 /* IAPStoreHelper.m in Sources */,
 				EF90D7AA204F22C900228A63 /* NSError+Convenience.m in Sources */,
 				4E5BD4F52061982300AD4724 /* FeedbackManager.m in Sources */,
 				4E0A3669215AB7EE008A3D7B /* UIFont+Additions.m in Sources */,

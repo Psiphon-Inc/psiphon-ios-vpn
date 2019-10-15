@@ -25,6 +25,13 @@
 #import "IA5String.h"
 
 
+// App receipt fields keys and constants
+#define kAppReceiptFileSize                             @"app_receipt_file_size"
+#define kLatestExpirationDate                           @"latest_expiration_date"
+#define kProductId                                      @"product_id"
+#define kHasBeenInIntroPeriod                           @"has_been_in_intro_period"
+
+
 @class AppStoreReceiptData;
 
 @interface AppStoreReceiptData : NSObject

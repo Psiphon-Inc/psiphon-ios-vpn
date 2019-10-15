@@ -21,7 +21,6 @@
 #import "AppStoreReceiptData.h"
 #import "SharedConstants.h"
 #import "NSDate+Comparator.h"
-#import "IAPStoreHelper.h"
 #import "Logging.h"
 #import "PsiFeedbackLogger.h"
 #import "NSDate+PSIDateExtension.h"

@@ -19,7 +19,6 @@
 
 #import "IAPHelpViewController.h"
 #import "UIFont+Additions.h"
-#import "IAPStoreHelper.h"
 #import "Psiphon-Swift.h"
 
 @interface IAPHelpViewController () <UITableViewDataSource, UITableViewDelegate>
@@ -52,30 +51,9 @@
     // Sets navigation bar title.
     self.title = NSLocalizedStringWithDefaultValue(@"RESTORE_SUBSCRIPTION_BUTTON", nil, [NSBundle mainBundle], @"Restore Subscription", @"Button which, when pressed, attempts to restore any existing subscriptions the user has purchased");
 
-    // Listens to IAPStoreHelper transaction states.
     [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(onPaymentTransactionUpdate:)
-                                                 name:IAPHelperPaymentTransactionUpdateNotification
-                                               object:nil];
-
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(reloadTableData)
-                                                 name:IAPSKProductsRequestDidFailWithErrorNotification
-                                               object:nil];
-
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(reloadTableData)
-                                                 name:IAPSKProductsRequestDidReceiveResponseNotification
-                                               object:nil];
-
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(reloadTableData)
-                                                 name:IAPSKRequestRequestDidFinishNotification
-                                               object:nil];
-
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(reloadTableData)
-                                                 name:IAPHelperUpdatedSubscriptionDictionaryNotification
+                                             selector:@selector(onReceiptRefresh:)
+                                                 name:IAPActorNotification.refreshReceipt
                                                object:nil];
 
 }
@@ -210,14 +188,13 @@
 
 - (void)refreshReceiptAction {
     [self showProgressSpinnerAndBlockUI];
-
-    // TODO!!! maybe add a promise to the refresh receipt thing.
     [SwiftAppDelegate.instance refreshReceipt];
 }
 
 - (void)dismissViewController {
     [self.navigationController popViewControllerAnimated:YES];
 }
+
 - (void)showProgressSpinnerAndBlockUI {
     if (buyProgressAlert != nil) {
         [buyProgressAlert hideAnimated:YES];
@@ -248,15 +225,9 @@
     [self.navigationController popViewControllerAnimated:YES];
 }
 
-- (void)onPaymentTransactionUpdate:(NSNotification *)notification {
-    SKPaymentTransactionState transactionState = (SKPaymentTransactionState) [notification.userInfo[IAPHelperPaymentTransactionUpdateKey] integerValue];
+- (void)onReceiptRefresh:(NSNotification *)notification {
+    [self dismissProgressSpinnerAndUnblockUI];
 
-    if (SKPaymentTransactionStatePurchasing == transactionState) {
-        [self showProgressSpinnerAndBlockUI];
-    } else {
-        [self dismissProgressSpinnerAndUnblockUI];
-        [self.navigationController popViewControllerAnimated:YES];
-    }
 }
 
 @end

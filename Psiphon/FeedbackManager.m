@@ -21,14 +21,15 @@
 #import "AppDelegate.h"
 #import "DispatchUtils.h"
 #import "FeedbackUpload.h"
-#import "IAPStoreHelper.h"
 #import "MBProgressHUD.h"
 #import "PsiFeedbackLogger.h"
 #import "PsiphonClientCommonLibraryHelpers.h"
 #import "PsiphonDataSharedDB.h"
 #import "SharedConstants.h"
 #import "UIAlertController+Additions.h"
+#import <ReactiveObjC.h>
 #import <stdatomic.h>
+#import "Psiphon-Swift.h"
 
 @implementation FeedbackManager {
     MBProgressHUD *uploadProgressAlert;
@@ -61,9 +62,19 @@
     NSData *jsonData = [bundledConfigStr dataUsingEncoding:NSUTF8StringEncoding];
     NSError *err = nil;
     NSDictionary *readOnly = [NSJSONSerialization JSONObjectWithData:jsonData options:kNilOptions error:&err];
-    
+
+    // TODO: This is a blocking solution. It is fine in practice for now, since the loading page
+    //       doesn't disappear until
+    //       `getPsiphonConfig` depends on an Observable stream and hence it should itself
+    //       return an observable stream.
     // Return bundled config as is if user doesn't have an active subscription
-    if(![IAPStoreHelper hasActiveSubscriptionForNow] && !err) {
+    BridgedUserSubscription *_Nonnull status = [[[[AppDelegate.sharedAppDelegate subscriptionStatus] filter:^BOOL(BridgedUserSubscription *subscription) {
+            return subscription.state != BridgedSubscriptionStateUnknown;
+        }]
+        take:1]
+        first];
+
+    if (status.state == BridgedSubscriptionStateActive && !err) {
         return bundledConfigStr;
     }
     

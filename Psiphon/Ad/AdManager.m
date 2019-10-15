@@ -22,7 +22,6 @@
 #import "VPNManager.h"
 #import "AppDelegate.h"
 #import "Logging.h"
-#import "IAPStoreHelper.h"
 #import "RACCompoundDisposable.h"
 #import "RACSignal.h"
 #import "RACSignal+Operations.h"

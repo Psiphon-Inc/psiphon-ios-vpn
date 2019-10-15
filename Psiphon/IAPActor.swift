@@ -23,8 +23,10 @@ import SwiftActors
 import RxSwift
 import Promises
 
-infix operator | : TernaryPrecedence
-
+@objcMembers
+class IAPActorNotification: NSObject {
+    static let refreshReceipt = NSNotification.Name(rawValue: "IAPActorReceiptRefreshed")
+}
 
 class IAPActor: Actor {
 
@@ -61,7 +63,8 @@ class IAPActor: Actor {
     let param: Params
     var subscriptionActor: ActorRef!
     var psiCashPendingTransactions = [SKPaymentTransaction]()
-    private var paymentTransactionDelegate: PaymentTransactionDelegate!
+    private lazy var paymentTransactionDelegate = PaymentTransactionDelegate(replyTo: self)
+    private lazy var receiptRefreshDelegate = ReceiptRefreshRequestDelegate(replyTo: self)
 
     /// Notifies `subscriptionActor` of the updated receipt data (if any).
     var receiptData: ReceiptData? = .none {
@@ -74,10 +77,12 @@ class IAPActor: Actor {
         switch $0 {
         case let msg as Action:
             switch msg {
-            case .buyProduct(let product): self.buyProduct(product)
-            // TODO!!! this shouldn't be exposed to the user.
-            case .refreshReceipt: self.refreshReceipt()
-            case .completePsiCashTransactions: self.completePsiCashTransactions()
+            case .buyProduct(let product):
+                self.buyProduct(product)
+            case .refreshReceipt:
+                self.refreshReceipt()
+            case .completePsiCashTransactions:
+                self.completePsiCashTransactions()
             }
 
         case let msg as TransactionMessage: self.handleStoreKitTransaction(msg)
@@ -88,9 +93,6 @@ class IAPActor: Actor {
         return .same
     }
 
-
-    // MARK: -
-
     required init(_ param: Params) {
         self.param = param
     }
@@ -100,9 +102,8 @@ class IAPActor: Actor {
     }
 
     func refreshReceipt() {
-        let responseDelegate = ReceiptRefreshRequestDelegate(replyTo: self)
         let request = SKReceiptRefreshRequest()
-        request.delegate = responseDelegate
+        request.delegate = self.receiptRefreshDelegate
         request.start()
     }
 
@@ -117,13 +118,13 @@ class IAPActor: Actor {
     private func handleRequestResult(_ msg: RequestResult) {
         switch msg {
         case .receiptRefreshResult(let result):
-            switch result {
-            case .success:
+            if case .success = result {
                 self.receiptData = .fromLocalReceipt(self.param.appBundle)
-            case .failure(_):
-                // TODO!! maybe show an error message to the user
-                break
             }
+
+            NotificationCenter.default.post(name: IAPActorNotification.refreshReceipt,
+                                            object: .none,
+                                            userInfo: .none)
 
         }
     }
@@ -158,7 +159,7 @@ class IAPActor: Actor {
                         updateReceiptData = true
 
                     @unknown default:
-                        assertionFailure("unknown transaction state \(transaction.transactionState)")
+                        fatalError("unknown transaction state \(transaction.transactionState)")
                     }
                 }
                 if updateReceiptData {
@@ -183,7 +184,6 @@ class IAPActor: Actor {
         // TODO!!! finish this
         /// According to https://developer.apple.com/documentation/storekit/in-app_purchase/setting_up_the_transaction_observer_and_payment_queue
         /// this should be added in AppDelegate didFinishLaunchingWithOptions.
-        self.paymentTransactionDelegate = PaymentTransactionDelegate(replyTo: self)
         SKPaymentQueue.default().add(self.paymentTransactionDelegate)
 
         // Creates the subscription actor.
@@ -249,7 +249,6 @@ fileprivate class PaymentTransactionDelegate: ActorDelegate, SKPaymentTransactio
     }
 
 }
-
 
 /// ActorDelegate for StoreKit receipt refresh request: `SKReceiptRefreshRequest`.
 fileprivate class ReceiptRefreshRequestDelegate: ActorDelegate, SKRequestDelegate {

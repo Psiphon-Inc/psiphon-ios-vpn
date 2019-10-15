@@ -145,7 +145,7 @@ struct SubscriptionData: Equatable, Codable {
     let productId: String
     let hasBeenInIntroPeriod: Bool
 
-    // Enum values match dictionary keys defined in "IAPStoreHelper.h"
+    // Enum values match dictionary keys defined in "AppStoreReceiptData.h"
     private enum ReceiptFields: String {
         case appReceiptFileSize = "app_receipt_file_size"
         case latestExpirationDate = "latest_expiration_date"

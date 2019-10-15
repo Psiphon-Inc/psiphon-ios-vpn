@@ -41,7 +41,6 @@
 #import "VPNManager.h"
 #import "AdManager.h"
 #import "Logging.h"
-#import "IAPStoreHelper.h"
 #import "NEBridge.h"
 #import "DispatchUtils.h"
 #import "PsiFeedbackLogger.h"
@@ -129,11 +128,6 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
         // Reset Jetsam counter.
         [self.sharedDB resetJetsamCounter];
     }
-
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(onUpdatedSubscriptionDictionary)
-                                                 name:IAPHelperUpdatedSubscriptionDictionaryNotification
-                                               object:nil];
 
     // Immediately register to receive notifications from the Network Extension process.
     [[Notifier sharedInstance] registerObserver:self callbackQueue:dispatch_get_main_queue()];
@@ -486,20 +480,6 @@ PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
     } else if ([NotifierNetworkConnectivityFailed isEqualToString:message]) {
         [self.checkExtensionNetworkConnectivityFailedSubject sendNext:RACUnit.defaultUnit];
     }
-}
-
-#pragma mark - Subscription
-
-
-// Called on `IAPHelperUpdatedSubscriptionDictionaryNotification` notification.
-- (void)onUpdatedSubscriptionDictionary {
-
-    NSDictionary *_Nullable subscription = IAPStoreHelper.subscriptionDictionary;
-
-    if (subscription) {
-        // TODO! send message to SubscriptionActor
-    }
-
 }
 
 #pragma mark - Global alerts
