@@ -68,7 +68,7 @@
     }
 
     if ([userDefaults boolForKey:kDisableTimeouts]) {
-        [userConfigs setObject:@(3.0) forKey:@"NetworkLatencyMultiplier"];
+        [userConfigs setObject:@(0.1) forKey:@"NetworkLatencyMultiplierLambda"];
     }
 
     NSString *upstreamProxyUrl = [userDefaults stringForKey:PSIPHON_CONFIG_UPSTREAM_PROXY_URL];
