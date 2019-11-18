@@ -102,7 +102,11 @@
     NSArray<NSString *> *files = [fm contentsOfDirectoryAtPath:dir error:&err];
 
     NSDictionary *dirattrs = [fm attributesOfItemAtPath:dir error:&err];
-    [PsiFeedbackLogger error:@"Dir (%@) attributes:\n\n%@", [dir lastPathComponent], dirattrs[NSFileProtectionKey]];
+    if (err) {
+        [PsiFeedbackLogger errorWithType:@"FileUtils" message:@"ListingDir" object:err];
+    }
+
+    LOG_DEBUG(@"Dir (%@) attributes:%@", [dir lastPathComponent], dirattrs[NSFileProtectionKey]);
 
     if ([files count] > 0) {
         for (NSString *f in files) {
