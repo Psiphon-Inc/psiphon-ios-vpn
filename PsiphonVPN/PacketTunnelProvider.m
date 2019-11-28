@@ -58,6 +58,7 @@ NSErrorDomain _Nonnull const PsiphonTunnelErrorDomain = @"PsiphonTunnelErrorDoma
 
 PsiFeedbackLogType const SubscriptionCheckLogType = @"SubscriptionCheck";
 PsiFeedbackLogType const ExtensionNotificationLogType = @"ExtensionNotification";
+PsiFeedbackLogType const ExtensionErrorLogType = @"ExtensionError";
 PsiFeedbackLogType const PacketTunnelProviderLogType = @"PacketTunnelProvider";
 PsiFeedbackLogType const ExitReasonLogType = @"ExitReason";
 
@@ -945,14 +946,52 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 
     // In case of duplicate keys, value from psiphonConfigUserDefaults
     // will replace mutableConfigCopy value.
-    PsiphonConfigUserDefaults *psiphonConfigUserDefaults = [[PsiphonConfigUserDefaults alloc]
-      initWithSuiteName:APP_GROUP_IDENTIFIER];
+    PsiphonConfigUserDefaults *psiphonConfigUserDefaults =
+        [[PsiphonConfigUserDefaults alloc] initWithSuiteName:APP_GROUP_IDENTIFIER];
     [mutableConfigCopy addEntriesFromDictionary:[psiphonConfigUserDefaults dictionaryRepresentation]];
 
     mutableConfigCopy[@"PacketTunnelTunFileDescriptor"] = fd;
 
     mutableConfigCopy[@"ClientVersion"] = [AppInfo appVersion];
 
+    // Configure data root directory.
+    // PsiphonTunnel will store all of its files under this directory.
+
+    NSError *err;
+
+    NSURL *dataRootDirectory = [PsiphonDataSharedDB dataRootDirectory];
+    if (dataRootDirectory == nil) {
+        [PsiFeedbackLogger errorWithType:ExtensionErrorLogType
+                                 message:@"Failed to get data root directory"];
+        [self displayCorruptSettingsFileMessage];
+        [self exitGracefully];
+    }
+
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    [fileManager createDirectoryAtURL:dataRootDirectory withIntermediateDirectories:YES attributes:nil error:&err];
+    if (err != nil) {
+        [PsiFeedbackLogger errorWithType:ExtensionErrorLogType
+                                 message:@"Failed to create data root directory"
+                                  object:err];
+        [self displayCorruptSettingsFileMessage];
+        [self exitGracefully];
+    }
+
+    mutableConfigCopy[@"DataRootDirectory"] = dataRootDirectory.path;
+
+    // Ensure homepage and notice files are migrated
+    mutableConfigCopy[@"MigrateRotatingNoticesFilename"] = [self.sharedDB oldRotatingLogNoticesPath];
+    mutableConfigCopy[@"MigrateHompageNoticesFilename"] = [self.sharedDB oldHomepageNoticesPath];
+
+    // Use default rotation rules for homepage and notice files.
+    // Note: homepage and notice files are only used if this field is set.
+    NSMutableDictionary *noticeFiles = [[NSMutableDictionary alloc] init];
+    [noticeFiles setObject:@0 forKey:@"RotatingFileSize"];
+    [noticeFiles setObject:@0 forKey:@"RotatingSyncFrequency"];
+
+    mutableConfigCopy[@"UseNoticeFiles"] = noticeFiles;
+
+    // Provide auth tokens
     NSArray *authorizations = [self getAllAuthorizations];
     if ([authorizations count] > 0) {
         mutableConfigCopy[@"Authorizations"] = [authorizations copy];
@@ -1108,14 +1147,6 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
     }
     NSString *strReachabilityFlags = [reachability currentReachabilityFlagsToString];
     LOG_DEBUG(@"onInternetReachabilityChanged: %@", strReachabilityFlags);
-}
-
-- (NSString * _Nullable)getHomepageNoticesPath {
-    return [self.sharedDB homepageNoticesPath];
-}
-
-- (NSString * _Nullable)getRotatingNoticesPath {
-    return [self.sharedDB rotatingLogNoticesPath];
 }
 
 - (void)onDiagnosticMessage:(NSString *_Nonnull)message withTimestamp:(NSString *_Nonnull)timestamp {

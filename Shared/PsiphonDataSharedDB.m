@@ -22,6 +22,8 @@
 #import "NSDate+PSIDateExtension.h"
 #import "UserDefaults.h"
 #import "Authorization.h"
+#import "SharedConstants.h"
+#import <PsiphonTunnel/PsiphonTunnel.h>
 
 // File operations parameters
 #define MAX_RETRIES 3
@@ -103,20 +105,40 @@ UserDefaultsKey const DebugPsiphonConnectionStateStringKey = @"PsiphonDataShared
 
 #pragma mark - Logging
 
-- (NSString *)homepageNoticesPath {
+// See comment in header
++ (NSURL *)dataRootDirectory {
+    return [[[NSFileManager defaultManager]
+             containerURLForSecurityApplicationGroupIdentifier:APP_GROUP_IDENTIFIER]
+            URLByAppendingPathComponent:@"com.psiphon3.ios.PsiphonTunnel"];
+}
+
+// See comment in header
+- (NSString *)oldHomepageNoticesPath {
     return [[[[NSFileManager defaultManager]
             containerURLForSecurityApplicationGroupIdentifier:appGroupIdentifier] path]
             stringByAppendingPathComponent:@"homepage_notices"];
 }
 
-- (NSString *)rotatingLogNoticesPath {
+// See comment in header
+- (NSString *)oldRotatingLogNoticesPath {
     return [[[[NSFileManager defaultManager]
             containerURLForSecurityApplicationGroupIdentifier:appGroupIdentifier] path]
             stringByAppendingPathComponent:@"rotating_notices"];
 }
 
+// See comment in header
+- (NSString *)homepageNoticesPath {
+    return [PsiphonTunnel homepageFilePath:[PsiphonDataSharedDB dataRootDirectory]].path;
+}
+
+// See comment in header
+- (NSString *)rotatingLogNoticesPath {
+    return [PsiphonTunnel noticesFilePath:[PsiphonDataSharedDB dataRootDirectory]].path;
+}
+
+// See comment in header
 - (NSString *)rotatingOlderLogNoticesPath {
-    return [[self rotatingLogNoticesPath] stringByAppendingString:@".1"];
+    return [PsiphonTunnel olderNoticesFilePath:[PsiphonDataSharedDB dataRootDirectory]].path;
 }
 
 + (NSString *_Nullable)tryReadingFile:(NSString *_Nonnull)filePath {
