@@ -26,7 +26,12 @@
 + (NSError *)createDir:(NSURL *)dirURL;
 
 #if DEBUG
-+ (void)listDirectory:(NSString *)dir resource:(NSString *)resource;
+
+/// Lists all files in the target directory.
+/// @param dir Directory to list files from.
+/// @param resource Resource name for logging. E.g. "Assets Directory".
+/// @param recurse If true, recursively list all files in all subdirectories.
++ (void)listDirectory:(NSString *)dir resource:(NSString *)resource recursively:(BOOL)recurse;
 #endif
 
 @end
