@@ -934,6 +934,8 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 
     NSDictionary *configs = [PsiphonConfigReader fromConfigFile].configs;
     if (!configs) {
+        [PsiFeedbackLogger errorWithType:PsiphonTunnelDelegateLogType
+                                 message:@"Failed to get config"];
         [self displayCorruptSettingsFileMessage];
         [self exitGracefully];
     }
