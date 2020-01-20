@@ -980,6 +980,21 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
     mutableConfigCopy[@"DataRootDirectory"] = dataRootDirectory.path;
 
     // Ensure homepage and notice files are migrated
+    NSString *oldRotatingLogNoticesPath = [self.sharedDB oldRotatingLogNoticesPath];
+    if (oldRotatingLogNoticesPath) {
+        mutableConfigCopy[@"MigrateRotatingNoticesFilename"] = oldRotatingLogNoticesPath;
+    } else {
+        [PsiFeedbackLogger infoWithType:PsiphonTunnelDelegateLogType
+                                message:@"Failed to get old rotating notices log path"];
+    }
+
+    NSString *oldHomepageNoticesPath = [self.sharedDB oldHomepageNoticesPath];
+    if (oldHomepageNoticesPath) {
+        mutableConfigCopy[@"MigrateHompageNoticesFilename"] = oldHomepageNoticesPath;
+    } else {
+        [PsiFeedbackLogger infoWithType:PsiphonTunnelDelegateLogType
+                                message:@"Failed to get old homepage notices path"];
+    }
 
     // Use default rotation rules for homepage and notice files.
     // Note: homepage and notice files are only used if this field is set.
