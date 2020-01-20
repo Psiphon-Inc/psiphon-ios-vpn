@@ -107,8 +107,8 @@ PsiFeedbackLogType const BasePacketTunnelProviderLogType = @"BasePacketTunnelPro
         }
 
     #if DEBUG
-        [FileUtils listDirectory:paths[0] resource:@"Library"];
-        [FileUtils listDirectory:paths[1] resource:@"Shared container"];
+        [FileUtils listDirectory:paths[0] resource:@"Library" recursively:YES];
+        [FileUtils listDirectory:paths[1] resource:@"Shared container" recursively:YES];
     #endif
 
         BOOL tunnelStartedFromContainerRecently = FALSE;
