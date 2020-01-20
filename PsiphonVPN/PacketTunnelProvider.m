@@ -58,7 +58,7 @@ NSErrorDomain _Nonnull const PsiphonTunnelErrorDomain = @"PsiphonTunnelErrorDoma
 
 PsiFeedbackLogType const SubscriptionCheckLogType = @"SubscriptionCheck";
 PsiFeedbackLogType const ExtensionNotificationLogType = @"ExtensionNotification";
-PsiFeedbackLogType const ExtensionErrorLogType = @"ExtensionError";
+PsiFeedbackLogType const PsiphonTunnelDelegateLogType = @"PsiphonTunnelDelegate";
 PsiFeedbackLogType const PacketTunnelProviderLogType = @"PacketTunnelProvider";
 PsiFeedbackLogType const ExitReasonLogType = @"ExitReason";
 
@@ -961,7 +961,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 
     NSURL *dataRootDirectory = [PsiphonDataSharedDB dataRootDirectory];
     if (dataRootDirectory == nil) {
-        [PsiFeedbackLogger errorWithType:ExtensionErrorLogType
+        [PsiFeedbackLogger errorWithType:PsiphonTunnelDelegateLogType
                                  message:@"Failed to get data root directory"];
         [self displayCorruptSettingsFileMessage];
         [self exitGracefully];
@@ -970,7 +970,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
     NSFileManager *fileManager = [NSFileManager defaultManager];
     [fileManager createDirectoryAtURL:dataRootDirectory withIntermediateDirectories:YES attributes:nil error:&err];
     if (err != nil) {
-        [PsiFeedbackLogger errorWithType:ExtensionErrorLogType
+        [PsiFeedbackLogger errorWithType:PsiphonTunnelDelegateLogType
                                  message:@"Failed to create data root directory"
                                   object:err];
         [self displayCorruptSettingsFileMessage];
@@ -980,8 +980,6 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
     mutableConfigCopy[@"DataRootDirectory"] = dataRootDirectory.path;
 
     // Ensure homepage and notice files are migrated
-    mutableConfigCopy[@"MigrateRotatingNoticesFilename"] = [self.sharedDB oldRotatingLogNoticesPath];
-    mutableConfigCopy[@"MigrateHompageNoticesFilename"] = [self.sharedDB oldHomepageNoticesPath];
 
     // Use default rotation rules for homepage and notice files.
     // Note: homepage and notice files are only used if this field is set.
