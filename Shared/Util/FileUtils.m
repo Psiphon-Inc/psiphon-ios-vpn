@@ -94,12 +94,31 @@
 }
 
 #if DEBUG
-+ (void)listDirectory:(NSString *)dir resource:(NSString *)resource{
+// See comment in header
++ (void)listDirectory:(NSString *)dir resource:(NSString *)resource recursively:(BOOL)recurse {
     NSError *err;
     NSFileManager *fm = [NSFileManager defaultManager];
     NSMutableArray<NSString *> *desc = [NSMutableArray array];
+    NSMutableArray<NSString *> *subdirs = [NSMutableArray array];
 
     NSArray<NSString *> *files = [fm contentsOfDirectoryAtPath:dir error:&err];
+    if (err != nil) {
+        LOG_DEBUG(@"Failed to get contents of directory (%@): %@", dir, err);
+        return;
+    }
+
+    NSNumber *dirExcludedFromBackupResourceValue;
+    // The URL must be of the file scheme ("file://"), otherwise the `setResourceValue:forKey:error`
+    // operation will silently fail with: "CFURLCopyResourcePropertyForKey failed because passed URL
+    // no scheme".
+    NSURL *dirURLWithScheme = [NSURL fileURLWithPath:dir isDirectory:YES];
+
+    BOOL succeeded = [dirURLWithScheme getResourceValue:&dirExcludedFromBackupResourceValue
+                                                 forKey:NSURLIsExcludedFromBackupKey
+                                                  error:&err];
+    if (!succeeded) {
+        LOG_DEBUG(@"Failed to get resource value of file %@: %@", dir, err);
+    }
 
     NSDictionary *dirattrs = [fm attributesOfItemAtPath:dir error:&err];
     if (err) {
@@ -107,6 +126,12 @@
     }
 
     LOG_DEBUG(@"Dir (%@) attributes:%@", [dir lastPathComponent], dirattrs[NSFileProtectionKey]);
+
+    [desc addObject:[NSString stringWithFormat:
+                     @"{directory:%@, attributes:%@, excludedFromBackup:%@}",
+                     dir,
+                     dirattrs[NSFileProtectionKey],
+                     dirExcludedFromBackupResourceValue]];
 
     if ([files count] > 0) {
         for (NSString *f in files) {
@@ -119,14 +144,48 @@
 
             BOOL isDir;
             [fm fileExistsAtPath:file isDirectory:&isDir];
+
+            NSNumber *excludedFromBackupResourceValue;
+
+            // The URL must be of the file scheme ("file://"), otherwise the `setResourceValue:forKey:error`
+            // operation will silently fail with: "CFURLCopyResourcePropertyForKey failed because passed URL
+            // no scheme".
+            NSURL *fileURLWithScheme = [NSURL fileURLWithPath:file];
+
+            BOOL succeeded = [fileURLWithScheme getResourceValue:&excludedFromBackupResourceValue
+                                                          forKey:NSURLIsExcludedFromBackupKey
+                                                           error:&err];
+            if (!succeeded) {
+                LOG_DEBUG(@"Failed to get resource value of file %@: %@", file, err);
+            }
+
             NSDictionary *attrs = [fm attributesOfItemAtPath:file error:&err];
             if (err) {
-                LOG_DEBUG(@"filepath: %@, %@",file, err);
+                LOG_DEBUG(@"Failed to get attributes of file %@: %@", file, err);
             }
-            [desc addObject:[NSString stringWithFormat:@"%@ : %@ : %@", [file lastPathComponent], (isDir) ? @"dir" : @"file", attrs[NSFileProtectionKey]]];
+
+            [desc addObject:[NSString stringWithFormat:
+                             @"{file:%@, type:%@, attributes:%@, excludedFromBackup:%@}",
+                             [file lastPathComponent],
+                             (isDir) ? @"dir" : @"file",
+                             attrs[NSFileProtectionKey],
+                             excludedFromBackupResourceValue]];
+
+            if (isDir && recurse) {
+                [subdirs addObject:file];
+            }
         }
 
-        LOG_DEBUG(@"Resource (%@) Checking files at dir (%@)\n%@", resource, [dir lastPathComponent], desc);
+        NSString *fileDescriptions = [desc componentsJoinedByString:@", "];
+
+        LOG_DEBUG(@"Resource (%@) Checking files at dir (%@): [%@]",
+                  resource,
+                  dir,
+                  fileDescriptions);
+
+        for (NSString *subdir in subdirs) {
+            [FileUtils listDirectory:subdir resource:resource recursively:recurse];
+        }
     }
 }
 #endif
