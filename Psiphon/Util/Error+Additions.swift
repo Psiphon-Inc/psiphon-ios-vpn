@@ -29,12 +29,20 @@ struct FatalError: Error {
 /// String representation of a type-erased error.
 struct ErrorRepr: HashableError {
     let repr: String
+
+    static func systemError(_ systemError: SystemError) -> Self {
+        return .init(repr: String(describing: systemError))
+    }
 }
 
 /// Wraps an error event with a localized user description of the error.
 struct ErrorEventDescription<E: HashableError>: HashableError {
     let event: ErrorEvent<E>
     let localizedUserDescription: String
+
+    static func == (lhs: Self, rhs: Self) -> Bool {
+        return lhs.event == rhs.event
+    }
 }
 
 extension ErrorEventDescription where E: SystemError {

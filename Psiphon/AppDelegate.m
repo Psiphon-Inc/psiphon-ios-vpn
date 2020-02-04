@@ -499,6 +499,15 @@ willFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     }
 
     AppDelegate *__weak weakSelf = self;
+
+    // If the current view controller at the time of this call is not present,
+    // we will not display the ad.
+    // This is to guarantee to a degree that current VC that was the origin of this
+    // function call is still present by the time the ad is loaded and ready to be presented.
+    // Note that the guarantee is strong only if `weakTopMostVC.beingDismissed` flag is checked
+    // immediately before presenting.
+    UIViewController *__weak weakTopMostVC = [AppDelegate getTopMostViewController];
+
     LOG_DEBUG(@"rewarded video started");
 
     self->rewardedVideoAdDisposable =
@@ -516,16 +525,17 @@ willFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
         return next;
     }] doNext:^(NSNumber *adLoadStatusObj) {
         AdLoadStatus s = (AdLoadStatus) [adLoadStatusObj integerValue];
-        [delegate adLoadStatus:s];
+        [delegate adLoadStatus:s error:nil];
     }] filter:^BOOL(NSNumber *adLoadStatusObj) {
         AdLoadStatus s = (AdLoadStatus) [adLoadStatusObj integerValue];
         // Filter terminating states.
         return (AdLoadStatusDone == s) || (AdLoadStatusError == s);
     }] take:1]
           flattenMap:^RACSignal *(NSNumber *adLoadStatusObj) {
+        UIViewController *__strong topMostVC = weakTopMostVC;
         AdLoadStatus s = (AdLoadStatus) [adLoadStatusObj integerValue];
-        if (AdLoadStatusDone == s) {
-            UIViewController *topMostVC = [AppDelegate getTopMostViewController];
+
+        if (topMostVC && !topMostVC.beingDismissed && AdLoadStatusDone == s) {
             return [[AdManager sharedInstance] presentRewardedVideoOnViewController:topMostVC withCustomData:customData];
         } else {
             return [RACSignal empty];
@@ -597,6 +607,7 @@ willFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     } error:^(NSError *error) {
         AppDelegate *strongSelf = weakSelf;
         if (strongSelf) {
+            [delegate adLoadStatus:AdLoadStatusError error:error];
             [PsiFeedbackLogger errorWithType:RewardedVideoLogType message:@"Error with rewarded video"
                                       object:error];
             [strongSelf->rewardedVideoAdDisposable dispose];

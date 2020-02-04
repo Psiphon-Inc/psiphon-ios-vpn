@@ -39,13 +39,20 @@ enum PurchasingState: Equatable {
 }
 
 typealias RewardedVideoPresentation = AdPresentation
-typealias RewardedVideoLoad = AdLoadStatus
+typealias RewardedVideoLoad = Result<AdLoadStatus, ErrorEvent<ErrorRepr>>
 
 struct RewardedVideoState: Equatable {
-    var loading: RewardedVideoLoad = .none
+    var loading: RewardedVideoLoad = .success(.none)
     var presentation: RewardedVideoPresentation = .didDisappear
     var dismissed: Bool = false
     var rewarded: Bool = false
+
+    var isLoading: Bool {
+        switch loading {
+        case .success(.inProgress): return true
+        default: return false
+        }
+    }
 
     var rewardedAndDismissed: Bool {
         return dismissed && rewarded
@@ -61,25 +68,29 @@ enum PsiCashAction {
     case rewardedVideoPresentation(RewardedVideoPresentation)
     case rewardedVideoLoad(RewardedVideoLoad)
     case connectToPsiphonTapped
-    case iapErrorAlertDismissed
-    case speedBoostAlreadyActiveDismissed
+    case dismissedAlert(PsiCashAlertDismissAction)
+}
+
+enum PsiCashAlertDismissAction {
+    case psiCashCoinPurchase
+    case rewardedVideo
+    case speedBoostAlreadyActive
 }
 
 func psiCashReducer(
     state: inout PsiCashState, action: PsiCashAction
 ) -> [EffectType<PsiCashAction, Application.ExternalAction>] {
     switch action {
-
     case .psiCashCoinProductList(let reqres):
         switch reqres {
         case .request:
-            state.products = .inProgress
+            state.psiCashIAPProducts = .inProgress
             return [.internal(
                 appStoreProductRequest(productIds: .psiCash()).map { result -> PsiCashAction in
                     return .psiCashCoinProductList(.response(result))
             })]
         case .response(let result):
-            state.products = ProgressiveResult.from(result: result.map {
+            state.psiCashIAPProducts = ProgressiveResult.from(result: result.map {
                 $0.map { skProduct in
                     PsiCashPurchasableViewModel.from(skProduct: skProduct)
                 }
@@ -221,8 +232,10 @@ func psiCashReducer(
                 return .empty
             }
 
-            return [.external(.action(.psiCash(.receivedRewardedVideoReward(amount: rewardAmount)))),
-                    .external(Effect(refreshWithRetryEffect))]
+            return [
+                .external(.action(.psiCash(.receivedRewardedVideoReward(amount: rewardAmount)))),
+                    .external(Effect(refreshWithRetryEffect))
+            ]
         } else {
             return []
         }
@@ -231,13 +244,15 @@ func psiCashReducer(
         state.rewardedVideo.combine(loading: loadStatus)
         return []
 
-    case .iapErrorAlertDismissed:
-        state.purchasing = .none
-        return []
-
-    case .speedBoostAlreadyActiveDismissed:
-        state.purchasing = .none
-        return []
+    case .dismissedAlert(let dismissed):
+        switch dismissed {
+        case .psiCashCoinPurchase, .speedBoostAlreadyActive:
+            state.purchasing = .none
+            return []
+        case .rewardedVideo:
+            state.rewardedVideo.combineWithErrorDismissed()
+            return []
+        }
 
     case .connectToPsiphonTapped:
         return [.external(.objc(.connectTunnel)),
@@ -265,7 +280,6 @@ final class PsiCashViewController: UIViewController {
         case psiCashPurchaseScreen
         case speedBoostPurchaseDialog
         case speedBoostAlreadyActiveAlert
-        case purchaseErrorAlert(ErrorEventDescription<ErrorRepr>)
     }
 
     enum UITab: UICases {
@@ -287,8 +301,9 @@ final class PsiCashViewController: UIViewController {
     @State private var activeTab: UITab = .speedBoost
     private var navigation: Screen = .mainScreen
 
-    /// Currently presented error alert.
-    private var errorAlert: ErrorEventDescription<ErrorRepr>?
+    /// Set of presented error alerts.
+    /// Note: Once an error alert has been dismissed by the user, it will be removed from the set.
+    private var errorAlerts = Set<ErrorEventDescription<ErrorRepr>>()
 
     // Views
     private let balanceView = PsiCashBalanceView(frame: .zero)
@@ -340,6 +355,14 @@ final class PsiCashViewController: UIViewController {
             .startWithValues { [unowned self] observed in
                 let tunnelState = TunnelConnected.from(vpnStatus: observed.vpnStatus)
 
+                if case let .failure(errorEvent) = observed.state.rewardedVideo.loading {
+                    let errorDesc = ErrorEventDescription(
+                        event: errorEvent,
+                        localizedUserDescription: UserStrings.Rewarded_video_load_failed())
+
+                    self.display(errorDesc: errorDesc, onDismiss: .rewardedVideo)
+                }
+
                 // TODO: nagivation. This should probably be factored out as an external effect.
                 switch (observed.state.purchasing, self.navigation) {
                 case (.none, _):
@@ -363,12 +386,12 @@ final class PsiCashViewController: UIViewController {
                     if case .serverError(.existingTransaction, _) = errorEvent.error {
                         self.display(screen: .speedBoostAlreadyActiveAlert)
                     } else {
-                        let errorDescription = ErrorEventDescription(
+                        let errorDesc = ErrorEventDescription(
                             event: errorEvent.eraseToRepr(),
                             localizedUserDescription: errorEvent.error.userDescription
                         )
 
-                        self.display(screen: .purchaseErrorAlert(errorDescription))
+                        self.display(errorDesc: errorDesc, onDismiss: .speedBoostAlreadyActive)
                     }
 
                 case (.iapError(let errorEvent), _):
@@ -388,12 +411,16 @@ final class PsiCashViewController: UIViewController {
                         }
                     }
 
-                    self.display(screen: .purchaseErrorAlert(
-                        ErrorEventDescription(event: errorEvent.eraseToRepr(),
-                                              localizedUserDescription: description)))
+                    let errorDesc = ErrorEventDescription(event: errorEvent.eraseToRepr(),
+                                                          localizedUserDescription: description)
+                    self.display(errorDesc: errorDesc, onDismiss: .psiCashCoinPurchase)
 
                 default:
-                    fatalError("Invalid navigation state 'state.purchasing: \(String(describing: observed.state.purchasing))', 'navigation: \(self.navigation)'")
+                    fatalError("""
+                        Invalid navigation state 'state.purchasing: \
+                        \(String(describing: observed.state.purchasing))', \
+                        'navigation: \(self.navigation)'
+                        """)
                 }
 
                 switch observed.actorState {
@@ -417,7 +444,7 @@ final class PsiCashViewController: UIViewController {
                     case (.notConnected, .addPsiCash),
                          (.connected, .addPsiCash):
 
-                        switch observed.state.products {
+                        switch observed.state.allProducts {
                         case .inProgress:
                             self.containerBindable.bind(.left(.right(.left(true))))
                         case .completed(let productRequestResult):
@@ -534,6 +561,30 @@ final class PsiCashViewController: UIViewController {
 // Navigations
 extension PsiCashViewController {
 
+    private func display(
+        errorDesc: ErrorEventDescription<ErrorRepr>,
+        onDismiss dismissAction: PsiCashAlertDismissAction
+    ) {
+        let (inserted, _) = self.errorAlerts.insert(errorDesc)
+
+        // Prevent display of the same error event.
+        guard inserted else {
+            return
+        }
+
+        let alert = UIAlertController(title: UserStrings.Error_title(),
+                                      message: errorDesc.localizedUserDescription,
+                                      preferredStyle: .alert)
+
+        alert.addAction(UIAlertAction(title: UserStrings.OK_button_title(), style: .default)
+        { [unowned self, errorDesc] _ in
+            self.errorAlerts.remove(errorDesc)
+            self.store.send(.dismissedAlert(dismissAction))
+        })
+
+        self.topMostController().present(alert, animated: true, completion: nil)
+    }
+
     private func display(screen: Screen) {
         guard self.navigation != screen else {
             return
@@ -548,7 +599,8 @@ extension PsiCashViewController {
             let purchasingViewController = AlertViewController(viewBuilder:
                 PsiCashPurchasingViewBuilder())
 
-            self.topMostController().present(purchasingViewController, animated: false, completion: nil)
+            self.topMostController().present(purchasingViewController, animated: false,
+                                             completion: nil)
 
         case .speedBoostPurchaseDialog:
             let vc = AlertViewController(viewBuilder: PurchasingSpeedBoostAlertViewBuilder())
@@ -559,27 +611,9 @@ extension PsiCashViewController {
             self.presentedViewController?.dismiss(animated: false, completion: nil)
             let vc = AlertViewController(viewBuilder:
                 SpeedBoostActiveAlertViewBuilder(dimissHandler: { [unowned self] in
-                    self.store.send(.speedBoostAlreadyActiveDismissed)
+                    self.store.send(.dismissedAlert(.speedBoostAlreadyActive))
                 }))
             self.present(vc, animated: false, completion: nil)
-
-        case .purchaseErrorAlert(let errorDescription):
-            // TODO: Is it always valid to perform this check?
-            guard self.errorAlert != errorDescription else {
-                return
-            }
-
-            self.errorAlert = errorDescription
-            let alert = UIAlertController(title: UserStrings.Error_title(),
-                message: errorDescription.localizedUserDescription,
-                preferredStyle: .alert)
-
-            alert.addAction(UIAlertAction(title: UserStrings.OK_button_title(), style: .default) { _ in
-                self.errorAlert = .none
-                self.store.send(.iapErrorAlertDismissed)
-            })
-
-            self.topMostController().present(alert, animated: true, completion: nil)
         }
     }
 
@@ -588,6 +622,13 @@ extension PsiCashViewController {
 // MARK: Extensions
 
 extension RewardedVideoState {
+    mutating func combineWithErrorDismissed() {
+        guard case .failure(_) = self.loading else {
+            return
+        }
+        self.loading = .success(.none)
+    }
+
     mutating func combine(loading: RewardedVideoLoad) {
         self.loading = loading
     }
