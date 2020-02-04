@@ -261,6 +261,9 @@
 /* Title of button which triggers an attempt to restore the user's existing subscription */
 "RESTORE_SUBSCRIPTION_BUTTON_TITLE" = "Restore my subscription";
 
+/* Shown in a pop-up alert if user's rewarded video ad failed to load. */
+"REWARDED_VIDEO_LOAD_FAILED" = "Failed to load rewarded video. Please try again later.";
+
 /* Title for screen that allows user to select language. Use all capital letters in the translation only if it makes sense. */
 "SELECT_LANG" = "SELECT LANGUAGE";
 

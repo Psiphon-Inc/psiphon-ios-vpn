@@ -126,18 +126,27 @@ import Foundation
                                  comment: "Shown when user is not connected to Psiphon network. Do not translate or transliterate 'Psiphon'")
     }
 
-    static func Watch_rewarded_video_and_earn() -> String {
-        return NSLocalizedString("WATCH_REWARDED_VIDEO_AND_EARN", tableName: nil, bundle: Bundle.main,
-                                 value: "Watch Video & Earn",
-                                 comment: "Button subtitle informing the user that if pressed a rewarded video ad will be displayed and they will earn credit.")
-    }
-
     static func Free() -> String {
         return NSLocalizedString("FREE_PSICASH_COIN", tableName: nil, bundle: Bundle.main,
                                  value: "Free",
                                  comment: "Button title for a product that is free. There is no cost or payment associated.")
     }
 
+}
+
+// MARK: Rewarded Videos
+extension UserStrings {
+    static func Watch_rewarded_video_and_earn() -> String {
+        return NSLocalizedString("WATCH_REWARDED_VIDEO_AND_EARN", tableName: nil, bundle: Bundle.main,
+                                 value: "Watch Video & Earn",
+                                 comment: "Button subtitle informing the user that if pressed a rewarded video ad will be displayed and they will earn credit.")
+    }
+
+    static func Rewarded_video_load_failed() -> String {
+        return NSLocalizedString("REWARDED_VIDEO_LOAD_FAILED", tableName: nil, bundle: Bundle.main,
+                                 value: "Failed to load rewarded video. Please try again later.",
+                                 comment: "Shown in a pop-up alert if user's rewarded video ad failed to load.")
+    }
 }
 
 // MARK: General Strings
