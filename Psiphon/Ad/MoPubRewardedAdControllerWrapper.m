@@ -127,6 +127,14 @@ PsiFeedbackLogType const MoPubRewardedAdControllerWrapperLogType = @"MoPubReward
                 return;
             }
 
+            // We hav seen cases that shows the ad SDK does not check if the
+            // view controller has been dismissed before presting the ad.
+            if (viewController.beingDismissed) {
+                [subscriber sendNext:@(AdPresentationErrorFailedToPlay)];
+                [subscriber sendCompleted];
+                return;
+            }
+
             NSArray<MPRewardedVideoReward *> *rewards =
                 [MPRewardedVideo availableRewardsForAdUnitID:self.adUnitID];
 

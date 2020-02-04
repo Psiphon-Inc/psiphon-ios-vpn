@@ -139,8 +139,16 @@ PsiFeedbackLogType const AdMobRewardedAdControllerWrapperLogType = @"AdMobReward
 
         GADRewardBasedVideoAd *videoAd = [GADRewardBasedVideoAd sharedInstance];
 
-        if (!videoAd.isReady) {
+        if (!videoAd.isReady || viewController.beingDismissed) {
             [subscriber sendNext:@(AdPresentationErrorNoAdsLoaded)];
+            [subscriber sendCompleted];
+            return nil;
+        }
+
+        // We hav seen cases that shows the ad SDK does not check if the
+        // view controller has been dismissed before presting the ad.
+        if (viewController.beingDismissed) {
+            [subscriber sendNext:@(AdPresentationErrorFailedToPlay)];
             [subscriber sendCompleted];
             return nil;
         }

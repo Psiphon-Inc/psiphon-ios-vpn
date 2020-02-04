@@ -85,8 +85,21 @@ extension SwiftDelegate: RewardedVideoAdBridgeDelegate {
         self.app!.store.send(.psiCash(.rewardedVideoPresentation(status)))
     }
 
-    func adLoadStatus(_ status: AdLoadStatus) {
-        self.app!.store.send(.psiCash(.rewardedVideoLoad(status)))
+    func adLoadStatus(_ status: AdLoadStatus, error: SystemError?) {
+        let loadResult: RewardedVideoLoad
+        if let error = error {
+            // Note that error event is created here as opposed to the origin
+            // of where the error occured. However this is acceptable as long as
+            // this function is called once for each error that happened almost immediately.
+            loadResult = .failure(ErrorEvent(.systemError(error)))
+        } else {
+            if case .error = status {
+                loadResult = .failure(ErrorEvent(ErrorRepr(repr: "Ad failed to load")))
+            } else {
+                loadResult = .success(status)
+            }
+        }
+        self.app!.store.send(.psiCash(.rewardedVideoLoad(loadResult)))
     }
 }
 

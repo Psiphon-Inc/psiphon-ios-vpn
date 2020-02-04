@@ -22,7 +22,7 @@ import StoreKit
 
 struct PsiCashPurchasableViewModel: Equatable {
     enum ProductType: Equatable {
-        case rewardedVideoAd
+        case rewardedVideoAd(loading: Bool)
         case product(SKProduct)
     }
     let product: ProductType
@@ -58,7 +58,7 @@ UITableViewDelegate {
 
     private let PurchaseCellID = "PurchaseCellID"
     private let TermsCellID = "TermsCellID"
-    private var data: NonEmpty<PsiCashPurchasableViewModel>
+    private var data: [PsiCashPurchasableViewModel]
     private let table: UITableView
     private let purchaseHandler: (PsiCashPurchasableViewModel.ProductType) -> Void
     var numRows: Int {
@@ -68,12 +68,7 @@ UITableViewDelegate {
     var view: UIView { table }
 
     init(purchaseHandler: @escaping (PsiCashPurchasableViewModel.ProductType) -> Void) {
-        self.data = NonEmpty(
-            PsiCashPurchasableViewModel(product: .rewardedVideoAd,
-                                        title: Current.hardCodedValues.psiCashRewardTitle,
-                                        subtitle: UserStrings.Watch_rewarded_video_and_earn(),
-                                        price: 0.0), [])
-
+        self.data = []
         self.purchaseHandler = purchaseHandler
         table = UITableView(frame: .zero, style: .plain)
         super.init()
@@ -91,8 +86,8 @@ UITableViewDelegate {
     }
 
     func bind(_ newValue: [PsiCashPurchasableViewModel]) {
-        guard data.tail != newValue else { return }
-        data.tail = newValue
+        guard data != newValue else { return }
+        data = newValue
         table.reloadData()
     }
 
@@ -165,6 +160,7 @@ fileprivate final class PurchaseCellContent: UIView, Bindable {
     private let titleLabel: UILabel
     private let subtitleLabel: UILabel
     private let button: GradientButton
+    private let spinner: UIActivityIndicatorView
     private let clickHandler: (PsiCashPurchasableViewModel.ProductType) -> Void
 
     init(clickHandler: @escaping (PsiCashPurchasableViewModel.ProductType) -> Void) {
@@ -172,6 +168,7 @@ fileprivate final class PurchaseCellContent: UIView, Bindable {
         titleLabel = UILabel.make(fontSize: .h3, typeface: .bold)
         subtitleLabel = UILabel.make(fontSize: .normal)
         button = GradientButton(gradient: .grey)
+        spinner = .init(style: .gray)
         super.init(frame: .zero)
 
         // View properties
@@ -181,9 +178,11 @@ fileprivate final class PurchaseCellContent: UIView, Bindable {
         button.setTitleColor(.darkBlue(), for: .normal)
         button.titleLabel!.font = AvenirFont.bold.font(.h3)
 
+        spinner.isHidden = true
+
         // Setup subaviews
         let imageView = UIImageView.make(image: "PsiCashCoin_Large")
-        addSubviews(imageView, titleLabel, subtitleLabel, button)
+        addSubviews(imageView, titleLabel, subtitleLabel, button, spinner)
 
         // Setup auto layout for subviews
         imageView.activateConstraints {
@@ -212,6 +211,10 @@ fileprivate final class PurchaseCellContent: UIView, Bindable {
                   $0.leadingAnchor.constraint(equalTo: titleLabel.trailingAnchor, constant: 12) ]
         }
 
+        spinner.activateConstraints {
+            $0.constraint(to: button, [.centerX(0), .centerY(0)])
+        }
+
         titleLabel.contentHuggingPriority(lowerThan: imageView, for: .horizontal)
         subtitleLabel.contentHuggingPriority(lowerThan: imageView, for: .horizontal)
         button.contentHuggingPriority(lowerThan: titleLabel, for: .horizontal)
@@ -225,6 +228,23 @@ fileprivate final class PurchaseCellContent: UIView, Bindable {
         titleLabel.text = newValue.title
         subtitleLabel.text = newValue.subtitle
 
+        button.setEventHandler { [unowned self] in
+            self.clickHandler(newValue.product)
+        }
+
+        // If product is rewarded video and it is loading, then shows
+        // the spinner with no button text.
+        if case .rewardedVideoAd(loading: let loading) = newValue.product {
+            if loading {
+                spinner.isHidden = false
+                spinner.startAnimating()
+                button.setTitle("", for: .normal)
+                return
+            }
+        }
+
+        spinner.isHidden = true
+        spinner.stopAnimating()
         if newValue.price == 0.0 {
             button.setTitle(UserStrings.Free(), for: .normal)
         } else {
@@ -232,8 +252,5 @@ fileprivate final class PurchaseCellContent: UIView, Bindable {
                             for: .normal)
         }
 
-        button.setEventHandler { [unowned self] in
-            self.clickHandler(newValue.product)
-        }
     }
 }

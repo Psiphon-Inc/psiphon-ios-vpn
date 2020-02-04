@@ -25,7 +25,7 @@ import Promises
 /// Interface for AppDelegate functionality implemented in Swift and called from ObjC.
 @objc protocol RewardedVideoAdBridgeDelegate {
     func adPresentationStatus(_ status: AdPresentation)
-    func adLoadStatus(_ status: AdLoadStatus)
+    func adLoadStatus(_ status: AdLoadStatus, error: SystemError?)
 }
 
 /// ObjC-Swift interface. Functionality implemented in ObjC and called from Swift.

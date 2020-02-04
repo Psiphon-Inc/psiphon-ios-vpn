@@ -42,9 +42,9 @@ struct Debugging {
     var psiCashDevServer = true
     var ignoreTunneledChecks = false
 
-    var printStoreLogs = true
-    var printActorState = true
-    var printAppState = true
+    var printStoreLogs = false
+    var printActorState = false
+    var printAppState = false
 
     // TODO: Replace with a Debug toolbox button to finish all pending transactions.
     var immediatelyFinishAllIAPTransaction = false
@@ -100,9 +100,37 @@ var Style = AppStyle()
 }
 
 struct PsiCashState: Equatable {
-    var rewardedVideo = RewardedVideoState()
-    var purchasing: PurchasingState? = .none
-    var products: ProgressiveResult<[PsiCashPurchasableViewModel], SystemErrorEvent> = .inProgress
+    var rewardedVideo: RewardedVideoState
+    var purchasing: PurchasingState?
+    var psiCashIAPProducts: ProgressiveResult<[PsiCashPurchasableViewModel], SystemErrorEvent>
+}
+
+extension PsiCashState {
+    init() {
+        rewardedVideo = .init()
+        purchasing = .none
+        psiCashIAPProducts = .inProgress
+    }
+
+    var rewardedVideoProduct: PsiCashPurchasableViewModel {
+        PsiCashPurchasableViewModel(
+            product: .rewardedVideoAd(loading: self.rewardedVideo.isLoading),
+            title: Current.hardCodedValues.psiCashRewardTitle,
+            subtitle: UserStrings.Watch_rewarded_video_and_earn(),
+            price: 0.0)
+    }
+
+    var allProducts: ProgressiveResult<[PsiCashPurchasableViewModel], SystemErrorEvent> {
+        guard case let .completed(productRequestResult) = psiCashIAPProducts else {
+            return .inProgress
+        }
+        switch productRequestResult {
+        case .success(let iapProducts):
+            return .from(result: .success([rewardedVideoProduct] + iapProducts))
+        case .failure(let errorEvent):
+            return .completed(.failure(errorEvent))
+        }
+    }
 }
 
 struct UIState: Equatable {
