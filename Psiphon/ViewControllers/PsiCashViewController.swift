@@ -84,7 +84,8 @@ func psiCashReducer(
     case .psiCashCoinProductList(let reqres):
         switch reqres {
         case .request:
-            state.psiCashIAPProducts = .inProgress
+            // TODO: The `psiCashIAPProducts` is more UI dependent than representing true state.
+            state.psiCashIAPProducts = state.inProgressIfNoPsiCashIAPProducts()
             return [.internal(
                 appStoreProductRequest(productIds: .psiCash()).map { result -> PsiCashAction in
                     return .psiCashCoinProductList(.response(result))
