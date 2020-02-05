@@ -112,6 +112,15 @@ extension PsiCashState {
         psiCashIAPProducts = .inProgress
     }
 
+    func inProgressIfNoPsiCashIAPProducts() -> ProgressiveResult<[PsiCashPurchasableViewModel], SystemErrorEvent> {
+        if case .completed(.success(let previousState)) = psiCashIAPProducts {
+            if previousState.count > 0 {
+                return psiCashIAPProducts
+            }
+        }
+        return .inProgress
+    }
+
     var rewardedVideoProduct: PsiCashPurchasableViewModel {
         PsiCashPurchasableViewModel(
             product: .rewardedVideoAd(loading: self.rewardedVideo.isLoading),
