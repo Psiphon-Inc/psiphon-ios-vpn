@@ -33,6 +33,7 @@
 
 // Specifier keys for cells in settings menu
 // These keys are defined in Psiphon/InAppSettings.bundle/Root.inApp.plist
+NSString * const SettingsPsiCashCellSpecifierKey = @"settingsPsiCash";
 NSString * const SettingsSubscriptionCellSpecifierKey = @"settingsSubscription";
 NSString * const SettingsReinstallVPNConfigurationKey = @"settingsReinstallVPNConfiguration";
 NSString * const SettingsResetAdConsentCellSpecifierKey = @"settingsResetAdConsent";
@@ -158,7 +159,10 @@ NSString * const SettingsResetAdConsentCellSpecifierKey = @"settingsResetAdConse
 
     [super settingsViewController:self tableView:tableView didSelectCustomViewSpecifier:specifier];
 
-    if ([specifier.key isEqualToString:SettingsSubscriptionCellSpecifierKey]) {
+    if ([specifier.key isEqualToString:SettingsPsiCashCellSpecifierKey]) {
+        [self openPsiCashViewController];
+
+    } else if ([specifier.key isEqualToString:SettingsSubscriptionCellSpecifierKey]) {
         [self openIAPViewController];
 
     } else if ([specifier.key isEqualToString:SettingsReinstallVPNConfigurationKey]) {
@@ -184,6 +188,7 @@ NSString * const SettingsResetAdConsentCellSpecifierKey = @"settingsResetAdConse
     UITableViewCell *cell = nil;
 
     NSArray<NSString *> *customKeys = @[
+      SettingsPsiCashCellSpecifierKey,
       SettingsSubscriptionCellSpecifierKey,
       SettingsReinstallVPNConfigurationKey,
       SettingsResetAdConsentCellSpecifierKey
@@ -194,8 +199,12 @@ NSString * const SettingsResetAdConsentCellSpecifierKey = @"settingsResetAdConse
         return cell;
     }
 
-    if ([specifier.key isEqualToString:SettingsSubscriptionCellSpecifierKey]) {
+    if ([specifier.key isEqualToString:SettingsPsiCashCellSpecifierKey]) {
+        cell = [super tableView:tableView cellForSpecifier:specifier];
+        [cell setAccessoryType:UITableViewCellAccessoryDisclosureIndicator];
+        cell.textLabel.text = [UserStrings PsiCash];
 
+    } else if ([specifier.key isEqualToString:SettingsSubscriptionCellSpecifierKey]) {
         cell = [super tableView:tableView cellForSpecifier:specifier];
         [cell setAccessoryType:UITableViewCellAccessoryDisclosureIndicator];
         subscriptionTableViewCell = cell;
@@ -231,6 +240,11 @@ NSString * const SettingsResetAdConsentCellSpecifierKey = @"settingsResetAdConse
 }
 
 #pragma mark - Callbacks
+
+- (void)openPsiCashViewController {
+    UIViewController *psiCashViewController = [SwiftDelegate.bridge createPsiCashViewController];
+    [self presentViewController:psiCashViewController animated:YES completion:nil];
+}
 
 - (void)openIAPViewController {
     IAPViewController *iapViewController = [[IAPViewController alloc]init];

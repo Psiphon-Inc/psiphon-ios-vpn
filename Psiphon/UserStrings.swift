@@ -28,6 +28,11 @@ import Foundation
 
 @objc final class UserStrings: NSObject {
 
+    @objc static func PsiCash() -> String {
+        // PsiCash is not translated or transliterated.
+        return "PsiCash"
+    }
+
     static func PsiCash_balance() -> String {
         return NSLocalizedString("PSICASH_BALANCE", tableName: nil, bundle: Bundle.main,
                                  value: "PsiCash Balance:",
