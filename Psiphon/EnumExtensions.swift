@@ -158,6 +158,7 @@ extension PsiCashActor.PublicAction {
         case .rewardedVideoCustomData(let promise): return promise.eraseToAny()
         case .pendingPsiCashIAP: return nil
         case .receivedRewardedVideoReward(_): return nil
+        case .userSubscription(_): return nil
         }
     }
 }
@@ -199,4 +200,14 @@ extension IAPActor.RequestResult {
     }
 }
 
+// MARK: SubscriptionActor.swift
 
+extension SubscriptionState {
+    var isSubscribed: Bool {
+        switch self {
+        case .subscribed(_): return true
+        case .notSubscribed: return false
+        case .unknown: return false
+        }
+    }
+}
