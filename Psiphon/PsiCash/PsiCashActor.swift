@@ -92,6 +92,7 @@ final class PsiCashActor: Actor, OutputProtocol, TypedInput {
     typealias InputType = Action
 
     struct Params {
+        let initiallySubscribed: Bool
         let pipeOut: Signal<OutputType, OutputErrorType>.Observer
     }
 
@@ -121,6 +122,9 @@ final class PsiCashActor: Actor, OutputProtocol, TypedInput {
 
         /// Notifies the actor that there's a pending (not finalized) IAP.
         case pendingPsiCashIAP
+
+        /// Signals that the  user subscription status has changed.
+        case userSubscription(Bool)
     }
 
     enum RequestResult: AnyMessage {
@@ -136,10 +140,9 @@ final class PsiCashActor: Actor, OutputProtocol, TypedInput {
 
     var context: ActorContext!
     private let (lifetime, token) = Lifetime.make()
-
     private let psiCashLib = PsiCash()
     private lazy var logger = PsiCashLogger(client: psiCashLib)
-
+    private var userSubscribed: Bool
     @ActorOutput private var state: State
 
     // TODO: Current behavior composition operators `<>` and `<|>` do not enable the refresh state
@@ -149,6 +152,22 @@ final class PsiCashActor: Actor, OutputProtocol, TypedInput {
     private var pendingRefreshStatePromises = [Promise<Result<(), ErrorEvent<PsiCashRefreshError>>>]()
 
     private var consumablePendingVerification: PsiCashConsumableTransaction?
+
+    /// Drops all messages if `userSubscribed` evaluates to true.
+    private lazy var subscribedHandler = Action.handler { [unowned self] msg in
+        switch msg {
+        case .public(.userSubscription(let subscribed)):
+            self.userSubscribed = subscribed
+            return .same
+        default:
+            // Drops message if user is subscribed.
+            if self.userSubscribed {
+                return .same
+            } else {
+                return .unhandled
+            }
+        }
+    }
 
     /// Behavior that only handles `refreshState` and `purchase` messages.
     private lazy var tunneledHandler = Action.handler { [unowned self] msg in
@@ -215,14 +234,13 @@ final class PsiCashActor: Actor, OutputProtocol, TypedInput {
         Action.handler(Action.pull(self.publicMessageHandler(message:),
                                    self.internalMessageHandler(message:)))
 
-    private lazy var allCases = self.untunneledHandler <|> self.tunneledHandler
-    lazy var receive = self.allCases
+    lazy var receive = self.untunneledHandler <|> self.tunneledHandler <|> self.subscribedHandler
 
     required init(_ param: Params) {
         // Removes any stale purchases from PsiCash library before setting the first state value.
         let sharedDBAuthIds = Current.sharedDB.getNonSubscriptionAuthorizations().map(\.id)
         self.psiCashLib.expirePurchases(notFoundIn: sharedDBAuthIds)
-
+        self.userSubscribed = param.initiallySubscribed
         self.state = State.fromExpectedUserReward(libData: psiCashLib.dataModel())
         self.$state.setPassthrough(param.pipeOut)
 
@@ -276,6 +294,9 @@ final class PsiCashActor: Actor, OutputProtocol, TypedInput {
             self.state.balanceState = .waitingForExpectedIncrease(withAddedReward: amount,
                                                                   libData: self.state.libData)
             return .same
+
+        case .userSubscription(_):
+            return .unhandled
         }
     }
 
