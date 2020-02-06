@@ -108,7 +108,7 @@ class IAPActor: Actor, OutputProtocol, TypedInput {
     /// Notifies `subscriptionActor` of the updated receipt data (if any).
     private var receiptData: AppStoreReceipt? = .none {
         didSet {
-            self.subscriptionActor ! SubscriptionActor.Action.updatedReceiptData(receiptData)
+            self.subscriptionActor ! .updatedReceiptData(receiptData)
         }
     }
 
