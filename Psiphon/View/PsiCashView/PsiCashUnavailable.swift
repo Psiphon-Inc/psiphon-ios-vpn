@@ -23,6 +23,7 @@ import UIKit
 struct PsiCashUnavailable: ViewBuilder {
 
     enum Message {
+        case userSubscribed
         case unavailableWhileConnecting
         case otherErrorTryAgain
     }
@@ -68,6 +69,8 @@ struct PsiCashUnavailable: ViewBuilder {
         return .init(viewable: root) { _ -> ((PsiCashUnavailable.Message) -> UIView?) in
             return { msg in
                 switch msg {
+                case .userSubscribed:
+                    subtitle.text = UserStrings.PsiCash_is_unavailable_while_subscribed()
                 case .unavailableWhileConnecting:
                     subtitle.text = UserStrings.PsiCash_is_unavailable_while_connecting_to_psiphon()
                 case .otherErrorTryAgain:

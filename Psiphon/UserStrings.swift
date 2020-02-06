@@ -113,6 +113,12 @@ import Foundation
 
     }
 
+    static func PsiCash_is_unavailable_while_subscribed() -> String {
+        return NSLocalizedString("PSICASH_UNAVAILABLE_WHILE_CONNECTING", tableName: nil, bundle: Bundle.main,
+                                 value: "PsiCash is unavailable while subscribed",
+                                 comment: "'PsiCash' features are unavailable while the user has a subscription. Do not translate or transliterate 'PsiCash'")
+    }
+
     static func PsiCash_is_unavailable_while_connecting_to_psiphon() -> String {
         return NSLocalizedString("PSICASH_UNAVAILABLE_WHILE_CONNECTING", tableName: nil, bundle: Bundle.main,
                                  value: "PsiCash is unavailable while connecting to Psiphon",

@@ -171,7 +171,7 @@ extension SwiftDelegate: SwiftBridgeDelegate {
                 value: { $0.psiCash },
                 action: { .psiCash($0) },
                 external: { $0 }),
-            actorStateSignal: app!.actorOutput.map(\.psiCash)
+            actorStateSignal: app!.actorOutput
         )
     }
 

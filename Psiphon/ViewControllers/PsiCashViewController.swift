@@ -274,7 +274,7 @@ final class PsiCashViewController: UIViewController {
         EitherView<Spinner, SpeedBoostUnavailable_ViewBuilder>>
 
     struct ObservedState: Equatable {
-        let actorState: PsiCashActor.State?
+        let actorState: AppRootActor.State
         let state: PsiCashState
         let activeTab: PsiCashViewController.UITab
         let vpnStatus: NEVPNStatus
@@ -320,7 +320,7 @@ final class PsiCashViewController: UIViewController {
     private let containerBindable: EitherView<AddPsiCashViewType, SpeedBoostViewType>.BuildType
 
     init(store: Store<PsiCashState, PsiCashAction, Application.ExternalAction>,
-         actorStateSignal: SignalProducer<PsiCashActor.State?, Never>) {
+         actorStateSignal: SignalProducer<AppRootActor.State, Never>) {
 
         self.store = store
         self.container = .init(
@@ -431,13 +431,21 @@ final class PsiCashViewController: UIViewController {
                         """)
                 }
 
-                switch observed.actorState {
-                case .none:
+                switch (observed.actorState.psiCash, observed.actorState.subscription) {
+                case (.none, _), (_, .unknown):
+                    // There is not PsiCash state or subscription state is unknow.
                     self.balanceView.isHidden = true
                     self.tabControl.isHidden = true
                     self.containerBindable.bind(.left(.right(.right(.otherErrorTryAgain))))
 
-                case .some(let psiCashActorState):
+                case (.some(let psiCashActorState), .subscribed(_)):
+                    // User is subcribed. Only shows the PsiCash balance.
+                    self.balanceView.isHidden = false
+                    self.tabControl.isHidden = true
+                    self.balanceView.bind(psiCashActorState.balanceState)
+                    self.containerBindable.bind(.left(.right(.right(.userSubscribed))))
+
+                case (.some(let psiCashActorState), .notSubscribed):
                     self.balanceView.isHidden = false
                     self.tabControl.isHidden = false
                     self.balanceView.bind(psiCashActorState.balanceState)
