@@ -189,13 +189,14 @@ willFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
 
     // If the extension has been waiting for the app to come into foreground,
     // send the VPNManager startVPN message again.
-    __block RACDisposable *connectedDisposable = [[[RACSignal
-                                                    zip:@[
-                                                        [[AdManager sharedInstance].adIsShowing take:1],
-                                                        [self.vpnManager queryIsPsiphonTunnelConnected],
-                                                        [self.vpnManager.lastTunnelStatus take:1],
-                                                    ]]
-                                                   flattenMap:^RACSignal<RACUnit *> *(RACTuple *tuple) {
+    __block RACDisposable *connectedDisposable =
+    [[[RACSignal
+       zip:@[
+           [[AdManager sharedInstance].adIsShowing take:1],
+           [self.vpnManager queryIsPsiphonTunnelConnected],
+           [self.vpnManager.lastTunnelStatus take:1],
+       ]]
+      flattenMap:^RACSignal<RACUnit *> *(RACTuple *tuple) {
         BOOL adIsShowing = [(NSNumber *) tuple.first boolValue];
         BOOL tunnelConnected = [(NSNumber *) tuple.second boolValue];
         VPNStatus vpnStatus = (VPNStatus) [tuple.third integerValue];
@@ -208,14 +209,11 @@ willFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
         }
 
         return [RACSignal empty];
-    }]
-                                                  subscribeNext:^(RACUnit *x) {
+    }] subscribeNext:^(RACUnit *x) {
         [weakSelf.vpnManager startVPN];
-    }
-                                                  error:^(NSError *error) {
+    } error:^(NSError *error) {
         [weakSelf.compoundDisposable removeDisposable:connectedDisposable];
-    }
-                                                  completed:^{
+    } completed:^{
         [weakSelf.compoundDisposable removeDisposable:connectedDisposable];
     }];
 
@@ -304,17 +302,15 @@ willFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
         // tunnel is already connected, give up on the Ad and
         // start the VPN. Otherwise the startVPN message will be
         // sent after the Ad has disappeared.
-        __block RACDisposable *disposable = [[[AdManager sharedInstance].adIsShowing take:1]
-                                             subscribeNext:^(NSNumber *adIsShowing) {
-
+        __block RACDisposable *disposable =
+        [[[AdManager sharedInstance].adIsShowing take:1]
+         subscribeNext:^(NSNumber *adIsShowing) {
             if (![adIsShowing boolValue]) {
                 [weakSelf.vpnManager startVPN];
             }
-        }
-                                             error:^(NSError *error) {
+        } error:^(NSError *error) {
             [weakSelf.compoundDisposable removeDisposable:disposable];
-        }
-                                             completed:^{
+        } completed:^{
             [weakSelf.compoundDisposable removeDisposable:disposable];
         }];
 
