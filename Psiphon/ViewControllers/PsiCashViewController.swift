@@ -149,8 +149,12 @@ func psiCashReducer(
             switch purchaseResult {
             case .success:
                 state.purchasing = .none
-            case .failure(let error):
-                state.purchasing = .iapError(error)
+            case .failure(let errorEvent):
+                if errorEvent.error.purchaseCancelled {
+                    state.purchasing = .none
+                } else {
+                    state.purchasing = .iapError(errorEvent)
+                }
             }
             return []
         }
@@ -408,7 +412,10 @@ final class PsiCashViewController: UIViewController {
                             please connect to finish the transaction.
                             """ // TODO: Translate error.
                         case .storeKitError(let storeKitError):
-                            description = "Purchase Failed (\(storeKitError.localizedDescription))"
+                            description = """
+                            \(UserStrings.Purchase_failed())
+                            (\(storeKitError.localizedDescription))
+                            """
                         }
                     }
 
@@ -654,5 +661,17 @@ extension RewardedVideoState {
             dismissed = false
             rewarded = false
         }
+    }
+}
+
+extension PurchaseError {
+    /// True if purchase is cancelled by the user
+    var purchaseCancelled: Bool {
+        if case let .purchaseRequestError(.storeKitError(skError)) = self {
+            if case .paymentCancelled = skError.code {
+                return true
+            }
+        }
+        return false
     }
 }
