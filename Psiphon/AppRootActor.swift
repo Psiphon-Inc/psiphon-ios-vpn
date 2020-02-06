@@ -43,9 +43,8 @@ final class AppRootActor: Actor, OutputProtocol, TypedInput {
         case verifyPsiCashConsumable(PsiCashConsumableTransaction)
     }
 
-    fileprivate enum PrivateAction<T: Actor>: AnyMessage {
-        case create
-        case destroy
+    fileprivate enum PrivateAction: AnyMessage {
+        case subscription(SubscriptionState)
     }
 
     struct State: Equatable {
@@ -162,14 +161,23 @@ final class AppRootActor: Actor, OutputProtocol, TypedInput {
 
             }
 
-        case let msg as PrivateAction<PsiCashActor>:
+        case let msg as PrivateAction:
             switch msg {
-            case .create:
-                self.makePsiCash()
-                return .same
-            case .destroy:
-                self.psiCash.destroy()
-                return .same
+            case .subscription(let subscriptionState):
+                switch subscriptionState {
+                case .subscribed(_), .notSubscribed:
+                    // If PsiCashActor is not created yet, it creates it,
+                    // otherwise it is sent a `userSubscribed` message.
+                    if let psiCashActor = self.psiCash.actor {
+                        psiCashActor ! .userSubscription(subscriptionState.isSubscribed)
+                    } else {
+                        self.makePsiCash(userSubscribed: subscriptionState.isSubscribed)
+                    }
+                    return .same
+                case .unknown:
+                    // No-op if subscription state is not known yet.
+                    return .same
+                }
             }
 
         case let msg as NotificationMessage:
@@ -202,15 +210,8 @@ final class AppRootActor: Actor, OutputProtocol, TypedInput {
         // Creates a feedback loop by listening to IAPActor subscription output, and sending
         // messages to self.
         self.lifetime += iapActor.output.map {
-            subscriptionState -> PrivateAction<PsiCashActor>? in
-            switch subscriptionState {
-            case .subscribed(_):
-                return .destroy
-            case .notSubscribed:
-                return .create
-            case .unknown:
-                return .none
-            }
+            subscriptionState -> PrivateAction? in
+            return .subscription(subscriptionState)
         }
         .tell(actor: self)
     }
@@ -238,13 +239,14 @@ private extension AppRootActor {
 
     /// Makes PsiCashActor and binds an event stream to it. Updates `psiCashWrapper`.
     /// - Note: No-op if actor is not destroyed after the first `create` call.
-    func makePsiCash() {
+    func makePsiCash(userSubscribed: Bool) {
         self.psiCash.create(Current.actorBuilder,
                             parent: self,
                             transform: { .public($0) },
                             propsBuilder: { input in
                                 Props(PsiCashActor.self,
                                       param: PsiCashActor.Params(
+                                        initiallySubscribed: userSubscribed,
                                         pipeOut: input),
                                       qos: .userInteractive)
         })
