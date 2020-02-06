@@ -162,6 +162,12 @@ extension UserStrings {
                                  value: "Please try again later.",
                                  comment: "Subtitle shown when the current operation failed, asking the user to try again at a later time.")
     }
+
+    static func Purchase_failed() -> String {
+        return NSLocalizedString("GENERIC_PURCHASE_FAILED", tableName: nil, bundle: Bundle.main,
+                                 value: "Purchase Failed",
+                                 comment: "Generic alert shown when purchase of a product fails.")
+    }
 }
 
 // MARK: Generic values

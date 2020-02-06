@@ -55,7 +55,7 @@ struct IAPResult {
 
 enum IAPError: HashableError {
     case waitingForPendingTransactions
-    case storeKitError(SystemError)
+    case storeKitError(SKError)
 }
 
 class IAPActor: Actor, OutputProtocol, TypedInput {
@@ -208,9 +208,9 @@ class IAPActor: Actor, OutputProtocol, TypedInput {
                     }
 
                     switch completedState {
-                    case let .failure(systemError):
+                    case let .failure(skError):
                         self.paymenQueue.finishTransaction(transaction)
-                        pendingResult = .failure(ErrorEvent(IAPError.storeKitError(systemError)))
+                        pendingResult = .failure(ErrorEvent(IAPError.storeKitError(skError)))
 
                     case let .success(success):
                         switch success {

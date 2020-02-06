@@ -93,6 +93,9 @@
 /* Button title for a product that is free. There is no cost or payment associated. */
 "FREE_PSICASH_COIN" = "Free";
 
+/* Generic alert shown when purchase of a product fails. */
+"GENERIC_PURCHASE_FAILED" = "Purchase Failed";
+
 /* User does not have suffiecient 'PsiCash' balance. PsiCash is a type of credit. Do not translate or transliterate 'PsiCash'. */
 "INSUFFICIENT_PSICASH_BALANCE" = "Insuffiecient PsiCash balance";
 
