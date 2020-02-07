@@ -252,17 +252,14 @@ class IAPActor: Actor, OutputProtocol, TypedInput {
     required init(_ param: Params) {
         self.param = param
         self.state = .init(pendingPsiCashPurchase: nil)
+
+        self.lifetime += SignalProducer.combineLatest(SignalProducer(self.subscriptionActor.output),
+                                                      self.$state.signalProducer)
+            .map(OutputState.init(subscription:iapState:))
+            .start(self.param.pipeOut)
     }
 
     func preStart() {
-        self.lifetime += Signal.combineLatest(self.subscriptionActor.output,
-                                              self.$state.observable)
-            .map(OutputState.init(subscription: iapState:))
-            .observe(self.param.pipeOut)
-
-        // TODO: 
-        self.state = .init(pendingPsiCashPurchase: nil)
-
         /// According to https://developer.apple.com/documentation/storekit/in-app_purchase/setting_up_the_transaction_observer_and_payment_queue
         /// this observer must be persistent and no deallocated during the app lifecycle.
         self.paymenQueue.add(self.paymentTransactionDelegate)
