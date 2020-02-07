@@ -19,10 +19,10 @@
 
 import UIKit
 
-/// ViewBuilder for the "PsiCash Unavailable" screen.
-struct PsiCashUnavailable: ViewBuilder {
+struct PsiCashMessageView: ViewBuilder {
 
     enum Message {
+        case speedBoostAlreadyActive
         case userSubscribed
         case unavailableWhileConnecting
         case otherErrorTryAgain
@@ -31,20 +31,19 @@ struct PsiCashUnavailable: ViewBuilder {
     func build(_ container: UIView?) -> MutableBindableViewable<Message, UIView> {
         let root = UIView(frame: .zero)
 
-        let image = UIImageView.make(image: "PsiCashCoinCloud")
+        let imageView = UIImageView()
+        imageView.contentMode = .scaleAspectFit
 
-        let title = UILabel.make(text: UserStrings.PsiCash_unavailable(),
-            fontSize: .h1,
-            alignment: .center)
+        let title = UILabel.make(fontSize: .h1,
+                                 alignment: .center)
 
-        let subtitle = UILabel.make(text: UserStrings.Please_try_again_later(),
-            fontSize: .h3,
-            typeface: .medium,
-            numberOfLines: 0,
-            alignment: .center)
+        let subtitle = UILabel.make(fontSize: .h3,
+                                    typeface: .medium,
+                                    numberOfLines: 0,
+                                    alignment: .center)
 
         // Add subviews
-        root.addSubviews(image, title, subtitle)
+        root.addSubviews(imageView, title, subtitle)
         container!.addSubview(root)
 
         // Autolayout
@@ -52,13 +51,13 @@ struct PsiCashUnavailable: ViewBuilder {
             $0.constraintToParent(.leading(), .trailing(),.centerX(), .centerY())
         }
 
-        image.activateConstraints {
+        imageView.activateConstraints {
             $0.constraintToParent(.top(), .centerX())
         }
 
         title.activateConstraints {
             $0.constraintToParent(.leading(), .trailing()) +
-                [ $0.topAnchor.constraint(equalTo: image.bottomAnchor, constant: 20) ]
+                [ $0.topAnchor.constraint(equalTo: imageView.bottomAnchor, constant: 20) ]
         }
 
         subtitle.activateConstraints {
@@ -66,14 +65,27 @@ struct PsiCashUnavailable: ViewBuilder {
                 [ $0.topAnchor.constraint(equalTo: title.bottomAnchor, constant: 13) ]
         }
 
-        return .init(viewable: root) { _ -> ((PsiCashUnavailable.Message) -> UIView?) in
-            return { msg in
+        return .init(viewable: root) { [imageView, title, subtitle] _ -> ((PsiCashMessageView.Message) -> UIView?) in
+            return { [imageView, title, subtitle] msg in
                 switch msg {
+                case .speedBoostAlreadyActive:
+                    imageView.image = UIImage(named: "SpeedBoostActive")!
+                    title.text = UserStrings.Speed_boost_active()
+                    subtitle.text = UserStrings.Speed_boost_you_already_have()
+
                 case .userSubscribed:
+                    imageView.image =  UIImage(named: "PsiCashCoinCloud")!
+                    title.text = UserStrings.PsiCash_unavailable()
                     subtitle.text = UserStrings.PsiCash_is_unavailable_while_subscribed()
+
                 case .unavailableWhileConnecting:
+                    imageView.image =  UIImage(named: "PsiCashCoinCloud")!
+                    title.text = UserStrings.PsiCash_unavailable()
                     subtitle.text = UserStrings.PsiCash_is_unavailable_while_connecting_to_psiphon()
+                    
                 case .otherErrorTryAgain:
+                    imageView.image =  UIImage(named: "PsiCashCoinCloud")!
+                    title.text = UserStrings.PsiCash_unavailable()
                     subtitle.text = UserStrings.Please_try_again_later()
                 }
                 return nil
