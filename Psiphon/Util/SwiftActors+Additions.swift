@@ -286,7 +286,7 @@ where T.OutputErrorType == Never {
 
 
 @propertyWrapper
-final class ActorOutput<Value> {
+final class ActorState<Value> {
     private var passthrough: Signal<Value, Never>.Observer? = nil
     private let (output, input) = Signal<Value, Never>.pipe()
 
@@ -297,7 +297,7 @@ final class ActorOutput<Value> {
         }
     }
 
-    var projectedValue: ActorOutput {
+    var projectedValue: ActorState {
         return self
     }
 

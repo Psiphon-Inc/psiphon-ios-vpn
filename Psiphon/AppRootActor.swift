@@ -49,7 +49,7 @@ final class AppRootActor: Actor, OutputProtocol, TypedInput {
 
     struct State: Equatable {
         let psiCash: PsiCashActor.State?
-        let subscription: SubscriptionState
+        let iap: IAPActor.OutputState
     }
 
     var context: ActorContext!
@@ -203,15 +203,15 @@ final class AppRootActor: Actor, OutputProtocol, TypedInput {
         // Combines result from all child actors, and drains it into output (`self.param.output`).
         self.lifetime +=
             Signal.combineLatest(self.psiCash.output, self.iapActor.output)
-                .map(State.init(psiCash: subscription:))
+                .map(State.init(psiCash: iap:))
                 .skipRepeats()
                 .observe(self.param.pipeOut)
 
         // Creates a feedback loop by listening to IAPActor subscription output, and sending
         // messages to self.
         self.lifetime += iapActor.output.map {
-            subscriptionState -> PrivateAction? in
-            return .subscription(subscriptionState)
+            iapState -> PrivateAction? in
+            return .subscription(iapState.subscription)
         }
         .tell(actor: self)
     }

@@ -60,7 +60,7 @@ final class SubscriptionActor: Actor, OutputProtocol, TypedInput {
     private let param: Param
     private var expiryTimer: SingleFireTimer?
     private var subscriptionData: SubscriptionData?
-    @ActorOutput private var state: SubscriptionState
+    @ActorState private var state: SubscriptionState
 
     required init(_ param: Param) {
         self.param = param

@@ -78,3 +78,5 @@ struct ErrorEvent<E: HashableError>: HashableError {
 /// (i.e. `Error & Hashable`).
 typealias SystemError = NSError
 typealias SystemErrorEvent = ErrorEvent<SystemError>
+
+extension Either: Error where A: Error, B: Error {}

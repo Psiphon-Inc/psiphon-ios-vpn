@@ -143,7 +143,7 @@ final class PsiCashActor: Actor, OutputProtocol, TypedInput {
     private let psiCashLib = PsiCash()
     private lazy var logger = PsiCashLogger(client: psiCashLib)
     private var userSubscribed: Bool
-    @ActorOutput private var state: State
+    @ActorState private var state: State
 
     // TODO: Current behavior composition operators `<>` and `<|>` do not enable the refresh state
     // logic to be easily implemented with the help of `promiseAccumulator`

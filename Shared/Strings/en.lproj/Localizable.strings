@@ -45,6 +45,9 @@
 /* User must connect to 'Psiphon' in order to use 'Speed Boost' product. Do not translate or transliterate 'Psiphon'. Do not transliterate 'Speed Boost'. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
 "CONENCT_TO_USE_SPEED_BOOST" = "Connect to Psiphon to use Speed Boost";
 
+/* Text shown to the user telling them to connect to 'Psiphon', to finish their unfinished transaction. Do not translate or transliterate 'Psiphon'. */
+"CONNECT_TO_FINALIZE_PSICASH_TRANSACTION" = "Connect to Psiphon to finalize your transaction";
+
 /* Button title that lets the user to connec to the Psiphon network. Do not translate or transliterate 'Psiphon' */
 "CONNECT_TO_PSIPHON" = "Connect to Psiphon";
 
@@ -237,6 +240,9 @@
 /* 'PsiCash' features are unavailable while the app the connecting to 'Psiphon'. PsiCash is a type of credit. Do not translate or transliterate 'Psiphon'. Do not translate or transliterate 'PsiCash'
    'PsiCash' features are unavailable while the user has a subscription. Do not translate or transliterate 'PsiCash' */
 "PSICASH_UNAVAILABLE_WHILE_CONNECTING" = "PsiCash is unavailable while subscribed";
+
+/* An error that signifies a state where the user has made a 'PsiCash' purchase, but extra action is needed from the user to finish the transaction. Do not translate or transliterate 'PsiCash'. */
+"PSICASH_UNFINISHED_PURCHASE" = "You have a pending PsiCash transaction";
 
 /* Shown when user is not connected to Psiphon network. Do not translate or transliterate 'Psiphon' */
 "PSIPHON_IS_NOT_CONNECTED" = "Psiphon is not connected";
