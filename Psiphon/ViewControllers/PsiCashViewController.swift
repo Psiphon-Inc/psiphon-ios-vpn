@@ -267,11 +267,13 @@ func psiCashReducer(
 // MARK: ViewController
 
 final class PsiCashViewController: UIViewController {
-    typealias AddPsiCashViewType = EitherView<PsiCashCoinPurchaseTable,
-        EitherView<Spinner, PsiCashUnavailable>>
+    typealias AddPsiCashViewType =
+        EitherView<PsiCashCoinPurchaseTable,
+            EitherView<Spinner,
+                EitherView<FeatureUnavailableUntunneled, PsiCashUnavailable>>>
 
     typealias SpeedBoostViewType = EitherView<SpeedBoostPurchaseTable,
-        EitherView<Spinner, SpeedBoostUnavailable_ViewBuilder>>
+        EitherView<Spinner, FeatureUnavailableUntunneled>>
 
     struct ObservedState: Equatable {
         let actorState: AppRootActor.State
@@ -334,13 +336,17 @@ final class PsiCashViewController: UIViewController {
                     }
                 }),
                 .init(Spinner(style: .whiteLarge),
-                      PsiCashUnavailable())),
+                      .init(FeatureUnavailableUntunneled(
+                        action: { [unowned store] in
+                            store.send(.connectToPsiphonTapped)
+                      }),
+                            PsiCashUnavailable()))),
             SpeedBoostViewType(
                 SpeedBoostPurchaseTable(purchaseHandler: {
                     store.send(.buyPsiCashProduct(.request(.speedBoost($0))))
                 }),
                 .init(Spinner(style: .whiteLarge),
-                      SpeedBoostUnavailable_ViewBuilder(
+                      FeatureUnavailableUntunneled(
                         action: { [unowned store] in
                             store.send(.connectToPsiphonTapped)
                       }))))
@@ -431,19 +437,19 @@ final class PsiCashViewController: UIViewController {
                         """)
                 }
 
-                switch (observed.actorState.psiCash, observed.actorState.subscription) {
+                switch (observed.actorState.psiCash, observed.actorState.iap.subscription) {
                 case (.none, _), (_, .unknown):
                     // There is not PsiCash state or subscription state is unknow.
                     self.balanceView.isHidden = true
                     self.tabControl.isHidden = true
-                    self.containerBindable.bind(.left(.right(.right(.otherErrorTryAgain))))
+                    self.containerBindable.bind(.left(.right(.right(.right(.otherErrorTryAgain)))))
 
                 case (.some(let psiCashActorState), .subscribed(_)):
                     // User is subcribed. Only shows the PsiCash balance.
                     self.balanceView.isHidden = false
                     self.tabControl.isHidden = true
                     self.balanceView.bind(psiCashActorState.balanceState)
-                    self.containerBindable.bind(.left(.right(.right(.userSubscribed))))
+                    self.containerBindable.bind(.left(.right(.right(.right(.userSubscribed)))))
 
                 case (.some(let psiCashActorState), .notSubscribed):
                     self.balanceView.isHidden = false
@@ -460,27 +466,38 @@ final class PsiCashViewController: UIViewController {
                     case (.notConnected, .addPsiCash),
                          (.connected, .addPsiCash):
 
-                        switch observed.state.allProducts {
-                        case .inProgress:
-                            self.containerBindable.bind(.left(.right(.left(true))))
-                        case .completed(let productRequestResult):
-                            switch productRequestResult {
-                            case .success(let psiCashCoinProducts):
-                                self.containerBindable.bind(.left(.left(psiCashCoinProducts)))
-                            case .failure(_):
-                                self.containerBindable.bind(
-                                    .left(.right(.right(.otherErrorTryAgain))))
+                        if tunnelState == .notConnected
+                        && observed.actorState.iap.iapState.pendingPsiCashPurchase != nil {
+                            // If tunnel is not connected and there is a pending PsiCash IAP,
+                            // then shows the "pending psicash purchase" screen.
+                            self.containerBindable.bind(
+                                .left(.right(.right(.left(.pendingPsiCashPurchase))))
+                            )
+
+                        } else {
+                            switch observed.state.allProducts {
+                            case .inProgress:
+                                self.containerBindable.bind(.left(.right(.left(true))))
+                            case .completed(let productRequestResult):
+                                switch productRequestResult {
+                                case .success(let psiCashCoinProducts):
+                                    self.containerBindable.bind(.left(.left(psiCashCoinProducts)))
+                                case .failure(_):
+                                    self.containerBindable.bind(
+                                        .left(.right(.right(.right(.otherErrorTryAgain)))))
+                                }
                             }
                         }
 
                     case (.connecting, .addPsiCash):
                         self.containerBindable.bind(
-                            .left(.right(.right(.unavailableWhileConnecting))))
+                            .left(.right(.right(.right(.unavailableWhileConnecting)))))
 
                     case (.notConnected, .speedBoost), (.connecting, .speedBoost):
                         let connectToPsiphonMessage =
-                            SpeedBoostUnavailable_ViewBuilder.Message(
-                                subtitle: UserStrings.Connect_to_psiphon_to_use_speed_boost())
+                            FeatureUnavailableUntunneled.Message
+                                .speedBoostUnavailable(subtitle: .connectToPsiphon)
+
                         self.containerBindable.bind(.right(.right(.right(connectToPsiphonMessage))))
 
                     case (.connected, .speedBoost):
@@ -492,9 +509,8 @@ final class PsiCashViewController: UIViewController {
                         if let viewModel = viewModel {
                             self.containerBindable.bind(.right(.left(viewModel)))
                         } else {
-                            let tryAgainLater =
-                                SpeedBoostUnavailable_ViewBuilder.Message(subtitle:
-                                    UserStrings.Please_try_again_later())
+                            let tryAgainLater = FeatureUnavailableUntunneled.Message
+                                .speedBoostUnavailable(subtitle: .tryAgainLater)
                             self.containerBindable.bind(.right(.right(.right(tryAgainLater))))
 
 
@@ -675,11 +691,15 @@ extension RewardedVideoState {
 extension PurchaseError {
     /// True if purchase is cancelled by the user
     var purchaseCancelled: Bool {
-        if case let .purchaseRequestError(.storeKitError(skError)) = self {
-            if case .paymentCancelled = skError.code {
-                return true
-            }
+        guard case let .purchaseRequestError(.storeKitError(error)) = self else {
+            return false
         }
-        return false
+        guard case .left(let skError) = error else {
+            return false
+        }
+        guard case .paymentCancelled = skError.code else {
+            return false
+        }
+        return true
     }
 }

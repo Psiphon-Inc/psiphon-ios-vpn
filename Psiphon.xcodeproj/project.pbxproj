@@ -102,7 +102,7 @@
 		52A2465E239081C100A01FF1 /* Application.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52A2465D239081C100A01FF1 /* Application.swift */; };
 		52A24662239B07E000A01FF1 /* psiCashProductIds.plist in Resources */ = {isa = PBXBuildFile; fileRef = 52A24661239B07E000A01FF1 /* psiCashProductIds.plist */; };
 		52A2466D23A172A800A01FF1 /* AlertViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52A2466C23A172A800A01FF1 /* AlertViewController.swift */; };
-		52A2466F23A1769300A01FF1 /* SpeedBoostUnavailable_ViewBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52A2466E23A1769300A01FF1 /* SpeedBoostUnavailable_ViewBuilder.swift */; };
+		52A2466F23A1769300A01FF1 /* FeatureUnavailableUntunneled.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52A2466E23A1769300A01FF1 /* FeatureUnavailableUntunneled.swift */; };
 		52A2467123A176BA00A01FF1 /* PsiCashPurchasingAlertViewBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52A2467023A176BA00A01FF1 /* PsiCashPurchasingAlertViewBuilder.swift */; };
 		52B3C54323DA31E1003F6B12 /* VerifierServerModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52B3C54223DA31E1003F6B12 /* VerifierServerModels.swift */; };
 		52B3C54523DA391F003F6B12 /* Requests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52B3C54423DA391F003F6B12 /* Requests.swift */; };
@@ -444,7 +444,7 @@
 		52A2465D239081C100A01FF1 /* Application.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Application.swift; sourceTree = "<group>"; };
 		52A24661239B07E000A01FF1 /* psiCashProductIds.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = psiCashProductIds.plist; sourceTree = "<group>"; };
 		52A2466C23A172A800A01FF1 /* AlertViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertViewController.swift; sourceTree = "<group>"; };
-		52A2466E23A1769300A01FF1 /* SpeedBoostUnavailable_ViewBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeedBoostUnavailable_ViewBuilder.swift; sourceTree = "<group>"; };
+		52A2466E23A1769300A01FF1 /* FeatureUnavailableUntunneled.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeatureUnavailableUntunneled.swift; sourceTree = "<group>"; };
 		52A2467023A176BA00A01FF1 /* PsiCashPurchasingAlertViewBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PsiCashPurchasingAlertViewBuilder.swift; sourceTree = "<group>"; };
 		52B3C54223DA31E1003F6B12 /* VerifierServerModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VerifierServerModels.swift; sourceTree = "<group>"; };
 		52B3C54423DA391F003F6B12 /* Requests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Requests.swift; sourceTree = "<group>"; };
@@ -1003,7 +1003,7 @@
 				52C8F0AC237E145C00E5F9C0 /* PsiCashCoinPurchaseTable.swift */,
 				528D81322384823F00AA2D77 /* PsiCashUnavailable.swift */,
 				52A24658238C9AB700A01FF1 /* SpeedBoostPurchaseTable.swift */,
-				52A2466E23A1769300A01FF1 /* SpeedBoostUnavailable_ViewBuilder.swift */,
+				52A2466E23A1769300A01FF1 /* FeatureUnavailableUntunneled.swift */,
 				52A2467023A176BA00A01FF1 /* PsiCashPurchasingAlertViewBuilder.swift */,
 				5237387323AABB0F00DDE396 /* PurchasingSpeedBoostAlertViewBuilder.swift */,
 				52DF5E8623AAF97400A1B067 /* SpeedBoostActiveAlertViewBuilder.swift */,
@@ -1764,7 +1764,7 @@
 				EF90D7A1204F22C900228A63 /* timestamp_valid.c in Sources */,
 				445F24DF20E1A5BA00D004E9 /* ANY.c in Sources */,
 				5254093D2332AA0E001E7B12 /* SubscriptionActor.swift in Sources */,
-				52A2466F23A1769300A01FF1 /* SpeedBoostUnavailable_ViewBuilder.swift in Sources */,
+				52A2466F23A1769300A01FF1 /* FeatureUnavailableUntunneled.swift in Sources */,
 				4E90C94420CB37F5003FC319 /* PsiCashLogger.m in Sources */,
 				EFC2F5C420226782007B52F9 /* RootContainerController.m in Sources */,
 				5248B4D223219EE8008C00D4 /* SwiftActors+Additions.swift in Sources */,

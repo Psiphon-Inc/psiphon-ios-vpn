@@ -134,7 +134,7 @@ extension SwiftDelegate: SwiftBridgeDelegate {
                                     self.objcBridge.dismiss(screen: screen)
                                 }})
 
-        self.lifetime += self.app!.actorOutput.map(\.subscription)
+        self.lifetime += self.app!.actorOutput.map(\.iap.subscription)
             .startWithValues { [unowned self] in
                 self.objcBridge.onSubscriptionStatus(BridgedUserSubscription.from(state: $0))
         }

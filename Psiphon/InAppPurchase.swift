@@ -220,7 +220,7 @@ enum IAPCompletedTransactionState: Equatable {
 /// Refines `SKPaymentTransaction` state.
 enum IAPTransactionState: Equatable {
     case pending(IAPPendingTransactionState)
-    case completed(Result<IAPCompletedTransactionState, SKError>)
+    case completed(Result<IAPCompletedTransactionState, Either<SKError, SystemError>>)
 }
 
 extension SKPaymentTransaction {
@@ -238,8 +238,12 @@ extension SKPaymentTransaction {
             return .completed(.success(.restored))
         case .failed:
             // Error is non-null when state is failed.
-            let error = self.error! as! SKError
-            return .completed(.failure(error))
+            let someError = self.error!
+            if let skError = someError as? SKError {
+                return .completed(.failure(.left(skError)))
+            } else {
+                return .completed(.failure(.right(someError as SystemError)))
+            }
         @unknown default:
             fatalError("unknown transaction state \(self.transactionState)")
         }

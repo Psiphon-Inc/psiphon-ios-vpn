@@ -137,6 +137,7 @@ public enum Either<A, B> {
 }
 
 extension Either: Equatable where A: Equatable, B: Equatable {}
+extension Either: Hashable where A: Hashable, B: Hashable {}
 
 public extension Either {
 
