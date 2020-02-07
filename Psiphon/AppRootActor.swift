@@ -54,7 +54,6 @@ final class AppRootActor: Actor, OutputProtocol, TypedInput {
 
     var context: ActorContext!
     private let (lifetime, token) = Lifetime.make()
-    private let param: Params
 
     private var psiCash = MutableObservableActor<PsiCashActor, PsiCashActor.PublicAction>()
     private var iapActor = ObservableActor<IAPActor, IAPActor.Action>()
@@ -193,19 +192,12 @@ final class AppRootActor: Actor, OutputProtocol, TypedInput {
     lazy var receive = self.defaultBehavior <|> self.forwardBehavior
 
     required init(_ param: Params) {
-        self.param = param
-    }
-    
-    func preStart() {
-        makeLandingPageActor()
-        makeIAP()
-
         // Combines result from all child actors, and drains it into output (`self.param.output`).
         self.lifetime +=
             Signal.combineLatest(self.psiCash.output, self.iapActor.output)
                 .map(State.init(psiCash: iap:))
                 .skipRepeats()
-                .observe(self.param.pipeOut)
+                .observe(param.pipeOut)
 
         // Creates a feedback loop by listening to IAPActor subscription output, and sending
         // messages to self.
@@ -214,6 +206,11 @@ final class AppRootActor: Actor, OutputProtocol, TypedInput {
             return .subscription(iapState.subscription)
         }
         .tell(actor: self)
+    }
+    
+    func preStart() {
+        makeLandingPageActor()
+        makeIAP()
     }
 
     func modifyLandingPageAndOpen(_ url: RestrictedURL) {

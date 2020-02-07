@@ -271,10 +271,10 @@ final class PsiCashActor: Actor, OutputProtocol, TypedInput {
             // TODO: Observable lifetime issue
             // Check if subscription is disposed once completed
             // Check if observable is ever completed.
-            self.$state.observable
+            self.$state.signalProducer
                 .map(\.libData.authPackage.hasEarnerToken)
                 .falseIfNotTrue(within: .seconds(5))
-                .observeValues { _ in
+                .startWithValues { _ in
                     promise.fulfill(addPsiCashToLandingPage(url, psicash: self.psiCashLib,
                                                             logger: self.logger))
             }

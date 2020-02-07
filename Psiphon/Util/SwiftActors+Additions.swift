@@ -287,6 +287,14 @@ where T.OutputErrorType == Never {
 
 @propertyWrapper
 final class ActorState<Value> {
+
+    // - NOTE
+    // Actors are almost always interested in the current state value, and not just
+    // future values that can be observed from `output`.
+    // Hence only `signalProducer` is provided as opposed to making `output`
+    // directly available for subscription.
+    // Using `signal` can lead to subtle bugs.
+
     private var passthrough: Signal<Value, Never>.Observer? = nil
     private let (output, input) = Signal<Value, Never>.pipe()
 
@@ -301,8 +309,11 @@ final class ActorState<Value> {
         return self
     }
 
-    var observable: Signal<Value, Never> {
-        output
+    var signalProducer: SignalProducer<Value, Never> {
+        SignalProducer { [unowned self] observer, lifetime in
+            observer.send(value: self.wrappedValue)
+            lifetime += self.output.observe(observer)
+        }
     }
 
     init(wrappedValue: Value) {
@@ -325,7 +336,6 @@ final class ActorState<Value> {
 @propertyWrapper
 public final class State<Value> {
     private let passthroughSubject = Signal<Value, Never>.pipe()
-    private lazy var sharedProducer = SignalProducer<Value, Never>.init(value: self.wrappedValue)
 
     public var wrappedValue: Value {
         didSet { // TODO: is willSet more correct to use?
