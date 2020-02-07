@@ -238,6 +238,11 @@ struct ExpirableTransaction: Equatable {
     let localTimeExpiry: Date
     let authorization: Authorization
 
+    // True if expiry date has already passed.
+    var expired: Bool {
+        return localTimeExpiry.timeIntervalSinceNow <= 0
+    }
+
     static func from(psiCashPurchase purchase: PsiCashPurchase) -> Self? {
         guard let serverTimeExpiry = purchase.serverTimeExpiry else { return nil }
         guard let localTimeExpiry = purchase.localTimeExpiry else { return nil }

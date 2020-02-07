@@ -239,7 +239,7 @@ func psiCashReducer(
 
             return [
                 .external(.action(.psiCash(.receivedRewardedVideoReward(amount: rewardAmount)))),
-                    .external(Effect(refreshWithRetryEffect))
+                .external(Effect(refreshWithRetryEffect))
             ]
         } else {
             return []
@@ -269,16 +269,17 @@ func psiCashReducer(
 final class PsiCashViewController: UIViewController {
     typealias AddPsiCashViewType =
         EitherView<PsiCashCoinPurchaseTable,
-            EitherView<Spinner,
-                EitherView<FeatureUnavailableUntunneled, PsiCashUnavailable>>>
+        EitherView<Spinner,
+        EitherView<PsiCashMessageViewUntunneled, PsiCashMessageView>>>
 
     typealias SpeedBoostViewType = EitherView<SpeedBoostPurchaseTable,
-        EitherView<Spinner, FeatureUnavailableUntunneled>>
+        EitherView<Spinner,
+        EitherView<PsiCashMessageViewUntunneled, PsiCashMessageView>>>
 
     struct ObservedState: Equatable {
         let actorState: AppRootActor.State
         let state: PsiCashState
-        let activeTab: PsiCashViewController.UITab
+        let activeTab: PsiCashViewController.Tabs
         let vpnStatus: NEVPNStatus
     }
 
@@ -286,10 +287,9 @@ final class PsiCashViewController: UIViewController {
         case mainScreen
         case psiCashPurchaseScreen
         case speedBoostPurchaseDialog
-        case speedBoostAlreadyActiveAlert
     }
 
-    enum UITab: UICases {
+    enum Tabs: UICases {
         case addPsiCash
         case speedBoost
 
@@ -305,7 +305,7 @@ final class PsiCashViewController: UIViewController {
     private let store: Store<PsiCashState, PsiCashAction, Application.ExternalAction>
 
     // VC-specific UI state
-    @State private var activeTab: UITab = .speedBoost
+    @State private var activeTab: Tabs = .speedBoost
     private var navigation: Screen = .mainScreen
 
     /// Set of presented error alerts.
@@ -315,7 +315,7 @@ final class PsiCashViewController: UIViewController {
     // Views
     private let balanceView = PsiCashBalanceView(frame: .zero)
     private let closeButton = CloseButton(frame: .zero)
-    private let tabControl = TabControlView<UITab>()
+    private let tabControl = TabControlView<Tabs>()
 
     private let container: EitherView<AddPsiCashViewType, SpeedBoostViewType>
     private let containerView = UIView(frame: .zero)
@@ -336,20 +336,17 @@ final class PsiCashViewController: UIViewController {
                     }
                 }),
                 .init(Spinner(style: .whiteLarge),
-                      .init(FeatureUnavailableUntunneled(
-                        action: { [unowned store] in
-                            store.send(.connectToPsiphonTapped)
-                      }),
-                            PsiCashUnavailable()))),
+                      .init(PsiCashMessageViewUntunneled(action: { [unowned store] in
+                        store.send(.connectToPsiphonTapped)
+                      }), PsiCashMessageView()))),
             SpeedBoostViewType(
                 SpeedBoostPurchaseTable(purchaseHandler: {
                     store.send(.buyPsiCashProduct(.request(.speedBoost($0))))
                 }),
                 .init(Spinner(style: .whiteLarge),
-                      FeatureUnavailableUntunneled(
-                        action: { [unowned store] in
-                            store.send(.connectToPsiphonTapped)
-                      }))))
+                      .init(PsiCashMessageViewUntunneled(action: { [unowned store] in
+                        store.send(.connectToPsiphonTapped)
+                      }), PsiCashMessageView()))))
 
         containerBindable = self.container.build(self.containerView)
 
@@ -393,17 +390,12 @@ final class PsiCashViewController: UIViewController {
                     break
 
                 case (.psiCashError(let errorEvent), _):
+                    let errorDesc = ErrorEventDescription(
+                        event: errorEvent.eraseToRepr(),
+                        localizedUserDescription: errorEvent.error.userDescription
+                    )
 
-                    if case .serverError(.existingTransaction, _) = errorEvent.error {
-                        self.display(screen: .speedBoostAlreadyActiveAlert)
-                    } else {
-                        let errorDesc = ErrorEventDescription(
-                            event: errorEvent.eraseToRepr(),
-                            localizedUserDescription: errorEvent.error.userDescription
-                        )
-
-                        self.display(errorDesc: errorDesc, onDismiss: .speedBoostAlreadyActive)
-                    }
+                    self.display(errorDesc: errorDesc, onDismiss: .speedBoostAlreadyActive)
 
                 case (.iapError(let errorEvent), _):
                     let description: String
@@ -416,7 +408,7 @@ final class PsiCashViewController: UIViewController {
                             description = """
                             There is already a pending PsiCash purchase, \
                             please connect to finish the transaction.
-                            """ // TODO: Translate error.
+                        """ // TODO: Translate error.
                         case .storeKitError(let storeKitError):
                             description = """
                             \(UserStrings.Purchase_failed())
@@ -467,7 +459,7 @@ final class PsiCashViewController: UIViewController {
                          (.connected, .addPsiCash):
 
                         if tunnelState == .notConnected
-                        && observed.actorState.iap.iapState.pendingPsiCashPurchase != nil {
+                            && observed.actorState.iap.iapState.pendingPsiCashPurchase != nil {
                             // If tunnel is not connected and there is a pending PsiCash IAP,
                             // then shows the "pending psicash purchase" screen.
                             self.containerBindable.bind(
@@ -493,27 +485,54 @@ final class PsiCashViewController: UIViewController {
                         self.containerBindable.bind(
                             .left(.right(.right(.right(.unavailableWhileConnecting)))))
 
-                    case (.notConnected, .speedBoost), (.connecting, .speedBoost):
-                        let connectToPsiphonMessage =
-                            FeatureUnavailableUntunneled.Message
-                                .speedBoostUnavailable(subtitle: .connectToPsiphon)
+                    case (let tunnelState, .speedBoost):
 
-                        self.containerBindable.bind(.right(.right(.right(connectToPsiphonMessage))))
+                        let activeSpeedBoost = observed.actorState.psiCash?.activeSpeedBoost
 
-                    case (.connected, .speedBoost):
-                        let viewModel = NonEmpty(array:
-                            psiCashActorState.libData.availableProducts
+                        switch tunnelState {
+                        case .notConnected, .connecting:
+
+                            switch activeSpeedBoost {
+                            case .none:
+                                // There is no active speed boost.
+                            let connectToPsiphonMessage =
+                                PsiCashMessageViewUntunneled.Message
+                                    .speedBoostUnavailable(subtitle: .connectToPsiphon)
+
+                            self.containerBindable.bind(
+                                .right(.right(.right(.left(connectToPsiphonMessage)))))
+
+                            case .some(_):
+                                // There is an active speed boost.
+                                self.containerBindable.bind(
+                                    .right(.right(.right(.left(.speedBoostAlreadyActive)))))
+                            }
+
+
+                        case .connected:
+                            switch activeSpeedBoost {
+                            case .none:
+                                // There is no active speed boost.
+                                let viewModel = NonEmpty(array:
+                                psiCashActorState.libData.availableProducts
                                 .items.compactMap { $0.speedBoost }
                                 .map { SpeedBoostPurchasableViewModel(purchasable: $0) })
 
-                        if let viewModel = viewModel {
-                            self.containerBindable.bind(.right(.left(viewModel)))
-                        } else {
-                            let tryAgainLater = FeatureUnavailableUntunneled.Message
+                                if let viewModel = viewModel {
+                                self.containerBindable.bind(.right(.left(viewModel)))
+                                } else {
+                                let tryAgainLater = PsiCashMessageViewUntunneled.Message
                                 .speedBoostUnavailable(subtitle: .tryAgainLater)
-                            self.containerBindable.bind(.right(.right(.right(tryAgainLater))))
+                                self.containerBindable.bind(
+                                .right(.right(.right(.left(tryAgainLater)))))
+                                }
 
-
+                            case .some(_):
+                                // There is an active speed boost.
+                                // There is an active speed boost.
+                                self.containerBindable.bind(
+                                    .right(.right(.right(.right(.speedBoostAlreadyActive)))))
+                            }
                         }
                     }
                 }
@@ -636,15 +655,6 @@ extension PsiCashViewController {
 
         case .speedBoostPurchaseDialog:
             let vc = AlertViewController(viewBuilder: PurchasingSpeedBoostAlertViewBuilder())
-            self.present(vc, animated: false, completion: nil)
-
-        case .speedBoostAlreadyActiveAlert:
-            // Dismisses any alert currently presented, before displaying new alert.
-            self.presentedViewController?.dismiss(animated: false, completion: nil)
-            let vc = AlertViewController(viewBuilder:
-                SpeedBoostActiveAlertViewBuilder(dimissHandler: { [unowned self] in
-                    self.store.send(.dismissedAlert(.speedBoostAlreadyActive))
-                }))
             self.present(vc, animated: false, completion: nil)
         }
     }

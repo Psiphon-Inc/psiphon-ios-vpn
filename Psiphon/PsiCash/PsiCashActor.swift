@@ -456,6 +456,16 @@ fileprivate func rewardedVideoCustomData(psicash: PsiCash, logger: PsiCashLogger
 
 // MARK: Extensions
 
+extension PsiCashActor.State {
+    // Returns the first Speed Boost product that has not expired.
+    var activeSpeedBoost: PurchasedExpirableProduct<SpeedBoostProduct>? {
+        let activeSpeedBoosts = libData.activePurchases.items
+            .compactMap { $0.speedBoost }
+            .filter { !$0.transaction.expired }
+        return activeSpeedBoosts[maybe: 0]
+    }
+}
+
 fileprivate extension PsiCashPurchaseResult {
 
     var shouldRetry: Bool {
