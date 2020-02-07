@@ -147,16 +147,19 @@ extension SwiftDelegate: SwiftBridgeDelegate {
                 self.objcBridge.onPsiCashBalanceUpdate(.init(swiftBalanceState: balanceState))
         }
 
-        self.lifetime += self.app!.actorOutput.map(\.psiCash?.libData.activePurchases.items)
-            .startWithValues { [unowned self] (purchased: [PsiCashPurchasedType]?) in
+        self.lifetime += self.app!.actorOutput
+            .map { actorState -> (activeSpeedBoost: PurchasedExpirableProduct<SpeedBoostProduct>?,
+                subscription: SubscriptionState) in
+                return (activeSpeedBoost: actorState.psiCash?.activeSpeedBoost,
+                        subscription: actorState.iap.subscription)
+            }
+            .startWithValues { [unowned self] resultState in
                 let expiry: Date?
-                let maybeSpeedBoost = purchased?.compactMap({ $0.speedBoost })[maybe: 0]
-                if let speedBoostProduct = maybeSpeedBoost {
-                    expiry = speedBoostProduct.transaction.localTimeExpiry
-                } else {
+                if case .subscribed(_) = resultState.subscription {
                     expiry = nil
+                } else {
+                    expiry = resultState.activeSpeedBoost?.transaction.localTimeExpiry
                 }
-
                 self.objcBridge.onSpeedBoostActivePurchase(expiry)
         }
     }
