@@ -90,9 +90,9 @@ struct FeatureUnavailableUntunneled: ViewBuilder {
                         subtitle.text = UserStrings.Please_try_again_later()
                     }
                 case .pendingPsiCashPurchase:
-                    imageView.image = UIImage(named: "SpeedBoostUnavailable")
-                    title.text = UserStrings.PsiCash_unfinished_purchase()
-                    subtitle.text = UserStrings.Connect_to_finalize_psicash_transaction()
+                    imageView.image = UIImage(named: "PsiCashPendingTransaction")
+                    title.text = UserStrings.PsiCash_transaction_pending()
+                    subtitle.text = UserStrings.Connect_to_finish_psicash_transaction()
                 }
 
             }
