@@ -19,10 +19,16 @@
 
 import UIKit
 
-struct SpeedBoostUnavailable_ViewBuilder: ViewBuilder {
+struct FeatureUnavailableUntunneled: ViewBuilder {
 
-    struct Message: Equatable {
-        let subtitle: String
+    enum Message: Equatable {
+        case speedBoostUnavailable(subtitle: SpeedBoostUnavailableMessage)
+        case pendingPsiCashPurchase
+    }
+
+    enum SpeedBoostUnavailableMessage: Equatable {
+        case tryAgainLater
+        case connectToPsiphon
     }
 
     let action: () -> Void
@@ -30,16 +36,17 @@ struct SpeedBoostUnavailable_ViewBuilder: ViewBuilder {
     func build(_ container: UIView?) -> StrictBindableViewable<Message, UIView> {
         let root = UIView(frame: .zero)
 
-        let image = UIImageView.make(image: "SpeedBoostUnavailable")
+        let imageView = UIImageView()
+        imageView.contentMode = .scaleAspectFit
 
-        let title = UILabel.make(text: UserStrings.Speed_boost_unavailable(),
-            fontSize: .h1,
-            alignment: .center)
+        let title = UILabel.make(fontSize: .h1,
+                                 numberOfLines: 0,
+                                 alignment: .center)
 
-        let subtitle = UILabel.make(text: "",
-            fontSize: .h3,
-            typeface: .medium,
-            alignment: .center)
+        let subtitle = UILabel.make(fontSize: .h3,
+                                    typeface: .medium,
+                                    numberOfLines: 0,
+                                    alignment: .center)
 
         let button = GradientButton(gradient: .grey)
         button.setTitleColor(.darkBlue(), for: .normal)
@@ -48,16 +55,16 @@ struct SpeedBoostUnavailable_ViewBuilder: ViewBuilder {
         button.setEventHandler(self.action)
 
         // Add subviews
-        root.addSubviews(image, title, subtitle, button)
+        root.addSubviews(imageView, title, subtitle, button)
 
         // Autolayout
-        image.activateConstraints {
+        imageView.activateConstraints {
             $0.constraintToParent(.top(40), .centerX())
         }
 
         title.activateConstraints {
             $0.constraintToParent(.leading(), .trailing()) +
-                [ $0.topAnchor.constraint(equalTo: image.bottomAnchor, constant: 20) ]
+                [ $0.topAnchor.constraint(equalTo: imageView.bottomAnchor, constant: 20) ]
         }
 
         subtitle.activateConstraints {
@@ -72,7 +79,22 @@ struct SpeedBoostUnavailable_ViewBuilder: ViewBuilder {
 
         return .init(viewable: root) { _ -> ((Message) -> Void) in
             return { message in
-                subtitle.text = message.subtitle
+                switch message {
+                case let .speedBoostUnavailable(subtitle: subtitleMessage):
+                    imageView.image = UIImage(named: "SpeedBoostUnavailable")
+                    title.text = UserStrings.Speed_boost_unavailable()
+                    switch subtitleMessage {
+                    case .connectToPsiphon:
+                        subtitle.text = UserStrings.Connect_to_psiphon_to_use_speed_boost()
+                    case .tryAgainLater:
+                        subtitle.text = UserStrings.Please_try_again_later()
+                    }
+                case .pendingPsiCashPurchase:
+                    imageView.image = UIImage(named: "SpeedBoostUnavailable")
+                    title.text = UserStrings.PsiCash_unfinished_purchase()
+                    subtitle.text = UserStrings.Connect_to_finalize_psicash_transaction()
+                }
+
             }
         }
     }

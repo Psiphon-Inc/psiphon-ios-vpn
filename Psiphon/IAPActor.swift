@@ -55,11 +55,11 @@ struct IAPResult {
 
 enum IAPError: HashableError {
     case waitingForPendingTransactions
-    case storeKitError(SKError)
+    case storeKitError(Either<SKError, SystemError>)
 }
 
 class IAPActor: Actor, OutputProtocol, TypedInput {
-    typealias OutputType = SubscriptionActor.OutputType
+    typealias OutputType = OutputState
     typealias OutputErrorType = Never
     typealias InputType = Action
 
@@ -90,17 +90,25 @@ class IAPActor: Actor, OutputProtocol, TypedInput {
         case restoredCompletedTransactions(error: Error?)
     }
 
+    struct OutputState: Equatable {
+        var subscription: SubscriptionState
+        var iapState: State
+    }
+
+    struct State: Equatable {
+        var pendingPsiCashPurchase: SKPaymentTransaction?
+    }
+
     var context: ActorContext!
     private let (lifetime, token) = Lifetime.make()
     private let param: Params
-    private var subscriptionActor: TypedActor<SubscriptionActor.Action>!
+
+    @ActorState private var state: State
+    private var subscriptionActor = ObservableActor<SubscriptionActor, SubscriptionActor.Action>()
     private let paymenQueue = SKPaymentQueue.default()
 
     /// Set of promises, pending purchase result.
     private var pendingPurchasePromises = Set<PendingPurchase>()
-
-    /// Consumable transaction that has not yet been verified by our server.
-    private var consumablePendingTransaction: SKPaymentTransaction?
 
     private lazy var paymentTransactionDelegate = PaymentTransactionDelegate(replyTo: self)
     private lazy var receiptRefreshDelegate = ReceiptRefreshRequestDelegate(replyTo: self)
@@ -108,7 +116,7 @@ class IAPActor: Actor, OutputProtocol, TypedInput {
     /// Notifies `subscriptionActor` of the updated receipt data (if any).
     private var receiptData: AppStoreReceipt? = .none {
         didSet {
-            self.subscriptionActor ! .updatedReceiptData(receiptData)
+            self.subscriptionActor.actor! ! .updatedReceiptData(receiptData)
         }
     }
 
@@ -131,7 +139,7 @@ class IAPActor: Actor, OutputProtocol, TypedInput {
                 return .unhandled
 
             case .verifiedConsumableTransaction(let psiCashConsumable):
-                guard let pendingConsumable = self.consumablePendingTransaction,
+                guard let pendingConsumable = self.state.pendingPsiCashPurchase,
                     psiCashConsumable.transaction.isEqual(pendingConsumable) else {
                     fatalError("""
                         Verified an unknown consumable transaction \
@@ -140,7 +148,7 @@ class IAPActor: Actor, OutputProtocol, TypedInput {
                 }
 
                 self.paymenQueue.finishTransaction(pendingConsumable)
-                self.consumablePendingTransaction = nil
+                self.state.pendingPsiCashPurchase = nil
                 return .same
             }
 
@@ -154,10 +162,6 @@ class IAPActor: Actor, OutputProtocol, TypedInput {
     }
 
     lazy var receive = self.defaultHandler <> self.refreshReceiptHandler
-
-    required init(_ param: Params) {
-        self.param = param
-    }
 
     private func buyProduct(_ purchasable: PurchasableProduct, _ promise: Promise<IAPResult>) {
         // Rejects product purchase if a transaction is already in progress.
@@ -224,7 +228,7 @@ class IAPActor: Actor, OutputProtocol, TypedInput {
                                 if Current.debugging.immediatelyFinishAllIAPTransaction {
                                     self.paymenQueue.finishTransaction(transaction)
                                 }
-                                self.consumablePendingTransaction = transaction
+                                self.state.pendingPsiCashPurchase = transaction
                                 self.param.consumableTxObserver.tell(message:
                                     PsiCashConsumableTransaction(transaction: transaction))
                             case .subscription:
@@ -245,17 +249,33 @@ class IAPActor: Actor, OutputProtocol, TypedInput {
         }
     }
 
+    required init(_ param: Params) {
+        self.param = param
+        self.state = .init(pendingPsiCashPurchase: nil)
+    }
+
     func preStart() {
+        self.lifetime += Signal.combineLatest(self.subscriptionActor.output,
+                                              self.$state.observable)
+            .map(OutputState.init(subscription: iapState:))
+            .observe(self.param.pipeOut)
+
+        // TODO: 
+        self.state = .init(pendingPsiCashPurchase: nil)
+
         /// According to https://developer.apple.com/documentation/storekit/in-app_purchase/setting_up_the_transaction_observer_and_payment_queue
         /// this observer must be persistent and no deallocated during the app lifecycle.
         self.paymenQueue.add(self.paymentTransactionDelegate)
 
         // Creates the subscription actor.
-        let props = Props(SubscriptionActor.self,
-                          param: SubscriptionActor.Param(pipeOut: self.param.pipeOut),
-                          qos: .userInteractive)
-
-        self.subscriptionActor = Current.actorBuilder.makeActor(self, props)
+        self.subscriptionActor.create(Current.actorBuilder,
+                                      parent: self,
+                                      transform: id,
+                                      propsBuilder: { input in
+                                        Props(SubscriptionActor.self,
+                                              param: SubscriptionActor.Param(pipeOut: input),
+                                              qos: .userInteractive)
+        })
         self.receiptData = .fromLocalReceipt(Current.appBundle)
     }
 
