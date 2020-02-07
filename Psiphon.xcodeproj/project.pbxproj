@@ -96,13 +96,13 @@
 		5254093D2332AA0E001E7B12 /* SubscriptionActor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5254093C2332AA0E001E7B12 /* SubscriptionActor.swift */; };
 		525E1E2F22F0E22A0079DB49 /* LandingPageActor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 525E1E2E22F0E22A0079DB49 /* LandingPageActor.swift */; };
 		52805BA122DD1EB8006B205B /* ReactiveSwift+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52805BA022DD1EB8006B205B /* ReactiveSwift+Additions.swift */; };
-		528D81332384823F00AA2D77 /* PsiCashUnavailable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 528D81322384823F00AA2D77 /* PsiCashUnavailable.swift */; };
+		528D81332384823F00AA2D77 /* PsiCashMessageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 528D81322384823F00AA2D77 /* PsiCashMessageView.swift */; };
 		52A24659238C9AB700A01FF1 /* SpeedBoostPurchaseTable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52A24658238C9AB700A01FF1 /* SpeedBoostPurchaseTable.swift */; };
 		52A2465C2390569800A01FF1 /* Store.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52A2465B2390569800A01FF1 /* Store.swift */; };
 		52A2465E239081C100A01FF1 /* Application.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52A2465D239081C100A01FF1 /* Application.swift */; };
 		52A24662239B07E000A01FF1 /* psiCashProductIds.plist in Resources */ = {isa = PBXBuildFile; fileRef = 52A24661239B07E000A01FF1 /* psiCashProductIds.plist */; };
 		52A2466D23A172A800A01FF1 /* AlertViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52A2466C23A172A800A01FF1 /* AlertViewController.swift */; };
-		52A2466F23A1769300A01FF1 /* FeatureUnavailableUntunneled.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52A2466E23A1769300A01FF1 /* FeatureUnavailableUntunneled.swift */; };
+		52A2466F23A1769300A01FF1 /* PsiCashMessageViewUntunneled.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52A2466E23A1769300A01FF1 /* PsiCashMessageViewUntunneled.swift */; };
 		52A2467123A176BA00A01FF1 /* PsiCashPurchasingAlertViewBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52A2467023A176BA00A01FF1 /* PsiCashPurchasingAlertViewBuilder.swift */; };
 		52B3C54323DA31E1003F6B12 /* VerifierServerModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52B3C54223DA31E1003F6B12 /* VerifierServerModels.swift */; };
 		52B3C54523DA391F003F6B12 /* Requests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52B3C54423DA391F003F6B12 /* Requests.swift */; };
@@ -120,7 +120,6 @@
 		52D363CB230DEBED002C2221 /* CloseButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D363CA230DEBED002C2221 /* CloseButton.swift */; };
 		52D363CD230EEBAC002C2221 /* AnimatedUIButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D363CC230EEBAC002C2221 /* AnimatedUIButton.swift */; };
 		52D363CF230F112E002C2221 /* TabControlView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D363CE230F112E002C2221 /* TabControlView.swift */; };
-		52DF5E8723AAF97400A1B067 /* SpeedBoostActiveAlertViewBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52DF5E8623AAF97400A1B067 /* SpeedBoostActiveAlertViewBuilder.swift */; };
 		52DF5E9223C675EC00A1B067 /* ViewController+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52DF5E9123C675EC00A1B067 /* ViewController+Additions.swift */; };
 		52DF5E9623C7A31100A1B067 /* Error+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52DF5E9523C7A31100A1B067 /* Error+Additions.swift */; };
 		52DF5E9823CE5A8300A1B067 /* EnumExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52DF5E9723CE5A8300A1B067 /* EnumExtensions.swift */; };
@@ -438,13 +437,13 @@
 		5254093C2332AA0E001E7B12 /* SubscriptionActor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionActor.swift; sourceTree = "<group>"; };
 		525E1E2E22F0E22A0079DB49 /* LandingPageActor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LandingPageActor.swift; sourceTree = "<group>"; };
 		52805BA022DD1EB8006B205B /* ReactiveSwift+Additions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ReactiveSwift+Additions.swift"; sourceTree = "<group>"; };
-		528D81322384823F00AA2D77 /* PsiCashUnavailable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PsiCashUnavailable.swift; sourceTree = "<group>"; };
+		528D81322384823F00AA2D77 /* PsiCashMessageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PsiCashMessageView.swift; sourceTree = "<group>"; };
 		52A24658238C9AB700A01FF1 /* SpeedBoostPurchaseTable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeedBoostPurchaseTable.swift; sourceTree = "<group>"; };
 		52A2465B2390569800A01FF1 /* Store.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Store.swift; sourceTree = "<group>"; };
 		52A2465D239081C100A01FF1 /* Application.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Application.swift; sourceTree = "<group>"; };
 		52A24661239B07E000A01FF1 /* psiCashProductIds.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = psiCashProductIds.plist; sourceTree = "<group>"; };
 		52A2466C23A172A800A01FF1 /* AlertViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertViewController.swift; sourceTree = "<group>"; };
-		52A2466E23A1769300A01FF1 /* FeatureUnavailableUntunneled.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeatureUnavailableUntunneled.swift; sourceTree = "<group>"; };
+		52A2466E23A1769300A01FF1 /* PsiCashMessageViewUntunneled.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PsiCashMessageViewUntunneled.swift; sourceTree = "<group>"; };
 		52A2467023A176BA00A01FF1 /* PsiCashPurchasingAlertViewBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PsiCashPurchasingAlertViewBuilder.swift; sourceTree = "<group>"; };
 		52B3C54223DA31E1003F6B12 /* VerifierServerModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VerifierServerModels.swift; sourceTree = "<group>"; };
 		52B3C54423DA391F003F6B12 /* Requests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Requests.swift; sourceTree = "<group>"; };
@@ -465,7 +464,6 @@
 		52D363CA230DEBED002C2221 /* CloseButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloseButton.swift; sourceTree = "<group>"; };
 		52D363CC230EEBAC002C2221 /* AnimatedUIButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimatedUIButton.swift; sourceTree = "<group>"; };
 		52D363CE230F112E002C2221 /* TabControlView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabControlView.swift; sourceTree = "<group>"; };
-		52DF5E8623AAF97400A1B067 /* SpeedBoostActiveAlertViewBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeedBoostActiveAlertViewBuilder.swift; sourceTree = "<group>"; };
 		52DF5E9123C675EC00A1B067 /* ViewController+Additions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ViewController+Additions.swift"; sourceTree = "<group>"; };
 		52DF5E9523C7A31100A1B067 /* Error+Additions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Error+Additions.swift"; sourceTree = "<group>"; };
 		52DF5E9723CE5A8300A1B067 /* EnumExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnumExtensions.swift; sourceTree = "<group>"; };
@@ -1001,12 +999,11 @@
 				5246800822D51CE4009AEC6E /* PsiCashBalanceView.swift */,
 				52055D05230C833700244F9E /* SpeedBoostButton.swift */,
 				52C8F0AC237E145C00E5F9C0 /* PsiCashCoinPurchaseTable.swift */,
-				528D81322384823F00AA2D77 /* PsiCashUnavailable.swift */,
+				528D81322384823F00AA2D77 /* PsiCashMessageView.swift */,
 				52A24658238C9AB700A01FF1 /* SpeedBoostPurchaseTable.swift */,
-				52A2466E23A1769300A01FF1 /* FeatureUnavailableUntunneled.swift */,
+				52A2466E23A1769300A01FF1 /* PsiCashMessageViewUntunneled.swift */,
 				52A2467023A176BA00A01FF1 /* PsiCashPurchasingAlertViewBuilder.swift */,
 				5237387323AABB0F00DDE396 /* PurchasingSpeedBoostAlertViewBuilder.swift */,
-				52DF5E8623AAF97400A1B067 /* SpeedBoostActiveAlertViewBuilder.swift */,
 			);
 			path = PsiCashView;
 			sourceTree = "<group>";
@@ -1764,7 +1761,7 @@
 				EF90D7A1204F22C900228A63 /* timestamp_valid.c in Sources */,
 				445F24DF20E1A5BA00D004E9 /* ANY.c in Sources */,
 				5254093D2332AA0E001E7B12 /* SubscriptionActor.swift in Sources */,
-				52A2466F23A1769300A01FF1 /* FeatureUnavailableUntunneled.swift in Sources */,
+				52A2466F23A1769300A01FF1 /* PsiCashMessageViewUntunneled.swift in Sources */,
 				4E90C94420CB37F5003FC319 /* PsiCashLogger.m in Sources */,
 				EFC2F5C420226782007B52F9 /* RootContainerController.m in Sources */,
 				5248B4D223219EE8008C00D4 /* SwiftActors+Additions.swift in Sources */,
@@ -1800,7 +1797,7 @@
 				4E0A3669215AB7EE008A3D7B /* UIFont+Additions.m in Sources */,
 				5246800722D51AA3009AEC6E /* PsiCashWidgetView.swift in Sources */,
 				52D363C9230DE215002C2221 /* PsiCashViewController.swift in Sources */,
-				528D81332384823F00AA2D77 /* PsiCashUnavailable.swift in Sources */,
+				528D81332384823F00AA2D77 /* PsiCashMessageView.swift in Sources */,
 				EF90D7A8204F22C900228A63 /* DispatchUtils.m in Sources */,
 				445F24D820E1A5BA00D004E9 /* OBJECT_IDENTIFIER.c in Sources */,
 				445F24D920E1A5BA00D004E9 /* BIT_STRING.c in Sources */,
@@ -1853,7 +1850,6 @@
 				445F24DB20E1A5BA00D004E9 /* ber_decoder.c in Sources */,
 				52D2581122BADE1900CA956A /* SwiftDelegate.swift in Sources */,
 				5202011D2360D34000D00C8E /* EitherView.swift in Sources */,
-				52DF5E8723AAF97400A1B067 /* SpeedBoostActiveAlertViewBuilder.swift in Sources */,
 				9BFEC1F0DA87B4E66C8CC4AA /* MoPubInterstitialAdControllerWrapper.m in Sources */,
 				52805BA122DD1EB8006B205B /* ReactiveSwift+Additions.swift in Sources */,
 				9BFECFE618966005B01CF582 /* MoPubRewardedAdControllerWrapper.m in Sources */,

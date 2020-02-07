@@ -19,9 +19,10 @@
 
 import UIKit
 
-struct FeatureUnavailableUntunneled: ViewBuilder {
+struct PsiCashMessageViewUntunneled: ViewBuilder {
 
     enum Message: Equatable {
+        case speedBoostAlreadyActive
         case speedBoostUnavailable(subtitle: SpeedBoostUnavailableMessage)
         case pendingPsiCashPurchase
     }
@@ -80,6 +81,11 @@ struct FeatureUnavailableUntunneled: ViewBuilder {
         return .init(viewable: root) { _ -> ((Message) -> Void) in
             return { message in
                 switch message {
+                case .speedBoostAlreadyActive:
+                    imageView.image = UIImage(named: "SpeedBoostActive")!
+                    title.text = UserStrings.Speed_boost_active()
+                    subtitle.text = UserStrings.Speed_boost_you_already_have()
+
                 case let .speedBoostUnavailable(subtitle: subtitleMessage):
                     imageView.image = UIImage(named: "SpeedBoostUnavailable")
                     title.text = UserStrings.Speed_boost_unavailable()
@@ -89,6 +95,7 @@ struct FeatureUnavailableUntunneled: ViewBuilder {
                     case .tryAgainLater:
                         subtitle.text = UserStrings.Please_try_again_later()
                     }
+
                 case .pendingPsiCashPurchase:
                     imageView.image = UIImage(named: "PsiCashPendingTransaction")
                     title.text = UserStrings.PsiCash_transaction_pending()
