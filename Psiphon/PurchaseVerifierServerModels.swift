@@ -19,7 +19,7 @@
 
 import Foundation
 
-struct VerifierServerEndpoints {
+struct PurchaseVerifierServerEndpoints {
 
     private enum EndpointURL {
         case psiCash
@@ -40,6 +40,7 @@ struct VerifierServerEndpoints {
         _ requestBody: PsiCashValidationRequest
     ) -> HTTPRequest<PsiCashValidationResponse>? {
         return HTTPRequest.json(url: EndpointURL.psiCash.url, body: requestBody,
+                                clientMetaData: Current.clientMetaData,
                                 method: .post, response: PsiCashValidationResponse.self)
     }
 }

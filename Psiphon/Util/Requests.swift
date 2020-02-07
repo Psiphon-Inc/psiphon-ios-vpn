@@ -46,7 +46,7 @@ struct HTTPRequest<Response: HTTPResponse> {
     let urlRequest: URLRequest
     let responseType: Response.Type
 
-    init(url: URL, body: Data?, method: HTTPMethod, contentType: HTTPContentType,
+    init(url: URL, body: Data?, clientMetaData: String, method: HTTPMethod, contentType: HTTPContentType,
          response: Response.Type) {
         var request = URLRequest(url: url,
                                 cachePolicy: .reloadIgnoringLocalAndRemoteCacheData,
@@ -54,13 +54,18 @@ struct HTTPRequest<Response: HTTPResponse> {
         request.httpBody = body
         request.httpMethod = method.rawValue
         request.setValue(contentType.rawValue, forHTTPHeaderField: HTTPContentType.headerKey)
+        request.setValue(clientMetaData, forHTTPHeaderField: "X-Verifier-Metadata")
+
+        if Current.debugging.printHttpRequests {
+            request.debugPrint()
+        }
 
         self.urlRequest = request
         self.responseType = response
     }
 
     static func json<Body: Encodable>(
-        url: URL, body: Body, method: HTTPMethod, response: Response.Type
+        url: URL, body: Body, clientMetaData: String, method: HTTPMethod, response: Response.Type
     ) -> Self? {
         let jsonData: Data
         do {
@@ -72,8 +77,8 @@ struct HTTPRequest<Response: HTTPResponse> {
             return  nil
         }
 
-        return .init(url: url, body: jsonData, method: method, contentType: .json,
-                     response: response)
+        return .init(url: url, body: jsonData, clientMetaData: clientMetaData,
+                     method: method, contentType: .json, response: response)
     }
 
 }
@@ -103,4 +108,24 @@ func request<Response>(
         handler(Response(urlSessionResult: result))
     }
     session.resume()
+}
+
+struct ClientMetaData: Encodable {
+    let clientPlatform: String = AppInfo.clientPlatform()
+    let clientRegion: String = AppInfo.clientRegion() ?? ""
+    let clientVersion: String = AppInfo.appVersion() ?? ""
+    let propagationChannelID: String = AppInfo.propagationChannelId() ?? ""
+    let sponsorID: String = AppInfo.sponsorId() ?? ""
+
+    private enum CodingKeys: String, CodingKey {
+        case clientPlatform = "client_platform"
+        case clientRegion = "client_region"
+        case clientVersion = "client_version"
+        case propagationChannelID = "propagation_channel_id"
+        case sponsorID = "sponsor_id"
+    }
+
+    static func base64Data() -> String {
+        return (try? JSONEncoder().encode(ClientMetaData()).base64EncodedString()) ?? ""
+    }
 }

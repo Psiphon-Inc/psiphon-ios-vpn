@@ -430,3 +430,18 @@ struct JSONUserDefault<T: Codable> {
         get { self }
     }
 }
+
+// MARK: Debug Utils
+public extension URLRequest {
+    func debugPrint() {
+        print("""
+            HTTP Request:
+            URL:
+            \(self.url!.absoluteString)
+            Header:
+            \(String(describing: self.allHTTPHeaderFields!))
+            Body:
+            \(String(data: self.httpBody!, encoding: .utf8)!)
+            """)
+    }
+}
