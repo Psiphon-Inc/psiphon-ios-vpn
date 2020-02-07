@@ -39,15 +39,15 @@ import Foundation
                                  comment: "PsiCash is a type of credit. Do not translate or transliterate 'PsiCash'. Text shown next to the user's PsiCash balance (a numerical value). Keep colon if appropriate.")
     }
 
-    static func PsiCash_unfinished_purchase() -> String {
-        return NSLocalizedString("PSICASH_UNFINISHED_PURCHASE", tableName: nil, bundle: Bundle.main,
-                                 value: "You have a pending PsiCash transaction",
+    static func PsiCash_transaction_pending() -> String {
+        return NSLocalizedString("PSICASH_TRANSACTION_PENDING", tableName: nil, bundle: Bundle.main,
+                                 value: "Transaction Pending",
                                  comment: "An error that signifies a state where the user has made a 'PsiCash' purchase, but extra action is needed from the user to finish the transaction. Do not translate or transliterate 'PsiCash'.")
     }
 
-    static func Connect_to_finalize_psicash_transaction() -> String {
-        return NSLocalizedString("CONNECT_TO_FINALIZE_PSICASH_TRANSACTION", tableName: nil, bundle: Bundle.main,
-                                 value: "Connect to Psiphon to finalize your transaction",
+    static func Connect_to_finish_psicash_transaction() -> String {
+        return NSLocalizedString("CONNECT_TO_FINISH_PSICASH_TRANSACTION", tableName: nil, bundle: Bundle.main,
+                                 value: "Please connect to Psiphon to finish your transaction",
                                  comment: "Text shown to the user telling them to connect to 'Psiphon', to finish their unfinished transaction. Do not translate or transliterate 'Psiphon'.")
     }
 
