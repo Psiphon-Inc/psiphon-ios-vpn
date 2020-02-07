@@ -45,6 +45,7 @@ struct Debugging {
     var printStoreLogs = false
     var printActorState = false
     var printAppState = false
+    var printHttpRequests = true
 
     // TODO: Replace with a Debug toolbox button to finish all pending transactions.
     var immediatelyFinishAllIAPTransaction = false
@@ -57,6 +58,7 @@ struct Debugging {
                      printStoreLogs: false,
                      printActorState: false,
                      printAppState: false,
+                     printHttpRequests: false,
                      immediatelyFinishAllIAPTransaction: false)
     }
 }
@@ -74,6 +76,7 @@ struct Environment {
     #endif
     lazy var priceFormatter = CurrencyFormatter(locale: self.locale)
     lazy var psiCashPriceFormatter = PsiCashAmountFormatter(locale: self.locale)
+    lazy var clientMetaData = ClientMetaData.base64Data()
     var locale = Locale.current
     var appBundle = PsiphonBundle.from(bundle: Bundle.main)
     var userConfigs = UserDefaultsConfig()

@@ -104,7 +104,7 @@
 		52A2466D23A172A800A01FF1 /* AlertViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52A2466C23A172A800A01FF1 /* AlertViewController.swift */; };
 		52A2466F23A1769300A01FF1 /* PsiCashMessageViewUntunneled.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52A2466E23A1769300A01FF1 /* PsiCashMessageViewUntunneled.swift */; };
 		52A2467123A176BA00A01FF1 /* PsiCashPurchasingAlertViewBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52A2467023A176BA00A01FF1 /* PsiCashPurchasingAlertViewBuilder.swift */; };
-		52B3C54323DA31E1003F6B12 /* VerifierServerModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52B3C54223DA31E1003F6B12 /* VerifierServerModels.swift */; };
+		52B3C54323DA31E1003F6B12 /* PurchaseVerifierServerModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52B3C54223DA31E1003F6B12 /* PurchaseVerifierServerModels.swift */; };
 		52B3C54523DA391F003F6B12 /* Requests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52B3C54423DA391F003F6B12 /* Requests.swift */; };
 		52B3C54A23DF99E8003F6B12 /* AppObservables.m in Sources */ = {isa = PBXBuildFile; fileRef = 52B3C54923DF99E8003F6B12 /* AppObservables.m */; };
 		52B3C54C23E0E895003F6B12 /* ButtonBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52B3C54B23E0E895003F6B12 /* ButtonBuilder.swift */; };
@@ -445,7 +445,7 @@
 		52A2466C23A172A800A01FF1 /* AlertViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertViewController.swift; sourceTree = "<group>"; };
 		52A2466E23A1769300A01FF1 /* PsiCashMessageViewUntunneled.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PsiCashMessageViewUntunneled.swift; sourceTree = "<group>"; };
 		52A2467023A176BA00A01FF1 /* PsiCashPurchasingAlertViewBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PsiCashPurchasingAlertViewBuilder.swift; sourceTree = "<group>"; };
-		52B3C54223DA31E1003F6B12 /* VerifierServerModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VerifierServerModels.swift; sourceTree = "<group>"; };
+		52B3C54223DA31E1003F6B12 /* PurchaseVerifierServerModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PurchaseVerifierServerModels.swift; sourceTree = "<group>"; };
 		52B3C54423DA391F003F6B12 /* Requests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Requests.swift; sourceTree = "<group>"; };
 		52B3C54823DF99E8003F6B12 /* AppObservables.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppObservables.h; sourceTree = "<group>"; };
 		52B3C54923DF99E8003F6B12 /* AppObservables.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppObservables.m; sourceTree = "<group>"; };
@@ -1176,7 +1176,7 @@
 				52DF5E9723CE5A8300A1B067 /* EnumExtensions.swift */,
 				52DF5E9923CE835100A1B067 /* UserStrings.swift */,
 				52DF5E9D23D0D01F00A1B067 /* BridgingTypes.swift */,
-				52B3C54223DA31E1003F6B12 /* VerifierServerModels.swift */,
+				52B3C54223DA31E1003F6B12 /* PurchaseVerifierServerModels.swift */,
 				52B3C54823DF99E8003F6B12 /* AppObservables.h */,
 				52B3C54923DF99E8003F6B12 /* AppObservables.m */,
 				52B3C54D23E22454003F6B12 /* Logging.swift */,
@@ -1745,7 +1745,7 @@
 				EF652CD71F35224C002AFB48 /* MainViewController.m in Sources */,
 				52B3C54E23E22454003F6B12 /* Logging.swift in Sources */,
 				EF90D7A4204F22C900228A63 /* timestamp_format.c in Sources */,
-				52B3C54323DA31E1003F6B12 /* VerifierServerModels.swift in Sources */,
+				52B3C54323DA31E1003F6B12 /* PurchaseVerifierServerModels.swift in Sources */,
 				F132D7E01F5739A800AF7F91 /* LaunchScreenViewController.m in Sources */,
 				445F24E920E1A5BA00D004E9 /* ber_tlv_length.c in Sources */,
 				5237387423AABB0F00DDE396 /* PurchasingSpeedBoostAlertViewBuilder.swift in Sources */,

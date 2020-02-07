@@ -118,7 +118,7 @@ final class AppRootActor: Actor, OutputProtocol, TypedInput {
                         return SignalProducer(error: FatalError(message: "failed to read receipt"))
                     }
 
-                    let maybeUrlRequest = VerifierServerEndpoints.psiCash(
+                    let maybeUrlRequest = PurchaseVerifierServerEndpoints.psiCash(
                         PsiCashValidationRequest(
                             productId: psiCashConsumable.transaction.payment.productIdentifier,
                             receiptData: receipt.data.base64EncodedString(),
