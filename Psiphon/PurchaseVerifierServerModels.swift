@@ -58,7 +58,6 @@ struct PsiCashValidationRequest: Encodable {
 }
 
 struct PsiCashValidationResponse: HTTPResponse {
-
     enum ResponseError: HashableError {
         case failedRequest(SystemError)
         case errorStatusCode(HTTPURLResponse)
