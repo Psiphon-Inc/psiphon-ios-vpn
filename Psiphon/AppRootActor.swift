@@ -130,30 +130,31 @@ final class AppRootActor: Actor, OutputProtocol, TypedInput {
                     }
                     return SignalProducer(value: urlRequest)
                 }
-                .flatMapError { [unowned self] fatalError in
+                .flatMapError { [unowned self] fatalError
+                    -> SignalProducer<HTTPRequest<PsiCashValidationResponse>, Never> in
                     PsiFeedbackLogger.error(withType: self.logType,
                                             message: "verify consumable failed",
                                             object: fatalError)
                     return .empty
                 }
                 .flatMap(.latest) { request
-                    -> SignalProducer<ConsumableVerificationResult, Never> in
-                    return verifyPsiCashConsumable(request: request)
+                    -> PsiCashValidationResponse.ResponseSignalProducerType in
+                    return httpRequest(request: request)
                         .retry(upTo: 10, interval: 1.0, on: QueueScheduler.main)
-                        .flatMapError { [unowned self] error
-                            -> SignalProducer<ConsumableVerificationResult, Never> in
-                            PsiFeedbackLogger.error(withType: self.logType,
-                                                    message: "request to verify consumable failed",
-                                                    object: error)
-                            return .empty
-                    }
                 }
-                .startWithValues { [unowned self] _ in
-                    PsiFeedbackLogger.info(withType: self.logType,
-                                           json: ["event": "verified psicash consumable"])
+                .startWithResult { [unowned self] result in
+                    switch result {
+                    case .success:
+                        PsiFeedbackLogger.info(withType: self.logType,
+                                               json: ["event": "verified psicash consumable"])
 
-                    self.iapActor.actor? ! .verifiedConsumableTransaction(psiCashConsumable)
-                    self.psiCash.actor? ! .refreshState(reason: .psiCashIAP, promise:nil)
+                        self.iapActor.actor? ! .verifiedConsumableTransaction(psiCashConsumable)
+                        self.psiCash.actor? ! .refreshState(reason: .psiCashIAP, promise:nil)
+                    case let .failure(error):
+                        PsiFeedbackLogger.error(withType: self.logType,
+                                                message: "request to verify consumable failed",
+                                                object: error)
+                    }
                 }
 
                 return .same
@@ -279,20 +280,4 @@ private extension AppRootActor {
 
 struct ConsumableVerificationResult {
     let result: Result<(), ErrorEvent<PsiCashValidationResponse.ResponseError>>
-}
-
-fileprivate func verifyPsiCashConsumable(
-    request urlRequest: HTTPRequest<PsiCashValidationResponse>
-) -> SignalProducer<ConsumableVerificationResult, FatalError> {
-    return SignalProducer { observer, lifetime in
-        request(urlRequest) { response in
-            switch response.result {
-            case .success(_):
-                observer.send(value: ConsumableVerificationResult(result: .success(())))
-                observer.sendCompleted()
-            case let .failure(error):
-                observer.send(value: ConsumableVerificationResult(result: .failure(error)))
-            }
-        }
-    }
 }
