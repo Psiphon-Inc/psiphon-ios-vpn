@@ -18,6 +18,7 @@
  */
 
 import Foundation
+import ReactiveSwift
 
 enum HTTPMethod: String {
     case get = "GET"
@@ -39,6 +40,13 @@ protocol HTTPHeader {
 }
 
 protocol HTTPResponse {
+    associatedtype Success
+    associatedtype Failure: HashableError
+    typealias FailureEvent = ErrorEvent<Failure>
+    typealias ResponseSignalProducerType = SignalProducer<Success, FailureEvent>
+
+    var result: Result<Success, FailureEvent> { get }
+
     init(urlSessionResult: URLSessionResult)
 }
 
@@ -91,7 +99,7 @@ struct HTTPRequestError: Error {
     let errorEvent: ErrorEvent<SystemError>
 }
 
-func request<Response>(
+fileprivate func request<Response>(
     _ requestData: HTTPRequest<Response>,
     handler: @escaping (Response) -> Void
 ) {
@@ -127,5 +135,21 @@ struct ClientMetaData: Encodable {
 
     static func base64Data() -> String {
         return (try? JSONEncoder().encode(ClientMetaData()).base64EncodedString()) ?? ""
+    }
+}
+
+func httpRequest<Response>(
+    request urlRequest: HTTPRequest<Response>
+) -> Response.ResponseSignalProducerType {
+    return SignalProducer { observer, lifetime in
+        request(urlRequest) { response in
+            switch response.result {
+            case let .success(value):
+                observer.send(value: value)
+                observer.sendCompleted()
+            case let .failure(error):
+                observer.send(error: error)
+            }
+        }
     }
 }

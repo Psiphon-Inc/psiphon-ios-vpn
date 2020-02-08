@@ -405,10 +405,10 @@ final class PsiCashViewController: UIViewController {
                     case let .purchaseRequestError(error: iapError):
                         switch iapError {
                         case .waitingForPendingTransactions:
+                            // TODO: Translate error.
                             description = """
-                            There is already a pending PsiCash purchase, \
-                            please connect to finish the transaction.
-                        """ // TODO: Translate error.
+                            There is already a pending PsiCash purchase.
+                            """
                         case .storeKitError(let storeKitError):
                             description = """
                             \(UserStrings.Purchase_failed())
