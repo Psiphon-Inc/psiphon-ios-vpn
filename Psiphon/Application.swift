@@ -76,7 +76,7 @@ struct Environment {
     #endif
     lazy var priceFormatter = CurrencyFormatter(locale: self.locale)
     lazy var psiCashPriceFormatter = PsiCashAmountFormatter(locale: self.locale)
-    lazy var clientMetaData = ClientMetaData.base64Data()
+    lazy var clientMetaData = ClientMetaData.jsonData()
     var locale = Locale.current
     var appBundle = PsiphonBundle.from(bundle: Bundle.main)
     var userConfigs = UserDefaultsConfig()

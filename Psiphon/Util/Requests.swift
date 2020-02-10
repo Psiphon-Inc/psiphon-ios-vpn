@@ -134,8 +134,18 @@ struct ClientMetaData: Encodable {
         case sponsorID = "sponsor_id"
     }
 
-    static func base64Data() -> String {
-        return (try? JSONEncoder().encode(ClientMetaData()).base64EncodedString()) ?? ""
+    static func jsonData() -> String {
+        do {
+            let jsonData = try JSONEncoder().encode(ClientMetaData())
+            if let jsonString = String(data: jsonData, encoding: .utf8) {
+                return jsonString
+            }
+        } catch {
+            PsiFeedbackLogger.error(withType: "Requests",
+                                    message: "failed to serialize client metadata",
+                                    object: error)
+        }
+        return ""
     }
 }
 
