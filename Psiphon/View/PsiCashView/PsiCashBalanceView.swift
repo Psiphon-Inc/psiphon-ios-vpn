@@ -45,10 +45,11 @@ import UIKit
         balance = UILabel.make(fontSize: fontSize, typeface: typeface)
 
         guard let coinImage = UIImage(named: "PsiCashCoin") else { fatalError() }
+        guard let waitingForExpectedIncreaseImage = UIImage(named: "PsiCash_Alert") else { fatalError() }
 
         icon = .init(ImageViewBuidler(image: coinImage),
                      .init(Spinner(style: .white),
-                           ButtonBuilder(style: .infoLight, tint: .red, eventHandler: {
+                           ButtonBuilder(style: .custom, tint: .none, image: waitingForExpectedIncreaseImage, eventHandler: {
                             let alert = UIAlertController(
                                 title: UserStrings.PsiCash_balance_out_of_date(),
                                 message: UserStrings.Connect_to_psiphon_to_update_psiCash(),
