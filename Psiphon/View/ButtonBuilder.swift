@@ -22,12 +22,16 @@ import UIKit
 struct ButtonBuilder: ViewBuilder {
     let style: UIButton.ButtonType
     let tint: UIColor?
+    let image: UIImage?
     let eventHandler: (() -> Void)?
 
     func build(_ container: UIView?) -> StrictBindableViewable<Unit, SwiftUIButton> {
         let button = SwiftUIButton(type: style)
         if let tint = tint {
             button.tintColor = tint
+        }
+        if let image = image {
+            button.setImage(image, for: .normal)
         }
         if let eventHandler = eventHandler {
             button.setEventHandler(eventHandler)
