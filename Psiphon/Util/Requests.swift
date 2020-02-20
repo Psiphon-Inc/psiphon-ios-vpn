@@ -102,7 +102,7 @@ struct HTTPRequestError: Error {
 fileprivate func request<Response>(
     _ requestData: HTTPRequest<Response>,
     handler: @escaping (Response) -> Void
-) {
+) -> URLSessionTask {
     let config = URLSessionConfiguration.ephemeral
     let session = URLSession(configuration: config).dataTask(with: requestData.urlRequest)
     { data, response, error in
@@ -116,6 +116,7 @@ fileprivate func request<Response>(
         handler(Response(urlSessionResult: result))
     }
     session.resume()
+    return session
 }
 
 struct ClientMetaData: Encodable {
@@ -142,7 +143,7 @@ func httpRequest<Response>(
     request urlRequest: HTTPRequest<Response>
 ) -> Response.ResponseSignalProducerType {
     return SignalProducer { observer, lifetime in
-        request(urlRequest) { response in
+        let session = request(urlRequest) { response in
             switch response.result {
             case let .success(value):
                 observer.send(value: value)
@@ -150,6 +151,10 @@ func httpRequest<Response>(
             case let .failure(error):
                 observer.send(error: error)
             }
+        }
+
+        lifetime.observeEnded {
+            session.cancel()
         }
     }
 }

@@ -151,8 +151,6 @@ final class PsiCashActor: Actor, OutputProtocol, TypedInput {
     // and fulfulling them all once the result of the action has been received.
     private var pendingRefreshStatePromises = [Promise<Result<(), ErrorEvent<PsiCashRefreshError>>>]()
 
-    private var consumablePendingVerification: PsiCashConsumableTransaction?
-
     /// Drops all messages if `userSubscribed` evaluates to true.
     private lazy var subscribedHandler = Action.handler { [unowned self] msg in
         switch msg {
