@@ -22,7 +22,7 @@ import Foundation
 
 typealias HashableError = Error & Hashable
 
-struct FatalError: Error {
+struct FatalError: HashableError {
     let message: String
 }
 
