@@ -45,6 +45,7 @@ final class AppRootActor: Actor, OutputProtocol, TypedInput {
 
     fileprivate enum PrivateAction: AnyMessage {
         case subscription(SubscriptionState)
+        case consumableVerified(PsiCashConsumableTransaction)
     }
 
     struct State: Equatable {
@@ -58,6 +59,8 @@ final class AppRootActor: Actor, OutputProtocol, TypedInput {
     private var psiCash = MutableObservableActor<PsiCashActor, PsiCashActor.PublicAction>()
     private var iapActor = ObservableActor<IAPActor, IAPActor.Action>()
     private var landingPageActor: TypedActor<LandingPageActor.Action>!
+
+    private var pendingPsiCashConsumable: PsiCashConsumableTransaction? = nil
 
     private lazy var forwardBehavior = alternate(
         forwarder(self.psiCash, message: \Action.psiCashAction),
@@ -85,78 +88,15 @@ final class AppRootActor: Actor, OutputProtocol, TypedInput {
                 return .unhandled
 
             case .verifyPsiCashConsumable(let psiCashConsumable):
+                guard self.pendingPsiCashConsumable == nil else {
+                    return .same
+                }
+                self.pendingPsiCashConsumable = psiCashConsumable
                 self.psiCash.actor? ! .pendingPsiCashIAP
-
-                self.lifetime += Current.vpnStatus.signalProducer.filter {
-                    if Current.debugging.ignoreTunneledChecks {
-                        return true
-                    } else {
-                        return $0 == .connected
-                    }
+                self.lifetime += verifyConsumable(self.psiCash, psiCashConsumable)
+                    .startWithValues { _ in
+                        self ! PrivateAction.consumableVerified(psiCashConsumable)
                 }
-                .take(first: 1)
-                .flatMap(.latest) { [unowned self] _ -> SignalProducer<CustomData?, Never> in
-                    // TODO: Work on observable-promise interaction.
-                    guard let psiCashActor = self.psiCash.actor else {
-                        PsiFeedbackLogger.warn(withType: self.logType,
-                                               json: ["event": "VerifyPsiCashConsumable",
-                                                      "result": "failed",
-                                                      "reason": "no PsiCashActor"])
-                        return .empty
-                    }
-                    let customData = Promise<CustomData?>.pending()
-                    psiCashActor ! .rewardedVideoCustomData(customData)
-                    return SignalProducer.mapAsync(promise: customData)
-                }
-                .flatMap(.latest) { maybeCustomData
-                    -> SignalProducer<HTTPRequest<PsiCashValidationResponse>, FatalError> in
-                    guard let customData = maybeCustomData else {
-                        return SignalProducer(error: FatalError(message: "empty custom data"))
-                    }
-
-                    guard let receipt = AppStoreReceipt.fromLocalReceipt(Current.appBundle) else {
-                        return SignalProducer(error: FatalError(message: "failed to read receipt"))
-                    }
-
-                    let maybeUrlRequest = PurchaseVerifierServerEndpoints.psiCash(
-                        PsiCashValidationRequest(
-                            productId: psiCashConsumable.transaction.payment.productIdentifier,
-                            receiptData: receipt.data.base64EncodedString(),
-                            customData: customData)
-                    )
-                    guard let urlRequest = maybeUrlRequest else {
-                        return SignalProducer(error:
-                            FatalError(message: "failed to create url request"))
-                    }
-                    return SignalProducer(value: urlRequest)
-                }
-                .flatMapError { [unowned self] fatalError
-                    -> SignalProducer<HTTPRequest<PsiCashValidationResponse>, Never> in
-                    PsiFeedbackLogger.error(withType: self.logType,
-                                            message: "verify consumable failed",
-                                            object: fatalError)
-                    return .empty
-                }
-                .flatMap(.latest) { request
-                    -> PsiCashValidationResponse.ResponseSignalProducerType in
-                    return httpRequest(request: request)
-                        .retry(upTo: 10, interval: 1.0, on: QueueScheduler.main)
-                }
-                .startWithResult { [unowned self] result in
-                    switch result {
-                    case .success:
-                        PsiFeedbackLogger.info(withType: self.logType,
-                                               json: ["event": "verified psicash consumable"])
-
-                        self.iapActor.actor? ! .verifiedConsumableTransaction(psiCashConsumable)
-                        self.psiCash.actor? ! .refreshState(reason: .psiCashIAP, promise:nil)
-                    case let .failure(error):
-                        PsiFeedbackLogger.error(withType: self.logType,
-                                                message: "request to verify consumable failed",
-                                                object: error)
-                    }
-                }
-
                 return .same
 
             }
@@ -178,6 +118,14 @@ final class AppRootActor: Actor, OutputProtocol, TypedInput {
                     // No-op if subscription state is not known yet.
                     return .same
                 }
+
+            case .consumableVerified(let psiCashConsumable):
+                PsiFeedbackLogger.info(withType: self.logType,
+                                       json: ["event": "verified psicash consumable"])
+                self.pendingPsiCashConsumable = nil
+                self.iapActor.actor? ! .verifiedConsumableTransaction(psiCashConsumable)
+                self.psiCash.actor? ! .refreshState(reason: .psiCashIAP, promise:nil)
+                return .same
             }
 
         case let msg as NotificationMessage:
@@ -276,8 +224,4 @@ private extension AppRootActor {
         self.landingPageActor = Current.actorBuilder.makeActor(self, props)
     }
     
-}
-
-struct ConsumableVerificationResult {
-    let result: Result<(), ErrorEvent<PsiCashValidationResponse.ResponseError>>
 }
