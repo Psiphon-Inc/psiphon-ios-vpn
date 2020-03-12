@@ -115,13 +115,14 @@ func iapReducer(state: inout IAPReducerState, action: IAPAction) -> [Effect<IAPA
             ]
             
         case .updatedTransactions(let transactions):
+            var effects = [Effect<IAPAction>]()
+            
             for transaction in transactions {
                 switch transaction.typedTransactionState {
                 case .pending(_):
                     return []
                     
                 case .completed(let completedState):
-                    var effects = [Effect<IAPAction>]()
                     let finishTransaction: Bool
                     let newResult: Pending<Result<Unit, ErrorEvent<IAPError>>>
                     
@@ -177,12 +178,10 @@ func iapReducer(state: inout IAPReducerState, action: IAPAction) -> [Effect<IAPA
                             }
                         )
                     }
-                    
-                    return effects
                 }
             }
             
-            return []
+            return effects
         }
     }
 }
