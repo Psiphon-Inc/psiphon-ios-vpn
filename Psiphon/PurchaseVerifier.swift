@@ -128,63 +128,60 @@ struct VerifiedPsiCashConsumableTransaction: Equatable {
 func verifyConsumable(
     _ transaction: UnverifiedPsiCashConsumableTransaction
 ) -> Effect<VerifiedPsiCashConsumableTransaction> {
-    Effect(Current.vpnStatus.signalProducer
+    Current.vpnStatus.signalProducer
     .skipRepeats()
     .flatMap(.latest) { value
-        -> SignalProducer<(CustomData?), ConsumableVerificationError> in
+        -> SignalProducer<VerifiedPsiCashConsumableTransaction, Never> in
         let vpnStatus = Debugging.ignoreTunneledChecks ? .connected : value
         guard case .connected = vpnStatus else {
-            return .init(error: .requestBuildError(
-                FatalError(message: "tunnel status not connected")))
+            return .never
         }
         return SignalProducer(value: Current.psiCashEffect.rewardedVideoCustomData())
-            .promoteError()
-    }
-    .flatMap(.latest) { maybeCustomData
-        -> SignalProducer<VerifiedPsiCashConsumableTransaction, ConsumableVerificationError> in
-        guard let customData = maybeCustomData else {
-            return .init(error: .requestBuildError(
-                FatalError(message: "empty custom data")))
-        }
-        guard let receipt = Receipt.fromLocalReceipt(Current.appBundle) else {
-            return .init(error: .requestBuildError(
-                FatalError(message: "failed to read receipt")))
-        }
-        let maybeUrlRequest = PurchaseVerifierServerEndpoints.psiCash(
-            PsiCashValidationRequest(
-                transaction: transaction,
-                receipt: receipt,
-                customData: customData
-            )
-        )
-        guard let urlRequest = maybeUrlRequest else {
-            return .init(error: .requestBuildError(
-                FatalError(message: "failed to create url request")))
-        }
-        return httpRequest(request: urlRequest)
-            .flatMap(.latest, { (response: PsiCashValidationResponse) ->
-                SignalProducer<(), PsiCashValidationResponse.ResponseError> in
-                switch response.result {
-                case .success:
-                    return .init(value: ())
-                case .failure(let errorEvent):
-                    if response.shouldRetry {
-                        return .init(error: errorEvent.error)
-                    } else {
-                        return .init(value: ())
-                    }
+            .flatMap(.latest) { maybeCustomData in
+                guard let customData = maybeCustomData else {
+                    return .init(error: .requestBuildError(
+                        FatalError(message: "empty custom data")))
                 }
-            })
-            .retry(upTo: 10, interval: 1.0, on: QueueScheduler.main)
-            .map(value: VerifiedPsiCashConsumableTransaction(value: transaction.value))
-            .mapError { .serverError($0) }
+                guard let receipt = Receipt.fromLocalReceipt(Current.appBundle) else {
+                    return .init(error: .requestBuildError(
+                        FatalError(message: "failed to read receipt")))
+                }
+                let maybeUrlRequest = PurchaseVerifierServerEndpoints.psiCash(
+                    PsiCashValidationRequest(
+                        transaction: transaction,
+                        receipt: receipt,
+                        customData: customData
+                    )
+                )
+                guard let urlRequest = maybeUrlRequest else {
+                    return .init(error: .requestBuildError(
+                        FatalError(message: "failed to create url request")))
+                }
+                return httpRequest(request: urlRequest)
+                    .flatMap(.latest, { (response: PsiCashValidationResponse) ->
+                        SignalProducer<(), PsiCashValidationResponse.ResponseError> in
+                        switch response.result {
+                        case .success:
+                            return .init(value: ())
+                        case .failure(let errorEvent):
+                            if response.shouldRetry {
+                                return .init(error: errorEvent.error)
+                            } else {
+                                return .init(value: ())
+                            }
+                        }
+                    })
+                    .retry(upTo: 10, interval: 1.0, on: QueueScheduler.main)
+                    .map(value: VerifiedPsiCashConsumableTransaction(value: transaction.value))
+                    .mapError { .serverError($0) }
+            }
+            .on(failed: { (error: ConsumableVerificationError) in
+                PsiFeedbackLogger.error(withType: "VerifyConsumable",
+                                        message: "verification of consumable failed",
+                                        object: error)
+            }).flatMapError { _ -> Effect<VerifiedPsiCashConsumableTransaction> in
+                return .never
+            }
     }
-    .flatMapError { (error: ConsumableVerificationError)
-        -> SignalProducer<VerifiedPsiCashConsumableTransaction, Never> in
-        PsiFeedbackLogger.error(withType: "VerifyConsumable",
-                                message: "verification of consumable failed",
-                                object: error)
-        return .never
-    }
-    .take(first: 1))  // Since upstream signals do not complete, signal is terminated here.
+    .take(first: 1)  // Since upstream signals do not complete, signal is terminated here.
 }
