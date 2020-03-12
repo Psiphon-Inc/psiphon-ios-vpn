@@ -100,6 +100,9 @@ func iapReducer(state: inout IAPReducerState, action: IAPAction) -> [Effect<IAPA
         return [
             Current.paymentQueue.finishTransaction(verifiedTransaction.value).mapNever(),
             .fireAndForget {
+                Current.app.store.send(.psiCash(.refreshPsiCashState))
+            },
+            .fireAndForget {
                 PsiFeedbackLogger.info(withType: "IAP",
                                        json: ["event": "verified psicash consumable"])
             }
