@@ -118,8 +118,9 @@ func psiCashReducer(
         
     case .refreshPsiCashStateResult(let result):
         state.psiCash.pendingPsiCashRefresh = result.map { $0.map { _ in .unit } }
-        if case .completed(.success(let refreshedDataModel)) = result {
-            state.psiCash.libData = refreshedDataModel
+        if case .completed(.success(let refreshedLibData)) = result {
+            state.psiCash.libData = refreshedLibData
+            state.psiCash.balanceState = .refreshed(refreshedData: refreshedLibData)
         }
         return []
         
