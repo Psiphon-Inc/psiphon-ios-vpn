@@ -51,7 +51,7 @@ enum AppAction {
 let appReducer: Reducer<AppState, AppAction> =
     combine(
         pullback(psiCashReducer, value: \.psiCashReducerState, action: \.psiCash),
-        pullback(landingPageReducer, value: \.shownLandingPage, action: \.landingPage),
+        pullback(landingPageReducer, value: \.landingPageReducerState, action: \.landingPage),
         pullback(iapReducer, value: \.iapReducerState, action: \.inAppPurchase),
         pullback(receiptReducer, value: \.appReceipt, action: \.appReceipt),
         pullback(subscriptionReducer, value: \.subscription, action: \.subscription),

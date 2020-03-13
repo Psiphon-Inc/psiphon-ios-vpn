@@ -130,6 +130,18 @@ extension AppState {
         }
     }
     
+    var landingPageReducerState: LandingPageReducerState {
+        get {
+            LandingPageReducerState(
+                shownLandingPage: shownLandingPage,
+                activeSpeedBoost: psiCash.activeSpeedBoost
+            )
+        }
+        set {
+            shownLandingPage = newValue.shownLandingPage
+        }
+    }
+    
     var psiCashViewController: PsiCashViewControllerState {
         PsiCashViewControllerState(
             psiCash: self.psiCash,
