@@ -23,6 +23,7 @@ import ReactiveSwift
 typealias PendingPsiCashRefresh = PendingResult<Unit, ErrorEvent<PsiCashRefreshError>>
 
 struct PsiCashState: Equatable {
+    var purchasing: PsiCashPurchasingState
     var rewardedVideo: RewardedVideoState
     var libData: PsiCashLibData    
     var balanceState: BalanceState
@@ -32,6 +33,7 @@ struct PsiCashState: Equatable {
 extension PsiCashState {
     
     init() {
+        purchasing = .none
         rewardedVideo = .init()
         libData = .init()
         balanceState = .init(pendingExpectedBalanceIncrease: false,
@@ -61,12 +63,9 @@ extension PsiCashState {
     }
 }
 
-enum PurchasingState: Equatable {
+enum PsiCashPurchasingState: Equatable {
     case none
-    case psiCash
-    case subscription
     case speedBoost(SpeedBoostPurchasable)
-    case iapError(ErrorEvent<PurchaseError>)
     case psiCashError(ErrorEvent<PsiCashPurchaseResponseError>)
 }
 
@@ -89,12 +88,6 @@ struct RewardedVideoState: Equatable {
     var rewardedAndDismissed: Bool {
         dismissed && rewarded
     }
-}
-
-// TODO: Some errors here can probably be combined.
-enum PurchaseError: HashableError {
-    case failedToCreatePurchase(reason: String)
-    case purchaseRequestError(error: IAPError)
 }
 
 enum PsiCashPurchaseResponseError: HashableError {
@@ -131,21 +124,11 @@ enum PsiCashTransactionMismatchError: HashableError {
     case existingTransaction
 }
 
-// TODO! remove
-enum RefreshReason {
-    case tunnelConnected
-    case appForegrounded
-    case rewardedVideoAd
-    case psiCashIAP
-    case other
-}
-
 struct PsiCashPurchaseResult: Equatable {
     let purchasable: PsiCashPurchasableType
     let result: Result<PsiCashPurchasedType, ErrorEvent<PsiCashPurchaseResponseError>>
 }
 
-// TODO! Make private
 extension PsiCashPurchaseResult {
 
     var shouldRetry: Bool {
@@ -179,7 +162,6 @@ struct BalanceState: Equatable {
     var balance: PsiCashAmount
 }
 
-// TODO! Make fileprivate
 extension BalanceState {
     static func fromStoredExpectedReward(libData: PsiCashLibData) -> Self {
         let reward = Current.userConfigs.expectedPsiCashReward

@@ -151,7 +151,6 @@ struct PsiCashEffect {
         return s as String?
     }
     
-    // TODO!! use this function
     func expirePurchases() -> Effect<Never> {
         .fireAndForget {
             let sharedDBAuthIds = Current.sharedDB.getNonSubscriptionAuthorizations().map(\.id)

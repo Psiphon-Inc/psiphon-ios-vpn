@@ -22,7 +22,7 @@ import ReactiveSwift
 import Promises
 
 enum IAPAction {
-    case purchase(PurchasableProduct)
+    case purchase(IAPPurchasableProduct)
     case purchaseAdded(PurchaseAddedResult)
     case verifiedPsiCashConsumable(VerifiedPsiCashConsumableTransaction)
     case transactionUpdate(TransactionUpdate)
@@ -35,7 +35,6 @@ enum TransactionUpdate {
 }
 
 struct IAPReducerState {
-    var purchasing: PurchasingState
     var iap: IAPState
     let psiCashAuth: PsiCashAuthPackage
 }
@@ -43,57 +42,36 @@ struct IAPReducerState {
 func iapReducer(state: inout IAPReducerState, action: IAPAction) -> [Effect<IAPAction>] {
     switch action {
     case .purchase(let product):
-        guard case .none = state.purchasing else {
+        guard state.iap.purchasing.completed else {
             return []
         }
         
-        switch product {
-        case .psiCash(product: _):
+        // PsiCash IAP requires presence of PsiCash spender token.
+        if case .psiCash = product {
             guard state.psiCashAuth.hasSpenderToken else {
-                state.purchasing = .iapError(ErrorEvent(
-                    .failedToCreatePurchase(reason: "PsiCash data not present.")))
+                state.iap.purchasing = .error(ErrorEvent(
+                    .failedToCreatePurchase(reason: "PsiCash data not present.")
+                ))
                 return []
             }
-            state.purchasing = .psiCash
-            
-        case .subscription(product: _):
-            state.purchasing = .subscription
         }
-        
+    
+        state.iap.purchasing = .pending(product)
+
         return [
-            Current.paymentQueue.purchase(product)
+            Current.paymentQueue.addPurchase(product)
                 .map(IAPAction.purchaseAdded)
         ]
         
     case .purchaseAdded(let result):
         switch result {
-        case .success(let addedPayment):
-            state.purchasing = .none
-            
-            switch addedPayment.product {
-            case .psiCash(product: _):
-                state.iap.payments.insert(
-                    PendingPayment(
-                        payment: .psiCash(addedPayment.payment),
-                        paidSuccessfully: .pending)
-                )
-            case .subscription(product: _, promise: let promise):
-                state.iap.payments.insert(
-                    PendingPayment(
-                        payment: .subscription(addedPayment.payment, promise),
-                        paidSuccessfully: .pending)
-                )
-            }
+        case .success(_):
+            return []
             
         case .failure(let errorEvent):
-            if errorEvent.error.paymentCancelled {
-                state.purchasing = .none
-            } else {
-                state.purchasing = .iapError(errorEvent
-                    .map(PurchaseError.purchaseRequestError(error:)))
-            }
+            state.iap.purchasing = .error(errorEvent)
+            return []
         }
-        return []
         
     case .verifiedPsiCashConsumable(let verifiedTransaction):
         state.iap.unverifiedPsiCashTransaction = .none
@@ -127,18 +105,17 @@ func iapReducer(state: inout IAPReducerState, action: IAPAction) -> [Effect<IAPA
                     
                 case .completed(let completedState):
                     let finishTransaction: Bool
-                    let newResult: Pending<Result<Unit, ErrorEvent<IAPError>>>
+                    let purchasingState: IAPPurchasingState
                     
                     switch completedState {
                     case let .failure(skError):
-                        newResult = .completed(.failure(ErrorEvent(.storeKitError(skError))))
+                        purchasingState = .error(ErrorEvent(.storeKitError(skError)))
                         finishTransaction = true
                         
                     case let .success(success):
+                        purchasingState = .none
                         switch success {
                         case .purchased:
-                            newResult = .completed(.success(.unit))
-                            
                             switch try? AppStoreProductType.from(transaction: transaction) {
                             case .none:
                                 fatalError("unknown product \(String(describing: transaction))")
@@ -157,16 +134,12 @@ func iapReducer(state: inout IAPReducerState, action: IAPAction) -> [Effect<IAPA
                             }
                             
                         case .restored :
-                            newResult = .completed(.success(.unit))
                             finishTransaction = true
                         }
                     }
                     
-                    // Updates PendingPayment result value.
-                    state.iap.payments = state.iap.payments.mutateResult(
-                        transaction: transaction,
-                        to: newResult
-                    )
+                    // Updates purchasing state
+                    state.iap.purchasing = purchasingState
                     
                     if finishTransaction {
                         effects.append(
@@ -234,21 +207,3 @@ SKPaymentTransactionObserver {
     }
     
 }
-
-extension Set where Element == PendingPayment {
-    
-    // TODO! write a more proper function
-    func mutateResult(
-        transaction: SKPaymentTransaction, to newValue: Pending<Result<Unit, ErrorEvent<IAPError>>>
-    ) -> Set<PendingPayment> {
-        Set(self.map { (pendingPayment: PendingPayment) -> PendingPayment in
-            guard transaction.payment.isEqual(pendingPayment.payment.paymentObject) else {
-                return pendingPayment
-            }
-            return PendingPayment(payment: pendingPayment.payment,
-                                  paidSuccessfully: newValue)
-        })
-    }
-    
-}
-
