@@ -137,11 +137,13 @@ extension SwiftDelegate: SwiftBridgeDelegate {
         // to ObjCBridgeDelegate.
         self.lifetime += Current.app.store.$value.signalProducer
             .map { appState -> Date? in
-                guard case .subscribed(_) = appState.subscription.status else {
+                if case .subscribed(_) = appState.subscription.status {
                     return nil
+                } else {
+                    return appState.psiCash.activeSpeedBoost?.transaction.localTimeExpiry
                 }
-                return appState.psiCash.activeSpeedBoost?.transaction.localTimeExpiry
         }
+        .skipRepeats()
         .startWithValues{ speedBoostExpiry in
             guard let bridge = Current.objcBridgeDelegate else { fatalError() }
             bridge.onSpeedBoostActivePurchase(speedBoostExpiry)
