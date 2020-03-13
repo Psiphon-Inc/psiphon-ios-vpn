@@ -26,7 +26,7 @@ enum ProductIdError: Error {
     case invalidString(String)
 }
 
-struct AppStoreProduct: Equatable {
+struct AppStoreProduct: Hashable {
     let type: AppStoreProductType
     let skProduct: SKProduct
 

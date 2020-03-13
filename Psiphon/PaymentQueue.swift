@@ -23,7 +23,7 @@ import ReactiveSwift
 
 struct PaymentQueue {
     let transactions: () -> Effect<[SKPaymentTransaction]>
-    let addPayment: (PurchasableProduct) -> Effect<AddedPayment>
+    let addPayment: (IAPPurchasableProduct) -> Effect<AddedPayment>
     let addObserver: (SKPaymentTransactionObserver) -> Effect<Never>
     let removeObserver: (SKPaymentTransactionObserver) -> Effect<Never>
     let finishTransaction: (SKPaymentTransaction) -> Effect<Never>
@@ -31,8 +31,8 @@ struct PaymentQueue {
 
 /// Represents a payment that has been added to `SKPaymentQueue`.
 struct AddedPayment {
-    let product: PurchasableProduct
-    let payment: SKPayment
+    let product: IAPPurchasableProduct
+    let paymentObj: SKPayment
 }
 
 typealias PurchaseAddedResult = Result<AddedPayment, ErrorEvent<IAPError>>
@@ -49,7 +49,7 @@ extension PaymentQueue {
             Effect { () -> AddedPayment in
                 let payment = SKPayment(product: purchasable.appStoreProduct.skProduct)
                 SKPaymentQueue.default().add(payment)
-                return AddedPayment(product: purchasable, payment: payment)
+                return AddedPayment(product: purchasable, paymentObj: payment)
             }
         },
         addObserver: { observer in
@@ -68,12 +68,9 @@ extension PaymentQueue {
             }
         })
     
-    func purchase(_ purchasable: PurchasableProduct) -> Effect<PurchaseAddedResult> {
+    func addPurchase(_ purchasable: IAPPurchasableProduct) -> Effect<PurchaseAddedResult> {
         transactions().flatMap(.latest) { transactions -> Effect<PurchaseAddedResult> in
-            guard transactions.count == 0 else {
-                return Effect(value: .failure(ErrorEvent(.waitingForPendingTransactions)))
-            }
-            return self.addPayment(purchasable).map {
+            self.addPayment(purchasable).map {
                 .success($0)
             }
         }

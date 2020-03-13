@@ -109,13 +109,11 @@ extension AppState {
     var iapReducerState: IAPReducerState {
         get {
             IAPReducerState(
-                purchasing: self.purchasing,
                 iap: self.iapState,
                 psiCashAuth: self.psiCash.libData.authPackage
             )
         }
         set {
-            self.purchasing = newValue.purchasing
             self.iapState = newValue.iap
         }
     }
@@ -123,20 +121,17 @@ extension AppState {
     var psiCashReducerState: PsiCashReducerState {
         get {
             PsiCashReducerState(
-                purchasing: self.purchasing,
                 psiCash: self.psiCash,
                 subscription: self.subscription
             )
         }
         set {
-            self.purchasing = newValue.purchasing
             self.psiCash = newValue.psiCash
         }
     }
     
     var psiCashViewController: PsiCashViewControllerState {
         PsiCashViewControllerState(
-            purchasing: self.purchasing,
             psiCash: self.psiCash,
             iap: self.iapState,
             subscription: self.subscription,
@@ -147,7 +142,7 @@ extension AppState {
 
 // MARK: IAPState.swift
 
-extension PaymentType {
+extension IAPPaymentType {
     
     var paymentObject: SKPayment {
         switch self {
@@ -180,24 +175,9 @@ extension PsiCashPurchaseResponseError {
     }
 }
 
-extension RefreshReason {
-
-    // TODO! this function is not used
-    var expectsBalanceIncrease: Bool {
-        switch self {
-        case .tunnelConnected: return false
-        case .appForegrounded: return false
-        case .rewardedVideoAd: return true
-        case .psiCashIAP: return true
-        case .other: return false
-        }
-    }
-
-}
-
 // MARK: IAPState.swift
 
-extension PurchasableProduct {
+extension IAPPurchasableProduct {
     var appStoreProduct: AppStoreProduct {
         switch self {
         case let .psiCash(product: product): return product

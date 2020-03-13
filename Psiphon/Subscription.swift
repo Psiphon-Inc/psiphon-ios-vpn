@@ -36,7 +36,7 @@ enum SubscriptionStatus: Equatable {
     case unknown
 }
 
-// TODO! store and recover this struct instead of the subscription dictionary
+// TODO: store and recover this struct instead of the subscription dictionary
 struct SubscriptionData: Equatable, Codable {
     let latestExpiry: Date
     let productId: String

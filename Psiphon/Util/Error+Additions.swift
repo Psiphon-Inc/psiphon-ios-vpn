@@ -79,4 +79,13 @@ struct ErrorEvent<E: HashableError>: HashableError {
 typealias SystemError = NSError
 typealias SystemErrorEvent = ErrorEvent<SystemError>
 
-extension Either: Error where A: Error, B: Error {}
+extension Either: Error where A: Error, B: Error {
+    var localizedDescription: String {
+        switch self {
+        case let .left(error):
+            return error.localizedDescription
+        case let .right(error):
+            return error.localizedDescription
+        }
+    }
+}

@@ -20,18 +20,6 @@
 import Foundation
 import ReactiveSwift
 
-#if DEBUG
-var Debugging = DebugFlags()
-var Current = Environment.debug(flags: Debugging)
-#else
-var Debugging = DebugFlags.disabled()
-var Current = Environment.default()
-#endif
-
-var Style = AppStyle()
-
-// MARK: AppState
-
 /// Represents UIViewController's that can be dismissed.
 @objc enum DismissableScreen: Int {
     case psiCash
@@ -39,7 +27,6 @@ var Style = AppStyle()
 
 struct AppState: Equatable {
     var shownLandingPage: Pending<Bool> = .completed(false)
-    var purchasing: PurchasingState = .none
     var psiCash = PsiCashState()
     var appReceipt = ReceiptState()
     var subscription = SubscriptionState()
@@ -75,7 +62,6 @@ let appReducer: Reducer<AppState, AppAction> =
 /// Represents an application that has finished loading.
 final class Application {
     private(set) var store: Store<AppState, AppAction>
-    private let (lifetime, token) = Lifetime.make()
 
     /// - Parameter objcHandler: Handles `ObjcAction` type. Always called from the main thread.
     init(initalState: AppState, reducer: @escaping Reducer<AppState, AppAction>) {

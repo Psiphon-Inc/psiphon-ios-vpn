@@ -36,6 +36,7 @@ func appDelegateReducer(
     case .appDidLaunch(psiCashData: let libData):
         state.appDidLaunch(libData)
         return [
+            Current.psiCashEffect.expirePurchases().mapNever(),
             Current.paymentQueue.addObserver(Current.paymentTransactionDelegate).mapNever(),
             .fireAndForget {
                 Current.app.store.send(.appReceipt(.receiptRefreshed(.success(()))))
@@ -99,10 +100,10 @@ extension SwiftDelegate: SwiftBridgeDelegate {
     @objc func applicationDidFinishLaunching(_ application: UIApplication) {
         if Debugging.printAppState {
             self.lifetime += Current.app.store.$value.signalProducer.startWithValues { appState in
-                let path = \AppState.psiCash.balanceState
-                print("AppState Path \(path)")
-                print(String(describing: appState[keyPath: path]))
-                print("-----")
+                let path = \AppState.iapState.purchasing
+                print("*", "AppState Path \(path)")
+                print("*", String(describing: appState[keyPath: path]))
+                print("*", "-----")
             }
         }
         
@@ -210,7 +211,7 @@ extension SwiftDelegate: SwiftBridgeDelegate {
         do {
             let appStoreProduct = try AppStoreProduct(product)
             Current.app.store.send(.iap(.purchase(
-                PurchasableProduct.subscription(product: appStoreProduct, promise: promise)
+                IAPPurchasableProduct.subscription(product: appStoreProduct, promise: promise)
                 )))
             
         } catch {
