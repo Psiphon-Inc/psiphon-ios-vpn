@@ -21,7 +21,17 @@ import Foundation
 import UIKit
 
 @objc final class PsiCashBalanceView: UIView, Bindable {
-    typealias BindingType = BalanceState
+    typealias BindingType = State
+    
+    struct State: Equatable {
+        let pendingPsiCashRefresh: PendingPsiCashRefresh
+        let balanceState: BalanceState
+        
+        init(_ psiCashState: PsiCashState) {
+            pendingPsiCashRefresh = psiCashState.pendingPsiCashRefresh
+            balanceState = psiCashState.balanceState
+        }
+    }
 
     private typealias IconType = EitherView<ImageViewBuidler, EitherView<Spinner, ButtonBuilder>>
 
@@ -110,17 +120,18 @@ import UIKit
         }
     }
 
-    func bind(_ newValue: BalanceState) {
+    func bind(_ newValue: BindingType) {
         let iconValue: IconType.BuildType.BindingType
-        switch newValue.refreshState {
-        case .refreshing:
+        switch (newValue.pendingPsiCashRefresh,
+                newValue.balanceState.pendingExpectedBalanceIncrease) {
+        case (.pending, _):
             iconValue = .right(.left(true))  // Spinner
-        case .refreshed:
-            iconValue = .left(.unit)  // Coin icon
-        case .waitingForExpectedIncrease:
+        case (.completed(_), true):
             iconValue = .right(.right(.unit))  // Red "i" info button
+        case (.completed(_), false):
+            iconValue = .left(.unit)  // Coin icon
         }
-        self.setAmount(newValue.balance)
+        self.setAmount(newValue.balanceState.balance)
         self.iconBindable.bind(iconValue)
     }
 
@@ -129,8 +140,8 @@ import UIKit
 // ObjC bindings for updating balance view.
 extension PsiCashBalanceView {
 
-    @objc func objcBind(_ newValue: BridgedBalanceViewBindingType) {
-        self.bind(newValue.balanceState)
+    @objc func objcBind(_ bindingValue: BridgedBalanceViewBindingType) {
+        self.bind(bindingValue.state)
     }
 
 }

@@ -213,6 +213,9 @@
 /* Text which appears in the Speed Boost meter when the user's buy request for Speed Boost is being processed. Please keep this text concise as the width of the text box is restricted in size. */
 "PSICASH_BUYING_SPEED_BOOST_TEXT" = "Buying Speed Boost...";
 
+/* PsiCash in-app purchase disclaimer that appears on the bottom of the screen where users can buy different amounts of PsiCash from the PlayStore.  Do not translate or transliterate terms PsiCash */
+"PSICASH_PURCHASE_SCREEN_NOTICE" = "IMPORTANT: Your PsiCash will not be preserved if you uninstall Psiphon.";
+
 /* Button title when loading. */
 "PSICASH_REWARDED_VIDEO_LOADING_TITLE" = "Loading";
 

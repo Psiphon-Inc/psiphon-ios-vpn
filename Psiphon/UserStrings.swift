@@ -142,6 +142,12 @@ import Foundation
                                  value: "PsiCash is unavailable while connecting to Psiphon",
                                  comment: "'PsiCash' features are unavailable while the app the connecting to 'Psiphon'. PsiCash is a type of credit. Do not translate or transliterate 'Psiphon'. Do not translate or transliterate 'PsiCash'")
     }
+    
+    static func PsiCash_purchase_notice() -> String {
+        return NSLocalizedString("PSICASH_PURCHASE_SCREEN_NOTICE", tableName: nil, bundle: Bundle.main,
+                                 value: "IMPORTANT: Your PsiCash will not be preserved if you uninstall Psiphon.",
+                                 comment: "PsiCash in-app purchase disclaimer that appears on the bottom of the screen where users can buy different amounts of PsiCash from the PlayStore.  Do not translate or transliterate terms PsiCash")
+    }
 
     static func Connect_to_psiphon_button() -> String {
         return NSLocalizedString("CONNECT_TO_PSIPHON", tableName: nil, bundle: Bundle.main,

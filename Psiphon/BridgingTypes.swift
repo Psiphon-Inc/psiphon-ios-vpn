@@ -52,6 +52,7 @@ import Promises
     @objc func set(objcBridge: ObjCBridgeDelegate)
     @objc func applicationDidFinishLaunching(_ application: UIApplication)
     @objc func applicationWillEnterForeground(_ application: UIApplication)
+    @objc func applicationWillTerminate(_ application: UIApplication)
     @objc func createPsiCashViewController() -> UIViewController?
     @objc func getCustomRewardData(_ callback: @escaping (String?) -> Void)
     @objc func resetLandingPage()
@@ -100,7 +101,7 @@ import Promises
         self.hasBeenInIntroPeriod = data?.hasBeenInIntroPeriod ?? false
     }
 
-    static func from(state: SubscriptionState) -> BridgedUserSubscription {
+    static func from(state: SubscriptionStatus) -> BridgedUserSubscription {
         switch state {
         case .subscribed(let data):
             return .init(.active, data)
@@ -115,10 +116,10 @@ import Promises
 
 /// Wraps `BalanceState` struct.
 @objc class BridgedBalanceViewBindingType: NSObject {
-    let balanceState: BalanceState
+    let state: PsiCashBalanceView.BindingType
 
-    init(swiftBalanceState state: BalanceState) {
-        self.balanceState = state
+    init(swiftState state: PsiCashBalanceView.BindingType) {
+        self.state = state
     }
 }
 
@@ -133,8 +134,6 @@ import Promises
     }
 
     static func from(iapResult: IAPResult) -> ObjCIAPResult {
-        // `IAPError` is either set to internal `IAPActor` error,
-        // or it wraps the `SKPaymenTransaction` error.
         return ObjCIAPResult(transaction: iapResult.transaction,
                              error: iapResult.result.projectError())
     }

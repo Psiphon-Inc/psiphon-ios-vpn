@@ -24,247 +24,26 @@ import ReactiveSwift
 import Promises
 import StoreKit
 
-typealias PurchaseResult = Result<(), ErrorEvent<PurchaseError>>
-
-enum PurchaseError: HashableError {
-    case failedToCreatePurchase(reason: String)
-    case purchaseRequestError(error: IAPError)
+struct PsiCashViewControllerState: Equatable {
+    let purchasing: PurchasingState
+    let psiCash: PsiCashState
+    let iap: IAPState
+    let subscription: SubscriptionState
+    let appStorePsiCashProducts: Pending<Result<[PsiCashPurchasableViewModel], SystemErrorEvent>>
 }
 
-enum PurchasingState: Equatable {
-    case psiCash
-    case speedBoost(SpeedBoostPurchasable)
-    case iapError(ErrorEvent<PurchaseError>)
-    case psiCashError(ErrorEvent<PsiCashPurchaseResponseError>)
-}
-
-typealias RewardedVideoPresentation = AdPresentation
-typealias RewardedVideoLoad = Result<AdLoadStatus, ErrorEvent<ErrorRepr>>
-
-struct RewardedVideoState: Equatable {
-    var loading: RewardedVideoLoad = .success(.none)
-    var presentation: RewardedVideoPresentation = .didDisappear
-    var dismissed: Bool = false
-    var rewarded: Bool = false
-
-    var isLoading: Bool {
-        switch loading {
-        case .success(.inProgress): return true
-        default: return false
-        }
+extension PsiCashViewControllerState {
+    
+    /// Adds rewarded video product to list of `PsiCashPurchasableViewModel`  retrieved from AppStore.
+    var allProducts: PendingResult<[PsiCashPurchasableViewModel], SystemErrorEvent> {
+        appStorePsiCashProducts.map( { result in
+            result.map { viewModelList -> [PsiCashPurchasableViewModel] in
+                [psiCash.rewardedVideoProduct] + viewModelList
+            }
+        })
     }
-
-    var rewardedAndDismissed: Bool {
-        return dismissed && rewarded
-    }
+    
 }
-
-enum PsiCashAction {
-    // TODO: Wrap SKProduct in a type-safe container.
-    case psiCashCoinProductList(ReqRes<(), Result<[SKProduct], SystemErrorEvent>>)
-    case buyPsiCashCoin(ReqRes<SKProduct, PurchaseResult>)
-    case buyPsiCashProduct(ReqRes<PsiCashPurchasableType, PsiCashPurchaseResult>)
-    case showRewardedVideoAd
-    case rewardedVideoPresentation(RewardedVideoPresentation)
-    case rewardedVideoLoad(RewardedVideoLoad)
-    case connectToPsiphonTapped
-    case dismissedAlert(PsiCashAlertDismissAction)
-}
-
-enum PsiCashAlertDismissAction {
-    case psiCashCoinPurchase
-    case rewardedVideo
-    case speedBoostAlreadyActive
-}
-
-func psiCashReducer(
-    state: inout PsiCashState, action: PsiCashAction
-) -> [EffectType<PsiCashAction, Application.ExternalAction>] {
-    switch action {
-    case .psiCashCoinProductList(let reqres):
-        switch reqres {
-        case .request:
-            // TODO: The `psiCashIAPProducts` is more UI dependent than representing true state.
-            state.psiCashIAPProducts = state.inProgressIfNoPsiCashIAPProducts()
-            return [.internal(
-                appStoreProductRequest(productIds: .psiCash()).map { result -> PsiCashAction in
-                    return .psiCashCoinProductList(.response(result))
-            })]
-        case .response(let result):
-            state.psiCashIAPProducts = ProgressiveResult.from(result: result.map {
-                $0.map { skProduct in
-                    PsiCashPurchasableViewModel.from(skProduct: skProduct)
-                }
-            })
-            return []
-        }
-
-    case .buyPsiCashCoin(let reqres):
-        switch reqres {
-        case let .request(product):
-            guard state.purchasing == .none else {
-                return []
-            }
-            guard let appStoreProduct = AppStoreProduct(product) else {
-                // TODO: show an error to the user saying this product is unknown
-                // TODO: Refresh product request.
-                // TODO: write log to feedback.
-                return []
-            }
-            state.purchasing = .psiCash
-            let purchasePromise = Promise<PurchaseResult>.pending()
-            let customDataPromise = Promise<CustomData?>.pending()
-
-            return [
-                .external(.action(.psiCash(.rewardedVideoCustomData(customDataPromise)))),
-                .external(Effect(promise: customDataPromise, then:
-                    { [appStoreProduct, purchasePromise] in
-                        // TODO: How to guarantee that purchasePromise.fullfil
-                        // is called in all branches of this scope?
-                        guard let customData = $0 else {
-                            purchasePromise.fulfill(.failure(
-                                ErrorEvent(.failedToCreatePurchase(
-                                    reason: "PsiCash data not present."))))
-                            return nil
-                        }
-                        let purchasable = PurchasableProduct.psiCash(product: appStoreProduct,
-                                                                     customData: customData)
-                        // TODO: Check promise ref
-                        let promise = Promise<IAPResult>.pending()
-                        promise.then { resolution in
-                            let newResolution = resolution.result.mapError { iapErrorEvent in
-                                iapErrorEvent.map { iapError -> PurchaseError in
-                                    .purchaseRequestError(error: iapError)
-                                }
-                            }
-                            purchasePromise.fulfill(newResolution)
-                        }
-                        return .actor(.inAppPurchase(.buyProduct(purchasable, promise)))
-                })),
-                .internal(Effect<PsiCashAction>(promise: purchasePromise, then: {
-                    .buyPsiCashCoin(.response($0))
-                }))]
-
-        case let .response(purchaseResult):
-            switch purchaseResult {
-            case .success:
-                state.purchasing = .none
-            case .failure(let errorEvent):
-                if errorEvent.error.purchaseCancelled {
-                    state.purchasing = .none
-                } else {
-                    state.purchasing = .iapError(errorEvent)
-                }
-            }
-            return []
-        }
-
-    case .buyPsiCashProduct(let reqres):
-        switch reqres {
-        case .request(let purchasableType):
-
-            guard state.purchasing == .none else {
-                return []
-            }
-
-            guard let purchasable = purchasableType.speedBoost else {
-                fatalError()
-            }
-
-            state.purchasing = .speedBoost(purchasable)
-
-            let promise = Promise<PsiCashPurchaseResult>.pending()
-
-            return [.external(.action(.psiCash(.purchase(purchasableType, promise)))),
-                    .internal(Effect<PsiCashAction>(promise: promise, then: {
-                        .buyPsiCashProduct(.response($0))
-                    }))
-            ]
-
-        case .response(let purchaseResult):
-            guard case .speedBoost = state.purchasing else {
-                fatalError("Expected '.speedBoost' state:'\(String(describing: state.purchasing))'")
-            }
-
-            guard purchaseResult.purchasable.speedBoost != nil else {
-                fatalError("Expected '.speedBoost'; purchasable: '\(purchaseResult.purchasable)'")
-            }
-            
-            switch purchaseResult.purchasedResult {
-            case .success(let purchasedType):
-                guard case .speedBoost = purchasedType else {
-                    fatalError("Expected '.speedBoost' purchaesd type")
-                }
-                state.purchasing = .none
-                return [.external(.objc(.dismiss(.psiCash)))]
-
-            case .failure(let errorEvent):
-                state.purchasing = .psiCashError(errorEvent)
-                return []
-            }
-        }
-
-    case .showRewardedVideoAd:
-        let rewardAdCustomData = Promise<CustomData?>.pending()
-        return [.external(.action(.psiCash(.rewardedVideoCustomData(rewardAdCustomData)))),
-                .external(Effect<Application.ExternalAction>(promise: rewardAdCustomData, then: {
-                    guard let customData = $0 else {
-                        return nil
-                    }
-                    return .objc(.presentRewardedVideoAd(customData: customData))
-                }))]
-
-    case .rewardedVideoPresentation(let presentation):
-        state.rewardedVideo.combine(presentation: presentation)
-
-        if state.rewardedVideo.rewardedAndDismissed {
-
-            let rewardAmount = Current.hardCodedValues.psiCashRewardValue
-
-            let refreshWithRetryEffect = SignalProducer<Application.ExternalAction, ErrorEvent<PsiCashRefreshError>>{ observer, _ in
-                let promise = Promise<Result<(), ErrorEvent<PsiCashRefreshError>>>.pending()
-                observer.send(value: .actor(.psiCash(.refreshState(reason: .rewardedVideoAd, promise: promise))))
-                promise.then { result in
-                    if let error = result.projectError() {
-                        observer.send(error: error)
-                    } else {
-                        observer.sendCompleted()
-                    }
-                }
-            }
-            .retry(upTo: 10, interval: 1.0, on: QueueScheduler.main)
-            .flatMapError{ _ -> SignalProducer<Application.ExternalAction, Never> in
-                return .empty
-            }
-
-            return [
-                .external(.action(.psiCash(.receivedRewardedVideoReward(amount: rewardAmount)))),
-                .external(Effect(refreshWithRetryEffect))
-            ]
-        } else {
-            return []
-        }
-
-    case .rewardedVideoLoad(let loadStatus):
-        state.rewardedVideo.combine(loading: loadStatus)
-        return []
-
-    case .dismissedAlert(let dismissed):
-        switch dismissed {
-        case .psiCashCoinPurchase, .speedBoostAlreadyActive:
-            state.purchasing = .none
-            return []
-        case .rewardedVideo:
-            state.rewardedVideo.combineWithErrorDismissed()
-            return []
-        }
-
-    case .connectToPsiphonTapped:
-        return [.external(.objc(.connectTunnel)),
-                .external(.objc(.dismiss(.psiCash)))]
-    }
-}
-// MARK: ViewController
 
 final class PsiCashViewController: UIViewController {
     typealias AddPsiCashViewType =
@@ -277,8 +56,7 @@ final class PsiCashViewController: UIViewController {
         EitherView<PsiCashMessageViewUntunneled, PsiCashMessageView>>>
 
     struct ObservedState: Equatable {
-        let actorState: AppRootActor.State
-        let state: PsiCashState
+        let state: PsiCashViewControllerState
         let activeTab: PsiCashViewController.Tabs
         let vpnStatus: NEVPNStatus
     }
@@ -302,7 +80,8 @@ final class PsiCashViewController: UIViewController {
     }
 
     private let (lifetime, token) = Lifetime.make()
-    private let store: Store<PsiCashState, PsiCashAction, Application.ExternalAction>
+    private let store: Store<PsiCashViewControllerState, PsiCashAction>
+    private let productRequestStore: Store<Unit, ProductRequestAction>
 
     // VC-specific UI state
     @State private var activeTab: Tabs = .speedBoost
@@ -321,18 +100,21 @@ final class PsiCashViewController: UIViewController {
     private let containerView = UIView(frame: .zero)
     private let containerBindable: EitherView<AddPsiCashViewType, SpeedBoostViewType>.BuildType
 
-    init(store: Store<PsiCashState, PsiCashAction, Application.ExternalAction>,
-         actorStateSignal: SignalProducer<AppRootActor.State, Never>) {
+    init(store: Store<PsiCashViewControllerState, PsiCashAction>,
+         iapStore: Store<Unit, IAPAction>,
+         productRequestStore: Store<Unit, ProductRequestAction>) {
 
         self.store = store
+        self.productRequestStore = productRequestStore
+        
         self.container = .init(
             AddPsiCashViewType(
                 PsiCashCoinPurchaseTable(purchaseHandler: {
                     switch $0 {
                     case .rewardedVideoAd:
                         store.send(.showRewardedVideoAd)
-                    case .product(let skProduct):
-                        store.send(.buyPsiCashCoin(.request(skProduct)))
+                    case .product(let product):
+                        iapStore.send(.purchase(.psiCash(product: product)))
                     }
                 }),
                 .init(Spinner(style: .whiteLarge),
@@ -341,7 +123,7 @@ final class PsiCashViewController: UIViewController {
                       }), PsiCashMessageView()))),
             SpeedBoostViewType(
                 SpeedBoostPurchaseTable(purchaseHandler: {
-                    store.send(.buyPsiCashProduct(.request(.speedBoost($0))))
+                    store.send(.buyPsiCashProduct(.speedBoost($0)))
                 }),
                 .init(Spinner(style: .whiteLarge),
                       .init(PsiCashMessageViewUntunneled(action: { [unowned store] in
@@ -354,7 +136,6 @@ final class PsiCashViewController: UIViewController {
 
         // Updates UI by merging all necessary signals.
         self.lifetime += SignalProducer.combineLatest(
-            actorStateSignal,
             store.$value.signalProducer,
             self.$activeTab.signalProducer,
             Current.vpnStatus.signalProducer)
@@ -363,7 +144,7 @@ final class PsiCashViewController: UIViewController {
             .startWithValues { [unowned self] observed in
                 let tunnelState = TunnelConnected.from(vpnStatus: observed.vpnStatus)
 
-                if case let .failure(errorEvent) = observed.state.rewardedVideo.loading {
+                if case let .failure(errorEvent) = observed.state.psiCash.rewardedVideo.loading {
                     let errorDesc = ErrorEventDescription(
                         event: errorEvent,
                         localizedUserDescription: UserStrings.Rewarded_video_load_failed())
@@ -428,38 +209,47 @@ final class PsiCashViewController: UIViewController {
                         'navigation: \(self.navigation)'
                         """)
                 }
+                
+                guard observed.state.psiCash.libData.authPackage.hasSpenderToken else {
+                    self.balanceView.isHidden = true
+                    self.tabControl.isHidden = true
+                    self.containerBindable.bind(.left(.right(.right(.right(.otherErrorTryAgain)))))
+                    return
+                }
 
-                switch (observed.actorState.psiCash, observed.actorState.iap.subscription) {
-                case (.none, _), (_, .unknown):
+                switch observed.state.subscription.status {
+                case .unknown:
                     // There is not PsiCash state or subscription state is unknow.
                     self.balanceView.isHidden = true
                     self.tabControl.isHidden = true
                     self.containerBindable.bind(.left(.right(.right(.right(.otherErrorTryAgain)))))
 
-                case (.some(let psiCashActorState), .subscribed(_)):
+                case .subscribed(_):
                     // User is subcribed. Only shows the PsiCash balance.
                     self.balanceView.isHidden = false
                     self.tabControl.isHidden = true
-                    self.balanceView.bind(psiCashActorState.balanceState)
+                    self.balanceView.bind(PsiCashBalanceView.State(observed.state.psiCash))
                     self.containerBindable.bind(.left(.right(.right(.right(.userSubscribed)))))
 
-                case (.some(let psiCashActorState), .notSubscribed):
+                case .notSubscribed:
                     self.balanceView.isHidden = false
                     self.tabControl.isHidden = false
-                    self.balanceView.bind(psiCashActorState.balanceState)
+                    self.balanceView.bind(PsiCashBalanceView.State(observed.state.psiCash))
 
                     // Updates active tab UI
                     switch observed.activeTab {
-                    case .addPsiCash: self.tabControl.bind(.addPsiCash)
-                    case .speedBoost: self.tabControl.bind(.speedBoost)
+                    case .addPsiCash:
+                        self.tabControl.bind(.addPsiCash)
+                    case .speedBoost:
+                        self.tabControl.bind(.speedBoost)
                     }
 
                     switch (tunnelState, observed.activeTab) {
                     case (.notConnected, .addPsiCash),
                          (.connected, .addPsiCash):
-
+                        
                         if tunnelState == .notConnected
-                            && observed.actorState.iap.iapState.pendingPsiCashPurchase != nil {
+                            && observed.state.iap.unverifiedPsiCashTransaction != nil {
                             // If tunnel is not connected and there is a pending PsiCash IAP,
                             // then shows the "pending psicash purchase" screen.
                             self.containerBindable.bind(
@@ -468,7 +258,7 @@ final class PsiCashViewController: UIViewController {
 
                         } else {
                             switch observed.state.allProducts {
-                            case .inProgress:
+                            case .pending:
                                 self.containerBindable.bind(.left(.right(.left(true))))
                             case .completed(let productRequestResult):
                                 switch productRequestResult {
@@ -487,8 +277,8 @@ final class PsiCashViewController: UIViewController {
 
                     case (let tunnelState, .speedBoost):
 
-                        let activeSpeedBoost = observed.actorState.psiCash?.activeSpeedBoost
-
+                        let activeSpeedBoost = observed.state.psiCash.activeSpeedBoost
+                        
                         switch tunnelState {
                         case .notConnected, .connecting:
 
@@ -514,7 +304,7 @@ final class PsiCashViewController: UIViewController {
                             case .none:
                                 // There is no active speed boost.
                                 let viewModel = NonEmpty(array:
-                                psiCashActorState.libData.availableProducts
+                                    observed.state.psiCash.libData.availableProducts
                                 .items.compactMap { $0.speedBoost }
                                 .map { SpeedBoostPurchasableViewModel(purchasable: $0) })
 
@@ -604,7 +394,7 @@ final class PsiCashViewController: UIViewController {
     }
 
     override func viewWillAppear(_ animated: Bool) {
-        store.send(.psiCashCoinProductList(.request(())))
+        productRequestStore.send(.getProductList)
     }
 
 }
@@ -698,18 +488,3 @@ extension RewardedVideoState {
     }
 }
 
-extension PurchaseError {
-    /// True if purchase is cancelled by the user
-    var purchaseCancelled: Bool {
-        guard case let .purchaseRequestError(.storeKitError(error)) = self else {
-            return false
-        }
-        guard case .left(let skError) = error else {
-            return false
-        }
-        guard case .paymentCancelled = skError.code else {
-            return false
-        }
-        return true
-    }
-}

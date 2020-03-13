@@ -23,18 +23,18 @@ import StoreKit
 struct PsiCashPurchasableViewModel: Equatable {
     enum ProductType: Equatable {
         case rewardedVideoAd(loading: Bool)
-        case product(SKProduct)
+        case product(AppStoreProduct)
     }
     let product: ProductType
     let title: String
     let subtitle: String
     let price: Double
 
-    static func from(skProduct: SKProduct) -> Self {
-        return .init(product: .product(skProduct),
-                     title: skProduct.localizedTitle,
-                     subtitle: skProduct.localizedDescription,
-                     price: skProduct.price.doubleValue)
+    static func from(_ product: AppStoreProduct) -> Self {
+        return .init(product: .product(product),
+                     title: product.skProduct.localizedTitle,
+                     subtitle: product.skProduct.localizedDescription,
+                     price: product.skProduct.price.doubleValue)
     }
 }
 
@@ -139,7 +139,7 @@ fileprivate func addTermsView(toCell cell: UITableViewCell) {
     cell.backgroundColor = .clear
     cell.selectionStyle = .none
 
-    let label = UILabel.make(text: "Consumable IAP Terms", // TODO: Replace with actual terms
+    let label = UILabel.make(text: UserStrings.PsiCash_purchase_notice(),
         fontSize: .normal,
         typeface: .medium,
         color: .blueGrey(),
