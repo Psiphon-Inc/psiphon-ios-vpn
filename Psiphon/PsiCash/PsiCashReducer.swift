@@ -74,6 +74,7 @@ func psiCashReducer(
             fatalError("Expected '.speedBoost'; purchasable: '\(purchaseResult.purchasable)'")
         }
         
+        state.psiCash.libData = purchaseResult.refreshedLibData
         switch purchaseResult.result {
         case .success(let purchasedType):
             guard case .speedBoost(let purchasedProduct) = purchasedType else {
