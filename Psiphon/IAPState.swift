@@ -25,6 +25,7 @@ enum IAPPurchasingState: Equatable {
     case error(ErrorEvent<IAPError>)
     case pending(IAPPurchasableProduct)
     
+    /// True if purchasing is completed (succeeded or failed)
     var completed: Bool {
         switch self {
         case .none: return true
