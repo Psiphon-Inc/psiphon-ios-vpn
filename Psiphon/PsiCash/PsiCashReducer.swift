@@ -52,7 +52,7 @@ func psiCashReducer(
         guard case .notSubscribed = state.subscription.status else {
             return []
         }
-        guard case .none = state.psiCash.purchasing else {
+        guard state.psiCash.purchasing.completed else {
             return []
         }
         guard let purchasable = purchasableType.speedBoost else {

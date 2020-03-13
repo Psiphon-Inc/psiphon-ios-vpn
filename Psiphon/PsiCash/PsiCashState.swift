@@ -67,6 +67,15 @@ enum PsiCashPurchasingState: Equatable {
     case none
     case speedBoost(SpeedBoostPurchasable)
     case psiCashError(ErrorEvent<PsiCashPurchaseResponseError>)
+    
+    /// True if purchasing is completed (succeeded or failed)
+    var completed: Bool {
+        switch self {
+        case .none: return true
+        case .error(_): return true
+        case .pending(_): return false
+        }
+    }
 }
 
 typealias RewardedVideoPresentation = AdPresentation
