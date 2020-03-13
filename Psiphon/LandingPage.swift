@@ -22,6 +22,11 @@ import ReactiveSwift
 
 typealias RestrictedURL = PredicatedValue<URL, Environment>
 
+struct LandingPageReducerState {
+    var shownLandingPage: Pending<Bool>
+    let activeSpeedBoost: PurchasedExpirableProduct<SpeedBoostProduct>?
+}
+
 enum LandingPageAction {
     /// Will try to open latest stored landing page for the current session if VPN is connected.
     case open(RestrictedURL)
@@ -32,14 +37,18 @@ enum LandingPageAction {
 }
 
 func landingPageReducer(
-    state: inout Pending<Bool>, action: LandingPageAction
+    state: inout LandingPageReducerState, action: LandingPageAction
 ) -> [Effect<LandingPageAction>] {
     switch action {
     case .open(let url):
-        guard case .completed(_) = state else {
+        guard case .completed(_) = state.shownLandingPage else {
             return []
         }
-        state = .pending
+        // Landing page not showing if SpeedBoost is active.
+        guard case .none = state.activeSpeedBoost else {
+            return []
+        }
+        state.shownLandingPage =  .pending
         return [
             Current.vpnStatus.signalProducer
                 .map { $0 == .connected }
@@ -58,11 +67,11 @@ func landingPageReducer(
         ]
         
     case .urlOpened(success: let success):
-        state = .completed(success)
+        state.shownLandingPage =  .completed(success)
         return []
         
     case .reset:
-        state = .completed(false)
+        state.shownLandingPage =  .completed(false)
         return []
     }
 }
