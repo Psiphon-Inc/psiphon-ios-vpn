@@ -36,6 +36,7 @@ enum TransactionUpdate {
 
 struct IAPReducerState {
     var iap: IAPState
+    var psiCashBalance: BalanceState
     let psiCashAuth: PsiCashAuthPackage
 }
 
@@ -120,6 +121,12 @@ func iapReducer(state: inout IAPReducerState, action: IAPAction) -> [Effect<IAPA
                             case .none:
                                 fatalError("unknown product \(String(describing: transaction))")
                             case .psiCash:
+                                // Updates balance state to reflect expected increase
+                                // in PsiCash balance.
+                                state.psiCashBalance.waitingForExpectedIncrease(
+                                    withAddedReward: .zero()
+                                )
+                                
                                 let unverifiedTx =
                                     UnverifiedPsiCashConsumableTransaction(value: transaction)
                                 state.iap.unverifiedPsiCashTransaction = unverifiedTx

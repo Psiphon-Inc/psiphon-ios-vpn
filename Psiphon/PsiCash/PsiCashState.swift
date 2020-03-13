@@ -26,7 +26,6 @@ struct PsiCashState: Equatable {
     var purchasing: PsiCashPurchasingState
     var rewardedVideo: RewardedVideoState
     var libData: PsiCashLibData    
-    var balanceState: BalanceState
     var pendingPsiCashRefresh: PendingPsiCashRefresh
 }
 
@@ -36,14 +35,11 @@ extension PsiCashState {
         purchasing = .none
         rewardedVideo = .init()
         libData = .init()
-        balanceState = .init(pendingExpectedBalanceIncrease: false,
-                             balance: .zero())
         pendingPsiCashRefresh = .completed(.success(.unit))
     }
     
     mutating func appDidLaunch(_ libData: PsiCashLibData) {
         self.libData = libData
-        self.balanceState = .fromStoredExpectedReward(libData: libData)
     }
 
     var rewardedVideoProduct: PsiCashPurchasableViewModel {
@@ -66,14 +62,14 @@ extension PsiCashState {
 enum PsiCashPurchasingState: Equatable {
     case none
     case speedBoost(SpeedBoostPurchasable)
-    case psiCashError(ErrorEvent<PsiCashPurchaseResponseError>)
+    case error(ErrorEvent<PsiCashPurchaseResponseError>)
     
     /// True if purchasing is completed (succeeded or failed)
     var completed: Bool {
         switch self {
         case .none: return true
         case .error(_): return true
-        case .pending(_): return false
+        case .speedBoost(_): return false
         }
     }
 }
@@ -173,6 +169,23 @@ struct BalanceState: Equatable {
 }
 
 extension BalanceState {
+    init() {
+        pendingExpectedBalanceIncrease = false
+        balance = .zero()
+    }
+}
+
+extension BalanceState {
+    
+    mutating func waitingForExpectedIncrease(withAddedReward addedReward: PsiCashAmount) {
+        pendingExpectedBalanceIncrease = true
+        if addedReward > .zero() {
+            let newRewardAmount = Current.userConfigs.expectedPsiCashReward + addedReward
+            Current.userConfigs.expectedPsiCashReward = newRewardAmount
+            balance = balance + newRewardAmount
+        }
+    }
+    
     static func fromStoredExpectedReward(libData: PsiCashLibData) -> Self {
         let reward = Current.userConfigs.expectedPsiCashReward
         return .init(pendingExpectedBalanceIncrease: !reward.isZero,
@@ -182,19 +195,6 @@ extension BalanceState {
     static func refreshed(refreshedData libData: PsiCashLibData) -> Self {
         Current.userConfigs.expectedPsiCashReward = PsiCashAmount.zero()
         return .init(pendingExpectedBalanceIncrease: false, balance: libData.balance)
-    }
-
-    static func waitingForExpectedIncrease(withAddedReward addedReward: PsiCashAmount,
-                                           libData: PsiCashLibData) -> Self {
-        let newBalance: PsiCashAmount
-        if addedReward > .zero() {
-            let newRewardAmount = Current.userConfigs.expectedPsiCashReward + addedReward
-            Current.userConfigs.expectedPsiCashReward = newRewardAmount
-            newBalance = libData.balance + newRewardAmount
-        } else {
-            newBalance = libData.balance
-        }
-        return .init(pendingExpectedBalanceIncrease: true, balance: newBalance)
     }
 
 }
