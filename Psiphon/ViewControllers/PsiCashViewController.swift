@@ -25,6 +25,7 @@ import Promises
 import StoreKit
 
 struct PsiCashViewControllerState: Equatable {
+    let psiCashBalance: BalanceState
     let psiCash: PsiCashState
     let iap: IAPState
     let subscription: SubscriptionState
@@ -165,7 +166,7 @@ final class PsiCashViewController: UIViewController {
                 case (_, .speedBoost(_), .mainScreen):
                     self.display(screen: .speedBoostPurchaseDialog)
                     
-                case (_, .psiCashError(let psiCashErrorEvent), _):
+                case (_, .error(let psiCashErrorEvent), _):
                     let errorDesc = ErrorEventDescription(
                         event: psiCashErrorEvent.eraseToRepr(),
                         localizedUserDescription: psiCashErrorEvent.error.userDescription
@@ -215,13 +216,19 @@ final class PsiCashViewController: UIViewController {
                     // User is subcribed. Only shows the PsiCash balance.
                     self.balanceView.isHidden = false
                     self.tabControl.isHidden = true
-                    self.balanceView.bind(PsiCashBalanceView.State(observed.state.psiCash))
+                    self.balanceView.bind(
+                        PsiCashBalanceView.ViewModel(psiCashState: observed.state.psiCash,
+                                                     balanceState: observed.state.psiCashBalance)
+                    )
                     self.containerBindable.bind(.left(.right(.right(.right(.userSubscribed)))))
 
                 case .notSubscribed:
                     self.balanceView.isHidden = false
                     self.tabControl.isHidden = false
-                    self.balanceView.bind(PsiCashBalanceView.State(observed.state.psiCash))
+                    self.balanceView.bind(
+                        PsiCashBalanceView.ViewModel(psiCashState: observed.state.psiCash,
+                                                     balanceState: observed.state.psiCashBalance)
+                    )
 
                     // Updates active tab UI
                     switch observed.activeTab {

@@ -26,6 +26,7 @@ import ReactiveSwift
 }
 
 struct AppState: Equatable {
+    var psiCashBalance = BalanceState()
     var shownLandingPage: Pending<Bool> = .completed(false)
     var psiCash = PsiCashState()
     var appReceipt = ReceiptState()

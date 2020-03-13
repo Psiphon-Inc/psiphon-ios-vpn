@@ -24,7 +24,7 @@ enum PsiCashAction {
     case buyPsiCashProduct(PsiCashPurchasableType)
     case psiCashProductPurchaseResult(PsiCashPurchaseResult)
     
-    case refreshPsiCashState // TODO!! Handle the case of expected reward increase
+    case refreshPsiCashState
     case refreshPsiCashStateResult(PsiCashRefreshResult)
     
     case showRewardedVideoAd
@@ -40,6 +40,7 @@ enum PsiCashAlertDismissAction {
 }
 
 struct PsiCashReducerState: Equatable {
+    var psiCashBalance: BalanceState
     var psiCash: PsiCashState
     let subscription: SubscriptionState
 }
@@ -75,6 +76,7 @@ func psiCashReducer(
         }
         
         state.psiCash.libData = purchaseResult.refreshedLibData
+        state.psiCashBalance = .refreshed(refreshedData: purchaseResult.refreshedLibData)
         switch purchaseResult.result {
         case .success(let purchasedType):
             guard case .speedBoost(let purchasedProduct) = purchasedType else {
@@ -94,7 +96,7 @@ func psiCashReducer(
             ]
             
         case .failure(let errorEvent):
-            state.psiCash.purchasing = .psiCashError(errorEvent)
+            state.psiCash.purchasing = .error(errorEvent)
             return [
                 .fireAndForget {
                     PsiFeedbackLogger.error(withType: "PsiCash",
@@ -121,7 +123,7 @@ func psiCashReducer(
         state.psiCash.pendingPsiCashRefresh = result.map { $0.map { _ in .unit } }
         if case .completed(.success(let refreshedLibData)) = result {
             state.psiCash.libData = refreshedLibData
-            state.psiCash.balanceState = .refreshed(refreshedData: refreshedLibData)
+            state.psiCashBalance = .refreshed(refreshedData: refreshedLibData)
         }
         return []
         
@@ -148,9 +150,7 @@ func psiCashReducer(
         
         if state.psiCash.rewardedVideo.rewardedAndDismissed {
             let rewardAmount = Current.hardCodedValues.psiCash.videoAdRewardAmount
-            
-            state.psiCash.balanceState = .waitingForExpectedIncrease(withAddedReward: rewardAmount,
-                                                             libData: state.psiCash.libData)
+            state.psiCashBalance.waitingForExpectedIncrease(withAddedReward: rewardAmount)
             return [Effect { .refreshPsiCashState }]
         } else {
             return []

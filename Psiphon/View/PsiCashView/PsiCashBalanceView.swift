@@ -21,15 +21,15 @@ import Foundation
 import UIKit
 
 @objc final class PsiCashBalanceView: UIView, Bindable {
-    typealias BindingType = State
+    typealias BindingType = ViewModel
     
-    struct State: Equatable {
+    struct ViewModel: Equatable {
         let pendingPsiCashRefresh: PendingPsiCashRefresh
         let balanceState: BalanceState
         
-        init(_ psiCashState: PsiCashState) {
-            pendingPsiCashRefresh = psiCashState.pendingPsiCashRefresh
-            balanceState = psiCashState.balanceState
+        init(psiCashState: PsiCashState, balanceState: BalanceState) {
+            self.pendingPsiCashRefresh = psiCashState.pendingPsiCashRefresh
+            self.balanceState = balanceState
         }
     }
 
