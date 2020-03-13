@@ -26,6 +26,7 @@ func id<Value>(_ value: Value) -> Value {
     return value
 }
 
+// TODO! Remove ReqRes
 enum ReqRes<RequestValue, ResponseValue> {
     case request(RequestValue)
     case response(ResponseValue)
@@ -195,10 +196,6 @@ public extension Result {
         }
     }
 
-    func mapSuccessToUnit() -> Result<(), Failure> {
-        return self.map { _ in () }
-    }
-
 }
 
 public extension Result where Success == Void {
@@ -209,6 +206,12 @@ public extension Result where Success == Void {
             return .none
         case .failure(let error):
             return error
+        }
+    }
+    
+    func mapToUnit() -> Result<Unit, Failure> {
+        self.map { _ in
+            .unit
         }
     }
 
@@ -236,30 +239,28 @@ public protocol Bindable {
     func bind(_ newValue: BindingType)
 }
 
-/// A result that is progressing towards completion. It can either be inProgress, or completed with `Result` associated value.
-public enum ProgressiveResult<Success: Equatable, Failure: Error & Equatable>: Equatable {
-    /// Result is in progress.
-    case inProgress
-    /// A failure, storing a `Failure` value.
-    case completed(Result<Success, Failure>)
+typealias PendingResult<Success: Equatable, Failure: Error & Equatable> = Pending<Result<Success, Failure>>
 
-    var didSucceed: Bool {
-        if case .completed(.success(_)) = self {
-            return true
-        } else {
-            return false
-        }
-    }
-
-    static func from(result: Result<Success, Failure>) -> Self {
-        return .completed(result)
-    }
+/// A type that is isomorphic to Optional type, intended to represent computations that are "pending" before finishing.
+public enum Pending<Value> {
+    case pending
+    case completed(Value)
 }
 
-/// A type that is isomorphic to Optional type, intended to represent computations that are "in progress" before finishing.
-public enum Progressive<Result> {
-    case inProgress
-    case done(Result)
+extension Pending: Equatable where Value: Equatable {}
+extension Pending: Hashable where Value: Hashable {}
+
+extension Pending {
+    
+    func map<B>(_ f: (Value) -> B) -> Pending<B> {
+        switch self {
+        case .pending:
+            return .pending
+        case .completed(let value):
+            return .completed(f(value))
+        }
+    }
+    
 }
 
 /// Enables dictionary set/get directly with enums that their raw value type matches the dictionary key.
@@ -272,49 +273,6 @@ extension Dictionary where Key: ExpressibleByStringLiteral {
         set(newValue) {
             self[index.rawValue] = newValue
         }
-    }
-
-}
-
-/// Create a DispatchSourceTimer that on
-class SingleFireTimer {
-
-    private let timer: DispatchSourceTimer
-
-    /// - Parameter handler: Uses default `DispatchSourceTimer` dispatch queue.
-    init(deadline: TimeInterval, leeway: DispatchTimeInterval = .seconds(1),
-         queue: DispatchQueue? = .none, _ handler: @escaping () -> Void) {
-
-        timer = DispatchSource.makeTimerSource(flags: [], queue: queue)
-        timer.schedule(deadline: .intervalFromNow(deadline),
-                       repeating: .never,
-                       leeway: leeway)
-        timer.setEventHandler(handler: handler)
-        timer.resume()
-    }
-
-    deinit {
-        timer.setEventHandler(handler: {})
-
-        // It's an error on call cancel on a suspended timer.
-        // Details here: https://forums.developer.apple.com/thread/15902
-        timer.cancel()
-    }
-
-}
-
-extension DispatchTime {
-
-    /// Creats DispatchTime by adding `interval` to `DispatchTime.now()`.
-    /// - Important: Sub-millisecond precision is lost in the current implementation.
-    static func intervalFromNow(_ interval: TimeInterval) -> DispatchTime {
-        let intervalInMilliseconds = 1000 * interval
-
-        if intervalInMilliseconds == Double.infinity {
-            fatalError("interval '\(interval)' is too large")
-        }
-
-        return DispatchTime.now() + DispatchTimeInterval.milliseconds(Int(intervalInMilliseconds))
     }
 
 }

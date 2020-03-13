@@ -66,8 +66,6 @@ PODS:
   - ReactiveObjC (3.1.0)
   - ReactiveSwift (6.2.1)
   - SVProgressHUD (2.2.5)
-  - SwiftActors (1.1.1):
-    - PromisesSwift (~> 1.2)
 
 DEPENDENCIES:
   - CustomIOSAlertView (~> 0.9.5)
@@ -77,12 +75,12 @@ DEPENDENCIES:
   - MoPub-AdMob-Adapters (~> 7.37)
   - mopub-ios-sdk (~> 5.4)
   - PersonalizedAdConsent
+  - PromisesSwift (~> 1.2)
   - PsiphonClientCommonLibrary (from `https://github.com/Psiphon-Inc/psiphon-ios-client-common-library.git`, commit `f97b258`)
   - ReactiveCocoa (~> 10.1)
   - ReactiveObjC (from `https://github.com/Psiphon-Inc/ReactiveObjC.git`, commit `8bbf9dd`)
   - ReactiveSwift (~> 6.1)
   - SVProgressHUD
-  - SwiftActors (from `https://github.com/Psiphon-Inc/swift-actors.git`, commit `a28147a`)
 
 SPEC REPOS:
   trunk:
@@ -111,9 +109,6 @@ EXTERNAL SOURCES:
   ReactiveObjC:
     :commit: 8bbf9dd
     :git: https://github.com/Psiphon-Inc/ReactiveObjC.git
-  SwiftActors:
-    :commit: a28147a
-    :git: https://github.com/Psiphon-Inc/swift-actors.git
 
 CHECKOUT OPTIONS:
   InAppSettingsKit:
@@ -125,9 +120,6 @@ CHECKOUT OPTIONS:
   ReactiveObjC:
     :commit: 8bbf9dd
     :git: https://github.com/Psiphon-Inc/ReactiveObjC.git
-  SwiftActors:
-    :commit: a28147a
-    :git: https://github.com/Psiphon-Inc/swift-actors.git
 
 SPEC CHECKSUMS:
   CustomIOSAlertView: cc4fa8e36219be3fd5ebcd40789f5b4aaae0f38e
@@ -147,8 +139,7 @@ SPEC CHECKSUMS:
   ReactiveObjC: 2a38ea15335de4119d8b17caf1db1484f61db902
   ReactiveSwift: 07ddf579f4eb3ee3bd656214f0461aaf2c0fd639
   SVProgressHUD: 1428aafac632c1f86f62aa4243ec12008d7a51d6
-  SwiftActors: 75f57bd66413a5a2f2bd1e0d3e8a54984d8e2c18
 
-PODFILE CHECKSUM: c8e7d5439d30973142ec421ac509730c07a880d4
+PODFILE CHECKSUM: 78bbe3add810e7c21b55f2c91f545379dfbef2d3
 
 COCOAPODS: 1.8.4

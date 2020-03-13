@@ -20,7 +20,6 @@
 import Foundation
 import ReactiveSwift
 import Promises
-import SwiftActors
 
 struct TimeoutError: Error {}
 
@@ -58,7 +57,7 @@ extension SignalProducer where Error == Never {
 
 extension Signal where Error == Never {
 
-    func observe<A, B>(store: Store<A, Value, B>) -> Disposable? {
+    func observe<A>(store: Store<A, Value>) -> Disposable? {
         return self.observeValues { [unowned store] (value: Signal.Value) in
             store.send(value)
         }
@@ -96,37 +95,13 @@ extension SignalProducer where Value == Bool, Error == Never {
 
 }
 
-extension SignalProducer where Value: Message, Error == Never {
-
-    func tell(actor: TypedActor<Value>) -> Disposable? {
-        return startWithValues { typedMsg in
-            actor ! typedMsg
+extension SignalProducer where Error == Never {
+    
+    func send<StoreValue>(store: Store<StoreValue, Value>) -> Disposable? {
+        return startWithValues { action in
+            store.send(action)
         }
     }
-}
-
-extension Signal where Value: Message, Error == Never {
-
-    func tell(actor: TypedActor<Value>) -> Disposable? {
-        return observeValues { typedMsg in
-            actor ! typedMsg
-        }
-    }
-
-}
-
-extension Signal where Error == Never {
-
-    func tell<M: AnyMessage>(actor: ActorRef) -> Disposable? where Value == Optional<M> {
-
-        return observeValues { msg in
-            guard let msg = msg else {
-                return
-
-            }
-            actor ! msg
-        }
-    }
-
+    
 }
 
