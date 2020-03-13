@@ -18,73 +18,55 @@
  */
 
 import Foundation
-import SwiftActors
 import ReactiveSwift
 import Promises
 import StoreKit
 
 // TODO: `self.app` is force unwrapped multiple times in this file.
 
-// Represents actions that are sent from ObjC and result in an effect in `appDelegateReducer`.
-enum ObjcEffectAction {
-    case appForegrounded
-    case landingPage(LandingPageAction)
-    case iapStore(IAPAction)
+enum AppDelegateAction {
+    case appDidLaunch(psiCashData: PsiCashLibData)
+    case appEnteredForeground
 }
 
-typealias LandingPageAction = LandingPageActor.Action
-typealias IAPAction = IAPActor.Action
-
 func appDelegateReducer(
-    state: inout UIState, action: AppAction
-) -> [EffectType<AppAction, Application.ExternalAction>] {
+    state: inout PsiCashState, action: AppDelegateAction
+) -> [Effect<AppDelegateAction>] {
     switch action {
-
-    case .objcEffectAction(let objcAction):
-        switch objcAction {
-        case .appForegrounded:
-            return [.external(.action(.psiCash(.refreshState(reason: .appForegrounded, promise: nil))))]
-
-        case let .landingPage(.open(url)):
-            return [.external(.action(.landingPage(.open(url))))]
-
-        case let .iapStore(.refreshReceipt(promise)):
-            return [.external(.action(.inAppPurchase(.refreshReceipt(promise))))]
-
-        case let .iapStore(.buyProduct(product, promise)):
-            return [.external(.action(.inAppPurchase(.buyProduct(product, promise))))]
-
-        case .landingPage(.reset):
-            return [.external(.action(.landingPage(.reset)))]
-
-        case .iapStore(.verifiedConsumableTransaction(_)):
-            // TODO: This action should be made private to actors only.
-            fatalError()
-        }
-
-    default:
-        return []
+    case .appDidLaunch(psiCashData: let libData):
+        state.appDidLaunch(libData)
+        return [
+            Current.paymentQueue.addObserver(Current.paymentTransactionDelegate).mapNever(),
+            .fireAndForget {
+                Current.app.store.send(.appReceipt(.receiptRefreshed(.success(()))))
+            }
+        ]
+        
+    case .appEnteredForeground:
+        return [
+            .fireAndForget {
+                Current.app.store.send(.psiCash(.refreshPsiCashState))
+            }
+        ]
     }
-
+    
 }
 
 // MARK: SwiftAppDelegate
 @objc final class SwiftDelegate: NSObject {
-
+    
     static let instance = SwiftDelegate()
     private var (lifetime, token) = Lifetime.make()
-    private var objcBridge: ObjCBridgeDelegate!
-    private var app: Application?
-
+    
 }
 
 // MARK: Bridge API
 
 extension SwiftDelegate: RewardedVideoAdBridgeDelegate {
     func adPresentationStatus(_ status: AdPresentation) {
-        self.app!.store.send(.psiCash(.rewardedVideoPresentation(status)))
+        Current.app.store.send(.psiCash(.rewardedVideoPresentation(status)))
     }
-
+    
     func adLoadStatus(_ status: AdLoadStatus, error: SystemError?) {
         let loadResult: RewardedVideoLoad
         if let error = error {
@@ -99,120 +81,124 @@ extension SwiftDelegate: RewardedVideoAdBridgeDelegate {
                 loadResult = .success(status)
             }
         }
-        self.app!.store.send(.psiCash(.rewardedVideoLoad(loadResult)))
+        Current.app.store.send(.psiCash(.rewardedVideoLoad(loadResult)))
     }
 }
 
 // API exposed to ObjC.
 extension SwiftDelegate: SwiftBridgeDelegate {
-
+    
     @objc static var bridge: SwiftBridgeDelegate {
         return SwiftDelegate.instance
     }
-
+    
     @objc func set(objcBridge: ObjCBridgeDelegate) {
-        self.objcBridge = objcBridge
+        Current.objcBridgeDelegate = objcBridge
     }
-
+    
     @objc func applicationDidFinishLaunching(_ application: UIApplication) {
-        let reducer: Reducer<UIState, AppAction, Application.ExternalAction>
-        if Current.debugging.printStoreLogs {
-            reducer = logging(appReducer)
-        } else {
-            reducer = appReducer
-        }
-        self.app = Application(initialValue: .init(psiCash: PsiCashState()),
-                               reducer: reducer,
-                               objcEffectHandler: { [unowned self] objAction in
-                                switch objAction {
-                                case .presentRewardedVideoAd(let customData):
-                                    self.objcBridge.presentRewardedVideoAd(customData: customData,
-                                                                           delegate: self)
-                                case .connectTunnel:
-                                    Current.vpnManager.startTunnel()
-                                case .dismiss(let screen):
-                                    self.objcBridge.dismiss(screen: screen)
-                                }})
-
-        self.lifetime += self.app!.actorOutput.map(\.iap.subscription)
-            .startWithValues { [unowned self] in
-                self.objcBridge.onSubscriptionStatus(BridgedUserSubscription.from(state: $0))
-        }
-
-        self.lifetime += self.app!.actorOutput.map(\.psiCash?)
-            .startWithValues { [unowned self] in
-                guard let balanceState = $0?.balanceState else {
-                    return
-                }
-                self.objcBridge.onPsiCashBalanceUpdate(.init(swiftBalanceState: balanceState))
-        }
-
-        self.lifetime += self.app!.actorOutput
-            .map { actorState -> (activeSpeedBoost: PurchasedExpirableProduct<SpeedBoostProduct>?,
-                subscription: SubscriptionState) in
-                return (activeSpeedBoost: actorState.psiCash?.activeSpeedBoost,
-                        subscription: actorState.iap.subscription)
+        if Debugging.printAppState {
+            self.lifetime += Current.app.store.$value.signalProducer.startWithValues { appState in
+                let path = \AppState.psiCash.balanceState
+                print("AppState Path \(path)")
+                print(String(describing: appState[keyPath: path]))
+                print("-----")
             }
-            .startWithValues { [unowned self] resultState in
-                let expiry: Date?
-                if case .subscribed(_) = resultState.subscription {
-                    expiry = nil
-                } else {
-                    expiry = resultState.activeSpeedBoost?.transaction.localTimeExpiry
-                }
-                self.objcBridge.onSpeedBoostActivePurchase(expiry)
         }
-    }
+        
+        Current.app.store.send(
+            .appDelegateAction(.appDidLaunch(psiCashData: Current.psiCashEffect.libData))
+        )
+        
+        // Maps connected events to refresh state messages sent to store.
+        self.lifetime += Current.vpnStatus.signalProducer
+            .skipRepeats()
+            .filter { $0 == .connected }
+            .map(value: AppAction.psiCash(.refreshPsiCashState))
+            .send(store: Current.app.store)
+        
+        // Forwards `PsiCashState` updates to ObjCBridgeDelegate.
+        self.lifetime += Current.app.store.$value.signalProducer
+            .map(\.psiCash)
+            .startWithValues { psiCashState in
+                guard let bridge = Current.objcBridgeDelegate else { fatalError() }
+                bridge.onPsiCashBalanceUpdate(.init(swiftState: .init(psiCashState)))
+        }
+        
+        // Forwards `SubscriptionStatus` updates to ObjCBridgeDelegate.
+        self.lifetime += Current.app.store.$value.signalProducer.map(\.subscription.status)
+            .startWithValues {
+                guard let bridge = Current.objcBridgeDelegate else { fatalError() }
+                bridge.onSubscriptionStatus(BridgedUserSubscription.from(state: $0))
+        }
+        
+        // Forewards SpeedBoost purchase expiry date (if the user is not subscribed)
+        // to ObjCBridgeDelegate.
+        self.lifetime += Current.app.store.$value.signalProducer
+            .map { appState -> Date? in
+                guard case .subscribed(_) = appState.subscription.status else {
+                    return nil
+                }
+                return appState.psiCash.activeSpeedBoost?.transaction.localTimeExpiry
+        }
+        .startWithValues{ speedBoostExpiry in
+            guard let bridge = Current.objcBridgeDelegate else { fatalError() }
+            bridge.onSpeedBoostActivePurchase(speedBoostExpiry)
+        }
 
+    }
+    
     @objc func applicationWillEnterForeground(_ application: UIApplication) {
-        self.app!.store.send(.objcEffectAction(.appForegrounded))
+        Current.app.store.send(.appDelegateAction(.appEnteredForeground))
     }
-
+    
+    @objc func applicationWillTerminate(_ application: UIApplication) {
+        let _ = Current.paymentQueue.removeObserver(Current.paymentTransactionDelegate).wait()
+    }
+    
     @objc func createPsiCashViewController() -> UIViewController? {
         PsiCashViewController(
-            store: app!.store.projection(
-                value: { $0.psiCash },
-                action: { .psiCash($0) },
-                external: { $0 }),
-            actorStateSignal: app!.actorOutput
+            store: Current.app.store.projection(
+                value: { $0.psiCashViewController },
+                action: { .psiCash($0) }),
+            iapStore: Current.app.store.projection(
+                value: erase,
+                action: { .iap($0) }),
+            productRequestStore: Current.app.store.projection(
+                value: erase,
+                action: { .productRequest($0) } )
         )
     }
-
+    
     @objc func getCustomRewardData(_ callback: @escaping (CustomData?) -> Void) {
-        let promise = Promise<CustomData?>.pending()
-        self.app!.appRoot.actor?.tell(message:
-            .psiCash(.rewardedVideoCustomData(promise)))
-        promise.then {
-            callback($0)
-        }
+        callback(Current.psiCashEffect.rewardedVideoCustomData())
     }
-
+    
     @objc func resetLandingPage() {
-        self.app!.store.send(.objcEffectAction(.landingPage(.reset)))
+        Current.app.store.send(.landingPage(.reset))
     }
-
+    
     @objc func showLandingPage() {
         guard let landingPages = Current.sharedDB.getHomepages(), landingPages.count > 0 else {
             return
         }
         let randomURL = landingPages.randomElement()!.url
-
+        
         let restrictedURL = RestrictedURL(value: randomURL) { (env: Environment) -> Bool in
             return env.tunneled
         }
-
-        self.app!.store.send(.objcEffectAction(.landingPage(.open(restrictedURL))))
+        Current.app.store.send(.landingPage(.open(restrictedURL)))
     }
-
+    
     @objc func refreshAppStoreReceipt() -> Promise<Error?>.ObjCPromise<NSError> {
         let promise = Promise<Result<(), SystemErrorEvent>>.pending()
         let objcPromise = promise.then { result -> Error? in
             return result.projectError()?.error
         }
-        self.app!.store.send(.objcEffectAction(.iapStore(.refreshReceipt(promise))))
+        Current.app.store.send(.appReceipt(.refreshAppReceipt(optinalPromise: promise)))
         return objcPromise.asObjCPromise()
     }
-
+    
     @objc func buyAppStoreSubscriptionProduct(
         _ product: SKProduct
     ) -> Promise<ObjCIAPResult>.ObjCPromise<ObjCIAPResult> {
@@ -220,15 +206,18 @@ extension SwiftDelegate: SwiftBridgeDelegate {
         let objcPromise = promise.then { (result: IAPResult) -> ObjCIAPResult in
             ObjCIAPResult.from(iapResult: result)
         }
-
-        if let purchasable = AppStoreProduct(product) {
-            self.app!.store.send(.objcEffectAction(.iapStore(.buyProduct(
-                PurchasableProduct.subscription(product: purchasable), promise))))
-        } else {
+        
+        do {
+            let appStoreProduct = try AppStoreProduct(product)
+            Current.app.store.send(.iap(.purchase(
+                PurchasableProduct.subscription(product: appStoreProduct, promise: promise)
+                )))
+            
+        } catch {
             fatalError("Unknown subscription product identifier '\(product.productIdentifier)'")
         }
-
+        
         return objcPromise.asObjCPromise()
     }
-
+    
 }

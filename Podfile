@@ -17,11 +17,10 @@ target 'Psiphon' do
   #pod "PsiphonClientCommonLibrary", :path => "../psiphon-ios-client-common-library"
 
   # Swift dependencies
-  pod 'SwiftActors', :git => "https://github.com/Psiphon-Inc/swift-actors.git", :commit => 'a28147a'
   pod 'ReactiveSwift', '~> 6.1'
   pod 'ReactiveCocoa', '~> 10.1'
-
   pod 'ReactiveObjC', :git => "https://github.com/Psiphon-Inc/ReactiveObjC.git", :commit => '8bbf9dd'
+  pod 'PromisesSwift', '~> 1.2'
   pod 'mopub-ios-sdk', '~> 5.4'
   pod 'MoPub-AdMob-Adapters', '~> 7.37'
   pod 'Google-Mobile-Ads-SDK', '~> 7.37'

@@ -43,7 +43,6 @@ protocol HTTPResponse {
     associatedtype Success
     associatedtype Failure: HashableError
     typealias FailureEvent = ErrorEvent<Failure>
-    typealias ResponseSignalProducerType = SignalProducer<Success, FailureEvent>
 
     var result: Result<Success, FailureEvent> { get }
 
@@ -64,7 +63,7 @@ struct HTTPRequest<Response: HTTPResponse> {
         request.setValue(contentType.rawValue, forHTTPHeaderField: HTTPContentType.headerKey)
         request.setValue(clientMetaData, forHTTPHeaderField: "X-Verifier-Metadata")
 
-        if Current.debugging.printHttpRequests {
+        if Debugging.printHttpRequests {
             request.debugPrint()
         }
 
@@ -125,7 +124,8 @@ struct ClientMetaData: Encodable {
     let clientVersion: String = AppInfo.appVersion() ?? ""
     let propagationChannelID: String = AppInfo.propagationChannelId() ?? ""
     let sponsorID: String = AppInfo.sponsorId() ?? ""
-
+    
+    
     private enum CodingKeys: String, CodingKey {
         case clientPlatform = "client_platform"
         case clientRegion = "client_region"
@@ -134,7 +134,7 @@ struct ClientMetaData: Encodable {
         case sponsorID = "sponsor_id"
     }
 
-    static func jsonData() -> String {
+    lazy var jsonString: String = {
         do {
             let jsonData = try JSONEncoder().encode(ClientMetaData())
             if let jsonString = String(data: jsonData, encoding: .utf8) {
@@ -146,23 +146,17 @@ struct ClientMetaData: Encodable {
                                     object: error)
         }
         return ""
-    }
+    }()
+    
 }
 
 func httpRequest<Response>(
     request urlRequest: HTTPRequest<Response>
-) -> Response.ResponseSignalProducerType {
+) -> Effect<Response> {
     return SignalProducer { observer, lifetime in
         let session = request(urlRequest) { response in
-            switch response.result {
-            case let .success(value):
-                observer.send(value: value)
-                observer.sendCompleted()
-            case let .failure(error):
-                observer.send(error: error)
-            }
+            observer.fulfill(value: response)
         }
-
         lifetime.observeEnded {
             session.cancel()
         }

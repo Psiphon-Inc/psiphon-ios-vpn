@@ -249,6 +249,7 @@ willFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
 - (void)applicationWillTerminate:(UIApplication *)application {
     LOG_DEBUG();
     // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
+    [SwiftDelegate.bridge applicationWillTerminate:application];
 }
 
 #pragma mark -

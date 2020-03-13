@@ -48,6 +48,15 @@ struct PsiCashLibData: Equatable {
     let activePurchases: PsiCashParsed<PsiCashPurchasedType>
 }
 
+extension PsiCashLibData {
+    init() {
+        authPackage = .init(withTokenTypes: [])
+        balance = .zero()
+        availableProducts = .init(items: [], parseErrors: [])
+        activePurchases = .init(items: [], parseErrors: [])
+    }
+}
+
 extension PsiCash {
 
     func setRequestMetadata() {
@@ -363,11 +372,12 @@ struct SpeedBoostProduct: PsiCashProduct {
     let distinguisher: String
     let hours: Int
 
-    /// - Speed Boost distinguishers have the patter: `[1-9][0-9]*hr`
+    /// Initializer fails if provided `distinguisher` is not supported.
+    /// - Note: [PsiCashSpeedBoostSupportedProducts](x-source-tag://PsiCashSpeedBoostSupportedProducts)
     init?(distinguisher: String) {
         self.distinguisher = distinguisher
-        let index = distinguisher.index(distinguisher.endIndex, offsetBy: -2)
-        guard let hours = Int(String(distinguisher[..<index])) else {
+        guard let hours =
+            Current.hardCodedValues.supportedSpeedBoosts.distinguisherToHours[distinguisher] else {
             return nil
         }
         self.hours = hours
