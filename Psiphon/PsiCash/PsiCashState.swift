@@ -126,6 +126,7 @@ enum PsiCashTransactionMismatchError: HashableError {
 
 struct PsiCashPurchaseResult: Equatable {
     let purchasable: PsiCashPurchasableType
+    let refreshedLibData: PsiCashLibData
     let result: Result<PsiCashPurchasedType, ErrorEvent<PsiCashPurchaseResponseError>>
 }
 

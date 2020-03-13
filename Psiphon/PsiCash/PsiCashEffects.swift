@@ -75,8 +75,11 @@ struct PsiCashEffect {
             
             guard Current.tunneled else {
                 observer.fulfill(value:
-                    PsiCashPurchaseResult(purchasable: purchasable,
-                                          result: .failure(ErrorEvent(.tunnelNotConnected))))
+                    PsiCashPurchaseResult(
+                        purchasable: purchasable,
+                        refreshedLibData: self.psiCash.dataModel(),
+                        result: .failure(ErrorEvent(.tunnelNotConnected)))
+                )
                 return
             }
             
@@ -96,6 +99,7 @@ struct PsiCashEffect {
                 if status == .success, let purchase = purchase {
                     result = PsiCashPurchaseResult(
                         purchasable: purchasable,
+                        refreshedLibData: self.psiCash.dataModel(),
                         result: purchase.mapToPurchased().mapError {
                             ErrorEvent(PsiCashPurchaseResponseError.parseError($0))
                     })
@@ -103,6 +107,7 @@ struct PsiCashEffect {
                 } else {
                     result = PsiCashPurchaseResult(
                         purchasable: purchasable,
+                        refreshedLibData: self.psiCash.dataModel(),
                         result: .failure(ErrorEvent(.serverError(status, error as SystemError?)))
                     )
                 }
