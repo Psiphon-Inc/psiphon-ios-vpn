@@ -35,7 +35,6 @@ struct Styling {
     var statusBarStyle = UIStatusBarStyle.lightContent
 }
 
-
 enum Gradients: Int {
     case grey
     case blue

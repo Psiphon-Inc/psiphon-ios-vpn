@@ -35,13 +35,11 @@ enum PsiCashAction {
 }
 
 enum PsiCashAlertDismissAction {
-    case psiCashCoinPurchase
     case rewardedVideo
     case speedBoostAlreadyActive
 }
 
 struct PsiCashReducerState: Equatable {
-    var purchasing: PurchasingState
     var psiCash: PsiCashState
     let subscription: SubscriptionState
 }
@@ -54,21 +52,23 @@ func psiCashReducer(
         guard case .notSubscribed = state.subscription.status else {
             return []
         }
-        guard state.purchasing == .none else {
+        guard case .none = state.psiCash.purchasing else {
             return []
         }
         guard let purchasable = purchasableType.speedBoost else {
             fatalError()
         }
-        state.purchasing = .speedBoost(purchasable)
+        state.psiCash.purchasing = .speedBoost(purchasable)
         return [
             Current.psiCashEffect.purchaseProduct(purchasableType)
                 .map(PsiCashAction.psiCashProductPurchaseResult)
         ]
         
     case .psiCashProductPurchaseResult(let purchaseResult):
-        guard case .speedBoost = state.purchasing else {
-            fatalError("Expected '.speedBoost' state:'\(String(describing: state.purchasing))'")
+        guard case .speedBoost(_) = state.psiCash.purchasing else {
+            fatalError("""
+                Expected '.speedBoost' state:'\(String(describing: state.psiCash.purchasing))'
+                """)
         }
         guard purchaseResult.purchasable.speedBoost != nil else {
             fatalError("Expected '.speedBoost'; purchasable: '\(purchaseResult.purchasable)'")
@@ -79,7 +79,7 @@ func psiCashReducer(
             guard case .speedBoost(let purchasedProduct) = purchasedType else {
                 fatalError("Expected '.speedBoost' purchased type")
             }
-            state.purchasing = .none
+            state.psiCash.purchasing = .none
             return [
                 .fireAndForget {
                     Current.sharedDB.appendNonSubscriptionAuthorization(
@@ -93,7 +93,7 @@ func psiCashReducer(
             ]
             
         case .failure(let errorEvent):
-            state.purchasing = .psiCashError(errorEvent)
+            state.psiCash.purchasing = .psiCashError(errorEvent)
             return [
                 .fireAndForget {
                     PsiFeedbackLogger.error(withType: "PsiCash",
@@ -150,7 +150,6 @@ func psiCashReducer(
             
             state.psiCash.balanceState = .waitingForExpectedIncrease(withAddedReward: rewardAmount,
                                                              libData: state.psiCash.libData)
-            // TODO! return internal refresh state action
             return [Effect { .refreshPsiCashState }]
         } else {
             return []
@@ -162,8 +161,8 @@ func psiCashReducer(
         
     case .dismissedAlert(let dismissed):
         switch dismissed {
-        case .psiCashCoinPurchase, .speedBoostAlreadyActive:
-            state.purchasing = .none
+        case .speedBoostAlreadyActive:
+            state.psiCash.purchasing = .none
             return []
         case .rewardedVideo:
             state.psiCash.rewardedVideo.combineWithErrorDismissed()

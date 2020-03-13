@@ -20,27 +20,75 @@
 import Foundation
 import Promises
 
-struct PendingPayment: Hashable {
-    // For example what should happen in the case of PsiCash
-    let payment: PaymentType
-    var paidSuccessfully: Pending<Result<Unit, ErrorEvent<IAPError>>>
-}
-
-struct IAPState: Equatable {
-    var payments: Set<PendingPayment> // TODO! Something needs to clear these payments
+enum IAPPurchasingState: Equatable {
+    case none
+    case error(ErrorEvent<IAPError>)
+    case pending(IAPPurchasableProduct)
     
-    /// PsiCash consumable transaction pending server verification.
-    var unverifiedPsiCashTransaction: UnverifiedPsiCashConsumableTransaction?
-}
-
-extension IAPState {
-    init() {
-        payments = Set()
-        unverifiedPsiCashTransaction = nil
+    var completed: Bool {
+        switch self {
+        case .none: return true
+        case .error(_): return true
+        case .pending(_): return false
+        }
     }
 }
 
-enum PaymentType: Hashable {
+struct PendingPayment: Hashable {
+    // For example what should happen in the case of PsiCash
+    let product: IAPPurchasableProduct
+    var paymentObj: SKPayment?
+    
+    var paymentStatus: Pending<Result<Unit, ErrorEvent<IAPError>>> {
+        didSet {
+            guard case .subscription(product: _, promise: let promise) = product else {
+                return
+            }
+            guard case .completed(let completedResult) = paymentStatus else {
+                return
+            }
+            promise.fulfill(IAPResult(transaction: nil, result: completedResult))
+        }
+    }
+    
+    init(product: IAPPurchasableProduct,
+         paymentStatus: Pending<Result<Unit, ErrorEvent<IAPError>>>) {
+        self.product = product
+        self.paymentStatus = paymentStatus
+        self.paymentObj = nil
+    }
+    
+}
+
+struct IAPState: Equatable {
+    
+    /// PsiCash consumable transaction pending server verification.
+    var unverifiedPsiCashTransaction: UnverifiedPsiCashConsumableTransaction?
+    
+    var purchasing: IAPPurchasingState {
+        willSet {
+            guard case let .pending(.subscription(product: _, promise: promise)) = purchasing else {
+                return
+            }
+            switch newValue {
+            case .none:
+                promise.fulfill(IAPResult(transaction: nil, result: .success(.unit)))
+            case .error(let errorEvent):
+                promise.fulfill(IAPResult(transaction: nil, result: .failure(errorEvent)))
+            case .pending(_):
+                return
+            }
+        }
+    }
+    
+    init() {
+        self.purchasing = .none
+        self.unverifiedPsiCashTransaction = nil
+    }
+}
+
+/// Represents payment object for product types through AppStore.
+enum IAPPaymentType: Hashable {
     case psiCash(SKPayment)
     
     /// Result type error is from SKPaymentTransaction error:
@@ -49,15 +97,11 @@ enum PaymentType: Hashable {
 }
 
 struct IAPResult {
-    /// Updated payment transaction.
-    /// -Note SKPaymenTransaction is wrapped along with the result
-    /// for easier ObjC compatibility.
     let transaction: SKPaymentTransaction?
-    let result: Result<(), ErrorEvent<IAPError>>
+    let result: Result<Unit, ErrorEvent<IAPError>>
 }
 
-// TODO! rename
-enum PurchasableProduct {
+enum IAPPurchasableProduct: Hashable {
     case psiCash(product: AppStoreProduct)
     
     /// Since subscription implementation is in Objective-C, communication of purchase result
@@ -65,9 +109,8 @@ enum PurchasableProduct {
     case subscription(product: AppStoreProduct, promise: Promise<IAPResult>)
 }
 
-// TODO! This is not needed. Since these results aren't returned together
 enum IAPError: HashableError {
-    case waitingForPendingTransactions
+    case failedToCreatePurchase(reason: String)
     case storeKitError(Either<SKError, SystemError>)
 }
 

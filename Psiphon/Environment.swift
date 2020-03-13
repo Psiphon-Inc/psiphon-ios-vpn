@@ -19,6 +19,16 @@
 
 import Foundation
 
+#if DEBUG
+var Debugging = DebugFlags()
+var Current = Environment.debug(flags: Debugging)
+#else
+var Debugging = DebugFlags.disabled()
+var Current = Environment.default()
+#endif
+
+var Style = AppStyle()
+
 /// A verified stricter set of `Bundle` properties.
 struct PsiphonBundle {
     let bundleIdentifier: String
@@ -39,7 +49,7 @@ struct DebugFlags {
     var ignoreTunneledChecks = false
     
     var printStoreLogs = false
-    var printAppState = false
+    var printAppState = true
     var printHttpRequests = true
     
     static func disabled() -> Self {

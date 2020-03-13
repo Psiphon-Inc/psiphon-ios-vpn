@@ -25,7 +25,6 @@ import Promises
 import StoreKit
 
 struct PsiCashViewControllerState: Equatable {
-    let purchasing: PurchasingState
     let psiCash: PsiCashState
     let iap: IAPState
     let subscription: SubscriptionState
@@ -63,7 +62,7 @@ final class PsiCashViewController: UIViewController {
 
     enum Screen: Equatable {
         case mainScreen
-        case psiCashPurchaseScreen
+        case psiCashPurchaseDialog
         case speedBoostPurchaseDialog
     }
 
@@ -149,64 +148,52 @@ final class PsiCashViewController: UIViewController {
                         event: errorEvent,
                         localizedUserDescription: UserStrings.Rewarded_video_load_failed())
 
-                    self.display(errorDesc: errorDesc, onDismiss: .rewardedVideo)
+                    self.display(errorDesc: errorDesc)
                 }
-
-                // TODO: nagivation. This should probably be factored out as an external effect.
-                switch (observed.state.purchasing, self.navigation) {
-                case (.none, _):
-                    if self.navigation != .mainScreen {
-                        self.display(screen: .mainScreen)
-                    }
-                case (.psiCash, .mainScreen):
-                    self.display(screen: .psiCashPurchaseScreen)
-
-                case (.psiCash, .psiCashPurchaseScreen):
-                    break
-
-                case (.speedBoost, .mainScreen):
+                
+                let purchasingNavState = (observed.state.iap.purchasing,
+                                          observed.state.psiCash.purchasing,
+                                          self.navigation)
+                
+                switch purchasingNavState {
+                case (.none, .none, _):
+                    self.display(screen: .mainScreen)
+                    
+                case (.pending(.psiCash(_)), _, .mainScreen):
+                    self.display(screen: .psiCashPurchaseDialog)
+                    
+                case (_, .speedBoost(_), .mainScreen):
                     self.display(screen: .speedBoostPurchaseDialog)
-
-                case (.speedBoost, .speedBoostPurchaseDialog):
-                    break
-
-                case (.psiCashError(let errorEvent), _):
+                    
+                case (_, .psiCashError(let psiCashErrorEvent), _):
                     let errorDesc = ErrorEventDescription(
-                        event: errorEvent.eraseToRepr(),
-                        localizedUserDescription: errorEvent.error.userDescription
+                        event: psiCashErrorEvent.eraseToRepr(),
+                        localizedUserDescription: psiCashErrorEvent.error.userDescription
                     )
-
-                    self.display(errorDesc: errorDesc, onDismiss: .speedBoostAlreadyActive)
-
-                case (.iapError(let errorEvent), _):
+                    self.display(screen: .mainScreen)
+                    self.display(errorDesc: errorDesc)
+                    
+                case (.error(let iapErrorEvent), _, _):
                     let description: String
-                    switch errorEvent.error {
+                    switch iapErrorEvent.error {
                     case let .failedToCreatePurchase(reason: reason):
                         description = reason
-                    case let .purchaseRequestError(error: iapError):
-                        switch iapError {
-                        case .waitingForPendingTransactions:
-                            // TODO: Translate error.
-                            description = """
-                            There is already a pending PsiCash purchase.
-                            """
-                        case .storeKitError(let storeKitError):
-                            description = """
-                            \(UserStrings.Purchase_failed())
-                            (\(storeKitError.localizedDescription))
-                            """
-                        }
+                    case let .storeKitError(error: skError):
+                        description = """
+                        \(UserStrings.Purchase_failed())
+                        (\(skError.localizedDescription))
+                        """
+                        
                     }
-
-                    let errorDesc = ErrorEventDescription(event: errorEvent.eraseToRepr(),
+                    let errorDesc = ErrorEventDescription(event: iapErrorEvent.eraseToRepr(),
                                                           localizedUserDescription: description)
-                    self.display(errorDesc: errorDesc, onDismiss: .psiCashCoinPurchase)
-
+                    self.display(screen: .mainScreen)
+                    self.display(errorDesc: errorDesc)
+                    
                 default:
                     fatalError("""
-                        Invalid navigation state 'state.purchasing: \
-                        \(String(describing: observed.state.purchasing))', \
-                        'navigation: \(self.navigation)'
+                        Invalid purchase navigation state combination: \
+                        '\(String(describing: purchasingNavState))',
                         """)
                 }
                 
@@ -402,10 +389,7 @@ final class PsiCashViewController: UIViewController {
 // Navigations
 extension PsiCashViewController {
 
-    private func display(
-        errorDesc: ErrorEventDescription<ErrorRepr>,
-        onDismiss dismissAction: PsiCashAlertDismissAction
-    ) {
+    private func display(errorDesc: ErrorEventDescription<ErrorRepr>) {
         let (inserted, _) = self.errorAlerts.insert(errorDesc)
 
         // Prevent display of the same error event.
@@ -420,7 +404,6 @@ extension PsiCashViewController {
         alert.addAction(UIAlertAction(title: UserStrings.OK_button_title(), style: .default)
         { [unowned self, errorDesc] _ in
             self.errorAlerts.remove(errorDesc)
-            self.store.send(.dismissedAlert(dismissAction))
         })
 
         self.topMostController().present(alert, animated: true, completion: nil)
@@ -436,7 +419,7 @@ extension PsiCashViewController {
         case .mainScreen:
             self.presentedViewController?.dismiss(animated: false, completion: nil)
 
-        case .psiCashPurchaseScreen:
+        case .psiCashPurchaseDialog:
             let purchasingViewController = AlertViewController(viewBuilder:
                 PsiCashPurchasingViewBuilder())
 

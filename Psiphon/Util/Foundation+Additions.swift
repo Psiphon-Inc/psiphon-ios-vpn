@@ -26,12 +26,6 @@ func id<Value>(_ value: Value) -> Value {
     return value
 }
 
-// TODO! Remove ReqRes
-enum ReqRes<RequestValue, ResponseValue> {
-    case request(RequestValue)
-    case response(ResponseValue)
-}
-
 public struct NonEmpty<Element> {
 
     public var head: Element
@@ -196,10 +190,6 @@ public extension Result {
         }
     }
 
-}
-
-public extension Result where Success == Void {
-
     func projectError() -> Error? {
         switch self {
         case .success:
@@ -208,6 +198,10 @@ public extension Result where Success == Void {
             return error
         }
     }
+    
+}
+
+public extension Result where Success == () {
     
     func mapToUnit() -> Result<Unit, Failure> {
         self.map { _ in
@@ -242,22 +236,22 @@ public protocol Bindable {
 typealias PendingResult<Success: Equatable, Failure: Error & Equatable> = Pending<Result<Success, Failure>>
 
 /// A type that is isomorphic to Optional type, intended to represent computations that are "pending" before finishing.
-public enum Pending<Value> {
+public enum Pending<Completed> {
     case pending
-    case completed(Value)
+    case completed(Completed)
 }
 
-extension Pending: Equatable where Value: Equatable {}
-extension Pending: Hashable where Value: Hashable {}
+extension Pending: Equatable where Completed: Equatable {}
+extension Pending: Hashable where Completed: Hashable {}
 
 extension Pending {
     
-    func map<B>(_ f: (Value) -> B) -> Pending<B> {
+    func map<B>(_ f: (Completed) -> B) -> Pending<B> {
         switch self {
         case .pending:
             return .pending
-        case .completed(let value):
-            return .completed(f(value))
+        case .completed(let completed):
+            return .completed(f(completed))
         }
     }
     
