@@ -265,7 +265,8 @@ final class PsiCashViewController: UIViewController {
                             }
                         }
 
-                    case (.connecting, .addPsiCash):
+                    case (.connecting, _):
+                        self.tabControl.isHidden = true
                         self.containerBindable.bind(
                             .left(.right(.right(.right(.unavailableWhileConnecting)))))
 
