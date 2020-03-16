@@ -198,3 +198,12 @@ extension BalanceState {
     }
 
 }
+
+extension PsiCashAuthPackage {
+    
+    /// true if the user has minimal tokens for the PsiCash features to function.
+    var hasMinimalTokens: Bool {
+        hasSpenderToken && hasIndicatorToken
+    }
+    
+}
