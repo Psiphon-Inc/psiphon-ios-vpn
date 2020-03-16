@@ -411,10 +411,9 @@ extension PsiCashViewController {
                                       message: errorDesc.localizedUserDescription,
                                       preferredStyle: .alert)
 
-        alert.addAction(UIAlertAction(title: UserStrings.OK_button_title(), style: .default)
-        { [unowned self, errorDesc] _ in
-            self.errorAlerts.remove(errorDesc)
-        })
+        alert.addAction(
+            UIAlertAction(title: UserStrings.OK_button_title(), style: .default)
+        )
 
         self.topMostController().present(alert, animated: true, completion: nil)
     }
