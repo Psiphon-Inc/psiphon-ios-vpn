@@ -152,16 +152,31 @@ public extension Either {
 
 public extension Set {
 
-    func add(_ newMember: Element) -> Self {
-        var newValue = self
-        newValue.insert(newMember)
-        return newValue
-    }
-
-    func delete(_ element: Element) -> Self {
-        var newValue = self
-        newValue.remove(element)
-        return newValue
+    /// Inserts `newMember` into the set if it is not contained in the set.
+    /// If the set contains a member with value under path `equalPath` equal to `newMember`'s value under the same
+    /// key path, then the contained member is removed from the set, and `newMember` is inserted.
+    /// - Returns: true if `newMember` is inserted.
+    mutating func insert<T: Hashable>(
+        orReplaceIfEqual equalPath: KeyPath<Element, T>, _ newMember: Element
+    ) -> Bool {
+        guard !contains(newMember) else {
+            return false
+        }
+        
+        var equalMember: Element? = .none
+        for member in self {
+            if member[keyPath: equalPath] == newMember[keyPath: equalPath] {
+                equalMember = member
+                break
+            }
+        }
+        
+        if let equalMember = equalMember {
+            remove(equalMember)
+        }
+        
+        let (inserted, _) = insert(newMember)
+        return inserted
     }
 
 }
