@@ -36,12 +36,18 @@ struct ErrorRepr: HashableError {
 }
 
 /// Wraps an error event with a localized user description of the error.
+/// Note that `ErrorEventDescription` values are equal up to their `event` value only,
+/// i.e. `localizedUserDescription` value does not participate in hashValue or equality check.
 struct ErrorEventDescription<E: HashableError>: HashableError {
     let event: ErrorEvent<E>
     let localizedUserDescription: String
 
     static func == (lhs: Self, rhs: Self) -> Bool {
         return lhs.event == rhs.event
+    }
+
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(event)
     }
 }
 
