@@ -49,7 +49,7 @@ func iapReducer(state: inout IAPReducerState, action: IAPAction) -> [Effect<IAPA
         
         // PsiCash IAP requires presence of PsiCash spender token.
         if case .psiCash = product {
-            guard state.psiCashAuth.hasSpenderToken else {
+            guard state.psiCashAuth.hasMinimalTokens else {
                 state.iap.purchasing = .error(ErrorEvent(
                     .failedToCreatePurchase(reason: "PsiCash data not present.")
                 ))

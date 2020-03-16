@@ -198,7 +198,7 @@ final class PsiCashViewController: UIViewController {
                         """)
                 }
                 
-                guard observed.state.psiCash.libData.authPackage.hasSpenderToken else {
+                guard observed.state.psiCash.libData.authPackage.hasMinimalTokens else {
                     self.balanceView.isHidden = true
                     self.tabControl.isHidden = true
                     self.containerBindable.bind(.left(.right(.right(.right(.otherErrorTryAgain)))))
