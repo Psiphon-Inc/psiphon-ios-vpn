@@ -416,7 +416,7 @@ extension PsiCashViewController {
             UIAlertAction(title: UserStrings.OK_button_title(), style: .default)
         )
 
-        self.topMostController().present(alert, animated: true, completion: nil)
+        self.present(alert, animated: true, completion: nil)
     }
 
     private func display(screen: Screen) {
@@ -433,7 +433,7 @@ extension PsiCashViewController {
             let purchasingViewController = AlertViewController(viewBuilder:
                 PsiCashPurchasingViewBuilder())
 
-            self.topMostController().present(purchasingViewController, animated: false,
+            self.present(purchasingViewController, animated: false,
                                              completion: nil)
 
         case .speedBoostPurchaseDialog:
