@@ -397,7 +397,10 @@ final class PsiCashViewController: UIViewController {
 extension PsiCashViewController {
 
     private func display(errorDesc: ErrorEventDescription<ErrorRepr>) {
-        let (inserted, _) = self.errorAlerts.insert(errorDesc)
+        // Inserts `errorDesc` into `errorAlerts` set.
+        // If a member of `errorAlerts` is equal to `errorDesc.event.error`, then
+        // that member is removed and `errorDesc` is inserted.
+        let inserted = self.errorAlerts.insert(orReplaceIfEqual: \.event.error, errorDesc)
 
         // Prevent display of the same error event.
         guard inserted else {
