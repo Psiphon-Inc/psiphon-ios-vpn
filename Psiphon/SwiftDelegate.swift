@@ -29,12 +29,18 @@ enum AppDelegateAction {
     case appEnteredForeground
 }
 
+struct AppDelegateReducerState: Equatable {
+    var psiCashBalance: PsiCashBalance
+    var psiCash: PsiCashState
+}
+
 func appDelegateReducer(
-    state: inout PsiCashState, action: AppDelegateAction
+    state: inout AppDelegateReducerState, action: AppDelegateAction
 ) -> [Effect<AppDelegateAction>] {
     switch action {
     case .appDidLaunch(psiCashData: let libData):
-        state.appDidLaunch(libData)
+        state.psiCash.appDidLaunch(libData)
+        state.psiCashBalance = .fromStoredExpectedReward(libData: libData)
         return [
             Current.psiCashEffect.expirePurchases().mapNever(),
             Current.paymentQueue.addObserver(Current.paymentTransactionDelegate).mapNever(),
