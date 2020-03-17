@@ -101,6 +101,26 @@ enum PsiCashPurchaseResponseError: HashableError {
     case serverError(PsiCashStatus, SystemError?)
 }
 
+extension PsiCashPurchaseResponseError {
+    
+    var userDescription: String {
+        switch self {
+        case .tunnelNotConnected:
+            return UserStrings.Psiphon_is_not_connected()
+        case .parseError(_):
+            return UserStrings.Operation_failed_alert_message()
+        case let .serverError(psiCashStatus, _):
+            switch psiCashStatus {
+            case .insufficientBalance:
+                return UserStrings.Insufficient_psiCash_balance()
+            default:
+                return UserStrings.Operation_failed_alert_message()
+            }
+        }
+    }
+    
+}
+
 enum PsiCashRefreshError: HashableError {
     /// Refresh request is rejected due to tunnel not connected.
     case tunnelNotConnected

@@ -36,6 +36,18 @@ enum SubscriptionStatus: Equatable {
     case unknown
 }
 
+extension SubscriptionStatus {
+    
+    var isSubscribed: Bool {
+        switch self {
+        case .subscribed(_): return true
+        case .notSubscribed: return false
+        case .unknown: return false
+        }
+    }
+    
+}
+
 // TODO: store and recover this struct instead of the subscription dictionary
 struct SubscriptionData: Equatable, Codable {
     let latestExpiry: Date

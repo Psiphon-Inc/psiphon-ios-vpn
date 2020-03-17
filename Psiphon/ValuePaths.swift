@@ -179,26 +179,6 @@ extension IAPPaymentType {
     
 }
 
-// MARK: PsiCashState.swift
-
-extension PsiCashPurchaseResponseError {
-    var userDescription: String {
-        switch self {
-        case .tunnelNotConnected:
-            return UserStrings.Psiphon_is_not_connected()
-        case .parseError(_):
-            return UserStrings.Operation_failed_alert_message()
-        case let .serverError(psiCashStatus, _):
-            switch psiCashStatus {
-            case .insufficientBalance:
-                return UserStrings.Insufficient_psiCash_balance()
-            default:
-                return UserStrings.Operation_failed_alert_message()
-            }
-        }
-    }
-}
-
 // MARK: IAPState.swift
 
 extension IAPPurchasableProduct {
@@ -206,18 +186,6 @@ extension IAPPurchasableProduct {
         switch self {
         case let .psiCash(product: product): return product
         case let .subscription(product: product, promise: _): return product
-        }
-    }
-}
-
-// MARK: Subscription.swift
-
-extension SubscriptionStatus {
-    var isSubscribed: Bool {
-        switch self {
-        case .subscribed(_): return true
-        case .notSubscribed: return false
-        case .unknown: return false
         }
     }
 }
