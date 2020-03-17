@@ -59,7 +59,7 @@ PODS:
   - PromisesObjC (1.2.8)
   - PromisesSwift (1.2.8):
     - PromisesObjC (= 1.2.8)
-  - PsiphonClientCommonLibrary (1.2.1):
+  - PsiphonClientCommonLibrary (1.2.2):
     - InAppSettingsKit
   - ReactiveCocoa (10.2.0):
     - ReactiveSwift (~> 6.2)
@@ -76,7 +76,7 @@ DEPENDENCIES:
   - mopub-ios-sdk (~> 5.11)
   - PersonalizedAdConsent (~> 1.0)
   - PromisesSwift (~> 1.2)
-  - PsiphonClientCommonLibrary (from `https://github.com/Psiphon-Inc/psiphon-ios-client-common-library.git`, commit `0fd8d41`)
+  - PsiphonClientCommonLibrary (from `https://github.com/Psiphon-Inc/psiphon-ios-client-common-library.git`, commit `f97b258`)
   - ReactiveCocoa (~> 10.1)
   - ReactiveObjC (from `https://github.com/Psiphon-Inc/ReactiveObjC.git`, commit `8bbf9dd`)
   - ReactiveSwift (~> 6.2)
@@ -104,7 +104,7 @@ EXTERNAL SOURCES:
     :commit: 598c498
     :git: https://github.com/Psiphon-Inc/InAppSettingsKit.git
   PsiphonClientCommonLibrary:
-    :commit: 0fd8d41
+    :commit: f97b258
     :git: https://github.com/Psiphon-Inc/psiphon-ios-client-common-library.git
   ReactiveObjC:
     :commit: 8bbf9dd
@@ -115,7 +115,7 @@ CHECKOUT OPTIONS:
     :commit: 598c498
     :git: https://github.com/Psiphon-Inc/InAppSettingsKit.git
   PsiphonClientCommonLibrary:
-    :commit: 0fd8d41
+    :commit: f97b258
     :git: https://github.com/Psiphon-Inc/psiphon-ios-client-common-library.git
   ReactiveObjC:
     :commit: 8bbf9dd
@@ -134,12 +134,12 @@ SPEC CHECKSUMS:
   PersonalizedAdConsent: dbecabb3467df967c16d9cebc2ef4a8890e4bbd8
   PromisesObjC: c119f3cd559f50b7ae681fa59dc1acd19173b7e6
   PromisesSwift: 37bad6f4daddb02f7c9c531efe91e8b21c13ee2f
-  PsiphonClientCommonLibrary: da44de9be38f5bddd404f46e4d8a1d23d7810c21
+  PsiphonClientCommonLibrary: 8ac2c3a40332aaf3a8c9c9a7e1a71997878e21af
   ReactiveCocoa: a123c42f449c552460a4ee217dd49c76a17c8204
   ReactiveObjC: 2a38ea15335de4119d8b17caf1db1484f61db902
   ReactiveSwift: 07ddf579f4eb3ee3bd656214f0461aaf2c0fd639
   SVProgressHUD: 1428aafac632c1f86f62aa4243ec12008d7a51d6
 
-PODFILE CHECKSUM: efe0fc47bf47786f4ad1c9f725f73e005fdef567
+PODFILE CHECKSUM: 0aaa1546f5d45b84c1143ab828c10203c7841949
 
 COCOAPODS: 1.8.4

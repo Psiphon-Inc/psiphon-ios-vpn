@@ -45,9 +45,37 @@ NS_ASSUME_NONNULL_BEGIN
 
 #pragma mark - Logging
 
+/// Directory under which PsiphonTunnel is configured to store all of its files.
+/// This directory must be created prior to starting PsiphonTunnel.
++ (NSURL *)dataRootDirectory;
+
+/// Path for PsiphonTunnel to write homepage notices.
+/// Deprecated:
+/// PsiphonTunnel now stores all of its files under the configured data root directory.
+/// This directory can be obtained with `homepageNoticesPath`.
+/// PsiphonTunnel must be given a config with the `MigrateHompageNoticesFilename`
+/// field set to this path to ensure that the homepage file at the old path is migrated to
+/// the new location used by PsiphonTunnel.
+- (NSString *)oldHomepageNoticesPath;
+
+
+/// Path for PsiphonTunnel to write log notices.
+/// Deprecated:
+/// PsiphonTunnel now stores all of its files under the configured data root directory.
+/// This directory can be obtained with `rotatingLogNoticesPath`.
+/// PsiphonTunnel must be given a config with the `MigrateRotatingNoticesFilename`
+/// field set to this path to ensure that the log notices file at the old path is migrated
+/// to the new location used by PsiphonTunnel.
+- (NSString *)oldRotatingLogNoticesPath;
+
+/// Path at which PsiphonTunnel to writes homepage notices.
 - (NSString *)homepageNoticesPath;
 
+/// Path at which PsiphonTunnel to writes log notices.
 - (NSString *)rotatingLogNoticesPath;
+
+/// Path at which PsiphonTunnel will rotate log notices to.
+- (NSString *)rotatingOlderLogNoticesPath;
 
 #if !(TARGET_IS_EXTENSION)
 
