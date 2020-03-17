@@ -26,13 +26,23 @@ import ReactiveSwift
 }
 
 struct AppState: Equatable {
-    var psiCashBalance = BalanceState()
+    var psiCashBalance = PsiCashBalance()
     var shownLandingPage: Pending<Bool> = .completed(false)
     var psiCash = PsiCashState()
     var appReceipt = ReceiptState()
     var subscription = SubscriptionState()
     var iapState = IAPState()
     var products = PsiCashAppStoreProductsState()
+}
+
+struct BalanceState: Equatable {
+    let pendingPsiCashRefresh: PendingPsiCashRefresh
+    let psiCashBalance: PsiCashBalance
+    
+    init(psiCashState: PsiCashState, balance: PsiCashBalance) {
+        self.pendingPsiCashRefresh = psiCashState.pendingPsiCashRefresh
+        self.psiCashBalance = balance
+    }
 }
  
 // MARK: AppAction

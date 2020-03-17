@@ -156,10 +156,10 @@ extension AppState {
         )
     }
     
-    var balanceViewModel: PsiCashBalanceView.ViewModel {
-        PsiCashBalanceView.ViewModel(
+    var balanceState: BalanceState {
+        BalanceState(
             psiCashState: self.psiCash,
-            balanceState: self.psiCashBalance
+            balance: self.psiCashBalance
         )
     }
 }
