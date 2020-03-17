@@ -36,7 +36,7 @@ enum TransactionUpdate {
 
 struct IAPReducerState {
     var iap: IAPState
-    var psiCashBalance: BalanceState
+    var psiCashBalance: PsiCashBalance
     let psiCashAuth: PsiCashAuthPackage
 }
 

@@ -40,7 +40,7 @@ enum PsiCashAlertDismissAction {
 }
 
 struct PsiCashReducerState: Equatable {
-    var psiCashBalance: BalanceState
+    var psiCashBalance: PsiCashBalance
     var psiCash: PsiCashState
     let subscription: SubscriptionState
 }

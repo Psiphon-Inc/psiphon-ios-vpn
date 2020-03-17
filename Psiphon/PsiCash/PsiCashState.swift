@@ -179,42 +179,42 @@ extension PsiCashPurchaseResult {
 
 }
 
-struct BalanceState: Equatable {
+struct PsiCashBalance: Equatable {
     /// Indicates an expected increase in PsiCash balance after next sync with the PsiCash server.
     var pendingExpectedBalanceIncrease: Bool
     
     /// Balance with expected rewrad amount added.
     /// - Note: This value is either equal to `PsiCashLibData.balance`, or higher if there is expected reward amount.
-    var balance: PsiCashAmount
+    var value: PsiCashAmount
 }
 
-extension BalanceState {
+extension PsiCashBalance {
     init() {
         pendingExpectedBalanceIncrease = false
-        balance = .zero()
+        value = .zero()
     }
 }
 
-extension BalanceState {
+extension PsiCashBalance {
     
     mutating func waitingForExpectedIncrease(withAddedReward addedReward: PsiCashAmount) {
         pendingExpectedBalanceIncrease = true
         if addedReward > .zero() {
             let newRewardAmount = Current.userConfigs.expectedPsiCashReward + addedReward
             Current.userConfigs.expectedPsiCashReward = newRewardAmount
-            balance = balance + newRewardAmount
+            value = value + newRewardAmount
         }
     }
     
     static func fromStoredExpectedReward(libData: PsiCashLibData) -> Self {
         let reward = Current.userConfigs.expectedPsiCashReward
         return .init(pendingExpectedBalanceIncrease: !reward.isZero,
-                     balance: libData.balance + reward)
+                     value: libData.balance + reward)
     }
 
     static func refreshed(refreshedData libData: PsiCashLibData) -> Self {
         Current.userConfigs.expectedPsiCashReward = PsiCashAmount.zero()
-        return .init(pendingExpectedBalanceIncrease: false, balance: libData.balance)
+        return .init(pendingExpectedBalanceIncrease: false, value: libData.balance)
     }
 
 }
