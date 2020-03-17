@@ -35,6 +35,16 @@ DEPENDENCIES:
   - ReactiveObjC (from `https://github.com/Psiphon-Inc/ReactiveObjC.git`, commit `8bbf9dd`)
   - SVProgressHUD
 
+SPEC REPOS:
+  trunk:
+    - CustomIOSAlertView
+    - Google-Mobile-Ads-SDK
+    - MBProgressHUD
+    - MoPub-AdMob-Adapters
+    - mopub-ios-sdk
+    - PersonalizedAdConsent
+    - SVProgressHUD
+
 EXTERNAL SOURCES:
   InAppSettingsKit:
     :commit: 598c498
@@ -71,4 +81,4 @@ SPEC CHECKSUMS:
 
 PODFILE CHECKSUM: f28e343c2dc696da4e1efb06882df187fdd2df25
 
-COCOAPODS: 1.4.0
+COCOAPODS: 1.8.4
