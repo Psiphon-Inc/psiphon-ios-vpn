@@ -134,6 +134,19 @@ extension AppState {
         }
     }
     
+    var appDelegateReducerState: AppDelegateReducerState {
+        get {
+            AppDelegateReducerState(
+                psiCashBalance: self.psiCashBalance,
+                psiCash: self.psiCash
+            )
+        }
+        set {
+            self.psiCashBalance = newValue.psiCashBalance
+            self.psiCash = newValue.psiCash
+        }
+    }
+    
     var landingPageReducerState: LandingPageReducerState {
         get {
             LandingPageReducerState(

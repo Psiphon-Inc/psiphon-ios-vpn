@@ -67,7 +67,7 @@ let appReducer: Reducer<AppState, AppAction> =
         pullback(receiptReducer, value: \.appReceipt, action: \.appReceipt),
         pullback(subscriptionReducer, value: \.subscription, action: \.subscription),
         pullback(productRequestReducer, value: \.products, action: \.productRequest),
-        pullback(appDelegateReducer, value: \.psiCash, action: \.appDelegateAction)
+        pullback(appDelegateReducer, value: \.appDelegateReducerState, action: \.appDelegateAction)
 )
 
 /// Represents an application that has finished loading.
