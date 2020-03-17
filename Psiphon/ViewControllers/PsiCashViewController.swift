@@ -25,7 +25,7 @@ import Promises
 import StoreKit
 
 struct PsiCashViewControllerState: Equatable {
-    let psiCashBalance: BalanceState
+    let psiCashBalance: PsiCashBalance
     let psiCash: PsiCashState
     let iap: IAPState
     let subscription: SubscriptionState
@@ -217,8 +217,8 @@ final class PsiCashViewController: UIViewController {
                     self.balanceView.isHidden = false
                     self.tabControl.isHidden = true
                     self.balanceView.bind(
-                        PsiCashBalanceView.ViewModel(psiCashState: observed.state.psiCash,
-                                                     balanceState: observed.state.psiCashBalance)
+                        BalanceState(psiCashState: observed.state.psiCash,
+                                     balance: observed.state.psiCashBalance)
                     )
                     self.containerBindable.bind(.left(.right(.right(.right(.userSubscribed)))))
 
@@ -226,8 +226,8 @@ final class PsiCashViewController: UIViewController {
                     self.balanceView.isHidden = false
                     self.tabControl.isHidden = false
                     self.balanceView.bind(
-                        PsiCashBalanceView.ViewModel(psiCashState: observed.state.psiCash,
-                                                     balanceState: observed.state.psiCashBalance)
+                        BalanceState(psiCashState: observed.state.psiCash,
+                                     balance: observed.state.psiCashBalance)
                     )
 
                     // Updates active tab UI

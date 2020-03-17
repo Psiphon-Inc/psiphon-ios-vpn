@@ -21,17 +21,7 @@ import Foundation
 import UIKit
 
 @objc final class PsiCashBalanceView: UIView, Bindable {
-    typealias BindingType = ViewModel
-    
-    struct ViewModel: Equatable {
-        let pendingPsiCashRefresh: PendingPsiCashRefresh
-        let balanceState: BalanceState
-        
-        init(psiCashState: PsiCashState, balanceState: BalanceState) {
-            self.pendingPsiCashRefresh = psiCashState.pendingPsiCashRefresh
-            self.balanceState = balanceState
-        }
-    }
+    typealias BindingType = BalanceState
 
     private typealias IconType = EitherView<ImageViewBuidler, EitherView<Spinner, ButtonBuilder>>
 
@@ -123,7 +113,7 @@ import UIKit
     func bind(_ newValue: BindingType) {
         let iconValue: IconType.BuildType.BindingType
         switch (newValue.pendingPsiCashRefresh,
-                newValue.balanceState.pendingExpectedBalanceIncrease) {
+                newValue.psiCashBalance.pendingExpectedBalanceIncrease) {
         case (.pending, _):
             iconValue = .right(.left(true))  // Spinner
         case (.completed(_), true):
@@ -131,7 +121,7 @@ import UIKit
         case (.completed(_), false):
             iconValue = .left(.unit)  // Coin icon
         }
-        self.setAmount(newValue.balanceState.balance)
+        self.setAmount(newValue.psiCashBalance.value)
         self.iconBindable.bind(iconValue)
     }
 
