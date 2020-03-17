@@ -55,6 +55,7 @@
 #import "RACTargetQueueScheduler.h"
 #import "UnionSerialQueue.h"
 #import "PsiphonDataSharedDB.h"
+#import "Psiphon-Swift.h"
 
 NSErrorDomain const VPNManagerErrorDomain = @"VPNManagerErrorDomain";
 
@@ -193,6 +194,7 @@ PsiFeedbackLogType const VPNManagerLogType = @"VPNManager";
         }
 
         [self.internalTunnelStatus sendNext:@(_tunnelProviderManager.connection.status)];
+        [VPNStatusBridge.instance next:_tunnelProviderManager.connection.status];
 
         VPNManager *__weak weakSelf = self;
 
@@ -205,6 +207,9 @@ PsiFeedbackLogType const VPNManagerLogType = @"VPNManager";
 
                       // Observers of VPNManagerStatusDidChangeNotification will be notified
                       // at the same time.
+
+                      /// Pass tunnel status into Swift delegate.
+                      [VPNStatusBridge.instance next:_tunnelProviderManager.connection.status];
 
                       [self.internalTunnelStatus
                         sendNext:@(_tunnelProviderManager.connection.status)];
@@ -712,18 +717,8 @@ PsiFeedbackLogType const VPNManagerLogType = @"VPNManager";
 
     VPNManager *__weak weakSelf = self;
 
-    // Emits a single item of type UserSubscriptionStatus whenever the subscription status is known.
-    RACSignal *knownSubStatus = [[AppDelegate.sharedAppDelegate.subscriptionStatus
-      filter:^BOOL(NSNumber *value) {
-          UserSubscriptionStatus s = (UserSubscriptionStatus) [value integerValue];
-          return (s != UserSubscriptionUnknown);
-      }]
-      take:1];
-
-    return [[[[[[RACSignal return:manager] zipWith:knownSubStatus]
-      map:^NETunnelProviderManager *(RACTwoTuple *tuple) {
-
-          NETunnelProviderManager *pm = tuple.first;
+    return [[[[[RACSignal return:manager]
+      map:^NETunnelProviderManager *(NETunnelProviderManager *_Nullable pm) {
 
           if (!pm) {
               NETunnelProviderProtocol *providerProtocol = [[NETunnelProviderProtocol alloc] init];

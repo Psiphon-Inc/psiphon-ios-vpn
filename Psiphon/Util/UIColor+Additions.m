@@ -137,4 +137,36 @@
     return [UIColor colorWithWhite:0.0f alpha:0.19f];
 }
 
++ (UIColor * _Nonnull)softGrey1Color {
+    return [UIColor colorWithWhite:231.0f / 255.0f alpha:1.0f];
+}
+
++ (UIColor * _Nonnull)softGrey2Color {
+    return [UIColor colorWithWhite:1.0f alpha:1.0f];
+}
+
++ (UIColor * _Nonnull)darkGreyBlueColor {
+    return [UIColor colorWithRed:47.0f / 255.0f green:55.0f / 255.0f blue:95.0f / 255.0f alpha:1.0f];
+}
+
++ (UIColor * _Nonnull)psiCashBlueGreyColor {
+    return [UIColor colorWithRed:146.0f / 255.0f green:155.0f / 255.0f blue:192.0f / 255.0f alpha:1.0f];
+}
+
++ (UIColor * _Nonnull)brightTealColor {
+    return [UIColor colorWithRed:0.0f green:1.0f blue:200.0f / 255.0f alpha:1.0f];
+}
+
++ (UIColor * _Nonnull)weirdGreenColor {
+    return [UIColor colorWithRed:79.0f / 255.0f green:238.0f / 255.0f blue:117.0f / 255.0f alpha:1.0f];
+}
+
++ (UIColor * _Nonnull)lightNavyColor {
+    return [UIColor colorWithRed:18.0f / 255.0f green:37.0f / 255.0f blue:109.0f / 255.0f alpha:1.0f];
+}
+
++ (UIColor * _Nonnull)darkNavyColor {
+    return [UIColor colorWithRed:0.0f green:9.0f / 255.0f blue:57.0f / 255.0f alpha:1.0f];
+}
+
 @end

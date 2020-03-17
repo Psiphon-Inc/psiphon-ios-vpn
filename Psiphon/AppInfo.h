@@ -29,6 +29,8 @@
 + (NSString*_Nullable)propagationChannelId;
 
 + (NSString*_Nullable)sponsorId;
+
++ (NSString *_Nonnull)clientPlatform;
 #endif
 
 + (BOOL)runningUITest;

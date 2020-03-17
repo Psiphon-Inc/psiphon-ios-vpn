@@ -25,6 +25,7 @@
 #import "PsiphonDataSharedDB.h"
 #import "SharedConstants.h"
 #import "UserDefaults.h"
+#import <PsiphonTunnel/JailbreakCheck.h>
 
 PsiFeedbackLogType const AppInfoLogType = @"AppInfo";
 
@@ -60,6 +61,42 @@ UserDefaultsKey const AppInfoFastLaneSnapShotBoolKey = @"FASTLANE_SNAPSHOT";
 + (NSString*)sponsorId {
     PsiphonDataSharedDB *sharedDB = [[PsiphonDataSharedDB alloc] initForAppGroupIdentifier:APP_GROUP_IDENTIFIER];
     return [sharedDB getCurrentSponsorId];
+}
+
+// Code is borrowed from: https://github.com/Psiphon-Labs/psiphon-tunnel-core/blob/master/MobileLibrary/iOS/PsiphonTunnel/PsiphonTunnel/PsiphonTunnel.m
++ (NSString *)clientPlatform {
+    // ClientPlatform must not contain:
+    //   - underscores, which are used by us to separate the constituent parts
+    //   - spaces, which are considered invalid by the server
+    // Like "iOS". Older iOS reports "iPhone OS", which we will convert.
+    NSString *systemName = [[UIDevice currentDevice] systemName];
+    if ([systemName isEqual: @"iPhone OS"]) {
+        systemName = @"iOS";
+    }
+    systemName = [[systemName
+                   stringByReplacingOccurrencesOfString:@"_" withString:@"-"]
+                  stringByReplacingOccurrencesOfString:@" " withString:@"-"];
+    // Like "10.2.1"
+    NSString *systemVersion = [[[[UIDevice currentDevice]systemVersion]
+                                stringByReplacingOccurrencesOfString:@"_" withString:@"-"]
+                               stringByReplacingOccurrencesOfString:@" " withString:@"-"];
+
+    // "unjailbroken"/"jailbroken"
+    NSString *jailbroken = @"unjailbroken";
+    if ([JailbreakCheck isDeviceJailbroken]) {
+        jailbroken = @"jailbroken";
+    }
+    // Like "com.psiphon3.browser"
+    NSString *bundleIdentifier = [[[[NSBundle mainBundle] bundleIdentifier]
+                                   stringByReplacingOccurrencesOfString:@"_" withString:@"-"]
+                                  stringByReplacingOccurrencesOfString:@" " withString:@"-"];
+
+    NSString *clientPlatform = [NSString stringWithFormat:@"%@_%@_%@_%@",
+                                systemName,
+                                systemVersion,
+                                jailbroken,
+                                bundleIdentifier];
+    return clientPlatform;
 }
 
 #endif

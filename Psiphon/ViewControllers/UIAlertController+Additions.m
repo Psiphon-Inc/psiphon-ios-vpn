@@ -20,6 +20,7 @@
 #import "AppDelegate.h"
 #import "UIAlertController+Additions.h"
 #import "Strings.h"
+#import "Psiphon-Swift.h"
 
 @implementation UIAlertController (Additions)
 
@@ -32,7 +33,7 @@
                                                                 message:message
                                                          preferredStyle:preferredStyle];
 
-    UIAlertAction *okAction = [UIAlertAction actionWithTitle:[Strings okButtonTitle]
+    UIAlertAction *okAction = [UIAlertAction actionWithTitle:[UserStrings OK_button_title]
                                                        style:UIAlertActionStyleDefault
                                                      handler:okHandler];
     [ac addAction:okAction];
@@ -45,7 +46,7 @@
 }
 
 - (void)addCancelAction:(void (^_Nullable)(UIAlertAction *action))handler {
-    UIAlertAction *dismissAction = [UIAlertAction actionWithTitle:[Strings cancelButtonTitle]
+    UIAlertAction *dismissAction = [UIAlertAction actionWithTitle:[UserStrings Cancel_button_title]
                                                             style:UIAlertActionStyleCancel
                                                           handler:handler];
     [self addAction:dismissAction];

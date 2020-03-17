@@ -36,6 +36,7 @@
 #import "AppDelegate.h"
 #import "CloudsView.h"
 #import "Logging.h"
+#import "Psiphon-Swift.h"
 
 const int NumPages = 4;
 
@@ -174,14 +175,14 @@ const int NumPages = 4;
         case 2: {
             // Privacy Policy page
             RoyalSkyButton *acceptButton = [[RoyalSkyButton alloc] initForAutoLayout];
-            [acceptButton setTitle:[Strings acceptButtonTitle]];
+            [acceptButton setTitle:[UserStrings Accept_button_title]];
             [acceptButton addTarget:self
                              action:@selector(onPrivacyPolicyAccepted)
                    forControlEvents:UIControlEventTouchUpInside];
             acceptButton.shadow = TRUE;
 
             RingSkyButton *declineButton = [[RingSkyButton alloc] initForAutoLayout];
-            [declineButton setTitle:[Strings declineButtonTitle]];
+            [declineButton setTitle:[UserStrings Decline_button_title]];
             [declineButton addTarget:self
                               action:@selector(onPrivacyPolicyDeclined)
                     forControlEvents:UIControlEventTouchUpInside];
