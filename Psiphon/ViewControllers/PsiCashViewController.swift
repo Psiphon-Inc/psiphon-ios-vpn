@@ -175,21 +175,10 @@ final class PsiCashViewController: UIViewController {
                     self.display(errorDesc: errorDesc)
                     
                 case (.error(let iapErrorEvent), _, _):
-                    let description: String
-                    switch iapErrorEvent.error {
-                    case let .failedToCreatePurchase(reason: reason):
-                        description = reason
-                    case let .storeKitError(error: skError):
-                        description = """
-                        \(UserStrings.Purchase_failed())
-                        (\(skError.localizedDescription))
-                        """
-                        
-                    }
-                    let errorDesc = ErrorEventDescription(event: iapErrorEvent.eraseToRepr(),
-                                                          localizedUserDescription: description)
                     self.display(screen: .mainScreen)
-                    self.display(errorDesc: errorDesc)
+                    if let errorDesc = errorEventDescription(iapErrorEvent: iapErrorEvent) {
+                        self.display(errorDesc: errorDesc)
+                    }
                     
                 default:
                     fatalError("""
@@ -481,3 +470,28 @@ extension RewardedVideoState {
     }
 }
 
+fileprivate func errorEventDescription(
+    iapErrorEvent: ErrorEvent<IAPError>
+) -> ErrorEventDescription<ErrorRepr>? {
+    let optionalDescription: String?
+    switch iapErrorEvent.error {
+    case let .failedToCreatePurchase(reason: reason):
+        optionalDescription = reason
+    case let .storeKitError(error: error):
+        // Payment cancelled errors are ignored.
+        if case let .left(skError) = error, skError.code == .paymentCancelled {
+            optionalDescription = .none
+        } else {
+            optionalDescription = """
+            \(UserStrings.Purchase_failed())
+            (\(error.localizedDescription))
+            """
+        }
+    }
+    
+    guard let description = optionalDescription else {
+        return nil
+    }
+    return ErrorEventDescription(event: iapErrorEvent.eraseToRepr(),
+                                 localizedUserDescription: description)
+}
