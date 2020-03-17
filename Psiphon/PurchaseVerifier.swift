@@ -29,7 +29,7 @@ struct PurchaseVerifierServerEndpoints {
         var url: URL {
             switch self {
             case .psiCash:
-                if Debugging.psiCashDevServer {
+                if Debugging.devServers {
                     return URL(string: "https://dev-subscription.psiphon3.com/v2/appstore/psicash")!
                 } else {
                     return URL(string: "https://subscription.psiphon3.com/v2/appstore/psicash")!

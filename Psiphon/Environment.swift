@@ -45,7 +45,7 @@ struct PsiphonBundle {
 struct DebugFlags {
     var mainThreadChecks = true
     var disableURLHandler = true
-    var psiCashDevServer = true
+    var devServers = true
     var ignoreTunneledChecks = false
     
     var printStoreLogs = false
@@ -55,7 +55,7 @@ struct DebugFlags {
     static func disabled() -> Self {
         return .init(mainThreadChecks: false,
                      disableURLHandler: false,
-                     psiCashDevServer: false,
+                     devServers: false,
                      ignoreTunneledChecks: false,
                      printStoreLogs: false,
                      printAppState: false,
@@ -135,7 +135,7 @@ extension Environment {
         let psiCashLib = PsiCash()
         let app = Application(initalState: AppState(), reducer: appReducer)
         
-        if flags.psiCashDevServer {
+        if flags.devServers {
             psiCashLib.setValue("dev-api.psi.cash", forKey: "serverHostname")
         }
         
