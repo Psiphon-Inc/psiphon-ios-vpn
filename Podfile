@@ -38,9 +38,3 @@ target 'PsiphonVPN' do
 
 end
 
-target 'PsiphonPlayground' do
-  # Swift dependencies
-  pod 'ReactiveSwift', '~> 6.2'
-  pod 'ReactiveCocoa', '~> 10.1'
-end
-
