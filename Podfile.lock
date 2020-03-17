@@ -1,6 +1,6 @@
 PODS:
   - CustomIOSAlertView (0.9.5)
-  - Google-Mobile-Ads-SDK (7.56.0):
+  - Google-Mobile-Ads-SDK (7.53.1):
     - GoogleAppMeasurement (~> 6.0)
   - GoogleAppMeasurement (6.3.1):
     - GoogleUtilities/AppDelegateSwizzler (~> 6.0)
@@ -26,14 +26,14 @@ PODS:
     - GoogleUtilities/Logger
   - InAppSettingsKit (2.9.4)
   - MBProgressHUD (1.1.0)
-  - MoPub-AdMob-Adapters (7.56.0.0):
-    - MoPub-AdMob-Adapters/MoPub (= 7.56.0.0)
-    - MoPub-AdMob-Adapters/Network (= 7.56.0.0)
-  - MoPub-AdMob-Adapters/MoPub (7.56.0.0):
+  - MoPub-AdMob-Adapters (7.53.1.2):
+    - MoPub-AdMob-Adapters/MoPub (= 7.53.1.2)
+    - MoPub-AdMob-Adapters/Network (= 7.53.1.2)
+  - MoPub-AdMob-Adapters/MoPub (7.53.1.2):
     - mopub-ios-sdk/Core (~> 5.8)
     - mopub-ios-sdk/NativeAds (~> 5.8)
-  - MoPub-AdMob-Adapters/Network (7.56.0.0):
-    - Google-Mobile-Ads-SDK (= 7.56.0)
+  - MoPub-AdMob-Adapters/Network (7.53.1.2):
+    - Google-Mobile-Ads-SDK (= 7.53.1)
     - mopub-ios-sdk/Core (~> 5.8)
     - mopub-ios-sdk/NativeAds (~> 5.8)
   - mopub-ios-sdk (5.11.0):
@@ -69,17 +69,17 @@ PODS:
 
 DEPENDENCIES:
   - CustomIOSAlertView (~> 0.9.5)
-  - Google-Mobile-Ads-SDK (~> 7.37)
+  - Google-Mobile-Ads-SDK (~> 7.53.1)
   - InAppSettingsKit (from `https://github.com/Psiphon-Inc/InAppSettingsKit.git`, commit `598c498`)
   - MBProgressHUD (~> 1.1.0)
-  - MoPub-AdMob-Adapters (~> 7.37)
-  - mopub-ios-sdk (~> 5.4)
-  - PersonalizedAdConsent
+  - MoPub-AdMob-Adapters (~> 7.53.1)
+  - mopub-ios-sdk (~> 5.11)
+  - PersonalizedAdConsent (~> 1.0)
   - PromisesSwift (~> 1.2)
   - PsiphonClientCommonLibrary (from `https://github.com/Psiphon-Inc/psiphon-ios-client-common-library.git`, commit `f97b258`)
   - ReactiveCocoa (~> 10.1)
   - ReactiveObjC (from `https://github.com/Psiphon-Inc/ReactiveObjC.git`, commit `8bbf9dd`)
-  - ReactiveSwift (~> 6.1)
+  - ReactiveSwift (~> 6.2)
   - SVProgressHUD
 
 SPEC REPOS:
@@ -123,12 +123,12 @@ CHECKOUT OPTIONS:
 
 SPEC CHECKSUMS:
   CustomIOSAlertView: cc4fa8e36219be3fd5ebcd40789f5b4aaae0f38e
-  Google-Mobile-Ads-SDK: 65e335fadc97c5a91a9d4546214bfd3a2fb11047
+  Google-Mobile-Ads-SDK: fac081606dbd438d8db57198b83ba8b5f875a601
   GoogleAppMeasurement: c29d405ff76e18551b5d158eaba6753fda8c7542
   GoogleUtilities: ad0f3b691c67909d03a3327cc205222ab8f42e0e
   InAppSettingsKit: 567ef538698cd6cf3afb9c5529b89a8936fdacb5
   MBProgressHUD: e7baa36a220447d8aeb12769bf0585582f3866d9
-  MoPub-AdMob-Adapters: 8a847666e0f97cc143fd09ab05710bb6da27ec01
+  MoPub-AdMob-Adapters: f93ec396dd64e70ec3dcd8a1f2e5c1ae9fe8debe
   mopub-ios-sdk: 292b8e9a55a2e72a34afc04ec01e85486af46240
   nanopb: 18003b5e52dab79db540fe93fe9579f399bd1ccd
   PersonalizedAdConsent: dbecabb3467df967c16d9cebc2ef4a8890e4bbd8
@@ -140,6 +140,6 @@ SPEC CHECKSUMS:
   ReactiveSwift: 07ddf579f4eb3ee3bd656214f0461aaf2c0fd639
   SVProgressHUD: 1428aafac632c1f86f62aa4243ec12008d7a51d6
 
-PODFILE CHECKSUM: 78bbe3add810e7c21b55f2c91f545379dfbef2d3
+PODFILE CHECKSUM: 0aaa1546f5d45b84c1143ab828c10203c7841949
 
 COCOAPODS: 1.8.4
