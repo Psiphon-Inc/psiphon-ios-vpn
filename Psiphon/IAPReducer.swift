@@ -47,8 +47,13 @@ func iapReducer(state: inout IAPReducerState, action: IAPAction) -> [Effect<IAPA
             return []
         }
         
-        // PsiCash IAP requires presence of PsiCash spender token.
         if case .psiCash = product {
+            // No action is taken if there is already an unverified PsiCash transaction.
+            guard state.iap.unverifiedPsiCashTransaction == nil else {
+                return []
+            }
+            
+            // PsiCash IAP requires presence of PsiCash spender token.
             guard state.psiCashAuth.hasMinimalTokens else {
                 state.iap.purchasing = .error(ErrorEvent(
                     .failedToCreatePurchase(reason: "PsiCash data not present.")
@@ -75,6 +80,14 @@ func iapReducer(state: inout IAPReducerState, action: IAPAction) -> [Effect<IAPA
         }
         
     case .verifiedPsiCashConsumable(let verifiedTransaction):
+        guard let pendingTransaction = state.iap.unverifiedPsiCashTransaction else {
+            fatalError("there is no unverfieid IAP transaction '\(verifiedTransaction)'")
+        }
+        guard verifiedTransaction.value == pendingTransaction.value else {
+            fatalError("""
+                transactions are not equal '\(verifiedTransaction)' != '\(pendingTransaction)'
+                """)
+        }
         state.iap.unverifiedPsiCashTransaction = .none
         return [
             Current.paymentQueue.finishTransaction(verifiedTransaction.value).mapNever(),
@@ -120,21 +133,45 @@ func iapReducer(state: inout IAPReducerState, action: IAPAction) -> [Effect<IAPA
                             switch try? AppStoreProductType.from(transaction: transaction) {
                             case .none:
                                 fatalError("unknown product \(String(describing: transaction))")
-                            case .psiCash:
-                                // Updates balance state to reflect expected increase
-                                // in PsiCash balance.
-                                state.psiCashBalance.waitingForExpectedIncrease(
-                                    withAddedReward: .zero()
-                                )
                                 
-                                let unverifiedTx =
-                                    UnverifiedPsiCashConsumableTransaction(value: transaction)
-                                state.iap.unverifiedPsiCashTransaction = unverifiedTx
-                                finishTransaction = false
-                                effects.append(
-                                    verifyConsumable(unverifiedTx)
-                                        .map(IAPAction.verifiedPsiCashConsumable)
-                                )
+                            case .psiCash:
+                                switch state.iap.unverifiedPsiCashTransaction?
+                                    .isEqualTransactionId(to: transaction) {
+                                case .none:
+                                    // There is no unverified psicash IAP transaction.
+                                    
+                                    // Updates balance state to reflect expected increase
+                                    // in PsiCash balance.
+                                    state.psiCashBalance.waitingForExpectedIncrease(
+                                        withAddedReward: .zero()
+                                    )
+                                    let unverifiedTx =
+                                        UnverifiedPsiCashConsumableTransaction(value: transaction)
+                                    state.iap.unverifiedPsiCashTransaction = unverifiedTx
+                                    finishTransaction = false
+                                    effects.append(
+                                        verifyConsumable(unverifiedTx)
+                                            .map(IAPAction.verifiedPsiCashConsumable)
+                                    )
+                                    
+                                case .some(true):
+                                    // Tranaction has the same identifier as the current
+                                    // unverified psicash IAP transaction.
+                                    finishTransaction = true
+                                    
+                                case .some(false):
+                                    // Unexpected presence of two consumable transactions
+                                    // with different transaction ids.
+                                    let unverifiedTxId = state.iap.unverifiedPsiCashTransaction!
+                                        .value.transactionIdentifier ?? "(none)"
+                                    let newTxId = transaction.transactionIdentifier ?? "(none)"
+                                    fatalError("""
+                                    cannot have two completed but unverified consumable purchases: \
+                                        unverified transaction: '\(unverifiedTxId)', \
+                                        new transaction: '\(newTxId)'
+                                    """)
+                                }
+
                                 
                             case .subscription:
                                 finishTransaction = true
