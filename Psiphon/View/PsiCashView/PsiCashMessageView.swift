@@ -22,6 +22,7 @@ import UIKit
 struct PsiCashMessageView: ViewBuilder {
 
     enum Message {
+        case pendingPsiCashVerification
         case speedBoostAlreadyActive
         case userSubscribed
         case unavailableWhileConnecting
@@ -68,6 +69,11 @@ struct PsiCashMessageView: ViewBuilder {
         return .init(viewable: root) { [imageView, title, subtitle] _ -> ((PsiCashMessageView.Message) -> UIView?) in
             return { [imageView, title, subtitle] msg in
                 switch msg {
+                case .pendingPsiCashVerification:
+                    imageView.image = UIImage(named: "PsiCashPendingTransaction")
+                    title.text = UserStrings.PsiCash_transaction_pending()
+                    subtitle.text = UserStrings.PsiCash_wait_for_transaction_to_be_verified()
+
                 case .speedBoostAlreadyActive:
                     imageView.image = UIImage(named: "SpeedBoostActive")!
                     title.text = UserStrings.Speed_boost_active()

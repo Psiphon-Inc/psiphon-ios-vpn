@@ -50,6 +50,12 @@ import Foundation
                                  value: "Please connect to Psiphon to finish your transaction",
                                  comment: "Text shown to the user telling them to connect to 'Psiphon', to finish their unfinished transaction. Do not translate or transliterate 'Psiphon'.")
     }
+    
+    static func PsiCash_wait_for_transaction_to_be_verified() -> String {
+        return NSLocalizedString("PSICASH_WAIT_TRANSACTION_VERIFIED", tableName: nil, bundle: Bundle.main,
+                                 value: "Please wait while your transaction is being verified",
+                                 comment: "Message when the user has made a purchase, and paid successfully, however the transaction is not complete yet and is pending verification")
+    }
 
     static func PsiCash_balance_out_of_date() -> String {
         return NSLocalizedString("PSICASH_BALANCE_OUT_OF_DATE_ALERT_TITLE", tableName: nil, bundle: Bundle.main,
