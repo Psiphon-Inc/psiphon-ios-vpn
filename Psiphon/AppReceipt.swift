@@ -21,7 +21,7 @@ import Foundation
 import Promises
 
 struct ReceiptState: Equatable {
-    var receiptData: Receipt?
+    var receiptData: ReceiptData?
     var receiptRefreshState: Pending<Result<Unit, SystemErrorEvent>>
     var refreshAppReceiptPromises: [Promise<Result<(), SystemErrorEvent>>]
     
@@ -38,7 +38,7 @@ extension ReceiptState {
 }
 
 enum ReceiptStateAction {
-    case refreshAppReceipt(optinalPromise: Promise<Result<(), SystemErrorEvent>>?)
+    case refreshReceipt(optinalPromise: Promise<Result<(), SystemErrorEvent>>?)
     case receiptRefreshed(Result<(), SystemErrorEvent>)
 }
 
@@ -46,7 +46,7 @@ func receiptReducer(
     state: inout ReceiptState, action: ReceiptStateAction
 ) -> [Effect<ReceiptStateAction>] {
     switch action {
-    case .refreshAppReceipt(optinalPromise: let optionalPromise):
+    case .refreshReceipt(optinalPromise: let optionalPromise):
         if let promise = optionalPromise {
             state.refreshAppReceiptPromises.append(promise)
         }
@@ -83,6 +83,7 @@ func receiptReducer(
         return [
             .fireAndForget {
                 Current.app.store.send(.subscription(.updatedReceiptData(receiptData)))
+                Current.app.store.send(.iap(.receiptUpdated))
             }
         ]
     }
@@ -103,7 +104,7 @@ class ReceiptRefreshRequestDelegate: StoreDelegate<ReceiptStateAction>, SKReques
     
 }
 
-struct Receipt: Equatable, Codable {
+struct ReceiptData: Equatable, Codable {
     let fileSize: Int
     /// Subscription data stored in the receipt.
     /// Nil if no subscription data is found in the receipt.
@@ -113,7 +114,7 @@ struct Receipt: Equatable, Codable {
     /// Parses local app receipt and returns a `RceiptData` object.
     /// If no receipt file is found at path pointed to by the `Bundle` `.none` is returned.
     /// - Note: It is expected for the `Bundle` object to have a valid
-    static func fromLocalReceipt(_ appBundle: PsiphonBundle) -> Receipt? {
+    static func fromLocalReceipt(_ appBundle: PsiphonBundle) -> ReceiptData? {
         let receiptURL = appBundle.appStoreReceiptURL
         guard FileManager.default.fileExists(atPath: receiptURL.path) else {
             return .none
@@ -150,7 +151,7 @@ struct Receipt: Equatable, Codable {
             return .none
         }
         
-        return Receipt(fileSize: receiptData.fileSize as! Int,
+        return ReceiptData(fileSize: receiptData.fileSize as! Int,
                        subscription: subscriptionData,
                        data: data)
     }

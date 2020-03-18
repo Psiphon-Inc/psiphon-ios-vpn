@@ -32,6 +32,7 @@ enum AppDelegateAction {
 struct AppDelegateReducerState: Equatable {
     var psiCashBalance: PsiCashBalance
     var psiCash: PsiCashState
+    var receiptData: ReceiptData?
 }
 
 func appDelegateReducer(
@@ -41,6 +42,7 @@ func appDelegateReducer(
     case .appDidLaunch(psiCashData: let libData):
         state.psiCash.appDidLaunch(libData)
         state.psiCashBalance = .fromStoredExpectedReward(libData: libData)
+        state.receiptData = .fromLocalReceipt(Current.appBundle)
         return [
             Current.psiCashEffect.expirePurchases().mapNever(),
             Current.paymentQueue.addObserver(Current.paymentTransactionDelegate).mapNever(),
@@ -204,7 +206,7 @@ extension SwiftDelegate: SwiftBridgeDelegate {
         let objcPromise = promise.then { result -> Error? in
             return result.projectError()?.error
         }
-        Current.app.store.send(.appReceipt(.refreshAppReceipt(optinalPromise: promise)))
+        Current.app.store.send(.appReceipt(.refreshReceipt(optinalPromise: promise)))
         return objcPromise.asObjCPromise()
     }
     
