@@ -78,7 +78,7 @@ struct SubscriptionData: Equatable, Codable {
 }
 
 enum SubscriptionAction {
-    case updatedReceiptData(Receipt?)
+    case updatedReceiptData(ReceiptData?)
     case timerFinished(withExpiry:Date)
 }
 
@@ -146,7 +146,7 @@ func subscriptionReducer(
 // MARK: Effects
 
 /// Updates `UserDefaultsConfig` and `PsiphonDataSharedDB` based on the `data`.
-func updatePersistedData(receipt data: Receipt?) -> Effect<Never> {
+func updatePersistedData(receipt data: ReceiptData?) -> Effect<Never> {
     .fireAndForget {
         guard let data = data else {
             Current.sharedDB.setContainerEmptyReceiptFileSize(NSNumber(integerLiteral: 0))

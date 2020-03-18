@@ -26,6 +26,7 @@ enum IAPAction {
     case purchaseAdded(PurchaseAddedResult)
     case verifiedPsiCashConsumable(VerifiedPsiCashConsumableTransaction)
     case transactionUpdate(TransactionUpdate)
+    case receiptUpdated
 }
 
 /// StoreKit transaction obersver
@@ -38,6 +39,7 @@ struct IAPReducerState {
     var iap: IAPState
     var psiCashBalance: PsiCashBalance
     let psiCashAuth: PsiCashAuthPackage
+    let receiptData: ReceiptData?
 }
 
 func iapReducer(state: inout IAPReducerState, action: IAPAction) -> [Effect<IAPAction>] {
@@ -49,7 +51,7 @@ func iapReducer(state: inout IAPReducerState, action: IAPAction) -> [Effect<IAPA
         
         if case .psiCash = product {
             // No action is taken if there is already an unverified PsiCash transaction.
-            guard state.iap.unverifiedPsiCashTransaction == nil else {
+            guard state.iap.unverifiedPsiCashTx == nil else {
                 return []
             }
             
@@ -79,18 +81,30 @@ func iapReducer(state: inout IAPReducerState, action: IAPAction) -> [Effect<IAPA
             return []
         }
         
-    case .verifiedPsiCashConsumable(let verifiedTransaction):
-        guard let pendingTransaction = state.iap.unverifiedPsiCashTransaction else {
-            fatalError("there is no unverfieid IAP transaction '\(verifiedTransaction)'")
+    case .receiptUpdated:
+        guard let receiptData = state.receiptData else {
+            return []
         }
-        guard verifiedTransaction.value == pendingTransaction.value else {
+        guard case let .pendingVerification(unverifiedTx) = state.iap.unverifiedPsiCashTx else {
+            return []
+        }
+        return [
+            verifyConsumable(transaction: unverifiedTx, receipt: receiptData)
+                .map(IAPAction.verifiedPsiCashConsumable)
+        ]
+        
+    case .verifiedPsiCashConsumable(let verifiedTx):
+        guard case let .pendingVerificationResult(pendingTx) = state.iap.unverifiedPsiCashTx else {
+            fatalError("there is no unverfieid IAP transaction '\(verifiedTx)'")
+        }
+        guard verifiedTx.value == pendingTx.value else {
             fatalError("""
-                transactions are not equal '\(verifiedTransaction)' != '\(pendingTransaction)'
+                transactions are not equal '\(verifiedTx)' != '\(pendingTx)'
                 """)
         }
-        state.iap.unverifiedPsiCashTransaction = .none
+        state.iap.unverifiedPsiCashTx = .none
         return [
-            Current.paymentQueue.finishTransaction(verifiedTransaction.value).mapNever(),
+            Current.paymentQueue.finishTransaction(verifiedTx.value).mapNever(),
             .fireAndForget {
                 Current.app.store.send(.psiCash(.refreshPsiCashState))
             },
@@ -135,7 +149,7 @@ func iapReducer(state: inout IAPReducerState, action: IAPAction) -> [Effect<IAPA
                                 fatalError("unknown product \(String(describing: transaction))")
                                 
                             case .psiCash:
-                                switch state.iap.unverifiedPsiCashTransaction?
+                                switch state.iap.unverifiedPsiCashTx?.transaction
                                     .isEqualTransactionId(to: transaction) {
                                 case .none:
                                     // There is no unverified psicash IAP transaction.
@@ -147,12 +161,33 @@ func iapReducer(state: inout IAPReducerState, action: IAPAction) -> [Effect<IAPA
                                     )
                                     let unverifiedTx =
                                         UnverifiedPsiCashConsumableTransaction(value: transaction)
-                                    state.iap.unverifiedPsiCashTransaction = unverifiedTx
                                     finishTransaction = false
-                                    effects.append(
-                                        verifyConsumable(unverifiedTx)
-                                            .map(IAPAction.verifiedPsiCashConsumable)
-                                    )
+                                    
+                                    if let receiptData = state.receiptData {
+                                        state.iap.unverifiedPsiCashTx =
+                                            .pendingVerificationResult(unverifiedTx)
+                                        
+                                        effects.append(
+                                            verifyConsumable(transaction: unverifiedTx,
+                                                             receipt: receiptData)
+                                                .map(IAPAction.verifiedPsiCashConsumable)
+                                        )
+                                    } else {
+                                        // Does a receipt refresh if there is no valid
+                                        // App Store receipt.
+                                        
+                                        state.iap.unverifiedPsiCashTx =
+                                            .pendingVerification(unverifiedTx)
+                                        
+                                        effects.append(
+                                            .fireAndForget {
+                                                Current.app.store.send(
+                                                    .appReceipt(
+                                                        .refreshReceipt(optinalPromise: nil))
+                                                )
+                                            }
+                                        )
+                                    }
                                     
                                 case .some(true):
                                     // Tranaction has the same identifier as the current
@@ -162,8 +197,8 @@ func iapReducer(state: inout IAPReducerState, action: IAPAction) -> [Effect<IAPA
                                 case .some(false):
                                     // Unexpected presence of two consumable transactions
                                     // with different transaction ids.
-                                    let unverifiedTxId = state.iap.unverifiedPsiCashTransaction!
-                                        .value.transactionIdentifier ?? "(none)"
+                                    let unverifiedTxId = state.iap.unverifiedPsiCashTx!
+                                    .transaction.value.transactionIdentifier ?? "(none)"
                                     let newTxId = transaction.transactionIdentifier ?? "(none)"
                                     fatalError("""
                                     cannot have two completed but unverified consumable purchases: \

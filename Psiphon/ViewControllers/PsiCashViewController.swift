@@ -231,7 +231,7 @@ final class PsiCashViewController: UIViewController {
                     case (.notConnected, .addPsiCash),
                          (.connected, .addPsiCash):
                         
-                        if observed.state.iap.unverifiedPsiCashTransaction != nil {
+                        if observed.state.iap.unverifiedPsiCashTx != nil {
                             switch tunnelState {
                             case .connected:
                                 self.containerBindable.bind(
