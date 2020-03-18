@@ -231,13 +231,21 @@ final class PsiCashViewController: UIViewController {
                     case (.notConnected, .addPsiCash),
                          (.connected, .addPsiCash):
                         
-                        if tunnelState == .notConnected
-                            && observed.state.iap.unverifiedPsiCashTransaction != nil {
-                            // If tunnel is not connected and there is a pending PsiCash IAP,
-                            // then shows the "pending psicash purchase" screen.
-                            self.containerBindable.bind(
-                                .left(.right(.right(.left(.pendingPsiCashPurchase))))
-                            )
+                        if observed.state.iap.unverifiedPsiCashTransaction != nil {
+                            switch tunnelState {
+                            case .connected:
+                                self.containerBindable.bind(
+                                    .left(.right(.right(.right(.pendingPsiCashVerification))))
+                                )
+                            case .notConnected:
+                                // If tunnel is not connected and there is a pending PsiCash IAP,
+                                // then shows the "pending psicash purchase" screen.
+                                self.containerBindable.bind(
+                                    .left(.right(.right(.left(.pendingPsiCashPurchase))))
+                                )
+                            case .connecting:
+                                fatalError("tunnelState at this point should not be 'connecting'")
+                            }
 
                         } else {
                             switch observed.state.allProducts {
