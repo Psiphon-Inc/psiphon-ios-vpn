@@ -118,6 +118,21 @@ struct UnverifiedPsiCashConsumableTransaction: Equatable {
     let value: SKPaymentTransaction
 }
 
+extension UnverifiedPsiCashConsumableTransaction {
+    
+    /// Compares transaction identifier to provided `transaction`'s transaction identifier.
+    /// - Returns: true if both transaction id are non-nil and are equal, false otherwise.
+    func isEqualTransactionId(to transaction: SKPaymentTransaction) -> Bool {
+        guard let idA = value.transactionIdentifier else {
+            return false
+        }
+        guard let idB = transaction.transactionIdentifier else {
+            return false
+        }
+        return idA == idB
+    }
+}
+
 struct VerifiedPsiCashConsumableTransaction: Equatable {
     let value: SKPaymentTransaction
 }
