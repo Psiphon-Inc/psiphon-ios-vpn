@@ -53,7 +53,7 @@ struct PsiCashValidationRequest: Encodable {
     let customData: String
     
     init(transaction: UnverifiedPsiCashConsumableTransaction,
-         receipt: Receipt,
+         receipt: ReceiptData,
          customData: CustomData) {
         self.productId = transaction.value.payment.productIdentifier
         self.receiptData = receipt.data.base64EncodedString()
@@ -141,7 +141,8 @@ struct VerifiedPsiCashConsumableTransaction: Equatable {
 /// Returned effect completes only after successfully verifying the purchase.
 /// If all retries to the purchase verifier server failed, it is next retried after a new tunneled event.
 func verifyConsumable(
-    _ transaction: UnverifiedPsiCashConsumableTransaction
+    transaction: UnverifiedPsiCashConsumableTransaction,
+    receipt: ReceiptData
 ) -> Effect<VerifiedPsiCashConsumableTransaction> {
     Current.vpnStatus.signalProducer
     .skipRepeats()
@@ -156,10 +157,6 @@ func verifyConsumable(
                 guard let customData = maybeCustomData else {
                     return .init(error: .requestBuildError(
                         FatalError(message: "empty custom data")))
-                }
-                guard let receipt = Receipt.fromLocalReceipt(Current.appBundle) else {
-                    return .init(error: .requestBuildError(
-                        FatalError(message: "failed to read receipt")))
                 }
                 let maybeUrlRequest = PurchaseVerifierServerEndpoints.psiCash(
                     PsiCashValidationRequest(
