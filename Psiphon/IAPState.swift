@@ -61,10 +61,22 @@ struct PendingPayment: Hashable {
     
 }
 
+enum UnverifiedPsiCashTransactionState: Equatable {
+    case pendingVerification(UnverifiedPsiCashConsumableTransaction)
+    case pendingVerificationResult(UnverifiedPsiCashConsumableTransaction)
+    
+    var transaction: UnverifiedPsiCashConsumableTransaction {
+        switch self {
+        case .pendingVerification(let value): return value
+        case .pendingVerificationResult(let value): return value
+        }
+    }
+}
+
 struct IAPState: Equatable {
     
     /// PsiCash consumable transaction pending server verification.
-    var unverifiedPsiCashTransaction: UnverifiedPsiCashConsumableTransaction?
+    var unverifiedPsiCashTx: UnverifiedPsiCashTransactionState?
     
     var purchasing: IAPPurchasingState {
         willSet {
@@ -84,7 +96,7 @@ struct IAPState: Equatable {
     
     init() {
         self.purchasing = .none
-        self.unverifiedPsiCashTransaction = nil
+        self.unverifiedPsiCashTx = nil
     }
 }
 

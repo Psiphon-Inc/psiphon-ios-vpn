@@ -111,7 +111,8 @@ extension AppState {
             IAPReducerState(
                 iap: self.iapState,
                 psiCashBalance: self.psiCashBalance,
-                psiCashAuth: self.psiCash.libData.authPackage
+                psiCashAuth: self.psiCash.libData.authPackage,
+                receiptData: self.appReceipt.receiptData
             )
         }
         set {
@@ -138,12 +139,14 @@ extension AppState {
         get {
             AppDelegateReducerState(
                 psiCashBalance: self.psiCashBalance,
-                psiCash: self.psiCash
+                psiCash: self.psiCash,
+                receiptData: self.appReceipt.receiptData
             )
         }
         set {
             self.psiCashBalance = newValue.psiCashBalance
             self.psiCash = newValue.psiCash
+            self.appReceipt.receiptData = newValue.receiptData
         }
     }
     
