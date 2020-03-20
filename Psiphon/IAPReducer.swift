@@ -88,6 +88,7 @@ func iapReducer(state: inout IAPReducerState, action: IAPAction) -> [Effect<IAPA
         guard case let .pendingVerification(unverifiedTx) = state.iap.unverifiedPsiCashTx else {
             return []
         }
+        state.iap.unverifiedPsiCashTx = .pendingVerificationResult(unverifiedTx)
         return [
             verifyConsumable(transaction: unverifiedTx, receipt: receiptData)
                 .map(IAPAction.verifiedPsiCashConsumable)
@@ -95,7 +96,10 @@ func iapReducer(state: inout IAPReducerState, action: IAPAction) -> [Effect<IAPA
         
     case .verifiedPsiCashConsumable(let verifiedTx):
         guard case let .pendingVerificationResult(pendingTx) = state.iap.unverifiedPsiCashTx else {
-            fatalError("there is no unverified IAP transaction '\(verifiedTx)'")
+            fatalError("""
+                found no unverified transaction equal to '\(verifiedTx)' \
+                pending verification result
+                """)
         }
         guard verifiedTx.value == pendingTx.value else {
             fatalError("""
