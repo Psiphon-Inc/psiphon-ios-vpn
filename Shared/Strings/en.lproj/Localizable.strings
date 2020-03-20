@@ -100,7 +100,7 @@
 "GENERIC_PURCHASE_FAILED" = "Purchase Failed";
 
 /* User does not have suffiecient 'PsiCash' balance. PsiCash is a type of credit. Do not translate or transliterate 'PsiCash'. */
-"INSUFFICIENT_PSICASH_BALANCE" = "Insuffiecient PsiCash balance";
+"INSUFFICIENT_PSICASH_BALANCE" = "Insufficient PsiCash balance";
 
 /* External link to the license page. Please update this with the correct language specific link (if available) e.g. https://psiphon.ca/fr/license.html for french. */
 "LICENSE_PAGE_URL" = "https://psiphon.ca/en/license.html";
