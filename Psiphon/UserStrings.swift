@@ -132,7 +132,7 @@ import Foundation
 
     static func Insufficient_psiCash_balance() -> String {
         return NSLocalizedString("INSUFFICIENT_PSICASH_BALANCE", tableName: nil, bundle: Bundle.main,
-                                 value: "Insuffiecient PsiCash balance",
+                                 value: "Insufficient PsiCash balance",
                                  comment: "User does not have suffiecient 'PsiCash' balance. PsiCash is a type of credit. Do not translate or transliterate 'PsiCash'.")
 
     }
