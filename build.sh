@@ -19,7 +19,6 @@
 #!/bin/bash -u -e
 
 BASE_DIR=$(cd "$(dirname "$0")" ; pwd -P)
-altool="/Applications/Xcode.app/Contents/Applications/Application Loader.app/Contents/Frameworks/ITunesSoftwareService.framework/Versions/A/Support/altool"
 
 usage () {
     echo " Usage: ${0} <release|testflight|internal>"
@@ -43,6 +42,11 @@ setup_env () {
     python psi_export_doc.py
     if [[ $? != 0 ]]; then
         echo "psi_export_doc.py failed. Failed to update config values. See psi_export_doc.log for details..."
+        exit 1
+    fi
+
+    if ! [ -x "$(command -v xcrun)" ]; then
+        echo "Error: 'xcrun' is not installed"
         exit 1
     fi
 }
@@ -78,14 +82,14 @@ inc_vers_and_commit () {
 
 upload_ipa () {
     echo "Validating exported ipa..."
-    "${altool}" --validate-app -f "${BUILD_DIR}/Psiphon.ipa" -u "${ITUNES_CONNECT_USERNAME}" -p "${ITUNES_CONNECT_PASSWORD}"
+    xcrun altool --validate-app -t ios -f "${BUILD_DIR}/Psiphon.ipa" -u "${ITUNES_CONNECT_USERNAME}" -p "${ITUNES_CONNECT_PASSWORD}"
     if [[ $? != 0 ]]; then
         echo "Psiphon.ipa failed validation, aborting..."
         exit 1
     fi
 
     echo "Uploading validated ipa to TestFlight..."
-    "${altool}" --upload-app -f "${BUILD_DIR}/Psiphon.ipa" -u "${ITUNES_CONNECT_USERNAME}" -p "${ITUNES_CONNECT_PASSWORD}"
+    xcrun altool --upload-app -t ios -f "${BUILD_DIR}/Psiphon.ipa" -u "${ITUNES_CONNECT_USERNAME}" -p "${ITUNES_CONNECT_PASSWORD}"
     if [[ $? != 0 ]]; then
         echo "Failed to upload Psiphon.ipa, aborting..."
         exit 1
