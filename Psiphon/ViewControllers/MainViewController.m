@@ -953,6 +953,7 @@ NSString * const CommandStopVPN = @"StopVPN";
 
 }
 
+#if DEBUG
 - (void)setupVersionLabel {
     versionLabel.translatesAutoresizingMaskIntoConstraints = NO;
     [versionLabel setTitle:[NSString stringWithFormat:@"v%@",[[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"]]
@@ -974,6 +975,7 @@ NSString * const CommandStopVPN = @"StopVPN";
       [versionLabel.topAnchor constraintEqualToAnchor:psiCashWidget.bottomAnchor constant:10.f]
     ]];
 }
+#endif
 
 - (void)setupSubscriptionsBar {
     [subscriptionsBar addTarget:self
