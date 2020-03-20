@@ -1,5 +1,5 @@
 # Uncomment the next line to define a global platform for your project
-platform :ios, '10.0'
+platform :ios, '10.2'
 
  # Disable sending stats
 ENV['COCOAPODS_DISABLE_STATS'] = 'true'
@@ -36,5 +36,13 @@ target 'PsiphonVPN' do
 
   pod 'ReactiveObjC', :git => "https://github.com/Psiphon-Inc/ReactiveObjC.git", :commit => '8bbf9dd'
 
+end
+
+post_install do |installer|
+  installer.pods_project.targets.each do |target|
+    target.build_configurations.each do |config|
+      config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '10.2'
+    end
+  end
 end
 
