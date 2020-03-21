@@ -139,6 +139,7 @@
 		8D417EDD2419DBA100FEE587 /* ProductRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D417EDC2419DBA100FEE587 /* ProductRequest.swift */; };
 		8D417EDF241AA89C00FEE587 /* Effect.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D417EDE241AA89C00FEE587 /* Effect.swift */; };
 		8DA3466624114DB400F9E2D1 /* PsiCashState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DA3466524114DB400F9E2D1 /* PsiCashState.swift */; };
+		8DDA60292425BB4800DBA8EC /* DebugStrings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DDA60282425BB4800DBA8EC /* DebugStrings.swift */; };
 		9BFEC10661A7DC0402AF4B37 /* AsyncOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC6DEB0BE772BE801A9E6 /* AsyncOperation.m */; };
 		9BFEC1F0DA87B4E66C8CC4AA /* MoPubInterstitialAdControllerWrapper.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFECF45CA0CAF6997411D22 /* MoPubInterstitialAdControllerWrapper.m */; };
 		9BFEC2458D1346F537E9089E /* Nullity.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFECCCF429898FD903B69A6 /* Nullity.m */; };
@@ -523,6 +524,7 @@
 		8D417EDC2419DBA100FEE587 /* ProductRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductRequest.swift; sourceTree = "<group>"; };
 		8D417EDE241AA89C00FEE587 /* Effect.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Effect.swift; sourceTree = "<group>"; };
 		8DA3466524114DB400F9E2D1 /* PsiCashState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PsiCashState.swift; sourceTree = "<group>"; };
+		8DDA60282425BB4800DBA8EC /* DebugStrings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugStrings.swift; sourceTree = "<group>"; };
 		9BFEC0419AD3808370915E01 /* PsiphonConfigUserDefaults.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PsiphonConfigUserDefaults.h; sourceTree = "<group>"; };
 		9BFEC1C9F506CE1DF07306D2 /* NEBridge.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NEBridge.h; sourceTree = "<group>"; };
 		9BFEC1E485FB857A0358ED94 /* UnionSerialQueue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UnionSerialQueue.h; sourceTree = "<group>"; };
@@ -948,6 +950,7 @@
 				52DF5E9523C7A31100A1B067 /* Error+Additions.swift */,
 				52B3C54423DA391F003F6B12 /* Requests.swift */,
 				8D417ED8241844FA00FEE587 /* FloatingPoint+Additions.swift */,
+				8DDA60282425BB4800DBA8EC /* DebugStrings.swift */,
 			);
 			path = Util;
 			sourceTree = "<group>";
@@ -1858,6 +1861,7 @@
 				9BFEC3D66910918A0C8954E1 /* AdMobConsent.m in Sources */,
 				8D417EDF241AA89C00FEE587 /* Effect.swift in Sources */,
 				52DF5E9A23CE835100A1B067 /* UserStrings.swift in Sources */,
+				8DDA60292425BB4800DBA8EC /* DebugStrings.swift in Sources */,
 				52C8F0AD237E145C00E5F9C0 /* PsiCashCoinPurchaseTable.swift in Sources */,
 				9BFECA152514A7739551AA70 /* MoPubConsent.m in Sources */,
 				521FD0EF219E0D5600F748EC /* DebugDirectoryViewerViewController.m in Sources */,
