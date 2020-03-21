@@ -22,8 +22,15 @@ import ReactiveSwift
 
 typealias RestrictedURL = PredicatedValue<URL, Environment>
 
+enum LandingPageShownState {
+    case pending
+    case shown
+    case notShown
+    case notShownDueSpeedBoostPurchase
+}
+
 struct LandingPageReducerState {
-    var shownLandingPage: Pending<Bool>
+    var shownLandingPage: LandingPageShownState
     let activeSpeedBoost: PurchasedExpirableProduct<SpeedBoostProduct>?
 }
 
@@ -41,37 +48,48 @@ func landingPageReducer(
 ) -> [Effect<LandingPageAction>] {
     switch action {
     case .open(let url):
-        guard case .completed(_) = state.shownLandingPage else {
+        
+        switch (state.shownLandingPage, state.activeSpeedBoost) {
+        case (.pending, _),
+             (.shown, _):
             return []
-        }
-        // Landing page not showing if SpeedBoost is active.
-        guard case .none = state.activeSpeedBoost else {
+            
+        case (.notShown, .some(_)):
+            state.shownLandingPage = .notShownDueSpeedBoostPurchase
             return []
+            
+        case (.notShown, .none),
+             (.notShownDueSpeedBoostPurchase, _):
+            state.shownLandingPage = .pending
+            return [
+                // Waits up to 1 second for vpnStatus to change to `.connected`.
+                Current.vpnStatus.signalProducer
+                    .map { $0 == .connected }
+                    .falseIfNotTrue(within: .seconds(1))
+                    .take(first: 1)
+                    .flatMap(.latest) { connected -> SignalProducer<LandingPageAction, Never> in
+                        if connected {
+                            return modifyLandingPagePendingEarnerToken(url: url)
+                                .flatMap(.latest) {
+                                    Current.urlHandler.open($0)
+                            }.map(LandingPageAction.urlOpened(success:))
+                        } else {
+                            return SignalProducer(value: .urlOpened(success: false))
+                        }
+                }
+            ]
         }
-        state.shownLandingPage =  .pending
-        return [
-            Current.vpnStatus.signalProducer
-                .map { $0 == .connected }
-                .falseIfNotTrue(within: .seconds(1))
-                .take(first: 1)
-                .flatMap(.latest) { connected -> SignalProducer<LandingPageAction, Never> in
-                    if connected {
-                        return modifyLandingPagePendingEarnerToken(url: url)
-                            .flatMap(.latest) {
-                                Current.urlHandler.open($0)
-                        }.map(LandingPageAction.urlOpened(success:))
-                    } else {
-                        return SignalProducer(value: .urlOpened(success: false))
-                    }
-            }
-        ]
         
     case .urlOpened(success: let success):
-        state.shownLandingPage =  .completed(success)
+        if success {
+            state.shownLandingPage = .shown
+        } else {
+            state.shownLandingPage = .notShown
+        }
         return []
         
     case .reset:
-        state.shownLandingPage =  .completed(false)
+        state.shownLandingPage =  .notShown
         return []
     }
 }
