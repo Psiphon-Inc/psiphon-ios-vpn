@@ -134,7 +134,10 @@ extension PsiCash {
         }
 
         let psiCashAuthIds = Set(validPurchases.compactMap { purchase -> AuthID? in
-            AuthID(purchase.id)
+            guard let auth = Authorization(encodedAuthorization: purchase.authorization) else {
+                return nil
+            }
+            return AuthID(auth.id)
         })
 
         // Auth ids in PsiCash library not found in `sourceOfTruth`.
