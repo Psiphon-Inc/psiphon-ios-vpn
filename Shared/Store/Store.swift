@@ -67,6 +67,7 @@ public final class Store<Value: Equatable, Action> {
 
     @State public private(set) var value: Value
 
+    private let scheduler: UIScheduler
     private let reducer: StoreReducer
     private var disposable: Disposable? = .none
     private var effectDisposables = CompositeDisposable()
@@ -74,6 +75,13 @@ public final class Store<Value: Equatable, Action> {
     public init(initialValue: Value, reducer: @escaping StoreReducer) {
         self.reducer = reducer
         self.value = initialValue
+        self.scheduler = .init()
+    }
+    
+    private init(scheduler: UIScheduler, initialValue: Value, reducer: @escaping StoreReducer) {
+        self.reducer = reducer
+        self.value = initialValue
+        self.scheduler = scheduler
     }
     
     deinit {
@@ -92,7 +100,7 @@ public final class Store<Value: Equatable, Action> {
         effects.forEach { effect in
             var disposable: Disposable?
             
-            disposable = effect.observeOnUIScheduler()
+            disposable = effect.observe(on: self.scheduler)
                 .sink(receiveCompletion: {
                     disposable?.dispose()
                 }, receiveValues: { [unowned self] internalAction in
@@ -112,6 +120,7 @@ public final class Store<Value: Equatable, Action> {
     ) -> Store<LocalValue, LocalAction> {
         
         let localStore = Store<LocalValue, LocalAction>(
+            scheduler: self.scheduler,
             initialValue: toLocalValue(self.value),
             reducer: { localValue, localAction in
                 // Local projection sends actions to the global MainStore.
