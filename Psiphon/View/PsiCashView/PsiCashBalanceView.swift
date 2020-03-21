@@ -116,9 +116,10 @@ import UIKit
                 newValue.psiCashBalance.pendingExpectedBalanceIncrease) {
         case (.pending, _):
             iconValue = .right(.left(true))  // Spinner
-        case (.completed(_), true):
+        case (.completed(_), .purchasedPsiCash):
             iconValue = .right(.right(.unit))  // Red "i" info button
-        case (.completed(_), false):
+        case (.completed(_), .none),
+             (.completed(_), .watchedRewardedVideo):
             iconValue = .left(.unit)  // Coin icon
         }
         self.setAmount(newValue.psiCashBalance.value)

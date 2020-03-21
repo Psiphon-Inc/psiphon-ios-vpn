@@ -161,7 +161,8 @@ func iapReducer(state: inout IAPReducerState, action: IAPAction) -> [Effect<IAPA
                                     // Updates balance state to reflect expected increase
                                     // in PsiCash balance.
                                     state.psiCashBalance.waitingForExpectedIncrease(
-                                        withAddedReward: .zero()
+                                        withAddedReward: .zero(),
+                                        reason: .purchasedPsiCash
                                     )
                                     let unverifiedTx =
                                         UnverifiedPsiCashConsumableTransaction(value: transaction)
