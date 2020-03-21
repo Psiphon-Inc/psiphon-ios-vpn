@@ -150,7 +150,7 @@ extension SpeedBoostCollection: UICollectionViewDelegateFlowLayout {
 }
 
 
-fileprivate final class PurchaseCellContent: UIView, Bindable {
+fileprivate final class PurchaseCellContent: AnimatedUIView, Bindable {
     private var purchasable: SpeedBoostPurchasable? = .none
     private let purchaseHandler: (SpeedBoostPurchasable) -> Void
 
@@ -170,6 +170,7 @@ fileprivate final class PurchaseCellContent: UIView, Bindable {
         button.setImage(psiCashCoinImage, for: .highlighted)
         button.setTitleColor(.darkBlue(), for: .normal)
         button.titleLabel!.font = AvenirFont.bold.font(.h3)
+        button.isUserInteractionEnabled = false
 
         self.addSubviews(backgroundView, title, button)
 
@@ -185,6 +186,10 @@ fileprivate final class PurchaseCellContent: UIView, Bindable {
             $0.constraintToParent(.leading(10), .trailing(-10), .bottom(-13)) +
                 [ $0.topAnchor.constraint(equalTo: title.bottomAnchor, constant: 2) ]
         }
+        
+        // Gesture recognizer
+        let tapRecognizer = UITapGestureRecognizer(target: self, action: #selector(onViewTapped))
+        addGestureRecognizer(tapRecognizer)
     }
 
     required init?(coder: NSCoder) {
@@ -199,9 +204,11 @@ fileprivate final class PurchaseCellContent: UIView, Bindable {
         button.setTitle(
             Current.psiCashPriceFormatter.string(from: newValue.purchasable.price.inPsi),
             for: .normal)
-
-        button.setEventHandler { [unowned self] in
-            self.purchaseHandler(newValue.purchasable)
+    }
+    
+    @objc func onViewTapped() {
+        if let purchasable = self.purchasable {
+            self.purchaseHandler(purchasable)
         }
     }
 
