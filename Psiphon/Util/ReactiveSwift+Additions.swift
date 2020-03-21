@@ -23,22 +23,6 @@ import Promises
 
 struct TimeoutError: Error {}
 
-extension Signal {
-
-    func observeOnUIScheduler() -> Signal<Value, Error> {
-        return self.observe(on: UIScheduler())
-    }
-
-}
-
-extension SignalProducer {
-
-    func observeOnUIScheduler() -> SignalProducer<Value, Error> {
-        return self.observe(on: UIScheduler())
-    }
-
-}
-
 extension SignalProducer where Error == Never {
 
     // TODO: Check the promise lifecycle.
