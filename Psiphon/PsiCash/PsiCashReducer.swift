@@ -150,7 +150,8 @@ func psiCashReducer(
         
         if state.psiCash.rewardedVideo.rewardedAndDismissed {
             let rewardAmount = Current.hardCodedValues.psiCash.videoAdRewardAmount
-            state.psiCashBalance.waitingForExpectedIncrease(withAddedReward: rewardAmount)
+            state.psiCashBalance.waitingForExpectedIncrease(withAddedReward: rewardAmount,
+                                                            reason: .watchedRewardedVideo)
             return [Effect { .refreshPsiCashState }]
         } else {
             return []
