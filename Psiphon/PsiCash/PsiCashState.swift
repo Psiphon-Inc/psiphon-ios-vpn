@@ -180,8 +180,13 @@ extension PsiCashPurchaseResult {
 }
 
 struct PsiCashBalance: Equatable {
-    /// Indicates an expected increase in PsiCash balance after next sync with the PsiCash server.
-    var pendingExpectedBalanceIncrease: Bool
+    
+    enum BalanceIncreaseExpectationReason: Equatable {
+        case watchedRewardedVideo
+        case purchasedPsiCash
+    }
+    
+    var pendingExpectedBalanceIncrease: BalanceIncreaseExpectationReason?
     
     /// Balance with expected rewrad amount added.
     /// - Note: This value is either equal to `PsiCashLibData.balance`, or higher if there is expected reward amount.
@@ -190,15 +195,17 @@ struct PsiCashBalance: Equatable {
 
 extension PsiCashBalance {
     init() {
-        pendingExpectedBalanceIncrease = false
+        pendingExpectedBalanceIncrease = .none
         value = .zero()
     }
 }
 
 extension PsiCashBalance {
     
-    mutating func waitingForExpectedIncrease(withAddedReward addedReward: PsiCashAmount) {
-        pendingExpectedBalanceIncrease = true
+    mutating func waitingForExpectedIncrease(
+        withAddedReward addedReward: PsiCashAmount, reason: BalanceIncreaseExpectationReason
+    ) {
+        pendingExpectedBalanceIncrease = reason
         if addedReward > .zero() {
             let newRewardAmount = Current.userConfigs.expectedPsiCashReward + addedReward
             Current.userConfigs.expectedPsiCashReward = newRewardAmount
@@ -207,14 +214,20 @@ extension PsiCashBalance {
     }
     
     static func fromStoredExpectedReward(libData: PsiCashLibData) -> Self {
-        let reward = Current.userConfigs.expectedPsiCashReward
-        return .init(pendingExpectedBalanceIncrease: !reward.isZero,
-                     value: libData.balance + reward)
+        let adReward = Current.userConfigs.expectedPsiCashReward
+        let reason: BalanceIncreaseExpectationReason?
+        if adReward.isZero {
+            reason = .none
+        } else {
+            reason = .watchedRewardedVideo
+        }
+        return .init(pendingExpectedBalanceIncrease: reason,
+                     value: libData.balance + adReward)
     }
 
     static func refreshed(refreshedData libData: PsiCashLibData) -> Self {
         Current.userConfigs.expectedPsiCashReward = PsiCashAmount.zero()
-        return .init(pendingExpectedBalanceIncrease: false, value: libData.balance)
+        return .init(pendingExpectedBalanceIncrease: .none, value: libData.balance)
     }
 
 }
