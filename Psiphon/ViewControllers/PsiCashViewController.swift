@@ -163,8 +163,14 @@ final class PsiCashViewController: UIViewController {
                 case (.pending(.psiCash(_)), _, .mainScreen):
                     self.display(screen: .psiCashPurchaseDialog)
                     
+                case (.pending(.psiCash(_)), _, .psiCashPurchaseDialog):
+                    break
+                    
                 case (_, .speedBoost(_), .mainScreen):
                     self.display(screen: .speedBoostPurchaseDialog)
+                    
+                case (_, .speedBoost(_), .speedBoostPurchaseDialog):
+                    break
                     
                 case (_, .error(let psiCashErrorEvent), _):
                     let errorDesc = ErrorEventDescription(
