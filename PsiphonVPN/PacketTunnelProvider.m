@@ -847,11 +847,12 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
     }
 
     if ([self.psiphonTunnel getConnectionState] == PsiphonConnectionStateConnected) {
-        // The container waits up to `LandingPageTimeout` to see the tunnel connected
-        // status from when the Homepage notification is received by it.
         [self startVPN];
         self.reasserting = FALSE;
-        [[Notifier sharedInstance] post:NotifierNewHomepages];
+        
+        if (self.extensionStartMethod == ExtensionStartMethodFromContainer) {
+            [[Notifier sharedInstance] post:NotifierNewHomepages];
+        }
         return TRUE;
     }
 
