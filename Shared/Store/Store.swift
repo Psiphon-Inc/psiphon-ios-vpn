@@ -132,8 +132,11 @@ public final class Store<Value: Equatable, Action> {
 
         // Subscribes localStore to the value changes of the "global store",
         // due to actions outside the localStore.
-        localStore.disposable = self.$value.signalProducer.startWithValues { [weak localStore] in
-            localStore?.value = toLocalValue($0)
+        localStore.disposable = self.$value.signalProducer
+            .map(toLocalValue)
+            .skipRepeats()
+            .startWithValues { [weak localStore] newValue in
+                localStore?.value = newValue
         }
 
         return localStore
