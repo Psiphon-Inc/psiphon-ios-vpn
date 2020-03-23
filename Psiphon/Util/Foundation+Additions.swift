@@ -235,6 +235,15 @@ public extension Result where Success == () {
 
 }
 
+func join<A>(_ optional: Optional<Optional<A>>) -> Optional<A> {
+    switch optional {
+    case .some(.some(let value)):
+        return value
+    default:
+        return .none
+    }
+}
+
 public extension Optional where Wrapped == Bool {
 
     /// Returns `nilValue` if nil, otherwise returns wrapped value.
