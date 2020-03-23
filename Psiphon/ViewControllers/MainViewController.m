@@ -1080,6 +1080,19 @@ NSString * const CommandStopVPN = @"StopVPN";
 
     UINavigationController *navController = [[UINavigationController alloc]
       initWithRootViewController:appSettingsViewController];
+
+    if (@available(iOS 13, *)) {
+        // The default navigation controller in the iOS 13 SDK is not fullscreen and can be
+        // dismissed by swiping it away.
+        //
+        // PsiphonSettingsViewController depends on being dismissed with the "done" button, which
+        // is hooked into the InAppSettingsKit lifecycle. Swiping away the settings menu bypasses
+        // this and results in the VPN not being restarted if: a new region was selected, the
+        // disable timeouts settings was changed, etc. The solution is to force fullscreen
+        // presentation until the settings menu can be refactored.
+        navController.modalPresentationStyle = UIModalPresentationFullScreen;
+    }
+
     [self presentViewController:navController animated:YES completion:nil];
 }
 
