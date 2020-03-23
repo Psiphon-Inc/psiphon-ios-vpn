@@ -204,6 +204,15 @@ public extension Result {
         case .failure(_): return false
         }
     }
+    
+    func projectSuccess() -> Success? {
+        switch self {
+        case .success(let value):
+            return value
+        case .failure(_):
+            return .none
+        }
+    }
 
     func projectError() -> Error? {
         switch self {
