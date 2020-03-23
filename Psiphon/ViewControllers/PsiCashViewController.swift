@@ -49,7 +49,8 @@ final class PsiCashViewController: UIViewController {
     typealias AddPsiCashViewType =
         EitherView<PsiCashCoinPurchaseTable,
         EitherView<Spinner,
-        EitherView<PsiCashMessageViewUntunneled, PsiCashMessageView>>>
+        EitherView<PsiCashMessageViewUntunneled,
+        EitherView<PsiCashMessageWithRetryView, PsiCashMessageView>>>>
 
     typealias SpeedBoostViewType = EitherView<SpeedBoostPurchaseTable,
         EitherView<Spinner,
@@ -120,7 +121,9 @@ final class PsiCashViewController: UIViewController {
                 .init(Spinner(style: .whiteLarge),
                       .init(PsiCashMessageViewUntunneled(action: { [unowned store] in
                         store.send(.connectToPsiphonTapped)
-                      }), PsiCashMessageView()))),
+                      }), .init(PsiCashMessageWithRetryView(retryAction: {
+                        productRequestStore.send(.getProductList)
+                      }), PsiCashMessageView())))),
             SpeedBoostViewType(
                 SpeedBoostPurchaseTable(purchaseHandler: {
                     store.send(.buyPsiCashProduct(.speedBoost($0)))
@@ -196,7 +199,9 @@ final class PsiCashViewController: UIViewController {
                 guard observed.state.psiCash.libData.authPackage.hasMinimalTokens else {
                     self.balanceView.isHidden = true
                     self.tabControl.isHidden = true
-                    self.containerBindable.bind(.left(.right(.right(.right(.otherErrorTryAgain)))))
+                    self.containerBindable.bind(
+                        .left(.right(.right(.right(.right(.otherErrorTryAgain)))))
+                    )
                     return
                 }
 
@@ -205,7 +210,9 @@ final class PsiCashViewController: UIViewController {
                     // There is not PsiCash state or subscription state is unknow.
                     self.balanceView.isHidden = true
                     self.tabControl.isHidden = true
-                    self.containerBindable.bind(.left(.right(.right(.right(.otherErrorTryAgain)))))
+                    self.containerBindable.bind(
+                        .left(.right(.right(.right(.right(.otherErrorTryAgain)))))
+                    )
 
                 case .subscribed(_):
                     // User is subcribed. Only shows the PsiCash balance.
@@ -215,7 +222,9 @@ final class PsiCashViewController: UIViewController {
                         BalanceState(psiCashState: observed.state.psiCash,
                                      balance: observed.state.psiCashBalance)
                     )
-                    self.containerBindable.bind(.left(.right(.right(.right(.userSubscribed)))))
+                    self.containerBindable.bind(
+                        .left(.right(.right(.right(.right(.userSubscribed)))))
+                    )
 
                 case .notSubscribed:
                     self.balanceView.isHidden = false
@@ -241,7 +250,8 @@ final class PsiCashViewController: UIViewController {
                             switch tunnelState {
                             case .connected:
                                 self.containerBindable.bind(
-                                    .left(.right(.right(.right(.pendingPsiCashVerification))))
+                                    .left(
+                                        .right(.right(.right(.right(.pendingPsiCashVerification)))))
                                 )
                             case .notConnected:
                                 // If tunnel is not connected and there is a pending PsiCash IAP,
@@ -262,8 +272,10 @@ final class PsiCashViewController: UIViewController {
                                 case .success(let psiCashCoinProducts):
                                     self.containerBindable.bind(.left(.left(psiCashCoinProducts)))
                                 case .failure(_):
+                                    // Shows failed to load message with tap to retry button.
                                     self.containerBindable.bind(
-                                        .left(.right(.right(.right(.otherErrorTryAgain)))))
+                                        .left(.right(.right(.right(.left(
+                                            .failedToLoadProductList))))))
                                 }
                             }
                         }
@@ -271,7 +283,7 @@ final class PsiCashViewController: UIViewController {
                     case (.connecting, _):
                         self.tabControl.isHidden = true
                         self.containerBindable.bind(
-                            .left(.right(.right(.right(.unavailableWhileConnecting)))))
+                            .left(.right(.right(.right(.right(.unavailableWhileConnecting))))))
 
                     case (let tunnelState, .speedBoost):
 
