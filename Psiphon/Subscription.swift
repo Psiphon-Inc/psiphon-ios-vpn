@@ -132,10 +132,13 @@ func subscriptionReducer(
             return []
         }
         
+        let timerExpiry: TimeInterval = expiry.timeIntervalSinceNow
+        let subscriptionExpiry: TimeInterval = subscription.latestExpiry.timeIntervalSinceNow
+        let tolerance = Current.hardCodedValues.subscription.subscriptionTimerDiffTolerance
+        
         // Changes state to `.notSubscribed` only if timers expiry matches
         // current subscription expiry value.
-        if expiry.timeIntervalSinceNow.isAlmostEqual(to:
-            subscription.latestExpiry.timeIntervalSinceNow) {
+        if abs(timerExpiry - subscriptionExpiry) < tolerance {
             state.status = .notSubscribed
         }
         
