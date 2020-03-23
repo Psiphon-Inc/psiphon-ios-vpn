@@ -172,7 +172,25 @@ import Foundation
                                  value: "Free",
                                  comment: "Button title for a product that is free. There is no cost or payment associated.")
     }
+    
+    static func Failed_to_load() -> String {
+        return NSLocalizedString("FAILED_TO_LOAD", tableName: nil, bundle: Bundle.main,
+                                 value: "Failed to load",
+                                 comment: "Message shown when something fails to load")
+    }
+    
+    static func Product_list_could_not_be_retrieved() -> String {
+        return NSLocalizedString("PRODUCT_LIST_COULD_NOT_BE_RETRIEVED", tableName: nil, bundle: Bundle.main,
+                                 value: "Product list could not be retrieved",
+                                 comment: "Message shown when products available for purchase could not be retrieved.")
 
+    }
+    
+    static func Tap_to_retry() -> String {
+        return NSLocalizedString("TAP_TO_RETRY", tableName: nil, bundle: Bundle.main,
+                                 value: "Tap to Retry",
+                                 comment: "Button title shown when something fails to load. Asks the user to tap the button to retry the operation")
+    }
 }
 
 // MARK: Rewarded Videos
