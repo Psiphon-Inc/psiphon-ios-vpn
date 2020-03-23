@@ -33,6 +33,7 @@ struct Styling {
     var padding: CGFloat = 15.0
     var largeButtonHeight: CGFloat = 60.0
     var statusBarStyle = UIStatusBarStyle.lightContent
+    var buttonContentEdgeInsets = UIEdgeInsets(top: 10.0, left: 15.0, bottom: 10.0, right: 15.0)
 }
 
 enum Gradients: Int {
