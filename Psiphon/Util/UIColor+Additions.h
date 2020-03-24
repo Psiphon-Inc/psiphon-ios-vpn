@@ -95,4 +95,6 @@
 
 + (UIColor * _Nonnull)darkNavyColor;
 
++ (UIColor * _Nonnull)duskColor;
+
 @end

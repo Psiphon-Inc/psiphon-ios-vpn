@@ -164,8 +164,11 @@ extension SwiftDelegate: SwiftBridgeDelegate {
         let _ = Current.paymentQueue.removeObserver(Current.paymentTransactionDelegate).wait()
     }
     
-    @objc func createPsiCashViewController() -> UIViewController? {
+    @objc func createPsiCashViewController(
+        _ initialTab: PsiCashViewController.Tabs
+    ) -> UIViewController? {
         PsiCashViewController(
+            initialTab: initialTab,
             store: Current.app.store.projection(
                 value: { $0.psiCashViewController },
                 action: { .psiCash($0) }),

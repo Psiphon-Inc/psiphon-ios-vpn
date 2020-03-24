@@ -1116,8 +1116,15 @@ NSString * const CommandStopVPN = @"StopVPN";
 
 #pragma mark - PsiCash UI
 
-- (void)speedBoostButton {
-    UIViewController *psiCashViewController = [SwiftDelegate.bridge createPsiCashViewController];
+- (void)addPsiCashButtonTapped {
+    UIViewController *psiCashViewController = [SwiftDelegate.bridge
+                                               createPsiCashViewController:TabsAddPsiCash];
+    [self presentViewController:psiCashViewController animated:YES completion:nil];
+}
+
+- (void)speedBoostButtonTapped {
+    UIViewController *psiCashViewController = [SwiftDelegate.bridge
+                                               createPsiCashViewController:TabsSpeedBoost];
     [self presentViewController:psiCashViewController animated:YES completion:nil];
 }
 
@@ -1180,7 +1187,8 @@ NSString * const CommandStopVPN = @"StopVPN";
     ]];
 
     // Sets button action
-    [psiCashWidget.speedBoostButton addTarget:self action:@selector(speedBoostButton) forControlEvents:UIControlEventTouchUpInside];
+    [psiCashWidget.addPsiCashButton addTarget:self action:@selector(addPsiCashButtonTapped) forControlEvents:UIControlEventTouchUpInside];
+    [psiCashWidget.speedBoostButton addTarget:self action:@selector(speedBoostButtonTapped) forControlEvents:UIControlEventTouchUpInside];
 }
 
 - (void)setPsiCashContentHidden:(BOOL)hidden {
@@ -1189,6 +1197,7 @@ NSString * const CommandStopVPN = @"StopVPN";
 
     // Show Psiphon large logo and hide Psiphon small logo when PsiCash is hidden.
     psiphonLargeLogo.hidden = !hidden;
+    psiphonTitle.hidden = hidden;
 }
 
 #pragma mark - RegionAdapterDelegate protocol implementation
