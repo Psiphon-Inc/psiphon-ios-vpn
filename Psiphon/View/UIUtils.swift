@@ -64,6 +64,11 @@ enum AvenirFont: String {
     func font(_ size: FontSize = .normal) -> UIFont {
         return UIFont(name: self.rawValue, size: CGFloat(size.rawValue))!
     }
+    
+    /// Prefer to use `font(_:)` instead for better consistency across the app.
+    func customFont(_ size: Float) -> UIFont {
+        return UIFont(name: self.rawValue, size: CGFloat(size))!
+    }
 }
 
 enum Loading<Value: Equatable>: Equatable {

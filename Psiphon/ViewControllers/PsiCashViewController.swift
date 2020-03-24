@@ -68,7 +68,7 @@ final class PsiCashViewController: UIViewController {
         case speedBoostPurchaseDialog
     }
 
-    enum Tabs: UICases {
+    @objc enum Tabs: Int, UICases {
         case addPsiCash
         case speedBoost
 
@@ -85,7 +85,7 @@ final class PsiCashViewController: UIViewController {
     private let productRequestStore: Store<Unit, ProductRequestAction>
 
     // VC-specific UI state
-    @State private var activeTab: Tabs = .speedBoost
+    @State private var activeTab: Tabs
     private var navigation: Screen = .mainScreen
 
     /// Set of presented error alerts.
@@ -101,10 +101,12 @@ final class PsiCashViewController: UIViewController {
     private let containerView = UIView(frame: .zero)
     private let containerBindable: EitherView<AddPsiCashViewType, SpeedBoostViewType>.BuildType
 
-    init(store: Store<PsiCashViewControllerState, PsiCashAction>,
+    init(initialTab: Tabs,
+         store: Store<PsiCashViewControllerState, PsiCashAction>,
          iapStore: Store<Unit, IAPAction>,
          productRequestStore: Store<Unit, ProductRequestAction>) {
 
+        self.activeTab = initialTab
         self.store = store
         self.productRequestStore = productRequestStore
         

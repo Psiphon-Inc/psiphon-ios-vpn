@@ -24,22 +24,37 @@ import UIKit
 
     @objc let balanceView = PsiCashBalanceView(frame: CGRect.zero)
     @objc let speedBoostButton = SpeedBoostButton()
+    @objc let addPsiCashButton = DuskButton()
+    @objc let topRowStackView = UIStackView(frame: .zero)
 
     override init(frame: CGRect) {
         super.init(frame: frame)
-
-        addSubview(balanceView)
-        addSubview(speedBoostButton)
-
+        
+        addPsiCashButton.setTitle("+", for: .normal)
+        addPsiCashButton.titleLabel!.font = AvenirFont.demiBold.customFont(20.0)
+        addPsiCashButton.setTitleColor(.white, for: .normal)
+        addPsiCashButton.contentEdgeInsets = UIEdgeInsets(top: 0, left: 7, bottom: 0, right: 7)
+        
         speedBoostButton.contentEdgeInset(.normal)
+        
+        topRowStackView.axis = .horizontal
+        topRowStackView.distribution = .fillProportionally
+        topRowStackView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+        topRowStackView.spacing = 8.0
 
-        balanceView.activateConstraints {
-            $0.constraintToParent(.centerX(), .top())
+        addSubview(topRowStackView)
+        addSubview(speedBoostButton)
+        topRowStackView.addArrangedSubview(balanceView)
+        topRowStackView.addArrangedSubview(addPsiCashButton)
+
+        topRowStackView.activateConstraints {
+            $0.constraintToParent(.centerX(0), .top(0))
         }
 
         speedBoostButton.activateConstraints {
             $0.constraintToParent(.bottom(), .leading(), .trailing()) +
-                [ $0.topAnchor.constraint(equalTo: balanceView.bottomAnchor, constant: Style.default.padding) ]
+                [ $0.topAnchor.constraint(equalTo: balanceView.bottomAnchor,
+                                          constant: Style.default.padding) ]
         }
 
     }
