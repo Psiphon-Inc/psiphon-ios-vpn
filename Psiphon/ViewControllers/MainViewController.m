@@ -1181,6 +1181,12 @@ NSString * const CommandStopVPN = @"StopVPN";
     // Sets button action
     [psiCashWidget.addPsiCashButton addTarget:self action:@selector(addPsiCashButtonTapped) forControlEvents:UIControlEventTouchUpInside];
     [psiCashWidget.speedBoostButton addTarget:self action:@selector(speedBoostButtonTapped) forControlEvents:UIControlEventTouchUpInside];
+    
+    // Makes balance view tappable
+    UITapGestureRecognizer *tapRecognizer = [[UITapGestureRecognizer alloc]
+                                             initWithTarget:self
+                                             action:@selector(addPsiCashButtonTapped)];
+    [psiCashWidget.balanceView addGestureRecognizer:tapRecognizer];
 }
 
 - (void)setPsiCashContentHidden:(BOOL)hidden {
