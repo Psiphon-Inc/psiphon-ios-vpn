@@ -139,7 +139,11 @@ func subscriptionReducer(
             state.status = .notSubscribed
         }
         
-        return []
+        return [
+            .fireAndForget {
+                Current.app.store.send(.appReceipt(.remoteReceiptRefresh(optinalPromise: nil)))
+            }
+        ]
     }
 }
 

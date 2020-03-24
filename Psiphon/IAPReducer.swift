@@ -188,7 +188,7 @@ func iapReducer(state: inout IAPReducerState, action: IAPAction) -> [Effect<IAPA
                                             .fireAndForget {
                                                 Current.app.store.send(
                                                     .appReceipt(
-                                                        .refreshReceipt(optinalPromise: nil))
+                                                        .remoteReceiptRefresh(optinalPromise: nil))
                                                 )
                                             }
                                         )
