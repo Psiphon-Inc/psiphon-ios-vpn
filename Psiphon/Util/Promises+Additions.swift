@@ -32,3 +32,9 @@ extension Promise: Hashable {
     }
 
 }
+
+public func fulfillAll<Value>(promises: [Promise<Value>], with value: Value) {
+    for promise in promises {
+        promise.fulfill(value)
+    }
+}

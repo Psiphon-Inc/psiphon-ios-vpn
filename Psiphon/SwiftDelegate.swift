@@ -22,8 +22,6 @@ import ReactiveSwift
 import Promises
 import StoreKit
 
-// TODO: `self.app` is force unwrapped multiple times in this file.
-
 enum AppDelegateAction {
     case appDidLaunch(psiCashData: PsiCashLibData)
     case appEnteredForeground
@@ -42,12 +40,11 @@ func appDelegateReducer(
     case .appDidLaunch(psiCashData: let libData):
         state.psiCash.appDidLaunch(libData)
         state.psiCashBalance = .fromStoredExpectedReward(libData: libData)
-        state.receiptData = .fromLocalReceipt(Current.appBundle)
         return [
             Current.psiCashEffect.expirePurchases().mapNever(),
             Current.paymentQueue.addObserver(Current.paymentTransactionDelegate).mapNever(),
             .fireAndForget {
-                Current.app.store.send(.appReceipt(.receiptRefreshed(.success(()))))
+                Current.app.store.send(.appReceipt(.localReceiptRefresh))
             }
         ]
         
@@ -206,7 +203,7 @@ extension SwiftDelegate: SwiftBridgeDelegate {
         let objcPromise = promise.then { result -> Error? in
             return result.projectError()?.error
         }
-        Current.app.store.send(.appReceipt(.refreshReceipt(optinalPromise: promise)))
+        Current.app.store.send(.appReceipt(.remoteReceiptRefresh(optinalPromise: promise)))
         return objcPromise.asObjCPromise()
     }
     
