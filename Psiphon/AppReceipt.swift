@@ -58,6 +58,12 @@ func receiptReducer(
     switch action {
     case .localReceiptRefresh:
         let refreshedData = ReceiptData.fromLocalReceipt(Current.appBundle)
+        
+        // Carries out notify effect if the receipt is nil after a local refresh.
+        guard refreshedData != nil, state.receiptData != nil else {
+            return [ notifyUpdatedReceipt(state.receiptData).mapNever() ]
+        }
+        
         guard refreshedData != state.receiptData else {
             return []
         }
