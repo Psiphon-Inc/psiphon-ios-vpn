@@ -24,7 +24,7 @@ fileprivate enum ControlState {
     case selected
 }
 
-class TabControlView<Tabs: UICases>: UIView, Bindable {
+final class TabControlView<Tabs: UICases>: UIView, Bindable {
 
     let borderGradient: CAGradientLayer
     let borderMask: CAShapeLayer

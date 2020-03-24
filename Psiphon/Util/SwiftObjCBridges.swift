@@ -76,7 +76,7 @@ struct NotificationObserver {
 }
 
 
-@objc class ObjCNotificationObserver: NSObject {
+@objc final class ObjCNotificationObserver: NSObject {
 
     private let callback: NotificationCallback
 
