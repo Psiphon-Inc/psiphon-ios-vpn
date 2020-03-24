@@ -26,7 +26,7 @@ enum IAPAction {
     case purchaseAdded(PurchaseAddedResult)
     case verifiedPsiCashConsumable(VerifiedPsiCashConsumableTransaction)
     case transactionUpdate(TransactionUpdate)
-    case receiptUpdated
+    case receiptUpdated(ReceiptData?)
 }
 
 /// StoreKit transaction obersver
@@ -39,7 +39,6 @@ struct IAPReducerState {
     var iap: IAPState
     var psiCashBalance: PsiCashBalance
     let psiCashAuth: PsiCashAuthPackage
-    let receiptData: ReceiptData?
 }
 
 func iapReducer(state: inout IAPReducerState, action: IAPAction) -> [Effect<IAPAction>] {
@@ -81,8 +80,8 @@ func iapReducer(state: inout IAPReducerState, action: IAPAction) -> [Effect<IAPA
             return []
         }
         
-    case .receiptUpdated:
-        guard let receiptData = state.receiptData else {
+    case .receiptUpdated(let maybeReceiptData):
+        guard let receiptData = maybeReceiptData else {
             return []
         }
         guard case let .pendingVerification(unverifiedTx) = state.iap.unverifiedPsiCashTx else {
@@ -164,35 +163,22 @@ func iapReducer(state: inout IAPReducerState, action: IAPAction) -> [Effect<IAPA
                                         withAddedReward: .zero(),
                                         reason: .purchasedPsiCash
                                     )
-                                    let unverifiedTx =
-                                        UnverifiedPsiCashConsumableTransaction(value: transaction)
+                                        
                                     finishTransaction = false
+                                    state.iap.unverifiedPsiCashTx = .pendingVerification(
+                                        UnverifiedPsiCashConsumableTransaction(value: transaction)
+                                    )
                                     
-                                    if let receiptData = state.receiptData {
-                                        state.iap.unverifiedPsiCashTx =
-                                            .pendingVerificationResult(unverifiedTx)
-                                        
-                                        effects.append(
-                                            verifyConsumable(transaction: unverifiedTx,
-                                                             receipt: receiptData)
-                                                .map(IAPAction.verifiedPsiCashConsumable)
-                                        )
-                                    } else {
-                                        // Does a receipt refresh if there is no valid
-                                        // App Store receipt.
-                                        
-                                        state.iap.unverifiedPsiCashTx =
-                                            .pendingVerification(unverifiedTx)
-                                        
-                                        effects.append(
-                                            .fireAndForget {
-                                                Current.app.store.send(
-                                                    .appReceipt(
-                                                        .remoteReceiptRefresh(optinalPromise: nil))
-                                                )
-                                            }
-                                        )
-                                    }
+                                    // Performs a remote receipt refresh before submitting
+                                    // the receipt for verification.
+                                    effects.append(
+                                        .fireAndForget {
+                                            Current.app.store.send(
+                                                .appReceipt(
+                                                    .remoteReceiptRefresh(optinalPromise: nil))
+                                            )
+                                        }
+                                    )
                                     
                                 case .some(true):
                                     // Tranaction has the same identifier as the current
