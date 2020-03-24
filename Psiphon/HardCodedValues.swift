@@ -46,6 +46,10 @@ struct SubscriptionHardCodedValues {
     /// Minimum amount of time left on a subscription to do a subscription check.
     let subscriptionCheckMinTime: TimeInterval = 60.0  // 60 seconds
     
+    /// Diff tolerance between timer's expired value and the subscription expiry value.
+    /// Current value is 1 second.
+    let subscriptionTimerDiffTolerance: TimeInterval = 1.0
+    
     init() {
         precondition(subscriptionCheckMinTime > subscriptionUIMinTime)
     }

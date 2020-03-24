@@ -22,8 +22,8 @@ import Promises
 
 struct ReceiptState: Equatable {
     var receiptData: ReceiptData?
-    var receiptRefreshState: Pending<Result<Unit, SystemErrorEvent>>
-    var refreshAppReceiptPromises: [Promise<Result<(), SystemErrorEvent>>]
+    var remoteReceiptRefreshState: Pending<Result<Unit, SystemErrorEvent>>
+    var remoteRefreshAppReceiptPromises: [Promise<Result<(), SystemErrorEvent>>]
     
     /// Strong reference to request object.
     var receiptRefereshRequestObject: SKReceiptRefreshRequest?
@@ -32,13 +32,23 @@ struct ReceiptState: Equatable {
 extension ReceiptState {
     init() {
         receiptData = .none
-        receiptRefreshState = .completed(.success(.unit))
-        refreshAppReceiptPromises = []
+        remoteReceiptRefreshState = .completed(.success(.unit))
+        remoteRefreshAppReceiptPromises = []
+    }
+    
+    mutating func fulfillRefreshPromises(_ value: Result<(), SystemErrorEvent>) -> Effect<Never> {
+        let refreshPromises = self.remoteRefreshAppReceiptPromises
+        self.remoteRefreshAppReceiptPromises = []
+        return .fireAndForget {
+            fulfillAll(promises: refreshPromises, with: value)
+        }
     }
 }
 
 enum ReceiptStateAction {
-    case refreshReceipt(optinalPromise: Promise<Result<(), SystemErrorEvent>>?)
+    case localReceiptRefresh
+    /// A remote receipt refresh can open a dialog box to
+    case remoteReceiptRefresh(optinalPromise: Promise<Result<(), SystemErrorEvent>>?)
     case receiptRefreshed(Result<(), SystemErrorEvent>)
 }
 
@@ -46,13 +56,21 @@ func receiptReducer(
     state: inout ReceiptState, action: ReceiptStateAction
 ) -> [Effect<ReceiptStateAction>] {
     switch action {
-    case .refreshReceipt(optinalPromise: let optionalPromise):
+    case .localReceiptRefresh:
+        let refreshedData = ReceiptData.fromLocalReceipt(Current.appBundle)
+        guard refreshedData != state.receiptData else {
+            return []
+        }
+        state.receiptData = refreshedData
+        return [ notifyUpdatedReceipt(state.receiptData).mapNever() ]
+        
+    case .remoteReceiptRefresh(optinalPromise: let optionalPromise):
         if let promise = optionalPromise {
-            state.refreshAppReceiptPromises.append(promise)
+            state.remoteRefreshAppReceiptPromises.append(promise)
         }
         
         // No effects if there is already a pending receipt refresh operation.
-        guard case .completed(_) = state.receiptRefreshState else {
+        guard case .completed(_) = state.remoteReceiptRefreshState else {
             return []
         }
         
@@ -66,28 +84,35 @@ func receiptReducer(
         ]
         
     case .receiptRefreshed(let result):
-        state.receiptRefreshState = .completed(result.mapToUnit())
+        var effects = [Effect<ReceiptStateAction>]()
+        state.remoteReceiptRefreshState = .completed(result.mapToUnit())
         state.receiptRefereshRequestObject = nil
         
-        if case .success(_) = result {
-            state.receiptData = .fromLocalReceipt(Current.appBundle)
-        }
+        let refreshedData = join(result.map { ReceiptData.fromLocalReceipt(Current.appBundle) }
+            .projectSuccess())
+
+        // Creates effect for fulling receipt refresh promises.
+        effects.append(
+            state.fulfillRefreshPromises(result).mapNever()
+        )
         
-        // Fulfills all pending promises with the result.
-        for promise in state.refreshAppReceiptPromises {
-            promise.fulfill(result)
+        guard refreshedData != state.receiptData else {
+            return effects
         }
-        state.refreshAppReceiptPromises = []
-        
-        let receiptData = state.receiptData
-        return [
-            .fireAndForget {
-                Current.app.store.send(.subscription(.updatedReceiptData(receiptData)))
-                Current.app.store.send(.iap(.receiptUpdated))
-            }
-        ]
+        state.receiptData = refreshedData
+        effects.append(
+            notifyUpdatedReceipt(refreshedData).mapNever()
+        )
+        return effects
     }
     
+}
+
+fileprivate func notifyUpdatedReceipt(_ receiptData: ReceiptData?) -> Effect<Never> {
+    .fireAndForget {
+        Current.app.store.send(.subscription(.updatedReceiptData(receiptData)))
+        Current.app.store.send(.iap(.receiptUpdated))
+    }
 }
 
 /// Default delegate for StoreKit receipt refresh request: `SKReceiptRefreshRequest`.
