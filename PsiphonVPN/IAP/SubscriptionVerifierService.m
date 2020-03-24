@@ -32,6 +32,7 @@
 #import "PsiphonDataSharedDB.h"
 #import "SharedConstants.h"
 #import "SubscriptionData.h"
+#import "PsiphonVPN-Swift.h"
 
 NSErrorDomain _Nonnull const ReceiptValidationErrorDomain = @"PsiphonReceiptValidationErrorDomain";
 
@@ -124,6 +125,7 @@ PsiFeedbackLogType const SubscriptionVerifierServiceLogType = @"SubscriptionVeri
     [request setHTTPBodyStream:[NSInputStream inputStreamWithURL:NSBundle.mainBundle.appStoreReceiptURL]];
     [request setHTTPMethod:@"POST"];
     [request setValue:@"application/octet-stream" forHTTPHeaderField:@"Content-Type"];
+    [request setValue:ObjCClientMetaData.jsonString forHTTPHeaderField:ObjCClientMetaData.httpHeaderField];
 
     NSURLSessionConfiguration *sessionConfig = [NSURLSessionConfiguration ephemeralSessionConfiguration];
     sessionConfig.timeoutIntervalForRequest = kReceiptRequestTimeOutSeconds;

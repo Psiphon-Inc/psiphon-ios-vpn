@@ -61,7 +61,7 @@ struct HTTPRequest<Response: HTTPResponse> {
         request.httpBody = body
         request.httpMethod = method.rawValue
         request.setValue(contentType.rawValue, forHTTPHeaderField: HTTPContentType.headerKey)
-        request.setValue(clientMetaData, forHTTPHeaderField: "X-Verifier-Metadata")
+        request.setValue(clientMetaData, forHTTPHeaderField: VerifierRequestMetadataHttpHeaderField)
 
         if Debugging.printHttpRequests {
             request.debugPrint()
@@ -116,38 +116,6 @@ fileprivate func request<Response>(
     }
     session.resume()
     return session
-}
-
-struct ClientMetaData: Encodable {
-    let clientPlatform: String = AppInfo.clientPlatform()
-    let clientRegion: String = AppInfo.clientRegion() ?? ""
-    let clientVersion: String = AppInfo.appVersion() ?? ""
-    let propagationChannelID: String = AppInfo.propagationChannelId() ?? ""
-    let sponsorID: String = AppInfo.sponsorId() ?? ""
-    
-    
-    private enum CodingKeys: String, CodingKey {
-        case clientPlatform = "client_platform"
-        case clientRegion = "client_region"
-        case clientVersion = "client_version"
-        case propagationChannelID = "propagation_channel_id"
-        case sponsorID = "sponsor_id"
-    }
-
-    lazy var jsonString: String = {
-        do {
-            let jsonData = try JSONEncoder().encode(ClientMetaData())
-            if let jsonString = String(data: jsonData, encoding: .utf8) {
-                return jsonString
-            }
-        } catch {
-            PsiFeedbackLogger.error(withType: "Requests",
-                                    message: "failed to serialize client metadata",
-                                    object: error)
-        }
-        return ""
-    }()
-    
 }
 
 func httpRequest<Response>(

@@ -37,8 +37,6 @@ UserDefaultsKey const AppInfoFastLaneSnapShotBoolKey = @"FASTLANE_SNAPSHOT";
     return [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleVersion"];
 }
 
-#if !(TARGET_IS_EXTENSION)
-
 + (NSString*)clientRegion {
     PsiphonDataSharedDB *sharedDB = [[PsiphonDataSharedDB alloc] initForAppGroupIdentifier:APP_GROUP_IDENTIFIER];
     return [sharedDB emittedClientRegion];
@@ -98,8 +96,6 @@ UserDefaultsKey const AppInfoFastLaneSnapShotBoolKey = @"FASTLANE_SNAPSHOT";
                                 bundleIdentifier];
     return clientPlatform;
 }
-
-#endif
 
 + (BOOL)runningUITest {
 #if DEBUG
