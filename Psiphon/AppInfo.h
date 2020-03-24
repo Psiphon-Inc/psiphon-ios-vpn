@@ -23,7 +23,6 @@
 
 + (NSString*_Nullable)appVersion;
 
-#if !(TARGET_IS_EXTENSION)
 + (NSString*_Nullable)clientRegion;
 
 + (NSString*_Nullable)propagationChannelId;
@@ -31,7 +30,6 @@
 + (NSString*_Nullable)sponsorId;
 
 + (NSString *_Nonnull)clientPlatform;
-#endif
 
 + (BOOL)runningUITest;
 
