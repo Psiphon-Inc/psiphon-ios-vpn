@@ -169,4 +169,8 @@
     return [UIColor colorWithRed:0.0f green:9.0f / 255.0f blue:57.0f / 255.0f alpha:1.0f];
 }
 
++ (UIColor * _Nonnull)duskColor {
+    return [UIColor colorWithRed:60.0f / 255.0f green:66.0f / 255.0f blue:106.0f / 255.0f alpha:1.0f];
+}
+
 @end
