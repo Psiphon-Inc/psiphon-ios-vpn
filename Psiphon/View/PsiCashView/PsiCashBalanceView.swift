@@ -35,7 +35,7 @@ import UIKit
 
     override init(frame: CGRect) {
         let titleString = UserStrings.PsiCash_balance().localizedUppercase
-        let fontSize: FontSize = .h3
+        let fontSize: FontSize = .normal
 
         title = UILabel.make(text: titleString,
                              fontSize: fontSize,
