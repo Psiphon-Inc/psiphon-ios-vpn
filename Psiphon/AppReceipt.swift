@@ -122,7 +122,7 @@ fileprivate func notifyUpdatedReceipt(_ receiptData: ReceiptData?) -> Effect<Nev
 }
 
 /// Default delegate for StoreKit receipt refresh request: `SKReceiptRefreshRequest`.
-class ReceiptRefreshRequestDelegate: StoreDelegate<ReceiptStateAction>, SKRequestDelegate {
+final class ReceiptRefreshRequestDelegate: StoreDelegate<ReceiptStateAction>, SKRequestDelegate {
     
     func requestDidFinish(_ request: SKRequest) {
         sendOnMain(.receiptRefreshed(.success(())))

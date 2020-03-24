@@ -19,7 +19,7 @@
 
 import UIKit
 
-@objc class DuskButton: AnimatedUIButton {
+@objc final class DuskButton: AnimatedUIButton {
     
     init() {
         super.init(frame: .zero)

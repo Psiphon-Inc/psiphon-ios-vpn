@@ -68,7 +68,7 @@ import Promises
 // MARK: Bridged Types
 
 /// `NEVPNStatus` observable bridged to Swift.
-@objc class VPNStatusBridge: NSObject {
+@objc final class VPNStatusBridge: NSObject {
 
     @objc static let instance = VPNStatusBridge()
 
@@ -90,7 +90,7 @@ import Promises
 }
 
 // `SubscriptionState` with associated value bridged to ObjC compatible type.
-@objc class BridgedUserSubscription: NSObject {
+@objc final class BridgedUserSubscription: NSObject {
     @objc let state: BridgedSubscriptionState
     @objc let latestExpiry: Date?
     @objc let productId: String?
@@ -117,7 +117,7 @@ import Promises
 }
 
 /// Wraps `BalanceState` struct.
-@objc class BridgedBalanceViewBindingType: NSObject {
+@objc final class BridgedBalanceViewBindingType: NSObject {
     let state: PsiCashBalanceView.BindingType
 
     init(swiftState state: PsiCashBalanceView.BindingType) {
