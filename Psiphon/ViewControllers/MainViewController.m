@@ -92,12 +92,8 @@ NSString * const CommandStopVPN = @"StopVPN";
 
     // UI elements
     UILayoutGuide *viewWidthGuide;
-
     UILabel *statusLabel;
-
-#if DEBUG
     UIButton *versionLabel;
-#endif
     SubscriptionsBar *subscriptionsBar;
     RegionSelectionButton *regionSelectionButton;
     VPNStartAndStopButton *startAndStopButton;
