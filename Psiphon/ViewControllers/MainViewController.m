@@ -92,12 +92,8 @@ NSString * const CommandStopVPN = @"StopVPN";
 
     // UI elements
     UILayoutGuide *viewWidthGuide;
-
     UILabel *statusLabel;
-
-#if DEBUG
     UIButton *versionLabel;
-#endif
     SubscriptionsBar *subscriptionsBar;
     RegionSelectionButton *regionSelectionButton;
     VPNStartAndStopButton *startAndStopButton;
@@ -668,9 +664,7 @@ NSString * const CommandStopVPN = @"StopVPN";
     cloudMiddleRight = [[UIImageView alloc] initWithImage:cloud];
     cloudTopRight = [[UIImageView alloc] initWithImage:cloud];
     cloudBottomRight = [[UIImageView alloc] initWithImage:cloud];
-#if DEBUG
     versionLabel = [[UIButton alloc] init];
-#endif
     settingsButton = [[UIButton alloc] init];
     psiphonLargeLogo = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"PsiphonLogoWhite"]];
     psiphonTitle = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"PsiphonTitle"]];
@@ -690,9 +684,7 @@ NSString * const CommandStopVPN = @"StopVPN";
     [self.view addSubview:psiphonLargeLogo];
     [self.view addSubview:psiphonTitle];
     [self.view addSubview:psiCashWidget];
-#if DEBUG
     [self.view addSubview:versionLabel];
-#endif
     [self.view addSubview:settingsButton];
     [self.view addSubview:startAndStopButton];
     [self.view addSubview:statusLabel];
