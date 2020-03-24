@@ -111,7 +111,7 @@ func receiptReducer(
 fileprivate func notifyUpdatedReceipt(_ receiptData: ReceiptData?) -> Effect<Never> {
     .fireAndForget {
         Current.app.store.send(.subscription(.updatedReceiptData(receiptData)))
-        Current.app.store.send(.iap(.receiptUpdated))
+        Current.app.store.send(.iap(.receiptUpdated(receiptData)))
     }
 }
 
