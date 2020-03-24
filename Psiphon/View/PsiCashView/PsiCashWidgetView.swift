@@ -20,7 +20,7 @@
 import Foundation
 import UIKit
 
-@objc class PsiCashWidgetView: UIView {
+@objc final class PsiCashWidgetView: UIView {
 
     @objc let balanceView = PsiCashBalanceView(frame: CGRect.zero)
     @objc let speedBoostButton = SpeedBoostButton()

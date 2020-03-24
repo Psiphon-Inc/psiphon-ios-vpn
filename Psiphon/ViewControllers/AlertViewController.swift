@@ -19,7 +19,7 @@
 
 import UIKit
 
-class AlertViewController<T: ViewBuilder>: UIViewController {
+final class AlertViewController<T: ViewBuilder>: UIViewController {
 
     private let viewBuilder: T
     var bindable: T.BuildType?

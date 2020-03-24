@@ -19,7 +19,7 @@
 
 import Foundation
 
-class UserDefaultsConfig {
+final class UserDefaultsConfig {
 
     @JSONUserDefault(.standard, "subscription_data_v1", defaultValue: .none)
     var subscriptionData: SubscriptionData?

@@ -77,7 +77,7 @@ func productRequestReducer(
     }
 }
 
-class ProductRequestDelegate: StoreDelegate<ProductRequestAction>, SKProductsRequestDelegate {
+final class ProductRequestDelegate: StoreDelegate<ProductRequestAction>, SKProductsRequestDelegate {
     
     func productsRequest(_ request: SKProductsRequest, didReceive response: SKProductsResponse) {
         sendOnMain(.productRequestResult(request, .success(response)))

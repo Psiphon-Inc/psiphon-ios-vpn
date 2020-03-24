@@ -235,7 +235,7 @@ func iapReducer(state: inout IAPReducerState, action: IAPAction) -> [Effect<IAPA
 /// Delegate for StoreKit transactions.
 /// - Note: There is no callback from StoreKit if purchasing a product that is already
 /// purchased.
-class PaymentTransactionDelegate: StoreDelegate<TransactionUpdate>,
+final class PaymentTransactionDelegate: StoreDelegate<TransactionUpdate>,
 SKPaymentTransactionObserver {
     
     // Sent when transactions are removed from the queue (via finishTransaction:).
