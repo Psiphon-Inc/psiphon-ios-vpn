@@ -119,6 +119,7 @@ NSString * const CommandStopVPN = @"StopVPN";
     // Psiphon Logo
     // Replaces the PsiCash UI when the user is subscribed
     UIImageView *psiphonLargeLogo;
+    UIImageView *psiphonTitle;
 
     // PsiCash
     PsiCashWidgetView *psiCashWidget;
@@ -201,10 +202,9 @@ NSString * const CommandStopVPN = @"StopVPN";
     [self setupWidthLayoutGuide];
     [self addViews];
     [self setupClouds];
-#if DEBUG
     [self setupVersionLabel];
-#endif
     [self setupPsiphonLogoView];
+    [self setupPsiphonTitle];
     [self setupStartAndStopButton];
     [self setupStatusLabel];
     [self setupRegionSelectionButton];
@@ -673,6 +673,7 @@ NSString * const CommandStopVPN = @"StopVPN";
 #endif
     settingsButton = [[UIButton alloc] init];
     psiphonLargeLogo = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"PsiphonLogoWhite"]];
+    psiphonTitle = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"PsiphonTitle"]];
     psiCashWidget = [[PsiCashWidgetView alloc] initWithFrame:CGRectZero];
     startAndStopButton = [VPNStartAndStopButton buttonWithType:UIButtonTypeCustom];
     statusLabel = [[UILabel alloc] init];
@@ -687,6 +688,7 @@ NSString * const CommandStopVPN = @"StopVPN";
     [self.view addSubview:cloudTopRight];
     [self.view addSubview:cloudBottomRight];
     [self.view addSubview:psiphonLargeLogo];
+    [self.view addSubview:psiphonTitle];
     [self.view addSubview:psiCashWidget];
 #if DEBUG
     [self.view addSubview:versionLabel];
@@ -953,29 +955,33 @@ NSString * const CommandStopVPN = @"StopVPN";
 
 }
 
-#if DEBUG
 - (void)setupVersionLabel {
+    CGFloat padding = 10.0f;
+    
     versionLabel.translatesAutoresizingMaskIntoConstraints = NO;
-    [versionLabel setTitle:[NSString stringWithFormat:@"v%@",[[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"]]
+    [versionLabel setTitle:[NSString stringWithFormat:@"V.%@",
+                            [[NSBundle mainBundle]
+                             objectForInfoDictionaryKey:@"CFBundleShortVersionString"]]
                   forState:UIControlStateNormal];
     [versionLabel setTitleColor:UIColor.nepalGreyBlueColor forState:UIControlStateNormal];
     versionLabel.titleLabel.adjustsFontSizeToFitWidth = YES;
-    versionLabel.titleLabel.font = [UIFont avenirNextBold:10.5f];
+    versionLabel.titleLabel.font = [UIFont avenirNextBold:12.f];
     versionLabel.userInteractionEnabled = FALSE;
-    versionLabel.contentEdgeInsets = UIEdgeInsetsMake(10.f, 10.f, 10.f, 10.f);
+    versionLabel.contentEdgeInsets = UIEdgeInsetsMake(padding, padding, padding, padding);
 
+# if DEBUG
     versionLabel.userInteractionEnabled = TRUE;
     [versionLabel addTarget:self
                      action:@selector(onVersionLabelTap:)
            forControlEvents:UIControlEventTouchUpInside];
-
+#endif
     // Setup autolayout
     [NSLayoutConstraint activateConstraints:@[
-      [versionLabel.leadingAnchor constraintEqualToAnchor:viewWidthGuide.leadingAnchor],
-      [versionLabel.topAnchor constraintEqualToAnchor:psiCashWidget.bottomAnchor constant:10.f]
+      [versionLabel.trailingAnchor constraintEqualToAnchor:psiCashWidget.trailingAnchor
+                                                  constant:padding + 15.f],
+      [versionLabel.topAnchor constraintEqualToAnchor:psiphonTitle.topAnchor constant:-padding]
     ]];
 }
-#endif
 
 - (void)setupSubscriptionsBar {
     [subscriptionsBar addTarget:self
@@ -1124,14 +1130,41 @@ NSString * const CommandStopVPN = @"StopVPN";
     if (@available(iOS 11.0, *)) {
         [psiphonLargeLogo.centerXAnchor
          constraintEqualToAnchor:self.view.safeAreaLayoutGuide.centerXAnchor].active = TRUE;
-        [psiphonLargeLogo.topAnchor
-         constraintEqualToAnchor:self.view.safeAreaLayoutGuide.topAnchor
-         constant:offset].active = TRUE;
     } else {
         [psiphonLargeLogo.centerXAnchor
          constraintEqualToAnchor:self.view.centerXAnchor].active = TRUE;
-        [psiphonLargeLogo.topAnchor
-         constraintEqualToAnchor:self.view.topAnchor constant:offset].active = TRUE;
+    }
+    
+    [psiphonLargeLogo.topAnchor
+     constraintEqualToAnchor:psiphonTitle.bottomAnchor
+     constant:offset].active = TRUE;
+}
+
+- (void)setupPsiphonTitle {
+    psiphonTitle.translatesAutoresizingMaskIntoConstraints = NO;
+    psiphonTitle.contentMode = UIViewContentModeScaleAspectFit;
+    
+    CGFloat topPadding = 15.0;
+    CGFloat leadingPadding = 15.0;
+    
+    if (@available(iOS 11.0, *)) {
+        [NSLayoutConstraint activateConstraints:@[
+            [psiphonTitle.leadingAnchor
+             constraintEqualToAnchor:self.view.safeAreaLayoutGuide.leadingAnchor
+             constant:leadingPadding],
+            [psiphonTitle.topAnchor
+            constraintEqualToAnchor:self.view.safeAreaLayoutGuide.topAnchor
+            constant:topPadding]
+        ]];
+    } else {
+        [NSLayoutConstraint activateConstraints:@[
+            [psiphonTitle.leadingAnchor
+             constraintEqualToAnchor:psiCashWidget.leadingAnchor
+             constant:leadingPadding],
+            [psiphonTitle.topAnchor
+            constraintEqualToAnchor:self.view.topAnchor
+            constant:topPadding]
+        ]];
     }
 }
 
@@ -1140,8 +1173,8 @@ NSString * const CommandStopVPN = @"StopVPN";
 
     [NSLayoutConstraint activateConstraints:@[
         [psiCashWidget.centerXAnchor constraintEqualToAnchor:self.view.centerXAnchor],
-        [psiCashWidget.topAnchor constraintEqualToAnchor:self.topLayoutGuide.bottomAnchor
-                                                constant:26],
+        [psiCashWidget.topAnchor constraintEqualToAnchor:psiphonTitle.bottomAnchor
+                                                constant:25.0],
         [psiCashWidget.leadingAnchor constraintEqualToAnchor:viewWidthGuide.leadingAnchor],
         [psiCashWidget.trailingAnchor constraintEqualToAnchor:viewWidthGuide.trailingAnchor]
     ]];
