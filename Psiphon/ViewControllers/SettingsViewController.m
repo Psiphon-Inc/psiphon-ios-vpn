@@ -242,7 +242,8 @@ NSString * const SettingsResetAdConsentCellSpecifierKey = @"settingsResetAdConse
 #pragma mark - Callbacks
 
 - (void)openPsiCashViewController {
-    UIViewController *psiCashViewController = [SwiftDelegate.bridge createPsiCashViewController];
+    UIViewController *psiCashViewController = [SwiftDelegate.bridge
+                                               createPsiCashViewController:TabsSpeedBoost];
     [self presentViewController:psiCashViewController animated:YES completion:nil];
 }
 

@@ -53,7 +53,9 @@ import Promises
     @objc func applicationDidFinishLaunching(_ application: UIApplication)
     @objc func applicationWillEnterForeground(_ application: UIApplication)
     @objc func applicationWillTerminate(_ application: UIApplication)
-    @objc func createPsiCashViewController() -> UIViewController?
+    @objc func createPsiCashViewController(
+        _ initialTab: PsiCashViewController.Tabs
+    ) -> UIViewController?
     @objc func getCustomRewardData(_ callback: @escaping (String?) -> Void)
     @objc func resetLandingPage()
     @objc func showLandingPage()
