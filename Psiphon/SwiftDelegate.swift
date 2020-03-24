@@ -30,7 +30,6 @@ enum AppDelegateAction {
 struct AppDelegateReducerState: Equatable {
     var psiCashBalance: PsiCashBalance
     var psiCash: PsiCashState
-    var receiptData: ReceiptData?
 }
 
 func appDelegateReducer(
