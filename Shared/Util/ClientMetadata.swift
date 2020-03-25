@@ -51,7 +51,7 @@ struct ClientMetaData: Encodable {
     }()
 }
 
-@objc class ObjCClientMetaData: NSObject {
+@objc final class ObjCClientMetaData: NSObject {
     @objc class func httpHeaderField() -> String {
         return VerifierRequestMetadataHttpHeaderField
     }
