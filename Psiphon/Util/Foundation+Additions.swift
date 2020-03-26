@@ -368,7 +368,7 @@ struct UserDefault<T> {
 
 @propertyWrapper
 struct JSONUserDefault<T: Codable> {
-    let logType = LogType("JSONUserDefault")
+    let logType = LogTag("JSONUserDefault")
     let key: String
     let defaultValue: T
     let store: UserDefaults
