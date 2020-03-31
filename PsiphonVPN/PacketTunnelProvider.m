@@ -56,6 +56,10 @@
 
 NSErrorDomain _Nonnull const PsiphonTunnelErrorDomain = @"PsiphonTunnelErrorDomain";
 
+// UserDefaults key for the ID of the last authorization obtained from the verifier server.
+NSString *_Nonnull const UserDefaultsLastAuthID = @"LastAuthID";
+NSString *_Nonnull const UserDefaultsLastAuthAccessType = @"LastAuthAccessType";
+
 PsiFeedbackLogType const SubscriptionCheckLogType = @"SubscriptionCheck";
 PsiFeedbackLogType const ExtensionNotificationLogType = @"ExtensionNotification";
 PsiFeedbackLogType const PsiphonTunnelDelegateLogType = @"PsiphonTunnelDelegate";
@@ -239,17 +243,20 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
     // Otherwise, it combines information from local subscription check and information received from the tunnel,
     // to determine how the subscription check should be performed. (i.e. does remote server need to be contacted).
     //
-    RACSignal<NSNumber *> *subscriptionCheckSignal = [[RACSignal return:[NSNumber numberWithBool:remoteCheckForced]]
+    RACSignal<LocalSubscriptionCheckResult *> *subscriptionCheckSignal = [[RACSignal return:[NSNumber numberWithBool:remoteCheckForced]]
       flattenMap:^RACSignal *(NSNumber *forceBoolValue) {
+
           if ([forceBoolValue boolValue]) {
-              return [RACSignal return:@(SubscriptionCheckShouldUpdateAuthorization)];
+              return [RACSignal return:[LocalSubscriptionCheckResult localSubscriptionCheckResult:@(SubscriptionCheckShouldUpdateAuthorization)
+                                                                                           reason:@"forced"]];
           } else {
               return [[self->subscriptionAuthorizationActiveSubject
                 take:1]
                 flattenMap:^RACSignal *(NSNumber *authorizationStatus) {
                     if ([authorizationStatus integerValue] == SubscriptionAuthorizationStatusRejected) {
                         // Previous subscription authorization sent is not active, should contact subscription server.
-                        return [RACSignal return:@(SubscriptionCheckShouldUpdateAuthorization)];
+                        return [RACSignal return:[LocalSubscriptionCheckResult localSubscriptionCheckResult:@(SubscriptionCheckShouldUpdateAuthorization)
+                                                                                                     reason:@"authorizationStatusRejected"]];
                     } else {
                         // Either no subscription authorization was passed or it was valid.
                         return [SubscriptionVerifierService localSubscriptionCheck];
@@ -278,9 +285,16 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
           // of type SubscriptionCheckEnum.
           return subscriptionCheckSignal;
       }]
-      flattenMap:^RACSignal<SubscriptionResultModel *> *(NSNumber *subscriptionCheckObject) {
+      flattenMap:^RACSignal<SubscriptionResultModel *> *(LocalSubscriptionCheckResult *localSubscriptionCheck) {
 
-          switch ((SubscriptionCheckEnum) [subscriptionCheckObject integerValue]) {
+          // Create request metadata to include with request for logging on the verifier server.
+          SubscriptionVerifierRequestMetadata *subscriptionVerifierRequestMetadata = [[SubscriptionVerifierRequestMetadata alloc] init];
+          subscriptionVerifierRequestMetadata.reason = localSubscriptionCheck.reason;
+          subscriptionVerifierRequestMetadata.extensionStartReason = [[self extensionStartMethodTextDescription] lowercaseString];
+          subscriptionVerifierRequestMetadata.lastAuthId = [[NSUserDefaults standardUserDefaults] objectForKey:UserDefaultsLastAuthID];
+          subscriptionVerifierRequestMetadata.lastAuthAccessType = [[NSUserDefaults standardUserDefaults] objectForKey:UserDefaultsLastAuthAccessType];
+
+          switch ((SubscriptionCheckEnum) [localSubscriptionCheck.subscriptionCheckEnum integerValue]) {
               case SubscriptionCheckAuthorizationExpired:
                   [PsiFeedbackLogger infoWithType:SubscriptionCheckLogType message:@"authorization expired"];
                   return [RACSignal return:[SubscriptionResultModel failed:SubscriptionResultErrorExpired]];
@@ -295,7 +309,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 
                   // Emits an item whose value is the dictionary returned from the subscription verifier server,
                   // emits an error on all errors.
-                  return [[[[SubscriptionVerifierService updateAuthorizationFromRemote]
+                  return [[[[SubscriptionVerifierService updateAuthorizationFromRemoteWithRequestMetadata:subscriptionVerifierRequestMetadata]
                     retryWhen:^RACSignal *(RACSignal *errors) {
                         return [[errors
                           zipWith:[RACSignal rangeStartFrom:1 count:networkRetryCount]]
@@ -307,6 +321,10 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
                               }
                               // Exponential backoff.
                               [PsiFeedbackLogger errorWithType:SubscriptionCheckLogType message:@"retry authorization request" object:retryCountTuple.first];
+
+                              // Add retry metadata to next request.
+                              subscriptionVerifierRequestMetadata.previousRequestError = retryCountTuple.first;
+                              subscriptionVerifierRequestMetadata.retryNumber = retryCountTuple.second.integerValue;
 
                               return [[RACSignal timer:pow(4, [retryCountTuple.second integerValue])] flattenMap:^RACSignal *(id value) {
                                   // Make sure tunnel is connected before retrying, otherwise terminate subscription chain.
@@ -334,7 +352,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
                     }];
 
               default:
-                  [PsiFeedbackLogger errorWithType:SubscriptionCheckLogType message:@"unhandled check value %@", subscriptionCheckObject];
+                  [PsiFeedbackLogger errorWithType:SubscriptionCheckLogType message:@"unhandled check value %@", localSubscriptionCheck.subscriptionCheckEnum];
                   [weakSelf exitGracefully];
                   return [RACSignal empty];
           }
@@ -422,6 +440,13 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
               }
 
               if (subscription.authorization) {
+                  // Persist select authorization information so it can be included in the next
+                  // request to the verifier server for logging.
+                  [[NSUserDefaults standardUserDefaults] setObject:subscription.authorization.ID
+                                                            forKey:UserDefaultsLastAuthID];
+                  [[NSUserDefaults standardUserDefaults] setObject:subscription.authorization.accessType
+                                                            forKey:UserDefaultsLastAuthAccessType];
+
                   // New authorization was received from the subscription verifier server.
                   // Restarts the tunnel to connect with the new authorization only if it is different from
                   // the authorization in use by the tunnel.

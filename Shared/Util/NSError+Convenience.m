@@ -38,4 +38,37 @@
     return [NSError errorWithDomain:domain code:code userInfo:errorDict];
 }
 
+- (NSDictionary<NSString *, id> *)jsonSerializableDictionaryRepresentation {
+    NSMutableDictionary *d = [[NSMutableDictionary alloc] init];
+
+    [d setObject:@(self.code) forKey:@"code"];
+
+    if (self.domain) {
+        [d setObject:self.domain forKey:@"domain"];
+    }
+
+    if (self.userInfo && [self.userInfo count] > 0) {
+        NSMutableDictionary *userInfo = [[NSMutableDictionary alloc] init];
+
+        id localizedDescription = [self.userInfo objectForKey:NSLocalizedDescriptionKey];
+        if (localizedDescription && [localizedDescription isKindOfClass:NSString.class]) {
+            [userInfo setObject:(NSString*)localizedDescription forKey:@"localized_description"];
+        }
+
+        id underlyingError = [self.userInfo objectForKey:NSUnderlyingErrorKey];
+        if (underlyingError && [underlyingError isKindOfClass:[NSError class]]) {
+            [userInfo setObject:[(NSError*)underlyingError jsonSerializableDictionaryRepresentation] forKey:@"underlying_error"];
+        }
+
+        id failureReason = [self.userInfo objectForKey:NSLocalizedFailureReasonErrorKey];
+        if (failureReason && [failureReason isKindOfClass:[NSString class]]) {
+            [userInfo setObject:(NSString*)failureReason forKey:@"failure_reason"];
+        }
+
+        [d setObject:userInfo forKey:@"user_info"];
+    }
+
+    return d;
+}
+
 @end
