@@ -23,6 +23,20 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+/// Type which represents result from `shouldUpdateAuthorization`
+@interface ShouldUpdateAuthResult : NSObject
+
+/// TRUE  if subscription verification server should be contacted, FALSE otherwise
+@property (nonatomic, assign) BOOL shouldUpdateAuth;
+
+/// Reason for the value in `shouldUpdateAuth`
+@property (nonatomic) NSString *reason;
+
++ (ShouldUpdateAuthResult *_Nonnull)shouldUpdateAuth:(BOOL)shouldUpdateAuth
+                                              reason:(NSString*)reason;
+
+@end
+
 @interface MutableSubscriptionData : SubscriptionData
 
 + (MutableSubscriptionData *_Nonnull)fromPersistedDefaults;
@@ -35,9 +49,9 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * @note This is a blocking function until the new state is persisted.
  *
- * @return TRUE if subscription verification server should be contacted, FALSE otherwise.
+ * @return ShouldUpdateAuthResult See comments for `ShouldUpdateAuthResult`.
  */
-- (BOOL)shouldUpdateAuthorization;
+- (ShouldUpdateAuthResult*)shouldUpdateAuthorization;
 
 /**
  * Convenience method for updating current subscription instance from the dictionary
