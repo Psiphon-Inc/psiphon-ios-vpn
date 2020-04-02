@@ -156,7 +156,7 @@ static inline void AddDarwinNotifyObserver(CFNotificationCenterRef center, const
         if (center) {
             CFNotificationCenterPostNotification(center, (__bridge CFStringRef)message, NULL, NULL, 0);
 
-            [PsiFeedbackLogger infoWithType:NotifierLogType message:@"sent [%@]", message];
+            [PsiFeedbackLogger infoWithType:NotifierLogType format:@"sent [%@]", message];
         }
     });
 
@@ -197,7 +197,7 @@ static inline void AddDarwinNotifyObserver(CFNotificationCenterRef center, const
 // Called on the main thread.
 - (void)notificationCallback:(NotifierMessage)message {
 
-    [PsiFeedbackLogger infoWithType:NotifierLogType message:@"received [%@]", message];
+    [PsiFeedbackLogger infoWithType:NotifierLogType format:@"received [%@]", message];
 
     // Since subscribers could potentially block the main thread, we will not block the main
     // thread to send the message to `messageSubject`.
