@@ -25,6 +25,7 @@ import UIKit
 
     private typealias IconType = EitherView<ImageViewBuidler, EitherView<Spinner, ButtonBuilder>>
 
+    private let psiCashPriceFormatter = PsiCashAmountFormatter(locale: Locale.current)
     private let title: UILabel
     private let iconContainer = UIView(frame: .zero)
     private let icon: IconType
@@ -104,7 +105,7 @@ import UIKit
 
     private func setAmount(_ amount: PsiCashAmount?) {
         if let amount = amount {
-            balance.text = Current.psiCashPriceFormatter.string(from: amount.inPsi)
+            balance.text = psiCashPriceFormatter.string(from: amount.inPsi)
         } else {
             balance.text = ""
         }

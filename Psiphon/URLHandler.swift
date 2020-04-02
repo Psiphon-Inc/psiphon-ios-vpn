@@ -21,12 +21,12 @@ import Foundation
 import  ReactiveSwift
 
 struct URLHandler {
-    let open: (RestrictedURL) -> Effect<Bool>
+    let open: (RestrictedURL, VPNManager) -> Effect<Bool>
 }
 
 extension URLHandler {
     static let `default` = URLHandler(
-        open: { url in
+        open: { url, vpnManager in
             Effect { observer, _ in
                 if Debugging.disableURLHandler {
                     observer.fulfill(value: true)
@@ -37,7 +37,7 @@ extension URLHandler {
                     /// Due to memory pressure, the network extension is at high risk of jetsamming before the landing page can be opened.
                     /// Tunnel status should be assessed directly (not through observables that might introduce some latency),
                     /// before opening the landing page.
-                    guard let landingPage = url.getValue(Current) else {
+                    guard let landingPage = url.getValue(vpnManager.tunnelProviderStatus) else {
                         observer.fulfill(value: false)
                         return
                     }

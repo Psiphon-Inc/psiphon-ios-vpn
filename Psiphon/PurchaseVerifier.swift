@@ -39,10 +39,11 @@ struct PurchaseVerifierServerEndpoints {
     }
 
     static func psiCash(
-        _ requestBody: PsiCashValidationRequest
+        request: PsiCashValidationRequest,
+        clientMetaData: ClientMetaData
     ) -> HTTPRequest<PsiCashValidationResponse>? {
-        return HTTPRequest.json(url: EndpointURL.psiCash.url, body: requestBody,
-                                clientMetaData: Current.clientMetaData.jsonString,
+        return HTTPRequest.json(url: EndpointURL.psiCash.url, body: request,
+                                clientMetaData: clientMetaData.jsonString,
                                 method: .post, response: PsiCashValidationResponse.self)
     }
 }
@@ -142,50 +143,54 @@ struct VerifiedPsiCashConsumableTransaction: Equatable {
 /// If all retries to the purchase verifier server failed, it is next retried after a new tunneled event.
 func verifyConsumable(
     transaction: UnverifiedPsiCashConsumableTransaction,
-    receipt: ReceiptData
+    receipt: ReceiptData,
+    vpnStatus: SignalProducer<NEVPNStatus, Never>,
+    psiCashEffects: PsiCashEffect,
+    clientMetaData: ClientMetaData
 ) -> Effect<VerifiedPsiCashConsumableTransaction> {
-    Current.vpnStatus.signalProducer
-    .skipRepeats()
-    .flatMap(.latest) { value
-        -> SignalProducer<VerifiedPsiCashConsumableTransaction, Never> in
-        let vpnStatus = Debugging.ignoreTunneledChecks ? .connected : value
-        guard case .connected = vpnStatus else {
-            return .never
-        }
-        return SignalProducer(value: Current.psiCashEffect.rewardedVideoCustomData())
-            .flatMap(.latest) { maybeCustomData in
-                guard let customData = maybeCustomData else {
-                    return .init(error: .requestBuildError(
-                        FatalError(message: "empty custom data")))
-                }
-                let maybeUrlRequest = PurchaseVerifierServerEndpoints.psiCash(
-                    PsiCashValidationRequest(
-                        transaction: transaction,
-                        receipt: receipt,
-                        customData: customData
+    vpnStatus
+        .skipRepeats()
+        .flatMap(.latest) { value
+            -> SignalProducer<VerifiedPsiCashConsumableTransaction, Never> in
+            let vpnStatus = Debugging.ignoreTunneledChecks ? .connected : value
+            guard case .connected = vpnStatus else {
+                return .never
+            }
+            return SignalProducer(value: psiCashEffects.rewardedVideoCustomData())
+                .flatMap(.latest) { maybeCustomData in
+                    guard let customData = maybeCustomData else {
+                        return .init(error: .requestBuildError(
+                            FatalError(message: "empty custom data")))
+                    }
+                    let maybeUrlRequest = PurchaseVerifierServerEndpoints.psiCash(
+                        request: PsiCashValidationRequest(
+                            transaction: transaction,
+                            receipt: receipt,
+                            customData: customData
+                        ),
+                        clientMetaData: clientMetaData
                     )
-                )
-                guard let urlRequest = maybeUrlRequest else {
-                    return .init(error: .requestBuildError(
-                        FatalError(message: "failed to create url request")))
-                }
-                return httpRequest(request: urlRequest)
-                    .flatMap(.latest, { (response: PsiCashValidationResponse) ->
-                        SignalProducer<(), PsiCashValidationResponse.ResponseError> in
-                        switch response.result {
-                        case .success:
-                            return .init(value: ())
-                        case .failure(let errorEvent):
-                            if response.shouldRetry {
-                                return .init(error: errorEvent.error)
-                            } else {
+                    guard let urlRequest = maybeUrlRequest else {
+                        return .init(error: .requestBuildError(
+                            FatalError(message: "failed to create url request")))
+                    }
+                    return httpRequest(request: urlRequest)
+                        .flatMap(.latest, { (response: PsiCashValidationResponse) ->
+                            SignalProducer<(), PsiCashValidationResponse.ResponseError> in
+                            switch response.result {
+                            case .success:
                                 return .init(value: ())
+                            case .failure(let errorEvent):
+                                if response.shouldRetry {
+                                    return .init(error: errorEvent.error)
+                                } else {
+                                    return .init(value: ())
+                                }
                             }
-                        }
-                    })
-                    .retry(upTo: 10, interval: 1.0, on: QueueScheduler.main)
-                    .map(value: VerifiedPsiCashConsumableTransaction(value: transaction.value))
-                    .mapError { .serverError($0) }
+                        })
+                        .retry(upTo: 10, interval: 1.0, on: QueueScheduler.main)
+                        .map(value: VerifiedPsiCashConsumableTransaction(value: transaction.value))
+                        .mapError { .serverError($0) }
             }
             .on(failed: { (error: ConsumableVerificationError) in
                 PsiFeedbackLogger.error(withType: "VerifyConsumable",
@@ -195,5 +200,5 @@ func verifyConsumable(
                 return .never
             }
     }
-    .take(first: 1)  // Since upstream signals do not complete, signal is terminated here.
+        .take(first: 1)  // Since upstream signals do not complete, signal is terminated here.
 }

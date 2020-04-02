@@ -52,23 +52,30 @@ enum ReceiptStateAction {
     case receiptRefreshed(Result<(), SystemErrorEvent>)
 }
 
+typealias ReceiptReducerEnvironment = (
+    appBundle: PsiphonBundle,
+    iapStore: (IAPAction) -> Effect<Never>,
+    subscriptionStore: (SubscriptionAction) -> Effect<Never>,
+    receiptRefreshRequestDelegate: ReceiptRefreshRequestDelegate
+)
+
 func receiptReducer(
-    state: inout ReceiptState, action: ReceiptStateAction
+    state: inout ReceiptState, action: ReceiptStateAction, environment: ReceiptReducerEnvironment
 ) -> [Effect<ReceiptStateAction>] {
     switch action {
     case .localReceiptRefresh:
-        let refreshedData = ReceiptData.fromLocalReceipt(Current.appBundle)
+        let refreshedData = ReceiptData.fromLocalReceipt(environment.appBundle)
         
         // Carries out notify effect if the receipt is nil after a local refresh.
         guard refreshedData != nil, state.receiptData != nil else {
-            return [ notifyUpdatedReceipt(state.receiptData).mapNever() ]
+            return notifyUpdatedReceiptEffects(state.receiptData, environment: environment)
         }
         
         guard refreshedData != state.receiptData else {
             return []
         }
         state.receiptData = refreshedData
-        return [ notifyUpdatedReceipt(state.receiptData).mapNever() ]
+        return notifyUpdatedReceiptEffects(state.receiptData, environment: environment)
         
     case .remoteReceiptRefresh(optinalPromise: let optionalPromise):
         if let promise = optionalPromise {
@@ -84,7 +91,7 @@ func receiptReducer(
         state.receiptRefereshRequestObject = request
         return [
             .fireAndForget {
-                request.delegate = Current.receiptRefreshDelegate
+                request.delegate = environment.receiptRefreshRequestDelegate
                 request.start()
             }
         ]
@@ -94,7 +101,7 @@ func receiptReducer(
         state.remoteReceiptRefreshState = .completed(result.mapToUnit())
         state.receiptRefereshRequestObject = nil
         
-        let refreshedData = join(result.map { ReceiptData.fromLocalReceipt(Current.appBundle) }
+        let refreshedData = join(result.map { ReceiptData.fromLocalReceipt(environment.appBundle) }
             .projectSuccess())
 
         // Creates effect for fulling receipt refresh promises.
@@ -106,19 +113,21 @@ func receiptReducer(
             return effects
         }
         state.receiptData = refreshedData
-        effects.append(
-            notifyUpdatedReceipt(refreshedData).mapNever()
+        effects.append(contentsOf:
+            notifyUpdatedReceiptEffects(refreshedData, environment: environment)
         )
         return effects
     }
     
 }
 
-fileprivate func notifyUpdatedReceipt(_ receiptData: ReceiptData?) -> Effect<Never> {
-    .fireAndForget {
-        Current.app.store.send(.subscription(.updatedReceiptData(receiptData)))
-        Current.app.store.send(.iap(.receiptUpdated(receiptData)))
-    }
+fileprivate func notifyUpdatedReceiptEffects<NeverAction>(
+    _ receiptData: ReceiptData?, environment: ReceiptReducerEnvironment
+) -> [Effect<NeverAction>] {
+    return [
+        environment.subscriptionStore(.updatedReceiptData(receiptData)).mapNever(),
+        environment.iapStore(.receiptUpdated(receiptData)).mapNever()
+    ]
 }
 
 /// Default delegate for StoreKit receipt refresh request: `SKReceiptRefreshRequest`.

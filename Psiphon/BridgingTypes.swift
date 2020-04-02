@@ -49,8 +49,8 @@ import Promises
 /// Inteface for AppDelegate functionality implemented in Swift and called from ObjC.
 @objc protocol SwiftBridgeDelegate {
     @objc static var bridge: SwiftBridgeDelegate { get }
-    @objc func set(objcBridge: ObjCBridgeDelegate)
-    @objc func applicationDidFinishLaunching(_ application: UIApplication)
+    @objc func applicationDidFinishLaunching(_ application: UIApplication,
+                                             objcBridge: ObjCBridgeDelegate)
     @objc func applicationWillEnterForeground(_ application: UIApplication)
     @objc func applicationWillTerminate(_ application: UIApplication)
     @objc func createPsiCashViewController(

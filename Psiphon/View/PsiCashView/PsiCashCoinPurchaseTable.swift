@@ -58,6 +58,7 @@ UITableViewDelegate {
 
     private let PurchaseCellID = "PurchaseCellID"
     private let TermsCellID = "TermsCellID"
+    private let priceFormatter = CurrencyFormatter(locale: Locale.current)
     private var data: [PsiCashPurchasableViewModel]
     private let table: UITableView
     private let purchaseHandler: (PsiCashPurchasableViewModel.ProductType) -> Void
@@ -105,7 +106,8 @@ UITableViewDelegate {
             let cell = tableView.dequeueReusableCell(withIdentifier: PurchaseCellID, for: indexPath)
             let cellData = data[indexPath.row]
             if !cell.hasContent {
-                let content = PurchaseCellContent(clickHandler: self.purchaseHandler)
+                let content = PurchaseCellContent(priceFormatter: self.priceFormatter,
+                                                  clickHandler: self.purchaseHandler)
                 cell.contentView.addSubview(content)
                 content.activateConstraints {
                     $0.matchParentConstraints(bottom: -10)
@@ -157,13 +159,16 @@ fileprivate func addTermsView(toCell cell: UITableViewCell) {
 fileprivate final class PurchaseCellContent: UIView, Bindable {
     private let topPad: Float = 14
     private let bottomPad: Float = -14
+    private let priceFormatter: CurrencyFormatter
     private let titleLabel: UILabel
     private let subtitleLabel: UILabel
     private let button: GradientButton
     private let spinner: UIActivityIndicatorView
     private let clickHandler: (PsiCashPurchasableViewModel.ProductType) -> Void
 
-    init(clickHandler: @escaping (PsiCashPurchasableViewModel.ProductType) -> Void) {
+    init(priceFormatter: CurrencyFormatter,
+         clickHandler: @escaping (PsiCashPurchasableViewModel.ProductType) -> Void) {
+        self.priceFormatter = priceFormatter
         self.clickHandler = clickHandler
         titleLabel = UILabel.make(fontSize: .h3, typeface: .bold)
         subtitleLabel = UILabel.make(fontSize: .normal)
@@ -248,7 +253,7 @@ fileprivate final class PurchaseCellContent: UIView, Bindable {
         if newValue.price == 0.0 {
             button.setTitle(UserStrings.Free(), for: .normal)
         } else {
-            button.setTitle(Current.priceFormatter.string(from: NSNumber(value: newValue.price))!,
+            button.setTitle(priceFormatter.string(from: NSNumber(value: newValue.price))!,
                             for: .normal)
         }
 

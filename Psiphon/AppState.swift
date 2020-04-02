@@ -20,6 +20,48 @@
 import Foundation
 import ReactiveSwift
 
+#if DEBUG
+var Debugging = DebugFlags()
+#else
+var Debugging = DebugFlags.disabled()
+#endif
+
+var Style = AppStyle()
+
+/// A verified stricter set of `Bundle` properties.
+struct PsiphonBundle {
+    let bundleIdentifier: String
+    let appStoreReceiptURL: URL
+    
+    /// Validates app's environment give the assumptions made in the app for certain invariants to hold true.
+    /// - Note: Stops program execution if any of the vaidations fail.
+    static func from(bundle: Bundle) -> PsiphonBundle {
+        return PsiphonBundle(bundleIdentifier: bundle.bundleIdentifier!,
+                             appStoreReceiptURL: bundle.appStoreReceiptURL!)
+    }
+}
+
+struct DebugFlags {
+    var mainThreadChecks = true
+    var disableURLHandler = true
+    var devServers = true
+    var ignoreTunneledChecks = false
+    
+    var printStoreLogs = false
+    var printAppState = true
+    var printHttpRequests = true
+    
+    static func disabled() -> Self {
+        return .init(mainThreadChecks: false,
+                     disableURLHandler: false,
+                     devServers: false,
+                     ignoreTunneledChecks: false,
+                     printStoreLogs: false,
+                     printAppState: false,
+                     printHttpRequests: false)
+    }
+}
+
 /// Represents UIViewController's that can be dismissed.
 @objc enum DismissableScreen: Int {
     case psiCash
@@ -57,26 +99,204 @@ enum AppAction {
     case productRequest(ProductRequestAction)
 }
 
-// MARK: Application
+// MARK: Environemnt
 
-let appReducer: Reducer<AppState, AppAction> =
-    combine(
-        pullback(psiCashReducer, value: \.psiCashReducerState, action: \.psiCash),
-        pullback(landingPageReducer, value: \.landingPageReducerState, action: \.landingPage),
-        pullback(iapReducer, value: \.iapReducerState, action: \.inAppPurchase),
-        pullback(receiptReducer, value: \.appReceipt, action: \.appReceipt),
-        pullback(subscriptionReducer, value: \.subscription, action: \.subscription),
-        pullback(productRequestReducer, value: \.products, action: \.productRequest),
-        pullback(appDelegateReducer, value: \.appDelegateReducerState, action: \.appDelegateAction)
+extension VPNManager {
+    var tunneled: Bool {
+        if Debugging.ignoreTunneledChecks { return true }
+        return self.tunnelProviderStatus == .connected
+    }
+}
+
+typealias AppEnvironment = (
+    appBundle: PsiphonBundle,
+    psiCashEffects: PsiCashEffect,
+    clientMetaData: ClientMetaData,
+    sharedDB: PsiphonDataSharedDB,
+    userConfigs: UserDefaultsConfig,
+    notifier: Notifier,
+    vpnManager: VPNManager,
+    vpnStatusSignal: SignalProducer<NEVPNStatus, Never>,
+    psiCashAuthPackageSignal: SignalProducer<PsiCashAuthPackage, Never>,
+    urlHandler: URLHandler,
+    paymentQueue: PaymentQueue,
+    objcBridgeDelegate: ObjCBridgeDelegate,
+    receiptRefreshRequestDelegate: ReceiptRefreshRequestDelegate,
+    paymentTransactionDelegate: PaymentTransactionDelegate,
+    rewardedVideoAdBridgeDelegate: RewardedVideoAdBridgeDelegate,
+    productRequestDelegate: ProductRequestDelegate,
+    psiCashStore: (PsiCashAction) -> Effect<Never>,
+    appReceiptStore: (ReceiptStateAction) -> Effect<Never>,
+    iapStore: (IAPAction) -> Effect<Never>,
+    subscriptionStore: (SubscriptionAction) -> Effect<Never>
 )
 
-/// Represents an application that has finished loading.
-final class Application {
-    private(set) var store: Store<AppState, AppAction>
-
-    /// - Parameter objcHandler: Handles `ObjcAction` type. Always called from the main thread.
-    init(initalState: AppState, reducer: @escaping Reducer<AppState, AppAction>) {
-        self.store = Store(initialValue: initalState, reducer: reducer)
+/// Creates required environment for store `Store<AppState, AppAction>`.
+/// - Returns: Tuple (environment, cleanup). `cleanup` should be called
+/// in `applicationWillTerminate(:_)` delegate callback.
+func makeEnvironment(
+    store: Store<AppState, AppAction>,
+    vpnStatus: State<NEVPNStatus>,
+    psiCashLib: PsiCash,
+    objcBridgeDelegate: ObjCBridgeDelegate,
+    rewardedVideoAdBridgeDelegate: RewardedVideoAdBridgeDelegate
+) -> (environment: AppEnvironment, cleanup: () -> Void) {
+    
+    let paymentTransactionDelegate = PaymentTransactionDelegate(store:
+        store.projection(
+            value: erase,
+            action: { .iap(.transactionUpdate($0)) })
+    )
+    SKPaymentQueue.default().add(paymentTransactionDelegate)
+    
+    let environment = AppEnvironment(
+        appBundle: PsiphonBundle.from(bundle: Bundle.main),
+        psiCashEffects: PsiCashEffect(psiCash: psiCashLib),
+        clientMetaData: ClientMetaData(),
+        sharedDB: PsiphonDataSharedDB(forAppGroupIdentifier: APP_GROUP_IDENTIFIER),
+        userConfigs: UserDefaultsConfig(),
+        notifier:  Notifier.sharedInstance(),
+        vpnManager:  VPNManager.sharedInstance(),
+        vpnStatusSignal: vpnStatus.signalProducer,
+        psiCashAuthPackageSignal: store.$value.signalProducer.map(\.psiCash.libData.authPackage),
+        urlHandler: .default,
+        paymentQueue: .default,
+        objcBridgeDelegate: objcBridgeDelegate,
+        receiptRefreshRequestDelegate: ReceiptRefreshRequestDelegate(store:
+            store.projection(
+                value: erase,
+                action: { .appReceipt($0) })
+        ),
+        paymentTransactionDelegate: paymentTransactionDelegate,
+        rewardedVideoAdBridgeDelegate: rewardedVideoAdBridgeDelegate,
+        productRequestDelegate: ProductRequestDelegate(store:
+            store.projection(
+                value: erase,
+                action: { .productRequest($0) })
+        ),
+        psiCashStore: { [unowned store] (action: PsiCashAction) -> Effect<Never> in
+            .fireAndForget {
+                store.send(.psiCash(action))
+            }
+        },
+        appReceiptStore: { [unowned store] (action: ReceiptStateAction) -> Effect<Never> in
+            .fireAndForget {
+                store.send(.appReceipt(action))
+            }
+        },
+        iapStore: { [unowned store] (action: IAPAction) -> Effect<Never> in
+            .fireAndForget {
+                store.send(.iap(action))
+            }
+        },
+        subscriptionStore: { [unowned store] (action: SubscriptionAction) -> Effect<Never> in
+            .fireAndForget {
+                store.send(.subscription(action))
+            }
+        }
+    )
+    
+    let cleanup = { [paymentTransactionDelegate] in
+        SKPaymentQueue.default().remove(paymentTransactionDelegate)
     }
+    
+    return (environment: environment, cleanup: cleanup)
+}
 
+fileprivate func toPsiCashEnvironment(env: AppEnvironment) -> PsiCashEnvironment {
+    PsiCashEnvironment(
+        psiCashEffects: env.psiCashEffects,
+        sharedDB: env.sharedDB,
+        userConfigs: env.userConfigs,
+        notifier: env.notifier,
+        vpnManager: env.vpnManager,
+        objcBridgeDelegate: env.objcBridgeDelegate,
+        rewardedVideoAdBridgeDelegate: env.rewardedVideoAdBridgeDelegate
+    )
+}
+
+fileprivate func toLandingPageEnvironment(env: AppEnvironment) -> LandingPageEnvironment {
+    LandingPageEnvironment(
+        sharedDB: env.sharedDB,
+        urlHandler: env.urlHandler,
+        psiCashEffects: env.psiCashEffects,
+        vpnManager: env.vpnManager,
+        vpnStatusSignal: env.vpnStatusSignal,
+        psiCashAuthPackageSignal: env.psiCashAuthPackageSignal
+    )
+}
+
+fileprivate func toIAPReducerEnvironment(env: AppEnvironment) -> IAPEnvironment {
+    IAPEnvironment(
+        vpnStatus: env.vpnStatusSignal,
+        psiCashEffects: env.psiCashEffects,
+        clientMetaData: env.clientMetaData,
+        paymentQueue: env.paymentQueue,
+        userConfigs: env.userConfigs,
+        psiCashStore: env.psiCashStore,
+        appReceiptStore: env.appReceiptStore
+    )
+}
+
+fileprivate func toReceiptReducerEnvironment(env: AppEnvironment) -> ReceiptReducerEnvironment {
+    ReceiptReducerEnvironment(
+        appBundle: env.appBundle,
+        iapStore: env.iapStore,
+        subscriptionStore: env.subscriptionStore,
+        receiptRefreshRequestDelegate: env.receiptRefreshRequestDelegate
+    )
+}
+
+fileprivate func toSubscriptionReducerEnvironment(env: AppEnvironment) -> SubscriptionReducerEnvironment {
+    SubscriptionReducerEnvironment(
+        notifier: env.notifier,
+        sharedDB: env.sharedDB,
+        userConfigs: env.userConfigs,
+        appReceiptStore: env.appReceiptStore
+    )
+}
+
+fileprivate func toAppDelegateReducerEnvironment(env: AppEnvironment) -> AppDelegateEnvironment {
+    AppDelegateEnvironment(
+        userConfigs: env.userConfigs,
+        sharedDB: env.sharedDB,
+        psiCashEffects: env.psiCashEffects,
+        paymentQueue: env.paymentQueue,
+        appReceiptStore: env.appReceiptStore,
+        psiCashStore: env.psiCashStore,
+        paymentTransactionDelegate: env.paymentTransactionDelegate
+    )
+}
+
+func makeAppReducer() -> Reducer<AppState, AppAction, AppEnvironment> {
+    combine(
+        pullback(psiCashReducer,
+                 value: \.psiCashReducerState,
+                 action: \.psiCash,
+                 environment: toPsiCashEnvironment(env:)),
+        pullback(landingPageReducer,
+                 value: \.landingPageReducerState,
+                 action: \.landingPage,
+                 environment: toLandingPageEnvironment(env:)),
+        pullback(iapReducer,
+                 value: \.iapReducerState,
+                 action: \.inAppPurchase,
+                 environment: toIAPReducerEnvironment(env:)),
+        pullback(receiptReducer,
+                 value: \.appReceipt,
+                 action: \.appReceipt,
+                 environment: toReceiptReducerEnvironment(env:)),
+        pullback(subscriptionReducer,
+                 value: \.subscription,
+                 action: \.subscription,
+                 environment: toSubscriptionReducerEnvironment(env:)),
+        pullback(productRequestReducer,
+                 value: \.products,
+                 action: \.productRequest,
+                 environment: { $0.productRequestDelegate }),
+        pullback(appDelegateReducer,
+                 value: \.appDelegateReducerState,
+                 action: \.appDelegateAction,
+                 environment: toAppDelegateReducerEnvironment(env:))
+    )
 }

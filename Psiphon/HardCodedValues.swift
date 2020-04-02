@@ -19,55 +19,32 @@
 
 import Foundation
 
-struct HardCodedValues {
-    let psiCash = PsiCashHardCodedValues()
-    let supportedSpeedBoosts = PsiCashSpeedBoostSupportedProducts()
-    let subscription = SubscriptionHardCodedValues()
-}
-
 struct PsiCashHardCodedValues {
-    let videoAdRewardAmount = PsiCashAmount(nanoPsi: Int64(35e9))
-    let videoAdRewardTitle = "35 PsiCash"
+    static let videoAdRewardAmount = PsiCashAmount(nanoPsi: Int64(35e9))
+    static let videoAdRewardTitle = "35 PsiCash"
     /// Amount of time to wait for PsiCash to have an earner token for modifying .
-    let getEarnerTokenTimeout: DispatchTimeInterval = .seconds(5)
+    static let getEarnerTokenTimeout: DispatchTimeInterval = .seconds(5)
 }
 
 struct SubscriptionHardCodedValues {
     /// Timer leeway.
-    let leeway: DispatchTimeInterval = .seconds(10)
+    static let leeway: DispatchTimeInterval = .seconds(10)
 
     /// Minimum time interval in seconds before the subscription expires
     /// that will trigger a forced subscription check in the network extension.
-    let notifierMinSubDuration: TimeInterval = 60.0  // 60 seconds
+    static let notifierMinSubDuration: TimeInterval = 60.0  // 60 seconds
     
     /// Minimum time left of a subscription to still be considered active.
-    let subscriptionUIMinTime: TimeInterval = 1.0  // 1 second
+    static let subscriptionUIMinTime: TimeInterval = 1.0  // 1 second
     
     /// Minimum amount of time left on a subscription to do a subscription check.
-    let subscriptionCheckMinTime: TimeInterval = 60.0  // 60 seconds
+    static let subscriptionCheckMinTime: TimeInterval = 60.0  // 60 seconds
     
     /// Diff tolerance between timer's expired value and the subscription expiry value.
     /// Current value is 1 second.
-    let subscriptionTimerDiffTolerance: TimeInterval = 1.0
+    static let subscriptionTimerDiffTolerance: TimeInterval = 1.0
     
     init() {
-        precondition(subscriptionCheckMinTime > subscriptionUIMinTime)
+        precondition(Self.subscriptionCheckMinTime > Self.subscriptionUIMinTime)
     }
-}
-
-/// - Tag: PsiCashSpeedBoostSupportedProducts
-struct PsiCashSpeedBoostSupportedProducts {
-    
-    let distinguisherToHours: [String: Int] = [
-        "1hr": 1,
-        "2hr": 2,
-        "3hr": 3,
-        "4hr": 4,
-        "5hr": 5,
-        "6hr": 6,
-        "7hr": 7,
-        "8hr": 8,
-        "9hr": 9
-    ]
-    
 }

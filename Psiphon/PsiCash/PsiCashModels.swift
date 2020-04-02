@@ -371,16 +371,27 @@ extension PsiCashPurchasableType: Hashable {
 }
 
 struct SpeedBoostProduct: PsiCashProduct {
+    
+    static let supportedProducts: [String: Int] = [
+        "1hr": 1,
+        "2hr": 2,
+        "3hr": 3,
+        "4hr": 4,
+        "5hr": 5,
+        "6hr": 6,
+        "7hr": 7,
+        "8hr": 8,
+        "9hr": 9
+    ]
+    
     let transactionClass: PsiCashTransactionClass = .speedBoost
     let distinguisher: String
     let hours: Int
 
     /// Initializer fails if provided `distinguisher` is not supported.
-    /// - Note: [PsiCashSpeedBoostSupportedProducts](x-source-tag://PsiCashSpeedBoostSupportedProducts)
     init?(distinguisher: String) {
         self.distinguisher = distinguisher
-        guard let hours =
-            Current.hardCodedValues.supportedSpeedBoosts.distinguisherToHours[distinguisher] else {
+        guard let hours = Self.supportedProducts[distinguisher] else {
             return nil
         }
         self.hours = hours

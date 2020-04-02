@@ -25,9 +25,11 @@ typealias PsiCashRefreshResult = PendingResult<PsiCashLibData, ErrorEvent<PsiCas
 struct PsiCashEffect {
     
     private let psiCash: PsiCash
+    private let psiCashLogger: PsiCashLogger
     
     init(psiCash: PsiCash) {
         self.psiCash = psiCash
+        self.psiCashLogger = PsiCashLogger(client: psiCash)
     }
     
     var libData: PsiCashLibData {
@@ -35,11 +37,12 @@ struct PsiCashEffect {
     }
     
     func refreshState(
-        andGetPricesFor priceClasses: [PsiCashTransactionClass]
+        andGetPricesFor priceClasses: [PsiCashTransactionClass],
+        vpnManager: VPNManager
     ) -> Effect<PsiCashRefreshResult> {
         
         Effect { observer, lifetime in
-            guard Current.tunneled else {
+            guard vpnManager.tunneled else {
                 observer.fulfill(value: .completed(.failure(ErrorEvent(.tunnelNotConnected))))
                 return
             }
@@ -70,10 +73,12 @@ struct PsiCashEffect {
         }
     }
     
-    func purchaseProduct(_ purchasable: PsiCashPurchasableType) -> Effect<PsiCashPurchaseResult> {
+    func purchaseProduct(
+        _ purchasable: PsiCashPurchasableType, vpnManager: VPNManager
+    ) -> Effect<PsiCashPurchaseResult> {
         Effect { observer, lifetime in
             
-            guard Current.tunneled else {
+            guard vpnManager.tunneled else {
                 observer.fulfill(value:
                     PsiCashPurchaseResult(
                         purchasable: purchasable,
@@ -83,9 +88,9 @@ struct PsiCashEffect {
                 return
             }
             
-            Current.psiCashLogger.logEvent("Purchase",
-                                           withInfo: String(describing: purchasable),
-                                           includingDiagnosticInfo: false)
+            self.psiCashLogger.logEvent("Purchase",
+                                        withInfo: String(describing: purchasable),
+                                        includingDiagnosticInfo: false)
             
             // Updates request metadata before sending the request.
             self.psiCash.setRequestMetadata()
@@ -124,16 +129,16 @@ struct PsiCashEffect {
                 let error = self.psiCash.modifyLandingPage(url.absoluteString,
                                                            modifiedURL: &maybeModifiedURL)
                 guard error == nil else {
-                    Current.psiCashLogger.logErrorEvent("ModifyURLFailed",
-                                                        withError: error,
-                                                        includingDiagnosticInfo: true)
+                    self.psiCashLogger.logErrorEvent("ModifyURLFailed",
+                                                     withError: error,
+                                                     includingDiagnosticInfo: true)
                     return url
                 }
                 
                 guard let modifiedURL = maybeModifiedURL else {
-                    Current.psiCashLogger.logErrorEvent("ModifyURLFailed",
-                                                        withInfo: "modified URL is nil",
-                                                        includingDiagnosticInfo: true)
+                    self.psiCashLogger.logErrorEvent("ModifyURLFailed",
+                                                     withInfo: "modified URL is nil",
+                                                     includingDiagnosticInfo: true)
                     return url
                 }
                 
@@ -147,18 +152,18 @@ struct PsiCashEffect {
         let error = psiCash.getRewardedActivityData(&s)
         
         guard error == nil else {
-            Current.psiCashLogger.logErrorEvent("GetRewardedActivityDataFailed",
-                                                withError: error,
-                                                includingDiagnosticInfo: true)
+            self.psiCashLogger.logErrorEvent("GetRewardedActivityDataFailed",
+                                             withError: error,
+                                             includingDiagnosticInfo: true)
             return nil
         }
         
         return s as String?
     }
     
-    func expirePurchases() -> Effect<Never> {
+    func expirePurchases(sharedDB: PsiphonDataSharedDB) -> Effect<Never> {
         .fireAndForget {
-            let sharedDBAuthIds = Current.sharedDB.getNonSubscriptionAuthorizations().map(\.id)
+            let sharedDBAuthIds = sharedDB.getNonSubscriptionAuthorizations().map(\.id)
             self.psiCash.expirePurchases(notFoundIn: sharedDBAuthIds)
         }
     }

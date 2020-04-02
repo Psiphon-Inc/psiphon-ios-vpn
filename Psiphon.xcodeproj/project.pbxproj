@@ -127,7 +127,6 @@
 		8D417EA12411A89500FEE587 /* IAPState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D417EA02411A89500FEE587 /* IAPState.swift */; };
 		8D417EB124147C6D00FEE587 /* LandingPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D417EB024147C6D00FEE587 /* LandingPage.swift */; };
 		8D417EB324148C1E00FEE587 /* URLHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D417EB224148C1E00FEE587 /* URLHandler.swift */; };
-		8D417EB524149F4000FEE587 /* Environment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D417EB424149F4000FEE587 /* Environment.swift */; };
 		8D417EB72415633300FEE587 /* IAPReducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D417EB62415633300FEE587 /* IAPReducer.swift */; };
 		8D417EB92415667900FEE587 /* StoreDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D417EB82415667900FEE587 /* StoreDelegate.swift */; };
 		8D417EBB2417155000FEE587 /* AppReceipt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D417EBA2417155000FEE587 /* AppReceipt.swift */; };
@@ -514,7 +513,6 @@
 		8D417EA02411A89500FEE587 /* IAPState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IAPState.swift; sourceTree = "<group>"; };
 		8D417EB024147C6D00FEE587 /* LandingPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LandingPage.swift; sourceTree = "<group>"; };
 		8D417EB224148C1E00FEE587 /* URLHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLHandler.swift; sourceTree = "<group>"; };
-		8D417EB424149F4000FEE587 /* Environment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Environment.swift; sourceTree = "<group>"; };
 		8D417EB62415633300FEE587 /* IAPReducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IAPReducer.swift; sourceTree = "<group>"; };
 		8D417EB82415667900FEE587 /* StoreDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoreDelegate.swift; sourceTree = "<group>"; };
 		8D417EBA2417155000FEE587 /* AppReceipt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppReceipt.swift; sourceTree = "<group>"; };
@@ -1200,7 +1198,6 @@
 				52B3C54D23E22454003F6B12 /* Logging.swift */,
 				8D417EB024147C6D00FEE587 /* LandingPage.swift */,
 				8D417EB224148C1E00FEE587 /* URLHandler.swift */,
-				8D417EB424149F4000FEE587 /* Environment.swift */,
 				8D417EBC2417FF5B00FEE587 /* Subscription.swift */,
 				8D417EBE2417FFB000FEE587 /* HardCodedValues.swift */,
 			);
@@ -1785,7 +1782,6 @@
 				52B3C54523DA391F003F6B12 /* Requests.swift in Sources */,
 				9BFEC4F02A47FF8265635803 /* Notifier.m in Sources */,
 				4EC5526620AB8DCD000B4BEA /* PastelView.m in Sources */,
-				8D417EB524149F4000FEE587 /* Environment.swift in Sources */,
 				4E5263C7207294600021FEF5 /* EmbeddedServerEntries.m in Sources */,
 				52A2466D23A172A800A01FF1 /* AlertViewController.swift in Sources */,
 				5246800D22D65926009AEC6E /* UIUtils.swift in Sources */,

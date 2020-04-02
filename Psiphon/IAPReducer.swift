@@ -41,7 +41,19 @@ struct IAPReducerState {
     let psiCashAuth: PsiCashAuthPackage
 }
 
-func iapReducer(state: inout IAPReducerState, action: IAPAction) -> [Effect<IAPAction>] {
+typealias IAPEnvironment = (
+    vpnStatus: SignalProducer<NEVPNStatus, Never>,
+    psiCashEffects: PsiCashEffect,
+    clientMetaData: ClientMetaData,
+    paymentQueue: PaymentQueue,
+    userConfigs: UserDefaultsConfig,
+    psiCashStore: (PsiCashAction) -> Effect<Never>,
+    appReceiptStore: (ReceiptStateAction) -> Effect<Never>
+)
+
+func iapReducer(
+    state: inout IAPReducerState, action: IAPAction, environment: IAPEnvironment
+) -> [Effect<IAPAction>] {
     switch action {
     case .purchase(let product):
         guard state.iap.purchasing.completed else {
@@ -66,7 +78,7 @@ func iapReducer(state: inout IAPReducerState, action: IAPAction) -> [Effect<IAPA
         state.iap.purchasing = .pending(product)
 
         return [
-            Current.paymentQueue.addPurchase(product)
+            environment.paymentQueue.addPurchase(product)
                 .map(IAPAction.purchaseAdded)
         ]
         
@@ -89,7 +101,11 @@ func iapReducer(state: inout IAPReducerState, action: IAPAction) -> [Effect<IAPA
         }
         state.iap.unverifiedPsiCashTx = .pendingVerificationResult(unverifiedTx)
         return [
-            verifyConsumable(transaction: unverifiedTx, receipt: receiptData)
+            verifyConsumable(transaction: unverifiedTx,
+                             receipt: receiptData,
+                             vpnStatus: environment.vpnStatus,
+                             psiCashEffects: environment.psiCashEffects,
+                             clientMetaData: environment.clientMetaData)
                 .map(IAPAction.verifiedPsiCashConsumable)
         ]
         
@@ -107,10 +123,9 @@ func iapReducer(state: inout IAPReducerState, action: IAPAction) -> [Effect<IAPA
         }
         state.iap.unverifiedPsiCashTx = .none
         return [
-            Current.paymentQueue.finishTransaction(verifiedTx.value).mapNever(),
-            .fireAndForget {
-                Current.app.store.send(.psiCash(.refreshPsiCashState))
-            },
+            environment.paymentQueue.finishTransaction(verifiedTx.value).mapNever(),
+            environment.psiCashStore(.refreshPsiCashState).mapNever()
+            ,
             .fireAndForget {
                 PsiFeedbackLogger.info(withType: "IAP",
                                        json: ["event": "verified psicash consumable"])
@@ -121,9 +136,7 @@ func iapReducer(state: inout IAPReducerState, action: IAPAction) -> [Effect<IAPA
         switch value {
         case .restoredCompletedTransactions:
             return [
-                .fireAndForget {
-                    Current.app.store.send(.appReceipt(.receiptRefreshed(.success(()))))
-                }
+                environment.appReceiptStore(.receiptRefreshed(.success(()))).mapNever()
             ]
             
         case .updatedTransactions(let transactions):
@@ -161,7 +174,8 @@ func iapReducer(state: inout IAPReducerState, action: IAPAction) -> [Effect<IAPA
                                     // in PsiCash balance.
                                     state.psiCashBalance.waitingForExpectedIncrease(
                                         withAddedReward: .zero(),
-                                        reason: .purchasedPsiCash
+                                        reason: .purchasedPsiCash,
+                                        userConfigs: environment.userConfigs
                                     )
                                         
                                     finishTransaction = false
@@ -172,12 +186,9 @@ func iapReducer(state: inout IAPReducerState, action: IAPAction) -> [Effect<IAPA
                                     // Performs a remote receipt refresh before submitting
                                     // the receipt for verification.
                                     effects.append(
-                                        .fireAndForget {
-                                            Current.app.store.send(
-                                                .appReceipt(
-                                                    .remoteReceiptRefresh(optinalPromise: nil))
-                                            )
-                                        }
+                                        environment.appReceiptStore(
+                                            .remoteReceiptRefresh(optinalPromise: nil)
+                                        ).mapNever()
                                     )
                                     
                                 case .some(true):
@@ -213,15 +224,13 @@ func iapReducer(state: inout IAPReducerState, action: IAPAction) -> [Effect<IAPA
                     
                     if finishTransaction {
                         effects.append(
-                            Current.paymentQueue.finishTransaction(transaction).mapNever()
+                            environment.paymentQueue.finishTransaction(transaction).mapNever()
                         )
                     }
                     
                     if transactions.appReceiptUpdated {
                         effects.append(
-                            .fireAndForget {
-                                Current.app.store.send(.appReceipt(.receiptRefreshed(.success(()))))
-                            }
+                            environment.appReceiptStore(.receiptRefreshed(.success(()))).mapNever()
                         )
                     }
                 }

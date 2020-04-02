@@ -39,8 +39,11 @@ enum ProductRequestAction {
     case productRequestResult(SKProductsRequest, Result<SKProductsResponse, SystemErrorEvent>)
 }
 
+typealias ProductRequestEnvironment = ProductRequestDelegate
+
 func productRequestReducer(
-    state: inout PsiCashAppStoreProductsState, action: ProductRequestAction
+    state: inout PsiCashAppStoreProductsState, action: ProductRequestAction,
+    environment: ProductRequestEnvironment
 ) -> [Effect<ProductRequestAction>] {
     switch action {
     case .getProductList:
@@ -52,7 +55,7 @@ func productRequestReducer(
         state.psiCashRequest = request
         return [
             .fireAndForget {
-                request.delegate = Current.productRequestDelegate
+                request.delegate = environment
                 request.start()
             }
         ]
