@@ -77,7 +77,7 @@ PsiFeedbackLogType const AsyncOperationLogType = @"AsyncOperation";
 
 - (void)observeValueForKeyPath:(nullable NSString *)keyPath ofObject:(nullable id)object change:(nullable NSDictionary<NSKeyValueChangeKey, id> *)change context:(nullable void *)context {
     if ([keyPath isEqualToString:@"cancelled"]) {
-        [PsiFeedbackLogger warnWithType:AsyncOperationLogType message:@"[%@] cancelled", self.name];
+        [PsiFeedbackLogger warnWithType:AsyncOperationLogType format:@"[%@] cancelled", self.name];
         self.executing = FALSE;
         self.finished = TRUE;
     }

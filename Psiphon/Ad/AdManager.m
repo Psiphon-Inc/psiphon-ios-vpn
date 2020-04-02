@@ -249,7 +249,7 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
                             // MoPub consent dialog was presented successfully and dismissed
                             // or consent is already given or is not needed.
                             // We can start loading ads.
-                            [PsiFeedbackLogger infoWithType:AdManagerLogType message:@"adSDKInitSucceeded"];
+                            [PsiFeedbackLogger infoWithType:AdManagerLogType format:@"adSDKInitSucceeded"];
                             [subscriber sendNext:RACUnit.defaultUnit];
                             [subscriber sendCompleted];
                         }];

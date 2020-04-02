@@ -543,7 +543,7 @@ willFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
         [delegate adPresentationStatus:ap];
         switch (ap) {
             case AdPresentationWillAppear:
-                [PsiFeedbackLogger infoWithType:RewardedVideoLogType message:@"AdPresentationWillAppear"];
+                [PsiFeedbackLogger infoWithType:RewardedVideoLogType format:@"AdPresentationWillAppear"];
                 LOG_DEBUG(@"rewarded video AdPresentationWillAppear");
                 break;
             case AdPresentationDidAppear:
@@ -561,22 +561,22 @@ willFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
             case AdPresentationErrorCustomDataNotSet:
                 LOG_DEBUG(@"rewarded video AdPresentationErrorCustomDataNotSet");
                 [PsiFeedbackLogger errorWithType:RewardedVideoLogType
-                                         message:@"AdPresentationErrorCustomDataNotSet"];
+                                         format:@"AdPresentationErrorCustomDataNotSet"];
                 break;
             case AdPresentationErrorInappropriateState:
                 LOG_DEBUG(@"rewarded video AdPresentationErrorInappropriateState");
                 [PsiFeedbackLogger errorWithType:RewardedVideoLogType
-                                         message:@"AdPresentationErrorInappropriateState"];
+                                         format:@"AdPresentationErrorInappropriateState"];
                 break;
             case AdPresentationErrorNoAdsLoaded:
                 LOG_DEBUG(@"rewarded video AdPresentationErrorNoAdsLoaded");
                 [PsiFeedbackLogger errorWithType:RewardedVideoLogType
-                                         message:@"AdPresentationErrorNoAdsLoaded"];
+                                         format:@"AdPresentationErrorNoAdsLoaded"];
                 break;
             case AdPresentationErrorFailedToPlay:
                 LOG_DEBUG(@"rewarded video AdPresentationErrorFailedToPlay");
                 [PsiFeedbackLogger errorWithType:RewardedVideoLogType
-                                         message:@"AdPresentationErrorFailedToPlay"];
+                                         format:@"AdPresentationErrorFailedToPlay"];
                 break;
         }
     }] scanWithStart:[RACTwoTuple pack:@(FALSE) :@(FALSE)]
@@ -614,7 +614,7 @@ willFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
         AppDelegate *strongSelf = weakSelf;
         if (strongSelf) {
             LOG_DEBUG(@"rewarded video completed");
-            [PsiFeedbackLogger infoWithType:RewardedVideoLogType message:@"completed"];
+            [PsiFeedbackLogger infoWithType:RewardedVideoLogType format:@"completed"];
             [strongSelf->rewardedVideoAdDisposable dispose];
             strongSelf->rewardedVideoAdDisposable = nil;
         }

@@ -20,3 +20,22 @@
 import Foundation
 
 typealias LogType = String
+
+enum LogLevel: Int {
+    case info
+    case warn
+    case error
+}
+
+func feedbackLog(_ level: LogLevel, _ logType: LogType, _ message: String) -> Effect<Never> {
+    .fireAndForget {
+        switch level {
+        case .info:
+            PsiFeedbackLogger.info(withType: logType, message: message)
+        case .warn:
+            PsiFeedbackLogger.warn(withType: logType, message: message)
+        case .error:
+            PsiFeedbackLogger.error(withType: logType, message: message)
+        }
+    }
+}

@@ -76,7 +76,7 @@ NSErrorDomain const PsiCashClientErrorDomain = @"PsiCashClientErrorDomain";
     }
 
     if (![NSJSONSerialization isValidJSONObject:log]) {
-        [PsiFeedbackLogger errorWithType:PsiCashLogType message:@"invalid JSON object"];
+        [PsiFeedbackLogger errorWithType:PsiCashLogType format:@"invalid JSON object"];
         return;
     }
 
@@ -96,7 +96,7 @@ NSErrorDomain const PsiCashClientErrorDomain = @"PsiCashClientErrorDomain";
                           };
 
     if (![NSJSONSerialization isValidJSONObject:log]) {
-        [PsiFeedbackLogger errorWithType:PsiCashLogType message:@"invalid JSON object"];
+        [PsiFeedbackLogger errorWithType:PsiCashLogType format:@"invalid JSON object"];
         return nil;
     }
 
