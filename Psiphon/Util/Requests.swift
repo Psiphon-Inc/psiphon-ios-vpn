@@ -134,7 +134,7 @@ struct ClientMetaData: Encodable {
         case sponsorID = "sponsor_id"
     }
 
-    lazy var jsonString: String = {
+    var jsonString: String {
         do {
             let jsonData = try JSONEncoder().encode(ClientMetaData())
             if let jsonString = String(data: jsonData, encoding: .utf8) {
@@ -146,7 +146,7 @@ struct ClientMetaData: Encodable {
                                     object: error)
         }
         return ""
-    }()
+    }
     
 }
 

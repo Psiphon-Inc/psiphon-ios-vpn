@@ -53,7 +53,8 @@ final class SpeedBoostCollection: NSObject, ViewWrapper, Bindable {
                                              left: 15.0,
                                              bottom: 15.0,
                                              right: 15.0)
-
+    private let psiCashPriceFormatter = PsiCashAmountFormatter(locale: Locale.current)
+    
     private var data: BindingType?
     private let collectionView: UICollectionView
     private let purchaseHandler: (SpeedBoostPurchasable) -> Void
@@ -103,7 +104,8 @@ extension SpeedBoostCollection: UICollectionViewDataSource {
                                                       for: indexPath)
 
         if cell.contentView.subviews[maybe: 0] == nil {
-            let content = PurchaseCellContent(purchaseHandler: self.purchaseHandler)
+            let content = PurchaseCellContent(psiCashPriceFormatter: self.psiCashPriceFormatter,
+                                              purchaseHandler: self.purchaseHandler)
             cell.contentView.addSubview(content)
             content.activateConstraints { $0.matchParentConstraints() }
             cell.backgroundColor = .clear
@@ -154,11 +156,14 @@ fileprivate final class PurchaseCellContent: AnimatedUIView, Bindable {
     private var purchasable: SpeedBoostPurchasable? = .none
     private let purchaseHandler: (SpeedBoostPurchasable) -> Void
 
+    private let psiCashPriceFormatter: PsiCashAmountFormatter
     private let backgroundView: UIImageView
     private let title = UILabel.make(fontSize: .h3, typeface: .bold)
     private let button = GradientButton(gradient: .grey)
 
-    init(purchaseHandler: @escaping (SpeedBoostPurchasable) -> Void) {
+    init(psiCashPriceFormatter: PsiCashAmountFormatter,
+         purchaseHandler: @escaping (SpeedBoostPurchasable) -> Void) {
+        self.psiCashPriceFormatter = psiCashPriceFormatter
         self.purchaseHandler = purchaseHandler
         self.backgroundView = UIImageView.make(image:
             SpeedBoostPurchaseBackground.allCases.randomElement()!.rawValue)
@@ -202,7 +207,7 @@ fileprivate final class PurchaseCellContent: AnimatedUIView, Bindable {
         title.text = "\(newValue.purchasable.product.hours) HOUR"
 
         button.setTitle(
-            Current.psiCashPriceFormatter.string(from: newValue.purchasable.price.inPsi),
+            psiCashPriceFormatter.string(from: newValue.purchasable.price.inPsi),
             for: .normal)
     }
     

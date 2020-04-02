@@ -135,8 +135,8 @@ willFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
 
     [AppObservables.shared appLaunched];
 
-    [SwiftDelegate.bridge setWithObjcBridge:self];
-    [SwiftDelegate.bridge applicationDidFinishLaunching:application];
+    [SwiftDelegate.bridge applicationDidFinishLaunching:application
+                                             objcBridge:(id<ObjCBridgeDelegate>) self];
 
     // Override point for customization after application launch.
     self.window = [[UIWindow alloc] initWithFrame:UIScreen.mainScreen.bounds];

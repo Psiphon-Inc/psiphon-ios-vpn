@@ -104,7 +104,8 @@ final class PsiCashViewController: UIViewController {
     init(initialTab: Tabs,
          store: Store<PsiCashViewControllerState, PsiCashAction>,
          iapStore: Store<Unit, IAPAction>,
-         productRequestStore: Store<Unit, ProductRequestAction>) {
+         productRequestStore: Store<Unit, ProductRequestAction>,
+         vpnStatusSignal: SignalProducer<NEVPNStatus, Never>) {
 
         self.activeTab = initialTab
         self.store = store
@@ -143,7 +144,7 @@ final class PsiCashViewController: UIViewController {
         self.lifetime += SignalProducer.combineLatest(
             store.$value.signalProducer,
             self.$activeTab.signalProducer,
-            Current.vpnStatus.signalProducer)
+            vpnStatusSignal)
             .map(ObservedState.init)
             .skipRepeats()
             .startWithValues { [unowned self] observed in

@@ -82,13 +82,21 @@ enum SubscriptionAction {
     case timerFinished(withExpiry:Date)
 }
 
+typealias SubscriptionReducerEnvironment = (
+    notifier: Notifier,
+    sharedDB: PsiphonDataSharedDB,
+    userConfigs: UserDefaultsConfig,
+    appReceiptStore: (ReceiptStateAction) -> Effect<Never>
+)
+
 func subscriptionReducer(
-    state: inout SubscriptionState, action: SubscriptionAction
+    state: inout SubscriptionState, action: SubscriptionAction,
+    environment: SubscriptionReducerEnvironment
 ) -> [Effect<SubscriptionAction>] {
     switch action {
     case .updatedReceiptData(let receipt):
         var effects = [Effect<SubscriptionAction>]()
-        effects.append(updatePersistedData(receipt: receipt).mapNever())
+        effects.append(updatePersistedData(receipt: receipt, environment: environment).mapNever())
         
         guard let receipt = receipt, let subscription = receipt.subscription else {
                 state.status = .notSubscribed
@@ -96,7 +104,7 @@ func subscriptionReducer(
         }
         
         let intervalToExpired = subscription.latestExpiry.timeIntervalSinceNow
-        guard intervalToExpired > Current.hardCodedValues.subscription.subscriptionUIMinTime else {
+        guard intervalToExpired > SubscriptionHardCodedValues.subscriptionUIMinTime else {
             state.status = .notSubscribed
             return effects
         }
@@ -105,17 +113,16 @@ func subscriptionReducer(
         
         // Notifies extension to run a subscription check if subscription does not
         // expire with `subscriptionCheckMinTime`.
-        if intervalToExpired > Current.hardCodedValues.subscription.subscriptionCheckMinTime {
+        if intervalToExpired > SubscriptionHardCodedValues.subscriptionCheckMinTime {
             effects.append(
                 .fireAndForget {
-                    Current.notifier.post(NotifierForceSubscriptionCheck)
+                    environment.notifier.post(NotifierForceSubscriptionCheck)
                 }
             )
         }
         
         effects.append(
-            singleFireTimer(interval: intervalToExpired,
-                            leeway: Current.hardCodedValues.subscription.leeway)
+            singleFireTimer(interval: intervalToExpired, leeway: SubscriptionHardCodedValues.leeway)
                 .map { _ in .timerFinished(withExpiry: subscription.latestExpiry)
             }
         )
@@ -134,7 +141,7 @@ func subscriptionReducer(
         
         let timerExpiry: TimeInterval = expiry.timeIntervalSinceNow
         let subscriptionExpiry: TimeInterval = subscription.latestExpiry.timeIntervalSinceNow
-        let tolerance = Current.hardCodedValues.subscription.subscriptionTimerDiffTolerance
+        let tolerance = SubscriptionHardCodedValues.subscriptionTimerDiffTolerance
         
         // Changes state to `.notSubscribed` only if timers expiry matches
         // current subscription expiry value.
@@ -143,9 +150,7 @@ func subscriptionReducer(
         }
         
         return [
-            .fireAndForget {
-                Current.app.store.send(.appReceipt(.remoteReceiptRefresh(optinalPromise: nil)))
-            }
+            environment.appReceiptStore(.remoteReceiptRefresh(optinalPromise: nil)).mapNever()
         ]
     }
 }
@@ -153,23 +158,25 @@ func subscriptionReducer(
 // MARK: Effects
 
 /// Updates `UserDefaultsConfig` and `PsiphonDataSharedDB` based on the `data`.
-func updatePersistedData(receipt data: ReceiptData?) -> Effect<Never> {
+func updatePersistedData(
+    receipt data: ReceiptData?, environment: SubscriptionReducerEnvironment
+) -> Effect<Never> {
     .fireAndForget {
         guard let data = data else {
-            Current.sharedDB.setContainerEmptyReceiptFileSize(NSNumber(integerLiteral: 0))
+            environment.sharedDB.setContainerEmptyReceiptFileSize(NSNumber(integerLiteral: 0))
             return
         }
 
         guard let subscription = data.subscription else {
-            Current.sharedDB.setContainerEmptyReceiptFileSize(data.fileSize as NSNumber)
+            environment.sharedDB.setContainerEmptyReceiptFileSize(data.fileSize as NSNumber)
             return
         }
 
-        Current.userConfigs.subscriptionData = subscription
+        environment.userConfigs.subscriptionData = subscription
 
         // The receipt contains purchase data, reset value in the shared DB.
-        Current.sharedDB.setContainerEmptyReceiptFileSize(.none)
-        Current.sharedDB.setContainerLastSubscriptionReceiptExpiryDate(subscription.latestExpiry)
+        environment.sharedDB.setContainerEmptyReceiptFileSize(.none)
+        environment.sharedDB.setContainerLastSubscriptionReceiptExpiryDate(subscription.latestExpiry)
     }
 }
 

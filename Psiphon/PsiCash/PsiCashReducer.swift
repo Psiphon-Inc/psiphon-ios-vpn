@@ -45,8 +45,20 @@ struct PsiCashReducerState: Equatable {
     let subscription: SubscriptionState
 }
 
+typealias PsiCashEnvironment = (
+    psiCashEffects: PsiCashEffect,
+    sharedDB: PsiphonDataSharedDB,
+    userConfigs: UserDefaultsConfig,
+    notifier: Notifier,
+    vpnManager: VPNManager,
+    // TODO: Remove this dependency from reducer's environment. UI-related effects
+    // unnecessarily complicate reducers.
+    objcBridgeDelegate: ObjCBridgeDelegate?,
+    rewardedVideoAdBridgeDelegate: RewardedVideoAdBridgeDelegate
+)
+
 func psiCashReducer(
-    state: inout PsiCashReducerState, action: PsiCashAction
+    state: inout PsiCashReducerState, action: PsiCashAction, environment: PsiCashEnvironment
 ) -> [Effect<PsiCashAction>] {
     switch action {
     case .buyPsiCashProduct(let purchasableType):
@@ -61,7 +73,8 @@ func psiCashReducer(
         }
         state.psiCash.purchasing = .speedBoost(purchasable)
         return [
-            Current.psiCashEffect.purchaseProduct(purchasableType)
+            environment.psiCashEffects.purchaseProduct(purchasableType,
+                                                       vpnManager: environment.vpnManager)
                 .map(PsiCashAction.psiCashProductPurchaseResult)
         ]
         
@@ -76,7 +89,8 @@ func psiCashReducer(
         }
         
         state.psiCash.libData = purchaseResult.refreshedLibData
-        state.psiCashBalance = .refreshed(refreshedData: purchaseResult.refreshedLibData)
+        state.psiCashBalance = .refreshed(refreshedData: purchaseResult.refreshedLibData,
+                                          userConfigs: environment.userConfigs)
         switch purchaseResult.result {
         case .success(let purchasedType):
             guard case .speedBoost(let purchasedProduct) = purchasedType else {
@@ -85,13 +99,13 @@ func psiCashReducer(
             state.psiCash.purchasing = .none
             return [
                 .fireAndForget {
-                    Current.sharedDB.appendNonSubscriptionAuthorization(
+                    environment.sharedDB.appendNonSubscriptionAuthorization(
                         purchasedProduct.transaction.authorization
                     )
-                    Current.notifier.post(NotifierUpdatedNonSubscriptionAuths)
+                    environment.notifier.post(NotifierUpdatedNonSubscriptionAuths)
                 },
                 .fireAndForget {
-                    Current.objcBridgeDelegate?.dismiss(screen: .psiCash)
+                    environment.objcBridgeDelegate?.dismiss(screen: .psiCash)
                 }
             ]
             
@@ -114,8 +128,9 @@ func psiCashReducer(
             return []
         }
         return [
-            Current.psiCashEffect
-                .refreshState(andGetPricesFor: PsiCashTransactionClass.allCases)
+            environment.psiCashEffects
+                .refreshState(andGetPricesFor: PsiCashTransactionClass.allCases,
+                              vpnManager: environment.vpnManager)
                 .map(PsiCashAction.refreshPsiCashStateResult)
         ]
         
@@ -123,7 +138,8 @@ func psiCashReducer(
         state.psiCash.pendingPsiCashRefresh = result.map { $0.map { _ in .unit } }
         if case .completed(.success(let refreshedLibData)) = result {
             state.psiCash.libData = refreshedLibData
-            state.psiCashBalance = .refreshed(refreshedData: refreshedLibData)
+            state.psiCashBalance = .refreshed(refreshedData: refreshedLibData,
+                                              userConfigs: environment.userConfigs)
         }
         return []
         
@@ -132,16 +148,16 @@ func psiCashReducer(
             return []
         }
         // TODO: Provide a more informative error message
-        guard let customData = Current.psiCashEffect.rewardedVideoCustomData() else {
+        guard let customData = environment.psiCashEffects.rewardedVideoCustomData() else {
             state.psiCash.rewardedVideo.combine(loading:
                 .failure(ErrorEvent(ErrorRepr(repr: "PsiCash data missing"))))
             return []
         }
         return [
             .fireAndForget {
-                Current.objcBridgeDelegate?.presentRewardedVideoAd(
+                environment.objcBridgeDelegate?.presentRewardedVideoAd(
                     customData: customData,
-                    delegate: Current.rewardedVideoAdBridgeDelegate)
+                    delegate: environment.rewardedVideoAdBridgeDelegate)
             }
         ]
         
@@ -149,9 +165,10 @@ func psiCashReducer(
         state.psiCash.rewardedVideo.combine(presentation: presentation)
         
         if state.psiCash.rewardedVideo.rewardedAndDismissed {
-            let rewardAmount = Current.hardCodedValues.psiCash.videoAdRewardAmount
+            let rewardAmount = PsiCashHardCodedValues.videoAdRewardAmount
             state.psiCashBalance.waitingForExpectedIncrease(withAddedReward: rewardAmount,
-                                                            reason: .watchedRewardedVideo)
+                                                            reason: .watchedRewardedVideo,
+                                                            userConfigs: environment.userConfigs)
             return [Effect { .refreshPsiCashState }]
         } else {
             return []
@@ -174,10 +191,10 @@ func psiCashReducer(
     case .connectToPsiphonTapped:
         return [
             .fireAndForget {
-                Current.vpnManager.startTunnel()
+                environment.vpnManager.startTunnel()
             },
             .fireAndForget {
-                Current.objcBridgeDelegate?.dismiss(screen: .psiCash)
+                environment.objcBridgeDelegate?.dismiss(screen: .psiCash)
             }
         ]
     }

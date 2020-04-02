@@ -45,7 +45,7 @@ extension PsiCashState {
     var rewardedVideoProduct: PsiCashPurchasableViewModel {
         PsiCashPurchasableViewModel(
             product: .rewardedVideoAd(loading: self.rewardedVideo.isLoading),
-            title: Current.hardCodedValues.psiCash.videoAdRewardTitle,
+            title: PsiCashHardCodedValues.videoAdRewardTitle,
             subtitle: UserStrings.Watch_rewarded_video_and_earn(),
             price: 0.0)
     }
@@ -203,18 +203,21 @@ extension PsiCashBalance {
 extension PsiCashBalance {
     
     mutating func waitingForExpectedIncrease(
-        withAddedReward addedReward: PsiCashAmount, reason: BalanceIncreaseExpectationReason
+        withAddedReward addedReward: PsiCashAmount, reason: BalanceIncreaseExpectationReason,
+        userConfigs: UserDefaultsConfig
     ) {
         pendingExpectedBalanceIncrease = reason
         if addedReward > .zero() {
-            let newRewardAmount = Current.userConfigs.expectedPsiCashReward + addedReward
-            Current.userConfigs.expectedPsiCashReward = newRewardAmount
+            let newRewardAmount = userConfigs.expectedPsiCashReward + addedReward
+            userConfigs.expectedPsiCashReward = newRewardAmount
             value = value + newRewardAmount
         }
     }
     
-    static func fromStoredExpectedReward(libData: PsiCashLibData) -> Self {
-        let adReward = Current.userConfigs.expectedPsiCashReward
+    static func fromStoredExpectedReward(
+        libData: PsiCashLibData, userConfigs: UserDefaultsConfig
+    ) -> Self {
+        let adReward = userConfigs.expectedPsiCashReward
         let reason: BalanceIncreaseExpectationReason?
         if adReward.isZero {
             reason = .none
@@ -225,8 +228,10 @@ extension PsiCashBalance {
                      value: libData.balance + adReward)
     }
 
-    static func refreshed(refreshedData libData: PsiCashLibData) -> Self {
-        Current.userConfigs.expectedPsiCashReward = PsiCashAmount.zero()
+    static func refreshed(
+        refreshedData libData: PsiCashLibData, userConfigs: UserDefaultsConfig
+    ) -> Self {
+        userConfigs.expectedPsiCashReward = PsiCashAmount.zero()
         return .init(pendingExpectedBalanceIncrease: .none, value: libData.balance)
     }
 

@@ -21,29 +21,31 @@ import Foundation
 import Promises
 import ReactiveSwift
 
-public typealias Reducer<Value, Action> = (inout Value, Action) -> [Effect<Action>]
+public typealias Reducer<Value, Action, Environment> =
+    (inout Value, Action, Environment) -> [Effect<Action>]
 
-public func combine<Value, Action>(
-    _ reducers: Reducer<Value, Action>...
-) -> Reducer<Value, Action> {
-    return { value, action in
-        let effects = reducers.flatMap { $0(&value, action) }
+public func combine<Value, Action, Environment>(
+    _ reducers: Reducer<Value, Action, Environment>...
+) -> Reducer<Value, Action, Environment> {
+    return { value, action, environment in
+        let effects = reducers.flatMap { $0(&value, action, environment) }
         return effects
     }
 }
 
-public func pullback<LocalValue, GlobalValue, LocalAction, GlobalAction>(
-    _ localReducer: @escaping Reducer<LocalValue, LocalAction>,
+public func pullback<LocalValue, GlobalValue, LocalAction, GlobalAction, LocalEnv, GlobalEnv>(
+    _ localReducer: @escaping Reducer<LocalValue, LocalAction, LocalEnv>,
     value valuePath: WritableKeyPath<GlobalValue, LocalValue>,
-    action actionPath: WritableKeyPath<GlobalAction, LocalAction?>
-) -> Reducer<GlobalValue, GlobalAction> {
-    return { globalValue, globalAction in
+    action actionPath: WritableKeyPath<GlobalAction, LocalAction?>,
+    environment toLocalEnvironment: @escaping (GlobalEnv) -> (LocalEnv)
+) -> Reducer<GlobalValue, GlobalAction, GlobalEnv> {
+    return { globalValue, globalAction, globalEnv in
 
         // Converts GlobalAction into LocalAction accepted by `localReducer`.
         guard let localAction = globalAction[keyPath: actionPath] else { return [] }
 
-        let effects = localReducer(&globalValue[keyPath: valuePath],
-                                   localAction)
+        let effects = localReducer(&globalValue[keyPath: valuePath], localAction,
+                                   toLocalEnvironment(globalEnv))
 
         // Pulls local action into global action.
         let pulledLocalEffects = effects.map { localEffect in
@@ -63,19 +65,27 @@ public func pullback<LocalValue, GlobalValue, LocalAction, GlobalAction>(
 public final class Store<Value: Equatable, Action> {
     public typealias OutputType = Value
     public typealias OutputErrorType = Never
-    public typealias StoreReducer = Reducer<Value, Action>
+    public typealias StoreReducer = Reducer<Value, Action, ()>
 
     @State public private(set) var value: Value
 
     private let scheduler: UIScheduler
-    private let reducer: StoreReducer
+    private var reducer: StoreReducer!
     private var disposable: Disposable? = .none
     private var effectDisposables = CompositeDisposable()
-
-    public init(initialValue: Value, reducer: @escaping StoreReducer) {
-        self.reducer = reducer
+    
+    public init<Environment>(
+        initialValue: Value,
+        reducer: @escaping Reducer<Value, Action, Environment>,
+        environment makeEnvironment: (Store<Value, Action>) -> Environment
+    ) {
         self.value = initialValue
         self.scheduler = .init()
+        
+        let environment = makeEnvironment(self)
+        self.reducer = { value, action, _ in
+            reducer(&value, action, environment)
+        }
     }
     
     private init(scheduler: UIScheduler, initialValue: Value, reducer: @escaping StoreReducer) {
@@ -87,7 +97,7 @@ public final class Store<Value: Equatable, Action> {
     deinit {
         effectDisposables.dispose()
     }
-
+     
     /// Sends action to the store.
     /// - Note: Stops program execution if called from threads other than the main thread.
     public func send(_ action: Action) {
@@ -95,11 +105,10 @@ public final class Store<Value: Equatable, Action> {
             precondition(Thread.isMainThread, "actions should only be sent from the main thread")
         }
         // Executes the reducer and collects the effects
-        let effects = self.reducer(&self.value, action)
+        let effects = self.reducer!(&self.value, action, ())
 
         effects.forEach { effect in
             var disposable: Disposable?
-            
             disposable = effect.observe(on: self.scheduler)
                 .sink(receiveCompletion: {
                     disposable?.dispose()
@@ -122,7 +131,7 @@ public final class Store<Value: Equatable, Action> {
         let localStore = Store<LocalValue, LocalAction>(
             scheduler: self.scheduler,
             initialValue: toLocalValue(self.value),
-            reducer: { localValue, localAction in
+            reducer: { localValue, localAction, _ in
                 // Local projection sends actions to the global MainStore.
                 self.send(toGlobalAction(localAction))
                 // Updates local stores value immediately.

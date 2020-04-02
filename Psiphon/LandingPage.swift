@@ -20,7 +20,7 @@
 import Foundation
 import ReactiveSwift
 
-typealias RestrictedURL = PredicatedValue<URL, Environment>
+typealias RestrictedURL = PredicatedValue<URL, NEVPNStatus>
 
 enum LandingPageShownState {
     case pending
@@ -35,20 +35,28 @@ struct LandingPageReducerState {
 }
 
 enum LandingPageAction {
-    /// Will try to open latest stored landing page for the current session if VPN is connected.
-    case open(RestrictedURL)
-    
+    /// Will try to open a randomly selected landing page from stored landing pages if VPN is connected.
+    case openRandomlySelectedLandingPage
     case urlOpened(success: Bool)
     /// Resets the shown landing page for current session flag.
     case reset
 }
 
+typealias LandingPageEnvironment = (
+    sharedDB: PsiphonDataSharedDB,
+    urlHandler: URLHandler,
+    psiCashEffects: PsiCashEffect,
+    vpnManager: VPNManager,
+    vpnStatusSignal: SignalProducer<NEVPNStatus, Never>,
+    psiCashAuthPackageSignal: SignalProducer<PsiCashAuthPackage, Never>
+)
+
 func landingPageReducer(
-    state: inout LandingPageReducerState, action: LandingPageAction
+    state: inout LandingPageReducerState, action: LandingPageAction,
+    environment: LandingPageEnvironment
 ) -> [Effect<LandingPageAction>] {
     switch action {
-    case .open(let url):
-        
+    case .openRandomlySelectedLandingPage:
         switch (state.shownLandingPage, state.activeSpeedBoost) {
         case (.pending, _),
              (.shown, _):
@@ -60,21 +68,36 @@ func landingPageReducer(
             
         case (.notShown, .none),
              (.notShownDueSpeedBoostPurchase, _):
+            
             state.shownLandingPage = .pending
             return [
                 // Waits up to 1 second for vpnStatus to change to `.connected`.
-                Current.vpnStatus.signalProducer
+                environment.vpnStatusSignal
                     .map { $0 == .connected }
                     .falseIfNotTrue(within: .seconds(1))
                     .take(first: 1)
                     .flatMap(.latest) { connected -> SignalProducer<LandingPageAction, Never> in
                         if connected {
-                            return modifyLandingPagePendingEarnerToken(url: url)
-                                .flatMap(.latest) {
-                                    Current.urlHandler.open($0)
-                            }.map(LandingPageAction.urlOpened(success:))
+                            guard
+                                let landingPages = environment.sharedDB.getHomepages(),
+                                landingPages.count > 1 else {
+                                return Effect(value: .urlOpened(success: false))
+                            }
+                            
+                            let randomlySelectedURL =
+                                RestrictedURL(value: landingPages.randomElement()!.url,
+                                              predicate: { $0 == .connected })
+                            
+                            return modifyLandingPagePendingEarnerToken(
+                                url: randomlySelectedURL,
+                                authPackageSignal: environment.psiCashAuthPackageSignal,
+                                psiCashEffects: environment.psiCashEffects
+                            ).flatMap(.latest) {
+                                environment.urlHandler.open($0, environment.vpnManager)
+                            }
+                            .map(LandingPageAction.urlOpened(success:))
                         } else {
-                            return SignalProducer(value: .urlOpened(success: false))
+                            return Effect(value: .urlOpened(success: false))
                         }
                 }
             ]
@@ -94,13 +117,16 @@ func landingPageReducer(
     }
 }
 
-fileprivate func modifyLandingPagePendingEarnerToken(url: RestrictedURL) -> Effect<RestrictedURL> {
-    Current.app.store.$value.signalProducer
-        .map(\.psiCash.libData.authPackage.hasEarnerToken)
-        .falseIfNotTrue(within:Current.hardCodedValues.psiCash.getEarnerTokenTimeout)
+fileprivate func modifyLandingPagePendingEarnerToken(
+    url: RestrictedURL, authPackageSignal: SignalProducer<PsiCashAuthPackage, Never>,
+    psiCashEffects: PsiCashEffect
+) -> Effect<RestrictedURL> {
+    authPackageSignal
+        .map(\.hasEarnerToken)
+        .falseIfNotTrue(within: PsiCashHardCodedValues.getEarnerTokenTimeout)
         .flatMap(.latest) { hasEarnerToken -> SignalProducer<RestrictedURL, Never> in
             if hasEarnerToken {
-                return Current.psiCashEffect.modifyLandingPage(url)
+                return psiCashEffects.modifyLandingPage(url)
             } else {
                 return SignalProducer(value: url)
             }
