@@ -381,11 +381,11 @@ typedef NS_ENUM(NSInteger, SubscriptionStateEnum) {
     }
 
     if (self.lastAuthId) {
-        [d setObject:self.lastAuthId forKey:@"last_auth_id"];
+        [d setObject:self.lastAuthId forKey:@"last_authorization_id"];
     }
 
     if (self.lastAuthAccessType) {
-        [d setObject:self.lastAuthAccessType forKey:@"last_auth_access_type"];
+        [d setObject:self.lastAuthAccessType forKey:@"last_authorization_access_type"];
     }
 
     [d setObject:@(self.retryNumber) forKey:@"retry_number"];
