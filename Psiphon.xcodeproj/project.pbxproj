@@ -1200,6 +1200,7 @@
 				8D417EB224148C1E00FEE587 /* URLHandler.swift */,
 				8D417EBC2417FF5B00FEE587 /* Subscription.swift */,
 				8D417EBE2417FFB000FEE587 /* HardCodedValues.swift */,
+				8D9E603424366D71003A46D8 /* FeedbackDescriptions.swift */,
 			);
 			path = Psiphon;
 			sourceTree = "<group>";
@@ -1874,6 +1875,7 @@
 				A84082260CE7662A93697CFF /* LoadingCircleLayer.m in Sources */,
 				A8408AACE30F860F2C961A04 /* WhiteSkyButton.m in Sources */,
 				A8408008B18277F93286799F /* PsiphonProgressView.m in Sources */,
+				8D9E603524366D71003A46D8 /* FeedbackDescriptions.swift in Sources */,
 				A8408FA13890CD67154033C6 /* RegionSelectionButton.m in Sources */,
 				A84087459E9F796B1954D049 /* SubscriptionsBar.m in Sources */,
 				A8408E611665FC60D5DFF339 /* SubscriptionStatusView.m in Sources */,
