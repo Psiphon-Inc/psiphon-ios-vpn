@@ -21,6 +21,7 @@
 #import <ReactiveObjC/RACDisposable.h>
 #import <ReactiveObjC/RACScheduler.h>
 #import "AppProfiler.h"
+#import "ClientMetadata.h"
 #import "SubscriptionVerifierService.h"
 #import "NSDate+Comparator.h"
 #import "NSError+Convenience.h"
@@ -136,6 +137,12 @@ static NSInteger _requestNumber = 0;
     [request setHTTPBodyStream:[NSInputStream inputStreamWithURL:NSBundle.mainBundle.appStoreReceiptURL]];
     [request setHTTPMethod:@"POST"];
     [request setValue:@"application/octet-stream" forHTTPHeaderField:@"Content-Type"];
+
+    // Attach client metadata
+    NSString *clientMetadata = [ClientMetadata jsonString];
+    if (clientMetadata) {
+        [request setValue:clientMetadata forHTTPHeaderField:VerifierSubscriptionCheckClientMetadataHeaderField];
+    }
 
     // Attach request metadata
     metadata.requestNumber = _requestNumber++;
