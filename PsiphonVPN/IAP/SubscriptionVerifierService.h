@@ -44,6 +44,51 @@ typedef NS_ERROR_ENUM(ReceiptValidationErrorDomain, PsiphonReceiptValidationErro
     PsiphonReceiptValidationErrorJSONParseFailed,
 };
 
+# pragma mark - Subscription Verifier Request Metadata
+
+/// Metadata added to requests made against the verifier server for context.
+@interface SubscriptionVerifierRequestMetadata : NSObject
+
+/// Reason the extension was started
+@property (nonatomic, nullable) NSString *extensionStartReason;
+
+/// Reason the subscription check is being performed
+@property (nonatomic, nullable) NSString *reason;
+
+/// ID of last auth ID returned from the verifier server
+@property (nonatomic, nullable) NSString *lastAuthId;
+
+/// Access type of last auth ID returned from the verifier server
+@property (nonatomic, nullable) NSString *lastAuthAccessType;
+
+/// Number of request retries that have been performed
+@property (nonatomic, assign) NSInteger retryNumber;
+
+/// Number of requests that have been made during the current run of the extension
+@property (nonatomic, assign) NSInteger requestNumber;
+
+/// Error encountered by the previous request in the event of a retry
+@property (nonatomic, nullable) NSError  *previousRequestError;
+
+- (NSDictionary*)dictionaryRepresentation;
+
+@end
+
+# pragma mark - Local Subscription Check Result
+
+@interface LocalSubscriptionCheckResult : NSObject
+
+@property (nonatomic, assign) NSNumber *subscriptionCheckEnum;
+
+/// Reason for the value in `subscriptionCheckEnum`.
+@property (nonatomic, nullable) NSString *reason;
+
++ (LocalSubscriptionCheckResult *_Nonnull)localSubscriptionCheckResult:(NSNumber*)subscriptionCheckEnum
+                                                                reason:(NSString*)reason;
+
+@end
+
+# pragma mark - Subscription Verifier Service
 
 @interface SubscriptionVerifierService : NSObject
 
@@ -52,11 +97,12 @@ typedef NS_ERROR_ENUM(ReceiptValidationErrorDomain, PsiphonReceiptValidationErro
  * The value returned only reflects subscription information available locally, and should be combined
  * with other sources of information regarding subscription authorization validity to determine
  * if the authorization is valid or whether the subscription verifier server needs to contacted.
- * @return Returns a signal that emits one of SubscriptionCheckEnum enums and then completes immediately.
+ * @param requestMetadata Metadata which is added to the request made to the verifier server.
+ * @return Returns a signal that emits one of LocalSubscriptionCheckResult and then completes immediately.
  */
-+ (RACSignal<NSNumber *> *)localSubscriptionCheck;
++ (RACSignal<LocalSubscriptionCheckResult *> *)localSubscriptionCheck;
 
-+ (RACSignal<RACTwoTuple<NSDictionary *, NSNumber *> *> *)updateAuthorizationFromRemote;
++ (RACSignal<RACTwoTuple<NSDictionary *, NSNumber *> *> *)updateAuthorizationFromRemoteWithRequestMetadata:(SubscriptionVerifierRequestMetadata*)requestMetadata;
 
 @end
 
