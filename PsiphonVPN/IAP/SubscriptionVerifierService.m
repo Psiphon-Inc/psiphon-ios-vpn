@@ -21,6 +21,7 @@
 #import <ReactiveObjC/RACDisposable.h>
 #import <ReactiveObjC/RACScheduler.h>
 #import "AppProfiler.h"
+#import "ClientMetadata.h"
 #import "SubscriptionVerifierService.h"
 #import "NSDate+Comparator.h"
 #import "NSError+Convenience.h"
@@ -35,28 +36,36 @@
 
 NSErrorDomain _Nonnull const ReceiptValidationErrorDomain = @"PsiphonReceiptValidationErrorDomain";
 
+NSString *_Nonnull const VerifierSubscriptionCheckMetadataHeaderField = @"X-Verifier-iOS-SubscriptionCheck-Metadata";
+
 PsiFeedbackLogType const SubscriptionVerifierServiceLogType = @"SubscriptionVerifierService";
 
 @implementation SubscriptionVerifierService {
     NSURLSession *urlSession;
 }
 
-+ (RACSignal<NSNumber *> *_Nonnull)localSubscriptionCheck {
++ (RACSignal<LocalSubscriptionCheckResult*> *_Nonnull)localSubscriptionCheck {
     return [RACSignal createSignal:^RACDisposable *(id <RACSubscriber> subscriber) {
         MutableSubscriptionData *subscription = [MutableSubscriptionData fromPersistedDefaults];
-        if ([subscription shouldUpdateAuthorization]) {
+
+        ShouldUpdateAuthResult *shouldUpdateAuthResult = [subscription shouldUpdateAuthorization];
+
+        if (shouldUpdateAuthResult.shouldUpdateAuth) {
             // subscription server needs to be contacted.
-            [subscriber sendNext:@(SubscriptionCheckShouldUpdateAuthorization)];
+            [subscriber sendNext:[LocalSubscriptionCheckResult localSubscriptionCheckResult:@(SubscriptionCheckShouldUpdateAuthorization)
+                                                                                     reason:shouldUpdateAuthResult.reason]];
             [subscriber sendCompleted];
         } else {
             // subscription server doesn't need to be contacted.
             // Checks if subscription is active compared to device's clock.
             if ([subscription hasActiveAuthorizationForDate:[NSDate date]]) {
-                [subscriber sendNext:@(SubscriptionCheckHasActiveAuthorization)];
+                [subscriber sendNext:[LocalSubscriptionCheckResult localSubscriptionCheckResult:@(SubscriptionCheckHasActiveAuthorization)
+                                                                                         reason:shouldUpdateAuthResult.reason]];
                 [subscriber sendCompleted];
             } else {
                 // Send error, subscription has expired.
-                [subscriber sendNext:@(SubscriptionCheckAuthorizationExpired)];
+                [subscriber sendNext:[LocalSubscriptionCheckResult localSubscriptionCheckResult:@(SubscriptionCheckAuthorizationExpired)
+                                                                                         reason:shouldUpdateAuthResult.reason]];
                 [subscriber sendCompleted];
             }
         }
@@ -65,7 +74,8 @@ PsiFeedbackLogType const SubscriptionVerifierServiceLogType = @"SubscriptionVeri
     }];
 }
 
-+ (RACSignal<RACTwoTuple<NSDictionary *, NSNumber *> *> *)updateAuthorizationFromRemote {
++ (RACSignal<RACTwoTuple<NSDictionary *, NSNumber *> *> *)updateAuthorizationFromRemoteWithRequestMetadata:(SubscriptionVerifierRequestMetadata*)metadata {
+    // TODO/subs: use metadata
     return [RACSignal createSignal:^RACDisposable *(id <RACSubscriber> subscriber) {
 
         // This object holds a reference to the current scheduler, in order to schedule
@@ -91,7 +101,7 @@ PsiFeedbackLogType const SubscriptionVerifierServiceLogType = @"SubscriptionVeri
             }];
 
             [compoundDisposable addDisposable:schedulingDisposable];
-        }];
+        } andRequestMetadata:metadata];
 
         [compoundDisposable addDisposable:[RACDisposable disposableWithBlock:^{
             @autoreleasepool {
@@ -103,13 +113,16 @@ PsiFeedbackLogType const SubscriptionVerifierServiceLogType = @"SubscriptionVeri
     }];
 }
 
+// Track number of requests made during the extension lifecycle
+static NSInteger _requestNumber = 0;
+
 /**
  * Starts asynchronous task that upload current App Store receipt file to the subscription verifier server,
  * and calls receiptUploadCompletionHandler with the response from the server.
  * @param receiptUploadCompletionHandler Completion handler called with the result of the network request.
  * @details Note that the completion handler is called from a queue handled by the system.
  */
-- (void)startWithCompletionHandler:(SubscriptionVerifierCompletionHandler _Nonnull)receiptUploadCompletionHandler {
+- (void)startWithCompletionHandler:(SubscriptionVerifierCompletionHandler _Nonnull)receiptUploadCompletionHandler andRequestMetadata:(SubscriptionVerifierRequestMetadata*)metadata {
     NSMutableURLRequest *request;
 
     [AppProfiler logMemoryReportWithTag:@"SubscriptionVerifierSubmitAuthRequest"];
@@ -125,53 +138,77 @@ PsiFeedbackLogType const SubscriptionVerifierServiceLogType = @"SubscriptionVeri
     [request setHTTPMethod:@"POST"];
     [request setValue:@"application/octet-stream" forHTTPHeaderField:@"Content-Type"];
 
+    // Attach client metadata
+    NSString *clientMetadata = [ClientMetadata jsonString];
+    if (clientMetadata) {
+        [request setValue:clientMetadata forHTTPHeaderField:VerifierSubscriptionCheckClientMetadataHeaderField];
+    }
+
+    // Attach request metadata
+    metadata.requestNumber = _requestNumber++;
+    NSError *error;
+    NSData *jsonData = [NSJSONSerialization dataWithJSONObject:[metadata dictionaryRepresentation]
+                                                       options:0
+                                                         error:&error];
+    if (!jsonData && error) {
+        [PsiFeedbackLogger errorWithType:SubscriptionVerifierServiceLogType message:@"Failed to serialize metadata as JSON" object:error];
+    } else {
+        [request setValue:[[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding] forHTTPHeaderField:VerifierSubscriptionCheckMetadataHeaderField];
+    }
+
     NSURLSessionConfiguration *sessionConfig = [NSURLSessionConfiguration ephemeralSessionConfiguration];
     sessionConfig.timeoutIntervalForRequest = kReceiptRequestTimeOutSeconds;
 
     urlSession = [NSURLSession sessionWithConfiguration:sessionConfig];
 
+    SubscriptionVerifierService *__weak weakSelf = self;
+
     NSURLSessionDataTask *postDataTask = [urlSession dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
 
-        [AppProfiler logMemoryReportWithTag:@"SubscriptionVerifierLoadRequestCompleted"];
-        [PsiFeedbackLogger infoWithType:SubscriptionVerifierServiceLogType message:@"load request completed"];
+        SubscriptionVerifierService *__strong strongSelf = weakSelf;
+        if (strongSelf != nil) {
 
-        // Session is no longer needed, invalidates and cancels outstanding tasks.
-        [urlSession invalidateAndCancel];
+            [AppProfiler logMemoryReportWithTag:@"SubscriptionVerifierLoadRequestCompleted"];
+            [PsiFeedbackLogger infoWithType:SubscriptionVerifierServiceLogType message:@"load request completed"];
 
-        if (error) {
-            NSDictionary *errorDict = @{NSLocalizedDescriptionKey: @"NSURLSession error", NSUnderlyingErrorKey: error};
-            NSError *err = [[NSError alloc] initWithDomain:ReceiptValidationErrorDomain code:PsiphonReceiptValidationErrorNSURLSessionFailed userInfo:errorDict];
-            receiptUploadCompletionHandler(nil, appReceiptFileSize, err);
-            return;
+            // Session is no longer needed, invalidates and cancels outstanding tasks.
+            [strongSelf->urlSession invalidateAndCancel];
+
+            if (error) {
+                NSDictionary *errorDict = @{NSLocalizedDescriptionKey: @"NSURLSession error", NSUnderlyingErrorKey: error};
+                NSError *err = [[NSError alloc] initWithDomain:ReceiptValidationErrorDomain code:PsiphonReceiptValidationErrorNSURLSessionFailed userInfo:errorDict];
+                receiptUploadCompletionHandler(nil, appReceiptFileSize, err);
+                return;
+            }
+
+            NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *) response;
+            if (httpResponse.statusCode != 200) {
+                NSString *description = [NSString stringWithFormat:@"HTTP code: %ld", (long) httpResponse.statusCode];
+                NSDictionary *errorDict = @{NSLocalizedDescriptionKey: description};
+                NSError *err = [[NSError alloc] initWithDomain:ReceiptValidationErrorDomain code:PsiphonReceiptValidationErrorHTTPFailed userInfo:errorDict];
+                receiptUploadCompletionHandler(nil, appReceiptFileSize, err);
+                return;
+            }
+
+            if (data.length == 0) {
+                NSDictionary *errorDict = @{NSLocalizedDescriptionKey: @"Empty server response"};
+                NSError *err = [[NSError alloc] initWithDomain:ReceiptValidationErrorDomain code:PsiphonReceiptValidationErrorInvalidReceipt userInfo:errorDict];
+                receiptUploadCompletionHandler(nil, appReceiptFileSize, err);
+                return;
+            }
+
+            NSError *jsonError;
+            NSDictionary *dict = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&jsonError];
+
+            if (jsonError) {
+                NSDictionary *errorDict = @{NSLocalizedDescriptionKey:@"JSON parse failure", NSUnderlyingErrorKey:jsonError};
+                NSError *err = [[NSError alloc] initWithDomain:ReceiptValidationErrorDomain code:PsiphonReceiptValidationErrorJSONParseFailed userInfo:errorDict];
+                receiptUploadCompletionHandler(nil, appReceiptFileSize, err);
+                return;
+            }
+
+            receiptUploadCompletionHandler(dict, appReceiptFileSize, nil);
         }
-
-        NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *) response;
-        if (httpResponse.statusCode != 200) {
-            NSString *description = [NSString stringWithFormat:@"HTTP code: %ld", (long) httpResponse.statusCode];
-            NSDictionary *errorDict = @{NSLocalizedDescriptionKey: description};
-            NSError *err = [[NSError alloc] initWithDomain:ReceiptValidationErrorDomain code:PsiphonReceiptValidationErrorHTTPFailed userInfo:errorDict];
-            receiptUploadCompletionHandler(nil, appReceiptFileSize, err);
-            return;
-        }
-
-        if (data.length == 0) {
-            NSDictionary *errorDict = @{NSLocalizedDescriptionKey: @"Empty server response"};
-            NSError *err = [[NSError alloc] initWithDomain:ReceiptValidationErrorDomain code:PsiphonReceiptValidationErrorInvalidReceipt userInfo:errorDict];
-            receiptUploadCompletionHandler(nil, appReceiptFileSize, err);
-            return;
-        }
-
-        NSError *jsonError;
-        NSDictionary *dict = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&jsonError];
-
-        if (jsonError) {
-            NSDictionary *errorDict = @{NSLocalizedDescriptionKey:@"JSON parse failure", NSUnderlyingErrorKey:jsonError};
-            NSError *err = [[NSError alloc] initWithDomain:ReceiptValidationErrorDomain code:PsiphonReceiptValidationErrorJSONParseFailed userInfo:errorDict];
-            receiptUploadCompletionHandler(nil, appReceiptFileSize, err);
-            return;
-        }
-
-        receiptUploadCompletionHandler(dict, appReceiptFileSize, nil);
     }];
 
     [postDataTask resume];
@@ -316,6 +353,56 @@ typedef NS_ENUM(NSInteger, SubscriptionStateEnum) {
         case SubscriptionStateSubscribed: return @"Subscribed";
     }
     return @"";
+}
+
+@end
+
+#pragma mark - LocalSubscriptionCheckResult
+
+@implementation LocalSubscriptionCheckResult
+
++ (LocalSubscriptionCheckResult *_Nonnull)localSubscriptionCheckResult:(NSNumber*)subscriptionCheckEnum
+                                                                reason:(NSString*)reason {
+    LocalSubscriptionCheckResult *instance = [[LocalSubscriptionCheckResult alloc] init];
+    instance.subscriptionCheckEnum = subscriptionCheckEnum;
+    instance.reason = reason;
+    return instance;
+}
+
+@end
+
+#pragma mark - Subscription Verifier Request Metadata
+
+@implementation SubscriptionVerifierRequestMetadata
+
+- (NSDictionary*)dictionaryRepresentation {
+
+    NSMutableDictionary *d = [[NSMutableDictionary alloc] init];
+
+    if (self.extensionStartReason) {
+        [d setObject:self.extensionStartReason forKey:@"extension_start_reason"];
+    }
+
+    if (self.reason) {
+        [d setObject:self.reason forKey:@"reason"];
+    }
+
+    if (self.lastAuthId) {
+        [d setObject:self.lastAuthId forKey:@"last_authorization_id"];
+    }
+
+    if (self.lastAuthAccessType) {
+        [d setObject:self.lastAuthAccessType forKey:@"last_authorization_access_type"];
+    }
+
+    [d setObject:@(self.retryNumber) forKey:@"retry_number"];
+    [d setObject:@(self.requestNumber) forKey:@"request_number"];
+
+    if (self.previousRequestError) {
+        [d setObject:[self.previousRequestError jsonSerializableDictionaryRepresentation] forKey:@"previous_request_failure"];
+    }
+
+    return d;
 }
 
 @end

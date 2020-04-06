@@ -27,4 +27,7 @@
 
 + (instancetype)errorWithDomain:(NSErrorDomain)domain code:(NSInteger)code withUnderlyingError:(NSError *)error;
 
+/// Dictionary representation which is JSON serializable with the default implementation
+- (NSDictionary<NSString *, id> *)jsonSerializableDictionaryRepresentation;
+
 @end

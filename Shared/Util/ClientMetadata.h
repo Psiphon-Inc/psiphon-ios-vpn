@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, Psiphon Inc.
+ * Copyright (c) 2020, Psiphon Inc.
  * All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -19,18 +19,14 @@
 
 #import <Foundation/Foundation.h>
 
-@interface AppInfo : NSObject
+NS_ASSUME_NONNULL_BEGIN
 
-+ (NSString*_Nullable)appVersion;
+FOUNDATION_EXPORT NSString * const VerifierSubscriptionCheckClientMetadataHeaderField;
 
-+ (NSString*_Nullable)clientRegion;
+@interface ClientMetadata : NSObject
 
-+ (NSString*_Nullable)propagationChannelId;
-
-+ (NSString*_Nullable)sponsorId;
-
-+ (NSString *_Nonnull)clientPlatform;
-
-+ (BOOL)runningUITest;
++ (NSString *__nullable)jsonString;
 
 @end
+
+NS_ASSUME_NONNULL_END
