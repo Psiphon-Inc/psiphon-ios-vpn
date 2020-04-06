@@ -143,6 +143,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 #pragma mark - Extension Data (Data originating in the extension)
 
+- (NSString *_Nullable)emittedClientRegion;
+
+- (NSString *_Nullable)getCurrentSponsorId;
+
 #if TARGET_IS_EXTENSION
 
 /*!
@@ -173,10 +177,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSArray<Homepage *> *_Nullable)getHomepages;
 
 - (NSArray<NSString *> *_Nullable)emittedEgressRegions;
-
-- (NSString *_Nullable)emittedClientRegion;
-
-- (NSString *_Nullable)getCurrentSponsorId;
 
 /**
  * @brief Returns previously persisted server timestamp from the shared NSUserDefaults
