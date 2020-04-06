@@ -15,10 +15,10 @@ target 'Psiphon' do
   #pod "PsiphonClientCommonLibrary", :path => "../psiphon-ios-client-common-library"
 
   pod 'ReactiveObjC', :git => "https://github.com/Psiphon-Inc/ReactiveObjC.git", :commit => '8bbf9dd'
-  pod 'mopub-ios-sdk', '~> 5.4'
-  pod 'MoPub-AdMob-Adapters', '~> 7.37'
-  pod 'Google-Mobile-Ads-SDK', '~> 7.37'
-  pod 'PersonalizedAdConsent'  # Google Mobile Ads Consent SDK
+  pod 'mopub-ios-sdk', '~> 5.11'
+  pod 'MoPub-AdMob-Adapters', '~> 7.53.1'
+  pod 'Google-Mobile-Ads-SDK', '~> 7.53.1'
+  pod 'PersonalizedAdConsent', '~> 1.0'  # Google Mobile Ads Consent SDK
   pod 'MBProgressHUD', '~> 1.1.0'
   pod 'CustomIOSAlertView', '~> 0.9.5'
   pod 'SVProgressHUD'
