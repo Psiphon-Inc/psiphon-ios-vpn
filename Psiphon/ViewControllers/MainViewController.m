@@ -747,18 +747,18 @@ NSString * const CommandStopVPN = @"StopVPN";
 
     // Remove all on-going cloud animations
     void (^removeAllCloudAnimations)(void) = ^void(void) {
-        [cloudMiddleLeft.layer removeAllAnimations];
-        [cloudMiddleRight.layer removeAllAnimations];
-        [cloudTopRight.layer removeAllAnimations];
-        [cloudBottomRight.layer removeAllAnimations];
+        [self->cloudMiddleLeft.layer removeAllAnimations];
+        [self->cloudMiddleRight.layer removeAllAnimations];
+        [self->cloudTopRight.layer removeAllAnimations];
+        [self->cloudBottomRight.layer removeAllAnimations];
     };
 
     // Position clouds in their default positions
     void (^disconnectedAndConnectedLayout)(void) = ^void(void) {
-        cloudMiddleLeftHorizontalConstraint.constant = cloudMiddleLeftOffset;
-        cloudMiddleRightHorizontalConstraint.constant = cloudWidth/2; // hidden
-        cloudTopRightHorizontalConstraint.constant = cloudTopRightOffset;
-        cloudBottomRightHorizontalConstraint.constant = cloudBottomRightOffset;
+        self->cloudMiddleLeftHorizontalConstraint.constant = cloudMiddleLeftOffset;
+        self->cloudMiddleRightHorizontalConstraint.constant = cloudWidth/2; // hidden
+        self->cloudTopRightHorizontalConstraint.constant = cloudTopRightOffset;
+        self->cloudBottomRightHorizontalConstraint.constant = cloudBottomRightOffset;
         [self.view layoutIfNeeded];
     };
 
@@ -775,10 +775,10 @@ NSString * const CommandStopVPN = @"StopVPN";
         maxTranslation = MAX(maxTranslation, MAX(ABS(cloudTopRightHorizontalTranslation),ABS(cloudBottomRightHorizontalTranslation)));
 
         void (^connectingLayout)(void) = ^void(void) {
-            cloudMiddleLeftHorizontalConstraint.constant = cloudMiddleLeftHorizontalTranslation;
-            cloudMiddleRightHorizontalConstraint.constant = cloudMiddleRightHorizontalTranslation;
-            cloudTopRightHorizontalConstraint.constant = cloudTopRightHorizontalTranslation;
-            cloudBottomRightHorizontalConstraint.constant = cloudBottomRightHorizontalTranslation;
+            self->cloudMiddleLeftHorizontalConstraint.constant = cloudMiddleLeftHorizontalTranslation;
+            self->cloudMiddleRightHorizontalConstraint.constant = cloudMiddleRightHorizontalTranslation;
+            self->cloudTopRightHorizontalConstraint.constant = cloudTopRightHorizontalTranslation;
+            self->cloudBottomRightHorizontalConstraint.constant = cloudBottomRightHorizontalTranslation;
             [self.view layoutIfNeeded];
         };
 
@@ -809,10 +809,10 @@ NSString * const CommandStopVPN = @"StopVPN";
 
             [UIView animateWithDuration:0.25 * animationTimeStretchFactor delay:0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
 
-                cloudMiddleLeftHorizontalConstraint.constant = -cloudWidth; // hidden
-                cloudMiddleRightHorizontalConstraint.constant = cloudWidth/2 + cloudMiddleLeftOffset;
-                cloudTopRightHorizontalConstraint.constant = -self.view.frame.size.width - cloudWidth/2 + cloudTopRightOffset;
-                cloudBottomRightHorizontalConstraint.constant = -self.view.frame.size.width - cloudWidth/2 + cloudBottomRightOffset;
+                self->cloudMiddleLeftHorizontalConstraint.constant = -cloudWidth; // hidden
+                self->cloudMiddleRightHorizontalConstraint.constant = cloudWidth/2 + cloudMiddleLeftOffset;
+                self->cloudTopRightHorizontalConstraint.constant = -self.view.frame.size.width - cloudWidth/2 + cloudTopRightOffset;
+                self->cloudBottomRightHorizontalConstraint.constant = -self.view.frame.size.width - cloudWidth/2 + cloudBottomRightOffset;
                 [self.view layoutIfNeeded];
 
             } completion:^(BOOL finished) {
@@ -821,10 +821,10 @@ NSString * const CommandStopVPN = @"StopVPN";
                     // We want all the clouds to animate at the same speed so we put them all at the
                     // same distance from their final point.
                     CGFloat maxOffset = MAX(MAX(ABS(cloudMiddleLeftOffset), ABS(cloudTopRightOffset)), ABS(cloudBottomRightOffset));
-                    cloudMiddleLeftHorizontalConstraint.constant = -cloudWidth/2 - (maxOffset + cloudMiddleLeftOffset);
-                    cloudMiddleRightHorizontalConstraint.constant = cloudWidth/2 - (maxOffset + cloudMiddleLeftOffset);
-                    cloudTopRightHorizontalConstraint.constant = cloudWidth/2 + (maxOffset + cloudTopRightOffset);
-                    cloudBottomRightHorizontalConstraint.constant = cloudWidth/2 + (maxOffset + cloudBottomRightOffset);
+                    self->cloudMiddleLeftHorizontalConstraint.constant = -cloudWidth/2 - (maxOffset + cloudMiddleLeftOffset);
+                    self->cloudMiddleRightHorizontalConstraint.constant = cloudWidth/2 - (maxOffset + cloudMiddleLeftOffset);
+                    self->cloudTopRightHorizontalConstraint.constant = cloudWidth/2 + (maxOffset + cloudTopRightOffset);
+                    self->cloudBottomRightHorizontalConstraint.constant = cloudWidth/2 + (maxOffset + cloudBottomRightOffset);
                     [self.view layoutIfNeeded];
 
                     [UIView animateWithDuration:0.25 * animationTimeStretchFactor delay:0 options:UIViewAnimationOptionCurveEaseOut animations:^{
