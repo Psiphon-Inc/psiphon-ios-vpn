@@ -1,0 +1,6 @@
+framework module HyprMX {
+  umbrella header "HyprMX.h"
+
+  export *
+  module * { export * }
+}
