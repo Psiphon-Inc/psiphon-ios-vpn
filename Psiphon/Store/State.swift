@@ -26,9 +26,6 @@ public final class State<Value> {
 
     public var wrappedValue: Value {
         didSet {
-            if Debugging.mainThreadChecks {
-                precondition(Thread.isMainThread, "state can only be set from the main thread")
-            }
             self.passthroughSubject.input.send(value: wrappedValue)
         }
     }
