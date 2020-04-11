@@ -19,6 +19,51 @@
 
 import Foundation
 
+extension AdLoadStatus: CustomStringFeedbackDescription {
+    
+    public var description: String {
+        switch self {
+        case .none: return "none"
+        case .inProgress: return "inProgress"
+        case .done: return "done"
+        case .error: return "error"
+        @unknown default: return "unknown(\(self.rawValue)"
+        }
+    }
+    
+}
+
+extension TunnelProviderVPNStatus: CustomStringFeedbackDescription {
+    
+    public var description: String {
+        switch self {
+        case .invalid: return "invalid"
+        case .disconnected: return "disconnected"
+        case .connecting: return "connecting"
+        case .connected: return "connected"
+        case .reasserting: return "reasserting"
+        case .disconnecting: return "disconnecting"
+        @unknown default: return "unknown(\(self.rawValue)"
+        }
+    }
+    
+}
+
+extension TunnelProviderSyncReason: CustomStringFeedbackDescription {
+    
+    public var description: String {
+        switch self {
+        case .appLaunched:
+            return "appLaunched"
+        case .appDidBecomeActive:
+            return "appDidBecomeActive"
+        case .providerNotificationPsiphonTunnelConnected:
+            return "providerNotificationPsiphonTunnelConnected"
+        }
+    }
+    
+}
+
 extension Authorization: CustomFeedbackDescription {
     
     var feedbackFields: [String : CustomStringConvertible] {
