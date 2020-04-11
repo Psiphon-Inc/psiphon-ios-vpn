@@ -101,24 +101,22 @@ public final class Store<Value: Equatable, Action> {
     /// Sends action to the store.
     /// - Note: Stops program execution if called from threads other than the main thread.
     public func send(_ action: Action) {
-        if Debugging.mainThreadChecks {
-            precondition(Thread.isMainThread, "actions should only be sent from the main thread")
-        }
-        // Executes the reducer and collects the effects
-        let effects = self.reducer!(&self.value, action, ())
+        self.scheduler.schedule { [unowned self] in
+            // Executes the reducer and collects the effects
+            let effects = self.reducer!(&self.value, action, ())
 
-        effects.forEach { effect in
-            var disposable: Disposable?
-            disposable = effect.observe(on: self.scheduler)
-                .sink(receiveCompletion: {
-                    disposable?.dispose()
-                }, receiveValues: { [unowned self] internalAction in
-                    self.send(internalAction)
-                })
-            
-            self.effectDisposables.add(disposable)
+            effects.forEach { effect in
+                var disposable: Disposable?
+                disposable = effect.observe(on: self.scheduler)
+                    .sink(receiveCompletion: {
+                        disposable?.dispose()
+                    }, receiveValues: { [unowned self] internalAction in
+                        self.send(internalAction)
+                    })
+                
+                self.effectDisposables.add(disposable)
+            }
         }
-
     }
 
     /// Creates a  projection of the store value and action types.
