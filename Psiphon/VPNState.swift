@@ -534,6 +534,10 @@ fileprivate func tunnelProviderReducer<T: TunnelProviderManager>(
             return []
         case .failure(let errorEvent):
             state.startStopState = .completed(.failure(errorEvent))
+            
+            // Resets tunnel intent, since desired tunnel start state could not be achieved.
+            state.tunnelIntent = .none
+            
             return [ feedbackLog(.error, tag: vpnStartTag, errorEvent).mapNever() ]
         }
         
@@ -575,14 +579,16 @@ fileprivate func startPsiphonTunnelReducer<T: TunnelProviderManager>(
             updateConfig($0, for: .startVPN)
         }
         .flatMap(.latest, saveAndLoadConfig)
-        .flatMap(.latest) { result -> Effect<TPMEffectResultWrapper<T>> in
+        .flatMap(.latest) { (result: Result<T, ErrorEvent<NEVPNError>>)
+            -> Effect<TPMEffectResultWrapper<T>> in
             switch result {
             case .success(let tpm):
                 return startPsiphonTunnel(tpm)
                     .map { .startTunnelResult($0.dropSuccessValue().mapToUnit()) }
                     .prefix(value: .configUpdated(.success(tpm)))
             case .failure(let errorEvent):
-                return Effect(value:
+                return Effect(value: .startTunnelResult(.failure(errorEvent)))
+                    .prefix(value:
                     .configUpdated(.failure(errorEvent.map { .failedConfigLoadSave($0) }))
                 )
             }
