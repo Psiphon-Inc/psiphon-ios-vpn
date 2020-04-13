@@ -31,7 +31,6 @@ PsiFeedbackLogType const NotifierLogType = @"Notifier";
 #pragma mark - NotiferMessage values
 
 // Messages sent by the extension.
-NotifierMessage const NotifierNewHomepages           = PSIPHON_VPN_GROUP @".NewHomepages";
 NotifierMessage const NotifierTunnelConnected        = PSIPHON_VPN_GROUP @".TunnelConnected";
 NotifierMessage const NotifierAvailableEgressRegions = PSIPHON_VPN_GROUP @".AvailableEgressRegions";
 NotifierMessage const NotifierNetworkConnectivityFailed = PSIPHON_VPN_GROUP @".NetworkConnectivityFailed";
@@ -124,7 +123,6 @@ static inline void AddDarwinNotifyObserver(CFNotificationCenterRef center, const
 
 #else
     // Listens to all messages sent by the extension.
-    AddDarwinNotifyObserver(center, (__bridge const void *)self, (__bridge CFStringRef)NotifierNewHomepages);
     AddDarwinNotifyObserver(center, (__bridge const void *)self, (__bridge CFStringRef)NotifierTunnelConnected);
     AddDarwinNotifyObserver(center, (__bridge const void *)self, (__bridge CFStringRef)NotifierAvailableEgressRegions);
     AddDarwinNotifyObserver(center, (__bridge const void *)self, (__bridge CFStringRef)NotifierNetworkConnectivityFailed);

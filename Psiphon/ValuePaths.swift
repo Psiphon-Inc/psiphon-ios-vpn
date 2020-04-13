@@ -170,13 +170,12 @@ extension AppState {
     var landingPageReducerState: LandingPageReducerState<PsiphonTPM> {
         get {
             LandingPageReducerState(
-                shownLandingPage: self.shownLandingPage,
-                activeSpeedBoost: self.psiCash.activeSpeedBoost,
+                pendingLandingPageOpening: self.pendingLandingPageOpening,
                 tunnelProviderManager: self.tunnelProviderManager
             )
         }
         set {
-            self.shownLandingPage = newValue.shownLandingPage
+            self.pendingLandingPageOpening = newValue.pendingLandingPageOpening
         }
     }
     

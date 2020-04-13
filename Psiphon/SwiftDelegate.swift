@@ -184,6 +184,32 @@ extension SwiftDelegate: SwiftBridgeDelegate {
                 objcBridge.onVPNStartStopStateDidChange(value)
         }
         
+        // Opens landing page whenever Psiphon tunnel is connected, with
+        // change in value of `VPNState` tunnel intent.
+        self.lifetime += self.store.$value.signalProducer
+            .map(\.vpnState.value.tunnelIntent)
+            .skipRepeats()
+            .combinePrevious(initial: .none)
+            .filter { (combined: Combined<TunnelStartStopIntent?>) -> Bool in
+                switch (combined.previous, combined.current) {
+                case (.stop, .start(transition: .none)):
+                    return true
+                default:
+                    return false
+                }
+            }
+            .flatMap(.latest) { [unowned store = self.store] _ in
+                // Observes tunnel connected events after the user has switched
+                // tunnel intent to `.start(transition: _)`.
+                store!.$value.signalProducer
+                    .map(\.vpnState.value.providerVPNStatus)
+                    .skipRepeats()
+                    .filter { $0 == .connected }
+                    .take(first: 1)
+                    .map(value: AppAction.landingPage(.tunnelConnectedAfterIntentSwitchedToStart))
+            }
+            .send(store: self.store)
+
         if Debugging.printAppState {
             self.lifetime += self.store.$value.signalProducer.startWithValues { appState in
                 dump(appState[keyPath: \.vpnState])
@@ -191,6 +217,11 @@ extension SwiftDelegate: SwiftBridgeDelegate {
             }
         }
 
+    }
+    
+    struct Changed<Value> {
+        let changed: Bool
+        let value: Value
     }
     
     @objc func applicationWillEnterForeground(_ application: UIApplication) {
@@ -226,10 +257,6 @@ extension SwiftDelegate: SwiftBridgeDelegate {
     
     @objc func getCustomRewardData(_ callback: @escaping (CustomData?) -> Void) {
         callback(PsiCashEffect(psiCash: self.psiCashLib).rewardedVideoCustomData())
-    }
-    
-    @objc func showLandingPage() {
-        self.store.send(.landingPage(.openRandomlySelectedLandingPage))
     }
     
     @objc func refreshAppStoreReceipt() -> Promise<Error?>.ObjCPromise<NSError> {

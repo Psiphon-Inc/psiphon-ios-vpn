@@ -23,20 +23,9 @@ import Promises
 
 struct TimeoutError: Error {}
 
-extension SignalProducer where Error == Never {
-
-    // TODO: Check the promise lifecycle.
-    static func mapAsync(promise: Promise<Value>) -> SignalProducer<Value, Error> {
-        return SignalProducer.init { observer, lifetime in
-            promise.then { result in
-                observer.send(value: result)
-                observer.sendCompleted()
-            }.catch { error in
-                fatalError("promise should fail by emitting a result ('\(error)')")
-            }
-        }
-    }
-    
+struct Combined<Value> {
+    let previous: Value
+    let current: Value
 }
 
 extension Signal where Error == Never {
@@ -62,6 +51,18 @@ extension Signal where Value == Bool, Error == Never {
             }
     }
 
+}
+
+extension SignalProducer {
+    
+    /// A `SignalProducerConvertible` version of `combinePrevious(_:)`
+    func combinePrevious(initial: Value) -> SignalProducer<Combined<Value>, Error> {
+        self.combinePrevious(initial)
+            .map { (combined: (Value, Value)) -> Combined<Value> in
+                Combined(previous: combined.0, current: combined.1)
+        }
+    }
+    
 }
 
 extension SignalProducer where Value == Bool, Error == Never {

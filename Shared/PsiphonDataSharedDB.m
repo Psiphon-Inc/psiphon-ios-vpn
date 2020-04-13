@@ -360,8 +360,7 @@ UserDefaultsKey const DebugPsiphonConnectionStateStringKey = @"PsiphonDataShared
         return nil;
     }
 
-    // Pre-allocation optimization
-    homepages = [NSMutableArray arrayWithCapacity:50];
+    homepages = [NSMutableArray array];
     NSArray *homepageNotices = [data componentsSeparatedByString:@"\n"];
 
     for (NSString *line in homepageNotices) {

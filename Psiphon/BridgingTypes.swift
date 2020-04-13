@@ -68,7 +68,6 @@ import Promises
         _ initialTab: PsiCashViewController.Tabs
     ) -> UIViewController?
     @objc func getCustomRewardData(_ callback: @escaping (String?) -> Void)
-    @objc func showLandingPage()
     @objc func refreshAppStoreReceipt() -> Promise<Error?>.ObjCPromise<NSError>
     @objc func buyAppStoreSubscriptionProduct(
         _ product: SKProduct

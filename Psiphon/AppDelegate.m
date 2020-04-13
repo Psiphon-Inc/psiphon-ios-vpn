@@ -201,11 +201,7 @@ willFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
 #pragma mark - Notifier callback
 
 - (void)onMessageReceived:(NotifierMessage)message {
-    if ([NotifierNewHomepages isEqualToString:message]) {
-        LOG_DEBUG(@"Received notification NE.newHomepages");
-        [SwiftDelegate.bridge showLandingPage];
-
-    } else if ([NotifierTunnelConnected isEqualToString:message]) {
+    if ([NotifierTunnelConnected isEqualToString:message]) {
         LOG_DEBUG(@"Received notification NE.tunnelConnected");
         [SwiftDelegate.bridge syncWithTunnelProviderWithReason:
          TunnelProviderSyncReasonProviderNotificationPsiphonTunnelConnected];
