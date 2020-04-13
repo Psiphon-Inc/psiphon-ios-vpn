@@ -28,6 +28,7 @@ enum TunnelConnectedStatus {
     case notConnected
 }
 
+/// Connection status of the tunnel provider.
 typealias TunnelProviderVPNStatus = NEVPNStatus
 
 extension TunnelProviderVPNStatus {

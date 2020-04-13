@@ -70,13 +70,13 @@ struct DebugFlags {
 struct AppState: Equatable {
     var vpnState = VPNState<PsiphonTPM>(.init())
     var psiCashBalance = PsiCashBalance()
-    var shownLandingPage = LandingPageShownState.notShown
     var psiCash = PsiCashState()
     var appReceipt = ReceiptState()
     var subscription = SubscriptionState()
     var iapState = IAPState()
     var products = PsiCashAppStoreProductsState()
     var adPresentationState: Bool = false
+    var pendingLandingPageOpening: Bool = false
 }
 
 struct BalanceState: Equatable {
@@ -203,8 +203,6 @@ func makeEnvironment(
             }
         },
         vpnStartCondition: { [unowned store] () -> Bool in
-            // It is safe to access Store's value directly here, since the environment
-            // is accessed on the Store object's scheduler.
             return !store.value.adPresentationState
         }
     )
@@ -235,7 +233,6 @@ fileprivate func toLandingPageEnvironment(
         sharedDB: env.sharedDB,
         urlHandler: env.urlHandler,
         psiCashEffects: env.psiCashEffects,
-        tunnelProviderStatusSignal: env.tunnelProviderStatusSignal,
         psiCashAuthPackageSignal: env.psiCashAuthPackageSignal
     )
 }

@@ -20,34 +20,24 @@
 import Foundation
 import ReactiveSwift
 
+fileprivate let landingPageTag = LogTag("LandingPage")
+
 typealias RestrictedURL = PredicatedValue<URL, TunnelProviderVPNStatus>
 
-enum LandingPageShownState {
-    case pending
-    case shown
-    case notShown
-    case notShownDueSpeedBoostPurchase
-}
-
 struct LandingPageReducerState<T: TunnelProviderManager> {
-    var shownLandingPage: LandingPageShownState
-    let activeSpeedBoost: PurchasedExpirableProduct<SpeedBoostProduct>?
+    var pendingLandingPageOpening: Bool
     let tunnelProviderManager: T?
 }
 
 enum LandingPageAction {
-    /// Will try to open a randomly selected landing page from stored landing pages if VPN is connected.
-    case openRandomlySelectedLandingPage
-    case urlOpened(success: Bool)
-    /// Resets the shown landing page for current session flag.
-    case reset
+    case tunnelConnectedAfterIntentSwitchedToStart
+    case _urlOpened(success: Bool)
 }
 
 typealias LandingPageEnvironment<T: TunnelProviderManager> = (
     sharedDB: PsiphonDataSharedDB,
     urlHandler: URLHandler<T>,
     psiCashEffects: PsiCashEffect,
-    tunnelProviderStatusSignal: SignalProducer<TunnelProviderVPNStatus, Never>,
     psiCashAuthPackageSignal: SignalProducer<PsiCashAuthPackage, Never>
 )
 
@@ -56,69 +46,43 @@ func landingPageReducer<T: TunnelProviderManager>(
     environment: LandingPageEnvironment<T>
 ) -> [Effect<LandingPageAction>] {
     switch action {
-    case .openRandomlySelectedLandingPage:
-        switch (state.shownLandingPage, state.activeSpeedBoost) {
-        case (.pending, _),
-             (.shown, _):
-            return []
-            
-        case (.notShown, .some(_)):
-            state.shownLandingPage = .notShownDueSpeedBoostPurchase
-            return []
-            
-        case (.notShown, .none),
-             (.notShownDueSpeedBoostPurchase, _):
-            
-            guard let tpm = state.tunnelProviderManager else {
-                return []
-            }
-            
-            state.shownLandingPage = .pending
+    case .tunnelConnectedAfterIntentSwitchedToStart:
+        guard !state.pendingLandingPageOpening else {
             return [
-                // Waits up to 1 second for vpnStatus to change to `.connected`.
-                environment.tunnelProviderStatusSignal
-                    .map { $0 == .connected }
-                    .falseIfNotTrue(within: .seconds(1))
-                    .take(first: 1)
-                    .flatMap(.latest) { connected -> SignalProducer<LandingPageAction, Never> in
-                        if connected {
-                            guard
-                                let landingPages = environment.sharedDB.getHomepages(),
-                                landingPages.count > 0 else
-                            {
-                                return Effect(value: .urlOpened(success: false))
-                            }
-                            
-                            let randomlySelectedURL =
-                                RestrictedURL(value: landingPages.randomElement()!.url,
-                                              predicate: { $0 == .connected })
-                            
-                            return modifyLandingPagePendingEarnerToken(
-                                url: randomlySelectedURL,
-                                authPackageSignal: environment.psiCashAuthPackageSignal,
-                                psiCashEffects: environment.psiCashEffects
-                            ).flatMap(.latest) {
-                                environment.urlHandler.open($0, tpm)
-                            }
-                            .map(LandingPageAction.urlOpened(success:))
-                        } else {
-                            return Effect(value: .urlOpened(success: false))
-                        }
-                }
+                feedbackLog(.info, tag: landingPageTag, "pending landing page opening").mapNever()
+            ]
+        }
+        guard let tpm = state.tunnelProviderManager else {
+            fatalError("expected a valid tunnel provider")
+        }
+        
+        guard let landingPages = NonEmpty(array: environment.sharedDB.getHomepages()) else {
+            return [
+                Effect(value: ._urlOpened(success: false)),
+                feedbackLog(.warn, tag: landingPageTag, "no landing pages found").mapNever()
             ]
         }
         
-    case .urlOpened(success: let success):
-        if success {
-            state.shownLandingPage = .shown
-        } else {
-            state.shownLandingPage = .notShown
-        }
-        return []
+        state.pendingLandingPageOpening = true
         
-    case .reset:
-        state.shownLandingPage =  .notShown
+        let randomlySelectedURL = RestrictedURL(value: landingPages.randomElement()!.url,
+                                                predicate: { $0 == .connected })
+        
+        return [
+            modifyLandingPagePendingEarnerToken(
+                url: randomlySelectedURL,
+                authPackageSignal: environment.psiCashAuthPackageSignal,
+                psiCashEffects: environment.psiCashEffects
+            ).flatMap(.latest) {
+                environment.urlHandler.open($0, tpm)
+            }
+            .map(LandingPageAction._urlOpened(success:))
+        ]
+
+    case ._urlOpened(success: _):
+        state.pendingLandingPageOpening = false
         return []
+
     }
 }
 

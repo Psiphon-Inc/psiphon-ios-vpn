@@ -850,10 +850,6 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
     if ([self.psiphonTunnel getConnectionState] == PsiphonConnectionStateConnected) {
         [self startVPN];
         self.reasserting = FALSE;
-        
-        if (self.extensionStartMethod == ExtensionStartMethodFromContainer) {
-            [[Notifier sharedInstance] post:NotifierNewHomepages];
-        }
         return TRUE;
     }
 

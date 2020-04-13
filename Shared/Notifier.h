@@ -27,7 +27,6 @@ NS_ASSUME_NONNULL_BEGIN
 typedef NSString * NotifierMessage;
 
 // Messages sent by the extension.
-extern NotifierMessage const NotifierNewHomepages;
 extern NotifierMessage const NotifierTunnelConnected;
 extern NotifierMessage const NotifierAvailableEgressRegions;
 extern NotifierMessage const NotifierNetworkConnectivityFailed;
