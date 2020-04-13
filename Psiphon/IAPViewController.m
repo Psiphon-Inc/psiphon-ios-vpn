@@ -89,8 +89,7 @@ SKProductsRequestDelegate, SKPaymentTransactionObserver>
         return;
     }
 
-    NSURL *plistURL = [[NSBundle mainBundle] URLForResource:@"productIDs" withExtension:@"plist"];
-    NSSet<NSString *> *productIdentifiers = [NSSet setWithArray:[NSArray arrayWithContentsOfURL:plistURL]];
+    NSSet<NSString *> *productIdentifiers = [SwiftDelegate.bridge getAppStoreSubscriptionProductIDs];
     SKProductsRequest* productRequest = [[SKProductsRequest alloc] initWithProductIdentifiers:productIdentifiers];
     productRequest.delegate = self;
     [productRequest start];
