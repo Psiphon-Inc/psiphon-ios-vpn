@@ -56,49 +56,41 @@ public struct Queue<Element> {
 extension Queue: Equatable where Element: Equatable {}
 
 public struct NonEmpty<Element> {
-
-    public var head: Element
-    public var tail: [Element]
+    private var storage: [Element]
 
     public init(_ head: Element, _ tail: [Element]) {
-        self.head = head
-        self.tail = tail
+        self.storage = [head] + tail
     }
 
-    public init?(array: [Element]) {
-        guard let head = array.first else {
+    public init?(array: [Element]?) {
+        guard let array = array else {
             return nil
         }
-        self.head = head
-        self.tail = Array(array[1...])
+        guard array.count > 0 else {
+            return nil
+        }
+        self.storage = array
+    }
+    
+    public var head: Element {
+        self.storage.first!
+    }
+    
+    public var tail: ArraySlice<Element> {
+        self.storage.dropFirst()
     }
 
     public var count: Int {
-        1 + tail.count
+        self.storage.count
     }
 
     public subscript(index: Int) -> Element {
         get {
-            switch index {
-            case 0: return head
-            default: return tail[index - 1]
-            }
+            self.storage[index]
         }
         set(newValue) {
-            switch index {
-            case 0: head = newValue
-            default: tail[index - 1] = newValue
-            }
+            self.storage[index] = newValue
         }
-    }
-
-    subscript(maybe range: Range<Index>) -> [Element?] {
-        var result: [Element?] = []
-        result.reserveCapacity(range.count)
-        for i in range {
-            result.append(self[maybe: i])
-        }
-        return result
     }
 
 }
@@ -107,13 +99,11 @@ extension NonEmpty: Equatable where Element: Equatable {}
 extension NonEmpty: Hashable where Element: Hashable {}
 
 extension NonEmpty: Collection {
-    public func index(after i: Int) -> Int {
-        return i + 1
-    }
+    public func index(after i: Int) -> Int { self.storage.index(after: i) }
 
-    public var startIndex: Int { 0 }
+    public var startIndex: Int { self.storage.startIndex }
 
-    public var endIndex: Int { tail.count }
+    public var endIndex: Int { self.storage.endIndex }
 }
 
 
