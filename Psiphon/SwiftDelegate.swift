@@ -266,6 +266,11 @@ extension SwiftDelegate: SwiftBridgeDelegate {
         self.store.send(.appDelegateAction(.adPresentationStatus(presenting: presenting)))
     }
     
+    @objc func getAppStoreSubscriptionProductIDs() -> Set<String> {
+        let productIds = StoreProductIds.subscription()
+        return productIds.values
+    }
+    
     @objc func swithVPNStartStopIntent()
         -> Promise<SwitchedVPNStartStopIntent>.ObjCPromise<SwitchedVPNStartStopIntent>
     {

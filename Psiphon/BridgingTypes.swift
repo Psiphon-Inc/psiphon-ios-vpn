@@ -74,6 +74,7 @@ import Promises
         _ product: SKProduct
     ) -> Promise<ObjCIAPResult>.ObjCPromise<ObjCIAPResult>
     @objc func onAdPresentationStatusChange(_ presenting: Bool)
+    @objc func getAppStoreSubscriptionProductIDs() -> Set<String>
     
     // VPN
     
