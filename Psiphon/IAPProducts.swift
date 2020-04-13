@@ -66,7 +66,7 @@ struct StoreProductIds {
     let values: Set<String>
 
     private init(for type: AppStoreProductType, validator: (Set<String>) -> Bool) {
-        values = try! plistReader(key: type.rawValue)
+        values = try! plistReader(key: type.rawValue, toType: Set<String>.self)
     }
 
     static func subscription() -> StoreProductIds {

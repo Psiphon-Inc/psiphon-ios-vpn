@@ -378,14 +378,15 @@ extension DispatchTimeInterval {
 
 // MARK: File operations
 
-func plistReader(key: String) throws -> Set<String> {
+func plistReader<DecodeType: Decodable>(key: String, toType: DecodeType.Type) throws -> DecodeType {
+    // TODO: Add bundle dependency as an argument.
     guard let url = Bundle.main.url(forResource: key, withExtension: "plist") else {
         fatalError("'\(key).plist' is not valid")
     }
 
     let data = try Data(contentsOf: url)
     let decoder = PropertyListDecoder()
-    return try decoder.decode(Set<String>.self, from: data)
+    return try decoder.decode(toType, from: data)
 }
 
 // MARK: User Defaults
