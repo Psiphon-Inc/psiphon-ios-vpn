@@ -19,7 +19,6 @@
 
 #import <PsiphonTunnel/PsiphonTunnel.h>
 #import "AdManager.h"
-#import "VPNManager.h"
 #import "AppDelegate.h"
 #import "Logging.h"
 #import "RACCompoundDisposable.h"

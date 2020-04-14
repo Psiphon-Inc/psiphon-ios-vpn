@@ -39,6 +39,10 @@ import Promises
     @objc func onSpeedBoostActivePurchase(_ expiryTime: Date?)
 
     @objc func onSubscriptionStatus(_ status: BridgedUserSubscription)
+    
+    @objc func onVPNStatusDidChange(_ status: VPNStatus)
+    
+    @objc func onVPNStartStopStateDidChange(_ status: VPNStartStopStatus)
 
     @objc func dismiss(screen: DismissableScreen)
 
@@ -49,37 +53,146 @@ import Promises
 /// Inteface for AppDelegate functionality implemented in Swift and called from ObjC.
 @objc protocol SwiftBridgeDelegate {
     @objc static var bridge: SwiftBridgeDelegate { get }
+    
+    // UIApplicationDelegate callbacks
+    
     @objc func applicationDidFinishLaunching(_ application: UIApplication,
                                              objcBridge: ObjCBridgeDelegate)
     @objc func applicationWillEnterForeground(_ application: UIApplication)
+    @objc func applicationDidBecomeActive(_ application: UIApplication)
     @objc func applicationWillTerminate(_ application: UIApplication)
+    
+    // -
+    
     @objc func createPsiCashViewController(
         _ initialTab: PsiCashViewController.Tabs
     ) -> UIViewController?
     @objc func getCustomRewardData(_ callback: @escaping (String?) -> Void)
-    @objc func resetLandingPage()
     @objc func showLandingPage()
     @objc func refreshAppStoreReceipt() -> Promise<Error?>.ObjCPromise<NSError>
     @objc func buyAppStoreSubscriptionProduct(
         _ product: SKProduct
     ) -> Promise<ObjCIAPResult>.ObjCPromise<ObjCIAPResult>
+    @objc func onAdPresentationStatusChange(_ presenting: Bool)
+    
+    // VPN
+    
+    @objc func swithVPNStartStopIntent()
+        -> Promise<SwitchedVPNStartStopIntent>.ObjCPromise<SwitchedVPNStartStopIntent>
+    @objc func sendNewVPNIntent(_ value: SwitchedVPNStartStopIntent)
+    @objc func restartVPNIfActive()
+    @objc func syncWithTunnelProvider(reason: TunnelProviderSyncReason)
+    @objc func reinstallVPNConfig()
+    @objc func installVPNConfigWithPromise()
+        -> Promise<VPNConfigInstallResultWrapper>.ObjCPromise<VPNConfigInstallResultWrapper>
 }
 
 // MARK: Bridged Types
 
-/// `NEVPNStatus` observable bridged to Swift.
-@objc final class VPNStatusBridge: NSObject {
-
-    @objc static let instance = VPNStatusBridge()
-
-    @State var status: NEVPNStatus = .invalid
-
-    @objc func next(_ vpnStatus: NEVPNStatus) {
-        DispatchQueue.main.async {
-            self.status = vpnStatus
+@objc final class SwitchedVPNStartStopIntent: NSObject {
+    
+    let switchedIntent: TunnelStartStopIntent
+    @objc let vpnConfigInstalled: Bool
+    @objc let userSubscribed: Bool
+    
+    @objc var intendToStart: Bool {
+        switch switchedIntent {
+        case .start(transition: .none): return true
+        case .stop: return false
+        default: fatalError()
         }
     }
+    
+    private init(switchedIntent: TunnelStartStopIntent, vpnConfigInstalled: Bool,
+                 userSubscribed: Bool) {
+        self.switchedIntent = switchedIntent
+        self.vpnConfigInstalled = vpnConfigInstalled
+        self.userSubscribed = userSubscribed
+    }
+    
+    static func make<T: TunnelProviderManager>(
+        fromProviderManagerState state: VPNProviderManagerState<T>,
+        subscriptionStatus: SubscriptionStatus
+    ) -> Self {
+        guard !state.pendingProviderSync else {
+            fatalError("expected no pending sync with tunnel provider")
+        }
+        
+        let userSubscribed: Bool
+        switch subscriptionStatus {
+        case .subscribed(_):
+            userSubscribed = true
+        case .notSubscribed:
+            userSubscribed = false
+        case .unknown:
+            fatalError("expected subscription status to not be unknown")
+        }
+        
+        switch state.tunnelIntent {
+        case .start(transition: _):
+            return .init(switchedIntent: .stop,
+                         vpnConfigInstalled: state.loadState.vpnConfigurationInstalled,
+                         userSubscribed: userSubscribed)
+        case .stop, .none:
+            return .init(switchedIntent: .start(transition: .none),
+                         vpnConfigInstalled: state.loadState.vpnConfigurationInstalled,
+                         userSubscribed: userSubscribed)
+        }
+    }
+    
+}
 
+/// Bridging type with a simpler representation of `AppState.vpnState.value.startStopState`.
+@objc enum VPNStartStopStatus: Int {
+    case none
+    case pendingStart
+    case startFinished
+    case failedUserPermissionDenied
+    case failedOtherReason
+    
+    static func from(startStopState: VPNStartStopStateType) -> Self {
+        switch startStopState {
+            case .pending(.startPsiphonTunnel):
+                return .pendingStart
+            case .completed(.success(.startPsiphonTunnel)):
+                return .startFinished
+            case .completed(.failure(let errorEvent)):
+                if errorEvent.error.configurationReadWriteFailedPermissionDenied {
+                    return .failedUserPermissionDenied
+                } else {
+                    return .failedOtherReason
+                }
+            default:
+                return .none
+        }
+    }
+    
+}
+
+/// Bridging type representing result of installing VPN configuration.
+
+@objc enum VPNConfigInstallResult: Int {
+    case installedSuccessfully
+    case permissionDenied
+    case otherError
+}
+
+@objc final class VPNConfigInstallResultWrapper: NSObject {
+    @objc let value: VPNConfigInstallResult
+    init(_ value: VPNConfigInstallResult) {
+        self.value = value
+    }
+}
+
+@objc final class VPNStateCompat: NSObject {
+    
+    @objc static func providerNotStopped(_ value: TunnelProviderVPNStatus) -> Bool {
+        return value.providerNotStopped
+    }
+    
+    @objc static func providerNotStopped(vpnStatus value: VPNStatus) -> Bool {
+        return value.providerNotStopped
+    }
 }
 
 // `SubscriptionState` case only bridged to ObjC compatible type.

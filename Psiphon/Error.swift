@@ -95,3 +95,5 @@ extension Either: Error where A: Error, B: Error {
         }
     }
 }
+
+extension Array: Error where Element: Error {}

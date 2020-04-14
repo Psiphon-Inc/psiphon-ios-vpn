@@ -42,7 +42,7 @@ struct IAPReducerState {
 }
 
 typealias IAPEnvironment = (
-    vpnStatus: SignalProducer<NEVPNStatus, Never>,
+    tunnelProviderStatusSignal: SignalProducer<TunnelProviderVPNStatus, Never>,
     psiCashEffects: PsiCashEffect,
     clientMetaData: ClientMetaData,
     paymentQueue: PaymentQueue,
@@ -103,7 +103,7 @@ func iapReducer(
         return [
             verifyConsumable(transaction: unverifiedTx,
                              receipt: receiptData,
-                             vpnStatus: environment.vpnStatus,
+                             tunnelProviderStatusSignal: environment.tunnelProviderStatusSignal,
                              psiCashEffects: environment.psiCashEffects,
                              clientMetaData: environment.clientMetaData)
                 .map(IAPAction.verifiedPsiCashConsumable)

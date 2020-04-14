@@ -21,6 +21,8 @@ import Foundation
 
 protocol FeedbackDescription {}
 
+protocol CustomStringFeedbackDescription: FeedbackDescription, CustomStringConvertible {}
+
 protocol CustomFeedbackDescription {
     var feedbackFields: [String: CustomStringConvertible] { get }
 }
@@ -57,7 +59,8 @@ enum LogLevel: Int {
     case error
 }
 
-struct LogMessage: ExpressibleByStringLiteral, Equatable, CustomStringConvertible {
+struct LogMessage: ExpressibleByStringLiteral, ExpressibleByStringInterpolation,
+Equatable, CustomStringConvertible {
     typealias StringLiteralType = String
     
     private var value: String

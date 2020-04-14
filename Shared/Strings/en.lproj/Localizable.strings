@@ -114,9 +114,6 @@
 /* Button title that takes user to the next page */
 "NEXT_PAGE_BUTTON_TITLE" = "Next";
 
-/* Alert title informing user there is no internet connection */
-"NO_INTERNET" = "No Internet Connection";
-
 /* Subscriptions view text that is visible when the list of subscriptions is not available */
 "NO_PRODUCTS_TEXT_2" = "Could not retrieve subscriptions from the App Store. Please try again later.";
 
@@ -362,9 +359,6 @@
 
 /* Button title shown when something fails to load. Asks the user to tap the button to retry the operation */
 "TAP_TO_RETRY" = "Tap to Retry";
-
-/* Alert message informing user to turn on their cellular data or wifi to connect to the internet */
-"TURN_ON_DATE" = "Turn on cellular data or use Wi-Fi to access data.";
 
 /* Alert dialog message informing the user that an error occurred while starting Psiphon (Do not translate 'Psiphon'). The user should try again, and if the problem persists, they should try reinstalling the app. */
 "VPN_START_FAIL_MESSAGE" = "An error occurred while starting Psiphon. Please try again. If this problem persists, try reinstalling the Psiphon app.";

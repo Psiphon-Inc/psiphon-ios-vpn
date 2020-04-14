@@ -20,7 +20,7 @@
 import Foundation
 import ReactiveSwift
 
-typealias RestrictedURL = PredicatedValue<URL, NEVPNStatus>
+typealias RestrictedURL = PredicatedValue<URL, TunnelProviderVPNStatus>
 
 enum LandingPageShownState {
     case pending
@@ -29,9 +29,10 @@ enum LandingPageShownState {
     case notShownDueSpeedBoostPurchase
 }
 
-struct LandingPageReducerState {
+struct LandingPageReducerState<T: TunnelProviderManager> {
     var shownLandingPage: LandingPageShownState
     let activeSpeedBoost: PurchasedExpirableProduct<SpeedBoostProduct>?
+    let tunnelProviderManager: T?
 }
 
 enum LandingPageAction {
@@ -42,18 +43,17 @@ enum LandingPageAction {
     case reset
 }
 
-typealias LandingPageEnvironment = (
+typealias LandingPageEnvironment<T: TunnelProviderManager> = (
     sharedDB: PsiphonDataSharedDB,
-    urlHandler: URLHandler,
+    urlHandler: URLHandler<T>,
     psiCashEffects: PsiCashEffect,
-    vpnManager: VPNManager,
-    vpnStatusSignal: SignalProducer<NEVPNStatus, Never>,
+    tunnelProviderStatusSignal: SignalProducer<TunnelProviderVPNStatus, Never>,
     psiCashAuthPackageSignal: SignalProducer<PsiCashAuthPackage, Never>
 )
 
-func landingPageReducer(
-    state: inout LandingPageReducerState, action: LandingPageAction,
-    environment: LandingPageEnvironment
+func landingPageReducer<T: TunnelProviderManager>(
+    state: inout LandingPageReducerState<T>, action: LandingPageAction,
+    environment: LandingPageEnvironment<T>
 ) -> [Effect<LandingPageAction>] {
     switch action {
     case .openRandomlySelectedLandingPage:
@@ -69,10 +69,14 @@ func landingPageReducer(
         case (.notShown, .none),
              (.notShownDueSpeedBoostPurchase, _):
             
+            guard let tpm = state.tunnelProviderManager else {
+                return []
+            }
+            
             state.shownLandingPage = .pending
             return [
                 // Waits up to 1 second for vpnStatus to change to `.connected`.
-                environment.vpnStatusSignal
+                environment.tunnelProviderStatusSignal
                     .map { $0 == .connected }
                     .falseIfNotTrue(within: .seconds(1))
                     .take(first: 1)
@@ -80,7 +84,8 @@ func landingPageReducer(
                         if connected {
                             guard
                                 let landingPages = environment.sharedDB.getHomepages(),
-                                landingPages.count > 1 else {
+                                landingPages.count > 0 else
+                            {
                                 return Effect(value: .urlOpened(success: false))
                             }
                             
@@ -93,7 +98,7 @@ func landingPageReducer(
                                 authPackageSignal: environment.psiCashAuthPackageSignal,
                                 psiCashEffects: environment.psiCashEffects
                             ).flatMap(.latest) {
-                                environment.urlHandler.open($0, environment.vpnManager)
+                                environment.urlHandler.open($0, tpm)
                             }
                             .map(LandingPageAction.urlOpened(success:))
                         } else {

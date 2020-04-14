@@ -39,10 +39,11 @@ enum PsiCashAlertDismissAction {
     case speedBoostAlreadyActive
 }
 
-struct PsiCashReducerState: Equatable {
+struct PsiCashReducerState<T: TunnelProviderManager>: Equatable {
     var psiCashBalance: PsiCashBalance
     var psiCash: PsiCashState
     let subscription: SubscriptionState
+    let tunnelProviderManager: T?
 }
 
 typealias PsiCashEnvironment = (
@@ -50,18 +51,21 @@ typealias PsiCashEnvironment = (
     sharedDB: PsiphonDataSharedDB,
     userConfigs: UserDefaultsConfig,
     notifier: Notifier,
-    vpnManager: VPNManager,
+    vpnActionStore: (VPNExternalAction) -> Effect<Never>,
     // TODO: Remove this dependency from reducer's environment. UI-related effects
     // unnecessarily complicate reducers.
     objcBridgeDelegate: ObjCBridgeDelegate?,
     rewardedVideoAdBridgeDelegate: RewardedVideoAdBridgeDelegate
 )
 
-func psiCashReducer(
-    state: inout PsiCashReducerState, action: PsiCashAction, environment: PsiCashEnvironment
+func psiCashReducer<T: TunnelProviderManager>(
+    state: inout PsiCashReducerState<T>, action: PsiCashAction, environment: PsiCashEnvironment
 ) -> [Effect<PsiCashAction>] {
     switch action {
     case .buyPsiCashProduct(let purchasableType):
+        guard let tunnelProviderManager = state.tunnelProviderManager else {
+            return []
+        }
         guard case .notSubscribed = state.subscription.status else {
             return []
         }
@@ -74,7 +78,7 @@ func psiCashReducer(
         state.psiCash.purchasing = .speedBoost(purchasable)
         return [
             environment.psiCashEffects.purchaseProduct(purchasableType,
-                                                       vpnManager: environment.vpnManager)
+                                                       tunnelProviderManager: tunnelProviderManager)
                 .map(PsiCashAction.psiCashProductPurchaseResult)
         ]
         
@@ -121,6 +125,9 @@ func psiCashReducer(
         }
         
     case .refreshPsiCashState:
+        guard let tunnelProviderManager = state.tunnelProviderManager else {
+            return []
+        }
         guard case .notSubscribed = state.subscription.status else {
             return []
         }
@@ -130,7 +137,7 @@ func psiCashReducer(
         return [
             environment.psiCashEffects
                 .refreshState(andGetPricesFor: PsiCashTransactionClass.allCases,
-                              vpnManager: environment.vpnManager)
+                              tunnelProviderManager: tunnelProviderManager)
                 .map(PsiCashAction.refreshPsiCashStateResult)
         ]
         
@@ -190,9 +197,7 @@ func psiCashReducer(
         
     case .connectToPsiphonTapped:
         return [
-            .fireAndForget {
-                environment.vpnManager.startTunnel()
-            },
+            environment.vpnActionStore(.tunnelStateIntent(.start(transition: .none))).mapNever(),
             .fireAndForget {
                 environment.objcBridgeDelegate?.dismiss(screen: .psiCash)
             }

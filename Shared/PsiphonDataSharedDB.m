@@ -35,8 +35,6 @@ UserDefaultsKey const EgressRegionsStringArrayKey = @"egress_regions";
 
 UserDefaultsKey const ClientRegionStringKey = @"client_region";
 
-UserDefaultsKey const AppForegroundBoolKey = @"app_foreground";
-
 UserDefaultsKey const TunnelStartTimeStringKey = @"tunnel_start_time";
 
 UserDefaultsKey const TunnelSponsorIDStringKey = @"current_sponsor_id";
@@ -314,10 +312,6 @@ UserDefaultsKey const DebugPsiphonConnectionStateStringKey = @"PsiphonDataShared
 
 #pragma mark - Container Data (Data originating in the container)
 
-- (BOOL)getAppForegroundState {
-    return [sharedDefaults boolForKey:AppForegroundBoolKey];
-}
-
 - (NSDate *_Nullable)getContainerTunnelStartTime {
     NSString *_Nullable rfc3339Date = [sharedDefaults stringForKey:TunnelStartTimeStringKey];
     if (!rfc3339Date) {
@@ -325,11 +319,6 @@ UserDefaultsKey const DebugPsiphonConnectionStateStringKey = @"PsiphonDataShared
     }
 
     return [NSDate fromRFC3339String:rfc3339Date];
-}
-
-- (BOOL)updateAppForegroundState:(BOOL)foreground {
-    [sharedDefaults setBool:foreground forKey:AppForegroundBoolKey];
-    return [sharedDefaults synchronize];
 }
 
 - (void)setContainerTunnelStartTime:(NSDate *)startTime {

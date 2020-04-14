@@ -23,7 +23,6 @@
 #import "RACSignal.h"
 #import "RACCompoundDisposable.h"
 #import "RACReplaySubject.h"
-#import "VPNManager.h"
 #import "Asserts.h"
 #import "AdManager.h"
 #import "Strings.h"
@@ -85,7 +84,7 @@ NSString * const SettingsResetAdConsentCellSpecifierKey = @"settingsResetAdConse
     [self.compoundDisposable addDisposable:subscriptionStatusDisposable];
 
     __block RACDisposable *tunnelStatusDisposable =
-      [[VPNManager sharedInstance].lastTunnelStatus
+      [AppObservables.shared.vpnStatus
         subscribeNext:^(NSNumber *statusObject) {
             weakSelf.vpnStatus = (VPNStatus) [statusObject integerValue];
             [weakSelf updateReinstallVPNProfileCell];
@@ -99,12 +98,12 @@ NSString * const SettingsResetAdConsentCellSpecifierKey = @"settingsResetAdConse
     NSMutableSet *hiddenKeys = [NSMutableSet setWithSet:self.hiddenKeys];
 
     // If the VPN is not active, don't show the force reconnect button.
-    if (![VPNManager mapIsVPNActive:self.vpnStatus]) {
-        [hiddenKeys addObject:kForceReconnect];
-        [hiddenKeys addObject:kForceReconnectFooter];
-    } else {
+    if ([VPNStateCompat providerNotStopped:self.vpnStatus]) {
         [hiddenKeys removeObject:kForceReconnect];
         [hiddenKeys removeObject:kForceReconnectFooter];
+    } else {
+        [hiddenKeys addObject:kForceReconnect];
+        [hiddenKeys addObject:kForceReconnectFooter];
     }
 
     self.hiddenKeys = hiddenKeys;
@@ -155,8 +154,6 @@ NSString * const SettingsResetAdConsentCellSpecifierKey = @"settingsResetAdConse
                      tableView:(UITableView *)tableView
     didSelectCustomViewSpecifier:(IASKSpecifier*)specifier {
 
-    SettingsViewController *__weak weakSelf = self;
-
     [super settingsViewController:self tableView:tableView didSelectCustomViewSpecifier:specifier];
 
     if ([specifier.key isEqualToString:SettingsPsiCashCellSpecifierKey]) {
@@ -166,16 +163,8 @@ NSString * const SettingsResetAdConsentCellSpecifierKey = @"settingsResetAdConse
         [self openIAPViewController];
 
     } else if ([specifier.key isEqualToString:SettingsReinstallVPNConfigurationKey]) {
-        __block RACDisposable *disposable = [[[VPNManager sharedInstance] reinstallVPNConfiguration]
-          subscribeError:^(NSError *error) {
-              [weakSelf.compoundDisposable removeDisposable:disposable];
-              [weakSelf settingsViewControllerDidEnd:nil];
-          }
-          completed:^{
-              [weakSelf.compoundDisposable removeDisposable:disposable];
-              [weakSelf settingsViewControllerDidEnd:nil];
-          }];
-        [self.compoundDisposable addDisposable:disposable];
+        [SwiftDelegate.bridge reinstallVPNConfig];
+        [self settingsViewControllerDidEnd:nil];
 
     } else if ([specifier.key isEqualToString:SettingsResetAdConsentCellSpecifierKey]) {
         [self onResetConsent];

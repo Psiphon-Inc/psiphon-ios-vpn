@@ -59,7 +59,7 @@ final class PsiCashViewController: UIViewController {
     struct ObservedState: Equatable {
         let state: PsiCashViewControllerState
         let activeTab: PsiCashViewController.Tabs
-        let vpnStatus: NEVPNStatus
+        let tunneled: TunnelConnectedStatus
     }
 
     enum Screen: Equatable {
@@ -105,7 +105,7 @@ final class PsiCashViewController: UIViewController {
          store: Store<PsiCashViewControllerState, PsiCashAction>,
          iapStore: Store<Unit, IAPAction>,
          productRequestStore: Store<Unit, ProductRequestAction>,
-         vpnStatusSignal: SignalProducer<NEVPNStatus, Never>) {
+         tunnelConnectedSignal: SignalProducer<TunnelConnectedStatus, Never>) {
 
         self.activeTab = initialTab
         self.store = store
@@ -144,12 +144,10 @@ final class PsiCashViewController: UIViewController {
         self.lifetime += SignalProducer.combineLatest(
             store.$value.signalProducer,
             self.$activeTab.signalProducer,
-            vpnStatusSignal)
+            tunnelConnectedSignal)
             .map(ObservedState.init)
             .skipRepeats()
             .startWithValues { [unowned self] observed in
-                let tunnelState = TunnelConnected.from(vpnStatus: observed.vpnStatus)
-
                 if case let .failure(errorEvent) = observed.state.psiCash.rewardedVideo.loading {
                     let errorDesc = ErrorEventDescription(
                         event: errorEvent,
@@ -245,12 +243,12 @@ final class PsiCashViewController: UIViewController {
                         self.tabControl.bind(.speedBoost)
                     }
 
-                    switch (tunnelState, observed.activeTab) {
+                    switch (observed.tunneled, observed.activeTab) {
                     case (.notConnected, .addPsiCash),
                          (.connected, .addPsiCash):
                         
                         if observed.state.iap.unverifiedPsiCashTx != nil {
-                            switch tunnelState {
+                            switch observed.tunneled {
                             case .connected:
                                 self.containerBindable.bind(
                                     .left(

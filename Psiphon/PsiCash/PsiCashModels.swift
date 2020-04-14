@@ -58,6 +58,14 @@ extension PsiCashLibData {
 }
 
 extension PsiCash {
+    
+    static func make(flags: DebugFlags) -> PsiCash {
+        let psiCashLib = PsiCash()
+        if flags.devServers {
+            psiCashLib.setValue("dev-api.psi.cash", forKey: "serverHostname")
+        }
+        return psiCashLib
+    }
 
     func setRequestMetadata() {
         if let appVersion = AppInfo.appVersion() {

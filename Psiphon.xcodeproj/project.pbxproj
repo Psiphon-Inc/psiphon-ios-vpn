@@ -90,7 +90,6 @@
 		52805BA122DD1EB8006B205B /* ReactiveSwift+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52805BA022DD1EB8006B205B /* ReactiveSwift+Additions.swift */; };
 		528D81332384823F00AA2D77 /* PsiCashMessageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 528D81322384823F00AA2D77 /* PsiCashMessageView.swift */; };
 		52A24659238C9AB700A01FF1 /* SpeedBoostPurchaseTable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52A24658238C9AB700A01FF1 /* SpeedBoostPurchaseTable.swift */; };
-		52A2465C2390569800A01FF1 /* Store.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52A2465B2390569800A01FF1 /* Store.swift */; };
 		52A2465E239081C100A01FF1 /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52A2465D239081C100A01FF1 /* AppState.swift */; };
 		52A24662239B07E000A01FF1 /* psiCashProductIds.plist in Resources */ = {isa = PBXBuildFile; fileRef = 52A24661239B07E000A01FF1 /* psiCashProductIds.plist */; };
 		52A2466D23A172A800A01FF1 /* AlertViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52A2466C23A172A800A01FF1 /* AlertViewController.swift */; };
@@ -128,16 +127,21 @@
 		8D417EB124147C6D00FEE587 /* LandingPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D417EB024147C6D00FEE587 /* LandingPage.swift */; };
 		8D417EB324148C1E00FEE587 /* URLHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D417EB224148C1E00FEE587 /* URLHandler.swift */; };
 		8D417EB72415633300FEE587 /* IAPReducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D417EB62415633300FEE587 /* IAPReducer.swift */; };
-		8D417EB92415667900FEE587 /* StoreDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D417EB82415667900FEE587 /* StoreDelegate.swift */; };
 		8D417EBB2417155000FEE587 /* AppReceipt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D417EBA2417155000FEE587 /* AppReceipt.swift */; };
 		8D417EBD2417FF5C00FEE587 /* Subscription.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D417EBC2417FF5B00FEE587 /* Subscription.swift */; };
 		8D417EBF2417FFB000FEE587 /* HardCodedValues.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D417EBE2417FFB000FEE587 /* HardCodedValues.swift */; };
 		8D417ED9241844FA00FEE587 /* FloatingPoint+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D417ED8241844FA00FEE587 /* FloatingPoint+Additions.swift */; };
-		8D417EDB2419D9D000FEE587 /* State.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D417EDA2419D9CF00FEE587 /* State.swift */; };
 		8D417EDD2419DBA100FEE587 /* ProductRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D417EDC2419DBA100FEE587 /* ProductRequest.swift */; };
-		8D417EDF241AA89C00FEE587 /* Effect.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D417EDE241AA89C00FEE587 /* Effect.swift */; };
 		8D7E9B9D2425DF42006F3A2F /* AnimatedUIView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D7E9B9C2425DF42006F3A2F /* AnimatedUIView.swift */; };
 		8D7E9B9F2425E053006F3A2F /* Animations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D7E9B9E2425E053006F3A2F /* Animations.swift */; };
+		8D9E602A24364ED2003A46D8 /* VPNState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D9E602924364ED2003A46D8 /* VPNState.swift */; };
+		8D9E602C24364EE6003A46D8 /* TunnelProviderManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D9E602B24364EE6003A46D8 /* TunnelProviderManager.swift */; };
+		8D9E602F24366AE7003A46D8 /* SerialEffect.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D9E602D24364FB6003A46D8 /* SerialEffect.swift */; };
+		8D9E603024366AEC003A46D8 /* Effect.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D417EDE241AA89C00FEE587 /* Effect.swift */; };
+		8D9E603124366AEF003A46D8 /* State.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D417EDA2419D9CF00FEE587 /* State.swift */; };
+		8D9E603224366AF2003A46D8 /* StoreDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D417EB82415667900FEE587 /* StoreDelegate.swift */; };
+		8D9E603324366AF4003A46D8 /* Store.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52A2465B2390569800A01FF1 /* Store.swift */; };
+		8D9E603524366D71003A46D8 /* FeedbackDescriptions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D9E603424366D71003A46D8 /* FeedbackDescriptions.swift */; };
 		8DA3466624114DB400F9E2D1 /* PsiCashState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DA3466524114DB400F9E2D1 /* PsiCashState.swift */; };
 		8DB6C6362429080C005E2F4C /* PsiCashMessageWithRetryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DB6C6352429080C005E2F4C /* PsiCashMessageWithRetryView.swift */; };
 		8DB6C638242A4D06005E2F4C /* DuskButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DB6C637242A4D06005E2F4C /* DuskButton.swift */; };
@@ -148,7 +152,6 @@
 		9BFEC3D66910918A0C8954E1 /* AdMobConsent.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC5F8D8BB828703CCCC2F /* AdMobConsent.m */; };
 		9BFEC459666697D89B09A492 /* AdMobRewardedAdControllerWrapper.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFECF6BF16767758F28D1A0 /* AdMobRewardedAdControllerWrapper.m */; };
 		9BFEC4F02A47FF8265635803 /* Notifier.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC91ED4A1C511520E9948 /* Notifier.m */; };
-		9BFEC530849525066327C815 /* VPNManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFECBACAAF0FC84C7EA783E /* VPNManager.m */; };
 		9BFEC5C256EBC72398FAE8D8 /* UnionSerialQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC84F5DF6D2C3EF754962 /* UnionSerialQueue.m */; };
 		9BFEC5C3F8FFF1366FF19D0B /* AsyncOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC6DEB0BE772BE801A9E6 /* AsyncOperation.m */; };
 		9BFEC8058885B68B2822E2B8 /* AdManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC3CE64925E5984AAA9BE /* AdManager.m */; };
@@ -524,6 +527,10 @@
 		8D417EDE241AA89C00FEE587 /* Effect.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Effect.swift; sourceTree = "<group>"; };
 		8D7E9B9C2425DF42006F3A2F /* AnimatedUIView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimatedUIView.swift; sourceTree = "<group>"; };
 		8D7E9B9E2425E053006F3A2F /* Animations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Animations.swift; sourceTree = "<group>"; };
+		8D9E602924364ED2003A46D8 /* VPNState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VPNState.swift; sourceTree = "<group>"; };
+		8D9E602B24364EE6003A46D8 /* TunnelProviderManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TunnelProviderManager.swift; sourceTree = "<group>"; };
+		8D9E602D24364FB6003A46D8 /* SerialEffect.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SerialEffect.swift; sourceTree = "<group>"; };
+		8D9E603424366D71003A46D8 /* FeedbackDescriptions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedbackDescriptions.swift; sourceTree = "<group>"; };
 		8DA3466524114DB400F9E2D1 /* PsiCashState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PsiCashState.swift; sourceTree = "<group>"; };
 		8DB6C6352429080C005E2F4C /* PsiCashMessageWithRetryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PsiCashMessageWithRetryView.swift; sourceTree = "<group>"; };
 		8DB6C637242A4D06005E2F4C /* DuskButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DuskButton.swift; sourceTree = "<group>"; };
@@ -535,7 +542,6 @@
 		9BFEC3165745A5D14C8C3C08 /* Notifier.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Notifier.h; sourceTree = "<group>"; };
 		9BFEC31B61584FD2EAAF5DE6 /* Authorization.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Authorization.m; sourceTree = "<group>"; };
 		9BFEC327A0BE7E5243CCB2E0 /* MoPubInterstitialAdControllerWrapper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MoPubInterstitialAdControllerWrapper.h; sourceTree = "<group>"; };
-		9BFEC33236183B2DA0000D5B /* VPNManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VPNManager.h; sourceTree = "<group>"; };
 		9BFEC356373DB0938069FBA8 /* AdControllerWrapper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AdControllerWrapper.h; sourceTree = "<group>"; };
 		9BFEC365D314919C8FA4C1DE /* AdMobInterstitialAdControllerWrapper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AdMobInterstitialAdControllerWrapper.h; sourceTree = "<group>"; };
 		9BFEC3CE64925E5984AAA9BE /* AdManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AdManager.m; sourceTree = "<group>"; };
@@ -558,7 +564,6 @@
 		9BFECA9ADB17DC329DA64AA5 /* AsyncOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AsyncOperation.h; sourceTree = "<group>"; };
 		9BFECACF5093B4C4EE5D3592 /* MoPubConsent.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MoPubConsent.m; sourceTree = "<group>"; };
 		9BFECB09D7F866F34551DBD4 /* IAPHelpViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IAPHelpViewController.h; sourceTree = "<group>"; };
-		9BFECBACAAF0FC84C7EA783E /* VPNManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VPNManager.m; sourceTree = "<group>"; };
 		9BFECC3FADE9C8A76A0913DE /* BasePacketTunnelProvider.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BasePacketTunnelProvider.m; sourceTree = "<group>"; };
 		9BFECC9B2B9F2BFBD4F8A47B /* UserDefaults.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UserDefaults.h; sourceTree = "<group>"; };
 		9BFECCCF429898FD903B69A6 /* Nullity.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Nullity.m; sourceTree = "<group>"; };
@@ -839,7 +844,6 @@
 		4E0DCB101F28458100495781 /* Shared */ = {
 			isa = PBXGroup;
 			children = (
-				52A2465A2390565700A01FF1 /* Store */,
 				521FD102219E0E8400F748EC /* Annotations.h */,
 				521FD101219E0E6300F748EC /* NotificationCenter.h */,
 				521FD0F4219E0DC300F748EC /* Profiling */,
@@ -1044,6 +1048,7 @@
 				8D417EB82415667900FEE587 /* StoreDelegate.swift */,
 				8D417EDA2419D9CF00FEE587 /* State.swift */,
 				8D417EDE241AA89C00FEE587 /* Effect.swift */,
+				8D9E602D24364FB6003A46D8 /* SerialEffect.swift */,
 			);
 			path = Store;
 			sourceTree = "<group>";
@@ -1150,6 +1155,7 @@
 		CE26FC8C1BBDC7B800B83375 /* Psiphon */ = {
 			isa = PBXGroup;
 			children = (
+				52A2465A2390565700A01FF1 /* Store */,
 				52055D02230C821200244F9E /* View */,
 				521FD0E4219E0D4500F748EC /* Debug */,
 				CE4E9BBF1BBEECF30060FF8B /* Psiphon.entitlements */,
@@ -1174,8 +1180,6 @@
 				4E5263BF207292920021FEF5 /* EmbeddedServerEntries.m */,
 				4E5263B5207290360021FEF5 /* EmbeddedServerEntriesHelpers.h */,
 				4E5263B6207290360021FEF5 /* EmbeddedServerEntriesHelpers.c */,
-				9BFEC33236183B2DA0000D5B /* VPNManager.h */,
-				9BFECBACAAF0FC84C7EA783E /* VPNManager.m */,
 				A84086716D701D0F5B48E4C0 /* ContainerDB.m */,
 				A8408319CD72511CABBE4CD4 /* ContainerDB.h */,
 				A84089CB9E8B0DF1D88D0500 /* AppUpgrade.m */,
@@ -1199,6 +1203,8 @@
 				8D417EB224148C1E00FEE587 /* URLHandler.swift */,
 				8D417EBC2417FF5B00FEE587 /* Subscription.swift */,
 				8D417EBE2417FFB000FEE587 /* HardCodedValues.swift */,
+				8D9E602924364ED2003A46D8 /* VPNState.swift */,
+				8D9E602B24364EE6003A46D8 /* TunnelProviderManager.swift */,
 				8D9E603424366D71003A46D8 /* FeedbackDescriptions.swift */,
 				52DF5E9523C7A31100A1B067 /* Error.swift */,
 			);
@@ -1761,11 +1767,9 @@
 				4E90C94420CB37F5003FC319 /* PsiCashLogger.m in Sources */,
 				EFC2F5C420226782007B52F9 /* RootContainerController.m in Sources */,
 				8D417EBB2417155000FEE587 /* AppReceipt.swift in Sources */,
-				8D417EB92415667900FEE587 /* StoreDelegate.swift in Sources */,
 				EF90D7A5204F22C900228A63 /* timestamp_parse.c in Sources */,
 				52DF5E9623C7A31100A1B067 /* Error.swift in Sources */,
 				EF652CD11F352212002AFB48 /* main.m in Sources */,
-				8D417EDB2419D9D000FEE587 /* State.swift in Sources */,
 				445F24EB20E1A5BA00D004E9 /* xer_support.c in Sources */,
 				4E5DAE6520A942A300E06342 /* UILabel+GetLabelHeight.m in Sources */,
 				EFC2F5CB202267B1007B52F9 /* PsiphonConfigReader.m in Sources */,
@@ -1793,8 +1797,10 @@
 				52DF5E9823CE5A8300A1B067 /* ValuePaths.swift in Sources */,
 				4E5BD4F52061982300AD4724 /* FeedbackManager.m in Sources */,
 				4E0A3669215AB7EE008A3D7B /* UIFont+Additions.m in Sources */,
+				8D9E602F24366AE7003A46D8 /* SerialEffect.swift in Sources */,
 				5246800722D51AA3009AEC6E /* PsiCashWidgetView.swift in Sources */,
 				52D363C9230DE215002C2221 /* PsiCashViewController.swift in Sources */,
+				8D9E603324366AF4003A46D8 /* Store.swift in Sources */,
 				528D81332384823F00AA2D77 /* PsiCashMessageView.swift in Sources */,
 				EF90D7A8204F22C900228A63 /* DispatchUtils.m in Sources */,
 				445F24D820E1A5BA00D004E9 /* OBJECT_IDENTIFIER.c in Sources */,
@@ -1805,6 +1811,7 @@
 				445F24E120E1A5BA00D004E9 /* ReceiptAttribute.c in Sources */,
 				EF90D7A2204F22C900228A63 /* timestamp_compare.c in Sources */,
 				52A24659238C9AB700A01FF1 /* SpeedBoostPurchaseTable.swift in Sources */,
+				8D9E602A24364ED2003A46D8 /* VPNState.swift in Sources */,
 				9BFECB6BF077F45D491093F1 /* Authorization.m in Sources */,
 				EF90D7A3204F22C900228A63 /* timestamp_tm.c in Sources */,
 				52D363CD230EEBAC002C2221 /* AnimatedUIButton.swift in Sources */,
@@ -1816,7 +1823,6 @@
 				52DF5E9223C675EC00A1B067 /* ViewController+Additions.swift in Sources */,
 				8DA3466624114DB400F9E2D1 /* PsiCashState.swift in Sources */,
 				52467FE122C2A704009AEC6E /* PsiCashModels.swift in Sources */,
-				9BFEC530849525066327C815 /* VPNManager.m in Sources */,
 				52C8F0AB237CA26200E5F9C0 /* ImageViewBuidler.swift in Sources */,
 				445F24F620E1A85D00D004E9 /* UTF8String.c in Sources */,
 				521FD0F0219E0D5600F748EC /* DebugLogViewController.m in Sources */,
@@ -1837,6 +1843,7 @@
 				520201212360F5B800D00C8E /* IndexedViewSwitcher.swift in Sources */,
 				52DF5E9E23D0D01F00A1B067 /* BridgingTypes.swift in Sources */,
 				9BFECD2FAA1FCDA88A7D432E /* UIColor+Additions.m in Sources */,
+				8D9E603124366AEF003A46D8 /* State.swift in Sources */,
 				521FD0F9219E0DDF00F748EC /* AppStats.m in Sources */,
 				8D417E992411954A00FEE587 /* PsiCashReducer.swift in Sources */,
 				8D417EA12411A89500FEE587 /* IAPState.swift in Sources */,
@@ -1856,7 +1863,6 @@
 				9BFECFE618966005B01CF582 /* MoPubRewardedAdControllerWrapper.m in Sources */,
 				9BFEC8058885B68B2822E2B8 /* AdManager.m in Sources */,
 				9BFEC3D66910918A0C8954E1 /* AdMobConsent.m in Sources */,
-				8D417EDF241AA89C00FEE587 /* Effect.swift in Sources */,
 				52DF5E9A23CE835100A1B067 /* UserStrings.swift in Sources */,
 				8DDA60292425BB4800DBA8EC /* DebugStrings.swift in Sources */,
 				52C8F0AD237E145C00E5F9C0 /* PsiCashCoinPurchaseTable.swift in Sources */,
@@ -1866,6 +1872,7 @@
 				52055D06230C833700244F9E /* SpeedBoostButton.swift in Sources */,
 				9BFEC459666697D89B09A492 /* AdMobRewardedAdControllerWrapper.m in Sources */,
 				8D417EBF2417FFB000FEE587 /* HardCodedValues.swift in Sources */,
+				8D9E603024366AEC003A46D8 /* Effect.swift in Sources */,
 				521FD0FD219E0E0F00F748EC /* DebugUtils.m in Sources */,
 				524B4E6B2316F0E3004E9891 /* BorderedSubtitleButton.m in Sources */,
 				9BFEC8A2F99380655E853F81 /* AdControllerWrapper.m in Sources */,
@@ -1882,7 +1889,6 @@
 				A8408EB13777DDCBEF7DE3C0 /* SwoopView.m in Sources */,
 				8D7E9B9D2425DF42006F3A2F /* AnimatedUIView.swift in Sources */,
 				A84080E163F24876A1476544 /* VPNStartAndStopButton.m in Sources */,
-				52A2465C2390569800A01FF1 /* Store.swift in Sources */,
 				8D417ED9241844FA00FEE587 /* FloatingPoint+Additions.swift in Sources */,
 				A840875B190F7666A1BD98E5 /* UIView+AutoLayoutViewGroup.m in Sources */,
 				A84088DD7FBB838689BC1FCC /* OnboardingViewController.m in Sources */,
@@ -1905,6 +1911,7 @@
 				A8408692D005E8599267522E /* UIView+Additions.m in Sources */,
 				A84087AFA5806D689C3BF6D2 /* PickerViewController.m in Sources */,
 				52A2467123A176BA00A01FF1 /* PsiCashPurchasingAlertViewBuilder.swift in Sources */,
+				8D9E603224366AF2003A46D8 /* StoreDelegate.swift in Sources */,
 				A8408EB1E9DABE35016580A7 /* ImageUtils.m in Sources */,
 				A8408BC29B903A6C0A32F32C /* SkyRegionSelectionViewController.m in Sources */,
 				8D417E9F2411A60900FEE587 /* PsiCashEffects.swift in Sources */,
@@ -1914,6 +1921,7 @@
 				A84081194DA12328ABB5A43E /* UIImageView+Additions.m in Sources */,
 				A840849074861D633B3EB4D1 /* AppEvent.m in Sources */,
 				A84080E9FC63E29F71A79A63 /* RelaySubject.m in Sources */,
+				8D9E602C24364EE6003A46D8 /* TunnelProviderManager.swift in Sources */,
 				A840803A0733D9FCA5410796 /* ActivityIndicatorRoyalSkyButton.m in Sources */,
 				A84084F47D4EA8D2B91E6609 /* SubscriptionData.m in Sources */,
 				52467FF922CE77A1009AEC6E /* Foundation+Additions.swift in Sources */,
