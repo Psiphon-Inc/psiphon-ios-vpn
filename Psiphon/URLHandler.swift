@@ -28,9 +28,9 @@ extension URLHandler {
     static func `default`<T: TunnelProviderManager>() -> URLHandler<T> {
         URLHandler<T>(
             open: { url, tpm in
-                Effect { observer, _ in
+                Effect.deferred { fulfilled in
                     if Debugging.disableURLHandler {
-                        observer.fulfill(value: true)
+                        fulfilled(true)
                         return
                     }
                     
@@ -40,12 +40,12 @@ extension URLHandler {
                         /// Tunnel status should be assessed directly (not through observables that might
                         /// introduce some latency), before opening the landing page.
                         guard let landingPage = url.getValue(tpm.connectionStatus) else {
-                            observer.fulfill(value: false)
+                            fulfilled(false)
                             return
                         }
                         
                         UIApplication.shared.open(landingPage) { success in
-                            observer.fulfill(value: success)
+                            fulfilled(success)
                         }
                     }
                 }

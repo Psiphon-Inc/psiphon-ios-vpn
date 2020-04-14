@@ -243,16 +243,15 @@ final class PsiphonTPM: TunnelProviderManager {
 func loadFromPreferences<T: TunnelProviderManager>()
     -> Effect<Result<[T], ErrorEvent<NEVPNError>>>
 {
-    Effect { observer, _ in
+    Effect.deferred { fulfilled in
         T.loadAll { (maybeManagers: [T]?, maybeError: Error?) in
                 switch (maybeManagers, maybeError) {
                 case (nil, nil):
-                    observer.fulfill(value: .success([]))
+                    fulfilled(.success([]))
                 case (.some(let managers), nil):
-                    observer.fulfill(value: .success(managers))
+                    fulfilled(.success(managers))
                 case (_ , .some(let error)):
-                    observer.fulfill(value:
-                        .failure(ErrorEvent(NEVPNError(_nsError: error as NSError))))
+                    fulfilled(.failure(ErrorEvent(NEVPNError(_nsError: error as NSError))))
                 }
         }
     }
@@ -291,16 +290,16 @@ func stopVPN<T: TunnelProviderManager>(_ tpm: T) -> Effect<()> {
 func saveAndLoadConfig<T: TunnelProviderManager>(_ tpm: T)
     -> Effect<Result<T, ErrorEvent<NEVPNError>>>
 {
-    Effect { observer, _ in
+    Effect.deferred { fulfilled in
         tpm.save { maybeError in
             if let error = maybeError {
-                observer.fulfill(value: .failure(ErrorEvent(error)))
+                fulfilled(.failure(ErrorEvent(error)))
             } else {
                 tpm.load { maybeError in
                     if let error = maybeError {
-                        observer.fulfill(value: .failure(ErrorEvent(error)))
+                        fulfilled(.failure(ErrorEvent(error)))
                     } else {
-                        observer.fulfill(value: .success(tpm))
+                        fulfilled(.success(tpm))
                     }
                 }
             }
@@ -311,12 +310,12 @@ func saveAndLoadConfig<T: TunnelProviderManager>(_ tpm: T)
 func removeFromPreferences<T: TunnelProviderManager>(_ tpm: T)
     -> Effect<Result<(), ErrorEvent<NEVPNError>>>
 {
-    Effect { observer, _ in
+    Effect.deferred { fulfilled in
         tpm.remove { maybeError in
             if let error = maybeError {
-                observer.fulfill(value: .failure(ErrorEvent(error)))
+                fulfilled(.failure(ErrorEvent(error)))
             } else {
-                observer.fulfill(value: .success(()))
+                fulfilled(.success(()))
             }
         }
     }
@@ -335,9 +334,9 @@ func observeConnectionStatus<T: TunnelProviderManager>(
 func sendMessage<T: TunnelProviderManager>(
     toProvider tpm: T, data: Data
 ) -> Effect<(T, Result<Data, ErrorEvent<ProviderMessageSendError>>)> {
-    Effect { observer, _ in
+    Effect.deferred { fulfilled in
         guard tpm.connectionStatus.providerNotStopped else {
-            observer.fulfill(value: (tpm, .failure(ErrorEvent(.providerNotActive))))
+            fulfilled((tpm, .failure(ErrorEvent(.providerNotActive))))
             return
         }
         
@@ -348,16 +347,14 @@ func sendMessage<T: TunnelProviderManager>(
                     let error: ProviderMessageSendError = .other(.right(
                         ProviderResponseMessageError(message: "nil response")))
                     
-                    observer.fulfill(value: (tpm, .failure(ErrorEvent(error))))
+                    fulfilled((tpm, .failure(ErrorEvent(error))))
                     return
                 }
-                observer.fulfill(value: (tpm, .success(responseData)))
+                fulfilled((tpm, .success(responseData)))
             }
         } catch {
             let vpnError = NEVPNError(_nsError: error as NSError)
-            observer.fulfill(value:
-                (tpm, .failure(ErrorEvent(.other(.left(vpnError)))))
-            )
+            fulfilled((tpm, .failure(ErrorEvent(.other(.left(vpnError))))))
         }
     }
 }

@@ -64,8 +64,19 @@ extension Effect {
         }
     }
     
+    /// A safer work-around for `Effect.init(_ startHandler:)`.
+    /// The async work is only given access to the `fulfill(value:)` function of the `Signal.Observer`,
+    /// and hence the returned Effect is completed as long as the `fulfill(value:)` function is called.
+    public static func deferred(
+        work: @escaping (@escaping (Value) -> Void) -> Void
+    ) -> Effect<Value> {
+        Effect { observer, _ in
+            work(observer.fulfill(value:))
+        }
+    }
+    
     public static func dispatchGlobal(action: @escaping () -> Value) -> Effect<Value> {
-        return Effect { observer, _ in
+        Effect { observer, _ in
             DispatchQueue.global(qos: .default).async {
                 observer.fulfill(value: action())
             }
