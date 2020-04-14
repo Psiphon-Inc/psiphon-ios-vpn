@@ -21,9 +21,6 @@ import Foundation
 
 final class UserDefaultsConfig {
 
-    @JSONUserDefault(.standard, "subscription_data_v1", defaultValue: .none)
-    var subscriptionData: SubscriptionData?
-
     /// Expected PsiCash reward while waiting for a successful PsiCash refresh state.
     @JSONUserDefault(.standard, "psicash_expected_reward_v1",
                      defaultValue: PsiCashAmount.zero())

@@ -48,7 +48,6 @@ extension SubscriptionStatus {
     
 }
 
-// TODO: store and recover this struct instead of the subscription dictionary
 struct SubscriptionData: Equatable, Codable {
     let latestExpiry: Date
     let productId: String
@@ -171,8 +170,6 @@ func updatePersistedData(
             environment.sharedDB.setContainerEmptyReceiptFileSize(data.fileSize as NSNumber)
             return
         }
-
-        environment.userConfigs.subscriptionData = subscription
 
         // The receipt contains purchase data, reset value in the shared DB.
         environment.sharedDB.setContainerEmptyReceiptFileSize(.none)
