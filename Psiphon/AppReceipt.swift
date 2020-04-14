@@ -64,18 +64,20 @@ func receiptReducer(
 ) -> [Effect<ReceiptStateAction>] {
     switch action {
     case .localReceiptRefresh:
-        let refreshedData = ReceiptData.fromLocalReceipt(environment.appBundle)
+        let maybeRefreshedData = ReceiptData.fromLocalReceipt(environment.appBundle)
         
-        // Carries out notify effect if the receipt is nil after a local refresh.
-        guard refreshedData != nil, state.receiptData != nil else {
-            return notifyUpdatedReceiptEffects(state.receiptData, environment: environment)
+        switch (maybeRefreshedData, state.receiptData) {
+        case (nil, _), (_, nil):
+            state.receiptData = maybeRefreshedData
+            return notifyUpdatedReceiptEffects(maybeRefreshedData, environment: environment)
+        case let (.some(refreshedData), .some(currentReceiptData)):
+            if refreshedData != currentReceiptData {
+                state.receiptData = maybeRefreshedData
+                return notifyUpdatedReceiptEffects(maybeRefreshedData, environment: environment)
+            } else {
+               return []
+            }
         }
-        
-        guard refreshedData != state.receiptData else {
-            return []
-        }
-        state.receiptData = refreshedData
-        return notifyUpdatedReceiptEffects(state.receiptData, environment: environment)
         
     case .remoteReceiptRefresh(optinalPromise: let optionalPromise):
         if let promise = optionalPromise {
