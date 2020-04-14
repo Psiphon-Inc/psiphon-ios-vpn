@@ -55,8 +55,8 @@ extension TunnelProviderSyncReason: CustomStringFeedbackDescription {
         switch self {
         case .appLaunched:
             return "appLaunched"
-        case .appDidBecomeActive:
-            return "appDidBecomeActive"
+        case .appEnteredForeground:
+            return "appEnteredForeground"
         case .providerNotificationPsiphonTunnelConnected:
             return "providerNotificationPsiphonTunnelConnected"
         }

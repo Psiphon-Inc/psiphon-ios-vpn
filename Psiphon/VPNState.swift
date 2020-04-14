@@ -181,7 +181,7 @@ enum TPMEffectResultWrapper<T: TunnelProviderManager>: Equatable {
 
 @objc enum TunnelProviderSyncReason: Int, Equatable {
     case appLaunched
-    case appDidBecomeActive
+    case appEnteredForeground
     case providerNotificationPsiphonTunnelConnected
 }
 
@@ -414,7 +414,7 @@ fileprivate func vpnProviderManagerStateReducer<T: TunnelProviderManager>(
                 guard case .pending = state.providerSyncResult else {
                     fatalError()
                 }
-            case .appDidBecomeActive, .providerNotificationPsiphonTunnelConnected:
+            case .appEnteredForeground, .providerNotificationPsiphonTunnelConnected:
                 guard case .completed(_) = state.providerSyncResult else {
                     fatalError()
                 }
