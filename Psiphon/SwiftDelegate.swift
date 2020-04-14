@@ -144,12 +144,15 @@ extension SwiftDelegate: SwiftBridgeDelegate {
         // Forwards `PsiCashState` updates to ObjCBridgeDelegate.
         self.lifetime += self.store.$value.signalProducer
             .map(\.balanceState)
+            .skipRepeats()
             .startWithValues { [unowned objcBridge] balanceViewModel in
                 objcBridge.onPsiCashBalanceUpdate(.init(swiftState: balanceViewModel))
         }
         
         // Forwards `SubscriptionStatus` updates to ObjCBridgeDelegate.
-        self.lifetime += self.store.$value.signalProducer.map(\.subscription.status)
+        self.lifetime += self.store.$value.signalProducer
+            .map(\.subscription.status)
+            .skipRepeats()
             .startWithValues { [unowned objcBridge] in
                 objcBridge.onSubscriptionStatus(BridgedUserSubscription.from(state: $0))
         }
