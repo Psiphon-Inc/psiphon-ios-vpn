@@ -68,10 +68,12 @@ PsiFeedbackLogType const ExitReasonLogType = @"ExitReason";
 
 /** Status of subscription authorization included in Psiphon config. */
 typedef NS_ENUM(NSInteger, SubscriptionAuthorizationStatus) {
+    /** @const SubscriptionAuthorizationStatusEmpty No authorization was sent. */
+    SubscriptionAuthorizationStatusEmpty,
     /** @const SubscriptionAuthorizationStatusRejected Authorization was rejected by Psiphon. */
     SubscriptionAuthorizationStatusRejected,
-    /** @const SubscriptionAuthorizationStatusActiveOrEmpty Authorization was either accepted by Psiphon, or no authorization was sent. */
-    SubscriptionAuthorizationStatusActiveOrEmpty
+    /** @const SubscriptionAuthorizationStatusActive Authorization was accepted by Psiphon. */
+    SubscriptionAuthorizationStatusActive
 };
 
 /** PacketTunnelProvider state */
@@ -129,8 +131,9 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
     // @scheduler Events are delivered on some background system thread.
     RACReplaySubject<NSNumber *> *_Nullable tunnelConnectionStateSubject;
 
-    // An infinite signal that emits @(SubscriptionAuthorizationStatusRejected) if the subscription authorization
-    // was invalid, and @(SubscriptionAuthorizationStatusActiveOrEmpty) if it was valid (or non-existent).
+    // An infinite signal that emits @(SubscriptionAuthorizationStatusRejected) if the subscription
+    // authorization was invalid, @(SubscriptionAuthorizationStatusActive) if it was valid or
+    // @(SubscriptionAuthorizationStatusEmpty) if no subscription authorization was sent.
     // When subscribed, replays the last item this subject was sent by onActiveAuthorizationIDs callback.
     RACReplaySubject<NSNumber *> *_Nullable subscriptionAuthorizationActiveSubject;
 
@@ -192,7 +195,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 
         // Bootstraps subscriptionAuthorizationActiveSubject by a item of type SubscriptionAuthorizationStatus to it.
         // The value doesn't matter since the subscription is forced.
-        [self->subscriptionAuthorizationActiveSubject sendNext:@(SubscriptionAuthorizationStatusActiveOrEmpty)];
+        [self->subscriptionAuthorizationActiveSubject sendNext:@(SubscriptionAuthorizationStatusEmpty)];
     }
 
     PSIAssert(self->subscriptionScheduler != nil);
@@ -257,8 +260,12 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
                         // Previous subscription authorization sent is not active, should contact subscription server.
                         return [RACSignal return:[LocalSubscriptionCheckResult localSubscriptionCheckResult:@(SubscriptionCheckShouldUpdateAuthorization)
                                                                                                      reason:@"authorizationStatusRejected"]];
+                    } else if ([authorizationStatus integerValue] == SubscriptionAuthorizationStatusActive) {
+                        // Previous subscription authorization sent was active. Do not need to contact subscription server.
+                        return [RACSignal return:[LocalSubscriptionCheckResult localSubscriptionCheckResult:@(SubscriptionCheckHasActiveAuthorization)
+                                                                                                     reason:@"authorizationStatusAccepted"]];
                     } else {
-                        // Either no subscription authorization was passed or it was valid.
+                        // No subscription authorization was sent.
                         return [SubscriptionVerifierService localSubscriptionCheck];
                     }
                 }];
@@ -1092,14 +1099,17 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
         // It is assumed that the subscription info at this point is the same as the subscription info
         // passed in getPsiphonConfig callback.
         SubscriptionData *subscription = [SubscriptionData fromPersistedDefaults];
-        if (subscription.authorization && ![authorizationIds containsObject:subscription.authorization.ID]) {
-
-            // Send value SubscriptionAuthorizationStatusRejected if subscription authorization was invalid.
-            [strongSelf->subscriptionAuthorizationActiveSubject sendNext:@(SubscriptionAuthorizationStatusRejected)];
-
+        if (subscription.authorization) {
+            if ([authorizationIds containsObject:subscription.authorization.ID]) {
+                // Send value SubscriptionAuthorizationStatusActive if subscription authorization was valid (accepted by the server).
+                [strongSelf->subscriptionAuthorizationActiveSubject sendNext:@(SubscriptionAuthorizationStatusActive)];
+            } else {
+                // Send value SubscriptionAuthorizationStatusRejected if subscription authorization was invalid.
+                [strongSelf->subscriptionAuthorizationActiveSubject sendNext:@(SubscriptionAuthorizationStatusRejected)];
+            }
         } else {
-            // Send value SubscriptionAuthorizationStatusActiveOrEmpty if subscription authorization was not invalid (i.e. authorization is non-existent or valid)
-            [strongSelf->subscriptionAuthorizationActiveSubject sendNext:@(SubscriptionAuthorizationStatusActiveOrEmpty)];
+            // Send value SubscriptionAuthorizationStatusEmpty if no subscription authorization was sent to the server.
+            [strongSelf->subscriptionAuthorizationActiveSubject sendNext:@(SubscriptionAuthorizationStatusEmpty)];
         }
 
         // Marks container authorizations found to be invalid, and sends notification to the container.
