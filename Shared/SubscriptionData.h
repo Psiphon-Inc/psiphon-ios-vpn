@@ -68,9 +68,15 @@ NS_ASSUME_NONNULL_BEGIN
 - (BOOL)hasActiveSubscriptionForNow;
 
 /**
+* Returns TRUE if subscription authorization is active against current time.
+* @return TRUE if authorization is active, FALSE otherwise.
+*/
+- (BOOL)hasActiveAuthorizationForNow;
+
+/**
  * Returns TRUE if subscription authorization is active compared to provided date.
  * @param date Date to compare the authorization expiration to.
- * @return TRUE if subscription is active, FALSE otherwise.
+ * @return TRUE if authorization is active, FALSE otherwise.
  */
 - (BOOL)hasActiveAuthorizationForDate:(NSDate *)date;
 
