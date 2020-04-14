@@ -286,7 +286,7 @@ struct VPNProviderManagerState<T: TunnelProviderManager>: Equatable {
     var loadState: ProviderManagerLoadState<T>
     var providerVPNStatus: TunnelProviderVPNStatus
     var startStopState: VPNStartStopStateType
-    var pendingProviderSync: Bool
+    var providerSyncResult: Pending<ErrorEvent<TunnelProviderSyncedState.SyncError>?>
 }
 
 extension VPNProviderManagerState {
@@ -311,7 +311,7 @@ extension VPNProviderManagerState {
         self.loadState = .init()
         self.providerVPNStatus = .invalid
         self.startStopState = .none
-        self.pendingProviderSync = false
+        self.providerSyncResult = .completed(.none)
     }
     
 }
@@ -397,7 +397,7 @@ fileprivate func vpnProviderManagerStateReducer<T: TunnelProviderManager>(
             guard case .nonLoaded = state.loadState.value else {
                 fatalError()
             }
-            state.pendingProviderSync = true
+            state.providerSyncResult = .pending
             return [
                 loadConfigs().map { .tpmEffectResultWrapper(.configUpdated($0)) },
                 Effect(value: .external(.syncWithProvider(reason: .appLaunched)))
@@ -405,16 +405,20 @@ fileprivate func vpnProviderManagerStateReducer<T: TunnelProviderManager>(
             
         case .syncWithProvider(reason: let reason):
             guard case .loaded(let tpm) = state.loadState.value else {
-                state.pendingProviderSync = false
+                state.providerSyncResult = .completed(.none)
                 return []
             }
             
             switch reason {
             case .appLaunched:
-                guard state.pendingProviderSync else { fatalError() }
+                guard case .pending = state.providerSyncResult else {
+                    fatalError()
+                }
             case .appDidBecomeActive, .providerNotificationPsiphonTunnelConnected:
-                guard !state.pendingProviderSync else { fatalError() }
-                state.pendingProviderSync = true
+                guard case .completed(_) = state.providerSyncResult else {
+                    fatalError()
+                }
+                state.providerSyncResult = .pending
             }
             
             return [
@@ -493,17 +497,21 @@ fileprivate func tunnelProviderReducer<T: TunnelProviderManager>(
         return effects.map { $0.mapNever() }
         
     case let .syncedStateWithProvider(syncReason: reason, syncedState):
-        
-        guard state.pendingProviderSync else {
+        guard case .pending = state.providerSyncResult else {
             fatalError()
+        }
+        
+        // Updates `state.providerSyncResult` value.
+        if case .unknown(let syncErrorEvent) = syncedState {
+            state.providerSyncResult = .completed(syncErrorEvent)
+        } else {
+            state.providerSyncResult = .completed(.none)
         }
         
         // Initialize tunnel intent value given none was previously set.
         if case .appLaunched = reason, case .none = state.tunnelIntent {
             state.tunnelIntent = .initializeIntentGiven(reason, syncedState)
         }
-        
-        state.pendingProviderSync = false
         
         switch syncedState {
         case .zombie:

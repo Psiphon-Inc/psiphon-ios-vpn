@@ -114,7 +114,7 @@ import Promises
         fromProviderManagerState state: VPNProviderManagerState<T>,
         subscriptionStatus: SubscriptionStatus
     ) -> Self {
-        guard !state.pendingProviderSync else {
+        guard case .completed(_) = state.providerSyncResult else {
             fatalError("expected no pending sync with tunnel provider")
         }
         
