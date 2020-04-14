@@ -432,21 +432,26 @@ fileprivate func vpnProviderManagerStateReducer<T: TunnelProviderManager>(
             
         case .reinstallVPNConfig:
             if case let .loaded(tpm) = state.loadState.value {
+                // Returned effect calls `stop()` on the tunnel provider manager object first,
+                // before remvoing the VPN config.
                 return [
-                    removeFromPreferences(tpm)
-                        .flatMap(.latest) { result -> Effect<TPMEffectResultWrapper<T>> in
-                            switch result {
-                            case .success(()):
-                                return installNewVPNConfig()
-                                
-                            case .failure(let errorEvent):
-                                return Effect(value:
-                                    .configUpdated(
-                                        .failure(errorEvent.map{ .failedRemovingConfigs([$0]) }))
-                                )
-                            }
-                    }.map {
-                        .tpmEffectResultWrapper($0)
+                    stopVPN(tpm).flatMap(.latest) {
+                        removeFromPreferences(tpm)
+                            .flatMap(.latest) { result -> Effect<TPMEffectResultWrapper<T>> in
+                                switch result {
+                                case .success(()):
+                                    return installNewVPNConfig()
+                                    
+                                case .failure(let errorEvent):
+                                    return Effect(value:
+                                        .configUpdated(
+                                            .failure(errorEvent.map{ .failedRemovingConfigs([$0]) })
+                                        )
+                                    )
+                                }
+                        }.map {
+                            .tpmEffectResultWrapper($0)
+                        }
                     }
                 ]
             } else {

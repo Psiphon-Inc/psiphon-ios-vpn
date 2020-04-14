@@ -396,6 +396,9 @@
 /* Status when the VPN is restarting. */
 "VPN_STATUS_RESTARTING" = "Restarting";
 
+/* Error message when something was wrong with the VPN. Asks the user that if the error persists, try tapping the 'Reinstall VPN Profile' button in the settings menu. 'Reinstall VPN Profile' translation has key SETTINGS_REINSTALL_VPN_CONFIGURATION_CELL_TITLE */
+"VPN_SYNC_FAILED_REINSTALL_CONFIG" = "Something went wrong. If this error persists try 'Reinstall VPN Profile'.";
+
 /* Button subtitle informing the user that if pressed a rewarded video ad will be displayed and they will earn credit. */
 "WATCH_REWARDED_VIDEO_AND_EARN" = "Watch Video & Earn";
 

@@ -164,6 +164,28 @@ extension SwiftDelegate: SwiftBridgeDelegate {
                 objcBridge.onVPNStatusDidChange($0)
             }
         
+        // Forwards VPN state `providerSyncResult` error values, for a maximum of 5 emissions.
+        // Errors are debounced for time interval defined in `VPNHardCodedValues`.
+        self.lifetime += self.store.$value.signalProducer
+            .map(\.vpnState.value.providerSyncResult)
+            .skipRepeats()
+            .compactMap { syncResult -> ErrorEvent<TunnelProviderSyncedState.SyncError>? in
+                guard case let .completed(.some(syncErrorEvent)) = syncResult else {
+                    return nil
+                }
+                return syncErrorEvent
+            }
+            .debounce(VPNHardCodedValues.syncStateErrorDebounceInterval, on: QueueScheduler.main)
+            .take(first: 5)
+            .startWithValues { [unowned objcBridge] syncErrorEvent in
+                let message = """
+                \(UserStrings.Tunnel_provider_sync_failed_reinstall_config())
+                
+                (\(String(describing: syncErrorEvent.error)))
+                """
+                objcBridge.onVPNStateSyncError(message)
+            }
+        
         // Forewards SpeedBoost purchase expiry date (if the user is not subscribed)
         // to ObjCBridgeDelegate.
         self.lifetime += self.store.$value.signalProducer

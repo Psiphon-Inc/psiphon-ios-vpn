@@ -203,11 +203,7 @@ NSString * const SettingsResetAdConsentCellSpecifierKey = @"settingsResetAdConse
 
         cell = [super tableView:tableView cellForSpecifier:specifier];
         [cell setAccessoryType:UITableViewCellAccessoryNone];
-        [cell.textLabel setText:NSLocalizedStringWithDefaultValue(@"SETTINGS_REINSTALL_VPN_CONFIGURATION_CELL_TITLE",
-                                                                  nil,
-                                                                  [NSBundle mainBundle],
-                                                                  @"Reinstall VPN profile",
-                                                                  @"Title of cell in settings menu which, when pressed, reinstalls the user's VPN profile for Psiphon")];
+        [cell.textLabel setText:[UserStrings Reinstall_vpn_config]];
         reinstallVPNProfileCell = cell;
         [self updateReinstallVPNProfileCell];
 
