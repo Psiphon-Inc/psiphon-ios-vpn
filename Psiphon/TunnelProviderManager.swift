@@ -81,13 +81,11 @@ enum TunnelProviderManagerUpdateType {
     case stopVPN
 }
 
-struct ProviderResponseMessageError: HashableError {
-    let message: String
-}
-
 enum ProviderMessageSendError: HashableError {
     case providerNotActive
-    case other(Either<NEVPNError, ProviderResponseMessageError>)
+    case timedout(TimeInterval)
+    case neVPNError(NEVPNError)
+    case parseError(String)
 }
 
 class VPNConnectionObserver<T: TunnelProviderManager>:
@@ -344,17 +342,14 @@ func sendMessage<T: TunnelProviderManager>(
             try tpm.sendProviderMessage(data) { maybeResponseData in
                 // A respose is always required from the tunenl provider.
                 guard let responseData = maybeResponseData else {
-                    let error: ProviderMessageSendError = .other(.right(
-                        ProviderResponseMessageError(message: "nil response")))
-                    
-                    fulfilled((tpm, .failure(ErrorEvent(error))))
+                    fulfilled((tpm, .failure(ErrorEvent(.parseError("nil response")))))
                     return
                 }
                 fulfilled((tpm, .success(responseData)))
             }
         } catch {
             let vpnError = NEVPNError(_nsError: error as NSError)
-            fulfilled((tpm, .failure(ErrorEvent(.other(.left(vpnError))))))
+            fulfilled((tpm, .failure(ErrorEvent(.neVPNError(vpnError)))))
         }
     }
 }

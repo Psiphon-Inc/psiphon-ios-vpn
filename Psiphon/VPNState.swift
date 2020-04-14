@@ -152,6 +152,13 @@ enum PsiphonTunnelState: Equatable {
 /// Represents state of the tunnel provider after sync.
 /// - Note: State sync is perfomed through sending `EXTENSION_QUERY_TUNNEL_PROVIDER_STATE` to the provider.
 enum TunnelProviderSyncedState: Equatable {
+    
+    enum SyncError: HashableError {
+        case neVPNError(NEVPNError)
+        case timedout(TimeInterval)
+        case responseParseError(String)
+    }
+    
     /// Psiphon tunnel is not connected when the tunnel provider is in zombie state.
     case zombie
     /// Represents state where tunnel provider is not in zombie state.
@@ -159,7 +166,7 @@ enum TunnelProviderSyncedState: Equatable {
     /// Tunnel provider process is not running
     case inactive
     /// Tunnel provider state is unknown either due to some error in syncing state or before any state sync is perfomed.
-    case unknown(ErrorEvent<Either<NEVPNError, ProviderResponseMessageError>>?)
+    case unknown(ErrorEvent<SyncError>?)
 }
 
 typealias ConfigUpdatedResult<T: TunnelProviderManager> =
@@ -412,7 +419,7 @@ fileprivate func vpnProviderManagerStateReducer<T: TunnelProviderManager>(
             
             return [
                 sendProviderStateQuery(tpm).map { _, queryResult in
-                    let providerState = TunnelProviderSyncedState.createFromQueryResult(queryResult)
+                    let providerState = TunnelProviderSyncedState.make(fromQueryResult: queryResult)
                     return .tpmEffectResultWrapper(
                         .syncedStateWithProvider(syncReason: reason, providerState)
                     )
@@ -518,7 +525,14 @@ fileprivate func tunnelProviderReducer<T: TunnelProviderManager>(
             guard let errorEvent = errorEvent else {
                 fatalError("expected non-nil error after provider state sync")
             }
-            return [ feedbackLog(.info, tag: vpnProviderSyncTag, errorEvent).mapNever() ]
+            
+            // Resets tunnel intent, since provider status could not be determined.
+            state.tunnelIntent = .none
+            
+            return [
+                Effect(value: .stopVPN),
+                feedbackLog(.info, tag: vpnProviderSyncTag, errorEvent).mapNever()
+            ]
             
         default:
             return []
@@ -690,9 +704,26 @@ fileprivate struct ProviderStateQueryResponseValue: Decodable {
     
 }
 
+extension TunnelProviderSyncedState.SyncError {
+    
+    fileprivate static func make(fromSendError sendError: ProviderMessageSendError) -> Self? {
+        switch sendError {
+        case .providerNotActive:
+            return nil
+        case .timedout(let interval):
+            return .timedout(interval)
+        case .neVPNError(let neVPNError):
+            return .neVPNError(neVPNError)
+        case .parseError(let string):
+            return .responseParseError(string)
+        }
+    }
+    
+}
+
 extension TunnelProviderSyncedState {
     
-    fileprivate static func createFromQueryResult(_ result: ProviderStateQueryResult) -> Self {
+    fileprivate static func make(fromQueryResult result: ProviderStateQueryResult) -> Self {
         switch result {
         case let .success(response):
             let responseValues = (zombie: response.isZombie,
@@ -715,8 +746,15 @@ extension TunnelProviderSyncedState {
             switch errorEvent.error {
             case .providerNotActive:
                 return .inactive
-            case let .other(error):
-                return .unknown(errorEvent.map { _ in error })
+            case .timedout, .neVPNError, .parseError:
+                return .unknown(errorEvent.map { sendError -> SyncError in
+                    guard let syncError = SyncError.make(fromSendError: sendError) else {
+                        fatalError("""
+                            failed to map '\(String(describing: errorEvent))' to 'SyncError'
+                            """)
+                    }
+                    return syncError
+                })
             }
         }
     }
@@ -738,6 +776,7 @@ fileprivate func sendProviderStateQuery<T: TunnelProviderManager>(
     _ tpm: T
 ) -> Effect<(T, ProviderStateQueryResult)> {
     let queryData = EXTENSION_QUERY_TUNNEL_PROVIDER_STATE.data(using: .utf8)!
+    let timeoutInterval = VPNHardCodedValues.providerMessageSendTimeout
     
     return sendMessage(toProvider: tpm, data: queryData).map { tpm, result in
         switch result {
@@ -747,12 +786,19 @@ fileprivate func sendProviderStateQuery<T: TunnelProviderManager>(
                     .decode(ProviderStateQueryResponseValue.self, from: responseData)
                 return (tpm, .success(providerState))
             } catch {
-                let wrapped = ProviderResponseMessageError(message: String(describing: error))
-                return (tpm, .failure(ErrorEvent(.other(.right(wrapped)))))
+                return (tpm, .failure(ErrorEvent(.parseError(String(describing: error)))))
             }
             
         case .failure(let errorEvent):
             return (tpm, .failure(errorEvent))
         }
     }
+    .promoteError(ProviderMessageSendError.self)
+    .timeout(after: timeoutInterval,
+             raising: ProviderMessageSendError.timedout(timeoutInterval),
+             on: QueueScheduler.main)
+    .flatMapError { [tpm] error -> Effect<(T, ProviderStateQueryResult)> in
+            return Effect(value: (tpm, .failure(ErrorEvent(error))))
+    }
+    
 }

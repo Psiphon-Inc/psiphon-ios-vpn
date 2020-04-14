@@ -19,6 +19,12 @@
 
 import Foundation
 
+struct VPNHardCodedValues {
+    
+    static let providerMessageSendTimeout: TimeInterval = 5.0  // 5 seconds
+    
+}
+
 struct PsiCashHardCodedValues {
     static let videoAdRewardAmount = PsiCashAmount(nanoPsi: Int64(35e9))
     static let videoAdRewardTitle = "35 PsiCash"
