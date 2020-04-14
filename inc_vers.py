@@ -56,6 +56,12 @@ if __name__ == "__main__":
     call(["git","pull"])
     short_version = call_with_output(["agvtool","what-marketing-version","-terse1"])
     version = call_with_output(["agvtool","what-version","-terse"])
+    
+    # Fix for a bug where agvtool returns multiple versions.
+    # E.g. ["123\n124"].
+    split_version = version.split('\n')
+    if len(split_version) > 0:
+        version = split_version[-1]
 
     # switch back to active branch
     call(["git","checkout",active_branch])
