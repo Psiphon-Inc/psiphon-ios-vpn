@@ -61,6 +61,10 @@
     return [self hasActiveAuthorizationForDate:[NSDate date]];
 }
 
+- (BOOL)hasActiveAuthorizationForNow {
+    return [self hasActiveAuthorizationForDate:[NSDate date]];
+}
+
 - (BOOL)hasActiveAuthorizationForDate:(NSDate *)date {
     if ([self isEmpty]) {
         return FALSE;
