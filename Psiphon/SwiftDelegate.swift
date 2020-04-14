@@ -250,6 +250,7 @@ extension SwiftDelegate: SwiftBridgeDelegate {
     }
     
     @objc func applicationWillEnterForeground(_ application: UIApplication) {
+        self.store.send(vpnAction: .syncWithProvider(reason: .appEnteredForeground))
         self.store.send(.psiCash(.refreshPsiCashState))
     }
     
@@ -257,9 +258,7 @@ extension SwiftDelegate: SwiftBridgeDelegate {
         self.environmentCleanup?()
     }
     
-    @objc func applicationDidBecomeActive(_ application: UIApplication) {
-        self.store.send(vpnAction: .syncWithProvider(reason: .appDidBecomeActive))
-    }
+    @objc func applicationDidBecomeActive(_ application: UIApplication) {}
     
     @objc func createPsiCashViewController(
         _ initialTab: PsiCashViewController.Tabs
