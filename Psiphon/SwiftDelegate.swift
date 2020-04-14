@@ -316,7 +316,11 @@ extension SwiftDelegate: SwiftBridgeDelegate {
             self.store.$value.signalProducer
                 .map(\.vpnState.value)
                 .filter { vpnProviderManagerState -> Bool in
-                    !vpnProviderManagerState.pendingProviderSync
+                    if case .completed(_) = vpnProviderManagerState.providerSyncResult {
+                        return true
+                    } else {
+                        return false
+                    }
                 }
                 .take(first: 1)
         
