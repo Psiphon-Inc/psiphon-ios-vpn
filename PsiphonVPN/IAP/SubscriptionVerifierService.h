@@ -110,7 +110,7 @@ typedef NS_ERROR_ENUM(ReceiptValidationErrorDomain, PsiphonReceiptValidationErro
 typedef NS_ENUM(NSInteger, SubscriptionCheckEnum) {
     SubscriptionCheckShouldUpdateAuthorization,
     SubscriptionCheckHasActiveAuthorization,
-    SubscriptionCheckAuthorizationExpired,
+    SubscriptionCheckAuthorizationExpired
 };
 
 
