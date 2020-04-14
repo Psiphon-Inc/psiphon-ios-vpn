@@ -19,6 +19,10 @@
 
 import Foundation
 
+// Feedback description note:
+// For new fields that are added, the feedback description in FeedbackDescriptions.swift
+// should also be updated.
+
 final class UserDefaultsConfig {
 
     /// Expected PsiCash reward while waiting for a successful PsiCash refresh state.
