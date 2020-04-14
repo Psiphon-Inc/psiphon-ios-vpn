@@ -101,7 +101,7 @@ typedef NS_ENUM(NSInteger, VPNIntent) {
     
     // Settings
     PsiphonSettingsViewController *appSettingsViewController;
-    UIButton *settingsButton;
+    AnimatedUIButton *settingsButton;
     
     // Region Selection
     UIView *bottomBar;
@@ -663,7 +663,7 @@ typedef NS_ENUM(NSInteger, VPNIntent) {
     cloudTopRight = [[UIImageView alloc] initWithImage:cloud];
     cloudBottomRight = [[UIImageView alloc] initWithImage:cloud];
     versionLabel = [[UIButton alloc] init];
-    settingsButton = [[UIButton alloc] init];
+    settingsButton = [[AnimatedUIButton alloc] init];
     psiphonLargeLogo = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"PsiphonLogoWhite"]];
     psiphonTitle = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"PsiphonTitle"]];
     psiCashWidget = [[PsiCashWidgetView alloc] initWithFrame:CGRectZero];
