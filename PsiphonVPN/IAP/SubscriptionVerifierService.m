@@ -58,7 +58,7 @@ PsiFeedbackLogType const SubscriptionVerifierServiceLogType = @"SubscriptionVeri
         } else {
             // subscription server doesn't need to be contacted.
             // Checks if subscription is active compared to device's clock.
-            if ([subscription hasActiveAuthorizationForDate:[NSDate date]]) {
+            if ([subscription hasActiveAuthorizationForNow]) {
                 [subscriber sendNext:[LocalSubscriptionCheckResult localSubscriptionCheckResult:@(SubscriptionCheckHasActiveAuthorization)
                                                                                          reason:shouldUpdateAuthResult.reason]];
                 [subscriber sendCompleted];

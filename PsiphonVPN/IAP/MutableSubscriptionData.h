@@ -45,7 +45,8 @@ NS_ASSUME_NONNULL_BEGIN
  * Returns TRUE if Subscription info is missing, the App Store receipt has changed, or we expect
  * the subscription to be renewed.
  * If this method returns TRUE, current subscription information should be deemed stale, and
- * subscription verifier server should be contacted to get latest subscription information.
+ * subscription verifier server should be contacted to get latest subscription information -- unless
+ * the client already has an active authorization.
  *
  * @note This is a blocking function until the new state is persisted.
  *
