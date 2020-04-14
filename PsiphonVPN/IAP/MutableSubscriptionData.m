@@ -85,7 +85,7 @@ PsiFeedbackLogType const MutableSubscriptionDataLogType = @"SubscriptionData";
 
     // Last expiry date recorded by the container still has time left - YES
     NSDate *_Nullable containerReceiptExpiry = [sharedDB getContainerLastSubscriptionReceiptExpiryDate];
-    if (![self hasActiveAuthorizationForNow] && containerReceiptExpiry && [containerReceiptExpiry afterOrEqualTo:[NSDate date]]) {
+    if (containerReceiptExpiry && [containerReceiptExpiry afterOrEqualTo:[NSDate date]]) {
         ShouldUpdateAuthResult *result = [ShouldUpdateAuthResult shouldUpdateAuth:YES reason:@"containerHasReceiptWithExpiry"];
         [PsiFeedbackLogger infoWithType:MutableSubscriptionDataLogType
                                    json:@{@"event": @"shouldUpdateAuth",
