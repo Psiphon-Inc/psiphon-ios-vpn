@@ -21,7 +21,12 @@ import Foundation
 
 struct VPNHardCodedValues {
     
+    /// Time interval during which a response to the messent sent to the tunnel provider is expected.
+    /// After which the send message Effect should timeout.
     static let providerMessageSendTimeout: TimeInterval = 5.0  // 5 seconds
+    
+    /// Debounce time interval for forwarding sync state errrors.
+    static let syncStateErrorDebounceInterval: TimeInterval = 5.0  // 5 seconds
     
 }
 

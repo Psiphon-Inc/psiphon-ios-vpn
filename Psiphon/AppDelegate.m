@@ -277,6 +277,27 @@ willFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     [AppObservables.shared.vpnStatus sendNext:@(status)];
 }
 
+- (void)onVPNStateSyncError:(NSString *)userErrorMessage {
+    UIAlertController *ac = [UIAlertController
+                             alertControllerWithTitle:[UserStrings Error_title]
+                             message:userErrorMessage
+                             preferredStyle:UIAlertControllerStyleAlert];
+
+    UIAlertAction *okAction = [UIAlertAction actionWithTitle:[UserStrings OK_button_title]
+                                                       style:UIAlertActionStyleCancel
+                                                     handler:nil];
+    
+    UIAlertAction *reinstallConfigAction = [UIAlertAction
+                                            actionWithTitle:[UserStrings Reinstall_vpn_config]
+                                            style:UIAlertActionStyleDefault
+                                            handler:^(UIAlertAction * _Nonnull action) {
+        [SwiftDelegate.bridge reinstallVPNConfig];
+    }];
+    [ac addAction:okAction];
+    [ac addAction:reinstallConfigAction];
+    [ac presentFromTopController];
+}
+
 - (void)onVPNStartStopStateDidChange:(VPNStartStopStatus)status {
     [AppObservables.shared.vpnStartStopStatus sendNext:@(status)];
 }

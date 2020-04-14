@@ -232,7 +232,7 @@ extension UserStrings {
 // MARK: Generic values
 extension UserStrings {
 
-    static func Error_title() -> String {
+    @objc static func Error_title() -> String {
             return  NSLocalizedString("ERROR_TITLE", tableName: nil, bundle: Bundle.main,
                                       value: "Error",
                                       comment: "Error alert title")
@@ -275,8 +275,21 @@ extension UserStrings {
     }
 }
 
-// MARK: VPN Status strings
+// MARK: VPN strings
 extension UserStrings {
+    
+    @objc static func Reinstall_vpn_config() -> String {
+        return NSLocalizedString("SETTINGS_REINSTALL_VPN_CONFIGURATION_CELL_TITLE", tableName: nil, bundle: Bundle.main,
+                                 value: "Reinstall VPN profile",
+                                 comment: "Title of cell in settings menu which, when pressed, reinstalls the user's VPN profile for Psiphon")
+    }
+    
+    @objc static func Tunnel_provider_sync_failed_reinstall_config() -> String {
+        return NSLocalizedString("VPN_SYNC_FAILED_REINSTALL_CONFIG", tableName: nil, bundle: Bundle.main,
+                                 value: "Something went wrong. If this error persists try 'Reinstall VPN Profile'.",
+                                 comment: "Error message when something was wrong with the VPN. Asks the user that if the error persists, try tapping the 'Reinstall VPN Profile' button in the settings menu. 'Reinstall VPN Profile' translation has key SETTINGS_REINSTALL_VPN_CONFIGURATION_CELL_TITLE")
+    }
+    
     @objc static func Vpn_status_disconnected() -> String {
         return NSLocalizedString("VPN_STATUS_DISCONNECTED", tableName: nil, bundle: Bundle.main,
                                  value: "Disconnected",
