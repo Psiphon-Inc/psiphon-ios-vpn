@@ -39,21 +39,19 @@ struct PsiCashEffect {
     func refreshState<T: TunnelProviderManager>(
         andGetPricesFor priceClasses: [PsiCashTransactionClass],
         tunnelProviderManager: T
-    ) -> Effect<PsiCashRefreshResult> {
-        
-        Effect { observer, lifetime in
+    ) -> Effect<PsiCashRefreshResult>
+    {
+        Effect.deferred { fulfilled in
             guard case .connected = tunnelProviderManager.connectionStatus.tunneled else {
-                observer.fulfill(value: .completed(.failure(ErrorEvent(.tunnelNotConnected))))
+                fulfilled(.completed(.failure(ErrorEvent(.tunnelNotConnected))))
                 return
             }
-            
-            observer.send(value: .pending)
-            
+                        
             // Updates request metadata before sending the request.
             self.psiCash.setRequestMetadata()
             let purchaseClasses = priceClasses.map { $0.rawValue }
             
-            self.psiCash.refreshState(purchaseClasses) { psiCashStatus, error in
+            self.psiCash.refreshState(purchaseClasses) { [fulfilled] psiCashStatus, error in
                 let result: Result<PsiCashLibData, ErrorEvent<PsiCashRefreshError>>
                 switch (psiCashStatus, error) {
                 case (.success, nil):
@@ -67,19 +65,17 @@ struct PsiCashEffect {
                 case (_, .none):
                     preconditionFailure("unknown PsiCash status '\(psiCashStatus)'")
                 }
-                
-                observer.fulfill(value: .completed(result))
+                fulfilled(.completed(result))
             }
-        }
+        }.prefix(value: .pending)
     }
     
     func purchaseProduct<T: TunnelProviderManager>(
         _ purchasable: PsiCashPurchasableType, tunnelProviderManager: T
     ) -> Effect<PsiCashPurchaseResult> {
-        Effect { observer, lifetime in
-            
+        Effect.deferred { fulfilled in
             guard case .connected = tunnelProviderManager.connectionStatus.tunneled else {
-                observer.fulfill(value:
+                fulfilled(
                     PsiCashPurchaseResult(
                         purchasable: purchasable,
                         refreshedLibData: self.psiCash.dataModel(),
@@ -117,7 +113,7 @@ struct PsiCashEffect {
                     )
                 }
                 
-                observer.fulfill(value: result)
+                fulfilled(result)
             }
         }
     }
