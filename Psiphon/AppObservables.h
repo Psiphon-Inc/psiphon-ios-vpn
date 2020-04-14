@@ -47,6 +47,12 @@ NS_ASSUME_NONNULL_BEGIN
 // Contained value is nil if there is not Speed Boost purchase.
 @property (nonatomic, readonly) RACReplaySubject<NSDate *> *speedBoostExpiry;
 
+// Wraps VPN status of type `NEVPNStatus`.
+@property (nonatomic, readonly) RACReplaySubject<NSNumber *> *vpnStatus;
+
+// Wraps VPN start stop state status of type `VPNStartStopStatus`.
+@property (nonatomic, readonly) RACReplaySubject<NSNumber *> *vpnStartStopStatus;
+
 + (AppObservables *)shared;
 
 // Should be called when app is launched for the first time.

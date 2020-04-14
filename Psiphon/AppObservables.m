@@ -10,7 +10,6 @@
 #import "AppObservables.h"
 #import <ReactiveObjC.h>
 #import "Logging.h"
-#import "VPNManager.h"
 #import "Psiphon-Swift.h"
 
 @interface AppObservables ()
@@ -24,6 +23,10 @@
 @property (nonatomic, readwrite) RACReplaySubject<BridgedBalanceViewBindingType *> *psiCashBalance;
 
 @property (nonatomic, readwrite) RACReplaySubject<NSDate *> *speedBoostExpiry;
+
+@property (nonatomic, readwrite) RACReplaySubject<NSNumber *> *vpnStatus;
+
+@property (nonatomic, readwrite) RACReplaySubject<NSNumber *> *vpnStartStopStatus;
 
 // Private properties
 @property (nonatomic) RACCompoundDisposable *compoundDisposable;
@@ -51,6 +54,8 @@
         _subscriptionStatus = [RACReplaySubject replaySubjectWithCapacity:1];
         _psiCashBalance = [RACReplaySubject replaySubjectWithCapacity:1];
         _speedBoostExpiry = [RACReplaySubject replaySubjectWithCapacity:1];
+        _vpnStatus = [RACReplaySubject replaySubjectWithCapacity:1];
+        _vpnStartStopStatus = [RACReplaySubject replaySubjectWithCapacity:1];
         _compoundDisposable = [RACCompoundDisposable compoundDisposable];
     }
     return self;
@@ -94,10 +99,10 @@
 
     // Infinite cold signal - emits events of type @(TunnelState) for various tunnel events.
     // While the tunnel is being established or destroyed, this signal emits @(TunnelStateNeither).
-    RACSignal<NSNumber *> *tunnelConnectedSignal = [[VPNManager sharedInstance].lastTunnelStatus
-                                                    map:^NSNumber *(NSNumber *value) {
+    RACSignal<NSNumber *> *tunnelConnectedSignal =
+    [self.vpnStatus map:^NSNumber *(NSNumber *value) {
         VPNStatus s = (VPNStatus) [value integerValue];
-
+        
         if (s == VPNStatusConnected) {
             return @(TunnelStateTunneled);
         } else if (s == VPNStatusDisconnected || s == VPNStatusInvalid) {

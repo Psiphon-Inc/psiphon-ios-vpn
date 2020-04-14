@@ -144,11 +144,11 @@ struct VerifiedPsiCashConsumableTransaction: Equatable {
 func verifyConsumable(
     transaction: UnverifiedPsiCashConsumableTransaction,
     receipt: ReceiptData,
-    vpnStatus: SignalProducer<NEVPNStatus, Never>,
+    tunnelProviderStatusSignal: SignalProducer<TunnelProviderVPNStatus, Never>,
     psiCashEffects: PsiCashEffect,
     clientMetaData: ClientMetaData
 ) -> Effect<VerifiedPsiCashConsumableTransaction> {
-    vpnStatus
+    tunnelProviderStatusSignal
         .skipRepeats()
         .flatMap(.latest) { value
             -> SignalProducer<VerifiedPsiCashConsumableTransaction, Never> in

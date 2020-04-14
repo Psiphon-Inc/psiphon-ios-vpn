@@ -45,7 +45,6 @@
 #import "UIColor+Additions.h"
 #import "UIFont+Additions.h"
 #import "UILabel+GetLabelHeight.h"
-#import "VPNManager.h"
 #import "VPNStartAndStopButton.h"
 #import "AlertDialogs.h"
 #import "RACSignal+Operations2.h"
@@ -57,8 +56,6 @@
 #import "UIView+Additions.h"
 #import "AdMobRewardedAdControllerWrapper.h"
 #import "AppObservables.h"
-#import "Psiphon-Swift.h"
-
 
 PsiFeedbackLogType const MainViewControllerLogType = @"MainViewController";
 
@@ -68,17 +65,17 @@ NSTimeInterval const MaxAdLoadingTime = 1.f;
 NSTimeInterval const MaxAdLoadingTime = 10.f;
 #endif
 
-// TODO: turn this into an enum.
-NSString * const CommandNoInternetAlert = @"NoInternetAlert";
-NSString * const CommandStartTunnel = @"StartTunnel";
-NSString * const CommandStopVPN = @"StopVPN";
-
+typedef NS_ENUM(NSInteger, VPNIntent) {
+    VPNIntentStartPsiphonTunnelWithoutAds,
+    VPNIntentStartPsiphonTunnelWithAds,
+    VPNIntentStopVPN,
+    VPNIntentNoInternetAlert,
+};
 
 @interface MainViewController ()
 
 @property (nonatomic) RACCompoundDisposable *compoundDisposable;
 @property (nonatomic) AdManager *adManager;
-@property (nonatomic) VPNManager *vpnManager;
 
 @property (nonatomic, readonly) BOOL startVPNOnFirstLoad;
 
@@ -145,10 +142,8 @@ NSString * const CommandStopVPN = @"StopVPN";
         
         _compoundDisposable = [RACCompoundDisposable compoundDisposable];
         
-        _vpnManager = [VPNManager sharedInstance];
-        
         _adManager = [AdManager sharedInstance];
-        
+
         feedbackManager = [[FeedbackManager alloc] init];
 
         // TODO: remove persistance form init function.
@@ -212,7 +207,7 @@ NSString * const CommandStopVPN = @"StopVPN";
     MainViewController *__weak weakSelf = self;
     
     // Observe VPN status for updating UI state
-    RACDisposable *tunnelStatusDisposable = [[self.vpnManager.lastTunnelStatus distinctUntilChanged]
+    RACDisposable *tunnelStatusDisposable = [AppObservables.shared.vpnStatus
       subscribeNext:^(NSNumber *statusObject) {
           MainViewController *__strong strongSelf = weakSelf;
           if (strongSelf != nil) {
@@ -231,27 +226,26 @@ NSString * const CommandStopVPN = @"StopVPN";
     
     [self.compoundDisposable addDisposable:tunnelStatusDisposable];
     
-    RACDisposable *vpnStartStatusDisposable = [[self.vpnManager.vpnStartStatus
+    RACDisposable *vpnStartStatusDisposable = [[AppObservables.shared.vpnStartStopStatus
       deliverOnMainThread]
       subscribeNext:^(NSNumber *statusObject) {
           MainViewController *__strong strongSelf = weakSelf;
           if (strongSelf != nil) {
+              VPNStartStopStatus startStatus = (VPNStartStopStatus) [statusObject integerValue];
 
-              VPNStartStatus startStatus = (VPNStartStatus) [statusObject integerValue];
-
-              if (startStatus == VPNStartStatusStart) {
+              if (startStatus == VPNStartStopStatusPendingStart) {
                   [strongSelf->startAndStopButton setHighlighted:TRUE];
               } else {
                   [strongSelf->startAndStopButton setHighlighted:FALSE];
               }
 
-              if (startStatus == VPNStartStatusFailedUserPermissionDenied) {
+              if (startStatus == VPNStartStopStatusFailedUserPermissionDenied) {
 
                   // Present the VPN permission denied alert.
                   UIAlertController *alert = [AlertDialogs vpnPermissionDeniedAlert];
                   [alert presentFromTopController];
 
-              } else if (startStatus == VPNStartStatusFailedOther) {
+              } else if (startStatus == VPNStartStopStatusFailedOtherReason) {
 
                   // Alert the user that the VPN failed to start, and that they should try again.
                   [UIAlertController presentSimpleAlertWithTitle:NSLocalizedStringWithDefaultValue(@"VPN_START_FAIL_TITLE", nil, [NSBundle mainBundle], @"Unable to start", @"Alert dialog title indicating to the user that Psiphon was unable to start (MainViewController)")
@@ -304,13 +298,9 @@ NSString * const CommandStopVPN = @"StopVPN";
               }
           }]
           doNext:^(RACUnit *x) {
-              // Start PsiCash and AdManager lifecycle.
+              // Start AdManager lifecycle.
               // Important: dependencies might be initialized while the tunnel is connecting or
               // when there is no active internet connection.
-
-              // TODO: Add custom initialization method to PsiCash
-              // TODO: [[PsiCashClient sharedInstance] scheduleRefreshState];
-
               [[AdManager sharedInstance] initializeAdManager];
               [[AdManager sharedInstance] initializeRewardedVideos];
           }]
@@ -404,7 +394,7 @@ NSString * const CommandStopVPN = @"StopVPN";
     // when MaxAdLoadingTime has passed.
     // If the device in not in untunneled state, this signal makes an emission and
     // then completes immediately, without checking the untunneled interstitial status.
-    RACSignal *adsLoadingSignal = [[[VPNManager sharedInstance].lastTunnelStatus
+    RACSignal *adsLoadingSignal = [[AppObservables.shared.vpnStatus
       flattenMap:^RACSignal *(NSNumber *statusObject) {
 
           VPNStatus s = (VPNStatus) [statusObject integerValue];
@@ -452,67 +442,76 @@ NSString * const CommandStopVPN = @"StopVPN";
     }];
 }
 
-// Emits one of the `Command_` strings.
-- (RACSignal<NSString *> *)startOrStopVPNSignalWithAd:(BOOL)showAd {
+// Emitted NSNumber is of type VPNIntent.
+- (RACSignal<RACTwoTuple<NSNumber*, SwitchedVPNStartStopIntent*> *> *)startOrStopVPNSignalWithAd:(BOOL)showAd {
     MainViewController *__weak weakSelf = self;
-
-    return [[[[self.vpnManager isVPNActive]
-      flattenMap:^RACSignal<NSString *> *(RACTwoTuple<NSNumber *, NSNumber *> *value) {
-          BOOL vpnActive = [value.first boolValue];
-          BOOL isZombie = (VPNStatusZombie == (VPNStatus)[value.second integerValue]);
-
-          // Emits command to stop VPN if it has already started or is in zombie mode.
-          // Otherwise, it checks for internet connectivity and emits
-          // one of CommandNoInternetAlert or CommandStartTunnel.
-          if (vpnActive || isZombie) {
-              return [RACSignal return:CommandStopVPN];
-
-          } else {
-              // Alerts the user if there is no internet connection.
-              Reachability *reachability = [Reachability reachabilityForInternetConnection];
-              if ([reachability currentReachabilityStatus] == NotReachable) {
-                  return [RACSignal return:CommandNoInternetAlert];
-
-              } else {
-
-                  // Returned signal checks whether or not VPN configuration is already installed.
-                  // Skips presenting ads if the VPN configuration is not installed, or
-                  // we're asked to not show ads.
-                  return [[weakSelf.vpnManager vpnConfigurationInstalled]
-                    flattenMap:^RACSignal *(NSNumber *value) {
-                        BOOL vpnInstalled = [value boolValue];
-
-                        if (!vpnInstalled || !showAd) {
-                            return [RACSignal return:CommandStartTunnel];
+    return [[[[RACSignal createSignal:^RACDisposable *(id <RACSubscriber> subscriber) {
+        [[SwiftDelegate.bridge swithVPNStartStopIntent]
+         then:^id _Nullable(SwitchedVPNStartStopIntent * newIntent) {
+            if (newIntent == nil) {
+                [NSException raise:@"nil found"
+                            format:@"expected non-nil SwitchedVPNStartStopIntent value"];
+            }
+            
+            VPNIntent vpnIntentValue;
+            
+            if (newIntent.intendToStart) {
+                // If the new intent is to start the VPN, first checks for internet connectivity.
+                // If there is internet connectivity, tunnel can be startet without ads
+                // if the user is subscribed, if if there the VPN config is not installed.
+                // Otherwise tunnel should be started after interstitial ad has been displayed.
+                
+                Reachability *reachability = [Reachability reachabilityForInternetConnection];
+                if ([reachability currentReachabilityStatus] == NotReachable) {
+                    vpnIntentValue = VPNIntentNoInternetAlert;
+                } else {
+                    if (newIntent.vpnConfigInstalled) {
+                        if (newIntent.userSubscribed || !showAd) {
+                            vpnIntentValue = VPNIntentStartPsiphonTunnelWithoutAds;
                         } else {
-                            // Start tunnel after ad presentation signal completes.
-                            // We always want to start the tunnel after the presentation signal
-                            // is completed, no matter if it presented an ad or it failed.
-                            return [[weakSelf.adManager
-                              presentInterstitialOnViewController:weakSelf]
-                              then:^RACSignal * {
-                                  return [RACSignal return:CommandStartTunnel];
-                              }];
+                            vpnIntentValue = VPNIntentStartPsiphonTunnelWithAds;
                         }
-                    }];
-              }
-          }
-
-      }]
-      doNext:^(NSString *command) {
-          dispatch_async_main(^{
-              if ([CommandStartTunnel isEqualToString:command]) {
-                  [weakSelf.vpnManager startTunnel];
-
-              } else if ([CommandStopVPN isEqualToString:command]) {
-                  [weakSelf.vpnManager stopVPN];
-
-              } else if ([CommandNoInternetAlert isEqualToString:command]) {
-                  [[AppDelegate sharedAppDelegate] displayAlertNoInternet:nil];
-              }
-          });
-      }]
-      deliverOnMainThread];
+                    } else {
+                        // VPN Config is not installed. Skip ads.
+                        vpnIntentValue = VPNIntentStartPsiphonTunnelWithoutAds;
+                    }
+                }
+            } else {
+                // The new intent is to stop the VPN.
+                vpnIntentValue = VPNIntentStopVPN;
+            }
+            
+            [subscriber sendNext:[RACTwoTuple pack:@(vpnIntentValue) :newIntent]];
+            [subscriber sendCompleted];
+            return nil;
+        }];
+        
+        return nil;
+    }] flattenMap:^RACSignal<RACTwoTuple *> *(RACTwoTuple<NSNumber*, SwitchedVPNStartStopIntent*> *value) {
+        VPNIntent vpnIntent = (VPNIntent)[value.first integerValue];
+        if (vpnIntent == VPNIntentStartPsiphonTunnelWithAds) {
+            // Start tunnel after ad presentation signal completes.
+            // We always want to start the tunnel after the presentation signal
+            // is completed, no matter if it presented an ad or it failed.
+            return [[weakSelf.adManager presentInterstitialOnViewController:weakSelf]
+                    then:^RACSignal * {
+                return [RACSignal return:value];
+            }];
+        } else {
+            return [RACSignal return:value];
+        }
+    }] doNext:^(RACTwoTuple<NSNumber*, SwitchedVPNStartStopIntent*> *value) {
+        VPNIntent vpnIntent = (VPNIntent)[value.first integerValue];
+        dispatch_async_main(^{
+            // If there is no internet connectivity, skips sending a start intent
+            // to SwiftDelegate, and shows an alert to the user instead.
+            if (vpnIntent == VPNIntentNoInternetAlert) {
+                // TODO: Show the no internet alert.
+            } else {
+                [SwiftDelegate.bridge sendNewVPNIntent:value.second];
+            }
+        });
+    }] deliverOnMainThread];
 }
 
 #pragma mark - UI callbacks
@@ -555,7 +554,7 @@ NSString * const CommandStopVPN = @"StopVPN";
               if (![NSString stringsBothEqualOrNil:selectedRegion.code b:selectedRegionCodeSnapshot]) {
                   [strongSelf persistSelectedRegion];
                   [strongSelf->regionSelectionButton update];
-                  [weakSelf.vpnManager restartVPNIfActive];
+                  [SwiftDelegate.bridge restartVPNIfActive];
               }
 
               [viewController dismissViewControllerAnimated:TRUE completion:nil];
@@ -589,9 +588,8 @@ NSString * const CommandStopVPN = @"StopVPN";
         case VPNStatusDisconnecting: return UserStrings.Vpn_status_disconnecting;
         case VPNStatusReasserting: return UserStrings.Vpn_status_reconnecting;
         case VPNStatusRestarting: return UserStrings.Vpn_status_restarting;
-        case VPNStatusZombie: return @"...";
     }
-    [PsiFeedbackLogger error:@"MainViewController unhandled VPNStatus (%ld)", status];
+    [PsiFeedbackLogger error:@"MainViewController unhandled VPNStatus (%ld)", (long)status];
     return nil;
 }
 
@@ -619,7 +617,7 @@ NSString * const CommandStopVPN = @"StopVPN";
 
     [startAndStopButton setHighlighted:FALSE];
     
-    if ([VPNManager mapIsVPNActive:s] && s != VPNStatusConnected) {
+    if ([VPNStateCompat providerNotStoppedWithVpnStatus:s] && s != VPNStatusConnected) {
         [startAndStopButton setConnecting];
     }
     else if (s == VPNStatusConnected) {
@@ -762,7 +760,7 @@ NSString * const CommandStopVPN = @"StopVPN";
         [self.view layoutIfNeeded];
     };
 
-    if ([VPNManager mapIsVPNActive:s] && s != VPNStatusConnected
+    if ([VPNStateCompat providerNotStoppedWithVpnStatus:s] && s != VPNStatusConnected
         && s != VPNStatusRestarting) {
         // Connecting
 
@@ -785,7 +783,7 @@ NSString * const CommandStopVPN = @"StopVPN";
         cloudMiddleRightHorizontalConstraint.constant = maxTranslation - cloudWidth/2;
         [self.view layoutIfNeeded];
 
-        if (!([VPNManager mapIsVPNActive:previousState]
+        if (!([VPNStateCompat providerNotStoppedWithVpnStatus:previousState]
               && previousState != VPNStatusConnected)
               && previousState != VPNStatusInvalid /* don't animate if the app was just opened */ ) {
 
@@ -1029,7 +1027,7 @@ NSString * const CommandStopVPN = @"StopVPN";
 - (void)settingsWillDismissWithForceReconnect:(BOOL)forceReconnect {
     if (forceReconnect) {
         [self persistSettingsToSharedUserDefaults];
-        [self.vpnManager restartVPNIfActive];
+        [SwiftDelegate.bridge restartVPNIfActive];
     }
 }
 

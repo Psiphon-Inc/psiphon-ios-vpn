@@ -20,8 +20,6 @@
 import Foundation
 import Promises
 
-// MARK: Application.swift
-
 extension AppAction {
 
     var appDelegateAction: AppDelegateAction? {
@@ -101,10 +99,29 @@ extension AppAction {
         }
     }
 
+    var vpnStateAction: VPNStateAction<PsiphonTPM>? {
+        get {
+            guard case let .vpnStateAction(value) = self else { return nil }
+            return value
+        }
+        set {
+            guard case .vpnStateAction = self, let newValue = newValue else { return }
+            self = .vpnStateAction(newValue)
+        }
+    }
 }
 
 
 extension AppState {
+    
+    var tunnelProviderManager: PsiphonTPM? {
+        get {
+            guard case let .loaded(tpm) = self.vpnState.value.loadState.value else {
+                return nil
+            }
+            return tpm
+        }
+    }
     
     var iapReducerState: IAPReducerState {
         get {
@@ -120,12 +137,13 @@ extension AppState {
         }
     }
     
-    var psiCashReducerState: PsiCashReducerState {
+    var psiCashReducerState: PsiCashReducerState<PsiphonTPM> {
         get {
             PsiCashReducerState(
                 psiCashBalance: self.psiCashBalance,
                 psiCash: self.psiCash,
-                subscription: self.subscription
+                subscription: self.subscription,
+                tunnelProviderManager: self.tunnelProviderManager
             )
         }
         set {
@@ -138,24 +156,27 @@ extension AppState {
         get {
             AppDelegateReducerState(
                 psiCashBalance: self.psiCashBalance,
-                psiCash: self.psiCash
+                psiCash: self.psiCash,
+                adPresentationState: self.adPresentationState
             )
         }
         set {
             self.psiCashBalance = newValue.psiCashBalance
             self.psiCash = newValue.psiCash
+            self.adPresentationState = newValue.adPresentationState
         }
     }
     
-    var landingPageReducerState: LandingPageReducerState {
+    var landingPageReducerState: LandingPageReducerState<PsiphonTPM> {
         get {
             LandingPageReducerState(
-                shownLandingPage: shownLandingPage,
-                activeSpeedBoost: psiCash.activeSpeedBoost
+                shownLandingPage: self.shownLandingPage,
+                activeSpeedBoost: self.psiCash.activeSpeedBoost,
+                tunnelProviderManager: self.tunnelProviderManager
             )
         }
         set {
-            shownLandingPage = newValue.shownLandingPage
+            self.shownLandingPage = newValue.shownLandingPage
         }
     }
     

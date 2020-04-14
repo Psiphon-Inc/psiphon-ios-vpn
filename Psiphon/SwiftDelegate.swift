@@ -21,15 +21,17 @@ import Foundation
 import ReactiveSwift
 import Promises
 import StoreKit
+import NetworkExtension
 
 enum AppDelegateAction {
     case appDidLaunch(psiCashData: PsiCashLibData)
-    case appEnteredForeground
+    case adPresentationStatus(presenting: Bool)
 }
 
 struct AppDelegateReducerState: Equatable {
     var psiCashBalance: PsiCashBalance
     var psiCash: PsiCashState
+    var adPresentationState: Bool
 }
 
 typealias AppDelegateEnvironment = (
@@ -57,8 +59,9 @@ func appDelegateReducer(
             environment.appReceiptStore(.localReceiptRefresh).mapNever()
         ]
         
-    case .appEnteredForeground:
-        return [ environment.psiCashStore(.refreshPsiCashState).mapNever() ]
+    case .adPresentationStatus(presenting: let presenting):
+        state.adPresentationState = presenting
+        return []
     }
     
 }
@@ -110,7 +113,7 @@ extension SwiftDelegate: SwiftBridgeDelegate {
     @objc func applicationDidFinishLaunching(
         _ application: UIApplication, objcBridge: ObjCBridgeDelegate
     ) {
-        self.psiCashLib = PsiCash()
+        self.psiCashLib = PsiCash.make(flags: Debugging)
         
         self.store = Store(
             initialValue: AppState(),
@@ -118,7 +121,6 @@ extension SwiftDelegate: SwiftBridgeDelegate {
             environment: { [unowned self] store in
                 let (environment, cleanup) = makeEnvironment(
                     store: store,
-                    vpnStatus: VPNStatusBridge.instance.$status,
                     psiCashLib: self.psiCashLib,
                     objcBridgeDelegate: objcBridge,
                     rewardedVideoAdBridgeDelegate: self
@@ -127,12 +129,13 @@ extension SwiftDelegate: SwiftBridgeDelegate {
                 return environment
         })
         
+        self.store.send(vpnAction: .appLaunched)
         self.store.send(
             .appDelegateAction(.appDidLaunch(psiCashData: self.psiCashLib.dataModel()))
         )
         
         // Maps connected events to refresh state messages sent to store.
-        self.lifetime += VPNStatusBridge.instance.$status.signalProducer
+        self.lifetime += self.store.$value.signalProducer.map(\.vpnState.value.vpnStatus)
             .skipRepeats()
             .filter { $0 == .connected }
             .map(value: AppAction.psiCash(.refreshPsiCashState))
@@ -151,6 +154,13 @@ extension SwiftDelegate: SwiftBridgeDelegate {
                 objcBridge.onSubscriptionStatus(BridgedUserSubscription.from(state: $0))
         }
         
+        // Forwards VPN status changes to ObjCBridgeDelegaet.
+        self.lifetime += self.store.$value.signalProducer.map(\.vpnState.value.vpnStatus)
+            .skipRepeats()
+            .startWithValues { [unowned objcBridge] in
+                objcBridge.onVPNStatusDidChange($0)
+            }
+        
         // Forewards SpeedBoost purchase expiry date (if the user is not subscribed)
         // to ObjCBridgeDelegate.
         self.lifetime += self.store.$value.signalProducer
@@ -165,15 +175,34 @@ extension SwiftDelegate: SwiftBridgeDelegate {
         .startWithValues{ [unowned objcBridge] speedBoostExpiry in
             objcBridge.onSpeedBoostActivePurchase(speedBoostExpiry)
         }
+        
+        self.lifetime += self.store.$value.signalProducer
+            .map(\.vpnState.value.startStopState)
+            .skipRepeats()
+            .startWithValues { [unowned objcBridge] startStopState in
+                let value = VPNStartStopStatus.from(startStopState: startStopState)
+                objcBridge.onVPNStartStopStateDidChange(value)
+        }
+        
+        if Debugging.printAppState {
+            self.lifetime += self.store.$value.signalProducer.startWithValues { appState in
+                dump(appState[keyPath: \.vpnState])
+                print("*", "-----")
+            }
+        }
 
     }
     
     @objc func applicationWillEnterForeground(_ application: UIApplication) {
-        self.store.send(.appDelegateAction(.appEnteredForeground))
+        self.store.send(.psiCash(.refreshPsiCashState))
     }
     
     @objc func applicationWillTerminate(_ application: UIApplication) {
         self.environmentCleanup?()
+    }
+    
+    @objc func applicationDidBecomeActive(_ application: UIApplication) {
+        self.store.send(vpnAction: .syncWithProvider(reason: .appDidBecomeActive))
     }
     
     @objc func createPsiCashViewController(
@@ -190,16 +219,13 @@ extension SwiftDelegate: SwiftBridgeDelegate {
             productRequestStore: self.store.projection(
                 value: erase,
                 action: { .productRequest($0) } ),
-            vpnStatusSignal: VPNStatusBridge.instance.$status.signalProducer
+            tunnelConnectedSignal: self.store.$value.signalProducer
+                .map(\.vpnState.value.providerVPNStatus.tunneled)
         )
     }
     
     @objc func getCustomRewardData(_ callback: @escaping (CustomData?) -> Void) {
         callback(PsiCashEffect(psiCash: self.psiCashLib).rewardedVideoCustomData())
-    }
-    
-    @objc func resetLandingPage() {
-        self.store.send(.landingPage(.reset))
     }
     
     @objc func showLandingPage() {
@@ -236,4 +262,128 @@ extension SwiftDelegate: SwiftBridgeDelegate {
         return objcPromise.asObjCPromise()
     }
     
+    @objc func onAdPresentationStatusChange(_ presenting: Bool) {
+        self.store.send(.appDelegateAction(.adPresentationStatus(presenting: presenting)))
+    }
+    
+    @objc func swithVPNStartStopIntent()
+        -> Promise<SwitchedVPNStartStopIntent>.ObjCPromise<SwitchedVPNStartStopIntent>
+    {
+        let promise = Promise<SwitchedVPNStartStopIntent>.pending()
+        
+        let subscription: SignalProducer<SubscriptionStatus, Never> =
+            self.store.$value.signalProducer
+                .map(\.subscription.status)
+                .filter { $0 != .unknown }
+                .take(first: 1)
+        
+        let syncedVPNState: SignalProducer<VPNProviderManagerState<PsiphonTPM>, Never> =
+            self.store.$value.signalProducer
+                .map(\.vpnState.value)
+                .filter { vpnProviderManagerState -> Bool in
+                    !vpnProviderManagerState.pendingProviderSync
+                }
+                .take(first: 1)
+        
+        
+        // TODO!!!! Still haven't investigated the lifetime object for signals that complete.
+        self.lifetime += syncedVPNState.zip(with: subscription)
+            .map {
+                SwitchedVPNStartStopIntent.make(fromProviderManagerState: $0.0,
+                                                subscriptionStatus: $0.1)
+            }.startWithValues { newIntentValue in
+                promise.fulfill(newIntentValue)
+            }
+        
+        return promise.asObjCPromise()
+    }
+    
+    @objc func sendNewVPNIntent(_ value: SwitchedVPNStartStopIntent) {
+        switch value.switchedIntent {
+        case .start(transition: .none):
+            self.store.send(vpnAction: .tunnelStateIntent(.start(transition: .none)))
+        case .stop:
+            self.store.send(vpnAction: .tunnelStateIntent(.stop))
+        default:
+            fatalError("unexpected state")
+        }
+    }
+    
+    @objc func restartVPNIfActive() {
+        self.store.send(vpnAction: .tunnelStateIntent(.start(transition: .restart)))
+    }
+    
+    @objc func syncWithTunnelProvider(reason: TunnelProviderSyncReason) {
+        self.store.send(vpnAction: .syncWithProvider(reason: reason))
+    }
+    
+    @objc func reinstallVPNConfig() {
+        self.store.send(vpnAction: .reinstallVPNConfig)
+    }
+
+    typealias IndexedPsiphonTPMLoadState = Indexed<ProviderManagerLoadState<PsiphonTPM>.LoadState>
+    
+    @objc func installVPNConfigWithPromise() ->
+        Promise<VPNConfigInstallResultWrapper>.ObjCPromise<VPNConfigInstallResultWrapper>
+    {
+        let promise = Promise<VPNConfigInstallResultWrapper>.pending()
+        
+        self.lifetime += self.store.$value.signalProducer
+            .map(\.vpnState.value.loadState.value)
+            .skipRepeats()
+            .scan(IndexedPsiphonTPMLoadState(index: 0, value: .nonLoaded))
+            { (previous, tpmLoadState) -> IndexedPsiphonTPMLoadState in
+                // Indexes `tpmLoadState` emitted items, starting from 0.
+                return IndexedPsiphonTPMLoadState(index: previous.index + 1, value: tpmLoadState)
+        }.flatMap(.latest) { indexed -> SignalProducer<IndexedPsiphonTPMLoadState, Never> in
+            
+            // Index 1 represents the value of ProviderManagerLoadState before
+            // `.reinstallVPNConfig` action is sent.
+            
+            switch indexed.index {
+            case 0:
+                fatalError()
+            case 1:
+                switch indexed.value {
+                case .nonLoaded:
+                    return Effect.never
+                case .noneStored, .loaded(_), .error(_):
+                    return Effect(value: indexed)
+                }
+            default:
+                switch indexed.value {
+                case .nonLoaded,.noneStored:
+                    return Effect.never
+                case .loaded(_), .error(_):
+                    return Effect(value: indexed)
+                }
+            }
+        }
+        .take(first: 2)
+        .startWithValues { [promise, unowned store = self.store] indexed in
+            switch indexed.index {
+            case 0:
+                fatalError()
+            case 1:
+                store!.send(vpnAction: .reinstallVPNConfig)
+            default:
+                switch indexed.value {
+                case .nonLoaded, .noneStored:
+                    fatalError()
+                case .loaded(_):
+                    promise.fulfill(.init(.installedSuccessfully))
+                case .error(let errorEvent):
+                    if case .failedConfigLoadSave(let error) = errorEvent.error {
+                        if error.configurationReadWriteFailedPermissionDenied {
+                            promise.fulfill(.init(.permissionDenied))
+                        } else {
+                            promise.fulfill(.init(.otherError))
+                        }
+                    }
+                }
+            }
+        }
+        
+        return promise.asObjCPromise()
+    }
 }

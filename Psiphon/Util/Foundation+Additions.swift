@@ -26,6 +26,35 @@ func id<Value>(_ value: Value) -> Value {
     return value
 }
 
+struct Indexed<Value> {
+    let index: Int
+    let value: Value
+}
+
+/// A not so efficient queue.
+public struct Queue<Element> {
+    private var items = [Element]()
+
+    var count: Int { items.count }
+    
+    var isEmpty: Bool { items.isEmpty }
+    
+    /// - Complexity: O(n) where n is the size of the queue.
+    mutating func enqueue(_ item: Element) {
+        items.insert(item, at: 0)
+    }
+    
+    /// - Complexity: O(1)
+    mutating func dequeue() -> Element? {
+        guard !items.isEmpty else {
+            return .none
+        }
+        return items.removeLast()
+    }
+}
+
+extension Queue: Equatable where Element: Equatable {}
+
 public struct NonEmpty<Element> {
 
     public var head: Element
@@ -223,6 +252,15 @@ public extension Result {
         }
     }
     
+    func dropSuccessValue() -> Result<(), Failure> {
+        switch self {
+        case .success(_):
+            return .success(())
+        case .failure(let error):
+            return .failure(error)
+        }
+    }
+    
 }
 
 public extension Result where Success == () {
@@ -289,6 +327,14 @@ extension Pending {
     }
     
 }
+
+// TODO: Combine `Pending` and `PendingValue` into one type.
+enum PendingValue<PendingValue, CompletedValue> {
+    case pending(PendingValue)
+    case completed(CompletedValue)
+}
+
+extension PendingValue: Equatable where PendingValue: Equatable, CompletedValue: Equatable {}
 
 /// Enables dictionary set/get directly with enums that their raw value type matches the dictionary key.
 extension Dictionary where Key: ExpressibleByStringLiteral {

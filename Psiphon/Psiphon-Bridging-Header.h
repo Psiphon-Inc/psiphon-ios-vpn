@@ -7,8 +7,8 @@
 #import <PsiCashLib/PsiCashAPIModels.h>
 #import "PsiCashLogger.h"
 
-// VPNManager
-#import "VPNManager.h"
+// Tunnel Provider
+#import "NEBridge.h"
 
 // AppStore receipt
 #import "AppStoreReceiptData.h"

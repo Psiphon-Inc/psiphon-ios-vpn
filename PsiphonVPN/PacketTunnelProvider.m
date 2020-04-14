@@ -650,19 +650,20 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 #pragma mark - Query methods
 
 - (NSNumber *)isNEZombie {
-    return @(self.tunnelProviderState == TunnelProviderStateZombie);
+    return [NSNumber numberWithBool:self.tunnelProviderState == TunnelProviderStateZombie];
 }
 
 - (NSNumber *)isTunnelConnected {
-    return @([self.psiphonTunnel getConnectionState] == PsiphonConnectionStateConnected);
+    return [NSNumber numberWithBool:
+            [self.psiphonTunnel getConnectionState] == PsiphonConnectionStateConnected];
 }
 
 - (NSNumber *)isNetworkReachable {
     NetworkStatus status;
     if ([self.psiphonTunnel getNetworkReachabilityStatus:&status]) {
-        return @(status != NotReachable);
+        return [NSNumber numberWithBool:status != NotReachable];
     }
-    return nil;
+    return [NSNumber numberWithBool:FALSE];
 }
 
 #pragma mark - Notifier callback

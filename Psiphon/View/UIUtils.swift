@@ -76,28 +76,6 @@ enum Loading<Value: Equatable>: Equatable {
     case loaded(Value)
 }
 
-/// Tunnel states most relevant to UI
-enum TunnelConnected {
-    case notConnected
-    case connecting
-    case connected
-
-    static func from(vpnStatus: NEVPNStatus) -> Self {
-        switch vpnStatus {
-        case .invalid, .disconnected:
-            return .notConnected
-        case .connecting, .reasserting:
-            return .connecting
-        case .connected:
-            return .connected
-        case .disconnecting:
-            return .notConnected
-        @unknown default:
-            return .notConnected
-        }
-    }
-}
-
 extension UILabel {
 
     static func make(

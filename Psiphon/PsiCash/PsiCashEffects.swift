@@ -36,13 +36,13 @@ struct PsiCashEffect {
         self.psiCash.dataModel()
     }
     
-    func refreshState(
+    func refreshState<T: TunnelProviderManager>(
         andGetPricesFor priceClasses: [PsiCashTransactionClass],
-        vpnManager: VPNManager
+        tunnelProviderManager: T
     ) -> Effect<PsiCashRefreshResult> {
         
         Effect { observer, lifetime in
-            guard vpnManager.tunneled else {
+            guard case .connected = tunnelProviderManager.connectionStatus.tunneled else {
                 observer.fulfill(value: .completed(.failure(ErrorEvent(.tunnelNotConnected))))
                 return
             }
@@ -73,12 +73,12 @@ struct PsiCashEffect {
         }
     }
     
-    func purchaseProduct(
-        _ purchasable: PsiCashPurchasableType, vpnManager: VPNManager
+    func purchaseProduct<T: TunnelProviderManager>(
+        _ purchasable: PsiCashPurchasableType, tunnelProviderManager: T
     ) -> Effect<PsiCashPurchaseResult> {
         Effect { observer, lifetime in
             
-            guard vpnManager.tunneled else {
+            guard case .connected = tunnelProviderManager.connectionStatus.tunneled else {
                 observer.fulfill(value:
                     PsiCashPurchaseResult(
                         purchasable: purchasable,

@@ -37,7 +37,6 @@
 #import "RootContainerController.h"
 #import "SharedConstants.h"
 #import "UIAlertController+Additions.h"
-#import "VPNManager.h"
 #import "AdManager.h"
 #import "Logging.h"
 #import "NEBridge.h"
@@ -56,12 +55,6 @@
 #import "AppUpgrade.h"
 #import "AppEvent.h"
 #import "AppObservables.h"
-#import "Psiphon-Swift.h"
-
-
-// Number of seconds to wait before checking reachability status after receiving
-// `NotifierNetworkConnectivityFailed` from the extension.
-NSTimeInterval const InternetReachabilityCheckTimeout = 10.0;
 
 PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
 PsiFeedbackLogType const RewardedVideoLogType = @"RewardedVideo";
@@ -71,13 +64,7 @@ PsiFeedbackLogType const RewardedVideoLogType = @"RewardedVideo";
 
 // Private properties
 @property (nonatomic) RACCompoundDisposable *compoundDisposable;
-
-@property (nonatomic) VPNManager *vpnManager;
 @property (nonatomic) PsiphonDataSharedDB *sharedDB;
-@property (nonatomic) NSTimer *subscriptionCheckTimer;
-
-// Private state subjects
-@property (nonatomic) RACSubject<RACUnit *> *checkExtensionNetworkConnectivityFailedSubject;
 
 @end
 
@@ -89,12 +76,8 @@ PsiFeedbackLogType const RewardedVideoLogType = @"RewardedVideo";
 - (instancetype)init {
     self = [super init];
     if (self) {
-        _vpnManager = [VPNManager sharedInstance];
         _sharedDB = [[PsiphonDataSharedDB alloc] initForAppGroupIdentifier:APP_GROUP_IDENTIFIER];
         _compoundDisposable = [RACCompoundDisposable compoundDisposable];
-
-        _checkExtensionNetworkConnectivityFailedSubject = [RACSubject subject];
-
     }
     return self;
 }
@@ -131,8 +114,6 @@ willFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     LOG_DEBUG();
-    AppDelegate *__weak weakSelf = self;
-
     [AppObservables.shared appLaunched];
 
     [SwiftDelegate.bridge applicationDidFinishLaunching:application
@@ -147,88 +128,21 @@ willFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // UIKit always waits for application:didFinishLaunchingWithOptions:
     // to return before making the window visible on the screen.
     [self.window makeKeyAndVisible];
-
-    // Listen for VPN status changes from VPNManager.
-    __block RACDisposable *disposable = [self.vpnManager.lastTunnelStatus
-                                         subscribeNext:^(NSNumber *statusObject) {
-        VPNStatus s = (VPNStatus) [statusObject integerValue];
-
-        if (s == VPNStatusDisconnected || s == VPNStatusRestarting ) {
-            // Resets the homepage flag if the VPN has disconnected or is restarting.
-            [SwiftDelegate.bridge resetLandingPage];
-        }
-
-    } error:^(NSError *error) {
-        [weakSelf.compoundDisposable removeDisposable:disposable];
-    } completed:^{
-        [weakSelf.compoundDisposable removeDisposable:disposable];
-    }];
-
-    [self.compoundDisposable addDisposable:disposable];
-
-    // Observe internet reachability status.
-    [self.compoundDisposable addDisposable:[self observeNetworkExtensionReachabilityStatus]];
-
+    
+    // Forwards AdManager `adIsShowing` events to SwiftDelegate.
+    [self.compoundDisposable addDisposable:[[AdManager sharedInstance].adIsShowing subscribeNext:^(NSNumber * _Nullable adisShowingObj) {
+        [SwiftDelegate.bridge onAdPresentationStatusChange: [adisShowingObj boolValue]];
+    }]];
+    
     return YES;
 }
 
 - (void)applicationDidBecomeActive:(UIApplication *)application {
     LOG_DEBUG();
-
-    __weak AppDelegate *weakSelf = self;
-
-    // Before submitting any other work to the VPNManager, update its status.
-    [[self.vpnManager checkOrFixVPN] subscribeNext:^(NSNumber *extensionProcessRunning) {
-        if ([extensionProcessRunning boolValue]) {
-            [weakSelf.checkExtensionNetworkConnectivityFailedSubject sendNext:RACUnit.defaultUnit];
-        }
-    }];
+    
+    [SwiftDelegate.bridge applicationDidBecomeActive:application];
 
     // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
-    [self.sharedDB updateAppForegroundState:YES];
-
-    // If the extension has been waiting for the app to come into foreground,
-    // send the VPNManager startVPN message again.
-    __block RACDisposable *connectedDisposable =
-    [[[RACSignal
-       zip:@[
-           [[AdManager sharedInstance].adIsShowing take:1],
-           [self.vpnManager queryIsPsiphonTunnelConnected],
-           [self.vpnManager.lastTunnelStatus take:1],
-       ]]
-      flattenMap:^RACSignal<RACUnit *> *(RACTuple *tuple) {
-        BOOL adIsShowing = [(NSNumber *) tuple.first boolValue];
-        BOOL tunnelConnected = [(NSNumber *) tuple.second boolValue];
-        VPNStatus vpnStatus = (VPNStatus) [tuple.third integerValue];
-
-        // App has recently been foregrounded.
-        // If an ad is not showing, and tunnel is connected, but the VPN status is connecting, then send the
-        // start VPN message to the extension.
-        if (!adIsShowing && tunnelConnected && vpnStatus == VPNStatusConnecting) {
-            return [RACSignal return:RACUnit.defaultUnit];
-        }
-
-        return [RACSignal empty];
-    }] subscribeNext:^(RACUnit *x) {
-        [weakSelf.vpnManager startVPN];
-    } error:^(NSError *error) {
-        [weakSelf.compoundDisposable removeDisposable:connectedDisposable];
-    } completed:^{
-        [weakSelf.compoundDisposable removeDisposable:connectedDisposable];
-    }];
-
-    [self.compoundDisposable addDisposable:connectedDisposable];
-}
-
-- (void)applicationWillResignActive:(UIApplication *)application {
-    LOG_DEBUG();
-    // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
-    // Use this method to pause ongoing tasks, disable timers, and invalidate graphics rendering callbacks. Games should use this method to pause the game.
-
-    // Cancel subscription expiry timer if active.
-    [self.subscriptionCheckTimer invalidate];
-
-    [self.sharedDB updateAppForegroundState:NO];
 }
 
 - (void)applicationDidEnterBackground:(UIApplication *)application {
@@ -287,72 +201,27 @@ willFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
 #pragma mark - Notifier callback
 
 - (void)onMessageReceived:(NotifierMessage)message {
-
-    __weak AppDelegate *weakSelf = self;
-
     if ([NotifierNewHomepages isEqualToString:message]) {
-
         LOG_DEBUG(@"Received notification NE.newHomepages");
         [SwiftDelegate.bridge showLandingPage];
 
-
     } else if ([NotifierTunnelConnected isEqualToString:message]) {
         LOG_DEBUG(@"Received notification NE.tunnelConnected");
-
-        // If we haven't had a chance to load an Ad, and the
-        // tunnel is already connected, give up on the Ad and
-        // start the VPN. Otherwise the startVPN message will be
-        // sent after the Ad has disappeared.
-        __block RACDisposable *disposable =
-        [[[AdManager sharedInstance].adIsShowing take:1]
-         subscribeNext:^(NSNumber *adIsShowing) {
-            if (![adIsShowing boolValue]) {
-                [weakSelf.vpnManager startVPN];
-            }
-        } error:^(NSError *error) {
-            [weakSelf.compoundDisposable removeDisposable:disposable];
-        } completed:^{
-            [weakSelf.compoundDisposable removeDisposable:disposable];
-        }];
-
-        [self.compoundDisposable addDisposable:disposable];
+        [SwiftDelegate.bridge syncWithTunnelProviderWithReason:
+         TunnelProviderSyncReasonProviderNotificationPsiphonTunnelConnected];
 
     } else if ([NotifierAvailableEgressRegions isEqualToString:message]) {
         LOG_DEBUG(@"Received notification NE.onAvailableEgressRegions");
         // Update available regions
+        __weak AppDelegate *weakSelf = self;
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
             NSArray<NSString *> *regions = [weakSelf.sharedDB emittedEgressRegions];
             [[RegionAdapter sharedInstance] onAvailableEgressRegions:regions];
         });
 
     } else if ([NotifierNetworkConnectivityFailed isEqualToString:message]) {
-        [self.checkExtensionNetworkConnectivityFailedSubject sendNext:RACUnit.defaultUnit];
+        // TODO: fix
     }
-}
-
-#pragma mark - Global alerts
-
-- (UIAlertController *)displayAlertNoInternet:(void (^_Nullable)(UIAlertAction *))handler {
-
-    UIAlertController *alert = [UIAlertController
-                                alertControllerWithTitle:NSLocalizedStringWithDefaultValue(@"NO_INTERNET", nil, [NSBundle mainBundle], @"No Internet Connection", @"Alert title informing user there is no internet connection")
-                                message:NSLocalizedStringWithDefaultValue(@"TURN_ON_DATE", nil, [NSBundle mainBundle], @"Turn on cellular data or use Wi-Fi to access data.", @"Alert message informing user to turn on their cellular data or wifi to connect to the internet")
-                                preferredStyle:UIAlertControllerStyleAlert];
-
-    UIAlertAction *defaultAction = [UIAlertAction
-                                    actionWithTitle:NSLocalizedStringWithDefaultValue(@"OK_BUTTON", nil, [NSBundle mainBundle], @"OK", @"Alert OK Button")
-                                    style:UIAlertActionStyleDefault
-                                    handler:^(UIAlertAction *action) {
-        if (handler) {
-            handler(action);
-        }
-    }];
-
-    [alert addAction:defaultAction];
-
-    [alert presentFromTopController];
-
-    return alert;
 }
 
 #pragma mark -
@@ -363,78 +232,6 @@ willFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
         topController = topController.presentedViewController;
     }
     return topController;
-}
-
-#pragma mark - Private helper methods
-
-- (RACDisposable *)observeNetworkExtensionReachabilityStatus {
-    AppDelegate *__weak weakSelf = self;
-
-    __block UIAlertController *noInternetAlert;
-    __block _Atomic BOOL ongoing;
-    atomic_init(&ongoing, FALSE);
-
-    return [[[[self.checkExtensionNetworkConnectivityFailedSubject
-               filter:^BOOL(RACUnit *x) {
-        // Prevent creation of another alert if one is already ongoing.
-        return !atomic_load(&ongoing);
-    }]
-              flattenMap:^RACSignal<NSNumber *> *(RACUnit *x) {
-        atomic_store(&ongoing, TRUE);
-
-        // resolvedSignal is a hot terminating signal that emits @(TRUE) followed
-        // by RACUnit if the extension posts that connectivity has been resolved
-        // or that tunnel status changes to connected.
-        RACSignal *resolvedSignal = [[[[[[Notifier sharedInstance]
-                                         listenForMessages:@[NotifierNetworkConnectivityResolved]]
-                                        merge:[weakSelf.vpnManager.lastTunnelStatus filter:^BOOL(NSNumber *v) {
-            // Assumed resolved if VPN is connected, or not running.
-            VPNStatus s = (VPNStatus) [v integerValue];
-            return (s == VPNStatusConnected || s == VPNStatusDisconnected);
-        }]]
-                                       mapReplace:@(TRUE)]
-                                      take:1]
-                                     concat:[RACSignal return:RACUnit.defaultUnit]];
-
-        // timerSignal is a cold terminating signal.
-        RACSignal *timerSignal = [[[RACSignal timer:InternetReachabilityCheckTimeout]
-                                   doNext:^(id x) {
-            // Reset ongoing flag.
-            atomic_store(&ongoing, FALSE);
-        }]
-                                  flattenMap:^RACSignal<NSNumber *> *(id x) {
-            // Timer done. We now check extension internet reachability.
-            return [weakSelf.vpnManager queryIsNetworkReachable];
-        }];
-
-        // The returned signal is a hot terminating signal that in effect unsubscribes
-        // from the merged sources once `resolvedSignal` emits RACUnit.
-        return [[[RACSignal merge:@[timerSignal, resolvedSignal]]
-                 takeUntilBlock:^BOOL(id emission) {
-            return RACUnit.defaultUnit == emission;
-        }]
-                doCompleted:^{
-            // Reset ongoing flag in case timer was cancelled by the resolvedSignal.
-            atomic_store(&ongoing, FALSE);
-        }];
-    }]
-             deliverOnMainThread]
-            subscribeNext:^(NSNumber *_Nullable networkReachability) {
-        // networkReachability is nil whenever VPNManager `-queryIsNetworkReachable` emits nil.
-
-        if (![networkReachability boolValue]) {
-            if (!noInternetAlert) {
-                noInternetAlert = [weakSelf displayAlertNoInternet:^(UIAlertAction *action) {
-                    // Alert dismissed by user.
-                    noInternetAlert = nil;
-                }];
-            }
-        } else {
-            [noInternetAlert dismissViewControllerAnimated:TRUE completion:nil];
-            noInternetAlert = nil;
-        }
-
-    }];
 }
 
 @end
@@ -478,6 +275,14 @@ willFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
 
 - (void)onSubscriptionStatus:(BridgedUserSubscription * _Nonnull)status {
     [AppObservables.shared.subscriptionStatus sendNext:status];
+}
+
+- (void)onVPNStatusDidChange:(NEVPNStatus)status {
+    [AppObservables.shared.vpnStatus sendNext:@(status)];
+}
+
+- (void)onVPNStartStopStateDidChange:(VPNStartStopStatus)status {
+    [AppObservables.shared.vpnStartStopStatus sendNext:@(status)];
 }
 
 - (void)dismissWithScreen:(enum DismissableScreen)screen {

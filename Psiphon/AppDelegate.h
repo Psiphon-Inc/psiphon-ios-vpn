@@ -32,8 +32,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)reloadOnboardingViewController;
 
-- (UIAlertController *)displayAlertNoInternet:(void (^_Nullable)(UIAlertAction *))handler;
-
 + (UIViewController *)getTopMostViewController;
 
 @end
