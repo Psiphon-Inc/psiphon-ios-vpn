@@ -75,3 +75,19 @@ extension Authorization: CustomFeedbackDescription {
 }
 
 extension ErrorEvent: FeedbackDescription {}
+
+extension PsiCashAmount: CustomStringFeedbackDescription {
+    
+    public var description: String {
+        "PsiCash(inPsi %.2f: \(String(format: "%.2f", self.inPsi)))"
+    }
+    
+}
+
+extension UserDefaultsConfig: CustomFeedbackDescription {
+    
+    var feedbackFields: [String : CustomStringConvertible] {
+        ["expectedPsiCashReward": self.expectedPsiCashReward]
+    }
+    
+}
