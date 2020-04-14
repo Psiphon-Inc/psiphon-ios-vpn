@@ -324,9 +324,7 @@ extension SwiftDelegate: SwiftBridgeDelegate {
                 }
                 .take(first: 1)
         
-        
-        // TODO!!!! Still haven't investigated the lifetime object for signals that complete.
-        self.lifetime += syncedVPNState.zip(with: subscription)
+        syncedVPNState.zip(with: subscription)
             .map {
                 SwitchedVPNStartStopIntent.make(fromProviderManagerState: $0.0,
                                                 subscriptionStatus: $0.1)
@@ -367,7 +365,7 @@ extension SwiftDelegate: SwiftBridgeDelegate {
     {
         let promise = Promise<VPNConfigInstallResultWrapper>.pending()
         
-        self.lifetime += self.store.$value.signalProducer
+        self.store.$value.signalProducer
             .map(\.vpnState.value.loadState.value)
             .skipRepeats()
             .scan(IndexedPsiphonTPMLoadState(index: 0, value: .nonLoaded))
