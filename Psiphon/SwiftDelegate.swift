@@ -223,7 +223,7 @@ extension SwiftDelegate: SwiftBridgeDelegate {
                     return false
                 }
             }
-            .flatMap(.latest) { [unowned store = self.store] _ in
+            .flatMap(.latest) { [unowned store] _ in
                 // Observes tunnel connected events after the user has switched
                 // tunnel intent to `.start(transition: _)`.
                 store!.$value.signalProducer
@@ -418,7 +418,7 @@ extension SwiftDelegate: SwiftBridgeDelegate {
             }
         }
         .take(first: 2)
-        .startWithValues { [promise, unowned store = self.store] indexed in
+        .startWithValues { [promise, unowned store] indexed in
             switch indexed.index {
             case 0:
                 fatalError()
