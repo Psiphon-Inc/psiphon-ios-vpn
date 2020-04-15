@@ -1,0 +1,21 @@
+framework module HyprMX {
+    umbrella header "HyprMX.h"
+    
+    export *
+    module * { export * }
+    link framework "WebKit"
+    link framework "AdSupport"
+    link framework "AVFoundation"
+    link framework "CoreGraphics"
+    link framework "CoreTelephony"
+    link framework "EventKit"
+    link framework "EventKitUI"
+    link framework "Foundation"
+    link framework "JavaScriptCore"
+    link framework "MobileCoreServices"
+    link framework "QuartzCore"
+    link framework "SafariServices"
+    link framework "StoreKit"
+    link framework "SystemConfiguration"
+    link framework "UIKit"
+}

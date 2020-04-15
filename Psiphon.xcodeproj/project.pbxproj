@@ -164,6 +164,8 @@
 		CE425D1F2159485600B7893D /* StarView.m in Sources */ = {isa = PBXBuildFile; fileRef = CE425D1E2159485500B7893D /* StarView.m */; };
 		CE4E9BC01BBEECF30060FF8B /* Psiphon.entitlements in Resources */ = {isa = PBXBuildFile; fileRef = CE4E9BBF1BBEECF30060FF8B /* Psiphon.entitlements */; };
 		CE4E9BC21BBEECFC0060FF8B /* PsiphonVPN.entitlements in Resources */ = {isa = PBXBuildFile; fileRef = CE4E9BC11BBEECFC0060FF8B /* PsiphonVPN.entitlements */; };
+		CE5DBCFD24478BD50078DDC4 /* HyprMX.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CE5DBCFC24478BD50078DDC4 /* HyprMX.framework */; };
+		CE5DBCFF24478BF50078DDC4 /* HyperMX in Resources */ = {isa = PBXBuildFile; fileRef = CE5DBCFE24478BF50078DDC4 /* HyperMX */; };
 		CE6C3F6A24366AE1007A17F0 /* ClientMetadata.m in Sources */ = {isa = PBXBuildFile; fileRef = CE6C3F6924366AE1007A17F0 /* ClientMetadata.m */; };
 		CE7B76431F54881F00EA44BD /* PsiphonTunnel.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 66094F781E8067520069EC4E /* PsiphonTunnel.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		D672BC574F14042B4D77AB28 /* libPods-Psiphon.a in Frameworks */ = {isa = PBXBuildFile; fileRef = CB8BB19F016330264C4DCB80 /* libPods-Psiphon.a */; };
@@ -570,6 +572,8 @@
 		CE425D1E2159485500B7893D /* StarView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = StarView.m; sourceTree = "<group>"; };
 		CE4E9BBF1BBEECF30060FF8B /* Psiphon.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = Psiphon.entitlements; sourceTree = "<group>"; };
 		CE4E9BC11BBEECFC0060FF8B /* PsiphonVPN.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.entitlements; path = PsiphonVPN.entitlements; sourceTree = "<group>"; };
+		CE5DBCFC24478BD50078DDC4 /* HyprMX.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = HyprMX.framework; sourceTree = "<group>"; };
+		CE5DBCFE24478BF50078DDC4 /* HyperMX */ = {isa = PBXFileReference; lastKnownFileType = folder; path = HyperMX; sourceTree = "<group>"; };
 		CE6C3F6824366AE1007A17F0 /* ClientMetadata.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ClientMetadata.h; sourceTree = "<group>"; };
 		CE6C3F6924366AE1007A17F0 /* ClientMetadata.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ClientMetadata.m; sourceTree = "<group>"; };
 		DD100E19194B9A79F5D7DF55 /* Pods-PsiphonVPN.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PsiphonVPN.debug.xcconfig"; path = "Pods/Target Support Files/Pods-PsiphonVPN/Pods-PsiphonVPN.debug.xcconfig"; sourceTree = "<group>"; };
@@ -631,6 +635,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CE5DBCFD24478BD50078DDC4 /* HyprMX.framework in Frameworks */,
 				668AF9C01E92CBE0008CAAAA /* NetworkExtension.framework in Frameworks */,
 				440D75BE1F59E041005C603B /* StoreKit.framework in Frameworks */,
 				D672BC574F14042B4D77AB28 /* libPods-Psiphon.a in Frameworks */,
@@ -1045,6 +1050,7 @@
 		CE26FC811BBDC7B700B83375 = {
 			isa = PBXGroup;
 			children = (
+				CE5DBCFC24478BD50078DDC4 /* HyprMX.framework */,
 				4E30745D2097921B00B6D2A3 /* PsiCashLib.framework */,
 				66094F781E8067520069EC4E /* PsiphonTunnel.framework */,
 				4E0DCB101F28458100495781 /* Shared */,
@@ -1206,6 +1212,7 @@
 		EFFA4AB620F68CE100E35E8E /* Ad */ = {
 			isa = PBXGroup;
 			children = (
+				CE5DBCFE24478BF50078DDC4 /* HyperMX */,
 				9BFECF45CA0CAF6997411D22 /* MoPubInterstitialAdControllerWrapper.m */,
 				9BFEC327A0BE7E5243CCB2E0 /* MoPubInterstitialAdControllerWrapper.h */,
 				9BFEC970B3CC179C3B9DE44D /* MoPubRewardedAdControllerWrapper.m */,
@@ -1432,6 +1439,7 @@
 				CE26FC951BBDC7B800B83375 /* Assets.xcassets in Resources */,
 				445F24E720E1A5BA00D004E9 /* pkcs7-signed-data.asn1 in Resources */,
 				F136C2951F62E3E1000D3EAB /* LaunchScreen.xib in Resources */,
+				CE5DBCFF24478BF50078DDC4 /* HyperMX in Resources */,
 				CE4E9BC01BBEECF30060FF8B /* Psiphon.entitlements in Resources */,
 				445F24DE20E1A5BA00D004E9 /* pkcs7-signed-data-simplified.asn1 in Resources */,
 				EF743FCA1F99549000AC89A2 /* productIDs.plist in Resources */,
