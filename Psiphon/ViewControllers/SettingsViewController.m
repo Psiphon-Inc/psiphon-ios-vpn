@@ -98,7 +98,7 @@ NSString * const SettingsResetAdConsentCellSpecifierKey = @"settingsResetAdConse
     NSMutableSet *hiddenKeys = [NSMutableSet setWithSet:self.hiddenKeys];
 
     // If the VPN is not active, don't show the force reconnect button.
-    if ([VPNStateCompat providerNotStopped:self.vpnStatus]) {
+    if ([VPNStateCompat providerNotStoppedWithVpnStatus:self.vpnStatus]) {
         [hiddenKeys removeObject:kForceReconnect];
         [hiddenKeys removeObject:kForceReconnectFooter];
     } else {
