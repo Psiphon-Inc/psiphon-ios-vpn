@@ -23,6 +23,7 @@
 #import "ImageUtils.h"
 #import "UIFont+Additions.h"
 #import "Strings.h"
+#import "Psiphon-Swift.h"
 
 NSString * const CellIdentifier = @"cell";
 
@@ -62,7 +63,7 @@ NSString * const CellIdentifier = @"cell";
         [self.navigationController.navigationBar setValue:@(TRUE) forKeyPath:@"hidesShadow"];
 
         UIBarButtonItem *doneButton = [[UIBarButtonItem alloc]
-          initWithTitle:[Strings doneButtonTitle]
+          initWithTitle:[UserStrings Done_button_title]
                   style:UIBarButtonItemStyleDone
                  target:self
                  action:@selector(onDone)];

@@ -38,11 +38,15 @@ typedef NSString * PsiFeedbackLogType;
 
 + (void)info:(NSString *)format, ... NS_FORMAT_FUNCTION(1,2);
 
-+ (void)infoWithType:(PsiFeedbackLogType)sourceType message:(NSString *)format, ... NS_FORMAT_FUNCTION(2,3);
++ (void)infoWithType:(PsiFeedbackLogType)sourceType message:(NSString *)message;
+
++ (void)infoWithType:(PsiFeedbackLogType)sourceType format:(NSString *)format, ... NS_FORMAT_FUNCTION(2,3);
 
 + (void)infoWithType:(PsiFeedbackLogType)sourceType json:(NSDictionary*_Nonnull)json;
 
-+ (void)warnWithType:(PsiFeedbackLogType)sourceType message:(NSString *)format, ... NS_FORMAT_FUNCTION(2,3);
++ (void)warnWithType:(PsiFeedbackLogType)sourceType message:(NSString *)message;
+
++ (void)warnWithType:(PsiFeedbackLogType)sourceType format:(NSString *)format, ... NS_FORMAT_FUNCTION(2,3);
 
 + (void)warnWithType:(PsiFeedbackLogType)sourceType message:(NSString *)message object:(NSError *)error;
 
@@ -50,7 +54,9 @@ typedef NSString * PsiFeedbackLogType;
 
 + (void)error:(NSString *)format, ... NS_FORMAT_FUNCTION(1,2);
 
-+ (void)errorWithType:(PsiFeedbackLogType)sourceType message:(NSString *)format, ... NS_FORMAT_FUNCTION(2,3);
++ (void)errorWithType:(PsiFeedbackLogType)sourceType message:(NSString *)message;
+
++ (void)errorWithType:(PsiFeedbackLogType)sourceType format:(NSString *)format, ... NS_FORMAT_FUNCTION(2,3);
 
 + (void)errorWithType:(PsiFeedbackLogType)sourceType json:(NSDictionary*_Nonnull)json;
 

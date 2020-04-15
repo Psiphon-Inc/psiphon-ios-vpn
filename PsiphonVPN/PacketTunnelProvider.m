@@ -105,7 +105,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 
 // Authorization IDs supplied to tunnel-core from the container.
 // NOTE: Does not include subscription authorization ID.
-@property (atomic, nonnull) NSSet<NSString *> *suppliedContainerAuthorizationIDs;
+@property (atomic, nonnull) NSSet<NSString *> *nonSubscriptionAuthIdSnapshot;
 
 @property (nonatomic) PsiphonConfigSponsorIds *cachedSponsorIDs;
 
@@ -156,7 +156,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
         _tunnelProviderState = TunnelProviderStateInit;
         _subscriptionCheckState = nil;
         _waitForContainerStartVPNCommand = FALSE;
-        _suppliedContainerAuthorizationIDs = [NSSet set];
+        _nonSubscriptionAuthIdSnapshot = [NSSet set];
 
         _postedNetworkConnectivityFailed = FALSE;
     }
@@ -228,7 +228,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 
     void (^handleExpiredSubscription)(void) = ^{
         PSIAssert([weakSelf.subscriptionCheckState isInProgress]);
-        [PsiFeedbackLogger infoWithType:SubscriptionCheckLogType message:@"authorization expired restarting tunnel"];
+        [PsiFeedbackLogger infoWithType:SubscriptionCheckLogType format:@"authorization expired restarting tunnel"];
 
         // Restarts the tunnel to re-connect with the correct sponsor ID.
         [weakSelf.subscriptionCheckState setStateNotSubscribed];
@@ -284,7 +284,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
     RACSignal *updateSubscriptionAuthorizationSignal = [[[[[self subscriptionReceiptUnlocked]
       flattenMap:^RACSignal *(id nilValue) {
           // Emits an item when Psiphon tunnel is connected and VPN is started.
-          [PsiFeedbackLogger infoWithType:SubscriptionCheckLogType message:@"receipt is readable"];
+          [PsiFeedbackLogger infoWithType:SubscriptionCheckLogType format:@"receipt is readable"];
           return [self.vpnStartedSignal zipWith:[tunnelConnectedSignal take:1]];
       }]
       flattenMap:^RACSignal *(id nilValue) {
@@ -303,16 +303,16 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 
           switch ((SubscriptionCheckEnum) [localSubscriptionCheck.subscriptionCheckEnum integerValue]) {
               case SubscriptionCheckAuthorizationExpired:
-                  [PsiFeedbackLogger infoWithType:SubscriptionCheckLogType message:@"authorization expired"];
+                  [PsiFeedbackLogger infoWithType:SubscriptionCheckLogType format:@"authorization expired"];
                   return [RACSignal return:[SubscriptionResultModel failed:SubscriptionResultErrorExpired]];
 
               case SubscriptionCheckHasActiveAuthorization:
-                  [PsiFeedbackLogger infoWithType:SubscriptionCheckLogType message:@"authorization already active"];
+                  [PsiFeedbackLogger infoWithType:SubscriptionCheckLogType format:@"authorization already active"];
                   return [RACSignal return:[SubscriptionResultModel success:nil receiptFileSize:nil]];
 
               case SubscriptionCheckShouldUpdateAuthorization:
 
-                  [PsiFeedbackLogger infoWithType:SubscriptionCheckLogType message:@"authorization request"];
+                  [PsiFeedbackLogger infoWithType:SubscriptionCheckLogType format:@"authorization request"];
 
                   // Emits an item whose value is the dictionary returned from the subscription verifier server,
                   // emits an error on all errors.
@@ -359,7 +359,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
                     }];
 
               default:
-                  [PsiFeedbackLogger errorWithType:SubscriptionCheckLogType message:@"unhandled check value %@", localSubscriptionCheck.subscriptionCheckEnum];
+                  [PsiFeedbackLogger errorWithType:SubscriptionCheckLogType format:@"unhandled check value %@", localSubscriptionCheck.subscriptionCheckEnum];
                   [weakSelf exitGracefully];
                   return [RACSignal empty];
           }
@@ -376,7 +376,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
               // Subscription check is in progress.
               // Sets extension's subscription status to in progress.
 
-              [PsiFeedbackLogger infoWithType:SubscriptionCheckLogType message:@"started"];
+              [PsiFeedbackLogger infoWithType:SubscriptionCheckLogType format:@"started"];
               [weakSelf.subscriptionCheckState setStateInProgress];
               return;
           }
@@ -402,7 +402,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
                       break;
 
                   default:
-                      [PsiFeedbackLogger errorWithType:SubscriptionCheckLogType message:@"unhandled error code %ld", (long) result.error.code];
+                      [PsiFeedbackLogger errorWithType:SubscriptionCheckLogType format:@"unhandled error code %ld", (long) result.error.code];
                       [weakSelf exitGracefully];
                       break;
               }
@@ -426,7 +426,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 
               [subscription updateWithRemoteAuthDict:result.remoteAuthDict submittedReceiptFilesize:result.submittedReceiptFileSize];
 
-              [PsiFeedbackLogger infoWithType:SubscriptionCheckLogType message:@"received authorization %@ expiring on %@", subscription.authorization.ID,
+              [PsiFeedbackLogger infoWithType:SubscriptionCheckLogType format:@"received authorization %@ expiring on %@", subscription.authorization.ID,
                   subscription.authorization.expires];
 
               // Extract request date from the response and convert to NSDate.
@@ -489,7 +489,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
       }
       completed:^{
           [AppProfiler logMemoryReportWithTag:@"SubscriptionCheckCompleted"];
-          [PsiFeedbackLogger infoWithType:SubscriptionCheckLogType message:@"finished"];
+          [PsiFeedbackLogger infoWithType:SubscriptionCheckLogType format:@"finished"];
           subscriptionDisposable = nil;
       }];
 }
@@ -617,7 +617,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 - (void)reconnectWithConfig:(NSString *_Nullable)sponsorId {
     dispatch_async(self->workQueue, ^{
         [AppProfiler logMemoryReportWithTag:@"reconnectWithConfig"];
-        [self.psiphonTunnel reconnectWithConfig:sponsorId :[self getAllAuthorizations]];
+        [self.psiphonTunnel reconnectWithConfig:sponsorId :[self getAllAuthorizationsAndSetSnapshot]];
     });
 }
 
@@ -657,19 +657,20 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 #pragma mark - Query methods
 
 - (NSNumber *)isNEZombie {
-    return @(self.tunnelProviderState == TunnelProviderStateZombie);
+    return [NSNumber numberWithBool:self.tunnelProviderState == TunnelProviderStateZombie];
 }
 
 - (NSNumber *)isTunnelConnected {
-    return @([self.psiphonTunnel getConnectionState] == PsiphonConnectionStateConnected);
+    return [NSNumber numberWithBool:
+            [self.psiphonTunnel getConnectionState] == PsiphonConnectionStateConnected];
 }
 
 - (NSNumber *)isNetworkReachable {
     NetworkStatus status;
     if ([self.psiphonTunnel getNetworkReachabilityStatus:&status]) {
-        return @(status != NotReachable);
+        return [NSNumber numberWithBool:status != NotReachable];
     }
-    return nil;
+    return [NSNumber numberWithBool:FALSE];
 }
 
 #pragma mark - Notifier callback
@@ -696,17 +697,17 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
     } else if ([NotifierForceSubscriptionCheck isEqualToString:message]) {
 
         // Container received a new subscription transaction.
-        [PsiFeedbackLogger infoWithType:ExtensionNotificationLogType message:@"force subscription check"];
+        [PsiFeedbackLogger infoWithType:ExtensionNotificationLogType format:@"force subscription check"];
         [self scheduleSubscriptionCheckWithRemoteCheckForced:TRUE];
 
-    } else if ([NotifierUpdatedAuthorizations isEqualToString:message]) {
+    } else if ([NotifierUpdatedNonSubscriptionAuths isEqualToString:message]) {
 
         // Restarts the tunnel only if the persisted authorizations have changed from the
         // last set of authorizations supplied to tunnel-core.
-        NSSet<NSString *> *nonMarkedAuths = [Authorization authorizationIDsFrom:[
-          self.sharedDB getNonMarkedAuthorizations]];
+        NSSet<NSString *> *newAuthIds = [Authorization authorizationIDsFrom:
+                                             [self.sharedDB getNonSubscriptionAuthorizations]];
 
-        if (![nonMarkedAuths isEqualToSet:self.suppliedContainerAuthorizationIDs]) {
+        if (![newAuthIds isEqualToSet:self.nonSubscriptionAuthIdSnapshot]) {
             [self reconnectWithConfig:nil];
         }
 
@@ -854,11 +855,8 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
     }
 
     if ([self.psiphonTunnel getConnectionState] == PsiphonConnectionStateConnected) {
-        // The container waits up to `LandingPageTimeout` to see the tunnel connected
-        // status from when the Homepage notification is received by it.
         [self startVPN];
         self.reasserting = FALSE;
-        [[Notifier sharedInstance] post:NotifierNewHomepages];
         return TRUE;
     }
 
@@ -868,22 +866,22 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 #pragma mark - Subscription and authorizations
 
 // Returns possibly empty array of authorizations.
-- (NSArray<NSString *> *_Nonnull)getAllAuthorizations {
+- (NSArray<NSString *> *_Nonnull)getAllAuthorizationsAndSetSnapshot {
 
     NSMutableArray *auths = [NSMutableArray arrayWithCapacity:1];
     
     // Add subscription authorization.
     SubscriptionData *subscription = [SubscriptionData fromPersistedDefaults];
     if (subscription.authorization) {
-        [PsiFeedbackLogger infoWithType:PacketTunnelProviderLogType message:@"subscription authorization ID:%@", subscription.authorization.ID];
+        [PsiFeedbackLogger infoWithType:PacketTunnelProviderLogType format:@"subscription authorization ID:%@", subscription.authorization.ID];
         [auths addObject:subscription.authorization.base64Representation];
     }
     
     // Adds authorizations persisted by the container (minus the authorizations already marked as expired).
-    NSSet<Authorization *> *_Nonnull nonMarkedAuths = [self.sharedDB getNonMarkedAuthorizations];
-    [auths addObjectsFromArray:[Authorization encodeAuthorizations:nonMarkedAuths]];
+    NSSet<Authorization *> *_Nonnull snapshot = [self.sharedDB getNonSubscriptionAuthorizations];
+    [auths addObjectsFromArray:[Authorization encodeAuthorizations:snapshot]];
     
-    self.suppliedContainerAuthorizationIDs = [Authorization authorizationIDsFrom:nonMarkedAuths];
+    self.nonSubscriptionAuthIdSnapshot = [Authorization authorizationIDsFrom:snapshot];
 
     return auths;
 }
@@ -929,13 +927,13 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 }
 
 - (void)exitForBadClock {
-    [PsiFeedbackLogger errorWithType:ExitReasonLogType message:@"bad clock"];
+    [PsiFeedbackLogger errorWithType:ExitReasonLogType format:@"bad clock"];
     NSString *message = NSLocalizedStringWithDefaultValue(@"BAD_CLOCK_ALERT_MESSAGE", nil, [NSBundle mainBundle], @"We've detected the time on your device is out of sync with your time zone. Please update your clock settings and restart the app", @"Alert message informing user that the device clock needs to be updated with current time");
     [self displayMessageAndExitGracefully:message];
 }
 
 - (void)exitForInvalidReceipt {
-    [PsiFeedbackLogger errorWithType:ExitReasonLogType message:@"invalid subscription receipt"];
+    [PsiFeedbackLogger errorWithType:ExitReasonLogType format:@"invalid subscription receipt"];
     NSString *message = NSLocalizedStringWithDefaultValue(@"BAD_RECEIPT_ALERT_MESSAGE", nil, [NSBundle mainBundle], @"Your subscription receipt can not be verified, please refresh it and try again.", @"Alert message informing user that subscription receipt can not be verified");
     [self displayMessageAndExitGracefully:message];
 }
@@ -967,7 +965,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
     NSDictionary *configs = [PsiphonConfigReader fromConfigFile].configs;
     if (!configs) {
         [PsiFeedbackLogger errorWithType:PsiphonTunnelDelegateLogType
-                                 message:@"Failed to get config"];
+                                 format:@"Failed to get config"];
         [self displayCorruptSettingsFileMessage];
         [self exitGracefully];
     }
@@ -996,7 +994,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
     NSURL *dataRootDirectory = [PsiphonDataSharedDB dataRootDirectory];
     if (dataRootDirectory == nil) {
         [PsiFeedbackLogger errorWithType:PsiphonTunnelDelegateLogType
-                                 message:@"Failed to get data root directory"];
+                                 format:@"Failed to get data root directory"];
         [self displayCorruptSettingsFileMessage];
         [self exitGracefully];
     }
@@ -1019,7 +1017,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
         mutableConfigCopy[@"MigrateRotatingNoticesFilename"] = oldRotatingLogNoticesPath;
     } else {
         [PsiFeedbackLogger infoWithType:PsiphonTunnelDelegateLogType
-                                message:@"Failed to get old rotating notices log path"];
+                                format:@"Failed to get old rotating notices log path"];
     }
 
     NSString *oldHomepageNoticesPath = [self.sharedDB oldHomepageNoticesPath];
@@ -1027,7 +1025,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
         mutableConfigCopy[@"MigrateHompageNoticesFilename"] = oldHomepageNoticesPath;
     } else {
         [PsiFeedbackLogger infoWithType:PsiphonTunnelDelegateLogType
-                                message:@"Failed to get old homepage notices path"];
+                                format:@"Failed to get old homepage notices path"];
     }
 
     // Use default rotation rules for homepage and notice files.
@@ -1039,7 +1037,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
     mutableConfigCopy[@"UseNoticeFiles"] = noticeFiles;
 
     // Provide auth tokens
-    NSArray *authorizations = [self getAllAuthorizations];
+    NSArray *authorizations = [self getAllAuthorizationsAndSetSnapshot];
     if ([authorizations count] > 0) {
         mutableConfigCopy[@"Authorizations"] = [authorizations copy];
     }
@@ -1113,17 +1111,16 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
         }
 
         // Marks container authorizations found to be invalid, and sends notification to the container.
-        if ([self.suppliedContainerAuthorizationIDs count] > 0) {
-
+        if ([self.nonSubscriptionAuthIdSnapshot count] > 0) {
+            LOG_DEBUG(@"Supplied Auth Ids: %@", self.nonSubscriptionAuthIdSnapshot.description);
+            
             // Subtracts provided active authorizations from the the set of authorizations supplied in Psiphon config,
             // to get the set of inactive authorizations.
-            NSMutableSet<NSString *> *inactiveAuthIDs = [NSMutableSet setWithSet:self.suppliedContainerAuthorizationIDs];
-            [inactiveAuthIDs minusSet:[NSSet setWithArray:authorizationIds]];
+            NSMutableSet<NSString *> *noAcceptedAuthIds = [NSMutableSet setWithSet:self.nonSubscriptionAuthIdSnapshot];
+            [noAcceptedAuthIds minusSet:[NSSet setWithArray:authorizationIds]];
 
-            // Append inactive authorizations.
-            [self.sharedDB appendExpiredAuthorizationIDs:inactiveAuthIDs];
-
-            [[Notifier sharedInstance] post:NotifierMarkedAuthorizations];
+            // Immediately delete authorization ids not accepted.
+            [self.sharedDB removeNonSubscriptionAuthorizationsNotAccepted:noAcceptedAuthIds];
 
         }
 

@@ -19,7 +19,6 @@
 
 #import "IAPViewController.h"
 #import "AppDelegate.h"
-#import "IAPStoreHelper.h"
 #import "MBProgressHUD.h"
 #import "NSDate+Comparator.h"
 #import "PsiphonClientCommonLibraryHelpers.h"
@@ -36,26 +35,32 @@
 #import "RoyalSkyButton.h"
 #import "DispatchUtils.h"
 #import "Nullity.h"
+#import <ReactiveObjC.h>
+#import "AppObservables.h"
+#import "Psiphon-Swift.h"
+
 
 // Ratio of the width of table view cell's content to the cell.
 #define CellContentWithMultiplier 0.88
 
 static NSString *iapCellID = @"IAPTableCellID";
 
-@interface IAPViewController () <UITableViewDataSource, UITableViewDelegate>
+@interface IAPViewController () <UITableViewDataSource, UITableViewDelegate,
+SKProductsRequestDelegate, SKPaymentTransactionObserver>
 
 @property (nonatomic) UITableView *tableView;
 @property (nonatomic) NSNumberFormatter *priceFormatter;
-@property (nonatomic) UIRefreshControl *refreshControl;
 
 @property (nonatomic) BOOL hasActiveSubscription;
 @property (nonatomic) BOOL hasBeenInIntroPeriod;
-@property (nonatomic) SKProduct *latestSubscriptionProduct;
-@property (nonatomic) NSDate *latestSubscriptionExpirationDate;
+@property (nonatomic) NSArray<SKProduct *> *_Nonnull storeProducts;
+@property (nonatomic) NSString *_Nullable pendingProductIdentifier;
+@property (nonatomic) RACDisposable *subscriptionStatusDisposable;
 
 @end
 
 @implementation IAPViewController {
+    FBLPromise<ObjCIAPResult *> *_Nullable pendingPurchasePromise;
     MBProgressHUD *buyProgressAlert;
     NSTimer *buyProgressAlertTimer;
 }
@@ -63,10 +68,10 @@ static NSString *iapCellID = @"IAPTableCellID";
 - (instancetype)init {
     self = [super init];
     if (self) {
-        _latestSubscriptionExpirationDate = nil;
-        _latestSubscriptionProduct = nil;
         _hasActiveSubscription = FALSE;
         _hasBeenInIntroPeriod = FALSE;
+        _storeProducts = [NSArray array];
+        _pendingProductIdentifier = nil;
 
         _priceFormatter = [[NSNumberFormatter alloc] init];
         _priceFormatter.formatterBehavior = NSNumberFormatterBehavior10_4;
@@ -75,8 +80,90 @@ static NSString *iapCellID = @"IAPTableCellID";
     return self;
 }
 
+// Sets UI to refreshing state, and starts products request.
+// No-op if the user already has an active subscription.
+- (void)startProductListRequest {
+
+    // No-op if the user already has an active subscription.
+    if (self.hasActiveSubscription) {
+        return;
+    }
+
+    NSSet<NSString *> *productIdentifiers = [SwiftDelegate.bridge getAppStoreSubscriptionProductIDs];
+    SKProductsRequest* productRequest = [[SKProductsRequest alloc] initWithProductIdentifiers:productIdentifiers];
+    productRequest.delegate = self;
+    [productRequest start];
+}
+
+#pragma mark - SKProductsRequestDelegate
+
+- (void)productsRequest:(SKProductsRequest *)request didReceiveResponse:(SKProductsResponse *)response {
+    dispatch_async_main(^{
+        NSSortDescriptor *mySortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"price" ascending:YES];
+        NSMutableArray *sortArray = [[NSMutableArray alloc] initWithArray:response.products];
+        [sortArray sortUsingDescriptors:[NSArray arrayWithObject:mySortDescriptor]];
+        self.storeProducts = sortArray;
+        [self reloadTableData];
+    });
+}
+
+- (void)request:(SKRequest *)request didFailWithError:(NSError *)error {
+    dispatch_async_main(^{
+        [self reloadTableData];
+    });
+}
+
+#pragma mark - SKPaymentTransactionObserver
+
+- (void)paymentQueue:(SKPaymentQueue *)queue updatedTransactions:(NSArray<SKPaymentTransaction *> *)transactions {
+
+    dispatch_async_main(^{
+
+        if (!self.pendingProductIdentifier) {
+            return;
+        }
+
+        for (SKPaymentTransaction *tx in transactions) {
+            if ( [tx.payment.productIdentifier isEqualToString:self.pendingProductIdentifier]) {
+
+                if (tx.transactionState == SKPaymentTransactionStatePurchasing) {
+                    [self showProgressSpinnerAndBlockUI];
+                } else {
+                    [self dismissProgressSpinnerAndUnblockUI];
+                }
+
+                break;
+            }
+        }
+    });
+}
+
+#pragma mark -
+
 - (void)viewDidLoad {
     [super viewDidLoad];
+
+    self.subscriptionStatusDisposable =
+    [[AppObservables.shared.subscriptionStatus
+      deliverOnMainThread]
+     subscribeNext:^(BridgedUserSubscription * _Nullable subscription) {
+        if (subscription.state == BridgedSubscriptionStateUnknown) {
+            return;
+        }
+
+        if (subscription.state == BridgedSubscriptionStateActive) {
+            self.hasActiveSubscription = TRUE;
+        } else {
+            self.hasActiveSubscription = FALSE;
+            self.hasBeenInIntroPeriod = subscription.hasBeenInIntroPeriod;
+            [self startProductListRequest];
+        }
+
+        [self reloadTableData];
+    }];
+
+    // Adds ViewController as an observer of transactions.
+    [SKPaymentQueue.defaultQueue addTransactionObserver:self];
 
     // Removes the default iOS bottom border.
     [self.navigationController.navigationBar setValue:@(TRUE) forKeyPath:@"hidesShadow"];
@@ -133,12 +220,6 @@ static NSString *iapCellID = @"IAPTableCellID";
     self.tableView.dataSource = self;
     [self.view addSubview:self.tableView];
 
-
-    self.refreshControl = [[UIRefreshControl alloc] init];
-    [self.refreshControl addTarget:self action:@selector(startProductsRequest) forControlEvents:UIControlEventValueChanged];
-    [self.tableView addSubview:self.refreshControl];
-    [self.tableView sendSubviewToBack:self.refreshControl];
-
     // Sets screen background and navigation bar colours.
     self.view.backgroundColor = UIColor.darkBlueColor;
 
@@ -150,42 +231,14 @@ static NSString *iapCellID = @"IAPTableCellID";
         [self.tableView.leadingAnchor constraintEqualToAnchor:self.view.safeLeadingAnchor],
         [self.tableView.trailingAnchor constraintEqualToAnchor:self.view.safeTrailingAnchor],
     ]];
-
-    // Listens to IAPStoreHelper transaction states.
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(onPaymentTransactionUpdate:)
-                                                 name:IAPHelperPaymentTransactionUpdateNotification
-                                               object:nil];
-    
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(reloadProducts)
-                                                 name:IAPSKProductsRequestDidFailWithErrorNotification
-                                               object:nil];
-    
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(reloadProducts)
-                                                 name:IAPSKProductsRequestDidReceiveResponseNotification
-                                               object:nil];
-    
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(reloadProducts)
-                                                 name:IAPSKRequestRequestDidFinishNotification
-                                               object:nil];
-    
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(reloadProducts)
-                                                 name:IAPHelperUpdatedSubscriptionDictionaryNotification
-                                               object:nil];
-
-    [self updateHasActiveSubscription];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
-    
-    if([[IAPStoreHelper sharedInstance].storeProducts count] == 0) {
-        // retry getting products from the store
-        [self startProductsRequest];
+
+    // Get store products for first time, or retry if previous attempt failed.
+    if ([self.storeProducts count] == 0) {
+        [self startProductListRequest];
     }
 }
 
@@ -217,7 +270,7 @@ static NSString *iapCellID = @"IAPTableCellID";
     [refreshButton setTintColor:UIColor.whiteColor];
     refreshButton.titleLabel.font = [UIFont avenirNextDemiBold:14.0];
     [refreshButton addTarget:self
-                      action:@selector(startProductsRequest)
+                      action:@selector(startProductListRequest)
             forControlEvents:UIControlEventTouchUpInside];
 
     // Add subview to the stack view.
@@ -246,14 +299,14 @@ static NSString *iapCellID = @"IAPTableCellID";
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
 
-    if ([[IAPStoreHelper sharedInstance].storeProducts count] == 0) {
+    if ([self.storeProducts count] == 0 && !self.hasActiveSubscription) {
         return 0;
     }
 
     NSInteger numRows = 2;  // Start count with number of rows that are always visible.
 
     if (!self.hasActiveSubscription) {
-        numRows += [[IAPStoreHelper sharedInstance].storeProducts count];
+        numRows += [self.storeProducts count];
     }
 
     return numRows;
@@ -264,7 +317,7 @@ static NSString *iapCellID = @"IAPTableCellID";
 - (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section {
 
     // If no products have been loaded show the alternative header.
-    if ([[IAPStoreHelper sharedInstance].storeProducts count] == 0) {
+    if ([self.storeProducts count] == 0 && !self.hasActiveSubscription) {
         UIView *header = [self createNoProductsView];
         return header;
 
@@ -559,7 +612,7 @@ static NSString *iapCellID = @"IAPTableCellID";
     UITableViewCell *cell = [[UITableViewCell alloc] init];
     if (!self.hasActiveSubscription) {
         
-        SKProduct *product = [IAPStoreHelper sharedInstance].storeProducts[indexPath.row];
+        SKProduct *product = self.storeProducts[indexPath.row];
 
         cell.backgroundColor = UIColor.clearColor;
         cell.selectionStyle = UITableViewCellSelectionStyleNone;
@@ -593,7 +646,7 @@ static NSString *iapCellID = @"IAPTableCellID";
 - (nullable UIView *)tableView:(UITableView *)tableView viewForFooterInSection:(NSInteger)section {
 
     // Does not show the regular footer if no products have been loaded.
-    if ([[IAPStoreHelper sharedInstance].storeProducts count] == 0) {
+    if ([self.storeProducts count] == 0) {
         return nil;
     }
 
@@ -678,13 +731,32 @@ static NSString *iapCellID = @"IAPTableCellID";
 #pragma mark -
 
 - (void)buyButtonPressed:(UISegmentedControl *)sender {
-    int productID = (int)sender.tag;
+    IAPViewController *__weak weakSelf = self;
 
-    [self showProgressSpinnerAndBlockUI];
+    void (^handlePromise)(void) = ^{
+        IAPViewController *__strong strongSelf = weakSelf;
+        if (strongSelf) {
+            [strongSelf dismissProgressSpinnerAndUnblockUI];
+            strongSelf->_pendingProductIdentifier = nil;
+            strongSelf->pendingPurchasePromise = nil;
+        }
+    };
 
-    if([IAPStoreHelper sharedInstance].storeProducts.count > productID) {
-        SKProduct* product = [IAPStoreHelper sharedInstance].storeProducts[productID];
-        [[IAPStoreHelper sharedInstance] buyProduct:product];
+    if (!pendingPurchasePromise) {
+        int productID = (int)sender.tag;
+        if (productID < self.storeProducts.count) {
+            [self showProgressSpinnerAndBlockUI];
+            SKProduct* product = self.storeProducts[productID];
+            self.pendingProductIdentifier = product.productIdentifier;
+
+            pendingPurchasePromise = [[[SwiftDelegate.bridge buyAppStoreSubscriptionProduct:product] onQueue:dispatch_get_main_queue() then:^id _Nullable(ObjCIAPResult * _Nullable value) {
+                handlePromise();
+                return nil;
+            }] catch:^(NSError * _Nonnull error) {
+                [NSException raise:@"CatchNotImplemented"
+                            format:@"Unexpected IAP promise error: '%@'", error];
+            }];
+        }
     }
 }
 
@@ -724,24 +796,6 @@ static NSString *iapCellID = @"IAPTableCellID";
     [self.navigationController pushViewController:vc animated:TRUE];
 }
 
-- (void)beginRefreshingUI {
-    if (!self.refreshControl.isRefreshing) {
-        [self.refreshControl beginRefreshing];
-        [self.tableView setContentOffset:CGPointMake(0, self.tableView.contentOffset.y-self.refreshControl.frame.size.height) animated:YES];
-    }
-
-    // Timeout after 20 seconds
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 20 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
-        [self endRefreshingUI];
-    });
-}
-
-- (void)endRefreshingUI {
-    if (self.refreshControl.isRefreshing) {
-        [self.refreshControl endRefreshing];
-    }
-}
-
 - (void)dismissViewController {
     if (self.openedFromSettings) {
         [self.navigationController popViewControllerAnimated:YES];
@@ -750,27 +804,8 @@ static NSString *iapCellID = @"IAPTableCellID";
     }
 }
 
-- (void)reloadProducts {
-    dispatch_async_main(^{
-        [self endRefreshingUI];
-        [self updateHasActiveSubscription];
-        [self.tableView reloadData];
-    });
-}
-
-- (void)startProductsRequest {
-    [self beginRefreshingUI];
-    [[IAPStoreHelper sharedInstance] startProductsRequest];
-}
-
-- (void)onPaymentTransactionUpdate:(NSNotification *)notification {
-    SKPaymentTransactionState transactionState = (SKPaymentTransactionState) [notification.userInfo[IAPHelperPaymentTransactionUpdateKey] integerValue];
-
-    if (SKPaymentTransactionStatePurchasing == transactionState) {
-        [self showProgressSpinnerAndBlockUI];
-    } else {
-        [self dismissProgressSpinnerAndUnblockUI];
-    }
+- (void)reloadTableData {
+    [self.tableView reloadData];
 }
 
 - (void)showProgressSpinnerAndBlockUI {
@@ -795,36 +830,6 @@ static NSString *iapCellID = @"IAPTableCellID";
     if (buyProgressAlert != nil) {
         [buyProgressAlert hideAnimated:YES];
         buyProgressAlert = nil;
-    }
-}
-
-- (void)updateHasActiveSubscription {
-
-    NSDictionary *_Nullable subscriptionDict = [IAPStoreHelper subscriptionDictionary];
-
-    if (subscriptionDict) {
-
-        self.hasBeenInIntroPeriod = [subscriptionDict[kHasBeenInIntroPeriod] boolValue];
-
-        // Load subscription information.
-        if ([IAPStoreHelper hasActiveSubscriptionForDate:[NSDate date]
-                                                  inDict:subscriptionDict
-                                           getExpiryDate:nil]) {
-
-            // Store latest product expiration date.
-            self.latestSubscriptionExpirationDate = subscriptionDict[kLatestExpirationDate];
-
-            NSString *productId = subscriptionDict[kProductId];
-
-            for (SKProduct *product in [IAPStoreHelper sharedInstance].storeProducts) {
-                if ([product.productIdentifier isEqualToString:productId]) {
-                    self.latestSubscriptionProduct = product;
-                    self.hasActiveSubscription = TRUE;
-
-                    break;
-                }
-            }
-        }
     }
 }
 
