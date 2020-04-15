@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<array>
+	<string>ca.psiphon.Psiphon.psicash.tier1</string>
+	<string>ca.psiphon.Psiphon.psicash.tier2</string>
+	<string>ca.psiphon.Psiphon.psicash.tier3</string>
+	<string>ca.psiphon.Psiphon.psicash.tier4</string>
+	<string>ca.psiphon.Psiphon.psicash.tier5</string>
+	<string>ca.psiphon.Psiphon.psicash.tier6</string>
+	<string>ca.psiphon.Psiphon.psicash.tier7</string>
+	<string>ca.psiphon.Psiphon.psicash.tier8</string>
+	<string>ca.psiphon.Psiphon.psicash.tier9</string>
+</array>
+</plist>

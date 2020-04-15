@@ -79,4 +79,22 @@
 
 + (UIColor * _Nonnull)black19Color;
 
++ (UIColor * _Nonnull)softGrey1Color;
+
++ (UIColor * _Nonnull)softGrey2Color;
+
++ (UIColor * _Nonnull)darkGreyBlueColor;
+
++ (UIColor * _Nonnull)psiCashBlueGreyColor;
+
++ (UIColor * _Nonnull)brightTealColor;
+
++ (UIColor * _Nonnull)weirdGreenColor;
+
++ (UIColor * _Nonnull)lightNavyColor;
+
++ (UIColor * _Nonnull)darkNavyColor;
+
++ (UIColor * _Nonnull)duskColor;
+
 @end
