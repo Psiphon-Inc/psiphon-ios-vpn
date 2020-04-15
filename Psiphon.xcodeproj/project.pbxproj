@@ -165,9 +165,10 @@
 		CE4E9BC01BBEECF30060FF8B /* Psiphon.entitlements in Resources */ = {isa = PBXBuildFile; fileRef = CE4E9BBF1BBEECF30060FF8B /* Psiphon.entitlements */; };
 		CE4E9BC21BBEECFC0060FF8B /* PsiphonVPN.entitlements in Resources */ = {isa = PBXBuildFile; fileRef = CE4E9BC11BBEECFC0060FF8B /* PsiphonVPN.entitlements */; };
 		CE5DBCFD24478BD50078DDC4 /* HyprMX.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CE5DBCFC24478BD50078DDC4 /* HyprMX.framework */; };
-		CE5DBCFF24478BF50078DDC4 /* HyperMX in Resources */ = {isa = PBXBuildFile; fileRef = CE5DBCFE24478BF50078DDC4 /* HyperMX */; };
 		CE6C3F6A24366AE1007A17F0 /* ClientMetadata.m in Sources */ = {isa = PBXBuildFile; fileRef = CE6C3F6924366AE1007A17F0 /* ClientMetadata.m */; };
 		CE7B76431F54881F00EA44BD /* PsiphonTunnel.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 66094F781E8067520069EC4E /* PsiphonTunnel.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		CEAECE9C2447924600174C64 /* HYPRAdMobVideoAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = CEAECE982447924500174C64 /* HYPRAdMobVideoAdapter.m */; };
+		CEAECE9D2447924600174C64 /* HyprMXAdNetworkExtras.m in Sources */ = {isa = PBXBuildFile; fileRef = CEAECE9A2447924500174C64 /* HyprMXAdNetworkExtras.m */; };
 		D672BC574F14042B4D77AB28 /* libPods-Psiphon.a in Frameworks */ = {isa = PBXBuildFile; fileRef = CB8BB19F016330264C4DCB80 /* libPods-Psiphon.a */; };
 		EF4F1F3D206055F7006A40A1 /* RACSignal+Operations2.m in Sources */ = {isa = PBXBuildFile; fileRef = EF90D79F204F22C900228A63 /* RACSignal+Operations2.m */; };
 		EF639C2F1F8FCE37009D6B42 /* PsiFeedbackLogger.m in Sources */ = {isa = PBXBuildFile; fileRef = EF639C2E1F8FCE2A009D6B42 /* PsiFeedbackLogger.m */; };
@@ -573,9 +574,13 @@
 		CE4E9BBF1BBEECF30060FF8B /* Psiphon.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = Psiphon.entitlements; sourceTree = "<group>"; };
 		CE4E9BC11BBEECFC0060FF8B /* PsiphonVPN.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.entitlements; path = PsiphonVPN.entitlements; sourceTree = "<group>"; };
 		CE5DBCFC24478BD50078DDC4 /* HyprMX.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = HyprMX.framework; sourceTree = "<group>"; };
-		CE5DBCFE24478BF50078DDC4 /* HyperMX */ = {isa = PBXFileReference; lastKnownFileType = folder; path = HyperMX; sourceTree = "<group>"; };
 		CE6C3F6824366AE1007A17F0 /* ClientMetadata.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ClientMetadata.h; sourceTree = "<group>"; };
 		CE6C3F6924366AE1007A17F0 /* ClientMetadata.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ClientMetadata.m; sourceTree = "<group>"; };
+		CEAECE972447924500174C64 /* HYPRAdMobVideoAdapter.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HYPRAdMobVideoAdapter.h; sourceTree = "<group>"; };
+		CEAECE982447924500174C64 /* HYPRAdMobVideoAdapter.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = HYPRAdMobVideoAdapter.m; sourceTree = "<group>"; };
+		CEAECE992447924500174C64 /* HyprMXAdNetworkExtras.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HyprMXAdNetworkExtras.h; sourceTree = "<group>"; };
+		CEAECE9A2447924500174C64 /* HyprMXAdNetworkExtras.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = HyprMXAdNetworkExtras.m; sourceTree = "<group>"; };
+		CEAECE9B2447924500174C64 /* HyprMX_Mobile_SDK_Overview.markdown */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = HyprMX_Mobile_SDK_Overview.markdown; sourceTree = "<group>"; };
 		DD100E19194B9A79F5D7DF55 /* Pods-PsiphonVPN.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PsiphonVPN.debug.xcconfig"; path = "Pods/Target Support Files/Pods-PsiphonVPN/Pods-PsiphonVPN.debug.xcconfig"; sourceTree = "<group>"; };
 		EDB109A2FBFB32D821FF121D /* Pods-Psiphon.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Psiphon.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Psiphon/Pods-Psiphon.debug.xcconfig"; sourceTree = "<group>"; };
 		EF639C2D1F8FCE2A009D6B42 /* PsiFeedbackLogger.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PsiFeedbackLogger.h; sourceTree = "<group>"; };
@@ -1131,6 +1136,18 @@
 			path = PsiphonVPN;
 			sourceTree = "<group>";
 		};
+		CEAECE9E2447925200174C64 /* HyprMX */ = {
+			isa = PBXGroup;
+			children = (
+				CEAECE972447924500174C64 /* HYPRAdMobVideoAdapter.h */,
+				CEAECE982447924500174C64 /* HYPRAdMobVideoAdapter.m */,
+				CEAECE9B2447924500174C64 /* HyprMX_Mobile_SDK_Overview.markdown */,
+				CEAECE992447924500174C64 /* HyprMXAdNetworkExtras.h */,
+				CEAECE9A2447924500174C64 /* HyprMXAdNetworkExtras.m */,
+			);
+			path = HyprMX;
+			sourceTree = "<group>";
+		};
 		EF652CCF1F3521F8002AFB48 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
@@ -1212,7 +1229,7 @@
 		EFFA4AB620F68CE100E35E8E /* Ad */ = {
 			isa = PBXGroup;
 			children = (
-				CE5DBCFE24478BF50078DDC4 /* HyperMX */,
+				CEAECE9E2447925200174C64 /* HyprMX */,
 				9BFECF45CA0CAF6997411D22 /* MoPubInterstitialAdControllerWrapper.m */,
 				9BFEC327A0BE7E5243CCB2E0 /* MoPubInterstitialAdControllerWrapper.h */,
 				9BFEC970B3CC179C3B9DE44D /* MoPubRewardedAdControllerWrapper.m */,
@@ -1439,7 +1456,6 @@
 				CE26FC951BBDC7B800B83375 /* Assets.xcassets in Resources */,
 				445F24E720E1A5BA00D004E9 /* pkcs7-signed-data.asn1 in Resources */,
 				F136C2951F62E3E1000D3EAB /* LaunchScreen.xib in Resources */,
-				CE5DBCFF24478BF50078DDC4 /* HyperMX in Resources */,
 				CE4E9BC01BBEECF30060FF8B /* Psiphon.entitlements in Resources */,
 				445F24DE20E1A5BA00D004E9 /* pkcs7-signed-data-simplified.asn1 in Resources */,
 				EF743FCA1F99549000AC89A2 /* productIDs.plist in Resources */,
@@ -1632,6 +1648,7 @@
 				445F24DA20E1A5BA00D004E9 /* constr_SET_OF.c in Sources */,
 				4EF6D9CB20A8C7FE00AE9D44 /* PsiCashOnboardingInfoViewController.m in Sources */,
 				445F24E520E1A5BA00D004E9 /* asn_SET_OF.c in Sources */,
+				CEAECE9D2447924600174C64 /* HyprMXAdNetworkExtras.m in Sources */,
 				9BFEC4F02A47FF8265635803 /* Notifier.m in Sources */,
 				4EC5526620AB8DCD000B4BEA /* PastelView.m in Sources */,
 				4E5263C7207294600021FEF5 /* EmbeddedServerEntries.m in Sources */,
@@ -1669,6 +1686,7 @@
 				445F24E620E1A5BA00D004E9 /* per_opentype.c in Sources */,
 				445F24EC20E1A5BA00D004E9 /* SignedData.c in Sources */,
 				9BFEC2458D1346F537E9089E /* Nullity.m in Sources */,
+				CEAECE9C2447924600174C64 /* HYPRAdMobVideoAdapter.m in Sources */,
 				445F24D420E1A5BA00D004E9 /* ReceiptAttributes.c in Sources */,
 				524B4E6E2316F27F004E9891 /* AnimatedControl.m in Sources */,
 				445F24EA20E1A5BA00D004E9 /* per_decoder.c in Sources */,
