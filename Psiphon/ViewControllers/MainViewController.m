@@ -54,7 +54,6 @@
 #import "Strings.h"
 #import "SkyRegionSelectionViewController.h"
 #import "UIView+Additions.h"
-#import "AdMobRewardedAdControllerWrapper.h"
 #import "AppObservables.h"
 
 PsiFeedbackLogType const MainViewControllerLogType = @"MainViewController";
@@ -84,8 +83,6 @@ typedef NS_ENUM(NSInteger, VPNIntent) {
 @implementation MainViewController {
     // Models
     AvailableServerRegions *availableServerRegions;
-
-    AdMobRewardedAdControllerWrapper* admob;
 
     // UI elements
     UILayoutGuide *viewWidthGuide;
