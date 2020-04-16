@@ -318,6 +318,35 @@ extension Pending {
     
 }
 
+/// Represents a type that has a default init constructor.
+protocol DefaultValue {
+    init()
+}
+
+extension Array: DefaultValue {}
+
+/// Represents a computation that carries the success result in a subsequent pending state.
+typealias PendingWithLastSuccess<Success: DefaultValue, Failure: Error> =
+    PendingValue<Success, Result<Success, Failure>>
+
+extension PendingWithLastSuccess {
+    
+    static func pending<Success: DefaultValue, Failure: Error>(
+        previousValue: PendingWithLastSuccess<Success, Failure>
+    ) -> PendingWithLastSuccess<Success, Failure> {
+        switch previousValue {
+        case .pending(_):
+            return previousValue
+        case let .completed(.success(success)):
+            return .pending(success)
+        case .completed(.failure(_)):
+            return .pending(.init())
+        }
+    }
+    
+}
+
+
 // TODO: Combine `Pending` and `PendingValue` into one type.
 enum PendingValue<Pending, Completed> {
     case pending(Pending)
