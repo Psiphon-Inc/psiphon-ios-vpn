@@ -1153,11 +1153,11 @@ typedef NS_ENUM(NSInteger, VPNIntent) {
     } else {
         [NSLayoutConstraint activateConstraints:@[
             [psiphonTitle.leadingAnchor
-             constraintEqualToAnchor:psiCashWidget.leadingAnchor
+             constraintEqualToAnchor:self.view.leadingAnchor
              constant:leadingPadding],
             [psiphonTitle.topAnchor
             constraintEqualToAnchor:self.view.topAnchor
-            constant:topPadding]
+            constant:topPadding + 20]
         ]];
     }
 }
