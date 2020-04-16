@@ -651,13 +651,26 @@ fileprivate func startPsiphonTunnelReducer<T: TunnelProviderManager>(
             updateConfig($0, for: .startVPN)
         }
         .flatMap(.latest, saveAndLoadConfig)
-        .flatMap(.latest) { (result: Result<T, ErrorEvent<NEVPNError>>)
+        .flatMap(.latest) { (saveLoadConfigResult: Result<T, ErrorEvent<NEVPNError>>)
             -> Effect<TPMEffectResultWrapper<T>> in
-            switch result {
+            switch saveLoadConfigResult {
             case .success(let tpm):
+                // Starts the tunnel and then saves the updated config from tunnel start.
                 return startPsiphonTunnel(tpm)
-                    .map { .startTunnelResult($0.dropSuccessValue().mapToUnit()) }
-                    .prefix(value: .configUpdated(.success(tpm)))
+                    .flatMap(.latest) { startResult -> Effect<TPMEffectResultWrapper<T>> in
+                        switch startResult {
+                        case .success(let tpm):
+                            return saveAndLoadConfig(tpm)
+                                .map { .configUpdated(.fromConfigSaveAndLoad($0)) }
+                            .prefix(value:
+                                .startTunnelResult(startResult.dropSuccessValue().mapToUnit())
+                            )
+                        case .failure(_):
+                            return Effect(value:
+                                .startTunnelResult(startResult.dropSuccessValue().mapToUnit()))
+                                .prefix(value: .configUpdated(.success(tpm)))
+                        }
+                    }
             case .failure(let errorEvent):
                 return Effect(value: .startTunnelResult(.failure(errorEvent)))
                     .prefix(value:
@@ -671,6 +684,19 @@ fileprivate func startPsiphonTunnelReducer<T: TunnelProviderManager>(
 }
 
 // MARK: Utility functions
+
+extension ConfigUpdatedResult {
+    
+    fileprivate static func fromConfigSaveAndLoad<T: TunnelProviderManager>(
+        _ result: Result<T, ErrorEvent<NEVPNError>>
+    ) -> Result<T?, ErrorEvent<ProviderManagerLoadState<T>.TPMError>> {
+        result.map { .some($0) }
+            .mapError { neVPNErrorEvent in
+                neVPNErrorEvent.map { .failedConfigLoadSave($0) }
+        }
+    }
+    
+}
 
 fileprivate func wrapVPNObserverWithTPMResult<T: TunnelProviderManager, Failure>(
     _ result: Result<T?, Failure>, _ observer: VPNConnectionObserver<T>
@@ -700,11 +726,7 @@ fileprivate func installNewVPNConfig<T: TunnelProviderManager>()
         }
         .flatMap(.latest, saveAndLoadConfig)
         .map { result -> TPMEffectResultWrapper<T> in
-            // Maps Result<T, SystemErrorEvent> to
-            //      Result<T?, ErrorEvent<TunnelManagerLoadState<T>.TPMError>>
-            return .configUpdated(result.map { $0 as T?}.mapError { systemErrorEvent in
-                systemErrorEvent.map { .failedConfigLoadSave($0) }
-            })
+            return .configUpdated(.fromConfigSaveAndLoad(result))
         }
 }
 
