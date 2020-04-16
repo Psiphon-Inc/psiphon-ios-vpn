@@ -319,12 +319,12 @@ extension Pending {
 }
 
 // TODO: Combine `Pending` and `PendingValue` into one type.
-enum PendingValue<PendingValue, CompletedValue> {
-    case pending(PendingValue)
-    case completed(CompletedValue)
+enum PendingValue<Pending, Completed> {
+    case pending(Pending)
+    case completed(Completed)
 }
 
-extension PendingValue: Equatable where PendingValue: Equatable, CompletedValue: Equatable {}
+extension PendingValue: Equatable where Pending: Equatable, Completed: Equatable {}
 
 /// Enables dictionary set/get directly with enums that their raw value type matches the dictionary key.
 extension Dictionary where Key: ExpressibleByStringLiteral {
