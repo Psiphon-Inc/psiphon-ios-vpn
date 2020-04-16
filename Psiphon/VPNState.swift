@@ -411,24 +411,48 @@ fileprivate func vpnProviderManagerStateReducer<T: TunnelProviderManager>(
             
             switch reason {
             case .appLaunched:
+                // At app launch, `state.providerSyncResult` defaults to `.pending`.
                 guard case .pending = state.providerSyncResult else {
                     fatalError()
                 }
-            case .appEnteredForeground, .providerNotificationPsiphonTunnelConnected:
+                return [
+                    syncStateWithProvider(syncReason: reason, tpm)
+                        .map { .tpmEffectResultWrapper($0) }
+                ]
+                
+            case .appEnteredForeground:
                 guard case .completed(_) = state.providerSyncResult else {
                     fatalError()
                 }
                 state.providerSyncResult = .pending
-            }
-            
-            return [
-                sendProviderStateQuery(tpm).map { _, queryResult in
-                    let providerState = TunnelProviderSyncedState.make(fromQueryResult: queryResult)
-                    return .tpmEffectResultWrapper(
-                        .syncedStateWithProvider(syncReason: reason, providerState)
-                    )
+                return [
+                    loadConfig(tpm).flatMap(.latest) { result -> Effect<TPMEffectResultWrapper<T>> in
+                        switch result {
+                        case .success(let tpm):
+                            return syncStateWithProvider(syncReason: reason, tpm)
+                                .prefix(value: .configUpdated(.success(tpm)))
+                        case .failure(let errorEvent):
+                            return Effect(value:
+                                .syncedStateWithProvider(syncReason: reason, .unknown(nil))
+                            ).prefix(value: .configUpdated(.failure(errorEvent.map {
+                                .failedConfigLoadSave($0)
+                            })))
+                        }
+                    }.map {
+                        .tpmEffectResultWrapper($0)
+                    }
+                ]
+                
+            case .providerNotificationPsiphonTunnelConnected:
+                guard case .completed(_) = state.providerSyncResult else {
+                    fatalError()
                 }
-            ]
+                state.providerSyncResult = .pending
+                return [
+                    syncStateWithProvider(syncReason: reason, tpm)
+                        .map { .tpmEffectResultWrapper($0) }
+                ]
+            }
             
         case .reinstallVPNConfig:
             if case let .loaded(tpm) = state.loadState.value {
@@ -772,6 +796,15 @@ extension TunnelProviderSyncedState {
         }
     }
     
+}
+
+fileprivate func syncStateWithProvider<T: TunnelProviderManager>(
+    syncReason: TunnelProviderSyncReason,_ tpm: T
+) -> Effect<TPMEffectResultWrapper<T>> {
+    sendProviderStateQuery(tpm).map { _, queryResult in
+        let providerState = TunnelProviderSyncedState.make(fromQueryResult: queryResult)
+        return .syncedStateWithProvider(syncReason: syncReason, providerState)
+    }
 }
 
 // Response result type alias of TunnelProviderManager.sendProviderStateQuery()
