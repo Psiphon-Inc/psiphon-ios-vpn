@@ -116,6 +116,8 @@ protocol TunnelProviderManager: class, Equatable {
     
     func observeConnectionStatus(observer: VPNConnectionObserver<Self>)
     
+    func verifyConfig(forExpectedType expectedType: TunnelProviderManagerUpdateType) -> Bool
+
     func updateConfig(for updateType: TunnelProviderManagerUpdateType)
     
 }
@@ -203,6 +205,30 @@ final class PsiphonTPM: TunnelProviderManager {
     
     func observeConnectionStatus(observer: VPNConnectionObserver<PsiphonTPM>) {
         observer.setTunnelProviderManager(self)
+    }
+    
+    func verifyConfig(forExpectedType expectedType: TunnelProviderManagerUpdateType) -> Bool {
+        switch expectedType {
+        case .startVPN:
+            guard self.wrappedManager.isEnabled else {
+                return false
+            }
+            guard let _ = NonEmpty(array: self.wrappedManager.onDemandRules) else {
+                return false
+            }
+            guard self.wrappedManager.isOnDemandEnabled else {
+                return false
+            }
+            return true
+        case .stopVPN:
+            guard self.wrappedManager.isEnabled == false else {
+                return false
+            }
+            guard self.wrappedManager.isOnDemandEnabled == false else {
+                return false
+            }
+            return true
+        }
     }
     
     func updateConfig(for updateType: TunnelProviderManagerUpdateType) {
