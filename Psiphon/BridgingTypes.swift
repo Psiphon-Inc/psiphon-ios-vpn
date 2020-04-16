@@ -76,6 +76,7 @@ import Promises
     ) -> Promise<ObjCIAPResult>.ObjCPromise<ObjCIAPResult>
     @objc func onAdPresentationStatusChange(_ presenting: Bool)
     @objc func getAppStoreSubscriptionProductIDs() -> Set<String>
+    @objc func getAppStateFeedbackEntry(completionHandler: @escaping (String) -> Void)
     
     // VPN
     

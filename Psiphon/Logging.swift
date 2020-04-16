@@ -117,3 +117,12 @@ func feedbackLog<T: CustomFeedbackDescription>(
         }
     }
 }
+
+/// Creates a string representation of `value` fit for sending in feedback.
+/// - Note: Escapes double-quotes `"`, and removes "Psiphon" and "Swift" module names.
+func makeFeedbackEntry<T: FeedbackDescription>(_ value: T) -> String {
+    String(describing: value)
+        .replacingOccurrences(of: "\"", with: "\\\"")
+        .replacingOccurrences(of: "Psiphon.", with: "")
+        .replacingOccurrences(of: "Swift.", with: "")
+}
