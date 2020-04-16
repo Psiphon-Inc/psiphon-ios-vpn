@@ -136,11 +136,15 @@
 
         __weak FeedbackManager *weakSelf = self;
         SendFeedbackHandler sendFeedbackHandler = ^(NSString *jsonString, NSString *pubKey, NSString *uploadServer, NSString *uploadServerHeaders) {
-            if (inactiveTunnel == nil) {
-                // Lazily allocate PsiphonTunnel instance
-                inactiveTunnel = [PsiphonTunnel newPsiphonTunnel:weakSelf]; // TODO: we need to update PsiphonTunnel framework to not require this and fix this warning
+            FeedbackManager *__strong strongSelf = weakSelf;
+            if (!strongSelf) {
+                return;
             }
-            [inactiveTunnel sendFeedback:jsonString publicKey:pubKey uploadServer:uploadServer uploadServerHeaders:uploadServerHeaders];
+            if (strongSelf->inactiveTunnel == nil) {
+                // Lazily allocate PsiphonTunnel instance
+                strongSelf->inactiveTunnel = [PsiphonTunnel newPsiphonTunnel:weakSelf]; // TODO: we need to update PsiphonTunnel framework to not require this and fix this warning
+            }
+            [strongSelf->inactiveTunnel sendFeedback:jsonString publicKey:pubKey uploadServer:uploadServer uploadServerHeaders:uploadServerHeaders];
         };
         
         NSError *err = [FeedbackUpload generateAndSendFeedback:selectedThumbIndex
