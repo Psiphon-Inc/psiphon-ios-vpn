@@ -54,11 +54,9 @@
 #import <ReactiveObjC/RACSubject.h>
 #import <ReactiveObjC/RACReplaySubject.h>
 
-NSErrorDomain _Nonnull const PsiphonTunnelErrorDomain = @"PsiphonTunnelErrorDomain";
+#import "PersistentSubsMetadata.h"
 
-// UserDefaults key for the ID of the last authorization obtained from the verifier server.
-NSString *_Nonnull const UserDefaultsLastAuthID = @"LastAuthID";
-NSString *_Nonnull const UserDefaultsLastAuthAccessType = @"LastAuthAccessType";
+NSErrorDomain _Nonnull const PsiphonTunnelErrorDomain = @"PsiphonTunnelErrorDomain";
 
 PsiFeedbackLogType const SubscriptionCheckLogType = @"SubscriptionCheck";
 PsiFeedbackLogType const ExtensionNotificationLogType = @"ExtensionNotification";
@@ -298,8 +296,8 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
           SubscriptionVerifierRequestMetadata *subscriptionVerifierRequestMetadata = [[SubscriptionVerifierRequestMetadata alloc] init];
           subscriptionVerifierRequestMetadata.reason = [ShouldUpdateAuthResult reasonToString:localSubscriptionCheck.reason];
           subscriptionVerifierRequestMetadata.extensionStartReason = [[self extensionStartMethodTextDescription] lowercaseString];
-          subscriptionVerifierRequestMetadata.lastAuthId = [[NSUserDefaults standardUserDefaults] objectForKey:UserDefaultsLastAuthID];
-          subscriptionVerifierRequestMetadata.lastAuthAccessType = [[NSUserDefaults standardUserDefaults] objectForKey:UserDefaultsLastAuthAccessType];
+          subscriptionVerifierRequestMetadata.lastAuthId = [PersistentSubsMetadataUserDefaults lastAuthID];
+          subscriptionVerifierRequestMetadata.lastAuthAccessType = [PersistentSubsMetadataUserDefaults lastAuthAccessType];
 
           switch ((SubscriptionCheckEnum) [localSubscriptionCheck.subscriptionCheckEnum integerValue]) {
               case SubscriptionCheckAuthorizationExpired:
@@ -449,10 +447,8 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
               if (subscription.authorization) {
                   // Persist select authorization information so it can be included in the next
                   // request to the verifier server for logging.
-                  [[NSUserDefaults standardUserDefaults] setObject:subscription.authorization.ID
-                                                            forKey:UserDefaultsLastAuthID];
-                  [[NSUserDefaults standardUserDefaults] setObject:subscription.authorization.accessType
-                                                            forKey:UserDefaultsLastAuthAccessType];
+                  [PersistentSubsMetadataUserDefaults setLastAuthID:subscription.authorization.ID];
+                  [PersistentSubsMetadataUserDefaults setLastAuthAccessType:subscription.authorization.accessType];
 
                   // New authorization was received from the subscription verifier server.
                   // Restarts the tunnel to connect with the new authorization only if it is different from
