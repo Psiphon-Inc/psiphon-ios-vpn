@@ -311,6 +311,20 @@ func stopVPN<T: TunnelProviderManager>(_ tpm: T) -> Effect<()> {
     }
 }
 
+func loadConfig<T: TunnelProviderManager>(_ tpm: T)
+    -> Effect<Result<T, ErrorEvent<NEVPNError>>>
+{
+    Effect.deferred { fulfilled in
+        tpm.load { maybeError in
+            if let error = maybeError {
+                fulfilled(.failure(ErrorEvent(error)))
+            } else {
+                fulfilled(.success(tpm))
+            }
+        }
+    }
+}
+
 func saveAndLoadConfig<T: TunnelProviderManager>(_ tpm: T)
     -> Effect<Result<T, ErrorEvent<NEVPNError>>>
 {
