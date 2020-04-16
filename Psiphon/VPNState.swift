@@ -529,6 +529,9 @@ fileprivate func tunnelProviderReducer<T: TunnelProviderManager>(
         guard case .pending = state.providerSyncResult else {
             fatalError()
         }
+        guard case let .loaded(tpm) = state.loadState.value else {
+            fatalError()
+        }
         
         // Updates `state.providerSyncResult` value.
         if case .unknown(let syncErrorEvent) = syncedState {
@@ -538,8 +541,15 @@ fileprivate func tunnelProviderReducer<T: TunnelProviderManager>(
         }
         
         // Initialize tunnel intent value given none was previously set.
-        if case .appLaunched = reason, case .none = state.tunnelIntent {
+        switch (reason: reason, currentIntent:state.tunnelIntent, syncedState: syncedState) {
+        case (reason: .appLaunched, currentIntent: .none, syncedState: _):
+            // Initializes tunnel intent when app is first launched
             state.tunnelIntent = .initializeIntentGiven(reason, syncedState)
+        case (reason: _, currentIntent: .stop, syncedState: .active(_)):
+            // Updates the tunnel intent to `.start` if the tunnel provider was
+            // started from system settings.
+            state.tunnelIntent = .start(transition: .none)
+        default: break
         }
         
         switch syncedState {
@@ -550,6 +560,17 @@ fileprivate func tunnelProviderReducer<T: TunnelProviderManager>(
             ]
             
         case .active(.connected):
+            guard case .start(transition: .none) = state.tunnelIntent else {
+                fatalError()
+            }
+            guard tpm.verifyConfig(forExpectedType: .startVPN) else {
+                // Failed to verify VPN config values.
+                // To update the config, tunnel is restarted.
+                return [
+                    Effect(value: .external(.tunnelStateIntent(.start(transition: .restart))))
+                ]
+            }
+            
             // Sends start vpn notification to the tunnel provider
             // if vpnStartCondition passes.
             guard state.loadState.connectionStatus == .connecting,
