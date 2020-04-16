@@ -17,7 +17,6 @@
  *
  */
 
-#import "UserDefaults.h"
 #import "Authorization.h"
 #import "RACSignal.h"
 #import "RACSubscriber.h"
