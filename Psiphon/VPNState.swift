@@ -399,7 +399,7 @@ fileprivate func vpnProviderManagerStateReducer<T: TunnelProviderManager>(
             }
             state.providerSyncResult = .pending
             return [
-                loadConfigs().map { .tpmEffectResultWrapper(.configUpdated($0)) },
+                loadAllConfigs().map { .tpmEffectResultWrapper(.configUpdated($0)) },
                 Effect(value: .external(.syncWithProvider(reason: .appLaunched)))
             ]
             
@@ -663,7 +663,7 @@ fileprivate func installNewVPNConfig<T: TunnelProviderManager>()
         }
 }
 
-fileprivate func loadConfigs<T: TunnelProviderManager>() -> Effect<ConfigUpdatedResult<T>> {
+fileprivate func loadAllConfigs<T: TunnelProviderManager>() -> Effect<ConfigUpdatedResult<T>> {
     loadFromPreferences()
         .flatMap(.latest) { (result: Result<[T], ErrorEvent<NEVPNError>>)
             -> Effect<ConfigUpdatedResult<T>> in
