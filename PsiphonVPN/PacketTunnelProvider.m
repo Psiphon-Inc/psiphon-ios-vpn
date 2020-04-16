@@ -251,7 +251,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 
           if ([forceBoolValue boolValue]) {
               return [RACSignal return:[LocalSubscriptionCheckResult localSubscriptionCheckResult:@(SubscriptionCheckShouldUpdateAuthorization)
-                                                                                           reason:@"forced"]];
+                                                                                           reason:ShouldUpdateAuthReasonForced]];
           } else {
               return [[self->subscriptionAuthorizationActiveSubject
                 take:1]
@@ -259,11 +259,11 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
                     if ([authorizationStatus integerValue] == SubscriptionAuthorizationStatusRejected) {
                         // Previous subscription authorization sent is not active, should contact subscription server.
                         return [RACSignal return:[LocalSubscriptionCheckResult localSubscriptionCheckResult:@(SubscriptionCheckShouldUpdateAuthorization)
-                                                                                                     reason:@"authorizationStatusRejected"]];
+                                                                                                     reason:ShouldUpdateAuthReasonAuthorizationStatusRejected]];
                     } else if ([authorizationStatus integerValue] == SubscriptionAuthorizationStatusActive) {
                         // Previous subscription authorization sent was active. Do not need to contact subscription server.
                         return [RACSignal return:[LocalSubscriptionCheckResult localSubscriptionCheckResult:@(SubscriptionCheckHasActiveAuthorization)
-                                                                                                     reason:@"authorizationStatusAccepted"]];
+                                                                                                     reason:ShouldUpdateAuthReasonHasActiveAuthorization]];
                     } else {
                         // No subscription authorization was sent.
                         return [SubscriptionVerifierService localSubscriptionCheck];
@@ -296,7 +296,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 
           // Create request metadata to include with request for logging on the verifier server.
           SubscriptionVerifierRequestMetadata *subscriptionVerifierRequestMetadata = [[SubscriptionVerifierRequestMetadata alloc] init];
-          subscriptionVerifierRequestMetadata.reason = localSubscriptionCheck.reason;
+          subscriptionVerifierRequestMetadata.reason = [ShouldUpdateAuthResult reasonToString:localSubscriptionCheck.reason];
           subscriptionVerifierRequestMetadata.extensionStartReason = [[self extensionStartMethodTextDescription] lowercaseString];
           subscriptionVerifierRequestMetadata.lastAuthId = [[NSUserDefaults standardUserDefaults] objectForKey:UserDefaultsLastAuthID];
           subscriptionVerifierRequestMetadata.lastAuthAccessType = [[NSUserDefaults standardUserDefaults] objectForKey:UserDefaultsLastAuthAccessType];
