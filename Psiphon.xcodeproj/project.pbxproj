@@ -657,8 +657,8 @@
 		CE8026A32448B5B4005AF848 /* NSUserDefaults+KeyedDataStore.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "NSUserDefaults+KeyedDataStore.m"; sourceTree = "<group>"; };
 		CE8026A62448B7E6005AF848 /* PersistentSubsMetadata.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PersistentSubsMetadata.m; sourceTree = "<group>"; };
 		CE8026AD2448BA2E005AF848 /* LocalDataStoreKeys.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = LocalDataStoreKeys.m; sourceTree = "<group>"; };
-		CE8026AF2448C1C4005AF848 /* LocalDataStoreKeys.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = LocalDataStoreKeys.h; path = ../../../../.Trash/LocalDataStoreKeys.h; sourceTree = "<group>"; };
 		CE8026B02448C1D6005AF848 /* PersistentSubsMetadata.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PersistentSubsMetadata.h; sourceTree = "<group>"; };
+		CE8026B42448EABC005AF848 /* LocalDataStoreKeys.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LocalDataStoreKeys.h; sourceTree = "<group>"; };
 		DD100E19194B9A79F5D7DF55 /* Pods-PsiphonVPN.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PsiphonVPN.debug.xcconfig"; path = "Pods/Target Support Files/Pods-PsiphonVPN/Pods-PsiphonVPN.debug.xcconfig"; sourceTree = "<group>"; };
 		EDB109A2FBFB32D821FF121D /* Pods-Psiphon.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Psiphon.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Psiphon/Pods-Psiphon.debug.xcconfig"; sourceTree = "<group>"; };
 		EF639C2D1F8FCE2A009D6B42 /* PsiFeedbackLogger.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PsiFeedbackLogger.h; sourceTree = "<group>"; };
@@ -1239,7 +1239,7 @@
 		CE8026AB2448B990005AF848 /* LocalDatastore */ = {
 			isa = PBXGroup;
 			children = (
-				CE8026AF2448C1C4005AF848 /* LocalDataStoreKeys.h */,
+				CE8026B42448EABC005AF848 /* LocalDataStoreKeys.h */,
 				CE8026AD2448BA2E005AF848 /* LocalDataStoreKeys.m */,
 				CE8026B02448C1D6005AF848 /* PersistentSubsMetadata.h */,
 				CE8026A62448B7E6005AF848 /* PersistentSubsMetadata.m */,
