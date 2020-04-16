@@ -29,15 +29,22 @@ struct PsiCashViewControllerState: Equatable {
     let psiCash: PsiCashState
     let iap: IAPState
     let subscription: SubscriptionState
-    let appStorePsiCashProducts: Pending<Result<[PsiCashPurchasableViewModel], SystemErrorEvent>>
+    let appStorePsiCashProducts: PendingWithLastSuccess<[PsiCashPurchasableViewModel], SystemErrorEvent>
 }
 
 extension PsiCashViewControllerState {
     
     /// Adds rewarded video product to list of `PsiCashPurchasableViewModel`  retrieved from AppStore.
-    var allProducts: PendingResult<[PsiCashPurchasableViewModel], SystemErrorEvent> {
-        appStorePsiCashProducts.map( { result in
+    var allProducts: PendingWithLastSuccess<[PsiCashPurchasableViewModel], SystemErrorEvent> {
+        appStorePsiCashProducts.map(pending: { lastViewModelList -> [PsiCashPurchasableViewModel] in
+            // Adds rewarded video ad as the first product if
+            switch lastViewModelList {
+            case []: return []
+            default: return [psiCash.rewardedVideoProduct] + lastViewModelList
+            }
+        }, completed: { result in
             result.map { viewModelList -> [PsiCashPurchasableViewModel] in
+                // Adds rewarded video ad as the first product
                 [psiCash.rewardedVideoProduct] + viewModelList
             }
         })
@@ -266,9 +273,16 @@ final class PsiCashViewController: UIViewController {
 
                         } else {
                             switch observed.state.allProducts {
-                            case .pending:
+                            case .pending([]):
+                                // Product list is being retrieved from the
+                                // App Store for the first time.
+                                // A spinner is shown.
                                 self.containerBindable.bind(.left(.right(.left(true))))
+                            case .pending(let lastSuccess):
+                                // Displays product list from previous retrieval.
+                                self.containerBindable.bind(.left(.left(lastSuccess)))
                             case .completed(let productRequestResult):
+                                // Product list retrieved from App Store.
                                 switch productRequestResult {
                                 case .success(let psiCashCoinProducts):
                                     self.containerBindable.bind(.left(.left(psiCashCoinProducts)))

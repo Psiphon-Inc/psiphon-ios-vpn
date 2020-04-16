@@ -20,7 +20,7 @@
 import Foundation
 
 struct PsiCashAppStoreProductsState: Equatable {
-    var psiCashProducts: Pending<Result<[PsiCashPurchasableViewModel], SystemErrorEvent>>
+    var psiCashProducts: PendingWithLastSuccess<[PsiCashPurchasableViewModel], SystemErrorEvent>
     
     /// Strong reference to request object.
     /// - Reference: https://developer.apple.com/documentation/storekit/skproductsrequest
@@ -50,7 +50,10 @@ func productRequestReducer(
         guard case .completed(_) = state.psiCashProducts else {
             return []
         }
-        state.psiCashProducts = .pending
+        // If previous value had successful reslut,
+        // then the success value is added to `.pending` case.
+        state.psiCashProducts = .pending(previousValue: state.psiCashProducts)
+        
         let request = SKProductsRequest(productIdentifiers: StoreProductIds.psiCash().values)
         state.psiCashRequest = request
         return [
