@@ -326,6 +326,23 @@ enum PendingValue<Pending, Completed> {
 
 extension PendingValue: Equatable where Pending: Equatable, Completed: Equatable {}
 
+
+extension PendingValue {
+    
+    func map<A, B>(
+        pending transformPending: (Pending) -> A,
+        completed transformCompleted: (Completed) -> B
+    ) -> PendingValue<A, B> {
+        switch self {
+        case .pending(let value):
+            return .pending(transformPending(value))
+        case .completed(let value):
+            return .completed(transformCompleted(value))
+        }
+    }
+    
+}
+
 /// Enables dictionary set/get directly with enums that their raw value type matches the dictionary key.
 extension Dictionary where Key: ExpressibleByStringLiteral {
 
