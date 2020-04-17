@@ -29,23 +29,25 @@ struct PsiCashViewControllerState: Equatable {
     let psiCash: PsiCashState
     let iap: IAPState
     let subscription: SubscriptionState
-    let appStorePsiCashProducts: PendingWithLastSuccess<[PsiCashPurchasableViewModel], SystemErrorEvent>
+    let appStorePsiCashProducts:
+        PendingWithLastSuccess<[ParsedPsiCashAppStorePurchasable], SystemErrorEvent>
 }
 
 extension PsiCashViewControllerState {
     
     /// Adds rewarded video product to list of `PsiCashPurchasableViewModel`  retrieved from AppStore.
     var allProducts: PendingWithLastSuccess<[PsiCashPurchasableViewModel], SystemErrorEvent> {
-        appStorePsiCashProducts.map(pending: { lastViewModelList -> [PsiCashPurchasableViewModel] in
+        appStorePsiCashProducts.map(pending: { lastParsedList -> [PsiCashPurchasableViewModel] in
             // Adds rewarded video ad as the first product if
-            switch lastViewModelList {
+            let viewModels = lastParsedList.compactMap(\.viewModel)
+            switch viewModels {
             case []: return []
-            default: return [psiCash.rewardedVideoProduct] + lastViewModelList
+            default: return [psiCash.rewardedVideoProduct] + viewModels
             }
         }, completed: { result in
-            result.map { viewModelList -> [PsiCashPurchasableViewModel] in
+            result.map { parsedList -> [PsiCashPurchasableViewModel] in
                 // Adds rewarded video ad as the first product
-                [psiCash.rewardedVideoProduct] + viewModelList
+                [psiCash.rewardedVideoProduct] + parsedList.compactMap(\.viewModel)
             }
         })
     }

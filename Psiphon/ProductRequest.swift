@@ -19,8 +19,71 @@
 
 import Foundation
 
+
+/// Parsed representation of AppStore PsiCash consumable product.
+enum ParsedPsiCashAppStorePurchasable: Equatable {
+    
+    // Map from App Store defined Product Id to PsiCash value.
+    static let supportedProducts: [String: Double] = [
+        "ca.psiphon.Psiphon.psicash_1000": 1000,
+        "ca.psiphon.Psiphon.psicash_4000": 4000,
+        "ca.psiphon.Psiphon.psicash_10000": 10000,
+        "ca.psiphon.Psiphon.psicash_30000": 30000,
+        "ca.psiphon.Psiphon.psicash_100000": 100000,
+    ]
+    
+    
+    case purchasable(PsiCashPurchasableViewModel)
+    case parseError(reason: String)
+}
+
+extension ParsedPsiCashAppStorePurchasable {
+    
+    var viewModel: PsiCashPurchasableViewModel? {
+        guard case let .purchasable(value) = self else {
+            return nil
+        }
+        return value
+    }
+    
+    static func make(product: AppStoreProduct, formatter: PsiCashAmountFormatter) -> Self {
+        let productIdentifier = product.skProduct.productIdentifier
+        guard let psiCashValue = Self.supportedProducts[productIdentifier] else {
+            return .parseError(reason: """
+                AppStore IAP product with identifier '\(productIdentifier)' is not a supported product
+                """)
+        }
+        guard let title = formatter.string(from: psiCashValue) else {
+            return .parseError(reason: "Failed to format '\(psiCashValue)' into string")
+        }
+        return .purchasable(.init(product: .product(product),
+                                  title: title,
+                                  subtitle: product.skProduct.localizedDescription,
+                                  price: product.skProduct.price.doubleValue))
+    }
+    
+}
+
+extension Array where Element == ParsedPsiCashAppStorePurchasable {
+    
+    func sortPurchasables() -> [Element] {
+        self.sorted { (first, second) -> Bool in
+            guard case let .purchasable(firstPurchasable) = first else {
+                return false
+            }
+            guard case let .purchasable(secondPurchasable) = second else {
+                return true
+            }
+            return firstPurchasable.price < secondPurchasable.price
+        }
+    }
+    
+}
+
 struct PsiCashAppStoreProductsState: Equatable {
-    var psiCashProducts: PendingWithLastSuccess<[PsiCashPurchasableViewModel], SystemErrorEvent>
+    
+    var psiCashProducts:
+        PendingWithLastSuccess<[ParsedPsiCashAppStorePurchasable], SystemErrorEvent>
     
     /// Strong reference to request object.
     /// - Reference: https://developer.apple.com/documentation/storekit/skproductsrequest
@@ -68,15 +131,21 @@ func productRequestReducer(
             fatalError()
         }
         state.psiCashRequest = nil
+        
+        
         state.psiCashProducts = .completed(
             result.map { response in
-                response.products.compactMap { (skProduct) -> PsiCashPurchasableViewModel? in
-                    guard let product = try? AppStoreProduct(skProduct) else {
-                        return nil
+                
+                let formatter = PsiCashAmountFormatter(locale: Locale.current)
+
+                return response.products.map { skProduct -> ParsedPsiCashAppStorePurchasable in
+                    do {
+                        let product = try AppStoreProduct(skProduct)
+                        return .make(product: product, formatter: formatter)
+                    } catch {
+                        return .parseError(reason: String(describing: error))
                     }
-                    return PsiCashPurchasableViewModel.from(product)
-                    
-                }
+                }.sortPurchasables()
             }
         )
         return []
