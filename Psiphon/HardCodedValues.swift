@@ -32,7 +32,7 @@ struct VPNHardCodedValues {
 
 struct PsiCashHardCodedValues {
     static let videoAdRewardAmount = PsiCashAmount(nanoPsi: Int64(35e9))
-    static let videoAdRewardTitle = "35 PsiCash"
+    static let videoAdRewardTitle = "35"
     /// Amount of time to wait for PsiCash to have an earner token for modifying .
     static let getEarnerTokenTimeout: DispatchTimeInterval = .seconds(5)
 }

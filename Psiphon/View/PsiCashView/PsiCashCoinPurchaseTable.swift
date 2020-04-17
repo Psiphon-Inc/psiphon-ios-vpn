@@ -29,13 +29,6 @@ struct PsiCashPurchasableViewModel: Equatable {
     let title: String
     let subtitle: String
     let price: Double
-
-    static func from(_ product: AppStoreProduct) -> Self {
-        return .init(product: .product(product),
-                     title: product.skProduct.localizedTitle,
-                     subtitle: product.skProduct.localizedDescription,
-                     price: product.skProduct.price.doubleValue)
-    }
 }
 
 struct PsiCashCoinPurchaseTable: ViewBuilder {
