@@ -95,9 +95,12 @@ NSString * const SettingsResetAdConsentCellSpecifierKey = @"settingsResetAdConse
     __block RACDisposable *tunnelStatusDisposable =
       [AppObservables.shared.vpnStatus
         subscribeNext:^(NSNumber *statusObject) {
-            weakSelf.vpnStatus = (VPNStatus) [statusObject integerValue];
-            [weakSelf updateReinstallVPNProfileCell];
-            [weakSelf updateHiddenKeys];
+          SettingsViewController *__strong strongSelf = weakSelf;
+          if (strongSelf) {
+              strongSelf.vpnStatus = (VPNStatus) [statusObject integerValue];
+              [strongSelf updateReinstallVPNProfileCell];
+              [strongSelf updateHiddenKeys];
+          }
         }];
 
     [self.compoundDisposable addDisposable:tunnelStatusDisposable];
