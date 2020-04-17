@@ -39,7 +39,9 @@ extension PsiCashViewControllerState {
     var allProducts: PendingWithLastSuccess<[PsiCashPurchasableViewModel], SystemErrorEvent> {
         appStorePsiCashProducts.map(pending: { lastParsedList -> [PsiCashPurchasableViewModel] in
             // Adds rewarded video ad as the first product if
-            let viewModels = lastParsedList.compactMap(\.viewModel)
+            let viewModels = lastParsedList.compactMap { parsed -> PsiCashPurchasableViewModel? in
+                parsed.viewModel
+            }
             switch viewModels {
             case []: return []
             default: return [psiCash.rewardedVideoProduct] + viewModels
@@ -47,7 +49,9 @@ extension PsiCashViewControllerState {
         }, completed: { result in
             result.map { parsedList -> [PsiCashPurchasableViewModel] in
                 // Adds rewarded video ad as the first product
-                [psiCash.rewardedVideoProduct] + parsedList.compactMap(\.viewModel)
+                [psiCash.rewardedVideoProduct] + parsedList.compactMap { parsed -> PsiCashPurchasableViewModel? in
+                    parsed.viewModel
+                }
             }
         })
     }
