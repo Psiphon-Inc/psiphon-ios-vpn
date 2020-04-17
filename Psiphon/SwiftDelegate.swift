@@ -326,9 +326,12 @@ extension SwiftDelegate: SwiftBridgeDelegate {
         self.store.$value.signalProducer
             .take(first: 1)
             .startWithValues { appState in
-                completionHandler(
-                    "ContainerInfo: {\"AppState\":\"\(makeFeedbackEntry(appState))\"}"
-                )
+                completionHandler("""
+                    ContainerInfo: {
+                    \"AppState\":\"\(makeFeedbackEntry(appState))\",
+                    \"UserDefaultsConfig\":\"\(makeFeedbackEntry(UserDefaultsConfig()))\"
+                    }
+                    """)
         }
     }
     
