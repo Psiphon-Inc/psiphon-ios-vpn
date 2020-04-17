@@ -318,13 +318,59 @@ extension Pending {
     
 }
 
-// TODO: Combine `Pending` and `PendingValue` into one type.
-enum PendingValue<PendingValue, CompletedValue> {
-    case pending(PendingValue)
-    case completed(CompletedValue)
+/// Represents a type that has a default init constructor.
+protocol DefaultValue {
+    init()
 }
 
-extension PendingValue: Equatable where PendingValue: Equatable, CompletedValue: Equatable {}
+extension Array: DefaultValue {}
+
+/// Represents a computation that carries the success result in a subsequent pending state.
+typealias PendingWithLastSuccess<Success: DefaultValue, Failure: Error> =
+    PendingValue<Success, Result<Success, Failure>>
+
+extension PendingWithLastSuccess {
+    
+    static func pending<Success: DefaultValue, Failure: Error>(
+        previousValue: PendingWithLastSuccess<Success, Failure>
+    ) -> PendingWithLastSuccess<Success, Failure> {
+        switch previousValue {
+        case .pending(_):
+            return previousValue
+        case let .completed(.success(success)):
+            return .pending(success)
+        case .completed(.failure(_)):
+            return .pending(.init())
+        }
+    }
+    
+}
+
+
+// TODO: Combine `Pending` and `PendingValue` into one type.
+enum PendingValue<Pending, Completed> {
+    case pending(Pending)
+    case completed(Completed)
+}
+
+extension PendingValue: Equatable where Pending: Equatable, Completed: Equatable {}
+
+
+extension PendingValue {
+    
+    func map<A, B>(
+        pending transformPending: (Pending) -> A,
+        completed transformCompleted: (Completed) -> B
+    ) -> PendingValue<A, B> {
+        switch self {
+        case .pending(let value):
+            return .pending(transformPending(value))
+        case .completed(let value):
+            return .completed(transformCompleted(value))
+        }
+    }
+    
+}
 
 /// Enables dictionary set/get directly with enums that their raw value type matches the dictionary key.
 extension Dictionary where Key: ExpressibleByStringLiteral {

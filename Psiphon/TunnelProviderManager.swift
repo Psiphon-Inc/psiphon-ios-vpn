@@ -116,6 +116,8 @@ protocol TunnelProviderManager: class, Equatable {
     
     func observeConnectionStatus(observer: VPNConnectionObserver<Self>)
     
+    func verifyConfig(forExpectedType expectedType: TunnelProviderManagerUpdateType) -> Bool
+
     func updateConfig(for updateType: TunnelProviderManagerUpdateType)
     
 }
@@ -205,6 +207,30 @@ final class PsiphonTPM: TunnelProviderManager {
         observer.setTunnelProviderManager(self)
     }
     
+    func verifyConfig(forExpectedType expectedType: TunnelProviderManagerUpdateType) -> Bool {
+        switch expectedType {
+        case .startVPN:
+            guard self.wrappedManager.isEnabled else {
+                return false
+            }
+            guard let _ = NonEmpty(array: self.wrappedManager.onDemandRules) else {
+                return false
+            }
+            guard self.wrappedManager.isOnDemandEnabled else {
+                return false
+            }
+            return true
+        case .stopVPN:
+            guard self.wrappedManager.isEnabled == false else {
+                return false
+            }
+            guard self.wrappedManager.isOnDemandEnabled == false else {
+                return false
+            }
+            return true
+        }
+    }
+    
     func updateConfig(for updateType: TunnelProviderManagerUpdateType) {
         switch updateType {
         case .startVPN:
@@ -282,6 +308,20 @@ func stopVPN<T: TunnelProviderManager>(_ tpm: T) -> Effect<()> {
     Effect { () -> Void in
         tpm.stop()
         return ()
+    }
+}
+
+func loadConfig<T: TunnelProviderManager>(_ tpm: T)
+    -> Effect<Result<T, ErrorEvent<NEVPNError>>>
+{
+    Effect.deferred { fulfilled in
+        tpm.load { maybeError in
+            if let error = maybeError {
+                fulfilled(.failure(ErrorEvent(error)))
+            } else {
+                fulfilled(.success(tpm))
+            }
+        }
     }
 }
 
@@ -383,4 +423,38 @@ final class PsiphonTPMConnectionObserver: VPNConnectionObserver<PsiphonTPM> {
         sendOnMain(.vpnStatusChanged(manager.connectionStatus))
     }
     
+}
+
+// MARK: PsiphonTPM feedback description
+
+extension PsiphonTPM: CustomStringFeedbackDescription {
+
+    public var description: String {
+        // `description` of NETunnelProviderManager looks something like below:
+        //
+        // "{\n    localizedDescription = Psiphon\n    enabled = YES\n
+        // protocolConfiguration = {\n        serverAddress = <9-char-str>\n
+        // disconnectOnSleep = NO\n        includeAllNetworks = NO\n
+        // excludeLocalNetworks = NO\n
+        // providerBundleIdentifier = ca.psiphon.Psiphon.PsiphonVPN\n    }\n
+        // onDemandEnabled = NO\n    onDemandRules = (\n
+        // {\n            action = connect\n
+        // interfaceTypeMatch = any\n        },\n    )\n}"
+        //
+        // To make a readable string without newline characters, some simple processing is done,
+        // the result of which looks like this:
+        //
+        // "{ localizedDescription = Psiphon enabled = YES
+        // protocolConfiguration = { serverAddress = <9-char-str> disconnectOnSleep = NO
+        // includeAllNetworks = NO excludeLocalNetworks = NO
+        // providerBundleIdentifier = ca.psiphon.Psiphon.PsiphonVPN }
+        // onDemandEnabled = NO
+        // onDemandRules = ( { action = connect interfaceTypeMatch = any }, ) }"
+        
+        String(describing: self.wrappedManager)
+            .components(separatedBy: "\n")
+            .map { $0.trimmingCharacters(in: .whitespaces) }
+            .joined(separator: " ")
+    }
+
 }

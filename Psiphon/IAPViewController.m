@@ -784,11 +784,9 @@ SKProductsRequestDelegate, SKPaymentTransactionObserver>
 }
 
 - (void)onManageSubscriptionTap {
-    // Apple docs: https://developer.apple.com/library/content/documentation/NetworkingInternet/Conceptual/StoreKitGuide/Chapters/Subscriptions.html#//apple_ref/doc/uid/TP40008267-CH7-SW6
-    // Using "itmss" protocol to open iTunes directly. https://stackoverflow.com/a/18135776
-    // If the iTunes app is uninstalled, the system will show a "Restore iTunes Store" dialog, this behaviour is the same
-    // whether the "itmss" protocol is used or not.
-    [self openURL:[NSURL URLWithString:@"itmss://buy.itunes.apple.com/WebObjects/MZFinance.woa/wa/manageSubscriptions"]];
+    // The official way to open subscription management screen has been presented in
+    // https://developer.apple.com/videos/play/wwdc2018/705/
+    [self openURL:[NSURL URLWithString:@"https://apps.apple.com/account/subscriptions"]];
 }
 
 - (void)onSubscriptionHelpTap {
