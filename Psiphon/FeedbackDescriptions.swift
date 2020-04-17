@@ -66,7 +66,7 @@ extension TunnelProviderSyncReason: CustomStringFeedbackDescription {
     
 }
 
-extension Authorization: CustomFeedbackDescription {
+extension Authorization: CustomFieldFeedbackDescription {
     
     var feedbackFields: [String : CustomStringConvertible] {
         ["id": id,
@@ -86,7 +86,7 @@ extension PsiCashAmount: CustomStringFeedbackDescription {
     
 }
 
-extension UserDefaultsConfig: CustomFeedbackDescription {
+extension UserDefaultsConfig: CustomFieldFeedbackDescription {
     
     var feedbackFields: [String : CustomStringConvertible] {
         ["expectedPsiCashReward": self.expectedPsiCashReward]

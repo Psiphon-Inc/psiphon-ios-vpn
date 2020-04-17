@@ -23,11 +23,11 @@ protocol FeedbackDescription {}
 
 protocol CustomStringFeedbackDescription: FeedbackDescription, CustomStringConvertible {}
 
-protocol CustomFeedbackDescription {
+protocol CustomFieldFeedbackDescription: FeedbackDescription, CustomStringConvertible {
     var feedbackFields: [String: CustomStringConvertible] { get }
 }
 
-extension CustomFeedbackDescription {
+extension CustomFieldFeedbackDescription {
     /// Default description for `CustomFeedbackDescription`.
     ///
     /// For example, given the following struct
@@ -46,7 +46,7 @@ extension CustomFeedbackDescription {
     /// let value = SomeValue(string: "string", float: 3.14)
     /// value.description == "SomeValue([\"float\": 3.14])"
     /// ```
-    var description: String {
+    public var description: String {
         "\(String(describing: Self.self))(\(String(describing: feedbackFields))"
     }
 }
@@ -103,7 +103,7 @@ func feedbackLog<T: FeedbackDescription>(
     }
 }
 
-func feedbackLog<T: CustomFeedbackDescription>(
+func feedbackLog<T: CustomFieldFeedbackDescription>(
     _ level: LogLevel, tag: LogTag = "message",  _ value: T
 ) -> Effect<Never> {
     .fireAndForget {
