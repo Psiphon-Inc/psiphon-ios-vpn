@@ -71,14 +71,23 @@ NSString * const SettingsResetAdConsentCellSpecifierKey = @"settingsResetAdConse
 
     __block RACDisposable *subscriptionStatusDisposable = [AppObservables.shared.subscriptionStatus
       subscribeNext:^(BridgedUserSubscription *status) {
-          weakSelf.hasActiveSubscription = (status.state == BridgedSubscriptionStateActive);
-          [self updateSubscriptionCell];
-          [weakSelf updateHiddenKeys];
 
+        SettingsViewController *__strong strongSelf = weakSelf;
+        if (strongSelf) {
+            strongSelf.hasActiveSubscription = (status.state == BridgedSubscriptionStateActive);
+            [strongSelf updateSubscriptionCell];
+            [strongSelf updateHiddenKeys];
+        }
       } error:^(NSError *error) {
-          [weakSelf.compoundDisposable removeDisposable:subscriptionStatusDisposable];
+          SettingsViewController *__strong strongSelf = weakSelf;
+          if (strongSelf) {
+              [strongSelf.compoundDisposable removeDisposable:subscriptionStatusDisposable];
+          }
       } completed:^{
-          [weakSelf.compoundDisposable removeDisposable:subscriptionStatusDisposable];
+          SettingsViewController *__strong strongSelf = weakSelf;
+          if (strongSelf) {
+              [strongSelf.compoundDisposable removeDisposable:subscriptionStatusDisposable];
+          }
       }];
 
     [self.compoundDisposable addDisposable:subscriptionStatusDisposable];
