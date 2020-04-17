@@ -131,7 +131,7 @@ extension SpeedBoostCollection: UICollectionViewDelegateFlowLayout {
 
         let totalPaddingInRow = minimumLineSpacing * (itemsPerRow - 1)
         let totalAvailableWidth = view.frame.width - totalPaddingInRow
-        let availableWidthPerItem = totalAvailableWidth / itemsPerRow
+        let availableWidthPerItem = (totalAvailableWidth / itemsPerRow).rounded(.towardZero)
 
         return CGSize(width: availableWidthPerItem,
                       height: availableWidthPerItem * imageAspectRatio)

@@ -19,6 +19,8 @@
 
 import Foundation
 
+extension AppState: FeedbackDescription {}
+
 extension AdLoadStatus: CustomStringFeedbackDescription {
     
     public var description: String {

@@ -399,7 +399,7 @@ fileprivate func vpnProviderManagerStateReducer<T: TunnelProviderManager>(
             }
             state.providerSyncResult = .pending
             return [
-                loadConfigs().map { .tpmEffectResultWrapper(.configUpdated($0)) },
+                loadAllConfigs().map { .tpmEffectResultWrapper(.configUpdated($0)) },
                 Effect(value: .external(.syncWithProvider(reason: .appLaunched)))
             ]
             
@@ -411,24 +411,48 @@ fileprivate func vpnProviderManagerStateReducer<T: TunnelProviderManager>(
             
             switch reason {
             case .appLaunched:
+                // At app launch, `state.providerSyncResult` defaults to `.pending`.
                 guard case .pending = state.providerSyncResult else {
                     fatalError()
                 }
-            case .appEnteredForeground, .providerNotificationPsiphonTunnelConnected:
+                return [
+                    syncStateWithProvider(syncReason: reason, tpm)
+                        .map { .tpmEffectResultWrapper($0) }
+                ]
+                
+            case .appEnteredForeground:
                 guard case .completed(_) = state.providerSyncResult else {
                     fatalError()
                 }
                 state.providerSyncResult = .pending
-            }
-            
-            return [
-                sendProviderStateQuery(tpm).map { _, queryResult in
-                    let providerState = TunnelProviderSyncedState.make(fromQueryResult: queryResult)
-                    return .tpmEffectResultWrapper(
-                        .syncedStateWithProvider(syncReason: reason, providerState)
-                    )
+                return [
+                    loadConfig(tpm).flatMap(.latest) { result -> Effect<TPMEffectResultWrapper<T>> in
+                        switch result {
+                        case .success(let tpm):
+                            return syncStateWithProvider(syncReason: reason, tpm)
+                                .prefix(value: .configUpdated(.success(tpm)))
+                        case .failure(let errorEvent):
+                            return Effect(value:
+                                .syncedStateWithProvider(syncReason: reason, .unknown(nil))
+                            ).prefix(value: .configUpdated(.failure(errorEvent.map {
+                                .failedConfigLoadSave($0)
+                            })))
+                        }
+                    }.map {
+                        .tpmEffectResultWrapper($0)
+                    }
+                ]
+                
+            case .providerNotificationPsiphonTunnelConnected:
+                guard case .completed(_) = state.providerSyncResult else {
+                    fatalError()
                 }
-            ]
+                state.providerSyncResult = .pending
+                return [
+                    syncStateWithProvider(syncReason: reason, tpm)
+                        .map { .tpmEffectResultWrapper($0) }
+                ]
+            }
             
         case .reinstallVPNConfig:
             if case let .loaded(tpm) = state.loadState.value {
@@ -505,6 +529,9 @@ fileprivate func tunnelProviderReducer<T: TunnelProviderManager>(
         guard case .pending = state.providerSyncResult else {
             fatalError()
         }
+        guard case let .loaded(tpm) = state.loadState.value else {
+            fatalError()
+        }
         
         // Updates `state.providerSyncResult` value.
         if case .unknown(let syncErrorEvent) = syncedState {
@@ -514,8 +541,15 @@ fileprivate func tunnelProviderReducer<T: TunnelProviderManager>(
         }
         
         // Initialize tunnel intent value given none was previously set.
-        if case .appLaunched = reason, case .none = state.tunnelIntent {
+        switch (reason: reason, currentIntent:state.tunnelIntent, syncedState: syncedState) {
+        case (reason: .appLaunched, currentIntent: .none, syncedState: _):
+            // Initializes tunnel intent when app is first launched
             state.tunnelIntent = .initializeIntentGiven(reason, syncedState)
+        case (reason: _, currentIntent: .stop, syncedState: .active(_)):
+            // Updates the tunnel intent to `.start` if the tunnel provider was
+            // started from system settings.
+            state.tunnelIntent = .start(transition: .none)
+        default: break
         }
         
         switch syncedState {
@@ -526,6 +560,17 @@ fileprivate func tunnelProviderReducer<T: TunnelProviderManager>(
             ]
             
         case .active(.connected):
+            guard case .start(transition: .none) = state.tunnelIntent else {
+                fatalError()
+            }
+            guard tpm.verifyConfig(forExpectedType: .startVPN) else {
+                // Failed to verify VPN config values.
+                // To update the config, tunnel is restarted.
+                return [
+                    Effect(value: .external(.tunnelStateIntent(.start(transition: .restart))))
+                ]
+            }
+            
             // Sends start vpn notification to the tunnel provider
             // if vpnStartCondition passes.
             guard state.loadState.connectionStatus == .connecting,
@@ -606,13 +651,26 @@ fileprivate func startPsiphonTunnelReducer<T: TunnelProviderManager>(
             updateConfig($0, for: .startVPN)
         }
         .flatMap(.latest, saveAndLoadConfig)
-        .flatMap(.latest) { (result: Result<T, ErrorEvent<NEVPNError>>)
+        .flatMap(.latest) { (saveLoadConfigResult: Result<T, ErrorEvent<NEVPNError>>)
             -> Effect<TPMEffectResultWrapper<T>> in
-            switch result {
+            switch saveLoadConfigResult {
             case .success(let tpm):
+                // Starts the tunnel and then saves the updated config from tunnel start.
                 return startPsiphonTunnel(tpm)
-                    .map { .startTunnelResult($0.dropSuccessValue().mapToUnit()) }
-                    .prefix(value: .configUpdated(.success(tpm)))
+                    .flatMap(.latest) { startResult -> Effect<TPMEffectResultWrapper<T>> in
+                        switch startResult {
+                        case .success(let tpm):
+                            return saveAndLoadConfig(tpm)
+                                .map { .configUpdated(.fromConfigSaveAndLoad($0)) }
+                            .prefix(value:
+                                .startTunnelResult(startResult.dropSuccessValue().mapToUnit())
+                            )
+                        case .failure(_):
+                            return Effect(value:
+                                .startTunnelResult(startResult.dropSuccessValue().mapToUnit()))
+                                .prefix(value: .configUpdated(.success(tpm)))
+                        }
+                    }
             case .failure(let errorEvent):
                 return Effect(value: .startTunnelResult(.failure(errorEvent)))
                     .prefix(value:
@@ -626,6 +684,19 @@ fileprivate func startPsiphonTunnelReducer<T: TunnelProviderManager>(
 }
 
 // MARK: Utility functions
+
+extension ConfigUpdatedResult {
+    
+    fileprivate static func fromConfigSaveAndLoad<T: TunnelProviderManager>(
+        _ result: Result<T, ErrorEvent<NEVPNError>>
+    ) -> Result<T?, ErrorEvent<ProviderManagerLoadState<T>.TPMError>> {
+        result.map { .some($0) }
+            .mapError { neVPNErrorEvent in
+                neVPNErrorEvent.map { .failedConfigLoadSave($0) }
+        }
+    }
+    
+}
 
 fileprivate func wrapVPNObserverWithTPMResult<T: TunnelProviderManager, Failure>(
     _ result: Result<T?, Failure>, _ observer: VPNConnectionObserver<T>
@@ -655,15 +726,11 @@ fileprivate func installNewVPNConfig<T: TunnelProviderManager>()
         }
         .flatMap(.latest, saveAndLoadConfig)
         .map { result -> TPMEffectResultWrapper<T> in
-            // Maps Result<T, SystemErrorEvent> to
-            //      Result<T?, ErrorEvent<TunnelManagerLoadState<T>.TPMError>>
-            return .configUpdated(result.map { $0 as T?}.mapError { systemErrorEvent in
-                systemErrorEvent.map { .failedConfigLoadSave($0) }
-            })
+            return .configUpdated(.fromConfigSaveAndLoad(result))
         }
 }
 
-fileprivate func loadConfigs<T: TunnelProviderManager>() -> Effect<ConfigUpdatedResult<T>> {
+fileprivate func loadAllConfigs<T: TunnelProviderManager>() -> Effect<ConfigUpdatedResult<T>> {
     loadFromPreferences()
         .flatMap(.latest) { (result: Result<[T], ErrorEvent<NEVPNError>>)
             -> Effect<ConfigUpdatedResult<T>> in
@@ -772,6 +839,15 @@ extension TunnelProviderSyncedState {
         }
     }
     
+}
+
+fileprivate func syncStateWithProvider<T: TunnelProviderManager>(
+    syncReason: TunnelProviderSyncReason,_ tpm: T
+) -> Effect<TPMEffectResultWrapper<T>> {
+    sendProviderStateQuery(tpm).map { _, queryResult in
+        let providerState = TunnelProviderSyncedState.make(fromQueryResult: queryResult)
+        return .syncedStateWithProvider(syncReason: syncReason, providerState)
+    }
 }
 
 // Response result type alias of TunnelProviderManager.sendProviderStateQuery()
