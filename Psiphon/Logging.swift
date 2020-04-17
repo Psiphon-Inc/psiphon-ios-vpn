@@ -47,7 +47,7 @@ extension CustomFieldFeedbackDescription {
     /// value.description == "SomeValue([\"float\": 3.14])"
     /// ```
     public var description: String {
-        "\(String(describing: Self.self))(\(String(describing: feedbackFields))"
+        "\(String(describing: Self.self))(\(String(describing: feedbackFields)))"
     }
 }
 
