@@ -66,12 +66,13 @@ extension TunnelProviderSyncReason: CustomStringFeedbackDescription {
     
 }
 
-extension Authorization: CustomFeedbackDescription {
+extension Authorization: CustomStringFeedbackDescription {
     
-    var feedbackFields: [String : CustomStringConvertible] {
-        ["id": id,
-         "expires": expires,
-         "accessType": accessType]
+    public override var description: String {
+        let feedbackFields: [String : CustomStringConvertible] = ["id": id,
+                                                                  "expires": expires,
+                                                                  "accessType": accessType]
+        return "\(String(describing: Self.self))(\(String(describing: feedbackFields)))"
     }
     
 }
@@ -86,7 +87,7 @@ extension PsiCashAmount: CustomStringFeedbackDescription {
     
 }
 
-extension UserDefaultsConfig: CustomFeedbackDescription {
+extension UserDefaultsConfig: CustomFieldFeedbackDescription {
     
     var feedbackFields: [String : CustomStringConvertible] {
         ["expectedPsiCashReward": self.expectedPsiCashReward]
