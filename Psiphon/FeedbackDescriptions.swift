@@ -66,12 +66,13 @@ extension TunnelProviderSyncReason: CustomStringFeedbackDescription {
     
 }
 
-extension Authorization: CustomFieldFeedbackDescription {
+extension Authorization: CustomStringFeedbackDescription {
     
-    var feedbackFields: [String : CustomStringConvertible] {
-        ["id": id,
-         "expires": expires,
-         "accessType": accessType]
+    public override var description: String {
+        let feedbackFields: [String : CustomStringConvertible] = ["id": id,
+                                                                  "expires": expires,
+                                                                  "accessType": accessType]
+        return "\(String(describing: Self.self))(\(String(describing: feedbackFields)))"
     }
     
 }

@@ -23,6 +23,8 @@ protocol FeedbackDescription {}
 
 protocol CustomStringFeedbackDescription: FeedbackDescription, CustomStringConvertible {}
 
+/// `NSObject` classes should not adopt this protocol, since the default  `NSObject.description` function
+/// will be called instead of the default description value provided by this protocol.
 protocol CustomFieldFeedbackDescription: FeedbackDescription, CustomStringConvertible {
     var feedbackFields: [String: CustomStringConvertible] { get }
 }
