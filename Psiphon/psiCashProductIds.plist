@@ -2,14 +2,10 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <array>
-	<string>ca.psiphon.Psiphon.psicash.tier1</string>
-	<string>ca.psiphon.Psiphon.psicash.tier2</string>
-	<string>ca.psiphon.Psiphon.psicash.tier3</string>
-	<string>ca.psiphon.Psiphon.psicash.tier4</string>
-	<string>ca.psiphon.Psiphon.psicash.tier5</string>
-	<string>ca.psiphon.Psiphon.psicash.tier6</string>
-	<string>ca.psiphon.Psiphon.psicash.tier7</string>
-	<string>ca.psiphon.Psiphon.psicash.tier8</string>
-	<string>ca.psiphon.Psiphon.psicash.tier9</string>
+	<string>ca.psiphon.Psiphon.psicash_1000</string>
+	<string>ca.psiphon.Psiphon.psicash_4000</string>
+	<string>ca.psiphon.Psiphon.psicash_10000</string>
+	<string>ca.psiphon.Psiphon.psicash_30000</string>
+	<string>ca.psiphon.Psiphon.psicash_100000</string>
 </array>
 </plist>
