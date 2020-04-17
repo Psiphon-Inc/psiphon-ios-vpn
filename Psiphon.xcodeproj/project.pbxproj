@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 52;
+	objectVersion = 46;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -148,6 +148,7 @@
 		8DDA60292425BB4800DBA8EC /* DebugStrings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DDA60282425BB4800DBA8EC /* DebugStrings.swift */; };
 		9BFEC1F0DA87B4E66C8CC4AA /* MoPubInterstitialAdControllerWrapper.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFECF45CA0CAF6997411D22 /* MoPubInterstitialAdControllerWrapper.m */; };
 		9BFEC2458D1346F537E9089E /* Nullity.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFECCCF429898FD903B69A6 /* Nullity.m */; };
+		9BFEC3D66910918A0C8954E1 /* AdMobConsent.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC5F8D8BB828703CCCC2F /* AdMobConsent.m */; };
 		9BFEC459666697D89B09A492 /* AdMobRewardedAdControllerWrapper.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFECF6BF16767758F28D1A0 /* AdMobRewardedAdControllerWrapper.m */; };
 		9BFEC4F02A47FF8265635803 /* Notifier.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC91ED4A1C511520E9948 /* Notifier.m */; };
 		9BFEC5C256EBC72398FAE8D8 /* UnionSerialQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC84F5DF6D2C3EF754962 /* UnionSerialQueue.m */; };
@@ -210,16 +211,8 @@
 		CE26FCAC1BBDC85900B83375 /* PsiphonVPN.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = CE26FCA31BBDC85900B83375 /* PsiphonVPN.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		CE4E9BC01BBEECF30060FF8B /* Psiphon.entitlements in Resources */ = {isa = PBXBuildFile; fileRef = CE4E9BBF1BBEECF30060FF8B /* Psiphon.entitlements */; };
 		CE4E9BC21BBEECFC0060FF8B /* PsiphonVPN.entitlements in Resources */ = {isa = PBXBuildFile; fileRef = CE4E9BC11BBEECFC0060FF8B /* PsiphonVPN.entitlements */; };
-		CE60332C243F61D600F87242 /* HyprMX.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = CE60332A243F61A900F87242 /* HyprMX.xcframework */; };
-		CE60332D243F61D600F87242 /* HyprMX.xcframework in CopyFiles */ = {isa = PBXBuildFile; fileRef = CE60332A243F61A900F87242 /* HyprMX.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		CE6C3F6A24366AE1007A17F0 /* ClientMetadata.m in Sources */ = {isa = PBXBuildFile; fileRef = CE6C3F6924366AE1007A17F0 /* ClientMetadata.m */; };
 		CE7B76431F54881F00EA44BD /* PsiphonTunnel.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 66094F781E8067520069EC4E /* PsiphonTunnel.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		CEAA124F244641C200F38183 /* AdMobConsent.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC5F8D8BB828703CCCC2F /* AdMobConsent.m */; };
-		CEE9378F2446417A00D0F7C5 /* HYPRInitializationManager.m in Sources */ = {isa = PBXBuildFile; fileRef = CEE937862446417800D0F7C5 /* HYPRInitializationManager.m */; };
-		CEE937902446417A00D0F7C5 /* HYPRAdMobVideoAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = CEE9378C2446417A00D0F7C5 /* HYPRAdMobVideoAdapter.m */; };
-		CEE937912446417A00D0F7C5 /* HyprMXAdNetworkExtras.m in Sources */ = {isa = PBXBuildFile; fileRef = CEE9378E2446417A00D0F7C5 /* HyprMXAdNetworkExtras.m */; };
-		CEE937922446417A00D0F7C5 /* HYPRAdMobUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = CEE937882446417900D0F7C5 /* HYPRAdMobUtils.m */; };
-		CEE937932446417A00D0F7C5 /* HYPRAdMobRewardedAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = CEE937872446417900D0F7C5 /* HYPRAdMobRewardedAdapter.m */; };
 		D672BC574F14042B4D77AB28 /* libPods-Psiphon.a in Frameworks */ = {isa = PBXBuildFile; fileRef = CB8BB19F016330264C4DCB80 /* libPods-Psiphon.a */; };
 		EF4F1F3D206055F7006A40A1 /* RACSignal+Operations2.m in Sources */ = {isa = PBXBuildFile; fileRef = EF90D79F204F22C900228A63 /* RACSignal+Operations2.m */; };
 		EF639C2F1F8FCE37009D6B42 /* PsiFeedbackLogger.m in Sources */ = {isa = PBXBuildFile; fileRef = EF639C2E1F8FCE2A009D6B42 /* PsiFeedbackLogger.m */; };
@@ -299,7 +292,6 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				CE60332D243F61D600F87242 /* HyprMX.xcframework in CopyFiles */,
 				4E30745F2097922C00B6D2A3 /* PsiCashLib.framework in CopyFiles */,
 				CE7B76431F54881F00EA44BD /* PsiphonTunnel.framework in CopyFiles */,
 			);
@@ -655,19 +647,8 @@
 		CE26FCA91BBDC85900B83375 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		CE4E9BBF1BBEECF30060FF8B /* Psiphon.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = Psiphon.entitlements; sourceTree = "<group>"; };
 		CE4E9BC11BBEECFC0060FF8B /* PsiphonVPN.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.entitlements; path = PsiphonVPN.entitlements; sourceTree = "<group>"; };
-		CE60332A243F61A900F87242 /* HyprMX.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = HyprMX.xcframework; sourceTree = "<group>"; };
 		CE6C3F6824366AE1007A17F0 /* ClientMetadata.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ClientMetadata.h; sourceTree = "<group>"; };
 		CE6C3F6924366AE1007A17F0 /* ClientMetadata.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ClientMetadata.m; sourceTree = "<group>"; };
-		CEE937852446417800D0F7C5 /* HYPRAdMobRewardedAdapter.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HYPRAdMobRewardedAdapter.h; sourceTree = "<group>"; };
-		CEE937862446417800D0F7C5 /* HYPRInitializationManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = HYPRInitializationManager.m; sourceTree = "<group>"; };
-		CEE937872446417900D0F7C5 /* HYPRAdMobRewardedAdapter.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = HYPRAdMobRewardedAdapter.m; sourceTree = "<group>"; };
-		CEE937882446417900D0F7C5 /* HYPRAdMobUtils.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = HYPRAdMobUtils.m; sourceTree = "<group>"; };
-		CEE937892446417900D0F7C5 /* HyprMXAdNetworkExtras.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HyprMXAdNetworkExtras.h; sourceTree = "<group>"; };
-		CEE9378A2446417900D0F7C5 /* HyprMX_Mobile_SDK_Overview.markdown */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = HyprMX_Mobile_SDK_Overview.markdown; sourceTree = "<group>"; };
-		CEE9378B2446417900D0F7C5 /* HYPRAdMobVideoAdapter.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HYPRAdMobVideoAdapter.h; sourceTree = "<group>"; };
-		CEE9378C2446417A00D0F7C5 /* HYPRAdMobVideoAdapter.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = HYPRAdMobVideoAdapter.m; sourceTree = "<group>"; };
-		CEE9378D2446417A00D0F7C5 /* HYPRInitializationManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HYPRInitializationManager.h; sourceTree = "<group>"; };
-		CEE9378E2446417A00D0F7C5 /* HyprMXAdNetworkExtras.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = HyprMXAdNetworkExtras.m; sourceTree = "<group>"; };
 		DD100E19194B9A79F5D7DF55 /* Pods-PsiphonVPN.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PsiphonVPN.debug.xcconfig"; path = "Pods/Target Support Files/Pods-PsiphonVPN/Pods-PsiphonVPN.debug.xcconfig"; sourceTree = "<group>"; };
 		EDB109A2FBFB32D821FF121D /* Pods-Psiphon.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Psiphon.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Psiphon/Pods-Psiphon.debug.xcconfig"; sourceTree = "<group>"; };
 		EF639C2D1F8FCE2A009D6B42 /* PsiFeedbackLogger.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PsiFeedbackLogger.h; sourceTree = "<group>"; };
@@ -735,7 +716,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				668AF9C01E92CBE0008CAAAA /* NetworkExtension.framework in Frameworks */,
-				CE60332C243F61D600F87242 /* HyprMX.xcframework in Frameworks */,
 				440D75BE1F59E041005C603B /* StoreKit.framework in Frameworks */,
 				D672BC574F14042B4D77AB28 /* libPods-Psiphon.a in Frameworks */,
 			);
@@ -1145,7 +1125,6 @@
 		CE26FC811BBDC7B700B83375 = {
 			isa = PBXGroup;
 			children = (
-				CE60332A243F61A900F87242 /* HyprMX.xcframework */,
 				4E30745D2097921B00B6D2A3 /* PsiCashLib.framework */,
 				66094F781E8067520069EC4E /* PsiphonTunnel.framework */,
 				4E0DCB101F28458100495781 /* Shared */,
@@ -1245,23 +1224,6 @@
 			path = PsiphonVPN;
 			sourceTree = "<group>";
 		};
-		CED04C442445EA6B007818EA /* HyperMX */ = {
-			isa = PBXGroup;
-			children = (
-				CEE937852446417800D0F7C5 /* HYPRAdMobRewardedAdapter.h */,
-				CEE937872446417900D0F7C5 /* HYPRAdMobRewardedAdapter.m */,
-				CEE937882446417900D0F7C5 /* HYPRAdMobUtils.m */,
-				CEE9378B2446417900D0F7C5 /* HYPRAdMobVideoAdapter.h */,
-				CEE9378C2446417A00D0F7C5 /* HYPRAdMobVideoAdapter.m */,
-				CEE9378D2446417A00D0F7C5 /* HYPRInitializationManager.h */,
-				CEE937862446417800D0F7C5 /* HYPRInitializationManager.m */,
-				CEE9378A2446417900D0F7C5 /* HyprMX_Mobile_SDK_Overview.markdown */,
-				CEE937892446417900D0F7C5 /* HyprMXAdNetworkExtras.h */,
-				CEE9378E2446417A00D0F7C5 /* HyprMXAdNetworkExtras.m */,
-			);
-			path = HyperMX;
-			sourceTree = "<group>";
-		};
 		EF652CCF1F3521F8002AFB48 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
@@ -1341,7 +1303,6 @@
 		EFFA4AB620F68CE100E35E8E /* Ad */ = {
 			isa = PBXGroup;
 			children = (
-				CED04C442445EA6B007818EA /* HyperMX */,
 				9BFECF45CA0CAF6997411D22 /* MoPubInterstitialAdControllerWrapper.m */,
 				9BFEC327A0BE7E5243CCB2E0 /* MoPubInterstitialAdControllerWrapper.h */,
 				9BFEC970B3CC179C3B9DE44D /* MoPubRewardedAdControllerWrapper.m */,
@@ -1737,7 +1698,6 @@
 				445F24E920E1A5BA00D004E9 /* ber_tlv_length.c in Sources */,
 				5237387423AABB0F00DDE396 /* PurchasingSpeedBoostAlertViewBuilder.swift in Sources */,
 				4E0DCB1A1F28481E00495781 /* PsiphonDataSharedDB.m in Sources */,
-				CEE9378F2446417A00D0F7C5 /* HYPRInitializationManager.m in Sources */,
 				4435CC271F70566000F3A809 /* SettingsViewController.m in Sources */,
 				8D417EB72415633300FEE587 /* IAPReducer.swift in Sources */,
 				EF4F1F3D206055F7006A40A1 /* RACSignal+Operations2.m in Sources */,
@@ -1764,7 +1724,6 @@
 				445F239620E1817C00D004E9 /* AppStoreReceiptData.m in Sources */,
 				445F24E420E1A5BA00D004E9 /* constr_SEQUENCE.c in Sources */,
 				EF652CD61F35224C002AFB48 /* AppDelegate.m in Sources */,
-				CEE937902446417A00D0F7C5 /* HYPRAdMobVideoAdapter.m in Sources */,
 				EFC2F5C720226782007B52F9 /* UIAlertController+Additions.m in Sources */,
 				4E0A366C21666B99008A3D7B /* NSString+Additions.m in Sources */,
 				EF639C2F1F8FCE37009D6B42 /* PsiFeedbackLogger.m in Sources */,
@@ -1821,7 +1780,6 @@
 				445F24EE20E1A5BA00D004E9 /* asn_codecs_prim.c in Sources */,
 				521FD0FA219E0DDF00F748EC /* AppProfiler.m in Sources */,
 				445F24E620E1A5BA00D004E9 /* per_opentype.c in Sources */,
-				CEE937922446417A00D0F7C5 /* HYPRAdMobUtils.m in Sources */,
 				445F24EC20E1A5BA00D004E9 /* SignedData.c in Sources */,
 				9BFEC2458D1346F537E9089E /* Nullity.m in Sources */,
 				445F24D420E1A5BA00D004E9 /* ReceiptAttributes.c in Sources */,
@@ -1850,6 +1808,7 @@
 				52805BA122DD1EB8006B205B /* ReactiveSwift+Additions.swift in Sources */,
 				9BFECFE618966005B01CF582 /* MoPubRewardedAdControllerWrapper.m in Sources */,
 				9BFEC8058885B68B2822E2B8 /* AdManager.m in Sources */,
+				9BFEC3D66910918A0C8954E1 /* AdMobConsent.m in Sources */,
 				52DF5E9A23CE835100A1B067 /* UserStrings.swift in Sources */,
 				8DDA60292425BB4800DBA8EC /* DebugStrings.swift in Sources */,
 				52C8F0AD237E145C00E5F9C0 /* PsiCashCoinPurchaseTable.swift in Sources */,
@@ -1875,18 +1834,15 @@
 				A8408E611665FC60D5DFF339 /* SubscriptionStatusView.m in Sources */,
 				A8408EB13777DDCBEF7DE3C0 /* SwoopView.m in Sources */,
 				8D7E9B9D2425DF42006F3A2F /* AnimatedUIView.swift in Sources */,
-				CEE937912446417A00D0F7C5 /* HyprMXAdNetworkExtras.m in Sources */,
 				A84080E163F24876A1476544 /* VPNStartAndStopButton.m in Sources */,
 				8D417ED9241844FA00FEE587 /* FloatingPoint+Additions.swift in Sources */,
 				A840875B190F7666A1BD98E5 /* UIView+AutoLayoutViewGroup.m in Sources */,
 				A84088DD7FBB838689BC1FCC /* OnboardingViewController.m in Sources */,
 				A8408B83167EBE21E215C471 /* OnboardingView.m in Sources */,
 				A84088BD3CFC8C511F22182C /* RoyalSkyButton.m in Sources */,
-				CEE937932446417A00D0F7C5 /* HYPRAdMobRewardedAdapter.m in Sources */,
 				A8408161701C8F50F52866FC /* LayerAutoResizeUIView.m in Sources */,
 				A84083E76E518050B65E523A /* SkyButton.m in Sources */,
 				A840835FAC7F18A6A7021415 /* RingSkyButton.m in Sources */,
-				CEAA124F244641C200F38183 /* AdMobConsent.m in Sources */,
 				A84086D3F4BD2D551CA67611 /* AlertDialogs.m in Sources */,
 				8DB6C6362429080C005E2F4C /* PsiCashMessageWithRetryView.swift in Sources */,
 				A840854A7ACA14A7D891EC16 /* OnboardingScrollableView.m in Sources */,
@@ -2036,11 +1992,7 @@
 				);
 				INFOPLIST_FILE = PsiphonUITests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 11.1;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@loader_path/Frameworks",
-				);
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.psiphon.PsiphonUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
@@ -2065,11 +2017,7 @@
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				INFOPLIST_FILE = PsiphonUITests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 11.1;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@loader_path/Frameworks",
-				);
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.psiphon.PsiphonUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
@@ -2264,8 +2212,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 10.2;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
-				SWIFT_COMPILATION_MODE = wholemodule;
-				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
 			};
@@ -2287,10 +2234,7 @@
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = Psiphon/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-				);
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				OTHER_SWIFT_FLAGS = "$(inherited) -DDEBUG";
 				PRODUCT_BUNDLE_IDENTIFIER = ca.psiphon.Psiphon;
@@ -2324,10 +2268,7 @@
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = Psiphon/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-				);
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				OTHER_SWIFT_FLAGS = "$(inherited)";
 				PRODUCT_BUNDLE_IDENTIFIER = ca.psiphon.Psiphon;
@@ -2363,11 +2304,7 @@
 				);
 				INFOPLIST_FILE = PsiphonVPN/Info.plist;
 				LD_NO_PIE = YES;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@executable_path/../../Frameworks",
-				);
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = ca.psiphon.Psiphon.PsiphonVPN;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
@@ -2396,11 +2333,7 @@
 				);
 				INFOPLIST_FILE = PsiphonVPN/Info.plist;
 				LD_NO_PIE = YES;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@executable_path/../../Frameworks",
-				);
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = ca.psiphon.Psiphon.PsiphonVPN;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
