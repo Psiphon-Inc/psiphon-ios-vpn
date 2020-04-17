@@ -98,9 +98,12 @@ NSString * const SettingsResetAdConsentCellSpecifierKey = @"settingsResetAdConse
     __block RACDisposable *tunnelStatusDisposable =
       [[VPNManager sharedInstance].lastTunnelStatus
         subscribeNext:^(NSNumber *statusObject) {
-            weakSelf.vpnStatus = (VPNStatus) [statusObject integerValue];
-            [weakSelf updateReinstallVPNProfileCell];
-            [weakSelf updateHiddenKeys];
+          SettingsViewController *__strong strongSelf = weakSelf;
+          if (strongSelf) {
+              strongSelf.vpnStatus = (VPNStatus) [statusObject integerValue];
+              [strongSelf updateReinstallVPNProfileCell];
+              [strongSelf updateHiddenKeys];
+          }
         }];
 
     [self.compoundDisposable addDisposable:tunnelStatusDisposable];
@@ -173,8 +176,6 @@ NSString * const SettingsResetAdConsentCellSpecifierKey = @"settingsResetAdConse
                      tableView:(UITableView *)tableView
     didSelectCustomViewSpecifier:(IASKSpecifier*)specifier {
 
-    SettingsViewController *__weak weakSelf = self;
-
     [super settingsViewController:self tableView:tableView didSelectCustomViewSpecifier:specifier];
 
     if ([specifier.key isEqualToString:SettingsSubscriptionCellSpecifierKey]) {
@@ -184,14 +185,23 @@ NSString * const SettingsResetAdConsentCellSpecifierKey = @"settingsResetAdConse
         [self openPsiCashViewController];
 
     } else if ([specifier.key isEqualToString:SettingsReinstallVPNConfigurationKey]) {
+
+        SettingsViewController *__weak weakSelf = self;
+
         __block RACDisposable *disposable = [[[VPNManager sharedInstance] reinstallVPNConfiguration]
           subscribeError:^(NSError *error) {
-              [weakSelf.compoundDisposable removeDisposable:disposable];
-              [weakSelf settingsViewControllerDidEnd:nil];
+            SettingsViewController *__strong strongSelf = weakSelf;
+            if (strongSelf) {
+                [strongSelf.compoundDisposable removeDisposable:disposable];
+                [strongSelf settingsViewControllerDidEnd:nil];
+            }
           }
           completed:^{
-              [weakSelf.compoundDisposable removeDisposable:disposable];
-              [weakSelf settingsViewControllerDidEnd:nil];
+            SettingsViewController *__strong strongSelf = weakSelf;
+            if (strongSelf) {
+                [strongSelf.compoundDisposable removeDisposable:disposable];
+                [strongSelf settingsViewControllerDidEnd:nil];
+            }
           }];
         [self.compoundDisposable addDisposable:disposable];
 
