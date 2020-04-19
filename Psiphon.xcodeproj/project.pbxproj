@@ -209,13 +209,51 @@
 		B1D9FF416DDCA97A40A325AA /* libPods-PsiphonVPN.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 01122727D6CE50B340C55DBE /* libPods-PsiphonVPN.a */; };
 		CE26FC951BBDC7B800B83375 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = CE26FC941BBDC7B800B83375 /* Assets.xcassets */; };
 		CE26FCAC1BBDC85900B83375 /* PsiphonVPN.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = CE26FCA31BBDC85900B83375 /* PsiphonVPN.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		CE3B3225244FA3150079C13F /* JetsamMetrics.m in Sources */ = {isa = PBXBuildFile; fileRef = CE3B3224244FA3150079C13F /* JetsamMetrics.m */; };
+		CE3B3226244FA3150079C13F /* JetsamMetrics.m in Sources */ = {isa = PBXBuildFile; fileRef = CE3B3224244FA3150079C13F /* JetsamMetrics.m */; };
+		CE3B324424532F370079C13F /* NSError+Convenience.m in Sources */ = {isa = PBXBuildFile; fileRef = EF90D79A204F22C900228A63 /* NSError+Convenience.m */; };
+		CE3B3246245343DF0079C13F /* RunningStatsTest.m in Sources */ = {isa = PBXBuildFile; fileRef = CE3B3245245343DF0079C13F /* RunningStatsTest.m */; };
+		CE3B324924535F030079C13F /* stats.c in Sources */ = {isa = PBXBuildFile; fileRef = CE3B324824535F030079C13F /* stats.c */; };
+		CE3B325124538DD10079C13F /* RunningStat.m in Sources */ = {isa = PBXBuildFile; fileRef = CE3B324224520ABF0079C13F /* RunningStat.m */; };
+		CE3B325224538DE00079C13F /* RunningStat.m in Sources */ = {isa = PBXBuildFile; fileRef = CE3B324224520ABF0079C13F /* RunningStat.m */; };
+		CE3B3254245390090079C13F /* JetsamMetricsTest.m in Sources */ = {isa = PBXBuildFile; fileRef = CE3B3253245390090079C13F /* JetsamMetricsTest.m */; };
 		CE4E9BC01BBEECF30060FF8B /* Psiphon.entitlements in Resources */ = {isa = PBXBuildFile; fileRef = CE4E9BBF1BBEECF30060FF8B /* Psiphon.entitlements */; };
 		CE4E9BC21BBEECFC0060FF8B /* PsiphonVPN.entitlements in Resources */ = {isa = PBXBuildFile; fileRef = CE4E9BC11BBEECFC0060FF8B /* PsiphonVPN.entitlements */; };
 		CE6C3F6A24366AE1007A17F0 /* ClientMetadata.m in Sources */ = {isa = PBXBuildFile; fileRef = CE6C3F6924366AE1007A17F0 /* ClientMetadata.m */; };
+		CE7182132460689A008F815A /* JetsamTrackingTest.m in Sources */ = {isa = PBXBuildFile; fileRef = CE7182122460689A008F815A /* JetsamTrackingTest.m */; };
 		CE7B76431F54881F00EA44BD /* PsiphonTunnel.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 66094F781E8067520069EC4E /* PsiphonTunnel.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		CE8026A42448B5B4005AF848 /* NSUserDefaults+KeyedDataStore.m in Sources */ = {isa = PBXBuildFile; fileRef = CE8026A32448B5B4005AF848 /* NSUserDefaults+KeyedDataStore.m */; };
 		CE8026A72448B7E6005AF848 /* PersistentSubsMetadata.m in Sources */ = {isa = PBXBuildFile; fileRef = CE8026A62448B7E6005AF848 /* PersistentSubsMetadata.m */; };
 		CE8026AE2448BA2E005AF848 /* LocalDataStoreKeys.m in Sources */ = {isa = PBXBuildFile; fileRef = CE8026AD2448BA2E005AF848 /* LocalDataStoreKeys.m */; };
+		CE8026B72448EC4D005AF848 /* PersistentJetsamData.m in Sources */ = {isa = PBXBuildFile; fileRef = CE8026B62448EC4D005AF848 /* PersistentJetsamData.m */; };
+		CE82CE842459DFE1000C0512 /* RotatingFileTest.m in Sources */ = {isa = PBXBuildFile; fileRef = CE82CE832459DFE1000C0512 /* RotatingFileTest.m */; };
+		CE82CE90245A10E0000C0512 /* DelimitedFileTest.m in Sources */ = {isa = PBXBuildFile; fileRef = CE82CE8F245A10E0000C0512 /* DelimitedFileTest.m */; };
+		CE82CE92245A1232000C0512 /* DelimitedFile.m in Sources */ = {isa = PBXBuildFile; fileRef = CE82CE8B245A040A000C0512 /* DelimitedFile.m */; };
+		CE82CE93245A1232000C0512 /* DelimitedFile.m in Sources */ = {isa = PBXBuildFile; fileRef = CE82CE8B245A040A000C0512 /* DelimitedFile.m */; };
+		CE82CE95245A12B1000C0512 /* DelimitedFile.m in Sources */ = {isa = PBXBuildFile; fileRef = CE82CE8B245A040A000C0512 /* DelimitedFile.m */; };
+		CE82CEA0245C67F5000C0512 /* Archiver.m in Sources */ = {isa = PBXBuildFile; fileRef = CE82CE9F245C67F5000C0512 /* Archiver.m */; };
+		CE82CEA1245C67F5000C0512 /* Archiver.m in Sources */ = {isa = PBXBuildFile; fileRef = CE82CE9F245C67F5000C0512 /* Archiver.m */; };
+		CE82CEA2245C67F5000C0512 /* Archiver.m in Sources */ = {isa = PBXBuildFile; fileRef = CE82CE9F245C67F5000C0512 /* Archiver.m */; };
+		CE82CEA7245C6FFB000C0512 /* DiskBackedFile.m in Sources */ = {isa = PBXBuildFile; fileRef = CE82CEA5245C6FFB000C0512 /* DiskBackedFile.m */; };
+		CE82CEA8245C6FFB000C0512 /* DiskBackedFile.m in Sources */ = {isa = PBXBuildFile; fileRef = CE82CEA5245C6FFB000C0512 /* DiskBackedFile.m */; };
+		CE82CEA9245C6FFB000C0512 /* DiskBackedFile.m in Sources */ = {isa = PBXBuildFile; fileRef = CE82CEA5245C6FFB000C0512 /* DiskBackedFile.m */; };
+		CE82CEAC245C7007000C0512 /* JetsamTracking.m in Sources */ = {isa = PBXBuildFile; fileRef = CE82CEAA245C7007000C0512 /* JetsamTracking.m */; };
+		CE82CEAD245C7007000C0512 /* JetsamTracking.m in Sources */ = {isa = PBXBuildFile; fileRef = CE82CEAA245C7007000C0512 /* JetsamTracking.m */; };
+		CE82CEAE245C7007000C0512 /* JetsamTracking.m in Sources */ = {isa = PBXBuildFile; fileRef = CE82CEAA245C7007000C0512 /* JetsamTracking.m */; };
+		CE82CEB1245C7232000C0512 /* JetsamEvent.m in Sources */ = {isa = PBXBuildFile; fileRef = CE82CEB0245C7232000C0512 /* JetsamEvent.m */; };
+		CE82CEB2245C7232000C0512 /* JetsamEvent.m in Sources */ = {isa = PBXBuildFile; fileRef = CE82CEB0245C7232000C0512 /* JetsamEvent.m */; };
+		CE82CEBB245C753E000C0512 /* FileRegistry.m in Sources */ = {isa = PBXBuildFile; fileRef = CE82CEBA245C753E000C0512 /* FileRegistry.m */; };
+		CE82CEBC245C753E000C0512 /* FileRegistry.m in Sources */ = {isa = PBXBuildFile; fileRef = CE82CEBA245C753E000C0512 /* FileRegistry.m */; };
+		CE82CEC0245C757A000C0512 /* ExtensionContainerFile.m in Sources */ = {isa = PBXBuildFile; fileRef = CE82CEBF245C757A000C0512 /* ExtensionContainerFile.m */; };
+		CE82CEC1245C757A000C0512 /* ExtensionContainerFile.m in Sources */ = {isa = PBXBuildFile; fileRef = CE82CEBF245C757A000C0512 /* ExtensionContainerFile.m */; };
+		CE82CEC2245C757A000C0512 /* ExtensionContainerFile.m in Sources */ = {isa = PBXBuildFile; fileRef = CE82CEBF245C757A000C0512 /* ExtensionContainerFile.m */; };
+		CE8ED8FD24630616009C3187 /* JetsamMetrics+Feedback.m in Sources */ = {isa = PBXBuildFile; fileRef = CE8ED8FC24630616009C3187 /* JetsamMetrics+Feedback.m */; };
+		CE8ED90224633407009C3187 /* FileRegistryTest.m in Sources */ = {isa = PBXBuildFile; fileRef = CE8ED90124633407009C3187 /* FileRegistryTest.m */; };
+		CE8ED904246339BF009C3187 /* JetsamEventTest.m in Sources */ = {isa = PBXBuildFile; fileRef = CE8ED903246339BF009C3187 /* JetsamEventTest.m */; };
+		CEC69F4A245CA5860032B74F /* ExtensionContainerFileTest.m in Sources */ = {isa = PBXBuildFile; fileRef = CEC69F49245CA5860032B74F /* ExtensionContainerFileTest.m */; };
+		CEC8CD19245887BA00DF1010 /* RotatingFile.m in Sources */ = {isa = PBXBuildFile; fileRef = CEC8CD18245887BA00DF1010 /* RotatingFile.m */; };
+		CEC8CD1A245887BA00DF1010 /* RotatingFile.m in Sources */ = {isa = PBXBuildFile; fileRef = CEC8CD18245887BA00DF1010 /* RotatingFile.m */; };
+		CEC8CD1B245887BA00DF1010 /* RotatingFile.m in Sources */ = {isa = PBXBuildFile; fileRef = CEC8CD18245887BA00DF1010 /* RotatingFile.m */; };
 		D672BC574F14042B4D77AB28 /* libPods-Psiphon.a in Frameworks */ = {isa = PBXBuildFile; fileRef = CB8BB19F016330264C4DCB80 /* libPods-Psiphon.a */; };
 		EF4F1F3D206055F7006A40A1 /* RACSignal+Operations2.m in Sources */ = {isa = PBXBuildFile; fileRef = EF90D79F204F22C900228A63 /* RACSignal+Operations2.m */; };
 		EF639C2F1F8FCE37009D6B42 /* PsiFeedbackLogger.m in Sources */ = {isa = PBXBuildFile; fileRef = EF639C2E1F8FCE2A009D6B42 /* PsiFeedbackLogger.m */; };
@@ -274,6 +312,13 @@
 			proxyType = 1;
 			remoteGlobalIDString = CE26FCA21BBDC85900B83375;
 			remoteInfo = PsiphonVPN;
+		};
+		CE3B32382452069C0079C13F /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = CE26FC821BBDC7B700B83375 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = CE26FC891BBDC7B800B83375;
+			remoteInfo = Psiphon;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -648,10 +693,21 @@
 		CE26FC991BBDC7B800B83375 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		CE26FCA31BBDC85900B83375 /* PsiphonVPN.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = PsiphonVPN.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		CE26FCA91BBDC85900B83375 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		CE3B3223244FA3150079C13F /* JetsamMetrics.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = JetsamMetrics.h; sourceTree = "<group>"; };
+		CE3B3224244FA3150079C13F /* JetsamMetrics.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = JetsamMetrics.m; sourceTree = "<group>"; };
+		CE3B32332452069C0079C13F /* PsiphonTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PsiphonTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		CE3B32372452069C0079C13F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		CE3B324124520ABF0079C13F /* RunningStat.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RunningStat.h; sourceTree = "<group>"; };
+		CE3B324224520ABF0079C13F /* RunningStat.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RunningStat.m; sourceTree = "<group>"; };
+		CE3B3245245343DF0079C13F /* RunningStatsTest.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RunningStatsTest.m; sourceTree = "<group>"; };
+		CE3B324724535F030079C13F /* stats.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = stats.h; sourceTree = "<group>"; };
+		CE3B324824535F030079C13F /* stats.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = stats.c; sourceTree = "<group>"; };
+		CE3B3253245390090079C13F /* JetsamMetricsTest.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = JetsamMetricsTest.m; sourceTree = "<group>"; };
 		CE4E9BBF1BBEECF30060FF8B /* Psiphon.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = Psiphon.entitlements; sourceTree = "<group>"; };
 		CE4E9BC11BBEECFC0060FF8B /* PsiphonVPN.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.entitlements; path = PsiphonVPN.entitlements; sourceTree = "<group>"; };
 		CE6C3F6824366AE1007A17F0 /* ClientMetadata.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ClientMetadata.h; sourceTree = "<group>"; };
 		CE6C3F6924366AE1007A17F0 /* ClientMetadata.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ClientMetadata.m; sourceTree = "<group>"; };
+		CE7182122460689A008F815A /* JetsamTrackingTest.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = JetsamTrackingTest.m; sourceTree = "<group>"; };
 		CE80269F2448B46F005AF848 /* KeyedDataStore.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = KeyedDataStore.h; sourceTree = "<group>"; };
 		CE8026A22448B5B4005AF848 /* NSUserDefaults+KeyedDataStore.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSUserDefaults+KeyedDataStore.h"; sourceTree = "<group>"; };
 		CE8026A32448B5B4005AF848 /* NSUserDefaults+KeyedDataStore.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "NSUserDefaults+KeyedDataStore.m"; sourceTree = "<group>"; };
@@ -659,6 +715,31 @@
 		CE8026AD2448BA2E005AF848 /* LocalDataStoreKeys.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = LocalDataStoreKeys.m; sourceTree = "<group>"; };
 		CE8026B02448C1D6005AF848 /* PersistentSubsMetadata.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PersistentSubsMetadata.h; sourceTree = "<group>"; };
 		CE8026B42448EABC005AF848 /* LocalDataStoreKeys.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LocalDataStoreKeys.h; sourceTree = "<group>"; };
+		CE8026B52448EC4D005AF848 /* PersistentJetsamData.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PersistentJetsamData.h; sourceTree = "<group>"; };
+		CE8026B62448EC4D005AF848 /* PersistentJetsamData.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PersistentJetsamData.m; sourceTree = "<group>"; };
+		CE82CE832459DFE1000C0512 /* RotatingFileTest.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RotatingFileTest.m; sourceTree = "<group>"; };
+		CE82CE8A245A040A000C0512 /* DelimitedFile.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DelimitedFile.h; sourceTree = "<group>"; };
+		CE82CE8B245A040A000C0512 /* DelimitedFile.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DelimitedFile.m; sourceTree = "<group>"; };
+		CE82CE8F245A10E0000C0512 /* DelimitedFileTest.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DelimitedFileTest.m; sourceTree = "<group>"; };
+		CE82CE9E245C67F5000C0512 /* Archiver.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Archiver.h; sourceTree = "<group>"; };
+		CE82CE9F245C67F5000C0512 /* Archiver.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Archiver.m; sourceTree = "<group>"; };
+		CE82CEA5245C6FFB000C0512 /* DiskBackedFile.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DiskBackedFile.m; sourceTree = "<group>"; };
+		CE82CEA6245C6FFB000C0512 /* DiskBackedFile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DiskBackedFile.h; sourceTree = "<group>"; };
+		CE82CEAA245C7007000C0512 /* JetsamTracking.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = JetsamTracking.m; sourceTree = "<group>"; };
+		CE82CEAB245C7007000C0512 /* JetsamTracking.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JetsamTracking.h; sourceTree = "<group>"; };
+		CE82CEAF245C7232000C0512 /* JetsamEvent.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = JetsamEvent.h; sourceTree = "<group>"; };
+		CE82CEB0245C7232000C0512 /* JetsamEvent.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = JetsamEvent.m; sourceTree = "<group>"; };
+		CE82CEB9245C753E000C0512 /* FileRegistry.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FileRegistry.h; sourceTree = "<group>"; };
+		CE82CEBA245C753E000C0512 /* FileRegistry.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FileRegistry.m; sourceTree = "<group>"; };
+		CE82CEBE245C757A000C0512 /* ExtensionContainerFile.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ExtensionContainerFile.h; sourceTree = "<group>"; };
+		CE82CEBF245C757A000C0512 /* ExtensionContainerFile.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ExtensionContainerFile.m; sourceTree = "<group>"; };
+		CE8ED8FB24630616009C3187 /* JetsamMetrics+Feedback.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "JetsamMetrics+Feedback.h"; sourceTree = "<group>"; };
+		CE8ED8FC24630616009C3187 /* JetsamMetrics+Feedback.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "JetsamMetrics+Feedback.m"; sourceTree = "<group>"; };
+		CE8ED90124633407009C3187 /* FileRegistryTest.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FileRegistryTest.m; sourceTree = "<group>"; };
+		CE8ED903246339BF009C3187 /* JetsamEventTest.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = JetsamEventTest.m; sourceTree = "<group>"; };
+		CEC69F49245CA5860032B74F /* ExtensionContainerFileTest.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = ExtensionContainerFileTest.m; path = "/Users/user/myforks/psiphon-ios-vpn/jetsam-mitigation/PsiphonTests/ExtensionContainerFileTest.m"; sourceTree = "<absolute>"; };
+		CEC8CD18245887BA00DF1010 /* RotatingFile.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RotatingFile.m; sourceTree = "<group>"; };
+		CEC8CD212459D63B00DF1010 /* RotatingFile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RotatingFile.h; sourceTree = "<group>"; };
 		DD100E19194B9A79F5D7DF55 /* Pods-PsiphonVPN.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PsiphonVPN.debug.xcconfig"; path = "Pods/Target Support Files/Pods-PsiphonVPN/Pods-PsiphonVPN.debug.xcconfig"; sourceTree = "<group>"; };
 		EDB109A2FBFB32D821FF121D /* Pods-Psiphon.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Psiphon.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Psiphon/Pods-Psiphon.debug.xcconfig"; sourceTree = "<group>"; };
 		EF639C2D1F8FCE2A009D6B42 /* PsiFeedbackLogger.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PsiFeedbackLogger.h; sourceTree = "<group>"; };
@@ -738,6 +819,13 @@
 				668AF9BF1E92CBD3008CAAAA /* NetworkExtension.framework in Frameworks */,
 				66094F7A1E8067520069EC4E /* PsiphonTunnel.framework in Frameworks */,
 				B1D9FF416DDCA97A40A325AA /* libPods-PsiphonVPN.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CE3B32302452069C0079C13F /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -856,6 +944,7 @@
 				EF6C1F501F59E46500709554 /* embedded_server_entries */,
 				EF6C1F511F59E46500709554 /* psiphon_config */,
 				EF90D78B204F22C900228A63 /* External */,
+				CE8ED9052463418A009C3187 /* JetsamTracking */,
 				EF90D79E204F22C900228A63 /* ReactiveExtensions */,
 				669A10B61F58A74E00EE831F /* Strings */,
 				EF90D793204F22C900228A63 /* Util */,
@@ -879,6 +968,8 @@
 				A8408AAD421C096147E3FC8B /* Strings.h */,
 				A84081E6B9D2FF5986AA1BF0 /* SubscriptionData.m */,
 				A84083E1E11F50B1DFC100CD /* SubscriptionData.h */,
+				CE82CEBE245C757A000C0512 /* ExtensionContainerFile.h */,
+				CE82CEBF245C757A000C0512 /* ExtensionContainerFile.m */,
 			);
 			path = Shared;
 			sourceTree = "<group>";
@@ -1141,6 +1232,7 @@
 				CE26FC8C1BBDC7B800B83375 /* Psiphon */,
 				CE26FCA41BBDC85900B83375 /* PsiphonVPN */,
 				4E0D88221FA06B2400ADB61E /* PsiphonUITests */,
+				CE3B32342452069C0079C13F /* PsiphonTests */,
 				CE26FC8B1BBDC7B800B83375 /* Products */,
 				668AF9B81E92CB60008CAAAA /* Frameworks */,
 				FF0DC6191C07A3FC5D6EE10A /* Pods */,
@@ -1154,6 +1246,7 @@
 				CE26FCA31BBDC85900B83375 /* PsiphonVPN.appex */,
 				4E0D88211FA06B2400ADB61E /* PsiphonUITests.xctest */,
 				52C8F0A1237C8ED600E5F9C0 /* PsiphonPlayground.framework */,
+				CE3B32332452069C0079C13F /* PsiphonTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1236,6 +1329,55 @@
 			path = PsiphonVPN;
 			sourceTree = "<group>";
 		};
+		CE3B322A2451FB600079C13F /* Math */ = {
+			isa = PBXGroup;
+			children = (
+				CE3B324124520ABF0079C13F /* RunningStat.h */,
+				CE3B324224520ABF0079C13F /* RunningStat.m */,
+				CE3B324724535F030079C13F /* stats.h */,
+				CE3B324824535F030079C13F /* stats.c */,
+			);
+			path = Math;
+			sourceTree = "<group>";
+		};
+		CE3B32342452069C0079C13F /* PsiphonTests */ = {
+			isa = PBXGroup;
+			children = (
+				CE3B324D24538D820079C13F /* Shared */,
+				CEC69F49245CA5860032B74F /* ExtensionContainerFileTest.m */,
+				CE3B32372452069C0079C13F /* Info.plist */,
+			);
+			path = PsiphonTests;
+			sourceTree = "<group>";
+		};
+		CE3B324D24538D820079C13F /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				CE8ED906246341D7009C3187 /* JetsamTracking */,
+				CE3B324E24538D930079C13F /* Util */,
+			);
+			name = Shared;
+			sourceTree = "<group>";
+		};
+		CE3B324E24538D930079C13F /* Util */ = {
+			isa = PBXGroup;
+			children = (
+				CE3B324F24538D9D0079C13F /* Math */,
+				CE82CE8F245A10E0000C0512 /* DelimitedFileTest.m */,
+				CE8ED90124633407009C3187 /* FileRegistryTest.m */,
+				CE82CE832459DFE1000C0512 /* RotatingFileTest.m */,
+			);
+			name = Util;
+			sourceTree = "<group>";
+		};
+		CE3B324F24538D9D0079C13F /* Math */ = {
+			isa = PBXGroup;
+			children = (
+				CE3B3245245343DF0079C13F /* RunningStatsTest.m */,
+			);
+			name = Math;
+			sourceTree = "<group>";
+		};
 		CE8026AB2448B990005AF848 /* LocalDatastore */ = {
 			isa = PBXGroup;
 			children = (
@@ -1243,6 +1385,8 @@
 				CE8026AD2448BA2E005AF848 /* LocalDataStoreKeys.m */,
 				CE8026B02448C1D6005AF848 /* PersistentSubsMetadata.h */,
 				CE8026A62448B7E6005AF848 /* PersistentSubsMetadata.m */,
+				CE8026B52448EC4D005AF848 /* PersistentJetsamData.h */,
+				CE8026B62448EC4D005AF848 /* PersistentJetsamData.m */,
 			);
 			path = LocalDatastore;
 			sourceTree = "<group>";
@@ -1255,6 +1399,31 @@
 				CE8026A32448B5B4005AF848 /* NSUserDefaults+KeyedDataStore.m */,
 			);
 			path = Utils;
+			sourceTree = "<group>";
+		};
+		CE8ED9052463418A009C3187 /* JetsamTracking */ = {
+			isa = PBXGroup;
+			children = (
+				CE3B3223244FA3150079C13F /* JetsamMetrics.h */,
+				CE3B3224244FA3150079C13F /* JetsamMetrics.m */,
+				CE8ED8FB24630616009C3187 /* JetsamMetrics+Feedback.h */,
+				CE8ED8FC24630616009C3187 /* JetsamMetrics+Feedback.m */,
+				CE82CEAF245C7232000C0512 /* JetsamEvent.h */,
+				CE82CEB0245C7232000C0512 /* JetsamEvent.m */,
+				CE82CEAB245C7007000C0512 /* JetsamTracking.h */,
+				CE82CEAA245C7007000C0512 /* JetsamTracking.m */,
+			);
+			path = JetsamTracking;
+			sourceTree = "<group>";
+		};
+		CE8ED906246341D7009C3187 /* JetsamTracking */ = {
+			isa = PBXGroup;
+			children = (
+				CE3B3253245390090079C13F /* JetsamMetricsTest.m */,
+				CE8ED903246339BF009C3187 /* JetsamEventTest.m */,
+				CE7182122460689A008F815A /* JetsamTrackingTest.m */,
+			);
+			name = JetsamTracking;
 			sourceTree = "<group>";
 		};
 		EF652CCF1F3521F8002AFB48 /* Supporting Files */ = {
@@ -1300,6 +1469,7 @@
 		EF90D793204F22C900228A63 /* Util */ = {
 			isa = PBXGroup;
 			children = (
+				CE3B322A2451FB600079C13F /* Math */,
 				CE6C3F6824366AE1007A17F0 /* ClientMetadata.h */,
 				CE6C3F6924366AE1007A17F0 /* ClientMetadata.m */,
 				521FD0FC219E0E0E00F748EC /* DebugUtils.h */,
@@ -1316,6 +1486,16 @@
 				EF90D798204F22C900228A63 /* DispatchUtils.m */,
 				9BFECCCF429898FD903B69A6 /* Nullity.m */,
 				9BFECEEB971749A4E9705B15 /* Nullity.h */,
+				CE82CE9E245C67F5000C0512 /* Archiver.h */,
+				CE82CE9F245C67F5000C0512 /* Archiver.m */,
+				CE82CE8A245A040A000C0512 /* DelimitedFile.h */,
+				CE82CE8B245A040A000C0512 /* DelimitedFile.m */,
+				CE82CEA6245C6FFB000C0512 /* DiskBackedFile.h */,
+				CE82CEA5245C6FFB000C0512 /* DiskBackedFile.m */,
+				CE82CEB9245C753E000C0512 /* FileRegistry.h */,
+				CE82CEBA245C753E000C0512 /* FileRegistry.m */,
+				CEC8CD212459D63B00DF1010 /* RotatingFile.h */,
+				CEC8CD18245887BA00DF1010 /* RotatingFile.m */,
 			);
 			path = Util;
 			sourceTree = "<group>";
@@ -1466,6 +1646,24 @@
 			productReference = CE26FCA31BBDC85900B83375 /* PsiphonVPN.appex */;
 			productType = "com.apple.product-type.app-extension";
 		};
+		CE3B32322452069C0079C13F /* PsiphonTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = CE3B323A2452069C0079C13F /* Build configuration list for PBXNativeTarget "PsiphonTests" */;
+			buildPhases = (
+				CE3B322F2452069C0079C13F /* Sources */,
+				CE3B32302452069C0079C13F /* Frameworks */,
+				CE3B32312452069C0079C13F /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				CE3B32392452069C0079C13F /* PBXTargetDependency */,
+			);
+			name = PsiphonTests;
+			productName = PsiphonTests;
+			productReference = CE3B32332452069C0079C13F /* PsiphonTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -1522,6 +1720,11 @@
 							};
 						};
 					};
+					CE3B32322452069C0079C13F = {
+						CreatedOnToolsVersion = 11.3.1;
+						ProvisioningStyle = Automatic;
+						TestTargetID = CE26FC891BBDC7B800B83375;
+					};
 				};
 			};
 			buildConfigurationList = CE26FC851BBDC7B700B83375 /* Build configuration list for PBXProject "Psiphon" */;
@@ -1574,6 +1777,7 @@
 				CE26FCA21BBDC85900B83375 /* PsiphonVPN */,
 				4E0D88201FA06B2400ADB61E /* PsiphonUITests */,
 				52C8F0A0237C8ED600E5F9C0 /* PsiphonPlayground */,
+				CE3B32322452069C0079C13F /* PsiphonTests */,
 			);
 		};
 /* End PBXProject section */
@@ -1621,6 +1825,13 @@
 				EF6C1F531F59E46500709554 /* embedded_server_entries in Resources */,
 				EF743FCB1F99549000AC89A2 /* subscriptionProductIds.plist in Resources */,
 				9BFECF65871BB6B522C33F1E /* UserDefaults.h in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CE3B32312452069C0079C13F /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1765,6 +1976,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				52A2465E239081C100A01FF1 /* AppState.swift in Sources */,
+				CE82CEC0245C757A000C0512 /* ExtensionContainerFile.m in Sources */,
 				EF90D7A6204F22C900228A63 /* NSDate+Comparator.m in Sources */,
 				4EB846422151830600687344 /* AvailableServerRegions.m in Sources */,
 				5246800922D51CE4009AEC6E /* PsiCashBalanceView.swift in Sources */,
@@ -1780,10 +1992,13 @@
 				4E0DCB1A1F28481E00495781 /* PsiphonDataSharedDB.m in Sources */,
 				4435CC271F70566000F3A809 /* SettingsViewController.m in Sources */,
 				8D417EB72415633300FEE587 /* IAPReducer.swift in Sources */,
+				CE3B325224538DE00079C13F /* RunningStat.m in Sources */,
+				CE8ED8FD24630616009C3187 /* JetsamMetrics+Feedback.m in Sources */,
 				EF4F1F3D206055F7006A40A1 /* RACSignal+Operations2.m in Sources */,
 				445F24F020E1A5BA00D004E9 /* xer_encoder.c in Sources */,
 				445F24D520E1A5BA00D004E9 /* constr_TYPE.c in Sources */,
 				445F24E220E1A5BA00D004E9 /* der_encoder.c in Sources */,
+				CE82CE93245A1232000C0512 /* DelimitedFile.m in Sources */,
 				445F24DC20E1A5BA00D004E9 /* NativeInteger.c in Sources */,
 				521FD0F3219E0D5600F748EC /* DebugTextViewController.m in Sources */,
 				8D7E9B9F2425E053006F3A2F /* Animations.swift in Sources */,
@@ -1820,6 +2035,7 @@
 				9BFECFEB3BC9F10542C1A416 /* PsiphonConfigUserDefaults.m in Sources */,
 				4E5263CD2072984D0021FEF5 /* IAPViewController.m in Sources */,
 				445F24D720E1A5BA00D004E9 /* per_support.c in Sources */,
+				CE82CEA0245C67F5000C0512 /* Archiver.m in Sources */,
 				EF90D7AA204F22C900228A63 /* NSError+Convenience.m in Sources */,
 				52DF5E9823CE5A8300A1B067 /* ValuePaths.swift in Sources */,
 				4E5BD4F52061982300AD4724 /* FeedbackManager.m in Sources */,
@@ -1832,6 +2048,7 @@
 				EF90D7A8204F22C900228A63 /* DispatchUtils.m in Sources */,
 				445F24D820E1A5BA00D004E9 /* OBJECT_IDENTIFIER.c in Sources */,
 				445F24D920E1A5BA00D004E9 /* BIT_STRING.c in Sources */,
+				CE82CEAC245C7007000C0512 /* JetsamTracking.m in Sources */,
 				445F24E820E1A5BA00D004E9 /* NativeEnumerated.c in Sources */,
 				8D417EB324148C1E00FEE587 /* URLHandler.swift in Sources */,
 				445F24E320E1A5BA00D004E9 /* OCTET_STRING.c in Sources */,
@@ -1853,7 +2070,9 @@
 				52C8F0AB237CA26200E5F9C0 /* ImageViewBuidler.swift in Sources */,
 				445F24F620E1A85D00D004E9 /* UTF8String.c in Sources */,
 				521FD0F0219E0D5600F748EC /* DebugLogViewController.m in Sources */,
+				CE3B3225244FA3150079C13F /* JetsamMetrics.m in Sources */,
 				521FD0F1219E0D5600F748EC /* DebugToolboxViewController.m in Sources */,
+				CEC8CD19245887BA00DF1010 /* RotatingFile.m in Sources */,
 				445F24ED20E1A5BA00D004E9 /* ber_tlv_tag.c in Sources */,
 				4E5263B7207290360021FEF5 /* EmbeddedServerEntriesHelpers.c in Sources */,
 				4E10920820F3DA190033114B /* AppInfo.m in Sources */,
@@ -1916,6 +2135,7 @@
 				8D7E9B9D2425DF42006F3A2F /* AnimatedUIView.swift in Sources */,
 				A84080E163F24876A1476544 /* VPNStartAndStopButton.m in Sources */,
 				8D417ED9241844FA00FEE587 /* FloatingPoint+Additions.swift in Sources */,
+				CE82CEA7245C6FFB000C0512 /* DiskBackedFile.m in Sources */,
 				A840875B190F7666A1BD98E5 /* UIView+AutoLayoutViewGroup.m in Sources */,
 				A84088DD7FBB838689BC1FCC /* OnboardingViewController.m in Sources */,
 				A8408B83167EBE21E215C471 /* OnboardingView.m in Sources */,
@@ -1934,6 +2154,7 @@
 				52B3C54C23E0E895003F6B12 /* ButtonBuilder.swift in Sources */,
 				8D417E9D2411A0C200FEE587 /* PaymentQueue.swift in Sources */,
 				A8408D8C16D136075590193C /* AppUpgrade.m in Sources */,
+				CE82CEB1245C7232000C0512 /* JetsamEvent.m in Sources */,
 				A8408692D005E8599267522E /* UIView+Additions.m in Sources */,
 				A84087AFA5806D689C3BF6D2 /* PickerViewController.m in Sources */,
 				52A2467123A176BA00A01FF1 /* PsiCashPurchasingAlertViewBuilder.swift in Sources */,
@@ -1948,6 +2169,7 @@
 				A840849074861D633B3EB4D1 /* AppEvent.m in Sources */,
 				A84080E9FC63E29F71A79A63 /* RelaySubject.m in Sources */,
 				8D9E602C24364EE6003A46D8 /* TunnelProviderManager.swift in Sources */,
+				CE82CEBB245C753E000C0512 /* FileRegistry.m in Sources */,
 				A840803A0733D9FCA5410796 /* ActivityIndicatorRoyalSkyButton.m in Sources */,
 				A84084F47D4EA8D2B91E6609 /* SubscriptionData.m in Sources */,
 				52467FF922CE77A1009AEC6E /* Foundation+Additions.swift in Sources */,
@@ -1958,21 +2180,26 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CE82CEBC245C753E000C0512 /* FileRegistry.m in Sources */,
+				CE8026B72448EC4D005AF848 /* PersistentJetsamData.m in Sources */,
 				EF90D7AC204F22E300228A63 /* RACSignal+Operations2.m in Sources */,
 				EFC2F5CC20226835007B52F9 /* PsiphonConfigReader.m in Sources */,
 				CE6C3F6A24366AE1007A17F0 /* ClientMetadata.m in Sources */,
 				EF90D7B1204F231E00228A63 /* timestamp_tm.c in Sources */,
 				CE8026A42448B5B4005AF848 /* NSUserDefaults+KeyedDataStore.m in Sources */,
 				EF90D7B3204F232300228A63 /* timestamp_parse.c in Sources */,
+				CE82CEA8245C6FFB000C0512 /* DiskBackedFile.m in Sources */,
 				EF90D7B8204F236400228A63 /* NSError+Convenience.m in Sources */,
 				EF90D7B5204F234700228A63 /* NSDate+PSIDateExtension.m in Sources */,
 				44A0CAEE1FCCCDEC00859DB3 /* SubscriptionVerifierService.m in Sources */,
+				CE3B325124538DD10079C13F /* RunningStat.m in Sources */,
 				EF652CDA1F352271002AFB48 /* PacketTunnelProvider.m in Sources */,
 				521FD0FF219E0E2600F748EC /* AppStats.m in Sources */,
 				4E0DCB1E1F2855FC00495781 /* PsiphonDataSharedDB.m in Sources */,
 				4E10920920F3DC670033114B /* AppInfo.m in Sources */,
 				9BFECD1880B51B0E2EAEFF1F /* Notifier.m in Sources */,
 				EF90D7AF204F231900228A63 /* timestamp_valid.c in Sources */,
+				CE82CE92245A1232000C0512 /* DelimitedFile.m in Sources */,
 				EF639C301F8FCE37009D6B42 /* PsiFeedbackLogger.m in Sources */,
 				CE8026A72448B7E6005AF848 /* PersistentSubsMetadata.m in Sources */,
 				EF90D7B6204F235100228A63 /* DispatchUtils.m in Sources */,
@@ -1980,19 +2207,48 @@
 				9BFECF8895D5FE1940A6F700 /* PsiphonConfigUserDefaults.m in Sources */,
 				EF90D7B7204F235800228A63 /* FileUtils.m in Sources */,
 				EFC2F5B620226758007B52F9 /* PacketTunnelUtils.m in Sources */,
+				CE82CEB2245C7232000C0512 /* JetsamEvent.m in Sources */,
+				CE82CEAD245C7007000C0512 /* JetsamTracking.m in Sources */,
 				EF90D7B0204F231B00228A63 /* timestamp_compare.c in Sources */,
 				9BFECC62159FBEAA1A69F4F9 /* BasePacketTunnelProvider.m in Sources */,
+				CE3B3226244FA3150079C13F /* JetsamMetrics.m in Sources */,
 				521FD0FE219E0E1900F748EC /* AppProfiler.m in Sources */,
 				CE8026AE2448BA2E005AF848 /* LocalDataStoreKeys.m in Sources */,
 				EF90D7B4204F234100228A63 /* NSDate+Comparator.m in Sources */,
+				CEC8CD1A245887BA00DF1010 /* RotatingFile.m in Sources */,
 				9BFECEA225F023F895CC8DA1 /* Authorization.m in Sources */,
 				9BFECF9F760F1A93A8933089 /* Nullity.m in Sources */,
 				9BFEC5C256EBC72398FAE8D8 /* UnionSerialQueue.m in Sources */,
+				CE82CEC1245C757A000C0512 /* ExtensionContainerFile.m in Sources */,
 				521FD100219E0E3800F748EC /* DebugUtils.m in Sources */,
 				A8408F5F45CDBDF42701063E /* Strings.m in Sources */,
 				A84081FD0C1339DE954DAB7D /* RelaySubject.m in Sources */,
+				CE82CEA1245C67F5000C0512 /* Archiver.m in Sources */,
 				A84082D8D7BF55D509C4E5C5 /* SubscriptionData.m in Sources */,
 				A84084F82AEF06CC1B8037DD /* MutableSubscriptionData.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CE3B322F2452069C0079C13F /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CE7182132460689A008F815A /* JetsamTrackingTest.m in Sources */,
+				CE8ED90224633407009C3187 /* FileRegistryTest.m in Sources */,
+				CE82CE95245A12B1000C0512 /* DelimitedFile.m in Sources */,
+				CE82CEAE245C7007000C0512 /* JetsamTracking.m in Sources */,
+				CE3B3254245390090079C13F /* JetsamMetricsTest.m in Sources */,
+				CE3B324924535F030079C13F /* stats.c in Sources */,
+				CE3B324424532F370079C13F /* NSError+Convenience.m in Sources */,
+				CE82CEC2245C757A000C0512 /* ExtensionContainerFile.m in Sources */,
+				CEC8CD1B245887BA00DF1010 /* RotatingFile.m in Sources */,
+				CEC69F4A245CA5860032B74F /* ExtensionContainerFileTest.m in Sources */,
+				CE82CE842459DFE1000C0512 /* RotatingFileTest.m in Sources */,
+				CE82CEA9245C6FFB000C0512 /* DiskBackedFile.m in Sources */,
+				CE8ED904246339BF009C3187 /* JetsamEventTest.m in Sources */,
+				CE82CE90245A10E0000C0512 /* DelimitedFileTest.m in Sources */,
+				CE82CEA2245C67F5000C0512 /* Archiver.m in Sources */,
+				CE3B3246245343DF0079C13F /* RunningStatsTest.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2008,6 +2264,11 @@
 			isa = PBXTargetDependency;
 			target = CE26FCA21BBDC85900B83375 /* PsiphonVPN */;
 			targetProxy = CE26FCAA1BBDC85900B83375 /* PBXContainerItemProxy */;
+		};
+		CE3B32392452069C0079C13F /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = CE26FC891BBDC7B800B83375 /* Psiphon */;
+			targetProxy = CE3B32382452069C0079C13F /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -2065,9 +2326,10 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = Q6HLNEX92A;
+				DEVELOPMENT_TEAM = "";
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
@@ -2078,6 +2340,8 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.psiphon.PsiphonUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*]" = "";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -2094,9 +2358,10 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = Q6HLNEX92A;
+				DEVELOPMENT_TEAM = "";
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				INFOPLIST_FILE = PsiphonUITests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 11.1;
@@ -2308,6 +2573,15 @@
 				DEVELOPMENT_TEAM = Q6HLNEX92A;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"COCOAPODS=1",
+					"$(inherited)",
+					"PB_FIELD_32BIT=1",
+					"PB_NO_PACKED_STRUCTS=1",
+					"PB_ENABLE_MALLOC=1",
+					"TARGET_IS_CONTAINER=1",
+				);
 				INFOPLIST_FILE = Psiphon/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
@@ -2339,6 +2613,15 @@
 				DEVELOPMENT_TEAM = "";
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"COCOAPODS=1",
+					"$(inherited)",
+					"PB_FIELD_32BIT=1",
+					"PB_NO_PACKED_STRUCTS=1",
+					"PB_ENABLE_MALLOC=1",
+					"TARGET_IS_CONTAINER=1",
+				);
 				INFOPLIST_FILE = Psiphon/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
@@ -2414,6 +2697,73 @@
 			};
 			name = Release;
 		};
+		CE3B323B2452069C0079C13F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = "";
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"TARGET_IS_TEST=1",
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				INFOPLIST_FILE = PsiphonTests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.psiphon.PsiphonTests.PsiphonTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*]" = "";
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Psiphon.app/Psiphon";
+			};
+			name = Debug;
+		};
+		CE3B323C2452069C0079C13F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = "";
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_PREPROCESSOR_DEFINITIONS = "TARGET_IS_TEST=1";
+				INFOPLIST_FILE = PsiphonTests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.psiphon.PsiphonTests.PsiphonTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*]" = "";
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Psiphon.app/Psiphon";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -2458,6 +2808,15 @@
 			buildConfigurations = (
 				CE26FCAE1BBDC85900B83375 /* Debug */,
 				CE26FCAF1BBDC85900B83375 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		CE3B323A2452069C0079C13F /* Build configuration list for PBXNativeTarget "PsiphonTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CE3B323B2452069C0079C13F /* Debug */,
+				CE3B323C2452069C0079C13F /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

@@ -17,12 +17,23 @@
  *
  */
 
-#import "LocalDataStoreKeys.h"
+#import <Foundation/Foundation.h>
 
-// See comments in header.
+NS_ASSUME_NONNULL_BEGIN
 
-KeyedDataStoreKey const LastAuthIDKey = @"LastAuthID";
-KeyedDataStoreKey const LastAuthAccessTypeKey = @"LastAuthAccessType";
+/// Represents a jetsam event in the extension.
+@interface JetsamEvent : NSObject <NSCoding, NSSecureCoding> 
 
-KeyedDataStoreKey const ExtensionStartTimeKey = @"PersistentJetsamData.ExtensionStartTimeNSDateKey";
-KeyedDataStoreKey const TickerTimeKey = @"PersistentJetsamData.TickerTimeNSDateKey";
+@property (readonly, nonatomic, strong) NSString *appVersion;
+@property (readonly, nonatomic, assign) NSTimeInterval runningTime;
+@property (readonly, nonatomic, assign) NSTimeInterval jetsamDate; // epoch time
+
++ (instancetype)jetsamEventWithAppVersion:(NSString*)appVersion
+                              runningTime:(NSTimeInterval)runningTime
+                               jetsamDate:(NSTimeInterval)jetsamDate;
+
+- (BOOL)isEqualToJetsamEvent:(JetsamEvent*)jetsamEvent;
+
+@end
+
+NS_ASSUME_NONNULL_END

@@ -21,6 +21,8 @@
 #import "AppDelegate.h"
 #import "DispatchUtils.h"
 #import "FeedbackUpload.h"
+#import "JetsamMetrics+Feedback.h"
+#import "JetsamTracking.h"
 #import "MBProgressHUD.h"
 #import "PsiFeedbackLogger.h"
 #import "PsiphonClientCommonLibraryHelpers.h"
@@ -32,6 +34,8 @@
 #import "AppObservables.h"
 #import <PsiphonClientCommonLibrary/PsiphonData.h>
 #import "Psiphon-Swift.h"
+
+PsiFeedbackLogType const FeedbackUploadLogType = @"FeedbackUpload";
 
 @implementation FeedbackManager {
     MBProgressHUD *uploadProgressAlert;
@@ -48,7 +52,7 @@
         [self uploadFailed];
     }
     
-    [PsiFeedbackLogger logNoticeWithType:@"FeedbackUpload" message:message timestamp:timestamp];
+    [PsiFeedbackLogger logNoticeWithType:FeedbackUploadLogType message:message timestamp:timestamp];
 }
 
 /*!
@@ -137,8 +141,38 @@
                 // Corrupt settings file. Return early.
                 return;
             }
-            
+
+            // Add jetsam metrics log.
+            // Note: get the log first so any errors are logged and present in the current feedback.
+
+            NSString *jetsamMetricsLog = nil;
+            PsiphonDataSharedDB *sharedDB = [[PsiphonDataSharedDB alloc] initForAppGroupIdentifier:APP_GROUP_IDENTIFIER];
+
+            NSError *err;
+            JetsamMetrics *metrics = [ContainerJetsamTracking getMetricsFromFilePath:[sharedDB extensionJetsamMetricsFilePath]
+                                                                 withRotatedFilepath:[sharedDB extensionJetsamMetricsRotatedFilePath]
+                                                                    registryFilepath:[sharedDB containerJetsamMetricsRegistryFilePath]
+                                                                       readChunkSize:8000
+                                                                               error:&err];
+            if (err != nil) {
+                [PsiFeedbackLogger errorWithType:FeedbackUploadLogType
+                                         message:@"Failed to get jetsam metrics"
+                                          object:err];
+            }
+            if (metrics != nil) {
+                jetsamMetricsLog = [metrics logForFeedback:&err];
+                if (err != nil) {
+                    [PsiFeedbackLogger errorWithType:FeedbackUploadLogType
+                                             message:@"Failed to get jetsam metrics log for feedback"
+                                              object:err];
+                }
+            }
+
             NSMutableArray<DiagnosticEntry *> *diagnosticEntries = [[NSMutableArray alloc] initWithArray:[[[PsiphonDataSharedDB alloc] initForAppGroupIdentifier:APP_GROUP_IDENTIFIER] getAllLogs]];
+
+            if (jetsamMetricsLog != nil) {
+                [diagnosticEntries addObject:[[DiagnosticEntry alloc] init:jetsamMetricsLog andTimestamp:[NSDate date]]];
+            }
 
             [diagnosticEntries addObject: [[DiagnosticEntry alloc] init:appStateEntry
                                                            andTimestamp:[NSDate date]]];
@@ -155,17 +189,17 @@
                 [strongSelf->inactiveTunnel sendFeedback:jsonString publicKey:pubKey uploadServer:uploadServer uploadServerHeaders:uploadServerHeaders];
             };
             
-            NSError *err = [FeedbackUpload generateAndSendFeedback:selectedThumbIndex
-                                                         buildInfo:[PsiphonTunnel getBuildInfo]
-                                                          comments:comments
-                                                             email:email
-                                                sendDiagnosticInfo:uploadDiagnostics
-                                                 withPsiphonConfig:psiphonConfig
-                                                withClientPlatform:@"ios-vpn"
-                                                withConnectionType:[self getConnectionType]
-                                                      isJailbroken:[JailbreakCheck isDeviceJailbroken]
-                                               sendFeedbackHandler:sendFeedbackHandler
-                                                 diagnosticEntries:diagnosticEntries];
+            err = [FeedbackUpload generateAndSendFeedback:selectedThumbIndex
+                                                buildInfo:[PsiphonTunnel getBuildInfo]
+                                                 comments:comments
+                                                    email:email
+                                       sendDiagnosticInfo:uploadDiagnostics
+                                        withPsiphonConfig:psiphonConfig
+                                       withClientPlatform:@"ios-vpn"
+                                       withConnectionType:[self getConnectionType]
+                                             isJailbroken:[JailbreakCheck isDeviceJailbroken]
+                                      sendFeedbackHandler:sendFeedbackHandler
+                                        diagnosticEntries:diagnosticEntries];
             
             if (err != nil) {
                 // Feedback upload was never started

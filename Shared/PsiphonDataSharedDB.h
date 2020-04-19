@@ -232,22 +232,23 @@ NS_ASSUME_NONNULL_BEGIN
 
 #pragma mark - Jetsam counter
 
-#if TARGET_IS_EXTENSION
+- (NSString*)extensionJetsamMetricsFilePath;
 
-- (void)incrementJetsamCounter;
+- (NSString*)extensionJetsamMetricsRotatedFilePath;
+
+#if TARGET_IS_CONTAINER
+
+- (NSString*)containerJetsamMetricsRegistryFilePath;
+
+#endif
+
+#if TARGET_IS_EXTENSION
 
 - (void)setExtensionJetsammedBeforeStopFlag:(BOOL)crashed;
 
 - (BOOL)getExtensionJetsammedBeforeStopFlag;
 
-- (NSInteger)getJetsamCounter;
-
-#else
-
-- (void)resetJetsamCounter;
-
 #endif
-
 
 #pragma mark - Debug Prefernces
 

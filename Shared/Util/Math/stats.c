@@ -17,12 +17,32 @@
  *
  */
 
-#import "LocalDataStoreKeys.h"
+#include "stats.h"
+#import <math.h>
 
-// See comments in header.
+// Proposal: in the future return NAN if vals is
+// NULL or zero length.
+double double_mean(double *vals, int length) {
+    double runningTotal = 0.0;
 
-KeyedDataStoreKey const LastAuthIDKey = @"LastAuthID";
-KeyedDataStoreKey const LastAuthAccessTypeKey = @"LastAuthAccessType";
+    for (int i = 0; i < length; i++) {
+        runningTotal += vals[i];
+    }
 
-KeyedDataStoreKey const ExtensionStartTimeKey = @"PersistentJetsamData.ExtensionStartTimeNSDateKey";
-KeyedDataStoreKey const TickerTimeKey = @"PersistentJetsamData.TickerTimeNSDateKey";
+    return runningTotal / length;
+}
+
+// Proposal: in the future return NAN if vals is
+// NULL or zero length.
+double double_stdev(double *vals, int length) {
+    double mean = double_mean(vals, length);
+    double sumOfSquaredDifferences = 0.0;
+
+    for (int i = 0; i < length; i++) {
+        double difference = vals[i] - mean;
+        sumOfSquaredDifferences += difference * difference;
+    }
+
+    return sqrt(sumOfSquaredDifferences / (length - 1));
+}
+

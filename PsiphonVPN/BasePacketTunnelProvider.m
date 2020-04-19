@@ -19,7 +19,10 @@
 
 #import <Foundation/Foundation.h>
 #import "BasePacketTunnelProvider.h"
+#import "AppInfo.h"
+#import "JetsamTracking.h"
 #import "SharedConstants.h"
+#import "PersistentJetsamData.h"
 #import "PsiFeedbackLogger.h"
 #import "FileUtils.h"
 #import "RACReplaySubject.h"
@@ -28,9 +31,13 @@
 #import "PsiphonDataSharedDB.h"
 #import "Logging.h"
 
+#import "NSDate+PSIDateExtension.h"
+
 NSErrorDomain _Nonnull const BasePsiphonTunnelErrorDomain = @"BasePsiphonTunnelErrorDomain";
 
 PsiFeedbackLogType const BasePacketTunnelProviderLogType = @"BasePacketTunnelProvider";
+
+PsiFeedbackLogType const JetsamMetricsLogType = @"JetsamMetrics";
 
 @interface BasePacketTunnelProvider ()
 
@@ -77,10 +84,53 @@ PsiFeedbackLogType const BasePacketTunnelProviderLogType = @"BasePacketTunnelPro
         [self.sharedDB setExtensionJetsammedBeforeStopFlag:TRUE];
 
         if (previouslyJetsammed) {
-            [self.sharedDB incrementJetsamCounter];
-            [PsiFeedbackLogger errorWithType:BasePacketTunnelProviderLogType
-                                        json:@{@"JetsamCount": @([self.sharedDB getJetsamCounter])}];
+
+            NSDate *previousStartTime = [PersistentJetsamData extensionStartTime];
+            if (previousStartTime) {
+
+                NSDate *lastTickerTime = [PersistentJetsamData tickerTime];
+                if (lastTickerTime == nil) {
+                    // No previous ticker time. Set to now.
+                    lastTickerTime = NSDate.date;
+                    [PsiFeedbackLogger errorWithType:JetsamMetricsLogType
+                                             message:@"No previous ticker time."];
+                }
+
+                NSTimeInterval previousUptime = [lastTickerTime timeIntervalSinceDate:previousStartTime];
+                if (previousUptime >= 0) {
+
+                    JetsamEvent *jetsam = [JetsamEvent jetsamEventWithAppVersion:AppInfo.appVersion
+                                                                     runningTime:previousUptime
+                                                                      jetsamDate:[NSDate.date timeIntervalSince1970]];
+
+                    NSError *err;
+                    [ExtensionJetsamTracking logJetsamEvent:jetsam
+                                                 toFilepath:[self.sharedDB extensionJetsamMetricsFilePath]
+                                        withRotatedFilepath:[self.sharedDB extensionJetsamMetricsRotatedFilePath]
+                                           maxFilesizeBytes:1e6
+                                                      error:&err];
+                    if (err != nil) {
+                        [PsiFeedbackLogger errorWithType:JetsamMetricsLogType
+                                                 message:@"Error logging jetsam"
+                                                  object:err];
+                    }
+                } else {
+                    [PsiFeedbackLogger errorWithType:JetsamMetricsLogType
+                                             message:[NSString stringWithFormat:@"Negative uptime value: %f", previousUptime]];
+                }
+            } else {
+                // Do not log Jetsam event since the previous start time cannot be determined.
+            }
         }
+
+        [PersistentJetsamData setExtensionStartTimeToNow];
+
+        // Start timer which tracks extension uptime.
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [NSTimer scheduledTimerWithTimeInterval:5 repeats:YES block:^(NSTimer * _Nonnull timer) {
+                [PersistentJetsamData setTickerTimeToNow];
+            }];
+        });
 
         // Creates boot test file used for testing if device is unlocked since boot.
         // A boot test file is a file with protection type NSFileProtectionCompleteUntilFirstUserAuthentication.

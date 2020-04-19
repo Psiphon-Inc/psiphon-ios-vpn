@@ -17,12 +17,31 @@
  *
  */
 
+#import "PersistentJetsamData.h"
+#import "KeyedDataStore.h"
 #import "LocalDataStoreKeys.h"
+#import "NSUserDefaults+KeyedDataStore.h"
 
-// See comments in header.
+@implementation PersistentJetsamData
 
-KeyedDataStoreKey const LastAuthIDKey = @"LastAuthID";
-KeyedDataStoreKey const LastAuthAccessTypeKey = @"LastAuthAccessType";
++ (id<KeyedDataStore>)defaultDataStore {
+    return NSUserDefaults.standardUserDefaults;
+}
 
-KeyedDataStoreKey const ExtensionStartTimeKey = @"PersistentJetsamData.ExtensionStartTimeNSDateKey";
-KeyedDataStoreKey const TickerTimeKey = @"PersistentJetsamData.TickerTimeNSDateKey";
++ (NSDate*)extensionStartTime {
+    return [PersistentJetsamData.defaultDataStore lookup:ExtensionStartTimeKey];
+}
+
++ (void)setExtensionStartTimeToNow {
+    [PersistentJetsamData.defaultDataStore insert:[NSDate date] key:ExtensionStartTimeKey];
+}
+
++ (NSDate*)tickerTime {
+    return [PersistentJetsamData.defaultDataStore lookup:TickerTimeKey];
+}
+
++ (void)setTickerTimeToNow {
+    [PersistentJetsamData.defaultDataStore insert:[NSDate date] key:TickerTimeKey];
+}
+
+@end

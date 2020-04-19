@@ -28,20 +28,20 @@
 }
 
 + (NSString*)lastAuthID {
-    return [PersistentSubsMetadata lastAuthID:[PersistentSubsMetadataUserDefaults defaultDataStore]];
+    return [PersistentSubsMetadata lastAuthID:PersistentSubsMetadataUserDefaults.defaultDataStore];
 }
 
 + (void)setLastAuthID:(NSString*)lastAuthID {
-    [PersistentSubsMetadata setLastAuthID:[PersistentSubsMetadataUserDefaults defaultDataStore]
+    [PersistentSubsMetadata setLastAuthID:PersistentSubsMetadataUserDefaults.defaultDataStore
                      lastAuthID:lastAuthID];
 }
 
 + (NSString*)lastAuthAccessType {
-    return [PersistentSubsMetadata lastAuthAccessType:[PersistentSubsMetadataUserDefaults defaultDataStore]];
+    return [PersistentSubsMetadata lastAuthAccessType:PersistentSubsMetadataUserDefaults.defaultDataStore];
 }
 
 + (void)setLastAuthAccessType:(NSString*)lastAuthAccessType {
-    [PersistentSubsMetadata setLastAuthAccessType:[PersistentSubsMetadataUserDefaults defaultDataStore]
+    [PersistentSubsMetadata setLastAuthAccessType:PersistentSubsMetadataUserDefaults.defaultDataStore
                          lastAccessType:lastAuthAccessType];
 }
 

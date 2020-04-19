@@ -17,12 +17,24 @@
  *
  */
 
-#import "LocalDataStoreKeys.h"
+#import <Foundation/Foundation.h>
+#import "JetsamMetrics.h"
 
-// See comments in header.
+NS_ASSUME_NONNULL_BEGIN
 
-KeyedDataStoreKey const LastAuthIDKey = @"LastAuthID";
-KeyedDataStoreKey const LastAuthAccessTypeKey = @"LastAuthAccessType";
+FOUNDATION_EXPORT NSErrorDomain const JetsamMetrics_FeedbackErrorDomain;
 
-KeyedDataStoreKey const ExtensionStartTimeKey = @"PersistentJetsamData.ExtensionStartTimeNSDateKey";
-KeyedDataStoreKey const TickerTimeKey = @"PersistentJetsamData.TickerTimeNSDateKey";
+typedef NS_ERROR_ENUM(JetsamMetrics_FeedbackErrorDomain, JetsamMetrics_FeedbackErrorCode) {
+    JetsamMetrics_FeedbackErrorInvalidDictForJSON = 1,
+    JetsamMetrics_FeedbackErrorNestedDictNil = 2,
+    JetsamMetrics_FeedbackErrorFailedToSerializeJSON = 3,
+};
+
+/// Adds methods which structure the underlying data for submission with feedback.
+@interface JetsamMetrics (Feedback)
+
+- (nullable NSString *)logForFeedback:(NSError * _Nullable *)outError;
+
+@end
+
+NS_ASSUME_NONNULL_END
