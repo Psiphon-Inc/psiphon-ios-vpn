@@ -59,12 +59,6 @@ UserDefaultsKey const SubscriptionVerificationDictionaryKey = @"subscription_ver
  */
 UserDefaultsKey const SharedDataExtensionCrashedBeforeStopBoolKey = @"PsiphonDataSharedDB.ExtensionCrashedBeforeStopBoolKey";
 
-/**
- * Key for Jetsam counter.
- * @note This counter is reset on every app version upgrade.
- */
-UserDefaultsKey const SharedDataExtensionJetsamCounterIntegerKey = @"PsiphonDataSharedDB.ExtensionJetsamCounterIntKey";
-
 #if DEBUG
 
 UserDefaultsKey const DebugMemoryProfileBoolKey = @"PsiphonDataSharedDB.DebugMemoryProfilerBoolKey";
@@ -470,10 +464,23 @@ UserDefaultsKey const DebugPsiphonConnectionStateStringKey = @"PsiphonDataShared
 
 #pragma mark - Jetsam counter
 
-- (void)incrementJetsamCounter {
-    NSInteger count = [sharedDefaults integerForKey:SharedDataExtensionJetsamCounterIntegerKey];
-    [sharedDefaults setInteger:(count + 1) forKey:SharedDataExtensionJetsamCounterIntegerKey];
+- (NSString*)extensionJetsamMetricsFilePath {
+    return [[[[NSFileManager defaultManager] containerURLForSecurityApplicationGroupIdentifier:appGroupIdentifier] path] stringByAppendingPathComponent:@"extension.jetsams"];
 }
+
+- (NSString*)extensionJetsamMetricsRotatedFilePath {
+    return [[[[NSFileManager defaultManager] containerURLForSecurityApplicationGroupIdentifier:appGroupIdentifier] path] stringByAppendingPathComponent:@"extension.jetsams.1"];
+}
+
+#if TARGET_IS_CONTAINER
+
+- (NSString*)containerJetsamMetricsRegistryFilePath {
+    return [[[[NSFileManager defaultManager] containerURLForSecurityApplicationGroupIdentifier:appGroupIdentifier] path] stringByAppendingPathComponent:@"container.jetsam.registry"];
+}
+
+#endif
+
+#if TARGET_IS_EXTENSION
 
 - (void)setExtensionJetsammedBeforeStopFlag:(BOOL)crashed {
     [sharedDefaults setBool:crashed forKey:SharedDataExtensionCrashedBeforeStopBoolKey];
@@ -483,14 +490,7 @@ UserDefaultsKey const DebugPsiphonConnectionStateStringKey = @"PsiphonDataShared
     return [sharedDefaults boolForKey:SharedDataExtensionCrashedBeforeStopBoolKey];
 }
 
-- (NSInteger)getJetsamCounter {
-    return [sharedDefaults integerForKey:SharedDataExtensionJetsamCounterIntegerKey];
-}
-
-- (void)resetJetsamCounter {
-    [sharedDefaults setInteger:0 forKey:SharedDataExtensionJetsamCounterIntegerKey];
-}
-
+#endif
 
 #pragma mark - Debug Preferences
 

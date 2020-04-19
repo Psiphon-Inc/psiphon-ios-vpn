@@ -2,7 +2,7 @@ PODS:
   - CustomIOSAlertView (0.9.5)
   - Google-Mobile-Ads-SDK (7.53.1):
     - GoogleAppMeasurement (~> 6.0)
-  - GoogleAppMeasurement (6.3.1):
+  - GoogleAppMeasurement (6.4.1):
     - GoogleUtilities/AppDelegateSwizzler (~> 6.0)
     - GoogleUtilities/MethodSwizzler (~> 6.0)
     - GoogleUtilities/Network (~> 6.0)
@@ -36,19 +36,19 @@ PODS:
     - Google-Mobile-Ads-SDK (= 7.53.1)
     - mopub-ios-sdk/Core (~> 5.8)
     - mopub-ios-sdk/NativeAds (~> 5.8)
-  - mopub-ios-sdk (5.11.0):
-    - mopub-ios-sdk/MoPubSDK (= 5.11.0)
-  - mopub-ios-sdk/Avid (5.11.0):
+  - mopub-ios-sdk (5.12.0):
+    - mopub-ios-sdk/MoPubSDK (= 5.12.0)
+  - mopub-ios-sdk/Avid (5.12.0):
     - mopub-ios-sdk/Core
-  - mopub-ios-sdk/Core (5.11.0)
-  - mopub-ios-sdk/Moat (5.11.0):
+  - mopub-ios-sdk/Core (5.12.0)
+  - mopub-ios-sdk/Moat (5.12.0):
     - mopub-ios-sdk/Core
-  - mopub-ios-sdk/MoPubSDK (5.11.0):
+  - mopub-ios-sdk/MoPubSDK (5.12.0):
     - mopub-ios-sdk/Avid
     - mopub-ios-sdk/Core
     - mopub-ios-sdk/Moat
     - mopub-ios-sdk/NativeAds
-  - mopub-ios-sdk/NativeAds (5.11.0):
+  - mopub-ios-sdk/NativeAds (5.12.0):
     - mopub-ios-sdk/Core
   - nanopb (0.3.9011):
     - nanopb/decode (= 0.3.9011)
@@ -124,12 +124,12 @@ CHECKOUT OPTIONS:
 SPEC CHECKSUMS:
   CustomIOSAlertView: cc4fa8e36219be3fd5ebcd40789f5b4aaae0f38e
   Google-Mobile-Ads-SDK: fac081606dbd438d8db57198b83ba8b5f875a601
-  GoogleAppMeasurement: c29d405ff76e18551b5d158eaba6753fda8c7542
+  GoogleAppMeasurement: e49be3954045b17d046f271b9cc1ec052bad9702
   GoogleUtilities: ad0f3b691c67909d03a3327cc205222ab8f42e0e
   InAppSettingsKit: 567ef538698cd6cf3afb9c5529b89a8936fdacb5
   MBProgressHUD: e7baa36a220447d8aeb12769bf0585582f3866d9
   MoPub-AdMob-Adapters: f93ec396dd64e70ec3dcd8a1f2e5c1ae9fe8debe
-  mopub-ios-sdk: 292b8e9a55a2e72a34afc04ec01e85486af46240
+  mopub-ios-sdk: bb61d5741ba16c6a78e5a54e37bc60ef8c9a80a8
   nanopb: 18003b5e52dab79db540fe93fe9579f399bd1ccd
   PersonalizedAdConsent: dbecabb3467df967c16d9cebc2ef4a8890e4bbd8
   PromisesObjC: c119f3cd559f50b7ae681fa59dc1acd19173b7e6

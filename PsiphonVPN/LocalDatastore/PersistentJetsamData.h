@@ -17,12 +17,21 @@
  *
  */
 
-#import "LocalDataStoreKeys.h"
+#import <Foundation/Foundation.h>
 
-// See comments in header.
+NS_ASSUME_NONNULL_BEGIN
 
-KeyedDataStoreKey const LastAuthIDKey = @"LastAuthID";
-KeyedDataStoreKey const LastAuthAccessTypeKey = @"LastAuthAccessType";
+/// Persisted data used to track jetsam events in the extension.
+@interface PersistentJetsamData : NSObject
 
-KeyedDataStoreKey const ExtensionStartTimeKey = @"PersistentJetsamData.ExtensionStartTimeNSDateKey";
-KeyedDataStoreKey const TickerTimeKey = @"PersistentJetsamData.TickerTimeNSDateKey";
+/// Time when the extension was last started.
++ (NSDate*)extensionStartTime;
++ (void)setExtensionStartTimeToNow;
+
+/// Time when the ticker last fired in the extension.
++ (NSDate*)tickerTime;
++ (void)setTickerTimeToNow;
+
+@end
+
+NS_ASSUME_NONNULL_END

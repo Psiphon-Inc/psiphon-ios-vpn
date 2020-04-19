@@ -38,6 +38,7 @@
 #import "RegionAdapter.h"
 #import "SubscriptionVerifierService.h"
 #import "PacketTunnelUtils.h"
+#import "PersistentSubsMetadata.h"
 #import "NSError+Convenience.h"
 #import "RACSignal+Operations.h"
 #import "RACDisposable.h"
@@ -53,8 +54,6 @@
 #import "Strings.h"
 #import <ReactiveObjC/RACSubject.h>
 #import <ReactiveObjC/RACReplaySubject.h>
-
-#import "PersistentSubsMetadata.h"
 
 NSErrorDomain _Nonnull const PsiphonTunnelErrorDomain = @"PsiphonTunnelErrorDomain";
 

@@ -68,10 +68,9 @@ extension PsiCash {
     }
 
     func setRequestMetadata() {
-        if let appVersion = AppInfo.appVersion() {
-            setRequestMetadataAtKey(PsiCashRequestMetadataKey.clientVersion.rawValue,
-                                    withValue: appVersion)
-        }
+        let appVersion = AppInfo.appVersion()
+        setRequestMetadataAtKey(PsiCashRequestMetadataKey.clientVersion.rawValue,
+                                withValue: appVersion)
         if let propagationChannelId = AppInfo.propagationChannelId() {
             setRequestMetadataAtKey(PsiCashRequestMetadataKey.propagationChannelId.rawValue,
                                     withValue: propagationChannelId)

@@ -33,8 +33,14 @@
 *
 */
 
-/// Key for the ID of the last authorization obtained from the verifier server.
+/// Key for the ID of the last authorization obtained from the verifier server. Type: NSString.
 FOUNDATION_EXTERN KeyedDataStoreKey const LastAuthIDKey;
 
-/// Key for the access type of the last authorization obtained from the verifier server.
+/// Key for the access type of the last authorization obtained from the verifier server. Type: NSString.
 FOUNDATION_EXTERN KeyedDataStoreKey const LastAuthAccessTypeKey;
+
+/// Key for the time when the extension was last started. Type: NSDate.
+FOUNDATION_EXTERN KeyedDataStoreKey const ExtensionStartTimeKey;
+
+/// Key for the time when the ticker last fired in the extension. Type: NSDate.
+FOUNDATION_EXTERN KeyedDataStoreKey const TickerTimeKey;

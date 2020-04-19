@@ -19,15 +19,28 @@
 
 #import <Foundation/Foundation.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface NSError (Convenience)
 
 + (instancetype)errorWithDomain:(NSErrorDomain)domain code:(NSInteger)code;
 
-+ (instancetype)errorWithDomain:(NSErrorDomain)domain code:(NSInteger)code andLocalizedDescription:(NSString*)localizedDescription;
++ (instancetype)errorWithDomain:(NSErrorDomain)domain
+                           code:(NSInteger)code
+        andLocalizedDescription:(NSString*)localizedDescription;
 
-+ (instancetype)errorWithDomain:(NSErrorDomain)domain code:(NSInteger)code withUnderlyingError:(NSError *)error;
++ (instancetype)errorWithDomain:(NSErrorDomain)domain
+                           code:(NSInteger)code
+        andLocalizedDescription:(NSString*)localizedDescription
+            withUnderlyingError:(NSError *)error;
+
++ (instancetype)errorWithDomain:(NSErrorDomain)domain
+                           code:(NSInteger)code
+            withUnderlyingError:(NSError *)error;
 
 /// Dictionary representation which is JSON serializable with the default implementation
 - (NSDictionary<NSString *, id> *)jsonSerializableDictionaryRepresentation;
 
 @end
+
+NS_ASSUME_NONNULL_END

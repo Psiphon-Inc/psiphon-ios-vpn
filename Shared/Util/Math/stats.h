@@ -17,12 +17,14 @@
  *
  */
 
-#import "LocalDataStoreKeys.h"
+#ifndef stats_h
+#define stats_h
 
-// See comments in header.
+#include <stdio.h>
 
-KeyedDataStoreKey const LastAuthIDKey = @"LastAuthID";
-KeyedDataStoreKey const LastAuthAccessTypeKey = @"LastAuthAccessType";
+double double_mean(double *vals, int length);
 
-KeyedDataStoreKey const ExtensionStartTimeKey = @"PersistentJetsamData.ExtensionStartTimeNSDateKey";
-KeyedDataStoreKey const TickerTimeKey = @"PersistentJetsamData.TickerTimeNSDateKey";
+double double_stdev(double *vals, int length);
+
+#endif /* stats_h */
+
