@@ -56,7 +56,7 @@ PODS:
   - nanopb/decode (0.3.9011)
   - nanopb/encode (0.3.9011)
   - PersonalizedAdConsent (1.0.3)
-  - PsiphonClientCommonLibrary (1.2.2):
+  - PsiphonClientCommonLibrary (1.2.3):
     - InAppSettingsKit
   - ReactiveObjC (3.1.0)
   - SVProgressHUD (2.2.5)
@@ -69,7 +69,7 @@ DEPENDENCIES:
   - MoPub-AdMob-Adapters (~> 7.53.1)
   - mopub-ios-sdk (~> 5.11)
   - PersonalizedAdConsent (~> 1.0)
-  - PsiphonClientCommonLibrary (from `https://github.com/Psiphon-Inc/psiphon-ios-client-common-library.git`, commit `f97b258`)
+  - PsiphonClientCommonLibrary (from `https://github.com/Psiphon-Inc/psiphon-ios-client-common-library.git`, commit `fae1d2e`)
   - ReactiveObjC (from `https://github.com/Psiphon-Inc/ReactiveObjC.git`, commit `8bbf9dd`)
   - SVProgressHUD
 
@@ -91,7 +91,7 @@ EXTERNAL SOURCES:
     :commit: 598c498
     :git: https://github.com/Psiphon-Inc/InAppSettingsKit.git
   PsiphonClientCommonLibrary:
-    :commit: f97b258
+    :commit: fae1d2e
     :git: https://github.com/Psiphon-Inc/psiphon-ios-client-common-library.git
   ReactiveObjC:
     :commit: 8bbf9dd
@@ -102,7 +102,7 @@ CHECKOUT OPTIONS:
     :commit: 598c498
     :git: https://github.com/Psiphon-Inc/InAppSettingsKit.git
   PsiphonClientCommonLibrary:
-    :commit: f97b258
+    :commit: fae1d2e
     :git: https://github.com/Psiphon-Inc/psiphon-ios-client-common-library.git
   ReactiveObjC:
     :commit: 8bbf9dd
@@ -119,10 +119,10 @@ SPEC CHECKSUMS:
   mopub-ios-sdk: 292b8e9a55a2e72a34afc04ec01e85486af46240
   nanopb: 18003b5e52dab79db540fe93fe9579f399bd1ccd
   PersonalizedAdConsent: b50a8a5d6065b6db23121e8fcc0dce2ae983f6ea
-  PsiphonClientCommonLibrary: 8ac2c3a40332aaf3a8c9c9a7e1a71997878e21af
+  PsiphonClientCommonLibrary: 4bdd0e20d179458999451a5d17b74f33f6f2769b
   ReactiveObjC: 2a38ea15335de4119d8b17caf1db1484f61db902
   SVProgressHUD: 1428aafac632c1f86f62aa4243ec12008d7a51d6
 
-PODFILE CHECKSUM: 75d9de886881e3bc229764aa43bcfb3e52427dfe
+PODFILE CHECKSUM: e56b16a8e67c8c1dbc78c0ed7c21b8f3c3ec2f55
 
 COCOAPODS: 1.8.4
