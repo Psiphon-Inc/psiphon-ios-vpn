@@ -81,10 +81,10 @@ typedef NS_ERROR_ENUM(ReceiptValidationErrorDomain, PsiphonReceiptValidationErro
 @property (nonatomic, assign) NSNumber *subscriptionCheckEnum;
 
 /// Reason for the value in `subscriptionCheckEnum`.
-@property (nonatomic, nullable) NSString *reason;
+@property (nonatomic, assign) ShouldUpdateAuthReason reason;
 
 + (LocalSubscriptionCheckResult *_Nonnull)localSubscriptionCheckResult:(NSNumber*)subscriptionCheckEnum
-                                                                reason:(NSString*)reason;
+                                                                reason:(ShouldUpdateAuthReason)reason;
 
 @end
 

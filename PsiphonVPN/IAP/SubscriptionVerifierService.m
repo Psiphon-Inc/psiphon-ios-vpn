@@ -56,9 +56,9 @@ PsiFeedbackLogType const SubscriptionVerifierServiceLogType = @"SubscriptionVeri
                                                                                      reason:shouldUpdateAuthResult.reason]];
             [subscriber sendCompleted];
         } else {
-            // subscription server doesn't need to be contacted.
+            // Subscription server doesn't need to be contacted.
             // Checks if subscription is active compared to device's clock.
-            if ([subscription hasActiveAuthorizationForNow]) {
+            if (shouldUpdateAuthResult.reason == ShouldUpdateAuthReasonHasActiveAuthorization) {
                 [subscriber sendNext:[LocalSubscriptionCheckResult localSubscriptionCheckResult:@(SubscriptionCheckHasActiveAuthorization)
                                                                                          reason:shouldUpdateAuthResult.reason]];
                 [subscriber sendCompleted];
@@ -75,7 +75,7 @@ PsiFeedbackLogType const SubscriptionVerifierServiceLogType = @"SubscriptionVeri
 }
 
 + (RACSignal<RACTwoTuple<NSDictionary *, NSNumber *> *> *)updateAuthorizationFromRemoteWithRequestMetadata:(SubscriptionVerifierRequestMetadata*)metadata {
-    // TODO/subs: use metadata
+
     return [RACSignal createSignal:^RACDisposable *(id <RACSubscriber> subscriber) {
 
         // This object holds a reference to the current scheduler, in order to schedule
@@ -291,11 +291,11 @@ typedef NS_ENUM(NSInteger, SubscriptionStateEnum) {
     SubscriptionState *instance = [[SubscriptionState alloc] init];
     instance.state = SubscriptionStateNotSubscribed;
 
-    if ([subscription hasActiveSubscriptionForNow]) {
-        instance.state = SubscriptionStateSubscribed;
-
-    } else if ([subscription shouldUpdateAuthorization]) {
+    ShouldUpdateAuthResult *shouldUpdateAuthResult = [subscription shouldUpdateAuthorization];
+    if (shouldUpdateAuthResult.shouldUpdateAuth) {
         instance.state = SubscriptionStateInProgress;
+    } else if (shouldUpdateAuthResult.reason == ShouldUpdateAuthReasonHasActiveAuthorization) {
+        instance.state = SubscriptionStateSubscribed;
     }
 
     return instance;
@@ -362,7 +362,7 @@ typedef NS_ENUM(NSInteger, SubscriptionStateEnum) {
 @implementation LocalSubscriptionCheckResult
 
 + (LocalSubscriptionCheckResult *_Nonnull)localSubscriptionCheckResult:(NSNumber*)subscriptionCheckEnum
-                                                                reason:(NSString*)reason {
+                                                                reason:(ShouldUpdateAuthReason)reason {
     LocalSubscriptionCheckResult *instance = [[LocalSubscriptionCheckResult alloc] init];
     instance.subscriptionCheckEnum = subscriptionCheckEnum;
     instance.reason = reason;
