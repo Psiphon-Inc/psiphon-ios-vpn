@@ -20,6 +20,30 @@
 #import <Foundation/Foundation.h>
 #import "SubscriptionData.h"
 
+/** ShouldUpdateAuthResult reason */
+typedef NS_ENUM(NSInteger, ShouldUpdateAuthReason) {
+    /** @const ShouldUpdateAuthReasonHasActiveAuthorization The client has an active authorization for the current device date. */
+    ShouldUpdateAuthReasonHasActiveAuthorization,
+    /** @const ShouldUpdateAuthReasonNoReceiptFile No app receipt found. */
+    ShouldUpdateAuthReasonNoReceiptFile,
+    /** @const ShouldUpdateAuthReasonContainerHasReceiptWithExpiry Last expiry date recorded by the container still has time left. */
+    ShouldUpdateAuthReasonContainerHasReceiptWithExpiry,
+    /** @const ShouldUpdateAuthReasonReceiptHasNoTransactionData The receipt has no transaction data on it. */
+    ShouldUpdateAuthReasonReceiptHasNoTransactionData,
+    /** @const ShouldUpdateAuthReasonNoLocalData There's a receipt but no subscription data persisted. */
+    ShouldUpdateAuthReasonNoLocalData,
+    /** @const ShouldUpdateAuthReasonFileSizeChanged Receipt file size has changed since last check. */
+    ShouldUpdateAuthReasonFileSizeChanged,
+    /** @const ShouldUpdateAuthReasonSubscriptionWillBeRenewed Subscription expired but user's last known intention was to auto-renew. */
+    ShouldUpdateAuthReasonSubscriptionWillBeRenewed,
+    /** @const ShouldUpdateAuthReasonNoUpdateNeeded Authorization update not needed. */
+    ShouldUpdateAuthReasonNoUpdateNeeded,
+    /** @const ShouldUpdateAuthReasonForced A forced remote subscription check has been triggered. */
+    ShouldUpdateAuthReasonForced,
+    /** @const ShouldUpdateAuthReasonAuthorizationStatusRejected The server has rejected the current subscription authorization. */
+    ShouldUpdateAuthReasonAuthorizationStatusRejected,
+    
+};
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -30,10 +54,12 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, assign) BOOL shouldUpdateAuth;
 
 /// Reason for the value in `shouldUpdateAuth`
-@property (nonatomic) NSString *reason;
+@property (nonatomic, assign) ShouldUpdateAuthReason reason;
 
 + (ShouldUpdateAuthResult *_Nonnull)shouldUpdateAuth:(BOOL)shouldUpdateAuth
-                                              reason:(NSString*)reason;
+                                              reason:(ShouldUpdateAuthReason)reason;
+
++ (NSString *_Nonnull)reasonToString:(ShouldUpdateAuthReason)reason;
 
 @end
 
@@ -45,8 +71,7 @@ NS_ASSUME_NONNULL_BEGIN
  * Returns TRUE if Subscription info is missing, the App Store receipt has changed, or we expect
  * the subscription to be renewed.
  * If this method returns TRUE, current subscription information should be deemed stale, and
- * subscription verifier server should be contacted to get latest subscription information -- unless
- * the client already has an active authorization.
+ * subscription verifier server should be contacted to get latest subscription information.
  *
  * @note This is a blocking function until the new state is persisted.
  *

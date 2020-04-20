@@ -31,11 +31,49 @@ PsiFeedbackLogType const MutableSubscriptionDataLogType = @"SubscriptionData";
 @implementation ShouldUpdateAuthResult
 
 + (ShouldUpdateAuthResult *_Nonnull)shouldUpdateAuth:(BOOL)shouldUpdateAuth
-                                              reason:(NSString*)reason {
+                                              reason:(ShouldUpdateAuthReason)reason {
     ShouldUpdateAuthResult *instance = [[ShouldUpdateAuthResult alloc] init];
     instance.shouldUpdateAuth = shouldUpdateAuth;
     instance.reason = reason;
     return instance;
+}
+
++ (NSString *_Nonnull)reasonToString:(ShouldUpdateAuthReason)reason {
+    switch (reason) {
+        case ShouldUpdateAuthReasonHasActiveAuthorization:
+            return @"hasActiveAuthorization";
+            break;
+        case ShouldUpdateAuthReasonNoReceiptFile:
+            return @"noReceiptFile";
+            break;
+        case ShouldUpdateAuthReasonContainerHasReceiptWithExpiry:
+            return @"containerHasReceiptWithExpiry";
+            break;
+        case ShouldUpdateAuthReasonReceiptHasNoTransactionData:
+            return @"receiptHasNoTransactionData";
+            break;
+        case ShouldUpdateAuthReasonNoLocalData:
+            return @"noLocalData";
+            break;
+        case ShouldUpdateAuthReasonFileSizeChanged:
+            return @"fileSizeChanged";
+            break;
+        case ShouldUpdateAuthReasonSubscriptionWillBeRenewed:
+            return @"subscriptionWillBeRenewed";
+            break;
+        case ShouldUpdateAuthReasonNoUpdateNeeded:
+            return @"noUpdateNeeded";
+            break;
+        case ShouldUpdateAuthReasonForced:
+            return @"forced";
+            break;
+        case ShouldUpdateAuthReasonAuthorizationStatusRejected:
+            return @"authorizationStatusRejected";
+            break;
+        default:
+            return @"unknown";
+            break;
+    }
 }
 
 @end
@@ -67,17 +105,31 @@ PsiFeedbackLogType const MutableSubscriptionDataLogType = @"SubscriptionData";
 }
 
 - (ShouldUpdateAuthResult*)shouldUpdateAuthorization {
+
+    // If user has an active authorization for date - NO
+    if ([self hasActiveAuthorizationForNow]) {
+        LOG_DEBUG(@"device has active authorization for date");
+        ShouldUpdateAuthResult *result = [ShouldUpdateAuthResult shouldUpdateAuth:NO
+                                                                           reason:ShouldUpdateAuthReasonHasActiveAuthorization];
+        [PsiFeedbackLogger infoWithType:MutableSubscriptionDataLogType
+                                   json:@{@"event": @"shouldUpdateAuth",
+                                         @"result": @(result.shouldUpdateAuth),
+                                         @"reason": [ShouldUpdateAuthResult reasonToString:result.reason]}];
+        return result;
+    }
+
     // If no receipt - NO
     NSURL *appReceiptURL = [NSBundle mainBundle].appStoreReceiptURL;
 
     const BOOL exists = [[NSFileManager defaultManager] fileExistsAtPath:appReceiptURL.path isDirectory:nil];
     if (!exists) {
         LOG_DEBUG(@"receipt does not exist");
-        ShouldUpdateAuthResult *result = [ShouldUpdateAuthResult shouldUpdateAuth:NO reason:@"noReceiptFile"];
+        ShouldUpdateAuthResult *result = [ShouldUpdateAuthResult shouldUpdateAuth:NO
+                                                                           reason:ShouldUpdateAuthReasonNoReceiptFile];
         [PsiFeedbackLogger infoWithType:MutableSubscriptionDataLogType
                                    json:@{@"event": @"shouldUpdateAuth",
                                           @"result": @(result.shouldUpdateAuth),
-                                          @"reason": result.reason}];
+                                          @"reason": [ShouldUpdateAuthResult reasonToString:result.reason]}];
         return result;
     }
 
@@ -86,11 +138,12 @@ PsiFeedbackLogType const MutableSubscriptionDataLogType = @"SubscriptionData";
     // Last expiry date recorded by the container still has time left - YES
     NSDate *_Nullable containerReceiptExpiry = [sharedDB getContainerLastSubscriptionReceiptExpiryDate];
     if (containerReceiptExpiry && [containerReceiptExpiry afterOrEqualTo:[NSDate date]]) {
-        ShouldUpdateAuthResult *result = [ShouldUpdateAuthResult shouldUpdateAuth:YES reason:@"containerHasReceiptWithExpiry"];
+        ShouldUpdateAuthResult *result = [ShouldUpdateAuthResult shouldUpdateAuth:YES
+                                                                           reason:ShouldUpdateAuthReasonContainerHasReceiptWithExpiry];
         [PsiFeedbackLogger infoWithType:MutableSubscriptionDataLogType
                                    json:@{@"event": @"shouldUpdateAuth",
                                          @"result": @(result.shouldUpdateAuth),
-                                         @"reason": result.reason,
+                                         @"reason": [ShouldUpdateAuthResult reasonToString:result.reason],
                                          @"expiry": [PsiFeedbackLogger safeValue:containerReceiptExpiry]}];
         return result;
     }
@@ -106,17 +159,19 @@ PsiFeedbackLogType const MutableSubscriptionDataLogType = @"SubscriptionData";
         [self setAuthorization:nil];
         [self persistChanges];
 
-        return [ShouldUpdateAuthResult shouldUpdateAuth:NO reason:@"receiptHasNoTransactionData"];
+        return [ShouldUpdateAuthResult shouldUpdateAuth:NO
+                                                 reason:ShouldUpdateAuthReasonReceiptHasNoTransactionData];
     }
 
     // There's receipt but no subscription persisted - YES
     if([self isEmpty]) {
         LOG_DEBUG(@"receipt exist by no subscription persisted");
-        ShouldUpdateAuthResult *result = [ShouldUpdateAuthResult shouldUpdateAuth:YES reason:@"noLocalData"];
+        ShouldUpdateAuthResult *result = [ShouldUpdateAuthResult shouldUpdateAuth:YES
+                                                                           reason:ShouldUpdateAuthReasonNoLocalData];
         [PsiFeedbackLogger infoWithType:MutableSubscriptionDataLogType
                                    json:@{@"event": @"shouldUpdateAuth",
                                            @"result": @(result.shouldUpdateAuth),
-                                           @"reason": result.reason}];
+                                           @"reason": [ShouldUpdateAuthResult reasonToString:result.reason]}];
         return result;
     }
 
@@ -124,24 +179,14 @@ PsiFeedbackLogType const MutableSubscriptionDataLogType = @"SubscriptionData";
     if ([currentReceiptFileSize unsignedIntValue] != [self.appReceiptFileSize unsignedIntValue]) {
         LOG_DEBUG(@"receipt file size changed (%@) since last check (%@)",
           currentReceiptFileSize, self.appReceiptFileSize);
-        ShouldUpdateAuthResult *result = [ShouldUpdateAuthResult shouldUpdateAuth:YES reason:@"fileSizeChanged"];
+        ShouldUpdateAuthResult *result = [ShouldUpdateAuthResult shouldUpdateAuth:YES
+                                                                           reason:ShouldUpdateAuthReasonFileSizeChanged];
         [PsiFeedbackLogger infoWithType:MutableSubscriptionDataLogType
                                    json:@{@"event": @"shouldUpdateAuth",
                                            @"result": @(result.shouldUpdateAuth),
-                                           @"reason": result.reason,
+                                           @"reason": [ShouldUpdateAuthResult reasonToString:result.reason],
                                            @"oldFileSize": [PsiFeedbackLogger safeValue:self.appReceiptFileSize],
                                            @"newFileSize": [PsiFeedbackLogger safeValue:currentReceiptFileSize]}];
-        return result;
-    }
-
-    // If user has an active authorization for date - NO
-    if ([self hasActiveAuthorizationForDate:[NSDate date]]) {
-        LOG_DEBUG(@"device has active authorization for date");
-        ShouldUpdateAuthResult *result = [ShouldUpdateAuthResult shouldUpdateAuth:NO reason:@"hasActiveAuthorization"];
-        [PsiFeedbackLogger infoWithType:MutableSubscriptionDataLogType
-                                   json:@{@"event": @"shouldUpdateAuth",
-                                         @"result": @(result.shouldUpdateAuth),
-                                         @"reason": result.reason}];
         return result;
     }
 
@@ -155,22 +200,24 @@ PsiFeedbackLogType const MutableSubscriptionDataLogType = @"SubscriptionData";
 
         if (autoRenewStatus && [autoRenewStatus isEqualToString:@"1"]) {
             LOG_DEBUG(@"subscription expired but user's last known intention is to auto-renew");
-            ShouldUpdateAuthResult *result = [ShouldUpdateAuthResult shouldUpdateAuth:YES reason:@"subscriptionWillBeRenewed"];
+            ShouldUpdateAuthResult *result = [ShouldUpdateAuthResult shouldUpdateAuth:YES
+                                                                               reason:ShouldUpdateAuthReasonSubscriptionWillBeRenewed];
             [PsiFeedbackLogger infoWithType:MutableSubscriptionDataLogType
                                        json:@{@"event": @"shouldUpdateAuth",
                                              @"result": @(result.shouldUpdateAuth),
-                                             @"reason": result.reason}];
+                                             @"reason": [ShouldUpdateAuthResult reasonToString:result.reason]}];
 
             return result;
         }
     }
 
     LOG_DEBUG(@"authorization update not needed");
-    ShouldUpdateAuthResult *result = [ShouldUpdateAuthResult shouldUpdateAuth:NO reason:@"noUpdateNeeded"];
+    ShouldUpdateAuthResult *result = [ShouldUpdateAuthResult shouldUpdateAuth:NO
+                                                                       reason:ShouldUpdateAuthReasonNoUpdateNeeded];
     [PsiFeedbackLogger infoWithType:MutableSubscriptionDataLogType
                                json:@{@"event": @"shouldUpdateAuth",
                                        @"result": @(result.shouldUpdateAuth),
-                                       @"reason": result.reason}];
+                                       @"reason": [ShouldUpdateAuthResult reasonToString:result.reason]}];
 
     return result;
 }
