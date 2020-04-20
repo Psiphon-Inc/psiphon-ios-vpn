@@ -109,7 +109,7 @@ static long PsiphonASN1ReadInteger(const uint8_t *bytes, long length) {
         [AppStoreReceiptData enumerateReceiptAttributes:(const uint8_t*)asn1Data.bytes length:asn1Data.length usingBlock:^(NSData *data, long type) {
             switch (type) {
                 case PsiphonAppReceiptASN1TypeBundleIdentifier:
-                    _bundleIdentifier = PsiphonASN1ReadUTF8String(data.bytes, data.length);
+                    self->_bundleIdentifier = PsiphonASN1ReadUTF8String(data.bytes, data.length);
                     break;
                 case PsiphonAppReceiptASN1TypeInAppPurchaseReceipt: {
                     @autoreleasepool {
@@ -223,21 +223,21 @@ static long PsiphonASN1ReadInteger(const uint8_t *bytes, long length) {
             const NSUInteger length = data.length;
             switch (type) {
                 case PsiphonAppReceiptASN1TypeProductIdentifier:
-                    _productIdentifier = PsiphonASN1ReadUTF8String(p, length);
+                    self->_productIdentifier = PsiphonASN1ReadUTF8String(p, length);
                     break;
                 case PsiphonAppReceiptASN1TypeSubscriptionExpirationDate: {
                     NSString *string = PsiphonASN1ReadIA5SString(p, length);
-                    _subscriptionExpirationDate = [NSDate fromRFC3339String:string];
+                    self->_subscriptionExpirationDate = [NSDate fromRFC3339String:string];
                     break;
                 }
                 case PsiphonAppReceiptASN1TypeCancellationDate: {
                     NSString *string = PsiphonASN1ReadIA5SString(p, length);
-                    _cancellationDate = [NSDate fromRFC3339String:string];
+                    self->_cancellationDate = [NSDate fromRFC3339String:string];
                     break;
                 }
                 case PsiphonAppReceiptASN1TypeIsInIntroOfferPeriod: {
                     long is_in_intro_period = PsiphonASN1ReadInteger(p, length);
-                    _isInIntroPreiod = [[NSNumber numberWithLong: is_in_intro_period] boolValue];
+                    self->_isInIntroPreiod = [[NSNumber numberWithLong: is_in_intro_period] boolValue];
                     break;
                 }
             }
