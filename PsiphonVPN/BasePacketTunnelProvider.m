@@ -143,8 +143,8 @@ PsiFeedbackLogType const BasePacketTunnelProviderLogType = @"BasePacketTunnelPro
         // Start the tunnel.
         [(id <BasePacketTunnelProviderProtocol>)self startTunnelWithErrorHandler:^(NSError *error) {
             if (error) {
-                vpnStartCompletionHandler(error);
-                vpnStartCompletionHandler = nil;
+                self->vpnStartCompletionHandler(error);
+                self->vpnStartCompletionHandler = nil;
             }
         }];
 
