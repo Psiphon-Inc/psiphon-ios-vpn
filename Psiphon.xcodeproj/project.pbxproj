@@ -134,6 +134,7 @@
 		8D417EDD2419DBA100FEE587 /* ProductRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D417EDC2419DBA100FEE587 /* ProductRequest.swift */; };
 		8D7E9B9D2425DF42006F3A2F /* AnimatedUIView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D7E9B9C2425DF42006F3A2F /* AnimatedUIView.swift */; };
 		8D7E9B9F2425E053006F3A2F /* Animations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D7E9B9E2425E053006F3A2F /* Animations.swift */; };
+		8D938DD7244D43550009DE39 /* Receipt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D938DD6244D43550009DE39 /* Receipt.swift */; };
 		8D9E602A24364ED2003A46D8 /* VPNState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D9E602924364ED2003A46D8 /* VPNState.swift */; };
 		8D9E602C24364EE6003A46D8 /* TunnelProviderManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D9E602B24364EE6003A46D8 /* TunnelProviderManager.swift */; };
 		8D9E602F24366AE7003A46D8 /* SerialEffect.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D9E602D24364FB6003A46D8 /* SerialEffect.swift */; };
@@ -525,6 +526,7 @@
 		8D417EDE241AA89C00FEE587 /* Effect.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Effect.swift; sourceTree = "<group>"; };
 		8D7E9B9C2425DF42006F3A2F /* AnimatedUIView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimatedUIView.swift; sourceTree = "<group>"; };
 		8D7E9B9E2425E053006F3A2F /* Animations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Animations.swift; sourceTree = "<group>"; };
+		8D938DD6244D43550009DE39 /* Receipt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Receipt.swift; sourceTree = "<group>"; };
 		8D9E602924364ED2003A46D8 /* VPNState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VPNState.swift; sourceTree = "<group>"; };
 		8D9E602B24364EE6003A46D8 /* TunnelProviderManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TunnelProviderManager.swift; sourceTree = "<group>"; };
 		8D9E602D24364FB6003A46D8 /* SerialEffect.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SerialEffect.swift; sourceTree = "<group>"; };
@@ -823,6 +825,7 @@
 				521D084D2346A75700403B48 /* IAPProducts.swift */,
 				8D417EBA2417155000FEE587 /* AppReceipt.swift */,
 				8D417EDC2419DBA100FEE587 /* ProductRequest.swift */,
+				8D938DD6244D43550009DE39 /* Receipt.swift */,
 			);
 			name = IAP;
 			sourceTree = "<group>";
@@ -1775,6 +1778,7 @@
 				4E0A366C21666B99008A3D7B /* NSString+Additions.m in Sources */,
 				EF639C2F1F8FCE37009D6B42 /* PsiFeedbackLogger.m in Sources */,
 				445F24DA20E1A5BA00D004E9 /* constr_SET_OF.c in Sources */,
+				8D938DD7244D43550009DE39 /* Receipt.swift in Sources */,
 				8D417EBD2417FF5C00FEE587 /* Subscription.swift in Sources */,
 				8D417EB124147C6D00FEE587 /* LandingPage.swift in Sources */,
 				445F24E520E1A5BA00D004E9 /* asn_SET_OF.c in Sources */,
@@ -2095,11 +2099,7 @@
 				INFOPLIST_FILE = PsiphonPlayground/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 13.2;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@loader_path/Frameworks",
-				);
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = ca.psiphon.PsiphonPlayground;
@@ -2135,11 +2135,7 @@
 				INFOPLIST_FILE = PsiphonPlayground/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 13.2;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@loader_path/Frameworks",
-				);
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = ca.psiphon.PsiphonPlayground;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
@@ -2292,10 +2288,7 @@
 				SWIFT_OBJC_BRIDGING_HEADER = "Psiphon/Psiphon-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
-				USER_HEADER_SEARCH_PATHS = (
-					"\"${PROJECT_DIR}/Pods\"/**",
-					"${PROJECT_DIR}/Psiphon/asn1c",
-				);
+				USER_HEADER_SEARCH_PATHS = "\"${PROJECT_DIR}/Pods\"/** ${PROJECT_DIR}/Psiphon/asn1c";
 				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = Debug;
@@ -2325,10 +2318,7 @@
 				STRIP_BITCODE_FROM_COPIED_FILES = YES;
 				SWIFT_OBJC_BRIDGING_HEADER = "Psiphon/Psiphon-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
-				USER_HEADER_SEARCH_PATHS = (
-					"\"${PROJECT_DIR}/Pods\"/**",
-					"${PROJECT_DIR}/Psiphon/asn1c",
-				);
+				USER_HEADER_SEARCH_PATHS = "\"${PROJECT_DIR}/Pods\"/** ${PROJECT_DIR}/Psiphon/asn1c";
 				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = Release;

@@ -48,34 +48,6 @@ extension SubscriptionStatus {
     
 }
 
-struct SubscriptionData: Equatable, Codable {
-    let latestExpiry: Date
-    let productId: String
-    let hasBeenInIntroPeriod: Bool
-
-    // Enum values match dictionary keys defined in "AppStoreReceiptData.h"
-    private enum ReceiptFields: String {
-        case appReceiptFileSize = "app_receipt_file_size"
-        case latestExpirationDate = "latest_expiration_date"
-        case productId = "product_id"
-        case hasBeenInIntroPeriod = "has_been_in_intro_period"
-    }
-
-    static func fromSubsriptionDictionary(_ dict: [String: Any]) -> SubscriptionData? {
-        guard let expiration = dict[ReceiptFields.latestExpirationDate] as? Date else {
-            return .none
-        }
-        guard let productId = dict[ReceiptFields.productId] as? String else {
-            return .none
-        }
-        guard let introPeriod = dict[ReceiptFields.hasBeenInIntroPeriod] as? Bool else {
-            return .none
-        }
-        return SubscriptionData(latestExpiry: expiration, productId: productId,
-                                hasBeenInIntroPeriod: introPeriod)
-    }
-}
-
 enum SubscriptionAction {
     case updatedReceiptData(ReceiptData?)
     case timerFinished(withExpiry:Date)
