@@ -7,9 +7,6 @@ ENV['COCOAPODS_DISABLE_STATS'] = 'true'
 use_modular_headers!
 
 target 'Psiphon' do
-  # Comment the next line if you're not using Swift and don't want to use dynamic frameworks
-  #use_frameworks!
-
   # Pods for Psiphon
   pod "InAppSettingsKit", :git => "https://github.com/Psiphon-Inc/InAppSettingsKit.git", :commit => '598c498'
   #pod "InAppSettingsKit", :path => "../InAppSettingsKit"
@@ -31,8 +28,6 @@ target 'Psiphon' do
 end
 
 target 'PsiphonVPN' do
-  # Comment the next line if you're not using Swift and don't want to use dynamic frameworks
-  #use_frameworks!
 
   pod 'ReactiveObjC', :git => "https://github.com/Psiphon-Inc/ReactiveObjC.git", :commit => '8bbf9dd'
 
