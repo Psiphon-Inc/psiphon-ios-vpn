@@ -13,8 +13,8 @@ target 'Psiphon' do
   # Pods for Psiphon
   pod "InAppSettingsKit", :git => "https://github.com/Psiphon-Inc/InAppSettingsKit.git", :commit => '598c498'
   #pod "InAppSettingsKit", :path => "../InAppSettingsKit"
-  pod 'PsiphonClientCommonLibrary', :git => "https://github.com/Psiphon-Inc/psiphon-ios-client-common-library.git", :commit => 'f97b258'
   #pod "PsiphonClientCommonLibrary", :path => "../psiphon-ios-client-common-library"
+  pod 'PsiphonClientCommonLibrary', :git => "https://github.com/Psiphon-Inc/psiphon-ios-client-common-library.git", :commit => 'fae1d2e'
 
   # Swift dependencies
   pod 'ReactiveSwift', '~> 6.2'
