@@ -318,8 +318,8 @@ extension SwiftDelegate: SwiftBridgeDelegate {
     }
     
     @objc func getAppStoreSubscriptionProductIDs() -> Set<String> {
-        let productIds = StoreProductIds.subscription()
-        return productIds.values
+        // TODO: supported product ID's should be accessed from the AppState environment.
+        return SupportedAppStoreProductIDs.subscription().values
     }
     
     @objc func getAppStateFeedbackEntry(completionHandler: @escaping (String) -> Void) {
