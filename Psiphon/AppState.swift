@@ -128,7 +128,9 @@ typealias AppEnvironment = (
     subscriptionStore: (SubscriptionAction) -> Effect<Never>,
     /// `vpnStartCondition` retruns true whenever the app is in such a state as to to allow
     /// the VPN to be started. If false is returned the VPN should not be started.
-    vpnStartCondition: () -> Bool
+    vpnStartCondition: () -> Bool,
+    supportedSubscriptionIAPProductIDs: SupportedAppStoreProductIDs,
+    supportedPsiCashIAPProductIDs: SupportedAppStoreProductIDs
 )
 
 /// Creates required environment for store `Store<AppState, AppAction>`.
@@ -204,7 +206,9 @@ func makeEnvironment(
         },
         vpnStartCondition: { [unowned store] () -> Bool in
             return !store.value.adPresentationState
-        }
+        },
+        supportedSubscriptionIAPProductIDs: SupportedAppStoreProductIDs.subscription(),
+        supportedPsiCashIAPProductIDs: SupportedAppStoreProductIDs.psiCash()
     )
     
     let cleanup = { [paymentTransactionDelegate] in
@@ -269,6 +273,15 @@ fileprivate func toSubscriptionReducerEnvironment(
     )
 }
 
+fileprivate func toRequestDelegateReducerEnvironment(
+    env: AppEnvironment
+) -> ProductRequestEnvironment {
+    ProductRequestEnvironment(
+        productRequestDelegate: env.productRequestDelegate,
+        supportedPsiCashIAPProductIDs: env.supportedPsiCashIAPProductIDs
+    )
+}
+
 fileprivate func toAppDelegateReducerEnvironment(env: AppEnvironment) -> AppDelegateEnvironment {
     AppDelegateEnvironment(
         userConfigs: env.userConfigs,
@@ -318,7 +331,7 @@ func makeAppReducer() -> Reducer<AppState, AppAction, AppEnvironment> {
         pullback(productRequestReducer,
                  value: \.products,
                  action: \.productRequest,
-                 environment: { $0.productRequestDelegate }),
+                 environment: toRequestDelegateReducerEnvironment(env:)),
         pullback(appDelegateReducer,
                  value: \.appDelegateReducerState,
                  action: \.appDelegateAction,

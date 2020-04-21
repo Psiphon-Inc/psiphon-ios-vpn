@@ -102,7 +102,10 @@ enum ProductRequestAction {
     case productRequestResult(SKProductsRequest, Result<SKProductsResponse, SystemErrorEvent>)
 }
 
-typealias ProductRequestEnvironment = ProductRequestDelegate
+typealias ProductRequestEnvironment = (
+    productRequestDelegate: ProductRequestDelegate,
+    supportedPsiCashIAPProductIDs: SupportedAppStoreProductIDs
+)
 
 func productRequestReducer(
     state: inout PsiCashAppStoreProductsState, action: ProductRequestAction,
@@ -117,11 +120,11 @@ func productRequestReducer(
         // then the success value is added to `.pending` case.
         state.psiCashProducts = .pending(previousValue: state.psiCashProducts)
         
-        let request = SKProductsRequest(productIdentifiers: StoreProductIds.psiCash().values)
+        let request = SKProductsRequest(productIdentifiers: environment.supportedPsiCashIAPProductIDs.values)
         state.psiCashRequest = request
         return [
             .fireAndForget {
-                request.delegate = environment
+                request.delegate = environment.productRequestDelegate
                 request.start()
             }
         ]

@@ -62,21 +62,22 @@ enum AppStoreProductType: String {
     }
 }
 
-struct StoreProductIds {
+/// Represents product identifiers in-app purchase products that are supported.
+struct SupportedAppStoreProductIDs: Equatable {
     let values: Set<String>
 
     private init(for type: AppStoreProductType, validator: (Set<String>) -> Bool) {
         values = try! plistReader(key: type.rawValue, toType: Set<String>.self)
     }
 
-    static func subscription() -> StoreProductIds {
+    static func subscription() -> Self {
         return .init(for: .subscription) { ids -> Bool in
             // TODO: do some validation here.
             return true
         }
     }
 
-    static func psiCash() -> StoreProductIds {
+    static func psiCash() -> Self {
         return .init(for: .psiCash) { ids -> Bool in
             // TODO: do some validation here.
             return true
