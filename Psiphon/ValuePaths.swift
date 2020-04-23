@@ -114,12 +114,14 @@ extension AppAction {
 
 extension AppState {
     
-    var tunnelProviderManager: PsiphonTPM? {
+    /// `tunnelProviderManager` returns a weak reference to the underlying TunnelProviderManager reference.
+    /// This helps prevent resource leaks.
+    var tunnelProviderManager: WeakRef<PsiphonTPM>? {
         get {
             guard case let .loaded(tpm) = self.vpnState.value.loadState.value else {
                 return nil
             }
-            return tpm
+            return WeakRef(tpm)
         }
     }
     

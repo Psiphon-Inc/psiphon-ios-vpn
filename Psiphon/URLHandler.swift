@@ -21,13 +21,13 @@ import Foundation
 import  ReactiveSwift
 
 struct URLHandler<T: TunnelProviderManager> {
-    let open: (RestrictedURL, T) -> Effect<Bool>
+    let open: (RestrictedURL, WeakRef<T>) -> Effect<Bool>
 }
 
 extension URLHandler {
     static func `default`<T: TunnelProviderManager>() -> URLHandler<T> {
         URLHandler<T>(
-            open: { url, tpm in
+            open: { url, tpmWeakRef in
                 Effect.deferred { fulfilled in
                     if Debugging.disableURLHandler {
                         fulfilled(true)
@@ -39,6 +39,10 @@ extension URLHandler {
                         /// before the landing page can be opened.
                         /// Tunnel status should be assessed directly (not through observables that might
                         /// introduce some latency), before opening the landing page.
+                        guard let tpm = tpmWeakRef.weakRef else {
+                            fulfilled(false)
+                            return
+                        }
                         guard let landingPage = url.getValue(tpm.connectionStatus) else {
                             fulfilled(false)
                             return

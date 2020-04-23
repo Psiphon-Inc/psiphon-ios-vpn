@@ -26,7 +26,7 @@ typealias RestrictedURL = PredicatedValue<URL, TunnelProviderVPNStatus>
 
 struct LandingPageReducerState<T: TunnelProviderManager> {
     var pendingLandingPageOpening: Bool
-    let tunnelProviderManager: T?
+    let tunnelProviderManager: WeakRef<T>?
 }
 
 enum LandingPageAction {
@@ -52,7 +52,7 @@ func landingPageReducer<T: TunnelProviderManager>(
                 feedbackLog(.info, tag: landingPageTag, "pending landing page opening").mapNever()
             ]
         }
-        guard let tpm = state.tunnelProviderManager else {
+        guard let tpmWeakRef = state.tunnelProviderManager else {
             fatalError("expected a valid tunnel provider")
         }
         
@@ -74,7 +74,7 @@ func landingPageReducer<T: TunnelProviderManager>(
                 authPackageSignal: environment.psiCashAuthPackageSignal,
                 psiCashEffects: environment.psiCashEffects
             ).flatMap(.latest) {
-                environment.urlHandler.open($0, tpm)
+                environment.urlHandler.open($0, tpmWeakRef)
             }
             .map(LandingPageAction._urlOpened(success:))
         ]
