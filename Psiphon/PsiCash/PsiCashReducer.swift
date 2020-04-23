@@ -43,7 +43,7 @@ struct PsiCashReducerState<T: TunnelProviderManager>: Equatable {
     var psiCashBalance: PsiCashBalance
     var psiCash: PsiCashState
     let subscription: SubscriptionState
-    let tunnelProviderManager: T?
+    let tunnelProviderManager: WeakRef<T>?
 }
 
 typealias PsiCashEnvironment = (

@@ -94,7 +94,7 @@ StoreDelegate<VPNProviderManagerStateAction<T>>
     func setTunnelProviderManager(_ manager: T) {}
 }
 
-protocol TunnelProviderManager: class, Equatable {
+protocol TunnelProviderManager: ClassBound, Equatable {
 
     var connectionStatus: TunnelProviderVPNStatus { get }
     

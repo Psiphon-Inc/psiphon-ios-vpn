@@ -513,3 +513,28 @@ public extension URLRequest {
             """)
     }
 }
+
+// MARK: Reference management
+
+/// A protocol that is class-bound.
+/// - Discussion: This enables `where` clause to match protocol that are class-bound.
+protocol ClassBound: class {}
+
+/// `WeakRef` holds a weak reference to the underlying type.
+/// - Discussion: This type is useful to provide access to resource that might other be leaked.
+final class WeakRef<Wrapped: ClassBound> {
+    
+    weak var weakRef: Wrapped?
+    
+    init(_ ref: Wrapped) {
+        self.weakRef = ref
+    }
+}
+
+extension WeakRef: Equatable where Wrapped: Equatable {
+    
+    static func == (lhs: WeakRef<Wrapped>, rhs: WeakRef<Wrapped>) -> Bool {
+        return lhs.weakRef == rhs.weakRef
+    }
+    
+}
