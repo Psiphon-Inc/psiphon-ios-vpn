@@ -76,7 +76,7 @@ Equatable, CustomStringConvertible {
     }
 }
 
-func feedbackLog(_ level: LogLevel, tag: LogTag, _ message: LogMessage) -> Effect<Never> {
+func feedbackLog(_ level: LogLevel, tag: LogTag = #file, _ message: LogMessage) -> Effect<Never> {
     .fireAndForget {
         switch level {
         case .info:
@@ -90,7 +90,7 @@ func feedbackLog(_ level: LogLevel, tag: LogTag, _ message: LogMessage) -> Effec
 }
 
 func feedbackLog<T: FeedbackDescription>(
-    _ level: LogLevel, tag: LogTag = "message", _ value: T
+    _ level: LogLevel, tag: LogTag = #file, _ value: T
 ) -> Effect<Never> {
     .fireAndForget {
         let message = String(describing: value)
@@ -106,7 +106,7 @@ func feedbackLog<T: FeedbackDescription>(
 }
 
 func feedbackLog<T: CustomFieldFeedbackDescription>(
-    _ level: LogLevel, tag: LogTag = "message",  _ value: T
+    _ level: LogLevel, tag: LogTag = #file,  _ value: T
 ) -> Effect<Never> {
     .fireAndForget {
         switch level {
