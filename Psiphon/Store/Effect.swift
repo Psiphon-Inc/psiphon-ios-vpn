@@ -46,6 +46,13 @@ extension Effect where Value == Never {
 
 extension Effect {
     
+    /// Ignores all values emitted by `self`, and conforms the returned signal `Value` type to the call-site context.
+    /// Returned effect does not emit any values.
+    public func fireAndForget<Mapped>() -> Effect<Mapped> {
+        return self.then(Effect<Mapped>.fireAndForget(work: { () -> Void in }))
+            as! SignalProducer<Mapped, Never>
+    }
+    
     public func sink(
         receiveCompletion: @escaping () -> Void,
         receiveValues: @escaping (Value) -> Void
