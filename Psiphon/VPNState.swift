@@ -643,6 +643,9 @@ fileprivate func startPsiphonTunnelReducer<T: TunnelProviderManager>(
     
     let tpmDeffered: Effect<T> = state.loadState.providerManagerForTunnelStart()
     
+    // Options passed to tunnel provider start handler function.
+    let startOptions = [EXTENSION_OPTION_START_FROM_CONTAINER: EXTENSION_OPTION_TRUE]
+    
     return [
         .fireAndForget {
             environment.sharedDB.setContainerTunnelStartTime(Date())
@@ -656,7 +659,7 @@ fileprivate func startPsiphonTunnelReducer<T: TunnelProviderManager>(
             switch saveLoadConfigResult {
             case .success(let tpm):
                 // Starts the tunnel and then saves the updated config from tunnel start.
-                return startPsiphonTunnel(tpm)
+                return startPsiphonTunnel(tpm, options: startOptions)
                     .flatMap(.latest) { startResult -> Effect<TPMEffectResultWrapper<T>> in
                         switch startResult {
                         case .success(let tpm):
