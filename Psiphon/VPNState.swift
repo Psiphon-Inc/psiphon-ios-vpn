@@ -54,41 +54,6 @@ fileprivate let vpnStartTag = LogTag("VPNStart")
     case restarting = 6
 }
 
-extension VPNStatus: Equatable {
-    
-    /// `providerNotStopped` value represents whether the tunnel provider process is running, and
-    /// is not stopped or in the process of getting stopped.
-    /// - Note: A tunnel provider that is running can also be in a zombie state.
-    var providerNotStopped: Bool {
-        switch self {
-        case .invalid, .disconnected, .disconnecting:
-            return false
-        case .connecting, .connected, .reasserting, .restarting:
-            return true
-        @unknown default:
-            fatalError("unknown NEVPNStatus '\(self.rawValue)'")
-        }
-    }
-    
-}
-
-extension TunnelProviderVPNStatus {
-    
-    func mapToVPNStatus() -> VPNStatus {
-        switch self {
-        case .invalid: return .invalid
-        case .disconnected: return .disconnected
-        case .connecting: return .connecting
-        case .connected: return .connected
-        case .reasserting: return .reasserting
-        case .disconnecting: return .disconnecting
-        @unknown default:
-            fatalError("unknown NEVPNStatus value '\(self.rawValue)'")
-        }
-    }
-    
-}
-
 // MARK: -
 
 typealias VPNState<T: TunnelProviderManager> =
@@ -109,30 +74,6 @@ enum PendingTunnelTransition: Equatable {
 enum TunnelStartStopIntent: Equatable {
     case start(transition: PendingTunnelTransition?)
     case stop
-}
-
-extension TunnelStartStopIntent {
-    
-    static func initializeIntentGiven(
-        _ reason: TunnelProviderSyncReason, _ syncedState: TunnelProviderSyncedState
-    ) -> Self {
-        guard case .appLaunched = reason else {
-            fatalError("should only initialize TunnelStateIntent after app is initially launched")
-        }
-        switch syncedState {
-        case .zombie:
-            // Tunnel provider has been in zombie state before app launch,
-            // therefore default tunnelIntent state is set to `.stop`.
-            return .stop
-        case .active(_):
-            return .start(transition: .none)
-        case .inactive:
-            return .stop
-        case .unknown(_):
-            return .stop
-        }
-    }
-    
 }
 
 /// `TunnelProviderStartStopAction` represents start/stop actions for tunnel provider.
@@ -214,66 +155,7 @@ struct ProviderManagerLoadState<T: TunnelProviderManager>: Equatable {
         case error(ErrorEvent<TPMError>)
     }
     
-    private(set) var value: LoadState
-    
-    var connectionStatus: TunnelProviderVPNStatus {
-        guard case let .loaded(tpm) = self.value else {
-            return .invalid
-        }
-        return tpm.connectionStatus
-    }
-    
-    var vpnConfigurationInstalled: Bool {
-        switch self.value {
-        case .nonLoaded:
-            fatalError("VPN Config not loaded")
-        case .loaded(_):
-            return true
-        case .noneStored, .error(_):
-            return false
-        }
-    }
-    
-    init() {
-        self.value = .nonLoaded
-    }
-    
-    func providerManagerForTunnelStart() -> Effect<T> {
-        switch self.value {
-        case .nonLoaded:
-            fatalError()
-        case .noneStored, .error(_):
-            return Effect(value: T.make())
-        case .loaded(let tpm):
-            return Effect(value: tpm)
-        }
-    }
-    
-    mutating func updateState(
-        configUpdateResult: Result<(T, VPNConnectionObserver<T>)?, ErrorEvent<TPMError>>
-    ) -> [Effect<Never>] {
-        let previousValue = self.value
-        switch configUpdateResult {
-        case .success(.none):
-            self.value = .noneStored
-            return []
-            
-        case .success(let .some((tpm, connectionObserver))):
-            self.value = .loaded(tpm)
-            guard case .loaded(let previousTpm) = previousValue, previousTpm == tpm else {
-                return [
-                    .fireAndForget { [tpm] in
-                        tpm.observeConnectionStatus(observer: connectionObserver)
-                    }
-                ]
-            }
-            return []
-            
-        case .failure(let errorEvent):
-            self.value = .error(errorEvent)
-            return [ feedbackLog(.error, tag: "ProviderManagerStateUpdate", errorEvent) ]
-        }
-    }
+    private(set) var value: LoadState = .nonLoaded
     
 }
 
@@ -289,31 +171,6 @@ struct VPNProviderManagerState<T: TunnelProviderManager>: Equatable {
     var providerSyncResult: Pending<ErrorEvent<TunnelProviderSyncedState.SyncError>?>
 }
 
-extension VPNProviderManagerState {
-    
-    var noPendingProviderStartStopAction: Bool {
-        switch startStopState {
-        case .none, .completed(_): return true
-        case .pending(_): return false
-        }
-    }
-    
-    var vpnStatus: VPNStatus {
-        if case .start(.restart) = tunnelIntent {
-            return .restarting
-        } else {
-            return providerVPNStatus.mapToVPNStatus()
-        }
-    }
-    
-    init() {
-        self.tunnelIntent = .none
-        self.loadState = .init()
-        self.providerVPNStatus = .invalid
-        self.startStopState = .none
-        self.providerSyncResult = .completed(.none)
-    }
-    
 }
 
 typealias VPNReducerEnvironment<T: TunnelProviderManager> = (
@@ -684,6 +541,153 @@ fileprivate func startPsiphonTunnelReducer<T: TunnelProviderManager>(
             .tpmEffectResultWrapper($0)
         }
     ]
+}
+
+// MARK: Type extensions
+
+extension VPNStatus: Equatable {
+    
+    /// `providerNotStopped` value represents whether the tunnel provider process is running, and
+    /// is not stopped or in the process of getting stopped.
+    /// - Note: A tunnel provider that is running can also be in a zombie state.
+    var providerNotStopped: Bool {
+        switch self {
+        case .invalid, .disconnected, .disconnecting:
+            return false
+        case .connecting, .connected, .reasserting, .restarting:
+            return true
+        @unknown default:
+            fatalError("unknown NEVPNStatus '\(self.rawValue)'")
+        }
+    }
+    
+}
+
+extension TunnelProviderVPNStatus {
+    
+    func mapToVPNStatus() -> VPNStatus {
+        switch self {
+        case .invalid: return .invalid
+        case .disconnected: return .disconnected
+        case .connecting: return .connecting
+        case .connected: return .connected
+        case .reasserting: return .reasserting
+        case .disconnecting: return .disconnecting
+        @unknown default:
+            fatalError("unknown NEVPNStatus value '\(self.rawValue)'")
+        }
+    }
+    
+}
+
+extension TunnelStartStopIntent {
+    
+    static func initializeIntentGiven(
+        _ reason: TunnelProviderSyncReason, _ syncedState: TunnelProviderSyncedState
+    ) -> Self {
+        guard case .appLaunched = reason else {
+            fatalError("should only initialize TunnelStateIntent after app is initially launched")
+        }
+        switch syncedState {
+        case .zombie:
+            // Tunnel provider has been in zombie state before app launch,
+            // therefore default tunnelIntent state is set to `.stop`.
+            return .stop
+        case .active(_):
+            return .start(transition: .none)
+        case .inactive:
+            return .stop
+        case .unknown(_):
+            return .stop
+        }
+    }
+    
+}
+
+extension ProviderManagerLoadState {
+    
+    var connectionStatus: TunnelProviderVPNStatus {
+        guard case let .loaded(tpm) = self.value else {
+            return .invalid
+        }
+        return tpm.connectionStatus
+    }
+    
+    var vpnConfigurationInstalled: Bool {
+        switch self.value {
+        case .nonLoaded:
+            fatalError("VPN Config not loaded")
+        case .loaded(_):
+            return true
+        case .noneStored, .error(_):
+            return false
+        }
+    }
+    
+    func providerManagerForTunnelStart() -> Effect<T> {
+        switch self.value {
+        case .nonLoaded:
+            fatalError()
+        case .noneStored, .error(_):
+            return Effect(value: T.make())
+        case .loaded(let tpm):
+            return Effect(value: tpm)
+        }
+    }
+    
+    mutating func updateState(
+        configUpdateResult: Result<(T, VPNConnectionObserver<T>)?, ErrorEvent<TPMError>>
+    ) -> [Effect<Never>] {
+        let previousValue = self.value
+        switch configUpdateResult {
+        case .success(.none):
+            self.value = .noneStored
+            return []
+            
+        case .success(let .some((tpm, connectionObserver))):
+            self.value = .loaded(tpm)
+            guard case .loaded(let previousTpm) = previousValue, previousTpm == tpm else {
+                return [
+                    .fireAndForget { [tpm] in
+                        tpm.observeConnectionStatus(observer: connectionObserver)
+                    }
+                ]
+            }
+            return []
+            
+        case .failure(let errorEvent):
+            self.value = .error(errorEvent)
+            return [ feedbackLog(.error, tag: "ProviderManagerStateUpdate", errorEvent) ]
+        }
+    }
+    
+}
+
+extension VPNProviderManagerState {
+    
+    var noPendingProviderStartStopAction: Bool {
+        switch startStopState {
+        case .none, .completed(_): return true
+        case .pending(_): return false
+        }
+    }
+    
+    var vpnStatus: VPNStatus {
+        if case .start(.restart) = tunnelIntent {
+            return .restarting
+        } else {
+            return providerVPNStatus.mapToVPNStatus()
+        }
+    }
+    
+    init() {
+        self.tunnelIntent = .none
+        self.loadState = .init()
+        self.providerVPNStatus = .invalid
+        self.startStopState = .none
+        self.providerSyncResult = .completed(.none)
+    }
+    
 }
 
 // MARK: Utility functions
