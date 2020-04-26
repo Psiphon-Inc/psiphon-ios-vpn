@@ -290,11 +290,10 @@ func updateConfig<T: TunnelProviderManager>(
     }
 }
 
-func startPsiphonTunnel<T: TunnelProviderManager>(_ tpm: T)
-    -> Effect<Result<T, ErrorEvent<NEVPNError>>>
-{
+func startPsiphonTunnel<T: TunnelProviderManager>(
+    _ tpm: T, options: [String: String]
+) -> Effect<Result<T, ErrorEvent<NEVPNError>>> {
             Effect { () -> Result<T, ErrorEvent<NEVPNError>> in
-                let options = [EXTENSION_OPTION_START_FROM_CONTAINER: EXTENSION_OPTION_TRUE]
                 do {
                     try tpm.start(options: options)
                     return .success(tpm)
