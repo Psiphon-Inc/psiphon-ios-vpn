@@ -21,7 +21,7 @@
 
 @interface AppInfo : NSObject
 
-+ (NSString*_Nullable)appVersion;
++ (NSString*_Nonnull)appVersion;
 
 + (NSString*_Nullable)clientRegion;
 
