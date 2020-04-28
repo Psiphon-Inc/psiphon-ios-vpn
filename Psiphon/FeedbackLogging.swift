@@ -76,46 +76,49 @@ Equatable, CustomStringConvertible {
     }
 }
 
-func feedbackLog(_ level: LogLevel, tag: LogTag = #file, _ message: LogMessage) -> Effect<Never> {
-    .fireAndForget {
-        switch level {
-        case .info:
-            PsiFeedbackLogger.info(withType: tag, message: message.description)
-        case .warn:
-            PsiFeedbackLogger.warn(withType: tag, message: message.description)
-        case .error:
-            PsiFeedbackLogger.error(withType: tag, message: message.description)
-        }
-    }
+func feedbackLog(
+    _ level: LogLevel, file: String = #file, line: Int = #line, _ message: LogMessage
+) -> Effect<Never> {
+    feedbackLog(level, type: "\(file.lastPathComponent):\(line)", value: message.description)
 }
 
 func feedbackLog<T: FeedbackDescription>(
-    _ level: LogLevel, tag: LogTag = #file, _ value: T
+    _ level: LogLevel, file: String = #file, line: Int = #line, _ value: T
 ) -> Effect<Never> {
-    .fireAndForget {
-        let message = String(describing: value)
-        switch level {
-        case .info:
-            PsiFeedbackLogger.info(withType: tag, message: message)
-        case .warn:
-            PsiFeedbackLogger.warn(withType: tag, message: message)
-        case .error:
-            PsiFeedbackLogger.error(withType: tag, message: message)
-        }
-    }
+    feedbackLog(level, type: "\(file.lastPathComponent):\(line)", value: String(describing: value))
 }
 
 func feedbackLog<T: CustomFieldFeedbackDescription>(
-    _ level: LogLevel, tag: LogTag = #file,  _ value: T
+    _ level: LogLevel, file: String = #file, line: Int = #line, _ value: T
 ) -> Effect<Never> {
+    feedbackLog(level, type: "\(file.lastPathComponent):\(line)", value: value.description)
+}
+
+func feedbackLog(_ level: LogLevel, tag: LogTag, _ message: LogMessage) -> Effect<Never> {
+    feedbackLog(level, type: tag, value: message.description)
+}
+
+func feedbackLog<T: FeedbackDescription>(
+    _ level: LogLevel, tag: LogTag, _ value: T
+) -> Effect<Never> {
+    feedbackLog(level, type: tag, value: String(describing: value))
+}
+
+func feedbackLog<T: CustomFieldFeedbackDescription>(
+    _ level: LogLevel, tag: LogTag,  _ value: T
+) -> Effect<Never> {
+    feedbackLog(level, type: tag, value: value.description)
+}
+
+private func feedbackLog(_ level: LogLevel, type: String, value: String) -> Effect<Never> {
     .fireAndForget {
         switch level {
         case .info:
-            PsiFeedbackLogger.info(withType: tag, message: value.description)
+            PsiFeedbackLogger.info(withType: type, message: value)
         case .warn:
-            PsiFeedbackLogger.warn(withType: tag, message: value.description)
+            PsiFeedbackLogger.warn(withType: type, message: value)
         case .error:
-            PsiFeedbackLogger.error(withType: tag, message: value.description)
+            PsiFeedbackLogger.error(withType: type, message: value)
         }
     }
 }
@@ -127,4 +130,16 @@ func makeFeedbackEntry<T: FeedbackDescription>(_ value: T) -> String {
         .replacingOccurrences(of: "\"", with: "\\\"")
         .replacingOccurrences(of: "Psiphon.", with: "")
         .replacingOccurrences(of: "Swift.", with: "")
+}
+
+extension String {
+    
+    fileprivate var lastPathComponent: String {
+        if let path = URL(string: self) {
+            return path.lastPathComponent
+        } else {
+            return self
+        }
+    }
+    
 }
