@@ -99,7 +99,7 @@
 		52B3C54523DA391F003F6B12 /* Requests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52B3C54423DA391F003F6B12 /* Requests.swift */; };
 		52B3C54A23DF99E8003F6B12 /* AppObservables.m in Sources */ = {isa = PBXBuildFile; fileRef = 52B3C54923DF99E8003F6B12 /* AppObservables.m */; };
 		52B3C54C23E0E895003F6B12 /* ButtonBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52B3C54B23E0E895003F6B12 /* ButtonBuilder.swift */; };
-		52B3C54E23E22454003F6B12 /* Logging.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52B3C54D23E22454003F6B12 /* Logging.swift */; };
+		52B3C54E23E22454003F6B12 /* FeedbackLogging.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52B3C54D23E22454003F6B12 /* FeedbackLogging.swift */; };
 		52C8F0A9237C8F3E00E5F9C0 /* Foundation+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52467FF822CE77A1009AEC6E /* Foundation+Additions.swift */; };
 		52C8F0AB237CA26200E5F9C0 /* ImageViewBuidler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52C8F0AA237CA26200E5F9C0 /* ImageViewBuidler.swift */; };
 		52C8F0AD237E145C00E5F9C0 /* PsiCashCoinPurchaseTable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52C8F0AC237E145C00E5F9C0 /* PsiCashCoinPurchaseTable.swift */; };
@@ -456,7 +456,7 @@
 		52B3C54823DF99E8003F6B12 /* AppObservables.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppObservables.h; sourceTree = "<group>"; };
 		52B3C54923DF99E8003F6B12 /* AppObservables.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppObservables.m; sourceTree = "<group>"; };
 		52B3C54B23E0E895003F6B12 /* ButtonBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ButtonBuilder.swift; sourceTree = "<group>"; };
-		52B3C54D23E22454003F6B12 /* Logging.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Logging.swift; sourceTree = "<group>"; };
+		52B3C54D23E22454003F6B12 /* FeedbackLogging.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedbackLogging.swift; sourceTree = "<group>"; };
 		52C8F0A1237C8ED600E5F9C0 /* PsiphonPlayground.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = PsiphonPlayground.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		52C8F0AA237CA26200E5F9C0 /* ImageViewBuidler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageViewBuidler.swift; sourceTree = "<group>"; };
 		52C8F0AC237E145C00E5F9C0 /* PsiCashCoinPurchaseTable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PsiCashCoinPurchaseTable.swift; sourceTree = "<group>"; };
@@ -1200,7 +1200,7 @@
 				52B3C54223DA31E1003F6B12 /* PurchaseVerifier.swift */,
 				52B3C54823DF99E8003F6B12 /* AppObservables.h */,
 				52B3C54923DF99E8003F6B12 /* AppObservables.m */,
-				52B3C54D23E22454003F6B12 /* Logging.swift */,
+				52B3C54D23E22454003F6B12 /* FeedbackLogging.swift */,
 				8D417EB024147C6D00FEE587 /* LandingPage.swift */,
 				8D417EB224148C1E00FEE587 /* URLHandler.swift */,
 				8D417EBC2417FF5B00FEE587 /* Subscription.swift */,
@@ -1744,7 +1744,7 @@
 				52D363CF230F112E002C2221 /* TabControlView.swift in Sources */,
 				445F24D620E1A5BA00D004E9 /* xer_decoder.c in Sources */,
 				EF652CD71F35224C002AFB48 /* MainViewController.m in Sources */,
-				52B3C54E23E22454003F6B12 /* Logging.swift in Sources */,
+				52B3C54E23E22454003F6B12 /* FeedbackLogging.swift in Sources */,
 				EF90D7A4204F22C900228A63 /* timestamp_format.c in Sources */,
 				52B3C54323DA31E1003F6B12 /* PurchaseVerifier.swift in Sources */,
 				F132D7E01F5739A800AF7F91 /* LaunchScreenViewController.m in Sources */,
