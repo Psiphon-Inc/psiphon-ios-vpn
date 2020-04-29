@@ -32,10 +32,8 @@ class StoreDelegate<Action>: ObjCDelegate {
         self.store = store
     }
     
-    func sendOnMain(_ action: Action) {
-        DispatchQueue.main.async { [unowned self] in
-            self.store.send(action)
-        }
+    func storeSend(_ action: Action) {
+        self.store.send(action)
     }
     
 }

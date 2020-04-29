@@ -158,11 +158,11 @@ func productRequestReducer(
 final class ProductRequestDelegate: StoreDelegate<ProductRequestAction>, SKProductsRequestDelegate {
     
     func productsRequest(_ request: SKProductsRequest, didReceive response: SKProductsResponse) {
-        sendOnMain(.productRequestResult(request, .success(response)))
+        storeSend(.productRequestResult(request, .success(response)))
     }
     
     func request(_ request: SKRequest, didFailWithError error: Error) {
-        sendOnMain(
+        storeSend(
             .productRequestResult(
                 request as! SKProductsRequest, .failure(SystemErrorEvent(error as SystemError))
             )

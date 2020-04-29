@@ -136,12 +136,12 @@ fileprivate func notifyUpdatedReceiptEffects<NeverAction>(
 final class ReceiptRefreshRequestDelegate: StoreDelegate<ReceiptStateAction>, SKRequestDelegate {
     
     func requestDidFinish(_ request: SKRequest) {
-        sendOnMain(.receiptRefreshed(.success(())))
+        storeSend(._remoteReceiptRefreshResult(.success(())))
     }
     
     func request(_ request: SKRequest, didFailWithError error: Error) {
         let errorEvent = ErrorEvent(error as NSError)
-        sendOnMain(.receiptRefreshed(.failure(errorEvent)))
+        storeSend(._remoteReceiptRefreshResult(.failure(errorEvent)))
     }
     
 }

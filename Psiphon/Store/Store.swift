@@ -102,7 +102,6 @@ public final class Store<Value: Equatable, Action> {
     }
      
     /// Sends action to the store.
-    /// - Note: Stops program execution if called from threads other than the main thread.
     public func send(_ action: Action) {
         self.scheduler.schedule { [unowned self] in
             // Executes the reducer and collects the effects
