@@ -183,12 +183,10 @@ func iapReducer(
                                         UnverifiedPsiCashConsumableTransaction(value: transaction)
                                     )
                                     
-                                    // Performs a remote receipt refresh before submitting
+                                    // Performs a local receipt refresh before submitting
                                     // the receipt for verification.
                                     effects.append(
-                                        environment.appReceiptStore(
-                                            .remoteReceiptRefresh(optinalPromise: nil)
-                                        ).mapNever()
+                                        environment.appReceiptStore(.localReceiptRefresh).mapNever()
                                     )
                                     
                                 case .some(true):
