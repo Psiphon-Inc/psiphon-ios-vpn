@@ -74,6 +74,9 @@ public final class Store<Value: Equatable, Action> {
     private var disposable: Disposable? = .none
     private var effectDisposables = CompositeDisposable()
     
+    /// Count of effects that have not completed.
+    public private(set) var outstandingEffectCount = 0
+    
     public init<Environment>(
         initialValue: Value,
         reducer: @escaping Reducer<Value, Action, Environment>,
@@ -104,15 +107,21 @@ public final class Store<Value: Equatable, Action> {
         self.scheduler.schedule { [unowned self] in
             // Executes the reducer and collects the effects
             let effects = self.reducer!(&self.value, action, ())
+            
+            self.outstandingEffectCount += effects.count
 
             effects.forEach { effect in
                 var disposable: Disposable?
                 disposable = effect.observe(on: self.scheduler)
-                    .sink(receiveCompletion: {
-                        disposable?.dispose()
-                    }, receiveValues: { [unowned self] internalAction in
-                        self.send(internalAction)
-                    })
+                    .sink(
+                        receiveCompletion: {
+                            disposable?.dispose()
+                            self.outstandingEffectCount -= 1
+                        },
+                        receiveValues: { [unowned self] internalAction in
+                            self.send(internalAction)
+                        }
+                    )
                 
                 self.effectDisposables.add(disposable)
             }
