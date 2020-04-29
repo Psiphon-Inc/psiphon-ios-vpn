@@ -73,6 +73,7 @@ struct AppState: Equatable {
     var psiCash = PsiCashState()
     var appReceipt = ReceiptState()
     var subscription = SubscriptionState()
+    var subscriptionAuthState = SubscriptionAuthState()
     var iapState = IAPState()
     var products = PsiCashAppStoreProductsState()
     var adPresentationState: Bool = false
@@ -99,6 +100,7 @@ enum AppAction {
     case iap(IAPAction)
     case appReceipt(ReceiptStateAction)
     case subscription(SubscriptionAction)
+    case subscriptionAuthStateAction(SubscriptionAuthStateAction)
     case productRequest(ProductRequestAction)
 }
 
@@ -111,7 +113,7 @@ typealias AppEnvironment = (
     sharedDB: PsiphonDataSharedDB,
     userConfigs: UserDefaultsConfig,
     notifier: Notifier,
-    tunnelProviderStatusSignal: SignalProducer<TunnelProviderVPNStatus, Never>,
+    tunnelStatusWithIntentSignal: SignalProducer<VPNStatusWithIntent, Never>,
     psiCashAuthPackageSignal: SignalProducer<PsiCashAuthPackage, Never>,
     urlHandler: URLHandler<PsiphonTPM>,
     paymentQueue: PaymentQueue,
@@ -126,11 +128,14 @@ typealias AppEnvironment = (
     appReceiptStore: (ReceiptStateAction) -> Effect<Never>,
     iapStore: (IAPAction) -> Effect<Never>,
     subscriptionStore: (SubscriptionAction) -> Effect<Never>,
+    subscriptionAuthStateStore: (SubscriptionAuthStateAction) -> Effect<Never>,
     /// `vpnStartCondition` retruns true whenever the app is in such a state as to to allow
     /// the VPN to be started. If false is returned the VPN should not be started.
     vpnStartCondition: () -> Bool,
     supportedSubscriptionIAPProductIDs: SupportedAppStoreProductIDs,
-    supportedPsiCashIAPProductIDs: SupportedAppStoreProductIDs
+    supportedPsiCashIAPProductIDs: SupportedAppStoreProductIDs,
+    getCurrentTime: () -> Date,
+    compareDates: (Date, Date, Calendar.Component) -> ComparisonResult
 )
 
 /// Creates required environment for store `Store<AppState, AppAction>`.
@@ -140,7 +145,8 @@ func makeEnvironment(
     store: Store<AppState, AppAction>,
     psiCashLib: PsiCash,
     objcBridgeDelegate: ObjCBridgeDelegate,
-    rewardedVideoAdBridgeDelegate: RewardedVideoAdBridgeDelegate
+    rewardedVideoAdBridgeDelegate: RewardedVideoAdBridgeDelegate,
+    calendar: Calendar
 ) -> (environment: AppEnvironment, cleanup: () -> Void) {
     
     let paymentTransactionDelegate = PaymentTransactionDelegate(store:
@@ -157,8 +163,8 @@ func makeEnvironment(
         sharedDB: PsiphonDataSharedDB(forAppGroupIdentifier: APP_GROUP_IDENTIFIER),
         userConfigs: UserDefaultsConfig(),
         notifier:  Notifier.sharedInstance(),
-        tunnelProviderStatusSignal: store.$value.signalProducer
-            .map(\.vpnState.value.providerVPNStatus),
+        tunnelStatusWithIntentSignal: store.$value.signalProducer
+            .map(\.vpnState.value.vpnStatusWithIntent),
         psiCashAuthPackageSignal: store.$value.signalProducer.map(\.psiCash.libData.authPackage),
         urlHandler: .default(),
         paymentQueue: .default,
@@ -204,11 +210,23 @@ func makeEnvironment(
                 store.send(.subscription(action))
             }
         },
+        subscriptionAuthStateStore: { [unowned store] (action: SubscriptionAuthStateAction)
+            -> Effect<Never> in
+            .fireAndForget {
+                store.send(.subscriptionAuthStateAction(action))
+            }
+        },
         vpnStartCondition: { [unowned store] () -> Bool in
             return !store.value.adPresentationState
         },
         supportedSubscriptionIAPProductIDs: SupportedAppStoreProductIDs.subscription(),
-        supportedPsiCashIAPProductIDs: SupportedAppStoreProductIDs.psiCash()
+        supportedPsiCashIAPProductIDs: SupportedAppStoreProductIDs.psiCash(),
+        getCurrentTime: { () -> Date in
+            return Date()
+        },
+        compareDates: { date1, date2, granulairty -> ComparisonResult in
+            return calendar.compare(date1, to: date2, toGranularity: granulairty)
+        }
     )
     
     let cleanup = { [paymentTransactionDelegate] in
@@ -243,7 +261,7 @@ fileprivate func toLandingPageEnvironment(
 
 fileprivate func toIAPReducerEnvironment(env: AppEnvironment) -> IAPEnvironment {
     IAPEnvironment(
-        tunnelProviderStatusSignal: env.tunnelProviderStatusSignal,
+        tunnelStatusWithIntentSignal: env.tunnelStatusWithIntentSignal,
         psiCashEffects: env.psiCashEffects,
         clientMetaData: env.clientMetaData,
         paymentQueue: env.paymentQueue,
@@ -258,7 +276,12 @@ fileprivate func toReceiptReducerEnvironment(env: AppEnvironment) -> ReceiptRedu
         appBundle: env.appBundle,
         iapStore: env.iapStore,
         subscriptionStore: env.subscriptionStore,
-        receiptRefreshRequestDelegate: env.receiptRefreshRequestDelegate
+        subscriptionAuthStateStore: env.subscriptionAuthStateStore,
+        receiptRefreshRequestDelegate: env.receiptRefreshRequestDelegate,
+        consumableProductsIDs: env.supportedPsiCashIAPProductIDs.values,
+        subscriptionProductIDs: env.supportedSubscriptionIAPProductIDs.values,
+        getCurrentTime: env.getCurrentTime,
+        compareDates: env.compareDates
     )
 }
 
@@ -266,10 +289,22 @@ fileprivate func toSubscriptionReducerEnvironment(
     env: AppEnvironment
 ) -> SubscriptionReducerEnvironment {
     SubscriptionReducerEnvironment(
+        appReceiptStore: env.appReceiptStore,
+        getCurrentTime: env.getCurrentTime,
+        compareDates: env.compareDates
+    )
+}
+
+fileprivate func toSubscriptionAuthStateReducerEnvironment(
+    env: AppEnvironment
+) -> SubscriptionAuthStateReducerEnvironment {
+    SubscriptionAuthStateReducerEnvironment(
         notifier: env.notifier,
         sharedDB: env.sharedDB,
-        userConfigs: env.userConfigs,
-        appReceiptStore: env.appReceiptStore
+        tunnelStatusWithIntentSignal: env.tunnelStatusWithIntentSignal,
+        clientMetaData: env.clientMetaData,
+        getCurrentTime: env.getCurrentTime,
+        compareDates: env.compareDates
     )
 }
 
@@ -305,7 +340,7 @@ fileprivate func toVPNReducerEnvironment(env: AppEnvironment) -> VPNReducerEnvir
 func makeAppReducer() -> Reducer<AppState, AppAction, AppEnvironment> {
     combine(
         pullback(makeVpnStateReducer(),
-                 value: \.vpnState,
+                 value: \.vpnReducerState,
                  action: \.vpnStateAction,
                  environment: toVPNReducerEnvironment(env:)),
         pullback(psiCashReducer,
@@ -328,6 +363,10 @@ func makeAppReducer() -> Reducer<AppState, AppAction, AppEnvironment> {
                  value: \.subscription,
                  action: \.subscription,
                  environment: toSubscriptionReducerEnvironment(env:)),
+        pullback(subscriptionAuthStateReducer,
+                 value: \.subscriptionAuthReducerState,
+                 action: \.subscriptionAuthStateAction,
+                 environment: toSubscriptionAuthStateReducerEnvironment(env:)),
         pullback(productRequestReducer,
                  value: \.products,
                  action: \.productRequest,

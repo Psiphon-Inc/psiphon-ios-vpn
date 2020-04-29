@@ -172,63 +172,47 @@ NS_ASSUME_NONNULL_BEGIN
 #endif
 
 
-#pragma mark - Subscription
-
-#if TARGET_IS_EXTENSION
-
-/**
- * Sets subscription verification result.
- */
-- (void)setSubscriptionVerificationDictionary:(NSDictionary *_Nullable)dict;
-
-#else
-
-/**
- * If the receipt is empty (contains to transactions), the container should use
- * this method to set the receipt file size to be read by the network extension.
- * @param receiptFileSize File size of the empty receipt.
- */
-- (void)setContainerEmptyReceiptFileSize:(NSNumber *_Nullable)receiptFileSize;
-
-/**
- * Sets the expiry date as found in the subscription receipt by the container.
- */
-- (void)setContainerLastSubscriptionReceiptExpiryDate:(NSDate *_Nullable)expiryDate;
-
-#endif
-
-/**
- * Returns the file size of previously recorded empty receipt by the container (if any).
- * @return Nil or file size recorded by the container.
- */
-- (NSNumber *_Nullable)getContainerEmptyReceiptFileSize;
-
-/**
- * @return Nil or latest subscription expiry date that was read from the receipt file.
- */
-- (NSDate *_Nullable)getContainerLastSubscriptionReceiptExpiryDate;
-
-/**
- * Returns subscription verification dictionary previously stored by the extension.
- */
-- (NSDictionary *_Nullable)getSubscriptionVerificationDictionary;
-
-
 #pragma mark - Authorizations
 
 #if TARGET_IS_EXTENSION
 
-- (void)removeNonSubscriptionAuthorizationsNotAccepted:(NSSet<NSString *> *_Nullable)authIdsToRemove;
+- (void)removeNonSubscriptionAuthorizationsNotAccepted:(NSSet<NSString*>*_Nullable)authIdsToRemove;
 
 #else
 
-- (void)setNonSubscriptionAuthorizations:(NSSet<Authorization *> *_Nullable)authorizations;
+- (void)setNonSubscriptionEncodedAuthorizations:(NSSet<NSString*>*_Nullable)encodedAuthorizations;
 
-- (void)appendNonSubscriptionAuthorization:(Authorization *_Nonnull)authorization;
+- (void)appendNonSubscriptionEncodedAuthorization:(NSString *_Nonnull)base64Encoded;
 
 #endif
 
-- (NSSet<Authorization *> *)getNonSubscriptionAuthorizations;
+- (NSSet<NSString *> *)getNonSubscriptionEncodedAuthorizations;
+
+#pragma mark - Subscription Authorizations
+
+#if !(TARGET_IS_EXTENSION)
+/// Encoded object must JSON representation of type `[TransactionID: SubscriptionPurchaseAuth]`.
+/// This method does no validation on the given `purchaseAuths`.
+- (void)setSubscriptionAuths:(NSData *_Nullable)purchaseAuths;
+#endif
+
+/// Encoded object has JSON representation of type `[TransactionID: SubscriptionPurchaseAuth]`.
+/// This method does no validation on the stored data.
+- (NSData *_Nullable)getSubscriptionAuths;
+
+-(NSArray<NSString *> *_Nonnull)getRejectedSubscriptionAuthorizationIDs;
+
+#if TARGET_IS_EXTENSION
+- (void)insertRejectedSubscriptionAuthorizationID:(NSString *)authorizationID;
+#endif
+
+- (NSInteger)getExtensionRejectedSubscriptionAuthIdWriteSequenceNumber;
+
+- (NSInteger)getContainerRejectedSubscriptionAuthIdReadSequenceNumber;
+
+#if !(TARGET_IS_EXTENSION)
+- (void)updateContainerRejectedSubscriptionAuthIdReadSequenceNumber;
+#endif
 
 #pragma mark - Jetsam counter
 

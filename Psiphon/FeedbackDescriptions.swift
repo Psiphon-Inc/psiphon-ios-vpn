@@ -66,13 +66,12 @@ extension TunnelProviderSyncReason: CustomStringFeedbackDescription {
     
 }
 
-extension Authorization: CustomStringFeedbackDescription {
+extension SignedAuthorization: CustomFieldFeedbackDescription {
     
-    public override var description: String {
-        let feedbackFields: [String : CustomStringConvertible] = ["id": id,
-                                                                  "expires": expires,
-                                                                  "accessType": accessType]
-        return "\(String(describing: Self.self))(\(String(describing: feedbackFields)))"
+    var feedbackFields: [String : CustomStringConvertible] {
+        ["ID": authorization.id,
+         "Expires": authorization.expires,
+         "AccessType": authorization.accessType.rawValue]
     }
     
 }
@@ -94,3 +93,5 @@ extension UserDefaultsConfig: CustomFieldFeedbackDescription {
     }
     
 }
+
+extension RetriableTunneledHttpRequest.RequestResult.RetryCondition: FeedbackDescription {}

@@ -20,8 +20,6 @@
 import Foundation
 
 typealias CustomData = String
-typealias AuthID = String
-
 
 enum PsiCashParseError: HashableError {
     case speedBoostParseFailure(message: String)
@@ -87,12 +85,16 @@ extension PsiCash {
         }
     }
 
-    func speedBoostAuthorizations() -> Set<Authorization>? {
-        let auths = self.purchases()?
+    func speedBoostAuthorizations() -> Set<SignedAuthorization>? {
+        let maybeBase64Auths = self.purchases()?
             .filter { $0.transactionClass == PsiCashTransactionClass.speedBoost.rawValue }
             .compactMap { $0.authorization }
 
-        return Authorization.create(fromEncodedAuthorizations: auths)
+        guard let base64Auths = maybeBase64Auths else {
+            return nil
+        }
+        
+        return SignedAuthorization.make(setOfBase64Strings: base64Auths)
     }
 
     func parsedActivePurchases() -> PsiCashParsed<PsiCashPurchasedType> {
@@ -135,17 +137,20 @@ extension PsiCash {
 
     /// This function takes a source of truth for authorizations and explicitly expires
     /// any  authorization stored by PsiCash library that is not in `sourceOfTruth`.
-    func expirePurchases(notFoundIn sourceOfTruth: [AuthID]) {
+    func expirePurchases(notFoundIn sourceOfTruth: [AuthorizationID]) {
         // Set of Auth ids stored by PsiCash library.
         guard let validPurchases = self.validPurchases() else {
             return
         }
 
-        let psiCashAuthIds = Set(validPurchases.compactMap { purchase -> AuthID? in
-            guard let auth = Authorization(encodedAuthorization: purchase.authorization) else {
+        let psiCashAuthIds = Set(validPurchases.compactMap { purchase -> AuthorizationID? in
+            guard let base64Auth = purchase.authorization else {
                 return nil
             }
-            return AuthID(auth.id)
+            guard let auth = try? SignedAuthorization.make(base64String: base64Auth) else {
+                return nil
+            }
+            return auth.authorization.id
         })
 
         // Auth ids in PsiCash library not found in `sourceOfTruth`.
@@ -256,7 +261,7 @@ struct ExpirableTransaction: Equatable {
     let transactionId: String
     let serverTimeExpiry: Date
     let localTimeExpiry: Date
-    let authorization: Authorization
+    let authorization: SignedAuthorization
 
     // True if expiry date has already passed.
     var expired: Bool {
@@ -266,7 +271,8 @@ struct ExpirableTransaction: Equatable {
     static func from(psiCashPurchase purchase: PsiCashPurchase) -> Self? {
         guard let serverTimeExpiry = purchase.serverTimeExpiry else { return nil }
         guard let localTimeExpiry = purchase.localTimeExpiry else { return nil }
-        guard let authorization = Authorization(encodedAuthorization: purchase.authorization) else {
+        guard let base64Auth = purchase.authorization else { return nil }
+        guard let authorization = try? SignedAuthorization.make(base64String: base64Auth) else {
             return nil
         }
         return .init(transactionId: purchase.id,

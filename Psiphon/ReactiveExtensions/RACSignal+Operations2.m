@@ -28,7 +28,6 @@
 #import "Asserts.h"
 #import "RACTargetQueueScheduler.h"
 #import "RACTuple.h"
-#import "UnionSerialQueue.h"
 #import "Logging.h"
 
 @implementation RACSignal (Operations2)

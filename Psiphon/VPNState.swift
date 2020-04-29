@@ -59,11 +59,14 @@ fileprivate let vpnStartTag = LogTag("VPNStart")
 typealias VPNState<T: TunnelProviderManager> =
     SerialEffectState<VPNProviderManagerState<T>, VPNProviderManagerStateAction<T>>
 
+typealias VPNReducerState<T: TunnelProviderManager> =
+    SerialEffectState<VPNProviderManagerReducerState<T>, VPNProviderManagerStateAction<T>>
+
 typealias VPNStateAction<T: TunnelProviderManager> =
     SerialEffectAction<VPNProviderManagerStateAction<T>>
 
 func makeVpnStateReducer<T: TunnelProviderManager>()
-    -> Reducer<VPNState<T>, VPNStateAction<T>, VPNReducerEnvironment<T>> {
+    -> Reducer<VPNReducerState<T>, VPNStateAction<T>, VPNReducerEnvironment<T>> {
         makeSerialEffectReducer(vpnProviderManagerStateReducer)
 }
 
@@ -165,12 +168,16 @@ typealias VPNStartStopStateType =
 
 struct VPNProviderManagerState<T: TunnelProviderManager>: Equatable {
     var tunnelIntent: TunnelStartStopIntent?
+    // TODO: Use private(set)
     var loadState: ProviderManagerLoadState<T>
     var providerVPNStatus: TunnelProviderVPNStatus
     var startStopState: VPNStartStopStateType
     var providerSyncResult: Pending<ErrorEvent<TunnelProviderSyncedState.SyncError>?>
 }
 
+struct VPNProviderManagerReducerState<T: TunnelProviderManager>: Equatable {
+    var vpnState: VPNProviderManagerState<T>
+    let subscriptionTransactionsPendingAuthorization: Set<OriginalTransactionID>
 }
 
 typealias VPNReducerEnvironment<T: TunnelProviderManager> = (
@@ -180,31 +187,34 @@ typealias VPNReducerEnvironment<T: TunnelProviderManager> = (
 )
 
 fileprivate func vpnProviderManagerStateReducer<T: TunnelProviderManager>(
-    state: inout VPNProviderManagerState<T>, action: VPNProviderManagerStateAction<T>,
+    state: inout VPNProviderManagerReducerState<T>, action: VPNProviderManagerStateAction<T>,
     environment: VPNReducerEnvironment<T>
 ) -> [Effect<VPNProviderManagerStateAction<T>>] {
     switch action {
     case .tpmEffectResultWrapper(let tunnelProviderAction):
-        return tunnelProviderReducer(state: &state, action: tunnelProviderAction,
+        return tunnelProviderReducer(state: &state.vpnState, action: tunnelProviderAction,
                                      environment: environment)
         
     case .vpnStatusChanged(let vpnStatus):
-        state.providerVPNStatus = vpnStatus
+        state.vpnState.providerVPNStatus = vpnStatus
         
         // Resets tunnelIntent transition flag if previously was `.restart`.
         // Discussion:
         // The flag is reset at the disconnecting state change, since this is a clear
         // signal that the provider has started transitioning (being stopped and started again).
         //
-        if case .disconnecting = vpnStatus, case .start(transition: .restart) = state.tunnelIntent {
-            state.tunnelIntent = .start(transition: .none)
+        if case .disconnecting = vpnStatus, case .start(transition: .restart) = state.vpnState.tunnelIntent {
+            state.vpnState.tunnelIntent = .start(transition: .none)
         }
         
-        // Sends startPsiphonTunnel message if tunnelIntent is start, and
-        // the tunnel has disconnected.
-        if case .start(transition: _) = state.tunnelIntent, case .disconnected = vpnStatus {
+        // If the VPN connection is not in the expected state,
+        // sends a `.startPsiphonTunnel` or `.stopVPN` message.
+        switch (state.vpnState.tunnelIntent, vpnStatus) {
+        case (.start(transition: _), .disconnected):
             return [ Effect(value: .startPsiphonTunnel) ]
-        } else {
+        case (.stop, .reasserting), (.stop, .connecting), (.stop, .connected):
+            return [ Effect(value: .stopVPN) ]
+        default:
             return []
         }
           
@@ -212,19 +222,19 @@ fileprivate func vpnProviderManagerStateReducer<T: TunnelProviderManager>(
         return startPsiphonTunnelReducer(state: &state, environment: environment)
         
     case .stopVPN:
-        guard state.noPendingProviderStartStopAction else {
+        guard state.vpnState.noPendingProviderStartStopAction else {
             fatalError("""
                 cannot stopVPN since there is pending action \
-                '\(String(describing: state.startStopState))'
+                '\(String(describing: state.vpnState.startStopState))'
                 """)
         }
         
-        guard case .loaded(let tpm) = state.loadState.value,
+        guard case .loaded(let tpm) = state.vpnState.loadState.value,
             tpm.connectionStatus.providerNotStopped else {
                 return []
         }
         
-        state.startStopState = .pending(.stopVPN)
+        state.vpnState.startStopState = .pending(.stopVPN)
         
         return [
             updateConfig(tpm, for: .stopVPN)
@@ -251,25 +261,25 @@ fileprivate func vpnProviderManagerStateReducer<T: TunnelProviderManager>(
             // Loads current VPN configuration from VPN preferences.
             // After VPN configuration is loaded, `.syncWithProvider` action is sent.
             
-            guard case .nonLoaded = state.loadState.value else {
+            guard case .nonLoaded = state.vpnState.loadState.value else {
                 fatalError()
             }
-            state.providerSyncResult = .pending
+            state.vpnState.providerSyncResult = .pending
             return [
                 loadAllConfigs().map { .tpmEffectResultWrapper(.configUpdated($0)) },
                 Effect(value: .external(.syncWithProvider(reason: .appLaunched)))
             ]
             
         case .syncWithProvider(reason: let reason):
-            guard case .loaded(let tpm) = state.loadState.value else {
-                state.providerSyncResult = .completed(.none)
+            guard case .loaded(let tpm) = state.vpnState.loadState.value else {
+                state.vpnState.providerSyncResult = .completed(.none)
                 return []
             }
             
             switch reason {
             case .appLaunched:
-                // At app launch, `state.providerSyncResult` defaults to `.pending`.
-                guard case .pending = state.providerSyncResult else {
+                // At app launch, `state.vpnState.providerSyncResult` defaults to `.pending`.
+                guard case .pending = state.vpnState.providerSyncResult else {
                     fatalError()
                 }
                 return [
@@ -278,10 +288,10 @@ fileprivate func vpnProviderManagerStateReducer<T: TunnelProviderManager>(
                 ]
                 
             case .appEnteredForeground:
-                guard case .completed(_) = state.providerSyncResult else {
+                guard case .completed(_) = state.vpnState.providerSyncResult else {
                     fatalError()
                 }
-                state.providerSyncResult = .pending
+                state.vpnState.providerSyncResult = .pending
                 return [
                     loadConfig(tpm).flatMap(.latest) { result -> Effect<TPMEffectResultWrapper<T>> in
                         switch result {
@@ -301,10 +311,10 @@ fileprivate func vpnProviderManagerStateReducer<T: TunnelProviderManager>(
                 ]
                 
             case .providerNotificationPsiphonTunnelConnected:
-                guard case .completed(_) = state.providerSyncResult else {
+                guard case .completed(_) = state.vpnState.providerSyncResult else {
                     fatalError()
                 }
-                state.providerSyncResult = .pending
+                state.vpnState.providerSyncResult = .pending
                 return [
                     syncStateWithProvider(syncReason: reason, tpm)
                         .map { .tpmEffectResultWrapper($0) }
@@ -312,7 +322,7 @@ fileprivate func vpnProviderManagerStateReducer<T: TunnelProviderManager>(
             }
             
         case .reinstallVPNConfig:
-            if case let .loaded(tpm) = state.loadState.value {
+            if case let .loaded(tpm) = state.vpnState.loadState.value {
                 // Returned effect calls `stop()` on the tunnel provider manager object first,
                 // before remvoing the VPN config.
                 return [
@@ -340,28 +350,28 @@ fileprivate func vpnProviderManagerStateReducer<T: TunnelProviderManager>(
             }
             
         case .tunnelStateIntent(let intent):
-            if intent == state.tunnelIntent {
+            if intent == state.vpnState.tunnelIntent {
                 return []
             }
             
             switch intent {
             case .start(transition: .none):
                 // Starts Psiphon tunnel.
-                state.tunnelIntent = .start(transition: .none)
+                state.vpnState.tunnelIntent = .start(transition: .none)
                 return [ Effect(value: .startPsiphonTunnel) ]
                 
             case .start(transition: .restart):
                 // Restarts tunnel provider if not stopped.
-                guard case let .loaded(tpm) = state.loadState.value,
+                guard case let .loaded(tpm) = state.vpnState.loadState.value,
                     tpm.connectionStatus.providerNotStopped else {
                         return []
                 }
-                state.tunnelIntent = .start(transition: .restart)
+                state.vpnState.tunnelIntent = .start(transition: .restart)
                 return [ Effect(value: .stopVPN) ]
                 
             case .stop:
                 // Stops tunnel provider.
-                state.tunnelIntent = .stop
+                state.vpnState.tunnelIntent = .stop
                 return [ Effect(value: .stopVPN) ]
             }
         }
@@ -480,28 +490,34 @@ fileprivate func tunnelProviderReducer<T: TunnelProviderManager>(
 }
 
 fileprivate func startPsiphonTunnelReducer<T: TunnelProviderManager>(
-    state: inout VPNProviderManagerState<T>, environment: VPNReducerEnvironment<T>
+    state: inout VPNProviderManagerReducerState<T>, environment: VPNReducerEnvironment<T>
 ) -> [Effect<VPNProviderManagerStateAction<T>>] {
     
     // No-op if there is any pending provider action.
-    guard state.noPendingProviderStartStopAction else {
+    guard state.vpnState.noPendingProviderStartStopAction else {
         fatalError("""
             cannot startPsiphonTunnel since there is pending action \
-            '\(String(describing: state.startStopState))'
+            '\(String(describing: state.vpnState.startStopState))'
             """)
     }
     
     // No-op if the tunnel provider is already active.
-    if state.loadState.connectionStatus.providerNotStopped {
+    if state.vpnState.loadState.connectionStatus.providerNotStopped {
         return []
     }
     
-    state.startStopState = .pending(.startPsiphonTunnel)
+    state.vpnState.startStopState = .pending(.startPsiphonTunnel)
     
-    let tpmDeffered: Effect<T> = state.loadState.providerManagerForTunnelStart()
+    let tpmDeffered: Effect<T> = state.vpnState.loadState.providerManagerForTunnelStart()
     
     // Options passed to tunnel provider start handler function.
-    let startOptions = [EXTENSION_OPTION_START_FROM_CONTAINER: EXTENSION_OPTION_TRUE]
+    var startOptions = [EXTENSION_OPTION_START_FROM_CONTAINER: EXTENSION_OPTION_TRUE]
+    
+    // Adds subscription check sponsor id to tunnel provider start options if there are
+    // subscription transactiond pending authorization.
+    if !state.subscriptionTransactionsPendingAuthorization.isEmpty {
+        startOptions[EXTENSION_OPTION_SUBSCRIPTION_CHECK_SPONSOR_ID] = EXTENSION_OPTION_TRUE
+    }
     
     return [
         .fireAndForget {
@@ -691,6 +707,29 @@ extension VPNProviderManagerState {
 }
 
 // MARK: Utility functions
+
+struct VPNStatusWithIntent: Equatable {
+    let status: TunnelProviderVPNStatus
+    let intent: TunnelStartStopIntent?
+    
+    var willReconnect: Bool {
+        switch self.intent {
+        case .some(.start(transition: .none)): return true
+        default: return false
+        }
+    }
+}
+
+extension VPNProviderManagerState {
+    
+    var vpnStatusWithIntent: VPNStatusWithIntent {
+        VPNStatusWithIntent(
+            status: self.providerVPNStatus,
+            intent: self.tunnelIntent
+        )
+    }
+    
+}
 
 extension ConfigUpdatedResult {
     

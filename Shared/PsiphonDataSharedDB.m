@@ -21,9 +21,12 @@
 #import "Logging.h"
 #import "NSDate+PSIDateExtension.h"
 #import "UserDefaults.h"
-#import "Authorization.h"
 #import "SharedConstants.h"
 #import <PsiphonTunnel/PsiphonTunnel.h>
+
+#if TARGET_IS_EXTENSION
+#import "Authorization.h"
+#endif
 
 // File operations parameters
 #define MAX_RETRIES 3
@@ -41,14 +44,19 @@ UserDefaultsKey const TunnelSponsorIDStringKey = @"current_sponsor_id";
 
 UserDefaultsKey const ServerTimestampStringKey = @"server_timestamp";
 
-UserDefaultsKey const ContainerSubscriptionEmptyReceiptNumberKey = @"kContainerSubscriptionEmptyReceiptKey";
-
-UserDefaultsKey const ContainerSubscriptionReceiptExpiryDate = @"container_subscription_receipt_expiry_date";
-
 UserDefaultsKey const ContainerAuthorizationSetKey = @"authorizations_container_key";
 
-UserDefaultsKey const SubscriptionVerificationDictionaryKey = @"subscription_verification_dictionary_key";
+UserDefaultsKey const ContainerSubscriptionAuthorizationsDictKey =
+    @"subscription_authorizations_dict";
 
+UserDefaultsKey const ExtensionRejectedSubscriptionAuthorizationIDsArrayKey =
+    @"extension_rejected_subscription_authorization_ids";
+
+UserDefaultsKey const ExtensionRejectedSubscriptionAuthorizationIDsWriteSeqIntKey =
+@"extesnion_rejected_subscription_authorization_ids_write_seq_int";
+
+UserDefaultsKey const ContainerRejectedSubscriptionAuthorizationIDsReadSeqIntKey =
+    @"container_read_rejected_subscription_authorization_ids_read_seq_int";
 
 /**
  * Key for boolean value that when TRUE indicates that the extension crashed before stop was called.
@@ -404,69 +412,124 @@ UserDefaultsKey const DebugPsiphonConnectionStateStringKey = @"PsiphonDataShared
 }
 
 
-#pragma mark - Subscription
-
-- (NSDictionary *_Nullable)getSubscriptionVerificationDictionary {
-    return [sharedDefaults objectForKey:SubscriptionVerificationDictionaryKey];
-}
-
-- (void)setSubscriptionVerificationDictionary:(NSDictionary *_Nullable)dict {
-    [sharedDefaults setObject:dict forKey:SubscriptionVerificationDictionaryKey];
-}
-
-- (NSNumber *_Nullable)getContainerEmptyReceiptFileSize {
-    return [sharedDefaults objectForKey:ContainerSubscriptionEmptyReceiptNumberKey];
-}
-
-- (void)setContainerEmptyReceiptFileSize:(NSNumber *_Nullable)receiptFileSize {
-    [sharedDefaults setObject:receiptFileSize forKey:ContainerSubscriptionEmptyReceiptNumberKey];
-    [sharedDefaults synchronize];
-}
-
-- (void)setContainerLastSubscriptionReceiptExpiryDate:(NSDate *_Nullable)expiryDate {
-    [sharedDefaults setObject:expiryDate forKey:ContainerSubscriptionReceiptExpiryDate];
-}
-
-- (NSDate *_Nullable)getContainerLastSubscriptionReceiptExpiryDate {
-    return [sharedDefaults objectForKey:ContainerSubscriptionReceiptExpiryDate];
-}
-
-
 #pragma mark - Authorizations
 
+#if TARGET_IS_EXTENSION
 - (void)removeNonSubscriptionAuthorizationsNotAccepted:(NSSet<NSString *> *_Nullable)authIdsToRemove {
 
-    NSMutableSet<Authorization *> *newAuths = [NSMutableSet set];
+    NSMutableSet<NSString *> *newEncodedAuths = [NSMutableSet set];
 
-    [[self getNonSubscriptionAuthorizations] enumerateObjectsUsingBlock:^(Authorization * _Nonnull storedAuthorization, BOOL * _Nonnull stop) {
+    [[self getNonSubscriptionEncodedAuthorizations]
+     enumerateObjectsUsingBlock:^(NSString * _Nonnull encoded, BOOL * _Nonnull stop) {
+        Authorization *_Nullable storedAuthorization = [[Authorization alloc]
+                                                        initWithEncodedAuthorization:encoded];
+        if (storedAuthorization == nil) {
+            return;
+        }
+        
         if (![authIdsToRemove containsObject:storedAuthorization.ID]) {
             // storedAuthorization.ID doesn't match any of `authIdsToRemove`.
-            [newAuths addObject:storedAuthorization];
+            [newEncodedAuths addObject:storedAuthorization.base64Representation];
         }
 
     }];
 
-    [self setNonSubscriptionAuthorizations:newAuths];
+    [self setNonSubscriptionEncodedAuthorizations:newEncodedAuths];
 }
+#endif
 
-- (void)setNonSubscriptionAuthorizations:(NSSet<Authorization *> *_Nullable)authorizations {
+- (void)setNonSubscriptionEncodedAuthorizations:(NSSet<NSString*>*_Nullable)encodedAuthorizations {
     // Persists Base64 representation of the Authorizations.
-    [sharedDefaults setObject:[Authorization encodeAuthorizations:authorizations]
+    [sharedDefaults setObject:encodedAuthorizations.allObjects
                        forKey:ContainerAuthorizationSetKey];
     [sharedDefaults synchronize];
 }
 
-- (void)appendNonSubscriptionAuthorization:(Authorization *_Nonnull)authorization {
-    NSMutableSet<Authorization *> *newSet = [NSMutableSet setWithSet:
-                                             [self getNonSubscriptionAuthorizations]];
-    [newSet addObject:authorization];
-    [self setNonSubscriptionAuthorizations:newSet];
+- (void)appendNonSubscriptionEncodedAuthorization:(NSString *_Nonnull)base64Encoded {
+    NSMutableSet<NSString *> *newSet = [NSMutableSet
+                                        setWithSet:[self getNonSubscriptionEncodedAuthorizations]];
+    [newSet addObject:base64Encoded];
+    [self setNonSubscriptionEncodedAuthorizations:newSet];
 }
 
-- (NSSet<Authorization *> *_Nonnull)getNonSubscriptionAuthorizations {
-    NSArray<NSString *> *_Nullable encodedAuths = [sharedDefaults stringArrayForKey:ContainerAuthorizationSetKey];
-    return [Authorization createFromEncodedAuthorizations:encodedAuths];
+- (NSSet<NSString *> *_Nonnull)getNonSubscriptionEncodedAuthorizations {
+    NSArray<NSString *> *_Nullable encodedAuths = [sharedDefaults
+                                                   stringArrayForKey:ContainerAuthorizationSetKey];
+    if (encodedAuths == nil) {
+        return [NSSet set];
+    } else {
+        return [NSSet setWithArray:encodedAuths];
+    }
 }
+
+#pragma mark - Subscription
+
+#if !(TARGET_IS_EXTENSION)
+/// Encoded object must JSON representation of type `[SubscriptionPurchaseAuth]`.
+- (void)setSubscriptionAuths:(NSData *_Nullable)purchaseAuths {
+    [sharedDefaults setObject:purchaseAuths forKey:ContainerSubscriptionAuthorizationsDictKey];
+}
+#endif
+
+- (NSData *_Nullable)getSubscriptionAuths {
+    return [sharedDefaults dataForKey:ContainerSubscriptionAuthorizationsDictKey];
+}
+
+-(NSArray<NSString *> *_Nonnull)getRejectedSubscriptionAuthorizationIDs {
+    NSArray<NSString *> *_Nullable storedValue =
+        [sharedDefaults stringArrayForKey:ExtensionRejectedSubscriptionAuthorizationIDsArrayKey];
+    
+    if (storedValue == nil) {
+        return [NSArray array];
+    } else {
+        return storedValue;
+    }
+}
+
+#if TARGET_IS_EXTENSION
+- (void)insertRejectedSubscriptionAuthorizationID:(NSString *)authorizationID {
+    NSInteger extensionSeq = [self getExtensionRejectedSubscriptionAuthIdWriteSequenceNumber];
+    NSInteger containerSeq = [self getContainerRejectedSubscriptionAuthIdReadSequenceNumber];
+    
+    NSMutableArray<NSString *> *rejectedAuthIDs;
+    
+    if (containerSeq < extensionSeq) {
+        rejectedAuthIDs = [NSMutableArray arrayWithArray:[self getRejectedSubscriptionAuthorizationIDs]];
+    } else {
+        // Container is up-to-date with the extension.
+        // Currently stored values for rejected subscription authorization ids can be removed.
+        rejectedAuthIDs = [NSMutableArray array];
+    }
+    
+    [rejectedAuthIDs addObject:authorizationID];
+    
+    [sharedDefaults setInteger:(extensionSeq + 1)
+                        forKey:ExtensionRejectedSubscriptionAuthorizationIDsWriteSeqIntKey];
+    
+    [sharedDefaults setObject:rejectedAuthIDs
+                       forKey:ExtensionRejectedSubscriptionAuthorizationIDsArrayKey];
+}
+#endif
+
+- (NSInteger)getExtensionRejectedSubscriptionAuthIdWriteSequenceNumber {
+    NSInteger seq = [sharedDefaults
+                     integerForKey:ExtensionRejectedSubscriptionAuthorizationIDsWriteSeqIntKey];
+    return seq;
+}
+
+- (NSInteger)getContainerRejectedSubscriptionAuthIdReadSequenceNumber {
+    NSInteger seq = [sharedDefaults
+                     integerForKey:ContainerRejectedSubscriptionAuthorizationIDsReadSeqIntKey];
+    return seq;
+}
+
+#if !(TARGET_IS_EXTENSION)
+- (void)updateContainerRejectedSubscriptionAuthIdReadSequenceNumber {
+    NSInteger extensionSeq = [self getExtensionRejectedSubscriptionAuthIdWriteSequenceNumber];
+    [sharedDefaults setInteger:extensionSeq
+                        forKey:ContainerRejectedSubscriptionAuthorizationIDsReadSeqIntKey];
+}
+#endif
 
 #pragma mark - Jetsam counter
 

@@ -28,9 +28,6 @@ target 'Psiphon' do
 end
 
 target 'PsiphonVPN' do
-
-  pod 'ReactiveObjC', :git => "https://github.com/Psiphon-Inc/ReactiveObjC.git", :commit => '8bbf9dd'
-
 end
 
 post_install do |installer|
