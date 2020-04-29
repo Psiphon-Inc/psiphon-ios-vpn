@@ -428,7 +428,7 @@ func plistReader<DecodeType: Decodable>(key: String, toType: DecodeType.Type) th
 // MARK: User Defaults
 
 /// Represents a type that can be stored by `UserDefaults` (aka `NSUserDefaults`).
-/// List of types that conform are derived from following Apple documentation:
+/// Check `NSUserDefaults` documentation for information on supported types:
 /// https://developer.apple.com/documentation/foundation/userdefaults
 protocol UserDefaultsPropertyListType {}
 
