@@ -325,11 +325,12 @@ extension SwiftDelegate: SwiftBridgeDelegate {
     @objc func getAppStateFeedbackEntry(completionHandler: @escaping (String) -> Void) {
         self.store.$value.signalProducer
             .take(first: 1)
-            .startWithValues { appState in
+            .startWithValues { [unowned self] appState in
                 completionHandler("""
                     ContainerInfo: {
                     \"AppState\":\"\(makeFeedbackEntry(appState))\",
-                    \"UserDefaultsConfig\":\"\(makeFeedbackEntry(UserDefaultsConfig()))\"
+                    \"UserDefaultsConfig\":\"\(makeFeedbackEntry(UserDefaultsConfig()))\",
+                    \"OutstandingEffectCount\": \(self.store.outstandingEffectCount)
                     }
                     """)
         }
