@@ -425,6 +425,18 @@ func plistReader<DecodeType: Decodable>(key: String, toType: DecodeType.Type) th
     return try decoder.decode(toType, from: data)
 }
 
+// MARK: Coding
+
+extension JSONDecoder {
+    
+    static func makeIso8601JSONDecoder() -> JSONDecoder {
+        let decoder = JSONDecoder()
+        decoder.dateDecodingStrategy = .iso8601
+        return decoder
+    }
+    
+}
+
 // MARK: User Defaults
 
 /// Represents a type that can be stored by `UserDefaults` (aka `NSUserDefaults`).
