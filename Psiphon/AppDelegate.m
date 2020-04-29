@@ -56,9 +56,7 @@
 #import "AppEvent.h"
 #import "AppObservables.h"
 
-PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
 PsiFeedbackLogType const RewardedVideoLogType = @"RewardedVideo";
-
 
 @interface AppDelegate () <NotifierObserver>
 
