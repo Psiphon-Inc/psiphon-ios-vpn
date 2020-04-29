@@ -82,14 +82,6 @@ extension Effect {
         }
     }
     
-    public static func dispatchGlobal(action: @escaping () -> Value) -> Effect<Value> {
-        Effect { observer, _ in
-            DispatchQueue.global(qos: .default).async {
-                observer.fulfill(value: action())
-            }
-        }
-    }
-    
     public static func fireAndForget(work: @escaping () -> Void) -> Effect<Value> {
         Effect { observer, _ in
             if Debugging.mainThreadChecks {
