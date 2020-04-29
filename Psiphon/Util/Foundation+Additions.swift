@@ -169,6 +169,27 @@ public extension Either {
     }
 }
 
+/// `HashableView` provides an alternative view for the same value's hash.
+public struct HashableView<Value: Hashable, Alternative: Hashable>: Hashable {
+    
+    let value: Value
+    private let hashKeyPath: KeyPath<Value, Alternative>
+    
+    init(_ value: Value, _ hashKeyPath: KeyPath<Value, Alternative>) {
+        self.value = value
+        self.hashKeyPath = hashKeyPath
+    }
+    
+    public static func == (lhs: Self, rhs: Self) -> Bool {
+        lhs.value[keyPath: lhs.hashKeyPath] == rhs.value[keyPath: rhs.hashKeyPath]
+    }
+    
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(value[keyPath: hashKeyPath].hashValue)
+    }
+    
+}
+
 public extension Set {
 
     /// Inserts `newMember` into the set if it is not contained in the set.
