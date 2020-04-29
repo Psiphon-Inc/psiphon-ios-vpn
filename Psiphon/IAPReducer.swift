@@ -255,13 +255,13 @@ SKPaymentTransactionObserver {
     // from the user's purchase history back to the queue.
     func paymentQueue(_ queue: SKPaymentQueue,
                       restoreCompletedTransactionsFailedWithError error: Error) {
-        sendOnMain(.restoredCompletedTransactions(error: error))
+        storeSend(.restoredCompletedTransactions(error: error))
     }
     
     // Sent when all transactions from the user's purchase history have
     // successfully been added back to the queue.
     func paymentQueueRestoreCompletedTransactionsFinished(_ queue: SKPaymentQueue) {
-        sendOnMain(.restoredCompletedTransactions(error: .none))
+        storeSend(.restoredCompletedTransactions(error: .none))
     }
     
     // Sent when a user initiates an IAP buy from the App Store
@@ -275,7 +275,7 @@ SKPaymentTransactionObserver {
     // Client should check state of transactions and finish as appropriate.
     func paymentQueue(_ queue: SKPaymentQueue,
                       updatedTransactions transactions: [SKPaymentTransaction]) {
-        sendOnMain(.updatedTransactions(transactions))
+        storeSend(.updatedTransactions(transactions))
     }
     
     @available(iOS 13.0, *)

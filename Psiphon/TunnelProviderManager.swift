@@ -419,7 +419,7 @@ final class PsiphonTPMConnectionObserver: VPNConnectionObserver<PsiphonTPM> {
         guard let manager = self.tunnelProviderManager else {
             fatalError()
         }
-        sendOnMain(.vpnStatusChanged(manager.connectionStatus))
+        storeSend(.vpnStatusChanged(manager.connectionStatus))
     }
     
 }
