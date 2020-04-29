@@ -123,7 +123,8 @@ extension SwiftDelegate: SwiftBridgeDelegate {
                     store: store,
                     psiCashLib: self.psiCashLib,
                     objcBridgeDelegate: objcBridge,
-                    rewardedVideoAdBridgeDelegate: self
+                    rewardedVideoAdBridgeDelegate: self,
+                    calendar: Calendar.current
                 )
                 self.environmentCleanup = cleanup
                 return environment

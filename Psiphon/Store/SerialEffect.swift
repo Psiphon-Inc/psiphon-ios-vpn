@@ -26,17 +26,21 @@ enum SerialEffectAction<Action> {
 }
 
 struct SerialEffectState<Value: Equatable, Action: Equatable>: Equatable {
-    fileprivate var pendingActionQueue: Queue<Action>
-    fileprivate var pendingEffectActionQueue: Queue<Action>
-    fileprivate var pendingEffectCompletion: Bool
+    var pendingActionQueue: Queue<Action>
+    var pendingEffectActionQueue: Queue<Action>
+    var pendingEffectCompletion: Bool
     var value: Value
+}
 
+extension SerialEffectState {
+    
     init(_ initialValue: Value) {
         pendingActionQueue = Queue<Action>()
         pendingEffectActionQueue = Queue<Action>()
         pendingEffectCompletion = false
         value = initialValue
     }
+    
 }
 
 func makeSerialEffectReducer<Value, Action: Equatable, Environment>(

@@ -20,6 +20,12 @@
 import Foundation
 import Promises
 
+/// `ReceiptReadReason` represents the event that caused the receipt file to be read.
+enum ReceiptReadReason: Equatable {
+    case remoteRefresh
+    case localRefresh
+}
+
 struct ReceiptState: Equatable {
     var receiptData: ReceiptData?
     var remoteReceiptRefreshState: Pending<Result<Unit, SystemErrorEvent>>
@@ -49,14 +55,19 @@ enum ReceiptStateAction {
     case localReceiptRefresh
     /// A remote receipt refresh can open a dialog box to
     case remoteReceiptRefresh(optinalPromise: Promise<Result<(), SystemErrorEvent>>?)
-    case receiptRefreshed(Result<(), SystemErrorEvent>)
+    case _remoteReceiptRefreshResult(Result<(), SystemErrorEvent>)
 }
 
 typealias ReceiptReducerEnvironment = (
     appBundle: PsiphonBundle,
     iapStore: (IAPAction) -> Effect<Never>,
     subscriptionStore: (SubscriptionAction) -> Effect<Never>,
-    receiptRefreshRequestDelegate: ReceiptRefreshRequestDelegate
+    subscriptionAuthStateStore: (SubscriptionAuthStateAction) -> Effect<Never>,
+    receiptRefreshRequestDelegate: ReceiptRefreshRequestDelegate,
+    consumableProductsIDs: Set<ProductID>,
+    subscriptionProductIDs: Set<ProductID>,
+    getCurrentTime: () -> Date,
+    compareDates: (Date, Date, Calendar.Component) -> ComparisonResult
 )
 
 func receiptReducer(
@@ -64,16 +75,30 @@ func receiptReducer(
 ) -> [Effect<ReceiptStateAction>] {
     switch action {
     case .localReceiptRefresh:
-        let maybeRefreshedData = ReceiptData.fromLocalReceipt(environment.appBundle)
+        let maybeRefreshedData = ReceiptData.fromLocalReceipt(environment: environment)
         
         switch (maybeRefreshedData, state.receiptData) {
         case (nil, _), (_, nil):
             state.receiptData = maybeRefreshedData
-            return notifyUpdatedReceiptEffects(maybeRefreshedData, environment: environment)
+            
+            return notifyUpdatedReceiptEffects(
+                receiptData: maybeRefreshedData,
+                reason: .localRefresh,
+                environment: environment
+            )
+            
         case let (.some(refreshedData), .some(currentReceiptData)):
+            
             if refreshedData != currentReceiptData {
+                
                 state.receiptData = maybeRefreshedData
-                return notifyUpdatedReceiptEffects(maybeRefreshedData, environment: environment)
+                
+                return notifyUpdatedReceiptEffects(
+                    receiptData: maybeRefreshedData,
+                    reason: .localRefresh,
+                    environment: environment
+                )
+                
             } else {
                return []
             }
@@ -98,13 +123,14 @@ func receiptReducer(
             }
         ]
         
-    case .receiptRefreshed(let result):
+    case ._remoteReceiptRefreshResult(let result):
         var effects = [Effect<ReceiptStateAction>]()
         state.remoteReceiptRefreshState = .completed(result.mapToUnit())
         state.receiptRefereshRequestObject = nil
         
-        let refreshedData = join(result.map { ReceiptData.fromLocalReceipt(environment.appBundle) }
-            .projectSuccess())
+        let refreshedData = join(result.map {
+            ReceiptData.fromLocalReceipt(environment: environment)
+        }.projectSuccess())
 
         // Creates effect for fulling receipt refresh promises.
         effects.append(
@@ -114,20 +140,46 @@ func receiptReducer(
         guard refreshedData != state.receiptData else {
             return effects
         }
+        
         state.receiptData = refreshedData
+        
         effects.append(contentsOf:
-            notifyUpdatedReceiptEffects(refreshedData, environment: environment)
+            notifyUpdatedReceiptEffects(
+                receiptData: refreshedData,
+                reason: .remoteRefresh,
+                environment: environment
+            )
         )
+        
         return effects
     }
     
 }
 
+extension ReceiptData {
+    
+    fileprivate static func fromLocalReceipt(
+        environment: ReceiptReducerEnvironment
+    ) -> ReceiptData? {
+        ReceiptData.parseLocalReceipt(
+            appBundle: environment.appBundle,
+            consumableProductIDs: environment.consumableProductsIDs,
+            subscriptionProductIDs: environment.subscriptionProductIDs,
+            getCurrentTime: environment.getCurrentTime,
+            compareDates: environment.compareDates
+        )
+    }
+    
+}
+
 fileprivate func notifyUpdatedReceiptEffects<NeverAction>(
-    _ receiptData: ReceiptData?, environment: ReceiptReducerEnvironment
+    receiptData: ReceiptData?, reason: ReceiptReadReason, environment: ReceiptReducerEnvironment
 ) -> [Effect<NeverAction>] {
     return [
         environment.subscriptionStore(.updatedReceiptData(receiptData)).mapNever(),
+        environment.subscriptionAuthStateStore(
+            .localDataUpdate(type: .didRefreshReceiptData(reason))
+        ).mapNever(),
         environment.iapStore(.receiptUpdated(receiptData)).mapNever()
     ]
 }

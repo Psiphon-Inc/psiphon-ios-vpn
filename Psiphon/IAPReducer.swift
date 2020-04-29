@@ -42,7 +42,7 @@ struct IAPReducerState {
 }
 
 typealias IAPEnvironment = (
-    tunnelProviderStatusSignal: SignalProducer<TunnelProviderVPNStatus, Never>,
+    tunnelStatusWithIntentSignal: SignalProducer<VPNStatusWithIntent, Never>,
     psiCashEffects: PsiCashEffect,
     clientMetaData: ClientMetaData,
     paymentQueue: PaymentQueue,
@@ -103,7 +103,7 @@ func iapReducer(
         return [
             verifyConsumable(transaction: unverifiedTx,
                              receipt: receiptData,
-                             tunnelProviderStatusSignal: environment.tunnelProviderStatusSignal,
+                             tunnelProviderStatusSignal: environment.tunnelStatusWithIntentSignal,
                              psiCashEffects: environment.psiCashEffects,
                              clientMetaData: environment.clientMetaData)
                 .map(IAPAction.verifiedPsiCashConsumable)
@@ -136,7 +136,7 @@ func iapReducer(
         switch value {
         case .restoredCompletedTransactions:
             return [
-                environment.appReceiptStore(.receiptRefreshed(.success(()))).mapNever()
+                environment.appReceiptStore(._remoteReceiptRefreshResult(.success(()))).mapNever()
             ]
             
         case .updatedTransactions(let transactions):
@@ -228,7 +228,7 @@ func iapReducer(
                     
                     if transactions.appReceiptUpdated {
                         effects.append(
-                            environment.appReceiptStore(.receiptRefreshed(.success(()))).mapNever()
+                            environment.appReceiptStore(._remoteReceiptRefreshResult(.success(()))).mapNever()
                         )
                     }
                 }

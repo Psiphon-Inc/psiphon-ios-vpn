@@ -212,17 +212,17 @@ import Promises
     @objc let productId: String?
     @objc let hasBeenInIntroPeriod: Bool
 
-    init(_ state: BridgedSubscriptionState, _ data: SubscriptionData?) {
+    init(_ state: BridgedSubscriptionState, _ subscription: SubscriptionIAPPurchase?) {
         self.state = state
-        self.latestExpiry = data?.latestExpiry
-        self.productId = data?.productId
-        self.hasBeenInIntroPeriod = data?.hasBeenInIntroPeriod ?? false
+        self.latestExpiry = subscription?.expires
+        self.productId = subscription?.productID
+        self.hasBeenInIntroPeriod = subscription?.hasBeenInIntroOfferPeriod ?? false
     }
 
     static func from(state: SubscriptionStatus) -> BridgedUserSubscription {
         switch state {
-        case .subscribed(let data):
-            return .init(.active, data)
+        case .subscribed(let purchase):
+            return .init(.active, purchase)
         case .notSubscribed:
             return .init(.inactive, .none)
         case .unknown:

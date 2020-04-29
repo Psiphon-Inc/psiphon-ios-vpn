@@ -21,7 +21,10 @@
 #import "Notifier.h"
 #import "Asserts.h"
 #import "DispatchUtils.h"
+
+#if !(TARGET_IS_EXTENSION)
 #import "RACSubject.h"
+#endif
 
 #define PSIPHON_GROUP      @"group.ca.psiphon.Psiphon"
 #define PSIPHON_VPN_GROUP  @"group.ca.psiphon.Psiphon.PsiphonVPN"
@@ -38,9 +41,9 @@ NotifierMessage const NotifierNetworkConnectivityResolved = PSIPHON_VPN_GROUP @"
 
 // Messages sent by the container.
 NotifierMessage const NotifierStartVPN               = PSIPHON_GROUP @".StartVPN";
-NotifierMessage const NotifierForceSubscriptionCheck = PSIPHON_GROUP @".ForceSubscriptionCheck";
 NotifierMessage const NotifierAppEnteredBackground   = PSIPHON_GROUP @".AppEnteredBackground";
 NotifierMessage const NotifierUpdatedNonSubscriptionAuths  = PSIPHON_GROUP @".UpdatedNonSubscriptionAuths";
+NotifierMessage const NotifierUpdatedSubscriptionAuths  = PSIPHON_GROUP @".UpdatedSubscriptionAuths";
 
 #if DEBUG
 NotifierMessage const NotifierDebugCustomFunction    = PSIPHON_GROUP @".DebugCustomFunction";
@@ -110,9 +113,9 @@ static inline void AddDarwinNotifyObserver(CFNotificationCenterRef center, const
 #if TARGET_IS_EXTENSION
     // Listens to all messages sent by the container.
     AddDarwinNotifyObserver(center, (__bridge const void *)self, (__bridge CFStringRef)NotifierStartVPN);
-    AddDarwinNotifyObserver(center, (__bridge const void *)self, (__bridge CFStringRef)NotifierForceSubscriptionCheck);
     AddDarwinNotifyObserver(center, (__bridge const void *)self, (__bridge CFStringRef)NotifierAppEnteredBackground);
     AddDarwinNotifyObserver(center, (__bridge const void *)self, (__bridge CFStringRef)NotifierUpdatedNonSubscriptionAuths);
+    AddDarwinNotifyObserver(center, (__bridge const void *)self, (__bridge CFStringRef)NotifierUpdatedSubscriptionAuths);
 
 #if DEBUG
     AddDarwinNotifyObserver(center, (__bridge const void *)self, (__bridge CFStringRef)NotifierDebugCustomFunction);

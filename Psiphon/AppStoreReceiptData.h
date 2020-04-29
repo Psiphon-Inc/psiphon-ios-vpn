@@ -24,15 +24,41 @@
 #import "UTF8String.h"
 #import "IA5String.h"
 
+/** Represents an in-app purchase in the app receipt.
+ */
+@interface AppStoreParsedIAP : NSObject
 
-// App receipt fields keys and constants
-#define kAppReceiptFileSize                             @"app_receipt_file_size"
-#define kLatestExpirationDate                           @"latest_expiration_date"
-#define kProductId                                      @"product_id"
-#define kHasBeenInIntroPeriod                           @"has_been_in_intro_period"
+/** The product identifier of the item that was purchased. This value corresponds to the productIdentifier property of the SKPayment object stored in the transaction’s payment property.
+ */
+@property (nonatomic, strong, readonly) NSString *_Nonnull productIdentifier;
 
+@property (nonatomic, strong, readonly) NSString *_Nonnull transactionID;
 
-@class AppStoreReceiptData;
+@property (nonatomic, strong, readonly) NSString *_Nonnull originalTransactionID;
+
+@property (nonatomic, strong, readonly) NSDate *_Nonnull purchaseDate;
+
+/**
+ The expiration date for the subscription.
+ 
+ Only present for auto-renewable subscription receipts.
+ */
+@property (nonatomic, strong, readonly) NSDate *_Nullable expiresDate;
+
+/** For a transaction that was canceled by Apple customer support, the date of the cancellation.
+ */
+@property (nonatomic, strong, readonly) NSDate *_Nullable cancellationDate;
+
+/** True if this transaction is in intro period, False otherwise.
+ */
+@property (nonatomic, readonly) BOOL isInIntroPreiod;
+
+- (instancetype _Nonnull)initWithASN1Data:(NSData *_Nonnull)asn1Data NS_DESIGNATED_INITIALIZER;
+
+- (instancetype _Nonnull)init NS_UNAVAILABLE;
+
+@end
+
 
 @interface AppStoreReceiptData : NSObject
 
@@ -40,56 +66,25 @@
  
  This corresponds to the value of CFBundleIdentifier in the Info.plist file.
  */
-@property (nonatomic, strong, readonly) NSString *bundleIdentifier;
+@property (nonatomic, strong, readonly) NSString *_Nonnull bundleIdentifier;
 
-@property (nonatomic, strong, readonly) NSNumber *fileSize;
-
-@property (nonatomic, strong, readonly) NSDictionary *inAppSubscriptions;
-
+/** Set of in-app purchases. Contains subscriptions and other consumable transactions present in the receipt file.
+ This corresponds to the values in the "in_app" field of of JSON object retrieved from AppStore receipt verify servers.
+ Returned array is empty if there are no purchases recorded in the receipt.
+ */
+@property (nonatomic, strong, readonly) NSArray<AppStoreParsedIAP *> *_Nonnull inAppPurchases;
 
 /** Returns an initialized app receipt from the given data.
  @param asn1Data ASN1 data
  @return An initialized app receipt from the given data.
  */
-- (instancetype)initWithASN1Data:(NSData*)asn1Data NS_DESIGNATED_INITIALIZER;
-- (instancetype)init NS_UNAVAILABLE;
+- (instancetype _Nonnull)initWithASN1Data:(NSData *_Nonnull)asn1Data NS_DESIGNATED_INITIALIZER;
 
+- (instancetype _Nonnull)init NS_UNAVAILABLE;
 
 /**
  Parses receipt pointed to by `receiptURL` and returns  `AppStoreReceiptData` object created from the parsed data.
  */
-+ (AppStoreReceiptData *_Nullable)parseReceipt:(NSURL *_Nullable)receiptURL;
-
-@end
-
-/** Represents an in-app purchase in the app receipt.
- */
-@interface AppStoreReceiptIAP : NSObject
-
-/** The product identifier of the item that was purchased. This value corresponds to the productIdentifier property of the SKPayment object stored in the transaction’s payment property.
- */
-@property (nonatomic, strong, readonly) NSString *productIdentifier;
-
-/**
- The expiration date for the subscription.
- 
- Only present for auto-renewable subscription receipts.
- */
-@property (nonatomic, strong, readonly) NSDate *subscriptionExpirationDate;
-
-/** For a transaction that was canceled by Apple customer support, the date of the cancellation.
- */
-@property (nonatomic, strong, readonly) NSDate *cancellationDate;
-
-/** True if this transaction is in intro period, False otherwise.
- */
-@property (nonatomic) BOOL isInIntroPreiod;
-
-/** Returns an initialized in-app purchase from the given data.
- @param asn1Data ASN1 data
- @return An initialized in-app purchase from the given data.
- */
-- (instancetype)initWithASN1Data:(NSData*)asn1Data NS_DESIGNATED_INITIALIZER;
-- (instancetype)init NS_UNAVAILABLE;
++ (AppStoreReceiptData *_Nullable)parseReceiptData:(NSData *_Nonnull)receiptURL;
 
 @end

@@ -71,10 +71,10 @@ struct PsiCashEffect {
     }
     
     func purchaseProduct<T: TunnelProviderManager>(
-        _ purchasable: PsiCashPurchasableType, tunnelProviderManager: WeakRef<T>
+        _ purchasable: PsiCashPurchasableType, tunnelManagerRef: WeakRef<T>
     ) -> Effect<PsiCashPurchaseResult> {
         Effect.deferred { fulfilled in
-            guard case .connected = tunnelProviderManager.weakRef?.connectionStatus.tunneled else {
+            guard case .connected = tunnelManagerRef.weakRef?.connectionStatus.tunneled else {
                 fulfilled(
                     PsiCashPurchaseResult(
                         purchasable: purchasable,
@@ -88,7 +88,7 @@ struct PsiCashEffect {
                                         withInfo: String(describing: purchasable),
                                         includingDiagnosticInfo: false)
             
-            // Updates request metadata before sending the request.
+            // Updates request metadata before sendinfg the request.
             self.psiCash.setRequestMetadata()
             
             self.psiCash.newExpiringPurchaseTransaction(
@@ -159,8 +159,17 @@ struct PsiCashEffect {
     
     func expirePurchases(sharedDB: PsiphonDataSharedDB) -> Effect<Never> {
         .fireAndForget {
-            let sharedDBAuthIds = sharedDB.getNonSubscriptionAuthorizations().map(\.id)
-            self.psiCash.expirePurchases(notFoundIn: sharedDBAuthIds)
+            let decoder = JSONDecoder.makeIso8601JSONDecoder()
+            
+            let nonSubscriptionAuthIDs = sharedDB.getNonSubscriptionEncodedAuthorizations()
+                .compactMap { encodedAuth -> SignedAuthorization? in
+                    guard let data = encodedAuth.data(using: .utf8) else {
+                        return nil;
+                    }
+                    return try? decoder.decode(SignedAuthorization.self, from: data)
+            }.map(\.authorization.id)
+            
+            self.psiCash.expirePurchases(notFoundIn: nonSubscriptionAuthIDs)
         }
     }
     

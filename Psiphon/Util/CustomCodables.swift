@@ -22,12 +22,12 @@ import Foundation
 
 extension Result: Codable where Success: Codable, Failure: Codable {
     
-    enum CodingKeys: String, CodingKey {
+    private enum CodingKeys: String, CodingKey {
         case result
         case associatedValue
     }
     
-    enum TagKeys: String, Codable {
+    private enum TagKeys: String, Codable {
         case success
         case failure
     }
@@ -54,6 +54,75 @@ extension Result: Codable where Success: Codable, Failure: Codable {
         case .failure(let failureValue):
             try container.encode(TagKeys.failure, forKey: .result)
             try container.encode(failureValue, forKey: .associatedValue)
+        }
+    }
+    
+}
+
+extension SubscriptionPurchaseAuthState.AuthorizationState: Codable {
+    
+    private enum CodingKeys: String, CodingKey {
+        case state
+        case requestErrorValue
+        case requestRejectedReasonValue
+        case authorization
+    }
+    
+    private enum TagKeys: String, Codable {
+        case notRequested
+        case requestError
+        case requestRejected
+        case authorization
+        case rejectedByPsiphon
+    }
+    
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let state = try container.decode(TagKeys.self, forKey: .state)
+        switch state {
+        case .notRequested:
+            self = .notRequested
+        case .requestError:
+            let errorEvent = try container.decode(ErrorEvent<ErrorRepr>.self,
+                                                  forKey: .requestErrorValue)
+            self = .requestError(errorEvent)
+        case .requestRejected:
+            let reason = try container.decode(RequestRejectedReason.self,
+                                              forKey: .requestRejectedReasonValue)
+            self = .requestRejected(reason)
+        case .authorization, .rejectedByPsiphon:
+            let base64 = try container.decode(String.self, forKey: .authorization)
+            let maybeDecoded = try SignedAuthorization.make(base64String: base64)
+            guard let decoded = maybeDecoded else {
+                throw ErrorRepr(repr: "failed to decode '\(base64)'")
+            }
+            if case .authorization = state {
+                self = .authorization(decoded)
+            } else if case .rejectedByPsiphon = state {
+                self = .rejectedByPsiphon(decoded)
+            } else {
+                fatalError()
+            }
+        }
+    }
+    
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        switch self {
+        case .notRequested:
+            try container.encode(TagKeys.notRequested, forKey: .state)
+        case .requestError(let errorEvent):
+            try container.encode(TagKeys.requestError, forKey: .state)
+            try container.encode(errorEvent, forKey: .requestErrorValue)
+        case .requestRejected(let reason):
+            try container.encode(TagKeys.requestRejected, forKey: .state)
+            try container.encode(reason.rawValue, forKey: .requestRejectedReasonValue)
+        case .authorization(let auth):
+            try container.encode(TagKeys.authorization, forKey: .state)
+            try container.encode(auth.base64String(), forKey: .authorization)
+        case .rejectedByPsiphon(let auth):
+            try container.encode(TagKeys.rejectedByPsiphon, forKey: .state)
+            try container.encode(auth.base64String(), forKey: .authorization)
         }
     }
     

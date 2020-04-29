@@ -43,7 +43,7 @@ struct PsiCashReducerState<T: TunnelProviderManager>: Equatable {
     var psiCashBalance: PsiCashBalance
     var psiCash: PsiCashState
     let subscription: SubscriptionState
-    let tunnelProviderManager: WeakRef<T>?
+    let tunnelManagerRef: WeakRef<T>?
 }
 
 typealias PsiCashEnvironment = (
@@ -63,7 +63,7 @@ func psiCashReducer<T: TunnelProviderManager>(
 ) -> [Effect<PsiCashAction>] {
     switch action {
     case .buyPsiCashProduct(let purchasableType):
-        guard let tunnelProviderManager = state.tunnelProviderManager else {
+        guard let tunnelManagerRef = state.tunnelManagerRef else {
             return []
         }
         guard case .notSubscribed = state.subscription.status else {
@@ -78,7 +78,7 @@ func psiCashReducer<T: TunnelProviderManager>(
         state.psiCash.purchasing = .speedBoost(purchasable)
         return [
             environment.psiCashEffects.purchaseProduct(purchasableType,
-                                                       tunnelProviderManager: tunnelProviderManager)
+                                                       tunnelManagerRef: tunnelManagerRef)
                 .map(PsiCashAction.psiCashProductPurchaseResult)
         ]
         
@@ -103,9 +103,22 @@ func psiCashReducer<T: TunnelProviderManager>(
             state.psiCash.purchasing = .none
             return [
                 .fireAndForget {
-                    environment.sharedDB.appendNonSubscriptionAuthorization(
-                        purchasedProduct.transaction.authorization
-                    )
+                    
+                    do {
+                        let encodedAuth = try purchasedProduct.transaction.authorization
+                            .base64String()
+                        environment.sharedDB.appendNonSubscriptionEncodedAuthorization(encodedAuth)
+                    } catch {
+                        PsiFeedbackLogger.error(
+                            withType: "PsiCashReducer.swift",
+                            message: """
+                            failed to encode authorization \
+                            '\(purchasedProduct.transaction.authorization)'
+                            """,
+                            object: error
+                        )
+                    }
+                    
                     environment.notifier.post(NotifierUpdatedNonSubscriptionAuths)
                 },
                 .fireAndForget {
@@ -125,7 +138,7 @@ func psiCashReducer<T: TunnelProviderManager>(
         }
         
     case .refreshPsiCashState:
-        guard let tunnelProviderManager = state.tunnelProviderManager else {
+        guard let tunnelProviderManager = state.tunnelManagerRef else {
             return []
         }
         guard case .notSubscribed = state.subscription.status else {

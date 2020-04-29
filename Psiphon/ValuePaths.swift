@@ -88,6 +88,17 @@ extension AppAction {
         }
     }
     
+    var subscriptionAuthStateAction: SubscriptionAuthStateAction? {
+        get {
+            guard case let .subscriptionAuthStateAction(value) = self else { return nil }
+            return value
+        }
+        set {
+            guard case .subscriptionAuthStateAction = self, let newValue = newValue else { return }
+            self = .subscriptionAuthStateAction(newValue)
+        }
+    }
+    
     var productRequest: ProductRequestAction? {
         get {
             guard case let .productRequest(value) = self else { return nil }
@@ -114,14 +125,35 @@ extension AppAction {
 
 extension AppState {
     
-    /// `tunnelProviderManager` returns a weak reference to the underlying TunnelProviderManager reference.
+    /// `tunnelManagerRef` returns a weak reference to the underlying TunnelProviderManager reference.
     /// This helps prevent resource leaks.
-    var tunnelProviderManager: WeakRef<PsiphonTPM>? {
+    var tunnelManagerRef: WeakRef<PsiphonTPM>? {
         get {
             guard case let .loaded(tpm) = self.vpnState.value.loadState.value else {
                 return nil
             }
             return WeakRef(tpm)
+        }
+    }
+    
+    var vpnReducerState: VPNReducerState<PsiphonTPM> {
+        // TODO: This can be simplified by a new `SerialEffectState` constructor.
+        get {
+            VPNReducerState(
+                pendingActionQueue: self.vpnState.pendingActionQueue,
+                pendingEffectActionQueue: self.vpnState.pendingEffectActionQueue,
+                pendingEffectCompletion: self.vpnState.pendingEffectCompletion,
+                value: VPNProviderManagerReducerState (
+                    vpnState: self.vpnState.value,
+                    subscriptionTransactionsPendingAuthorization: self.subscriptionAuthState .transactionsPendingAuthRequest
+                )
+            )
+        }
+        set {
+            self.vpnState.pendingActionQueue = newValue.pendingActionQueue
+            self.vpnState.pendingEffectActionQueue = newValue.pendingEffectActionQueue
+            self.vpnState.pendingEffectCompletion = newValue.pendingEffectCompletion
+            self.vpnState.value = newValue.value.vpnState
         }
     }
     
@@ -145,7 +177,7 @@ extension AppState {
                 psiCashBalance: self.psiCashBalance,
                 psiCash: self.psiCash,
                 subscription: self.subscription,
-                tunnelProviderManager: self.tunnelProviderManager
+                tunnelManagerRef: self.tunnelManagerRef
             )
         }
         set {
@@ -173,11 +205,24 @@ extension AppState {
         get {
             LandingPageReducerState(
                 pendingLandingPageOpening: self.pendingLandingPageOpening,
-                tunnelProviderManager: self.tunnelProviderManager
+                tunnelProviderManager: self.tunnelManagerRef
             )
         }
         set {
             self.pendingLandingPageOpening = newValue.pendingLandingPageOpening
+        }
+    }
+    
+    var subscriptionAuthReducerState: SubscriptionReducerState<PsiphonTPM> {
+        get {
+            SubscriptionReducerState(
+                subscription: self.subscriptionAuthState,
+                receiptData: self.appReceipt.receiptData,
+                tunnelManagerRef: self.tunnelManagerRef
+            )
+        }
+        set {
+            self.subscriptionAuthState = newValue.subscription
         }
     }
     

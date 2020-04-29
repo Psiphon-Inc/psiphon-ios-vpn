@@ -64,7 +64,7 @@ enum AppStoreProductType: String {
 
 /// Represents product identifiers in-app purchase products that are supported.
 struct SupportedAppStoreProductIDs: Equatable {
-    let values: Set<String>
+    let values: Set<ProductID>
 
     private init(for type: AppStoreProductType, validator: (Set<String>) -> Bool) {
         values = try! plistReader(key: type.rawValue, toType: Set<String>.self)

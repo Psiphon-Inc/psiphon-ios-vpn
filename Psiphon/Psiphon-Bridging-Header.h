@@ -15,7 +15,6 @@
 
 // Utilities
 #import "AppInfo.h"
-#import "Authorization.h"
 #import "PsiphonDataSharedDB.h"
 #import "SharedConstants.h"
 #import "Notifier.h"

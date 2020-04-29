@@ -22,7 +22,6 @@
 #import "SharedConstants.h"
 #import "PsiFeedbackLogger.h"
 #import "FileUtils.h"
-#import "RACReplaySubject.h"
 #import "NSError+Convenience.h"
 #import "Asserts.h"
 #import "PsiphonDataSharedDB.h"
@@ -56,7 +55,6 @@ PsiFeedbackLogType const BasePacketTunnelProviderLogType = @"BasePacketTunnelPro
         [PsiFeedbackLogger infoWithType:BasePacketTunnelProviderLogType json:@{@"Event": @"Init",
                                                                                @"PID":@(pid)}];
 
-       _vpnStartedSignal = [RACReplaySubject replaySubjectWithCapacity:1];
        _sharedDB = [[PsiphonDataSharedDB alloc] initForAppGroupIdentifier:APP_GROUP_IDENTIFIER];
     }
     return self;
@@ -67,7 +65,6 @@ PsiFeedbackLogType const BasePacketTunnelProviderLogType = @"BasePacketTunnelPro
  */
 - (void)startTunnelWithOptions:(nullable NSDictionary<NSString *, NSObject *> *)options
              completionHandler:(void (^)(NSError *__nullable error))completionHandler {
-
     @synchronized (self) {
 
         // Determine if the extension jetsammed previously to this start.
@@ -141,7 +138,9 @@ PsiFeedbackLogType const BasePacketTunnelProviderLogType = @"BasePacketTunnelPro
         vpnStartCompletionHandler = completionHandler;
 
         // Start the tunnel.
-        [(id <BasePacketTunnelProviderProtocol>)self startTunnelWithErrorHandler:^(NSError *error) {
+        [(id <BasePacketTunnelProviderProtocol>)self startTunnelWithOptions:options
+                                                               errorHandler:^(NSError *_Nullable error)
+        {
             if (error) {
                 self->vpnStartCompletionHandler(error);
                 self->vpnStartCompletionHandler = nil;
@@ -174,16 +173,11 @@ PsiFeedbackLogType const BasePacketTunnelProviderLogType = @"BasePacketTunnelPro
 }
 
 - (BOOL)startVPN {
-
     @synchronized (self) {
         if (vpnStartCompletionHandler) {
             vpnStartCompletionHandler(nil);
             vpnStartCompletionHandler = nil;
             self.VPNStarted = TRUE;
-
-            [self.vpnStartedSignal sendNext:nil];
-            [self.vpnStartedSignal sendCompleted];
-
             return TRUE;
         }
         return FALSE;
