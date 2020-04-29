@@ -27,7 +27,7 @@ struct FatalError: HashableError {
 }
 
 /// String representation of a type-erased error.
-struct ErrorRepr: HashableError {
+struct ErrorRepr: HashableError, Codable {
     let repr: String
 
     static func systemError(_ systemError: SystemError) -> Self {
@@ -78,6 +78,8 @@ struct ErrorEvent<E: HashableError>: HashableError {
     }
 
 }
+
+extension ErrorEvent: Codable where E: Codable {}
 
 /// Represents an error that originates from Apple frameworks.
 /// Although `Error` and `NSError` are bridged, all of our errors will be explicitly tagged as `HashableError`
