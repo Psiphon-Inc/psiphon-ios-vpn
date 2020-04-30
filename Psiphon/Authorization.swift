@@ -81,6 +81,7 @@ struct Authorization: Hashable, Codable {
         case appleSubscription = "apple-subscription"
         case appleSubscriptionTest = "apple-subscription-test"
         case speedBoost = "speed-boost"
+        case speedBoostTest = "speed-boost-test"
     }
     
     enum CodingKeys: String, CodingKey {
