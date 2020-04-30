@@ -50,7 +50,7 @@ struct SignedAuthorization: Hashable, Codable {
 extension SignedAuthorization {
     
     func base64String() throws -> String {
-        let encoder = JSONEncoder.makeIso8601Encoder()
+        let encoder = JSONEncoder.makeRfc3339Encoder()
         let result = try encoder.encode(self)
         return result.base64EncodedString()
     }
@@ -59,7 +59,7 @@ extension SignedAuthorization {
         guard let data = Data(base64Encoded: base64String, options: .ignoreUnknownCharacters) else {
             return nil
         }
-        let decoder = JSONDecoder.makeIso8601Decoder()
+        let decoder = JSONDecoder.makeRfc3339Decoder()
         return try decoder.decode(Self.self, from: data)
     }
     

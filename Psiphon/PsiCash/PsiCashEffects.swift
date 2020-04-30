@@ -159,7 +159,7 @@ struct PsiCashEffect {
     
     func expirePurchases(sharedDB: PsiphonDataSharedDB) -> Effect<Never> {
         .fireAndForget {
-            let decoder = JSONDecoder.makeIso8601Decoder()
+            let decoder = JSONDecoder.makeRfc3339Decoder()
             
             let nonSubscriptionAuthIDs = sharedDB.getNonSubscriptionEncodedAuthorizations()
                 .compactMap { encodedAuth -> SignedAuthorization? in

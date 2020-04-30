@@ -99,7 +99,7 @@ struct HTTPRequest<Response: HTTPResponse>: Equatable {
         url: URL, body: Body, clientMetaData: String, method: HTTPMethod, response: Response.Type
     ) -> Self {
         do {
-            let jsonData = try JSONEncoder.makeIso8601Encoder().encode(body)
+            let jsonData = try JSONEncoder.makeRfc3339Encoder().encode(body)
             return .init(url: url, body: jsonData, clientMetaData: clientMetaData,
                          method: method, contentType: .json, response: response)
         } catch {

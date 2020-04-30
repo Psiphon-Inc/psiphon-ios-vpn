@@ -666,7 +666,7 @@ fileprivate enum StoredSubscriptionPurchasesAuthState {
                 return .success([:])
             }
             do {
-                let decoded = try JSONDecoder.makeIso8601Decoder()
+                let decoded = try JSONDecoder.makeRfc3339Decoder()
                     .decode(StoredDataType.self, from: data)
                 return .success(decoded)
             } catch {
@@ -685,7 +685,7 @@ fileprivate enum StoredSubscriptionPurchasesAuthState {
                     sharedDB.setSubscriptionAuths(nil)
                     return .success(())
                 }
-                let data = try JSONEncoder.makeIso8601Encoder().encode(value)
+                let data = try JSONEncoder.makeRfc3339Encoder().encode(value)
                 sharedDB.setSubscriptionAuths(data)
                 return .success(())
             } catch {
