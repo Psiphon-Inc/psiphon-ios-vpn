@@ -60,7 +60,7 @@
 @end
 
 
-@interface AppStoreReceiptData : NSObject
+@interface AppStoreParsedReceiptData : NSObject
 
 /** The app’s bundle identifier.
  
@@ -83,8 +83,8 @@
 - (instancetype _Nonnull)init NS_UNAVAILABLE;
 
 /**
- Parses receipt pointed to by `receiptURL` and returns  `AppStoreReceiptData` object created from the parsed data.
+ Parses receipt pointed to by `receiptURL` and returns  `AppStoreParsedReceiptData` object created from the parsed data.
  */
-+ (AppStoreReceiptData *_Nullable)parseReceiptData:(NSData *_Nonnull)receiptURL;
++ (AppStoreParsedReceiptData *_Nullable)parseReceiptData:(NSData *_Nonnull)receiptURL;
 
 @end

@@ -18,7 +18,7 @@
  */
 
 #import <UIKit/UIKit.h>
-#import "AppStoreReceiptData.h"
+#import "AppStoreParsedReceiptData.h"
 #import "SharedConstants.h"
 #import "NSDate+Comparator.h"
 #import "Logging.h"
@@ -101,7 +101,7 @@ static long ASN1ReadInteger(const uint8_t *bytes, long length) {
 // sending the receipt to Apple.
 // https://developer.apple.com/library/archive/releasenotes/General/ValidateAppStoreReceipt/Chapters/ReceiptFields.html#//apple_ref/doc/uid/TP40010573-CH106-SW25
 // Determining eligibility: https://developer.apple.com/documentation/storekit/in-app_purchase/implementing_introductory_offers_in_your_app
-@implementation AppStoreReceiptData
+@implementation AppStoreParsedReceiptData
 
 - (instancetype)initWithASN1Data:(NSData*)asn1Data {
     self = [super init];
@@ -109,7 +109,7 @@ static long ASN1ReadInteger(const uint8_t *bytes, long length) {
         NSMutableArray<AppStoreParsedIAP *> *mutablePurchases = [NSMutableArray array];
         
         // Explicit casting to avoid errors when compiling as Objective-C++
-        [AppStoreReceiptData enumerateReceiptAttributes:(const uint8_t*)asn1Data.bytes length:asn1Data.length usingBlock:^(NSData *data, long type) {
+        [AppStoreParsedReceiptData enumerateReceiptAttributes:(const uint8_t*)asn1Data.bytes length:asn1Data.length usingBlock:^(NSData *data, long type) {
             switch (type) {
                 case ReceiptASN1TypeBundleIdentifier:
                     self->_bundleIdentifier = ASN1ReadUTF8String(data.bytes, data.length);
@@ -129,8 +129,8 @@ static long ASN1ReadInteger(const uint8_t *bytes, long length) {
     return self;
 }
 
-+ (AppStoreReceiptData *_Nullable)parseReceiptData:(NSData *_Nonnull)data {
-    AppStoreReceiptData *receipt = nil;
++ (AppStoreParsedReceiptData *_Nullable)parseReceiptData:(NSData *_Nonnull)data {
+    AppStoreParsedReceiptData *receipt = nil;
     SignedData_t * signedData = NULL;
     
     void *bytes = (void*) [data bytes];
@@ -146,7 +146,7 @@ static long ASN1ReadInteger(const uint8_t *bytes, long length) {
         int signedDataSize = signedData->content.contentInfo.contentData.size;
         uint8_t* signedDataBuf = signedData->content.contentInfo.contentData.buf;
 
-       receipt = [[AppStoreReceiptData alloc] initWithASN1Data:[NSData dataWithBytesNoCopy:signedDataBuf length:signedDataSize freeWhenDone:NO ]];
+       receipt = [[AppStoreParsedReceiptData alloc] initWithASN1Data:[NSData dataWithBytesNoCopy:signedDataBuf length:signedDataSize freeWhenDone:NO ]];
     }
     
     if (signedData != NULL) {
@@ -186,7 +186,7 @@ static long ASN1ReadInteger(const uint8_t *bytes, long length) {
 - (instancetype)initWithASN1Data:(NSData *_Nonnull)asn1Data {
     self = [super init];
     if (self) {
-        [AppStoreReceiptData enumerateReceiptAttributes:(const uint8_t*)asn1Data.bytes
+        [AppStoreParsedReceiptData enumerateReceiptAttributes:(const uint8_t*)asn1Data.bytes
                                                  length:asn1Data.length
                                              usingBlock:^(NSData *data, long type)
          {

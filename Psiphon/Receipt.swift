@@ -114,7 +114,7 @@ struct ReceiptData: Equatable {
         
         let readDate = getCurrentTime()
         
-        guard let parsedData = AppStoreReceiptData.parseReceiptData(data) else {
+        guard let parsedData = AppStoreParsedReceiptData.parseReceiptData(data) else {
             PsiFeedbackLogger.error(withType: "InAppPurchase", message: "parse failed",
                                     object: FatalError(message: "failed to parse app receipt"))
             return .none
