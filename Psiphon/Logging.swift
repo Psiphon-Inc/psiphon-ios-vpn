@@ -62,7 +62,7 @@ enum LogLevel: Int {
 }
 
 struct LogMessage: ExpressibleByStringLiteral, ExpressibleByStringInterpolation,
-Equatable, CustomStringConvertible {
+Equatable, CustomStringConvertible, CustomStringFeedbackDescription {
     typealias StringLiteralType = String
     
     private var value: String
@@ -74,6 +74,17 @@ Equatable, CustomStringConvertible {
     public var description: String {
         return self.value
     }
+}
+
+func fatalErrorFeedbackLog(
+    file: String = #file, line: Int = #line, _ message: LogMessage
+) -> Never {
+    let tag = "\(file.lastPathComponent):\(line)"
+    PsiFeedbackLogger.fatalError(
+        withType: tag,
+        message: makeFeedbackEntry(message)
+    )
+    fatalError(tag)
 }
 
 func feedbackLog(_ level: LogLevel, tag: LogTag, _ message: LogMessage) -> Effect<Never> {
@@ -127,4 +138,16 @@ func makeFeedbackEntry<T: FeedbackDescription>(_ value: T) -> String {
         .replacingOccurrences(of: "\"", with: "\\\"")
         .replacingOccurrences(of: "Psiphon.", with: "")
         .replacingOccurrences(of: "Swift.", with: "")
+}
+
+extension String {
+    
+    fileprivate var lastPathComponent: String {
+        if let path = URL(string: self) {
+            return path.lastPathComponent
+        } else {
+            return self
+        }
+    }
+    
 }
