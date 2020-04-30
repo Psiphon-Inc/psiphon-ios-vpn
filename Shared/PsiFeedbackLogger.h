@@ -62,6 +62,8 @@ typedef NSString * PsiFeedbackLogType;
 
 + (void)errorWithType:(PsiFeedbackLogType)sourceType message:(NSString *)message object:(NSError *)error;
 
++ (void)fatalErrorWithType:(PsiFeedbackLogType)sourceType message:(NSString *)message;
+
 + (void)logNoticeWithType:(NSString *)noticeType message:(NSString *)message timestamp:(NSString *)timestamp;
 
 + (NSDictionary *_Nonnull)unpackError:(NSError *_Nullable)error;

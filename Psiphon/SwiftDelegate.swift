@@ -216,8 +216,11 @@ extension SwiftDelegate: SwiftBridgeDelegate {
             .skipRepeats()
             .combinePrevious(initial: .none)
             .filter { (combined: Combined<TunnelStartStopIntent?>) -> Bool in
-                switch (combined.previous, combined.current) {
-                case (.stop, .start(transition: .none)):
+                
+                switch (previous: combined.previous, current: combined.current) {
+                case (previous: .stop, current: .start(transition: .none)):
+                    return true
+                case (previous: .start(transition: .restart), current: .start(transition: .none)):
                     return true
                 default:
                     return false
@@ -307,7 +310,7 @@ extension SwiftDelegate: SwiftBridgeDelegate {
                 )))
             
         } catch {
-            fatalError("Unknown subscription product identifier '\(product.productIdentifier)'")
+            fatalErrorFeedbackLog("Unknown subscription product identifier '\(product.productIdentifier)'")
         }
         
         return objcPromise.asObjCPromise()
@@ -376,7 +379,7 @@ extension SwiftDelegate: SwiftBridgeDelegate {
         case .stop:
             self.store.send(vpnAction: .tunnelStateIntent(.stop))
         default:
-            fatalError("unexpected state")
+            fatalErrorFeedbackLog("Unexpected state '\(value.switchedIntent)'")
         }
     }
     
@@ -413,7 +416,7 @@ extension SwiftDelegate: SwiftBridgeDelegate {
             
             switch indexed.index {
             case 0:
-                fatalError()
+                fatalErrorFeedbackLog("Unexpected index 0")
             case 1:
                 switch indexed.value {
                 case .nonLoaded:
@@ -434,13 +437,13 @@ extension SwiftDelegate: SwiftBridgeDelegate {
         .startWithValues { [promise, unowned store] indexed in
             switch indexed.index {
             case 0:
-                fatalError()
+                fatalErrorFeedbackLog("Unexpected index 0")
             case 1:
                 store!.send(vpnAction: .reinstallVPNConfig)
             default:
                 switch indexed.value {
                 case .nonLoaded, .noneStored:
-                    fatalError()
+                    fatalErrorFeedbackLog("Unepxected value '\(indexed.value)'")
                 case .loaded(_):
                     promise.fulfill(.init(.installedSuccessfully))
                 case .error(let errorEvent):

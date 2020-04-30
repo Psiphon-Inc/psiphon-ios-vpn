@@ -52,10 +52,12 @@
 NSString * const InfoNoticeType = @"ExtensionInfo";
 NSString * const WarnNoticeType = @"ExtensionWarn";
 NSString * const ErrorNoticeType = @"ExtensionError";
+NSString * const FatalErrorNoticeType = @"ExtensionFatalError";
 #else
 NSString * const InfoNoticeType = @"ContainerInfo";
 NSString * const WarnNoticeType = @"ContainerWarn";
 NSString * const ErrorNoticeType = @"ContainerError";
+NSString * const FatalErrorNoticeType = @"ContainerFatalError";
 #endif
 
 
@@ -288,6 +290,15 @@ PsiFeedbackLogType const FeedbackInternalLogType = @"FeedbackLoggerInternal";
     NSLog(@"<ERROR> %@", data);
 #endif
 
+}
+
++ (void)fatalErrorWithType:(PsiFeedbackLogType)sourceType message:(NSString *)message {
+    NSDictionary *data = @{sourceType : message};
+    [[PsiFeedbackLogger sharedInstance] writeData:data noticeType:FatalErrorNoticeType];
+    
+#if DEBUG
+    NSLog(@"<FATAL> %@", data);
+#endif
 }
 
 + (void)logNoticeWithType:(NSString *)noticeType message:(NSString *)message timestamp:(NSString *)timestamp {

@@ -122,7 +122,7 @@ extension SKPaymentTransaction {
                 return .completed(.failure(.right(someError as SystemError)))
             }
         @unknown default:
-            fatalError("unknown transaction state \(self.transactionState)")
+            fatalErrorFeedbackLog("unknown transaction state \(self.transactionState)")
         }
     }
 

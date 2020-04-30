@@ -112,7 +112,8 @@ extension SpeedBoostCollection: UICollectionViewDataSource {
         }
 
         guard let content = cell.contentView.subviews[maybe: 0] as? PurchaseCellContent else {
-            fatalError()
+            fatalErrorFeedbackLog("Expected cell to have subview of type 'PurchaseCellContent'")
+
         }
 
         content.bind(data![indexPath.row])
@@ -198,7 +199,7 @@ fileprivate final class PurchaseCellContent: AnimatedUIView, Bindable {
     }
 
     required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+        fatalErrorFeedbackLog("init(coder:) has not been implemented")
     }
 
     func bind(_ newValue: SpeedBoostPurchasableViewModel) {

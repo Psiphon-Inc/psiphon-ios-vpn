@@ -75,7 +75,7 @@ final class TabControlView<Tabs: UICases>: UIView, Bindable {
     }
 
     required init(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+        fatalErrorFeedbackLog("init(coder:) has not been implemented")
     }
 
     func bind(_ newValue: Tabs) {

@@ -45,8 +45,12 @@ import UIKit
         
         balance = UILabel.make(fontSize: fontSize, typeface: typeface)
 
-        guard let coinImage = UIImage(named: "PsiCashCoin") else { fatalError() }
-        guard let waitingForExpectedIncreaseImage = UIImage(named: "PsiCash_Alert") else { fatalError() }
+        guard let coinImage = UIImage(named: "PsiCashCoin") else {
+            fatalErrorFeedbackLog("Could not find 'PsiCashCoin' image")
+        }
+        guard let waitingForExpectedIncreaseImage = UIImage(named: "PsiCash_Alert") else {
+            fatalErrorFeedbackLog("Could not find 'PsiCash_Alert' image")
+        }
 
         icon = .init(ImageViewBuidler(image: coinImage),
                      .init(Spinner(style: .white),
@@ -100,7 +104,7 @@ import UIKit
     }
 
     required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+        fatalErrorFeedbackLog("init(coder:) has not been implemented")
     }
 
     private func setAmount(_ amount: PsiCashAmount?) {
