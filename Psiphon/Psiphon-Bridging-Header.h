@@ -11,7 +11,7 @@
 #import "NEBridge.h"
 
 // AppStore receipt
-#import "AppStoreReceiptData.h"
+#import "AppStoreParsedReceiptData.h"
 
 // Utilities
 #import "AppInfo.h"

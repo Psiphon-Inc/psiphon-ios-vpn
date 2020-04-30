@@ -305,7 +305,7 @@
 		440D75BD1F59E041005C603B /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 		4435CC251F70566000F3A809 /* SettingsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SettingsViewController.h; sourceTree = "<group>"; };
 		4435CC261F70566000F3A809 /* SettingsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SettingsViewController.m; sourceTree = "<group>"; };
-		445F239420E1817B00D004E9 /* AppStoreReceiptData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppStoreReceiptData.h; sourceTree = "<group>"; };
+		445F239420E1817B00D004E9 /* AppStoreParsedReceiptData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppStoreParsedReceiptData.h; sourceTree = "<group>"; };
 		445F239520E1817C00D004E9 /* AppStoreReceiptData.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppStoreReceiptData.m; sourceTree = "<group>"; };
 		445F249820E1A5BA00D004E9 /* ReceiptAttributes.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ReceiptAttributes.c; sourceTree = "<group>"; };
 		445F249920E1A5BA00D004E9 /* constr_TYPE.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = constr_TYPE.c; sourceTree = "<group>"; };
@@ -812,7 +812,7 @@
 			isa = PBXGroup;
 			children = (
 				445F249720E1A5BA00D004E9 /* asn1c */,
-				445F239420E1817B00D004E9 /* AppStoreReceiptData.h */,
+				445F239420E1817B00D004E9 /* AppStoreParsedReceiptData.h */,
 				445F239520E1817C00D004E9 /* AppStoreReceiptData.m */,
 				EF743FC31F99549000AC89A2 /* subscriptionProductIds.plist */,
 				4E5263CB2072984D0021FEF5 /* IAPViewController.h */,
