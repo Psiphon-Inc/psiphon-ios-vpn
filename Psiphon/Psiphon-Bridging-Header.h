@@ -20,6 +20,7 @@
 #import "Notifier.h"
 #import "AppDelegate.h"
 #import "PsiFeedbackLogger.h"
+#include "timestamp.h"
 
 // UI
 #import "UIColor+Additions.h"

@@ -450,9 +450,30 @@ func plistReader<DecodeType: Decodable>(key: String, toType: DecodeType.Type) th
 
 extension JSONDecoder {
     
-    static func makeIso8601Decoder() -> JSONDecoder {
+    static func makeRfc3339Decoder() -> JSONDecoder {
         let decoder = JSONDecoder()
-        decoder.dateDecodingStrategy = .iso8601
+        decoder.dateDecodingStrategy = .custom{
+            let container = try $0.singleValueContainer()
+            let dateString = try container.decode(String.self)
+            
+            var ts = timestamp_t()
+            let result = timestamp_parse(dateString,
+                                         dateString.lengthOfBytes(using: .utf8),
+                                         &ts)
+            
+            guard result == 0 else {
+                throw DecodingError.dataCorrupted(
+                    DecodingError.Context(
+                        codingPath: $0.codingPath,
+                        debugDescription: "Failed to parse RFC3339 string '\(dateString)'"
+                    )
+                )
+            }
+            
+            let milliSeconds: Double = Double(ts.nsec) / pow(10, 9)
+            let timeIntervalSince1970: TimeInterval = Double(ts.sec) + milliSeconds
+            return Date(timeIntervalSince1970: timeIntervalSince1970)
+        }
         return decoder
     }
     
@@ -460,9 +481,45 @@ extension JSONDecoder {
 
 extension JSONEncoder {
     
-    static func makeIso8601Encoder() -> JSONEncoder {
+    static let SECOND_PRECISION = Int32(0)
+    static let MILLISECOND_PRECISION = Int32(3)
+    
+    static let TIME_ZONE_OFFSET_UTC_MINUTES = Int16(0)
+    
+    static func makeRfc3339Encoder() -> JSONEncoder {
         let encoder = JSONEncoder()
-        encoder.dateEncodingStrategy = .iso8601
+        encoder.dateEncodingStrategy = .custom { date, dateEncoder in
+            
+            let timeInterval = date.timeIntervalSince1970
+            
+            var sec_integral = Double()
+            let sec_fraction = modf(timeInterval, &sec_integral)
+            
+            let nsec = sec_fraction * pow(10, 9)
+            
+            var ts = timestamp_t(sec: Int64(sec_integral),
+                                 nsec: Int32(nsec),
+                                 offset: Self.TIME_ZONE_OFFSET_UTC_MINUTES)
+            
+            var buf = Array<Int8>(repeating: 0, count: 40)
+            let length = timestamp_format_precision(&buf, buf.count, &ts,
+                                                    Self.MILLISECOND_PRECISION)
+            
+            guard length > 0 else {
+                throw EncodingError.invalidValue(
+                    date,
+                    EncodingError.Context(
+                        codingPath: dateEncoder.codingPath,
+                        debugDescription: "Failed to format date '\(date)' to RFC3339 string"
+                    )
+                )
+            }
+            
+            let dateString = String(cString: buf)
+            
+            var container = dateEncoder.singleValueContainer()
+            try container.encode(dateString)
+        }
         return encoder
     }
     
