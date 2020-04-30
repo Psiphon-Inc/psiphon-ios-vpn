@@ -666,7 +666,7 @@ fileprivate enum StoredSubscriptionPurchasesAuthState {
                 return .success([:])
             }
             do {
-                let decoded = try JSONDecoder.makeIso8601JSONDecoder()
+                let decoded = try JSONDecoder.makeIso8601Decoder()
                     .decode(StoredDataType.self, from: data)
                 return .success(decoded)
             } catch {
