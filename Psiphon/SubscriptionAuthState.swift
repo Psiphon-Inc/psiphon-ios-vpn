@@ -316,7 +316,7 @@ func subscriptionAuthStateReducer<T: TunnelProviderManager>(
                 )
             },
             feedbackLog(.info, """
-                started authorization request for original transaction ID \
+                initiated auth request for original transaction ID \
                 \(purchaseWithLatestExpiry.purchase.originalTransactionID)
                 """).mapNever()
         ]
