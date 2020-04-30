@@ -168,7 +168,7 @@ struct ReceiptData: Equatable, Codable {
         }
         // Validate bundle identifier.
         guard receiptData.bundleIdentifier == appBundle.bundleIdentifier else {
-            fatalError("""
+            fatalErrorFeedbackLog("""
                 Receipt bundle identifier '\(String(describing: receiptData.bundleIdentifier))'
                 does not match app bundle identifier '\(appBundle.bundleIdentifier)'
                 """)

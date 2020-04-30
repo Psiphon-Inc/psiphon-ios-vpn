@@ -49,7 +49,7 @@ func makeSerialEffectReducer<Value, Action: Equatable, Environment>(
         switch serialEffectAction {
         case ._effectCompleted:
             guard serialEffectState.pendingEffectCompletion else {
-                fatalError()
+                fatalErrorFeedbackLog("Expected 'pendingEffectCompletion' to be true")
             }
             
             // Actions from pendingEffectActionQueue are prioritized over pendingEffectActionQueue.
@@ -98,7 +98,7 @@ func makeSerialEffectReducer<Value, Action: Equatable, Environment>(
                 case .completed:
                     return ._effectCompleted
                 case .interrupted:
-                    fatalError()
+                    fatalErrorFeedbackLog("Signal interrupted unexpectedly")
                 }
             }
         ]

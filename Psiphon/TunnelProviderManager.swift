@@ -43,7 +43,7 @@ extension TunnelProviderVPNStatus {
         case .connecting, .connected, .reasserting:
             return true
         @unknown default:
-            fatalError("unknown NEVPNStatus value '\(self.rawValue)'")
+            fatalErrorFeedbackLog("unknown NEVPNStatus value '\(self.rawValue)'")
         }
     }
     
@@ -418,7 +418,7 @@ final class PsiphonTPMConnectionObserver: VPNConnectionObserver<PsiphonTPM> {
     
     @objc private func statusDidChange() {
         guard let manager = self.tunnelProviderManager else {
-            fatalError()
+            fatalErrorFeedbackLog("No tunnel provider manager is set")
         }
         sendOnMain(.vpnStatusChanged(manager.connectionStatus))
     }
