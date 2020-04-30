@@ -215,7 +215,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
         
         [PsiFeedbackLogger
          infoWithType:AuthCheckLogType
-         message:@"reconnect since supplied non-sub auth ids don' match persisted value"];
+         message:@"reconnect since supplied non-sub auth ids don't match persisted value"];
         
         [self reconnectWithUpdatedAuthorizations];
         return;
