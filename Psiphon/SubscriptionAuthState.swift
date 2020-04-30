@@ -250,7 +250,7 @@ func subscriptionAuthStateReducer<T: TunnelProviderManager>(
     case .requestAuthorizationForPurchases:
         
         guard let tunnelManagerRef = state.tunnelManagerRef else {
-            fatalError()
+            return []
         }
         
         guard let receiptData = state.receiptData else {
