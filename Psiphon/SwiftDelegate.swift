@@ -245,11 +245,6 @@ extension SwiftDelegate: SwiftBridgeDelegate {
 
     }
     
-    struct Changed<Value> {
-        let changed: Bool
-        let value: Value
-    }
-    
     @objc func applicationWillEnterForeground(_ application: UIApplication) {
         self.store.send(vpnAction: .syncWithProvider(reason: .appEnteredForeground))
         self.store.send(.psiCash(.refreshPsiCashState))
