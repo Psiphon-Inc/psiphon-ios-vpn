@@ -238,7 +238,8 @@ extension SwiftDelegate: SwiftBridgeDelegate {
 
         if Debugging.printAppState {
             self.lifetime += self.store.$value.signalProducer.startWithValues { appState in
-                dump(appState[keyPath: \.vpnState])
+                print("*", "-----")
+                dump(appState[keyPath: \.subscriptionAuthState])
                 print("*", "-----")
             }
         }

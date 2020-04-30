@@ -662,6 +662,10 @@ extension ProviderManagerLoadState {
             
         case .success(let .some((tpm, connectionObserver))):
             self.value = .loaded(tpm)
+            
+            // If the NETunnelProviderManager reference in `previousValue` is different
+            // from `tpm`, then the NETunnelProviderManager from previous reference is no longer
+            // valid, and all references to it should be removed.
             guard case .loaded(let previousTpm) = previousValue, previousTpm == tpm else {
                 return [
                     .fireAndForget { [tpm] in

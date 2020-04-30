@@ -190,7 +190,15 @@ enum HttpRequestTunnelError: HashableError {
     /// Tunnel is not connected.
     case tunnelNotConnected
     /// The weak reference to the tunnel provider manager  is `nil`.
+    /// This error is not retirable.
     case nilTunnelProviderManager
+    
+    var isRetriable: Bool {
+        switch self {
+        case .tunnelNotConnected: return true
+        case .nilTunnelProviderManager: return false
+        }
+    }
 }
 
 /// `tunneledHttpRequest` check tunnel status immediately before sending the HTTP request.
@@ -332,6 +340,23 @@ struct RetriableTunneledHttpRequest<Response: RetriableHTTPResponse> {
                         .prefix(value: .value(.completed(result)))
                 }
             }
+            .flatMapError { requestErrorEvent
+                -> SignalProducer<SignalTermination, ErrorEvent<RequestError>> in
+                
+                // If the tunnel error request is not retriable, then the signal is completed
+                // and no further retries are carried out.
+                // Otherwise, the error is retriable and is simply forwarded.
+                
+                guard case let .tunnelError(tunnelError) = requestErrorEvent.error else {
+                    return SignalProducer(error: requestErrorEvent)
+                }
+                if tunnelError.isRetriable {
+                    return SignalProducer(error: requestErrorEvent)
+                } else {
+                    return SignalProducer(value: .terminate)
+                        .prefix(value: .value(.failed(requestErrorEvent)))
+                }
+            }
             .retry(upTo: self.retryCount,
                    interval: self.retryInterval.toDouble()!,
                    on: QueueScheduler.main)
@@ -346,13 +371,15 @@ struct RetriableTunneledHttpRequest<Response: RetriableHTTPResponse> {
                 return false
             }
             return true
-        })
-            .map { signalTermination -> RequestResult in
+        }).map { signalTermination -> RequestResult in
                 guard case let .value(requestResult) = signalTermination else {
                     fatalError()
                 }
                 return requestResult
-        }
+        }.on(completed: {
+            PsiFeedbackLogger.info(withType: "RetriableTunneledHttpRequest",
+                                   message: "SignalCompleted")
+        })
     }
     
 }
