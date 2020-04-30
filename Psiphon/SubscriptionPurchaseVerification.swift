@@ -99,7 +99,7 @@ struct SubscriptionValidationResponse: RetriableHTTPResponse {
             switch urlResponse.typedStatusCode {
             case .ok:
                 do {
-                    let decoder = JSONDecoder.makeIso8601JSONDecoder()
+                    let decoder = JSONDecoder.makeIso8601Decoder()
                     let decodedBody = try decoder.decode(SuccessResult.self, from: data)
                     self.result = .success(decodedBody)
                 } catch {

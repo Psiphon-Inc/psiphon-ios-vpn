@@ -59,7 +59,7 @@ extension SignedAuthorization {
         guard let data = Data(base64Encoded: base64String, options: .ignoreUnknownCharacters) else {
             return nil
         }
-        let decoder = JSONDecoder.makeIso8601JSONDecoder()
+        let decoder = JSONDecoder.makeIso8601Decoder()
         return try decoder.decode(Self.self, from: data)
     }
     

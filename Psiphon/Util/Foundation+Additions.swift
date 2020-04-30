@@ -450,7 +450,7 @@ func plistReader<DecodeType: Decodable>(key: String, toType: DecodeType.Type) th
 
 extension JSONDecoder {
     
-    static func makeIso8601JSONDecoder() -> JSONDecoder {
+    static func makeIso8601Decoder() -> JSONDecoder {
         let decoder = JSONDecoder()
         decoder.dateDecodingStrategy = .iso8601
         return decoder
