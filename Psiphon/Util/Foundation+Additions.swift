@@ -458,6 +458,16 @@ extension JSONDecoder {
     
 }
 
+extension JSONEncoder {
+    
+    static func makeIso8601Encoder() -> JSONEncoder {
+        let encoder = JSONEncoder()
+        encoder.dateEncodingStrategy = .iso8601
+        return encoder
+    }
+    
+}
+
 // MARK: User Defaults
 
 /// Represents a type that can be stored by `UserDefaults` (aka `NSUserDefaults`).
