@@ -23,6 +23,9 @@
 #import "PsiFeedbackLogger.h"
 #import "Logging.h"
 
+PsiFeedbackLogType const SubscriptionAuthCheckLogType = @"SubscriptionAuthCheck";
+
+
 @implementation SubscriptionAuthCheck
 
 + (Authorization *_Nullable)getLatestAuthrizationNotRejected {
@@ -41,7 +44,7 @@
                                                                        options:kNilOptions
                                                                          error:&err];
     if (err != nil) {
-        [PsiFeedbackLogger errorWithType:@"SubscriptionAuthCheck"
+        [PsiFeedbackLogger errorWithType:SubscriptionAuthCheckLogType
                                  message:@"Failed to decode stored data"
                                   object:err];
         return nil;
@@ -65,7 +68,7 @@
         
         NSString *_Nullable state = signedAuthorizationEnum[@"state"];
         if (state == nil) {
-            [PsiFeedbackLogger errorWithType:@"SubscriptionAuthCheck"
+            [PsiFeedbackLogger errorWithType:SubscriptionAuthCheckLogType
                                      message:@"'state' missing"];
             continue;
         }
@@ -76,7 +79,7 @@
         
         NSString *_Nullable base64Auth = signedAuthorizationEnum[@"authorization"];
         if (base64Auth == nil) {
-            [PsiFeedbackLogger errorWithType:@"SubscriptionAuthCheck"
+            [PsiFeedbackLogger errorWithType:SubscriptionAuthCheckLogType
                                      message:@"'authorization' missing"];
             continue;
         }
@@ -84,7 +87,7 @@
         Authorization *_Nullable decodedAuth = [[Authorization alloc]
                                                 initWithEncodedAuthorization:base64Auth];
         if (decodedAuth == nil) {
-            [PsiFeedbackLogger errorWithType:@"SubscriptionAuthCheck"
+            [PsiFeedbackLogger errorWithType:SubscriptionAuthCheckLogType
                                      format:@"failed to decode '%@'", base64Auth];
             continue;
         }
@@ -115,8 +118,12 @@
     // Checks if authorization is already rejected.
     for (NSString *rejectedAuthID in rejectedAuthIDs) {
         if ([authWithLatestExpiry.ID isEqualToString: rejectedAuthID]) {
-            LOG_DEBUG(@"authWithLatestExpiry authID '%@' matces rejected authID '%@'",
-                      authWithLatestExpiry.ID, rejectedAuthID);
+            
+            [PsiFeedbackLogger
+             infoWithType:SubscriptionAuthCheckLogType
+             format:@"Subscription auth with ID '%@' matched rejected auth ID '%@'",
+             authWithLatestExpiry.ID, rejectedAuthID];
+            
             return nil;
         }
     }

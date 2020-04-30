@@ -750,8 +750,25 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 
         // If subscription authorization was rejected, adds to the list of
         // rejected subscription authorization IDs.
-        if (self.storedAuthoriztions.subscriptionAuth != nil) {
+        if (self.subscriptionAuthID != nil) {
+            
+            // Sanity-check
+            if (![self.storedAuthoriztions.subscriptionAuth.ID
+                  isEqualToString:self.subscriptionAuthID]) {
+                
+                [NSException raise:@"StateInconsistency"
+                            format:@"Expected 'storedAuthorizations': '%@' to match \
+                 'subscriptionAuthID': '%@'", self.storedAuthoriztions.subscriptionAuth.ID,
+                 self.subscriptionAuthID];
+                
+            }
+            
             if (![authorizationIds containsObject:self.storedAuthoriztions.subscriptionAuth.ID]) {
+                
+                [PsiFeedbackLogger infoWithType:AuthCheckLogType
+                                         format:@"Subscription auth with ID '%@' rejected",
+                 self.storedAuthoriztions.subscriptionAuth.ID];
+                
                 [SubscriptionAuthCheck
                  addRejectedSubscriptionAuthID:self.storedAuthoriztions.subscriptionAuth.ID];
             }
