@@ -128,13 +128,7 @@ func psiCashReducer<T: TunnelProviderManager>(
             
         case .failure(let errorEvent):
             state.psiCash.purchasing = .error(errorEvent)
-            return [
-                .fireAndForget {
-                    PsiFeedbackLogger.error(withType: "PsiCash",
-                                            message: "psicash product purchase failed",
-                                            object: errorEvent)
-                }
-            ]
+            return [ feedbackLog(.error, errorEvent).mapNever() ]
         }
         
     case .refreshPsiCashState:

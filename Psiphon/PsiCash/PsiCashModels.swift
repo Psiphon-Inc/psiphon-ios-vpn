@@ -268,17 +268,27 @@ struct ExpirableTransaction: Equatable {
         return localTimeExpiry.timeIntervalSinceNow <= 0
     }
 
-    static func from(psiCashPurchase purchase: PsiCashPurchase) -> Self? {
-        guard let serverTimeExpiry = purchase.serverTimeExpiry else { return nil }
-        guard let localTimeExpiry = purchase.localTimeExpiry else { return nil }
-        guard let base64Auth = purchase.authorization else { return nil }
-        guard let authorization = try? SignedAuthorization.make(base64String: base64Auth) else {
-            return nil
+    static func from(psiCashPurchase purchase: PsiCashPurchase) -> Result<Self, ErrorRepr> {
+        guard let serverTimeExpiry = purchase.serverTimeExpiry else {
+            return .failure(ErrorRepr(repr: "'serverTimeExpiry' is nil"))
         }
-        return .init(transactionId: purchase.id,
-                     serverTimeExpiry: serverTimeExpiry,
-                     localTimeExpiry: localTimeExpiry,
-                     authorization: authorization)
+        guard let localTimeExpiry = purchase.localTimeExpiry else {
+            return .failure(ErrorRepr(repr: "'localTimeExpiry' is nil"))
+        }
+        guard let base64Auth = purchase.authorization else {
+            return .failure(ErrorRepr(repr: "'authorization' is nil"))
+        }
+        do {
+            guard let authorization = try SignedAuthorization.make(base64String: base64Auth) else {
+                return .failure(ErrorRepr(repr: "Failed to decode '\(base64Auth)'"))
+            }
+            return .success(.init(transactionId: purchase.id,
+                                  serverTimeExpiry: serverTimeExpiry,
+                                  localTimeExpiry: localTimeExpiry,
+                                  authorization: authorization))
+        } catch {
+            return .failure(ErrorRepr(repr: String(describing: error)))
+        }
     }
 }
 
@@ -306,15 +316,18 @@ enum PsiCashPurchasedType: Equatable {
                         purchase '\(String(describing: purchase))'
                         """))
             }
-            guard let transaction = ExpirableTransaction.from(psiCashPurchase: purchase) else {
+            let parsedTransaction = ExpirableTransaction.from(psiCashPurchase: purchase)
+            switch parsedTransaction {
+            case .success(let expirableTransaction):
+                return .success(.speedBoost(
+                    PurchasedExpirableProduct<SpeedBoostProduct>(transaction: expirableTransaction,
+                                                                 product: product)))
+            case .failure(let error):
                 return .failure(.speedBoostParseFailure(message: """
-                    Failed to create 'ExpirableTransaction' from
-                    purchase '\(String(describing: purchase))'
+                    Failed to create 'ExpirableTransaction' from \
+                    purchase '\(error)'
                     """))
             }
-            return .success(.speedBoost(
-                PurchasedExpirableProduct<SpeedBoostProduct>.init(transaction: transaction,
-                                                                  product: product)))
         }
     }
 }
