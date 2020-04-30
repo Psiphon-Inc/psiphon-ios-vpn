@@ -151,7 +151,13 @@ func productRequestReducer(
                 }.sortPurchasables()
             }
         )
-        return []
+        
+        switch result {
+        case .success(_):
+            return []
+        case .failure(let errorEvent):
+            return [ feedbackLog(.error, errorEvent).mapNever() ]
+        }
     }
 }
 
