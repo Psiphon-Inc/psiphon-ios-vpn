@@ -216,8 +216,11 @@ extension SwiftDelegate: SwiftBridgeDelegate {
             .skipRepeats()
             .combinePrevious(initial: .none)
             .filter { (combined: Combined<TunnelStartStopIntent?>) -> Bool in
-                switch (combined.previous, combined.current) {
-                case (.stop, .start(transition: .none)):
+                
+                switch (previous: combined.previous, current: combined.current) {
+                case (previous: .stop, current: .start(transition: .none)):
+                    return true
+                case (previous: .start(transition: .restart), current: .start(transition: .none)):
                     return true
                 default:
                     return false
