@@ -50,8 +50,7 @@ struct SignedAuthorization: Hashable, Codable {
 extension SignedAuthorization {
     
     func base64String() throws -> String {
-        let encoder = JSONEncoder()
-        encoder.dateEncodingStrategy = .iso8601
+        let encoder = JSONEncoder.makeIso8601Encoder()
         let result = try encoder.encode(self)
         return result.base64EncodedString()
     }
