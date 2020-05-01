@@ -216,7 +216,7 @@ func makeGradientBorderLayer(colors: [CGColor], width: CGFloat = 2.0)
 
 func setBackgroundGradient(for view: UIView) {
     guard view.bounds.size != CGSize.zero else {
-        preconditionFailure("view bounds not set")
+        preconditionFailureFeedbackLog("view bounds not set")
     }
 
     let backgroundGradient = CAGradientLayer()

@@ -164,27 +164,49 @@ extension SwiftDelegate: SwiftBridgeDelegate {
                 objcBridge.onVPNStatusDidChange($0)
             }
         
-        // Forwards VPN state `providerSyncResult` error values, for a maximum of 5 emissions.
-        // Errors are debounced for time interval defined in `VPNHardCodedValues`.
+        // Monitors state of VPN status and tunnel intent.
+        // If there's a mismatch when tunnel intent changes to start,
+        // it alerts the user if the error is not resolves within a few seconds.
         self.lifetime += self.store.$value.signalProducer
-            .map(\.vpnState.value.providerSyncResult)
+            .map(\.vpnState.value.vpnStatusWithIntent)
             .skipRepeats()
-            .compactMap { syncResult -> ErrorEvent<TunnelProviderSyncedState.SyncError>? in
-                guard case let .completed(.some(syncErrorEvent)) = syncResult else {
-                    return nil
-                }
-                return syncErrorEvent
-            }
-            .debounce(VPNHardCodedValues.syncStateErrorDebounceInterval, on: QueueScheduler.main)
-            .take(first: 5)
-            .startWithValues { [unowned objcBridge] syncErrorEvent in
-                let message = """
-                \(UserStrings.Tunnel_provider_sync_failed_reinstall_config())
+            .flatMap(.latest) { vpnStatusWithIntent ->
+                SignalProducer<Result<Unit, ErrorEvent<ErrorRepr>>, Never> in
+            
+                let compareValue = (current: vpnStatusWithIntent.status.tunneled,
+                                    expected: vpnStatusWithIntent.intent)
                 
-                (\(String(describing: syncErrorEvent.error)))
-                """
-                objcBridge.onVPNStateSyncError(message)
+                switch compareValue {
+                case (current: .notConnected, expected: .start(transition: .none)):
+                    let error = ErrorEvent(
+                        ErrorRepr(repr: "Unexpected value '\(vpnStatusWithIntent)'")
+                    )
+                    
+                    // Waits for the specified amount of time before emitting the vpn status
+                    // and tunnel intent mismatch error.
+                    return Effect(value: .failure(error)).delay(
+                        VPNHardCodedValues.vpnStatusAndTunnelIntentMismatchAlertDelay,
+                        on: QueueScheduler.main
+                    )
+                    
+                default:
+                    return Effect(value: .success(.unit))
+                }
+        }
+        .skipRepeats()
+        .startWithValues { (result: Result<Unit, ErrorEvent<ErrorRepr>>) in
+            switch result {
+            case .success(.unit):
+                break
+                
+            case .failure(let errorEvent):
+                immediateFeedbackLog(.error, errorEvent)
+                
+                objcBridge.onVPNStateSyncError(
+                    UserStrings.Tunnel_provider_sync_failed_reinstall_config()
+                )
             }
+        }
         
         // Forewards SpeedBoost purchase expiry date (if the user is not subscribed)
         // to ObjCBridgeDelegate.

@@ -93,7 +93,7 @@ extension SpeedBoostCollection: UICollectionViewDataSource {
 
     func collectionView(_ collectionView: UICollectionView,
                         numberOfItemsInSection section: Int) -> Int {
-        precondition(section == 0)
+        preconditionFeedbackLog(section == 0, "Section is not 0: '\(section)'")
         return data?.count ?? 0
     }
 

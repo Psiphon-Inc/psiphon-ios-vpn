@@ -2095,11 +2095,7 @@
 				INFOPLIST_FILE = PsiphonPlayground/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 13.2;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@loader_path/Frameworks",
-				);
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = ca.psiphon.PsiphonPlayground;
@@ -2135,11 +2131,7 @@
 				INFOPLIST_FILE = PsiphonPlayground/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 13.2;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@loader_path/Frameworks",
-				);
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = ca.psiphon.PsiphonPlayground;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
@@ -2292,10 +2284,7 @@
 				SWIFT_OBJC_BRIDGING_HEADER = "Psiphon/Psiphon-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
-				USER_HEADER_SEARCH_PATHS = (
-					"\"${PROJECT_DIR}/Pods\"/**",
-					"${PROJECT_DIR}/Psiphon/asn1c",
-				);
+				USER_HEADER_SEARCH_PATHS = "\"${PROJECT_DIR}/Pods\"/** ${PROJECT_DIR}/Psiphon/asn1c";
 				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = Debug;
@@ -2325,10 +2314,7 @@
 				STRIP_BITCODE_FROM_COPIED_FILES = YES;
 				SWIFT_OBJC_BRIDGING_HEADER = "Psiphon/Psiphon-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
-				USER_HEADER_SEARCH_PATHS = (
-					"\"${PROJECT_DIR}/Pods\"/**",
-					"${PROJECT_DIR}/Psiphon/asn1c",
-				);
+				USER_HEADER_SEARCH_PATHS = "\"${PROJECT_DIR}/Pods\"/** ${PROJECT_DIR}/Psiphon/asn1c";
 				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = Release;
