@@ -146,6 +146,21 @@ func feedbackLog<T: CustomFieldFeedbackDescription>(
     }
 }
 
+func immediateFeedbackLog<T: FeedbackDescription>(
+    _ level: LogLevel, _ value: T, file: String = #file, line: UInt = #line
+) {
+    let tag = "\(file.lastPathComponent):\(line)"
+    let message = makeFeedbackEntry(value)
+    switch level {
+    case .info:
+        PsiFeedbackLogger.info(withType: tag, message: message)
+    case .warn:
+        PsiFeedbackLogger.warn(withType: tag, message: message)
+    case .error:
+        PsiFeedbackLogger.error(withType: tag, message: message)
+    }
+}
+
 /// Creates a string representation of `value` fit for sending in feedback.
 /// - Note: Escapes double-quotes `"`, and removes "Psiphon" and "Swift" module names.
 func makeFeedbackEntry<T: FeedbackDescription>(_ value: T) -> String {
