@@ -603,7 +603,13 @@ fileprivate func tunnelProviderReducer<T: TunnelProviderManager>(
                 feedbackLog(.info, tag: vpnProviderSyncTag, errorEvent).mapNever()
             ]
             
-        default:
+        case .active(.connecting):
+            return []
+            
+        case .active(.networkNotReachable):
+            return []
+            
+        case .inactive:
             return []
         }
         
