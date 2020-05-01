@@ -632,15 +632,12 @@ fileprivate func tunnelProviderReducer<T: TunnelProviderManager>(
             return []
             
         case .inactive:
-            guard case .stop = state.tunnelIntent else {
-                fatalErrorFeedbackLog("Unexpected nil tunnel intent")
-            }
-            
             // Fixes "inactive" sync result and vpn status mismatch.
             if case let .loaded(tpm) = state.loadState.value {
                 switch tpm.connectionStatus {
                 case .reasserting, .connecting, .connected:
-                    // Tunnel provider is expected to be inactive!.
+                    // Tunnel provider is expected to be inactive!
+                    state.tunnelIntent = .stop
                     return [ Effect(value: .stopVPN) ]
                     
                 case .invalid, .disconnecting, .disconnected:
