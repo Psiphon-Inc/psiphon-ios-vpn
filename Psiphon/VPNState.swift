@@ -372,17 +372,17 @@ fileprivate func vpnProviderManagerStateReducer<T: TunnelProviderManager>(
         return [
             updateConfig(tpm, for: .stopVPN)
                 .flatMap(.latest, saveAndLoadConfig)
-            .flatMap(.latest) { result -> Effect<TPMEffectResultWrapper<T>> in
-                switch result {
-                case .success(let tpm):
-                    return stopVPN(tpm)
-                        .map { .stopTunnelResult(.unit) }
-                        .prefix(value: .configUpdated(.success(tpm)))
-                case .failure(let errorEvent):
-                    return Effect(value:
-                        .configUpdated(.failure(errorEvent.map { .failedConfigLoadSave($0) }))
-                    )
-                }
+                .flatMap(.latest) { result -> Effect<TPMEffectResultWrapper<T>> in
+                    switch result {
+                    case .success(let tpm):
+                        return stopVPN(tpm)
+                            .map { .stopTunnelResult(.unit) }
+                            .prefix(value: .configUpdated(.success(tpm)))
+                    case .failure(let errorEvent):
+                        return Effect(value:
+                            .configUpdated(.failure(errorEvent.map { .failedConfigLoadSave($0) }))
+                        )
+                    }
             }.map {
                 .tpmEffectResultWrapper($0)
             }
