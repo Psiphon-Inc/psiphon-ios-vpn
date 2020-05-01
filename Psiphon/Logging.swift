@@ -77,7 +77,7 @@ Equatable, CustomStringConvertible, CustomStringFeedbackDescription {
 }
 
 func fatalErrorFeedbackLog(
-    file: String = #file, line: Int = #line, _ message: LogMessage
+    _ message: LogMessage, file: String = #file, line: UInt = #line
 ) -> Never {
     let tag = "\(file.lastPathComponent):\(line)"
     PsiFeedbackLogger.fatalError(
@@ -85,6 +85,21 @@ func fatalErrorFeedbackLog(
         message: makeFeedbackEntry(message)
     )
     fatalError(tag)
+}
+
+func preconditionFeedbackLog(
+    _ condition: @autoclosure () -> Bool, _ message: LogMessage,
+    file: String = #file, line: UInt = #line
+) {
+    guard condition() else {
+        fatalErrorFeedbackLog(message, file: file, line: line)
+    }
+}
+
+func preconditionFailureFeedbackLog(
+    _ message: LogMessage, file: String = #file, line: UInt = #line
+) -> Never {
+    fatalErrorFeedbackLog(message, file: file, line: line)
 }
 
 func feedbackLog(_ level: LogLevel, tag: LogTag, _ message: LogMessage) -> Effect<Never> {
@@ -128,6 +143,21 @@ func feedbackLog<T: CustomFieldFeedbackDescription>(
         case .error:
             PsiFeedbackLogger.error(withType: tag, message: value.description)
         }
+    }
+}
+
+func immediateFeedbackLog<T: FeedbackDescription>(
+    _ level: LogLevel, _ value: T, file: String = #file, line: UInt = #line
+) {
+    let tag = "\(file.lastPathComponent):\(line)"
+    let message = makeFeedbackEntry(value)
+    switch level {
+    case .info:
+        PsiFeedbackLogger.info(withType: tag, message: message)
+    case .warn:
+        PsiFeedbackLogger.warn(withType: tag, message: message)
+    case .error:
+        PsiFeedbackLogger.error(withType: tag, message: message)
     }
 }
 

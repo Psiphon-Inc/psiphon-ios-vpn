@@ -190,6 +190,10 @@ final class PsiphonTPM: TunnelProviderManager {
         // Otherwise, a race condition is created in the network extension
         // between call to `startVPNTunnelWithOptions` and Connect On Demand.
         self.wrappedManager.isOnDemandEnabled = true
+        
+        if Debugging.disableConnectOnDemand {
+            self.wrappedManager.isOnDemandEnabled = false
+        }
     }
     
     func stop() {
@@ -216,8 +220,11 @@ final class PsiphonTPM: TunnelProviderManager {
             guard let _ = NonEmpty(array: self.wrappedManager.onDemandRules) else {
                 return false
             }
-            guard self.wrappedManager.isOnDemandEnabled else {
-                return false
+            // Disables Connect On Demand flag check, if debugging flag is set.
+            if !Debugging.disableConnectOnDemand {
+                guard self.wrappedManager.isOnDemandEnabled else {
+                    return false
+                }
             }
             return true
         case .stopVPN:
