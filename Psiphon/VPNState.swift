@@ -607,7 +607,8 @@ fileprivate func tunnelProviderReducer<T: TunnelProviderManager>(
                 switch tpm.connectionStatus {
                 case .reasserting, .connected:
                     state.tunnelIntent = .start(transition: .none)
-                    return [ Effect(value: .startPsiphonTunnel) ] + effects
+                    // No start/stop action is necessary.
+                    return effects
                     
                 case .connecting, .invalid, .disconnecting, .disconnected:
                     state.tunnelIntent = .stop
