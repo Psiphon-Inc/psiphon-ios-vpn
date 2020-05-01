@@ -23,10 +23,11 @@ struct VPNHardCodedValues {
     
     /// Time interval during which a response to the messent sent to the tunnel provider is expected.
     /// After which the send message Effect should timeout.
-    static let providerMessageSendTimeout: TimeInterval = 5.0  // 5 seconds
+    static let providerMessageSendTimeout: TimeInterval = 1.0  // 1 second
     
-    /// Debounce time interval for forwarding sync state errrors.
-    static let syncStateErrorDebounceInterval: TimeInterval = 5.0  // 5 seconds
+    /// Time interval to wait for VPN status and tunnel intent mismatch to be resolved
+    /// before an alert is shown to the user.
+    static let vpnStatusAndTunnelIntentMismatchAlertDelay: TimeInterval = 5.0  // 5 seconds
     
 }
 

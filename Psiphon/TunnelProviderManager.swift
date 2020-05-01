@@ -221,7 +221,7 @@ final class PsiphonTPM: TunnelProviderManager {
                 return false
             }
             // Disables Connect On Demand flag check, if debugging flag is set.
-            if Debugging.disableConnectOnDemand {
+            if !Debugging.disableConnectOnDemand {
                 guard self.wrappedManager.isOnDemandEnabled else {
                     return false
                 }
