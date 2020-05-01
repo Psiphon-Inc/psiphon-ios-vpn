@@ -77,7 +77,7 @@ Equatable, CustomStringConvertible, CustomStringFeedbackDescription {
 }
 
 func fatalErrorFeedbackLog(
-    file: String = #file, line: Int = #line, _ message: LogMessage
+    _ message: LogMessage, file: String = #file, line: UInt = #line
 ) -> Never {
     let tag = "\(file.lastPathComponent):\(line)"
     PsiFeedbackLogger.fatalError(
@@ -85,6 +85,21 @@ func fatalErrorFeedbackLog(
         message: makeFeedbackEntry(message)
     )
     fatalError(tag)
+}
+
+func preconditionFeedbackLog(
+    _ condition: @autoclosure () -> Bool, _ message: LogMessage,
+    file: String = #file, line: UInt = #line
+) {
+    guard condition() else {
+        fatalErrorFeedbackLog(message, file: file, line: line)
+    }
+}
+
+func preconditionFailureFeedbackLog(
+    _ message: LogMessage, file: String = #file, line: UInt = #line
+) -> Never {
+    fatalErrorFeedbackLog(message, file: file, line: line)
 }
 
 func feedbackLog(_ level: LogLevel, tag: LogTag, _ message: LogMessage) -> Effect<Never> {
