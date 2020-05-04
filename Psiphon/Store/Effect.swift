@@ -64,9 +64,9 @@ extension Effect {
             case .completed:
                 receiveCompletion()
             case .interrupted:
-                fatalError("Unexpected effect interruption")
+                fatalErrorFeedbackLog("Unexpected effect interruption")
             case .failed(_):
-                fatalError("Effect failed")
+                fatalErrorFeedbackLog("Effect failed")
             }
         }
     }

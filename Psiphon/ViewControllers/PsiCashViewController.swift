@@ -204,7 +204,7 @@ final class PsiCashViewController: UIViewController {
                     }
                     
                 default:
-                    fatalError("""
+                    fatalErrorFeedbackLog("""
                         Invalid purchase navigation state combination: \
                         '\(String(describing: purchasingNavState))',
                         """)
@@ -274,7 +274,7 @@ final class PsiCashViewController: UIViewController {
                                     .left(.right(.right(.left(.pendingPsiCashPurchase))))
                                 )
                             case .connecting:
-                                fatalError("tunnelState at this point should not be 'connecting'")
+                                fatalErrorFeedbackLog("tunnelState at this point should not be 'connecting'")
                             }
 
                         } else {
@@ -361,7 +361,7 @@ final class PsiCashViewController: UIViewController {
     }
 
     required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+        fatalErrorFeedbackLog("init(coder:) has not been implemented")
     }
 
     override var preferredStatusBarStyle: UIStatusBarStyle {

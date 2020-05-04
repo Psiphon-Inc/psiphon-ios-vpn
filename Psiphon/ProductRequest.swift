@@ -131,7 +131,10 @@ func productRequestReducer(
         
     case let .productRequestResult(request, result):
         guard request == state.psiCashRequest else {
-            fatalError()
+            fatalErrorFeedbackLog("""
+                Expected SKProductRequest object '\(request)' to match
+                state reference '\(String(describing: state.psiCashRequest))'.
+                """)
         }
         state.psiCashRequest = nil
         

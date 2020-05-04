@@ -41,7 +41,7 @@ extension Signal where Error == Never {
 extension Signal where Value == Bool, Error == Never {
 
     func falseIfNotTrue(within timeout: DispatchTimeInterval) -> Signal<Bool, Never> {
-        precondition(timeout != .never)
+        preconditionFeedbackLog(timeout != .never, "Unexpected '.never' timeout")
 
         return self.filter { $0 == true }
             .take(first: 1)
@@ -68,7 +68,7 @@ extension SignalProducer {
 extension SignalProducer where Value == Bool, Error == Never {
 
     func falseIfNotTrue(within timeout: DispatchTimeInterval) -> SignalProducer<Bool, Never> {
-        precondition(timeout != .never)
+        preconditionFeedbackLog(timeout != .never, "Unexpected '.never' timeout")
 
         return self.producer.filter { $0 == true }
             .take(first: 1)

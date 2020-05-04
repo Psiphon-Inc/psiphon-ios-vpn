@@ -53,7 +53,7 @@ func landingPageReducer<T: TunnelProviderManager>(
             ]
         }
         guard let tpmWeakRef = state.tunnelProviderManager else {
-            fatalError("expected a valid tunnel provider")
+            fatalErrorFeedbackLog("expected a valid tunnel provider")
         }
         
         guard let landingPages = NonEmpty(array: environment.sharedDB.getHomepages()) else {

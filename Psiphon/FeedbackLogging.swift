@@ -62,7 +62,7 @@ enum LogLevel: Int {
 }
 
 struct LogMessage: ExpressibleByStringLiteral, ExpressibleByStringInterpolation,
-Equatable, CustomStringConvertible {
+Equatable, CustomStringConvertible, CustomStringFeedbackDescription {
     typealias StringLiteralType = String
     
     private var value: String
@@ -74,6 +74,32 @@ Equatable, CustomStringConvertible {
     public var description: String {
         return self.value
     }
+}
+
+func fatalErrorFeedbackLog(
+    _ message: LogMessage, file: String = #file, line: UInt = #line
+) -> Never {
+    let tag = "\(file.lastPathComponent):\(line)"
+    PsiFeedbackLogger.fatalError(
+        withType: tag,
+        message: makeFeedbackEntry(message)
+    )
+    fatalError(tag)
+}
+
+func preconditionFeedbackLog(
+    _ condition: @autoclosure () -> Bool, _ message: LogMessage,
+    file: String = #file, line: UInt = #line
+) {
+    guard condition() else {
+        fatalErrorFeedbackLog(message, file: file, line: line)
+    }
+}
+
+func preconditionFailureFeedbackLog(
+    _ message: LogMessage, file: String = #file, line: UInt = #line
+) -> Never {
+    fatalErrorFeedbackLog(message, file: file, line: line)
 }
 
 func feedbackLog(
@@ -120,6 +146,21 @@ private func feedbackLog(_ level: LogLevel, type: String, value: String) -> Effe
         case .error:
             PsiFeedbackLogger.error(withType: type, message: value)
         }
+    }
+}
+
+func immediateFeedbackLog<T: FeedbackDescription>(
+    _ level: LogLevel, _ value: T, file: String = #file, line: UInt = #line
+) {
+    let tag = "\(file.lastPathComponent):\(line)"
+    let message = makeFeedbackEntry(value)
+    switch level {
+    case .info:
+        PsiFeedbackLogger.info(withType: tag, message: message)
+    case .warn:
+        PsiFeedbackLogger.warn(withType: tag, message: message)
+    case .error:
+        PsiFeedbackLogger.error(withType: tag, message: message)
     }
 }
 
