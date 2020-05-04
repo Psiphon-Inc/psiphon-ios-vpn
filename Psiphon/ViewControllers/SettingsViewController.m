@@ -19,22 +19,21 @@
 
 #import "SettingsViewController.h"
 #import "AppDelegate.h"
-#import "IAPStoreHelper.h"
 #import "IAPViewController.h"
-#import "PsiCashOnboardingViewController.h"
 #import "RACSignal.h"
 #import "RACCompoundDisposable.h"
 #import "RACReplaySubject.h"
-#import "VPNManager.h"
 #import "Asserts.h"
 #import "AdManager.h"
 #import "Strings.h"
 #import "UIAlertController+Additions.h"
+#import "AppObservables.h"
+#import "Psiphon-Swift.h"
 
 // Specifier keys for cells in settings menu
 // These keys are defined in Psiphon/InAppSettings.bundle/Root.inApp.plist
-NSString * const SettingsSubscriptionCellSpecifierKey = @"settingsSubscription";
 NSString * const SettingsPsiCashCellSpecifierKey = @"settingsPsiCash";
+NSString * const SettingsSubscriptionCellSpecifierKey = @"settingsSubscription";
 NSString * const SettingsReinstallVPNConfigurationKey = @"settingsReinstallVPNConfiguration";
 NSString * const SettingsResetAdConsentCellSpecifierKey = @"settingsResetAdConsent";
 
@@ -70,14 +69,12 @@ NSString * const SettingsResetAdConsentCellSpecifierKey = @"settingsResetAdConse
 
     __weak SettingsViewController *weakSelf = self;
 
-    __block RACDisposable *subscriptionStatusDisposable = [[AppDelegate sharedAppDelegate].subscriptionStatus
-      subscribeNext:^(NSNumber *value) {
+    __block RACDisposable *subscriptionStatusDisposable = [AppObservables.shared.subscriptionStatus
+      subscribeNext:^(BridgedUserSubscription *status) {
 
         SettingsViewController *__strong strongSelf = weakSelf;
         if (strongSelf) {
-            UserSubscriptionStatus s = (UserSubscriptionStatus) [value integerValue];
-
-            strongSelf.hasActiveSubscription = (s == UserSubscriptionActive);
+            strongSelf.hasActiveSubscription = (status.state == BridgedSubscriptionStateActive);
             [strongSelf updateSubscriptionCell];
             [strongSelf updateHiddenKeys];
         }
@@ -96,7 +93,7 @@ NSString * const SettingsResetAdConsentCellSpecifierKey = @"settingsResetAdConse
     [self.compoundDisposable addDisposable:subscriptionStatusDisposable];
 
     __block RACDisposable *tunnelStatusDisposable =
-      [[VPNManager sharedInstance].lastTunnelStatus
+      [AppObservables.shared.vpnStatus
         subscribeNext:^(NSNumber *statusObject) {
           SettingsViewController *__strong strongSelf = weakSelf;
           if (strongSelf) {
@@ -111,21 +108,14 @@ NSString * const SettingsResetAdConsentCellSpecifierKey = @"settingsResetAdConse
 
 - (void)updateHiddenKeys {
     NSMutableSet *hiddenKeys = [NSMutableSet setWithSet:self.hiddenKeys];
-     if(![IAPStoreHelper canMakePayments]) {
-         [hiddenKeys addObject:SettingsSubscriptionCellSpecifierKey];
-     }
-
-    if (self.hasActiveSubscription) {
-        [hiddenKeys addObject:SettingsPsiCashCellSpecifierKey];
-    }
 
     // If the VPN is not active, don't show the force reconnect button.
-    if (![VPNManager mapIsVPNActive:self.vpnStatus]) {
-        [hiddenKeys addObject:kForceReconnect];
-        [hiddenKeys addObject:kForceReconnectFooter];
-    } else {
+    if ([VPNStateCompat providerNotStoppedWithVpnStatus:self.vpnStatus]) {
         [hiddenKeys removeObject:kForceReconnect];
         [hiddenKeys removeObject:kForceReconnectFooter];
+    } else {
+        [hiddenKeys addObject:kForceReconnect];
+        [hiddenKeys addObject:kForceReconnectFooter];
     }
 
     self.hiddenKeys = hiddenKeys;
@@ -178,32 +168,15 @@ NSString * const SettingsResetAdConsentCellSpecifierKey = @"settingsResetAdConse
 
     [super settingsViewController:self tableView:tableView didSelectCustomViewSpecifier:specifier];
 
-    if ([specifier.key isEqualToString:SettingsSubscriptionCellSpecifierKey]) {
-        [self openIAPViewController];
-
-    } else if ([specifier.key isEqualToString:SettingsPsiCashCellSpecifierKey]) {
+    if ([specifier.key isEqualToString:SettingsPsiCashCellSpecifierKey]) {
         [self openPsiCashViewController];
 
+    } else if ([specifier.key isEqualToString:SettingsSubscriptionCellSpecifierKey]) {
+        [self openIAPViewController];
+
     } else if ([specifier.key isEqualToString:SettingsReinstallVPNConfigurationKey]) {
-
-        SettingsViewController *__weak weakSelf = self;
-
-        __block RACDisposable *disposable = [[[VPNManager sharedInstance] reinstallVPNConfiguration]
-          subscribeError:^(NSError *error) {
-            SettingsViewController *__strong strongSelf = weakSelf;
-            if (strongSelf) {
-                [strongSelf.compoundDisposable removeDisposable:disposable];
-                [strongSelf settingsViewControllerDidEnd:nil];
-            }
-          }
-          completed:^{
-            SettingsViewController *__strong strongSelf = weakSelf;
-            if (strongSelf) {
-                [strongSelf.compoundDisposable removeDisposable:disposable];
-                [strongSelf settingsViewControllerDidEnd:nil];
-            }
-          }];
-        [self.compoundDisposable addDisposable:disposable];
+        [SwiftDelegate.bridge reinstallVPNConfig];
+        [self settingsViewControllerDidEnd:nil];
 
     } else if ([specifier.key isEqualToString:SettingsResetAdConsentCellSpecifierKey]) {
         [self onResetConsent];
@@ -216,8 +189,8 @@ NSString * const SettingsResetAdConsentCellSpecifierKey = @"settingsResetAdConse
     UITableViewCell *cell = nil;
 
     NSArray<NSString *> *customKeys = @[
-      SettingsSubscriptionCellSpecifierKey,
       SettingsPsiCashCellSpecifierKey,
+      SettingsSubscriptionCellSpecifierKey,
       SettingsReinstallVPNConfigurationKey,
       SettingsResetAdConsentCellSpecifierKey
     ];
@@ -227,8 +200,12 @@ NSString * const SettingsResetAdConsentCellSpecifierKey = @"settingsResetAdConse
         return cell;
     }
 
-    if ([specifier.key isEqualToString:SettingsSubscriptionCellSpecifierKey]) {
+    if ([specifier.key isEqualToString:SettingsPsiCashCellSpecifierKey]) {
+        cell = [super tableView:tableView cellForSpecifier:specifier];
+        [cell setAccessoryType:UITableViewCellAccessoryDisclosureIndicator];
+        cell.textLabel.text = [UserStrings PsiCash];
 
+    } else if ([specifier.key isEqualToString:SettingsSubscriptionCellSpecifierKey]) {
         cell = [super tableView:tableView cellForSpecifier:specifier];
         [cell setAccessoryType:UITableViewCellAccessoryDisclosureIndicator];
         subscriptionTableViewCell = cell;
@@ -238,19 +215,9 @@ NSString * const SettingsResetAdConsentCellSpecifierKey = @"settingsResetAdConse
 
         cell = [super tableView:tableView cellForSpecifier:specifier];
         [cell setAccessoryType:UITableViewCellAccessoryNone];
-        [cell.textLabel setText:NSLocalizedStringWithDefaultValue(@"SETTINGS_REINSTALL_VPN_CONFIGURATION_CELL_TITLE",
-                                                                  nil,
-                                                                  [NSBundle mainBundle],
-                                                                  @"Reinstall VPN profile",
-                                                                  @"Title of cell in settings menu which, when pressed, reinstalls the user's VPN profile for Psiphon")];
+        [cell.textLabel setText:[UserStrings Reinstall_vpn_config]];
         reinstallVPNProfileCell = cell;
         [self updateReinstallVPNProfileCell];
-
-    } else if ([specifier.key isEqualToString:SettingsPsiCashCellSpecifierKey]) {
-
-        cell = [super tableView:tableView cellForSpecifier:specifier];
-        [cell setAccessoryType:UITableViewCellAccessoryDisclosureIndicator];
-        [cell.textLabel setText:@"PsiCash"];
 
     } else if ([specifier.key isEqualToString:SettingsResetAdConsentCellSpecifierKey]) {
         cell = [super tableView:tableView cellForSpecifier:specifier];
@@ -271,15 +238,16 @@ NSString * const SettingsResetAdConsentCellSpecifierKey = @"settingsResetAdConse
 
 #pragma mark - Callbacks
 
+- (void)openPsiCashViewController {
+    UIViewController *psiCashViewController = [SwiftDelegate.bridge
+                                               createPsiCashViewController:TabsAddPsiCash];
+    [self presentViewController:psiCashViewController animated:YES completion:nil];
+}
+
 - (void)openIAPViewController {
     IAPViewController *iapViewController = [[IAPViewController alloc]init];
     iapViewController.openedFromSettings = YES;
     [self.navigationController pushViewController:iapViewController animated:YES];
-}
-
-- (void)openPsiCashViewController {
-    PsiCashOnboardingViewController *onboarding = [[PsiCashOnboardingViewController alloc] init];
-    [self presentViewController:onboarding animated:NO completion:nil];
 }
 
 - (void)onResetConsent {

@@ -65,7 +65,7 @@ PsiFeedbackLogType const PsiphonConfigLogType = @"PsiphonConfigReader";
     NSString *bundledConfigPath = PsiphonConfigReader.psiphonConfigPath;
 
     if (![fileManager fileExistsAtPath:bundledConfigPath]) {
-        [PsiFeedbackLogger errorWithType:PsiphonConfigLogType message:@"file not found"];
+        [PsiFeedbackLogger errorWithType:PsiphonConfigLogType format:@"file not found"];
         return nil;
     }
 

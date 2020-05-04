@@ -96,6 +96,9 @@ PsiFeedbackLogType const AppUpgradeLogType = @"AppUpgrade";
 
     }
 
+    // TODO: on new PsiCash release delete the key defined:
+    // UserDefaultsKey const PsiCashHasBeenOnboardedBoolKey = @"PsiCash.HasBeenOnboarded";
+
 }
 
 @end

@@ -214,7 +214,7 @@ static NSInteger _requestNumber = 0;
     [postDataTask resume];
 
     [AppProfiler logMemoryReportWithTag:@"SubscriptionVerifierAuthRequestSubmitted"];
-    [PsiFeedbackLogger infoWithType:SubscriptionVerifierServiceLogType message:@"authorization request submitted"];
+    [PsiFeedbackLogger infoWithType:SubscriptionVerifierServiceLogType format:@"authorization request submitted"];
 
 }
 

@@ -20,39 +20,11 @@
 #import <UIKit/UIKit.h>
 #import "AppEvent.h"
 
-@class RACReplaySubject<ValueType>;
-@class RACMulticastConnection<__covariant ValueType>;
-
-/**
- * User's subscription status.
- */
-typedef NS_ENUM(NSInteger, UserSubscriptionStatus) {
-    /** @const UserSubscriptionUnknown User's subscription status is not known yet (pending). */
-    UserSubscriptionUnknown = 1,
-    /** @const UserSubscriptionInActive User does not have an active subscription. */
-    UserSubscriptionInactive,
-    /** @const UserSubscriptionActive User has an active subscription. */
-    UserSubscriptionActive
-};
+NS_ASSUME_NONNULL_BEGIN
 
 @interface AppDelegate : UIResponder <UIApplicationDelegate>
 
 @property (strong, nonatomic) UIWindow *window;
-
-// appEvents is hot infinite multicasted signal with underlying replay subject.
-@property (nonatomic, nullable, readonly) RACMulticastConnection<AppEvent *> *appEvents;
-
-/**
- * subscriptionStatus emits an item of type `UserSubscriptionStatus` wrapped in NSNumber.
- * This replay subject has the initial value of `UserSubscriptionUnknown`.
- *
- * @note This subject might emit non-unique events.
- *
- * @scheduler vpnStartStatus delivers its events on the main thread.
- */
-@property (nonatomic, readonly) RACReplaySubject<NSNumber *> *subscriptionStatus;
-
-@property (atomic) BOOL shownLandingPageForCurrentSession;
 
 + (AppDelegate *)sharedAppDelegate;
 
@@ -60,8 +32,8 @@ typedef NS_ENUM(NSInteger, UserSubscriptionStatus) {
 
 - (void)reloadOnboardingViewController;
 
-- (UIAlertController *)displayAlertNoInternet:(void (^_Nullable)(UIAlertAction *))handler;
-
 + (UIViewController *)getTopMostViewController;
 
 @end
+
+NS_ASSUME_NONNULL_END
