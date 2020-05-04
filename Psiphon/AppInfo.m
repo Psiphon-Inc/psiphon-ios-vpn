@@ -50,7 +50,7 @@ UserDefaultsKey const AppInfoFastLaneSnapShotBoolKey = @"FASTLANE_SNAPSHOT";
     }
     id propChanId = [configs objectForKey:@"PropagationChannelId"];
     if (![propChanId isKindOfClass:[NSString class]]) {
-        [PsiFeedbackLogger errorWithType:AppInfoLogType message:@"PropagationChannelId invalid type %@", NSStringFromClass([propChanId class])];
+        [PsiFeedbackLogger errorWithType:AppInfoLogType format:@"PropagationChannelId invalid type %@", NSStringFromClass([propChanId class])];
     }
 
     return (NSString*)propChanId;

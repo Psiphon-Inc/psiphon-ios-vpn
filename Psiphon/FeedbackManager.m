@@ -21,15 +21,17 @@
 #import "AppDelegate.h"
 #import "DispatchUtils.h"
 #import "FeedbackUpload.h"
-#import "IAPStoreHelper.h"
 #import "MBProgressHUD.h"
-#import "PsiCashClient.h"
 #import "PsiFeedbackLogger.h"
 #import "PsiphonClientCommonLibraryHelpers.h"
 #import "PsiphonDataSharedDB.h"
 #import "SharedConstants.h"
 #import "UIAlertController+Additions.h"
+#import <ReactiveObjC.h>
 #import <stdatomic.h>
+#import "AppObservables.h"
+#import <PsiphonClientCommonLibrary/PsiphonData.h>
+#import "Psiphon-Swift.h"
 
 @implementation FeedbackManager {
     MBProgressHUD *uploadProgressAlert;
@@ -62,9 +64,21 @@
     NSData *jsonData = [bundledConfigStr dataUsingEncoding:NSUTF8StringEncoding];
     NSError *err = nil;
     NSDictionary *readOnly = [NSJSONSerialization JSONObjectWithData:jsonData options:kNilOptions error:&err];
-    
+
+#warning Blocking a background thread by calling `first` on AppDelegate.sharedAppDelegate subscriptionStatus
+    // TODO: This is a blocking solution. It is fine in practice for now, since the loading page
+    //       doesn't disappear until
+    //       `getPsiphonConfig` depends on an Observable stream and hence it should itself
+    //       return an observable stream.
     // Return bundled config as is if user doesn't have an active subscription
-    if(![IAPStoreHelper hasActiveSubscriptionForNow] && !err) {
+    BridgedUserSubscription *_Nonnull status = [[[AppObservables.shared.subscriptionStatus
+        filter:^BOOL(BridgedUserSubscription *subscription) {
+            return subscription.state != BridgedSubscriptionStateUnknown;
+        }]
+        take:1]
+        first];
+
+    if (status.state == BridgedSubscriptionStateActive && !err) {
         return bundledConfigStr;
     }
     
@@ -112,46 +126,53 @@
     [self uploadInFlight];
     // Ensure psiphon data is populated with latest logs
     // TODO: should this be a delegate method of Psiphon Data in shared library
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        NSString *psiphonConfig = [self getPsiphonConfig];
-        if (!psiphonConfig) {
-            // Corrupt settings file. Return early.
-            return;
-        }
-        
-        NSMutableArray<DiagnosticEntry *> *diagnosticEntries = [[NSMutableArray alloc] initWithArray:[[[PsiphonDataSharedDB alloc] initForAppGroupIdentifier:APP_GROUP_IDENTIFIER] getAllLogs]];
-
-        NSString *psiCashLog = [[PsiCashClient sharedInstance] logForFeedback];
-        if (psiCashLog != nil) {
-            [diagnosticEntries addObject:[[DiagnosticEntry alloc] init:psiCashLog andTimestamp:[NSDate date]]];
-        }
-
-        __weak FeedbackManager *weakSelf = self;
-        SendFeedbackHandler sendFeedbackHandler = ^(NSString *jsonString, NSString *pubKey, NSString *uploadServer, NSString *uploadServerHeaders) {
-            if (inactiveTunnel == nil) {
-                // Lazily allocate PsiphonTunnel instance
-                inactiveTunnel = [PsiphonTunnel newPsiphonTunnel:weakSelf]; // TODO: we need to update PsiphonTunnel framework to not require this and fix this warning
+    
+    __weak FeedbackManager *weakSelf = self;
+    
+    // Adds AppState
+    [SwiftDelegate.bridge getAppStateFeedbackEntryWithCompletionHandler:^(NSString *appStateEntry) {
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+            NSString *psiphonConfig = [self getPsiphonConfig];
+            if (!psiphonConfig) {
+                // Corrupt settings file. Return early.
+                return;
             }
-            [inactiveTunnel sendFeedback:jsonString publicKey:pubKey uploadServer:uploadServer uploadServerHeaders:uploadServerHeaders];
-        };
-        
-        NSError *err = [FeedbackUpload generateAndSendFeedback:selectedThumbIndex
-                                                     buildInfo:[PsiphonTunnel getBuildInfo]
-                                                      comments:comments
-                                                         email:email
-                                            sendDiagnosticInfo:uploadDiagnostics
-                                             withPsiphonConfig:psiphonConfig
-                                            withClientPlatform:@"ios-vpn"
-                                            withConnectionType:[self getConnectionType]
-                                                  isJailbroken:[JailbreakCheck isDeviceJailbroken]
-                                           sendFeedbackHandler:sendFeedbackHandler
-                                             diagnosticEntries:diagnosticEntries];
-        
-        if (err != nil) {
-            // Feedback upload was never started
-            [self uploadFailed];
-        }
-    });
+            
+            NSMutableArray<DiagnosticEntry *> *diagnosticEntries = [[NSMutableArray alloc] initWithArray:[[[PsiphonDataSharedDB alloc] initForAppGroupIdentifier:APP_GROUP_IDENTIFIER] getAllLogs]];
+
+            [diagnosticEntries addObject: [[DiagnosticEntry alloc] init:appStateEntry
+                                                           andTimestamp:[NSDate date]]];
+            
+            SendFeedbackHandler sendFeedbackHandler = ^(NSString *jsonString, NSString *pubKey, NSString *uploadServer, NSString *uploadServerHeaders) {
+                FeedbackManager *__strong strongSelf = weakSelf;
+                if (!strongSelf) {
+                    return;
+                }
+                if (strongSelf->inactiveTunnel == nil) {
+                    // Lazily allocate PsiphonTunnel instance
+                    strongSelf->inactiveTunnel = [PsiphonTunnel newPsiphonTunnel:weakSelf]; // TODO: we need to update PsiphonTunnel framework to not require this and fix this warning
+                }
+                [strongSelf->inactiveTunnel sendFeedback:jsonString publicKey:pubKey uploadServer:uploadServer uploadServerHeaders:uploadServerHeaders];
+            };
+            
+            NSError *err = [FeedbackUpload generateAndSendFeedback:selectedThumbIndex
+                                                         buildInfo:[PsiphonTunnel getBuildInfo]
+                                                          comments:comments
+                                                             email:email
+                                                sendDiagnosticInfo:uploadDiagnostics
+                                                 withPsiphonConfig:psiphonConfig
+                                                withClientPlatform:@"ios-vpn"
+                                                withConnectionType:[self getConnectionType]
+                                                      isJailbroken:[JailbreakCheck isDeviceJailbroken]
+                                               sendFeedbackHandler:sendFeedbackHandler
+                                                 diagnosticEntries:diagnosticEntries];
+            
+            if (err != nil) {
+                // Feedback upload was never started
+                [self uploadFailed];
+            }
+        });
+    }];
 }
 
 - (void)userPressedURL:(NSURL *)URL {

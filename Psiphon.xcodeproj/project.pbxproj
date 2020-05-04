@@ -9,7 +9,7 @@
 /* Begin PBXBuildFile section */
 		440D75BE1F59E041005C603B /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 440D75BD1F59E041005C603B /* StoreKit.framework */; };
 		4435CC271F70566000F3A809 /* SettingsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4435CC261F70566000F3A809 /* SettingsViewController.m */; };
-		445F239620E1817C00D004E9 /* PsiphonAppReceipt.m in Sources */ = {isa = PBXBuildFile; fileRef = 445F239520E1817C00D004E9 /* PsiphonAppReceipt.m */; };
+		445F239620E1817C00D004E9 /* AppStoreReceiptData.m in Sources */ = {isa = PBXBuildFile; fileRef = 445F239520E1817C00D004E9 /* AppStoreReceiptData.m */; };
 		445F24D420E1A5BA00D004E9 /* ReceiptAttributes.c in Sources */ = {isa = PBXBuildFile; fileRef = 445F249820E1A5BA00D004E9 /* ReceiptAttributes.c */; };
 		445F24D520E1A5BA00D004E9 /* constr_TYPE.c in Sources */ = {isa = PBXBuildFile; fileRef = 445F249920E1A5BA00D004E9 /* constr_TYPE.c */; };
 		445F24D620E1A5BA00D004E9 /* xer_decoder.c in Sources */ = {isa = PBXBuildFile; fileRef = 445F249E20E1A5BA00D004E9 /* xer_decoder.c */; };
@@ -51,26 +51,21 @@
 		4E10920820F3DA190033114B /* AppInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E10920720F3DA190033114B /* AppInfo.m */; };
 		4E10920920F3DC670033114B /* AppInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E10920720F3DA190033114B /* AppInfo.m */; };
 		4E1FE1CB1FB213860031211C /* SnapshotHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E1FE1CA1FB213860031211C /* SnapshotHelper.swift */; };
-		4E2037A1207592A300B99A05 /* PsiCashTypes.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E2037A0207592A300B99A05 /* PsiCashTypes.m */; };
 		4E30745F2097922C00B6D2A3 /* PsiCashLib.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 4E30745D2097921B00B6D2A3 /* PsiCashLib.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		4E5263B7207290360021FEF5 /* EmbeddedServerEntriesHelpers.c in Sources */ = {isa = PBXBuildFile; fileRef = 4E5263B6207290360021FEF5 /* EmbeddedServerEntriesHelpers.c */; };
 		4E5263C7207294600021FEF5 /* EmbeddedServerEntries.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E5263BF207292920021FEF5 /* EmbeddedServerEntries.m */; };
 		4E5263CD2072984D0021FEF5 /* IAPViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E5263CA2072984D0021FEF5 /* IAPViewController.m */; };
-		4E5263CE2072984D0021FEF5 /* IAPStoreHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E5263CC2072984D0021FEF5 /* IAPStoreHelper.m */; };
-		4E5263D120732DDE0021FEF5 /* PsiCashAuthPackage.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E5263D020732DDE0021FEF5 /* PsiCashAuthPackage.m */; };
 		4E5BD4F52061982300AD4724 /* FeedbackManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E5BD4F42061982300AD4724 /* FeedbackManager.m */; };
 		4E5DAE6520A942A300E06342 /* UILabel+GetLabelHeight.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E5DAE6420A942A300E06342 /* UILabel+GetLabelHeight.m */; };
-		4E5DCF9720EC11C6009D8D39 /* PsiCashSpeedBoostProduct+PsiCashPurchasePrice.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E5DCF9520EC11C6009D8D39 /* PsiCashSpeedBoostProduct+PsiCashPurchasePrice.m */; };
-		4E5DCF9820EC11C6009D8D39 /* PsiCashSpeedBoostProduct.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E5DCF9620EC11C6009D8D39 /* PsiCashSpeedBoostProduct.m */; };
 		4E90C94420CB37F5003FC319 /* PsiCashLogger.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E90C94320CB37F5003FC319 /* PsiCashLogger.m */; };
-		4E9B2E13204F463100E63784 /* PsiCashClientModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E9B2E12204F463000E63784 /* PsiCashClientModel.m */; };
 		4EB846422151830600687344 /* AvailableServerRegions.m in Sources */ = {isa = PBXBuildFile; fileRef = 4EB846412151830600687344 /* AvailableServerRegions.m */; };
 		4EC5526320AB8DBE000B4BEA /* Pastel.m in Sources */ = {isa = PBXBuildFile; fileRef = 4EC5526220AB8DBE000B4BEA /* Pastel.m */; };
 		4EC5526620AB8DCD000B4BEA /* PastelView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4EC5526520AB8DCD000B4BEA /* PastelView.m */; };
-		4EEB2F0520644BD5006E80EF /* PsiCashClientModelStagingArea.m in Sources */ = {isa = PBXBuildFile; fileRef = 4EEB2F0420644BD5006E80EF /* PsiCashClientModelStagingArea.m */; };
-		4EF6D9CB20A8C7FE00AE9D44 /* PsiCashOnboardingInfoViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4EF6D9C720A8C7FE00AE9D44 /* PsiCashOnboardingInfoViewController.m */; };
-		4EF6D9CC20A8C7FE00AE9D44 /* PsiCashOnboardingViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4EF6D9C920A8C7FE00AE9D44 /* PsiCashOnboardingViewController.m */; };
-		4EFAAF2E2034CDC800EC0536 /* PsiCashClient.m in Sources */ = {isa = PBXBuildFile; fileRef = 4EFAAF282034CDC800EC0536 /* PsiCashClient.m */; };
+		5202011D2360D34000D00C8E /* EitherView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5202011C2360D34000D00C8E /* EitherView.swift */; };
+		520201212360F5B800D00C8E /* IndexedViewSwitcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520201202360F5B800D00C8E /* IndexedViewSwitcher.swift */; };
+		52055D04230C823100244F9E /* GradientButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52055D03230C823100244F9E /* GradientButton.swift */; };
+		52055D06230C833700244F9E /* SpeedBoostButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52055D05230C833700244F9E /* SpeedBoostButton.swift */; };
+		521D084E2346A75700403B48 /* IAPProducts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 521D084D2346A75700403B48 /* IAPProducts.swift */; };
 		521FD0EF219E0D5600F748EC /* DebugDirectoryViewerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 521FD0E5219E0D5500F748EC /* DebugDirectoryViewerViewController.m */; };
 		521FD0F0219E0D5600F748EC /* DebugLogViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 521FD0E6219E0D5500F748EC /* DebugLogViewController.m */; };
 		521FD0F1219E0D5600F748EC /* DebugToolboxViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 521FD0E7219E0D5600F748EC /* DebugToolboxViewController.m */; };
@@ -82,22 +77,81 @@
 		521FD0FE219E0E1900F748EC /* AppProfiler.m in Sources */ = {isa = PBXBuildFile; fileRef = 521FD0F8219E0DDF00F748EC /* AppProfiler.m */; };
 		521FD0FF219E0E2600F748EC /* AppStats.m in Sources */ = {isa = PBXBuildFile; fileRef = 521FD0F6219E0DDF00F748EC /* AppStats.m */; };
 		521FD100219E0E3800F748EC /* DebugUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 521FD0FB219E0E0E00F748EC /* DebugUtils.m */; };
+		5237387423AABB0F00DDE396 /* PurchasingSpeedBoostAlertViewBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5237387323AABB0F00DDE396 /* PurchasingSpeedBoostAlertViewBuilder.swift */; };
+		5245C5C92342A6840033EE13 /* UserDefaults.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5245C5C82342A6840033EE13 /* UserDefaults.swift */; };
+		52467FE122C2A704009AEC6E /* PsiCashModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52467FE022C2A704009AEC6E /* PsiCashModels.swift */; };
+		52467FF922CE77A1009AEC6E /* Foundation+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52467FF822CE77A1009AEC6E /* Foundation+Additions.swift */; };
+		5246800722D51AA3009AEC6E /* PsiCashWidgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5246800622D51AA3009AEC6E /* PsiCashWidgetView.swift */; };
+		5246800922D51CE4009AEC6E /* PsiCashBalanceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5246800822D51CE4009AEC6E /* PsiCashBalanceView.swift */; };
+		5246800D22D65926009AEC6E /* UIUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5246800C22D65926009AEC6E /* UIUtils.swift */; };
+		5248B4CE23203781008C00D4 /* SwiftObjCBridges.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5248B4CD23203781008C00D4 /* SwiftObjCBridges.swift */; };
 		524B4E6B2316F0E3004E9891 /* BorderedSubtitleButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 524B4E6A2316F0E3004E9891 /* BorderedSubtitleButton.m */; };
 		524B4E6E2316F27F004E9891 /* AnimatedControl.m in Sources */ = {isa = PBXBuildFile; fileRef = 524B4E6D2316F27F004E9891 /* AnimatedControl.m */; };
+		52805BA122DD1EB8006B205B /* ReactiveSwift+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52805BA022DD1EB8006B205B /* ReactiveSwift+Additions.swift */; };
+		528D81332384823F00AA2D77 /* PsiCashMessageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 528D81322384823F00AA2D77 /* PsiCashMessageView.swift */; };
+		52A24659238C9AB700A01FF1 /* SpeedBoostPurchaseTable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52A24658238C9AB700A01FF1 /* SpeedBoostPurchaseTable.swift */; };
+		52A2465E239081C100A01FF1 /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52A2465D239081C100A01FF1 /* AppState.swift */; };
+		52A24662239B07E000A01FF1 /* psiCashProductIds.plist in Resources */ = {isa = PBXBuildFile; fileRef = 52A24661239B07E000A01FF1 /* psiCashProductIds.plist */; };
+		52A2466D23A172A800A01FF1 /* AlertViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52A2466C23A172A800A01FF1 /* AlertViewController.swift */; };
+		52A2466F23A1769300A01FF1 /* PsiCashMessageViewUntunneled.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52A2466E23A1769300A01FF1 /* PsiCashMessageViewUntunneled.swift */; };
+		52A2467123A176BA00A01FF1 /* PsiCashPurchasingAlertViewBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52A2467023A176BA00A01FF1 /* PsiCashPurchasingAlertViewBuilder.swift */; };
+		52B3C54323DA31E1003F6B12 /* PurchaseVerifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52B3C54223DA31E1003F6B12 /* PurchaseVerifier.swift */; };
+		52B3C54523DA391F003F6B12 /* Requests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52B3C54423DA391F003F6B12 /* Requests.swift */; };
+		52B3C54A23DF99E8003F6B12 /* AppObservables.m in Sources */ = {isa = PBXBuildFile; fileRef = 52B3C54923DF99E8003F6B12 /* AppObservables.m */; };
+		52B3C54C23E0E895003F6B12 /* ButtonBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52B3C54B23E0E895003F6B12 /* ButtonBuilder.swift */; };
+		52B3C54E23E22454003F6B12 /* Logging.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52B3C54D23E22454003F6B12 /* Logging.swift */; };
+		52C8F0A9237C8F3E00E5F9C0 /* Foundation+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52467FF822CE77A1009AEC6E /* Foundation+Additions.swift */; };
+		52C8F0AB237CA26200E5F9C0 /* ImageViewBuidler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52C8F0AA237CA26200E5F9C0 /* ImageViewBuidler.swift */; };
+		52C8F0AD237E145C00E5F9C0 /* PsiCashCoinPurchaseTable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52C8F0AC237E145C00E5F9C0 /* PsiCashCoinPurchaseTable.swift */; };
+		52C8F0AF2383059200E5F9C0 /* Promises+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52C8F0AE2383059200E5F9C0 /* Promises+Additions.swift */; };
+		52CAC4312385D06600A92842 /* Spinner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52CAC4302385D06600A92842 /* Spinner.swift */; };
+		52D2581122BADE1900CA956A /* SwiftDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D2581022BADE1900CA956A /* SwiftDelegate.swift */; };
+		52D363C9230DE215002C2221 /* PsiCashViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D363C8230DE215002C2221 /* PsiCashViewController.swift */; };
+		52D363CB230DEBED002C2221 /* CloseButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D363CA230DEBED002C2221 /* CloseButton.swift */; };
+		52D363CD230EEBAC002C2221 /* AnimatedUIButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D363CC230EEBAC002C2221 /* AnimatedUIButton.swift */; };
+		52D363CF230F112E002C2221 /* TabControlView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D363CE230F112E002C2221 /* TabControlView.swift */; };
+		52DF5E9223C675EC00A1B067 /* ViewController+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52DF5E9123C675EC00A1B067 /* ViewController+Additions.swift */; };
+		52DF5E9623C7A31100A1B067 /* Error.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52DF5E9523C7A31100A1B067 /* Error.swift */; };
+		52DF5E9823CE5A8300A1B067 /* ValuePaths.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52DF5E9723CE5A8300A1B067 /* ValuePaths.swift */; };
+		52DF5E9A23CE835100A1B067 /* UserStrings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52DF5E9923CE835100A1B067 /* UserStrings.swift */; };
+		52DF5E9E23D0D01F00A1B067 /* BridgingTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52DF5E9D23D0D01F00A1B067 /* BridgingTypes.swift */; };
 		66094F7A1E8067520069EC4E /* PsiphonTunnel.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 66094F781E8067520069EC4E /* PsiphonTunnel.framework */; };
 		6615A5EA1F58A95500026C98 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 6615A5E81F58A95500026C98 /* Localizable.strings */; };
 		6615A5EB1F58A95B00026C98 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 6615A5E81F58A95500026C98 /* Localizable.strings */; };
 		668AF9BF1E92CBD3008CAAAA /* NetworkExtension.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 668AF9BE1E92CBD3008CAAAA /* NetworkExtension.framework */; };
 		668AF9C01E92CBE0008CAAAA /* NetworkExtension.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 668AF9BE1E92CBD3008CAAAA /* NetworkExtension.framework */; };
-		9BFEC10661A7DC0402AF4B37 /* AsyncOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC6DEB0BE772BE801A9E6 /* AsyncOperation.m */; };
+		8D417E992411954A00FEE587 /* PsiCashReducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D417E982411954A00FEE587 /* PsiCashReducer.swift */; };
+		8D417E9D2411A0C200FEE587 /* PaymentQueue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D417E9C2411A0C200FEE587 /* PaymentQueue.swift */; };
+		8D417E9F2411A60900FEE587 /* PsiCashEffects.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D417E9E2411A60900FEE587 /* PsiCashEffects.swift */; };
+		8D417EA12411A89500FEE587 /* IAPState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D417EA02411A89500FEE587 /* IAPState.swift */; };
+		8D417EB124147C6D00FEE587 /* LandingPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D417EB024147C6D00FEE587 /* LandingPage.swift */; };
+		8D417EB324148C1E00FEE587 /* URLHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D417EB224148C1E00FEE587 /* URLHandler.swift */; };
+		8D417EB72415633300FEE587 /* IAPReducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D417EB62415633300FEE587 /* IAPReducer.swift */; };
+		8D417EBB2417155000FEE587 /* AppReceipt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D417EBA2417155000FEE587 /* AppReceipt.swift */; };
+		8D417EBD2417FF5C00FEE587 /* Subscription.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D417EBC2417FF5B00FEE587 /* Subscription.swift */; };
+		8D417EBF2417FFB000FEE587 /* HardCodedValues.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D417EBE2417FFB000FEE587 /* HardCodedValues.swift */; };
+		8D417ED9241844FA00FEE587 /* FloatingPoint+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D417ED8241844FA00FEE587 /* FloatingPoint+Additions.swift */; };
+		8D417EDD2419DBA100FEE587 /* ProductRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D417EDC2419DBA100FEE587 /* ProductRequest.swift */; };
+		8D7E9B9D2425DF42006F3A2F /* AnimatedUIView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D7E9B9C2425DF42006F3A2F /* AnimatedUIView.swift */; };
+		8D7E9B9F2425E053006F3A2F /* Animations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D7E9B9E2425E053006F3A2F /* Animations.swift */; };
+		8D9E602A24364ED2003A46D8 /* VPNState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D9E602924364ED2003A46D8 /* VPNState.swift */; };
+		8D9E602C24364EE6003A46D8 /* TunnelProviderManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D9E602B24364EE6003A46D8 /* TunnelProviderManager.swift */; };
+		8D9E602F24366AE7003A46D8 /* SerialEffect.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D9E602D24364FB6003A46D8 /* SerialEffect.swift */; };
+		8D9E603024366AEC003A46D8 /* Effect.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D417EDE241AA89C00FEE587 /* Effect.swift */; };
+		8D9E603124366AEF003A46D8 /* State.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D417EDA2419D9CF00FEE587 /* State.swift */; };
+		8D9E603224366AF2003A46D8 /* StoreDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D417EB82415667900FEE587 /* StoreDelegate.swift */; };
+		8D9E603324366AF4003A46D8 /* Store.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52A2465B2390569800A01FF1 /* Store.swift */; };
+		8D9E603524366D71003A46D8 /* FeedbackDescriptions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D9E603424366D71003A46D8 /* FeedbackDescriptions.swift */; };
+		8DA3466624114DB400F9E2D1 /* PsiCashState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DA3466524114DB400F9E2D1 /* PsiCashState.swift */; };
+		8DB6C6362429080C005E2F4C /* PsiCashMessageWithRetryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DB6C6352429080C005E2F4C /* PsiCashMessageWithRetryView.swift */; };
+		8DB6C638242A4D06005E2F4C /* DuskButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DB6C637242A4D06005E2F4C /* DuskButton.swift */; };
+		8DDA60292425BB4800DBA8EC /* DebugStrings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DDA60282425BB4800DBA8EC /* DebugStrings.swift */; };
 		9BFEC1F0DA87B4E66C8CC4AA /* MoPubInterstitialAdControllerWrapper.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFECF45CA0CAF6997411D22 /* MoPubInterstitialAdControllerWrapper.m */; };
 		9BFEC2458D1346F537E9089E /* Nullity.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFECCCF429898FD903B69A6 /* Nullity.m */; };
 		9BFEC3D66910918A0C8954E1 /* AdMobConsent.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC5F8D8BB828703CCCC2F /* AdMobConsent.m */; };
 		9BFEC459666697D89B09A492 /* AdMobRewardedAdControllerWrapper.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFECF6BF16767758F28D1A0 /* AdMobRewardedAdControllerWrapper.m */; };
 		9BFEC4F02A47FF8265635803 /* Notifier.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC91ED4A1C511520E9948 /* Notifier.m */; };
-		9BFEC530849525066327C815 /* VPNManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFECBACAAF0FC84C7EA783E /* VPNManager.m */; };
 		9BFEC5C256EBC72398FAE8D8 /* UnionSerialQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC84F5DF6D2C3EF754962 /* UnionSerialQueue.m */; };
-		9BFEC5C3F8FFF1366FF19D0B /* AsyncOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC6DEB0BE772BE801A9E6 /* AsyncOperation.m */; };
 		9BFEC8058885B68B2822E2B8 /* AdManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC3CE64925E5984AAA9BE /* AdManager.m */; };
 		9BFEC8A2F99380655E853F81 /* AdControllerWrapper.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC460CD29B3A0667FE9A2 /* AdControllerWrapper.m */; };
 		9BFEC9C08697E4701A36A3B3 /* UnionSerialQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC84F5DF6D2C3EF754962 /* UnionSerialQueue.m */; };
@@ -116,18 +170,15 @@
 		9BFECFEB3BC9F10542C1A416 /* PsiphonConfigUserDefaults.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC584519C408D9D6D3FF1 /* PsiphonConfigUserDefaults.m */; };
 		A8408008B18277F93286799F /* PsiphonProgressView.m in Sources */ = {isa = PBXBuildFile; fileRef = A84087FA4B1BC2C725D900D9 /* PsiphonProgressView.m */; };
 		A840803A0733D9FCA5410796 /* ActivityIndicatorRoyalSkyButton.m in Sources */ = {isa = PBXBuildFile; fileRef = A840842CECC0146241243488 /* ActivityIndicatorRoyalSkyButton.m */; };
-		A84080838645BD1023136C3B /* PsiCashPurchaseView.m in Sources */ = {isa = PBXBuildFile; fileRef = A8408183BCB31ED8F0855E90 /* PsiCashPurchaseView.m */; };
 		A84080E163F24876A1476544 /* VPNStartAndStopButton.m in Sources */ = {isa = PBXBuildFile; fileRef = A8408F6123BCC98725932A59 /* VPNStartAndStopButton.m */; };
 		A84080E9FC63E29F71A79A63 /* RelaySubject.m in Sources */ = {isa = PBXBuildFile; fileRef = A84086DF1DDA5CC90C437009 /* RelaySubject.m */; };
 		A84081194DA12328ABB5A43E /* UIImageView+Additions.m in Sources */ = {isa = PBXBuildFile; fileRef = A840886E2E6D8EA82B0EC427 /* UIImageView+Additions.m */; };
 		A8408161701C8F50F52866FC /* LayerAutoResizeUIView.m in Sources */ = {isa = PBXBuildFile; fileRef = A8408DBEEDCF56EC798536BF /* LayerAutoResizeUIView.m */; };
 		A84081FD0C1339DE954DAB7D /* RelaySubject.m in Sources */ = {isa = PBXBuildFile; fileRef = A84086DF1DDA5CC90C437009 /* RelaySubject.m */; };
-		A84082122C339F45E630F610 /* PsiCashView.m in Sources */ = {isa = PBXBuildFile; fileRef = A8408DA63B0B641B765A1E4D /* PsiCashView.m */; };
 		A84082260CE7662A93697CFF /* LoadingCircleLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = A840845849B24AAA0E714664 /* LoadingCircleLayer.m */; };
 		A84082D8D7BF55D509C4E5C5 /* SubscriptionData.m in Sources */ = {isa = PBXBuildFile; fileRef = A84081E6B9D2FF5986AA1BF0 /* SubscriptionData.m */; };
 		A840835FAC7F18A6A7021415 /* RingSkyButton.m in Sources */ = {isa = PBXBuildFile; fileRef = A84086B04CBC1A6A5481EDD4 /* RingSkyButton.m */; };
 		A84083E76E518050B65E523A /* SkyButton.m in Sources */ = {isa = PBXBuildFile; fileRef = A8408672FB2E1CD144A2BE7C /* SkyButton.m */; };
-		A8408424387C3E0CE5694B5A /* PsiCashSpeedBoostMeterView.m in Sources */ = {isa = PBXBuildFile; fileRef = A84083F358BD2CC1440107B8 /* PsiCashSpeedBoostMeterView.m */; };
 		A840849074861D633B3EB4D1 /* AppEvent.m in Sources */ = {isa = PBXBuildFile; fileRef = A8408058458E7BFC4C3DFDDE /* AppEvent.m */; };
 		A84084C8B5C16F0EB80364FA /* Strings.m in Sources */ = {isa = PBXBuildFile; fileRef = A84083974C8CF9DDFE7A341D /* Strings.m */; };
 		A84084F47D4EA8D2B91E6609 /* SubscriptionData.m in Sources */ = {isa = PBXBuildFile; fileRef = A84081E6B9D2FF5986AA1BF0 /* SubscriptionData.m */; };
@@ -146,22 +197,18 @@
 		A8408B83167EBE21E215C471 /* OnboardingView.m in Sources */ = {isa = PBXBuildFile; fileRef = A84088889983161FB859D8A9 /* OnboardingView.m */; };
 		A8408BC29B903A6C0A32F32C /* SkyRegionSelectionViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A8408C8A7CA3C009F01FDA3B /* SkyRegionSelectionViewController.m */; };
 		A8408C424E64BF3D70273464 /* ConnectionStatusView.m in Sources */ = {isa = PBXBuildFile; fileRef = A8408E0115540B5B2B305EAE /* ConnectionStatusView.m */; };
-		A8408C5A98017E7074D00CEC /* PsiCashSpeedBoostSliderView.m in Sources */ = {isa = PBXBuildFile; fileRef = A840854913F6165FB0B97A6A /* PsiCashSpeedBoostSliderView.m */; };
 		A8408D8C16D136075590193C /* AppUpgrade.m in Sources */ = {isa = PBXBuildFile; fileRef = A84089CB9E8B0DF1D88D0500 /* AppUpgrade.m */; };
 		A8408E281270691F61F9C20C /* AppVersionNumberView.m in Sources */ = {isa = PBXBuildFile; fileRef = A84087C37CFC6977102EB09D /* AppVersionNumberView.m */; };
 		A8408E611665FC60D5DFF339 /* SubscriptionStatusView.m in Sources */ = {isa = PBXBuildFile; fileRef = A8408BA05DC0D983E6740558 /* SubscriptionStatusView.m */; };
 		A8408EB13777DDCBEF7DE3C0 /* SwoopView.m in Sources */ = {isa = PBXBuildFile; fileRef = A8408B9A66413A25FC1A2BE1 /* SwoopView.m */; };
 		A8408EB1E9DABE35016580A7 /* ImageUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = A8408A0C4220563DA1FE3048 /* ImageUtils.m */; };
-		A8408EF4582A3DB3FC378ACB /* PsiCashBalanceView.m in Sources */ = {isa = PBXBuildFile; fileRef = A840893B138A37A795FFFAB2 /* PsiCashBalanceView.m */; };
 		A8408F5F45CDBDF42701063E /* Strings.m in Sources */ = {isa = PBXBuildFile; fileRef = A84083974C8CF9DDFE7A341D /* Strings.m */; };
-		A8408F965BE2726531F4A215 /* PsiCashPurchaseAlertView.m in Sources */ = {isa = PBXBuildFile; fileRef = A84083B0CB962827E7C93024 /* PsiCashPurchaseAlertView.m */; };
 		A8408F99941C9664E3E7C48A /* LanguageSelectionViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A840896A2A9959280DAE2DA1 /* LanguageSelectionViewController.m */; };
 		A8408FA13890CD67154033C6 /* RegionSelectionButton.m in Sources */ = {isa = PBXBuildFile; fileRef = A8408C84138113DE79F0DCD0 /* RegionSelectionButton.m */; };
 		A8408FF45D08D31E102FA41F /* ContainerDB.m in Sources */ = {isa = PBXBuildFile; fileRef = A84086716D701D0F5B48E4C0 /* ContainerDB.m */; };
 		B1D9FF416DDCA97A40A325AA /* libPods-PsiphonVPN.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 01122727D6CE50B340C55DBE /* libPods-PsiphonVPN.a */; };
 		CE26FC951BBDC7B800B83375 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = CE26FC941BBDC7B800B83375 /* Assets.xcassets */; };
 		CE26FCAC1BBDC85900B83375 /* PsiphonVPN.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = CE26FCA31BBDC85900B83375 /* PsiphonVPN.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-		CE425D1F2159485600B7893D /* StarView.m in Sources */ = {isa = PBXBuildFile; fileRef = CE425D1E2159485500B7893D /* StarView.m */; };
 		CE4E9BC01BBEECF30060FF8B /* Psiphon.entitlements in Resources */ = {isa = PBXBuildFile; fileRef = CE4E9BBF1BBEECF30060FF8B /* Psiphon.entitlements */; };
 		CE4E9BC21BBEECFC0060FF8B /* PsiphonVPN.entitlements in Resources */ = {isa = PBXBuildFile; fileRef = CE4E9BC11BBEECFC0060FF8B /* PsiphonVPN.entitlements */; };
 		CE6C3F6A24366AE1007A17F0 /* ClientMetadata.m in Sources */ = {isa = PBXBuildFile; fileRef = CE6C3F6924366AE1007A17F0 /* ClientMetadata.m */; };
@@ -178,8 +225,8 @@
 		EF6C1F531F59E46500709554 /* embedded_server_entries in Resources */ = {isa = PBXBuildFile; fileRef = EF6C1F501F59E46500709554 /* embedded_server_entries */; };
 		EF6C1F541F59E46500709554 /* psiphon_config in Resources */ = {isa = PBXBuildFile; fileRef = EF6C1F511F59E46500709554 /* psiphon_config */; };
 		EF6C1F551F59E46500709554 /* psiphon_config in Resources */ = {isa = PBXBuildFile; fileRef = EF6C1F511F59E46500709554 /* psiphon_config */; };
-		EF743FCA1F99549000AC89A2 /* productIDs.plist in Resources */ = {isa = PBXBuildFile; fileRef = EF743FC31F99549000AC89A2 /* productIDs.plist */; };
-		EF743FCB1F99549000AC89A2 /* productIDs.plist in Resources */ = {isa = PBXBuildFile; fileRef = EF743FC31F99549000AC89A2 /* productIDs.plist */; };
+		EF743FCA1F99549000AC89A2 /* subscriptionProductIds.plist in Resources */ = {isa = PBXBuildFile; fileRef = EF743FC31F99549000AC89A2 /* subscriptionProductIds.plist */; };
+		EF743FCB1F99549000AC89A2 /* subscriptionProductIds.plist in Resources */ = {isa = PBXBuildFile; fileRef = EF743FC31F99549000AC89A2 /* subscriptionProductIds.plist */; };
 		EF90D7A1204F22C900228A63 /* timestamp_valid.c in Sources */ = {isa = PBXBuildFile; fileRef = EF90D78D204F22C900228A63 /* timestamp_valid.c */; };
 		EF90D7A2204F22C900228A63 /* timestamp_compare.c in Sources */ = {isa = PBXBuildFile; fileRef = EF90D78E204F22C900228A63 /* timestamp_compare.c */; };
 		EF90D7A3204F22C900228A63 /* timestamp_tm.c in Sources */ = {isa = PBXBuildFile; fileRef = EF90D78F204F22C900228A63 /* timestamp_tm.c */; };
@@ -257,8 +304,8 @@
 		440D75BD1F59E041005C603B /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 		4435CC251F70566000F3A809 /* SettingsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SettingsViewController.h; sourceTree = "<group>"; };
 		4435CC261F70566000F3A809 /* SettingsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SettingsViewController.m; sourceTree = "<group>"; };
-		445F239420E1817B00D004E9 /* PsiphonAppReceipt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PsiphonAppReceipt.h; sourceTree = "<group>"; };
-		445F239520E1817C00D004E9 /* PsiphonAppReceipt.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PsiphonAppReceipt.m; sourceTree = "<group>"; };
+		445F239420E1817B00D004E9 /* AppStoreReceiptData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppStoreReceiptData.h; sourceTree = "<group>"; };
+		445F239520E1817C00D004E9 /* AppStoreReceiptData.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppStoreReceiptData.m; sourceTree = "<group>"; };
 		445F249820E1A5BA00D004E9 /* ReceiptAttributes.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ReceiptAttributes.c; sourceTree = "<group>"; };
 		445F249920E1A5BA00D004E9 /* constr_TYPE.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = constr_TYPE.c; sourceTree = "<group>"; };
 		445F249A20E1A5BA00D004E9 /* asn_SET_OF.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = asn_SET_OF.h; sourceTree = "<group>"; };
@@ -338,32 +385,19 @@
 		4E10920620F3DA190033114B /* AppInfo.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppInfo.h; sourceTree = "<group>"; };
 		4E10920720F3DA190033114B /* AppInfo.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppInfo.m; sourceTree = "<group>"; };
 		4E1FE1CA1FB213860031211C /* SnapshotHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SnapshotHelper.swift; sourceTree = "<group>"; };
-		4E2037A0207592A300B99A05 /* PsiCashTypes.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PsiCashTypes.m; sourceTree = "<group>"; };
 		4E30745D2097921B00B6D2A3 /* PsiCashLib.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = PsiCashLib.framework; sourceTree = "<group>"; };
 		4E5263B5207290360021FEF5 /* EmbeddedServerEntriesHelpers.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EmbeddedServerEntriesHelpers.h; sourceTree = "<group>"; };
 		4E5263B6207290360021FEF5 /* EmbeddedServerEntriesHelpers.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = EmbeddedServerEntriesHelpers.c; sourceTree = "<group>"; };
 		4E5263BF207292920021FEF5 /* EmbeddedServerEntries.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = EmbeddedServerEntries.m; sourceTree = "<group>"; };
 		4E5263C6207294550021FEF5 /* EmbeddedServerEntries.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = EmbeddedServerEntries.h; sourceTree = "<group>"; };
-		4E5263C92072984C0021FEF5 /* IAPStoreHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IAPStoreHelper.h; sourceTree = "<group>"; };
 		4E5263CA2072984D0021FEF5 /* IAPViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IAPViewController.m; sourceTree = "<group>"; };
 		4E5263CB2072984D0021FEF5 /* IAPViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IAPViewController.h; sourceTree = "<group>"; };
-		4E5263CC2072984D0021FEF5 /* IAPStoreHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IAPStoreHelper.m; sourceTree = "<group>"; };
-		4E5263CF20732DDE0021FEF5 /* PsiCashAuthPackage.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PsiCashAuthPackage.h; sourceTree = "<group>"; };
-		4E5263D020732DDE0021FEF5 /* PsiCashAuthPackage.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PsiCashAuthPackage.m; sourceTree = "<group>"; };
-		4E5263D22073322B0021FEF5 /* PsiCashTypes.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PsiCashTypes.h; sourceTree = "<group>"; };
 		4E5BD4F32061982300AD4724 /* FeedbackManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FeedbackManager.h; sourceTree = "<group>"; };
 		4E5BD4F42061982300AD4724 /* FeedbackManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FeedbackManager.m; sourceTree = "<group>"; };
 		4E5DAE6320A942A300E06342 /* UILabel+GetLabelHeight.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UILabel+GetLabelHeight.h"; sourceTree = "<group>"; };
 		4E5DAE6420A942A300E06342 /* UILabel+GetLabelHeight.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UILabel+GetLabelHeight.m"; sourceTree = "<group>"; };
-		4E5DCF9220EC11C6009D8D39 /* PsiCashSpeedBoostProduct+PsiCashPurchasePrice.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "PsiCashSpeedBoostProduct+PsiCashPurchasePrice.h"; sourceTree = "<group>"; };
-		4E5DCF9320EC11C6009D8D39 /* PsiCashSpeedBoostProduct.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PsiCashSpeedBoostProduct.h; sourceTree = "<group>"; };
-		4E5DCF9420EC11C6009D8D39 /* PsiCashProduct.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PsiCashProduct.h; sourceTree = "<group>"; };
-		4E5DCF9520EC11C6009D8D39 /* PsiCashSpeedBoostProduct+PsiCashPurchasePrice.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "PsiCashSpeedBoostProduct+PsiCashPurchasePrice.m"; sourceTree = "<group>"; };
-		4E5DCF9620EC11C6009D8D39 /* PsiCashSpeedBoostProduct.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PsiCashSpeedBoostProduct.m; sourceTree = "<group>"; };
 		4E90C94220CB37F5003FC319 /* PsiCashLogger.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PsiCashLogger.h; sourceTree = "<group>"; };
 		4E90C94320CB37F5003FC319 /* PsiCashLogger.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PsiCashLogger.m; sourceTree = "<group>"; };
-		4E9B2E11204F463000E63784 /* PsiCashClientModel.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PsiCashClientModel.h; sourceTree = "<group>"; };
-		4E9B2E12204F463000E63784 /* PsiCashClientModel.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PsiCashClientModel.m; sourceTree = "<group>"; };
 		4EB846402151830600687344 /* AvailableServerRegions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AvailableServerRegions.h; sourceTree = "<group>"; };
 		4EB846412151830600687344 /* AvailableServerRegions.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AvailableServerRegions.m; sourceTree = "<group>"; };
 		4EC5526120AB8DB9000B4BEA /* Pastel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Pastel.h; sourceTree = "<group>"; };
@@ -371,14 +405,11 @@
 		4EC5526420AB8DC7000B4BEA /* PastelView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PastelView.h; sourceTree = "<group>"; };
 		4EC5526520AB8DCD000B4BEA /* PastelView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PastelView.m; sourceTree = "<group>"; };
 		4EC82F8E20C713DF004C2E9F /* hi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = hi; path = Strings/hi.lproj/Localizable.strings; sourceTree = "<group>"; };
-		4EEB2F0320644BD5006E80EF /* PsiCashClientModelStagingArea.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PsiCashClientModelStagingArea.h; sourceTree = "<group>"; };
-		4EEB2F0420644BD5006E80EF /* PsiCashClientModelStagingArea.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PsiCashClientModelStagingArea.m; sourceTree = "<group>"; };
-		4EF6D9C720A8C7FE00AE9D44 /* PsiCashOnboardingInfoViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PsiCashOnboardingInfoViewController.m; sourceTree = "<group>"; };
-		4EF6D9C820A8C7FE00AE9D44 /* PsiCashOnboardingViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PsiCashOnboardingViewController.h; sourceTree = "<group>"; };
-		4EF6D9C920A8C7FE00AE9D44 /* PsiCashOnboardingViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PsiCashOnboardingViewController.m; sourceTree = "<group>"; };
-		4EF6D9CA20A8C7FE00AE9D44 /* PsiCashOnboardingInfoViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PsiCashOnboardingInfoViewController.h; sourceTree = "<group>"; };
-		4EFAAF242034CDC700EC0536 /* PsiCashClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PsiCashClient.h; path = Psiphon/PsiCash/ClientWrapper/PsiCashClient.h; sourceTree = SOURCE_ROOT; };
-		4EFAAF282034CDC800EC0536 /* PsiCashClient.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PsiCashClient.m; path = Psiphon/PsiCash/ClientWrapper/PsiCashClient.m; sourceTree = SOURCE_ROOT; };
+		5202011C2360D34000D00C8E /* EitherView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EitherView.swift; sourceTree = "<group>"; };
+		520201202360F5B800D00C8E /* IndexedViewSwitcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IndexedViewSwitcher.swift; sourceTree = "<group>"; };
+		52055D03230C823100244F9E /* GradientButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GradientButton.swift; sourceTree = "<group>"; };
+		52055D05230C833700244F9E /* SpeedBoostButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeedBoostButton.swift; sourceTree = "<group>"; };
+		521D084D2346A75700403B48 /* IAPProducts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IAPProducts.swift; sourceTree = "<group>"; };
 		521FD0E5219E0D5500F748EC /* DebugDirectoryViewerViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DebugDirectoryViewerViewController.m; path = Psiphon/Debug/DebugDirectoryViewerViewController.m; sourceTree = SOURCE_ROOT; };
 		521FD0E6219E0D5500F748EC /* DebugLogViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DebugLogViewController.m; path = Psiphon/Debug/DebugLogViewController.m; sourceTree = SOURCE_ROOT; };
 		521FD0E7219E0D5600F748EC /* DebugToolboxViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DebugToolboxViewController.m; path = Psiphon/Debug/DebugToolboxViewController.m; sourceTree = SOURCE_ROOT; };
@@ -397,10 +428,49 @@
 		521FD0FC219E0E0E00F748EC /* DebugUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DebugUtils.h; sourceTree = "<group>"; };
 		521FD101219E0E6300F748EC /* NotificationCenter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NotificationCenter.h; sourceTree = "<group>"; };
 		521FD102219E0E8400F748EC /* Annotations.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Annotations.h; sourceTree = "<group>"; };
+		5237387323AABB0F00DDE396 /* PurchasingSpeedBoostAlertViewBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PurchasingSpeedBoostAlertViewBuilder.swift; sourceTree = "<group>"; };
+		5245C5C82342A6840033EE13 /* UserDefaults.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaults.swift; sourceTree = "<group>"; };
+		52467FE022C2A704009AEC6E /* PsiCashModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PsiCashModels.swift; sourceTree = "<group>"; };
+		52467FF822CE77A1009AEC6E /* Foundation+Additions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Foundation+Additions.swift"; sourceTree = "<group>"; };
+		5246800622D51AA3009AEC6E /* PsiCashWidgetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PsiCashWidgetView.swift; sourceTree = "<group>"; };
+		5246800822D51CE4009AEC6E /* PsiCashBalanceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PsiCashBalanceView.swift; sourceTree = "<group>"; };
+		5246800C22D65926009AEC6E /* UIUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIUtils.swift; sourceTree = "<group>"; };
+		5248B4CD23203781008C00D4 /* SwiftObjCBridges.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftObjCBridges.swift; sourceTree = "<group>"; };
 		524B4E692316F0E3004E9891 /* BorderedSubtitleButton.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BorderedSubtitleButton.h; sourceTree = "<group>"; };
 		524B4E6A2316F0E3004E9891 /* BorderedSubtitleButton.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = BorderedSubtitleButton.m; sourceTree = "<group>"; };
 		524B4E6C2316F27F004E9891 /* AnimatedControl.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AnimatedControl.h; sourceTree = "<group>"; };
 		524B4E6D2316F27F004E9891 /* AnimatedControl.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AnimatedControl.m; sourceTree = "<group>"; };
+		52805BA022DD1EB8006B205B /* ReactiveSwift+Additions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ReactiveSwift+Additions.swift"; sourceTree = "<group>"; };
+		528D81322384823F00AA2D77 /* PsiCashMessageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PsiCashMessageView.swift; sourceTree = "<group>"; };
+		52A24658238C9AB700A01FF1 /* SpeedBoostPurchaseTable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeedBoostPurchaseTable.swift; sourceTree = "<group>"; };
+		52A2465B2390569800A01FF1 /* Store.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Store.swift; sourceTree = "<group>"; };
+		52A2465D239081C100A01FF1 /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
+		52A24661239B07E000A01FF1 /* psiCashProductIds.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = psiCashProductIds.plist; sourceTree = "<group>"; };
+		52A2466C23A172A800A01FF1 /* AlertViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertViewController.swift; sourceTree = "<group>"; };
+		52A2466E23A1769300A01FF1 /* PsiCashMessageViewUntunneled.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PsiCashMessageViewUntunneled.swift; sourceTree = "<group>"; };
+		52A2467023A176BA00A01FF1 /* PsiCashPurchasingAlertViewBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PsiCashPurchasingAlertViewBuilder.swift; sourceTree = "<group>"; };
+		52B3C54223DA31E1003F6B12 /* PurchaseVerifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PurchaseVerifier.swift; sourceTree = "<group>"; };
+		52B3C54423DA391F003F6B12 /* Requests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Requests.swift; sourceTree = "<group>"; };
+		52B3C54823DF99E8003F6B12 /* AppObservables.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppObservables.h; sourceTree = "<group>"; };
+		52B3C54923DF99E8003F6B12 /* AppObservables.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppObservables.m; sourceTree = "<group>"; };
+		52B3C54B23E0E895003F6B12 /* ButtonBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ButtonBuilder.swift; sourceTree = "<group>"; };
+		52B3C54D23E22454003F6B12 /* Logging.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Logging.swift; sourceTree = "<group>"; };
+		52C8F0A1237C8ED600E5F9C0 /* PsiphonPlayground.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = PsiphonPlayground.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		52C8F0AA237CA26200E5F9C0 /* ImageViewBuidler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageViewBuidler.swift; sourceTree = "<group>"; };
+		52C8F0AC237E145C00E5F9C0 /* PsiCashCoinPurchaseTable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PsiCashCoinPurchaseTable.swift; sourceTree = "<group>"; };
+		52C8F0AE2383059200E5F9C0 /* Promises+Additions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Promises+Additions.swift"; sourceTree = "<group>"; };
+		52CAC4302385D06600A92842 /* Spinner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Spinner.swift; sourceTree = "<group>"; };
+		52D2580F22BADE1900CA956A /* Psiphon-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Psiphon-Bridging-Header.h"; sourceTree = "<group>"; };
+		52D2581022BADE1900CA956A /* SwiftDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftDelegate.swift; sourceTree = "<group>"; };
+		52D363C8230DE215002C2221 /* PsiCashViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PsiCashViewController.swift; sourceTree = "<group>"; };
+		52D363CA230DEBED002C2221 /* CloseButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloseButton.swift; sourceTree = "<group>"; };
+		52D363CC230EEBAC002C2221 /* AnimatedUIButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimatedUIButton.swift; sourceTree = "<group>"; };
+		52D363CE230F112E002C2221 /* TabControlView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabControlView.swift; sourceTree = "<group>"; };
+		52DF5E9123C675EC00A1B067 /* ViewController+Additions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ViewController+Additions.swift"; sourceTree = "<group>"; };
+		52DF5E9523C7A31100A1B067 /* Error.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Error.swift; sourceTree = "<group>"; };
+		52DF5E9723CE5A8300A1B067 /* ValuePaths.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ValuePaths.swift; sourceTree = "<group>"; };
+		52DF5E9923CE835100A1B067 /* UserStrings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserStrings.swift; sourceTree = "<group>"; };
+		52DF5E9D23D0D01F00A1B067 /* BridgingTypes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BridgingTypes.swift; sourceTree = "<group>"; };
 		571DC9418AF936E60179F07C /* Pods-Psiphon.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Psiphon.release.xcconfig"; path = "Pods/Target Support Files/Pods-Psiphon/Pods-Psiphon.release.xcconfig"; sourceTree = "<group>"; };
 		66094F781E8067520069EC4E /* PsiphonTunnel.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = PsiphonTunnel.framework; sourceTree = "<group>"; };
 		6615A5E91F58A95500026C98 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = Strings/en.lproj/Localizable.strings; sourceTree = "<group>"; };
@@ -438,6 +508,31 @@
 		6651BE051F6B177000D65633 /* my */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = my; path = Strings/my.lproj/Localizable.strings; sourceTree = "<group>"; };
 		668AF9BE1E92CBD3008CAAAA /* NetworkExtension.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = NetworkExtension.framework; path = System/Library/Frameworks/NetworkExtension.framework; sourceTree = SDKROOT; };
 		6B2646D9B515A2990796D972 /* Pods-PsiphonVPN.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PsiphonVPN.release.xcconfig"; path = "Pods/Target Support Files/Pods-PsiphonVPN/Pods-PsiphonVPN.release.xcconfig"; sourceTree = "<group>"; };
+		8D417E982411954A00FEE587 /* PsiCashReducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PsiCashReducer.swift; sourceTree = "<group>"; };
+		8D417E9C2411A0C200FEE587 /* PaymentQueue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentQueue.swift; sourceTree = "<group>"; };
+		8D417E9E2411A60900FEE587 /* PsiCashEffects.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PsiCashEffects.swift; sourceTree = "<group>"; };
+		8D417EA02411A89500FEE587 /* IAPState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IAPState.swift; sourceTree = "<group>"; };
+		8D417EB024147C6D00FEE587 /* LandingPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LandingPage.swift; sourceTree = "<group>"; };
+		8D417EB224148C1E00FEE587 /* URLHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLHandler.swift; sourceTree = "<group>"; };
+		8D417EB62415633300FEE587 /* IAPReducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IAPReducer.swift; sourceTree = "<group>"; };
+		8D417EB82415667900FEE587 /* StoreDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoreDelegate.swift; sourceTree = "<group>"; };
+		8D417EBA2417155000FEE587 /* AppReceipt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppReceipt.swift; sourceTree = "<group>"; };
+		8D417EBC2417FF5B00FEE587 /* Subscription.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Subscription.swift; sourceTree = "<group>"; };
+		8D417EBE2417FFB000FEE587 /* HardCodedValues.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HardCodedValues.swift; sourceTree = "<group>"; };
+		8D417ED8241844FA00FEE587 /* FloatingPoint+Additions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FloatingPoint+Additions.swift"; sourceTree = "<group>"; };
+		8D417EDA2419D9CF00FEE587 /* State.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = State.swift; sourceTree = "<group>"; };
+		8D417EDC2419DBA100FEE587 /* ProductRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductRequest.swift; sourceTree = "<group>"; };
+		8D417EDE241AA89C00FEE587 /* Effect.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Effect.swift; sourceTree = "<group>"; };
+		8D7E9B9C2425DF42006F3A2F /* AnimatedUIView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimatedUIView.swift; sourceTree = "<group>"; };
+		8D7E9B9E2425E053006F3A2F /* Animations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Animations.swift; sourceTree = "<group>"; };
+		8D9E602924364ED2003A46D8 /* VPNState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VPNState.swift; sourceTree = "<group>"; };
+		8D9E602B24364EE6003A46D8 /* TunnelProviderManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TunnelProviderManager.swift; sourceTree = "<group>"; };
+		8D9E602D24364FB6003A46D8 /* SerialEffect.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SerialEffect.swift; sourceTree = "<group>"; };
+		8D9E603424366D71003A46D8 /* FeedbackDescriptions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedbackDescriptions.swift; sourceTree = "<group>"; };
+		8DA3466524114DB400F9E2D1 /* PsiCashState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PsiCashState.swift; sourceTree = "<group>"; };
+		8DB6C6352429080C005E2F4C /* PsiCashMessageWithRetryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PsiCashMessageWithRetryView.swift; sourceTree = "<group>"; };
+		8DB6C637242A4D06005E2F4C /* DuskButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DuskButton.swift; sourceTree = "<group>"; };
+		8DDA60282425BB4800DBA8EC /* DebugStrings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugStrings.swift; sourceTree = "<group>"; };
 		9BFEC0419AD3808370915E01 /* PsiphonConfigUserDefaults.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PsiphonConfigUserDefaults.h; sourceTree = "<group>"; };
 		9BFEC1C9F506CE1DF07306D2 /* NEBridge.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NEBridge.h; sourceTree = "<group>"; };
 		9BFEC1E485FB857A0358ED94 /* UnionSerialQueue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UnionSerialQueue.h; sourceTree = "<group>"; };
@@ -445,7 +540,6 @@
 		9BFEC3165745A5D14C8C3C08 /* Notifier.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Notifier.h; sourceTree = "<group>"; };
 		9BFEC31B61584FD2EAAF5DE6 /* Authorization.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Authorization.m; sourceTree = "<group>"; };
 		9BFEC327A0BE7E5243CCB2E0 /* MoPubInterstitialAdControllerWrapper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MoPubInterstitialAdControllerWrapper.h; sourceTree = "<group>"; };
-		9BFEC33236183B2DA0000D5B /* VPNManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VPNManager.h; sourceTree = "<group>"; };
 		9BFEC356373DB0938069FBA8 /* AdControllerWrapper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AdControllerWrapper.h; sourceTree = "<group>"; };
 		9BFEC365D314919C8FA4C1DE /* AdMobInterstitialAdControllerWrapper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AdMobInterstitialAdControllerWrapper.h; sourceTree = "<group>"; };
 		9BFEC3CE64925E5984AAA9BE /* AdManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AdManager.m; sourceTree = "<group>"; };
@@ -457,7 +551,6 @@
 		9BFEC584519C408D9D6D3FF1 /* PsiphonConfigUserDefaults.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PsiphonConfigUserDefaults.m; sourceTree = "<group>"; };
 		9BFEC5F8D8BB828703CCCC2F /* AdMobConsent.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AdMobConsent.m; sourceTree = "<group>"; };
 		9BFEC673CE5EA236279F07BD /* Authorization.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Authorization.h; sourceTree = "<group>"; };
-		9BFEC6DEB0BE772BE801A9E6 /* AsyncOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AsyncOperation.m; sourceTree = "<group>"; };
 		9BFEC717F36D5A071D14AFFA /* AdManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AdManager.h; sourceTree = "<group>"; };
 		9BFEC72C282F6060193B2E87 /* UIColor+Additions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIColor+Additions.m"; sourceTree = "<group>"; };
 		9BFEC84F5DF6D2C3EF754962 /* UnionSerialQueue.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UnionSerialQueue.m; sourceTree = "<group>"; };
@@ -465,10 +558,8 @@
 		9BFEC8FDCD80DACA0D851A06 /* MoPubRewardedAdControllerWrapper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MoPubRewardedAdControllerWrapper.h; sourceTree = "<group>"; };
 		9BFEC91ED4A1C511520E9948 /* Notifier.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Notifier.m; sourceTree = "<group>"; };
 		9BFEC970B3CC179C3B9DE44D /* MoPubRewardedAdControllerWrapper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MoPubRewardedAdControllerWrapper.m; sourceTree = "<group>"; };
-		9BFECA9ADB17DC329DA64AA5 /* AsyncOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AsyncOperation.h; sourceTree = "<group>"; };
 		9BFECACF5093B4C4EE5D3592 /* MoPubConsent.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MoPubConsent.m; sourceTree = "<group>"; };
 		9BFECB09D7F866F34551DBD4 /* IAPHelpViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IAPHelpViewController.h; sourceTree = "<group>"; };
-		9BFECBACAAF0FC84C7EA783E /* VPNManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VPNManager.m; sourceTree = "<group>"; };
 		9BFECC3FADE9C8A76A0913DE /* BasePacketTunnelProvider.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BasePacketTunnelProvider.m; sourceTree = "<group>"; };
 		9BFECC9B2B9F2BFBD4F8A47B /* UserDefaults.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UserDefaults.h; sourceTree = "<group>"; };
 		9BFECCCF429898FD903B69A6 /* Nullity.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Nullity.m; sourceTree = "<group>"; };
@@ -480,31 +571,24 @@
 		A840802C7AEFA7F375205DCB /* VPNStartAndStopButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VPNStartAndStopButton.h; sourceTree = "<group>"; };
 		A8408058458E7BFC4C3DFDDE /* AppEvent.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppEvent.m; sourceTree = "<group>"; };
 		A84080B68F307C79F3BCCC59 /* SupportedLanguages.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SupportedLanguages.m; sourceTree = "<group>"; };
-		A84080C0D2CACFAE42D3810E /* PsiCashPurchaseView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PsiCashPurchaseView.h; sourceTree = "<group>"; };
 		A84080E2A20C786DDAD17D48 /* RoyalSkyButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RoyalSkyButton.h; sourceTree = "<group>"; };
-		A84080F32E861482A476250F /* PsiCashView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PsiCashView.h; sourceTree = "<group>"; };
 		A840812E38D27BF4328678E0 /* OnboardingViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OnboardingViewController.h; sourceTree = "<group>"; };
 		A840816C0C9B0658776A8B91 /* RegionSelectionButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RegionSelectionButton.h; sourceTree = "<group>"; };
-		A8408183BCB31ED8F0855E90 /* PsiCashPurchaseView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PsiCashPurchaseView.m; sourceTree = "<group>"; };
 		A84081B66B02DF8283448409 /* AutoLayoutProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AutoLayoutProtocol.h; sourceTree = "<group>"; };
 		A84081C4600325A12F9C3413 /* SubscriptionsBar.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SubscriptionsBar.m; sourceTree = "<group>"; };
 		A84081E39C751846A6009BEC /* CloudsView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CloudsView.m; sourceTree = "<group>"; };
 		A84081E6B9D2FF5986AA1BF0 /* SubscriptionData.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SubscriptionData.m; sourceTree = "<group>"; };
-		A84082D71B55E73D2883F645 /* PsiCashPurchaseAlertView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PsiCashPurchaseAlertView.h; sourceTree = "<group>"; };
 		A840830557814D4234CFD86D /* ImageUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ImageUtils.h; sourceTree = "<group>"; };
 		A84083119A599C815D2D80F5 /* SkyButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SkyButton.h; sourceTree = "<group>"; };
 		A8408319CD72511CABBE4CD4 /* ContainerDB.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ContainerDB.h; sourceTree = "<group>"; };
 		A8408390A766C7C2C246797C /* PickerViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PickerViewController.m; sourceTree = "<group>"; };
 		A84083974C8CF9DDFE7A341D /* Strings.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Strings.m; sourceTree = "<group>"; };
-		A84083B0CB962827E7C93024 /* PsiCashPurchaseAlertView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PsiCashPurchaseAlertView.m; sourceTree = "<group>"; };
 		A84083E1E11F50B1DFC100CD /* SubscriptionData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SubscriptionData.h; sourceTree = "<group>"; };
-		A84083F358BD2CC1440107B8 /* PsiCashSpeedBoostMeterView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PsiCashSpeedBoostMeterView.m; sourceTree = "<group>"; };
 		A840841151FC43C5E1658677 /* AlertDialogs.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AlertDialogs.m; sourceTree = "<group>"; };
 		A840842CECC0146241243488 /* ActivityIndicatorRoyalSkyButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ActivityIndicatorRoyalSkyButton.m; sourceTree = "<group>"; };
 		A8408454F205262BF90B55C1 /* UIImageView+Additions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImageView+Additions.h"; sourceTree = "<group>"; };
 		A840845849B24AAA0E714664 /* LoadingCircleLayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LoadingCircleLayer.m; sourceTree = "<group>"; };
 		A84084C5C538AC8171021D2C /* UIView+Additions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIView+Additions.m"; sourceTree = "<group>"; };
-		A840854913F6165FB0B97A6A /* PsiCashSpeedBoostSliderView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PsiCashSpeedBoostSliderView.m; sourceTree = "<group>"; };
 		A840856AD6865619ACF78509 /* PsiphonProgressView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PsiphonProgressView.h; sourceTree = "<group>"; };
 		A840864BAA38AA3E4620EC35 /* PickerViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PickerViewController.h; sourceTree = "<group>"; };
 		A84086716D701D0F5B48E4C0 /* ContainerDB.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ContainerDB.m; sourceTree = "<group>"; };
@@ -513,7 +597,6 @@
 		A84086A6BF880CC20E5C57B4 /* LayerAutoResizeUIView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LayerAutoResizeUIView.h; sourceTree = "<group>"; };
 		A84086A9E122059FADA6F411 /* RingSkyButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RingSkyButton.h; sourceTree = "<group>"; };
 		A84086B04CBC1A6A5481EDD4 /* RingSkyButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RingSkyButton.m; sourceTree = "<group>"; };
-		A84086D173C51DB8C7B7E62C /* PsiCashSpeedBoostSliderView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PsiCashSpeedBoostSliderView.h; sourceTree = "<group>"; };
 		A84086DF1DDA5CC90C437009 /* RelaySubject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RelaySubject.m; sourceTree = "<group>"; };
 		A8408710CC81EFA1CB22CAEC /* AppEvent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppEvent.h; sourceTree = "<group>"; };
 		A84087B4F756C5DA76723EFC /* LoadingCircleLayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LoadingCircleLayer.h; sourceTree = "<group>"; };
@@ -525,12 +608,9 @@
 		A84088779C0DA0B8A46BCC1A /* LanguageSelectionViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LanguageSelectionViewController.h; sourceTree = "<group>"; };
 		A84088889983161FB859D8A9 /* OnboardingView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OnboardingView.m; sourceTree = "<group>"; };
 		A8408902709B9D562B559532 /* CloudsView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CloudsView.h; sourceTree = "<group>"; };
-		A840893B138A37A795FFFAB2 /* PsiCashBalanceView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PsiCashBalanceView.m; sourceTree = "<group>"; };
 		A840896A2A9959280DAE2DA1 /* LanguageSelectionViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LanguageSelectionViewController.m; sourceTree = "<group>"; };
-		A840898FA26840E5AEA71BF5 /* PsiCashBalanceView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PsiCashBalanceView.h; sourceTree = "<group>"; };
 		A84089CB9E8B0DF1D88D0500 /* AppUpgrade.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppUpgrade.m; sourceTree = "<group>"; };
 		A8408A0C4220563DA1FE3048 /* ImageUtils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ImageUtils.m; sourceTree = "<group>"; };
-		A8408A1B786B9F6679539FCD /* PsiCashSpeedBoostMeterView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PsiCashSpeedBoostMeterView.h; sourceTree = "<group>"; };
 		A8408A83F0E1DDE55E30E406 /* SubscriptionsBar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SubscriptionsBar.h; sourceTree = "<group>"; };
 		A8408AAD421C096147E3FC8B /* Strings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Strings.h; sourceTree = "<group>"; };
 		A8408ABFCA9BBDD281E8A4FD /* SkyRegionSelectionViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SkyRegionSelectionViewController.h; sourceTree = "<group>"; };
@@ -550,7 +630,6 @@
 		A8408D7A1D96FE89B4FB49C1 /* ActivityIndicatorRoyalSkyButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ActivityIndicatorRoyalSkyButton.h; sourceTree = "<group>"; };
 		A8408D7A83250AE5DA42B445 /* MutableSubscriptionData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MutableSubscriptionData.h; sourceTree = "<group>"; };
 		A8408D96EC06ED36F86C690D /* OnboardingViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OnboardingViewController.m; sourceTree = "<group>"; };
-		A8408DA63B0B641B765A1E4D /* PsiCashView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PsiCashView.m; sourceTree = "<group>"; };
 		A8408DB71B7BE2CF13F9CD04 /* UIView+Additions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIView+Additions.h"; sourceTree = "<group>"; };
 		A8408DBEEDCF56EC798536BF /* LayerAutoResizeUIView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LayerAutoResizeUIView.m; sourceTree = "<group>"; };
 		A8408E0115540B5B2B305EAE /* ConnectionStatusView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ConnectionStatusView.m; sourceTree = "<group>"; };
@@ -566,8 +645,6 @@
 		CE26FC991BBDC7B800B83375 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		CE26FCA31BBDC85900B83375 /* PsiphonVPN.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = PsiphonVPN.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		CE26FCA91BBDC85900B83375 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		CE425D1D2159485500B7893D /* StarView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StarView.h; sourceTree = "<group>"; };
-		CE425D1E2159485500B7893D /* StarView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = StarView.m; sourceTree = "<group>"; };
 		CE4E9BBF1BBEECF30060FF8B /* Psiphon.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = Psiphon.entitlements; sourceTree = "<group>"; };
 		CE4E9BC11BBEECFC0060FF8B /* PsiphonVPN.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.entitlements; path = PsiphonVPN.entitlements; sourceTree = "<group>"; };
 		CE6C3F6824366AE1007A17F0 /* ClientMetadata.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ClientMetadata.h; sourceTree = "<group>"; };
@@ -586,7 +663,7 @@
 		EF652CDB1F365B8C002AFB48 /* SharedConstants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SharedConstants.h; sourceTree = "<group>"; };
 		EF6C1F501F59E46500709554 /* embedded_server_entries */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = embedded_server_entries; sourceTree = "<group>"; };
 		EF6C1F511F59E46500709554 /* psiphon_config */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = psiphon_config; sourceTree = "<group>"; };
-		EF743FC31F99549000AC89A2 /* productIDs.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = productIDs.plist; sourceTree = "<group>"; };
+		EF743FC31F99549000AC89A2 /* subscriptionProductIds.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = subscriptionProductIds.plist; sourceTree = "<group>"; };
 		EF90D78D204F22C900228A63 /* timestamp_valid.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = timestamp_valid.c; sourceTree = "<group>"; };
 		EF90D78E204F22C900228A63 /* timestamp_compare.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = timestamp_compare.c; sourceTree = "<group>"; };
 		EF90D78F204F22C900228A63 /* timestamp_tm.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = timestamp_tm.c; sourceTree = "<group>"; };
@@ -621,6 +698,13 @@
 
 /* Begin PBXFrameworksBuildPhase section */
 		4E0D881E1FA06B2400ADB61E /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		52C8F09E237C8ED600E5F9C0 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -725,15 +809,20 @@
 			isa = PBXGroup;
 			children = (
 				445F249720E1A5BA00D004E9 /* asn1c */,
-				445F239420E1817B00D004E9 /* PsiphonAppReceipt.h */,
-				445F239520E1817C00D004E9 /* PsiphonAppReceipt.m */,
-				EF743FC31F99549000AC89A2 /* productIDs.plist */,
-				4E5263C92072984C0021FEF5 /* IAPStoreHelper.h */,
-				4E5263CC2072984D0021FEF5 /* IAPStoreHelper.m */,
+				445F239420E1817B00D004E9 /* AppStoreReceiptData.h */,
+				445F239520E1817C00D004E9 /* AppStoreReceiptData.m */,
+				EF743FC31F99549000AC89A2 /* subscriptionProductIds.plist */,
 				4E5263CB2072984D0021FEF5 /* IAPViewController.h */,
 				4E5263CA2072984D0021FEF5 /* IAPViewController.m */,
 				9BFEC220C067BBE75AF970C1 /* IAPHelpViewController.m */,
 				9BFECB09D7F866F34551DBD4 /* IAPHelpViewController.h */,
+				52A24661239B07E000A01FF1 /* psiCashProductIds.plist */,
+				8D417E9C2411A0C200FEE587 /* PaymentQueue.swift */,
+				8D417EA02411A89500FEE587 /* IAPState.swift */,
+				8D417EB62415633300FEE587 /* IAPReducer.swift */,
+				521D084D2346A75700403B48 /* IAPProducts.swift */,
+				8D417EBA2417155000FEE587 /* AppReceipt.swift */,
+				8D417EDC2419DBA100FEE587 /* ProductRequest.swift */,
 			);
 			name = IAP;
 			sourceTree = "<group>";
@@ -793,63 +882,13 @@
 			name = Feedback;
 			sourceTree = "<group>";
 		};
-		4E5DCF9120EC11C6009D8D39 /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				4E5DCF9420EC11C6009D8D39 /* PsiCashProduct.h */,
-				4E5DCF9320EC11C6009D8D39 /* PsiCashSpeedBoostProduct.h */,
-				4E5DCF9620EC11C6009D8D39 /* PsiCashSpeedBoostProduct.m */,
-				4E5DCF9220EC11C6009D8D39 /* PsiCashSpeedBoostProduct+PsiCashPurchasePrice.h */,
-				4E5DCF9520EC11C6009D8D39 /* PsiCashSpeedBoostProduct+PsiCashPurchasePrice.m */,
-			);
-			name = Products;
-			path = ClientWrapper/Products;
-			sourceTree = "<group>";
-		};
-		4E856D8F20A8C612007861A2 /* Onboarding */ = {
-			isa = PBXGroup;
-			children = (
-				4EF6D9C820A8C7FE00AE9D44 /* PsiCashOnboardingViewController.h */,
-				4EF6D9C920A8C7FE00AE9D44 /* PsiCashOnboardingViewController.m */,
-				4EF6D9CA20A8C7FE00AE9D44 /* PsiCashOnboardingInfoViewController.h */,
-				4EF6D9C720A8C7FE00AE9D44 /* PsiCashOnboardingInfoViewController.m */,
-			);
-			path = Onboarding;
-			sourceTree = "<group>";
-		};
-		4E9B2E09204EFB7E00E63784 /* Objects */ = {
-			isa = PBXGroup;
-			children = (
-				4E5263CF20732DDE0021FEF5 /* PsiCashAuthPackage.h */,
-				4E5263D020732DDE0021FEF5 /* PsiCashAuthPackage.m */,
-				4E9B2E11204F463000E63784 /* PsiCashClientModel.h */,
-				4E9B2E12204F463000E63784 /* PsiCashClientModel.m */,
-				4EEB2F0320644BD5006E80EF /* PsiCashClientModelStagingArea.h */,
-				4EEB2F0420644BD5006E80EF /* PsiCashClientModelStagingArea.m */,
-				4E5263D22073322B0021FEF5 /* PsiCashTypes.h */,
-				4E2037A0207592A300B99A05 /* PsiCashTypes.m */,
-			);
-			path = Objects;
-			sourceTree = "<group>";
-		};
 		4E9B2E0A204EFB9400E63784 /* ClientWrapper */ = {
 			isa = PBXGroup;
 			children = (
-				4EFAAF242034CDC700EC0536 /* PsiCashClient.h */,
-				4EFAAF282034CDC800EC0536 /* PsiCashClient.m */,
 				4E90C94220CB37F5003FC319 /* PsiCashLogger.h */,
 				4E90C94320CB37F5003FC319 /* PsiCashLogger.m */,
 			);
 			path = ClientWrapper;
-			sourceTree = "<group>";
-		};
-		4EB8463A2151808F00687344 /* Stars */ = {
-			isa = PBXGroup;
-			children = (
-				CE425D1D2159485500B7893D /* StarView.h */,
-				CE425D1E2159485500B7893D /* StarView.m */,
-			);
-			path = Stars;
 			sourceTree = "<group>";
 		};
 		4EC5526720AB8DF1000B4BEA /* Pastel */ = {
@@ -887,6 +926,8 @@
 				A8408ABFCA9BBDD281E8A4FD /* SkyRegionSelectionViewController.h */,
 				A840896A2A9959280DAE2DA1 /* LanguageSelectionViewController.m */,
 				A84088779C0DA0B8A46BCC1A /* LanguageSelectionViewController.h */,
+				52D363C8230DE215002C2221 /* PsiCashViewController.swift */,
+				52A2466C23A172A800A01FF1 /* AlertViewController.swift */,
 			);
 			path = ViewControllers;
 			sourceTree = "<group>";
@@ -894,6 +935,9 @@
 		4ED48C06215058C900B1A9A5 /* Util */ = {
 			isa = PBXGroup;
 			children = (
+				5248B4CD23203781008C00D4 /* SwiftObjCBridges.swift */,
+				52805BA022DD1EB8006B205B /* ReactiveSwift+Additions.swift */,
+				52467FF822CE77A1009AEC6E /* Foundation+Additions.swift */,
 				9BFECE69F71F11C7B3A2D67E /* UIColor+Additions.h */,
 				9BFEC72C282F6060193B2E87 /* UIColor+Additions.m */,
 				4E0A3667215AB7EE008A3D7B /* UIFont+Additions.h */,
@@ -904,6 +948,11 @@
 				4E0A366B21666B99008A3D7B /* NSString+Additions.m */,
 				A8408A0C4220563DA1FE3048 /* ImageUtils.m */,
 				A840830557814D4234CFD86D /* ImageUtils.h */,
+				52C8F0AE2383059200E5F9C0 /* Promises+Additions.swift */,
+				52DF5E9123C675EC00A1B067 /* ViewController+Additions.swift */,
+				52B3C54423DA391F003F6B12 /* Requests.swift */,
+				8D417ED8241844FA00FEE587 /* FloatingPoint+Additions.swift */,
+				8DDA60282425BB4800DBA8EC /* DebugStrings.swift */,
 			);
 			path = Util;
 			sourceTree = "<group>";
@@ -912,11 +961,33 @@
 			isa = PBXGroup;
 			children = (
 				4E9B2E0A204EFB9400E63784 /* ClientWrapper */,
-				4E5DCF9120EC11C6009D8D39 /* Products */,
-				4E9B2E09204EFB7E00E63784 /* Objects */,
-				4E856D8F20A8C612007861A2 /* Onboarding */,
+				52467FE022C2A704009AEC6E /* PsiCashModels.swift */,
+				8DA3466524114DB400F9E2D1 /* PsiCashState.swift */,
+				8D417E982411954A00FEE587 /* PsiCashReducer.swift */,
+				8D417E9E2411A60900FEE587 /* PsiCashEffects.swift */,
 			);
 			path = PsiCash;
+			sourceTree = "<group>";
+		};
+		52055D02230C821200244F9E /* View */ = {
+			isa = PBXGroup;
+			children = (
+				5246800522D51A81009AEC6E /* PsiCashView */,
+				5246800C22D65926009AEC6E /* UIUtils.swift */,
+				52055D03230C823100244F9E /* GradientButton.swift */,
+				52D363CA230DEBED002C2221 /* CloseButton.swift */,
+				52D363CC230EEBAC002C2221 /* AnimatedUIButton.swift */,
+				52D363CE230F112E002C2221 /* TabControlView.swift */,
+				5202011C2360D34000D00C8E /* EitherView.swift */,
+				520201202360F5B800D00C8E /* IndexedViewSwitcher.swift */,
+				52C8F0AA237CA26200E5F9C0 /* ImageViewBuidler.swift */,
+				52CAC4302385D06600A92842 /* Spinner.swift */,
+				52B3C54B23E0E895003F6B12 /* ButtonBuilder.swift */,
+				8D7E9B9C2425DF42006F3A2F /* AnimatedUIView.swift */,
+				8D7E9B9E2425E053006F3A2F /* Animations.swift */,
+				8DB6C637242A4D06005E2F4C /* DuskButton.swift */,
+			);
+			path = View;
 			sourceTree = "<group>";
 		};
 		521FD0E4219E0D4500F748EC /* Debug */ = {
@@ -949,6 +1020,35 @@
 			path = "New Group";
 			sourceTree = "<group>";
 		};
+		5246800522D51A81009AEC6E /* PsiCashView */ = {
+			isa = PBXGroup;
+			children = (
+				5246800622D51AA3009AEC6E /* PsiCashWidgetView.swift */,
+				5246800822D51CE4009AEC6E /* PsiCashBalanceView.swift */,
+				52055D05230C833700244F9E /* SpeedBoostButton.swift */,
+				52C8F0AC237E145C00E5F9C0 /* PsiCashCoinPurchaseTable.swift */,
+				528D81322384823F00AA2D77 /* PsiCashMessageView.swift */,
+				52A24658238C9AB700A01FF1 /* SpeedBoostPurchaseTable.swift */,
+				52A2466E23A1769300A01FF1 /* PsiCashMessageViewUntunneled.swift */,
+				52A2467023A176BA00A01FF1 /* PsiCashPurchasingAlertViewBuilder.swift */,
+				5237387323AABB0F00DDE396 /* PurchasingSpeedBoostAlertViewBuilder.swift */,
+				8DB6C6352429080C005E2F4C /* PsiCashMessageWithRetryView.swift */,
+			);
+			path = PsiCashView;
+			sourceTree = "<group>";
+		};
+		52A2465A2390565700A01FF1 /* Store */ = {
+			isa = PBXGroup;
+			children = (
+				52A2465B2390569800A01FF1 /* Store.swift */,
+				8D417EB82415667900FEE587 /* StoreDelegate.swift */,
+				8D417EDA2419D9CF00FEE587 /* State.swift */,
+				8D417EDE241AA89C00FEE587 /* Effect.swift */,
+				8D9E602D24364FB6003A46D8 /* SerialEffect.swift */,
+			);
+			path = Store;
+			sourceTree = "<group>";
+		};
 		668AF9B81E92CB60008CAAAA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
@@ -966,25 +1066,6 @@
 				6615A5E81F58A95500026C98 /* Localizable.strings */,
 			);
 			name = Strings;
-			sourceTree = "<group>";
-		};
-		A84089FDEDA01677951D34C4 /* PsiCash */ = {
-			isa = PBXGroup;
-			children = (
-				A840898FA26840E5AEA71BF5 /* PsiCashBalanceView.h */,
-				A84080C0D2CACFAE42D3810E /* PsiCashPurchaseView.h */,
-				A840854913F6165FB0B97A6A /* PsiCashSpeedBoostSliderView.m */,
-				A84083F358BD2CC1440107B8 /* PsiCashSpeedBoostMeterView.m */,
-				A840893B138A37A795FFFAB2 /* PsiCashBalanceView.m */,
-				A84080F32E861482A476250F /* PsiCashView.h */,
-				A84083B0CB962827E7C93024 /* PsiCashPurchaseAlertView.m */,
-				A8408183BCB31ED8F0855E90 /* PsiCashPurchaseView.m */,
-				A84082D71B55E73D2883F645 /* PsiCashPurchaseAlertView.h */,
-				A8408A1B786B9F6679539FCD /* PsiCashSpeedBoostMeterView.h */,
-				A8408DA63B0B641B765A1E4D /* PsiCashView.m */,
-				A84086D173C51DB8C7B7E62C /* PsiCashSpeedBoostSliderView.h */,
-			);
-			path = PsiCash;
 			sourceTree = "<group>";
 		};
 		A8408C3BCEFC35B4744B684E /* Views */ = {
@@ -1016,7 +1097,6 @@
 				A8408EF0378D6C5C22CC3FE2 /* OnboardingView.h */,
 				A8408F08BFF80A05CF46C00A /* RoyalSkyButton.m */,
 				A84080E2A20C786DDAD17D48 /* RoyalSkyButton.h */,
-				A84089FDEDA01677951D34C4 /* PsiCash */,
 				A8408DBEEDCF56EC798536BF /* LayerAutoResizeUIView.m */,
 				A84086A6BF880CC20E5C57B4 /* LayerAutoResizeUIView.h */,
 				A8408672FB2E1CD144A2BE7C /* SkyButton.m */,
@@ -1063,6 +1143,7 @@
 				CE26FC8A1BBDC7B800B83375 /* Psiphon.app */,
 				CE26FCA31BBDC85900B83375 /* PsiphonVPN.appex */,
 				4E0D88211FA06B2400ADB61E /* PsiphonUITests.xctest */,
+				52C8F0A1237C8ED600E5F9C0 /* PsiphonPlayground.framework */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1070,6 +1151,8 @@
 		CE26FC8C1BBDC7B800B83375 /* Psiphon */ = {
 			isa = PBXGroup;
 			children = (
+				52A2465A2390565700A01FF1 /* Store */,
+				52055D02230C821200244F9E /* View */,
 				521FD0E4219E0D4500F748EC /* Debug */,
 				CE4E9BBF1BBEECF30060FF8B /* Psiphon.entitlements */,
 				CE26FC991BBDC7B800B83375 /* Info.plist */,
@@ -1080,7 +1163,6 @@
 				4EC5526720AB8DF1000B4BEA /* Pastel */,
 				4EFAAF1C2034CDA600EC0536 /* PsiCash */,
 				F136C2981F62E81F000D3EAB /* Resource */,
-				4EB8463A2151808F00687344 /* Stars */,
 				EF652CCF1F3521F8002AFB48 /* Supporting Files */,
 				4ED48C06215058C900B1A9A5 /* Util */,
 				4ED48C05215056E800B1A9A5 /* ViewControllers */,
@@ -1094,8 +1176,6 @@
 				4E5263BF207292920021FEF5 /* EmbeddedServerEntries.m */,
 				4E5263B5207290360021FEF5 /* EmbeddedServerEntriesHelpers.h */,
 				4E5263B6207290360021FEF5 /* EmbeddedServerEntriesHelpers.c */,
-				9BFEC33236183B2DA0000D5B /* VPNManager.h */,
-				9BFECBACAAF0FC84C7EA783E /* VPNManager.m */,
 				A84086716D701D0F5B48E4C0 /* ContainerDB.m */,
 				A8408319CD72511CABBE4CD4 /* ContainerDB.h */,
 				A84089CB9E8B0DF1D88D0500 /* AppUpgrade.m */,
@@ -1104,6 +1184,25 @@
 				A8408C79DD812741E678AB94 /* SupportedLanguages.h */,
 				A8408058458E7BFC4C3DFDDE /* AppEvent.m */,
 				A8408710CC81EFA1CB22CAEC /* AppEvent.h */,
+				52D2581022BADE1900CA956A /* SwiftDelegate.swift */,
+				52D2580F22BADE1900CA956A /* Psiphon-Bridging-Header.h */,
+				5245C5C82342A6840033EE13 /* UserDefaults.swift */,
+				52A2465D239081C100A01FF1 /* AppState.swift */,
+				52DF5E9723CE5A8300A1B067 /* ValuePaths.swift */,
+				52DF5E9923CE835100A1B067 /* UserStrings.swift */,
+				52DF5E9D23D0D01F00A1B067 /* BridgingTypes.swift */,
+				52B3C54223DA31E1003F6B12 /* PurchaseVerifier.swift */,
+				52B3C54823DF99E8003F6B12 /* AppObservables.h */,
+				52B3C54923DF99E8003F6B12 /* AppObservables.m */,
+				52B3C54D23E22454003F6B12 /* Logging.swift */,
+				8D417EB024147C6D00FEE587 /* LandingPage.swift */,
+				8D417EB224148C1E00FEE587 /* URLHandler.swift */,
+				8D417EBC2417FF5B00FEE587 /* Subscription.swift */,
+				8D417EBE2417FFB000FEE587 /* HardCodedValues.swift */,
+				8D9E602924364ED2003A46D8 /* VPNState.swift */,
+				8D9E602B24364EE6003A46D8 /* TunnelProviderManager.swift */,
+				8D9E603424366D71003A46D8 /* FeedbackDescriptions.swift */,
+				52DF5E9523C7A31100A1B067 /* Error.swift */,
 			);
 			path = Psiphon;
 			sourceTree = "<group>";
@@ -1182,8 +1281,6 @@
 				EF90D797204F22C900228A63 /* NSDate+PSIDateExtension.m */,
 				EF90D79B204F22C900228A63 /* DispatchUtils.h */,
 				EF90D798204F22C900228A63 /* DispatchUtils.m */,
-				9BFEC6DEB0BE772BE801A9E6 /* AsyncOperation.m */,
-				9BFECA9ADB17DC329DA64AA5 /* AsyncOperation.h */,
 				9BFECCCF429898FD903B69A6 /* Nullity.m */,
 				9BFECEEB971749A4E9705B15 /* Nullity.h */,
 			);
@@ -1248,6 +1345,16 @@
 		};
 /* End PBXGroup section */
 
+/* Begin PBXHeadersBuildPhase section */
+		52C8F09C237C8ED600E5F9C0 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
 /* Begin PBXNativeTarget section */
 		4E0D88201FA06B2400ADB61E /* PsiphonUITests */ = {
 			isa = PBXNativeTarget;
@@ -1266,6 +1373,24 @@
 			productName = PsiphonUITests;
 			productReference = 4E0D88211FA06B2400ADB61E /* PsiphonUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+		52C8F0A0237C8ED600E5F9C0 /* PsiphonPlayground */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 52C8F0A8237C8ED600E5F9C0 /* Build configuration list for PBXNativeTarget "PsiphonPlayground" */;
+			buildPhases = (
+				52C8F09C237C8ED600E5F9C0 /* Headers */,
+				52C8F09D237C8ED600E5F9C0 /* Sources */,
+				52C8F09E237C8ED600E5F9C0 /* Frameworks */,
+				52C8F09F237C8ED600E5F9C0 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = PsiphonPlayground;
+			productName = PsiphonPlayground;
+			productReference = 52C8F0A1237C8ED600E5F9C0 /* PsiphonPlayground.framework */;
+			productType = "com.apple.product-type.framework";
 		};
 		CE26FC891BBDC7B800B83375 /* Psiphon */ = {
 			isa = PBXNativeTarget;
@@ -1315,19 +1440,25 @@
 			isa = PBXProject;
 			attributes = {
 				LastSwiftUpdateCheck = 0910;
-				LastUpgradeCheck = 0900;
+				LastUpgradeCheck = 1130;
 				ORGANIZATIONNAME = "Psiphon Inc.";
 				TargetAttributes = {
 					4E0D88201FA06B2400ADB61E = {
 						CreatedOnToolsVersion = 9.1;
 						DevelopmentTeam = Q6HLNEX92A;
+						LastSwiftMigration = 1110;
 						ProvisioningStyle = Automatic;
 						TestTargetID = CE26FC891BBDC7B800B83375;
+					};
+					52C8F0A0237C8ED600E5F9C0 = {
+						CreatedOnToolsVersion = 11.2;
+						DevelopmentTeam = Q6HLNEX92A;
+						ProvisioningStyle = Automatic;
 					};
 					CE26FC891BBDC7B800B83375 = {
 						CreatedOnToolsVersion = 7.0;
 						DevelopmentTeam = Q6HLNEX92A;
-						LastSwiftMigration = 0820;
+						LastSwiftMigration = 1100;
 						ProvisioningStyle = Automatic;
 						SystemCapabilities = {
 							com.apple.ApplicationGroups.iOS = {
@@ -1409,6 +1540,7 @@
 				CE26FC891BBDC7B800B83375 /* Psiphon */,
 				CE26FCA21BBDC85900B83375 /* PsiphonVPN */,
 				4E0D88201FA06B2400ADB61E /* PsiphonUITests */,
+				52C8F0A0237C8ED600E5F9C0 /* PsiphonPlayground */,
 			);
 		};
 /* End PBXProject section */
@@ -1421,12 +1553,20 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		52C8F09F237C8ED600E5F9C0 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		CE26FC881BBDC7B800B83375 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 				6615A5EA1F58A95500026C98 /* Localizable.strings in Resources */,
 				EF6C1F521F59E46500709554 /* embedded_server_entries in Resources */,
+				52A24662239B07E000A01FF1 /* psiCashProductIds.plist in Resources */,
 				EF6C1F541F59E46500709554 /* psiphon_config in Resources */,
 				4E0774961F566B040097BC8C /* InAppSettings.bundle in Resources */,
 				CE26FC951BBDC7B800B83375 /* Assets.xcassets in Resources */,
@@ -1434,7 +1574,7 @@
 				F136C2951F62E3E1000D3EAB /* LaunchScreen.xib in Resources */,
 				CE4E9BC01BBEECF30060FF8B /* Psiphon.entitlements in Resources */,
 				445F24DE20E1A5BA00D004E9 /* pkcs7-signed-data-simplified.asn1 in Resources */,
-				EF743FCA1F99549000AC89A2 /* productIDs.plist in Resources */,
+				EF743FCA1F99549000AC89A2 /* subscriptionProductIds.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1446,7 +1586,7 @@
 				CE4E9BC21BBEECFC0060FF8B /* PsiphonVPN.entitlements in Resources */,
 				6615A5EB1F58A95B00026C98 /* Localizable.strings in Resources */,
 				EF6C1F531F59E46500709554 /* embedded_server_entries in Resources */,
-				EF743FCB1F99549000AC89A2 /* productIDs.plist in Resources */,
+				EF743FCB1F99549000AC89A2 /* subscriptionProductIds.plist in Resources */,
 				9BFECF65871BB6B522C33F1E /* UserDefaults.h in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1579,83 +1719,111 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		52C8F09D237C8ED600E5F9C0 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				52C8F0A9237C8F3E00E5F9C0 /* Foundation+Additions.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		CE26FC861BBDC7B800B83375 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4E5263D120732DDE0021FEF5 /* PsiCashAuthPackage.m in Sources */,
+				52A2465E239081C100A01FF1 /* AppState.swift in Sources */,
 				EF90D7A6204F22C900228A63 /* NSDate+Comparator.m in Sources */,
 				4EB846422151830600687344 /* AvailableServerRegions.m in Sources */,
+				5246800922D51CE4009AEC6E /* PsiCashBalanceView.swift in Sources */,
+				52D363CF230F112E002C2221 /* TabControlView.swift in Sources */,
 				445F24D620E1A5BA00D004E9 /* xer_decoder.c in Sources */,
 				EF652CD71F35224C002AFB48 /* MainViewController.m in Sources */,
+				52B3C54E23E22454003F6B12 /* Logging.swift in Sources */,
 				EF90D7A4204F22C900228A63 /* timestamp_format.c in Sources */,
+				52B3C54323DA31E1003F6B12 /* PurchaseVerifier.swift in Sources */,
 				F132D7E01F5739A800AF7F91 /* LaunchScreenViewController.m in Sources */,
 				445F24E920E1A5BA00D004E9 /* ber_tlv_length.c in Sources */,
-				4EEB2F0520644BD5006E80EF /* PsiCashClientModelStagingArea.m in Sources */,
+				5237387423AABB0F00DDE396 /* PurchasingSpeedBoostAlertViewBuilder.swift in Sources */,
 				4E0DCB1A1F28481E00495781 /* PsiphonDataSharedDB.m in Sources */,
-				4EF6D9CC20A8C7FE00AE9D44 /* PsiCashOnboardingViewController.m in Sources */,
 				4435CC271F70566000F3A809 /* SettingsViewController.m in Sources */,
+				8D417EB72415633300FEE587 /* IAPReducer.swift in Sources */,
 				EF4F1F3D206055F7006A40A1 /* RACSignal+Operations2.m in Sources */,
-				4E5DCF9720EC11C6009D8D39 /* PsiCashSpeedBoostProduct+PsiCashPurchasePrice.m in Sources */,
 				445F24F020E1A5BA00D004E9 /* xer_encoder.c in Sources */,
 				445F24D520E1A5BA00D004E9 /* constr_TYPE.c in Sources */,
 				445F24E220E1A5BA00D004E9 /* der_encoder.c in Sources */,
 				445F24DC20E1A5BA00D004E9 /* NativeInteger.c in Sources */,
 				521FD0F3219E0D5600F748EC /* DebugTextViewController.m in Sources */,
+				8D7E9B9F2425E053006F3A2F /* Animations.swift in Sources */,
 				EF90D7A9204F22C900228A63 /* FileUtils.m in Sources */,
 				EF90D7A1204F22C900228A63 /* timestamp_valid.c in Sources */,
 				445F24DF20E1A5BA00D004E9 /* ANY.c in Sources */,
+				52A2466F23A1769300A01FF1 /* PsiCashMessageViewUntunneled.swift in Sources */,
 				4E90C94420CB37F5003FC319 /* PsiCashLogger.m in Sources */,
 				EFC2F5C420226782007B52F9 /* RootContainerController.m in Sources */,
+				8D417EBB2417155000FEE587 /* AppReceipt.swift in Sources */,
 				EF90D7A5204F22C900228A63 /* timestamp_parse.c in Sources */,
+				52DF5E9623C7A31100A1B067 /* Error.swift in Sources */,
 				EF652CD11F352212002AFB48 /* main.m in Sources */,
 				445F24EB20E1A5BA00D004E9 /* xer_support.c in Sources */,
 				4E5DAE6520A942A300E06342 /* UILabel+GetLabelHeight.m in Sources */,
 				EFC2F5CB202267B1007B52F9 /* PsiphonConfigReader.m in Sources */,
 				EF90D7A7204F22C900228A63 /* NSDate+PSIDateExtension.m in Sources */,
-				445F239620E1817C00D004E9 /* PsiphonAppReceipt.m in Sources */,
+				445F239620E1817C00D004E9 /* AppStoreReceiptData.m in Sources */,
 				445F24E420E1A5BA00D004E9 /* constr_SEQUENCE.c in Sources */,
-				4EFAAF2E2034CDC800EC0536 /* PsiCashClient.m in Sources */,
-				4E9B2E13204F463100E63784 /* PsiCashClientModel.m in Sources */,
 				EF652CD61F35224C002AFB48 /* AppDelegate.m in Sources */,
 				EFC2F5C720226782007B52F9 /* UIAlertController+Additions.m in Sources */,
 				4E0A366C21666B99008A3D7B /* NSString+Additions.m in Sources */,
 				EF639C2F1F8FCE37009D6B42 /* PsiFeedbackLogger.m in Sources */,
 				445F24DA20E1A5BA00D004E9 /* constr_SET_OF.c in Sources */,
-				4EF6D9CB20A8C7FE00AE9D44 /* PsiCashOnboardingInfoViewController.m in Sources */,
+				8D417EBD2417FF5C00FEE587 /* Subscription.swift in Sources */,
+				8D417EB124147C6D00FEE587 /* LandingPage.swift in Sources */,
 				445F24E520E1A5BA00D004E9 /* asn_SET_OF.c in Sources */,
+				52B3C54523DA391F003F6B12 /* Requests.swift in Sources */,
 				9BFEC4F02A47FF8265635803 /* Notifier.m in Sources */,
 				4EC5526620AB8DCD000B4BEA /* PastelView.m in Sources */,
 				4E5263C7207294600021FEF5 /* EmbeddedServerEntries.m in Sources */,
+				52A2466D23A172A800A01FF1 /* AlertViewController.swift in Sources */,
+				5246800D22D65926009AEC6E /* UIUtils.swift in Sources */,
 				9BFECFEB3BC9F10542C1A416 /* PsiphonConfigUserDefaults.m in Sources */,
 				4E5263CD2072984D0021FEF5 /* IAPViewController.m in Sources */,
 				445F24D720E1A5BA00D004E9 /* per_support.c in Sources */,
-				4E5263CE2072984D0021FEF5 /* IAPStoreHelper.m in Sources */,
 				EF90D7AA204F22C900228A63 /* NSError+Convenience.m in Sources */,
+				52DF5E9823CE5A8300A1B067 /* ValuePaths.swift in Sources */,
 				4E5BD4F52061982300AD4724 /* FeedbackManager.m in Sources */,
 				4E0A3669215AB7EE008A3D7B /* UIFont+Additions.m in Sources */,
+				8D9E602F24366AE7003A46D8 /* SerialEffect.swift in Sources */,
+				5246800722D51AA3009AEC6E /* PsiCashWidgetView.swift in Sources */,
+				52D363C9230DE215002C2221 /* PsiCashViewController.swift in Sources */,
+				8D9E603324366AF4003A46D8 /* Store.swift in Sources */,
+				528D81332384823F00AA2D77 /* PsiCashMessageView.swift in Sources */,
 				EF90D7A8204F22C900228A63 /* DispatchUtils.m in Sources */,
 				445F24D820E1A5BA00D004E9 /* OBJECT_IDENTIFIER.c in Sources */,
-				4E5DCF9820EC11C6009D8D39 /* PsiCashSpeedBoostProduct.m in Sources */,
 				445F24D920E1A5BA00D004E9 /* BIT_STRING.c in Sources */,
 				445F24E820E1A5BA00D004E9 /* NativeEnumerated.c in Sources */,
+				8D417EB324148C1E00FEE587 /* URLHandler.swift in Sources */,
 				445F24E320E1A5BA00D004E9 /* OCTET_STRING.c in Sources */,
 				445F24E120E1A5BA00D004E9 /* ReceiptAttribute.c in Sources */,
 				EF90D7A2204F22C900228A63 /* timestamp_compare.c in Sources */,
+				52A24659238C9AB700A01FF1 /* SpeedBoostPurchaseTable.swift in Sources */,
+				8D9E602A24364ED2003A46D8 /* VPNState.swift in Sources */,
 				9BFECB6BF077F45D491093F1 /* Authorization.m in Sources */,
 				EF90D7A3204F22C900228A63 /* timestamp_tm.c in Sources */,
+				52D363CD230EEBAC002C2221 /* AnimatedUIButton.swift in Sources */,
 				445F24E020E1A5BA00D004E9 /* INTEGER.c in Sources */,
 				445F24DD20E1A5BA00D004E9 /* per_encoder.c in Sources */,
+				8DB6C638242A4D06005E2F4C /* DuskButton.swift in Sources */,
 				4EC5526320AB8DBE000B4BEA /* Pastel.m in Sources */,
-				9BFEC530849525066327C815 /* VPNManager.m in Sources */,
+				521D084E2346A75700403B48 /* IAPProducts.swift in Sources */,
+				52DF5E9223C675EC00A1B067 /* ViewController+Additions.swift in Sources */,
+				8DA3466624114DB400F9E2D1 /* PsiCashState.swift in Sources */,
+				52467FE122C2A704009AEC6E /* PsiCashModels.swift in Sources */,
+				52C8F0AB237CA26200E5F9C0 /* ImageViewBuidler.swift in Sources */,
 				445F24F620E1A85D00D004E9 /* UTF8String.c in Sources */,
 				521FD0F0219E0D5600F748EC /* DebugLogViewController.m in Sources */,
 				521FD0F1219E0D5600F748EC /* DebugToolboxViewController.m in Sources */,
 				445F24ED20E1A5BA00D004E9 /* ber_tlv_tag.c in Sources */,
-				9BFEC5C3F8FFF1366FF19D0B /* AsyncOperation.m in Sources */,
 				4E5263B7207290360021FEF5 /* EmbeddedServerEntriesHelpers.c in Sources */,
 				4E10920820F3DA190033114B /* AppInfo.m in Sources */,
-				4E2037A1207592A300B99A05 /* PsiCashTypes.m in Sources */,
 				445F24EE20E1A5BA00D004E9 /* asn_codecs_prim.c in Sources */,
 				521FD0FA219E0DDF00F748EC /* AppProfiler.m in Sources */,
 				445F24E620E1A5BA00D004E9 /* per_opentype.c in Sources */,
@@ -1665,65 +1833,91 @@
 				524B4E6E2316F27F004E9891 /* AnimatedControl.m in Sources */,
 				445F24EA20E1A5BA00D004E9 /* per_decoder.c in Sources */,
 				445F24F520E1A85D00D004E9 /* IA5String.c in Sources */,
+				520201212360F5B800D00C8E /* IndexedViewSwitcher.swift in Sources */,
+				52DF5E9E23D0D01F00A1B067 /* BridgingTypes.swift in Sources */,
 				9BFECD2FAA1FCDA88A7D432E /* UIColor+Additions.m in Sources */,
+				8D9E603124366AEF003A46D8 /* State.swift in Sources */,
 				521FD0F9219E0DDF00F748EC /* AppStats.m in Sources */,
+				8D417E992411954A00FEE587 /* PsiCashReducer.swift in Sources */,
+				8D417EA12411A89500FEE587 /* IAPState.swift in Sources */,
 				9BFECD174E254989EC97A437 /* IAPHelpViewController.m in Sources */,
+				52055D04230C823100244F9E /* GradientButton.swift in Sources */,
 				521FD0F2219E0D5600F748EC /* DebugViewController.m in Sources */,
+				52CAC4312385D06600A92842 /* Spinner.swift in Sources */,
 				9BFEC9C08697E4701A36A3B3 /* UnionSerialQueue.m in Sources */,
 				445F24EF20E1A5BA00D004E9 /* constraints.c in Sources */,
+				5248B4CE23203781008C00D4 /* SwiftObjCBridges.swift in Sources */,
+				52D363CB230DEBED002C2221 /* CloseButton.swift in Sources */,
 				445F24DB20E1A5BA00D004E9 /* ber_decoder.c in Sources */,
+				52D2581122BADE1900CA956A /* SwiftDelegate.swift in Sources */,
+				5202011D2360D34000D00C8E /* EitherView.swift in Sources */,
 				9BFEC1F0DA87B4E66C8CC4AA /* MoPubInterstitialAdControllerWrapper.m in Sources */,
+				52805BA122DD1EB8006B205B /* ReactiveSwift+Additions.swift in Sources */,
 				9BFECFE618966005B01CF582 /* MoPubRewardedAdControllerWrapper.m in Sources */,
-				CE425D1F2159485600B7893D /* StarView.m in Sources */,
 				9BFEC8058885B68B2822E2B8 /* AdManager.m in Sources */,
 				9BFEC3D66910918A0C8954E1 /* AdMobConsent.m in Sources */,
+				52DF5E9A23CE835100A1B067 /* UserStrings.swift in Sources */,
+				8DDA60292425BB4800DBA8EC /* DebugStrings.swift in Sources */,
+				52C8F0AD237E145C00E5F9C0 /* PsiCashCoinPurchaseTable.swift in Sources */,
 				9BFECA152514A7739551AA70 /* MoPubConsent.m in Sources */,
 				521FD0EF219E0D5600F748EC /* DebugDirectoryViewerViewController.m in Sources */,
 				9BFECF61970F215F32E76280 /* AdMobInterstitialAdControllerWrapper.m in Sources */,
+				52055D06230C833700244F9E /* SpeedBoostButton.swift in Sources */,
 				9BFEC459666697D89B09A492 /* AdMobRewardedAdControllerWrapper.m in Sources */,
+				8D417EBF2417FFB000FEE587 /* HardCodedValues.swift in Sources */,
+				8D9E603024366AEC003A46D8 /* Effect.swift in Sources */,
 				521FD0FD219E0E0F00F748EC /* DebugUtils.m in Sources */,
 				524B4E6B2316F0E3004E9891 /* BorderedSubtitleButton.m in Sources */,
 				9BFEC8A2F99380655E853F81 /* AdControllerWrapper.m in Sources */,
 				A8408E281270691F61F9C20C /* AppVersionNumberView.m in Sources */,
+				52C8F0AF2383059200E5F9C0 /* Promises+Additions.swift in Sources */,
 				A8408C424E64BF3D70273464 /* ConnectionStatusView.m in Sources */,
 				A84082260CE7662A93697CFF /* LoadingCircleLayer.m in Sources */,
 				A8408AACE30F860F2C961A04 /* WhiteSkyButton.m in Sources */,
 				A8408008B18277F93286799F /* PsiphonProgressView.m in Sources */,
+				8D9E603524366D71003A46D8 /* FeedbackDescriptions.swift in Sources */,
 				A8408FA13890CD67154033C6 /* RegionSelectionButton.m in Sources */,
 				A84087459E9F796B1954D049 /* SubscriptionsBar.m in Sources */,
 				A8408E611665FC60D5DFF339 /* SubscriptionStatusView.m in Sources */,
 				A8408EB13777DDCBEF7DE3C0 /* SwoopView.m in Sources */,
+				8D7E9B9D2425DF42006F3A2F /* AnimatedUIView.swift in Sources */,
 				A84080E163F24876A1476544 /* VPNStartAndStopButton.m in Sources */,
+				8D417ED9241844FA00FEE587 /* FloatingPoint+Additions.swift in Sources */,
 				A840875B190F7666A1BD98E5 /* UIView+AutoLayoutViewGroup.m in Sources */,
 				A84088DD7FBB838689BC1FCC /* OnboardingViewController.m in Sources */,
 				A8408B83167EBE21E215C471 /* OnboardingView.m in Sources */,
 				A84088BD3CFC8C511F22182C /* RoyalSkyButton.m in Sources */,
-				A8408C5A98017E7074D00CEC /* PsiCashSpeedBoostSliderView.m in Sources */,
-				A8408424387C3E0CE5694B5A /* PsiCashSpeedBoostMeterView.m in Sources */,
-				A8408EF4582A3DB3FC378ACB /* PsiCashBalanceView.m in Sources */,
-				A8408F965BE2726531F4A215 /* PsiCashPurchaseAlertView.m in Sources */,
-				A84080838645BD1023136C3B /* PsiCashPurchaseView.m in Sources */,
-				A84082122C339F45E630F610 /* PsiCashView.m in Sources */,
 				A8408161701C8F50F52866FC /* LayerAutoResizeUIView.m in Sources */,
 				A84083E76E518050B65E523A /* SkyButton.m in Sources */,
 				A840835FAC7F18A6A7021415 /* RingSkyButton.m in Sources */,
 				A84086D3F4BD2D551CA67611 /* AlertDialogs.m in Sources */,
+				8DB6C6362429080C005E2F4C /* PsiCashMessageWithRetryView.swift in Sources */,
 				A840854A7ACA14A7D891EC16 /* OnboardingScrollableView.m in Sources */,
+				8D417EDD2419DBA100FEE587 /* ProductRequest.swift in Sources */,
+				52B3C54A23DF99E8003F6B12 /* AppObservables.m in Sources */,
 				A84084C8B5C16F0EB80364FA /* Strings.m in Sources */,
 				A8408FF45D08D31E102FA41F /* ContainerDB.m in Sources */,
+				5245C5C92342A6840033EE13 /* UserDefaults.swift in Sources */,
+				52B3C54C23E0E895003F6B12 /* ButtonBuilder.swift in Sources */,
+				8D417E9D2411A0C200FEE587 /* PaymentQueue.swift in Sources */,
 				A8408D8C16D136075590193C /* AppUpgrade.m in Sources */,
 				A8408692D005E8599267522E /* UIView+Additions.m in Sources */,
 				A84087AFA5806D689C3BF6D2 /* PickerViewController.m in Sources */,
+				52A2467123A176BA00A01FF1 /* PsiCashPurchasingAlertViewBuilder.swift in Sources */,
+				8D9E603224366AF2003A46D8 /* StoreDelegate.swift in Sources */,
 				A8408EB1E9DABE35016580A7 /* ImageUtils.m in Sources */,
 				A8408BC29B903A6C0A32F32C /* SkyRegionSelectionViewController.m in Sources */,
+				8D417E9F2411A60900FEE587 /* PsiCashEffects.swift in Sources */,
 				A84088D3FD4B01A7D14CCC53 /* SupportedLanguages.m in Sources */,
 				A8408F99941C9664E3E7C48A /* LanguageSelectionViewController.m in Sources */,
 				A8408A3A478ECD6E3562CDF4 /* CloudsView.m in Sources */,
 				A84081194DA12328ABB5A43E /* UIImageView+Additions.m in Sources */,
 				A840849074861D633B3EB4D1 /* AppEvent.m in Sources */,
 				A84080E9FC63E29F71A79A63 /* RelaySubject.m in Sources */,
+				8D9E602C24364EE6003A46D8 /* TunnelProviderManager.swift in Sources */,
 				A840803A0733D9FCA5410796 /* ActivityIndicatorRoyalSkyButton.m in Sources */,
 				A84084F47D4EA8D2B91E6609 /* SubscriptionData.m in Sources */,
+				52467FF922CE77A1009AEC6E /* Foundation+Additions.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1756,7 +1950,6 @@
 				521FD0FE219E0E1900F748EC /* AppProfiler.m in Sources */,
 				EF90D7B4204F234100228A63 /* NSDate+Comparator.m in Sources */,
 				9BFECEA225F023F895CC8DA1 /* Authorization.m in Sources */,
-				9BFEC10661A7DC0402AF4B37 /* AsyncOperation.m in Sources */,
 				9BFECF9F760F1A93A8933089 /* Nullity.m in Sources */,
 				9BFEC5C256EBC72398FAE8D8 /* UnionSerialQueue.m in Sources */,
 				521FD100219E0E3800F748EC /* DebugUtils.m in Sources */,
@@ -1830,6 +2023,7 @@
 		4E0D88281FA06B2400ADB61E /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
@@ -1849,7 +2043,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.psiphon.PsiphonUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_TARGET_NAME = Psiphon;
 			};
@@ -1858,6 +2052,7 @@
 		4E0D88291FA06B2400ADB61E /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
@@ -1872,9 +2067,79 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.psiphon.PsiphonUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_TARGET_NAME = Psiphon;
+			};
+			name = Release;
+		};
+		52C8F0A6237C8ED600E5F9C0 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 148;
+				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = Q6HLNEX92A;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 148;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				INFOPLIST_FILE = PsiphonPlayground/Info.plist;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 13.2;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = ca.psiphon.PsiphonPlayground;
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Debug;
+		};
+		52C8F0A7237C8ED600E5F9C0 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 148;
+				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = Q6HLNEX92A;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 148;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				INFOPLIST_FILE = PsiphonPlayground/Info.plist;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 13.2;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = ca.psiphon.PsiphonPlayground;
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
 			};
 			name = Release;
 		};
@@ -1891,12 +2156,14 @@
 				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
@@ -1949,12 +2216,14 @@
 				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
@@ -1994,23 +2263,27 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = Psiphon/Psiphon.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				CURRENT_PROJECT_VERSION = 106;
+				CURRENT_PROJECT_VERSION = 148;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = Q6HLNEX92A;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = Psiphon/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
-				OTHER_SWIFT_FLAGS = "-D DEBUG";
+				OTHER_SWIFT_FLAGS = "$(inherited) -DDEBUG";
 				PRODUCT_BUNDLE_IDENTIFIER = ca.psiphon.Psiphon;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				STRIP_BITCODE_FROM_COPIED_FILES = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "Psiphon/Psiphon-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
 				USER_HEADER_SEARCH_PATHS = "\"${PROJECT_DIR}/Pods\"/** ${PROJECT_DIR}/Psiphon/asn1c";
 				VERSIONING_SYSTEM = "apple-generic";
 			};
@@ -2022,22 +2295,25 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = Psiphon/Psiphon.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				CURRENT_PROJECT_VERSION = 106;
+				CURRENT_PROJECT_VERSION = 148;
 				DEVELOPMENT_TEAM = "";
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = Psiphon/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
-				OTHER_SWIFT_FLAGS = "";
+				OTHER_SWIFT_FLAGS = "$(inherited)";
 				PRODUCT_BUNDLE_IDENTIFIER = ca.psiphon.Psiphon;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				STRIP_BITCODE_FROM_COPIED_FILES = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "Psiphon/Psiphon-Bridging-Header.h";
+				SWIFT_VERSION = 5.0;
 				USER_HEADER_SEARCH_PATHS = "\"${PROJECT_DIR}/Pods\"/** ${PROJECT_DIR}/Psiphon/asn1c";
 				VERSIONING_SYSTEM = "apple-generic";
 			};
@@ -2110,6 +2386,15 @@
 			buildConfigurations = (
 				4E0D88281FA06B2400ADB61E /* Debug */,
 				4E0D88291FA06B2400ADB61E /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		52C8F0A8237C8ED600E5F9C0 /* Build configuration list for PBXNativeTarget "PsiphonPlayground" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				52C8F0A6237C8ED600E5F9C0 /* Debug */,
+				52C8F0A7237C8ED600E5F9C0 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

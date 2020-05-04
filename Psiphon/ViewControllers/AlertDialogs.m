@@ -19,6 +19,7 @@
 
 #import "AlertDialogs.h"
 #import "Strings.h"
+#import "Psiphon-Swift.h"
 
 
 @implementation AlertDialogs
@@ -43,7 +44,7 @@
                                   }];
      }];
 
-    UIAlertAction *dismissAction = [UIAlertAction actionWithTitle:[Strings dismissButtonTitle]
+    UIAlertAction *dismissAction = [UIAlertAction actionWithTitle:[UserStrings Dismiss_button_title]
                                                             style:UIAlertActionStyleCancel
                                                           handler:^(UIAlertAction *action) {
                                                               // Do nothing.
@@ -60,7 +61,7 @@
       alertControllerWithTitle:[Strings privacyPolicyTitle]
                        message:[Strings privacyPolicyDeclinedAlertBody]
                 preferredStyle:UIAlertControllerStyleAlert];
-    UIAlertAction *dismissAction = [UIAlertAction actionWithTitle:[Strings dismissButtonTitle]
+    UIAlertAction *dismissAction = [UIAlertAction actionWithTitle:[UserStrings Dismiss_button_title]
                                                             style:UIAlertActionStyleCancel
                                                           handler:^(UIAlertAction *action) {
                                                               // Do nothing.
@@ -74,9 +75,9 @@
 + (UIAlertController *)genericOperationFailedTryAgain {
     UIAlertController *alert = [UIAlertController
       alertControllerWithTitle:[Strings operationFailedAlertTitle]
-                       message:[Strings operationFailedAlertMessage]
+                       message:[UserStrings Operation_failed_alert_message]
                 preferredStyle:UIAlertControllerStyleAlert];
-    UIAlertAction *dismissAction = [UIAlertAction actionWithTitle:[Strings dismissButtonTitle]
+    UIAlertAction *dismissAction = [UIAlertAction actionWithTitle:[UserStrings Dismiss_button_title]
                                                             style:UIAlertActionStyleCancel
                                                           handler:^(UIAlertAction *action) {
                                                               // Do nothing.

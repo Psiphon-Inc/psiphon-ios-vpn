@@ -55,10 +55,16 @@ PODS:
     - nanopb/encode (= 0.3.9011)
   - nanopb/decode (0.3.9011)
   - nanopb/encode (0.3.9011)
-  - PersonalizedAdConsent (1.0.3)
+  - PersonalizedAdConsent (1.0.5)
+  - PromisesObjC (1.2.8)
+  - PromisesSwift (1.2.8):
+    - PromisesObjC (= 1.2.8)
   - PsiphonClientCommonLibrary (1.2.3):
     - InAppSettingsKit
+  - ReactiveCocoa (10.2.0):
+    - ReactiveSwift (~> 6.2)
   - ReactiveObjC (3.1.0)
+  - ReactiveSwift (6.2.1)
   - SVProgressHUD (2.2.5)
 
 DEPENDENCIES:
@@ -69,8 +75,11 @@ DEPENDENCIES:
   - MoPub-AdMob-Adapters (~> 7.53.1)
   - mopub-ios-sdk (~> 5.11)
   - PersonalizedAdConsent (~> 1.0)
+  - PromisesSwift (~> 1.2)
   - PsiphonClientCommonLibrary (from `https://github.com/Psiphon-Inc/psiphon-ios-client-common-library.git`, commit `fae1d2e`)
+  - ReactiveCocoa (~> 10.1)
   - ReactiveObjC (from `https://github.com/Psiphon-Inc/ReactiveObjC.git`, commit `8bbf9dd`)
+  - ReactiveSwift (~> 6.2)
   - SVProgressHUD
 
 SPEC REPOS:
@@ -84,6 +93,10 @@ SPEC REPOS:
     - mopub-ios-sdk
     - nanopb
     - PersonalizedAdConsent
+    - PromisesObjC
+    - PromisesSwift
+    - ReactiveCocoa
+    - ReactiveSwift
     - SVProgressHUD
 
 EXTERNAL SOURCES:
@@ -118,11 +131,15 @@ SPEC CHECKSUMS:
   MoPub-AdMob-Adapters: f93ec396dd64e70ec3dcd8a1f2e5c1ae9fe8debe
   mopub-ios-sdk: 292b8e9a55a2e72a34afc04ec01e85486af46240
   nanopb: 18003b5e52dab79db540fe93fe9579f399bd1ccd
-  PersonalizedAdConsent: b50a8a5d6065b6db23121e8fcc0dce2ae983f6ea
+  PersonalizedAdConsent: dbecabb3467df967c16d9cebc2ef4a8890e4bbd8
+  PromisesObjC: c119f3cd559f50b7ae681fa59dc1acd19173b7e6
+  PromisesSwift: 37bad6f4daddb02f7c9c531efe91e8b21c13ee2f
   PsiphonClientCommonLibrary: 4bdd0e20d179458999451a5d17b74f33f6f2769b
+  ReactiveCocoa: a123c42f449c552460a4ee217dd49c76a17c8204
   ReactiveObjC: 2a38ea15335de4119d8b17caf1db1484f61db902
+  ReactiveSwift: 07ddf579f4eb3ee3bd656214f0461aaf2c0fd639
   SVProgressHUD: 1428aafac632c1f86f62aa4243ec12008d7a51d6
 
-PODFILE CHECKSUM: e56b16a8e67c8c1dbc78c0ed7c21b8f3c3ec2f55
+PODFILE CHECKSUM: 2d77d688a164d497c533314008ca7a071a164428
 
 COCOAPODS: 1.8.4
