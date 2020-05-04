@@ -82,3 +82,7 @@ launch_arguments(["-FASTLANE_SNAPSHOT YES"])
 
 # For more information about all available options run
 # fastlane snapshot --help
+
+# Disable concurrent simulators.
+# In the past running with concurrent simulators has caused issues.
+concurrent_simulators false
