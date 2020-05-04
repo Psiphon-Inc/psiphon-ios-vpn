@@ -19,11 +19,13 @@
 
 #import <PsiCashLib/PsiCash.h>
 #import "PsiCashLogger.h"
-#import "PsiCashClient.h"
-#import "PsiCashTypes.h"
 #import "PsiFeedbackLogger.h"
 
 NS_ASSUME_NONNULL_BEGIN
+
+PsiFeedbackLogType const PsiCashLogType = @"PsiCash";
+
+NSErrorDomain const PsiCashClientErrorDomain = @"PsiCashClientErrorDomain";
 
 @implementation PsiCashLogger {
     PsiCash *psiCash;
@@ -74,7 +76,7 @@ NS_ASSUME_NONNULL_BEGIN
     }
 
     if (![NSJSONSerialization isValidJSONObject:log]) {
-        [PsiFeedbackLogger errorWithType:PsiCashLogType message:@"invalid JSON object"];
+        [PsiFeedbackLogger errorWithType:PsiCashLogType format:@"invalid JSON object"];
         return;
     }
 
@@ -94,7 +96,7 @@ NS_ASSUME_NONNULL_BEGIN
                           };
 
     if (![NSJSONSerialization isValidJSONObject:log]) {
-        [PsiFeedbackLogger errorWithType:PsiCashLogType message:@"invalid JSON object"];
+        [PsiFeedbackLogger errorWithType:PsiCashLogType format:@"invalid JSON object"];
         return nil;
     }
 

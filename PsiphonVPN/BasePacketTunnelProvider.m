@@ -220,29 +220,26 @@ PsiFeedbackLogType const BasePacketTunnelProviderLogType = @"BasePacketTunnelPro
         }
 
         NSString *query = [[NSString alloc] initWithData:messageData encoding:NSUTF8StringEncoding];
-        NSNumber *respValue;
-
-        if ([EXTENSION_QUERY_IS_PROVIDER_ZOMBIE isEqualToString:query]) {
-            // If the Psiphon tunnel has been started when the extension was started
-            // responds with EXTENSION_RESP_TRUE, otherwise responds with EXTENSION_RESP_FALSE
-            respValue = [(id <BasePacketTunnelProviderProtocol>)self isNEZombie];
-
-        } else if ([EXTENSION_QUERY_IS_TUNNEL_CONNECTED isEqualToString:query]) {
-            respValue = [(id <BasePacketTunnelProviderProtocol>) self isTunnelConnected];
-
-        } else if ([EXTENSION_QUERY_IS_NETWORK_REACHABLE isEqualToString:query]) {
-            respValue = [(id <BasePacketTunnelProviderProtocol>) self isNetworkReachable];
-        }
-
-        NSData *respData = nil;
-        if ([respValue boolValue]) {
-            respData = [EXTENSION_RESP_TRUE dataUsingEncoding:NSUTF8StringEncoding];
-        } else {
-            respData = [EXTENSION_RESP_FALSE dataUsingEncoding:NSUTF8StringEncoding];
+        if ([EXTENSION_QUERY_TUNNEL_PROVIDER_STATE isEqualToString:query]) {
+            
+            id <BasePacketTunnelProviderProtocol> tunnelProvider = (id <BasePacketTunnelProviderProtocol>)self;
+            NSDictionary *responseDict = @{
+                @"isZombie": [tunnelProvider isNEZombie],
+                @"isPsiphonTunnelConnected": [tunnelProvider isTunnelConnected],
+                @"isNetworkReachable": [tunnelProvider isNetworkReachable]
+            };
+            
+            NSError *err;
+            // The resulting output will be UTF-8 encoded.
+            NSData *output = [NSJSONSerialization dataWithJSONObject:responseDict
+                                                             options:kNilOptions
+                                                               error:&err];
+            completionHandler(output);
+            return;
         }
 
         // iOS always expects completionHandler to be called.
-        completionHandler(respData);
+        completionHandler(nil);
     }
 }
 

@@ -31,10 +31,8 @@ PsiFeedbackLogType const NotifierLogType = @"Notifier";
 #pragma mark - NotiferMessage values
 
 // Messages sent by the extension.
-NotifierMessage const NotifierNewHomepages           = PSIPHON_VPN_GROUP @".NewHomepages";
 NotifierMessage const NotifierTunnelConnected        = PSIPHON_VPN_GROUP @".TunnelConnected";
 NotifierMessage const NotifierAvailableEgressRegions = PSIPHON_VPN_GROUP @".AvailableEgressRegions";
-NotifierMessage const NotifierMarkedAuthorizations   = PSIPHON_VPN_GROUP @".MarkedAuthorizations";
 NotifierMessage const NotifierNetworkConnectivityFailed = PSIPHON_VPN_GROUP @".NetworkConnectivityFailed";
 NotifierMessage const NotifierNetworkConnectivityResolved = PSIPHON_VPN_GROUP @".NetworkConnectivityResolved";
 
@@ -42,7 +40,7 @@ NotifierMessage const NotifierNetworkConnectivityResolved = PSIPHON_VPN_GROUP @"
 NotifierMessage const NotifierStartVPN               = PSIPHON_GROUP @".StartVPN";
 NotifierMessage const NotifierForceSubscriptionCheck = PSIPHON_GROUP @".ForceSubscriptionCheck";
 NotifierMessage const NotifierAppEnteredBackground   = PSIPHON_GROUP @".AppEnteredBackground";
-NotifierMessage const NotifierUpdatedAuthorizations  = PSIPHON_GROUP @".UpdatedAuthorizations";
+NotifierMessage const NotifierUpdatedNonSubscriptionAuths  = PSIPHON_GROUP @".UpdatedNonSubscriptionAuths";
 
 #if DEBUG
 NotifierMessage const NotifierDebugCustomFunction    = PSIPHON_GROUP @".DebugCustomFunction";
@@ -114,7 +112,7 @@ static inline void AddDarwinNotifyObserver(CFNotificationCenterRef center, const
     AddDarwinNotifyObserver(center, (__bridge const void *)self, (__bridge CFStringRef)NotifierStartVPN);
     AddDarwinNotifyObserver(center, (__bridge const void *)self, (__bridge CFStringRef)NotifierForceSubscriptionCheck);
     AddDarwinNotifyObserver(center, (__bridge const void *)self, (__bridge CFStringRef)NotifierAppEnteredBackground);
-    AddDarwinNotifyObserver(center, (__bridge const void *)self, (__bridge CFStringRef)NotifierUpdatedAuthorizations);
+    AddDarwinNotifyObserver(center, (__bridge const void *)self, (__bridge CFStringRef)NotifierUpdatedNonSubscriptionAuths);
 
 #if DEBUG
     AddDarwinNotifyObserver(center, (__bridge const void *)self, (__bridge CFStringRef)NotifierDebugCustomFunction);
@@ -125,10 +123,8 @@ static inline void AddDarwinNotifyObserver(CFNotificationCenterRef center, const
 
 #else
     // Listens to all messages sent by the extension.
-    AddDarwinNotifyObserver(center, (__bridge const void *)self, (__bridge CFStringRef)NotifierNewHomepages);
     AddDarwinNotifyObserver(center, (__bridge const void *)self, (__bridge CFStringRef)NotifierTunnelConnected);
     AddDarwinNotifyObserver(center, (__bridge const void *)self, (__bridge CFStringRef)NotifierAvailableEgressRegions);
-    AddDarwinNotifyObserver(center, (__bridge const void *)self, (__bridge CFStringRef)NotifierMarkedAuthorizations);
     AddDarwinNotifyObserver(center, (__bridge const void *)self, (__bridge CFStringRef)NotifierNetworkConnectivityFailed);
     AddDarwinNotifyObserver(center, (__bridge const void *)self, (__bridge CFStringRef)NotifierNetworkConnectivityResolved);
 
@@ -158,7 +154,7 @@ static inline void AddDarwinNotifyObserver(CFNotificationCenterRef center, const
         if (center) {
             CFNotificationCenterPostNotification(center, (__bridge CFStringRef)message, NULL, NULL, 0);
 
-            [PsiFeedbackLogger infoWithType:NotifierLogType message:@"sent [%@]", message];
+            [PsiFeedbackLogger infoWithType:NotifierLogType format:@"sent [%@]", message];
         }
     });
 
@@ -199,7 +195,7 @@ static inline void AddDarwinNotifyObserver(CFNotificationCenterRef center, const
 // Called on the main thread.
 - (void)notificationCallback:(NotifierMessage)message {
 
-    [PsiFeedbackLogger infoWithType:NotifierLogType message:@"received [%@]", message];
+    [PsiFeedbackLogger infoWithType:NotifierLogType format:@"received [%@]", message];
 
     // Since subscribers could potentially block the main thread, we will not block the main
     // thread to send the message to `messageSubject`.

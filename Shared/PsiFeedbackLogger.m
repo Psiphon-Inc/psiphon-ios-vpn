@@ -52,10 +52,12 @@
 NSString * const InfoNoticeType = @"ExtensionInfo";
 NSString * const WarnNoticeType = @"ExtensionWarn";
 NSString * const ErrorNoticeType = @"ExtensionError";
+NSString * const FatalErrorNoticeType = @"ExtensionFatalError";
 #else
 NSString * const InfoNoticeType = @"ContainerInfo";
 NSString * const WarnNoticeType = @"ContainerWarn";
 NSString * const ErrorNoticeType = @"ContainerError";
+NSString * const FatalErrorNoticeType = @"ContainerFatalError";
 #endif
 
 
@@ -159,7 +161,16 @@ PsiFeedbackLogType const FeedbackInternalLogType = @"FeedbackLoggerInternal";
 
 }
 
-+ (void)infoWithType:(PsiFeedbackLogType)sourceType message:(NSString *)format, ... {
++ (void)infoWithType:(PsiFeedbackLogType)sourceType message:(NSString *)message {
+    NSDictionary *data = @{sourceType : message};
+    [[PsiFeedbackLogger sharedInstance] writeData:data noticeType:InfoNoticeType];
+    
+#if DEBUG
+    NSLog(@"<INFO> %@", data);
+#endif
+}
+
++ (void)infoWithType:(PsiFeedbackLogType)sourceType format:(NSString *)format, ... {
 
     NSString *message;
     CONVERT_FORMAT_ARGS_TO_NSSTRING(message, format);
@@ -183,7 +194,16 @@ PsiFeedbackLogType const FeedbackInternalLogType = @"FeedbackLoggerInternal";
 
 }
 
-+ (void)warnWithType:(PsiFeedbackLogType)sourceType message:(NSString *)format, ... {
++ (void)warnWithType:(PsiFeedbackLogType)sourceType message:(NSString *)message {
+    NSDictionary *data = @{sourceType : message};
+    [[PsiFeedbackLogger sharedInstance] writeData:data noticeType:WarnNoticeType];
+    
+#if DEBUG
+    NSLog(@"<WARN> %@", data);
+#endif
+}
+
++ (void)warnWithType:(PsiFeedbackLogType)sourceType format:(NSString *)format, ... {
 
     NSString *message;
     CONVERT_FORMAT_ARGS_TO_NSSTRING(message, format);
@@ -228,7 +248,16 @@ PsiFeedbackLogType const FeedbackInternalLogType = @"FeedbackLoggerInternal";
 
 }
 
-+ (void)errorWithType:(PsiFeedbackLogType)sourceType message:(NSString *)format, ... {
++ (void)errorWithType:(PsiFeedbackLogType)sourceType message:(NSString *)message {
+    NSDictionary *data = @{sourceType : message};
+    [[PsiFeedbackLogger sharedInstance] writeData:data noticeType:ErrorNoticeType];
+    
+#if DEBUG
+    NSLog(@"<ERROR> %@", data);
+#endif
+}
+
++ (void)errorWithType:(PsiFeedbackLogType)sourceType format:(NSString *)format, ... {
 
     NSString *message;
     CONVERT_FORMAT_ARGS_TO_NSSTRING(message, format);
@@ -261,6 +290,15 @@ PsiFeedbackLogType const FeedbackInternalLogType = @"FeedbackLoggerInternal";
     NSLog(@"<ERROR> %@", data);
 #endif
 
+}
+
++ (void)fatalErrorWithType:(PsiFeedbackLogType)sourceType message:(NSString *)message {
+    NSDictionary *data = @{sourceType : message};
+    [[PsiFeedbackLogger sharedInstance] writeData:data noticeType:FatalErrorNoticeType];
+    
+#if DEBUG
+    NSLog(@"<FATAL> %@", data);
+#endif
 }
 
 + (void)logNoticeWithType:(NSString *)noticeType message:(NSString *)message timestamp:(NSString *)timestamp {
@@ -347,7 +385,7 @@ PsiFeedbackLogType const FeedbackInternalLogType = @"FeedbackLoggerInternal";
     };
 
     if (![NSJSONSerialization isValidJSONObject:outputDic]) {
-        [PsiFeedbackLogger errorWithType:FeedbackInternalLogType message:@"invalid log dictionary"];
+        [PsiFeedbackLogger errorWithType:FeedbackInternalLogType format:@"invalid log dictionary"];
 
 #if DEBUG
         abort();
