@@ -111,13 +111,13 @@ func iapReducer(
         
     case .verifiedPsiCashConsumable(let verifiedTx):
         guard case let .pendingVerificationResult(pendingTx) = state.iap.unverifiedPsiCashTx else {
-            fatalError("""
+            fatalErrorFeedbackLog("""
                 found no unverified transaction equal to '\(verifiedTx)' \
                 pending verification result
                 """)
         }
         guard verifiedTx.value == pendingTx.value else {
-            fatalError("""
+            fatalErrorFeedbackLog("""
                 transactions are not equal '\(verifiedTx)' != '\(pendingTx)'
                 """)
         }
@@ -162,7 +162,7 @@ func iapReducer(
                         case .purchased:
                             switch try? AppStoreProductType.from(transaction: transaction) {
                             case .none:
-                                fatalError("unknown product \(String(describing: transaction))")
+                                fatalErrorFeedbackLog("unknown product \(String(describing: transaction))")
                                 
                             case .psiCash:
                                 switch state.iap.unverifiedPsiCashTx?.transaction
@@ -200,7 +200,7 @@ func iapReducer(
                                     let unverifiedTxId = state.iap.unverifiedPsiCashTx!
                                     .transaction.value.transactionIdentifier ?? "(none)"
                                     let newTxId = transaction.transactionIdentifier ?? "(none)"
-                                    fatalError("""
+                                    fatalErrorFeedbackLog("""
                                     cannot have two completed but unverified consumable purchases: \
                                         unverified transaction: '\(unverifiedTxId)', \
                                         new transaction: '\(newTxId)'

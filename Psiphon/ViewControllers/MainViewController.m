@@ -500,12 +500,10 @@ typedef NS_ENUM(NSInteger, VPNIntent) {
     }] doNext:^(RACTwoTuple<NSNumber*, SwitchedVPNStartStopIntent*> *value) {
         VPNIntent vpnIntent = (VPNIntent)[value.first integerValue];
         dispatch_async_main(^{
-            // If there is no internet connectivity, skips sending a start intent
-            // to SwiftDelegate, and shows an alert to the user instead.
+            [SwiftDelegate.bridge sendNewVPNIntent:value.second];
+
             if (vpnIntent == VPNIntentNoInternetAlert) {
                 // TODO: Show the no internet alert.
-            } else {
-                [SwiftDelegate.bridge sendNewVPNIntent:value.second];
             }
         });
     }] deliverOnMainThread];

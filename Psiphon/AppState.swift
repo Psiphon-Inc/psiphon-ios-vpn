@@ -46,6 +46,7 @@ struct DebugFlags {
     var disableURLHandler = false
     var devServers = true
     var ignoreTunneledChecks = false
+    var disableConnectOnDemand = false
     
     var printStoreLogs = false
     var printAppState = true
@@ -56,6 +57,7 @@ struct DebugFlags {
                      disableURLHandler: false,
                      devServers: false,
                      ignoreTunneledChecks: false,
+                     disableConnectOnDemand: false,
                      printStoreLogs: false,
                      printAppState: false,
                      printHttpRequests: false)

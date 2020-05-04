@@ -102,7 +102,7 @@ import Promises
         switch switchedIntent {
         case .start(transition: .none): return true
         case .stop: return false
-        default: fatalError()
+        default: fatalErrorFeedbackLog("Unexpected tunnel intent value '\(switchedIntent)'")
         }
     }
     
@@ -118,7 +118,7 @@ import Promises
         subscriptionStatus: SubscriptionStatus
     ) -> Self {
         guard case .completed(_) = state.providerSyncResult else {
-            fatalError("expected no pending sync with tunnel provider")
+            fatalErrorFeedbackLog("expected no pending sync with tunnel provider")
         }
         
         let userSubscribed: Bool
@@ -128,7 +128,7 @@ import Promises
         case .notSubscribed:
             userSubscribed = false
         case .unknown:
-            fatalError("expected subscription status to not be unknown")
+            fatalErrorFeedbackLog("expected subscription status to not be unknown")
         }
         
         switch state.tunnelIntent {

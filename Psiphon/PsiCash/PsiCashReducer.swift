@@ -73,7 +73,7 @@ func psiCashReducer<T: TunnelProviderManager>(
             return []
         }
         guard let purchasable = purchasableType.speedBoost else {
-            fatalError()
+            fatalErrorFeedbackLog("Expected a PsiCashPurchasable in '\(purchasableType)'")
         }
         state.psiCash.purchasing = .speedBoost(purchasable)
         return [
@@ -84,12 +84,14 @@ func psiCashReducer<T: TunnelProviderManager>(
         
     case .psiCashProductPurchaseResult(let purchaseResult):
         guard case .speedBoost(_) = state.psiCash.purchasing else {
-            fatalError("""
+            fatalErrorFeedbackLog("""
                 Expected '.speedBoost' state:'\(String(describing: state.psiCash.purchasing))'
                 """)
         }
         guard purchaseResult.purchasable.speedBoost != nil else {
-            fatalError("Expected '.speedBoost'; purchasable: '\(purchaseResult.purchasable)'")
+            fatalErrorFeedbackLog("""
+                Expected '.speedBoost'; purchasable: '\(purchaseResult.purchasable)'
+                """)
         }
         
         state.psiCash.libData = purchaseResult.refreshedLibData
@@ -98,7 +100,7 @@ func psiCashReducer<T: TunnelProviderManager>(
         switch purchaseResult.result {
         case .success(let purchasedType):
             guard case .speedBoost(let purchasedProduct) = purchasedType else {
-                fatalError("Expected '.speedBoost' purchased type")
+                fatalErrorFeedbackLog("Expected '.speedBoost' purchased type")
             }
             state.psiCash.purchasing = .none
             return [

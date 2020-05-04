@@ -237,7 +237,7 @@ enum PsiCashTransactionClass: String, Codable, CaseIterable {
         case PsiCashTransactionClass.speedBoost.rawValue:
             return .speedBoost
 
-        default: preconditionFailure(
+        default: preconditionFailureFeedbackLog(
             "unknown PsiCash transaction class '\(transactionClass)'")
         }
     }

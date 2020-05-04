@@ -426,7 +426,7 @@ extension DispatchTimeInterval {
         case .never:
             result = nil
         @unknown default:
-            fatalError("Unknown value '\(String(describing: self))'")
+            fatalErrorFeedbackLog("Unknown value '\(String(describing: self))'")
         }
 
         return result
@@ -438,7 +438,7 @@ extension DispatchTimeInterval {
 func plistReader<DecodeType: Decodable>(key: String, toType: DecodeType.Type) throws -> DecodeType {
     // TODO: Add bundle dependency as an argument.
     guard let url = Bundle.main.url(forResource: key, withExtension: "plist") else {
-        fatalError("'\(key).plist' is not valid")
+        fatalErrorFeedbackLog("'\(key).plist' is not valid")
     }
 
     let data = try Data(contentsOf: url)
