@@ -25,7 +25,6 @@
 #import "RingSkyButton.h"
 #import "UIFont+Additions.h"
 #import "RoyalSkyButton.h"
-#import "VPNManager.h"
 #import "RACCompoundDisposable.h"
 #import "AlertDialogs.h"
 #import "UIView+Additions.h"
@@ -36,12 +35,15 @@
 #import "AppDelegate.h"
 #import "CloudsView.h"
 #import "Logging.h"
+#import "Psiphon-Swift.h"
 
 const int NumPages = 4;
 
 @interface OnboardingViewController ()
 
 @property (nonatomic) RACCompoundDisposable *compoundDisposable;
+
+@property (nonatomic) FBLPromise<NSNumber *> *_Nullable installVPNPromise;
 
 @end
 
@@ -51,12 +53,15 @@ const int NumPages = 4;
     UIButton *nextPageButton;
 
     UIView *currentOnboardingView;
+    
+    
 }
 
 - (instancetype)init {
     self = [super init];
     if (self) {
         _compoundDisposable = [RACCompoundDisposable compoundDisposable];
+        _installVPNPromise = nil;
     }
     return self;
 }
@@ -174,14 +179,14 @@ const int NumPages = 4;
         case 2: {
             // Privacy Policy page
             RoyalSkyButton *acceptButton = [[RoyalSkyButton alloc] initForAutoLayout];
-            [acceptButton setTitle:[Strings acceptButtonTitle]];
+            [acceptButton setTitle:[UserStrings Accept_button_title]];
             [acceptButton addTarget:self
                              action:@selector(onPrivacyPolicyAccepted)
                    forControlEvents:UIControlEventTouchUpInside];
             acceptButton.shadow = TRUE;
 
             RingSkyButton *declineButton = [[RingSkyButton alloc] initForAutoLayout];
-            [declineButton setTitle:[Strings declineButtonTitle]];
+            [declineButton setTitle:[UserStrings Decline_button_title]];
             [declineButton addTarget:self
                               action:@selector(onPrivacyPolicyDeclined)
                     forControlEvents:UIControlEventTouchUpInside];
@@ -241,38 +246,45 @@ const int NumPages = 4;
 
     // Prompt user for VPN configuration permission on page 4.
     if (newPage.tag == 4) {
-
-        __block RACDisposable *disposable = [[[VPNManager sharedInstance] reinstallVPNConfiguration]
-          subscribeNext:^(RACUnit *x) {
-              // Go to next onboarding page.
-              [weakSelf gotoNextPage];
-          }
-          error:^(NSError *error) {
-              // Go to previous page.
-              UIView *prvPage = [weakSelf createOnboardingViewForPage:3];
-              [weakSelf setCurrentOnboardingPage:prvPage];
-
-              // If the error was due to user denying permission to install VPN configuration,
-              // shows the `vpnPermissionDeniedAlert` instead of the generic operation failed alert.
-              if ([error.domain isEqualToString:NEVPNErrorDomain] &&
-                  error.code == NEVPNErrorConfigurationReadWriteFailed &&
-                  [error.localizedDescription isEqualToString:@"permission denied"] ) {
-
-                  // Present the VPN permission denied alert.
-                  UIAlertController *alert = [AlertDialogs vpnPermissionDeniedAlert];
-                  [weakSelf presentViewController:alert animated:TRUE completion:nil];
-
-              } else {
-                  UIAlertController *alert = [AlertDialogs genericOperationFailedTryAgain];
-                  [weakSelf presentViewController:alert animated:TRUE completion:nil];
-              }
-              [weakSelf.compoundDisposable removeDisposable:disposable];
-          }
-          completed:^{
-              [weakSelf.compoundDisposable removeDisposable:disposable];
-          }];
-
-        [self.compoundDisposable addDisposable:disposable];
+        if (self.installVPNPromise) {
+            [NSException raise:@"non-nil found"
+                        format:@"expected value of 'installVPNPromise' to be nil"];
+        }
+        
+        self.installVPNPromise = [[SwiftDelegate.bridge installVPNConfigWithPromise]
+                               then:^id _Nullable(VPNConfigInstallResultWrapper *_Nullable result) {
+            if (result == nil) {
+                [NSException raise:@"nil found" format:@"expected non-nil value"];
+            }
+            self.installVPNPromise = nil;
+            switch (result.value) {
+                case VPNConfigInstallResultInstalledSuccessfully: {
+                    // Go to next onboarding page.
+                    [weakSelf gotoNextPage];
+                    break;
+                }
+                case VPNConfigInstallResultPermissionDenied: {
+                    // Go to previous page.
+                    UIView *prvPage = [weakSelf createOnboardingViewForPage:3];
+                    [weakSelf setCurrentOnboardingPage:prvPage];
+                    
+                    // Present the VPN permission denied alert.
+                    UIAlertController *alert = [AlertDialogs vpnPermissionDeniedAlert];
+                    [weakSelf presentViewController:alert animated:TRUE completion:nil];
+                    break;
+                }
+                case VPNConfigInstallResultOtherError: {
+                    // Go to previous page.
+                    UIView *prvPage = [weakSelf createOnboardingViewForPage:3];
+                    [weakSelf setCurrentOnboardingPage:prvPage];
+                    
+                    UIAlertController *alert = [AlertDialogs genericOperationFailedTryAgain];
+                    [weakSelf presentViewController:alert animated:TRUE completion:nil];
+                    break;
+                }
+            }
+            return nil;
+        }];
     }
 }
 

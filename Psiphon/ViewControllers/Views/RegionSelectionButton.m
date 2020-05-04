@@ -42,7 +42,7 @@
 
         [self setBackgroundColor:[UIColor clearColor]];
         self.layer.cornerRadius = 8;
-        self.layer.borderColor = UIColor.denimBlueColor.CGColor;
+        self.layer.borderColor = UIColor.lightishBlueTwo.CGColor;
         self.layer.borderWidth = 2.f;
 
         flagImageView = [[UIImageView alloc] init];

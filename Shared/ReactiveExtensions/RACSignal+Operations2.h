@@ -102,56 +102,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (RACSignal *)retryWhen:(RACSignal *(^)(RACSignal * errors))notificationHandler;
 
 /**
- * Asynchronously subscribes observers to this signal on the specified operation queue.
- * The operation queue is required to have underlying serial dispatch queue.
- *
- * @note This operator can cause a deadlock if not used properly (hence the name "unsafe").
- *
- * Upon subscription to the returned signal a NSOperation is added to the `operationQueue` is
- * "finished" after the source signal has emitted one of the terminal events.
- * Events emitted by the receiver are forwarded to subscribers to the returned signal on the `queueScheduler`.
- *
- * @attention As long as receiver signal has not terminated (i.e. has not emitted error or completed),
- *            the operation added `operationQueue` will remain the queue and not be removed.
- *            Therefore, two operations on the same serial queue that are waiting for the other to complete
- *            will deadlock.
- *
- *            Example of a deadlock:
- *            @code
- *            UnionSerialQueue *serialQueue = [UnionSerialQueue createWithLabel:@"ca.psiphon.Psiphon.VPNManagerSerialQueue"];
- *            dispatch_queue_t serialQueue;
- *            NSOperationQueue *operationQueue; // with serialQueue as underlying dispatch queue.
- *            RACTargetQueueScheduler *queueScheduler; // with serialQueue as underlying dispatch queue.
- *
- *            RACSignal *signal1 = [[RACSignal return:@"source"]
- *              unsafeSubscribeOnSerialQueue:operationQueue scheduler:queueScheduler];
- *
- *            RACSignal *signal2= [[[[RACSignal return:@"first"] flattenMap:^RACSignal *(id value) {
- *                return signal1;
- *              }]
- *              unsafeSubscribeOnSerialQueue:serialQueue withName:@"serialQueueName"]
- *              subscribeNext:^(id x) {
- *                 // Never reached due to deadlock.
- *              }];
- *
- *            @endcode
- *
- *            signal2 is first scheduled on the operationQueue (queue = [signal2NSOperation]) upon subscription.
- *            Once signal2NSOperation execution is started, signal2 emits "first", and subsequent flatMap operator
- *            will return signal1.
- *            Upon subscription to the returned signal1 from flatMap, signal1NSOperation is added to operationQueue
- *            (queue = [signal2NSOperation, signal1NSOperation]).
- *            Since signal1 is waiting for signal2 to terminate, but signal2 is waiting for the result of
- *            signal1, a deadlock occurs.
- *
- * @param serialQueue An instance of UnionSerialQueue.
- * @param name Operation name.
- * @return The source observable modified so that its subscriptions happens on the specified NSOperationQueue.
- */
-- (RACSignal *)unsafeSubscribeOnSerialQueue:(UnionSerialQueue *)serialQueue
-                                   withName:(NSString *)name;
-
-/**
  * Combines the emission from receiving signal with the latest emission from provided `signal`.
  * Emissions from the receiving signal are dropped as long as `signal` has not emitted any values.
  *

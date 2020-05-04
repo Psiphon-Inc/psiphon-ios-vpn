@@ -109,13 +109,6 @@ NS_ASSUME_NONNULL_BEGIN
 #pragma mark - Container Data (Data originating in the container)
 
 /**
- * @brief Returns previously persisted app foreground state from the shared NSUserDefaults
- *        NOTE: returns FALSE if no previous value was set using updateAppForegroundState:
- * @return TRUE if app if on the foreground, FALSE otherwise.
- */
-- (BOOL)getAppForegroundState;
-
-/**
  * Last date/time immediately before the extension was last started from the container.
  * Check where `setContainerTunnelStartTime:` is called to set the last tunnel start time.
  *
@@ -124,14 +117,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSDate *_Nullable)getContainerTunnelStartTime;
 
 #if !(TARGET_IS_EXTENSION)
-
-/**
- * @brief Sets app foreground state in shared NSSUserDefaults dictionary.
- *        NOTE: this method blocks until changes are written to disk.
- * @param foreground Whether app is on the foreground or not.
- * @return TRUE if change was persisted to disk successfully, FALSE otherwise.
- */
-- (BOOL)updateAppForegroundState:(BOOL)foreground;
 
 /**
  * Time immediately before the extension is started from the tunnel.
@@ -233,22 +218,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 #if TARGET_IS_EXTENSION
 
-- (void)appendExpiredAuthorizationIDs:(NSSet<NSString *> *_Nullable)authsIDsToAppend;
-
-- (void)markExpiredAuthorizationIDs:(NSSet<NSString *> *_Nullable)authorizations;
+- (void)removeNonSubscriptionAuthorizationsNotAccepted:(NSSet<NSString *> *_Nullable)authIdsToRemove;
 
 #else
 
-- (void)setContainerAuthorizations:(NSSet<Authorization *> *_Nullable)authorizations;
+- (void)setNonSubscriptionAuthorizations:(NSSet<Authorization *> *_Nullable)authorizations;
+
+- (void)appendNonSubscriptionAuthorization:(Authorization *_Nonnull)authorization;
 
 #endif
 
-- (NSSet<Authorization *> *)getContainerAuthorizations;
-
-- (NSSet<Authorization *> *)getNonMarkedAuthorizations;
-
-- (NSSet<NSString *> *)getMarkedExpiredAuthorizationIDs;
-
+- (NSSet<Authorization *> *)getNonSubscriptionAuthorizations;
 
 #pragma mark - Jetsam counter
 

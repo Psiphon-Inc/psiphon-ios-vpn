@@ -157,22 +157,12 @@
             }
 
             dispatch_async(dispatch_get_main_queue(), ^{
-                // Calculate IndexPaths
-                NSUInteger currentNumRows = [self.diagnosticEntries count];
-                NSUInteger numRowsToAdd = [newEntries count];
-                NSMutableArray *indexPaths = [[NSMutableArray alloc] initWithCapacity:numRowsToAdd];
-                for (int i = 0; i < numRowsToAdd; ++i) {
-                    [indexPaths addObject:[NSIndexPath indexPathForRow:(i+currentNumRows) inSection:0]];
-                }
 
                 // Checks if last row was visible before the update.
-                BOOL lastRowWasVisible = isFirstLogRead || [self.tableView.indexPathsForVisibleRows containsObject:
-                  [NSIndexPath indexPathForRow:(currentNumRows - 1) inSection:0]];
+                BOOL lastRowWasVisible = isFirstLogRead || [self lastRowVisible];
 
-                [self.tableView beginUpdates];
-                [self.diagnosticEntries addObjectsFromArray:newEntries];
-                [self.tableView insertRowsAtIndexPaths:indexPaths withRowAnimation:UITableViewRowAnimationNone];
-                [self.tableView endUpdates];
+                // Add new entries to the table.
+                [self addEntries:newEntries];
 
                 // Only scroll to bottom if last row before the update
                 // was visible on the screen.
