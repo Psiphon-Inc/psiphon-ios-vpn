@@ -56,7 +56,7 @@ class PsiphonUITests: XCTestCase {
         // Use XCTAssert and related functions to verify your tests produce the correct results.
         snapshot("main")
 
-        XCUIApplication().buttons["regionSelectionButton"].tap() // Go to region selection
+        XCUIApplication().otherElements["regionSelectionButton"].tap() // Go to region selection
         snapshot("settings-region")
         XCUIApplication().navigationBars.buttons.element(boundBy: 0).tap() // Back to main screen
 
