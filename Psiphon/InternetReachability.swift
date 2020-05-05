@@ -51,7 +51,7 @@ enum ReachabilityAction {
 }
 
 struct ReachabilityState: Equatable {
-    var networkStatus: NetworkStatus = .init(0)
+    var networkStatus: NetworkStatus = NotReachable
     var codedStatus: ReachabilityCodedStatus = ""
 }
 

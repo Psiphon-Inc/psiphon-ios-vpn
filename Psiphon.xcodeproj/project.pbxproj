@@ -123,6 +123,7 @@
 		8D00AA4A2450B4D1001EB8DD /* SubscriptionPurchaseVerification.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D00AA492450B4D1001EB8DD /* SubscriptionPurchaseVerification.swift */; };
 		8D019B802451D864006F21C4 /* HTTPStatusCode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D019B7F2451D864006F21C4 /* HTTPStatusCode.swift */; };
 		8D255E2B2461E06900FD5D1C /* InternetReachability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D255E2A2461E06900FD5D1C /* InternetReachability.swift */; };
+		8D255E2D24620E2900FD5D1C /* NoConnectionBannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D255E2C24620E2900FD5D1C /* NoConnectionBannerView.swift */; };
 		8D417E992411954A00FEE587 /* PsiCashReducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D417E982411954A00FEE587 /* PsiCashReducer.swift */; };
 		8D417E9D2411A0C200FEE587 /* PaymentQueue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D417E9C2411A0C200FEE587 /* PaymentQueue.swift */; };
 		8D417E9F2411A60900FEE587 /* PsiCashEffects.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D417E9E2411A60900FEE587 /* PsiCashEffects.swift */; };
@@ -511,6 +512,7 @@
 		8D00AA492450B4D1001EB8DD /* SubscriptionPurchaseVerification.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionPurchaseVerification.swift; sourceTree = "<group>"; };
 		8D019B7F2451D864006F21C4 /* HTTPStatusCode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTTPStatusCode.swift; sourceTree = "<group>"; };
 		8D255E2A2461E06900FD5D1C /* InternetReachability.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InternetReachability.swift; sourceTree = "<group>"; };
+		8D255E2C24620E2900FD5D1C /* NoConnectionBannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoConnectionBannerView.swift; sourceTree = "<group>"; };
 		8D417E982411954A00FEE587 /* PsiCashReducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PsiCashReducer.swift; sourceTree = "<group>"; };
 		8D417E9C2411A0C200FEE587 /* PaymentQueue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentQueue.swift; sourceTree = "<group>"; };
 		8D417E9E2411A60900FEE587 /* PsiCashEffects.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PsiCashEffects.swift; sourceTree = "<group>"; };
@@ -989,6 +991,7 @@
 				8D7E9B9C2425DF42006F3A2F /* AnimatedUIView.swift */,
 				8D7E9B9E2425E053006F3A2F /* Animations.swift */,
 				8DB6C637242A4D06005E2F4C /* DuskButton.swift */,
+				8D255E2C24620E2900FD5D1C /* NoConnectionBannerView.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -1753,6 +1756,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				52A2465E239081C100A01FF1 /* AppState.swift in Sources */,
+				8D255E2D24620E2900FD5D1C /* NoConnectionBannerView.swift in Sources */,
 				EF90D7A6204F22C900228A63 /* NSDate+Comparator.m in Sources */,
 				4EB846422151830600687344 /* AvailableServerRegions.m in Sources */,
 				5246800922D51CE4009AEC6E /* PsiCashBalanceView.swift in Sources */,

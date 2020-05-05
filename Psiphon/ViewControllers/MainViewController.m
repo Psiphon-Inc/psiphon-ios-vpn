@@ -110,6 +110,7 @@ typedef NS_ENUM(NSInteger, VPNIntent) {
     // Replaces the PsiCash UI when the user is subscribed
     UIImageView *psiphonLargeLogo;
     UIImageView *psiphonTitle;
+    NoConnectionBannerView *noConnectionBannerView;
 
     // PsiCash
     PsiCashWidgetView *psiCashWidget;
@@ -193,6 +194,7 @@ typedef NS_ENUM(NSInteger, VPNIntent) {
     [self setupVersionLabel];
     [self setupPsiphonLogoView];
     [self setupPsiphonTitle];
+    [self setupNoConnectionBannerView];
     [self setupStartAndStopButton];
     [self setupStatusLabel];
     [self setupRegionSelectionButton];
@@ -311,7 +313,8 @@ typedef NS_ENUM(NSInteger, VPNIntent) {
         [self.compoundDisposable addDisposable:startDisposable];
     }
 
-    // Subscribes to `AppDelegate.psiCashBalance` subject to receive PsiCash balance updates.
+    // Subscribes to `AppObservable.shared.psiCashBalance` subject
+    // to receive PsiCash balance updates.
     {
         [self.compoundDisposable addDisposable:[AppObservables.shared.psiCashBalance
                                 subscribeNext:^(BridgedBalanceViewBindingType * _Nullable balance) {
@@ -322,14 +325,30 @@ typedef NS_ENUM(NSInteger, VPNIntent) {
         }]];
     }
 
-    // Subscribes to `AppDelegate.speedBoostExpiry` subject to update `psiCashWidget` with the
-    // latest expiry time.
+    // Subscribes to `AppObservable.shared.speedBoostExpiry` subject
+    // to update `psiCashWidget` with the latest expiry time.
     {
         [self.compoundDisposable addDisposable:[AppObservables.shared.speedBoostExpiry
                                                 subscribeNext:^(NSDate * _Nullable expiry) {
             MainViewController *__strong strongSelf = weakSelf;
             if (strongSelf) {
                 [strongSelf->psiCashWidget.speedBoostButton setExpiryTime:expiry];
+            }
+        }]];
+    }
+    
+    // Subscribes to `AppObservable.shared.speedBoostExpiry` subject
+    {
+        [self.compoundDisposable addDisposable:
+         [AppObservables.shared.reachabilityStatus subscribeNext:^(NSNumber * _Nullable statusObj) {
+            MainViewController *__strong strongSelf = weakSelf;
+            if (strongSelf) {
+                NetworkStatus networkStatus = (NetworkStatus)[statusObj integerValue];
+                if (networkStatus == NotReachable) {
+                    [strongSelf->noConnectionBannerView setHidden: FALSE];
+                } else {
+                    [strongSelf->noConnectionBannerView setHidden: TRUE];
+                }
             }
         }]];
     }
@@ -661,6 +680,7 @@ typedef NS_ENUM(NSInteger, VPNIntent) {
     settingsButton = [[AnimatedUIButton alloc] init];
     psiphonLargeLogo = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"PsiphonLogoWhite"]];
     psiphonTitle = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"PsiphonTitle"]];
+    noConnectionBannerView = [[NoConnectionBannerView alloc] init];
     psiCashWidget = [[PsiCashWidgetView alloc] initWithFrame:CGRectZero];
     startAndStopButton = [VPNStartAndStopButton buttonWithType:UIButtonTypeCustom];
     statusLabel = [[UILabel alloc] init];
@@ -685,6 +705,7 @@ typedef NS_ENUM(NSInteger, VPNIntent) {
     [self.view addSubview:regionSelectionButton];
     [self.view addSubview:bottomBar];
     [self.view addSubview:subscriptionsBar];
+    [self.view addSubview:noConnectionBannerView];
 }
 
 - (void)setupClouds {
@@ -1159,6 +1180,18 @@ typedef NS_ENUM(NSInteger, VPNIntent) {
             constant:topPadding + 20]
         ]];
     }
+}
+
+- (void)setupNoConnectionBannerView {
+    noConnectionBannerView.translatesAutoresizingMaskIntoConstraints = NO;
+    
+    [NSLayoutConstraint activateConstraints:@[
+        [noConnectionBannerView.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor],
+        [noConnectionBannerView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor],
+        [noConnectionBannerView.topAnchor constraintEqualToAnchor:self.view.topAnchor],
+        [noConnectionBannerView.bottomAnchor constraintEqualToAnchor:psiphonTitle.bottomAnchor]
+    ]];
+    
 }
 
 - (void)setupPsiCashWidgetView {
