@@ -122,6 +122,7 @@
 		8D00AA482450B4AB001EB8DD /* PsiCashPurchaseVerification.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D00AA472450B4AB001EB8DD /* PsiCashPurchaseVerification.swift */; };
 		8D00AA4A2450B4D1001EB8DD /* SubscriptionPurchaseVerification.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D00AA492450B4D1001EB8DD /* SubscriptionPurchaseVerification.swift */; };
 		8D019B802451D864006F21C4 /* HTTPStatusCode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D019B7F2451D864006F21C4 /* HTTPStatusCode.swift */; };
+		8D255E2B2461E06900FD5D1C /* InternetReachability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D255E2A2461E06900FD5D1C /* InternetReachability.swift */; };
 		8D417E992411954A00FEE587 /* PsiCashReducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D417E982411954A00FEE587 /* PsiCashReducer.swift */; };
 		8D417E9D2411A0C200FEE587 /* PaymentQueue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D417E9C2411A0C200FEE587 /* PaymentQueue.swift */; };
 		8D417E9F2411A60900FEE587 /* PsiCashEffects.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D417E9E2411A60900FEE587 /* PsiCashEffects.swift */; };
@@ -509,6 +510,7 @@
 		8D00AA472450B4AB001EB8DD /* PsiCashPurchaseVerification.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PsiCashPurchaseVerification.swift; sourceTree = "<group>"; };
 		8D00AA492450B4D1001EB8DD /* SubscriptionPurchaseVerification.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionPurchaseVerification.swift; sourceTree = "<group>"; };
 		8D019B7F2451D864006F21C4 /* HTTPStatusCode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTTPStatusCode.swift; sourceTree = "<group>"; };
+		8D255E2A2461E06900FD5D1C /* InternetReachability.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InternetReachability.swift; sourceTree = "<group>"; };
 		8D417E982411954A00FEE587 /* PsiCashReducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PsiCashReducer.swift; sourceTree = "<group>"; };
 		8D417E9C2411A0C200FEE587 /* PaymentQueue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentQueue.swift; sourceTree = "<group>"; };
 		8D417E9E2411A60900FEE587 /* PsiCashEffects.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PsiCashEffects.swift; sourceTree = "<group>"; };
@@ -1217,6 +1219,7 @@
 				52DF5E9523C7A31100A1B067 /* Error.swift */,
 				8DE4E6D3244E9D8E00275362 /* Authorization.swift */,
 				8D96601D2457DC6C0007718B /* SubscriptionState.swift */,
+				8D255E2A2461E06900FD5D1C /* InternetReachability.swift */,
 			);
 			path = Psiphon;
 			sourceTree = "<group>";
@@ -1892,6 +1895,7 @@
 				A8408E281270691F61F9C20C /* AppVersionNumberView.m in Sources */,
 				52C8F0AF2383059200E5F9C0 /* Promises+Additions.swift in Sources */,
 				A8408C424E64BF3D70273464 /* ConnectionStatusView.m in Sources */,
+				8D255E2B2461E06900FD5D1C /* InternetReachability.swift in Sources */,
 				A84082260CE7662A93697CFF /* LoadingCircleLayer.m in Sources */,
 				A8408AACE30F860F2C961A04 /* WhiteSkyButton.m in Sources */,
 				A8408008B18277F93286799F /* PsiphonProgressView.m in Sources */,

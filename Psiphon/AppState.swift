@@ -80,6 +80,7 @@ struct AppState: Equatable {
     var products = PsiCashAppStoreProductsState()
     var adPresentationState: Bool = false
     var pendingLandingPageOpening: Bool = false
+    var internetReachability = ReachabilityState()
 }
 
 struct BalanceState: Equatable {
@@ -104,6 +105,7 @@ enum AppAction {
     case subscription(SubscriptionAction)
     case subscriptionAuthStateAction(SubscriptionAuthStateAction)
     case productRequest(ProductRequestAction)
+    case reachabilityAction(ReachabilityAction)
 }
 
 // MARK: Environment
@@ -124,6 +126,7 @@ typealias AppEnvironment = (
     paymentTransactionDelegate: PaymentTransactionDelegate,
     rewardedVideoAdBridgeDelegate: RewardedVideoAdBridgeDelegate,
     productRequestDelegate: ProductRequestDelegate,
+    internetReachabilityDelegate: StoreDelegate<ReachabilityAction>,
     vpnConnectionObserver: VPNConnectionObserver<PsiphonTPM>,
     vpnActionStore: (VPNExternalAction) -> Effect<Never>,
     psiCashStore: (PsiCashAction) -> Effect<Never>,
@@ -182,6 +185,11 @@ func makeEnvironment(
             store.projection(
                 value: erase,
                 action: { .productRequest($0) })
+        ),
+        internetReachabilityDelegate: InternetReachabilityDelegate(store:
+            store.projection(
+                value: erase,
+                action: { .reachabilityAction($0) })
         ),
         vpnConnectionObserver: PsiphonTPMConnectionObserver(store:
             store.projection(value: erase,
@@ -345,6 +353,10 @@ func makeAppReducer() -> Reducer<AppState, AppAction, AppEnvironment> {
                  value: \.vpnReducerState,
                  action: \.vpnStateAction,
                  environment: toVPNReducerEnvironment(env:)),
+        pullback(internetReachabilityReducer,
+                 value: \.internetReachability,
+                 action: \.reachabilityAction,
+                 environment: erase),
         pullback(psiCashReducer,
                  value: \.psiCashReducerState,
                  action: \.psiCash,
