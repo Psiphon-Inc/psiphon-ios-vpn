@@ -91,17 +91,21 @@ extension SubscriptionPurchaseAuthState.AuthorizationState: Codable {
                                               forKey: .requestRejectedReasonValue)
             self = .requestRejected(reason)
         case .authorization, .rejectedByPsiphon:
-            let base64 = try container.decode(String.self, forKey: .authorization)
-            let maybeDecoded = try SignedAuthorization.make(base64String: base64)
-            guard let decoded = maybeDecoded else {
-                throw ErrorRepr(repr: "failed to decode '\(base64)'")
+            
+            let base64Auth = try container.decode(String.self, forKey: .authorization)
+            
+            guard let base64Data = Data(base64Encoded: base64Auth) else {
+                fatalErrorFeedbackLog("Failed to base64 decode value '\(base64Auth)'")
             }
+            let decoder = JSONDecoder.makeRfc3339Decoder()
+            let decodedAuth = try decoder.decode(SignedAuthorization.self, from: base64Data)
+            let authValue = SignedData(rawData: base64Auth, decoded: decodedAuth)
             if case .authorization = state {
-                self = .authorization(decoded)
+                self = .authorization(authValue)
             } else if case .rejectedByPsiphon = state {
-                self = .rejectedByPsiphon(decoded)
+                self = .rejectedByPsiphon(authValue)
             } else {
-                fatalError()
+                fatalErrorFeedbackLog("Unexpected 'state' value: '\(state.rawValue)'")
             }
         }
     }
@@ -117,12 +121,12 @@ extension SubscriptionPurchaseAuthState.AuthorizationState: Codable {
         case .requestRejected(let reason):
             try container.encode(TagKeys.requestRejected, forKey: .state)
             try container.encode(reason.rawValue, forKey: .requestRejectedReasonValue)
-        case .authorization(let auth):
+        case .authorization(let authData):
             try container.encode(TagKeys.authorization, forKey: .state)
-            try container.encode(auth.base64String(), forKey: .authorization)
-        case .rejectedByPsiphon(let auth):
+            try container.encode(authData.rawData, forKey: .authorization)
+        case .rejectedByPsiphon(let authData):
             try container.encode(TagKeys.rejectedByPsiphon, forKey: .state)
-            try container.encode(auth.base64String(), forKey: .authorization)
+            try container.encode(authData.rawData, forKey: .authorization)
         }
     }
     

@@ -261,7 +261,7 @@ struct ExpirableTransaction: Equatable {
     let transactionId: String
     let serverTimeExpiry: Date
     let localTimeExpiry: Date
-    let authorization: SignedAuthorization
+    let authorization: SignedData<SignedAuthorization>
 
     // True if expiry date has already passed.
     var expired: Bool {
@@ -278,14 +278,21 @@ struct ExpirableTransaction: Equatable {
         guard let base64Auth = purchase.authorization else {
             return .failure(ErrorRepr(repr: "'authorization' is nil"))
         }
+        guard let base64Data = Data(base64Encoded: base64Auth) else {
+            return .failure(
+                ErrorRepr(repr: """
+                    Failed to create data from base64 encoded string: '\(base64Auth)'
+                    """)
+            )
+        }
         do {
-            guard let authorization = try SignedAuthorization.make(base64String: base64Auth) else {
-                return .failure(ErrorRepr(repr: "Failed to decode '\(base64Auth)'"))
-            }
+            let decoder = JSONDecoder.makeRfc3339Decoder()
+            let decodedAuth = try decoder.decode(SignedAuthorization.self, from: base64Data)
             return .success(.init(transactionId: purchase.id,
                                   serverTimeExpiry: serverTimeExpiry,
                                   localTimeExpiry: localTimeExpiry,
-                                  authorization: authorization))
+                                  authorization: SignedData(rawData: base64Auth,
+                                                            decoded: decodedAuth)))
         } catch {
             return .failure(ErrorRepr(repr: String(describing: error)))
         }
