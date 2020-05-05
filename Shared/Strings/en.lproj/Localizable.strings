@@ -213,32 +213,8 @@
 /* User's PsiCash balance is not up to date. PsiCash is a type of credit. Do not translate or transliterate 'PsiCash'. Text is shown on an alert pop up title */
 "PSICASH_BALANCE_OUT_OF_DATE_ALERT_TITLE" = "PsiCash Balance Out of Date";
 
-/* Text which appears in the Speed Boost meter when the user's buy request for Speed Boost is being processed. Please keep this text concise as the width of the text box is restricted in size. */
-"PSICASH_BUYING_SPEED_BOOST_TEXT" = "Buying Speed Boost...";
-
 /* PsiCash in-app purchase disclaimer that appears on the bottom of the screen where users can buy different amounts of PsiCash from the PlayStore.  Do not translate or transliterate terms PsiCash */
 "PSICASH_PURCHASE_SCREEN_NOTICE" = "IMPORTANT: Your PsiCash will not be preserved if you uninstall Psiphon.";
-
-/* Button title when loading. */
-"PSICASH_REWARDED_VIDEO_LOADING_TITLE" = "Loading";
-
-/* Button title for rewarded video ads button after failure to load ad. We want to let the user know that their previous attempt to watch a rewarded video ad failed and that they can try again by tapping the button. */
-"PSICASH_REWARDED_VIDEO_RETRY_TITLE" = "Try again to watch a video";
-
-/* Text which appears in the Speed Boost meter when the user has activated Speed Boost. Please keep this text concise as the width of the text box is restricted in size. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
-"PSICASH_SPEED_BOOST_ACTIVE_TEXT" = "Speed Boost Active";
-
-/* Text which appears in the Speed Boost meter when the user has earned enough PsiCash to buy Speed Boost. Please keep this text concise as the width of the text box is restricted in size. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
-"PSICASH_SPEED_BOOST_AVAILABLE_TEXT" = "Speed Boost Available";
-
-/* Text which appears in the Speed Boost meter when the user has not yet earned enough PsiCash to Speed Boost. This text will be accompanied with a percentage indicating to the user how close they are to earning enough PsiCash to buy a minimum amount of Speed Boost. Please keep this text concise as the width of the text box is restricted in size. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
-"PSICASH_SPEED_BOOST_CHARGING_TEXT" = "Speed Boost Charging";
-
-/* Text which appears in the Speed Boost meter when the user has not earned any PsiCash yet. Please keep this text concise as the width of the text box is restricted in size. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. Note: 'PsiCash' should not be translated or transliterated. */
-"PSICASH_SPEED_BOOST_NOAUTH_TEXT" = "Earn PsiCash to buy Speed Boost";
-
-/* Text which appears in the Speed Boost meter when the user has not gone through the PsiCash onboarding. Please keep this text concise as the width of the text box is restricted in size. 'PsiCash' should not be translated or transliterated. */
-"PSICASH_SPEED_BOOST_USER_NOT_ONBOARDED_TEXT" = "Learn about PsiCash";
 
 /* An error that signifies a state where the user has made a 'PsiCash' purchase, but extra action is needed from the user to finish the transaction. Do not translate or transliterate 'PsiCash'. */
 "PSICASH_TRANSACTION_PENDING" = "Transaction Pending";
@@ -340,7 +316,7 @@
 "SUBSCRIPTIONS_PAGE_BANNER_SUBTITLE" = "No commitment, cancel anytime.";
 
 /* Title of the banner on the subscriptions page advertising that subscriptions enable no ads and maximum speed. */
-"SUBSCRIPTIONS_PAGE_BANNER_TITLE_2" = "No ads & maximum speed.";
+"SUBSCRIPTIONS_PAGE_BANNER_TITLE_2" = "No ads and maximum speed.";
 
 /* Title of the button on the subscriptions page which takes the user of of the app to iTunes where they can view detailed information about their subscription */
 "SUBSCRIPTIONS_PAGE_MANAGE_SUBSCRIPTION_BUTTON" = "Manage your subscription";
