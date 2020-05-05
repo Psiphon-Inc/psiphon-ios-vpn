@@ -104,7 +104,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 
 @property (atomic) BOOL startWithSubscriptionCheckSponsorID;
 
-@property (atomic, nullable) StoredAuthorizations *storedAuthoriztions;
+@property (atomic, nullable) StoredAuthorizations *storedAuthorizations;
 
 @end
 
@@ -138,7 +138,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
         _postedNetworkConnectivityFailed = FALSE;
         _startWithSubscriptionCheckSponsorID = FALSE;
         
-        _storedAuthoriztions = [[StoredAuthorizations alloc] init];
+        _storedAuthorizations = nil;
     }
     return self;
 }
@@ -164,25 +164,34 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
     }
 }
 
-- (NSArray<NSString *> *_Nonnull)getAllEncodedAuthsAndSetSnapshotWithSponsorID:(NSString *_Nonnull *)sponsorID {
-    if (self.storedAuthoriztions.subscriptionAuth == nil) {
+- (NSArray<NSString *> *_Nonnull)
+getAllEncodedAuthsWithUpdated:(StoredAuthorizations *_Nullable)updatedStoredAuths
+withSponsorID:(NSString *_Nonnull *)sponsorID {
+    
+    if (updatedStoredAuths == nil) {
+        self.storedAuthorizations = [[StoredAuthorizations alloc] initWithPersistedValues];
+    } else {
+        self.storedAuthorizations = updatedStoredAuths;
+    }
+    
+    if (self.storedAuthorizations.subscriptionAuth == nil) {
         (*sponsorID) = self.cachedSponsorIDs.defaultSponsorId;
     } else {
         (*sponsorID) = self.cachedSponsorIDs.subscriptionSponsorId;
     }
     
-    if (self.storedAuthoriztions.subscriptionAuth != nil) {
+    if (self.storedAuthorizations.subscriptionAuth != nil) {
         
         [PsiFeedbackLogger infoWithType:PacketTunnelProviderLogType
                                  format:@"using subscription authorization ID:%@",
-         self.storedAuthoriztions.subscriptionAuth.ID];
+         self.storedAuthorizations.subscriptionAuth.ID];
     }
     
     // Updates copy authorization IDs supplied to tunnel-core.
-    self.subscriptionAuthID = self.storedAuthoriztions.subscriptionAuth.ID;
-    self.nonSubscriptionAuthIdSnapshot = self.storedAuthoriztions.nonSubscriptionAuthIDs;
+    self.subscriptionAuthID = self.storedAuthorizations.subscriptionAuth.ID;
+    self.nonSubscriptionAuthIdSnapshot = self.storedAuthorizations.nonSubscriptionAuthIDs;
     
-    return [self.storedAuthoriztions encoded];
+    return [self.storedAuthorizations encoded];
 }
 
 // If tunnel is already connected, and there are updatedauthorization,
@@ -194,36 +203,40 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
         return;
     }
     
-    self.storedAuthoriztions = [[StoredAuthorizations alloc] init];
+    StoredAuthorizations *updatedStoredAuths = [[StoredAuthorizations alloc]
+                                                initWithPersistedValues];
+    
+    NSString *_Nullable currentSubscriptionAuthID = self.subscriptionAuthID;
+    NSSet<NSString *> *_Nonnull currentNonSubsAuths =  self.nonSubscriptionAuthIdSnapshot;
     
     // If current connection uses an authorization that no longer exists,
     // reconnects with no subscription authorizations.
-    if (self.storedAuthoriztions.subscriptionAuth == nil && self.subscriptionAuthID != nil) {
+    if (updatedStoredAuths.subscriptionAuth == nil && currentSubscriptionAuthID != nil) {
         
         [PsiFeedbackLogger
          infoWithType:AuthCheckLogType
          format:@"reconnect since stored subscription auth is 'nil' but tunnel connected with \
          auth id '%@'", self.subscriptionAuthID];
         
-        [self reconnectWithUpdatedAuthorizations];
+        [self reconnectWithUpdatedAuthorizations: updatedStoredAuths];
         return;
     }
     
     // Reconnects if non-subscription authorization IDs are different from previous
     // value passed to tunnel-core.
-    if (![self.storedAuthoriztions.nonSubscriptionAuthIDs isEqualToSet:self.nonSubscriptionAuthIdSnapshot]) {
+    if (![updatedStoredAuths.nonSubscriptionAuthIDs isEqualToSet:currentNonSubsAuths]) {
         
         [PsiFeedbackLogger
          infoWithType:AuthCheckLogType
          message:@"reconnect since supplied non-sub auth ids don't match persisted value"];
         
-        [self reconnectWithUpdatedAuthorizations];
+        [self reconnectWithUpdatedAuthorizations: updatedStoredAuths];
         return;
     }
     
-    if (self.storedAuthoriztions.subscriptionAuth != nil) {
-        if (self.subscriptionAuthID != nil &&
-            [self.storedAuthoriztions.subscriptionAuth.ID isEqualToString:self.subscriptionAuthID]) {
+    if (updatedStoredAuths.subscriptionAuth != nil) {
+        if (currentSubscriptionAuthID != nil &&
+            [updatedStoredAuths.subscriptionAuth.ID isEqualToString:currentSubscriptionAuthID]) {
             // Authorization used by tunnel-core has not changed.
             return;
             
@@ -231,16 +244,17 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
             // Reconnects with the new subscription authorization.
             [PsiFeedbackLogger infoWithType:AuthCheckLogType
                                     message:@"reconnect with new subscription authorization"];
-            [self reconnectWithUpdatedAuthorizations];
+            [self reconnectWithUpdatedAuthorizations: updatedStoredAuths];
         }
     }
 
 }
 
-- (void)reconnectWithUpdatedAuthorizations {
+- (void)reconnectWithUpdatedAuthorizations:(StoredAuthorizations *_Nullable)updatedAuths {
     dispatch_async(self->workQueue, ^{
         NSString *sponsorID = nil;
-        NSArray<NSString *> *_Nonnull auths = [self getAllEncodedAuthsAndSetSnapshotWithSponsorID:&sponsorID];
+        NSArray<NSString *> *_Nonnull auths = [self getAllEncodedAuthsWithUpdated:updatedAuths
+                                                                    withSponsorID:&sponsorID];
         
         [AppProfiler logMemoryReportWithTag:@"reconnectWithConfig"];
         [self.psiphonTunnel reconnectWithConfig:sponsorID :auths];
@@ -290,9 +304,9 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 
     if (self.extensionStartMethod == ExtensionStartMethodFromContainer ||
         self.extensionStartMethod == ExtensionStartMethodFromCrash ||
-        self.storedAuthoriztions.subscriptionAuth != nil) {
+        self.storedAuthorizations.subscriptionAuth != nil) {
 
-        if (self.storedAuthoriztions.subscriptionAuth == nil &&
+        if (self.storedAuthorizations.subscriptionAuth == nil &&
             self.extensionStartMethod == ExtensionStartMethodFromContainer) {
             self.waitForContainerStartVPNCommand = TRUE;
         }
@@ -701,7 +715,8 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 
     // Provide auth tokens
     NSString *sponsorID;
-    NSArray *authorizations = [self getAllEncodedAuthsAndSetSnapshotWithSponsorID:&sponsorID];
+    NSArray *authorizations = [self getAllEncodedAuthsWithUpdated:nil
+                                                    withSponsorID:&sponsorID];
     if ([authorizations count] > 0) {
         mutableConfigCopy[@"Authorizations"] = [authorizations copy];
     }
@@ -753,24 +768,24 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
         if (self.subscriptionAuthID != nil) {
             
             // Sanity-check
-            if (![self.storedAuthoriztions.subscriptionAuth.ID
+            if (![self.storedAuthorizations.subscriptionAuth.ID
                   isEqualToString:self.subscriptionAuthID]) {
                 
                 [NSException raise:@"StateInconsistency"
                             format:@"Expected 'storedAuthorizations': '%@' to match \
-                 'subscriptionAuthID': '%@'", self.storedAuthoriztions.subscriptionAuth.ID,
+                 'subscriptionAuthID': '%@'", self.storedAuthorizations.subscriptionAuth.ID,
                  self.subscriptionAuthID];
                 
             }
             
-            if (![authorizationIds containsObject:self.storedAuthoriztions.subscriptionAuth.ID]) {
+            if (![authorizationIds containsObject:self.storedAuthorizations.subscriptionAuth.ID]) {
                 
                 [PsiFeedbackLogger infoWithType:AuthCheckLogType
                                          format:@"Subscription auth with ID '%@' rejected",
-                 self.storedAuthoriztions.subscriptionAuth.ID];
+                 self.storedAuthorizations.subscriptionAuth.ID];
                 
                 [SubscriptionAuthCheck
-                 addRejectedSubscriptionAuthID:self.storedAuthoriztions.subscriptionAuth.ID];
+                 addRejectedSubscriptionAuthID:self.storedAuthorizations.subscriptionAuth.ID];
             }
         }
 
