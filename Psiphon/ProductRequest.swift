@@ -135,6 +135,16 @@ func productRequestReducer(
         }
         state.psiCashRequest = nil
         
+        var effects = [Effect<ProductRequestAction>]()
+        
+        // Logs invalid Product IDs.
+        if case .success(let skProductResponse) = result {
+            effects += skProductResponse.invalidProductIdentifiers.map { invalidProductID in
+                feedbackLog(.warn, tag: "PsiCashProductRequest",
+                            "Invalid App Store IAP Product ID: '\(invalidProductID)'"
+                ).mapNever()
+            }
+        }
         
         state.psiCashProducts = .completed(
             result.map { response in
@@ -151,7 +161,8 @@ func productRequestReducer(
                 }.sortPurchasables()
             }
         )
-        return []
+        
+        return effects
     }
 }
 
