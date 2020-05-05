@@ -193,6 +193,15 @@ import Foundation
     }
 }
 
+// MARK: Internet reachability
+extension UserStrings{
+    static func No_internet_connection() -> String {
+        return NSLocalizedString("NO_INTERNET_CONNECTION_TITLE", tableName: nil, bundle: Bundle.main,
+                                 value: "No internet connection",
+                                 comment: "Message shown to the user when there is no internet connect.")
+    }
+}
+
 // MARK: Rewarded Videos
 extension UserStrings {
     static func Watch_rewarded_video_and_earn() -> String {

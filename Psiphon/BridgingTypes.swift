@@ -45,6 +45,8 @@ import Promises
     @objc func onVPNStartStopStateDidChange(_ status: VPNStartStopStatus)
     
     @objc func onVPNStateSyncError(_ userErrorMessage: String)
+    
+    @objc func onReachabilityStatusDidChange(_ previousStats: NetworkStatus)
 
     @objc func dismiss(screen: DismissibleScreen)
 

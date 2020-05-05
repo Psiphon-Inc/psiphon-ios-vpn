@@ -300,6 +300,10 @@ willFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     [AppObservables.shared.vpnStartStopStatus sendNext:@(status)];
 }
 
+- (void)onReachabilityStatusDidChange:(NetworkStatus)status {
+    [AppObservables.shared.reachabilityStatus sendNext:@(status)];
+}
+
 - (void)dismissWithScreen:(enum DismissibleScreen)screen {
     switch (screen) {
         case DismissibleScreenPsiCash:

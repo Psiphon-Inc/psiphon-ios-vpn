@@ -232,6 +232,14 @@ extension SwiftDelegate: SwiftBridgeDelegate {
                 objcBridge.onVPNStartStopStateDidChange(value)
         }
         
+        // Forwards AppState `internetReachability` value to ObjCBridgeDelegate.
+        self.lifetime += self.store.$value.signalProducer
+            .map(\.internetReachability)
+            .skipRepeats()
+            .startWithValues { [unowned objcBridge] reachabilityStatus in
+                objcBridge.onReachabilityStatusDidChange(reachabilityStatus.networkStatus)
+        }
+        
         // Opens landing page whenever Psiphon tunnel is connected, with
         // change in value of `VPNState` tunnel intent.
         // Landing page should not be opened after a reconnection due to an In-App purchase.
