@@ -125,7 +125,7 @@ import Foundation
     }
 
     static func Connect_to_psiphon_to_use_speed_boost() -> String {
-        return NSLocalizedString("CONENCT_TO_USE_SPEED_BOOST", tableName: nil, bundle: Bundle.main,
+        return NSLocalizedString("CONNECT_TO_USE_SPEED_BOOST", tableName: nil, bundle: Bundle.main,
                                  value: "Connect to Psiphon to use Speed Boost",
                                  comment: "User must connect to 'Psiphon' in order to use 'Speed Boost' product. Do not translate or transliterate 'Psiphon'. Do not transliterate 'Speed Boost'. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed.")
     }
@@ -133,7 +133,7 @@ import Foundation
     static func Insufficient_psiCash_balance() -> String {
         return NSLocalizedString("INSUFFICIENT_PSICASH_BALANCE", tableName: nil, bundle: Bundle.main,
                                  value: "Insufficient PsiCash balance",
-                                 comment: "User does not have suffiecient 'PsiCash' balance. PsiCash is a type of credit. Do not translate or transliterate 'PsiCash'.")
+                                 comment: "User does not have sufficient 'PsiCash' balance. PsiCash is a type of credit. Do not translate or transliterate 'PsiCash'.")
 
     }
 
@@ -158,7 +158,7 @@ import Foundation
     static func Connect_to_psiphon_button() -> String {
         return NSLocalizedString("CONNECT_TO_PSIPHON", tableName: nil, bundle: Bundle.main,
                                  value: "Connect to Psiphon",
-                                 comment: "Button title that lets the user to connec to the Psiphon network. Do not translate or transliterate 'Psiphon'")
+                                 comment: "Button title that lets the user to connect to the Psiphon network. Do not translate or transliterate 'Psiphon'")
     }
 
     static func Psiphon_is_not_connected() -> String {
@@ -197,7 +197,7 @@ import Foundation
 extension UserStrings {
     static func Watch_rewarded_video_and_earn() -> String {
         return NSLocalizedString("WATCH_REWARDED_VIDEO_AND_EARN", tableName: nil, bundle: Bundle.main,
-                                 value: "Watch Video & Earn",
+                                 value: "Watch Video and Earn",
                                  comment: "Button subtitle informing the user that if pressed a rewarded video ad will be displayed and they will earn credit.")
     }
 
@@ -286,7 +286,7 @@ extension UserStrings {
     
     @objc static func Tunnel_provider_sync_failed_reinstall_config() -> String {
         return NSLocalizedString("VPN_SYNC_FAILED_REINSTALL_CONFIG", tableName: nil, bundle: Bundle.main,
-                                 value: "Something went wrong. If this error persists try 'Reinstall VPN Profile'.",
+                                 value: "If this error persists, please try 'Reinstall VPN Profile'.",
                                  comment: "Error message when something was wrong with the VPN. Asks the user that if the error persists, try tapping the 'Reinstall VPN Profile' button in the settings menu. 'Reinstall VPN Profile' translation has key SETTINGS_REINSTALL_VPN_CONFIGURATION_CELL_TITLE")
     }
     
