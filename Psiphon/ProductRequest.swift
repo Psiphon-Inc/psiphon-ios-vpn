@@ -138,6 +138,21 @@ func productRequestReducer(
         }
         state.psiCashRequest = nil
         
+        var effects = [Effect<ProductRequestAction>]()
+        
+        // Logs invalid Product IDs/error.
+        switch result {
+        case let .success(skProductsResponse):
+            effects += skProductsResponse.invalidProductIdentifiers.map { invalidProductID in
+                feedbackLog(.warn, tag: "PsiCashProductRequest",
+                            "Invalid App Store IAP Product ID: '\(invalidProductID)'"
+                ).mapNever()
+            }
+        case let .failure(errorEvent):
+            effects.append(
+                feedbackLog(.error, errorEvent).mapNever()
+            )
+        }
         
         state.psiCashProducts = .completed(
             result.map { response in
@@ -155,12 +170,7 @@ func productRequestReducer(
             }
         )
         
-        switch result {
-        case .success(_):
-            return []
-        case .failure(let errorEvent):
-            return [ feedbackLog(.error, errorEvent).mapNever() ]
-        }
+        return effects
     }
 }
 

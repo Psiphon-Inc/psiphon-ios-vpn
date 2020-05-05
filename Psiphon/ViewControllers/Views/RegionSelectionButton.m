@@ -36,7 +36,6 @@
     self = [super initWithFrame:frame];
 
     if (self) {
-        self.accessibilityIdentifier = @"regionSelectionButton"; // identifier for UI Tests
 
         isRTL = ([UIApplication sharedApplication].userInterfaceLayoutDirection == UIUserInterfaceLayoutDirectionRightToLeft);
 
