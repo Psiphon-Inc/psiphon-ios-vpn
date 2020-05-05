@@ -124,7 +124,7 @@ extension PsiCashPurchaseResponseError {
 enum PsiCashRefreshError: HashableError {
     /// Refresh request is rejected due to tunnel not connected.
     case tunnelNotConnected
-    /// Server has returnd 500 error response.
+    /// Server has returned 500 error response.
     /// (PsiCash v1.3.1-0-gd1471c1) the request has already been retried internally and any further retry should not be immediate/
     case serverError
     /// Tokens passed in are invalid.
@@ -188,7 +188,7 @@ struct PsiCashBalance: Equatable {
     
     var pendingExpectedBalanceIncrease: BalanceIncreaseExpectationReason?
     
-    /// Balance with expected rewrad amount added.
+    /// Balance with expected reward amount added.
     /// - Note: This value is either equal to `PsiCashLibData.balance`, or higher if there is expected reward amount.
     var value: PsiCashAmount
 }

@@ -29,7 +29,7 @@ final class TabControlView<Tabs: UICases>: UIView, Bindable {
     let borderGradient: CAGradientLayer
     let borderMask: CAShapeLayer
 
-    // Note that UIStackView is a non-rednering view,
+    // Note that UIStackView is a non-rendering view,
     // so it can't draw a background or any other layer added to it.
 
     let stackView = UIStackView()

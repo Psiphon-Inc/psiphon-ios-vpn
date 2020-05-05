@@ -36,14 +36,14 @@
 /* Main text in the 'Upstream Proxy Error' dialog box. This is shown when the user has directly altered these settings, and those settings are (probably) erroneous. DO NOT translate 'Psiphon'. */
 "CHECK_UPSTREAM_PROXY_SETTING" = "You have configured Psiphon to use an upstream proxy.\nHowever, we seem to be unable to connect to a Psiphon server through that proxy.\nPlease fix the settings and try again.";
 
-/* User must connect to 'Psiphon' in order to use 'Speed Boost' product. Do not translate or transliterate 'Psiphon'. Do not transliterate 'Speed Boost'. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
-"CONENCT_TO_USE_SPEED_BOOST" = "Connect to Psiphon to use Speed Boost";
-
 /* Text shown to the user telling them to connect to 'Psiphon', to finish their unfinished transaction. Do not translate or transliterate 'Psiphon'. */
 "CONNECT_TO_FINISH_PSICASH_TRANSACTION" = "Please connect to Psiphon to finish your transaction";
 
-/* Button title that lets the user to connec to the Psiphon network. Do not translate or transliterate 'Psiphon' */
+/* Button title that lets the user to connect to the Psiphon network. Do not translate or transliterate 'Psiphon' */
 "CONNECT_TO_PSIPHON" = "Connect to Psiphon";
+
+/* User must connect to 'Psiphon' in order to use 'Speed Boost' product. Do not translate or transliterate 'Psiphon'. Do not transliterate 'Speed Boost'. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
+"CONNECT_TO_USE_SPEED_BOOST" = "Connect to Psiphon to use Speed Boost";
 
 /* Title for screen that allows user to select their desired server region. Use all capital letters in the translation only if it makes sense. */
 "CONNECT_VIA" = "CONNECT VIA";
@@ -96,7 +96,7 @@
 /* Generic alert shown when purchase of a product fails. */
 "GENERIC_PURCHASE_FAILED" = "Purchase Failed";
 
-/* User does not have suffiecient 'PsiCash' balance. PsiCash is a type of credit. Do not translate or transliterate 'PsiCash'. */
+/* User does not have sufficient 'PsiCash' balance. PsiCash is a type of credit. Do not translate or transliterate 'PsiCash'. */
 "INSUFFICIENT_PSICASH_BALANCE" = "Insufficient PsiCash balance";
 
 /* External link to the license page. Please update this with the correct language specific link (if available) e.g. https://psiphon.ca/fr/license.html for french. */
@@ -114,9 +114,6 @@
 /* Alert OK Button */
 "OK_BUTTON" = "OK";
 
-/* Onboarding text for install VPN configuration. (Do not translate 'Psiphon'). */
-"ONBARDING_VPN_INSTALL_GUIDE_TEXT" = "You’ll need to allow Psiphon to add VPN configurations in order to connect.";
-
 /* Onboarding screen text. (Do not translate 'Psiphon'). */
 "ONBOARDING_BEYOND_BORDERS_BODY_2" = "Psiphon connects you to the content you want, no matter where you are.";
 
@@ -129,6 +126,9 @@
 /* Onboarding header */
 "ONBOARDING_GETTING_STARTED_HEADER" = "Getting Started";
 
+/* Onboarding text for install VPN configuration. (Do not translate 'Psiphon'). */
+"ONBOARDING_VPN_INSTALL_GUIDE_TEXT" = "You’ll need to allow Psiphon to add VPN configurations in order to connect.";
+
 /* Alert message informing the user they should open the app to finish connecting to the VPN. DO NOT translate 'Psiphon'. */
 "OPEN_PSIPHON_APP" = "Please open Psiphon app to finish connecting.";
 
@@ -138,7 +138,7 @@
 /* Subtitle shown when the current operation failed, asking the user to try again at a later time. */
 "PLEASE_TRY_AGAIN_LATER" = "Please try again later.";
 
-/* Alert message when the user declined privacy policy. They will not be able ot use the app until the user accepts the privacy policy (Do not translate 'Psiphon') */
+/* Alert message when the user declined privacy policy. They will not be able to use the app until the user accepts the privacy policy (Do not translate 'Psiphon') */
 "PRIVACY_POLICY_DECLINED_ALERT_BODY" = "You must accept our Privacy Policy before continuing to use Psiphon.";
 
 /* External link to the privacy policy page. Please update this with the correct language specific link (if available) e.g. https://psiphon.ca/fr/privacy.html for french. */

@@ -28,7 +28,7 @@ PsiFeedbackLogType const SubscriptionAuthCheckLogType = @"SubscriptionAuthCheck"
 
 @implementation SubscriptionAuthCheck
 
-+ (Authorization *_Nullable)getLatestAuthrizationNotRejected {
++ (Authorization *_Nullable)getLatestAuthorizationNotRejected {
     PsiphonDataSharedDB *sharedDB = [[PsiphonDataSharedDB alloc]
                                      initForAppGroupIdentifier:APP_GROUP_IDENTIFIER];
     
@@ -38,7 +38,7 @@ PsiFeedbackLogType const SubscriptionAuthCheckLogType = @"SubscriptionAuthCheck"
     }
 
     // Dictionary has the Swift type: `[OriginalTransactionID: SubscriptionPurchaseAuthState]`.
-    // Data is encoded as an array [OriginalTranscationID, SubscriptionPurchaseAuthState, ...].
+    // Data is encoded as an array [OriginalTransactionID, SubscriptionPurchaseAuthState, ...].
     NSError *_Nullable err;
     NSArray *subsAuthDict = (NSArray *)[NSJSONSerialization JSONObjectWithData:storedData
                                                                        options:kNilOptions

@@ -29,7 +29,7 @@ enum IAPAction {
     case receiptUpdated(ReceiptData?)
 }
 
-/// StoreKit transaction obersver
+/// StoreKit transaction observer
 enum TransactionUpdate {
     case updatedTransactions([SKPaymentTransaction])
     case restoredCompletedTransactions(error: Error?)
@@ -190,7 +190,7 @@ func iapReducer(
                                     )
                                     
                                 case .some(true):
-                                    // Tranaction has the same identifier as the current
+                                    // Transaction has the same identifier as the current
                                     // unverified psicash IAP transaction.
                                     finishTransaction = true
                                     

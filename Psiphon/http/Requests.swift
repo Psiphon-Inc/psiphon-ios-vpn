@@ -31,7 +31,7 @@ enum HTTPContentType: String, HTTPHeader {
     static var headerKey: String { "Content-Type" }
 }
 
-/// A success case neabs that the HTTP request succeeded and server returned a response,
+/// A success case means that the HTTP request succeeded and server returned a response,
 /// the response from the server might itself contain an error.
 typealias URLSessionResult = Result<(data: Data, response: HTTPURLResponse), HTTPRequestError>
 
@@ -190,7 +190,7 @@ enum HttpRequestTunnelError: HashableError {
     /// Tunnel is not connected.
     case tunnelNotConnected
     /// The weak reference to the tunnel provider manager  is `nil`.
-    /// This error is not retirable.
+    /// This error is not retriable.
     case nilTunnelProviderManager
     
     var isRetriable: Bool {

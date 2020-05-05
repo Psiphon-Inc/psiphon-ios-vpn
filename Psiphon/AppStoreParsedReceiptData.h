@@ -51,7 +51,7 @@
 
 /** True if this transaction is in intro period, False otherwise.
  */
-@property (nonatomic, readonly) BOOL isInIntroPreiod;
+@property (nonatomic, readonly) BOOL isInIntroPeriod;
 
 - (instancetype _Nonnull)initWithASN1Data:(NSData *_Nonnull)asn1Data NS_DESIGNATED_INITIALIZER;
 

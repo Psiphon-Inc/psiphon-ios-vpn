@@ -221,7 +221,7 @@ final class PsiCashViewController: UIViewController {
 
                 switch observed.state.subscription.status {
                 case .unknown:
-                    // There is not PsiCash state or subscription state is unknow.
+                    // There is not PsiCash state or subscription state is unknown.
                     self.balanceView.isHidden = true
                     self.tabControl.isHidden = true
                     self.containerBindable.bind(
@@ -229,7 +229,7 @@ final class PsiCashViewController: UIViewController {
                     )
 
                 case .subscribed(_):
-                    // User is subcribed. Only shows the PsiCash balance.
+                    // User is subscribed. Only shows the PsiCash balance.
                     self.balanceView.isHidden = false
                     self.tabControl.isHidden = true
                     self.balanceView.bind(
@@ -533,7 +533,7 @@ fileprivate func errorEventDescription(
             \(UserStrings.Purchase_failed())
             (\(error.localizedDescription))
             """
-        }
+        };
     }
     
     guard let description = optionalDescription else {

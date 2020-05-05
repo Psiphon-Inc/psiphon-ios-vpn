@@ -23,7 +23,7 @@ import UIKit
 @objc final class PsiCashBalanceView: UIView, Bindable {
     typealias BindingType = BalanceState
 
-    private typealias IconType = EitherView<ImageViewBuidler, EitherView<Spinner, ButtonBuilder>>
+    private typealias IconType = EitherView<ImageViewBuilder, EitherView<Spinner, ButtonBuilder>>
 
     private let psiCashPriceFormatter = PsiCashAmountFormatter(locale: Locale.current)
     private let title: UILabel
@@ -52,7 +52,7 @@ import UIKit
             fatalErrorFeedbackLog("Could not find 'PsiCash_Alert' image")
         }
 
-        icon = .init(ImageViewBuidler(image: coinImage),
+        icon = .init(ImageViewBuilder(image: coinImage),
                      .init(Spinner(style: .white),
                            ButtonBuilder(style: .custom, tint: .none, image: waitingForExpectedIncreaseImage, eventHandler: {
                             let alert = UIAlertController(

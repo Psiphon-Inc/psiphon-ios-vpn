@@ -194,7 +194,7 @@ withSponsorID:(NSString *_Nonnull *)sponsorID {
     return [self.storedAuthorizations encoded];
 }
 
-// If tunnel is already connected, and there are updatedauthorization,
+// If tunnel is already connected, and there are updated authorizations,
 // reconnects Psiphon tunnel with `-reconnectWithConfig::`.
 - (void)updateStoredAuthorizationAndReconnectIfNeeded {
     

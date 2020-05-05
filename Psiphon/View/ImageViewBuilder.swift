@@ -20,7 +20,7 @@
 
 import UIKit
 
-struct ImageViewBuidler: ViewBuilder {
+struct ImageViewBuilder: ViewBuilder {
 
     let image: UIImage
 

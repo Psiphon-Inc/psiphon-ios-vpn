@@ -129,7 +129,7 @@ extension SKPaymentTransaction {
 
     /// Indicates whether the app receipt has been updated.
     var appReceiptUpdated: Bool {
-        // Each case is explicitely typed as returning true or false
+        // Each case is explicitly typed as returning true or false
         // to ensure function correctness in future updates.
         switch self.typedTransactionState {
         case let .completed(completed):

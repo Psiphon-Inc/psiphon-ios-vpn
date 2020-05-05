@@ -116,7 +116,7 @@ func productRequestReducer(
         guard case .completed(_) = state.psiCashProducts else {
             return []
         }
-        // If previous value had successful reslut,
+        // If previous value had successful result,
         // then the success value is added to `.pending` case.
         state.psiCashProducts = .pending(previousValue: state.psiCashProducts)
         

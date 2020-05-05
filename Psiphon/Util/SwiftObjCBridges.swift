@@ -19,7 +19,7 @@
 
 import UIKit
 
-// MARK: UIControl Swift Brdige
+// MARK: UIControl Swift Bridge
 
 @objc class EventHandler: NSObject {
 

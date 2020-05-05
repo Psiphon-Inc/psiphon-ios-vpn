@@ -46,13 +46,13 @@ import Promises
     
     @objc func onVPNStateSyncError(_ userErrorMessage: String)
 
-    @objc func dismiss(screen: DismissableScreen)
+    @objc func dismiss(screen: DismissibleScreen)
 
     @objc func presentRewardedVideoAd(customData: CustomData,
                                       delegate: RewardedVideoAdBridgeDelegate)
 }
 
-/// Inteface for AppDelegate functionality implemented in Swift and called from ObjC.
+/// Interface for AppDelegate functionality implemented in Swift and called from ObjC.
 @objc protocol SwiftBridgeDelegate {
     @objc static var bridge: SwiftBridgeDelegate { get }
     
@@ -80,7 +80,7 @@ import Promises
     
     // VPN
     
-    @objc func swithVPNStartStopIntent()
+    @objc func switchVPNStartStopIntent()
         -> Promise<SwitchedVPNStartStopIntent>.ObjCPromise<SwitchedVPNStartStopIntent>
     @objc func sendNewVPNIntent(_ value: SwitchedVPNStartStopIntent)
     @objc func restartVPNIfActive()

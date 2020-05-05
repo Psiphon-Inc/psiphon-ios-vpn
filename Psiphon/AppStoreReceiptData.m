@@ -219,7 +219,7 @@ static long ASN1ReadInteger(const uint8_t *bytes, long length) {
                 }
                 case ReceiptASN1TypeIsInIntroOfferPeriod: {
                     long is_in_intro_period = ASN1ReadInteger(p, length);
-                    self->_isInIntroPreiod = [[NSNumber numberWithLong: is_in_intro_period] boolValue];
+                    self->_isInIntroPeriod = [[NSNumber numberWithLong: is_in_intro_period] boolValue];
                     break;
                 }
             }

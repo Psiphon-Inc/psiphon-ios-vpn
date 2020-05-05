@@ -89,7 +89,7 @@ extension SwiftDelegate: RewardedVideoAdBridgeDelegate {
         let loadResult: RewardedVideoLoad
         if let error = error {
             // Note that error event is created here as opposed to the origin
-            // of where the error occured. However this is acceptable as long as
+            // of where the error occurred. However this is acceptable as long as
             // this function is called once for each error that happened almost immediately.
             loadResult = .failure(ErrorEvent(.systemError(error)))
         } else {
@@ -158,7 +158,7 @@ extension SwiftDelegate: SwiftBridgeDelegate {
                 objcBridge.onSubscriptionStatus(BridgedUserSubscription.from(state: $0))
         }
         
-        // Forwards VPN status changes to ObjCBridgeDelegaet.
+        // Forwards VPN status changes to ObjCBridgeDelegate.
         self.lifetime += self.store.$value.signalProducer.map(\.vpnState.value.vpnStatus)
             .skipRepeats()
             .startWithValues { [unowned objcBridge] in
@@ -209,7 +209,7 @@ extension SwiftDelegate: SwiftBridgeDelegate {
             }
         }
         
-        // Forewards SpeedBoost purchase expiry date (if the user is not subscribed)
+        // Forwards SpeedBoost purchase expiry date (if the user is not subscribed)
         // to ObjCBridgeDelegate.
         self.lifetime += self.store.$value.signalProducer
             .map { appState -> Date? in
@@ -310,7 +310,7 @@ extension SwiftDelegate: SwiftBridgeDelegate {
         let objcPromise = promise.then { result -> Error? in
             return result.projectError()?.error
         }
-        self.store.send(.appReceipt(.remoteReceiptRefresh(optinalPromise: promise)))
+        self.store.send(.appReceipt(.remoteReceiptRefresh(optionalPromise: promise)))
         return objcPromise.asObjCPromise()
     }
     
@@ -358,7 +358,7 @@ extension SwiftDelegate: SwiftBridgeDelegate {
         }
     }
     
-    @objc func swithVPNStartStopIntent()
+    @objc func switchVPNStartStopIntent()
         -> Promise<SwitchedVPNStartStopIntent>.ObjCPromise<SwitchedVPNStartStopIntent>
     {
         let promise = Promise<SwitchedVPNStartStopIntent>.pending()
@@ -463,7 +463,7 @@ extension SwiftDelegate: SwiftBridgeDelegate {
             default:
                 switch indexed.value {
                 case .nonLoaded, .noneStored:
-                    fatalErrorFeedbackLog("Unepxected value '\(indexed.value)'")
+                    fatalErrorFeedbackLog("Unexpected value '\(indexed.value)'")
                 case .loaded(_):
                     promise.fulfill(.init(.installedSuccessfully))
                 case .error(let errorEvent):

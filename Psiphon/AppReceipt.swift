@@ -32,7 +32,7 @@ struct ReceiptState: Equatable {
     var remoteRefreshAppReceiptPromises: [Promise<Result<(), SystemErrorEvent>>]
     
     /// Strong reference to request object.
-    var receiptRefereshRequestObject: SKReceiptRefreshRequest?
+    var receiptRefreshRequestObject: SKReceiptRefreshRequest?
 }
 
 extension ReceiptState {
@@ -54,7 +54,7 @@ extension ReceiptState {
 enum ReceiptStateAction {
     case localReceiptRefresh
     /// A remote receipt refresh can open a dialog box to
-    case remoteReceiptRefresh(optinalPromise: Promise<Result<(), SystemErrorEvent>>?)
+    case remoteReceiptRefresh(optionalPromise: Promise<Result<(), SystemErrorEvent>>?)
     case _remoteReceiptRefreshResult(Result<(), SystemErrorEvent>)
 }
 
@@ -104,7 +104,7 @@ func receiptReducer(
             }
         }
         
-    case .remoteReceiptRefresh(optinalPromise: let optionalPromise):
+    case .remoteReceiptRefresh(optionalPromise: let optionalPromise):
         if let promise = optionalPromise {
             state.remoteRefreshAppReceiptPromises.append(promise)
         }
@@ -115,7 +115,7 @@ func receiptReducer(
         }
         
         let request = SKReceiptRefreshRequest()
-        state.receiptRefereshRequestObject = request
+        state.receiptRefreshRequestObject = request
         return [
             .fireAndForget {
                 request.delegate = environment.receiptRefreshRequestDelegate
@@ -126,7 +126,7 @@ func receiptReducer(
     case ._remoteReceiptRefreshResult(let result):
         var effects = [Effect<ReceiptStateAction>]()
         state.remoteReceiptRefreshState = .completed(result.mapToUnit())
-        state.receiptRefereshRequestObject = nil
+        state.receiptRefreshRequestObject = nil
         
         let refreshedData = join(result.map {
             ReceiptData.fromLocalReceipt(environment: environment)

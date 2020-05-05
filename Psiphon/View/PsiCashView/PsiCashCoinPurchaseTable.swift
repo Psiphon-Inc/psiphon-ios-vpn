@@ -178,7 +178,7 @@ fileprivate final class PurchaseCellContent: UIView, Bindable {
 
         spinner.isHidden = true
 
-        // Setup subaviews
+        // Setup subviews
         let imageView = UIImageView.make(image: "PsiCashCoin_Large")
         addSubviews(imageView, titleLabel, subtitleLabel, button, spinner)
 

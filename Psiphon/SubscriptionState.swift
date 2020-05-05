@@ -100,7 +100,7 @@ func subscriptionReducer(
         }
         
         return [
-            environment.appReceiptStore(.remoteReceiptRefresh(optinalPromise: nil)).mapNever()
+            environment.appReceiptStore(.remoteReceiptRefresh(optionalPromise: nil)).mapNever()
         ]
     }
 }

@@ -300,9 +300,9 @@ willFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     [AppObservables.shared.vpnStartStopStatus sendNext:@(status)];
 }
 
-- (void)dismissWithScreen:(enum DismissableScreen)screen {
+- (void)dismissWithScreen:(enum DismissibleScreen)screen {
     switch (screen) {
-        case DismissableScreenPsiCash:
+        case DismissibleScreenPsiCash:
             [self.window.rootViewController dismissViewControllerType:PsiCashViewController.class];
             break;
     }
