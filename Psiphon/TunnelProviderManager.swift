@@ -386,7 +386,7 @@ func sendMessage<T: TunnelProviderManager>(
         
         do {
             try tpm.sendProviderMessage(data) { maybeResponseData in
-                // A respose is always required from the tunenl provider.
+                // A response is always required from the tunnel provider.
                 guard let responseData = maybeResponseData else {
                     fulfilled((tpm, .failure(ErrorEvent(.parseError("nil response")))))
                     return

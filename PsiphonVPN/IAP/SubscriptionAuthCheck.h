@@ -24,7 +24,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface SubscriptionAuthCheck: NSObject
 
-+ (Authorization *_Nullable)getLatestAuthrizationNotRejected;
++ (Authorization *_Nullable)getLatestAuthorizationNotRejected;
 
 + (void)addRejectedSubscriptionAuthID:(NSString *)authorizationID;
 

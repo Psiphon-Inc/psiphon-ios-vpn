@@ -23,8 +23,8 @@ import NetworkExtension
 
 /// Note on terminology:
 /// - Psiphon tunnel is to the tunnel created in the Network Extension process.
-/// - Tunnel provider referes to the network extension.
-/// - Tunnel provider manager is the `NETunnelProivderManager` object that is used to manage the tunnel provider.
+/// - Tunnel provider refers to the network extension.
+/// - Tunnel provider manager is the `NETunnelProviderManager` object that is used to manage the tunnel provider.
 
 fileprivate let vpnConfigLoadTag = LogTag("VPNConfigLoad")
 fileprivate let vpnProviderSyncTag = LogTag("VPNProviderSync")
@@ -94,7 +94,7 @@ enum PsiphonTunnelState: Equatable {
 }
 
 /// Represents state of the tunnel provider after sync.
-/// - Note: State sync is perfomed through sending `EXTENSION_QUERY_TUNNEL_PROVIDER_STATE` to the provider.
+/// - Note: State sync is performed through sending `EXTENSION_QUERY_TUNNEL_PROVIDER_STATE` to the provider.
 enum TunnelProviderSyncedState: Equatable {
     
     enum SyncError: HashableError {
@@ -109,7 +109,7 @@ enum TunnelProviderSyncedState: Equatable {
     case active(PsiphonTunnelState)
     /// Tunnel provider process is not running
     case inactive
-    /// Tunnel provider state is unknown either due to some error in syncing state or before any state sync is perfomed.
+    /// Tunnel provider state is unknown either due to some error in syncing state or before any state sync is performed.
     case unknown(ErrorEvent<SyncError>)
 }
 
@@ -336,7 +336,7 @@ fileprivate func vpnProviderManagerStateReducer<T: TunnelProviderManager>(
         case .reinstallVPNConfig:
             if case let .loaded(tpm) = state.vpnState.loadState.value {
                 // Returned effect calls `stop()` on the tunnel provider manager object first,
-                // before remvoing the VPN config.
+                // before removing the VPN config.
                 return [
                     stopVPN(tpm).flatMap(.latest) {
                         removeFromPreferences(tpm)
@@ -563,13 +563,13 @@ fileprivate func startPsiphonTunnelReducer<T: TunnelProviderManager>(
     
     state.vpnState.startStopState = .pending(.startPsiphonTunnel)
     
-    let tpmDeffered: Effect<T> = state.vpnState.loadState.providerManagerForTunnelStart()
+    let tpmDeferred: Effect<T> = state.vpnState.loadState.providerManagerForTunnelStart()
     
     // Options passed to tunnel provider start handler function.
     var startOptions = [EXTENSION_OPTION_START_FROM_CONTAINER: EXTENSION_OPTION_TRUE]
     
     // Adds subscription check sponsor id to tunnel provider start options if there are
-    // subscription transactiond pending authorization.
+    // subscription transaction pending authorization.
     if !state.subscriptionTransactionsPendingAuthorization.isEmpty {
         startOptions[EXTENSION_OPTION_SUBSCRIPTION_CHECK_SPONSOR_ID] = EXTENSION_OPTION_TRUE
     }
@@ -578,7 +578,7 @@ fileprivate func startPsiphonTunnelReducer<T: TunnelProviderManager>(
         .fireAndForget {
             environment.sharedDB.setContainerTunnelStartTime(Date())
         },
-        tpmDeffered.flatMap(.latest) {
+        tpmDeferred.flatMap(.latest) {
             updateConfig($0, for: .startVPN)
         }
         .flatMap(.latest, saveAndLoadConfig)
@@ -848,8 +848,8 @@ fileprivate func loadAllConfigs<T: TunnelProviderManager>() -> Effect<ConfigUpda
                 case 1:
                     return Effect(value: .success(tpms.first!))
                 default:
-                    // There should only be one confiugation stored in VPN preferences.
-                    // Returned effect removes all configuartions in `tpms` from apps
+                    // There should only be one configuration stored in VPN preferences.
+                    // Returned effect removes all configurations in `tpms` from apps
                     // VPN preferences.
                     return Effect(tpms)
                         .flatMap(.merge, removeFromPreferences)

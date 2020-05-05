@@ -88,7 +88,7 @@ struct PsiCashEffect {
                                         withInfo: String(describing: purchasable),
                                         includingDiagnosticInfo: false)
             
-            // Updates request metadata before sendinfg the request.
+            // Updates request metadata before sending the request.
             self.psiCash.setRequestMetadata()
             
             self.psiCash.newExpiringPurchaseTransaction(

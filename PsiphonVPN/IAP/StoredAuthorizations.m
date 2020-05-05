@@ -31,7 +31,7 @@
         PsiphonDataSharedDB *sharedDB = [[PsiphonDataSharedDB alloc]
                                          initForAppGroupIdentifier:APP_GROUP_IDENTIFIER];
         
-        self.subscriptionAuth = [SubscriptionAuthCheck getLatestAuthrizationNotRejected];
+        self.subscriptionAuth = [SubscriptionAuthCheck getLatestAuthorizationNotRejected];
         
         self.nonSubscriptionAuths = [Authorization createFromEncodedAuthorizations:
                                      [sharedDB getNonSubscriptionEncodedAuthorizations].allObjects];

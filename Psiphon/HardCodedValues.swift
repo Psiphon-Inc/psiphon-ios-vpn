@@ -21,7 +21,7 @@ import Foundation
 
 struct VPNHardCodedValues {
     
-    /// Time interval during which a response to the messent sent to the tunnel provider is expected.
+    /// Time interval during which a response to the message sent to the tunnel provider is expected.
     /// After which the send message Effect should timeout.
     static let providerMessageSendTimeout: TimeInterval = 1.0  // 1 second
     
@@ -42,7 +42,7 @@ struct SubscriptionHardCodedValues {
     /// Timer leeway.
     static let leeway: DispatchTimeInterval = .seconds(10)
     
-    /// Minimum time left of a subscription to still be considered active.
+    /// Minimum time left off of a subscription to still be considered active.
     static let subscriptionUIMinTime: TimeInterval = 5.0  // 5 seconds
     
     /// Diff tolerance between timer's expired value and the subscription expiry value.

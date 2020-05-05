@@ -443,7 +443,7 @@ typedef NS_ENUM(NSInteger, VPNIntent) {
 - (RACSignal<RACTwoTuple<NSNumber*, SwitchedVPNStartStopIntent*> *> *)startOrStopVPNSignalWithAd:(BOOL)showAd {
     MainViewController *__weak weakSelf = self;
     return [[[[RACSignal createSignal:^RACDisposable *(id <RACSubscriber> subscriber) {
-        [[SwiftDelegate.bridge swithVPNStartStopIntent]
+        [[SwiftDelegate.bridge switchVPNStartStopIntent]
          then:^id _Nullable(SwitchedVPNStartStopIntent * newIntent) {
             if (newIntent == nil) {
                 [NSException raise:@"nil found"

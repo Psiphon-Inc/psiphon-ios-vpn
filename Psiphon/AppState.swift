@@ -34,7 +34,7 @@ struct PsiphonBundle {
     let appStoreReceiptURL: URL
     
     /// Validates app's environment give the assumptions made in the app for certain invariants to hold true.
-    /// - Note: Stops program execution if any of the vaidations fail.
+    /// - Note: Stops program execution if any of the validations fail.
     static func from(bundle: Bundle) -> PsiphonBundle {
         return PsiphonBundle(bundleIdentifier: bundle.bundleIdentifier!,
                              appStoreReceiptURL: bundle.appStoreReceiptURL!)
@@ -65,7 +65,7 @@ struct DebugFlags {
 }
 
 /// Represents UIViewController's that can be dismissed.
-@objc enum DismissableScreen: Int {
+@objc enum DismissibleScreen: Int {
     case psiCash
 }
 
@@ -106,7 +106,7 @@ enum AppAction {
     case productRequest(ProductRequestAction)
 }
 
-// MARK: Environemnt
+// MARK: Environment
 
 typealias AppEnvironment = (
     appBundle: PsiphonBundle,
@@ -131,7 +131,7 @@ typealias AppEnvironment = (
     iapStore: (IAPAction) -> Effect<Never>,
     subscriptionStore: (SubscriptionAction) -> Effect<Never>,
     subscriptionAuthStateStore: (SubscriptionAuthStateAction) -> Effect<Never>,
-    /// `vpnStartCondition` retruns true whenever the app is in such a state as to to allow
+    /// `vpnStartCondition` returns true whenever the app is in such a state as to to allow
     /// the VPN to be started. If false is returned the VPN should not be started.
     vpnStartCondition: () -> Bool,
     supportedSubscriptionIAPProductIDs: SupportedAppStoreProductIDs,
@@ -226,8 +226,8 @@ func makeEnvironment(
         getCurrentTime: { () -> Date in
             return Date()
         },
-        compareDates: { date1, date2, granulairty -> ComparisonResult in
-            return calendar.compare(date1, to: date2, toGranularity: granulairty)
+        compareDates: { date1, date2, granularity -> ComparisonResult in
+            return calendar.compare(date1, to: date2, toGranularity: granularity)
         }
     )
     

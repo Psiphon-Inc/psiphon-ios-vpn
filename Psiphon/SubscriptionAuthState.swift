@@ -26,7 +26,7 @@ struct SubscriptionPurchaseAuthState: Hashable, Codable {
     enum AuthorizationState: Hashable {
         
         enum RequestRejectedReason: String, Codable {
-            /// Received 400-Bad Request error from the purhcase verifier server.
+            /// Received 400-Bad Request error from the purchase verifier server.
             case badRequestError
             /// Transaction had expired.
             case transactionExpired
@@ -64,7 +64,7 @@ struct SubscriptionPurchaseAuthState: Hashable, Codable {
 enum SubscriptionAuthStateAction {
     
     enum StoredDataUpdateType {
-        case didUpdateRejectedSubscritionAuthIDs
+        case didUpdateRejectedSubscriptionAuthIDs
         case didRefreshReceiptData(ReceiptReadReason)
     }
     
@@ -168,7 +168,7 @@ func subscriptionAuthStateReducer<T: TunnelProviderManager>(
                             )
                         }
                         
-                        // Updates authorization state for any purchase that had it's authroization
+                        // Updates authorization state for any purchase that had it's authorization
                         // rejected by Psiphon servers.
                         newValue = newValue.updateAuthorizationState(
                             givenRejectedAuthIDs: rejectedAuthIDs
@@ -338,7 +338,7 @@ func subscriptionAuthStateReducer<T: TunnelProviderManager>(
             else {
             fatalError("""
                 expected 'state.subscription.purchaseAuthStates' to contain \
-                transctaion ID '\(purchase.transactionID)'
+                transaction ID '\(purchase.transactionID)'
                 """)
         }
         
@@ -372,7 +372,7 @@ func subscriptionAuthStateReducer<T: TunnelProviderManager>(
             ]
             
         case .completed(let subscriptionValidationResult):
-            // Authorization request completed with a response from puchase verifier server.
+            // Authorization request completed with a response from purchase verifier server.
             
             // Authorization request for this purchase is no longer pending.
             state.subscription.transactionsPendingAuthRequest.remove(purchase.originalTransactionID)
@@ -504,7 +504,7 @@ extension Dictionary where Key == OriginalTransactionID, Value == SubscriptionPu
     /// Resets the authorization state of transactions that resulted in a 400-Bad Request error
     /// from the purchase verifier server.
     /// The refreshed receipt should prevent future bad request errors.
-    /// Note: Tranaction IDs are regenerated after subscription is restored.
+    /// Note: Transaction IDs are regenerated after subscription is restored.
     func resetAuthorizationBadRequest(forReceiptUpdateType updateType: ReceiptReadReason) -> Self {
         switch updateType {
         case .localRefresh:
@@ -563,7 +563,7 @@ extension Dictionary where Key == OriginalTransactionID, Value == SubscriptionPu
 
 extension SubscriptionPurchaseAuthState {
     
-    /// `canRequestAuthorization` determintes whether an authorization request could be sent to the purchase verifier
+    /// `canRequestAuthorization` determines whether an authorization request could be sent to the purchase verifier
     /// server based on the current state of `signedAuthorization`, and device clock.
     func canRequestAuthorization(
         getCurrentTime: () -> Date,

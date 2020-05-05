@@ -118,8 +118,8 @@ enum HTTPStatusCode: Int, Error {
     /// - temporaryRedirect: The request should be repeated with another URI.
     case temporaryRedirect = 307
     
-    /// - permenantRedirect: The request and all future requests should be repeated using another URI.
-    case permenantRedirect = 308
+    /// - permanentRedirect: The request and all future requests should be repeated using another URI.
+    case permanentRedirect = 308
     
     //
     // Client Error - 4xx

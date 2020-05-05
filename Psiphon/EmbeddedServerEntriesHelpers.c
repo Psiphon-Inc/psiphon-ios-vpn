@@ -109,11 +109,11 @@ void drop_last_char_if_char(char *s, int c) {
 }
 
 /*!
- * @brief Returns pointer to the nth occurence of character c in the string s.
+ * @brief Returns pointer to the nth occurrence of character c in the string s.
  * @param s Pointer to string.
  * @param c Character being searched for.
- * @param n Nth occurence.
- * @return  Pointer to nth occurence of c. NULL if nth occurence does not exist.
+ * @param n Nth occurrence.
+ * @return  Pointer to nth occurrence of c. NULL if nth occurrence does not exist.
  */
 char * strchrn(char const *s, int c, int n) {
     const char ch = c;

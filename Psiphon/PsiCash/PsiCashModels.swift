@@ -225,7 +225,7 @@ struct PsiCashAuthPackage: Equatable {
     }
 }
 
-// MARK: PsiCash prooducts
+// MARK: PsiCash products
 
 /// PsiCash transaction class raw values.
 enum PsiCashTransactionClass: String, Codable, CaseIterable {

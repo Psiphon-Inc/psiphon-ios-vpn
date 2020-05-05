@@ -86,7 +86,7 @@ struct ReceiptData: Equatable {
     /// Date at which the receipt `data` was read.
     let readDate: Date
     
-    /// Parses local app receipt and returns a `RceiptData` object.
+    /// Parses local app receipt and returns a `ReceiptData` object.
     /// If no receipt file is found at path pointed to by the `Bundle` `.none` is returned.
     /// - Note: It is expected for the `Bundle` object to have a valid
     static func parseLocalReceipt(
@@ -133,7 +133,7 @@ struct ReceiptData: Equatable {
         let hasSubscriptionBeenInIntroOfferPeriod = parsedData.inAppPurchases.filter {
             subscriptionProductIDs.contains($0.productIdentifier)
         }.map {
-            $0.isInIntroPreiod
+            $0.isInIntroPeriod
         }.contains(true)
 
         // Filters out subscription purchases that have already expired at by `readDate`.
@@ -149,7 +149,7 @@ struct ReceiptData: Equatable {
                         parsedIAP.originalTransactionID),
                     purchaseDate: parsedIAP.purchaseDate,
                     expires: parsedIAP.expiresDate!,
-                    isInIntroOfferPeriod: parsedIAP.isInIntroPreiod,
+                    isInIntroOfferPeriod: parsedIAP.isInIntroPeriod,
                     hasBeenInIntroOfferPeriod: hasSubscriptionBeenInIntroOfferPeriod
                 )
                 

@@ -140,7 +140,7 @@ extension UIImageView {
 
 extension UITableViewCell {
     /// Returns true if the cells `contentView` has any subviews.
-    /// Indiciating that the cell has some content.
+    /// Indicating that the cell has some content.
     var hasContent: Bool {
         return contentView.subviews.count > 0
     }
@@ -497,12 +497,12 @@ protocol ViewBuilder {
     /// This value may or may not be nil, depending on whether the `container` is being re-used.
     ///
     /// - A `MutableBindableViewable` should add it's views to the passed in `container`.
-    /// In this case the passed in `container` will alwayb be non-nil.
+    /// In this case the passed in `container` will always be non-nil.
     func build(_ container: UIView?) -> BuildType
 }
 
 /// A type that wraps a `UIView` object.
-/// - Note:`UIView` itslef conforms to Viewable.
+/// - Note:`UIView` itself conforms to Viewable.
 protocol ViewWrapper {
     var view: UIView { get }
 }
@@ -529,7 +529,7 @@ final class StrictBindableViewable<BindingType: Equatable, WrappedView: ViewWrap
         binding(newValue)
     }
 
-    /// Nil is passed to `builder`s `build`  function, as this ViewBuilder type doesn't allow mutating the cotainer.
+    /// Nil is passed to `builder`s `build`  function, as this ViewBuilder type doesn't allow mutating the container.
     /// TODO: This nil passing shows that this is not a good abstraction.
     static func build<Builder: ViewBuilder>(
         with builder: Builder, addTo container: UIView
