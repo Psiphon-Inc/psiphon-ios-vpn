@@ -28,6 +28,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, nonnull) NSSet<Authorization *> *nonSubscriptionAuths;
 
+- (instancetype _Nonnull)init NS_UNAVAILABLE;
+
+- (instancetype)initWithPersistedValues NS_DESIGNATED_INITIALIZER;
+
 // Returns Authorization ID of `self.nonSubscriptionAuths`.
 - (NSSet<NSString *> *)nonSubscriptionAuthIDs;
 

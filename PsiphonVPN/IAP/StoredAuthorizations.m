@@ -25,7 +25,7 @@
 
 @implementation StoredAuthorizations
 
-- (instancetype)init {
+- (instancetype)initWithPersistedValues {
     self = [super init];
     if (self) {
         PsiphonDataSharedDB *sharedDB = [[PsiphonDataSharedDB alloc]
