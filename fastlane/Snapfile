@@ -10,17 +10,23 @@ devices([
 #  "iPhone 6s Plus",
 #  "iPhone 7",
 #  "iPhone 7 Plus",
-#  "iPhone 8",
+   "iPhone 8",
 #  "iPhone 8 Plus",
 #  "iPad Air",
 #  "iPad Air 2",
+#  "iPad Air (3rd generation)",
 #  "iPad (5th generation)",
+#  "iPad (7th generation)",
 #  "iPad Pro (9.7 inch)",
 #  "iPad Pro (10.5-inch)",
+#  "iPad Pro (11-inch)",
   "iPad Pro (12.9-inch)",
   "iPad Pro (12.9-inch) (3rd generation)",
   "iPhone X",
-  "iPhone Xs Max"
+  "iPhone Xs Max",
+  "iPhone 11"
+#  "iPhone 11 Pro",
+#  "iPhone 11 Pro Max"
  ])
 
 languages([
@@ -76,3 +82,7 @@ launch_arguments(["-FASTLANE_SNAPSHOT YES"])
 
 # For more information about all available options run
 # fastlane snapshot --help
+
+# Disable concurrent simulators.
+# In the past running with concurrent simulators has caused issues.
+concurrent_simulators false
