@@ -19,7 +19,7 @@
 
 import UIKit
 
-@objc class SpeedBoostButton: GradientButton, Bindable {
+@objc final class SpeedBoostButton: GradientButton, Bindable {
 
     enum SpeedBoostButtonState: Equatable {
         case inactive

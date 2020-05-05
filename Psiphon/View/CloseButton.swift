@@ -19,7 +19,7 @@
 
 import UIKit
 
-class CloseButton: AnimatedUIButton {
+final class CloseButton: AnimatedUIButton {
 
     override init(frame: CGRect) {
         super.init(frame: frame)
