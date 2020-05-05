@@ -19,15 +19,6 @@
 
 #import <Foundation/Foundation.h>
 
-// Authorization AccessTypes
-
-#if DEBUG
-#define kAuthorizationAccessTypeApple     @"apple-subscription-test"
-#else
-#define kAuthorizationAccessTypeApple     @"apple-subscription"
-#endif
-
-
 @interface Authorization : NSObject
 
 @property (nonatomic, readonly, nonnull) NSString *base64Representation;
