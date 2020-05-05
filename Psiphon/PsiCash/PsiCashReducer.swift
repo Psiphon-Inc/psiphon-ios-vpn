@@ -105,22 +105,9 @@ func psiCashReducer<T: TunnelProviderManager>(
             state.psiCash.purchasing = .none
             return [
                 .fireAndForget {
-                    
-                    do {
-                        let encodedAuth = try purchasedProduct.transaction.authorization
-                            .base64String()
-                        environment.sharedDB.appendNonSubscriptionEncodedAuthorization(encodedAuth)
-                    } catch {
-                        PsiFeedbackLogger.error(
-                            withType: "PsiCashReducer.swift",
-                            message: """
-                            failed to encode authorization \
-                            '\(purchasedProduct.transaction.authorization)'
-                            """,
-                            object: error
-                        )
-                    }
-                    
+                    environment.sharedDB.appendNonSubscriptionEncodedAuthorization(
+                        purchasedProduct.transaction.authorization.rawData
+                    )
                     environment.notifier.post(NotifierUpdatedNonSubscriptionAuths)
                 },
                 .fireAndForget {

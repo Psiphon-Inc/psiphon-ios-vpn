@@ -50,7 +50,7 @@ struct SubscriptionValidationResponse: RetriableHTTPResponse {
     struct SuccessResult: Equatable, Decodable {
         let requestDate: Date
         let originalTransactionID: OriginalTransactionID
-        let signedAuthorization: SignedAuthorization?
+        let signedAuthorization: SignedData<SignedAuthorization>?
         let errorStatus: ErrorStatus
         let errorDescription: String
         
@@ -79,8 +79,15 @@ struct SubscriptionValidationResponse: RetriableHTTPResponse {
             
             switch errorStatus {
             case .noError:
-                let base64 = try values.decode(String.self, forKey: .signedAuthorization)
-                signedAuthorization = try SignedAuthorization.make(base64String: base64)
+                let base64Auth = try values.decode(String.self, forKey: .signedAuthorization)
+                guard let base64Data = Data(base64Encoded: base64Auth) else {
+                    fatalErrorFeedbackLog(
+                        "Failed to create data from base64 encoded string: '\(base64Auth)'"
+                    )
+                }
+                let decoder = JSONDecoder.makeRfc3339Decoder()
+                let decodedAuth = try decoder.decode(SignedAuthorization.self, from: base64Data)
+                signedAuthorization = SignedData(rawData: base64Auth, decoded: decodedAuth)
             default:
                 signedAuthorization = nil
             }

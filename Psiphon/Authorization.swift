@@ -49,12 +49,6 @@ struct SignedAuthorization: Hashable, Codable {
 
 extension SignedAuthorization {
     
-    func base64String() throws -> String {
-        let encoder = JSONEncoder.makeRfc3339Encoder()
-        let result = try encoder.encode(self)
-        return result.base64EncodedString()
-    }
-    
     static func make(base64String: String) throws -> Self? {
         guard let data = Data(base64Encoded: base64String, options: .ignoreUnknownCharacters) else {
             return nil
@@ -92,6 +86,27 @@ struct Authorization: Hashable, Codable {
     func hash(into hasher: inout Hasher) {
         // Authorization ID is unique.
         hasher.combine(self.id)
+    }
+    
+}
+
+/// `SignedData` is a wrapper around signed decodable data returned by a server(e.g. base64 encoded
+/// `SignedAuthorization` string returned as part of purchase verifier's server response),
+/// that also holds the original raw value.
+/// This struct is useful when the raw value needs to be preserved, where there
+/// might be potential data change from encodings/decodings. (e.g. a `Date` encoded value
+/// might slightly differ from the value from the server)
+struct SignedData<Decoded: Decodable>: Hashable {
+
+    let rawData: String
+    let decoded: Decoded
+    
+    static func == (lhs: SignedData<Decoded>, rhs: SignedData<Decoded>) -> Bool {
+        lhs.rawData == rhs.rawData
+    }
+    
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(rawData)
     }
     
 }

@@ -46,11 +46,11 @@ struct SubscriptionPurchaseAuthState: Hashable, Codable {
         case requestRejected(RequestRejectedReason)
         
         /// Retrieved an authorization successfully.
-        case authorization(SignedAuthorization)
+        case authorization(SignedData<SignedAuthorization>)
         
         /// Authorization rejected by the Psiphon servers.
         /// If the transaction has not expired, another authorization can be requested from the purchase verifier server.
-        case rejectedByPsiphon(SignedAuthorization)
+        case rejectedByPsiphon(SignedData<SignedAuthorization>)
     }
     
     /// Subscription purchase contained in the app receipt.
@@ -404,8 +404,8 @@ func subscriptionAuthStateReducer<T: TunnelProviderManager>(
                         stateUpdateEffect.mapNever(),
                         feedbackLog(.info, """
                             authorization request completed with auth id \
-                            '\(signedAuthorization.authorization.id)' expiring on \
-                            '\(signedAuthorization.authorization.expires)'
+                            '\(signedAuthorization.decoded.authorization.id)' expiring on \
+                            '\(signedAuthorization.decoded.authorization.expires)'
                             """
                         ).mapNever()
                     ]
@@ -490,7 +490,7 @@ extension Dictionary where Key == OriginalTransactionID, Value == SubscriptionPu
                 return currentValue
             }
             
-            guard rejectedAuthIDs.contains(signedAuth.authorization.id) else {
+            guard rejectedAuthIDs.contains(signedAuth.decoded.authorization.id) else {
                 return currentValue
             }
             
