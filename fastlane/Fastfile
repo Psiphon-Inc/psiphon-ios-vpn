@@ -18,7 +18,10 @@ default_platform(:ios)
 platform :ios do
   desc "Generate new localized screenshots"
   lane :screenshots do
-    capture_screenshots(workspace: "Psiphon.xcworkspace", scheme: "Psiphon")
+    capture_ios_screenshots(workspace: "Psiphon.xcworkspace",
+                            scheme: "Psiphon",
+                            stop_after_first_error: true,
+                            dark_mode: true)
     upload_to_app_store(skip_binary_upload: true, skip_metadata: true, screenshots_path: 'StoreAssets/screenshots')
   end
 end

@@ -665,6 +665,7 @@ typedef NS_ENUM(NSInteger, VPNIntent) {
     startAndStopButton = [VPNStartAndStopButton buttonWithType:UIButtonTypeCustom];
     statusLabel = [[UILabel alloc] init];
     regionSelectionButton = [[RegionSelectionButton alloc] init];
+    regionSelectionButton.accessibilityIdentifier = @"regionSelectionButton"; // identifier for UI Tests
     bottomBar = [[UIView alloc] init];
     subscriptionsBar = [[SubscriptionsBar alloc] init];
 

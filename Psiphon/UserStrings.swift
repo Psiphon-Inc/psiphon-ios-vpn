@@ -197,7 +197,7 @@ import Foundation
 extension UserStrings {
     static func Watch_rewarded_video_and_earn() -> String {
         return NSLocalizedString("WATCH_REWARDED_VIDEO_AND_EARN", tableName: nil, bundle: Bundle.main,
-                                 value: "Watch Video & Earn",
+                                 value: "Watch Video and Earn",
                                  comment: "Button subtitle informing the user that if pressed a rewarded video ad will be displayed and they will earn credit.")
     }
 
@@ -286,7 +286,7 @@ extension UserStrings {
     
     @objc static func Tunnel_provider_sync_failed_reinstall_config() -> String {
         return NSLocalizedString("VPN_SYNC_FAILED_REINSTALL_CONFIG", tableName: nil, bundle: Bundle.main,
-                                 value: "Something went wrong. If this error persists try 'Reinstall VPN Profile'.",
+                                 value: "If this error persists, please try 'Reinstall VPN Profile'.",
                                  comment: "Error message when something was wrong with the VPN. Asks the user that if the error persists, try tapping the 'Reinstall VPN Profile' button in the settings menu. 'Reinstall VPN Profile' translation has key SETTINGS_REINSTALL_VPN_CONFIGURATION_CELL_TITLE")
     }
     
