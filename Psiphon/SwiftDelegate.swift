@@ -234,6 +234,9 @@ extension SwiftDelegate: SwiftBridgeDelegate {
         
         // Opens landing page whenever Psiphon tunnel is connected, with
         // change in value of `VPNState` tunnel intent.
+        // Landing page should not be opened after a reconnection due to an In-App purchase.
+        // This condition is implicitly handled, since reconnections do not cause a change
+        // the in tunnel intent value.
         self.lifetime += self.store.$value.signalProducer
             .map(\.vpnState.value.tunnelIntent)
             .skipRepeats()
