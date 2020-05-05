@@ -21,6 +21,7 @@
 #import "AppDelegate.h"
 #import "PsiFeedbackLogger.h"
 #include "timestamp.h"
+#import <PsiphonTunnel/Reachability.h>
 
 // UI
 #import "UIColor+Additions.h"

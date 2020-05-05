@@ -110,6 +110,17 @@ extension AppAction {
         }
     }
 
+    var reachabilityAction: ReachabilityAction? {
+        get {
+            guard case let .reachabilityAction(value) = self else { return nil }
+            return value
+        }
+        set {
+            guard case .reachabilityAction = self, let newValue = newValue else { return }
+            self = .reachabilityAction(newValue)
+        }
+    }
+    
     var vpnStateAction: VPNStateAction<PsiphonTPM>? {
         get {
             guard case let .vpnStateAction(value) = self else { return nil }
