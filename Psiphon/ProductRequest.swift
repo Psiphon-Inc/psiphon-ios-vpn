@@ -25,11 +25,11 @@ enum ParsedPsiCashAppStorePurchasable: Equatable {
     
     // Map from App Store defined Product Id to PsiCash value.
     static let supportedProducts: [String: Double] = [
-        "ca.psiphon.Psiphon.psicash_1000": 1000,
-        "ca.psiphon.Psiphon.psicash_4000": 4000,
-        "ca.psiphon.Psiphon.psicash_10000": 10000,
-        "ca.psiphon.Psiphon.psicash_30000": 30000,
-        "ca.psiphon.Psiphon.psicash_100000": 100000,
+        "ca.psiphon.Psiphon.PsiCash.1000": 1000,
+        "ca.psiphon.Psiphon.PsiCash.4000": 4000,
+        "ca.psiphon.Psiphon.PsiCash.10000": 10000,
+        "ca.psiphon.Psiphon.PsiCash.30000": 30000,
+        "ca.psiphon.Psiphon.PsiCash.100000": 100000,
     ]
     
     
@@ -117,13 +117,16 @@ func productRequestReducer(
         // then the success value is added to `.pending` case.
         state.psiCashProducts = .pending(previousValue: state.psiCashProducts)
         
-        let request = SKProductsRequest(productIdentifiers: StoreProductIds.psiCash().values)
+        let requestingProductIDs = StoreProductIds.psiCash().values
+        let request = SKProductsRequest(productIdentifiers: requestingProductIDs)
         state.psiCashRequest = request
         return [
             .fireAndForget {
                 request.delegate = environment
                 request.start()
-            }
+            },
+            feedbackLog(.info, tag: "PsiCashProductRequest",
+                        "Requesting product IDs: '\(requestingProductIDs)'").mapNever()
         ]
         
     case let .productRequestResult(request, result):
@@ -135,6 +138,16 @@ func productRequestReducer(
         }
         state.psiCashRequest = nil
         
+        var effects = [Effect<ProductRequestAction>]()
+        
+        // Logs invalid Product IDs.
+        if case .success(let skProductResponse) = result {
+            effects += skProductResponse.invalidProductIdentifiers.map { invalidProductID in
+                feedbackLog(.warn, tag: "PsiCashProductRequest",
+                            "Invalid App Store IAP Product ID: '\(invalidProductID)'"
+                ).mapNever()
+            }
+        }
         
         state.psiCashProducts = .completed(
             result.map { response in
@@ -151,7 +164,8 @@ func productRequestReducer(
                 }.sortPurchasables()
             }
         )
-        return []
+        
+        return effects
     }
 }
 

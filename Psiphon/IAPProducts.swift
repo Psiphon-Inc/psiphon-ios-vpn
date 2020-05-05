@@ -42,7 +42,7 @@ enum AppStoreProductType: String {
     case psiCash = "psiCashProductIds"
 
     private static func from(productIdentifier: String) throws -> AppStoreProductType {
-        if productIdentifier.hasPrefix("ca.psiphon.Psiphon.psicash_") {
+        if productIdentifier.hasPrefix("ca.psiphon.Psiphon.PsiCash.") {
             return .psiCash
         }
 
