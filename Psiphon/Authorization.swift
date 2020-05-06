@@ -96,7 +96,7 @@ struct Authorization: Hashable, Codable {
 /// This struct is useful when the raw value needs to be preserved, where there
 /// might be potential data change from encodings/decodings. (e.g. a `Date` encoded value
 /// might slightly differ from the value from the server)
-struct SignedData<Decoded: Decodable>: Hashable {
+struct SignedData<Decoded: Decodable & CustomStringConvertible>: Hashable, CustomStringConvertible {
 
     let rawData: String
     let decoded: Decoded
@@ -107,6 +107,11 @@ struct SignedData<Decoded: Decodable>: Hashable {
     
     func hash(into hasher: inout Hasher) {
         hasher.combine(rawData)
+    }
+    
+    /// `rawData` is treated as a secret value and not included in the description.
+    var description: String {
+        return decoded.description
     }
     
 }

@@ -49,6 +49,17 @@ extension CustomFieldFeedbackDescription {
     /// value.description == "SomeValue([\"float\": 3.14])"
     /// ```
     public var description: String {
+        feedbackFieldsDescription
+    }
+    
+    /// For `NSObject` classes, default `description` field of `CustomFieldFeedbackDescription` will not be called.
+    /// Classes that want to conform to this protocol should also override `NSObject` `description` property,
+    /// and only call this function.
+    public func objcClassDescription() -> String {
+        feedbackFieldsDescription
+    }
+    
+    private var feedbackFieldsDescription: String {
         "\(String(describing: Self.self))(\(String(describing: feedbackFields)))"
     }
 }
@@ -167,8 +178,17 @@ func immediateFeedbackLog<T: FeedbackDescription>(
 /// Creates a string representation of `value` fit for sending in feedback.
 /// - Note: Escapes double-quotes `"`, and removes "Psiphon" and "Swift" module names.
 func makeFeedbackEntry<T: FeedbackDescription>(_ value: T) -> String {
-    String(describing: value)
-        .replacingOccurrences(of: "\"", with: "\\\"")
+    normalizeFeedbackDescriptionTypes(String(describing: value))
+}
+
+/// Creates a string representation of `value` fit for sending in feedback.
+/// - Note: Escapes double-quotes `"`, and removes "Psiphon" and "Swift" module names.
+func makeFeedbackEntry<T: CustomFieldFeedbackDescription>(_ value: T) -> String {
+    normalizeFeedbackDescriptionTypes(value.description)
+}
+
+fileprivate func normalizeFeedbackDescriptionTypes(_ value: String) -> String {
+    value.replacingOccurrences(of: "\"", with: "\\\"")
         .replacingOccurrences(of: "Psiphon.", with: "")
         .replacingOccurrences(of: "Swift.", with: "")
 }
