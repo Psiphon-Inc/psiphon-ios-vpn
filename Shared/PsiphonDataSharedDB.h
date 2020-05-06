@@ -233,7 +233,7 @@ NS_ASSUME_NONNULL_BEGIN
 #endif
 
 
-#pragma mark - Debug Prefernces
+#pragma mark - Debug Preferences
 
 #if DEBUG
 
