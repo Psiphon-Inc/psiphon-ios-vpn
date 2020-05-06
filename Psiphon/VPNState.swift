@@ -635,6 +635,20 @@ extension VPNStatus: Equatable {
         }
     }
     
+    /// `providerRunning` is `true` whenever the tunnel provider process (extension) is running,
+    /// otherwise it is `false`.
+    /// If the tunnel provider is being restarted by the container, `providerRunning` is `true`.
+    var providerRunning: Bool {
+        switch self {
+        case .invalid, .disconnected:
+            return false
+        case .disconnecting, .connecting, .reasserting, .restarting, .connected:
+            return true
+        @unknown default:
+            fatalErrorFeedbackLog("unknown NEVPNStatus '\(self.rawValue)'")
+        }
+    }
+    
 }
 
 extension TunnelProviderVPNStatus {
