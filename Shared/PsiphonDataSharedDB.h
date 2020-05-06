@@ -18,12 +18,31 @@
  */
 
 #import <Foundation/Foundation.h>
+#import "UserDefaults.h"
 
 #if !(TARGET_IS_EXTENSION)
 #import "PsiphonData.h"
 #endif
 
 @class Authorization;
+
+#pragma mark - NSUserDefaults Keys
+
+extern UserDefaultsKey const _Nonnull EgressRegionsStringArrayKey;
+extern UserDefaultsKey const _Nonnull ClientRegionStringKey;
+extern UserDefaultsKey const _Nonnull TunnelStartTimeStringKey;
+extern UserDefaultsKey const _Nonnull TunnelSponsorIDStringKey;
+extern UserDefaultsKey const _Nonnull ServerTimestampStringKey;
+extern UserDefaultsKey const _Nonnull ContainerAuthorizationSetKey;
+extern UserDefaultsKey const _Nonnull ContainerSubscriptionAuthorizationsDictKey;
+extern UserDefaultsKey const _Nonnull ExtensionRejectedSubscriptionAuthorizationIDsArrayKey;
+extern UserDefaultsKey const _Nonnull ExtensionRejectedSubscriptionAuthorizationIDsWriteSeqIntKey;
+extern UserDefaultsKey const _Nonnull ContainerRejectedSubscriptionAuthorizationIDsReadSeqIntKey;
+extern UserDefaultsKey const _Nonnull ContainerForegroundStateBoolKey;
+extern UserDefaultsKey const _Nonnull SharedDataExtensionCrashedBeforeStopBoolKey;
+extern UserDefaultsKey const _Nonnull SharedDataExtensionJetsamCounterIntegerKey;
+extern UserDefaultsKey const _Nonnull DebugMemoryProfileBoolKey;
+extern UserDefaultsKey const _Nonnull DebugPsiphonConnectionStateStringKey;
 
 
 NS_ASSUME_NONNULL_BEGIN
@@ -42,6 +61,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)initForAppGroupIdentifier:(NSString*)identifier;
 
+- (NSDictionary<NSString *, NSString *> *)objcFeedbackFields;
 
 #pragma mark - Logging
 
@@ -233,16 +253,15 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)setExtensionJetsammedBeforeStopFlag:(BOOL)crashed;
 
-- (BOOL)getExtensionJetsammedBeforeStopFlag;
-
-- (NSInteger)getJetsamCounter;
-
 #else
 
 - (void)resetJetsamCounter;
 
 #endif
 
+- (NSInteger)getJetsamCounter;
+
+- (BOOL)getExtensionJetsammedBeforeStopFlag;
 
 #pragma mark - Debug Preferences
 

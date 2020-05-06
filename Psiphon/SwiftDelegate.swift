@@ -372,6 +372,7 @@ extension SwiftDelegate: SwiftBridgeDelegate {
                     ContainerInfo: {
                     \"AppState\":\"\(makeFeedbackEntry(appState))\",
                     \"UserDefaultsConfig\":\"\(makeFeedbackEntry(UserDefaultsConfig()))\",
+                    \"PsiphonDataSharedDB\": \"\(makeFeedbackEntry(self.sharedDB))\",
                     \"OutstandingEffectCount\": \(self.store.outstandingEffectCount)
                     }
                     """)

@@ -20,7 +20,6 @@
 #import "PsiphonDataSharedDB.h"
 #import "Logging.h"
 #import "NSDate+PSIDateExtension.h"
-#import "UserDefaults.h"
 #import "SharedConstants.h"
 #import <PsiphonTunnel/PsiphonTunnel.h>
 
@@ -76,12 +75,8 @@ UserDefaultsKey const SharedDataExtensionCrashedBeforeStopBoolKey = @"PsiphonDat
  */
 UserDefaultsKey const SharedDataExtensionJetsamCounterIntegerKey = @"PsiphonDataSharedDB.ExtensionJetsamCounterIntKey";
 
-#if DEBUG
-
 UserDefaultsKey const DebugMemoryProfileBoolKey = @"PsiphonDataSharedDB.DebugMemoryProfilerBoolKey";
 UserDefaultsKey const DebugPsiphonConnectionStateStringKey = @"PsiphonDataSharedDB.DebugPsiphonConnectionStateStringKey";
-
-#endif
 
 
 #pragma mark -

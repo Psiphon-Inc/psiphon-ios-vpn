@@ -95,3 +95,87 @@ extension UserDefaultsConfig: CustomFieldFeedbackDescription {
 }
 
 extension RetriableTunneledHttpRequest.RequestResult.RetryCondition: FeedbackDescription {}
+
+extension PsiphonDataSharedDB: CustomFieldFeedbackDescription {
+    
+    private func getNonSecretNonSubscriptionEncodedAuthorizations() -> String {
+        let decoder = JSONDecoder.makeRfc3339Decoder()
+        
+        do {
+            let secret = self.getNonSubscriptionEncodedAuthorizations()
+            let signedAuths = try secret.map { base64Auth -> SignedAuthorization in
+                guard let authData = Data(base64Encoded: base64Auth) else {
+                    throw ErrorRepr(repr: """
+                        Failed to create data from base64 encoded string: '\(base64Auth)'
+                        """)
+                }
+                return try decoder.decode(SignedAuthorization.self, from: authData)
+            }
+            
+            return String(describing: signedAuths.map { $0.description })
+            
+        } catch {
+            return String(describing: error)
+        }
+    }
+    
+    private func getNonSecretSubscriptionAuths() -> String {
+        guard let data = self.getSubscriptionAuths() else {
+            return "nil"
+        }
+        
+        let decoder = JSONDecoder.makeRfc3339Decoder()
+        
+        do {
+            let decoded = try decoder.decode(SubscriptionAuthState.PurchaseAuthStateDict.self,
+                                             from: data)
+            return decoded.description
+            
+        } catch {
+            return String(describing: error)
+        }
+        
+    }
+    
+    var feedbackFields: [String : CustomStringConvertible] {
+        
+        [EgressRegionsStringArrayKey: String(describing: self.emittedEgressRegions()),
+         
+         ClientRegionStringKey:  String(describing: self.emittedClientRegion()),
+         
+         TunnelStartTimeStringKey: String(describing: self.getContainerTunnelStartTime()),
+         
+         TunnelSponsorIDStringKey:  String(describing: self.getCurrentSponsorId()),
+         
+         ServerTimestampStringKey: String(describing: self.getServerTimestamp()),
+         
+         ContainerAuthorizationSetKey: self.getNonSecretNonSubscriptionEncodedAuthorizations(),
+         
+         ContainerSubscriptionAuthorizationsDictKey: self.getNonSecretSubscriptionAuths(),
+         
+         ExtensionRejectedSubscriptionAuthorizationIDsArrayKey:
+            String(describing: self.getRejectedSubscriptionAuthorizationIDs()),
+         
+         ExtensionRejectedSubscriptionAuthorizationIDsWriteSeqIntKey:
+            self.getExtensionRejectedSubscriptionAuthIdWriteSequenceNumber(),
+         
+         ContainerRejectedSubscriptionAuthorizationIDsReadSeqIntKey:
+            self.getContainerRejectedSubscriptionAuthIdReadSequenceNumber(),
+         
+         ContainerForegroundStateBoolKey: self.getAppForegroundState(),
+         
+         SharedDataExtensionCrashedBeforeStopBoolKey: self.getExtensionJetsammedBeforeStopFlag(),
+         
+         SharedDataExtensionJetsamCounterIntegerKey: self.getJetsamCounter(),
+         
+         DebugMemoryProfileBoolKey: self.getDebugMemoryProfiler(),
+         
+         DebugPsiphonConnectionStateStringKey: self.getDebugPsiphonConnectionState()
+        ]
+    }
+    
+    open override var description: String {
+        self.objcClassDescription()
+    }
+    
+}
