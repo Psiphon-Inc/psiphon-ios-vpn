@@ -53,7 +53,7 @@ UserDefaultsKey const ExtensionRejectedSubscriptionAuthorizationIDsArrayKey =
     @"extension_rejected_subscription_authorization_ids";
 
 UserDefaultsKey const ExtensionRejectedSubscriptionAuthorizationIDsWriteSeqIntKey =
-@"extesnion_rejected_subscription_authorization_ids_write_seq_int";
+@"extension_rejected_subscription_authorization_ids_write_seq_int";
 
 UserDefaultsKey const ContainerRejectedSubscriptionAuthorizationIDsReadSeqIntKey =
     @"container_read_rejected_subscription_authorization_ids_read_seq_int";
