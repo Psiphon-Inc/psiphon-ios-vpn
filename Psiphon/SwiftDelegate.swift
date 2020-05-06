@@ -71,6 +71,8 @@ func appDelegateReducer(
     
     static let instance = SwiftDelegate()
     
+    private let sharedDB = PsiphonDataSharedDB(forAppGroupIdentifier: APP_GROUP_IDENTIFIER)
+    
     private var (lifetime, token) = Lifetime.make()
     private var store: Store<AppState, AppAction>!
     private var psiCashLib: PsiCash!
@@ -121,6 +123,7 @@ extension SwiftDelegate: SwiftBridgeDelegate {
             environment: { [unowned self] store in
                 let (environment, cleanup) = makeEnvironment(
                     store: store,
+                    sharedDB: self.sharedDB,
                     psiCashLib: self.psiCashLib,
                     objcBridgeDelegate: objcBridge,
                     rewardedVideoAdBridgeDelegate: self,
@@ -285,6 +288,12 @@ extension SwiftDelegate: SwiftBridgeDelegate {
     @objc func applicationWillEnterForeground(_ application: UIApplication) {
         self.store.send(vpnAction: .syncWithProvider(reason: .appEnteredForeground))
         self.store.send(.psiCash(.refreshPsiCashState))
+        
+        self.sharedDB.setAppForegroundState(true)
+    }
+    
+    @objc func applicationDidEnterBackground(_ application: UIApplication) {
+        self.sharedDB.setAppForegroundState(false)
     }
     
     @objc func applicationWillTerminate(_ application: UIApplication) {

@@ -69,6 +69,9 @@
 /* Error alert title */
 "ERROR_TITLE" = "Error";
 
+/* No comment provided by engineer. */
+"EXTENSION_EXPIRED_SUBSCRIPTION_ALERT" = "Your Psiphon subscription has expired.\n\n Please open Psiphon app to renew your subscription.";
+
 /* Message shown when something fails to load */
 "FAILED_TO_LOAD" = "Failed to load";
 

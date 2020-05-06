@@ -108,6 +108,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 #pragma mark - Container Data (Data originating in the container)
 
+/** Returns last foreground state value written by the container.
+ * - Note: The value is not ground truth and might be stale if e.g. the container crashes.
+ */
+- (BOOL)getAppForegroundState;
+
+#if !(TARGET_IS_EXTENSION)
+/** Sets app foregrounded state. This state is used by the network extension.
+ */
+- (BOOL)setAppForegroundState:(BOOL)foregrounded;
+#endif
+
 /**
  * Last date/time immediately before the extension was last started from the container.
  * Check where `setContainerTunnelStartTime:` is called to set the last tunnel start time.

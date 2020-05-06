@@ -149,6 +149,7 @@ typealias AppEnvironment = (
 /// in `applicationWillTerminate(:_)` delegate callback.
 func makeEnvironment(
     store: Store<AppState, AppAction>,
+    sharedDB: PsiphonDataSharedDB,
     psiCashLib: PsiCash,
     objcBridgeDelegate: ObjCBridgeDelegate,
     rewardedVideoAdBridgeDelegate: RewardedVideoAdBridgeDelegate,
@@ -168,7 +169,7 @@ func makeEnvironment(
         appBundle: PsiphonBundle.from(bundle: Bundle.main),
         psiCashEffects: PsiCashEffect(psiCash: psiCashLib),
         clientMetaData: ClientMetaData(),
-        sharedDB: PsiphonDataSharedDB(forAppGroupIdentifier: APP_GROUP_IDENTIFIER),
+        sharedDB: sharedDB,
         userConfigs: UserDefaultsConfig(),
         notifier:  Notifier.sharedInstance(),
         tunnelStatusWithIntentSignal: store.$value.signalProducer
