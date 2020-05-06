@@ -132,17 +132,18 @@ import Promises
         case .unknown:
             fatalErrorFeedbackLog("expected subscription status to not be unknown")
         }
-        
-        switch state.tunnelIntent {
-        case .start(transition: _):
-            return .init(switchedIntent: .stop,
-                         vpnConfigInstalled: state.loadState.vpnConfigurationInstalled,
-                         userSubscribed: userSubscribed)
-        case .stop, .none:
-            return .init(switchedIntent: .start(transition: .none),
-                         vpnConfigInstalled: state.loadState.vpnConfigurationInstalled,
-                         userSubscribed: userSubscribed)
+
+        let newIntent: TunnelStartStopIntent
+        if state.vpnStatus.providerRunning {
+            newIntent = .stop
+        } else {
+            newIntent = .start(transition: .none)
         }
+        
+        return .init(switchedIntent: newIntent,
+                     vpnConfigInstalled: state.loadState.vpnConfigurationInstalled,
+                     userSubscribed: userSubscribed)
+    
     }
     
 }

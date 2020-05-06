@@ -483,25 +483,16 @@ typedef NS_ENUM(NSInteger, VPNIntent) {
             VPNIntent vpnIntentValue;
             
             if (newIntent.intendToStart) {
-                // If the new intent is to start the VPN, first checks for internet connectivity.
-                // If there is internet connectivity, tunnel can be started without ads
-                // if the user is subscribed, if if there the VPN config is not installed.
-                // Otherwise tunnel should be started after interstitial ad has been displayed.
                 
-                Reachability *reachability = [Reachability reachabilityForInternetConnection];
-                if ([reachability currentReachabilityStatus] == NotReachable) {
-                    vpnIntentValue = VPNIntentNoInternetAlert;
-                } else {
-                    if (newIntent.vpnConfigInstalled) {
-                        if (newIntent.userSubscribed || !showAd) {
-                            vpnIntentValue = VPNIntentStartPsiphonTunnelWithoutAds;
-                        } else {
-                            vpnIntentValue = VPNIntentStartPsiphonTunnelWithAds;
-                        }
-                    } else {
-                        // VPN Config is not installed. Skip ads.
+                if (newIntent.vpnConfigInstalled) {
+                    if (newIntent.userSubscribed || !showAd) {
                         vpnIntentValue = VPNIntentStartPsiphonTunnelWithoutAds;
+                    } else {
+                        vpnIntentValue = VPNIntentStartPsiphonTunnelWithAds;
                     }
+                } else {
+                    // VPN Config is not installed. Skip ads.
+                    vpnIntentValue = VPNIntentStartPsiphonTunnelWithoutAds;
                 }
             } else {
                 // The new intent is to stop the VPN.
