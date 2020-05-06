@@ -786,6 +786,12 @@ withSponsorID:(NSString *_Nonnull *)sponsorID {
                 
                 [SubscriptionAuthCheck
                  addRejectedSubscriptionAuthID:self.storedAuthorizations.subscriptionAuth.ID];
+                
+                // Displays an alert to the user for the expired subscription.
+                // This only happens if the container has not been up for 24 hours before expiry.
+                if ([self.sharedDB getAppForegroundState] == FALSE) {
+                    [self displayMessage: NSLocalizedStringWithDefaultValue(@"EXTENSION_EXPIRED_SUBSCRIPTION_ALERT", nil, [NSBundle mainBundle], @"Your Psiphon subscription has expired.\n\n Please open Psiphon app to renew your subscription.", @"")];
+                }
             }
         }
 

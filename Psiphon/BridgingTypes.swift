@@ -63,6 +63,7 @@ import Promises
     @objc func applicationDidFinishLaunching(_ application: UIApplication,
                                              objcBridge: ObjCBridgeDelegate)
     @objc func applicationWillEnterForeground(_ application: UIApplication)
+    @objc func applicationDidEnterBackground(_ application: UIApplication)
     @objc func applicationDidBecomeActive(_ application: UIApplication)
     @objc func applicationWillTerminate(_ application: UIApplication)
     

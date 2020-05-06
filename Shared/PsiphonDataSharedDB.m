@@ -58,6 +58,9 @@ UserDefaultsKey const ExtensionRejectedSubscriptionAuthorizationIDsWriteSeqIntKe
 UserDefaultsKey const ContainerRejectedSubscriptionAuthorizationIDsReadSeqIntKey =
     @"container_read_rejected_subscription_authorization_ids_read_seq_int";
 
+UserDefaultsKey const ContainerForegroundStateBoolKey =
+@"container_foreground_state_bool_key";
+
 /**
  * Key for boolean value that when TRUE indicates that the extension crashed before stop was called.
  * This value is only valid if the extension is not currently running.
@@ -319,6 +322,15 @@ UserDefaultsKey const DebugPsiphonConnectionStateStringKey = @"PsiphonDataShared
 #endif
 
 #pragma mark - Container Data (Data originating in the container)
+
+- (BOOL)getAppForegroundState {
+    return [sharedDefaults boolForKey:ContainerForegroundStateBoolKey];
+}
+
+- (BOOL)setAppForegroundState:(BOOL)foregrounded {
+    [sharedDefaults setBool:foregrounded forKey:ContainerForegroundStateBoolKey];
+    return [sharedDefaults synchronize];
+}
 
 - (NSDate *_Nullable)getContainerTunnelStartTime {
     NSString *_Nullable rfc3339Date = [sharedDefaults stringForKey:TunnelStartTimeStringKey];
