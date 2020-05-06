@@ -244,13 +244,23 @@ typedef NS_ENUM(NSInteger, VPNIntent) {
                   UIAlertController *alert = [AlertDialogs vpnPermissionDeniedAlert];
                   [alert presentFromTopController];
 
+              } else if (startStatus == VPNStartStopStatusInternetNotReachable) {
+                  
+                  // Alert the user that tunnel start failed due to no internet access.
+                  [UIAlertController
+                   presentSimpleAlertWithTitle:[UserStrings No_internet_alert_title]
+                   message:[UserStrings No_internet_alert_body]
+                   preferredStyle:UIAlertControllerStyleAlert
+                   okHandler:nil];
+                  
               } else if (startStatus == VPNStartStopStatusFailedOtherReason) {
 
                   // Alert the user that the VPN failed to start, and that they should try again.
-                  [UIAlertController presentSimpleAlertWithTitle:NSLocalizedStringWithDefaultValue(@"VPN_START_FAIL_TITLE", nil, [NSBundle mainBundle], @"Unable to start", @"Alert dialog title indicating to the user that Psiphon was unable to start (MainViewController)")
-                                                         message:NSLocalizedStringWithDefaultValue(@"VPN_START_FAIL_MESSAGE", nil, [NSBundle mainBundle], @"An error occurred while starting Psiphon. Please try again. If this problem persists, try reinstalling the Psiphon app.", @"Alert dialog message informing the user that an error occurred while starting Psiphon (Do not translate 'Psiphon'). The user should try again, and if the problem persists, they should try reinstalling the app.")
-                                                  preferredStyle:UIAlertControllerStyleAlert
-                                                       okHandler:nil];
+                  [UIAlertController
+                   presentSimpleAlertWithTitle:[UserStrings Unable_to_start_alert_title]
+                   message:[UserStrings Error_while_start_psiphon_alert_body]
+                   preferredStyle:UIAlertControllerStyleAlert
+                   okHandler:nil];
               }
           }
       }];
@@ -460,6 +470,7 @@ typedef NS_ENUM(NSInteger, VPNIntent) {
 
 // Emitted NSNumber is of type VPNIntent.
 - (RACSignal<RACTwoTuple<NSNumber*, SwitchedVPNStartStopIntent*> *> *)startOrStopVPNSignalWithAd:(BOOL)showAd {
+    
     MainViewController *__weak weakSelf = self;
     return [[[[RACSignal createSignal:^RACDisposable *(id <RACSubscriber> subscriber) {
         [[SwiftDelegate.bridge switchVPNStartStopIntent]
@@ -473,7 +484,7 @@ typedef NS_ENUM(NSInteger, VPNIntent) {
             
             if (newIntent.intendToStart) {
                 // If the new intent is to start the VPN, first checks for internet connectivity.
-                // If there is internet connectivity, tunnel can be startet without ads
+                // If there is internet connectivity, tunnel can be started without ads
                 // if the user is subscribed, if if there the VPN config is not installed.
                 // Otherwise tunnel should be started after interstitial ad has been displayed.
                 
@@ -517,13 +528,8 @@ typedef NS_ENUM(NSInteger, VPNIntent) {
             return [RACSignal return:value];
         }
     }] doNext:^(RACTwoTuple<NSNumber*, SwitchedVPNStartStopIntent*> *value) {
-        VPNIntent vpnIntent = (VPNIntent)[value.first integerValue];
         dispatch_async_main(^{
             [SwiftDelegate.bridge sendNewVPNIntent:value.second];
-
-            if (vpnIntent == VPNIntentNoInternetAlert) {
-                // TODO: Show the no internet alert.
-            }
         });
     }] deliverOnMainThread];
 }

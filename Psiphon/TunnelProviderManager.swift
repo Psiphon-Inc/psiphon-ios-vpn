@@ -297,15 +297,23 @@ func updateConfig<T: TunnelProviderManager>(
     }
 }
 
+enum StartTunnelError: HashableError {
+    case neVPNError(NEVPNError)
+    case internetNotReachable
+}
+
 func startPsiphonTunnel<T: TunnelProviderManager>(
-    _ tpm: T, options: [String: String]
-) -> Effect<Result<T, ErrorEvent<NEVPNError>>> {
-            Effect { () -> Result<T, ErrorEvent<NEVPNError>> in
+    _ tpm: T, options: [String: String], internetReachability: InternetReachability
+) -> Effect<Result<T, ErrorEvent<StartTunnelError>>> {
+            Effect { () -> Result<T, ErrorEvent<StartTunnelError>> in
+                guard internetReachability.isCurrentlyReachable else {
+                    return .failure(ErrorEvent(.internetNotReachable))
+                }
                 do {
                     try tpm.start(options: options)
                     return .success(tpm)
                 } catch {
-                    return .failure(ErrorEvent(NEVPNError(_nsError: error as NSError)))
+                    return .failure(ErrorEvent(.neVPNError(NEVPNError(_nsError: error as NSError))))
                 }
             }
 }
