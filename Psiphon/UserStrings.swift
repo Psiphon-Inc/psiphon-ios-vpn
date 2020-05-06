@@ -287,6 +287,30 @@ extension UserStrings {
 // MARK: VPN strings
 extension UserStrings {
     
+    @objc static func No_internet_alert_title() -> String {
+        return NSLocalizedString("NO_INTERNET", tableName: nil, bundle: Bundle.main,
+                                 value: "No Internet Connection",
+                                 comment: "Alert title informing user there is no internet connection")
+    }
+    
+    @objc static func No_internet_alert_body() -> String {
+        return NSLocalizedString("TURN_ON_DATE", tableName: nil, bundle: Bundle.main,
+                                 value: "Please turn on cellular data or use Wi-Fi.",
+                                 comment: "Alert message informing user to turn on their cellular data or wifi to connect to the internet")
+    }
+    
+    @objc static func Unable_to_start_alert_title() -> String {
+        return NSLocalizedString("VPN_START_FAIL_TITLE", tableName: nil, bundle: Bundle.main,
+                                 value: "Unable to start",
+                                 comment: "Alert dialog title indicating to the user that Psiphon was unable to start")
+    }
+    
+    @objc static func Error_while_start_psiphon_alert_body() -> String {
+        return NSLocalizedString("VPN_START_FAIL_MESSAGE", tableName: nil, bundle: Bundle.main,
+                                 value: "An error occurred while starting Psiphon. Please try again.",
+                                 comment: "Alert dialog message informing the user that an error occurred while starting Psiphon (Do not translate 'Psiphon'). The user should try again, and if the problem persists, they should try reinstalling the app.")
+    }
+    
     @objc static func Reinstall_vpn_config() -> String {
         return NSLocalizedString("SETTINGS_REINSTALL_VPN_CONFIGURATION_CELL_TITLE", tableName: nil, bundle: Bundle.main,
                                  value: "Reinstall VPN profile",

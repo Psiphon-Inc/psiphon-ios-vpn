@@ -154,6 +154,7 @@ import Promises
     case startFinished
     case failedUserPermissionDenied
     case failedOtherReason
+    case internetNotReachable
     
     static func from(startStopState: VPNStartStopStateType) -> Self {
         switch startStopState {
@@ -162,10 +163,15 @@ import Promises
             case .completed(.success(.startPsiphonTunnel)):
                 return .startFinished
             case .completed(.failure(let errorEvent)):
-                if errorEvent.error.configurationReadWriteFailedPermissionDenied {
-                    return .failedUserPermissionDenied
-                } else {
-                    return .failedOtherReason
+                switch errorEvent.error {
+                case .neVPNError(let neVPNError):
+                    if neVPNError.configurationReadWriteFailedPermissionDenied {
+                        return .failedUserPermissionDenied
+                    } else {
+                        return .failedOtherReason
+                    }
+                case .internetNotReachable:
+                    return .internetNotReachable
                 }
             default:
                 return .none

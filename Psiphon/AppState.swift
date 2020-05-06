@@ -126,6 +126,7 @@ typealias AppEnvironment = (
     paymentTransactionDelegate: PaymentTransactionDelegate,
     rewardedVideoAdBridgeDelegate: RewardedVideoAdBridgeDelegate,
     productRequestDelegate: ProductRequestDelegate,
+    internetReachability: InternetReachability,
     internetReachabilityDelegate: StoreDelegate<ReachabilityAction>,
     vpnConnectionObserver: VPNConnectionObserver<PsiphonTPM>,
     vpnActionStore: (VPNExternalAction) -> Effect<Never>,
@@ -161,6 +162,8 @@ func makeEnvironment(
     )
     SKPaymentQueue.default().add(paymentTransactionDelegate)
     
+    let reachabilityForInternetConnection = Reachability.forInternetConnection()!
+    
     let environment = AppEnvironment(
         appBundle: PsiphonBundle.from(bundle: Bundle.main),
         psiCashEffects: PsiCashEffect(psiCash: psiCashLib),
@@ -186,8 +189,10 @@ func makeEnvironment(
                 value: erase,
                 action: { .productRequest($0) })
         ),
-        internetReachabilityDelegate: InternetReachabilityDelegate(store:
-            store.projection(
+        internetReachability: reachabilityForInternetConnection,
+        internetReachabilityDelegate: InternetReachabilityDelegate(
+            reachability: reachabilityForInternetConnection,
+            store: store.projection(
                 value: erase,
                 action: { .reachabilityAction($0) })
         ),
@@ -343,7 +348,8 @@ fileprivate func toVPNReducerEnvironment(env: AppEnvironment) -> VPNReducerEnvir
     VPNReducerEnvironment(
         sharedDB: env.sharedDB,
         vpnStartCondition: env.vpnStartCondition,
-        vpnConnectionObserver: env.vpnConnectionObserver
+        vpnConnectionObserver: env.vpnConnectionObserver,
+        internetReachability: env.internetReachability
     )
 }
 

@@ -66,12 +66,43 @@ func internetReachabilityReducer(
     }
 }
 
+protocol InternetReachability {
+    
+    func currentReachabilityStatus() -> NetworkStatus
+    
+    func currentReachabilityFlags() -> ReachabilityCodedStatus
+    
+}
+
+extension InternetReachability {
+    
+    var isCurrentlyReachable: Bool {
+        let status = self.currentReachabilityStatus()
+        switch status {
+        case NotReachable: return false
+        case ReachableViaWiFi: return true
+        case ReachableViaWWAN: return true
+        default:
+            fatalErrorFeedbackLog("Unknown reachability status '\(status)'")
+        }
+    }
+    
+}
+
+extension Reachability: InternetReachability {
+    
+    func currentReachabilityFlags() -> ReachabilityCodedStatus {
+        ReachabilityCodedStatus(stringLiteral: self.currentReachabilityFlagsToString())
+    }
+    
+}
+
 final class InternetReachabilityDelegate: StoreDelegate<ReachabilityAction> {
     
     private let reachability: Reachability
     
-    override init(store: Store<Unit, ReachabilityAction>) {
-        self.reachability = Reachability.forInternetConnection()!
+    init(reachability: Reachability, store: Store<Unit, ReachabilityAction>) {
+        self.reachability = reachability
         super.init(store: store)
         
         self.reachability.startNotifier()

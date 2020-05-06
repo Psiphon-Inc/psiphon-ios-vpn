@@ -119,7 +119,7 @@ typealias ConfigUpdatedResult<T: TunnelProviderManager> =
 enum TPMEffectResultWrapper<T: TunnelProviderManager>: Equatable {
     case configUpdated(ConfigUpdatedResult<T>)
     case syncedStateWithProvider(syncReason: TunnelProviderSyncReason, TunnelProviderSyncedState)
-    case startTunnelResult(Result<Unit, ErrorEvent<NEVPNError>>)
+    case startTunnelResult(Result<Unit, ErrorEvent<StartTunnelError>>)
     case stopTunnelResult(Unit)
 }
 
@@ -164,7 +164,7 @@ struct ProviderManagerLoadState<T: TunnelProviderManager>: Equatable {
 
 typealias VPNStartStopStateType =
     PendingValue<TunnelProviderStartStopAction,
-    Result<TunnelProviderStartStopAction, ErrorEvent<NEVPNError>>>?
+    Result<TunnelProviderStartStopAction, ErrorEvent<StartTunnelError>>>?
 
 struct VPNProviderManagerState<T: TunnelProviderManager>: Equatable {
     var tunnelIntent: TunnelStartStopIntent?
@@ -183,7 +183,8 @@ struct VPNProviderManagerReducerState<T: TunnelProviderManager>: Equatable {
 typealias VPNReducerEnvironment<T: TunnelProviderManager> = (
     sharedDB: PsiphonDataSharedDB,
     vpnStartCondition: () -> Bool,
-    vpnConnectionObserver: VPNConnectionObserver<T>
+    vpnConnectionObserver: VPNConnectionObserver<T>,
+    internetReachability: InternetReachability
 )
 
 fileprivate func vpnProviderManagerStateReducer<T: TunnelProviderManager>(
@@ -587,8 +588,9 @@ fileprivate func startPsiphonTunnelReducer<T: TunnelProviderManager>(
             switch saveLoadConfigResult {
             case .success(let tpm):
                 // Starts the tunnel and then saves the updated config from tunnel start.
-                return startPsiphonTunnel(tpm, options: startOptions)
-                    .flatMap(.latest) { startResult -> Effect<TPMEffectResultWrapper<T>> in
+                return startPsiphonTunnel(tpm, options: startOptions,
+                                          internetReachability: environment.internetReachability
+                ).flatMap(.latest) { startResult -> Effect<TPMEffectResultWrapper<T>> in
                         switch startResult {
                         case .success(let tpm):
                             return saveAndLoadConfig(tpm)
@@ -603,8 +605,9 @@ fileprivate func startPsiphonTunnelReducer<T: TunnelProviderManager>(
                         }
                     }
             case .failure(let errorEvent):
-                return Effect(value: .startTunnelResult(.failure(errorEvent)))
-                    .prefix(value:
+                return Effect(value:
+                    .startTunnelResult(.failure(errorEvent.map(StartTunnelError.neVPNError)))
+                ).prefix(value:
                     .configUpdated(.failure(errorEvent.map { .failedConfigLoadSave($0) }))
                 )
             }
