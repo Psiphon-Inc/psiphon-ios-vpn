@@ -814,12 +814,21 @@ withSponsorID:(NSString *_Nonnull *)sponsorID {
 }
 
 - (void)onConnected {
-    [AppProfiler logMemoryReportWithTag:@"onConnected"];
-    [[Notifier sharedInstance] post:NotifierTunnelConnected];
-    [self tryStartVPN];
+    PacketTunnelProvider *__weak weakSelf = self;
     
-    // Reconnect if subscription authorizations has been updated.
-    [self updateStoredAuthorizationAndReconnectIfNeeded];
+    dispatch_async(self->workQueue, ^{
+        PacketTunnelProvider *__strong strongSelf = weakSelf;
+        if (strongSelf == nil) {
+            return;
+        }
+        
+        [AppProfiler logMemoryReportWithTag:@"onConnected"];
+        [[Notifier sharedInstance] post:NotifierTunnelConnected];
+        [self tryStartVPN];
+        
+        // Reconnect if subscription authorizations has been updated.
+        [self updateStoredAuthorizationAndReconnectIfNeeded];
+    });
 }
 
 - (void)onServerTimestamp:(NSString * _Nonnull)timestamp {
