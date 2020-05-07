@@ -115,7 +115,7 @@ extension TunnelStartStopIntent {
     
     var integerCode: Int {
         switch self {
-        case .start(transition: .restart): return Int(TUNNEL_INTENT_UNDEFINED)
+        case .start(transition: .some(_)): return Int(TUNNEL_INTENT_UNDEFINED)
         case .start(transition: .none): return Int(TUNNEL_INTENT_START)
         case .stop: return Int(TUNNEL_INTENT_STOP)
         }
