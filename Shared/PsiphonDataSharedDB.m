@@ -54,8 +54,8 @@ UserDefaultsKey const ExtensionRejectedSubscriptionAuthorizationIDsArrayKey =
 UserDefaultsKey const ExtensionRejectedSubscriptionAuthorizationIDsWriteSeqIntKey =
 @"extension_rejected_subscription_authorization_ids_write_seq_int";
 
-UserDefaultsKey const ContainerRejectedSubscriptionAuthorizationIDsReadSeqIntKey =
-    @"container_read_rejected_subscription_authorization_ids_read_seq_int";
+UserDefaultsKey const ContainerRejectedSubscriptionAuthorizationIDsReadAtLeastUpToSeqIntKey =
+    @"container_read_rejected_subscription_authorization_ids_read_at_least_up_to_seq_int";
 
 UserDefaultsKey const ContainerForegroundStateBoolKey =
 @"container_foreground_state_bool_key";
@@ -496,11 +496,12 @@ UserDefaultsKey const DebugPsiphonConnectionStateStringKey = @"PsiphonDataShared
 #if TARGET_IS_EXTENSION
 - (void)insertRejectedSubscriptionAuthorizationID:(NSString *)authorizationID {
     NSInteger extensionSeq = [self getExtensionRejectedSubscriptionAuthIdWriteSequenceNumber];
-    NSInteger containerSeq = [self getContainerRejectedSubscriptionAuthIdReadSequenceNumber];
+    NSInteger containerReadAtLeastToSeq =
+      [self getContainerRejectedSubscriptionAuthIdReadAtLeastUpToSequenceNumber];
     
     NSMutableArray<NSString *> *rejectedAuthIDs;
     
-    if (containerSeq < extensionSeq) {
+    if (containerReadAtLeastToSeq < extensionSeq) {
         rejectedAuthIDs = [NSMutableArray arrayWithArray:[self getRejectedSubscriptionAuthorizationIDs]];
     } else {
         // Container is up-to-date with the extension.
@@ -524,17 +525,16 @@ UserDefaultsKey const DebugPsiphonConnectionStateStringKey = @"PsiphonDataShared
     return seq;
 }
 
-- (NSInteger)getContainerRejectedSubscriptionAuthIdReadSequenceNumber {
+- (NSInteger)getContainerRejectedSubscriptionAuthIdReadAtLeastUpToSequenceNumber {
     NSInteger seq = [sharedDefaults
-                     integerForKey:ContainerRejectedSubscriptionAuthorizationIDsReadSeqIntKey];
+               integerForKey:ContainerRejectedSubscriptionAuthorizationIDsReadAtLeastUpToSeqIntKey];
     return seq;
 }
 
 #if !(TARGET_IS_EXTENSION)
-- (void)updateContainerRejectedSubscriptionAuthIdReadSequenceNumber {
-    NSInteger extensionSeq = [self getExtensionRejectedSubscriptionAuthIdWriteSequenceNumber];
-    [sharedDefaults setInteger:extensionSeq
-                        forKey:ContainerRejectedSubscriptionAuthorizationIDsReadSeqIntKey];
+- (void)setContainerRejectedSubscriptionAuthIdReadAtLeastUpToSequenceNumber:(NSInteger)seq {
+    [sharedDefaults setInteger:seq
+                      forKey:ContainerRejectedSubscriptionAuthorizationIDsReadAtLeastUpToSeqIntKey];
 }
 #endif
 

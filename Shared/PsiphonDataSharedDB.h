@@ -37,7 +37,7 @@ extern UserDefaultsKey const _Nonnull ContainerAuthorizationSetKey;
 extern UserDefaultsKey const _Nonnull ContainerSubscriptionAuthorizationsDictKey;
 extern UserDefaultsKey const _Nonnull ExtensionRejectedSubscriptionAuthorizationIDsArrayKey;
 extern UserDefaultsKey const _Nonnull ExtensionRejectedSubscriptionAuthorizationIDsWriteSeqIntKey;
-extern UserDefaultsKey const _Nonnull ContainerRejectedSubscriptionAuthorizationIDsReadSeqIntKey;
+extern UserDefaultsKey const _Nonnull ContainerRejectedSubscriptionAuthorizationIDsReadAtLeastUpToSeqIntKey;
 extern UserDefaultsKey const _Nonnull ContainerForegroundStateBoolKey;
 extern UserDefaultsKey const _Nonnull SharedDataExtensionCrashedBeforeStopBoolKey;
 extern UserDefaultsKey const _Nonnull SharedDataExtensionJetsamCounterIntegerKey;
@@ -239,10 +239,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSInteger)getExtensionRejectedSubscriptionAuthIdWriteSequenceNumber;
 
-- (NSInteger)getContainerRejectedSubscriptionAuthIdReadSequenceNumber;
+- (NSInteger)getContainerRejectedSubscriptionAuthIdReadAtLeastUpToSequenceNumber;
 
 #if !(TARGET_IS_EXTENSION)
-- (void)updateContainerRejectedSubscriptionAuthIdReadSequenceNumber;
+- (void)setContainerRejectedSubscriptionAuthIdReadAtLeastUpToSequenceNumber:(NSInteger)seq;
 #endif
 
 #pragma mark - Jetsam counter

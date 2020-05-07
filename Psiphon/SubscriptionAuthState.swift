@@ -150,7 +150,7 @@ func subscriptionAuthStateReducer<T: TunnelProviderManager>(
         
         return [
             StoredRejectedSubscriptionAuthIDs.getValue(sharedDB: environment.sharedDB)
-                .map { rejectedAuthIDs -> SubscriptionAuthStateAction in
+                .map { rejectedAuthIDsSeqTuple -> SubscriptionAuthStateAction in
                     ._localDataUpdateResult { current in
                         
                         var effects = [Effect<SubscriptionAuthStateAction>]()
@@ -171,11 +171,12 @@ func subscriptionAuthStateReducer<T: TunnelProviderManager>(
                         // Updates authorization state for any purchase that had it's authorization
                         // rejected by Psiphon servers.
                         newValue = newValue.updateAuthorizationState(
-                            givenRejectedAuthIDs: rejectedAuthIDs
+                            givenRejectedAuthIDs: rejectedAuthIDsSeqTuple.rejectedValues
                         )
                         
                         effects.append(
                             StoredRejectedSubscriptionAuthIDs.setContainerReadRejectedAuthIDs(
+                                atLeastUpToSequenceNumber: rejectedAuthIDsSeqTuple.writeSeqNumber,
                                 sharedDB: environment.sharedDB
                             ).fireAndForget()
                         )
@@ -652,15 +653,31 @@ extension SubscriptionAuthState {
 
 fileprivate enum StoredRejectedSubscriptionAuthIDs {
     
-    static func getValue(sharedDB: PsiphonDataSharedDB) -> Effect<Set<AuthorizationID>> {
-        Effect { () -> Set<AuthorizationID> in
-            return Set(sharedDB.getRejectedSubscriptionAuthorizationIDs())
+    static func getValue(
+        sharedDB: PsiphonDataSharedDB
+    ) -> Effect<(rejectedValues: Set<AuthorizationID>, writeSeqNumber: Int)> {
+        Effect { () -> (rejectedValues: Set<AuthorizationID>, writeSeqNumber: Int) in
+            
+            // Sequence number is read before reading the rejected auth ID values.
+            // This is important because we do not have any atomicity guarantee.
+            //
+            // What could go wrong is described in the following steps:
+            // 1. Container reads rejected Auth IDs.
+            // 2. Extension updates sequence number and rejected subscription auth IDs.
+            // 3. Container reads updated sequence number, but now holds stale rejected Auth IDs.
+            
+            let lastWriteSeq = sharedDB.getExtensionRejectedSubscriptionAuthIdWriteSequenceNumber()
+            
+            return (rejectedValues: Set(sharedDB.getRejectedSubscriptionAuthorizationIDs()),
+                    writeSeqNumber: lastWriteSeq)
         }
     }
     
-    static func setContainerReadRejectedAuthIDs(sharedDB: PsiphonDataSharedDB) -> Effect<()> {
+    static func setContainerReadRejectedAuthIDs(
+        atLeastUpToSequenceNumber seq: Int, sharedDB: PsiphonDataSharedDB
+    ) -> Effect<()> {
         Effect { () -> Void in
-            sharedDB.updateContainerRejectedSubscriptionAuthIdReadSequenceNumber()
+            sharedDB.setContainerRejectedSubscriptionAuthIdReadAtLeastUpToSequenceNumber(seq)
         }
     }
     
