@@ -27,7 +27,7 @@ final class UserDefaultsConfig {
 
     /// Expected PsiCash reward while waiting for a successful PsiCash refresh state.
     @JSONUserDefault(.standard, "psicash_expected_reward_v1",
-                     defaultValue: PsiCashAmount.zero())
+                     defaultValue: PsiCashAmount.zero)
     var expectedPsiCashReward: PsiCashAmount
 
 }

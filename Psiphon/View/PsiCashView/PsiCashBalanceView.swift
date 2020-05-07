@@ -32,7 +32,7 @@ import UIKit
     private let iconBindable: IconType.BuildType
     private let balance: UILabel
     private let typeface = AvenirFont.bold
-    private var state: Loading<PsiCashAmount> = .loaded(PsiCashAmount.zero())
+    private var state: Loading<PsiCashAmount> = .loaded(PsiCashAmount.zero)
 
     override init(frame: CGRect) {
         let titleString = UserStrings.PsiCash_balance().localizedUppercase
@@ -127,7 +127,7 @@ import UIKit
              (.completed(_), .watchedRewardedVideo):
             iconValue = .left(.unit)  // Coin icon
         }
-        self.setAmount(newValue.psiCashBalance.value)
+        self.setAmount(newValue.psiCashBalance.optimisticBalance)
         self.iconBindable.bind(iconValue)
     }
 
