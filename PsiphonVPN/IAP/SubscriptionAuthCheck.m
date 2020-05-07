@@ -50,6 +50,8 @@ PsiFeedbackLogType const SubscriptionAuthCheckLogType = @"SubscriptionAuthCheck"
         return nil;
     }
     
+    // This is equivalent to check if there is at least one `SubscriptionPurchaseAuthState` element.
+    // Since starting from 0, index i will be the dictionary's key, and (i + 1) will be the value.
     if ([subsAuthDict count] < 2) {
         return nil;
     }
@@ -95,6 +97,8 @@ PsiFeedbackLogType const SubscriptionAuthCheckLogType = @"SubscriptionAuthCheck"
         [authorizations addObject:decodedAuth];
     }
     
+    // Goes through all elements of `authorizations` looking for
+    // the authorization with the latest expiry, and assigns it to `authWithLatestExpiry`.
     Authorization *_Nullable authWithLatestExpiry = nil;
     for (Authorization *auth in authorizations) {
         if (authWithLatestExpiry == nil) {
