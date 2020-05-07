@@ -284,7 +284,7 @@ struct RetriableTunneledHttpRequest<Response: RetriableHTTPResponse> {
     }
     
     let request: HTTPRequest<Response>
-    let retryCount: Int = 10
+    let retryCount: Int = 5
     let retryInterval: DispatchTimeInterval = .seconds(1)
     
     func makeRequestSignal<T: TunnelProviderManager>(
