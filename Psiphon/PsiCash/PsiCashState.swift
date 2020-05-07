@@ -101,7 +101,7 @@ enum PsiCashPurchaseResponseError: HashableError {
     case serverError(PsiCashStatus, SystemError?)
 }
 
-extension PsiCashPurchaseResponseError {
+extension PsiCashPurchaseResponseError: ErrorUserDescription {
     
     var userDescription: String {
         switch self {

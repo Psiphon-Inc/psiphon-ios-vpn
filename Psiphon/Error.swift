@@ -99,3 +99,10 @@ extension Either: Error where A: Error, B: Error {
 }
 
 extension Array: Error where Element: Error {}
+
+protocol ErrorUserDescription where Self: Error {
+    
+    /// User-facing description of error.
+    var userDescription: String { get }
+    
+}
