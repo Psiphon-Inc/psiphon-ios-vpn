@@ -21,17 +21,20 @@ import Foundation
 
 class ObjCDelegate: NSObject {}
 
+/// `StoreDelegate` is a convenience class meant to be sub-classed by classes that are delegates
+/// of some object.
+/// Delegate callbacks can call `storeSend(_:)` to send actions to the `store` object.
 class StoreDelegate<Action>: ObjCDelegate {
     
     /// Delegates typically return their result on a global concurrent dispatch queue.
-    /// To avoid `store.send` accidentally being called from outside the main dispatch queue,
-    /// we therefore hide access to store object and provide a `sendOnMain` function.
     private let store: Store<Unit, Action>
     
     init(store: Store<Unit, Action>) {
         self.store = store
     }
     
+    /// Sends action to `store` object this delegate is initialized with.
+    /// This function is thread-safe.
     func storeSend(_ action: Action) {
         self.store.send(action)
     }
