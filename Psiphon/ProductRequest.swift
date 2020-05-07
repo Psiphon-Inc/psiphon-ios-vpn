@@ -25,11 +25,11 @@ enum ParsedPsiCashAppStorePurchasable: Equatable {
     
     // Map from App Store defined Product Id to PsiCash value.
     static let supportedProducts: [String: Double] = [
-        "ca.psiphon.Psiphon.PsiCash.1000": 1000,
-        "ca.psiphon.Psiphon.PsiCash.4000": 4000,
-        "ca.psiphon.Psiphon.PsiCash.10000": 10000,
-        "ca.psiphon.Psiphon.PsiCash.30000": 30000,
-        "ca.psiphon.Psiphon.PsiCash.100000": 100000,
+        "ca.psiphon.Psiphon.PsiCash.1000Psi": 1000,
+        "ca.psiphon.Psiphon.PsiCash.4000Psi": 4000,
+        "ca.psiphon.Psiphon.PsiCash.10000Psi": 10000,
+        "ca.psiphon.Psiphon.PsiCash.30000Psi": 30000,
+        "ca.psiphon.Psiphon.PsiCash.100000Psi": 100000,
     ]
     
     
