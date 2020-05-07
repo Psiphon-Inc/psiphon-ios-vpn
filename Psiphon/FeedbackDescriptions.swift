@@ -159,8 +159,8 @@ extension PsiphonDataSharedDB: CustomFieldFeedbackDescription {
          ExtensionRejectedSubscriptionAuthorizationIDsWriteSeqIntKey:
             self.getExtensionRejectedSubscriptionAuthIdWriteSequenceNumber(),
          
-         ContainerRejectedSubscriptionAuthorizationIDsReadSeqIntKey:
-            self.getContainerRejectedSubscriptionAuthIdReadSequenceNumber(),
+         ContainerRejectedSubscriptionAuthorizationIDsReadAtLeastUpToSeqIntKey:
+            self.getContainerRejectedSubscriptionAuthIdReadAtLeastUpToSequenceNumber(),
          
          ContainerForegroundStateBoolKey: self.getAppForegroundState(),
          
