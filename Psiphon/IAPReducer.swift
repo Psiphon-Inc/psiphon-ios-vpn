@@ -173,7 +173,7 @@ func iapReducer(
                                     // Updates balance state to reflect expected increase
                                     // in PsiCash balance.
                                     state.psiCashBalance.waitingForExpectedIncrease(
-                                        withAddedReward: .zero(),
+                                        withAddedReward: .zero,
                                         reason: .purchasedPsiCash,
                                         userConfigs: environment.userConfigs
                                     )
