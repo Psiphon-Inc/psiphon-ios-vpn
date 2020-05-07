@@ -117,18 +117,40 @@ struct HTTPRequestError: Error {
     let errorEvent: ErrorEvent<SystemError>
 }
 
+extension URL {
+    
+    var isSchemeHttp: Bool {
+        switch self.scheme {
+        case "http": return true
+        case "https": return true
+        default: return false
+        }
+    }
+    
+}
+
 fileprivate func makeHTTPRequest<Response>(
     _ requestData: HTTPRequest<Response>,
     handler: @escaping (Response) -> Void
 ) -> URLSessionTask {
+    
+    guard requestData.urlRequest.url?.isSchemeHttp ?? false else {
+        fatalErrorFeedbackLog(
+            "Expected HTTP/HTTPS request '\(String(describing: requestData.urlRequest.url))'"
+        )
+    }
+    
     let config = URLSessionConfiguration.ephemeral
     let session = URLSession(configuration: config).dataTask(with: requestData.urlRequest)
     { data, response, error in
         let result: URLSessionResult
         if let error = error {
+            // If URLSession task resulted in an error, there might be a partial response.
             result = .failure(HTTPRequestError(partialResponse: response as? HTTPURLResponse,
                                                errorEvent: ErrorEvent(error as SystemError)))
         } else {
+            // If `error` is nil, then URLSession task callback guarantees that
+            // `data` and `response` are non-nil.
             result = .success((data: data!, response: response! as! HTTPURLResponse))
         }
         handler(Response(urlSessionResult: result))
