@@ -190,13 +190,17 @@ struct PsiCashBalance: Equatable {
     
     /// Balance with expected reward amount added.
     /// - Note: This value is either equal to `PsiCashLibData.balance`, or higher if there is expected reward amount.
-    var value: PsiCashAmount
+    var optimisticBalance: PsiCashAmount
+    
+    /// PsiCash balance as of last PsiCash refresh state.
+    var lastRefreshBalance: PsiCashAmount
 }
 
 extension PsiCashBalance {
     init() {
         pendingExpectedBalanceIncrease = .none
-        value = .zero()
+        optimisticBalance = .zero
+        lastRefreshBalance = .zero
     }
 }
 
@@ -207,10 +211,10 @@ extension PsiCashBalance {
         userConfigs: UserDefaultsConfig
     ) {
         pendingExpectedBalanceIncrease = reason
-        if addedReward > .zero() {
-            let newRewardAmount = userConfigs.expectedPsiCashReward + addedReward
-            userConfigs.expectedPsiCashReward = newRewardAmount
-            value = value + newRewardAmount
+        if addedReward > .zero {
+            let totalExpectedReward = userConfigs.expectedPsiCashReward + addedReward
+            userConfigs.expectedPsiCashReward = totalExpectedReward
+            optimisticBalance = lastRefreshBalance + totalExpectedReward
         }
     }
     
@@ -225,14 +229,17 @@ extension PsiCashBalance {
             reason = .watchedRewardedVideo
         }
         return .init(pendingExpectedBalanceIncrease: reason,
-                     value: libData.balance + adReward)
+                     optimisticBalance: libData.balance + adReward,
+                     lastRefreshBalance: libData.balance)
     }
 
     static func refreshed(
         refreshedData libData: PsiCashLibData, userConfigs: UserDefaultsConfig
     ) -> Self {
-        userConfigs.expectedPsiCashReward = PsiCashAmount.zero()
-        return .init(pendingExpectedBalanceIncrease: .none, value: libData.balance)
+        userConfigs.expectedPsiCashReward = PsiCashAmount.zero
+        return .init(pendingExpectedBalanceIncrease: .none,
+                     optimisticBalance: libData.balance,
+                     lastRefreshBalance: libData.balance)
     }
 
 }
