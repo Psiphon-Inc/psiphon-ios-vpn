@@ -355,6 +355,11 @@ func subscriptionAuthStateReducer<T: TunnelProviderManager>(
         case .failed(let errorEvent):
             // Authorization request finished in failure.
             
+            var effects = [Effect<SubscriptionAuthStateAction>]()
+            effects.append(
+                feedbackLog(.error, "authorization request failed '\(errorEvent)'").mapNever()
+            )
+            
             // Authorization request for this purchase is no longer pending.
             state.subscription.transactionsPendingAuthRequest.remove(purchase.originalTransactionID)
             
@@ -366,10 +371,19 @@ func subscriptionAuthStateReducer<T: TunnelProviderManager>(
                 environment: environment
             )
             
-            return [
-                stateUpdateEffect.mapNever(),
-                feedbackLog(.error, "authorization request failed '\(errorEvent)'").mapNever()
-            ]
+            effects.append(
+                stateUpdateEffect.mapNever()
+            )
+            
+            // Retry the request for authorization purchases if tunnel provider manager
+            // previous references has been invalidated.
+            if case .tunnelError(.nilTunnelProviderManager) = errorEvent.error {
+                effects.append(
+                    Effect(value: .requestAuthorizationForPurchases)
+                )
+            }
+            
+            return effects
             
         case .completed(let subscriptionValidationResult):
             // Authorization request completed with a response from purchase verifier server.

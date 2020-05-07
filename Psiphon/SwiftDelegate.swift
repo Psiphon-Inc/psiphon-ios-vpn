@@ -145,6 +145,15 @@ extension SwiftDelegate: SwiftBridgeDelegate {
             .map(value: AppAction.psiCash(.refreshPsiCashState))
             .send(store: self.store)
         
+        // Maps connected events to request authorization for purchases.
+        // This is a retry condition needed only if there was a fatal error in previous
+        // authorization request attempts.
+        self.lifetime += self.store.$value.signalProducer.map(\.vpnState.value.vpnStatus)
+            .skipRepeats()
+            .filter { $0 == .connected }
+            .map(value: AppAction.subscriptionAuthStateAction(.requestAuthorizationForPurchases))
+            .send(store: self.store)
+        
         // Forwards `PsiCashState` updates to ObjCBridgeDelegate.
         self.lifetime += self.store.$value.signalProducer
             .map(\.balanceState)
