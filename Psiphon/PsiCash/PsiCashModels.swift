@@ -49,7 +49,7 @@ struct PsiCashLibData: Equatable {
 extension PsiCashLibData {
     init() {
         authPackage = .init(withTokenTypes: [])
-        balance = .zero()
+        balance = .zero
         availableProducts = .init(items: [], parseErrors: [])
         activePurchases = .init(items: [], parseErrors: [])
     }
@@ -200,9 +200,7 @@ struct PsiCashAmount: Comparable, Hashable, Codable {
         _storage = amount
     }
 
-    static func zero() -> Self {
-        return .init(nanoPsi: 0)
-    }
+    static let zero: Self = .init(nanoPsi: 0)
     
     static func < (lhs: PsiCashAmount, rhs: PsiCashAmount) -> Bool {
         return lhs._storage < rhs._storage
