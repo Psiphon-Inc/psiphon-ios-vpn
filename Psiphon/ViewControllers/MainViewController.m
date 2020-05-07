@@ -81,6 +81,9 @@ typedef NS_ENUM(NSInteger, VPNIntent) {
 @end
 
 @implementation MainViewController {
+    // Flags
+    BOOL pendingStartStopSignalCompletion;
+    
     // Models
     AvailableServerRegions *availableServerRegions;
 
@@ -513,13 +516,26 @@ typedef NS_ENUM(NSInteger, VPNIntent) {
 
 - (void)onStartStopTap:(UIButton *)sender {
     MainViewController *__weak weakSelf = self;
+    
+    if (pendingStartStopSignalCompletion == TRUE) {
+        return;
+    }
+    pendingStartStopSignalCompletion = TRUE;
 
     __block RACDisposable *disposable = [[self startOrStopVPNSignalWithAd:TRUE]
       subscribeError:^(NSError *error) {
         [weakSelf.compoundDisposable removeDisposable:disposable];
       }
       completed:^{
-        [weakSelf.compoundDisposable removeDisposable:disposable];
+        if (NSThread.isMainThread != TRUE) {
+            [NSException raise:@"MainThreadCheck"
+                        format:@"Expected callback on main-thread"];
+        }
+        MainViewController *__strong strongSelf = weakSelf;
+        if (strongSelf != nil) {
+            [strongSelf.compoundDisposable removeDisposable:disposable];
+            strongSelf->pendingStartStopSignalCompletion = FALSE;
+        }
       }];
 
     [self.compoundDisposable addDisposable:disposable];
