@@ -2,10 +2,10 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <array>
-	<string>ca.psiphon.Psiphon.PsiCash.1000</string>
-	<string>ca.psiphon.Psiphon.PsiCash.4000</string>
-	<string>ca.psiphon.Psiphon.PsiCash.10000</string>
-	<string>ca.psiphon.Psiphon.PsiCash.30000</string>
-	<string>ca.psiphon.Psiphon.PsiCash.100000</string>
+	<string>ca.psiphon.Psiphon.PsiCash.1000Psi</string>
+	<string>ca.psiphon.Psiphon.PsiCash.4000Psi</string>
+	<string>ca.psiphon.Psiphon.PsiCash.10000Psi</string>
+	<string>ca.psiphon.Psiphon.PsiCash.30000Psi</string>
+	<string>ca.psiphon.Psiphon.PsiCash.100000Psi</string>
 </array>
 </plist>
