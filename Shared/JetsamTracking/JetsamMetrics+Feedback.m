@@ -81,9 +81,7 @@ NSErrorDomain _Nonnull const JetsamMetrics_FeedbackErrorDomain = @"JetsamMetrics
                dictionaryWithDictionary:@{@"count": @(stat.count),
                                           @"min": @(stat.min),
                                           @"max": @(stat.max),
-                                          @"mean": @(stat.mean),
-                                          @"stdev": @([stat stdev]),
-                                          @"var": @([stat variance])}];
+                                          @"mean": @(stat.mean)}];
             if (stat.count > 1) {
                 [perVersionStat setObject:@([stat stdev]) forKey:@"stdev"];
                 [perVersionStat setObject:@([stat variance]) forKey:@"var"];
