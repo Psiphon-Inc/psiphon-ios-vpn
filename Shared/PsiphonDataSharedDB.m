@@ -511,11 +511,15 @@ UserDefaultsKey const DebugPsiphonConnectionStateStringKey = @"PsiphonDataShared
     
     [rejectedAuthIDs addObject:authorizationID];
     
-    [sharedDefaults setInteger:(extensionSeq + 1)
-                        forKey:ExtensionRejectedSubscriptionAuthorizationIDsWriteSeqIntKey];
+    // Updates the rejection authorization IDs before sequence number.
+    // This guarantees that there is no data loss, and at most sequence number
+    // will be out-of-sync.
     
     [sharedDefaults setObject:rejectedAuthIDs
                        forKey:ExtensionRejectedSubscriptionAuthorizationIDsArrayKey];
+    
+    [sharedDefaults setInteger:(extensionSeq + 1)
+                        forKey:ExtensionRejectedSubscriptionAuthorizationIDsWriteSeqIntKey];
 }
 #endif
 
