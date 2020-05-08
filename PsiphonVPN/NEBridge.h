@@ -28,3 +28,8 @@
 
 // Network Extension queries
 #define EXTENSION_QUERY_TUNNEL_PROVIDER_STATE @"queryTunnelProviderState"
+
+// Integer codes for `TunnelStartStopIntent`.
+#define TUNNEL_INTENT_UNDEFINED 0
+#define TUNNEL_INTENT_START 1
+#define TUNNEL_INTENT_STOP 2

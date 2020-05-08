@@ -423,10 +423,13 @@ withSponsorID:(NSString *_Nonnull *)sponsorID {
     } else if ([NotifierAppEnteredBackground isEqualToString:message]) {
 
         LOG_DEBUG(@"container entered background");
-
+        
+        // TunnelStartStopIntent integer codes are defined in VPNState.swift.
+        NSInteger tunnelIntent = [self.sharedDB getContainerTunnelIntentStatus];
+        
         // If the container StartVPN command has not been received from the container,
         // and the container goes to the background, then alert the user to open the app.
-        if (self.waitForContainerStartVPNCommand) {
+        if (self.waitForContainerStartVPNCommand && tunnelIntent == TUNNEL_INTENT_START) {
             [self displayMessage:NSLocalizedStringWithDefaultValue(@"OPEN_PSIPHON_APP", nil, [NSBundle mainBundle], @"Please open Psiphon app to finish connecting.", @"Alert message informing the user they should open the app to finish connecting to the VPN. DO NOT translate 'Psiphon'.")];
         }
 
