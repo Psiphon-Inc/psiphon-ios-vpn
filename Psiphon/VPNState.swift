@@ -206,9 +206,10 @@ fileprivate func vpnProviderManagerStateReducer<T: TunnelProviderManager>(
         // The flag is reset at the disconnecting state change, since this is a clear
         // signal that the provider has started transitioning (being stopped and started again).
         //
-        if case .disconnecting = vpnStatus, case .start(transition: .restart) = state.tunnelIntent {
+        if case .disconnecting = vpnStatus,
+            case .start(transition: .restart) = state.vpnState.tunnelIntent {
             effects.append(
-                state.tunnelIntent.updateState(
+                state.vpnState.tunnelIntent.updateState(
                     newValue: .start(transition: .none),
                     sharedDB: environment.sharedDB
                 ).mapNever()
@@ -377,7 +378,7 @@ fileprivate func vpnProviderManagerStateReducer<T: TunnelProviderManager>(
             switch intent {
             case .start(transition: .none):
                 // Starts Psiphon tunnel.
-                let intentUpdateEffect = state.tunnelIntent.updateState(
+                let intentUpdateEffect = state.vpnState.tunnelIntent.updateState(
                     newValue: .start(transition: .none),
                     sharedDB: environment.sharedDB
                 )
@@ -394,7 +395,7 @@ fileprivate func vpnProviderManagerStateReducer<T: TunnelProviderManager>(
                         return []
                 }
                 
-                let intentUpdateEffect = state.tunnelIntent.updateState(
+                let intentUpdateEffect = state.vpnState.tunnelIntent.updateState(
                     newValue: .start(transition: .restart),
                     sharedDB: environment.sharedDB
                 )
@@ -407,7 +408,7 @@ fileprivate func vpnProviderManagerStateReducer<T: TunnelProviderManager>(
             case .stop:
                 // Stops tunnel provider.
 
-                let intentUpdateEffect = state.tunnelIntent.updateState(
+                let intentUpdateEffect = state.vpnState.tunnelIntent.updateState(
                     newValue: .stop,
                     sharedDB: environment.sharedDB
                 )
