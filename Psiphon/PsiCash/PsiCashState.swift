@@ -47,7 +47,8 @@ extension PsiCashState {
             product: .rewardedVideoAd(loading: self.rewardedVideo.isLoading),
             title: PsiCashHardCodedValues.videoAdRewardTitle,
             subtitle: UserStrings.Watch_rewarded_video_and_earn(),
-            price: 0.0)
+            localizedPrice: .free
+        )
     }
     
     // Returns the first Speed Boost product that has not expired.
