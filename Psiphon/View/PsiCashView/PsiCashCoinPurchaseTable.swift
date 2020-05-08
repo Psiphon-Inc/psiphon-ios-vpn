@@ -28,7 +28,7 @@ struct PsiCashPurchasableViewModel: Equatable {
     let product: ProductType
     let title: String
     let subtitle: String
-    let price: Double
+    let localizedPrice: LocalizedPrice
 }
 
 struct PsiCashCoinPurchaseTable: ViewBuilder {
@@ -243,11 +243,12 @@ fileprivate final class PurchaseCellContent: UIView, Bindable {
 
         spinner.isHidden = true
         spinner.stopAnimating()
-        if newValue.price == 0.0 {
+        switch newValue.localizedPrice {
+        case .free:
             button.setTitle(UserStrings.Free(), for: .normal)
-        } else {
-            button.setTitle(priceFormatter.string(from: NSNumber(value: newValue.price))!,
-                            for: .normal)
+        case let .localizedPrice(price: price, priceLocale: priceLocale):
+            priceFormatter.locale = priceLocale
+            button.setTitle(priceFormatter.string(from: price), for: .normal)
         }
 
     }
