@@ -50,7 +50,7 @@
     XCTAssertNotNil(v1stat);
 
     double stat_stdev = [v1stat stdev];
-    double stat_mean = v1stat.mean;
+    double stat_mean = [v1stat mean];
     double actual_stdev = double_stdev(running_times, sample_size);
     double actual_mean = double_mean(running_times, sample_size);
     free(running_times);

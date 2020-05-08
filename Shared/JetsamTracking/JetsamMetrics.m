@@ -52,9 +52,10 @@ NSString *_Nonnull const MetricsDictionaryCoderKey = @"metrics.dict";
 
     RunningStat *metric = [newPerVersionMetrics objectForKey:appVersion];
     if (metric == NULL) {
-        metric = [[RunningStat alloc] init];
+        metric = [[RunningStat alloc] initWithValue:(double)runningTime];
+    } else {
+        [metric addValue:(double)runningTime];
     }
-    [metric addValue:(double)runningTime];
 
     [newPerVersionMetrics setObject:metric forKey:appVersion];
     self.perVersionMetrics = newPerVersionMetrics;

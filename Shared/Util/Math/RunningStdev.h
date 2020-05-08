@@ -18,38 +18,38 @@
  */
 
 #import <Foundation/Foundation.h>
-#import "RunningMinMax.h"
-#import "RunningStdev.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-FOUNDATION_EXPORT NSErrorDomain const RunningStatErrorDomain;
+FOUNDATION_EXPORT NSErrorDomain const RunningStdevErrorDomain;
 
-typedef NS_ERROR_ENUM(RunningStatErrorDomain, RunningStatErrorCode) {
-    RunningStatErrorIntegerOverflow = 1,
-    RunningStatErrorStdev = 2
+typedef NS_ERROR_ENUM(RunningStdevErrorDomain, RunningStdevErrorCode) {
+    RunningStdevErrorIntegerOverflow = 1,
+    RunningStdevErrorDoubleOverflow  = 2,
 };
 
-@interface RunningStat : NSObject <NSCopying, NSCoding, NSSecureCoding>
+@interface RunningStdev : NSObject <NSCopying, NSCoding, NSSecureCoding>
 
 @property (readonly, nonatomic, assign) int count;
 
+@property (readonly, nonatomic, assign) double mean;
+@property (readonly, nonatomic, assign) double old_mean;
+
+ // sum of squares of differences from the current mean
+@property (readonly, nonatomic, assign) double m2_s;
+@property (readonly, nonatomic, assign) double old_m2_s;
+
 - (instancetype)init NS_UNAVAILABLE;
+
 - (instancetype)initWithValue:(double)x;
 
-- (NSError *_Nullable)addValue:(double)x;
+- (NSError*)addValue:(double)x;
 
 - (double)stdev;
 
 - (double)variance;
 
-- (double)mean;
-
-- (double)min;
-
-- (double)max;
-
-- (BOOL)isEqualToRunningStat:(RunningStat*)stat;
+- (BOOL)isEqualToRunningStdev:(RunningStdev*)stat;
 
 @end
 
