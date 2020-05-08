@@ -56,10 +56,14 @@ extension ParsedPsiCashAppStorePurchasable {
         guard let title = formatter.string(from: psiCashValue) else {
             return .parseError(reason: "Failed to format '\(psiCashValue)' into string")
         }
-        return .purchasable(.init(product: .product(product),
-                                  title: title,
-                                  subtitle: product.skProduct.localizedDescription,
-                                  price: product.skProduct.price.doubleValue))
+        return .purchasable(
+            PsiCashPurchasableViewModel(
+                product: .product(product),
+                title: title,
+                subtitle: product.skProduct.localizedDescription,
+                localizedPrice: .makeLocalizedPrice(skProduct: product.skProduct)
+            )
+        )
     }
     
 }
@@ -74,7 +78,26 @@ extension Array where Element == ParsedPsiCashAppStorePurchasable {
             guard case let .purchasable(secondPurchasable) = second else {
                 return true
             }
-            return firstPurchasable.price < secondPurchasable.price
+                        
+            switch (firstPurchasable.localizedPrice, secondPurchasable.localizedPrice) {
+            case (.free, .free):
+                return true
+            case (.free, .localizedPrice(price: _, priceLocale: _)):
+                return true
+            case (.localizedPrice(price: _, priceLocale: _), .free):
+                return false
+            case let (.localizedPrice(price: price1, priceLocale: priceLocale1),
+                      .localizedPrice(price: price2, priceLocale: priceLocale2)):
+                switch priceLocale1.currencyCode!.compare(priceLocale2.currencyCode!) {
+                case .orderedSame:
+                    return price1 < price2
+                case .orderedAscending:
+                    return true
+                case .orderedDescending:
+                    return false
+                }
+            }
+            
         }
     }
     
@@ -113,7 +136,7 @@ func productRequestReducer(
         guard case .completed(_) = state.psiCashProducts else {
             return []
         }
-        // If previous value had successful reslut,
+        // If previous value had successful result,
         // then the success value is added to `.pending` case.
         state.psiCashProducts = .pending(previousValue: state.psiCashProducts)
         
