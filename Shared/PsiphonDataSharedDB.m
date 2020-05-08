@@ -60,6 +60,8 @@ UserDefaultsKey const ContainerRejectedSubscriptionAuthorizationIDsReadAtLeastUp
 UserDefaultsKey const ContainerForegroundStateBoolKey =
 @"container_foreground_state_bool_key";
 
+UserDefaultsKey const ContainerTunnelIntentStatusIntKey = @"container_tunnel_intent_status_key";
+
 /**
  * Key for boolean value that when TRUE indicates that the extension crashed before stop was called.
  * This value is only valid if the extension is not currently running.
@@ -326,6 +328,16 @@ UserDefaultsKey const DebugPsiphonConnectionStateStringKey = @"PsiphonDataShared
     [sharedDefaults setBool:foregrounded forKey:ContainerForegroundStateBoolKey];
     return [sharedDefaults synchronize];
 }
+
+- (NSInteger)getContainerTunnelIntentStatus {
+    return [sharedDefaults integerForKey:ContainerTunnelIntentStatusIntKey];
+}
+
+#if !(TARGET_IS_EXTENSION)
+- (void)setContainerTunnelIntentStatus:(NSInteger)statusCode {
+    [sharedDefaults setInteger:statusCode forKey:ContainerTunnelIntentStatusIntKey];
+}
+#endif
 
 - (NSDate *_Nullable)getContainerTunnelStartTime {
     NSString *_Nullable rfc3339Date = [sharedDefaults stringForKey:TunnelStartTimeStringKey];

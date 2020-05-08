@@ -199,13 +199,20 @@ fileprivate func vpnProviderManagerStateReducer<T: TunnelProviderManager>(
     case .vpnStatusChanged(let vpnStatus):
         state.vpnState.providerVPNStatus = vpnStatus
         
+        var effects = [Effect<VPNProviderManagerStateAction<T>>]()
+        
         // Resets tunnelIntent transition flag if previously was `.restart`.
         // Discussion:
         // The flag is reset at the disconnecting state change, since this is a clear
         // signal that the provider has started transitioning (being stopped and started again).
         //
-        if case .disconnecting = vpnStatus, case .start(transition: .restart) = state.vpnState.tunnelIntent {
-            state.vpnState.tunnelIntent = .start(transition: .none)
+        if case .disconnecting = vpnStatus, case .start(transition: .restart) = state.tunnelIntent {
+            effects.append(
+                state.tunnelIntent.updateState(
+                    newValue: .start(transition: .none),
+                    sharedDB: environment.sharedDB
+                ).mapNever()
+            )
         }
         
         // If the VPN connection is not in the expected state,
@@ -370,8 +377,15 @@ fileprivate func vpnProviderManagerStateReducer<T: TunnelProviderManager>(
             switch intent {
             case .start(transition: .none):
                 // Starts Psiphon tunnel.
-                state.vpnState.tunnelIntent = .start(transition: .none)
-                return [ Effect(value: .startPsiphonTunnel) ]
+                let intentUpdateEffect = state.tunnelIntent.updateState(
+                    newValue: .start(transition: .none),
+                    sharedDB: environment.sharedDB
+                )
+                
+                return [
+                    intentUpdateEffect.mapNever(),
+                    Effect(value: .startPsiphonTunnel)
+                ]
                 
             case .start(transition: .restart):
                 // Restarts tunnel provider if not stopped.
@@ -379,13 +393,28 @@ fileprivate func vpnProviderManagerStateReducer<T: TunnelProviderManager>(
                     tpm.connectionStatus.providerNotStopped else {
                         return []
                 }
-                state.vpnState.tunnelIntent = .start(transition: .restart)
-                return [ Effect(value: .stopVPN) ]
+                
+                let intentUpdateEffect = state.tunnelIntent.updateState(
+                    newValue: .start(transition: .restart),
+                    sharedDB: environment.sharedDB
+                )
+                
+                return [
+                    intentUpdateEffect.mapNever(),
+                    Effect(value: .stopVPN)
+                ]
                 
             case .stop:
                 // Stops tunnel provider.
-                state.vpnState.tunnelIntent = .stop
-                return [ Effect(value: .stopVPN) ]
+
+                let intentUpdateEffect = state.tunnelIntent.updateState(
+                    newValue: .stop,
+                    sharedDB: environment.sharedDB
+                )
+                return [
+                    intentUpdateEffect.mapNever(),
+                    Effect(value: .stopVPN)
+                ]
             }
         }
     }
@@ -422,21 +451,35 @@ fileprivate func tunnelProviderReducer<T: TunnelProviderManager>(
             state.providerSyncResult = .completed(.none)
         }
         
+        // This set of effects should be always be returned first
+        // before any other effects. This preserves the ordering of effects.
+        var firstEffects = [Effect<VPNProviderManagerStateAction<T>>]()
+        
         // Initialize tunnel intent value given none was previously set.
         switch (reason: reason, currentIntent:state.tunnelIntent, syncedState: syncedState) {
         case (reason: .appLaunched, currentIntent: .none, syncedState: _):
             // Initializes tunnel intent when app is first launched
-            state.tunnelIntent = .initializeIntentGiven(reason, syncedState)
+            firstEffects.append(
+                state.tunnelIntent.updateState(
+                    newValue: .initializeIntentGiven(reason, syncedState),
+                    sharedDB: environment.sharedDB
+                ).mapNever()
+            )
         case (reason: _, currentIntent: .stop, syncedState: .active(_)):
             // Updates the tunnel intent to `.start` if the tunnel provider was
             // started from system settings.
-            state.tunnelIntent = .start(transition: .none)
+            firstEffects.append(
+                state.tunnelIntent.updateState(
+                    newValue: .start(transition: .none),
+                    sharedDB: environment.sharedDB
+                ).mapNever()
+            )
         default: break
         }
         
         switch syncedState {
         case .zombie:
-            return [
+            return firstEffects + [
                 Effect(value: .stopVPN),
                 feedbackLog(.info, tag: vpnProviderSyncTag, "zombie provider").mapNever()
             ]
@@ -448,7 +491,7 @@ fileprivate func tunnelProviderReducer<T: TunnelProviderManager>(
             guard tpm.verifyConfig(forExpectedType: .startVPN) else {
                 // Failed to verify VPN config values.
                 // To update the config, tunnel is restarted.
-                return [
+                return firstEffects + [
                     Effect(value: .external(.tunnelStateIntent(.start(transition: .restart))))
                 ]
             }
@@ -457,13 +500,13 @@ fileprivate func tunnelProviderReducer<T: TunnelProviderManager>(
             // if vpnStartCondition passes.
             guard state.loadState.connectionStatus == .connecting,
                 environment.vpnStartCondition() else {
-                    return []
+                    return firstEffects
             }
-            return [ notifyStartVPN().mapNever() ]
+            return firstEffects + [ notifyStartVPN().mapNever() ]
             
         case .unknown(let errorEvent):
-            var effects = [Effect<VPNProviderManagerStateAction<T>>]()
-            effects.append(
+            var unknownEffects = [Effect<VPNProviderManagerStateAction<T>>]()
+            unknownEffects.append(
                 feedbackLog(.info, tag: vpnProviderSyncTag, errorEvent).mapNever()
             )
             
@@ -474,13 +517,23 @@ fileprivate func tunnelProviderReducer<T: TunnelProviderManager>(
             if case let .loaded(tpm) = state.loadState.value {
                 switch tpm.connectionStatus {
                 case .reasserting, .connected:
-                    state.tunnelIntent = .start(transition: .none)
+                    firstEffects.append(
+                        state.tunnelIntent.updateState(
+                            newValue: .start(transition: .none),
+                            sharedDB: environment.sharedDB
+                        ).mapNever()
+                    )
                     // No start/stop action is necessary.
-                    return effects
+                    return firstEffects + unknownEffects
                     
                 case .connecting, .invalid, .disconnecting, .disconnected:
-                    state.tunnelIntent = .stop
-                    return [ Effect(value: .stopVPN) ] + effects
+                    firstEffects.append(
+                        state.tunnelIntent.updateState(
+                            newValue: .stop,
+                            sharedDB: environment.sharedDB
+                        ).mapNever()
+                    )
+                    return firstEffects + [ Effect(value: .stopVPN) ] + unknownEffects
 
                 @unknown default:
                     fatalErrorFeedbackLog("Unknown connection status '\(tpm.connectionStatus)'")
@@ -488,16 +541,21 @@ fileprivate func tunnelProviderReducer<T: TunnelProviderManager>(
             } else {
             
                 // Resets tunnel intent, and stops VPN (if active).
-                state.tunnelIntent = .none
+                firstEffects.append(
+                    state.tunnelIntent.updateState(
+                        newValue: .none,
+                        sharedDB: environment.sharedDB
+                    ).mapNever()
+                )
                 
-                return [ Effect(value: .stopVPN) ] + effects
+                return firstEffects + [ Effect(value: .stopVPN) ] + unknownEffects
             }
             
         case .active(.connecting):
-            return []
+            return firstEffects
             
         case .active(.networkNotReachable):
-            return []
+            return firstEffects
             
         case .inactive:
             // Fixes "inactive" sync result and vpn status mismatch.
@@ -505,18 +563,23 @@ fileprivate func tunnelProviderReducer<T: TunnelProviderManager>(
                 switch tpm.connectionStatus {
                 case .reasserting, .connecting, .connected:
                     // Tunnel provider is expected to be inactive!
-                    state.tunnelIntent = .stop
-                    return [ Effect(value: .stopVPN) ]
+                    firstEffects.append(
+                        state.tunnelIntent.updateState(
+                            newValue: .stop,
+                            sharedDB: environment.sharedDB
+                        ).mapNever()
+                    )
+                    return firstEffects + [ Effect(value: .stopVPN) ]
                     
                 case .invalid, .disconnecting, .disconnected:
-                    return []
+                    return firstEffects
 
                 @unknown default:
                     fatalErrorFeedbackLog("Unknown connection status '\(tpm.connectionStatus)'")
                 }
             }
             
-            return []
+            return firstEffects
         }
         
     case .startTunnelResult(let result):
@@ -531,9 +594,16 @@ fileprivate func tunnelProviderReducer<T: TunnelProviderManager>(
             state.startStopState = .completed(.failure(errorEvent))
             
             // Resets tunnel intent, since desired tunnel start state could not be achieved.
-            state.tunnelIntent = .none
+            let intentUpdateEffect = state.tunnelIntent.updateState(
+                newValue: .none,
+                sharedDB: environment.sharedDB
+            )
             
-            return [ feedbackLog(.error, tag: vpnStartTag, errorEvent).mapNever() ]
+            
+            return [
+                intentUpdateEffect.mapNever(),
+                feedbackLog(.error, tag: vpnStartTag, errorEvent).mapNever()
+            ]
         }
         
     case .stopTunnelResult(.unit):
@@ -667,8 +737,16 @@ extension TunnelProviderVPNStatus {
     }
     
 }
-
+    
 extension TunnelStartStopIntent {
+    
+    var integerCode: Int {
+        switch self {
+        case .start(transition: .some(_)): return Int(TUNNEL_INTENT_UNDEFINED)
+        case .start(transition: .none): return Int(TUNNEL_INTENT_START)
+        case .stop: return Int(TUNNEL_INTENT_STOP)
+        }
+    }
     
     static func initializeIntentGiven(
         _ reason: TunnelProviderSyncReason, _ syncedState: TunnelProviderSyncedState
@@ -686,7 +764,7 @@ extension TunnelStartStopIntent {
         case .inactive:
             return .stop
         case .unknown(_):
-            return nil
+            return .none
         }
     }
     
@@ -833,6 +911,20 @@ fileprivate func wrapVPNObserverWithTPMResult<T: TunnelProviderManager, Failure>
 }
 
 // MARK: Effects
+
+fileprivate extension Optional where Wrapped == TunnelStartStopIntent {
+    
+    mutating func updateState(
+        newValue: TunnelStartStopIntent?, sharedDB: PsiphonDataSharedDB
+    ) -> Effect<Never> {
+        self = newValue
+        let statusCode = self?.integerCode ?? Int(TUNNEL_INTENT_UNDEFINED)
+        return .fireAndForget {
+            sharedDB.setContainerTunnelIntentStatus(statusCode)
+        }
+    }
+    
+}
 
 fileprivate func notifyStartVPN() -> Effect<Never> {
     .fireAndForget {

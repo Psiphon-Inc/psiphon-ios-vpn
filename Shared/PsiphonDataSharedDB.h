@@ -139,6 +139,18 @@ NS_ASSUME_NONNULL_BEGIN
 - (BOOL)setAppForegroundState:(BOOL)foregrounded;
 #endif
 
+/** Returns the last `TunnelStartStopIntent` written by the container.
+The integer values are defined in `NEBridge.h` with prefix `TUNNEL_INTENT_`.
+ */
+- (NSInteger)getContainerTunnelIntentStatus;
+
+#if !(TARGET_IS_EXTENSION)
+/** Sets the `TunnelStartStopIntent` status to be used by the tunnel provider.
+ Values should be one of the constants defined in `NEBrdige.h` starting with prefix `TUNNEL_INTENT_`.
+ */
+- (void)setContainerTunnelIntentStatus:(NSInteger)statusCode;
+#endif
+
 /**
  * Last date/time immediately before the extension was last started from the container.
  * Check where `setContainerTunnelStartTime:` is called to set the last tunnel start time.

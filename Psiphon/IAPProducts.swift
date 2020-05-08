@@ -22,6 +22,23 @@ import StoreKit
 import Promises
 import ReactiveSwift
 
+enum LocalizedPrice: Equatable {
+    case free
+    case localizedPrice(price: Double, priceLocale: Locale)
+}
+
+extension LocalizedPrice {
+    
+    static func makeLocalizedPrice(skProduct: SKProduct) -> Self {
+        guard skProduct.price.doubleValue > 0.0 else {
+            fatalErrorFeedbackLog("SKProduct cannot have value 0")
+        }
+        return .localizedPrice(price: skProduct.price.doubleValue,
+                               priceLocale: skProduct.priceLocale)
+    }
+    
+}
+
 enum ProductIdError: Error {
     case invalidString(String)
 }
