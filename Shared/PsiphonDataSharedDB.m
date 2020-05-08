@@ -49,6 +49,7 @@ UserDefaultsKey const ContainerAuthorizationSetKey = @"authorizations_container_
 
 UserDefaultsKey const SubscriptionVerificationDictionaryKey = @"subscription_verification_dictionary_key";
 
+UserDefaultsKey const ContainerTunnelIntentStatusIntKey = @"container_tunnel_intent_status_key";
 
 /**
  * Key for boolean value that when TRUE indicates that the extension crashed before stop was called.
@@ -311,6 +312,16 @@ UserDefaultsKey const DebugPsiphonConnectionStateStringKey = @"PsiphonDataShared
 #endif
 
 #pragma mark - Container Data (Data originating in the container)
+
+- (NSInteger)getContainerTunnelIntentStatus {
+    return [sharedDefaults integerForKey:ContainerTunnelIntentStatusIntKey];
+}
+
+#if !(TARGET_IS_EXTENSION)
+- (void)setContainerTunnelIntentStatus:(NSInteger)statusCode {
+    [sharedDefaults setInteger:statusCode forKey:ContainerTunnelIntentStatusIntKey];
+}
+#endif
 
 - (NSDate *_Nullable)getContainerTunnelStartTime {
     NSString *_Nullable rfc3339Date = [sharedDefaults stringForKey:TunnelStartTimeStringKey];
