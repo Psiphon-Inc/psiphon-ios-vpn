@@ -18,38 +18,22 @@
  */
 
 #import <Foundation/Foundation.h>
-#import "RunningMinMax.h"
-#import "RunningStdev.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-FOUNDATION_EXPORT NSErrorDomain const RunningStatErrorDomain;
+@interface RunningMinMax : NSObject <NSCopying, NSCoding, NSSecureCoding>
 
-typedef NS_ERROR_ENUM(RunningStatErrorDomain, RunningStatErrorCode) {
-    RunningStatErrorIntegerOverflow = 1,
-    RunningStatErrorStdev = 2
-};
-
-@interface RunningStat : NSObject <NSCopying, NSCoding, NSSecureCoding>
-
-@property (readonly, nonatomic, assign) int count;
+@property (readonly, nonatomic, assign) double min;
+@property (readonly, nonatomic, assign) double max;
 
 - (instancetype)init NS_UNAVAILABLE;
+
 - (instancetype)initWithValue:(double)x;
+- (instancetype)initWithMin:(double)min andMax:(double)max;
 
-- (NSError *_Nullable)addValue:(double)x;
+- (void)addValue:(double)x;
 
-- (double)stdev;
-
-- (double)variance;
-
-- (double)mean;
-
-- (double)min;
-
-- (double)max;
-
-- (BOOL)isEqualToRunningStat:(RunningStat*)stat;
+- (BOOL)isEqualToRunningMinMax:(RunningMinMax*)runningMinMax;
 
 @end
 

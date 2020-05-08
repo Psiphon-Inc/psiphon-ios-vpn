@@ -79,9 +79,10 @@
 
         RunningStat *stat = [expectedMetrics objectForKey:jetsam.appVersion];
         if (stat == nil) {
-            stat = [[RunningStat alloc] init];
+            stat = [[RunningStat alloc] initWithValue:jetsam.runningTime];
+        } else {
+            [stat addValue:jetsam.runningTime];
         }
-        [stat addValue:jetsam.runningTime];
         [expectedMetrics setObject:stat forKey:jetsam.appVersion];
     }
 
@@ -149,9 +150,10 @@
 
         RunningStat *stat = [expectedMetrics objectForKey:jetsam.appVersion];
         if (stat == nil) {
-            stat = [[RunningStat alloc] init];
+            stat = [[RunningStat alloc] initWithValue:jetsam.runningTime];
+        } else {
+            [stat addValue:jetsam.runningTime];
         }
-        [stat addValue:jetsam.runningTime];
         [expectedMetrics setObject:stat forKey:jetsam.appVersion];
     }
 

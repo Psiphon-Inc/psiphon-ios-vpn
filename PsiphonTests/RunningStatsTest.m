@@ -31,7 +31,7 @@
 // Overflows internal count integer variable.
 // Note: this takes a long time to run (~5 minutes on a 2.9GHz i9).
 - (void)testIntegerOverflow {
-    RunningStat *stat = [[RunningStat alloc] init];
+    RunningStat *stat = [[RunningStat alloc] initWithValue:0];
     for (int i = 0; i < INT_MAX-1; i++) {
         NSError *err = [stat addValue:1];
         if (err) {
@@ -46,7 +46,7 @@
 
 // Overflow internal calculation.
 - (void)testDoubleOverflow {
-    RunningStat *stat = [[RunningStat alloc] init];
+    RunningStat *stat = [[RunningStat alloc] initWithValue:0];
     NSError *err = [stat addValue:DBL_MAX];
     if (err != nil) {
         XCTFail(@"%@", err.localizedDescription);
@@ -54,32 +54,28 @@
     }
 
     err = [stat addValue:0];
-    XCTAssertEqual(err.code, RunningStatErrorDoubleOverflow);
+    XCTAssertEqual(err.code, RunningStatErrorStdev);
+    XCTAssertEqual(((NSError*)err.userInfo[NSUnderlyingErrorKey]).code, RunningStdevErrorDoubleOverflow);
 }
 
 // Underflow internal calculation.
 - (void)testDoubleUnderflow {
-    RunningStat *stat = [[RunningStat alloc] init];
-    NSError *err = [stat addValue:0];
-    if (err != nil) {
-        XCTFail(@"%@", err.localizedDescription);
-        return;
-    }
-
-    err = [stat addValue:-INFINITY];
-    XCTAssertEqual(err.code, RunningStatErrorDoubleOverflow);
+    RunningStat *stat = [[RunningStat alloc] initWithValue:0];
+    NSError *err = [stat addValue:-INFINITY];
+    XCTAssertEqual(err.code, RunningStatErrorStdev);
+    XCTAssertEqual(((NSError*)err.userInfo[NSUnderlyingErrorKey]).code, RunningStdevErrorDoubleOverflow);
 }
 
 - (void)testMinAndMax {
-    RunningStat *stat = [[RunningStat alloc] init];
+    RunningStat *stat = [[RunningStat alloc] initWithValue:0];
 
     [stat addValue:1];
     [stat addValue:-1];
     [stat addValue:4];
     [stat addValue:3];
 
-    XCTAssertEqual(-1, stat.min);
-    XCTAssertEqual(4, stat.max);
+    XCTAssertEqual(-1, [stat min]);
+    XCTAssertEqual(4, [stat max]);
 }
 
 - (void)testStdDevAndMean {
@@ -87,7 +83,7 @@
     const double error_margin = 0.0000001;
     const unsigned int sample_size = 1000;
 
-    RunningStat *stat = [[RunningStat alloc] init];
+    RunningStat *stat = nil;
 
     srand((unsigned int)time(NULL));
 
@@ -99,10 +95,14 @@
 
         // Omit the last value which is added later.
         if (i != sample_size -1 ) {
-            NSError *err = [stat addValue:num];
-            if (err) {
-                XCTFail(@"%@", err.localizedDescription);
-                return;
+            if (stat == nil) {
+                stat = [[RunningStat alloc] initWithValue:num];
+            } else {
+                NSError *err = [stat addValue:num];
+                if (err) {
+                    XCTFail(@"%@", err.localizedDescription);
+                    return;
+                }
             }
         }
     }
@@ -114,7 +114,8 @@
     NSError *err = [stat addValue:INFINITY];
     XCTAssertNotNil(err);
     if (err) {
-        XCTAssertEqual(err.code, RunningStatErrorDoubleOverflow);
+        XCTAssertEqual(err.code, RunningStatErrorStdev);
+        XCTAssertEqual(((NSError*)err.userInfo[NSUnderlyingErrorKey]).code, RunningStdevErrorDoubleOverflow);
     }
 
     // Use the backup and add the final value.
@@ -122,7 +123,7 @@
     [stat addValue:samples[sample_size-1]];
 
     double stat_stdev = [stat stdev];
-    double stat_mean = stat.mean;
+    double stat_mean = [stat mean];
     double actual_stdev = double_stdev(samples, sample_size);
     double actual_mean = double_mean(samples, sample_size);
     free(samples);
@@ -156,8 +157,7 @@
 #pragma mark - NSCopying protocol implementation tests
 
 - (void)testNSCopying {
-    RunningStat *stat = [[RunningStat alloc] init];
-    [stat addValue:1];
+    RunningStat *stat = [[RunningStat alloc] initWithValue:1];
     [stat addValue:5];
 
     RunningStat *copiedStat = [stat copy];
@@ -171,8 +171,7 @@
 #pragma mark - NSCoding protocol implementation tests
 
 - (void)testNSCoding {
-    RunningStat *stat = [[RunningStat alloc] init];
-    [stat addValue:1];
+    RunningStat *stat = [[RunningStat alloc] initWithValue:1];
     [stat addValue:5];
 
     // Encode
