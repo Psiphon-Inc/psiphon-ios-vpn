@@ -214,7 +214,6 @@
 		CE3B324424532F370079C13F /* NSError+Convenience.m in Sources */ = {isa = PBXBuildFile; fileRef = EF90D79A204F22C900228A63 /* NSError+Convenience.m */; };
 		CE3B3246245343DF0079C13F /* RunningStatsTest.m in Sources */ = {isa = PBXBuildFile; fileRef = CE3B3245245343DF0079C13F /* RunningStatsTest.m */; };
 		CE3B324924535F030079C13F /* stats.c in Sources */ = {isa = PBXBuildFile; fileRef = CE3B324824535F030079C13F /* stats.c */; };
-		CE3B325124538DD10079C13F /* RunningStdev.m in Sources */ = {isa = PBXBuildFile; fileRef = CE3B324224520ABF0079C13F /* RunningStdev.m */; };
 		CE3B325224538DE00079C13F /* RunningStdev.m in Sources */ = {isa = PBXBuildFile; fileRef = CE3B324224520ABF0079C13F /* RunningStdev.m */; };
 		CE3B3254245390090079C13F /* JetsamMetricsTest.m in Sources */ = {isa = PBXBuildFile; fileRef = CE3B3253245390090079C13F /* JetsamMetricsTest.m */; };
 		CE4E9BC01BBEECF30060FF8B /* Psiphon.entitlements in Resources */ = {isa = PBXBuildFile; fileRef = CE4E9BBF1BBEECF30060FF8B /* Psiphon.entitlements */; };
@@ -257,8 +256,12 @@
 		CEE6FB252466040100F74D05 /* RunningMinMax.m in Sources */ = {isa = PBXBuildFile; fileRef = CEE6FB242466040100F74D05 /* RunningMinMax.m */; };
 		CEE6FB2824660F9700F74D05 /* RunningStat.m in Sources */ = {isa = PBXBuildFile; fileRef = CEE6FB2724660F9700F74D05 /* RunningStat.m */; };
 		CEE6FB2924661B9B00F74D05 /* RunningStat.m in Sources */ = {isa = PBXBuildFile; fileRef = CEE6FB2724660F9700F74D05 /* RunningStat.m */; };
-		CEE6FB2B24661BB200F74D05 /* RunningMinMax.m in Sources */ = {isa = PBXBuildFile; fileRef = CEE6FB242466040100F74D05 /* RunningMinMax.m */; };
 		CEE6FB2C24661D1600F74D05 /* RunningStat.m in Sources */ = {isa = PBXBuildFile; fileRef = CEE6FB2724660F9700F74D05 /* RunningStat.m */; };
+		CEE6FB2F2466223900F74D05 /* RunningBuckets.m in Sources */ = {isa = PBXBuildFile; fileRef = CEE6FB2E2466223900F74D05 /* RunningBuckets.m */; };
+		CEE6FB302466224800F74D05 /* RunningMinMax.m in Sources */ = {isa = PBXBuildFile; fileRef = CEE6FB242466040100F74D05 /* RunningMinMax.m */; };
+		CEE6FB312466224B00F74D05 /* RunningStdev.m in Sources */ = {isa = PBXBuildFile; fileRef = CE3B324224520ABF0079C13F /* RunningStdev.m */; };
+		CEE6FB33246625EA00F74D05 /* RunningBucketsTest.m in Sources */ = {isa = PBXBuildFile; fileRef = CEE6FB32246625EA00F74D05 /* RunningBucketsTest.m */; };
+		CEE6FB342466260000F74D05 /* RunningBuckets.m in Sources */ = {isa = PBXBuildFile; fileRef = CEE6FB2E2466223900F74D05 /* RunningBuckets.m */; };
 		D672BC574F14042B4D77AB28 /* libPods-Psiphon.a in Frameworks */ = {isa = PBXBuildFile; fileRef = CB8BB19F016330264C4DCB80 /* libPods-Psiphon.a */; };
 		EF4F1F3D206055F7006A40A1 /* RACSignal+Operations2.m in Sources */ = {isa = PBXBuildFile; fileRef = EF90D79F204F22C900228A63 /* RACSignal+Operations2.m */; };
 		EF639C2F1F8FCE37009D6B42 /* PsiFeedbackLogger.m in Sources */ = {isa = PBXBuildFile; fileRef = EF639C2E1F8FCE2A009D6B42 /* PsiFeedbackLogger.m */; };
@@ -749,6 +752,9 @@
 		CEE6FB242466040100F74D05 /* RunningMinMax.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RunningMinMax.m; sourceTree = "<group>"; };
 		CEE6FB2624660F9700F74D05 /* RunningStat.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RunningStat.h; sourceTree = "<group>"; };
 		CEE6FB2724660F9700F74D05 /* RunningStat.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RunningStat.m; sourceTree = "<group>"; };
+		CEE6FB2D2466223900F74D05 /* RunningBuckets.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RunningBuckets.h; sourceTree = "<group>"; };
+		CEE6FB2E2466223900F74D05 /* RunningBuckets.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RunningBuckets.m; sourceTree = "<group>"; };
+		CEE6FB32246625EA00F74D05 /* RunningBucketsTest.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RunningBucketsTest.m; sourceTree = "<group>"; };
 		DD100E19194B9A79F5D7DF55 /* Pods-PsiphonVPN.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PsiphonVPN.debug.xcconfig"; path = "Pods/Target Support Files/Pods-PsiphonVPN/Pods-PsiphonVPN.debug.xcconfig"; sourceTree = "<group>"; };
 		EDB109A2FBFB32D821FF121D /* Pods-Psiphon.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Psiphon.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Psiphon/Pods-Psiphon.debug.xcconfig"; sourceTree = "<group>"; };
 		EF639C2D1F8FCE2A009D6B42 /* PsiFeedbackLogger.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PsiFeedbackLogger.h; sourceTree = "<group>"; };
@@ -1347,6 +1353,8 @@
 				CEE6FB242466040100F74D05 /* RunningMinMax.m */,
 				CEE6FB2624660F9700F74D05 /* RunningStat.h */,
 				CEE6FB2724660F9700F74D05 /* RunningStat.m */,
+				CEE6FB2D2466223900F74D05 /* RunningBuckets.h */,
+				CEE6FB2E2466223900F74D05 /* RunningBuckets.m */,
 				CE3B324724535F030079C13F /* stats.h */,
 				CE3B324824535F030079C13F /* stats.c */,
 			);
@@ -1387,6 +1395,7 @@
 			isa = PBXGroup;
 			children = (
 				CE3B3245245343DF0079C13F /* RunningStatsTest.m */,
+				CEE6FB32246625EA00F74D05 /* RunningBucketsTest.m */,
 			);
 			name = Math;
 			sourceTree = "<group>";
@@ -2110,6 +2119,7 @@
 				521FD0F2219E0D5600F748EC /* DebugViewController.m in Sources */,
 				52CAC4312385D06600A92842 /* Spinner.swift in Sources */,
 				9BFEC9C08697E4701A36A3B3 /* UnionSerialQueue.m in Sources */,
+				CEE6FB2F2466223900F74D05 /* RunningBuckets.m in Sources */,
 				445F24EF20E1A5BA00D004E9 /* constraints.c in Sources */,
 				5248B4CE23203781008C00D4 /* SwiftObjCBridges.swift in Sources */,
 				52D363CB230DEBED002C2221 /* CloseButton.swift in Sources */,
@@ -2200,7 +2210,6 @@
 				EF90D7AC204F22E300228A63 /* RACSignal+Operations2.m in Sources */,
 				EFC2F5CC20226835007B52F9 /* PsiphonConfigReader.m in Sources */,
 				CE6C3F6A24366AE1007A17F0 /* ClientMetadata.m in Sources */,
-				CEE6FB2B24661BB200F74D05 /* RunningMinMax.m in Sources */,
 				EF90D7B1204F231E00228A63 /* timestamp_tm.c in Sources */,
 				CE8026A42448B5B4005AF848 /* NSUserDefaults+KeyedDataStore.m in Sources */,
 				EF90D7B3204F232300228A63 /* timestamp_parse.c in Sources */,
@@ -2208,7 +2217,7 @@
 				EF90D7B8204F236400228A63 /* NSError+Convenience.m in Sources */,
 				EF90D7B5204F234700228A63 /* NSDate+PSIDateExtension.m in Sources */,
 				44A0CAEE1FCCCDEC00859DB3 /* SubscriptionVerifierService.m in Sources */,
-				CE3B325124538DD10079C13F /* RunningStdev.m in Sources */,
+				CEE6FB302466224800F74D05 /* RunningMinMax.m in Sources */,
 				EF652CDA1F352271002AFB48 /* PacketTunnelProvider.m in Sources */,
 				521FD0FF219E0E2600F748EC /* AppStats.m in Sources */,
 				4E0DCB1E1F2855FC00495781 /* PsiphonDataSharedDB.m in Sources */,
@@ -2228,6 +2237,7 @@
 				EF90D7B0204F231B00228A63 /* timestamp_compare.c in Sources */,
 				9BFECC62159FBEAA1A69F4F9 /* BasePacketTunnelProvider.m in Sources */,
 				CE3B3226244FA3150079C13F /* JetsamMetrics.m in Sources */,
+				CEE6FB312466224B00F74D05 /* RunningStdev.m in Sources */,
 				521FD0FE219E0E1900F748EC /* AppProfiler.m in Sources */,
 				CE8026AE2448BA2E005AF848 /* LocalDataStoreKeys.m in Sources */,
 				EF90D7B4204F234100228A63 /* NSDate+Comparator.m in Sources */,
@@ -2251,6 +2261,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				CE7182132460689A008F815A /* JetsamTrackingTest.m in Sources */,
+				CEE6FB342466260000F74D05 /* RunningBuckets.m in Sources */,
+				CEE6FB33246625EA00F74D05 /* RunningBucketsTest.m in Sources */,
 				CE8ED90224633407009C3187 /* FileRegistryTest.m in Sources */,
 				CE82CE95245A12B1000C0512 /* DelimitedFile.m in Sources */,
 				CE82CEAE245C7007000C0512 /* JetsamTracking.m in Sources */,
