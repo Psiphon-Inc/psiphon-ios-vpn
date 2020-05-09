@@ -257,29 +257,34 @@ struct ProviderManagerLoadState<T: TunnelProviderManager>: Equatable {
         }
     }
     
+    /// Updates `ProviderManagerLoadState`.
+    /// - Returns: Tuple `(updateEffects: , vpnStatusInvalid:),`. where `updateEffects`
+    /// is set of effects from state update. `vpnStatusInvalid` is true if tunnel provider manager has been removed
+    /// and VPN status should be considered same as `NEVPNStatusInvalid`.
     mutating func updateState(
         configUpdateResult: Result<(T, VPNConnectionObserver<T>)?, ErrorEvent<TPMError>>
-    ) -> [Effect<Never>] {
+    ) -> (updateEffects: [Effect<Never>], vpnStatusInvalid: Bool) {
         let previousValue = self.value
         switch configUpdateResult {
         case .success(.none):
             self.value = .noneStored
-            return []
+            return (updateEffects: [], vpnStatusInvalid: true)
             
         case .success(let .some((tpm, connectionObserver))):
             self.value = .loaded(tpm)
-            guard case .loaded(let previousTpm) = previousValue, previousTpm == tpm else {
-                return [
-                    .fireAndForget { [tpm] in
-                        tpm.observeConnectionStatus(observer: connectionObserver)
-                    }
-                ]
+            if case .loaded(let previousTpm) = previousValue, previousTpm == tpm {
+                return (updateEffects: [], vpnStatusInvalid: false)
+            } else {
+                let observeEffect = Effect<Never>.fireAndForget { [tpm] in
+                    tpm.observeConnectionStatus(observer: connectionObserver)
+                }
+                return (updateEffects: [ observeEffect ], vpnStatusInvalid: false)
             }
-            return []
             
         case .failure(let errorEvent):
             self.value = .error(errorEvent)
-            return [ feedbackLog(.error, tag: "ProviderManagerStateUpdate", errorEvent) ]
+            let feedbackEffect = feedbackLog(.error, tag: "ProviderManagerStateUpdate", errorEvent)
+            return (updateEffects: [ feedbackEffect ], vpnStatusInvalid: true)
         }
     }
     
@@ -340,32 +345,12 @@ fileprivate func vpnProviderManagerStateReducer<T: TunnelProviderManager>(
                                      environment: environment)
         
     case ._vpnStatusDidChange(let vpnStatus):
-        state.providerVPNStatus = vpnStatus
+        return vpnStatusDidChangeReducer(
+            state: &state,
+            vpnStatus: vpnStatus,
+            sharedDB: environment.sharedDB
+        )
         
-        var effects = [Effect<VPNProviderManagerStateAction<T>>]()
-        
-        // Resets tunnelIntent transition flag if previously was `.restart`.
-        // Discussion:
-        // The flag is reset at the disconnecting state change, since this is a clear
-        // signal that the provider has started transitioning (being stopped and started again).
-        //
-        if case .disconnecting = vpnStatus, case .start(transition: .restart) = state.tunnelIntent {
-            effects.append(
-                state.tunnelIntent.updateState(
-                    newValue: .start(transition: .none),
-                    sharedDB: environment.sharedDB
-                ).mapNever()
-            )
-        }
-        
-        // Sends startPsiphonTunnel message if tunnelIntent is start, and
-        // the tunnel has disconnected.
-        if case .start(transition: _) = state.tunnelIntent, case .disconnected = vpnStatus {
-            return [ Effect(value: .startPsiphonTunnel) ]
-        } else {
-            return []
-        }
-          
     case .startPsiphonTunnel:
         return startPsiphonTunnelReducer(state: &state, environment: environment)
         
@@ -566,13 +551,23 @@ fileprivate func tunnelProviderReducer<T: TunnelProviderManager>(
 ) -> [Effect<VPNProviderManagerStateAction<T>>] {
     switch action {
     case .configUpdated(let result):
-        let effects = state.loadState.updateState(
+        let (loadStateUpdateEffects, vpnStatusInvalid) = state.loadState.updateState(
             configUpdateResult: wrapVPNObserverWithTPMResult(
                 result,
                 environment.vpnConnectionObserver
             )
         )
-        return effects.map { $0.mapNever() }
+        
+        let vpnStatusUpdateEffects: [Effect<VPNProviderManagerStateAction<T>>]
+        if vpnStatusInvalid {
+            vpnStatusUpdateEffects = vpnStatusDidChangeReducer(
+                state: &state, vpnStatus: .invalid, sharedDB: environment.sharedDB
+            )
+        } else {
+            vpnStatusUpdateEffects = []
+        }
+        
+        return vpnStatusUpdateEffects + loadStateUpdateEffects.map { $0.mapNever() }
         
     case let .syncedStateWithProvider(syncReason: reason, syncedState):
         guard case .pending = state.providerSyncResult else {
@@ -751,6 +746,42 @@ fileprivate func tunnelProviderReducer<T: TunnelProviderManager>(
             fatalErrorFeedbackLog("Unexpected state '\(String(describing: state.startStopState))'")
         }
         state.startStopState = .completed(.success(.stopVPN))
+        return []
+    }
+}
+
+fileprivate func vpnStatusDidChangeReducer<T: TunnelProviderManager>(
+    state: inout VPNProviderManagerState<T>, vpnStatus: TunnelProviderVPNStatus,
+    sharedDB: PsiphonDataSharedDB
+) -> [Effect<VPNProviderManagerStateAction<T>>] {
+    
+    state.providerVPNStatus = vpnStatus
+    
+    var effects = [Effect<VPNProviderManagerStateAction<T>>]()
+    
+    // Resets tunnelIntent transition flag if previously was `.restart`.
+    // Discussion:
+    // The flag is reset at the disconnecting state change, since this is a clear
+    // signal that the provider has started transitioning (being stopped and started again).
+    //
+    if case .disconnecting = vpnStatus,
+        case .start(transition: .restart) = state.tunnelIntent {
+        effects.append(
+            state.tunnelIntent.updateState(
+                newValue: .start(transition: .none),
+                sharedDB: sharedDB
+            ).mapNever()
+        )
+    }
+    
+    // If the VPN connection is not in the expected state,
+    // sends a `.startPsiphonTunnel` or `.stopVPN` message.
+    switch (state.tunnelIntent, vpnStatus) {
+    case (.start(transition: _), .disconnected):
+        return [ Effect(value: .startPsiphonTunnel) ]
+    case (.stop, .reasserting), (.stop, .connecting), (.stop, .connected):
+        return [ Effect(value: .stopVPN) ]
+    default:
         return []
     }
 }

@@ -424,8 +424,12 @@ final class PsiphonTPMConnectionObserver: VPNConnectionObserver<PsiphonTPM> {
     }
     
     @objc private func statusDidChange() {
+        // statusDidChange callback can be called even after previous tunnel provider manager
+        // has been deallocated.
+        // It is valid in this case to send store with `NEVPNStatusInvalid`.
         guard let manager = self.tunnelProviderManager else {
-            fatalErrorFeedbackLog("No tunnel provider manager is set")
+            sendOnMain(._vpnStatusDidChange(.invalid))
+            return
         }
         sendOnMain(._vpnStatusDidChange(manager.connectionStatus))
     }
