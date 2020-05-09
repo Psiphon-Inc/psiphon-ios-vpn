@@ -425,29 +425,11 @@ fileprivate func vpnProviderManagerStateReducer<T: TunnelProviderManager>(
                 
             case .appEnteredForeground:
                 guard case .completed(_) = state.providerSyncResult else {
-                    fatalErrorFeedbackLog("""
-                    Expected sync '.completed(_)' synced state at app entered foreground \
-                    instead got \(state.providerSyncResult)
-                    """)
+                    return []
                 }
                 state.providerSyncResult = .pending
                 return [
-                    loadConfig(tpm).flatMap(.latest) { result -> Effect<TPMEffectResultWrapper<T>> in
-                        switch result {
-                        case .success(let tpm):
-                            return syncStateWithProvider(syncReason: reason, tpm)
-                                .prefix(value: .configUpdated(.success(tpm)))
-                        case .failure(let errorEvent):
-                            return Effect(value:
-                                .syncedStateWithProvider(
-                                    syncReason: reason,
-                                    .unknown(errorEvent.map { .neVPNError($0) })
-                                )
-                            ).prefix(value: .configUpdated(.failure(errorEvent.map {
-                                .failedConfigLoadSave($0)
-                            })))
-                        }
-                    }.map {
+                    syncStateWithProvider(syncReason: reason, tpm).map {
                         ._tpmEffectResultWrapper($0)
                     }
                 ]
