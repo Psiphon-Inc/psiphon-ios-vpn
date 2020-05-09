@@ -427,7 +427,7 @@ final class PsiphonTPMConnectionObserver: VPNConnectionObserver<PsiphonTPM> {
         guard let manager = self.tunnelProviderManager else {
             fatalErrorFeedbackLog("No tunnel provider manager is set")
         }
-        sendOnMain(.vpnStatusChanged(manager.connectionStatus))
+        sendOnMain(._vpnStatusDidChange(manager.connectionStatus))
     }
     
 }
