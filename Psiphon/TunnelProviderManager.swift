@@ -411,7 +411,7 @@ final class PsiphonTPMConnectionObserver: VPNConnectionObserver<PsiphonTPM> {
     override func setTunnelProviderManager(_ manager: PsiphonTPM) {
         if let current = self.tunnelProviderManager {
             NotificationCenter.default.removeObserver(self, name: .NEVPNStatusDidChange,
-                                                      object: current.wrappedManager)
+                                                      object: current.wrappedManager.connection)
         }
         self.tunnelProviderManager = manager
         NotificationCenter.default.addObserver(self, selector: #selector(statusDidChange),
