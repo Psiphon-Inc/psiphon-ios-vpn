@@ -4,17 +4,14 @@
 /* Title of the section in the subscription dialog that shows currently active subscription information. */
 "ACTIVE_SUBSCRIPTION_SECTION_TITLE" = "您已订阅！";
 
-/*[UNTRANSLATED] Alert dialog body. */
-"ALERT_BODY_OPERATION_FAILED" = "Operation failed, please try again.";
+/* Button title to add to user's PsiCash balance. PsiCash is a type of credit. Do not translate or transliterate 'PsiCash'. */
+"ADD_PSICASH" = "加入PsiCash";
 
-/*[UNTRANSLATED] Alert dialog title. */
-"ALERT_TITLE_OPERATION_FAILED" = "Operation Failed";
+/* Alert dialog body when requested operation by the user failed. */
+"ALERT_BODY_OPERATION_FAILED" = "操作失败，请重试。";
 
-/* Text for app subtitle on main view. */
-"APP_SUB_TITLE_MAIN_VIEW" = "超越国界";
-
-/* Text showing the app version. The '%@' placeholder is the version number. So it will look like 'v.2'. */
-"APP_VERSION" = "版本 %@";
+/* Alert dialog title. */
+"ALERT_TITLE_OPERATION_FAILED" = "操作失败";
 
 /* Title of the button which takes the user to the previous screen. Text should be short and one word when possible. */
 "BACK_BUTTON" = "返回";
@@ -25,33 +22,35 @@
 /* Alert message informing user that subscription receipt can not be verified */
 "BAD_RECEIPT_ALERT_MESSAGE" = "您的订阅单据无法验证，请刷新并重试。";
 
-/* Buy button on a pop-up alert where the user uses a slider to select how many hours of Speed Boost they want to purchase and then presses the buy button to make the purchase. */
-"BUY_BUTTON" = "购买";
-
 /* Title of button on alert view which shows the progress of the user's buy request. Hitting this button dismisses the alert and the buy request continues processing in the background. */
 "BUY_REQUEST_PROGRESS_ALERT_DISMISS_BUTTON_TITLE" = "忽略";
 
-/*[UNTRANSLATED] Buy subscription dialog footer text explaining where the user can cancel an active subscription */
-"BUY_SUBSCRIPTIONS_FOOTER_CANCEL_INSTRUCTIONS_TEXT" = "You can cancel an active subscription in your iTunes Account Settings.";
+/* Buy subscription dialog footer text explaining where the user can cancel an active subscription */
+"BUY_SUBSCRIPTIONS_FOOTER_CANCEL_INSTRUCTIONS_TEXT" = "您可以在您的 iTunes 帐号设置里取消一个活跃的订阅";
 
 /* Buy subscription dialog footer text */
-"BUY_SUBSCRIPTIONS_FOOTER_TEXT" = "订阅是自动续费的，这意味着一旦购买，订阅将自动续订，直到您在当前订阅期结束前24小时取消为止。\n\n您的iTunes账户将在本期结束前的24小时内续订，并收取订阅费用。";
-
-/* Cancel button on a pop-up alert. The alert will be dismissed if the user presses this button. */
-"CANCEL_BUTTON" = "取消";
+"BUY_SUBSCRIPTIONS_FOOTER_TEXT" = "订阅是自动续费的，这意味着一旦购买，订阅将自动续订，直到您在当前订阅期结束前24小时取消为止。\n\n您的 iTunes 账户将在本期结束前的24小时内续订，并收取订阅费用。";
 
 /* Title for a button that cancels an action. This should be generic enough to make sense whenever a cancel button is used. */
 "CANCEL_BUTTON_TITLE" = "取消";
 
 /* Alert message informing user that their subscription has expired or that they're not a subscriber, therefore Psiphon can only be started from the Psiphon app. DO NOT translate 'Psiphon'. */
-"CANNOT_START_TUNNEL_DUE_TO_SUBSCRIPTION" = "您没有可用的 Psiphon 订阅。\n由于您不是订阅者或订阅已过期，赛风只能从赛风应用启动。\n\n请打开赛风应用。";
+"CANNOT_START_TUNNEL_DUE_TO_SUBSCRIPTION" = "您没有活跃的订阅。\n由于您不是订阅者或订阅已过期，Psiphon 只能从 Psiphon 应用启动。\n\n请打开 Psiphon 应用。";
 
 /* Main text in the 'Upstream Proxy Error' dialog box. This is shown when the user has directly altered these settings, and those settings are (probably) erroneous. DO NOT translate 'Psiphon'. */
-"CHECK_UPSTREAM_PROXY_SETTING" = "您已将赛风配置为使用上游代理。\n但是，我们似乎无法通过该代理连接到赛风服务器。\n请修复设置并重试。";
+"CHECK_UPSTREAM_PROXY_SETTING" = "您已将 Psiphon 设置为使用上游代理。\n但是，我们似乎无法通过该代理连接到 Psiphon 服务器。\n请修改设置并重试。";
 
-/* Text above change region button that allows user to select their desired server region
-   Title for screen that allows user to select their desired server region. Use all capital letters in the translation only if it makes sense. */
-"CONNECT_VIA" = "连接经由";
+/* Text shown to the user telling them to connect to 'Psiphon', to finish their unfinished transaction. Do not translate or transliterate 'Psiphon'. */
+"CONNECT_TO_FINISH_PSICASH_TRANSACTION" = "请连接至Psiphon来完成您的交易";
+
+/* Button title that lets the user to connect to the Psiphon network. Do not translate or transliterate 'Psiphon' */
+"CONNECT_TO_PSIPHON" = "连接到赛风";
+
+/* User must connect to 'Psiphon' in order to use 'Speed Boost' product. Do not translate or transliterate 'Psiphon'. Do not transliterate 'Speed Boost'. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
+"CONNECT_TO_USE_SPEED_BOOST" = "连接至Psiphon以使用加速功能。";
+
+/* Title for screen that allows user to select their desired server region. Use all capital letters in the translation only if it makes sense. */
+"CONNECT_VIA" = "连接方式";
 
 /* Alert dialog title of alert which informs the user that the settings file in the app is corrupt. */
 "CORRUPT_SETTINGS_ALERT_TITLE" = "被损坏的设置";
@@ -59,21 +58,26 @@
 /* Alert dialog message informing the user that the settings file in the app is corrupt, and that they can potentially fix this issue by re-installing the app. */
 "CORRUPT_SETTINGS_MESSAGE" = "您的应用设置文件似乎已损坏。请尝试重新安装应用来修复设置文件。";
 
-/*[UNTRANSLATED] Decline button title */
-"DECLINE_BUTTON_TITLE" = "Decline";
+/* Decline button title */
+"DECLINE_BUTTON_TITLE" = "拒绝";
 
 /* Dismiss button title. Dismisses pop-up alert when the user clicks on the button */
 "DISMISS_BUTTON_TITLE" = "忽略";
 
-/* Title of the button that dismisses region selection dialog
-   Title of the button that dismisses the subscriptions menu */
+/* Title of the button that dismisses the subscriptions menu */
 "DONE_ACTION" = "完成";
 
 /* Title of the button that dismisses a screen or a dialog */
 "DONE_BUTTON_TITLE" = "完成";
 
+/* Error alert title */
+"ERROR_TITLE" = "错误";
+
+/* Message shown when something fails to load */
+"FAILED_TO_LOAD" = "加载失败";
+
 /* Alert dialog message indicating to the user that the app has failed to upload their feedback and that they should try again.  */
-"FEEDBACK_UPLOAD_FAILED_MESSAGE" = "上传您的反馈时发生错误。请再试一次。您的反馈有助于我们改进赛风网络。";
+"FEEDBACK_UPLOAD_FAILED_MESSAGE" = "上传您的反馈时发生错误。请再试一次。您的反馈有助于我们改进 Psiphon 网络。";
 
 /* Alert dialog title indicating to the user that the app has failed to upload their feedback to Psiphon's servers. */
 "FEEDBACK_UPLOAD_FAILED_TITLE" = "反馈上传失败";
@@ -85,13 +89,22 @@
 "FEEDBACK_UPLOAD_IN_PROGRESS_MESSAGE" = "正在发送反馈…";
 
 /* Alert dialog message thanking the user for helping improve the Psiphon network by submitting their feedback. */
-"FEEDBACK_UPLOAD_SUCCESSFUL_MESSAGE" = "感谢您帮助改进赛风！";
+"FEEDBACK_UPLOAD_SUCCESSFUL_MESSAGE" = "感谢您帮助改进 Psiphon！";
 
 /* Alert dialog title indicating to the user that their feedback has been successfully uploaded to Psiphon's servers. */
 "FEEDBACK_UPLOAD_SUCCESSFUL_TITLE" = "反馈上传成功";
 
-/*[UNTRANSLATED] External link to the license page. Please update this with the correct language specific link (if available) e.g. https://psiphon.ca/fr/license.html for french. */
-"LICENSE_PAGE_URL" = "https://psiphon.ca/en/license.html";
+/* Button title for a product that is free. There is no cost or payment associated. */
+"FREE_PSICASH_COIN" = "免费";
+
+/* Generic alert shown when purchase of a product fails. */
+"GENERIC_PURCHASE_FAILED" = "购买失败";
+
+/* User does not have sufficient 'PsiCash' balance. PsiCash is a type of credit. Do not translate or transliterate 'PsiCash'. */
+"INSUFFICIENT_PSICASH_BALANCE" = "PsiCash余额不足";
+
+/* External link to the license page. Please update this with the correct language specific link (if available) e.g. https://psiphon.ca/fr/license.html for french. */
+"LICENSE_PAGE_URL" = "https://psiphon.ca/zh/license.html";
 
 /* Text displayed while app loads */
 "LOADING" = "加载中...";
@@ -99,196 +112,143 @@
 /* Button title that takes user to the next page */
 "NEXT_PAGE_BUTTON_TITLE" = "下一步";
 
-/* Alert title informing user there is no internet connection */
-"NO_INTERNET" = "无互联网连接";
-
 /* Subscriptions view text that is visible when the list of subscriptions is not available */
-"NO_PRODUCTS_TEXT" = "无法从App Store检索订阅。下拉刷新或稍后再试。";
+"NO_PRODUCTS_TEXT_2" = "无法从 App Store 获取订阅资料。请稍后再试。";
 
-/* Alert OK Button
-   OK button on a pop-up alert. The alert will be dismissed when the user presses this button. */
+/* Alert OK Button */
 "OK_BUTTON" = "是";
 
-/*[UNTRANSLATED] Onboarding text for install VPN configuration. (Do not translate 'Psiphon'). */
-"ONBARDING_VPN_INSTALL_GUIDE_TEXT" = "You’ll need to allow Psiphon to add VPN configurations in order to connect.";
+/* Onboarding text for install VPN configuration. (Do not translate 'Psiphon'). */
+"ONBARDING_VPN_INSTALL_GUIDE_TEXT" = "您需要允许 Psiphon 添加 VPN 配置文件才能连接。";
 
-/*[UNTRANSLATED] Onboarding screen text. (Do not translate 'Psiphon'). */
-"ONBOARDING_BEYOND_BORDERS_BODY" = "Censored by your country, corporation, or campus? Psiphon is uniquely suited to help you get to the content you want, whenever and wherever you want it.";
+/* Onboarding screen text. (Do not translate 'Psiphon'). */
+"ONBOARDING_BEYOND_BORDERS_BODY_2" = "无论您身处何方，Psiphon 总能连接到您想要的内容。";
 
 /* Beyond Borders title */
 "ONBOARDING_BEYOND_BORDERS_HEADER" = "超越国界";
 
-/* Text of button at the bottom right or left (depending on rtl) of the last onboarding screen which allows the user to finish the onboarding sequence. Note: should be all uppercase (capitalized) when possible. */
-"ONBOARDING_DONE_BUTTON" = "完成";
+/* Onboarding screen 'getting started' body. (Do not translate 'Psiphon'). */
+"ONBOARDING_GETTING_STARTED_BODY_2" = "为了连接，Psiphon 需要能够添加 VPN 配置文件。";
 
-/*[UNTRANSLATED] Onboarding screen 'getting started' body. */
-"ONBOARDING_GETTING_STARTED_BODY" = "Psiphon uses VPN technology to provide you with uncensored access to internet content. You’ll need to allow Psiphon to add VPN configurations to your phone in order to connect with a safe path to the internet.";
-
-/*[UNTRANSLATED] Onboarding header */
-"ONBOARDING_GETTING_STARTED_HEADER" = "Getting Started";
-
-/* Text of button at the bottom right or left (depending on rtl) of the onboarding screens which allows the user to move on to the next onboarding screen. Note: should be all uppercase (capitalized) when possible. */
-"ONBOARDING_NEXT_BUTTON" = "下一步";
+/* Onboarding header */
+"ONBOARDING_GETTING_STARTED_HEADER" = "快速上手";
 
 /* Alert message informing the user they should open the app to finish connecting to the VPN. DO NOT translate 'Psiphon'. */
-"OPEN_PSIPHON_APP" = "请打开赛风应用来完成连接";
+"OPEN_PSIPHON_APP" = "请打开 Psiphon 应用来完成连接";
 
 /* Alert dialog title indicating to the user that Psiphon needs their permission */
 "PERMISSION_REQUIRED_ALERT__TITLE" = "需要权限";
 
-/* Cancel button title. */
-"PRIVACY_POLICY_CANCEL_BUTTON" = "取消";
+/* Subtitle shown when the current operation failed, asking the user to try again at a later time. */
+"PLEASE_TRY_AGAIN_LATER" = "请稍后重试。";
 
-/*[UNTRANSLATED] Alert message when the user declined privacy policy. They will not be able ot use the app until the user accepts the privacy policy (Do not translate 'Psiphon') */
-"PRIVACY_POLICY_DECLINED_ALERT_BODY" = "You must accept our Privacy Policy before continuing to use Psiphon.";
+/* Alert message when the user declined privacy policy. They will not be able ot use the app until the user accepts the privacy policy (Do not translate 'Psiphon') */
+"PRIVACY_POLICY_DECLINED_ALERT_BODY" = "在继续使用 Psiphon 之前，您必须接受我们的隐私条款。";
 
-/*[UNTRANSLATED] External link to the privacy policy page. Please update this with the correct language specific link (if available) e.g. https://psiphon.ca/fr/privacy.html for french. */
-"PRIVACY_POLICY_URL" = "https://psiphon.ca/en/privacy.html";
-
-/* Paragraph text in the 'What does Psiphon do with your VPN data?' subsection of the 'User VPN Data' section of the Privacy page. */
-"PrivacyInformationCollectedVpndataWhatdoespsiphondowithPara1" = "赛风 仅在收集有关我们系统使用情况的统计数据所需的程度上查看您的数据。我们记录为用户连接传输的总字节数，以及为某些特定域传输的字节数。这些统计数据在60天后被丢弃。";
+/* External link to the privacy policy page. Please update this with the correct language specific link (if available) e.g. https://psiphon.ca/fr/privacy.html for french. */
+"PRIVACY_POLICY_URL" = "https://psiphon.ca/zh/privacy.html";
 
 /* Paragraph text in the 'What does Psiphon do with your VPN data?' subsection of the 'User VPN Data' section of the Privacy page. */
-"PrivacyInformationCollectedVpndataWhatdoespsiphondowithPara2" = "赛风不会检查或记录完整的URL（仅限域名），也不会进一步检查您的数据。 赛风在通过 VPN 时不会修改您的数据。";
+"PrivacyInformationCollectedVpndataWhatdoespsiphondowithPara1" = "Psiphon 为了收集有关系统使用情况，会查看您的数据。 我们记录为用户连接传输的总字节数，以及为某些特定域传输的字节数。 这些统计数据在60天后被遗弃。";
 
-/*[UNTRANSLATED] Paragraph text in the 'What does Psiphon do with your VPN data?' subsection of the 'User VPN Data' section of the Privacy page. */
-"PrivacyInformationCollectedVpndataWhatdoespsiphondowithPara3" = "Even this coarse data would be difficult to link back to you, since we immediately convert your IP address to geographical info and then discard the IP. Nor is any other identifying information stored.";
+/* Paragraph text in the 'What does Psiphon do with your VPN data?' subsection of the 'User VPN Data' section of the Privacy page. */
+"PrivacyInformationCollectedVpndataWhatdoespsiphondowithPara2" = "Psiphon 不会检查或记录完整的 URL（仅限域名），也不会进一步检查您的数据。 Psiphon 在通过 VPN 时不会修改您的数据。";
 
-/*[UNTRANSLATED] Sub-heading in the 'User VPN Data' section of the Privacy Policy page. The section describes what Psiphon does with the little bit of VPN data that it collects stats from. */
-"PrivacyInformationCollectedVpndataWhatdoespsiphondowithSubhead" = "What does Psiphon do with your VPN data?";
+/* Paragraph text in the 'What does Psiphon do with your VPN data?' subsection of the 'User VPN Data' section of the Privacy page. */
+"PrivacyInformationCollectedVpndataWhatdoespsiphondowithPara3" = "想要通过这一未被加工的数据追踪到您也是十分困难的，因为我们会立即将您的 IP 地址转换为地理信息并丢弃 IP。另外，我们不会储存其他可能会识别出您身份的信息。";
 
-/*[UNTRANSLATED] Paragraph text in the 'Who does Psiphon share these statistics with?' subsection of the 'User VPN Data' section of the Privacy page. */
-"PrivacyInformationCollectedVpndataWhopsiphonshareswithPara1" = "When sharing with third parties, Psiphon only ever provides coarse, aggregate domain-bytes statistics. We never share per-session information or any other possibly-identifying information.";
+/* Sub-heading in the 'User VPN Data' section of the Privacy Policy page. The section describes what Psiphon does with the little bit of VPN data that it collects stats from. */
+"PrivacyInformationCollectedVpndataWhatdoespsiphondowithSubhead" = "Psiphon 会用您的 VPN 数据做什么？";
 
-/*[UNTRANSLATED] Paragraph text in the 'Who does Psiphon share these statistics with?' subsection of the 'User VPN Data' section of the Privacy page. */
-"PrivacyInformationCollectedVpndataWhopsiphonshareswithPara2" = "This sharing is typically done with services or organizations we collaborate with — as <a href=\"http://www.dw.com/en/psiphon-helps-dodge-the-online-trackers/a-16765092\" target=\"_blank\">we did with DW</a> a few years ago. These statistics help us and them answer questions like, “how many bytes were transferred through Psiphon for DW.com to all users in Iran in April?”";
+/* Paragraph text in the 'Who does Psiphon share these statistics with?' subsection of the 'User VPN Data' section of the Privacy page. */
+"PrivacyInformationCollectedVpndataWhopsiphonshareswithPara1" = "跟第三方共享数据时，Psiphon 永远只提供原始的、合并过的域名-字节统计数字。我们永远不会分享单次会话访问的信息，或其他任何可能辨认身份的信息。";
 
-/*[UNTRANSLATED] Paragraph text in the 'Who does Psiphon share these statistics with?' subsection of the 'User VPN Data' section of the Privacy page. */
-"PrivacyInformationCollectedVpndataWhopsiphonshareswithPara3" = "Again, we specifically do not give detailed or potentially user-identifying information to partners or any other third parties.";
+/* Paragraph text in the 'Who does Psiphon share these statistics with?' subsection of the 'User VPN Data' section of the Privacy page. */
+"PrivacyInformationCollectedVpndataWhopsiphonshareswithPara2" = "这一类的分享对象通常是与我们合作的服务商或机构 - 如几年前<a href=\"http://www.dw.com/en/psiphon-helps-dodge-the-online-trackers/a-16765092\" target=\"_blank\">我们和 DW 合作的</a>那样。这些统计帮助我们和他们回答一些问题，如，“对于 DW.com，在伊朗的所有用户，四月份内有多少个字节是通过 Psiphon 传送的？”";
 
-/*[UNTRANSLATED] Sub-heading in the 'User VPN Data' section of the Privacy Policy page. The section describes who Psiphon shares VPN data stats. The answer will be organizations and not specific people, in case that makes a difference in your language. */
-"PrivacyInformationCollectedVpndataWhopsiphonshareswithSubhead" = "Who does Psiphon share these statistics with?";
+/* Paragraph text in the 'Who does Psiphon share these statistics with?' subsection of the 'User VPN Data' section of the Privacy page. */
+"PrivacyInformationCollectedVpndataWhopsiphonshareswithPara3" = "再次强调，我们特别不会把细节的、可能会辨别用户身份的信息给合作伙伴或任何其他第三方。";
+
+/* Sub-heading in the 'User VPN Data' section of the Privacy Policy page. The section describes who Psiphon shares VPN data stats. The answer will be organizations and not specific people, in case that makes a difference in your language. */
+"PrivacyInformationCollectedVpndataWhopsiphonshareswithSubhead" = "赛风与谁共享这些数据？";
 
 /* Paragraph text in the 'Why should you care?' subsection of the 'User VPN Data' section of the Privacy page. */
 "PrivacyInformationCollectedVpndataWhycarePara1" = "使用 VPN 或代理时，您应该关注提供商可以在您的数据中看到的内容，从中收集数据并对其进行操作。对于某些 Web 和电子邮件连接，理论上 VPN 可以查看，收集和修改内容。";
 
-/*[UNTRANSLATED] Sub-heading in the 'User VPN Data' section of the Privacy Policy page. The section describes why it's important for users to consider what a VPN does with their traffic data. */
-"PrivacyInformationCollectedVpndataWhycareSubhead" = "Why should you care?";
+/* Sub-heading in the 'User VPN Data' section of the Privacy Policy page. The section describes why it's important for users to consider what a VPN does with their traffic data. */
+"PrivacyInformationCollectedVpndataWhycareSubhead" = "为什么你需要关心？";
 
-/*[UNTRANSLATED] Bullet list text under 'Why does Psiphon need these statistics?' subsection of the 'User VPN Data' section of the Privacy page. */
-"PrivacyInformationCollectedVpndataWhydoespsiphonneedPara1Item1" = "Estimate future costs: The huge amount of user data we transfer each month is a major factor in our costs. It is vital for us to see and understand usage fluctuations.";
+/* Bullet list text under 'Why does Psiphon need these statistics?' subsection of the 'User VPN Data' section of the Privacy page. */
+"PrivacyInformationCollectedVpndataWhydoespsiphonneedPara1Item1" = "未来估计成本：每个月传输的大量用户数据是我们成本的一个主要因素。对我们来说，看到和理解使用状况的波动是至关重要的。";
 
-/*[UNTRANSLATED] Bullet list text under 'Why does Psiphon need these statistics?' subsection of the 'User VPN Data' section of the Privacy page. */
-"PrivacyInformationCollectedVpndataWhydoespsiphonneedPara1Item2" = "Optimize for traffic types: Video streaming has different network requirements than web browsing does, which is different than chat, which is different than voice, and so on. Statistics about the number of bytes transferred for some major media providers helps us to understand how to provide the best experience to our users.";
+/* Bullet list text under 'Why does Psiphon need these statistics?' subsection of the 'User VPN Data' section of the Privacy page. */
+"PrivacyInformationCollectedVpndataWhydoespsiphonneedPara1Item2" = "为通信类型做优化：视频流播需要不同的网络需求，它不同于网页浏览、聊天、语音通话，等等。有关传输向某些主要媒体提供商的字节数的数据，可以帮助我们理解如何才能为我们的用户提供最好的体验。";
 
-/*[UNTRANSLATED] Bullet list text under 'Why does Psiphon need these statistics?' subsection of the 'User VPN Data' section of the Privacy page. If available in your language, the blog post URLs should be updated to the localized post. */
-"PrivacyInformationCollectedVpndataWhydoespsiphonneedPara1Item3" = "Determine the nature of major censorship events: Sites and services often get blocked suddenly and without warning, which can lead to huge variations in regional usage of Psiphon. For example, we had up to 20x surges in usage within a day when <a href=\"https://blog-en.psiphon.ca/2016/07/psiphon-usage-surges-as-brazil-blocks.html\" target=\"_blank\">Brazil blocked WhatsApp</a> or <a href=\"https://blog-en.psiphon.ca/2016/11/social-media-and-internet-ban-in-turkey.html\" target=\"_blank\">Turkey blocked social media</a>.";
+/* Bullet list text under 'Why does Psiphon need these statistics?' subsection of the 'User VPN Data' section of the Privacy page. If available in your language, the blog post URLs should be updated to the localized post. */
+"PrivacyInformationCollectedVpndataWhydoespsiphonneedPara1Item3" = "确定主要审查活动的特质：网站和服务经常被突然封锁而没有事先警告。这会导致 Psiphon 在不同区域的使用量截然不同。例如，在 <a href=\"https://blog-en.psiphon.ca/2016/07/psiphon-usage-surges-as-brazil-blocks.html\" target=\"_blank\">巴西封锁 WhatsApp</a> 或 <a href=\"https://blog-en.psiphon.ca/2016/11/social-media-and-internet-ban-in-turkey.html\" target=\"_blank\">土耳其封锁社交媒体</a> 的那天，我们的使用量激增 20 倍。";
 
-/*[UNTRANSLATED] Bullet list text under 'Why does Psiphon need these statistics?' subsection of the 'User VPN Data' section of the Privacy page. (English is using 'who' instead of 'whom' to reflect common idiom.) */
-"PrivacyInformationCollectedVpndataWhydoespsiphonneedPara1Item4" = "Understand who we need to help: Some sites and services will never get blocked anywhere, some will always be blocked in certain countries, and some will occasionally be blocked in some countries. To make sure that our users are able to communicate and learn freely, we need to understand these patterns, see who is affected, and work with partners to make sure their services work best with Psiphon.";
+/* Bullet list text under 'Why does Psiphon need these statistics?' subsection of the 'User VPN Data' section of the Privacy page. (English is using 'who' instead of 'whom' to reflect common idiom.) */
+"PrivacyInformationCollectedVpndataWhydoespsiphonneedPara1Item4" = "我们会帮助谁：有些网站及服务在任何地域都不会被屏蔽，有些在一些国家总会被屏蔽，有些在一些国家可能被屏蔽。为了确保我们的用户能够自由地交流、学习，我们需要了解这些规律，找出受影响的网站及服务，并与合作伙伴共同努力，以确保他们的服务在 Psiphon 下更好地工作。";
 
-/*[UNTRANSLATED] Paragraph text in the 'Why does Psiphon need these statistics?' subsection of the 'User VPN Data' section of the Privacy page. This paragraph serves as preamble for a detailed list, which is why it ends with a colon. */
-"PrivacyInformationCollectedVpndataWhydoespsiphonneedPara1ListStart" = "This data is used by us to determine how our network is being used. This allows us to do things like:";
+/* Paragraph text in the 'Why does Psiphon need these statistics?' subsection of the 'User VPN Data' section of the Privacy page. This paragraph serves as preamble for a detailed list, which is why it ends with a colon. */
+"PrivacyInformationCollectedVpndataWhydoespsiphonneedPara1ListStart" = "我们通过这一数据来确定我们的网络是如何被使用的。这让我们可以完成如下事项：";
 
-/*[UNTRANSLATED] Sub-heading in the 'User VPN Data' section of the Privacy Policy page. The section describes why Psiphon needs VPN data stats. */
-"PrivacyInformationCollectedVpndataWhydoespsiphonneedSubhead" = "Why does Psiphon need these statistics?";
-
-/*[UNTRANSLATED] Button label at the end of privacy policy screen, indication that when clicked user can start using Psiphon */
-"PrivacyPolicyGetStartedButtonTitle" = "Get started with Psiphon";
+/* Sub-heading in the 'User VPN Data' section of the Privacy Policy page. The section describes why Psiphon needs VPN data stats. */
+"PrivacyInformationCollectedVpndataWhydoespsiphonneedSubhead" = "为什么 Psiphon 需要这些数据？";
 
 /* page title for the Privacy Policy page */
 "PrivacyTitle" = "隐私政策";
 
-/*[UNTRANSLATED] Text which appears in the Speed Boost meter when the user's buy request for Speed Boost is being processed. Please keep this text concise as the width of the text box is restricted in size.
-   Text which appears in the Speed Boost meter when the user's buy request for Speed Boost is being processed. Please keep this text concise as the width of the text box is restricted in size. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
-"PSICASH_BUYING_SPEED_BOOST_TEXT" = "Buying Speed Boost...";
+/* Message shown when products available for purchase could not be retrieved. */
+"PRODUCT_LIST_COULD_NOT_BE_RETRIEVED" = "产品清单不可更改";
 
-/*[UNTRANSLATED] Alert message indicating to the user that they can't purchase Speed Boost while the app is connecting. Do not translate 'Psiphon'. */
-"PSICASH_CONNECTED_OR_DISCONNECTED" = "Speed Boost purchase unavailable while Psiphon is connecting.";
+/* PsiCash is a type of credit. Do not translate or transliterate 'PsiCash'. Text shown next to the user's PsiCash balance (a numerical value). Keep colon if appropriate. */
+"PSICASH_BALANCE" = "PsiCash余额：";
 
-/*[UNTRANSLATED] Text conveying to the user how much the displayed number of hours of Speed Boost costs. %@ should be not be removed but placed in the appropriate location because it will be replaced with the number of hours programmatically. After this sentence the cost of the Speed Boost item will be displayed. For example '1 hour of Speed Boost at 50'. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
-"PSICASH_CONVERSION_HOUR_MESSAGE" = "%@ hour of Speed Boost at";
+/* User's PsiCash balance is not up to date. PsiCash is a type of credit. Do not translate or transliterate 'Psiphon'. Do not translate or transliterate 'PsiCash'. Text is shown on an alert pop up title */
+"PSICASH_BALANCE_OUT_OF_DATE_ALERT_BODY" = "连接至Psiphon以升级您的PsiCash额度。";
 
-/*[UNTRANSLATED] Text conveying to the user how much the displayed number of hours of Speed Boost costs. %@ should be not be removed but placed in the appropriate location because it will be replaced with the number of hours programmatically. After this sentence the cost of the Speed Boost item will be displayed. For example '2 hours of Speed Boost at 100'. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
-"PSICASH_CONVERSION_HOURS_MESSAGE" = "%@ hours of Speed Boost at";
+/* User's PsiCash balance is not up to date. PsiCash is a type of credit. Do not translate or transliterate 'PsiCash'. Text is shown on an alert pop up title */
+"PSICASH_BALANCE_OUT_OF_DATE_ALERT_TITLE" = "PsiCash额度过期";
 
-/*[UNTRANSLATED] Text conveying to the user how much the displayed number of hours of Speed Boost costs. %@ should be not be removed but placed in the appropriate location because it will be replaced with the number of hours programmatically. After this sentence the cost of the Speed Boost item will be displayed. For example '5 mins of Speed Boost at 25'. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
-"PSICASH_CONVERSION_MINS_MESSAGE" = "%d minutes of Speed Boost at";
+/* PsiCash in-app purchase disclaimer that appears on the bottom of the screen where users can buy different amounts of PsiCash from the PlayStore.  Do not translate or transliterate terms PsiCash */
+"PSICASH_PURCHASE_SCREEN_NOTICE" = "重要信息：如果您卸载了Psiphon，您的PsiCash信息不会被保存。";
 
-/*[UNTRANSLATED] Text conveying to the user that the target Speed Boost product is being loaded. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
-"PSICASH_LOADING_SPEED_BOOST_PRODUCTS_MESSAGE" = "Loading Speed Boost product...";
+/* An error that signifies a state where the user has made a 'PsiCash' purchase, but extra action is needed from the user to finish the transaction. Do not translate or transliterate 'PsiCash'. */
+"PSICASH_TRANSACTION_PENDING" = "交易等待中";
 
-/*[UNTRANSLATED] Body text on the first PsiCash onboarding screen. This is in reference to the ability to use PsiCash to purchase 'Speed Boost', which grants unlimited network speed through Psiphon. */
-"PSICASH_ONBOARDING_PAGE_1_TEXT" = "A new way for you to enjoy maximum speeds, absolutely free.";
+/* PsiCash currently unavailable. PsiCash is a type of credit. Do not translate or transliterate 'PsiCash'. */
+"PSICASH_UNAVAILABLE" = "PsiCash不可用";
 
-/* Title text on the first PsiCash onboarding screen. The word 'PsiCash' should not be translated or transliterated. PsiCash is a reward system within Psiphon where users can build up credit that they can then spend on 'Speed Boost' (unlimited connection speed) and, in the future, other rewards. */
-"PSICASH_ONBOARDING_PAGE_1_TITLE" = "让我们欢迎 PsiCash";
+/* 'PsiCash' features are unavailable while the app the connecting to 'Psiphon'. PsiCash is a type of credit. Do not translate or transliterate 'Psiphon'. Do not translate or transliterate 'PsiCash' */
+"PSICASH_UNAVAILABLE_WHILE_CONNECTING" = "PsiCash在连接至Psiphon时不可用";
 
-/*[UNTRANSLATED] Body text on the second PsiCash onboarding screen. This is telling the user how to earn PsiCash. The user will be rewared for visiting Psiphon-related websites and pages, browsing and interacting with active content. 'Connect' is in the 'Connect to Psiphon' sense; 'engage with our content' is in the sense of 'visit our sites, read our posts, interact and participate with our content'. The English is intentionally somewhat obtuse, but the translation can use whatever works best. Note: 'PsiCash' should not be translated or transliterated. */
-"PSICASH_ONBOARDING_PAGE_2_TEXT" = "Connect and engage with our content to earn PsiCash.";
+/* 'PsiCash' features are unavailable while the user has a subscription. Do not translate or transliterate 'PsiCash' */
+"PSICASH_UNAVAILABLE_WHILE_SUBSCRIBED" = "在订阅时PsiCash不可用";
 
-/*[UNTRANSLATED] Title text on the second PsiCash onboarding screen. This shows the user's PsiCash balance, which is the amount of credit they have. Note: 'PsiCash' should not be translated or transliterated. */
-"PSICASH_ONBOARDING_PAGE_2_TITLE" = "Your PsiCash balance";
+/* Message when the user has made a purchase, and paid successfully, however the transaction is not complete yet and is pending verification */
+"PSICASH_WAIT_TRANSACTION_VERIFIED" = "请耐心等待您的交易验证";
 
-/*[UNTRANSLATED] Body text on the third PsiCash onboarding screen. This indicates that 'Speed Boost' can be purchased with PsiCash credit after earning a sufficient amount. Note: 'PsiCash' should not be translated or transliterated. */
-"PSICASH_ONBOARDING_PAGE_3_TEXT" = "When you've collected enough PsiCash, you can activate Speed Boost and enjoy Psiphon at max speed!";
+/* Shown when user is not connected to Psiphon network. Do not translate or transliterate 'Psiphon' */
+"PSIPHON_IS_NOT_CONNECTED" = "未连接至Psiphon";
 
-/*[UNTRANSLATED] Title text on the third PsiCash onboarding screen. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
-"PSICASH_ONBOARDING_PAGE_3_TITLE" = "Speed Boost";
+/* Shown when the user is purchasing PsiCash. PsiCash is a type of credit. Do not translate or transliterate 'PsiCash'. Including ellipses '…' if appropriate. */
+"PURCHASING_PSICASH" = "购买PsiCash...";
 
-/*[UNTRANSLATED] Alert error message informing user that the app failed to retrieve their PsiCash information from the server. Note: 'PsiCash' should not be translated or transliterated. */
-"PSICASH_REFRESH_STATE_FAILED_MESSAGE_TEXT" = "Failed to update PsiCash state";
-
-/* Text which appears in the Speed Boost meter when the user has activated Speed Boost. Please keep this text concise as the width of the text box is restricted in size. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
-"PSICASH_SPEED_BOOST_ACTIVE_TEXT" = "加速已开启";
-
-/* Text which appears in the Speed Boost meter when the user has earned enough PsiCash to buy Speed Boost. Please keep this text concise as the width of the text box is restricted in size. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
-"PSICASH_SPEED_BOOST_AVAILABLE_TEXT" = "加速可用";
-
-/* Text which appears in the Speed Boost meter when the user has not yet earned enough PsiCash to Speed Boost. This text will be accompanied with a percentage indicating to the user how close they are to earning enough PsiCash to buy a minimum amount of Speed Boost. Please keep this text concise as the width of the text box is restricted in size. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
-"PSICASH_SPEED_BOOST_CHARGING_TEXT" = "正购买加速";
-
-/*[UNTRANSLATED] Text which appears in the Speed Boost meter when the user has not earned any PsiCash yet. Please keep this text concise as the width of the text box is restricted in size. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. Note: 'PsiCash' should not be translated or transliterated. */
-"PSICASH_SPEED_BOOST_NOAUTH_TEXT" = "Earn PsiCash to buy Speed Boost";
-
-/*[UNTRANSLATED] Alert error message informing user that their Speed Boost purchase request failed because they already have an active Speed Boost purchase. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
-"PSICASH_SPEED_BOOST_PURCHASE_FAILED_ALREADY_ACTIVE_PURCHASE" = "Error: you already have an active Speed Boost purchase.";
-
-/*[UNTRANSLATED] Alert error message informing user that their Speed Boost purchase request failed because they have an insufficient balance. Required price in PsiCash will be appended after the colon. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
-"PSICASH_SPEED_BOOST_PURCHASE_FAILED_INSUFFICIENT_FUNDS" = "Insufficient balance for Speed Boost purchase. Price:";
-
-/*[UNTRANSLATED] Alert error message informing user that their Speed Boost purchase request failed because their app has entered an invalid state and that they should try updating or reinstalling the app. Note: 'PsiCash' should not be translated or transliterated. */
-"PSICASH_SPEED_BOOST_PURCHASE_FAILED_INVALID_TOKENS" = "Invalid Tokens: the app has entered an invalid state. Please reinstall the app to continue using PsiCash.";
-
-/*[UNTRANSLATED] Alert message informing user that their Speed Boost purchase attempt unexpectedly failed and that they should try again in a few minutes. */
-"PSICASH_SPEED_BOOST_PURCHASE_FAILED_MESSAGE_TEXT" = "Purchase failed, please try again in a few minutes.";
-
-/*[UNTRANSLATED] Alert error message informing user that their Speed Boost purchase request failed because they tried to make the purchase with an out of date product price. Updated price will be appended after the colon. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
-"PSICASH_SPEED_BOOST_PURCHASE_FAILED_PRICE_OUT_OF_DATE" = "Error: price of Speed Boost is out of date. Price:";
-
-/*[UNTRANSLATED] Alert error message informing user that their Speed Boost purchase request failed because they tried to make the purchase with an out of date product price and that the price is being updated. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
-"PSICASH_SPEED_BOOST_PURCHASE_FAILED_PRICE_OUT_OF_DATE_NO_MISMATCH" = "Error: price of Speed Boost is out of date. Updating local products.";
-
-/*[UNTRANSLATED] Alert error message informing user that their Speed Boost purchase request failed because they attempted to buy a product that is no longer available and that they should try updating or reinstalling the app. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
-"PSICASH_SPEED_BOOST_PURCHASE_FAILED_PRODUCT_NOT_FOUND" = "Error: Speed Boost product not found. Local products updated. Your app may be out of date. Please check for updates.";
-
-/*[UNTRANSLATED] Alert error message informing user that their Speed Boost purchase request failed due to a server error and that they should try again in a few minutes */
-"PSICASH_SPEED_BOOST_PURCHASE_FAILED_SERVER_ERROR" = "Server error. Please try again in a few minutes.";
-
-/*[UNTRANSLATED] Alert error message informing user that their Speed Boost purchase request failed because of an unknown error. Note: 'PsiCash' should not be translated or transliterated. */
-"PSICASH_SPEED_BOOST_PURCHASE_FAILED_UNEXPECTED_CODE" = "Invalid or unexpected status code returned from PsiCash library.";
+/* Purchasing 'Speed Boost' product. Including ellipses '…' if appropriate. Do not transliterate 'Speed Boost'. 'Speed Boost' is a product that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
+"PURCHASING_SPEED_BOOST" = "购买加速";
 
 /* Description text above a list of scenarios where the user should try refreshing their app receipt to restore an existing subscription */
 "REFRESH_APP_RECEIPT_BUTTON_DESCRIPTION_LIST_HEADER" = "何时刷新应用收据：";
 
-/*[UNTRANSLATED] Point in a list of scenarios where the user should try refreshing their app receipt to restore an existing subscription */
-"REFRESH_APP_RECEIPT_BUTTON_DESCRIPTION_POINT_1" = "You need to recover a subscription on your account with a new phone";
+/* Point in a list of scenarios where the user should try refreshing their app receipt to restore an existing subscription */
+"REFRESH_APP_RECEIPT_BUTTON_DESCRIPTION_POINT_1" = "使用新电话时，你需要恢复账户里的订阅";
 
-/*[UNTRANSLATED] Point in a list of scenarios where the user should try refreshing their app receipt to restore an existing subscription */
-"REFRESH_APP_RECEIPT_BUTTON_DESCRIPTION_POINT_2" = "You cannot see a subscription you purchased on this device";
+/* Point in a list of scenarios where the user should try refreshing their app receipt to restore an existing subscription */
+"REFRESH_APP_RECEIPT_BUTTON_DESCRIPTION_POINT_2" = "无法在本设备上看到你购买的订阅";
 
-/*[UNTRANSLATED] Title for a confirmation button that resets a user's previous consent. */
-"RESET_IDENTIFIER_BUTTON_TITLE" = "Reset Consent";
+/* Title for a confirmation button that resets a user's previous consent. */
+"RESET_IDENTIFIER_BUTTON_TITLE" = "重置内容";
 
 /* Button which, when pressed, attempts to restore any existing subscriptions the user has purchased */
 "RESTORE_SUBSCRIPTION_BUTTON" = "恢复订阅";
@@ -296,14 +256,11 @@
 /* Title of button which triggers an attempt to restore the user's existing subscription */
 "RESTORE_SUBSCRIPTION_BUTTON_TITLE" = "恢复我的订阅";
 
-/* Button label indicating to the user that they will earn PsiCash if they watch a video advertisement. The word 'PsiCash' should not be translated or transliterated. */
-"REWARDED_VIDEO_EARN_PSICASH" = "看视频，赚 PsiCash ！";
+/* Shown in a pop-up alert if user's rewarded video ad failed to load. */
+"REWARDED_VIDEO_LOAD_FAILED" = "奖励视频加载失败。请稍后重试。";
 
-/*[UNTRANSLATED] Button label indicating to the user that there are no videos available for them to watch. */
-"REWARDED_VIDEO_NO_VIDEOS_AVAILABLE" = "No Videos Available";
-
-/*[UNTRANSLATED] Title for screen that allows user to select language. Use all capital letters in the translation only if it makes sense. */
-"SELECT_LANG" = "SELECT LANGUAGE";
+/* Title for screen that allows user to select language. Use all capital letters in the translation only if it makes sense. */
+"SELECT_LANG" = "选择语言";
 
 /* Select language button title. */
 "SELECT_LANG_BUTTON_TITLE" = "选择语言";
@@ -311,8 +268,8 @@
 /* Title of cell in settings menu which, when pressed, reinstalls the user's VPN profile for Psiphon */
 "SETTINGS_REINSTALL_VPN_CONFIGURATION_CELL_TITLE" = "重新安装 VPN 配置文件";
 
-/*[UNTRANSLATED] (Do not translate 'AdMob') Title of cell in settings menu which indicates the user can change or revoke the consent they've given to admob */
-"SETTINGS_RESET_ADMOB_CONSENT" = "Reset AdMob Consent";
+/* (Do not translate 'AdMob') Title of cell in settings menu which indicates the user can change or revoke the consent they've given to admob */
+"SETTINGS_RESET_ADMOB_CONSENT" = "重置 AdMob 同意书";
 
 /* Subscriptions item title in the app settings when user has an active subscription. Clicking this item opens subscriptions view */
 "SETTINGS_SUBSCRIPTION_ACTIVE" = "订阅";
@@ -320,29 +277,44 @@
 /* Subscriptions item title in the app settings when user does not have an active subscription. Clicking this item opens subscriptions view. If “Premium” doesn't easily translate, please choose a term that conveys “Pro” or “Extra” or “Better” or “Elite”. */
 "SETTINGS_SUBSCRIPTION_NOT_ACTIVE" = "升级到高级版！";
 
-/*[UNTRANSLATED] Footer text beside button that opens paid subscriptions manager UI. At this point the user is not subscribed. Please keep this text concise as the width of the text box is restricted in size. */
-"SUBSCRIPTION_BAR_FOOTER_TEXT_NOT_SUBSCRIBED" = "Remove ads";
+/* Do not transliterate 'Speed Boost'. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
+"SPEED_BOOST" = "加速";
 
-/*[UNTRANSLATED] Footer text beside button that opens paid subscriptions manager UI. At this point the user is subscribed. If “Premium” doesn't easily translate, please choose a term that conveys “Pro” or “Extra” or “Better” or “Elite”. Please keep this text concise as the width of the text box is restricted in size. */
-"SUBSCRIPTION_BAR_FOOTER_TEXT_SUBSCRIBED" = "Premium - Max Speed";
+/* Do not transliterate 'Speed Boost'. 'Speed Boost' is a product that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
+"SPEED_BOOST_ACTIVE" = "加速已被激活";
 
-/*[UNTRANSLATED] Header text beside button that opens paid subscriptions manager UI. At this point the user is not subscribed. If “Premium” doesn't easily translate, please choose a term that conveys “Pro” or “Extra” or “Better” or “Elite”. Please keep this text concise as the width of the text box is restricted in size. */
-"SUBSCRIPTION_BAR_HEADER_TEXT_NOT_SUBSCRIBED" = "GET PREMIUM";
+/* '%@' is going to be replace by a timer (e.g. '02:12'). Place the exact string '%@' at the appropriate place. This string is shown when the user's 'Speed Boost' is active. Do not transliterate 'Speed Boost'. 'Speed Boost' is a product that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
+"SPEED_BOOST_IS_ACTIVE" = "加速已激活%@";
 
-/*[UNTRANSLATED] Header text beside button that opens paid subscriptions manager UI. At this point the user is subscribed. Please keep this text concise as the width of the text box is restricted in size. */
-"SUBSCRIPTION_BAR_HEADER_TEXT_SUBSCRIBED" = "SUBSCRIPTION";
+/* 'Speed Boost' product is currently unavailable. Do not transliterate 'Speed Boost'. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
+"SPEED_BOOST_UNAVAILABLE" = "加速功能不可用";
 
-/* Text for button that opens paid subscriptions manager UI. If “Premium” doesn't easily translate, please choose a term that conveys “Pro” or “Extra” or “Better” or “Elite”. */
-"SUBSCRIPTION_BUTTON_TITLE" = "立刻升级到高级版！";
+/* Do not transliterate 'Speed Boost'. 'Speed Boost' is a product that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
+"SPEED_BOOST_YOU_ALREADY_HAVE" = "您已经加速";
+
+/* Footer text beside button that opens paid subscriptions manager UI. At this point the user is not subscribed. Please keep this text concise as the width of the text box is restricted in size. */
+"SUBSCRIPTION_BAR_FOOTER_TEXT_NOT_SUBSCRIBED_2" = "移除广告•极速";
+
+/* Footer text beside button that opens paid subscriptions manager UI. At this point the user is subscribed. If “Premium” doesn't easily translate, please choose a term that conveys “Pro” or “Extra” or “Better” or “Elite”. Please keep this text concise as the width of the text box is restricted in size. */
+"SUBSCRIPTION_BAR_FOOTER_TEXT_SUBSCRIBED" = "高级版-极速";
+
+/* Header text beside button that opens paid subscriptions manager UI. At this point the user is not subscribed. If “Premium” doesn't easily translate, please choose a term that conveys “Pro” or “Extra” or “Better” or “Elite”. Please keep this text concise as the width of the text box is restricted in size. */
+"SUBSCRIPTION_BAR_HEADER_TEXT_NOT_SUBSCRIBED" = "升级到高级版";
+
+/* Header text beside button that opens paid subscriptions manager UI. At this point the user is subscribed. Please keep this text concise as the width of the text box is restricted in size. */
+"SUBSCRIPTION_BAR_HEADER_TEXT_SUBSCRIBED" = "订阅";
 
 /* Title of the dialog for available in-app paid subscriptions */
 "SUBSCRIPTIONS" = "订阅";
 
-/*[UNTRANSLATED] Label on a button which, when pressed, opens a screen where the user can manage their currently active subscription. */
-"SUBSCRIPTIONS_MANAGE_SUBSCRIPTION_BUTTON" = "Manage";
+/* Label on a button which, when pressed, opens a screen where the user can manage their currently active subscription. */
+"SUBSCRIPTIONS_MANAGE_SUBSCRIPTION_BUTTON" = "管理";
 
-/*[UNTRANSLATED] Title of the banner on the subscriptions page that tells the user how many initial free days they get once subscribed */
-"SUBSCRIPTIONS_PAGE_BANNER_TITLE" = "Get 3 days of premium FREE when subscribing to any plan";
+/* Subtitle of the banner on the subscriptions page informing the user that the subscriptions require no commitment, and can be cancelled anytime */
+"SUBSCRIPTIONS_PAGE_BANNER_SUBTITLE" = "无条件随时取消。";
+
+/* Title of the banner on the subscriptions page advertising that subscriptions enable no ads and maximum speed. */
+"SUBSCRIPTIONS_PAGE_BANNER_TITLE_2" = "无广告，高速传输";
 
 /* Title of the button on the subscriptions page which takes the user of of the app to iTunes where they can view detailed information about their subscription */
 "SUBSCRIPTIONS_PAGE_MANAGE_SUBSCRIPTION_BUTTON" = "管理我的订阅";
@@ -359,26 +331,20 @@
 /* Title of button on subscriptions page which opens Psiphon's terms of use webpage */
 "SUBSCRIPTIONS_TERMS_OF_USE_BUTTON_TEXT" = "使用条款";
 
-/* Alert message informing user to turn on their cellular data or wifi to connect to the internet */
-"TURN_ON_DATE" = "打开行动上网或是使用 Wi-Fi 来接取数据";
+/* Button title shown when something fails to load. Asks the user to tap the button to retry the operation */
+"TAP_TO_RETRY" = "轻按重试";
 
 /* Alert dialog message informing the user that an error occurred while starting Psiphon (Do not translate 'Psiphon'). The user should try again, and if the problem persists, they should try reinstalling the app. */
-"VPN_START_FAIL_MESSAGE" = "启动赛风时发生错误。请再试一次。如果问题仍然存在，请尝试重新安装赛风应用。";
+"VPN_START_FAIL_MESSAGE" = "启动 Psiphon 时发生错误。请再试一次。如果问题仍然存在，请尝试重新安装 Psiphon 应用。";
 
-/*[UNTRANSLATED] Alert dialog message informing the user that an error occurred while starting Psiphon because they selected an egress region that is no longer available (Do not translate 'Psiphon'). The user has been automatically switched to to 'Fastest Country', but they can also open the Psiphon app to choose another country. Note: the backslash before each quotation mark should be left as is for formatting. */
-"VPN_START_FAIL_REGION_INVALID_MESSAGE_2" = "The region you selected is no longer available. You have automatically been switched to \"Fastest Country\".\n\n You can also select a new region from the Psiphon app.";
+/* Alert dialog message informing the user that an error occurred while starting Psiphon because they selected an egress region that is no longer available (Do not translate 'Psiphon'). The user has been automatically switched to to 'Fastest Country', but they can also open the Psiphon app to choose another country. Note: the backslash before each quotation mark should be left as is for formatting. */
+"VPN_START_FAIL_REGION_INVALID_MESSAGE_2" = "你所选择的区域不再有效。已经自动将你转到“最快的国家”。\n\n你也可以从 Psiphon 应用中选取一个新的区域。";
 
 /* Alert dialog title indicating to the user that Psiphon was unable to start (MainViewController) */
 "VPN_START_FAIL_TITLE" = "无法启动";
 
 /* ('Privacy Policy' should be the same translation as privacy policy button VPN_START_PRIVACY_POLICY_BUTTON), (Do not translate 'VPN profile'), (Do not translate 'Psiphon') */
-"VPN_START_PERMISSION_DENIED_MESSAGE" = "赛风需要您的许可才能安装VPN配置文件以供连接。\n\n赛风致力于保护用户的隐私。您可以点击“隐私政策”来查看我们的隐私政策。";
-
-/* Dismiss button title. Dismisses pop-up alert when the user clicks on the button */
-"VPN_START_PERMISSION_DISMISS_BUTTON" = "忽略";
-
-/* Alert dialog title indicating to the user that Psiphon needs their permission */
-"VPN_START_PERMISSION_REQUIRED_TITLE" = "需要权限";
+"VPN_START_PERMISSION_DENIED_MESSAGE" = "Psiphon 需要您的许可才能安装 VPN 配置文件以供连接。\n\nPsiphon 致力于保护用户的隐私。您可以点击“隐私政策”来查看我们的隐私政策。";
 
 /* Button label taking user's to our Privacy Policy page */
 "VPN_START_PRIVACY_POLICY_BUTTON" = "隐私政策";
@@ -403,4 +369,10 @@
 
 /* Status when the VPN is restarting. */
 "VPN_STATUS_RESTARTING" = "重新启动";
+
+/* Error message when something was wrong with the VPN. Asks the user that if the error persists, try tapping the 'Reinstall VPN Profile' button in the settings menu. 'Reinstall VPN Profile' translation has key SETTINGS_REINSTALL_VPN_CONFIGURATION_CELL_TITLE */
+"VPN_SYNC_FAILED_REINSTALL_CONFIG" = "如果这个问题仍然存在，请尝试“重新安装VPN文件”。";
+
+/* Button subtitle informing the user that if pressed a rewarded video ad will be displayed and they will earn credit. */
+"WATCH_REWARDED_VIDEO_AND_EARN" = "观看视频以获得奖励";
 

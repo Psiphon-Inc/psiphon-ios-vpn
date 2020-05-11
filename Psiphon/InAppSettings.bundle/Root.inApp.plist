@@ -71,9 +71,11 @@
 				<string>es</string>
 				<string>fi</string>
 				<string>fr</string>
+				<string>he</string>
 				<string>hi</string>
 				<string>hr</string>
 				<string>id</string>
+				<string>it</string>
 				<string>kk</string>
 				<string>km</string>
 				<string>ko</string>
@@ -162,6 +164,10 @@
 				</dict>
 				<dict>
 					<key>Title</key>
+					<string>עברית</string>
+				</dict>
+				<dict>
+					<key>Title</key>
 					<string>हिन्दी</string>
 				</dict>
 				<dict>
@@ -171,6 +177,10 @@
 				<dict>
 					<key>Title</key>
 					<string>Bahasa Indonesia</string>
+				</dict>
+				<dict>
+					<key>Title</key>
+					<string>Italiano</string>
 				</dict>
 				<dict>
 					<key>Title</key>

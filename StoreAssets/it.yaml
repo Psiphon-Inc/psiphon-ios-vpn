@@ -1,0 +1,38 @@
+it:
+  app_name: Psiphon
+  subtitle: Oltre i Confini
+  description: |
+    Dopo aver aiutato decine di milioni di utenti ad accedere alle app e ai siti web che amano, Psiphon ha lanciato la sua prima app per iOS! La nostra nuova app integra perfettamente l'accesso alla rete Psiphon, collegandoti in modo sicuro alle tue app e ai tuoi siti web.
+
+    Non importa dove ti trovi nel mondo, l'app Psiphon ti collegherà alle tue app e ai tuoi siti web preferiti. L'app fornisce inoltre un ulteriore livello di protezione quando si utilizzano servizi Wi-Fi pubblici o altre reti che potrebbero essere inaffidabili.
+
+    Le caratteristiche principali includono:
+    • Uso personale gratuito e illimitato.
+    • Facile da scaricare, installare e utilizzare. Nessuna registrazione o configurazione richiesta.
+    • Selezione automatica dei protocolli per fornire sempre un accesso rapido e affidabile.
+    • Supporto multilingue e posizione server configurabile.
+
+    Informazioni sugli abbonamenti:
+    • Un abbonamento rimuove gli annunci e ti consente di navigare su Internet più velocemente!
+    • Periodo di prova gratuito di 3 giorni.
+    • Prezzi: US $ 2,99 per una settimana, US $ 9,99 per un mese o US $ 99,99 per un anno.
+    • Il pagamento verrà addebitato sul tuo account iTunes alla conferma dell'acquisto.
+    • Le iscrizioni si rinnovano automaticamente a meno che il rinnovo automatico non venga disattivato almeno 24 ore prima della fine del periodo corrente.
+    • Il rinnovo verrà addebitato sul tuo account entro 24 ore prima della fine del periodo in corso e indicherà il costo dell'abbonamento.
+    • Nessuna cancellazione di un abbonamento è consentita durante il periodo di abbonamento attivo.
+    • Le sottoscrizioni possono essere gestite e il rinnovo automatico potrà essere disattivato accedendo alle impostazioni dell'account dopo l'acquisto.
+    • Qualsiasi parte non utilizzata di un periodo di prova gratuito verrà annullata quando si acquista un abbonamento.
+
+    Informativa Privacy: https://psiphon.ca/en/privacy.html
+    Termini e Condizioni: https://psiphon.ca/en/license.html
+  keywords: Psiphon, proxy
+  subscriptions:
+    weekly:
+      title: Premium 1 settimana
+      description: Rinnovo automatico abbonamento
+    monthly:
+      title: Premium 1 mese
+      description: Rinnovo automatico abbonamento
+    yearly:
+      title: Premium 1 anno
+      description: Rinnovo automatico abbonamento
