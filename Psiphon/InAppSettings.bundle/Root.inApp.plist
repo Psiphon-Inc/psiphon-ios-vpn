@@ -71,6 +71,7 @@
 				<string>es</string>
 				<string>fi</string>
 				<string>fr</string>
+				<string>he</string>
 				<string>hi</string>
 				<string>hr</string>
 				<string>id</string>
@@ -159,6 +160,10 @@
 				<dict>
 					<key>Title</key>
 					<string>Français</string>
+				</dict>
+				<dict>
+					<key>Title</key>
+					<string>עברית</string>
 				</dict>
 				<dict>
 					<key>Title</key>

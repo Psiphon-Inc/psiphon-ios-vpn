@@ -647,6 +647,7 @@
 		CE26FCA91BBDC85900B83375 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		CE4E9BBF1BBEECF30060FF8B /* Psiphon.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = Psiphon.entitlements; sourceTree = "<group>"; };
 		CE4E9BC11BBEECFC0060FF8B /* PsiphonVPN.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.entitlements; path = PsiphonVPN.entitlements; sourceTree = "<group>"; };
+		CE50A256246997250047D3FE /* he */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = he; path = Strings/he.lproj/Localizable.strings; sourceTree = "<group>"; };
 		CE6C3F6824366AE1007A17F0 /* ClientMetadata.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ClientMetadata.h; sourceTree = "<group>"; };
 		CE6C3F6924366AE1007A17F0 /* ClientMetadata.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ClientMetadata.m; sourceTree = "<group>"; };
 		DD100E19194B9A79F5D7DF55 /* Pods-PsiphonVPN.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PsiphonVPN.debug.xcconfig"; path = "Pods/Target Support Files/Pods-PsiphonVPN/Pods-PsiphonVPN.debug.xcconfig"; sourceTree = "<group>"; };
@@ -1531,6 +1532,7 @@
 				be,
 				tg,
 				hi,
+				he,
 			);
 			mainGroup = CE26FC811BBDC7B700B83375;
 			productRefGroup = CE26FC8B1BBDC7B800B83375 /* Products */;
@@ -2013,6 +2015,7 @@
 				664469C81F72C305005E995B /* be */,
 				663EEF3A1FAB857A0034A9E7 /* tg */,
 				4EC82F8E20C713DF004C2E9F /* hi */,
+				CE50A256246997250047D3FE /* he */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";
