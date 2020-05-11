@@ -1,6 +1,31 @@
 tr:
   app_name: Psiphon
   subtitle: Sınırları Aşın
+  description: |
+    On milyonlarca kullanıcının sevdikleri uygulama ve web sitelerine erişmelerinde yardımcı olduktan sonra, Psiphon ilk iOS uygulamasını yayınladı! Yeni uygulamamız Psiphon ağına kesintisiz erişim sağlayarak uygulama ve web sitelerine güvenle bağlanılmasını sağlar.
+
+    Dünyanın neresinde olursanız olun, Psiphon uygulaması sizi sık kullandığınız uygulama ve web sitelerine bağlar. Bu uygulama herkese açık Wi-Fi hizmetlerini ya da güvenilmez olabilecek diğer ağları kullanırken de ek bir koruma katmanı sağlar.
+
+    Temel özellikleri:
+
+    • Kişisel kullanım için ücretsiz ve sınırsız.
+    • İndirmesi, kurması ve kullanması kolay. Herhangi bir kayıt ya da yapılandırma gerekmez.
+    • Hızlı ve güvenli erişim sağlamak için iletişim kuralları otomatik olarak seçilir.
+    • Çeşitli dillerde kullanabilir ve sunucu konumu seçilebilir.
+
+    Abonelik:
+    • Abone olduğunuzda reklamlar kaldırılır ve İnternet gezinme hızınız artar!
+    • 3 gün sınırsız deneyebilirsiniz.
+    • Fiyatlar: Bir haftalık US$2.99, bir aylık US$9.99, bir yıllık US$99.99.
+    • Ödeme, satın alma onayınızdan sonra iTunes Hesabınızdan alınır.
+    • Abonelikler otomatik olarak yenilenir. Yenilenmesini istemiyorsanız geçerli abonelik süresinin sonundan en az 24 saat önce otomatik yenilemeyi kapatmanız gerekir.
+    • Yenileme ücreti abonelik süresinin biteceği son 24 saatte belirlenir ve alınır.
+    • Abonelik süresi içinde abonelik iptal edilemez.
+    • Satın alınan abonelikler Hesap Ayarları bölümünden yönetilebilir ve otomatik yenileme kapatılabilir.
+    • Abonelik satın aldığınızda ücretsiz deneme süresinin kalanı abonelik süresine eklenir.
+
+    Gizlilik İlkesi: https://psiphon.ca/en/privacy.html
+    Kullanım Koşulları: https://psiphon.ca/en/license.html
   keywords: Psiphon, vekil sunucu
   subscriptions:
     weekly:
