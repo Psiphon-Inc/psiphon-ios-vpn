@@ -1,44 +1,44 @@
-/*[UNTRANSLATED] Accept button title */
-"ACCEPT_BUTTON_TITLE" = "Accept";
+/* Accept button title */
+"ACCEPT_BUTTON_TITLE" = "Accetto";
 
 /* Title of the section in the subscription dialog that shows currently active subscription information. */
-"ACTIVE_SUBSCRIPTION_SECTION_TITLE" = "Current subscription";
+"ACTIVE_SUBSCRIPTION_SECTION_TITLE" = "Sei abbonato!";
 
 /*[UNTRANSLATED] Button title to add to user's PsiCash balance. PsiCash is a type of credit. Do not translate or transliterate 'PsiCash'. */
 "ADD_PSICASH" = "Add PsiCash";
 
-/*[UNTRANSLATED] Alert dialog body when requested operation by the user failed. */
-"ALERT_BODY_OPERATION_FAILED" = "Operation failed, please try again.";
+/* Alert dialog body when requested operation by the user failed. */
+"ALERT_BODY_OPERATION_FAILED" = "Operazione fallita. Si prega di riprovare.";
 
-/*[UNTRANSLATED] Alert dialog title. */
-"ALERT_TITLE_OPERATION_FAILED" = "Operation Failed";
+/* Alert dialog title. */
+"ALERT_TITLE_OPERATION_FAILED" = "Operazione Fallita";
 
-/*[UNTRANSLATED] Title of the button which takes the user to the previous screen. Text should be short and one word when possible. */
-"BACK_BUTTON" = "Back";
+/* Title of the button which takes the user to the previous screen. Text should be short and one word when possible. */
+"BACK_BUTTON" = "Indietro";
 
-/*[UNTRANSLATED] Alert message informing user that the device clock needs to be updated with current time */
-"BAD_CLOCK_ALERT_MESSAGE" = "We've detected the time on your device is out of sync with your time zone. Please update your clock settings and restart the app";
+/* Alert message informing user that the device clock needs to be updated with current time */
+"BAD_CLOCK_ALERT_MESSAGE" = "Abbiamo rilevato che l'ora sul tuo dispositivo non è sincronizzata col fuso orario del tuo paese. Aggiornare le impostazioni dell'orologio e riavviare l'applicazione";
 
-/*[UNTRANSLATED] Alert message informing user that subscription receipt can not be verified */
-"BAD_RECEIPT_ALERT_MESSAGE" = "Your subscription receipt can not be verified, please refresh it and try again.";
+/* Alert message informing user that subscription receipt can not be verified */
+"BAD_RECEIPT_ALERT_MESSAGE" = "La ricevuta dell'abbonamento non può essere verificata, si prega di aggiornarla e di riprovare.";
 
-/*[UNTRANSLATED] Title of button on alert view which shows the progress of the user's buy request. Hitting this button dismisses the alert and the buy request continues processing in the background. */
-"BUY_REQUEST_PROGRESS_ALERT_DISMISS_BUTTON_TITLE" = "Dismiss";
+/* Title of button on alert view which shows the progress of the user's buy request. Hitting this button dismisses the alert and the buy request continues processing in the background. */
+"BUY_REQUEST_PROGRESS_ALERT_DISMISS_BUTTON_TITLE" = "Ignora";
 
-/*[UNTRANSLATED] Buy subscription dialog footer text explaining where the user can cancel an active subscription */
-"BUY_SUBSCRIPTIONS_FOOTER_CANCEL_INSTRUCTIONS_TEXT" = "You can cancel an active subscription in your iTunes Account Settings.";
+/* Buy subscription dialog footer text explaining where the user can cancel an active subscription */
+"BUY_SUBSCRIPTIONS_FOOTER_CANCEL_INSTRUCTIONS_TEXT" = "Puoi annullare un abbonamento attivo nelle impostazioni dell'account iTunes.";
 
-/*[UNTRANSLATED] Buy subscription dialog footer text */
-"BUY_SUBSCRIPTIONS_FOOTER_TEXT" = "A subscription is auto-renewable which means that once purchased it will be automatically renewed until you cancel it 24 hours prior to the end of the current period.\n\nYour iTunes Account will be charged for renewal within 24-hours prior to the end of the current period with the cost of the subscription.";
+/* Buy subscription dialog footer text */
+"BUY_SUBSCRIPTIONS_FOOTER_TEXT" = "Un abbonamento è auto-rinnovabile, il che significa che una volta acquistato sarà aggiornato automaticamente fino a quando non lo si annulli, almeno 24 ore prima della fine del periodo corrente.\n\nIl costo per il rinnovo dell'abbonamento verrà addebitato nel tuo account iTunes, entro 24 ore prima della fine del periodo corrente.";
 
 /* Title for a button that cancels an action. This should be generic enough to make sense whenever a cancel button is used. */
-"CANCEL_BUTTON_TITLE" = "Ακύρωση";
+"CANCEL_BUTTON_TITLE" = "Annulla";
 
-/*[UNTRANSLATED] Alert message informing user that their subscription has expired or that they're not a subscriber, therefore Psiphon can only be started from the Psiphon app. DO NOT translate 'Psiphon'. */
-"CANNOT_START_TUNNEL_DUE_TO_SUBSCRIPTION" = "You don't have an active subscription.\nSince you're not a subscriber or your subscription has expired, Psiphon can only be started from the Psiphon app.\n\nPlease open the Psiphon app to start.";
+/* Alert message informing user that their subscription has expired or that they're not a subscriber, therefore Psiphon can only be started from the Psiphon app. DO NOT translate 'Psiphon'. */
+"CANNOT_START_TUNNEL_DUE_TO_SUBSCRIPTION" = "Non hai abbonamenti attivi.\nPoiché non sei abbonato o il tuo abbonamento è scaduto, Psiphon può essere avviato solo dall'app Psiphon.\n\nAvvia l'app Psiphon per iniziare.";
 
-/*[UNTRANSLATED] Main text in the 'Upstream Proxy Error' dialog box. This is shown when the user has directly altered these settings, and those settings are (probably) erroneous. DO NOT translate 'Psiphon'. */
-"CHECK_UPSTREAM_PROXY_SETTING" = "You have configured Psiphon to use an upstream proxy.\nHowever, we seem to be unable to connect to a Psiphon server through that proxy.\nPlease fix the settings and try again.";
+/* Main text in the 'Upstream Proxy Error' dialog box. This is shown when the user has directly altered these settings, and those settings are (probably) erroneous. DO NOT translate 'Psiphon'. */
+"CHECK_UPSTREAM_PROXY_SETTING" = "Hai configurato Psiphon per utilizzare un proxy.\nA quanto sembra non siamo in grado di connetterci a un server Psiphon attraverso quel proxy.\nCorreggere le impostazioni e riprovare.";
 
 /*[UNTRANSLATED] Text shown to the user telling them to connect to 'Psiphon', to finish their unfinished transaction. Do not translate or transliterate 'Psiphon'. */
 "CONNECT_TO_FINISH_PSICASH_TRANSACTION" = "Please connect to Psiphon to finish your transaction";
@@ -49,53 +49,53 @@
 /*[UNTRANSLATED] User must connect to 'Psiphon' in order to use 'Speed Boost' product. Do not translate or transliterate 'Psiphon'. Do not transliterate 'Speed Boost'. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
 "CONNECT_TO_USE_SPEED_BOOST" = "Connect to Psiphon to use Speed Boost";
 
-/*[UNTRANSLATED] Title for screen that allows user to select their desired server region. Use all capital letters in the translation only if it makes sense. */
-"CONNECT_VIA" = "CONNECT VIA";
+/* Title for screen that allows user to select their desired server region. Use all capital letters in the translation only if it makes sense. */
+"CONNECT_VIA" = "CONNETTI VIA";
 
-/*[UNTRANSLATED] Alert dialog title of alert which informs the user that the settings file in the app is corrupt. */
-"CORRUPT_SETTINGS_ALERT_TITLE" = "Corrupt Settings";
+/* Alert dialog title of alert which informs the user that the settings file in the app is corrupt. */
+"CORRUPT_SETTINGS_ALERT_TITLE" = "Impostazioni Corrotte";
 
-/*[UNTRANSLATED] Alert dialog message informing the user that the settings file in the app is corrupt, and that they can potentially fix this issue by re-installing the app. */
-"CORRUPT_SETTINGS_MESSAGE" = "Your app settings file appears to be corrupt. Try reinstalling the app to repair the file.";
+/* Alert dialog message informing the user that the settings file in the app is corrupt, and that they can potentially fix this issue by re-installing the app. */
+"CORRUPT_SETTINGS_MESSAGE" = "Il file delle impostazioni dell'app sembra essere corrotto. Provare a reinstallare l'app per riparare il file.";
 
-/*[UNTRANSLATED] Decline button title */
-"DECLINE_BUTTON_TITLE" = "Decline";
+/* Decline button title */
+"DECLINE_BUTTON_TITLE" = "Rifiuta";
 
-/*[UNTRANSLATED] Dismiss button title. Dismisses pop-up alert when the user clicks on the button */
-"DISMISS_BUTTON_TITLE" = "Dismiss";
+/* Dismiss button title. Dismisses pop-up alert when the user clicks on the button */
+"DISMISS_BUTTON_TITLE" = "Ignora";
 
 /* Title of the button that dismisses the subscriptions menu */
-"DONE_ACTION" = "Έγινε";
+"DONE_ACTION" = "Fatto";
 
 /* Title of the button that dismisses a screen or a dialog */
-"DONE_BUTTON_TITLE" = "Έγινε";
+"DONE_BUTTON_TITLE" = "Fatto";
 
 /* Error alert title */
-"ERROR_TITLE" = "Σφάλμα";
+"ERROR_TITLE" = "Errore";
 
 /*[UNTRANSLATED] Message shown when something fails to load */
 "FAILED_TO_LOAD" = "Failed to load";
 
-/*[UNTRANSLATED] Alert dialog message indicating to the user that the app has failed to upload their feedback and that they should try again.  */
-"FEEDBACK_UPLOAD_FAILED_MESSAGE" = "An error occured while uploading your feedback. Please try again. Your feedback helps us improve the Psiphon network.";
+/* Alert dialog message indicating to the user that the app has failed to upload their feedback and that they should try again.  */
+"FEEDBACK_UPLOAD_FAILED_MESSAGE" = "Si è verificato un errore durante il caricamento del feedback. Ti invitiamo a riprovare. Il tuo feedback ci aiuta a migliorare la rete Psiphon.";
 
-/*[UNTRANSLATED] Alert dialog title indicating to the user that the app has failed to upload their feedback to Psiphon's servers. */
-"FEEDBACK_UPLOAD_FAILED_TITLE" = "Feedback upload failed";
+/* Alert dialog title indicating to the user that the app has failed to upload their feedback to Psiphon's servers. */
+"FEEDBACK_UPLOAD_FAILED_TITLE" = "Invio feedback fallito";
 
 /*[UNTRANSLATED] Title of button on alert view which shows the progress of the users feedback being uploaded to Psiphon's servers. Hitting this button dismisses the alert and the upload continues in the background. */
 "FEEDBACK_UPLOAD_IN_PROGRESS_BACKGROUND_BUTTON_TITLE" = "Background";
 
-/*[UNTRANSLATED] Alert dialog title indicating to the user that their feedback is being encrypted and securely uploaded to Psiphon's servers. */
-"FEEDBACK_UPLOAD_IN_PROGRESS_MESSAGE" = "Sending feedback…";
+/* Alert dialog title indicating to the user that their feedback is being encrypted and securely uploaded to Psiphon's servers. */
+"FEEDBACK_UPLOAD_IN_PROGRESS_MESSAGE" = "Trasmissione feedback...";
 
-/*[UNTRANSLATED] Alert dialog message thanking the user for helping improve the Psiphon network by submitting their feedback. */
-"FEEDBACK_UPLOAD_SUCCESSFUL_MESSAGE" = "Thank you for helping improve Psiphon!";
+/* Alert dialog message thanking the user for helping improve the Psiphon network by submitting their feedback. */
+"FEEDBACK_UPLOAD_SUCCESSFUL_MESSAGE" = "Grazie per contribuire a migliorare Psiphon!";
 
-/*[UNTRANSLATED] Alert dialog title indicating to the user that their feedback has been successfully uploaded to Psiphon's servers. */
-"FEEDBACK_UPLOAD_SUCCESSFUL_TITLE" = "Feedback uploaded successfully";
+/* Alert dialog title indicating to the user that their feedback has been successfully uploaded to Psiphon's servers. */
+"FEEDBACK_UPLOAD_SUCCESSFUL_TITLE" = "Feedback inviato con successo";
 
-/*[UNTRANSLATED] Button title for a product that is free. There is no cost or payment associated. */
-"FREE_PSICASH_COIN" = "Free";
+/* Button title for a product that is free. There is no cost or payment associated. */
+"FREE_PSICASH_COIN" = "Libero";
 
 /*[UNTRANSLATED] Generic alert shown when purchase of a product fails. */
 "GENERIC_PURCHASE_FAILED" = "Purchase Failed";
@@ -103,62 +103,62 @@
 /*[UNTRANSLATED] User does not have sufficient 'PsiCash' balance. PsiCash is a type of credit. Do not translate or transliterate 'PsiCash'. */
 "INSUFFICIENT_PSICASH_BALANCE" = "Insufficient PsiCash balance";
 
-/* External link to the license page. Please update this with the correct language specific link (if available) e.g. https://psiphon.ca/fr/license.html for french. */
-"LICENSE_PAGE_URL" = "https://psiphon.ca/el/license.html";
+/*[UNTRANSLATED] External link to the license page. Please update this with the correct language specific link (if available) e.g. https://psiphon.ca/fr/license.html for french. */
+"LICENSE_PAGE_URL" = "https://psiphon.ca/en/license.html";
 
 /* Text displayed while app loads */
-"LOADING" = "Γίνεται φόρτωση...";
+"LOADING" = "Caricamento...";
 
 /* Button title that takes user to the next page */
-"NEXT_PAGE_BUTTON_TITLE" = "Επόμενο";
+"NEXT_PAGE_BUTTON_TITLE" = "Successivo";
 
-/*[UNTRANSLATED] Subscriptions view text that is visible when the list of subscriptions is not available */
-"NO_PRODUCTS_TEXT_2" = "Could not retrieve subscriptions from the App Store. Please try again later.";
+/* Subscriptions view text that is visible when the list of subscriptions is not available */
+"NO_PRODUCTS_TEXT_2" = "Non è stato possibile recuperare gli abbonamenti dall'App Store. Pregasi riprovare più tardi.";
 
 /*[UNTRANSLATED] Alert OK Button */
 "OK_BUTTON" = "OK";
 
-/*[UNTRANSLATED] Onboarding text for install VPN configuration. (Do not translate 'Psiphon'). */
-"ONBARDING_VPN_INSTALL_GUIDE_TEXT" = "You’ll need to allow Psiphon to add VPN configurations in order to connect.";
+/* Onboarding text for install VPN configuration. (Do not translate 'Psiphon'). */
+"ONBARDING_VPN_INSTALL_GUIDE_TEXT" = "Sarà necessario consentire a Psiphon di aggiungere configurazioni VPN per potersi connettere.";
 
-/*[UNTRANSLATED] Onboarding screen text. (Do not translate 'Psiphon'). */
-"ONBOARDING_BEYOND_BORDERS_BODY_2" = "Psiphon connects you to the content you want, no matter where you are.";
+/* Onboarding screen text. (Do not translate 'Psiphon'). */
+"ONBOARDING_BEYOND_BORDERS_BODY_2" = "Psiphon ti collega ai contenuti ricercati, non importa dove ti trovi.";
 
-/*[UNTRANSLATED] Beyond Borders title */
-"ONBOARDING_BEYOND_BORDERS_HEADER" = "Beyond Borders";
+/* Beyond Borders title */
+"ONBOARDING_BEYOND_BORDERS_HEADER" = "Oltre i Confini";
 
-/*[UNTRANSLATED] Onboarding screen 'getting started' body. (Do not translate 'Psiphon'). */
-"ONBOARDING_GETTING_STARTED_BODY_2" = "In order to connect, Psiphon needs the ability to add VPN configurations.";
+/* Onboarding screen 'getting started' body. (Do not translate 'Psiphon'). */
+"ONBOARDING_GETTING_STARTED_BODY_2" = "Per potersi connettere, Psiphon necessita dell'autorizzazione per aggiungere configurazioni VPN.";
 
-/*[UNTRANSLATED] Onboarding header */
-"ONBOARDING_GETTING_STARTED_HEADER" = "Getting Started";
+/* Onboarding header */
+"ONBOARDING_GETTING_STARTED_HEADER" = "Iniziamo";
 
 /* Alert message informing the user they should open the app to finish connecting to the VPN. DO NOT translate 'Psiphon'. */
-"OPEN_PSIPHON_APP" = "Παρακαλούμε ανοίξτε την εφαρμογή Psiphon για να ολοκληρώσετε τη σύνδεση.";
+"OPEN_PSIPHON_APP" = "Avviare l'app Psiphon per terminare la connessione.";
 
-/*[UNTRANSLATED] Alert dialog title indicating to the user that Psiphon needs their permission */
-"PERMISSION_REQUIRED_ALERT__TITLE" = "Permission required";
+/* Alert dialog title indicating to the user that Psiphon needs their permission */
+"PERMISSION_REQUIRED_ALERT__TITLE" = "Autorizzazione richiesta";
 
 /*[UNTRANSLATED] Subtitle shown when the current operation failed, asking the user to try again at a later time. */
 "PLEASE_TRY_AGAIN_LATER" = "Please try again later.";
 
-/*[UNTRANSLATED] Alert message when the user declined privacy policy. They will not be able ot use the app until the user accepts the privacy policy (Do not translate 'Psiphon') */
-"PRIVACY_POLICY_DECLINED_ALERT_BODY" = "You must accept our Privacy Policy before continuing to use Psiphon.";
+/* Alert message when the user declined privacy policy. They will not be able ot use the app until the user accepts the privacy policy (Do not translate 'Psiphon') */
+"PRIVACY_POLICY_DECLINED_ALERT_BODY" = "È necessario accettare la nostra politica sulla privacy prima di continuare a utilizzare Psiphon.";
 
-/* External link to the privacy policy page. Please update this with the correct language specific link (if available) e.g. https://psiphon.ca/fr/privacy.html for french. */
-"PRIVACY_POLICY_URL" = "https://psiphon.ca/el/privacy.html";
+/*[UNTRANSLATED] External link to the privacy policy page. Please update this with the correct language specific link (if available) e.g. https://psiphon.ca/fr/privacy.html for french. */
+"PRIVACY_POLICY_URL" = "https://psiphon.ca/en/privacy.html";
 
-/*[UNTRANSLATED] Paragraph text in the 'What does Psiphon do with your VPN data?' subsection of the 'User VPN Data' section of the Privacy page. */
-"PrivacyInformationCollectedVpndataWhatdoespsiphondowithPara1" = "Psiphon looks at your data only to the degree necessary to collect statistics about the usage of our system. We record the total bytes transferred for a user connection, as well as the bytes transferred for some specific domains. These statistics are discarded after 60 days.";
+/* Paragraph text in the 'What does Psiphon do with your VPN data?' subsection of the 'User VPN Data' section of the Privacy page. */
+"PrivacyInformationCollectedVpndataWhatdoespsiphondowithPara1" = "Psiphon analizza i tuoi dati solo nella misura necessaria a raccogliere statistiche sull'utilizzo del nostro servizio. Registriamo i byte totali trasferiti per connessione utente, così come i byte trasferiti per alcuni domini specifici. Queste bollettino statistiche viene eliminato dopo 60 giorni.";
 
-/*[UNTRANSLATED] Paragraph text in the 'What does Psiphon do with your VPN data?' subsection of the 'User VPN Data' section of the Privacy page. */
-"PrivacyInformationCollectedVpndataWhatdoespsiphondowithPara2" = "Psiphon does not inspect or record full URLs (only domain names), and does not further inspect your data. Psiphon does not modify your data as it passes through the VPN.";
+/* Paragraph text in the 'What does Psiphon do with your VPN data?' subsection of the 'User VPN Data' section of the Privacy page. */
+"PrivacyInformationCollectedVpndataWhatdoespsiphondowithPara2" = "Psiphon non esamina o registra gli URL completi (solo i nomi a dominio) e non controlla ulteriormente i tuoi dati. Psiphon non modifica i tuoi dati mentre transitano nella VPN.";
 
-/*[UNTRANSLATED] Paragraph text in the 'What does Psiphon do with your VPN data?' subsection of the 'User VPN Data' section of the Privacy page. */
-"PrivacyInformationCollectedVpndataWhatdoespsiphondowithPara3" = "Even this coarse data would be difficult to link back to you, since we immediately convert your IP address to geographical info and then discard the IP. Nor is any other identifying information stored.";
+/* Paragraph text in the 'What does Psiphon do with your VPN data?' subsection of the 'User VPN Data' section of the Privacy page. */
+"PrivacyInformationCollectedVpndataWhatdoespsiphondowithPara3" = "Questi dati approssimativi potrebbero difficilmente ricondurre a te, poiché convertiamo immediatamente l'IP in informazioni geografiche e poi lo eliminiamo. Non vengono memorizzati nemmeno altri dati identificativi.";
 
-/*[UNTRANSLATED] Sub-heading in the 'User VPN Data' section of the Privacy Policy page. The section describes what Psiphon does with the little bit of VPN data that it collects stats from. */
-"PrivacyInformationCollectedVpndataWhatdoespsiphondowithSubhead" = "What does Psiphon do with your VPN data?";
+/* Sub-heading in the 'User VPN Data' section of the Privacy Policy page. The section describes what Psiphon does with the little bit of VPN data that it collects stats from. */
+"PrivacyInformationCollectedVpndataWhatdoespsiphondowithSubhead" = "Cosa fa Psiphon con i vostri dati VPN?";
 
 /*[UNTRANSLATED] Paragraph text in the 'Who does Psiphon share these statistics with?' subsection of the 'User VPN Data' section of the Privacy page. */
 "PrivacyInformationCollectedVpndataWhopsiphonshareswithPara1" = "When sharing with third parties, Psiphon only ever provides coarse, aggregate domain-bytes statistics. We never share per-session information or any other possibly-identifying information.";
@@ -196,8 +196,8 @@
 /*[UNTRANSLATED] Sub-heading in the 'User VPN Data' section of the Privacy Policy page. The section describes why Psiphon needs VPN data stats. */
 "PrivacyInformationCollectedVpndataWhydoespsiphonneedSubhead" = "Why does Psiphon need these statistics?";
 
-/* page title for the Privacy Policy page */
-"PrivacyTitle" = "Πολιτική Απορρήτου";
+/*[UNTRANSLATED] page title for the Privacy Policy page */
+"PrivacyTitle" = "Privacy Policy";
 
 /*[UNTRANSLATED] Message shown when products available for purchase could not be retrieved. */
 "PRODUCT_LIST_COULD_NOT_BE_RETRIEVED" = "Product list could not be retrieved";
@@ -253,8 +253,8 @@
 /*[UNTRANSLATED] Button which, when pressed, attempts to restore any existing subscriptions the user has purchased */
 "RESTORE_SUBSCRIPTION_BUTTON" = "Restore Subscription";
 
-/* Title of button which triggers an attempt to restore the user's existing subscription */
-"RESTORE_SUBSCRIPTION_BUTTON_TITLE" = "Restore my existing subscription";
+/*[UNTRANSLATED] Title of button which triggers an attempt to restore the user's existing subscription */
+"RESTORE_SUBSCRIPTION_BUTTON_TITLE" = "Restore my subscription";
 
 /*[UNTRANSLATED] Shown in a pop-up alert if user's rewarded video ad failed to load. */
 "REWARDED_VIDEO_LOAD_FAILED" = "Failed to load rewarded video. Please try again later.";
@@ -263,7 +263,7 @@
 "SELECT_LANG" = "SELECT LANGUAGE";
 
 /* Select language button title. */
-"SELECT_LANG_BUTTON_TITLE" = "Επιλογή γλώσσας";
+"SELECT_LANG_BUTTON_TITLE" = "Seleziona lingua";
 
 /*[UNTRANSLATED] Title of cell in settings menu which, when pressed, reinstalls the user's VPN profile for Psiphon */
 "SETTINGS_REINSTALL_VPN_CONFIGURATION_CELL_TITLE" = "Reinstall VPN profile";
@@ -271,8 +271,8 @@
 /*[UNTRANSLATED] (Do not translate 'AdMob') Title of cell in settings menu which indicates the user can change or revoke the consent they've given to admob */
 "SETTINGS_RESET_ADMOB_CONSENT" = "Reset AdMob Consent";
 
-/*[UNTRANSLATED] Subscriptions item title in the app settings when user has an active subscription. Clicking this item opens subscriptions view */
-"SETTINGS_SUBSCRIPTION_ACTIVE" = "Subscriptions";
+/* Subscriptions item title in the app settings when user has an active subscription. Clicking this item opens subscriptions view */
+"SETTINGS_SUBSCRIPTION_ACTIVE" = "Sottoscrizioni";
 
 /*[UNTRANSLATED] Subscriptions item title in the app settings when user does not have an active subscription. Clicking this item opens subscriptions view. If “Premium” doesn't easily translate, please choose a term that conveys “Pro” or “Extra” or “Better” or “Elite”. */
 "SETTINGS_SUBSCRIPTION_NOT_ACTIVE" = "Go premium!";
@@ -304,11 +304,11 @@
 /*[UNTRANSLATED] Header text beside button that opens paid subscriptions manager UI. At this point the user is subscribed. Please keep this text concise as the width of the text box is restricted in size. */
 "SUBSCRIPTION_BAR_HEADER_TEXT_SUBSCRIBED" = "SUBSCRIPTION";
 
-/*[UNTRANSLATED] Title of the dialog for available in-app paid subscriptions */
-"SUBSCRIPTIONS" = "Subscriptions";
+/* Title of the dialog for available in-app paid subscriptions */
+"SUBSCRIPTIONS" = "Sottoscrizioni";
 
-/*[UNTRANSLATED] Label on a button which, when pressed, opens a screen where the user can manage their currently active subscription. */
-"SUBSCRIPTIONS_MANAGE_SUBSCRIPTION_BUTTON" = "Manage";
+/* Label on a button which, when pressed, opens a screen where the user can manage their currently active subscription. */
+"SUBSCRIPTIONS_MANAGE_SUBSCRIPTION_BUTTON" = "Gestire";
 
 /*[UNTRANSLATED] Subtitle of the banner on the subscriptions page informing the user that the subscriptions require no commitment, and can be cancelled anytime */
 "SUBSCRIPTIONS_PAGE_BANNER_SUBTITLE" = "No commitment, cancel anytime.";
@@ -322,14 +322,14 @@
 /*[UNTRANSLATED] Title of the button on the subscriptions page which, when pressed, navigates the user to the page where they can restore their existing subscription */
 "SUBSCRIPTIONS_PAGE_RESTORE_SUBSCRIPTION_BUTTON" = "I don't see my subscription";
 
-/* Title of button on subscriptions page which opens Psiphon's privacy policy webpage */
-"SUBSCRIPTIONS_PRIVACY_POLICY_BUTTON_TEXT" = "Πολιτική Απορρήτου";
+/*[UNTRANSLATED] Title of button on subscriptions page which opens Psiphon's privacy policy webpage */
+"SUBSCRIPTIONS_PRIVACY_POLICY_BUTTON_TEXT" = "Privacy Policy";
 
-/*[UNTRANSLATED] Label on a button which, when pressed, opens a screen where the user can choose from multiple subscription plans. */
-"SUBSCRIPTIONS_SUBSCRIBE_BUTTON" = "Subscribe";
+/* Label on a button which, when pressed, opens a screen where the user can choose from multiple subscription plans. */
+"SUBSCRIPTIONS_SUBSCRIBE_BUTTON" = "Sottoscrivi";
 
 /* Title of button on subscriptions page which opens Psiphon's terms of use webpage */
-"SUBSCRIPTIONS_TERMS_OF_USE_BUTTON_TEXT" = "Όροι Χρήσης";
+"SUBSCRIPTIONS_TERMS_OF_USE_BUTTON_TEXT" = "Termini d'utilizzo";
 
 /*[UNTRANSLATED] Button title shown when something fails to load. Asks the user to tap the button to retry the operation */
 "TAP_TO_RETRY" = "Tap to Retry";
@@ -346,29 +346,29 @@
 /*[UNTRANSLATED] ('Privacy Policy' should be the same translation as privacy policy button VPN_START_PRIVACY_POLICY_BUTTON), (Do not translate 'VPN profile'), (Do not translate 'Psiphon') */
 "VPN_START_PERMISSION_DENIED_MESSAGE" = "Psiphon needs your permission to install a VPN profile in order to connect.\n\nPsiphon is committed to protecting the privacy of our users. You can review our privacy policy by tapping \"Privacy Policy\".";
 
-/* Button label taking user's to our Privacy Policy page */
-"VPN_START_PRIVACY_POLICY_BUTTON" = "Πολιτική Απορρήτου";
+/*[UNTRANSLATED] Button label taking user's to our Privacy Policy page */
+"VPN_START_PRIVACY_POLICY_BUTTON" = "Privacy Policy";
 
 /* Status when the VPN is connected to a Psiphon server */
-"VPN_STATUS_CONNECTED" = "Συνδεδεμένο";
+"VPN_STATUS_CONNECTED" = "Connesso";
 
 /* Status when the VPN is connecting; that is, trying to connect to a Psiphon server */
-"VPN_STATUS_CONNECTING" = "Γίνεται σύνδεση";
+"VPN_STATUS_CONNECTING" = "Connessione";
 
 /* Status when the VPN is not connected to a Psiphon server, not trying to connect, and not in an error state */
-"VPN_STATUS_DISCONNECTED" = "Αποσυνδεδεμένο";
+"VPN_STATUS_DISCONNECTED" = "Disconnesso";
 
 /* Status when the VPN is disconnecting. Sometimes going from connected to disconnected can take some time, and this is that state. */
-"VPN_STATUS_DISCONNECTING" = "Γίνεται αποσύνδεση";
+"VPN_STATUS_DISCONNECTING" = "Disconnessione";
 
 /* Status when the VPN is in an invalid state. For example, if the user doesn't give permission for the VPN configuration to be installed, and therefore the Psiphon VPN can't even try to connect. */
-"VPN_STATUS_INVALID" = "Αποσυνδεδεμένο";
+"VPN_STATUS_INVALID" = "Disconnesso";
 
 /* Status when the VPN was connected to a Psiphon server, got disconnected unexpectedly, and is currently trying to reconnect */
-"VPN_STATUS_RECONNECTING" = "Γίνεται επανασύνδεση";
+"VPN_STATUS_RECONNECTING" = "Riconnessione";
 
 /* Status when the VPN is restarting. */
-"VPN_STATUS_RESTARTING" = "Γίνεται επανεκκίνηση";
+"VPN_STATUS_RESTARTING" = "Riavvio";
 
 /*[UNTRANSLATED] Error message when something was wrong with the VPN. Asks the user that if the error persists, try tapping the 'Reinstall VPN Profile' button in the settings menu. 'Reinstall VPN Profile' translation has key SETTINGS_REINSTALL_VPN_CONFIGURATION_CELL_TITLE */
 "VPN_SYNC_FAILED_REINSTALL_CONFIG" = "If this error persists, please try 'Reinstall VPN Profile'.";
