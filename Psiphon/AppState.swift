@@ -123,7 +123,7 @@ typealias AppEnvironment = (
     rewardedVideoAdBridgeDelegate: RewardedVideoAdBridgeDelegate,
     productRequestDelegate: ProductRequestDelegate,
     vpnConnectionObserver: VPNConnectionObserver<PsiphonTPM>,
-    vpnActionStore: (VPNExternalAction) -> Effect<Never>,
+    vpnActionStore: (VPNPublicAction) -> Effect<Never>,
     psiCashStore: (PsiCashAction) -> Effect<Never>,
     appReceiptStore: (ReceiptStateAction) -> Effect<Never>,
     iapStore: (IAPAction) -> Effect<Never>,
@@ -179,7 +179,7 @@ func makeEnvironment(
             store.projection(value: erase,
                              action: { .vpnStateAction(.action($0)) })
         ),
-        vpnActionStore: { [unowned store] (action: VPNExternalAction) -> Effect<Never> in
+        vpnActionStore: { [unowned store] (action: VPNPublicAction) -> Effect<Never> in
             .fireAndForget {
                 store.send(vpnAction: action)
             }
@@ -332,9 +332,9 @@ func makeAppReducer() -> Reducer<AppState, AppAction, AppEnvironment> {
 
 extension Store where Value == AppState, Action == AppAction {
     
-    /// Convenience send function that wraps given `VPNExternalAction` into `AppAction`.
-    func send(vpnAction: VPNExternalAction) {
-        self.send(.vpnStateAction(.action(.external(vpnAction))))
+    /// Convenience send function that wraps given `VPNPublicAction` into `AppAction`.
+    func send(vpnAction: VPNPublicAction) {
+        self.send(.vpnStateAction(.action(.public(vpnAction))))
     }
     
 }
