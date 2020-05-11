@@ -168,18 +168,25 @@ extension SwiftDelegate: SwiftBridgeDelegate {
         // If there's a mismatch when tunnel intent changes to start,
         // it alerts the user if the error is not resolves within a few seconds.
         self.lifetime += self.store.$value.signalProducer
-            .map(\.vpnState.value.vpnStatusWithIntent)
+            .map { appState -> Pair<VPNStatusWithIntent, ProviderManagerLoadState<PsiphonTPM>> in
+                Pair(first: appState.vpnState.value.vpnStatusWithIntent,
+                     second: appState.vpnState.value.loadState)
+            }
             .skipRepeats()
-            .flatMap(.latest) { vpnStatusWithIntent ->
+            .flatMap(.latest) { vpnStateTunnelLoadStatePair ->
                 SignalProducer<Result<Unit, ErrorEvent<ErrorRepr>>, Never> in
+                
+                guard case .loaded(_) = vpnStateTunnelLoadStatePair.second.value else {
+                    return Effect(value: .success(.unit))
+                }
             
-                let compareValue = (current: vpnStatusWithIntent.status.tunneled,
-                                    expected: vpnStatusWithIntent.intent)
+                let compareValue = (current: vpnStateTunnelLoadStatePair.first.status.tunneled,
+                                    expected: vpnStateTunnelLoadStatePair.first.intent)
                 
                 switch compareValue {
                 case (current: .notConnected, expected: .start(transition: .none)):
                     let error = ErrorEvent(
-                        ErrorRepr(repr: "Unexpected value '\(vpnStatusWithIntent)'")
+                        ErrorRepr(repr: "Unexpected value '\(vpnStateTunnelLoadStatePair.second)'")
                     )
                     
                     // Waits for the specified amount of time before emitting the vpn status

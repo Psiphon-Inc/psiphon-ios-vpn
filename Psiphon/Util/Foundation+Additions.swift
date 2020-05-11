@@ -31,6 +31,14 @@ struct Indexed<Value> {
     let value: Value
 }
 
+/// A 2-tuple, useful for when the tuple type can't be used.
+struct Pair<A, B> {
+    let first: A
+    let second: B
+}
+
+extension Pair: Equatable where A: Equatable, B: Equatable {}
+
 /// A not so efficient queue.
 public struct Queue<Element> {
     private var items = [Element]()
