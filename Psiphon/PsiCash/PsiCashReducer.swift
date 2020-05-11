@@ -51,7 +51,7 @@ typealias PsiCashEnvironment = (
     sharedDB: PsiphonDataSharedDB,
     userConfigs: UserDefaultsConfig,
     notifier: Notifier,
-    vpnActionStore: (VPNExternalAction) -> Effect<Never>,
+    vpnActionStore: (VPNPublicAction) -> Effect<Never>,
     // TODO: Remove this dependency from reducer's environment. UI-related effects
     // unnecessarily complicate reducers.
     objcBridgeDelegate: ObjCBridgeDelegate?,
