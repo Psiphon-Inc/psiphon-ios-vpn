@@ -26,7 +26,6 @@ target 'Psiphon' do
   pod 'Google-Mobile-Ads-SDK', '~> 7.53.1'
   pod 'PersonalizedAdConsent', '~> 1.0'  # Google Mobile Ads Consent SDK
   pod 'MBProgressHUD', '~> 1.1.0'
-  pod 'CustomIOSAlertView', '~> 0.9.5'
   pod 'SVProgressHUD'
 end
 
