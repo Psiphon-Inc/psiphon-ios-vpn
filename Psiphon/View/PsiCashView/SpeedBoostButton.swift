@@ -91,7 +91,12 @@ import UIKit
         imageView!.contentMode = .scaleAspectFit
 
         // Adds space between image and label
-        imageEdgeInsets = UIEdgeInsets(top: 0.0, left: 0.0, bottom: 0.0, right: 10.0)
+        let isRTL = UIApplication.shared.userInterfaceLayoutDirection == .rightToLeft
+        if isRTL {
+            imageEdgeInsets = UIEdgeInsets(top: 0.0, left: 10.0, bottom: 0.0, right: 0.0)
+        } else {
+            imageEdgeInsets = UIEdgeInsets(top: 0.0, left: 0.0, bottom: 0.0, right: 10.0)
+        }
 
         titleLabel!.font = AvenirFont.demiBold.font(.h3)
     }
