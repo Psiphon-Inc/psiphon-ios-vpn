@@ -55,6 +55,7 @@ DEFAULT_LANGS = {
     'hi': 'hi',         # Hindi
     'hr': 'hr',         # Croation
     'id': 'id',         # Indonesian
+    'it': 'it',         # Italian
     'kk': 'kk',         # Kazakh
     'km': 'km',         # Khmer
     'ko': 'ko',         # Korean
