@@ -51,6 +51,7 @@ DEFAULT_LANGS = {
     'fa': 'fa',         # Farsi/Persian
     'fi_FI': 'fi',      # Finnish
     'fr': 'fr',         # French
+    'he': 'he',         # Hebrew
     'hi': 'hi',         # Hindi
     'hr': 'hr',         # Croation
     'id': 'id',         # Indonesian
