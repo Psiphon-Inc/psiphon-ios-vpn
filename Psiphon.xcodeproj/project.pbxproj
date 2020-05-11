@@ -218,6 +218,7 @@
 		CE3B3254245390090079C13F /* JetsamMetricsTest.m in Sources */ = {isa = PBXBuildFile; fileRef = CE3B3253245390090079C13F /* JetsamMetricsTest.m */; };
 		CE4E9BC01BBEECF30060FF8B /* Psiphon.entitlements in Resources */ = {isa = PBXBuildFile; fileRef = CE4E9BBF1BBEECF30060FF8B /* Psiphon.entitlements */; };
 		CE4E9BC21BBEECFC0060FF8B /* PsiphonVPN.entitlements in Resources */ = {isa = PBXBuildFile; fileRef = CE4E9BC11BBEECFC0060FF8B /* PsiphonVPN.entitlements */; };
+		CE50A2582469D6390047D3FE /* RunningBuckets.m in Sources */ = {isa = PBXBuildFile; fileRef = CEE6FB2E2466223900F74D05 /* RunningBuckets.m */; };
 		CE6C3F6A24366AE1007A17F0 /* ClientMetadata.m in Sources */ = {isa = PBXBuildFile; fileRef = CE6C3F6924366AE1007A17F0 /* ClientMetadata.m */; };
 		CE7182132460689A008F815A /* JetsamTrackingTest.m in Sources */ = {isa = PBXBuildFile; fileRef = CE7182122460689A008F815A /* JetsamTrackingTest.m */; };
 		CE7B76431F54881F00EA44BD /* PsiphonTunnel.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 66094F781E8067520069EC4E /* PsiphonTunnel.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -235,7 +236,6 @@
 		CE82CEA2245C67F5000C0512 /* Archiver.m in Sources */ = {isa = PBXBuildFile; fileRef = CE82CE9F245C67F5000C0512 /* Archiver.m */; };
 		CE82CEA7245C6FFB000C0512 /* DiskBackedFile.m in Sources */ = {isa = PBXBuildFile; fileRef = CE82CEA5245C6FFB000C0512 /* DiskBackedFile.m */; };
 		CE82CEA8245C6FFB000C0512 /* DiskBackedFile.m in Sources */ = {isa = PBXBuildFile; fileRef = CE82CEA5245C6FFB000C0512 /* DiskBackedFile.m */; };
-		CE82CEA9245C6FFB000C0512 /* DiskBackedFile.m in Sources */ = {isa = PBXBuildFile; fileRef = CE82CEA5245C6FFB000C0512 /* DiskBackedFile.m */; };
 		CE82CEAC245C7007000C0512 /* JetsamTracking.m in Sources */ = {isa = PBXBuildFile; fileRef = CE82CEAA245C7007000C0512 /* JetsamTracking.m */; };
 		CE82CEAD245C7007000C0512 /* JetsamTracking.m in Sources */ = {isa = PBXBuildFile; fileRef = CE82CEAA245C7007000C0512 /* JetsamTracking.m */; };
 		CE82CEAE245C7007000C0512 /* JetsamTracking.m in Sources */ = {isa = PBXBuildFile; fileRef = CE82CEAA245C7007000C0512 /* JetsamTracking.m */; };
@@ -252,16 +252,13 @@
 		CEC69F4A245CA5860032B74F /* ExtensionContainerFileTest.m in Sources */ = {isa = PBXBuildFile; fileRef = CEC69F49245CA5860032B74F /* ExtensionContainerFileTest.m */; };
 		CEC8CD19245887BA00DF1010 /* RotatingFile.m in Sources */ = {isa = PBXBuildFile; fileRef = CEC8CD18245887BA00DF1010 /* RotatingFile.m */; };
 		CEC8CD1A245887BA00DF1010 /* RotatingFile.m in Sources */ = {isa = PBXBuildFile; fileRef = CEC8CD18245887BA00DF1010 /* RotatingFile.m */; };
-		CEC8CD1B245887BA00DF1010 /* RotatingFile.m in Sources */ = {isa = PBXBuildFile; fileRef = CEC8CD18245887BA00DF1010 /* RotatingFile.m */; };
 		CEE6FB252466040100F74D05 /* RunningMinMax.m in Sources */ = {isa = PBXBuildFile; fileRef = CEE6FB242466040100F74D05 /* RunningMinMax.m */; };
 		CEE6FB2824660F9700F74D05 /* RunningStat.m in Sources */ = {isa = PBXBuildFile; fileRef = CEE6FB2724660F9700F74D05 /* RunningStat.m */; };
 		CEE6FB2924661B9B00F74D05 /* RunningStat.m in Sources */ = {isa = PBXBuildFile; fileRef = CEE6FB2724660F9700F74D05 /* RunningStat.m */; };
-		CEE6FB2C24661D1600F74D05 /* RunningStat.m in Sources */ = {isa = PBXBuildFile; fileRef = CEE6FB2724660F9700F74D05 /* RunningStat.m */; };
 		CEE6FB2F2466223900F74D05 /* RunningBuckets.m in Sources */ = {isa = PBXBuildFile; fileRef = CEE6FB2E2466223900F74D05 /* RunningBuckets.m */; };
 		CEE6FB302466224800F74D05 /* RunningMinMax.m in Sources */ = {isa = PBXBuildFile; fileRef = CEE6FB242466040100F74D05 /* RunningMinMax.m */; };
 		CEE6FB312466224B00F74D05 /* RunningStdev.m in Sources */ = {isa = PBXBuildFile; fileRef = CE3B324224520ABF0079C13F /* RunningStdev.m */; };
 		CEE6FB33246625EA00F74D05 /* RunningBucketsTest.m in Sources */ = {isa = PBXBuildFile; fileRef = CEE6FB32246625EA00F74D05 /* RunningBucketsTest.m */; };
-		CEE6FB342466260000F74D05 /* RunningBuckets.m in Sources */ = {isa = PBXBuildFile; fileRef = CEE6FB2E2466223900F74D05 /* RunningBuckets.m */; };
 		D672BC574F14042B4D77AB28 /* libPods-Psiphon.a in Frameworks */ = {isa = PBXBuildFile; fileRef = CB8BB19F016330264C4DCB80 /* libPods-Psiphon.a */; };
 		EF4F1F3D206055F7006A40A1 /* RACSignal+Operations2.m in Sources */ = {isa = PBXBuildFile; fileRef = EF90D79F204F22C900228A63 /* RACSignal+Operations2.m */; };
 		EF639C2F1F8FCE37009D6B42 /* PsiFeedbackLogger.m in Sources */ = {isa = PBXBuildFile; fileRef = EF639C2E1F8FCE2A009D6B42 /* PsiFeedbackLogger.m */; };
@@ -2230,6 +2227,7 @@
 				EF90D7B6204F235100228A63 /* DispatchUtils.m in Sources */,
 				EF90D7B2204F232100228A63 /* timestamp_format.c in Sources */,
 				9BFECF8895D5FE1940A6F700 /* PsiphonConfigUserDefaults.m in Sources */,
+				CE50A2582469D6390047D3FE /* RunningBuckets.m in Sources */,
 				EF90D7B7204F235800228A63 /* FileUtils.m in Sources */,
 				EFC2F5B620226758007B52F9 /* PacketTunnelUtils.m in Sources */,
 				CE82CEB2245C7232000C0512 /* JetsamEvent.m in Sources */,
@@ -2261,7 +2259,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				CE7182132460689A008F815A /* JetsamTrackingTest.m in Sources */,
-				CEE6FB342466260000F74D05 /* RunningBuckets.m in Sources */,
 				CEE6FB33246625EA00F74D05 /* RunningBucketsTest.m in Sources */,
 				CE8ED90224633407009C3187 /* FileRegistryTest.m in Sources */,
 				CE82CE95245A12B1000C0512 /* DelimitedFile.m in Sources */,
@@ -2269,12 +2266,9 @@
 				CE3B3254245390090079C13F /* JetsamMetricsTest.m in Sources */,
 				CE3B324924535F030079C13F /* stats.c in Sources */,
 				CE3B324424532F370079C13F /* NSError+Convenience.m in Sources */,
-				CEE6FB2C24661D1600F74D05 /* RunningStat.m in Sources */,
 				CE82CEC2245C757A000C0512 /* ExtensionContainerFile.m in Sources */,
-				CEC8CD1B245887BA00DF1010 /* RotatingFile.m in Sources */,
 				CEC69F4A245CA5860032B74F /* ExtensionContainerFileTest.m in Sources */,
 				CE82CE842459DFE1000C0512 /* RotatingFileTest.m in Sources */,
-				CE82CEA9245C6FFB000C0512 /* DiskBackedFile.m in Sources */,
 				CE8ED904246339BF009C3187 /* JetsamEventTest.m in Sources */,
 				CE82CE90245A10E0000C0512 /* DelimitedFileTest.m in Sources */,
 				CE82CEA2245C67F5000C0512 /* Archiver.m in Sources */,

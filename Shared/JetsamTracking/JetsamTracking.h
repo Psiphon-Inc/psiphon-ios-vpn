@@ -20,6 +20,7 @@
 #import <Foundation/Foundation.h>
 #import "JetsamEvent.h"
 #import "JetsamMetrics.h"
+#import "RunningBuckets.h"
 
 /*
 * Two classes which facilitate logging jetsam events from the extension and aggregating these events
@@ -51,12 +52,14 @@ typedef NS_ERROR_ENUM(ContainerJetsamTrackingErrorDomain, ContainerJetsamTrackin
 /// @param rotatedFilepath Location where the file which contains jetsam logs is rotated.
 /// @param registryFilepath Filepath at which to store the registry file (which is used to track file reads).
 /// @param readChunkSize Number of bytes to read at a time.
+/// @param bucketRanges A collection of bucket ranges in which to bin jetsam times.
 /// @param outError  If non-nill on return, then initializing the reader failed with the provided error.
 /// @return Returns nil when `outError` is non-nil.
 + (JetsamMetrics *_Nullable)getMetricsFromFilePath:(NSString*)filepath
                                withRotatedFilepath:(NSString*)rotatedFilepath
                                   registryFilepath:(NSString*)registryFilepath
                                      readChunkSize:(NSUInteger)readChunkSize
+                                      bucketRanges:(NSArray<BucketRange*>*_Nullable)bucketRanges
                                              error:(NSError * _Nullable *)outError;
 
 @end

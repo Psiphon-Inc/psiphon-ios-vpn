@@ -29,17 +29,18 @@
 /// Tests multiple buckets with different inclusive and exclusive boundaries.
 - (void)testBoundaries {
 
-    RunningBuckets *buckets = [[RunningBuckets alloc]
-                              initWithBuckets:@[
-                                  [Bucket bucketWithRange:MakeBucketRange(-DBL_MAX, FALSE, -1, TRUE)],
-                                  [Bucket bucketWithRange:MakeBucketRange(0.00, FALSE, 1.00, FALSE)],
-                                  [Bucket bucketWithRange:MakeBucketRange(0.00, TRUE,  1.00, FALSE)],
-                                  [Bucket bucketWithRange:MakeBucketRange(0.00, FALSE, 1.00, TRUE)],
-                                  [Bucket bucketWithRange:MakeBucketRange(0.00, TRUE,  1.00, TRUE)],
-                                  [Bucket bucketWithRange:MakeBucketRange(0.00, TRUE,  0.25, FALSE)],
-                                  [Bucket bucketWithRange:MakeBucketRange(0.25, TRUE,  0.50, FALSE)],
-                                  [Bucket bucketWithRange:MakeBucketRange(0.50, TRUE,  1.00, TRUE)],
-                                  [Bucket bucketWithRange:MakeBucketRange(-DBL_MAX, FALSE, DBL_MAX, FALSE)]]];
+    NSArray<BucketRange*> *bucketRanges = @[
+        [BucketRange bucketRangeWithRange:MakeCBucketRange(-DBL_MAX, FALSE, -1, TRUE)],
+        [BucketRange bucketRangeWithRange:MakeCBucketRange(0.00, FALSE, 1.00, FALSE)],
+        [BucketRange bucketRangeWithRange:MakeCBucketRange(0.00, TRUE,  1.00, FALSE)],
+        [BucketRange bucketRangeWithRange:MakeCBucketRange(0.00, FALSE, 1.00, TRUE)],
+        [BucketRange bucketRangeWithRange:MakeCBucketRange(0.00, TRUE,  1.00, TRUE)],
+        [BucketRange bucketRangeWithRange:MakeCBucketRange(0.00, TRUE,  0.25, FALSE)],
+        [BucketRange bucketRangeWithRange:MakeCBucketRange(0.25, TRUE,  0.50, FALSE)],
+        [BucketRange bucketRangeWithRange:MakeCBucketRange(0.50, TRUE,  1.00, TRUE)],
+        [BucketRange bucketRangeWithRange:MakeCBucketRange(-DBL_MAX, FALSE, DBL_MAX, FALSE)]];
+
+    RunningBuckets *buckets = [[RunningBuckets alloc] initWithBucketRanges:bucketRanges];
 
     NSArray<NSNumber*> *values = @[[NSNumber numberWithDouble:0],
                                    [NSNumber numberWithDouble:1],

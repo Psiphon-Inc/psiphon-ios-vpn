@@ -19,17 +19,17 @@
 
 #import <Foundation/Foundation.h>
 
-typedef struct _BucketRange {
+typedef struct _CBucketRange {
     double min;
     BOOL minInclusive;
     double max;
     BOOL maxInclusive;
-} BucketRange;
+} CBucketRange;
 
-NS_INLINE BucketRange MakeBucketRange(double min, BOOL minInclusive,
-                                      double max, BOOL maxInclusive) {
+NS_INLINE CBucketRange MakeCBucketRange(double min, BOOL minInclusive,
+                                        double max, BOOL maxInclusive) {
     assert(min <= max);
-    BucketRange r;
+    CBucketRange r;
     r.min = min;
     r.minInclusive = minInclusive;
     r.max = max;
@@ -40,17 +40,32 @@ NS_INLINE BucketRange MakeBucketRange(double min, BOOL minInclusive,
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface Bucket : NSObject
+/// Obj-C wrapper for CBucketRange
+@interface BucketRange : NSObject <NSCoding, NSSecureCoding>
+
++ (instancetype)bucketRangeWithRange:(CBucketRange)range;
+
+@property (readonly, nonatomic, assign) double min;
+@property (readonly, nonatomic, assign) BOOL minInclusive;
+
+@property (readonly, nonatomic, assign) double max;
+@property (readonly, nonatomic, assign) BOOL maxInclusive;
+
+- (BOOL)isEqualToBucketRange:(BucketRange*)bucketRange;
+
+@end
+
+@interface Bucket : NSObject <NSCoding, NSSecureCoding>
 
 @property (readonly, nonatomic, assign) int count;
 
-@property (readonly, nonatomic, assign) BucketRange range;
+@property (readonly, nonatomic) BucketRange *range;
 
-+ (instancetype)bucketWithRange:(BucketRange)range;
++ (instancetype)bucketWithRange:(BucketRange*)range;
 
 - (instancetype)init NS_UNAVAILABLE;
 
-- (instancetype)initWithRange:(BucketRange)bucketRange;
+- (instancetype)initWithRange:(BucketRange*)bucketRange;
 
 /// Increment the bucket's count.
 - (void)incrementCount;
@@ -60,18 +75,22 @@ NS_ASSUME_NONNULL_BEGIN
 /// @return Returns true if the value is in range, otherwise false.
 - (BOOL)valueInRange:(double)x;
 
+- (BOOL)isEqualToBucket:(Bucket*)bucket;
+
 @end
 
-@interface RunningBuckets : NSObject
+@interface RunningBuckets : NSObject <NSCoding, NSSecureCoding>
 
 @property (readonly, nonatomic, assign) int count;
 
-@property (readonly, nonatomic) NSArray<Bucket*> *buckets;
+@property (readonly, strong, nonatomic) NSArray<Bucket*> *buckets;
 
 - (instancetype)init NS_UNAVAILABLE;
-- (instancetype)initWithBuckets:(NSArray<Bucket*>*)buckets;
+- (instancetype)initWithBucketRanges:(NSArray<BucketRange*>*)bucketRanges;
 
 - (void)addValue:(double)x;
+
+- (BOOL)isEqualToRunningBuckets:(RunningBuckets*)buckets;
 
 @end
 

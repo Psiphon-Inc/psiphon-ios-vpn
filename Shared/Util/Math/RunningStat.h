@@ -19,6 +19,7 @@
 
 #import <Foundation/Foundation.h>
 #import "RunningMinMax.h"
+#import "RunningBuckets.h"
 #import "RunningStdev.h"
 
 NS_ASSUME_NONNULL_BEGIN
@@ -30,12 +31,13 @@ typedef NS_ERROR_ENUM(RunningStatErrorDomain, RunningStatErrorCode) {
     RunningStatErrorStdev = 2
 };
 
+/// A collection of stats computed with online algorithms
 @interface RunningStat : NSObject <NSCopying, NSCoding, NSSecureCoding>
 
 @property (readonly, nonatomic, assign) int count;
 
 - (instancetype)init NS_UNAVAILABLE;
-- (instancetype)initWithValue:(double)x;
+- (instancetype)initWithValue:(double)x bucketRanges:(NSArray<BucketRange*>*_Nullable)bucketRanges;
 
 - (NSError *_Nullable)addValue:(double)x;
 
@@ -48,6 +50,8 @@ typedef NS_ERROR_ENUM(RunningStatErrorDomain, RunningStatErrorCode) {
 - (double)min;
 
 - (double)max;
+
+- (NSArray<Bucket*>*_Nullable)talliedBuckets;
 
 - (BOOL)isEqualToRunningStat:(RunningStat*)stat;
 

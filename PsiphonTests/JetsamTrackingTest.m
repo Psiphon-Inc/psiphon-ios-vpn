@@ -79,7 +79,7 @@
 
         RunningStat *stat = [expectedMetrics objectForKey:jetsam.appVersion];
         if (stat == nil) {
-            stat = [[RunningStat alloc] initWithValue:jetsam.runningTime];
+            stat = [[RunningStat alloc] initWithValue:jetsam.runningTime bucketRanges:nil];
         } else {
             [stat addValue:jetsam.runningTime];
         }
@@ -90,6 +90,7 @@
                                                          withRotatedFilepath:olderFilePath
                                                             registryFilepath:registryFilePath
                                                                readChunkSize:32
+                                                                bucketRanges:nil
                                                                        error:&err];
     if (err != nil) {
         XCTFail(@"Unexpected error: %@", err);
@@ -150,7 +151,7 @@
 
         RunningStat *stat = [expectedMetrics objectForKey:jetsam.appVersion];
         if (stat == nil) {
-            stat = [[RunningStat alloc] initWithValue:jetsam.runningTime];
+            stat = [[RunningStat alloc] initWithValue:jetsam.runningTime bucketRanges:nil];
         } else {
             [stat addValue:jetsam.runningTime];
         }
@@ -166,6 +167,7 @@
                                                          withRotatedFilepath:olderFilePath
                                                             registryFilepath:registryFilePath
                                                                readChunkSize:32
+                                                                bucketRanges:nil
                                                                        error:&err];
     if (err == nil) {
         XCTFail(@"Unexpected error");
@@ -184,7 +186,8 @@
     for (NSString *key in perVersionMetrics) {
         RunningStat *stat = [perVersionMetrics objectForKey:key];
         if (stat != nil) {
-            NSLog(@"(v%@) count: %d, min: %f, max: %f, stdev: %f", key, stat.count, stat.min, stat.max, [stat stdev]);
+            NSLog(@"(v%@) count: %d, min: %f, max: %f, stdev: %f, buckets: %@",
+                  key,stat.count, stat.min, stat.max, [stat stdev], stat.talliedBuckets);
         }
     }
 }
