@@ -1,1 +1,2 @@
-el: {app_name: Psiphon}
+el:
+  app_name: Psiphon

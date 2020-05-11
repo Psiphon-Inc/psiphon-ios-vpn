@@ -1,1 +1,2 @@
-fi: {app_name: Psiphon}
+fi:
+  app_name: Psiphon

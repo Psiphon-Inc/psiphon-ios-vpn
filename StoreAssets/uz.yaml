@@ -1,11 +1,14 @@
-uz: {app_name: Psiphon, subtitle: To‘siqlarsiz, keywords: 'Psiphon, proksi', description: "O‘n\
-    \ millionlab foydalanuvchilarning sevimli saytlarida kezishiga yordam bergan Psiphon\
-    \ jamoasi o‘zlarining birinchi rasmiy iOS ilovasini ishga tushirdi! Brauzer ilovamiz\
-    \ Psiphon tarmog‘iga uzilishsiz ulanib, saytlarni xavfsiz kezishingizni ta’minlaydi.\n\
-    \nQayerda bo‘lishingizdan qat’iy nazar, Psiphon brauzeri ilovasi orqali xohlagan\
-    \ saytingizga ulanishingiz mumkin. Jamoat Wi-Fi xizmatlari yoki boshqa ishonchsiz\
-    \ tarmoqlardan foydalanishda ilova qo‘shimcha himoya qobig‘ini ta’minlaydi.\n\n\
-    Asosiy funksiyalar:\n• Bepul, cheklanmagan foydalanish.\n• Yuklab olish, o‘rnatish\
-    \ va foydalanish juda sodda. Ro‘yxatdan o‘tish yoki sozlash talab qilinmaydi.\n\
-    • Har safar tez va ishonchli aloqani ta’minlovchi protokollar avtomatik tanlanadi.\n\
-    • Ko‘p tillardagi ko‘mak xizmati va sozlanuvchan serverlar tanlovi.\n"}
+uz:
+  app_name: Psiphon
+  subtitle: To‘siqlarsiz
+  keywords: Psiphon, proksi
+  description: "O‘n millionlab foydalanuvchilarning sevimli saytlarida kezishiga yordam\
+    \ bergan Psiphon jamoasi o‘zlarining birinchi rasmiy iOS ilovasini ishga tushirdi!\
+    \ Brauzer ilovamiz Psiphon tarmog‘iga uzilishsiz ulanib, saytlarni xavfsiz kezishingizni\
+    \ ta’minlaydi.\n\nQayerda bo‘lishingizdan qat’iy nazar, Psiphon brauzeri ilovasi\
+    \ orqali xohlagan saytingizga ulanishingiz mumkin. Jamoat Wi-Fi xizmatlari yoki\
+    \ boshqa ishonchsiz tarmoqlardan foydalanishda ilova qo‘shimcha himoya qobig‘ini\
+    \ ta’minlaydi.\n\nAsosiy funksiyalar:\n• Bepul, cheklanmagan foydalanish.\n• Yuklab\
+    \ olish, o‘rnatish va foydalanish juda sodda. Ro‘yxatdan o‘tish yoki sozlash talab\
+    \ qilinmaydi.\n• Har safar tez va ishonchli aloqani ta’minlovchi protokollar avtomatik\
+    \ tanlanadi.\n• Ko‘p tillardagi ko‘mak xizmati va sozlanuvchan serverlar tanlovi.\n"

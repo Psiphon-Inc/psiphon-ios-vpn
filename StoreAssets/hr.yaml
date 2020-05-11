@@ -1,1 +1,38 @@
-hr: {app_name: Psiphon, subtitle: Izvan granica}
+hr:
+  app_name: Psiphon
+  subtitle: Izvan granica
+  description: |
+    Nakon što smo pomogli desecima milijuna korisnika da ostvare pristup stranicama koje vole, mi u Psiphonu smo izbacili svoju prvu, službenu iOS aplikaciju! Naša nova aplikacija neprimjetno integrira pristup Psiphon mreži, sigurno Vas povezujući s Vašim stranicama
+
+    Bez obzira gdje se nalazite u svijetu, Psiphon preglednik će Vas spojiti s Vašim odredišnim stranicama. Aplikacija također pruža dodatni sloj sigurnosti pri korištenju javnih Wi-Fi servisa ili drugih mreža koje nisu od povjerenja.
+
+    Ključne znaćajke uključuju:
+    • Besplatnu, neograničenu osobnu upotrebu.
+    • Lako preuzimanje, instalaciju i korištenje. Ne zahtjeva registraciju ili konfiguraciju.
+    • Automatsko biranje protokola kako bi se pružio brz i pouzdan pristup, svaki put.
+    • Višejezičnu podršku i podesivu lokacija poslužitelja.
+
+    O pretplatama:
+    • Pretplata uklanja reklame i omogućuje brže surfanje webom!
+    • Besplatni trodnevni testni period.
+    • Cijene: US$ 2.99 za jedan tjedan, US$ 9.99 za jedan mjesec, US$ 99.99 za jednu godinu.
+    • Naplata će se izvršiti preko Vašeg iTunes računa nakon potvrde o kupovini.
+    • Pretplate se automatski obnavljaju osim ako je automatska obnova isključena najmanje 24 sata prije isteka trenutnog perioda.
+    • Vaš račun će se teretiti za obnovu pretplate 24 sata prije isteka trenutnog perioda, te ćete biti obaviješteni o troškovima
+    • Otkazivanje aktivne pretplate tokom trenutnog perioda nije dozvoljeno.
+    • Pretplatama i automatskom obnovom se može upravljati nakon kupovine u postavkama računa.
+    • Sav neiskorišteni dio besplatnog testnog perioda prestaje vrijediti po kupovini pretplate.
+
+    Politika privatnosti: https://psiphon.ca/hr/privacy.html
+    Uvjeti korištenja: https://psiphon.ca/hr/license.html
+  keywords: Psiphon, prexy
+  subscriptions:
+    weekly:
+      title: Premimum 1 tjedan
+      description: Automatski obnovljiva pretplata
+    monthly:
+      title: Premium 1 mjesec
+      description: Automatski obnovljiva pretplata
+    yearly:
+      title: Premium 1 godina
+      description: Automatski obnovljiva pretplata
