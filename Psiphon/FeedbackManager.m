@@ -148,11 +148,32 @@ PsiFeedbackLogType const FeedbackUploadLogType = @"FeedbackUpload";
             NSString *jetsamMetricsLog = nil;
             PsiphonDataSharedDB *sharedDB = [[PsiphonDataSharedDB alloc] initForAppGroupIdentifier:APP_GROUP_IDENTIFIER];
 
+            // Jetsam running time buckets
+            NSArray<BucketRange*>* bucketRanges = @[
+                // [0, 30s)
+                [BucketRange bucketRangeWithRange:MakeCBucketRange(    0.00,   TRUE,      30.00, FALSE)],
+                // [30s, 60s)
+                [BucketRange bucketRangeWithRange:MakeCBucketRange(   30.00,   TRUE,      60.00, FALSE)],
+                // [60s, 5m)
+                [BucketRange bucketRangeWithRange:MakeCBucketRange(   60.00,   TRUE,    5*60.00, FALSE)],
+                // [5m, 10m)
+                [BucketRange bucketRangeWithRange:MakeCBucketRange( 5*60.00,   TRUE,   10*60.00, FALSE)],
+                // [10m, 30m)
+                [BucketRange bucketRangeWithRange:MakeCBucketRange(10*60.00,   TRUE,   30*60.00, FALSE)],
+                // [30m, 1h)
+                [BucketRange bucketRangeWithRange:MakeCBucketRange(30*60.00,   TRUE,   60*60.00, FALSE)],
+                // [1h, 6h)
+                [BucketRange bucketRangeWithRange:MakeCBucketRange(60*60.00,   TRUE, 6*60*60.00, FALSE)],
+                // [6h, inf]
+                [BucketRange bucketRangeWithRange:MakeCBucketRange(6*60*60.00, TRUE,    DBL_MAX, TRUE)]
+            ];
+
             NSError *err;
             JetsamMetrics *metrics = [ContainerJetsamTracking getMetricsFromFilePath:[sharedDB extensionJetsamMetricsFilePath]
                                                                  withRotatedFilepath:[sharedDB extensionJetsamMetricsRotatedFilePath]
                                                                     registryFilepath:[sharedDB containerJetsamMetricsRegistryFilePath]
                                                                        readChunkSize:8000
+                                                                        bucketRanges:bucketRanges
                                                                                error:&err];
             if (err != nil) {
                 [PsiFeedbackLogger errorWithType:FeedbackUploadLogType

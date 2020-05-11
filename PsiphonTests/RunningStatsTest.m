@@ -31,7 +31,7 @@
 // Overflows internal count integer variable.
 // Note: this takes a long time to run (~5 minutes on a 2.9GHz i9).
 - (void)testIntegerOverflow {
-    RunningStat *stat = [[RunningStat alloc] initWithValue:0];
+    RunningStat *stat = [[RunningStat alloc] initWithValue:0 bucketRanges:nil];
     for (int i = 0; i < INT_MAX-1; i++) {
         NSError *err = [stat addValue:1];
         if (err) {
@@ -46,28 +46,23 @@
 
 // Overflow internal calculation.
 - (void)testDoubleOverflow {
-    RunningStat *stat = [[RunningStat alloc] initWithValue:0];
+    RunningStat *stat = [[RunningStat alloc] initWithValue:0 bucketRanges:nil];
     NSError *err = [stat addValue:DBL_MAX];
-    if (err != nil) {
-        XCTFail(@"%@", err.localizedDescription);
-        return;
-    }
 
-    err = [stat addValue:0];
     XCTAssertEqual(err.code, RunningStatErrorStdev);
     XCTAssertEqual(((NSError*)err.userInfo[NSUnderlyingErrorKey]).code, RunningStdevErrorDoubleOverflow);
 }
 
 // Underflow internal calculation.
 - (void)testDoubleUnderflow {
-    RunningStat *stat = [[RunningStat alloc] initWithValue:0];
+    RunningStat *stat = [[RunningStat alloc] initWithValue:0 bucketRanges:nil];
     NSError *err = [stat addValue:-INFINITY];
     XCTAssertEqual(err.code, RunningStatErrorStdev);
     XCTAssertEqual(((NSError*)err.userInfo[NSUnderlyingErrorKey]).code, RunningStdevErrorDoubleOverflow);
 }
 
 - (void)testMinAndMax {
-    RunningStat *stat = [[RunningStat alloc] initWithValue:0];
+    RunningStat *stat = [[RunningStat alloc] initWithValue:0 bucketRanges:nil];
 
     [stat addValue:1];
     [stat addValue:-1];
@@ -96,7 +91,7 @@
         // Omit the last value which is added later.
         if (i != sample_size -1 ) {
             if (stat == nil) {
-                stat = [[RunningStat alloc] initWithValue:num];
+                stat = [[RunningStat alloc] initWithValue:num bucketRanges:nil];
             } else {
                 NSError *err = [stat addValue:num];
                 if (err) {
@@ -157,7 +152,10 @@
 #pragma mark - NSCopying protocol implementation tests
 
 - (void)testNSCopying {
-    RunningStat *stat = [[RunningStat alloc] initWithValue:1];
+    RunningStat *stat = [[RunningStat alloc] initWithValue:1
+                                              bucketRanges:@[
+                                                  [BucketRange bucketRangeWithRange:MakeCBucketRange(0, TRUE, 10, TRUE)]
+                                              ]];
     [stat addValue:5];
 
     RunningStat *copiedStat = [stat copy];
@@ -171,7 +169,10 @@
 #pragma mark - NSCoding protocol implementation tests
 
 - (void)testNSCoding {
-    RunningStat *stat = [[RunningStat alloc] initWithValue:1];
+    RunningStat *stat = [[RunningStat alloc] initWithValue:1
+                                              bucketRanges:@[
+                                                  [BucketRange bucketRangeWithRange:MakeCBucketRange(0, TRUE, 10, TRUE)]
+                                              ]];
     [stat addValue:5];
 
     // Encode
@@ -191,7 +192,7 @@
 
     // Compare
     XCTAssertNotNil(decodedStat);
-    XCTAssertTrue([stat isEqualToRunningStat:decodedStat]);
+    XCTAssertTrue([stat isEqual:decodedStat]);
 }
 
 @end

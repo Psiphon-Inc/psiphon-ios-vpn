@@ -18,6 +18,7 @@
  */
 
 #import "JetsamMetrics+Feedback.h"
+#import "RunningBuckets.h"
 #import "NSError+Convenience.h"
 
 NSErrorDomain _Nonnull const JetsamMetrics_FeedbackErrorDomain = @"JetsamMetrics_FeedbackErrorDomain";
@@ -84,6 +85,23 @@ NSErrorDomain _Nonnull const JetsamMetrics_FeedbackErrorDomain = @"JetsamMetrics
                                           @"mean": @([stat stdev]),
                                           @"stdev": @([stat stdev]),
                                           @"var": @([stat variance])}];
+
+            NSArray<Bucket*> *talliedBuckets = [stat talliedBuckets];
+            if (talliedBuckets != nil) {
+                NSMutableArray<NSDictionary*> *bucketMetrics = [[NSMutableArray alloc]
+                                                                initWithCapacity:[talliedBuckets count]];
+                // Add each bucket
+                for (Bucket *bucket in talliedBuckets) {
+                    NSString *minKey = bucket.range.minInclusive ? @"min_inclusive" : @"min_exclusive";
+                    NSString *maxKey = bucket.range.maxInclusive ? @"max_inclusive" : @"max_exclusive";
+                    NSDictionary *bucketMetric = @{minKey: @(bucket.range.min),
+                                                   maxKey: @(bucket.range.max),
+                                                   @"count": @(bucket.count)};
+                    [bucketMetrics addObject:bucketMetric];
+                }
+                [perVersionStat setObject:bucketMetrics forKey:@"buckets"];
+            }
+
             [jsonDict setObject:perVersionStat forKey:key];
         }
     }

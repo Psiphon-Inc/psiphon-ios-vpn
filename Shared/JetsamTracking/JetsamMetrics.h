@@ -18,6 +18,7 @@
  */
 
 #import <Foundation/Foundation.h>
+#import "RunningBuckets.h"
 #import "RunningStat.h"
 
 NS_ASSUME_NONNULL_BEGIN
@@ -26,6 +27,10 @@ NS_ASSUME_NONNULL_BEGIN
 @interface JetsamMetrics : NSObject <NSCopying, NSCoding, NSSecureCoding>
 
 @property (readonly, nonatomic, strong) NSDictionary <NSString *, RunningStat *> *perVersionMetrics;
+
+/// Track the number of jetsams which fall within specific running time ranges.
+/// @param bucketRanges Ranges to track.
+- (instancetype)initWithBucketRanges:(NSArray<BucketRange*>*)bucketRanges;
 
 /// Updates the jetsam statistics for the corresponding app version with the given running time.
 /// @param appVersion Application version corresponding to jetsam event.
