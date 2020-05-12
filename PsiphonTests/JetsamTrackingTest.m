@@ -64,6 +64,11 @@
         [JetsamEvent jetsamEventWithAppVersion:@"2" runningTime:1 jetsamDate:[NSDate.date timeIntervalSince1970]]
     ];
 
+    NSArray<BucketRange*>* bucketRanges = @[
+        [BucketRange bucketRangeWithRange:MakeCBucketRange(0, TRUE, 10, FALSE)],
+        [BucketRange bucketRangeWithRange:MakeCBucketRange(10, TRUE, DBL_MAX, TRUE)],
+    ];
+
     NSMutableDictionary<NSString*, RunningStat*>* expectedMetrics = [[NSMutableDictionary alloc] init];
 
     for (JetsamEvent *jetsam in jetsams) {
@@ -79,7 +84,7 @@
 
         RunningStat *stat = [expectedMetrics objectForKey:jetsam.appVersion];
         if (stat == nil) {
-            stat = [[RunningStat alloc] initWithValue:jetsam.runningTime bucketRanges:nil];
+            stat = [[RunningStat alloc] initWithValue:jetsam.runningTime bucketRanges:bucketRanges];
         } else {
             [stat addValue:jetsam.runningTime];
         }
@@ -90,7 +95,7 @@
                                                          withRotatedFilepath:olderFilePath
                                                             registryFilepath:registryFilePath
                                                                readChunkSize:32
-                                                                bucketRanges:nil
+                                                                bucketRanges:bucketRanges
                                                                        error:&err];
     if (err != nil) {
         XCTFail(@"Unexpected error: %@", err);

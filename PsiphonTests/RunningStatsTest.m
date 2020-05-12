@@ -149,12 +149,28 @@
     return;
 }
 
+- (void)testBucketRanges {
+    RunningStat *stat = [[RunningStat alloc] initWithValue:0
+                                              bucketRanges:@[
+                                                  [BucketRange bucketRangeWithRange:MakeCBucketRange(0, TRUE, 60, FALSE)],
+                                                  [BucketRange bucketRangeWithRange:MakeCBucketRange(60, TRUE, 120, FALSE)]
+                                              ]];
+    [stat addValue:5];
+    [stat addValue:10];
+    [stat addValue:60];
+    [stat addValue:90];
+    [stat addValue:120];
+
+    XCTAssertEqual([stat.talliedBuckets objectAtIndex:0].count, 3);
+    XCTAssertEqual([stat.talliedBuckets objectAtIndex:1].count, 2);
+}
+
 #pragma mark - NSCopying protocol implementation tests
 
 - (void)testNSCopying {
     RunningStat *stat = [[RunningStat alloc] initWithValue:1
                                               bucketRanges:@[
-                                                  [BucketRange bucketRangeWithRange:MakeCBucketRange(0, TRUE, 10, TRUE)]
+                                                  [BucketRange bucketRangeWithRange:MakeCBucketRange(0, TRUE, 10, FALSE)]
                                               ]];
     [stat addValue:5];
 
@@ -171,7 +187,7 @@
 - (void)testNSCoding {
     RunningStat *stat = [[RunningStat alloc] initWithValue:1
                                               bucketRanges:@[
-                                                  [BucketRange bucketRangeWithRange:MakeCBucketRange(0, TRUE, 10, TRUE)]
+                                                  [BucketRange bucketRangeWithRange:MakeCBucketRange(0, TRUE, 10, FALSE)]
                                               ]];
     [stat addValue:5];
 

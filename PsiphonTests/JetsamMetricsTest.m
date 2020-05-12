@@ -78,6 +78,38 @@
     }
 }
 
+- (void)testBucketRanges {
+    JetsamMetrics *metrics = [[JetsamMetrics alloc] initWithBucketRanges:
+                              @[
+                                  [BucketRange bucketRangeWithRange:MakeCBucketRange(0, TRUE, 60, FALSE)],
+                                  [BucketRange bucketRangeWithRange:MakeCBucketRange(60, TRUE, 120, FALSE)]
+                              ]];
+    [metrics addJetsamForAppVersion:@"1" runningTime:0];
+    [metrics addJetsamForAppVersion:@"1" runningTime:5];
+    [metrics addJetsamForAppVersion:@"1" runningTime:10];
+    [metrics addJetsamForAppVersion:@"1" runningTime:60];
+    [metrics addJetsamForAppVersion:@"1" runningTime:90];
+    [metrics addJetsamForAppVersion:@"1" runningTime:120];
+    [metrics addJetsamForAppVersion:@"2" runningTime:3];
+    [metrics addJetsamForAppVersion:@"2" runningTime:3];
+
+    NSArray<Bucket*>* version1Buckets = [metrics.perVersionMetrics objectForKey:@"1"].talliedBuckets;
+    if (version1Buckets == nil) {
+        XCTFail(@"Expected version 1 buckets");
+        return;
+    }
+    NSArray<Bucket*>* version2Buckets = [metrics.perVersionMetrics objectForKey:@"2"].talliedBuckets;
+    if (version2Buckets == nil) {
+        XCTFail(@"Expected version 2 buckets");
+        return;
+    }
+
+    XCTAssertEqual([version1Buckets objectAtIndex:0].count, 3);
+    XCTAssertEqual([version1Buckets objectAtIndex:1].count, 2);
+    XCTAssertEqual([version2Buckets objectAtIndex:0].count, 2);
+    XCTAssertEqual([version2Buckets objectAtIndex:1].count, 0);
+}
+
 #pragma mark - NSCopying protocol implementation tests
 
 - (void)testNSCopying {
