@@ -49,7 +49,7 @@ struct DebugFlags {
     var disableConnectOnDemand = false
     
     var printStoreLogs = false
-    var printAppState = true
+    var printAppState = false
     var printHttpRequests = true
     
     static func disabled() -> Self {
@@ -65,7 +65,7 @@ struct DebugFlags {
 }
 
 /// Represents UIViewController's that can be dismissed.
-@objc enum DismissableScreen: Int {
+@objc enum DismissibleScreen: Int {
     case psiCash
 }
 
