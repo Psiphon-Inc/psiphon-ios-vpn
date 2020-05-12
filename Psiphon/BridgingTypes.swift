@@ -48,8 +48,8 @@ import Promises
 
     @objc func dismiss(screen: DismissableScreen)
 
-    @objc func presentRewardedVideoAd(customData: CustomData,
-                                      delegate: RewardedVideoAdBridgeDelegate)
+    @objc func presentUntunneledRewardedVideoAd(customData: CustomData,
+                                                delegate: RewardedVideoAdBridgeDelegate)
 }
 
 /// Inteface for AppDelegate functionality implemented in Swift and called from ObjC.

@@ -309,8 +309,8 @@ willFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     }
 }
 
-- (void)presentRewardedVideoAdWithCustomData:(NSString *)customData
-                                    delegate:(id<RewardedVideoAdBridgeDelegate>)delegate {
+- (void)presentUntunneledRewardedVideoAdWithCustomData:(NSString *)customData
+                                              delegate:(id<RewardedVideoAdBridgeDelegate>)delegate {
     // No-op if there's an active subscription for displaying rewarded videos.
     if (self->rewardedVideoAdDisposable) {
         return;
