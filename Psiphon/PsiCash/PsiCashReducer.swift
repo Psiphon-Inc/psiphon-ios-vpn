@@ -157,7 +157,7 @@ func psiCashReducer<T: TunnelProviderManager>(
                 loading: .failure(ErrorEvent(.noTunneledRewardedVideoAd))
             )
             return []
-        case .connecting:
+        case .connecting, .disconnecting:
             return []
         case .notConnected, .none:
             guard let customData = environment.psiCashEffects.rewardedVideoCustomData() else {
