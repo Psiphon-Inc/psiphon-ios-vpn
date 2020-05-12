@@ -29,7 +29,6 @@
 #import "EmbeddedServerEntries.h"
 #import "IAPViewController.h"
 #import "Logging.h"
-#import "MPInterstitialAdController.h"
 #import "Notifier.h"
 #import "PsiphonClientCommonLibraryHelpers.h"
 #import "PsiphonConfigReader.h"
