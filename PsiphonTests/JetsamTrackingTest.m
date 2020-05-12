@@ -110,6 +110,27 @@
         [self printPerVersionMetrics:expectedMetrics];
         return;
     }
+
+    // Confirm that next metric is empty since all the Jetsam events
+    // have been read and the file registry persisted.
+
+    metrics = [ContainerJetsamTracking getMetricsFromFilePath:filePath
+                                          withRotatedFilepath:olderFilePath
+                                             registryFilepath:registryFilePath
+                                                readChunkSize:32
+                                                    binRanges:binRanges
+                                                        error:&err];
+    if (err != nil) {
+        XCTFail(@"Unexpected error: %@", err);
+        return;
+    }
+
+    if (![metrics.perVersionMetrics isEqualToDictionary:@{}]) {
+        XCTFail(@"Expected per version metrics to be empty");
+        NSLog(@"Got:");
+        [self printPerVersionMetrics:metrics.perVersionMetrics];
+        return;
+    }
 }
 
 /// Test corrupting the jetsam log file. The container reader should return an error.

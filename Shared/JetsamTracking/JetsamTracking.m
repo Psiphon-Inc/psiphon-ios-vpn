@@ -62,7 +62,14 @@ NSErrorDomain _Nonnull const ContainerJetsamTrackingErrorDomain = @"ContainerJet
             return nil;
         }
         if (line == nil) {
-            // Done reading
+            // Done reading. Persist the registry.
+            [cont persistRegistry:&err];
+            if (err != nil) {
+                *outError = [NSError errorWithDomain:ContainerJetsamTrackingErrorDomain
+                                                code:ContainerJetsamTrackingErrorPersistingRegistryFailed
+                                 withUnderlyingError:err];
+                return nil;
+            }
             return metrics;
         }
 
