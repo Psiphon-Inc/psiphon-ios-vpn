@@ -81,8 +81,8 @@
 - (void)testBucketRanges {
     JetsamMetrics *metrics = [[JetsamMetrics alloc] initWithBucketRanges:
                               @[
-                                  [BucketRange bucketRangeWithRange:MakeCBucketRange(0, TRUE, 60, FALSE)],
-                                  [BucketRange bucketRangeWithRange:MakeCBucketRange(60, TRUE, 120, FALSE)]
+                                  [BucketRange bucketRangeWithRange:MakeCBucketRange(0, 60)],
+                                  [BucketRange bucketRangeWithRange:MakeCBucketRange(60, 120)]
                               ]];
     [metrics addJetsamForAppVersion:@"1" runningTime:0];
     [metrics addJetsamForAppVersion:@"1" runningTime:5];

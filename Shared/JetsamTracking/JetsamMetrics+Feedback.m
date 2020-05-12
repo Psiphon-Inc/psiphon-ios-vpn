@@ -92,10 +92,8 @@ NSErrorDomain _Nonnull const JetsamMetrics_FeedbackErrorDomain = @"JetsamMetrics
                                                                 initWithCapacity:[talliedBuckets count]];
                 // Add each bucket
                 for (Bucket *bucket in talliedBuckets) {
-                    NSString *minKey = bucket.range.minInclusive ? @"min_inclusive" : @"min_exclusive";
-                    NSString *maxKey = bucket.range.maxInclusive ? @"max_inclusive" : @"max_exclusive";
-                    NSDictionary *bucketMetric = @{minKey: @(bucket.range.min),
-                                                   maxKey: @(bucket.range.max),
+                    NSDictionary *bucketMetric = @{@"lower_bound": @(bucket.range.lowerBound),
+                                                   @"upper_bound": @(bucket.range.upperBound),
                                                    @"count": @(bucket.count)};
                     [bucketMetrics addObject:bucketMetric];
                 }

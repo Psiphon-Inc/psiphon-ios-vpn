@@ -65,8 +65,8 @@
     ];
 
     NSArray<BucketRange*>* bucketRanges = @[
-        [BucketRange bucketRangeWithRange:MakeCBucketRange(0, TRUE, 10, FALSE)],
-        [BucketRange bucketRangeWithRange:MakeCBucketRange(10, TRUE, DBL_MAX, TRUE)],
+        [BucketRange bucketRangeWithRange:MakeCBucketRange(0, 10)],
+        [BucketRange bucketRangeWithRange:MakeCBucketRange(10, DBL_MAX)],
     ];
 
     NSMutableDictionary<NSString*, RunningStat*>* expectedMetrics = [[NSMutableDictionary alloc] init];

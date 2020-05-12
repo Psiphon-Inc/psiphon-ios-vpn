@@ -152,8 +152,8 @@
 - (void)testBucketRanges {
     RunningStat *stat = [[RunningStat alloc] initWithValue:0
                                               bucketRanges:@[
-                                                  [BucketRange bucketRangeWithRange:MakeCBucketRange(0, TRUE, 60, FALSE)],
-                                                  [BucketRange bucketRangeWithRange:MakeCBucketRange(60, TRUE, 120, FALSE)]
+                                                  [BucketRange bucketRangeWithRange:MakeCBucketRange(0, 60)],
+                                                  [BucketRange bucketRangeWithRange:MakeCBucketRange(60, 120)]
                                               ]];
     [stat addValue:5];
     [stat addValue:10];
@@ -170,7 +170,7 @@
 - (void)testNSCopying {
     RunningStat *stat = [[RunningStat alloc] initWithValue:1
                                               bucketRanges:@[
-                                                  [BucketRange bucketRangeWithRange:MakeCBucketRange(0, TRUE, 10, FALSE)]
+                                                  [BucketRange bucketRangeWithRange:MakeCBucketRange(0, 10)]
                                               ]];
     [stat addValue:5];
 
@@ -187,7 +187,7 @@
 - (void)testNSCoding {
     RunningStat *stat = [[RunningStat alloc] initWithValue:1
                                               bucketRanges:@[
-                                                  [BucketRange bucketRangeWithRange:MakeCBucketRange(0, TRUE, 10, FALSE)]
+                                                  [BucketRange bucketRangeWithRange:MakeCBucketRange(0, 10)]
                                               ]];
     [stat addValue:5];
 

@@ -30,15 +30,12 @@
 - (void)testBoundaries {
 
     NSArray<BucketRange*> *bucketRanges = @[
-        [BucketRange bucketRangeWithRange:MakeCBucketRange(-DBL_MAX, FALSE, -1, TRUE)],
-        [BucketRange bucketRangeWithRange:MakeCBucketRange(0.00, FALSE, 1.00, FALSE)],
-        [BucketRange bucketRangeWithRange:MakeCBucketRange(0.00, TRUE,  1.00, FALSE)],
-        [BucketRange bucketRangeWithRange:MakeCBucketRange(0.00, FALSE, 1.00, TRUE)],
-        [BucketRange bucketRangeWithRange:MakeCBucketRange(0.00, TRUE,  1.00, TRUE)],
-        [BucketRange bucketRangeWithRange:MakeCBucketRange(0.00, TRUE,  0.25, FALSE)],
-        [BucketRange bucketRangeWithRange:MakeCBucketRange(0.25, TRUE,  0.50, FALSE)],
-        [BucketRange bucketRangeWithRange:MakeCBucketRange(0.50, TRUE,  1.00, TRUE)],
-        [BucketRange bucketRangeWithRange:MakeCBucketRange(-DBL_MAX, FALSE, DBL_MAX, FALSE)]];
+        [BucketRange bucketRangeWithRange:MakeCBucketRange(-DBL_MAX, -1)],
+        [BucketRange bucketRangeWithRange:MakeCBucketRange(0.00, 1.00)],
+        [BucketRange bucketRangeWithRange:MakeCBucketRange(0.00, 0.25)],
+        [BucketRange bucketRangeWithRange:MakeCBucketRange(0.25, 0.50)],
+        [BucketRange bucketRangeWithRange:MakeCBucketRange(0.50, 1.00)],
+        [BucketRange bucketRangeWithRange:MakeCBucketRange(-DBL_MAX, DBL_MAX)]];
 
     RunningBuckets *buckets = [[RunningBuckets alloc] initWithBucketRanges:bucketRanges];
 
@@ -56,14 +53,11 @@
 
     XCTAssertEqual(buckets.count, values.count);
     XCTAssertEqual([buckets.buckets objectAtIndex:0].count, 0);
-    XCTAssertEqual([buckets.buckets objectAtIndex:1].count, 5);
-    XCTAssertEqual([buckets.buckets objectAtIndex:2].count, 6);
-    XCTAssertEqual([buckets.buckets objectAtIndex:3].count, 6);
-    XCTAssertEqual([buckets.buckets objectAtIndex:4].count, 7);
-    XCTAssertEqual([buckets.buckets objectAtIndex:5].count, 2);
-    XCTAssertEqual([buckets.buckets objectAtIndex:6].count, 1);
-    XCTAssertEqual([buckets.buckets objectAtIndex:7].count, 4);
-    XCTAssertEqual([buckets.buckets objectAtIndex:8].count, 7);
+    XCTAssertEqual([buckets.buckets objectAtIndex:1].count, 6);
+    XCTAssertEqual([buckets.buckets objectAtIndex:2].count, 2);
+    XCTAssertEqual([buckets.buckets objectAtIndex:3].count, 1);
+    XCTAssertEqual([buckets.buckets objectAtIndex:4].count, 3);
+    XCTAssertEqual([buckets.buckets objectAtIndex:5].count, 7);
 }
 
 @end
