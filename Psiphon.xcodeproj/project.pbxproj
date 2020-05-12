@@ -248,6 +248,8 @@
 		CE8ED8FD24630616009C3187 /* JetsamMetrics+Feedback.m in Sources */ = {isa = PBXBuildFile; fileRef = CE8ED8FC24630616009C3187 /* JetsamMetrics+Feedback.m */; };
 		CE8ED90224633407009C3187 /* FileRegistryTest.m in Sources */ = {isa = PBXBuildFile; fileRef = CE8ED90124633407009C3187 /* FileRegistryTest.m */; };
 		CE8ED904246339BF009C3187 /* JetsamEventTest.m in Sources */ = {isa = PBXBuildFile; fileRef = CE8ED903246339BF009C3187 /* JetsamEventTest.m */; };
+		CE9E1F48246B0906007F937F /* JSONCodable.m in Sources */ = {isa = PBXBuildFile; fileRef = CE9E1F47246B0906007F937F /* JSONCodable.m */; };
+		CE9E1F49246B0906007F937F /* JSONCodable.m in Sources */ = {isa = PBXBuildFile; fileRef = CE9E1F47246B0906007F937F /* JSONCodable.m */; };
 		CEC69F4A245CA5860032B74F /* ExtensionContainerFileTest.m in Sources */ = {isa = PBXBuildFile; fileRef = CEC69F49245CA5860032B74F /* ExtensionContainerFileTest.m */; };
 		CEC8CD19245887BA00DF1010 /* RotatingFile.m in Sources */ = {isa = PBXBuildFile; fileRef = CEC8CD18245887BA00DF1010 /* RotatingFile.m */; };
 		CEC8CD1A245887BA00DF1010 /* RotatingFile.m in Sources */ = {isa = PBXBuildFile; fileRef = CEC8CD18245887BA00DF1010 /* RotatingFile.m */; };
@@ -739,6 +741,8 @@
 		CE8ED8FC24630616009C3187 /* JetsamMetrics+Feedback.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "JetsamMetrics+Feedback.m"; sourceTree = "<group>"; };
 		CE8ED90124633407009C3187 /* FileRegistryTest.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FileRegistryTest.m; sourceTree = "<group>"; };
 		CE8ED903246339BF009C3187 /* JetsamEventTest.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = JetsamEventTest.m; sourceTree = "<group>"; };
+		CE9E1F43246B04C5007F937F /* JSONCodable.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = JSONCodable.h; sourceTree = "<group>"; };
+		CE9E1F47246B0906007F937F /* JSONCodable.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = JSONCodable.m; sourceTree = "<group>"; };
 		CEC69F49245CA5860032B74F /* ExtensionContainerFileTest.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = ExtensionContainerFileTest.m; path = "/Users/user/myforks/psiphon-ios-vpn/jetsam-mitigation/PsiphonTests/ExtensionContainerFileTest.m"; sourceTree = "<absolute>"; };
 		CEC8CD18245887BA00DF1010 /* RotatingFile.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RotatingFile.m; sourceTree = "<group>"; };
 		CEC8CD212459D63B00DF1010 /* RotatingFile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RotatingFile.h; sourceTree = "<group>"; };
@@ -1510,6 +1514,8 @@
 				CE82CEBA245C753E000C0512 /* FileRegistry.m */,
 				CEC8CD212459D63B00DF1010 /* RotatingFile.h */,
 				CEC8CD18245887BA00DF1010 /* RotatingFile.m */,
+				CE9E1F43246B04C5007F937F /* JSONCodable.h */,
+				CE9E1F47246B0906007F937F /* JSONCodable.m */,
 			);
 			path = Util;
 			sourceTree = "<group>";
@@ -2177,6 +2183,7 @@
 				52A2467123A176BA00A01FF1 /* PsiCashPurchasingAlertViewBuilder.swift in Sources */,
 				8D9E603224366AF2003A46D8 /* StoreDelegate.swift in Sources */,
 				A8408EB1E9DABE35016580A7 /* ImageUtils.m in Sources */,
+				CE9E1F48246B0906007F937F /* JSONCodable.m in Sources */,
 				A8408BC29B903A6C0A32F32C /* SkyRegionSelectionViewController.m in Sources */,
 				8D417E9F2411A60900FEE587 /* PsiCashEffects.swift in Sources */,
 				A84088D3FD4B01A7D14CCC53 /* SupportedLanguages.m in Sources */,
@@ -2229,6 +2236,7 @@
 				EF90D7B0204F231B00228A63 /* timestamp_compare.c in Sources */,
 				9BFECC62159FBEAA1A69F4F9 /* BasePacketTunnelProvider.m in Sources */,
 				CE3B3226244FA3150079C13F /* JetsamMetrics.m in Sources */,
+				CE9E1F49246B0906007F937F /* JSONCodable.m in Sources */,
 				CEE6FB312466224B00F74D05 /* RunningStdev.m in Sources */,
 				521FD0FE219E0E1900F748EC /* AppProfiler.m in Sources */,
 				CE8026AE2448BA2E005AF848 /* ExtensionDataStoreKeys.m in Sources */,
