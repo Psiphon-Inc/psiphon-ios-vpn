@@ -57,6 +57,9 @@
 /* Decline button title */
 "DECLINE_BUTTON_TITLE" = "Decline";
 
+/* Text next to the button indicating to the user that the rewarded video advertisement is only available when they are not connected to Psiphon. Do not translate or transliterate 'PsiCash'. Do not translate or transliterate 'Psiphon'. */
+"DISCONNECT_TO_WATCH_AND_EARN_PSICASH" = "You must disconnect from Psiphon to watch a video to earn PsiCash";
+
 /* Dismiss button title. Dismisses pop-up alert when the user clicks on the button */
 "DISMISS_BUTTON_TITLE" = "Dismiss";
 

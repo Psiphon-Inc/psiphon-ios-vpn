@@ -49,7 +49,7 @@ struct DebugFlags {
     var disableConnectOnDemand = false
     
     var printStoreLogs = false
-    var printAppState = true
+    var printAppState = false
     var printHttpRequests = true
     
     static func disabled() -> Self {

@@ -111,7 +111,7 @@ func psiCashReducer<T: TunnelProviderManager>(
                     environment.notifier.post(NotifierUpdatedNonSubscriptionAuths)
                 },
                 .fireAndForget {
-                    environment.objcBridgeDelegate?.dismiss(screen: .psiCash)
+                    environment.objcBridgeDelegate?.dismiss(screen: .psiCash, completion: nil)
                 }
             ]
             
@@ -150,19 +150,29 @@ func psiCashReducer<T: TunnelProviderManager>(
         guard case .notSubscribed = state.subscription.status else {
             return []
         }
-        // TODO: Provide a more informative error message
-        guard let customData = environment.psiCashEffects.rewardedVideoCustomData() else {
-            state.psiCash.rewardedVideo.combine(loading:
-                .failure(ErrorEvent(ErrorRepr(repr: "PsiCash data missing"))))
+        
+        switch state.tunnelManagerRef?.weakRef?.connectionStatus.tunneled {
+        case .connected:
+            state.psiCash.rewardedVideo.combine(
+                loading: .failure(ErrorEvent(.noTunneledRewardedVideoAd))
+            )
             return []
-        }
-        return [
-            .fireAndForget {
-                environment.objcBridgeDelegate?.presentRewardedVideoAd(
-                    customData: customData,
-                    delegate: environment.rewardedVideoAdBridgeDelegate)
+        case .connecting:
+            return []
+        case .notConnected, .none:
+            guard let customData = environment.psiCashEffects.rewardedVideoCustomData() else {
+                state.psiCash.rewardedVideo.combine(
+                    loading: .failure(ErrorEvent(.customDataNotPresent)))
+                return []
             }
-        ]
+            return [
+                .fireAndForget {
+                    environment.objcBridgeDelegate?.presentUntunneledRewardedVideoAd(
+                        customData: customData,
+                        delegate: environment.rewardedVideoAdBridgeDelegate)
+                }
+            ]
+        }
         
     case .rewardedVideoPresentation(let presentation):
         state.psiCash.rewardedVideo.combine(presentation: presentation)
@@ -193,9 +203,10 @@ func psiCashReducer<T: TunnelProviderManager>(
         
     case .connectToPsiphonTapped:
         return [
-            environment.vpnActionStore(.tunnelStateIntent(.start(transition: .none))).mapNever(),
-            .fireAndForget {
-                environment.objcBridgeDelegate?.dismiss(screen: .psiCash)
+            .fireAndForget { [unowned objcBridgeDelegate = environment.objcBridgeDelegate] in
+                objcBridgeDelegate?.dismiss(screen: .psiCash, completion: {
+                    objcBridgeDelegate?.startStopVPNWithInterstitial()
+                })
             }
         ]
     }

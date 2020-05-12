@@ -93,10 +93,10 @@ extension SwiftDelegate: RewardedVideoAdBridgeDelegate {
             // Note that error event is created here as opposed to the origin
             // of where the error occurred. However this is acceptable as long as
             // this function is called once for each error that happened almost immediately.
-            loadResult = .failure(ErrorEvent(.systemError(error)))
+            loadResult = .failure(ErrorEvent(.adSDKError(error)))
         } else {
             if case .error = status {
-                loadResult = .failure(ErrorEvent(ErrorRepr(repr: "Ad failed to load")))
+                loadResult = .failure(ErrorEvent(.requestedAdFailedToLoad))
             } else {
                 loadResult = .success(status)
             }

@@ -42,12 +42,15 @@ extension PsiCashState {
         self.libData = libData
     }
 
-    var rewardedVideoProduct: PsiCashPurchasableViewModel {
+    func rewardedVideoProduct(
+        clearedForSale: Bool, subtitle: String
+    ) -> PsiCashPurchasableViewModel {
         PsiCashPurchasableViewModel(
             product: .rewardedVideoAd(loading: self.rewardedVideo.isLoading),
             title: PsiCashHardCodedValues.videoAdRewardTitle,
-            subtitle: UserStrings.Watch_rewarded_video_and_earn(),
-            localizedPrice: .free
+            subtitle: subtitle,
+            localizedPrice: .free,
+            clearedForSale: clearedForSale
         )
     }
     
@@ -76,7 +79,14 @@ enum PsiCashPurchasingState: Equatable {
 }
 
 typealias RewardedVideoPresentation = AdPresentation
-typealias RewardedVideoLoad = Result<AdLoadStatus, ErrorEvent<ErrorRepr>>
+typealias RewardedVideoLoad = Result<AdLoadStatus, ErrorEvent<RewardedVideoAdLoadError>>
+
+enum RewardedVideoAdLoadError: HashableError {
+    case customDataNotPresent
+    case noTunneledRewardedVideoAd
+    case requestedAdFailedToLoad
+    case adSDKError(SystemError)
+}
 
 struct RewardedVideoState: Equatable {
     var loading: RewardedVideoLoad = .success(.none)

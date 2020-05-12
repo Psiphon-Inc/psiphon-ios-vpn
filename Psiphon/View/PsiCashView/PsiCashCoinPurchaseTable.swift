@@ -29,6 +29,7 @@ struct PsiCashPurchasableViewModel: Equatable {
     let title: String
     let subtitle: String
     let localizedPrice: LocalizedPrice
+    let clearedForSale: Bool
 }
 
 struct PsiCashCoinPurchaseTable: ViewBuilder {
@@ -164,7 +165,7 @@ fileprivate final class PurchaseCellContent: UIView, Bindable {
         self.priceFormatter = priceFormatter
         self.clickHandler = clickHandler
         titleLabel = UILabel.make(fontSize: .h3, typeface: .bold)
-        subtitleLabel = UILabel.make(fontSize: .normal)
+        subtitleLabel = UILabel.make(fontSize: .subtitle, numberOfLines: 0)
         button = GradientButton(gradient: .grey)
         spinner = .init(style: .gray)
         super.init(frame: .zero)
@@ -184,12 +185,14 @@ fileprivate final class PurchaseCellContent: UIView, Bindable {
 
         // Setup auto layout for subviews
         imageView.activateConstraints {
-            $0.constraintToParent(.top(topPad), .leading(12), .bottom(bottomPad))
+            $0.constraintToParent(.top(topPad), .leading(12), .bottom(bottomPad)) +
+                [ $0.widthAnchor.constraint(equalTo: self.widthAnchor,
+                                            multiplier: 0.11, constant: 0.0) ]
         }
 
         titleLabel.activateConstraints {
             $0.constraintToParent(.top(topPad)) +
-                [ $0.leadingAnchor.constraint(equalTo: imageView.trailingAnchor, constant: 18),
+                [ $0.leadingAnchor.constraint(equalTo: imageView.trailingAnchor, constant: 12),
             ]
         }
 
@@ -200,9 +203,10 @@ fileprivate final class PurchaseCellContent: UIView, Bindable {
         }
 
         button.activateConstraints {
-            $0.constraintToParent(.top(topPad), .bottom(bottomPad), .trailing(-12)) +
+            $0.constraintToParent(.centerY(0), .trailing(-12)) +
                 $0.widthConstraint(to: 80, withMax: 150) +
-                [ $0.leadingAnchor.constraint(greaterThanOrEqualTo: titleLabel.trailingAnchor,
+                [ $0.heightAnchor.constraint(equalTo: imageView.widthAnchor),
+                  $0.leadingAnchor.constraint(greaterThanOrEqualTo: titleLabel.trailingAnchor,
                                               constant: 12),
                   $0.leadingAnchor.constraint(greaterThanOrEqualTo: subtitleLabel.trailingAnchor,
                                               constant: 12),
@@ -239,6 +243,15 @@ fileprivate final class PurchaseCellContent: UIView, Bindable {
                 button.setTitle("", for: .normal)
                 return
             }
+        }
+        
+        // Gives the button a "disabled" look when not cleared for sale.
+        if newValue.clearedForSale {
+            button.isEnabled = true
+            button.setTitleColor(.darkBlue(), for: .normal)
+        } else {
+            button.isEnabled = false
+            button.setTitleColor(.gray, for: .normal)
         }
 
         spinner.isHidden = true

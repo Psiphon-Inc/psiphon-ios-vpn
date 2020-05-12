@@ -156,14 +156,12 @@
 		8DDA60292425BB4800DBA8EC /* DebugStrings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DDA60282425BB4800DBA8EC /* DebugStrings.swift */; };
 		8DE4E6D2244E97D000275362 /* CustomCodables.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DE4E6D1244E97D000275362 /* CustomCodables.swift */; };
 		8DE4E6D4244E9D8E00275362 /* Authorization.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DE4E6D3244E9D8E00275362 /* Authorization.swift */; };
-		9BFEC1F0DA87B4E66C8CC4AA /* MoPubInterstitialAdControllerWrapper.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFECF45CA0CAF6997411D22 /* MoPubInterstitialAdControllerWrapper.m */; };
 		9BFEC2458D1346F537E9089E /* Nullity.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFECCCF429898FD903B69A6 /* Nullity.m */; };
 		9BFEC3D66910918A0C8954E1 /* AdMobConsent.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC5F8D8BB828703CCCC2F /* AdMobConsent.m */; };
 		9BFEC459666697D89B09A492 /* AdMobRewardedAdControllerWrapper.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFECF6BF16767758F28D1A0 /* AdMobRewardedAdControllerWrapper.m */; };
 		9BFEC4F02A47FF8265635803 /* Notifier.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC91ED4A1C511520E9948 /* Notifier.m */; };
 		9BFEC8058885B68B2822E2B8 /* AdManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC3CE64925E5984AAA9BE /* AdManager.m */; };
 		9BFEC8A2F99380655E853F81 /* AdControllerWrapper.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC460CD29B3A0667FE9A2 /* AdControllerWrapper.m */; };
-		9BFECA152514A7739551AA70 /* MoPubConsent.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFECACF5093B4C4EE5D3592 /* MoPubConsent.m */; };
 		9BFECC62159FBEAA1A69F4F9 /* BasePacketTunnelProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFECC3FADE9C8A76A0913DE /* BasePacketTunnelProvider.m */; };
 		9BFECD174E254989EC97A437 /* IAPHelpViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC220C067BBE75AF970C1 /* IAPHelpViewController.m */; };
 		9BFECD1880B51B0E2EAEFF1F /* Notifier.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC91ED4A1C511520E9948 /* Notifier.m */; };
@@ -173,7 +171,6 @@
 		9BFECF65871BB6B522C33F1E /* UserDefaults.h in Resources */ = {isa = PBXBuildFile; fileRef = 9BFECC9B2B9F2BFBD4F8A47B /* UserDefaults.h */; };
 		9BFECF8895D5FE1940A6F700 /* PsiphonConfigUserDefaults.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC584519C408D9D6D3FF1 /* PsiphonConfigUserDefaults.m */; };
 		9BFECF9F760F1A93A8933089 /* Nullity.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFECCCF429898FD903B69A6 /* Nullity.m */; };
-		9BFECFE618966005B01CF582 /* MoPubRewardedAdControllerWrapper.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC970B3CC179C3B9DE44D /* MoPubRewardedAdControllerWrapper.m */; };
 		9BFECFEB3BC9F10542C1A416 /* PsiphonConfigUserDefaults.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC584519C408D9D6D3FF1 /* PsiphonConfigUserDefaults.m */; };
 		A8408008B18277F93286799F /* PsiphonProgressView.m in Sources */ = {isa = PBXBuildFile; fileRef = A84087FA4B1BC2C725D900D9 /* PsiphonProgressView.m */; };
 		A840803A0733D9FCA5410796 /* ActivityIndicatorRoyalSkyButton.m in Sources */ = {isa = PBXBuildFile; fileRef = A840842CECC0146241243488 /* ActivityIndicatorRoyalSkyButton.m */; };
@@ -551,14 +548,12 @@
 		9BFEC220C067BBE75AF970C1 /* IAPHelpViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IAPHelpViewController.m; sourceTree = "<group>"; };
 		9BFEC3165745A5D14C8C3C08 /* Notifier.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Notifier.h; sourceTree = "<group>"; };
 		9BFEC31B61584FD2EAAF5DE6 /* Authorization.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Authorization.m; sourceTree = "<group>"; };
-		9BFEC327A0BE7E5243CCB2E0 /* MoPubInterstitialAdControllerWrapper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MoPubInterstitialAdControllerWrapper.h; sourceTree = "<group>"; };
 		9BFEC356373DB0938069FBA8 /* AdControllerWrapper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AdControllerWrapper.h; sourceTree = "<group>"; };
 		9BFEC365D314919C8FA4C1DE /* AdMobInterstitialAdControllerWrapper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AdMobInterstitialAdControllerWrapper.h; sourceTree = "<group>"; };
 		9BFEC3CE64925E5984AAA9BE /* AdManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AdManager.m; sourceTree = "<group>"; };
 		9BFEC460CD29B3A0667FE9A2 /* AdControllerWrapper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AdControllerWrapper.m; sourceTree = "<group>"; };
 		9BFEC4D609BFCD0DC812BDB3 /* Asserts.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Asserts.h; sourceTree = "<group>"; };
 		9BFEC4F42A7FC2F11FF43636 /* AdMobInterstitialAdControllerWrapper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AdMobInterstitialAdControllerWrapper.m; sourceTree = "<group>"; };
-		9BFEC556918CCEF2B28DDA8D /* MoPubConsent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MoPubConsent.h; sourceTree = "<group>"; };
 		9BFEC5603ADEFD6BA23F8F74 /* AdMobRewardedAdControllerWrapper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AdMobRewardedAdControllerWrapper.h; sourceTree = "<group>"; };
 		9BFEC584519C408D9D6D3FF1 /* PsiphonConfigUserDefaults.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PsiphonConfigUserDefaults.m; sourceTree = "<group>"; };
 		9BFEC5F8D8BB828703CCCC2F /* AdMobConsent.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AdMobConsent.m; sourceTree = "<group>"; };
@@ -566,17 +561,13 @@
 		9BFEC717F36D5A071D14AFFA /* AdManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AdManager.h; sourceTree = "<group>"; };
 		9BFEC72C282F6060193B2E87 /* UIColor+Additions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIColor+Additions.m"; sourceTree = "<group>"; };
 		9BFEC8783D4222F2272E50E7 /* BasePacketTunnelProvider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BasePacketTunnelProvider.h; sourceTree = "<group>"; };
-		9BFEC8FDCD80DACA0D851A06 /* MoPubRewardedAdControllerWrapper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MoPubRewardedAdControllerWrapper.h; sourceTree = "<group>"; };
 		9BFEC91ED4A1C511520E9948 /* Notifier.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Notifier.m; sourceTree = "<group>"; };
-		9BFEC970B3CC179C3B9DE44D /* MoPubRewardedAdControllerWrapper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MoPubRewardedAdControllerWrapper.m; sourceTree = "<group>"; };
-		9BFECACF5093B4C4EE5D3592 /* MoPubConsent.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MoPubConsent.m; sourceTree = "<group>"; };
 		9BFECB09D7F866F34551DBD4 /* IAPHelpViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IAPHelpViewController.h; sourceTree = "<group>"; };
 		9BFECC3FADE9C8A76A0913DE /* BasePacketTunnelProvider.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BasePacketTunnelProvider.m; sourceTree = "<group>"; };
 		9BFECC9B2B9F2BFBD4F8A47B /* UserDefaults.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UserDefaults.h; sourceTree = "<group>"; };
 		9BFECCCF429898FD903B69A6 /* Nullity.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Nullity.m; sourceTree = "<group>"; };
 		9BFECE69F71F11C7B3A2D67E /* UIColor+Additions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIColor+Additions.h"; sourceTree = "<group>"; };
 		9BFECEEB971749A4E9705B15 /* Nullity.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Nullity.h; sourceTree = "<group>"; };
-		9BFECF45CA0CAF6997411D22 /* MoPubInterstitialAdControllerWrapper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MoPubInterstitialAdControllerWrapper.m; sourceTree = "<group>"; };
 		9BFECF6BF16767758F28D1A0 /* AdMobRewardedAdControllerWrapper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AdMobRewardedAdControllerWrapper.m; sourceTree = "<group>"; };
 		9BFECF74881B6C4227813A63 /* AdMobConsent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AdMobConsent.h; sourceTree = "<group>"; };
 		A44F0D2E7AB9F499D75A1AC4 /* libPods-PsiphonVPN.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-PsiphonVPN.a"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -1325,16 +1316,10 @@
 		EFFA4AB620F68CE100E35E8E /* Ad */ = {
 			isa = PBXGroup;
 			children = (
-				9BFECF45CA0CAF6997411D22 /* MoPubInterstitialAdControllerWrapper.m */,
-				9BFEC327A0BE7E5243CCB2E0 /* MoPubInterstitialAdControllerWrapper.h */,
-				9BFEC970B3CC179C3B9DE44D /* MoPubRewardedAdControllerWrapper.m */,
-				9BFEC8FDCD80DACA0D851A06 /* MoPubRewardedAdControllerWrapper.h */,
 				9BFEC717F36D5A071D14AFFA /* AdManager.h */,
 				9BFEC3CE64925E5984AAA9BE /* AdManager.m */,
 				9BFEC5F8D8BB828703CCCC2F /* AdMobConsent.m */,
 				9BFECF74881B6C4227813A63 /* AdMobConsent.h */,
-				9BFECACF5093B4C4EE5D3592 /* MoPubConsent.m */,
-				9BFEC556918CCEF2B28DDA8D /* MoPubConsent.h */,
 				9BFEC4F42A7FC2F11FF43636 /* AdMobInterstitialAdControllerWrapper.m */,
 				9BFEC365D314919C8FA4C1DE /* AdMobInterstitialAdControllerWrapper.h */,
 				9BFECF6BF16767758F28D1A0 /* AdMobRewardedAdControllerWrapper.m */,
@@ -1629,26 +1614,6 @@
 				"${PODS_CONFIGURATION_BUILD_DIR}/PersonalizedAdConsent/PersonalizedAdConsent.bundle",
 				"${PODS_CONFIGURATION_BUILD_DIR}/PsiphonClientCommonLibrary/PsiphonClientCommonLibrary.bundle",
 				"${PODS_ROOT}/SVProgressHUD/SVProgressHUD/SVProgressHUD.bundle",
-				"${PODS_ROOT}/mopub-ios-sdk/MoPubSDK/Resources/MPCloseBtn.png",
-				"${PODS_ROOT}/mopub-ios-sdk/MoPubSDK/Resources/MPCloseBtn@2x.png",
-				"${PODS_ROOT}/mopub-ios-sdk/MoPubSDK/Resources/MPCloseBtn@3x.png",
-				"${PODS_ROOT}/mopub-ios-sdk/MoPubSDK/Resources/MPCloseButtonX.png",
-				"${PODS_ROOT}/mopub-ios-sdk/MoPubSDK/Resources/MPCloseButtonX@2x.png",
-				"${PODS_ROOT}/mopub-ios-sdk/MoPubSDK/Resources/MPCloseButtonX@3x.png",
-				"${PODS_ROOT}/mopub-ios-sdk/MoPubSDK/Resources/MPDAAIcon.png",
-				"${PODS_ROOT}/mopub-ios-sdk/MoPubSDK/Resources/MPDAAIcon@2x.png",
-				"${PODS_ROOT}/mopub-ios-sdk/MoPubSDK/Resources/MPDAAIcon@3x.png",
-				"${PODS_ROOT}/mopub-ios-sdk/MoPubSDK/Resources/MPMutedBtn.png",
-				"${PODS_ROOT}/mopub-ios-sdk/MoPubSDK/Resources/MPMutedBtn@2x.png",
-				"${PODS_ROOT}/mopub-ios-sdk/MoPubSDK/Resources/MPMutedBtn@3x.png",
-				"${PODS_ROOT}/mopub-ios-sdk/MoPubSDK/Resources/MPPlayBtn.png",
-				"${PODS_ROOT}/mopub-ios-sdk/MoPubSDK/Resources/MPPlayBtn@2x.png",
-				"${PODS_ROOT}/mopub-ios-sdk/MoPubSDK/Resources/MPPlayBtn@3x.png",
-				"${PODS_ROOT}/mopub-ios-sdk/MoPubSDK/Resources/MPUnmutedBtn.png",
-				"${PODS_ROOT}/mopub-ios-sdk/MoPubSDK/Resources/MPUnmutedBtn@2x.png",
-				"${PODS_ROOT}/mopub-ios-sdk/MoPubSDK/Resources/MPUnmutedBtn@3x.png",
-				"${PODS_ROOT}/mopub-ios-sdk/MoPubSDK/Resources/MRAID.bundle",
-				"${PODS_ROOT}/mopub-ios-sdk/MoPubSDK/Resources/MPAdapters.plist",
 			);
 			name = "[CP] Copy Pods Resources";
 			outputPaths = (
@@ -1656,26 +1621,6 @@
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/PersonalizedAdConsent.bundle",
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/PsiphonClientCommonLibrary.bundle",
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/SVProgressHUD.bundle",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/MPCloseBtn.png",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/MPCloseBtn@2x.png",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/MPCloseBtn@3x.png",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/MPCloseButtonX.png",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/MPCloseButtonX@2x.png",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/MPCloseButtonX@3x.png",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/MPDAAIcon.png",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/MPDAAIcon@2x.png",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/MPDAAIcon@3x.png",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/MPMutedBtn.png",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/MPMutedBtn@2x.png",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/MPMutedBtn@3x.png",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/MPPlayBtn.png",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/MPPlayBtn@2x.png",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/MPPlayBtn@3x.png",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/MPUnmutedBtn.png",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/MPUnmutedBtn@2x.png",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/MPUnmutedBtn@3x.png",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/MRAID.bundle",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/MPAdapters.plist",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -1880,16 +1825,13 @@
 				445F24DB20E1A5BA00D004E9 /* ber_decoder.c in Sources */,
 				52D2581122BADE1900CA956A /* SwiftDelegate.swift in Sources */,
 				5202011D2360D34000D00C8E /* EitherView.swift in Sources */,
-				9BFEC1F0DA87B4E66C8CC4AA /* MoPubInterstitialAdControllerWrapper.m in Sources */,
 				52805BA122DD1EB8006B205B /* ReactiveSwift+Additions.swift in Sources */,
-				9BFECFE618966005B01CF582 /* MoPubRewardedAdControllerWrapper.m in Sources */,
 				9BFEC8058885B68B2822E2B8 /* AdManager.m in Sources */,
 				8D00AA4A2450B4D1001EB8DD /* SubscriptionPurchaseVerification.swift in Sources */,
 				9BFEC3D66910918A0C8954E1 /* AdMobConsent.m in Sources */,
 				52DF5E9A23CE835100A1B067 /* UserStrings.swift in Sources */,
 				8DDA60292425BB4800DBA8EC /* DebugStrings.swift in Sources */,
 				52C8F0AD237E145C00E5F9C0 /* PsiCashCoinPurchaseTable.swift in Sources */,
-				9BFECA152514A7739551AA70 /* MoPubConsent.m in Sources */,
 				8DE4E6D2244E97D000275362 /* CustomCodables.swift in Sources */,
 				521FD0EF219E0D5600F748EC /* DebugDirectoryViewerViewController.m in Sources */,
 				9BFECF61970F215F32E76280 /* AdMobInterstitialAdControllerWrapper.m in Sources */,
