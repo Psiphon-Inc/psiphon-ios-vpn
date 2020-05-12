@@ -21,7 +21,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-FOUNDATION_EXPORT NSErrorDomain const RunningStatErrorDomain;
+FOUNDATION_EXPORT NSErrorDomain const RotatingFileErrorDomain;
 
 /// Represents a log file which is rotated once it exceeds a configurable maximum size.
 @interface RotatingFile : NSObject
