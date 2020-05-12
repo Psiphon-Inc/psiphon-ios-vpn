@@ -31,7 +31,6 @@ NS_ASSUME_NONNULL_BEGIN
 // List of all AdControllerTag objects.
 FOUNDATION_EXPORT AdControllerTag const AdControllerTagAdMobUntunneledInterstitial;
 FOUNDATION_EXPORT AdControllerTag const AdControllerTagAdMobUntunneledRewardedVideo;
-FOUNDATION_EXPORT AdControllerTag const AdControllerTagMoPubTunneledRewardedVideo;
 
 @interface AdManager : NSObject
 
