@@ -111,7 +111,7 @@ func psiCashReducer<T: TunnelProviderManager>(
                     environment.notifier.post(NotifierUpdatedNonSubscriptionAuths)
                 },
                 .fireAndForget {
-                    environment.objcBridgeDelegate?.dismiss(screen: .psiCash)
+                    environment.objcBridgeDelegate?.dismiss(screen: .psiCash, completion: nil)
                 }
             ]
             
@@ -209,9 +209,10 @@ func psiCashReducer<T: TunnelProviderManager>(
         
     case .connectToPsiphonTapped:
         return [
-            environment.vpnActionStore(.tunnelStateIntent(.start(transition: .none))).mapNever(),
-            .fireAndForget {
-                environment.objcBridgeDelegate?.dismiss(screen: .psiCash)
+            .fireAndForget { [unowned objcBridgeDelegate = environment.objcBridgeDelegate] in
+                objcBridgeDelegate?.dismiss(screen: .psiCash, completion: {
+                    objcBridgeDelegate?.startStopVPNWithInterstitial()
+                })
             }
         ]
     }
