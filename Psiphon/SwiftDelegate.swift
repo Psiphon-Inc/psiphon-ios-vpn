@@ -367,7 +367,7 @@ extension SwiftDelegate: SwiftBridgeDelegate {
         }
     }
     
-    @objc func swithVPNStartStopIntent()
+    @objc func switchVPNStartStopIntent()
         -> Promise<SwitchedVPNStartStopIntent>.ObjCPromise<SwitchedVPNStartStopIntent>
     {
         let promise = Promise<SwitchedVPNStartStopIntent>.pending()
