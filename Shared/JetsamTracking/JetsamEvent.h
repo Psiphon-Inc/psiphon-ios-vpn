@@ -18,11 +18,12 @@
  */
 
 #import <Foundation/Foundation.h>
+#import "JSONCodable.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 /// Represents a jetsam event in the extension.
-@interface JetsamEvent : NSObject <NSCoding, NSSecureCoding> 
+@interface JetsamEvent : NSObject <NSCoding, NSSecureCoding, JSONCodable> 
 
 @property (readonly, nonatomic, strong) NSString *appVersion;
 @property (readonly, nonatomic, assign) NSTimeInterval runningTime;
