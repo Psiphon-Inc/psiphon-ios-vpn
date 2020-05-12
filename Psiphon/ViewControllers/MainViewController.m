@@ -65,13 +65,6 @@ NSTimeInterval const MaxAdLoadingTime = 1.f;
 NSTimeInterval const MaxAdLoadingTime = 10.f;
 #endif
 
-typedef NS_ENUM(NSInteger, VPNIntent) {
-    VPNIntentStartPsiphonTunnelWithoutAds,
-    VPNIntentStartPsiphonTunnelWithAds,
-    VPNIntentStopVPN,
-    VPNIntentNoInternetAlert,
-};
-
 @interface MainViewController ()
 
 @property (nonatomic) RACCompoundDisposable *compoundDisposable;
@@ -82,9 +75,6 @@ typedef NS_ENUM(NSInteger, VPNIntent) {
 @end
 
 @implementation MainViewController {
-    // Flags
-    BOOL pendingStartStopSignalCompletion;
-    
     // Models
     AvailableServerRegions *availableServerRegions;
 
@@ -311,7 +301,7 @@ typedef NS_ENUM(NSInteger, VPNIntent) {
     // Calls startStopVPN if startVPNOnFirstLoad is TRUE.
     {
         if (self.startVPNOnFirstLoad == TRUE) {
-            [self startStopVPN];
+            [AppDelegate.sharedAppDelegate startStopVPNWithAd:FALSE];
         }
     }
     
@@ -429,107 +419,10 @@ typedef NS_ENUM(NSInteger, VPNIntent) {
     }];
 }
 
-// Emitted NSNumber is of type VPNIntent.
-- (RACSignal<RACTwoTuple<NSNumber*, SwitchedVPNStartStopIntent*> *> *)startOrStopVPNSignalWithAd:(BOOL)showAd {
-    MainViewController *__weak weakSelf = self;
-    return [[[[RACSignal createSignal:^RACDisposable *(id <RACSubscriber> subscriber) {
-        [[SwiftDelegate.bridge swithVPNStartStopIntent]
-         then:^id _Nullable(SwitchedVPNStartStopIntent * newIntent) {
-            if (newIntent == nil) {
-                [NSException raise:@"nil found"
-                            format:@"expected non-nil SwitchedVPNStartStopIntent value"];
-            }
-            
-            VPNIntent vpnIntentValue;
-            
-            if (newIntent.intendToStart) {
-                // If the new intent is to start the VPN, first checks for internet connectivity.
-                // If there is internet connectivity, tunnel can be startet without ads
-                // if the user is subscribed, if if there the VPN config is not installed.
-                // Otherwise tunnel should be started after interstitial ad has been displayed.
-                
-                Reachability *reachability = [Reachability reachabilityForInternetConnection];
-                if ([reachability currentReachabilityStatus] == NotReachable) {
-                    vpnIntentValue = VPNIntentNoInternetAlert;
-                } else {
-                    if (newIntent.vpnConfigInstalled) {
-                        if (newIntent.userSubscribed || !showAd) {
-                            vpnIntentValue = VPNIntentStartPsiphonTunnelWithoutAds;
-                        } else {
-                            vpnIntentValue = VPNIntentStartPsiphonTunnelWithAds;
-                        }
-                    } else {
-                        // VPN Config is not installed. Skip ads.
-                        vpnIntentValue = VPNIntentStartPsiphonTunnelWithoutAds;
-                    }
-                }
-            } else {
-                // The new intent is to stop the VPN.
-                vpnIntentValue = VPNIntentStopVPN;
-            }
-            
-            [subscriber sendNext:[RACTwoTuple pack:@(vpnIntentValue) :newIntent]];
-            [subscriber sendCompleted];
-            return nil;
-        }];
-        
-        return nil;
-    }] flattenMap:^RACSignal<RACTwoTuple *> *(RACTwoTuple<NSNumber*, SwitchedVPNStartStopIntent*> *value) {
-        VPNIntent vpnIntent = (VPNIntent)[value.first integerValue];
-        if (vpnIntent == VPNIntentStartPsiphonTunnelWithAds) {
-            // Start tunnel after ad presentation signal completes.
-            // We always want to start the tunnel after the presentation signal
-            // is completed, no matter if it presented an ad or it failed.
-            return [[weakSelf.adManager presentInterstitialOnViewController:weakSelf]
-                    then:^RACSignal * {
-                return [RACSignal return:value];
-            }];
-        } else {
-            return [RACSignal return:value];
-        }
-    }] doNext:^(RACTwoTuple<NSNumber*, SwitchedVPNStartStopIntent*> *value) {
-        VPNIntent vpnIntent = (VPNIntent)[value.first integerValue];
-        dispatch_async_main(^{
-            [SwiftDelegate.bridge sendNewVPNIntent:value.second];
-
-            if (vpnIntent == VPNIntentNoInternetAlert) {
-                // TODO: Show the no internet alert.
-            }
-        });
-    }] deliverOnMainThread];
-}
-
 #pragma mark - UI callbacks
 
 - (void)onStartStopTap:(UIButton *)sender {
-    [self startStopVPN];
-}
-
-- (void)startStopVPN {
-    MainViewController *__weak weakSelf = self;
-    
-    if (pendingStartStopSignalCompletion == TRUE) {
-        return;
-    }
-    pendingStartStopSignalCompletion = TRUE;
-
-    __block RACDisposable *disposable = [[self startOrStopVPNSignalWithAd:TRUE]
-      subscribeError:^(NSError *error) {
-        [weakSelf.compoundDisposable removeDisposable:disposable];
-      }
-      completed:^{
-        if (NSThread.isMainThread != TRUE) {
-            [NSException raise:@"MainThreadCheck"
-                        format:@"Expected callback on main-thread"];
-        }
-        MainViewController *__strong strongSelf = weakSelf;
-        if (strongSelf != nil) {
-            [strongSelf.compoundDisposable removeDisposable:disposable];
-            strongSelf->pendingStartStopSignalCompletion = FALSE;
-        }
-      }];
-
-    [self.compoundDisposable addDisposable:disposable];
+    [AppDelegate.sharedAppDelegate startStopVPNWithAd:TRUE];
 }
 
 - (void)onSettingsButtonTap:(UIButton *)sender {

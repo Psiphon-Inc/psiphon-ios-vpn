@@ -31,6 +31,9 @@ import Promises
 /// ObjC-Swift interface. Functionality implemented in ObjC and called from Swift.
 /// All Delegate functions are called on the main thread.
 @objc protocol ObjCBridgeDelegate {
+    
+    @objc func startStopVPNWithInterstitial()
+    
     @objc func onPsiCashBalanceUpdate(_ balance: BridgedBalanceViewBindingType)
 
     /// Called with latest active Speed Boost expiry time.
@@ -46,7 +49,7 @@ import Promises
     
     @objc func onVPNStateSyncError(_ userErrorMessage: String)
 
-    @objc func dismiss(screen: DismissableScreen)
+    @objc func dismiss(screen: DismissibleScreen, completion: (() -> Void)?)
 
     @objc func presentUntunneledRewardedVideoAd(customData: CustomData,
                                                 delegate: RewardedVideoAdBridgeDelegate)

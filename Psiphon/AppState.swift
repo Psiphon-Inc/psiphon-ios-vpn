@@ -65,7 +65,7 @@ struct DebugFlags {
 }
 
 /// Represents UIViewController's that can be dismissed.
-@objc enum DismissableScreen: Int {
+@objc enum DismissibleScreen: Int {
     case psiCash
 }
 
