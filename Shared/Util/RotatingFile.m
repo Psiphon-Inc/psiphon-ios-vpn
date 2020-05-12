@@ -24,7 +24,7 @@
 
 NSErrorDomain _Nonnull const RotatingFileErrorDomain = @"RotatingFileErrorDomain";
 
-typedef NS_ERROR_ENUM(RunningStatErrorDomain, RunningStatErrorCode) {
+typedef NS_ERROR_ENUM(RotatingFileErrorDomain, RotatingFileErrorCode) {
     RotatingFileErrorCreateFileFailed = 1,
     RotatingFileErrorRemoveFileFailed = 2,
     RotatingFileErrorWriteFileFailed = 3,
