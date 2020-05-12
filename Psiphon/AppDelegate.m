@@ -181,7 +181,7 @@ typedef NS_ENUM(NSInteger, VPNIntent) {
 - (RACSignal<RACTwoTuple<NSNumber*, SwitchedVPNStartStopIntent*> *> *)startOrStopVPNSignalWithAd:(BOOL)showAd {
     
     return [[[[RACSignal createSignal:^RACDisposable *(id <RACSubscriber> subscriber) {
-        [[SwiftDelegate.bridge swithVPNStartStopIntent]
+        [[SwiftDelegate.bridge switchVPNStartStopIntent]
          then:^id _Nullable(SwitchedVPNStartStopIntent * newIntent) {
             if (newIntent == nil) {
                 [NSException raise:@"nil found"
@@ -192,7 +192,7 @@ typedef NS_ENUM(NSInteger, VPNIntent) {
             
             if (newIntent.intendToStart) {
                 // If the new intent is to start the VPN, first checks for internet connectivity.
-                // If there is internet connectivity, tunnel can be startet without ads
+                // If there is internet connectivity, tunnel can be started without ads
                 // if the user is subscribed, if if there the VPN config is not installed.
                 // Otherwise tunnel should be started after interstitial ad has been displayed.
                 
