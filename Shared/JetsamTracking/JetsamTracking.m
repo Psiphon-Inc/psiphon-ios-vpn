@@ -18,7 +18,6 @@
  */
 
 #import "JetsamTracking.h"
-#import "Archiver.h"
 #import "ExtensionContainerFile.h"
 #import "NSError+Convenience.h"
 
@@ -82,7 +81,9 @@ NSErrorDomain _Nonnull const ContainerJetsamTrackingErrorDomain = @"ContainerJet
             return nil;
         }
 
-        JetsamEvent *event = [Archiver unarchiveObjectWithData:data error:&err];
+        JetsamEvent *event = [JSONCodable jsonCodableDecodeObjectofClass:[JetsamEvent class]
+                                                                    data:data
+                                                                   error:&err];
         if (err != nil) {
             *outError = [NSError errorWithDomain:ContainerJetsamTrackingErrorDomain
                                             code:ContainerJetsamTrackingErrorUnarchivingDataFailed
@@ -127,7 +128,7 @@ NSErrorDomain _Nonnull const ExtensionJetsamTrackingErrorDomain = @"ExtensionJet
         return;
     }
 
-    NSData *encodedData = [Archiver archiveObject:jetsamEvent error:&err];
+    NSData *encodedData = [JSONCodable jsonCodableEncodeObject:jetsamEvent error:&err];
     if (err != nil) {
         *outError = [NSError errorWithDomain:ExtensionJetsamTrackingErrorDomain
                                         code:ExtensionJetsamTrackingErrorArchiveDataFailed
