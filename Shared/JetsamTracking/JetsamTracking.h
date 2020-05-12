@@ -41,6 +41,7 @@ typedef NS_ERROR_ENUM(ContainerJetsamTrackingErrorDomain, ContainerJetsamTrackin
     ContainerJetsamTrackingErrorReadingDataFailed = 2,
     ContainerJetsamTrackingErrorDecodingDataFailed = 3,
     ContainerJetsamTrackingErrorUnarchivingDataFailed = 4,
+    ContainerJetsamTrackingErrorPersistingRegistryFailed = 5,
 };
 
 

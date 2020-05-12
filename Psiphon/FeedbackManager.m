@@ -130,7 +130,7 @@ PsiFeedbackLogType const FeedbackUploadLogType = @"FeedbackUpload";
     [self uploadInFlight];
     // Ensure psiphon data is populated with latest logs
     // TODO: should this be a delegate method of Psiphon Data in shared library
-    
+
     __weak FeedbackManager *weakSelf = self;
     
     // Adds AppState
@@ -168,6 +168,9 @@ PsiFeedbackLogType const FeedbackUploadLogType = @"FeedbackUpload";
                 [BinRange binRangeWithRange:MakeCBinRange(6*60*60.00, DBL_MAX)]
             ];
 
+            // TODO: if PsiphonTunnel:SendFeedback: supports a completion callback in the future,
+            // then the registry used by ContainerJetsamTracking should only be persisted once the
+            // feedback has been successfully uploaded.
             NSError *err;
             JetsamMetrics *metrics = [ContainerJetsamTracking getMetricsFromFilePath:[sharedDB extensionJetsamMetricsFilePath]
                                                                  withRotatedFilepath:[sharedDB extensionJetsamMetricsRotatedFilePath]

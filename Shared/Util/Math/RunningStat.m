@@ -189,7 +189,7 @@ NSErrorDomain _Nonnull const RunningStatErrorDomain = @"RunningStatErrorDomain";
     RunningMinMax *minMax = [coder decodeObjectOfClass:[RunningMinMax class]
                                                 forKey:RunningStatMinMaxCoderKey];
     RunningStdev *rStdev = [coder decodeObjectOfClass:[RunningStdev class]
-                                              forKey:RunningStatStdevCoderKey];
+                                               forKey:RunningStatStdevCoderKey];
     RunningBins *bins = [coder decodeObjectOfClass:[RunningBins class]
                                             forKey:RunningStatBinsCoderKey];
 
