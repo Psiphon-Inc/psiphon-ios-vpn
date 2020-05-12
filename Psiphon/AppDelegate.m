@@ -29,7 +29,6 @@
 #import "EmbeddedServerEntries.h"
 #import "IAPViewController.h"
 #import "Logging.h"
-#import "MPInterstitialAdController.h"
 #import "Notifier.h"
 #import "PsiphonClientCommonLibraryHelpers.h"
 #import "PsiphonConfigReader.h"
@@ -55,6 +54,7 @@
 #import "AppUpgrade.h"
 #import "AppEvent.h"
 #import "AppObservables.h"
+#import <PsiphonTunnel/PsiphonTunnel.h>
 
 PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
 PsiFeedbackLogType const RewardedVideoLogType = @"RewardedVideo";
@@ -69,6 +69,7 @@ PsiFeedbackLogType const RewardedVideoLogType = @"RewardedVideo";
 @end
 
 @implementation AppDelegate {
+    BOOL pendingStartStopSignalCompletion;
     RootContainerController *rootContainerController;
     RACDisposable *_Nullable rewardedVideoAdDisposable;
 }
@@ -76,6 +77,7 @@ PsiFeedbackLogType const RewardedVideoLogType = @"RewardedVideo";
 - (instancetype)init {
     self = [super init];
     if (self) {
+        pendingStartStopSignalCompletion = FALSE;
         _sharedDB = [[PsiphonDataSharedDB alloc] initForAppGroupIdentifier:APP_GROUP_IDENTIFIER];
         _compoundDisposable = [RACCompoundDisposable compoundDisposable];
     }
@@ -166,6 +168,113 @@ willFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     [SwiftDelegate.bridge applicationWillTerminate:application];
 }
 
+#pragma mark - VPN start stop
+
+typedef NS_ENUM(NSInteger, VPNIntent) {
+    VPNIntentStartPsiphonTunnelWithoutAds,
+    VPNIntentStartPsiphonTunnelWithAds,
+    VPNIntentStopVPN,
+    VPNIntentNoInternetAlert,
+};
+
+// Emitted NSNumber is of type VPNIntent.
+- (RACSignal<RACTwoTuple<NSNumber*, SwitchedVPNStartStopIntent*> *> *)startOrStopVPNSignalWithAd:(BOOL)showAd {
+    
+    return [[[[RACSignal createSignal:^RACDisposable *(id <RACSubscriber> subscriber) {
+        [[SwiftDelegate.bridge switchVPNStartStopIntent]
+         then:^id _Nullable(SwitchedVPNStartStopIntent * newIntent) {
+            if (newIntent == nil) {
+                [NSException raise:@"nil found"
+                            format:@"expected non-nil SwitchedVPNStartStopIntent value"];
+            }
+            
+            VPNIntent vpnIntentValue;
+            
+            if (newIntent.intendToStart) {
+                // If the new intent is to start the VPN, first checks for internet connectivity.
+                // If there is internet connectivity, tunnel can be started without ads
+                // if the user is subscribed, if if there the VPN config is not installed.
+                // Otherwise tunnel should be started after interstitial ad has been displayed.
+                
+                Reachability *reachability = [Reachability reachabilityForInternetConnection];
+                if ([reachability currentReachabilityStatus] == NotReachable) {
+                    vpnIntentValue = VPNIntentNoInternetAlert;
+                } else {
+                    if (newIntent.vpnConfigInstalled) {
+                        if (newIntent.userSubscribed || !showAd) {
+                            vpnIntentValue = VPNIntentStartPsiphonTunnelWithoutAds;
+                        } else {
+                            vpnIntentValue = VPNIntentStartPsiphonTunnelWithAds;
+                        }
+                    } else {
+                        // VPN Config is not installed. Skip ads.
+                        vpnIntentValue = VPNIntentStartPsiphonTunnelWithoutAds;
+                    }
+                }
+            } else {
+                // The new intent is to stop the VPN.
+                vpnIntentValue = VPNIntentStopVPN;
+            }
+            
+            [subscriber sendNext:[RACTwoTuple pack:@(vpnIntentValue) :newIntent]];
+            [subscriber sendCompleted];
+            return nil;
+        }];
+        
+        return nil;
+    }] flattenMap:^RACSignal<RACTwoTuple *> *(RACTwoTuple<NSNumber*, SwitchedVPNStartStopIntent*> *value) {
+        VPNIntent vpnIntent = (VPNIntent)[value.first integerValue];
+        if (vpnIntent == VPNIntentStartPsiphonTunnelWithAds) {
+            // Start tunnel after ad presentation signal completes.
+            // We always want to start the tunnel after the presentation signal
+            // is completed, no matter if it presented an ad or it failed.
+            return [[AdManager.sharedInstance
+                     presentInterstitialOnViewController:[AppDelegate getTopMostViewController]]
+                    then:^RACSignal * {
+                return [RACSignal return:value];
+            }];
+        } else {
+            return [RACSignal return:value];
+        }
+    }] doNext:^(RACTwoTuple<NSNumber*, SwitchedVPNStartStopIntent*> *value) {
+        VPNIntent vpnIntent = (VPNIntent)[value.first integerValue];
+        dispatch_async_main(^{
+            [SwiftDelegate.bridge sendNewVPNIntent:value.second];
+
+            if (vpnIntent == VPNIntentNoInternetAlert) {
+                // TODO: Show the no internet alert.
+            }
+        });
+    }] deliverOnMainThread];
+}
+
+- (void)startStopVPNWithAd:(BOOL)showAd {
+    AppDelegate *__weak weakSelf = self;
+    
+    if (pendingStartStopSignalCompletion == TRUE) {
+        return;
+    }
+    pendingStartStopSignalCompletion = TRUE;
+
+    __block RACDisposable *disposable = [[self startOrStopVPNSignalWithAd:showAd]
+      subscribeError:^(NSError *error) {
+        [weakSelf.compoundDisposable removeDisposable:disposable];
+      }
+      completed:^{
+        if (NSThread.isMainThread != TRUE) {
+            [NSException raise:@"MainThreadCheck"
+                        format:@"Expected callback on main-thread"];
+        }
+        AppDelegate *__strong strongSelf = weakSelf;
+        if (strongSelf != nil) {
+            [strongSelf.compoundDisposable removeDisposable:disposable];
+            strongSelf->pendingStartStopSignalCompletion = FALSE;
+        }
+      }];
+
+    [self.compoundDisposable addDisposable:disposable];
+}
+
 #pragma mark -
 
 - (void)reloadMainViewControllerAndImmediatelyOpenSettings {
@@ -236,22 +345,26 @@ willFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
 
 @interface UIViewController (DimissViewController)
 // Helper function for dismissing a ViewController in the hierarchy.
-- (void)dismissViewControllerType:(Class)viewControllerClass;
+- (void)dismissViewControllerType:(Class)viewControllerClass
+                       completion:(void (^ _Nullable)(void))completion;
 @end
 
 @implementation UIViewController (DismissViewController)
 
-- (void)dismissViewControllerType:(Class)viewControllerClass {
+- (void)dismissViewControllerType:(Class)viewControllerClass
+                       completion:(void (^ _Nullable)(void))completion
+{
     if ([self isKindOfClass:viewControllerClass]) {
-        [self dismissViewControllerAnimated:true completion:nil];
+        [self dismissViewControllerAnimated:true completion:completion];
         return;
     }
 
     for (UIViewController *childVC in self.childViewControllers) {
-        [childVC dismissViewControllerType:viewControllerClass];
+        [childVC dismissViewControllerType:viewControllerClass completion:completion];
     }
 
-    [self.presentedViewController dismissViewControllerType:viewControllerClass];
+    [self.presentedViewController dismissViewControllerType:viewControllerClass
+                                                 completion:completion];
 }
 
 @end
@@ -260,6 +373,10 @@ willFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
 @end
 
 @implementation AppDelegate (SwiftExtensions)
+
+- (void)startStopVPNWithInterstitial {
+    [self startStopVPNWithAd:TRUE];
+}
 
 - (void)onPsiCashBalanceUpdate:(BridgedBalanceViewBindingType *)balance {
     [AppObservables.shared.psiCashBalance sendNext:balance];
@@ -302,16 +419,19 @@ willFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     [AppObservables.shared.vpnStartStopStatus sendNext:@(status)];
 }
 
-- (void)dismissWithScreen:(enum DismissableScreen)screen {
+- (void)dismissWithScreen:(enum DismissibleScreen)screen
+               completion:(void (^ _Nullable)(void))completion
+{
     switch (screen) {
-        case DismissableScreenPsiCash:
-            [self.window.rootViewController dismissViewControllerType:PsiCashViewController.class];
+        case DismissibleScreenPsiCash:
+            [self.window.rootViewController dismissViewControllerType:PsiCashViewController.class
+                                                           completion:completion];
             break;
     }
 }
 
-- (void)presentRewardedVideoAdWithCustomData:(NSString *)customData
-                                    delegate:(id<RewardedVideoAdBridgeDelegate>)delegate {
+- (void)presentUntunneledRewardedVideoAdWithCustomData:(NSString *)customData
+                                              delegate:(id<RewardedVideoAdBridgeDelegate>)delegate {
     // No-op if there's an active subscription for displaying rewarded videos.
     if (self->rewardedVideoAdDisposable) {
         return;

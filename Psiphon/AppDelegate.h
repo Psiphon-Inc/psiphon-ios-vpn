@@ -32,6 +32,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)reloadOnboardingViewController;
 
+- (void)startStopVPNWithAd:(BOOL)showAd;
+
 + (UIViewController *)getTopMostViewController;
 
 @end
