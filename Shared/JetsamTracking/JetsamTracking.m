@@ -75,9 +75,9 @@ NSErrorDomain _Nonnull const ContainerJetsamTrackingErrorDomain = @"ContainerJet
         NSData *data = [[NSData alloc] initWithBase64EncodedData:[line dataUsingEncoding:NSUTF8StringEncoding]
                                                          options:kNilOptions];
         if (data == nil) {
-             *outError = [NSError errorWithDomain:ContainerJetsamTrackingErrorDomain
-                                             code:ContainerJetsamTrackingErrorDecodingDataFailed
-                          andLocalizedDescription:@"data is nil"];
+            *outError = [NSError errorWithDomain:ContainerJetsamTrackingErrorDomain
+                                            code:ContainerJetsamTrackingErrorDecodingDataFailed
+                         andLocalizedDescription:@"data is nil"];
             return nil;
         }
 

@@ -18,7 +18,7 @@
  */
 
 #include "stats.h"
-#import <math.h>
+#include <math.h>
 
 // Proposal: in the future return NAN if vals is
 // NULL or zero length.

@@ -77,14 +77,18 @@ NSErrorDomain _Nonnull const JetsamMetrics_FeedbackErrorDomain = @"JetsamMetrics
     for (NSString *key in [self.perVersionMetrics allKeys]) {
         RunningStat *stat = [self.perVersionMetrics objectForKey:key];
         if (stat != nil) {
+            // Round to zero decimal places.
             NSMutableDictionary *perVersionStat =
               [NSMutableDictionary
                dictionaryWithDictionary:@{@"count": @(stat.count),
-                                          @"min": @([stat min]),
-                                          @"max": @([stat max]),
-                                          @"mean": @([stat stdev]),
-                                          @"stdev": @([stat stdev]),
-                                          @"var": @([stat variance])}];
+                                          @"min": @((int)round([stat min])),
+                                          @"max": @((int)round([stat max])),
+                                          @"mean": @((int)round([stat mean]))}];
+
+            if (stat.count > 1) {
+                [perVersionStat setObject:@((int)round([stat stdev])) forKey:@"stdev"];
+                [perVersionStat setObject:@((int)round([stat variance])) forKey:@"var"];
+            }
 
             NSArray<Bin*> *talliedBins = [stat talliedBins];
             if (talliedBins != nil) {
@@ -92,9 +96,16 @@ NSErrorDomain _Nonnull const JetsamMetrics_FeedbackErrorDomain = @"JetsamMetrics
                                                              initWithCapacity:[talliedBins count]];
                 // Add each bin
                 for (Bin *bin in talliedBins) {
-                    NSDictionary *binMetric = @{@"lower_bound": @(bin.range.lowerBound),
-                                                   @"upper_bound": @(bin.range.upperBound),
-                                                   @"count": @(bin.count)};
+                    NSMutableDictionary *binMetric = [NSMutableDictionary dictionaryWithDictionary:@{@"count": @(bin.count)}];
+
+                    // Omit bound if it is the absolute max or min.
+                    if (bin.range.lowerBound != -DBL_MAX) {
+                        [binMetric setObject:@(bin.range.lowerBound) forKey:@"lower_bound"];
+                    }
+                    if (bin.range.upperBound != DBL_MAX) {
+                        [binMetric setObject:@(bin.range.upperBound) forKey:@"upper_bound"];
+                    }
+
                     [binMetrics addObject:binMetric];
                 }
                 [perVersionStat setObject:binMetrics forKey:@"bins"];
