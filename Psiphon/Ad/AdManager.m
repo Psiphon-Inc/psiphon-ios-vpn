@@ -200,6 +200,11 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
             
             [AdMobConsent collectConsentForPublisherID:AdMobPublisherID withCompletionHandler:^(NSError * _Nullable error, PACConsentStatus s) {
                 
+                if  (error != nil) {
+                    [subscriber sendError:error];
+                    return;
+                }
+                
                 // Starts Google AdMob SDK.
                 [GADMobileAds.sharedInstance startWithCompletionHandler:
                  ^(GADInitializationStatus * _Nonnull status) {
@@ -230,10 +235,9 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
           }]
           take:1]
           flattenMap:^RACSignal<RACUnit *> *(AppEvent *value) {
-            // Retry 3 time by resubscribing to adSDKInitConsent before giving up for the current AppEvent emission.
-            return [adSDKInitConsent retry:3];
+            return adSDKInitConsent;
           }]
-          retry]   // If still failed after retrying 3 times, retry again by resubscribing to the `appEvents.signal`.
+          retry:3]
           take:1]
           deliverOnMainThread]
           multicast:[RACReplaySubject replaySubjectWithCapacity:1]];

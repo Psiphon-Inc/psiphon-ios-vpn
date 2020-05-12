@@ -373,36 +373,39 @@ typedef NS_ENUM(NSInteger, VPNIntent) {
 #pragma mark - Public properties
 
 - (RACSignal<RACUnit *> *)activeStateLoadingSignal {
-
-    // adsLoadingSignal emits unit type when untunneled interstitial ad has loaded or
-    // when MaxAdLoadingTime has passed.
-    // If the device in not in untunneled state, this signal emits unit type and
-    // then completes immediately, without checking the untunneled interstitial status.
-    RACSignal<RACUnit *> *adsLoadingSignal = [[[AppObservables.shared.vpnStatus zipWith:AdManager.sharedInstance.adSDKStarted]
-      flattenMap:^__kindof RACSignal * _Nullable(RACTwoTuple<NSNumber *, RACUnit *> * _Nullable value) {
-        // At this point Ad SDK has started by emitting RACUnit.
-        VPNStatus s = (VPNStatus) [value.first integerValue];
+    
+    // If MainViewController is started from onboarding, dismisses launch screen.
+    if (self.startVPNOnFirstLoad == TRUE) {
+        return [RACSignal return:RACUnit.defaultUnit];
+    }
+    
+    // unsubscribedAdLoadingSignal if tunneled emits unit value when
+    // untunneled interstitial ad had loaded or when MaxAdLoadingTime has passed,
+    // otherwise, emits unit value immediately.
+    RACSignal<RACUnit *> *unsubscribedAdLoadingSignal = [[[AppObservables.shared.vpnStatus
+      map:^RACSignal * _Nullable(NSNumber * _Nullable value) {
+        VPNStatus s = (VPNStatus) value.integerValue;
         
         if (s == VPNStatusDisconnected || s == VPNStatusInvalid) {
             
-            // Device is untunneled and ad consent is given or not needed,
-            // we therefore wait for the ad to load.
-            return [[[[[AdManager sharedInstance].untunneledInterstitialLoadStatus
-              filter:^BOOL(NSNumber *loadStatus) {
-                  AdLoadStatus status = (AdLoadStatus) [loadStatus integerValue];
-                  return status == AdLoadStatusDone;
-              }]
-              merge:[RACSignal timer:MaxAdLoadingTime]]
-              take:1]
-              mapReplace:RACUnit.defaultUnit];
+            
+            return [[[[AdManager.sharedInstance.adSDKStarted
+                       flattenMap:^__kindof RACSignal * _Nullable(RACUnit * _Nullable value) {
+                
+                // Ad SDK has loaded and consent collected.
+                return [AdManager.sharedInstance.untunneledInterstitialLoadStatus
+                        filter:^BOOL(NSNumber *loadStatus) {
+                    AdLoadStatus status = (AdLoadStatus) [loadStatus integerValue];
+                    return status == AdLoadStatusDone;
+                }];
+            }] merge:[RACSignal timer:MaxAdLoadingTime]]
+                     take:1]
+                    mapReplace:RACUnit.defaultUnit];
             
         } else {
-            // Device in _not_ untunneled or we need to show the Ad consent modal screen,
-            // we will emit RACUnit immediately since no ads will be loaded here.
             return [RACSignal return:RACUnit.defaultUnit];
         }
-        
-    }] take:1];
+    }] switchToLatest] take:1];
 
     // subscriptionLoadingSignal emits a value when the user subscription status becomes known.
     RACSignal *subscriptionLoadingSignal = [[AppObservables.shared.subscriptionStatus
@@ -421,7 +424,7 @@ typedef NS_ENUM(NSInteger, VPNIntent) {
             return [RACSignal return:RACUnit.defaultUnit];
         } else {
             // User is not subscribed, wait for the adsLoadingSignal.
-            return adsLoadingSignal;
+            return unsubscribedAdLoadingSignal;
         }
     }];
 }
