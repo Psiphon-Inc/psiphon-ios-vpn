@@ -19,18 +19,18 @@
 
 #import <Foundation/Foundation.h>
 
-typedef struct _CBucketRange {
+typedef struct _CBinRange {
     double lower_bound; // Inclusive lower bound
     double upper_bound; // Exclusive upper bound
-} CBucketRange;
+} CBinRange;
 
-/// Make a bucket range.
+/// Make a bin with a target range.
 /// @param lower_bound Inclusive lower bound.
 /// @param upper_bound Exclusive upper bound.
-NS_INLINE CBucketRange MakeCBucketRange(double lower_bound,
+NS_INLINE CBinRange MakeCBinRange(double lower_bound,
                                         double upper_bound) {
     assert(lower_bound <= upper_bound);
-    CBucketRange r;
+    CBinRange r;
     r.lower_bound = lower_bound;
     r.upper_bound = upper_bound;
 
@@ -39,10 +39,10 @@ NS_INLINE CBucketRange MakeCBucketRange(double lower_bound,
 
 NS_ASSUME_NONNULL_BEGIN
 
-/// Obj-C wrapper for CBucketRange
-@interface BucketRange : NSObject <NSCoding, NSSecureCoding>
+/// Obj-C wrapper for CBinRange
+@interface BinRange : NSObject <NSCoding, NSSecureCoding>
 
-+ (instancetype)bucketRangeWithRange:(CBucketRange)range;
++ (instancetype)binRangeWithRange:(CBinRange)range;
 
 /// Inclusive lower bound.
 @property (readonly, nonatomic, assign) double lowerBound;
@@ -50,46 +50,46 @@ NS_ASSUME_NONNULL_BEGIN
 /// Exclusive upper bound.
 @property (readonly, nonatomic, assign) double upperBound;
 
-- (BOOL)isEqualToBucketRange:(BucketRange*)bucketRange;
+- (BOOL)isEqualToBinRange:(BinRange*)binRange;
 
 @end
 
-@interface Bucket : NSObject <NSCoding, NSSecureCoding>
+@interface Bin : NSObject <NSCoding, NSSecureCoding>
 
 @property (readonly, nonatomic, assign) int count;
 
-@property (readonly, nonatomic) BucketRange *range;
+@property (readonly, nonatomic) BinRange *range;
 
-+ (instancetype)bucketWithRange:(BucketRange*)range;
++ (instancetype)binWithRange:(BinRange*)range;
 
 - (instancetype)init NS_UNAVAILABLE;
 
-- (instancetype)initWithRange:(BucketRange*)bucketRange;
+- (instancetype)initWithRange:(BinRange*)binRange;
 
-/// Increment the bucket's count.
+/// Increment the bin's count.
 - (void)incrementCount;
 
-/// Check if value is in the bucket's range.
+/// Check if value is in the bin's range.
 /// @param x Value to check.
-/// @return Returns true if the value falls within the range [bucket.range.lowerBound, bucket.range.upperBound).
+/// @return Returns true if the value falls within the range [bin.range.lowerBound, bin.range.upperBound).
 - (BOOL)valueInRange:(double)x;
 
-- (BOOL)isEqualToBucket:(Bucket*)bucket;
+- (BOOL)isEqualToBin:(Bin*)bin;
 
 @end
 
-@interface RunningBuckets : NSObject <NSCoding, NSSecureCoding>
+@interface RunningBins : NSObject <NSCoding, NSSecureCoding>
 
 @property (readonly, nonatomic, assign) int count;
 
-@property (readonly, strong, nonatomic) NSArray<Bucket*> *buckets;
+@property (readonly, strong, nonatomic) NSArray<Bin*> *bins;
 
 - (instancetype)init NS_UNAVAILABLE;
-- (instancetype)initWithBucketRanges:(NSArray<BucketRange*>*)bucketRanges;
+- (instancetype)initWithBinRanges:(NSArray<BinRange*>*)binRanges;
 
 - (void)addValue:(double)x;
 
-- (BOOL)isEqualToRunningBuckets:(RunningBuckets*)buckets;
+- (BOOL)isEqualToRunningBins:(RunningBins*)bins;
 
 @end
 

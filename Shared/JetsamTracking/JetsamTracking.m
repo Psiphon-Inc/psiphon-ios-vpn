@@ -32,7 +32,7 @@ NSErrorDomain _Nonnull const ContainerJetsamTrackingErrorDomain = @"ContainerJet
                      withRotatedFilepath:(NSString*)rotatedFilepath
                         registryFilepath:(NSString*)registryFilepath
                            readChunkSize:(NSUInteger)readChunkSize
-                            bucketRanges:(NSArray<BucketRange*>*_Nullable)bucketRanges
+                               binRanges:(NSArray<BinRange*>*_Nullable)binRanges
                                    error:(NSError * _Nullable *)outError {
 
     *outError = nil;
@@ -51,7 +51,7 @@ NSErrorDomain _Nonnull const ContainerJetsamTrackingErrorDomain = @"ContainerJet
         return nil;
     }
 
-    JetsamMetrics *metrics = [[JetsamMetrics alloc] initWithBucketRanges:bucketRanges];
+    JetsamMetrics *metrics = [[JetsamMetrics alloc] initWithBinRanges:binRanges];
 
     while (true) {
         NSString *line = [cont readLineWithError:&err];
