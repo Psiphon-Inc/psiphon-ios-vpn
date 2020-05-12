@@ -103,9 +103,6 @@ PsiFeedbackLogType const AdMobInterstitialAdControllerWrapperLogType = @"AdMobIn
 
             GADRequest *request = [AdMobConsent createGADRequestWithUserConsentStatus];
 
-#if DEBUG
-            request.testDevices = @[ @"4a907b319b37ceee4d9970dbb0231ef0" ];
-#endif
             [weakSelf.interstitial loadRequest:request];
 
         } else if (weakSelf.interstitial.isReady) {

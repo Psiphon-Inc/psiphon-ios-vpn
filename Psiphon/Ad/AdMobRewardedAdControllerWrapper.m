@@ -26,14 +26,13 @@
 #import "Nullity.h"
 #import "NSError+Convenience.h"
 #import "Asserts.h"
-#import <GoogleMobileAds/GADRewardBasedVideoAdDelegate.h>
 #import "AdMobConsent.h"
 #import "RelaySubject.h"
 #import "Psiphon-Swift.h"
 
 PsiFeedbackLogType const AdMobRewardedAdControllerWrapperLogType = @"AdMobRewardedAdControllerWrapper";
 
-@interface AdMobRewardedAdControllerWrapper () <GADRewardBasedVideoAdDelegate>
+@interface AdMobRewardedAdControllerWrapper () <GADRewardedAdDelegate>
 
 @property (nonatomic, readwrite, nonnull) BehaviorRelay<NSNumber *> *adLoadStatus;
 
@@ -50,6 +49,8 @@ PsiFeedbackLogType const AdMobRewardedAdControllerWrapperLogType = @"AdMobReward
 
 @property (nonatomic, readonly) NSString *adUnitID;
 
+@property (nonatomic, readwrite, nullable) GADRewardedAd* rewardedAd;
+
 @end
 
 @implementation AdMobRewardedAdControllerWrapper
@@ -63,6 +64,7 @@ PsiFeedbackLogType const AdMobRewardedAdControllerWrapperLogType = @"AdMobReward
     _adLoadStatus = [BehaviorRelay behaviorSubjectWithDefaultValue:@(AdLoadStatusNone)];
     _presentedAdDismissed = [RACSubject subject];
     _presentationStatus = [RACSubject subject];
+    _rewardedAd = nil;
     return self;
 }
 
@@ -79,6 +81,12 @@ PsiFeedbackLogType const AdMobRewardedAdControllerWrapperLogType = @"AdMobReward
         RACCompoundDisposable *compoundDisposable = [[RACCompoundDisposable alloc] init];
 
         [SwiftDelegate.bridge getCustomRewardData:^(NSString * _Nullable customData) {
+            
+            AdMobRewardedAdControllerWrapper *__strong strongSelf = weakSelf;
+            if (strongSelf == nil) {
+                return;
+            }
+            
             if ([Nullity isEmpty:customData]) {
                 NSError *e = [NSError errorWithDomain:AdControllerWrapperErrorDomain
                                                  code:AdControllerWrapperErrorCustomDataNotSet];
@@ -90,26 +98,38 @@ PsiFeedbackLogType const AdMobRewardedAdControllerWrapperLogType = @"AdMobReward
             // race-condition with ad"adDidLoad" delegate callback.
             [compoundDisposable addDisposable:[weakSelf.loadStatusRelay subscribe:subscriber]];
 
-            GADRewardBasedVideoAd *videoAd = [GADRewardBasedVideoAd sharedInstance];
-            if (!videoAd.delegate) {
-                videoAd.delegate = weakSelf;
-            }
-
             // Create ad request only if one is not ready.
-            if (videoAd.isReady) {
-                // Manually call the delegate method to re-execute the logic
-                // for when an ad is loaded.
-                [weakSelf rewardBasedVideoAdDidReceiveAd:videoAd];
+            if (strongSelf.rewardedAd != nil && strongSelf.rewardedAd.isReady) {
+                [strongSelf handleAdLoadedSuccessfully];
 
             } else {
                 [self.adLoadStatus accept:@(AdLoadStatusInProgress)];
-
+                
+                strongSelf.rewardedAd = [[GADRewardedAd alloc]
+                                         initWithAdUnitID:strongSelf.adUnitID];
+                
                 GADRequest *request = [AdMobConsent createGADRequestWithUserConsentStatus];
-#if DEBUG
-                request.testDevices = @[@"4a907b319b37ceee4d9970dbb0231ef0"];
-#endif
-                [videoAd setCustomRewardString:customData];
-                [videoAd loadRequest:request withAdUnitID:self.adUnitID];
+                [strongSelf.rewardedAd loadRequest:request completionHandler:^(GADRequestError * _Nullable error) {
+                    AdMobRewardedAdControllerWrapper *__strong strongSelf = weakSelf;
+                    if (strongSelf == nil) {
+                        return;
+                    }
+                    
+                    if (error == nil) {
+                        // Ad loaded successfully.
+                        [strongSelf handleAdLoadedSuccessfully];
+                        
+                    } else {
+                        // Ad failed to load.
+                        [strongSelf.adLoadStatus accept:@(AdLoadStatusError)];
+                        NSError *e = [NSError errorWithDomain:AdControllerWrapperErrorDomain
+                                                         code:AdControllerWrapperErrorAdFailedToLoad
+                                          withUnderlyingError:error];
+                        [strongSelf.loadStatusRelay accept:[RACTwoTuple pack:self.tag :e]];
+                    }
+                    
+                    
+                }];
             }
         }];
 
@@ -136,17 +156,22 @@ PsiFeedbackLogType const AdMobRewardedAdControllerWrapperLogType = @"AdMobReward
     AdMobRewardedAdControllerWrapper *__weak weakSelf = self;
 
     return [RACSignal createSignal:^RACDisposable *(id <RACSubscriber> subscriber) {
+        
+        AdMobRewardedAdControllerWrapper *__strong strongSelf = weakSelf;
+        if (strongSelf == nil) {
+            return nil;
+        }
 
-        GADRewardBasedVideoAd *videoAd = [GADRewardBasedVideoAd sharedInstance];
-
-        if (!videoAd.isReady || viewController.beingDismissed) {
+        if (!(strongSelf.rewardedAd != nil && strongSelf.rewardedAd.isReady) ||
+            viewController.beingDismissed
+        ){
             [subscriber sendNext:@(AdPresentationErrorNoAdsLoaded)];
             [subscriber sendCompleted];
             return nil;
         }
 
         // We hav seen cases that shows the ad SDK does not check if the
-        // view controller has been dismissed before presting the ad.
+        // view controller has been dismissed before presenting the ad.
         if (viewController.beingDismissed) {
             [subscriber sendNext:@(AdPresentationErrorFailedToPlay)];
             [subscriber sendCompleted];
@@ -158,51 +183,38 @@ PsiFeedbackLogType const AdMobRewardedAdControllerWrapperLogType = @"AdMobReward
           transformAdPresentationToTerminatingSignal:weakSelf.presentationStatus
                          allowOutOfOrderRewardStatus:TRUE]
           subscribe:subscriber];
-
-        [videoAd presentFromRootViewController:viewController];
+        
+        [strongSelf.rewardedAd presentFromRootViewController:viewController
+                                                    delegate:strongSelf];
 
         return disposable;
     }];
 }
 
-#pragma mark - <GADRewardBasedVideoAdDelegate> status relay
-
-- (void)rewardBasedVideoAd:(GADRewardBasedVideoAd *)rewardBasedVideoAd didRewardUserWithReward:(GADAdReward *)reward {
-    LOG_DEBUG(@"User rewarded for ad unit (%@)", self.adUnitID);
-    [self.presentationStatus sendNext:@(AdPresentationDidRewardUser)];
-}
-
-- (void)rewardBasedVideoAdDidReceiveAd:(GADRewardBasedVideoAd *)rewardBasedVideoAd {
+- (void)handleAdLoadedSuccessfully {
     [self.adLoadStatus accept:@(AdLoadStatusDone)];
     [self.loadStatusRelay accept:[RACTwoTuple pack:self.tag :nil]];
 }
 
-- (void)rewardBasedVideoAd:(GADRewardBasedVideoAd *)rewardBasedVideoAd didFailToLoadWithError:(NSError *)error {
-    [self.adLoadStatus accept:@(AdLoadStatusError)];
+#pragma mark - <GADRewardBasedVideoAdDelegate> status relay
 
-    NSError *e = [NSError errorWithDomain:AdControllerWrapperErrorDomain
-                                     code:AdControllerWrapperErrorAdFailedToLoad
-                      withUnderlyingError:error];
-    [self.loadStatusRelay accept:[RACTwoTuple pack:self.tag :e]];
+- (void)rewardedAd:(GADRewardedAd *)rewardedAd userDidEarnReward:(GADAdReward *)reward {
+    LOG_DEBUG(@"User rewarded for ad unit (%@)", self.adUnitID);
+    [self.presentationStatus sendNext:@(AdPresentationDidRewardUser)];
 }
 
-- (void)rewardBasedVideoAdDidOpen:(GADRewardBasedVideoAd *)rewardBasedVideoAd {
+- (void)rewardedAdDidPresent:(GADRewardedAd *)rewardedAd {
+    [self.adLoadStatus accept:@(AdLoadStatusNone)];
+
     [self.presentationStatus sendNext:@(AdPresentationWillAppear)];
     [self.presentationStatus sendNext:@(AdPresentationDidAppear)];
 }
 
-- (void)rewardBasedVideoAdDidStartPlaying:(GADRewardBasedVideoAd *)rewardBasedVideoAd {
+- (void)rewardedAd:(GADRewardedAd *)rewardedAd didFailToPresentWithError:(NSError *)error {
     [self.adLoadStatus accept:@(AdLoadStatusNone)];
-    // Do nothing.
 }
 
-- (void)rewardBasedVideoAdDidCompletePlaying:(GADRewardBasedVideoAd *)rewardBasedVideoAd {
-    // Do nothing.
-}
-
-- (void)rewardBasedVideoAdDidClose:(GADRewardBasedVideoAd *)rewardBasedVideoAd {
-    // Do nothing.
-
+- (void)rewardedAdDidDismiss:(GADRewardedAd *)rewardedAd {
     [self.presentationStatus sendNext:@(AdPresentationWillDisappear)];
     [self.presentationStatus sendNext:@(AdPresentationDidDisappear)];
 
@@ -210,10 +222,6 @@ PsiFeedbackLogType const AdMobRewardedAdControllerWrapperLogType = @"AdMobReward
 
     [PsiFeedbackLogger infoWithType:AdMobRewardedAdControllerWrapperLogType json:
       @{@"event": @"adDidDisappear", @"tag": self.tag}];
-}
-
-- (void)rewardBasedVideoAdWillLeaveApplication:(GADRewardBasedVideoAd *)rewardBasedVideoAd {
-    // Do nothing.
 }
 
 @end

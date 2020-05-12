@@ -55,6 +55,7 @@
 #import "SkyRegionSelectionViewController.h"
 #import "UIView+Additions.h"
 #import "AppObservables.h"
+#import <PersonalizedAdConsent/PersonalizedAdConsent.h>
 
 PsiFeedbackLogType const MainViewControllerLogType = @"MainViewController";
 
@@ -63,13 +64,6 @@ NSTimeInterval const MaxAdLoadingTime = 1.f;
 #else
 NSTimeInterval const MaxAdLoadingTime = 10.f;
 #endif
-
-typedef NS_ENUM(NSInteger, VPNIntent) {
-    VPNIntentStartPsiphonTunnelWithoutAds,
-    VPNIntentStartPsiphonTunnelWithAds,
-    VPNIntentStopVPN,
-    VPNIntentNoInternetAlert,
-};
 
 @interface MainViewController ()
 
@@ -81,9 +75,6 @@ typedef NS_ENUM(NSInteger, VPNIntent) {
 @end
 
 @implementation MainViewController {
-    // Flags
-    BOOL pendingStartStopSignalCompletion;
-    
     // Models
     AvailableServerRegions *availableServerRegions;
 
@@ -284,36 +275,6 @@ typedef NS_ENUM(NSInteger, VPNIntent) {
 
     [self.compoundDisposable addDisposable:disposable];
 
-    // If MainViewController is asked to start VPN first, then initialize dependencies
-    // only after starting the VPN. Otherwise, we initialize the dependencies immediately.
-    {
-        __block RACDisposable *startDisposable = [[[[RACSignal return:@(self.startVPNOnFirstLoad)]
-          flattenMap:^RACSignal<RACUnit *> *(NSNumber *startVPNFirst) {
-
-              if ([startVPNFirst boolValue]) {
-                  return [[weakSelf startOrStopVPNSignalWithAd:FALSE]
-                    mapReplace:RACUnit.defaultUnit];
-              } else {
-                  return [RACSignal return:RACUnit.defaultUnit];
-              }
-          }]
-          doNext:^(RACUnit *x) {
-              // Start AdManager lifecycle.
-              // Important: dependencies might be initialized while the tunnel is connecting or
-              // when there is no active internet connection.
-              [[AdManager sharedInstance] initializeAdManager];
-              [[AdManager sharedInstance] initializeRewardedVideos];
-          }]
-          subscribeError:^(NSError *error) {
-              [weakSelf.compoundDisposable removeDisposable:startDisposable];
-          }
-          completed:^{
-              [weakSelf.compoundDisposable removeDisposable:startDisposable];
-          }];
-
-        [self.compoundDisposable addDisposable:startDisposable];
-    }
-
     // Subscribes to `AppDelegate.psiCashBalance` subject to receive PsiCash balance updates.
     {
         [self.compoundDisposable addDisposable:[AppObservables.shared.psiCashBalance
@@ -335,6 +296,19 @@ typedef NS_ENUM(NSInteger, VPNIntent) {
                 [strongSelf->psiCashWidget.speedBoostButton setExpiryTime:expiry];
             }
         }]];
+    }
+    
+    // Calls startStopVPN if startVPNOnFirstLoad is TRUE.
+    {
+        if (self.startVPNOnFirstLoad == TRUE) {
+            [AppDelegate.sharedAppDelegate startStopVPNWithAd:FALSE];
+        }
+    }
+    
+    // Initializes AdManager.
+    {
+        [[AdManager sharedInstance] initializeAdManager];
+        [[AdManager sharedInstance] initializeRewardedVideos];
     }
 }
 
@@ -389,36 +363,39 @@ typedef NS_ENUM(NSInteger, VPNIntent) {
 #pragma mark - Public properties
 
 - (RACSignal<RACUnit *> *)activeStateLoadingSignal {
-
-    // adsLoadingSignal emits a value when untunnelled interstitial ad has loaded or
-    // when MaxAdLoadingTime has passed.
-    // If the device in not in untunneled state, this signal makes an emission and
-    // then completes immediately, without checking the untunneled interstitial status.
-    RACSignal *adsLoadingSignal = [[AppObservables.shared.vpnStatus
-      flattenMap:^RACSignal *(NSNumber *statusObject) {
-
-          VPNStatus s = (VPNStatus) [statusObject integerValue];
-          BOOL needAdConsent = [MoPub sharedInstance].shouldShowConsentDialog;
-
-          if (!needAdConsent && (s == VPNStatusDisconnected || s == VPNStatusInvalid)) {
-
-              // Device is untunneled and ad consent is given or not needed,
-              // we therefore wait for the ad to load.
-              return [[[[AdManager sharedInstance].untunneledInterstitialLoadStatus
-                filter:^BOOL(NSNumber *loadStatus) {
+    
+    // If MainViewController is started from onboarding, dismisses launch screen.
+    if (self.startVPNOnFirstLoad == TRUE) {
+        return [RACSignal return:RACUnit.defaultUnit];
+    }
+    
+    // unsubscribedAdLoadingSignal if tunneled emits unit value when
+    // untunneled interstitial ad had loaded or when MaxAdLoadingTime has passed,
+    // otherwise, emits unit value immediately.
+    RACSignal<RACUnit *> *unsubscribedAdLoadingSignal = [[[AppObservables.shared.vpnStatus
+      map:^RACSignal * _Nullable(NSNumber * _Nullable value) {
+        VPNStatus s = (VPNStatus) value.integerValue;
+        
+        if (s == VPNStatusDisconnected || s == VPNStatusInvalid) {
+            
+            
+            return [[[[AdManager.sharedInstance.adSDKStarted
+                       flattenMap:^__kindof RACSignal * _Nullable(RACUnit * _Nullable value) {
+                
+                // Ad SDK has loaded and consent collected.
+                return [AdManager.sharedInstance.untunneledInterstitialLoadStatus
+                        filter:^BOOL(NSNumber *loadStatus) {
                     AdLoadStatus status = (AdLoadStatus) [loadStatus integerValue];
                     return status == AdLoadStatusDone;
-                }]
-                merge:[RACSignal timer:MaxAdLoadingTime]]
-                take:1];
-
-          } else {
-              // Device in _not_ untunneled or we need to show the Ad consent modal screen,
-              // wo we will emit RACUnit immediately since no ads will be loaded here.
-              return [RACSignal return:RACUnit.defaultUnit];
-          }
-      }]
-      take:1];
+                }];
+            }] merge:[RACSignal timer:MaxAdLoadingTime]]
+                     take:1]
+                    mapReplace:RACUnit.defaultUnit];
+            
+        } else {
+            return [RACSignal return:RACUnit.defaultUnit];
+        }
+    }] switchToLatest] take:1];
 
     // subscriptionLoadingSignal emits a value when the user subscription status becomes known.
     RACSignal *subscriptionLoadingSignal = [[AppObservables.shared.subscriptionStatus
@@ -437,108 +414,15 @@ typedef NS_ENUM(NSInteger, VPNIntent) {
             return [RACSignal return:RACUnit.defaultUnit];
         } else {
             // User is not subscribed, wait for the adsLoadingSignal.
-            return [adsLoadingSignal mapReplace:RACUnit.defaultUnit];
+            return unsubscribedAdLoadingSignal;
         }
     }];
-}
-
-// Emitted NSNumber is of type VPNIntent.
-- (RACSignal<RACTwoTuple<NSNumber*, SwitchedVPNStartStopIntent*> *> *)startOrStopVPNSignalWithAd:(BOOL)showAd {
-    MainViewController *__weak weakSelf = self;
-    return [[[[RACSignal createSignal:^RACDisposable *(id <RACSubscriber> subscriber) {
-        [[SwiftDelegate.bridge swithVPNStartStopIntent]
-         then:^id _Nullable(SwitchedVPNStartStopIntent * newIntent) {
-            if (newIntent == nil) {
-                [NSException raise:@"nil found"
-                            format:@"expected non-nil SwitchedVPNStartStopIntent value"];
-            }
-            
-            VPNIntent vpnIntentValue;
-            
-            if (newIntent.intendToStart) {
-                // If the new intent is to start the VPN, first checks for internet connectivity.
-                // If there is internet connectivity, tunnel can be startet without ads
-                // if the user is subscribed, if if there the VPN config is not installed.
-                // Otherwise tunnel should be started after interstitial ad has been displayed.
-                
-                Reachability *reachability = [Reachability reachabilityForInternetConnection];
-                if ([reachability currentReachabilityStatus] == NotReachable) {
-                    vpnIntentValue = VPNIntentNoInternetAlert;
-                } else {
-                    if (newIntent.vpnConfigInstalled) {
-                        if (newIntent.userSubscribed || !showAd) {
-                            vpnIntentValue = VPNIntentStartPsiphonTunnelWithoutAds;
-                        } else {
-                            vpnIntentValue = VPNIntentStartPsiphonTunnelWithAds;
-                        }
-                    } else {
-                        // VPN Config is not installed. Skip ads.
-                        vpnIntentValue = VPNIntentStartPsiphonTunnelWithoutAds;
-                    }
-                }
-            } else {
-                // The new intent is to stop the VPN.
-                vpnIntentValue = VPNIntentStopVPN;
-            }
-            
-            [subscriber sendNext:[RACTwoTuple pack:@(vpnIntentValue) :newIntent]];
-            [subscriber sendCompleted];
-            return nil;
-        }];
-        
-        return nil;
-    }] flattenMap:^RACSignal<RACTwoTuple *> *(RACTwoTuple<NSNumber*, SwitchedVPNStartStopIntent*> *value) {
-        VPNIntent vpnIntent = (VPNIntent)[value.first integerValue];
-        if (vpnIntent == VPNIntentStartPsiphonTunnelWithAds) {
-            // Start tunnel after ad presentation signal completes.
-            // We always want to start the tunnel after the presentation signal
-            // is completed, no matter if it presented an ad or it failed.
-            return [[weakSelf.adManager presentInterstitialOnViewController:weakSelf]
-                    then:^RACSignal * {
-                return [RACSignal return:value];
-            }];
-        } else {
-            return [RACSignal return:value];
-        }
-    }] doNext:^(RACTwoTuple<NSNumber*, SwitchedVPNStartStopIntent*> *value) {
-        VPNIntent vpnIntent = (VPNIntent)[value.first integerValue];
-        dispatch_async_main(^{
-            [SwiftDelegate.bridge sendNewVPNIntent:value.second];
-
-            if (vpnIntent == VPNIntentNoInternetAlert) {
-                // TODO: Show the no internet alert.
-            }
-        });
-    }] deliverOnMainThread];
 }
 
 #pragma mark - UI callbacks
 
 - (void)onStartStopTap:(UIButton *)sender {
-    MainViewController *__weak weakSelf = self;
-    
-    if (pendingStartStopSignalCompletion == TRUE) {
-        return;
-    }
-    pendingStartStopSignalCompletion = TRUE;
-
-    __block RACDisposable *disposable = [[self startOrStopVPNSignalWithAd:TRUE]
-      subscribeError:^(NSError *error) {
-        [weakSelf.compoundDisposable removeDisposable:disposable];
-      }
-      completed:^{
-        if (NSThread.isMainThread != TRUE) {
-            [NSException raise:@"MainThreadCheck"
-                        format:@"Expected callback on main-thread"];
-        }
-        MainViewController *__strong strongSelf = weakSelf;
-        if (strongSelf != nil) {
-            [strongSelf.compoundDisposable removeDisposable:disposable];
-            strongSelf->pendingStartStopSignalCompletion = FALSE;
-        }
-      }];
-
-    [self.compoundDisposable addDisposable:disposable];
+    [AppDelegate.sharedAppDelegate startStopVPNWithAd:TRUE];
 }
 
 - (void)onSettingsButtonTap:(UIButton *)sender {
