@@ -54,4 +54,35 @@
     XCTAssertTrue([jetsam isEqual:decodedJetsam]);
 }
 
+#pragma mark - JSONCodable protocol implementation tests
+
+- (void)testJSONCodable {
+    JetsamEvent *jetsam = [JetsamEvent jetsamEventWithAppVersion:@"1"
+                                                     runningTime:10
+                                                      jetsamDate:[NSDate.date timeIntervalSince1970]];
+
+    // Encode
+
+    NSError *err;
+    NSData *data = [JSONCodable jsonCodableEncodeObject:jetsam
+                                                  error:&err];
+    if (err != nil) {
+        XCTFail(@"Unexpected error: %@", err);
+    }
+
+    // Decode
+
+    JetsamEvent *decodedJetsam = [JSONCodable jsonCodableDecodeObjectofClass:[JetsamEvent class]
+                                                                        data:data
+                                                                       error:&err];
+    if (err != nil) {
+        XCTFail(@"Unexpected error: %@", err);
+    }
+
+    // Compare
+    XCTAssertNotNil(decodedJetsam);
+    XCTAssertTrue([jetsam isEqual:decodedJetsam]);
+}
+
+
 @end
