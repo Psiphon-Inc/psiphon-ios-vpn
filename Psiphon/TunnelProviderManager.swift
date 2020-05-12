@@ -25,6 +25,7 @@ import NetworkExtension
 enum TunnelConnectedStatus {
     case connected
     case connecting
+    case disconnecting
     case notConnected
 }
 
@@ -59,9 +60,9 @@ extension TunnelProviderVPNStatus {
         case .connected:
             return .connected
         case .disconnecting:
-            return .notConnected
+            return .disconnecting
         @unknown default:
-            return .notConnected
+            fatalErrorFeedbackLog("Unknown NEVPNStatus '\(self.rawValue)'")
         }
     }
     

@@ -320,7 +320,7 @@ final class PsiCashViewController: UIViewController {
                                 self.containerBindable.bind(
                                     .left(.right(.right(.left(.pendingPsiCashPurchase))))
                                 )
-                            case .connecting:
+                            case .connecting, .disconnecting:
                                 fatalErrorFeedbackLog("tunnelState at this point should not be 'connecting'")
                             }
 
@@ -338,7 +338,7 @@ final class PsiCashViewController: UIViewController {
                             case .notConnected:
                                 rewardedVideoClearedForSale = true
                                 rewardedVideoSubtitle = UserStrings.Watch_rewarded_video_and_earn()
-                            case .connecting:
+                            case .connecting, .disconnecting:
                                 fatalErrorFeedbackLog("Unexpected state")
                             }
                             
@@ -374,13 +374,18 @@ final class PsiCashViewController: UIViewController {
                         self.tabControl.isHidden = true
                         self.containerBindable.bind(
                             .left(.right(.right(.right(.right(.unavailableWhileConnecting))))))
+                    
+                    case (.disconnecting, _):
+                        self.tabControl.isHidden = true
+                        self.containerBindable.bind(
+                        .left(.right(.right(.right(.right(.unavailableWhileDisconnecting))))))
 
                     case (let tunnelState, .speedBoost):
 
                         let activeSpeedBoost = observed.state.psiCash.activeSpeedBoost
                         
                         switch tunnelState {
-                        case .notConnected, .connecting:
+                        case .notConnected, .connecting, .disconnecting:
 
                             switch activeSpeedBoost {
                             case .none:
