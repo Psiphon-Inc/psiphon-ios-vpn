@@ -206,6 +206,13 @@ extension UserStrings {
                                  value: "Failed to load rewarded video. Please try again later.",
                                  comment: "Shown in a pop-up alert if user's rewarded video ad failed to load.")
     }
+    
+    static func Disconnect_from_psiphon_to_watch_and_earn_psicash() -> String {
+        return NSLocalizedString("DISCONNECT_TO_WATCH_AND_EARN_PSICASH", tableName: nil, bundle: Bundle.main,
+                                 value: "You must disconnect from Psiphon to watch a video to earn PsiCash",
+                                 comment: "Text next to the button indicating to the user that the rewarded video advertisement is only available when they are not connected to Psiphon. Do not translate or transliterate 'PsiCash'. Do not translate or transliterate 'Psiphon'.")
+    }
+    
 }
 
 // MARK: General Strings

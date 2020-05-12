@@ -26,9 +26,6 @@
 #import "RACSignal+Operations.h"
 #import "RACReplaySubject.h"
 #import "DispatchUtils.h"
-#import "MPGoogleGlobalMediationSettings.h"
-#import "MoPubInterstitialAdControllerWrapper.h"
-#import "MoPubRewardedAdControllerWrapper.h"
 #import <ReactiveObjC/NSNotificationCenter+RACSupport.h>
 #import <ReactiveObjC/RACUnit.h>
 #import <ReactiveObjC/RACTuple.h>
@@ -40,7 +37,6 @@
 #import "RACSignal+Operations2.h"
 #import "Asserts.h"
 #import "NSError+Convenience.h"
-#import "MoPubConsent.h"
 #import "AdMobInterstitialAdControllerWrapper.h"
 #import "AdMobRewardedAdControllerWrapper.h"
 #import <PersonalizedAdConsent/PersonalizedAdConsent.h>
@@ -60,12 +56,10 @@ NSString * const AdMobPublisherID = @"pub-1072041961750291";
 
 NSString * const UntunneledAdMobInterstitialAdUnitID = @"ca-app-pub-1072041961750291/8751062454";
 NSString * const UntunneledAdMobRewardedVideoAdUnitID = @"ca-app-pub-1072041961750291/8356247142";
-NSString * const MoPubTunneledRewardVideoAdUnitID    = @"b9440504384740a2a3913a3d1b6db80e";
 
 // AdControllerTag values must be unique.
 AdControllerTag const AdControllerTagAdMobUntunneledInterstitial = @"AdMobUntunneledInterstitial";
 AdControllerTag const AdControllerTagAdMobUntunneledRewardedVideo = @"AdMobUntunneledRewardedVideo";
-AdControllerTag const AdControllerTagMoPubTunneledRewardedVideo = @"MoPubTunneledRewardedVideo";
 
 #pragma mark - SourceAction type
 
@@ -118,6 +112,8 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
 
 @interface AdManager ()
 
+@property (nonatomic, readwrite, nonnull) RACSubject<RACUnit *> *adSDKStarted;
+
 @property (nonatomic, readwrite, nonnull) RACBehaviorSubject<NSNumber *> *adIsShowing;
 @property (nonatomic, readwrite, nonnull) RACBehaviorSubject<NSNumber *> *untunneledInterstitialLoadStatus;
 @property (nonatomic, readwrite, nonnull) RACBehaviorSubject<NSNumber *> *rewardedVideoLoadStatus;
@@ -126,7 +122,6 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
 // Private properties
 @property (nonatomic, readwrite, nonnull) AdMobInterstitialAdControllerWrapper *untunneledInterstitial;
 @property (nonatomic, readwrite, nonnull) AdMobRewardedAdControllerWrapper *untunneledRewardVideo;
-@property (nonatomic, readwrite, nonnull) MoPubRewardedAdControllerWrapper *tunneledRewardVideo;
 
 @property (nonatomic, nonnull) RACCompoundDisposable *compoundDisposable;
 
@@ -141,6 +136,8 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
 - (instancetype)init {
     self = [super init];
     if (self) {
+        
+        _adSDKStarted = [RACSubject subject];
 
         _adIsShowing = [RACBehaviorSubject behaviorSubjectWithDefaultValue:@(FALSE)];
 
@@ -159,10 +156,6 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
         _untunneledRewardVideo = [[AdMobRewardedAdControllerWrapper alloc]
           initWithAdUnitID:UntunneledAdMobRewardedVideoAdUnitID
                    withTag:AdControllerTagAdMobUntunneledRewardedVideo];
-
-        _tunneledRewardVideo = [[MoPubRewardedAdControllerWrapper alloc]
-          initWithAdUnitID:MoPubTunneledRewardVideoAdUnitID
-                   withTag:AdControllerTagMoPubTunneledRewardedVideo];
 
     }
     return self;
@@ -204,58 +197,28 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
     // consent is collected. Otherwise terminates with an error.
     RACSignal<RACUnit *> *adSDKInitConsent = [RACSignal createSignal:^RACDisposable *(id <RACSubscriber> subscriber) {
         dispatch_async_main(^{
-          [AdMobConsent collectConsentForPublisherID:AdMobPublisherID
-                           withCompletionHandler:^(NSError *error, PACConsentStatus consentStatus) {
-
-                if (error) {
-                    // Stop ad initialization and don't load any ads.
+            
+            [AdMobConsent collectConsentForPublisherID:AdMobPublisherID withCompletionHandler:^(NSError * _Nullable error, PACConsentStatus s) {
+                
+                if  (error != nil) {
                     [subscriber sendError:error];
                     return;
                 }
-
-                // Implementation follows these guides:
-                //  - https://developers.mopub.com/docs/ios/initialization/
-                //  - https://developers.mopub.com/docs/mediation/networks/google/
-
-                // Forwards user's ad preference to AdMob.
-                MPGoogleGlobalMediationSettings *googleMediationSettings =
-                  [[MPGoogleGlobalMediationSettings alloc] init];
-
-                googleMediationSettings.npa = [AdMobConsent NPAStringforConsentStatus:consentStatus];
-
-                // MPMoPubConfiguration should be instantiated with any valid ad unit ID from the app.
-                MPMoPubConfiguration *sdkConfig = [[MPMoPubConfiguration alloc]
-                  initWithAdUnitIdForAppInitialization:MoPubTunneledRewardVideoAdUnitID];
-
-                sdkConfig.globalMediationSettings = @[googleMediationSettings];
-
-                // Initializes the MoPub SDK and then checks GDPR applicability and show the consent modal screen
-                // if necessary.
-                [[MoPub sharedInstance] initializeSdkWithConfiguration:sdkConfig completion:^{
-                    LOG_DEBUG(@"MoPub SDK initialized");
-
-                    // Concurrency Note: MoPub invokes the completion handler on a concurrent background queue.
-                    dispatch_async_main(^{
-                        [MoPubConsent collectConsentWithCompletionHandler:^(NSError *error) {
-                            if (error) {
-                                // Stop ad initialization and don't load any ads.
-                                [subscriber sendError:error];
-                                return;
-                            }
-
-                            [GADMobileAds configureWithApplicationID:GoogleAdMobAppID];
-
-                            // MoPub consent dialog was presented successfully and dismissed
-                            // or consent is already given or is not needed.
-                            // We can start loading ads.
-                            [PsiFeedbackLogger infoWithType:AdManagerLogType format:@"adSDKInitSucceeded"];
-                            [subscriber sendNext:RACUnit.defaultUnit];
-                            [subscriber sendCompleted];
-                        }];
-                    });
-
+                
+                // Starts Google AdMob SDK.
+                [GADMobileAds.sharedInstance startWithCompletionHandler:
+                 ^(GADInitializationStatus * _Nonnull status) {
+                    [PsiFeedbackLogger
+                     infoWithType:AdManagerLogType
+                     message:[NSString stringWithFormat:@"Initialized AdMob SDK '%@'",
+                              status.adapterStatusesByClassName]];
+                    
+                    [subscriber sendNext:RACUnit.defaultUnit];
+                    [subscriber sendCompleted];
                 }];
+                
             }];
+            
         });
 
         return nil;
@@ -272,15 +235,17 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
           }]
           take:1]
           flattenMap:^RACSignal<RACUnit *> *(AppEvent *value) {
-            // Retry 3 time by resubscribing to adSDKInitConsent before giving up for the current AppEvent emission.
-            return [adSDKInitConsent retry:3];
+            return adSDKInitConsent;
           }]
-          retry]   // If still failed after retrying 3 times, retry again by resubscribing to the `appEvents.signal`.
+          retry:3]
           take:1]
           deliverOnMainThread]
           multicast:[RACReplaySubject replaySubjectWithCapacity:1]];
 
         [self.compoundDisposable addDisposable:[self.adSDKInitMultiCast connect]];
+        
+        [self.compoundDisposable addDisposable:
+         [self.adSDKInitMultiCast.signal subscribe:self.adSDKStarted]];
     }
 
     // Ad controller signals:
@@ -306,8 +271,7 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
         RACMulticastConnection<NSNumber *> *adPresentationMultiCast = [[[[[RACSignal
           merge:@[
             self.untunneledInterstitial.presentationStatus,
-            self.untunneledRewardVideo.presentationStatus,
-            self.tunneledRewardVideo.presentationStatus
+            self.untunneledRewardVideo.presentationStatus
           ]]
           map:^NSNumber *(NSNumber *presentationStatus) {
               AdPresentation ap = (AdPresentation) [presentationStatus integerValue];
@@ -344,9 +308,6 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
 
                   if (appEvent.tunnelState == TunnelStateUntunneled) {
                       return weakSelf.untunneledRewardVideo.adLoadStatus;
-
-                  } else if (appEvent.tunnelState == TunnelStateTunneled) {
-                      return weakSelf.tunneledRewardVideo.adLoadStatus;
                   }
               }
 
@@ -367,12 +328,6 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
                                                   reloadAdAfterPresenting:AdLoadActionImmediate
                                     andWaitForPsiCashRewardedActivityData:TRUE]];
 
-    // Tunneled rewarded video
-    [self.compoundDisposable addDisposable:[self subscribeToAdSignalForAd:self.tunneledRewardVideo
-                                            withActionLoadDelayedInterval:1.0
-                                                    withLoadInTunnelState:TunnelStateTunneled
-                                                  reloadAdAfterPresenting:AdLoadActionImmediate
-                                    andWaitForPsiCashRewardedActivityData:TRUE]];
 }
 
 - (void)resetUserConsent {
@@ -395,7 +350,7 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
     return [self presentAdHelper:^RACSignal<NSNumber *> *(TunnelState tunnelState) {
         switch (tunnelState) {
             case TunnelStateTunneled:
-                return [self.tunneledRewardVideo presentAdFromViewController:viewController];
+                return [RACSignal empty];
             case TunnelStateUntunneled:
                 return [self.untunneledRewardVideo presentAdFromViewController:viewController];
             case TunnelStateNeither:

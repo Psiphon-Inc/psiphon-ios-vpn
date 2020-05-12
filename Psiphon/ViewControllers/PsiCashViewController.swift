@@ -36,7 +36,10 @@ struct PsiCashViewControllerState: Equatable {
 extension PsiCashViewControllerState {
     
     /// Adds rewarded video product to list of `PsiCashPurchasableViewModel`  retrieved from AppStore.
-    var allProducts: PendingWithLastSuccess<[PsiCashPurchasableViewModel], SystemErrorEvent> {
+    func allProducts(
+        rewardedVideoClearedForSale: Bool,
+        rewardedVideoSubtitle: String
+    ) -> PendingWithLastSuccess<[PsiCashPurchasableViewModel], SystemErrorEvent> {
         appStorePsiCashProducts.map(pending: { lastParsedList -> [PsiCashPurchasableViewModel] in
             // Adds rewarded video ad as the first product if
             let viewModels = lastParsedList.compactMap { parsed -> PsiCashPurchasableViewModel? in
@@ -44,13 +47,20 @@ extension PsiCashViewControllerState {
             }
             switch viewModels {
             case []: return []
-            default: return [psiCash.rewardedVideoProduct] + viewModels
+            default: return [
+                psiCash.rewardedVideoProduct(
+                    clearedForSale: rewardedVideoClearedForSale, subtitle: rewardedVideoSubtitle
+                )
+                ] + viewModels
             }
         }, completed: { result in
             result.map { parsedList -> [PsiCashPurchasableViewModel] in
                 // Adds rewarded video ad as the first product
-                [psiCash.rewardedVideoProduct] + parsedList.compactMap { parsed -> PsiCashPurchasableViewModel? in
-                    parsed.viewModel
+                [
+                    psiCash.rewardedVideoProduct(
+                        clearedForSale: rewardedVideoClearedForSale, subtitle: rewardedVideoSubtitle
+                    ) ] + parsedList.compactMap { parsed -> PsiCashPurchasableViewModel? in
+                        parsed.viewModel
                 }
             }
         })
@@ -126,7 +136,7 @@ final class PsiCashViewController: UIViewController {
         
         self.container = .init(
             AddPsiCashViewType(
-                PsiCashCoinPurchaseTable(purchaseHandler: {
+                PsiCashCoinPurchaseTable(purchaseHandler: { [unowned store, iapStore] in
                     switch $0 {
                     case .rewardedVideoAd:
                         store.send(.showRewardedVideoAd)
@@ -161,12 +171,22 @@ final class PsiCashViewController: UIViewController {
             .map(ObservedState.init)
             .skipRepeats()
             .startWithValues { [unowned self] observed in
+                
                 if case let .failure(errorEvent) = observed.state.psiCash.rewardedVideo.loading {
-                    let errorDesc = ErrorEventDescription(
-                        event: errorEvent,
-                        localizedUserDescription: UserStrings.Rewarded_video_load_failed())
+                    switch errorEvent.error {
+                    case .adSDKError(_), .requestedAdFailedToLoad:
+                        let errorDesc = ErrorEventDescription(
+                            event: errorEvent.eraseToRepr(),
+                            localizedUserDescription: UserStrings.Rewarded_video_load_failed())
 
-                    self.display(errorDesc: errorDesc)
+                        self.display(errorDesc: errorDesc)
+                        
+                    case .noTunneledRewardedVideoAd:
+                        break
+                        
+                    case .customDataNotPresent:
+                        fatalErrorFeedbackLog("Custom data not present")
+                    }
                 }
                 
                 let purchasingNavState = (observed.state.iap.purchasing,
@@ -221,7 +241,7 @@ final class PsiCashViewController: UIViewController {
 
                 switch observed.state.subscription.status {
                 case .unknown:
-                    // There is not PsiCash state or subscription state is unknow.
+                    // There is not PsiCash state or subscription state is unknown.
                     self.balanceView.isHidden = true
                     self.tabControl.isHidden = true
                     self.containerBindable.bind(
@@ -229,7 +249,7 @@ final class PsiCashViewController: UIViewController {
                     )
 
                 case .subscribed(_):
-                    // User is subcribed. Only shows the PsiCash balance.
+                    // User is subscribed. Only shows the PsiCash balance.
                     self.balanceView.isHidden = false
                     self.tabControl.isHidden = true
                     self.balanceView.bind(
@@ -278,7 +298,29 @@ final class PsiCashViewController: UIViewController {
                             }
 
                         } else {
-                            switch observed.state.allProducts {
+                            
+                            
+                            // Subtitle for rewarded video product given tunneled status.
+                            let rewardedVideoClearedForSale: Bool
+                            let rewardedVideoSubtitle: String
+                            switch observed.tunneled {
+                            case .connected:
+                                rewardedVideoClearedForSale = false
+                                rewardedVideoSubtitle =
+                                    UserStrings.Disconnect_from_psiphon_to_watch_and_earn_psicash()
+                            case .notConnected:
+                                rewardedVideoClearedForSale = true
+                                rewardedVideoSubtitle = UserStrings.Watch_rewarded_video_and_earn()
+                            case .connecting:
+                                fatalErrorFeedbackLog("Unexpected state")
+                            }
+                            
+                            let allProducts = observed.state.allProducts(
+                                rewardedVideoClearedForSale: rewardedVideoClearedForSale,
+                                rewardedVideoSubtitle: rewardedVideoSubtitle
+                            )
+                            
+                            switch allProducts {
                             case .pending([]):
                                 // Product list is being retrieved from the
                                 // App Store for the first time.

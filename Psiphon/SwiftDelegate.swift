@@ -89,12 +89,12 @@ extension SwiftDelegate: RewardedVideoAdBridgeDelegate {
         let loadResult: RewardedVideoLoad
         if let error = error {
             // Note that error event is created here as opposed to the origin
-            // of where the error occured. However this is acceptable as long as
+            // of where the error occurred. However this is acceptable as long as
             // this function is called once for each error that happened almost immediately.
-            loadResult = .failure(ErrorEvent(.systemError(error)))
+            loadResult = .failure(ErrorEvent(.adSDKError(error)))
         } else {
             if case .error = status {
-                loadResult = .failure(ErrorEvent(ErrorRepr(repr: "Ad failed to load")))
+                loadResult = .failure(ErrorEvent(.requestedAdFailedToLoad))
             } else {
                 loadResult = .success(status)
             }
@@ -367,7 +367,7 @@ extension SwiftDelegate: SwiftBridgeDelegate {
         }
     }
     
-    @objc func swithVPNStartStopIntent()
+    @objc func switchVPNStartStopIntent()
         -> Promise<SwitchedVPNStartStopIntent>.ObjCPromise<SwitchedVPNStartStopIntent>
     {
         let promise = Promise<SwitchedVPNStartStopIntent>.pending()
