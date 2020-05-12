@@ -25,7 +25,7 @@ NS_ASSUME_NONNULL_BEGIN
 /// This allows the reader to only read new data when the file is appended to.
 @interface FileRegistryEntry : NSObject <NSCoding, NSSecureCoding>
 
-@property (readonly, nonatomic, assign) NSString *filepath;
+@property (readonly, nonatomic) NSString *filepath;
 @property (readonly, nonatomic, assign) unsigned long long fileSystemFileNumber;
 @property (readonly, nonatomic, assign) unsigned long long offset;
 

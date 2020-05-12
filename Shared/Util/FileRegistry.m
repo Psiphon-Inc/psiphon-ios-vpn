@@ -32,7 +32,7 @@ NSString *_Nonnull const FileRegistryEntryOffsetIntCoderKey = @"offset.int";
 
 @interface FileRegistryEntry ()
 
-@property (nonatomic, assign) NSString *filepath;
+@property (nonatomic) NSString *filepath;
 @property (nonatomic, assign) unsigned long long fileSystemFileNumber;
 @property (nonatomic, assign) unsigned long long offset;
 
