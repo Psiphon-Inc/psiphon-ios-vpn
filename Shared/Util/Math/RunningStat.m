@@ -30,7 +30,7 @@ NSString *_Nonnull const RunningStatArchiveVersionIntCoderKey = @"version.int";
 NSString *_Nonnull const RunningStatCountIntCoderKey = @"count.int";
 NSString *_Nonnull const RunningStatMinMaxCoderKey = @"min_max.running_min_max";
 NSString *_Nonnull const RunningStatStdevCoderKey = @"r_stdev.running_stdev";
-NSString *_Nonnull const RunningStatBucketsCoderKey = @"buckets.running_buckets";
+NSString *_Nonnull const RunningStatBinsCoderKey = @"bins.running_bins";
 
 #pragma mark - NSError key
 
@@ -40,7 +40,7 @@ NSErrorDomain _Nonnull const RunningStatErrorDomain = @"RunningStatErrorDomain";
 
 @property (nonatomic, assign) int count;
 
-@property (nonatomic) RunningBuckets *buckets;
+@property (nonatomic) RunningBins *bins;
 
 @property (nonatomic) RunningMinMax *minMax;
 @property (nonatomic) RunningStdev *rStdev;
@@ -49,15 +49,15 @@ NSErrorDomain _Nonnull const RunningStatErrorDomain = @"RunningStatErrorDomain";
 
 @implementation RunningStat
 
-- (instancetype)initWithValue:(double)x bucketRanges:(NSArray<BucketRange*>*)bucketRanges {
+- (instancetype)initWithValue:(double)x binRanges:(NSArray<BinRange*>*)binRanges {
     self = [super init];
     if (self) {
         self.count = 1;
         self.minMax = [[RunningMinMax alloc] initWithValue:x];
         self.rStdev = [[RunningStdev alloc] initWithValue:x];
-        if (bucketRanges != nil) {
-            self.buckets = [[RunningBuckets alloc] initWithBucketRanges:bucketRanges];
-            [self.buckets addValue:x];
+        if (binRanges != nil) {
+            self.bins = [[RunningBins alloc] initWithBinRanges:binRanges];
+            [self.bins addValue:x];
         }
     }
     return self;
@@ -66,13 +66,13 @@ NSErrorDomain _Nonnull const RunningStatErrorDomain = @"RunningStatErrorDomain";
 - (instancetype)initWithCount:(int)count
                        minMax:(RunningMinMax*)minMax
                        rStdev:(RunningStdev*)rStdev
-                      buckets:(RunningBuckets*)buckets {
+                         bins:(RunningBins*)bins {
     self = [super init];
     if (self) {
         self.count = count;
         self.minMax = minMax;
         self.rStdev = rStdev;
-        self.buckets = buckets;
+        self.bins = bins;
     }
     return self;
 }
@@ -87,8 +87,8 @@ NSErrorDomain _Nonnull const RunningStatErrorDomain = @"RunningStatErrorDomain";
                 andLocalizedDescription:@"count overflowed"];
     }
 
-    if (self.buckets != nil) {
-        [self.buckets addValue:x];
+    if (self.bins != nil) {
+        [self.bins addValue:x];
     }
 
     NSError *err = [self.rStdev addValue:x];
@@ -123,8 +123,8 @@ NSErrorDomain _Nonnull const RunningStatErrorDomain = @"RunningStatErrorDomain";
     return self.minMax.max;
 }
 
-- (NSArray<Bucket*>*_Nullable)talliedBuckets {
-    return self.buckets.buckets;
+- (NSArray<Bin*>*_Nullable)talliedBins {
+    return self.bins.bins;
 }
 
 #pragma mark - Equality
@@ -134,14 +134,14 @@ NSErrorDomain _Nonnull const RunningStatErrorDomain = @"RunningStatErrorDomain";
     BOOL minMaxEqual = [self.minMax isEqual:stat.minMax];
     BOOL rStdevEqual = [self.rStdev isEqual:stat.rStdev];
 
-    BOOL bucketsEqual;
-    if (self.buckets == nil || stat.buckets == nil) {
-        bucketsEqual = self.buckets == stat.buckets;
+    BOOL binsEqual;
+    if (self.bins == nil || stat.bins == nil) {
+        binsEqual = self.bins == stat.bins;
     } else {
-        bucketsEqual = [self.buckets isEqual:stat.buckets];
+        binsEqual = [self.bins isEqual:stat.bins];
     }
 
-    return countEqual && minMaxEqual && rStdevEqual && bucketsEqual;
+    return countEqual && minMaxEqual && rStdevEqual && binsEqual;
 }
 
 - (BOOL)isEqual:(id)object {
@@ -162,7 +162,7 @@ NSErrorDomain _Nonnull const RunningStatErrorDomain = @"RunningStatErrorDomain";
     return [[RunningStat alloc] initWithCount:self.count
                                        minMax:self.minMax
                                        rStdev:self.rStdev
-                                      buckets:self.buckets];
+                                         bins:self.bins];
 }
 
 #pragma mark - NSCoding protocol implementation
@@ -179,8 +179,8 @@ NSErrorDomain _Nonnull const RunningStatErrorDomain = @"RunningStatErrorDomain";
     [coder encodeObject:self.rStdev
                  forKey:RunningStatStdevCoderKey];
 
-    [coder encodeObject:self.buckets
-                 forKey:RunningStatBucketsCoderKey];
+    [coder encodeObject:self.bins
+                 forKey:RunningStatBinsCoderKey];
 }
 
 - (nullable instancetype)initWithCoder:(nonnull NSCoder *)coder {
@@ -190,13 +190,13 @@ NSErrorDomain _Nonnull const RunningStatErrorDomain = @"RunningStatErrorDomain";
                                                 forKey:RunningStatMinMaxCoderKey];
     RunningStdev *rStdev = [coder decodeObjectOfClass:[RunningStdev class]
                                               forKey:RunningStatStdevCoderKey];
-    RunningBuckets *buckets = [coder decodeObjectOfClass:[RunningBuckets class]
-                                                  forKey:RunningStatBucketsCoderKey];
+    RunningBins *bins = [coder decodeObjectOfClass:[RunningBins class]
+                                            forKey:RunningStatBinsCoderKey];
 
     return [self initWithCount:count
                         minMax:minMax
                         rStdev:rStdev
-                       buckets:buckets];
+                          bins:bins];
 }
 
 #pragma mark - NSSecureCoding protocol implementatino

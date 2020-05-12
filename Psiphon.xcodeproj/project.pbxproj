@@ -218,7 +218,7 @@
 		CE3B3254245390090079C13F /* JetsamMetricsTest.m in Sources */ = {isa = PBXBuildFile; fileRef = CE3B3253245390090079C13F /* JetsamMetricsTest.m */; };
 		CE4E9BC01BBEECF30060FF8B /* Psiphon.entitlements in Resources */ = {isa = PBXBuildFile; fileRef = CE4E9BBF1BBEECF30060FF8B /* Psiphon.entitlements */; };
 		CE4E9BC21BBEECFC0060FF8B /* PsiphonVPN.entitlements in Resources */ = {isa = PBXBuildFile; fileRef = CE4E9BC11BBEECFC0060FF8B /* PsiphonVPN.entitlements */; };
-		CE50A2582469D6390047D3FE /* RunningBuckets.m in Sources */ = {isa = PBXBuildFile; fileRef = CEE6FB2E2466223900F74D05 /* RunningBuckets.m */; };
+		CE50A2582469D6390047D3FE /* RunningBins.m in Sources */ = {isa = PBXBuildFile; fileRef = CEE6FB2E2466223900F74D05 /* RunningBins.m */; };
 		CE6C3F6A24366AE1007A17F0 /* ClientMetadata.m in Sources */ = {isa = PBXBuildFile; fileRef = CE6C3F6924366AE1007A17F0 /* ClientMetadata.m */; };
 		CE7182132460689A008F815A /* JetsamTrackingTest.m in Sources */ = {isa = PBXBuildFile; fileRef = CE7182122460689A008F815A /* JetsamTrackingTest.m */; };
 		CE7B76431F54881F00EA44BD /* PsiphonTunnel.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 66094F781E8067520069EC4E /* PsiphonTunnel.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -255,10 +255,10 @@
 		CEE6FB252466040100F74D05 /* RunningMinMax.m in Sources */ = {isa = PBXBuildFile; fileRef = CEE6FB242466040100F74D05 /* RunningMinMax.m */; };
 		CEE6FB2824660F9700F74D05 /* RunningStat.m in Sources */ = {isa = PBXBuildFile; fileRef = CEE6FB2724660F9700F74D05 /* RunningStat.m */; };
 		CEE6FB2924661B9B00F74D05 /* RunningStat.m in Sources */ = {isa = PBXBuildFile; fileRef = CEE6FB2724660F9700F74D05 /* RunningStat.m */; };
-		CEE6FB2F2466223900F74D05 /* RunningBuckets.m in Sources */ = {isa = PBXBuildFile; fileRef = CEE6FB2E2466223900F74D05 /* RunningBuckets.m */; };
+		CEE6FB2F2466223900F74D05 /* RunningBins.m in Sources */ = {isa = PBXBuildFile; fileRef = CEE6FB2E2466223900F74D05 /* RunningBins.m */; };
 		CEE6FB302466224800F74D05 /* RunningMinMax.m in Sources */ = {isa = PBXBuildFile; fileRef = CEE6FB242466040100F74D05 /* RunningMinMax.m */; };
 		CEE6FB312466224B00F74D05 /* RunningStdev.m in Sources */ = {isa = PBXBuildFile; fileRef = CE3B324224520ABF0079C13F /* RunningStdev.m */; };
-		CEE6FB33246625EA00F74D05 /* RunningBucketsTest.m in Sources */ = {isa = PBXBuildFile; fileRef = CEE6FB32246625EA00F74D05 /* RunningBucketsTest.m */; };
+		CEE6FB33246625EA00F74D05 /* RunningBinsTest.m in Sources */ = {isa = PBXBuildFile; fileRef = CEE6FB32246625EA00F74D05 /* RunningBinsTest.m */; };
 		D672BC574F14042B4D77AB28 /* libPods-Psiphon.a in Frameworks */ = {isa = PBXBuildFile; fileRef = CB8BB19F016330264C4DCB80 /* libPods-Psiphon.a */; };
 		EF4F1F3D206055F7006A40A1 /* RACSignal+Operations2.m in Sources */ = {isa = PBXBuildFile; fileRef = EF90D79F204F22C900228A63 /* RACSignal+Operations2.m */; };
 		EF639C2F1F8FCE37009D6B42 /* PsiFeedbackLogger.m in Sources */ = {isa = PBXBuildFile; fileRef = EF639C2E1F8FCE2A009D6B42 /* PsiFeedbackLogger.m */; };
@@ -749,9 +749,9 @@
 		CEE6FB242466040100F74D05 /* RunningMinMax.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RunningMinMax.m; sourceTree = "<group>"; };
 		CEE6FB2624660F9700F74D05 /* RunningStat.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RunningStat.h; sourceTree = "<group>"; };
 		CEE6FB2724660F9700F74D05 /* RunningStat.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RunningStat.m; sourceTree = "<group>"; };
-		CEE6FB2D2466223900F74D05 /* RunningBuckets.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RunningBuckets.h; sourceTree = "<group>"; };
-		CEE6FB2E2466223900F74D05 /* RunningBuckets.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RunningBuckets.m; sourceTree = "<group>"; };
-		CEE6FB32246625EA00F74D05 /* RunningBucketsTest.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RunningBucketsTest.m; sourceTree = "<group>"; };
+		CEE6FB2D2466223900F74D05 /* RunningBins.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RunningBins.h; sourceTree = "<group>"; };
+		CEE6FB2E2466223900F74D05 /* RunningBins.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RunningBins.m; sourceTree = "<group>"; };
+		CEE6FB32246625EA00F74D05 /* RunningBinsTest.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RunningBinsTest.m; sourceTree = "<group>"; };
 		DD100E19194B9A79F5D7DF55 /* Pods-PsiphonVPN.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PsiphonVPN.debug.xcconfig"; path = "Pods/Target Support Files/Pods-PsiphonVPN/Pods-PsiphonVPN.debug.xcconfig"; sourceTree = "<group>"; };
 		EDB109A2FBFB32D821FF121D /* Pods-Psiphon.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Psiphon.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Psiphon/Pods-Psiphon.debug.xcconfig"; sourceTree = "<group>"; };
 		EF639C2D1F8FCE2A009D6B42 /* PsiFeedbackLogger.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PsiFeedbackLogger.h; sourceTree = "<group>"; };
@@ -1350,8 +1350,8 @@
 				CEE6FB242466040100F74D05 /* RunningMinMax.m */,
 				CEE6FB2624660F9700F74D05 /* RunningStat.h */,
 				CEE6FB2724660F9700F74D05 /* RunningStat.m */,
-				CEE6FB2D2466223900F74D05 /* RunningBuckets.h */,
-				CEE6FB2E2466223900F74D05 /* RunningBuckets.m */,
+				CEE6FB2D2466223900F74D05 /* RunningBins.h */,
+				CEE6FB2E2466223900F74D05 /* RunningBins.m */,
 				CE3B324724535F030079C13F /* stats.h */,
 				CE3B324824535F030079C13F /* stats.c */,
 			);
@@ -1392,7 +1392,7 @@
 			isa = PBXGroup;
 			children = (
 				CE3B3245245343DF0079C13F /* RunningStatsTest.m */,
-				CEE6FB32246625EA00F74D05 /* RunningBucketsTest.m */,
+				CEE6FB32246625EA00F74D05 /* RunningBinsTest.m */,
 			);
 			name = Math;
 			sourceTree = "<group>";
@@ -2116,7 +2116,7 @@
 				521FD0F2219E0D5600F748EC /* DebugViewController.m in Sources */,
 				52CAC4312385D06600A92842 /* Spinner.swift in Sources */,
 				9BFEC9C08697E4701A36A3B3 /* UnionSerialQueue.m in Sources */,
-				CEE6FB2F2466223900F74D05 /* RunningBuckets.m in Sources */,
+				CEE6FB2F2466223900F74D05 /* RunningBins.m in Sources */,
 				445F24EF20E1A5BA00D004E9 /* constraints.c in Sources */,
 				5248B4CE23203781008C00D4 /* SwiftObjCBridges.swift in Sources */,
 				52D363CB230DEBED002C2221 /* CloseButton.swift in Sources */,
@@ -2227,7 +2227,7 @@
 				EF90D7B6204F235100228A63 /* DispatchUtils.m in Sources */,
 				EF90D7B2204F232100228A63 /* timestamp_format.c in Sources */,
 				9BFECF8895D5FE1940A6F700 /* PsiphonConfigUserDefaults.m in Sources */,
-				CE50A2582469D6390047D3FE /* RunningBuckets.m in Sources */,
+				CE50A2582469D6390047D3FE /* RunningBins.m in Sources */,
 				EF90D7B7204F235800228A63 /* FileUtils.m in Sources */,
 				EFC2F5B620226758007B52F9 /* PacketTunnelUtils.m in Sources */,
 				CE82CEB2245C7232000C0512 /* JetsamEvent.m in Sources */,
@@ -2259,7 +2259,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				CE7182132460689A008F815A /* JetsamTrackingTest.m in Sources */,
-				CEE6FB33246625EA00F74D05 /* RunningBucketsTest.m in Sources */,
+				CEE6FB33246625EA00F74D05 /* RunningBinsTest.m in Sources */,
 				CE8ED90224633407009C3187 /* FileRegistryTest.m in Sources */,
 				CE82CE95245A12B1000C0512 /* DelimitedFile.m in Sources */,
 				CE82CEAE245C7007000C0512 /* JetsamTracking.m in Sources */,

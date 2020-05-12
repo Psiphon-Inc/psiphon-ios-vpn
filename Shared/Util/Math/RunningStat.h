@@ -19,7 +19,7 @@
 
 #import <Foundation/Foundation.h>
 #import "RunningMinMax.h"
-#import "RunningBuckets.h"
+#import "RunningBins.h"
 #import "RunningStdev.h"
 
 NS_ASSUME_NONNULL_BEGIN
@@ -37,7 +37,7 @@ typedef NS_ERROR_ENUM(RunningStatErrorDomain, RunningStatErrorCode) {
 @property (readonly, nonatomic, assign) int count;
 
 - (instancetype)init NS_UNAVAILABLE;
-- (instancetype)initWithValue:(double)x bucketRanges:(NSArray<BucketRange*>*_Nullable)bucketRanges;
+- (instancetype)initWithValue:(double)x binRanges:(NSArray<BinRange*>*_Nullable)binRanges;
 
 - (NSError *_Nullable)addValue:(double)x;
 
@@ -51,7 +51,7 @@ typedef NS_ERROR_ENUM(RunningStatErrorDomain, RunningStatErrorCode) {
 
 - (double)max;
 
-- (NSArray<Bucket*>*_Nullable)talliedBuckets;
+- (NSArray<Bin*>*_Nullable)talliedBins;
 
 - (BOOL)isEqualToRunningStat:(RunningStat*)stat;
 

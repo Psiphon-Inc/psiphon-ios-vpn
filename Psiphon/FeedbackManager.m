@@ -149,23 +149,23 @@ PsiFeedbackLogType const FeedbackUploadLogType = @"FeedbackUpload";
             PsiphonDataSharedDB *sharedDB = [[PsiphonDataSharedDB alloc] initForAppGroupIdentifier:APP_GROUP_IDENTIFIER];
 
             // Jetsam running time buckets
-            NSArray<BucketRange*>* bucketRanges = @[
+            NSArray<BinRange*>* binRanges = @[
                 // [0, 30s)
-                [BucketRange bucketRangeWithRange:MakeCBucketRange(0.00, 30.00)],
+                [BinRange binRangeWithRange:MakeCBinRange(0.00, 30.00)],
                 // [30s, 60s)
-                [BucketRange bucketRangeWithRange:MakeCBucketRange(30.00, 60.00)],
+                [BinRange binRangeWithRange:MakeCBinRange(30.00, 60.00)],
                 // [60s, 5m)
-                [BucketRange bucketRangeWithRange:MakeCBucketRange(60.00, 5*60.00)],
+                [BinRange binRangeWithRange:MakeCBinRange(60.00, 5*60.00)],
                 // [5m, 10m)
-                [BucketRange bucketRangeWithRange:MakeCBucketRange(5*60.00, 10*60.00)],
+                [BinRange binRangeWithRange:MakeCBinRange(5*60.00, 10*60.00)],
                 // [10m, 30m)
-                [BucketRange bucketRangeWithRange:MakeCBucketRange(10*60.00, 30*60.00)],
+                [BinRange binRangeWithRange:MakeCBinRange(10*60.00, 30*60.00)],
                 // [30m, 1h)
-                [BucketRange bucketRangeWithRange:MakeCBucketRange(30*60.00, 60*60.00)],
+                [BinRange binRangeWithRange:MakeCBinRange(30*60.00, 60*60.00)],
                 // [1h, 6h)
-                [BucketRange bucketRangeWithRange:MakeCBucketRange(60*60.00, 6*60*60.00)],
+                [BinRange binRangeWithRange:MakeCBinRange(60*60.00, 6*60*60.00)],
                 // [6h, inf]
-                [BucketRange bucketRangeWithRange:MakeCBucketRange(6*60*60.00, DBL_MAX)]
+                [BinRange binRangeWithRange:MakeCBinRange(6*60*60.00, DBL_MAX)]
             ];
 
             NSError *err;
@@ -173,7 +173,7 @@ PsiFeedbackLogType const FeedbackUploadLogType = @"FeedbackUpload";
                                                                  withRotatedFilepath:[sharedDB extensionJetsamMetricsRotatedFilePath]
                                                                     registryFilepath:[sharedDB containerJetsamMetricsRegistryFilePath]
                                                                        readChunkSize:8000
-                                                                        bucketRanges:bucketRanges
+                                                                           binRanges:binRanges
                                                                                error:&err];
             if (err != nil) {
                 [PsiFeedbackLogger errorWithType:FeedbackUploadLogType

@@ -78,11 +78,11 @@
     }
 }
 
-- (void)testBucketRanges {
-    JetsamMetrics *metrics = [[JetsamMetrics alloc] initWithBucketRanges:
+- (void)testBinRanges {
+    JetsamMetrics *metrics = [[JetsamMetrics alloc] initWithBinRanges:
                               @[
-                                  [BucketRange bucketRangeWithRange:MakeCBucketRange(0, 60)],
-                                  [BucketRange bucketRangeWithRange:MakeCBucketRange(60, 120)]
+                                  [BinRange binRangeWithRange:MakeCBinRange(0, 60)],
+                                  [BinRange binRangeWithRange:MakeCBinRange(60, 120)]
                               ]];
     [metrics addJetsamForAppVersion:@"1" runningTime:0];
     [metrics addJetsamForAppVersion:@"1" runningTime:5];
@@ -93,21 +93,21 @@
     [metrics addJetsamForAppVersion:@"2" runningTime:3];
     [metrics addJetsamForAppVersion:@"2" runningTime:3];
 
-    NSArray<Bucket*>* version1Buckets = [metrics.perVersionMetrics objectForKey:@"1"].talliedBuckets;
-    if (version1Buckets == nil) {
-        XCTFail(@"Expected version 1 buckets");
+    NSArray<Bin*>* version1Bins = [metrics.perVersionMetrics objectForKey:@"1"].talliedBins;
+    if (version1Bins == nil) {
+        XCTFail(@"Expected version 1 bins");
         return;
     }
-    NSArray<Bucket*>* version2Buckets = [metrics.perVersionMetrics objectForKey:@"2"].talliedBuckets;
-    if (version2Buckets == nil) {
-        XCTFail(@"Expected version 2 buckets");
+    NSArray<Bin*>* version2Bins = [metrics.perVersionMetrics objectForKey:@"2"].talliedBins;
+    if (version2Bins == nil) {
+        XCTFail(@"Expected version 2 bins");
         return;
     }
 
-    XCTAssertEqual([version1Buckets objectAtIndex:0].count, 3);
-    XCTAssertEqual([version1Buckets objectAtIndex:1].count, 2);
-    XCTAssertEqual([version2Buckets objectAtIndex:0].count, 2);
-    XCTAssertEqual([version2Buckets objectAtIndex:1].count, 0);
+    XCTAssertEqual([version1Bins objectAtIndex:0].count, 3);
+    XCTAssertEqual([version1Bins objectAtIndex:1].count, 2);
+    XCTAssertEqual([version2Bins objectAtIndex:0].count, 2);
+    XCTAssertEqual([version2Bins objectAtIndex:1].count, 0);
 }
 
 #pragma mark - NSCopying protocol implementation tests

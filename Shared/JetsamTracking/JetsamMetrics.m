@@ -31,7 +31,7 @@ NSString *_Nonnull const MetricsDictionaryCoderKey = @"metrics.dict";
 @interface JetsamMetrics ()
 
 @property (nonatomic, strong) NSDictionary <NSString *, RunningStat *> *perVersionMetrics;
-@property (nonatomic, strong) NSArray<BucketRange*> *bucketRanges;
+@property (nonatomic, strong) NSArray<BinRange*> *binRanges;
 
 @end
 
@@ -46,10 +46,10 @@ NSString *_Nonnull const MetricsDictionaryCoderKey = @"metrics.dict";
     return self;
 }
 
-- (instancetype)initWithBucketRanges:(NSArray<BucketRange*>*)bucketRanges {
+- (instancetype)initWithBinRanges:(NSArray<BinRange*>*)binRanges {
     self = [self init];
     if (self) {
-        self.bucketRanges = bucketRanges;
+        self.binRanges = binRanges;
     }
     return self;
 }
@@ -61,7 +61,7 @@ NSString *_Nonnull const MetricsDictionaryCoderKey = @"metrics.dict";
 
     RunningStat *metric = [newPerVersionMetrics objectForKey:appVersion];
     if (metric == NULL) {
-        metric = [[RunningStat alloc] initWithValue:(double)runningTime bucketRanges:self.bucketRanges];
+        metric = [[RunningStat alloc] initWithValue:(double)runningTime binRanges:self.binRanges];
     } else {
         [metric addValue:(double)runningTime];
     }

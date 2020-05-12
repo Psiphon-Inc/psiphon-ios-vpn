@@ -18,7 +18,7 @@
  */
 
 #import "JetsamMetrics+Feedback.h"
-#import "RunningBuckets.h"
+#import "RunningBins.h"
 #import "NSError+Convenience.h"
 
 NSErrorDomain _Nonnull const JetsamMetrics_FeedbackErrorDomain = @"JetsamMetrics_FeedbackErrorDomain";
@@ -86,18 +86,18 @@ NSErrorDomain _Nonnull const JetsamMetrics_FeedbackErrorDomain = @"JetsamMetrics
                                           @"stdev": @([stat stdev]),
                                           @"var": @([stat variance])}];
 
-            NSArray<Bucket*> *talliedBuckets = [stat talliedBuckets];
-            if (talliedBuckets != nil) {
-                NSMutableArray<NSDictionary*> *bucketMetrics = [[NSMutableArray alloc]
-                                                                initWithCapacity:[talliedBuckets count]];
-                // Add each bucket
-                for (Bucket *bucket in talliedBuckets) {
-                    NSDictionary *bucketMetric = @{@"lower_bound": @(bucket.range.lowerBound),
-                                                   @"upper_bound": @(bucket.range.upperBound),
-                                                   @"count": @(bucket.count)};
-                    [bucketMetrics addObject:bucketMetric];
+            NSArray<Bin*> *talliedBins = [stat talliedBins];
+            if (talliedBins != nil) {
+                NSMutableArray<NSDictionary*> *binMetrics = [[NSMutableArray alloc]
+                                                             initWithCapacity:[talliedBins count]];
+                // Add each bin
+                for (Bin *bin in talliedBins) {
+                    NSDictionary *binMetric = @{@"lower_bound": @(bin.range.lowerBound),
+                                                   @"upper_bound": @(bin.range.upperBound),
+                                                   @"count": @(bin.count)};
+                    [binMetrics addObject:binMetric];
                 }
-                [perVersionStat setObject:bucketMetrics forKey:@"buckets"];
+                [perVersionStat setObject:binMetrics forKey:@"bins"];
             }
 
             [jsonDict setObject:perVersionStat forKey:key];

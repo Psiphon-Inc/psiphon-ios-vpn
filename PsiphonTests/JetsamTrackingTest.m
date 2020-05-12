@@ -64,9 +64,9 @@
         [JetsamEvent jetsamEventWithAppVersion:@"2" runningTime:1 jetsamDate:[NSDate.date timeIntervalSince1970]]
     ];
 
-    NSArray<BucketRange*>* bucketRanges = @[
-        [BucketRange bucketRangeWithRange:MakeCBucketRange(0, 10)],
-        [BucketRange bucketRangeWithRange:MakeCBucketRange(10, DBL_MAX)],
+    NSArray<BinRange*>* binRanges = @[
+        [BinRange binRangeWithRange:MakeCBinRange(0, 10)],
+        [BinRange binRangeWithRange:MakeCBinRange(10, DBL_MAX)],
     ];
 
     NSMutableDictionary<NSString*, RunningStat*>* expectedMetrics = [[NSMutableDictionary alloc] init];
@@ -84,7 +84,7 @@
 
         RunningStat *stat = [expectedMetrics objectForKey:jetsam.appVersion];
         if (stat == nil) {
-            stat = [[RunningStat alloc] initWithValue:jetsam.runningTime bucketRanges:bucketRanges];
+            stat = [[RunningStat alloc] initWithValue:jetsam.runningTime binRanges:binRanges];
         } else {
             [stat addValue:jetsam.runningTime];
         }
@@ -95,7 +95,7 @@
                                                          withRotatedFilepath:olderFilePath
                                                             registryFilepath:registryFilePath
                                                                readChunkSize:32
-                                                                bucketRanges:bucketRanges
+                                                                   binRanges:binRanges
                                                                        error:&err];
     if (err != nil) {
         XCTFail(@"Unexpected error: %@", err);
@@ -156,7 +156,7 @@
 
         RunningStat *stat = [expectedMetrics objectForKey:jetsam.appVersion];
         if (stat == nil) {
-            stat = [[RunningStat alloc] initWithValue:jetsam.runningTime bucketRanges:nil];
+            stat = [[RunningStat alloc] initWithValue:jetsam.runningTime binRanges:nil];
         } else {
             [stat addValue:jetsam.runningTime];
         }
@@ -172,7 +172,7 @@
                                                          withRotatedFilepath:olderFilePath
                                                             registryFilepath:registryFilePath
                                                                readChunkSize:32
-                                                                bucketRanges:nil
+                                                                   binRanges:nil
                                                                        error:&err];
     if (err == nil) {
         XCTFail(@"Unexpected error");
@@ -191,8 +191,8 @@
     for (NSString *key in perVersionMetrics) {
         RunningStat *stat = [perVersionMetrics objectForKey:key];
         if (stat != nil) {
-            NSLog(@"(v%@) count: %d, min: %f, max: %f, stdev: %f, buckets: %@",
-                  key,stat.count, stat.min, stat.max, [stat stdev], stat.talliedBuckets);
+            NSLog(@"(v%@) count: %d, min: %f, max: %f, stdev: %f, bins: %@",
+                  key,stat.count, stat.min, stat.max, [stat stdev], stat.talliedBins);
         }
     }
 }

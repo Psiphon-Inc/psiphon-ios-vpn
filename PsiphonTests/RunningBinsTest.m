@@ -18,26 +18,26 @@
  */
 
 #import <XCTest/XCTest.h>
-#import "RunningBuckets.h"
+#import "RunningBins.h"
 
-@interface RunningBucketsTest : XCTestCase
+@interface RunningBinsTest : XCTestCase
 
 @end
 
-@implementation RunningBucketsTest
+@implementation RunningBinsTest
 
-/// Tests multiple buckets with different inclusive and exclusive boundaries.
+/// Tests multiple bins with different inclusive and exclusive boundaries.
 - (void)testBoundaries {
 
-    NSArray<BucketRange*> *bucketRanges = @[
-        [BucketRange bucketRangeWithRange:MakeCBucketRange(-DBL_MAX, -1)],
-        [BucketRange bucketRangeWithRange:MakeCBucketRange(0.00, 1.00)],
-        [BucketRange bucketRangeWithRange:MakeCBucketRange(0.00, 0.25)],
-        [BucketRange bucketRangeWithRange:MakeCBucketRange(0.25, 0.50)],
-        [BucketRange bucketRangeWithRange:MakeCBucketRange(0.50, 1.00)],
-        [BucketRange bucketRangeWithRange:MakeCBucketRange(-DBL_MAX, DBL_MAX)]];
+    NSArray<BinRange*> *binRanges = @[
+        [BinRange binRangeWithRange:MakeCBinRange(-DBL_MAX, -1)],
+        [BinRange binRangeWithRange:MakeCBinRange(0.00, 1.00)],
+        [BinRange binRangeWithRange:MakeCBinRange(0.00, 0.25)],
+        [BinRange binRangeWithRange:MakeCBinRange(0.25, 0.50)],
+        [BinRange binRangeWithRange:MakeCBinRange(0.50, 1.00)],
+        [BinRange binRangeWithRange:MakeCBinRange(-DBL_MAX, DBL_MAX)]];
 
-    RunningBuckets *buckets = [[RunningBuckets alloc] initWithBucketRanges:bucketRanges];
+    RunningBins *bins = [[RunningBins alloc] initWithBinRanges:binRanges];
 
     NSArray<NSNumber*> *values = @[[NSNumber numberWithDouble:0],
                                    [NSNumber numberWithDouble:1],
@@ -48,16 +48,16 @@
                                    [NSNumber numberWithDouble:0.999]];
 
     for (NSNumber *val in values) {
-       [buckets addValue:val.doubleValue];
+       [bins addValue:val.doubleValue];
     }
 
-    XCTAssertEqual(buckets.count, values.count);
-    XCTAssertEqual([buckets.buckets objectAtIndex:0].count, 0);
-    XCTAssertEqual([buckets.buckets objectAtIndex:1].count, 6);
-    XCTAssertEqual([buckets.buckets objectAtIndex:2].count, 2);
-    XCTAssertEqual([buckets.buckets objectAtIndex:3].count, 1);
-    XCTAssertEqual([buckets.buckets objectAtIndex:4].count, 3);
-    XCTAssertEqual([buckets.buckets objectAtIndex:5].count, 7);
+    XCTAssertEqual(bins.count, values.count);
+    XCTAssertEqual([bins.bins objectAtIndex:0].count, 0);
+    XCTAssertEqual([bins.bins objectAtIndex:1].count, 6);
+    XCTAssertEqual([bins.bins objectAtIndex:2].count, 2);
+    XCTAssertEqual([bins.bins objectAtIndex:3].count, 1);
+    XCTAssertEqual([bins.bins objectAtIndex:4].count, 3);
+    XCTAssertEqual([bins.bins objectAtIndex:5].count, 7);
 }
 
 @end
