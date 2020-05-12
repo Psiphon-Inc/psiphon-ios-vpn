@@ -28,6 +28,7 @@
 #import <stdatomic.h>
 #import "AppInfo.h"
 #import "AppProfiler.h"
+#import "ExtensionDataStore.h"
 #import "PacketTunnelProvider.h"
 #import "PsiphonConfigReader.h"
 #import "PsiphonConfigUserDefaults.h"
@@ -38,7 +39,6 @@
 #import "RegionAdapter.h"
 #import "SubscriptionVerifierService.h"
 #import "PacketTunnelUtils.h"
-#import "PersistentSubsMetadata.h"
 #import "NSError+Convenience.h"
 #import "RACSignal+Operations.h"
 #import "RACDisposable.h"
@@ -52,6 +52,7 @@
 #import "DebugUtils.h"
 #import "FileUtils.h"
 #import "Strings.h"
+#import "NSUserDefaults+KeyedDataStore.h"
 #import <ReactiveObjC/RACSubject.h>
 #import <ReactiveObjC/RACReplaySubject.h>
 
@@ -295,8 +296,10 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
           SubscriptionVerifierRequestMetadata *subscriptionVerifierRequestMetadata = [[SubscriptionVerifierRequestMetadata alloc] init];
           subscriptionVerifierRequestMetadata.reason = [ShouldUpdateAuthResult reasonToString:localSubscriptionCheck.reason];
           subscriptionVerifierRequestMetadata.extensionStartReason = [[self extensionStartMethodTextDescription] lowercaseString];
-          subscriptionVerifierRequestMetadata.lastAuthId = [PersistentSubsMetadataUserDefaults lastAuthID];
-          subscriptionVerifierRequestMetadata.lastAuthAccessType = [PersistentSubsMetadataUserDefaults lastAuthAccessType];
+          ExtensionDataStore *dataStore = [[ExtensionDataStore alloc]
+                                           initWithDataStore:[NSUserDefaults standardUserDefaults]];
+          subscriptionVerifierRequestMetadata.lastAuthId = [dataStore lastAuthID];
+          subscriptionVerifierRequestMetadata.lastAuthAccessType = [dataStore lastAuthAccessType];
 
           switch ((SubscriptionCheckEnum) [localSubscriptionCheck.subscriptionCheckEnum integerValue]) {
               case SubscriptionCheckAuthorizationExpired:
@@ -446,8 +449,10 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
               if (subscription.authorization) {
                   // Persist select authorization information so it can be included in the next
                   // request to the verifier server for logging.
-                  [PersistentSubsMetadataUserDefaults setLastAuthID:subscription.authorization.ID];
-                  [PersistentSubsMetadataUserDefaults setLastAuthAccessType:subscription.authorization.accessType];
+                  ExtensionDataStore *dataStore = [[ExtensionDataStore alloc]
+                                                   initWithDataStore:[NSUserDefaults standardUserDefaults]];
+                  [dataStore setLastAuthID:subscription.authorization.ID];
+                  [dataStore setLastAuthAccessType:subscription.authorization.accessType];
 
                   // New authorization was received from the subscription verifier server.
                   // Restarts the tunnel to connect with the new authorization only if it is different from

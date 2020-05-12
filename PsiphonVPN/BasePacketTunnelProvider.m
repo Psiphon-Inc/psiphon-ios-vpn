@@ -20,9 +20,9 @@
 #import <Foundation/Foundation.h>
 #import "BasePacketTunnelProvider.h"
 #import "AppInfo.h"
+#import "ExtensionDataStore.h"
 #import "JetsamTracking.h"
 #import "SharedConstants.h"
-#import "PersistentJetsamData.h"
 #import "PsiFeedbackLogger.h"
 #import "FileUtils.h"
 #import "RACReplaySubject.h"
@@ -30,8 +30,8 @@
 #import "Asserts.h"
 #import "PsiphonDataSharedDB.h"
 #import "Logging.h"
-
 #import "NSDate+PSIDateExtension.h"
+#import "NSUserDefaults+KeyedDataStore.h"
 
 NSErrorDomain _Nonnull const BasePsiphonTunnelErrorDomain = @"BasePsiphonTunnelErrorDomain";
 
@@ -84,11 +84,13 @@ PsiFeedbackLogType const JetsamMetricsLogType = @"JetsamMetrics";
         [self.sharedDB setExtensionJetsammedBeforeStopFlag:TRUE];
 
         if (previouslyJetsammed) {
+            ExtensionDataStore *dataStore = [[ExtensionDataStore alloc]
+                                             initWithDataStore:[NSUserDefaults standardUserDefaults]];
 
-            NSDate *previousStartTime = [PersistentJetsamData extensionStartTime];
+            NSDate *previousStartTime = [dataStore extensionStartTime];
             if (previousStartTime) {
 
-                NSDate *lastTickerTime = [PersistentJetsamData tickerTime];
+                NSDate *lastTickerTime = [dataStore tickerTime];
                 if (lastTickerTime == nil) {
                     // No previous ticker time. Set to now.
                     lastTickerTime = NSDate.date;
@@ -123,12 +125,14 @@ PsiFeedbackLogType const JetsamMetricsLogType = @"JetsamMetrics";
             }
         }
 
-        [PersistentJetsamData setExtensionStartTimeToNow];
+        ExtensionDataStore *dataStore = [[ExtensionDataStore alloc]
+                                         initWithDataStore:[NSUserDefaults standardUserDefaults]];
+        [dataStore setExtensionStartTimeToNow];
 
         // Start timer which tracks extension uptime.
         dispatch_async(dispatch_get_main_queue(), ^{
             [NSTimer scheduledTimerWithTimeInterval:5 repeats:YES block:^(NSTimer * _Nonnull timer) {
-                [PersistentJetsamData setTickerTimeToNow];
+                [dataStore setTickerTimeToNow];
             }];
         });
 
