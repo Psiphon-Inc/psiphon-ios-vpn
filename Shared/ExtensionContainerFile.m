@@ -202,8 +202,13 @@ NSErrorDomain _Nonnull const ContainerReaderRotatedFileErrorDomain = @"Container
                FileRegistryEntry *newEntry =
                  [FileRegistryEntry fileRegistryEntryWithFilepath:self->olderFilepath
                                              fileSystemFileNumber:fileEntry.fileSystemFileNumber
-                                                           offset:olderFile.bytesReturned - olderFileInitialOffset];
+                                                           offset:self->olderFileInitialOffset + olderFile.bytesReturned];
                [registry setEntry:newEntry];
+           } else {
+               *outError = [NSError errorWithDomain:ContainerReaderRotatedFileErrorDomain
+                                               code:ContainerReaderRotatedFileErrorReadRegistryFailed
+                            andLocalizedDescription:@"Older file registry not found"];
+               return nil;
            }
 
            if (line != nil) {
@@ -228,8 +233,13 @@ NSErrorDomain _Nonnull const ContainerReaderRotatedFileErrorDomain = @"Container
             FileRegistryEntry *newEntry =
               [FileRegistryEntry fileRegistryEntryWithFilepath:self->filepath
                                           fileSystemFileNumber:fileEntry.fileSystemFileNumber
-                                                        offset:file.bytesReturned - fileInitialOffset];
+                                                        offset:self->fileInitialOffset + file.bytesReturned];
             [registry setEntry:newEntry];
+        } else {
+            *outError = [NSError errorWithDomain:ContainerReaderRotatedFileErrorDomain
+                                            code:ContainerReaderRotatedFileErrorReadRegistryFailed
+                         andLocalizedDescription:@"File registry not found"];
+            return nil;
         }
 
         if (line != nil) {

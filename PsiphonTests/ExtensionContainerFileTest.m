@@ -134,16 +134,23 @@
     }
     XCTAssertNil(line);
 
+    [cont persistRegistry:&err];
+    if (err != nil) {
+        XCTFail(@"Unexpected error: %@", err);
+        return;
+    }
+
     // Write some more lines and validate that the registry has been persisted and restored
     // successfully.
 
-    lines = @[@"1234", @"5678"];
+    lines = @[@"1234"];
     // Expect to only read back the latest lines since the previous lines have been read and this
     // was persisted in the registry.
-    expectedLines = @[@"1234", @"5678"];
+    expectedLines = @[@"1234"];
 
     for (NSString *line in lines) {
-        [ext writeData:[[line stringByAppendingString:@"\n"] dataUsingEncoding:NSASCIIStringEncoding]
+        [ext writeData:[[line stringByAppendingString:@"\n"]
+                        dataUsingEncoding:NSASCIIStringEncoding]
                  error:&err];
         if (err != nil) {
             XCTFail(@"Unexpected error: %@", err);
@@ -174,6 +181,88 @@
 
     if (![readLines isEqualToArray:expectedLines]) {
         XCTFail(@"%@ is not equal to expected lines %@", readLines, expectedLines);
+        return;
+    }
+
+    [cont persistRegistry:&err];
+    if (err != nil) {
+        XCTFail(@"Unexpected error: %@", err);
+        return;
+    }
+
+    // Write another line which will not cause a file rotation.
+    // After this we can check if the offset was restored successfully.
+
+    lines = @[@"5678"];
+    // Expect to only read back the latest lines since the previous lines have been read and this
+    // was persisted in the registry.
+    expectedLines = @[@"5678"];
+
+    for (NSString *line in lines) {
+        [ext writeData:[[line stringByAppendingString:@"\n"]
+                        dataUsingEncoding:NSASCIIStringEncoding]
+                 error:&err];
+        if (err != nil) {
+            XCTFail(@"Unexpected error: %@", err);
+            return;
+        }
+    }
+
+    cont =
+      [[ContainerReaderRotatedFile alloc] initWithFilepath:filePath
+                                           olderFilepath:olderFilePath
+                                        registryFilepath:registryFilePath
+                                           readChunkSize:1
+                                                   error:&err];
+
+    readLines = [[NSMutableArray alloc] init]; // reset
+
+    while (true) {
+        NSString *line = [cont readLineWithError:&err];
+        if (err != nil) {
+            XCTFail(@"Unexpected error: %@", err);
+            return;
+        }
+        if (line == nil) {
+            break;
+        }
+        [readLines addObject:line];
+    }
+
+    if (![readLines isEqualToArray:expectedLines]) {
+        XCTFail(@"%@ is not equal to expected lines %@", readLines, expectedLines);
+        return;
+    }
+
+    [cont persistRegistry:&err];
+    if (err != nil) {
+        XCTFail(@"Unexpected error: %@", err);
+        return;
+    }
+
+    // Confirm the offset was successfully restored and the next read returns nothing.
+
+    cont =
+        [[ContainerReaderRotatedFile alloc] initWithFilepath:filePath
+                                               olderFilepath:olderFilePath
+                                            registryFilepath:registryFilePath
+                                               readChunkSize:64
+                                                       error:&err];
+    if (err != nil) {
+        XCTFail(@"Unexpected error: %@", err);
+        return;
+    }
+
+    line = [cont readLineWithError:&err];
+    if (err != nil) {
+        XCTFail(@"Unexpected error: %@", err);
+        return;
+    }
+    XCTAssertNil(line);
+
+    [cont persistRegistry:&err];
+    if (err != nil) {
+        XCTFail(@"Unexpected error: %@", err);
         return;
     }
 }
