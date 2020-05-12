@@ -151,21 +151,21 @@ PsiFeedbackLogType const FeedbackUploadLogType = @"FeedbackUpload";
             // Jetsam running time buckets
             NSArray<BucketRange*>* bucketRanges = @[
                 // [0, 30s)
-                [BucketRange bucketRangeWithRange:MakeCBucketRange(    0.00,   TRUE,      30.00, FALSE)],
+                [BucketRange bucketRangeWithRange:MakeCBucketRange(0.00, 30.00)],
                 // [30s, 60s)
-                [BucketRange bucketRangeWithRange:MakeCBucketRange(   30.00,   TRUE,      60.00, FALSE)],
+                [BucketRange bucketRangeWithRange:MakeCBucketRange(30.00, 60.00)],
                 // [60s, 5m)
-                [BucketRange bucketRangeWithRange:MakeCBucketRange(   60.00,   TRUE,    5*60.00, FALSE)],
+                [BucketRange bucketRangeWithRange:MakeCBucketRange(60.00, 5*60.00)],
                 // [5m, 10m)
-                [BucketRange bucketRangeWithRange:MakeCBucketRange( 5*60.00,   TRUE,   10*60.00, FALSE)],
+                [BucketRange bucketRangeWithRange:MakeCBucketRange(5*60.00, 10*60.00)],
                 // [10m, 30m)
-                [BucketRange bucketRangeWithRange:MakeCBucketRange(10*60.00,   TRUE,   30*60.00, FALSE)],
+                [BucketRange bucketRangeWithRange:MakeCBucketRange(10*60.00, 30*60.00)],
                 // [30m, 1h)
-                [BucketRange bucketRangeWithRange:MakeCBucketRange(30*60.00,   TRUE,   60*60.00, FALSE)],
+                [BucketRange bucketRangeWithRange:MakeCBucketRange(30*60.00, 60*60.00)],
                 // [1h, 6h)
-                [BucketRange bucketRangeWithRange:MakeCBucketRange(60*60.00,   TRUE, 6*60*60.00, FALSE)],
+                [BucketRange bucketRangeWithRange:MakeCBucketRange(60*60.00, 6*60*60.00)],
                 // [6h, inf]
-                [BucketRange bucketRangeWithRange:MakeCBucketRange(6*60*60.00, TRUE,    DBL_MAX, TRUE)]
+                [BucketRange bucketRangeWithRange:MakeCBucketRange(6*60*60.00, DBL_MAX)]
             ];
 
             NSError *err;

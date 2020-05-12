@@ -21,11 +21,8 @@
 
 @interface BucketRange ()
 
-@property (nonatomic, assign) double min;
-@property (nonatomic, assign) BOOL minInclusive;
-
-@property (nonatomic, assign) double max;
-@property (nonatomic, assign) BOOL maxInclusive;
+@property (nonatomic, assign) double lowerBound;
+@property (nonatomic, assign) double upperBound;
 
 @end
 
@@ -34,19 +31,15 @@ NSUInteger const BucketRangeArchiveVersion1 = 1;
 
 // NSCoder keys (must be unique)
 NSString *_Nonnull const BucketRangeArchiveVersionIntCoderKey = @"version.int";
-NSString *_Nonnull const BucketRangeMinDoubleCoderKey = @"min.double";
-NSString *_Nonnull const BucketRangeMinInclusiveBoolCoderKey = @"min_inclusive.bool";
-NSString *_Nonnull const BucketRangeMaxDoubleCoderKey = @"max.double";
-NSString *_Nonnull const BucketRangeMaxInclusiveBoolCoderKey = @"max_inclusive.bool";
+NSString *_Nonnull const BucketRangeLowerBoundDoubleCoderKey = @"lower_bound.double";
+NSString *_Nonnull const BucketRangeUpperBoundDoubleCoderKey = @"upper_bound.double";
 
 @implementation BucketRange
 
 + (instancetype)bucketRangeWithRange:(CBucketRange)range {
     BucketRange *x = [[BucketRange alloc] init];
-    x.min = range.min;
-    x.minInclusive = range.minInclusive;
-    x.max = range.max;
-    x.maxInclusive = range.maxInclusive;
+    x.lowerBound = range.lower_bound;
+    x.upperBound = range.upper_bound;
 
     return x;
 }
@@ -55,10 +48,8 @@ NSString *_Nonnull const BucketRangeMaxInclusiveBoolCoderKey = @"max_inclusive.b
 
 - (BOOL)isEqualToBucketRange:(BucketRange *)bucketRange {
     return
-        self.min == bucketRange.min &&
-        self.minInclusive == bucketRange.minInclusive &&
-        self.max == bucketRange.max &&
-        self.maxInclusive == bucketRange.maxInclusive;
+        self.lowerBound == bucketRange.lowerBound &&
+        self.upperBound == bucketRange.upperBound;
 }
 
 - (BOOL)isEqual:(id)object {
@@ -79,25 +70,17 @@ NSString *_Nonnull const BucketRangeMaxInclusiveBoolCoderKey = @"max_inclusive.b
     [coder encodeInt:BucketRangeArchiveVersion1
               forKey:BucketRangeArchiveVersionIntCoderKey];
 
-    [coder encodeDouble:self.min
-                 forKey:BucketRangeMinDoubleCoderKey];
-    [coder encodeBool:self.minInclusive
-               forKey:BucketRangeMinInclusiveBoolCoderKey];
-
-    [coder encodeDouble:self.max
-                 forKey:BucketRangeMaxDoubleCoderKey];
-    [coder encodeBool:self.maxInclusive
-               forKey:BucketRangeMaxInclusiveBoolCoderKey];
+    [coder encodeDouble:self.lowerBound
+                 forKey:BucketRangeLowerBoundDoubleCoderKey];
+    [coder encodeDouble:self.upperBound
+                 forKey:BucketRangeUpperBoundDoubleCoderKey];
 }
 
 - (nullable instancetype)initWithCoder:(nonnull NSCoder *)coder {
     self = [super init];
     if (self) {
-        self.min = [coder decodeDoubleForKey:BucketRangeMinDoubleCoderKey];
-        self.minInclusive = [coder decodeBoolForKey:BucketRangeMinInclusiveBoolCoderKey];
-
-        self.max = [coder decodeDoubleForKey:BucketRangeMaxDoubleCoderKey];
-        self.maxInclusive = [coder decodeBoolForKey:BucketRangeMaxInclusiveBoolCoderKey];
+        self.lowerBound = [coder decodeDoubleForKey:BucketRangeLowerBoundDoubleCoderKey];
+        self.upperBound = [coder decodeDoubleForKey:BucketRangeUpperBoundDoubleCoderKey];
     }
 
     return self;
@@ -133,7 +116,7 @@ NSString *_Nonnull const BucketBucketRangeCoderKey = @"bucket_range.bucket_range
 }
 
 - (instancetype)initWithRange:(BucketRange*)range {
-    assert(range.min <= range.max);
+    assert(range.lowerBound <= range.upperBound);
 
     self = [super init];
     if (self) {
@@ -148,8 +131,10 @@ NSString *_Nonnull const BucketBucketRangeCoderKey = @"bucket_range.bucket_range
 }
 
 - (BOOL)valueInRange:(double)x {
-    if (x > self.range.min || (x == self.range.min && self.range.minInclusive)) {
-        if (x < self.range.max || (x == self.range.max && self.range.maxInclusive)) {
+    // Lower bound is inclusive
+    if (x >= self.range.lowerBound) {
+        // Upper bound is exclusive
+        if (x < self.range.upperBound) {
             return TRUE;
         }
         return FALSE;

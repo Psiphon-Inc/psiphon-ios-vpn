@@ -20,20 +20,19 @@
 #import <Foundation/Foundation.h>
 
 typedef struct _CBucketRange {
-    double min;
-    BOOL minInclusive;
-    double max;
-    BOOL maxInclusive;
+    double lower_bound; // Inclusive lower bound
+    double upper_bound; // Exclusive upper bound
 } CBucketRange;
 
-NS_INLINE CBucketRange MakeCBucketRange(double min, BOOL minInclusive,
-                                        double max, BOOL maxInclusive) {
-    assert(min <= max);
+/// Make a bucket range.
+/// @param lower_bound Inclusive lower bound.
+/// @param upper_bound Exclusive upper bound.
+NS_INLINE CBucketRange MakeCBucketRange(double lower_bound,
+                                        double upper_bound) {
+    assert(lower_bound <= upper_bound);
     CBucketRange r;
-    r.min = min;
-    r.minInclusive = minInclusive;
-    r.max = max;
-    r.maxInclusive = maxInclusive;
+    r.lower_bound = lower_bound;
+    r.upper_bound = upper_bound;
 
     return r;
 }
@@ -45,11 +44,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (instancetype)bucketRangeWithRange:(CBucketRange)range;
 
-@property (readonly, nonatomic, assign) double min;
-@property (readonly, nonatomic, assign) BOOL minInclusive;
+/// Inclusive lower bound.
+@property (readonly, nonatomic, assign) double lowerBound;
 
-@property (readonly, nonatomic, assign) double max;
-@property (readonly, nonatomic, assign) BOOL maxInclusive;
+/// Exclusive upper bound.
+@property (readonly, nonatomic, assign) double upperBound;
 
 - (BOOL)isEqualToBucketRange:(BucketRange*)bucketRange;
 
@@ -72,7 +71,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /// Check if value is in the bucket's range.
 /// @param x Value to check.
-/// @return Returns true if the value is in range, otherwise false.
+/// @return Returns true if the value falls within the range [bucket.range.lowerBound, bucket.range.upperBound).
 - (BOOL)valueInRange:(double)x;
 
 - (BOOL)isEqualToBucket:(Bucket*)bucket;
