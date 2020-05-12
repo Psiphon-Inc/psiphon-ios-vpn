@@ -18,9 +18,6 @@
  */
 
 #import <Foundation/Foundation.h>
-#import <mopub-ios-sdk/MPInterstitialAdController.h>
-#import <mopub-ios-sdk/MoPub.h>
-#import <mopub-ios-sdk/MPRewardedVideo.h>
 #import "AdControllerWrapper.h"
 @import GoogleMobileAds;
 
@@ -37,6 +34,10 @@ FOUNDATION_EXPORT AdControllerTag const AdControllerTagAdMobUntunneledRewardedVi
 FOUNDATION_EXPORT AdControllerTag const AdControllerTagMoPubTunneledRewardedVideo;
 
 @interface AdManager : NSObject
+
+/** Terminating signal, that emits unit value when ad SDK is loaded.
+ */
+@property (nonatomic, readonly) RACSubject<RACUnit *> *adSDKStarted;
 
 /**
  * Infinite signal that emits @(TRUE) if an is currently being displayed, @(FALSE) otherwise.
