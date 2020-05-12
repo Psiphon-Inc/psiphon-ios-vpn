@@ -61,7 +61,8 @@ extension ParsedPsiCashAppStorePurchasable {
                 product: .product(product),
                 title: title,
                 subtitle: product.skProduct.localizedDescription,
-                localizedPrice: .makeLocalizedPrice(skProduct: product.skProduct)
+                localizedPrice: .makeLocalizedPrice(skProduct: product.skProduct),
+                clearedForSale: true
             )
         )
     }
