@@ -223,9 +223,8 @@
 		CE7182132460689A008F815A /* JetsamTrackingTest.m in Sources */ = {isa = PBXBuildFile; fileRef = CE7182122460689A008F815A /* JetsamTrackingTest.m */; };
 		CE7B76431F54881F00EA44BD /* PsiphonTunnel.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 66094F781E8067520069EC4E /* PsiphonTunnel.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		CE8026A42448B5B4005AF848 /* NSUserDefaults+KeyedDataStore.m in Sources */ = {isa = PBXBuildFile; fileRef = CE8026A32448B5B4005AF848 /* NSUserDefaults+KeyedDataStore.m */; };
-		CE8026A72448B7E6005AF848 /* PersistentSubsMetadata.m in Sources */ = {isa = PBXBuildFile; fileRef = CE8026A62448B7E6005AF848 /* PersistentSubsMetadata.m */; };
-		CE8026AE2448BA2E005AF848 /* LocalDataStoreKeys.m in Sources */ = {isa = PBXBuildFile; fileRef = CE8026AD2448BA2E005AF848 /* LocalDataStoreKeys.m */; };
-		CE8026B72448EC4D005AF848 /* PersistentJetsamData.m in Sources */ = {isa = PBXBuildFile; fileRef = CE8026B62448EC4D005AF848 /* PersistentJetsamData.m */; };
+		CE8026A72448B7E6005AF848 /* ExtensionDataStore.m in Sources */ = {isa = PBXBuildFile; fileRef = CE8026A62448B7E6005AF848 /* ExtensionDataStore.m */; };
+		CE8026AE2448BA2E005AF848 /* ExtensionDataStoreKeys.m in Sources */ = {isa = PBXBuildFile; fileRef = CE8026AD2448BA2E005AF848 /* ExtensionDataStoreKeys.m */; };
 		CE82CE842459DFE1000C0512 /* RotatingFileTest.m in Sources */ = {isa = PBXBuildFile; fileRef = CE82CE832459DFE1000C0512 /* RotatingFileTest.m */; };
 		CE82CE90245A10E0000C0512 /* DelimitedFileTest.m in Sources */ = {isa = PBXBuildFile; fileRef = CE82CE8F245A10E0000C0512 /* DelimitedFileTest.m */; };
 		CE82CE92245A1232000C0512 /* DelimitedFile.m in Sources */ = {isa = PBXBuildFile; fileRef = CE82CE8B245A040A000C0512 /* DelimitedFile.m */; };
@@ -716,12 +715,10 @@
 		CE80269F2448B46F005AF848 /* KeyedDataStore.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = KeyedDataStore.h; sourceTree = "<group>"; };
 		CE8026A22448B5B4005AF848 /* NSUserDefaults+KeyedDataStore.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSUserDefaults+KeyedDataStore.h"; sourceTree = "<group>"; };
 		CE8026A32448B5B4005AF848 /* NSUserDefaults+KeyedDataStore.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "NSUserDefaults+KeyedDataStore.m"; sourceTree = "<group>"; };
-		CE8026A62448B7E6005AF848 /* PersistentSubsMetadata.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PersistentSubsMetadata.m; sourceTree = "<group>"; };
-		CE8026AD2448BA2E005AF848 /* LocalDataStoreKeys.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = LocalDataStoreKeys.m; sourceTree = "<group>"; };
-		CE8026B02448C1D6005AF848 /* PersistentSubsMetadata.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PersistentSubsMetadata.h; sourceTree = "<group>"; };
-		CE8026B42448EABC005AF848 /* LocalDataStoreKeys.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LocalDataStoreKeys.h; sourceTree = "<group>"; };
-		CE8026B52448EC4D005AF848 /* PersistentJetsamData.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PersistentJetsamData.h; sourceTree = "<group>"; };
-		CE8026B62448EC4D005AF848 /* PersistentJetsamData.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PersistentJetsamData.m; sourceTree = "<group>"; };
+		CE8026A62448B7E6005AF848 /* ExtensionDataStore.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ExtensionDataStore.m; sourceTree = "<group>"; };
+		CE8026AD2448BA2E005AF848 /* ExtensionDataStoreKeys.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ExtensionDataStoreKeys.m; sourceTree = "<group>"; };
+		CE8026B02448C1D6005AF848 /* ExtensionDataStore.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ExtensionDataStore.h; sourceTree = "<group>"; };
+		CE8026B42448EABC005AF848 /* ExtensionDataStoreKeys.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ExtensionDataStoreKeys.h; sourceTree = "<group>"; };
 		CE82CE832459DFE1000C0512 /* RotatingFileTest.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RotatingFileTest.m; sourceTree = "<group>"; };
 		CE82CE8A245A040A000C0512 /* DelimitedFile.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DelimitedFile.h; sourceTree = "<group>"; };
 		CE82CE8B245A040A000C0512 /* DelimitedFile.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DelimitedFile.m; sourceTree = "<group>"; };
@@ -1400,12 +1397,10 @@
 		CE8026AB2448B990005AF848 /* LocalDatastore */ = {
 			isa = PBXGroup;
 			children = (
-				CE8026B42448EABC005AF848 /* LocalDataStoreKeys.h */,
-				CE8026AD2448BA2E005AF848 /* LocalDataStoreKeys.m */,
-				CE8026B02448C1D6005AF848 /* PersistentSubsMetadata.h */,
-				CE8026A62448B7E6005AF848 /* PersistentSubsMetadata.m */,
-				CE8026B52448EC4D005AF848 /* PersistentJetsamData.h */,
-				CE8026B62448EC4D005AF848 /* PersistentJetsamData.m */,
+				CE8026B42448EABC005AF848 /* ExtensionDataStoreKeys.h */,
+				CE8026AD2448BA2E005AF848 /* ExtensionDataStoreKeys.m */,
+				CE8026B02448C1D6005AF848 /* ExtensionDataStore.h */,
+				CE8026A62448B7E6005AF848 /* ExtensionDataStore.m */,
 			);
 			path = LocalDatastore;
 			sourceTree = "<group>";
@@ -2203,7 +2198,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				CE82CEBC245C753E000C0512 /* FileRegistry.m in Sources */,
-				CE8026B72448EC4D005AF848 /* PersistentJetsamData.m in Sources */,
 				EF90D7AC204F22E300228A63 /* RACSignal+Operations2.m in Sources */,
 				EFC2F5CC20226835007B52F9 /* PsiphonConfigReader.m in Sources */,
 				CE6C3F6A24366AE1007A17F0 /* ClientMetadata.m in Sources */,
@@ -2223,7 +2217,7 @@
 				EF90D7AF204F231900228A63 /* timestamp_valid.c in Sources */,
 				CE82CE92245A1232000C0512 /* DelimitedFile.m in Sources */,
 				EF639C301F8FCE37009D6B42 /* PsiFeedbackLogger.m in Sources */,
-				CE8026A72448B7E6005AF848 /* PersistentSubsMetadata.m in Sources */,
+				CE8026A72448B7E6005AF848 /* ExtensionDataStore.m in Sources */,
 				EF90D7B6204F235100228A63 /* DispatchUtils.m in Sources */,
 				EF90D7B2204F232100228A63 /* timestamp_format.c in Sources */,
 				9BFECF8895D5FE1940A6F700 /* PsiphonConfigUserDefaults.m in Sources */,
@@ -2237,7 +2231,7 @@
 				CE3B3226244FA3150079C13F /* JetsamMetrics.m in Sources */,
 				CEE6FB312466224B00F74D05 /* RunningStdev.m in Sources */,
 				521FD0FE219E0E1900F748EC /* AppProfiler.m in Sources */,
-				CE8026AE2448BA2E005AF848 /* LocalDataStoreKeys.m in Sources */,
+				CE8026AE2448BA2E005AF848 /* ExtensionDataStoreKeys.m in Sources */,
 				EF90D7B4204F234100228A63 /* NSDate+Comparator.m in Sources */,
 				CEE6FB2924661B9B00F74D05 /* RunningStat.m in Sources */,
 				CEC8CD1A245887BA00DF1010 /* RotatingFile.m in Sources */,
