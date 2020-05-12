@@ -179,7 +179,7 @@ final class PsiCashViewController: UIViewController {
                             event: errorEvent.eraseToRepr(),
                             localizedUserDescription: UserStrings.Rewarded_video_load_failed())
 
-                        self.display(errorDesc: errorDesc)
+                        self.displayBasicAlert(errorDesc: errorDesc)
                         
                     case .noTunneledRewardedVideoAd:
                         break
@@ -214,13 +214,40 @@ final class PsiCashViewController: UIViewController {
                         event: psiCashErrorEvent.eraseToRepr(),
                         localizedUserDescription: psiCashErrorEvent.error.userDescription
                     )
+                    
                     self.display(screen: .mainScreen)
-                    self.display(errorDesc: errorDesc)
+                    
+                    if case .serverError(.insufficientBalance, nil) = psiCashErrorEvent.error {
+                        self.display(errorDesc: errorDesc) { () -> UIAlertController in
+                            let alertController = UIAlertController(
+                                title: UserStrings.Error_title(),
+                                message: errorDesc.localizedUserDescription,
+                                preferredStyle: .alert
+                            )
+
+                            alertController.addAction(
+                                UIAlertAction(
+                                    title: "Add PsiCash",
+                                    style: .default,
+                                    handler: { [unowned self] _ in
+                                        self.activeTab = .addPsiCash
+                                })
+                            )
+                            
+                            alertController.addAction(
+                                UIAlertAction(title: UserStrings.Dismiss_button_title(),
+                                              style: .cancel)
+                            )
+                            return alertController
+                        }
+                    } else {
+                        self.displayBasicAlert(errorDesc: errorDesc)
+                    }
                     
                 case (.error(let iapErrorEvent), _, _):
                     self.display(screen: .mainScreen)
                     if let errorDesc = errorEventDescription(iapErrorEvent: iapErrorEvent) {
-                        self.display(errorDesc: errorDesc)
+                        self.displayBasicAlert(errorDesc: errorDesc)
                     }
                     
                 default:
@@ -475,7 +502,26 @@ final class PsiCashViewController: UIViewController {
 // Navigations
 extension PsiCashViewController {
 
-    private func display(errorDesc: ErrorEventDescription<ErrorRepr>) {
+    /// Display an error alert with a single "OK" button.
+    private func displayBasicAlert(errorDesc: ErrorEventDescription<ErrorRepr>) {
+
+        self.display(errorDesc: errorDesc) { () -> UIAlertController in
+            let alert = UIAlertController(title: UserStrings.Error_title(),
+                                          message: errorDesc.localizedUserDescription,
+                                          preferredStyle: .alert)
+
+            alert.addAction(
+                UIAlertAction(title: UserStrings.OK_button_title(), style: .default)
+            )
+            
+            return alert
+        }
+    }
+    
+    /// Display error alert if `errorDesc` is a unique alert not in `self.errorAlerts`.
+    /// Only if the error is unique `makeAlertController` is called for creating the alert controller.
+    private func display(errorDesc: ErrorEventDescription<ErrorRepr>,
+                         makeAlertController: () -> UIAlertController) {
         // Inserts `errorDesc` into `errorAlerts` set.
         // If a member of `errorAlerts` is equal to `errorDesc.event.error`, then
         // that member is removed and `errorDesc` is inserted.
@@ -485,16 +531,9 @@ extension PsiCashViewController {
         guard inserted else {
             return
         }
-
-        let alert = UIAlertController(title: UserStrings.Error_title(),
-                                      message: errorDesc.localizedUserDescription,
-                                      preferredStyle: .alert)
-
-        alert.addAction(
-            UIAlertAction(title: UserStrings.OK_button_title(), style: .default)
-        )
-
-        self.present(alert, animated: true, completion: nil)
+        
+        let alertController = makeAlertController()
+        self.present(alertController, animated: true, completion: nil)
     }
 
     private func display(screen: Screen) {
