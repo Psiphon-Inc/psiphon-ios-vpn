@@ -468,7 +468,7 @@ typedef NS_ENUM(NSInteger, VPNIntent) {
     }] filter:^BOOL(NSNumber *adLoadStatusObj) {
         AdLoadStatus s = (AdLoadStatus) [adLoadStatusObj integerValue];
         // Filter terminating states.
-        return (AdLoadStatusDone == s) || (AdLoadStatusError == s);
+        return (AdLoadStatusDone == s) || (AdLoadStatusError == s) || (AdLoadStatusNone == s);
     }] take:1]
           flattenMap:^RACSignal *(NSNumber *adLoadStatusObj) {
         UIViewController *__strong topMostVC = weakTopMostVC;

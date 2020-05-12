@@ -170,8 +170,9 @@ PsiFeedbackLogType const AdMobRewardedAdControllerWrapperLogType = @"AdMobReward
             return nil;
         }
 
-        // We hav seen cases that shows the ad SDK does not check if the
-        // view controller has been dismissed before presenting the ad.
+        // Check if viewController passed in is being dismissed before
+        // presenting the ad.
+        // This check should be done regardless of the SDK.
         if (viewController.beingDismissed) {
             [subscriber sendNext:@(AdPresentationErrorFailedToPlay)];
             [subscriber sendCompleted];
@@ -212,6 +213,7 @@ PsiFeedbackLogType const AdMobRewardedAdControllerWrapperLogType = @"AdMobReward
 
 - (void)rewardedAd:(GADRewardedAd *)rewardedAd didFailToPresentWithError:(NSError *)error {
     [self.adLoadStatus accept:@(AdLoadStatusNone)];
+    [self.presentationStatus sendNext:@(AdPresentationErrorFailedToPlay)];
 }
 
 - (void)rewardedAdDidDismiss:(GADRewardedAd *)rewardedAd {

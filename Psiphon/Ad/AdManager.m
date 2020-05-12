@@ -308,6 +308,8 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
 
                   if (appEvent.tunnelState == TunnelStateUntunneled) {
                       return weakSelf.untunneledRewardVideo.adLoadStatus;
+                  } else if (appEvent.tunnelState == TunnelStateTunneled) {
+                      return [RACSignal return:@(AdLoadStatusError)];
                   }
               }
 
