@@ -41,6 +41,8 @@ UserDefaultsKey const TunnelSponsorIDStringKey = @"current_sponsor_id";
 
 UserDefaultsKey const ServerTimestampStringKey = @"server_timestamp";
 
+UserDefaultsKey const ExtensionIsZombieBoolKey = @"extensino_zombie";
+
 UserDefaultsKey const ContainerSubscriptionEmptyReceiptNumberKey = @"kContainerSubscriptionEmptyReceiptKey";
 
 UserDefaultsKey const ContainerSubscriptionReceiptExpiryDate = @"container_subscription_receipt_expiry_date";
@@ -358,6 +360,14 @@ UserDefaultsKey const DebugPsiphonConnectionStateStringKey = @"PsiphonDataShared
 - (void)updateServerTimestamp:(NSString*) timestamp {
     [sharedDefaults setObject:timestamp forKey:ServerTimestampStringKey];
     [sharedDefaults synchronize];
+}
+
+- (void)setExtensionIsZombie:(BOOL)isZombie {
+    [sharedDefaults setBool:isZombie forKey:ExtensionIsZombieBoolKey];
+}
+
+- (BOOL)getExtensionIsZombie {
+    return [sharedDefaults boolForKey:ExtensionIsZombieBoolKey];
 }
 
 - (NSArray<Homepage *> *_Nullable)getHomepages {
