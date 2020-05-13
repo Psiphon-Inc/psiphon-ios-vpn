@@ -109,6 +109,11 @@ PsiFeedbackLogType const AdMobRewardedAdControllerWrapperLogType = @"AdMobReward
                                          initWithAdUnitID:strongSelf.adUnitID];
                 
                 GADRequest *request = [AdMobConsent createGADRequestWithUserConsentStatus];
+                
+                GADServerSideVerificationOptions *ssvOptions = [[GADServerSideVerificationOptions alloc] init];
+                ssvOptions.customRewardString = customData;
+                [strongSelf.rewardedAd setServerSideVerificationOptions:ssvOptions];
+                
                 [strongSelf.rewardedAd loadRequest:request completionHandler:^(GADRequestError * _Nullable error) {
                     AdMobRewardedAdControllerWrapper *__strong strongSelf = weakSelf;
                     if (strongSelf == nil) {
