@@ -555,6 +555,8 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
     if (self.extensionStartMethod == ExtensionStartMethodFromContainer
         || self.extensionStartMethod == ExtensionStartMethodFromCrash
         || [self.subscriptionCheckState isSubscribedOrInProgress]) {
+        
+        [self.sharedDB setExtensionIsZombie:FALSE];
 
         if (![self.subscriptionCheckState isSubscribedOrInProgress] &&
             self.extensionStartMethod == ExtensionStartMethodFromContainer) {
@@ -587,6 +589,8 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
         //
         // To potentially stop leaking sensitive traffic while in this state, we will route
         // the network to a dead-end by setting tunnel network settings and not starting Psiphon tunnel.
+        
+        [self.sharedDB setExtensionIsZombie:TRUE];
 
         [PsiFeedbackLogger info:@"zombie mode"];
 
