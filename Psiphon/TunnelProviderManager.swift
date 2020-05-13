@@ -379,10 +379,11 @@ func observeConnectionStatus<T: TunnelProviderManager>(
 /// If not active, an error event with value `ProviderMessageError.providerNotActive` is sent.
 func sendMessage<T: TunnelProviderManager>(
     toProvider tpm: T, data: Data
-) -> Effect<(T, Result<Data, ErrorEvent<ProviderMessageSendError>>)> {
+) -> Effect<(T, TunnelProviderVPNStatus, Result<Data, ErrorEvent<ProviderMessageSendError>>)> {
     Effect.deferred { fulfilled in
-        guard tpm.connectionStatus.providerNotStopped else {
-            fulfilled((tpm, .failure(ErrorEvent(.providerNotActive))))
+        let connectionStatus = tpm.connectionStatus
+        guard connectionStatus.providerNotStopped else {
+            fulfilled((tpm, connectionStatus, .failure(ErrorEvent(.providerNotActive))))
             return
         }
         
@@ -390,14 +391,16 @@ func sendMessage<T: TunnelProviderManager>(
             try tpm.sendProviderMessage(data) { maybeResponseData in
                 // A respose is always required from the tunenl provider.
                 guard let responseData = maybeResponseData else {
-                    fulfilled((tpm, .failure(ErrorEvent(.parseError("nil response")))))
+                    fulfilled(
+                        (tpm, connectionStatus, .failure(ErrorEvent(.parseError("nil response"))))
+                    )
                     return
                 }
-                fulfilled((tpm, .success(responseData)))
+                fulfilled((tpm, connectionStatus, .success(responseData)))
             }
         } catch {
             let vpnError = NEVPNError(_nsError: error as NSError)
-            fulfilled((tpm, .failure(ErrorEvent(.neVPNError(vpnError)))))
+            fulfilled((tpm, connectionStatus, .failure(ErrorEvent(.neVPNError(vpnError)))))
         }
     }
 }
