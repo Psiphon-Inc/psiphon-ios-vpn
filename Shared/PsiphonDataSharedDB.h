@@ -169,6 +169,11 @@ The integer values are defined in `NEBridge.h` with prefix `TUNNEL_INTENT_`.
  */
 - (void)updateServerTimestamp:(NSString *)timestamp;
 
+/**
+ * Set by the extension when initialized.
+ */
+- (void)setExtensionIsZombie:(BOOL)isZombie;
+
 #else
 
 - (NSArray<Homepage *> *_Nullable)getHomepages;
@@ -183,6 +188,10 @@ The integer values are defined in `NEBridge.h` with prefix `TUNNEL_INTENT_`.
 
 #endif
 
+/**
+ * Returns last value recorded by the extension with call to `setExtensionIsZombie:`.
+ */
+- (BOOL)getExtensionIsZombie;
 
 #pragma mark - Subscription
 
