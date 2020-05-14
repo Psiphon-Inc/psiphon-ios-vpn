@@ -24,7 +24,7 @@ import Promises
 enum IAPAction {
     case purchase(IAPPurchasableProduct)
     case purchaseAdded(PurchaseAddedResult)
-    case verifiedPsiCashConsumable(VerifiedPsiCashConsumableTransaction)
+    case _verifiedPsiCashConsumable(VerifiedPsiCashConsumableTransaction)
     case transactionUpdate(TransactionUpdate)
     case receiptUpdated(ReceiptData?)
 }
@@ -106,10 +106,10 @@ func iapReducer(
                              tunnelProviderStatusSignal: environment.tunnelStatusWithIntentSignal,
                              psiCashEffects: environment.psiCashEffects,
                              clientMetaData: environment.clientMetaData)
-                .map(IAPAction.verifiedPsiCashConsumable)
+                .map(IAPAction._verifiedPsiCashConsumable)
         ]
         
-    case .verifiedPsiCashConsumable(let verifiedTx):
+    case ._verifiedPsiCashConsumable(let verifiedTx):
         guard case let .pendingVerificationResult(pendingTx) = state.iap.unverifiedPsiCashTx else {
             fatalErrorFeedbackLog("""
                 found no unverified transaction equal to '\(verifiedTx)' \
@@ -124,12 +124,15 @@ func iapReducer(
         state.iap.unverifiedPsiCashTx = .none
         return [
             environment.paymentQueue.finishTransaction(verifiedTx.value).mapNever(),
-            environment.psiCashStore(.refreshPsiCashState).mapNever()
-            ,
-            .fireAndForget {
-                PsiFeedbackLogger.info(withType: "IAP",
-                                       json: ["event": "verified psicash consumable"])
-            }
+            environment.psiCashStore(.refreshPsiCashState).mapNever(),
+            feedbackLog(
+                .info,
+                """
+                Verified PsiCash consumable with transaction ID \
+                '\(String(describing: verifiedTx.value.transactionIdentifier))' and date \
+                '\(String(describing: verifiedTx.value.transactionDate))'
+                """
+            ).mapNever()
         ]
         
     case .transactionUpdate(let value):
@@ -162,7 +165,9 @@ func iapReducer(
                         case .purchased:
                             switch try? AppStoreProductType.from(transaction: transaction) {
                             case .none:
-                                fatalErrorFeedbackLog("unknown product \(String(describing: transaction))")
+                                fatalErrorFeedbackLog(
+                                    "unknown product \(String(describing: transaction))"
+                                )
                                 
                             case .psiCash:
                                 switch state.iap.unverifiedPsiCashTx?.transaction
