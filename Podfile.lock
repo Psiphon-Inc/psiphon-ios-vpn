@@ -24,7 +24,7 @@ PODS:
   - "GoogleUtilities/NSData+zlib (6.6.0)"
   - GoogleUtilities/Reachability (6.6.0):
     - GoogleUtilities/Logger
-  - InAppSettingsKit (2.9.4)
+  - InAppSettingsKit (2.15)
   - MBProgressHUD (1.1.0)
   - nanopb (1.30905.0):
     - nanopb/decode (= 1.30905.0)
@@ -35,8 +35,8 @@ PODS:
   - PromisesObjC (1.2.8)
   - PromisesSwift (1.2.8):
     - PromisesObjC (= 1.2.8)
-  - PsiphonClientCommonLibrary (1.2.3):
-    - InAppSettingsKit
+  - PsiphonClientCommonLibrary (2.0.0):
+    - InAppSettingsKit (= 2.15)
   - ReactiveCocoa (10.2.0):
     - ReactiveSwift (~> 6.2)
   - ReactiveObjC (3.1.0)
@@ -45,11 +45,11 @@ PODS:
 
 DEPENDENCIES:
   - Google-Mobile-Ads-SDK (~> 7.59)
-  - InAppSettingsKit (from `https://github.com/Psiphon-Inc/InAppSettingsKit.git`, commit `598c498`)
+  - InAppSettingsKit (from `https://github.com/Psiphon-Inc/InAppSettingsKit.git`, commit `8bd203c`)
   - MBProgressHUD (~> 1.1.0)
   - PersonalizedAdConsent (~> 1.0)
   - PromisesSwift (~> 1.2)
-  - PsiphonClientCommonLibrary (from `https://github.com/Psiphon-Inc/psiphon-ios-client-common-library.git`, commit `fae1d2e`)
+  - PsiphonClientCommonLibrary (from `https://github.com/Psiphon-Inc/psiphon-ios-client-common-library.git`, commit `3c04c40`)
   - ReactiveCocoa (~> 10.1)
   - ReactiveObjC (from `https://github.com/Psiphon-Inc/ReactiveObjC.git`, commit `8bbf9dd`)
   - ReactiveSwift (~> 6.2)
@@ -71,10 +71,10 @@ SPEC REPOS:
 
 EXTERNAL SOURCES:
   InAppSettingsKit:
-    :commit: 598c498
+    :commit: 8bd203c
     :git: https://github.com/Psiphon-Inc/InAppSettingsKit.git
   PsiphonClientCommonLibrary:
-    :commit: fae1d2e
+    :commit: 3c04c40
     :git: https://github.com/Psiphon-Inc/psiphon-ios-client-common-library.git
   ReactiveObjC:
     :commit: 8bbf9dd
@@ -82,10 +82,10 @@ EXTERNAL SOURCES:
 
 CHECKOUT OPTIONS:
   InAppSettingsKit:
-    :commit: 598c498
+    :commit: 8bd203c
     :git: https://github.com/Psiphon-Inc/InAppSettingsKit.git
   PsiphonClientCommonLibrary:
-    :commit: fae1d2e
+    :commit: 3c04c40
     :git: https://github.com/Psiphon-Inc/psiphon-ios-client-common-library.git
   ReactiveObjC:
     :commit: 8bbf9dd
@@ -95,18 +95,18 @@ SPEC CHECKSUMS:
   Google-Mobile-Ads-SDK: 118217ac8b80e28aabe0c00aedab1cd885857776
   GoogleAppMeasurement: 4c644d86835d827bab30ab6aabb9ecaf1f500735
   GoogleUtilities: 39530bc0ad980530298e9c4af8549e991fd033b1
-  InAppSettingsKit: 567ef538698cd6cf3afb9c5529b89a8936fdacb5
+  InAppSettingsKit: 4890a44f9df7a1742c632920f0ea939cbeb29ea2
   MBProgressHUD: e7baa36a220447d8aeb12769bf0585582f3866d9
   nanopb: c43f40fadfe79e8b8db116583945847910cbabc9
   PersonalizedAdConsent: dbecabb3467df967c16d9cebc2ef4a8890e4bbd8
   PromisesObjC: c119f3cd559f50b7ae681fa59dc1acd19173b7e6
   PromisesSwift: 37bad6f4daddb02f7c9c531efe91e8b21c13ee2f
-  PsiphonClientCommonLibrary: 4bdd0e20d179458999451a5d17b74f33f6f2769b
+  PsiphonClientCommonLibrary: e515f527d74a1bcc9228f5990d791bc1a2310ab8
   ReactiveCocoa: a123c42f449c552460a4ee217dd49c76a17c8204
   ReactiveObjC: 2a38ea15335de4119d8b17caf1db1484f61db902
   ReactiveSwift: 07ddf579f4eb3ee3bd656214f0461aaf2c0fd639
   SVProgressHUD: 1428aafac632c1f86f62aa4243ec12008d7a51d6
 
-PODFILE CHECKSUM: cf1298b1c28d267020e4b6907f5e23726624ca55
+PODFILE CHECKSUM: 9f8dea3a2d048f18b498d2d6d9288ceaf1b9c283
 
-COCOAPODS: 1.8.4
+COCOAPODS: 1.9.1
