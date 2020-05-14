@@ -124,15 +124,14 @@ func iapReducer(
         state.iap.unverifiedPsiCashTx = .none
         return [
             environment.paymentQueue.finishTransaction(verifiedTx.value).mapNever(),
+            
             environment.psiCashStore(.refreshPsiCashState).mapNever(),
-            feedbackLog(
-                .info,
-                """
+            
+            feedbackLog(.info, """
                 Verified PsiCash consumable with transaction ID \
                 '\(String(describing: verifiedTx.value.transactionIdentifier))' and date \
                 '\(String(describing: verifiedTx.value.transactionDate))'
-                """
-            ).mapNever()
+                """).mapNever()
         ]
         
     case .transactionUpdate(let value):

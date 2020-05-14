@@ -27,12 +27,14 @@ enum ReceiptReadReason: Equatable {
 }
 
 struct ReceiptState: Equatable {
-    var receiptData: ReceiptData?
-    var remoteReceiptRefreshState: Pending<Result<Unit, SystemErrorEvent>>
-    var remoteRefreshAppReceiptPromises: [Promise<Result<(), SystemErrorEvent>>]
     
-    /// Strong reference to request object.
-    var receiptRefreshRequestObject: SKReceiptRefreshRequest?
+    var receiptData: ReceiptData?
+    
+    // remoteReceiptRefreshState holds a strong reference to the `SKReceiptRefreshRequest`
+    // object while the request is in progress.
+    var remoteReceiptRefreshState: PendingValue<SKReceiptRefreshRequest, Result<Unit, SystemErrorEvent>>
+    
+    var remoteRefreshAppReceiptPromises: [Promise<Result<(), SystemErrorEvent>>]
 }
 
 extension ReceiptState {
@@ -53,6 +55,7 @@ extension ReceiptState {
 
 enum ReceiptStateAction {
     case localReceiptRefresh
+    case _localReceiptDidRefresh(refreshedData: ReceiptData?)
     /// A remote receipt refresh can open a dialog box to
     case remoteReceiptRefresh(optionalPromise: Promise<Result<(), SystemErrorEvent>>?)
     case _remoteReceiptRefreshResult(Result<(), SystemErrorEvent>)
@@ -75,32 +78,20 @@ func receiptReducer(
 ) -> [Effect<ReceiptStateAction>] {
     switch action {
     case .localReceiptRefresh:
+         return [
+            ReceiptData.fromLocalReceipt(environment: environment)
+                .map(ReceiptStateAction._localReceiptDidRefresh(refreshedData:))
+        ]
+
+    case ._localReceiptDidRefresh(let refreshedData):
         
-        let maybeRefreshedData = ReceiptData.fromLocalReceipt(environment: environment)
-        let receiptUpdated: Bool
-        
-        switch (maybeRefreshedData, state.receiptData) {
-        case (nil, _), (_, nil):
-            receiptUpdated = true
-        case let (.some(refreshedData), .some(currentReceiptData)):
-            if refreshedData != currentReceiptData {
-                receiptUpdated = true
-            } else {
-                receiptUpdated = false
-            }
-        }
-        
-        if receiptUpdated {
-            state.receiptData = maybeRefreshedData
-                        
-            return notifyUpdatedReceiptEffects(
-                receiptData: maybeRefreshedData,
-                reason: .localRefresh,
-                environment: environment
-            )
-        } else {
-            return []
-        }
+        state.receiptData = refreshedData
+
+        return notifyRefreshedReceiptEffects(
+            receiptData: refreshedData,
+            reason: .localRefresh,
+            environment: environment
+        )
         
     case .remoteReceiptRefresh(optionalPromise: let optionalPromise):
         if let promise = optionalPromise {
@@ -113,7 +104,7 @@ func receiptReducer(
         }
         
         let request = SKReceiptRefreshRequest()
-        state.receiptRefreshRequestObject = request
+        state.remoteReceiptRefreshState = .pending(request)
         return [
             .fireAndForget {
                 request.delegate = environment.receiptRefreshRequestDelegate
@@ -122,34 +113,14 @@ func receiptReducer(
         ]
         
     case ._remoteReceiptRefreshResult(let result):
-        var effects = [Effect<ReceiptStateAction>]()
         state.remoteReceiptRefreshState = .completed(result.mapToUnit())
-        state.receiptRefreshRequestObject = nil
         
-        let refreshedData = join(result.map {
+        return [
+            state.fulfillRefreshPromises(result).mapNever(),
             ReceiptData.fromLocalReceipt(environment: environment)
-        }.projectSuccess())
-
-        // Creates effect for fulling receipt refresh promises.
-        effects.append(
-            state.fulfillRefreshPromises(result).mapNever()
-        )
+                .map(ReceiptStateAction._localReceiptDidRefresh(refreshedData:))
+        ]
         
-        guard refreshedData != state.receiptData else {
-            return effects
-        }
-        
-        state.receiptData = refreshedData
-        
-        effects.append(contentsOf:
-            notifyUpdatedReceiptEffects(
-                receiptData: refreshedData,
-                reason: .remoteRefresh,
-                environment: environment
-            )
-        )
-        
-        return effects
     }
     
 }
@@ -158,19 +129,21 @@ extension ReceiptData {
     
     fileprivate static func fromLocalReceipt(
         environment: ReceiptReducerEnvironment
-    ) -> ReceiptData? {
-        ReceiptData.parseLocalReceipt(
-            appBundle: environment.appBundle,
-            consumableProductIDs: environment.consumableProductsIDs,
-            subscriptionProductIDs: environment.subscriptionProductIDs,
-            getCurrentTime: environment.getCurrentTime,
-            compareDates: environment.compareDates
-        )
+    ) -> Effect<ReceiptData?> {
+        Effect { () -> ReceiptData? in
+            ReceiptData.parseLocalReceipt(
+                appBundle: environment.appBundle,
+                consumableProductIDs: environment.consumableProductsIDs,
+                subscriptionProductIDs: environment.subscriptionProductIDs,
+                getCurrentTime: environment.getCurrentTime,
+                compareDates: environment.compareDates
+            )
+        }
     }
     
 }
 
-fileprivate func notifyUpdatedReceiptEffects<NeverAction>(
+fileprivate func notifyRefreshedReceiptEffects<NeverAction>(
     receiptData: ReceiptData?, reason: ReceiptReadReason, environment: ReceiptReducerEnvironment
 ) -> [Effect<NeverAction>] {
     return [
