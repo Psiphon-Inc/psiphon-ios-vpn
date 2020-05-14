@@ -306,6 +306,8 @@ withSponsorID:(NSString *_Nonnull *)sponsorID {
         self.extensionStartMethod == ExtensionStartMethodFromCrash ||
         self.storedAuthorizations.subscriptionAuth != nil) {
 
+        [self.sharedDB setExtensionIsZombie:FALSE];
+
         if (self.storedAuthorizations.subscriptionAuth == nil &&
             self.extensionStartMethod == ExtensionStartMethodFromContainer) {
             self.waitForContainerStartVPNCommand = TRUE;
@@ -333,6 +335,8 @@ withSponsorID:(NSString *_Nonnull *)sponsorID {
         //
         // To potentially stop leaking sensitive traffic while in this state, we will route
         // the network to a dead-end by setting tunnel network settings and not starting Psiphon tunnel.
+        
+        [self.sharedDB setExtensionIsZombie:TRUE];
 
         [PsiFeedbackLogger info:@"zombie mode"];
 

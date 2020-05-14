@@ -434,16 +434,22 @@ extension SwiftDelegate: SwiftBridgeDelegate {
     @objc func sendNewVPNIntent(_ value: SwitchedVPNStartStopIntent) {
         switch value.switchedIntent {
         case .start(transition: .none):
-            self.store.send(vpnAction: .tunnelStateIntent(.start(transition: .none)))
+            self.store.send(vpnAction: .tunnelStateIntent(
+                intent: .start(transition: .none), reason: .userInitiated
+            ))
         case .stop:
-            self.store.send(vpnAction: .tunnelStateIntent(.stop))
+            self.store.send(vpnAction: .tunnelStateIntent(
+                intent: .stop, reason: .userInitiated
+            ))
         default:
             fatalErrorFeedbackLog("Unexpected state '\(value.switchedIntent)'")
         }
     }
     
     @objc func restartVPNIfActive() {
-        self.store.send(vpnAction: .tunnelStateIntent(.start(transition: .restart)))
+        self.store.send(vpnAction: .tunnelStateIntent(
+            intent: .start(transition: .restart), reason: .userInitiated
+            ))
     }
     
     @objc func syncWithTunnelProvider(reason: TunnelProviderSyncReason) {
