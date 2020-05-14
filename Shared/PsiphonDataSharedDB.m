@@ -45,7 +45,7 @@ UserDefaultsKey const ServerTimestampStringKey = @"server_timestamp";
 
 UserDefaultsKey const ContainerAuthorizationSetKey = @"authorizations_container_key";
 
-UserDefaultsKey const ExtensionIsZombieBoolKey = @"extensino_zombie";
+UserDefaultsKey const ExtensionIsZombieBoolKey = @"extension_zombie";
 
 UserDefaultsKey const ContainerSubscriptionAuthorizationsDictKey =
     @"subscription_authorizations_dict";
