@@ -185,6 +185,9 @@ extension PsiphonDataSharedDB: CustomFieldFeedbackDescription {
     
 }
 
-extension Optional: FeedbackDescription where Wrapped == TunnelStartStopIntent {}
+extension ReceiptData: FeedbackDescription {}
+
+extension Optional: FeedbackDescription {}
+
 extension TunnelStartStopIntent: FeedbackDescription {}
 extension TunnelStartStopIntentReason: FeedbackDescription {}

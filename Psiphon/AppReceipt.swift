@@ -75,33 +75,31 @@ func receiptReducer(
 ) -> [Effect<ReceiptStateAction>] {
     switch action {
     case .localReceiptRefresh:
+        
         let maybeRefreshedData = ReceiptData.fromLocalReceipt(environment: environment)
+        let receiptUpdated: Bool
         
         switch (maybeRefreshedData, state.receiptData) {
         case (nil, _), (_, nil):
+            receiptUpdated = true
+        case let (.some(refreshedData), .some(currentReceiptData)):
+            if refreshedData != currentReceiptData {
+                receiptUpdated = true
+            } else {
+                receiptUpdated = false
+            }
+        }
+        
+        if receiptUpdated {
             state.receiptData = maybeRefreshedData
-            
+                        
             return notifyUpdatedReceiptEffects(
                 receiptData: maybeRefreshedData,
                 reason: .localRefresh,
                 environment: environment
             )
-            
-        case let (.some(refreshedData), .some(currentReceiptData)):
-            
-            if refreshedData != currentReceiptData {
-                
-                state.receiptData = maybeRefreshedData
-                
-                return notifyUpdatedReceiptEffects(
-                    receiptData: maybeRefreshedData,
-                    reason: .localRefresh,
-                    environment: environment
-                )
-                
-            } else {
-               return []
-            }
+        } else {
+            return []
         }
         
     case .remoteReceiptRefresh(optionalPromise: let optionalPromise):
@@ -180,7 +178,10 @@ fileprivate func notifyUpdatedReceiptEffects<NeverAction>(
         environment.subscriptionAuthStateStore(
             .localDataUpdate(type: .didRefreshReceiptData(reason))
         ).mapNever(),
-        environment.iapStore(.receiptUpdated(receiptData)).mapNever()
+        environment.iapStore(.receiptUpdated(receiptData)).mapNever(),
+        feedbackLog(
+            .info, LogMessage(stringLiteral: makeFeedbackEntry(receiptData))
+        ).mapNever()
     ]
 }
 
