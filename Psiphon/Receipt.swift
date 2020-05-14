@@ -177,6 +177,10 @@ struct ReceiptData: Equatable {
                            data: data, readDate: readDate)
     }
     
+    static func == (lhs: Self, rhs: Self) -> Bool {
+        lhs.data == rhs.data
+    }
+    
 }
 
 /// Represents a consumable in-app purchase contained in the app receipt.
