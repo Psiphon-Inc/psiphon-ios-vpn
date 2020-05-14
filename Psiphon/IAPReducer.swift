@@ -106,7 +106,13 @@ func iapReducer(
                              tunnelProviderStatusSignal: environment.tunnelStatusWithIntentSignal,
                              psiCashEffects: environment.psiCashEffects,
                              clientMetaData: environment.clientMetaData)
-                .map(IAPAction._verifiedPsiCashConsumable)
+                .map(IAPAction._verifiedPsiCashConsumable),
+            
+            feedbackLog(.info, """
+                Verifying PsiCash consumable IAP with transaction ID \
+                '\(String(describing: unverifiedTx.value.transactionIdentifier))' and date \
+                '\(String(describing: unverifiedTx.value.transactionDate))'
+                """).mapNever()
         ]
         
     case ._verifiedPsiCashConsumable(let verifiedTx):
