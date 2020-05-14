@@ -45,6 +45,8 @@ UserDefaultsKey const ServerTimestampStringKey = @"server_timestamp";
 
 UserDefaultsKey const ContainerAuthorizationSetKey = @"authorizations_container_key";
 
+UserDefaultsKey const ExtensionIsZombieBoolKey = @"extensino_zombie";
+
 UserDefaultsKey const ContainerSubscriptionAuthorizationsDictKey =
     @"subscription_authorizations_dict";
 
@@ -374,6 +376,14 @@ UserDefaultsKey const DebugPsiphonConnectionStateStringKey = @"PsiphonDataShared
 - (void)updateServerTimestamp:(NSString*) timestamp {
     [sharedDefaults setObject:timestamp forKey:ServerTimestampStringKey];
     [sharedDefaults synchronize];
+}
+
+- (void)setExtensionIsZombie:(BOOL)isZombie {
+    [sharedDefaults setBool:isZombie forKey:ExtensionIsZombieBoolKey];
+}
+
+- (BOOL)getExtensionIsZombie {
+    return [sharedDefaults boolForKey:ExtensionIsZombieBoolKey];
 }
 
 - (NSArray<Homepage *> *_Nullable)getHomepages {
