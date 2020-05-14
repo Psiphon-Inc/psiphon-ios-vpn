@@ -782,6 +782,15 @@ extension TunnelStartStopIntent {
         }
     }
     
+    static func description(integerCode: Int) -> String {
+        switch integerCode {
+        case Int(TUNNEL_INTENT_UNDEFINED): return "TUNNEL_INTENT_UNDEFINED"
+        case Int(TUNNEL_INTENT_START): return "TUNNEL_INTENT_START"
+        case Int(TUNNEL_INTENT_STOP): return "TUNNEL_INTENT_STOP"
+        default: return "Unknown code \(integerCode)"
+        }
+    }
+    
     static func initializeIntentGiven(
         reason: TunnelProviderSyncReason,
         syncResult: TunnelProviderSyncedState,

@@ -151,6 +151,8 @@ extension PsiphonDataSharedDB: CustomFieldFeedbackDescription {
          
          ContainerAuthorizationSetKey: self.getNonSecretNonSubscriptionEncodedAuthorizations(),
          
+         ExtensionIsZombieBoolKey: self.getExtensionIsZombie(),
+         
          ContainerSubscriptionAuthorizationsDictKey: self.getNonSecretSubscriptionAuths(),
          
          ExtensionRejectedSubscriptionAuthorizationIDsArrayKey:
@@ -163,6 +165,9 @@ extension PsiphonDataSharedDB: CustomFieldFeedbackDescription {
             self.getContainerRejectedSubscriptionAuthIdReadAtLeastUpToSequenceNumber(),
          
          ContainerForegroundStateBoolKey: self.getAppForegroundState(),
+         
+         ContainerTunnelIntentStatusIntKey:
+            TunnelStartStopIntent.description(integerCode: self.getContainerTunnelIntentStatus()),
          
          SharedDataExtensionCrashedBeforeStopBoolKey: self.getExtensionJetsammedBeforeStopFlag(),
          
