@@ -174,14 +174,6 @@ func iapReducer(
                                     .isEqualTransactionId(to: transaction) {
                                 case .none:
                                     // There is no unverified psicash IAP transaction.
-                                    
-                                    // Updates balance state to reflect expected increase
-                                    // in PsiCash balance.
-                                    state.psiCashBalance.waitingForExpectedIncrease(
-                                        withAddedReward: .zero,
-                                        reason: .purchasedPsiCash,
-                                        userConfigs: environment.userConfigs
-                                    )
                                         
                                     finishTransaction = false
                                     state.iap.unverifiedPsiCashTx = .pendingVerification(
