@@ -70,6 +70,10 @@ enum AppStoreProductType: String {
         throw ProductIdError.invalidString(productIdentifier)
     }
 
+    static func from(transaction: PaymentTransaction) throws -> AppStoreProductType {
+        return try .from(productIdentifier: transaction.productID())
+    }
+    
     static func from(transaction: SKPaymentTransaction) throws -> AppStoreProductType {
         return try from(productIdentifier: transaction.payment.productIdentifier)
     }
@@ -102,53 +106,60 @@ struct SupportedAppStoreProductIDs: Equatable {
     }
 }
 
-enum IAPPendingTransactionState: Equatable {
-    case purchasing
-    case deferred
-}
-
-enum IAPCompletedTransactionState: Equatable {
-    case purchased
-    case restored
-}
-
-/// Refines `SKPaymentTransaction` state.
-enum IAPTransactionState: Equatable {
-    case pending(IAPPendingTransactionState)
-    case completed(Result<IAPCompletedTransactionState, Either<SKError, SystemError>>)
-}
-
-extension SKPaymentTransaction {
-
-    /// Stricter typing of transaction state type `SKPaymentTransactionState`.
-    var typedTransactionState: IAPTransactionState {
-        switch self.transactionState {
-        case .purchasing:
-            return .pending(.purchasing)
-        case .deferred:
-            return .pending(.deferred)
-        case .purchased:
-            return .completed(.success(.purchased))
-        case .restored:
-            return .completed(.success(.restored))
-        case .failed:
-            // Error is non-null when state is failed.
-            let someError = self.error!
-            if let skError = someError as? SKError {
-                return .completed(.failure(.left(skError)))
-            } else {
-                return .completed(.failure(.right(someError as SystemError)))
-            }
-        @unknown default:
-            fatalErrorFeedbackLog("unknown transaction state \(self.transactionState)")
+struct PaymentTransaction: Equatable {
+    
+    /// Refines `SKPaymentTransaction` state.
+    enum TransactionState: Equatable {
+        
+        enum PendingTransactionState: Equatable {
+            case purchasing
+            case deferred
+        }
+        
+        enum CompletedTransactionState: Equatable {
+            case purchased
+            case restored
+        }
+        
+        case pending(PendingTransactionState)
+        case completed(Result<CompletedTransactionState, Either<SKError, SystemError>>)
+    }
+    
+    let transactionID: () -> TransactionID
+    let transactionDate: () -> Date
+    let productID: () -> String
+    let transactionState: () -> TransactionState
+    private let isEqual: (PaymentTransaction) -> Bool
+    
+    let skPaymentTransaction: () -> SKPaymentTransaction?
+    
+    func isEqualTransactionID(to other: PaymentTransaction) -> Bool {
+        self.transactionID() == other.transactionID()
+    }
+    
+    static func == (lhs: Self, rhs: Self) -> Bool {
+        switch (lhs.skPaymentTransaction(), rhs.skPaymentTransaction()) {
+        case (nil, nil):
+            return lhs.transactionID() == rhs.transactionID()
+        case let (.some(lobj), .some(robj)):
+            return lobj.isEqual(robj)
+        default:
+            fatalErrorFeedbackLog("""
+                expected lhs and rhs to have same underlying type: \
+                lhs: '\(String(describing: lhs))' \
+                rhs: '\(String(describing: rhs))'
+                """)
         }
     }
+}
 
+extension PaymentTransaction.TransactionState {
+    
     /// Indicates whether the app receipt has been updated.
     var appReceiptUpdated: Bool {
         // Each case is explicitly typed as returning true or false
         // to ensure function correctness in future updates.
-        switch self.typedTransactionState {
+        switch self {
         case let .completed(completed):
             switch completed {
             case .success(.purchased): return true
@@ -162,13 +173,54 @@ extension SKPaymentTransaction {
             }
         }
     }
-
+    
 }
 
-extension Array where Element == SKPaymentTransaction {
-
-    var appReceiptUpdated: Bool {
-        return self.map({ $0.appReceiptUpdated }).contains(true)
+extension PaymentTransaction {
+    
+    /// Created PaymentTransaction holds a strong reference to the `skPaymentTransaction` object.
+    static func make(from skPaymentTransaction: SKPaymentTransaction) -> Self {
+        PaymentTransaction(
+            transactionID: { () -> TransactionID in
+                TransactionID(stringLiteral: skPaymentTransaction.transactionIdentifier!)
+            },
+            transactionDate: { () -> Date in
+                skPaymentTransaction.transactionDate!
+            },
+            productID: { () -> String in
+                skPaymentTransaction.payment.productIdentifier
+            },
+            transactionState: { () -> TransactionState in
+                switch skPaymentTransaction.transactionState {
+                case .purchasing:
+                    return .pending(.purchasing)
+                case .deferred:
+                    return .pending(.deferred)
+                case .purchased:
+                    return .completed(.success(.purchased))
+                case .restored:
+                    return .completed(.success(.restored))
+                case .failed:
+                    // Error is non-null when state is failed.
+                    let someError = skPaymentTransaction.error!
+                    if let skError = someError as? SKError {
+                        return .completed(.failure(.left(skError)))
+                    } else {
+                        return .completed(.failure(.right(someError as SystemError)))
+                    }
+                @unknown default:
+                    fatalErrorFeedbackLog("""
+                        unknown transaction state \(skPaymentTransaction.transactionState)
+                        """)
+                }
+            },
+            isEqual: { other -> Bool in
+                skPaymentTransaction.isEqual(other)
+            },
+            skPaymentTransaction: { () -> SKPaymentTransaction? in
+                skPaymentTransaction
+            }
+        )
     }
-
+    
 }

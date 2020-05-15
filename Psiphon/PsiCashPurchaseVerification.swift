@@ -25,10 +25,10 @@ struct PsiCashValidationRequest: Encodable {
     let receiptData: String
     let customData: String
     
-    init(transaction: UnverifiedPsiCashConsumableTransaction,
+    init(transaction: PaymentTransaction,
          receipt: ReceiptData,
          customData: CustomData) {
-        self.productId = transaction.value.payment.productIdentifier
+        self.productId = transaction.productID()
         self.receiptData = receipt.data.base64EncodedString()
         self.customData = customData
     }
@@ -40,23 +40,19 @@ struct PsiCashValidationRequest: Encodable {
     }
 }
 
-struct PsiCashValidationResponse: HTTPResponse {
+struct PsiCashValidationResponse: RetriableHTTPResponse {
     enum ResponseError: HashableError {
         case failedRequest(SystemError)
         case errorStatusCode(HTTPURLResponse)
     }
 
     let result: Result<Unit, ErrorEvent<ResponseError>>
-    private let urlSessionResult: URLSessionResult
 
     init(urlSessionResult: URLSessionResult) {
-        self.urlSessionResult = urlSessionResult
-
-        // TODO: The mapping of types of `urlSessionResult` to `result` can be generalized.
         switch urlSessionResult {
         case let .success((_, urlResponse)):
-            switch urlResponse.statusCode {
-            case 200:
+            switch urlResponse.typedStatusCode {
+            case .ok:
                 self.result = .success(.unit)
             default:
                 self.result = .failure(ErrorEvent(.errorStatusCode(urlResponse)))
@@ -64,17 +60,39 @@ struct PsiCashValidationResponse: HTTPResponse {
         case let .failure(httpRequestError):
             self.result = .failure(httpRequestError.errorEvent.map { .failedRequest($0) })
 
-        }
+        }   
     }
-
-    var shouldRetry: Bool {
-        switch self.urlSessionResult {
-        case .failure(_):
-            return true
-        case .success(let success):
-            switch success.response.statusCode {
-            case 500, 503: return true
-            default: return false
+    
+    static func unpackRetriableResultError(
+        _ result: ResultType
+    ) -> (result: ResultType, retryError: FailureEvent?) {
+        switch result {
+            
+        // Request succeeded.
+        case .success(.unit):
+            return (result: result, retryError: .none)
+            
+        // Request failed.
+        case .failure(let errorEvent):
+            switch errorEvent.error {
+            
+            case .failedRequest(_):
+                // Retry if the request failed due to networking or reasons
+                // unrelated to a response from the server.
+                return (result: result, retryError: errorEvent)
+                
+            case .errorStatusCode(let httpUrlResponse):
+                // Received a non-200 OK response from the server.
+                switch httpUrlResponse.typedStatusCode {
+                case .internalServerError,
+                     .serviceUnavailable:
+                    // Retry if the HTTP status code is 500 or 503.
+                    return (result: result, retryError: errorEvent)
+                    
+                default:
+                    // Do not retry otherwise.
+                    return (result: result, retryError: .none)
+                }
             }
         }
     }
@@ -85,90 +103,4 @@ enum ConsumableVerificationError: HashableError {
     case requestBuildError(FatalError)
     /// Wraps error from purchase verifier server
     case serverError(PsiCashValidationResponse.ResponseError)
-}
-
-struct UnverifiedPsiCashConsumableTransaction: Equatable {
-    let value: SKPaymentTransaction
-}
-
-extension UnverifiedPsiCashConsumableTransaction {
-    
-    /// Compares transaction identifier to provided `transaction`'s transaction identifier.
-    /// - Returns: true if both transaction id are non-nil and are equal, false otherwise.
-    func isEqualTransactionId(to transaction: SKPaymentTransaction) -> Bool {
-        guard let idA = value.transactionIdentifier else {
-            return false
-        }
-        guard let idB = transaction.transactionIdentifier else {
-            return false
-        }
-        return idA == idB
-    }
-}
-
-struct VerifiedPsiCashConsumableTransaction: Equatable {
-    let value: SKPaymentTransaction
-}
-
-/// Verifies provided `PsiCashConsumableTransaction` against purchase verifier server.
-/// Returned effect completes only after successfully verifying the purchase.
-/// If all retries to the purchase verifier server failed, it is next retried after a new tunneled event.
-// TODO: Use RetriableTunneledHttpRequest
-func verifyConsumable(
-    transaction: UnverifiedPsiCashConsumableTransaction,
-    receipt: ReceiptData,
-    tunnelProviderStatusSignal: SignalProducer<VPNStatusWithIntent, Never>,
-    psiCashEffects: PsiCashEffect,
-    clientMetaData: ClientMetaData
-) -> Effect<VerifiedPsiCashConsumableTransaction> {
-    tunnelProviderStatusSignal
-        .skipRepeats()
-        .flatMap(.latest) { value -> Effect<VerifiedPsiCashConsumableTransaction> in
-            let vpnStatus = Debugging.ignoreTunneledChecks ? .connected : value.status
-            guard case .connected = vpnStatus else {
-                return .never
-            }
-            return SignalProducer(value: psiCashEffects.rewardedVideoCustomData())
-                .flatMap(.latest) { maybeCustomData in
-                    guard let customData = maybeCustomData else {
-                        return .init(error: .requestBuildError(
-                            FatalError(message: "empty custom data")))
-                    }
-                    
-                    let request = PurchaseVerifierServerEndpoints.psiCash(
-                        requestBody: PsiCashValidationRequest(
-                            transaction: transaction,
-                            receipt: receipt,
-                            customData: customData
-                        ),
-                        clientMetaData: clientMetaData
-                    )
-                    
-                    return httpRequest(request: request)
-                        .flatMap(.latest, { (response: PsiCashValidationResponse) ->
-                            SignalProducer<(), PsiCashValidationResponse.ResponseError> in
-                            switch response.result {
-                            case .success:
-                                return .init(value: ())
-                            case .failure(let errorEvent):
-                                if response.shouldRetry {
-                                    return .init(error: errorEvent.error)
-                                } else {
-                                    return .init(value: ())
-                                }
-                            }
-                        })
-                        .retry(upTo: 10, interval: 1.0, on: QueueScheduler.main)
-                        .map(value: VerifiedPsiCashConsumableTransaction(value: transaction.value))
-                        .mapError { .serverError($0) }
-            }
-            .on(failed: { (error: ConsumableVerificationError) in
-                PsiFeedbackLogger.error(withType: "VerifyConsumable",
-                                        message: "verification of consumable failed",
-                                        object: error)
-            }).flatMapError { _ -> Effect<VerifiedPsiCashConsumableTransaction> in
-                return .never
-            }
-    }
-        .take(first: 1)  // Since upstream signals do not complete, signal is terminated here.
 }
