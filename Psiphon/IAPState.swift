@@ -61,16 +61,16 @@ struct PendingPayment: Hashable {
     
 }
 
-enum UnverifiedPsiCashTransactionState: Equatable {
-    case pendingVerification(UnverifiedPsiCashConsumableTransaction)
-    case pendingVerificationResult(UnverifiedPsiCashConsumableTransaction)
+struct UnverifiedPsiCashTransactionState: Equatable {
     
-    var transaction: UnverifiedPsiCashConsumableTransaction {
-        switch self {
-        case .pendingVerification(let value): return value
-        case .pendingVerificationResult(let value): return value
-        }
+    enum VerificationRequestState: Equatable {
+        case notRequested
+        case pendingVerificationResult
+        case requestError(ErrorEvent<ErrorRepr>)
     }
+    
+    let transaction: PaymentTransaction
+    let verificationState: VerificationRequestState
 }
 
 struct IAPState: Equatable {

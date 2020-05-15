@@ -24,21 +24,25 @@ import Promises
 enum IAPAction {
     case purchase(IAPPurchasableProduct)
     case purchaseAdded(PurchaseAddedResult)
-    case _verifiedPsiCashConsumable(VerifiedPsiCashConsumableTransaction)
+    case _psiCashConsumableAuthorizationRequestResult(
+        result: RetriableTunneledHttpRequest<PsiCashValidationResponse>.RequestResult,
+        forTransaction: PaymentTransaction
+    )
     case transactionUpdate(TransactionUpdate)
     case receiptUpdated(ReceiptData?)
 }
 
 /// StoreKit transaction observer
 enum TransactionUpdate {
-    case updatedTransactions([SKPaymentTransaction])
+    case updatedTransactions([PaymentTransaction])
     case restoredCompletedTransactions(error: Error?)
 }
 
-struct IAPReducerState {
+struct IAPReducerState<T: TunnelProviderManager> {
     var iap: IAPState
     var psiCashBalance: PsiCashBalance
     let psiCashAuth: PsiCashAuthPackage
+    let tunnelManagerRef: WeakRef<T>?
 }
 
 typealias IAPEnvironment = (
@@ -51,8 +55,8 @@ typealias IAPEnvironment = (
     appReceiptStore: (ReceiptStateAction) -> Effect<Never>
 )
 
-func iapReducer(
-    state: inout IAPReducerState, action: IAPAction, environment: IAPEnvironment
+func iapReducer<T: TunnelProviderManager>(
+    state: inout IAPReducerState<T>, action: IAPAction, environment: IAPEnvironment
 ) -> [Effect<IAPAction>] {
     switch action {
     case .purchase(let product):
@@ -93,56 +97,164 @@ func iapReducer(
         }
         
     case .receiptUpdated(let maybeReceiptData):
+        guard let unverifiedPsiCashTx = state.iap.unverifiedPsiCashTx else {
+            return []
+        }
+        
+        // Requests verification only if one has not been made, or it failed.
+        if case .pendingVerificationResult = unverifiedPsiCashTx.verificationState {
+            // A verification request has already been made.
+            return []
+        }
+        
+        guard let tunnelManagerRef = state.tunnelManagerRef else {
+            return [
+                feedbackLog(.error, """
+                    nil tunnel provider manager: \
+                    failed to send verification request for transaction: \
+                    '\(unverifiedPsiCashTx)'
+                    """)
+                    .mapNever()
+            ]
+        }
+        
         guard let receiptData = maybeReceiptData else {
-            return []
+            return [
+                feedbackLog(.error, """
+                    nil receipt data: \
+                    failed to send verification request for transaction: \
+                    '\(unverifiedPsiCashTx)'
+                    """)
+                    .mapNever()
+            ]
         }
-        guard case let .pendingVerification(unverifiedTx) = state.iap.unverifiedPsiCashTx else {
-            return []
+        
+        guard let customData = environment.psiCashEffects.rewardedVideoCustomData() else {
+            return [
+                feedbackLog(.error, """
+                    nil customData: \
+                    failed to send verification request for transaction: \
+                    '\(unverifiedPsiCashTx)'
+                    """)
+                    .mapNever()
+            ]
         }
-        state.iap.unverifiedPsiCashTx = .pendingVerificationResult(unverifiedTx)
+        
+        state.iap.unverifiedPsiCashTx = UnverifiedPsiCashTransactionState(
+            transaction: unverifiedPsiCashTx.transaction,
+            verificationState: .pendingVerificationResult
+        )
+               
+        let authRequest = RetriableTunneledHttpRequest(
+            request: PurchaseVerifierServerEndpoints.psiCash(
+                requestBody: PsiCashValidationRequest(
+                    transaction: unverifiedPsiCashTx.transaction,
+                    receipt: receiptData,
+                    customData: customData
+                ),
+                clientMetaData: environment.clientMetaData
+            )
+        )
+        
         return [
-            verifyConsumable(transaction: unverifiedTx,
-                             receipt: receiptData,
-                             tunnelProviderStatusSignal: environment.tunnelStatusWithIntentSignal,
-                             psiCashEffects: environment.psiCashEffects,
-                             clientMetaData: environment.clientMetaData)
-                .map(IAPAction._verifiedPsiCashConsumable),
+            authRequest.callAsFunction(
+                tunnelStatusWithIntentSignal: environment.tunnelStatusWithIntentSignal,
+                tunnelManagerRef: tunnelManagerRef
+            ).map {
+                ._psiCashConsumableAuthorizationRequestResult(
+                    result: $0,
+                    forTransaction: unverifiedPsiCashTx.transaction
+                )
+            },
             
             feedbackLog(.info, """
                 Consumables in app receipt '\(receiptData.consumableInAppPurchases)'
                 """).mapNever(),
             
             feedbackLog(.info, """
-                Verifying PsiCash consumable IAP with transaction ID \
-                '\(String(describing: unverifiedTx.value.transactionIdentifier))' purchased on \
-                '\(String(describing: unverifiedTx.value.transactionDate))'
+                verifying PsiCash consumable IAP with transaction ID: \
+                '\(unverifiedPsiCashTx.transaction)'
                 """).mapNever()
         ]
         
-    case ._verifiedPsiCashConsumable(let verifiedTx):
-        guard case let .pendingVerificationResult(pendingTx) = state.iap.unverifiedPsiCashTx else {
+    case let ._psiCashConsumableAuthorizationRequestResult(requestResult, requestTransaction):
+        guard let unverifiedPsiCashTx = state.iap.unverifiedPsiCashTx else {
+            fatalErrorFeedbackLog("expected non-nil 'unverifiedPsiCashTx'")
+        }
+        
+        guard case .pendingVerificationResult = unverifiedPsiCashTx.verificationState else {
             fatalErrorFeedbackLog("""
-                found no unverified transaction equal to '\(verifiedTx)' \
-                pending verification result
+                unexpected state for unverified PsiCash IAP transaction \
+                '\(String(describing: state.iap.unverifiedPsiCashTx))'
                 """)
         }
-        guard verifiedTx.value == pendingTx.value else {
+        
+        guard unverifiedPsiCashTx.transaction == requestTransaction else {
             fatalErrorFeedbackLog("""
-                transactions are not equal '\(verifiedTx)' != '\(pendingTx)'
+                expected transactions to be equal: \
+                '\(String(describing: requestTransaction.transactionID()))' != \
+                '\(String(describing: unverifiedPsiCashTx.transaction.transactionID()))'
                 """)
         }
-        state.iap.unverifiedPsiCashTx = .none
-        return [
-            environment.paymentQueue.finishTransaction(verifiedTx.value).mapNever(),
+        
+        switch requestResult {
             
-            environment.psiCashStore(.refreshPsiCashState).mapNever(),
+        case .willRetry(when: let retryCondition):
+            // Authorization request will be retried whenever retryCondition becomes true.
+            switch retryCondition {
+            case .tunnelConnected:
+                // This event is too frequent to log.
+                return []
+            case .afterTimeInterval:
+                return [ feedbackLog(.error, retryCondition).mapNever() ]
+            }
+        
+        case .failed(let errorEvent):
+            // Authorization request finished in failure, and will not be retried automatically.
             
-            feedbackLog(.info, """
-                Verified PsiCash consumable with transaction ID \
-                '\(String(describing: verifiedTx.value.transactionIdentifier))' and date \
-                '\(String(describing: verifiedTx.value.transactionDate))'
-                """).mapNever()
-        ]
+            state.iap.unverifiedPsiCashTx = UnverifiedPsiCashTransactionState(
+                transaction: requestTransaction,
+                verificationState: .requestError(errorEvent.eraseToRepr())
+            )
+            
+            return [
+                feedbackLog(.error, """
+                    verification request failed: '\(errorEvent)'\
+                    transaction: '\(requestTransaction)'
+                    """).mapNever()
+            ]
+        
+        case .completed(let psiCashValidationResponse):
+            switch psiCashValidationResponse {
+            case .success(.unit):
+                // 200-OK response from the server
+                state.iap.unverifiedPsiCashTx = .none
+                
+                // Finishes the transaction, and refreshes PsiCash state for the latest balance.
+                return [
+                    environment.paymentQueue.finishTransaction(requestTransaction).mapNever(),
+                    environment.psiCashStore(.refreshPsiCashState).mapNever(),
+                    feedbackLog(.info, "verified consumable transaction: '\(requestTransaction)'")
+                        .mapNever()
+                ]
+            
+            case .failure(let errorEvent):
+                // Non-200 OK response.
+                
+                // This is a fatal error and should not happen in production.
+                state.iap.unverifiedPsiCashTx = UnverifiedPsiCashTransactionState(
+                    transaction: requestTransaction,
+                    verificationState: .requestError(errorEvent.eraseToRepr())
+                )
+                
+                return [
+                    feedbackLog(.error, """
+                        verification failed: '\(errorEvent)'\
+                        transaction: '\(requestTransaction)'
+                        """).mapNever()
+                ]
+            }
+        }
         
     case .transactionUpdate(let value):
         switch value {
@@ -155,7 +267,7 @@ func iapReducer(
             var effects = [Effect<IAPAction>]()
             
             for transaction in transactions {
-                switch transaction.typedTransactionState {
+                switch transaction.transactionState() {
                 case .pending(_):
                     return []
                     
@@ -180,13 +292,23 @@ func iapReducer(
                                 
                             case .psiCash:
                                 switch state.iap.unverifiedPsiCashTx?.transaction
-                                    .isEqualTransactionId(to: transaction) {
+                                    .isEqualTransactionID(to:transaction)
+                                {
                                 case .none:
                                     // There is no unverified psicash IAP transaction.
                                         
                                     finishTransaction = false
-                                    state.iap.unverifiedPsiCashTx = .pendingVerification(
-                                        UnverifiedPsiCashConsumableTransaction(value: transaction)
+                                    
+                                    state.iap.unverifiedPsiCashTx =
+                                        UnverifiedPsiCashTransactionState(
+                                            transaction: transaction,
+                                            verificationState: .notRequested
+                                        )
+                                    
+                                    effects.append(
+                                        feedbackLog(.info, """
+                                            New PsiCash consumable transaction '\(transaction)'
+                                            """).mapNever()
                                     )
                                     
                                     // Performs a local receipt refresh before submitting
@@ -203,17 +325,17 @@ func iapReducer(
                                 case .some(false):
                                     // Unexpected presence of two consumable transactions
                                     // with different transaction ids.
-                                    let unverifiedTxId = state.iap.unverifiedPsiCashTx!
-                                    .transaction.value.transactionIdentifier ?? "(none)"
-                                    let newTxId = transaction.transactionIdentifier ?? "(none)"
                                     fatalErrorFeedbackLog("""
-                                    cannot have two completed but unverified consumable purchases: \
-                                        unverified transaction: '\(unverifiedTxId)', \
-                                        new transaction: '\(newTxId)'
-                                    """)
+                                        found two completed but unverified consumable purchases: \
+                                        unverified transaction: \
+                                        '\(String(describing:
+                                        state.iap.unverifiedPsiCashTx?.transaction.transactionID)
+                                        )', \
+                                        new transaction: \
+                                        '\(transaction.transactionID())'
+                                        """)
                                 }
 
-                                
                             case .subscription:
                                 finishTransaction = true
                             }
@@ -232,7 +354,7 @@ func iapReducer(
                         )
                     }
                     
-                    if transactions.appReceiptUpdated {
+                    if transactions.map({ $0.transactionState().appReceiptUpdated }).contains(true) {
                         effects.append(
                             environment.appReceiptStore(._remoteReceiptRefreshResult(.success(()))).mapNever()
                         )
@@ -281,7 +403,9 @@ SKPaymentTransactionObserver {
     // Client should check state of transactions and finish as appropriate.
     func paymentQueue(_ queue: SKPaymentQueue,
                       updatedTransactions transactions: [SKPaymentTransaction]) {
-        storeSend(.updatedTransactions(transactions))
+        storeSend(
+            .updatedTransactions(transactions.map(PaymentTransaction.make(from:)))
+        )
     }
     
     @available(iOS 13.0, *)

@@ -26,7 +26,7 @@ struct PaymentQueue {
     let addPayment: (IAPPurchasableProduct) -> Effect<AddedPayment>
     let addObserver: (SKPaymentTransactionObserver) -> Effect<Never>
     let removeObserver: (SKPaymentTransactionObserver) -> Effect<Never>
-    let finishTransaction: (SKPaymentTransaction) -> Effect<Never>
+    let finishTransaction: (PaymentTransaction) -> Effect<Never>
 }
 
 /// Represents a payment that has been added to `SKPaymentQueue`.
@@ -64,7 +64,10 @@ extension PaymentQueue {
         },
         finishTransaction: { transaction in
             .fireAndForget {
-                SKPaymentQueue.default().finishTransaction(transaction)
+                guard let skPaymentTransaction = transaction.skPaymentTransaction() else {
+                    return
+                }
+                SKPaymentQueue.default().finishTransaction(skPaymentTransaction)
             }
         })
     

@@ -168,12 +168,13 @@ extension AppState {
         }
     }
     
-    var iapReducerState: IAPReducerState {
+    var iapReducerState: IAPReducerState<PsiphonTPM> {
         get {
             IAPReducerState(
                 iap: self.iapState,
                 psiCashBalance: self.psiCashBalance,
-                psiCashAuth: self.psiCash.libData.authPackage
+                psiCashAuth: self.psiCash.libData.authPackage,
+                tunnelManagerRef: self.tunnelManagerRef
             )
         }
         set {
