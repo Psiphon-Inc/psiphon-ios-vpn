@@ -207,6 +207,8 @@
 		A8408FA13890CD67154033C6 /* RegionSelectionButton.m in Sources */ = {isa = PBXBuildFile; fileRef = A8408C84138113DE79F0DCD0 /* RegionSelectionButton.m */; };
 		A8408FF45D08D31E102FA41F /* ContainerDB.m in Sources */ = {isa = PBXBuildFile; fileRef = A84086716D701D0F5B48E4C0 /* ContainerDB.m */; };
 		B1D9FF416DDCA97A40A325AA /* libPods-PsiphonVPN.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 01122727D6CE50B340C55DBE /* libPods-PsiphonVPN.a */; };
+		CE19D01F246EEE7A002A8DA6 /* JetsamPerAppVersionStat.m in Sources */ = {isa = PBXBuildFile; fileRef = CE19D01E246EEE7A002A8DA6 /* JetsamPerAppVersionStat.m */; };
+		CE19D023246F0D75002A8DA6 /* JetsamPerAppVersionStat.m in Sources */ = {isa = PBXBuildFile; fileRef = CE19D01E246EEE7A002A8DA6 /* JetsamPerAppVersionStat.m */; };
 		CE26FC951BBDC7B800B83375 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = CE26FC941BBDC7B800B83375 /* Assets.xcassets */; };
 		CE26FCAC1BBDC85900B83375 /* PsiphonVPN.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = CE26FCA31BBDC85900B83375 /* PsiphonVPN.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		CE3B3225244FA3150079C13F /* JetsamMetrics.m in Sources */ = {isa = PBXBuildFile; fileRef = CE3B3224244FA3150079C13F /* JetsamMetrics.m */; };
@@ -694,6 +696,8 @@
 		A8408F6123BCC98725932A59 /* VPNStartAndStopButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VPNStartAndStopButton.m; sourceTree = "<group>"; };
 		A8408FA077C517546DF6033C /* WhiteSkyButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WhiteSkyButton.m; sourceTree = "<group>"; };
 		CB8BB19F016330264C4DCB80 /* libPods-Psiphon.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Psiphon.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		CE19D01D246EEE7A002A8DA6 /* JetsamPerAppVersionStat.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = JetsamPerAppVersionStat.h; sourceTree = "<group>"; };
+		CE19D01E246EEE7A002A8DA6 /* JetsamPerAppVersionStat.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = JetsamPerAppVersionStat.m; sourceTree = "<group>"; };
 		CE26FC8A1BBDC7B800B83375 /* Psiphon.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Psiphon.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		CE26FC941BBDC7B800B83375 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		CE26FC991BBDC7B800B83375 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -1422,6 +1426,8 @@
 		CE8ED9052463418A009C3187 /* JetsamTracking */ = {
 			isa = PBXGroup;
 			children = (
+				CE19D01D246EEE7A002A8DA6 /* JetsamPerAppVersionStat.h */,
+				CE19D01E246EEE7A002A8DA6 /* JetsamPerAppVersionStat.m */,
 				CE3B3223244FA3150079C13F /* JetsamMetrics.h */,
 				CE3B3224244FA3150079C13F /* JetsamMetrics.m */,
 				CE8ED8FB24630616009C3187 /* JetsamMetrics+Feedback.h */,
@@ -2004,6 +2010,7 @@
 				445F24D620E1A5BA00D004E9 /* xer_decoder.c in Sources */,
 				EF652CD71F35224C002AFB48 /* MainViewController.m in Sources */,
 				52B3C54E23E22454003F6B12 /* Logging.swift in Sources */,
+				CE19D01F246EEE7A002A8DA6 /* JetsamPerAppVersionStat.m in Sources */,
 				EF90D7A4204F22C900228A63 /* timestamp_format.c in Sources */,
 				52B3C54323DA31E1003F6B12 /* PurchaseVerifier.swift in Sources */,
 				F132D7E01F5739A800AF7F91 /* LaunchScreenViewController.m in Sources */,
@@ -2208,6 +2215,7 @@
 				EF90D7AC204F22E300228A63 /* RACSignal+Operations2.m in Sources */,
 				EFC2F5CC20226835007B52F9 /* PsiphonConfigReader.m in Sources */,
 				CE6C3F6A24366AE1007A17F0 /* ClientMetadata.m in Sources */,
+				CE19D023246F0D75002A8DA6 /* JetsamPerAppVersionStat.m in Sources */,
 				EF90D7B1204F231E00228A63 /* timestamp_tm.c in Sources */,
 				CE8026A42448B5B4005AF848 /* NSUserDefaults+KeyedDataStore.m in Sources */,
 				EF90D7B3204F232300228A63 /* timestamp_parse.c in Sources */,

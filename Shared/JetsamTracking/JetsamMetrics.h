@@ -20,13 +20,14 @@
 #import <Foundation/Foundation.h>
 #import "RunningBins.h"
 #import "RunningStat.h"
+#import "JetsamPerAppVersionStat.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 /// A representation of jetsam statistics across different app versions.
 @interface JetsamMetrics : NSObject <NSCopying, NSCoding, NSSecureCoding>
 
-@property (readonly, nonatomic, strong) NSDictionary <NSString *, RunningStat *> *perVersionMetrics;
+@property (readonly, nonatomic, strong) NSDictionary <NSString *, JetsamPerAppVersionStat *> *perVersionMetrics;
 
 /// Track the number of jetsams which fall within specific running time ranges.
 /// @param binRanges Ranges to track.
@@ -37,6 +38,15 @@ NS_ASSUME_NONNULL_BEGIN
 /// @param runningTime Amount of time the application ran before the jetsam occured.
 - (void)addJetsamForAppVersion:(NSString*)appVersion
                    runningTime:(NSTimeInterval)runningTime;
+
+/// Updates the jetsam statistics for the corresponding app version with the given running time
+/// and time since the last jetsam.
+/// @param appVersion Application version corresponding to jetsam event.
+/// @param runningTime Amount of time the application ran before the jetsam occured.
+/// @param timeSinceLastJetsam Amount of time that has elapsed since the last jetsam.
+- (void)addJetsamForAppVersion:(NSString*)appVersion
+                   runningTime:(NSTimeInterval)runningTime
+           timeSinceLastJetsam:(NSTimeInterval)timeSinceLastJetsam;
 
 - (BOOL)isEqualToJetsamMetrics:(JetsamMetrics*)jetsamMetrics;
 

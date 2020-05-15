@@ -131,15 +131,9 @@ NSErrorDomain _Nonnull const RunningStatErrorDomain = @"RunningStatErrorDomain";
 
 - (BOOL)isEqualToRunningStat:(RunningStat*)stat {
     BOOL countEqual = self.count == stat.count;
-    BOOL minMaxEqual = [self.minMax isEqual:stat.minMax];
-    BOOL rStdevEqual = [self.rStdev isEqual:stat.rStdev];
-
-    BOOL binsEqual;
-    if (self.bins == nil || stat.bins == nil) {
-        binsEqual = self.bins == stat.bins;
-    } else {
-        binsEqual = [self.bins isEqual:stat.bins];
-    }
+    BOOL minMaxEqual = (self.minMax == nil && stat.minMax == nil) || [self.minMax isEqual:stat.minMax];
+    BOOL rStdevEqual = (self.rStdev == nil && stat.rStdev == nil) || [self.rStdev isEqual:stat.rStdev];
+    BOOL binsEqual = (self.bins == nil && stat.bins == nil) || [self.bins isEqual:stat.bins];
 
     return countEqual && minMaxEqual && rStdevEqual && binsEqual;
 }

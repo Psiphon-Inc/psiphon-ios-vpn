@@ -51,6 +51,7 @@ NSErrorDomain _Nonnull const ContainerJetsamTrackingErrorDomain = @"ContainerJet
     }
 
     JetsamMetrics *metrics = [[JetsamMetrics alloc] initWithBinRanges:binRanges];
+    JetsamEvent *prevEvent = nil;
 
     while (true) {
         NSString *line = [cont readLineWithError:&err];
@@ -91,7 +92,27 @@ NSErrorDomain _Nonnull const ContainerJetsamTrackingErrorDomain = @"ContainerJet
             return nil;
         }
 
-        [metrics addJetsamForAppVersion:event.appVersion runningTime:event.runningTime];
+        // Count time since last jetsam if the last jetsam was of the same app version.
+        if (prevEvent && [prevEvent.appVersion isEqualToString:event.appVersion]) {
+            // This calculation is possible because jetsams are read back in
+            // the order that they occured.
+            // Note: rounded to the nearest second.
+            NSTimeInterval timeSinceLastJetsam = round(event.jetsamDate - prevEvent.jetsamDate);
+            if (timeSinceLastJetsam >= 0) {
+                [metrics addJetsamForAppVersion:event.appVersion
+                                    runningTime:event.runningTime
+                            timeSinceLastJetsam:timeSinceLastJetsam];
+            } else {
+                // TODO: capture error for feedback
+                [metrics addJetsamForAppVersion:event.appVersion
+                                    runningTime:event.runningTime];
+            }
+        } else {
+            [metrics addJetsamForAppVersion:event.appVersion
+                                runningTime:event.runningTime];
+        }
+
+        prevEvent = event;
     }
 
 }

@@ -59,8 +59,12 @@ NSString *_Nonnull const JetsamEventAppVersionCoderKey = @"app_version.dbl";
 #pragma mark - Equality
 
 - (BOOL)isEqualToJetsamEvent:(JetsamEvent*)jetsam {
+    BOOL appVersionEqual =
+        (self.appVersion == nil && jetsam.appVersion == nil) ||
+        [jetsam.appVersion isEqualToString:self.appVersion];
+
     return
-        [jetsam.appVersion isEqualToString:self.appVersion] &&
+        appVersionEqual &&
         jetsam.runningTime == self.runningTime &&
         jetsam.jetsamDate == self.jetsamDate;
 }

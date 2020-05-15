@@ -30,7 +30,7 @@ NSString *_Nonnull const MetricsDictionaryCoderKey = @"metrics.dict";
 
 @interface JetsamMetrics ()
 
-@property (nonatomic, strong) NSDictionary <NSString *, RunningStat *> *perVersionMetrics;
+@property (nonatomic, strong) NSDictionary <NSString *, JetsamPerAppVersionStat *> *perVersionMetrics;
 @property (nonatomic, strong) NSArray<BinRange*> *binRanges;
 
 @end
@@ -59,21 +59,57 @@ NSString *_Nonnull const MetricsDictionaryCoderKey = @"metrics.dict";
 
     NSMutableDictionary *newPerVersionMetrics = [[NSMutableDictionary alloc] initWithDictionary:self.perVersionMetrics];
 
-    RunningStat *metric = [newPerVersionMetrics objectForKey:appVersion];
-    if (metric == NULL) {
-        metric = [[RunningStat alloc] initWithValue:(double)runningTime binRanges:self.binRanges];
-    } else {
-        [metric addValue:(double)runningTime];
+    JetsamPerAppVersionStat *stat = [newPerVersionMetrics objectForKey:appVersion];
+    if (stat == NULL) {
+        stat = [[JetsamPerAppVersionStat alloc] init];
     }
 
-    [newPerVersionMetrics setObject:metric forKey:appVersion];
+    if (stat.runningTime == NULL) {
+        stat.runningTime = [[RunningStat alloc] initWithValue:(double)runningTime
+                                                    binRanges:self.binRanges];
+    } else {
+        [stat.runningTime addValue:(double)runningTime];
+    }
+
+    [newPerVersionMetrics setObject:stat forKey:appVersion];
+    self.perVersionMetrics = newPerVersionMetrics;
+}
+
+- (void)addJetsamForAppVersion:(NSString*)appVersion
+                   runningTime:(NSTimeInterval)runningTime
+           timeSinceLastJetsam:(NSTimeInterval)timeSinceLastJetsam {
+
+    NSMutableDictionary *newPerVersionMetrics = [[NSMutableDictionary alloc] initWithDictionary:self.perVersionMetrics];
+
+    JetsamPerAppVersionStat *stat = [newPerVersionMetrics objectForKey:appVersion];
+    if (stat == NULL) {
+        stat = [[JetsamPerAppVersionStat alloc] init];
+    }
+
+    if (stat.runningTime == NULL) {
+        stat.runningTime = [[RunningStat alloc] initWithValue:(double)runningTime
+                                                    binRanges:self.binRanges];
+    } else {
+        [stat.runningTime addValue:(double)runningTime];
+    }
+
+    if (stat.timeBetweenJetsams == NULL) {
+        stat.timeBetweenJetsams = [[RunningStat alloc] initWithValue:(double)timeSinceLastJetsam
+                                                           binRanges:self.binRanges];
+    } else {
+        [stat.timeBetweenJetsams addValue:(double)timeSinceLastJetsam];
+    }
+
+    [newPerVersionMetrics setObject:stat forKey:appVersion];
     self.perVersionMetrics = newPerVersionMetrics;
 }
 
 #pragma mark - Equality
 
 - (BOOL)isEqualToJetsamMetrics:(JetsamMetrics*)jetsamMetrics {
-    return [jetsamMetrics.perVersionMetrics isEqualToDictionary:self.perVersionMetrics];
+    return
+        (self.perVersionMetrics == nil && jetsamMetrics.perVersionMetrics == nil) ||
+        [jetsamMetrics.perVersionMetrics isEqualToDictionary:self.perVersionMetrics];
 }
 
 - (BOOL)isEqual:(id)object {
