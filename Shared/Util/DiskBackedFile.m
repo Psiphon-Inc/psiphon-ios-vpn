@@ -78,11 +78,48 @@ NSErrorDomain _Nonnull const DiskBackedFileErrorDomain = @"DiskBackedFileErrorDo
     return data;
 }
 
-+ (void)writeDataToFile:(NSData*)data
-                   path:(NSString*)filepath
-                  error:(NSError * _Nullable *)outError {
-
++ (void)createFileAtPath:(NSString*)filepath
+                    data:(NSData*)data
+                   error:(NSError * _Nullable *)outError {
     *outError = nil;
+
+    NSFileManager *fm = [NSFileManager defaultManager];
+    if ([fm fileExistsAtPath:filepath]) {
+        NSError *err;
+        BOOL success = [fm removeItemAtPath:filepath error:&err];
+        if (err != nil) {
+            *outError = [NSError errorWithDomain:DiskBackedFileErrorDomain
+                                            code:DiskBackedFileErrorDeleteFileFailed
+                             withUnderlyingError:err];
+            return;
+        }
+        if (success == FALSE) {
+            *outError = [NSError errorWithDomain:DiskBackedFileErrorDomain
+                                            code:DiskBackedFileErrorDeleteFileFailed];
+            return;
+        }
+    }
+
+    BOOL success = [fm createFileAtPath:filepath contents:nil attributes:nil];
+    if (success == FALSE) {
+        *outError = [NSError errorWithDomain:DiskBackedFileErrorDomain
+                                        code:DiskBackedFileErrorCreateFileFailed];
+        return;
+    }
+
+    NSError *err;
+    [DiskBackedFile writeDataToFileAtPath:filepath data:data error:&err];
+    if (err != nil) {
+       *outError = [NSError errorWithDomain:DiskBackedFileErrorDomain
+                                       code:DiskBackedFileErrorWriteFailed
+                        withUnderlyingError:err];
+       return;
+    }
+}
+
++ (void)writeDataToFileAtPath:(NSString*)filepath
+                         data:(NSData*)data
+                        error:(NSError * _Nullable *)outError {
 
     NSFileHandle *fh = [NSFileHandle fileHandleForWritingAtPath:filepath];
 
@@ -92,6 +129,46 @@ NSErrorDomain _Nonnull const DiskBackedFileErrorDomain = @"DiskBackedFileErrorDo
                      andLocalizedDescription:@"file handle nil"];
         return;
     }
+
+    NSError *err;
+    [DiskBackedFile writeDataToFileHandle:fh
+                                     data:data
+                                    error:&err];
+    if (err != nil) {
+        *outError = err;
+    }
+}
+
++ (void)appendDataToFileAtPath:(NSString*)filepath
+                          data:(NSData*)data
+                         error:(NSError * _Nullable *)outError {
+
+    NSFileHandle *fh = [NSFileHandle fileHandleForWritingAtPath:filepath];
+
+    if (fh == nil) {
+        *outError = [NSError errorWithDomain:DiskBackedFileErrorDomain
+                                        code:DiskBackedFileErrorGetFileHandleFailed
+                     andLocalizedDescription:@"file handle nil"];
+        return;
+    }
+
+    [fh seekToEndOfFile];
+
+    NSError *err;
+    [DiskBackedFile writeDataToFileHandle:fh
+                                     data:data
+                                    error:&err];
+    if (err != nil) {
+        *outError = err;
+    }
+}
+
+
++ (void)writeDataToFileHandle:(NSFileHandle*)fh
+                         data:(NSData*)data
+                        error:(NSError * _Nullable *)outError {
+
+    *outError = nil;
 
     NSError *err;
     if (@available(iOS 13.0, *)) {
@@ -110,6 +187,17 @@ NSErrorDomain _Nonnull const DiskBackedFileErrorDomain = @"DiskBackedFileErrorDo
             [fh closeFile];
             return;
         }
+
+        [fh synchronizeAndReturnError:&err];
+        if (err != nil) {
+            *outError = [NSError errorWithDomain:DiskBackedFileErrorDomain
+                                            code:DiskBackedFileErrorSyncFileFailed
+                             withUnderlyingError:err];
+            [fh closeFile];
+            return;
+        }
+
+        return;
     } else {
         // Fallback on earlier versions
         @try {
@@ -124,6 +212,8 @@ NSErrorDomain _Nonnull const DiskBackedFileErrorDomain = @"DiskBackedFileErrorDo
             return;
         }
         @finally{}
+
+        [fh synchronizeFile];
     }
 
     [fh closeFile];
