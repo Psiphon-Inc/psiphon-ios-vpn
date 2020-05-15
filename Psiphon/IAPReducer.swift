@@ -22,6 +22,7 @@ import ReactiveSwift
 import Promises
 
 enum IAPAction {
+    case checkUnverifiedTransaction
     case purchase(IAPPurchasableProduct)
     case purchaseAdded(PurchaseAddedResult)
     case _psiCashConsumableAuthorizationRequestResult(
@@ -59,6 +60,16 @@ func iapReducer<T: TunnelProviderManager>(
     state: inout IAPReducerState<T>, action: IAPAction, environment: IAPEnvironment
 ) -> [Effect<IAPAction>] {
     switch action {
+    case .checkUnverifiedTransaction:
+        // Checks if there is an unverified transaction.
+        guard state.iap.unverifiedPsiCashTx != nil else {
+            return []
+        }
+        
+        return [
+            environment.appReceiptStore(.localReceiptRefresh).mapNever()
+        ]
+        
     case .purchase(let product):
         guard state.iap.purchasing.completed else {
             return []
