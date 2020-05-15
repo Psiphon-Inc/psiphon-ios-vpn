@@ -307,7 +307,7 @@ func subscriptionAuthStateReducer<T: TunnelProviderManager>(
         )
         
         return [
-            authRequest.makeRequestSignal(
+            authRequest.callAsFunction(
                 tunnelStatusWithIntentSignal: environment.tunnelStatusWithIntentSignal,
                 tunnelManagerRef: tunnelManagerRef
             ).map {
