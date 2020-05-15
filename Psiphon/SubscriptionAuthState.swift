@@ -364,10 +364,8 @@ func subscriptionAuthStateReducer<T: TunnelProviderManager>(
             // Authorization request for this purchase is no longer pending.
             state.subscription.transactionsPendingAuthRequest.remove(purchase.originalTransactionID)
             
-            let errorRepr = errorEvent.map { ErrorRepr(repr: String(describing: $0)) }
-            
             let stateUpdateEffect = state.subscription.setAuthorizationState(
-                newValue: .requestError(errorRepr),
+                newValue: .requestError(errorEvent.eraseToRepr()),
                 forOriginalTransactionID: purchase.originalTransactionID,
                 environment: environment
             )
