@@ -109,8 +109,12 @@ func iapReducer(
                 .map(IAPAction._verifiedPsiCashConsumable),
             
             feedbackLog(.info, """
+                Consumables in app receipt '\(receiptData.consumableInAppPurchases)'
+                """).mapNever(),
+            
+            feedbackLog(.info, """
                 Verifying PsiCash consumable IAP with transaction ID \
-                '\(String(describing: unverifiedTx.value.transactionIdentifier))' and date \
+                '\(String(describing: unverifiedTx.value.transactionIdentifier))' purchased on \
                 '\(String(describing: unverifiedTx.value.transactionDate))'
                 """).mapNever()
         ]
