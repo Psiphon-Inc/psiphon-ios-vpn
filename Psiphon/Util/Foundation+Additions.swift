@@ -464,12 +464,7 @@ extension JSONDecoder {
             let container = try $0.singleValueContainer()
             let dateString = try container.decode(String.self)
             
-            var ts = timestamp_t()
-            let result = timestamp_parse(dateString,
-                                         dateString.lengthOfBytes(using: .utf8),
-                                         &ts)
-            
-            guard result == 0 else {
+            guard let date = Date.parse(rfc3339Date: dateString) else {
                 throw DecodingError.dataCorrupted(
                     DecodingError.Context(
                         codingPath: $0.codingPath,
@@ -477,10 +472,7 @@ extension JSONDecoder {
                     )
                 )
             }
-            
-            let milliSeconds: Double = Double(ts.nsec) / pow(10, 9)
-            let timeIntervalSince1970: TimeInterval = Double(ts.sec) + milliSeconds
-            return Date(timeIntervalSince1970: timeIntervalSince1970)
+            return date
         }
         return decoder
     }
@@ -498,22 +490,7 @@ extension JSONEncoder {
         let encoder = JSONEncoder()
         encoder.dateEncodingStrategy = .custom { date, dateEncoder in
             
-            let timeInterval = date.timeIntervalSince1970
-            
-            var sec_integral = Double()
-            let sec_fraction = modf(timeInterval, &sec_integral)
-            
-            let nsec = sec_fraction * pow(10, 9)
-            
-            var ts = timestamp_t(sec: Int64(sec_integral),
-                                 nsec: Int32(nsec),
-                                 offset: Self.TIME_ZONE_OFFSET_UTC_MINUTES)
-            
-            var buf = Array<Int8>(repeating: 0, count: 40)
-            let length = timestamp_format_precision(&buf, buf.count, &ts,
-                                                    Self.MILLISECOND_PRECISION)
-            
-            guard length > 0 else {
+            guard let formattedDate = date.formatRFC3339() else {
                 throw EncodingError.invalidValue(
                     date,
                     EncodingError.Context(
@@ -523,12 +500,64 @@ extension JSONEncoder {
                 )
             }
             
-            let dateString = String(cString: buf)
-            
             var container = dateEncoder.singleValueContainer()
-            try container.encode(dateString)
+            try container.encode(formattedDate)
         }
         return encoder
+    }
+    
+}
+
+// MARK: Date and time
+
+extension Date {
+    
+    enum MilliSecondPrecision: Int32 {
+        case zero = 0
+        case three = 3
+        case six = 6
+        case nine = 9
+    }
+    
+    static func parse(rfc3339Date: String) -> Date? {
+        var ts = timestamp_t()
+        let result = timestamp_parse(rfc3339Date,
+                                     rfc3339Date.lengthOfBytes(using: .utf8),
+                                     &ts)
+        
+        // 0 success case
+        guard result == 0 else {
+            return nil
+        }
+        
+        let secondFraction: Double = Double(ts.nsec) / pow(10, 9)
+        let timeIntervalSince1970: TimeInterval = Double(ts.sec) + secondFraction
+        return Date(timeIntervalSince1970: timeIntervalSince1970)
+    }
+    
+    func formatRFC3339(
+        milliSecondPrecision: MilliSecondPrecision = .three,
+        timezoneOffsetUTCMinutes: Int16 = Int16(0)
+    ) -> String? {
+        let timeInterval = self.timeIntervalSince1970
+        
+        var sec_integral = Double()
+        let sec_fraction = modf(timeInterval, &sec_integral)
+        
+        let nsec = sec_fraction * pow(10, 9)
+        
+        var ts = timestamp_t(sec: Int64(sec_integral),
+                             nsec: Int32(nsec),
+                             offset: timezoneOffsetUTCMinutes)
+        
+        var buf = Array<Int8>(repeating: 0, count: 40)
+        let length = timestamp_format_precision(&buf, buf.count, &ts, milliSecondPrecision.rawValue)
+        
+        guard length > 0 else {
+            return nil
+        }
+        
+        return String(cString: buf)
     }
     
 }
