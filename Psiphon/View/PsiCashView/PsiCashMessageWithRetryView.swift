@@ -21,11 +21,20 @@ import UIKit
 
 struct PsiCashMessageWithRetryView: ViewBuilder {
 
-    enum Message {
-        case failedToLoadProductList
+    enum Message: Equatable {
+        case failedToLoadProductList(retryAction: () -> Void)
+        case failedToVerifyPsiCashIAPPurchase(retryAction: () -> Void)
+        
+        static func == (lhs: Self, rhs: Self) -> Bool {
+            switch (lhs, rhs) {
+            case (.failedToLoadProductList, .failedToLoadProductList):
+                return true
+            case (.failedToVerifyPsiCashIAPPurchase, .failedToVerifyPsiCashIAPPurchase):
+                return true
+            default: return false
+            }
+        }
     }
-    
-    let retryAction: () -> Void
 
     func build(_ container: UIView?) -> StrictBindableViewable<Message, UIView> {
         let root = UIView(frame: .zero)
@@ -46,7 +55,6 @@ struct PsiCashMessageWithRetryView: ViewBuilder {
         retryButton.titleLabel!.font = AvenirFont.demiBold.font(.normal)
         retryButton.setTitle(UserStrings.Tap_to_retry(), for: .normal)
         retryButton.contentEdgeInsets = Style.default.buttonContentEdgeInsets
-        retryButton.setEventHandler(self.retryAction)
 
         // Add subviews
         root.addSubviews(imageView, title, subtitle, retryButton)
@@ -74,10 +82,17 @@ struct PsiCashMessageWithRetryView: ViewBuilder {
         return .init(viewable: root) { [imageView, title, subtitle] _ -> ((Message) -> Void) in
             return { [imageView, title, subtitle] msg in
                 switch msg {
-                case .failedToLoadProductList:
-                    imageView.image =  UIImage(named: "PsiCashCoinCloud")!
+                case .failedToLoadProductList(let retryAction):
+                    imageView.image = UIImage(named: "PsiCashCoinCloud")!
                     title.text = UserStrings.Failed_to_load()
                     subtitle.text = UserStrings.Product_list_could_not_be_retrieved()
+                    retryButton.setEventHandler(retryAction)
+                    
+                case .failedToVerifyPsiCashIAPPurchase(let retryAction):
+                    imageView.image = UIImage(named: "PsiCashPendingTransaction")!
+                    title.text = UserStrings.Failed_to_verify_psicash_purchase()
+                    subtitle.text = UserStrings.Please_try_again_later()
+                    retryButton.setEventHandler(retryAction)
                 }
             }
         }

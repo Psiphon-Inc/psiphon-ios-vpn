@@ -192,6 +192,12 @@ import Foundation
 
     }
     
+    static func Failed_to_verify_psicash_purchase() -> String {
+        return NSLocalizedString("FAILED_TO_VERIFY_PSICASH_IAP_PURCHASE", tableName: nil, bundle: Bundle.main,
+                                 value: "Failed to verify purchase",
+                                 comment: "Message shown when verification of a product already purchased fails.")
+    }
+    
     static func Tap_to_retry() -> String {
         return NSLocalizedString("TAP_TO_RETRY", tableName: nil, bundle: Bundle.main,
                                  value: "Tap to Retry",

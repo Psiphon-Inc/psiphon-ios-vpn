@@ -147,9 +147,8 @@ final class PsiCashViewController: UIViewController {
                 .init(Spinner(style: .whiteLarge),
                       .init(PsiCashMessageViewUntunneled(action: { [unowned store] in
                         store.send(.connectToPsiphonTapped)
-                      }), .init(PsiCashMessageWithRetryView(retryAction: {
-                        productRequestStore.send(.getProductList)
-                      }), PsiCashMessageView())))),
+                      }), .init(PsiCashMessageWithRetryView(),
+                                PsiCashMessageView())))),
             SpeedBoostViewType(
                 SpeedBoostPurchaseTable(purchaseHandler: {
                     store.send(.buyPsiCashProduct(.speedBoost($0)))
@@ -307,13 +306,29 @@ final class PsiCashViewController: UIViewController {
                     case (.notConnected, .addPsiCash),
                          (.connected, .addPsiCash):
                         
-                        if observed.state.iap.unverifiedPsiCashTx != nil {
+                        if let unverifiedPsiCashTx = observed.state.iap.unverifiedPsiCashTx {
                             switch observed.tunneled {
                             case .connected:
-                                self.containerBindable.bind(
-                                    .left(
-                                        .right(.right(.right(.right(.pendingPsiCashVerification)))))
-                                )
+                                
+                                // Set view content based on verification state of the
+                                // unverified PsiCash IAP transaction.
+                                switch unverifiedPsiCashTx.verificationState {
+                                case .notRequested, .pendingVerificationResult:
+                                    self.containerBindable.bind(
+                                        .left(.right(.right(.right(.right(
+                                            .pendingPsiCashVerification)))))
+                                    )
+                                    
+                                case .requestError(_):
+                                    // Shows failed to verify purchase message with,
+                                    // tap to retry button.
+                                    self.containerBindable.bind(
+                                        .left(.right(.right(.right(.left(
+                                            .failedToVerifyPsiCashIAPPurchase(retryAction: {
+                                                iapStore.send(.checkUnverifiedTransaction)
+                                            })))))))
+                                }
+                                
                             case .notConnected:
                                 // If tunnel is not connected and there is a pending PsiCash IAP,
                                 // then shows the "pending psicash purchase" screen.
@@ -365,7 +380,9 @@ final class PsiCashViewController: UIViewController {
                                     // Shows failed to load message with tap to retry button.
                                     self.containerBindable.bind(
                                         .left(.right(.right(.right(.left(
-                                            .failedToLoadProductList))))))
+                                            .failedToLoadProductList(retryAction: {
+                                                productRequestStore.send(.getProductList)
+                                            })))))))
                                 }
                             }
                         }
