@@ -131,6 +131,7 @@ PsiFeedbackLogType const JetsamMetricsLogType = @"JetsamMetrics";
 
         // Start timer which tracks extension uptime.
         dispatch_async(dispatch_get_main_queue(), ^{
+            [dataStore setTickerTimeToNow];
             [NSTimer scheduledTimerWithTimeInterval:5 repeats:YES block:^(NSTimer * _Nonnull timer) {
                 [dataStore setTickerTimeToNow];
             }];

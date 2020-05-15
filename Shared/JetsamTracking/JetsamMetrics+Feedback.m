@@ -75,44 +75,22 @@ NSErrorDomain _Nonnull const JetsamMetrics_FeedbackErrorDomain = @"JetsamMetrics
     NSMutableDictionary *jsonDict = [[NSMutableDictionary alloc] init];
 
     for (NSString *key in [self.perVersionMetrics allKeys]) {
-        RunningStat *stat = [self.perVersionMetrics objectForKey:key];
-        if (stat != nil) {
-            // Round to zero decimal places.
-            NSMutableDictionary *perVersionStat =
-              [NSMutableDictionary
-               dictionaryWithDictionary:@{@"count": @(stat.count),
-                                          @"min": @((int)round([stat min])),
-                                          @"max": @((int)round([stat max])),
-                                          @"mean": @((int)round([stat mean]))}];
+        JetsamPerAppVersionStat *stat = [self.perVersionMetrics objectForKey:key];
 
-            if (stat.count > 1) {
-                [perVersionStat setObject:@((int)round([stat stdev])) forKey:@"stdev"];
-                [perVersionStat setObject:@((int)round([stat variance])) forKey:@"var"];
-            }
+        NSMutableDictionary *perVersionStats = [[NSMutableDictionary alloc] init];
 
-            NSArray<Bin*> *talliedBins = [stat talliedBins];
-            if (talliedBins != nil) {
-                NSMutableArray<NSDictionary*> *binMetrics = [[NSMutableArray alloc]
-                                                             initWithCapacity:[talliedBins count]];
-                // Add each bin
-                for (Bin *bin in talliedBins) {
-                    NSMutableDictionary *binMetric = [NSMutableDictionary dictionaryWithDictionary:@{@"count": @(bin.count)}];
-
-                    // Omit bound if it is the absolute max or min.
-                    if (bin.range.lowerBound != -DBL_MAX) {
-                        [binMetric setObject:@(bin.range.lowerBound) forKey:@"lower_bound"];
-                    }
-                    if (bin.range.upperBound != DBL_MAX) {
-                        [binMetric setObject:@(bin.range.upperBound) forKey:@"upper_bound"];
-                    }
-
-                    [binMetrics addObject:binMetric];
-                }
-                [perVersionStat setObject:binMetrics forKey:@"bins"];
-            }
-
-            [jsonDict setObject:perVersionStat forKey:key];
+        RunningStat *runningTimeStat = stat.runningTime;
+        if (runningTimeStat != NULL) {
+            [perVersionStats setObject:[JetsamMetrics statToFeedbackDict:runningTimeStat]
+                                forKey:@"running_times"];
         }
+        RunningStat *timeBetweenJetsamsStat = stat.timeBetweenJetsams;
+        if (timeBetweenJetsamsStat != NULL) {
+            [perVersionStats setObject:[JetsamMetrics statToFeedbackDict:timeBetweenJetsamsStat]
+                                forKey:@"time_between"];
+        }
+
+        [jsonDict setObject:perVersionStats forKey:key];
     }
 
     if (![NSJSONSerialization isValidJSONObject:jsonDict]) {
@@ -122,6 +100,46 @@ NSErrorDomain _Nonnull const JetsamMetrics_FeedbackErrorDomain = @"JetsamMetrics
     }
 
     return jsonDict;
+}
+
+/// Transform stat into a dictionary valid for JSON serialization.
++ (NSDictionary *_Nonnull)statToFeedbackDict:(RunningStat*_Nonnull)stat {
+
+    // Round to zero decimal places.
+    NSMutableDictionary *statDict =
+      [NSMutableDictionary
+       dictionaryWithDictionary:@{@"count": @(stat.count),
+                                  @"min": @((int)round([stat min])),
+                                  @"max": @((int)round([stat max])),
+                                  @"mean": @((int)round([stat mean]))}];
+
+    if (stat.count > 1) {
+        [statDict setObject:@((int)round([stat stdev])) forKey:@"stdev"];
+        [statDict setObject:@((int)round([stat variance])) forKey:@"var"];
+    }
+
+    NSArray<Bin*> *talliedBins = [stat talliedBins];
+    if (talliedBins != nil) {
+        NSMutableArray<NSDictionary*> *binMetrics = [[NSMutableArray alloc]
+                                                     initWithCapacity:[talliedBins count]];
+        // Add each bin
+        for (Bin *bin in talliedBins) {
+            NSMutableDictionary *binMetric = [NSMutableDictionary dictionaryWithDictionary:@{@"count": @(bin.count)}];
+
+            // Omit bound if it is the absolute max or min.
+            if (bin.range.lowerBound != -DBL_MAX) {
+                [binMetric setObject:@(bin.range.lowerBound) forKey:@"lower_bound"];
+            }
+            if (bin.range.upperBound != DBL_MAX) {
+                [binMetric setObject:@(bin.range.upperBound) forKey:@"upper_bound"];
+            }
+
+            [binMetrics addObject:binMetric];
+        }
+        [statDict setObject:binMetrics forKey:@"bins"];
+    }
+
+    return statDict;
 }
 
 @end

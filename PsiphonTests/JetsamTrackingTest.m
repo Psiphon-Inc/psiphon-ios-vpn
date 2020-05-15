@@ -55,13 +55,13 @@
     [fileManager removeItemAtPath:registryFilePath error:nil];
 
     NSArray<JetsamEvent*>* jetsams = @[
-        [JetsamEvent jetsamEventWithAppVersion:@"1" runningTime:10 jetsamDate:[NSDate.date timeIntervalSince1970]],
-        [JetsamEvent jetsamEventWithAppVersion:@"1" runningTime:100 jetsamDate:[NSDate.date timeIntervalSince1970]],
-        [JetsamEvent jetsamEventWithAppVersion:@"2" runningTime:1 jetsamDate:[NSDate.date timeIntervalSince1970]],
-        [JetsamEvent jetsamEventWithAppVersion:@"2" runningTime:1 jetsamDate:[NSDate.date timeIntervalSince1970]],
-        [JetsamEvent jetsamEventWithAppVersion:@"2" runningTime:1 jetsamDate:[NSDate.date timeIntervalSince1970]],
-        [JetsamEvent jetsamEventWithAppVersion:@"2" runningTime:1 jetsamDate:[NSDate.date timeIntervalSince1970]],
-        [JetsamEvent jetsamEventWithAppVersion:@"2" runningTime:1 jetsamDate:[NSDate.date timeIntervalSince1970]]
+        [JetsamEvent jetsamEventWithAppVersion:@"1" runningTime:10 jetsamDate:NSDate.date.timeIntervalSince1970 + 0],
+        [JetsamEvent jetsamEventWithAppVersion:@"1" runningTime:100 jetsamDate:NSDate.date.timeIntervalSince1970 + 10],
+        [JetsamEvent jetsamEventWithAppVersion:@"2" runningTime:1 jetsamDate:NSDate.date.timeIntervalSince1970 + 20],
+        [JetsamEvent jetsamEventWithAppVersion:@"2" runningTime:1 jetsamDate:NSDate.date.timeIntervalSince1970 + 30],
+        [JetsamEvent jetsamEventWithAppVersion:@"2" runningTime:1 jetsamDate:NSDate.date.timeIntervalSince1970 + 50],
+        [JetsamEvent jetsamEventWithAppVersion:@"2" runningTime:1 jetsamDate:NSDate.date.timeIntervalSince1970 + 60],
+        [JetsamEvent jetsamEventWithAppVersion:@"2" runningTime:1 jetsamDate:NSDate.date.timeIntervalSince1970 - 60 /* should not be counted */]
     ];
 
     NSArray<BinRange*>* binRanges = @[
@@ -69,7 +69,8 @@
         [BinRange binRangeWithRange:MakeCBinRange(10, DBL_MAX)],
     ];
 
-    NSMutableDictionary<NSString*, RunningStat*>* expectedMetrics = [[NSMutableDictionary alloc] init];
+    NSMutableDictionary<NSString*, JetsamPerAppVersionStat*>* expectedMetrics = [[NSMutableDictionary alloc] init];
+    JetsamEvent *prevJetsam = nil;
 
     for (JetsamEvent *jetsam in jetsams) {
         [ExtensionJetsamTracking logJetsamEvent:jetsam
@@ -82,13 +83,33 @@
             return;
         }
 
-        RunningStat *stat = [expectedMetrics objectForKey:jetsam.appVersion];
+        // Mirror jetsam tracking stat calculation
+        JetsamPerAppVersionStat *stat = [expectedMetrics objectForKey:jetsam.appVersion];
         if (stat == nil) {
-            stat = [[RunningStat alloc] initWithValue:jetsam.runningTime binRanges:binRanges];
-        } else {
-            [stat addValue:jetsam.runningTime];
+            stat = [[JetsamPerAppVersionStat alloc] init];
         }
+
+        if (stat.runningTime == nil) {
+            stat.runningTime = [[RunningStat alloc] initWithValue:jetsam.runningTime binRanges:binRanges];
+        } else {
+            [stat.runningTime addValue:jetsam.runningTime];
+        }
+
+        if (prevJetsam != nil && [prevJetsam.appVersion isEqualToString:jetsam.appVersion]) {
+            // Round to the nearest second
+            NSTimeInterval timeSinceLastJetsam = round(jetsam.jetsamDate - prevJetsam.jetsamDate);
+            if (timeSinceLastJetsam >= 0) {
+                if (stat.timeBetweenJetsams == nil) {
+                    stat.timeBetweenJetsams = [[RunningStat alloc] initWithValue:timeSinceLastJetsam binRanges:binRanges];
+                } else {
+                    [stat.timeBetweenJetsams addValue:timeSinceLastJetsam];
+                }
+            }
+        }
+
         [expectedMetrics setObject:stat forKey:jetsam.appVersion];
+
+        prevJetsam = jetsam;
     }
 
     JetsamMetrics *metrics = [ContainerJetsamTracking getMetricsFromFilePath:filePath
@@ -162,8 +183,6 @@
         [JetsamEvent jetsamEventWithAppVersion:@"1" runningTime:10 jetsamDate:[NSDate.date timeIntervalSince1970]],
     ];
 
-    NSMutableDictionary<NSString*, RunningStat*>* expectedMetrics = [[NSMutableDictionary alloc] init];
-
     for (JetsamEvent *jetsam in jetsams) {
         [ExtensionJetsamTracking logJetsamEvent:jetsam
                                      toFilepath:filePath
@@ -174,14 +193,6 @@
             XCTFail(@"Unexpected error: %@", err);
             return;
         }
-
-        RunningStat *stat = [expectedMetrics objectForKey:jetsam.appVersion];
-        if (stat == nil) {
-            stat = [[RunningStat alloc] initWithValue:jetsam.runningTime binRanges:nil];
-        } else {
-            [stat addValue:jetsam.runningTime];
-        }
-        [expectedMetrics setObject:stat forKey:jetsam.appVersion];
     }
 
     NSFileHandle *fh = [NSFileHandle fileHandleForWritingAtPath:filePath];
@@ -208,12 +219,21 @@
 
 #pragma mark - Helpers
 
-- (void)printPerVersionMetrics:(NSDictionary<NSString*, RunningStat*>*)perVersionMetrics {
+- (void)printPerVersionMetrics:(NSDictionary<NSString*, JetsamPerAppVersionStat*>*)perVersionMetrics {
     for (NSString *key in perVersionMetrics) {
-        RunningStat *stat = [perVersionMetrics objectForKey:key];
-        if (stat != nil) {
-            NSLog(@"(v%@) count: %d, min: %f, max: %f, stdev: %f, bins: %@",
-                  key,stat.count, stat.min, stat.max, [stat stdev], stat.talliedBins);
+
+        RunningStat *runningTime = [perVersionMetrics objectForKey:key].runningTime;
+        if (runningTime != nil) {
+            NSLog(@"RunningTime - (v%@) count: %d, min: %f, max: %f, stdev: %f, bins: %@",
+                  key, runningTime.count, runningTime.min, runningTime.max,
+                  [runningTime stdev], runningTime.talliedBins);
+        }
+
+        RunningStat *timeBetweenJetsams = [perVersionMetrics objectForKey:key].timeBetweenJetsams;
+        if (timeBetweenJetsams != nil) {
+            NSLog(@"TimeBetweenJetsams - (v%@) count: %d, min: %f, max: %f, stdev: %f, bins: %@",
+                  key, timeBetweenJetsams.count, timeBetweenJetsams.min, timeBetweenJetsams.max,
+                  [timeBetweenJetsams stdev], timeBetweenJetsams.talliedBins);
         }
     }
 }

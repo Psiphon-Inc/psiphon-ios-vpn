@@ -18,22 +18,20 @@
  */
 
 #import <Foundation/Foundation.h>
-#import "JSONCodable.h"
+#import "RunningStat.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-/// Represents a jetsam event in the extension.
-@interface JetsamEvent : NSObject <NSCoding, NSSecureCoding, JSONCodable> 
+/// Jetsam stat calculated per app version.
+@interface JetsamPerAppVersionStat : NSObject <NSCopying, NSCoding, NSSecureCoding>
 
-@property (readonly, nonatomic, strong) NSString *appVersion;
-@property (readonly, nonatomic, assign) NSTimeInterval runningTime; // epoch time
-@property (readonly, nonatomic, assign) NSTimeInterval jetsamDate; // epoch time
+/// Stat for the amount of time the extension ran before each jetsam.
+@property (nonatomic, strong) RunningStat *runningTime;
 
-+ (instancetype)jetsamEventWithAppVersion:(NSString*)appVersion
-                              runningTime:(NSTimeInterval)runningTime
-                               jetsamDate:(NSTimeInterval)jetsamDate;
+/// Stat for the amount of time between jetsam events.
+@property (nonatomic, strong) RunningStat *timeBetweenJetsams;
 
-- (BOOL)isEqualToJetsamEvent:(JetsamEvent*)jetsamEvent;
+- (BOOL)isEqualToJetsamPerAppVersionStat:(JetsamPerAppVersionStat*)stat;
 
 @end
 
