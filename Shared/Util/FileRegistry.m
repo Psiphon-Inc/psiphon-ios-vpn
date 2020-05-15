@@ -34,7 +34,6 @@ NSString *_Nonnull const FileRegistryEntryOffsetIntCoderKey = @"offset.int";
 
 @property (nonatomic) NSString *filepath;
 @property (nonatomic, assign) unsigned long long fileSystemFileNumber;
-@property (nonatomic, assign) unsigned long long offset;
 
 @end
 
@@ -123,6 +122,13 @@ NSString *_Nonnull const FileRegistryEntriesDictCoderKey = @"entries.dict";
 @end
 
 @implementation FileRegistry
+
+- (FileRegistryEntry*_Nullable)entryForFilepath:(NSString*)filepath {
+    if (self.entries != nil) {
+        return [self.entries objectForKey:filepath];
+    }
+    return nil;
+}
 
 - (void)setEntry:(FileRegistryEntry*)entry {
     @synchronized (self) {

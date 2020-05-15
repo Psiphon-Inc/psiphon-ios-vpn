@@ -34,12 +34,13 @@ NSErrorDomain _Nonnull const ContainerReaderRotatedFileErrorDomain = @"Container
     NSString *filepath;
     NSString *olderFilepath;
     NSString *registryFilepath;
-    FileRegistry *registry;
-    NSUInteger fileInitialOffset;
-    NSUInteger olderFileInitialOffset;
+    FileRegistryEntry *fileEntry;
+    FileRegistryEntry *olderFileEntry;
 
     DelimitedFile *file;
     DelimitedFile *olderFile;
+    NSUInteger initialFileOffset;
+    NSUInteger initialOlderFileOffset;
 }
 
 - (instancetype)initWithFilepath:(NSString*)filepath
@@ -68,17 +69,20 @@ NSErrorDomain _Nonnull const ContainerReaderRotatedFileErrorDomain = @"Container
             }
 
             if (registryData != nil) {
-               NSError *err;
-               self->registry = [Archiver unarchiveObjectWithData:registryData error:&err];
-               if (err != nil) {
+                NSError *err;
+                FileRegistry *registry = [Archiver unarchiveObjectWithData:registryData error:&err];
+                if (err != nil) {
                    *outError = [NSError errorWithDomain:ContainerReaderRotatedFileErrorDomain
                                                    code:ContainerReaderRotatedFileErrorUnarchiveRegistryFailed
                                     withUnderlyingError:err];
                    return nil;
-               }
+                }
+
+                if (registry != nil) {
+                    self->fileEntry = [registry entryForFilepath:self->filepath];
+                    self->olderFileEntry = [registry entryForFilepath:self->olderFilepath];
+                }
             }
-        } else {
-            self->registry = [[FileRegistry alloc] init];
         }
 
         // Open files for reading
@@ -114,68 +118,55 @@ NSErrorDomain _Nonnull const ContainerReaderRotatedFileErrorDomain = @"Container
         if (olderFile != nil) {
 
             struct stat older_file_stat;
-            int ret = fstat(olderFile.fileHandle.fileDescriptor, &older_file_stat);
+            int ret = fstat(self->olderFile.fileHandle.fileDescriptor, &older_file_stat);
             if (ret < 0) {
-               *outError = [NSError errorWithDomain:ContainerReaderRotatedFileErrorDomain
+                *outError = [NSError errorWithDomain:ContainerReaderRotatedFileErrorDomain
                                                code:ContainerReaderRotatedFileErrorFstatFailed
                             andLocalizedDescription:[NSString stringWithFormat:@"errno(%d): %s", errno, strerror(errno)]];
-               return nil;
+                return nil;
             }
 
-            FileRegistryEntry *fileEntry = [registry.entries objectForKey:self->filepath];
-            FileRegistryEntry *olderFileEntry = [registry.entries objectForKey:self->olderFilepath];
-
-            if (olderFileEntry != nil) {
-                if (olderFileEntry.fileSystemFileNumber != older_file_stat.st_ino) {
-                    // File was replaced
-                    NSUInteger offset = 0;
-                    if (fileEntry && fileEntry.fileSystemFileNumber == older_file_stat.st_ino) {
-                        // Replacement was the result of a rotation
-                        [self->registry removeEntryForFilepath:self->filepath];
-                        offset = fileEntry.offset;
-                    }
-
-                    olderFileEntry = [FileRegistryEntry fileRegistryEntryWithFilepath:self->olderFilepath
-                                                                 fileSystemFileNumber:older_file_stat.st_ino
-                                                                               offset:offset];
+            if (self->olderFileEntry == nil || self->olderFileEntry.fileSystemFileNumber != older_file_stat.st_ino) {
+                NSUInteger offset = 0;
+                if (self->fileEntry && self->fileEntry.fileSystemFileNumber == older_file_stat.st_ino) {
+                    // File was replaced as a result of a rotation
+                    offset = self->fileEntry.offset;
+                    self->fileEntry = nil;
                 }
-            } else {
-                olderFileEntry = [FileRegistryEntry fileRegistryEntryWithFilepath:self->olderFilepath
-                                                             fileSystemFileNumber:older_file_stat.st_ino
-                                                                           offset:0];
+
+                self->olderFileEntry = [FileRegistryEntry fileRegistryEntryWithFilepath:self->olderFilepath
+                                                                   fileSystemFileNumber:older_file_stat.st_ino
+                                                                                 offset:offset];
             }
 
-            [registry setEntry:olderFileEntry];
-
-            if (olderFileEntry.offset >= older_file_stat.st_size) {
+            if (self->olderFileEntry.offset >= older_file_stat.st_size) {
                 self->olderFile = nil;
             } else {
-                [self->olderFile.fileHandle seekToFileOffset:olderFileEntry.offset];
-                olderFileInitialOffset = olderFileEntry.offset;
+                self->initialOlderFileOffset = self->olderFileEntry.offset;
+                [self->olderFile.fileHandle seekToFileOffset:self->initialOlderFileOffset];
             }
         }
 
         if (file != nil) {
-           struct stat file_stat;
-           int ret = fstat(file.fileHandle.fileDescriptor, &file_stat);
-           if (ret < 0) {
+            struct stat file_stat;
+            int ret = fstat(self->file.fileHandle.fileDescriptor, &file_stat);
+            if (ret < 0) {
               *outError = [NSError errorWithDomain:ContainerReaderRotatedFileErrorDomain
                                               code:ContainerReaderRotatedFileErrorFstatFailed
                            andLocalizedDescription:[NSString stringWithFormat:@"errno(%d): %s", errno, strerror(errno)]];
                return nil;
-           }
-           FileRegistryEntry *fileEntry = [registry.entries objectForKey:self->filepath];
+            }
 
-           if (fileEntry == nil || fileEntry.fileSystemFileNumber != file_stat.st_ino) {
-               [registry setEntry:[FileRegistryEntry fileRegistryEntryWithFilepath:self->filepath
-                                                              fileSystemFileNumber:file_stat.st_ino
-                                                                            offset:0]];
-           } else if (fileEntry.offset >= file_stat.st_size) {
+            if (self->fileEntry == nil || self->fileEntry.fileSystemFileNumber != file_stat.st_ino) {
+               self->fileEntry = [FileRegistryEntry fileRegistryEntryWithFilepath:self->filepath
+                                                             fileSystemFileNumber:file_stat.st_ino
+                                                                           offset:0];
+            } else if (self->fileEntry.offset >= file_stat.st_size) {
                self->file = nil;
-           } else {
-               [self->file.fileHandle seekToFileOffset:fileEntry.offset];
-               fileInitialOffset = fileEntry.offset;
-           }
+            } else {
+                self->initialFileOffset = self->fileEntry.offset;
+                [self->file.fileHandle seekToFileOffset:self->initialFileOffset];
+            }
         }
     }
 
@@ -187,40 +178,28 @@ NSErrorDomain _Nonnull const ContainerReaderRotatedFileErrorDomain = @"Container
 
     NSString *line;
 
-    if (olderFile != nil) {
-           NSError *err;
-           line = [olderFile readLineWithError:&err];
-           if (err != nil) {
-               *outError = [NSError errorWithDomain:ContainerReaderRotatedFileErrorDomain
-                                               code:ContainerReaderRotatedFileErrorReadFileFailed
-                                withUnderlyingError:err];
-               return nil;
-           }
-
-           FileRegistryEntry *fileEntry = [registry.entries objectForKey:self->olderFilepath];
-           if (fileEntry != nil) {
-               FileRegistryEntry *newEntry =
-                 [FileRegistryEntry fileRegistryEntryWithFilepath:self->olderFilepath
-                                             fileSystemFileNumber:fileEntry.fileSystemFileNumber
-                                                           offset:self->olderFileInitialOffset + olderFile.bytesReturned];
-               [registry setEntry:newEntry];
-           } else {
-               *outError = [NSError errorWithDomain:ContainerReaderRotatedFileErrorDomain
-                                               code:ContainerReaderRotatedFileErrorReadRegistryFailed
-                            andLocalizedDescription:@"Older file registry not found"];
-               return nil;
-           }
-
-           if (line != nil) {
-               return line;
-           } else {
-               olderFile = nil;
-           }
-       }
-
-    if (file != nil) {
+    if (self->olderFile != nil) {
         NSError *err;
-        line = [file readLineWithError:&err];
+        line = [self->olderFile readLineWithError:&err];
+        if (err != nil) {
+           *outError = [NSError errorWithDomain:ContainerReaderRotatedFileErrorDomain
+                                           code:ContainerReaderRotatedFileErrorReadFileFailed
+                            withUnderlyingError:err];
+           return nil;
+        }
+
+        self->olderFileEntry.offset = self->initialOlderFileOffset + self->olderFile.bytesReturned;
+
+        if (line != nil) {
+            return line;
+        } else {
+            self->olderFile = nil;
+        }
+    }
+
+    if (self->file != nil) {
+        NSError *err;
+        line = [self->file readLineWithError:&err];
         if (err != nil) {
             *outError = [NSError errorWithDomain:ContainerReaderRotatedFileErrorDomain
                                             code:ContainerReaderRotatedFileErrorReadFileFailed
@@ -228,24 +207,12 @@ NSErrorDomain _Nonnull const ContainerReaderRotatedFileErrorDomain = @"Container
             return nil;
         }
 
-        FileRegistryEntry *fileEntry = [registry.entries objectForKey:self->filepath];
-        if (fileEntry != nil) {
-            FileRegistryEntry *newEntry =
-              [FileRegistryEntry fileRegistryEntryWithFilepath:self->filepath
-                                          fileSystemFileNumber:fileEntry.fileSystemFileNumber
-                                                        offset:self->fileInitialOffset + file.bytesReturned];
-            [registry setEntry:newEntry];
-        } else {
-            *outError = [NSError errorWithDomain:ContainerReaderRotatedFileErrorDomain
-                                            code:ContainerReaderRotatedFileErrorReadRegistryFailed
-                         andLocalizedDescription:@"File registry not found"];
-            return nil;
-        }
+        self->fileEntry.offset = self->initialFileOffset + self->file.bytesReturned;
 
         if (line != nil) {
             return line;
         } else {
-            file = nil;
+            self->file = nil;
         }
     }
 
@@ -257,8 +224,16 @@ NSErrorDomain _Nonnull const ContainerReaderRotatedFileErrorDomain = @"Container
 - (void)persistRegistry:(NSError * _Nullable *)outError {
     *outError = nil;
 
+    FileRegistry *registry = [[FileRegistry alloc] init];
+    if (self->fileEntry != nil) {
+        [registry setEntry:self->fileEntry];
+    }
+    if (self->olderFileEntry != nil) {
+        [registry setEntry:self->olderFileEntry];
+    }
+
     NSError *err;
-    NSData *data = [Archiver archiveObject:self->registry error:&err];
+    NSData *data = [Archiver archiveObject:registry error:&err];
     if (err != nil) {
         *outError = [NSError errorWithDomain:ContainerReaderRotatedFileErrorDomain
                                         code:ContainerReaderRotatedFileErrorArchiveRegistryFailed
@@ -266,12 +241,7 @@ NSErrorDomain _Nonnull const ContainerReaderRotatedFileErrorDomain = @"Container
         return;
     }
 
-    NSFileManager *fm = [NSFileManager defaultManager];
-    if (![fm fileExistsAtPath:self->registryFilepath]) {
-        [fm createFileAtPath:self->registryFilepath contents:nil attributes:nil];
-    }
-
-    [DiskBackedFile writeDataToFile:data path:self->registryFilepath error:&err];
+    [DiskBackedFile createFileAtPath:self->registryFilepath data:data error:&err];
     if (err != nil) {
         *outError = [NSError errorWithDomain:ContainerReaderRotatedFileErrorDomain
                                         code:ContainerReaderRotatedFileErrorWriteRegistryFailed

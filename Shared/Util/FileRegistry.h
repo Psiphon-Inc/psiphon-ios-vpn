@@ -27,7 +27,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (readonly, nonatomic) NSString *filepath;
 @property (readonly, nonatomic, assign) unsigned long long fileSystemFileNumber;
-@property (readonly, nonatomic, assign) unsigned long long offset;
+@property (nonatomic, assign) unsigned long long offset;
 
 + (FileRegistryEntry*)fileRegistryEntryWithFilepath:(NSString*)filePath
                                fileSystemFileNumber:(unsigned long long)fileSystemFileNumber
@@ -46,6 +46,12 @@ NS_ASSUME_NONNULL_BEGIN
 /// Adds an entry to the registry with the filepath as the key. Will overwrite previous entries with the same key.
 /// @param entry Entry to add to the registry.
 - (void)setEntry:(FileRegistryEntry*)entry;
+
+/// Get an entry from the registry.
+/// @param filepath Filepath to find an entry for.
+/// @returns The entry if one exists for the given filepath. Otherwise returns nil.
+- (FileRegistryEntry*_Nullable)entryForFilepath:(NSString*)filepath;
+
 /// Removes an entry from the registry.
 /// @param filepath Key to delete from the registry.
 - (void)removeEntryForFilepath:(NSString*)filepath;

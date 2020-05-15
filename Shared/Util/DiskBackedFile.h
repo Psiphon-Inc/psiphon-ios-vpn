@@ -28,7 +28,10 @@ typedef NS_ERROR_ENUM(DiskBackedFileErrorDomain, DiskBackedFileErrorCode) {
     DiskBackedFileErrorGetFileHandleFailed = 2,
     DiskBackedFileErrorGetAttributesFailed = 3,
     DiskBackedFileErrorReadFailed = 4,
-    DiskBackedFileErrorWriteFailed = 5
+    DiskBackedFileErrorWriteFailed = 5,
+    DiskBackedFileErrorCreateFileFailed = 6,
+    DiskBackedFileErrorDeleteFileFailed = 7,
+    DiskBackedFileErrorSyncFileFailed = 8
 };
 
 /// Convenience class for interacting with the filesystem.
@@ -45,13 +48,29 @@ typedef NS_ERROR_ENUM(DiskBackedFileErrorDomain, DiskBackedFileErrorCode) {
 /// @return Returns nil when `outError` is non-nil.
 + (NSData *)fileDataAtPath:(NSString*)filepath error:(NSError * _Nullable *)outError;
 
-/// Write data to file.
+/// Create file with given data.
+/// @param filepath Filepath to write to. If a file exists at this path, it will be overwritten.
 /// @param data Data to write.
-/// @param filepath Filepath to write to. Either creating a new file or appending to an existing one.
 /// @param outError If non-nill on return, then writing data failed with the provided error.
-+ (void)writeDataToFile:(NSData*)data
-                   path:(NSString*)filepath
-                  error:(NSError * _Nullable *)outError;
++ (void)createFileAtPath:(NSString*)filepath
+                    data:(NSData*)data
+                   error:(NSError * _Nullable *)outError;
+
+/// Append data to file.
+/// @param filepath Filepath of file to append to.
+/// @param data Data to append.
+/// @param outError If non-nill on return, then writing data failed with the provided error.
++ (void)appendDataToFileAtPath:(NSString*)filepath
+                          data:(NSData*)data
+                         error:(NSError * _Nullable *)outError;
+
+/// Write data to file.
+/// @param filepath Filepath of file to write to.
+/// @param data Data to write.
+/// @param outError If non-nill on return, then writing data failed with the provided error.
++ (void)writeDataToFileAtPath:(NSString*)filepath
+                         data:(NSData*)data
+                        error:(NSError * _Nullable *)outError;
 
 @end
 
