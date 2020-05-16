@@ -21,20 +21,20 @@ import Foundation
 import ReactiveSwift
 
 struct PsiCashValidationRequest: Encodable {
-    let productId: String
+    let productID: String
     let receiptData: String
     let customData: String
     
     init(transaction: PaymentTransaction,
          receipt: ReceiptData,
          customData: CustomData) {
-        self.productId = transaction.productID()
+        self.productID = transaction.productID()
         self.receiptData = receipt.data.base64EncodedString()
         self.customData = customData
     }
 
     private enum CodingKeys: String, CodingKey {
-        case productId = "product_id"
+        case productID = "product_id"
         case receiptData = "receipt-data"
         case customData = "custom_data"
     }
@@ -65,12 +65,12 @@ struct PsiCashValidationResponse: RetriableHTTPResponse {
     
     static func unpackRetriableResultError(
         _ result: ResultType
-    ) -> (result: ResultType, retryError: FailureEvent?) {
+    ) -> (result: ResultType, retryDueToError: FailureEvent?) {
         switch result {
             
         // Request succeeded.
         case .success(.unit):
-            return (result: result, retryError: .none)
+            return (result: result, retryDueToError: .none)
             
         // Request failed.
         case .failure(let errorEvent):
@@ -79,7 +79,7 @@ struct PsiCashValidationResponse: RetriableHTTPResponse {
             case .failedRequest(_):
                 // Retry if the request failed due to networking or reasons
                 // unrelated to a response from the server.
-                return (result: result, retryError: errorEvent)
+                return (result: result, retryDueToError: errorEvent)
                 
             case .errorStatusCode(let httpUrlResponse):
                 // Received a non-200 OK response from the server.
@@ -87,11 +87,11 @@ struct PsiCashValidationResponse: RetriableHTTPResponse {
                 case .internalServerError,
                      .serviceUnavailable:
                     // Retry if the HTTP status code is 500 or 503.
-                    return (result: result, retryError: errorEvent)
+                    return (result: result, retryDueToError: errorEvent)
                     
                 default:
                     // Do not retry otherwise.
-                    return (result: result, retryError: .none)
+                    return (result: result, retryDueToError: .none)
                 }
             }
         }
