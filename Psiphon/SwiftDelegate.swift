@@ -156,6 +156,23 @@ extension SwiftDelegate: SwiftBridgeDelegate {
             )
             .send(store: self.store)
         
+        // Notifies interested parties of tunnel provider manager load events.
+        self.lifetime += self.store.$value.signalProducer.map(\.vpnState.value.loadState)
+            .skipRepeats()
+            .filter { loadState in
+                guard case .loaded(_) = loadState.value else {
+                    return false
+                }
+                return true
+            }
+            .map { _ -> [AppAction] in
+                [
+                    .subscriptionAuthStateAction(.requestAuthorizationForPurchases),
+                    .iap(.checkUnverifiedTransaction)
+                ]
+            }
+            .send(store: self.store)
+        
         // Forwards `PsiCashState` updates to ObjCBridgeDelegate.
         self.lifetime += self.store.$value.signalProducer
             .map(\.balanceState)
