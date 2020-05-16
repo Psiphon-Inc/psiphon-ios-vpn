@@ -130,6 +130,12 @@ func iapReducer<T: TunnelProviderManager>(
         }
         
         guard let receiptData = maybeReceiptData else {
+            state.iap.unverifiedPsiCashTx = UnverifiedPsiCashTransactionState(
+                transaction: unverifiedPsiCashTx.transaction,
+                verificationState: .requestError(
+                    ErrorEvent(ErrorRepr(repr: "nil receipt"))
+                )
+            )
             return [
                 feedbackLog(.error, """
                     nil receipt data: \
@@ -141,6 +147,12 @@ func iapReducer<T: TunnelProviderManager>(
         }
         
         guard let customData = environment.psiCashEffects.rewardedVideoCustomData() else {
+            state.iap.unverifiedPsiCashTx = UnverifiedPsiCashTransactionState(
+                transaction: unverifiedPsiCashTx.transaction,
+                verificationState: .requestError(
+                    ErrorEvent(ErrorRepr(repr: "nil custom data"))
+                )
+            )
             return [
                 feedbackLog(.error, """
                     nil customData: \
