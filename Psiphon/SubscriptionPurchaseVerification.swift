@@ -125,11 +125,11 @@ struct SubscriptionValidationResponse: RetriableHTTPResponse {
     }
 
     static func unpackRetriableResultError(_ result: ResultType)
-        -> (result: ResultType, retryError: FailureEvent?)
+        -> (result: ResultType, retryDueToError: FailureEvent?)
     {
         switch result {
         case .success(_):
-            return (result: result, retryError: .none)
+            return (result: result, retryDueToError: .none)
             
         case .failure(let errorEvent):
             switch errorEvent.error {
@@ -137,11 +137,11 @@ struct SubscriptionValidationResponse: RetriableHTTPResponse {
                  .otherErrorStatusCode(.serviceUnavailable),
                  .failedRequest(_),
                  .responseParseError(_):
-                return (result: result, retryError: errorEvent)
+                return (result: result, retryDueToError: errorEvent)
                 
             case .badRequest,
                  .otherErrorStatusCode:
-                return (result: result, retryError: .none)
+                return (result: result, retryDueToError: .none)
             }
         }
     }

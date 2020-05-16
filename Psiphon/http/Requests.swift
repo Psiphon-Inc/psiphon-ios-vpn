@@ -54,17 +54,17 @@ protocol HTTPResponse {
 /// needs to be retried solely based on the response value.
 protocol RetriableHTTPResponse: HTTPResponse {
     
-    /// `unpackRetriableResultError` returns `(result: result, retryError: nil)`, if
+    /// `unpackRetriableResultError` returns `(result: result, retryDueToError: nil)`, if
     /// the request that produced `result` does not need to be retried.
-    /// Otherwise returns `(result: result, retryError: .some())`.
+    /// Otherwise returns `(result: result, retryDueToError: .some())`.
     static func unpackRetriableResultError(_ result: ResultType)
-        -> (result: ResultType, retryError: FailureEvent?)
+        -> (result: ResultType, retryDueToError: FailureEvent?)
     
 }
 
 extension RetriableHTTPResponse {
     
-    func unpackRetriableResultError() -> (result: ResultType, retryError: FailureEvent?) {
+    func unpackRetriableResultError() -> (result: ResultType, retryDueToError: FailureEvent?) {
         return Self.unpackRetriableResultError(self.result)
     }
     
@@ -344,10 +344,10 @@ struct RetriableTunneledHttpRequest<Response: RetriableHTTPResponse> {
                 -> SignalProducer<SignalTermination, ErrorEvent<RequestError>> in
                 
                 // Determines if the request needs to be retried.
-                let (result, maybeRetryError) = response.unpackRetriableResultError()
+                let (result, maybeRetryDueToError) = response.unpackRetriableResultError()
                 
-                if let retryError = maybeRetryError {
-                    let errorValue = retryError.map(RequestError.responseRetryError)
+                if let retryDueToError = maybeRetryDueToError {
+                    let errorValue = retryDueToError.map(RequestError.responseRetryError)
                     // Request needs to be retried.
                     return SignalProducer(error: errorValue)
                         .prefix(value:
