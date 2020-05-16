@@ -214,21 +214,21 @@ extension SwiftDelegate: SwiftBridgeDelegate {
                 default:
                     return Effect(value: .success(.unit))
                 }
-        }
-        .skipRepeats()
-        .startWithValues { (result: Result<Unit, ErrorEvent<ErrorRepr>>) in
-            switch result {
-            case .success(.unit):
-                break
-                
-            case .failure(let errorEvent):
-                immediateFeedbackLog(.error, errorEvent)
-                
-                objcBridge.onVPNStateSyncError(
-                    UserStrings.Tunnel_provider_sync_failed_reinstall_config()
-                )
             }
-        }
+            .skipRepeats()
+            .startWithValues { (result: Result<Unit, ErrorEvent<ErrorRepr>>) in
+                switch result {
+                case .success(.unit):
+                    break
+                    
+                case .failure(let errorEvent):
+                    immediateFeedbackLog(.error, errorEvent)
+                    
+                    objcBridge.onVPNStateSyncError(
+                        UserStrings.Tunnel_provider_sync_failed_reinstall_config()
+                    )
+                }
+            }
         
         // Forwards SpeedBoost purchase expiry date (if the user is not subscribed)
         // to ObjCBridgeDelegate.
@@ -239,11 +239,11 @@ extension SwiftDelegate: SwiftBridgeDelegate {
                 } else {
                     return appState.psiCash.activeSpeedBoost?.transaction.localTimeExpiry
                 }
-        }
-        .skipRepeats()
-        .startWithValues{ [unowned objcBridge] speedBoostExpiry in
-            objcBridge.onSpeedBoostActivePurchase(speedBoostExpiry)
-        }
+            }
+            .skipRepeats()
+            .startWithValues{ [unowned objcBridge] speedBoostExpiry in
+                objcBridge.onSpeedBoostActivePurchase(speedBoostExpiry)
+            }
         
         self.lifetime += self.store.$value.signalProducer
             .map(\.vpnState.value.startStopState)
@@ -251,7 +251,7 @@ extension SwiftDelegate: SwiftBridgeDelegate {
             .startWithValues { [unowned objcBridge] startStopState in
                 let value = VPNStartStopStatus.from(startStopState: startStopState)
                 objcBridge.onVPNStartStopStateDidChange(value)
-        }
+            }
         
         // Forwards AppState `internetReachability` value to ObjCBridgeDelegate.
         self.lifetime += self.store.$value.signalProducer
@@ -259,7 +259,7 @@ extension SwiftDelegate: SwiftBridgeDelegate {
             .skipRepeats()
             .startWithValues { [unowned objcBridge] reachabilityStatus in
                 objcBridge.onReachabilityStatusDidChange(reachabilityStatus.networkStatus)
-        }
+            }
         
         // Opens landing page whenever Psiphon tunnel is connected, with
         // change in value of `VPNState` tunnel intent.
