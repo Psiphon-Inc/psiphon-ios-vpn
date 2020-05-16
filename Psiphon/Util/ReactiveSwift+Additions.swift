@@ -90,3 +90,16 @@ extension SignalProducer where Error == Never {
     
 }
 
+extension SignalProducer where Value: Collection, Error == Never {
+    
+    /// Sends all elements of emitted value as actions to `store` sequentially.
+    func send<StoreValue>(store: Store<StoreValue, Value.Element>) -> Disposable? {
+        return startWithValues { actions in
+            for action in actions {
+                store.send(action)
+            }
+        }
+    }
+    
+}
+

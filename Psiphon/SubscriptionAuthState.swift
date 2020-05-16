@@ -374,14 +374,6 @@ func subscriptionAuthStateReducer<T: TunnelProviderManager>(
                 stateUpdateEffect.mapNever()
             )
             
-            // Retry the request for authorization purchases if tunnel provider manager
-            // previous references has been invalidated.
-            if case .tunnelError(.nilTunnelProviderManager) = errorEvent.error {
-                effects.append(
-                    Effect(value: .requestAuthorizationForPurchases)
-                )
-            }
-            
             return effects
             
         case .completed(let subscriptionValidationResult):
