@@ -76,7 +76,10 @@ func subscriptionReducer(
 
         return [
             singleFireTimer(interval: timeLeft, leeway: SubscriptionHardCodedValues.leeway)
-                .map(value: ._timerFinished(withExpiry: purchaseWithLatestExpiry.expires))
+                .map(value: ._timerFinished(withExpiry: purchaseWithLatestExpiry.expires)),
+            feedbackLog(.info,
+                "subscribed: timer expiring on: '\(purchaseWithLatestExpiry.expires)'"
+            ).mapNever()
         ]
         
         
@@ -100,7 +103,8 @@ func subscriptionReducer(
         }
         
         return [
-            environment.appReceiptStore(.remoteReceiptRefresh(optionalPromise: nil)).mapNever()
+            environment.appReceiptStore(.remoteReceiptRefresh(optionalPromise: nil)).mapNever(),
+            feedbackLog(.info, "subscription expired").mapNever()
         ]
     }
 }
