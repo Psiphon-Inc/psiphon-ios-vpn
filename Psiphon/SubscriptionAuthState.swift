@@ -92,6 +92,7 @@ typealias SubscriptionAuthStateReducerEnvironment = (
     notifier: Notifier,
     sharedDB: PsiphonDataSharedDB,
     tunnelStatusWithIntentSignal: SignalProducer<VPNStatusWithIntent, Never>,
+    tunnelManagerRefSignal: SignalProducer<WeakRef<PsiphonTPM>?, Never>,
     clientMetaData: ClientMetaData,
     getCurrentTime: () -> Date,
     compareDates: (Date, Date, Calendar.Component) -> ComparisonResult
@@ -113,7 +114,6 @@ struct SubscriptionAuthState: Equatable {
 struct SubscriptionReducerState<T: TunnelProviderManager>: Equatable {
     var subscription: SubscriptionAuthState
     let receiptData: ReceiptData?
-    let tunnelManagerRef: WeakRef<T>?
 }
 
 func subscriptionAuthStateReducer<T: TunnelProviderManager>(
@@ -249,11 +249,6 @@ func subscriptionAuthStateReducer<T: TunnelProviderManager>(
         ]
         
     case .requestAuthorizationForPurchases:
-        
-        guard let tunnelManagerRef = state.tunnelManagerRef else {
-            return []
-        }
-        
         guard let receiptData = state.receiptData else {
             return []
         }
@@ -309,7 +304,7 @@ func subscriptionAuthStateReducer<T: TunnelProviderManager>(
         return [
             authRequest.callAsFunction(
                 tunnelStatusWithIntentSignal: environment.tunnelStatusWithIntentSignal,
-                tunnelManagerRef: tunnelManagerRef
+                tunnelManagerRefSignal: environment.tunnelManagerRefSignal
             ).map {
                 ._authorizationRequestResult(
                     result: $0,
@@ -346,9 +341,13 @@ func subscriptionAuthStateReducer<T: TunnelProviderManager>(
         switch requestResult {
         case .willRetry(when: let retryCondition):
             switch retryCondition {
-            case .tunnelConnected:
-                // This event is too frequent to log individually.
+            case .whenResolved(tunnelError: .nilTunnelProviderManager):
+                return [ feedbackLog(.error, retryCondition).mapNever() ]
+                
+            case .whenResolved(tunnelError: .tunnelNotConnected):
+                // This event is too frequent to log.
                 return []
+                
             case .afterTimeInterval:
                 return [ feedbackLog(.error, retryCondition).mapNever() ]
             }

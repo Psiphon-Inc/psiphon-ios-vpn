@@ -43,11 +43,11 @@ struct IAPReducerState<T: TunnelProviderManager> {
     var iap: IAPState
     var psiCashBalance: PsiCashBalance
     let psiCashAuth: PsiCashAuthPackage
-    let tunnelManagerRef: WeakRef<T>?
 }
 
 typealias IAPEnvironment = (
     tunnelStatusWithIntentSignal: SignalProducer<VPNStatusWithIntent, Never>,
+    tunnelManagerRefSignal: SignalProducer<WeakRef<PsiphonTPM>?, Never>,
     psiCashEffects: PsiCashEffect,
     clientMetaData: ClientMetaData,
     paymentQueue: PaymentQueue,
@@ -118,17 +118,6 @@ func iapReducer<T: TunnelProviderManager>(
             return []
         }
         
-        guard let tunnelManagerRef = state.tunnelManagerRef else {
-            return [
-                feedbackLog(.error, """
-                    nil tunnel provider manager: \
-                    failed to send verification request for transaction: \
-                    '\(unverifiedPsiCashTx)'
-                    """)
-                    .mapNever()
-            ]
-        }
-        
         guard let receiptData = maybeReceiptData else {
             state.iap.unverifiedPsiCashTx = UnverifiedPsiCashTransactionState(
                 transaction: unverifiedPsiCashTx.transaction,
@@ -182,7 +171,7 @@ func iapReducer<T: TunnelProviderManager>(
         return [
             authRequest.callAsFunction(
                 tunnelStatusWithIntentSignal: environment.tunnelStatusWithIntentSignal,
-                tunnelManagerRef: tunnelManagerRef
+                tunnelManagerRefSignal: environment.tunnelManagerRefSignal
             ).map {
                 ._psiCashConsumableAuthorizationRequestResult(
                     result: $0,
@@ -225,9 +214,13 @@ func iapReducer<T: TunnelProviderManager>(
         case .willRetry(when: let retryCondition):
             // Authorization request will be retried whenever retryCondition becomes true.
             switch retryCondition {
-            case .tunnelConnected:
+            case .whenResolved(tunnelError: .nilTunnelProviderManager):
+                return [ feedbackLog(.error, retryCondition).mapNever() ]
+                
+            case .whenResolved(tunnelError: .tunnelNotConnected):
                 // This event is too frequent to log.
                 return []
+
             case .afterTimeInterval:
                 return [ feedbackLog(.error, retryCondition).mapNever() ]
             }

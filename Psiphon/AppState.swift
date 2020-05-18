@@ -119,6 +119,7 @@ typealias AppEnvironment = (
     notifier: Notifier,
     tunnelStatusWithIntentSignal: SignalProducer<VPNStatusWithIntent, Never>,
     psiCashAuthPackageSignal: SignalProducer<PsiCashAuthPackage, Never>,
+    tunnelManagerRefSignal: SignalProducer<WeakRef<PsiphonTPM>?, Never>,
     urlHandler: URLHandler<PsiphonTPM>,
     paymentQueue: PaymentQueue,
     objcBridgeDelegate: ObjCBridgeDelegate,
@@ -175,6 +176,7 @@ func makeEnvironment(
         tunnelStatusWithIntentSignal: store.$value.signalProducer
             .map(\.vpnState.value.vpnStatusWithIntent),
         psiCashAuthPackageSignal: store.$value.signalProducer.map(\.psiCash.libData.authPackage),
+        tunnelManagerRefSignal: store.$value.signalProducer.map(\.tunnelManagerRef),
         urlHandler: .default(),
         paymentQueue: .default,
         objcBridgeDelegate: objcBridgeDelegate,
@@ -278,6 +280,7 @@ fileprivate func toLandingPageEnvironment(
 fileprivate func toIAPReducerEnvironment(env: AppEnvironment) -> IAPEnvironment {
     IAPEnvironment(
         tunnelStatusWithIntentSignal: env.tunnelStatusWithIntentSignal,
+        tunnelManagerRefSignal: env.tunnelManagerRefSignal,
         psiCashEffects: env.psiCashEffects,
         clientMetaData: env.clientMetaData,
         paymentQueue: env.paymentQueue,
@@ -318,6 +321,7 @@ fileprivate func toSubscriptionAuthStateReducerEnvironment(
         notifier: env.notifier,
         sharedDB: env.sharedDB,
         tunnelStatusWithIntentSignal: env.tunnelStatusWithIntentSignal,
+        tunnelManagerRefSignal: env.tunnelManagerRefSignal,
         clientMetaData: env.clientMetaData,
         getCurrentTime: env.getCurrentTime,
         compareDates: env.compareDates
