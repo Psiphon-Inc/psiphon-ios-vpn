@@ -214,13 +214,6 @@ enum HttpRequestTunnelError: HashableError {
     /// The weak reference to the tunnel provider manager  is `nil`.
     /// This error is not retriable.
     case nilTunnelProviderManager
-    
-    var isRetriable: Bool {
-        switch self {
-        case .tunnelNotConnected: return true
-        case .nilTunnelProviderManager: return false
-        }
-    }
 }
 
 /// `tunneledHttpRequest` check tunnel status immediately before sending the HTTP request.
@@ -250,7 +243,7 @@ fileprivate func tunneledHttpRequest<Response, T: TunnelProviderManager>(
 }
 
 struct RetriableTunneledHttpRequest<Response: RetriableHTTPResponse> {
-        
+    
     /// `SignalTermination` represents whether the authorization request signal has completed,
     /// and that the signal should be completed.
     private enum SignalTermination: Equatable {
@@ -258,25 +251,40 @@ struct RetriableTunneledHttpRequest<Response: RetriableHTTPResponse> {
         case terminate
     }
     
-    /// `RetriableTunneledHttpResult` wraps possible values from `retriableTunneledHttpRequest` function call.
+    /// `RequestResult` represents all values that can be emitted by the returned Effect.
     enum RequestResult: Equatable {
         
+        /// `RetryCondition` represents the conditions that need to resolved in order for the request
+        /// to be retried automatically.
         enum RetryCondition: Equatable {
-            case tunnelConnected
+            
+            /// Request will not be retried until the `tunnelError` error is resolved.
+            case whenResolved(tunnelError: HttpRequestTunnelError)
+            
+            /// Request will be retried automatically after the given internal.
             case afterTimeInterval(interval: DispatchTimeInterval, result: Response.ResultType)
+            
         }
         
-        /// Request will be retried after the given condition is met.
-        case willRetry(when: RetryCondition)
+        /// Request will be retried according to RetryCondition.
+        case willRetry(RetryCondition)
         
         /// Request failed and will not be retried.
-        case failed(ErrorEvent<RequestError>)
+        /// This is a terminal value.
+        case failed(ErrorEvent<Response.Failure>)
         
         /// Request is completed and will not be retried.
+        /// This is a terminal value.
         case completed(Response.ResultType)
     }
     
-    enum RequestError: HashableError {
+    /// RetryError represents errors that can be retried automatically.
+    /// - Errors of type`.tunnelError` are tunnel-related issues and
+    /// are not retried immediately until some condition given the app state is met.
+    /// - Errors of type `.responseRetryError` are errors originating from
+    /// the request response (e.g. a 200-OK response that contains an error in it's body),
+    /// and can be retried automatically regardless of other app state.z
+    private enum RetryError: HashableError {
         /// Request error due to tunnel error.
         case tunnelError(HttpRequestTunnelError)
         /// Request error due to response indicating a retry is needed.
@@ -289,13 +297,13 @@ struct RetriableTunneledHttpRequest<Response: RetriableHTTPResponse> {
     
     func callAsFunction<T: TunnelProviderManager>(
         tunnelStatusWithIntentSignal: SignalProducer<VPNStatusWithIntent, Never>,
-        tunnelManagerRef: WeakRef<T>
+        tunnelManagerRefSignal: SignalProducer<WeakRef<T>?, Never>
     ) -> Effect<RequestResult>
     {
         tunnelStatusWithIntentSignal
             .skipRepeats()
             .combinePrevious(initial: VPNStatusWithIntent(status: .invalid, intent: nil))
-            .take(while: { combined -> Bool in
+            .take(while: { (combined: Combined<VPNStatusWithIntent>) -> Bool in
                 // Takes values while either of the following cases is true:
                 // - Intent value of .start(.none) is not observed.
                 // - After transitioning to .start(.none), the intent does not change.
@@ -315,93 +323,106 @@ struct RetriableTunneledHttpRequest<Response: RetriableHTTPResponse> {
                     return true
                 }
             })
-            .filter {
+            .filter { (combined: Combined<VPNStatusWithIntent>) -> Bool in
                 if Debugging.ignoreTunneledChecks {
                     return true
                 }
                 
                 // Filters out values until the intent value changes to .start(.none)
-                return $0.current.intent == .some(.start(transition: .none))
+                return combined.current.intent == .some(.start(transition: .none))
         }
         .map(\.current.status)
-        .skipRepeats()
-        .flatMap(.latest) { value -> SignalProducer<SignalTermination, ErrorEvent<RequestError>> in
-            let vpnStatus = Debugging.ignoreTunneledChecks ? .connected : value
+        .combineLatest(with: tunnelManagerRefSignal)
+        .skipRepeats({ (lhs, rhs) -> Bool in
+            return lhs.0 == rhs.0 && lhs.1?.weakRef == rhs.1?.weakRef
+        })
+        .flatMap(.latest) { (value: (TunnelProviderVPNStatus, WeakRef<T>?))
+            -> SignalProducer<SignalTermination, ErrorEvent<Response.Failure>> in
+            
+            let vpnStatus = Debugging.ignoreTunneledChecks ? .connected : value.0
             guard case .connected = vpnStatus else {
-                return SignalProducer(value: .value(.willRetry(when: .tunnelConnected)))
+                return SignalProducer(value: .value(.willRetry(.whenResolved(tunnelError: .tunnelNotConnected))))
+            }
+            
+            guard let tunnelManagerRef = value.1 else {
+                return SignalProducer(value: .value(.willRetry(
+                    .whenResolved(tunnelError: .nilTunnelProviderManager))))
             }
             
             // Signal invariant:
-            // Tunnel intent is .start(.none) and VPN status is connected.
-            
+            // Tunnel intent is .start(.none), VPN status is connected and tunnel manager is loaded.
             return tunneledHttpRequest(
                 request: self.request,
                 tunnelManagerRef: tunnelManagerRef
-            ).mapError { tunnelErrorEvent -> ErrorEvent<RequestError> in
+            ).mapError { (tunnelErrorEvent: ErrorEvent<HttpRequestTunnelError>)
+                -> ErrorEvent<RetryError> in
+                
                 tunnelErrorEvent.map { .tunnelError($0) }
             }
             .flatMap(.latest) { (response: Response)
-                -> SignalProducer<SignalTermination, ErrorEvent<RequestError>> in
+                -> SignalProducer<SignalTermination, ErrorEvent<RetryError>> in
                 
                 // Determines if the request needs to be retried.
                 let (result, maybeRetryDueToError) = response.unpackRetriableResultError()
                 
                 if let retryDueToError = maybeRetryDueToError {
-                    let errorValue = retryDueToError.map(RequestError.responseRetryError)
+                    let errorValue = retryDueToError.map(RetryError.responseRetryError)
                     // Request needs to be retried.
                     return SignalProducer(error: errorValue)
-                        .prefix(value:
-                            .value(
-                                .willRetry(when:
-                                    .afterTimeInterval(interval: self.retryInterval, result: result)
-                                )
-                            ))
+                        .prefix(value:.value(.willRetry(
+                            .afterTimeInterval(interval: self.retryInterval, result: result))))
                 } else {
-                    // Request is complete and does not need to be retried.
+                    // Request is completed and does not need to be retried.
                     return SignalProducer(value: .terminate)
                         .prefix(value: .value(.completed(result)))
                 }
             }
-            .flatMapError { requestErrorEvent
-                -> SignalProducer<SignalTermination, ErrorEvent<RequestError>> in
+            .flatMapError { (requestRetryErrorEvent: ErrorEvent<RetryError>)
+                -> SignalProducer<SignalTermination, ErrorEvent<Response.Failure>> in
                 
                 // If the tunnel error request is not retriable, then the signal is completed
                 // and no further retries are carried out.
                 // Otherwise, the error is retriable and is simply forwarded.
+                switch requestRetryErrorEvent.error {
+                case .tunnelError(let tunnelError):
+                    // Tunnel errors should be resolved from upstream,
+                    // hence error is converted to a value and passed downstream.
+                    // These errors will not terminate the signal.
+                    return SignalProducer(value:
+                        .value(.willRetry(.whenResolved(tunnelError: tunnelError)))
+                    )
+                    
+                case .responseRetryError(let responseError):
+                    // Error is due to retrieved response for the request,
+                    // and is forwarded downstream to be retried.
+                    return SignalProducer(error: requestRetryErrorEvent.map { _ in
+                        return responseError
+                    })
+                }
                 
-                guard case let .tunnelError(tunnelError) = requestErrorEvent.error else {
-                    return SignalProducer(error: requestErrorEvent)
-                }
-                if tunnelError.isRetriable {
-                    return SignalProducer(error: requestErrorEvent)
-                } else {
-                    return SignalProducer(value: .terminate)
-                        .prefix(value: .value(.failed(requestErrorEvent)))
-                }
             }
             .retry(upTo: self.retryCount,
                    interval: self.retryInterval.toDouble()!,
                    on: QueueScheduler.main)
-            
         }
-        .flatMapError { (requestErrorEvent: ErrorEvent<RequestError>) -> Effect<SignalTermination> in
-            return Effect(value: .value(.failed(requestErrorEvent)))
+        .flatMapError { (responseError: ErrorEvent<Response.Failure>)
+            -> Effect<SignalTermination> in
+            // Maps failure response error after all retries from a signal failure
+            // to a signal value event.
+            return Effect(value: .value(.failed(responseError)))
         }
-        .take(while: { signalTermination -> Bool in
+        .take(while: { (signalTermination: SignalTermination) -> Bool in
             // Forwards values while the `.terminate` value has not been emitted.
             guard case .value(_) = signalTermination else {
                 return false
             }
             return true
-        }).map { signalTermination -> RequestResult in
-                guard case let .value(requestResult) = signalTermination else {
-                    fatalError()
-                }
-                return requestResult
-        }.on(completed: {
-            PsiFeedbackLogger.info(withType: "RetriableTunneledHttpRequest",
-                                   message: "SignalCompleted")
-        })
+        }).map { (signalTermination: SignalTermination) -> RequestResult in
+            guard case let .value(requestResult) = signalTermination else {
+                fatalError()
+            }
+            return requestResult
+        }
     }
     
 }

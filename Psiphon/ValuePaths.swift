@@ -173,8 +173,7 @@ extension AppState {
             IAPReducerState(
                 iap: self.iapState,
                 psiCashBalance: self.psiCashBalance,
-                psiCashAuth: self.psiCash.libData.authPackage,
-                tunnelManagerRef: self.tunnelManagerRef
+                psiCashAuth: self.psiCash.libData.authPackage
             )
         }
         set {
@@ -229,8 +228,7 @@ extension AppState {
         get {
             SubscriptionReducerState(
                 subscription: self.subscriptionAuthState,
-                receiptData: self.appReceipt.receiptData,
-                tunnelManagerRef: self.tunnelManagerRef
+                receiptData: self.appReceipt.receiptData
             )
         }
         set {
