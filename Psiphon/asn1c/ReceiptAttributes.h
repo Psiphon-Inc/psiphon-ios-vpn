@@ -9,11 +9,11 @@
 #define	_ReceiptAttributes_H_
 
 
-#include <asn_application.h>
+#include "asn_application.h"
 
 /* Including external dependencies */
-#include <asn_SET_OF.h>
-#include <constr_SET_OF.h>
+#include "asn_SET_OF.h"
+#include "constr_SET_OF.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -41,4 +41,4 @@ extern asn_TYPE_descriptor_t asn_DEF_ReceiptAttributes;
 #include "ReceiptAttribute.h"
 
 #endif	/* _ReceiptAttributes_H_ */
-#include <asn_internal.h>
+#include "asn_internal.h"
