@@ -72,7 +72,7 @@ NSErrorDomain _Nonnull const JetsamMetrics_FeedbackErrorDomain = @"JetsamMetrics
 
     *outError = nil;
 
-    NSMutableDictionary *jsonDict = [[NSMutableDictionary alloc] init];
+    NSMutableDictionary *jsonDict = [[NSMutableDictionary alloc] initWithDictionary:@{@"v":@1}];
 
     for (NSString *key in [self.perVersionMetrics allKeys]) {
         JetsamPerAppVersionStat *stat = [self.perVersionMetrics objectForKey:key];
