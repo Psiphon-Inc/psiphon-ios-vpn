@@ -148,7 +148,7 @@ PsiFeedbackLogType const FeedbackUploadLogType = @"FeedbackUpload";
             NSString *jetsamMetricsLog = nil;
             PsiphonDataSharedDB *sharedDB = [[PsiphonDataSharedDB alloc] initForAppGroupIdentifier:APP_GROUP_IDENTIFIER];
 
-            // Jetsam running time buckets
+            // Jetsam running time and time between jetsams bins
             NSArray<BinRange*>* binRanges = @[
                 // [0, 30s)
                 [BinRange binRangeWithRange:MakeCBinRange(0.00, 30.00)],
