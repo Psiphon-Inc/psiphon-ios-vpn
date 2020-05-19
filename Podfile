@@ -27,6 +27,14 @@ end
 target 'PsiphonVPN' do
 end
 
+target 'PsiphonTests' do
+  pod 'PsiphonClientCommonLibrary', :git => "https://github.com/Psiphon-Inc/psiphon-ios-client-common-library.git", :commit => '3c04c40'
+  pod 'ReactiveSwift', '~> 6.2'
+  pod 'ReactiveCocoa', '~> 10.1'
+  pod 'ReactiveObjC', :git => "https://github.com/Psiphon-Inc/ReactiveObjC.git", :commit => '8bbf9dd'
+  pod 'PromisesSwift', '~> 1.2'
+end
+
 post_install do |installer|
   installer.pods_project.targets.each do |target|
     target.build_configurations.each do |config|
