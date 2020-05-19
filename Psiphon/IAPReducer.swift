@@ -157,7 +157,8 @@ func iapReducer<T: TunnelProviderManager>(
             verificationState: .pendingVerificationResult
         )
                
-        let authRequest = RetriableTunneledHttpRequest(
+        // Creates request to verify PsiCash AppStore IAP purchase.
+        let psiCashVerifyRequest = RetriableTunneledHttpRequest(
             request: PurchaseVerifierServerEndpoints.psiCash(
                 requestBody: PsiCashValidationRequest(
                     transaction: unverifiedPsiCashTx.transaction,
@@ -169,7 +170,7 @@ func iapReducer<T: TunnelProviderManager>(
         )
         
         return [
-            authRequest.callAsFunction(
+            psiCashVerifyRequest.callAsFunction(
                 tunnelStatusWithIntentSignal: environment.tunnelStatusWithIntentSignal,
                 tunnelManagerRefSignal: environment.tunnelManagerRefSignal
             ).map {
