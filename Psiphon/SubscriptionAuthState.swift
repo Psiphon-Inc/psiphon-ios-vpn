@@ -94,7 +94,7 @@ typealias SubscriptionAuthStateReducerEnvironment = (
     notifier: Notifier,
     sharedDB: PsiphonDataSharedDB,
     tunnelStatusWithIntentSignal: SignalProducer<VPNStatusWithIntent, Never>,
-    tunnelManagerRefSignal: SignalProducer<WeakRef<PsiphonTPM>?, Never>,
+    tunnelConnectionRefSignal: SignalProducer<TunnelConnection?, Never>,
     clientMetaData: ClientMetaData,
     getCurrentTime: () -> Date,
     compareDates: (Date, Date, Calendar.Component) -> ComparisonResult
@@ -113,13 +113,13 @@ struct SubscriptionAuthState: Equatable {
     var transactionsPendingAuthRequest = Set<OriginalTransactionID>()
 }
 
-struct SubscriptionReducerState<T: TunnelProviderManager>: Equatable {
+struct SubscriptionReducerState: Equatable {
     var subscription: SubscriptionAuthState
     let receiptData: ReceiptData?
 }
 
-func subscriptionAuthStateReducer<T: TunnelProviderManager>(
-    state: inout SubscriptionReducerState<T>, action: SubscriptionAuthStateAction,
+func subscriptionAuthStateReducer(
+    state: inout SubscriptionReducerState, action: SubscriptionAuthStateAction,
     environment: SubscriptionAuthStateReducerEnvironment
 ) -> [Effect<SubscriptionAuthStateAction>] {
     switch action {
@@ -306,7 +306,7 @@ func subscriptionAuthStateReducer<T: TunnelProviderManager>(
         return [
             authRequest.callAsFunction(
                 tunnelStatusWithIntentSignal: environment.tunnelStatusWithIntentSignal,
-                tunnelManagerRefSignal: environment.tunnelManagerRefSignal,
+                tunnelConnectionRefSignal: environment.tunnelConnectionRefSignal,
                 httpClient: environment.httpClient
             ).map {
                 ._authorizationRequestResult(

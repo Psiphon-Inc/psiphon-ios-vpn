@@ -24,9 +24,9 @@ fileprivate let landingPageTag = LogTag("LandingPage")
 
 typealias RestrictedURL = PredicatedValue<URL, TunnelProviderVPNStatus>
 
-struct LandingPageReducerState<T: TunnelProviderManager> {
+struct LandingPageReducerState {
     var pendingLandingPageOpening: Bool
-    let tunnelProviderManager: WeakRef<T>?
+    let tunnelConnection: TunnelConnection?
 }
 
 enum LandingPageAction {
@@ -34,17 +34,17 @@ enum LandingPageAction {
     case _urlOpened(success: Bool)
 }
 
-typealias LandingPageEnvironment<T: TunnelProviderManager> = (
+typealias LandingPageEnvironment = (
     feedbackLogger: FeedbackLogger,
     sharedDB: PsiphonDataSharedDB,
-    urlHandler: URLHandler<T>,
+    urlHandler: URLHandler,
     psiCashEffects: PsiCashEffect,
     psiCashAuthPackageSignal: SignalProducer<PsiCashAuthPackage, Never>
 )
 
-func landingPageReducer<T: TunnelProviderManager>(
-    state: inout LandingPageReducerState<T>, action: LandingPageAction,
-    environment: LandingPageEnvironment<T>
+func landingPageReducer(
+    state: inout LandingPageReducerState, action: LandingPageAction,
+    environment: LandingPageEnvironment
 ) -> [Effect<LandingPageAction>] {
     switch action {
     case .tunnelConnectedAfterIntentSwitchedToStart:
@@ -54,7 +54,7 @@ func landingPageReducer<T: TunnelProviderManager>(
                     .info, tag: landingPageTag, "pending landing page opening").mapNever()
             ]
         }
-        guard let tpmWeakRef = state.tunnelProviderManager else {
+        guard let tunnelConnection = state.tunnelConnection else {
             environment.feedbackLogger.fatalError("expected a valid tunnel provider")
         }
         
@@ -77,7 +77,7 @@ func landingPageReducer<T: TunnelProviderManager>(
                 authPackageSignal: environment.psiCashAuthPackageSignal,
                 psiCashEffects: environment.psiCashEffects
             ).flatMap(.latest) {
-                environment.urlHandler.open($0, tpmWeakRef)
+                environment.urlHandler.open($0, tunnelConnection)
             }
             .map(LandingPageAction._urlOpened(success:))
         ]

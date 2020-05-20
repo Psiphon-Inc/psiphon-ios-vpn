@@ -249,28 +249,32 @@ extension URLSessionTask: HTTPRequestTask {
 }
 
 /// `tunneledHttpRequest` check tunnel status immediately before sending the HTTP request.
-fileprivate func tunneledHttpRequest<Response, T: TunnelProviderManager>(
+fileprivate func tunneledHttpRequest<Response>(
     request urlRequest: HTTPRequest<Response>,
-    tunnelManagerRef: WeakRef<T>,
+    tunnelConnection: TunnelConnection,
     httpClient: HTTPClient
 ) -> SignalProducer<Response, ErrorEvent<HttpRequestTunnelError>> {
     return SignalProducer { observer, lifetime in
-        guard let tunnelManager = tunnelManagerRef.weakRef else {
+        
+        switch tunnelConnection.connectionStatus() {
+        case .resourceReleased:
             observer.send(error: ErrorEvent(.nilTunnelProviderManager))
             observer.sendCompleted()
             return
-        }
-        let vpnStatus = Debugging.ignoreTunneledChecks ? .connected : tunnelManager.connectionStatus
-        guard case .connected = vpnStatus else {
-            observer.send(error: ErrorEvent(.tunnelNotConnected))
-            observer.sendCompleted()
-            return
-        }
-        let session = httpClient.request(urlRequest) { response in
-            observer.fulfill(value: response)
-        }
-        lifetime.observeEnded {
-            session.cancel()
+            
+        case .connection(let connection):
+            let vpnStatus = Debugging.ignoreTunneledChecks ? .connected : connection
+            guard case .connected = vpnStatus else {
+                observer.send(error: ErrorEvent(.tunnelNotConnected))
+                observer.sendCompleted()
+                return
+            }
+            let session = httpClient.request(urlRequest) { response in
+                observer.fulfill(value: response)
+            }
+            lifetime.observeEnded {
+                session.cancel()
+            }
         }
     }
 }
@@ -328,9 +332,9 @@ struct RetriableTunneledHttpRequest<Response: RetriableHTTPResponse>: Equatable 
     let retryCount: Int = 5
     let retryInterval: DispatchTimeInterval = .seconds(1)
     
-    func callAsFunction<T: TunnelProviderManager>(
+    func callAsFunction(
         tunnelStatusWithIntentSignal: SignalProducer<VPNStatusWithIntent, Never>,
-        tunnelManagerRefSignal: SignalProducer<WeakRef<T>?, Never>,
+        tunnelConnectionRefSignal: SignalProducer<TunnelConnection?, Never>,
         httpClient: HTTPClient
     ) -> Effect<RequestResult>
     {
@@ -366,11 +370,11 @@ struct RetriableTunneledHttpRequest<Response: RetriableHTTPResponse>: Equatable 
                 return combined.current.intent == .some(.start(transition: .none))
         }
         .map(\.current.status)
-        .combineLatest(with: tunnelManagerRefSignal)
+        .combineLatest(with: tunnelConnectionRefSignal)
         .skipRepeats({ (lhs, rhs) -> Bool in
-            return lhs.0 == rhs.0 && lhs.1?.weakRef == rhs.1?.weakRef
+            return lhs.0 == rhs.0 && lhs.1 == rhs.1
         })
-        .flatMap(.latest) { (value: (TunnelProviderVPNStatus, WeakRef<T>?))
+        .flatMap(.latest) { (value: (TunnelProviderVPNStatus, TunnelConnection?))
             -> SignalProducer<SignalTermination, ErrorEvent<Response.Failure>> in
             
             let vpnStatus = Debugging.ignoreTunneledChecks ? .connected : value.0
@@ -378,7 +382,7 @@ struct RetriableTunneledHttpRequest<Response: RetriableHTTPResponse>: Equatable 
                 return SignalProducer(value: .value(.willRetry(.whenResolved(tunnelError: .tunnelNotConnected))))
             }
             
-            guard let tunnelManagerRef = value.1 else {
+            guard let tunnelConnection = value.1 else {
                 return SignalProducer(value: .value(.willRetry(
                     .whenResolved(tunnelError: .nilTunnelProviderManager))))
             }
@@ -387,7 +391,7 @@ struct RetriableTunneledHttpRequest<Response: RetriableHTTPResponse>: Equatable 
             // Tunnel intent is .start(.none), VPN status is connected and tunnel manager is loaded.
             return tunneledHttpRequest(
                 request: self.request,
-                tunnelManagerRef: tunnelManagerRef,
+                tunnelConnection: tunnelConnection,
                 httpClient: httpClient
             ).mapError { (tunnelErrorEvent: ErrorEvent<HttpRequestTunnelError>)
                 -> ErrorEvent<RetryError> in

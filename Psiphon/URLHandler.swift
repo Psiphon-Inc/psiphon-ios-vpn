@@ -20,14 +20,14 @@
 import Foundation
 import  ReactiveSwift
 
-struct URLHandler<T: TunnelProviderManager> {
-    let open: (RestrictedURL, WeakRef<T>) -> Effect<Bool>
+struct URLHandler {
+    let open: (RestrictedURL, TunnelConnection) -> Effect<Bool>
 }
 
 extension URLHandler {
-    static func `default`<T: TunnelProviderManager>() -> URLHandler<T> {
-        URLHandler<T>(
-            open: { url, tpmWeakRef in
+    static func `default`() -> URLHandler {
+        URLHandler(
+            open: { url, tunnelConnection in
                 Effect.deferred { fulfilled in
                     if Debugging.disableURLHandler {
                         fulfilled(true)
@@ -39,17 +39,19 @@ extension URLHandler {
                         /// before the landing page can be opened.
                         /// Tunnel status should be assessed directly (not through observables that might
                         /// introduce some latency), before opening the landing page.
-                        guard let tpm = tpmWeakRef.weakRef else {
+                        switch tunnelConnection.connectionStatus() {
+                        case .resourceReleased:
                             fulfilled(false)
                             return
-                        }
-                        guard let landingPage = url.getValue(tpm.connectionStatus) else {
-                            fulfilled(false)
-                            return
-                        }
-                        
-                        UIApplication.shared.open(landingPage) { success in
-                            fulfilled(success)
+                        case .connection(let connection):
+                            guard let landingPage = url.getValue(connection) else {
+                                fulfilled(false)
+                                return
+                            }
+                            
+                            UIApplication.shared.open(landingPage) { success in
+                                fulfilled(success)
+                            }
                         }
                     }
                 }

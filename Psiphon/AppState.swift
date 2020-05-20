@@ -79,8 +79,8 @@ typealias AppEnvironment = (
     notifier: Notifier,
     tunnelStatusWithIntentSignal: SignalProducer<VPNStatusWithIntent, Never>,
     psiCashAuthPackageSignal: SignalProducer<PsiCashAuthPackage, Never>,
-    tunnelManagerRefSignal: SignalProducer<WeakRef<PsiphonTPM>?, Never>,
-    urlHandler: URLHandler<PsiphonTPM>,
+    tunnelConnectionRefSignal: SignalProducer<TunnelConnection?, Never>,
+    urlHandler: URLHandler,
     paymentQueue: PaymentQueue,
     objcBridgeDelegate: ObjCBridgeDelegate,
     receiptRefreshRequestDelegate: ReceiptRefreshRequestDelegate,
@@ -139,7 +139,7 @@ func makeEnvironment(
         tunnelStatusWithIntentSignal: store.$value.signalProducer
             .map(\.vpnState.value.vpnStatusWithIntent),
         psiCashAuthPackageSignal: store.$value.signalProducer.map(\.psiCash.libData.authPackage),
-        tunnelManagerRefSignal: store.$value.signalProducer.map(\.tunnelManagerRef),
+        tunnelConnectionRefSignal: store.$value.signalProducer.map(\.tunnelConnection),
         urlHandler: .default(),
         paymentQueue: .default,
         objcBridgeDelegate: objcBridgeDelegate,
@@ -232,7 +232,7 @@ fileprivate func toPsiCashEnvironment(env: AppEnvironment) -> PsiCashEnvironment
 
 fileprivate func toLandingPageEnvironment(
     env: AppEnvironment
-) -> LandingPageEnvironment<PsiphonTPM> {
+) -> LandingPageEnvironment {
     LandingPageEnvironment(
         feedbackLogger: env.feedbackLogger,
         sharedDB: env.sharedDB,
@@ -246,7 +246,7 @@ fileprivate func toIAPReducerEnvironment(env: AppEnvironment) -> IAPEnvironment 
     IAPEnvironment(
         feedbackLogger: env.feedbackLogger,
         tunnelStatusWithIntentSignal: env.tunnelStatusWithIntentSignal,
-        tunnelManagerRefSignal: env.tunnelManagerRefSignal,
+        tunnelConnectionRefSignal: env.tunnelConnectionRefSignal,
         psiCashEffects: env.psiCashEffects,
         clientMetaData: env.clientMetaData,
         paymentQueue: env.paymentQueue,
@@ -292,7 +292,7 @@ fileprivate func toSubscriptionAuthStateReducerEnvironment(
         notifier: env.notifier,
         sharedDB: env.sharedDB,
         tunnelStatusWithIntentSignal: env.tunnelStatusWithIntentSignal,
-        tunnelManagerRefSignal: env.tunnelManagerRefSignal,
+        tunnelConnectionRefSignal: env.tunnelConnectionRefSignal,
         clientMetaData: env.clientMetaData,
         getCurrentTime: env.getCurrentTime,
         compareDates: env.compareDates
