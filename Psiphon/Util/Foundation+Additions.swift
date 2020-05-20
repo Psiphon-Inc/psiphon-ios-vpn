@@ -103,7 +103,13 @@ public struct NonEmpty<Element> {
 
 }
 
-extension NonEmpty: Equatable where Element: Equatable {}
+extension NonEmpty: Equatable where Element: Equatable {
+    
+    public func isEqual(_ array: [Element]) -> Bool {
+        return self.storage == array
+    }
+    
+}
 extension NonEmpty: Hashable where Element: Hashable {}
 
 extension NonEmpty: Collection {
