@@ -129,51 +129,6 @@ extension URL {
     
 }
 
-fileprivate func makeHTTPRequest<Response>(
-    _ requestData: HTTPRequest<Response>,
-    handler: @escaping (Response) -> Void
-) -> URLSessionTask {
-    
-    guard requestData.urlRequest.url?.isSchemeHttp ?? false else {
-        fatalError(
-            "Expected HTTP/HTTPS request '\(String(describing: requestData.urlRequest.url))'"
-        )
-    }
-    
-    let config = URLSessionConfiguration.ephemeral
-    let session = URLSession(configuration: config).dataTask(with: requestData.urlRequest)
-    { data, response, error in
-        let result: URLSessionResult
-        if let error = error {
-            // If URLSession task resulted in an error, there might be a partial response.
-            result = .failure(HTTPRequestError(partialResponse: response as? HTTPURLResponse,
-                                               errorEvent: ErrorEvent(error as SystemError)))
-        } else {
-            // If `error` is nil, then URLSession task callback guarantees that
-            // `data` and `response` are non-nil.
-            result = .success((data: data!, response: response! as! HTTPURLResponse))
-        }
-        handler(Response(urlSessionResult: result))
-    }
-    session.resume()
-    return session
-}
-
-/// `httpRequest` makes an HTTP request and returns the result in the returned Effect.
-/// Use `RetriableTunneledHttpRequest` if the request needs to be tunneled.
-func httpRequest<Response>(
-    request urlRequest: HTTPRequest<Response>
-) -> Effect<Response> {
-    return SignalProducer { observer, lifetime in
-        let session = makeHTTPRequest(urlRequest) { response in
-            observer.fulfill(value: response)
-        }
-        lifetime.observeEnded {
-            session.cancel()
-        }
-    }
-}
-
 /// Emitted by `tunneledHttpRequest` if tunnel is not connect
 /// at the time of the request.
 enum HttpRequestTunnelError: HashableError {
@@ -184,10 +139,120 @@ enum HttpRequestTunnelError: HashableError {
     case nilTunnelProviderManager
 }
 
+
+protocol CancellableURLRequest {
+    func cancel()
+}
+
+extension URLSessionTask: CancellableURLRequest {}
+
+
+struct HTTPClient {
+    
+    typealias RequestFunc = (URLSessionConfiguration, URLRequest,
+        @escaping (URLSessionResult) -> Void) -> CancellableURLRequest
+    
+    let config = URLSessionConfiguration.ephemeral
+    private let makeRequest: RequestFunc
+
+    init(_ makeRequest: @escaping RequestFunc) {
+        self.makeRequest = makeRequest
+    }
+    
+    func request<Response>(
+        _ requestData: HTTPRequest<Response>,
+        handler: @escaping (Response) -> Void
+    ) -> CancellableURLRequest {
+        
+        guard requestData.urlRequest.url?.isSchemeHttp ?? false else {
+            fatalError(
+                "Expected HTTP/HTTPS request '\(String(describing: requestData.urlRequest.url))'"
+            )
+        }
+        
+        return self.makeRequest(self.config, requestData.urlRequest) { result in
+            handler(Response(urlSessionResult: result))
+        }
+        
+    }
+    
+}
+
+extension HTTPClient {
+    
+    static let `default` = HTTPClient { (config, urlRequest, completionHandler)
+        -> CancellableURLRequest in
+        
+        let session = URLSession(configuration: config).dataTask(with: urlRequest)
+        { data, response, error in
+            let result: URLSessionResult
+            if let error = error {
+                // If URLSession task resulted in an error, there might be a partial response.
+                result = .failure(HTTPRequestError(partialResponse: response as? HTTPURLResponse,
+                                                   errorEvent: ErrorEvent(error as SystemError)))
+            } else {
+                // If `error` is nil, then URLSession task callback guarantees that
+                // `data` and `response` are non-nil.
+                result = .success((data: data!, response: response! as! HTTPURLResponse))
+            }
+            completionHandler(result)
+        }
+        session.resume()
+        return session
+    }
+    
+}
+
+protocol HTTPRequestTask {
+    
+    static func request<Response>(
+        _ requestData: HTTPRequest<Response>, handler: @escaping (Response) -> Void
+    ) -> HTTPRequestTask
+    
+    func cancel()
+    
+}
+
+extension URLSessionTask: HTTPRequestTask {
+    
+    static func request<Response>(
+        _ requestData: HTTPRequest<Response>,
+        handler: @escaping (Response) -> Void
+    ) -> HTTPRequestTask {
+        
+        guard requestData.urlRequest.url?.isSchemeHttp ?? false else {
+            fatalError(
+                "Expected HTTP/HTTPS request '\(String(describing: requestData.urlRequest.url))'"
+            )
+        }
+        
+        let config = URLSessionConfiguration.ephemeral
+        let session = URLSession(configuration: config).dataTask(with: requestData.urlRequest)
+        { data, response, error in
+            let result: URLSessionResult
+            if let error = error {
+                // If URLSession task resulted in an error, there might be a partial response.
+                result = .failure(HTTPRequestError(partialResponse: response as? HTTPURLResponse,
+                                                   errorEvent: ErrorEvent(error as SystemError)))
+            } else {
+                // If `error` is nil, then URLSession task callback guarantees that
+                // `data` and `response` are non-nil.
+                result = .success((data: data!, response: response! as! HTTPURLResponse))
+            }
+            handler(Response(urlSessionResult: result))
+        }
+        session.resume()
+        return session
+    }
+
+    
+}
+
 /// `tunneledHttpRequest` check tunnel status immediately before sending the HTTP request.
 fileprivate func tunneledHttpRequest<Response, T: TunnelProviderManager>(
     request urlRequest: HTTPRequest<Response>,
-    tunnelManagerRef: WeakRef<T>
+    tunnelManagerRef: WeakRef<T>,
+    httpClient: HTTPClient
 ) -> SignalProducer<Response, ErrorEvent<HttpRequestTunnelError>> {
     return SignalProducer { observer, lifetime in
         guard let tunnelManager = tunnelManagerRef.weakRef else {
@@ -201,7 +266,7 @@ fileprivate func tunneledHttpRequest<Response, T: TunnelProviderManager>(
             observer.sendCompleted()
             return
         }
-        let session = makeHTTPRequest(urlRequest) { response in
+        let session = httpClient.request(urlRequest) { response in
             observer.fulfill(value: response)
         }
         lifetime.observeEnded {
@@ -210,7 +275,7 @@ fileprivate func tunneledHttpRequest<Response, T: TunnelProviderManager>(
     }
 }
 
-struct RetriableTunneledHttpRequest<Response: RetriableHTTPResponse> {
+struct RetriableTunneledHttpRequest<Response: RetriableHTTPResponse>: Equatable {
     
     /// `SignalTermination` represents whether the authorization request signal has completed,
     /// and that the signal should be completed.
@@ -265,7 +330,8 @@ struct RetriableTunneledHttpRequest<Response: RetriableHTTPResponse> {
     
     func callAsFunction<T: TunnelProviderManager>(
         tunnelStatusWithIntentSignal: SignalProducer<VPNStatusWithIntent, Never>,
-        tunnelManagerRefSignal: SignalProducer<WeakRef<T>?, Never>
+        tunnelManagerRefSignal: SignalProducer<WeakRef<T>?, Never>,
+        httpClient: HTTPClient
     ) -> Effect<RequestResult>
     {
         tunnelStatusWithIntentSignal
@@ -321,7 +387,8 @@ struct RetriableTunneledHttpRequest<Response: RetriableHTTPResponse> {
             // Tunnel intent is .start(.none), VPN status is connected and tunnel manager is loaded.
             return tunneledHttpRequest(
                 request: self.request,
-                tunnelManagerRef: tunnelManagerRef
+                tunnelManagerRef: tunnelManagerRef,
+                httpClient: httpClient
             ).mapError { (tunnelErrorEvent: ErrorEvent<HttpRequestTunnelError>)
                 -> ErrorEvent<RetryError> in
                 
@@ -394,5 +461,3 @@ struct RetriableTunneledHttpRequest<Response: RetriableHTTPResponse> {
     }
     
 }
-
-extension RetriableTunneledHttpRequest : Equatable {}

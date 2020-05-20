@@ -54,7 +54,8 @@ typealias IAPEnvironment = (
     paymentQueue: PaymentQueue,
     userConfigs: UserDefaultsConfig,
     psiCashStore: (PsiCashAction) -> Effect<Never>,
-    appReceiptStore: (ReceiptStateAction) -> Effect<Never>
+    appReceiptStore: (ReceiptStateAction) -> Effect<Never>,
+    httpClient: HTTPClient
 )
 
 func iapReducer<T: TunnelProviderManager>(
@@ -173,7 +174,8 @@ func iapReducer<T: TunnelProviderManager>(
         return [
             psiCashVerifyRequest.callAsFunction(
                 tunnelStatusWithIntentSignal: environment.tunnelStatusWithIntentSignal,
-                tunnelManagerRefSignal: environment.tunnelManagerRefSignal
+                tunnelManagerRefSignal: environment.tunnelManagerRefSignal,
+                httpClient: environment.httpClient
             ).map {
                 ._psiCashConsumableAuthorizationRequestResult(
                     result: $0,

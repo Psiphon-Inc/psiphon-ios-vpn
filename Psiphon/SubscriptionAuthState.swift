@@ -90,6 +90,7 @@ enum SubscriptionAuthStateAction {
 
 typealias SubscriptionAuthStateReducerEnvironment = (
     feedbackLogger: FeedbackLogger,
+    httpClient: HTTPClient,
     notifier: Notifier,
     sharedDB: PsiphonDataSharedDB,
     tunnelStatusWithIntentSignal: SignalProducer<VPNStatusWithIntent, Never>,
@@ -305,7 +306,8 @@ func subscriptionAuthStateReducer<T: TunnelProviderManager>(
         return [
             authRequest.callAsFunction(
                 tunnelStatusWithIntentSignal: environment.tunnelStatusWithIntentSignal,
-                tunnelManagerRefSignal: environment.tunnelManagerRefSignal
+                tunnelManagerRefSignal: environment.tunnelManagerRefSignal,
+                httpClient: environment.httpClient
             ).map {
                 ._authorizationRequestResult(
                     result: $0,
