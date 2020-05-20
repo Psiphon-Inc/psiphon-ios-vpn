@@ -175,6 +175,7 @@
 		8D45704324757BCD00E1CC57 /* ANY.c in Sources */ = {isa = PBXBuildFile; fileRef = 445F24B520E1A5BA00D004E9 /* ANY.c */; };
 		8D45704424757BD400E1CC57 /* PsiFeedbackLogger.m in Sources */ = {isa = PBXBuildFile; fileRef = EF639C2E1F8FCE2A009D6B42 /* PsiFeedbackLogger.m */; };
 		8D45704524757BE100E1CC57 /* Nullity.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFECCCF429898FD903B69A6 /* Nullity.m */; };
+		8D4570472475BA5900E1CC57 /* PsiphonTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D4570462475BA5900E1CC57 /* PsiphonTests.swift */; };
 		8D778978247469FE0038BFDA /* AppInfo.h in Sources */ = {isa = PBXBuildFile; fileRef = 4E10920620F3DA190033114B /* AppInfo.h */; };
 		8D77897C2474839C0038BFDA /* RequestsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D77897B2474839C0038BFDA /* RequestsTests.swift */; };
 		8D7789A324748F8C0038BFDA /* Requests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52B3C54423DA391F003F6B12 /* Requests.swift */; };
@@ -605,6 +606,7 @@
 		8D417EDC2419DBA100FEE587 /* ProductRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductRequest.swift; sourceTree = "<group>"; };
 		8D417EDE241AA89C00FEE587 /* Effect.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Effect.swift; sourceTree = "<group>"; };
 		8D45701D247577D400E1CC57 /* PsiphonTests-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "PsiphonTests-Bridging-Header.h"; sourceTree = "<group>"; };
+		8D4570462475BA5900E1CC57 /* PsiphonTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PsiphonTests.swift; sourceTree = "<group>"; };
 		8D77893F24745DD90038BFDA /* PsiphonTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PsiphonTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		8D77894324745DD90038BFDA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		8D77897B2474839C0038BFDA /* RequestsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RequestsTests.swift; sourceTree = "<group>"; };
@@ -1180,6 +1182,7 @@
 			children = (
 				8D77894324745DD90038BFDA /* Info.plist */,
 				8D45701D247577D400E1CC57 /* PsiphonTests-Bridging-Header.h */,
+				8D4570462475BA5900E1CC57 /* PsiphonTests.swift */,
 			);
 			path = PsiphonTests;
 			sourceTree = "<group>";
@@ -1895,6 +1898,7 @@
 				8D45703524757B8600E1CC57 /* constr_SEQUENCE.c in Sources */,
 				8D45702724757B8600E1CC57 /* ReceiptAttributes.c in Sources */,
 				8D45704324757BCD00E1CC57 /* ANY.c in Sources */,
+				8D4570472475BA5900E1CC57 /* PsiphonTests.swift in Sources */,
 				8D45702D24757B8600E1CC57 /* constr_SET_OF.c in Sources */,
 				8D45703924757B8600E1CC57 /* NativeEnumerated.c in Sources */,
 				8D45703E24757B8600E1CC57 /* ber_tlv_tag.c in Sources */,
