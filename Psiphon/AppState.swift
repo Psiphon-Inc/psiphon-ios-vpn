@@ -71,6 +71,7 @@ enum AppAction {
 typealias AppEnvironment = (
     appBundle: PsiphonBundle,
     feedbackLogger: FeedbackLogger,
+    httpClient: HTTPClient,
     psiCashEffects: PsiCashEffect,
     clientMetaData: ClientMetaData,
     sharedDB: PsiphonDataSharedDB,
@@ -129,6 +130,7 @@ func makeEnvironment(
     let environment = AppEnvironment(
         appBundle: PsiphonBundle.from(bundle: Bundle.main),
         feedbackLogger: feedbackLogger,
+        httpClient: HTTPClient.default,
         psiCashEffects: PsiCashEffect(psiCash: psiCashLib),
         clientMetaData: ClientMetaData(),
         sharedDB: sharedDB,
@@ -250,7 +252,8 @@ fileprivate func toIAPReducerEnvironment(env: AppEnvironment) -> IAPEnvironment 
         paymentQueue: env.paymentQueue,
         userConfigs: env.userConfigs,
         psiCashStore: env.psiCashStore,
-        appReceiptStore: env.appReceiptStore
+        appReceiptStore: env.appReceiptStore,
+        httpClient: env.httpClient
     )
 }
 
@@ -285,6 +288,7 @@ fileprivate func toSubscriptionAuthStateReducerEnvironment(
 ) -> SubscriptionAuthStateReducerEnvironment {
     SubscriptionAuthStateReducerEnvironment(
         feedbackLogger: env.feedbackLogger,
+        httpClient: env.httpClient,
         notifier: env.notifier,
         sharedDB: env.sharedDB,
         tunnelStatusWithIntentSignal: env.tunnelStatusWithIntentSignal,
