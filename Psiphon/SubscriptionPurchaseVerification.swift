@@ -81,7 +81,7 @@ struct SubscriptionValidationResponse: RetriableHTTPResponse {
             case .noError:
                 let base64Auth = try values.decode(String.self, forKey: .signedAuthorization)
                 guard let base64Data = Data(base64Encoded: base64Auth) else {
-                    fatalErrorFeedbackLog(
+                    fatalError(
                         "Failed to create data from base64 encoded string: '\(base64Auth)'"
                     )
                 }

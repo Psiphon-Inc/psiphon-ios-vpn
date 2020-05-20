@@ -20,49 +20,7 @@
 import Foundation
 import ReactiveSwift
 
-#if DEBUG
-var Debugging = DebugFlags()
-#else
-var Debugging = DebugFlags.disabled()
-#endif
-
 var Style = AppStyle()
-
-/// A verified stricter set of `Bundle` properties.
-struct PsiphonBundle {
-    let bundleIdentifier: String
-    let appStoreReceiptURL: URL
-    
-    /// Validates app's environment give the assumptions made in the app for certain invariants to hold true.
-    /// - Note: Stops program execution if any of the validations fail.
-    static func from(bundle: Bundle) -> PsiphonBundle {
-        return PsiphonBundle(bundleIdentifier: bundle.bundleIdentifier!,
-                             appStoreReceiptURL: bundle.appStoreReceiptURL!)
-    }
-}
-
-struct DebugFlags {
-    var mainThreadChecks = true
-    var disableURLHandler = false
-    var devServers = true
-    var ignoreTunneledChecks = false
-    var disableConnectOnDemand = false
-    
-    var printStoreLogs = false
-    var printAppState = false
-    var printHttpRequests = true
-    
-    static func disabled() -> Self {
-        return .init(mainThreadChecks: false,
-                     disableURLHandler: false,
-                     devServers: false,
-                     ignoreTunneledChecks: false,
-                     disableConnectOnDemand: false,
-                     printStoreLogs: false,
-                     printAppState: false,
-                     printHttpRequests: false)
-    }
-}
 
 /// Represents UIViewController's that can be dismissed.
 @objc enum DismissibleScreen: Int {
@@ -112,6 +70,7 @@ enum AppAction {
 
 typealias AppEnvironment = (
     appBundle: PsiphonBundle,
+    feedbackLogger: FeedbackLogger,
     psiCashEffects: PsiCashEffect,
     clientMetaData: ClientMetaData,
     sharedDB: PsiphonDataSharedDB,
@@ -150,6 +109,7 @@ typealias AppEnvironment = (
 /// in `applicationWillTerminate(:_)` delegate callback.
 func makeEnvironment(
     store: Store<AppState, AppAction>,
+    feedbackLogger: FeedbackLogger,
     sharedDB: PsiphonDataSharedDB,
     psiCashLib: PsiCash,
     objcBridgeDelegate: ObjCBridgeDelegate,
@@ -168,6 +128,7 @@ func makeEnvironment(
     
     let environment = AppEnvironment(
         appBundle: PsiphonBundle.from(bundle: Bundle.main),
+        feedbackLogger: feedbackLogger,
         psiCashEffects: PsiCashEffect(psiCash: psiCashLib),
         clientMetaData: ClientMetaData(),
         sharedDB: sharedDB,
@@ -201,7 +162,7 @@ func makeEnvironment(
         ),
         vpnConnectionObserver: PsiphonTPMConnectionObserver(store:
             store.projection(value: erase,
-                             action: { .vpnStateAction(.action($0)) })
+                             action: { .vpnStateAction(.action(._vpnStatusDidChange($0))) })
         ),
         vpnActionStore: { [unowned store] (action: VPNPublicAction) -> Effect<Never> in
             .fireAndForget {
@@ -256,6 +217,7 @@ func makeEnvironment(
 
 fileprivate func toPsiCashEnvironment(env: AppEnvironment) -> PsiCashEnvironment {
     PsiCashEnvironment(
+        feedbackLogger: env.feedbackLogger,
         psiCashEffects: env.psiCashEffects,
         sharedDB: env.sharedDB,
         userConfigs: env.userConfigs,
@@ -270,6 +232,7 @@ fileprivate func toLandingPageEnvironment(
     env: AppEnvironment
 ) -> LandingPageEnvironment<PsiphonTPM> {
     LandingPageEnvironment(
+        feedbackLogger: env.feedbackLogger,
         sharedDB: env.sharedDB,
         urlHandler: env.urlHandler,
         psiCashEffects: env.psiCashEffects,
@@ -279,6 +242,7 @@ fileprivate func toLandingPageEnvironment(
 
 fileprivate func toIAPReducerEnvironment(env: AppEnvironment) -> IAPEnvironment {
     IAPEnvironment(
+        feedbackLogger: env.feedbackLogger,
         tunnelStatusWithIntentSignal: env.tunnelStatusWithIntentSignal,
         tunnelManagerRefSignal: env.tunnelManagerRefSignal,
         psiCashEffects: env.psiCashEffects,
@@ -292,6 +256,7 @@ fileprivate func toIAPReducerEnvironment(env: AppEnvironment) -> IAPEnvironment 
 
 fileprivate func toReceiptReducerEnvironment(env: AppEnvironment) -> ReceiptReducerEnvironment {
     ReceiptReducerEnvironment(
+        feedbackLogger: env.feedbackLogger,
         appBundle: env.appBundle,
         iapStore: env.iapStore,
         subscriptionStore: env.subscriptionStore,
@@ -308,6 +273,7 @@ fileprivate func toSubscriptionReducerEnvironment(
     env: AppEnvironment
 ) -> SubscriptionReducerEnvironment {
     SubscriptionReducerEnvironment(
+        feedbackLogger: env.feedbackLogger,
         appReceiptStore: env.appReceiptStore,
         getCurrentTime: env.getCurrentTime,
         compareDates: env.compareDates
@@ -318,6 +284,7 @@ fileprivate func toSubscriptionAuthStateReducerEnvironment(
     env: AppEnvironment
 ) -> SubscriptionAuthStateReducerEnvironment {
     SubscriptionAuthStateReducerEnvironment(
+        feedbackLogger: env.feedbackLogger,
         notifier: env.notifier,
         sharedDB: env.sharedDB,
         tunnelStatusWithIntentSignal: env.tunnelStatusWithIntentSignal,
@@ -332,6 +299,7 @@ fileprivate func toRequestDelegateReducerEnvironment(
     env: AppEnvironment
 ) -> ProductRequestEnvironment {
     ProductRequestEnvironment(
+        feedbackLogger: env.feedbackLogger,
         productRequestDelegate: env.productRequestDelegate,
         supportedPsiCashIAPProductIDs: env.supportedPsiCashIAPProductIDs
     )
@@ -351,6 +319,7 @@ fileprivate func toAppDelegateReducerEnvironment(env: AppEnvironment) -> AppDele
 
 fileprivate func toVPNReducerEnvironment(env: AppEnvironment) -> VPNReducerEnvironment<PsiphonTPM> {
     VPNReducerEnvironment(
+        feedbackLogger: env.feedbackLogger,
         sharedDB: env.sharedDB,
         vpnStartCondition: env.vpnStartCondition,
         vpnConnectionObserver: env.vpnConnectionObserver,
@@ -358,9 +327,11 @@ fileprivate func toVPNReducerEnvironment(env: AppEnvironment) -> VPNReducerEnvir
     )
 }
 
-func makeAppReducer() -> Reducer<AppState, AppAction, AppEnvironment> {
+func makeAppReducer(
+    feedbackLogger: FeedbackLogger
+) -> Reducer<AppState, AppAction, AppEnvironment> {
     combine(
-        pullback(makeVpnStateReducer(),
+        pullback(makeVpnStateReducer(feedbackLogger: feedbackLogger),
                  value: \.vpnReducerState,
                  action: \.vpnStateAction,
                  environment: toVPNReducerEnvironment(env:)),

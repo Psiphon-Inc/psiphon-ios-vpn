@@ -403,7 +403,7 @@ typedef NS_ENUM(NSInteger, VPNIntent) {
     [AppObservables.shared.vpnStartStopStatus sendNext:@(status)];
 }
 
-- (void)onReachabilityStatusDidChange:(NetworkStatus)status {
+- (void)onReachabilityStatusDidChange:(ReachabilityStatus)status {
     [AppObservables.shared.reachabilityStatus sendNext:@(status)];
 }
 

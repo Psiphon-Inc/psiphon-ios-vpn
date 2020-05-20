@@ -55,7 +55,8 @@ extension Effect {
     
     public func sink(
         receiveCompletion: @escaping () -> Void,
-        receiveValues: @escaping (Value) -> Void
+        receiveValues: @escaping (Value) -> Void,
+        feedbackLogger: FeedbackLogger
     ) -> Disposable? {
         return self.start { event in
             switch event {
@@ -64,9 +65,9 @@ extension Effect {
             case .completed:
                 receiveCompletion()
             case .interrupted:
-                fatalErrorFeedbackLog("Unexpected effect interruption")
+                feedbackLogger.fatalError("Unexpected effect interruption")
             case .failed(_):
-                fatalErrorFeedbackLog("Effect failed")
+                feedbackLogger.fatalError("Effect failed")
             }
         }
     }

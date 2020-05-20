@@ -17,21 +17,17 @@
 *
 */
 
-import UIKit
+import Foundation
 
-@objc final class DuskButton: AnimatedUIButton {
+/// A verified stricter set of `Bundle` properties.
+struct PsiphonBundle {
+    let bundleIdentifier: String
+    let appStoreReceiptURL: URL
     
-    init() {
-        super.init(frame: .zero)
-        backgroundColor = UIColor.dusk()
-        layer.cornerRadius = Style.default.cornerRadius
-        clipsToBounds = true
-        contentMode = .center
-        addShadow(toLayer: layer)
+    /// Validates app's environment give the assumptions made in the app for certain invariants to hold true.
+    /// - Note: Stops program execution if any of the validations fail.
+    static func from(bundle: Bundle) -> PsiphonBundle {
+        return PsiphonBundle(bundleIdentifier: bundle.bundleIdentifier!,
+                             appStoreReceiptURL: bundle.appStoreReceiptURL!)
     }
-
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-
 }

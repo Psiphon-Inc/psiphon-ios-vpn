@@ -17,21 +17,11 @@
 *
 */
 
-import UIKit
+#ifndef PsiphonTests_Bridging_Header_h
+#define PsiphonTests_Bridging_Header_h
 
-@objc final class DuskButton: AnimatedUIButton {
-    
-    init() {
-        super.init(frame: .zero)
-        backgroundColor = UIColor.dusk()
-        layer.cornerRadius = Style.default.cornerRadius
-        clipsToBounds = true
-        contentMode = .center
-        addShadow(toLayer: layer)
-    }
+// Import C/Obj-C headers for testing here.
 
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
+#import "Psiphon-Bridging-Header.h"
 
-}
+#endif /* PsiphonTests_Bridging_Header_h */

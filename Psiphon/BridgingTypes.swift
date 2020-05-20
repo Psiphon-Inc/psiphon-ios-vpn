@@ -49,7 +49,7 @@ import Promises
     
     @objc func onVPNStateSyncError(_ userErrorMessage: String)
     
-    @objc func onReachabilityStatusDidChange(_ previousStats: NetworkStatus)
+    @objc func onReachabilityStatusDidChange(_ previousStats: ReachabilityStatus)
 
     @objc func dismiss(screen: DismissibleScreen, completion: (() -> Void)?)
 
@@ -98,6 +98,7 @@ import Promises
 
 // MARK: Bridged Types
 
+// TODO: Log the fatalError calls
 @objc final class SwitchedVPNStartStopIntent: NSObject {
     
     let switchedIntent: TunnelStartStopIntent
@@ -108,7 +109,7 @@ import Promises
         switch switchedIntent {
         case .start(transition: .none): return true
         case .stop: return false
-        default: fatalErrorFeedbackLog("Unexpected tunnel intent value '\(switchedIntent)'")
+        default: fatalError("Unexpected tunnel intent value '\(switchedIntent)'")
         }
     }
     
@@ -124,7 +125,7 @@ import Promises
         subscriptionStatus: SubscriptionStatus
     ) -> Self {
         guard case .completed(_) = state.providerSyncResult else {
-            fatalErrorFeedbackLog("expected no pending sync with tunnel provider")
+            fatalError("expected no pending sync with tunnel provider")
         }
         
         let userSubscribed: Bool
@@ -134,7 +135,7 @@ import Promises
         case .notSubscribed:
             userSubscribed = false
         case .unknown:
-            fatalErrorFeedbackLog("expected subscription status to not be unknown")
+            fatalError("expected subscription status to not be unknown")
         }
 
         let newIntent: TunnelStartStopIntent

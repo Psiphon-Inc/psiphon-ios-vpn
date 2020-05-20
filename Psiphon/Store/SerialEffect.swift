@@ -44,7 +44,8 @@ extension SerialEffectState {
 }
 
 func makeSerialEffectReducer<Value, Action: Equatable, Environment>(
-    _ reducer: @escaping Reducer<Value, Action, Environment>
+    _ reducer: @escaping Reducer<Value, Action, Environment>,
+    feedbackLogger: FeedbackLogger
 ) -> Reducer<SerialEffectState<Value, Action>, SerialEffectAction<Action>, Environment> {
     return { serialEffectState, serialEffectAction, environment in
 
@@ -53,7 +54,7 @@ func makeSerialEffectReducer<Value, Action: Equatable, Environment>(
         switch serialEffectAction {
         case ._effectCompleted:
             guard serialEffectState.pendingEffectCompletion else {
-                fatalErrorFeedbackLog("Expected 'pendingEffectCompletion' to be true")
+                feedbackLogger.fatalError("Expected 'pendingEffectCompletion' to be true")
             }
             
             // Actions from pendingEffectActionQueue are prioritized over pendingEffectActionQueue.
@@ -102,7 +103,7 @@ func makeSerialEffectReducer<Value, Action: Equatable, Environment>(
                 case .completed:
                     return ._effectCompleted
                 case .interrupted:
-                    fatalErrorFeedbackLog("Signal interrupted unexpectedly")
+                    feedbackLogger.fatalError("Signal interrupted unexpectedly")
                 }
             }
         ]

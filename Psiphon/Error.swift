@@ -60,7 +60,7 @@ extension ErrorEventDescription where E: SystemError {
 
 }
 
-struct ErrorEvent<E: HashableError>: HashableError {
+struct ErrorEvent<E: HashableError>: HashableError, FeedbackDescription {
     let error: E
     let date: Date
 
@@ -98,7 +98,7 @@ extension Either: Error where A: Error, B: Error {
     }
 }
 
-extension Array: Error where Element: Error {}
+//extension Array: Error where Element: Error {}
 
 protocol ErrorUserDescription where Self: Error {
     

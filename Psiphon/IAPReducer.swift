@@ -46,6 +46,7 @@ struct IAPReducerState<T: TunnelProviderManager> {
 }
 
 typealias IAPEnvironment = (
+    feedbackLogger: FeedbackLogger,
     tunnelStatusWithIntentSignal: SignalProducer<VPNStatusWithIntent, Never>,
     tunnelManagerRefSignal: SignalProducer<WeakRef<PsiphonTPM>?, Never>,
     psiCashEffects: PsiCashEffect,
@@ -126,7 +127,7 @@ func iapReducer<T: TunnelProviderManager>(
                 )
             )
             return [
-                feedbackLog(.error, """
+                environment.feedbackLogger.log(.error, """
                     nil receipt data: \
                     failed to send verification request for transaction: \
                     '\(unverifiedPsiCashTx)'
@@ -143,7 +144,7 @@ func iapReducer<T: TunnelProviderManager>(
                 )
             )
             return [
-                feedbackLog(.error, """
+                environment.feedbackLogger.log(.error, """
                     nil customData: \
                     failed to send verification request for transaction: \
                     '\(unverifiedPsiCashTx)'
@@ -180,11 +181,11 @@ func iapReducer<T: TunnelProviderManager>(
                 )
             },
             
-            feedbackLog(.info, """
+            environment.feedbackLogger.log(.info, """
                 Consumables in app receipt '\(receiptData.consumableInAppPurchases)'
                 """).mapNever(),
             
-            feedbackLog(.info, """
+            environment.feedbackLogger.log(.info, """
                 verifying PsiCash consumable IAP with transaction ID: \
                 '\(unverifiedPsiCashTx.transaction)'
                 """).mapNever()
@@ -192,18 +193,18 @@ func iapReducer<T: TunnelProviderManager>(
         
     case let ._psiCashConsumableAuthorizationRequestResult(requestResult, requestTransaction):
         guard let unverifiedPsiCashTx = state.iap.unverifiedPsiCashTx else {
-            fatalErrorFeedbackLog("expected non-nil 'unverifiedPsiCashTx'")
+            environment.feedbackLogger.fatalError("expected non-nil 'unverifiedPsiCashTx'")
         }
         
         guard case .pendingVerificationResult = unverifiedPsiCashTx.verificationState else {
-            fatalErrorFeedbackLog("""
+            environment.feedbackLogger.fatalError("""
                 unexpected state for unverified PsiCash IAP transaction \
                 '\(String(describing: state.iap.unverifiedPsiCashTx))'
                 """)
         }
         
         guard unverifiedPsiCashTx.transaction == requestTransaction else {
-            fatalErrorFeedbackLog("""
+            environment.feedbackLogger.fatalError("""
                 expected transactions to be equal: \
                 '\(String(describing: requestTransaction.transactionID()))' != \
                 '\(String(describing: unverifiedPsiCashTx.transaction.transactionID()))'
@@ -216,14 +217,14 @@ func iapReducer<T: TunnelProviderManager>(
             // Authorization request will be retried whenever retryCondition becomes true.
             switch retryCondition {
             case .whenResolved(tunnelError: .nilTunnelProviderManager):
-                return [ feedbackLog(.error, retryCondition).mapNever() ]
+                return [ environment.feedbackLogger.log(.error, retryCondition).mapNever() ]
                 
             case .whenResolved(tunnelError: .tunnelNotConnected):
                 // This event is too frequent to log.
                 return []
 
             case .afterTimeInterval:
-                return [ feedbackLog(.error, retryCondition).mapNever() ]
+                return [ environment.feedbackLogger.log(.error, retryCondition).mapNever() ]
             }
         
         case .failed(let errorEvent):
@@ -235,7 +236,7 @@ func iapReducer<T: TunnelProviderManager>(
             )
             
             return [
-                feedbackLog(.error, """
+                environment.feedbackLogger.log(.error, """
                     verification request failed: '\(errorEvent)'\
                     transaction: '\(requestTransaction)'
                     """).mapNever()
@@ -251,7 +252,7 @@ func iapReducer<T: TunnelProviderManager>(
                 return [
                     environment.paymentQueue.finishTransaction(requestTransaction).mapNever(),
                     environment.psiCashStore(.refreshPsiCashState).mapNever(),
-                    feedbackLog(.info, "verified consumable transaction: '\(requestTransaction)'")
+                    environment.feedbackLogger.log(.info, "verified consumable transaction: '\(requestTransaction)'")
                         .mapNever()
                 ]
             
@@ -265,7 +266,7 @@ func iapReducer<T: TunnelProviderManager>(
                 )
                 
                 return [
-                    feedbackLog(.error, """
+                    environment.feedbackLogger.log(.error, """
                         verification failed: '\(errorEvent)'\
                         transaction: '\(requestTransaction)'
                         """).mapNever()
@@ -303,7 +304,7 @@ func iapReducer<T: TunnelProviderManager>(
                         case .purchased:
                             switch try? AppStoreProductType.from(transaction: transaction) {
                             case .none:
-                                fatalErrorFeedbackLog(
+                                environment.feedbackLogger.fatalError(
                                     "unknown product \(String(describing: transaction))"
                                 )
                                 
@@ -323,7 +324,7 @@ func iapReducer<T: TunnelProviderManager>(
                                         )
                                     
                                     effects.append(
-                                        feedbackLog(.info, """
+                                        environment.feedbackLogger.log(.info, """
                                             New PsiCash consumable transaction '\(transaction)'
                                             """).mapNever()
                                     )
@@ -342,7 +343,7 @@ func iapReducer<T: TunnelProviderManager>(
                                 case .some(false):
                                     // Unexpected presence of two consumable transactions
                                     // with different transaction ids.
-                                    fatalErrorFeedbackLog("""
+                                    environment.feedbackLogger.fatalError("""
                                         found two completed but unverified consumable purchases: \
                                         unverified transaction: \
                                         '\(String(describing:

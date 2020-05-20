@@ -46,10 +46,10 @@ import UIKit
         balance = UILabel.make(fontSize: fontSize, typeface: typeface)
 
         guard let coinImage = UIImage(named: "PsiCashCoin") else {
-            fatalErrorFeedbackLog("Could not find 'PsiCashCoin' image")
+            fatalError("Could not find 'PsiCashCoin' image")
         }
         guard let waitingForExpectedIncreaseImage = UIImage(named: "PsiCash_Alert") else {
-            fatalErrorFeedbackLog("Could not find 'PsiCash_Alert' image")
+            fatalError("Could not find 'PsiCash_Alert' image")
         }
 
         icon = .init(ImageViewBuilder(image: coinImage),
@@ -104,7 +104,7 @@ import UIKit
     }
 
     required init?(coder: NSCoder) {
-        fatalErrorFeedbackLog("init(coder:) has not been implemented")
+        fatalError("init(coder:) has not been implemented")
     }
 
     private func setAmount(_ amount: PsiCashAmount?) {

@@ -66,18 +66,6 @@ extension TunnelProviderSyncReason: CustomStringFeedbackDescription {
     
 }
 
-extension SignedAuthorization: CustomFieldFeedbackDescription {
-    
-    var feedbackFields: [String : CustomStringConvertible] {
-        ["ID": authorization.id,
-         "Expires": authorization.expires,
-         "AccessType": authorization.accessType.rawValue]
-    }
-    
-}
-
-extension ErrorEvent: FeedbackDescription {}
-
 extension PsiCashAmount: CustomStringFeedbackDescription {
     
     public var description: String {
@@ -199,8 +187,3 @@ extension PaymentTransaction: CustomFieldFeedbackDescription {
 }
 
 extension ReceiptData: FeedbackDescription {}
-
-extension Optional: FeedbackDescription {}
-
-extension TunnelStartStopIntent: FeedbackDescription {}
-extension TunnelStartStopIntentReason: FeedbackDescription {}

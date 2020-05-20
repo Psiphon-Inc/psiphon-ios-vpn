@@ -65,6 +65,16 @@ extension SignedAuthorization {
     
 }
 
+extension SignedAuthorization: CustomFieldFeedbackDescription {
+    
+    var feedbackFields: [String : CustomStringConvertible] {
+        ["ID": authorization.id,
+         "Expires": authorization.expires,
+         "AccessType": authorization.accessType.rawValue]
+    }
+    
+}
+
 struct Authorization: Hashable, Codable {
     let id: AuthorizationID
     let accessType: AccessType

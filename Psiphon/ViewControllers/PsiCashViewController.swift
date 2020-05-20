@@ -128,7 +128,9 @@ final class PsiCashViewController: UIViewController {
          store: Store<PsiCashViewControllerState, PsiCashAction>,
          iapStore: Store<Unit, IAPAction>,
          productRequestStore: Store<Unit, ProductRequestAction>,
-         tunnelConnectedSignal: SignalProducer<TunnelConnectedStatus, Never>) {
+         tunnelConnectedSignal: SignalProducer<TunnelConnectedStatus, Never>,
+         feedbackLogger: FeedbackLogger
+    ) {
 
         self.activeTab = initialTab
         self.store = store
@@ -184,7 +186,7 @@ final class PsiCashViewController: UIViewController {
                         break
                         
                     case .customDataNotPresent:
-                        fatalErrorFeedbackLog("Custom data not present")
+                        feedbackLogger.fatalError("Custom data not present")
                     }
                 }
                 
@@ -250,7 +252,7 @@ final class PsiCashViewController: UIViewController {
                     }
                     
                 default:
-                    fatalErrorFeedbackLog("""
+                    feedbackLogger.fatalError("""
                         Invalid purchase navigation state combination: \
                         '\(String(describing: purchasingNavState))',
                         """)
@@ -336,7 +338,7 @@ final class PsiCashViewController: UIViewController {
                                     .left(.right(.right(.left(.pendingPsiCashPurchase))))
                                 )
                             case .connecting, .disconnecting:
-                                fatalErrorFeedbackLog("tunnelState at this point should not be 'connecting'")
+                                feedbackLogger.fatalError("tunnelState at this point should not be 'connecting'")
                             }
 
                         } else {
@@ -354,7 +356,7 @@ final class PsiCashViewController: UIViewController {
                                 rewardedVideoClearedForSale = true
                                 rewardedVideoSubtitle = UserStrings.Watch_rewarded_video_and_earn()
                             case .connecting, .disconnecting:
-                                fatalErrorFeedbackLog("Unexpected state")
+                                feedbackLogger.fatalError("Unexpected state")
                             }
                             
                             let allProducts = observed.state.allProducts(
@@ -452,7 +454,7 @@ final class PsiCashViewController: UIViewController {
     }
 
     required init?(coder: NSCoder) {
-        fatalErrorFeedbackLog("init(coder:) has not been implemented")
+        fatalError("init(coder:) has not been implemented")
     }
 
     override var preferredStatusBarStyle: UIStatusBarStyle {

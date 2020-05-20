@@ -72,6 +72,7 @@ func appDelegateReducer(
     static let instance = SwiftDelegate()
     
     private let sharedDB = PsiphonDataSharedDB(forAppGroupIdentifier: APP_GROUP_IDENTIFIER)
+    private let feedbackLogger = FeedbackLogger(PsiphonRotatingFileFeedbackLogHandler())
     
     private var (lifetime, token) = Lifetime.make()
     private var store: Store<AppState, AppAction>!
@@ -119,10 +120,12 @@ extension SwiftDelegate: SwiftBridgeDelegate {
         
         self.store = Store(
             initialValue: AppState(),
-            reducer: makeAppReducer(),
+            reducer: makeAppReducer(feedbackLogger: self.feedbackLogger),
+            feedbackLogger: self.feedbackLogger,
             environment: { [unowned self] store in
                 let (environment, cleanup) = makeEnvironment(
                     store: store,
+                    feedbackLogger: self.feedbackLogger,
                     sharedDB: self.sharedDB,
                     psiCashLib: self.psiCashLib,
                     objcBridgeDelegate: objcBridge,
@@ -233,13 +236,13 @@ extension SwiftDelegate: SwiftBridgeDelegate {
                 }
             }
             .skipRepeats()
-            .startWithValues { (result: Result<Unit, ErrorEvent<ErrorRepr>>) in
+            .startWithValues { [unowned self] (result: Result<Unit, ErrorEvent<ErrorRepr>>) in
                 switch result {
                 case .success(.unit):
                     break
                     
                 case .failure(let errorEvent):
-                    immediateFeedbackLog(.error, errorEvent)
+                    self.feedbackLogger.immediate(.error, "\(errorEvent)")
                     
                     objcBridge.onVPNStateSyncError(
                         UserStrings.Tunnel_provider_sync_failed_reinstall_config()
@@ -352,7 +355,8 @@ extension SwiftDelegate: SwiftBridgeDelegate {
                 value: erase,
                 action: { .productRequest($0) } ),
             tunnelConnectedSignal: self.store.$value.signalProducer
-                .map(\.vpnState.value.providerVPNStatus.tunneled)
+                .map(\.vpnState.value.providerVPNStatus.tunneled),
+            feedbackLogger: self.feedbackLogger
         )
     }
     
@@ -384,7 +388,8 @@ extension SwiftDelegate: SwiftBridgeDelegate {
                 )))
             
         } catch {
-            fatalErrorFeedbackLog("Unknown subscription product identifier '\(product.productIdentifier)'")
+            self.feedbackLogger.fatalError(
+                "Unknown subscription product identifier '\(product.productIdentifier)'")
         }
         
         return objcPromise.asObjCPromise()
@@ -459,7 +464,7 @@ extension SwiftDelegate: SwiftBridgeDelegate {
                 intent: .stop, reason: .userInitiated
             ))
         default:
-            fatalErrorFeedbackLog("Unexpected state '\(value.switchedIntent)'")
+            self.feedbackLogger.fatalError("Unexpected state '\(value.switchedIntent)'")
         }
     }
     
@@ -491,14 +496,15 @@ extension SwiftDelegate: SwiftBridgeDelegate {
             { (previous, tpmLoadState) -> IndexedPsiphonTPMLoadState in
                 // Indexes `tpmLoadState` emitted items, starting from 0.
                 return IndexedPsiphonTPMLoadState(index: previous.index + 1, value: tpmLoadState)
-        }.flatMap(.latest) { indexed -> SignalProducer<IndexedPsiphonTPMLoadState, Never> in
+        }.flatMap(.latest) { [unowned self] indexed
+            -> SignalProducer<IndexedPsiphonTPMLoadState, Never> in
             
             // Index 1 represents the value of ProviderManagerLoadState before
             // `.reinstallVPNConfig` action is sent.
             
             switch indexed.index {
             case 0:
-                fatalErrorFeedbackLog("Unexpected index 0")
+                self.feedbackLogger.fatalError("Unexpected index 0")
             case 1:
                 switch indexed.value {
                 case .nonLoaded:
@@ -516,16 +522,16 @@ extension SwiftDelegate: SwiftBridgeDelegate {
             }
         }
         .take(first: 2)
-        .startWithValues { [promise, unowned store] indexed in
+        .startWithValues { [promise, unowned self] indexed in
             switch indexed.index {
             case 0:
-                fatalErrorFeedbackLog("Unexpected index 0")
+                self.feedbackLogger.fatalError("Unexpected index 0")
             case 1:
-                store!.send(vpnAction: .reinstallVPNConfig)
+                self.store.send(vpnAction: .reinstallVPNConfig)
             default:
                 switch indexed.value {
                 case .nonLoaded, .noneStored:
-                    fatalErrorFeedbackLog("Unexpected value '\(indexed.value)'")
+                    self.feedbackLogger.fatalError("Unexpected value '\(indexed.value)'")
                 case .loaded(_):
                     promise.fulfill(.init(.installedSuccessfully))
                 case .error(let errorEvent):

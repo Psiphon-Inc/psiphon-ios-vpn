@@ -36,6 +36,7 @@ enum SubscriptionAction {
 }
 
 typealias SubscriptionReducerEnvironment = (
+    feedbackLogger: FeedbackLogger,
     appReceiptStore: (ReceiptStateAction) -> Effect<Never>,
     getCurrentTime: () -> Date,
     compareDates: (Date, Date, Calendar.Component) -> ComparisonResult
@@ -77,7 +78,7 @@ func subscriptionReducer(
         return [
             singleFireTimer(interval: timeLeft, leeway: SubscriptionHardCodedValues.leeway)
                 .map(value: ._timerFinished(withExpiry: purchaseWithLatestExpiry.expires)),
-            feedbackLog(.info,
+            environment.feedbackLogger.log(.info,
                 "subscribed: timer expiring on: '\(purchaseWithLatestExpiry.expires)'"
             ).mapNever()
         ]
@@ -104,7 +105,7 @@ func subscriptionReducer(
         
         return [
             environment.appReceiptStore(.remoteReceiptRefresh(optionalPromise: nil)).mapNever(),
-            feedbackLog(.info, "subscription expired").mapNever()
+            environment.feedbackLogger.log(.info, "subscription expired").mapNever()
         ]
     }
 }

@@ -112,7 +112,7 @@ UITableViewDelegate {
             }
 
             guard let content = cell.contentView.subviews[maybe: 0] as? PurchaseCellContent else {
-                fatalErrorFeedbackLog("Expected cell to have subview of type 'PurchaseCellContent'")
+                fatalError("Expected cell to have subview of type 'PurchaseCellContent'")
             }
 
             content.bind(cellData)
@@ -126,7 +126,7 @@ UITableViewDelegate {
             return cell
 
         default:
-            fatalErrorFeedbackLog("Unexpected IndexPath '\(indexPath)'")
+            fatalError("Unexpected IndexPath '\(indexPath)'")
         }
     }
 }
@@ -223,7 +223,7 @@ fileprivate final class PurchaseCellContent: UIView, Bindable {
     }
 
     required init?(coder: NSCoder) {
-        fatalErrorFeedbackLog("init(coder:) has not been implemented")
+        fatalError("init(coder:) has not been implemented")
     }
 
     func bind(_ newValue: PsiCashPurchasableViewModel) {

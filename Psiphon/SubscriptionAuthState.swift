@@ -89,6 +89,7 @@ enum SubscriptionAuthStateAction {
 }
 
 typealias SubscriptionAuthStateReducerEnvironment = (
+    feedbackLogger: FeedbackLogger,
     notifier: Notifier,
     sharedDB: PsiphonDataSharedDB,
     tunnelStatusWithIntentSignal: SignalProducer<VPNStatusWithIntent, Never>,
@@ -219,7 +220,7 @@ func subscriptionAuthStateReducer<T: TunnelProviderManager>(
                     Effect(value: .localDataUpdate(type: .didRefreshReceiptData(.localRefresh)))
                 ),
                 
-                feedbackLog(.error, "failed reading stored subscription auth state '\(errorEvent)'")
+                environment.feedbackLogger.log(.error, "failed reading stored subscription auth state '\(errorEvent)'")
                     .mapNever()
             ]
         }
@@ -311,7 +312,7 @@ func subscriptionAuthStateReducer<T: TunnelProviderManager>(
                     forPurchase: purchaseWithLatestExpiry.purchase
                 )
             },
-            feedbackLog(.info, """
+            environment.feedbackLogger.log(.info, """
                 initiated auth request for original transaction ID \
                 \(purchaseWithLatestExpiry.purchase.originalTransactionID)
                 """).mapNever()
@@ -342,14 +343,14 @@ func subscriptionAuthStateReducer<T: TunnelProviderManager>(
         case .willRetry(when: let retryCondition):
             switch retryCondition {
             case .whenResolved(tunnelError: .nilTunnelProviderManager):
-                return [ feedbackLog(.error, retryCondition).mapNever() ]
+                return [ environment.feedbackLogger.log(.error, retryCondition).mapNever() ]
                 
             case .whenResolved(tunnelError: .tunnelNotConnected):
                 // This event is too frequent to log.
                 return []
                 
             case .afterTimeInterval:
-                return [ feedbackLog(.error, retryCondition).mapNever() ]
+                return [ environment.feedbackLogger.log(.error, retryCondition).mapNever() ]
             }
             
         case .failed(let errorEvent):
@@ -357,7 +358,7 @@ func subscriptionAuthStateReducer<T: TunnelProviderManager>(
             
             var effects = [Effect<SubscriptionAuthStateAction>]()
             effects.append(
-                feedbackLog(.error, "authorization request failed '\(errorEvent)'").mapNever()
+                environment.feedbackLogger.log(.error, "authorization request failed '\(errorEvent)'").mapNever()
             )
             
             // Authorization request for this purchase is no longer pending.
@@ -406,7 +407,7 @@ func subscriptionAuthStateReducer<T: TunnelProviderManager>(
                     
                     return [
                         stateUpdateEffect.mapNever(),
-                        feedbackLog(.info, """
+                        environment.feedbackLogger.log(.info, """
                             authorization request completed with auth id \
                             '\(signedAuthorization.decoded.authorization.id)' expiring on \
                             '\(signedAuthorization.decoded.authorization.expires)'
@@ -423,7 +424,7 @@ func subscriptionAuthStateReducer<T: TunnelProviderManager>(
                     
                     return [
                         stateUpdateEffect.mapNever(),
-                        feedbackLog(.error, """
+                        environment.feedbackLogger.log(.error, """
                             authorization request completed with error \
                             '\(okResponse.errorDescription)'
                             """).mapNever()
@@ -438,7 +439,7 @@ func subscriptionAuthStateReducer<T: TunnelProviderManager>(
                     
                     return [
                         stateUpdateEffect.mapNever(),
-                        feedbackLog(.error, """
+                        environment.feedbackLogger.log(.error, """
                             authorization request completed with error \
                             '\(okResponse.errorDescription)'
                             """).mapNever()
@@ -450,7 +451,7 @@ func subscriptionAuthStateReducer<T: TunnelProviderManager>(
                 var effects = [Effect<SubscriptionAuthStateAction>]()
                 
                 effects.append(
-                    feedbackLog(.error, "authorization request failed '\(failureEvent)'").mapNever()
+                    environment.feedbackLogger.log(.error, "authorization request failed '\(failureEvent)'").mapNever()
                 )
                 
                 if case .badRequest = failureEvent.error {
