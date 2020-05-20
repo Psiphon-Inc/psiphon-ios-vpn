@@ -127,6 +127,7 @@ enum ProductRequestAction {
 }
 
 typealias ProductRequestEnvironment = (
+    feedbackLogger: FeedbackLogger,
     productRequestDelegate: ProductRequestDelegate,
     supportedPsiCashIAPProductIDs: SupportedAppStoreProductIDs
 )
@@ -152,13 +153,13 @@ func productRequestReducer(
                 request.delegate = environment.productRequestDelegate
                 request.start()
             },
-            feedbackLog(.info, tag: "PsiCashProductRequest",
+            environment.feedbackLogger.log(.info, tag: "PsiCashProductRequest",
                         "Requesting product IDs: '\(requestingProductIDs)'").mapNever()
         ]
         
     case let .productRequestResult(request, result):
         guard request == state.psiCashRequest else {
-            fatalErrorFeedbackLog("""
+            environment.feedbackLogger.fatalError("""
                 Expected SKProductRequest object '\(request)' to match
                 state reference '\(String(describing: state.psiCashRequest))'.
                 """)
@@ -171,13 +172,13 @@ func productRequestReducer(
         switch result {
         case let .success(skProductsResponse):
             effects += skProductsResponse.invalidProductIdentifiers.map { invalidProductID in
-                feedbackLog(.warn, tag: "PsiCashProductRequest",
+                environment.feedbackLogger.log(.warn, tag: "PsiCashProductRequest",
                             "Invalid App Store IAP Product ID: '\(invalidProductID)'"
                 ).mapNever()
             }
         case let .failure(errorEvent):
             effects.append(
-                feedbackLog(.error, errorEvent).mapNever()
+                environment.feedbackLogger.log(.error, errorEvent).mapNever()
             )
         }
         

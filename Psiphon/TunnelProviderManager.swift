@@ -44,7 +44,7 @@ extension TunnelProviderVPNStatus {
         case .connecting, .connected, .reasserting:
             return true
         @unknown default:
-            fatalErrorFeedbackLog("unknown NEVPNStatus value '\(self.rawValue)'")
+            fatalError("unknown NEVPNStatus value '\(self.rawValue)'")
         }
     }
     
@@ -62,7 +62,7 @@ extension TunnelProviderVPNStatus {
         case .disconnecting:
             return .disconnecting
         @unknown default:
-            fatalErrorFeedbackLog("Unknown NEVPNStatus '\(self.rawValue)'")
+            fatalError("Unknown NEVPNStatus '\(self.rawValue)'")
         }
     }
     
@@ -89,9 +89,7 @@ enum ProviderMessageSendError: HashableError {
     case parseError(String)
 }
 
-class VPNConnectionObserver<T: TunnelProviderManager>:
-StoreDelegate<VPNProviderManagerStateAction<T>>
-{
+class VPNConnectionObserver<T: TunnelProviderManager>: StoreDelegate<TunnelProviderVPNStatus> {
     func setTunnelProviderManager(_ manager: T) {}
 }
 
@@ -439,10 +437,10 @@ final class PsiphonTPMConnectionObserver: VPNConnectionObserver<PsiphonTPM> {
         // has been deallocated.
         // It is valid in this case to send store with `NEVPNStatusInvalid`.
         guard let manager = self.tunnelProviderManager else {
-            storeSend(._vpnStatusDidChange(.invalid))
+            storeSend(.invalid)
             return
         }
-        storeSend(._vpnStatusDidChange(manager.connectionStatus))
+        storeSend(manager.connectionStatus as TunnelProviderVPNStatus)
     }
     
 }

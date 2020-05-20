@@ -188,7 +188,7 @@ func addShadow(toLayer layer: CALayer?) {
     }
 
     guard !(layer is CATransformLayer) else {
-        fatalErrorFeedbackLog("Cannot add shadow to CATransformLayer")
+        fatalError("Cannot add shadow to CATransformLayer")
     }
 
     layer.shadowColor = UIColor.black.cgColor
@@ -217,7 +217,7 @@ func makeGradientBorderLayer(colors: [CGColor], width: CGFloat = 2.0)
 
 func setBackgroundGradient(for view: UIView) {
     guard view.bounds.size != CGSize.zero else {
-        preconditionFailureFeedbackLog("view bounds not set")
+        fatalError("view bounds not set")
     }
 
     let backgroundGradient = CAGradientLayer()
@@ -339,7 +339,7 @@ extension UIView {
 
     func constraintToParent(_ anchors: Anchor...) -> [NSLayoutConstraint] {
         guard let parent = self.superview else {
-            fatalErrorFeedbackLog("'constraintToParent' requires the view to have a parent view")
+            fatalError("'constraintToParent' requires the view to have a parent view")
         }
         return constraint(to: parent, anchors)
     }
@@ -391,7 +391,7 @@ extension NSLayoutConstraint {
 
     func priority(higherThan constraint: NSLayoutConstraint) -> NSLayoutConstraint {
         guard constraint.priority < UILayoutPriority.required else {
-            fatalErrorFeedbackLog("Priority cannot be higher than 'required'")
+            fatalError("Priority cannot be higher than 'required'")
         }
         self.priority = constraint.priority + 1
         return self
@@ -399,7 +399,7 @@ extension NSLayoutConstraint {
 
     func priority(lowerThan constraint: NSLayoutConstraint) -> NSLayoutConstraint {
         guard constraint.priority.rawValue > 0 else {
-            fatalErrorFeedbackLog("Priority cannot be lower than 0")
+            fatalError("Priority cannot be lower than 0")
         }
         self.priority = constraint.priority - 1
         return self
@@ -445,7 +445,7 @@ final class CurrencyFormatter: WrappedNumberFormatter {
     }
 
     required init?(coder: NSCoder) {
-        fatalErrorFeedbackLog("init(coder:) has not been implemented")
+        fatalError("init(coder:) has not been implemented")
     }
 
 }
@@ -460,7 +460,7 @@ final class PsiCashAmountFormatter: WrappedNumberFormatter {
     }
 
     required init?(coder: NSCoder) {
-        fatalErrorFeedbackLog("init(coder:) has not been implemented")
+        fatalError("init(coder:) has not been implemented")
     }
 
 }

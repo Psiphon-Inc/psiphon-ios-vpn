@@ -62,6 +62,7 @@ enum ReceiptStateAction {
 }
 
 typealias ReceiptReducerEnvironment = (
+    feedbackLogger: FeedbackLogger,
     appBundle: PsiphonBundle,
     iapStore: (IAPAction) -> Effect<Never>,
     subscriptionStore: (SubscriptionAction) -> Effect<Never>,
@@ -136,7 +137,8 @@ extension ReceiptData {
                 consumableProductIDs: environment.consumableProductsIDs,
                 subscriptionProductIDs: environment.subscriptionProductIDs,
                 getCurrentTime: environment.getCurrentTime,
-                compareDates: environment.compareDates
+                compareDates: environment.compareDates,
+                feedbackLogger: environment.feedbackLogger
             )
         }
     }
@@ -152,7 +154,7 @@ fileprivate func notifyRefreshedReceiptEffects<NeverAction>(
             .localDataUpdate(type: .didRefreshReceiptData(reason))
         ).mapNever(),
         environment.iapStore(.receiptUpdated(receiptData)).mapNever(),
-        feedbackLog(
+        environment.feedbackLogger.log(
             .info, LogMessage(stringLiteral: makeFeedbackEntry(receiptData))
         ).mapNever()
     ]

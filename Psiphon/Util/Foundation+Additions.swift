@@ -434,7 +434,7 @@ extension DispatchTimeInterval {
         case .never:
             result = nil
         @unknown default:
-            fatalErrorFeedbackLog("Unknown value '\(String(describing: self))'")
+            fatalError("Unknown value '\(String(describing: self))'")
         }
 
         return result
@@ -446,120 +446,12 @@ extension DispatchTimeInterval {
 func plistReader<DecodeType: Decodable>(key: String, toType: DecodeType.Type) throws -> DecodeType {
     // TODO: Add bundle dependency as an argument.
     guard let url = Bundle.main.url(forResource: key, withExtension: "plist") else {
-        fatalErrorFeedbackLog("'\(key).plist' is not valid")
+        fatalError("'\(key).plist' is not valid")
     }
 
     let data = try Data(contentsOf: url)
     let decoder = PropertyListDecoder()
     return try decoder.decode(toType, from: data)
-}
-
-// MARK: Coding
-
-extension JSONDecoder {
-    
-    static func makeRfc3339Decoder() -> JSONDecoder {
-        let decoder = JSONDecoder()
-        decoder.dateDecodingStrategy = .custom{
-            let container = try $0.singleValueContainer()
-            let dateString = try container.decode(String.self)
-            
-            guard let date = Date.parse(rfc3339Date: dateString) else {
-                throw DecodingError.dataCorrupted(
-                    DecodingError.Context(
-                        codingPath: $0.codingPath,
-                        debugDescription: "Failed to parse RFC3339 string '\(dateString)'"
-                    )
-                )
-            }
-            return date
-        }
-        return decoder
-    }
-    
-}
-
-extension JSONEncoder {
-    
-    static let SECOND_PRECISION = Int32(0)
-    static let MILLISECOND_PRECISION = Int32(3)
-    
-    static let TIME_ZONE_OFFSET_UTC_MINUTES = Int16(0)
-    
-    static func makeRfc3339Encoder() -> JSONEncoder {
-        let encoder = JSONEncoder()
-        encoder.dateEncodingStrategy = .custom { date, dateEncoder in
-            
-            guard let formattedDate = date.formatRFC3339() else {
-                throw EncodingError.invalidValue(
-                    date,
-                    EncodingError.Context(
-                        codingPath: dateEncoder.codingPath,
-                        debugDescription: "Failed to format date '\(date)' to RFC3339 string"
-                    )
-                )
-            }
-            
-            var container = dateEncoder.singleValueContainer()
-            try container.encode(formattedDate)
-        }
-        return encoder
-    }
-    
-}
-
-// MARK: Date and time
-
-extension Date {
-    
-    enum MilliSecondPrecision: Int32 {
-        case zero = 0
-        case three = 3
-        case six = 6
-        case nine = 9
-    }
-    
-    static func parse(rfc3339Date: String) -> Date? {
-        var ts = timestamp_t()
-        let result = timestamp_parse(rfc3339Date,
-                                     rfc3339Date.lengthOfBytes(using: .utf8),
-                                     &ts)
-        
-        // 0 success case
-        guard result == 0 else {
-            return nil
-        }
-        
-        let secondFraction: Double = Double(ts.nsec) / pow(10, 9)
-        let timeIntervalSince1970: TimeInterval = Double(ts.sec) + secondFraction
-        return Date(timeIntervalSince1970: timeIntervalSince1970)
-    }
-    
-    func formatRFC3339(
-        milliSecondPrecision: MilliSecondPrecision = .three,
-        timezoneOffsetUTCMinutes: Int16 = Int16(0)
-    ) -> String? {
-        let timeInterval = self.timeIntervalSince1970
-        
-        var sec_integral = Double()
-        let sec_fraction = modf(timeInterval, &sec_integral)
-        
-        let nsec = sec_fraction * pow(10, 9)
-        
-        var ts = timestamp_t(sec: Int64(sec_integral),
-                             nsec: Int32(nsec),
-                             offset: timezoneOffsetUTCMinutes)
-        
-        var buf = Array<Int8>(repeating: 0, count: 40)
-        let length = timestamp_format_precision(&buf, buf.count, &ts, milliSecondPrecision.rawValue)
-        
-        guard length > 0 else {
-            return nil
-        }
-        
-        return String(cString: buf)
-    }
-    
 }
 
 // MARK: User Defaults

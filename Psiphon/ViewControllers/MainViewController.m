@@ -18,7 +18,6 @@
  */
 
 #import <Foundation/Foundation.h>
-#import <PsiphonTunnel/PsiphonTunnel.h>
 #import "MainViewController.h"
 #import "AdManager.h"
 #import "AppInfo.h"
@@ -316,8 +315,8 @@ NSTimeInterval const MaxAdLoadingTime = 10.f;
          [AppObservables.shared.reachabilityStatus subscribeNext:^(NSNumber * _Nullable statusObj) {
             MainViewController *__strong strongSelf = weakSelf;
             if (strongSelf) {
-                NetworkStatus networkStatus = (NetworkStatus)[statusObj integerValue];
-                if (networkStatus == NotReachable) {
+                ReachabilityStatus networkStatus = (ReachabilityStatus)[statusObj integerValue];
+                if (networkStatus == ReachabilityStatusNotReachable) {
                     [strongSelf->noConnectionBannerView setHidden: FALSE];
                 } else {
                     [strongSelf->noConnectionBannerView setHidden: TRUE];

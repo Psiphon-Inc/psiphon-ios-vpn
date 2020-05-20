@@ -135,7 +135,7 @@ fileprivate func makeHTTPRequest<Response>(
 ) -> URLSessionTask {
     
     guard requestData.urlRequest.url?.isSchemeHttp ?? false else {
-        fatalErrorFeedbackLog(
+        fatalError(
             "Expected HTTP/HTTPS request '\(String(describing: requestData.urlRequest.url))'"
         )
     }
@@ -157,38 +157,6 @@ fileprivate func makeHTTPRequest<Response>(
     }
     session.resume()
     return session
-}
-
-struct ClientMetaData: Encodable {
-    let clientPlatform: String = AppInfo.clientPlatform()
-    let clientRegion: String = AppInfo.clientRegion() ?? ""
-    let clientVersion: String = AppInfo.appVersion() ?? ""
-    let propagationChannelID: String = AppInfo.propagationChannelId() ?? ""
-    let sponsorID: String = AppInfo.sponsorId() ?? ""
-    
-    
-    private enum CodingKeys: String, CodingKey {
-        case clientPlatform = "client_platform"
-        case clientRegion = "client_region"
-        case clientVersion = "client_version"
-        case propagationChannelID = "propagation_channel_id"
-        case sponsorID = "sponsor_id"
-    }
-    
-    var jsonString: String {
-        do {
-            let jsonData = try JSONEncoder().encode(ClientMetaData())
-            if let jsonString = String(data: jsonData, encoding: .utf8) {
-                return jsonString
-            }
-        } catch {
-            PsiFeedbackLogger.error(withType: "Requests",
-                                    message: "failed to serialize client metadata",
-                                    object: error)
-        }
-        return ""
-    }
-    
 }
 
 /// `httpRequest` makes an HTTP request and returns the result in the returned Effect.

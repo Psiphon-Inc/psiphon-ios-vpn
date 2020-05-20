@@ -31,7 +31,7 @@ extension LocalizedPrice {
     
     static func makeLocalizedPrice(skProduct: SKProduct) -> Self {
         guard skProduct.price.doubleValue > 0.0 else {
-            fatalErrorFeedbackLog("SKProduct cannot have value 0")
+            fatalError("SKProduct cannot have value 0")
         }
         return .localizedPrice(price: skProduct.price.doubleValue,
                                priceLocale: skProduct.priceLocale)
@@ -144,7 +144,7 @@ struct PaymentTransaction: Equatable {
         case let (.some(lobj), .some(robj)):
             return lobj.isEqual(robj)
         default:
-            fatalErrorFeedbackLog("""
+            fatalError("""
                 expected lhs and rhs to have same underlying type: \
                 lhs: '\(String(describing: lhs))' \
                 rhs: '\(String(describing: rhs))'
@@ -209,7 +209,7 @@ extension PaymentTransaction {
                         return .completed(.failure(.right(someError as SystemError)))
                     }
                 @unknown default:
-                    fatalErrorFeedbackLog("""
+                    fatalError("""
                         unknown transaction state \(skPaymentTransaction.transactionState)
                         """)
                 }

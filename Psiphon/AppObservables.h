@@ -53,7 +53,7 @@ NS_ASSUME_NONNULL_BEGIN
 // Wraps VPN start stop state status of type `VPNStartStopStatus`.
 @property (nonatomic, readonly) RACReplaySubject<NSNumber *> *vpnStartStopStatus;
 
-// reachabilityStatus subject forwards AppState `internetReachability` NetworkStatus values.
+// reachabilityStatus subject forwards AppState `internetReachability` ReachabilityStatus values.
 @property (nonatomic, readonly) RACReplaySubject<NSNumber *> *reachabilityStatus;
 
 + (AppObservables *)shared;

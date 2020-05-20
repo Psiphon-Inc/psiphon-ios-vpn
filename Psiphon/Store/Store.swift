@@ -73,6 +73,7 @@ public final class Store<Value: Equatable, Action> {
     private var reducer: StoreReducer!
     private var disposable: Disposable? = .none
     private var effectDisposables = CompositeDisposable()
+    private let feedbackLogger: FeedbackLogger
     
     /// Count of effects that have not completed.
     public private(set) var outstandingEffectCount = 0
@@ -80,10 +81,12 @@ public final class Store<Value: Equatable, Action> {
     public init<Environment>(
         initialValue: Value,
         reducer: @escaping Reducer<Value, Action, Environment>,
+        feedbackLogger: FeedbackLogger,
         environment makeEnvironment: (Store<Value, Action>) -> Environment
     ) {
         self.value = initialValue
         self.scheduler = .init()
+        self.feedbackLogger = feedbackLogger
         
         let environment = makeEnvironment(self)
         self.reducer = { value, action, _ in
@@ -91,10 +94,12 @@ public final class Store<Value: Equatable, Action> {
         }
     }
     
-    private init(scheduler: UIScheduler, initialValue: Value, reducer: @escaping StoreReducer) {
+    private init(scheduler: UIScheduler, feedbackLogger: FeedbackLogger,
+                 initialValue: Value, reducer: @escaping StoreReducer) {
         self.reducer = reducer
         self.value = initialValue
         self.scheduler = scheduler
+        self.feedbackLogger = feedbackLogger
     }
     
     deinit {
@@ -119,7 +124,8 @@ public final class Store<Value: Equatable, Action> {
                         },
                         receiveValues: { [unowned self] internalAction in
                             self.send(internalAction)
-                        }
+                        },
+                        feedbackLogger: self.feedbackLogger
                     )
                 
                 self.effectDisposables.add(disposable)
@@ -136,6 +142,7 @@ public final class Store<Value: Equatable, Action> {
         
         let localStore = Store<LocalValue, LocalAction>(
             scheduler: self.scheduler,
+            feedbackLogger: self.feedbackLogger,
             initialValue: toLocalValue(self.value),
             reducer: { localValue, localAction, _ in
                 // Local projection sends actions to the global MainStore.

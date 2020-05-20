@@ -94,7 +94,8 @@ struct ReceiptData: Equatable {
         consumableProductIDs: Set<ProductID>,
         subscriptionProductIDs: Set<ProductID>,
         getCurrentTime: () -> Date,
-        compareDates: (Date, Date, Calendar.Component) -> ComparisonResult
+        compareDates: (Date, Date, Calendar.Component) -> ComparisonResult,
+        feedbackLogger: FeedbackLogger
     ) -> ReceiptData? {
         // TODO: This function should return a result type and not log errors directly here.
         let receiptURL = appBundle.appStoreReceiptURL
@@ -106,17 +107,15 @@ struct ReceiptData: Equatable {
         do {
             try data = Data(contentsOf: receiptURL)
         } catch {
-            PsiFeedbackLogger.error(withType: "InAppPurchase",
-                                    message: "failed to read app receipt",
-                                    object: error)
+            feedbackLogger.immediate(
+                .error, "failed to read app receipt: '\(String(describing: error))'")
             return .none
         }
         
         let readDate = getCurrentTime()
         
         guard let parsedData = AppStoreParsedReceiptData.parseReceiptData(data) else {
-            PsiFeedbackLogger.error(withType: "InAppPurchase", message: "parse failed",
-                                    object: FatalError(message: "failed to parse app receipt"))
+            feedbackLogger.immediate(.error, "failed to parse app receipt")
             return .none
         }
         

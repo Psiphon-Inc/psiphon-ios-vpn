@@ -63,7 +63,7 @@ struct PsiCashEffect {
                 case (_, .some(let error)):
                     result = .failure(ErrorEvent(.error(error as SystemError)))
                 case (_, .none):
-                    preconditionFailureFeedbackLog("unknown PsiCash status '\(psiCashStatus)'")
+                    fatalError("unknown PsiCash status '\(psiCashStatus)'")
                 }
                 fulfilled(.completed(result))
             }

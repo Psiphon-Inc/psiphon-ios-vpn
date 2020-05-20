@@ -17,21 +17,23 @@
 *
 */
 
-import UIKit
+import Foundation
 
-@objc final class DuskButton: AnimatedUIButton {
+final class PsiphonRotatingFileFeedbackLogHandler: FeedbackLogHandler {
     
-    init() {
-        super.init(frame: .zero)
-        backgroundColor = UIColor.dusk()
-        layer.cornerRadius = Style.default.cornerRadius
-        clipsToBounds = true
-        contentMode = .center
-        addShadow(toLayer: layer)
+    func fatalError(type: String, message: String) {
+        PsiFeedbackLogger.fatalError(withType: type, message: message)
     }
-
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+    
+    func feedbackLog(level: LogLevel, type: String, message: String) {
+        switch level {
+        case .info:
+            PsiFeedbackLogger.info(withType: type, message: message)
+        case .warn:
+            PsiFeedbackLogger.warn(withType: type, message: message)
+        case .error:
+            PsiFeedbackLogger.error(withType: type, message: message)
+        }
     }
-
+    
 }

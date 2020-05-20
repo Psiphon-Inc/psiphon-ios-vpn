@@ -35,6 +35,7 @@ enum LandingPageAction {
 }
 
 typealias LandingPageEnvironment<T: TunnelProviderManager> = (
+    feedbackLogger: FeedbackLogger,
     sharedDB: PsiphonDataSharedDB,
     urlHandler: URLHandler<T>,
     psiCashEffects: PsiCashEffect,
@@ -49,17 +50,19 @@ func landingPageReducer<T: TunnelProviderManager>(
     case .tunnelConnectedAfterIntentSwitchedToStart:
         guard !state.pendingLandingPageOpening else {
             return [
-                feedbackLog(.info, tag: landingPageTag, "pending landing page opening").mapNever()
+                environment.feedbackLogger.log(
+                    .info, tag: landingPageTag, "pending landing page opening").mapNever()
             ]
         }
         guard let tpmWeakRef = state.tunnelProviderManager else {
-            fatalErrorFeedbackLog("expected a valid tunnel provider")
+            environment.feedbackLogger.fatalError("expected a valid tunnel provider")
         }
         
         guard let landingPages = NonEmpty(array: environment.sharedDB.getHomepages()) else {
             return [
                 Effect(value: ._urlOpened(success: false)),
-                feedbackLog(.warn, tag: landingPageTag, "no landing pages found").mapNever()
+                environment.feedbackLogger.log(
+                    .warn, tag: landingPageTag, "no landing pages found").mapNever()
             ]
         }
         

@@ -95,7 +95,7 @@ extension SubscriptionPurchaseAuthState.AuthorizationState: Codable {
             let base64Auth = try container.decode(String.self, forKey: .authorization)
             
             guard let base64Data = Data(base64Encoded: base64Auth) else {
-                fatalErrorFeedbackLog("Failed to base64 decode value '\(base64Auth)'")
+                throw ErrorRepr(repr: "Failed to base64 decode value '\(base64Auth)'")
             }
             let decoder = JSONDecoder.makeRfc3339Decoder()
             let decodedAuth = try decoder.decode(SignedAuthorization.self, from: base64Data)
@@ -105,7 +105,7 @@ extension SubscriptionPurchaseAuthState.AuthorizationState: Codable {
             } else if case .rejectedByPsiphon = state {
                 self = .rejectedByPsiphon(authValue)
             } else {
-                fatalErrorFeedbackLog("Unexpected 'state' value: '\(state.rawValue)'")
+                throw ErrorRepr(repr: "Unexpected 'state' value: '\(state.rawValue)'")
             }
         }
     }

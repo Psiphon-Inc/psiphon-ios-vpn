@@ -47,6 +47,7 @@ struct PsiCashReducerState<T: TunnelProviderManager>: Equatable {
 }
 
 typealias PsiCashEnvironment = (
+    feedbackLogger: FeedbackLogger,
     psiCashEffects: PsiCashEffect,
     sharedDB: PsiphonDataSharedDB,
     userConfigs: UserDefaultsConfig,
@@ -73,7 +74,8 @@ func psiCashReducer<T: TunnelProviderManager>(
             return []
         }
         guard let purchasable = purchasableType.speedBoost else {
-            fatalErrorFeedbackLog("Expected a PsiCashPurchasable in '\(purchasableType)'")
+            environment.feedbackLogger.fatalError(
+                "Expected a PsiCashPurchasable in '\(purchasableType)'")
         }
         state.psiCash.purchasing = .speedBoost(purchasable)
         return [
@@ -84,12 +86,12 @@ func psiCashReducer<T: TunnelProviderManager>(
         
     case .psiCashProductPurchaseResult(let purchaseResult):
         guard case .speedBoost(_) = state.psiCash.purchasing else {
-            fatalErrorFeedbackLog("""
+            environment.feedbackLogger.fatalError("""
                 Expected '.speedBoost' state:'\(String(describing: state.psiCash.purchasing))'
                 """)
         }
         guard purchaseResult.purchasable.speedBoost != nil else {
-            fatalErrorFeedbackLog("""
+            environment.feedbackLogger.fatalError("""
                 Expected '.speedBoost'; purchasable: '\(purchaseResult.purchasable)'
                 """)
         }
@@ -100,7 +102,7 @@ func psiCashReducer<T: TunnelProviderManager>(
         switch purchaseResult.result {
         case .success(let purchasedType):
             guard case .speedBoost(let purchasedProduct) = purchasedType else {
-                fatalErrorFeedbackLog("Expected '.speedBoost' purchased type")
+                environment.feedbackLogger.fatalError("Expected '.speedBoost' purchased type")
             }
             state.psiCash.purchasing = .none
             return [
@@ -117,7 +119,7 @@ func psiCashReducer<T: TunnelProviderManager>(
             
         case .failure(let errorEvent):
             state.psiCash.purchasing = .error(errorEvent)
-            return [ feedbackLog(.error, errorEvent).mapNever() ]
+            return [ environment.feedbackLogger.log(.error, errorEvent).mapNever() ]
         }
         
     case .refreshPsiCashState:

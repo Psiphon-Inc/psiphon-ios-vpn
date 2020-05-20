@@ -20,6 +20,12 @@
 import Foundation
 import ReactiveSwift
 
+@objc enum ReachabilityStatus: Int {
+    case notReachable
+    case viaWiFi
+    case viaWWAN
+}
+
 /// Represents reachability status flags coded into a string.
 struct ReachabilityCodedStatus: ExpressibleByStringLiteral, Hashable, Codable,
 CustomStringConvertible {
@@ -47,11 +53,11 @@ CustomStringConvertible {
 }
 
 enum ReachabilityAction {
-    case reachabilityStatus(NetworkStatus, ReachabilityCodedStatus)
+    case reachabilityStatus(ReachabilityStatus, ReachabilityCodedStatus)
 }
 
 struct ReachabilityState: Equatable {
-    var networkStatus: NetworkStatus = NotReachable
+    var networkStatus: ReachabilityStatus = .notReachable
     var codedStatus: ReachabilityCodedStatus = ""
 }
 
@@ -68,7 +74,7 @@ func internetReachabilityReducer(
 
 protocol InternetReachability {
     
-    func currentReachabilityStatus() -> NetworkStatus
+    func currentStatus() -> ReachabilityStatus
     
     func currentReachabilityFlags() -> ReachabilityCodedStatus
     
@@ -77,59 +83,12 @@ protocol InternetReachability {
 extension InternetReachability {
     
     var isCurrentlyReachable: Bool {
-        let status = self.currentReachabilityStatus()
+        let status = self.currentStatus()
         switch status {
-        case NotReachable: return false
-        case ReachableViaWiFi: return true
-        case ReachableViaWWAN: return true
-        default:
-            fatalErrorFeedbackLog("Unknown reachability status '\(status)'")
+        case .notReachable: return false
+        case .viaWiFi: return true
+        case .viaWWAN: return true
         }
-    }
-    
-}
-
-extension Reachability: InternetReachability {
-    
-    func currentReachabilityFlags() -> ReachabilityCodedStatus {
-        ReachabilityCodedStatus(stringLiteral: self.currentReachabilityFlagsToString())
-    }
-    
-}
-
-final class InternetReachabilityDelegate: StoreDelegate<ReachabilityAction> {
-    
-    private let reachability: Reachability
-    
-    init(reachability: Reachability, store: Store<Unit, ReachabilityAction>) {
-        self.reachability = reachability
-        super.init(store: store)
-        
-        self.reachability.startNotifier()
-        NotificationCenter.default.addObserver(self, selector: #selector(statusDidChange),
-                                               name: NSNotification.Name.reachabilityChanged,
-                                               object: self.reachability)
-        
-        // Sends current state before notifications for status change kick in.
-        statusDidChange()
-    }
-    
-    @objc private func statusDidChange() {
-        let networkStatus = self.reachability.currentReachabilityStatus()
-        let codedStatus = self.reachability.currentReachabilityFlagsToString()!
-        storeSend(
-            .reachabilityStatus(
-                networkStatus,
-                ReachabilityCodedStatus(stringLiteral: codedStatus)
-            )
-        )
-    }
-    
-    deinit {
-        self.reachability.stopNotifier()
-        NotificationCenter.default.removeObserver(self,
-                                                  name: NSNotification.Name.reachabilityChanged,
-                                                  object: self.reachability)
     }
     
 }
