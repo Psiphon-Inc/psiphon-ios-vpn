@@ -136,14 +136,14 @@ extension AppAction {
 
 extension AppState {
     
-    /// `tunnelManagerRef` returns a weak reference to the underlying TunnelProviderManager reference.
-    /// This helps prevent resource leaks.
-    var tunnelManagerRef: WeakRef<PsiphonTPM>? {
+    /// `tunnelConnection` returns a TunnelConnection object holding a weak reference to the underlying
+    ///  TunnelProviderManager reference if it exists.
+    var tunnelConnection: TunnelConnection? {
         get {
             guard case let .loaded(tpm) = self.vpnState.value.loadState.value else {
                 return nil
             }
-            return WeakRef(tpm)
+            return tpm.connection
         }
     }
     
@@ -168,7 +168,7 @@ extension AppState {
         }
     }
     
-    var iapReducerState: IAPReducerState<PsiphonTPM> {
+    var iapReducerState: IAPReducerState {
         get {
             IAPReducerState(
                 iap: self.iapState,
@@ -182,13 +182,13 @@ extension AppState {
         }
     }
     
-    var psiCashReducerState: PsiCashReducerState<PsiphonTPM> {
+    var psiCashReducerState: PsiCashReducerState {
         get {
             PsiCashReducerState(
                 psiCashBalance: self.psiCashBalance,
                 psiCash: self.psiCash,
                 subscription: self.subscription,
-                tunnelManagerRef: self.tunnelManagerRef
+                tunnelConnection: self.tunnelConnection
             )
         }
         set {
@@ -212,11 +212,11 @@ extension AppState {
         }
     }
     
-    var landingPageReducerState: LandingPageReducerState<PsiphonTPM> {
+    var landingPageReducerState: LandingPageReducerState {
         get {
             LandingPageReducerState(
                 pendingLandingPageOpening: self.pendingLandingPageOpening,
-                tunnelProviderManager: self.tunnelManagerRef
+                tunnelConnection: self.tunnelConnection
             )
         }
         set {
@@ -224,7 +224,7 @@ extension AppState {
         }
     }
     
-    var subscriptionAuthReducerState: SubscriptionReducerState<PsiphonTPM> {
+    var subscriptionAuthReducerState: SubscriptionReducerState {
         get {
             SubscriptionReducerState(
                 subscription: self.subscriptionAuthState,

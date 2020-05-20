@@ -36,13 +36,13 @@ struct PsiCashEffect {
         self.psiCash.dataModel()
     }
     
-    func refreshState<T: TunnelProviderManager>(
+    func refreshState(
         andGetPricesFor priceClasses: [PsiCashTransactionClass],
-        tunnelProviderManager: WeakRef<T>
+        tunnelConnection: TunnelConnection
     ) -> Effect<PsiCashRefreshResult>
     {
         Effect.deferred { fulfilled in
-            guard case .connected = tunnelProviderManager.weakRef?.connectionStatus.tunneled else {
+            guard case .connected = tunnelConnection.tunneled else {
                 fulfilled(.completed(.failure(ErrorEvent(.tunnelNotConnected))))
                 return
             }
@@ -70,11 +70,11 @@ struct PsiCashEffect {
         }.prefix(value: .pending)
     }
     
-    func purchaseProduct<T: TunnelProviderManager>(
-        _ purchasable: PsiCashPurchasableType, tunnelManagerRef: WeakRef<T>
+    func purchaseProduct(
+        _ purchasable: PsiCashPurchasableType, tunnelConnection: TunnelConnection
     ) -> Effect<PsiCashPurchaseResult> {
         Effect.deferred { fulfilled in
-            guard case .connected = tunnelManagerRef.weakRef?.connectionStatus.tunneled else {
+            guard case .connected = tunnelConnection.tunneled else {
                 fulfilled(
                     PsiCashPurchaseResult(
                         purchasable: purchasable,

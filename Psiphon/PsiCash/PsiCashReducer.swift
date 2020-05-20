@@ -39,11 +39,11 @@ enum PsiCashAlertDismissAction {
     case speedBoostAlreadyActive
 }
 
-struct PsiCashReducerState<T: TunnelProviderManager>: Equatable {
+struct PsiCashReducerState: Equatable {
     var psiCashBalance: PsiCashBalance
     var psiCash: PsiCashState
     let subscription: SubscriptionState
-    let tunnelManagerRef: WeakRef<T>?
+    let tunnelConnection: TunnelConnection?
 }
 
 typealias PsiCashEnvironment = (
@@ -59,12 +59,12 @@ typealias PsiCashEnvironment = (
     rewardedVideoAdBridgeDelegate: RewardedVideoAdBridgeDelegate
 )
 
-func psiCashReducer<T: TunnelProviderManager>(
-    state: inout PsiCashReducerState<T>, action: PsiCashAction, environment: PsiCashEnvironment
+func psiCashReducer(
+    state: inout PsiCashReducerState, action: PsiCashAction, environment: PsiCashEnvironment
 ) -> [Effect<PsiCashAction>] {
     switch action {
     case .buyPsiCashProduct(let purchasableType):
-        guard let tunnelManagerRef = state.tunnelManagerRef else {
+        guard let tunnelConnection = state.tunnelConnection else {
             return []
         }
         guard case .notSubscribed = state.subscription.status else {
@@ -80,7 +80,7 @@ func psiCashReducer<T: TunnelProviderManager>(
         state.psiCash.purchasing = .speedBoost(purchasable)
         return [
             environment.psiCashEffects.purchaseProduct(purchasableType,
-                                                       tunnelManagerRef: tunnelManagerRef)
+                                                       tunnelConnection: tunnelConnection)
                 .map(PsiCashAction.psiCashProductPurchaseResult)
         ]
         
@@ -123,7 +123,7 @@ func psiCashReducer<T: TunnelProviderManager>(
         }
         
     case .refreshPsiCashState:
-        guard let tunnelProviderManager = state.tunnelManagerRef else {
+        guard let tunnelConnection = state.tunnelConnection else {
             return []
         }
         guard case .notSubscribed = state.subscription.status else {
@@ -135,7 +135,7 @@ func psiCashReducer<T: TunnelProviderManager>(
         return [
             environment.psiCashEffects
                 .refreshState(andGetPricesFor: PsiCashTransactionClass.allCases,
-                              tunnelProviderManager: tunnelProviderManager)
+                              tunnelConnection: tunnelConnection)
                 .map(PsiCashAction.refreshPsiCashStateResult)
         ]
         
@@ -153,7 +153,7 @@ func psiCashReducer<T: TunnelProviderManager>(
             return []
         }
         
-        switch state.tunnelManagerRef?.weakRef?.connectionStatus.tunneled {
+        switch state.tunnelConnection?.tunneled {
         case .connected:
             state.psiCash.rewardedVideo.combine(
                 loading: .failure(ErrorEvent(.noTunneledRewardedVideoAd))

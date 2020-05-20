@@ -39,7 +39,7 @@ enum TransactionUpdate {
     case restoredCompletedTransactions(error: Error?)
 }
 
-struct IAPReducerState<T: TunnelProviderManager> {
+struct IAPReducerState {
     var iap: IAPState
     var psiCashBalance: PsiCashBalance
     let psiCashAuth: PsiCashAuthPackage
@@ -48,7 +48,7 @@ struct IAPReducerState<T: TunnelProviderManager> {
 typealias IAPEnvironment = (
     feedbackLogger: FeedbackLogger,
     tunnelStatusWithIntentSignal: SignalProducer<VPNStatusWithIntent, Never>,
-    tunnelManagerRefSignal: SignalProducer<WeakRef<PsiphonTPM>?, Never>,
+    tunnelConnectionRefSignal: SignalProducer<TunnelConnection?, Never>,
     psiCashEffects: PsiCashEffect,
     clientMetaData: ClientMetaData,
     paymentQueue: PaymentQueue,
@@ -58,8 +58,8 @@ typealias IAPEnvironment = (
     httpClient: HTTPClient
 )
 
-func iapReducer<T: TunnelProviderManager>(
-    state: inout IAPReducerState<T>, action: IAPAction, environment: IAPEnvironment
+func iapReducer(
+    state: inout IAPReducerState, action: IAPAction, environment: IAPEnvironment
 ) -> [Effect<IAPAction>] {
     switch action {
     case .checkUnverifiedTransaction:
@@ -174,7 +174,7 @@ func iapReducer<T: TunnelProviderManager>(
         return [
             psiCashVerifyRequest.callAsFunction(
                 tunnelStatusWithIntentSignal: environment.tunnelStatusWithIntentSignal,
-                tunnelManagerRefSignal: environment.tunnelManagerRefSignal,
+                tunnelConnectionRefSignal: environment.tunnelConnectionRefSignal,
                 httpClient: environment.httpClient
             ).map {
                 ._psiCashConsumableAuthorizationRequestResult(

@@ -93,9 +93,54 @@ class VPNConnectionObserver<T: TunnelProviderManager>: StoreDelegate<TunnelProvi
     func setTunnelProviderManager(_ manager: T) {}
 }
 
+final class TunnelConnection: Equatable {
+    
+    enum ConnectionResourceStatus: Equatable {
+        case resourceReleased
+        case connection(TunnelProviderVPNStatus)
+    }
+    
+    let connectionStatus: () -> ConnectionResourceStatus
+    
+    var tunneled: TunnelConnectedStatus {
+        switch self.connectionStatus() {
+        case .resourceReleased:
+            return .notConnected
+            
+        case .connection(let connectionStatus):
+            if Debugging.ignoreTunneledChecks {
+                return .connected
+            }
+            switch connectionStatus {
+            case .invalid, .disconnected:
+                return .notConnected
+            case .connecting, .reasserting:
+                return .connecting
+            case .connected:
+                return .connected
+            case .disconnecting:
+                return .disconnecting
+            @unknown default:
+                fatalError("Unknown NEVPNStatus '\(connectionStatus.rawValue)'")
+            }
+        }
+    }
+    
+    init(_ connectionStatus: @escaping () -> ConnectionResourceStatus) {
+        self.connectionStatus = connectionStatus
+    }
+    
+    static func == (lhs: TunnelConnection, rhs: TunnelConnection) -> Bool {
+        return lhs === rhs
+    }
+    
+}
+
 protocol TunnelProviderManager: ClassBound, Equatable {
 
     var connectionStatus: TunnelProviderVPNStatus { get }
+    
+    var connection: TunnelConnection { get }
     
     static func loadAll(completionHandler: @escaping ([Self]?, NEVPNError?) -> Void)
     
@@ -129,6 +174,13 @@ final class PsiphonTPM: TunnelProviderManager {
     }
 
     fileprivate let wrappedManager: NETunnelProviderManager
+    
+    lazy var connection = TunnelConnection { [weak wrappedManager] in
+        guard let tunnelManager = wrappedManager else {
+            return .resourceReleased
+        }
+        return .connection(tunnelManager.connection.status as TunnelProviderVPNStatus)
+    }
     
     private init(_ manager: NETunnelProviderManager) {
         self.wrappedManager = manager
