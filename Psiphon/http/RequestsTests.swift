@@ -145,8 +145,8 @@ final class RequestsTest: XCTestCase {
         
         // Act
         let result = request.callAsFunction(
-            tunnelStatusWithIntentSignal: SignalProducer(value: connectedIntent),
-            tunnelConnectionRefSignal: SignalProducer(value: connectedConnection),
+            tunnelStatusWithIntentSignal: SignalProducer.neverComplete(value: connectedIntent),
+            tunnelConnectionRefSignal: SignalProducer.neverComplete(value: connectedConnection),
             httpClient: echoHttpClient
         ).collectForTesting(timeout: 1.0)
         

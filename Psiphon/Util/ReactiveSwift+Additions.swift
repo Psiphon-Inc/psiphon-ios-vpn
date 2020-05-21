@@ -55,6 +55,12 @@ extension Signal where Value == Bool, Error == Never {
 
 extension SignalProducer {
     
+    static func neverComplete(value: Value) -> Self {
+        SignalProducer { observer, _ in
+            observer.send(value: value)
+        }
+    }
+    
     /// A `SignalProducerConvertible` version of `combinePrevious(_:)`
     func combinePrevious(initial: Value) -> SignalProducer<Combined<Value>, Error> {
         self.combinePrevious(initial)
