@@ -25,6 +25,27 @@ func XCTFatal(message: String = "") -> Never {
     fatalError()
 }
 
+struct Generator<Value>: IteratorProtocol {
+    
+    private let sequence: [Value]
+    private var index = 0
+    
+    init(sequence: [Value]) {
+        self.sequence = sequence
+    }
+    
+    mutating func next() -> Value? {
+        guard index < sequence.count else {
+            return nil
+        }
+        defer {
+            index += 1
+        }
+        return sequence[index]
+    }
+    
+}
+
 let globalTestingScheduler = QueueScheduler(qos: .userInteractive,
                                      name: "PsiphonTestsScheduler",
                                      targeting: .global())
@@ -32,18 +53,20 @@ let globalTestingScheduler = QueueScheduler(qos: .userInteractive,
 extension SignalProducer where Error: Equatable {
     
     enum SignalError: Swift.Error, Equatable {
-        case timedOut
+        /// Signal did not complete within the timeout interval.
+        case signalTimedOut
+        /// Wrapped upstream error.
         case signalError(Error)
     }
     
     func collectForTesting(
         timeout: TimeInterval = 1.0
-    ) -> NonEmpty<Signal<Value, SignalProducer<Value, Error>.SignalError>.Event> {
+    ) -> NonEmpty<Signal<Value, SignalError>.Event> {
         
         let result = self.mapError { signalError -> SignalError in
             return .signalError(signalError)
         }
-        .timeout(after: timeout, raising: .timedOut, on: globalTestingScheduler)
+        .timeout(after: timeout, raising: .signalTimedOut, on: globalTestingScheduler)
         .materialize()
         .collect()
         .single()
@@ -52,6 +75,28 @@ extension SignalProducer where Error: Equatable {
             fatalError("Expected non-empty result array: '\(String(describing: result))'")
         }
         return nonEmptyArray
+    }
+    
+    static func just(values: [Value], withInterval interval: DispatchTimeInterval) -> Self {
+        SignalProducer { observer, lifetime in
+            let timer = DispatchSource.makeTimerSource()
+            timer.schedule(deadline: .now(), repeating: interval, leeway: .nanoseconds(0))
+            
+            var generator = Generator(sequence: values)
+            timer.setEventHandler {
+                guard let nextValue = generator.next() else {
+                    observer.sendCompleted()
+                    return
+                }
+                observer.send(value: nextValue)
+            }
+            
+            timer.resume()
+            
+            lifetime += AnyDisposable {
+                timer.cancel()
+            }
+        }
     }
     
 }
