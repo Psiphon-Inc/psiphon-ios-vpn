@@ -20,7 +20,6 @@
 import XCTest
 import ReactiveSwift
 import NetworkExtension
-@testable import Psiphon
 
 final class MockCancellableURLRequest: CancellableURLRequest {
     func cancel() {}
@@ -28,7 +27,7 @@ final class MockCancellableURLRequest: CancellableURLRequest {
 
 extension HTTPRequest {
     
-    static func jsonMock<Body: Encodable>(
+    static func mockJsonRequest<Body: Encodable>(
         body: Body, method: HTTPMethod = .get, responseType: Response.Type
     ) -> Self {
         .json(url: URL(string: "https://test.psiphon.ca/")!,
@@ -36,6 +35,64 @@ extension HTTPRequest {
               clientMetaData: "",
               method: method,
               response: responseType)
+    }
+    
+}
+
+final class EchoHTTPClient {
+    
+    var responseSequence: Generator<Result<(), HTTPRequestError>>
+        = Generator(sequence: [.success(())])
+    
+    var responseDelay: DispatchTimeInterval = .milliseconds(0)
+    var responseStatusCode = HTTPStatusCode.ok
+    var requestCount: Int = 0
+    var httpVersion = "HTTP/1.1"
+    var headers = [String: String]()
+    
+    init() {}
+    
+    lazy var client = HTTPClient { _, _, request, completionHandler -> CancellableURLRequest in
+        
+        guard let httpBody = request.httpBody else {
+            XCTFatal()
+        }
+        
+        guard let httpBodyString = String(bytes: httpBody, encoding: .utf8) else {
+            XCTFatal()
+        }
+        
+        guard let url = request.url else {
+            XCTFatal()
+        }
+        
+        guard let resp = "Request:\(self.requestCount)\n\(httpBodyString)".data(using: .utf8) else {
+            XCTFatal()
+        }
+        
+        self.requestCount += 1
+                    
+        DispatchQueue.global().asyncAfter(deadline: .now() + self.responseDelay) {
+            
+            guard let response = self.responseSequence.next() else {
+                XCTFatal()
+            }
+            
+            let sessionResult: URLSessionResult = response.map { _
+                -> (data: Data, response: HTTPURLResponse) in
+                (data: resp,
+                 response: HTTPURLResponse(
+                    url: url,
+                    statusCode: self.responseStatusCode.rawValue,
+                    httpVersion: self.httpVersion,
+                    headerFields: self.headers)!)
+            }
+            
+            completionHandler(sessionResult)
+
+        }
+        
+        return MockCancellableURLRequest()
     }
     
 }
@@ -48,6 +105,10 @@ struct RetriableTestResponse: RetriableHTTPResponse {
     
     let result: Result<String, ErrorEvent<ErrorRepr>>
 
+    init(result: ResultType) {
+        self.result = result
+    }
+    
     init(urlSessionResult: URLSessionResult) {
         switch urlSessionResult {
         case let .success((dataBytes, urlResponse)):
@@ -67,6 +128,7 @@ struct RetriableTestResponse: RetriableHTTPResponse {
         }
     }
     
+    /// Every Non-200 OK response is a retriable error.
     static func unpackRetriableResultError(
         _ result: ResultType
     ) -> (result: ResultType, retryDueToError: FailureEvent?) {
@@ -81,55 +143,76 @@ struct RetriableTestResponse: RetriableHTTPResponse {
     
 }
 
+func generateRetriableTunneledHttpRequestTest(
+    echoHttpClient: HTTPClient,
+    connectionStatusBeforeRequestSeq: [TunnelConnection.ConnectionResourceStatus],
+    vpnStatusSeq: [TunnelProviderVPNStatus],
+    vpnStatusSeqInterval: DispatchTimeInterval = .milliseconds(0),
+    totalTimeout: TimeInterval = 1.0,
+    retryCount: Int = 2,
+    retryInterval: DispatchTimeInterval = .milliseconds(1),
+    getCurrentTime: (() -> Date)? = nil
+) -> NonEmpty<Signal<RetriableTunneledHttpRequest<RetriableTestResponse>.RequestResult, SignalProducer<RetriableTunneledHttpRequest<RetriableTestResponse>.RequestResult, Never>.SignalError>.Event> {
+    
+    let currentTimeFunc: () -> Date
+    if let timeFunc = getCurrentTime {
+        currentTimeFunc = timeFunc
+    } else {
+        currentTimeFunc = {
+            return Date()
+        }
+    }
+    
+    // Arrange
+    var connectionSeqGenerator = Generator(sequence: connectionStatusBeforeRequestSeq)
+    
+    let request = RetriableTunneledHttpRequest(
+        request: HTTPRequest.mockJsonRequest(
+            body: TestRequest(value: "request test data"),
+            responseType: RetriableTestResponse.self),
+        retryCount: retryCount,
+        retryInterval: retryInterval
+    )
+
+    let connectedConnection = TunnelConnection {
+        guard let value = connectionSeqGenerator.next() else {
+            XCTFatal()
+        }
+        return value
+    }
+
+    // Act
+    let result = request.callAsFunction(
+        getCurrentTime: currentTimeFunc,
+        tunnelStatusSignal: SignalProducer.just(
+            values: vpnStatusSeq,
+            withInterval: vpnStatusSeqInterval
+        ).concat(.never),
+        tunnelConnectionRefSignal: SignalProducer.neverComplete(value: connectedConnection),
+        httpClient: echoHttpClient
+    ).collectForTesting(timeout: totalTimeout)
+
+    return result
+}
+
+
 final class RequestsTest: XCTestCase {
     
-    var httpRequestNum: Int = 0
-    var echoHttpClient: HTTPClient!
+    var echoHttpClient: EchoHTTPClient!
     
     override func setUpWithError() throws {
         Debugging = .disabled()
-        
-        echoHttpClient = HTTPClient { _, request, completionHandler -> CancellableURLRequest in
-            
-            guard let httpBody = request.httpBody else {
-                XCTFatal()
-            }
-            
-            guard let httpBodyString = String(bytes: httpBody, encoding: .utf8) else {
-                XCTFatal()
-            }
-            
-            guard let url = request.url else {
-                XCTFatal()
-            }
-            
-            guard let resp = "\(self.httpRequestNum)\n\(httpBodyString)".data(using: .utf8) else {
-                XCTFatal()
-            }
-            
-            self.httpRequestNum += 1
-                        
-            completionHandler(.success(
-                (data: resp,
-                 response: HTTPURLResponse(
-                    url: url,
-                    statusCode: HTTPStatusCode.ok.rawValue,
-                    httpVersion: "HTTP/1.1",
-                    headerFields: nil)!)))
-            
-            return MockCancellableURLRequest()
-        }
+        echoHttpClient = EchoHTTPClient()
     }
     
     override func tearDownWithError() throws {
         echoHttpClient = nil
-        httpRequestNum = 0
     }
     
     func testTunneled200OKRequest() {
         // Arrange
         let request = RetriableTunneledHttpRequest(
-            request: HTTPRequest.jsonMock(
+            request: HTTPRequest.mockJsonRequest(
                 body: TestRequest(value: "request test data"),
                 responseType: RetriableTestResponse.self)
         )
@@ -138,25 +221,331 @@ final class RequestsTest: XCTestCase {
             .connection(.connected)
         }
         
-        let connectedIntent = VPNStatusWithIntent(
-            status: .connected,
-            intent: .start(transition: .none)
-        )
-        
         // Act
         let result = request.callAsFunction(
-            tunnelStatusWithIntentSignal: SignalProducer.neverComplete(value: connectedIntent),
+            getCurrentTime: { Date() },
+            tunnelStatusSignal: SignalProducer.neverComplete(value: .connected),
             tunnelConnectionRefSignal: SignalProducer.neverComplete(value: connectedConnection),
-            httpClient: echoHttpClient
+            httpClient: echoHttpClient.client
         ).collectForTesting(timeout: 1.0)
         
         // Assert
         XCTAssert(
             result.isEqual(
-                [.value(.completed(.success(#"0\#n{"value":"request test data"}"#))), .completed]
+                [.value(.completed(.success(#"Request:0\#n{"value":"request test data"}"#))), .completed]
             ),
             "Got result '\(result)'"
         )
+    }
+    
+    func testConnectedNilTunnelManager() {
+        // Act
+        let result = generateRetriableTunneledHttpRequestTest(
+            echoHttpClient: self.echoHttpClient.client,
+            connectionStatusBeforeRequestSeq: [ .resourceReleased ],
+            vpnStatusSeq: [ .connected ]
+        )
+        
+        // Assert
+        XCTAssert(
+            result.isEqual(
+                [.value(.willRetry(.whenResolved(tunnelError: .nilTunnelProviderManager))),
+                 .failed(.signalTimedOut)]
+            ),
+            "Got result '\(result)'"
+        )
+        
+        XCTAssert(self.echoHttpClient.requestCount == 0)
+    }
+    
+    func testRetryAfterNewTunnelManager() {
+        // Act
+        let result = generateRetriableTunneledHttpRequestTest(
+            echoHttpClient: self.echoHttpClient.client,
+            connectionStatusBeforeRequestSeq: [
+                .resourceReleased,
+                .resourceReleased,
+                .connection(.connected)
+            ],
+            vpnStatusSeq: [
+                .connected,
+                .disconnected,
+                .connected,
+                .connecting,
+                .connected
+            ]
+        )
+        
+        // Assert
+        XCTAssert(
+            result.isEqual(
+                [.value(.willRetry(.whenResolved(tunnelError: .nilTunnelProviderManager))),
+                 .value(.willRetry(.whenResolved(tunnelError: .tunnelNotConnected))),
+                 .value(.willRetry(.whenResolved(tunnelError: .nilTunnelProviderManager))),
+                 .value(.willRetry(.whenResolved(tunnelError: .tunnelNotConnected))),
+                 .value(.completed(.success(#"Request:0\#n{"value":"request test data"}"#))),
+                 .completed]
+            ),
+            "Got result '\(result)'"
+        )
+        
+        XCTAssert(self.echoHttpClient.requestCount == 1)
+    }
+    
+    func testConnectedThenQuickJetsamRace() {
+        // Tests tunnel being initially connected at the time of the request,
+        // and quickly disconnected (e.g. jetsam) just after the request is made.
+        
+        // Arrange
+        echoHttpClient.responseDelay = .milliseconds(10)
+        
+        // Act
+        let result = generateRetriableTunneledHttpRequestTest(
+            echoHttpClient: self.echoHttpClient.client,
+            connectionStatusBeforeRequestSeq: [.connection(.connected)],
+            vpnStatusSeq: [
+                .connected,
+                .disconnected
+            ],
+            vpnStatusSeqInterval: .milliseconds(1)
+        )
+        
+        // Assert
+        XCTAssert(
+            result.isEqual(
+                [.value(.willRetry(.whenResolved(tunnelError: .tunnelNotConnected))),
+                 .failed(.signalTimedOut)]
+            ),
+            "Got result '\(result)'"
+        )
+        
+        XCTAssert(self.echoHttpClient.requestCount == 1)
+    }
+    
+    func testConnectedThenDelayedJetsamRace() {
+        // Tests tunnel being initially connected at the time of the request,
+        // and then disconnected (e.g. jetsam) after response is received from server.
+        
+        // Act
+        let result = generateRetriableTunneledHttpRequestTest(
+            echoHttpClient: self.echoHttpClient.client,
+            connectionStatusBeforeRequestSeq: [.connection(.connected)],
+            vpnStatusSeq: [
+                .connected,
+                .disconnected
+            ],
+            vpnStatusSeqInterval: .milliseconds(10)
+        )
+        
+        // Assert
+        XCTAssert(self.echoHttpClient.responseDelay == .milliseconds(0))
+        
+        XCTAssert(
+            result.isEqual(
+                [.value(.completed(.success(#"Request:0\#n{"value":"request test data"}"#))),
+                 .completed]
+            ),
+            "Got result '\(result)'"
+        )
+        
+        XCTAssert(self.echoHttpClient.requestCount == 1)
+    }
+    
+    func testShowcaseDoubleRequest() {
+        // This is more of a showcase of the condition that can cause two requests
+        // to be sent to server due to quick disconnected event.
+        
+        // Arrange
+        self.echoHttpClient.responseDelay = .milliseconds(10)
+        self.echoHttpClient.responseSequence = Generator(sequence:
+            [.success(()), .success(())]
+        )
+        
+        // Act
+        let result = generateRetriableTunneledHttpRequestTest(
+            echoHttpClient: self.echoHttpClient.client,
+            connectionStatusBeforeRequestSeq: [
+                .connection(.connected),
+                .connection(.connected)
+            ],
+            vpnStatusSeq: [
+                .connected,
+                .disconnected,
+                .connected,
+                .disconnected
+            ],
+            vpnStatusSeqInterval: .milliseconds(0)
+        )
+        
+        // Assert
+        XCTAssert(self.echoHttpClient.responseDelay == .milliseconds(10))
+        
+        XCTAssert(
+            result.isEqual(
+                [.value(.willRetry(.whenResolved(tunnelError: .tunnelNotConnected))),
+                 .value(.willRetry(.whenResolved(tunnelError: .tunnelNotConnected))),
+                 .failed(.signalTimedOut)
+                ]
+            ),
+            "Got result '\(result)'"
+        )
+        
+        XCTAssert(self.echoHttpClient.requestCount == 2)
+    }
+    
+    func testDisconnectedToConnected() {
+        // Tests requesting not going through due to tunnel status signal emitting disconnected,
+        // and then tunnel disconnecting, just before the request is made,
+        // and then tunnel status signal emitting disconnected once again before
+        // the tunnel is connected and request is sent successfully.
+        
+        // Arrange
+        self.echoHttpClient.responseDelay = .milliseconds(10)
+        
+        // Act
+        let result = generateRetriableTunneledHttpRequestTest(
+            echoHttpClient: self.echoHttpClient.client,
+            connectionStatusBeforeRequestSeq: [
+                .connection(.disconnected),
+                .connection(.connected)
+            ],
+            vpnStatusSeq: [
+                .disconnected,
+                .connected,
+                .disconnected,
+                .connected,
+            ]
+        )
+        
+        // Assert
+        XCTAssert(self.echoHttpClient.responseDelay == .milliseconds(10))
+
+        XCTAssert(
+            result.isEqual(
+                [.value(.willRetry(.whenResolved(tunnelError: .tunnelNotConnected))),
+                 .value(.willRetry(.whenResolved(tunnelError: .tunnelNotConnected))),
+                 .value(.willRetry(.whenResolved(tunnelError: .tunnelNotConnected))),
+                 .value(.completed(.success(#"Request:0\#n{"value":"request test data"}"#))),
+                 .completed]
+            ),
+            "Got result '\(result)'"
+        )
+        
+        XCTAssert(self.echoHttpClient.requestCount == 1)
+    }
+    
+    func testRetryWithHttpStatusError() {
+        
+        // Arrange
+        let errorDate = Date()
+        
+        let responseErrorEvent = ErrorEvent(ErrorRepr(repr: "request error"), date: errorDate)
+        
+        let expectedResponse = RetriableTestResponse(result: .failure(responseErrorEvent))
+                
+        let httpClientError = ErrorEvent(SystemError(), date: errorDate)
+        
+        // HTTPClient error date should match expected response error date.
+        self.echoHttpClient.responseSequence = Generator(sequence:
+            [.failure(HTTPRequestError(partialResponse: nil, errorEvent: httpClientError)),
+             .failure(HTTPRequestError(partialResponse: nil, errorEvent: httpClientError)),
+             .failure(HTTPRequestError(partialResponse: nil, errorEvent: httpClientError))]
+        )
+        
+        let retryInterval = DispatchTimeInterval.milliseconds(1)
+        
+        // Act
+        let result = generateRetriableTunneledHttpRequestTest(
+            echoHttpClient: self.echoHttpClient.client,
+            connectionStatusBeforeRequestSeq: [
+                .connection(.connected),
+                .connection(.connected), // Retry 1
+                .connection(.connected)  // Retry 2
+            ],
+            vpnStatusSeq: [ .connected ],
+            retryCount: 2,
+            retryInterval: retryInterval,
+            getCurrentTime: {
+                XCTFatal(message: "getCurrentTime should not be called")
+            }
+        )
+        
+        // Assert
+        
+        // Checks that every error result is a retriable error for `RetriableTestResponse`.
+        let errorEvent = ErrorEvent(ErrorRepr(repr: "error"))
+        let resultTuple = RetriableTestResponse.unpackRetriableResultError(.failure(errorEvent))
+        XCTAssert(resultTuple.retryDueToError == errorEvent)
+        
+        XCTAssert(
+            result.isEqual(
+                [.value(.willRetry(.afterTimeInterval(
+                    interval: retryInterval, result: expectedResponse.result))),
+                 .value(.willRetry(.afterTimeInterval(
+                    interval: retryInterval, result: expectedResponse.result))),
+                 .value(.willRetry(.afterTimeInterval(
+                    interval: retryInterval, result: expectedResponse.result))),
+                 .value(.failed(responseErrorEvent)),
+                 .completed]
+            ),
+            "Got result '\(result)'"
+        )
+        
+        XCTAssert(self.echoHttpClient.requestCount == 3)
+    }
+    
+    func testRetryWithHttpStatusErrorThenSuccess() {
+        
+        // Arrange
+        let errorDate = Date()
+        
+        let responseErrorEvent = ErrorEvent(ErrorRepr(repr: "request error"), date: errorDate)
+        
+        let expectedResponse = RetriableTestResponse(result: .failure(responseErrorEvent))
+                
+        let httpClientError = ErrorEvent(SystemError(), date: errorDate)
+        
+        // HTTPClient error date should match expected response error date.
+        self.echoHttpClient.responseSequence = Generator(sequence:
+            [.failure(HTTPRequestError(partialResponse: nil, errorEvent: httpClientError)),
+             .success(())]
+        )
+        
+        let retryInterval = DispatchTimeInterval.milliseconds(1)
+        
+        // Act
+        let result = generateRetriableTunneledHttpRequestTest(
+            echoHttpClient: self.echoHttpClient.client,
+            connectionStatusBeforeRequestSeq: [
+                .connection(.connected),
+                .connection(.connected), // Retry 1
+            ],
+            vpnStatusSeq: [ .connected ],
+            retryCount: 2,
+            retryInterval: retryInterval,
+            getCurrentTime: {
+                XCTFatal(message: "getCurrentTime should not be called")
+            }
+        )
+        
+        // Assert
+        
+        // Checks that every error result is a retriable error for `RetriableTestResponse`.
+        let errorEvent = ErrorEvent(ErrorRepr(repr: "error"))
+        let resultTuple = RetriableTestResponse.unpackRetriableResultError(.failure(errorEvent))
+        XCTAssert(resultTuple.retryDueToError == errorEvent)
+        
+        XCTAssert(
+            result.isEqual(
+                [.value(.willRetry(.afterTimeInterval(
+                    interval: retryInterval, result: expectedResponse.result))),
+                 .value(.completed(.success(#"Request:1\#n{"value":"request test data"}"#))),
+                 .completed]
+            ),
+            "Got result '\(result)'"
+        )
+        
+        XCTAssert(self.echoHttpClient.requestCount == 2)
     }
     
 }
