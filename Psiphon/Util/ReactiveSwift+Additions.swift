@@ -61,6 +61,12 @@ extension SignalProducer {
         }
     }
     
+    static func neverComplete(error: Error) -> Self {
+        SignalProducer { observer, _ in
+            observer.send(error: error)
+        }
+    }
+    
     /// A `SignalProducerConvertible` version of `combinePrevious(_:)`
     func combinePrevious(initial: Value) -> SignalProducer<Combined<Value>, Error> {
         self.combinePrevious(initial)

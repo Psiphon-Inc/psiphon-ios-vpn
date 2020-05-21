@@ -77,7 +77,7 @@ typealias AppEnvironment = (
     sharedDB: PsiphonDataSharedDB,
     userConfigs: UserDefaultsConfig,
     notifier: Notifier,
-    tunnelStatusWithIntentSignal: SignalProducer<VPNStatusWithIntent, Never>,
+    tunnelStatusSignal: SignalProducer<TunnelProviderVPNStatus, Never>,
     psiCashAuthPackageSignal: SignalProducer<PsiCashAuthPackage, Never>,
     tunnelConnectionRefSignal: SignalProducer<TunnelConnection?, Never>,
     urlHandler: URLHandler,
@@ -136,8 +136,8 @@ func makeEnvironment(
         sharedDB: sharedDB,
         userConfigs: UserDefaultsConfig(),
         notifier:  Notifier.sharedInstance(),
-        tunnelStatusWithIntentSignal: store.$value.signalProducer
-            .map(\.vpnState.value.vpnStatusWithIntent),
+        tunnelStatusSignal: store.$value.signalProducer
+            .map(\.vpnState.value.providerVPNStatus),
         psiCashAuthPackageSignal: store.$value.signalProducer.map(\.psiCash.libData.authPackage),
         tunnelConnectionRefSignal: store.$value.signalProducer.map(\.tunnelConnection),
         urlHandler: .default(),
@@ -245,7 +245,7 @@ fileprivate func toLandingPageEnvironment(
 fileprivate func toIAPReducerEnvironment(env: AppEnvironment) -> IAPEnvironment {
     IAPEnvironment(
         feedbackLogger: env.feedbackLogger,
-        tunnelStatusWithIntentSignal: env.tunnelStatusWithIntentSignal,
+        tunnelStatusSignal: env.tunnelStatusSignal,
         tunnelConnectionRefSignal: env.tunnelConnectionRefSignal,
         psiCashEffects: env.psiCashEffects,
         clientMetaData: env.clientMetaData,
@@ -291,7 +291,7 @@ fileprivate func toSubscriptionAuthStateReducerEnvironment(
         httpClient: env.httpClient,
         notifier: env.notifier,
         sharedDB: env.sharedDB,
-        tunnelStatusWithIntentSignal: env.tunnelStatusWithIntentSignal,
+        tunnelStatusSignal: env.tunnelStatusSignal,
         tunnelConnectionRefSignal: env.tunnelConnectionRefSignal,
         clientMetaData: env.clientMetaData,
         getCurrentTime: env.getCurrentTime,
