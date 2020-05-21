@@ -298,13 +298,6 @@ fileprivate func tunneledHttpRequest<Response>(
 
 struct RetriableTunneledHttpRequest<Response: RetriableHTTPResponse>: Equatable {
     
-    /// `SignalTermination` represents whether the authorization request signal has completed,
-    /// and that the signal should be completed.
-    private enum SignalTermination: Equatable {
-        case value(RequestResult)
-        case terminate
-    }
-    
     /// `RequestResult` represents all values that can be emitted by the returned Effect.
     enum RequestResult: Equatable {
         
@@ -343,6 +336,13 @@ struct RetriableTunneledHttpRequest<Response: RetriableHTTPResponse>: Equatable 
         case tunnelError(HttpRequestTunnelError)
         /// Request error due to response indicating a retry is needed.
         case responseRetryError(Response.Failure)
+    }
+    
+    /// `SignalTermination` represents whether the authorization request signal has completed,
+    /// and that the signal should be completed.
+    private enum SignalTermination: Equatable {
+        case value(RequestResult)
+        case terminate
     }
     
     let request: HTTPRequest<Response>
@@ -429,7 +429,7 @@ struct RetriableTunneledHttpRequest<Response: RetriableHTTPResponse>: Equatable 
                 case .responseRetryError(let responseError):
                     // Error is due to retrieved response for the request,
                     // and is forwarded downstream to be retried.
-                    return SignalProducer.neverComplete(error: requestRetryErrorEvent.map { _ in
+                    return SignalProducer(error: requestRetryErrorEvent.map { _ in
                         return responseError
                     })
                 }
@@ -437,13 +437,13 @@ struct RetriableTunneledHttpRequest<Response: RetriableHTTPResponse>: Equatable 
             }
             .retry(upTo: self.retryCount,
                    interval: self.retryInterval.toDouble()!,
-                   on: QueueScheduler.main)
+                   on: QueueScheduler(qos: .default, name: "RetryScheduler"))
         }
         .flatMapError { (responseError: ErrorEvent<Response.Failure>)
             -> Effect<SignalTermination> in
             // Maps failure response error after all retries from a signal failure
             // to a signal value event.
-            return SignalProducer.neverComplete(value: .value(.failed(responseError)))
+            return SignalProducer(value: .value(.failed(responseError)))
         }
         .take(while: { (signalTermination: SignalTermination) -> Bool in
             // Forwards values while the `.terminate` value has not been emitted.
