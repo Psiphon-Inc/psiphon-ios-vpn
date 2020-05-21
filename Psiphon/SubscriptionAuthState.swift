@@ -305,6 +305,7 @@ func subscriptionAuthStateReducer(
         
         return [
             authRequest.callAsFunction(
+                getCurrentTime: environment.getCurrentTime,
                 tunnelStatusSignal: environment.tunnelStatusSignal,
                 tunnelConnectionRefSignal: environment.tunnelConnectionRefSignal,
                 httpClient: environment.httpClient
