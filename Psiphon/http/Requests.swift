@@ -333,43 +333,12 @@ struct RetriableTunneledHttpRequest<Response: RetriableHTTPResponse>: Equatable 
     let retryInterval: DispatchTimeInterval = .seconds(1)
     
     func callAsFunction(
-        tunnelStatusWithIntentSignal: SignalProducer<VPNStatusWithIntent, Never>,
+        tunnelStatusSignal: SignalProducer<TunnelProviderVPNStatus, Never>,
         tunnelConnectionRefSignal: SignalProducer<TunnelConnection?, Never>,
         httpClient: HTTPClient
     ) -> Effect<RequestResult>
     {
-        tunnelStatusWithIntentSignal
-        .skipRepeats()
-        .combinePrevious(initial: VPNStatusWithIntent(status: .invalid, intent: nil))
-        .take(while: { (combined: Combined<VPNStatusWithIntent>) -> Bool in
-            // Takes values while either of the following cases is true:
-            // - Intent value of .start(.none) is not observed.
-            // - After transitioning to .start(.none), the intent does not change.
-            
-            if Debugging.ignoreTunneledChecks {
-                return true
-            }
-            
-            switch (combined.previous.intent, combined.current.intent) {
-            case (.start(transition: .none), .start(transition: .none)):
-                return true
-            case (_, .start(transition: .none)):
-                return true
-            case (.start(transition: .none), _):
-                return false
-            case (_, _):
-                return true
-            }
-        })
-        .filter { (combined: Combined<VPNStatusWithIntent>) -> Bool in
-            if Debugging.ignoreTunneledChecks {
-                return true
-            }
-            
-            // Filters out values until the intent value changes to .start(.none)
-            return combined.current.intent == .some(.start(transition: .none))
-        }
-        .map(\.current.status)
+        tunnelStatusSignal
         .combineLatest(with: tunnelConnectionRefSignal)
         .skipRepeats({ (lhs, rhs) -> Bool in
             return lhs.0 == rhs.0 && lhs.1 == rhs.1
@@ -427,14 +396,14 @@ struct RetriableTunneledHttpRequest<Response: RetriableHTTPResponse>: Equatable 
                     // Tunnel errors should be resolved from upstream,
                     // hence error is converted to a value and passed downstream.
                     // These errors will not terminate the signal.
-                    return SignalProducer(value:
+                    return SignalProducer.neverComplete(value:
                         .value(.willRetry(.whenResolved(tunnelError: tunnelError)))
-                    )
+                    ).concat(.never)
                     
                 case .responseRetryError(let responseError):
                     // Error is due to retrieved response for the request,
                     // and is forwarded downstream to be retried.
-                    return SignalProducer(error: requestRetryErrorEvent.map { _ in
+                    return SignalProducer.neverComplete(error: requestRetryErrorEvent.map { _ in
                         return responseError
                     })
                 }
@@ -448,7 +417,7 @@ struct RetriableTunneledHttpRequest<Response: RetriableHTTPResponse>: Equatable 
             -> Effect<SignalTermination> in
             // Maps failure response error after all retries from a signal failure
             // to a signal value event.
-            return Effect(value: .value(.failed(responseError)))
+            return SignalProducer.neverComplete(value: .value(.failed(responseError)))
         }
         .take(while: { (signalTermination: SignalTermination) -> Bool in
             // Forwards values while the `.terminate` value has not been emitted.

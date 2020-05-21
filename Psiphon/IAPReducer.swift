@@ -47,7 +47,7 @@ struct IAPReducerState {
 
 typealias IAPEnvironment = (
     feedbackLogger: FeedbackLogger,
-    tunnelStatusWithIntentSignal: SignalProducer<VPNStatusWithIntent, Never>,
+    tunnelStatusSignal: SignalProducer<TunnelProviderVPNStatus, Never>,
     tunnelConnectionRefSignal: SignalProducer<TunnelConnection?, Never>,
     psiCashEffects: PsiCashEffect,
     clientMetaData: ClientMetaData,
@@ -173,7 +173,7 @@ func iapReducer(
         
         return [
             psiCashVerifyRequest.callAsFunction(
-                tunnelStatusWithIntentSignal: environment.tunnelStatusWithIntentSignal,
+                tunnelStatusSignal: environment.tunnelStatusSignal,
                 tunnelConnectionRefSignal: environment.tunnelConnectionRefSignal,
                 httpClient: environment.httpClient
             ).map {

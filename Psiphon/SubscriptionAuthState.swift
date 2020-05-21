@@ -93,7 +93,7 @@ typealias SubscriptionAuthStateReducerEnvironment = (
     httpClient: HTTPClient,
     notifier: Notifier,
     sharedDB: PsiphonDataSharedDB,
-    tunnelStatusWithIntentSignal: SignalProducer<VPNStatusWithIntent, Never>,
+    tunnelStatusSignal: SignalProducer<TunnelProviderVPNStatus, Never>,
     tunnelConnectionRefSignal: SignalProducer<TunnelConnection?, Never>,
     clientMetaData: ClientMetaData,
     getCurrentTime: () -> Date,
@@ -305,7 +305,7 @@ func subscriptionAuthStateReducer(
         
         return [
             authRequest.callAsFunction(
-                tunnelStatusWithIntentSignal: environment.tunnelStatusWithIntentSignal,
+                tunnelStatusSignal: environment.tunnelStatusSignal,
                 tunnelConnectionRefSignal: environment.tunnelConnectionRefSignal,
                 httpClient: environment.httpClient
             ).map {
