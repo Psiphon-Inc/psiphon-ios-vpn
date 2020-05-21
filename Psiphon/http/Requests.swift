@@ -149,8 +149,12 @@ extension URLSessionTask: CancellableURLRequest {}
 
 struct HTTPClient {
     
-    typealias RequestFunc = (URLSessionConfiguration, URLRequest,
-        @escaping (URLSessionResult) -> Void) -> CancellableURLRequest
+    typealias RequestFunc = (
+        @escaping () -> Date,
+        URLSessionConfiguration,
+        URLRequest,
+        @escaping (URLSessionResult) -> Void
+        ) -> CancellableURLRequest
     
     let config = URLSessionConfiguration.ephemeral
     private let makeRequest: RequestFunc
@@ -160,6 +164,7 @@ struct HTTPClient {
     }
     
     func request<Response>(
+        _ getCurrentTime: @escaping () -> Date,
         _ requestData: HTTPRequest<Response>,
         handler: @escaping (Response) -> Void
     ) -> CancellableURLRequest {
@@ -170,7 +175,7 @@ struct HTTPClient {
             )
         }
         
-        return self.makeRequest(self.config, requestData.urlRequest) { result in
+        return self.makeRequest(getCurrentTime, self.config, requestData.urlRequest) { result in
             handler(Response(urlSessionResult: result))
         }
         
@@ -180,7 +185,7 @@ struct HTTPClient {
 
 extension HTTPClient {
     
-    static let `default` = HTTPClient { (config, urlRequest, completionHandler)
+    static let `default` = HTTPClient { (getCurrentTime, config, urlRequest, completionHandler)
         -> CancellableURLRequest in
         
         let session = URLSession(configuration: config).dataTask(with: urlRequest)
@@ -188,8 +193,12 @@ extension HTTPClient {
             let result: URLSessionResult
             if let error = error {
                 // If URLSession task resulted in an error, there might be a partial response.
-                result = .failure(HTTPRequestError(partialResponse: response as? HTTPURLResponse,
-                                                   errorEvent: ErrorEvent(error as SystemError)))
+                result = .failure(
+                    HTTPRequestError(
+                        partialResponse: response as? HTTPURLResponse,
+                        errorEvent: ErrorEvent(error as SystemError, date: getCurrentTime())
+                    )
+                )
             } else {
                 // If `error` is nil, then URLSession task callback guarantees that
                 // `data` and `response` are non-nil.
@@ -206,7 +215,9 @@ extension HTTPClient {
 protocol HTTPRequestTask {
     
     static func request<Response>(
-        _ requestData: HTTPRequest<Response>, handler: @escaping (Response) -> Void
+        getCurrentTime: @escaping () -> Date,
+        _ requestData: HTTPRequest<Response>,
+        handler: @escaping (Response) -> Void
     ) -> HTTPRequestTask
     
     func cancel()
@@ -216,6 +227,7 @@ protocol HTTPRequestTask {
 extension URLSessionTask: HTTPRequestTask {
     
     static func request<Response>(
+        getCurrentTime: @escaping () -> Date,
         _ requestData: HTTPRequest<Response>,
         handler: @escaping (Response) -> Void
     ) -> HTTPRequestTask {
@@ -232,8 +244,12 @@ extension URLSessionTask: HTTPRequestTask {
             let result: URLSessionResult
             if let error = error {
                 // If URLSession task resulted in an error, there might be a partial response.
-                result = .failure(HTTPRequestError(partialResponse: response as? HTTPURLResponse,
-                                                   errorEvent: ErrorEvent(error as SystemError)))
+                result = .failure(
+                    HTTPRequestError(
+                        partialResponse: response as? HTTPURLResponse,
+                        errorEvent: ErrorEvent(error as SystemError, date: getCurrentTime())
+                    )
+                )
             } else {
                 // If `error` is nil, then URLSession task callback guarantees that
                 // `data` and `response` are non-nil.
@@ -250,6 +266,7 @@ extension URLSessionTask: HTTPRequestTask {
 
 /// `tunneledHttpRequest` check tunnel status immediately before sending the HTTP request.
 fileprivate func tunneledHttpRequest<Response>(
+    getCurrentTime: @escaping () -> Date,
     request urlRequest: HTTPRequest<Response>,
     tunnelConnection: TunnelConnection,
     httpClient: HTTPClient
@@ -258,18 +275,18 @@ fileprivate func tunneledHttpRequest<Response>(
         
         switch tunnelConnection.connectionStatus() {
         case .resourceReleased:
-            observer.send(error: ErrorEvent(.nilTunnelProviderManager))
+            observer.send(error: ErrorEvent(.nilTunnelProviderManager, date: getCurrentTime()))
             observer.sendCompleted()
             return
             
         case .connection(let connection):
             let vpnStatus = Debugging.ignoreTunneledChecks ? .connected : connection
             guard case .connected = vpnStatus else {
-                observer.send(error: ErrorEvent(.tunnelNotConnected))
+                observer.send(error: ErrorEvent(.tunnelNotConnected, date: getCurrentTime()))
                 observer.sendCompleted()
                 return
             }
-            let session = httpClient.request(urlRequest) { response in
+            let session = httpClient.request(getCurrentTime, urlRequest) { response in
                 observer.fulfill(value: response)
             }
             lifetime.observeEnded {
@@ -329,10 +346,18 @@ struct RetriableTunneledHttpRequest<Response: RetriableHTTPResponse>: Equatable 
     }
     
     let request: HTTPRequest<Response>
-    let retryCount: Int = 5
-    let retryInterval: DispatchTimeInterval = .seconds(1)
+    let retryCount: Int
+    let retryInterval: DispatchTimeInterval
+    
+    init(request: HTTPRequest<Response>, retryCount: Int = 5,
+         retryInterval: DispatchTimeInterval = .seconds(1)) {
+        self.request = request
+        self.retryCount = retryCount
+        self.retryInterval = retryInterval
+    }
     
     func callAsFunction(
+        getCurrentTime: @escaping () -> Date,
         tunnelStatusSignal: SignalProducer<TunnelProviderVPNStatus, Never>,
         tunnelConnectionRefSignal: SignalProducer<TunnelConnection?, Never>,
         httpClient: HTTPClient
@@ -359,6 +384,7 @@ struct RetriableTunneledHttpRequest<Response: RetriableHTTPResponse>: Equatable 
             // Signal invariant:
             // Tunnel intent is .start(.none), VPN status is connected and tunnel manager is loaded.
             return tunneledHttpRequest(
+                getCurrentTime: getCurrentTime,
                 request: self.request,
                 tunnelConnection: tunnelConnection,
                 httpClient: httpClient

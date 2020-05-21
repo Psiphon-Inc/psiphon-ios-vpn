@@ -253,7 +253,8 @@ fileprivate func toIAPReducerEnvironment(env: AppEnvironment) -> IAPEnvironment 
         userConfigs: env.userConfigs,
         psiCashStore: env.psiCashStore,
         appReceiptStore: env.appReceiptStore,
-        httpClient: env.httpClient
+        httpClient: env.httpClient,
+        getCurrentTime: env.getCurrentTime
     )
 }
 

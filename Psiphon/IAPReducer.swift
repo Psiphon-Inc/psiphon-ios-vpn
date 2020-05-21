@@ -55,7 +55,8 @@ typealias IAPEnvironment = (
     userConfigs: UserDefaultsConfig,
     psiCashStore: (PsiCashAction) -> Effect<Never>,
     appReceiptStore: (ReceiptStateAction) -> Effect<Never>,
-    httpClient: HTTPClient
+    httpClient: HTTPClient,
+    getCurrentTime: () -> Date
 )
 
 func iapReducer(
@@ -173,6 +174,7 @@ func iapReducer(
         
         return [
             psiCashVerifyRequest.callAsFunction(
+                getCurrentTime: environment.getCurrentTime,
                 tunnelStatusSignal: environment.tunnelStatusSignal,
                 tunnelConnectionRefSignal: environment.tunnelConnectionRefSignal,
                 httpClient: environment.httpClient
