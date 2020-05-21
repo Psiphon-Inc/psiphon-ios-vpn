@@ -339,35 +339,35 @@ struct RetriableTunneledHttpRequest<Response: RetriableHTTPResponse>: Equatable 
     ) -> Effect<RequestResult>
     {
         tunnelStatusWithIntentSignal
-            .skipRepeats()
-            .combinePrevious(initial: VPNStatusWithIntent(status: .invalid, intent: nil))
-            .take(while: { (combined: Combined<VPNStatusWithIntent>) -> Bool in
-                // Takes values while either of the following cases is true:
-                // - Intent value of .start(.none) is not observed.
-                // - After transitioning to .start(.none), the intent does not change.
-                
-                if Debugging.ignoreTunneledChecks {
-                    return true
-                }
-                
-                switch (combined.previous.intent, combined.current.intent) {
-                case (.start(transition: .none), .start(transition: .none)):
-                    return true
-                case (_, .start(transition: .none)):
-                    return true
-                case (.start(transition: .none), _):
-                    return false
-                case (_, _):
-                    return true
-                }
-            })
-            .filter { (combined: Combined<VPNStatusWithIntent>) -> Bool in
-                if Debugging.ignoreTunneledChecks {
-                    return true
-                }
-                
-                // Filters out values until the intent value changes to .start(.none)
-                return combined.current.intent == .some(.start(transition: .none))
+        .skipRepeats()
+        .combinePrevious(initial: VPNStatusWithIntent(status: .invalid, intent: nil))
+        .take(while: { (combined: Combined<VPNStatusWithIntent>) -> Bool in
+            // Takes values while either of the following cases is true:
+            // - Intent value of .start(.none) is not observed.
+            // - After transitioning to .start(.none), the intent does not change.
+            
+            if Debugging.ignoreTunneledChecks {
+                return true
+            }
+            
+            switch (combined.previous.intent, combined.current.intent) {
+            case (.start(transition: .none), .start(transition: .none)):
+                return true
+            case (_, .start(transition: .none)):
+                return true
+            case (.start(transition: .none), _):
+                return false
+            case (_, _):
+                return true
+            }
+        })
+        .filter { (combined: Combined<VPNStatusWithIntent>) -> Bool in
+            if Debugging.ignoreTunneledChecks {
+                return true
+            }
+            
+            // Filters out values until the intent value changes to .start(.none)
+            return combined.current.intent == .some(.start(transition: .none))
         }
         .map(\.current.status)
         .combineLatest(with: tunnelConnectionRefSignal)
