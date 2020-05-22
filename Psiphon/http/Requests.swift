@@ -191,7 +191,7 @@ extension HTTPClient {
         HTTPClient(urlSession: urlSession) { (getCurrentTime, session, urlRequest, completionHandler)
             -> CancellableURLRequest in
             
-            let session = session.dataTask(with: urlRequest)
+            let sessionTask = session.dataTask(with: urlRequest)
             { data, response, error in
                 let result: URLSessionResult
                 if let error = error {
@@ -209,8 +209,8 @@ extension HTTPClient {
                 }
                 completionHandler(result)
             }
-            session.resume()
-            return session
+            sessionTask.resume()
+            return sessionTask
         }
     }
     
