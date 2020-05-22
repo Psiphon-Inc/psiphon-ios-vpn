@@ -142,7 +142,7 @@ func makeEnvironment(
         feedbackLogger: feedbackLogger,
         httpClient: HTTPClient.default(urlSession: urlSession),
         psiCashEffects: PsiCashEffect(psiCash: psiCashLib),
-        clientMetaData: ClientMetaData(),
+        clientMetaData: ClientMetaData(AppInfoObjC()),
         sharedDB: sharedDB,
         userConfigs: UserDefaultsConfig(),
         notifier:  Notifier.sharedInstance(),
@@ -301,6 +301,7 @@ fileprivate func toSubscriptionAuthStateReducerEnvironment(
         feedbackLogger: env.feedbackLogger,
         httpClient: env.httpClient,
         notifier: env.notifier,
+        notifierUpdatedSubscriptionAuthsMessage: NotifierUpdatedSubscriptionAuths,
         sharedDB: env.sharedDB,
         tunnelStatusSignal: env.tunnelStatusSignal,
         tunnelConnectionRefSignal: env.tunnelConnectionRefSignal,
@@ -398,4 +399,14 @@ extension Store where Value == AppState, Action == AppAction {
         self.send(.vpnStateAction(.action(.public(vpnAction))))
     }
     
+}
+
+// MARK: AppInfoProvider
+
+struct AppInfoObjC : AppInfoProvider {
+    let clientPlatform: String = AppInfo.clientPlatform()
+    let clientRegion: String = AppInfo.clientRegion() ?? ""
+    let clientVersion: String = AppInfo.appVersion() ?? ""
+    let propagationChannelId: String = AppInfo.propagationChannelId() ?? ""
+    let sponsorId: String = AppInfo.sponsorId() ?? ""
 }

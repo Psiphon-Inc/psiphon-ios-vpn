@@ -19,34 +19,54 @@
 
 import Foundation
 
+protocol AppInfoProvider : Encodable {
+    var clientPlatform : String { get }
+    var clientRegion : String { get }
+    var clientVersion : String { get }
+    var propagationChannelId : String { get }
+    var sponsorId : String { get }
+}
+
 struct ClientMetaData: Encodable {
-    let clientPlatform: String = AppInfo.clientPlatform()
-    let clientRegion: String = AppInfo.clientRegion() ?? ""
-    let clientVersion: String = AppInfo.appVersion() ?? ""
-    let propagationChannelID: String = AppInfo.propagationChannelId() ?? ""
-    let sponsorID: String = AppInfo.sponsorId() ?? ""
-    
-    
+
+    let clientPlatform : String
+    let clientRegion : String
+    let clientVersion : String
+    let propagationChannelId : String
+    let sponsorId : String
+
     private enum CodingKeys: String, CodingKey {
         case clientPlatform = "client_platform"
         case clientRegion = "client_region"
         case clientVersion = "client_version"
-        case propagationChannelID = "propagation_channel_id"
-        case sponsorID = "sponsor_id"
+        case propagationChannelId = "propagation_channel_id"
+        case sponsorId = "sponsor_id"
     }
-    
-    var jsonString: String {
+
+    init(_ appInfo : AppInfoProvider) {
+        self.clientPlatform = appInfo.clientPlatform
+        self.clientRegion = appInfo.clientRegion
+        self.clientVersion = appInfo.clientVersion
+        self.propagationChannelId = appInfo.propagationChannelId
+        self.sponsorId = appInfo.sponsorId
+    }
+
+    var jsonString: Either<ScopedError<ErrorRepr>, String> {
         do {
-            let jsonData = try JSONEncoder().encode(ClientMetaData())
+            let jsonData = try JSONEncoder().encode(self)
             if let jsonString = String(data: jsonData, encoding: .utf8) {
-                return jsonString
+                return .right(jsonString)
             }
+            return
+                .left(
+                    ScopedError(err:
+                        ErrorRepr(repr: "failed to encode ClientMetaData as utf8 string")))
         } catch {
-            PsiFeedbackLogger.error(withType: "Requests",
-                                    message: "failed to serialize client metadata",
-                                    object: error)
+            return
+                .left(
+                    ScopedError(err:
+                        ErrorRepr(repr: error.localizedDescription)))
         }
-        return ""
     }
     
 }
