@@ -28,6 +28,8 @@ typedef NS_ERROR_ENUM(RunningStdevErrorDomain, RunningStdevErrorCode) {
     RunningStdevErrorDoubleOverflow  = 2,
 };
 
+/// Facilitates calculating standard deviation using Welford's online algorithm
+/// https://en.wikipedia.org/wiki/Algorithms_for_calculating_variance#Welford's_online_algorithm
 @interface RunningStdev : NSObject <NSCopying, NSCoding, NSSecureCoding>
 
 @property (readonly, nonatomic, assign) int count;
