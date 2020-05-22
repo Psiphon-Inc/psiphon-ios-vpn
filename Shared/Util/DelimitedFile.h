@@ -31,7 +31,7 @@ typedef NS_ERROR_ENUM(DelimitedFileErrorDomain, DelimitedFileErrorCode) {
 };
 
 /// DelimitedFile facilitates reading an ASCII encoded file with newline delimiters line-by-line.
-@interface DelimitedFile : NSObject <NSStreamDelegate>
+@interface DelimitedFile : NSObject
 
 @property (readonly, strong, nonatomic) NSFileHandle *fileHandle;
 
@@ -56,7 +56,7 @@ typedef NS_ERROR_ENUM(DelimitedFileErrorDomain, DelimitedFileErrorCode) {
 /// Read a line from the file.
 /// @param outError If non-nill on return, then reading data failed with the provided error.
 /// @return Returns nil when all lines have been read or `outError` is non-nil.
-- (NSString*)readLineWithError:(NSError * _Nullable *)outError;
+- (NSString*_Nullable)readLineWithError:(NSError * _Nullable *)outError;
 
 @end
 

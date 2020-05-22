@@ -35,10 +35,10 @@ NS_ASSUME_NONNULL_BEGIN
  */
 
 /// ID of the last authorization obtained from the verifier server.
-- (NSString*)lastAuthID;
+- (NSString*_Nullable)lastAuthID;
 
 /// Access type of the last authorization obtained from the verifier server.
-- (NSString*)lastAuthAccessType;
+- (NSString*_Nullable)lastAuthAccessType;
 
 /// Set new auth ID. Should be called when a new authorization is obtained from the
 /// subscription verifier server.
@@ -54,11 +54,11 @@ NS_ASSUME_NONNULL_BEGIN
  */
 
 /// Time when the extension was last started.
-- (NSDate*)extensionStartTime;
+- (NSDate*_Nullable)extensionStartTime;
 - (void)setExtensionStartTimeToNow;
 
 /// Time when the ticker last fired in the extension.
-- (NSDate*)tickerTime;
+- (NSDate*_Nullable)tickerTime;
 - (void)setTickerTimeToNow;
 
 @end

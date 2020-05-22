@@ -84,7 +84,7 @@ typedef NS_ERROR_ENUM(ExtensionWriterRotatedFileErrorDomain, ExtensionWriterRota
 @interface ExtensionWriterRotatedFile : NSObject
 
 /// Initialize the writer.
-/// @param filepath Filepath where the file should be created or appened to if it already exists.
+/// @param filepath Filepath where the file should be created or appended to if it already exists.
 /// @param olderFilepath Filepath where the file should be rotated when it exceeds the configured max filesize.
 /// @param maxFileSizeBytes Configured max filesize.
 /// @param outError If non-nill on return, then initializing the writer failed with the provided error.
