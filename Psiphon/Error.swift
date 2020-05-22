@@ -109,7 +109,7 @@ protocol ErrorUserDescription where Self: Error {
 
 typealias CodableError = Codable & Error
 
-struct ScopedError<T: CodableError> : Error {
+struct ScopedError<T: Error> : Error {
     let err: T
     let file: String
     let line: UInt
@@ -121,7 +121,7 @@ struct ScopedError<T: CodableError> : Error {
     }
 }
 
-extension ScopedError : Codable {
+extension ScopedError : Codable where T: Codable {
     
     private enum CodingKeys: String, CodingKey {
         case err = "error"
