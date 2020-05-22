@@ -51,7 +51,7 @@ class NonEmptySeqTest: XCTestCase {
         // Test decoding
 
         do {
-Sequence
+
             let y: NonEmptySeq<String> = try JSONDecoder().decode(NonEmptySeq<String>.self, from: jsonData)
 
             XCTAssertEqual(x, y)
