@@ -151,15 +151,17 @@ struct HTTPClient {
     
     typealias RequestFunc = (
         @escaping () -> Date,
-        URLSessionConfiguration,
+        URLSession,
         URLRequest,
         @escaping (URLSessionResult) -> Void
         ) -> CancellableURLRequest
     
-    let config = URLSessionConfiguration.ephemeral
+    let session: URLSession
+    
     private let makeRequest: RequestFunc
 
-    init(_ makeRequest: @escaping RequestFunc) {
+    init(urlSession: URLSession, _ makeRequest: @escaping RequestFunc) {
+        self.session = urlSession
         self.makeRequest = makeRequest
     }
     
@@ -175,7 +177,7 @@ struct HTTPClient {
             )
         }
         
-        return self.makeRequest(getCurrentTime, self.config, requestData.urlRequest) { result in
+        return self.makeRequest(getCurrentTime, self.session, requestData.urlRequest) { result in
             handler(Response(urlSessionResult: result))
         }
         
@@ -185,29 +187,31 @@ struct HTTPClient {
 
 extension HTTPClient {
     
-    static let `default` = HTTPClient { (getCurrentTime, config, urlRequest, completionHandler)
-        -> CancellableURLRequest in
-        
-        let session = URLSession(configuration: config).dataTask(with: urlRequest)
-        { data, response, error in
-            let result: URLSessionResult
-            if let error = error {
-                // If URLSession task resulted in an error, there might be a partial response.
-                result = .failure(
-                    HTTPRequestError(
-                        partialResponse: response as? HTTPURLResponse,
-                        errorEvent: ErrorEvent(error as SystemError, date: getCurrentTime())
+    static func `default`(urlSession: URLSession) -> HTTPClient {
+        HTTPClient(urlSession: urlSession) { (getCurrentTime, session, urlRequest, completionHandler)
+            -> CancellableURLRequest in
+            
+            let session = session.dataTask(with: urlRequest)
+            { data, response, error in
+                let result: URLSessionResult
+                if let error = error {
+                    // If URLSession task resulted in an error, there might be a partial response.
+                    result = .failure(
+                        HTTPRequestError(
+                            partialResponse: response as? HTTPURLResponse,
+                            errorEvent: ErrorEvent(error as SystemError, date: getCurrentTime())
+                        )
                     )
-                )
-            } else {
-                // If `error` is nil, then URLSession task callback guarantees that
-                // `data` and `response` are non-nil.
-                result = .success((data: data!, response: response! as! HTTPURLResponse))
+                } else {
+                    // If `error` is nil, then URLSession task callback guarantees that
+                    // `data` and `response` are non-nil.
+                    result = .success((data: data!, response: response! as! HTTPURLResponse))
+                }
+                completionHandler(result)
             }
-            completionHandler(result)
+            session.resume()
+            return session
         }
-        session.resume()
-        return session
     }
     
 }
