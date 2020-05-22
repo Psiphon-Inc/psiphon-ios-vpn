@@ -19,14 +19,14 @@
 
 import XCTest
 
-class NonEmptyListTest: XCTestCase {
+class NonEmptySeqTest: XCTestCase {
 
     func testJSONEncoding() throws {
 
-        let x: NonEmptyList<String> = .cons("1",
-                                            .cons("2",
-                                                  .cons("3",
-                                                        .elem("4"))))
+        let x: NonEmptySeq<String> = .cons("1",
+                                           .cons("2",
+                                                 .cons("3",
+                                                       .elem("4"))))
 
         // Test encoding
 
@@ -51,8 +51,8 @@ class NonEmptyListTest: XCTestCase {
         // Test decoding
 
         do {
-
-            let y: NonEmptyList<String> =  try JSONDecoder().decode(NonEmptyList<String>.self, from: jsonData)
+Sequence
+            let y: NonEmptySeq<String> = try JSONDecoder().decode(NonEmptySeq<String>.self, from: jsonData)
 
             XCTAssertEqual(x, y)
 
