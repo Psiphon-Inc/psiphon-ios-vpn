@@ -46,7 +46,7 @@ typedef NS_ERROR_ENUM(DiskBackedFileErrorDomain, DiskBackedFileErrorCode) {
 /// @param filepath Path of the file that should be read from.
 /// @param outError If non-nill on return, then writing data failed with the provided error.
 /// @return Returns nil when `outError` is non-nil.
-+ (NSData *)fileDataAtPath:(NSString*)filepath error:(NSError * _Nullable *)outError;
++ (NSData *_Nullable)fileDataAtPath:(NSString*)filepath error:(NSError * _Nullable *)outError;
 
 /// Create file with given data.
 /// @param filepath Filepath to write to. If a file exists at this path, it will be overwritten.

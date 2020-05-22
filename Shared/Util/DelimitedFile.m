@@ -50,18 +50,10 @@ NSErrorDomain _Nonnull const DelimitedFileErrorDomain = @"DelimitedFileErrorDoma
 
 #pragma mark - Public methods
 
-- (instancetype)init {
-    self = [super init];
-    if (self) {
-        self->decodedBuffer = [[NSMutableString alloc] init];
-    }
-    return self;
-}
-
 - (instancetype)initWithFilepath:(NSString*)filepath
                        chunkSize:(NSUInteger)chunkSize
                            error:(NSError * _Nullable *)outError {
-    self = [self init];
+    self = [super init];
     if (self) {
         NSFileManager *fileManager = [NSFileManager defaultManager];
         if (![fileManager fileExistsAtPath:filepath]) {
@@ -80,6 +72,7 @@ NSErrorDomain _Nonnull const DelimitedFileErrorDomain = @"DelimitedFileErrorDoma
         self->chunkSize = chunkSize;
         self.bytesRead = 0;
         self.bytesReturned = 0;
+        self->decodedBuffer = [[NSMutableString alloc] init];
     }
     return self;
 }
