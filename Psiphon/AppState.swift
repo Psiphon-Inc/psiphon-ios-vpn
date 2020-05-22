@@ -118,6 +118,16 @@ func makeEnvironment(
     calendar: Calendar
 ) -> (environment: AppEnvironment, cleanup: () -> Void) {
     
+    let urlSessionConfig = URLSessionConfiguration.default
+    urlSessionConfig.timeoutIntervalForRequest = UrlRequestParameters.timeoutInterval
+    urlSessionConfig.requestCachePolicy = UrlRequestParameters.cachePolicy
+    if #available(iOS 11.0, *) {
+        // waitsForConnectivity determines whether the session should wait for connectivity
+        // to become available, or fail immediately.
+        urlSessionConfig.waitsForConnectivity = false
+    }
+    let urlSession = URLSession(configuration: urlSessionConfig)
+    
     let paymentTransactionDelegate = PaymentTransactionDelegate(store:
         store.projection(
             value: erase,
@@ -130,7 +140,7 @@ func makeEnvironment(
     let environment = AppEnvironment(
         appBundle: PsiphonBundle.from(bundle: Bundle.main),
         feedbackLogger: feedbackLogger,
-        httpClient: HTTPClient.default,
+        httpClient: HTTPClient.default(urlSession: urlSession),
         psiCashEffects: PsiCashEffect(psiCash: psiCashLib),
         clientMetaData: ClientMetaData(),
         sharedDB: sharedDB,
