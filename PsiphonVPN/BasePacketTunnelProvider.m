@@ -53,6 +53,8 @@ PsiFeedbackLogType const JetsamMetricsLogType = @"JetsamMetrics";
     // Pointer to startTunnelWithOptions completion handler.
     // NOTE: value is expected to be nil after completion handler has been called.
     void (^vpnStartCompletionHandler)(NSError *__nullable error);
+
+    dispatch_source_t tickerDispatch;
 }
 
 - (instancetype)init {
@@ -67,6 +69,12 @@ PsiFeedbackLogType const JetsamMetricsLogType = @"JetsamMetrics";
        _sharedDB = [[PsiphonDataSharedDB alloc] initForAppGroupIdentifier:APP_GROUP_IDENTIFIER];
     }
     return self;
+}
+
+- (void)dealloc {
+    if (self->tickerDispatch != NULL) {
+        dispatch_source_cancel(tickerDispatch);
+    }
 }
 
 /**
@@ -130,12 +138,23 @@ PsiFeedbackLogType const JetsamMetricsLogType = @"JetsamMetrics";
         [dataStore setExtensionStartTimeToNow];
 
         // Start timer which tracks extension uptime.
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [dataStore setTickerTimeToNow];
-            [NSTimer scheduledTimerWithTimeInterval:5 repeats:YES block:^(NSTimer * _Nonnull timer) {
+
+        self->tickerDispatch = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0,
+                                                      dispatch_get_main_queue());
+
+        if (self->tickerDispatch != NULL) {
+            // Start timer which fires every 5s with a leeway of 5s.
+            dispatch_source_set_timer(self->tickerDispatch,
+                                      dispatch_time(DISPATCH_TIME_NOW, 0),
+                                      5 * NSEC_PER_SEC,
+                                      5 * NSEC_PER_SEC);
+
+            dispatch_source_set_event_handler(self->tickerDispatch, ^{
                 [dataStore setTickerTimeToNow];
-            }];
-        });
+            });
+
+            dispatch_resume(self->tickerDispatch);
+        }
 
         // Creates boot test file used for testing if device is unlocked since boot.
         // A boot test file is a file with protection type NSFileProtectionCompleteUntilFirstUserAuthentication.
