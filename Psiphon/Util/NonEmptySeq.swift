@@ -19,13 +19,13 @@
 
 import Foundation
 
-enum NonEmptyList<T> {
+enum NonEmptySeq<T> {
     case elem(T)
-    indirect case cons(T, NonEmptyList<T>)
+    indirect case cons(T, NonEmptySeq<T>)
 }
 
-extension NonEmptyList {
-    mutating func append(x: T) -> NonEmptyList<T> {
+extension NonEmptySeq {
+    mutating func append(x: T) -> NonEmptySeq<T> {
         switch self {
         case .elem(let y):
             return .cons(y, .elem(x))
@@ -34,7 +34,7 @@ extension NonEmptyList {
         }
     }
 
-    mutating func prepend(x: T) -> NonEmptyList<T> {
+    mutating func prepend(x: T) -> NonEmptySeq<T> {
         switch self {
         case .elem(let y):
             return .cons(x, .elem(y))
@@ -44,12 +44,12 @@ extension NonEmptyList {
     }
 }
 
-enum NonEmptyListCodingError: Error {
+enum NonEmptySeqCodingError: Error {
     case coding(String)
     case decoding(String)
 }
 
-extension NonEmptyList: Equatable where T: Equatable {
+extension NonEmptySeq: Equatable where T: Equatable {
     static func == (lhs: Self, rhs: Self) -> Bool {
         switch (lhs, rhs) {
         case (.elem(let x), .elem(let y)):
@@ -64,7 +64,7 @@ extension NonEmptyList: Equatable where T: Equatable {
     }
 }
 
-extension NonEmptyList: Codable where T: Codable {
+extension NonEmptySeq: Codable where T: Codable {
 
     private enum CodingKeys: String, CodingKey {
         case elem = "elem"
@@ -73,9 +73,9 @@ extension NonEmptyList: Codable where T: Codable {
 
     private struct ConsTuple<T: Codable> : Codable {
         let elem : T
-        let cons : NonEmptyList<T>
+        let cons : NonEmptySeq<T>
 
-        init(elem: T, cons: NonEmptyList<T>) {
+        init(elem: T, cons: NonEmptySeq<T>) {
             self.elem = elem
             self.cons = cons
         }
@@ -106,7 +106,7 @@ extension NonEmptyList: Codable where T: Codable {
             self = .cons(value.elem, value.cons)
             return
         }
-        throw NonEmptyListCodingError.decoding("Failed to decode non-empty list from: \(dump(values))")
+        throw NonEmptySeqCodingError.decoding("Failed to decode non-empty list from: \(dump(values))")
     }
 
 }

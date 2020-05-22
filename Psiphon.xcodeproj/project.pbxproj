@@ -289,11 +289,11 @@
 		CE4E9BC21BBEECFC0060FF8B /* PsiphonVPN.entitlements in Resources */ = {isa = PBXBuildFile; fileRef = CE4E9BC11BBEECFC0060FF8B /* PsiphonVPN.entitlements */; };
 		CE6C3F6A24366AE1007A17F0 /* ClientMetadata.m in Sources */ = {isa = PBXBuildFile; fileRef = CE6C3F6924366AE1007A17F0 /* ClientMetadata.m */; };
 		CE7B76431F54881F00EA44BD /* PsiphonTunnel.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 66094F781E8067520069EC4E /* PsiphonTunnel.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		CEC8F8942478254200D273DF /* NonEmptyList.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEC8F8932478254200D273DF /* NonEmptyList.swift */; };
-		CEC8F8952478254200D273DF /* NonEmptyList.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEC8F8932478254200D273DF /* NonEmptyList.swift */; };
-		CEC8F897247825B700D273DF /* NonEmptyListTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEC8F896247825B700D273DF /* NonEmptyListTest.swift */; };
-		CEC8F8992478332300D273DF /* NonEmptyList+CustomStringFeedbackDescription.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEC8F8982478332300D273DF /* NonEmptyList+CustomStringFeedbackDescription.swift */; };
-		CEC8F89A2478332300D273DF /* NonEmptyList+CustomStringFeedbackDescription.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEC8F8982478332300D273DF /* NonEmptyList+CustomStringFeedbackDescription.swift */; };
+		CEC8F8942478254200D273DF /* NonEmptySeq.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEC8F8932478254200D273DF /* NonEmptySeq.swift */; };
+		CEC8F8952478254200D273DF /* NonEmptySeq.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEC8F8932478254200D273DF /* NonEmptySeq.swift */; };
+		CEC8F897247825B700D273DF /* NonEmptySeqTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEC8F896247825B700D273DF /* NonEmptySeqTest.swift */; };
+		CEC8F8992478332300D273DF /* NonEmptySeq+CustomStringFeedbackDescription.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEC8F8982478332300D273DF /* NonEmptySeq+CustomStringFeedbackDescription.swift */; };
+		CEC8F89A2478332300D273DF /* NonEmptySeq+CustomStringFeedbackDescription.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEC8F8982478332300D273DF /* NonEmptySeq+CustomStringFeedbackDescription.swift */; };
 		CEED78242476FA13002D9D55 /* SubscriptionState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D96601D2457DC6C0007718B /* SubscriptionState.swift */; };
 		CEED78252476FA76002D9D55 /* AppReceipt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D417EBA2417155000FEE587 /* AppReceipt.swift */; };
 		CEED78272476FA9D002D9D55 /* SubscriptionAuthState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D417EBC2417FF5B00FEE587 /* SubscriptionAuthState.swift */; };
@@ -774,9 +774,9 @@
 		CE50A25724699CD80047D3FE /* it */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = it; path = Strings/it.lproj/Localizable.strings; sourceTree = "<group>"; };
 		CE6C3F6824366AE1007A17F0 /* ClientMetadata.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ClientMetadata.h; sourceTree = "<group>"; };
 		CE6C3F6924366AE1007A17F0 /* ClientMetadata.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ClientMetadata.m; sourceTree = "<group>"; };
-		CEC8F8932478254200D273DF /* NonEmptyList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NonEmptyList.swift; sourceTree = "<group>"; };
-		CEC8F896247825B700D273DF /* NonEmptyListTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NonEmptyListTest.swift; sourceTree = "<group>"; };
-		CEC8F8982478332300D273DF /* NonEmptyList+CustomStringFeedbackDescription.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NonEmptyList+CustomStringFeedbackDescription.swift"; sourceTree = "<group>"; };
+		CEC8F8932478254200D273DF /* NonEmptySeq.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NonEmptySeq.swift; sourceTree = "<group>"; };
+		CEC8F896247825B700D273DF /* NonEmptySeqTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NonEmptySeqTest.swift; sourceTree = "<group>"; };
+		CEC8F8982478332300D273DF /* NonEmptySeq+CustomStringFeedbackDescription.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NonEmptySeq+CustomStringFeedbackDescription.swift"; sourceTree = "<group>"; };
 		CEED782C2476FD5F002D9D55 /* IAPValuePaths.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IAPValuePaths.swift; sourceTree = "<group>"; };
 		CEED7834247703DD002D9D55 /* AppReceiptReducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppReceiptReducer.swift; sourceTree = "<group>"; };
 		CEED783A247707F3002D9D55 /* PurchaseVerifier+PsiCash.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PurchaseVerifier+PsiCash.swift"; sourceTree = "<group>"; };
@@ -1091,9 +1091,9 @@
 				8DDA60282425BB4800DBA8EC /* DebugStrings.swift */,
 				8DE4E6D1244E97D000275362 /* Result+Codable.swift */,
 				8D7789BF247496520038BFDA /* RFC3339.swift */,
-				CEC8F8932478254200D273DF /* NonEmptyList.swift */,
-				CEC8F8982478332300D273DF /* NonEmptyList+CustomStringFeedbackDescription.swift */,
-				CEC8F896247825B700D273DF /* NonEmptyListTest.swift */,
+				CEC8F8932478254200D273DF /* NonEmptySeq.swift */,
+				CEC8F8982478332300D273DF /* NonEmptySeq+CustomStringFeedbackDescription.swift */,
+				CEC8F896247825B700D273DF /* NonEmptySeqTest.swift */,
 			);
 			path = Util;
 			sourceTree = "<group>";
@@ -1925,7 +1925,7 @@
 				8D45702324757B3700E1CC57 /* timestamp_format.c in Sources */,
 				CEED78302476FE04002D9D55 /* Promises+Additions.swift in Sources */,
 				CEED78272476FA9D002D9D55 /* SubscriptionAuthState.swift in Sources */,
-				CEC8F8952478254200D273DF /* NonEmptyList.swift in Sources */,
+				CEC8F8952478254200D273DF /* NonEmptySeq.swift in Sources */,
 				8D45702F24757B8600E1CC57 /* NativeInteger.c in Sources */,
 				8D7789A724748FC70038BFDA /* Foundation+Additions.swift in Sources */,
 				8D7789AF247490490038BFDA /* DebugFlags.swift in Sources */,
@@ -1946,7 +1946,7 @@
 				CEED78332477039C002D9D55 /* PurchaseVerifier+Subscription.swift in Sources */,
 				CE4903A924784F27004AEBAF /* FeedbackLogging.swift in Sources */,
 				8D45704024757B8600E1CC57 /* constraints.c in Sources */,
-				CEC8F89A2478332300D273DF /* NonEmptyList+CustomStringFeedbackDescription.swift in Sources */,
+				CEC8F89A2478332300D273DF /* NonEmptySeq+CustomStringFeedbackDescription.swift in Sources */,
 				CEED78252476FA76002D9D55 /* AppReceipt.swift in Sources */,
 				8D7789B6247490F50038BFDA /* Receipt.swift in Sources */,
 				8D45702824757B8600E1CC57 /* constr_TYPE.c in Sources */,
@@ -1991,7 +1991,7 @@
 				8D7789AC247490120038BFDA /* Authorization.swift in Sources */,
 				8D45703D24757B8600E1CC57 /* SignedData.c in Sources */,
 				8D45703F24757B8600E1CC57 /* asn_codecs_prim.c in Sources */,
-				CEC8F897247825B700D273DF /* NonEmptyListTest.swift in Sources */,
+				CEC8F897247825B700D273DF /* NonEmptySeqTest.swift in Sources */,
 				8D45704424757BD400E1CC57 /* PsiFeedbackLogger.m in Sources */,
 				8D7789B4247490CD0038BFDA /* InternetReachability.swift in Sources */,
 				8D7789C8247498560038BFDA /* FeedbackDescription.swift in Sources */,
@@ -2016,7 +2016,7 @@
 				52B3C54E23E22454003F6B12 /* FeedbackLogging.swift in Sources */,
 				EF90D7A4204F22C900228A63 /* timestamp_format.c in Sources */,
 				52B3C54323DA31E1003F6B12 /* PurchaseVerifier+Subscription.swift in Sources */,
-				CEC8F8942478254200D273DF /* NonEmptyList.swift in Sources */,
+				CEC8F8942478254200D273DF /* NonEmptySeq.swift in Sources */,
 				F132D7E01F5739A800AF7F91 /* LaunchScreenViewController.m in Sources */,
 				445F24E920E1A5BA00D004E9 /* ber_tlv_length.c in Sources */,
 				CEED7835247703DD002D9D55 /* AppReceiptReducer.swift in Sources */,
@@ -2024,7 +2024,7 @@
 				4E0DCB1A1F28481E00495781 /* PsiphonDataSharedDB.m in Sources */,
 				4435CC271F70566000F3A809 /* SettingsViewController.m in Sources */,
 				8D417EB72415633300FEE587 /* IAPReducer.swift in Sources */,
-				CEC8F8992478332300D273DF /* NonEmptyList+CustomStringFeedbackDescription.swift in Sources */,
+				CEC8F8992478332300D273DF /* NonEmptySeq+CustomStringFeedbackDescription.swift in Sources */,
 				8D7789D02474D53D0038BFDA /* PsiphonRotatingFileFeedbackLogger.swift in Sources */,
 				EF4F1F3D206055F7006A40A1 /* RACSignal+Operations2.m in Sources */,
 				CE4903A724784156004AEBAF /* PurchaseVerifier.swift in Sources */,

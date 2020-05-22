@@ -131,4 +131,4 @@ extension ScopedError : Codable {
 
 }
 
-typealias NestedScopedError<T : CodableError> = NonEmptyList<ScopedError<T>>
+typealias NestedScopedError<T : CodableError> = NonEmptySeq<ScopedError<T>>

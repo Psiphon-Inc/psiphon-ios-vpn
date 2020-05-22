@@ -19,11 +19,11 @@
 
 import Foundation
 
-extension NonEmptyList : FeedbackDescription {}
+extension NonEmptySeq : FeedbackDescription {}
 
-extension NonEmptyList : CustomStringConvertible where T: CustomStringConvertible {}
+extension NonEmptySeq : CustomStringConvertible where T: CustomStringConvertible {}
 
-extension NonEmptyList : CustomFieldFeedbackDescription where T: CustomStringConvertible {
+extension NonEmptySeq : CustomFieldFeedbackDescription where T: CustomStringConvertible {
     var feedbackFields: [String : CustomStringConvertible] {
         var fields : [String : CustomStringConvertible] = [:]
         switch self {
