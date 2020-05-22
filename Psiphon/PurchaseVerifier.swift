@@ -18,48 +18,35 @@
  */
 
 import Foundation
-import Promises
-import ReactiveSwift
 
-struct PurchaseVerifierServerEndpoints {
+/// Each server endpoint should be defined as an extension
+/// in a separate file (e.g. PurchaseVerfier+PsiCash.swift)
+struct PurchaseVerifierServer {
 
-    private enum EndpointURL {
-        case subscription
-        case psiCash
+    static func req<T: Encodable, R>(
+        url: URL,
+        requestBody: T,
+        clientMetaData: ClientMetaData
+    ) -> (error: NestedScopedError<ErrorRepr>?,
+          request: HTTPRequest<R>) {
 
-        var url: URL {
-            switch self {
-            case .subscription:
-                if Debugging.devServers {
-                    return PurchaseVerifierURLs.devSubscriptionVerify
-                } else {
-                    return PurchaseVerifierURLs.subscriptionVerify
-                }
-            case .psiCash:
-                if Debugging.devServers {
-                    return PurchaseVerifierURLs.devPsiCashVerify
-                } else {
-                    return PurchaseVerifierURLs.psiCashVerify
-                }
-            }
+        var clientMetadataJSON : String = ""
+        var clientMetadataError : NestedScopedError<ErrorRepr>? = .none
+
+        switch clientMetaData.jsonString {
+        case .left(let error):
+            clientMetadataError =
+                .some(.cons(ScopedError.init(err: ErrorRepr(repr: "client metadata error")),
+                            .elem(error)))
+        case .right(let jsonString):
+            clientMetadataJSON = jsonString
         }
-    }
-    
-    static func subscription(
-        requestBody: SubscriptionValidationRequest,
-        clientMetaData: ClientMetaData
-    ) -> HTTPRequest<SubscriptionValidationResponse> {
-        return HTTPRequest.json(url: EndpointURL.subscription.url, body: requestBody,
-                                clientMetaData: clientMetaData.jsonString,
-                                method: .post, response: SubscriptionValidationResponse.self)
+
+        let req = HTTPRequest.json(url: url, body: requestBody,
+                                clientMetaData: clientMetadataJSON,
+                                method: .post, response: R.self)
+
+        return (error: clientMetadataError, request: req)
     }
 
-    static func psiCash(
-        requestBody: PsiCashValidationRequest,
-        clientMetaData: ClientMetaData
-    ) -> HTTPRequest<PsiCashValidationResponse> {
-        return HTTPRequest.json(url: EndpointURL.psiCash.url, body: requestBody,
-                                clientMetaData: clientMetaData.jsonString,
-                                method: .post, response: PsiCashValidationResponse.self)
-    }
 }

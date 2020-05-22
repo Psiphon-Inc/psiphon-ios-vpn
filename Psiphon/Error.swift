@@ -106,3 +106,29 @@ protocol ErrorUserDescription where Self: Error {
     var userDescription: String { get }
     
 }
+
+typealias CodableError = Codable & Error
+
+struct ScopedError<T: CodableError> : Error {
+    let err: T
+    let file: String
+    let line: UInt
+
+    init(err: T, file: String = #file, line: UInt = #line) {
+        self.err = err
+        self.file = file
+        self.line = line
+    }
+}
+
+extension ScopedError : Codable {
+    
+    private enum CodingKeys: String, CodingKey {
+        case err = "error"
+        case file = "file"
+        case line = "line"
+    }
+
+}
+
+typealias NestedScopedError<T : CodableError> = NonEmptyList<ScopedError<T>>

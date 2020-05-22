@@ -19,7 +19,6 @@
 
 import XCTest
 import ReactiveSwift
-import NetworkExtension
 
 final class MockCancellableURLRequest: CancellableURLRequest {
     func cancel() {}

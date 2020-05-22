@@ -92,6 +92,7 @@ typealias SubscriptionAuthStateReducerEnvironment = (
     feedbackLogger: FeedbackLogger,
     httpClient: HTTPClient,
     notifier: Notifier,
+    notifierUpdatedSubscriptionAuthsMessage: String,
     sharedDB: PsiphonDataSharedDB,
     tunnelStatusSignal: SignalProducer<TunnelProviderVPNStatus, Never>,
     tunnelConnectionRefSignal: SignalProducer<TunnelConnection?, Never>,
@@ -291,19 +292,30 @@ func subscriptionAuthStateReducer(
         guard inserted else {
             return []
         }
-        
+
         // Creates retriable authorization request.
-        let authRequest = RetriableTunneledHttpRequest(
-            request: PurchaseVerifierServerEndpoints.subscription(
-                requestBody: SubscriptionValidationRequest(
-                    originalTransactionID: purchaseWithLatestExpiry.purchase.originalTransactionID,
-                    receipt: receiptData
-                ),
-                clientMetaData: environment.clientMetaData
-            )
+
+        let req = PurchaseVerifierServer.subscription(
+         requestBody: SubscriptionValidationRequest(
+             originalTransactionID: purchaseWithLatestExpiry.purchase.originalTransactionID,
+             receipt: receiptData
+         ),
+         clientMetaData: environment.clientMetaData
         )
+
+        let authRequest = RetriableTunneledHttpRequest(
+            request: req.request
+        )
+
+        var effects = [Effect<SubscriptionAuthStateAction>]()
+
+        if let error = req.error {
+            effects += [environment.feedbackLogger.log(.error,
+                                                       tag: "SubscriptionAuthStateReducer.requestAuthorizationForPurchases",
+                                                       error).mapNever()]
+        }
         
-        return [
+        return effects + [
             authRequest.callAsFunction(
                 getCurrentTime: environment.getCurrentTime,
                 tunnelStatusSignal: environment.tunnelStatusSignal,
@@ -320,7 +332,6 @@ func subscriptionAuthStateReducer(
                 \(purchaseWithLatestExpiry.purchase.originalTransactionID)
                 """).mapNever()
         ]
-        
         
     case let ._authorizationRequestResult(result: requestResult, forPurchase: purchase):
         guard
@@ -635,7 +646,7 @@ extension SubscriptionAuthState {
                 sharedDB: environment.sharedDB, value: newValue
             ).then(
                 .fireAndForget {
-                    environment.notifier.post(NotifierUpdatedSubscriptionAuths)
+					environment.notifier.post(environment.notifierUpdatedSubscriptionAuthsMessage)
                 }
             )
     }

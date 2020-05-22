@@ -161,18 +161,29 @@ func iapReducer(
         )
                
         // Creates request to verify PsiCash AppStore IAP purchase.
-        let psiCashVerifyRequest = RetriableTunneledHttpRequest(
-            request: PurchaseVerifierServerEndpoints.psiCash(
-                requestBody: PsiCashValidationRequest(
-                    transaction: unverifiedPsiCashTx.transaction,
-                    receipt: receiptData,
-                    customData: customData
-                ),
-                clientMetaData: environment.clientMetaData
-            )
+
+        let req = PurchaseVerifierServer.psiCash(
+            requestBody: PsiCashValidationRequest(
+                transaction: unverifiedPsiCashTx.transaction,
+                receipt: receiptData,
+                customData: customData
+            ),
+            clientMetaData: environment.clientMetaData
         )
+
+        let psiCashVerifyRequest = RetriableTunneledHttpRequest(
+            request: req.request
+        )
+
+        var effects = [Effect<IAPAction>]()
+
+        if let error = req.error {
+            effects += [environment.feedbackLogger.log(.error,
+                                                       tag: "IAPReducer.receiptUpdated",
+                                                       error).mapNever()]
+        }
         
-        return [
+        return effects + [
             psiCashVerifyRequest.callAsFunction(
                 getCurrentTime: environment.getCurrentTime,
                 tunnelStatusSignal: environment.tunnelStatusSignal,

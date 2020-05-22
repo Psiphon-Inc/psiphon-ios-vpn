@@ -253,29 +253,3 @@ extension AppState {
         )
     }
 }
-
-// MARK: IAPState.swift
-
-extension IAPPaymentType {
-    
-    var paymentObject: SKPayment {
-        switch self {
-        case .psiCash(let value):
-            return value
-        case .subscription(let value, _):
-            return value
-        }
-    }
-    
-}
-
-// MARK: IAPState.swift
-
-extension IAPPurchasableProduct {
-    var appStoreProduct: AppStoreProduct {
-        switch self {
-        case let .psiCash(product: product): return product
-        case let .subscription(product: product, promise: _): return product
-        }
-    }
-}

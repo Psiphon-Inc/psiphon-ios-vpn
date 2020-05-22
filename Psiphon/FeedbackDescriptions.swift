@@ -82,8 +82,6 @@ extension UserDefaultsConfig: CustomFieldFeedbackDescription {
     
 }
 
-extension RetriableTunneledHttpRequest.RequestResult.RetryCondition: FeedbackDescription {}
-
 extension PsiphonDataSharedDB: CustomFieldFeedbackDescription {
     
     private func getNonSecretNonSubscriptionEncodedAuthorizations() -> String {
