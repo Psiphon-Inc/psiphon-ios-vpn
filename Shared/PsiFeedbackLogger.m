@@ -389,8 +389,7 @@ PsiFeedbackLogType const FeedbackInternalLogType = @"FeedbackLoggerInternal";
 
     [writeLock lock];
 
-    BOOL success = FALSE;
-    for (int i = 0; i < MAX_RETRIES && !success; i++) {
+    for (int i = 0; i < MAX_RETRIES; i++) {
         // Add newline delimiter
         NSMutableData *data = [NSMutableData dataWithData:output];
         [data appendData:[@"\n" dataUsingEncoding:NSUTF8StringEncoding]];
@@ -399,7 +398,9 @@ PsiFeedbackLogType const FeedbackInternalLogType = @"FeedbackLoggerInternal";
         [self->rotatedFile writeData:data error:&err];
         if (err != nil) {
             LOG_ERROR_NO_NOTICE(@"Failed to write data: %@", err);
+            continue;
         }
+        break;
     }
 
     [writeLock unlock];
