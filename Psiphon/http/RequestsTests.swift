@@ -51,7 +51,7 @@ final class EchoHTTPClient {
     
     init() {}
     
-    lazy var client = HTTPClient { _, _, request, completionHandler -> CancellableURLRequest in
+    lazy var client = HTTPClient(urlSession: URLSession()) { _, _, request, completionHandler -> CancellableURLRequest in
         
         guard let httpBody = request.httpBody else {
             XCTFatal()
