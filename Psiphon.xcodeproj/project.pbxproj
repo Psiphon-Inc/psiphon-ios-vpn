@@ -212,6 +212,7 @@
 		8D90A984247633D200FC86F0 /* TestUtilTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D90A983247633D200FC86F0 /* TestUtilTests.swift */; };
 		8D938DD7244D43550009DE39 /* Receipt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D938DD6244D43550009DE39 /* Receipt.swift */; };
 		8D96601E2457DC6C0007718B /* SubscriptionState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D96601D2457DC6C0007718B /* SubscriptionState.swift */; };
+		8D9D9B87247C1FBF0093220E /* RFC3339Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D9D9B86247C1FBF0093220E /* RFC3339Tests.swift */; };
 		8D9E602A24364ED2003A46D8 /* VPNStateReducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D9E602924364ED2003A46D8 /* VPNStateReducer.swift */; };
 		8D9E602C24364EE6003A46D8 /* TunnelProviderManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D9E602B24364EE6003A46D8 /* TunnelProviderManager.swift */; };
 		8D9E602F24366AE7003A46D8 /* SerialEffect.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D9E602D24364FB6003A46D8 /* SerialEffect.swift */; };
@@ -651,6 +652,7 @@
 		8D90A983247633D200FC86F0 /* TestUtilTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestUtilTests.swift; sourceTree = "<group>"; };
 		8D938DD6244D43550009DE39 /* Receipt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Receipt.swift; sourceTree = "<group>"; };
 		8D96601D2457DC6C0007718B /* SubscriptionState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionState.swift; sourceTree = "<group>"; };
+		8D9D9B86247C1FBF0093220E /* RFC3339Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RFC3339Tests.swift; sourceTree = "<group>"; };
 		8D9E602924364ED2003A46D8 /* VPNStateReducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VPNStateReducer.swift; sourceTree = "<group>"; };
 		8D9E602B24364EE6003A46D8 /* TunnelProviderManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TunnelProviderManager.swift; sourceTree = "<group>"; };
 		8D9E602D24364FB6003A46D8 /* SerialEffect.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SerialEffect.swift; sourceTree = "<group>"; };
@@ -1094,6 +1096,7 @@
 				CEC8F8932478254200D273DF /* NonEmptySeq.swift */,
 				CEC8F8982478332300D273DF /* NonEmptySeq+CustomStringFeedbackDescription.swift */,
 				CEC8F896247825B700D273DF /* NonEmptySeqTest.swift */,
+				8D9D9B86247C1FBF0093220E /* RFC3339Tests.swift */,
 			);
 			path = Util;
 			sourceTree = "<group>";
@@ -1932,6 +1935,7 @@
 				8D7789A524748FA80038BFDA /* Effect.swift in Sources */,
 				8D7789BE247493300038BFDA /* VPNState.swift in Sources */,
 				8D45702A24757B8600E1CC57 /* per_support.c in Sources */,
+				8D9D9B87247C1FBF0093220E /* RFC3339Tests.swift in Sources */,
 				8D45701F2475795900E1CC57 /* HTTPStatusCode.swift in Sources */,
 				CEED78242476FA13002D9D55 /* SubscriptionState.swift in Sources */,
 				CEED784724774B80002D9D55 /* AuthorizationState+Codable.swift in Sources */,
