@@ -25,7 +25,7 @@ enum IAPAction {
     case checkUnverifiedTransaction
     case purchase(IAPPurchasableProduct)
     case purchaseAdded(PurchaseAddedResult)
-    case _psiCashConsumableAuthorizationRequestResult(
+    case _psiCashConsumableVerificationRequestResult(
         result: RetriableTunneledHttpRequest<PsiCashValidationResponse>.RequestResult,
         forTransaction: PaymentTransaction
     )
@@ -190,7 +190,7 @@ func iapReducer(
                 tunnelConnectionRefSignal: environment.tunnelConnectionRefSignal,
                 httpClient: environment.httpClient
             ).map {
-                ._psiCashConsumableAuthorizationRequestResult(
+                ._psiCashConsumableVerificationRequestResult(
                     result: $0,
                     forTransaction: unverifiedPsiCashTx.transaction
                 )
@@ -206,7 +206,7 @@ func iapReducer(
                 """).mapNever()
         ]
         
-    case let ._psiCashConsumableAuthorizationRequestResult(requestResult, requestTransaction):
+    case let ._psiCashConsumableVerificationRequestResult(requestResult, requestTransaction):
         guard let unverifiedPsiCashTx = state.iap.unverifiedPsiCashTx else {
             environment.feedbackLogger.fatalError("expected non-nil 'unverifiedPsiCashTx'")
         }
