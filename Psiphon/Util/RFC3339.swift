@@ -100,11 +100,15 @@ extension JSONDecoder {
 
 extension JSONEncoder {
     
-    static func makeRfc3339Encoder() -> JSONEncoder {
+    static func makeRfc3339Encoder(
+        precision: Date.SecondsFractionPrecision = .three,
+        timezoneOffset: Int16 = 0
+    ) -> JSONEncoder {
         let encoder = JSONEncoder()
         encoder.dateEncodingStrategy = .custom { date, dateEncoder in
-            
-            guard let formattedDate = date.formatRFC3339() else {
+            let maybeFormattedData = date.formatRFC3339(secondsFractionPrecision: precision,
+                                                        timezoneOffsetUTCMinutes: timezoneOffset)
+            guard let formattedDate = maybeFormattedData else {
                 throw EncodingError.invalidValue(
                     date,
                     EncodingError.Context(
