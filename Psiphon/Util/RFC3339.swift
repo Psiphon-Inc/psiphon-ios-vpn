@@ -21,7 +21,7 @@ import Foundation
 
 extension Date {
     
-    enum MilliSecondPrecision: Int32 {
+    enum SecondsFractionPrecision: Int32 {
         case zero = 0
         case three = 3
         case six = 6
@@ -45,23 +45,27 @@ extension Date {
     }
     
     func formatRFC3339(
-        milliSecondPrecision: MilliSecondPrecision = .three,
+        secondsFractionPrecision: SecondsFractionPrecision = .three,
         timezoneOffsetUTCMinutes: Int16 = Int16(0)
     ) -> String? {
-        let timeInterval = self.timeIntervalSince1970
+        // TimeInterval cannot represent unix time
+        // with an accuracy of higher than 7 decimal places.
+        let unixTime = self.timeIntervalSince1970
+
+        let (sec_integral, sec_fraction) = modf(unixTime)
         
-        var sec_integral = Double()
-        let sec_fraction = modf(timeInterval, &sec_integral)
-        
-        let nsec = sec_fraction * pow(10, 9)
+        // Converts sec_fraction to an integral nanoseconds value without loss in precision.
+        let precision = secondsFractionPrecision.rawValue
+        let sec_fraction_integer = (sec_fraction * 1_000_000).rounded()
+        let nsec = sec_fraction_integer * 1_000
         
         var ts = timestamp_t(sec: Int64(sec_integral),
                              nsec: Int32(nsec),
                              offset: timezoneOffsetUTCMinutes)
         
         var buf = Array<Int8>(repeating: 0, count: 40)
-        let length = timestamp_format_precision(&buf, buf.count, &ts, milliSecondPrecision.rawValue)
-        
+        let length = timestamp_format_precision(&buf, buf.count, &ts, precision)
+                
         guard length > 0 else {
             return nil
         }
