@@ -116,6 +116,8 @@
 		668AF9C01E92CBE0008CAAAA /* NetworkExtension.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 668AF9BE1E92CBD3008CAAAA /* NetworkExtension.framework */; };
 		8D00AA482450B4AB001EB8DD /* PsiCashPurchaseVerification.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D00AA472450B4AB001EB8DD /* PsiCashPurchaseVerification.swift */; };
 		8D00AA4A2450B4D1001EB8DD /* SubscriptionPurchaseVerification.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D00AA492450B4D1001EB8DD /* SubscriptionPurchaseVerification.swift */; };
+		8D1F62BA247DBB0D0028AFAF /* Utilities in Frameworks */ = {isa = PBXBuildFile; productRef = 8D1F62B9247DBB0D0028AFAF /* Utilities */; };
+		8D1F62BC247DBB130028AFAF /* PsiApi in Frameworks */ = {isa = PBXBuildFile; productRef = 8D1F62BB247DBB130028AFAF /* PsiApi */; };
 		8D255E2D24620E2900FD5D1C /* NoConnectionBannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D255E2C24620E2900FD5D1C /* NoConnectionBannerView.swift */; };
 		8D417E992411954A00FEE587 /* PsiCashReducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D417E982411954A00FEE587 /* PsiCashReducer.swift */; };
 		8D417E9D2411A0C200FEE587 /* PaymentQueue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D417E9C2411A0C200FEE587 /* PaymentQueue.swift */; };
@@ -128,8 +130,6 @@
 		8D417EBD2417FF5C00FEE587 /* SubscriptionAuthState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D417EBC2417FF5B00FEE587 /* SubscriptionAuthState.swift */; };
 		8D417ED9241844FA00FEE587 /* FloatingPoint+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D417ED8241844FA00FEE587 /* FloatingPoint+Additions.swift */; };
 		8D417EDD2419DBA100FEE587 /* ProductRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D417EDC2419DBA100FEE587 /* ProductRequest.swift */; };
-		8D497A21247CE97E009CEBA8 /* Promises in Frameworks */ = {isa = PBXBuildFile; productRef = 8D497A20247CE97E009CEBA8 /* Promises */; };
-		8D497A23247CE985009CEBA8 /* FBLPromises in Frameworks */ = {isa = PBXBuildFile; productRef = 8D497A22247CE985009CEBA8 /* FBLPromises */; };
 		8D497A28247CEF50009CEBA8 /* GoogleAppMeasurement.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8D497A24247CEF4F009CEBA8 /* GoogleAppMeasurement.framework */; };
 		8D497A2A247CEF50009CEBA8 /* GoogleMobileAds.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8D497A25247CEF4F009CEBA8 /* GoogleMobileAds.framework */; };
 		8D497A2C247CEF50009CEBA8 /* GoogleUtilities.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8D497A26247CEF4F009CEBA8 /* GoogleUtilities.xcframework */; };
@@ -152,10 +152,7 @@
 		8DB6C6362429080C005E2F4C /* PsiCashMessageWithRetryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DB6C6352429080C005E2F4C /* PsiCashMessageWithRetryView.swift */; };
 		8DB6C638242A4D06005E2F4C /* DuskButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DB6C637242A4D06005E2F4C /* DuskButton.swift */; };
 		8DCA6864247C7CF8001D026E /* Bindable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DCA6863247C7CF8001D026E /* Bindable.swift */; };
-		8DCA6872247CCB74001D026E /* PsiApi in Frameworks */ = {isa = PBXBuildFile; productRef = 8DCA6871247CCB74001D026E /* PsiApi */; };
 		8DCA6876247CD0EB001D026E /* RFC3339.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DCA6875247CD0EB001D026E /* RFC3339.swift */; };
-		8DCA687A247CD767001D026E /* Utilities in Frameworks */ = {isa = PBXBuildFile; productRef = 8DCA6879247CD767001D026E /* Utilities */; };
-		8DCA687D247CE3E7001D026E /* ReactiveSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 8DCA687C247CE3E7001D026E /* ReactiveSwift */; };
 		8DD6E7E524591E270041DAC5 /* SubscriptionAuthCheck.m in Sources */ = {isa = PBXBuildFile; fileRef = 8DD6E7E424591E270041DAC5 /* SubscriptionAuthCheck.m */; };
 		8DD6E7E82459C83B0041DAC5 /* StoredAuthorizations.m in Sources */ = {isa = PBXBuildFile; fileRef = 8DD6E7E72459C83B0041DAC5 /* StoredAuthorizations.m */; };
 		8DDA60292425BB4800DBA8EC /* DebugStrings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DDA60282425BB4800DBA8EC /* DebugStrings.swift */; };
@@ -553,6 +550,9 @@
 		8D497A26247CEF4F009CEBA8 /* GoogleUtilities.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = GoogleUtilities.xcframework; sourceTree = "<group>"; };
 		8D497A27247CEF4F009CEBA8 /* nanopb.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = nanopb.xcframework; sourceTree = "<group>"; };
 		8D5D8494247CE6420018A35B /* libPromisesObjC.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = libPromisesObjC.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		8D5F08A5247DB21700F51A42 /* Testing */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Testing; sourceTree = SOURCE_ROOT; };
+		8D5F08A6247DB23A00F51A42 /* Utilities */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Utilities; sourceTree = SOURCE_ROOT; };
+		8D5F08A7247DB24C00F51A42 /* PsiApi */ = {isa = PBXFileReference; lastKnownFileType = folder; path = PsiApi; sourceTree = SOURCE_ROOT; };
 		8D7789B8247491CA0038BFDA /* PsiphonBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PsiphonBundle.swift; sourceTree = "<group>"; };
 		8D7789BC247493300038BFDA /* VPNState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VPNState.swift; sourceTree = "<group>"; };
 		8D7789C2247496C00038BFDA /* ClientMetadata.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClientMetadata.swift; sourceTree = "<group>"; };
@@ -771,17 +771,14 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				8DCA6872247CCB74001D026E /* PsiApi in Frameworks */,
-				8D497A23247CE985009CEBA8 /* FBLPromises in Frameworks */,
 				8D497A2A247CEF50009CEBA8 /* GoogleMobileAds.framework in Frameworks */,
 				8D497A2E247CEF50009CEBA8 /* nanopb.xcframework in Frameworks */,
 				8D497A28247CEF50009CEBA8 /* GoogleAppMeasurement.framework in Frameworks */,
+				8D1F62BC247DBB130028AFAF /* PsiApi in Frameworks */,
 				8D497A2C247CEF50009CEBA8 /* GoogleUtilities.xcframework in Frameworks */,
-				8DCA687D247CE3E7001D026E /* ReactiveSwift in Frameworks */,
-				8D497A21247CE97E009CEBA8 /* Promises in Frameworks */,
 				668AF9C01E92CBE0008CAAAA /* NetworkExtension.framework in Frameworks */,
+				8D1F62BA247DBB0D0028AFAF /* Utilities in Frameworks */,
 				440D75BE1F59E041005C603B /* StoreKit.framework in Frameworks */,
-				8DCA687A247CD767001D026E /* Utilities in Frameworks */,
 				474C2778BC8FAFDB749E5DC3 /* libPods-Psiphon.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1197,6 +1194,9 @@
 		CE26FC811BBDC7B700B83375 = {
 			isa = PBXGroup;
 			children = (
+				8D5F08A7247DB24C00F51A42 /* PsiApi */,
+				8D5F08A6247DB23A00F51A42 /* Utilities */,
+				8D5F08A5247DB21700F51A42 /* Testing */,
 				4E30745D2097921B00B6D2A3 /* PsiCashLib.framework */,
 				66094F781E8067520069EC4E /* PsiphonTunnel.framework */,
 				4E0DCB101F28458100495781 /* Shared */,
@@ -1502,11 +1502,8 @@
 			);
 			name = Psiphon;
 			packageProductDependencies = (
-				8DCA6871247CCB74001D026E /* PsiApi */,
-				8DCA6879247CD767001D026E /* Utilities */,
-				8DCA687C247CE3E7001D026E /* ReactiveSwift */,
-				8D497A20247CE97E009CEBA8 /* Promises */,
-				8D497A22247CE985009CEBA8 /* FBLPromises */,
+				8D1F62B9247DBB0D0028AFAF /* Utilities */,
+				8D1F62BB247DBB130028AFAF /* PsiApi */,
 			);
 			productName = Psiphon;
 			productReference = CE26FC8A1BBDC7B800B83375 /* Psiphon.app */;
@@ -1628,8 +1625,6 @@
 			);
 			mainGroup = CE26FC811BBDC7B700B83375;
 			packageReferences = (
-				8DCA687B247CE3E7001D026E /* XCRemoteSwiftPackageReference "ReactiveSwift" */,
-				8DCA687E247CE403001D026E /* XCRemoteSwiftPackageReference "promises" */,
 			);
 			productRefGroup = CE26FC8B1BBDC7B800B83375 /* Products */;
 			projectDirPath = "";
@@ -2421,48 +2416,14 @@
 		};
 /* End XCConfigurationList section */
 
-/* Begin XCRemoteSwiftPackageReference section */
-		8DCA687B247CE3E7001D026E /* XCRemoteSwiftPackageReference "ReactiveSwift" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/ReactiveCocoa/ReactiveSwift.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 6.3.0;
-			};
-		};
-		8DCA687E247CE403001D026E /* XCRemoteSwiftPackageReference "promises" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/google/promises";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 1.2.8;
-			};
-		};
-/* End XCRemoteSwiftPackageReference section */
-
 /* Begin XCSwiftPackageProductDependency section */
-		8D497A20247CE97E009CEBA8 /* Promises */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 8DCA687E247CE403001D026E /* XCRemoteSwiftPackageReference "promises" */;
-			productName = Promises;
-		};
-		8D497A22247CE985009CEBA8 /* FBLPromises */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 8DCA687E247CE403001D026E /* XCRemoteSwiftPackageReference "promises" */;
-			productName = FBLPromises;
-		};
-		8DCA6871247CCB74001D026E /* PsiApi */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = PsiApi;
-		};
-		8DCA6879247CD767001D026E /* Utilities */ = {
+		8D1F62B9247DBB0D0028AFAF /* Utilities */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = Utilities;
 		};
-		8DCA687C247CE3E7001D026E /* ReactiveSwift */ = {
+		8D1F62BB247DBB130028AFAF /* PsiApi */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 8DCA687B247CE3E7001D026E /* XCRemoteSwiftPackageReference "ReactiveSwift" */;
-			productName = ReactiveSwift;
+			productName = PsiApi;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
