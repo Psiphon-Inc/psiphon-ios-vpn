@@ -18,6 +18,8 @@
 */
 
 import Foundation
+import PsiApi
+import Utilities
 
 extension ReachabilityStatus {
     
@@ -37,11 +39,11 @@ extension ReachabilityStatus {
 
 extension Reachability: InternetReachability {
     
-    func currentStatus() -> ReachabilityStatus {
+    public func currentStatus() -> ReachabilityStatus {
         ReachabilityStatus(objcNetworkStatus: self.currentReachabilityStatus())
     }
     
-    func currentReachabilityFlags() -> ReachabilityCodedStatus {
+    public func currentReachabilityFlags() -> ReachabilityCodedStatus {
         ReachabilityCodedStatus(stringLiteral: self.currentReachabilityFlagsToString())
     }
     
@@ -51,7 +53,7 @@ final class InternetReachabilityDelegate: StoreDelegate<ReachabilityAction> {
     
     private let reachability: Reachability
     
-    init(reachability: Reachability, store: Store<Unit, ReachabilityAction>) {
+    init(reachability: Reachability, store: Store<Utilities.Unit, ReachabilityAction>) {
         self.reachability = reachability
         super.init(store: store)
         

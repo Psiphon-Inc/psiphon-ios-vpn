@@ -19,6 +19,7 @@
 
 import Foundation
 import ReactiveSwift
+import PsiApi
 
 enum SubscriptionStatus: Equatable {
     case subscribed(SubscriptionIAPPurchase)

@@ -19,6 +19,8 @@
 
 import Foundation
 import Promises
+import PsiApi
+import Utilities
 
 enum IAPPurchasingState: Equatable {
     case none
@@ -40,7 +42,7 @@ struct PendingPayment: Hashable {
     let product: IAPPurchasableProduct
     var paymentObj: SKPayment?
     
-    var paymentStatus: Pending<Result<Unit, ErrorEvent<IAPError>>> {
+    var paymentStatus: Pending<Result<Utilities.Unit, ErrorEvent<IAPError>>> {
         didSet {
             guard case .subscription(product: _, promise: let promise) = product else {
                 return
@@ -53,7 +55,7 @@ struct PendingPayment: Hashable {
     }
     
     init(product: IAPPurchasableProduct,
-         paymentStatus: Pending<Result<Unit, ErrorEvent<IAPError>>>) {
+         paymentStatus: Pending<Result<Utilities.Unit, ErrorEvent<IAPError>>>) {
         self.product = product
         self.paymentStatus = paymentStatus
         self.paymentObj = nil
@@ -111,7 +113,7 @@ enum IAPPaymentType: Hashable {
 
 struct IAPResult {
     let transaction: SKPaymentTransaction?
-    let result: Result<Unit, ErrorEvent<IAPError>>
+    let result: Result<Utilities.Unit, ErrorEvent<IAPError>>
 }
 
 enum IAPPurchasableProduct: Hashable {

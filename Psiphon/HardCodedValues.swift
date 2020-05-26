@@ -16,61 +16,11 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 *
 */
-
 import Foundation
-
-struct VPNHardCodedValues {
-    
-    /// Time interval during which a response to the message sent to the tunnel provider is expected.
-    /// After which the send message Effect should timeout.
-    static let providerMessageSendTimeout: TimeInterval = 1.0  // 1 second
-    
-    /// Time interval to wait for VPN status and tunnel intent mismatch to be resolved
-    /// before an alert is shown to the user.
-    static let vpnStatusAndTunnelIntentMismatchAlertDelay: TimeInterval = 5.0  // 5 seconds
-    
-}
 
 struct PsiCashHardCodedValues {
     static let videoAdRewardAmount = PsiCashAmount(nanoPsi: Int64(35e9))
     static let videoAdRewardTitle = "35"
     /// Amount of time to wait for PsiCash to have an earner token for modifying .
     static let getEarnerTokenTimeout: DispatchTimeInterval = .seconds(5)
-}
-
-struct SubscriptionHardCodedValues {
-    /// Timer leeway.
-    static let leeway: DispatchTimeInterval = .seconds(10)
-    
-    /// Minimum time left off of a subscription to still be considered active.
-    static let subscriptionUIMinTime: TimeInterval = 5.0  // 5 seconds
-    
-    /// Diff tolerance between timer's expired value and the subscription expiry value.
-    /// Current value is 1 second.
-    static let subscriptionTimerDiffTolerance: TimeInterval = 1.0
-    
-}
-
-struct PurchaseVerifierURLs {
-    
-    static let verifierServer = "https://subscription.psiphon3.com"
-    
-    static let debugVerifierServer = "https://dev-subscription.psiphon3.com"
-    
-    static let subscriptionVerify = URL(string:"\(Self.verifierServer)/v2/appstore/subscription")!
-  
-    static let devSubscriptionVerify = URL(string:
-        "\(Self.debugVerifierServer)/v2/appstore/subscription")!
-    
-    static let psiCashVerify = URL(string: "\(Self.verifierServer)/v2/appstore/psicash")!
-
-    static let devPsiCashVerify = URL(string: "\(Self.debugVerifierServer)/v2/appstore/psicash")!
-}
-
-struct UrlRequestParameters {
-    
-    static let cachePolicy: URLRequest.CachePolicy = .reloadIgnoringLocalAndRemoteCacheData
-    
-    static let timeoutInterval: TimeInterval = 60.0
-    
 }

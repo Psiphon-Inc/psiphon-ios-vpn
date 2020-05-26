@@ -18,7 +18,8 @@
 */
 
 import Foundation
-import  ReactiveSwift
+import ReactiveSwift
+import PsiApi
 
 struct URLHandler {
     let open: (RestrictedURL, TunnelConnection) -> Effect<Bool>

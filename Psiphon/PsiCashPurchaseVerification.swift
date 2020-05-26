@@ -19,6 +19,8 @@
 
 import Foundation
 import ReactiveSwift
+import PsiApi
+import Utilities
 
 struct PsiCashValidationRequest: Encodable {
     let productID: String
@@ -46,7 +48,7 @@ struct PsiCashValidationResponse: RetriableHTTPResponse {
         case errorStatusCode(HTTPURLResponse)
     }
 
-    let result: Result<Unit, ErrorEvent<ResponseError>>
+    let result: Result<Utilities.Unit, ErrorEvent<ResponseError>>
 
     init(urlSessionResult: URLSessionResult) {
         switch urlSessionResult {

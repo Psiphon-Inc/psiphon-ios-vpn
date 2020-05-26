@@ -22,6 +22,8 @@ import ReactiveSwift
 import Promises
 import StoreKit
 import NetworkExtension
+import Utilities
+import PsiApi
 
 enum AppDelegateAction {
     case appDidLaunch(psiCashData: PsiCashLibData)
@@ -192,7 +194,7 @@ extension SwiftDelegate: SwiftBridgeDelegate {
             }
             .skipRepeats()
             .flatMap(.latest) { vpnStateTunnelLoadStatePair ->
-                SignalProducer<Result<Unit, ErrorEvent<ErrorRepr>>, Never> in
+                SignalProducer<Result<Utilities.Unit, ErrorEvent<ErrorRepr>>, Never> in
                 
                 guard case .loaded(_) = vpnStateTunnelLoadStatePair.second.value else {
                     return Effect(value: .success(.unit))
@@ -219,7 +221,7 @@ extension SwiftDelegate: SwiftBridgeDelegate {
                 }
             }
             .skipRepeats()
-            .startWithValues { [unowned self] (result: Result<Unit, ErrorEvent<ErrorRepr>>) in
+        .startWithValues { [unowned self] (result: Result<Utilities.Unit, ErrorEvent<ErrorRepr>>) in
                 switch result {
                 case .success(.unit):
                     break

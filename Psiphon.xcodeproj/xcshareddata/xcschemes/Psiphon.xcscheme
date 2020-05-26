@@ -38,12 +38,42 @@
       </MacroExpansion>
       <Testables>
          <TestableReference
+            skipped = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "4E0D88201FA06B2400ADB61E"
+               BuildableName = "PsiphonUITests.xctest"
+               BlueprintName = "PsiphonUITests"
+               ReferencedContainer = "container:Psiphon.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "8D77893E24745DD90038BFDA"
-               BuildableName = "PsiphonTests.xctest"
-               BlueprintName = "PsiphonTests"
+               BlueprintIdentifier = "8D9D9B9E247C64CC0093220E"
+               BuildableName = "PsiApiTests.xctest"
+               BlueprintName = "PsiApiTests"
+               ReferencedContainer = "container:Psiphon.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "8D9D9BDF247C6C9D0093220E"
+               BuildableName = "UtilitiesTests.xctest"
+               BlueprintName = "UtilitiesTests"
+               ReferencedContainer = "container:Psiphon.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "8D9D9C10247C75DE0093220E"
+               BuildableName = "TestingTests.xctest"
+               BlueprintName = "TestingTests"
                ReferencedContainer = "container:Psiphon.xcodeproj">
             </BuildableReference>
          </TestableReference>

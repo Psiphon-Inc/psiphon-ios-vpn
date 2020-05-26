@@ -19,7 +19,7 @@
 
 import Foundation
 import ReactiveSwift
-
+import PsiApi
 
 struct SubscriptionValidationRequest: Encodable {
     let originalTransactionID: OriginalTransactionID

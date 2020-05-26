@@ -20,6 +20,8 @@
 import Foundation
 import ReactiveSwift
 import NetworkExtension
+import PsiApi
+import Utilities
 
 /// Note on terminology:
 /// - Psiphon tunnel is to the tunnel created in the Network Extension process.
@@ -106,8 +108,8 @@ enum TPMEffectResultWrapper<T: TunnelProviderManager>: Equatable {
         syncResult:TunnelProviderSyncedState,
         connectionStatus: TunnelProviderVPNStatus
     )
-    case startTunnelResult(Result<Unit, ErrorEvent<StartTunnelError>>)
-    case stopTunnelResult(Unit)
+    case startTunnelResult(Result<Utilities.Unit, ErrorEvent<StartTunnelError>>)
+    case stopTunnelResult(Utilities.Unit)
 }
 
 @objc enum TunnelProviderSyncReason: Int, Equatable {

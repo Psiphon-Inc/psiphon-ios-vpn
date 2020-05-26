@@ -18,6 +18,7 @@
 */
 
 import Foundation
+import PsiApi
 
 extension AppState: FeedbackDescription {}
 
@@ -123,7 +124,7 @@ extension PsiphonDataSharedDB: CustomFieldFeedbackDescription {
         
     }
     
-    var feedbackFields: [String : CustomStringConvertible] {
+    public var feedbackFields: [String : CustomStringConvertible] {
         
         [EgressRegionsStringArrayKey: String(describing: self.emittedEgressRegions()),
          

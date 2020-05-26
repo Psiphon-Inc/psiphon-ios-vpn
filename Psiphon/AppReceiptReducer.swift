@@ -19,6 +19,7 @@
 
 import Foundation
 import Promises
+import PsiApi
 
 typealias ReceiptReducerEnvironment = (
     feedbackLogger: FeedbackLogger,

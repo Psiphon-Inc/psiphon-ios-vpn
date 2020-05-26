@@ -19,16 +19,17 @@
 
 
 import UIKit
+import Utilities
 
 struct ImageViewBuilder: ViewBuilder {
 
     let image: UIImage
 
-    func build(_ container: UIView?) -> StrictBindableViewable<Unit, UIImageView> {
+    func build(_ container: UIView?) -> StrictBindableViewable<Utilities.Unit, UIImageView> {
         let imageView = UIImageView(image: image)
         imageView.contentMode = .scaleAspectFit
 
-        return .init(viewable: imageView) { _ -> ((Unit) -> Void) in
+        return .init(viewable: imageView) { _ -> ((Utilities.Unit) -> Void) in
             return { _ in }
         }
     }

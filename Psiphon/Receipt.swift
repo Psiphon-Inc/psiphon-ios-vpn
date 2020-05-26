@@ -18,6 +18,7 @@
 */
 
 import Foundation
+import PsiApi
 
 /// Represents an in-app purchase transaction identifier present in the app receipt.
 /// Apple Ref: https://developer.apple.com/documentation/appstorereceipts/transaction_id
