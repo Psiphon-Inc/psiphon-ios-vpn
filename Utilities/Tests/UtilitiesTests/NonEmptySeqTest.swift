@@ -18,7 +18,7 @@
  */
 
 import XCTest
-@testable import PsiApi
+@testable import Utilities
 
 class NonEmptySeqTest: XCTestCase {
 
@@ -62,5 +62,9 @@ class NonEmptySeqTest: XCTestCase {
             return
         }
     }
+    
+    static var allTests = [
+        ("testJSONEncoding", testJSONEncoding),
+    ]
 
 }

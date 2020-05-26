@@ -19,6 +19,7 @@
 
 import Foundation
 import PsiApi
+import Utilities
 
 protocol AppInfoProvider : Encodable {
     var clientPlatform : String { get }

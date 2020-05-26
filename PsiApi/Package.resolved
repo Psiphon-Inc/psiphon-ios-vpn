@@ -1,0 +1,25 @@
+{
+  "object": {
+    "pins": [
+      {
+        "package": "Promises",
+        "repositoryURL": "https://github.com/google/promises.git",
+        "state": {
+          "branch": null,
+          "revision": "6b6f4fe3385ed37389fb231bc40be81de2f1230f",
+          "version": "1.2.8"
+        }
+      },
+      {
+        "package": "ReactiveSwift",
+        "repositoryURL": "https://github.com/ReactiveCocoa/ReactiveSwift.git",
+        "state": {
+          "branch": null,
+          "revision": "3f4351d04115fd8797802d9b2d17b812cd761602",
+          "version": "6.3.0"
+        }
+      }
+    ]
+  },
+  "version": 1
+}

@@ -18,6 +18,7 @@
  */
 
 import UIKit
+import Utilities
 
 struct SpeedBoostPurchasableViewModel: Equatable {
     let purchasable: SpeedBoostPurchasable

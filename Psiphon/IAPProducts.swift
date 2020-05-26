@@ -22,6 +22,7 @@ import StoreKit
 import Promises
 import ReactiveSwift
 import PsiApi
+import Utilities
 
 enum LocalizedPrice: Equatable {
     case free

@@ -32,11 +32,12 @@ extension HTTPRequest {
     static func mockJsonRequest<Body: Encodable>(
         body: Body, method: HTTPMethod = .get, responseType: Response.Type
     ) -> Self {
-        .json(url: URL(string: "https://test.psiphon.ca/")!,
-              body: body,
-              clientMetaData: "",
-              method: method,
-              response: responseType)
+        let jsonData = try! JSONEncoder().encode(body)
+        return .json(url: URL(string: "https://test.psiphon.ca/")!,
+                     jsonData: jsonData,
+                     clientMetaData: "",
+                     method: method,
+                     response: responseType)
     }
     
 }
@@ -145,6 +146,8 @@ struct RetriableTestResponse: RetriableHTTPResponse {
     
 }
 
+typealias RequestResult = RetriableTunneledHttpRequest<RetriableTestResponse>.RequestResult
+
 func generateRetriableTunneledHttpRequestTest(
     echoHttpClient: HTTPClient,
     connectionStatusBeforeRequestSeq: [TunnelConnection.ConnectionResourceStatus],
@@ -154,7 +157,7 @@ func generateRetriableTunneledHttpRequestTest(
     retryCount: Int = 2,
     retryInterval: DispatchTimeInterval = .milliseconds(1),
     getCurrentTime: (() -> Date)? = nil
-) -> NonEmpty<Signal<RetriableTunneledHttpRequest<RetriableTestResponse>.RequestResult, SignalProducer<RetriableTunneledHttpRequest<RetriableTestResponse>.RequestResult, Never>.SignalError>.Event> {
+) -> [Signal<RequestResult, SignalProducer<RequestResult, Never>.SignalError>.Event] {
     
     let currentTimeFunc: () -> Date
     if let timeFunc = getCurrentTime {
@@ -198,7 +201,7 @@ func generateRetriableTunneledHttpRequestTest(
 }
 
 
-final class RequestsTest: XCTestCase {
+final class RequestsTests: XCTestCase {
     
     var echoHttpClient: EchoHTTPClient!
     
@@ -233,9 +236,9 @@ final class RequestsTest: XCTestCase {
         
         // Assert
         XCTAssert(
-            result.isEqual(
-                [.value(.completed(.success(#"Request:0\#n{"value":"request test data"}"#))), .completed]
-            ),
+            result == [
+                .value(.completed(.success(#"Request:0\#n{"value":"request test data"}"#))),
+                .completed],
             "Got result '\(result)'"
         )
     }
@@ -250,10 +253,9 @@ final class RequestsTest: XCTestCase {
         
         // Assert
         XCTAssert(
-            result.isEqual(
-                [.value(.willRetry(.whenResolved(tunnelError: .nilTunnelProviderManager))),
-                 .failed(.signalTimedOut)]
-            ),
+            result == [
+                .value(.willRetry(.whenResolved(tunnelError: .nilTunnelProviderManager))),
+                .failed(.signalTimedOut)],
             "Got result '\(result)'"
         )
         
@@ -280,14 +282,12 @@ final class RequestsTest: XCTestCase {
         
         // Assert
         XCTAssert(
-            result.isEqual(
-                [.value(.willRetry(.whenResolved(tunnelError: .nilTunnelProviderManager))),
+            result == [.value(.willRetry(.whenResolved(tunnelError: .nilTunnelProviderManager))),
                  .value(.willRetry(.whenResolved(tunnelError: .tunnelNotConnected))),
                  .value(.willRetry(.whenResolved(tunnelError: .nilTunnelProviderManager))),
                  .value(.willRetry(.whenResolved(tunnelError: .tunnelNotConnected))),
                  .value(.completed(.success(#"Request:0\#n{"value":"request test data"}"#))),
-                 .completed]
-            ),
+                 .completed],
             "Got result '\(result)'"
         )
         
@@ -314,10 +314,9 @@ final class RequestsTest: XCTestCase {
         
         // Assert
         XCTAssert(
-            result.isEqual(
-                [.value(.willRetry(.whenResolved(tunnelError: .tunnelNotConnected))),
-                 .failed(.signalTimedOut)]
-            ),
+            result == [
+                .value(.willRetry(.whenResolved(tunnelError: .tunnelNotConnected))),
+                .failed(.signalTimedOut)],
             "Got result '\(result)'"
         )
         
@@ -343,10 +342,8 @@ final class RequestsTest: XCTestCase {
         XCTAssert(self.echoHttpClient.responseDelay == .milliseconds(0))
         
         XCTAssert(
-            result.isEqual(
-                [.value(.completed(.success(#"Request:0\#n{"value":"request test data"}"#))),
-                 .completed]
-            ),
+            result == [.value(.completed(.success(#"Request:0\#n{"value":"request test data"}"#))),
+                 .completed],
             "Got result '\(result)'"
         )
         
@@ -383,12 +380,11 @@ final class RequestsTest: XCTestCase {
         XCTAssert(self.echoHttpClient.responseDelay == .milliseconds(10))
         
         XCTAssert(
-            result.isEqual(
-                [.value(.willRetry(.whenResolved(tunnelError: .tunnelNotConnected))),
-                 .value(.willRetry(.whenResolved(tunnelError: .tunnelNotConnected))),
-                 .failed(.signalTimedOut)
-                ]
-            ),
+            result == [
+                .value(.willRetry(.whenResolved(tunnelError: .tunnelNotConnected))),
+                .value(.willRetry(.whenResolved(tunnelError: .tunnelNotConnected))),
+                .failed(.signalTimedOut)
+            ],
             "Got result '\(result)'"
         )
         
@@ -421,15 +417,14 @@ final class RequestsTest: XCTestCase {
         
         // Assert
         XCTAssert(self.echoHttpClient.responseDelay == .milliseconds(10))
-
+        
         XCTAssert(
-            result.isEqual(
-                [.value(.willRetry(.whenResolved(tunnelError: .tunnelNotConnected))),
-                 .value(.willRetry(.whenResolved(tunnelError: .tunnelNotConnected))),
-                 .value(.willRetry(.whenResolved(tunnelError: .tunnelNotConnected))),
-                 .value(.completed(.success(#"Request:0\#n{"value":"request test data"}"#))),
-                 .completed]
-            ),
+            result == [
+                .value(.willRetry(.whenResolved(tunnelError: .tunnelNotConnected))),
+                .value(.willRetry(.whenResolved(tunnelError: .tunnelNotConnected))),
+                .value(.willRetry(.whenResolved(tunnelError: .tunnelNotConnected))),
+                .value(.completed(.success(#"Request:0\#n{"value":"request test data"}"#))),
+                .completed],
             "Got result '\(result)'"
         )
         
@@ -480,7 +475,7 @@ final class RequestsTest: XCTestCase {
         XCTAssert(resultTuple.retryDueToError == errorEvent)
         
         XCTAssert(
-            result.isEqual(
+            result ==
                 [.value(.willRetry(.afterTimeInterval(
                     interval: retryInterval, result: expectedResponse.result))),
                  .value(.willRetry(.afterTimeInterval(
@@ -488,8 +483,7 @@ final class RequestsTest: XCTestCase {
                  .value(.willRetry(.afterTimeInterval(
                     interval: retryInterval, result: expectedResponse.result))),
                  .value(.failed(responseErrorEvent)),
-                 .completed]
-            ),
+                 .completed],
             "Got result '\(result)'"
         )
         
@@ -538,16 +532,19 @@ final class RequestsTest: XCTestCase {
         XCTAssert(resultTuple.retryDueToError == errorEvent)
         
         XCTAssert(
-            result.isEqual(
-                [.value(.willRetry(.afterTimeInterval(
+            result == [
+                .value(.willRetry(.afterTimeInterval(
                     interval: retryInterval, result: expectedResponse.result))),
-                 .value(.completed(.success(#"Request:1\#n{"value":"request test data"}"#))),
-                 .completed]
-            ),
+                .value(.completed(.success(#"Request:1\#n{"value":"request test data"}"#))),
+                .completed],
             "Got result '\(result)'"
         )
         
         XCTAssert(self.echoHttpClient.requestCount == 2)
     }
+    
+    static var allTests = [
+        ("testRetryWithHttpStatusErrorThenSuccess", testRetryWithHttpStatusErrorThenSuccess),
+    ]
     
 }

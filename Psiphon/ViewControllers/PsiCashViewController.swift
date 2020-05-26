@@ -19,7 +19,6 @@
 
 import Foundation
 import UIKit
-import ReactiveCocoa
 import ReactiveSwift
 import Promises
 import StoreKit

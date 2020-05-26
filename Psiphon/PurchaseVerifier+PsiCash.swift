@@ -36,10 +36,15 @@ extension PurchaseVerifierServer {
         requestBody: PsiCashValidationRequest,
         clientMetaData: ClientMetaData
     ) -> (error: NestedScopedError<ErrorRepr>?,
-          request: HTTPRequest<PsiCashValidationResponse>) {
-
-            return PurchaseVerifierServer.req(url: PurchaseVerifierServer.psiCashUrl(),
-                                              requestBody: requestBody,
-                                              clientMetaData: clientMetaData)
+        request: HTTPRequest<PsiCashValidationResponse>) {
+            do {
+                let encoder = JSONEncoder.makeRfc3339Encoder()
+                let jsonData = try encoder.encode(requestBody)
+                return PurchaseVerifierServer.req(url: PurchaseVerifierServer.psiCashUrl(),
+                                                  jsonData: jsonData,
+                                                  clientMetaData: clientMetaData)
+            } catch {
+                fatalError("failed to create request '\(error)'")
+            }
     }
 }

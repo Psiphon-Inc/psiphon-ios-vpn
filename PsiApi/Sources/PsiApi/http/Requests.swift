@@ -96,17 +96,13 @@ public struct HTTPRequest<Response: HTTPResponse>: Equatable {
         self.urlRequest = request
     }
     
-    /// Makes a HTTP request with a JSON body, by encoding `body`.
-    public static func json<Body: Encodable>(
-        url: URL, body: Body, clientMetaData: String, method: HTTPMethod, response: Response.Type
+    /// Makes a HTTP request with a JSON body.
+    public static func json(
+        url: URL, jsonData: Data, clientMetaData: String, method: HTTPMethod,
+        response: Response.Type
     ) -> Self {
-        do {
-            let jsonData = try JSONEncoder.makeRfc3339Encoder().encode(body)
-            return .init(url: url, body: jsonData, clientMetaData: clientMetaData,
-                         method: method, contentType: .json, response: response)
-        } catch {
-            fatalError("failed to serialize body '\(body)' error: '\(error)'")
-        }
+        return .init(url: url, body: jsonData, clientMetaData: clientMetaData,
+                     method: method, contentType: .json, response: response)
     }
     
 }
