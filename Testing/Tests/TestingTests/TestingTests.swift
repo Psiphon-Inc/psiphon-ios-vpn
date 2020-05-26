@@ -19,7 +19,6 @@
 
 import XCTest
 import ReactiveSwift
-import Utilities
 @testable import Testing
 
 class TestUtilTests: XCTestCase {
@@ -55,11 +54,11 @@ class TestUtilTests: XCTestCase {
                   "exceeded lower bound by more than 20%: '\(diff)'")
                 
         XCTAssert(
-            result.isEqual([
+            result == [
                 .value(1), .value(2), .value(3), .value(4), .value(5),
                 .value(6), .value(7), .value(8), .value(9), .value(10),
                 .completed
-            ]),
+            ],
             "Got result '\(result)'"
         )
     }

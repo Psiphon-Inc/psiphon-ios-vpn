@@ -36,10 +36,15 @@ extension PurchaseVerifierServer {
         requestBody: SubscriptionValidationRequest,
         clientMetaData: ClientMetaData
     ) -> (error: NestedScopedError<ErrorRepr>?,
-          request: HTTPRequest<SubscriptionValidationResponse>) {
-
-            return PurchaseVerifierServer.req(url: PurchaseVerifierServer.subscriptionUrl(),
-                                              requestBody: requestBody,
-                                              clientMetaData: clientMetaData)
+        request: HTTPRequest<SubscriptionValidationResponse>) {
+            do {
+                let encoder = JSONEncoder.makeRfc3339Encoder()
+                let jsonData = try encoder.encode(requestBody)
+                return PurchaseVerifierServer.req(url: PurchaseVerifierServer.subscriptionUrl(),
+                                                  jsonData: jsonData,
+                                                  clientMetaData: clientMetaData)
+            } catch {
+                fatalError("failed to create request '\(error)'")
+            }
     }
 }

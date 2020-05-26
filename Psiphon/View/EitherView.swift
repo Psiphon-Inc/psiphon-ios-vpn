@@ -19,6 +19,7 @@
 
 import UIKit
 import ReactiveSwift
+import Utilities
 
 struct EitherView<A: ViewBuilder, B: ViewBuilder>: ViewBuilder {
     typealias BindingType = Either<A.BuildType.BindingType, B.BuildType.BindingType>

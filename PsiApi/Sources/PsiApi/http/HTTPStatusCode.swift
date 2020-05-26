@@ -293,6 +293,8 @@ public enum HTTPStatusCode: Int, Error {
     
 }
 
+import Foundation
+
 extension HTTPURLResponse {
     
     /// Same as `statusCode` property, but typed.

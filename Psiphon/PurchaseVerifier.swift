@@ -24,9 +24,9 @@ import PsiApi
 /// in a separate file (e.g. PurchaseVerfier+PsiCash.swift)
 struct PurchaseVerifierServer {
 
-    static func req<T: Encodable, R>(
+    static func req<R>(
         url: URL,
-        requestBody: T,
+        jsonData: Data,
         clientMetaData: ClientMetaData
     ) -> (error: NestedScopedError<ErrorRepr>?,
           request: HTTPRequest<R>) {
@@ -43,7 +43,7 @@ struct PurchaseVerifierServer {
             clientMetadataJSON = jsonString
         }
 
-        let req = HTTPRequest.json(url: url, body: requestBody,
+        let req = HTTPRequest.json(url: url, jsonData: jsonData,
                                 clientMetaData: clientMetadataJSON,
                                 method: .post, response: R.self)
 

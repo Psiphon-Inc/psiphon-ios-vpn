@@ -19,7 +19,6 @@
 
 import XCTest
 import ReactiveSwift
-import Utilities
 
 public func XCTFatal(message: String = "") -> Never {
     XCTFail(message)
@@ -62,7 +61,7 @@ extension SignalProducer where Error: Equatable {
     
     public func collectForTesting(
         timeout: TimeInterval = 1.0
-    ) -> NonEmpty<Signal<Value, SignalError>.Event> {
+    ) -> [Signal<Value, SignalError>.Event] {
         
         let result = self.mapError { signalError -> SignalError in
             return .signalError(signalError)
@@ -72,10 +71,12 @@ extension SignalProducer where Error: Equatable {
         .collect()
         .single()
         
-        guard let nonEmptyArray = NonEmpty(array: result?.projectSuccess()) else {
-            fatalError("Expected non-empty result array: '\(String(describing: result))'")
+        guard case let .success(value) = result else {
+            XCTFail()
+            return []
         }
-        return nonEmptyArray
+        
+        return value
     }
     
     public static func just(values: [Value], withInterval interval: DispatchTimeInterval) -> Self {

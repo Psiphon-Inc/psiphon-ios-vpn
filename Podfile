@@ -14,10 +14,7 @@ target 'Psiphon' do
   pod 'PsiphonClientCommonLibrary', :git => "https://github.com/Psiphon-Inc/psiphon-ios-client-common-library.git", :commit => '3c04c40'
 
   # Swift dependencies
-  pod 'ReactiveSwift', '~> 6.2'
-  pod 'ReactiveCocoa', '~> 10.1'
   pod 'ReactiveObjC', :git => "https://github.com/Psiphon-Inc/ReactiveObjC.git", :commit => '8bbf9dd'
-  pod 'PromisesSwift', '~> 1.2'
   pod 'Google-Mobile-Ads-SDK', '~> 7.59'
   pod 'PersonalizedAdConsent', '~> 1.0'  # Google Mobile Ads Consent SDK
   pod 'MBProgressHUD', '~> 1.1.0'
@@ -25,31 +22,6 @@ target 'Psiphon' do
 end
 
 target 'PsiphonVPN' do
-end
-
-target 'PsiApi' do
-  pod 'ReactiveSwift', '~> 6.2'
-  pod 'PromisesSwift', '~> 1.2'
-  
-  target 'PsiApiTests' do
-  end
-  
-end
-
-target 'Utilities' do
-  pod 'ReactiveSwift', '~> 6.2'
-  
-  target 'UtilitiesTests' do
-  end
-  
-end
-
-target 'Testing' do
-  pod 'ReactiveSwift', '~> 6.2'
-  
-  target 'TestingTests' do
-  end
-  
 end
 
 post_install do |installer|

@@ -18,6 +18,7 @@
  */
 
 import Foundation
+import Utilities
 
 extension NonEmptySeq : FeedbackDescription {}
 
