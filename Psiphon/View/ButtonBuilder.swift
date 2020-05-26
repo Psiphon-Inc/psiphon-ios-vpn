@@ -18,6 +18,7 @@
  */
 
 import UIKit
+import Utilities
 
 struct ButtonBuilder: ViewBuilder {
     let style: UIButton.ButtonType
@@ -25,7 +26,7 @@ struct ButtonBuilder: ViewBuilder {
     let image: UIImage?
     let eventHandler: (() -> Void)?
 
-    func build(_ container: UIView?) -> StrictBindableViewable<Unit, SwiftUIButton> {
+    func build(_ container: UIView?) -> StrictBindableViewable<Utilities.Unit, SwiftUIButton> {
         let button = SwiftUIButton(type: style)
         if let tint = tint {
             button.tintColor = tint
@@ -36,7 +37,7 @@ struct ButtonBuilder: ViewBuilder {
         if let eventHandler = eventHandler {
             button.setEventHandler(eventHandler)
         }
-        return .init(viewable: button) { _ -> ((Unit) -> Void) in
+        return .init(viewable: button) { _ -> ((Utilities.Unit) -> Void) in
             return { _ in }
         }
     }

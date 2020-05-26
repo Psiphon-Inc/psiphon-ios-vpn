@@ -19,6 +19,7 @@
 
 import Foundation
 import ReactiveSwift
+import PsiApi
 
 /// Represents authorization state for subscription purchase.
 struct SubscriptionPurchaseAuthState: Hashable, Codable {

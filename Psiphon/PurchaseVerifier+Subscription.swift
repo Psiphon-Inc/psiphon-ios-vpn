@@ -20,6 +20,7 @@
 import Foundation
 import Promises
 import ReactiveSwift
+import PsiApi
 
 extension PurchaseVerifierServer {
 

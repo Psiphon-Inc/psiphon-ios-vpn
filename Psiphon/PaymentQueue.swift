@@ -20,6 +20,7 @@
 import Foundation
 import StoreKit
 import ReactiveSwift
+import PsiApi
 
 struct PaymentQueue {
     let transactions: () -> Effect<[SKPaymentTransaction]>

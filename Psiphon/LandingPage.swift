@@ -19,6 +19,7 @@
 
 import Foundation
 import ReactiveSwift
+import PsiApi
 
 fileprivate let landingPageTag = LogTag("LandingPage")
 

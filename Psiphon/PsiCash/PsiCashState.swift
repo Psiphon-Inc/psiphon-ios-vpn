@@ -19,8 +19,10 @@
 
 import Foundation
 import ReactiveSwift
+import PsiApi
+import Utilities
 
-typealias PendingPsiCashRefresh = PendingResult<Unit, ErrorEvent<PsiCashRefreshError>>
+typealias PendingPsiCashRefresh = PendingResult<Utilities.Unit, ErrorEvent<PsiCashRefreshError>>
 
 struct PsiCashState: Equatable {
     var purchasing: PsiCashPurchasingState

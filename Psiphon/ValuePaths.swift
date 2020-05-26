@@ -19,6 +19,7 @@
 
 import Foundation
 import Promises
+import PsiApi
 
 extension AppAction {
 

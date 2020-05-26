@@ -19,6 +19,8 @@
 
 import Foundation
 import Promises
+import PsiApi
+import Utilities
 
 /// `ReceiptReadReason` represents the event that caused the receipt file to be read.
 enum ReceiptReadReason: Equatable {
@@ -32,7 +34,7 @@ struct ReceiptState: Equatable {
     
     // remoteReceiptRefreshState holds a strong reference to the `SKReceiptRefreshRequest`
     // object while the request is in progress.
-    var remoteReceiptRefreshState: PendingValue<SKReceiptRefreshRequest, Result<Unit, SystemErrorEvent>>
+    var remoteReceiptRefreshState: PendingValue<SKReceiptRefreshRequest, Result<Utilities.Unit, SystemErrorEvent>>
     
     var remoteRefreshAppReceiptPromises: [Promise<Result<(), SystemErrorEvent>>]
 }

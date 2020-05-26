@@ -19,6 +19,7 @@
 
 import Foundation
 import NetworkExtension
+import PsiApi
 
 struct ProviderManagerLoadState<T: TunnelProviderManager>: Equatable {
     

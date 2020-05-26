@@ -19,6 +19,7 @@
 
 import Foundation
 import ReactiveSwift
+import PsiApi
 
 typealias PsiCashRefreshResult = PendingResult<PsiCashLibData, ErrorEvent<PsiCashRefreshError>>
 

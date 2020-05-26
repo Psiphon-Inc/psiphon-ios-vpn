@@ -23,6 +23,8 @@ import ReactiveCocoa
 import ReactiveSwift
 import Promises
 import StoreKit
+import PsiApi
+import Utilities
 
 struct PsiCashViewControllerState: Equatable {
     let psiCashBalance: PsiCashBalance
@@ -105,7 +107,7 @@ final class PsiCashViewController: UIViewController {
 
     private let (lifetime, token) = Lifetime.make()
     private let store: Store<PsiCashViewControllerState, PsiCashAction>
-    private let productRequestStore: Store<Unit, ProductRequestAction>
+    private let productRequestStore: Store<Utilities.Unit, ProductRequestAction>
 
     // VC-specific UI state
     @State private var activeTab: Tabs
@@ -126,8 +128,8 @@ final class PsiCashViewController: UIViewController {
 
     init(initialTab: Tabs,
          store: Store<PsiCashViewControllerState, PsiCashAction>,
-         iapStore: Store<Unit, IAPAction>,
-         productRequestStore: Store<Unit, ProductRequestAction>,
+         iapStore: Store<Utilities.Unit, IAPAction>,
+         productRequestStore: Store<Utilities.Unit, ProductRequestAction>,
          tunnelConnectedSignal: SignalProducer<TunnelConnectedStatus, Never>,
          feedbackLogger: FeedbackLogger
     ) {

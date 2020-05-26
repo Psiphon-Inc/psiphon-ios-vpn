@@ -19,6 +19,7 @@
 
 import Foundation
 import ReactiveSwift
+import PsiApi
 
 enum PsiCashAction {
     case buyPsiCashProduct(PsiCashPurchasableType)

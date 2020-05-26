@@ -18,6 +18,7 @@
  */
 
 import Foundation
+import PsiApi
 
 extension SubscriptionPurchaseAuthState.AuthorizationState: Codable {
 

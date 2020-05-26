@@ -18,6 +18,7 @@
  */
 
 import Foundation
+import PsiApi
 
 /// Each server endpoint should be defined as an extension
 /// in a separate file (e.g. PurchaseVerfier+PsiCash.swift)

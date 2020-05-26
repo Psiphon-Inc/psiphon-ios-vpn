@@ -79,14 +79,12 @@
 		5237387423AABB0F00DDE396 /* PurchasingSpeedBoostAlertViewBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5237387323AABB0F00DDE396 /* PurchasingSpeedBoostAlertViewBuilder.swift */; };
 		5245C5C92342A6840033EE13 /* UserDefaults.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5245C5C82342A6840033EE13 /* UserDefaults.swift */; };
 		52467FE122C2A704009AEC6E /* PsiCashModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52467FE022C2A704009AEC6E /* PsiCashModels.swift */; };
-		52467FF922CE77A1009AEC6E /* Foundation+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52467FF822CE77A1009AEC6E /* Foundation+Additions.swift */; };
 		5246800722D51AA3009AEC6E /* PsiCashWidgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5246800622D51AA3009AEC6E /* PsiCashWidgetView.swift */; };
 		5246800922D51CE4009AEC6E /* PsiCashBalanceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5246800822D51CE4009AEC6E /* PsiCashBalanceView.swift */; };
 		5246800D22D65926009AEC6E /* UIUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5246800C22D65926009AEC6E /* UIUtils.swift */; };
 		5248B4CE23203781008C00D4 /* SwiftObjCBridges.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5248B4CD23203781008C00D4 /* SwiftObjCBridges.swift */; };
 		524B4E6B2316F0E3004E9891 /* BorderedSubtitleButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 524B4E6A2316F0E3004E9891 /* BorderedSubtitleButton.m */; };
 		524B4E6E2316F27F004E9891 /* AnimatedControl.m in Sources */ = {isa = PBXBuildFile; fileRef = 524B4E6D2316F27F004E9891 /* AnimatedControl.m */; };
-		52805BA122DD1EB8006B205B /* ReactiveSwift+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52805BA022DD1EB8006B205B /* ReactiveSwift+Additions.swift */; };
 		528D81332384823F00AA2D77 /* PsiCashMessageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 528D81322384823F00AA2D77 /* PsiCashMessageView.swift */; };
 		52A24659238C9AB700A01FF1 /* SpeedBoostPurchaseTable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52A24658238C9AB700A01FF1 /* SpeedBoostPurchaseTable.swift */; };
 		52A2465E239081C100A01FF1 /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52A2465D239081C100A01FF1 /* AppState.swift */; };
@@ -95,10 +93,8 @@
 		52A2466F23A1769300A01FF1 /* PsiCashMessageViewUntunneled.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52A2466E23A1769300A01FF1 /* PsiCashMessageViewUntunneled.swift */; };
 		52A2467123A176BA00A01FF1 /* PsiCashPurchasingAlertViewBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52A2467023A176BA00A01FF1 /* PsiCashPurchasingAlertViewBuilder.swift */; };
 		52B3C54323DA31E1003F6B12 /* PurchaseVerifier+Subscription.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52B3C54223DA31E1003F6B12 /* PurchaseVerifier+Subscription.swift */; };
-		52B3C54523DA391F003F6B12 /* Requests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52B3C54423DA391F003F6B12 /* Requests.swift */; };
 		52B3C54A23DF99E8003F6B12 /* AppObservables.m in Sources */ = {isa = PBXBuildFile; fileRef = 52B3C54923DF99E8003F6B12 /* AppObservables.m */; };
 		52B3C54C23E0E895003F6B12 /* ButtonBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52B3C54B23E0E895003F6B12 /* ButtonBuilder.swift */; };
-		52B3C54E23E22454003F6B12 /* FeedbackLogging.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52B3C54D23E22454003F6B12 /* FeedbackLogging.swift */; };
 		52C8F0AB237CA26200E5F9C0 /* ImageViewBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52C8F0AA237CA26200E5F9C0 /* ImageViewBuilder.swift */; };
 		52C8F0AD237E145C00E5F9C0 /* PsiCashCoinPurchaseTable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52C8F0AC237E145C00E5F9C0 /* PsiCashCoinPurchaseTable.swift */; };
 		52C8F0AF2383059200E5F9C0 /* Promises+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52C8F0AE2383059200E5F9C0 /* Promises+Additions.swift */; };
@@ -109,7 +105,6 @@
 		52D363CD230EEBAC002C2221 /* AnimatedUIButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D363CC230EEBAC002C2221 /* AnimatedUIButton.swift */; };
 		52D363CF230F112E002C2221 /* TabControlView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D363CE230F112E002C2221 /* TabControlView.swift */; };
 		52DF5E9223C675EC00A1B067 /* ViewController+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52DF5E9123C675EC00A1B067 /* ViewController+Additions.swift */; };
-		52DF5E9623C7A31100A1B067 /* Error.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52DF5E9523C7A31100A1B067 /* Error.swift */; };
 		52DF5E9823CE5A8300A1B067 /* ValuePaths.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52DF5E9723CE5A8300A1B067 /* ValuePaths.swift */; };
 		52DF5E9A23CE835100A1B067 /* UserStrings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52DF5E9923CE835100A1B067 /* UserStrings.swift */; };
 		52DF5E9E23D0D01F00A1B067 /* BridgingTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52DF5E9D23D0D01F00A1B067 /* BridgingTypes.swift */; };
@@ -120,8 +115,6 @@
 		668AF9C01E92CBE0008CAAAA /* NetworkExtension.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 668AF9BE1E92CBD3008CAAAA /* NetworkExtension.framework */; };
 		8D00AA482450B4AB001EB8DD /* PsiCashPurchaseVerification.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D00AA472450B4AB001EB8DD /* PsiCashPurchaseVerification.swift */; };
 		8D00AA4A2450B4D1001EB8DD /* SubscriptionPurchaseVerification.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D00AA492450B4D1001EB8DD /* SubscriptionPurchaseVerification.swift */; };
-		8D019B802451D864006F21C4 /* HTTPStatusCode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D019B7F2451D864006F21C4 /* HTTPStatusCode.swift */; };
-		8D255E2B2461E06900FD5D1C /* InternetReachability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D255E2A2461E06900FD5D1C /* InternetReachability.swift */; };
 		8D255E2D24620E2900FD5D1C /* NoConnectionBannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D255E2C24620E2900FD5D1C /* NoConnectionBannerView.swift */; };
 		8D417E992411954A00FEE587 /* PsiCashReducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D417E982411954A00FEE587 /* PsiCashReducer.swift */; };
 		8D417E9D2411A0C200FEE587 /* PaymentQueue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D417E9C2411A0C200FEE587 /* PaymentQueue.swift */; };
@@ -132,98 +125,72 @@
 		8D417EB72415633300FEE587 /* IAPReducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D417EB62415633300FEE587 /* IAPReducer.swift */; };
 		8D417EBB2417155000FEE587 /* AppReceipt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D417EBA2417155000FEE587 /* AppReceipt.swift */; };
 		8D417EBD2417FF5C00FEE587 /* SubscriptionAuthState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D417EBC2417FF5B00FEE587 /* SubscriptionAuthState.swift */; };
-		8D417EBF2417FFB000FEE587 /* HardCodedValues.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D417EBE2417FFB000FEE587 /* HardCodedValues.swift */; };
 		8D417ED9241844FA00FEE587 /* FloatingPoint+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D417ED8241844FA00FEE587 /* FloatingPoint+Additions.swift */; };
 		8D417EDD2419DBA100FEE587 /* ProductRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D417EDC2419DBA100FEE587 /* ProductRequest.swift */; };
-		8D45701E2475785000E1CC57 /* RFC3339.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D7789BF247496520038BFDA /* RFC3339.swift */; };
-		8D45701F2475795900E1CC57 /* HTTPStatusCode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D019B7F2451D864006F21C4 /* HTTPStatusCode.swift */; };
-		8D45702024757B3700E1CC57 /* timestamp_valid.c in Sources */ = {isa = PBXBuildFile; fileRef = EF90D78D204F22C900228A63 /* timestamp_valid.c */; };
-		8D45702124757B3700E1CC57 /* timestamp_compare.c in Sources */ = {isa = PBXBuildFile; fileRef = EF90D78E204F22C900228A63 /* timestamp_compare.c */; };
-		8D45702224757B3700E1CC57 /* timestamp_tm.c in Sources */ = {isa = PBXBuildFile; fileRef = EF90D78F204F22C900228A63 /* timestamp_tm.c */; };
-		8D45702324757B3700E1CC57 /* timestamp_format.c in Sources */ = {isa = PBXBuildFile; fileRef = EF90D790204F22C900228A63 /* timestamp_format.c */; };
-		8D45702424757B3700E1CC57 /* timestamp_parse.c in Sources */ = {isa = PBXBuildFile; fileRef = EF90D791204F22C900228A63 /* timestamp_parse.c */; };
-		8D45702524757B8600E1CC57 /* IA5String.c in Sources */ = {isa = PBXBuildFile; fileRef = 445F24F220E1A85C00D004E9 /* IA5String.c */; };
-		8D45702624757B8600E1CC57 /* UTF8String.c in Sources */ = {isa = PBXBuildFile; fileRef = 445F24F320E1A85C00D004E9 /* UTF8String.c */; };
-		8D45702724757B8600E1CC57 /* ReceiptAttributes.c in Sources */ = {isa = PBXBuildFile; fileRef = 445F249820E1A5BA00D004E9 /* ReceiptAttributes.c */; };
-		8D45702824757B8600E1CC57 /* constr_TYPE.c in Sources */ = {isa = PBXBuildFile; fileRef = 445F249920E1A5BA00D004E9 /* constr_TYPE.c */; };
-		8D45702924757B8600E1CC57 /* xer_decoder.c in Sources */ = {isa = PBXBuildFile; fileRef = 445F249E20E1A5BA00D004E9 /* xer_decoder.c */; };
-		8D45702A24757B8600E1CC57 /* per_support.c in Sources */ = {isa = PBXBuildFile; fileRef = 445F249F20E1A5BA00D004E9 /* per_support.c */; };
-		8D45702B24757B8600E1CC57 /* OBJECT_IDENTIFIER.c in Sources */ = {isa = PBXBuildFile; fileRef = 445F24A120E1A5BA00D004E9 /* OBJECT_IDENTIFIER.c */; };
-		8D45702C24757B8600E1CC57 /* BIT_STRING.c in Sources */ = {isa = PBXBuildFile; fileRef = 445F24A620E1A5BA00D004E9 /* BIT_STRING.c */; };
-		8D45702D24757B8600E1CC57 /* constr_SET_OF.c in Sources */ = {isa = PBXBuildFile; fileRef = 445F24A820E1A5BA00D004E9 /* constr_SET_OF.c */; };
-		8D45702E24757B8600E1CC57 /* ber_decoder.c in Sources */ = {isa = PBXBuildFile; fileRef = 445F24A920E1A5BA00D004E9 /* ber_decoder.c */; };
-		8D45702F24757B8600E1CC57 /* NativeInteger.c in Sources */ = {isa = PBXBuildFile; fileRef = 445F24AA20E1A5BA00D004E9 /* NativeInteger.c */; };
-		8D45703024757B8600E1CC57 /* per_encoder.c in Sources */ = {isa = PBXBuildFile; fileRef = 445F24AF20E1A5BA00D004E9 /* per_encoder.c */; };
-		8D45703124757B8600E1CC57 /* INTEGER.c in Sources */ = {isa = PBXBuildFile; fileRef = 445F24B620E1A5BA00D004E9 /* INTEGER.c */; };
-		8D45703224757B8600E1CC57 /* ReceiptAttribute.c in Sources */ = {isa = PBXBuildFile; fileRef = 445F24B820E1A5BA00D004E9 /* ReceiptAttribute.c */; };
-		8D45703324757B8600E1CC57 /* der_encoder.c in Sources */ = {isa = PBXBuildFile; fileRef = 445F24BC20E1A5BA00D004E9 /* der_encoder.c */; };
-		8D45703424757B8600E1CC57 /* OCTET_STRING.c in Sources */ = {isa = PBXBuildFile; fileRef = 445F24BD20E1A5BA00D004E9 /* OCTET_STRING.c */; };
-		8D45703524757B8600E1CC57 /* constr_SEQUENCE.c in Sources */ = {isa = PBXBuildFile; fileRef = 445F24BF20E1A5BA00D004E9 /* constr_SEQUENCE.c */; };
-		8D45703624757B8600E1CC57 /* asn_SET_OF.c in Sources */ = {isa = PBXBuildFile; fileRef = 445F24C020E1A5BA00D004E9 /* asn_SET_OF.c */; };
-		8D45703724757B8600E1CC57 /* per_opentype.c in Sources */ = {isa = PBXBuildFile; fileRef = 445F24C220E1A5BA00D004E9 /* per_opentype.c */; };
-		8D45703824757B8600E1CC57 /* pkcs7-signed-data.asn1 in Resources */ = {isa = PBXBuildFile; fileRef = 445F24C320E1A5BA00D004E9 /* pkcs7-signed-data.asn1 */; };
-		8D45703924757B8600E1CC57 /* NativeEnumerated.c in Sources */ = {isa = PBXBuildFile; fileRef = 445F24C420E1A5BA00D004E9 /* NativeEnumerated.c */; };
-		8D45703A24757B8600E1CC57 /* ber_tlv_length.c in Sources */ = {isa = PBXBuildFile; fileRef = 445F24C620E1A5BA00D004E9 /* ber_tlv_length.c */; };
-		8D45703B24757B8600E1CC57 /* per_decoder.c in Sources */ = {isa = PBXBuildFile; fileRef = 445F24C920E1A5BA00D004E9 /* per_decoder.c */; };
-		8D45703C24757B8600E1CC57 /* xer_support.c in Sources */ = {isa = PBXBuildFile; fileRef = 445F24CA20E1A5BA00D004E9 /* xer_support.c */; };
-		8D45703D24757B8600E1CC57 /* SignedData.c in Sources */ = {isa = PBXBuildFile; fileRef = 445F24CC20E1A5BA00D004E9 /* SignedData.c */; };
-		8D45703E24757B8600E1CC57 /* ber_tlv_tag.c in Sources */ = {isa = PBXBuildFile; fileRef = 445F24CD20E1A5BA00D004E9 /* ber_tlv_tag.c */; };
-		8D45703F24757B8600E1CC57 /* asn_codecs_prim.c in Sources */ = {isa = PBXBuildFile; fileRef = 445F24CE20E1A5BA00D004E9 /* asn_codecs_prim.c */; };
-		8D45704024757B8600E1CC57 /* constraints.c in Sources */ = {isa = PBXBuildFile; fileRef = 445F24CF20E1A5BA00D004E9 /* constraints.c */; };
-		8D45704124757B8600E1CC57 /* xer_encoder.c in Sources */ = {isa = PBXBuildFile; fileRef = 445F24D220E1A5BA00D004E9 /* xer_encoder.c */; };
-		8D45704224757B9300E1CC57 /* pkcs7-signed-data-simplified.asn1 in Resources */ = {isa = PBXBuildFile; fileRef = 445F24B220E1A5BA00D004E9 /* pkcs7-signed-data-simplified.asn1 */; };
-		8D45704324757BCD00E1CC57 /* ANY.c in Sources */ = {isa = PBXBuildFile; fileRef = 445F24B520E1A5BA00D004E9 /* ANY.c */; };
-		8D45704424757BD400E1CC57 /* PsiFeedbackLogger.m in Sources */ = {isa = PBXBuildFile; fileRef = EF639C2E1F8FCE2A009D6B42 /* PsiFeedbackLogger.m */; };
-		8D45704524757BE100E1CC57 /* Nullity.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFECCCF429898FD903B69A6 /* Nullity.m */; };
-		8D4570472475BA5900E1CC57 /* PsiphonTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D4570462475BA5900E1CC57 /* PsiphonTests.swift */; };
 		8D778978247469FE0038BFDA /* AppInfo.h in Sources */ = {isa = PBXBuildFile; fileRef = 4E10920620F3DA190033114B /* AppInfo.h */; };
-		8D77897C2474839C0038BFDA /* RequestsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D77897B2474839C0038BFDA /* RequestsTests.swift */; };
-		8D7789A324748F8C0038BFDA /* Requests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52B3C54423DA391F003F6B12 /* Requests.swift */; };
-		8D7789A424748F920038BFDA /* Error.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52DF5E9523C7A31100A1B067 /* Error.swift */; };
-		8D7789A524748FA80038BFDA /* Effect.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D417EDE241AA89C00FEE587 /* Effect.swift */; };
-		8D7789A624748FB10038BFDA /* TunnelProviderManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D9E602B24364EE6003A46D8 /* TunnelProviderManager.swift */; };
-		8D7789A724748FC70038BFDA /* Foundation+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52467FF822CE77A1009AEC6E /* Foundation+Additions.swift */; };
-		8D7789AA24748FFA0038BFDA /* HardCodedValues.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D417EBE2417FFB000FEE587 /* HardCodedValues.swift */; };
-		8D7789AB247490060038BFDA /* PsiCashModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52467FE022C2A704009AEC6E /* PsiCashModels.swift */; };
-		8D7789AC247490120038BFDA /* Authorization.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DE4E6D3244E9D8E00275362 /* Authorization.swift */; };
-		8D7789AE247490490038BFDA /* DebugFlags.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D7789AD247490490038BFDA /* DebugFlags.swift */; };
-		8D7789AF247490490038BFDA /* DebugFlags.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D7789AD247490490038BFDA /* DebugFlags.swift */; };
-		8D7789B0247490700038BFDA /* ReactiveSwift+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52805BA022DD1EB8006B205B /* ReactiveSwift+Additions.swift */; };
-		8D7789B12474907B0038BFDA /* Store.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52A2465B2390569800A01FF1 /* Store.swift */; };
-		8D7789B2247490850038BFDA /* State.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D417EDA2419D9CF00FEE587 /* State.swift */; };
-		8D7789B3247490930038BFDA /* StoreDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D417EB82415667900FEE587 /* StoreDelegate.swift */; };
-		8D7789B4247490CD0038BFDA /* InternetReachability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D255E2A2461E06900FD5D1C /* InternetReachability.swift */; };
-		8D7789B6247490F50038BFDA /* Receipt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D938DD6244D43550009DE39 /* Receipt.swift */; };
-		8D7789B7247490FD0038BFDA /* SerialEffect.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D9E602D24364FB6003A46D8 /* SerialEffect.swift */; };
 		8D7789B9247491CA0038BFDA /* PsiphonBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D7789B8247491CA0038BFDA /* PsiphonBundle.swift */; };
-		8D7789BA247491CA0038BFDA /* PsiphonBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D7789B8247491CA0038BFDA /* PsiphonBundle.swift */; };
-		8D7789BB247492840038BFDA /* AppStoreParsedReceiptData.m in Sources */ = {isa = PBXBuildFile; fileRef = 445F239520E1817C00D004E9 /* AppStoreParsedReceiptData.m */; };
 		8D7789BD247493300038BFDA /* VPNState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D7789BC247493300038BFDA /* VPNState.swift */; };
-		8D7789BE247493300038BFDA /* VPNState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D7789BC247493300038BFDA /* VPNState.swift */; };
-		8D7789C0247496520038BFDA /* RFC3339.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D7789BF247496520038BFDA /* RFC3339.swift */; };
 		8D7789C3247496C00038BFDA /* ClientMetadata.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D7789C2247496C00038BFDA /* ClientMetadata.swift */; };
 		8D7789C5247496F60038BFDA /* PsiCashLib+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D7789C4247496F60038BFDA /* PsiCashLib+Additions.swift */; };
-		8D7789C7247497F40038BFDA /* FeedbackDescription.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D7789C6247497F40038BFDA /* FeedbackDescription.swift */; };
-		8D7789C8247498560038BFDA /* FeedbackDescription.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D7789C6247497F40038BFDA /* FeedbackDescription.swift */; };
 		8D7789CA247499110038BFDA /* Reachability+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D7789C9247499110038BFDA /* Reachability+Additions.swift */; };
-		8D7789D02474D53D0038BFDA /* PsiphonRotatingFileFeedbackLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D7789CF2474D53D0038BFDA /* PsiphonRotatingFileFeedbackLogger.swift */; };
 		8D7E9B9D2425DF42006F3A2F /* AnimatedUIView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D7E9B9C2425DF42006F3A2F /* AnimatedUIView.swift */; };
 		8D7E9B9F2425E053006F3A2F /* Animations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D7E9B9E2425E053006F3A2F /* Animations.swift */; };
-		8D90A984247633D200FC86F0 /* TestUtilTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D90A983247633D200FC86F0 /* TestUtilTests.swift */; };
 		8D938DD7244D43550009DE39 /* Receipt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D938DD6244D43550009DE39 /* Receipt.swift */; };
 		8D96601E2457DC6C0007718B /* SubscriptionState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D96601D2457DC6C0007718B /* SubscriptionState.swift */; };
-		8D9D9B87247C1FBF0093220E /* RFC3339Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D9D9B86247C1FBF0093220E /* RFC3339Tests.swift */; };
+		8D9D9BA0247C64CC0093220E /* PsiApi.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8D9D9B97247C64CB0093220E /* PsiApi.framework */; };
+		8D9D9BA9247C64CC0093220E /* PsiApi.h in Headers */ = {isa = PBXBuildFile; fileRef = 8D9D9B99247C64CB0093220E /* PsiApi.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		8D9D9BAC247C64CC0093220E /* PsiApi.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8D9D9B97247C64CB0093220E /* PsiApi.framework */; };
+		8D9D9BAD247C64CC0093220E /* PsiApi.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8D9D9B97247C64CB0093220E /* PsiApi.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		8D9D9BB4247C66060093220E /* Requests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52B3C54423DA391F003F6B12 /* Requests.swift */; };
+		8D9D9BB5247C66060093220E /* HTTPStatusCode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D019B7F2451D864006F21C4 /* HTTPStatusCode.swift */; };
+		8D9D9BB6247C66060093220E /* RetryCondition+FeedbackDescription.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEED784124771415002D9D55 /* RetryCondition+FeedbackDescription.swift */; };
+		8D9D9BB9247C669D0093220E /* RequestsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D77897B2474839C0038BFDA /* RequestsTests.swift */; };
+		8D9D9BBA247C66E10093220E /* Error.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52DF5E9523C7A31100A1B067 /* Error.swift */; };
+		8D9D9BBB247C66FC0093220E /* FeedbackDescription.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D7789C6247497F40038BFDA /* FeedbackDescription.swift */; };
+		8D9D9BBC247C68A00093220E /* Foundation+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52467FF822CE77A1009AEC6E /* Foundation+Additions.swift */; };
+		8D9D9BBD247C68BD0093220E /* NonEmptySeq.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEC8F8932478254200D273DF /* NonEmptySeq.swift */; };
+		8D9D9BBF247C68C50093220E /* NonEmptySeq+CustomStringFeedbackDescription.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEC8F8982478332300D273DF /* NonEmptySeq+CustomStringFeedbackDescription.swift */; };
+		8D9D9BC0247C68CB0093220E /* NonEmptySeqTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEC8F896247825B700D273DF /* NonEmptySeqTest.swift */; };
+		8D9D9BC1247C69520093220E /* TunnelProviderManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D9E602B24364EE6003A46D8 /* TunnelProviderManager.swift */; };
+		8D9D9BC3247C69F80093220E /* Store.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52A2465B2390569800A01FF1 /* Store.swift */; };
+		8D9D9BC4247C69F80093220E /* StoreDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D417EB82415667900FEE587 /* StoreDelegate.swift */; };
+		8D9D9BC5247C69F80093220E /* State.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D417EDA2419D9CF00FEE587 /* State.swift */; };
+		8D9D9BC6247C69F80093220E /* Effect.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D417EDE241AA89C00FEE587 /* Effect.swift */; };
+		8D9D9BC7247C69F80093220E /* SerialEffect.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D9E602D24364FB6003A46D8 /* SerialEffect.swift */; };
+		8D9D9BCA247C6A6E0093220E /* FeedbackLogging.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52B3C54D23E22454003F6B12 /* FeedbackLogging.swift */; };
+		8D9D9BCC247C6A9D0093220E /* PsiphonRotatingFileFeedbackLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D7789CF2474D53D0038BFDA /* PsiphonRotatingFileFeedbackLogger.swift */; };
+		8D9D9BCD247C6B160093220E /* DebugFlags.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D7789AD247490490038BFDA /* DebugFlags.swift */; };
+		8D9D9BCE247C6B2D0093220E /* HardCodedValues.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D417EBE2417FFB000FEE587 /* HardCodedValues.swift */; };
+		8D9D9BD0247C6B910093220E /* HardCodedValues.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D9D9BCF247C6B910093220E /* HardCodedValues.swift */; };
+		8D9D9BD1247C6BED0093220E /* InternetReachability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D255E2A2461E06900FD5D1C /* InternetReachability.swift */; };
+		8D9D9BD2247C6BF10093220E /* ReactiveSwift+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52805BA022DD1EB8006B205B /* ReactiveSwift+Additions.swift */; };
+		8D9D9BE1247C6C9D0093220E /* Utilities.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8D9D9BD8247C6C9C0093220E /* Utilities.framework */; };
+		8D9D9BEA247C6C9D0093220E /* Utilities.h in Headers */ = {isa = PBXBuildFile; fileRef = 8D9D9BDA247C6C9D0093220E /* Utilities.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		8D9D9BED247C6C9D0093220E /* Utilities.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8D9D9BD8247C6C9C0093220E /* Utilities.framework */; };
+		8D9D9BEE247C6C9D0093220E /* Utilities.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8D9D9BD8247C6C9C0093220E /* Utilities.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		8D9D9BF5247C6CBC0093220E /* RFC3339.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D7789BF247496520038BFDA /* RFC3339.swift */; };
+		8D9D9BF7247C6CC20093220E /* RFC3339Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D9D9B86247C1FBF0093220E /* RFC3339Tests.swift */; };
+		8D9D9BF8247C6D150093220E /* timestamp_valid.c in Sources */ = {isa = PBXBuildFile; fileRef = EF90D78D204F22C900228A63 /* timestamp_valid.c */; };
+		8D9D9BF9247C6D150093220E /* timestamp_compare.c in Sources */ = {isa = PBXBuildFile; fileRef = EF90D78E204F22C900228A63 /* timestamp_compare.c */; };
+		8D9D9BFA247C6D150093220E /* timestamp_tm.c in Sources */ = {isa = PBXBuildFile; fileRef = EF90D78F204F22C900228A63 /* timestamp_tm.c */; };
+		8D9D9BFB247C6D150093220E /* timestamp_format.c in Sources */ = {isa = PBXBuildFile; fileRef = EF90D790204F22C900228A63 /* timestamp_format.c */; };
+		8D9D9BFC247C6D150093220E /* timestamp_parse.c in Sources */ = {isa = PBXBuildFile; fileRef = EF90D791204F22C900228A63 /* timestamp_parse.c */; };
+		8D9D9C03247C73F80093220E /* timestamp.h in Headers */ = {isa = PBXBuildFile; fileRef = EF90D792204F22C900228A63 /* timestamp.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		8D9D9C12247C75DE0093220E /* Testing.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8D9D9C09247C75DD0093220E /* Testing.framework */; };
+		8D9D9C1B247C75DE0093220E /* Testing.h in Headers */ = {isa = PBXBuildFile; fileRef = 8D9D9C0B247C75DD0093220E /* Testing.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		8D9D9C1F247C75DE0093220E /* Testing.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8D9D9C09247C75DD0093220E /* Testing.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		8D9D9C26247C75F90093220E /* TestingUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D4570462475BA5900E1CC57 /* TestingUtils.swift */; };
+		8D9D9C28247C76110093220E /* TestUtilTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D90A983247633D200FC86F0 /* TestUtilTests.swift */; };
+		8D9D9C2A247C77AB0093220E /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8D9D9C29247C77AB0093220E /* XCTest.framework */; };
+		8D9D9C2C247C77E20093220E /* NonEmptyList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D9D9C2B247C77E20093220E /* NonEmptyList.swift */; };
+		8D9D9C30247C78620093220E /* Result+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D9D9C2F247C78620093220E /* Result+Additions.swift */; };
+		8D9D9C32247C78BD0093220E /* DataTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D9D9C31247C78BD0093220E /* DataTypes.swift */; };
 		8D9E602A24364ED2003A46D8 /* VPNStateReducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D9E602924364ED2003A46D8 /* VPNStateReducer.swift */; };
-		8D9E602C24364EE6003A46D8 /* TunnelProviderManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D9E602B24364EE6003A46D8 /* TunnelProviderManager.swift */; };
-		8D9E602F24366AE7003A46D8 /* SerialEffect.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D9E602D24364FB6003A46D8 /* SerialEffect.swift */; };
-		8D9E603024366AEC003A46D8 /* Effect.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D417EDE241AA89C00FEE587 /* Effect.swift */; };
-		8D9E603124366AEF003A46D8 /* State.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D417EDA2419D9CF00FEE587 /* State.swift */; };
-		8D9E603224366AF2003A46D8 /* StoreDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D417EB82415667900FEE587 /* StoreDelegate.swift */; };
-		8D9E603324366AF4003A46D8 /* Store.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52A2465B2390569800A01FF1 /* Store.swift */; };
 		8D9E603524366D71003A46D8 /* FeedbackDescriptions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D9E603424366D71003A46D8 /* FeedbackDescriptions.swift */; };
 		8DA3466624114DB400F9E2D1 /* PsiCashState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DA3466524114DB400F9E2D1 /* PsiCashState.swift */; };
 		8DB6C6362429080C005E2F4C /* PsiCashMessageWithRetryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DB6C6352429080C005E2F4C /* PsiCashMessageWithRetryView.swift */; };
 		8DB6C638242A4D06005E2F4C /* DuskButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DB6C637242A4D06005E2F4C /* DuskButton.swift */; };
+		8DCA6864247C7CF8001D026E /* Bindable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DCA6863247C7CF8001D026E /* Bindable.swift */; };
 		8DD6E7E524591E270041DAC5 /* SubscriptionAuthCheck.m in Sources */ = {isa = PBXBuildFile; fileRef = 8DD6E7E424591E270041DAC5 /* SubscriptionAuthCheck.m */; };
 		8DD6E7E82459C83B0041DAC5 /* StoredAuthorizations.m in Sources */ = {isa = PBXBuildFile; fileRef = 8DD6E7E72459C83B0041DAC5 /* StoredAuthorizations.m */; };
 		8DDA60292425BB4800DBA8EC /* DebugStrings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DDA60282425BB4800DBA8EC /* DebugStrings.swift */; };
@@ -279,42 +246,24 @@
 		A8408F99941C9664E3E7C48A /* LanguageSelectionViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A840896A2A9959280DAE2DA1 /* LanguageSelectionViewController.m */; };
 		A8408FA13890CD67154033C6 /* RegionSelectionButton.m in Sources */ = {isa = PBXBuildFile; fileRef = A8408C84138113DE79F0DCD0 /* RegionSelectionButton.m */; };
 		A8408FF45D08D31E102FA41F /* ContainerDB.m in Sources */ = {isa = PBXBuildFile; fileRef = A84086716D701D0F5B48E4C0 /* ContainerDB.m */; };
-		C06CE6DFC7F62C518C57374F /* libPods-PsiphonTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = AB870335F4C2AA3297D49236 /* libPods-PsiphonTests.a */; };
+		C6632A93F44F61F510F1B5C0 /* libPods-Testing.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0F6E7ECE29C482C0CEEA9171 /* libPods-Testing.a */; };
+		C6C3535DE4B651B0B0CC644F /* libPods-PsiApi-PsiApiTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 8422B782F6ACED7897FCAC25 /* libPods-PsiApi-PsiApiTests.a */; };
+		C88BAE7819F1A11A18EF1C2D /* libPods-Utilities.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5BD54CAD6ADCC8D87B9A02C7 /* libPods-Utilities.a */; };
 		CB0CFCFF11CEECCAA1A2C8BF /* libPods-PsiphonVPN.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A44F0D2E7AB9F499D75A1AC4 /* libPods-PsiphonVPN.a */; };
 		CE26FC951BBDC7B800B83375 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = CE26FC941BBDC7B800B83375 /* Assets.xcassets */; };
 		CE26FCAC1BBDC85900B83375 /* PsiphonVPN.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = CE26FCA31BBDC85900B83375 /* PsiphonVPN.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		CE4903A724784156004AEBAF /* PurchaseVerifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE4903A624784156004AEBAF /* PurchaseVerifier.swift */; };
-		CE4903A8247841F8004AEBAF /* PurchaseVerifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE4903A624784156004AEBAF /* PurchaseVerifier.swift */; };
-		CE4903A924784F27004AEBAF /* FeedbackLogging.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52B3C54D23E22454003F6B12 /* FeedbackLogging.swift */; };
 		CE4E9BC01BBEECF30060FF8B /* Psiphon.entitlements in Resources */ = {isa = PBXBuildFile; fileRef = CE4E9BBF1BBEECF30060FF8B /* Psiphon.entitlements */; };
 		CE4E9BC21BBEECFC0060FF8B /* PsiphonVPN.entitlements in Resources */ = {isa = PBXBuildFile; fileRef = CE4E9BC11BBEECFC0060FF8B /* PsiphonVPN.entitlements */; };
 		CE6C3F6A24366AE1007A17F0 /* ClientMetadata.m in Sources */ = {isa = PBXBuildFile; fileRef = CE6C3F6924366AE1007A17F0 /* ClientMetadata.m */; };
 		CE7B76431F54881F00EA44BD /* PsiphonTunnel.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 66094F781E8067520069EC4E /* PsiphonTunnel.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		CEC8F8942478254200D273DF /* NonEmptySeq.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEC8F8932478254200D273DF /* NonEmptySeq.swift */; };
-		CEC8F8952478254200D273DF /* NonEmptySeq.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEC8F8932478254200D273DF /* NonEmptySeq.swift */; };
-		CEC8F897247825B700D273DF /* NonEmptySeqTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEC8F896247825B700D273DF /* NonEmptySeqTest.swift */; };
-		CEC8F8992478332300D273DF /* NonEmptySeq+CustomStringFeedbackDescription.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEC8F8982478332300D273DF /* NonEmptySeq+CustomStringFeedbackDescription.swift */; };
-		CEC8F89A2478332300D273DF /* NonEmptySeq+CustomStringFeedbackDescription.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEC8F8982478332300D273DF /* NonEmptySeq+CustomStringFeedbackDescription.swift */; };
-		CEED78242476FA13002D9D55 /* SubscriptionState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D96601D2457DC6C0007718B /* SubscriptionState.swift */; };
-		CEED78252476FA76002D9D55 /* AppReceipt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D417EBA2417155000FEE587 /* AppReceipt.swift */; };
-		CEED78272476FA9D002D9D55 /* SubscriptionAuthState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D417EBC2417FF5B00FEE587 /* SubscriptionAuthState.swift */; };
-		CEED78292476FB72002D9D55 /* IAPState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D417EA02411A89500FEE587 /* IAPState.swift */; };
-		CEED782A2476FC3A002D9D55 /* IAPProducts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 521D084D2346A75700403B48 /* IAPProducts.swift */; };
-		CEED782B2476FC4B002D9D55 /* PaymentQueue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D417E9C2411A0C200FEE587 /* PaymentQueue.swift */; };
 		CEED782D2476FD5F002D9D55 /* IAPValuePaths.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEED782C2476FD5F002D9D55 /* IAPValuePaths.swift */; };
-		CEED782F2476FDDB002D9D55 /* IAPValuePaths.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEED782C2476FD5F002D9D55 /* IAPValuePaths.swift */; };
-		CEED78302476FE04002D9D55 /* Promises+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52C8F0AE2383059200E5F9C0 /* Promises+Additions.swift */; };
-		CEED78312476FE49002D9D55 /* SubscriptionPurchaseVerification.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D00AA492450B4D1001EB8DD /* SubscriptionPurchaseVerification.swift */; };
-		CEED78322476FF3D002D9D55 /* Result+Codable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DE4E6D1244E97D000275362 /* Result+Codable.swift */; };
-		CEED78332477039C002D9D55 /* PurchaseVerifier+Subscription.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52B3C54223DA31E1003F6B12 /* PurchaseVerifier+Subscription.swift */; };
 		CEED7835247703DD002D9D55 /* AppReceiptReducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEED7834247703DD002D9D55 /* AppReceiptReducer.swift */; };
 		CEED783B247707F3002D9D55 /* PurchaseVerifier+PsiCash.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEED783A247707F3002D9D55 /* PurchaseVerifier+PsiCash.swift */; };
-		CEED7840247712D7002D9D55 /* ClientMetadata.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D7789C2247496C00038BFDA /* ClientMetadata.swift */; };
-		CEED784224771415002D9D55 /* RetryCondition+FeedbackDescription.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEED784124771415002D9D55 /* RetryCondition+FeedbackDescription.swift */; };
-		CEED784324771415002D9D55 /* RetryCondition+FeedbackDescription.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEED784124771415002D9D55 /* RetryCondition+FeedbackDescription.swift */; };
 		CEED784624774B80002D9D55 /* AuthorizationState+Codable.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEED784524774B80002D9D55 /* AuthorizationState+Codable.swift */; };
-		CEED784724774B80002D9D55 /* AuthorizationState+Codable.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEED784524774B80002D9D55 /* AuthorizationState+Codable.swift */; };
 		D672BC574F14042B4D77AB28 /* libPods-Psiphon.a in Frameworks */ = {isa = PBXBuildFile; fileRef = CB8BB19F016330264C4DCB80 /* libPods-Psiphon.a */; };
+		DC5D9CAA0D2981A6EA3D1584 /* libPods-Utilities-UtilitiesTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BB13EB8F2A08D93B4FB284DA /* libPods-Utilities-UtilitiesTests.a */; };
+		DE9EA7BCCCEE05C4C6D61514 /* libPods-PsiApi.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 548DC13880329CCB9E0CD4B2 /* libPods-PsiApi.a */; };
 		EF4F1F3D206055F7006A40A1 /* RACSignal+Operations2.m in Sources */ = {isa = PBXBuildFile; fileRef = EF90D79F204F22C900228A63 /* RACSignal+Operations2.m */; };
 		EF639C2F1F8FCE37009D6B42 /* PsiFeedbackLogger.m in Sources */ = {isa = PBXBuildFile; fileRef = EF639C2E1F8FCE2A009D6B42 /* PsiFeedbackLogger.m */; };
 		EF639C301F8FCE37009D6B42 /* PsiFeedbackLogger.m in Sources */ = {isa = PBXBuildFile; fileRef = EF639C2E1F8FCE2A009D6B42 /* PsiFeedbackLogger.m */; };
@@ -355,6 +304,7 @@
 		EFC2F5CC20226835007B52F9 /* PsiphonConfigReader.m in Sources */ = {isa = PBXBuildFile; fileRef = EFC2F5CA202267B0007B52F9 /* PsiphonConfigReader.m */; };
 		F132D7E01F5739A800AF7F91 /* LaunchScreenViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = F132D7DF1F5739A800AF7F91 /* LaunchScreenViewController.m */; };
 		F136C2951F62E3E1000D3EAB /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = F136C2941F62E3E1000D3EAB /* LaunchScreen.xib */; };
+		FC01C4BBEE75174AD2A86D26 /* libPods-Testing-TestingTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 89AFBADD685AA2E2BC967A94 /* libPods-Testing-TestingTests.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -365,12 +315,75 @@
 			remoteGlobalIDString = CE26FC891BBDC7B800B83375;
 			remoteInfo = Psiphon;
 		};
-		8D77894424745DD90038BFDA /* PBXContainerItemProxy */ = {
+		8D9D9BA1247C64CC0093220E /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = CE26FC821BBDC7B700B83375 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 8D9D9B96247C64CB0093220E;
+			remoteInfo = PsiApi;
+		};
+		8D9D9BA3247C64CC0093220E /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = CE26FC821BBDC7B700B83375 /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = CE26FC891BBDC7B800B83375;
 			remoteInfo = Psiphon;
+		};
+		8D9D9BAA247C64CC0093220E /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = CE26FC821BBDC7B700B83375 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 8D9D9B96247C64CB0093220E;
+			remoteInfo = PsiApi;
+		};
+		8D9D9BE2247C6C9D0093220E /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = CE26FC821BBDC7B700B83375 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 8D9D9BD7247C6C9C0093220E;
+			remoteInfo = Utilities;
+		};
+		8D9D9BE4247C6C9D0093220E /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = CE26FC821BBDC7B700B83375 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = CE26FC891BBDC7B800B83375;
+			remoteInfo = Psiphon;
+		};
+		8D9D9BEB247C6C9D0093220E /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = CE26FC821BBDC7B700B83375 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 8D9D9BD7247C6C9C0093220E;
+			remoteInfo = Utilities;
+		};
+		8D9D9C13247C75DE0093220E /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = CE26FC821BBDC7B700B83375 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 8D9D9C08247C75DD0093220E;
+			remoteInfo = Testing;
+		};
+		8D9D9C15247C75DE0093220E /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = CE26FC821BBDC7B700B83375 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = CE26FC891BBDC7B800B83375;
+			remoteInfo = Psiphon;
+		};
+		8D9D9C2D247C78280093220E /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = CE26FC821BBDC7B700B83375 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 8D9D9BD7247C6C9C0093220E;
+			remoteInfo = Utilities;
+		};
+		8D9D9C33247C795D0093220E /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = CE26FC821BBDC7B700B83375 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 8D9D9BD7247C6C9C0093220E;
+			remoteInfo = Utilities;
 		};
 		CE26FCAA1BBDC85900B83375 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -400,16 +413,28 @@
 			dstSubfolderSpec = 10;
 			files = (
 				4E30745F2097922C00B6D2A3 /* PsiCashLib.framework in CopyFiles */,
+				8D9D9BAD247C64CC0093220E /* PsiApi.framework in CopyFiles */,
+				8D9D9C1F247C75DE0093220E /* Testing.framework in CopyFiles */,
 				CE7B76431F54881F00EA44BD /* PsiphonTunnel.framework in CopyFiles */,
+				8D9D9BEE247C6C9D0093220E /* Utilities.framework in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		015255F2FAC67FC9CE25D8EC /* Pods-PsiApi-PsiApiTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PsiApi-PsiApiTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-PsiApi-PsiApiTests/Pods-PsiApi-PsiApiTests.debug.xcconfig"; sourceTree = "<group>"; };
 		04965F4B8ED97E34A3E4E661 /* Pods-PsiphonVPN.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PsiphonVPN.debug.xcconfig"; path = "Pods/Target Support Files/Pods-PsiphonVPN/Pods-PsiphonVPN.debug.xcconfig"; sourceTree = "<group>"; };
+		0F6E7ECE29C482C0CEEA9171 /* libPods-Testing.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Testing.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		139D1D60EFF73A79ECF31F19 /* Pods-PsiphonVPN.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PsiphonVPN.release.xcconfig"; path = "Pods/Target Support Files/Pods-PsiphonVPN/Pods-PsiphonVPN.release.xcconfig"; sourceTree = "<group>"; };
+		1787CA7A8FA75358E02689FB /* Pods-Psiphon-PsiApi-PsiApiTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Psiphon-PsiApi-PsiApiTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-Psiphon-PsiApi-PsiApiTests/Pods-Psiphon-PsiApi-PsiApiTests.release.xcconfig"; sourceTree = "<group>"; };
 		1FE4700126FC2AD287FCB45B /* Pods-PsiphonTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PsiphonTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-PsiphonTests/Pods-PsiphonTests.release.xcconfig"; sourceTree = "<group>"; };
+		2D1DAF6C9CAF197D05CDCFCF /* Pods-Testing-TestingTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Testing-TestingTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-Testing-TestingTests/Pods-Testing-TestingTests.release.xcconfig"; sourceTree = "<group>"; };
+		2EAE1D54BEBC6BF081A5B8D3 /* Pods-Testing-TestingTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Testing-TestingTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Testing-TestingTests/Pods-Testing-TestingTests.debug.xcconfig"; sourceTree = "<group>"; };
+		364EDFAD32DACAD0E8259C6E /* Pods-Psiphon-PsiApi.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Psiphon-PsiApi.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Psiphon-PsiApi/Pods-Psiphon-PsiApi.debug.xcconfig"; sourceTree = "<group>"; };
+		38595BFE7626FC3E5C373BC9 /* Pods-Testing.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Testing.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Testing/Pods-Testing.debug.xcconfig"; sourceTree = "<group>"; };
+		3E7745DBA0A65C097BB74EB5 /* Pods-Testing.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Testing.release.xcconfig"; path = "Pods/Target Support Files/Pods-Testing/Pods-Testing.release.xcconfig"; sourceTree = "<group>"; };
+		3EEE97DA12A99CDA3F3DA635 /* Pods-Psiphon-Testing.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Psiphon-Testing.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Psiphon-Testing/Pods-Psiphon-Testing.debug.xcconfig"; sourceTree = "<group>"; };
 		440D75BD1F59E041005C603B /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 		4435CC251F70566000F3A809 /* SettingsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SettingsViewController.h; sourceTree = "<group>"; };
 		4435CC261F70566000F3A809 /* SettingsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SettingsViewController.m; sourceTree = "<group>"; };
@@ -479,6 +504,7 @@
 		445F24F220E1A85C00D004E9 /* IA5String.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = IA5String.c; sourceTree = "<group>"; };
 		445F24F320E1A85C00D004E9 /* UTF8String.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = UTF8String.c; sourceTree = "<group>"; };
 		445F24F420E1A85C00D004E9 /* IA5String.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IA5String.h; sourceTree = "<group>"; };
+		49886790EED7F2868C4610A7 /* Pods-Psiphon-PsiApi-PsiApiTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Psiphon-PsiApi-PsiApiTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Psiphon-PsiApi-PsiApiTests/Pods-Psiphon-PsiApi-PsiApiTests.debug.xcconfig"; sourceTree = "<group>"; };
 		4E0774951F566ADA0097BC8C /* InAppSettings.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = InAppSettings.bundle; sourceTree = "<group>"; };
 		4E0A3667215AB7EE008A3D7B /* UIFont+Additions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "UIFont+Additions.h"; sourceTree = "<group>"; };
 		4E0A3668215AB7EE008A3D7B /* UIFont+Additions.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "UIFont+Additions.m"; sourceTree = "<group>"; };
@@ -577,7 +603,10 @@
 		52DF5E9723CE5A8300A1B067 /* ValuePaths.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ValuePaths.swift; sourceTree = "<group>"; };
 		52DF5E9923CE835100A1B067 /* UserStrings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserStrings.swift; sourceTree = "<group>"; };
 		52DF5E9D23D0D01F00A1B067 /* BridgingTypes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BridgingTypes.swift; sourceTree = "<group>"; };
+		548DC13880329CCB9E0CD4B2 /* libPods-PsiApi.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-PsiApi.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		571DC9418AF936E60179F07C /* Pods-Psiphon.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Psiphon.release.xcconfig"; path = "Pods/Target Support Files/Pods-Psiphon/Pods-Psiphon.release.xcconfig"; sourceTree = "<group>"; };
+		5BD54CAD6ADCC8D87B9A02C7 /* libPods-Utilities.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Utilities.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		65957584722BB1AA6B3B4825 /* Pods-PsiApi.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PsiApi.release.xcconfig"; path = "Pods/Target Support Files/Pods-PsiApi/Pods-PsiApi.release.xcconfig"; sourceTree = "<group>"; };
 		66094F781E8067520069EC4E /* PsiphonTunnel.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = PsiphonTunnel.framework; sourceTree = "<group>"; };
 		6615A5E91F58A95500026C98 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = Strings/en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		6615A5EC1F58A95E00026C98 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = Strings/fr.lproj/Localizable.strings; sourceTree = "<group>"; };
@@ -613,9 +642,15 @@
 		6651BE041F6B176500D65633 /* kk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = kk; path = Strings/kk.lproj/Localizable.strings; sourceTree = "<group>"; };
 		6651BE051F6B177000D65633 /* my */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = my; path = Strings/my.lproj/Localizable.strings; sourceTree = "<group>"; };
 		668AF9BE1E92CBD3008CAAAA /* NetworkExtension.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = NetworkExtension.framework; path = System/Library/Frameworks/NetworkExtension.framework; sourceTree = SDKROOT; };
+		672D77B7307F9CEE82EECCCC /* Pods-PsiApi.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PsiApi.debug.xcconfig"; path = "Pods/Target Support Files/Pods-PsiApi/Pods-PsiApi.debug.xcconfig"; sourceTree = "<group>"; };
+		78C6298EAA632CD41F06795D /* Pods-Utilities.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Utilities.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Utilities/Pods-Utilities.debug.xcconfig"; sourceTree = "<group>"; };
+		8422B782F6ACED7897FCAC25 /* libPods-PsiApi-PsiApiTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-PsiApi-PsiApiTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		894580B71199444DBB2C3FA2 /* Pods-Psiphon-Testing.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Psiphon-Testing.release.xcconfig"; path = "Pods/Target Support Files/Pods-Psiphon-Testing/Pods-Psiphon-Testing.release.xcconfig"; sourceTree = "<group>"; };
+		89AFBADD685AA2E2BC967A94 /* libPods-Testing-TestingTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Testing-TestingTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		8D00AA472450B4AB001EB8DD /* PsiCashPurchaseVerification.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PsiCashPurchaseVerification.swift; sourceTree = "<group>"; };
 		8D00AA492450B4D1001EB8DD /* SubscriptionPurchaseVerification.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionPurchaseVerification.swift; sourceTree = "<group>"; };
 		8D019B7F2451D864006F21C4 /* HTTPStatusCode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTTPStatusCode.swift; sourceTree = "<group>"; };
+		8D14CCB4BB61E10B351D20DC /* Pods-Psiphon-PsiApi.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Psiphon-PsiApi.release.xcconfig"; path = "Pods/Target Support Files/Pods-Psiphon-PsiApi/Pods-Psiphon-PsiApi.release.xcconfig"; sourceTree = "<group>"; };
 		8D255E2A2461E06900FD5D1C /* InternetReachability.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InternetReachability.swift; sourceTree = "<group>"; };
 		8D255E2C24620E2900FD5D1C /* NoConnectionBannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoConnectionBannerView.swift; sourceTree = "<group>"; };
 		8D417E982411954A00FEE587 /* PsiCashReducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PsiCashReducer.swift; sourceTree = "<group>"; };
@@ -633,10 +668,7 @@
 		8D417EDA2419D9CF00FEE587 /* State.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = State.swift; sourceTree = "<group>"; };
 		8D417EDC2419DBA100FEE587 /* ProductRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductRequest.swift; sourceTree = "<group>"; };
 		8D417EDE241AA89C00FEE587 /* Effect.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Effect.swift; sourceTree = "<group>"; };
-		8D45701D247577D400E1CC57 /* PsiphonTests-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "PsiphonTests-Bridging-Header.h"; sourceTree = "<group>"; };
-		8D4570462475BA5900E1CC57 /* PsiphonTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PsiphonTests.swift; sourceTree = "<group>"; };
-		8D77893F24745DD90038BFDA /* PsiphonTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PsiphonTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		8D77894324745DD90038BFDA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		8D4570462475BA5900E1CC57 /* TestingUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestingUtils.swift; sourceTree = "<group>"; };
 		8D77897B2474839C0038BFDA /* RequestsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RequestsTests.swift; sourceTree = "<group>"; };
 		8D7789AD247490490038BFDA /* DebugFlags.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugFlags.swift; sourceTree = "<group>"; };
 		8D7789B8247491CA0038BFDA /* PsiphonBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PsiphonBundle.swift; sourceTree = "<group>"; };
@@ -653,6 +685,26 @@
 		8D938DD6244D43550009DE39 /* Receipt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Receipt.swift; sourceTree = "<group>"; };
 		8D96601D2457DC6C0007718B /* SubscriptionState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionState.swift; sourceTree = "<group>"; };
 		8D9D9B86247C1FBF0093220E /* RFC3339Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RFC3339Tests.swift; sourceTree = "<group>"; };
+		8D9D9B97247C64CB0093220E /* PsiApi.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = PsiApi.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		8D9D9B99247C64CB0093220E /* PsiApi.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PsiApi.h; sourceTree = "<group>"; };
+		8D9D9B9A247C64CB0093220E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		8D9D9B9F247C64CC0093220E /* PsiApiTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PsiApiTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		8D9D9BA8247C64CC0093220E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		8D9D9BCF247C6B910093220E /* HardCodedValues.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HardCodedValues.swift; sourceTree = "<group>"; };
+		8D9D9BD8247C6C9C0093220E /* Utilities.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Utilities.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		8D9D9BDA247C6C9D0093220E /* Utilities.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Utilities.h; sourceTree = "<group>"; };
+		8D9D9BDB247C6C9D0093220E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		8D9D9BE0247C6C9D0093220E /* UtilitiesTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = UtilitiesTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		8D9D9BE9247C6C9D0093220E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		8D9D9C09247C75DD0093220E /* Testing.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Testing.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		8D9D9C0B247C75DD0093220E /* Testing.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Testing.h; sourceTree = "<group>"; };
+		8D9D9C0C247C75DD0093220E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		8D9D9C11247C75DE0093220E /* TestingTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TestingTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		8D9D9C1A247C75DE0093220E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		8D9D9C29247C77AB0093220E /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Platforms/iPhoneOS.platform/Developer/Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
+		8D9D9C2B247C77E20093220E /* NonEmptyList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NonEmptyList.swift; sourceTree = "<group>"; };
+		8D9D9C2F247C78620093220E /* Result+Additions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Result+Additions.swift"; sourceTree = "<group>"; };
+		8D9D9C31247C78BD0093220E /* DataTypes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataTypes.swift; sourceTree = "<group>"; };
 		8D9E602924364ED2003A46D8 /* VPNStateReducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VPNStateReducer.swift; sourceTree = "<group>"; };
 		8D9E602B24364EE6003A46D8 /* TunnelProviderManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TunnelProviderManager.swift; sourceTree = "<group>"; };
 		8D9E602D24364FB6003A46D8 /* SerialEffect.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SerialEffect.swift; sourceTree = "<group>"; };
@@ -660,6 +712,7 @@
 		8DA3466524114DB400F9E2D1 /* PsiCashState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PsiCashState.swift; sourceTree = "<group>"; };
 		8DB6C6352429080C005E2F4C /* PsiCashMessageWithRetryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PsiCashMessageWithRetryView.swift; sourceTree = "<group>"; };
 		8DB6C637242A4D06005E2F4C /* DuskButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DuskButton.swift; sourceTree = "<group>"; };
+		8DCA6863247C7CF8001D026E /* Bindable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Bindable.swift; sourceTree = "<group>"; };
 		8DD6E7E324591E270041DAC5 /* SubscriptionAuthCheck.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SubscriptionAuthCheck.h; sourceTree = "<group>"; };
 		8DD6E7E424591E270041DAC5 /* SubscriptionAuthCheck.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SubscriptionAuthCheck.m; sourceTree = "<group>"; };
 		8DD6E7E62459C83B0041DAC5 /* StoredAuthorizations.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = StoredAuthorizations.h; sourceTree = "<group>"; };
@@ -667,6 +720,7 @@
 		8DDA60282425BB4800DBA8EC /* DebugStrings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugStrings.swift; sourceTree = "<group>"; };
 		8DE4E6D1244E97D000275362 /* Result+Codable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Result+Codable.swift"; sourceTree = "<group>"; };
 		8DE4E6D3244E9D8E00275362 /* Authorization.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Authorization.swift; sourceTree = "<group>"; };
+		9433F6FADEFD218CED8B343A /* Pods-PsiApi-PsiApiTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PsiApi-PsiApiTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-PsiApi-PsiApiTests/Pods-PsiApi-PsiApiTests.release.xcconfig"; sourceTree = "<group>"; };
 		9BFEC0419AD3808370915E01 /* PsiphonConfigUserDefaults.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PsiphonConfigUserDefaults.h; sourceTree = "<group>"; };
 		9BFEC1C9F506CE1DF07306D2 /* NEBridge.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NEBridge.h; sourceTree = "<group>"; };
 		9BFEC220C067BBE75AF970C1 /* IAPHelpViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IAPHelpViewController.m; sourceTree = "<group>"; };
@@ -694,6 +748,7 @@
 		9BFECEEB971749A4E9705B15 /* Nullity.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Nullity.h; sourceTree = "<group>"; };
 		9BFECF6BF16767758F28D1A0 /* AdMobRewardedAdControllerWrapper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AdMobRewardedAdControllerWrapper.m; sourceTree = "<group>"; };
 		9BFECF74881B6C4227813A63 /* AdMobConsent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AdMobConsent.h; sourceTree = "<group>"; };
+		A13608CD23499831149566BA /* Pods-Psiphon-Testing-TestingTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Psiphon-Testing-TestingTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-Psiphon-Testing-TestingTests/Pods-Psiphon-Testing-TestingTests.release.xcconfig"; sourceTree = "<group>"; };
 		A44F0D2E7AB9F499D75A1AC4 /* libPods-PsiphonVPN.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-PsiphonVPN.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		A840802C7AEFA7F375205DCB /* VPNStartAndStopButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VPNStartAndStopButton.h; sourceTree = "<group>"; };
 		A8408058458E7BFC4C3DFDDE /* AppEvent.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppEvent.m; sourceTree = "<group>"; };
@@ -763,6 +818,13 @@
 		A8408F6123BCC98725932A59 /* VPNStartAndStopButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VPNStartAndStopButton.m; sourceTree = "<group>"; };
 		A8408FA077C517546DF6033C /* WhiteSkyButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WhiteSkyButton.m; sourceTree = "<group>"; };
 		AB870335F4C2AA3297D49236 /* libPods-PsiphonTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-PsiphonTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		AC42AE4003B8FEF4D7B8E863 /* Pods-Psiphon-Testing-TestingTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Psiphon-Testing-TestingTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Psiphon-Testing-TestingTests/Pods-Psiphon-Testing-TestingTests.debug.xcconfig"; sourceTree = "<group>"; };
+		AC50BC070A94E760D3F894F7 /* Pods-Utilities.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Utilities.release.xcconfig"; path = "Pods/Target Support Files/Pods-Utilities/Pods-Utilities.release.xcconfig"; sourceTree = "<group>"; };
+		AF86192758FCD49D1549C59F /* Pods-Psiphon-Utilities-UtilitiesTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Psiphon-Utilities-UtilitiesTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Psiphon-Utilities-UtilitiesTests/Pods-Psiphon-Utilities-UtilitiesTests.debug.xcconfig"; sourceTree = "<group>"; };
+		B0273A876290D2B26E433A82 /* Pods-Psiphon-Utilities.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Psiphon-Utilities.release.xcconfig"; path = "Pods/Target Support Files/Pods-Psiphon-Utilities/Pods-Psiphon-Utilities.release.xcconfig"; sourceTree = "<group>"; };
+		BB13EB8F2A08D93B4FB284DA /* libPods-Utilities-UtilitiesTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Utilities-UtilitiesTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		BE85E028F71260A6BD3E48A0 /* Pods-Psiphon-Utilities-UtilitiesTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Psiphon-Utilities-UtilitiesTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-Psiphon-Utilities-UtilitiesTests/Pods-Psiphon-Utilities-UtilitiesTests.release.xcconfig"; sourceTree = "<group>"; };
+		C9BDA0C779D86E722D8B8DB2 /* Pods-Utilities-UtilitiesTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Utilities-UtilitiesTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-Utilities-UtilitiesTests/Pods-Utilities-UtilitiesTests.release.xcconfig"; sourceTree = "<group>"; };
 		CB8BB19F016330264C4DCB80 /* libPods-Psiphon.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Psiphon.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		CE26FC8A1BBDC7B800B83375 /* Psiphon.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Psiphon.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		CE26FC941BBDC7B800B83375 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -825,9 +887,11 @@
 		EFC2F5C120226782007B52F9 /* RootContainerController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RootContainerController.h; sourceTree = "<group>"; };
 		EFC2F5C9202267B0007B52F9 /* PsiphonConfigReader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PsiphonConfigReader.h; sourceTree = "<group>"; };
 		EFC2F5CA202267B0007B52F9 /* PsiphonConfigReader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PsiphonConfigReader.m; sourceTree = "<group>"; };
+		EFF94F005129FBF0532001B5 /* Pods-Utilities-UtilitiesTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Utilities-UtilitiesTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Utilities-UtilitiesTests/Pods-Utilities-UtilitiesTests.debug.xcconfig"; sourceTree = "<group>"; };
 		F132D7DE1F5739A800AF7F91 /* LaunchScreenViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LaunchScreenViewController.h; sourceTree = "<group>"; };
 		F132D7DF1F5739A800AF7F91 /* LaunchScreenViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LaunchScreenViewController.m; sourceTree = "<group>"; };
 		F136C2941F62E3E1000D3EAB /* LaunchScreen.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = LaunchScreen.xib; sourceTree = "<group>"; };
+		F4C4D7C3B9D998539C1D57FE /* Pods-Psiphon-Utilities.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Psiphon-Utilities.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Psiphon-Utilities/Pods-Psiphon-Utilities.debug.xcconfig"; sourceTree = "<group>"; };
 		F8FCDC22ED21515D276CE274 /* Pods-PsiphonTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PsiphonTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-PsiphonTests/Pods-PsiphonTests.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -839,11 +903,55 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		8D77893C24745DD90038BFDA /* Frameworks */ = {
+		8D9D9B94247C64CB0093220E /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C06CE6DFC7F62C518C57374F /* libPods-PsiphonTests.a in Frameworks */,
+				DE9EA7BCCCEE05C4C6D61514 /* libPods-PsiApi.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		8D9D9B9C247C64CC0093220E /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8D9D9BA0247C64CC0093220E /* PsiApi.framework in Frameworks */,
+				C6C3535DE4B651B0B0CC644F /* libPods-PsiApi-PsiApiTests.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		8D9D9BD5247C6C9C0093220E /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C88BAE7819F1A11A18EF1C2D /* libPods-Utilities.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		8D9D9BDD247C6C9D0093220E /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8D9D9BE1247C6C9D0093220E /* Utilities.framework in Frameworks */,
+				DC5D9CAA0D2981A6EA3D1584 /* libPods-Utilities-UtilitiesTests.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		8D9D9C06247C75DD0093220E /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8D9D9C2A247C77AB0093220E /* XCTest.framework in Frameworks */,
+				C6632A93F44F61F510F1B5C0 /* libPods-Testing.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		8D9D9C0E247C75DE0093220E /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8D9D9C12247C75DE0093220E /* Testing.framework in Frameworks */,
+				FC01C4BBEE75174AD2A86D26 /* libPods-Testing-TestingTests.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -851,8 +959,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8D9D9BED247C6C9D0093220E /* Utilities.framework in Frameworks */,
 				668AF9C01E92CBE0008CAAAA /* NetworkExtension.framework in Frameworks */,
 				440D75BE1F59E041005C603B /* StoreKit.framework in Frameworks */,
+				8D9D9BAC247C64CC0093220E /* PsiApi.framework in Frameworks */,
 				D672BC574F14042B4D77AB28 /* libPods-Psiphon.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1075,8 +1185,6 @@
 			isa = PBXGroup;
 			children = (
 				5248B4CD23203781008C00D4 /* SwiftObjCBridges.swift */,
-				52805BA022DD1EB8006B205B /* ReactiveSwift+Additions.swift */,
-				52467FF822CE77A1009AEC6E /* Foundation+Additions.swift */,
 				9BFECE69F71F11C7B3A2D67E /* UIColor+Additions.h */,
 				9BFEC72C282F6060193B2E87 /* UIColor+Additions.m */,
 				4E0A3667215AB7EE008A3D7B /* UIFont+Additions.h */,
@@ -1092,11 +1200,6 @@
 				8D417ED8241844FA00FEE587 /* FloatingPoint+Additions.swift */,
 				8DDA60282425BB4800DBA8EC /* DebugStrings.swift */,
 				8DE4E6D1244E97D000275362 /* Result+Codable.swift */,
-				8D7789BF247496520038BFDA /* RFC3339.swift */,
-				CEC8F8932478254200D273DF /* NonEmptySeq.swift */,
-				CEC8F8982478332300D273DF /* NonEmptySeq+CustomStringFeedbackDescription.swift */,
-				CEC8F896247825B700D273DF /* NonEmptySeqTest.swift */,
-				8D9D9B86247C1FBF0093220E /* RFC3339Tests.swift */,
 			);
 			path = Util;
 			sourceTree = "<group>";
@@ -1183,26 +1286,21 @@
 			path = PsiCashView;
 			sourceTree = "<group>";
 		};
-		52A2465A2390565700A01FF1 /* Store */ = {
-			isa = PBXGroup;
-			children = (
-				52A2465B2390569800A01FF1 /* Store.swift */,
-				8D417EB82415667900FEE587 /* StoreDelegate.swift */,
-				8D417EDA2419D9CF00FEE587 /* State.swift */,
-				8D417EDE241AA89C00FEE587 /* Effect.swift */,
-				8D9E602D24364FB6003A46D8 /* SerialEffect.swift */,
-			);
-			path = Store;
-			sourceTree = "<group>";
-		};
 		668AF9B81E92CB60008CAAAA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				8D9D9C29247C77AB0093220E /* XCTest.framework */,
 				440D75BD1F59E041005C603B /* StoreKit.framework */,
 				668AF9BE1E92CBD3008CAAAA /* NetworkExtension.framework */,
 				CB8BB19F016330264C4DCB80 /* libPods-Psiphon.a */,
 				A44F0D2E7AB9F499D75A1AC4 /* libPods-PsiphonVPN.a */,
 				AB870335F4C2AA3297D49236 /* libPods-PsiphonTests.a */,
+				548DC13880329CCB9E0CD4B2 /* libPods-PsiApi.a */,
+				8422B782F6ACED7897FCAC25 /* libPods-PsiApi-PsiApiTests.a */,
+				0F6E7ECE29C482C0CEEA9171 /* libPods-Testing.a */,
+				89AFBADD685AA2E2BC967A94 /* libPods-Testing-TestingTests.a */,
+				5BD54CAD6ADCC8D87B9A02C7 /* libPods-Utilities.a */,
+				BB13EB8F2A08D93B4FB284DA /* libPods-Utilities-UtilitiesTests.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -1215,7 +1313,38 @@
 			name = Strings;
 			sourceTree = "<group>";
 		};
-		8D019B7E2451D84F006F21C4 /* http */ = {
+		8D9D9B98247C64CB0093220E /* PsiApi */ = {
+			isa = PBXGroup;
+			children = (
+				8D255E2A2461E06900FD5D1C /* InternetReachability.swift */,
+				8D417EBE2417FFB000FEE587 /* HardCodedValues.swift */,
+				52805BA022DD1EB8006B205B /* ReactiveSwift+Additions.swift */,
+				8D7789AD247490490038BFDA /* DebugFlags.swift */,
+				8D9D9BC8247C6A530093220E /* Logging */,
+				8D9D9BC2247C69870093220E /* Store */,
+				8D9E602B24364EE6003A46D8 /* TunnelProviderManager.swift */,
+				52DF5E9523C7A31100A1B067 /* Error.swift */,
+				8D7789C6247497F40038BFDA /* FeedbackDescription.swift */,
+				52467FF822CE77A1009AEC6E /* Foundation+Additions.swift */,
+				CEC8F8932478254200D273DF /* NonEmptySeq.swift */,
+				CEC8F8982478332300D273DF /* NonEmptySeq+CustomStringFeedbackDescription.swift */,
+				CEC8F896247825B700D273DF /* NonEmptySeqTest.swift */,
+				8D9D9BB8247C660C0093220E /* http */,
+				8D9D9B99247C64CB0093220E /* PsiApi.h */,
+				8D9D9B9A247C64CB0093220E /* Info.plist */,
+			);
+			path = PsiApi;
+			sourceTree = "<group>";
+		};
+		8D9D9BA5247C64CC0093220E /* PsiApiTests */ = {
+			isa = PBXGroup;
+			children = (
+				8D9D9BA8247C64CC0093220E /* Info.plist */,
+			);
+			path = PsiApiTests;
+			sourceTree = "<group>";
+		};
+		8D9D9BB8247C660C0093220E /* http */ = {
 			isa = PBXGroup;
 			children = (
 				8D019B7F2451D864006F21C4 /* HTTPStatusCode.swift */,
@@ -1226,24 +1355,65 @@
 			path = http;
 			sourceTree = "<group>";
 		};
-		8D77894024745DD90038BFDA /* PsiphonTests */ = {
+		8D9D9BC2247C69870093220E /* Store */ = {
 			isa = PBXGroup;
 			children = (
-				8D77894324745DD90038BFDA /* Info.plist */,
-				8D45701D247577D400E1CC57 /* PsiphonTests-Bridging-Header.h */,
-				8D4570462475BA5900E1CC57 /* PsiphonTests.swift */,
-				8D90A983247633D200FC86F0 /* TestUtilTests.swift */,
+				52A2465B2390569800A01FF1 /* Store.swift */,
+				8D417EB82415667900FEE587 /* StoreDelegate.swift */,
+				8D417EDA2419D9CF00FEE587 /* State.swift */,
+				8D417EDE241AA89C00FEE587 /* Effect.swift */,
+				8D9E602D24364FB6003A46D8 /* SerialEffect.swift */,
 			);
-			path = PsiphonTests;
+			path = Store;
 			sourceTree = "<group>";
 		};
-		8D7789CC2474D4120038BFDA /* Logging */ = {
+		8D9D9BC8247C6A530093220E /* Logging */ = {
 			isa = PBXGroup;
 			children = (
 				52B3C54D23E22454003F6B12 /* FeedbackLogging.swift */,
-				8D7789CF2474D53D0038BFDA /* PsiphonRotatingFileFeedbackLogger.swift */,
 			);
 			path = Logging;
+			sourceTree = "<group>";
+		};
+		8D9D9BD9247C6C9D0093220E /* Utilities */ = {
+			isa = PBXGroup;
+			children = (
+				8D7789BF247496520038BFDA /* RFC3339.swift */,
+				8D9D9B86247C1FBF0093220E /* RFC3339Tests.swift */,
+				8D9D9BDA247C6C9D0093220E /* Utilities.h */,
+				8D9D9BDB247C6C9D0093220E /* Info.plist */,
+				8D9D9C2B247C77E20093220E /* NonEmptyList.swift */,
+				8D9D9C2F247C78620093220E /* Result+Additions.swift */,
+				8D9D9C31247C78BD0093220E /* DataTypes.swift */,
+			);
+			path = Utilities;
+			sourceTree = "<group>";
+		};
+		8D9D9BE6247C6C9D0093220E /* UtilitiesTests */ = {
+			isa = PBXGroup;
+			children = (
+				8D9D9BE9247C6C9D0093220E /* Info.plist */,
+			);
+			path = UtilitiesTests;
+			sourceTree = "<group>";
+		};
+		8D9D9C0A247C75DD0093220E /* Testing */ = {
+			isa = PBXGroup;
+			children = (
+				8D4570462475BA5900E1CC57 /* TestingUtils.swift */,
+				8D9D9C0B247C75DD0093220E /* Testing.h */,
+				8D9D9C0C247C75DD0093220E /* Info.plist */,
+			);
+			path = Testing;
+			sourceTree = "<group>";
+		};
+		8D9D9C17247C75DE0093220E /* TestingTests */ = {
+			isa = PBXGroup;
+			children = (
+				8D90A983247633D200FC86F0 /* TestUtilTests.swift */,
+				8D9D9C1A247C75DE0093220E /* Info.plist */,
+			);
+			path = TestingTests;
 			sourceTree = "<group>";
 		};
 		A8408C3BCEFC35B4744B684E /* Views */ = {
@@ -1309,7 +1479,12 @@
 				CE26FC8C1BBDC7B800B83375 /* Psiphon */,
 				CE26FCA41BBDC85900B83375 /* PsiphonVPN */,
 				4E0D88221FA06B2400ADB61E /* PsiphonUITests */,
-				8D77894024745DD90038BFDA /* PsiphonTests */,
+				8D9D9B98247C64CB0093220E /* PsiApi */,
+				8D9D9BA5247C64CC0093220E /* PsiApiTests */,
+				8D9D9BD9247C6C9D0093220E /* Utilities */,
+				8D9D9BE6247C6C9D0093220E /* UtilitiesTests */,
+				8D9D9C0A247C75DD0093220E /* Testing */,
+				8D9D9C17247C75DE0093220E /* TestingTests */,
 				CE26FC8B1BBDC7B800B83375 /* Products */,
 				668AF9B81E92CB60008CAAAA /* Frameworks */,
 				FF0DC6191C07A3FC5D6EE10A /* Pods */,
@@ -1322,7 +1497,12 @@
 				CE26FC8A1BBDC7B800B83375 /* Psiphon.app */,
 				CE26FCA31BBDC85900B83375 /* PsiphonVPN.appex */,
 				4E0D88211FA06B2400ADB61E /* PsiphonUITests.xctest */,
-				8D77893F24745DD90038BFDA /* PsiphonTests.xctest */,
+				8D9D9B97247C64CB0093220E /* PsiApi.framework */,
+				8D9D9B9F247C64CC0093220E /* PsiApiTests.xctest */,
+				8D9D9BD8247C6C9C0093220E /* Utilities.framework */,
+				8D9D9BE0247C6C9D0093220E /* UtilitiesTests.xctest */,
+				8D9D9C09247C75DD0093220E /* Testing.framework */,
+				8D9D9C11247C75DE0093220E /* TestingTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1330,10 +1510,7 @@
 		CE26FC8C1BBDC7B800B83375 /* Psiphon */ = {
 			isa = PBXGroup;
 			children = (
-				8D7789CC2474D4120038BFDA /* Logging */,
-				8D019B7E2451D84F006F21C4 /* http */,
 				EF90D79E204F22C900228A63 /* ReactiveExtensions */,
-				52A2465A2390565700A01FF1 /* Store */,
 				52055D02230C821200244F9E /* View */,
 				521FD0E4219E0D4500F748EC /* Debug */,
 				CE4E9BBF1BBEECF30060FF8B /* Psiphon.entitlements */,
@@ -1377,19 +1554,16 @@
 				52B3C54923DF99E8003F6B12 /* AppObservables.m */,
 				8D417EB024147C6D00FEE587 /* LandingPage.swift */,
 				8D417EB224148C1E00FEE587 /* URLHandler.swift */,
-				8D417EBE2417FFB000FEE587 /* HardCodedValues.swift */,
 				8D9E602924364ED2003A46D8 /* VPNStateReducer.swift */,
-				8D9E602B24364EE6003A46D8 /* TunnelProviderManager.swift */,
 				8D9E603424366D71003A46D8 /* FeedbackDescriptions.swift */,
-				52DF5E9523C7A31100A1B067 /* Error.swift */,
 				8DE4E6D3244E9D8E00275362 /* Authorization.swift */,
-				8D255E2A2461E06900FD5D1C /* InternetReachability.swift */,
-				8D7789AD247490490038BFDA /* DebugFlags.swift */,
 				8D7789B8247491CA0038BFDA /* PsiphonBundle.swift */,
 				8D7789BC247493300038BFDA /* VPNState.swift */,
 				8D7789C2247496C00038BFDA /* ClientMetadata.swift */,
-				8D7789C6247497F40038BFDA /* FeedbackDescription.swift */,
 				8D7789C9247499110038BFDA /* Reachability+Additions.swift */,
+				8D7789CF2474D53D0038BFDA /* PsiphonRotatingFileFeedbackLogger.swift */,
+				8D9D9BCF247C6B910093220E /* HardCodedValues.swift */,
+				8DCA6863247C7CF8001D026E /* Bindable.swift */,
 			);
 			path = Psiphon;
 			sourceTree = "<group>";
@@ -1533,11 +1707,63 @@
 				139D1D60EFF73A79ECF31F19 /* Pods-PsiphonVPN.release.xcconfig */,
 				F8FCDC22ED21515D276CE274 /* Pods-PsiphonTests.debug.xcconfig */,
 				1FE4700126FC2AD287FCB45B /* Pods-PsiphonTests.release.xcconfig */,
+				672D77B7307F9CEE82EECCCC /* Pods-PsiApi.debug.xcconfig */,
+				65957584722BB1AA6B3B4825 /* Pods-PsiApi.release.xcconfig */,
+				38595BFE7626FC3E5C373BC9 /* Pods-Testing.debug.xcconfig */,
+				3E7745DBA0A65C097BB74EB5 /* Pods-Testing.release.xcconfig */,
+				2EAE1D54BEBC6BF081A5B8D3 /* Pods-Testing-TestingTests.debug.xcconfig */,
+				2D1DAF6C9CAF197D05CDCFCF /* Pods-Testing-TestingTests.release.xcconfig */,
+				78C6298EAA632CD41F06795D /* Pods-Utilities.debug.xcconfig */,
+				AC50BC070A94E760D3F894F7 /* Pods-Utilities.release.xcconfig */,
+				EFF94F005129FBF0532001B5 /* Pods-Utilities-UtilitiesTests.debug.xcconfig */,
+				C9BDA0C779D86E722D8B8DB2 /* Pods-Utilities-UtilitiesTests.release.xcconfig */,
+				015255F2FAC67FC9CE25D8EC /* Pods-PsiApi-PsiApiTests.debug.xcconfig */,
+				9433F6FADEFD218CED8B343A /* Pods-PsiApi-PsiApiTests.release.xcconfig */,
+				364EDFAD32DACAD0E8259C6E /* Pods-Psiphon-PsiApi.debug.xcconfig */,
+				8D14CCB4BB61E10B351D20DC /* Pods-Psiphon-PsiApi.release.xcconfig */,
+				49886790EED7F2868C4610A7 /* Pods-Psiphon-PsiApi-PsiApiTests.debug.xcconfig */,
+				1787CA7A8FA75358E02689FB /* Pods-Psiphon-PsiApi-PsiApiTests.release.xcconfig */,
+				3EEE97DA12A99CDA3F3DA635 /* Pods-Psiphon-Testing.debug.xcconfig */,
+				894580B71199444DBB2C3FA2 /* Pods-Psiphon-Testing.release.xcconfig */,
+				AC42AE4003B8FEF4D7B8E863 /* Pods-Psiphon-Testing-TestingTests.debug.xcconfig */,
+				A13608CD23499831149566BA /* Pods-Psiphon-Testing-TestingTests.release.xcconfig */,
+				F4C4D7C3B9D998539C1D57FE /* Pods-Psiphon-Utilities.debug.xcconfig */,
+				B0273A876290D2B26E433A82 /* Pods-Psiphon-Utilities.release.xcconfig */,
+				AF86192758FCD49D1549C59F /* Pods-Psiphon-Utilities-UtilitiesTests.debug.xcconfig */,
+				BE85E028F71260A6BD3E48A0 /* Pods-Psiphon-Utilities-UtilitiesTests.release.xcconfig */,
 			);
 			name = Pods;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		8D9D9B92247C64CB0093220E /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8D9D9BA9247C64CC0093220E /* PsiApi.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		8D9D9BD3247C6C9C0093220E /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8D9D9BEA247C6C9D0093220E /* Utilities.h in Headers */,
+				8D9D9C03247C73F80093220E /* timestamp.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		8D9D9C04247C75DD0093220E /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8D9D9C1B247C75DE0093220E /* Testing.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
 		4E0D88201FA06B2400ADB61E /* PsiphonUITests */ = {
@@ -1558,24 +1784,123 @@
 			productReference = 4E0D88211FA06B2400ADB61E /* PsiphonUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
-		8D77893E24745DD90038BFDA /* PsiphonTests */ = {
+		8D9D9B96247C64CB0093220E /* PsiApi */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 8D77894624745DD90038BFDA /* Build configuration list for PBXNativeTarget "PsiphonTests" */;
+			buildConfigurationList = 8D9D9BB2247C64CC0093220E /* Build configuration list for PBXNativeTarget "PsiApi" */;
 			buildPhases = (
-				1937F0DC5328A43D40195C21 /* [CP] Check Pods Manifest.lock */,
-				8D77893B24745DD90038BFDA /* Sources */,
-				8D77893C24745DD90038BFDA /* Frameworks */,
-				8D77893D24745DD90038BFDA /* Resources */,
-				6FE10B8E20199D75A469E9FA /* [CP] Copy Pods Resources */,
+				3EC48899575873033F1A441F /* [CP] Check Pods Manifest.lock */,
+				8D9D9B92247C64CB0093220E /* Headers */,
+				8D9D9B93247C64CB0093220E /* Sources */,
+				8D9D9B94247C64CB0093220E /* Frameworks */,
+				8D9D9B95247C64CB0093220E /* Resources */,
 			);
 			buildRules = (
 			);
 			dependencies = (
-				8D77894524745DD90038BFDA /* PBXTargetDependency */,
+				8D9D9C34247C795D0093220E /* PBXTargetDependency */,
 			);
-			name = PsiphonTests;
-			productName = PsiphonTests;
-			productReference = 8D77893F24745DD90038BFDA /* PsiphonTests.xctest */;
+			name = PsiApi;
+			productName = PsiApi;
+			productReference = 8D9D9B97247C64CB0093220E /* PsiApi.framework */;
+			productType = "com.apple.product-type.framework";
+		};
+		8D9D9B9E247C64CC0093220E /* PsiApiTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 8D9D9BB3247C64CC0093220E /* Build configuration list for PBXNativeTarget "PsiApiTests" */;
+			buildPhases = (
+				D1667B91AAE70EE0871BCE40 /* [CP] Check Pods Manifest.lock */,
+				8D9D9B9B247C64CC0093220E /* Sources */,
+				8D9D9B9C247C64CC0093220E /* Frameworks */,
+				8D9D9B9D247C64CC0093220E /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				8D9D9BA2247C64CC0093220E /* PBXTargetDependency */,
+				8D9D9BA4247C64CC0093220E /* PBXTargetDependency */,
+			);
+			name = PsiApiTests;
+			productName = PsiApiTests;
+			productReference = 8D9D9B9F247C64CC0093220E /* PsiApiTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		8D9D9BD7247C6C9C0093220E /* Utilities */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 8D9D9BEF247C6C9D0093220E /* Build configuration list for PBXNativeTarget "Utilities" */;
+			buildPhases = (
+				29F96632DAF78A2252616D8E /* [CP] Check Pods Manifest.lock */,
+				8D9D9BD3247C6C9C0093220E /* Headers */,
+				8D9D9BD4247C6C9C0093220E /* Sources */,
+				8D9D9BD5247C6C9C0093220E /* Frameworks */,
+				8D9D9BD6247C6C9C0093220E /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Utilities;
+			productName = Utilities;
+			productReference = 8D9D9BD8247C6C9C0093220E /* Utilities.framework */;
+			productType = "com.apple.product-type.framework";
+		};
+		8D9D9BDF247C6C9D0093220E /* UtilitiesTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 8D9D9BF2247C6C9D0093220E /* Build configuration list for PBXNativeTarget "UtilitiesTests" */;
+			buildPhases = (
+				0C0EE7F6D3781FB80931588F /* [CP] Check Pods Manifest.lock */,
+				8D9D9BDC247C6C9D0093220E /* Sources */,
+				8D9D9BDD247C6C9D0093220E /* Frameworks */,
+				8D9D9BDE247C6C9D0093220E /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				8D9D9BE3247C6C9D0093220E /* PBXTargetDependency */,
+				8D9D9BE5247C6C9D0093220E /* PBXTargetDependency */,
+			);
+			name = UtilitiesTests;
+			productName = UtilitiesTests;
+			productReference = 8D9D9BE0247C6C9D0093220E /* UtilitiesTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		8D9D9C08247C75DD0093220E /* Testing */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 8D9D9C20247C75DE0093220E /* Build configuration list for PBXNativeTarget "Testing" */;
+			buildPhases = (
+				5065C1E7BFAEE249E8C664C7 /* [CP] Check Pods Manifest.lock */,
+				8D9D9C04247C75DD0093220E /* Headers */,
+				8D9D9C05247C75DD0093220E /* Sources */,
+				8D9D9C06247C75DD0093220E /* Frameworks */,
+				8D9D9C07247C75DD0093220E /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				8D9D9C2E247C78280093220E /* PBXTargetDependency */,
+			);
+			name = Testing;
+			productName = Testing;
+			productReference = 8D9D9C09247C75DD0093220E /* Testing.framework */;
+			productType = "com.apple.product-type.framework";
+		};
+		8D9D9C10247C75DE0093220E /* TestingTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 8D9D9C23247C75DE0093220E /* Build configuration list for PBXNativeTarget "TestingTests" */;
+			buildPhases = (
+				CD37E24B0E03DADA2C9D19A8 /* [CP] Check Pods Manifest.lock */,
+				8D9D9C0D247C75DE0093220E /* Sources */,
+				8D9D9C0E247C75DE0093220E /* Frameworks */,
+				8D9D9C0F247C75DE0093220E /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				8D9D9C14247C75DE0093220E /* PBXTargetDependency */,
+				8D9D9C16247C75DE0093220E /* PBXTargetDependency */,
+			);
+			name = TestingTests;
+			productName = TestingTests;
+			productReference = 8D9D9C11247C75DE0093220E /* TestingTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
 		CE26FC891BBDC7B800B83375 /* Psiphon */ = {
@@ -1595,6 +1920,8 @@
 			);
 			dependencies = (
 				CE26FCAB1BBDC85900B83375 /* PBXTargetDependency */,
+				8D9D9BAB247C64CC0093220E /* PBXTargetDependency */,
+				8D9D9BEC247C6C9D0093220E /* PBXTargetDependency */,
 			);
 			name = Psiphon;
 			productName = Psiphon;
@@ -1625,7 +1952,7 @@
 		CE26FC821BBDC7B700B83375 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastSwiftUpdateCheck = 1140;
+				LastSwiftUpdateCheck = 1150;
 				LastUpgradeCheck = 1130;
 				ORGANIZATIONNAME = "Psiphon Inc.";
 				TargetAttributes = {
@@ -1636,10 +1963,38 @@
 						ProvisioningStyle = Automatic;
 						TestTargetID = CE26FC891BBDC7B800B83375;
 					};
-					8D77893E24745DD90038BFDA = {
-						CreatedOnToolsVersion = 11.4.1;
+					8D9D9B96247C64CB0093220E = {
+						CreatedOnToolsVersion = 11.5;
 						DevelopmentTeam = Q6HLNEX92A;
 						ProvisioningStyle = Automatic;
+					};
+					8D9D9B9E247C64CC0093220E = {
+						CreatedOnToolsVersion = 11.5;
+						DevelopmentTeam = Q6HLNEX92A;
+						ProvisioningStyle = Automatic;
+						TestTargetID = CE26FC891BBDC7B800B83375;
+					};
+					8D9D9BD7247C6C9C0093220E = {
+						CreatedOnToolsVersion = 11.5;
+						DevelopmentTeam = Q6HLNEX92A;
+						ProvisioningStyle = Automatic;
+					};
+					8D9D9BDF247C6C9D0093220E = {
+						CreatedOnToolsVersion = 11.5;
+						DevelopmentTeam = Q6HLNEX92A;
+						ProvisioningStyle = Automatic;
+						TestTargetID = CE26FC891BBDC7B800B83375;
+					};
+					8D9D9C08247C75DD0093220E = {
+						CreatedOnToolsVersion = 11.5;
+						DevelopmentTeam = Q6HLNEX92A;
+						ProvisioningStyle = Automatic;
+					};
+					8D9D9C10247C75DE0093220E = {
+						CreatedOnToolsVersion = 11.5;
+						DevelopmentTeam = Q6HLNEX92A;
+						ProvisioningStyle = Automatic;
+						TestTargetID = CE26FC891BBDC7B800B83375;
 					};
 					CE26FC891BBDC7B800B83375 = {
 						CreatedOnToolsVersion = 7.0;
@@ -1728,7 +2083,12 @@
 				CE26FC891BBDC7B800B83375 /* Psiphon */,
 				CE26FCA21BBDC85900B83375 /* PsiphonVPN */,
 				4E0D88201FA06B2400ADB61E /* PsiphonUITests */,
-				8D77893E24745DD90038BFDA /* PsiphonTests */,
+				8D9D9B96247C64CB0093220E /* PsiApi */,
+				8D9D9B9E247C64CC0093220E /* PsiApiTests */,
+				8D9D9BD7247C6C9C0093220E /* Utilities */,
+				8D9D9BDF247C6C9D0093220E /* UtilitiesTests */,
+				8D9D9C08247C75DD0093220E /* Testing */,
+				8D9D9C10247C75DE0093220E /* TestingTests */,
 			);
 		};
 /* End PBXProject section */
@@ -1741,12 +2101,45 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		8D77893D24745DD90038BFDA /* Resources */ = {
+		8D9D9B95247C64CB0093220E /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				8D45703824757B8600E1CC57 /* pkcs7-signed-data.asn1 in Resources */,
-				8D45704224757B9300E1CC57 /* pkcs7-signed-data-simplified.asn1 in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		8D9D9B9D247C64CC0093220E /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		8D9D9BD6247C6C9C0093220E /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		8D9D9BDE247C6C9D0093220E /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		8D9D9C07247C75DD0093220E /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		8D9D9C0F247C75DE0093220E /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1784,7 +2177,7 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		1937F0DC5328A43D40195C21 /* [CP] Check Pods Manifest.lock */ = {
+		0C0EE7F6D3781FB80931588F /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -1799,7 +2192,7 @@
 			outputFileListPaths = (
 			);
 			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-PsiphonTests-checkManifestLockResult.txt",
+				"$(DERIVED_FILE_DIR)/Pods-Utilities-UtilitiesTests-checkManifestLockResult.txt",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -1830,6 +2223,72 @@
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Psiphon/Pods-Psiphon-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
+		29F96632DAF78A2252616D8E /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-Utilities-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		3EC48899575873033F1A441F /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-PsiApi-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		5065C1E7BFAEE249E8C664C7 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-Testing-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
 		68C760D8B13A9BB7EA40BC08 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -1846,26 +2305,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
-			showEnvVarsInLog = 0;
-		};
-		6FE10B8E20199D75A469E9FA /* [CP] Copy Pods Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-PsiphonTests/Pods-PsiphonTests-resources.sh",
-				"${PODS_CONFIGURATION_BUILD_DIR}/InAppSettingsKit/InAppSettingsKit.bundle",
-				"${PODS_CONFIGURATION_BUILD_DIR}/PsiphonClientCommonLibrary/PsiphonClientCommonLibrary.bundle",
-			);
-			name = "[CP] Copy Pods Resources";
-			outputPaths = (
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/InAppSettingsKit.bundle",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/PsiphonClientCommonLibrary.bundle",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-PsiphonTests/Pods-PsiphonTests-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		C2C27D850413C8FCDF0DBF29 /* [CP] Check Pods Manifest.lock */ = {
@@ -1890,6 +2329,28 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
+		CD37E24B0E03DADA2C9D19A8 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-Testing-TestingTests-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
 		CE7B76441F54882300EA44BD /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -1903,6 +2364,28 @@
 			shellPath = /bin/sh;
 			shellScript = "bash \"${BUILT_PRODUCTS_DIR}/${FRAMEWORKS_FOLDER_PATH}/PsiphonTunnel.framework/strip-frameworks.sh\"\n\n/usr/bin/env python \"./genstrings.py\"\nif [ $? != 0 ] ; then\n    exit 1\nfi\n";
 		};
+		D1667B91AAE70EE0871BCE40 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-PsiApi-PsiApiTests-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -1915,91 +2398,78 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		8D77893B24745DD90038BFDA /* Sources */ = {
+		8D9D9B93247C64CB0093220E /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				8D45703224757B8600E1CC57 /* ReceiptAttribute.c in Sources */,
-				8D7789B3247490930038BFDA /* StoreDelegate.swift in Sources */,
-				CEED782A2476FC3A002D9D55 /* IAPProducts.swift in Sources */,
-				8D45702E24757B8600E1CC57 /* ber_decoder.c in Sources */,
-				8D45702224757B3700E1CC57 /* timestamp_tm.c in Sources */,
-				8D7789BA247491CA0038BFDA /* PsiphonBundle.swift in Sources */,
-				8D45702324757B3700E1CC57 /* timestamp_format.c in Sources */,
-				CEED78302476FE04002D9D55 /* Promises+Additions.swift in Sources */,
-				CEED78272476FA9D002D9D55 /* SubscriptionAuthState.swift in Sources */,
-				CEC8F8952478254200D273DF /* NonEmptySeq.swift in Sources */,
-				8D45702F24757B8600E1CC57 /* NativeInteger.c in Sources */,
-				8D7789A724748FC70038BFDA /* Foundation+Additions.swift in Sources */,
-				8D7789AF247490490038BFDA /* DebugFlags.swift in Sources */,
-				8D7789A524748FA80038BFDA /* Effect.swift in Sources */,
-				8D7789BE247493300038BFDA /* VPNState.swift in Sources */,
-				8D45702A24757B8600E1CC57 /* per_support.c in Sources */,
-				8D9D9B87247C1FBF0093220E /* RFC3339Tests.swift in Sources */,
-				8D45701F2475795900E1CC57 /* HTTPStatusCode.swift in Sources */,
-				CEED78242476FA13002D9D55 /* SubscriptionState.swift in Sources */,
-				CEED784724774B80002D9D55 /* AuthorizationState+Codable.swift in Sources */,
-				8D77897C2474839C0038BFDA /* RequestsTests.swift in Sources */,
-				8D7789A424748F920038BFDA /* Error.swift in Sources */,
-				8D7789B2247490850038BFDA /* State.swift in Sources */,
-				8D45703C24757B8600E1CC57 /* xer_support.c in Sources */,
-				8D7789B0247490700038BFDA /* ReactiveSwift+Additions.swift in Sources */,
-				8D7789B12474907B0038BFDA /* Store.swift in Sources */,
-				8D7789A324748F8C0038BFDA /* Requests.swift in Sources */,
-				8D7789BB247492840038BFDA /* AppStoreParsedReceiptData.m in Sources */,
-				CEED78332477039C002D9D55 /* PurchaseVerifier+Subscription.swift in Sources */,
-				CE4903A924784F27004AEBAF /* FeedbackLogging.swift in Sources */,
-				8D45704024757B8600E1CC57 /* constraints.c in Sources */,
-				CEC8F89A2478332300D273DF /* NonEmptySeq+CustomStringFeedbackDescription.swift in Sources */,
-				CEED78252476FA76002D9D55 /* AppReceipt.swift in Sources */,
-				8D7789B6247490F50038BFDA /* Receipt.swift in Sources */,
-				8D45702824757B8600E1CC57 /* constr_TYPE.c in Sources */,
-				8D45703424757B8600E1CC57 /* OCTET_STRING.c in Sources */,
-				8D45703A24757B8600E1CC57 /* ber_tlv_length.c in Sources */,
-				8D45702024757B3700E1CC57 /* timestamp_valid.c in Sources */,
-				8D45703324757B8600E1CC57 /* der_encoder.c in Sources */,
-				CE4903A8247841F8004AEBAF /* PurchaseVerifier.swift in Sources */,
-				8D7789B7247490FD0038BFDA /* SerialEffect.swift in Sources */,
-				8D7789AA24748FFA0038BFDA /* HardCodedValues.swift in Sources */,
-				8D45702624757B8600E1CC57 /* UTF8String.c in Sources */,
-				CEED7840247712D7002D9D55 /* ClientMetadata.swift in Sources */,
-				8D7789A624748FB10038BFDA /* TunnelProviderManager.swift in Sources */,
-				8D45703024757B8600E1CC57 /* per_encoder.c in Sources */,
-				CEED78292476FB72002D9D55 /* IAPState.swift in Sources */,
-				8D45703524757B8600E1CC57 /* constr_SEQUENCE.c in Sources */,
-				8D45702724757B8600E1CC57 /* ReceiptAttributes.c in Sources */,
-				8D90A984247633D200FC86F0 /* TestUtilTests.swift in Sources */,
-				8D45704324757BCD00E1CC57 /* ANY.c in Sources */,
-				8D4570472475BA5900E1CC57 /* PsiphonTests.swift in Sources */,
-				8D45702D24757B8600E1CC57 /* constr_SET_OF.c in Sources */,
-				8D45703924757B8600E1CC57 /* NativeEnumerated.c in Sources */,
-				8D45703E24757B8600E1CC57 /* ber_tlv_tag.c in Sources */,
-				8D45702524757B8600E1CC57 /* IA5String.c in Sources */,
-				8D7789AB247490060038BFDA /* PsiCashModels.swift in Sources */,
-				8D45701E2475785000E1CC57 /* RFC3339.swift in Sources */,
-				8D45702B24757B8600E1CC57 /* OBJECT_IDENTIFIER.c in Sources */,
-				8D45703124757B8600E1CC57 /* INTEGER.c in Sources */,
-				8D45704124757B8600E1CC57 /* xer_encoder.c in Sources */,
-				CEED782B2476FC4B002D9D55 /* PaymentQueue.swift in Sources */,
-				8D45702C24757B8600E1CC57 /* BIT_STRING.c in Sources */,
-				CEED784324771415002D9D55 /* RetryCondition+FeedbackDescription.swift in Sources */,
-				8D45702124757B3700E1CC57 /* timestamp_compare.c in Sources */,
-				8D45703724757B8600E1CC57 /* per_opentype.c in Sources */,
-				8D45704524757BE100E1CC57 /* Nullity.m in Sources */,
-				CEED78312476FE49002D9D55 /* SubscriptionPurchaseVerification.swift in Sources */,
-				8D45702424757B3700E1CC57 /* timestamp_parse.c in Sources */,
-				8D45703B24757B8600E1CC57 /* per_decoder.c in Sources */,
-				8D45703624757B8600E1CC57 /* asn_SET_OF.c in Sources */,
-				8D45702924757B8600E1CC57 /* xer_decoder.c in Sources */,
-				CEED782F2476FDDB002D9D55 /* IAPValuePaths.swift in Sources */,
-				8D7789AC247490120038BFDA /* Authorization.swift in Sources */,
-				8D45703D24757B8600E1CC57 /* SignedData.c in Sources */,
-				8D45703F24757B8600E1CC57 /* asn_codecs_prim.c in Sources */,
-				CEC8F897247825B700D273DF /* NonEmptySeqTest.swift in Sources */,
-				8D45704424757BD400E1CC57 /* PsiFeedbackLogger.m in Sources */,
-				8D7789B4247490CD0038BFDA /* InternetReachability.swift in Sources */,
-				8D7789C8247498560038BFDA /* FeedbackDescription.swift in Sources */,
-				CEED78322476FF3D002D9D55 /* Result+Codable.swift in Sources */,
+				8D9D9BBD247C68BD0093220E /* NonEmptySeq.swift in Sources */,
+				8D9D9BBC247C68A00093220E /* Foundation+Additions.swift in Sources */,
+				8D9D9BBB247C66FC0093220E /* FeedbackDescription.swift in Sources */,
+				8D9D9BC6247C69F80093220E /* Effect.swift in Sources */,
+				8D9D9BBF247C68C50093220E /* NonEmptySeq+CustomStringFeedbackDescription.swift in Sources */,
+				8D9D9BC4247C69F80093220E /* StoreDelegate.swift in Sources */,
+				8D9D9BC7247C69F80093220E /* SerialEffect.swift in Sources */,
+				8D9D9BBA247C66E10093220E /* Error.swift in Sources */,
+				8D9D9BC3247C69F80093220E /* Store.swift in Sources */,
+				8D9D9BC1247C69520093220E /* TunnelProviderManager.swift in Sources */,
+				8D9D9BD2247C6BF10093220E /* ReactiveSwift+Additions.swift in Sources */,
+				8D9D9BB6247C66060093220E /* RetryCondition+FeedbackDescription.swift in Sources */,
+				8D9D9BB5247C66060093220E /* HTTPStatusCode.swift in Sources */,
+				8D9D9BB4247C66060093220E /* Requests.swift in Sources */,
+				8D9D9BCE247C6B2D0093220E /* HardCodedValues.swift in Sources */,
+				8D9D9BCA247C6A6E0093220E /* FeedbackLogging.swift in Sources */,
+				8D9D9BC5247C69F80093220E /* State.swift in Sources */,
+				8D9D9BCD247C6B160093220E /* DebugFlags.swift in Sources */,
+				8D9D9BD1247C6BED0093220E /* InternetReachability.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		8D9D9B9B247C64CC0093220E /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8D9D9BC0247C68CB0093220E /* NonEmptySeqTest.swift in Sources */,
+				8D9D9BB9247C669D0093220E /* RequestsTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		8D9D9BD4247C6C9C0093220E /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8D9D9BF5247C6CBC0093220E /* RFC3339.swift in Sources */,
+				8D9D9BF8247C6D150093220E /* timestamp_valid.c in Sources */,
+				8D9D9C30247C78620093220E /* Result+Additions.swift in Sources */,
+				8D9D9C32247C78BD0093220E /* DataTypes.swift in Sources */,
+				8D9D9C2C247C77E20093220E /* NonEmptyList.swift in Sources */,
+				8D9D9BFB247C6D150093220E /* timestamp_format.c in Sources */,
+				8D9D9BF9247C6D150093220E /* timestamp_compare.c in Sources */,
+				8D9D9BFC247C6D150093220E /* timestamp_parse.c in Sources */,
+				8D9D9BFA247C6D150093220E /* timestamp_tm.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		8D9D9BDC247C6C9D0093220E /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8D9D9BF7247C6CC20093220E /* RFC3339Tests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		8D9D9C05247C75DD0093220E /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8D9D9C26247C75F90093220E /* TestingUtils.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		8D9D9C0D247C75DE0093220E /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8D9D9C28247C76110093220E /* TestUtilTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2017,10 +2487,8 @@
 				52D363CF230F112E002C2221 /* TabControlView.swift in Sources */,
 				445F24D620E1A5BA00D004E9 /* xer_decoder.c in Sources */,
 				EF652CD71F35224C002AFB48 /* MainViewController.m in Sources */,
-				52B3C54E23E22454003F6B12 /* FeedbackLogging.swift in Sources */,
 				EF90D7A4204F22C900228A63 /* timestamp_format.c in Sources */,
 				52B3C54323DA31E1003F6B12 /* PurchaseVerifier+Subscription.swift in Sources */,
-				CEC8F8942478254200D273DF /* NonEmptySeq.swift in Sources */,
 				F132D7E01F5739A800AF7F91 /* LaunchScreenViewController.m in Sources */,
 				445F24E920E1A5BA00D004E9 /* ber_tlv_length.c in Sources */,
 				CEED7835247703DD002D9D55 /* AppReceiptReducer.swift in Sources */,
@@ -2028,8 +2496,6 @@
 				4E0DCB1A1F28481E00495781 /* PsiphonDataSharedDB.m in Sources */,
 				4435CC271F70566000F3A809 /* SettingsViewController.m in Sources */,
 				8D417EB72415633300FEE587 /* IAPReducer.swift in Sources */,
-				CEC8F8992478332300D273DF /* NonEmptySeq+CustomStringFeedbackDescription.swift in Sources */,
-				8D7789D02474D53D0038BFDA /* PsiphonRotatingFileFeedbackLogger.swift in Sources */,
 				EF4F1F3D206055F7006A40A1 /* RACSignal+Operations2.m in Sources */,
 				CE4903A724784156004AEBAF /* PurchaseVerifier.swift in Sources */,
 				445F24F020E1A5BA00D004E9 /* xer_encoder.c in Sources */,
@@ -2039,7 +2505,6 @@
 				521FD0F3219E0D5600F748EC /* DebugTextViewController.m in Sources */,
 				8D7E9B9F2425E053006F3A2F /* Animations.swift in Sources */,
 				EF90D7A9204F22C900228A63 /* FileUtils.m in Sources */,
-				CEED784224771415002D9D55 /* RetryCondition+FeedbackDescription.swift in Sources */,
 				EF90D7A1204F22C900228A63 /* timestamp_valid.c in Sources */,
 				445F24DF20E1A5BA00D004E9 /* ANY.c in Sources */,
 				52A2466F23A1769300A01FF1 /* PsiCashMessageViewUntunneled.swift in Sources */,
@@ -2047,12 +2512,12 @@
 				EFC2F5C420226782007B52F9 /* RootContainerController.m in Sources */,
 				8D417EBB2417155000FEE587 /* AppReceipt.swift in Sources */,
 				EF90D7A5204F22C900228A63 /* timestamp_parse.c in Sources */,
-				52DF5E9623C7A31100A1B067 /* Error.swift in Sources */,
 				EF652CD11F352212002AFB48 /* main.m in Sources */,
 				445F24EB20E1A5BA00D004E9 /* xer_support.c in Sources */,
 				4E5DAE6520A942A300E06342 /* UILabel+GetLabelHeight.m in Sources */,
 				EFC2F5CB202267B1007B52F9 /* PsiphonConfigReader.m in Sources */,
 				EF90D7A7204F22C900228A63 /* NSDate+PSIDateExtension.m in Sources */,
+				8DCA6864247C7CF8001D026E /* Bindable.swift in Sources */,
 				445F239620E1817C00D004E9 /* AppStoreParsedReceiptData.m in Sources */,
 				445F24E420E1A5BA00D004E9 /* constr_SEQUENCE.c in Sources */,
 				8D00AA482450B4AB001EB8DD /* PsiCashPurchaseVerification.swift in Sources */,
@@ -2065,7 +2530,6 @@
 				8D417EBD2417FF5C00FEE587 /* SubscriptionAuthState.swift in Sources */,
 				8D417EB124147C6D00FEE587 /* LandingPage.swift in Sources */,
 				445F24E520E1A5BA00D004E9 /* asn_SET_OF.c in Sources */,
-				52B3C54523DA391F003F6B12 /* Requests.swift in Sources */,
 				9BFEC4F02A47FF8265635803 /* Notifier.m in Sources */,
 				4EC5526620AB8DCD000B4BEA /* PastelView.m in Sources */,
 				CEED783B247707F3002D9D55 /* PurchaseVerifier+PsiCash.swift in Sources */,
@@ -2075,18 +2539,14 @@
 				5246800D22D65926009AEC6E /* UIUtils.swift in Sources */,
 				9BFECFEB3BC9F10542C1A416 /* PsiphonConfigUserDefaults.m in Sources */,
 				4E5263CD2072984D0021FEF5 /* IAPViewController.m in Sources */,
-				8D7789C0247496520038BFDA /* RFC3339.swift in Sources */,
 				8D7789B9247491CA0038BFDA /* PsiphonBundle.swift in Sources */,
 				445F24D720E1A5BA00D004E9 /* per_support.c in Sources */,
 				EF90D7AA204F22C900228A63 /* NSError+Convenience.m in Sources */,
 				52DF5E9823CE5A8300A1B067 /* ValuePaths.swift in Sources */,
 				4E5BD4F52061982300AD4724 /* FeedbackManager.m in Sources */,
-				8D7789AE247490490038BFDA /* DebugFlags.swift in Sources */,
 				4E0A3669215AB7EE008A3D7B /* UIFont+Additions.m in Sources */,
-				8D9E602F24366AE7003A46D8 /* SerialEffect.swift in Sources */,
 				5246800722D51AA3009AEC6E /* PsiCashWidgetView.swift in Sources */,
 				52D363C9230DE215002C2221 /* PsiCashViewController.swift in Sources */,
-				8D9E603324366AF4003A46D8 /* Store.swift in Sources */,
 				528D81332384823F00AA2D77 /* PsiCashMessageView.swift in Sources */,
 				EF90D7A8204F22C900228A63 /* DispatchUtils.m in Sources */,
 				445F24D820E1A5BA00D004E9 /* OBJECT_IDENTIFIER.c in Sources */,
@@ -2128,7 +2588,6 @@
 				520201212360F5B800D00C8E /* IndexedViewSwitcher.swift in Sources */,
 				52DF5E9E23D0D01F00A1B067 /* BridgingTypes.swift in Sources */,
 				9BFECD2FAA1FCDA88A7D432E /* UIColor+Additions.m in Sources */,
-				8D9E603124366AEF003A46D8 /* State.swift in Sources */,
 				CEED784624774B80002D9D55 /* AuthorizationState+Codable.swift in Sources */,
 				521FD0F9219E0DDF00F748EC /* AppStats.m in Sources */,
 				8D417E992411954A00FEE587 /* PsiCashReducer.swift in Sources */,
@@ -2136,6 +2595,7 @@
 				8D7789BD247493300038BFDA /* VPNState.swift in Sources */,
 				9BFECD174E254989EC97A437 /* IAPHelpViewController.m in Sources */,
 				52055D04230C823100244F9E /* GradientButton.swift in Sources */,
+				8D9D9BCC247C6A9D0093220E /* PsiphonRotatingFileFeedbackLogger.swift in Sources */,
 				521FD0F2219E0D5600F748EC /* DebugViewController.m in Sources */,
 				52CAC4312385D06600A92842 /* Spinner.swift in Sources */,
 				445F24EF20E1A5BA00D004E9 /* constraints.c in Sources */,
@@ -2144,7 +2604,6 @@
 				445F24DB20E1A5BA00D004E9 /* ber_decoder.c in Sources */,
 				52D2581122BADE1900CA956A /* SwiftDelegate.swift in Sources */,
 				5202011D2360D34000D00C8E /* EitherView.swift in Sources */,
-				52805BA122DD1EB8006B205B /* ReactiveSwift+Additions.swift in Sources */,
 				9BFEC8058885B68B2822E2B8 /* AdManager.m in Sources */,
 				8D00AA4A2450B4D1001EB8DD /* SubscriptionPurchaseVerification.swift in Sources */,
 				9BFEC3D66910918A0C8954E1 /* AdMobConsent.m in Sources */,
@@ -2156,15 +2615,12 @@
 				9BFECF61970F215F32E76280 /* AdMobInterstitialAdControllerWrapper.m in Sources */,
 				52055D06230C833700244F9E /* SpeedBoostButton.swift in Sources */,
 				9BFEC459666697D89B09A492 /* AdMobRewardedAdControllerWrapper.m in Sources */,
-				8D417EBF2417FFB000FEE587 /* HardCodedValues.swift in Sources */,
-				8D9E603024366AEC003A46D8 /* Effect.swift in Sources */,
 				521FD0FD219E0E0F00F748EC /* DebugUtils.m in Sources */,
 				524B4E6B2316F0E3004E9891 /* BorderedSubtitleButton.m in Sources */,
 				9BFEC8A2F99380655E853F81 /* AdControllerWrapper.m in Sources */,
 				A8408E281270691F61F9C20C /* AppVersionNumberView.m in Sources */,
 				52C8F0AF2383059200E5F9C0 /* Promises+Additions.swift in Sources */,
 				A8408C424E64BF3D70273464 /* ConnectionStatusView.m in Sources */,
-				8D255E2B2461E06900FD5D1C /* InternetReachability.swift in Sources */,
 				A84082260CE7662A93697CFF /* LoadingCircleLayer.m in Sources */,
 				A8408AACE30F860F2C961A04 /* WhiteSkyButton.m in Sources */,
 				A8408008B18277F93286799F /* PsiphonProgressView.m in Sources */,
@@ -2177,7 +2633,6 @@
 				A84080E163F24876A1476544 /* VPNStartAndStopButton.m in Sources */,
 				8D417ED9241844FA00FEE587 /* FloatingPoint+Additions.swift in Sources */,
 				A840875B190F7666A1BD98E5 /* UIView+AutoLayoutViewGroup.m in Sources */,
-				8D7789C7247497F40038BFDA /* FeedbackDescription.swift in Sources */,
 				A84088DD7FBB838689BC1FCC /* OnboardingViewController.m in Sources */,
 				CEED782D2476FD5F002D9D55 /* IAPValuePaths.swift in Sources */,
 				A8408B83167EBE21E215C471 /* OnboardingView.m in Sources */,
@@ -2201,20 +2656,17 @@
 				A8408692D005E8599267522E /* UIView+Additions.m in Sources */,
 				A84087AFA5806D689C3BF6D2 /* PickerViewController.m in Sources */,
 				52A2467123A176BA00A01FF1 /* PsiCashPurchasingAlertViewBuilder.swift in Sources */,
-				8D9E603224366AF2003A46D8 /* StoreDelegate.swift in Sources */,
 				A8408EB1E9DABE35016580A7 /* ImageUtils.m in Sources */,
 				A8408BC29B903A6C0A32F32C /* SkyRegionSelectionViewController.m in Sources */,
 				8D417E9F2411A60900FEE587 /* PsiCashEffects.swift in Sources */,
 				A84088D3FD4B01A7D14CCC53 /* SupportedLanguages.m in Sources */,
 				A8408F99941C9664E3E7C48A /* LanguageSelectionViewController.m in Sources */,
-				8D019B802451D864006F21C4 /* HTTPStatusCode.swift in Sources */,
 				A8408A3A478ECD6E3562CDF4 /* CloudsView.m in Sources */,
 				A84081194DA12328ABB5A43E /* UIImageView+Additions.m in Sources */,
 				A840849074861D633B3EB4D1 /* AppEvent.m in Sources */,
 				A84080E9FC63E29F71A79A63 /* RelaySubject.m in Sources */,
-				8D9E602C24364EE6003A46D8 /* TunnelProviderManager.swift in Sources */,
+				8D9D9BD0247C6B910093220E /* HardCodedValues.swift in Sources */,
 				A840803A0733D9FCA5410796 /* ActivityIndicatorRoyalSkyButton.m in Sources */,
-				52467FF922CE77A1009AEC6E /* Foundation+Additions.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2261,10 +2713,55 @@
 			target = CE26FC891BBDC7B800B83375 /* Psiphon */;
 			targetProxy = 4E0D88261FA06B2400ADB61E /* PBXContainerItemProxy */;
 		};
-		8D77894524745DD90038BFDA /* PBXTargetDependency */ = {
+		8D9D9BA2247C64CC0093220E /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 8D9D9B96247C64CB0093220E /* PsiApi */;
+			targetProxy = 8D9D9BA1247C64CC0093220E /* PBXContainerItemProxy */;
+		};
+		8D9D9BA4247C64CC0093220E /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = CE26FC891BBDC7B800B83375 /* Psiphon */;
-			targetProxy = 8D77894424745DD90038BFDA /* PBXContainerItemProxy */;
+			targetProxy = 8D9D9BA3247C64CC0093220E /* PBXContainerItemProxy */;
+		};
+		8D9D9BAB247C64CC0093220E /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 8D9D9B96247C64CB0093220E /* PsiApi */;
+			targetProxy = 8D9D9BAA247C64CC0093220E /* PBXContainerItemProxy */;
+		};
+		8D9D9BE3247C6C9D0093220E /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 8D9D9BD7247C6C9C0093220E /* Utilities */;
+			targetProxy = 8D9D9BE2247C6C9D0093220E /* PBXContainerItemProxy */;
+		};
+		8D9D9BE5247C6C9D0093220E /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = CE26FC891BBDC7B800B83375 /* Psiphon */;
+			targetProxy = 8D9D9BE4247C6C9D0093220E /* PBXContainerItemProxy */;
+		};
+		8D9D9BEC247C6C9D0093220E /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 8D9D9BD7247C6C9C0093220E /* Utilities */;
+			targetProxy = 8D9D9BEB247C6C9D0093220E /* PBXContainerItemProxy */;
+		};
+		8D9D9C14247C75DE0093220E /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 8D9D9C08247C75DD0093220E /* Testing */;
+			targetProxy = 8D9D9C13247C75DE0093220E /* PBXContainerItemProxy */;
+		};
+		8D9D9C16247C75DE0093220E /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = CE26FC891BBDC7B800B83375 /* Psiphon */;
+			targetProxy = 8D9D9C15247C75DE0093220E /* PBXContainerItemProxy */;
+		};
+		8D9D9C2E247C78280093220E /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 8D9D9BD7247C6C9C0093220E /* Utilities */;
+			targetProxy = 8D9D9C2D247C78280093220E /* PBXContainerItemProxy */;
+		};
+		8D9D9C34247C795D0093220E /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 8D9D9BD7247C6C9C0093220E /* Utilities */;
+			targetProxy = 8D9D9C33247C795D0093220E /* PBXContainerItemProxy */;
 		};
 		CE26FCAB1BBDC85900B83375 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -2373,57 +2870,401 @@
 			};
 			name = Release;
 		};
-		8D77894724745DD90038BFDA /* Debug */ = {
+		8D9D9BAE247C64CC0093220E /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = F8FCDC22ED21515D276CE274 /* Pods-PsiphonTests.debug.xcconfig */;
+			baseConfigurationReference = 672D77B7307F9CEE82EECCCC /* Pods-PsiApi.debug.xcconfig */;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
-				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = Q6HLNEX92A;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_BITCODE = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
-				INFOPLIST_FILE = PsiphonTests/Info.plist;
+				INFOPLIST_FILE = PsiApi/Info.plist;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 10.2;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = com.psiphon.PsiphonTests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_BUNDLE_IDENTIFIER = com.psiphon.Psiphon.PsiApi;
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SKIP_INSTALL = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
-				SWIFT_OBJC_BRIDGING_HEADER = "PsiphonTests/PsiphonTests-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
 			};
 			name = Debug;
 		};
-		8D77894824745DD90038BFDA /* Release */ = {
+		8D9D9BAF247C64CC0093220E /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 1FE4700126FC2AD287FCB45B /* Pods-PsiphonTests.release.xcconfig */;
+			baseConfigurationReference = 65957584722BB1AA6B3B4825 /* Pods-PsiApi.release.xcconfig */;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
-				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = Q6HLNEX92A;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_BITCODE = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
-				INFOPLIST_FILE = PsiphonTests/Info.plist;
+				INFOPLIST_FILE = PsiApi/Info.plist;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 10.2;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = com.psiphon.PsiphonTests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_OBJC_BRIDGING_HEADER = "PsiphonTests/PsiphonTests-Bridging-Header.h";
+				PRODUCT_BUNDLE_IDENTIFIER = com.psiphon.Psiphon.PsiApi;
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SKIP_INSTALL = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Release;
+		};
+		8D9D9BB0247C64CC0093220E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 015255F2FAC67FC9CE25D8EC /* Pods-PsiApi-PsiApiTests.debug.xcconfig */;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_STYLE = Automatic;
+				DEFINES_MODULE = NO;
+				DEVELOPMENT_TEAM = Q6HLNEX92A;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				INFOPLIST_FILE = PsiApiTests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.2;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.psiphon.Psiphon.PsiApiTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Psiphon.app/Psiphon";
+			};
+			name = Debug;
+		};
+		8D9D9BB1247C64CC0093220E /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 9433F6FADEFD218CED8B343A /* Pods-PsiApi-PsiApiTests.release.xcconfig */;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_STYLE = Automatic;
+				DEFINES_MODULE = NO;
+				DEVELOPMENT_TEAM = Q6HLNEX92A;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				INFOPLIST_FILE = PsiApiTests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.2;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.psiphon.Psiphon.PsiApiTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Psiphon.app/Psiphon";
+			};
+			name = Release;
+		};
+		8D9D9BF0247C6C9D0093220E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 78C6298EAA632CD41F06795D /* Pods-Utilities.debug.xcconfig */;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = Q6HLNEX92A;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_BITCODE = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				INFOPLIST_FILE = Utilities/Info.plist;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 10.2;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				MODULEMAP_FILE = "";
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.psiphon.Psiphon.Utilities;
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OBJC_BRIDGING_HEADER = "";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Debug;
+		};
+		8D9D9BF1247C6C9D0093220E /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = AC50BC070A94E760D3F894F7 /* Pods-Utilities.release.xcconfig */;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = Q6HLNEX92A;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_BITCODE = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				INFOPLIST_FILE = Utilities/Info.plist;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 10.2;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				MODULEMAP_FILE = "";
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.psiphon.Psiphon.Utilities;
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SKIP_INSTALL = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Release;
+		};
+		8D9D9BF3247C6C9D0093220E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = EFF94F005129FBF0532001B5 /* Pods-Utilities-UtilitiesTests.debug.xcconfig */;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = Q6HLNEX92A;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				INFOPLIST_FILE = UtilitiesTests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.2;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.psiphon.Psiphon.UtilitiesTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Psiphon.app/Psiphon";
+			};
+			name = Debug;
+		};
+		8D9D9BF4247C6C9D0093220E /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = C9BDA0C779D86E722D8B8DB2 /* Pods-Utilities-UtilitiesTests.release.xcconfig */;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = Q6HLNEX92A;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				INFOPLIST_FILE = UtilitiesTests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.2;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.psiphon.Psiphon.UtilitiesTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Psiphon.app/Psiphon";
+			};
+			name = Release;
+		};
+		8D9D9C21247C75DE0093220E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 38595BFE7626FC3E5C373BC9 /* Pods-Testing.debug.xcconfig */;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = Q6HLNEX92A;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_BITCODE = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				INFOPLIST_FILE = Testing/Info.plist;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 10.2;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.psiphon.Psiphon.Testing;
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Debug;
+		};
+		8D9D9C22247C75DE0093220E /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 3E7745DBA0A65C097BB74EB5 /* Pods-Testing.release.xcconfig */;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = Q6HLNEX92A;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_BITCODE = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				INFOPLIST_FILE = Testing/Info.plist;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 10.2;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.psiphon.Psiphon.Testing;
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Release;
+		};
+		8D9D9C24247C75DE0093220E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 2EAE1D54BEBC6BF081A5B8D3 /* Pods-Testing-TestingTests.debug.xcconfig */;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = Q6HLNEX92A;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				INFOPLIST_FILE = TestingTests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.2;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.psiphon.Psiphon.TestingTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Psiphon.app/Psiphon";
+			};
+			name = Debug;
+		};
+		8D9D9C25247C75DE0093220E /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 2D1DAF6C9CAF197D05CDCFCF /* Pods-Testing-TestingTests.release.xcconfig */;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = Q6HLNEX92A;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				INFOPLIST_FILE = TestingTests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.2;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.psiphon.Psiphon.TestingTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Psiphon.app/Psiphon";
 			};
 			name = Release;
 		};
@@ -2545,6 +3386,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = EDB109A2FBFB32D821FF121D /* Pods-Psiphon.debug.xcconfig */;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ALWAYS_SEARCH_USER_PATHS = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
@@ -2553,7 +3395,7 @@
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 148;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DEFINES_MODULE = YES;
+				DEFINES_MODULE = NO;
 				DEVELOPMENT_TEAM = Q6HLNEX92A;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
@@ -2578,6 +3420,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 571DC9418AF936E60179F07C /* Pods-Psiphon.release.xcconfig */;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ALWAYS_SEARCH_USER_PATHS = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
@@ -2585,7 +3428,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 148;
-				DEFINES_MODULE = YES;
+				DEFINES_MODULE = NO;
 				DEVELOPMENT_TEAM = Q6HLNEX92A;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
@@ -2676,11 +3519,56 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		8D77894624745DD90038BFDA /* Build configuration list for PBXNativeTarget "PsiphonTests" */ = {
+		8D9D9BB2247C64CC0093220E /* Build configuration list for PBXNativeTarget "PsiApi" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				8D77894724745DD90038BFDA /* Debug */,
-				8D77894824745DD90038BFDA /* Release */,
+				8D9D9BAE247C64CC0093220E /* Debug */,
+				8D9D9BAF247C64CC0093220E /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		8D9D9BB3247C64CC0093220E /* Build configuration list for PBXNativeTarget "PsiApiTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8D9D9BB0247C64CC0093220E /* Debug */,
+				8D9D9BB1247C64CC0093220E /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		8D9D9BEF247C6C9D0093220E /* Build configuration list for PBXNativeTarget "Utilities" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8D9D9BF0247C6C9D0093220E /* Debug */,
+				8D9D9BF1247C6C9D0093220E /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		8D9D9BF2247C6C9D0093220E /* Build configuration list for PBXNativeTarget "UtilitiesTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8D9D9BF3247C6C9D0093220E /* Debug */,
+				8D9D9BF4247C6C9D0093220E /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		8D9D9C20247C75DE0093220E /* Build configuration list for PBXNativeTarget "Testing" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8D9D9C21247C75DE0093220E /* Debug */,
+				8D9D9C22247C75DE0093220E /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		8D9D9C23247C75DE0093220E /* Build configuration list for PBXNativeTarget "TestingTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8D9D9C24247C75DE0093220E /* Debug */,
+				8D9D9C25247C75DE0093220E /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
