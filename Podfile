@@ -15,7 +15,6 @@ target 'Psiphon' do
 
   # Swift dependencies
   pod 'ReactiveObjC', :git => "https://github.com/Psiphon-Inc/ReactiveObjC.git", :commit => '8bbf9dd'
-  pod 'Google-Mobile-Ads-SDK', '~> 7.59'
   pod 'PersonalizedAdConsent', '~> 1.0'  # Google Mobile Ads Consent SDK
   pod 'MBProgressHUD', '~> 1.1.0'
   pod 'SVProgressHUD'

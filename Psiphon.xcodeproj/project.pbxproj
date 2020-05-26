@@ -130,6 +130,10 @@
 		8D417EDD2419DBA100FEE587 /* ProductRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D417EDC2419DBA100FEE587 /* ProductRequest.swift */; };
 		8D497A21247CE97E009CEBA8 /* Promises in Frameworks */ = {isa = PBXBuildFile; productRef = 8D497A20247CE97E009CEBA8 /* Promises */; };
 		8D497A23247CE985009CEBA8 /* FBLPromises in Frameworks */ = {isa = PBXBuildFile; productRef = 8D497A22247CE985009CEBA8 /* FBLPromises */; };
+		8D497A28247CEF50009CEBA8 /* GoogleAppMeasurement.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8D497A24247CEF4F009CEBA8 /* GoogleAppMeasurement.framework */; };
+		8D497A2A247CEF50009CEBA8 /* GoogleMobileAds.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8D497A25247CEF4F009CEBA8 /* GoogleMobileAds.framework */; };
+		8D497A2C247CEF50009CEBA8 /* GoogleUtilities.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8D497A26247CEF4F009CEBA8 /* GoogleUtilities.xcframework */; };
+		8D497A2E247CEF50009CEBA8 /* nanopb.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8D497A27247CEF4F009CEBA8 /* nanopb.xcframework */; };
 		8D778978247469FE0038BFDA /* AppInfo.h in Sources */ = {isa = PBXBuildFile; fileRef = 4E10920620F3DA190033114B /* AppInfo.h */; };
 		8D7789B9247491CA0038BFDA /* PsiphonBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D7789B8247491CA0038BFDA /* PsiphonBundle.swift */; };
 		8D7789BD247493300038BFDA /* VPNState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D7789BC247493300038BFDA /* VPNState.swift */; };
@@ -544,6 +548,10 @@
 		8D417EBC2417FF5B00FEE587 /* SubscriptionAuthState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionAuthState.swift; sourceTree = "<group>"; };
 		8D417ED8241844FA00FEE587 /* FloatingPoint+Additions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FloatingPoint+Additions.swift"; sourceTree = "<group>"; };
 		8D417EDC2419DBA100FEE587 /* ProductRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductRequest.swift; sourceTree = "<group>"; };
+		8D497A24247CEF4F009CEBA8 /* GoogleAppMeasurement.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = GoogleAppMeasurement.framework; sourceTree = "<group>"; };
+		8D497A25247CEF4F009CEBA8 /* GoogleMobileAds.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = GoogleMobileAds.framework; sourceTree = "<group>"; };
+		8D497A26247CEF4F009CEBA8 /* GoogleUtilities.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = GoogleUtilities.xcframework; sourceTree = "<group>"; };
+		8D497A27247CEF4F009CEBA8 /* nanopb.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = nanopb.xcframework; sourceTree = "<group>"; };
 		8D5D8494247CE6420018A35B /* libPromisesObjC.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = libPromisesObjC.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		8D7789B8247491CA0038BFDA /* PsiphonBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PsiphonBundle.swift; sourceTree = "<group>"; };
 		8D7789BC247493300038BFDA /* VPNState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VPNState.swift; sourceTree = "<group>"; };
@@ -765,6 +773,10 @@
 			files = (
 				8DCA6872247CCB74001D026E /* PsiApi in Frameworks */,
 				8D497A23247CE985009CEBA8 /* FBLPromises in Frameworks */,
+				8D497A2A247CEF50009CEBA8 /* GoogleMobileAds.framework in Frameworks */,
+				8D497A2E247CEF50009CEBA8 /* nanopb.xcframework in Frameworks */,
+				8D497A28247CEF50009CEBA8 /* GoogleAppMeasurement.framework in Frameworks */,
+				8D497A2C247CEF50009CEBA8 /* GoogleUtilities.xcframework in Frameworks */,
 				8DCA687D247CE3E7001D026E /* ReactiveSwift in Frameworks */,
 				8D497A21247CE97E009CEBA8 /* Promises in Frameworks */,
 				668AF9C01E92CBE0008CAAAA /* NetworkExtension.framework in Frameworks */,
@@ -1098,6 +1110,10 @@
 		668AF9B81E92CB60008CAAAA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				8D497A24247CEF4F009CEBA8 /* GoogleAppMeasurement.framework */,
+				8D497A25247CEF4F009CEBA8 /* GoogleMobileAds.framework */,
+				8D497A26247CEF4F009CEBA8 /* GoogleUtilities.xcframework */,
+				8D497A27247CEF4F009CEBA8 /* nanopb.xcframework */,
 				8D5D8494247CE6420018A35B /* libPromisesObjC.a */,
 				8DCA686B247CC383001D026E /* libReactiveSwift.a */,
 				8D9D9C29247C77AB0093220E /* XCTest.framework */,
