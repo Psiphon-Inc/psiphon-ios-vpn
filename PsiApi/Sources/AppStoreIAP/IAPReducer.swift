@@ -24,7 +24,7 @@ import StoreKit
 import PsiApi
 import PsiCashClient
 
-public enum IAPAction {
+public enum IAPAction: Equatable {
     case checkUnverifiedTransaction
     case purchase(IAPPurchasableProduct)
     case purchaseAdded(PurchaseAddedResult)
@@ -37,12 +37,12 @@ public enum IAPAction {
 }
 
 /// StoreKit transaction observer
-public enum TransactionUpdate {
+public enum TransactionUpdate: Equatable {
     case updatedTransactions([PaymentTransaction])
-    case restoredCompletedTransactions(error: Error?)
+    case restoredCompletedTransactions(error: SystemError?)
 }
 
-public struct IAPReducerState {
+public struct IAPReducerState: Equatable {
     public var iap: IAPState
     public var psiCashBalance: PsiCashBalance
     public let psiCashAuth: PsiCashAuthPackage
@@ -425,7 +425,7 @@ SKPaymentTransactionObserver {
     // from the user's purchase history back to the queue.
     public func paymentQueue(_ queue: SKPaymentQueue,
                       restoreCompletedTransactionsFailedWithError error: Error) {
-        storeSend(.restoredCompletedTransactions(error: error))
+        storeSend(.restoredCompletedTransactions(error: error as SystemError))
     }
     
     // Sent when all transactions from the user's purchase history have

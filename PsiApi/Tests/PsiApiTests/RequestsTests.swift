@@ -21,7 +21,7 @@ import XCTest
 import Testing
 import Utilities
 import ReactiveSwift
-@testable import PsiApiMockValues
+@testable import PsiApiTestingCommon
 @testable import PsiApi
 
 struct TestRequest: Encodable {

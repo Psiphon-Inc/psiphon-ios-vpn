@@ -109,7 +109,7 @@ public struct SupportedAppStoreProductIDs: Equatable {
 }
 
 public struct PaymentTransaction: Equatable {
-    
+
     /// Refines `SKPaymentTransaction` state.
     public enum TransactionState: Equatable {
         
@@ -134,6 +134,20 @@ public struct PaymentTransaction: Equatable {
     private let isEqual: (PaymentTransaction) -> Bool
     
     public let skPaymentTransaction: () -> SKPaymentTransaction?
+    
+    public init(transactionID: @escaping () -> TransactionID,
+                transactionDate: @escaping () -> Date,
+                productID: @escaping () -> String,
+                transactionState: @escaping () -> PaymentTransaction.TransactionState,
+                isEqual: @escaping (PaymentTransaction) -> Bool,
+                skPaymentTransaction: @escaping () -> SKPaymentTransaction?) {
+        self.transactionID = transactionID
+        self.transactionDate = transactionDate
+        self.productID = productID
+        self.transactionState = transactionState
+        self.isEqual = isEqual
+        self.skPaymentTransaction = skPaymentTransaction
+    }
     
     public func isEqualTransactionID(to other: PaymentTransaction) -> Bool {
         self.transactionID() == other.transactionID()
@@ -179,7 +193,7 @@ extension PaymentTransaction.TransactionState {
 }
 
 extension PaymentTransaction {
-    
+        
     /// Created PaymentTransaction holds a strong reference to the `skPaymentTransaction` object.
     public static func make(from skPaymentTransaction: SKPaymentTransaction) -> Self {
         PaymentTransaction(

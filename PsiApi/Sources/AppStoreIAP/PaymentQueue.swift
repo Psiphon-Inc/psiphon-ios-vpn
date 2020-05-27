@@ -52,7 +52,7 @@ public struct PaymentQueue {
 }
 
 /// Represents a payment that has been added to `SKPaymentQueue`.
-public struct AddedPayment {
+public struct AddedPayment: Equatable {
     public let product: IAPPurchasableProduct
     public let paymentObj: SKPayment
     
