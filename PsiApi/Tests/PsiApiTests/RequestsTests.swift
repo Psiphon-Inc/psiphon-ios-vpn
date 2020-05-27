@@ -121,6 +121,8 @@ func generateRetriableTunneledHttpRequestTest(
         httpClient: echoHttpClient
     ).collectForTesting(timeout: totalTimeout)
 
+    XCTAssert(connectionSeqGenerator.exhausted)
+    
     return result
 }
 
@@ -313,6 +315,8 @@ final class RequestsTests: XCTestCase {
         )
         
         XCTAssert(self.echoHttpClient.requestCount == 2)
+        
+        XCTAssert(self.echoHttpClient.responseSequence.exhausted)
     }
     
     func testDisconnectedToConnected() {
@@ -412,6 +416,8 @@ final class RequestsTests: XCTestCase {
         )
         
         XCTAssert(self.echoHttpClient.requestCount == 3)
+        
+        XCTAssert(self.echoHttpClient.responseSequence.exhausted)
     }
     
     func testRetryWithHttpStatusErrorThenSuccess() {
@@ -465,6 +471,8 @@ final class RequestsTests: XCTestCase {
         )
         
         XCTAssert(self.echoHttpClient.requestCount == 2)
+        
+        XCTAssert(self.echoHttpClient.responseSequence.exhausted)
     }
     
     static var allTests = [
