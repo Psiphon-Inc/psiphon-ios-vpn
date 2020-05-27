@@ -21,6 +21,7 @@ import UIKit
 import StoreKit
 import PsiApi
 import InAppPurchase
+import PsiCashClient
 
 struct PsiCashPurchasableViewModel: Equatable {
     enum ProductType: Equatable {

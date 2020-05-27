@@ -19,6 +19,7 @@
 
 import Foundation
 import PsiApi
+import PsiCashClient
 
 
 extension RewardedVideoPresentation {
@@ -105,6 +106,15 @@ extension PsiCashStatus {
         @unknown default:
             return false
         }
+    }
+    
+}
+
+
+extension PsiCashAmount: CustomStringFeedbackDescription {
+    
+    public var description: String {
+        "PsiCash(inPsi %.2f: \(String(format: "%.2f", self.inPsi)))"
     }
     
 }

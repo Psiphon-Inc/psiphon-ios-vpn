@@ -18,6 +18,7 @@
  */
 
 import Foundation
+import PsiApi
 
 public typealias CustomData = String
 

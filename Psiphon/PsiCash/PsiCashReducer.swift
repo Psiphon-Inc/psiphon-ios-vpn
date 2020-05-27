@@ -20,6 +20,7 @@
 import Foundation
 import ReactiveSwift
 import PsiApi
+import PsiCashClient
 
 struct PsiCashReducerState: Equatable {
     var psiCashBalance: PsiCashBalance
@@ -32,7 +33,7 @@ typealias PsiCashEnvironment = (
     feedbackLogger: FeedbackLogger,
     psiCashEffects: PsiCashEffects,
     sharedDB: PsiphonDataSharedDB,
-    userConfigs: PersistedConfig,
+    psiCashPersistedValues: PsiCashPersistedValues,
     notifier: Notifier,
     vpnActionStore: (VPNPublicAction) -> Effect<Never>,
     // TODO: Remove this dependency from reducer's environment. UI-related effects
@@ -79,7 +80,7 @@ func psiCashReducer(
         
         state.psiCash.libData = purchaseResult.refreshedLibData
         state.psiCashBalance = .refreshed(refreshedData: purchaseResult.refreshedLibData,
-                                          userConfigs: environment.userConfigs)
+                                          persisted: environment.psiCashPersistedValues)
         switch purchaseResult.result {
         case .success(let purchasedType):
             guard case .speedBoost(let purchasedProduct) = purchasedType else {
@@ -124,7 +125,7 @@ func psiCashReducer(
         if case .completed(.success(let refreshedLibData)) = result {
             state.psiCash.libData = refreshedLibData
             state.psiCashBalance = .refreshed(refreshedData: refreshedLibData,
-                                              userConfigs: environment.userConfigs)
+                                              persisted: environment.psiCashPersistedValues)
         }
         return []
         
@@ -161,9 +162,11 @@ func psiCashReducer(
         
         if state.psiCash.rewardedVideo.rewardedAndDismissed {
             let rewardAmount = PsiCashHardCodedValues.videoAdRewardAmount
-            state.psiCashBalance.waitingForExpectedIncrease(withAddedReward: rewardAmount,
-                                                            reason: .watchedRewardedVideo,
-                                                            userConfigs: environment.userConfigs)
+            state.psiCashBalance.waitingForExpectedIncrease(
+                withAddedReward: rewardAmount,
+                reason: .watchedRewardedVideo,
+                persisted: environment.psiCashPersistedValues
+            )
             return [Effect { .refreshPsiCashState }]
         } else {
             return []

@@ -19,6 +19,7 @@
 
 import Foundation
 import PsiApi
+import PsiCashClient
 
 extension PsiCash {
     

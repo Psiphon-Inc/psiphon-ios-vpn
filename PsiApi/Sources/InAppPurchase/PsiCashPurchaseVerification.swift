@@ -21,6 +21,7 @@ import Foundation
 import ReactiveSwift
 import Utilities
 import PsiApi
+import PsiCashClient
 
 public struct PsiCashValidationRequest: Encodable {
     let productID: String

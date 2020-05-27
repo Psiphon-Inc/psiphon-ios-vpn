@@ -19,7 +19,7 @@
 
 import Foundation
 
-public protocol PersistedConfig {
+public protocol PsiCashPersistedValues {
     
     var expectedPsiCashReward: PsiCashAmount { get }
     

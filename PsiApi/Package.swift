@@ -30,8 +30,11 @@ let package = Package(
             name: "PsiApi",
             dependencies: ["ReactiveSwift", "Promises", "Utilities"]),
         .target(
+            name: "PsiCashClient",
+            dependencies: ["PsiApi"]),
+        .target(
             name: "InAppPurchase",
-            dependencies: ["PsiApi", "ReactiveSwift", "Promises", "Utilities"]),
+            dependencies: ["PsiApi", "PsiCashClient", "ReactiveSwift", "Promises", "Utilities"]),
         .testTarget(
             name: "PsiApiTests",
             dependencies: ["PsiApi", "ReactiveSwift", "Promises", "Utilities", "Testing"]),

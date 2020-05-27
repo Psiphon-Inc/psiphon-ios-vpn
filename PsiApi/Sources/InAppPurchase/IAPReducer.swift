@@ -22,6 +22,7 @@ import ReactiveSwift
 import Promises
 import StoreKit
 import PsiApi
+import PsiCashClient
 
 public enum IAPAction {
     case checkUnverifiedTransaction
@@ -61,7 +62,6 @@ public typealias IAPEnvironment = (
     psiCashEffects: PsiCashEffects,
     clientMetaData: ClientMetaData,
     paymentQueue: PaymentQueue,
-    userConfigs: PersistedConfig,
     psiCashStore: (PsiCashAction) -> Effect<Never>,
     appReceiptStore: (ReceiptStateAction) -> Effect<Never>,
     httpClient: HTTPClient,

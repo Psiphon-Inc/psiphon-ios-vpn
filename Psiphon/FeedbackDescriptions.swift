@@ -67,14 +67,6 @@ extension TunnelProviderSyncReason: CustomStringFeedbackDescription {
     
 }
 
-extension PsiCashAmount: CustomStringFeedbackDescription {
-    
-    public var description: String {
-        "PsiCash(inPsi %.2f: \(String(format: "%.2f", self.inPsi)))"
-    }
-    
-}
-
 extension UserDefaultsConfig: CustomFieldFeedbackDescription {
     
     var feedbackFields: [String : CustomStringConvertible] {
