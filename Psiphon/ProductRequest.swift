@@ -19,6 +19,7 @@
 
 import Foundation
 import PsiApi
+import InAppPurchase
 
 /// Parsed representation of AppStore PsiCash consumable product.
 enum ParsedPsiCashAppStorePurchasable: Equatable {

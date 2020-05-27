@@ -13,7 +13,7 @@ let package = Package(
         // Products define the executables and libraries produced by a package, and make them visible to other packages.
         .library(
             name: "PsiApi",
-            targets: ["PsiApi"]),
+            targets: ["PsiApi", "InAppPurchase"]),
     ],
     dependencies: [
         // Dependencies declare other packages that this package depends on.
@@ -29,6 +29,9 @@ let package = Package(
         .target(
             name: "PsiApi",
             dependencies: ["ReactiveSwift", "Promises", "Utilities"]),
+        .target(
+            name: "InAppPurchase",
+            dependencies: ["PsiApi", "ReactiveSwift", "Promises", "Utilities"]),
         .testTarget(
             name: "PsiApiTests",
             dependencies: ["PsiApi", "ReactiveSwift", "Promises", "Utilities", "Testing"]),

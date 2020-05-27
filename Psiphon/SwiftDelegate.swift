@@ -24,6 +24,7 @@ import StoreKit
 import NetworkExtension
 import Utilities
 import PsiApi
+import InAppPurchase
 
 enum AppDelegateAction {
     case appDidLaunch(psiCashData: PsiCashLibData)

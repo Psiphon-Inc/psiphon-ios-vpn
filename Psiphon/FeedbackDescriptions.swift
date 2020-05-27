@@ -171,18 +171,3 @@ extension PsiphonDataSharedDB: CustomFieldFeedbackDescription {
     }
     
 }
-
-extension PaymentTransaction.TransactionState: FeedbackDescription {}
-
-extension PaymentTransaction: CustomFieldFeedbackDescription {
-    
-    public var feedbackFields: [String : CustomStringConvertible] {
-        ["transactionID": self.transactionID(),
-         "transactionDate": self.transactionDate(),
-         "productID": self.productID(),
-         "transactionState": makeFeedbackEntry(self.transactionState())]
-    }
-    
-}
-
-extension ReceiptData: FeedbackDescription {}

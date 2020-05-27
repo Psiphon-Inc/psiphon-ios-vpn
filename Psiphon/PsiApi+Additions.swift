@@ -17,9 +17,9 @@
  *
  */
 
-
 import Foundation
 import PsiApi
+
 
 extension RewardedVideoPresentation {
     
@@ -50,6 +50,7 @@ extension RewardedVideoPresentation {
     
 }
 
+
 extension RewardedVideoLoadStatus {
     
     init(objcAdLoadStatus: AdLoadStatus) {
@@ -68,6 +69,7 @@ extension RewardedVideoLoadStatus {
     }
     
 }
+
 
 extension PsiCashPurchaseResponseError: ErrorUserDescription {
     
@@ -89,42 +91,6 @@ extension PsiCashPurchaseResponseError: ErrorUserDescription {
     
 }
 
-
-extension PaymentQueue {
-    
-    static let `default` = PaymentQueue(
-        transactions: {
-            Effect {
-                SKPaymentQueue.default().transactions
-            }
-    },
-        addPayment: { purchasable in
-            Effect { () -> AddedPayment in
-                let payment = SKPayment(product: purchasable.appStoreProduct.skProduct)
-                SKPaymentQueue.default().add(payment)
-                return AddedPayment(product: purchasable, paymentObj: payment)
-            }
-    },
-        addObserver: { observer in
-            .fireAndForget {
-                SKPaymentQueue.default().add(observer)
-            }
-    },
-        removeObserver: { observer in
-            .fireAndForget {
-                SKPaymentQueue.default().remove(observer)
-            }
-    },
-        finishTransaction: { transaction in
-            .fireAndForget {
-                guard let skPaymentTransaction = transaction.skPaymentTransaction() else {
-                    return
-                }
-                SKPaymentQueue.default().finishTransaction(skPaymentTransaction)
-            }
-    })
-    
-}
 
 extension PsiCashStatus {
     

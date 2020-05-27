@@ -19,6 +19,7 @@
 
 import Foundation
 import Utilities
+import PsiApi
 
 /// Each server endpoint should be defined as an extension
 /// in a separate file (e.g. PurchaseVerifier+PsiCash.swift)

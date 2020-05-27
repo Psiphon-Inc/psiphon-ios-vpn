@@ -22,6 +22,7 @@ import ReactiveSwift
 import NetworkExtension
 import PsiApi
 import Utilities
+import InAppPurchase
 
 /// Note on terminology:
 /// - Psiphon tunnel is to the tunnel created in the Network Extension process.
