@@ -46,6 +46,14 @@ public struct Generator<Value>: IteratorProtocol {
     
 }
 
+extension Generator {
+    
+    public static func empty() -> Generator<Value> {
+        return Generator(sequence: [])
+    }
+    
+}
+
 public let globalTestingScheduler = QueueScheduler(qos: .userInteractive,
                                                    name: "PsiphonTestsScheduler",
                                                    targeting: .global())

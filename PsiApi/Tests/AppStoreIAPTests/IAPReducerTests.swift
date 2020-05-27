@@ -18,23 +18,27 @@
 */
 
 import Foundation
-import PsiApi
+import XCTest
+import PsiCashClient
+@testable import PsiApi
+@testable import AppStoreIAP
 
-final class PsiphonRotatingFileFeedbackLogHandler: FeedbackLogHandler {
+final class IAPReducerTests: XCTestCase {
     
-    func fatalError(type: String, message: String) {
-        PsiFeedbackLogger.fatalError(withType: type, message: message)
+    var feedbackLogger: FeedbackLogger!
+    
+    override func setUpWithError() throws {
+        feedbackLogger = FeedbackLogger(ArrayFeedbackLogger())
     }
     
-    func feedbackLog(level: NonFatalLogLevel, type: String, message: String) {
-        switch level {
-        case .info:
-            PsiFeedbackLogger.info(withType: type, message: message)
-        case .warn:
-            PsiFeedbackLogger.warn(withType: type, message: message)
-        case .error:
-            PsiFeedbackLogger.error(withType: type, message: message)
-        }
+    override func tearDownWithError() throws {
+        feedbackLogger = nil
+    }
+    
+    func testCheckingOfUnverifiedTransaction() {
+        
+        
+        
     }
     
 }

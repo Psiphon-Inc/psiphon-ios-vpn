@@ -21,17 +21,22 @@ import Foundation
 
 public typealias LogTag = String
 
-public enum LogLevel: Int {
+public enum NonFatalLogLevel: String, Codable {
     case info
     case warn
     case error
+}
+
+enum LogLevel {
+    case fatal
+    case nonFatal(NonFatalLogLevel)
 }
 
 public protocol FeedbackLogHandler {
     
     func fatalError(type: String, message: String)
     
-    func feedbackLog(level: LogLevel, type: String, message: String)
+    func feedbackLog(level: NonFatalLogLevel, type: String, message: String)
     
 }
 
@@ -41,8 +46,22 @@ public struct StdoutFeedbackLogger: FeedbackLogHandler {
         print("[FatalError] type: '\(type)' message: '\(message)'")
     }
     
-    public func feedbackLog(level: LogLevel, type: String, message: String) {
+    public func feedbackLog(level: NonFatalLogLevel, type: String, message: String) {
         print("[\(String(describing: level))] type: '\(type)' message: '\(message)'")
+    }
+    
+}
+
+final class ArrayFeedbackLogger: FeedbackLogHandler {
+    
+    var logs = [(level: LogLevel,type: String, message: String)]()
+    
+    func fatalError(type: String, message: String) {
+        logs.append((level: .fatal, type: type, message: message))
+    }
+    
+    func feedbackLog(level: NonFatalLogLevel, type: String, message: String) {
+        logs.append((level: .nonFatal(level), type: type, message: message))
     }
     
 }
@@ -94,47 +113,47 @@ public struct FeedbackLogger {
     }
 
     public func log(
-        _ level: LogLevel, file: String = #file, line: Int = #line, _ message: LogMessage
+        _ level: NonFatalLogLevel, file: String = #file, line: Int = #line, _ message: LogMessage
     ) -> Effect<Never> {
         log(level, type: "\(file.lastPathComponent):\(line)", value: message.description)
     }
 
     public func log<T: FeedbackDescription>(
-        _ level: LogLevel, file: String = #file, line: Int = #line, _ value: T
+        _ level: NonFatalLogLevel, file: String = #file, line: Int = #line, _ value: T
     ) -> Effect<Never> {
         log(level, type: "\(file.lastPathComponent):\(line)", value: String(describing: value))
     }
 
     public func log<T: CustomFieldFeedbackDescription>(
-        _ level: LogLevel, file: String = #file, line: Int = #line, _ value: T
+        _ level: NonFatalLogLevel, file: String = #file, line: Int = #line, _ value: T
     ) -> Effect<Never> {
         log(level, type: "\(file.lastPathComponent):\(line)", value: value.description)
     }
 
-    public func log(_ level: LogLevel, tag: LogTag, _ message: LogMessage) -> Effect<Never> {
+    public func log(_ level: NonFatalLogLevel, tag: LogTag, _ message: LogMessage) -> Effect<Never> {
         log(level, type: tag, value: message.description)
     }
 
     public func log<T: FeedbackDescription>(
-        _ level: LogLevel, tag: LogTag, _ value: T
+        _ level: NonFatalLogLevel, tag: LogTag, _ value: T
     ) -> Effect<Never> {
         log(level, type: tag, value: String(describing: value))
     }
 
     public func log<T: CustomFieldFeedbackDescription>(
-        _ level: LogLevel, tag: LogTag,  _ value: T
+        _ level: NonFatalLogLevel, tag: LogTag,  _ value: T
     ) -> Effect<Never> {
         log(level, type: tag, value: value.description)
     }
 
-    private func log(_ level: LogLevel, type: String, value: String) -> Effect<Never> {
+    private func log(_ level: NonFatalLogLevel, type: String, value: String) -> Effect<Never> {
         .fireAndForget {
             self.handler.feedbackLog(level: level, type: type, message: value)
         }
     }
 
     public func immediate(
-        _ level: LogLevel, _ value: LogMessage, file: String = #file, line: UInt = #line
+        _ level: NonFatalLogLevel, _ value: LogMessage, file: String = #file, line: UInt = #line
     ) {
         let tag = "\(file.lastPathComponent):\(line)"
         let message = makeFeedbackEntry(value)
