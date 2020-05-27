@@ -20,6 +20,7 @@
 import Foundation
 import Promises
 import PsiApi
+import InAppPurchase
 
 extension AppAction {
 

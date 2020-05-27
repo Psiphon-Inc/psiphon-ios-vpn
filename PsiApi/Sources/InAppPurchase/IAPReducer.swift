@@ -21,6 +21,7 @@ import Foundation
 import ReactiveSwift
 import Promises
 import StoreKit
+import PsiApi
 
 public enum IAPAction {
     case checkUnverifiedTransaction

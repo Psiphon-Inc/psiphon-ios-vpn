@@ -21,6 +21,7 @@ import Foundation
 import Promises
 import Utilities
 import StoreKit
+import PsiApi
 
 public enum IAPPurchasingState: Equatable {
     case none

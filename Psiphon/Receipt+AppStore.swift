@@ -19,6 +19,7 @@
 
 import Foundation
 import PsiApi
+import InAppPurchase
 
 extension ReceiptData {
     

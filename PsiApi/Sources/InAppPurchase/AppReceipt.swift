@@ -21,6 +21,7 @@ import Foundation
 import Promises
 import Utilities
 import StoreKit
+import PsiApi
 
 /// `ReceiptReadReason` represents the event that caused the receipt file to be read.
 public enum ReceiptReadReason: Equatable {
