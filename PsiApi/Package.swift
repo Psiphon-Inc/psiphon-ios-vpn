@@ -36,15 +36,15 @@ let package = Package(
             name: "AppStoreIAP",
             dependencies: ["PsiApi", "PsiCashClient", "ReactiveSwift", "Promises", "Utilities"]),
         .target(
-            name: "PsiApiMockValues",
+            name: "PsiApiTestingCommon",
             dependencies: ["PsiApi", "PsiCashClient", "AppStoreIAP", "ReactiveSwift", "Testing"],
-            path: "Tests/PsiApiMockValues"),
+            path: "Tests/PsiApiTestingCommon"),
         .testTarget(
             name: "PsiApiTests",
-            dependencies: ["PsiApi", "PsiApiMockValues", "ReactiveSwift", "Promises", "Utilities",
+            dependencies: ["PsiApi", "PsiApiTestingCommon", "ReactiveSwift", "Promises", "Utilities",
                            "Testing"]),
         .testTarget(
             name: "AppStoreIAPTests",
-            dependencies: ["AppStoreIAP", "PsiApiMockValues", "Testing"]),
+            dependencies: ["AppStoreIAP", "PsiApiTestingCommon", "Testing"]),
     ]
 )

@@ -22,8 +22,8 @@ import ReactiveSwift
 import PsiApi
 import PsiCashClient
 import Testing
-import AppStoreIAP
 import StoreKit
+@testable import AppStoreIAP
 
 func mockLibData(
     fullAuthPackage: Bool = true,
@@ -115,7 +115,7 @@ extension PaymentQueue {
 }
 
 func mockIAPEnvironment(
-    feedbackLogger: FeedbackLogger,
+    _ feedbackLogger: FeedbackLogger,
     tunnelStatusSignal: @autoclosure () -> SignalProducer<TunnelProviderVPNStatus, Never>? = nil,
     tunnelConnectionRefSignal: @autoclosure () -> SignalProducer<TunnelConnection?, Never>? = nil,
     psiCashEffects: @autoclosure () -> PsiCashEffects? = nil,
@@ -150,4 +150,24 @@ func mockIAPEnvironment(
         httpClient: _httpClient,
         getCurrentTime: { Date() }
     )
+}
+
+extension PaymentTransaction {
+    
+    static func mock(
+        transactionID: (() -> TransactionID)? = nil,
+        transactionDate: (() -> Date)? = nil,
+        productID: (() -> String)? = nil,
+        transactionState: (() -> TransactionState)? = nil,
+        isEqual: ((PaymentTransaction) -> Bool)? = nil
+    ) -> PaymentTransaction {
+        PaymentTransaction(
+            transactionID: transactionID ?? { TransactionID(stringLiteral: "TransactionID") },
+            transactionDate: transactionDate ?? { Date() },
+            productID: productID ?? { "ProductID" },
+            transactionState: transactionState ?? { TransactionState.completed(.success(.purchased)) },
+            isEqual: isEqual ?? { _ in true },
+            skPaymentTransaction: { nil })
+    }
+    
 }

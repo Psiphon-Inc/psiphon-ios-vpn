@@ -27,7 +27,7 @@ public enum NonFatalLogLevel: String, Codable {
     case error
 }
 
-enum LogLevel {
+enum LogLevel: Equatable {
     case fatal
     case nonFatal(NonFatalLogLevel)
 }
@@ -54,14 +54,20 @@ public struct StdoutFeedbackLogger: FeedbackLogHandler {
 
 final class ArrayFeedbackLogger: FeedbackLogHandler {
     
-    var logs = [(level: LogLevel,type: String, message: String)]()
+    struct Log: Equatable {
+        let level: LogLevel
+        let type: String
+        let message: String
+    }
+    
+    var logs = [Log]()
     
     func fatalError(type: String, message: String) {
-        logs.append((level: .fatal, type: type, message: message))
+        logs.append(Log(level: .fatal, type: type, message: message))
     }
     
     func feedbackLog(level: NonFatalLogLevel, type: String, message: String) {
-        logs.append((level: .nonFatal(level), type: type, message: message))
+        logs.append(Log(level: .nonFatal(level), type: type, message: message))
     }
     
 }
