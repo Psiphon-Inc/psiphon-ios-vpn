@@ -64,7 +64,7 @@ extension PsiCash {
 
     func parsedActivePurchases() -> PsiCashParsed<PsiCashPurchasedType> {
         guard let validPurchases = self.validPurchases() else {
-            return .init(items: [], parseErrors: [])
+            return PsiCashParsed(items: [], parseErrors: [])
         }
 
         let purchaseErrorTuple = validPurchases.map
@@ -175,11 +175,13 @@ extension ExpirableTransaction {
         do {
             let decoder = JSONDecoder.makeRfc3339Decoder()
             let decodedAuth = try decoder.decode(SignedAuthorization.self, from: base64Data)
-            return .success(.init(transactionId: purchase.id,
-                                  serverTimeExpiry: serverTimeExpiry,
-                                  localTimeExpiry: localTimeExpiry,
-                                  authorization: SignedData(rawData: base64Auth,
-                                                            decoded: decodedAuth)))
+            return .success(
+                ExpirableTransaction(transactionId: purchase.id,
+                                     serverTimeExpiry: serverTimeExpiry,
+                                     localTimeExpiry: localTimeExpiry,
+                                     authorization: SignedData(rawData: base64Auth,
+                                                               decoded: decodedAuth))
+            )
         } catch {
             return .failure(ErrorRepr(repr: String(describing: error)))
         }

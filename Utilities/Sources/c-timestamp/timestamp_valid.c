@@ -25,16 +25,16 @@
  */
 #include "timestamp.h"
 
-int
-dup_timestamp_compare(const dup_timestamp_t *t1, const dup_timestamp_t *t2) {
-    if (t1->sec < t2->sec)
-        return -1;
-    if (t1->sec > t2->sec)
-        return 1;
-    if (t1->nsec < t2->nsec)
-        return -1;
-    if (t1->nsec > t2->nsec)
-        return 1;
-    return 0;
+#define MIN_SEC INT64_C(-62135596800) /* 0001-01-01T00:00:00 */
+#define MAX_SEC INT64_C(253402300799) /* 9999-12-31T23:59:59 */
+
+bool
+timestamp_valid(const timestamp_t *tsp) {
+    const int64_t sec = tsp->sec + tsp->offset * 60;
+    if (sec < MIN_SEC || sec > MAX_SEC ||
+        tsp->nsec < 0 || tsp->nsec > 999999999 ||
+        tsp->offset < -1439 || tsp->offset > 1439)
+        return false;
+    return true;
 }
 

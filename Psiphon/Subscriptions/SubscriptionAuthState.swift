@@ -47,11 +47,11 @@ struct SubscriptionPurchaseAuthState: Hashable, Codable {
         case requestRejected(RequestRejectedReason)
         
         /// Retrieved an authorization successfully.
-        case authorization(SignedData<SignedAuthorization>)
+        case authorization(PsiApi.SignedData<SignedAuthorization>)
         
         /// Authorization rejected by the Psiphon servers.
         /// If the transaction has not expired, another authorization can be requested from the purchase verifier server.
-        case rejectedByPsiphon(SignedData<SignedAuthorization>)
+        case rejectedByPsiphon(PsiApi.SignedData<SignedAuthorization>)
     }
     
     /// Subscription purchase contained in the app receipt.

@@ -17,6 +17,7 @@
 *
 */
 import Foundation
+import PsiApi
 
 struct PsiCashHardCodedValues {
     static let videoAdRewardAmount = PsiCashAmount(nanoPsi: Int64(35e9))

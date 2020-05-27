@@ -21,25 +21,6 @@ import Foundation
 import ReactiveSwift
 import PsiApi
 
-enum PsiCashAction {
-    case buyPsiCashProduct(PsiCashPurchasableType)
-    case psiCashProductPurchaseResult(PsiCashPurchaseResult)
-    
-    case refreshPsiCashState
-    case refreshPsiCashStateResult(PsiCashRefreshResult)
-    
-    case showRewardedVideoAd
-    case rewardedVideoPresentation(RewardedVideoPresentation)
-    case rewardedVideoLoad(RewardedVideoLoad)
-    case connectToPsiphonTapped
-    case dismissedAlert(PsiCashAlertDismissAction)
-}
-
-enum PsiCashAlertDismissAction {
-    case rewardedVideo
-    case speedBoostAlreadyActive
-}
-
 struct PsiCashReducerState: Equatable {
     var psiCashBalance: PsiCashBalance
     var psiCash: PsiCashState
@@ -49,9 +30,9 @@ struct PsiCashReducerState: Equatable {
 
 typealias PsiCashEnvironment = (
     feedbackLogger: FeedbackLogger,
-    psiCashEffects: PsiCashEffect,
+    psiCashEffects: PsiCashEffects,
     sharedDB: PsiphonDataSharedDB,
-    userConfigs: UserDefaultsConfig,
+    userConfigs: PersistedConfig,
     notifier: Notifier,
     vpnActionStore: (VPNPublicAction) -> Effect<Never>,
     // TODO: Remove this dependency from reducer's environment. UI-related effects
@@ -80,8 +61,7 @@ func psiCashReducer(
         }
         state.psiCash.purchasing = .speedBoost(purchasable)
         return [
-            environment.psiCashEffects.purchaseProduct(purchasableType,
-                                                       tunnelConnection: tunnelConnection)
+            environment.psiCashEffects.purchaseProduct(purchasableType, tunnelConnection)
                 .map(PsiCashAction.psiCashProductPurchaseResult)
         ]
         
@@ -135,8 +115,7 @@ func psiCashReducer(
         }
         return [
             environment.psiCashEffects
-                .refreshState(andGetPricesFor: PsiCashTransactionClass.allCases,
-                              tunnelConnection: tunnelConnection)
+                .refreshState(PsiCashTransactionClass.allCases, tunnelConnection)
                 .map(PsiCashAction.refreshPsiCashStateResult)
         ]
         

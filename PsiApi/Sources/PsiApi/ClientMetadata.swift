@@ -18,10 +18,9 @@
 */
 
 import Foundation
-import PsiApi
 import Utilities
 
-protocol AppInfoProvider : Encodable {
+public protocol AppInfoProvider : Encodable {
     var clientPlatform : String { get }
     var clientRegion : String { get }
     var clientVersion : String { get }
@@ -29,13 +28,13 @@ protocol AppInfoProvider : Encodable {
     var sponsorId : String { get }
 }
 
-struct ClientMetaData: Encodable {
+public struct ClientMetaData: Encodable {
 
-    let clientPlatform : String
-    let clientRegion : String
-    let clientVersion : String
-    let propagationChannelId : String
-    let sponsorId : String
+    public let clientPlatform : String
+    public let clientRegion : String
+    public let clientVersion : String
+    public let propagationChannelId : String
+    public let sponsorId : String
 
     private enum CodingKeys: String, CodingKey {
         case clientPlatform = "client_platform"
@@ -45,7 +44,7 @@ struct ClientMetaData: Encodable {
         case sponsorId = "sponsor_id"
     }
 
-    init(_ appInfo : AppInfoProvider) {
+    public init(_ appInfo : AppInfoProvider) {
         self.clientPlatform = appInfo.clientPlatform
         self.clientRegion = appInfo.clientRegion
         self.clientVersion = appInfo.clientVersion
@@ -53,7 +52,7 @@ struct ClientMetaData: Encodable {
         self.sponsorId = appInfo.sponsorId
     }
 
-    var jsonString: Either<ScopedError<ErrorRepr>, String> {
+    public var jsonString: Either<ScopedError<ErrorRepr>, String> {
         do {
             let jsonData = try JSONEncoder().encode(self)
             if let jsonString = String(data: jsonData, encoding: .utf8) {

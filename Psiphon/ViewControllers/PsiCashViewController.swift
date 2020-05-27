@@ -219,7 +219,9 @@ final class PsiCashViewController: UIViewController {
                     
                     self.display(screen: .mainScreen)
                     
-                    if case .serverError(.insufficientBalance, nil) = psiCashErrorEvent.error {
+                    if case let .serverError(psiCashStatus, _, nil) = psiCashErrorEvent.error,
+                        PsiCashStatus(rawValue: psiCashStatus)! == .insufficientBalance {
+                        
                         self.display(errorDesc: errorDesc) { () -> UIAlertController in
                             let alertController = UIAlertController(
                                 title: UserStrings.Error_title(),

@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2019, Psiphon Inc.
+* Copyright (c) 2020, Psiphon Inc.
 * All rights reserved.
 *
 * This program is free software: you can redistribute it and/or modify
@@ -17,31 +17,23 @@
 *
 */
 
-// PsiCash
-#import <PsiCashLib/PsiCash.h>
-#import <PsiCashLib/PsiCashAPIModels.h>
-#import "PsiCashLogger.h"
+import Foundation
+import PsiApi
 
-// Tunnel Provider
-#import "NEBridge.h"
-
-// AppStore receipt
-#import "AppStoreParsedReceiptData.h"
-
-// Utilities
-#import "AppInfo.h"
-#import "PsiphonDataSharedDB.h"
-#import "SharedConstants.h"
-#import "Notifier.h"
-#import "AppDelegate.h"
-#import "PsiFeedbackLogger.h"
-#import <PsiphonTunnel/Reachability.h>
-
-// UI
-#import "UIColor+Additions.h"
-#import "UIFont+Additions.h"
-#import "Strings.h"
-
-// Ads
-#import "AdControllerWrapper.h"
-
+extension SignedAuthorization {
+    
+    static func make(base64String: String) throws -> Self? {
+        guard let data = Data(base64Encoded: base64String, options: .ignoreUnknownCharacters) else {
+            return nil
+        }
+        let decoder = JSONDecoder.makeRfc3339Decoder()
+        return try decoder.decode(Self.self, from: data)
+    }
+    
+    static func make(setOfBase64Strings: [String]) -> Set<SignedAuthorization> {
+        Set(setOfBase64Strings.compactMap {
+            return try? SignedAuthorization.make(base64String: $0)
+        })
+    }
+    
+}

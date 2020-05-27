@@ -24,8 +24,6 @@ import PsiApi
 
 fileprivate let landingPageTag = LogTag("LandingPage")
 
-typealias RestrictedURL = PredicatedValue<URL, TunnelProviderVPNStatus>
-
 struct LandingPageReducerState {
     var pendingLandingPageOpening: Bool
     let tunnelConnection: TunnelConnection?
@@ -40,7 +38,7 @@ typealias LandingPageEnvironment = (
     feedbackLogger: FeedbackLogger,
     sharedDB: PsiphonDataSharedDB,
     urlHandler: URLHandler,
-    psiCashEffects: PsiCashEffect,
+    psiCashEffects: PsiCashEffects,
     psiCashAuthPackageSignal: SignalProducer<PsiCashAuthPackage, Never>
 )
 
@@ -70,8 +68,7 @@ func landingPageReducer(
         
         state.pendingLandingPageOpening = true
         
-        let randomlySelectedURL = RestrictedURL(value: landingPages.randomElement()!.url,
-                                                predicate: { $0 == .connected })
+        let randomlySelectedURL = landingPages.randomElement()!.url
         
         return [
             modifyLandingPagePendingEarnerToken(
@@ -92,13 +89,13 @@ func landingPageReducer(
 }
 
 fileprivate func modifyLandingPagePendingEarnerToken(
-    url: RestrictedURL, authPackageSignal: SignalProducer<PsiCashAuthPackage, Never>,
-    psiCashEffects: PsiCashEffect
-) -> Effect<RestrictedURL> {
+    url: URL, authPackageSignal: SignalProducer<PsiCashAuthPackage, Never>,
+    psiCashEffects: PsiCashEffects
+) -> Effect<URL> {
     authPackageSignal
         .map(\.hasEarnerToken)
         .falseIfNotTrue(within: PsiCashHardCodedValues.getEarnerTokenTimeout)
-        .flatMap(.latest) { hasEarnerToken -> SignalProducer<RestrictedURL, Never> in
+        .flatMap(.latest) { hasEarnerToken -> SignalProducer<URL, Never> in
             if hasEarnerToken {
                 return psiCashEffects.modifyLandingPage(url)
             } else {

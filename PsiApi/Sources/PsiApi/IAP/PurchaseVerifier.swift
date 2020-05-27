@@ -18,13 +18,13 @@
  */
 
 import Foundation
-import PsiApi
+import Utilities
 
 /// Each server endpoint should be defined as an extension
-/// in a separate file (e.g. PurchaseVerfier+PsiCash.swift)
-struct PurchaseVerifierServer {
+/// in a separate file (e.g. PurchaseVerifier+PsiCash.swift)
+public struct PurchaseVerifierServer {
 
-    static func req<R>(
+    public static func req<R>(
         url: URL,
         jsonData: Data,
         clientMetaData: ClientMetaData
@@ -50,4 +50,32 @@ struct PurchaseVerifierServer {
         return (error: clientMetadataError, request: req)
     }
 
+}
+
+extension PurchaseVerifierServer {
+    
+    fileprivate static func psiCashUrl() -> URL {
+        if Debugging.devServers {
+            return PurchaseVerifierURLs.devPsiCashVerify
+        } else {
+            return PurchaseVerifierURLs.psiCashVerify
+        }
+    }
+
+    static func psiCash(
+        requestBody: PsiCashValidationRequest,
+        clientMetaData: ClientMetaData
+    ) -> (error: NestedScopedError<ErrorRepr>?,
+        request: HTTPRequest<PsiCashValidationResponse>) {
+            do {
+                let encoder = JSONEncoder.makeRfc3339Encoder()
+                let jsonData = try encoder.encode(requestBody)
+                return PurchaseVerifierServer.req(url: PurchaseVerifierServer.psiCashUrl(),
+                                                  jsonData: jsonData,
+                                                  clientMetaData: clientMetaData)
+            } catch {
+                fatalError("failed to create request '\(error)'")
+            }
+    }
+    
 }

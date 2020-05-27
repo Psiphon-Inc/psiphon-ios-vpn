@@ -24,7 +24,7 @@ import PsiApi
 // For new fields that are added, the feedback description in FeedbackDescriptions.swift
 // should also be updated.
 
-final class UserDefaultsConfig {
+final class UserDefaultsConfig: PersistedConfig {
 
     /// Expected PsiCash reward while waiting for a successful PsiCash refresh state.
     // TODO: Pass in feedback logger as a dependency.
@@ -33,4 +33,8 @@ final class UserDefaultsConfig {
                      errorLogger: FeedbackLogger(PsiphonRotatingFileFeedbackLogHandler()))
     var expectedPsiCashReward: PsiCashAmount
 
+    func setExpectedPsiCashReward(_ value: PsiCashAmount) {
+        self.expectedPsiCashReward = value
+    }
+    
 }

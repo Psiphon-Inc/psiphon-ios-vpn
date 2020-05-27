@@ -19,6 +19,7 @@
 
 import Foundation
 import UIKit
+import PsiApi
 
 @objc final class PsiCashBalanceView: UIView, Bindable {
     typealias BindingType = BalanceState

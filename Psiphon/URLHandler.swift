@@ -22,7 +22,7 @@ import ReactiveSwift
 import PsiApi
 
 struct URLHandler {
-    let open: (RestrictedURL, TunnelConnection) -> Effect<Bool>
+    let open: (URL, TunnelConnection) -> Effect<Bool>
 }
 
 extension URLHandler {
@@ -41,18 +41,13 @@ extension URLHandler {
                         /// Tunnel status should be assessed directly (not through observables that might
                         /// introduce some latency), before opening the landing page.
                         switch tunnelConnection.connectionStatus() {
-                        case .resourceReleased:
-                            fulfilled(false)
-                            return
-                        case .connection(let connection):
-                            guard let landingPage = url.getValue(connection) else {
-                                fulfilled(false)
-                                return
-                            }
-                            
-                            UIApplication.shared.open(landingPage) { success in
+                        case .connection(.connected):
+                            UIApplication.shared.open(url) { success in
                                 fulfilled(success)
                             }
+                        default:
+                            fulfilled(false)
+                            return
                         }
                     }
                 }

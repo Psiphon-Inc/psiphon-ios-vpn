@@ -19,6 +19,7 @@
 
 import UIKit
 import Utilities
+import PsiApi
 
 struct SpeedBoostPurchasableViewModel: Equatable {
     let purchasable: SpeedBoostPurchasable

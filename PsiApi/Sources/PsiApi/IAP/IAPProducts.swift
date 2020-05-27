@@ -21,17 +21,16 @@ import Foundation
 import StoreKit
 import Promises
 import ReactiveSwift
-import PsiApi
 import Utilities
 
-enum LocalizedPrice: Equatable {
+public enum LocalizedPrice: Equatable {
     case free
     case localizedPrice(price: Double, priceLocale: Locale)
 }
 
 extension LocalizedPrice {
     
-    static func makeLocalizedPrice(skProduct: SKProduct) -> Self {
+    public static func makeLocalizedPrice(skProduct: SKProduct) -> Self {
         guard skProduct.price.doubleValue > 0.0 else {
             fatalError("SKProduct cannot have value 0")
         }
@@ -41,22 +40,22 @@ extension LocalizedPrice {
     
 }
 
-enum ProductIdError: Error {
+public enum ProductIdError: Error {
     case invalidString(String)
 }
 
-struct AppStoreProduct: Hashable {
-    let type: AppStoreProductType
-    let skProduct: SKProduct
+public struct AppStoreProduct: Hashable {
+    public let type: AppStoreProductType
+    public let skProduct: SKProduct
 
-    init(_ skProduct: SKProduct) throws {
+    public init(_ skProduct: SKProduct) throws {
         let type = try AppStoreProductType.from(skProduct: skProduct)
         self.type = type
         self.skProduct = skProduct
     }
 }
 
-enum AppStoreProductType: String {
+public enum AppStoreProductType: String {
     case subscription = "subscriptionProductIds"
     case psiCash = "psiCashProductIds"
 
@@ -72,35 +71,35 @@ enum AppStoreProductType: String {
         throw ProductIdError.invalidString(productIdentifier)
     }
 
-    static func from(transaction: PaymentTransaction) throws -> AppStoreProductType {
+    public static func from(transaction: PaymentTransaction) throws -> AppStoreProductType {
         return try .from(productIdentifier: transaction.productID())
     }
     
-    static func from(transaction: SKPaymentTransaction) throws -> AppStoreProductType {
+    public static func from(transaction: SKPaymentTransaction) throws -> AppStoreProductType {
         return try from(productIdentifier: transaction.payment.productIdentifier)
     }
 
-    static func from(skProduct: SKProduct) throws -> AppStoreProductType {
+    public static func from(skProduct: SKProduct) throws -> AppStoreProductType {
         return try from(productIdentifier: skProduct.productIdentifier)
     }
 }
 
 /// Represents product identifiers in-app purchase products that are supported.
-struct SupportedAppStoreProductIDs: Equatable {
-    let values: Set<ProductID>
+public struct SupportedAppStoreProductIDs: Equatable {
+    public let values: Set<ProductID>
 
     private init(for type: AppStoreProductType, validator: (Set<String>) -> Bool) {
         values = try! plistReader(key: type.rawValue, toType: Set<String>.self)
     }
 
-    static func subscription() -> Self {
+    public static func subscription() -> Self {
         return .init(for: .subscription) { ids -> Bool in
             // TODO: do some validation here.
             return true
         }
     }
 
-    static func psiCash() -> Self {
+    public static func psiCash() -> Self {
         return .init(for: .psiCash) { ids -> Bool in
             // TODO: do some validation here.
             return true
@@ -108,17 +107,17 @@ struct SupportedAppStoreProductIDs: Equatable {
     }
 }
 
-struct PaymentTransaction: Equatable {
+public struct PaymentTransaction: Equatable {
     
     /// Refines `SKPaymentTransaction` state.
-    enum TransactionState: Equatable {
+    public enum TransactionState: Equatable {
         
-        enum PendingTransactionState: Equatable {
+        public enum PendingTransactionState: Equatable {
             case purchasing
             case deferred
         }
         
-        enum CompletedTransactionState: Equatable {
+        public enum CompletedTransactionState: Equatable {
             case purchased
             case restored
         }
@@ -127,19 +126,19 @@ struct PaymentTransaction: Equatable {
         case completed(Result<CompletedTransactionState, Either<SKError, SystemError>>)
     }
     
-    let transactionID: () -> TransactionID
-    let transactionDate: () -> Date
-    let productID: () -> String
-    let transactionState: () -> TransactionState
+    public let transactionID: () -> TransactionID
+    public let transactionDate: () -> Date
+    public let productID: () -> String
+    public let transactionState: () -> TransactionState
     private let isEqual: (PaymentTransaction) -> Bool
     
-    let skPaymentTransaction: () -> SKPaymentTransaction?
+    public let skPaymentTransaction: () -> SKPaymentTransaction?
     
-    func isEqualTransactionID(to other: PaymentTransaction) -> Bool {
+    public func isEqualTransactionID(to other: PaymentTransaction) -> Bool {
         self.transactionID() == other.transactionID()
     }
     
-    static func == (lhs: Self, rhs: Self) -> Bool {
+    public static func == (lhs: Self, rhs: Self) -> Bool {
         switch (lhs.skPaymentTransaction(), rhs.skPaymentTransaction()) {
         case (nil, nil):
             return lhs.transactionID() == rhs.transactionID()
@@ -181,7 +180,7 @@ extension PaymentTransaction.TransactionState {
 extension PaymentTransaction {
     
     /// Created PaymentTransaction holds a strong reference to the `skPaymentTransaction` object.
-    static func make(from skPaymentTransaction: SKPaymentTransaction) -> Self {
+    public static func make(from skPaymentTransaction: SKPaymentTransaction) -> Self {
         PaymentTransaction(
             transactionID: { () -> TransactionID in
                 TransactionID(stringLiteral: skPaymentTransaction.transactionIdentifier!)

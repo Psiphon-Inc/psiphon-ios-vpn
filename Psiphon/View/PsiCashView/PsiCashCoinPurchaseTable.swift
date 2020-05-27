@@ -19,6 +19,7 @@
 
 import UIKit
 import StoreKit
+import PsiApi
 
 struct PsiCashPurchasableViewModel: Equatable {
     enum ProductType: Equatable {
@@ -30,6 +31,22 @@ struct PsiCashPurchasableViewModel: Equatable {
     let subtitle: String
     let localizedPrice: LocalizedPrice
     let clearedForSale: Bool
+}
+
+extension PsiCashState {
+    
+    func rewardedVideoProduct(
+        clearedForSale: Bool, subtitle: String
+    ) -> PsiCashPurchasableViewModel {
+        PsiCashPurchasableViewModel(
+            product: .rewardedVideoAd(loading: self.rewardedVideo.isLoading),
+            title: PsiCashHardCodedValues.videoAdRewardTitle,
+            subtitle: subtitle,
+            localizedPrice: .free,
+            clearedForSale: clearedForSale
+        )
+    }
+    
 }
 
 struct PsiCashCoinPurchaseTable: ViewBuilder {

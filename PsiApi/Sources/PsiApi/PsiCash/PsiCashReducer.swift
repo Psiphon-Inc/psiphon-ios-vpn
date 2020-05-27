@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2019, Psiphon Inc.
+* Copyright (c) 2020, Psiphon Inc.
 * All rights reserved.
 *
 * This program is free software: you can redistribute it and/or modify
@@ -17,31 +17,24 @@
 *
 */
 
-// PsiCash
-#import <PsiCashLib/PsiCash.h>
-#import <PsiCashLib/PsiCashAPIModels.h>
-#import "PsiCashLogger.h"
 
-// Tunnel Provider
-#import "NEBridge.h"
+import Foundation
 
-// AppStore receipt
-#import "AppStoreParsedReceiptData.h"
+public enum PsiCashAction {
+    case buyPsiCashProduct(PsiCashPurchasableType)
+    case psiCashProductPurchaseResult(PsiCashPurchaseResult)
+    
+    case refreshPsiCashState
+    case refreshPsiCashStateResult(PsiCashRefreshResult)
+    
+    case showRewardedVideoAd
+    case rewardedVideoPresentation(RewardedVideoPresentation)
+    case rewardedVideoLoad(RewardedVideoLoad)
+    case connectToPsiphonTapped
+    case dismissedAlert(PsiCashAlertDismissAction)
+}
 
-// Utilities
-#import "AppInfo.h"
-#import "PsiphonDataSharedDB.h"
-#import "SharedConstants.h"
-#import "Notifier.h"
-#import "AppDelegate.h"
-#import "PsiFeedbackLogger.h"
-#import <PsiphonTunnel/Reachability.h>
-
-// UI
-#import "UIColor+Additions.h"
-#import "UIFont+Additions.h"
-#import "Strings.h"
-
-// Ads
-#import "AdControllerWrapper.h"
-
+public enum PsiCashAlertDismissAction {
+    case rewardedVideo
+    case speedBoostAlreadyActive
+}

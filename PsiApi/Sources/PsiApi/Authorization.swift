@@ -18,7 +18,6 @@
 */
 
 import Foundation
-import PsiApi
 
 /// Authorization JSON representation
 /// ```
@@ -34,12 +33,18 @@ import PsiApi
 /// ```
 ///
 
-typealias AuthorizationID = String
+public typealias AuthorizationID = String
 
-struct SignedAuthorization: Hashable, Codable {
-    let authorization: Authorization
-    let signingKeyID: String
-    let signature: String
+public struct SignedAuthorization: Hashable, Codable {
+    public let authorization: Authorization
+    public let signingKeyID: String
+    public let signature: String
+    
+    public init(authorization: Authorization, signingKeyID: String, signature: String) {
+        self.authorization = authorization
+        self.signingKeyID = signingKeyID
+        self.signature = signature
+    }
     
     enum CodingKeys: String, CodingKey {
         case authorization = "Authorization"
@@ -48,27 +53,9 @@ struct SignedAuthorization: Hashable, Codable {
     }
 }
 
-extension SignedAuthorization {
-    
-    static func make(base64String: String) throws -> Self? {
-        guard let data = Data(base64Encoded: base64String, options: .ignoreUnknownCharacters) else {
-            return nil
-        }
-        let decoder = JSONDecoder.makeRfc3339Decoder()
-        return try decoder.decode(Self.self, from: data)
-    }
-    
-    static func make(setOfBase64Strings: [String]) -> Set<SignedAuthorization> {
-        Set(setOfBase64Strings.compactMap {
-            return try? SignedAuthorization.make(base64String: $0)
-        })
-    }
-    
-}
-
 extension SignedAuthorization: CustomFieldFeedbackDescription {
     
-    var feedbackFields: [String : CustomStringConvertible] {
+    public var feedbackFields: [String : CustomStringConvertible] {
         ["ID": authorization.id,
          "Expires": authorization.expires,
          "AccessType": authorization.accessType.rawValue]
@@ -76,12 +63,12 @@ extension SignedAuthorization: CustomFieldFeedbackDescription {
     
 }
 
-struct Authorization: Hashable, Codable {
-    let id: AuthorizationID
-    let accessType: AccessType
-    let expires: Date
+public struct Authorization: Hashable, Codable {
+    public let id: AuthorizationID
+    public let accessType: AccessType
+    public let expires: Date
     
-    enum AccessType: String, Codable {
+    public enum AccessType: String, Codable {
         case appleSubscription = "apple-subscription"
         case appleSubscriptionTest = "apple-subscription-test"
         case speedBoost = "speed-boost"
@@ -94,7 +81,7 @@ struct Authorization: Hashable, Codable {
         case expires = "Expires"
     }
     
-    func hash(into hasher: inout Hasher) {
+    public func hash(into hasher: inout Hasher) {
         // Authorization ID is unique.
         hasher.combine(self.id)
     }
@@ -107,21 +94,26 @@ struct Authorization: Hashable, Codable {
 /// This struct is useful when the raw value needs to be preserved, where there
 /// might be potential data change from encodings/decodings. (e.g. a `Date` encoded value
 /// might slightly differ from the value from the server)
-struct SignedData<Decoded: Decodable & CustomStringConvertible>: Hashable, CustomStringConvertible {
+public struct SignedData<Decoded: Decodable & CustomStringConvertible>: Hashable, CustomStringConvertible {
 
-    let rawData: String
-    let decoded: Decoded
+    public let rawData: String
+    public let decoded: Decoded
     
-    static func == (lhs: SignedData<Decoded>, rhs: SignedData<Decoded>) -> Bool {
+    public init(rawData: String, decoded: Decoded) {
+        self.rawData = rawData
+        self.decoded = decoded
+    }
+    
+    public static func == (lhs: SignedData<Decoded>, rhs: SignedData<Decoded>) -> Bool {
         lhs.rawData == rhs.rawData
     }
     
-    func hash(into hasher: inout Hasher) {
+    public func hash(into hasher: inout Hasher) {
         hasher.combine(rawData)
     }
     
     /// `rawData` is treated as a secret value and not included in the description.
-    var description: String {
+    public var description: String {
         return decoded.description
     }
     

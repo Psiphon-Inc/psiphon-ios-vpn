@@ -20,9 +20,9 @@
 import Foundation
 import ReactiveSwift
 import Promises
-import PsiApi
+import StoreKit
 
-enum IAPAction {
+public enum IAPAction {
     case checkUnverifiedTransaction
     case purchase(IAPPurchasableProduct)
     case purchaseAdded(PurchaseAddedResult)
@@ -35,32 +35,39 @@ enum IAPAction {
 }
 
 /// StoreKit transaction observer
-enum TransactionUpdate {
+public enum TransactionUpdate {
     case updatedTransactions([PaymentTransaction])
     case restoredCompletedTransactions(error: Error?)
 }
 
-struct IAPReducerState {
-    var iap: IAPState
-    var psiCashBalance: PsiCashBalance
-    let psiCashAuth: PsiCashAuthPackage
+public struct IAPReducerState {
+    public var iap: IAPState
+    public var psiCashBalance: PsiCashBalance
+    public let psiCashAuth: PsiCashAuthPackage
+    
+    public init(iap: IAPState, psiCashBalance: PsiCashBalance, psiCashAuth: PsiCashAuthPackage) {
+        self.iap = iap
+        self.psiCashBalance = psiCashBalance
+        self.psiCashAuth = psiCashAuth
+    }
+    
 }
 
-typealias IAPEnvironment = (
+public typealias IAPEnvironment = (
     feedbackLogger: FeedbackLogger,
     tunnelStatusSignal: SignalProducer<TunnelProviderVPNStatus, Never>,
     tunnelConnectionRefSignal: SignalProducer<TunnelConnection?, Never>,
-    psiCashEffects: PsiCashEffect,
+    psiCashEffects: PsiCashEffects,
     clientMetaData: ClientMetaData,
     paymentQueue: PaymentQueue,
-    userConfigs: UserDefaultsConfig,
+    userConfigs: PersistedConfig,
     psiCashStore: (PsiCashAction) -> Effect<Never>,
     appReceiptStore: (ReceiptStateAction) -> Effect<Never>,
     httpClient: HTTPClient,
     getCurrentTime: () -> Date
 )
 
-func iapReducer(
+public func iapReducer(
     state: inout IAPReducerState, action: IAPAction, environment: IAPEnvironment
 ) -> [Effect<IAPAction>] {
     switch action {
@@ -404,47 +411,35 @@ func iapReducer(
 /// Delegate for StoreKit transactions.
 /// - Note: There is no callback from StoreKit if purchasing a product that is already
 /// purchased.
-final class PaymentTransactionDelegate: StoreDelegate<TransactionUpdate>,
+public final class PaymentTransactionDelegate: StoreDelegate<TransactionUpdate>,
 SKPaymentTransactionObserver {
     
     // Sent when transactions are removed from the queue (via finishTransaction:).
-    func paymentQueue(_ queue: SKPaymentQueue, removedTransactions
+    public func paymentQueue(_ queue: SKPaymentQueue, removedTransactions
         transactions: [SKPaymentTransaction]) {
         // Ignore.
     }
     
     // Sent when an error is encountered while adding transactions
     // from the user's purchase history back to the queue.
-    func paymentQueue(_ queue: SKPaymentQueue,
+    public func paymentQueue(_ queue: SKPaymentQueue,
                       restoreCompletedTransactionsFailedWithError error: Error) {
         storeSend(.restoredCompletedTransactions(error: error))
     }
     
     // Sent when all transactions from the user's purchase history have
     // successfully been added back to the queue.
-    func paymentQueueRestoreCompletedTransactionsFinished(_ queue: SKPaymentQueue) {
+    public func paymentQueueRestoreCompletedTransactionsFinished(_ queue: SKPaymentQueue) {
         storeSend(.restoredCompletedTransactions(error: .none))
-    }
-    
-    // Sent when a user initiates an IAP buy from the App Store
-    @available(iOS 11.0, *)
-    func paymentQueue(_ queue: SKPaymentQueue, shouldAddStorePayment payment: SKPayment,
-                      for product: SKProduct) -> Bool {
-        return false
     }
     
     // Sent when the transaction array has changed (additions or state changes).
     // Client should check state of transactions and finish as appropriate.
-    func paymentQueue(_ queue: SKPaymentQueue,
+    public func paymentQueue(_ queue: SKPaymentQueue,
                       updatedTransactions transactions: [SKPaymentTransaction]) {
         storeSend(
             .updatedTransactions(transactions.map(PaymentTransaction.make(from:)))
         )
-    }
-    
-    @available(iOS 13.0, *)
-    func paymentQueueDidChangeStorefront(_ queue: SKPaymentQueue) {
-        // Do nothing.
     }
     
 }
