@@ -20,31 +20,37 @@
 import Foundation
 import ReactiveSwift
 import PsiApi
-import AppStoreIAP
 
-enum SubscriptionStatus: Equatable {
+public enum SubscriptionStatus: Equatable {
     case subscribed(SubscriptionIAPPurchase)
     case notSubscribed
     case unknown
 }
 
-struct SubscriptionState: Equatable {
-    var status: SubscriptionStatus = .unknown
+public struct SubscriptionState: Equatable {
+    public var status: SubscriptionStatus = .unknown
+
+    public init() {
+        self.status = .unknown
+    }
 }
 
-enum SubscriptionAction {
+public enum SubscriptionAction {
     case updatedReceiptData(ReceiptData?)
     case _timerFinished(withExpiry:Date)
 }
 
-typealias SubscriptionReducerEnvironment = (
+extension SubscriptionAction: Equatable {}
+
+public typealias SubscriptionReducerEnvironment = (
     feedbackLogger: FeedbackLogger,
     appReceiptStore: (ReceiptStateAction) -> Effect<Never>,
     getCurrentTime: () -> Date,
-    compareDates: (Date, Date, Calendar.Component) -> ComparisonResult
+    compareDates: (Date, Date, Calendar.Component) -> ComparisonResult,
+    timerScheduler: DateScheduler
 )
 
-func subscriptionReducer(
+public func subscriptionReducer(
     state: inout SubscriptionState, action: SubscriptionAction,
     environment: SubscriptionReducerEnvironment
 ) -> [Effect<SubscriptionAction>] {
@@ -78,7 +84,9 @@ func subscriptionReducer(
         state.status = .subscribed(purchaseWithLatestExpiry)
 
         return [
-            singleFireTimer(interval: timeLeft, leeway: SubscriptionHardCodedValues.leeway)
+            singleFireTimer(scheduler:environment.timerScheduler,
+                            interval: timeLeft,
+                            leeway: SubscriptionHardCodedValues.leeway)
                 .map(value: ._timerFinished(withExpiry: purchaseWithLatestExpiry.expires)),
             environment.feedbackLogger.log(.info,
                 "subscribed: timer expiring on: '\(purchaseWithLatestExpiry.expires)'"
@@ -114,9 +122,11 @@ func subscriptionReducer(
 
 /// - Note: This function delivers its events on the main dispatch queue.
 /// - Important: Sub-millisecond precision is lost in the current implementation.
-func singleFireTimer(interval: TimeInterval, leeway: DispatchTimeInterval) -> Effect<()> {
+func singleFireTimer(scheduler: DateScheduler,
+                     interval: TimeInterval,
+                     leeway: DispatchTimeInterval) -> Effect<()> {
     SignalProducer.timer(interval: DispatchTimeInterval.milliseconds(Int(interval * 1000)),
-                         on: QueueScheduler.main,
+                         on: scheduler,
                          leeway: leeway)
         .map(value: ())
         .take(first: 1)

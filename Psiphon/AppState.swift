@@ -292,7 +292,8 @@ fileprivate func toSubscriptionReducerEnvironment(
         feedbackLogger: env.feedbackLogger,
         appReceiptStore: env.appReceiptStore,
         getCurrentTime: env.getCurrentTime,
-        compareDates: env.compareDates
+        compareDates: env.compareDates,
+        timerScheduler: QueueScheduler.main
     )
 }
 

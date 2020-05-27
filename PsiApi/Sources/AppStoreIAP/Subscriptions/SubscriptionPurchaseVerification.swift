@@ -20,13 +20,12 @@
 import Foundation
 import ReactiveSwift
 import PsiApi
-import AppStoreIAP
 
-struct SubscriptionValidationRequest: Encodable {
-    let originalTransactionID: OriginalTransactionID
+public struct SubscriptionValidationRequest: Encodable {
+    public let originalTransactionID: OriginalTransactionID
     let receiptData: String
     
-    init(originalTransactionID: OriginalTransactionID, receipt: ReceiptData) {
+    public init(originalTransactionID: OriginalTransactionID, receipt: ReceiptData) {
         self.originalTransactionID = originalTransactionID
         self.receiptData = receipt.data.base64EncodedString()
     }
@@ -38,9 +37,9 @@ struct SubscriptionValidationRequest: Encodable {
 }
 
 
-struct SubscriptionValidationResponse: RetriableHTTPResponse {
+public struct SubscriptionValidationResponse: RetriableHTTPResponse {
     
-    enum ResponseError: HashableError {
+    public enum ResponseError: HashableError {
         case failedRequest(SystemError)
         case badRequest
         case otherErrorStatusCode(HTTPStatusCode)
@@ -48,14 +47,14 @@ struct SubscriptionValidationResponse: RetriableHTTPResponse {
     }
     
     // 200 OK response type
-    struct SuccessResult: Equatable, Decodable {
+    public struct SuccessResult: Equatable, Decodable {
         let requestDate: Date
-        let originalTransactionID: OriginalTransactionID
-        let signedAuthorization: PsiApi.SignedData<SignedAuthorization>?
-        let errorStatus: ErrorStatus
-        let errorDescription: String
+        public let originalTransactionID: OriginalTransactionID
+        public let signedAuthorization: PsiApi.SignedData<SignedAuthorization>?
+        public let errorStatus: ErrorStatus
+        public let errorDescription: String
         
-        enum ErrorStatus: Int, Decodable {
+        public enum ErrorStatus: Int, Decodable {
             case noError = 0
             case transactionExpired = 1
             // The transaction has been cancelled by Apple customer support
@@ -70,7 +69,7 @@ struct SubscriptionValidationResponse: RetriableHTTPResponse {
             case errorDescription = "error_description"
         }
         
-        init(from decoder: Decoder) throws {
+        public init(from decoder: Decoder) throws {
             let values = try decoder.container(keyedBy: CodingKeys.self)
             requestDate = try values.decode(Date.self, forKey: .requestDate)
             originalTransactionID = try values.decode(OriginalTransactionID.self,
@@ -95,10 +94,10 @@ struct SubscriptionValidationResponse: RetriableHTTPResponse {
         }
     }
 
-    let result: Result<SuccessResult, ErrorEvent<ResponseError>>
+    public let result: Result<SuccessResult, ErrorEvent<ResponseError>>
     private let urlSessionResult: URLSessionResult
 
-    init(urlSessionResult: URLSessionResult) {
+    public init(urlSessionResult: URLSessionResult) {
         self.urlSessionResult = urlSessionResult
 
         // TODO: The mapping of types of `urlSessionResult` to `result` can be generalized.
@@ -125,7 +124,7 @@ struct SubscriptionValidationResponse: RetriableHTTPResponse {
         }
     }
 
-    static func unpackRetriableResultError(_ result: ResultType)
+    public static func unpackRetriableResultError(_ result: ResultType)
         -> (result: ResultType, retryDueToError: FailureEvent?)
     {
         switch result {
