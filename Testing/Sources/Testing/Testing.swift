@@ -30,6 +30,10 @@ public struct Generator<Value>: IteratorProtocol {
     private let sequence: [Value]
     private var index = 0
     
+    public var exhausted: Bool {
+        return sequence.count == index
+    }
+    
     public init(sequence: [Value]) {
         self.sequence = sequence
     }
