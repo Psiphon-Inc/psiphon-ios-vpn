@@ -20,7 +20,7 @@
 import UIKit
 import StoreKit
 import PsiApi
-import InAppPurchase
+import AppStoreIAP
 import PsiCashClient
 
 struct PsiCashPurchasableViewModel: Equatable {

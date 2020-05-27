@@ -21,7 +21,7 @@ import Foundation
 import Promises
 import ReactiveSwift
 import PsiApi
-import InAppPurchase
+import AppStoreIAP
 
 extension PurchaseVerifierServer {
 

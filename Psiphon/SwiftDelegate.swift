@@ -24,7 +24,7 @@ import StoreKit
 import NetworkExtension
 import Utilities
 import PsiApi
-import InAppPurchase
+import AppStoreIAP
 import PsiCashClient
 
 enum AppDelegateAction {

@@ -20,7 +20,7 @@
 import Foundation
 import ReactiveSwift
 import PsiApi
-import InAppPurchase
+import AppStoreIAP
 import PsiCashClient
 
 var Style = AppStyle()
