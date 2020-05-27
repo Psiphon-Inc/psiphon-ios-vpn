@@ -19,6 +19,7 @@
 
 import Foundation
 import ReactiveSwift
+import AppStoreIAP
 import PsiApi
 import PsiCashClient
 

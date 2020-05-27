@@ -110,7 +110,6 @@
 		6615A5EB1F58A95B00026C98 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 6615A5E81F58A95500026C98 /* Localizable.strings */; };
 		668AF9BF1E92CBD3008CAAAA /* NetworkExtension.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 668AF9BE1E92CBD3008CAAAA /* NetworkExtension.framework */; };
 		668AF9C01E92CBE0008CAAAA /* NetworkExtension.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 668AF9BE1E92CBD3008CAAAA /* NetworkExtension.framework */; };
-		8D00AA4A2450B4D1001EB8DD /* SubscriptionPurchaseVerification.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D00AA492450B4D1001EB8DD /* SubscriptionPurchaseVerification.swift */; };
 		8D1F62BA247DBB0D0028AFAF /* Utilities in Frameworks */ = {isa = PBXBuildFile; productRef = 8D1F62B9247DBB0D0028AFAF /* Utilities */; };
 		8D1F62BC247DBB130028AFAF /* PsiApi in Frameworks */ = {isa = PBXBuildFile; productRef = 8D1F62BB247DBB130028AFAF /* PsiApi */; };
 		8D1F62BE247DC1690028AFAF /* Receipt+AppStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D1F62BD247DC1690028AFAF /* Receipt+AppStore.swift */; };
@@ -135,7 +134,6 @@
 		8D7789CA247499110038BFDA /* Reachability+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D7789C9247499110038BFDA /* Reachability+Additions.swift */; };
 		8D7E9B9D2425DF42006F3A2F /* AnimatedUIView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D7E9B9C2425DF42006F3A2F /* AnimatedUIView.swift */; };
 		8D7E9B9F2425E053006F3A2F /* Animations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D7E9B9E2425E053006F3A2F /* Animations.swift */; };
-		8D96601E2457DC6C0007718B /* SubscriptionState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D96601D2457DC6C0007718B /* SubscriptionState.swift */; };
 		8D9D9BCC247C6A9D0093220E /* PsiphonRotatingFileFeedbackLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D7789CF2474D53D0038BFDA /* PsiphonRotatingFileFeedbackLogger.swift */; };
 		8D9D9BD0247C6B910093220E /* HardCodedValues.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D9D9BCF247C6B910093220E /* HardCodedValues.swift */; };
 		8D9E602A24364ED2003A46D8 /* VPNStateReducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D9E602924364ED2003A46D8 /* VPNStateReducer.swift */; };
@@ -511,7 +509,6 @@
 		8167C01B4242F1B0217731A9 /* Pods-PsiApi-Testing.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PsiApi-Testing.debug.xcconfig"; path = "Pods/Target Support Files/Pods-PsiApi-Testing/Pods-PsiApi-Testing.debug.xcconfig"; sourceTree = "<group>"; };
 		8422B782F6ACED7897FCAC25 /* libPods-PsiApi-PsiApiTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-PsiApi-PsiApiTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		894580B71199444DBB2C3FA2 /* Pods-Psiphon-Testing.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Psiphon-Testing.release.xcconfig"; path = "Pods/Target Support Files/Pods-Psiphon-Testing/Pods-Psiphon-Testing.release.xcconfig"; sourceTree = "<group>"; };
-		8D00AA492450B4D1001EB8DD /* SubscriptionPurchaseVerification.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionPurchaseVerification.swift; sourceTree = "<group>"; };
 		8D14CCB4BB61E10B351D20DC /* Pods-Psiphon-PsiApi.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Psiphon-PsiApi.release.xcconfig"; path = "Pods/Target Support Files/Pods-Psiphon-PsiApi/Pods-Psiphon-PsiApi.release.xcconfig"; sourceTree = "<group>"; };
 		8D1F62BD247DC1690028AFAF /* Receipt+AppStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Receipt+AppStore.swift"; sourceTree = "<group>"; };
 		8D1F62BF247DC3350028AFAF /* Authorization+Additions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Authorization+Additions.swift"; sourceTree = "<group>"; };
@@ -539,7 +536,6 @@
 		8D7789CF2474D53D0038BFDA /* PsiphonRotatingFileFeedbackLogger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PsiphonRotatingFileFeedbackLogger.swift; sourceTree = "<group>"; };
 		8D7E9B9C2425DF42006F3A2F /* AnimatedUIView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimatedUIView.swift; sourceTree = "<group>"; };
 		8D7E9B9E2425E053006F3A2F /* Animations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Animations.swift; sourceTree = "<group>"; };
-		8D96601D2457DC6C0007718B /* SubscriptionState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionState.swift; sourceTree = "<group>"; };
 		8D9D9BCF247C6B910093220E /* HardCodedValues.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HardCodedValues.swift; sourceTree = "<group>"; };
 		8D9D9C29247C77AB0093220E /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Platforms/iPhoneOS.platform/Developer/Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
 		8D9E602924364ED2003A46D8 /* VPNStateReducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VPNStateReducer.swift; sourceTree = "<group>"; };
@@ -1248,8 +1244,6 @@
 			children = (
 				EF743FC31F99549000AC89A2 /* subscriptionProductIds.plist */,
 				8D417EBC2417FF5B00FEE587 /* SubscriptionAuthState.swift */,
-				8D96601D2457DC6C0007718B /* SubscriptionState.swift */,
-				8D00AA492450B4D1001EB8DD /* SubscriptionPurchaseVerification.swift */,
 			);
 			path = Subscriptions;
 			sourceTree = "<group>";
@@ -1828,7 +1822,6 @@
 				52D2581122BADE1900CA956A /* SwiftDelegate.swift in Sources */,
 				5202011D2360D34000D00C8E /* EitherView.swift in Sources */,
 				9BFEC8058885B68B2822E2B8 /* AdManager.m in Sources */,
-				8D00AA4A2450B4D1001EB8DD /* SubscriptionPurchaseVerification.swift in Sources */,
 				9BFEC3D66910918A0C8954E1 /* AdMobConsent.m in Sources */,
 				52DF5E9A23CE835100A1B067 /* UserStrings.swift in Sources */,
 				8DDA60292425BB4800DBA8EC /* DebugStrings.swift in Sources */,
@@ -1860,7 +1853,6 @@
 				A84088DD7FBB838689BC1FCC /* OnboardingViewController.m in Sources */,
 				A8408B83167EBE21E215C471 /* OnboardingView.m in Sources */,
 				A84088BD3CFC8C511F22182C /* RoyalSkyButton.m in Sources */,
-				8D96601E2457DC6C0007718B /* SubscriptionState.swift in Sources */,
 				A8408161701C8F50F52866FC /* LayerAutoResizeUIView.m in Sources */,
 				A84083E76E518050B65E523A /* SkyButton.m in Sources */,
 				A840835FAC7F18A6A7021415 /* RingSkyButton.m in Sources */,
