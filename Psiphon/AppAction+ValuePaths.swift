@@ -21,6 +21,7 @@ import Foundation
 import Promises
 import PsiApi
 import InAppPurchase
+import PsiCashClient
 
 extension AppAction {
 

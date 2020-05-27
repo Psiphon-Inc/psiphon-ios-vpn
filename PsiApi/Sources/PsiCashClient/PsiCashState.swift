@@ -20,6 +20,7 @@
 import Foundation
 import ReactiveSwift
 import Utilities
+import PsiApi
 
 public typealias PendingPsiCashRefresh =
     PendingResult<Utilities.Unit, ErrorEvent<PsiCashRefreshError>>
@@ -229,20 +230,20 @@ extension PsiCashBalance {
     
     public mutating func waitingForExpectedIncrease(
         withAddedReward addedReward: PsiCashAmount, reason: BalanceIncreaseExpectationReason,
-        userConfigs: PersistedConfig
+        persisted: PsiCashPersistedValues
     ) {
         pendingExpectedBalanceIncrease = reason
         if addedReward > .zero {
-            let totalExpectedReward = userConfigs.expectedPsiCashReward + addedReward
-            userConfigs.setExpectedPsiCashReward(totalExpectedReward)
+            let totalExpectedReward = persisted.expectedPsiCashReward + addedReward
+            persisted.setExpectedPsiCashReward(totalExpectedReward)
             optimisticBalance = lastRefreshBalance + totalExpectedReward
         }
     }
     
     public static func fromStoredExpectedReward(
-        libData: PsiCashLibData, userConfigs: PersistedConfig
+        libData: PsiCashLibData, persisted: PsiCashPersistedValues
     ) -> Self {
-        let adReward = userConfigs.expectedPsiCashReward
+        let adReward = persisted.expectedPsiCashReward
         let reason: BalanceIncreaseExpectationReason?
         if adReward.isZero {
             reason = .none
@@ -255,9 +256,9 @@ extension PsiCashBalance {
     }
 
     public static func refreshed(
-        refreshedData libData: PsiCashLibData, userConfigs: PersistedConfig
+        refreshedData libData: PsiCashLibData, persisted: PsiCashPersistedValues
     ) -> Self {
-        userConfigs.setExpectedPsiCashReward(.zero)
+        persisted.setExpectedPsiCashReward(.zero)
         return .init(pendingExpectedBalanceIncrease: .none,
                      optimisticBalance: libData.balance,
                      lastRefreshBalance: libData.balance)

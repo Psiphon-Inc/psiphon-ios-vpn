@@ -21,6 +21,7 @@ import Foundation
 import Utilities
 import ReactiveSwift
 import PsiApi
+import PsiCashClient
 
 fileprivate let landingPageTag = LogTag("LandingPage")
 

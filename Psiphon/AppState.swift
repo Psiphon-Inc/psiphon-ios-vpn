@@ -21,6 +21,7 @@ import Foundation
 import ReactiveSwift
 import PsiApi
 import InAppPurchase
+import PsiCashClient
 
 var Style = AppStyle()
 
@@ -234,7 +235,7 @@ fileprivate func toPsiCashEnvironment(env: AppEnvironment) -> PsiCashEnvironment
         feedbackLogger: env.feedbackLogger,
         psiCashEffects: env.psiCashEffects,
         sharedDB: env.sharedDB,
-        userConfigs: env.userConfigs,
+        psiCashPersistedValues: env.userConfigs,
         notifier: env.notifier,
         vpnActionStore: env.vpnActionStore,
         objcBridgeDelegate: env.objcBridgeDelegate,
@@ -262,7 +263,6 @@ fileprivate func toIAPReducerEnvironment(env: AppEnvironment) -> IAPEnvironment 
         psiCashEffects: env.psiCashEffects,
         clientMetaData: env.clientMetaData,
         paymentQueue: env.paymentQueue,
-        userConfigs: env.userConfigs,
         psiCashStore: env.psiCashStore,
         appReceiptStore: env.appReceiptStore,
         httpClient: env.httpClient,
@@ -325,7 +325,7 @@ fileprivate func toRequestDelegateReducerEnvironment(
 
 fileprivate func toAppDelegateReducerEnvironment(env: AppEnvironment) -> AppDelegateEnvironment {
     AppDelegateEnvironment(
-        userConfigs: env.userConfigs,
+        psiCashPersistedValues: env.userConfigs,
         sharedDB: env.sharedDB,
         psiCashEffects: env.psiCashEffects,
         paymentQueue: env.paymentQueue,

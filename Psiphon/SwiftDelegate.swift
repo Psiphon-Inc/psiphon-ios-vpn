@@ -25,6 +25,7 @@ import NetworkExtension
 import Utilities
 import PsiApi
 import InAppPurchase
+import PsiCashClient
 
 enum AppDelegateAction {
     case appDidLaunch(psiCashData: PsiCashLibData)
@@ -38,7 +39,7 @@ struct AppDelegateReducerState: Equatable {
 }
 
 typealias AppDelegateEnvironment = (
-    userConfigs: PersistedConfig,
+    psiCashPersistedValues: PsiCashPersistedValues,
     sharedDB: PsiphonDataSharedDB,
     psiCashEffects: PsiCashEffects,
     paymentQueue: PaymentQueue,
@@ -54,8 +55,10 @@ func appDelegateReducer(
     switch action {
     case .appDidLaunch(psiCashData: let libData):
         state.psiCash.appDidLaunch(libData)
-        state.psiCashBalance = .fromStoredExpectedReward(libData: libData,
-                                                         userConfigs: environment.userConfigs)
+        state.psiCashBalance = .fromStoredExpectedReward(
+            libData: libData,
+            persisted: environment.psiCashPersistedValues
+        )
         
         let nonSubscriptionAuths = environment.sharedDB.getNonSubscriptionEncodedAuthorizations()
         

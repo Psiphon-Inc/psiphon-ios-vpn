@@ -19,12 +19,13 @@
 
 import Foundation
 import PsiApi
+import PsiCashClient
 
 // Feedback description note:
 // For new fields that are added, the feedback description in FeedbackDescriptions.swift
 // should also be updated.
 
-final class UserDefaultsConfig: PersistedConfig {
+final class UserDefaultsConfig: PsiCashPersistedValues {
 
     /// Expected PsiCash reward while waiting for a successful PsiCash refresh state.
     // TODO: Pass in feedback logger as a dependency.

@@ -25,6 +25,7 @@ import StoreKit
 import PsiApi
 import Utilities
 import InAppPurchase
+import PsiCashClient
 
 struct PsiCashViewControllerState: Equatable {
     let psiCashBalance: PsiCashBalance
