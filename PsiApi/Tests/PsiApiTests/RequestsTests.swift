@@ -21,84 +21,8 @@ import XCTest
 import Testing
 import Utilities
 import ReactiveSwift
+@testable import PsiApiMockValues
 @testable import PsiApi
-
-final class MockCancellableURLRequest: CancellableURLRequest {
-    func cancel() {}
-}
-
-extension HTTPRequest {
-    
-    static func mockJsonRequest<Body: Encodable>(
-        body: Body, method: HTTPMethod = .get, responseType: Response.Type
-    ) -> Self {
-        let jsonData = try! JSONEncoder().encode(body)
-        return .json(url: URL(string: "https://test.psiphon.ca/")!,
-                     jsonData: jsonData,
-                     clientMetaData: "",
-                     method: method,
-                     response: responseType)
-    }
-    
-}
-
-final class EchoHTTPClient {
-    
-    var responseSequence: Generator<Result<(), HTTPRequestError>>
-        = Generator(sequence: [.success(())])
-    
-    var responseDelay: DispatchTimeInterval = .milliseconds(0)
-    var responseStatusCode = HTTPStatusCode.ok
-    var requestCount: Int = 0
-    var httpVersion = "HTTP/1.1"
-    var headers = [String: String]()
-    
-    init() {}
-    
-    lazy var client = HTTPClient(urlSession: URLSession()) { _, _, request, completionHandler -> CancellableURLRequest in
-        
-        guard let httpBody = request.httpBody else {
-            XCTFatal()
-        }
-        
-        guard let httpBodyString = String(bytes: httpBody, encoding: .utf8) else {
-            XCTFatal()
-        }
-        
-        guard let url = request.url else {
-            XCTFatal()
-        }
-        
-        guard let resp = "Request:\(self.requestCount)\n\(httpBodyString)".data(using: .utf8) else {
-            XCTFatal()
-        }
-        
-        self.requestCount += 1
-                    
-        DispatchQueue.global().asyncAfter(deadline: .now() + self.responseDelay) {
-            
-            guard let response = self.responseSequence.next() else {
-                XCTFatal()
-            }
-            
-            let sessionResult: URLSessionResult = response.map { _
-                -> (data: Data, response: HTTPURLResponse) in
-                (data: resp,
-                 response: HTTPURLResponse(
-                    url: url,
-                    statusCode: self.responseStatusCode.rawValue,
-                    httpVersion: self.httpVersion,
-                    headerFields: self.headers)!)
-            }
-            
-            completionHandler(sessionResult)
-
-        }
-        
-        return MockCancellableURLRequest()
-    }
-    
-}
 
 struct TestRequest: Encodable {
     let value: String
