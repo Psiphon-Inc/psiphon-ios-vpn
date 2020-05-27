@@ -22,6 +22,7 @@ import ReactiveSwift
 import Testing
 @testable import PsiApi
 @testable import AppStoreIAP
+@testable import PsiApiTestingCommon
 
 final class SubscriptionStateTest: XCTestCase {
 
@@ -31,7 +32,7 @@ final class SubscriptionStateTest: XCTestCase {
     /// subscription purchases in the receipt.
     func testSubscriptionIAPs() {
 
-        let result = runReducer(waitForEffects: 0, iaps: [])
+        let result = runReducer(effectsTimeout: 0, iaps: [])
 
         XCTAssertEqual(result.subscriptionActions, [])
         XCTAssertEqual(result.receiptStateActions.count, 0)
@@ -46,7 +47,7 @@ final class SubscriptionStateTest: XCTestCase {
                               expires: Date(timeInterval: -10,
                                             since: Date()))
 
-        let result = runReducer(waitForEffects: 0, iaps: [iap])
+        let result = runReducer(effectsTimeout: 0, iaps: [iap])
 
         XCTAssertEqual(result.subscriptionActions, [])
         XCTAssertEqual(result.receiptStateActions.count, 0)
@@ -61,7 +62,7 @@ final class SubscriptionStateTest: XCTestCase {
                               expires: Date(timeInterval: 5,
                                             since: Date()))
 
-        let result = runReducer(waitForEffects: 0, iaps: [iap])
+        let result = runReducer(effectsTimeout: 0, iaps: [iap])
 
         XCTAssertEqual(result.subscriptionActions, [])
         XCTAssertEqual(result.receiptStateActions.count, 0)
@@ -77,12 +78,12 @@ final class SubscriptionStateTest: XCTestCase {
 
         let iap = iapPurchase(purchaseDate: Date(), expires: expiryDate)
 
-        let result = runReducer(waitForEffects: 15, iaps: [iap])
+        let result = runReducer(effectsTimeout: 15, iaps: [iap])
 
         XCTAssertEqual(result.subscriptionActions,
-                       [.value(._timerFinished(withExpiry: expiryDate)),
-                        .completed, // logging effect
-                        .completed]) // collect
+                       [[.value(._timerFinished(withExpiry: expiryDate)),
+                         .completed], // logging effect
+                        [.completed]]) // collect
         XCTAssertEqual(result.receiptStateActions.count, 0)
         XCTAssertEqual(result.subscriptionState.status, SubscriptionStatus.subscribed(iap))
     }
@@ -103,12 +104,12 @@ final class SubscriptionStateTest: XCTestCase {
                          expires: Date(timeInterval: -60*60*24, since: Date())),
              currentSubscription]
 
-        let result = runReducer(waitForEffects: 15, iaps: iaps)
+        let result = runReducer(effectsTimeout: 15, iaps: iaps)
 
         XCTAssertEqual(result.subscriptionActions,
-                       [.value(._timerFinished(withExpiry: currentSubscriptionExpiryDate)),
-                        .completed, // logging effect
-                        .completed]) // collect
+                       [[.value(._timerFinished(withExpiry: currentSubscriptionExpiryDate)),
+                         .completed], // logging effect
+                        [.completed]]) // collect
         XCTAssertEqual(result.receiptStateActions.count, 0)
         XCTAssertEqual(result.subscriptionState.status,
                        SubscriptionStatus.subscribed(currentSubscription))
@@ -127,11 +128,11 @@ final class SubscriptionStateTest: XCTestCase {
 
         let subscriptionStatus : SubscriptionStatus = .subscribed(iap)
 
-        let result = runReducer(waitForEffects: 5,
+        let result = runReducer(effectsTimeout: 5,
                                 subscriptionStatus: subscriptionStatus,
                                 subscriptionAction: ._timerFinished(withExpiry: Date()))
 
-        XCTAssertEqual(result.subscriptionActions, [.completed, .completed])
+        XCTAssertEqual(result.subscriptionActions, [[.completed], [.completed]])
 
         if (result.receiptStateActions.count != 1) {
             XCTFail("Expected 1 receipt state action but got \(result.receiptStateActions.count)")
@@ -157,11 +158,11 @@ final class SubscriptionStateTest: XCTestCase {
 
         let subscriptionStatus : SubscriptionStatus = .subscribed(iap)
 
-        let result = runReducer(waitForEffects: 10,
+        let result = runReducer(effectsTimeout: 10,
                                 subscriptionStatus: subscriptionStatus,
                                 subscriptionAction: ._timerFinished(withExpiry: Date()))
 
-        XCTAssertEqual(result.subscriptionActions, [.completed, .completed])
+        XCTAssertEqual(result.subscriptionActions, [[.completed], [.completed]])
 
         if (result.receiptStateActions.count != 1) {
             XCTFail("Expected 1 receipt state action but got \(result.receiptStateActions.count)")
@@ -185,7 +186,7 @@ final class SubscriptionStateTest: XCTestCase {
 
         for subscriptionStatus in subscriptionStatuses {
 
-            let result = runReducer(waitForEffects: 0,
+            let result = runReducer(effectsTimeout: 0,
                                     subscriptionStatus: subscriptionStatus,
                                     subscriptionAction: ._timerFinished(withExpiry: Date()))
 
@@ -200,9 +201,9 @@ final class SubscriptionStateTest: XCTestCase {
     struct ReducerOutputs {
         let subscriptionState: SubscriptionState
         let subscriptionActions:
-            [Signal<SubscriptionAction,
+            [[Signal<SubscriptionAction,
                     SignalProducer<SubscriptionAction, Never>.SignalError>
-            .Event]
+            .Event]]
         let receiptStateActions: [ReceiptStateAction]
     }
 
@@ -218,7 +219,7 @@ final class SubscriptionStateTest: XCTestCase {
     }
 
     /// Tests reducer with given subscription IAPs.
-    func runReducer(waitForEffects: TimeInterval,
+    func runReducer(effectsTimeout: TimeInterval,
                     iaps: Set<SubscriptionIAPPurchase>) -> ReducerOutputs {
 
         // NOTE: ReceiptData.parseLocalReceipt is unused because we forgo constructing
@@ -231,13 +232,13 @@ final class SubscriptionStateTest: XCTestCase {
 
         let subscriptionAction : SubscriptionAction = .updatedReceiptData(receiptData)
 
-        return runReducer(waitForEffects: waitForEffects,
+        return runReducer(effectsTimeout: effectsTimeout,
                           subscriptionStatus: .unknown,
                           subscriptionAction: subscriptionAction)
     }
 
     /// Run reducer with given parameters.
-    func runReducer(waitForEffects: TimeInterval,
+    func runReducer(effectsTimeout: TimeInterval,
                     subscriptionStatus: SubscriptionStatus,
                     subscriptionAction: SubscriptionAction) -> ReducerOutputs {
 
@@ -268,14 +269,11 @@ final class SubscriptionStateTest: XCTestCase {
         var subscriptionState : SubscriptionState = SubscriptionState()
         subscriptionState.status = subscriptionStatus
 
-        let effects = subscriptionReducer(state: &subscriptionState,
-                                          action: subscriptionAction,
-                                          environment: env)
+        let (nextSubscriptionState, effectsResults) =
+            testReducer(subscriptionState, subscriptionAction, env, subscriptionReducer, effectsTimeout)
 
-        let subscriptionActions = effects.flatMap({$0.collectForTesting(timeout:waitForEffects)})
-
-        return ReducerOutputs.init(subscriptionState: subscriptionState,
-                                   subscriptionActions: subscriptionActions,
+        return ReducerOutputs.init(subscriptionState: nextSubscriptionState,
+                                   subscriptionActions: effectsResults,
                                    receiptStateActions: receiptStateActions)
 
     }

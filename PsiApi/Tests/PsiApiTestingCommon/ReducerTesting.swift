@@ -33,3 +33,16 @@ func testReducer<Value, Action, Environment>(
     let effectsResults = effects.map { $0.collectForTesting() }
     return (nextState, effectsResults)
 }
+
+func testReducer<Value, Action, Environment>(
+    _ initialState: Value,
+    _ action: Action,
+    _ env: Environment,
+    _ reducer: Reducer<Value, Action, Environment>,
+    _ timeout: TimeInterval
+) -> (Value, [[Signal<Action, SignalProducer<Action, Never>.SignalError>.Event]]) {
+    var nextState = initialState
+    let effects = reducer(&nextState, action, env)
+    let effectsResults = effects.map { $0.collectForTesting(timeout: timeout) }
+    return (nextState, effectsResults)
+}
