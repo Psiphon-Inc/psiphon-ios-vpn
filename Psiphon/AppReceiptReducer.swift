@@ -20,7 +20,7 @@
 import Foundation
 import Promises
 import PsiApi
-import InAppPurchase
+import AppStoreIAP
 
 typealias ReceiptReducerEnvironment = (
     feedbackLogger: FeedbackLogger,

@@ -19,7 +19,7 @@
 
 import Foundation
 import PsiApi
-import InAppPurchase
+import AppStoreIAP
 
 extension ReceiptData {
     

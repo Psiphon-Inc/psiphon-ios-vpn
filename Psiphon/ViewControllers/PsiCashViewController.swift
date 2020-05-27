@@ -24,7 +24,7 @@ import Promises
 import StoreKit
 import PsiApi
 import Utilities
-import InAppPurchase
+import AppStoreIAP
 import PsiCashClient
 
 struct PsiCashViewControllerState: Equatable {

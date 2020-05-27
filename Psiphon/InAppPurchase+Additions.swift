@@ -18,7 +18,7 @@
 */
 
 import Foundation
-import InAppPurchase
+import AppStoreIAP
 import PsiApi
 
 extension PaymentQueue {
