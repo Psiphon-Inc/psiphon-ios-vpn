@@ -57,7 +57,6 @@
 		4E5263CD2072984D0021FEF5 /* IAPViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E5263CA2072984D0021FEF5 /* IAPViewController.m */; };
 		4E5BD4F52061982300AD4724 /* FeedbackManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E5BD4F42061982300AD4724 /* FeedbackManager.m */; };
 		4E5DAE6520A942A300E06342 /* UILabel+GetLabelHeight.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E5DAE6420A942A300E06342 /* UILabel+GetLabelHeight.m */; };
-		4E90C94420CB37F5003FC319 /* PsiCashLogger.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E90C94320CB37F5003FC319 /* PsiCashLogger.m */; };
 		4EB846422151830600687344 /* AvailableServerRegions.m in Sources */ = {isa = PBXBuildFile; fileRef = 4EB846412151830600687344 /* AvailableServerRegions.m */; };
 		4EC5526320AB8DBE000B4BEA /* Pastel.m in Sources */ = {isa = PBXBuildFile; fileRef = 4EC5526220AB8DBE000B4BEA /* Pastel.m */; };
 		4EC5526620AB8DCD000B4BEA /* PastelView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4EC5526520AB8DCD000B4BEA /* PastelView.m */; };
@@ -403,8 +402,6 @@
 		4E5BD4F42061982300AD4724 /* FeedbackManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FeedbackManager.m; sourceTree = "<group>"; };
 		4E5DAE6320A942A300E06342 /* UILabel+GetLabelHeight.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UILabel+GetLabelHeight.h"; sourceTree = "<group>"; };
 		4E5DAE6420A942A300E06342 /* UILabel+GetLabelHeight.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UILabel+GetLabelHeight.m"; sourceTree = "<group>"; };
-		4E90C94220CB37F5003FC319 /* PsiCashLogger.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PsiCashLogger.h; sourceTree = "<group>"; };
-		4E90C94320CB37F5003FC319 /* PsiCashLogger.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PsiCashLogger.m; sourceTree = "<group>"; };
 		4EB846402151830600687344 /* AvailableServerRegions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AvailableServerRegions.h; sourceTree = "<group>"; };
 		4EB846412151830600687344 /* AvailableServerRegions.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AvailableServerRegions.m; sourceTree = "<group>"; };
 		4EC5526120AB8DB9000B4BEA /* Pastel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Pastel.h; sourceTree = "<group>"; };
@@ -911,15 +908,6 @@
 			name = Feedback;
 			sourceTree = "<group>";
 		};
-		4E9B2E0A204EFB9400E63784 /* ClientWrapper */ = {
-			isa = PBXGroup;
-			children = (
-				4E90C94220CB37F5003FC319 /* PsiCashLogger.h */,
-				4E90C94320CB37F5003FC319 /* PsiCashLogger.m */,
-			);
-			path = ClientWrapper;
-			sourceTree = "<group>";
-		};
 		4EC5526720AB8DF1000B4BEA /* Pastel */ = {
 			isa = PBXGroup;
 			children = (
@@ -986,7 +974,6 @@
 		4EFAAF1C2034CDA600EC0536 /* PsiCash */ = {
 			isa = PBXGroup;
 			children = (
-				4E9B2E0A204EFB9400E63784 /* ClientWrapper */,
 				8D417E982411954A00FEE587 /* PsiCashReducer.swift */,
 				8D7789C4247496F60038BFDA /* PsiCashLib+Additions.swift */,
 			);
@@ -1754,7 +1741,6 @@
 				EF90D7A1204F22C900228A63 /* timestamp_valid.c in Sources */,
 				445F24DF20E1A5BA00D004E9 /* ANY.c in Sources */,
 				52A2466F23A1769300A01FF1 /* PsiCashMessageViewUntunneled.swift in Sources */,
-				4E90C94420CB37F5003FC319 /* PsiCashLogger.m in Sources */,
 				EFC2F5C420226782007B52F9 /* RootContainerController.m in Sources */,
 				EF90D7A5204F22C900228A63 /* timestamp_parse.c in Sources */,
 				EF652CD11F352212002AFB48 /* main.m in Sources */,
