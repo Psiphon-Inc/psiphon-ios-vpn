@@ -19,34 +19,35 @@
 
 import Foundation
 import Promises
-import PsiApi
 import Utilities
+import StoreKit
 
 /// `ReceiptReadReason` represents the event that caused the receipt file to be read.
-enum ReceiptReadReason: Equatable {
+public enum ReceiptReadReason: Equatable {
     case remoteRefresh
     case localRefresh
 }
 
-struct ReceiptState: Equatable {
+public struct ReceiptState: Equatable {
     
-    var receiptData: ReceiptData?
+    public var receiptData: ReceiptData?
     
     // remoteReceiptRefreshState holds a strong reference to the `SKReceiptRefreshRequest`
     // object while the request is in progress.
-    var remoteReceiptRefreshState: PendingValue<SKReceiptRefreshRequest, Result<Utilities.Unit, SystemErrorEvent>>
+    public var remoteReceiptRefreshState: PendingValue<SKReceiptRefreshRequest, Result<Utilities.Unit, SystemErrorEvent>>
     
-    var remoteRefreshAppReceiptPromises: [Promise<Result<(), SystemErrorEvent>>]
+    public var remoteRefreshAppReceiptPromises: [Promise<Result<(), SystemErrorEvent>>]
 }
 
 extension ReceiptState {
-    init() {
+    
+    public init() {
         receiptData = .none
         remoteReceiptRefreshState = .completed(.success(.unit))
         remoteRefreshAppReceiptPromises = []
     }
     
-    mutating func fulfillRefreshPromises(_ value: Result<(), SystemErrorEvent>) -> Effect<Never> {
+    public mutating func fulfillRefreshPromises(_ value: Result<(), SystemErrorEvent>) -> Effect<Never> {
         let refreshPromises = self.remoteRefreshAppReceiptPromises
         self.remoteRefreshAppReceiptPromises = []
         return .fireAndForget {
@@ -55,7 +56,7 @@ extension ReceiptState {
     }
 }
 
-enum ReceiptStateAction {
+public enum ReceiptStateAction {
     case localReceiptRefresh
     case _localReceiptDidRefresh(refreshedData: ReceiptData?)
     /// A remote receipt refresh can open a dialog box to

@@ -50,7 +50,7 @@ struct SubscriptionValidationResponse: RetriableHTTPResponse {
     struct SuccessResult: Equatable, Decodable {
         let requestDate: Date
         let originalTransactionID: OriginalTransactionID
-        let signedAuthorization: SignedData<SignedAuthorization>?
+        let signedAuthorization: PsiApi.SignedData<SignedAuthorization>?
         let errorStatus: ErrorStatus
         let errorDescription: String
         

@@ -138,7 +138,7 @@ public enum HttpRequestTunnelError: HashableError {
 }
 
 
-protocol CancellableURLRequest {
+public protocol CancellableURLRequest {
     func cancel()
 }
 
@@ -147,7 +147,7 @@ extension URLSessionTask: CancellableURLRequest {}
 
 public struct HTTPClient {
     
-    typealias RequestFunc = (
+    public typealias RequestFunc = (
         @escaping () -> Date,
         URLSession,
         URLRequest,
@@ -158,12 +158,12 @@ public struct HTTPClient {
     
     private let makeRequest: RequestFunc
 
-    init(urlSession: URLSession, _ makeRequest: @escaping RequestFunc) {
+    public init(urlSession: URLSession, _ makeRequest: @escaping RequestFunc) {
         self.session = urlSession
         self.makeRequest = makeRequest
     }
     
-    func request<Response>(
+    public func request<Response>(
         _ getCurrentTime: @escaping () -> Date,
         _ requestData: HTTPRequest<Response>,
         handler: @escaping (Response) -> Void

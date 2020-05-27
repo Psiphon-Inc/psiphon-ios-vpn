@@ -71,7 +71,7 @@ static const uint16_t DayOffset[13] = {
 };
 
 int
-dup_timestamp_parse(const char *str, size_t len, dup_timestamp_t *tsp) {
+timestamp_parse(const char *str, size_t len, timestamp_t *tsp) {
     const unsigned char *cur, *end;
     unsigned char ch;
     uint16_t year, month, day, hour, min, sec;

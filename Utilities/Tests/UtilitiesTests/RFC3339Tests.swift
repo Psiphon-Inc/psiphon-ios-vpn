@@ -19,7 +19,7 @@
 
 import XCTest
 import Testing
-@testable import Utilities
+import Rfc3339CTimestamp
 
 struct DateContainer: Codable {
     let date: Date

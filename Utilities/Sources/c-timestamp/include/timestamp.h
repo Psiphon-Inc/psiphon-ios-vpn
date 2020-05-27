@@ -23,18 +23,33 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-#include "timestamp.h"
+#ifndef __TIMESTAMP_H__
+#define __TIMESTAMP_H__
+#include <stddef.h>
+#include <time.h>
+#include <stdint.h>
+#include <stdbool.h>
 
-int
-dup_timestamp_compare(const dup_timestamp_t *t1, const dup_timestamp_t *t2) {
-    if (t1->sec < t2->sec)
-        return -1;
-    if (t1->sec > t2->sec)
-        return 1;
-    if (t1->nsec < t2->nsec)
-        return -1;
-    if (t1->nsec > t2->nsec)
-        return 1;
-    return 0;
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+typedef struct {
+    int64_t sec;    /* Number of seconds since the epoch of 1970-01-01T00:00:00Z */
+    int32_t nsec;   /* Nanoseconds [0, 999999999] */
+    int16_t offset; /* Offset from UTC in minutes [-1439, 1439] */
+} timestamp_t;
+
+int         timestamp_parse            (const char *str, size_t len, timestamp_t *tsp);
+size_t      timestamp_format           (char *dst, size_t len, const timestamp_t *tsp);
+size_t      timestamp_format_precision (char *dst, size_t len, const timestamp_t *tsp, int precision);
+int         timestamp_compare          (const timestamp_t *tsp1, const timestamp_t *tsp2);
+bool        timestamp_valid            (const timestamp_t *tsp);
+struct tm * timestamp_to_tm_utc        (const timestamp_t *tsp, struct tm *tmp);
+struct tm * timestamp_to_tm_local      (const timestamp_t *tsp, struct tm *tmp);
+
+#ifdef __cplusplus
 }
+#endif
+#endif
 

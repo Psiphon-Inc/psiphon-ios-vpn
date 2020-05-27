@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2019, Psiphon Inc.
+* Copyright (c) 2020, Psiphon Inc.
 * All rights reserved.
 *
 * This program is free software: you can redistribute it and/or modify
@@ -17,31 +17,12 @@
 *
 */
 
-// PsiCash
-#import <PsiCashLib/PsiCash.h>
-#import <PsiCashLib/PsiCashAPIModels.h>
-#import "PsiCashLogger.h"
+import Foundation
 
-// Tunnel Provider
-#import "NEBridge.h"
-
-// AppStore receipt
-#import "AppStoreParsedReceiptData.h"
-
-// Utilities
-#import "AppInfo.h"
-#import "PsiphonDataSharedDB.h"
-#import "SharedConstants.h"
-#import "Notifier.h"
-#import "AppDelegate.h"
-#import "PsiFeedbackLogger.h"
-#import <PsiphonTunnel/Reachability.h>
-
-// UI
-#import "UIColor+Additions.h"
-#import "UIFont+Additions.h"
-#import "Strings.h"
-
-// Ads
-#import "AdControllerWrapper.h"
-
+public protocol PersistedConfig {
+    
+    var expectedPsiCashReward: PsiCashAmount { get }
+    
+    func setExpectedPsiCashReward(_ value: PsiCashAmount)
+    
+}

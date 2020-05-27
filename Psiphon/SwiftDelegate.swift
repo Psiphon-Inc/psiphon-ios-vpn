@@ -37,9 +37,9 @@ struct AppDelegateReducerState: Equatable {
 }
 
 typealias AppDelegateEnvironment = (
-    userConfigs: UserDefaultsConfig,
+    userConfigs: PersistedConfig,
     sharedDB: PsiphonDataSharedDB,
-    psiCashEffects: PsiCashEffect,
+    psiCashEffects: PsiCashEffects,
     paymentQueue: PaymentQueue,
     appReceiptStore: (ReceiptStateAction) -> Effect<Never>,
     psiCashStore: (PsiCashAction) -> Effect<Never>,
@@ -55,8 +55,11 @@ func appDelegateReducer(
         state.psiCash.appDidLaunch(libData)
         state.psiCashBalance = .fromStoredExpectedReward(libData: libData,
                                                          userConfigs: environment.userConfigs)
+        
+        let nonSubscriptionAuths = environment.sharedDB.getNonSubscriptionEncodedAuthorizations()
+        
         return [
-            environment.psiCashEffects.expirePurchases(sharedDB: environment.sharedDB).mapNever(),
+            environment.psiCashEffects.expirePurchases(nonSubscriptionAuths).mapNever(),
             environment.paymentQueue.addObserver(environment.paymentTransactionDelegate).mapNever(),
             environment.appReceiptStore(.localReceiptRefresh).mapNever()
         ]
@@ -87,7 +90,9 @@ func appDelegateReducer(
 
 extension SwiftDelegate: RewardedVideoAdBridgeDelegate {
     func adPresentationStatus(_ status: AdPresentation) {
-        self.store.send(.psiCash(.rewardedVideoPresentation(status)))
+        self.store.send(.psiCash(
+            .rewardedVideoPresentation(RewardedVideoPresentation(objcAdPresentation: status)))
+        )
     }
     
     func adLoadStatus(_ status: AdLoadStatus, error: SystemError?) {
@@ -101,7 +106,7 @@ extension SwiftDelegate: RewardedVideoAdBridgeDelegate {
             if case .error = status {
                 loadResult = .failure(ErrorEvent(.requestedAdFailedToLoad))
             } else {
-                loadResult = .success(status)
+                loadResult = .success(RewardedVideoLoadStatus(objcAdLoadStatus: status))
             }
         }
         self.store.send(.psiCash(.rewardedVideoLoad(loadResult)))
@@ -346,7 +351,10 @@ extension SwiftDelegate: SwiftBridgeDelegate {
     }
     
     @objc func getCustomRewardData(_ callback: @escaping (CustomData?) -> Void) {
-        callback(PsiCashEffect(psiCash: self.psiCashLib).rewardedVideoCustomData())
+        callback(
+            PsiCashEffects.default(psiCash: self.psiCashLib, feedbackLogger: self.feedbackLogger)
+                .rewardedVideoCustomData()
+        )
     }
     
     @objc func refreshAppStoreReceipt() -> Promise<Error?>.ObjCPromise<NSError> {

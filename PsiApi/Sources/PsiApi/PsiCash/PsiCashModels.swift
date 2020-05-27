@@ -18,37 +18,55 @@
  */
 
 import Foundation
-import PsiApi
 
-typealias CustomData = String
+public typealias CustomData = String
 
-enum PsiCashParseError: HashableError {
+public enum PsiCashParseError: HashableError {
     case speedBoostParseFailure(message: String)
 }
 
 /// PsiCash request header metadata keys.
-enum PsiCashRequestMetadataKey: String {
+public enum PsiCashRequestMetadataKey: String {
     case clientVersion = "client_version"
     case propagationChannelId = "propagation_channel_id"
     case clientRegion = "client_region"
     case sponsorId = "sponsor_id"
 }
 
-struct PsiCashParsed<Value: Equatable>: Equatable {
-    let items: [Value]
-    let parseErrors: [PsiCashParseError]
+public struct PsiCashParsed<Value: Equatable>: Equatable {
+    public let items: [Value]
+    public let parseErrors: [PsiCashParseError]
+    
+    public init(items: [Value], parseErrors: [PsiCashParseError]) {
+        self.items = items
+        self.parseErrors = parseErrors
+    }
+    
 }
 
 // MARK: PsiCash data model
-struct PsiCashLibData: Equatable {
-    let authPackage: PsiCashAuthPackage
-    let balance: PsiCashAmount
-    let availableProducts: PsiCashParsed<PsiCashPurchasableType>
-    let activePurchases: PsiCashParsed<PsiCashPurchasedType>
+public struct PsiCashLibData: Equatable {
+    public let authPackage: PsiCashAuthPackage
+    public let balance: PsiCashAmount
+    public let availableProducts: PsiCashParsed<PsiCashPurchasableType>
+    public let activePurchases: PsiCashParsed<PsiCashPurchasedType>
+    
+    public init(
+        authPackage: PsiCashAuthPackage,
+        balance: PsiCashAmount,
+        availableProducts: PsiCashParsed<PsiCashPurchasableType>,
+        activePurchases: PsiCashParsed<PsiCashPurchasedType>
+    ) {
+        self.authPackage = authPackage
+        self.balance = balance
+        self.availableProducts = availableProducts
+        self.activePurchases = activePurchases
+    }
+    
 }
 
 extension PsiCashLibData {
-    init() {
+    public init() {
         authPackage = .init(withTokenTypes: [])
         balance = .zero
         availableProducts = .init(items: [], parseErrors: [])
@@ -58,33 +76,33 @@ extension PsiCashLibData {
 
 // MARK: Data models
 
-struct PsiCashAmount: Comparable, Hashable, Codable {
+public struct PsiCashAmount: Comparable, Hashable, Codable {
     private let _storage: Int64
-    var inPsi: Double { Double(_storage) / 1e9 }
-    var inNanoPsi: Int64 { _storage}
-    var isZero: Bool { _storage == 0 }
+    public var inPsi: Double { Double(_storage) / 1e9 }
+    public var inNanoPsi: Int64 { _storage}
+    public var isZero: Bool { _storage == 0 }
     
-    init(nanoPsi amount: Int64) {
+    public init(nanoPsi amount: Int64) {
         _storage = amount
     }
 
-    static let zero: Self = .init(nanoPsi: 0)
+    public static let zero: Self = .init(nanoPsi: 0)
     
-    static func < (lhs: PsiCashAmount, rhs: PsiCashAmount) -> Bool {
+    public static func < (lhs: PsiCashAmount, rhs: PsiCashAmount) -> Bool {
         return lhs._storage < rhs._storage
     }
 }
 
-func + (lhs: PsiCashAmount, rhs: PsiCashAmount) -> PsiCashAmount {
+public func + (lhs: PsiCashAmount, rhs: PsiCashAmount) -> PsiCashAmount {
     return PsiCashAmount(nanoPsi: lhs.inNanoPsi + rhs.inNanoPsi)
 }
 
-struct PsiCashAuthPackage: Equatable {
-    let hasEarnerToken: Bool
-    let hasIndicatorToken: Bool
-    let hasSpenderToken: Bool
+public struct PsiCashAuthPackage: Equatable {
+    public let hasEarnerToken: Bool
+    public let hasIndicatorToken: Bool
+    public let hasSpenderToken: Bool
     
-    init(withTokenTypes tokenTypes: [String]) {
+    public init(withTokenTypes tokenTypes: [String]) {
         hasEarnerToken = tokenTypes.contains("earner")
         hasIndicatorToken = tokenTypes.contains("indicator")
         hasSpenderToken = tokenTypes.contains("spender")
@@ -94,11 +112,11 @@ struct PsiCashAuthPackage: Equatable {
 // MARK: PsiCash products
 
 /// PsiCash transaction class raw values.
-enum PsiCashTransactionClass: String, Codable, CaseIterable {
+public enum PsiCashTransactionClass: String, Codable, CaseIterable {
 
     case speedBoost = "speed-boost"
 
-    static func from(transactionClass: String) -> PsiCashTransactionClass? {
+    public static func from(transactionClass: String) -> PsiCashTransactionClass? {
         switch transactionClass {
         case PsiCashTransactionClass.speedBoost.rawValue:
             return .speedBoost
@@ -108,53 +126,76 @@ enum PsiCashTransactionClass: String, Codable, CaseIterable {
     }
 }
 
-protocol PsiCashProduct: Hashable, Codable {
+public protocol PsiCashProduct: Hashable, Codable {
     var transactionClass: PsiCashTransactionClass { get }
     var distinguisher: String { get }
 }
 
 /// Information about a PsiCash product that can be purchased, and its price.
-struct PsiCashPurchasable<Product: PsiCashProduct>: Hashable {
-    let product: Product
-    let price: PsiCashAmount
+public struct PsiCashPurchasable<Product: PsiCashProduct>: Hashable {
+    public let product: Product
+    public let price: PsiCashAmount
+    
+    public init(product: Product, price: PsiCashAmount) {
+        self.product = product
+        self.price = price
+    }
 }
 
-typealias SpeedBoostPurchasable = PsiCashPurchasable<SpeedBoostProduct>
+public typealias SpeedBoostPurchasable = PsiCashPurchasable<SpeedBoostProduct>
 
 /// A transaction with an expirable authorization that has been made.
-struct ExpirableTransaction: Equatable {
-    let transactionId: String
-    let serverTimeExpiry: Date
-    let localTimeExpiry: Date
-    let authorization: SignedData<SignedAuthorization>
+public struct ExpirableTransaction: Equatable {
+    
+    public let transactionId: String
+    public let serverTimeExpiry: Date
+    public let localTimeExpiry: Date
+    public let authorization: SignedData<SignedAuthorization>
 
     // True if expiry date has already passed.
-    var expired: Bool {
+    public var expired: Bool {
         return localTimeExpiry.timeIntervalSinceNow <= 0
+    }
+    
+    public init(
+        transactionId: String,
+        serverTimeExpiry: Date,
+        localTimeExpiry: Date,
+        authorization: SignedData<SignedAuthorization>
+    ) {
+        self.transactionId = transactionId
+        self.serverTimeExpiry = serverTimeExpiry
+        self.localTimeExpiry = localTimeExpiry
+        self.authorization = authorization
     }
 }
 
 /// Wraps a purchased product with the expirable transaction data.
-struct PurchasedExpirableProduct<Product: PsiCashProduct>: Equatable {
-    let transaction: ExpirableTransaction
-    let product: Product
+public struct PurchasedExpirableProduct<Product: PsiCashProduct>: Equatable {
+    public let transaction: ExpirableTransaction
+    public let product: Product
+    
+    public init(transaction: ExpirableTransaction, product: Product) {
+        self.transaction = transaction
+        self.product = product
+    }
 }
 
-enum PsiCashPurchasedType: Equatable {
+public enum PsiCashPurchasedType: Equatable {
     case speedBoost(PurchasedExpirableProduct<SpeedBoostProduct>)
 
-    var speedBoost: PurchasedExpirableProduct<SpeedBoostProduct>? {
+    public var speedBoost: PurchasedExpirableProduct<SpeedBoostProduct>? {
         guard case let .speedBoost(value) = self else { return nil }
         return value
     }
 }
 
 /// Union of all types of PsiCash products.
-enum PsiCashPurchasableType {
+public enum PsiCashPurchasableType {
 
     case speedBoost(PsiCashPurchasable<SpeedBoostProduct>)
 
-    var speedBoost: PsiCashPurchasable<SpeedBoostProduct>? {
+    public var speedBoost: PsiCashPurchasable<SpeedBoostProduct>? {
         guard case let .speedBoost(value) = self else { return .none }
         return value
     }
@@ -165,7 +206,7 @@ enum PsiCashPurchasableType {
 extension PsiCashPurchasableType {
 
     /// Returns underlying product transaction class.
-    var rawTransactionClass: String {
+    public var rawTransactionClass: String {
         switch self {
         case .speedBoost(let purchasable):
             return purchasable.product.transactionClass.rawValue
@@ -173,14 +214,14 @@ extension PsiCashPurchasableType {
     }
 
     /// Returns underlying product distinguisher.
-    var distinguisher: String {
+    public var distinguisher: String {
         switch self {
         case .speedBoost(let purchasable):
             return purchasable.product.distinguisher
         }
     }
 
-    var price: PsiCashAmount {
+    public var price: PsiCashAmount {
         switch self {
         case .speedBoost(let purchasable):
             return purchasable.price
@@ -190,7 +231,7 @@ extension PsiCashPurchasableType {
 
 extension PsiCashPurchasableType: Hashable {
 
-    func hash(into hasher: inout Hasher) {
+    public func hash(into hasher: inout Hasher) {
         switch self {
         case .speedBoost(let product):
             hasher.combine(PsiCashTransactionClass.speedBoost.rawValue)
@@ -200,9 +241,9 @@ extension PsiCashPurchasableType: Hashable {
 
 }
 
-struct SpeedBoostProduct: PsiCashProduct {
+public struct SpeedBoostProduct: PsiCashProduct {
     
-    static let supportedProducts: [String: Int] = [
+    public static let supportedProducts: [String: Int] = [
         "1hr": 1,
         "2hr": 2,
         "3hr": 3,
@@ -214,12 +255,12 @@ struct SpeedBoostProduct: PsiCashProduct {
         "9hr": 9
     ]
     
-    let transactionClass: PsiCashTransactionClass = .speedBoost
-    let distinguisher: String
-    let hours: Int
+    public let transactionClass: PsiCashTransactionClass = .speedBoost
+    public let distinguisher: String
+    public let hours: Int
 
     /// Initializer fails if provided `distinguisher` is not supported.
-    init?(distinguisher: String) {
+    public init?(distinguisher: String) {
         self.distinguisher = distinguisher
         guard let hours = Self.supportedProducts[distinguisher] else {
             return nil

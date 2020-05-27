@@ -19,10 +19,10 @@
 
 import Foundation
 import Promises
-import PsiApi
 import Utilities
+import StoreKit
 
-enum IAPPurchasingState: Equatable {
+public enum IAPPurchasingState: Equatable {
     case none
     case error(ErrorEvent<IAPError>)
     case pending(IAPPurchasableProduct)
@@ -63,24 +63,24 @@ struct PendingPayment: Hashable {
     
 }
 
-struct UnverifiedPsiCashTransactionState: Equatable {
+public struct UnverifiedPsiCashTransactionState: Equatable {
     
-    enum VerificationRequestState: Equatable {
+    public enum VerificationRequestState: Equatable {
         case notRequested
         case pendingVerificationResult
         case requestError(ErrorEvent<ErrorRepr>)
     }
     
-    let transaction: PaymentTransaction
-    let verificationState: VerificationRequestState
+    public let transaction: PaymentTransaction
+    public let verificationState: VerificationRequestState
 }
 
-struct IAPState: Equatable {
+public struct IAPState: Equatable {
     
     /// PsiCash consumable transaction pending server verification.
-    var unverifiedPsiCashTx: UnverifiedPsiCashTransactionState?
+    public var unverifiedPsiCashTx: UnverifiedPsiCashTransactionState?
     
-    var purchasing: IAPPurchasingState {
+    public var purchasing: IAPPurchasingState {
         willSet {
             guard case let .pending(.subscription(product: _, promise: promise)) = purchasing else {
                 return
@@ -96,14 +96,14 @@ struct IAPState: Equatable {
         }
     }
     
-    init() {
+    public init() {
         self.purchasing = .none
         self.unverifiedPsiCashTx = nil
     }
 }
 
 /// Represents payment object for product types through AppStore.
-enum IAPPaymentType: Hashable {
+public enum IAPPaymentType: Hashable {
     case psiCash(SKPayment)
     
     /// Result type error is from SKPaymentTransaction error:
@@ -111,12 +111,25 @@ enum IAPPaymentType: Hashable {
     case subscription(SKPayment, Promise<IAPResult>)
 }
 
-struct IAPResult {
-    let transaction: SKPaymentTransaction?
-    let result: Result<Utilities.Unit, ErrorEvent<IAPError>>
+extension IAPPaymentType {
+
+    var paymentObject: SKPayment {
+        switch self {
+        case .psiCash(let value):
+            return value
+        case .subscription(let value, _):
+            return value
+        }
+    }
+
 }
 
-enum IAPPurchasableProduct: Hashable {
+public struct IAPResult {
+    public let transaction: SKPaymentTransaction?
+    public let result: Result<Utilities.Unit, ErrorEvent<IAPError>>
+}
+
+public enum IAPPurchasableProduct: Hashable {
     case psiCash(product: AppStoreProduct)
     
     /// Since subscription implementation is in Objective-C, communication of purchase result
@@ -124,14 +137,25 @@ enum IAPPurchasableProduct: Hashable {
     case subscription(product: AppStoreProduct, promise: Promise<IAPResult>)
 }
 
-enum IAPError: HashableError {
+extension IAPPurchasableProduct {
+    
+    public var appStoreProduct: AppStoreProduct {
+        switch self {
+        case let .psiCash(product: product): return product
+        case let .subscription(product: product, promise: _): return product
+        }
+    }
+    
+}
+
+public enum IAPError: HashableError {
     case failedToCreatePurchase(reason: String)
     case storeKitError(Either<SKError, SystemError>)
 }
 
 extension IAPError {
     /// True if payment is cancelled by the user
-    var paymentCancelled: Bool {
+    public var paymentCancelled: Bool {
         guard case let .storeKitError(.left(skError)) = self else {
             return false
         }

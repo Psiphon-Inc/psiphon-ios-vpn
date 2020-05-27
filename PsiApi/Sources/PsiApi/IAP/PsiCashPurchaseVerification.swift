@@ -19,15 +19,14 @@
 
 import Foundation
 import ReactiveSwift
-import PsiApi
 import Utilities
 
-struct PsiCashValidationRequest: Encodable {
+public struct PsiCashValidationRequest: Encodable {
     let productID: String
     let receiptData: String
     let customData: String
     
-    init(transaction: PaymentTransaction,
+    public init(transaction: PaymentTransaction,
          receipt: ReceiptData,
          customData: CustomData) {
         self.productID = transaction.productID()
@@ -42,15 +41,15 @@ struct PsiCashValidationRequest: Encodable {
     }
 }
 
-struct PsiCashValidationResponse: RetriableHTTPResponse {
-    enum ResponseError: HashableError {
+public struct PsiCashValidationResponse: RetriableHTTPResponse {
+    public enum ResponseError: HashableError {
         case failedRequest(SystemError)
         case errorStatusCode(HTTPURLResponse)
     }
 
-    let result: Result<Utilities.Unit, ErrorEvent<ResponseError>>
+    public let result: Result<Utilities.Unit, ErrorEvent<ResponseError>>
 
-    init(urlSessionResult: URLSessionResult) {
+    public init(urlSessionResult: URLSessionResult) {
         switch urlSessionResult {
         case let .success((_, urlResponse)):
             switch urlResponse.typedStatusCode {
@@ -65,7 +64,7 @@ struct PsiCashValidationResponse: RetriableHTTPResponse {
         }   
     }
     
-    static func unpackRetriableResultError(
+    public static func unpackRetriableResultError(
         _ result: ResultType
     ) -> (result: ResultType, retryDueToError: FailureEvent?) {
         switch result {
@@ -100,7 +99,7 @@ struct PsiCashValidationResponse: RetriableHTTPResponse {
     }
 }
 
-enum ConsumableVerificationError: HashableError {
+public enum ConsumableVerificationError: HashableError {
     /// Wraps error produced during request building phase
     case requestBuildError(FatalError)
     /// Wraps error from purchase verifier server
