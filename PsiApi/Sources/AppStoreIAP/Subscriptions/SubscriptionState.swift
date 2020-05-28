@@ -47,7 +47,8 @@ public typealias SubscriptionReducerEnvironment = (
     appReceiptStore: (ReceiptStateAction) -> Effect<Never>,
     getCurrentTime: () -> Date,
     compareDates: (Date, Date, Calendar.Component) -> ComparisonResult,
-    timerScheduler: DateScheduler
+    singleFireTimer:
+    (_ interval: TimeInterval, _ leeway: DispatchTimeInterval) -> Effect<()>
 )
 
 public func subscriptionReducer(
@@ -84,9 +85,8 @@ public func subscriptionReducer(
         state.status = .subscribed(purchaseWithLatestExpiry)
 
         return [
-            singleFireTimer(scheduler:environment.timerScheduler,
-                            interval: timeLeft,
-                            leeway: SubscriptionHardCodedValues.leeway)
+            environment.singleFireTimer(timeLeft,
+                                        SubscriptionHardCodedValues.leeway)
                 .map(value: ._timerFinished(withExpiry: purchaseWithLatestExpiry.expires)),
             environment.feedbackLogger.log(.info,
                 "subscribed: timer expiring on: '\(purchaseWithLatestExpiry.expires)'"
@@ -118,16 +118,4 @@ public func subscriptionReducer(
             environment.feedbackLogger.log(.info, "subscription expired").mapNever()
         ]
     }
-}
-
-/// - Note: This function delivers its events on the main dispatch queue.
-/// - Important: Sub-millisecond precision is lost in the current implementation.
-func singleFireTimer(scheduler: DateScheduler,
-                     interval: TimeInterval,
-                     leeway: DispatchTimeInterval) -> Effect<()> {
-    SignalProducer.timer(interval: DispatchTimeInterval.milliseconds(Int(interval * 1000)),
-                         on: scheduler,
-                         leeway: leeway)
-        .map(value: ())
-        .take(first: 1)
 }
