@@ -200,7 +200,7 @@ extension PsiCashPurchaseResult {
 
 public struct PsiCashBalance: Equatable {
 
-    public enum BalanceIncreaseExpectationReason: Equatable {
+    public enum BalanceIncreaseExpectationReason: String, CaseIterable {
         case watchedRewardedVideo
         case purchasedPsiCash
     }
@@ -213,6 +213,14 @@ public struct PsiCashBalance: Equatable {
     
     /// PsiCash balance as of last PsiCash refresh state.
     public var lastRefreshBalance: PsiCashAmount
+    
+    public init(pendingExpectedBalanceIncrease: BalanceIncreaseExpectationReason?,
+         optimisticBalance: PsiCashAmount,
+         lastRefreshBalance: PsiCashAmount) {
+        self.pendingExpectedBalanceIncrease = pendingExpectedBalanceIncrease
+        self.optimisticBalance = optimisticBalance
+        self.lastRefreshBalance = lastRefreshBalance
+    }
 
 }
 

@@ -64,6 +64,8 @@ public let globalTestingScheduler = QueueScheduler(qos: .userInteractive,
 
 extension SignalProducer where Error: Equatable {
     
+    public typealias CollectedEvents = [Signal<Value, SignalError>.Event]
+    
     public enum SignalError: Swift.Error, Equatable {
         /// Signal did not complete within the timeout interval.
         case signalTimedOut
@@ -73,7 +75,7 @@ extension SignalProducer where Error: Equatable {
     
     public func collectForTesting(
         timeout: TimeInterval = 1.0
-    ) -> [Signal<Value, SignalError>.Event] {
+    ) -> CollectedEvents {
         
         let result = self.mapError { signalError -> SignalError in
             return .signalError(signalError)

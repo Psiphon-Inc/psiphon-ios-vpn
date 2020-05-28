@@ -27,6 +27,10 @@ import Utilities
 @testable import PsiApi
 @testable import AppStoreIAP
 
+func positiveDouble() -> Gen<Double> {
+    Double.arbitrary.map(abs)
+}
+
 extension Pair: Arbitrary where A: Arbitrary, B: Arbitrary {
     public static var arbitrary: Gen<Pair<A, B>> {
         Gen.zip(A.arbitrary, B.arbitrary).map(Pair.init)
@@ -70,5 +74,11 @@ extension ErrorRepr: Arbitrary {
 extension ErrorEvent: Arbitrary where E: Arbitrary {
     public static var arbitrary: Gen<ErrorEvent<E>> {
         Gen.zip(E.arbitrary, Date.arbitrary).map(ErrorEvent.init(_: date:))
+    }
+}
+
+extension Locale: Arbitrary {
+    public static var arbitrary: Gen<Locale> {
+        Gen.fromElements(of: Locale.availableIdentifiers).map(Locale.init(identifier:))
     }
 }

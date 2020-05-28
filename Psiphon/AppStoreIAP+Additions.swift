@@ -31,7 +31,7 @@ extension PaymentQueue {
     },
         addPayment: { purchasable in
             Effect { () -> AddedPayment in
-                let payment = SKPayment(product: purchasable.appStoreProduct.skProduct)
+                let payment = SKPayment(product: purchasable.appStoreProduct.skProductRef!)
                 SKPaymentQueue.default().add(payment)
                 return AddedPayment(product: purchasable, paymentObj: payment)
             }

@@ -51,7 +51,7 @@ struct PendingPayment: Hashable {
             guard case .completed(let completedResult) = paymentStatus else {
                 return
             }
-            promise.fulfill(IAPResult(transaction: nil, result: completedResult))
+            promise?.fulfill(IAPResult(transaction: nil, result: completedResult))
         }
     }
     
@@ -97,9 +97,9 @@ public struct IAPState: Equatable {
             }
             switch newValue {
             case .none:
-                promise.fulfill(IAPResult(transaction: nil, result: .success(.unit)))
+                promise?.fulfill(IAPResult(transaction: nil, result: .success(.unit)))
             case .error(let errorEvent):
-                promise.fulfill(IAPResult(transaction: nil, result: .failure(errorEvent)))
+                promise?.fulfill(IAPResult(transaction: nil, result: .failure(errorEvent)))
             case .pending(_):
                 return
             }
@@ -109,6 +109,11 @@ public struct IAPState: Equatable {
     public init() {
         self.purchasing = .none
         self.unverifiedPsiCashTx = nil
+    }
+    
+    init(unverifiedPsiCashTx: UnverifiedPsiCashTransactionState?, purchasing: IAPPurchasingState) {
+        self.unverifiedPsiCashTx = unverifiedPsiCashTx
+        self.purchasing = purchasing
     }
 }
 
@@ -144,7 +149,7 @@ public enum IAPPurchasableProduct: Hashable {
     
     /// Since subscription implementation is in Objective-C, communication of purchase result
     /// is done using a promise object.
-    case subscription(product: AppStoreProduct, promise: Promise<IAPResult>)
+    case subscription(product: AppStoreProduct, promise: Promise<IAPResult>?)
 }
 
 extension IAPPurchasableProduct {

@@ -48,10 +48,9 @@ extension ParsedPsiCashAppStorePurchasable {
     }
     
     static func make(product: AppStoreProduct, formatter: PsiCashAmountFormatter) -> Self {
-        let productIdentifier = product.skProduct.productIdentifier
-        guard let psiCashValue = Self.supportedProducts[productIdentifier] else {
+        guard let psiCashValue = Self.supportedProducts[product.productIdentifier] else {
             return .parseError(reason: """
-                AppStore IAP product with identifier '\(productIdentifier)' is not a supported product
+                AppStore IAP product with identifier '\(product.productIdentifier)' is not a supported product
                 """)
         }
         guard let title = formatter.string(from: psiCashValue) else {
@@ -61,8 +60,8 @@ extension ParsedPsiCashAppStorePurchasable {
             PsiCashPurchasableViewModel(
                 product: .product(product),
                 title: title,
-                subtitle: product.skProduct.localizedDescription,
-                localizedPrice: .makeLocalizedPrice(skProduct: product.skProduct),
+                subtitle: product.localizedDescription,
+                localizedPrice: product.price,
                 clearedForSale: true
             )
         )
@@ -190,7 +189,7 @@ func productRequestReducer(
 
                 return response.products.map { skProduct -> ParsedPsiCashAppStorePurchasable in
                     do {
-                        let product = try AppStoreProduct(skProduct)
+                        let product = try AppStoreProduct.from(skProduct: skProduct)
                         return .make(product: product, formatter: formatter)
                     } catch {
                         return .parseError(reason: String(describing: error))

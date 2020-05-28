@@ -44,42 +44,31 @@ final class IAPReducerTests: XCTestCase {
     
     func testCheckUnverifiedTransaction() {
         
-        let test = { (unverifiedPsiCashTx: UnverifiedPsiCashTransactionState?,
-            expectedEffectsResults: [[Signal<IAPAction, SignalProducer<IAPAction, Never>.SignalError>.Event]])
-            -> Bool in
-            
-            // Arrange
-            var iapState = IAPState()
-            iapState.unverifiedPsiCashTx = unverifiedPsiCashTx
-            
-            let initState = IAPReducerState(
-                iap: iapState,
-                psiCashBalance: PsiCashBalance(),
-                psiCashAuth: PsiCashAuthPackage(withTokenTypes: [])
-            )
-            
-            let env = mockIAPEnvironment(
-                self.feedbackLogger,
-                appReceiptStore: { action in
-                    guard case .localReceiptRefresh = action else { XCTFatal() }
-                    return .empty
-            })
-            
-            // Act
-            let (nextState, effectsResults) = testReducer(initState, .checkUnverifiedTransaction,
-                                                          env, iapReducer)
-            
-            // Assert
-            return (initState == nextState) && (effectsResults == expectedEffectsResults)
-        }
-             
+        let env = mockIAPEnvironment(
+            self.feedbackLogger,
+            appReceiptStore: { action in
+                guard case .localReceiptRefresh = action else { XCTFatal() }
+                return .empty
+        })
+        
         property("IAPReducer.checkUnverifiedTransaction refreshes local receipt")
-            <- forAll { (unverified: UnverifiedPsiCashTransactionState?) in
-                if let unverified = unverified {
-                    return test(unverified, [[.completed]])
+            <- forAll { (initState: IAPReducerState) in
+                
+                // Arrange
+                let expectedResult: [SignalProducer<IAPAction, Never>.CollectedEvents]
+                if initState.iap.unverifiedPsiCashTx != nil {
+                    expectedResult = [[.completed]]
                 } else {
-                    return test(unverified, [])
+                    expectedResult = []
                 }
+                                
+                // Act
+                let (nextState, effectsResults) = testReducer(initState,
+                                                              .checkUnverifiedTransaction,
+                                                              env, iapReducer)
+                
+                // Assert
+                return (initState == nextState) && (effectsResults == expectedResult)
         }
         
         // No feedback logs are expected

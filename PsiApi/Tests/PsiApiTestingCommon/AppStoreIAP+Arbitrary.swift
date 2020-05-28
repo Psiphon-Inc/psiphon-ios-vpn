@@ -27,6 +27,9 @@ import Utilities
 @testable import PsiApi
 @testable import AppStoreIAP
 
+let completedPsiCashAuthPackage = PsiCashAuthPackage(withTokenTypes:
+    ["earner", "indicator", "spender"])
+
 extension PsiCashAmount: Arbitrary {
     public static var arbitrary: Gen<PsiCashAmount> {
         Int64.arbitrary.resize(1000).map {PsiCashAmount.init(nanoPsi: abs($0)) }
@@ -130,6 +133,14 @@ extension PsiCashParsed: Arbitrary where Value: Arbitrary {
     }
 }
 
+extension PsiCashAuthPackage: Arbitrary {
+    public static var arbitrary: Gen<PsiCashAuthPackage> {
+        Gen.weighted([
+            (1, PsiCashAuthPackage(withTokenTypes: [])),
+            (3, completedPsiCashAuthPackage),
+        ])
+    }
+}
 
 extension PsiCashLibData: Arbitrary {
     /// Leans 9/10 times towards producing a non-empty `PsiCashLibData` value.
@@ -143,8 +154,7 @@ extension PsiCashLibData: Arbitrary {
             // Uses generated bool values to determine availability of PsiCash.
             if hasPsiCash {
                 return Gen.zip(
-                    Gen.pure(
-                        PsiCashAuthPackage(withTokenTypes: ["earner", "indicator", "spender"])),
+                    Gen.pure(completedPsiCashAuthPackage),
                     PsiCashAmount.arbitrary,
                     PsiCashParsed<PsiCashPurchasableType>.arbitrary,
                     PsiCashParsed<PsiCashPurchasedType>.arbitrary
@@ -248,5 +258,101 @@ extension UnverifiedPsiCashTransactionState: Arbitrary {
                 }
                 return value
             }
+    }
+}
+
+extension AppStoreProductType: Arbitrary {
+    public static var arbitrary: Gen<AppStoreProductType> {
+        Gen.fromElements(of: AppStoreProductType.allCases)
+    }
+}
+
+extension LocalizedPrice: Arbitrary {
+    public static var arbitrary: Gen<LocalizedPrice> {
+        Gen.one(of: [
+            // Should cover all cases
+            Gen.pure(LocalizedPrice.free),
+            Gen.zip(positiveDouble(), Locale.arbitrary)
+            .map(LocalizedPrice.localizedPrice(price: priceLocale:))
+        ])
+    }
+}
+ 
+extension AppStoreProduct: Arbitrary {
+    public static var arbitrary: Gen<AppStoreProduct> {
+        Gen.zip(AppStoreProductType.arbitrary, String.arbitrary,
+                String.arbitrary, LocalizedPrice.arbitrary, Gen.pure(nil))
+            .map(AppStoreProduct.init)
+    }
+}
+
+extension IAPPurchasableProduct: Arbitrary {
+    public static var arbitrary: Gen<IAPPurchasableProduct> {
+        Gen.one(of: [
+            // Should cover all cases
+            AppStoreProduct.arbitrary.map(IAPPurchasableProduct.psiCash(product:)),
+            
+            Gen.zip(AppStoreProduct.arbitrary, Gen.pure(nil))
+                .map(IAPPurchasableProduct.subscription(product: promise:))
+        ])
+    }
+}
+
+extension IAPError: Arbitrary {
+    public static var arbitrary: Gen<IAPError> {
+        Gen.one(of: [
+            // Should cover all cases
+            String.arbitrary.map(IAPError.failedToCreatePurchase(reason:)),
+            SKError.arbitrary.map(IAPError.storeKitError)
+        ])
+    }
+}
+
+extension IAPPurchasingState: Arbitrary {
+    public static var arbitrary: Gen<IAPPurchasingState> {
+        Gen.frequency([
+            // Should cover all cases
+            (1, Gen.pure(.none)),
+            (3, ErrorEvent<IAPError>.arbitrary.map(IAPPurchasingState.error)),
+            (6, IAPPurchasableProduct.arbitrary.map(IAPPurchasingState.pending)),
+        ])
+    }
+}
+
+extension IAPState: Arbitrary {
+    public static var arbitrary: Gen<IAPState> {
+        Gen.zip(UnverifiedPsiCashTransactionState?.arbitrary, IAPPurchasingState.arbitrary)
+            .map(IAPState.init(unverifiedPsiCashTx: purchasing:))
+    }
+}
+
+extension PsiCashBalance.BalanceIncreaseExpectationReason: Arbitrary {
+    public static var arbitrary: Gen<PsiCashBalance.BalanceIncreaseExpectationReason> {
+        Gen.fromElements(of: PsiCashBalance.BalanceIncreaseExpectationReason.allCases)
+    }
+}
+
+extension PsiCashBalance: Arbitrary {
+    public static var arbitrary: Gen<PsiCashBalance> {
+        Gen.zip(BalanceIncreaseExpectationReason?.arbitrary,
+                PsiCashAmount.arbitrary,
+                PsiCashAmount.arbitrary)
+            .map(PsiCashBalance.init(pendingExpectedBalanceIncrease:optimisticBalance:lastRefreshBalance:))
+    }
+}
+
+extension IAPReducerState: Arbitrary {
+    public static var arbitrary: Gen<IAPReducerState> {
+        PsiCashAuthPackage.arbitrary.flatMap { (authPackage: PsiCashAuthPackage) in
+            if authPackage.hasMinimalTokens {
+                return Gen.zip(IAPState.arbitrary, PsiCashBalance.arbitrary,
+                        Gen.pure(completedPsiCashAuthPackage))
+                    .map(IAPReducerState.init(iap:psiCashBalance:psiCashAuth:))
+            } else {
+                return Gen.zip(IAPState.arbitrary, Gen.pure(PsiCashBalance()),
+                        Gen.pure(PsiCashAuthPackage(withTokenTypes: [])))
+                    .map(IAPReducerState.init(iap:psiCashBalance:psiCashAuth:))
+            }
+        }
     }
 }
