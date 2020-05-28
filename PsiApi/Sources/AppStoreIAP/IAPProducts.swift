@@ -111,6 +111,8 @@ public struct SupportedAppStoreProductIDs: Equatable {
 public struct PaymentTransaction: Equatable {
 
     /// Refines `SKPaymentTransaction` state.
+    /// - Note: `SKPaymentTransaction.transactionDate` is only valid if state is
+    /// `SKPaymentTransactionStatePurchased` or `SKPaymentTransactionStateRestored`.
     public enum TransactionState: Equatable {
         
         public enum PendingTransactionState: Equatable {
@@ -124,11 +126,12 @@ public struct PaymentTransaction: Equatable {
         }
         
         case pending(PendingTransactionState)
-        case completed(Result<CompletedTransactionState, Either<SKError, SystemError>>)
+        
+        /// Success case `Date` is the transaction date.
+        case completed(Result<Pair<Date, CompletedTransactionState>, SKError>)
     }
     
     public let transactionID: () -> TransactionID
-    public let transactionDate: () -> Date
     public let productID: () -> String
     public let transactionState: () -> TransactionState
     private let isEqual: (PaymentTransaction) -> Bool
@@ -136,13 +139,11 @@ public struct PaymentTransaction: Equatable {
     public let skPaymentTransaction: () -> SKPaymentTransaction?
     
     public init(transactionID: @escaping () -> TransactionID,
-                transactionDate: @escaping () -> Date,
                 productID: @escaping () -> String,
                 transactionState: @escaping () -> PaymentTransaction.TransactionState,
                 isEqual: @escaping (PaymentTransaction) -> Bool,
                 skPaymentTransaction: @escaping () -> SKPaymentTransaction?) {
         self.transactionID = transactionID
-        self.transactionDate = transactionDate
         self.productID = productID
         self.transactionState = transactionState
         self.isEqual = isEqual
@@ -178,8 +179,7 @@ extension PaymentTransaction.TransactionState {
         switch self {
         case let .completed(completed):
             switch completed {
-            case .success(.purchased): return true
-            case .success(.restored): return true
+            case .success(_): return true
             case .failure(_): return false
             }
         case let .pending(pending):
@@ -200,9 +200,6 @@ extension PaymentTransaction {
             transactionID: { () -> TransactionID in
                 TransactionID(stringLiteral: skPaymentTransaction.transactionIdentifier!)
             },
-            transactionDate: { () -> Date in
-                skPaymentTransaction.transactionDate!
-            },
             productID: { () -> String in
                 skPaymentTransaction.payment.productIdentifier
             },
@@ -213,16 +210,18 @@ extension PaymentTransaction {
                 case .deferred:
                     return .pending(.deferred)
                 case .purchased:
-                    return .completed(.success(.purchased))
+                    return .completed(.success(
+                        Pair(skPaymentTransaction.transactionDate!, .purchased)))
                 case .restored:
-                    return .completed(.success(.restored))
+                    return .completed(.success(
+                        Pair(skPaymentTransaction.transactionDate!, .restored)))
                 case .failed:
                     // Error is non-null when state is failed.
                     let someError = skPaymentTransaction.error!
                     if let skError = someError as? SKError {
-                        return .completed(.failure(.left(skError)))
+                        return .completed(.failure(skError))
                     } else {
-                        return .completed(.failure(.right(someError as SystemError)))
+                        fatalError("Expected SKError: '\(someError)'")
                     }
                 @unknown default:
                     fatalError("""

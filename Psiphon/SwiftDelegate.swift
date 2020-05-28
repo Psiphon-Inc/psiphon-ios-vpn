@@ -198,8 +198,7 @@ extension SwiftDelegate: SwiftBridgeDelegate {
         // it alerts the user if the error is not resolves within a few seconds.
         self.lifetime += self.store.$value.signalProducer
             .map { appState -> Pair<VPNStatusWithIntent, ProviderManagerLoadState<PsiphonTPM>> in
-                Pair(first: appState.vpnState.value.vpnStatusWithIntent,
-                     second: appState.vpnState.value.loadState)
+                Pair(appState.vpnState.value.vpnStatusWithIntent, appState.vpnState.value.loadState)
             }
             .skipRepeats()
             .flatMap(.latest) { vpnStateTunnelLoadStatePair ->

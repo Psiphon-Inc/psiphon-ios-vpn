@@ -68,7 +68,7 @@ public struct Authorization: Hashable, Codable {
     public let accessType: AccessType
     public let expires: Date
     
-    public enum AccessType: String, Codable {
+    public enum AccessType: String, Codable, CaseIterable {
         case appleSubscription = "apple-subscription"
         case appleSubscriptionTest = "apple-subscription-test"
         case speedBoost = "speed-boost"
