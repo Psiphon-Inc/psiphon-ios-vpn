@@ -324,7 +324,7 @@ public func iapReducer(
                         
                     case let .success(success):
                         purchasingState = .none
-                        switch success {
+                        switch success.second {
                         case .purchased:
                             switch try? AppStoreProductType.from(transaction: transaction) {
                             case .none:
@@ -345,7 +345,15 @@ public func iapReducer(
                                         UnverifiedPsiCashTransactionState(
                                             transaction: transaction,
                                             verificationState: .notRequested
-                                        )
+                                    )
+                                    
+                                    guard state.iap.unverifiedPsiCashTx != nil else {
+                                        let s = transaction.skPaymentTransaction()?.transactionState
+                                        environment.feedbackLogger.fatalError("""
+                                            failed to set 'unverifiedPsiCashTx' \
+                                            transaction state: '\(String(describing: s))'
+                                            """)
+                                    }
                                     
                                     effects.append(
                                         environment.feedbackLogger.log(.info, """

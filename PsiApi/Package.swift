@@ -20,6 +20,7 @@ let package = Package(
         // .package(url: /* package url */, from: "1.0.0"),
         .package(url: "https://github.com/ReactiveCocoa/ReactiveSwift.git", from: "6.1.0"),
         .package(url: "https://github.com/google/promises.git", from: "1.2.8"),
+        .package(url: "https://github.com/typelift/SwiftCheck.git", from: "0.12.0"),
         .package(path: "../Utilities"),
         .package(path: "../Testing"),
     ],
@@ -37,7 +38,8 @@ let package = Package(
             dependencies: ["PsiApi", "PsiCashClient", "ReactiveSwift", "Promises", "Utilities"]),
         .target(
             name: "PsiApiTestingCommon",
-            dependencies: ["PsiApi", "PsiCashClient", "AppStoreIAP", "ReactiveSwift", "Testing"],
+            dependencies: ["PsiApi", "PsiCashClient", "AppStoreIAP", "ReactiveSwift", "Testing",
+                           "SwiftCheck"],
             path: "Tests/PsiApiTestingCommon"),
         .testTarget(
             name: "PsiApiTests",

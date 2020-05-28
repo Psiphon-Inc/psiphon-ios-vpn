@@ -634,14 +634,14 @@ fileprivate func errorEventDescription(
     switch iapErrorEvent.error {
     case let .failedToCreatePurchase(reason: reason):
         optionalDescription = reason
-    case let .storeKitError(error: error):
+    case let .storeKitError(error: skError):
         // Payment cancelled errors are ignored.
-        if case let .left(skError) = error, skError.code == .paymentCancelled {
+        if skError.code == .paymentCancelled {
             optionalDescription = .none
         } else {
             optionalDescription = """
             \(UserStrings.Purchase_failed())
-            (\(error.localizedDescription))
+            (\(skError.localizedDescription))
             """
         };
     }

@@ -19,10 +19,12 @@
 
 import Foundation
 import ReactiveSwift
-import PsiApi
 import PsiCashClient
 import Testing
 import StoreKit
+import SwiftCheck
+import Utilities
+@testable import PsiApi
 @testable import AppStoreIAP
 
 func mockLibData(
@@ -156,16 +158,15 @@ extension PaymentTransaction {
     
     static func mock(
         transactionID: (() -> TransactionID)? = nil,
-        transactionDate: (() -> Date)? = nil,
         productID: (() -> String)? = nil,
         transactionState: (() -> TransactionState)? = nil,
         isEqual: ((PaymentTransaction) -> Bool)? = nil
     ) -> PaymentTransaction {
         PaymentTransaction(
             transactionID: transactionID ?? { TransactionID(stringLiteral: "TransactionID") },
-            transactionDate: transactionDate ?? { Date() },
             productID: productID ?? { "ProductID" },
-            transactionState: transactionState ?? { TransactionState.completed(.success(.purchased)) },
+            transactionState: transactionState ??
+                { TransactionState.completed(.success(Pair(Date(), .purchased))) },
             isEqual: isEqual ?? { _ in true },
             skPaymentTransaction: { nil })
     }

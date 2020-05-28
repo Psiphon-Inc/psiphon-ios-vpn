@@ -74,6 +74,15 @@ public struct UnverifiedPsiCashTransactionState: Equatable {
     
     public let transaction: PaymentTransaction
     public let verificationState: VerificationRequestState
+    
+    public init?(transaction: PaymentTransaction, verificationState: VerificationRequestState) {
+        // An uncompleted transaction is not verifiable.
+        guard case .completed(.success(_)) = transaction.transactionState() else {
+            return nil
+        }
+        self.transaction = transaction
+        self.verificationState = verificationState
+    }
 }
 
 public struct IAPState: Equatable {
@@ -151,13 +160,13 @@ extension IAPPurchasableProduct {
 
 public enum IAPError: HashableError {
     case failedToCreatePurchase(reason: String)
-    case storeKitError(Either<SKError, SystemError>)
+    case storeKitError(SKError)
 }
 
 extension IAPError {
     /// True if payment is cancelled by the user
     public var paymentCancelled: Bool {
-        guard case let .storeKitError(.left(skError)) = self else {
+        guard case let .storeKitError(skError) = self else {
             return false
         }
         guard case .paymentCancelled = skError.code else {
