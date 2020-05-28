@@ -22,6 +22,8 @@ import XCTest
 import PsiCashClient
 import Testing
 import ReactiveSwift
+import StoreKit
+import SwiftCheck
 @testable import PsiApiTestingCommon
 @testable import PsiApi
 @testable import AppStoreIAP
@@ -42,9 +44,9 @@ final class IAPReducerTests: XCTestCase {
     
     func testCheckUnverifiedTransaction() {
         
-        let test = { (description: String,
-            unverifiedPsiCashTx: UnverifiedPsiCashTransactionState?,
-            expectedEffectsResults: [[Signal<IAPAction, SignalProducer<IAPAction, Never>.SignalError>.Event]]) in
+        let test = { (unverifiedPsiCashTx: UnverifiedPsiCashTransactionState?,
+            expectedEffectsResults: [[Signal<IAPAction, SignalProducer<IAPAction, Never>.SignalError>.Event]])
+            -> Bool in
             
             // Arrange
             var iapState = IAPState()
@@ -68,41 +70,17 @@ final class IAPReducerTests: XCTestCase {
                                                           env, iapReducer)
             
             // Assert
-            XCTAssert(initState == nextState, description)
-            XCTAssert(
-                effectsResults == expectedEffectsResults,
-                "'\(description)' Expected '\(expectedEffectsResults)' Got '\(effectsResults)'"
-            )
+            return (initState == nextState) && (effectsResults == expectedEffectsResults)
         }
-        
-        // Tests
-        
-        test("no unverified consumable",
-            nil, [])
-        
-        test("one unverified consumable - not requested",
-            UnverifiedPsiCashTransactionState(
-                transaction: PaymentTransaction.mock(),
-                verificationState: .notRequested
-            ),
-            [[.completed]]
-        )
-        
-        test("one unverified - pending request",
-            UnverifiedPsiCashTransactionState(
-                transaction: PaymentTransaction.mock(),
-                verificationState: .pendingVerificationResult
-            ),
-            [[.completed]]
-        )
-        
-        test("one unverified - request error",
-            UnverifiedPsiCashTransactionState(
-                transaction: PaymentTransaction.mock(),
-                verificationState: .requestError(ErrorEvent(ErrorRepr(repr: "")))
-            ),
-            [[.completed]]
-        )
+             
+        property("IAPReducer.checkUnverifiedTransaction refreshes local receipt")
+            <- forAll { (unverified: UnverifiedPsiCashTransactionState?) in
+                if let unverified = unverified {
+                    return test(unverified, [[.completed]])
+                } else {
+                    return test(unverified, [])
+                }
+        }
         
         // No feedback logs are expected
         XCTAssert(self.feedbackHandler.logs == [])
