@@ -370,7 +370,7 @@ extension SwiftDelegate: SwiftBridgeDelegate {
     }
     
     @objc func buyAppStoreSubscriptionProduct(
-        _ product: SKProduct
+        _ skProduct: SKProduct
     ) -> Promise<ObjCIAPResult>.ObjCPromise<ObjCIAPResult> {
         let promise = Promise<IAPResult>.pending()
         let objcPromise = promise.then { (result: IAPResult) -> ObjCIAPResult in
@@ -378,14 +378,14 @@ extension SwiftDelegate: SwiftBridgeDelegate {
         }
         
         do {
-            let appStoreProduct = try AppStoreProduct(product)
+            let appStoreProduct = try AppStoreProduct.from(skProduct: skProduct)
             self.store.send(.iap(.purchase(
                 IAPPurchasableProduct.subscription(product: appStoreProduct, promise: promise)
                 )))
             
         } catch {
             self.feedbackLogger.fatalError(
-                "Unknown subscription product identifier '\(product.productIdentifier)'")
+                "Unknown subscription product identifier '\(skProduct.productIdentifier)'")
         }
         
         return objcPromise.asObjCPromise()

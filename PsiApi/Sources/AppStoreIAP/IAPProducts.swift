@@ -24,7 +24,7 @@ import ReactiveSwift
 import Utilities
 import PsiApi
 
-public enum LocalizedPrice: Equatable {
+public enum LocalizedPrice: Hashable {
     case free
     case localizedPrice(price: Double, priceLocale: Locale)
 }
@@ -47,16 +47,24 @@ public enum ProductIdError: Error {
 
 public struct AppStoreProduct: Hashable {
     public let type: AppStoreProductType
-    public let skProduct: SKProduct
+    public let productIdentifier: String
+    public let localizedDescription: String
+    public let price: LocalizedPrice
+    
+    // Underlying SKProduct object
+    public let skProductRef: SKProduct?
 
-    public init(_ skProduct: SKProduct) throws {
+    public static func from(skProduct: SKProduct) throws -> AppStoreProduct {
         let type = try AppStoreProductType.from(skProduct: skProduct)
-        self.type = type
-        self.skProduct = skProduct
+        return AppStoreProduct(type: type,
+                               productIdentifier: skProduct.productIdentifier,
+                               localizedDescription: skProduct.localizedDescription,
+                               price: .makeLocalizedPrice(skProduct: skProduct),
+                               skProductRef: skProduct)
     }
 }
 
-public enum AppStoreProductType: String {
+public enum AppStoreProductType: String, CaseIterable {
     case subscription = "subscriptionProductIds"
     case psiCash = "psiCashProductIds"
 
