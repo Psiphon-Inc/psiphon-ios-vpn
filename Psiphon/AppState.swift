@@ -293,8 +293,19 @@ fileprivate func toSubscriptionReducerEnvironment(
         appReceiptStore: env.appReceiptStore,
         getCurrentTime: env.getCurrentTime,
         compareDates: env.compareDates,
-        timerScheduler: QueueScheduler.main
+        singleFireTimer: singleFireTimer
     )
+}
+
+/// - Note: This function delivers its events on the main dispatch queue.
+/// - Important: Sub-millisecond precision is lost in the current implementation.
+fileprivate func singleFireTimer(interval: TimeInterval,
+                                 leeway: DispatchTimeInterval) -> Effect<()> {
+    SignalProducer.timer(interval: DispatchTimeInterval.milliseconds(Int(interval * 1000)),
+                         on: QueueScheduler.main,
+                         leeway: leeway)
+        .map(value: ())
+        .take(first: 1)
 }
 
 fileprivate func toSubscriptionAuthStateReducerEnvironment(

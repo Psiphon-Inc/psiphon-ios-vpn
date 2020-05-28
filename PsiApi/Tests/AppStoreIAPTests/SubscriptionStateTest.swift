@@ -19,6 +19,7 @@
 
 import XCTest
 import ReactiveSwift
+import SwiftCheck
 import Testing
 @testable import PsiApi
 @testable import AppStoreIAP
@@ -26,13 +27,141 @@ import Testing
 
 final class SubscriptionStateTest: XCTestCase {
 
+    func testWithSwiftCheck() {
+
+        property("Subscription Reducer") <- forAll { (action : SubscriptionAction, status: SubscriptionStatus) in
+
+            // Since status is mutated
+            let originalStatus = status
+
+            let result = SubscriptionStateTest.runReducer(effectsTimeout: 10,
+                                                          subscriptionStatus: status,
+                                                          subscriptionAction: action)
+
+            switch (action, originalStatus) {
+            case (._timerFinished(let expiry), .subscribed(let iap)):
+
+                if abs(expiry.timeIntervalSinceNow - iap.expires.timeIntervalSinceNow) < 1.0 {
+                    // Status is set to not subscribed if the timer and subscription
+                    // IAP expire at approximately the same time.
+                    if result.subscriptionState.status != .notSubscribed {
+                        return false
+                    }
+                } else if result.subscriptionState.status != originalStatus {
+                    // Otherwise status will not have been changed.
+                    return false
+                }
+
+                if (result.subscriptionActions != [[.completed], [.completed]]) {
+                    return false
+                }
+
+                if (result.receiptStateActions.count != 1) {
+                    return false
+                }
+
+                // Expect a remote receipt refresh action
+                let action = result.receiptStateActions[0]
+                switch action {
+                    case .remoteReceiptRefresh(optionalPromise: _):
+                        break
+                    default:
+                        return false
+                }
+
+                return true
+
+            case (._timerFinished(_), _):
+                // No purchase present so status will be unchanged.
+
+                if result.receiptStateActions.count != 0 {
+                    return false
+                }
+
+                if result.subscriptionActions.count != 0 {
+                    return false
+                }
+
+                return result.subscriptionState.status == originalStatus
+            case (.updatedReceiptData(let data), _):
+                switch (result.subscriptionState.status) {
+                case .unknown:
+                    // Should never result in a status of unknown.
+                    return false
+                case .notSubscribed:
+                    // Status is always set in this branch of the reducer.
+
+                    // There should be no effects
+                    if result.subscriptionActions.count != 0 {
+                        return false
+                    }
+
+                    guard let receipt = data else {
+                        return true
+                    }
+
+                    guard let purchaseWithLatestExpiry = receipt.subscriptionInAppPurchases.sortedByExpiry().last else {
+                        return true
+                    }
+
+                    let isExpired = SubscriptionStateTest.isApproxExpired(date: purchaseWithLatestExpiry.expires)
+
+                    guard !isExpired else {
+                        return true
+                    }
+
+                    let timeLeft = purchaseWithLatestExpiry.expires.timeIntervalSinceNow
+
+                    guard timeLeft > 5 else {
+                        return true
+                    }
+
+                    // The status should actually be subscribed.
+                    return false
+                case .subscribed(let iap):
+
+                    // Check that there is a active subscription IAP
+                    // in the receipt.
+
+                    guard let receipt = data else {
+                        return false
+                    }
+
+                    guard let purchaseWithLatestExpiry = receipt.subscriptionInAppPurchases.sortedByExpiry().last else {
+                        return false
+                    }
+
+                    let isExpired = SubscriptionStateTest.isApproxExpired(date: purchaseWithLatestExpiry.expires)
+
+                    guard !isExpired else {
+                        return false
+                    }
+
+                    let timeLeft = purchaseWithLatestExpiry.expires.timeIntervalSinceNow
+
+                    guard timeLeft > 5 else {
+                        return false
+                    }
+
+                    if result.subscriptionActions != [[.value(._timerFinished(withExpiry: iap.expires)),
+                                                       .completed], // logging effect
+                                                      [.completed]] {
+                        return false
+                    }
+
+                    return true
+                }
+            }
+        }
+    }
+
     // MARK: .updatedReceiptData tests
 
     /// Expect subscription status to switch to `notSubscribed` since there are no
     /// subscription purchases in the receipt.
     func testSubscriptionIAPs() {
 
-        let result = runReducer(effectsTimeout: 0, iaps: [])
+        let result = SubscriptionStateTest.runReducer(effectsTimeout: 10, iaps: [])
 
         XCTAssertEqual(result.subscriptionActions, [])
         XCTAssertEqual(result.receiptStateActions.count, 0)
@@ -47,7 +176,7 @@ final class SubscriptionStateTest: XCTestCase {
                               expires: Date(timeInterval: -10,
                                             since: Date()))
 
-        let result = runReducer(effectsTimeout: 0, iaps: [iap])
+        let result = SubscriptionStateTest.runReducer(effectsTimeout: 0, iaps: [iap])
 
         XCTAssertEqual(result.subscriptionActions, [])
         XCTAssertEqual(result.receiptStateActions.count, 0)
@@ -62,7 +191,7 @@ final class SubscriptionStateTest: XCTestCase {
                               expires: Date(timeInterval: 5,
                                             since: Date()))
 
-        let result = runReducer(effectsTimeout: 0, iaps: [iap])
+        let result = SubscriptionStateTest.runReducer(effectsTimeout: 0, iaps: [iap])
 
         XCTAssertEqual(result.subscriptionActions, [])
         XCTAssertEqual(result.receiptStateActions.count, 0)
@@ -78,7 +207,7 @@ final class SubscriptionStateTest: XCTestCase {
 
         let iap = iapPurchase(purchaseDate: Date(), expires: expiryDate)
 
-        let result = runReducer(effectsTimeout: 15, iaps: [iap])
+        let result = SubscriptionStateTest.runReducer(effectsTimeout: 15, iaps: [iap])
 
         XCTAssertEqual(result.subscriptionActions,
                        [[.value(._timerFinished(withExpiry: expiryDate)),
@@ -104,7 +233,7 @@ final class SubscriptionStateTest: XCTestCase {
                          expires: Date(timeInterval: -60*60*24, since: Date())),
              currentSubscription]
 
-        let result = runReducer(effectsTimeout: 15, iaps: iaps)
+        let result = SubscriptionStateTest.runReducer(effectsTimeout: 15, iaps: iaps)
 
         XCTAssertEqual(result.subscriptionActions,
                        [[.value(._timerFinished(withExpiry: currentSubscriptionExpiryDate)),
@@ -128,9 +257,9 @@ final class SubscriptionStateTest: XCTestCase {
 
         let subscriptionStatus : SubscriptionStatus = .subscribed(iap)
 
-        let result = runReducer(effectsTimeout: 5,
-                                subscriptionStatus: subscriptionStatus,
-                                subscriptionAction: ._timerFinished(withExpiry: Date()))
+        let result = SubscriptionStateTest.runReducer(effectsTimeout: 5,
+                                                      subscriptionStatus: subscriptionStatus,
+                                                      subscriptionAction: ._timerFinished(withExpiry: Date()))
 
         XCTAssertEqual(result.subscriptionActions, [[.completed], [.completed]])
 
@@ -158,9 +287,9 @@ final class SubscriptionStateTest: XCTestCase {
 
         let subscriptionStatus : SubscriptionStatus = .subscribed(iap)
 
-        let result = runReducer(effectsTimeout: 10,
-                                subscriptionStatus: subscriptionStatus,
-                                subscriptionAction: ._timerFinished(withExpiry: Date()))
+        let result = SubscriptionStateTest.runReducer(effectsTimeout: 10,
+                                                      subscriptionStatus: subscriptionStatus,
+                                                      subscriptionAction: ._timerFinished(withExpiry: Date()))
 
         XCTAssertEqual(result.subscriptionActions, [[.completed], [.completed]])
 
@@ -186,9 +315,9 @@ final class SubscriptionStateTest: XCTestCase {
 
         for subscriptionStatus in subscriptionStatuses {
 
-            let result = runReducer(effectsTimeout: 0,
-                                    subscriptionStatus: subscriptionStatus,
-                                    subscriptionAction: ._timerFinished(withExpiry: Date()))
+            let result = SubscriptionStateTest.runReducer(effectsTimeout: 0,
+                                                          subscriptionStatus: subscriptionStatus,
+                                                          subscriptionAction: ._timerFinished(withExpiry: Date()))
 
             XCTAssertEqual(result.subscriptionActions, [])
             XCTAssertEqual(result.receiptStateActions.count, 0)
@@ -219,15 +348,15 @@ final class SubscriptionStateTest: XCTestCase {
     }
 
     /// Tests reducer with given subscription IAPs.
-    func runReducer(effectsTimeout: TimeInterval,
-                    iaps: Set<SubscriptionIAPPurchase>) -> ReducerOutputs {
+    static func runReducer(effectsTimeout: TimeInterval,
+                           iaps: Set<SubscriptionIAPPurchase>) -> ReducerOutputs {
 
         // NOTE: ReceiptData.parseLocalReceipt is unused because we forgo constructing
         // the ASN.1 receipt data.
         let receiptData: ReceiptData =
-            ReceiptData.init(subscriptionInAppPurchases: iaps,
-                             consumableInAppPurchases: [],
-                             data: Data.init(), // unused: see note above
+            ReceiptData(subscriptionInAppPurchases: iaps,
+                        consumableInAppPurchases: [],
+                        data: Data(), // unused: see note above
                 readDate: Date())
 
         let subscriptionAction : SubscriptionAction = .updatedReceiptData(receiptData)
@@ -238,12 +367,12 @@ final class SubscriptionStateTest: XCTestCase {
     }
 
     /// Run reducer with given parameters.
-    func runReducer(effectsTimeout: TimeInterval,
-                    subscriptionStatus: SubscriptionStatus,
-                    subscriptionAction: SubscriptionAction) -> ReducerOutputs {
+    static func runReducer(effectsTimeout: TimeInterval,
+                           subscriptionStatus: SubscriptionStatus,
+                           subscriptionAction: SubscriptionAction) -> ReducerOutputs {
 
         // output logs to stdout
-        let feedbackLogger: FeedbackLogger = FeedbackLogger.init(StdoutFeedbackLogger())
+        let feedbackLogger: FeedbackLogger = FeedbackLogger(StdoutFeedbackLogger())
 
         var receiptStateActions: [ReceiptStateAction] = []
 
@@ -257,13 +386,11 @@ final class SubscriptionStateTest: XCTestCase {
             getCurrentTime: {
                 return Date()
             },
-            compareDates: { date1, date2, granularity -> ComparisonResult in
+            compareDates: { date1, date2, _ -> ComparisonResult in
                 // NOTE: overrides granularity set by reducer for second level granularity.
-                return Calendar.current.compare(date1,
-                                                to: date2,
-                                                toGranularity: .second)
+                return SubscriptionStateTest.compareDates(date1, to: date2)
             },
-            timerScheduler: QueueScheduler.init()
+            singleFireTimer: { _,_ in SignalProducer(value: ())} // fire timer immediately
         )
 
         var subscriptionState : SubscriptionState = SubscriptionState()
@@ -272,10 +399,24 @@ final class SubscriptionStateTest: XCTestCase {
         let (nextSubscriptionState, effectsResults) =
             testReducer(subscriptionState, subscriptionAction, env, subscriptionReducer, effectsTimeout)
 
-        return ReducerOutputs.init(subscriptionState: nextSubscriptionState,
-                                   subscriptionActions: effectsResults,
-                                   receiptStateActions: receiptStateActions)
+        return ReducerOutputs(subscriptionState: nextSubscriptionState,
+                              subscriptionActions: effectsResults,
+                              receiptStateActions: receiptStateActions)
 
+    }
+
+    static func compareDates(_ date1: Date, to date2: Date) -> ComparisonResult {
+        return Calendar.current.compare(date1,
+                                        to: date2,
+                                        toGranularity: .second)
+    }
+
+    static func isApproxExpired(date: Date) -> Bool {
+        switch SubscriptionStateTest.compareDates(Date(), to: date) {
+            case .orderedAscending: return false
+            case .orderedDescending: return true
+            case .orderedSame: return true
+        }
     }
 
 }

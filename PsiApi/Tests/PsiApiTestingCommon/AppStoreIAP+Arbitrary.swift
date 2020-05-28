@@ -197,6 +197,14 @@ extension TransactionID: Arbitrary {
     }
 }
 
+extension OriginalTransactionID: Arbitrary {
+    public static var arbitrary: Gen<OriginalTransactionID> {
+        Int.arbitrary.resize(999_999_999).map(
+            comp(OriginalTransactionID.init(stringLiteral:), String.init, abs)
+        )
+    }
+}
+
 extension PaymentTransaction: Arbitrary {
     public static var arbitrary: Gen<PaymentTransaction> {
         Gen.zip(TransactionID.arbitrary, Date.arbitrary, String.arbitrary,
