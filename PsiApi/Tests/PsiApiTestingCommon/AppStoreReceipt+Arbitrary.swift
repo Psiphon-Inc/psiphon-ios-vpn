@@ -21,7 +21,7 @@ import Foundation
 import SwiftCheck
 @testable import AppStoreIAP
 
-extension SubscriptionIAPPurchase : Arbitrary {
+extension SubscriptionIAPPurchase: Arbitrary {
     public static var arbitrary: Gen<SubscriptionIAPPurchase> {
         Gen.compose { c in
             return SubscriptionIAPPurchase(
@@ -36,7 +36,7 @@ extension SubscriptionIAPPurchase : Arbitrary {
     }
 }
 
-extension ConsumableIAPPurchase : Arbitrary {
+extension ConsumableIAPPurchase: Arbitrary {
     public static var arbitrary: Gen<ConsumableIAPPurchase> {
         Gen.compose { c in
             ConsumableIAPPurchase(productID: c.generate(), transactionID: c.generate())
@@ -44,7 +44,7 @@ extension ConsumableIAPPurchase : Arbitrary {
     }
 }
 
-extension ReceiptData : Arbitrary {
+extension ReceiptData: Arbitrary {
     public static var arbitrary: Gen<ReceiptData> {
         Gen.compose { c in
             ReceiptData(subscriptionInAppPurchases: c.generate(),

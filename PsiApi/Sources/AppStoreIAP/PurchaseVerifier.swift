@@ -32,8 +32,8 @@ public struct PurchaseVerifierServer {
     ) -> (error: NestedScopedError<ErrorRepr>?,
           request: HTTPRequest<R>) {
 
-        var clientMetadataJSON : String = ""
-        var clientMetadataError : NestedScopedError<ErrorRepr>? = .none
+        var clientMetadataJSON: String = ""
+        var clientMetadataError: NestedScopedError<ErrorRepr>? = .none
 
         switch clientMetaData.jsonString {
         case .left(let error):

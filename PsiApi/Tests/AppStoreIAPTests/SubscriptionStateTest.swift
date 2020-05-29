@@ -29,7 +29,7 @@ final class SubscriptionStateTest: XCTestCase {
 
     func testWithSwiftCheck() {
 
-        property("Subscription Reducer") <- forAll { (action : SubscriptionAction, status: SubscriptionStatus) in
+        property("Subscription Reducer") <- forAll { (action: SubscriptionAction, status: SubscriptionStatus) in
 
             // Since status is mutated
             let originalStatus = status
@@ -255,7 +255,7 @@ final class SubscriptionStateTest: XCTestCase {
                               expires: Date(timeInterval: 0,
                                             since: Date()))
 
-        let subscriptionStatus : SubscriptionStatus = .subscribed(iap)
+        let subscriptionStatus: SubscriptionStatus = .subscribed(iap)
 
         let result = SubscriptionStateTest.runReducer(effectsTimeout: 5,
                                                       subscriptionStatus: subscriptionStatus,
@@ -285,7 +285,7 @@ final class SubscriptionStateTest: XCTestCase {
                               expires: Date(timeInterval: 10,
                                             since: Date()))
 
-        let subscriptionStatus : SubscriptionStatus = .subscribed(iap)
+        let subscriptionStatus: SubscriptionStatus = .subscribed(iap)
 
         let result = SubscriptionStateTest.runReducer(effectsTimeout: 10,
                                                       subscriptionStatus: subscriptionStatus,
@@ -359,7 +359,7 @@ final class SubscriptionStateTest: XCTestCase {
                         data: Data(), // unused: see note above
                 readDate: Date())
 
-        let subscriptionAction : SubscriptionAction = .updatedReceiptData(receiptData)
+        let subscriptionAction: SubscriptionAction = .updatedReceiptData(receiptData)
 
         return runReducer(effectsTimeout: effectsTimeout,
                           subscriptionStatus: .unknown,
@@ -393,7 +393,7 @@ final class SubscriptionStateTest: XCTestCase {
             singleFireTimer: { _,_ in SignalProducer(value: ())} // fire timer immediately
         )
 
-        var subscriptionState : SubscriptionState = SubscriptionState()
+        var subscriptionState: SubscriptionState = SubscriptionState()
         subscriptionState.status = subscriptionStatus
 
         let (nextSubscriptionState, effectsResults) =

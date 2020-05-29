@@ -153,7 +153,7 @@ public protocol TunnelProviderManager: ClassBound, Equatable {
     
     func remove(completionHandler: @escaping (NEVPNError?) -> Void)
     
-    func start(options: [String : Any]?) throws
+    func start(options: [String: Any]?) throws
     
     func stop()
     
@@ -235,7 +235,7 @@ public final class PsiphonTPM: TunnelProviderManager {
         }
     }
     
-    public func start(options: [String : Any]?) throws {
+    public func start(options: [String: Any]?) throws {
         let session = self.wrappedManager.connection as! NETunnelProviderSession
         try session.startTunnel(options: options)
         // Enables Connect On Demand only after starting the tunnel.

@@ -20,21 +20,21 @@
 import Foundation
 import Utilities
 
-public protocol AppInfoProvider : Encodable {
-    var clientPlatform : String { get }
-    var clientRegion : String { get }
-    var clientVersion : String { get }
-    var propagationChannelId : String { get }
-    var sponsorId : String { get }
+public protocol AppInfoProvider: Encodable {
+    var clientPlatform: String { get }
+    var clientRegion: String { get }
+    var clientVersion: String { get }
+    var propagationChannelId: String { get }
+    var sponsorId: String { get }
 }
 
 public struct ClientMetaData: Encodable {
 
-    public let clientPlatform : String
-    public let clientRegion : String
-    public let clientVersion : String
-    public let propagationChannelId : String
-    public let sponsorId : String
+    public let clientPlatform: String
+    public let clientRegion: String
+    public let clientVersion: String
+    public let propagationChannelId: String
+    public let sponsorId: String
 
     private enum CodingKeys: String, CodingKey {
         case clientPlatform = "client_platform"
@@ -44,7 +44,7 @@ public struct ClientMetaData: Encodable {
         case sponsorId = "sponsor_id"
     }
 
-    public init(_ appInfo : AppInfoProvider) {
+    public init(_ appInfo: AppInfoProvider) {
         self.clientPlatform = appInfo.clientPlatform
         self.clientRegion = appInfo.clientRegion
         self.clientVersion = appInfo.clientVersion

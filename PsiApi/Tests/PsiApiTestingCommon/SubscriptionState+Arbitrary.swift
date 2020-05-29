@@ -21,7 +21,7 @@ import Foundation
 import SwiftCheck
 @testable import AppStoreIAP
 
-enum GenSubscriptionStatus : CaseIterable {
+enum GenSubscriptionStatus: CaseIterable {
     case subscribed
     case notSubscribed
     case unknown
@@ -33,7 +33,7 @@ extension GenSubscriptionStatus: Arbitrary {
     }
 }
 
-extension SubscriptionStatus : Arbitrary {
+extension SubscriptionStatus: Arbitrary {
     public static var arbitrary: Gen<SubscriptionStatus> {
         GenSubscriptionStatus.arbitrary.flatMap { n -> Gen<SubscriptionStatus> in
             switch n {
@@ -48,7 +48,7 @@ extension SubscriptionStatus : Arbitrary {
     }
 }
 
-enum GenSubscriptionActions : CaseIterable {
+enum GenSubscriptionActions: CaseIterable {
     case updatedReceiptData
     case timerFinished
 }
