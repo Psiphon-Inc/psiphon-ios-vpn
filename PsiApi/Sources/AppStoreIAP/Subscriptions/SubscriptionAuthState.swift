@@ -20,14 +20,13 @@
 import Foundation
 import ReactiveSwift
 import PsiApi
-import AppStoreIAP
 
 /// Represents authorization state for subscription purchase.
-struct SubscriptionPurchaseAuthState: Hashable, Codable {
+public struct SubscriptionPurchaseAuthState: Hashable, Codable {
     
-    enum AuthorizationState: Hashable {
-        
-        enum RequestRejectedReason: String, Codable {
+    public enum AuthorizationState: Hashable {
+
+        public enum RequestRejectedReason: String, Codable {
             /// Received 400-Bad Request error from the purchase verifier server.
             case badRequestError
             /// Transaction had expired.
@@ -48,11 +47,11 @@ struct SubscriptionPurchaseAuthState: Hashable, Codable {
         case requestRejected(RequestRejectedReason)
         
         /// Retrieved an authorization successfully.
-        case authorization(PsiApi.SignedData<SignedAuthorization>)
+        case authorization(SignedData<SignedAuthorization>)
         
         /// Authorization rejected by the Psiphon servers.
         /// If the transaction has not expired, another authorization can be requested from the purchase verifier server.
-        case rejectedByPsiphon(PsiApi.SignedData<SignedAuthorization>)
+        case rejectedByPsiphon(SignedData<SignedAuthorization>)
     }
     
     /// Subscription purchase contained in the app receipt.
@@ -63,9 +62,9 @@ struct SubscriptionPurchaseAuthState: Hashable, Codable {
 
 }
 
-enum SubscriptionAuthStateAction {
+public enum SubscriptionAuthStateAction {
     
-    enum StoredDataUpdateType {
+    public enum StoredDataUpdateType {
         case didUpdateRejectedSubscriptionAuthIDs
         case didRefreshReceiptData(ReceiptReadReason)
     }
@@ -90,12 +89,12 @@ enum SubscriptionAuthStateAction {
     )
 }
 
-typealias SubscriptionAuthStateReducerEnvironment = (
+public typealias SubscriptionAuthStateReducerEnvironment = (
     feedbackLogger: FeedbackLogger,
     httpClient: HTTPClient,
     notifier: Notifier,
     notifierUpdatedSubscriptionAuthsMessage: String,
-    sharedDB: PsiphonDataSharedDB,
+    sharedDB: SharedDBContainer,
     tunnelStatusSignal: SignalProducer<TunnelProviderVPNStatus, Never>,
     tunnelConnectionRefSignal: SignalProducer<TunnelConnection?, Never>,
     clientMetaData: ClientMetaData,
@@ -103,25 +102,35 @@ typealias SubscriptionAuthStateReducerEnvironment = (
     compareDates: (Date, Date, Calendar.Component) -> ComparisonResult
 )
 
-struct SubscriptionAuthState: Equatable {
+public struct SubscriptionAuthState: Equatable {
+
+    public init() {}
     
-    typealias PurchaseAuthStateDict = [OriginalTransactionID: SubscriptionPurchaseAuthState]
+    public typealias PurchaseAuthStateDict = [OriginalTransactionID: SubscriptionPurchaseAuthState]
+
+    /// Set of transactions that either have a pending authorization request (either in-flight or pending tunnel connected).
+    public var transactionsPendingAuthRequest = Set<OriginalTransactionID>()
     
     /// `nil` represents that subscription auths have not been restored from previously stored value.
-    /// This value is in  sync with stored value in  `PsiphonDataSharedDB`
+    /// This value is in  sync with stored value in  `PsiphonDataSharedDBContainer`
     /// with key `subscription_authorizations_dict`.
     private(set) var purchasesAuthState: PurchaseAuthStateDict? = .none
-    
-    /// Set of transactions that either have a pending authorization request (either in-flight or pending tunnel connected).
-    var transactionsPendingAuthRequest = Set<OriginalTransactionID>()
 }
 
-struct SubscriptionReducerState: Equatable {
-    var subscription: SubscriptionAuthState
+public struct SubscriptionReducerState: Equatable {
+
+    public var subscription: SubscriptionAuthState
+
     let receiptData: ReceiptData?
+
+    public init(subscription: SubscriptionAuthState, receiptData: ReceiptData?)  {
+        self.subscription = subscription
+        self.receiptData = receiptData
+    }
+
 }
 
-func subscriptionAuthStateReducer(
+public func subscriptionAuthStateReducer(
     state: inout SubscriptionReducerState, action: SubscriptionAuthStateAction,
     environment: SubscriptionAuthStateReducerEnvironment
 ) -> [Effect<SubscriptionAuthStateAction>] {
@@ -211,7 +220,7 @@ func subscriptionAuthStateReducer(
             return effects
             
         case .failure(let errorEvent):
-            // Reading from PsiphonDataSharedDB failed.
+            // Reading from PsiphonDataSharedDBContainer failed.
             // Resets value of stored subscription purchase auth state.
             
             let stateUpdateEffect = state.subscription.setPurchasesAuthState(
@@ -660,7 +669,7 @@ extension SubscriptionAuthState {
 fileprivate enum StoredRejectedSubscriptionAuthIDs {
     
     static func getValue(
-        sharedDB: PsiphonDataSharedDB
+        sharedDB: SharedDBContainer
     ) -> Effect<(rejectedValues: Set<AuthorizationID>, writeSeqNumber: Int)> {
         Effect { () -> (rejectedValues: Set<AuthorizationID>, writeSeqNumber: Int) in
             
@@ -680,7 +689,7 @@ fileprivate enum StoredRejectedSubscriptionAuthIDs {
     }
     
     static func setContainerReadRejectedAuthIDs(
-        atLeastUpToSequenceNumber seq: Int, sharedDB: PsiphonDataSharedDB
+        atLeastUpToSequenceNumber seq: Int, sharedDB: SharedDBContainer
     ) -> Effect<()> {
         Effect { () -> Void in
             sharedDB.setContainerRejectedSubscriptionAuthIdReadAtLeastUpToSequenceNumber(seq)
@@ -696,7 +705,7 @@ fileprivate enum StoredSubscriptionPurchasesAuthState {
     /// Returned effect emits stored data with type `[OriginalTransactionID, SubscriptionPurchaseAuthState]`.
     /// If there is no stored data, returns an empty dictionary.
     static func getValue(
-        sharedDB: PsiphonDataSharedDB
+        sharedDB: SharedDBContainer
     ) -> Effect<Result<StoredDataType, SystemErrorEvent>> {
         Effect { () -> Result<StoredDataType, SystemErrorEvent> in
             guard let data = sharedDB.getSubscriptionAuths() else {
@@ -714,7 +723,7 @@ fileprivate enum StoredSubscriptionPurchasesAuthState {
     
     /// Encodes `value` and stores the `Data` in `sharedDB`.
     static func setValue(
-        sharedDB: PsiphonDataSharedDB, value: StoredDataType
+        sharedDB: SharedDBContainer, value: StoredDataType
     ) -> Effect<Result<(), SystemErrorEvent>> {
         Effect { () -> Result<(), SystemErrorEvent> in
             do {

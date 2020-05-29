@@ -118,3 +118,5 @@ public struct SignedData<Decoded: Decodable & CustomStringConvertible>: Hashable
     }
     
 }
+
+extension SignedData: Encodable where Decoded: Encodable {}
