@@ -20,13 +20,13 @@
 import Foundation
 import Utilities
 
-extension NonEmptySeq : FeedbackDescription {}
+extension NonEmptySeq: FeedbackDescription {}
 
-extension NonEmptySeq : CustomStringConvertible where T: CustomStringConvertible {}
+extension NonEmptySeq: CustomStringConvertible where T: CustomStringConvertible {}
 
-extension NonEmptySeq : CustomFieldFeedbackDescription where T: CustomStringConvertible {
-    public var feedbackFields: [String : CustomStringConvertible] {
-        var fields : [String : CustomStringConvertible] = [:]
+extension NonEmptySeq: CustomFieldFeedbackDescription where T: CustomStringConvertible {
+    public var feedbackFields: [String: CustomStringConvertible] {
+        var fields: [String: CustomStringConvertible] = [:]
         switch self {
         case .elem(let x):
             fields["elem"] = x

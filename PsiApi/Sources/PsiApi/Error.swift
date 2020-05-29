@@ -119,7 +119,7 @@ public protocol ErrorUserDescription where Self: Error {
 
 public typealias CodableError = Codable & Error
 
-public struct ScopedError<T: Error> : Error {
+public struct ScopedError<T: Error>: Error {
     let err: T
     let file: String
     let line: UInt
@@ -131,7 +131,7 @@ public struct ScopedError<T: Error> : Error {
     }
 }
 
-extension ScopedError : Codable where T: Codable {
+extension ScopedError: Codable where T: Codable {
     
     private enum CodingKeys: String, CodingKey {
         case err = "error"
@@ -141,4 +141,4 @@ extension ScopedError : Codable where T: Codable {
 
 }
 
-public typealias NestedScopedError<T : CodableError> = NonEmptySeq<ScopedError<T>>
+public typealias NestedScopedError<T: CodableError> = NonEmptySeq<ScopedError<T>>

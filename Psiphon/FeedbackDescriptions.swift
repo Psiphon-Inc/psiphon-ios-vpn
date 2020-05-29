@@ -69,7 +69,7 @@ extension TunnelProviderSyncReason: CustomStringFeedbackDescription {
 
 extension UserDefaultsConfig: CustomFieldFeedbackDescription {
     
-    var feedbackFields: [String : CustomStringConvertible] {
+    var feedbackFields: [String: CustomStringConvertible] {
         ["expectedPsiCashReward": self.expectedPsiCashReward]
     }
     
@@ -116,7 +116,7 @@ extension PsiphonDataSharedDB: CustomFieldFeedbackDescription {
         
     }
     
-    public var feedbackFields: [String : CustomStringConvertible] {
+    public var feedbackFields: [String: CustomStringConvertible] {
         
         [EgressRegionsStringArrayKey: String(describing: self.emittedEgressRegions()),
          

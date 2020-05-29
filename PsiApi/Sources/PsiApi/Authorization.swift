@@ -55,7 +55,7 @@ public struct SignedAuthorization: Hashable, Codable {
 
 extension SignedAuthorization: CustomFieldFeedbackDescription {
     
-    public var feedbackFields: [String : CustomStringConvertible] {
+    public var feedbackFields: [String: CustomStringConvertible] {
         ["ID": authorization.id,
          "Expires": authorization.expires,
          "AccessType": authorization.accessType.rawValue]

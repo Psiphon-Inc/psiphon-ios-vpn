@@ -31,7 +31,7 @@ class NonEmptySeqTest: XCTestCase {
 
         // Test encoding
 
-        var jsonData : Data
+        var jsonData: Data
 
         do {
             jsonData = try JSONEncoder().encode(x)

@@ -417,7 +417,7 @@ extension Store where Value == AppState, Action == AppAction {
 
 // MARK: AppInfoProvider
 
-struct AppInfoObjC : AppInfoProvider {
+struct AppInfoObjC: AppInfoProvider {
     let clientPlatform: String = AppInfo.clientPlatform()
     let clientRegion: String = AppInfo.clientRegion() ?? ""
     let clientVersion: String = AppInfo.appVersion() ?? ""

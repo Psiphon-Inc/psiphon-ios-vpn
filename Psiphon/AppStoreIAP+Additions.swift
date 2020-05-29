@@ -61,7 +61,7 @@ extension PaymentTransaction.TransactionState: FeedbackDescription {}
 
 extension PaymentTransaction: CustomFieldFeedbackDescription {
     
-    public var feedbackFields: [String : CustomStringConvertible] {
+    public var feedbackFields: [String: CustomStringConvertible] {
         ["transactionID": self.transactionID(),
          "productID": self.productID(),
          "transactionState": makeFeedbackEntry(self.transactionState())]
