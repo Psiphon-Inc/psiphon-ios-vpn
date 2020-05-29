@@ -27,64 +27,34 @@ import Utilities
 @testable import PsiApi
 @testable import AppStoreIAP
 
-func mockLibData(
-    fullAuthPackage: Bool = true,
-    balance: @autoclosure () -> PsiCashAmount? = nil,
-    availableProducts: @autoclosure () -> PsiCashParsed<PsiCashPurchasableType>? = nil,
-    activePurchases: @autoclosure () -> PsiCashParsed<PsiCashPurchasedType>? = nil
-) -> PsiCashLibData {
-    PsiCashLibData(
-        authPackage: PsiCashAuthPackage(
-            withTokenTypes: fullAuthPackage ? ["earner", "indicator", "spender"] : []
-        ),
-        balance: balance() ?? .zero,
-        availableProducts: availableProducts() ?? PsiCashParsed(items: [], parseErrors: []),
-        activePurchases: activePurchases() ?? PsiCashParsed(items: [], parseErrors: [])
-    )
-}
-
 extension PsiCashEffects {
     
     static func mock(
-        libData: @autoclosure () -> Generator<PsiCashLibData>? = nil,
-        refreshState: @autoclosure () -> Generator<PsiCashRefreshResult>? = nil,
-        purchaseProduct: @autoclosure () -> Generator<PsiCashPurchaseResult>? = nil,
-        modifyLandingPage: @autoclosure () -> Generator<URL>? = nil,
-        rewardedVideoCustomData: @escaping @autoclosure () -> String? = nil
+        libData: Gen<PsiCashLibData>? = nil,
+        refreshState: Gen<PsiCashRefreshResult>? = nil,
+        purchaseProduct: Gen<PsiCashPurchaseResult>? = nil,
+        modifyLandingPage: Gen<URL>? = nil,
+        rewardedVideoCustomData: Gen<String>? = nil
     ) -> PsiCashEffects {
-        
-        var libDataGen = libData() ?? Generator(sequence: [mockLibData()])
-        
-        var refreshStateGen = refreshState() ??
-            Generator(sequence: [.completed(.success(mockLibData()))])
-        
-        var purchaseProductGen = purchaseProduct() ?? .empty()
-        
-        var modifyLandingPageGen = modifyLandingPage() ?? .empty()
-        
-        return PsiCashEffects(
+        PsiCashEffects(
             libData: { () -> PsiCashLibData in
-                guard let next = libDataGen.next() else { XCTFatal() }
-                return next
-        },
+                returnGeneratedOrFail(libData)
+            },
             refreshState: { _, _ -> Effect<PsiCashRefreshResult> in
-                guard let next = refreshStateGen.next() else { XCTFatal() }
-                return Effect(value: next)
-        },
+                Effect(value: returnGeneratedOrFail(refreshState))
+            },
             purchaseProduct: { _, _ -> Effect<PsiCashPurchaseResult> in
-                guard let next = purchaseProductGen.next() else { XCTFatal() }
-                return Effect(value: next)
-        },
+                Effect(value: returnGeneratedOrFail(purchaseProduct))
+            },
             modifyLandingPage: { _ -> Effect<URL> in
-                guard let next = modifyLandingPageGen.next() else { XCTFatal() }
-                return Effect(value: next)
-        },
+                Effect(value: returnGeneratedOrFail(modifyLandingPage))
+            },
             rewardedVideoCustomData: { () -> String? in
-                return rewardedVideoCustomData()
-        },
+                returnGeneratedOrFail(rewardedVideoCustomData)
+            },
             expirePurchases: { _ -> Effect<Never> in
                 return .empty
-        })
+            })
     }
     
 }
@@ -92,26 +62,26 @@ extension PsiCashEffects {
 extension PaymentQueue {
     
     static func mock(
-        transactions: @autoclosure () -> [SKPaymentTransaction]? = nil
+        transactions: Gen<[PaymentTransaction]>? = nil,
+        addPayment: ((IAPPurchasableProduct) -> AddedPayment)? = nil
     ) -> PaymentQueue {
-        let _transactions = transactions() ?? [SKPaymentTransaction]()
-        
         return PaymentQueue(
-            transactions: { () -> Effect<[SKPaymentTransaction]> in
-                Effect(value: _transactions)
-        },
+            transactions: { () -> Effect<[PaymentTransaction]> in
+                Effect(value: returnGeneratedOrFail(transactions))
+            },
             addPayment: { product -> Effect<AddedPayment> in
-                Effect(value: AddedPayment(product: product, paymentObj: SKPayment()))
-        },
+                guard let addPayment = addPayment else { XCTFatal() }
+                return Effect(value: addPayment(product))
+            },
             addObserver: { _ -> Effect<Never> in
                 return .empty
-        },
+            },
             removeObserver: { _ -> Effect<Never> in
                 return .empty
-        },
+            },
             finishTransaction: { _ -> Effect<Never> in
                 return .empty
-        })
+            })
     }
     
 }
@@ -120,8 +90,8 @@ func mockIAPEnvironment(
     _ feedbackLogger: FeedbackLogger,
     tunnelStatusSignal: @autoclosure () -> SignalProducer<TunnelProviderVPNStatus, Never>? = nil,
     tunnelConnectionRefSignal: @autoclosure () -> SignalProducer<TunnelConnection?, Never>? = nil,
-    psiCashEffects: @autoclosure () -> PsiCashEffects? = nil,
-    transactions: @autoclosure () -> [SKPaymentTransaction]? = nil,
+    psiCashEffects: PsiCashEffects? = nil,
+    paymentQueue: PaymentQueue? = nil,
     psiCashStore: ((PsiCashAction) -> Effect<Never>)? = nil,
     appReceiptStore: ((ReceiptStateAction) -> Effect<Never>)? = nil,
     httpClient: HTTPClient? = nil
@@ -131,12 +101,10 @@ func mockIAPEnvironment(
     
     let _tunnelConnectionRefSignal = tunnelConnectionRefSignal() ??
         SignalProducer(value: .some(TunnelConnection { .connection(.connected) }))
+        
+    let _psiCashStore = psiCashStore ?? { _ in XCTFatal() }
     
-    let _psiCashEffects = psiCashEffects() ?? .mock()
-    
-    let _psiCashStore = psiCashStore ?? { _ in .empty }
-    
-    let _appReceiptStore = appReceiptStore ?? { _ in .empty }
+    let _appReceiptStore = appReceiptStore ?? { _ in XCTFatal() }
     
     let _httpClient = httpClient ?? EchoHTTPClient().client
         
@@ -144,31 +112,12 @@ func mockIAPEnvironment(
         feedbackLogger: feedbackLogger,
         tunnelStatusSignal: _tunnelStatusSignal,
         tunnelConnectionRefSignal: _tunnelConnectionRefSignal,
-        psiCashEffects: _psiCashEffects,
+        psiCashEffects: psiCashEffects ?? PsiCashEffects.mock(),
         clientMetaData: ClientMetaData(MockAppInfoProvider()),
-        paymentQueue: .mock(transactions: transactions()),
+        paymentQueue: paymentQueue ?? PaymentQueue.mock(),
         psiCashStore: _psiCashStore,
         appReceiptStore: _appReceiptStore,
         httpClient: _httpClient,
         getCurrentTime: { Date() }
     )
-}
-
-extension PaymentTransaction {
-    
-    static func mock(
-        transactionID: (() -> TransactionID)? = nil,
-        productID: (() -> String)? = nil,
-        transactionState: (() -> TransactionState)? = nil,
-        isEqual: ((PaymentTransaction) -> Bool)? = nil
-    ) -> PaymentTransaction {
-        PaymentTransaction(
-            transactionID: transactionID ?? { TransactionID(stringLiteral: "TransactionID") },
-            productID: productID ?? { "ProductID" },
-            transactionState: transactionState ??
-                { TransactionState.completed(.success(Pair(Date(), .purchased))) },
-            isEqual: isEqual ?? { _ in true },
-            skPaymentTransaction: { nil })
-    }
-    
 }

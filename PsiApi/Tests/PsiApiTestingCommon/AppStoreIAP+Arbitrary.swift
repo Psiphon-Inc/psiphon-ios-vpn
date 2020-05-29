@@ -27,9 +27,6 @@ import Utilities
 @testable import PsiApi
 @testable import AppStoreIAP
 
-let completedPsiCashAuthPackage = PsiCashAuthPackage(withTokenTypes:
-    ["earner", "indicator", "spender"])
-
 extension PsiCashAmount: Arbitrary {
     public static var arbitrary: Gen<PsiCashAmount> {
         Int64.arbitrary.resize(1000).map {PsiCashAmount.init(nanoPsi: abs($0)) }
@@ -137,9 +134,12 @@ extension PsiCashAuthPackage: Arbitrary {
     public static var arbitrary: Gen<PsiCashAuthPackage> {
         Gen.weighted([
             (1, PsiCashAuthPackage(withTokenTypes: [])),
-            (3, completedPsiCashAuthPackage),
+            (3, PsiCashAuthPackage.completeAuthPackage),
         ])
     }
+    
+    public static let completeAuthPackage = PsiCashAuthPackage(withTokenTypes:
+        ["earner", "indicator", "spender"])
 }
 
 extension PsiCashLibData: Arbitrary {
@@ -154,7 +154,7 @@ extension PsiCashLibData: Arbitrary {
             // Uses generated bool values to determine availability of PsiCash.
             if hasPsiCash {
                 return Gen.zip(
-                    Gen.pure(completedPsiCashAuthPackage),
+                    Gen.pure(PsiCashAuthPackage.completeAuthPackage),
                     PsiCashAmount.arbitrary,
                     PsiCashParsed<PsiCashPurchasableType>.arbitrary,
                     PsiCashParsed<PsiCashPurchasedType>.arbitrary
@@ -346,7 +346,7 @@ extension IAPReducerState: Arbitrary {
         PsiCashAuthPackage.arbitrary.flatMap { (authPackage: PsiCashAuthPackage) in
             if authPackage.hasMinimalTokens {
                 return Gen.zip(IAPState.arbitrary, PsiCashBalance.arbitrary,
-                        Gen.pure(completedPsiCashAuthPackage))
+                               Gen.pure(PsiCashAuthPackage.completeAuthPackage))
                     .map(IAPReducerState.init(iap:psiCashBalance:psiCashAuth:))
             } else {
                 return Gen.zip(IAPState.arbitrary, Gen.pure(PsiCashBalance()),
@@ -354,5 +354,12 @@ extension IAPReducerState: Arbitrary {
                     .map(IAPReducerState.init(iap:psiCashBalance:psiCashAuth:))
             }
         }
+    }
+}
+
+extension AddedPayment: Arbitrary {
+    public static var arbitrary: Gen<AddedPayment> {
+        Gen.zip(IAPPurchasableProduct.arbitrary, Gen.pure(SKPayment()))
+            .map(AddedPayment.init(_: _:))
     }
 }

@@ -28,8 +28,92 @@ import SwiftCheck
 @testable import PsiApi
 @testable import AppStoreIAP
 
+extension IAPPurchasableProduct {
+    
+    static let psiCashProduct = IAPPurchasableProduct.arbitrary.suchThat {
+        guard case .psiCash(product: _) = $0 else {
+            return false
+        }
+        return true
+    }
+    
+}
+
+extension IAPReducerState {
+    
+    // nonPurchasingState satisfies the following condition:
+    //
+    // state.iap.purchasing.completed &&
+    //  state.iap.unverifiedPsiCashTx == nil &&
+    //  state.psiCashAuth.hasMinimalTokens
+    //
+    static let nonPurchasingState = Gen<IAPReducerState>.compose { c in
+        IAPReducerState(
+            iap: IAPState(
+                unverifiedPsiCashTx: nil,
+                purchasing: c.generate(using:
+                    IAPPurchasingState.arbitrary.suchThat { $0.completed })
+            ),
+            psiCashBalance: c.generate(),
+            psiCashAuth: PsiCashAuthPackage.completeAuthPackage
+        )
+    }
+    
+    // pendingPurchaseState satisfies the following condition:
+    //
+    // state.iap.purchasing == .pending
+    //
+    static let pendingPurchaseState = Gen<IAPReducerState>.compose { c in
+        IAPReducerState(
+            iap: IAPState(
+                unverifiedPsiCashTx: c.generate(),
+                purchasing: .pending(c.generate())
+            ),
+            psiCashBalance: c.generate(),
+            psiCashAuth: c.generate()
+        )
+    }
+    
+    // pendingPurchaseState satisfies the following condition:
+    //
+    // state.iap.purchasing.completed &&
+    //  state.iap.unverifiedPsiCashTx != nil
+    //
+    static let pendingVerificationPurchaseState = Gen<IAPReducerState>.compose { c in
+        IAPReducerState(
+            iap: IAPState(
+                unverifiedPsiCashTx: c.generate(using:
+                    UnverifiedPsiCashTransactionState.arbitrary),
+                purchasing: c.generate(using:
+                    IAPPurchasingState.arbitrary.suchThat { $0.completed })
+            ),
+            psiCashBalance: c.generate(),
+            psiCashAuth: c.generate()
+        )
+    }
+    
+    // missingPsiCashPurchaseState satisfies the following condition:
+    //
+    // state.iap.purchasing.completed &&
+    //  state.iap.unverifiedPsiCashTx == nil &&
+    //  !(state.psiCashAuth.hasMinimalTokens)
+    static let missingPsiCashPurchaseState = Gen<IAPReducerState>.compose { c in
+        IAPReducerState(
+            iap: IAPState(
+                unverifiedPsiCashTx: nil,
+                purchasing: c.generate(using:
+                    IAPPurchasingState.arbitrary.suchThat { $0.completed })
+            ),
+            psiCashBalance: c.generate(),
+            psiCashAuth: PsiCashAuthPackage(withTokenTypes: [])
+        )
+    }
+    
+}
+
 final class IAPReducerTests: XCTestCase {
     
+    let args = CheckerArguments()
     var feedbackHandler: ArrayFeedbackLogger!
     var feedbackLogger: FeedbackLogger!
     
@@ -51,7 +135,7 @@ final class IAPReducerTests: XCTestCase {
                 return .empty
         })
         
-        property("IAPReducer.checkUnverifiedTransaction refreshes local receipt")
+        property("IAPReducer.checkUnverifiedTransaction refreshes local receipt", arguments: args)
             <- forAll { (initState: IAPReducerState) in
                 
                 // Arrange
@@ -73,6 +157,105 @@ final class IAPReducerTests: XCTestCase {
         
         // No feedback logs are expected
         XCTAssert(self.feedbackHandler.logs == [])
+    }
+    
+    func testPurchase() {
+
+        // A single reference is enough for testing since this object is immutable and created
+        // by the SDK.
+        let mockPayment = SKPayment()
+        
+        let env = mockIAPEnvironment(
+            self.feedbackLogger,
+            paymentQueue: PaymentQueue.mock(addPayment: { product -> AddedPayment in
+                return AddedPayment(product, mockPayment)
+            }))
+       
+        
+        property("""
+            IAPReducer.purchase adds purchase given that: there are no pending transactions, \
+            if the transaction is a consumable, that there are no consumables pending verification \
+            by the purchase-verifier server, and if the transaction is a PsiCash transaction that \
+            it has minimal tokens to purchase PsiCash
+            """, arguments: args)
+            <-
+            forAll(IAPReducerState.nonPurchasingState, IAPPurchasableProduct.arbitrary) {
+                (initState: IAPReducerState, product: IAPPurchasableProduct) in
+                
+                // Test
+                let (nextState, effectsResults) = testReducer(initState, .purchase(product),
+                                                              env, iapReducer)
+                
+                return (initState.iap.purchasing.completed) <?> "Init state"
+                    ^&&^
+                    (nextState.iap.purchasing == .pending(product)) <?> "State is pending"
+                    ^&&^
+                    (effectsResults == [[.value(._purchaseAdded(AddedPayment(product, mockPayment))),
+                                         .completed]]) <?> "Effect result added purchase"
+                    ^&&^
+                    (self.feedbackHandler.logs == []) <?> "Feedback logs"
+        }
+    
+        
+        property("IAPReducer.purchase results in no-op if there is pending purchase",
+                 arguments: args)
+            <-
+            forAll(IAPReducerState.pendingPurchaseState, IAPPurchasableProduct.arbitrary) {
+                (initState: IAPReducerState, product: IAPPurchasableProduct) in
+
+                let (nextState, effectsResults) = testReducer(initState, .purchase(product),
+                                                              env, iapReducer)
+                
+                return (nextState == initState) <?> "State unchanged"
+                    ^&&^
+                    (effectsResults == []) <?> "No effects"
+                    ^&&^
+                    (self.feedbackHandler.logs == []) <?> "Feedback logs"
+        }
+    
+        
+        property("IAPReducer.purchase results in no-op if there is consumable pending verification",
+                 arguments: args)
+            <-
+            forAll(IAPReducerState.pendingVerificationPurchaseState,
+                   IAPPurchasableProduct.psiCashProduct) {
+                (initState: IAPReducerState, product: IAPPurchasableProduct) in
+                
+                // Test
+                let (nextState, effectsResults) = testReducer(initState, .purchase(product),
+                                                              env, iapReducer)
+                                
+                return (nextState == initState) <?> "State unchanged"
+                    ^&&^
+                    (effectsResults == []) <?> "No effects"
+                    ^&&^
+                    (self.feedbackHandler.logs == []) <?> "Feedback logs"
+        }
+        
+        property("IAPReducer.purchase results in purchase error if PsiCash tokens are missing",
+                 arguments: args)
+            <-
+            forAll(IAPReducerState.missingPsiCashPurchaseState,
+                   IAPPurchasableProduct.psiCashProduct) {
+                (initState: IAPReducerState, product: IAPPurchasableProduct) in
+                
+                // Test
+                let (nextState, effectsResults) = testReducer(initState, .purchase(product),
+                                                              env, iapReducer)
+                                
+                guard case .error(let errorEvent) = nextState.iap.purchasing,
+                    case .failedToCreatePurchase(reason: "PsiCash data not present.") = errorEvent.error else {
+                    return false
+                }
+                
+                return (effectsResults == [[.completed]]) <?> "Feedback effect"
+                    ^&&^
+                    (self.feedbackHandler.logs[0].level == .nonFatal(.error)) <?> "Feedback logs"
+                    ^&&^
+                    (self.feedbackHandler.logs[0].message == "PsiCash IAP purchase without tokens")
+                        <?> "Feedback logs message"
+        }
+        
     }
     
 }
