@@ -60,6 +60,7 @@ func psiCashReducer(
         guard let purchasable = purchasableType.speedBoost else {
             environment.feedbackLogger.fatalError(
                 "Expected a PsiCashPurchasable in '\(purchasableType)'")
+            return []
         }
         state.psiCash.purchasing = .speedBoost(purchasable)
         return [
@@ -72,11 +73,13 @@ func psiCashReducer(
             environment.feedbackLogger.fatalError("""
                 Expected '.speedBoost' state:'\(String(describing: state.psiCash.purchasing))'
                 """)
+            return []
         }
         guard purchaseResult.purchasable.speedBoost != nil else {
             environment.feedbackLogger.fatalError("""
                 Expected '.speedBoost'; purchasable: '\(purchaseResult.purchasable)'
                 """)
+            return []
         }
         
         state.psiCash.libData = purchaseResult.refreshedLibData
@@ -86,6 +89,7 @@ func psiCashReducer(
         case .success(let purchasedType):
             guard case .speedBoost(let purchasedProduct) = purchasedType else {
                 environment.feedbackLogger.fatalError("Expected '.speedBoost' purchased type")
+                return []
             }
             state.psiCash.purchasing = .none
             return [

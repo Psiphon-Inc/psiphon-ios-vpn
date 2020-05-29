@@ -461,6 +461,7 @@ extension SwiftDelegate: SwiftBridgeDelegate {
             ))
         default:
             self.feedbackLogger.fatalError("Unexpected state '\(value.switchedIntent)'")
+            return
         }
     }
     
@@ -501,6 +502,7 @@ extension SwiftDelegate: SwiftBridgeDelegate {
             switch indexed.index {
             case 0:
                 self.feedbackLogger.fatalError("Unexpected index 0")
+                return .empty
             case 1:
                 switch indexed.value {
                 case .nonLoaded:
@@ -522,12 +524,14 @@ extension SwiftDelegate: SwiftBridgeDelegate {
             switch indexed.index {
             case 0:
                 self.feedbackLogger.fatalError("Unexpected index 0")
+                return
             case 1:
                 self.store.send(vpnAction: .reinstallVPNConfig)
             default:
                 switch indexed.value {
                 case .nonLoaded, .noneStored:
                     self.feedbackLogger.fatalError("Unexpected value '\(indexed.value)'")
+                    return
                 case .loaded(_):
                     promise.fulfill(.init(.installedSuccessfully))
                 case .error(let errorEvent):

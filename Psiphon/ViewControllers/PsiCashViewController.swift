@@ -190,6 +190,7 @@ final class PsiCashViewController: UIViewController {
                         
                     case .customDataNotPresent:
                         feedbackLogger.fatalError("Custom data not present")
+                        return
                     }
                 }
                 
@@ -261,6 +262,7 @@ final class PsiCashViewController: UIViewController {
                         Invalid purchase navigation state combination: \
                         '\(String(describing: purchasingNavState))',
                         """)
+                    return
                 }
                 
                 guard observed.state.psiCash.libData.authPackage.hasMinimalTokens else {
@@ -344,6 +346,7 @@ final class PsiCashViewController: UIViewController {
                                 )
                             case .connecting, .disconnecting:
                                 feedbackLogger.fatalError("tunnelState at this point should not be 'connecting'")
+                                return
                             }
 
                         } else {
@@ -362,6 +365,7 @@ final class PsiCashViewController: UIViewController {
                                 rewardedVideoSubtitle = UserStrings.Watch_rewarded_video_and_earn()
                             case .connecting, .disconnecting:
                                 feedbackLogger.fatalError("Unexpected state")
+                                return
                             }
                             
                             let allProducts = observed.state.allProducts(

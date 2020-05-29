@@ -57,6 +57,7 @@ func landingPageReducer(
         }
         guard let tunnelConnection = state.tunnelConnection else {
             environment.feedbackLogger.fatalError("expected a valid tunnel provider")
+            return []
         }
         
         guard let landingPages = NonEmpty(array: environment.sharedDB.getHomepages()) else {
