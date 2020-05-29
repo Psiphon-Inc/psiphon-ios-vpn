@@ -67,8 +67,10 @@ extension Effect {
                 receiveCompletion()
             case .interrupted:
                 feedbackLogger.fatalError("Unexpected effect interruption")
+                return
             case .failed(_):
                 feedbackLogger.fatalError("Effect failed")
+                return
             }
         }
     }

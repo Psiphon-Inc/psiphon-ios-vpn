@@ -163,6 +163,7 @@ func productRequestReducer(
                 Expected SKProductRequest object '\(request)' to match
                 state reference '\(String(describing: state.psiCashRequest))'.
                 """)
+            return []
         }
         state.psiCashRequest = nil
         

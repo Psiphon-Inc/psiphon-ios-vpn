@@ -117,6 +117,7 @@ public func iapReducer(
         guard case let .pending(product) = state.iap.purchasing,
             product == addedPayment.product else {
                 environment.feedbackLogger.fatalError("unexpected purchase added event")
+                return []
         }
         return [
             environment.feedbackLogger.log(.info, "Added payment: '\(addedPayment)'").mapNever()
@@ -221,6 +222,7 @@ public func iapReducer(
     case let ._psiCashConsumableVerificationRequestResult(requestResult, requestTransaction):
         guard let unverifiedPsiCashTx = state.iap.unverifiedPsiCashTx else {
             environment.feedbackLogger.fatalError("expected non-nil 'unverifiedPsiCashTx'")
+            return []
         }
         
         guard case .pendingVerificationResult = unverifiedPsiCashTx.verificationState else {
@@ -228,6 +230,7 @@ public func iapReducer(
                 unexpected state for unverified PsiCash IAP transaction \
                 '\(String(describing: state.iap.unverifiedPsiCashTx))'
                 """)
+            return []
         }
         
         guard unverifiedPsiCashTx.transaction == requestTransaction else {
@@ -236,6 +239,7 @@ public func iapReducer(
                 '\(String(describing: requestTransaction.transactionID()))' != \
                 '\(String(describing: unverifiedPsiCashTx.transaction.transactionID()))'
                 """)
+            return []
         }
         
         switch requestResult {
@@ -334,6 +338,7 @@ public func iapReducer(
                                 environment.feedbackLogger.fatalError(
                                     "unknown product \(String(describing: transaction))"
                                 )
+                                return []
                                 
                             case .psiCash:
                                 switch state.iap.unverifiedPsiCashTx?.transaction
@@ -356,6 +361,7 @@ public func iapReducer(
                                             failed to set 'unverifiedPsiCashTx' \
                                             transaction state: '\(String(describing: s))'
                                             """)
+                                        return []
                                     }
                                     
                                     effects.append(
@@ -387,6 +393,7 @@ public func iapReducer(
                                         new transaction: \
                                         '\(transaction.transactionID())'
                                         """)
+                                    return []
                                 }
 
                             case .subscription:

@@ -97,10 +97,9 @@ public struct FeedbackLogger {
     
     public func fatalError(
         _ message: LogMessage, file: String = #file, line: UInt = #line
-    ) -> Never {
+    ) {
         let tag = "\(file.lastPathComponent):\(line)"
         handler.fatalError(type: tag, message: makeFeedbackEntry(message))
-        Swift.fatalError(tag)
     }
 
     public func precondition(
@@ -109,12 +108,13 @@ public struct FeedbackLogger {
     ) {
         guard condition() else {
             fatalError(message, file: file, line: line)
+            return
         }
     }
 
     public func preconditionFailure(
         _ message: LogMessage, file: String = #file, line: UInt = #line
-    ) -> Never {
+    ) {
         fatalError(message, file: file, line: line)
     }
 

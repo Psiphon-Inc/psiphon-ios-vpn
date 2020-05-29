@@ -24,6 +24,7 @@ final class PsiphonRotatingFileFeedbackLogHandler: FeedbackLogHandler {
     
     func fatalError(type: String, message: String) {
         PsiFeedbackLogger.fatalError(withType: type, message: message)
+        Swift.fatalError(type)
     }
     
     func feedbackLog(level: NonFatalLogLevel, type: String, message: String) {

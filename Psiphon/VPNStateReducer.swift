@@ -106,7 +106,7 @@ enum TPMEffectResultWrapper<T: TunnelProviderManager>: Equatable {
     case configUpdated(ConfigUpdatedResult<T>)
     case syncedStateWithProvider(
         syncReason: TunnelProviderSyncReason,
-        syncResult:TunnelProviderSyncedState,
+        syncResult:TunnelProviderSyncedState?,
         connectionStatus: TunnelProviderVPNStatus
     )
     case startTunnelResult(Result<Utilities.Unit, ErrorEvent<StartTunnelError>>)
@@ -186,6 +186,7 @@ fileprivate func vpnProviderManagerStateReducer<T: TunnelProviderManager>(
                 cannot stopVPN since there is pending action \
                 '\(String(describing: state.vpnState.startStopState))'
                 """)
+            return []
         }
         
         guard case .loaded(let tpm) = state.vpnState.loadState.value,
@@ -222,6 +223,7 @@ fileprivate func vpnProviderManagerStateReducer<T: TunnelProviderManager>(
             
             guard case .nonLoaded = state.vpnState.loadState.value else {
                 environment.feedbackLogger.fatalError("Expected load status of '.nonLoaded' at app launch")
+                return []
             }
             state.vpnState.providerSyncResult = .pending
             return [
@@ -243,6 +245,7 @@ fileprivate func vpnProviderManagerStateReducer<T: TunnelProviderManager>(
                         Expected sync '.pending' synced state at app launch \
                         instead got \(state.vpnState.providerSyncResult)
                         """)
+                    return []
                 }
                 return [
                     syncStateWithProvider(syncReason: reason, tpm, environment.feedbackLogger)
@@ -266,6 +269,7 @@ fileprivate func vpnProviderManagerStateReducer<T: TunnelProviderManager>(
                     Expected sync '.completed(_)' synced state \
                         instead got \(state.vpnState.providerSyncResult)
                     """)
+                    return []
                 }
                 state.vpnState.providerSyncResult = .pending
                 return [
@@ -390,15 +394,22 @@ fileprivate func tunnelProviderReducer<T: TunnelProviderManager>(
         
         return vpnStatusUpdateEffects + loadStateUpdateEffects.map { $0.mapNever() }
         
-    case let .syncedStateWithProvider(reason, syncResult, connectionStatus):
+    case let .syncedStateWithProvider(reason, maybeSyncResult, connectionStatus):
+        
+        guard let syncResult = maybeSyncResult else {
+            environment.feedbackLogger.fatalError("nil sync result")
+            return []
+        }
         
         guard case .pending = state.providerSyncResult else {
             environment.feedbackLogger.fatalError("Unexpected state '\(state.providerSyncResult)'")
+            return []
         }
         guard case let .loaded(tpm) = state.loadState.value else {
             environment.feedbackLogger.fatalError("""
                 Unexpected tunnel provider manager load state \(state.loadState.value)
                 """)
+            return []
         }
                 
         // Updates `state.providerSyncResult` value.
@@ -479,6 +490,7 @@ fileprivate func tunnelProviderReducer<T: TunnelProviderManager>(
                 environment.feedbackLogger.fatalError(
                     "Unexpected state '\(String(describing: state.tunnelIntent))'"
                 )
+                return []
             }
             guard tpm.verifyConfig(forExpectedType: .startVPN) else {
                 // Failed to verify VPN config values.
@@ -549,6 +561,7 @@ fileprivate func tunnelProviderReducer<T: TunnelProviderManager>(
     case .startTunnelResult(let result):
         guard case .pending(.startPsiphonTunnel) = state.startStopState else {
             environment.feedbackLogger.fatalError("Unexpected state '\(String(describing: state.startStopState))'")
+            return []
         }
         switch result {
         case .success(.unit):
@@ -572,6 +585,7 @@ fileprivate func tunnelProviderReducer<T: TunnelProviderManager>(
     case .stopTunnelResult(.unit):
         guard case .pending(.stopVPN) = state.startStopState else {
             environment.feedbackLogger.fatalError("Unexpected state '\(String(describing: state.startStopState))'")
+            return []
         }
         state.startStopState = .completed(.success(.stopVPN))
         return []
@@ -624,6 +638,7 @@ fileprivate func startPsiphonTunnelReducer<T: TunnelProviderManager>(
             cannot startPsiphonTunnel since there is pending action \
             '\(String(describing: state.vpnState.startStopState))'
             """)
+        return []
     }
     
     // No-op if the tunnel provider is already active.
@@ -637,6 +652,7 @@ fileprivate func startPsiphonTunnelReducer<T: TunnelProviderManager>(
     switch state.vpnState.loadState.value {
     case .nonLoaded:
         environment.feedbackLogger.fatalError("Tunnel provider manager no loaded")
+        return []
     case .noneStored, .error(_):
         tpmDeferred = Effect(value: T.make())
     case .loaded(let tpm):
@@ -772,6 +788,7 @@ extension TunnelStartStopIntent {
     ) -> Self? {
         guard case .appLaunched = reason else {
             feedbackLogger.fatalError("initializeIntentGiven should only be called at app launch")
+            return nil
         }
         switch syncResult {
         case .zombie:
@@ -792,6 +809,7 @@ extension TunnelStartStopIntent {
                 return .start(transition: .none)
             @unknown default:
                 feedbackLogger.fatalError("Unknown NEVPNStatus '\(tunnelProviderStatus)'")
+                return nil
             }
         }
     }
@@ -973,7 +991,7 @@ extension TunnelProviderSyncedState {
     fileprivate static func make(
         fromQueryResult result: ProviderStateQueryResult,
         feedbackLogger: FeedbackLogger
-    ) -> Self {
+    ) -> Self? {
         switch result {
         case let .success(response):
             let responseValues = (zombie: response.isZombie,
@@ -991,6 +1009,7 @@ extension TunnelProviderSyncedState {
             default:
                 feedbackLogger.fatalError(
                     "unexpected tunnel provider response '\(response)'")
+                return nil
             }
             
         case let .failure(errorEvent):
@@ -998,14 +1017,14 @@ extension TunnelProviderSyncedState {
             case .providerNotActive:
                 return .inactive
             case .timedout, .neVPNError, .parseError:
-                return .unknown(errorEvent.map { sendError -> SyncError in
-                    guard let syncError = SyncError.make(fromSendError: sendError) else {
-                        feedbackLogger.fatalError("""
-                            failed to map '\(String(describing: errorEvent))' to 'SyncError'
-                            """)
-                    }
-                    return syncError
-                })
+                guard let syncError = SyncError.make(fromSendError: errorEvent.error) else {
+                    feedbackLogger.fatalError("""
+                        failed to map '\(String(describing: errorEvent))' to 'SyncError'
+                        """)
+                    return nil
+                }
+                
+                return .unknown(errorEvent.map { _ in syncError })
             }
         }
     }
