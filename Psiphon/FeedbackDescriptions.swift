@@ -19,6 +19,7 @@
 
 import Foundation
 import PsiApi
+import AppStoreIAP
 
 extension AppState: FeedbackDescription {}
 

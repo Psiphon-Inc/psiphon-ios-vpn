@@ -35,7 +35,7 @@ typealias PsiCashEnvironment = (
     psiCashEffects: PsiCashEffects,
     sharedDB: PsiphonDataSharedDB,
     psiCashPersistedValues: PsiCashPersistedValues,
-    notifier: Notifier,
+    notifier: PsiApi.Notifier,
     vpnActionStore: (VPNPublicAction) -> Effect<Never>,
     // TODO: Remove this dependency from reducer's environment. UI-related effects
     // unnecessarily complicate reducers.
