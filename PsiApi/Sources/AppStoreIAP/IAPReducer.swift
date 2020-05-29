@@ -27,7 +27,7 @@ import PsiCashClient
 public enum IAPAction: Equatable {
     case checkUnverifiedTransaction
     case purchase(IAPPurchasableProduct)
-    case purchaseAdded(PurchaseAddedResult)
+    case _purchaseAdded(AddedPayment)
     case _psiCashConsumableVerificationRequestResult(
         result: RetriableTunneledHttpRequest<PsiCashValidationResponse>.RequestResult,
         forTransaction: PaymentTransaction
@@ -98,26 +98,29 @@ public func iapReducer(
                 state.iap.purchasing = .error(ErrorEvent(
                     .failedToCreatePurchase(reason: "PsiCash data not present.")
                 ))
-                return []
+                return [
+                    environment.feedbackLogger.log(
+                        .error, "PsiCash IAP purchase without tokens"
+                    ).mapNever()
+                ]
             }
         }
     
         state.iap.purchasing = .pending(product)
 
         return [
-            environment.paymentQueue.addPurchase(product)
-                .map(IAPAction.purchaseAdded)
+            environment.paymentQueue.addPayment(product)
+                .map(IAPAction._purchaseAdded)
         ]
         
-    case .purchaseAdded(let result):
-        switch result {
-        case .success(_):
-            return []
-            
-        case .failure(let errorEvent):
-            state.iap.purchasing = .error(errorEvent)
-            return []
+    case ._purchaseAdded(let addedPayment):
+        guard case let .pending(product) = state.iap.purchasing,
+            product == addedPayment.product else {
+                environment.feedbackLogger.fatalError("unexpected purchase added event")
         }
+        return [
+            environment.feedbackLogger.log(.info, "Added payment: '\(addedPayment)'").mapNever()
+        ]
         
     case .receiptUpdated(let maybeReceiptData):
         guard let unverifiedPsiCashTx = state.iap.unverifiedPsiCashTx else {

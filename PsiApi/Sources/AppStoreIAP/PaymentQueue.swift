@@ -23,13 +23,13 @@ import ReactiveSwift
 import PsiApi
 
 public struct PaymentQueue {
-    public let transactions: () -> Effect<[SKPaymentTransaction]>
+    public let transactions: () -> Effect<[PaymentTransaction]>
     public let addPayment: (IAPPurchasableProduct) -> Effect<AddedPayment>
     public let addObserver: (SKPaymentTransactionObserver) -> Effect<Never>
     public let removeObserver: (SKPaymentTransactionObserver) -> Effect<Never>
     public let finishTransaction: (PaymentTransaction) -> Effect<Never>
     
-    public init(transactions: @escaping () -> Effect<[SKPaymentTransaction]>,
+    public init(transactions: @escaping () -> Effect<[PaymentTransaction]>,
                 addPayment: @escaping (IAPPurchasableProduct) -> Effect<AddedPayment>,
                 addObserver: @escaping (SKPaymentTransactionObserver) -> Effect<Never>,
                 removeObserver: @escaping (SKPaymentTransactionObserver) -> Effect<Never>,
@@ -41,14 +41,6 @@ public struct PaymentQueue {
         self.finishTransaction = finishTransaction
     }
     
-    func addPurchase(_ purchasable: IAPPurchasableProduct) -> Effect<PurchaseAddedResult> {
-        transactions().flatMap(.latest) { transactions -> Effect<PurchaseAddedResult> in
-            self.addPayment(purchasable).map {
-                .success($0)
-            }
-        }
-    }
-    
 }
 
 /// Represents a payment that has been added to `SKPaymentQueue`.
@@ -56,11 +48,9 @@ public struct AddedPayment: Equatable {
     public let product: IAPPurchasableProduct
     public let paymentObj: SKPayment
     
-    public init(product: IAPPurchasableProduct, paymentObj: SKPayment) {
+    public init(_ product: IAPPurchasableProduct, _ paymentObj: SKPayment) {
         self.product = product
         self.paymentObj = paymentObj
     }
     
 }
-
-public typealias PurchaseAddedResult = Result<AddedPayment, ErrorEvent<IAPError>>

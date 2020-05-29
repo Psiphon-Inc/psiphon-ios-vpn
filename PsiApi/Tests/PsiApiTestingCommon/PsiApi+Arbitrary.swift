@@ -27,6 +27,13 @@ import Utilities
 @testable import PsiApi
 @testable import AppStoreIAP
 
+func returnGeneratedOrFail<A>(_ gen: Gen<A>?) -> A {
+    guard let generated = gen?.generate else {
+        XCTFatal()
+    }
+    return generated
+}
+
 func positiveDouble() -> Gen<Double> {
     Double.arbitrary.map(abs)
 }
