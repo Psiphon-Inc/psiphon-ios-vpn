@@ -152,7 +152,7 @@ final class IAPReducerTests: XCTestCase {
                                                               env, iapReducer)
                 
                 // Assert
-                return (initState == nextState) && (effectsResults == expectedResult)
+                return (initState ==== nextState) ^&&^ (effectsResults ==== expectedResult)
         }
         
         // No feedback logs are expected
@@ -188,12 +188,12 @@ final class IAPReducerTests: XCTestCase {
                 
                 return (initState.iap.purchasing.completed) <?> "Init state"
                     ^&&^
-                    (nextState.iap.purchasing == .pending(product)) <?> "State is pending"
+                    (nextState.iap.purchasing ==== .pending(product)) <?> "State is pending"
                     ^&&^
-                    (effectsResults == [[.value(._purchaseAdded(AddedPayment(product, mockPayment))),
+                    (effectsResults ==== [[.value(._purchaseAdded(AddedPayment(product, mockPayment))),
                                          .completed]]) <?> "Effect result added purchase"
                     ^&&^
-                    (self.feedbackHandler.logs == []) <?> "Feedback logs"
+                    (self.feedbackHandler.logs ==== []) <?> "Feedback logs"
         }
     
         
@@ -206,11 +206,11 @@ final class IAPReducerTests: XCTestCase {
                 let (nextState, effectsResults) = testReducer(initState, .purchase(product),
                                                               env, iapReducer)
                 
-                return (nextState == initState) <?> "State unchanged"
+                return (nextState ==== initState) <?> "State unchanged"
                     ^&&^
-                    (effectsResults == []) <?> "No effects"
+                    (effectsResults ==== []) <?> "No effects"
                     ^&&^
-                    (self.feedbackHandler.logs == []) <?> "Feedback logs"
+                    (self.feedbackHandler.logs ==== []) <?> "Feedback logs"
         }
     
         
@@ -225,11 +225,11 @@ final class IAPReducerTests: XCTestCase {
                 let (nextState, effectsResults) = testReducer(initState, .purchase(product),
                                                               env, iapReducer)
                                 
-                return (nextState == initState) <?> "State unchanged"
+                return (nextState ==== initState) <?> "State unchanged"
                     ^&&^
-                    (effectsResults == []) <?> "No effects"
+                    (effectsResults ==== []) <?> "No effects"
                     ^&&^
-                    (self.feedbackHandler.logs == []) <?> "Feedback logs"
+                    (self.feedbackHandler.logs ==== []) <?> "Feedback logs"
         }
         
         property("IAPReducer.purchase results in purchase error if PsiCash tokens are missing",
@@ -244,15 +244,16 @@ final class IAPReducerTests: XCTestCase {
                                                               env, iapReducer)
                                 
                 guard case .error(let errorEvent) = nextState.iap.purchasing,
-                    case .failedToCreatePurchase(reason: "PsiCash data not present.") = errorEvent.error else {
+                    case .failedToCreatePurchase(reason: "PsiCash data not present.") =
+                    errorEvent.error else {
                     return false
                 }
                 
-                return (effectsResults == [[.completed]]) <?> "Feedback effect"
+                return (effectsResults ==== [[.completed]]) <?> "Feedback effect"
                     ^&&^
-                    (self.feedbackHandler.logs[0].level == .nonFatal(.error)) <?> "Feedback logs"
+                    (self.feedbackHandler.logs[0].level ==== .nonFatal(.error)) <?> "Feedback logs"
                     ^&&^
-                    (self.feedbackHandler.logs[0].message == "PsiCash IAP purchase without tokens")
+                    (self.feedbackHandler.logs[0].message ==== "PsiCash IAP purchase without tokens")
                         <?> "Feedback logs message"
         }
         
