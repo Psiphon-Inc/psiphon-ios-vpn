@@ -52,7 +52,7 @@ public struct StdoutFeedbackLogger: FeedbackLogHandler {
     
 }
 
-final class ArrayFeedbackLogger: FeedbackLogHandler {
+final class ArrayFeedbackLogHandler: FeedbackLogHandler {
     
     struct Log: Equatable {
         let level: LogLevel

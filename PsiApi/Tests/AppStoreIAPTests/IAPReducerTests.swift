@@ -114,11 +114,11 @@ extension IAPReducerState {
 final class IAPReducerTests: XCTestCase {
     
     let args = CheckerArguments()
-    var feedbackHandler: ArrayFeedbackLogger!
+    var feedbackHandler: ArrayFeedbackLogHandler!
     var feedbackLogger: FeedbackLogger!
     
     override func setUpWithError() throws {
-        feedbackHandler = ArrayFeedbackLogger()
+        feedbackHandler = ArrayFeedbackLogHandler()
         feedbackLogger = FeedbackLogger(feedbackHandler)
         Debugging = .disabled()
     }
