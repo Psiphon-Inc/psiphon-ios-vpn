@@ -61,7 +61,7 @@ public struct ErrorEventDescription<E: HashableError>: HashableError {
     }
 }
 
-extension ErrorEventDescription where E: SystemError {
+extension ErrorEventDescription where E == SystemError {
 
     public init(_ event: ErrorEvent<E>) {
         self.event = event
@@ -91,10 +91,23 @@ public struct ErrorEvent<E: HashableError>: HashableError, FeedbackDescription {
 
 extension ErrorEvent: Codable where E: Codable {}
 
-/// Represents an error that originates from Apple frameworks.
-/// Although `Error` and `NSError` are bridged, all of our errors will be explicitly tagged as `HashableError`
-/// (i.e. `Error & Hashable`).
-public typealias SystemError = NSError
+/// `SystemError` represents an error that originates from Apple frameworks (i.e. constructed from NSError).
+public struct SystemError: HashableError {
+    let domain: String
+    let code: Int
+    
+    public init(_ nsError: NSError) {
+        self.domain = nsError.domain
+        self.code = nsError.code
+    }
+    
+    public init(_ error: Error) {
+        let nsError = error as NSError
+        self.domain = nsError.domain
+        self.code = nsError.code
+    }
+}
+
 public typealias SystemErrorEvent = ErrorEvent<SystemError>
 
 extension Either: Error where A: Error, B: Error {

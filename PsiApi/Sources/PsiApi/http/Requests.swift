@@ -197,7 +197,7 @@ extension HTTPClient {
                     result = .failure(
                         HTTPRequestError(
                             partialResponse: response as? HTTPURLResponse,
-                            errorEvent: ErrorEvent(error as SystemError, date: getCurrentTime())
+                            errorEvent: ErrorEvent(SystemError(error), date: getCurrentTime())
                         )
                     )
                 } else {
@@ -249,7 +249,7 @@ extension URLSessionTask: HTTPRequestTask {
                 result = .failure(
                     HTTPRequestError(
                         partialResponse: response as? HTTPURLResponse,
-                        errorEvent: ErrorEvent(error as SystemError, date: getCurrentTime())
+                        errorEvent: ErrorEvent(SystemError(error), date: getCurrentTime())
                     )
                 )
             } else {

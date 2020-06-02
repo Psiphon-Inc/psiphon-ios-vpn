@@ -447,7 +447,7 @@ SKPaymentTransactionObserver {
     // from the user's purchase history back to the queue.
     public func paymentQueue(_ queue: SKPaymentQueue,
                       restoreCompletedTransactionsFailedWithError error: Error) {
-        storeSend(.restoredCompletedTransactions(error: error as SystemError))
+        storeSend(.restoredCompletedTransactions(error: SystemError(error)))
     }
     
     // Sent when all transactions from the user's purchase history have
