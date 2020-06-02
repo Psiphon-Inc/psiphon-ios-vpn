@@ -92,9 +92,11 @@ func mockIAPEnvironment(
     tunnelConnectionRefSignal: @autoclosure () -> SignalProducer<TunnelConnection?, Never>? = nil,
     psiCashEffects: PsiCashEffects? = nil,
     paymentQueue: PaymentQueue? = nil,
+    clientMetaData: (() -> ClientMetaData)? = nil,
     psiCashStore: ((PsiCashAction) -> Effect<Never>)? = nil,
     appReceiptStore: ((ReceiptStateAction) -> Effect<Never>)? = nil,
-    httpClient: HTTPClient? = nil
+    httpClient: HTTPClient? = nil,
+    getCurrentTime: (() -> Date)? = nil
 ) -> IAPEnvironment {
 
     let _tunnelStatusSignal = tunnelStatusSignal() ?? SignalProducer(value: .connected)
@@ -102,22 +104,22 @@ func mockIAPEnvironment(
     let _tunnelConnectionRefSignal = tunnelConnectionRefSignal() ??
         SignalProducer(value: .some(TunnelConnection { .connection(.connected) }))
         
+    let _clientMetaData = (clientMetaData ?? { ClientMetaData(MockAppInfoProvider()) })()
     let _psiCashStore = psiCashStore ?? { _ in XCTFatal() }
-    
     let _appReceiptStore = appReceiptStore ?? { _ in XCTFatal() }
-    
     let _httpClient = httpClient ?? EchoHTTPClient().client
+    let _getCurrentTime = getCurrentTime ?? { XCTFatal() }
         
     return IAPEnvironment(
         feedbackLogger: feedbackLogger,
         tunnelStatusSignal: _tunnelStatusSignal,
         tunnelConnectionRefSignal: _tunnelConnectionRefSignal,
         psiCashEffects: psiCashEffects ?? PsiCashEffects.mock(),
-        clientMetaData: ClientMetaData(MockAppInfoProvider()),
+        clientMetaData: _clientMetaData,
         paymentQueue: paymentQueue ?? PaymentQueue.mock(),
         psiCashStore: _psiCashStore,
         appReceiptStore: _appReceiptStore,
         httpClient: _httpClient,
-        getCurrentTime: { Date() }
+        getCurrentTime: _getCurrentTime
     )
 }

@@ -129,7 +129,7 @@ extension URL {
 
 /// Emitted by `tunneledHttpRequest` if tunnel is not connect
 /// at the time of the request.
-public enum HttpRequestTunnelError: HashableError {
+public enum HttpRequestTunnelError: String, CaseIterable, HashableError {
     /// Tunnel is not connected.
     case tunnelNotConnected
     /// The weak reference to the tunnel provider manager  is `nil`.

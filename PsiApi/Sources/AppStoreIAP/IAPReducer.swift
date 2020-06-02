@@ -28,12 +28,12 @@ public enum IAPAction: Equatable {
     case checkUnverifiedTransaction
     case purchase(IAPPurchasableProduct)
     case _purchaseAdded(AddedPayment)
+    case receiptUpdated(ReceiptData?)
     case _psiCashConsumableVerificationRequestResult(
         result: RetriableTunneledHttpRequest<PsiCashValidationResponse>.RequestResult,
         forTransaction: PaymentTransaction
     )
     case transactionUpdate(TransactionUpdate)
-    case receiptUpdated(ReceiptData?)
 }
 
 /// StoreKit transaction observer
@@ -138,9 +138,10 @@ public func iapReducer(
             state.iap.unverifiedPsiCashTx = UnverifiedPsiCashTransactionState(
                 transaction: unverifiedPsiCashTx.transaction,
                 verificationState: .requestError(
-                    ErrorEvent(ErrorRepr(repr: "nil receipt"))
+                    ErrorEvent(ErrorRepr(repr: "nil receipt"), date: environment.getCurrentTime())
                 )
             )
+            
             return [
                 environment.feedbackLogger.log(.error, """
                     nil receipt data: \
@@ -155,7 +156,10 @@ public func iapReducer(
             state.iap.unverifiedPsiCashTx = UnverifiedPsiCashTransactionState(
                 transaction: unverifiedPsiCashTx.transaction,
                 verificationState: .requestError(
-                    ErrorEvent(ErrorRepr(repr: "nil custom data"))
+                    ErrorEvent(
+                        ErrorRepr(repr: "nil custom data"),
+                        date: environment.getCurrentTime()
+                    )
                 )
             )
             return [

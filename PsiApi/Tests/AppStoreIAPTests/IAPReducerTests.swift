@@ -120,6 +120,7 @@ final class IAPReducerTests: XCTestCase {
     override func setUpWithError() throws {
         feedbackHandler = ArrayFeedbackLogger()
         feedbackLogger = FeedbackLogger(feedbackHandler)
+        Debugging = .disabled()
     }
     
     override func tearDownWithError() throws {
@@ -259,4 +260,202 @@ final class IAPReducerTests: XCTestCase {
         
     }
     
+    func testPurchasedAddedToPaymentQueue() {
+        
+        let env = mockIAPEnvironment(self.feedbackLogger)
+        
+        property("IAPReducer._purchaseAdded expected purchase added", arguments: args)
+            <-
+            forAll(IAPReducerState.pendingPurchaseState) { (initState: IAPReducerState) in
+                
+                guard case let .pending(product) = initState.iap.purchasing else {
+                    XCTFatal()
+                }
+                
+                let addedPayment = AddedPayment(product, SKPayment())
+                
+                // Test
+                let (nextState, effectsResults) = testReducer(initState,
+                                                              ._purchaseAdded(addedPayment),
+                                                              env, iapReducer)
+                
+                return (initState ==== nextState) <?> "No state change"
+                    ^&&^
+                    (effectsResults ==== [[.completed]]) <?> "Feedback log"
+                    ^&&^
+                    (self.feedbackHandler.logs[0].level ==== .nonFatal(.info)) <?> "Feedback logs"
+                    ^&&^
+                    (self.feedbackHandler.logs[0].message.contains("Added payment:"))
+                    <?> "Feedback logs"
+        }
+    }
+    
+    func testPurchaseAddedToPaymentQueueFail() {
+        
+        let env = mockIAPEnvironment(self.feedbackLogger)
+        
+        property("IAPReducer._purchaseAdded unexpected purchase added", arguments: args)
+            <-
+            forAll(IAPReducerState.nonPurchasingState,
+                   IAPPurchasableProduct.arbitrary,
+                   AddedPayment.arbitrary) {
+                    
+                    (initState: IAPReducerState,
+                    product: IAPPurchasableProduct,
+                    payment: AddedPayment) in
+                    
+                    // Test
+                    let (nextState, effectsResults) = testReducer(initState,
+                                                                  ._purchaseAdded(payment),
+                                                                  env, iapReducer)
+                    
+                    return (initState ==== nextState) <?> "No state change"
+                        ^&&^
+                        (effectsResults ==== []) <?> "No effects"
+                        ^&&^
+                        (self.feedbackHandler.logs[0].level ==== .fatal) <?> "Feedback logs"
+                        ^&&^
+                        (self.feedbackHandler.logs[0].message ==== "unexpected purchase added event")
+                        <?> "Feedback logs"
+        }
+        
+    }
+    
+    func testReceiptUpdates() {
+        
+        let fixedDate = Date()
+        
+        let env = mockIAPEnvironment(
+            FeedbackLogger(feedbackHandler),
+            tunnelStatusSignal: SignalProducer(value: .connected),
+            tunnelConnectionRefSignal: SignalProducer(value:
+                .some(TunnelConnection { .connection(.connected) })),
+            psiCashEffects: .mock(rewardedVideoCustomData: String.arbitrary),
+            getCurrentTime: { () -> Date in return fixedDate }
+        )
+        
+        property("""
+            IAPReducer.receiptUpdated creates a verification request for consumable product
+            for which a request has not been sent yet
+            """, arguments: args)
+            <-
+            forAll { (initState: IAPReducerState, receipt: ReceiptData?) in
+
+                // Resets feedbackHandler logs before each test.
+                self.feedbackHandler.logs = []
+                
+                return conjoin(
+                    
+                    // IAPReducer.receiptUpdated action does not create a second verification request
+                    // for a consumable if one is already pending
+                    (initState.iap.unverifiedPsiCashTx?.verificationState == .pendingVerificationResult) ==> {
+                        let (nextState, effectsResults) = testReducer(initState,
+                                                                      .receiptUpdated(receipt),
+                                                                      env, iapReducer)
+                        return (nextState ==== initState) ^&&^ (effectsResults ==== [])
+                    },
+                    
+                    // IAPReducer.receiptUpdated logs error if receipt is nil but there is a
+                    // consumable transaction pending verification
+                    (initState.iap.unverifiedPsiCashTx != nil &&
+                        initState.iap.unverifiedPsiCashTx?.verificationState != .pendingVerificationResult &&
+                        receipt == nil) ==> {
+                            
+                            var expectedNext = initState
+                            expectedNext.iap.unverifiedPsiCashTx = UnverifiedPsiCashTransactionState(
+                                transaction: initState.iap.unverifiedPsiCashTx!.transaction,
+                                verificationState: .requestError(
+                                    ErrorEvent(ErrorRepr(repr: "nil receipt"), date: fixedDate)
+                                )
+                            )
+                            
+                            let (nextState, effectsResults) = testReducer(initState,
+                                                                          .receiptUpdated(receipt),
+                                                                          env, iapReducer)
+                            
+                            return (nextState ==== expectedNext)
+                                ^&&^
+                                (effectsResults ==== [[.completed]]) <?> "Logged event"
+                                ^&&^
+                                (self.feedbackHandler.logs.count ==== 1)
+                                ^&&^
+                                (self.feedbackHandler.logs[0].level ==== .nonFatal(.error))
+                                ^&&^
+                                (self.feedbackHandler.logs[0].message.contains("nil receipt data"))
+                    },
+                    
+                    // IAPReducer.receiptUpdated creates a network request to verify
+                    // consumable purchase if all conditions set below are met.
+                    (initState.iap.unverifiedPsiCashTx != nil &&
+                        initState.iap.unverifiedPsiCashTx?.verificationState != .pendingVerificationResult &&
+                        receipt != nil) ==> {
+                            
+                            // Arrange
+                            let mockHttp = MockHTTPClient(Generator(sequence: [
+                                .success(Data())
+                            ]))
+                            
+                            let httpEnv = mockIAPEnvironment(
+                                FeedbackLogger(self.feedbackHandler),
+                                tunnelStatusSignal: SignalProducer(value: .connected),
+                                tunnelConnectionRefSignal: SignalProducer(value:
+                                    .some(TunnelConnection { .connection(.connected) })),
+                                psiCashEffects: .mock(rewardedVideoCustomData: String.arbitrary),
+                                httpClient: mockHttp.client,
+                                getCurrentTime: { () -> Date in return fixedDate }
+                            )
+
+                            // Before the request is submitted, verificationState is expected
+                            // to be in a pending state.
+                            var expectedNext = initState
+                            expectedNext.iap.unverifiedPsiCashTx = UnverifiedPsiCashTransactionState(
+                                transaction: initState.iap.unverifiedPsiCashTx!.transaction,
+                                verificationState: .pendingVerificationResult
+                            )
+                            
+                            let paymentTransaction = initState.iap.unverifiedPsiCashTx!.transaction
+                            
+                            // Act
+                            let (nextState, effectsResults) = testReducer(initState,
+                                                                          .receiptUpdated(receipt),
+                                                                          httpEnv, iapReducer)
+                            
+                            return (nextState ==== expectedNext)
+                                ^&&^
+                                (effectsResults ====
+                                    [[.value(._psiCashConsumableVerificationRequestResult(
+                                        result: .completed(.success(.unit)),
+                                        forTransaction: paymentTransaction)),
+                                      .completed],
+                                     [.completed],
+                                     [.completed]]
+                                )
+                                ^&&^
+                                (self.feedbackHandler.logs.count ==== 2)
+                            
+                    }
+                    
+                )
+        }
+        
+    }
+    
+    func testPsiCashConsumableVerificationRequestResult() {
+        
+        let fixedDate = Date()
+        
+        let env = mockIAPEnvironment(
+            FeedbackLogger(feedbackHandler),
+            tunnelStatusSignal: SignalProducer(value: .connected),
+            tunnelConnectionRefSignal: SignalProducer(value:
+                .some(TunnelConnection { .connection(.connected) })),
+            psiCashEffects: .mock(rewardedVideoCustomData: String.arbitrary),
+            getCurrentTime: { () -> Date in return fixedDate }
+        )
+        
+        
+        
+    }
+    
 }
+

@@ -19,7 +19,7 @@
 
 // Copied from https://gist.github.com/ollieatkinson/322338df8a5220d649ac01ff11e7de12
 
-public enum HTTPStatusCode: Int, Error {
+public enum HTTPStatusCode: Int, CaseIterable, Error {
     
     /// The response class representation of status codes, these get grouped by their first digit.
     enum ResponseType {
