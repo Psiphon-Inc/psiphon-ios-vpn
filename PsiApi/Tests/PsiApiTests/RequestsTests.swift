@@ -38,14 +38,14 @@ struct RetriableTestResponse: RetriableHTTPResponse {
     
     init(urlSessionResult: URLSessionResult) {
         switch urlSessionResult {
-        case let .success((dataBytes, urlResponse)):
+        case let .success((dataBytes, metadata)):
             let data = String(bytes: dataBytes, encoding: .utf8)!
-            switch urlResponse.typedStatusCode {
+            switch metadata.statusCode {
             case .ok:
                 self.result = .success(data)
             default:
                 self.result = .failure(ErrorEvent(ErrorRepr(
-                    repr: "status code: '\(urlResponse.statusCode)' data: '\(data)'"
+                    repr: "status code: '\(metadata.statusCode)' data: '\(data)'"
                 )))
             }
         case let .failure(requestError):
@@ -372,9 +372,9 @@ final class RequestsTests: XCTestCase {
         
         // HTTPClient error date should match expected response error date.
         self.echoHttpClient.responseSequence = Generator(sequence:
-            [.failure(HTTPRequestError(partialResponse: nil, errorEvent: httpClientError)),
-             .failure(HTTPRequestError(partialResponse: nil, errorEvent: httpClientError)),
-             .failure(HTTPRequestError(partialResponse: nil, errorEvent: httpClientError))]
+            [.failure(HTTPRequestError(partialResponseMetadata: nil, errorEvent: httpClientError)),
+             .failure(HTTPRequestError(partialResponseMetadata: nil, errorEvent: httpClientError)),
+             .failure(HTTPRequestError(partialResponseMetadata: nil, errorEvent: httpClientError))]
         )
         
         let retryInterval = DispatchTimeInterval.milliseconds(1)
@@ -433,7 +433,7 @@ final class RequestsTests: XCTestCase {
         
         // HTTPClient error date should match expected response error date.
         self.echoHttpClient.responseSequence = Generator(sequence:
-            [.failure(HTTPRequestError(partialResponse: nil, errorEvent: httpClientError)),
+            [.failure(HTTPRequestError(partialResponseMetadata: nil, errorEvent: httpClientError)),
              .success(())]
         )
         

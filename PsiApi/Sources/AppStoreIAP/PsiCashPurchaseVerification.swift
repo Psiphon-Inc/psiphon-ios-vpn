@@ -46,19 +46,19 @@ public struct PsiCashValidationRequest: Encodable {
 public struct PsiCashValidationResponse: RetriableHTTPResponse {
     public enum ResponseError: HashableError {
         case failedRequest(SystemError)
-        case errorStatusCode(HTTPURLResponse)
+        case errorStatusCode(HTTPResponseMetadata)
     }
 
     public let result: Result<Utilities.Unit, ErrorEvent<ResponseError>>
 
     public init(urlSessionResult: URLSessionResult) {
         switch urlSessionResult {
-        case let .success((_, urlResponse)):
-            switch urlResponse.typedStatusCode {
+        case let .success((_, metadata)):
+            switch metadata.statusCode {
             case .ok:
                 self.result = .success(.unit)
             default:
-                self.result = .failure(ErrorEvent(.errorStatusCode(urlResponse)))
+                self.result = .failure(ErrorEvent(.errorStatusCode(metadata)))
             }
         case let .failure(httpRequestError):
             self.result = .failure(httpRequestError.errorEvent.map { .failedRequest($0) })
@@ -84,9 +84,9 @@ public struct PsiCashValidationResponse: RetriableHTTPResponse {
                 // unrelated to a response from the server.
                 return (result: result, retryDueToError: errorEvent)
                 
-            case .errorStatusCode(let httpUrlResponse):
+            case .errorStatusCode(let metadata):
                 // Received a non-200 OK response from the server.
-                switch httpUrlResponse.typedStatusCode {
+                switch metadata.statusCode {
                 case .internalServerError,
                      .serviceUnavailable:
                     // Retry if the HTTP status code is 500 or 503.

@@ -102,8 +102,8 @@ public struct SubscriptionValidationResponse: RetriableHTTPResponse {
 
         // TODO: The mapping of types of `urlSessionResult` to `result` can be generalized.
         switch urlSessionResult {
-        case let .success((data, urlResponse)):
-            switch urlResponse.typedStatusCode {
+        case let .success((data, metadata)):
+            switch metadata.statusCode {
             case .ok:
                 do {
                     let decoder = JSONDecoder.makeRfc3339Decoder()
@@ -116,7 +116,7 @@ public struct SubscriptionValidationResponse: RetriableHTTPResponse {
                 self.result = .failure(ErrorEvent(.badRequest))
             default:
                 self.result = .failure(ErrorEvent(
-                    .otherErrorStatusCode(urlResponse.typedStatusCode)))
+                    .otherErrorStatusCode(metadata.statusCode)))
             }
         case let .failure(httpRequestError):
             self.result = .failure(httpRequestError.errorEvent.map { .failedRequest($0) })
