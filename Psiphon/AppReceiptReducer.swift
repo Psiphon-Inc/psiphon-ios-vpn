@@ -129,8 +129,7 @@ final class ReceiptRefreshRequestDelegate: StoreDelegate<ReceiptStateAction>, SK
     }
 
     func request(_ request: SKRequest, didFailWithError error: Error) {
-        let errorEvent = ErrorEvent(error as NSError)
-        storeSend(._remoteReceiptRefreshResult(.failure(errorEvent)))
+        storeSend(._remoteReceiptRefreshResult(.failure(ErrorEvent(SystemError(error)))))
     }
 
 }

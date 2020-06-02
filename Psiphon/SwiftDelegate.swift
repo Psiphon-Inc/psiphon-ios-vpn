@@ -99,13 +99,13 @@ extension SwiftDelegate: RewardedVideoAdBridgeDelegate {
         )
     }
     
-    func adLoadStatus(_ status: AdLoadStatus, error: SystemError?) {
+    func adLoadStatus(_ status: AdLoadStatus, error: NSError?) {
         let loadResult: RewardedVideoLoad
         if let error = error {
             // Note that error event is created here as opposed to the origin
             // of where the error occurred. However this is acceptable as long as
             // this function is called once for each error that happened almost immediately.
-            loadResult = .failure(ErrorEvent(.adSDKError(error)))
+            loadResult = .failure(ErrorEvent(.adSDKError(SystemError(error))))
         } else {
             if case .error = status {
                 loadResult = .failure(ErrorEvent(.requestedAdFailedToLoad))

@@ -110,7 +110,7 @@ public struct SubscriptionValidationResponse: RetriableHTTPResponse {
                     let decodedBody = try decoder.decode(SuccessResult.self, from: data)
                     self.result = .success(decodedBody)
                 } catch {
-                    self.result = .failure(ErrorEvent(.responseParseError(error as SystemError)))
+                    self.result = .failure(ErrorEvent(.responseParseError(SystemError(error))))
                 }
             case .badRequest:
                 self.result = .failure(ErrorEvent(.badRequest))
