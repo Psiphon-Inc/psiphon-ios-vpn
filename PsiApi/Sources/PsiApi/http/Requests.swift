@@ -31,9 +31,28 @@ public enum HTTPContentType: String, HTTPHeader {
     public static var headerKey: String { "Content-Type" }
 }
 
+public struct HTTPResponseMetadata: Hashable {
+    public let url: URL
+    public let headers: [String: String]
+    public let statusCode: HTTPStatusCode
+    
+    public init(url: URL, headers: [String: String], statusCode: HTTPStatusCode) {
+        self.url = url
+        self.headers = headers
+        self.statusCode = statusCode
+    }
+    
+    public init(_ httpURLResponse: HTTPURLResponse) {
+        self.url = httpURLResponse.url!
+        self.headers = httpURLResponse.allHeaderFields as! [String: String]
+        self.statusCode = HTTPStatusCode(rawValue: httpURLResponse.statusCode)!
+    }
+}
+
 /// A success case means that the HTTP request succeeded and server returned a response,
 /// the response from the server might itself contain an error.
-public typealias URLSessionResult = Result<(data: Data, response: HTTPURLResponse), HTTPRequestError>
+public typealias URLSessionResult =
+    Result<(data: Data, response: HTTPResponseMetadata), HTTPRequestError>
 
 public protocol HTTPHeader {
     static var headerKey: String { get }
@@ -111,7 +130,7 @@ public struct HTTPRequestError: Error {
     /// If a response from the server is received, regardless of whether the request
     /// completes successfully or fails, the response parameter contains that information.
     /// From: https://developer.apple.com/documentation/foundation/urlsession/1410330-datatask
-    public let partialResponse: HTTPURLResponse?
+    public let partialResponseMetadata: HTTPResponseMetadata?
     public let errorEvent: ErrorEvent<SystemError>
 }
 
@@ -196,14 +215,17 @@ extension HTTPClient {
                     // If URLSession task resulted in an error, there might be a partial response.
                     result = .failure(
                         HTTPRequestError(
-                            partialResponse: response as? HTTPURLResponse,
+                            partialResponseMetadata: (response as? HTTPURLResponse)
+                                .map(HTTPResponseMetadata.init),
                             errorEvent: ErrorEvent(SystemError(error), date: getCurrentTime())
                         )
                     )
                 } else {
                     // If `error` is nil, then URLSession task callback guarantees that
                     // `data` and `response` are non-nil.
-                    result = .success((data: data!, response: response! as! HTTPURLResponse))
+                    result = .success(
+                        (data: data!, response: HTTPResponseMetadata(response! as! HTTPURLResponse))
+                    )
                 }
                 completionHandler(result)
             }
@@ -211,58 +233,6 @@ extension HTTPClient {
             return sessionTask
         }
     }
-    
-}
-
-protocol HTTPRequestTask {
-    
-    static func request<Response>(
-        getCurrentTime: @escaping () -> Date,
-        _ requestData: HTTPRequest<Response>,
-        handler: @escaping (Response) -> Void
-    ) -> HTTPRequestTask
-    
-    func cancel()
-    
-}
-
-extension URLSessionTask: HTTPRequestTask {
-    
-    static func request<Response>(
-        getCurrentTime: @escaping () -> Date,
-        _ requestData: HTTPRequest<Response>,
-        handler: @escaping (Response) -> Void
-    ) -> HTTPRequestTask {
-        
-        guard requestData.urlRequest.url?.isSchemeHttp ?? false else {
-            fatalError(
-                "Expected HTTP/HTTPS request '\(String(describing: requestData.urlRequest.url))'"
-            )
-        }
-        
-        let config = URLSessionConfiguration.ephemeral
-        let session = URLSession(configuration: config).dataTask(with: requestData.urlRequest)
-        { data, response, error in
-            let result: URLSessionResult
-            if let error = error {
-                // If URLSession task resulted in an error, there might be a partial response.
-                result = .failure(
-                    HTTPRequestError(
-                        partialResponse: response as? HTTPURLResponse,
-                        errorEvent: ErrorEvent(SystemError(error), date: getCurrentTime())
-                    )
-                )
-            } else {
-                // If `error` is nil, then URLSession task callback guarantees that
-                // `data` and `response` are non-nil.
-                result = .success((data: data!, response: response! as! HTTPURLResponse))
-            }
-            handler(Response(urlSessionResult: result))
-        }
-        session.resume()
-        return session
-    }
-
     
 }
 

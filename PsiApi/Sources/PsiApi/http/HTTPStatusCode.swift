@@ -292,14 +292,3 @@ public enum HTTPStatusCode: Int, CaseIterable, Error {
     }
     
 }
-
-import Foundation
-
-extension HTTPURLResponse {
-    
-    /// Same as `statusCode` property, but typed.
-    public var typedStatusCode: HTTPStatusCode {
-        return HTTPStatusCode(rawValue: statusCode)!
-    }
-    
-}

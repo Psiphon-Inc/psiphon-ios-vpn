@@ -47,7 +47,6 @@ final class MockHTTPClient {
     var responseDelay: DispatchTimeInterval = .milliseconds(0)
     var responseStatusCode = HTTPStatusCode.ok
     var requestCount: Int = 0
-    var httpVersion = "HTTP/1.1"
     var headers = [String: String]()
     
     init(_ responseSequence: Generator<Result<Data, HTTPRequestError>>) {
@@ -69,13 +68,12 @@ final class MockHTTPClient {
             }
             
             let sessionResult: URLSessionResult = response.map { responseData
-                -> (data: Data, response: HTTPURLResponse) in
+                -> (data: Data, response: HTTPResponseMetadata) in
                 (data: responseData,
-                 response: HTTPURLResponse(
+                 response: HTTPResponseMetadata(
                     url: url,
-                    statusCode: self.responseStatusCode.rawValue,
-                    httpVersion: self.httpVersion,
-                    headerFields: self.headers)!)
+                    headers: self.headers,
+                    statusCode: self.responseStatusCode))
             }
             
             completionHandler(sessionResult)
@@ -96,7 +94,6 @@ final class EchoHTTPClient {
     var responseDelay: DispatchTimeInterval = .milliseconds(0)
     var responseStatusCode = HTTPStatusCode.ok
     var requestCount: Int = 0
-    var httpVersion = "HTTP/1.1"
     var headers = [String: String]()
     
     init() {}
@@ -128,13 +125,12 @@ final class EchoHTTPClient {
             }
             
             let sessionResult: URLSessionResult = response.map { _
-                -> (data: Data, response: HTTPURLResponse) in
+                -> (data: Data, response: HTTPResponseMetadata) in
                 (data: resp,
-                 response: HTTPURLResponse(
+                 response: HTTPResponseMetadata(
                     url: url,
-                    statusCode: self.responseStatusCode.rawValue,
-                    httpVersion: self.httpVersion,
-                    headerFields: self.headers)!)
+                    headers: self.headers,
+                    statusCode: self.responseStatusCode))
             }
             
             completionHandler(sessionResult)
