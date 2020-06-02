@@ -40,6 +40,54 @@ extension HTTPRequest {
     
 }
 
+final class MockHTTPClient {
+    
+    private(set) var responseSequence: Generator<Result<Data, HTTPRequestError>>
+    
+    var responseDelay: DispatchTimeInterval = .milliseconds(0)
+    var responseStatusCode = HTTPStatusCode.ok
+    var requestCount: Int = 0
+    var httpVersion = "HTTP/1.1"
+    var headers = [String: String]()
+    
+    init(_ responseSequence: Generator<Result<Data, HTTPRequestError>>) {
+        self.responseSequence = responseSequence
+    }
+    
+    lazy var client = HTTPClient(urlSession: URLSession.shared) { _, _, request, completionHandler -> CancellableURLRequest in
+
+        guard let url = request.url else {
+            XCTFatal()
+        }
+        
+        self.requestCount += 1
+                    
+        DispatchQueue.global().asyncAfter(deadline: .now() + self.responseDelay) {
+            
+            guard let response = self.responseSequence.next() else {
+                XCTFatal()
+            }
+            
+            let sessionResult: URLSessionResult = response.map { responseData
+                -> (data: Data, response: HTTPURLResponse) in
+                (data: responseData,
+                 response: HTTPURLResponse(
+                    url: url,
+                    statusCode: self.responseStatusCode.rawValue,
+                    httpVersion: self.httpVersion,
+                    headerFields: self.headers)!)
+            }
+            
+            completionHandler(sessionResult)
+
+        }
+        
+        return MockCancellableURLRequest()
+    }
+
+    
+}
+
 final class EchoHTTPClient {
     
     var responseSequence: Generator<Result<(), HTTPRequestError>>
@@ -53,7 +101,7 @@ final class EchoHTTPClient {
     
     init() {}
     
-    lazy var client = HTTPClient(urlSession: URLSession()) { _, _, request, completionHandler -> CancellableURLRequest in
+    lazy var client = HTTPClient(urlSession: URLSession.shared) { _, _, request, completionHandler -> CancellableURLRequest in
         
         guard let httpBody = request.httpBody else {
             XCTFatal()
