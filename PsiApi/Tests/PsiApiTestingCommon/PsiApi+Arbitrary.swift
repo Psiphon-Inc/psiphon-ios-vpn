@@ -84,6 +84,15 @@ extension ErrorEvent: Arbitrary where E: Arbitrary {
     }
 }
 
+extension SystemError: Arbitrary {
+    public static var arbitrary: Gen<SystemError> {
+        Gen.compose { c in
+            SystemError(domain: c.generate(),
+                        code: c.generate())
+        }
+    }
+}
+
 extension Locale: Arbitrary {
     public static var arbitrary: Gen<Locale> {
         Gen.fromElements(of: Locale.availableIdentifiers).map(Locale.init(identifier:))

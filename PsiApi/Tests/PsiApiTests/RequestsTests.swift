@@ -368,7 +368,7 @@ final class RequestsTests: XCTestCase {
         
         let expectedResponse = RetriableTestResponse(result: .failure(responseErrorEvent))
                 
-        let httpClientError = ErrorEvent(SystemError(), date: errorDate)
+        let httpClientError = ErrorEvent(SystemError.arbitrary.generate, date: errorDate)
         
         // HTTPClient error date should match expected response error date.
         self.echoHttpClient.responseSequence = Generator(sequence:
@@ -429,7 +429,7 @@ final class RequestsTests: XCTestCase {
         
         let expectedResponse = RetriableTestResponse(result: .failure(responseErrorEvent))
                 
-        let httpClientError = ErrorEvent(SystemError(), date: errorDate)
+        let httpClientError = ErrorEvent(SystemError.arbitrary.generate, date: errorDate)
         
         // HTTPClient error date should match expected response error date.
         self.echoHttpClient.responseSequence = Generator(sequence:
