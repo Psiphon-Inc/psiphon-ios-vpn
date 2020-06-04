@@ -42,7 +42,10 @@ final class SubscriptionAuthStateTest : XCTestCase {
             
             while let action = actions.popLast() {
 
-                let output = SubscriptionAuthStateTest.runReducer(effectsTimeout: 5,
+                // Note: a low, but non-zero, timeout is set because some effects
+                // returned by the reducer are never completed. A zero timeout
+                // causes the timer to expire before the completing effects complete.
+                let output = SubscriptionAuthStateTest.runReducer(effectsTimeout: 0.1,
                                                                   state: inputState,
                                                                   action: action,
                                                                   env: env)
