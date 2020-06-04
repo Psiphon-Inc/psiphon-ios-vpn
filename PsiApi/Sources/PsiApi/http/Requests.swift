@@ -31,6 +31,16 @@ public enum HTTPContentType: String, HTTPHeader {
     public static var headerKey: String { "Content-Type" }
 }
 
+public struct HTTPResponseData: Hashable {
+    public let metadata: HTTPResponseMetadata
+    public let data: Data
+
+    public init(data: Data, metadata: HTTPResponseMetadata) {
+        self.data = data
+        self.metadata = metadata
+    }
+}
+
 public struct HTTPResponseMetadata: Hashable {
     public let url: URL
     public let headers: [String: String]
@@ -52,7 +62,7 @@ public struct HTTPResponseMetadata: Hashable {
 /// A success case means that the HTTP request succeeded and server returned a response,
 /// the response from the server might itself contain an error.
 public typealias URLSessionResult =
-    Result<(data: Data, response: HTTPResponseMetadata), HTTPRequestError>
+    Result<HTTPResponseData, HTTPRequestError>
 
 public protocol HTTPHeader {
     static var headerKey: String { get }
@@ -224,7 +234,7 @@ extension HTTPClient {
                     // If `error` is nil, then URLSession task callback guarantees that
                     // `data` and `response` are non-nil.
                     result = .success(
-                        (data: data!, response: HTTPResponseMetadata(response! as! HTTPURLResponse))
+                        HTTPResponseData(data: data!, metadata: HTTPResponseMetadata(response! as! HTTPURLResponse))
                     )
                 }
                 completionHandler(result)

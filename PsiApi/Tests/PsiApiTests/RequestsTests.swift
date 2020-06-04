@@ -38,14 +38,14 @@ struct RetriableTestResponse: RetriableHTTPResponse {
     
     init(urlSessionResult: URLSessionResult) {
         switch urlSessionResult {
-        case let .success((dataBytes, metadata)):
-            let data = String(bytes: dataBytes, encoding: .utf8)!
-            switch metadata.statusCode {
+        case let .success(r):
+            let data = String(bytes: r.data, encoding: .utf8)!
+            switch r.metadata.statusCode {
             case .ok:
                 self.result = .success(data)
             default:
                 self.result = .failure(ErrorEvent(ErrorRepr(
-                    repr: "status code: '\(metadata.statusCode)' data: '\(data)'"
+                    repr: "status code: '\(r.metadata.statusCode)' data: '\(data)'"
                 )))
             }
         case let .failure(requestError):
@@ -419,7 +419,7 @@ final class RequestsTests: XCTestCase {
         
         XCTAssert(self.echoHttpClient.responseSequence.exhausted)
     }
-    
+
     func testRetryWithHttpStatusErrorThenSuccess() {
         
         // Arrange

@@ -54,7 +54,7 @@ public struct SubscriptionValidationResponse: RetriableHTTPResponse {
         public let errorStatus: ErrorStatus
         public let errorDescription: String
         
-        public enum ErrorStatus: Int, Decodable {
+        public enum ErrorStatus: Int, Decodable, CaseIterable {
             case noError = 0
             case transactionExpired = 1
             // The transaction has been cancelled by Apple customer support
@@ -67,6 +67,17 @@ public struct SubscriptionValidationResponse: RetriableHTTPResponse {
             case signedAuthorization = "signed_authorization"
             case errorStatus = "error_status"
             case errorDescription = "error_description"
+        }
+
+        public init(requestDate: Date, originalTransactionID: OriginalTransactionID,
+                    signedAuthorization: PsiApi.SignedData<SignedAuthorization>,
+                    errorStatus: ErrorStatus, errorDescription: String) {
+
+            self.requestDate = requestDate
+            self.originalTransactionID = originalTransactionID
+            self.signedAuthorization = signedAuthorization
+            self.errorStatus = errorStatus
+            self.errorDescription = errorDescription
         }
         
         public init(from decoder: Decoder) throws {
@@ -102,12 +113,12 @@ public struct SubscriptionValidationResponse: RetriableHTTPResponse {
 
         // TODO: The mapping of types of `urlSessionResult` to `result` can be generalized.
         switch urlSessionResult {
-        case let .success((data, metadata)):
-            switch metadata.statusCode {
+        case let .success(r):
+            switch r.metadata.statusCode {
             case .ok:
                 do {
                     let decoder = JSONDecoder.makeRfc3339Decoder()
-                    let decodedBody = try decoder.decode(SuccessResult.self, from: data)
+                    let decodedBody = try decoder.decode(SuccessResult.self, from: r.data)
                     self.result = .success(decodedBody)
                 } catch {
                     self.result = .failure(ErrorEvent(.responseParseError(SystemError(error))))
@@ -116,7 +127,7 @@ public struct SubscriptionValidationResponse: RetriableHTTPResponse {
                 self.result = .failure(ErrorEvent(.badRequest))
             default:
                 self.result = .failure(ErrorEvent(
-                    .otherErrorStatusCode(metadata.statusCode)))
+                    .otherErrorStatusCode(r.metadata.statusCode)))
             }
         case let .failure(httpRequestError):
             self.result = .failure(httpRequestError.errorEvent.map { .failedRequest($0) })

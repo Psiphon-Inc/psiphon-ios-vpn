@@ -53,12 +53,12 @@ public struct PsiCashValidationResponse: RetriableHTTPResponse {
 
     public init(urlSessionResult: URLSessionResult) {
         switch urlSessionResult {
-        case let .success((_, metadata)):
-            switch metadata.statusCode {
+        case let .success(r):
+            switch r.metadata.statusCode {
             case .ok:
                 self.result = .success(.unit)
             default:
-                self.result = .failure(ErrorEvent(.errorStatusCode(metadata)))
+                self.result = .failure(ErrorEvent(.errorStatusCode(r.metadata)))
             }
         case let .failure(httpRequestError):
             self.result = .failure(httpRequestError.errorEvent.map { .failedRequest($0) })

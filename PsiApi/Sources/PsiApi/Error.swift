@@ -96,11 +96,6 @@ public struct SystemError: HashableError {
     let domain: String
     let code: Int
     
-    init(domain: String, code: Int) {
-        self.domain = domain
-        self.code = code
-    }
-    
     public init(_ nsError: NSError) {
         self.domain = nsError.domain
         self.code = nsError.code

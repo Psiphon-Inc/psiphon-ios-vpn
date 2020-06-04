@@ -104,7 +104,7 @@ final class SubscriptionStateTest: XCTestCase {
                         return true
                     }
 
-                    let isExpired = SubscriptionStateTest.isApproxExpired(date: purchaseWithLatestExpiry.expires)
+                    let isExpired = isApproximatelyExpired(date: purchaseWithLatestExpiry.expires)
 
                     guard !isExpired else {
                         return true
@@ -131,7 +131,7 @@ final class SubscriptionStateTest: XCTestCase {
                         return false
                     }
 
-                    let isExpired = SubscriptionStateTest.isApproxExpired(date: purchaseWithLatestExpiry.expires)
+                    let isExpired = isApproximatelyExpired(date: purchaseWithLatestExpiry.expires)
 
                     guard !isExpired else {
                         return false
@@ -388,7 +388,7 @@ final class SubscriptionStateTest: XCTestCase {
             },
             compareDates: { date1, date2, _ -> ComparisonResult in
                 // NOTE: overrides granularity set by reducer for second level granularity.
-                return SubscriptionStateTest.compareDates(date1, to: date2)
+                return compareDates(date1, to: date2)
             },
             singleFireTimer: { _,_ in SignalProducer(value: ())} // fire timer immediately
         )
@@ -404,19 +404,4 @@ final class SubscriptionStateTest: XCTestCase {
                               receiptStateActions: receiptStateActions)
 
     }
-
-    static func compareDates(_ date1: Date, to date2: Date) -> ComparisonResult {
-        return Calendar.current.compare(date1,
-                                        to: date2,
-                                        toGranularity: .second)
-    }
-
-    static func isApproxExpired(date: Date) -> Bool {
-        switch SubscriptionStateTest.compareDates(Date(), to: date) {
-            case .orderedAscending: return false
-            case .orderedDescending: return true
-            case .orderedSame: return true
-        }
-    }
-
 }

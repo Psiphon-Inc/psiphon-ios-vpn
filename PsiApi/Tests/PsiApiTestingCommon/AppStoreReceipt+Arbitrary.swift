@@ -54,3 +54,24 @@ extension ReceiptData: Arbitrary {
         }
     }
 }
+
+extension ReceiptReadReason: Arbitrary {
+    public static var arbitrary: Gen<ReceiptReadReason> {
+        Gen<ReceiptReadReason>.fromElements(of: ReceiptReadReason.allCases)
+    }
+}
+
+// Mirror of function of the same name in `SubscriptionIAPPurchase` for testing.
+func isApproximatelyExpired(date: Date) -> Bool {
+    switch compareDates(Date(), to: date) {
+        case .orderedAscending: return false
+        case .orderedDescending: return true
+        case .orderedSame: return true
+    }
+}
+
+func compareDates(_ date1: Date, to date2: Date) -> ComparisonResult {
+    return Calendar.current.compare(date1,
+                                    to: date2,
+                                    toGranularity: .second)
+}
