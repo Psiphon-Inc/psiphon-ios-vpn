@@ -43,6 +43,8 @@ extension SubscriptionAuthStateReducerEnvironment: Arbitrary {
             return SubscriptionAuthStateReducerEnvironment(
                 feedbackLogger: FeedbackLogger(StdoutFeedbackLogger()),
                 httpClient: c.generate(),
+                httpRequestRetryCount: 0,
+                httpRequestRetryInterval: DispatchTimeInterval.seconds(0),
                 notifier: DevNullNotifier(),
                 notifierUpdatedSubscriptionAuthsMessage: c.generate(),
                 sharedDB: sharedDBContainer,
