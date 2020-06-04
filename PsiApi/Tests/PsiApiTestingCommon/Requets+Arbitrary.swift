@@ -75,21 +75,6 @@ Response.Success: Arbitrary, Response.Failure: Arbitrary {
     }
 }
 
-final class MockHTTPURLResponse: HTTPURLResponse {}
-
-extension MockHTTPURLResponse: Arbitrary {
-    static var arbitrary: Gen<MockHTTPURLResponse> {
-        Gen.compose { c in
-
-            // Note: url unused in testing
-            MockHTTPURLResponse(url: URL(string: "https://example.com")!,
-                                statusCode: c.generate(using: HTTPStatusCode.arbitrary).rawValue,
-                                httpVersion: c.generate(using:httpVersionGen()),
-                                headerFields: nil)
-        }.suchThat{ $0 != nil }.map{$0!}
-    }
-}
-
 struct CancellableURLRequestDisposable : CancellableURLRequest {
     let disposable: Disposable
 
