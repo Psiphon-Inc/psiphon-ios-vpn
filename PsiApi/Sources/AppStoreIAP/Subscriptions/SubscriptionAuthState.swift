@@ -26,7 +26,7 @@ public struct SubscriptionPurchaseAuthState: Hashable, Codable {
     
     public enum AuthorizationState: Hashable {
 
-        public enum RequestRejectedReason: String, Codable {
+        public enum RequestRejectedReason: String, Codable, CaseIterable {
             /// Received 400-Bad Request error from the purchase verifier server.
             case badRequestError
             /// Transaction had expired.
@@ -68,7 +68,7 @@ public enum SubscriptionAuthStateAction {
         case didUpdateRejectedSubscriptionAuthIDs
         case didRefreshReceiptData(ReceiptReadReason)
     }
-    
+
     case localDataUpdate(type: StoredDataUpdateType)
     
     case didLoadStoredPurchaseAuthState(
@@ -89,18 +89,18 @@ public enum SubscriptionAuthStateAction {
     )
 }
 
-public typealias SubscriptionAuthStateReducerEnvironment = (
-    feedbackLogger: FeedbackLogger,
-    httpClient: HTTPClient,
-    notifier: Notifier,
-    notifierUpdatedSubscriptionAuthsMessage: String,
-    sharedDB: SharedDBContainer,
-    tunnelStatusSignal: SignalProducer<TunnelProviderVPNStatus, Never>,
-    tunnelConnectionRefSignal: SignalProducer<TunnelConnection?, Never>,
-    clientMetaData: ClientMetaData,
-    getCurrentTime: () -> Date,
-    compareDates: (Date, Date, Calendar.Component) -> ComparisonResult
-)
+public struct SubscriptionAuthStateReducerEnvironment {
+    public let feedbackLogger: FeedbackLogger
+    public let httpClient: HTTPClient
+    public let notifier: Notifier
+    public let notifierUpdatedSubscriptionAuthsMessage: String
+    public let sharedDB: SharedDBContainer
+    public let tunnelStatusSignal: SignalProducer<TunnelProviderVPNStatus, Never>
+    public let tunnelConnectionRefSignal: SignalProducer<TunnelConnection?, Never>
+    public let clientMetaData: ClientMetaData
+    public let getCurrentTime: () -> Date
+    public let compareDates: (Date, Date, Calendar.Component) -> ComparisonResult
+}
 
 public struct SubscriptionAuthState: Equatable {
 
@@ -114,7 +114,7 @@ public struct SubscriptionAuthState: Equatable {
     /// `nil` represents that subscription auths have not been restored from previously stored value.
     /// This value is in  sync with stored value in  `PsiphonDataSharedDBContainer`
     /// with key `subscription_authorizations_dict`.
-    private(set) var purchasesAuthState: PurchaseAuthStateDict? = .none
+    var purchasesAuthState: PurchaseAuthStateDict? = .none
 }
 
 public struct SubscriptionReducerState: Equatable {
@@ -173,9 +173,9 @@ public func subscriptionAuthStateReducer(
                         // with `current` data for the given purchases.
                         var newValue = current.merge(withUpdatedPurchases: receiptInAppPurchases)
                         
-                        // If the receipt is refreshed form the App Store,
+                        // If the receipt is refreshed from the App Store,
                         // resets authorization state to `.notRequested`, for any
-                        // purchase whose authorization requested result in 400-Bad request error.
+                        // purchase whose authorization request result in 400-Bad request error.
                         if case .didRefreshReceiptData(let readReason) = updateType {
                             newValue = newValue.resetAuthorizationBadRequest(
                                 forReceiptUpdateType: readReason
@@ -208,7 +208,7 @@ public func subscriptionAuthStateReducer(
             effects.append(
                 state.subscription.setPurchasesAuthState(
                     newValue: loadedValue,
-                    environment:  environment
+                    environment: environment
                 ).mapNever()
             )
             
@@ -242,7 +242,7 @@ public func subscriptionAuthStateReducer(
         guard let currentPurchasesAuthState = state.subscription.purchasesAuthState else {
             fatalError()
         }
-        
+
         let (newValue, effects) = transformerFunc(currentPurchasesAuthState)
         
         // Avoids duplicate updates if there has been no value change.
@@ -251,12 +251,12 @@ public func subscriptionAuthStateReducer(
                 Effect(value: .requestAuthorizationForPurchases)
             ]
         }
-        
+
         let stateUpdateEffect = state.subscription.setPurchasesAuthState(
             newValue: newValue,
             environment: environment
         )
-        
+
         return effects + [
             stateUpdateEffect.mapNever(),
             Effect(value: .requestAuthorizationForPurchases)
@@ -569,7 +569,7 @@ extension Dictionary where Key == OriginalTransactionID, Value == SubscriptionPu
         let altUpdatedPurchases = Set(updatedPurchases.sortedByExpiry().reversed().map {
             HashableView($0, \.originalTransactionID)
         })
-        
+
         let updatedPurchasesDict = [OriginalTransactionID: SubscriptionIAPPurchase](
             uniqueKeysWithValues: altUpdatedPurchases.map {
                 ($0.value.originalTransactionID, $0.value)

@@ -68,12 +68,12 @@ final class MockHTTPClient {
             }
             
             let sessionResult: URLSessionResult = response.map { responseData
-                -> (data: Data, response: HTTPResponseMetadata) in
-                (data: responseData,
-                 response: HTTPResponseMetadata(
-                    url: url,
-                    headers: self.headers,
-                    statusCode: self.responseStatusCode))
+                -> HTTPResponseData in
+                HTTPResponseData(data: responseData,
+                                 metadata:HTTPResponseMetadata(
+                                    url: url,
+                                    headers: self.headers,
+                                    statusCode: self.responseStatusCode))
             }
             
             completionHandler(sessionResult)
@@ -125,12 +125,12 @@ final class EchoHTTPClient {
             }
             
             let sessionResult: URLSessionResult = response.map { _
-                -> (data: Data, response: HTTPResponseMetadata) in
-                (data: resp,
-                 response: HTTPResponseMetadata(
-                    url: url,
-                    headers: self.headers,
-                    statusCode: self.responseStatusCode))
+                -> HTTPResponseData in
+                HTTPResponseData(data: resp,
+                                 metadata: HTTPResponseMetadata(
+                                    url: url,
+                                    headers: self.headers,
+                                    statusCode: self.responseStatusCode))
             }
             
             completionHandler(sessionResult)

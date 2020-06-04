@@ -74,3 +74,95 @@ Response.Success: Arbitrary, Response.Failure: Arbitrary {
         ])
     }
 }
+
+final class MockHTTPURLResponse: HTTPURLResponse {}
+
+extension MockHTTPURLResponse: Arbitrary {
+    static var arbitrary: Gen<MockHTTPURLResponse> {
+        Gen.compose { c in
+
+            // Note: url unused in testing
+            MockHTTPURLResponse(url: URL(string: "https://example.com")!,
+                                statusCode: c.generate(using: HTTPStatusCode.arbitrary).rawValue,
+                                httpVersion: c.generate(using:httpVersionGen()),
+                                headerFields: nil)
+        }.suchThat{ $0 != nil }.map{$0!}
+    }
+}
+
+struct CancellableURLRequestDisposable : CancellableURLRequest {
+    let disposable: Disposable
+
+    init(_ disposable: Disposable) {
+        self.disposable = disposable
+    }
+
+    func cancel () {
+        self.disposable.dispose()
+    }
+}
+
+extension HTTPResponseData: Arbitrary {
+    public static var arbitrary: Gen<HTTPResponseData> {
+        Gen.compose { c in
+            // Note: data unused in testing.
+            HTTPResponseData(data: Data(), metadata: c.generate())
+        }
+    }
+}
+
+extension HTTPResponseMetadata: Arbitrary {
+    public static var arbitrary: Gen<HTTPResponseMetadata> {
+        Gen.compose { c in
+            // Note: url unused in testing.
+            HTTPResponseMetadata(url: URL(string:"https://example.com")!,
+                                 headers: [:],
+                                 statusCode: c.generate())
+        }
+    }
+}
+
+extension HTTPRequestError: Arbitrary {
+    public static var arbitrary: Gen<HTTPRequestError> {
+        Gen.compose { c in
+            return HTTPRequestError(partialResponseMetadata: c.generate(),
+                                    errorEvent: ErrorEvent(c.generate(),
+                                                           date: c.generate()))
+        }
+    }
+}
+
+/// HTTPClient which generates random responses immediately with room for configuring response times in the future.
+extension HTTPClient: Arbitrary {
+    public static var arbitrary: Gen<HTTPClient> {
+        Gen.compose { c in
+            // Note: URLSession unused
+            HTTPClient(urlSession: URLSession(configuration: .ephemeral)) {
+                (getCurrentTime, session, urlRequest, completionHandler)
+                -> CancellableURLRequest in
+
+                let timeout = SignalProducer.timer(interval: DispatchTimeInterval.seconds(0),
+                                                   on: QueueScheduler.init(),
+                                                   leeway: DispatchTimeInterval.milliseconds(0))
+                    .map(value: ())
+                    .take(first:1)
+
+                let disposable = timeout.start { event in
+                    switch event {
+                    case .value(_):
+                        completionHandler(c.generate())
+                        return
+                    case .completed:
+                        return
+                    case .interrupted:
+                        fatalError("Unexpected interruption")
+                    case .failed(_):
+                        fatalError("Unexpected effect failure")
+                    }
+                }
+
+                return CancellableURLRequestDisposable(disposable)
+            }
+        }
+    }
+}
