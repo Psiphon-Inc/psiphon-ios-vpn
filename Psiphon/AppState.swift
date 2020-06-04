@@ -314,6 +314,8 @@ fileprivate func toSubscriptionAuthStateReducerEnvironment(
     SubscriptionAuthStateReducerEnvironment(
         feedbackLogger: env.feedbackLogger,
         httpClient: env.httpClient,
+        httpRequestRetryCount: 5,
+        httpRequestRetryInterval: DispatchTimeInterval.seconds(1),
         notifier: env.notifier,
         notifierUpdatedSubscriptionAuthsMessage: NotifierUpdatedSubscriptionAuths,
         sharedDB: SharedDBContainerObjC(sharedDB:env.sharedDB),

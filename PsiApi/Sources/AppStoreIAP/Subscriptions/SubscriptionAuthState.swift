@@ -92,6 +92,8 @@ public enum SubscriptionAuthStateAction {
 public struct SubscriptionAuthStateReducerEnvironment {
     public let feedbackLogger: FeedbackLogger
     public let httpClient: HTTPClient
+    public let httpRequestRetryCount: Int
+    public let httpRequestRetryInterval: DispatchTimeInterval
     public let notifier: Notifier
     public let notifierUpdatedSubscriptionAuthsMessage: String
     public let sharedDB: SharedDBContainer
@@ -100,6 +102,30 @@ public struct SubscriptionAuthStateReducerEnvironment {
     public let clientMetaData: ClientMetaData
     public let getCurrentTime: () -> Date
     public let compareDates: (Date, Date, Calendar.Component) -> ComparisonResult
+
+    public init(feedbackLogger: FeedbackLogger, httpClient: HTTPClient,
+               httpRequestRetryCount: Int, httpRequestRetryInterval: DispatchTimeInterval,
+               notifier: Notifier, notifierUpdatedSubscriptionAuthsMessage: String,
+               sharedDB: SharedDBContainer,
+               tunnelStatusSignal: SignalProducer<TunnelProviderVPNStatus, Never>,
+               tunnelConnectionRefSignal: SignalProducer<TunnelConnection?, Never>,
+               clientMetaData: ClientMetaData,
+               getCurrentTime: @escaping () -> Date,
+               compareDates: @escaping (Date, Date, Calendar.Component) -> ComparisonResult) {
+
+        self.feedbackLogger = feedbackLogger
+        self.httpClient = httpClient
+        self.httpRequestRetryCount = httpRequestRetryCount
+        self.httpRequestRetryInterval = httpRequestRetryInterval
+        self.notifier = notifier
+        self.notifierUpdatedSubscriptionAuthsMessage = notifierUpdatedSubscriptionAuthsMessage
+        self.sharedDB = sharedDB
+        self.tunnelStatusSignal = tunnelStatusSignal
+        self.tunnelConnectionRefSignal = tunnelConnectionRefSignal
+        self.clientMetaData = clientMetaData
+        self.getCurrentTime = getCurrentTime
+        self.compareDates = compareDates
+    }
 }
 
 public struct SubscriptionAuthState: Equatable {
@@ -315,7 +341,9 @@ public func subscriptionAuthStateReducer(
         )
 
         let authRequest = RetriableTunneledHttpRequest(
-            request: req.request
+            request: req.request,
+            retryCount: environment.httpRequestRetryCount,
+            retryInterval: environment.httpRequestRetryInterval
         )
 
         var effects = [Effect<SubscriptionAuthStateAction>]()
