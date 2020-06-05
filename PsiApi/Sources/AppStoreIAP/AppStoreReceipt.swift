@@ -32,6 +32,7 @@ public struct TransactionID: TypedIdentifier {
     }
 }
 
+/// Represents App Store in-app purchase original transaction identifier.
 public struct OriginalTransactionID: TypedIdentifier {
     public var rawValue: String { value }
     
@@ -42,7 +43,7 @@ public struct OriginalTransactionID: TypedIdentifier {
     }
 }
 
-/// Represents in-app purchase product identifier
+/// Represents App Store in-app purchase product identifier.
 public struct ProductID: TypedIdentifier {
     public var rawValue: String { value }
     

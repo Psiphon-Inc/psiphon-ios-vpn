@@ -46,11 +46,11 @@ public struct PaymentQueue {
 /// Represents a payment that has been added to `SKPaymentQueue`.
 public struct AddedPayment: Equatable {
     public let product: IAPPurchasableProduct
-    public let paymentObj: SKPayment
+    public let payment: Payment
     
-    public init(_ product: IAPPurchasableProduct, _ paymentObj: SKPayment) {
+    public init(_ product: IAPPurchasableProduct, _ payment: Payment) {
         self.product = product
-        self.paymentObj = paymentObj
+        self.payment = payment
     }
     
 }

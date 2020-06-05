@@ -21,6 +21,7 @@ import Foundation
 import ReactiveSwift
 import Promises
 import StoreKit
+import Utilities
 import PsiApi
 import PsiCashClient
 
@@ -42,6 +43,22 @@ public enum TransactionUpdate: Equatable {
     case restoredCompletedTransactions(error: SystemError?)
 }
 
+extension TransactionUpdate {
+    var updatedTransactions: [PaymentTransaction]? {
+        guard case let .updatedTransactions(value) = self else {
+            return nil
+        }
+        return value
+    }
+    
+    var restoredCompletedTransactions: SystemError?? {
+        guard case let .restoredCompletedTransactions(error: error) = self else {
+            return nil
+        }
+        return .some(error)
+    }
+}
+
 public struct IAPReducerState: Equatable {
     public var iap: IAPState
     public var psiCashBalance: PsiCashBalance
@@ -55,18 +72,45 @@ public struct IAPReducerState: Equatable {
     
 }
 
-public typealias IAPEnvironment = (
-    feedbackLogger: FeedbackLogger,
-    tunnelStatusSignal: SignalProducer<TunnelProviderVPNStatus, Never>,
-    tunnelConnectionRefSignal: SignalProducer<TunnelConnection?, Never>,
-    psiCashEffects: PsiCashEffects,
-    clientMetaData: ClientMetaData,
-    paymentQueue: PaymentQueue,
-    psiCashStore: (PsiCashAction) -> Effect<Never>,
-    appReceiptStore: (ReceiptStateAction) -> Effect<Never>,
-    httpClient: HTTPClient,
-    getCurrentTime: () -> Date
-)
+public struct IAPEnvironment {
+    var feedbackLogger: FeedbackLogger
+    var tunnelStatusSignal: SignalProducer<TunnelProviderVPNStatus, Never>
+    var tunnelConnectionRefSignal: SignalProducer<TunnelConnection?, Never>
+    var psiCashEffects: PsiCashEffects
+    var clientMetaData: ClientMetaData
+    var paymentQueue: PaymentQueue
+    var isSupportedProduct: (ProductID) -> AppStoreProductType?
+    var psiCashStore: (PsiCashAction) -> Effect<Never>
+    var appReceiptStore: (ReceiptStateAction) -> Effect<Never>
+    var httpClient: HTTPClient
+    var getCurrentTime: () -> Date
+    
+    public init(
+        feedbackLogger: FeedbackLogger,
+        tunnelStatusSignal: SignalProducer<TunnelProviderVPNStatus, Never>,
+        tunnelConnectionRefSignal: SignalProducer<TunnelConnection?, Never>,
+        psiCashEffects: PsiCashEffects,
+        clientMetaData: ClientMetaData,
+        paymentQueue: PaymentQueue,
+        isSupportedProduct: @escaping (ProductID) -> AppStoreProductType?,
+        psiCashStore: @escaping (PsiCashAction) -> Effect<Never>,
+        appReceiptStore: @escaping (ReceiptStateAction) -> Effect<Never>,
+        httpClient: HTTPClient,
+        getCurrentTime: @escaping () -> Date
+    ) {
+        self.feedbackLogger = feedbackLogger
+        self.tunnelStatusSignal = tunnelStatusSignal
+        self.tunnelConnectionRefSignal = tunnelConnectionRefSignal
+        self.psiCashEffects = psiCashEffects
+        self.clientMetaData = clientMetaData
+        self.paymentQueue = paymentQueue
+        self.isSupportedProduct = isSupportedProduct
+        self.psiCashStore = psiCashStore
+        self.appReceiptStore = appReceiptStore
+        self.httpClient = httpClient
+        self.getCurrentTime = getCurrentTime
+    }
+}
 
 public func iapReducer(
     state: inout IAPReducerState, action: IAPAction, environment: IAPEnvironment
@@ -83,9 +127,6 @@ public func iapReducer(
         ]
         
     case .purchase(let product):
-        guard state.iap.purchasing.completed else {
-            return []
-        }
         
         if case .psiCash = product {
             // No action is taken if there is already an unverified PsiCash transaction.
@@ -95,9 +136,16 @@ public func iapReducer(
             
             // PsiCash IAP requires presence of PsiCash spender token.
             guard state.psiCashAuth.hasMinimalTokens else {
-                state.iap.purchasing = .error(ErrorEvent(
-                    .failedToCreatePurchase(reason: "PsiCash data not present.")
-                ))
+                
+                state.iap.purchasing.append(
+                    IAPPurchasing(
+                        product: product,
+                        purchasingState: .completed(.failure(
+                            ErrorEvent(.failedToCreatePurchase(reason: "PsiCash data not present"),
+                                       date: environment.getCurrentTime())))
+                    )
+                )
+                
                 return [
                     environment.feedbackLogger.log(
                         .error, "PsiCash IAP purchase without tokens"
@@ -105,8 +153,24 @@ public func iapReducer(
                 ]
             }
         }
-    
-        state.iap.purchasing = .pending(product)
+        
+        let newPurchase = IAPPurchasing(product: product, purchasingState: .pending(nil))
+        
+        let exists = state.iap.purchasing.contains { currentlyPurchasing -> Bool in
+            currentlyPurchasing.product == newPurchase.product
+        }
+        
+        guard !exists else {
+            return []
+        }
+        
+        let inserted = state.iap.purchasing.append(newPurchase)
+        
+        guard inserted else {
+            // This should never happen, since `state.iap.purchasing` has
+            // already been tested whether it contains `newPurchase.product`.
+            return []
+        }
 
         return [
             environment.paymentQueue.addPayment(product)
@@ -114,11 +178,34 @@ public func iapReducer(
         ]
         
     case ._purchaseAdded(let addedPayment):
-        guard case let .pending(product) = state.iap.purchasing,
-            product == addedPayment.product else {
-                environment.feedbackLogger.fatalError("unexpected purchase added event")
-                return []
+        
+        // State should contain one (and only one) pending purchase with the
+        // given product in addedPayment.
+        let currentPendingPurchases = state.iap.pendingPurchases(forProduct: addedPayment.product)
+        
+        guard currentPendingPurchases.count <= 1 else {
+            environment.feedbackLogger.fatalError("""
+                found more than one pending purchase matching payment: '\(addedPayment)'
+                """)
+            return []
         }
+        
+        guard let pendingPurchase = currentPendingPurchases.first else {
+            environment.feedbackLogger.fatalError("unexpected purchase of the same product")
+            return []
+        }
+        
+        // Updates purchasing state with the payment value.
+        var updatedPendingPurchase = pendingPurchase
+        updatedPendingPurchase.purchasingState = .pending(addedPayment.payment)
+            
+        guard state.iap.purchasing.replace(pendingPurchase, with: updatedPendingPurchase) else {
+            environment.feedbackLogger.fatalError("""
+                failed to insert '\(updatedPendingPurchase)' into '\(state.iap.purchasing)'
+                """)
+            return []
+        }
+        
         return [
             environment.feedbackLogger.log(.info, "Added payment: '\(addedPayment)'").mapNever()
         ]
@@ -129,7 +216,7 @@ public func iapReducer(
         }
         
         // Requests verification only if one has not been made, or it failed.
-        if case .pendingVerificationResult = unverifiedPsiCashTx.verificationState {
+        if case .pendingResponse = unverifiedPsiCashTx.verification {
             // A verification request has already been made.
             return []
         }
@@ -174,7 +261,7 @@ public func iapReducer(
         
         state.iap.unverifiedPsiCashTx = UnverifiedPsiCashTransactionState(
             transaction: unverifiedPsiCashTx.transaction,
-            verificationState: .pendingVerificationResult
+            verificationState: .pendingResponse
         )
                
         // Creates request to verify PsiCash AppStore IAP purchase.
@@ -229,7 +316,7 @@ public func iapReducer(
             return []
         }
         
-        guard case .pendingVerificationResult = unverifiedPsiCashTx.verificationState else {
+        guard case .pendingResponse = unverifiedPsiCashTx.verification else {
             environment.feedbackLogger.fatalError("""
                 unexpected state for unverified PsiCash IAP transaction \
                 '\(String(describing: state.iap.unverifiedPsiCashTx))'
@@ -313,31 +400,48 @@ public func iapReducer(
         switch value {
         case .restoredCompletedTransactions:
             return [
-                environment.appReceiptStore(._remoteReceiptRefreshResult(.success(()))).mapNever()
+                environment.appReceiptStore(._remoteReceiptRefreshResult(.success(.unit))).mapNever()
             ]
             
         case .updatedTransactions(let transactions):
             var effects = [Effect<IAPAction>]()
             
             for transaction in transactions {
+                
+                let matchingPurchases = state.iap.pendingPurchases(forTransaction: transaction)
+                guard let purchasing = matchingPurchases.first, matchingPurchases.count == 1 else {
+                    environment.feedbackLogger.fatalError("""
+                        expected only one matching purchase: '\(matchingPurchases)' \
+                        to transaction: \(transaction)
+                        """)
+                    return []
+                }
+                
                 switch transaction.transactionState() {
                 case .pending(_):
-                    return []
+                    continue
                     
                 case .completed(let completedState):
                     let finishTransaction: Bool
-                    let purchasingState: IAPPurchasingState
+                    var updatedPurchasingState: IAPPurchasing
                     
                     switch completedState {
+                        
                     case let .failure(skError):
-                        purchasingState = .error(ErrorEvent(.storeKitError(skError)))
+                        updatedPurchasingState = purchasing
+                        updatedPurchasingState.purchasingState = .completed(.failure(
+                            ErrorEvent(.storeKitError(skError))))
+                        
                         finishTransaction = true
                         
                     case let .success(success):
-                        purchasingState = .none
+                        
+                        updatedPurchasingState = purchasing
+                        updatedPurchasingState.purchasingState = .completed(.success(.unit))
+                        
                         switch success.second {
                         case .purchased:
-                            switch try? AppStoreProductType.from(transaction: transaction) {
+                            switch environment.isSupportedProduct(transaction.productID()) {
                             case .none:
                                 environment.feedbackLogger.fatalError(
                                     "unknown product \(String(describing: transaction))"
@@ -410,59 +514,33 @@ public func iapReducer(
                     }
                     
                     // Updates purchasing state
-                    state.iap.purchasing = purchasingState
+                    let replaced = state.iap.purchasing
+                        .replace(purchasing, with: updatedPurchasingState)
+                    
+                    guard replaced else {
+                        environment.feedbackLogger.fatalError("""
+                            failed to insert '\(updatedPurchasingState)' \
+                            into '\(state.iap.purchasing)'
+                            """)
+                        return []
+                    }
                     
                     if finishTransaction {
                         effects.append(
                             environment.paymentQueue.finishTransaction(transaction).mapNever()
                         )
                     }
-                    
-                    if transactions.map({ $0.transactionState().appReceiptUpdated }).contains(true) {
-                        effects.append(
-                            environment.appReceiptStore(._remoteReceiptRefreshResult(.success(()))).mapNever()
-                        )
-                    }
                 }
+            }
+            
+            if transactions.map({$0.transactionState().appReceiptUpdated}).contains(true) {
+                effects.append(
+                    environment.appReceiptStore(
+                        ._remoteReceiptRefreshResult(.success(.unit))).mapNever()
+                )
             }
             
             return effects
         }
     }
-}
-
-/// Delegate for StoreKit transactions.
-/// - Note: There is no callback from StoreKit if purchasing a product that is already
-/// purchased.
-public final class PaymentTransactionDelegate: StoreDelegate<TransactionUpdate>,
-SKPaymentTransactionObserver {
-    
-    // Sent when transactions are removed from the queue (via finishTransaction:).
-    public func paymentQueue(_ queue: SKPaymentQueue, removedTransactions
-        transactions: [SKPaymentTransaction]) {
-        // Ignore.
-    }
-    
-    // Sent when an error is encountered while adding transactions
-    // from the user's purchase history back to the queue.
-    public func paymentQueue(_ queue: SKPaymentQueue,
-                      restoreCompletedTransactionsFailedWithError error: Error) {
-        storeSend(.restoredCompletedTransactions(error: SystemError(error)))
-    }
-    
-    // Sent when all transactions from the user's purchase history have
-    // successfully been added back to the queue.
-    public func paymentQueueRestoreCompletedTransactionsFinished(_ queue: SKPaymentQueue) {
-        storeSend(.restoredCompletedTransactions(error: .none))
-    }
-    
-    // Sent when the transaction array has changed (additions or state changes).
-    // Client should check state of transactions and finish as appropriate.
-    public func paymentQueue(_ queue: SKPaymentQueue,
-                      updatedTransactions transactions: [SKPaymentTransaction]) {
-        storeSend(
-            .updatedTransactions(transactions.map(PaymentTransaction.make(from:)))
-        )
-    }
-    
 }

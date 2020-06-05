@@ -82,6 +82,8 @@ func appDelegateReducer(
     
     private let sharedDB = PsiphonDataSharedDB(forAppGroupIdentifier: APP_GROUP_IDENTIFIER)
     private let feedbackLogger = FeedbackLogger(PsiphonRotatingFileFeedbackLogHandler())
+    private let supportedProducts =
+        SupportedAppStoreProducts.fromPlists(types: [.subscription, .psiCash])
     
     private var (lifetime, token) = Lifetime.make()
     private var store: Store<AppState, AppAction>!
@@ -139,6 +141,7 @@ extension SwiftDelegate: SwiftBridgeDelegate {
                     feedbackLogger: self.feedbackLogger,
                     sharedDB: self.sharedDB,
                     psiCashLib: self.psiCashLib,
+                    supportedAppStoreProducts: self.supportedProducts,
                     objcBridgeDelegate: objcBridge,
                     rewardedVideoAdBridgeDelegate: self,
                     calendar: Calendar.current
@@ -378,7 +381,13 @@ extension SwiftDelegate: SwiftBridgeDelegate {
         }
         
         do {
-            let appStoreProduct = try AppStoreProduct.from(skProduct: skProduct)
+            let appStoreProduct = try AppStoreProduct.from(
+                skProduct: skProduct,
+                isSupportedProduct: self.supportedProducts.isSupportedProduct(_:)
+            )
+            guard case .subscription = appStoreProduct.type else {
+                fatalError()
+            }
             self.store.send(.iap(.purchase(
                 IAPPurchasableProduct.subscription(product: appStoreProduct, promise: promise)
                 )))
@@ -396,8 +405,7 @@ extension SwiftDelegate: SwiftBridgeDelegate {
     }
     
     @objc func getAppStoreSubscriptionProductIDs() -> Set<String> {
-        // TODO: supported product ID's should be accessed from the AppState environment.
-        return SupportedAppStoreProductIDs.subscription().values
+        return self.supportedProducts.supported[.subscription]!.rawValues
     }
     
     @objc func getAppStateFeedbackEntry(completionHandler: @escaping (String) -> Void) {
