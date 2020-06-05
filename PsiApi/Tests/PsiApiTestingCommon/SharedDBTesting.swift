@@ -20,7 +20,7 @@
 import Foundation
 import PsiApi
 
-class MutableDBContainer {
+final class MutableDBContainer {
     var subscriptionAuths: Data?
     var containerRejectedSubscriptionAuthIdReadAtLeastUpToSequenceNumber: Int
 

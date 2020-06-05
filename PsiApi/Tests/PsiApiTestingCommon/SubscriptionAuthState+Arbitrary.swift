@@ -36,10 +36,6 @@ extension SubscriptionAuthStateReducerEnvironment: Arbitrary {
     public static var arbitrary: Gen<SubscriptionAuthStateReducerEnvironment> {
         Gen.compose { c in
 
-            let sharedDBContainer = TestSharedDBContainer(state:
-                MutableDBContainer(subscriptionAuths: nil,
-                                   containerRejectedSubscriptionAuthIdReadAtLeastUpToSequenceNumber: 0))
-
             return SubscriptionAuthStateReducerEnvironment(
                 feedbackLogger: FeedbackLogger(StdoutFeedbackLogger()),
                 httpClient: c.generate(using:
@@ -48,7 +44,7 @@ extension SubscriptionAuthStateReducerEnvironment: Arbitrary {
                 httpRequestRetryInterval: DispatchTimeInterval.seconds(0),
                 notifier: DevNullNotifier(),
                 notifierUpdatedSubscriptionAuthsMessage: c.generate(),
-                sharedDB: sharedDBContainer,
+                sharedDB: TestSharedDBContainer(state:c.generate()),
                 tunnelStatusSignal: SignalProducer<TunnelProviderVPNStatus, Never>(value: c.generate()),
                 tunnelConnectionRefSignal: SignalProducer<TunnelConnection?, Never>(value: c.generate()),
                 clientMetaData: ClientMetaData(MockAppInfoProvider()),
@@ -60,6 +56,36 @@ extension SubscriptionAuthStateReducerEnvironment: Arbitrary {
                 }
             )
         }
+    }
+}
+
+extension MutableDBContainer: Arbitrary {
+    static var arbitrary: Gen<MutableDBContainer> {
+        Gen.frequency([
+            // Auth state data is present.
+            (3,
+             Gen.zip(SubscriptionAuthState.PurchaseAuthStateDict.arbitrary, UInt.arbitrary).map {
+                authState, seq -> MutableDBContainer in
+
+                let encoder = JSONEncoder.makeRfc3339Encoder()
+                let data = try! encoder.encode(authState)
+                return MutableDBContainer(subscriptionAuths: data,
+                                          containerRejectedSubscriptionAuthIdReadAtLeastUpToSequenceNumber: Int(seq))
+            }),
+            // Auth state data is corrupted.
+            (1,
+             Gen.zip(Data.arbitrary, UInt.arbitrary).map {
+                MutableDBContainer(subscriptionAuths: $0,
+                                   containerRejectedSubscriptionAuthIdReadAtLeastUpToSequenceNumber: Int($1))
+            }),
+            // Auth state data is missing.
+            (1,
+             UInt.arbitrary.map{
+                MutableDBContainer(subscriptionAuths: nil,
+                containerRejectedSubscriptionAuthIdReadAtLeastUpToSequenceNumber: Int($0))
+                }
+            )
+        ])
     }
 }
 
