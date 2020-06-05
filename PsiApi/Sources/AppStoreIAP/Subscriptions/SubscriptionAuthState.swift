@@ -440,10 +440,13 @@ public func subscriptionAuthStateReducer(
             case .success(let okResponse):
                 // 200-OK response from the purchase verifier server.
                 guard okResponse.originalTransactionID == purchase.originalTransactionID else {
-                    fatalError("""
-                        sever transaction ID '\(okResponse.originalTransactionID)' did not match \
-                        expected transaction ID '\(purchase.originalTransactionID)'
-                        """)
+                    return [
+                        environment.feedbackLogger.log(.error,"""
+                            sever transaction ID '\(okResponse.originalTransactionID)' did not match \
+                            expected transaction ID '\(purchase.originalTransactionID)'
+                            """
+                        ).mapNever()
+                    ]
                 }
                 
                 switch okResponse.errorStatus {

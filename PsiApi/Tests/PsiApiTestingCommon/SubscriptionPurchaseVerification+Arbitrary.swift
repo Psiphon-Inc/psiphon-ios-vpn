@@ -22,6 +22,87 @@ import SwiftCheck
 @testable import PsiApi
 @testable import AppStoreIAP
 
+extension HTTPResponseData {
+    fileprivate static func arbitraryPurchaseVerificationResponse(req: URLRequest) -> Gen<HTTPResponseData> {
+
+        Gen.compose { c in
+
+            var data: Data = Data()
+
+            if let requestData = req.httpBody {
+
+                // Generate a random request response
+                let result: SubscriptionValidationResponse.SuccessResult? = c.generate()
+
+                if let reifiedResult = result {
+
+                    // If a response will be returned:
+                    // - Overwrite the random transaction ID with the one in the request
+                    // - Make the authorization value in the response JSON a base64 encoded
+                    //   string (this is what the decoder expects)
+
+                    let decoder = JSONDecoder.makeRfc3339Decoder()
+                    let decodedRequest = try! decoder.decode(SubscriptionValidationRequest.self, from: requestData)
+
+                    let encoder = JSONEncoder.makeRfc3339Encoder()
+                    let firstEncoding = try! encoder.encode(reifiedResult)
+
+                    var response: [String: Any] = try! JSONSerialization.jsonObject(with: firstEncoding, options: []) as! [String : Any]
+
+
+                    if let base64EncodedAuthorization = reifiedResult.signedAuthorization?.rawData {
+                        response["authorization"] = base64EncodedAuthorization
+                        response["original_transaction_id"] = String(describing: decodedRequest.originalTransactionID)
+                    }
+
+                    data = try! JSONSerialization.data(withJSONObject: response)
+                }
+            }
+
+            let metadata: HTTPResponseMetadata =
+                c.generate(using:
+                    HTTPResponseMetadata.arbitraryPurchaseVerificationMetadata())
+
+            return HTTPResponseData(data: data,
+                                    metadata: metadata)
+        }
+    }
+}
+
+extension HTTPResponseMetadata {
+    fileprivate static func arbitraryPurchaseVerificationMetadata() -> Gen<HTTPResponseMetadata> {
+        Gen.compose { c in
+            // Bias status codes that are expected.
+            let statusCodeGen: Gen<HTTPStatusCode> =
+                Gen.one(of: [
+                    Gen.fromElements(of: [200, 400, 500]).map {
+                        HTTPStatusCode(rawValue: $0)!
+                    },
+                    HTTPStatusCode.arbitrary
+                ])
+
+            // Note: url unused in testing thus far.
+            return HTTPResponseMetadata(url: URL(string:"https://example.com")!,
+                                        headers: [:],
+                                        statusCode: c.generate(using: statusCodeGen))
+        }
+    }
+}
+
+
+extension HTTPClient {
+    public static func arbitraryPurchaseVerificationClient() -> Gen<HTTPClient> {
+        HTTPClient.arbitrary(resultGen: { urlRequest in
+            Gen.frequency([
+                (3,
+                 HTTPResponseData.arbitraryPurchaseVerificationResponse(req: urlRequest).map(Result.success)),
+                (1,
+                 HTTPRequestError.arbitrary.map(Result.failure))
+            ])
+        })
+    }
+}
+
 extension SubscriptionValidationResponse.ResponseError: Arbitrary {
     public static var arbitrary: Gen<SubscriptionValidationResponse.ResponseError> {
         Gen.one(of: [

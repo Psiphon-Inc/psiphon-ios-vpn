@@ -21,7 +21,7 @@ import Foundation
 import ReactiveSwift
 import PsiApi
 
-public struct SubscriptionValidationRequest: Encodable {
+public struct SubscriptionValidationRequest: Codable {
     public let originalTransactionID: OriginalTransactionID
     let receiptData: String
     
@@ -47,14 +47,14 @@ public struct SubscriptionValidationResponse: RetriableHTTPResponse {
     }
     
     // 200 OK response type
-    public struct SuccessResult: Equatable, Decodable {
+    public struct SuccessResult: Equatable, Codable {
         let requestDate: Date
         public let originalTransactionID: OriginalTransactionID
         public let signedAuthorization: PsiApi.SignedData<SignedAuthorization>?
         public let errorStatus: ErrorStatus
         public let errorDescription: String
         
-        public enum ErrorStatus: Int, Decodable, CaseIterable {
+        public enum ErrorStatus: Int, Codable, CaseIterable {
             case noError = 0
             case transactionExpired = 1
             // The transaction has been cancelled by Apple customer support
@@ -70,7 +70,7 @@ public struct SubscriptionValidationResponse: RetriableHTTPResponse {
         }
 
         public init(requestDate: Date, originalTransactionID: OriginalTransactionID,
-                    signedAuthorization: PsiApi.SignedData<SignedAuthorization>,
+                    signedAuthorization: PsiApi.SignedData<SignedAuthorization>?,
                     errorStatus: ErrorStatus, errorDescription: String) {
 
             self.requestDate = requestDate

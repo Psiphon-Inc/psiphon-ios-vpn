@@ -32,7 +32,15 @@ final class SubscriptionAuthStateTest : XCTestCase {
     /// will run forever and eventually be killed if this occurs.
     /// Additionally expected state changes are checked.
     func testExternalActions() {
-        property("Subscription auth state reducer") <- forAll {
+
+        // These parameters provide better coverage and this test
+        // is not focused on generating large random values.
+        let checkerArgs = CheckerArguments(replay: nil,
+                                           maxAllowableSuccessfulTests: 1000,
+                                           maxAllowableDiscardedTests: 5000,
+                                           maxTestCaseSize: 10)
+
+        property("Subscription auth state reducer", arguments: checkerArgs) <- forAll {
             (action: SubscriptionAuthStateAction,
             state: SubscriptionReducerState,
             env: SubscriptionAuthStateReducerEnvironment) in
