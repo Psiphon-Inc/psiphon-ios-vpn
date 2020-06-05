@@ -90,16 +90,7 @@ struct CancellableURLRequestDisposable : CancellableURLRequest {
 extension HTTPResponseData: Arbitrary {
     public static var arbitrary: Gen<HTTPResponseData> {
         Gen.compose { c in
-            var data: Data = Data()
-
-            let randomData = c.generate(using: String.arbitrary.map {
-                $0.data(using: .utf8)
-            })
-            if let reifiedRandomData = randomData {
-                data = reifiedRandomData
-            }
-
-            return HTTPResponseData(data: data, metadata: c.generate())
+            return HTTPResponseData(data: c.generate(), metadata: c.generate())
         }
     }
 }

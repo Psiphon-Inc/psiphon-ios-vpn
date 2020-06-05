@@ -44,6 +44,19 @@ extension Pair: Arbitrary where A: Arbitrary, B: Arbitrary {
     }
 }
 
+
+extension Data: Arbitrary {
+    // Arbitrary utf8 encoded string.
+    public static var arbitrary: Gen<Data> {
+        String.arbitrary.map{
+            if let reifiedData = $0.data(using: .utf8) {
+                return reifiedData
+            }
+            return Data()
+        }
+    }
+}
+
 extension Date: Arbitrary {
     /// Arbitrary date roughly in the range 1970s to 2096 with digits up to six decimal places.
     public static var arbitrary: Gen<Date> {
