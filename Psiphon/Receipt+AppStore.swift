@@ -28,8 +28,7 @@ extension ReceiptData {
     /// - Note: It is expected for the `Bundle` object to have a valid
     static func parseLocalReceipt(
         appBundle: PsiphonBundle,
-        consumableProductIDs: Set<ProductID>,
-        subscriptionProductIDs: Set<ProductID>,
+        isSupportedProduct: (ProductID) -> AppStoreProductType?,
         getCurrentTime: () -> Date,
         compareDates: (Date, Date, Calendar.Component) -> ComparisonResult,
         feedbackLogger: FeedbackLogger
@@ -68,7 +67,7 @@ extension ReceiptData {
         // have the "is_in_intro_offer_period" set to true.
         let hasSubscriptionBeenInIntroOfferPeriod = parsedData.inAppPurchases.filter {
             let productID = ProductID(rawValue: $0.productIdentifier)!
-            return subscriptionProductIDs.contains(productID)
+            return isSupportedProduct(productID) == .subscription
         }.map {
             $0.isInIntroPeriod
         }.contains(true)
@@ -77,7 +76,7 @@ extension ReceiptData {
         let subscriptionPurchases = Set(parsedData.inAppPurchases
             .compactMap { parsedIAP -> SubscriptionIAPPurchase? in
                 let productID = ProductID(rawValue: parsedIAP.productIdentifier)!
-                guard subscriptionProductIDs.contains(productID) else {
+                guard case .subscription = isSupportedProduct(productID) else {
                     return nil
                 }
                 let purchase = SubscriptionIAPPurchase(
@@ -102,7 +101,7 @@ extension ReceiptData {
         let consumablePurchases = Set(parsedData.inAppPurchases
             .compactMap { parsedIAP -> ConsumableIAPPurchase? in
                 let productID = ProductID(rawValue: parsedIAP.productIdentifier)!
-                guard consumableProductIDs.contains(productID) else {
+                guard isSupportedProduct(productID)?.isConsumable ?? false else {
                     return nil
                 }
                 return ConsumableIAPPurchase(

@@ -29,8 +29,7 @@ typealias ReceiptReducerEnvironment = (
     subscriptionStore: (SubscriptionAction) -> Effect<Never>,
     subscriptionAuthStateStore: (SubscriptionAuthStateAction) -> Effect<Never>,
     receiptRefreshRequestDelegate: ReceiptRefreshRequestDelegate,
-    consumableProductsIDs: Set<ProductID>,
-    subscriptionProductIDs: Set<ProductID>,
+    isSupportedProduct: (ProductID) -> AppStoreProductType?,
     getCurrentTime: () -> Date,
     compareDates: (Date, Date, Calendar.Component) -> ComparisonResult
 )
@@ -95,8 +94,7 @@ extension ReceiptData {
         Effect { () -> ReceiptData? in
             ReceiptData.parseLocalReceipt(
                 appBundle: environment.appBundle,
-                consumableProductIDs: environment.consumableProductsIDs,
-                subscriptionProductIDs: environment.subscriptionProductIDs,
+                isSupportedProduct: environment.isSupportedProduct,
                 getCurrentTime: environment.getCurrentTime,
                 compareDates: environment.compareDates,
                 feedbackLogger: environment.feedbackLogger
