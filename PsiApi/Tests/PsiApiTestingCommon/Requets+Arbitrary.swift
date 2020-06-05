@@ -1,21 +1,21 @@
 /*
-* Copyright (c) 2020, Psiphon Inc.
-* All rights reserved.
-*
-* This program is free software: you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by
-* the Free Software Foundation, either version 3 of the License, or
-* (at your option) any later version.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*
-*/
+ * Copyright (c) 2020, Psiphon Inc.
+ * All rights reserved.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
 
 import Foundation
 import ReactiveSwift
@@ -90,8 +90,16 @@ struct CancellableURLRequestDisposable : CancellableURLRequest {
 extension HTTPResponseData: Arbitrary {
     public static var arbitrary: Gen<HTTPResponseData> {
         Gen.compose { c in
-            // Note: data unused in testing.
-            HTTPResponseData(data: Data(), metadata: c.generate())
+            var data: Data = Data()
+
+            let randomData = c.generate(using: String.arbitrary.map {
+                $0.data(using: .utf8)
+            })
+            if let reifiedRandomData = randomData {
+                data = reifiedRandomData
+            }
+
+            return HTTPResponseData(data: data, metadata: c.generate())
         }
     }
 }
@@ -99,7 +107,7 @@ extension HTTPResponseData: Arbitrary {
 extension HTTPResponseMetadata: Arbitrary {
     public static var arbitrary: Gen<HTTPResponseMetadata> {
         Gen.compose { c in
-            // Note: url unused in testing.
+            // Note: url unused in testing thus far.
             HTTPResponseMetadata(url: URL(string:"https://example.com")!,
                                  headers: [:],
                                  statusCode: c.generate())
@@ -120,6 +128,12 @@ extension HTTPRequestError: Arbitrary {
 /// HTTPClient which generates random responses immediately with room for configuring response times in the future.
 extension HTTPClient: Arbitrary {
     public static var arbitrary: Gen<HTTPClient> {
+        HTTPClient.arbitrary(resultGen: { _ in
+            URLSessionResult.arbitrary
+        })
+    }
+
+    public static func arbitrary(resultGen: @escaping (URLRequest) -> Gen<URLSessionResult>) -> Gen<HTTPClient> {
         Gen.compose { c in
             // Note: URLSession unused
             HTTPClient(urlSession: URLSession(configuration: .ephemeral)) {
@@ -135,7 +149,7 @@ extension HTTPClient: Arbitrary {
                 let disposable = timeout.start { event in
                     switch event {
                     case .value(_):
-                        completionHandler(c.generate())
+                        completionHandler(c.generate(using: resultGen(urlRequest)))
                         return
                     case .completed:
                         return

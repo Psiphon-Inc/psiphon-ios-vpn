@@ -70,8 +70,21 @@ extension SignedAuthorization: Arbitrary {
 
 extension SignedData: Arbitrary where Decoded == SignedAuthorization {
     public static var arbitrary: Gen<SignedData<SignedAuthorization>> {
-        Gen.zip(String.arbitrary, SignedAuthorization.arbitrary)
-            .map(SignedData.init(rawData:decoded:))
+        // Note: in the future, likely for different reducers, this could be broken
+        // out into a separate function where the frequencies can be configured.
+        Gen.frequency([
+            // Raw data and authorization match
+            (3,
+             SignedAuthorization.arbitrary.map{
+                let encoder = JSONEncoder.makeRfc3339Encoder()
+                let data = try! encoder.encode($0)
+                return SignedData(rawData:data.base64EncodedString(), decoded:$0)
+            }),
+            // Raw data and authorization mismatch
+            (1,
+             Gen.zip(String.arbitrary, SignedAuthorization.arbitrary)
+                .map(SignedData.init(rawData:decoded:))),
+        ])
     }
 }
 
