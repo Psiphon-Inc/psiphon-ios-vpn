@@ -48,9 +48,9 @@ extension ParsedPsiCashAppStorePurchasable {
     }
     
     static func make(product: AppStoreProduct, formatter: PsiCashAmountFormatter) -> Self {
-        guard let psiCashValue = Self.supportedProducts[product.productIdentifier] else {
+        guard let psiCashValue = Self.supportedProducts[product.productID] else {
             return .parseError(reason: """
-                AppStore IAP product with identifier '\(product.productIdentifier)' is not a supported product
+                AppStore IAP product with identifier '\(product.productID)' is not a supported product
                 """)
         }
         guard let title = formatter.string(from: psiCashValue) else {
@@ -146,7 +146,7 @@ func productRequestReducer(
         state.psiCashProducts = .pending(previousValue: state.psiCashProducts)
         
         let requestingProductIDs = environment.supportedPsiCashIAPProductIDs.values
-        let request = SKProductsRequest(productIdentifiers: requestingProductIDs)
+        let request = SKProductsRequest(productIdentifiers: requestingProductIDs.rawValues)
         state.psiCashRequest = request
         return [
             .fireAndForget {

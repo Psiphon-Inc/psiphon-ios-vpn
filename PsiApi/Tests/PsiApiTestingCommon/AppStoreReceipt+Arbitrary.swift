@@ -21,6 +21,17 @@ import Foundation
 import SwiftCheck
 @testable import AppStoreIAP
 
+extension ProductID: Arbitrary {
+    public static var arbitrary: Gen<ProductID> {
+        Gen.zip(
+            Gen.fromElements(of: AppStoreProductIdPrefixes.allCases),
+            String.arbitrary
+        ).map { prefix, postfix -> ProductID in
+            ProductID(rawValue: "\(prefix).\(postfix)")!
+        }
+    }
+}
+
 extension SubscriptionIAPPurchase: Arbitrary {
     public static var arbitrary: Gen<SubscriptionIAPPurchase> {
         Gen.compose { c in

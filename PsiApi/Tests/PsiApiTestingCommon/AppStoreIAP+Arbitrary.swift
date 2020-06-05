@@ -201,17 +201,19 @@ extension PaymentTransaction.TransactionState: Arbitrary {
 
 extension TransactionID: Arbitrary {
     public static var arbitrary: Gen<TransactionID> {
-        Int.arbitrary.resize(999_999_999).map(
-            comp(TransactionID.init(stringLiteral:), String.init, abs)
-        )
+        Int.arbitrary.resize(999_999_999).map {
+            TransactionID.init(rawValue: String(abs($0)))!
+        }
     }
 }
 
 extension OriginalTransactionID: Arbitrary {
     public static var arbitrary: Gen<OriginalTransactionID> {
-        Int.arbitrary.resize(999_999_999).map(
-            comp(OriginalTransactionID.init(stringLiteral:), String.init, abs)
-        )
+        Int.arbitrary.resize(999_999_999).map {
+            OriginalTransactionID.init(rawValue: String(abs($0)))!
+        }
+    }
+}
     }
 }
 

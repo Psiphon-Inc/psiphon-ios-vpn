@@ -67,7 +67,8 @@ extension ReceiptData {
         // Computes whether any of subscription purchases in the receipt
         // have the "is_in_intro_offer_period" set to true.
         let hasSubscriptionBeenInIntroOfferPeriod = parsedData.inAppPurchases.filter {
-            subscriptionProductIDs.contains($0.productIdentifier)
+            let productID = ProductID(rawValue: $0.productIdentifier)!
+            return subscriptionProductIDs.contains(productID)
         }.map {
             $0.isInIntroPeriod
         }.contains(true)
@@ -75,14 +76,15 @@ extension ReceiptData {
         // Filters out subscription purchases that have already expired at by `readDate`.
         let subscriptionPurchases = Set(parsedData.inAppPurchases
             .compactMap { parsedIAP -> SubscriptionIAPPurchase? in
-                guard subscriptionProductIDs.contains(parsedIAP.productIdentifier) else {
+                let productID = ProductID(rawValue: parsedIAP.productIdentifier)!
+                guard subscriptionProductIDs.contains(productID) else {
                     return nil
                 }
                 let purchase = SubscriptionIAPPurchase(
-                    productID: parsedIAP.productIdentifier,
-                    transactionID: TransactionID(stringLiteral: parsedIAP.transactionID),
-                    originalTransactionID: OriginalTransactionID(stringLiteral:
-                        parsedIAP.originalTransactionID),
+                    productID: productID,
+                    transactionID: TransactionID(rawValue: parsedIAP.transactionID)!,
+                    originalTransactionID: OriginalTransactionID(rawValue:
+                        parsedIAP.originalTransactionID)!,
                     purchaseDate: parsedIAP.purchaseDate,
                     expires: parsedIAP.expiresDate!,
                     isInIntroOfferPeriod: parsedIAP.isInIntroPeriod,
@@ -99,12 +101,13 @@ extension ReceiptData {
         
         let consumablePurchases = Set(parsedData.inAppPurchases
             .compactMap { parsedIAP -> ConsumableIAPPurchase? in
-                guard consumableProductIDs.contains(parsedIAP.productIdentifier) else {
+                let productID = ProductID(rawValue: parsedIAP.productIdentifier)!
+                guard consumableProductIDs.contains(productID) else {
                     return nil
                 }
                 return ConsumableIAPPurchase(
-                    productID: parsedIAP.productIdentifier,
-                    transactionID: TransactionID(stringLiteral: parsedIAP.transactionID)
+                    productID: productID,
+                    transactionID: TransactionID(rawValue: parsedIAP.transactionID)!
                 )
         })
         
