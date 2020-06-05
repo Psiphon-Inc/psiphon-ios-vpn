@@ -23,7 +23,25 @@ import SwiftCheck
 @testable import AppStoreIAP
 
 extension HTTPResponseData {
-    fileprivate static func arbitraryPurchaseVerificationResponse(req: URLRequest) -> Gen<HTTPResponseData> {
+
+    static func arbitraryPurchaseVerificationResponse() -> Gen<HTTPResponseData> {
+
+        Gen.compose { c in
+            // Generate a random request response
+            let result: SubscriptionValidationResponse.SuccessResult? = c.generate()
+            let encoder = JSONEncoder.makeRfc3339Encoder()
+            let data = try! encoder.encode(result)
+
+            let metadata: HTTPResponseMetadata =
+                c.generate(using:
+                    HTTPResponseMetadata.arbitraryPurchaseVerificationMetadata())
+
+            return HTTPResponseData(data: data,
+                                    metadata: metadata)
+        }
+    }
+
+    static func arbitraryPurchaseVerificationResponse(req: URLRequest) -> Gen<HTTPResponseData> {
 
         Gen.compose { c in
 
@@ -49,8 +67,16 @@ extension HTTPResponseData {
 
                     var response: [String: Any] = try! JSONSerialization.jsonObject(with: firstEncoding, options: []) as! [String : Any]
 
+                    if case .noError = reifiedResult.errorStatus {
+                        // A signed authorization is expected if there was no error.
 
-                    if let base64EncodedAuthorization = reifiedResult.signedAuthorization?.rawData {
+                        var base64EncodedAuthorization = ""
+                        if let rawData = reifiedResult.signedAuthorization?.rawData {
+                            base64EncodedAuthorization = rawData
+                        } else {
+                            let signedAuth : PsiApi.SignedData<SignedAuthorization> = c.generate()
+                            base64EncodedAuthorization = signedAuth.rawData
+                        }
                         response["authorization"] = base64EncodedAuthorization
                         response["original_transaction_id"] = String(describing: decodedRequest.originalTransactionID)
                     }
