@@ -452,7 +452,11 @@ public func subscriptionAuthStateReducer(
                 switch okResponse.errorStatus {
                 case .noError:
                     guard let signedAuthorization = okResponse.signedAuthorization else {
-                        fatalError("expected 'signed_authorization' in response '\(okResponse)'")
+                        return [
+                            environment.feedbackLogger
+                                .log(.error, "expected 'signed_authorization' in response '\(okResponse)'"
+                            ).mapNever()
+                        ]
                     }
                     
                     let stateUpdateEffect = state.subscription.setAuthorizationState(
