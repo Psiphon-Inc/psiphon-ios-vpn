@@ -232,7 +232,7 @@ import PsiCashClient
     init(_ state: BridgedSubscriptionState, _ subscription: SubscriptionIAPPurchase?) {
         self.state = state
         self.latestExpiry = subscription?.expires
-        self.productId = subscription?.productID
+        self.productId = subscription?.productID.rawValue
         self.hasBeenInIntroPeriod = subscription?.hasBeenInIntroOfferPeriod ?? false
     }
 

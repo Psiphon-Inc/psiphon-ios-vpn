@@ -18,64 +18,40 @@
 */
 
 import Foundation
+import Utilities
 
 /// Represents an in-app purchase transaction identifier present in the app receipt.
 /// Apple Ref: https://developer.apple.com/documentation/appstorereceipts/transaction_id
-public struct TransactionID: ExpressibleByStringLiteral, Hashable, Codable,
-CustomStringConvertible {
-    public typealias StringLiteralType = String
+public struct TransactionID: TypedIdentifier {
+    public var rawValue: String { value }
     
     private let value: String
     
-    public init(stringLiteral value: String) {
-        self.value = value
+    public init?(rawValue: String) {
+        self.value = rawValue
     }
-    
-    public var description: String {
-        self.value
-    }
-    
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.singleValueContainer()
-        try container.encode(self.value)
-    }
-    
-    public init(from decoder: Decoder) throws {
-        let container = try decoder.singleValueContainer()
-        self.init(stringLiteral: try container.decode(String.self))
-    }
-    
 }
 
-public struct OriginalTransactionID: ExpressibleByStringLiteral, Hashable, Codable,
-CustomStringConvertible
-{
-    public typealias StringLiteralType = String
+public struct OriginalTransactionID: TypedIdentifier {
+    public var rawValue: String { value }
     
     private let value: String
     
-    public init(stringLiteral value: String) {
-        self.value = value
+    public init?(rawValue: String) {
+        self.value = rawValue
     }
-    
-    public var description: String {
-        self.value
-    }
-    
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.singleValueContainer()
-        try container.encode(self.value)
-    }
-    
-    public init(from decoder: Decoder) throws {
-        let container = try decoder.singleValueContainer()
-        self.init(stringLiteral: try container.decode(String.self))
-    }
-    
 }
 
 /// Represents in-app purchase product identifier
-public typealias ProductID = String
+public struct ProductID: TypedIdentifier {
+    public var rawValue: String { value }
+    
+    private let value: String
+    
+    public init?(rawValue: String) {
+        self.value = rawValue
+    }
+}
 
 public struct ReceiptData: Equatable {
     /// Subscription in-app purchases within the receipt that have not expired at the time of `readDate`.
