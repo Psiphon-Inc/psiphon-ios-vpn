@@ -129,7 +129,7 @@ final class SubscriptionAuthStateTest : XCTestCase {
                     stateCopy.subscription.transactionsPendingAuthRequest =
                         output.state.subscription.transactionsPendingAuthRequest
 
-                    if output.state != inputState {
+                    if output.state != stateCopy {
                         return (output.state ==== stateCopy) <?> ".requestAuthorizationForPurchases.stateEqual"
                     }
 
