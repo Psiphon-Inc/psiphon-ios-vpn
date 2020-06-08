@@ -214,6 +214,19 @@ final class SubscriptionAuthStateTest : XCTestCase {
             switch response.errorStatus {
             case .noError:
 
+                if purchase.originalTransactionID != response.originalTransactionID {
+
+                    // Response txn ID does not match that in the request.
+                    // Expect that auth state has been updated to `.requestError`.
+
+                    let log: LogMessage = "expected 'signed_authorization' in response '\(response)'"
+                    let err = ErrorEvent(ErrorRepr(repr:String(describing:log)),
+                                         date: response.requestDate)
+                    expectedNewState.subscription.purchasesAuthState?[updatedPurchase.originalTransactionID] =
+                                           SubscriptionPurchaseAuthState(purchase: updatedPurchase,
+                                                                         signedAuthorization: .requestError(err))
+                }
+
                 if let signedAuth = response.signedAuthorization {
                     expectedNewState.subscription.purchasesAuthState?[updatedPurchase.originalTransactionID] =
                         SubscriptionPurchaseAuthState(purchase: updatedPurchase,
