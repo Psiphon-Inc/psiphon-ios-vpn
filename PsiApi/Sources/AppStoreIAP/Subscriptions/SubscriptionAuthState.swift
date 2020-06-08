@@ -440,22 +440,36 @@ public func subscriptionAuthStateReducer(
             case .success(let okResponse):
                 // 200-OK response from the purchase verifier server.
                 guard okResponse.originalTransactionID == purchase.originalTransactionID else {
+                    let log: LogMessage =
+                        """
+                        sever transaction ID '\(okResponse.originalTransactionID)' did not match \
+                        expected transaction ID '\(purchase.originalTransactionID)'
+                        """
+                    let err = ErrorEvent(ErrorRepr(repr:String(describing:log)),
+                                         date: okResponse.requestDate)
                     return [
-                        environment.feedbackLogger.log(.error,"""
-                            sever transaction ID '\(okResponse.originalTransactionID)' did not match \
-                            expected transaction ID '\(purchase.originalTransactionID)'
-                            """
-                        ).mapNever()
+                        state.subscription.setAuthorizationState(
+                            newValue: .requestError(err),
+                            forOriginalTransactionID: purchase.originalTransactionID,
+                            environment: environment
+                        ).mapNever(),
+                        environment.feedbackLogger.log(.error, log).mapNever()
                     ]
                 }
                 
                 switch okResponse.errorStatus {
                 case .noError:
                     guard let signedAuthorization = okResponse.signedAuthorization else {
+                        let log: LogMessage = "expected 'signed_authorization' in response '\(okResponse)'"
+                        let err = ErrorEvent(ErrorRepr(repr:String(describing:log)),
+                                             date: okResponse.requestDate)
                         return [
-                            environment.feedbackLogger
-                                .log(.error, "expected 'signed_authorization' in response '\(okResponse)'"
-                            ).mapNever()
+                            state.subscription.setAuthorizationState(
+                                newValue: .requestError(err),
+                                forOriginalTransactionID: purchase.originalTransactionID,
+                                environment: environment
+                            ).mapNever(),
+                            environment.feedbackLogger.log(.error, log).mapNever()
                         ]
                     }
                     
