@@ -206,7 +206,7 @@ extension PaymentTransaction.TransactionState: Arbitrary {
             PendingTransactionState.arbitrary
                 .map(PaymentTransaction.TransactionState.pending),
             
-            Result<Pair<Date, CompletedTransactionState>, SKError>.arbitrary
+            Result<Pair<Date, CompletedTransactionState>, Either<SystemError, SKError>>.arbitrary
                 .map(PaymentTransaction.TransactionState.completed)
         ])
     }
@@ -335,7 +335,7 @@ extension IAPError: Arbitrary {
         Gen.one(of: [
             // Should cover all cases
             String.arbitrary.map(IAPError.failedToCreatePurchase(reason:)),
-            SKError.arbitrary.map(IAPError.storeKitError)
+            IAPError.StoreKitError.arbitrary.map(IAPError.storeKitError)
         ])
     }
 }

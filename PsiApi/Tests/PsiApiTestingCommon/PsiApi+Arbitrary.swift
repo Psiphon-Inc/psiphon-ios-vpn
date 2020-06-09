@@ -83,6 +83,15 @@ extension SKError: Arbitrary {
     }
 }
 
+extension Either: Arbitrary where A: Arbitrary, B: Arbitrary {
+    public static var arbitrary: Gen<Either<A, B>> {
+        Gen.one(of: [
+            A.arbitrary.map(Either.left),
+            B.arbitrary.map(Either.right)
+        ])
+    }
+}
+
 extension Result: Arbitrary where Success: Arbitrary, Failure: Arbitrary {
     public static var arbitrary: Gen<Result<Success, Failure>> {
         Gen.one(of: [
