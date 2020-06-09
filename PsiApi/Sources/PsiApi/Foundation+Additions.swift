@@ -245,8 +245,26 @@ public enum PendingValue<Pending, Completed> {
     case completed(Completed)
 }
 
-extension PendingValue: Equatable where Pending: Equatable, Completed: Equatable {}
+extension PendingValue {
+    
+    public var pending: Pending? {
+        guard case let .pending(value) = self else {
+            return nil
+        }
+        return value
+    }
+    
+    public var completed: Completed? {
+        guard case let .completed(value) = self else {
+            return nil
+        }
+        return value
+    }
+    
+}
 
+extension PendingValue: Equatable where Pending: Equatable, Completed: Equatable {}
+extension PendingValue: Hashable where Pending: Hashable, Completed: Hashable {}
 
 extension PendingValue {
     

@@ -63,7 +63,8 @@ extension PaymentQueue {
     
     static func mock(
         transactions: Gen<[PaymentTransaction]>? = nil,
-        addPayment: ((IAPPurchasableProduct) -> AddedPayment)? = nil
+        addPayment: ((AppStoreProduct) -> AddedPayment)? = nil,
+        finishTransaction: ((PaymentTransaction) -> Effect<Never>)? = nil
     ) -> PaymentQueue {
         return PaymentQueue(
             transactions: { () -> Effect<[PaymentTransaction]> in
@@ -79,8 +80,11 @@ extension PaymentQueue {
             removeObserver: { _ -> Effect<Never> in
                 return .empty
             },
-            finishTransaction: { _ -> Effect<Never> in
-                return .empty
+            finishTransaction: { paymentTx -> Effect<Never> in
+                guard let f = finishTransaction else {
+                    XCTFatal()
+                }
+                return f(paymentTx)
             })
     }
     

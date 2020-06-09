@@ -74,7 +74,7 @@ func receiptReducer(
         ]
 
     case ._remoteReceiptRefreshResult(let result):
-        state.remoteReceiptRefreshState = .completed(result.mapToUnit())
+        state.remoteReceiptRefreshState = .completed(result)
 
         return [
             state.fulfillRefreshPromises(result).mapNever(),
@@ -123,7 +123,7 @@ fileprivate func notifyRefreshedReceiptEffects<NeverAction>(
 final class ReceiptRefreshRequestDelegate: StoreDelegate<ReceiptStateAction>, SKRequestDelegate {
 
     func requestDidFinish(_ request: SKRequest) {
-        storeSend(._remoteReceiptRefreshResult(.success(())))
+        storeSend(._remoteReceiptRefreshResult(.success(.unit)))
     }
 
     func request(_ request: SKRequest, didFailWithError error: Error) {

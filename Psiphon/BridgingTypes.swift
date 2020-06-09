@@ -257,19 +257,3 @@ import PsiCashClient
         self.state = state
     }
 }
-
-// IAP result
-@objc final class ObjCIAPResult: NSObject {
-    @objc let transaction: SKPaymentTransaction?
-    @objc let error: Error?
-
-    init(transaction: SKPaymentTransaction?, error: Error?) {
-        self.transaction = transaction
-        self.error = error
-    }
-
-    static func from(iapResult: IAPResult) -> ObjCIAPResult {
-        return ObjCIAPResult(transaction: iapResult.transaction,
-                             error: iapResult.result.projectError())
-    }
-}

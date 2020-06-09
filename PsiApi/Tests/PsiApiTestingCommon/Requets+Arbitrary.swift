@@ -43,6 +43,16 @@ extension HttpRequestTunnelError: Arbitrary {
     }
 }
 
+extension HTTPResponseMetadata: Arbitrary {
+    public static var arbitrary: Gen<HTTPResponseMetadata> {
+        Gen.compose { c in
+            HTTPResponseMetadata(url: URL(string: "https://psiphon.ca")!,
+                                 headers: [String: String](),
+                                 statusCode: c.generate())
+        }
+    }
+}
+
 extension RetriableTunneledHttpRequest.RequestResult.RetryCondition: Arbitrary where
 Response.Success: Arbitrary, Response.Failure: Arbitrary {
     public static var arbitrary: Gen<RetriableTunneledHttpRequest<Response>.RequestResult.RetryCondition> {
