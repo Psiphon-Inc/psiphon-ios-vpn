@@ -292,6 +292,8 @@ final class SubscriptionAuthStateTest : XCTestCase {
         }
     }
 
+    // MARK: .localDataUpdate tests.
+
     func testLocalDataUpdateWhenExtensionRejectedAuthorizations () {
 
         struct IAPPurchaseWithSignedData: Hashable, Arbitrary {
@@ -343,7 +345,7 @@ final class SubscriptionAuthStateTest : XCTestCase {
                                                                              env: env)
 
             guard case let ._localDataUpdateResult(transformer) = localDataUpdateOutput.actions.first?.first?.value else {
-                return false <?> "Expected ._localDataUpdateResult, but got: \(localDataUpdateOutput)"
+                return false <?> "Expected ._localDataUpdateResult"
             }
 
             // Run local data update result action
@@ -379,6 +381,94 @@ final class SubscriptionAuthStateTest : XCTestCase {
                 ^&&^
                 // Expect authorization state of each purchase to now be `.rejectedByPsiphon`.
                 (expectedFinalState ==== localDataUpdateResultOutput.state) <?> "localDataUpdateResult action output state check"
+        }
+    }
+
+    // MARK: .requestAuthorizationForPurchases tests
+
+    /// Test requesting an authorization for a non-expired purchase.
+    /// The tunnel connection and vpn status values are randomized, but end on a combination which will allow the authorization
+    /// request to be made (VPN and tunnel are connected).
+    func testRequestAuthorizationForPurchases() {
+
+        let tunnelConnectionGen = [TunnelConnection?].arbitrary.resize(100)
+        let tunnelProviderVPNStatusGen = [TunnelProviderVPNStatus].arbitrary.resize(100)
+
+        property("Authorization request will eventually succeed") <- forAll(tunnelConnectionGen, tunnelProviderVPNStatusGen) {
+
+            tunnelConnections, vpnStatuses in
+
+            // Only generate non-expired purchases
+            let iapPurchaseGen = SubscriptionIAPPurchase.arbitrary.suchThat{$0.expires.timeIntervalSinceNow > 0}
+
+            let tunnelStatusSignal =
+                SignalProducer<TunnelProviderVPNStatus, Never>.init(vpnStatuses).concat(value: .connected)
+
+
+            let finalTunnelConnection: TunnelConnection? = .some(TunnelConnection{.connection(.connected)})
+            let tunnelConnectionRefSignal =
+                SignalProducer<TunnelConnection?, Never>.init(tunnelConnections).concat(value: finalTunnelConnection)
+
+            let envGen =
+                SubscriptionAuthStateReducerEnvironment
+                    .arbitraryWithTunnelSignals(
+                        tunnelStatusSignal: tunnelStatusSignal,
+                        tunnelConnectionRefSignal: tunnelConnectionRefSignal)
+
+            return forAll(iapPurchaseGen, envGen) {
+                purchase, env in
+
+                // Mark the purchase as `.notRequested`.
+                var authState = SubscriptionAuthState()
+                authState.purchasesAuthState = .some([
+                    purchase.originalTransactionID:
+                        SubscriptionPurchaseAuthState(purchase: purchase,
+                                                      signedAuthorization: .notRequested)
+                ])
+
+                let receiptData = ReceiptData(subscriptionInAppPurchases: Set(arrayLiteral:purchase),
+                                              consumableInAppPurchases: [],
+                                              data: Data() /* unused in this test */,
+                                              readDate: Date() /* unused in this test */)
+
+                let state = SubscriptionReducerState(subscription: authState,
+                                                     receiptData: receiptData)
+
+                let output = SubscriptionAuthStateTest.runReducer(effectsTimeout: 10,
+                                                                  state: state,
+                                                                  action: .requestAuthorizationForPurchases,
+                                                                  env: env)
+
+                guard let actions = output.actions.first else {
+                        return false <?> "Expected actions from reducer"
+                }
+
+                guard actions.count >= 2 else {
+                    return false <?> "Expected 2 or more actions from reducer"
+                }
+
+                // Take the second last action since the last one will be the
+                // materialized completed.
+                let finalAction = actions[actions.count-2]
+
+                switch finalAction {
+                case .value(._authorizationRequestResult(result: let result, forPurchase: purchase)):
+                    switch result {
+                    case .willRetry(_):
+                        return false <?> "Expected that the request was attempted"
+                    default:
+                        break
+                    }
+                default:
+                    return false <?> "Expected second last action to be completed"
+                }
+
+                // Expect the state to have the given purchase as pending auth request.
+                var expectedNewState = state
+                expectedNewState.subscription.transactionsPendingAuthRequest.insert(purchase.originalTransactionID)
+
+                return output.state ==== expectedNewState
+            }
         }
     }
 

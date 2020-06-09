@@ -57,6 +57,35 @@ extension SubscriptionAuthStateReducerEnvironment: Arbitrary {
             )
         }
     }
+
+    public static func arbitraryWithTunnelSignals(
+        tunnelStatusSignal: SignalProducer<TunnelProviderVPNStatus, Never>,
+        tunnelConnectionRefSignal: SignalProducer<TunnelConnection?, Never>) ->
+        Gen<SubscriptionAuthStateReducerEnvironment> {
+
+        Gen.compose { c in
+
+            return SubscriptionAuthStateReducerEnvironment(
+                feedbackLogger: FeedbackLogger(StdoutFeedbackLogger()),
+                httpClient: c.generate(using:
+                    HTTPClient.arbitraryPurchaseVerificationClient()),
+                httpRequestRetryCount: 0,
+                httpRequestRetryInterval: DispatchTimeInterval.seconds(0),
+                notifier: DevNullNotifier(),
+                notifierUpdatedSubscriptionAuthsMessage: c.generate(),
+                sharedDB: TestSharedDBContainer(state:c.generate()),
+                tunnelStatusSignal: tunnelStatusSignal,
+                tunnelConnectionRefSignal: tunnelConnectionRefSignal,
+                clientMetaData: ClientMetaData(MockAppInfoProvider()),
+                getCurrentTime: {
+                    return Date()
+                },
+                compareDates: { date1, date2, _ -> ComparisonResult in
+                    return PsiApiTestingCommon.compareDates(date1, to: date2)
+                }
+            )
+        }
+    }
 }
 
 extension MutableDBContainer: Arbitrary {
