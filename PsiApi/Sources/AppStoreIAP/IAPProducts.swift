@@ -36,6 +36,13 @@ public enum AppStoreProductType: String, CaseIterable {
         case .psiCash: return true
         }
     }
+    
+    public var prefix: AppStoreProductIdPrefixes {
+        switch self {
+        case .subscription: return .subscription
+        case .psiCash: return .psiCash
+        }
+    }
 }
 
 public enum LocalizedPrice: Hashable {
@@ -126,6 +133,16 @@ public struct AppStoreProduct: Hashable {
 public enum AppStoreProductIdPrefixes: String, CaseIterable {
     case subscription = "ca.psiphon.Psiphon"
     case psiCash = "ca.psiphon.Psiphon.Consumable.PsiCash"
+    
+    static func estimateProductTypeFromPrefix(_ productID: ProductID) -> AppStoreProductType? {
+        if productID.rawValue.contains(AppStoreProductIdPrefixes.psiCash.rawValue) {
+            return .psiCash
+        } else if productID.rawValue.contains(AppStoreProductIdPrefixes.subscription.rawValue) {
+            return .subscription
+        } else {
+            return nil
+        }
+    }
 }
 
 /// Represents product identifiers in-app purchase products that are supported.
@@ -143,6 +160,25 @@ public struct SupportedAppStoreProducts: Equatable {
                 return pair.1.map { ($0, pair.0) }
             }
         )
+    }
+    
+    public init(_ supportedSeq: [(AppStoreProductType, ProductID)]) {
+    
+        let supportedKeyWithValues = AppStoreProductType.allCases
+            .map { possibleType -> (AppStoreProductType, Set<ProductID>) in
+                
+                let sameTypeProductIDs: [ProductID] = supportedSeq
+                    .filter { productTypeProductIdPair -> Bool in
+                        productTypeProductIdPair.0 == possibleType
+                    }
+                    .map { $0.1 }
+                
+                return (possibleType, Set(sameTypeProductIDs))
+        }
+        
+        self.supported = Dictionary(uniqueKeysWithValues: supportedKeyWithValues)
+        
+        self.reversed = Dictionary(uniqueKeysWithValues:supportedSeq.map { ($0.1, $0.0) })
     }
 
     public func isSupportedProduct(_ productID: ProductID) -> AppStoreProductType? {

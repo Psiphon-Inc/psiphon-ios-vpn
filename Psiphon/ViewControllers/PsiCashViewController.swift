@@ -146,7 +146,7 @@ final class PsiCashViewController: UIViewController {
                     case .rewardedVideoAd:
                         store.send(.showRewardedVideoAd)
                     case .product(let product):
-                        iapStore.send(.purchase(.psiCash(product: product)))
+                        iapStore.send(.purchase(product: product))
                     }
                 }),
                 .init(Spinner(style: .whiteLarge),
@@ -194,7 +194,8 @@ final class PsiCashViewController: UIViewController {
                     }
                 }
                 
-                let purchasingNavState = (observed.state.iap.purchasing,
+                let psiCashIAPPurchase = observed.state.iap.purchasing[.psiCash] ?? nil
+                let purchasingNavState = (psiCashIAPPurchase?.purchasingState,
                                           observed.state.psiCash.purchasing,
                                           self.navigation)
                 
@@ -202,10 +203,10 @@ final class PsiCashViewController: UIViewController {
                 case (.none, .none, _):
                     self.display(screen: .mainScreen)
                     
-                case (.pending(.psiCash(_)), _, .mainScreen):
+                case (.pending(_), _, .mainScreen):
                     self.display(screen: .psiCashPurchaseDialog)
                     
-                case (.pending(.psiCash(_)), _, .psiCashPurchaseDialog):
+                case (.pending(_), _, .psiCashPurchaseDialog):
                     break
                     
                 case (_, .speedBoost(_), .mainScreen):
@@ -251,7 +252,7 @@ final class PsiCashViewController: UIViewController {
                         self.displayBasicAlert(errorDesc: errorDesc)
                     }
                     
-                case (.error(let iapErrorEvent), _, _):
+                case (.completed(let iapErrorEvent), _, _):
                     self.display(screen: .mainScreen)
                     if let errorDesc = errorEventDescription(iapErrorEvent: iapErrorEvent) {
                         self.displayBasicAlert(errorDesc: errorDesc)
@@ -321,8 +322,8 @@ final class PsiCashViewController: UIViewController {
                                 
                                 // Set view content based on verification state of the
                                 // unverified PsiCash IAP transaction.
-                                switch unverifiedPsiCashTx.verificationState {
-                                case .notRequested, .pendingVerificationResult:
+                                switch unverifiedPsiCashTx.verification {
+                                case .notRequested, .pendingResponse:
                                     self.containerBindable.bind(
                                         .left(.right(.right(.right(.right(
                                             .pendingPsiCashVerification)))))

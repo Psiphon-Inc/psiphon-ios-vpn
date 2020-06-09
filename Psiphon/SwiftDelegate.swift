@@ -364,7 +364,7 @@ extension SwiftDelegate: SwiftBridgeDelegate {
     }
     
     @objc func refreshAppStoreReceipt() -> Promise<Error?>.ObjCPromise<NSError> {
-        let promise = Promise<Result<(), SystemErrorEvent>>.pending()
+        let promise = Promise<Result<Utilities.Unit, SystemErrorEvent>>.pending()
         let objcPromise = promise.then { result -> Error? in
             return result.projectError()?.error
         }
@@ -375,29 +375,26 @@ extension SwiftDelegate: SwiftBridgeDelegate {
     @objc func buyAppStoreSubscriptionProduct(
         _ skProduct: SKProduct
     ) -> Promise<ObjCIAPResult>.ObjCPromise<ObjCIAPResult> {
-        let promise = Promise<IAPResult>.pending()
-        let objcPromise = promise.then { (result: IAPResult) -> ObjCIAPResult in
-            ObjCIAPResult.from(iapResult: result)
-        }
+        let promise = Promise<ObjCIAPResult>.pending()
         
         do {
             let appStoreProduct = try AppStoreProduct.from(
                 skProduct: skProduct,
                 isSupportedProduct: self.supportedProducts.isSupportedProduct(_:)
             )
+            
             guard case .subscription = appStoreProduct.type else {
                 fatalError()
             }
-            self.store.send(.iap(.purchase(
-                IAPPurchasableProduct.subscription(product: appStoreProduct, promise: promise)
-                )))
+            
+            self.store.send(.iap(.purchase(product: appStoreProduct, resultPromise: promise)))
             
         } catch {
             self.feedbackLogger.fatalError(
                 "Unknown subscription product identifier '\(skProduct.productIdentifier)'")
         }
         
-        return objcPromise.asObjCPromise()
+        return promise.asObjCPromise()
     }
     
     @objc func onAdPresentationStatusChange(_ presenting: Bool) {

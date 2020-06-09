@@ -24,13 +24,13 @@ import PsiApi
 
 public struct PaymentQueue {
     public let transactions: () -> Effect<[PaymentTransaction]>
-    public let addPayment: (IAPPurchasableProduct) -> Effect<AddedPayment>
+    public let addPayment: (AppStoreProduct) -> Effect<AddedPayment>
     public let addObserver: (SKPaymentTransactionObserver) -> Effect<Never>
     public let removeObserver: (SKPaymentTransactionObserver) -> Effect<Never>
     public let finishTransaction: (PaymentTransaction) -> Effect<Never>
     
     public init(transactions: @escaping () -> Effect<[PaymentTransaction]>,
-                addPayment: @escaping (IAPPurchasableProduct) -> Effect<AddedPayment>,
+                addPayment: @escaping (AppStoreProduct) -> Effect<AddedPayment>,
                 addObserver: @escaping (SKPaymentTransactionObserver) -> Effect<Never>,
                 removeObserver: @escaping (SKPaymentTransactionObserver) -> Effect<Never>,
                 finishTransaction: @escaping (PaymentTransaction) -> Effect<Never>) {
@@ -45,10 +45,10 @@ public struct PaymentQueue {
 
 /// Represents a payment that has been added to `SKPaymentQueue`.
 public struct AddedPayment: Equatable {
-    public let product: IAPPurchasableProduct
+    public let product: AppStoreProduct
     public let payment: Payment
     
-    public init(_ product: IAPPurchasableProduct, _ payment: Payment) {
+    public init(_ product: AppStoreProduct, _ payment: Payment) {
         self.product = product
         self.payment = payment
     }
