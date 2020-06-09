@@ -23,10 +23,15 @@ import PsiApi
 final class MutableDBContainer {
     var subscriptionAuths: Data?
     var containerRejectedSubscriptionAuthIdReadAtLeastUpToSequenceNumber: Int
+    var rejectedSubscriptionAuthorizationIDs: [String]
 
-    init(subscriptionAuths: Data?, containerRejectedSubscriptionAuthIdReadAtLeastUpToSequenceNumber: Int) {
+    init(subscriptionAuths: Data?,
+         containerRejectedSubscriptionAuthIdReadAtLeastUpToSequenceNumber: Int,
+         rejectedSubscriptionAuthorizationIDs: [String]) {
+
         self.subscriptionAuths = subscriptionAuths
         self.containerRejectedSubscriptionAuthIdReadAtLeastUpToSequenceNumber = containerRejectedSubscriptionAuthIdReadAtLeastUpToSequenceNumber
+        self.rejectedSubscriptionAuthorizationIDs = rejectedSubscriptionAuthorizationIDs
     }
 }
  
@@ -51,8 +56,6 @@ struct TestSharedDBContainer: SharedDBContainer {
     }
 
     func getRejectedSubscriptionAuthorizationIDs() -> [String] {
-        // TODO: in the future random auth IDs should be rejected or
-        // all auth IDs except the latest one.
-        return []
+        return self.state.rejectedSubscriptionAuthorizationIDs
     }
 }
