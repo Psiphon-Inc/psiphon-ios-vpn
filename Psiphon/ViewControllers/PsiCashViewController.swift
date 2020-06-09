@@ -634,18 +634,21 @@ extension RewardedVideoState {
 fileprivate func errorEventDescription(
     iapErrorEvent: ErrorEvent<IAPError>
 ) -> ErrorEventDescription<ErrorRepr>? {
+    
     let optionalDescription: String?
     switch iapErrorEvent.error {
+        
     case let .failedToCreatePurchase(reason: reason):
         optionalDescription = reason
-    case let .storeKitError(error: skError):
+        
+    case let .storeKitError(error: iapError):
         // Payment cancelled errors are ignored.
-        if skError.code == .paymentCancelled {
+        if iapError.paymentCancelled {
             optionalDescription = .none
         } else {
             optionalDescription = """
             \(UserStrings.Purchase_failed())
-            (\(skError.localizedDescription))
+            (\(iapError.localizedDescription))
             """
         };
     }
