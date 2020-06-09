@@ -24,7 +24,7 @@ import ReactiveSwift
 import Utilities
 import PsiApi
 
-// Supported app strong products
+// Supported App Store products
 public enum AppStoreProductType: String, CaseIterable {
     case subscription
     case psiCash
