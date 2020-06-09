@@ -145,7 +145,8 @@ extension HTTPClient: Arbitrary {
                     case .completed:
                         return
                     case .interrupted:
-                        fatalError("Unexpected interruption")
+                        // The request may be cancelled while in flight.
+                        return
                     case .failed(_):
                         fatalError("Unexpected effect failure")
                     }
