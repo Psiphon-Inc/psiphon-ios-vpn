@@ -28,6 +28,7 @@ import Utilities
 @testable import AppStoreIAP
 
 func returnGeneratedOrFail<A>(_ gen: Gen<A>?) -> A {
+    // TODO: Calling generate hinders replay functionality.
     guard let generated = gen?.generate else {
         XCTFatal()
     }
@@ -36,6 +37,12 @@ func returnGeneratedOrFail<A>(_ gen: Gen<A>?) -> A {
 
 func positiveDouble() -> Gen<Double> {
     Double.arbitrary.map(abs)
+}
+
+extension Utilities.Unit: Arbitrary {
+    public static var arbitrary: Gen<Utilities.Unit> {
+        Gen.pure(.unit)
+    }
 }
 
 extension Pair: Arbitrary where A: Arbitrary, B: Arbitrary {
@@ -100,5 +107,34 @@ extension ErrorEvent: Arbitrary where E: Arbitrary {
 extension Locale: Arbitrary {
     public static var arbitrary: Gen<Locale> {
         Gen.fromElements(of: Locale.availableIdentifiers).map(Locale.init(identifier:))
+    }
+}
+
+extension Pending: Arbitrary where Completed: Arbitrary {
+    public static var arbitrary: Gen<Pending<Completed>> {
+        Gen.frequency([
+            (1, Gen.pure(.pending)),
+            (4, Completed.arbitrary.map(Pending.completed))
+        ])
+    }
+}
+
+extension PendingValue: Arbitrary where Pending: Arbitrary, Completed: Arbitrary {
+    public static var arbitrary: Gen<PendingValue<Pending, Completed>> {
+        Gen.frequency([
+            (1, Pending.arbitrary.map(PendingValue.pending)),
+            (3, Completed.arbitrary.map(PendingValue.completed))
+        ])
+    }
+    
+    /// Generates arbitrary `PendingValue.completed` values.
+    static var arbitraryWithOnlyCompleted: Gen<PendingValue<Pending, Completed>> {
+        Completed.arbitrary.map(PendingValue.completed)
+    }
+}
+
+extension OrderedSet: Arbitrary where E: Arbitrary {
+    public static var arbitrary: Gen<OrderedSet<E>> {
+        [E].arbitrary.map(OrderedSet.init)
     }
 }

@@ -1,21 +1,21 @@
 /*
-* Copyright (c) 2020, Psiphon Inc.
-* All rights reserved.
-*
-* This program is free software: you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by
-* the Free Software Foundation, either version 3 of the License, or
-* (at your option) any later version.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*
-*/
+ * Copyright (c) 2020, Psiphon Inc.
+ * All rights reserved.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
 
 import Foundation
 import ReactiveSwift
@@ -214,33 +214,45 @@ extension PaymentTransaction.TransactionState: Arbitrary {
 
 extension TransactionID: Arbitrary {
     public static var arbitrary: Gen<TransactionID> {
-        Int.arbitrary.resize(999_999_999).map(
-            comp(TransactionID.init(stringLiteral:), String.init, abs)
-        )
+        Int.arbitrary.resize(999_999_999).map {
+            TransactionID.init(rawValue: String(abs($0)))!
+        }
     }
 }
 
 extension OriginalTransactionID: Arbitrary {
     public static var arbitrary: Gen<OriginalTransactionID> {
-        Int.arbitrary.resize(999_999_999).map(
-            comp(OriginalTransactionID.init(stringLiteral:), String.init, abs)
-        )
+        Int.arbitrary.resize(999_999_999).map {
+            OriginalTransactionID.init(rawValue: String(abs($0)))!
+        }
+    }
+}
+
+extension Payment: Arbitrary {
+    public static var arbitrary: Gen<Payment> {
+        Gen.compose { c in
+            Payment(productID: c.generate())
+        }
     }
 }
 
 extension PaymentTransaction: Arbitrary {
     public static var arbitrary: Gen<PaymentTransaction> {
-        Gen.zip(TransactionID.arbitrary, Date.arbitrary, String.arbitrary,
-                TransactionState.arbitrary)
-            .map({ (transactionID, date, productID, transactionState) in
-                PaymentTransaction(
-                    transactionID: { transactionID },
-                    productID: { productID },
-                    transactionState: { transactionState },
-                    isEqual: { $0.transactionID() == transactionID },
-                    skPaymentTransaction: { nil }
-                )
-            })
+        Gen.compose { c in
+            let transactionID: TransactionID = c.generate()
+            let productID: ProductID = c.generate()
+            let transactionState: TransactionState = c.generate()
+            let payment: Payment = c.generate()
+            
+            return PaymentTransaction(
+                transactionID: { transactionID },
+                productID: { productID },
+                transactionState: { transactionState },
+                payment: { payment },
+                isEqual: { $0.transactionID() == transactionID },
+                skPaymentTransaction: { nil }
+            )
+        }
     }
 }
 
@@ -249,7 +261,7 @@ extension UnverifiedPsiCashTransactionState.VerificationRequestState: Arbitrary 
         Gen.one(of: [
             // Should cover all cases
             Gen.pure(.notRequested),
-            Gen.pure(.pendingVerificationResult),
+            Gen.pure(.pendingResponse),
             ErrorEvent<ErrorRepr>.arbitrary
                 .map(UnverifiedPsiCashTransactionState.VerificationRequestState.requestError),
         ])
@@ -267,10 +279,10 @@ extension UnverifiedPsiCashTransactionState: Arbitrary {
             }).map {
                 guard let value =
                     UnverifiedPsiCashTransactionState(transaction: $0, verificationState: $1) else {
-                    XCTFatal()
+                        XCTFatal()
                 }
                 return value
-            }
+        }
     }
 }
 
@@ -286,29 +298,36 @@ extension LocalizedPrice: Arbitrary {
             // Should cover all cases
             Gen.pure(LocalizedPrice.free),
             Gen.zip(positiveDouble(), Locale.arbitrary)
-            .map(LocalizedPrice.localizedPrice(price: priceLocale:))
+                .map(LocalizedPrice.localizedPrice(price: priceLocale:))
         ])
-    }
-}
- 
-extension AppStoreProduct: Arbitrary {
-    public static var arbitrary: Gen<AppStoreProduct> {
-        Gen.zip(AppStoreProductType.arbitrary, String.arbitrary,
-                String.arbitrary, LocalizedPrice.arbitrary, Gen.pure(nil))
-            .map(AppStoreProduct.init)
     }
 }
 
-extension IAPPurchasableProduct: Arbitrary {
-    public static var arbitrary: Gen<IAPPurchasableProduct> {
-        Gen.one(of: [
-            // Should cover all cases
-            AppStoreProduct.arbitrary.map(IAPPurchasableProduct.psiCash(product:)),
-            
-            Gen.zip(AppStoreProduct.arbitrary, Gen.pure(nil))
-                .map(IAPPurchasableProduct.subscription(product: promise:))
-        ])
+extension AppStoreProduct: Arbitrary {
+    public static var arbitrary: Gen<AppStoreProduct> {
+        Gen.compose { c in
+            AppStoreProduct(
+                type: c.generate(),
+                productID: c.generate(),
+                localizedDescription: c.generate(),
+                price: c.generate(),
+                skProductRef: nil
+            )
+        }
     }
+    
+    static var arbitraryPsiCashProduct: Gen<AppStoreProduct> {
+        Gen.compose { c in
+            AppStoreProduct(
+                type: .psiCash,
+                productID: c.generate(),
+                localizedDescription: c.generate(),
+                price: c.generate(),
+                skProductRef: nil
+            )
+        }
+    }
+    
 }
 
 extension IAPError: Arbitrary {
@@ -321,21 +340,53 @@ extension IAPError: Arbitrary {
     }
 }
 
-extension IAPPurchasingState: Arbitrary {
-    public static var arbitrary: Gen<IAPPurchasingState> {
-        Gen.frequency([
-            // Should cover all cases
-            (1, Gen.pure(.none)),
-            (3, ErrorEvent<IAPError>.arbitrary.map(IAPPurchasingState.error)),
-            (6, IAPPurchasableProduct.arbitrary.map(IAPPurchasingState.pending)),
-        ])
+extension IAPPurchasing: Arbitrary {
+    public static var arbitrary: Gen<IAPPurchasing> {
+        Gen.compose { c in
+            let product: AppStoreProduct = c.generate()
+            
+            return IAPPurchasing(productType: product.type,
+                                 productID: product.productID,
+                                 purchasingState: c.generate())
+        }
     }
+    
+    /// Generates `IAPPurchasing` satisfying following condition:
+    ///
+    /// ```
+    /// purchasingState == .pending(.none) ||
+    ///   purchasingState == .pending(.some(_))
+    /// ```
+    ///
+    static var arbitraryWithPending: Gen<IAPPurchasing> {
+        Gen.compose { c in
+            let product: AppStoreProduct = c.generate()
+            let payment: Payment? = c.generate()
+            
+            return IAPPurchasing(productType: product.type,
+                                 productID: product.productID,
+                                 purchasingState: .pending(payment))
+        }
+    }
+    
+    static var arbitraryWithPendingNoPayment: Gen<IAPPurchasing> {
+        Gen.compose { c in
+            let product: AppStoreProduct = c.generate()
+            
+            return IAPPurchasing(productType: product.type,
+                                 productID: product.productID,
+                                 purchasingState: .pending(nil))
+        }
+    }
+    
 }
 
 extension IAPState: Arbitrary {
     public static var arbitrary: Gen<IAPState> {
-        Gen.zip(UnverifiedPsiCashTransactionState?.arbitrary, IAPPurchasingState.arbitrary)
-            .map(IAPState.init(unverifiedPsiCashTx: purchasing:))
+        Gen.compose { c in
+            IAPState(unverifiedPsiCashTx: c.generate(),
+                     purchasing: c.generate())
+        }
     }
 }
 
@@ -355,6 +406,7 @@ extension PsiCashBalance: Arbitrary {
 }
 
 extension IAPReducerState: Arbitrary {
+    
     public static var arbitrary: Gen<IAPReducerState> {
         PsiCashAuthPackage.arbitrary.flatMap { (authPackage: PsiCashAuthPackage) in
             if authPackage.hasMinimalTokens {
@@ -363,16 +415,260 @@ extension IAPReducerState: Arbitrary {
                     .map(IAPReducerState.init(iap:psiCashBalance:psiCashAuth:))
             } else {
                 return Gen.zip(IAPState.arbitrary, Gen.pure(PsiCashBalance()),
-                        Gen.pure(PsiCashAuthPackage(withTokenTypes: [])))
+                               Gen.pure(PsiCashAuthPackage(withTokenTypes: [])))
                     .map(IAPReducerState.init(iap:psiCashBalance:psiCashAuth:))
             }
         }
     }
+    
+    /// `arbitraryWithNonPurchasingState` satisfies the following condition:
+    ///
+    /// ```
+    ///  (∀ type, state.iap.purchasing[type] == nil) &&
+    ///  state.iap.unverifiedPsiCashTx == nil &&
+    ///  state.psiCashAuth.hasMinimalTokens
+    /// ```
+    static let arbitraryWithNonPurchasingState = Gen<IAPReducerState>.compose { c in
+        IAPReducerState(
+            iap: IAPState(
+                unverifiedPsiCashTx: nil,
+                purchasing: [:]
+            ),
+            psiCashBalance: c.generate(),
+            psiCashAuth: PsiCashAuthPackage.completeAuthPackage
+        )
+    }
+    
+    /// `arbitraryWithPurchasePending` satisfies the following condition:
+    ///
+    /// ```
+    /// (∃ type, state.iap.purchasing[type]?.purchasingState == .pending(_))
+    /// ```
+    ///
+    /// Returned IAPPurchasableProduct is the product in the last element of
+    /// returned `IAPReducerState.iap.purchasing`
+    static let arbitraryWithPurchasePending: Gen<Pair<IAPReducerState, AppStoreProduct>> =
+        Gen.zip(
+            IAPReducerState.arbitraryWithNonPurchasingState,
+            AppStoreProduct.arbitrary,
+            Payment?.arbitrary
+        ).map {
+            let purchasing = IAPPurchasing(productType: $1.type,
+                                           productID: $1.productID,
+                                           purchasingState: .pending($2))
+            
+            // Updates generated `IAPReducerState.iap.purchasing` value
+            // with given `AppStoreProduct` as the pending purchase.
+            var updatedState = $0
+            updatedState.iap.purchasing[purchasing.productType] = purchasing
+            
+            return Pair(updatedState, $1)
+    }
+    
+    /// `arbitraryWithPurchasePendingNoPayment` satisfies the following condition:
+    ///
+    /// ```
+    /// (∃ type, state.iap.purchasing[type]?.purchasingState == .pending(nil))
+    /// ```
+    ///
+    /// Returned IAPPurchasableProduct is the product in the last element of
+    /// returned `IAPReducerState.iap.purchasing`
+    static let arbitraryWithPurchasePendingNoPayment: Gen<Pair<IAPReducerState, AppStoreProduct>> =
+        Gen.zip(
+            IAPReducerState.arbitraryWithNonPurchasingState,
+            AppStoreProduct.arbitrary
+        ).map {
+            let purchasing = IAPPurchasing(productType: $1.type,
+                                           productID: $1.productID,
+                                           purchasingState: .pending(nil))
+            
+            // Updates generated `IAPReducerState.iap.purchasing` value
+            // with given `AppStoreProduct` as the pending purchase.
+            var updatedState = $0
+            updatedState.iap.purchasing[purchasing.productType] = purchasing
+            
+            return Pair(updatedState, $1)
+    }
+    
+    
+    /// `arbitraryWithPendingVerificationPurchaseState` satisfies the following condition:
+    ///
+    /// ```
+    /// state.iap.unverifiedPsiCashTx != nil
+    /// ```
+    static let arbitraryWithPendingVerificationPurchaseState = Gen<IAPReducerState>.compose { c in
+        IAPReducerState(
+            iap: IAPState(
+                unverifiedPsiCashTx: c.generate(using:UnverifiedPsiCashTransactionState.arbitrary),
+                purchasing: c.generate()
+            ),
+            psiCashBalance: c.generate(),
+            psiCashAuth: c.generate()
+        )
+    }
+    
+    /// `arbitraryWithMissingPsiCashTokens` satisfies the following condition:
+    ///
+    /// ```
+    ///  state.iap.unverifiedPsiCashTx == nil &&
+    ///     !(state.psiCashAuth.hasMinimalTokens)
+    /// ```
+    static let arbitraryWithMissingPsiCashTokens = Gen<IAPReducerState>.compose { c in
+        IAPReducerState(
+            iap: IAPState(
+                unverifiedPsiCashTx: nil,
+                purchasing: c.generate()
+            ),
+            psiCashBalance: c.generate(),
+            psiCashAuth: PsiCashAuthPackage(withTokenTypes: [])
+        )
+    }
+    
 }
 
 extension AddedPayment: Arbitrary {
     public static var arbitrary: Gen<AddedPayment> {
-        Gen.zip(IAPPurchasableProduct.arbitrary, Gen.pure(SKPayment()))
-            .map(AddedPayment.init(_: _:))
+        Gen.compose { c in
+            AddedPayment(c.generate(), c.generate())
+        }
     }
+}
+
+extension PsiCashValidationResponse.ResponseError: Arbitrary {
+    public static var arbitrary: Gen<PsiCashValidationResponse.ResponseError> {
+        Gen.one(of: [
+            // Should cover all cases
+            SystemError.arbitrary.map(PsiCashValidationResponse.ResponseError.failedRequest),
+            
+            HTTPResponseMetadata.arbitrary
+                .map(PsiCashValidationResponse.ResponseError.errorStatusCode)
+        ])
+    }
+}
+
+extension PsiCashValidationResponse: Arbitrary {
+    public static var arbitrary: Gen<PsiCashValidationResponse> {
+        Gen.compose { c in
+            PsiCashValidationResponse(result: c.generate())
+        }
+    }
+}
+
+extension PsiCashRefreshError: Arbitrary {
+    public static var arbitrary: Gen<PsiCashRefreshError> {
+        Gen.one(of: [
+            // Should cover all cases
+            Gen.pure(.tunnelNotConnected),
+            Gen.pure(.serverError),
+            Gen.pure(.invalidTokens),
+            SystemError.arbitrary.map(PsiCashRefreshError.error)
+        ])
+    }
+}
+
+extension TransactionUpdate: Arbitrary {
+    public static var arbitrary: Gen<TransactionUpdate> {
+        Gen.frequency([
+            // Should cover all cases
+            (4, [PaymentTransaction].arbitrary
+                .map(TransactionUpdate.updatedTransactions)),
+            (1, Optional<SystemError>.arbitrary
+                .map(TransactionUpdate.restoredCompletedTransactions(error:)))
+        ])
+    }
+    
+    /// Returns a generator that only generates `TransactionUpdate.restoredCompletedTransactions(error:)` case.
+    static var arbitraryWithOnlyRestoredCompletedTransactionsCase: Gen<TransactionUpdate> {
+        SystemError?.arbitrary.map(TransactionUpdate.restoredCompletedTransactions(error:))
+    }
+    
+    /// Returns a generator that only generates `TransactionUpdate.updatedTransactions` case
+    /// with possibly duplicate associated values.
+    static var arbitraryWithOnlyUpdatedTransactionsCaseWithDuplicates: Gen<TransactionUpdate> {
+        PaymentTransaction.arbitrary.proliferateWithDuplicates()
+            .map(TransactionUpdate.updatedTransactions)
+    }
+    
+}
+
+extension ProductID: Arbitrary {
+    /// Generates ProductID prefixed with one of the values from `AppStoreProductIdPrefixes`.
+    public static var arbitrary: Gen<ProductID> {
+        Gen.zip(
+            Gen.fromElements(of: AppStoreProductIdPrefixes.allCases),
+            String.arbitrary
+        ).map { prefix, postfix -> ProductID in
+            ProductID(rawValue: "\(prefix.rawValue).\(postfix)")!
+        }
+    }
+}
+
+extension SupportedAppStoreProducts: Arbitrary {
+    public static var arbitrary: Gen<SupportedAppStoreProducts> {
+        Set<ProductID>.arbitrary.map { productIdSet -> SupportedAppStoreProducts in
+            let supportedSeq = productIdSet.map { productID -> (AppStoreProductType, ProductID) in
+                let productType =
+                    AppStoreProductIdPrefixes.estimateProductTypeFromPrefix(productID)!
+                
+                return (productType, productID)
+            }
+            
+            return SupportedAppStoreProducts(supportedSeq)
+        }
+    }
+}
+
+extension SubscriptionIAPPurchase: Arbitrary {
+    public static var arbitrary: Gen<SubscriptionIAPPurchase> {
+        Gen.compose { c in
+            return SubscriptionIAPPurchase(
+                productID: c.generate(),
+                transactionID: c.generate(),
+                originalTransactionID: c.generate(),
+                purchaseDate: c.generate(),
+                expires: c.generate(),
+                isInIntroOfferPeriod: c.generate(),
+                hasBeenInIntroOfferPeriod: c.generate())
+        }
+    }
+}
+
+extension ConsumableIAPPurchase: Arbitrary {
+    public static var arbitrary: Gen<ConsumableIAPPurchase> {
+        Gen.compose { c in
+            ConsumableIAPPurchase(productID: c.generate(), transactionID: c.generate())
+        }
+    }
+}
+
+extension ReceiptData: Arbitrary {
+    public static var arbitrary: Gen<ReceiptData> {
+        Gen.compose { c in
+            ReceiptData(subscriptionInAppPurchases: c.generate(),
+                        consumableInAppPurchases: c.generate(),
+                        data: Data(), // TODO: currently unused in testing
+                        readDate: c.generate())
+        }
+    }
+}
+
+extension ReceiptReadReason: Arbitrary {
+    public static var arbitrary: Gen<ReceiptReadReason> {
+        Gen<ReceiptReadReason>.fromElements(of: ReceiptReadReason.allCases)
+    }
+}
+
+// Mirror of function of the same name in `SubscriptionIAPPurchase` for testing.
+func isApproximatelyExpired(date: Date) -> Bool {
+    switch compareDates(Date(), to: date) {
+        case .orderedAscending: return false
+        case .orderedDescending: return true
+        case .orderedSame: return true
+    }
+}
+
+func compareDates(_ date1: Date, to date2: Date) -> ComparisonResult {
+    return Calendar.current.compare(date1,
+                                    to: date2,
+                                    toGranularity: .second)
 }

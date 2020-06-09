@@ -245,8 +245,26 @@ public enum PendingValue<Pending, Completed> {
     case completed(Completed)
 }
 
-extension PendingValue: Equatable where Pending: Equatable, Completed: Equatable {}
+extension PendingValue {
+    
+    public var pending: Pending? {
+        guard case let .pending(value) = self else {
+            return nil
+        }
+        return value
+    }
+    
+    public var completed: Completed? {
+        guard case let .completed(value) = self else {
+            return nil
+        }
+        return value
+    }
+    
+}
 
+extension PendingValue: Equatable where Pending: Equatable, Completed: Equatable {}
+extension PendingValue: Hashable where Pending: Hashable, Completed: Hashable {}
 
 extension PendingValue {
     
@@ -302,19 +320,6 @@ extension DispatchTimeInterval {
 
         return result
     }
-}
-
-// MARK: File operations
-
-public func plistReader<DecodeType: Decodable>(key: String, toType: DecodeType.Type) throws -> DecodeType {
-    // TODO: Add bundle dependency as an argument.
-    guard let url = Bundle.main.url(forResource: key, withExtension: "plist") else {
-        fatalError("'\(key).plist' is not valid")
-    }
-
-    let data = try Data(contentsOf: url)
-    let decoder = PropertyListDecoder()
-    return try decoder.decode(toType, from: data)
 }
 
 // MARK: User Defaults

@@ -25,7 +25,7 @@ class TestUtilTests: XCTestCase {
     
     func testGenerator() {
         let seq = Array(1...10)
-        var generator = Generator(sequence: seq)
+        let generator = Generator(sequence: seq)
         
         var generatedSeq = [Int]()
         while let next = generator.next() {

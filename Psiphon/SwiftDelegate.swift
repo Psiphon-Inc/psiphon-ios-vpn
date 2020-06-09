@@ -82,6 +82,8 @@ func appDelegateReducer(
     
     private let sharedDB = PsiphonDataSharedDB(forAppGroupIdentifier: APP_GROUP_IDENTIFIER)
     private let feedbackLogger = FeedbackLogger(PsiphonRotatingFileFeedbackLogHandler())
+    private let supportedProducts =
+        SupportedAppStoreProducts.fromPlists(types: [.subscription, .psiCash])
     
     private var (lifetime, token) = Lifetime.make()
     private var store: Store<AppState, AppAction>!
@@ -139,6 +141,7 @@ extension SwiftDelegate: SwiftBridgeDelegate {
                     feedbackLogger: self.feedbackLogger,
                     sharedDB: self.sharedDB,
                     psiCashLib: self.psiCashLib,
+                    supportedAppStoreProducts: self.supportedProducts,
                     objcBridgeDelegate: objcBridge,
                     rewardedVideoAdBridgeDelegate: self,
                     calendar: Calendar.current
@@ -361,7 +364,7 @@ extension SwiftDelegate: SwiftBridgeDelegate {
     }
     
     @objc func refreshAppStoreReceipt() -> Promise<Error?>.ObjCPromise<NSError> {
-        let promise = Promise<Result<(), SystemErrorEvent>>.pending()
+        let promise = Promise<Result<Utilities.Unit, SystemErrorEvent>>.pending()
         let objcPromise = promise.then { result -> Error? in
             return result.projectError()?.error
         }
@@ -372,23 +375,26 @@ extension SwiftDelegate: SwiftBridgeDelegate {
     @objc func buyAppStoreSubscriptionProduct(
         _ skProduct: SKProduct
     ) -> Promise<ObjCIAPResult>.ObjCPromise<ObjCIAPResult> {
-        let promise = Promise<IAPResult>.pending()
-        let objcPromise = promise.then { (result: IAPResult) -> ObjCIAPResult in
-            ObjCIAPResult.from(iapResult: result)
-        }
+        let promise = Promise<ObjCIAPResult>.pending()
         
         do {
-            let appStoreProduct = try AppStoreProduct.from(skProduct: skProduct)
-            self.store.send(.iap(.purchase(
-                IAPPurchasableProduct.subscription(product: appStoreProduct, promise: promise)
-                )))
+            let appStoreProduct = try AppStoreProduct.from(
+                skProduct: skProduct,
+                isSupportedProduct: self.supportedProducts.isSupportedProduct(_:)
+            )
+            
+            guard case .subscription = appStoreProduct.type else {
+                fatalError()
+            }
+            
+            self.store.send(.iap(.purchase(product: appStoreProduct, resultPromise: promise)))
             
         } catch {
             self.feedbackLogger.fatalError(
                 "Unknown subscription product identifier '\(skProduct.productIdentifier)'")
         }
         
-        return objcPromise.asObjCPromise()
+        return promise.asObjCPromise()
     }
     
     @objc func onAdPresentationStatusChange(_ presenting: Bool) {
@@ -396,8 +402,7 @@ extension SwiftDelegate: SwiftBridgeDelegate {
     }
     
     @objc func getAppStoreSubscriptionProductIDs() -> Set<String> {
-        // TODO: supported product ID's should be accessed from the AppState environment.
-        return SupportedAppStoreProductIDs.subscription().values
+        return self.supportedProducts.supported[.subscription]!.rawValues
     }
     
     @objc func getAppStateFeedbackEntry(completionHandler: @escaping (String) -> Void) {

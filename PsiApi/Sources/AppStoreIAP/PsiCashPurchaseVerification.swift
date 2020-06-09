@@ -24,7 +24,7 @@ import PsiApi
 import PsiCashClient
 
 public struct PsiCashValidationRequest: Encodable {
-    let productID: String
+    let productID: ProductID
     let receiptData: String
     let customData: String
     
@@ -50,6 +50,10 @@ public struct PsiCashValidationResponse: RetriableHTTPResponse {
     }
 
     public let result: Result<Utilities.Unit, ErrorEvent<ResponseError>>
+    
+    init(result: Result<Utilities.Unit, ErrorEvent<ResponseError>>) {
+        self.result = result
+    }
 
     public init(urlSessionResult: URLSessionResult) {
         switch urlSessionResult {

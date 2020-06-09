@@ -368,6 +368,7 @@ final class RequestsTests: XCTestCase {
         
         let expectedResponse = RetriableTestResponse(result: .failure(responseErrorEvent))
                 
+        // TODO: Calling generate hinders replayability
         let httpClientError = ErrorEvent(SystemError.arbitrary.generate, date: errorDate)
         
         // HTTPClient error date should match expected response error date.
@@ -429,6 +430,7 @@ final class RequestsTests: XCTestCase {
         
         let expectedResponse = RetriableTestResponse(result: .failure(responseErrorEvent))
                 
+        // TODO: Calling generate hinders replay functionality.
         let httpClientError = ErrorEvent(SystemError.arbitrary.generate, date: errorDate)
         
         // HTTPClient error date should match expected response error date.

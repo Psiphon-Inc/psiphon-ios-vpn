@@ -99,7 +99,7 @@ public struct FeedbackLogger {
         _ message: LogMessage, file: String = #file, line: UInt = #line
     ) {
         let tag = "\(file.lastPathComponent):\(line)"
-        handler.fatalError(type: tag, message: makeFeedbackEntry(message))
+        handler.fatalError(type: tag, message: message.description)
     }
 
     public func precondition(

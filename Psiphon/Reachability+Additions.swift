@@ -44,7 +44,7 @@ extension Reachability: InternetReachability {
     }
     
     public func currentReachabilityFlags() -> ReachabilityCodedStatus {
-        ReachabilityCodedStatus(stringLiteral: self.currentReachabilityFlagsToString())
+        ReachabilityCodedStatus(rawValue: self.currentReachabilityFlagsToString())!
     }
     
 }
@@ -73,7 +73,7 @@ final class InternetReachabilityDelegate: StoreDelegate<ReachabilityAction> {
         storeSend(
             .reachabilityStatus(
                 ReachabilityStatus(objcNetworkStatus: networkStatus),
-                ReachabilityCodedStatus(stringLiteral: codedStatus)
+                ReachabilityCodedStatus(rawValue: codedStatus)!
             )
         )
     }

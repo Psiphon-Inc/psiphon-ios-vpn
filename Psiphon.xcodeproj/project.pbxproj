@@ -139,6 +139,7 @@
 		8DB6C6362429080C005E2F4C /* PsiCashMessageWithRetryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DB6C6352429080C005E2F4C /* PsiCashMessageWithRetryView.swift */; };
 		8DB6C638242A4D06005E2F4C /* DuskButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DB6C637242A4D06005E2F4C /* DuskButton.swift */; };
 		8DCA6864247C7CF8001D026E /* Bindable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DCA6863247C7CF8001D026E /* Bindable.swift */; };
+		8DD642C1248AAD8A006C94D2 /* Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DD642C0248AAD8A006C94D2 /* Utils.swift */; };
 		8DD6E7E524591E270041DAC5 /* SubscriptionAuthCheck.m in Sources */ = {isa = PBXBuildFile; fileRef = 8DD6E7E424591E270041DAC5 /* SubscriptionAuthCheck.m */; };
 		8DD6E7E82459C83B0041DAC5 /* StoredAuthorizations.m in Sources */ = {isa = PBXBuildFile; fileRef = 8DD6E7E72459C83B0041DAC5 /* StoredAuthorizations.m */; };
 		8DDA60292425BB4800DBA8EC /* DebugStrings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DDA60282425BB4800DBA8EC /* DebugStrings.swift */; };
@@ -541,6 +542,7 @@
 		8DB6C637242A4D06005E2F4C /* DuskButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DuskButton.swift; sourceTree = "<group>"; };
 		8DCA6863247C7CF8001D026E /* Bindable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Bindable.swift; sourceTree = "<group>"; };
 		8DCA686B247CC383001D026E /* libReactiveSwift.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = libReactiveSwift.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		8DD642C0248AAD8A006C94D2 /* Utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utils.swift; sourceTree = "<group>"; };
 		8DD6E7E324591E270041DAC5 /* SubscriptionAuthCheck.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SubscriptionAuthCheck.h; sourceTree = "<group>"; };
 		8DD6E7E424591E270041DAC5 /* SubscriptionAuthCheck.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SubscriptionAuthCheck.m; sourceTree = "<group>"; };
 		8DD6E7E62459C83B0041DAC5 /* StoredAuthorizations.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = StoredAuthorizations.h; sourceTree = "<group>"; };
@@ -846,6 +848,7 @@
 				9BFECB09D7F866F34551DBD4 /* IAPHelpViewController.h */,
 				8D417EDC2419DBA100FEE587 /* ProductRequest.swift */,
 				8D1F62BD247DC1690028AFAF /* Receipt+AppStore.swift */,
+				8D4ACD31247E3626008E404C /* AppStoreIAP+Additions.swift */,
 			);
 			name = IAP;
 			sourceTree = "<group>";
@@ -961,6 +964,7 @@
 				8D417ED8241844FA00FEE587 /* FloatingPoint+Additions.swift */,
 				8DDA60282425BB4800DBA8EC /* DebugStrings.swift */,
 				8DE4E6D1244E97D000275362 /* Result+Codable.swift */,
+				8DD642C0248AAD8A006C94D2 /* Utils.swift */,
 			);
 			path = Util;
 			sourceTree = "<group>";
@@ -1215,7 +1219,6 @@
 				8DCA6863247C7CF8001D026E /* Bindable.swift */,
 				8D1F62BF247DC3350028AFAF /* Authorization+Additions.swift */,
 				8D1F62C1247DC4840028AFAF /* PsiCashClient+Additions.swift */,
-				8D4ACD31247E3626008E404C /* AppStoreIAP+Additions.swift */,
 			);
 			path = Psiphon;
 			sourceTree = "<group>";
@@ -1709,6 +1712,7 @@
 				4EB846422151830600687344 /* AvailableServerRegions.m in Sources */,
 				8D7789CA247499110038BFDA /* Reachability+Additions.swift in Sources */,
 				5246800922D51CE4009AEC6E /* PsiCashBalanceView.swift in Sources */,
+				8DD642C1248AAD8A006C94D2 /* Utils.swift in Sources */,
 				52D363CF230F112E002C2221 /* TabControlView.swift in Sources */,
 				445F24D620E1A5BA00D004E9 /* xer_decoder.c in Sources */,
 				EF652CD71F35224C002AFB48 /* MainViewController.m in Sources */,
