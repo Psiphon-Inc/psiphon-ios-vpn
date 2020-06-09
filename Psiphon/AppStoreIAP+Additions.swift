@@ -172,9 +172,9 @@ extension PaymentTransaction {
                     // Error is non-null when state is failed.
                     let someError = skPaymentTransaction.error!
                     if let skError = someError as? SKError {
-                        return .completed(.failure(skError))
+                        return .completed(.failure(.right(skError)))
                     } else {
-                        fatalError("Expected SKError: '\(someError)'")
+                        return .completed(.failure(.left(SystemError(someError))))
                     }
                 @unknown default:
                     fatalError("""
