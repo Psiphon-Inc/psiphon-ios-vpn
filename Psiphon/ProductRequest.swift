@@ -48,9 +48,9 @@ extension ParsedPsiCashAppStorePurchasable {
     }
     
     static func make(product: AppStoreProduct, formatter: PsiCashAmountFormatter) -> Self {
-        guard let psiCashValue = Self.supportedProducts[product.productIdentifier] else {
+        guard let psiCashValue = Self.supportedProducts[product.productID] else {
             return .parseError(reason: """
-                AppStore IAP product with identifier '\(product.productIdentifier)' is not a supported product
+                AppStore IAP product with identifier '\(product.productID)' is not a supported product
                 """)
         }
         guard let title = formatter.string(from: psiCashValue) else {
@@ -129,7 +129,7 @@ enum ProductRequestAction {
 typealias ProductRequestEnvironment = (
     feedbackLogger: FeedbackLogger,
     productRequestDelegate: ProductRequestDelegate,
-    supportedPsiCashIAPProductIDs: SupportedAppStoreProductIDs
+    supportedAppStoreProducts: SupportedAppStoreProducts
 )
 
 func productRequestReducer(
@@ -145,9 +145,15 @@ func productRequestReducer(
         // then the success value is added to `.pending` case.
         state.psiCashProducts = .pending(previousValue: state.psiCashProducts)
         
-        let requestingProductIDs = environment.supportedPsiCashIAPProductIDs.values
-        let request = SKProductsRequest(productIdentifiers: requestingProductIDs)
+        let maybeRequestingProductIDs = environment.supportedAppStoreProducts.supported[.psiCash]
+        guard let requestingProductIDs = maybeRequestingProductIDs else {
+            environment.feedbackLogger.fatalError("PsiCash product not supported")
+            return []
+        }
+        
+        let request = SKProductsRequest(productIdentifiers: requestingProductIDs.rawValues)
         state.psiCashRequest = request
+        
         return [
             .fireAndForget {
                 request.delegate = environment.productRequestDelegate
@@ -190,7 +196,14 @@ func productRequestReducer(
 
                 return response.products.map { skProduct -> ParsedPsiCashAppStorePurchasable in
                     do {
-                        let product = try AppStoreProduct.from(skProduct: skProduct)
+                        let product = try AppStoreProduct.from(
+                            skProduct: skProduct,
+                            isSupportedProduct: environment.supportedAppStoreProducts
+                                .isSupportedProduct(_:)
+                        )
+                        guard case .psiCash = product.type else {
+                            throw ErrorRepr(repr: "Expected PsiCash product")
+                        }
                         return .make(product: product, formatter: formatter)
                     } catch {
                         return .parseError(reason: String(describing: error))

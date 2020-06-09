@@ -18,6 +18,7 @@
 */
 
 import Foundation
+import Utilities
 import ReactiveSwift
 
 @objc public  enum ReachabilityStatus: Int {
@@ -27,28 +28,13 @@ import ReactiveSwift
 }
 
 /// Represents reachability status flags coded into a string.
-public struct ReachabilityCodedStatus: ExpressibleByStringLiteral, Hashable, Codable,
-CustomStringConvertible {
-    public typealias StringLiteralType = String
+public struct ReachabilityCodedStatus: TypedIdentifier {
+    public var rawValue: String { value }
     
     private let value: String
     
-    public init(stringLiteral value: String) {
-        self.value = value
-    }
-    
-    public var description: String {
-        self.value
-    }
-    
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.singleValueContainer()
-        try container.encode(self.value)
-    }
-    
-    public init(from decoder: Decoder) throws {
-        let container = try decoder.singleValueContainer()
-        self.init(stringLiteral: try container.decode(String.self))
+    public init?(rawValue: String) {
+        self.value = rawValue
     }
 }
 
@@ -61,9 +47,9 @@ public struct ReachabilityState: Equatable {
     public var codedStatus: ReachabilityCodedStatus
     
     public init(networkStatus: ReachabilityStatus = .notReachable,
-                codedStatus: ReachabilityCodedStatus = "") {
+                codedStatus: ReachabilityCodedStatus? = nil) {
         self.networkStatus = networkStatus
-        self.codedStatus = codedStatus
+        self.codedStatus = codedStatus ?? ReachabilityCodedStatus(rawValue: "")!
     }
 }
 

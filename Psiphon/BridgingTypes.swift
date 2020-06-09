@@ -232,7 +232,7 @@ import PsiCashClient
     init(_ state: BridgedSubscriptionState, _ subscription: SubscriptionIAPPurchase?) {
         self.state = state
         self.latestExpiry = subscription?.expires
-        self.productId = subscription?.productID
+        self.productId = subscription?.productID.rawValue
         self.hasBeenInIntroPeriod = subscription?.hasBeenInIntroOfferPeriod ?? false
     }
 
@@ -255,21 +255,5 @@ import PsiCashClient
 
     init(swiftState state: PsiCashBalanceView.BindingType) {
         self.state = state
-    }
-}
-
-// IAP result
-@objc final class ObjCIAPResult: NSObject {
-    @objc let transaction: SKPaymentTransaction?
-    @objc let error: Error?
-
-    init(transaction: SKPaymentTransaction?, error: Error?) {
-        self.transaction = transaction
-        self.error = error
-    }
-
-    static func from(iapResult: IAPResult) -> ObjCIAPResult {
-        return ObjCIAPResult(transaction: iapResult.transaction,
-                             error: iapResult.result.projectError())
     }
 }

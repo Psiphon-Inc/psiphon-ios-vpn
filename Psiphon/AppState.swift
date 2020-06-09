@@ -85,6 +85,7 @@ typealias AppEnvironment = (
     tunnelConnectionRefSignal: SignalProducer<TunnelConnection?, Never>,
     urlHandler: URLHandler,
     paymentQueue: PaymentQueue,
+    supportedAppStoreProducts: SupportedAppStoreProducts,
     objcBridgeDelegate: ObjCBridgeDelegate,
     receiptRefreshRequestDelegate: ReceiptRefreshRequestDelegate,
     paymentTransactionDelegate: PaymentTransactionDelegate,
@@ -102,8 +103,6 @@ typealias AppEnvironment = (
     /// `vpnStartCondition` returns true whenever the app is in such a state as to to allow
     /// the VPN to be started. If false is returned the VPN should not be started.
     vpnStartCondition: () -> Bool,
-    supportedSubscriptionIAPProductIDs: SupportedAppStoreProductIDs,
-    supportedPsiCashIAPProductIDs: SupportedAppStoreProductIDs,
     getCurrentTime: () -> Date,
     compareDates: (Date, Date, Calendar.Component) -> ComparisonResult
 )
@@ -116,6 +115,7 @@ func makeEnvironment(
     feedbackLogger: FeedbackLogger,
     sharedDB: PsiphonDataSharedDB,
     psiCashLib: PsiCash,
+    supportedAppStoreProducts: SupportedAppStoreProducts,
     objcBridgeDelegate: ObjCBridgeDelegate,
     rewardedVideoAdBridgeDelegate: RewardedVideoAdBridgeDelegate,
     calendar: Calendar
@@ -155,6 +155,7 @@ func makeEnvironment(
         tunnelConnectionRefSignal: store.$value.signalProducer.map(\.tunnelConnection),
         urlHandler: .default(),
         paymentQueue: .default,
+        supportedAppStoreProducts: supportedAppStoreProducts,
         objcBridgeDelegate: objcBridgeDelegate,
         receiptRefreshRequestDelegate: ReceiptRefreshRequestDelegate(store:
             store.projection(
@@ -213,8 +214,6 @@ func makeEnvironment(
         vpnStartCondition: { [unowned store] () -> Bool in
             return !store.value.adPresentationState
         },
-        supportedSubscriptionIAPProductIDs: SupportedAppStoreProductIDs.subscription(),
-        supportedPsiCashIAPProductIDs: SupportedAppStoreProductIDs.psiCash(),
         getCurrentTime: { () -> Date in
             return Date()
         },
@@ -263,6 +262,7 @@ fileprivate func toIAPReducerEnvironment(env: AppEnvironment) -> IAPEnvironment 
         psiCashEffects: env.psiCashEffects,
         clientMetaData: env.clientMetaData,
         paymentQueue: env.paymentQueue,
+        isSupportedProduct: env.supportedAppStoreProducts.isSupportedProduct(_:),
         psiCashStore: env.psiCashStore,
         appReceiptStore: env.appReceiptStore,
         httpClient: env.httpClient,
@@ -278,8 +278,7 @@ fileprivate func toReceiptReducerEnvironment(env: AppEnvironment) -> ReceiptRedu
         subscriptionStore: env.subscriptionStore,
         subscriptionAuthStateStore: env.subscriptionAuthStateStore,
         receiptRefreshRequestDelegate: env.receiptRefreshRequestDelegate,
-        consumableProductsIDs: env.supportedPsiCashIAPProductIDs.values,
-        subscriptionProductIDs: env.supportedSubscriptionIAPProductIDs.values,
+        isSupportedProduct: env.supportedAppStoreProducts.isSupportedProduct(_:),
         getCurrentTime: env.getCurrentTime,
         compareDates: env.compareDates
     )
@@ -333,7 +332,7 @@ fileprivate func toRequestDelegateReducerEnvironment(
     ProductRequestEnvironment(
         feedbackLogger: env.feedbackLogger,
         productRequestDelegate: env.productRequestDelegate,
-        supportedPsiCashIAPProductIDs: env.supportedPsiCashIAPProductIDs
+        supportedAppStoreProducts: env.supportedAppStoreProducts
     )
 }
 

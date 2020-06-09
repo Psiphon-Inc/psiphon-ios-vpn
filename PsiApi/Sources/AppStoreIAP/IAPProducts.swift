@@ -24,6 +24,27 @@ import ReactiveSwift
 import Utilities
 import PsiApi
 
+// Supported App Store products
+public enum AppStoreProductType: String, CaseIterable {
+    case subscription
+    case psiCash
+    
+    /// Returns true if self is a consumable App Store product type.
+    public var isConsumable: Bool {
+        switch self {
+        case .subscription: return false
+        case .psiCash: return true
+        }
+    }
+    
+    public var prefix: AppStoreProductIdPrefixes {
+        switch self {
+        case .subscription: return .subscription
+        case .psiCash: return .psiCash
+        }
+    }
+}
+
 public enum LocalizedPrice: Hashable {
     case free
     case localizedPrice(price: Double, priceLocale: Locale)
@@ -45,74 +66,123 @@ public enum ProductIdError: Error {
     case invalidString(String)
 }
 
+/// Wraps `SKPayment` object.
+public struct Payment: Hashable {
+
+    public let productID: ProductID
+    public let quantity: Int
+    public let skPaymentObj: SKPayment?
+    public let skPaymentHash: Int
+
+    init(productID: ProductID, quantity: Int = 1) {
+        self.productID = productID
+        self.quantity = quantity
+        self.skPaymentObj = nil
+        self.skPaymentHash = productID.hashValue
+    }
+    
+    public init(
+        productID: ProductID,
+        quantity: Int,
+        skPaymentObj: SKPayment?,
+        skPaymentHash: Int
+    ) {
+        self.productID = productID
+        self.quantity = quantity
+        self.skPaymentObj = skPaymentObj
+        self.skPaymentHash = skPaymentHash
+    }
+    
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(self.skPaymentHash)
+    }
+    
+    public static func == (lhs: Self, rhs: Self) -> Bool {
+        lhs.skPaymentHash == rhs.skPaymentHash
+    }
+    
+}
+
+/// Wraps SKProduct.
 public struct AppStoreProduct: Hashable {
+    
     public let type: AppStoreProductType
-    public let productIdentifier: String
+    public let productID: ProductID
     public let localizedDescription: String
     public let price: LocalizedPrice
     
     // Underlying SKProduct object
     public let skProductRef: SKProduct?
-
-    public static func from(skProduct: SKProduct) throws -> AppStoreProduct {
-        let type = try AppStoreProductType.from(skProduct: skProduct)
-        return AppStoreProduct(type: type,
-                               productIdentifier: skProduct.productIdentifier,
-                               localizedDescription: skProduct.localizedDescription,
-                               price: .makeLocalizedPrice(skProduct: skProduct),
-                               skProductRef: skProduct)
+    
+    public init(
+        type: AppStoreProductType,
+        productID: ProductID,
+        localizedDescription: String,
+        price: LocalizedPrice,
+        skProductRef: SKProduct?
+    ) {
+        self.type = type
+        self.productID = productID
+        self.localizedDescription = localizedDescription
+        self.price = price
+        self.skProductRef = skProductRef
     }
 }
 
-public enum AppStoreProductType: String, CaseIterable {
-    case subscription = "subscriptionProductIds"
-    case psiCash = "psiCashProductIds"
 
-    private static func from(productIdentifier: String) throws -> AppStoreProductType {
-        if productIdentifier.hasPrefix("ca.psiphon.Psiphon.Consumable.PsiCash.") {
-            return .psiCash
-        }
-
-        if productIdentifier.hasPrefix("ca.psiphon.Psiphon.") {
-            return .subscription
-        }
-
-        throw ProductIdError.invalidString(productIdentifier)
-    }
-
-    public static func from(transaction: PaymentTransaction) throws -> AppStoreProductType {
-        return try .from(productIdentifier: transaction.productID())
-    }
+public enum AppStoreProductIdPrefixes: String, CaseIterable {
+    case subscription = "ca.psiphon.Psiphon"
+    case psiCash = "ca.psiphon.Psiphon.Consumable.PsiCash"
     
-    public static func from(transaction: SKPaymentTransaction) throws -> AppStoreProductType {
-        return try from(productIdentifier: transaction.payment.productIdentifier)
-    }
-
-    public static func from(skProduct: SKProduct) throws -> AppStoreProductType {
-        return try from(productIdentifier: skProduct.productIdentifier)
+    static func estimateProductTypeFromPrefix(_ productID: ProductID) -> AppStoreProductType? {
+        if productID.rawValue.contains(AppStoreProductIdPrefixes.psiCash.rawValue) {
+            return .psiCash
+        } else if productID.rawValue.contains(AppStoreProductIdPrefixes.subscription.rawValue) {
+            return .subscription
+        } else {
+            return nil
+        }
     }
 }
 
 /// Represents product identifiers in-app purchase products that are supported.
-public struct SupportedAppStoreProductIDs: Equatable {
-    public let values: Set<ProductID>
-
-    private init(for type: AppStoreProductType, validator: (Set<String>) -> Bool) {
-        values = try! plistReader(key: type.rawValue, toType: Set<String>.self)
+public struct SupportedAppStoreProducts: Equatable {
+    
+    public let supported: [AppStoreProductType: Set<ProductID>]
+    private let reversed: [ProductID: AppStoreProductType]
+    
+    public init(_ supportedSeq: [(AppStoreProductType, Set<ProductID>)]) {
+        
+        self.supported = Dictionary(uniqueKeysWithValues: supportedSeq)
+        
+        self.reversed = Dictionary(uniqueKeysWithValues:
+            supportedSeq.flatMap { pair -> [(ProductID, AppStoreProductType)] in
+                return pair.1.map { ($0, pair.0) }
+            }
+        )
+    }
+    
+    public init(_ supportedSeq: [(AppStoreProductType, ProductID)]) {
+    
+        let supportedKeyWithValues = AppStoreProductType.allCases
+            .map { possibleType -> (AppStoreProductType, Set<ProductID>) in
+                
+                let sameTypeProductIDs: [ProductID] = supportedSeq
+                    .filter { productTypeProductIdPair -> Bool in
+                        productTypeProductIdPair.0 == possibleType
+                    }
+                    .map { $0.1 }
+                
+                return (possibleType, Set(sameTypeProductIDs))
+        }
+        
+        self.supported = Dictionary(uniqueKeysWithValues: supportedKeyWithValues)
+        
+        self.reversed = Dictionary(uniqueKeysWithValues:supportedSeq.map { ($0.1, $0.0) })
     }
 
-    public static func subscription() -> Self {
-        return .init(for: .subscription) { ids -> Bool in
-            // TODO: do some validation here.
-            return true
-        }
-    }
-
-    public static func psiCash() -> Self {
-        return .init(for: .psiCash) { ids -> Bool in
-            // TODO: do some validation here.
-            return true
-        }
+    public func isSupportedProduct(_ productID: ProductID) -> AppStoreProductType? {
+        return reversed[productID]
     }
 }
 
@@ -140,20 +210,23 @@ public struct PaymentTransaction: Equatable {
     }
     
     public let transactionID: () -> TransactionID
-    public let productID: () -> String
+    public let productID: () -> ProductID
     public let transactionState: () -> TransactionState
+    public let payment: () -> Payment
     private let isEqual: (PaymentTransaction) -> Bool
     
     public let skPaymentTransaction: () -> SKPaymentTransaction?
     
     public init(transactionID: @escaping () -> TransactionID,
-                productID: @escaping () -> String,
+                productID: @escaping () -> ProductID,
                 transactionState: @escaping () -> PaymentTransaction.TransactionState,
+                payment: @escaping () -> Payment,
                 isEqual: @escaping (PaymentTransaction) -> Bool,
                 skPaymentTransaction: @escaping () -> SKPaymentTransaction?) {
         self.transactionID = transactionID
         self.productID = productID
         self.transactionState = transactionState
+        self.payment = payment
         self.isEqual = isEqual
         self.skPaymentTransaction = skPaymentTransaction
     }
@@ -196,54 +269,6 @@ extension PaymentTransaction.TransactionState {
             case .purchasing: return false
             }
         }
-    }
-    
-}
-
-extension PaymentTransaction {
-        
-    /// Created PaymentTransaction holds a strong reference to the `skPaymentTransaction` object.
-    public static func make(from skPaymentTransaction: SKPaymentTransaction) -> Self {
-        PaymentTransaction(
-            transactionID: { () -> TransactionID in
-                TransactionID(stringLiteral: skPaymentTransaction.transactionIdentifier!)
-            },
-            productID: { () -> String in
-                skPaymentTransaction.payment.productIdentifier
-            },
-            transactionState: { () -> TransactionState in
-                switch skPaymentTransaction.transactionState {
-                case .purchasing:
-                    return .pending(.purchasing)
-                case .deferred:
-                    return .pending(.deferred)
-                case .purchased:
-                    return .completed(.success(
-                        Pair(skPaymentTransaction.transactionDate!, .purchased)))
-                case .restored:
-                    return .completed(.success(
-                        Pair(skPaymentTransaction.transactionDate!, .restored)))
-                case .failed:
-                    // Error is non-null when state is failed.
-                    let someError = skPaymentTransaction.error!
-                    if let skError = someError as? SKError {
-                        return .completed(.failure(.right(skError)))
-                    } else {
-                        return .completed(.failure(.left(SystemError(someError))))
-                    }
-                @unknown default:
-                    fatalError("""
-                        unknown transaction state \(skPaymentTransaction.transactionState)
-                        """)
-                }
-            },
-            isEqual: { other -> Bool in
-                skPaymentTransaction.isEqual(other)
-            },
-            skPaymentTransaction: { () -> SKPaymentTransaction? in
-                skPaymentTransaction
-            }
-        )
     }
     
 }

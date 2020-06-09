@@ -29,8 +29,7 @@ typealias ReceiptReducerEnvironment = (
     subscriptionStore: (SubscriptionAction) -> Effect<Never>,
     subscriptionAuthStateStore: (SubscriptionAuthStateAction) -> Effect<Never>,
     receiptRefreshRequestDelegate: ReceiptRefreshRequestDelegate,
-    consumableProductsIDs: Set<ProductID>,
-    subscriptionProductIDs: Set<ProductID>,
+    isSupportedProduct: (ProductID) -> AppStoreProductType?,
     getCurrentTime: () -> Date,
     compareDates: (Date, Date, Calendar.Component) -> ComparisonResult
 )
@@ -75,7 +74,7 @@ func receiptReducer(
         ]
 
     case ._remoteReceiptRefreshResult(let result):
-        state.remoteReceiptRefreshState = .completed(result.mapToUnit())
+        state.remoteReceiptRefreshState = .completed(result)
 
         return [
             state.fulfillRefreshPromises(result).mapNever(),
@@ -95,8 +94,7 @@ extension ReceiptData {
         Effect { () -> ReceiptData? in
             ReceiptData.parseLocalReceipt(
                 appBundle: environment.appBundle,
-                consumableProductIDs: environment.consumableProductsIDs,
-                subscriptionProductIDs: environment.subscriptionProductIDs,
+                isSupportedProduct: environment.isSupportedProduct,
                 getCurrentTime: environment.getCurrentTime,
                 compareDates: environment.compareDates,
                 feedbackLogger: environment.feedbackLogger
@@ -125,7 +123,7 @@ fileprivate func notifyRefreshedReceiptEffects<NeverAction>(
 final class ReceiptRefreshRequestDelegate: StoreDelegate<ReceiptStateAction>, SKRequestDelegate {
 
     func requestDidFinish(_ request: SKRequest) {
-        storeSend(._remoteReceiptRefreshResult(.success(())))
+        storeSend(._remoteReceiptRefreshResult(.success(.unit)))
     }
 
     func request(_ request: SKRequest, didFailWithError error: Error) {

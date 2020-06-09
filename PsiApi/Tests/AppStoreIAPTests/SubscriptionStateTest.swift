@@ -338,13 +338,15 @@ final class SubscriptionStateTest: XCTestCase {
 
     /// Generates IAP purchase with unique ID.
     func iapPurchase(purchaseDate: Date, expires: Date) -> SubscriptionIAPPurchase {
-        return SubscriptionIAPPurchase(productID: "com.test.subscription1",
-                                       transactionID: TransactionID(stringLiteral: UUID().uuidString),
-                                       originalTransactionID: "12345678",
-                                       purchaseDate: purchaseDate,
-                                       expires: expires,
-                                       isInIntroOfferPeriod: false,
-                                       hasBeenInIntroOfferPeriod: false)
+        SubscriptionIAPPurchase(
+            productID: ProductID(rawValue: "com.test.subscription1")!,
+            transactionID: TransactionID(rawValue: UUID().uuidString)!,
+            originalTransactionID: OriginalTransactionID(rawValue: "12345678")!,
+            purchaseDate: purchaseDate,
+            expires: expires,
+            isInIntroOfferPeriod: false,
+            hasBeenInIntroOfferPeriod: false
+        )
     }
 
     /// Tests reducer with given subscription IAPs.
