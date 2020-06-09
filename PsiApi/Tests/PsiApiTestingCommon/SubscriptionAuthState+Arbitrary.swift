@@ -64,25 +64,28 @@ extension MutableDBContainer: Arbitrary {
         Gen.frequency([
             // Auth state data is present.
             (3,
-             Gen.zip(SubscriptionAuthState.PurchaseAuthStateDict.arbitrary, UInt.arbitrary).map {
-                authState, seq -> MutableDBContainer in
+             Gen.zip(SubscriptionAuthState.PurchaseAuthStateDict.arbitrary, UInt.arbitrary, [String].arbitrary).map {
+                authState, seq, rejectedAuthIDs -> MutableDBContainer in
 
                 let encoder = JSONEncoder.makeRfc3339Encoder()
                 let data = try! encoder.encode(authState)
                 return MutableDBContainer(subscriptionAuths: data,
-                                          containerRejectedSubscriptionAuthIdReadAtLeastUpToSequenceNumber: Int(seq))
+                                          containerRejectedSubscriptionAuthIdReadAtLeastUpToSequenceNumber: Int(seq),
+                                          rejectedSubscriptionAuthorizationIDs: rejectedAuthIDs)
             }),
             // Auth state data is corrupted.
             (1,
-             Gen.zip(Data.arbitrary, UInt.arbitrary).map {
+             Gen.zip(Data.arbitrary, UInt.arbitrary, [String].arbitrary).map {
                 MutableDBContainer(subscriptionAuths: $0,
-                                   containerRejectedSubscriptionAuthIdReadAtLeastUpToSequenceNumber: Int($1))
+                                   containerRejectedSubscriptionAuthIdReadAtLeastUpToSequenceNumber: Int($1),
+                                   rejectedSubscriptionAuthorizationIDs: $2)
             }),
             // Auth state data is missing.
             (1,
-             UInt.arbitrary.map{
+             Gen.zip(UInt.arbitrary, [String].arbitrary).map{
                 MutableDBContainer(subscriptionAuths: nil,
-                containerRejectedSubscriptionAuthIdReadAtLeastUpToSequenceNumber: Int($0))
+                                   containerRejectedSubscriptionAuthIdReadAtLeastUpToSequenceNumber: Int($0),
+                                   rejectedSubscriptionAuthorizationIDs: $1)
                 }
             )
         ])

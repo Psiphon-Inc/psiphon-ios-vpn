@@ -292,6 +292,96 @@ final class SubscriptionAuthStateTest : XCTestCase {
         }
     }
 
+    func testLocalDataUpdateWhenExtensionRejectedAuthorizations () {
+
+        struct IAPPurchaseWithSignedData: Hashable, Arbitrary {
+            static var arbitrary: Gen<IAPPurchaseWithSignedData> {
+                Gen.compose { c in
+                    IAPPurchaseWithSignedData(purchase: c.generate(),
+                                              signedData: c.generate())
+                }
+            }
+            let purchase: SubscriptionIAPPurchase
+            let signedData: SignedData<SignedAuthorization>
+        }
+
+        property("Local data update where the extension has rejected authorizations") <- forAll {
+            (updateType: SubscriptionAuthStateAction.StoredDataUpdateType,
+            purchasesWithAuth: Set<IAPPurchaseWithSignedData>,
+            env: SubscriptionAuthStateReducerEnvironment) in
+
+            // Setup reducer state.
+
+            var inputAuthState = SubscriptionAuthState()
+            inputAuthState.purchasesAuthState = .some([:])
+            for purchaseWithAuth in purchasesWithAuth {
+                inputAuthState.purchasesAuthState?[purchaseWithAuth.purchase.originalTransactionID] =
+                    SubscriptionPurchaseAuthState(purchase: purchaseWithAuth.purchase,
+                                                  signedAuthorization: .authorization(purchaseWithAuth.signedData))
+            }
+
+            let receiptData = ReceiptData(subscriptionInAppPurchases: Set(purchasesWithAuth.map(\.purchase)),
+                                          consumableInAppPurchases: [],
+                                          data: Data() /* unused in this test */,
+                                          readDate: Date() /* unused in this test */)
+
+            let inputState = SubscriptionReducerState(subscription: inputAuthState,
+                                                      receiptData: .some(receiptData))
+
+            // Mark all authorizations as rejected in the shared DB.
+            // This will cause the local data update return an action (_localDataUpdateResult)
+            // which will mark all the authorizations as rejected.
+            (env.sharedDB as! TestSharedDBContainer)
+                .state.rejectedSubscriptionAuthorizationIDs =
+                purchasesWithAuth.map(\.signedData.decoded.authorization.id)
+
+            // Run local data update action
+
+            let localDataUpdateOutput = SubscriptionAuthStateTest.runReducer(effectsTimeout: 0.1,
+                                                                             state: inputState,
+                                                                             action: .localDataUpdate(type: updateType),
+                                                                             env: env)
+
+            guard case let ._localDataUpdateResult(transformer) = localDataUpdateOutput.actions.first?.first?.value else {
+                return false <?> "Expected ._localDataUpdateResult, but got: \(localDataUpdateOutput)"
+            }
+
+            // Run local data update result action
+
+            let localDataUpdateResultOutput = SubscriptionAuthStateTest.runReducer(effectsTimeout: 0.1,
+                                                                                   state: localDataUpdateOutput.state,
+                                                                                   action: ._localDataUpdateResult(transformer: transformer),
+                                                                                   env: env)
+
+            // Setup the expected final auth state, which is the input state
+            // with every authorization marked as `rejectedByPsiphon`.
+            var expectedFinalAuthState = SubscriptionAuthState()
+            expectedFinalAuthState.purchasesAuthState =
+                inputState.subscription.purchasesAuthState?.mapValues {
+                    authState -> SubscriptionPurchaseAuthState in
+
+                    switch authState.signedAuthorization {
+                    case .authorization(let signedData):
+                        var expectedAuth = authState
+                        expectedAuth.signedAuthorization = .rejectedByPsiphon(signedData)
+                        return expectedAuth
+                    default:
+                        // Unexpected and test will naturally fail in this scenario.
+                        return authState
+                    }
+            }
+            let expectedFinalState = SubscriptionReducerState(subscription: expectedFinalAuthState,
+                                                              receiptData: inputState.receiptData)
+
+            return
+                // Expect state to be unchanged.
+                (inputState ==== localDataUpdateOutput.state) <?> "localDataUpdate action output state check"
+                ^&&^
+                // Expect authorization state of each purchase to now be `.rejectedByPsiphon`.
+                (expectedFinalState ==== localDataUpdateResultOutput.state) <?> "localDataUpdateResult action output state check"
+        }
+    }
+
     // MARK: test helpers
 
     struct ReducerOutputs {
