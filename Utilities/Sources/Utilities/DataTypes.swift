@@ -20,7 +20,7 @@ import Foundation
 
 /// Represents unit `()` type that is `Equatable`.
 /// - Bug: This is a hack since `()` (and generally tuples) do not conform to `Equatable`.
-public enum Unit: Equatable {
+public enum Unit: Hashable {
     case unit
 }
 

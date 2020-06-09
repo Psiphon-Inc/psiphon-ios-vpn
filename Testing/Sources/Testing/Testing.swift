@@ -25,7 +25,7 @@ public func XCTFatal(message: String = "") -> Never {
     fatalError()
 }
 
-public struct Generator<Value>: IteratorProtocol {
+public final class Generator<Value>: IteratorProtocol {
     
     private let sequence: [Value]
     private var index = 0
@@ -38,7 +38,7 @@ public struct Generator<Value>: IteratorProtocol {
         self.sequence = sequence
     }
     
-    public mutating func next() -> Value? {
+    public func next() -> Value? {
         guard index < sequence.count else {
             return nil
         }
@@ -46,6 +46,16 @@ public struct Generator<Value>: IteratorProtocol {
             index += 1
         }
         return sequence[index]
+    }
+    
+    /// Returns a function that ignores its input, and returns next value from this generator.
+    public func returnNextOrFail<In>() -> (In) -> Value {
+        return { _ -> Value in
+            guard let next = self.next() else {
+                XCTFatal()
+            }
+            return next
+        }
     }
     
 }
@@ -98,7 +108,7 @@ extension SignalProducer where Error: Equatable {
             let timer = DispatchSource.makeTimerSource()
             timer.schedule(deadline: .now(), repeating: interval, leeway: .nanoseconds(0))
             
-            var generator = Generator(sequence: values)
+            let generator = Generator(sequence: values)
             timer.setEventHandler {
                 guard let nextValue = generator.next() else {
                     observer.sendCompleted()
