@@ -136,7 +136,7 @@ public struct PaymentTransaction: Equatable {
         case pending(PendingTransactionState)
         
         /// Success case `Date` is the transaction date.
-        case completed(Result<Pair<Date, CompletedTransactionState>, SKError>)
+        case completed(Result<Pair<Date, CompletedTransactionState>, Either<SystemError, SKError>>)
     }
     
     public let transactionID: () -> TransactionID
@@ -227,9 +227,9 @@ extension PaymentTransaction {
                     // Error is non-null when state is failed.
                     let someError = skPaymentTransaction.error!
                     if let skError = someError as? SKError {
-                        return .completed(.failure(skError))
+                        return .completed(.failure(.right(skError)))
                     } else {
-                        fatalError("Expected SKError: '\(someError)'")
+                        return .completed(.failure(.left(SystemError(someError))))
                     }
                 @unknown default:
                     fatalError("""

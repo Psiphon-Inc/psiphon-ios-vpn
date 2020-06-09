@@ -164,14 +164,18 @@ extension IAPPurchasableProduct {
 }
 
 public enum IAPError: HashableError {
+    // Fully specified StoreKit error type.
+    // Not all errors emitted by StoreKit are of type `SKError`.
+    public typealias StoreKitError = Either<SystemError, SKError>
+    
     case failedToCreatePurchase(reason: String)
-    case storeKitError(SKError)
+    case storeKitError(StoreKitError)
 }
 
-extension IAPError {
+extension IAPError.StoreKitError {
     /// True if payment is cancelled by the user
     public var paymentCancelled: Bool {
-        guard case let .storeKitError(skError) = self else {
+        guard case let .right(skError) = self else {
             return false
         }
         guard case .paymentCancelled = skError.code else {
