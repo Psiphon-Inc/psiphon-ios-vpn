@@ -71,12 +71,12 @@ public enum SubscriptionAuthStateAction {
 
     case localDataUpdate(type: StoredDataUpdateType)
     
-    case didLoadStoredPurchaseAuthState(
+    case _didLoadStoredPurchaseAuthState(
         loadResult: Result<SubscriptionAuthState.PurchaseAuthStateDict, SystemErrorEvent>,
         replayDataUpdate: StoredDataUpdateType?
     )
     
-    case requestAuthorizationForPurchases
+    case _requestAuthorizationForPurchases
     
     case _localDataUpdateResult(
         transformer: (SubscriptionAuthState.PurchaseAuthStateDict) ->
@@ -166,7 +166,7 @@ public func subscriptionAuthStateReducer(
         guard let receiptData = state.receiptData else {
             return [
                 Effect(value:
-                    .didLoadStoredPurchaseAuthState(
+                    ._didLoadStoredPurchaseAuthState(
                         loadResult: .success([:]),
                         replayDataUpdate: .none
                     )
@@ -178,7 +178,7 @@ public func subscriptionAuthStateReducer(
             return [
                 StoredSubscriptionPurchasesAuthState.getValue(sharedDB: environment.sharedDB)
                     .map {
-                        .didLoadStoredPurchaseAuthState(
+                        ._didLoadStoredPurchaseAuthState(
                             loadResult: $0,
                             replayDataUpdate: updateType
                         )
@@ -226,7 +226,7 @@ public func subscriptionAuthStateReducer(
                 }
         ]
         
-    case let .didLoadStoredPurchaseAuthState(loadResult: loadResult, replayDataUpdate: updateType):
+    case let ._didLoadStoredPurchaseAuthState(loadResult: loadResult, replayDataUpdate: updateType):
         switch loadResult {
         case .success(let loadedValue):
             var effects = [Effect<SubscriptionAuthStateAction>]()
@@ -274,7 +274,7 @@ public func subscriptionAuthStateReducer(
         // Avoids duplicate updates if there has been no value change.
         guard newValue != currentPurchasesAuthState else {
             return effects + [
-                Effect(value: .requestAuthorizationForPurchases)
+                Effect(value: ._requestAuthorizationForPurchases)
             ]
         }
 
@@ -285,10 +285,10 @@ public func subscriptionAuthStateReducer(
 
         return effects + [
             stateUpdateEffect.mapNever(),
-            Effect(value: .requestAuthorizationForPurchases)
+            Effect(value: ._requestAuthorizationForPurchases)
         ]
         
-    case .requestAuthorizationForPurchases:
+    case ._requestAuthorizationForPurchases:
         guard let receiptData = state.receiptData else {
             return []
         }
@@ -350,7 +350,7 @@ public func subscriptionAuthStateReducer(
 
         if let error = req.error {
             effects += [environment.feedbackLogger.log(.error,
-                                                       tag: "SubscriptionAuthStateReducer.requestAuthorizationForPurchases",
+                                                       tag: "SubscriptionAuthStateReducer._requestAuthorizationForPurchases",
                                                        error).mapNever()]
         }
         
