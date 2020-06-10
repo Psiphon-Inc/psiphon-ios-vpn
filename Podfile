@@ -17,7 +17,8 @@ target 'Psiphon' do
   pod 'ReactiveObjC', :git => "https://github.com/Psiphon-Inc/ReactiveObjC.git", :commit => '8bbf9dd'
   pod 'PersonalizedAdConsent', '~> 1.0'  # Google Mobile Ads Consent SDK
   pod 'MBProgressHUD', '~> 1.1.0'
-  pod 'SVProgressHUD'
+  pod 'SVProgressHUD', '~> 2.2.5'
+  pod 'EFCountingLabel', '~> 5.1.1'
 end
 
 target 'PsiphonVPN' do
