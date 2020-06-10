@@ -386,6 +386,12 @@ public func subscriptionAuthStateReducer(
         
         guard purchasesAuthState.contains(originalTransactionID: purchase.originalTransactionID)
             else {
+                
+                // Removes the transaction from set of transactions pending auth request,
+                // as this transaction is no longer valid (since it is not part of the state).
+                state.subscription.transactionsPendingAuthRequest
+                    .remove(purchase.originalTransactionID)
+                
                 return [
                     environment.feedbackLogger.log(.warn, """
                         'state.subscription.purchaseAuthStates' does not contain purchase
