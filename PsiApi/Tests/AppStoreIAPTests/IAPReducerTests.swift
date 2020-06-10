@@ -144,9 +144,11 @@ final class IAPReducerTests: XCTestCase {
                 // Assert
                 return (nextState ==== initState) <?> "State unchanged"
                     ^&&^
-                    (effectsResults ==== []) <?> "No effects"
+                    (effectsResults ==== [[.completed]]) <?> "Log effect"
                     ^&&^
-                    (self.feedbackHandler.logs ==== []) <?> "Feedback logs"
+                    (self.feedbackHandler.logs.count ==== 1) <?> "Feedback logs"
+                    ^&&^
+                    (self.feedbackHandler.logs[maybe: 0]?.level ==== .nonFatal(.warn))
         }
 
 
@@ -169,9 +171,11 @@ final class IAPReducerTests: XCTestCase {
                 // Assert
                 return (nextState ==== initState) <?> "State unchanged"
                     ^&&^
-                    (effectsResults ==== []) <?> "No effects"
+                    (effectsResults ==== [[.completed]]) <?> "Log effect"
                     ^&&^
-                    (self.feedbackHandler.logs ==== []) <?> "Feedback logs"
+                    (self.feedbackHandler.logs.count ==== 1) <?> "Feedback logs"
+                    ^&&^
+                    (self.feedbackHandler.logs[maybe: 0]?.level ==== .nonFatal(.warn))
         }
 
         
@@ -197,7 +201,7 @@ final class IAPReducerTests: XCTestCase {
                     // If a product with the same type as generated `product` is not being
                     // purchased, then reducer sets the purchasing state for product type
                     // to error indicating there's no psicash token.
-                    (initState.iap.purchasing[product.type] == nil) ==> {
+                    (initState.iap.purchasing[product.type]?.completed == true) ==> {
                         return (nextState.iap.purchasing[product.type]?.purchasingState ====
                             .completed(ErrorEvent(.failedToCreatePurchase(reason: "PsiCash data not present"), date: fixedTime)))
                             ^&&^
@@ -211,10 +215,14 @@ final class IAPReducerTests: XCTestCase {
                             <?> "Feedback logs message"
                     },
                     
-                    (initState.iap.purchasing[product.type] != nil) ==> {
-                        return (initState ==== nextState)
+                    (initState.iap.purchasing[product.type]?.completed == false) ==> {
+                        return (initState ==== nextState) <?> "No State change"
                             ^&&^
-                            (effectsResults ==== [])
+                            (effectsResults ==== [[.completed]]) <?> "Log effect"
+                            ^&&^
+                            (self.feedbackHandler.logs.count ==== 1) <?> "Feedback logs"
+                            ^&&^
+                            (self.feedbackHandler.logs[maybe: 0]?.level ==== .nonFatal(.warn))
                     }
                 )
 
