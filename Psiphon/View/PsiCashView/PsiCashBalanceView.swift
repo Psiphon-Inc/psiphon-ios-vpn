@@ -20,6 +20,8 @@
 import Foundation
 import UIKit
 import PsiCashClient
+import EFCountingLabel
+import PsiCashClient
 
 @objc final class PsiCashBalanceView: UIView, Bindable {
     typealias BindingType = BalanceState
@@ -31,9 +33,11 @@ import PsiCashClient
     private let iconContainer = UIView(frame: .zero)
     private let icon: IconType
     private let iconBindable: IconType.BuildType
-    private let balance: UILabel
+    private let balanceView: EFCountingLabel
     private let typeface = AvenirFont.bold
-    private var state: Loading<PsiCashAmount> = .loaded(PsiCashAmount.zero)
+    
+    
+    private var currentAmount: PsiCashAmount?
 
     override init(frame: CGRect) {
         let titleString = UserStrings.PsiCash_balance().localizedUppercase
@@ -44,7 +48,7 @@ import PsiCashClient
                              typeface: typeface,
                              color: UIColor.blueGrey())
         
-        balance = UILabel.make(fontSize: fontSize, typeface: typeface)
+        balanceView = UILabel.make(fontSize: fontSize, typeface: typeface)
 
         guard let coinImage = UIImage(named: "PsiCashCoin") else {
             fatalError("Could not find 'PsiCashCoin' image")
@@ -69,17 +73,23 @@ import PsiCashClient
         iconBindable = icon.build(iconContainer)
 
         super.init(frame: frame)
+        
+        balanceView.setUpdateBlock { [unowned self] (value, label) in
+            label.text = self.psiCashPriceFormatter.string(from: Double(value).rounded(.down))
+        }
+        
+        balanceView.counter.timingFunction = EFTimingFunction.easeInOut(easingRate: 5)
 
         layer.masksToBounds = false
         backgroundColor = .clear
 
         addSubview(title)
         addSubview(iconContainer)
-        addSubview(balance)
+        addSubview(balanceView)
 
         title.translatesAutoresizingMaskIntoConstraints = false
         iconContainer.translatesAutoresizingMaskIntoConstraints = false
-        balance.translatesAutoresizingMaskIntoConstraints = false
+        balanceView.translatesAutoresizingMaskIntoConstraints = false
 
         iconContainer.setContentCompressionResistancePriority(.defaultLow, for: .vertical)
         iconContainer.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
@@ -97,10 +107,10 @@ import PsiCashClient
                 CGFloat(1.33 * fontSize.rawValue)),
             iconContainer.widthAnchor.constraint(equalTo: iconContainer.heightAnchor),
 
-            balance.leadingAnchor.constraint(equalTo: iconContainer.trailingAnchor, constant: 5.0),
-            balance.trailingAnchor.constraint(equalTo: self.trailingAnchor),
-            balance.topAnchor.constraint(equalTo: self.topAnchor),
-            balance.bottomAnchor.constraint(equalTo: self.bottomAnchor),
+            balanceView.leadingAnchor.constraint(equalTo: iconContainer.trailingAnchor, constant: 5.0),
+            balanceView.trailingAnchor.constraint(equalTo: self.trailingAnchor),
+            balanceView.topAnchor.constraint(equalTo: self.topAnchor),
+            balanceView.bottomAnchor.constraint(equalTo: self.bottomAnchor),
         ])
     }
 
@@ -108,11 +118,24 @@ import PsiCashClient
         fatalError("init(coder:) has not been implemented")
     }
 
-    private func setAmount(_ amount: PsiCashAmount?) {
-        if let amount = amount {
-            balance.text = psiCashPriceFormatter.string(from: amount.inPsi)
+    private func setAmount(_ newAmount: PsiCashAmount?) {
+        defer {
+            currentAmount = newAmount
+        }
+        if let newAmount = newAmount {
+            let newAmountF = CGFloat(newAmount.inPsi)
+            
+            if let current = currentAmount {
+                let currentAmountF = CGFloat(current.inPsi)
+                balanceView.countFrom(currentAmountF, to: newAmountF, withDuration: 1.0)
+                
+            } else {
+                // Don't animate the first time value is set
+                balanceView.countFrom(newAmountF, to: newAmountF, withDuration: 0.0)
+            }
+                        
         } else {
-            balance.text = ""
+            balanceView.text = ""
         }
     }
 
