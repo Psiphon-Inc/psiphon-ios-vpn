@@ -386,10 +386,12 @@ public func subscriptionAuthStateReducer(
         
         guard purchasesAuthState.contains(originalTransactionID: purchase.originalTransactionID)
             else {
-            fatalError("""
-                expected 'state.subscription.purchaseAuthStates' to contain \
-                transaction ID '\(purchase.transactionID)'
-                """)
+                return [
+                    environment.feedbackLogger.log(.warn, """
+                        'state.subscription.purchaseAuthStates' does not contain purchase
+                        with original transaction ID: '\(purchase.originalTransactionID)'
+                        """).mapNever()
+                ]
         }
         
         switch requestResult {
