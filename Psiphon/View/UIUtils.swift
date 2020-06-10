@@ -79,15 +79,15 @@ enum Loading<Value: Equatable>: Equatable {
 
 extension UILabel {
 
-    static func make(
+    static func make<Label: UILabel>(
         text: String = "",
         fontSize: FontSize = .normal,
         typeface: AvenirFont = .demiBold,
         color: UIColor = .white,
         numberOfLines: Int = 1,
-        alignment: NSTextAlignment = .natural) -> UILabel {
+        alignment: NSTextAlignment = .natural) -> Label {
 
-        let v = UILabel(frame: .zero)
+        let v = Label(frame: .zero)
         v.backgroundColor = .clear
         v.adjustsFontSizeToFitWidth = true
         v.minimumScaleFactor = 0.6
