@@ -377,7 +377,12 @@ public func subscriptionAuthStateReducer(
             state.subscription.transactionsPendingAuthRequest
                 .contains(purchase.originalTransactionID)
             else {
-                fatalError()
+                return [
+                    environment.feedbackLogger.log(.warn, """
+                        'state.subscription.transactionsPendingAuthRequest' does not contains \
+                        purchase with original transaction ID: '\(purchase.originalTransactionID)'
+                        """).mapNever()
+                ]
         }
         
         guard let purchasesAuthState = state.subscription.purchasesAuthState else {
