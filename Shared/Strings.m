@@ -77,7 +77,7 @@
 
     NSMutableString *string = [[NSMutableString alloc] init];
 
-    // Since Apple sets 1 week as 7 days, we will explicitely return "1 Week".
+    // Since Apple sets 1 week as 7 days, we will explicitly return "1 Week".
     if (subscription.numberOfUnits == 7 &&
         subscription.unit == SKProductPeriodUnitDay) {
 
@@ -156,7 +156,7 @@
 }
 
 + (NSString *)vpnInstallGuideText {
-    return  NSLocalizedStringWithDefaultValue(@"ONBARDING_VPN_INSTALL_GUIDE_TEXT", nil, [NSBundle mainBundle], @"You’ll need to allow Psiphon to add VPN configurations in order to connect.", @"Onboarding text for install VPN configuration. (Do not translate 'Psiphon').");
+    return  NSLocalizedStringWithDefaultValue(@"ONBOARDING_VPN_INSTALL_GUIDE_TEXT", nil, [NSBundle mainBundle], @"You’ll need to allow Psiphon to add VPN configurations in order to connect.", @"Onboarding text for install VPN configuration. (Do not translate 'Psiphon').");
 }
 
 + (NSString *)nextPageButtonTitle {
@@ -219,7 +219,7 @@
 }
 
 + (NSString *)privacyPolicyDeclinedAlertBody {
-    return  NSLocalizedStringWithDefaultValue(@"PRIVACY_POLICY_DECLINED_ALERT_BODY", nil, [NSBundle mainBundle], @"You must accept our Privacy Policy before continuing to use Psiphon.", @"Alert message when the user declined privacy policy. They will not be able ot use the app until the user accepts the privacy policy (Do not translate 'Psiphon')");
+    return  NSLocalizedStringWithDefaultValue(@"PRIVACY_POLICY_DECLINED_ALERT_BODY", nil, [NSBundle mainBundle], @"You must accept our Privacy Policy before continuing to use Psiphon.", @"Alert message when the user declined privacy policy. They will not be able to use the app until the user accepts the privacy policy (Do not translate 'Psiphon')");
 }
 
 + (NSString *)activeSubscriptionBannerTitle {

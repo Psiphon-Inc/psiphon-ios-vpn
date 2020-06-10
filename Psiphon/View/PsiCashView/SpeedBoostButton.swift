@@ -19,7 +19,7 @@
 
 import UIKit
 
-@objc class SpeedBoostButton: GradientButton, Bindable {
+@objc final class SpeedBoostButton: GradientButton, Bindable {
 
     enum SpeedBoostButtonState: Equatable {
         case inactive
@@ -64,7 +64,7 @@ import UIKit
             case .inactive:
                 self.timer = nil
             case .none:
-                fatalErrorFeedbackLog("Invalid SpeedBoostButton state")
+                fatalError("Invalid SpeedBoostButton state")
             }
 
             updateUIState(timerState: newState!)
@@ -80,7 +80,7 @@ import UIKit
     }
 
     required init?(coder: NSCoder) {
-        fatalErrorFeedbackLog("init(coder:) has not been implemented")
+        fatalError("init(coder:) has not been implemented")
     }
 
     override func initViewBeforeShadowAndGradient() {

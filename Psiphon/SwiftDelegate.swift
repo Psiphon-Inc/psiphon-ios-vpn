@@ -22,6 +22,10 @@ import ReactiveSwift
 import Promises
 import StoreKit
 import NetworkExtension
+import Utilities
+import PsiApi
+import AppStoreIAP
+import PsiCashClient
 
 enum AppDelegateAction {
     case appDidLaunch(psiCashData: PsiCashLibData)
@@ -35,9 +39,9 @@ struct AppDelegateReducerState: Equatable {
 }
 
 typealias AppDelegateEnvironment = (
-    userConfigs: UserDefaultsConfig,
+    psiCashPersistedValues: PsiCashPersistedValues,
     sharedDB: PsiphonDataSharedDB,
-    psiCashEffects: PsiCashEffect,
+    psiCashEffects: PsiCashEffects,
     paymentQueue: PaymentQueue,
     appReceiptStore: (ReceiptStateAction) -> Effect<Never>,
     psiCashStore: (PsiCashAction) -> Effect<Never>,
@@ -51,10 +55,15 @@ func appDelegateReducer(
     switch action {
     case .appDidLaunch(psiCashData: let libData):
         state.psiCash.appDidLaunch(libData)
-        state.psiCashBalance = .fromStoredExpectedReward(libData: libData,
-                                                         userConfigs: environment.userConfigs)
+        state.psiCashBalance = .fromStoredExpectedReward(
+            libData: libData,
+            persisted: environment.psiCashPersistedValues
+        )
+        
+        let nonSubscriptionAuths = environment.sharedDB.getNonSubscriptionEncodedAuthorizations()
+        
         return [
-            environment.psiCashEffects.expirePurchases(sharedDB: environment.sharedDB).mapNever(),
+            environment.psiCashEffects.expirePurchases(nonSubscriptionAuths).mapNever(),
             environment.paymentQueue.addObserver(environment.paymentTransactionDelegate).mapNever(),
             environment.appReceiptStore(.localReceiptRefresh).mapNever()
         ]
@@ -71,6 +80,11 @@ func appDelegateReducer(
     
     static let instance = SwiftDelegate()
     
+    private let sharedDB = PsiphonDataSharedDB(forAppGroupIdentifier: APP_GROUP_IDENTIFIER)
+    private let feedbackLogger = FeedbackLogger(PsiphonRotatingFileFeedbackLogHandler())
+    private let supportedProducts =
+        SupportedAppStoreProducts.fromPlists(types: [.subscription, .psiCash])
+    
     private var (lifetime, token) = Lifetime.make()
     private var store: Store<AppState, AppAction>!
     private var psiCashLib: PsiCash!
@@ -82,21 +96,23 @@ func appDelegateReducer(
 
 extension SwiftDelegate: RewardedVideoAdBridgeDelegate {
     func adPresentationStatus(_ status: AdPresentation) {
-        self.store.send(.psiCash(.rewardedVideoPresentation(status)))
+        self.store.send(.psiCash(
+            .rewardedVideoPresentation(RewardedVideoPresentation(objcAdPresentation: status)))
+        )
     }
     
-    func adLoadStatus(_ status: AdLoadStatus, error: SystemError?) {
+    func adLoadStatus(_ status: AdLoadStatus, error: NSError?) {
         let loadResult: RewardedVideoLoad
         if let error = error {
             // Note that error event is created here as opposed to the origin
             // of where the error occurred. However this is acceptable as long as
             // this function is called once for each error that happened almost immediately.
-            loadResult = .failure(ErrorEvent(.adSDKError(error)))
+            loadResult = .failure(ErrorEvent(.adSDKError(SystemError(error))))
         } else {
             if case .error = status {
                 loadResult = .failure(ErrorEvent(.requestedAdFailedToLoad))
             } else {
-                loadResult = .success(status)
+                loadResult = .success(RewardedVideoLoadStatus(objcAdLoadStatus: status))
             }
         }
         self.store.send(.psiCash(.rewardedVideoLoad(loadResult)))
@@ -117,13 +133,18 @@ extension SwiftDelegate: SwiftBridgeDelegate {
         
         self.store = Store(
             initialValue: AppState(),
-            reducer: makeAppReducer(),
+            reducer: makeAppReducer(feedbackLogger: self.feedbackLogger),
+            feedbackLogger: self.feedbackLogger,
             environment: { [unowned self] store in
                 let (environment, cleanup) = makeEnvironment(
                     store: store,
+                    feedbackLogger: self.feedbackLogger,
+                    sharedDB: self.sharedDB,
                     psiCashLib: self.psiCashLib,
+                    supportedAppStoreProducts: self.supportedProducts,
                     objcBridgeDelegate: objcBridge,
-                    rewardedVideoAdBridgeDelegate: self
+                    rewardedVideoAdBridgeDelegate: self,
+                    calendar: Calendar.current
                 )
                 self.environmentCleanup = cleanup
                 return environment
@@ -139,6 +160,17 @@ extension SwiftDelegate: SwiftBridgeDelegate {
             .skipRepeats()
             .filter { $0 == .connected }
             .map(value: AppAction.psiCash(.refreshPsiCashState))
+            .send(store: self.store)
+        
+        // Maps connected events to rejected authorization ID data update.
+        // This is true as long as rejected authorization IDs are updated in tunnel provider
+        // during `onActiveAuthorizationIDs:` callback, before the `onConnected` callback.
+        self.lifetime += self.store.$value.signalProducer.map(\.vpnState.value.vpnStatus)
+            .skipRepeats()
+            .filter { $0 == .connected }
+            .map(value: AppAction.subscriptionAuthStateAction(
+                .localDataUpdate(type: .didUpdateRejectedSubscriptionAuthIDs))
+            )
             .send(store: self.store)
         
         // Forwards `PsiCashState` updates to ObjCBridgeDelegate.
@@ -157,7 +189,7 @@ extension SwiftDelegate: SwiftBridgeDelegate {
                 objcBridge.onSubscriptionStatus(BridgedUserSubscription.from(state: $0))
         }
         
-        // Forwards VPN status changes to ObjCBridgeDelegaet.
+        // Forwards VPN status changes to ObjCBridgeDelegate.
         self.lifetime += self.store.$value.signalProducer.map(\.vpnState.value.vpnStatus)
             .skipRepeats()
             .startWithValues { [unowned objcBridge] in
@@ -169,12 +201,11 @@ extension SwiftDelegate: SwiftBridgeDelegate {
         // it alerts the user if the error is not resolves within a few seconds.
         self.lifetime += self.store.$value.signalProducer
             .map { appState -> Pair<VPNStatusWithIntent, ProviderManagerLoadState<PsiphonTPM>> in
-                Pair(first: appState.vpnState.value.vpnStatusWithIntent,
-                     second: appState.vpnState.value.loadState)
+                Pair(appState.vpnState.value.vpnStatusWithIntent, appState.vpnState.value.loadState)
             }
             .skipRepeats()
             .flatMap(.latest) { vpnStateTunnelLoadStatePair ->
-                SignalProducer<Result<Unit, ErrorEvent<ErrorRepr>>, Never> in
+                SignalProducer<Result<Utilities.Unit, ErrorEvent<ErrorRepr>>, Never> in
                 
                 guard case .loaded(_) = vpnStateTunnelLoadStatePair.second.value else {
                     return Effect(value: .success(.unit))
@@ -199,23 +230,23 @@ extension SwiftDelegate: SwiftBridgeDelegate {
                 default:
                     return Effect(value: .success(.unit))
                 }
-        }
-        .skipRepeats()
-        .startWithValues { (result: Result<Unit, ErrorEvent<ErrorRepr>>) in
-            switch result {
-            case .success(.unit):
-                break
-                
-            case .failure(let errorEvent):
-                immediateFeedbackLog(.error, errorEvent)
-                
-                objcBridge.onVPNStateSyncError(
-                    UserStrings.Tunnel_provider_sync_failed_reinstall_config()
-                )
             }
-        }
+            .skipRepeats()
+        .startWithValues { [unowned self] (result: Result<Utilities.Unit, ErrorEvent<ErrorRepr>>) in
+                switch result {
+                case .success(.unit):
+                    break
+                    
+                case .failure(let errorEvent):
+                    self.feedbackLogger.immediate(.error, "\(errorEvent)")
+                    
+                    objcBridge.onVPNStateSyncError(
+                        UserStrings.Tunnel_provider_sync_failed_reinstall_config()
+                    )
+                }
+            }
         
-        // Forewards SpeedBoost purchase expiry date (if the user is not subscribed)
+        // Forwards SpeedBoost purchase expiry date (if the user is not subscribed)
         // to ObjCBridgeDelegate.
         self.lifetime += self.store.$value.signalProducer
             .map { appState -> Date? in
@@ -224,11 +255,11 @@ extension SwiftDelegate: SwiftBridgeDelegate {
                 } else {
                     return appState.psiCash.activeSpeedBoost?.transaction.localTimeExpiry
                 }
-        }
-        .skipRepeats()
-        .startWithValues{ [unowned objcBridge] speedBoostExpiry in
-            objcBridge.onSpeedBoostActivePurchase(speedBoostExpiry)
-        }
+            }
+            .skipRepeats()
+            .startWithValues{ [unowned objcBridge] speedBoostExpiry in
+                objcBridge.onSpeedBoostActivePurchase(speedBoostExpiry)
+            }
         
         self.lifetime += self.store.$value.signalProducer
             .map(\.vpnState.value.startStopState)
@@ -236,10 +267,21 @@ extension SwiftDelegate: SwiftBridgeDelegate {
             .startWithValues { [unowned objcBridge] startStopState in
                 let value = VPNStartStopStatus.from(startStopState: startStopState)
                 objcBridge.onVPNStartStopStateDidChange(value)
-        }
+            }
+        
+        // Forwards AppState `internetReachability` value to ObjCBridgeDelegate.
+        self.lifetime += self.store.$value.signalProducer
+            .map(\.internetReachability)
+            .skipRepeats()
+            .startWithValues { [unowned objcBridge] reachabilityStatus in
+                objcBridge.onReachabilityStatusDidChange(reachabilityStatus.networkStatus)
+            }
         
         // Opens landing page whenever Psiphon tunnel is connected, with
         // change in value of `VPNState` tunnel intent.
+        // Landing page should not be opened after a reconnection due to an In-App purchase.
+        // This condition is implicitly handled, since reconnections do not cause a change
+        // the in tunnel intent value.
         self.lifetime += self.store.$value.signalProducer
             .map(\.vpnState.value.tunnelIntent)
             .skipRepeats()
@@ -269,21 +311,23 @@ extension SwiftDelegate: SwiftBridgeDelegate {
 
         if Debugging.printAppState {
             self.lifetime += self.store.$value.signalProducer.startWithValues { appState in
-                dump(appState[keyPath: \.vpnState])
+                print("*", "-----")
+                dump(appState[keyPath: \.subscriptionAuthState])
                 print("*", "-----")
             }
         }
 
     }
     
-    struct Changed<Value> {
-        let changed: Bool
-        let value: Value
-    }
-    
     @objc func applicationWillEnterForeground(_ application: UIApplication) {
         self.store.send(vpnAction: .syncWithProvider(reason: .appEnteredForeground))
         self.store.send(.psiCash(.refreshPsiCashState))
+        
+        self.sharedDB.setAppForegroundState(true)
+    }
+    
+    @objc func applicationDidEnterBackground(_ application: UIApplication) {
+        self.sharedDB.setAppForegroundState(false)
     }
     
     @objc func applicationWillTerminate(_ application: UIApplication) {
@@ -307,42 +351,50 @@ extension SwiftDelegate: SwiftBridgeDelegate {
                 value: erase,
                 action: { .productRequest($0) } ),
             tunnelConnectedSignal: self.store.$value.signalProducer
-                .map(\.vpnState.value.providerVPNStatus.tunneled)
+                .map(\.vpnState.value.providerVPNStatus.tunneled),
+            feedbackLogger: self.feedbackLogger
         )
     }
     
     @objc func getCustomRewardData(_ callback: @escaping (CustomData?) -> Void) {
-        callback(PsiCashEffect(psiCash: self.psiCashLib).rewardedVideoCustomData())
+        callback(
+            PsiCashEffects.default(psiCash: self.psiCashLib, feedbackLogger: self.feedbackLogger)
+                .rewardedVideoCustomData()
+        )
     }
     
     @objc func refreshAppStoreReceipt() -> Promise<Error?>.ObjCPromise<NSError> {
-        let promise = Promise<Result<(), SystemErrorEvent>>.pending()
+        let promise = Promise<Result<Utilities.Unit, SystemErrorEvent>>.pending()
         let objcPromise = promise.then { result -> Error? in
             return result.projectError()?.error
         }
-        self.store.send(.appReceipt(.remoteReceiptRefresh(optinalPromise: promise)))
+        self.store.send(.appReceipt(.remoteReceiptRefresh(optionalPromise: promise)))
         return objcPromise.asObjCPromise()
     }
     
     @objc func buyAppStoreSubscriptionProduct(
-        _ product: SKProduct
+        _ skProduct: SKProduct
     ) -> Promise<ObjCIAPResult>.ObjCPromise<ObjCIAPResult> {
-        let promise = Promise<IAPResult>.pending()
-        let objcPromise = promise.then { (result: IAPResult) -> ObjCIAPResult in
-            ObjCIAPResult.from(iapResult: result)
-        }
+        let promise = Promise<ObjCIAPResult>.pending()
         
         do {
-            let appStoreProduct = try AppStoreProduct(product)
-            self.store.send(.iap(.purchase(
-                IAPPurchasableProduct.subscription(product: appStoreProduct, promise: promise)
-                )))
+            let appStoreProduct = try AppStoreProduct.from(
+                skProduct: skProduct,
+                isSupportedProduct: self.supportedProducts.isSupportedProduct(_:)
+            )
+            
+            guard case .subscription = appStoreProduct.type else {
+                fatalError()
+            }
+            
+            self.store.send(.iap(.purchase(product: appStoreProduct, resultPromise: promise)))
             
         } catch {
-            fatalErrorFeedbackLog("Unknown subscription product identifier '\(product.productIdentifier)'")
+            self.feedbackLogger.fatalError(
+                "Unknown subscription product identifier '\(skProduct.productIdentifier)'")
         }
         
-        return objcPromise.asObjCPromise()
+        return promise.asObjCPromise()
     }
     
     @objc func onAdPresentationStatusChange(_ presenting: Bool) {
@@ -350,18 +402,19 @@ extension SwiftDelegate: SwiftBridgeDelegate {
     }
     
     @objc func getAppStoreSubscriptionProductIDs() -> Set<String> {
-        let productIds = StoreProductIds.subscription()
-        return productIds.values
+        return self.supportedProducts.supported[.subscription]!.rawValues
     }
     
     @objc func getAppStateFeedbackEntry(completionHandler: @escaping (String) -> Void) {
         self.store.$value.signalProducer
             .take(first: 1)
-            .startWithValues { appState in
+            .startWithValues { [unowned self] appState in
                 completionHandler("""
                     ContainerInfo: {
                     \"AppState\":\"\(makeFeedbackEntry(appState))\",
-                    \"UserDefaultsConfig\":\"\(makeFeedbackEntry(UserDefaultsConfig()))\"
+                    \"UserDefaultsConfig\":\"\(makeFeedbackEntry(UserDefaultsConfig()))\",
+                    \"PsiphonDataSharedDB\": \"\(makeFeedbackEntry(self.sharedDB))\",
+                    \"OutstandingEffectCount\": \(self.store.outstandingEffectCount)
                     }
                     """)
         }
@@ -412,7 +465,8 @@ extension SwiftDelegate: SwiftBridgeDelegate {
                 intent: .stop, reason: .userInitiated
             ))
         default:
-            fatalErrorFeedbackLog("Unexpected state '\(value.switchedIntent)'")
+            self.feedbackLogger.fatalError("Unexpected state '\(value.switchedIntent)'")
+            return
         }
     }
     
@@ -444,14 +498,16 @@ extension SwiftDelegate: SwiftBridgeDelegate {
             { (previous, tpmLoadState) -> IndexedPsiphonTPMLoadState in
                 // Indexes `tpmLoadState` emitted items, starting from 0.
                 return IndexedPsiphonTPMLoadState(index: previous.index + 1, value: tpmLoadState)
-        }.flatMap(.latest) { indexed -> SignalProducer<IndexedPsiphonTPMLoadState, Never> in
+        }.flatMap(.latest) { [unowned self] indexed
+            -> SignalProducer<IndexedPsiphonTPMLoadState, Never> in
             
             // Index 1 represents the value of ProviderManagerLoadState before
             // `.reinstallVPNConfig` action is sent.
             
             switch indexed.index {
             case 0:
-                fatalErrorFeedbackLog("Unexpected index 0")
+                self.feedbackLogger.fatalError("Unexpected index 0")
+                return .empty
             case 1:
                 switch indexed.value {
                 case .nonLoaded:
@@ -469,16 +525,18 @@ extension SwiftDelegate: SwiftBridgeDelegate {
             }
         }
         .take(first: 2)
-        .startWithValues { [promise, unowned store] indexed in
+        .startWithValues { [promise, unowned self] indexed in
             switch indexed.index {
             case 0:
-                fatalErrorFeedbackLog("Unexpected index 0")
+                self.feedbackLogger.fatalError("Unexpected index 0")
+                return
             case 1:
-                store!.send(vpnAction: .reinstallVPNConfig)
+                self.store.send(vpnAction: .reinstallVPNConfig)
             default:
                 switch indexed.value {
                 case .nonLoaded, .noneStored:
-                    fatalErrorFeedbackLog("Unepxected value '\(indexed.value)'")
+                    self.feedbackLogger.fatalError("Unexpected value '\(indexed.value)'")
+                    return
                 case .loaded(_):
                     promise.fulfill(.init(.installedSuccessfully))
                 case .error(let errorEvent):

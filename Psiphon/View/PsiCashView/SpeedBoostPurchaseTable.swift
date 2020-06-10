@@ -18,6 +18,9 @@
  */
 
 import UIKit
+import Utilities
+import PsiApi
+import PsiCashClient
 
 struct SpeedBoostPurchasableViewModel: Equatable {
     let purchasable: SpeedBoostPurchasable
@@ -93,7 +96,7 @@ extension SpeedBoostCollection: UICollectionViewDataSource {
 
     func collectionView(_ collectionView: UICollectionView,
                         numberOfItemsInSection section: Int) -> Int {
-        preconditionFeedbackLog(section == 0, "Section is not 0: '\(section)'")
+        precondition(section == 0, "Section is not 0: '\(section)'")
         return data?.count ?? 0
     }
 
@@ -112,8 +115,7 @@ extension SpeedBoostCollection: UICollectionViewDataSource {
         }
 
         guard let content = cell.contentView.subviews[maybe: 0] as? PurchaseCellContent else {
-            fatalErrorFeedbackLog("Expected cell to have subview of type 'PurchaseCellContent'")
-
+            fatalError("Expected cell to have subview of type 'PurchaseCellContent'")
         }
 
         content.bind(data![indexPath.row])
@@ -199,7 +201,7 @@ fileprivate final class PurchaseCellContent: AnimatedUIView, Bindable {
     }
 
     required init?(coder: NSCoder) {
-        fatalErrorFeedbackLog("init(coder:) has not been implemented")
+        fatalError("init(coder:) has not been implemented")
     }
 
     func bind(_ newValue: SpeedBoostPurchasableViewModel) {

@@ -18,6 +18,8 @@
 */
 
 import Foundation
+import PsiApi
+import AppStoreIAP
 
 extension AppState: FeedbackDescription {}
 
@@ -66,35 +68,99 @@ extension TunnelProviderSyncReason: CustomStringFeedbackDescription {
     
 }
 
-extension Authorization: CustomStringFeedbackDescription {
-    
-    public override var description: String {
-        let feedbackFields: [String : CustomStringConvertible] = ["id": id,
-                                                                  "expires": expires,
-                                                                  "accessType": accessType]
-        return "\(String(describing: Self.self))(\(String(describing: feedbackFields)))"
-    }
-    
-}
-
-extension ErrorEvent: FeedbackDescription {}
-
-extension PsiCashAmount: CustomStringFeedbackDescription {
-    
-    public var description: String {
-        "PsiCash(inPsi %.2f: \(String(format: "%.2f", self.inPsi)))"
-    }
-    
-}
-
 extension UserDefaultsConfig: CustomFieldFeedbackDescription {
     
-    var feedbackFields: [String : CustomStringConvertible] {
+    var feedbackFields: [String: CustomStringConvertible] {
         ["expectedPsiCashReward": self.expectedPsiCashReward]
     }
     
 }
 
-extension Optional: FeedbackDescription where Wrapped == TunnelStartStopIntent {}
-extension TunnelStartStopIntent: FeedbackDescription {}
-extension TunnelStartStopIntentReason: FeedbackDescription {}
+extension PsiphonDataSharedDB: CustomFieldFeedbackDescription {
+    
+    private func getNonSecretNonSubscriptionEncodedAuthorizations() -> String {
+        let decoder = JSONDecoder.makeRfc3339Decoder()
+        
+        do {
+            let secret = self.getNonSubscriptionEncodedAuthorizations()
+            let signedAuths = try secret.map { base64Auth -> SignedAuthorization in
+                guard let authData = Data(base64Encoded: base64Auth) else {
+                    throw ErrorRepr(repr: """
+                        Failed to create data from base64 encoded string: '\(base64Auth)'
+                        """)
+                }
+                return try decoder.decode(SignedAuthorization.self, from: authData)
+            }
+            
+            return String(describing: signedAuths.map { $0.description })
+            
+        } catch {
+            return String(describing: error)
+        }
+    }
+    
+    private func getNonSecretSubscriptionAuths() -> String {
+        guard let data = self.getSubscriptionAuths() else {
+            return "nil"
+        }
+        
+        let decoder = JSONDecoder.makeRfc3339Decoder()
+        
+        do {
+            let decoded = try decoder.decode(SubscriptionAuthState.PurchaseAuthStateDict.self,
+                                             from: data)
+            return decoded.description
+            
+        } catch {
+            return String(describing: error)
+        }
+        
+    }
+    
+    public var feedbackFields: [String: CustomStringConvertible] {
+        
+        [EgressRegionsStringArrayKey: String(describing: self.emittedEgressRegions()),
+         
+         ClientRegionStringKey:  String(describing: self.emittedClientRegion()),
+         
+         TunnelStartTimeStringKey: String(describing: self.getContainerTunnelStartTime()),
+         
+         TunnelSponsorIDStringKey:  String(describing: self.getCurrentSponsorId()),
+         
+         ServerTimestampStringKey: String(describing: self.getServerTimestamp()),
+         
+         ContainerAuthorizationSetKey: self.getNonSecretNonSubscriptionEncodedAuthorizations(),
+         
+         ExtensionIsZombieBoolKey: self.getExtensionIsZombie(),
+         
+         ContainerSubscriptionAuthorizationsDictKey: self.getNonSecretSubscriptionAuths(),
+         
+         ExtensionRejectedSubscriptionAuthorizationIDsArrayKey:
+            String(describing: self.getRejectedSubscriptionAuthorizationIDs()),
+         
+         ExtensionRejectedSubscriptionAuthorizationIDsWriteSeqIntKey:
+            self.getExtensionRejectedSubscriptionAuthIdWriteSequenceNumber(),
+         
+         ContainerRejectedSubscriptionAuthorizationIDsReadAtLeastUpToSeqIntKey:
+            self.getContainerRejectedSubscriptionAuthIdReadAtLeastUpToSequenceNumber(),
+         
+         ContainerForegroundStateBoolKey: self.getAppForegroundState(),
+         
+         ContainerTunnelIntentStatusIntKey:
+            TunnelStartStopIntent.description(integerCode: self.getContainerTunnelIntentStatus()),
+         
+         SharedDataExtensionCrashedBeforeStopBoolKey: self.getExtensionJetsammedBeforeStopFlag(),
+         
+         SharedDataExtensionJetsamCounterIntegerKey: self.getJetsamCounter(),
+         
+         DebugMemoryProfileBoolKey: self.getDebugMemoryProfiler(),
+         
+         DebugPsiphonConnectionStateStringKey: self.getDebugPsiphonConnectionState()
+        ]
+    }
+    
+    open override var description: String {
+        self.objcClassDescription()
+    }
+    
+}

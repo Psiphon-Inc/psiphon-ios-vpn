@@ -71,7 +71,8 @@ typedef NS_ENUM(NSInteger, ExtensionStartMethodEnum) {
 @protocol BasePacketTunnelProviderProtocol
 
 @required
-- (void)startTunnelWithErrorHandler:(void (^)(NSError *error))errorHandler;
+- (void)startTunnelWithOptions:(NSDictionary<NSString *, NSObject *> *)options
+                  errorHandler:(void (^)(NSError *error))errorHandler;
 
 - (void)stopTunnelWithReason:(NEProviderStopReason)reason;
 
@@ -92,11 +93,6 @@ typedef NS_ENUM(NSInteger, ExtensionStartMethodEnum) {
 @property (nonatomic, readonly) BOOL VPNStarted;
 
 @property (nonatomic, readonly) PsiphonDataSharedDB *sharedDB;
-
-/**
- * vpnStartedSignal is a finite signal that emits an item when the VPN is started and completes immediately.
- */
-@property (nonatomic, nonnull) RACReplaySubject *vpnStartedSignal;
 
 /**
  * Starts system VPN and sets the connection state to 'Connected'.
