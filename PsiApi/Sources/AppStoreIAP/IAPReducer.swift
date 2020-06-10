@@ -129,14 +129,24 @@ public func iapReducer(
     case let .purchase(product: product, resultPromise: promise):
         
         // For each product type, only one product is allowed to be purchased at a time.
-        guard state.iap.purchasing[product.type] == nil else {
-            return []
+        guard state.iap.purchasing[product.type]?.completed ?? true else {
+            return [
+                environment.feedbackLogger.log(.warn, """
+                    nop purchase: purchase in progress product type: '\(product.type)' \
+                    : state: '\(makeFeedbackEntry(state.iap.purchasing[product.type]))'
+                    """).mapNever()
+            ]
         }
         
         if case .psiCash = product.type {
             // No action is taken if there is already an unverified PsiCash transaction.
             guard state.iap.unverifiedPsiCashTx == nil else {
-                return []
+                return [
+                    environment.feedbackLogger.log(.warn, """
+                        nop PsiCash IAP purchase: unverified PsiCash transaction: \
+                        '\(makeFeedbackEntry(state.iap.unverifiedPsiCashTx))'
+                        """).mapNever()
+                ]
             }
             
             // PsiCash IAP requires presence of PsiCash spender token.
