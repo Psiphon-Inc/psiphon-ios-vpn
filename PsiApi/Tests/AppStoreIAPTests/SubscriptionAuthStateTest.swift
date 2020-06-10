@@ -83,7 +83,7 @@ final class SubscriptionAuthStateTest : XCTestCase {
                         return (output.state ==== inputState)
                     }
 
-                case .didLoadStoredPurchaseAuthState(loadResult: let loadResult,
+                case ._didLoadStoredPurchaseAuthState(loadResult: let loadResult,
                                                      replayDataUpdate: _):
                     switch loadResult {
                     case .success(let loadedValue):
@@ -91,7 +91,7 @@ final class SubscriptionAuthStateTest : XCTestCase {
                         stateCopy.subscription.purchasesAuthState = loadedValue
 
                         if output.state != stateCopy {
-                            return (output.state ==== stateCopy) <?> ".didLoadStoredPurchaseAuthState.sucess"
+                            return (output.state ==== stateCopy) <?> "._didLoadStoredPurchaseAuthState.sucess"
                         }
 
                     case .failure(_):
@@ -99,7 +99,7 @@ final class SubscriptionAuthStateTest : XCTestCase {
                         stateCopy.subscription.purchasesAuthState = [:]
 
                         if output.state != stateCopy {
-                            return (output.state ==== stateCopy) <?> ".didLoadStoredPurchaseAuthState.failure"
+                            return (output.state ==== stateCopy) <?> "._didLoadStoredPurchaseAuthState.failure"
                         }
                     }
 
@@ -112,7 +112,7 @@ final class SubscriptionAuthStateTest : XCTestCase {
                         output.state.subscription.purchasesAuthState
                     break
 
-                case .requestAuthorizationForPurchases:
+                case ._requestAuthorizationForPurchases:
                     // Txns pending auth request may have changed
 
                     if (output.state.subscription.transactionsPendingAuthRequest !=
@@ -127,7 +127,7 @@ final class SubscriptionAuthStateTest : XCTestCase {
                             return (
                                 output.state.subscription.transactionsPendingAuthRequest ====
                                 inputState.subscription.transactionsPendingAuthRequest
-                                ) <?> ".requestAuthorizationForPurchases.maxOneTxnInserted"
+                                ) <?> "._requestAuthorizationForPurchases.maxOneTxnInserted"
                         }
                     }
 
@@ -138,7 +138,7 @@ final class SubscriptionAuthStateTest : XCTestCase {
                         output.state.subscription.transactionsPendingAuthRequest
 
                     if output.state != stateCopy {
-                        return (output.state ==== stateCopy) <?> ".requestAuthorizationForPurchases.stateEqual"
+                        return (output.state ==== stateCopy) <?> "._requestAuthorizationForPurchases.stateEqual"
                     }
 
                 case ._authorizationRequestResult(_, _):
@@ -384,7 +384,7 @@ final class SubscriptionAuthStateTest : XCTestCase {
         }
     }
 
-    // MARK: .requestAuthorizationForPurchases tests
+    // MARK: ._requestAuthorizationForPurchases tests
 
     /// Test requesting an authorization for a non-expired purchase.
     /// The tunnel connection and vpn status values are randomized, but end on a combination which will allow the authorization
@@ -436,7 +436,7 @@ final class SubscriptionAuthStateTest : XCTestCase {
 
                 let output = SubscriptionAuthStateTest.runReducer(effectsTimeout: 10,
                                                                   state: state,
-                                                                  action: .requestAuthorizationForPurchases,
+                                                                  action: ._requestAuthorizationForPurchases,
                                                                   env: env)
 
                 guard let actions = output.actions.first else {
