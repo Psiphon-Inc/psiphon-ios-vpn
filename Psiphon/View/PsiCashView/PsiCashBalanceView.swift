@@ -19,11 +19,12 @@
 
 import Foundation
 import UIKit
+import PsiCashClient
 
 @objc final class PsiCashBalanceView: UIView, Bindable {
     typealias BindingType = BalanceState
 
-    private typealias IconType = EitherView<ImageViewBuidler, EitherView<Spinner, ButtonBuilder>>
+    private typealias IconType = EitherView<ImageViewBuilder, EitherView<Spinner, ButtonBuilder>>
 
     private let psiCashPriceFormatter = PsiCashAmountFormatter(locale: Locale.current)
     private let title: UILabel
@@ -46,13 +47,13 @@ import UIKit
         balance = UILabel.make(fontSize: fontSize, typeface: typeface)
 
         guard let coinImage = UIImage(named: "PsiCashCoin") else {
-            fatalErrorFeedbackLog("Could not find 'PsiCashCoin' image")
+            fatalError("Could not find 'PsiCashCoin' image")
         }
         guard let waitingForExpectedIncreaseImage = UIImage(named: "PsiCash_Alert") else {
-            fatalErrorFeedbackLog("Could not find 'PsiCash_Alert' image")
+            fatalError("Could not find 'PsiCash_Alert' image")
         }
 
-        icon = .init(ImageViewBuidler(image: coinImage),
+        icon = .init(ImageViewBuilder(image: coinImage),
                      .init(Spinner(style: .white),
                            ButtonBuilder(style: .custom, tint: .none, image: waitingForExpectedIncreaseImage, eventHandler: {
                             let alert = UIAlertController(
@@ -104,7 +105,7 @@ import UIKit
     }
 
     required init?(coder: NSCoder) {
-        fatalErrorFeedbackLog("init(coder:) has not been implemented")
+        fatalError("init(coder:) has not been implemented")
     }
 
     private func setAmount(_ amount: PsiCashAmount?) {

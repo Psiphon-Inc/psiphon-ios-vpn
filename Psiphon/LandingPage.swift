@@ -18,15 +18,16 @@
  */
 
 import Foundation
+import Utilities
 import ReactiveSwift
+import PsiApi
+import PsiCashClient
 
 fileprivate let landingPageTag = LogTag("LandingPage")
 
-typealias RestrictedURL = PredicatedValue<URL, TunnelProviderVPNStatus>
-
-struct LandingPageReducerState<T: TunnelProviderManager> {
+struct LandingPageReducerState {
     var pendingLandingPageOpening: Bool
-    let tunnelProviderManager: T?
+    let tunnelConnection: TunnelConnection?
 }
 
 enum LandingPageAction {
@@ -34,39 +35,42 @@ enum LandingPageAction {
     case _urlOpened(success: Bool)
 }
 
-typealias LandingPageEnvironment<T: TunnelProviderManager> = (
+typealias LandingPageEnvironment = (
+    feedbackLogger: FeedbackLogger,
     sharedDB: PsiphonDataSharedDB,
-    urlHandler: URLHandler<T>,
-    psiCashEffects: PsiCashEffect,
+    urlHandler: URLHandler,
+    psiCashEffects: PsiCashEffects,
     psiCashAuthPackageSignal: SignalProducer<PsiCashAuthPackage, Never>
 )
 
-func landingPageReducer<T: TunnelProviderManager>(
-    state: inout LandingPageReducerState<T>, action: LandingPageAction,
-    environment: LandingPageEnvironment<T>
+func landingPageReducer(
+    state: inout LandingPageReducerState, action: LandingPageAction,
+    environment: LandingPageEnvironment
 ) -> [Effect<LandingPageAction>] {
     switch action {
     case .tunnelConnectedAfterIntentSwitchedToStart:
         guard !state.pendingLandingPageOpening else {
             return [
-                feedbackLog(.info, tag: landingPageTag, "pending landing page opening").mapNever()
+                environment.feedbackLogger.log(
+                    .info, tag: landingPageTag, "pending landing page opening").mapNever()
             ]
         }
-        guard let tpm = state.tunnelProviderManager else {
-            fatalErrorFeedbackLog("expected a valid tunnel provider")
+        guard let tunnelConnection = state.tunnelConnection else {
+            environment.feedbackLogger.fatalError("expected a valid tunnel provider")
+            return []
         }
         
         guard let landingPages = NonEmpty(array: environment.sharedDB.getHomepages()) else {
             return [
                 Effect(value: ._urlOpened(success: false)),
-                feedbackLog(.warn, tag: landingPageTag, "no landing pages found").mapNever()
+                environment.feedbackLogger.log(
+                    .warn, tag: landingPageTag, "no landing pages found").mapNever()
             ]
         }
         
         state.pendingLandingPageOpening = true
         
-        let randomlySelectedURL = RestrictedURL(value: landingPages.randomElement()!.url,
-                                                predicate: { $0 == .connected })
+        let randomlySelectedURL = landingPages.randomElement()!.url
         
         return [
             modifyLandingPagePendingEarnerToken(
@@ -74,7 +78,7 @@ func landingPageReducer<T: TunnelProviderManager>(
                 authPackageSignal: environment.psiCashAuthPackageSignal,
                 psiCashEffects: environment.psiCashEffects
             ).flatMap(.latest) {
-                environment.urlHandler.open($0, tpm)
+                environment.urlHandler.open($0, tunnelConnection)
             }
             .map(LandingPageAction._urlOpened(success:))
         ]
@@ -87,13 +91,13 @@ func landingPageReducer<T: TunnelProviderManager>(
 }
 
 fileprivate func modifyLandingPagePendingEarnerToken(
-    url: RestrictedURL, authPackageSignal: SignalProducer<PsiCashAuthPackage, Never>,
-    psiCashEffects: PsiCashEffect
-) -> Effect<RestrictedURL> {
+    url: URL, authPackageSignal: SignalProducer<PsiCashAuthPackage, Never>,
+    psiCashEffects: PsiCashEffects
+) -> Effect<URL> {
     authPackageSignal
         .map(\.hasEarnerToken)
         .falseIfNotTrue(within: PsiCashHardCodedValues.getEarnerTokenTimeout)
-        .flatMap(.latest) { hasEarnerToken -> SignalProducer<RestrictedURL, Never> in
+        .flatMap(.latest) { hasEarnerToken -> SignalProducer<URL, Never> in
             if hasEarnerToken {
                 return psiCashEffects.modifyLandingPage(url)
             } else {

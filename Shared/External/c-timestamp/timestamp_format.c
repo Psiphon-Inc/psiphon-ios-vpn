@@ -61,7 +61,7 @@ static const uint32_t Pow10[10] = {
 };
 
 static size_t
-timestamp_format_internal(char *dst, size_t len, const timestamp_t *tsp, const int precision) {
+timestamp_format_internal(char *dst, size_t len, const dup_timestamp_t *tsp, const int precision) {
     unsigned char *p;
     uint64_t sec;
     uint32_t rdn, v;
@@ -164,11 +164,11 @@ timestamp_format_internal(char *dst, size_t len, const timestamp_t *tsp, const i
  */
 
 size_t
-timestamp_format(char *dst, size_t len, const timestamp_t *tsp) {
+dup_timestamp_format(char *dst, size_t len, const dup_timestamp_t *tsp) {
     uint32_t f;
     int precision;
 
-    if (!timestamp_valid(tsp))
+    if (!dup_timestamp_valid(tsp))
         return 0;
 
     f = tsp->nsec;
@@ -183,8 +183,8 @@ timestamp_format(char *dst, size_t len, const timestamp_t *tsp) {
 }
 
 size_t
-timestamp_format_precision(char *dst, size_t len, const timestamp_t *tsp, int precision) {
-    if (!timestamp_valid(tsp) || precision < 0 || precision > 9)
+dup_timestamp_format_precision(char *dst, size_t len, const dup_timestamp_t *tsp, int precision) {
+    if (!dup_timestamp_valid(tsp) || precision < 0 || precision > 9)
         return 0;
     return timestamp_format_internal(dst, len, tsp, precision);
 }

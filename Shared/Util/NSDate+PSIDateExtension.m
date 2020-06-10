@@ -42,9 +42,9 @@
         return nil;
     }
 
-    timestamp_t ts;
+    dup_timestamp_t ts;
 
-    int result = timestamp_parse([timestamp UTF8String], [timestamp lengthOfBytesUsingEncoding:NSUTF8StringEncoding], &ts);
+    int result = dup_timestamp_parse([timestamp UTF8String], [timestamp lengthOfBytesUsingEncoding:NSUTF8StringEncoding], &ts);
 
     if (result != 0) {
         return nil;
@@ -62,11 +62,11 @@
     double sec_integral, sec_fraction;
     sec_fraction = modf(interval, &sec_integral);
 
-    const timestamp_t ts = {.sec = (int64_t) sec_integral,
+    const dup_timestamp_t ts = {.sec = (int64_t) sec_integral,
                             .offset = TIME_ZONE_OFFSET_UTC_MINUTES};
 
     char buf[40];
-    size_t length = timestamp_format_precision(buf, sizeof(buf), &ts, SECOND_PRECISION);
+    size_t length = dup_timestamp_format_precision(buf, sizeof(buf), &ts, SECOND_PRECISION);
 
     PSIAssert(length > 0);
 
@@ -82,10 +82,10 @@
 
     int32_t nsec = (int32_t) (sec_fraction * POW_10_9);
     
-    const timestamp_t ts = {.sec = (int64_t) sec_integral, .nsec = nsec, .offset = TIME_ZONE_OFFSET_UTC_MINUTES};
+    const dup_timestamp_t ts = {.sec = (int64_t) sec_integral, .nsec = nsec, .offset = TIME_ZONE_OFFSET_UTC_MINUTES};
 
     char buf[40];
-    size_t length = timestamp_format_precision(buf, sizeof(buf), &ts, MILLISECOND_PRECISION);
+    size_t length = dup_timestamp_format_precision(buf, sizeof(buf), &ts, MILLISECOND_PRECISION);
 
     PSIAssert(length > 0);
 

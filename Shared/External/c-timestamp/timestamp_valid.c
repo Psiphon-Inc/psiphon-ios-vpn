@@ -29,7 +29,7 @@
 #define MAX_SEC INT64_C(253402300799) /* 9999-12-31T23:59:59 */
 
 bool
-timestamp_valid(const timestamp_t *tsp) {
+dup_timestamp_valid(const dup_timestamp_t *tsp) {
     const int64_t sec = tsp->sec + tsp->offset * 60;
     if (sec < MIN_SEC || sec > MAX_SEC ||
         tsp->nsec < 0 || tsp->nsec > 999999999 ||

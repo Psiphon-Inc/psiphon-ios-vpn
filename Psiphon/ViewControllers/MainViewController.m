@@ -18,7 +18,6 @@
  */
 
 #import <Foundation/Foundation.h>
-#import <PsiphonTunnel/PsiphonTunnel.h>
 #import "MainViewController.h"
 #import "AdManager.h"
 #import "AppInfo.h"
@@ -104,6 +103,7 @@ NSTimeInterval const MaxAdLoadingTime = 10.f;
     // Replaces the PsiCash UI when the user is subscribed
     UIImageView *psiphonLargeLogo;
     UIImageView *psiphonTitle;
+    NoConnectionBannerView *noConnectionBannerView;
 
     // PsiCash
     PsiCashWidgetView *psiCashWidget;
@@ -187,6 +187,7 @@ NSTimeInterval const MaxAdLoadingTime = 10.f;
     [self setupVersionLabel];
     [self setupPsiphonLogoView];
     [self setupPsiphonTitle];
+    [self setupNoConnectionBannerView];
     [self setupStartAndStopButton];
     [self setupStatusLabel];
     [self setupRegionSelectionButton];
@@ -236,13 +237,23 @@ NSTimeInterval const MaxAdLoadingTime = 10.f;
                   UIAlertController *alert = [AlertDialogs vpnPermissionDeniedAlert];
                   [alert presentFromTopController];
 
+              } else if (startStatus == VPNStartStopStatusInternetNotReachable) {
+                  
+                  // Alert the user that tunnel start failed due to no internet access.
+                  [UIAlertController
+                   presentSimpleAlertWithTitle:[UserStrings No_internet_alert_title]
+                   message:[UserStrings No_internet_alert_body]
+                   preferredStyle:UIAlertControllerStyleAlert
+                   okHandler:nil];
+                  
               } else if (startStatus == VPNStartStopStatusFailedOtherReason) {
 
                   // Alert the user that the VPN failed to start, and that they should try again.
-                  [UIAlertController presentSimpleAlertWithTitle:NSLocalizedStringWithDefaultValue(@"VPN_START_FAIL_TITLE", nil, [NSBundle mainBundle], @"Unable to start", @"Alert dialog title indicating to the user that Psiphon was unable to start (MainViewController)")
-                                                         message:NSLocalizedStringWithDefaultValue(@"VPN_START_FAIL_MESSAGE", nil, [NSBundle mainBundle], @"An error occurred while starting Psiphon. Please try again. If this problem persists, try reinstalling the Psiphon app.", @"Alert dialog message informing the user that an error occurred while starting Psiphon (Do not translate 'Psiphon'). The user should try again, and if the problem persists, they should try reinstalling the app.")
-                                                  preferredStyle:UIAlertControllerStyleAlert
-                                                       okHandler:nil];
+                  [UIAlertController
+                   presentSimpleAlertWithTitle:[UserStrings Unable_to_start_alert_title]
+                   message:[UserStrings Error_while_start_psiphon_alert_body]
+                   preferredStyle:UIAlertControllerStyleAlert
+                   okHandler:nil];
               }
           }
       }];
@@ -286,14 +297,30 @@ NSTimeInterval const MaxAdLoadingTime = 10.f;
         }]];
     }
 
-    // Subscribes to `AppDelegate.speedBoostExpiry` subject to update `psiCashWidget` with the
-    // latest expiry time.
+    // Subscribes to `AppObservable.shared.speedBoostExpiry` subject
+    // to update `psiCashWidget` with the latest expiry time.
     {
         [self.compoundDisposable addDisposable:[AppObservables.shared.speedBoostExpiry
                                                 subscribeNext:^(NSDate * _Nullable expiry) {
             MainViewController *__strong strongSelf = weakSelf;
             if (strongSelf) {
                 [strongSelf->psiCashWidget.speedBoostButton setExpiryTime:expiry];
+            }
+        }]];
+    }
+
+    // Observes reachability status.
+    {
+        [self.compoundDisposable addDisposable:
+         [AppObservables.shared.reachabilityStatus subscribeNext:^(NSNumber * _Nullable statusObj) {
+            MainViewController *__strong strongSelf = weakSelf;
+            if (strongSelf) {
+                ReachabilityStatus networkStatus = (ReachabilityStatus)[statusObj integerValue];
+                if (networkStatus == ReachabilityStatusNotReachable) {
+                    [strongSelf->noConnectionBannerView setHidden: FALSE];
+                } else {
+                    [strongSelf->noConnectionBannerView setHidden: TRUE];
+                }
             }
         }]];
     }
@@ -561,6 +588,7 @@ NSTimeInterval const MaxAdLoadingTime = 10.f;
     settingsButton = [[AnimatedUIButton alloc] init];
     psiphonLargeLogo = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"PsiphonLogoWhite"]];
     psiphonTitle = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"PsiphonTitle"]];
+    noConnectionBannerView = [[NoConnectionBannerView alloc] init];
     psiCashWidget = [[PsiCashWidgetView alloc] initWithFrame:CGRectZero];
     startAndStopButton = [VPNStartAndStopButton buttonWithType:UIButtonTypeCustom];
     statusLabel = [[UILabel alloc] init];
@@ -585,6 +613,7 @@ NSTimeInterval const MaxAdLoadingTime = 10.f;
     [self.view addSubview:regionSelectionButton];
     [self.view addSubview:bottomBar];
     [self.view addSubview:subscriptionsBar];
+    [self.view addSubview:noConnectionBannerView];
 }
 
 - (void)setupClouds {
@@ -1059,6 +1088,18 @@ NSTimeInterval const MaxAdLoadingTime = 10.f;
             constant:topPadding + 20]
         ]];
     }
+}
+
+- (void)setupNoConnectionBannerView {
+    noConnectionBannerView.translatesAutoresizingMaskIntoConstraints = NO;
+    
+    [NSLayoutConstraint activateConstraints:@[
+        [noConnectionBannerView.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor],
+        [noConnectionBannerView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor],
+        [noConnectionBannerView.topAnchor constraintEqualToAnchor:self.view.topAnchor],
+        [noConnectionBannerView.bottomAnchor constraintEqualToAnchor:psiphonTitle.bottomAnchor]
+    ]];
+    
 }
 
 - (void)setupPsiCashWidgetView {

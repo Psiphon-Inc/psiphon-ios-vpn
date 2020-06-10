@@ -19,6 +19,9 @@
 
 import UIKit
 import StoreKit
+import PsiApi
+import AppStoreIAP
+import PsiCashClient
 
 struct PsiCashPurchasableViewModel: Equatable {
     enum ProductType: Equatable {
@@ -30,6 +33,22 @@ struct PsiCashPurchasableViewModel: Equatable {
     let subtitle: String
     let localizedPrice: LocalizedPrice
     let clearedForSale: Bool
+}
+
+extension PsiCashState {
+    
+    func rewardedVideoProduct(
+        clearedForSale: Bool, subtitle: String
+    ) -> PsiCashPurchasableViewModel {
+        PsiCashPurchasableViewModel(
+            product: .rewardedVideoAd(loading: self.rewardedVideo.isLoading),
+            title: PsiCashHardCodedValues.videoAdRewardTitle,
+            subtitle: subtitle,
+            localizedPrice: .free,
+            clearedForSale: clearedForSale
+        )
+    }
+    
 }
 
 struct PsiCashCoinPurchaseTable: ViewBuilder {
@@ -112,7 +131,7 @@ UITableViewDelegate {
             }
 
             guard let content = cell.contentView.subviews[maybe: 0] as? PurchaseCellContent else {
-                fatalErrorFeedbackLog("Expected cell to have subview of type 'PurchaseCellContent'")
+                fatalError("Expected cell to have subview of type 'PurchaseCellContent'")
             }
 
             content.bind(cellData)
@@ -126,7 +145,7 @@ UITableViewDelegate {
             return cell
 
         default:
-            fatalErrorFeedbackLog("Unexpected IndexPath '\(indexPath)'")
+            fatalError("Unexpected IndexPath '\(indexPath)'")
         }
     }
 }
@@ -179,7 +198,7 @@ fileprivate final class PurchaseCellContent: UIView, Bindable {
 
         spinner.isHidden = true
 
-        // Setup subaviews
+        // Setup subviews
         let imageView = UIImageView.make(image: "PsiCashCoin_Large")
         addSubviews(imageView, titleLabel, subtitleLabel, button, spinner)
 
@@ -223,7 +242,7 @@ fileprivate final class PurchaseCellContent: UIView, Bindable {
     }
 
     required init?(coder: NSCoder) {
-        fatalErrorFeedbackLog("init(coder:) has not been implemented")
+        fatalError("init(coder:) has not been implemented")
     }
 
     func bind(_ newValue: PsiCashPurchasableViewModel) {

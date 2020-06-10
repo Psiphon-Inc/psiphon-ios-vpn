@@ -3,13 +3,13 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 46;
+	objectVersion = 52;
 	objects = {
 
 /* Begin PBXBuildFile section */
 		440D75BE1F59E041005C603B /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 440D75BD1F59E041005C603B /* StoreKit.framework */; };
 		4435CC271F70566000F3A809 /* SettingsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4435CC261F70566000F3A809 /* SettingsViewController.m */; };
-		445F239620E1817C00D004E9 /* AppStoreReceiptData.m in Sources */ = {isa = PBXBuildFile; fileRef = 445F239520E1817C00D004E9 /* AppStoreReceiptData.m */; };
+		445F239620E1817C00D004E9 /* AppStoreParsedReceiptData.m in Sources */ = {isa = PBXBuildFile; fileRef = 445F239520E1817C00D004E9 /* AppStoreParsedReceiptData.m */; };
 		445F24D420E1A5BA00D004E9 /* ReceiptAttributes.c in Sources */ = {isa = PBXBuildFile; fileRef = 445F249820E1A5BA00D004E9 /* ReceiptAttributes.c */; };
 		445F24D520E1A5BA00D004E9 /* constr_TYPE.c in Sources */ = {isa = PBXBuildFile; fileRef = 445F249920E1A5BA00D004E9 /* constr_TYPE.c */; };
 		445F24D620E1A5BA00D004E9 /* xer_decoder.c in Sources */ = {isa = PBXBuildFile; fileRef = 445F249E20E1A5BA00D004E9 /* xer_decoder.c */; };
@@ -41,7 +41,7 @@
 		445F24F020E1A5BA00D004E9 /* xer_encoder.c in Sources */ = {isa = PBXBuildFile; fileRef = 445F24D220E1A5BA00D004E9 /* xer_encoder.c */; };
 		445F24F520E1A85D00D004E9 /* IA5String.c in Sources */ = {isa = PBXBuildFile; fileRef = 445F24F220E1A85C00D004E9 /* IA5String.c */; };
 		445F24F620E1A85D00D004E9 /* UTF8String.c in Sources */ = {isa = PBXBuildFile; fileRef = 445F24F320E1A85C00D004E9 /* UTF8String.c */; };
-		44A0CAEE1FCCCDEC00859DB3 /* SubscriptionVerifierService.m in Sources */ = {isa = PBXBuildFile; fileRef = 44E3CB6B1FCCA83200C80C82 /* SubscriptionVerifierService.m */; };
+		474C2778BC8FAFDB749E5DC3 /* libPods-Psiphon.a in Frameworks */ = {isa = PBXBuildFile; fileRef = CA0750CFBD1D93988672EBF5 /* libPods-Psiphon.a */; };
 		4E0774961F566B040097BC8C /* InAppSettings.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 4E0774951F566ADA0097BC8C /* InAppSettings.bundle */; };
 		4E0A3669215AB7EE008A3D7B /* UIFont+Additions.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E0A3668215AB7EE008A3D7B /* UIFont+Additions.m */; };
 		4E0A366C21666B99008A3D7B /* NSString+Additions.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E0A366B21666B99008A3D7B /* NSString+Additions.m */; };
@@ -57,7 +57,6 @@
 		4E5263CD2072984D0021FEF5 /* IAPViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E5263CA2072984D0021FEF5 /* IAPViewController.m */; };
 		4E5BD4F52061982300AD4724 /* FeedbackManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E5BD4F42061982300AD4724 /* FeedbackManager.m */; };
 		4E5DAE6520A942A300E06342 /* UILabel+GetLabelHeight.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E5DAE6420A942A300E06342 /* UILabel+GetLabelHeight.m */; };
-		4E90C94420CB37F5003FC319 /* PsiCashLogger.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E90C94320CB37F5003FC319 /* PsiCashLogger.m */; };
 		4EB846422151830600687344 /* AvailableServerRegions.m in Sources */ = {isa = PBXBuildFile; fileRef = 4EB846412151830600687344 /* AvailableServerRegions.m */; };
 		4EC5526320AB8DBE000B4BEA /* Pastel.m in Sources */ = {isa = PBXBuildFile; fileRef = 4EC5526220AB8DBE000B4BEA /* Pastel.m */; };
 		4EC5526620AB8DCD000B4BEA /* PastelView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4EC5526520AB8DCD000B4BEA /* PastelView.m */; };
@@ -65,7 +64,6 @@
 		520201212360F5B800D00C8E /* IndexedViewSwitcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520201202360F5B800D00C8E /* IndexedViewSwitcher.swift */; };
 		52055D04230C823100244F9E /* GradientButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52055D03230C823100244F9E /* GradientButton.swift */; };
 		52055D06230C833700244F9E /* SpeedBoostButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52055D05230C833700244F9E /* SpeedBoostButton.swift */; };
-		521D084E2346A75700403B48 /* IAPProducts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 521D084D2346A75700403B48 /* IAPProducts.swift */; };
 		521FD0EF219E0D5600F748EC /* DebugDirectoryViewerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 521FD0E5219E0D5500F748EC /* DebugDirectoryViewerViewController.m */; };
 		521FD0F0219E0D5600F748EC /* DebugLogViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 521FD0E6219E0D5500F748EC /* DebugLogViewController.m */; };
 		521FD0F1219E0D5600F748EC /* DebugToolboxViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 521FD0E7219E0D5600F748EC /* DebugToolboxViewController.m */; };
@@ -79,15 +77,12 @@
 		521FD100219E0E3800F748EC /* DebugUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 521FD0FB219E0E0E00F748EC /* DebugUtils.m */; };
 		5237387423AABB0F00DDE396 /* PurchasingSpeedBoostAlertViewBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5237387323AABB0F00DDE396 /* PurchasingSpeedBoostAlertViewBuilder.swift */; };
 		5245C5C92342A6840033EE13 /* UserDefaults.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5245C5C82342A6840033EE13 /* UserDefaults.swift */; };
-		52467FE122C2A704009AEC6E /* PsiCashModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52467FE022C2A704009AEC6E /* PsiCashModels.swift */; };
-		52467FF922CE77A1009AEC6E /* Foundation+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52467FF822CE77A1009AEC6E /* Foundation+Additions.swift */; };
 		5246800722D51AA3009AEC6E /* PsiCashWidgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5246800622D51AA3009AEC6E /* PsiCashWidgetView.swift */; };
 		5246800922D51CE4009AEC6E /* PsiCashBalanceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5246800822D51CE4009AEC6E /* PsiCashBalanceView.swift */; };
 		5246800D22D65926009AEC6E /* UIUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5246800C22D65926009AEC6E /* UIUtils.swift */; };
 		5248B4CE23203781008C00D4 /* SwiftObjCBridges.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5248B4CD23203781008C00D4 /* SwiftObjCBridges.swift */; };
 		524B4E6B2316F0E3004E9891 /* BorderedSubtitleButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 524B4E6A2316F0E3004E9891 /* BorderedSubtitleButton.m */; };
 		524B4E6E2316F27F004E9891 /* AnimatedControl.m in Sources */ = {isa = PBXBuildFile; fileRef = 524B4E6D2316F27F004E9891 /* AnimatedControl.m */; };
-		52805BA122DD1EB8006B205B /* ReactiveSwift+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52805BA022DD1EB8006B205B /* ReactiveSwift+Additions.swift */; };
 		528D81332384823F00AA2D77 /* PsiCashMessageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 528D81322384823F00AA2D77 /* PsiCashMessageView.swift */; };
 		52A24659238C9AB700A01FF1 /* SpeedBoostPurchaseTable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52A24658238C9AB700A01FF1 /* SpeedBoostPurchaseTable.swift */; };
 		52A2465E239081C100A01FF1 /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52A2465D239081C100A01FF1 /* AppState.swift */; };
@@ -95,15 +90,10 @@
 		52A2466D23A172A800A01FF1 /* AlertViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52A2466C23A172A800A01FF1 /* AlertViewController.swift */; };
 		52A2466F23A1769300A01FF1 /* PsiCashMessageViewUntunneled.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52A2466E23A1769300A01FF1 /* PsiCashMessageViewUntunneled.swift */; };
 		52A2467123A176BA00A01FF1 /* PsiCashPurchasingAlertViewBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52A2467023A176BA00A01FF1 /* PsiCashPurchasingAlertViewBuilder.swift */; };
-		52B3C54323DA31E1003F6B12 /* PurchaseVerifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52B3C54223DA31E1003F6B12 /* PurchaseVerifier.swift */; };
-		52B3C54523DA391F003F6B12 /* Requests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52B3C54423DA391F003F6B12 /* Requests.swift */; };
 		52B3C54A23DF99E8003F6B12 /* AppObservables.m in Sources */ = {isa = PBXBuildFile; fileRef = 52B3C54923DF99E8003F6B12 /* AppObservables.m */; };
 		52B3C54C23E0E895003F6B12 /* ButtonBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52B3C54B23E0E895003F6B12 /* ButtonBuilder.swift */; };
-		52B3C54E23E22454003F6B12 /* Logging.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52B3C54D23E22454003F6B12 /* Logging.swift */; };
-		52C8F0A9237C8F3E00E5F9C0 /* Foundation+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52467FF822CE77A1009AEC6E /* Foundation+Additions.swift */; };
-		52C8F0AB237CA26200E5F9C0 /* ImageViewBuidler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52C8F0AA237CA26200E5F9C0 /* ImageViewBuidler.swift */; };
+		52C8F0AB237CA26200E5F9C0 /* ImageViewBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52C8F0AA237CA26200E5F9C0 /* ImageViewBuilder.swift */; };
 		52C8F0AD237E145C00E5F9C0 /* PsiCashCoinPurchaseTable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52C8F0AC237E145C00E5F9C0 /* PsiCashCoinPurchaseTable.swift */; };
-		52C8F0AF2383059200E5F9C0 /* Promises+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52C8F0AE2383059200E5F9C0 /* Promises+Additions.swift */; };
 		52CAC4312385D06600A92842 /* Spinner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52CAC4302385D06600A92842 /* Spinner.swift */; };
 		52D2581122BADE1900CA956A /* SwiftDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D2581022BADE1900CA956A /* SwiftDelegate.swift */; };
 		52D363C9230DE215002C2221 /* PsiCashViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D363C8230DE215002C2221 /* PsiCashViewController.swift */; };
@@ -111,8 +101,7 @@
 		52D363CD230EEBAC002C2221 /* AnimatedUIButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D363CC230EEBAC002C2221 /* AnimatedUIButton.swift */; };
 		52D363CF230F112E002C2221 /* TabControlView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D363CE230F112E002C2221 /* TabControlView.swift */; };
 		52DF5E9223C675EC00A1B067 /* ViewController+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52DF5E9123C675EC00A1B067 /* ViewController+Additions.swift */; };
-		52DF5E9623C7A31100A1B067 /* Error.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52DF5E9523C7A31100A1B067 /* Error.swift */; };
-		52DF5E9823CE5A8300A1B067 /* ValuePaths.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52DF5E9723CE5A8300A1B067 /* ValuePaths.swift */; };
+		52DF5E9823CE5A8300A1B067 /* AppAction+ValuePaths.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52DF5E9723CE5A8300A1B067 /* AppAction+ValuePaths.swift */; };
 		52DF5E9A23CE835100A1B067 /* UserStrings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52DF5E9923CE835100A1B067 /* UserStrings.swift */; };
 		52DF5E9E23D0D01F00A1B067 /* BridgingTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52DF5E9D23D0D01F00A1B067 /* BridgingTypes.swift */; };
 		66094F7A1E8067520069EC4E /* PsiphonTunnel.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 66094F781E8067520069EC4E /* PsiphonTunnel.framework */; };
@@ -120,41 +109,47 @@
 		6615A5EB1F58A95B00026C98 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 6615A5E81F58A95500026C98 /* Localizable.strings */; };
 		668AF9BF1E92CBD3008CAAAA /* NetworkExtension.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 668AF9BE1E92CBD3008CAAAA /* NetworkExtension.framework */; };
 		668AF9C01E92CBE0008CAAAA /* NetworkExtension.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 668AF9BE1E92CBD3008CAAAA /* NetworkExtension.framework */; };
+		8D1F62BA247DBB0D0028AFAF /* Utilities in Frameworks */ = {isa = PBXBuildFile; productRef = 8D1F62B9247DBB0D0028AFAF /* Utilities */; };
+		8D1F62BC247DBB130028AFAF /* PsiApi in Frameworks */ = {isa = PBXBuildFile; productRef = 8D1F62BB247DBB130028AFAF /* PsiApi */; };
+		8D1F62BE247DC1690028AFAF /* Receipt+AppStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D1F62BD247DC1690028AFAF /* Receipt+AppStore.swift */; };
+		8D1F62C0247DC3350028AFAF /* Authorization+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D1F62BF247DC3350028AFAF /* Authorization+Additions.swift */; };
+		8D1F62C2247DC4840028AFAF /* PsiCashClient+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D1F62C1247DC4840028AFAF /* PsiCashClient+Additions.swift */; };
+		8D255E2D24620E2900FD5D1C /* NoConnectionBannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D255E2C24620E2900FD5D1C /* NoConnectionBannerView.swift */; };
 		8D417E992411954A00FEE587 /* PsiCashReducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D417E982411954A00FEE587 /* PsiCashReducer.swift */; };
-		8D417E9D2411A0C200FEE587 /* PaymentQueue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D417E9C2411A0C200FEE587 /* PaymentQueue.swift */; };
-		8D417E9F2411A60900FEE587 /* PsiCashEffects.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D417E9E2411A60900FEE587 /* PsiCashEffects.swift */; };
-		8D417EA12411A89500FEE587 /* IAPState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D417EA02411A89500FEE587 /* IAPState.swift */; };
 		8D417EB124147C6D00FEE587 /* LandingPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D417EB024147C6D00FEE587 /* LandingPage.swift */; };
 		8D417EB324148C1E00FEE587 /* URLHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D417EB224148C1E00FEE587 /* URLHandler.swift */; };
-		8D417EB72415633300FEE587 /* IAPReducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D417EB62415633300FEE587 /* IAPReducer.swift */; };
-		8D417EBB2417155000FEE587 /* AppReceipt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D417EBA2417155000FEE587 /* AppReceipt.swift */; };
-		8D417EBD2417FF5C00FEE587 /* Subscription.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D417EBC2417FF5B00FEE587 /* Subscription.swift */; };
-		8D417EBF2417FFB000FEE587 /* HardCodedValues.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D417EBE2417FFB000FEE587 /* HardCodedValues.swift */; };
 		8D417ED9241844FA00FEE587 /* FloatingPoint+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D417ED8241844FA00FEE587 /* FloatingPoint+Additions.swift */; };
 		8D417EDD2419DBA100FEE587 /* ProductRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D417EDC2419DBA100FEE587 /* ProductRequest.swift */; };
+		8D497A28247CEF50009CEBA8 /* GoogleAppMeasurement.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8D497A24247CEF4F009CEBA8 /* GoogleAppMeasurement.framework */; };
+		8D497A2A247CEF50009CEBA8 /* GoogleMobileAds.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8D497A25247CEF4F009CEBA8 /* GoogleMobileAds.framework */; };
+		8D497A2C247CEF50009CEBA8 /* GoogleUtilities.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8D497A26247CEF4F009CEBA8 /* GoogleUtilities.xcframework */; };
+		8D497A2E247CEF50009CEBA8 /* nanopb.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8D497A27247CEF4F009CEBA8 /* nanopb.xcframework */; };
+		8D4ACD32247E3626008E404C /* AppStoreIAP+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D4ACD31247E3626008E404C /* AppStoreIAP+Additions.swift */; };
+		8D778978247469FE0038BFDA /* AppInfo.h in Sources */ = {isa = PBXBuildFile; fileRef = 4E10920620F3DA190033114B /* AppInfo.h */; };
+		8D7789B9247491CA0038BFDA /* PsiphonBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D7789B8247491CA0038BFDA /* PsiphonBundle.swift */; };
+		8D7789BD247493300038BFDA /* VPNState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D7789BC247493300038BFDA /* VPNState.swift */; };
+		8D7789C5247496F60038BFDA /* PsiCashLib+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D7789C4247496F60038BFDA /* PsiCashLib+Additions.swift */; };
+		8D7789CA247499110038BFDA /* Reachability+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D7789C9247499110038BFDA /* Reachability+Additions.swift */; };
 		8D7E9B9D2425DF42006F3A2F /* AnimatedUIView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D7E9B9C2425DF42006F3A2F /* AnimatedUIView.swift */; };
 		8D7E9B9F2425E053006F3A2F /* Animations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D7E9B9E2425E053006F3A2F /* Animations.swift */; };
-		8D9E602A24364ED2003A46D8 /* VPNState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D9E602924364ED2003A46D8 /* VPNState.swift */; };
-		8D9E602C24364EE6003A46D8 /* TunnelProviderManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D9E602B24364EE6003A46D8 /* TunnelProviderManager.swift */; };
-		8D9E602F24366AE7003A46D8 /* SerialEffect.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D9E602D24364FB6003A46D8 /* SerialEffect.swift */; };
-		8D9E603024366AEC003A46D8 /* Effect.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D417EDE241AA89C00FEE587 /* Effect.swift */; };
-		8D9E603124366AEF003A46D8 /* State.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D417EDA2419D9CF00FEE587 /* State.swift */; };
-		8D9E603224366AF2003A46D8 /* StoreDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D417EB82415667900FEE587 /* StoreDelegate.swift */; };
-		8D9E603324366AF4003A46D8 /* Store.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52A2465B2390569800A01FF1 /* Store.swift */; };
+		8D9D9BCC247C6A9D0093220E /* PsiphonRotatingFileFeedbackLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D7789CF2474D53D0038BFDA /* PsiphonRotatingFileFeedbackLogger.swift */; };
+		8D9D9BD0247C6B910093220E /* HardCodedValues.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D9D9BCF247C6B910093220E /* HardCodedValues.swift */; };
+		8D9E602A24364ED2003A46D8 /* VPNStateReducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D9E602924364ED2003A46D8 /* VPNStateReducer.swift */; };
 		8D9E603524366D71003A46D8 /* FeedbackDescriptions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D9E603424366D71003A46D8 /* FeedbackDescriptions.swift */; };
-		8DA3466624114DB400F9E2D1 /* PsiCashState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DA3466524114DB400F9E2D1 /* PsiCashState.swift */; };
 		8DB6C6362429080C005E2F4C /* PsiCashMessageWithRetryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DB6C6352429080C005E2F4C /* PsiCashMessageWithRetryView.swift */; };
 		8DB6C638242A4D06005E2F4C /* DuskButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DB6C637242A4D06005E2F4C /* DuskButton.swift */; };
+		8DCA6864247C7CF8001D026E /* Bindable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DCA6863247C7CF8001D026E /* Bindable.swift */; };
+		8DD642C1248AAD8A006C94D2 /* Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DD642C0248AAD8A006C94D2 /* Utils.swift */; };
+		8DD6E7E524591E270041DAC5 /* SubscriptionAuthCheck.m in Sources */ = {isa = PBXBuildFile; fileRef = 8DD6E7E424591E270041DAC5 /* SubscriptionAuthCheck.m */; };
+		8DD6E7E82459C83B0041DAC5 /* StoredAuthorizations.m in Sources */ = {isa = PBXBuildFile; fileRef = 8DD6E7E72459C83B0041DAC5 /* StoredAuthorizations.m */; };
 		8DDA60292425BB4800DBA8EC /* DebugStrings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DDA60282425BB4800DBA8EC /* DebugStrings.swift */; };
+		8DE4E6D2244E97D000275362 /* Result+Codable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DE4E6D1244E97D000275362 /* Result+Codable.swift */; };
 		9BFEC2458D1346F537E9089E /* Nullity.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFECCCF429898FD903B69A6 /* Nullity.m */; };
 		9BFEC3D66910918A0C8954E1 /* AdMobConsent.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC5F8D8BB828703CCCC2F /* AdMobConsent.m */; };
 		9BFEC459666697D89B09A492 /* AdMobRewardedAdControllerWrapper.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFECF6BF16767758F28D1A0 /* AdMobRewardedAdControllerWrapper.m */; };
 		9BFEC4F02A47FF8265635803 /* Notifier.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC91ED4A1C511520E9948 /* Notifier.m */; };
-		9BFEC5C256EBC72398FAE8D8 /* UnionSerialQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC84F5DF6D2C3EF754962 /* UnionSerialQueue.m */; };
 		9BFEC8058885B68B2822E2B8 /* AdManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC3CE64925E5984AAA9BE /* AdManager.m */; };
 		9BFEC8A2F99380655E853F81 /* AdControllerWrapper.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC460CD29B3A0667FE9A2 /* AdControllerWrapper.m */; };
-		9BFEC9C08697E4701A36A3B3 /* UnionSerialQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC84F5DF6D2C3EF754962 /* UnionSerialQueue.m */; };
-		9BFECB6BF077F45D491093F1 /* Authorization.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC31B61584FD2EAAF5DE6 /* Authorization.m */; };
 		9BFECC62159FBEAA1A69F4F9 /* BasePacketTunnelProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFECC3FADE9C8A76A0913DE /* BasePacketTunnelProvider.m */; };
 		9BFECD174E254989EC97A437 /* IAPHelpViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC220C067BBE75AF970C1 /* IAPHelpViewController.m */; };
 		9BFECD1880B51B0E2EAEFF1F /* Notifier.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC91ED4A1C511520E9948 /* Notifier.m */; };
@@ -171,15 +166,11 @@
 		A84080E9FC63E29F71A79A63 /* RelaySubject.m in Sources */ = {isa = PBXBuildFile; fileRef = A84086DF1DDA5CC90C437009 /* RelaySubject.m */; };
 		A84081194DA12328ABB5A43E /* UIImageView+Additions.m in Sources */ = {isa = PBXBuildFile; fileRef = A840886E2E6D8EA82B0EC427 /* UIImageView+Additions.m */; };
 		A8408161701C8F50F52866FC /* LayerAutoResizeUIView.m in Sources */ = {isa = PBXBuildFile; fileRef = A8408DBEEDCF56EC798536BF /* LayerAutoResizeUIView.m */; };
-		A84081FD0C1339DE954DAB7D /* RelaySubject.m in Sources */ = {isa = PBXBuildFile; fileRef = A84086DF1DDA5CC90C437009 /* RelaySubject.m */; };
 		A84082260CE7662A93697CFF /* LoadingCircleLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = A840845849B24AAA0E714664 /* LoadingCircleLayer.m */; };
-		A84082D8D7BF55D509C4E5C5 /* SubscriptionData.m in Sources */ = {isa = PBXBuildFile; fileRef = A84081E6B9D2FF5986AA1BF0 /* SubscriptionData.m */; };
 		A840835FAC7F18A6A7021415 /* RingSkyButton.m in Sources */ = {isa = PBXBuildFile; fileRef = A84086B04CBC1A6A5481EDD4 /* RingSkyButton.m */; };
 		A84083E76E518050B65E523A /* SkyButton.m in Sources */ = {isa = PBXBuildFile; fileRef = A8408672FB2E1CD144A2BE7C /* SkyButton.m */; };
 		A840849074861D633B3EB4D1 /* AppEvent.m in Sources */ = {isa = PBXBuildFile; fileRef = A8408058458E7BFC4C3DFDDE /* AppEvent.m */; };
 		A84084C8B5C16F0EB80364FA /* Strings.m in Sources */ = {isa = PBXBuildFile; fileRef = A84083974C8CF9DDFE7A341D /* Strings.m */; };
-		A84084F47D4EA8D2B91E6609 /* SubscriptionData.m in Sources */ = {isa = PBXBuildFile; fileRef = A84081E6B9D2FF5986AA1BF0 /* SubscriptionData.m */; };
-		A84084F82AEF06CC1B8037DD /* MutableSubscriptionData.m in Sources */ = {isa = PBXBuildFile; fileRef = A8408BA51A715A7C022A7900 /* MutableSubscriptionData.m */; };
 		A840854A7ACA14A7D891EC16 /* OnboardingScrollableView.m in Sources */ = {isa = PBXBuildFile; fileRef = A8408CEB0E34BC897F3FA7D6 /* OnboardingScrollableView.m */; };
 		A8408692D005E8599267522E /* UIView+Additions.m in Sources */ = {isa = PBXBuildFile; fileRef = A84084C5C538AC8171021D2C /* UIView+Additions.m */; };
 		A84086D3F4BD2D551CA67611 /* AlertDialogs.m in Sources */ = {isa = PBXBuildFile; fileRef = A840841151FC43C5E1658677 /* AlertDialogs.m */; };
@@ -203,14 +194,16 @@
 		A8408F99941C9664E3E7C48A /* LanguageSelectionViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A840896A2A9959280DAE2DA1 /* LanguageSelectionViewController.m */; };
 		A8408FA13890CD67154033C6 /* RegionSelectionButton.m in Sources */ = {isa = PBXBuildFile; fileRef = A8408C84138113DE79F0DCD0 /* RegionSelectionButton.m */; };
 		A8408FF45D08D31E102FA41F /* ContainerDB.m in Sources */ = {isa = PBXBuildFile; fileRef = A84086716D701D0F5B48E4C0 /* ContainerDB.m */; };
-		B1D9FF416DDCA97A40A325AA /* libPods-PsiphonVPN.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 01122727D6CE50B340C55DBE /* libPods-PsiphonVPN.a */; };
+		CB0CFCFF11CEECCAA1A2C8BF /* libPods-PsiphonVPN.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A44F0D2E7AB9F499D75A1AC4 /* libPods-PsiphonVPN.a */; };
 		CE26FC951BBDC7B800B83375 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = CE26FC941BBDC7B800B83375 /* Assets.xcassets */; };
 		CE26FCAC1BBDC85900B83375 /* PsiphonVPN.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = CE26FCA31BBDC85900B83375 /* PsiphonVPN.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		CE4E9BC01BBEECF30060FF8B /* Psiphon.entitlements in Resources */ = {isa = PBXBuildFile; fileRef = CE4E9BBF1BBEECF30060FF8B /* Psiphon.entitlements */; };
 		CE4E9BC21BBEECFC0060FF8B /* PsiphonVPN.entitlements in Resources */ = {isa = PBXBuildFile; fileRef = CE4E9BC11BBEECFC0060FF8B /* PsiphonVPN.entitlements */; };
 		CE6C3F6A24366AE1007A17F0 /* ClientMetadata.m in Sources */ = {isa = PBXBuildFile; fileRef = CE6C3F6924366AE1007A17F0 /* ClientMetadata.m */; };
 		CE7B76431F54881F00EA44BD /* PsiphonTunnel.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 66094F781E8067520069EC4E /* PsiphonTunnel.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		D672BC574F14042B4D77AB28 /* libPods-Psiphon.a in Frameworks */ = {isa = PBXBuildFile; fileRef = CB8BB19F016330264C4DCB80 /* libPods-Psiphon.a */; };
+		CEBA9C112481A5C80097D700 /* Notifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEBA9C102481A5C80097D700 /* Notifier.swift */; };
+		CEBA9C132481AA9F0097D700 /* SharedDB.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEBA9C122481AA9F0097D700 /* SharedDB.swift */; };
+		CEED7835247703DD002D9D55 /* AppReceiptReducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEED7834247703DD002D9D55 /* AppReceiptReducer.swift */; };
 		EF4F1F3D206055F7006A40A1 /* RACSignal+Operations2.m in Sources */ = {isa = PBXBuildFile; fileRef = EF90D79F204F22C900228A63 /* RACSignal+Operations2.m */; };
 		EF639C2F1F8FCE37009D6B42 /* PsiFeedbackLogger.m in Sources */ = {isa = PBXBuildFile; fileRef = EF639C2E1F8FCE2A009D6B42 /* PsiFeedbackLogger.m */; };
 		EF639C301F8FCE37009D6B42 /* PsiFeedbackLogger.m in Sources */ = {isa = PBXBuildFile; fileRef = EF639C2E1F8FCE2A009D6B42 /* PsiFeedbackLogger.m */; };
@@ -234,7 +227,6 @@
 		EF90D7A8204F22C900228A63 /* DispatchUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = EF90D798204F22C900228A63 /* DispatchUtils.m */; };
 		EF90D7A9204F22C900228A63 /* FileUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = EF90D799204F22C900228A63 /* FileUtils.m */; };
 		EF90D7AA204F22C900228A63 /* NSError+Convenience.m in Sources */ = {isa = PBXBuildFile; fileRef = EF90D79A204F22C900228A63 /* NSError+Convenience.m */; };
-		EF90D7AC204F22E300228A63 /* RACSignal+Operations2.m in Sources */ = {isa = PBXBuildFile; fileRef = EF90D79F204F22C900228A63 /* RACSignal+Operations2.m */; };
 		EF90D7AF204F231900228A63 /* timestamp_valid.c in Sources */ = {isa = PBXBuildFile; fileRef = EF90D78D204F22C900228A63 /* timestamp_valid.c */; };
 		EF90D7B0204F231B00228A63 /* timestamp_compare.c in Sources */ = {isa = PBXBuildFile; fileRef = EF90D78E204F22C900228A63 /* timestamp_compare.c */; };
 		EF90D7B1204F231E00228A63 /* timestamp_tm.c in Sources */ = {isa = PBXBuildFile; fileRef = EF90D78F204F22C900228A63 /* timestamp_tm.c */; };
@@ -297,12 +289,27 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		01122727D6CE50B340C55DBE /* libPods-PsiphonVPN.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-PsiphonVPN.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		015255F2FAC67FC9CE25D8EC /* Pods-PsiApi-PsiApiTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PsiApi-PsiApiTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-PsiApi-PsiApiTests/Pods-PsiApi-PsiApiTests.debug.xcconfig"; sourceTree = "<group>"; };
+		0241C17D583A4905634E85AA /* libPods-Testing.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Testing.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		0285C1D0D4B4D2A707D6FDEF /* libPods-Utilities-UtilitiesTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Utilities-UtilitiesTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		04965F4B8ED97E34A3E4E661 /* Pods-PsiphonVPN.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PsiphonVPN.debug.xcconfig"; path = "Pods/Target Support Files/Pods-PsiphonVPN/Pods-PsiphonVPN.debug.xcconfig"; sourceTree = "<group>"; };
+		139D1D60EFF73A79ECF31F19 /* Pods-PsiphonVPN.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PsiphonVPN.release.xcconfig"; path = "Pods/Target Support Files/Pods-PsiphonVPN/Pods-PsiphonVPN.release.xcconfig"; sourceTree = "<group>"; };
+		1787CA7A8FA75358E02689FB /* Pods-Psiphon-PsiApi-PsiApiTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Psiphon-PsiApi-PsiApiTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-Psiphon-PsiApi-PsiApiTests/Pods-Psiphon-PsiApi-PsiApiTests.release.xcconfig"; sourceTree = "<group>"; };
+		1CF6F36D51088259B2AC450E /* Pods-PsiApi-Testing.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PsiApi-Testing.release.xcconfig"; path = "Pods/Target Support Files/Pods-PsiApi-Testing/Pods-PsiApi-Testing.release.xcconfig"; sourceTree = "<group>"; };
+		1FE4700126FC2AD287FCB45B /* Pods-PsiphonTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PsiphonTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-PsiphonTests/Pods-PsiphonTests.release.xcconfig"; sourceTree = "<group>"; };
+		2D1DAF6C9CAF197D05CDCFCF /* Pods-Testing-TestingTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Testing-TestingTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-Testing-TestingTests/Pods-Testing-TestingTests.release.xcconfig"; sourceTree = "<group>"; };
+		2EAE1D54BEBC6BF081A5B8D3 /* Pods-Testing-TestingTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Testing-TestingTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Testing-TestingTests/Pods-Testing-TestingTests.debug.xcconfig"; sourceTree = "<group>"; };
+		364EDFAD32DACAD0E8259C6E /* Pods-Psiphon-PsiApi.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Psiphon-PsiApi.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Psiphon-PsiApi/Pods-Psiphon-PsiApi.debug.xcconfig"; sourceTree = "<group>"; };
+		36D715C03CCF23E685E94A40 /* Pods-PsiApi-Testing-Utilities.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PsiApi-Testing-Utilities.debug.xcconfig"; path = "Pods/Target Support Files/Pods-PsiApi-Testing-Utilities/Pods-PsiApi-Testing-Utilities.debug.xcconfig"; sourceTree = "<group>"; };
+		38595BFE7626FC3E5C373BC9 /* Pods-Testing.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Testing.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Testing/Pods-Testing.debug.xcconfig"; sourceTree = "<group>"; };
+		3BBB25EFC24AA94133DA2104 /* Pods-PsiApi-Utilities-UtilitiesTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PsiApi-Utilities-UtilitiesTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-PsiApi-Utilities-UtilitiesTests/Pods-PsiApi-Utilities-UtilitiesTests.debug.xcconfig"; sourceTree = "<group>"; };
+		3E7745DBA0A65C097BB74EB5 /* Pods-Testing.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Testing.release.xcconfig"; path = "Pods/Target Support Files/Pods-Testing/Pods-Testing.release.xcconfig"; sourceTree = "<group>"; };
+		3EEE97DA12A99CDA3F3DA635 /* Pods-Psiphon-Testing.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Psiphon-Testing.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Psiphon-Testing/Pods-Psiphon-Testing.debug.xcconfig"; sourceTree = "<group>"; };
 		440D75BD1F59E041005C603B /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 		4435CC251F70566000F3A809 /* SettingsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SettingsViewController.h; sourceTree = "<group>"; };
 		4435CC261F70566000F3A809 /* SettingsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SettingsViewController.m; sourceTree = "<group>"; };
-		445F239420E1817B00D004E9 /* AppStoreReceiptData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppStoreReceiptData.h; sourceTree = "<group>"; };
-		445F239520E1817C00D004E9 /* AppStoreReceiptData.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppStoreReceiptData.m; sourceTree = "<group>"; };
+		445F239420E1817B00D004E9 /* AppStoreParsedReceiptData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppStoreParsedReceiptData.h; sourceTree = "<group>"; };
+		445F239520E1817C00D004E9 /* AppStoreParsedReceiptData.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppStoreParsedReceiptData.m; sourceTree = "<group>"; };
 		445F249820E1A5BA00D004E9 /* ReceiptAttributes.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ReceiptAttributes.c; sourceTree = "<group>"; };
 		445F249920E1A5BA00D004E9 /* constr_TYPE.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = constr_TYPE.c; sourceTree = "<group>"; };
 		445F249A20E1A5BA00D004E9 /* asn_SET_OF.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = asn_SET_OF.h; sourceTree = "<group>"; };
@@ -367,8 +374,8 @@
 		445F24F220E1A85C00D004E9 /* IA5String.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = IA5String.c; sourceTree = "<group>"; };
 		445F24F320E1A85C00D004E9 /* UTF8String.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = UTF8String.c; sourceTree = "<group>"; };
 		445F24F420E1A85C00D004E9 /* IA5String.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IA5String.h; sourceTree = "<group>"; };
-		44E3CB6A1FCCA83100C80C82 /* SubscriptionVerifierService.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SubscriptionVerifierService.h; sourceTree = "<group>"; };
-		44E3CB6B1FCCA83200C80C82 /* SubscriptionVerifierService.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SubscriptionVerifierService.m; sourceTree = "<group>"; };
+		4969BEF6E56CA5C8402749D0 /* Pods-PsiApi-Utilities.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PsiApi-Utilities.release.xcconfig"; path = "Pods/Target Support Files/Pods-PsiApi-Utilities/Pods-PsiApi-Utilities.release.xcconfig"; sourceTree = "<group>"; };
+		49886790EED7F2868C4610A7 /* Pods-Psiphon-PsiApi-PsiApiTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Psiphon-PsiApi-PsiApiTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Psiphon-PsiApi-PsiApiTests/Pods-Psiphon-PsiApi-PsiApiTests.debug.xcconfig"; sourceTree = "<group>"; };
 		4E0774951F566ADA0097BC8C /* InAppSettings.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = InAppSettings.bundle; sourceTree = "<group>"; };
 		4E0A3667215AB7EE008A3D7B /* UIFont+Additions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "UIFont+Additions.h"; sourceTree = "<group>"; };
 		4E0A3668215AB7EE008A3D7B /* UIFont+Additions.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "UIFont+Additions.m"; sourceTree = "<group>"; };
@@ -393,8 +400,6 @@
 		4E5BD4F42061982300AD4724 /* FeedbackManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FeedbackManager.m; sourceTree = "<group>"; };
 		4E5DAE6320A942A300E06342 /* UILabel+GetLabelHeight.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UILabel+GetLabelHeight.h"; sourceTree = "<group>"; };
 		4E5DAE6420A942A300E06342 /* UILabel+GetLabelHeight.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UILabel+GetLabelHeight.m"; sourceTree = "<group>"; };
-		4E90C94220CB37F5003FC319 /* PsiCashLogger.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PsiCashLogger.h; sourceTree = "<group>"; };
-		4E90C94320CB37F5003FC319 /* PsiCashLogger.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PsiCashLogger.m; sourceTree = "<group>"; };
 		4EB846402151830600687344 /* AvailableServerRegions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AvailableServerRegions.h; sourceTree = "<group>"; };
 		4EB846412151830600687344 /* AvailableServerRegions.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AvailableServerRegions.m; sourceTree = "<group>"; };
 		4EC5526120AB8DB9000B4BEA /* Pastel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Pastel.h; sourceTree = "<group>"; };
@@ -406,7 +411,6 @@
 		520201202360F5B800D00C8E /* IndexedViewSwitcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IndexedViewSwitcher.swift; sourceTree = "<group>"; };
 		52055D03230C823100244F9E /* GradientButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GradientButton.swift; sourceTree = "<group>"; };
 		52055D05230C833700244F9E /* SpeedBoostButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeedBoostButton.swift; sourceTree = "<group>"; };
-		521D084D2346A75700403B48 /* IAPProducts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IAPProducts.swift; sourceTree = "<group>"; };
 		521FD0E5219E0D5500F748EC /* DebugDirectoryViewerViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DebugDirectoryViewerViewController.m; path = Psiphon/Debug/DebugDirectoryViewerViewController.m; sourceTree = SOURCE_ROOT; };
 		521FD0E6219E0D5500F748EC /* DebugLogViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DebugLogViewController.m; path = Psiphon/Debug/DebugLogViewController.m; sourceTree = SOURCE_ROOT; };
 		521FD0E7219E0D5600F748EC /* DebugToolboxViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DebugToolboxViewController.m; path = Psiphon/Debug/DebugToolboxViewController.m; sourceTree = SOURCE_ROOT; };
@@ -427,8 +431,6 @@
 		521FD102219E0E8400F748EC /* Annotations.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Annotations.h; sourceTree = "<group>"; };
 		5237387323AABB0F00DDE396 /* PurchasingSpeedBoostAlertViewBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PurchasingSpeedBoostAlertViewBuilder.swift; sourceTree = "<group>"; };
 		5245C5C82342A6840033EE13 /* UserDefaults.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaults.swift; sourceTree = "<group>"; };
-		52467FE022C2A704009AEC6E /* PsiCashModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PsiCashModels.swift; sourceTree = "<group>"; };
-		52467FF822CE77A1009AEC6E /* Foundation+Additions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Foundation+Additions.swift"; sourceTree = "<group>"; };
 		5246800622D51AA3009AEC6E /* PsiCashWidgetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PsiCashWidgetView.swift; sourceTree = "<group>"; };
 		5246800822D51CE4009AEC6E /* PsiCashBalanceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PsiCashBalanceView.swift; sourceTree = "<group>"; };
 		5246800C22D65926009AEC6E /* UIUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIUtils.swift; sourceTree = "<group>"; };
@@ -437,25 +439,18 @@
 		524B4E6A2316F0E3004E9891 /* BorderedSubtitleButton.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = BorderedSubtitleButton.m; sourceTree = "<group>"; };
 		524B4E6C2316F27F004E9891 /* AnimatedControl.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AnimatedControl.h; sourceTree = "<group>"; };
 		524B4E6D2316F27F004E9891 /* AnimatedControl.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AnimatedControl.m; sourceTree = "<group>"; };
-		52805BA022DD1EB8006B205B /* ReactiveSwift+Additions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ReactiveSwift+Additions.swift"; sourceTree = "<group>"; };
 		528D81322384823F00AA2D77 /* PsiCashMessageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PsiCashMessageView.swift; sourceTree = "<group>"; };
 		52A24658238C9AB700A01FF1 /* SpeedBoostPurchaseTable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeedBoostPurchaseTable.swift; sourceTree = "<group>"; };
-		52A2465B2390569800A01FF1 /* Store.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Store.swift; sourceTree = "<group>"; };
 		52A2465D239081C100A01FF1 /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
 		52A24661239B07E000A01FF1 /* psiCashProductIds.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = psiCashProductIds.plist; sourceTree = "<group>"; };
 		52A2466C23A172A800A01FF1 /* AlertViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertViewController.swift; sourceTree = "<group>"; };
 		52A2466E23A1769300A01FF1 /* PsiCashMessageViewUntunneled.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PsiCashMessageViewUntunneled.swift; sourceTree = "<group>"; };
 		52A2467023A176BA00A01FF1 /* PsiCashPurchasingAlertViewBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PsiCashPurchasingAlertViewBuilder.swift; sourceTree = "<group>"; };
-		52B3C54223DA31E1003F6B12 /* PurchaseVerifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PurchaseVerifier.swift; sourceTree = "<group>"; };
-		52B3C54423DA391F003F6B12 /* Requests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Requests.swift; sourceTree = "<group>"; };
 		52B3C54823DF99E8003F6B12 /* AppObservables.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppObservables.h; sourceTree = "<group>"; };
 		52B3C54923DF99E8003F6B12 /* AppObservables.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppObservables.m; sourceTree = "<group>"; };
 		52B3C54B23E0E895003F6B12 /* ButtonBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ButtonBuilder.swift; sourceTree = "<group>"; };
-		52B3C54D23E22454003F6B12 /* Logging.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Logging.swift; sourceTree = "<group>"; };
-		52C8F0A1237C8ED600E5F9C0 /* PsiphonPlayground.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = PsiphonPlayground.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		52C8F0AA237CA26200E5F9C0 /* ImageViewBuidler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageViewBuidler.swift; sourceTree = "<group>"; };
+		52C8F0AA237CA26200E5F9C0 /* ImageViewBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageViewBuilder.swift; sourceTree = "<group>"; };
 		52C8F0AC237E145C00E5F9C0 /* PsiCashCoinPurchaseTable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PsiCashCoinPurchaseTable.swift; sourceTree = "<group>"; };
-		52C8F0AE2383059200E5F9C0 /* Promises+Additions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Promises+Additions.swift"; sourceTree = "<group>"; };
 		52CAC4302385D06600A92842 /* Spinner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Spinner.swift; sourceTree = "<group>"; };
 		52D2580F22BADE1900CA956A /* Psiphon-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Psiphon-Bridging-Header.h"; sourceTree = "<group>"; };
 		52D2581022BADE1900CA956A /* SwiftDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftDelegate.swift; sourceTree = "<group>"; };
@@ -464,11 +459,13 @@
 		52D363CC230EEBAC002C2221 /* AnimatedUIButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimatedUIButton.swift; sourceTree = "<group>"; };
 		52D363CE230F112E002C2221 /* TabControlView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabControlView.swift; sourceTree = "<group>"; };
 		52DF5E9123C675EC00A1B067 /* ViewController+Additions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ViewController+Additions.swift"; sourceTree = "<group>"; };
-		52DF5E9523C7A31100A1B067 /* Error.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Error.swift; sourceTree = "<group>"; };
-		52DF5E9723CE5A8300A1B067 /* ValuePaths.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ValuePaths.swift; sourceTree = "<group>"; };
+		52DF5E9723CE5A8300A1B067 /* AppAction+ValuePaths.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppAction+ValuePaths.swift"; sourceTree = "<group>"; };
 		52DF5E9923CE835100A1B067 /* UserStrings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserStrings.swift; sourceTree = "<group>"; };
 		52DF5E9D23D0D01F00A1B067 /* BridgingTypes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BridgingTypes.swift; sourceTree = "<group>"; };
+		548DC13880329CCB9E0CD4B2 /* libPods-PsiApi.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-PsiApi.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		571DC9418AF936E60179F07C /* Pods-Psiphon.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Psiphon.release.xcconfig"; path = "Pods/Target Support Files/Pods-Psiphon/Pods-Psiphon.release.xcconfig"; sourceTree = "<group>"; };
+		657B68F7581AB2C5DFB33758 /* Pods-PsiApi-Testing-TestingTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PsiApi-Testing-TestingTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-PsiApi-Testing-TestingTests/Pods-PsiApi-Testing-TestingTests.release.xcconfig"; sourceTree = "<group>"; };
+		65957584722BB1AA6B3B4825 /* Pods-PsiApi.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PsiApi.release.xcconfig"; path = "Pods/Target Support Files/Pods-PsiApi/Pods-PsiApi.release.xcconfig"; sourceTree = "<group>"; };
 		66094F781E8067520069EC4E /* PsiphonTunnel.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = PsiphonTunnel.framework; sourceTree = "<group>"; };
 		6615A5E91F58A95500026C98 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = Strings/en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		6615A5EC1F58A95E00026C98 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = Strings/fr.lproj/Localizable.strings; sourceTree = "<group>"; };
@@ -504,35 +501,59 @@
 		6651BE041F6B176500D65633 /* kk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = kk; path = Strings/kk.lproj/Localizable.strings; sourceTree = "<group>"; };
 		6651BE051F6B177000D65633 /* my */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = my; path = Strings/my.lproj/Localizable.strings; sourceTree = "<group>"; };
 		668AF9BE1E92CBD3008CAAAA /* NetworkExtension.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = NetworkExtension.framework; path = System/Library/Frameworks/NetworkExtension.framework; sourceTree = SDKROOT; };
-		6B2646D9B515A2990796D972 /* Pods-PsiphonVPN.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PsiphonVPN.release.xcconfig"; path = "Pods/Target Support Files/Pods-PsiphonVPN/Pods-PsiphonVPN.release.xcconfig"; sourceTree = "<group>"; };
+		672D77B7307F9CEE82EECCCC /* Pods-PsiApi.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PsiApi.debug.xcconfig"; path = "Pods/Target Support Files/Pods-PsiApi/Pods-PsiApi.debug.xcconfig"; sourceTree = "<group>"; };
+		6EFA35869537D7B410191321 /* libPods-Utilities.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Utilities.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		7498D20B47C34B9D33BE95E4 /* Pods-PsiApi-Testing-TestingTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PsiApi-Testing-TestingTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-PsiApi-Testing-TestingTests/Pods-PsiApi-Testing-TestingTests.debug.xcconfig"; sourceTree = "<group>"; };
+		78C6298EAA632CD41F06795D /* Pods-Utilities.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Utilities.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Utilities/Pods-Utilities.debug.xcconfig"; sourceTree = "<group>"; };
+		8167C01B4242F1B0217731A9 /* Pods-PsiApi-Testing.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PsiApi-Testing.debug.xcconfig"; path = "Pods/Target Support Files/Pods-PsiApi-Testing/Pods-PsiApi-Testing.debug.xcconfig"; sourceTree = "<group>"; };
+		8422B782F6ACED7897FCAC25 /* libPods-PsiApi-PsiApiTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-PsiApi-PsiApiTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		894580B71199444DBB2C3FA2 /* Pods-Psiphon-Testing.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Psiphon-Testing.release.xcconfig"; path = "Pods/Target Support Files/Pods-Psiphon-Testing/Pods-Psiphon-Testing.release.xcconfig"; sourceTree = "<group>"; };
+		8D14CCB4BB61E10B351D20DC /* Pods-Psiphon-PsiApi.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Psiphon-PsiApi.release.xcconfig"; path = "Pods/Target Support Files/Pods-Psiphon-PsiApi/Pods-Psiphon-PsiApi.release.xcconfig"; sourceTree = "<group>"; };
+		8D1F62BD247DC1690028AFAF /* Receipt+AppStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Receipt+AppStore.swift"; sourceTree = "<group>"; };
+		8D1F62BF247DC3350028AFAF /* Authorization+Additions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Authorization+Additions.swift"; sourceTree = "<group>"; };
+		8D1F62C1247DC4840028AFAF /* PsiCashClient+Additions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PsiCashClient+Additions.swift"; sourceTree = "<group>"; };
+		8D255E2C24620E2900FD5D1C /* NoConnectionBannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoConnectionBannerView.swift; sourceTree = "<group>"; };
 		8D417E982411954A00FEE587 /* PsiCashReducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PsiCashReducer.swift; sourceTree = "<group>"; };
-		8D417E9C2411A0C200FEE587 /* PaymentQueue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentQueue.swift; sourceTree = "<group>"; };
-		8D417E9E2411A60900FEE587 /* PsiCashEffects.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PsiCashEffects.swift; sourceTree = "<group>"; };
-		8D417EA02411A89500FEE587 /* IAPState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IAPState.swift; sourceTree = "<group>"; };
 		8D417EB024147C6D00FEE587 /* LandingPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LandingPage.swift; sourceTree = "<group>"; };
 		8D417EB224148C1E00FEE587 /* URLHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLHandler.swift; sourceTree = "<group>"; };
-		8D417EB62415633300FEE587 /* IAPReducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IAPReducer.swift; sourceTree = "<group>"; };
-		8D417EB82415667900FEE587 /* StoreDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoreDelegate.swift; sourceTree = "<group>"; };
-		8D417EBA2417155000FEE587 /* AppReceipt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppReceipt.swift; sourceTree = "<group>"; };
-		8D417EBC2417FF5B00FEE587 /* Subscription.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Subscription.swift; sourceTree = "<group>"; };
-		8D417EBE2417FFB000FEE587 /* HardCodedValues.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HardCodedValues.swift; sourceTree = "<group>"; };
 		8D417ED8241844FA00FEE587 /* FloatingPoint+Additions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FloatingPoint+Additions.swift"; sourceTree = "<group>"; };
-		8D417EDA2419D9CF00FEE587 /* State.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = State.swift; sourceTree = "<group>"; };
 		8D417EDC2419DBA100FEE587 /* ProductRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductRequest.swift; sourceTree = "<group>"; };
-		8D417EDE241AA89C00FEE587 /* Effect.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Effect.swift; sourceTree = "<group>"; };
+		8D497A24247CEF4F009CEBA8 /* GoogleAppMeasurement.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = GoogleAppMeasurement.framework; sourceTree = "<group>"; };
+		8D497A25247CEF4F009CEBA8 /* GoogleMobileAds.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = GoogleMobileAds.framework; sourceTree = "<group>"; };
+		8D497A26247CEF4F009CEBA8 /* GoogleUtilities.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = GoogleUtilities.xcframework; sourceTree = "<group>"; };
+		8D497A27247CEF4F009CEBA8 /* nanopb.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = nanopb.xcframework; sourceTree = "<group>"; };
+		8D4ACD31247E3626008E404C /* AppStoreIAP+Additions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppStoreIAP+Additions.swift"; sourceTree = "<group>"; };
+		8D5D8494247CE6420018A35B /* libPromisesObjC.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = libPromisesObjC.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		8D5F08A5247DB21700F51A42 /* Testing */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Testing; sourceTree = SOURCE_ROOT; };
+		8D5F08A6247DB23A00F51A42 /* Utilities */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Utilities; sourceTree = SOURCE_ROOT; };
+		8D5F08A7247DB24C00F51A42 /* PsiApi */ = {isa = PBXFileReference; lastKnownFileType = folder; path = PsiApi; sourceTree = SOURCE_ROOT; };
+		8D7789B8247491CA0038BFDA /* PsiphonBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PsiphonBundle.swift; sourceTree = "<group>"; };
+		8D7789BC247493300038BFDA /* VPNState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VPNState.swift; sourceTree = "<group>"; };
+		8D7789C4247496F60038BFDA /* PsiCashLib+Additions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PsiCashLib+Additions.swift"; sourceTree = "<group>"; };
+		8D7789C9247499110038BFDA /* Reachability+Additions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Reachability+Additions.swift"; sourceTree = "<group>"; };
+		8D7789CF2474D53D0038BFDA /* PsiphonRotatingFileFeedbackLogger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PsiphonRotatingFileFeedbackLogger.swift; sourceTree = "<group>"; };
 		8D7E9B9C2425DF42006F3A2F /* AnimatedUIView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimatedUIView.swift; sourceTree = "<group>"; };
 		8D7E9B9E2425E053006F3A2F /* Animations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Animations.swift; sourceTree = "<group>"; };
-		8D9E602924364ED2003A46D8 /* VPNState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VPNState.swift; sourceTree = "<group>"; };
-		8D9E602B24364EE6003A46D8 /* TunnelProviderManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TunnelProviderManager.swift; sourceTree = "<group>"; };
-		8D9E602D24364FB6003A46D8 /* SerialEffect.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SerialEffect.swift; sourceTree = "<group>"; };
+		8D9D9BCF247C6B910093220E /* HardCodedValues.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HardCodedValues.swift; sourceTree = "<group>"; };
+		8D9D9C29247C77AB0093220E /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Platforms/iPhoneOS.platform/Developer/Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
+		8D9E602924364ED2003A46D8 /* VPNStateReducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VPNStateReducer.swift; sourceTree = "<group>"; };
 		8D9E603424366D71003A46D8 /* FeedbackDescriptions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedbackDescriptions.swift; sourceTree = "<group>"; };
-		8DA3466524114DB400F9E2D1 /* PsiCashState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PsiCashState.swift; sourceTree = "<group>"; };
 		8DB6C6352429080C005E2F4C /* PsiCashMessageWithRetryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PsiCashMessageWithRetryView.swift; sourceTree = "<group>"; };
 		8DB6C637242A4D06005E2F4C /* DuskButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DuskButton.swift; sourceTree = "<group>"; };
+		8DCA6863247C7CF8001D026E /* Bindable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Bindable.swift; sourceTree = "<group>"; };
+		8DCA686B247CC383001D026E /* libReactiveSwift.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = libReactiveSwift.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		8DD642C0248AAD8A006C94D2 /* Utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utils.swift; sourceTree = "<group>"; };
+		8DD6E7E324591E270041DAC5 /* SubscriptionAuthCheck.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SubscriptionAuthCheck.h; sourceTree = "<group>"; };
+		8DD6E7E424591E270041DAC5 /* SubscriptionAuthCheck.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SubscriptionAuthCheck.m; sourceTree = "<group>"; };
+		8DD6E7E62459C83B0041DAC5 /* StoredAuthorizations.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = StoredAuthorizations.h; sourceTree = "<group>"; };
+		8DD6E7E72459C83B0041DAC5 /* StoredAuthorizations.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = StoredAuthorizations.m; sourceTree = "<group>"; };
 		8DDA60282425BB4800DBA8EC /* DebugStrings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugStrings.swift; sourceTree = "<group>"; };
+		8DE4E6D1244E97D000275362 /* Result+Codable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Result+Codable.swift"; sourceTree = "<group>"; };
+		9433F6FADEFD218CED8B343A /* Pods-PsiApi-PsiApiTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PsiApi-PsiApiTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-PsiApi-PsiApiTests/Pods-PsiApi-PsiApiTests.release.xcconfig"; sourceTree = "<group>"; };
+		9876294EDE951EF39C9F97BE /* Pods-PsiApi-Testing-Utilities.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PsiApi-Testing-Utilities.release.xcconfig"; path = "Pods/Target Support Files/Pods-PsiApi-Testing-Utilities/Pods-PsiApi-Testing-Utilities.release.xcconfig"; sourceTree = "<group>"; };
+		9A06EEF4B515E4AE40E5CA93 /* Pods-PsiApi-Utilities-UtilitiesTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PsiApi-Utilities-UtilitiesTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-PsiApi-Utilities-UtilitiesTests/Pods-PsiApi-Utilities-UtilitiesTests.release.xcconfig"; sourceTree = "<group>"; };
 		9BFEC0419AD3808370915E01 /* PsiphonConfigUserDefaults.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PsiphonConfigUserDefaults.h; sourceTree = "<group>"; };
 		9BFEC1C9F506CE1DF07306D2 /* NEBridge.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NEBridge.h; sourceTree = "<group>"; };
-		9BFEC1E485FB857A0358ED94 /* UnionSerialQueue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UnionSerialQueue.h; sourceTree = "<group>"; };
 		9BFEC220C067BBE75AF970C1 /* IAPHelpViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IAPHelpViewController.m; sourceTree = "<group>"; };
 		9BFEC3165745A5D14C8C3C08 /* Notifier.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Notifier.h; sourceTree = "<group>"; };
 		9BFEC31B61584FD2EAAF5DE6 /* Authorization.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Authorization.m; sourceTree = "<group>"; };
@@ -548,7 +569,6 @@
 		9BFEC673CE5EA236279F07BD /* Authorization.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Authorization.h; sourceTree = "<group>"; };
 		9BFEC717F36D5A071D14AFFA /* AdManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AdManager.h; sourceTree = "<group>"; };
 		9BFEC72C282F6060193B2E87 /* UIColor+Additions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIColor+Additions.m"; sourceTree = "<group>"; };
-		9BFEC84F5DF6D2C3EF754962 /* UnionSerialQueue.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UnionSerialQueue.m; sourceTree = "<group>"; };
 		9BFEC8783D4222F2272E50E7 /* BasePacketTunnelProvider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BasePacketTunnelProvider.h; sourceTree = "<group>"; };
 		9BFEC91ED4A1C511520E9948 /* Notifier.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Notifier.m; sourceTree = "<group>"; };
 		9BFECB09D7F866F34551DBD4 /* IAPHelpViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IAPHelpViewController.h; sourceTree = "<group>"; };
@@ -559,6 +579,8 @@
 		9BFECEEB971749A4E9705B15 /* Nullity.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Nullity.h; sourceTree = "<group>"; };
 		9BFECF6BF16767758F28D1A0 /* AdMobRewardedAdControllerWrapper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AdMobRewardedAdControllerWrapper.m; sourceTree = "<group>"; };
 		9BFECF74881B6C4227813A63 /* AdMobConsent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AdMobConsent.h; sourceTree = "<group>"; };
+		A13608CD23499831149566BA /* Pods-Psiphon-Testing-TestingTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Psiphon-Testing-TestingTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-Psiphon-Testing-TestingTests/Pods-Psiphon-Testing-TestingTests.release.xcconfig"; sourceTree = "<group>"; };
+		A44F0D2E7AB9F499D75A1AC4 /* libPods-PsiphonVPN.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-PsiphonVPN.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		A840802C7AEFA7F375205DCB /* VPNStartAndStopButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VPNStartAndStopButton.h; sourceTree = "<group>"; };
 		A8408058458E7BFC4C3DFDDE /* AppEvent.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppEvent.m; sourceTree = "<group>"; };
 		A84080B68F307C79F3BCCC59 /* SupportedLanguages.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SupportedLanguages.m; sourceTree = "<group>"; };
@@ -568,13 +590,11 @@
 		A84081B66B02DF8283448409 /* AutoLayoutProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AutoLayoutProtocol.h; sourceTree = "<group>"; };
 		A84081C4600325A12F9C3413 /* SubscriptionsBar.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SubscriptionsBar.m; sourceTree = "<group>"; };
 		A84081E39C751846A6009BEC /* CloudsView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CloudsView.m; sourceTree = "<group>"; };
-		A84081E6B9D2FF5986AA1BF0 /* SubscriptionData.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SubscriptionData.m; sourceTree = "<group>"; };
 		A840830557814D4234CFD86D /* ImageUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ImageUtils.h; sourceTree = "<group>"; };
 		A84083119A599C815D2D80F5 /* SkyButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SkyButton.h; sourceTree = "<group>"; };
 		A8408319CD72511CABBE4CD4 /* ContainerDB.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ContainerDB.h; sourceTree = "<group>"; };
 		A8408390A766C7C2C246797C /* PickerViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PickerViewController.m; sourceTree = "<group>"; };
 		A84083974C8CF9DDFE7A341D /* Strings.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Strings.m; sourceTree = "<group>"; };
-		A84083E1E11F50B1DFC100CD /* SubscriptionData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SubscriptionData.h; sourceTree = "<group>"; };
 		A840841151FC43C5E1658677 /* AlertDialogs.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AlertDialogs.m; sourceTree = "<group>"; };
 		A840842CECC0146241243488 /* ActivityIndicatorRoyalSkyButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ActivityIndicatorRoyalSkyButton.m; sourceTree = "<group>"; };
 		A8408454F205262BF90B55C1 /* UIImageView+Additions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImageView+Additions.h"; sourceTree = "<group>"; };
@@ -610,7 +630,6 @@
 		A8408B98D73EB239C92FB450 /* WhiteSkyButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WhiteSkyButton.h; sourceTree = "<group>"; };
 		A8408B9A66413A25FC1A2BE1 /* SwoopView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SwoopView.m; sourceTree = "<group>"; };
 		A8408BA05DC0D983E6740558 /* SubscriptionStatusView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SubscriptionStatusView.m; sourceTree = "<group>"; };
-		A8408BA51A715A7C022A7900 /* MutableSubscriptionData.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MutableSubscriptionData.m; sourceTree = "<group>"; };
 		A8408BAC196A108FFE3A5957 /* AlertDialogs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AlertDialogs.h; sourceTree = "<group>"; };
 		A8408C3C21E6934EAE9C0977 /* RelaySubject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RelaySubject.h; sourceTree = "<group>"; };
 		A8408C79DD812741E678AB94 /* SupportedLanguages.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SupportedLanguages.h; sourceTree = "<group>"; };
@@ -619,7 +638,6 @@
 		A8408CEB0E34BC897F3FA7D6 /* OnboardingScrollableView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OnboardingScrollableView.m; sourceTree = "<group>"; };
 		A8408D462EEE90AA7F2A8AFA /* SwoopView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SwoopView.h; sourceTree = "<group>"; };
 		A8408D7A1D96FE89B4FB49C1 /* ActivityIndicatorRoyalSkyButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ActivityIndicatorRoyalSkyButton.h; sourceTree = "<group>"; };
-		A8408D7A83250AE5DA42B445 /* MutableSubscriptionData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MutableSubscriptionData.h; sourceTree = "<group>"; };
 		A8408D96EC06ED36F86C690D /* OnboardingViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OnboardingViewController.m; sourceTree = "<group>"; };
 		A8408DB71B7BE2CF13F9CD04 /* UIView+Additions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIView+Additions.h"; sourceTree = "<group>"; };
 		A8408DBEEDCF56EC798536BF /* LayerAutoResizeUIView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LayerAutoResizeUIView.m; sourceTree = "<group>"; };
@@ -630,7 +648,17 @@
 		A8408F08BFF80A05CF46C00A /* RoyalSkyButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RoyalSkyButton.m; sourceTree = "<group>"; };
 		A8408F6123BCC98725932A59 /* VPNStartAndStopButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VPNStartAndStopButton.m; sourceTree = "<group>"; };
 		A8408FA077C517546DF6033C /* WhiteSkyButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WhiteSkyButton.m; sourceTree = "<group>"; };
-		CB8BB19F016330264C4DCB80 /* libPods-Psiphon.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Psiphon.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		AB870335F4C2AA3297D49236 /* libPods-PsiphonTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-PsiphonTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		AC42AE4003B8FEF4D7B8E863 /* Pods-Psiphon-Testing-TestingTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Psiphon-Testing-TestingTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Psiphon-Testing-TestingTests/Pods-Psiphon-Testing-TestingTests.debug.xcconfig"; sourceTree = "<group>"; };
+		AC50BC070A94E760D3F894F7 /* Pods-Utilities.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Utilities.release.xcconfig"; path = "Pods/Target Support Files/Pods-Utilities/Pods-Utilities.release.xcconfig"; sourceTree = "<group>"; };
+		AF86192758FCD49D1549C59F /* Pods-Psiphon-Utilities-UtilitiesTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Psiphon-Utilities-UtilitiesTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Psiphon-Utilities-UtilitiesTests/Pods-Psiphon-Utilities-UtilitiesTests.debug.xcconfig"; sourceTree = "<group>"; };
+		B0273A876290D2B26E433A82 /* Pods-Psiphon-Utilities.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Psiphon-Utilities.release.xcconfig"; path = "Pods/Target Support Files/Pods-Psiphon-Utilities/Pods-Psiphon-Utilities.release.xcconfig"; sourceTree = "<group>"; };
+		B46335F9F4EC10D8EC032F92 /* Pods-PsiApi-Psiphon.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PsiApi-Psiphon.debug.xcconfig"; path = "Pods/Target Support Files/Pods-PsiApi-Psiphon/Pods-PsiApi-Psiphon.debug.xcconfig"; sourceTree = "<group>"; };
+		B52267F44F3BB11D4A7CD820 /* Pods-PsiApi-Testing-Utilities-UtilitiesTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PsiApi-Testing-Utilities-UtilitiesTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-PsiApi-Testing-Utilities-UtilitiesTests/Pods-PsiApi-Testing-Utilities-UtilitiesTests.debug.xcconfig"; sourceTree = "<group>"; };
+		B5AC8D28B1AFC18A9DACA282 /* libPods-Testing-TestingTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Testing-TestingTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		BE85E028F71260A6BD3E48A0 /* Pods-Psiphon-Utilities-UtilitiesTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Psiphon-Utilities-UtilitiesTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-Psiphon-Utilities-UtilitiesTests/Pods-Psiphon-Utilities-UtilitiesTests.release.xcconfig"; sourceTree = "<group>"; };
+		C9BDA0C779D86E722D8B8DB2 /* Pods-Utilities-UtilitiesTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Utilities-UtilitiesTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-Utilities-UtilitiesTests/Pods-Utilities-UtilitiesTests.release.xcconfig"; sourceTree = "<group>"; };
+		CA0750CFBD1D93988672EBF5 /* libPods-Psiphon.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Psiphon.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		CE26FC8A1BBDC7B800B83375 /* Psiphon.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Psiphon.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		CE26FC941BBDC7B800B83375 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		CE26FC991BBDC7B800B83375 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -642,7 +670,12 @@
 		CE50A25724699CD80047D3FE /* it */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = it; path = Strings/it.lproj/Localizable.strings; sourceTree = "<group>"; };
 		CE6C3F6824366AE1007A17F0 /* ClientMetadata.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ClientMetadata.h; sourceTree = "<group>"; };
 		CE6C3F6924366AE1007A17F0 /* ClientMetadata.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ClientMetadata.m; sourceTree = "<group>"; };
-		DD100E19194B9A79F5D7DF55 /* Pods-PsiphonVPN.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PsiphonVPN.debug.xcconfig"; path = "Pods/Target Support Files/Pods-PsiphonVPN/Pods-PsiphonVPN.debug.xcconfig"; sourceTree = "<group>"; };
+		CEBA9C102481A5C80097D700 /* Notifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Notifier.swift; sourceTree = "<group>"; };
+		CEBA9C122481AA9F0097D700 /* SharedDB.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedDB.swift; sourceTree = "<group>"; };
+		CEED7834247703DD002D9D55 /* AppReceiptReducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppReceiptReducer.swift; sourceTree = "<group>"; };
+		CF62E51A6A76190276A6FF94 /* Pods-PsiApi-Utilities.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PsiApi-Utilities.debug.xcconfig"; path = "Pods/Target Support Files/Pods-PsiApi-Utilities/Pods-PsiApi-Utilities.debug.xcconfig"; sourceTree = "<group>"; };
+		E4619DE60D098E874B40B6F6 /* Pods-PsiApi-Psiphon.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PsiApi-Psiphon.release.xcconfig"; path = "Pods/Target Support Files/Pods-PsiApi-Psiphon/Pods-PsiApi-Psiphon.release.xcconfig"; sourceTree = "<group>"; };
+		E61DE98A991FFAF35BA880D9 /* Pods-PsiApi-Testing-Utilities-UtilitiesTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PsiApi-Testing-Utilities-UtilitiesTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-PsiApi-Testing-Utilities-UtilitiesTests/Pods-PsiApi-Testing-Utilities-UtilitiesTests.release.xcconfig"; sourceTree = "<group>"; };
 		EDB109A2FBFB32D821FF121D /* Pods-Psiphon.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Psiphon.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Psiphon/Pods-Psiphon.debug.xcconfig"; sourceTree = "<group>"; };
 		EF639C2D1F8FCE2A009D6B42 /* PsiFeedbackLogger.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PsiFeedbackLogger.h; sourceTree = "<group>"; };
 		EF639C2E1F8FCE2A009D6B42 /* PsiFeedbackLogger.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PsiFeedbackLogger.m; sourceTree = "<group>"; };
@@ -684,9 +717,12 @@
 		EFC2F5C120226782007B52F9 /* RootContainerController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RootContainerController.h; sourceTree = "<group>"; };
 		EFC2F5C9202267B0007B52F9 /* PsiphonConfigReader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PsiphonConfigReader.h; sourceTree = "<group>"; };
 		EFC2F5CA202267B0007B52F9 /* PsiphonConfigReader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PsiphonConfigReader.m; sourceTree = "<group>"; };
+		EFF94F005129FBF0532001B5 /* Pods-Utilities-UtilitiesTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Utilities-UtilitiesTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Utilities-UtilitiesTests/Pods-Utilities-UtilitiesTests.debug.xcconfig"; sourceTree = "<group>"; };
 		F132D7DE1F5739A800AF7F91 /* LaunchScreenViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LaunchScreenViewController.h; sourceTree = "<group>"; };
 		F132D7DF1F5739A800AF7F91 /* LaunchScreenViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LaunchScreenViewController.m; sourceTree = "<group>"; };
 		F136C2941F62E3E1000D3EAB /* LaunchScreen.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = LaunchScreen.xib; sourceTree = "<group>"; };
+		F4C4D7C3B9D998539C1D57FE /* Pods-Psiphon-Utilities.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Psiphon-Utilities.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Psiphon-Utilities/Pods-Psiphon-Utilities.debug.xcconfig"; sourceTree = "<group>"; };
+		F8FCDC22ED21515D276CE274 /* Pods-PsiphonTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PsiphonTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-PsiphonTests/Pods-PsiphonTests.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -697,20 +733,19 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		52C8F09E237C8ED600E5F9C0 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		CE26FC871BBDC7B800B83375 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8D497A2A247CEF50009CEBA8 /* GoogleMobileAds.framework in Frameworks */,
+				8D497A2E247CEF50009CEBA8 /* nanopb.xcframework in Frameworks */,
+				8D497A28247CEF50009CEBA8 /* GoogleAppMeasurement.framework in Frameworks */,
+				8D1F62BC247DBB130028AFAF /* PsiApi in Frameworks */,
+				8D497A2C247CEF50009CEBA8 /* GoogleUtilities.xcframework in Frameworks */,
 				668AF9C01E92CBE0008CAAAA /* NetworkExtension.framework in Frameworks */,
+				8D1F62BA247DBB0D0028AFAF /* Utilities in Frameworks */,
 				440D75BE1F59E041005C603B /* StoreKit.framework in Frameworks */,
-				D672BC574F14042B4D77AB28 /* libPods-Psiphon.a in Frameworks */,
+				474C2778BC8FAFDB749E5DC3 /* libPods-Psiphon.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -720,7 +755,7 @@
 			files = (
 				668AF9BF1E92CBD3008CAAAA /* NetworkExtension.framework in Frameworks */,
 				66094F7A1E8067520069EC4E /* PsiphonTunnel.framework in Frameworks */,
-				B1D9FF416DDCA97A40A325AA /* libPods-PsiphonVPN.a in Frameworks */,
+				CB0CFCFF11CEECCAA1A2C8BF /* libPods-PsiphonVPN.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -801,21 +836,19 @@
 		448AD86C1F5DC89000316BA9 /* IAP */ = {
 			isa = PBXGroup;
 			children = (
+				52A24661239B07E000A01FF1 /* psiCashProductIds.plist */,
 				445F249720E1A5BA00D004E9 /* asn1c */,
-				445F239420E1817B00D004E9 /* AppStoreReceiptData.h */,
-				445F239520E1817C00D004E9 /* AppStoreReceiptData.m */,
-				EF743FC31F99549000AC89A2 /* subscriptionProductIds.plist */,
+				CEED78232476F9BF002D9D55 /* Subscriptions */,
+				CEED7834247703DD002D9D55 /* AppReceiptReducer.swift */,
+				445F239420E1817B00D004E9 /* AppStoreParsedReceiptData.h */,
+				445F239520E1817C00D004E9 /* AppStoreParsedReceiptData.m */,
 				4E5263CB2072984D0021FEF5 /* IAPViewController.h */,
 				4E5263CA2072984D0021FEF5 /* IAPViewController.m */,
 				9BFEC220C067BBE75AF970C1 /* IAPHelpViewController.m */,
 				9BFECB09D7F866F34551DBD4 /* IAPHelpViewController.h */,
-				52A24661239B07E000A01FF1 /* psiCashProductIds.plist */,
-				8D417E9C2411A0C200FEE587 /* PaymentQueue.swift */,
-				8D417EA02411A89500FEE587 /* IAPState.swift */,
-				8D417EB62415633300FEE587 /* IAPReducer.swift */,
-				521D084D2346A75700403B48 /* IAPProducts.swift */,
-				8D417EBA2417155000FEE587 /* AppReceipt.swift */,
 				8D417EDC2419DBA100FEE587 /* ProductRequest.swift */,
+				8D1F62BD247DC1690028AFAF /* Receipt+AppStore.swift */,
+				8D4ACD31247E3626008E404C /* AppStoreIAP+Additions.swift */,
 			);
 			name = IAP;
 			sourceTree = "<group>";
@@ -839,15 +872,13 @@
 				EF6C1F501F59E46500709554 /* embedded_server_entries */,
 				EF6C1F511F59E46500709554 /* psiphon_config */,
 				EF90D78B204F22C900228A63 /* External */,
-				EF90D79E204F22C900228A63 /* ReactiveExtensions */,
 				669A10B61F58A74E00EE831F /* Strings */,
 				EF90D793204F22C900228A63 /* Util */,
 				9BFEC4D609BFCD0DC812BDB3 /* Asserts.h */,
-				9BFEC673CE5EA236279F07BD /* Authorization.h */,
-				9BFEC31B61584FD2EAAF5DE6 /* Authorization.m */,
 				EFB3E62D1F66F23F004AAE8C /* Logging.h */,
 				9BFEC3165745A5D14C8C3C08 /* Notifier.h */,
 				9BFEC91ED4A1C511520E9948 /* Notifier.m */,
+				CEBA9C102481A5C80097D700 /* Notifier.swift */,
 				EF639C2D1F8FCE2A009D6B42 /* PsiFeedbackLogger.h */,
 				EF639C2E1F8FCE2A009D6B42 /* PsiFeedbackLogger.m */,
 				EFC2F5C9202267B0007B52F9 /* PsiphonConfigReader.h */,
@@ -857,11 +888,10 @@
 				4E0DCB181F28481E00495781 /* PsiphonDataSharedDB.h */,
 				4E0DCB191F28481E00495781 /* PsiphonDataSharedDB.m */,
 				EF652CDB1F365B8C002AFB48 /* SharedConstants.h */,
+				CEBA9C122481AA9F0097D700 /* SharedDB.swift */,
 				9BFECC9B2B9F2BFBD4F8A47B /* UserDefaults.h */,
 				A84083974C8CF9DDFE7A341D /* Strings.m */,
 				A8408AAD421C096147E3FC8B /* Strings.h */,
-				A84081E6B9D2FF5986AA1BF0 /* SubscriptionData.m */,
-				A84083E1E11F50B1DFC100CD /* SubscriptionData.h */,
 			);
 			path = Shared;
 			sourceTree = "<group>";
@@ -873,15 +903,6 @@
 				4E5BD4F42061982300AD4724 /* FeedbackManager.m */,
 			);
 			name = Feedback;
-			sourceTree = "<group>";
-		};
-		4E9B2E0A204EFB9400E63784 /* ClientWrapper */ = {
-			isa = PBXGroup;
-			children = (
-				4E90C94220CB37F5003FC319 /* PsiCashLogger.h */,
-				4E90C94320CB37F5003FC319 /* PsiCashLogger.m */,
-			);
-			path = ClientWrapper;
 			sourceTree = "<group>";
 		};
 		4EC5526720AB8DF1000B4BEA /* Pastel */ = {
@@ -929,8 +950,6 @@
 			isa = PBXGroup;
 			children = (
 				5248B4CD23203781008C00D4 /* SwiftObjCBridges.swift */,
-				52805BA022DD1EB8006B205B /* ReactiveSwift+Additions.swift */,
-				52467FF822CE77A1009AEC6E /* Foundation+Additions.swift */,
 				9BFECE69F71F11C7B3A2D67E /* UIColor+Additions.h */,
 				9BFEC72C282F6060193B2E87 /* UIColor+Additions.m */,
 				4E0A3667215AB7EE008A3D7B /* UIFont+Additions.h */,
@@ -941,11 +960,11 @@
 				4E0A366B21666B99008A3D7B /* NSString+Additions.m */,
 				A8408A0C4220563DA1FE3048 /* ImageUtils.m */,
 				A840830557814D4234CFD86D /* ImageUtils.h */,
-				52C8F0AE2383059200E5F9C0 /* Promises+Additions.swift */,
 				52DF5E9123C675EC00A1B067 /* ViewController+Additions.swift */,
-				52B3C54423DA391F003F6B12 /* Requests.swift */,
 				8D417ED8241844FA00FEE587 /* FloatingPoint+Additions.swift */,
 				8DDA60282425BB4800DBA8EC /* DebugStrings.swift */,
+				8DE4E6D1244E97D000275362 /* Result+Codable.swift */,
+				8DD642C0248AAD8A006C94D2 /* Utils.swift */,
 			);
 			path = Util;
 			sourceTree = "<group>";
@@ -953,11 +972,8 @@
 		4EFAAF1C2034CDA600EC0536 /* PsiCash */ = {
 			isa = PBXGroup;
 			children = (
-				4E9B2E0A204EFB9400E63784 /* ClientWrapper */,
-				52467FE022C2A704009AEC6E /* PsiCashModels.swift */,
-				8DA3466524114DB400F9E2D1 /* PsiCashState.swift */,
 				8D417E982411954A00FEE587 /* PsiCashReducer.swift */,
-				8D417E9E2411A60900FEE587 /* PsiCashEffects.swift */,
+				8D7789C4247496F60038BFDA /* PsiCashLib+Additions.swift */,
 			);
 			path = PsiCash;
 			sourceTree = "<group>";
@@ -973,12 +989,13 @@
 				52D363CE230F112E002C2221 /* TabControlView.swift */,
 				5202011C2360D34000D00C8E /* EitherView.swift */,
 				520201202360F5B800D00C8E /* IndexedViewSwitcher.swift */,
-				52C8F0AA237CA26200E5F9C0 /* ImageViewBuidler.swift */,
+				52C8F0AA237CA26200E5F9C0 /* ImageViewBuilder.swift */,
 				52CAC4302385D06600A92842 /* Spinner.swift */,
 				52B3C54B23E0E895003F6B12 /* ButtonBuilder.swift */,
 				8D7E9B9C2425DF42006F3A2F /* AnimatedUIView.swift */,
 				8D7E9B9E2425E053006F3A2F /* Animations.swift */,
 				8DB6C637242A4D06005E2F4C /* DuskButton.swift */,
+				8D255E2C24620E2900FD5D1C /* NoConnectionBannerView.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -1030,25 +1047,27 @@
 			path = PsiCashView;
 			sourceTree = "<group>";
 		};
-		52A2465A2390565700A01FF1 /* Store */ = {
-			isa = PBXGroup;
-			children = (
-				52A2465B2390569800A01FF1 /* Store.swift */,
-				8D417EB82415667900FEE587 /* StoreDelegate.swift */,
-				8D417EDA2419D9CF00FEE587 /* State.swift */,
-				8D417EDE241AA89C00FEE587 /* Effect.swift */,
-				8D9E602D24364FB6003A46D8 /* SerialEffect.swift */,
-			);
-			path = Store;
-			sourceTree = "<group>";
-		};
 		668AF9B81E92CB60008CAAAA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				8D497A24247CEF4F009CEBA8 /* GoogleAppMeasurement.framework */,
+				8D497A25247CEF4F009CEBA8 /* GoogleMobileAds.framework */,
+				8D497A26247CEF4F009CEBA8 /* GoogleUtilities.xcframework */,
+				8D497A27247CEF4F009CEBA8 /* nanopb.xcframework */,
+				8D5D8494247CE6420018A35B /* libPromisesObjC.a */,
+				8DCA686B247CC383001D026E /* libReactiveSwift.a */,
+				8D9D9C29247C77AB0093220E /* XCTest.framework */,
 				440D75BD1F59E041005C603B /* StoreKit.framework */,
 				668AF9BE1E92CBD3008CAAAA /* NetworkExtension.framework */,
-				CB8BB19F016330264C4DCB80 /* libPods-Psiphon.a */,
-				01122727D6CE50B340C55DBE /* libPods-PsiphonVPN.a */,
+				A44F0D2E7AB9F499D75A1AC4 /* libPods-PsiphonVPN.a */,
+				AB870335F4C2AA3297D49236 /* libPods-PsiphonTests.a */,
+				548DC13880329CCB9E0CD4B2 /* libPods-PsiApi.a */,
+				8422B782F6ACED7897FCAC25 /* libPods-PsiApi-PsiApiTests.a */,
+				CA0750CFBD1D93988672EBF5 /* libPods-Psiphon.a */,
+				0241C17D583A4905634E85AA /* libPods-Testing.a */,
+				B5AC8D28B1AFC18A9DACA282 /* libPods-Testing-TestingTests.a */,
+				6EFA35869537D7B410191321 /* libPods-Utilities.a */,
+				0285C1D0D4B4D2A707D6FDEF /* libPods-Utilities-UtilitiesTests.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -1118,6 +1137,9 @@
 		CE26FC811BBDC7B700B83375 = {
 			isa = PBXGroup;
 			children = (
+				8D5F08A7247DB24C00F51A42 /* PsiApi */,
+				8D5F08A6247DB23A00F51A42 /* Utilities */,
+				8D5F08A5247DB21700F51A42 /* Testing */,
 				4E30745D2097921B00B6D2A3 /* PsiCashLib.framework */,
 				66094F781E8067520069EC4E /* PsiphonTunnel.framework */,
 				4E0DCB101F28458100495781 /* Shared */,
@@ -1136,7 +1158,6 @@
 				CE26FC8A1BBDC7B800B83375 /* Psiphon.app */,
 				CE26FCA31BBDC85900B83375 /* PsiphonVPN.appex */,
 				4E0D88211FA06B2400ADB61E /* PsiphonUITests.xctest */,
-				52C8F0A1237C8ED600E5F9C0 /* PsiphonPlayground.framework */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1144,7 +1165,7 @@
 		CE26FC8C1BBDC7B800B83375 /* Psiphon */ = {
 			isa = PBXGroup;
 			children = (
-				52A2465A2390565700A01FF1 /* Store */,
+				EF90D79E204F22C900228A63 /* ReactiveExtensions */,
 				52055D02230C821200244F9E /* View */,
 				521FD0E4219E0D4500F748EC /* Debug */,
 				CE4E9BBF1BBEECF30060FF8B /* Psiphon.entitlements */,
@@ -1181,21 +1202,23 @@
 				52D2580F22BADE1900CA956A /* Psiphon-Bridging-Header.h */,
 				5245C5C82342A6840033EE13 /* UserDefaults.swift */,
 				52A2465D239081C100A01FF1 /* AppState.swift */,
-				52DF5E9723CE5A8300A1B067 /* ValuePaths.swift */,
+				52DF5E9723CE5A8300A1B067 /* AppAction+ValuePaths.swift */,
 				52DF5E9923CE835100A1B067 /* UserStrings.swift */,
 				52DF5E9D23D0D01F00A1B067 /* BridgingTypes.swift */,
-				52B3C54223DA31E1003F6B12 /* PurchaseVerifier.swift */,
 				52B3C54823DF99E8003F6B12 /* AppObservables.h */,
 				52B3C54923DF99E8003F6B12 /* AppObservables.m */,
-				52B3C54D23E22454003F6B12 /* Logging.swift */,
 				8D417EB024147C6D00FEE587 /* LandingPage.swift */,
 				8D417EB224148C1E00FEE587 /* URLHandler.swift */,
-				8D417EBC2417FF5B00FEE587 /* Subscription.swift */,
-				8D417EBE2417FFB000FEE587 /* HardCodedValues.swift */,
-				8D9E602924364ED2003A46D8 /* VPNState.swift */,
-				8D9E602B24364EE6003A46D8 /* TunnelProviderManager.swift */,
+				8D9E602924364ED2003A46D8 /* VPNStateReducer.swift */,
 				8D9E603424366D71003A46D8 /* FeedbackDescriptions.swift */,
-				52DF5E9523C7A31100A1B067 /* Error.swift */,
+				8D7789B8247491CA0038BFDA /* PsiphonBundle.swift */,
+				8D7789BC247493300038BFDA /* VPNState.swift */,
+				8D7789C9247499110038BFDA /* Reachability+Additions.swift */,
+				8D7789CF2474D53D0038BFDA /* PsiphonRotatingFileFeedbackLogger.swift */,
+				8D9D9BCF247C6B910093220E /* HardCodedValues.swift */,
+				8DCA6863247C7CF8001D026E /* Bindable.swift */,
+				8D1F62BF247DC3350028AFAF /* Authorization+Additions.swift */,
+				8D1F62C1247DC4840028AFAF /* PsiCashClient+Additions.swift */,
 			);
 			path = Psiphon;
 			sourceTree = "<group>";
@@ -1217,6 +1240,14 @@
 			path = PsiphonVPN;
 			sourceTree = "<group>";
 		};
+		CEED78232476F9BF002D9D55 /* Subscriptions */ = {
+			isa = PBXGroup;
+			children = (
+				EF743FC31F99549000AC89A2 /* subscriptionProductIds.plist */,
+			);
+			path = Subscriptions;
+			sourceTree = "<group>";
+		};
 		EF652CCF1F3521F8002AFB48 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
@@ -1228,10 +1259,12 @@
 		EF743FC11F99546B00AC89A2 /* IAP */ = {
 			isa = PBXGroup;
 			children = (
-				44E3CB6A1FCCA83100C80C82 /* SubscriptionVerifierService.h */,
-				44E3CB6B1FCCA83200C80C82 /* SubscriptionVerifierService.m */,
-				A8408BA51A715A7C022A7900 /* MutableSubscriptionData.m */,
-				A8408D7A83250AE5DA42B445 /* MutableSubscriptionData.h */,
+				9BFEC673CE5EA236279F07BD /* Authorization.h */,
+				9BFEC31B61584FD2EAAF5DE6 /* Authorization.m */,
+				8DD6E7E324591E270041DAC5 /* SubscriptionAuthCheck.h */,
+				8DD6E7E424591E270041DAC5 /* SubscriptionAuthCheck.m */,
+				8DD6E7E62459C83B0041DAC5 /* StoredAuthorizations.h */,
+				8DD6E7E72459C83B0041DAC5 /* StoredAuthorizations.m */,
 			);
 			path = IAP;
 			sourceTree = "<group>";
@@ -1285,8 +1318,6 @@
 			children = (
 				EF90D79F204F22C900228A63 /* RACSignal+Operations2.m */,
 				EF90D7A0204F22C900228A63 /* RACSignal+Operations2.h */,
-				9BFEC84F5DF6D2C3EF754962 /* UnionSerialQueue.m */,
-				9BFEC1E485FB857A0358ED94 /* UnionSerialQueue.h */,
 				A84086DF1DDA5CC90C437009 /* RelaySubject.m */,
 				A8408C3C21E6934EAE9C0977 /* RelaySubject.h */,
 			);
@@ -1324,23 +1355,53 @@
 			children = (
 				EDB109A2FBFB32D821FF121D /* Pods-Psiphon.debug.xcconfig */,
 				571DC9418AF936E60179F07C /* Pods-Psiphon.release.xcconfig */,
-				DD100E19194B9A79F5D7DF55 /* Pods-PsiphonVPN.debug.xcconfig */,
-				6B2646D9B515A2990796D972 /* Pods-PsiphonVPN.release.xcconfig */,
+				04965F4B8ED97E34A3E4E661 /* Pods-PsiphonVPN.debug.xcconfig */,
+				139D1D60EFF73A79ECF31F19 /* Pods-PsiphonVPN.release.xcconfig */,
+				F8FCDC22ED21515D276CE274 /* Pods-PsiphonTests.debug.xcconfig */,
+				1FE4700126FC2AD287FCB45B /* Pods-PsiphonTests.release.xcconfig */,
+				672D77B7307F9CEE82EECCCC /* Pods-PsiApi.debug.xcconfig */,
+				65957584722BB1AA6B3B4825 /* Pods-PsiApi.release.xcconfig */,
+				38595BFE7626FC3E5C373BC9 /* Pods-Testing.debug.xcconfig */,
+				3E7745DBA0A65C097BB74EB5 /* Pods-Testing.release.xcconfig */,
+				2EAE1D54BEBC6BF081A5B8D3 /* Pods-Testing-TestingTests.debug.xcconfig */,
+				2D1DAF6C9CAF197D05CDCFCF /* Pods-Testing-TestingTests.release.xcconfig */,
+				78C6298EAA632CD41F06795D /* Pods-Utilities.debug.xcconfig */,
+				AC50BC070A94E760D3F894F7 /* Pods-Utilities.release.xcconfig */,
+				EFF94F005129FBF0532001B5 /* Pods-Utilities-UtilitiesTests.debug.xcconfig */,
+				C9BDA0C779D86E722D8B8DB2 /* Pods-Utilities-UtilitiesTests.release.xcconfig */,
+				015255F2FAC67FC9CE25D8EC /* Pods-PsiApi-PsiApiTests.debug.xcconfig */,
+				9433F6FADEFD218CED8B343A /* Pods-PsiApi-PsiApiTests.release.xcconfig */,
+				364EDFAD32DACAD0E8259C6E /* Pods-Psiphon-PsiApi.debug.xcconfig */,
+				8D14CCB4BB61E10B351D20DC /* Pods-Psiphon-PsiApi.release.xcconfig */,
+				49886790EED7F2868C4610A7 /* Pods-Psiphon-PsiApi-PsiApiTests.debug.xcconfig */,
+				1787CA7A8FA75358E02689FB /* Pods-Psiphon-PsiApi-PsiApiTests.release.xcconfig */,
+				3EEE97DA12A99CDA3F3DA635 /* Pods-Psiphon-Testing.debug.xcconfig */,
+				894580B71199444DBB2C3FA2 /* Pods-Psiphon-Testing.release.xcconfig */,
+				AC42AE4003B8FEF4D7B8E863 /* Pods-Psiphon-Testing-TestingTests.debug.xcconfig */,
+				A13608CD23499831149566BA /* Pods-Psiphon-Testing-TestingTests.release.xcconfig */,
+				F4C4D7C3B9D998539C1D57FE /* Pods-Psiphon-Utilities.debug.xcconfig */,
+				B0273A876290D2B26E433A82 /* Pods-Psiphon-Utilities.release.xcconfig */,
+				AF86192758FCD49D1549C59F /* Pods-Psiphon-Utilities-UtilitiesTests.debug.xcconfig */,
+				BE85E028F71260A6BD3E48A0 /* Pods-Psiphon-Utilities-UtilitiesTests.release.xcconfig */,
+				B46335F9F4EC10D8EC032F92 /* Pods-PsiApi-Psiphon.debug.xcconfig */,
+				E4619DE60D098E874B40B6F6 /* Pods-PsiApi-Psiphon.release.xcconfig */,
+				8167C01B4242F1B0217731A9 /* Pods-PsiApi-Testing.debug.xcconfig */,
+				1CF6F36D51088259B2AC450E /* Pods-PsiApi-Testing.release.xcconfig */,
+				7498D20B47C34B9D33BE95E4 /* Pods-PsiApi-Testing-TestingTests.debug.xcconfig */,
+				657B68F7581AB2C5DFB33758 /* Pods-PsiApi-Testing-TestingTests.release.xcconfig */,
+				CF62E51A6A76190276A6FF94 /* Pods-PsiApi-Utilities.debug.xcconfig */,
+				4969BEF6E56CA5C8402749D0 /* Pods-PsiApi-Utilities.release.xcconfig */,
+				3BBB25EFC24AA94133DA2104 /* Pods-PsiApi-Utilities-UtilitiesTests.debug.xcconfig */,
+				9A06EEF4B515E4AE40E5CA93 /* Pods-PsiApi-Utilities-UtilitiesTests.release.xcconfig */,
+				36D715C03CCF23E685E94A40 /* Pods-PsiApi-Testing-Utilities.debug.xcconfig */,
+				9876294EDE951EF39C9F97BE /* Pods-PsiApi-Testing-Utilities.release.xcconfig */,
+				B52267F44F3BB11D4A7CD820 /* Pods-PsiApi-Testing-Utilities-UtilitiesTests.debug.xcconfig */,
+				E61DE98A991FFAF35BA880D9 /* Pods-PsiApi-Testing-Utilities-UtilitiesTests.release.xcconfig */,
 			);
 			name = Pods;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
-
-/* Begin PBXHeadersBuildPhase section */
-		52C8F09C237C8ED600E5F9C0 /* Headers */ = {
-			isa = PBXHeadersBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
 		4E0D88201FA06B2400ADB61E /* PsiphonUITests */ = {
@@ -1361,24 +1422,6 @@
 			productReference = 4E0D88211FA06B2400ADB61E /* PsiphonUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
-		52C8F0A0237C8ED600E5F9C0 /* PsiphonPlayground */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 52C8F0A8237C8ED600E5F9C0 /* Build configuration list for PBXNativeTarget "PsiphonPlayground" */;
-			buildPhases = (
-				52C8F09C237C8ED600E5F9C0 /* Headers */,
-				52C8F09D237C8ED600E5F9C0 /* Sources */,
-				52C8F09E237C8ED600E5F9C0 /* Frameworks */,
-				52C8F09F237C8ED600E5F9C0 /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = PsiphonPlayground;
-			productName = PsiphonPlayground;
-			productReference = 52C8F0A1237C8ED600E5F9C0 /* PsiphonPlayground.framework */;
-			productType = "com.apple.product-type.framework";
-		};
 		CE26FC891BBDC7B800B83375 /* Psiphon */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = CE26FC9C1BBDC7B800B83375 /* Build configuration list for PBXNativeTarget "Psiphon" */;
@@ -1398,6 +1441,10 @@
 				CE26FCAB1BBDC85900B83375 /* PBXTargetDependency */,
 			);
 			name = Psiphon;
+			packageProductDependencies = (
+				8D1F62B9247DBB0D0028AFAF /* Utilities */,
+				8D1F62BB247DBB130028AFAF /* PsiApi */,
+			);
 			productName = Psiphon;
 			productReference = CE26FC8A1BBDC7B800B83375 /* Psiphon.app */;
 			productType = "com.apple.product-type.application";
@@ -1406,7 +1453,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = CE26FCAD1BBDC85900B83375 /* Build configuration list for PBXNativeTarget "PsiphonVPN" */;
 			buildPhases = (
-				2DBF001E8C4C4AD1FBA710D1 /* [CP] Check Pods Manifest.lock */,
+				C2C27D850413C8FCDF0DBF29 /* [CP] Check Pods Manifest.lock */,
 				CE26FC9F1BBDC85900B83375 /* Sources */,
 				CE26FCA01BBDC85900B83375 /* Frameworks */,
 				CE26FCA11BBDC85900B83375 /* Resources */,
@@ -1426,7 +1473,7 @@
 		CE26FC821BBDC7B700B83375 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastSwiftUpdateCheck = 0910;
+				LastSwiftUpdateCheck = 1150;
 				LastUpgradeCheck = 1130;
 				ORGANIZATIONNAME = "Psiphon Inc.";
 				TargetAttributes = {
@@ -1436,11 +1483,6 @@
 						LastSwiftMigration = 1110;
 						ProvisioningStyle = Automatic;
 						TestTargetID = CE26FC891BBDC7B800B83375;
-					};
-					52C8F0A0237C8ED600E5F9C0 = {
-						CreatedOnToolsVersion = 11.2;
-						DevelopmentTeam = Q6HLNEX92A;
-						ProvisioningStyle = Automatic;
 					};
 					CE26FC891BBDC7B800B83375 = {
 						CreatedOnToolsVersion = 7.0;
@@ -1522,6 +1564,8 @@
 				it,
 			);
 			mainGroup = CE26FC811BBDC7B700B83375;
+			packageReferences = (
+			);
 			productRefGroup = CE26FC8B1BBDC7B800B83375 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -1529,20 +1573,12 @@
 				CE26FC891BBDC7B800B83375 /* Psiphon */,
 				CE26FCA21BBDC85900B83375 /* PsiphonVPN */,
 				4E0D88201FA06B2400ADB61E /* PsiphonUITests */,
-				52C8F0A0237C8ED600E5F9C0 /* PsiphonPlayground */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
 		4E0D881F1FA06B2400ADB61E /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		52C8F09F237C8ED600E5F9C0 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -1588,41 +1624,16 @@
 			buildActionMask = 2147483647;
 			files = (
 			);
-			inputPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-Psiphon/Pods-Psiphon-resources.sh",
-				"${PODS_CONFIGURATION_BUILD_DIR}/InAppSettingsKit/InAppSettingsKit.bundle",
-				"${PODS_CONFIGURATION_BUILD_DIR}/PersonalizedAdConsent/PersonalizedAdConsent.bundle",
-				"${PODS_CONFIGURATION_BUILD_DIR}/PsiphonClientCommonLibrary/PsiphonClientCommonLibrary.bundle",
-				"${PODS_ROOT}/SVProgressHUD/SVProgressHUD/SVProgressHUD.bundle",
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-Psiphon/Pods-Psiphon-resources-${CONFIGURATION}-input-files.xcfilelist",
 			);
 			name = "[CP] Copy Pods Resources";
-			outputPaths = (
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/InAppSettingsKit.bundle",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/PersonalizedAdConsent.bundle",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/PsiphonClientCommonLibrary.bundle",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/SVProgressHUD.bundle",
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-Psiphon/Pods-Psiphon-resources-${CONFIGURATION}-output-files.xcfilelist",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Psiphon/Pods-Psiphon-resources.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		2DBF001E8C4C4AD1FBA710D1 /* [CP] Check Pods Manifest.lock */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
-				"${PODS_ROOT}/Manifest.lock",
-			);
-			name = "[CP] Check Pods Manifest.lock";
-			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-PsiphonVPN-checkManifestLockResult.txt",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
 		68C760D8B13A9BB7EA40BC08 /* [CP] Check Pods Manifest.lock */ = {
@@ -1637,6 +1648,28 @@
 			name = "[CP] Check Pods Manifest.lock";
 			outputPaths = (
 				"$(DERIVED_FILE_DIR)/Pods-Psiphon-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		C2C27D850413C8FCDF0DBF29 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-PsiphonVPN-checkManifestLockResult.txt",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -1668,34 +1701,30 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		52C8F09D237C8ED600E5F9C0 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				52C8F0A9237C8F3E00E5F9C0 /* Foundation+Additions.swift in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		CE26FC861BBDC7B800B83375 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8D778978247469FE0038BFDA /* AppInfo.h in Sources */,
 				52A2465E239081C100A01FF1 /* AppState.swift in Sources */,
+				8D255E2D24620E2900FD5D1C /* NoConnectionBannerView.swift in Sources */,
 				EF90D7A6204F22C900228A63 /* NSDate+Comparator.m in Sources */,
 				4EB846422151830600687344 /* AvailableServerRegions.m in Sources */,
+				8D7789CA247499110038BFDA /* Reachability+Additions.swift in Sources */,
 				5246800922D51CE4009AEC6E /* PsiCashBalanceView.swift in Sources */,
+				8DD642C1248AAD8A006C94D2 /* Utils.swift in Sources */,
 				52D363CF230F112E002C2221 /* TabControlView.swift in Sources */,
 				445F24D620E1A5BA00D004E9 /* xer_decoder.c in Sources */,
 				EF652CD71F35224C002AFB48 /* MainViewController.m in Sources */,
-				52B3C54E23E22454003F6B12 /* Logging.swift in Sources */,
 				EF90D7A4204F22C900228A63 /* timestamp_format.c in Sources */,
-				52B3C54323DA31E1003F6B12 /* PurchaseVerifier.swift in Sources */,
+				8D1F62C2247DC4840028AFAF /* PsiCashClient+Additions.swift in Sources */,
+				CEBA9C112481A5C80097D700 /* Notifier.swift in Sources */,
 				F132D7E01F5739A800AF7F91 /* LaunchScreenViewController.m in Sources */,
 				445F24E920E1A5BA00D004E9 /* ber_tlv_length.c in Sources */,
+				CEED7835247703DD002D9D55 /* AppReceiptReducer.swift in Sources */,
 				5237387423AABB0F00DDE396 /* PurchasingSpeedBoostAlertViewBuilder.swift in Sources */,
 				4E0DCB1A1F28481E00495781 /* PsiphonDataSharedDB.m in Sources */,
 				4435CC271F70566000F3A809 /* SettingsViewController.m in Sources */,
-				8D417EB72415633300FEE587 /* IAPReducer.swift in Sources */,
 				EF4F1F3D206055F7006A40A1 /* RACSignal+Operations2.m in Sources */,
 				445F24F020E1A5BA00D004E9 /* xer_encoder.c in Sources */,
 				445F24D520E1A5BA00D004E9 /* constr_TYPE.c in Sources */,
@@ -1707,27 +1736,24 @@
 				EF90D7A1204F22C900228A63 /* timestamp_valid.c in Sources */,
 				445F24DF20E1A5BA00D004E9 /* ANY.c in Sources */,
 				52A2466F23A1769300A01FF1 /* PsiCashMessageViewUntunneled.swift in Sources */,
-				4E90C94420CB37F5003FC319 /* PsiCashLogger.m in Sources */,
 				EFC2F5C420226782007B52F9 /* RootContainerController.m in Sources */,
-				8D417EBB2417155000FEE587 /* AppReceipt.swift in Sources */,
 				EF90D7A5204F22C900228A63 /* timestamp_parse.c in Sources */,
-				52DF5E9623C7A31100A1B067 /* Error.swift in Sources */,
 				EF652CD11F352212002AFB48 /* main.m in Sources */,
 				445F24EB20E1A5BA00D004E9 /* xer_support.c in Sources */,
 				4E5DAE6520A942A300E06342 /* UILabel+GetLabelHeight.m in Sources */,
 				EFC2F5CB202267B1007B52F9 /* PsiphonConfigReader.m in Sources */,
 				EF90D7A7204F22C900228A63 /* NSDate+PSIDateExtension.m in Sources */,
-				445F239620E1817C00D004E9 /* AppStoreReceiptData.m in Sources */,
+				8DCA6864247C7CF8001D026E /* Bindable.swift in Sources */,
+				445F239620E1817C00D004E9 /* AppStoreParsedReceiptData.m in Sources */,
 				445F24E420E1A5BA00D004E9 /* constr_SEQUENCE.c in Sources */,
+				CEBA9C132481AA9F0097D700 /* SharedDB.swift in Sources */,
 				EF652CD61F35224C002AFB48 /* AppDelegate.m in Sources */,
 				EFC2F5C720226782007B52F9 /* UIAlertController+Additions.m in Sources */,
 				4E0A366C21666B99008A3D7B /* NSString+Additions.m in Sources */,
 				EF639C2F1F8FCE37009D6B42 /* PsiFeedbackLogger.m in Sources */,
 				445F24DA20E1A5BA00D004E9 /* constr_SET_OF.c in Sources */,
-				8D417EBD2417FF5C00FEE587 /* Subscription.swift in Sources */,
 				8D417EB124147C6D00FEE587 /* LandingPage.swift in Sources */,
 				445F24E520E1A5BA00D004E9 /* asn_SET_OF.c in Sources */,
-				52B3C54523DA391F003F6B12 /* Requests.swift in Sources */,
 				9BFEC4F02A47FF8265635803 /* Notifier.m in Sources */,
 				4EC5526620AB8DCD000B4BEA /* PastelView.m in Sources */,
 				4E5263C7207294600021FEF5 /* EmbeddedServerEntries.m in Sources */,
@@ -1735,15 +1761,14 @@
 				5246800D22D65926009AEC6E /* UIUtils.swift in Sources */,
 				9BFECFEB3BC9F10542C1A416 /* PsiphonConfigUserDefaults.m in Sources */,
 				4E5263CD2072984D0021FEF5 /* IAPViewController.m in Sources */,
+				8D7789B9247491CA0038BFDA /* PsiphonBundle.swift in Sources */,
 				445F24D720E1A5BA00D004E9 /* per_support.c in Sources */,
 				EF90D7AA204F22C900228A63 /* NSError+Convenience.m in Sources */,
-				52DF5E9823CE5A8300A1B067 /* ValuePaths.swift in Sources */,
+				52DF5E9823CE5A8300A1B067 /* AppAction+ValuePaths.swift in Sources */,
 				4E5BD4F52061982300AD4724 /* FeedbackManager.m in Sources */,
 				4E0A3669215AB7EE008A3D7B /* UIFont+Additions.m in Sources */,
-				8D9E602F24366AE7003A46D8 /* SerialEffect.swift in Sources */,
 				5246800722D51AA3009AEC6E /* PsiCashWidgetView.swift in Sources */,
 				52D363C9230DE215002C2221 /* PsiCashViewController.swift in Sources */,
-				8D9E603324366AF4003A46D8 /* Store.swift in Sources */,
 				528D81332384823F00AA2D77 /* PsiCashMessageView.swift in Sources */,
 				EF90D7A8204F22C900228A63 /* DispatchUtils.m in Sources */,
 				445F24D820E1A5BA00D004E9 /* OBJECT_IDENTIFIER.c in Sources */,
@@ -1754,24 +1779,21 @@
 				445F24E120E1A5BA00D004E9 /* ReceiptAttribute.c in Sources */,
 				EF90D7A2204F22C900228A63 /* timestamp_compare.c in Sources */,
 				52A24659238C9AB700A01FF1 /* SpeedBoostPurchaseTable.swift in Sources */,
-				8D9E602A24364ED2003A46D8 /* VPNState.swift in Sources */,
-				9BFECB6BF077F45D491093F1 /* Authorization.m in Sources */,
+				8D9E602A24364ED2003A46D8 /* VPNStateReducer.swift in Sources */,
 				EF90D7A3204F22C900228A63 /* timestamp_tm.c in Sources */,
 				52D363CD230EEBAC002C2221 /* AnimatedUIButton.swift in Sources */,
 				445F24E020E1A5BA00D004E9 /* INTEGER.c in Sources */,
 				445F24DD20E1A5BA00D004E9 /* per_encoder.c in Sources */,
 				8DB6C638242A4D06005E2F4C /* DuskButton.swift in Sources */,
 				4EC5526320AB8DBE000B4BEA /* Pastel.m in Sources */,
-				521D084E2346A75700403B48 /* IAPProducts.swift in Sources */,
 				52DF5E9223C675EC00A1B067 /* ViewController+Additions.swift in Sources */,
-				8DA3466624114DB400F9E2D1 /* PsiCashState.swift in Sources */,
-				52467FE122C2A704009AEC6E /* PsiCashModels.swift in Sources */,
-				52C8F0AB237CA26200E5F9C0 /* ImageViewBuidler.swift in Sources */,
+				52C8F0AB237CA26200E5F9C0 /* ImageViewBuilder.swift in Sources */,
 				445F24F620E1A85D00D004E9 /* UTF8String.c in Sources */,
 				521FD0F0219E0D5600F748EC /* DebugLogViewController.m in Sources */,
 				521FD0F1219E0D5600F748EC /* DebugToolboxViewController.m in Sources */,
 				445F24ED20E1A5BA00D004E9 /* ber_tlv_tag.c in Sources */,
 				4E5263B7207290360021FEF5 /* EmbeddedServerEntriesHelpers.c in Sources */,
+				8D7789C5247496F60038BFDA /* PsiCashLib+Additions.swift in Sources */,
 				4E10920820F3DA190033114B /* AppInfo.m in Sources */,
 				445F24EE20E1A5BA00D004E9 /* asn_codecs_prim.c in Sources */,
 				521FD0FA219E0DDF00F748EC /* AppProfiler.m in Sources */,
@@ -1785,39 +1807,36 @@
 				520201212360F5B800D00C8E /* IndexedViewSwitcher.swift in Sources */,
 				52DF5E9E23D0D01F00A1B067 /* BridgingTypes.swift in Sources */,
 				9BFECD2FAA1FCDA88A7D432E /* UIColor+Additions.m in Sources */,
-				8D9E603124366AEF003A46D8 /* State.swift in Sources */,
 				521FD0F9219E0DDF00F748EC /* AppStats.m in Sources */,
 				8D417E992411954A00FEE587 /* PsiCashReducer.swift in Sources */,
-				8D417EA12411A89500FEE587 /* IAPState.swift in Sources */,
+				8D7789BD247493300038BFDA /* VPNState.swift in Sources */,
 				9BFECD174E254989EC97A437 /* IAPHelpViewController.m in Sources */,
 				52055D04230C823100244F9E /* GradientButton.swift in Sources */,
+				8D9D9BCC247C6A9D0093220E /* PsiphonRotatingFileFeedbackLogger.swift in Sources */,
 				521FD0F2219E0D5600F748EC /* DebugViewController.m in Sources */,
 				52CAC4312385D06600A92842 /* Spinner.swift in Sources */,
-				9BFEC9C08697E4701A36A3B3 /* UnionSerialQueue.m in Sources */,
 				445F24EF20E1A5BA00D004E9 /* constraints.c in Sources */,
 				5248B4CE23203781008C00D4 /* SwiftObjCBridges.swift in Sources */,
 				52D363CB230DEBED002C2221 /* CloseButton.swift in Sources */,
 				445F24DB20E1A5BA00D004E9 /* ber_decoder.c in Sources */,
 				52D2581122BADE1900CA956A /* SwiftDelegate.swift in Sources */,
 				5202011D2360D34000D00C8E /* EitherView.swift in Sources */,
-				52805BA122DD1EB8006B205B /* ReactiveSwift+Additions.swift in Sources */,
 				9BFEC8058885B68B2822E2B8 /* AdManager.m in Sources */,
 				9BFEC3D66910918A0C8954E1 /* AdMobConsent.m in Sources */,
 				52DF5E9A23CE835100A1B067 /* UserStrings.swift in Sources */,
 				8DDA60292425BB4800DBA8EC /* DebugStrings.swift in Sources */,
 				52C8F0AD237E145C00E5F9C0 /* PsiCashCoinPurchaseTable.swift in Sources */,
+				8DE4E6D2244E97D000275362 /* Result+Codable.swift in Sources */,
 				521FD0EF219E0D5600F748EC /* DebugDirectoryViewerViewController.m in Sources */,
 				9BFECF61970F215F32E76280 /* AdMobInterstitialAdControllerWrapper.m in Sources */,
 				52055D06230C833700244F9E /* SpeedBoostButton.swift in Sources */,
 				9BFEC459666697D89B09A492 /* AdMobRewardedAdControllerWrapper.m in Sources */,
-				8D417EBF2417FFB000FEE587 /* HardCodedValues.swift in Sources */,
-				8D9E603024366AEC003A46D8 /* Effect.swift in Sources */,
 				521FD0FD219E0E0F00F748EC /* DebugUtils.m in Sources */,
 				524B4E6B2316F0E3004E9891 /* BorderedSubtitleButton.m in Sources */,
 				9BFEC8A2F99380655E853F81 /* AdControllerWrapper.m in Sources */,
 				A8408E281270691F61F9C20C /* AppVersionNumberView.m in Sources */,
-				52C8F0AF2383059200E5F9C0 /* Promises+Additions.swift in Sources */,
 				A8408C424E64BF3D70273464 /* ConnectionStatusView.m in Sources */,
+				8D4ACD32247E3626008E404C /* AppStoreIAP+Additions.swift in Sources */,
 				A84082260CE7662A93697CFF /* LoadingCircleLayer.m in Sources */,
 				A8408AACE30F860F2C961A04 /* WhiteSkyButton.m in Sources */,
 				A8408008B18277F93286799F /* PsiphonProgressView.m in Sources */,
@@ -1827,6 +1846,7 @@
 				A8408E611665FC60D5DFF339 /* SubscriptionStatusView.m in Sources */,
 				A8408EB13777DDCBEF7DE3C0 /* SwoopView.m in Sources */,
 				8D7E9B9D2425DF42006F3A2F /* AnimatedUIView.swift in Sources */,
+				8D1F62C0247DC3350028AFAF /* Authorization+Additions.swift in Sources */,
 				A84080E163F24876A1476544 /* VPNStartAndStopButton.m in Sources */,
 				8D417ED9241844FA00FEE587 /* FloatingPoint+Additions.swift in Sources */,
 				A840875B190F7666A1BD98E5 /* UIView+AutoLayoutViewGroup.m in Sources */,
@@ -1845,25 +1865,21 @@
 				A8408FF45D08D31E102FA41F /* ContainerDB.m in Sources */,
 				5245C5C92342A6840033EE13 /* UserDefaults.swift in Sources */,
 				52B3C54C23E0E895003F6B12 /* ButtonBuilder.swift in Sources */,
-				8D417E9D2411A0C200FEE587 /* PaymentQueue.swift in Sources */,
 				A8408D8C16D136075590193C /* AppUpgrade.m in Sources */,
 				A8408692D005E8599267522E /* UIView+Additions.m in Sources */,
+				8D1F62BE247DC1690028AFAF /* Receipt+AppStore.swift in Sources */,
 				A84087AFA5806D689C3BF6D2 /* PickerViewController.m in Sources */,
 				52A2467123A176BA00A01FF1 /* PsiCashPurchasingAlertViewBuilder.swift in Sources */,
-				8D9E603224366AF2003A46D8 /* StoreDelegate.swift in Sources */,
 				A8408EB1E9DABE35016580A7 /* ImageUtils.m in Sources */,
 				A8408BC29B903A6C0A32F32C /* SkyRegionSelectionViewController.m in Sources */,
-				8D417E9F2411A60900FEE587 /* PsiCashEffects.swift in Sources */,
 				A84088D3FD4B01A7D14CCC53 /* SupportedLanguages.m in Sources */,
 				A8408F99941C9664E3E7C48A /* LanguageSelectionViewController.m in Sources */,
 				A8408A3A478ECD6E3562CDF4 /* CloudsView.m in Sources */,
 				A84081194DA12328ABB5A43E /* UIImageView+Additions.m in Sources */,
 				A840849074861D633B3EB4D1 /* AppEvent.m in Sources */,
 				A84080E9FC63E29F71A79A63 /* RelaySubject.m in Sources */,
-				8D9E602C24364EE6003A46D8 /* TunnelProviderManager.swift in Sources */,
+				8D9D9BD0247C6B910093220E /* HardCodedValues.swift in Sources */,
 				A840803A0733D9FCA5410796 /* ActivityIndicatorRoyalSkyButton.m in Sources */,
-				A84084F47D4EA8D2B91E6609 /* SubscriptionData.m in Sources */,
-				52467FF922CE77A1009AEC6E /* Foundation+Additions.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1871,14 +1887,14 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				EF90D7AC204F22E300228A63 /* RACSignal+Operations2.m in Sources */,
 				EFC2F5CC20226835007B52F9 /* PsiphonConfigReader.m in Sources */,
 				CE6C3F6A24366AE1007A17F0 /* ClientMetadata.m in Sources */,
 				EF90D7B1204F231E00228A63 /* timestamp_tm.c in Sources */,
+				8DD6E7E524591E270041DAC5 /* SubscriptionAuthCheck.m in Sources */,
+				8DD6E7E82459C83B0041DAC5 /* StoredAuthorizations.m in Sources */,
 				EF90D7B3204F232300228A63 /* timestamp_parse.c in Sources */,
 				EF90D7B8204F236400228A63 /* NSError+Convenience.m in Sources */,
 				EF90D7B5204F234700228A63 /* NSDate+PSIDateExtension.m in Sources */,
-				44A0CAEE1FCCCDEC00859DB3 /* SubscriptionVerifierService.m in Sources */,
 				EF652CDA1F352271002AFB48 /* PacketTunnelProvider.m in Sources */,
 				521FD0FF219E0E2600F748EC /* AppStats.m in Sources */,
 				4E0DCB1E1F2855FC00495781 /* PsiphonDataSharedDB.m in Sources */,
@@ -1897,12 +1913,8 @@
 				EF90D7B4204F234100228A63 /* NSDate+Comparator.m in Sources */,
 				9BFECEA225F023F895CC8DA1 /* Authorization.m in Sources */,
 				9BFECF9F760F1A93A8933089 /* Nullity.m in Sources */,
-				9BFEC5C256EBC72398FAE8D8 /* UnionSerialQueue.m in Sources */,
 				521FD100219E0E3800F748EC /* DebugUtils.m in Sources */,
 				A8408F5F45CDBDF42701063E /* Strings.m in Sources */,
-				A84081FD0C1339DE954DAB7D /* RelaySubject.m in Sources */,
-				A84082D8D7BF55D509C4E5C5 /* SubscriptionData.m in Sources */,
-				A84084F82AEF06CC1B8037DD /* MutableSubscriptionData.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1987,7 +1999,11 @@
 				);
 				INFOPLIST_FILE = PsiphonUITests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 11.1;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.psiphon.PsiphonUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
@@ -2012,82 +2028,16 @@
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				INFOPLIST_FILE = PsiphonUITests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 11.1;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.psiphon.PsiphonUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_TARGET_NAME = Psiphon;
-			};
-			name = Release;
-		};
-		52C8F0A6237C8ED600E5F9C0 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CLANG_ANALYZER_NONNULL = YES;
-				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
-				CLANG_ENABLE_OBJC_WEAK = YES;
-				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
-				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
-				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
-				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 148;
-				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = Q6HLNEX92A;
-				DYLIB_COMPATIBILITY_VERSION = 1;
-				DYLIB_CURRENT_VERSION = 148;
-				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				GCC_C_LANGUAGE_STANDARD = gnu11;
-				INFOPLIST_FILE = PsiphonPlayground/Info.plist;
-				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 13.2;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
-				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = ca.psiphon.PsiphonPlayground;
-				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
-				SKIP_INSTALL = YES;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				VERSIONING_SYSTEM = "apple-generic";
-				VERSION_INFO_PREFIX = "";
-			};
-			name = Debug;
-		};
-		52C8F0A7237C8ED600E5F9C0 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CLANG_ANALYZER_NONNULL = YES;
-				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
-				CLANG_ENABLE_OBJC_WEAK = YES;
-				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
-				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
-				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
-				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 148;
-				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = Q6HLNEX92A;
-				DYLIB_COMPATIBILITY_VERSION = 1;
-				DYLIB_CURRENT_VERSION = 148;
-				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				GCC_C_LANGUAGE_STANDARD = gnu11;
-				INFOPLIST_FILE = PsiphonPlayground/Info.plist;
-				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 13.2;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = ca.psiphon.PsiphonPlayground;
-				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
-				SKIP_INSTALL = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				VERSIONING_SYSTEM = "apple-generic";
-				VERSION_INFO_PREFIX = "";
 			};
 			name = Release;
 		};
@@ -2199,7 +2149,8 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 10.2;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
-				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
 			};
@@ -2215,13 +2166,17 @@
 				CODE_SIGN_ENTITLEMENTS = Psiphon/Psiphon.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				CURRENT_PROJECT_VERSION = 148;
+				CURRENT_PROJECT_VERSION = 150;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEFINES_MODULE = NO;
 				DEVELOPMENT_TEAM = Q6HLNEX92A;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = Psiphon/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				OTHER_SWIFT_FLAGS = "$(inherited) -DDEBUG";
 				PRODUCT_BUNDLE_IDENTIFIER = ca.psiphon.Psiphon;
@@ -2232,7 +2187,10 @@
 				SWIFT_OBJC_BRIDGING_HEADER = "Psiphon/Psiphon-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
-				USER_HEADER_SEARCH_PATHS = "\"${PROJECT_DIR}/Pods\"/** ${PROJECT_DIR}/Psiphon/asn1c";
+				USER_HEADER_SEARCH_PATHS = (
+					"\"${PROJECT_DIR}/Pods\"/**",
+					"${PROJECT_DIR}/Psiphon/asn1c",
+				);
 				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = Debug;
@@ -2248,11 +2206,15 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 148;
-				DEVELOPMENT_TEAM = "";
+				DEFINES_MODULE = NO;
+				DEVELOPMENT_TEAM = Q6HLNEX92A;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = Psiphon/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				OTHER_SWIFT_FLAGS = "$(inherited)";
 				PRODUCT_BUNDLE_IDENTIFIER = ca.psiphon.Psiphon;
@@ -2262,14 +2224,17 @@
 				STRIP_BITCODE_FROM_COPIED_FILES = YES;
 				SWIFT_OBJC_BRIDGING_HEADER = "Psiphon/Psiphon-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
-				USER_HEADER_SEARCH_PATHS = "\"${PROJECT_DIR}/Pods\"/** ${PROJECT_DIR}/Psiphon/asn1c";
+				USER_HEADER_SEARCH_PATHS = (
+					"\"${PROJECT_DIR}/Pods\"/**",
+					"${PROJECT_DIR}/Psiphon/asn1c",
+				);
 				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = Release;
 		};
 		CE26FCAE1BBDC85900B83375 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = DD100E19194B9A79F5D7DF55 /* Pods-PsiphonVPN.debug.xcconfig */;
+			baseConfigurationReference = 04965F4B8ED97E34A3E4E661 /* Pods-PsiphonVPN.debug.xcconfig */;
 			buildSettings = {
 				APPLICATION_EXTENSION_API_ONLY = YES;
 				CODE_SIGN_ENTITLEMENTS = PsiphonVPN/PsiphonVPN.entitlements;
@@ -2285,7 +2250,11 @@
 				);
 				INFOPLIST_FILE = PsiphonVPN/Info.plist;
 				LD_NO_PIE = YES;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = ca.psiphon.Psiphon.PsiphonVPN;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
@@ -2299,7 +2268,7 @@
 		};
 		CE26FCAF1BBDC85900B83375 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 6B2646D9B515A2990796D972 /* Pods-PsiphonVPN.release.xcconfig */;
+			baseConfigurationReference = 139D1D60EFF73A79ECF31F19 /* Pods-PsiphonVPN.release.xcconfig */;
 			buildSettings = {
 				APPLICATION_EXTENSION_API_ONLY = YES;
 				CODE_SIGN_ENTITLEMENTS = PsiphonVPN/PsiphonVPN.entitlements;
@@ -2314,7 +2283,11 @@
 				);
 				INFOPLIST_FILE = PsiphonVPN/Info.plist;
 				LD_NO_PIE = YES;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = ca.psiphon.Psiphon.PsiphonVPN;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
@@ -2334,15 +2307,6 @@
 			buildConfigurations = (
 				4E0D88281FA06B2400ADB61E /* Debug */,
 				4E0D88291FA06B2400ADB61E /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		52C8F0A8237C8ED600E5F9C0 /* Build configuration list for PBXNativeTarget "PsiphonPlayground" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				52C8F0A6237C8ED600E5F9C0 /* Debug */,
-				52C8F0A7237C8ED600E5F9C0 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -2375,6 +2339,17 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		8D1F62B9247DBB0D0028AFAF /* Utilities */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Utilities;
+		};
+		8D1F62BB247DBB130028AFAF /* PsiApi */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = PsiApi;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = CE26FC821BBDC7B700B83375 /* Project object */;
 }

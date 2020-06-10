@@ -19,10 +19,13 @@
 
 import Foundation
 import UIKit
-import ReactiveCocoa
 import ReactiveSwift
 import Promises
 import StoreKit
+import PsiApi
+import Utilities
+import AppStoreIAP
+import PsiCashClient
 
 struct PsiCashViewControllerState: Equatable {
     let psiCashBalance: PsiCashBalance
@@ -105,7 +108,7 @@ final class PsiCashViewController: UIViewController {
 
     private let (lifetime, token) = Lifetime.make()
     private let store: Store<PsiCashViewControllerState, PsiCashAction>
-    private let productRequestStore: Store<Unit, ProductRequestAction>
+    private let productRequestStore: Store<Utilities.Unit, ProductRequestAction>
 
     // VC-specific UI state
     @State private var activeTab: Tabs
@@ -126,9 +129,11 @@ final class PsiCashViewController: UIViewController {
 
     init(initialTab: Tabs,
          store: Store<PsiCashViewControllerState, PsiCashAction>,
-         iapStore: Store<Unit, IAPAction>,
-         productRequestStore: Store<Unit, ProductRequestAction>,
-         tunnelConnectedSignal: SignalProducer<TunnelConnectedStatus, Never>) {
+         iapStore: Store<Utilities.Unit, IAPAction>,
+         productRequestStore: Store<Utilities.Unit, ProductRequestAction>,
+         tunnelConnectedSignal: SignalProducer<TunnelConnectedStatus, Never>,
+         feedbackLogger: FeedbackLogger
+    ) {
 
         self.activeTab = initialTab
         self.store = store
@@ -141,15 +146,14 @@ final class PsiCashViewController: UIViewController {
                     case .rewardedVideoAd:
                         store.send(.showRewardedVideoAd)
                     case .product(let product):
-                        iapStore.send(.purchase(.psiCash(product: product)))
+                        iapStore.send(.purchase(product: product))
                     }
                 }),
                 .init(Spinner(style: .whiteLarge),
                       .init(PsiCashMessageViewUntunneled(action: { [unowned store] in
                         store.send(.connectToPsiphonTapped)
-                      }), .init(PsiCashMessageWithRetryView(retryAction: {
-                        productRequestStore.send(.getProductList)
-                      }), PsiCashMessageView())))),
+                      }), .init(PsiCashMessageWithRetryView(),
+                                PsiCashMessageView())))),
             SpeedBoostViewType(
                 SpeedBoostPurchaseTable(purchaseHandler: {
                     store.send(.buyPsiCashProduct(.speedBoost($0)))
@@ -185,11 +189,13 @@ final class PsiCashViewController: UIViewController {
                         break
                         
                     case .customDataNotPresent:
-                        fatalErrorFeedbackLog("Custom data not present")
+                        feedbackLogger.fatalError("Custom data not present")
+                        return
                     }
                 }
                 
-                let purchasingNavState = (observed.state.iap.purchasing,
+                let psiCashIAPPurchase = observed.state.iap.purchasing[.psiCash] ?? nil
+                let purchasingNavState = (psiCashIAPPurchase?.purchasingState,
                                           observed.state.psiCash.purchasing,
                                           self.navigation)
                 
@@ -197,10 +203,10 @@ final class PsiCashViewController: UIViewController {
                 case (.none, .none, _):
                     self.display(screen: .mainScreen)
                     
-                case (.pending(.psiCash(_)), _, .mainScreen):
+                case (.pending(_), _, .mainScreen):
                     self.display(screen: .psiCashPurchaseDialog)
                     
-                case (.pending(.psiCash(_)), _, .psiCashPurchaseDialog):
+                case (.pending(_), _, .psiCashPurchaseDialog):
                     break
                     
                 case (_, .speedBoost(_), .mainScreen):
@@ -217,7 +223,9 @@ final class PsiCashViewController: UIViewController {
                     
                     self.display(screen: .mainScreen)
                     
-                    if case .serverError(.insufficientBalance, nil) = psiCashErrorEvent.error {
+                    if case let .serverError(psiCashStatus, _, nil) = psiCashErrorEvent.error,
+                        PsiCashStatus(rawValue: psiCashStatus)! == .insufficientBalance {
+                        
                         self.display(errorDesc: errorDesc) { () -> UIAlertController in
                             let alertController = UIAlertController(
                                 title: UserStrings.Error_title(),
@@ -244,17 +252,18 @@ final class PsiCashViewController: UIViewController {
                         self.displayBasicAlert(errorDesc: errorDesc)
                     }
                     
-                case (.error(let iapErrorEvent), _, _):
+                case (.completed(let iapErrorEvent), _, _):
                     self.display(screen: .mainScreen)
                     if let errorDesc = errorEventDescription(iapErrorEvent: iapErrorEvent) {
                         self.displayBasicAlert(errorDesc: errorDesc)
                     }
                     
                 default:
-                    fatalErrorFeedbackLog("""
+                    feedbackLogger.fatalError("""
                         Invalid purchase navigation state combination: \
                         '\(String(describing: purchasingNavState))',
                         """)
+                    return
                 }
                 
                 guard observed.state.psiCash.libData.authPackage.hasMinimalTokens else {
@@ -307,13 +316,29 @@ final class PsiCashViewController: UIViewController {
                     case (.notConnected, .addPsiCash),
                          (.connected, .addPsiCash):
                         
-                        if observed.state.iap.unverifiedPsiCashTx != nil {
+                        if let unverifiedPsiCashTx = observed.state.iap.unverifiedPsiCashTx {
                             switch observed.tunneled {
                             case .connected:
-                                self.containerBindable.bind(
-                                    .left(
-                                        .right(.right(.right(.right(.pendingPsiCashVerification)))))
-                                )
+                                
+                                // Set view content based on verification state of the
+                                // unverified PsiCash IAP transaction.
+                                switch unverifiedPsiCashTx.verification {
+                                case .notRequested, .pendingResponse:
+                                    self.containerBindable.bind(
+                                        .left(.right(.right(.right(.right(
+                                            .pendingPsiCashVerification)))))
+                                    )
+                                    
+                                case .requestError(_):
+                                    // Shows failed to verify purchase message with,
+                                    // tap to retry button.
+                                    self.containerBindable.bind(
+                                        .left(.right(.right(.right(.left(
+                                            .failedToVerifyPsiCashIAPPurchase(retryAction: {
+                                                iapStore.send(.checkUnverifiedTransaction)
+                                            })))))))
+                                }
+                                
                             case .notConnected:
                                 // If tunnel is not connected and there is a pending PsiCash IAP,
                                 // then shows the "pending psicash purchase" screen.
@@ -321,7 +346,8 @@ final class PsiCashViewController: UIViewController {
                                     .left(.right(.right(.left(.pendingPsiCashPurchase))))
                                 )
                             case .connecting, .disconnecting:
-                                fatalErrorFeedbackLog("tunnelState at this point should not be 'connecting'")
+                                feedbackLogger.fatalError("tunnelState at this point should not be 'connecting'")
+                                return
                             }
 
                         } else {
@@ -339,7 +365,8 @@ final class PsiCashViewController: UIViewController {
                                 rewardedVideoClearedForSale = true
                                 rewardedVideoSubtitle = UserStrings.Watch_rewarded_video_and_earn()
                             case .connecting, .disconnecting:
-                                fatalErrorFeedbackLog("Unexpected state")
+                                feedbackLogger.fatalError("Unexpected state")
+                                return
                             }
                             
                             let allProducts = observed.state.allProducts(
@@ -365,7 +392,9 @@ final class PsiCashViewController: UIViewController {
                                     // Shows failed to load message with tap to retry button.
                                     self.containerBindable.bind(
                                         .left(.right(.right(.right(.left(
-                                            .failedToLoadProductList))))))
+                                            .failedToLoadProductList(retryAction: {
+                                                productRequestStore.send(.getProductList)
+                                            })))))))
                                 }
                             }
                         }
@@ -435,7 +464,7 @@ final class PsiCashViewController: UIViewController {
     }
 
     required init?(coder: NSCoder) {
-        fatalErrorFeedbackLog("init(coder:) has not been implemented")
+        fatalError("init(coder:) has not been implemented")
     }
 
     override var preferredStatusBarStyle: UIStatusBarStyle {
@@ -606,20 +635,23 @@ extension RewardedVideoState {
 fileprivate func errorEventDescription(
     iapErrorEvent: ErrorEvent<IAPError>
 ) -> ErrorEventDescription<ErrorRepr>? {
+    
     let optionalDescription: String?
     switch iapErrorEvent.error {
+        
     case let .failedToCreatePurchase(reason: reason):
         optionalDescription = reason
-    case let .storeKitError(error: error):
+        
+    case let .storeKitError(error: iapError):
         // Payment cancelled errors are ignored.
-        if case let .left(skError) = error, skError.code == .paymentCancelled {
+        if iapError.paymentCancelled {
             optionalDescription = .none
         } else {
             optionalDescription = """
             \(UserStrings.Purchase_failed())
-            (\(error.localizedDescription))
+            (\(iapError.localizedDescription))
             """
-        }
+        };
     }
     
     guard let description = optionalDescription else {

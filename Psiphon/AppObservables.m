@@ -28,6 +28,8 @@
 
 @property (nonatomic, readwrite) RACReplaySubject<NSNumber *> *vpnStartStopStatus;
 
+@property (nonatomic, readwrite) RACReplaySubject<NSNumber *> *reachabilityStatus;
+
 // Private properties
 @property (nonatomic) RACCompoundDisposable *compoundDisposable;
 
@@ -56,6 +58,7 @@
         _speedBoostExpiry = [RACReplaySubject replaySubjectWithCapacity:1];
         _vpnStatus = [RACReplaySubject replaySubjectWithCapacity:1];
         _vpnStartStopStatus = [RACReplaySubject replaySubjectWithCapacity:1];
+        _reachabilityStatus = [RACReplaySubject replaySubjectWithCapacity:1];
         _compoundDisposable = [RACCompoundDisposable compoundDisposable];
     }
     return self;

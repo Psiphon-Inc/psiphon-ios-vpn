@@ -18,16 +18,24 @@
 */
 
 import Foundation
+import PsiApi
+import PsiCashClient
 
 // Feedback description note:
 // For new fields that are added, the feedback description in FeedbackDescriptions.swift
 // should also be updated.
 
-final class UserDefaultsConfig {
+final class UserDefaultsConfig: PsiCashPersistedValues {
 
     /// Expected PsiCash reward while waiting for a successful PsiCash refresh state.
+    // TODO: Pass in feedback logger as a dependency.
     @JSONUserDefault(.standard, "psicash_expected_reward_v1",
-                     defaultValue: PsiCashAmount.zero)
+                     defaultValue: PsiCashAmount.zero,
+                     errorLogger: FeedbackLogger(PsiphonRotatingFileFeedbackLogHandler()))
     var expectedPsiCashReward: PsiCashAmount
 
+    func setExpectedPsiCashReward(_ value: PsiCashAmount) {
+        self.expectedPsiCashReward = value
+    }
+    
 }

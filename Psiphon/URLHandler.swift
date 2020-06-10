@@ -18,16 +18,17 @@
 */
 
 import Foundation
-import  ReactiveSwift
+import ReactiveSwift
+import PsiApi
 
-struct URLHandler<T: TunnelProviderManager> {
-    let open: (RestrictedURL, T) -> Effect<Bool>
+struct URLHandler {
+    let open: (URL, TunnelConnection) -> Effect<Bool>
 }
 
 extension URLHandler {
-    static func `default`<T: TunnelProviderManager>() -> URLHandler<T> {
-        URLHandler<T>(
-            open: { url, tpm in
+    static func `default`() -> URLHandler {
+        URLHandler(
+            open: { url, tunnelConnection in
                 Effect.deferred { fulfilled in
                     if Debugging.disableURLHandler {
                         fulfilled(true)
@@ -39,13 +40,14 @@ extension URLHandler {
                         /// before the landing page can be opened.
                         /// Tunnel status should be assessed directly (not through observables that might
                         /// introduce some latency), before opening the landing page.
-                        guard let landingPage = url.getValue(tpm.connectionStatus) else {
+                        switch tunnelConnection.connectionStatus() {
+                        case .connection(.connected):
+                            UIApplication.shared.open(url) { success in
+                                fulfilled(success)
+                            }
+                        default:
                             fulfilled(false)
                             return
-                        }
-                        
-                        UIApplication.shared.open(landingPage) { success in
-                            fulfilled(success)
                         }
                     }
                 }

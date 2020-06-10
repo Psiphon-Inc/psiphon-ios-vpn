@@ -32,7 +32,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * After reports whether receiver's time is strictly after the given time.
- * @param ttime The date with which to compare the receiver.
+ * @param time The date with which to compare the receiver.
  * @return TRUE if receiver's time is after provided time, FALSE otherwise.
  */
 - (BOOL)after:(NSDate *)time;

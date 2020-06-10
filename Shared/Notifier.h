@@ -20,7 +20,9 @@
 #import <Foundation/Foundation.h>
 #import <notify.h>
 
+#if !(TARGET_IS_EXTENSION)
 @class RACSignal<__covariant ValueType>;
+#endif
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -35,9 +37,9 @@ extern NotifierMessage const NotifierNetworkConnectivityResolved;
 
 // Messages sent by the container.
 extern NotifierMessage const NotifierStartVPN;
-extern NotifierMessage const NotifierForceSubscriptionCheck;
 extern NotifierMessage const NotifierAppEnteredBackground;
 extern NotifierMessage const NotifierUpdatedNonSubscriptionAuths;
+extern NotifierMessage const NotifierUpdatedSubscriptionAuths;
 
 // Messages allowed only in debug build.
 #if DEBUG

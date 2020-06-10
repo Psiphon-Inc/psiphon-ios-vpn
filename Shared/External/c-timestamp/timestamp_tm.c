@@ -63,11 +63,11 @@ rdn_to_struct_tm(uint32_t rdn, struct tm *tmp) {
 #define RDN_OFFSET INT64_C(62135683200)  /* 1970-01-01T00:00:00 */
 
 static struct tm *
-timestamp_to_tm(const timestamp_t *tsp, struct tm *tmp, const bool local) {
+timestamp_to_tm(const dup_timestamp_t *tsp, struct tm *tmp, const bool local) {
     uint64_t sec;
     uint32_t rdn, sod;
 
-    if (!timestamp_valid(tsp))
+    if (!dup_timestamp_valid(tsp))
         return NULL;
 
     sec = tsp->sec + RDN_OFFSET;
@@ -84,12 +84,12 @@ timestamp_to_tm(const timestamp_t *tsp, struct tm *tmp, const bool local) {
 }
 
 struct tm *
-timestamp_to_tm_local(const timestamp_t *tsp, struct tm *tmp) {
+dup_timestamp_to_tm_local(const dup_timestamp_t *tsp, struct tm *tmp) {
     return timestamp_to_tm(tsp, tmp, true);
 }
 
 struct tm *
-timestamp_to_tm_utc(const timestamp_t *tsp, struct tm *tmp) {
+dup_timestamp_to_tm_utc(const dup_timestamp_t *tsp, struct tm *tmp) {
     return timestamp_to_tm(tsp, tmp, false);
 }
 

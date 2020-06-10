@@ -1,0 +1,160 @@
+/*
+* Copyright (c) 2020, Psiphon Inc.
+* All rights reserved.
+*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*
+*/
+
+import Foundation
+import ReactiveSwift
+import PsiApi
+
+public struct SubscriptionValidationRequest: Codable {
+    public let originalTransactionID: OriginalTransactionID
+    let receiptData: String
+    
+    public init(originalTransactionID: OriginalTransactionID, receipt: ReceiptData) {
+        self.originalTransactionID = originalTransactionID
+        self.receiptData = receipt.data.base64EncodedString()
+    }
+    
+    private enum CodingKeys: String, CodingKey {
+        case originalTransactionID = "original_transaction_id"
+        case receiptData = "receipt_data"
+    }
+}
+
+
+public struct SubscriptionValidationResponse: RetriableHTTPResponse {
+    
+    public enum ResponseError: HashableError {
+        case failedRequest(SystemError)
+        case badRequest
+        case otherErrorStatusCode(HTTPStatusCode)
+        case responseParseError(SystemError)
+    }
+    
+    // 200 OK response type
+    public struct SuccessResult: Equatable, Codable {
+        let requestDate: Date
+        public let originalTransactionID: OriginalTransactionID
+        public let signedAuthorization: PsiApi.SignedData<SignedAuthorization>?
+        public let errorStatus: ErrorStatus
+        public let errorDescription: String
+        
+        public enum ErrorStatus: Int, Codable, CaseIterable {
+            case noError = 0
+            case transactionExpired = 1
+            // The transaction has been cancelled by Apple customer support
+            case transactionCancelled = 2
+        }
+        
+        private enum CodingKeys: String, CodingKey {
+            case requestDate = "request_date"
+            case originalTransactionID = "original_transaction_id"
+            case signedAuthorization = "signed_authorization"
+            case errorStatus = "error_status"
+            case errorDescription = "error_description"
+        }
+
+        public init(requestDate: Date, originalTransactionID: OriginalTransactionID,
+                    signedAuthorization: PsiApi.SignedData<SignedAuthorization>?,
+                    errorStatus: ErrorStatus, errorDescription: String) {
+
+            self.requestDate = requestDate
+            self.originalTransactionID = originalTransactionID
+            self.signedAuthorization = signedAuthorization
+            self.errorStatus = errorStatus
+            self.errorDescription = errorDescription
+        }
+        
+        public init(from decoder: Decoder) throws {
+            let values = try decoder.container(keyedBy: CodingKeys.self)
+            requestDate = try values.decode(Date.self, forKey: .requestDate)
+            originalTransactionID = try values.decode(OriginalTransactionID.self,
+                                                      forKey: .originalTransactionID)
+            errorStatus = try values.decode(ErrorStatus.self, forKey: .errorStatus)
+            errorDescription = try values.decode(String.self, forKey: .errorDescription)
+            
+            switch errorStatus {
+            case .noError:
+                let base64Auth = try values.decode(String.self, forKey: .signedAuthorization)
+                guard let base64Data = Data(base64Encoded: base64Auth) else {
+                    fatalError(
+                        "Failed to create data from base64 encoded string: '\(base64Auth)'"
+                    )
+                }
+                let decoder = JSONDecoder.makeRfc3339Decoder()
+                let decodedAuth = try decoder.decode(SignedAuthorization.self, from: base64Data)
+                signedAuthorization = SignedData(rawData: base64Auth, decoded: decodedAuth)
+            default:
+                signedAuthorization = nil
+            }
+        }
+    }
+
+    public let result: Result<SuccessResult, ErrorEvent<ResponseError>>
+    private let urlSessionResult: URLSessionResult
+
+    public init(urlSessionResult: URLSessionResult) {
+        self.urlSessionResult = urlSessionResult
+
+        // TODO: The mapping of types of `urlSessionResult` to `result` can be generalized.
+        switch urlSessionResult {
+        case let .success(r):
+            switch r.metadata.statusCode {
+            case .ok:
+                do {
+                    let decoder = JSONDecoder.makeRfc3339Decoder()
+                    let decodedBody = try decoder.decode(SuccessResult.self, from: r.data)
+                    self.result = .success(decodedBody)
+                } catch {
+                    self.result = .failure(ErrorEvent(.responseParseError(SystemError(error))))
+                }
+            case .badRequest:
+                self.result = .failure(ErrorEvent(.badRequest))
+            default:
+                self.result = .failure(ErrorEvent(
+                    .otherErrorStatusCode(r.metadata.statusCode)))
+            }
+        case let .failure(httpRequestError):
+            self.result = .failure(httpRequestError.errorEvent.map { .failedRequest($0) })
+
+        }
+    }
+
+    public static func unpackRetriableResultError(_ result: ResultType)
+        -> (result: ResultType, retryDueToError: FailureEvent?)
+    {
+        switch result {
+        case .success(_):
+            return (result: result, retryDueToError: .none)
+            
+        case .failure(let errorEvent):
+            switch errorEvent.error {
+            case .otherErrorStatusCode(.internalServerError),
+                 .otherErrorStatusCode(.serviceUnavailable),
+                 .failedRequest(_),
+                 .responseParseError(_):
+                return (result: result, retryDueToError: errorEvent)
+                
+            case .badRequest,
+                 .otherErrorStatusCode:
+                return (result: result, retryDueToError: .none)
+            }
+        }
+    }
+
+}
