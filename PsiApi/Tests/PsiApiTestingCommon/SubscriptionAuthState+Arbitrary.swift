@@ -189,9 +189,9 @@ extension SubscriptionAuthStateAction: Arbitrary {
             ),
             Gen.zip(Result<SubscriptionAuthState.PurchaseAuthStateDict, SystemErrorEvent>.arbitrary,
                     StoredDataUpdateType?.arbitrary).map(
-                        SubscriptionAuthStateAction.didLoadStoredPurchaseAuthState
+                        SubscriptionAuthStateAction._didLoadStoredPurchaseAuthState
             ),
-            Gen.pure(SubscriptionAuthStateAction.requestAuthorizationForPurchases),
+            Gen.pure(SubscriptionAuthStateAction._requestAuthorizationForPurchases),
             // Omitted internal actions:
             //SubscriptionAuthStateAction._localDataUpdateResult(...),
             //SubscriptionAuthStateAction._authorizationRequestResult(...)
