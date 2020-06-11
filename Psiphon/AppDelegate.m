@@ -151,6 +151,7 @@ willFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
 
     [[UIApplication sharedApplication] ignoreSnapshotOnNextApplicationLaunch];
+    [SwiftDelegate.bridge applicationDidEnterBackground:application];
     [[Notifier sharedInstance] post:NotifierAppEnteredBackground];
 }
 
