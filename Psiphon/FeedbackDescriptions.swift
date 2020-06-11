@@ -119,44 +119,49 @@ extension PsiphonDataSharedDB: CustomFieldFeedbackDescription {
     
     public var feedbackFields: [String: CustomStringConvertible] {
         
-        [EgressRegionsStringArrayKey: String(describing: self.emittedEgressRegions()),
-         
-         ClientRegionStringKey:  String(describing: self.emittedClientRegion()),
-         
-         TunnelStartTimeStringKey: String(describing: self.getContainerTunnelStartTime()),
-         
-         TunnelSponsorIDStringKey:  String(describing: self.getCurrentSponsorId()),
-         
-         ServerTimestampStringKey: String(describing: self.getServerTimestamp()),
-         
-         ContainerAuthorizationSetKey: self.getNonSecretNonSubscriptionEncodedAuthorizations(),
-         
-         ExtensionIsZombieBoolKey: self.getExtensionIsZombie(),
-         
-         ContainerSubscriptionAuthorizationsDictKey: self.getNonSecretSubscriptionAuths(),
-         
-         ExtensionRejectedSubscriptionAuthorizationIDsArrayKey:
-            String(describing: self.getRejectedSubscriptionAuthorizationIDs()),
-         
-         ExtensionRejectedSubscriptionAuthorizationIDsWriteSeqIntKey:
-            self.getExtensionRejectedSubscriptionAuthIdWriteSequenceNumber(),
-         
-         ContainerRejectedSubscriptionAuthorizationIDsReadAtLeastUpToSeqIntKey:
-            self.getContainerRejectedSubscriptionAuthIdReadAtLeastUpToSequenceNumber(),
-         
-         ContainerForegroundStateBoolKey: self.getAppForegroundState(),
-         
-         ContainerTunnelIntentStatusIntKey:
-            TunnelStartStopIntent.description(integerCode: self.getContainerTunnelIntentStatus()),
-         
-         SharedDataExtensionCrashedBeforeStopBoolKey: self.getExtensionJetsammedBeforeStopFlag(),
-         
-         SharedDataExtensionJetsamCounterIntegerKey: self.getJetsamCounter(),
-         
-         DebugMemoryProfileBoolKey: self.getDebugMemoryProfiler(),
-         
-         DebugPsiphonConnectionStateStringKey: self.getDebugPsiphonConnectionState()
+        var fields: [String: CustomStringConvertible] = [
+            
+            EgressRegionsStringArrayKey: String(describing: self.emittedEgressRegions()),
+            
+            ClientRegionStringKey:  String(describing: self.emittedClientRegion()),
+            
+            TunnelStartTimeStringKey: String(describing: self.getContainerTunnelStartTime()),
+            
+            TunnelSponsorIDStringKey:  String(describing: self.getCurrentSponsorId()),
+            
+            ServerTimestampStringKey: String(describing: self.getServerTimestamp()),
+            
+            ContainerAuthorizationSetKey: self.getNonSecretNonSubscriptionEncodedAuthorizations(),
+            
+            ExtensionIsZombieBoolKey: self.getExtensionIsZombie(),
+            
+            ContainerSubscriptionAuthorizationsDictKey: self.getNonSecretSubscriptionAuths(),
+            
+            ExtensionRejectedSubscriptionAuthorizationIDsArrayKey:
+                String(describing: self.getRejectedSubscriptionAuthorizationIDs()),
+            
+            ExtensionRejectedSubscriptionAuthorizationIDsWriteSeqIntKey:
+                self.getExtensionRejectedSubscriptionAuthIdWriteSequenceNumber(),
+            
+            ContainerRejectedSubscriptionAuthorizationIDsReadAtLeastUpToSeqIntKey:
+                self.getContainerRejectedSubscriptionAuthIdReadAtLeastUpToSequenceNumber(),
+            
+            ContainerForegroundStateBoolKey: self.getAppForegroundState(),
+            
+            ContainerTunnelIntentStatusIntKey: TunnelStartStopIntent.description(integerCode:
+                self.getContainerTunnelIntentStatus()),
+            
+            SharedDataExtensionCrashedBeforeStopBoolKey: self.getExtensionJetsammedBeforeStopFlag(),
+            
+            SharedDataExtensionJetsamCounterIntegerKey: self.getJetsamCounter()
         ]
+        
+        #if DEBUG
+        fields[DebugMemoryProfileBoolKey] = String(describing: self.getDebugMemoryProfiler())
+        fields[DebugPsiphonConnectionStateStringKey] = self.getDebugPsiphonConnectionState()
+        #endif
+        
+        return fields
     }
     
     open override var description: String {
