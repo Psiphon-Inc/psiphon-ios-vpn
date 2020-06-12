@@ -86,6 +86,7 @@ func appDelegateReducer(
         SupportedAppStoreProducts.fromPlists(types: [.subscription, .psiCash])
     
     private var (lifetime, token) = Lifetime.make()
+    private var objcBridge: ObjCBridgeDelegate!
     private var store: Store<AppState, AppAction>!
     private var psiCashLib: PsiCash!
     private var environmentCleanup: (() -> Void)?
@@ -129,6 +130,8 @@ extension SwiftDelegate: SwiftBridgeDelegate {
     @objc func applicationDidFinishLaunching(
         _ application: UIApplication, objcBridge: ObjCBridgeDelegate
     ) {
+        self.objcBridge = objcBridge
+        
         self.psiCashLib = PsiCash.make(flags: Debugging)
         
         self.store = Store(
@@ -187,6 +190,25 @@ extension SwiftDelegate: SwiftBridgeDelegate {
             .skipRepeats()
             .startWithValues { [unowned objcBridge] in
                 objcBridge.onSubscriptionStatus(BridgedUserSubscription.from(state: $0))
+        }
+        
+        // Forwards subscription auth status to ObjCBridgeDelegate.
+        self.lifetime += SignalProducer.combineLatest(
+            self.store.$value.signalProducer.map(\.subscriptionAuthState).skipRepeats(),
+            self.store.$value.signalProducer.map(\.subscription.status).skipRepeats(),
+            self.store.$value.signalProducer
+                .map(\.vpnState.value.providerVPNStatus.tunneled).skipRepeats()
+            ).map {
+                SubscriptionBarView.SubscriptionBarState.make(
+                    authState: $0.0, subscriptionStatus: $0.1, tunnelStatus: $0.2
+                )
+            }
+            .skipRepeats()
+            .startWithValues { [unowned objcBridge] newValue in
+                
+                objcBridge.onSubscriptionBarViewStatusUpdate(
+                    ObjcSubscriptionBarViewState(swiftState: newValue)
+                )
         }
         
         // Forwards VPN status changes to ObjCBridgeDelegate.
@@ -319,11 +341,13 @@ extension SwiftDelegate: SwiftBridgeDelegate {
 
     }
     
+    @objc func applicationDidBecomeActive(_ application: UIApplication) {
+        self.sharedDB.setAppForegroundState(true)
+    }
+    
     @objc func applicationWillEnterForeground(_ application: UIApplication) {
         self.store.send(vpnAction: .syncWithProvider(reason: .appEnteredForeground))
         self.store.send(.psiCash(.refreshPsiCashState))
-        
-        self.sharedDB.setAppForegroundState(true)
     }
     
     @objc func applicationDidEnterBackground(_ application: UIApplication) {
@@ -334,9 +358,24 @@ extension SwiftDelegate: SwiftBridgeDelegate {
         self.environmentCleanup?()
     }
     
-    @objc func applicationDidBecomeActive(_ application: UIApplication) {}
+    @objc func makeSubscriptionBarView() -> SubscriptionBarView {
+        SubscriptionBarView { [unowned objcBridge, store] state in
+            switch state.authState {
+            case .notSubscribed, .subscribedWithAuth:
+                objcBridge?.presentSubscriptionIAPViewController()
+            
+            case .failedRetry:
+                store?.send(.appReceipt(.localReceiptRefresh))
+        
+            case .pending:
+                if state.tunnelStatus == .notConnected {
+                    objcBridge?.startStopVPNWithInterstitial()
+                }
+            }
+        }
+    }
     
-    @objc func createPsiCashViewController(
+    @objc func makePsiCashViewController(
         _ initialTab: PsiCashViewController.Tabs
     ) -> UIViewController? {
         PsiCashViewController(

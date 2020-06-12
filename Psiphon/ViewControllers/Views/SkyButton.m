@@ -23,8 +23,8 @@
 #import "Logging.h"
 
 @implementation SkyButton {
-    NSString *normalTitle;
-    NSString *disabledTitle;
+    NSString *_Nonnull normalTitle;
+    NSString *_Nonnull disabledTitle;
 }
 
 @synthesize titleLabel = _titleLabel;
@@ -32,6 +32,8 @@
 - (instancetype)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     if (self) {
+        normalTitle = @"";
+        disabledTitle = @"";
         _titleLabel = [[UILabel alloc] init];
         _fontSize = 15.f;
         _shadow = FALSE;
@@ -172,29 +174,35 @@
 
 - (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(nullable UIEvent *)event {
     [super touchesBegan:touches withEvent:event];
-    [UIView animateWithDuration:0.1
-                     animations:^{
-                        self.transform = CGAffineTransformMakeScale(0.98f, 0.98f);
-                        self.alpha = 0.8;
-                     }];
+    if (self.isEnabled) {
+        [UIView animateWithDuration:0.1
+                         animations:^{
+            self.transform = CGAffineTransformMakeScale(0.98f, 0.98f);
+            self.alpha = 0.8;
+        }];
+    }
 }
 
 - (void)touchesCancelled:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
     [super touchesCancelled:touches withEvent:event];
-    [UIView animateWithDuration:0.1
-                     animations:^{
-                         self.transform = CGAffineTransformMakeScale(1.f, 1.f);
-                         self.alpha = 1.0;
-                     }];
+    if (self.isEnabled) {
+        [UIView animateWithDuration:0.1
+                         animations:^{
+            self.transform = CGAffineTransformMakeScale(1.f, 1.f);
+            self.alpha = 1.0;
+        }];
+    }
 }
 
 - (void)touchesEnded:(NSSet<UITouch *> *)touches withEvent:(nullable UIEvent *)event {
     [super touchesEnded:touches withEvent:event];
-    [UIView animateWithDuration:0.1
-                     animations:^{
-                         self.transform = CGAffineTransformMakeScale(1.f, 1.f);
-                         self.alpha = 1.0;
-                     }];
+    if (self.isEnabled) {
+        [UIView animateWithDuration:0.1
+                         animations:^{
+            self.transform = CGAffineTransformMakeScale(1.f, 1.f);
+            self.alpha = 1.0;
+        }];
+    }
 }
 
 @end

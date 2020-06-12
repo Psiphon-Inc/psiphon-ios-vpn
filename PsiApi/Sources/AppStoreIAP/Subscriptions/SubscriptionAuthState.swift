@@ -55,10 +55,10 @@ public struct SubscriptionPurchaseAuthState: Hashable, Codable {
     }
     
     /// Subscription purchase contained in the app receipt.
-    let purchase: SubscriptionIAPPurchase
+    public let purchase: SubscriptionIAPPurchase
     
     /// State of authorization for the `purchase`.
-    var signedAuthorization: AuthorizationState
+    public var signedAuthorization: AuthorizationState
 
 }
 
@@ -140,7 +140,7 @@ public struct SubscriptionAuthState: Equatable {
     /// `nil` represents that subscription auths have not been restored from previously stored value.
     /// This value is in  sync with stored value in  `PsiphonDataSharedDBContainer`
     /// with key `subscription_authorizations_dict`.
-    var purchasesAuthState: PurchaseAuthStateDict? = .none
+    public var purchasesAuthState: PurchaseAuthStateDict? = .none
 }
 
 public struct SubscriptionReducerState: Equatable {
@@ -544,6 +544,15 @@ public func subscriptionAuthStateReducer(
                 if case .badRequest = failureEvent.error {
                     let stateUpdateEffect = state.subscription.setAuthorizationState(
                         newValue: .requestRejected(.badRequestError),
+                        forOriginalTransactionID: purchase.originalTransactionID,
+                        environment: environment
+                    )
+                    
+                    effects.append(stateUpdateEffect.mapNever())
+                    
+                } else {
+                    let stateUpdateEffect = state.subscription.setAuthorizationState(
+                        newValue: .requestError(failureEvent.eraseToRepr()),
                         forOriginalTransactionID: purchase.originalTransactionID,
                         environment: environment
                     )

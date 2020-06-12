@@ -3,6 +3,9 @@
 /* Accept button title */
 "ACCEPT_BUTTON_TITLE" = "Accept";
 
+/* After a user successfully purchases a subscription, it needs to be activated. A label with this title is presented to the user indicating the the subscription is in the process of getting activated. Include the ellipses or equivalent symbol if it makes sense in the translated language. */
+"ACTIVATE_SUBSCRIPTION_BUTTON_TITILE" = "Activating...";
+
 /* Title of the section in the subscription dialog that shows currently active subscription information. */
 "ACTIVE_SUBSCRIPTION_SECTION_TITLE" = "You're subscribed!";
 
@@ -35,6 +38,9 @@
 
 /* Main text in the 'Upstream Proxy Error' dialog box. This is shown when the user has directly altered these settings, and those settings are (probably) erroneous. DO NOT translate 'Psiphon'. */
 "CHECK_UPSTREAM_PROXY_SETTING" = "You have configured Psiphon to use an upstream proxy.\nHowever, we seem to be unable to connect to a Psiphon server through that proxy.\nPlease fix the settings and try again.";
+
+/* Action button title, that when pressed connects the user to Psiphon network. */
+"CONNECT_BUTTON_TITLE" = "Connect";
 
 /* Text shown to the user telling them to connect to 'Psiphon', to finish their unfinished transaction. Do not translate or transliterate 'Psiphon'. */
 "CONNECT_TO_FINISH_PSICASH_TRANSACTION" = "Please connect to Psiphon to finish your transaction";
@@ -270,6 +276,9 @@
 /* Title of button which triggers an attempt to restore the user's existing subscription */
 "RESTORE_SUBSCRIPTION_BUTTON_TITLE" = "Restore my subscription";
 
+/* Action button title, that when pressed retries the recently failed operation. */
+"RETRY_BUTTON_TITLE" = "Retry";
+
 /* Shown in a pop-up alert if user's rewarded video ad failed to load. */
 "REWARDED_VIDEO_LOAD_FAILED" = "Failed to load rewarded video. Please try again later.";
 
@@ -287,9 +296,6 @@
 
 /* Subscriptions item title in the app settings when user has an active subscription. Clicking this item opens subscriptions view */
 "SETTINGS_SUBSCRIPTION_ACTIVE" = "Subscriptions";
-
-/* Subscriptions item title in the app settings when user does not have an active subscription. Clicking this item opens subscriptions view. If “Premium” doesn't easily translate, please choose a term that conveys “Pro” or “Extra” or “Better” or “Elite”. */
-"SETTINGS_SUBSCRIPTION_NOT_ACTIVE" = "Go premium!";
 
 /* Do not transliterate 'Speed Boost'. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
 "SPEED_BOOST" = "Speed Boost";
@@ -310,13 +316,25 @@
 "SUBSCRIPTION_BAR_FOOTER_TEXT_NOT_SUBSCRIBED_2" = "Remove ads • Max speed";
 
 /* Footer text beside button that opens paid subscriptions manager UI. At this point the user is subscribed. If “Premium” doesn't easily translate, please choose a term that conveys “Pro” or “Extra” or “Better” or “Elite”. Please keep this text concise as the width of the text box is restricted in size. */
-"SUBSCRIPTION_BAR_FOOTER_TEXT_SUBSCRIBED" = "Premium - Max Speed";
+"SUBSCRIPTION_BAR_FOOTER_TEXT_SUBSCRIBED_V2" = "Premium • Max Speed";
 
 /* Header text beside button that opens paid subscriptions manager UI. At this point the user is not subscribed. If “Premium” doesn't easily translate, please choose a term that conveys “Pro” or “Extra” or “Better” or “Elite”. Please keep this text concise as the width of the text box is restricted in size. */
 "SUBSCRIPTION_BAR_HEADER_TEXT_NOT_SUBSCRIBED" = "GET PREMIUM";
 
 /* Header text beside button that opens paid subscriptions manager UI. At this point the user is subscribed. Please keep this text concise as the width of the text box is restricted in size. */
 "SUBSCRIPTION_BAR_HEADER_TEXT_SUBSCRIBED" = "SUBSCRIPTION";
+
+/* After a user successfully purchases a subscription, it needs to be activated. This title is displayed on the main screen indicating that the subscription is pending activation. */
+"SUBSCRIPTION_BAR_HEADER_TEXT_SUBSCRIPTION_PENDING" = "SUBSCRIPTION PENDING";
+
+/* After a user successfully purchases a subscription, it needs to be activated. Label with this text displayed on the main screen, indicating that the user needs to connect to Psiphon in order to activate the subscription. */
+"SUBSCRIPTION_CONNECT_TO_ACTIVATE" = "Connect to activate";
+
+/* After a user successfully purchases a subscription, it needs to be activated. Label with this text is displayed on the main screen, indicating that activation of user's subscription failed. */
+"SUBSCRIPTION_FAILED_TO_ACTIVATE" = "Failed to activate";
+
+/* After a user successfully purchases a subscription, it needs to be activated. Label with this text is displayed on the main screen, indicating to the user that the subscription is in the process of getting activated */
+"SUBSCRIPTION_PLEASE_WAIT_WHILE_ACTIVATING" = "Please wait while activating";
 
 /* Title of the dialog for available in-app paid subscriptions */
 "SUBSCRIPTIONS" = "Subscriptions";

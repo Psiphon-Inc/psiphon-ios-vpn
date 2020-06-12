@@ -173,4 +173,24 @@
     return [UIColor colorWithRed:60.0f / 255.0f green:66.0f / 255.0f blue:106.0f / 255.0f alpha:1.0f];
 }
 
++ (UIColor * _Nonnull)salmonColor {
+    return [UIColor colorWithRed:1.0f green:122.0f / 255.0f blue:122.0f / 255.0f alpha:1.0f];
+}
+
++ (UIColor * _Nonnull)brightOrangeColor {
+    return [UIColor colorWithRed:1.0f green:91.0f / 255.0f blue:0.0f alpha:1.0f];
+}
+
++ (UIColor * _Nonnull)lightBluishGreenColor {
+    return [UIColor colorWithRed:118.0f / 255.0f green:1.0f blue:150.0f / 255.0f alpha:1.0f];
+}
+
++ (UIColor * _Nonnull)algaeGreenColor {
+    return [UIColor colorWithRed:41.0f / 255.0f green:219.0f / 255.0f blue:110.0f / 255.0f alpha:1.0f];
+}
+
++ (UIColor * _Nonnull)greyishColor {
+    return [UIColor colorWithWhite:180.0f / 255.0f alpha:1.0f];
+}
+
 @end

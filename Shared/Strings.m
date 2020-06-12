@@ -115,14 +115,6 @@
     return NSLocalizedStringWithDefaultValue(@"ALERT_TITLE_OPERATION_FAILED", nil, [NSBundle mainBundle], @"Operation Failed", @"Alert dialog title.");
 }
 
-+ (NSString *)manageSubscriptionButtonTitle {
-    return NSLocalizedStringWithDefaultValue(@"SUBSCRIPTIONS_MANAGE_SUBSCRIPTION_BUTTON", nil, [NSBundle mainBundle], @"Manage", @"Label on a button which, when pressed, opens a screen where the user can manage their currently active subscription.");
-}
-
-+ (NSString *)subscribeButtonTitle {
-    return NSLocalizedStringWithDefaultValue(@"SUBSCRIPTIONS_SUBSCRIBE_BUTTON", nil, [NSBundle mainBundle], @"Subscribe", @"Label on a button which, when pressed, opens a screen where the user can choose from multiple subscription plans.");
-}
-
 + (NSString *)connectViaTitle {
     return  NSLocalizedStringWithDefaultValue(@"CONNECT_VIA", nil, [NSBundle mainBundle], @"CONNECT VIA", @"Title for screen that allows user to select their desired server region. Use all capital letters in the translation only if it makes sense.");
 }
