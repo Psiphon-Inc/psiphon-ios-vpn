@@ -375,6 +375,10 @@ typedef NS_ENUM(NSInteger, VPNIntent) {
     [AppObservables.shared.subscriptionStatus sendNext:status];
 }
 
+- (void)onSubscriptionBarViewStatusUpdate:(ObjcSubscriptionBarViewState *)status {
+    [AppObservables.shared.subscriptionBarStatus sendNext: status];
+}
+
 - (void)onVPNStatusDidChange:(NEVPNStatus)status {
     [AppObservables.shared.vpnStatus sendNext:@(status)];
 }
@@ -550,6 +554,18 @@ typedef NS_ENUM(NSInteger, VPNIntent) {
             strongSelf->rewardedVideoAdDisposable = nil;
         }
     }];
+}
+
+- (void)presentSubscriptionIAPViewController {
+    IAPViewController* iapViewController = [[IAPViewController alloc] init];
+    iapViewController.openedFromSettings = FALSE;
+    
+    UINavigationController* navCtrl = [[UINavigationController alloc]
+                                       initWithRootViewController:iapViewController];
+    
+    [[AppDelegate getTopMostViewController] presentViewController:navCtrl
+                                                         animated:TRUE
+                                                       completion:nil];
 }
 
 @end

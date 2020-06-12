@@ -20,6 +20,8 @@
 //// Emits type ObjcUserSubscription
 @property (nonatomic, readwrite) RACReplaySubject<BridgedUserSubscription *> *subscriptionStatus;
 
+@property (nonatomic, readwrite) RACReplaySubject<ObjcSubscriptionBarViewState *> *subscriptionBarStatus;
+
 @property (nonatomic, readwrite) RACReplaySubject<BridgedBalanceViewBindingType *> *psiCashBalance;
 
 @property (nonatomic, readwrite) RACReplaySubject<NSDate *> *speedBoostExpiry;
@@ -54,6 +56,7 @@
         reachability = [Reachability reachabilityForInternetConnection];
 
         _subscriptionStatus = [RACReplaySubject replaySubjectWithCapacity:1];
+        _subscriptionBarStatus = [RACReplaySubject replaySubjectWithCapacity:1];
         _psiCashBalance = [RACReplaySubject replaySubjectWithCapacity:1];
         _speedBoostExpiry = [RACReplaySubject replaySubjectWithCapacity:1];
         _vpnStatus = [RACReplaySubject replaySubjectWithCapacity:1];

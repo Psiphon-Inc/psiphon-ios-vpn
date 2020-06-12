@@ -20,7 +20,7 @@
 import Foundation
 
 /// A type that can be binded to to change it's state.
-public protocol Bindable {
+protocol Bindable {
     associatedtype BindingType: Equatable
     typealias Binding = (BindingType) -> Void
 

@@ -132,6 +132,7 @@
 		8D7789CA247499110038BFDA /* Reachability+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D7789C9247499110038BFDA /* Reachability+Additions.swift */; };
 		8D7E9B9D2425DF42006F3A2F /* AnimatedUIView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D7E9B9C2425DF42006F3A2F /* AnimatedUIView.swift */; };
 		8D7E9B9F2425E053006F3A2F /* Animations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D7E9B9E2425E053006F3A2F /* Animations.swift */; };
+		8D92A33124928E4900F75254 /* SubscriptionBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D92A33024928E4900F75254 /* SubscriptionBarView.swift */; };
 		8D9D9BCC247C6A9D0093220E /* PsiphonRotatingFileFeedbackLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D7789CF2474D53D0038BFDA /* PsiphonRotatingFileFeedbackLogger.swift */; };
 		8D9D9BD0247C6B910093220E /* HardCodedValues.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D9D9BCF247C6B910093220E /* HardCodedValues.swift */; };
 		8D9E602A24364ED2003A46D8 /* VPNStateReducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D9E602924364ED2003A46D8 /* VPNStateReducer.swift */; };
@@ -174,7 +175,6 @@
 		A840854A7ACA14A7D891EC16 /* OnboardingScrollableView.m in Sources */ = {isa = PBXBuildFile; fileRef = A8408CEB0E34BC897F3FA7D6 /* OnboardingScrollableView.m */; };
 		A8408692D005E8599267522E /* UIView+Additions.m in Sources */ = {isa = PBXBuildFile; fileRef = A84084C5C538AC8171021D2C /* UIView+Additions.m */; };
 		A84086D3F4BD2D551CA67611 /* AlertDialogs.m in Sources */ = {isa = PBXBuildFile; fileRef = A840841151FC43C5E1658677 /* AlertDialogs.m */; };
-		A84087459E9F796B1954D049 /* SubscriptionsBar.m in Sources */ = {isa = PBXBuildFile; fileRef = A84081C4600325A12F9C3413 /* SubscriptionsBar.m */; };
 		A840875B190F7666A1BD98E5 /* UIView+AutoLayoutViewGroup.m in Sources */ = {isa = PBXBuildFile; fileRef = A840867F8062E477F0B355DD /* UIView+AutoLayoutViewGroup.m */; };
 		A84087AFA5806D689C3BF6D2 /* PickerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A8408390A766C7C2C246797C /* PickerViewController.m */; };
 		A84088BD3CFC8C511F22182C /* RoyalSkyButton.m in Sources */ = {isa = PBXBuildFile; fileRef = A8408F08BFF80A05CF46C00A /* RoyalSkyButton.m */; };
@@ -534,6 +534,7 @@
 		8D7789CF2474D53D0038BFDA /* PsiphonRotatingFileFeedbackLogger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PsiphonRotatingFileFeedbackLogger.swift; sourceTree = "<group>"; };
 		8D7E9B9C2425DF42006F3A2F /* AnimatedUIView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimatedUIView.swift; sourceTree = "<group>"; };
 		8D7E9B9E2425E053006F3A2F /* Animations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Animations.swift; sourceTree = "<group>"; };
+		8D92A33024928E4900F75254 /* SubscriptionBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionBarView.swift; sourceTree = "<group>"; };
 		8D9D9BCF247C6B910093220E /* HardCodedValues.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HardCodedValues.swift; sourceTree = "<group>"; };
 		8D9D9C29247C77AB0093220E /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Platforms/iPhoneOS.platform/Developer/Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
 		8D9E602924364ED2003A46D8 /* VPNStateReducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VPNStateReducer.swift; sourceTree = "<group>"; };
@@ -588,7 +589,6 @@
 		A840812E38D27BF4328678E0 /* OnboardingViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OnboardingViewController.h; sourceTree = "<group>"; };
 		A840816C0C9B0658776A8B91 /* RegionSelectionButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RegionSelectionButton.h; sourceTree = "<group>"; };
 		A84081B66B02DF8283448409 /* AutoLayoutProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AutoLayoutProtocol.h; sourceTree = "<group>"; };
-		A84081C4600325A12F9C3413 /* SubscriptionsBar.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SubscriptionsBar.m; sourceTree = "<group>"; };
 		A84081E39C751846A6009BEC /* CloudsView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CloudsView.m; sourceTree = "<group>"; };
 		A840830557814D4234CFD86D /* ImageUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ImageUtils.h; sourceTree = "<group>"; };
 		A84083119A599C815D2D80F5 /* SkyButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SkyButton.h; sourceTree = "<group>"; };
@@ -622,7 +622,6 @@
 		A840896A2A9959280DAE2DA1 /* LanguageSelectionViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LanguageSelectionViewController.m; sourceTree = "<group>"; };
 		A84089CB9E8B0DF1D88D0500 /* AppUpgrade.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppUpgrade.m; sourceTree = "<group>"; };
 		A8408A0C4220563DA1FE3048 /* ImageUtils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ImageUtils.m; sourceTree = "<group>"; };
-		A8408A83F0E1DDE55E30E406 /* SubscriptionsBar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SubscriptionsBar.h; sourceTree = "<group>"; };
 		A8408AAD421C096147E3FC8B /* Strings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Strings.h; sourceTree = "<group>"; };
 		A8408ABFCA9BBDD281E8A4FD /* SkyRegionSelectionViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SkyRegionSelectionViewController.h; sourceTree = "<group>"; };
 		A8408AD78B4EB15E3C8F33B2 /* AppVersionNumberView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppVersionNumberView.h; sourceTree = "<group>"; };
@@ -996,6 +995,7 @@
 				8D7E9B9E2425E053006F3A2F /* Animations.swift */,
 				8DB6C637242A4D06005E2F4C /* DuskButton.swift */,
 				8D255E2C24620E2900FD5D1C /* NoConnectionBannerView.swift */,
+				8D92A33024928E4900F75254 /* SubscriptionBarView.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -1095,8 +1095,6 @@
 				A84087FA4B1BC2C725D900D9 /* PsiphonProgressView.m */,
 				A840816C0C9B0658776A8B91 /* RegionSelectionButton.h */,
 				A8408C84138113DE79F0DCD0 /* RegionSelectionButton.m */,
-				A8408A83F0E1DDE55E30E406 /* SubscriptionsBar.h */,
-				A84081C4600325A12F9C3413 /* SubscriptionsBar.m */,
 				A84087D31D8D9A1FD30337E4 /* SubscriptionStatusView.h */,
 				A8408BA05DC0D983E6740558 /* SubscriptionStatusView.m */,
 				A8408D462EEE90AA7F2A8AFA /* SwoopView.h */,
@@ -1827,6 +1825,7 @@
 				8DDA60292425BB4800DBA8EC /* DebugStrings.swift in Sources */,
 				52C8F0AD237E145C00E5F9C0 /* PsiCashCoinPurchaseTable.swift in Sources */,
 				8DE4E6D2244E97D000275362 /* Result+Codable.swift in Sources */,
+				8D92A33124928E4900F75254 /* SubscriptionBarView.swift in Sources */,
 				521FD0EF219E0D5600F748EC /* DebugDirectoryViewerViewController.m in Sources */,
 				9BFECF61970F215F32E76280 /* AdMobInterstitialAdControllerWrapper.m in Sources */,
 				52055D06230C833700244F9E /* SpeedBoostButton.swift in Sources */,
@@ -1842,7 +1841,6 @@
 				A8408008B18277F93286799F /* PsiphonProgressView.m in Sources */,
 				8D9E603524366D71003A46D8 /* FeedbackDescriptions.swift in Sources */,
 				A8408FA13890CD67154033C6 /* RegionSelectionButton.m in Sources */,
-				A84087459E9F796B1954D049 /* SubscriptionsBar.m in Sources */,
 				A8408E611665FC60D5DFF339 /* SubscriptionStatusView.m in Sources */,
 				A8408EB13777DDCBEF7DE3C0 /* SwoopView.m in Sources */,
 				8D7E9B9D2425DF42006F3A2F /* AnimatedUIView.swift in Sources */,

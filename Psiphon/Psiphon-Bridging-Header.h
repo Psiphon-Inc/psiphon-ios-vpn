@@ -40,6 +40,9 @@
 #import "UIColor+Additions.h"
 #import "UIFont+Additions.h"
 #import "Strings.h"
+#import "WhiteSkyButton.h"
+#import "SubscriptionStatusView.h"
+
 
 // Ads
 #import "AdControllerWrapper.h"

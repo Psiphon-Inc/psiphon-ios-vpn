@@ -23,17 +23,23 @@ class AnimatedUIButton: SwiftUIButton {
 
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         super.touchesBegan(touches, with: event)
-        animateShrink(.shrink, self)
+        if self.isEnabled {
+            animateShrink(.shrink, self)
+        }
     }
 
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         super.touchesEnded(touches, with: event)
-        animateShrink(.restore, self)
+        if self.isEnabled {
+            animateShrink(.restore, self)
+        }
     }
 
     override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
         super.touchesCancelled(touches, with: event)
-        animateShrink(.restore, self)
+        if self.isEnabled {
+            animateShrink(.restore, self)
+        }
     }
 
 }
