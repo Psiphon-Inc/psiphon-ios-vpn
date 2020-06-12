@@ -193,12 +193,14 @@ extension SwiftDelegate: SwiftBridgeDelegate {
         }
         
         // Forwards subscription auth status to ObjCBridgeDelegate.
-        self.lifetime += self.store.$value.signalProducer
-            .map { appState in
+        self.lifetime += SignalProducer.combineLatest(
+            self.store.$value.signalProducer.map(\.subscriptionAuthState).skipRepeats(),
+            self.store.$value.signalProducer.map(\.subscription.status).skipRepeats(),
+            self.store.$value.signalProducer
+                .map(\.vpnState.value.providerVPNStatus.tunneled).skipRepeats()
+            ).map {
                 SubscriptionBarView.SubscriptionBarState.make(
-                    authState: appState.subscriptionAuthState,
-                    subscriptionStatus: appState.subscription.status,
-                    tunnelStatus: appState.vpnState.value.providerVPNStatus.tunneled
+                    authState: $0.0, subscriptionStatus: $0.1, tunnelStatus: $0.2
                 )
             }
             .skipRepeats()
