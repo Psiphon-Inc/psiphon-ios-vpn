@@ -18,7 +18,8 @@
  */
 
 import Foundation
-
+import PsiApi
+import AppStoreIAP
 
 /// Parsed representation of AppStore PsiCash consumable product.
 enum ParsedPsiCashAppStorePurchasable: Equatable {
@@ -47,10 +48,9 @@ extension ParsedPsiCashAppStorePurchasable {
     }
     
     static func make(product: AppStoreProduct, formatter: PsiCashAmountFormatter) -> Self {
-        let productIdentifier = product.skProduct.productIdentifier
-        guard let psiCashValue = Self.supportedProducts[productIdentifier] else {
+        guard let psiCashValue = Self.supportedProducts[product.productID] else {
             return .parseError(reason: """
-                AppStore IAP product with identifier '\(productIdentifier)' is not a supported product
+                AppStore IAP product with identifier '\(product.productID)' is not a supported product
                 """)
         }
         guard let title = formatter.string(from: psiCashValue) else {
@@ -60,8 +60,8 @@ extension ParsedPsiCashAppStorePurchasable {
             PsiCashPurchasableViewModel(
                 product: .product(product),
                 title: title,
-                subtitle: product.skProduct.localizedDescription,
-                localizedPrice: .makeLocalizedPrice(skProduct: product.skProduct),
+                subtitle: product.localizedDescription,
+                localizedPrice: product.price,
                 clearedForSale: true
             )
         )
@@ -126,7 +126,11 @@ enum ProductRequestAction {
     case productRequestResult(SKProductsRequest, Result<SKProductsResponse, SystemErrorEvent>)
 }
 
-typealias ProductRequestEnvironment = ProductRequestDelegate
+typealias ProductRequestEnvironment = (
+    feedbackLogger: FeedbackLogger,
+    productRequestDelegate: ProductRequestDelegate,
+    supportedAppStoreProducts: SupportedAppStoreProducts
+)
 
 func productRequestReducer(
     state: inout PsiCashAppStoreProductsState, action: ProductRequestAction,
@@ -141,36 +145,48 @@ func productRequestReducer(
         // then the success value is added to `.pending` case.
         state.psiCashProducts = .pending(previousValue: state.psiCashProducts)
         
-        let requestingProductIDs = StoreProductIds.psiCash().values
-        let request = SKProductsRequest(productIdentifiers: requestingProductIDs)
+        let maybeRequestingProductIDs = environment.supportedAppStoreProducts.supported[.psiCash]
+        guard let requestingProductIDs = maybeRequestingProductIDs else {
+            environment.feedbackLogger.fatalError("PsiCash product not supported")
+            return []
+        }
+        
+        let request = SKProductsRequest(productIdentifiers: requestingProductIDs.rawValues)
         state.psiCashRequest = request
+        
         return [
             .fireAndForget {
-                request.delegate = environment
+                request.delegate = environment.productRequestDelegate
                 request.start()
             },
-            feedbackLog(.info, tag: "PsiCashProductRequest",
+            environment.feedbackLogger.log(.info, tag: "PsiCashProductRequest",
                         "Requesting product IDs: '\(requestingProductIDs)'").mapNever()
         ]
         
     case let .productRequestResult(request, result):
         guard request == state.psiCashRequest else {
-            fatalErrorFeedbackLog("""
+            environment.feedbackLogger.fatalError("""
                 Expected SKProductRequest object '\(request)' to match
                 state reference '\(String(describing: state.psiCashRequest))'.
                 """)
+            return []
         }
         state.psiCashRequest = nil
         
         var effects = [Effect<ProductRequestAction>]()
         
-        // Logs invalid Product IDs.
-        if case .success(let skProductResponse) = result {
-            effects += skProductResponse.invalidProductIdentifiers.map { invalidProductID in
-                feedbackLog(.warn, tag: "PsiCashProductRequest",
+        // Logs invalid Product IDs/error.
+        switch result {
+        case let .success(skProductsResponse):
+            effects += skProductsResponse.invalidProductIdentifiers.map { invalidProductID in
+                environment.feedbackLogger.log(.warn, tag: "PsiCashProductRequest",
                             "Invalid App Store IAP Product ID: '\(invalidProductID)'"
                 ).mapNever()
             }
+        case let .failure(errorEvent):
+            effects.append(
+                environment.feedbackLogger.log(.error, errorEvent).mapNever()
+            )
         }
         
         state.psiCashProducts = .completed(
@@ -180,7 +196,14 @@ func productRequestReducer(
 
                 return response.products.map { skProduct -> ParsedPsiCashAppStorePurchasable in
                     do {
-                        let product = try AppStoreProduct(skProduct)
+                        let product = try AppStoreProduct.from(
+                            skProduct: skProduct,
+                            isSupportedProduct: environment.supportedAppStoreProducts
+                                .isSupportedProduct(_:)
+                        )
+                        guard case .psiCash = product.type else {
+                            throw ErrorRepr(repr: "Expected PsiCash product")
+                        }
                         return .make(product: product, formatter: formatter)
                     } catch {
                         return .parseError(reason: String(describing: error))
@@ -196,13 +219,13 @@ func productRequestReducer(
 final class ProductRequestDelegate: StoreDelegate<ProductRequestAction>, SKProductsRequestDelegate {
     
     func productsRequest(_ request: SKProductsRequest, didReceive response: SKProductsResponse) {
-        sendOnMain(.productRequestResult(request, .success(response)))
+        storeSend(.productRequestResult(request, .success(response)))
     }
     
     func request(_ request: SKRequest, didFailWithError error: Error) {
-        sendOnMain(
+        storeSend(
             .productRequestResult(
-                request as! SKProductsRequest, .failure(SystemErrorEvent(error as SystemError))
+                request as! SKProductsRequest, .failure(SystemErrorEvent(SystemError(error)))
             )
         )
     }

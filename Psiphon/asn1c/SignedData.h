@@ -9,14 +9,14 @@
 #define	_SignedData_H_
 
 
-#include <asn_application.h>
+#include "asn_application.h"
 
 /* Including external dependencies */
-#include <OBJECT_IDENTIFIER.h>
-#include <NativeInteger.h>
-#include <ANY.h>
-#include <OCTET_STRING.h>
-#include <constr_SEQUENCE.h>
+#include "OBJECT_IDENTIFIER.h"
+#include "NativeInteger.h"
+#include "ANY.h"
+#include "OCTET_STRING.h"
+#include "constr_SEQUENCE.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -56,4 +56,4 @@ extern asn_TYPE_descriptor_t asn_DEF_SignedData;
 #endif
 
 #endif	/* _SignedData_H_ */
-#include <asn_internal.h>
+#include "asn_internal.h"

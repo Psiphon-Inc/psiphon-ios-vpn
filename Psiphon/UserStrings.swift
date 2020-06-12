@@ -192,10 +192,25 @@ import Foundation
 
     }
     
+    static func Failed_to_verify_psicash_purchase() -> String {
+        return NSLocalizedString("FAILED_TO_VERIFY_PSICASH_IAP_PURCHASE", tableName: nil, bundle: Bundle.main,
+                                 value: "Failed to verify purchase",
+                                 comment: "Message shown when verification of a product already purchased fails.")
+    }
+    
     static func Tap_to_retry() -> String {
         return NSLocalizedString("TAP_TO_RETRY", tableName: nil, bundle: Bundle.main,
                                  value: "Tap to Retry",
                                  comment: "Button title shown when something fails to load. Asks the user to tap the button to retry the operation")
+    }
+}
+
+// MARK: Internet reachability
+extension UserStrings{
+    static func No_internet_connection() -> String {
+        return NSLocalizedString("NO_INTERNET_CONNECTION_TITLE", tableName: nil, bundle: Bundle.main,
+                                 value: "No internet connection",
+                                 comment: "Message shown to the user when there is no internet connect.")
     }
 }
 
@@ -291,6 +306,30 @@ extension UserStrings {
 // MARK: VPN strings
 extension UserStrings {
     
+    @objc static func No_internet_alert_title() -> String {
+        return NSLocalizedString("NO_INTERNET", tableName: nil, bundle: Bundle.main,
+                                 value: "No Internet Connection",
+                                 comment: "Alert title informing user there is no internet connection")
+    }
+    
+    @objc static func No_internet_alert_body() -> String {
+        return NSLocalizedString("TURN_ON_DATE", tableName: nil, bundle: Bundle.main,
+                                 value: "Please turn on cellular data or use Wi-Fi.",
+                                 comment: "Alert message informing user to turn on their cellular data or wifi to connect to the internet")
+    }
+    
+    @objc static func Unable_to_start_alert_title() -> String {
+        return NSLocalizedString("VPN_START_FAIL_TITLE", tableName: nil, bundle: Bundle.main,
+                                 value: "Unable to start",
+                                 comment: "Alert dialog title indicating to the user that Psiphon was unable to start")
+    }
+    
+    @objc static func Error_while_start_psiphon_alert_body() -> String {
+        return NSLocalizedString("VPN_START_FAIL_MESSAGE", tableName: nil, bundle: Bundle.main,
+                                 value: "An error occurred while starting Psiphon. Please try again.",
+                                 comment: "Alert dialog message informing the user that an error occurred while starting Psiphon (Do not translate 'Psiphon'). The user should try again, and if the problem persists, they should try reinstalling the app.")
+    }
+    
     @objc static func Reinstall_vpn_config() -> String {
         return NSLocalizedString("SETTINGS_REINSTALL_VPN_CONFIGURATION_CELL_TITLE", tableName: nil, bundle: Bundle.main,
                                  value: "Reinstall VPN profile",
@@ -345,4 +384,107 @@ extension UserStrings {
                                  comment: "Status when the VPN is restarting.")
     }
 
+}
+
+// MARK: Subscription-related Strings
+extension UserStrings {
+    
+    @objc static func Subscription() -> String {
+        NSLocalizedString(
+            "SETTINGS_SUBSCRIPTION_ACTIVE", tableName: nil, bundle: .main,
+            value: "Subscriptions",
+            comment: "Subscriptions item title in the app settings when user has an active subscription. Clicking this item opens subscriptions view")
+    }
+    
+    static func Subscription_bar_header() -> String {
+        return NSLocalizedString(
+            "SUBSCRIPTION_BAR_HEADER_TEXT_SUBSCRIBED", tableName: nil, bundle: .main,
+            value: "SUBSCRIPTION",
+            comment: "Header text beside button that opens paid subscriptions manager UI. At this point the user is subscribed. Please keep this text concise as the width of the text box is restricted in size.")
+    }
+    
+    static func Subscription_pending_bar_header() -> String {
+        return NSLocalizedString(
+            "SUBSCRIPTION_BAR_HEADER_TEXT_SUBSCRIPTION_PENDING", tableName: nil, bundle: .main,
+            value: "SUBSCRIPTION PENDING",
+            comment: "After a user successfully purchases a subscription, it needs to be activated. This title is displayed on the main screen indicating that the subscription is pending activation.")
+    }
+    
+    static func Premium_max_speed_footer_subscribed() -> String {
+        return NSLocalizedString(
+            "SUBSCRIPTION_BAR_FOOTER_TEXT_SUBSCRIBED_V2", tableName: nil, bundle: .main,
+            value: "Premium • Max Speed",
+            comment: "Footer text beside button that opens paid subscriptions manager UI. At this point the user is subscribed. If “Premium” doesn't easily translate, please choose a term that conveys “Pro” or “Extra” or “Better” or “Elite”. Please keep this text concise as the width of the text box is restricted in size.")
+    }
+    
+    static func Get_premium_header_not_subscribed() -> String {
+        return NSLocalizedString(
+            "SUBSCRIPTION_BAR_HEADER_TEXT_NOT_SUBSCRIBED", tableName: nil, bundle: .main,
+            value: "GET PREMIUM",
+            comment: "Header text beside button that opens paid subscriptions manager UI. At this point the user is not subscribed. If “Premium” doesn't easily translate, please choose a term that conveys “Pro” or “Extra” or “Better” or “Elite”. Please keep this text concise as the width of the text box is restricted in size.")
+    }
+    
+    static func Remove_ads_max_speed_footer_not_subscribed() -> String {
+        return NSLocalizedString(
+            "SUBSCRIPTION_BAR_FOOTER_TEXT_NOT_SUBSCRIBED_2", tableName: nil, bundle: .main,
+            value: "Remove ads • Max speed",
+            comment: "Footer text beside button that opens paid subscriptions manager UI. At this point the user is not subscribed. Please keep this text concise as the width of the text box is restricted in size.")
+    }
+    
+    static func Connect_to_activate_subscription() -> String {
+        return NSLocalizedString(
+            "SUBSCRIPTION_CONNECT_TO_ACTIVATE", tableName: nil, bundle: .main,
+            value: "Connect to activate",
+            comment: "After a user successfully purchases a subscription, it needs to be activated. Label with this text displayed on the main screen, indicating that the user needs to connect to Psiphon in order to activate the subscription.")
+    }
+
+    static func Failed_to_activate_subscription() -> String {
+        return NSLocalizedString(
+            "SUBSCRIPTION_FAILED_TO_ACTIVATE", tableName: nil, bundle: .main,
+            value: "Failed to activate",
+            comment: "After a user successfully purchases a subscription, it needs to be activated. Label with this text is displayed on the main screen, indicating that activation of user's subscription failed.")
+    }
+    
+    static func Please_wait_while_activating_subscription() -> String {
+        return NSLocalizedString(
+            "SUBSCRIPTION_PLEASE_WAIT_WHILE_ACTIVATING", tableName: nil, bundle: .main,
+            value: "Please wait while activating",
+            comment: "After a user successfully purchases a subscription, it needs to be activated. Label with this text is displayed on the main screen, indicating to the user that the subscription is in the process of getting activated")
+    }
+    
+    static func Manage_subscription_button_title() -> String {
+        return NSLocalizedString(
+            "SUBSCRIPTIONS_MANAGE_SUBSCRIPTION_BUTTON", tableName: nil, bundle: .main,
+            value: "Manage",
+            comment: "Label on a button which, when pressed, opens a screen where the user can manage their currently active subscription.")
+    }
+
+    static func Subscribe_action_button_title() -> String {
+        return NSLocalizedString(
+            "SUBSCRIPTIONS_SUBSCRIBE_BUTTON", tableName: nil, bundle: .main,
+            value: "Subscribe",
+            comment: "Label on a button which, when pressed, opens a screen where the user can choose from multiple subscription plans.")
+    }
+    
+    static func Activating_subscription_title() -> String {
+        return NSLocalizedString(
+        "ACTIVATE_SUBSCRIPTION_BUTTON_TITILE", tableName: nil, bundle: .main,
+        value: "Activating...",
+        comment: "After a user successfully purchases a subscription, it needs to be activated. A label with this title is presented to the user indicating the the subscription is in the process of getting activated. Include the ellipses or equivalent symbol if it makes sense in the translated language.")
+    }
+    
+    static func Connect_button_title() -> String {
+        return NSLocalizedString(
+            "CONNECT_BUTTON_TITLE", tableName: nil, bundle: .main,
+            value: "Connect",
+            comment: "Action button title, that when pressed connects the user to Psiphon network.")
+    }
+
+    static func Retry_button_title() -> String {
+        return NSLocalizedString(
+            "RETRY_BUTTON_TITLE", tableName: nil, bundle: .main,
+            value: "Retry",
+            comment: "Action button title, that when pressed retries the recently failed operation.")
+    }
+    
 }

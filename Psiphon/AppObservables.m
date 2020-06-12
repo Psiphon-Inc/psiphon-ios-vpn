@@ -20,6 +20,8 @@
 //// Emits type ObjcUserSubscription
 @property (nonatomic, readwrite) RACReplaySubject<BridgedUserSubscription *> *subscriptionStatus;
 
+@property (nonatomic, readwrite) RACReplaySubject<ObjcSubscriptionBarViewState *> *subscriptionBarStatus;
+
 @property (nonatomic, readwrite) RACReplaySubject<BridgedBalanceViewBindingType *> *psiCashBalance;
 
 @property (nonatomic, readwrite) RACReplaySubject<NSDate *> *speedBoostExpiry;
@@ -27,6 +29,8 @@
 @property (nonatomic, readwrite) RACReplaySubject<NSNumber *> *vpnStatus;
 
 @property (nonatomic, readwrite) RACReplaySubject<NSNumber *> *vpnStartStopStatus;
+
+@property (nonatomic, readwrite) RACReplaySubject<NSNumber *> *reachabilityStatus;
 
 // Private properties
 @property (nonatomic) RACCompoundDisposable *compoundDisposable;
@@ -52,10 +56,12 @@
         reachability = [Reachability reachabilityForInternetConnection];
 
         _subscriptionStatus = [RACReplaySubject replaySubjectWithCapacity:1];
+        _subscriptionBarStatus = [RACReplaySubject replaySubjectWithCapacity:1];
         _psiCashBalance = [RACReplaySubject replaySubjectWithCapacity:1];
         _speedBoostExpiry = [RACReplaySubject replaySubjectWithCapacity:1];
         _vpnStatus = [RACReplaySubject replaySubjectWithCapacity:1];
         _vpnStartStopStatus = [RACReplaySubject replaySubjectWithCapacity:1];
+        _reachabilityStatus = [RACReplaySubject replaySubjectWithCapacity:1];
         _compoundDisposable = [RACCompoundDisposable compoundDisposable];
     }
     return self;

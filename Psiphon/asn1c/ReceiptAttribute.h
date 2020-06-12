@@ -9,12 +9,12 @@
 #define	_ReceiptAttribute_H_
 
 
-#include <asn_application.h>
+#include "asn_application.h"
 
 /* Including external dependencies */
-#include <NativeInteger.h>
-#include <OCTET_STRING.h>
-#include <constr_SEQUENCE.h>
+#include "NativeInteger.h"
+#include "OCTET_STRING.h"
+#include "constr_SEQUENCE.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -38,4 +38,4 @@ extern asn_TYPE_descriptor_t asn_DEF_ReceiptAttribute;
 #endif
 
 #endif	/* _ReceiptAttribute_H_ */
-#include <asn_internal.h>
+#include "asn_internal.h"

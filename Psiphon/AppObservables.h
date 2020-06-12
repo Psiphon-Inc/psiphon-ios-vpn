@@ -38,9 +38,10 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * @note This subject might emit non-unique events.
  *
- * @scheduler vpnStartStatus delivers its events on the main thread.
  */
 @property (nonatomic, readonly) RACReplaySubject<BridgedUserSubscription *> *subscriptionStatus;
+
+@property (nonatomic, readonly) RACReplaySubject<ObjcSubscriptionBarViewState *> *subscriptionBarStatus;
 
 @property (nonatomic, readonly) RACReplaySubject<BridgedBalanceViewBindingType *> *psiCashBalance;
 
@@ -52,6 +53,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 // Wraps VPN start stop state status of type `VPNStartStopStatus`.
 @property (nonatomic, readonly) RACReplaySubject<NSNumber *> *vpnStartStopStatus;
+
+// reachabilityStatus subject forwards AppState `internetReachability` ReachabilityStatus values.
+@property (nonatomic, readonly) RACReplaySubject<NSNumber *> *reachabilityStatus;
 
 + (AppObservables *)shared;
 

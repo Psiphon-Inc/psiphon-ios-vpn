@@ -19,7 +19,7 @@
 
 import UIKit
 
-class CloseButton: AnimatedUIButton {
+final class CloseButton: AnimatedUIButton {
 
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -49,7 +49,7 @@ class CloseButton: AnimatedUIButton {
     }
 
     required init?(coder: NSCoder) {
-        fatalErrorFeedbackLog("init(coder:) has not been implemented")
+        fatalError("init(coder:) has not been implemented")
     }
 
     override func layoutSubviews() {

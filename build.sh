@@ -38,13 +38,6 @@ setup_env () {
     # Clean previous output
     rm -rf "${BUILD_DIR}"
 
-    # Get the latest config values
-    python psi_export_doc.py
-    if [[ $? != 0 ]]; then
-        echo "psi_export_doc.py failed. Failed to update config values. See psi_export_doc.log for details..."
-        exit 1
-    fi
-
     if ! [ -x "$(command -v xcrun)" ]; then
         echo "Error: 'xcrun' is not installed"
         exit 1

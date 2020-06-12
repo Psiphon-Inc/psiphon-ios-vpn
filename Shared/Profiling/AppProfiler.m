@@ -18,73 +18,121 @@
  */
 
 #import "AppProfiler.h"
-#import <ReactiveObjC/RACCompoundDisposable.h>
-#import <ReactiveObjC/RACDisposable.h>
-#import <ReactiveObjC/RACReplaySubject.h>
-#import <ReactiveObjC/RACScheduler.h>
-#import <ReactiveObjC/RACSubject.h>
-#import <ReactiveObjC/RACSignal+Operations.h>
 #import "AppStats.h"
 #import "Asserts.h"
 #import "Logging.h"
 #import "PsiFeedbackLogger.h"
-#import "RACSignal+Operations2.h"
 
 PsiFeedbackLogType const ExtensionMemoryProfilingLogType = @"MemoryProfiling";
 
+@interface AppProfiler ()
+
+@property (nonatomic, assign) BOOL suspendTimerWithBackoff;
+
+@end
+
 @implementation AppProfiler {
-    RACDisposable *disposable;
+    dispatch_source_t timerDispatch;
     float lastRSS;
 }
 
-- (void)startProfilingWithStartInterval:(NSTimeInterval)startInterval forNumLogs:(int)numLogsAtStartInterval andThenExponentialBackoffTo:(NSTimeInterval)endInterval withNumLogsAtEachBackOff:(int)numLogsAtEachBackOff {
-
-#define backoffExponentOffset 2
-
-    PSIAssert(startInterval < endInterval);
-
-    [disposable dispose];
-
-    disposable = [[RACSignal timerRepeating:^NSTimeInterval{
-        static int index = 0;
-
-        NSTimeInterval backoff = startInterval;
-
-        if (index >= numLogsAtStartInterval) {
-            int exp = (int)(index - numLogsAtStartInterval)/numLogsAtEachBackOff;
-            backoff += pow(2, exp + backoffExponentOffset);
-        }
-
-        if (backoff >= endInterval) {
-            return - 1;
-        }
-
-        index++;
-
-        LOG_DEBUG(@"%@: backoff %dm%ds", ExtensionMemoryProfilingLogType, (int)backoff / 60 % 60, (int)backoff % 60);
-
-        return backoff;
-
-    }] subscribeNext:^(id  _Nullable x) {
-        [self logMemoryReportIfDelta];
-    } error:^(NSError * _Nullable error) {
-        [PsiFeedbackLogger errorWithType:ExtensionMemoryProfilingLogType message:@"Unexpected error while profiling" object:error];
-    } completed:^{
-        [self startProfilingWithInterval:endInterval];
-    }];
+- (void)startProfilingWithStartInterval:(NSTimeInterval)startInterval
+                             forNumLogs:(int)numLogsAtStartInterval
+            andThenExponentialBackoffTo:(NSTimeInterval)endInterval
+               withNumLogsAtEachBackOff:(int)numLogsAtEachBackOff
+{
+    [self startProfilingWithStartInterval:startInterval
+                               forNumLogs:numLogsAtStartInterval
+              andThenExponentialBackoffTo:endInterval
+                 withNumLogsAtEachBackOff:numLogsAtEachBackOff
+                                    index:0];
 }
 
-- (void)startProfilingWithInterval:(NSTimeInterval)interval {
-    [disposable dispose];
+// Starts profiling with exponential back-off, and then with regular interval.
+- (void)startProfilingWithStartInterval:(NSTimeInterval)startInterval
+                             forNumLogs:(int)numLogsAtStartInterval
+            andThenExponentialBackoffTo:(NSTimeInterval)endInterval
+               withNumLogsAtEachBackOff:(int)numLogsAtEachBackOff index:(int)index
+{
+#define backoffExponentOffset 2
+    
+    if (self.suspendTimerWithBackoff) {
+        return;
+    }
 
-    disposable = [[RACSignal interval:interval onScheduler:RACScheduler.scheduler withLeeway:1] subscribeNext:^(NSDate * _Nullable x) {
-        [self logMemoryReportIfDelta];
-    }];
+    PSIAssert(startInterval < endInterval);
+    
+    NSTimeInterval backoff = startInterval;
+
+    if (index >= numLogsAtStartInterval) {
+        int exp = (int)(index - numLogsAtStartInterval)/numLogsAtEachBackOff;
+        backoff += pow(2, exp + backoffExponentOffset);
+    }
+
+    if (backoff >= endInterval) {
+        [self startProfilingWithInterval:endInterval];
+        return;
+    }
+    
+    LOG_DEBUG(@"%@: backoff %dm%ds", ExtensionMemoryProfilingLogType,
+              (int)backoff / 60 % 60, (int)backoff % 60);
+    
+    
+    AppProfiler *__weak weakSelf = self;
+
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(backoff * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        
+        AppProfiler *__strong strongSelf = weakSelf;
+        
+        if (strongSelf != nil) {
+            
+            [strongSelf logMemoryReportIfDelta];
+            
+            [strongSelf startProfilingWithStartInterval:startInterval
+                                             forNumLogs:numLogsAtStartInterval
+                            andThenExponentialBackoffTo:endInterval
+                               withNumLogsAtEachBackOff:numLogsAtEachBackOff
+                                                  index:index + 1];
+        }
+    });
+}
+
+// Starts profiling at regular interval.
+- (void)startProfilingWithInterval:(NSTimeInterval)interval {
+    AppProfiler *__weak weakSelf = self;
+    
+    if (timerDispatch != nil) {
+        dispatch_source_cancel(timerDispatch);
+    }
+    
+    timerDispatch = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0,
+                                           dispatch_get_main_queue());
+    
+    if (timerDispatch == nil) {
+        return;
+    }
+    
+    dispatch_source_set_timer(timerDispatch,
+                              dispatch_time(DISPATCH_TIME_NOW, interval * NSEC_PER_SEC),
+                              interval * NSEC_PER_SEC,
+                              1 * NSEC_PER_SEC);
+    
+    dispatch_source_set_event_handler(timerDispatch, ^{
+        AppProfiler *__strong strongSelf = weakSelf;
+        if (strongSelf != nil) {
+            [strongSelf logMemoryReportIfDelta];
+        }
+    });
+    
+    dispatch_resume(timerDispatch);
 }
 
 - (void)stopProfiling {
-    [disposable dispose];
-    disposable = nil;
+    if (timerDispatch != nil) {
+        dispatch_source_cancel(timerDispatch);
+        timerDispatch = nil;
+    }
+    self.suspendTimerWithBackoff = TRUE;
 }
 
 #pragma mark - Logging

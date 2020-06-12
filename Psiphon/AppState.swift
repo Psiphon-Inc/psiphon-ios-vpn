@@ -19,50 +19,11 @@
 
 import Foundation
 import ReactiveSwift
-
-#if DEBUG
-var Debugging = DebugFlags()
-#else
-var Debugging = DebugFlags.disabled()
-#endif
+import PsiApi
+import AppStoreIAP
+import PsiCashClient
 
 var Style = AppStyle()
-
-/// A verified stricter set of `Bundle` properties.
-struct PsiphonBundle {
-    let bundleIdentifier: String
-    let appStoreReceiptURL: URL
-    
-    /// Validates app's environment give the assumptions made in the app for certain invariants to hold true.
-    /// - Note: Stops program execution if any of the vaidations fail.
-    static func from(bundle: Bundle) -> PsiphonBundle {
-        return PsiphonBundle(bundleIdentifier: bundle.bundleIdentifier!,
-                             appStoreReceiptURL: bundle.appStoreReceiptURL!)
-    }
-}
-
-struct DebugFlags {
-    var mainThreadChecks = true
-    var disableURLHandler = false
-    var devServers = true
-    var ignoreTunneledChecks = false
-    var disableConnectOnDemand = false
-    
-    var printStoreLogs = false
-    var printAppState = false
-    var printHttpRequests = true
-    
-    static func disabled() -> Self {
-        return .init(mainThreadChecks: false,
-                     disableURLHandler: false,
-                     devServers: false,
-                     ignoreTunneledChecks: false,
-                     disableConnectOnDemand: false,
-                     printStoreLogs: false,
-                     printAppState: false,
-                     printHttpRequests: false)
-    }
-}
 
 /// Represents UIViewController's that can be dismissed.
 @objc enum DismissibleScreen: Int {
@@ -75,10 +36,12 @@ struct AppState: Equatable {
     var psiCash = PsiCashState()
     var appReceipt = ReceiptState()
     var subscription = SubscriptionState()
+    var subscriptionAuthState = SubscriptionAuthState()
     var iapState = IAPState()
     var products = PsiCashAppStoreProductsState()
     var adPresentationState: Bool = false
     var pendingLandingPageOpening: Bool = false
+    var internetReachability = ReachabilityState()
 }
 
 struct BalanceState: Equatable {
@@ -101,36 +64,47 @@ enum AppAction {
     case iap(IAPAction)
     case appReceipt(ReceiptStateAction)
     case subscription(SubscriptionAction)
+    case subscriptionAuthStateAction(SubscriptionAuthStateAction)
     case productRequest(ProductRequestAction)
+    case reachabilityAction(ReachabilityAction)
 }
 
-// MARK: Environemnt
+// MARK: Environment
 
 typealias AppEnvironment = (
     appBundle: PsiphonBundle,
-    psiCashEffects: PsiCashEffect,
+    feedbackLogger: FeedbackLogger,
+    httpClient: HTTPClient,
+    psiCashEffects: PsiCashEffects,
     clientMetaData: ClientMetaData,
     sharedDB: PsiphonDataSharedDB,
     userConfigs: UserDefaultsConfig,
-    notifier: Notifier,
-    tunnelProviderStatusSignal: SignalProducer<TunnelProviderVPNStatus, Never>,
+    notifier: PsiApi.Notifier,
+    tunnelStatusSignal: SignalProducer<TunnelProviderVPNStatus, Never>,
     psiCashAuthPackageSignal: SignalProducer<PsiCashAuthPackage, Never>,
-    urlHandler: URLHandler<PsiphonTPM>,
+    tunnelConnectionRefSignal: SignalProducer<TunnelConnection?, Never>,
+    urlHandler: URLHandler,
     paymentQueue: PaymentQueue,
+    supportedAppStoreProducts: SupportedAppStoreProducts,
     objcBridgeDelegate: ObjCBridgeDelegate,
     receiptRefreshRequestDelegate: ReceiptRefreshRequestDelegate,
     paymentTransactionDelegate: PaymentTransactionDelegate,
     rewardedVideoAdBridgeDelegate: RewardedVideoAdBridgeDelegate,
     productRequestDelegate: ProductRequestDelegate,
+    internetReachability: InternetReachability,
+    internetReachabilityDelegate: StoreDelegate<ReachabilityAction>,
     vpnConnectionObserver: VPNConnectionObserver<PsiphonTPM>,
     vpnActionStore: (VPNPublicAction) -> Effect<Never>,
     psiCashStore: (PsiCashAction) -> Effect<Never>,
     appReceiptStore: (ReceiptStateAction) -> Effect<Never>,
     iapStore: (IAPAction) -> Effect<Never>,
     subscriptionStore: (SubscriptionAction) -> Effect<Never>,
-    /// `vpnStartCondition` retruns true whenever the app is in such a state as to to allow
+    subscriptionAuthStateStore: (SubscriptionAuthStateAction) -> Effect<Never>,
+    /// `vpnStartCondition` returns true whenever the app is in such a state as to to allow
     /// the VPN to be started. If false is returned the VPN should not be started.
-    vpnStartCondition: () -> Bool
+    vpnStartCondition: () -> Bool,
+    getCurrentTime: () -> Date,
+    compareDates: (Date, Date, Calendar.Component) -> ComparisonResult
 )
 
 /// Creates required environment for store `Store<AppState, AppAction>`.
@@ -138,10 +112,24 @@ typealias AppEnvironment = (
 /// in `applicationWillTerminate(:_)` delegate callback.
 func makeEnvironment(
     store: Store<AppState, AppAction>,
+    feedbackLogger: FeedbackLogger,
+    sharedDB: PsiphonDataSharedDB,
     psiCashLib: PsiCash,
+    supportedAppStoreProducts: SupportedAppStoreProducts,
     objcBridgeDelegate: ObjCBridgeDelegate,
-    rewardedVideoAdBridgeDelegate: RewardedVideoAdBridgeDelegate
+    rewardedVideoAdBridgeDelegate: RewardedVideoAdBridgeDelegate,
+    calendar: Calendar
 ) -> (environment: AppEnvironment, cleanup: () -> Void) {
+    
+    let urlSessionConfig = URLSessionConfiguration.default
+    urlSessionConfig.timeoutIntervalForRequest = UrlRequestParameters.timeoutInterval
+    urlSessionConfig.requestCachePolicy = UrlRequestParameters.cachePolicy
+    if #available(iOS 11.0, *) {
+        // waitsForConnectivity determines whether the session should wait for connectivity
+        // to become available, or fail immediately.
+        urlSessionConfig.waitsForConnectivity = false
+    }
+    let urlSession = URLSession(configuration: urlSessionConfig)
     
     let paymentTransactionDelegate = PaymentTransactionDelegate(store:
         store.projection(
@@ -150,18 +138,24 @@ func makeEnvironment(
     )
     SKPaymentQueue.default().add(paymentTransactionDelegate)
     
+    let reachabilityForInternetConnection = Reachability.forInternetConnection()!
+    
     let environment = AppEnvironment(
         appBundle: PsiphonBundle.from(bundle: Bundle.main),
-        psiCashEffects: PsiCashEffect(psiCash: psiCashLib),
-        clientMetaData: ClientMetaData(),
-        sharedDB: PsiphonDataSharedDB(forAppGroupIdentifier: APP_GROUP_IDENTIFIER),
+        feedbackLogger: feedbackLogger,
+        httpClient: HTTPClient.default(urlSession: urlSession),
+        psiCashEffects: PsiCashEffects.default(psiCash: psiCashLib, feedbackLogger: feedbackLogger),
+        clientMetaData: ClientMetaData(AppInfoObjC()),
+        sharedDB: sharedDB,
         userConfigs: UserDefaultsConfig(),
-        notifier:  Notifier.sharedInstance(),
-        tunnelProviderStatusSignal: store.$value.signalProducer
+        notifier: NotifierObjC(notifier:Notifier.sharedInstance()),
+        tunnelStatusSignal: store.$value.signalProducer
             .map(\.vpnState.value.providerVPNStatus),
         psiCashAuthPackageSignal: store.$value.signalProducer.map(\.psiCash.libData.authPackage),
+        tunnelConnectionRefSignal: store.$value.signalProducer.map(\.tunnelConnection),
         urlHandler: .default(),
         paymentQueue: .default,
+        supportedAppStoreProducts: supportedAppStoreProducts,
         objcBridgeDelegate: objcBridgeDelegate,
         receiptRefreshRequestDelegate: ReceiptRefreshRequestDelegate(store:
             store.projection(
@@ -175,9 +169,16 @@ func makeEnvironment(
                 value: erase,
                 action: { .productRequest($0) })
         ),
+        internetReachability: reachabilityForInternetConnection,
+        internetReachabilityDelegate: InternetReachabilityDelegate(
+            reachability: reachabilityForInternetConnection,
+            store: store.projection(
+                value: erase,
+                action: { .reachabilityAction($0) })
+        ),
         vpnConnectionObserver: PsiphonTPMConnectionObserver(store:
             store.projection(value: erase,
-                             action: { .vpnStateAction(.action($0)) })
+                             action: { .vpnStateAction(.action(._vpnStatusDidChange($0))) })
         ),
         vpnActionStore: { [unowned store] (action: VPNPublicAction) -> Effect<Never> in
             .fireAndForget {
@@ -204,8 +205,20 @@ func makeEnvironment(
                 store.send(.subscription(action))
             }
         },
+        subscriptionAuthStateStore: { [unowned store] (action: SubscriptionAuthStateAction)
+            -> Effect<Never> in
+            .fireAndForget {
+                store.send(.subscriptionAuthStateAction(action))
+            }
+        },
         vpnStartCondition: { [unowned store] () -> Bool in
             return !store.value.adPresentationState
+        },
+        getCurrentTime: { () -> Date in
+            return Date()
+        },
+        compareDates: { date1, date2, granularity -> ComparisonResult in
+            return calendar.compare(date1, to: date2, toGranularity: granularity)
         }
     )
     
@@ -218,9 +231,10 @@ func makeEnvironment(
 
 fileprivate func toPsiCashEnvironment(env: AppEnvironment) -> PsiCashEnvironment {
     PsiCashEnvironment(
+        feedbackLogger: env.feedbackLogger,
         psiCashEffects: env.psiCashEffects,
         sharedDB: env.sharedDB,
-        userConfigs: env.userConfigs,
+        psiCashPersistedValues: env.userConfigs,
         notifier: env.notifier,
         vpnActionStore: env.vpnActionStore,
         objcBridgeDelegate: env.objcBridgeDelegate,
@@ -230,8 +244,9 @@ fileprivate func toPsiCashEnvironment(env: AppEnvironment) -> PsiCashEnvironment
 
 fileprivate func toLandingPageEnvironment(
     env: AppEnvironment
-) -> LandingPageEnvironment<PsiphonTPM> {
+) -> LandingPageEnvironment {
     LandingPageEnvironment(
+        feedbackLogger: env.feedbackLogger,
         sharedDB: env.sharedDB,
         urlHandler: env.urlHandler,
         psiCashEffects: env.psiCashEffects,
@@ -241,22 +256,31 @@ fileprivate func toLandingPageEnvironment(
 
 fileprivate func toIAPReducerEnvironment(env: AppEnvironment) -> IAPEnvironment {
     IAPEnvironment(
-        tunnelProviderStatusSignal: env.tunnelProviderStatusSignal,
+        feedbackLogger: env.feedbackLogger,
+        tunnelStatusSignal: env.tunnelStatusSignal,
+        tunnelConnectionRefSignal: env.tunnelConnectionRefSignal,
         psiCashEffects: env.psiCashEffects,
         clientMetaData: env.clientMetaData,
         paymentQueue: env.paymentQueue,
-        userConfigs: env.userConfigs,
+        isSupportedProduct: env.supportedAppStoreProducts.isSupportedProduct(_:),
         psiCashStore: env.psiCashStore,
-        appReceiptStore: env.appReceiptStore
+        appReceiptStore: env.appReceiptStore,
+        httpClient: env.httpClient,
+        getCurrentTime: env.getCurrentTime
     )
 }
 
 fileprivate func toReceiptReducerEnvironment(env: AppEnvironment) -> ReceiptReducerEnvironment {
     ReceiptReducerEnvironment(
+        feedbackLogger: env.feedbackLogger,
         appBundle: env.appBundle,
         iapStore: env.iapStore,
         subscriptionStore: env.subscriptionStore,
-        receiptRefreshRequestDelegate: env.receiptRefreshRequestDelegate
+        subscriptionAuthStateStore: env.subscriptionAuthStateStore,
+        receiptRefreshRequestDelegate: env.receiptRefreshRequestDelegate,
+        isSupportedProduct: env.supportedAppStoreProducts.isSupportedProduct(_:),
+        getCurrentTime: env.getCurrentTime,
+        compareDates: env.compareDates
     )
 }
 
@@ -264,16 +288,57 @@ fileprivate func toSubscriptionReducerEnvironment(
     env: AppEnvironment
 ) -> SubscriptionReducerEnvironment {
     SubscriptionReducerEnvironment(
+        feedbackLogger: env.feedbackLogger,
+        appReceiptStore: env.appReceiptStore,
+        getCurrentTime: env.getCurrentTime,
+        compareDates: env.compareDates,
+        singleFireTimer: singleFireTimer
+    )
+}
+
+/// - Note: This function delivers its events on the main dispatch queue.
+/// - Important: Sub-millisecond precision is lost in the current implementation.
+fileprivate func singleFireTimer(interval: TimeInterval,
+                                 leeway: DispatchTimeInterval) -> Effect<()> {
+    SignalProducer.timer(interval: DispatchTimeInterval.milliseconds(Int(interval * 1000)),
+                         on: QueueScheduler.main,
+                         leeway: leeway)
+        .map(value: ())
+        .take(first: 1)
+}
+
+fileprivate func toSubscriptionAuthStateReducerEnvironment(
+    env: AppEnvironment
+) -> SubscriptionAuthStateReducerEnvironment {
+    SubscriptionAuthStateReducerEnvironment(
+        feedbackLogger: env.feedbackLogger,
+        httpClient: env.httpClient,
+        httpRequestRetryCount: 5,
+        httpRequestRetryInterval: DispatchTimeInterval.seconds(1),
         notifier: env.notifier,
-        sharedDB: env.sharedDB,
-        userConfigs: env.userConfigs,
-        appReceiptStore: env.appReceiptStore
+        notifierUpdatedSubscriptionAuthsMessage: NotifierUpdatedSubscriptionAuths,
+        sharedDB: SharedDBContainerObjC(sharedDB:env.sharedDB),
+        tunnelStatusSignal: env.tunnelStatusSignal,
+        tunnelConnectionRefSignal: env.tunnelConnectionRefSignal,
+        clientMetaData: env.clientMetaData,
+        getCurrentTime: env.getCurrentTime,
+        compareDates: env.compareDates
+    )
+}
+
+fileprivate func toRequestDelegateReducerEnvironment(
+    env: AppEnvironment
+) -> ProductRequestEnvironment {
+    ProductRequestEnvironment(
+        feedbackLogger: env.feedbackLogger,
+        productRequestDelegate: env.productRequestDelegate,
+        supportedAppStoreProducts: env.supportedAppStoreProducts
     )
 }
 
 fileprivate func toAppDelegateReducerEnvironment(env: AppEnvironment) -> AppDelegateEnvironment {
     AppDelegateEnvironment(
-        userConfigs: env.userConfigs,
+        psiCashPersistedValues: env.userConfigs,
         sharedDB: env.sharedDB,
         psiCashEffects: env.psiCashEffects,
         paymentQueue: env.paymentQueue,
@@ -285,18 +350,26 @@ fileprivate func toAppDelegateReducerEnvironment(env: AppEnvironment) -> AppDele
 
 fileprivate func toVPNReducerEnvironment(env: AppEnvironment) -> VPNReducerEnvironment<PsiphonTPM> {
     VPNReducerEnvironment(
+        feedbackLogger: env.feedbackLogger,
         sharedDB: env.sharedDB,
         vpnStartCondition: env.vpnStartCondition,
-        vpnConnectionObserver: env.vpnConnectionObserver
+        vpnConnectionObserver: env.vpnConnectionObserver,
+        internetReachability: env.internetReachability
     )
 }
 
-func makeAppReducer() -> Reducer<AppState, AppAction, AppEnvironment> {
+func makeAppReducer(
+    feedbackLogger: FeedbackLogger
+) -> Reducer<AppState, AppAction, AppEnvironment> {
     combine(
-        pullback(makeVpnStateReducer(),
-                 value: \.vpnState,
+        pullback(makeVpnStateReducer(feedbackLogger: feedbackLogger),
+                 value: \.vpnReducerState,
                  action: \.vpnStateAction,
                  environment: toVPNReducerEnvironment(env:)),
+        pullback(internetReachabilityReducer,
+                 value: \.internetReachability,
+                 action: \.reachabilityAction,
+                 environment: erase),
         pullback(psiCashReducer,
                  value: \.psiCashReducerState,
                  action: \.psiCash,
@@ -317,10 +390,14 @@ func makeAppReducer() -> Reducer<AppState, AppAction, AppEnvironment> {
                  value: \.subscription,
                  action: \.subscription,
                  environment: toSubscriptionReducerEnvironment(env:)),
+        pullback(subscriptionAuthStateReducer,
+                 value: \.subscriptionAuthReducerState,
+                 action: \.subscriptionAuthStateAction,
+                 environment: toSubscriptionAuthStateReducerEnvironment(env:)),
         pullback(productRequestReducer,
                  value: \.products,
                  action: \.productRequest,
-                 environment: { $0.productRequestDelegate }),
+                 environment: toRequestDelegateReducerEnvironment(env:)),
         pullback(appDelegateReducer,
                  value: \.appDelegateReducerState,
                  action: \.appDelegateAction,
@@ -337,4 +414,14 @@ extension Store where Value == AppState, Action == AppAction {
         self.send(.vpnStateAction(.action(.public(vpnAction))))
     }
     
+}
+
+// MARK: AppInfoProvider
+
+struct AppInfoObjC: AppInfoProvider {
+    let clientPlatform: String = AppInfo.clientPlatform()
+    let clientRegion: String = AppInfo.clientRegion() ?? ""
+    let clientVersion: String = AppInfo.appVersion() ?? ""
+    let propagationChannelId: String = AppInfo.propagationChannelId() ?? ""
+    let sponsorId: String = AppInfo.sponsorId() ?? ""
 }
