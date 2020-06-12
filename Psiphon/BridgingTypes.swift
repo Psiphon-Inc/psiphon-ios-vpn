@@ -46,6 +46,8 @@ import PsiCashClient
 
     @objc func onSubscriptionStatus(_ status: BridgedUserSubscription)
     
+    @objc func onSubscriptionBarViewStatusUpdate(_ status: ObjcSubscriptionBarViewState)
+    
     @objc func onVPNStatusDidChange(_ status: VPNStatus)
     
     @objc func onVPNStartStopStateDidChange(_ status: VPNStartStopStatus)
@@ -58,6 +60,8 @@ import PsiCashClient
 
     @objc func presentUntunneledRewardedVideoAd(customData: CustomData,
                                                 delegate: RewardedVideoAdBridgeDelegate)
+    
+    @objc func presentSubscriptionIAPViewController()
 }
 
 /// Interface for AppDelegate functionality implemented in Swift and called from ObjC.
@@ -75,7 +79,9 @@ import PsiCashClient
     
     // -
     
-    @objc func createPsiCashViewController(
+    @objc func makeSubscriptionBarView() -> SubscriptionBarView
+    
+    @objc func makePsiCashViewController(
         _ initialTab: PsiCashViewController.Tabs
     ) -> UIViewController?
     @objc func getCustomRewardData(_ callback: @escaping (String?) -> Void)
@@ -226,13 +232,11 @@ import PsiCashClient
 @objc final class BridgedUserSubscription: NSObject {
     @objc let state: BridgedSubscriptionState
     @objc let latestExpiry: Date?
-    @objc let productId: String?
     @objc let hasBeenInIntroPeriod: Bool
 
     init(_ state: BridgedSubscriptionState, _ subscription: SubscriptionIAPPurchase?) {
         self.state = state
         self.latestExpiry = subscription?.expires
-        self.productId = subscription?.productID.rawValue
         self.hasBeenInIntroPeriod = subscription?.hasBeenInIntroOfferPeriod ?? false
     }
 

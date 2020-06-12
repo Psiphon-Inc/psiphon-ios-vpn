@@ -28,6 +28,7 @@ struct AppStyle {
 }
 
 struct Styling {
+    var animationDuration: TimeInterval = 0.1
     var borderWidth: CGFloat = 5.0
     var cornerRadius: CGFloat = 8.0
     var padding: CGFloat = 15.0
@@ -240,8 +241,8 @@ enum Anchor {
     case bottom(Float = 0)
     case centerX(Float = 0)
     case centerY(Float = 0)
-    case width(Float = 0)
-    case height(Float = 0)
+    case width(const: Float = 0, multiplier: Float = 0)
+    case height(const: Float = 0, multiplier: Float = 0)
 }
 
 protocol Anchorable {
@@ -303,13 +304,15 @@ extension Anchorable {
                 constraints.append(
                     self.centerYAnchor.constraint(equalTo: anchorable.centerYAnchor,
                                                   constant: CGFloat(const)))
-            case .width(let const):
+            case let .width(const: const, multiplier: multiplier):
                 constraints.append(
                     self.widthAnchor.constraint(equalTo: anchorable.widthAnchor,
+                                                multiplier: CGFloat(multiplier),
                                                 constant: CGFloat(const)))
-            case .height(let const):
+            case let .height(const: const, multiplier: multiplier):
                 constraints.append(
                     self.heightAnchor.constraint(equalTo: anchorable.heightAnchor,
+                                                 multiplier: CGFloat(multiplier),
                                                  constant: CGFloat(const)))
             }
         }
