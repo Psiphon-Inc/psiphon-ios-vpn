@@ -28,6 +28,16 @@ import AppStoreIAP
     init(swiftState state: SubscriptionBarView.BindingType) {
         self.state = state
     }
+    
+    /// Maps `SubscriptionBarView.SubscriptionBarState.backgroundGradientColors` to `[CGColor]`.
+    /// However since this property is used from Objective-C, arrays are mapped to `NSArray`
+    /// which can't hold primitive types. This is resolved by casting to `[Any]`.
+    ///
+    /// For example this is equivalent to `id` cast in ObjC: `@[(id)UIColor.someColor.CGColor, ...]`.
+    @objc var backgroundGradientColors: [Any] {
+        return self.state.backgroundGradientColors.cgColors
+    }
+    
 }
 
 @objc final class SubscriptionBarView: UIControl, Bindable {
@@ -47,7 +57,6 @@ import AppStoreIAP
     }
 
     private let clickHandler: (SubscriptionBarState) -> Void
-    private let backgroundGradient: CAGradientLayer
     private let manageButton: WhiteSkyButton
     private let statusView: SubscriptionStatusView
     private let hStackView: UIStackView
@@ -59,7 +68,6 @@ import AppStoreIAP
         
     init(clickHandler: @escaping (SubscriptionBarState) -> Void) {
         self.clickHandler = clickHandler
-        self.backgroundGradient = CAGradientLayer()
         self.manageButton = WhiteSkyButton(forAutoLayout: ())
         self.statusView = SubscriptionStatusView()
         self.hStackView = UIStackView()
@@ -69,7 +77,6 @@ import AppStoreIAP
         super.init(frame: .zero)
         self.addTarget(self, action: #selector(onClick), for: .touchUpInside)
         
-        self.layer.insertSublayer(backgroundGradient, at: 0)
         
         self.manageButton.shadow = true
         
@@ -144,16 +151,11 @@ import AppStoreIAP
         UIView.animate(
             withDuration: Style.default.animationDuration,
             animations: {
-                self.backgroundGradient.colors = newValue.backgroundGradientColors
                 self.manageButton.titleLabel.textColor = newValue.subscriptionButtonColor
                 self.manageButton.alpha = newValue.subscriptionButtonEnabled ? 1.0 : 0.0
         })
     }
-    
-    override func layoutSubviews() {
-        self.backgroundGradient.frame = self.bounds
-    }
-    
+
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         super.touchesBegan(touches, with: event)
         if self.manageButton.isEnabled {
@@ -229,15 +231,15 @@ extension SubscriptionBarView.SubscriptionBarState {
         }
     }
     
-    var backgroundGradientColors: [CGColor] {
+    var backgroundGradientColors: [UIColor] {
         switch self.authState {
         case .notSubscribed, .subscribedWithAuth:
-            return [.lightishBlue(), .lightRoyalBlueTwo()].cgColors
+            return [.lightishBlue(), .lightRoyalBlueTwo()]
         case .pending, .failedRetry:
             if self.tunnelStatus == .connected {
-                return [.lightBluishGreen(), .algaeGreen()].cgColors
+                return [.lightBluishGreen(), .algaeGreen()]
             } else {
-                return [.salmon(), .brightOrange()].cgColors
+                return [.salmon(), .brightOrange()]
             }
         }
     }

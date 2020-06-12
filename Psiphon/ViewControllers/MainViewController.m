@@ -80,7 +80,11 @@ NSTimeInterval const MaxAdLoadingTime = 10.f;
     UILayoutGuide *viewWidthGuide;
     UILabel *statusLabel;
     UIButton *versionLabel;
+    
+    UIView *bottomBarBackground;
+    CAGradientLayer *bottomBarBackgroundGradient;
     SubscriptionBarView *subscriptionBarView;
+    
     RegionSelectionButton *regionSelectionButton;
     VPNStartAndStopButton *startAndStopButton;
     
@@ -187,6 +191,7 @@ NSTimeInterval const MaxAdLoadingTime = 10.f;
     [self setupStatusLabel];
     [self setupRegionSelectionButton];
     [self setupSettingsButton];
+    [self setupBottomBarBackground];
     [self setupSubscriptionsBar];
     [self setupPsiCashWidgetView];
 
@@ -282,7 +287,8 @@ NSTimeInterval const MaxAdLoadingTime = 10.f;
                                              subscribeNext: ^(ObjcSubscriptionBarViewState *state) {
             MainViewController *__strong strongSelf = weakSelf;
             if (strongSelf != nil) {
-                [strongSelf->subscriptionBarView objcBind: state];
+                strongSelf->bottomBarBackgroundGradient.colors = state.backgroundGradientColors;
+                [strongSelf->subscriptionBarView objcBind:state];
             }
         } error:^(NSError *error) {
             [weakSelf.compoundDisposable removeDisposable:disposable];
@@ -386,6 +392,11 @@ NSTimeInterval const MaxAdLoadingTime = 10.f;
     [self setStartButtonSizeConstraints:size];
     
     [super viewWillTransitionToSize:size withTransitionCoordinator:coordinator];
+}
+
+- (void)viewDidLayoutSubviews {
+    [super viewDidLayoutSubviews];
+    bottomBarBackgroundGradient.frame = bottomBarBackground.bounds;
 }
 
 #pragma mark - Public properties
@@ -591,6 +602,7 @@ NSTimeInterval const MaxAdLoadingTime = 10.f;
     statusLabel = [[UILabel alloc] init];
     regionSelectionButton = [[RegionSelectionButton alloc] init];
     regionSelectionButton.accessibilityIdentifier = @"regionSelectionButton"; // identifier for UI Tests
+    bottomBarBackground = [[UIView alloc] init];
     subscriptionBarView = [SwiftDelegate.bridge makeSubscriptionBarView];
 
     // NOTE: some views overlap so the order they are added
@@ -607,6 +619,7 @@ NSTimeInterval const MaxAdLoadingTime = 10.f;
     [self.view addSubview:startAndStopButton];
     [self.view addSubview:statusLabel];
     [self.view addSubview:regionSelectionButton];
+    [self.view addSubview:bottomBarBackground];
     [self.view addSubview:subscriptionBarView];
     [self.view addSubview:noConnectionBannerView];
 }
@@ -827,7 +840,7 @@ NSTimeInterval const MaxAdLoadingTime = 10.f;
 
     // Add constraints
     regionSelectionButton.translatesAutoresizingMaskIntoConstraints = NO;
-    NSLayoutConstraint *idealBottomSpacing = [regionSelectionButton.bottomAnchor constraintEqualToAnchor:subscriptionBarView.topAnchor constant:-31.f];
+    NSLayoutConstraint *idealBottomSpacing = [regionSelectionButton.bottomAnchor constraintEqualToAnchor:bottomBarBackground.topAnchor constant:-31.f];
     [idealBottomSpacing setPriority:999];
 
     [NSLayoutConstraint activateConstraints:@[
@@ -868,17 +881,40 @@ NSTimeInterval const MaxAdLoadingTime = 10.f;
     ]];
 }
 
+- (void)setupBottomBarBackground {
+    bottomBarBackground.translatesAutoresizingMaskIntoConstraints = NO;
+    bottomBarBackground.backgroundColor = [UIColor clearColor];
+    
+    // Setup autolayout
+    [NSLayoutConstraint activateConstraints:@[
+      [bottomBarBackground.topAnchor constraintEqualToAnchor:subscriptionBarView.topAnchor],
+      [bottomBarBackground.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor],
+      [bottomBarBackground.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor],
+      [bottomBarBackground.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor]
+    ]];
+
+    bottomBarBackgroundGradient = [CAGradientLayer layer];
+    bottomBarBackgroundGradient.frame = bottomBarBackground.bounds; // frame reset in viewDidLayoutSubviews
+
+    [bottomBarBackground.layer insertSublayer:bottomBarBackgroundGradient atIndex:0];
+}
+
 - (void)setupSubscriptionsBar {
     // Setup autolayout
     subscriptionBarView.translatesAutoresizingMaskIntoConstraints = FALSE;
 
+    NSLayoutConstraint *maxHeightConstraint = [subscriptionBarView.heightAnchor
+                                               constraintLessThanOrEqualToAnchor:self.view.safeHeightAnchor
+                                               multiplier:0.14];
+    
+    maxHeightConstraint.priority = UILayoutPriorityDefaultHigh;
+    maxHeightConstraint.active = TRUE;
+    
     [NSLayoutConstraint activateConstraints:@[
-        [subscriptionBarView.centerXAnchor constraintEqualToAnchor:self.view.centerXAnchor],
-      [subscriptionBarView.bottomAnchor constraintEqualToAnchor:self.view.safeBottomAnchor],
-      [subscriptionBarView.widthAnchor constraintEqualToAnchor:self.view.widthAnchor],
-      [subscriptionBarView.heightAnchor constraintGreaterThanOrEqualToConstant:100.0],
-      [subscriptionBarView.heightAnchor constraintLessThanOrEqualToAnchor:self.view.safeHeightAnchor
-                                                  multiplier:0.13],
+        [subscriptionBarView.centerXAnchor constraintEqualToAnchor:bottomBarBackground.centerXAnchor],
+        [subscriptionBarView.centerYAnchor constraintEqualToAnchor:bottomBarBackground.safeCenterYAnchor],
+        [subscriptionBarView.widthAnchor constraintEqualToAnchor:self.view.widthAnchor],
+        [subscriptionBarView.heightAnchor constraintGreaterThanOrEqualToConstant:90.0]
     ]];
 
 }
