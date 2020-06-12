@@ -373,7 +373,7 @@ extension SwiftDelegate: SwiftBridgeDelegate {
         }
     }
     
-    @objc func createPsiCashViewController(
+    @objc func makePsiCashViewController(
         _ initialTab: PsiCashViewController.Tabs
     ) -> UIViewController? {
         PsiCashViewController(

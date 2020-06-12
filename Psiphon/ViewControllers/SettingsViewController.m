@@ -220,7 +220,7 @@ NSString * const SettingsResetAdConsentCellSpecifierKey = @"settingsResetAdConse
 
 - (void)openPsiCashViewController {
     UIViewController *psiCashViewController = [SwiftDelegate.bridge
-                                               createPsiCashViewController:TabsAddPsiCash];
+                                               makePsiCashViewController:TabsAddPsiCash];
     [self presentViewController:psiCashViewController animated:YES completion:nil];
 }
 
