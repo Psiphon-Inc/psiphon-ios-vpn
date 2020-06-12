@@ -81,7 +81,7 @@ import PsiCashClient
     
     @objc func makeSubscriptionBarView() -> SubscriptionBarView
     
-    @objc func createPsiCashViewController(
+    @objc func makePsiCashViewController(
         _ initialTab: PsiCashViewController.Tabs
     ) -> UIViewController?
     @objc func getCustomRewardData(_ callback: @escaping (String?) -> Void)

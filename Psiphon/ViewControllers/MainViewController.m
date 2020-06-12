@@ -999,13 +999,13 @@ NSTimeInterval const MaxAdLoadingTime = 10.f;
 
 - (void)addPsiCashButtonTapped {
     UIViewController *psiCashViewController = [SwiftDelegate.bridge
-                                               createPsiCashViewController:TabsAddPsiCash];
+                                               makePsiCashViewController:TabsAddPsiCash];
     [self presentViewController:psiCashViewController animated:YES completion:nil];
 }
 
 - (void)speedBoostButtonTapped {
     UIViewController *psiCashViewController = [SwiftDelegate.bridge
-                                               createPsiCashViewController:TabsSpeedBoost];
+                                               makePsiCashViewController:TabsSpeedBoost];
     [self presentViewController:psiCashViewController animated:YES completion:nil];
 }
 
