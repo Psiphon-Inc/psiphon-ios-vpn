@@ -38,9 +38,10 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * @note This subject might emit non-unique events.
  *
- * @scheduler vpnStartStatus delivers its events on the main thread.
  */
 @property (nonatomic, readonly) RACReplaySubject<BridgedUserSubscription *> *subscriptionStatus;
+
+@property (nonatomic, readonly) RACReplaySubject<ObjcSubscriptionBarViewState *> *subscriptionBarStatus;
 
 @property (nonatomic, readonly) RACReplaySubject<BridgedBalanceViewBindingType *> *psiCashBalance;
 

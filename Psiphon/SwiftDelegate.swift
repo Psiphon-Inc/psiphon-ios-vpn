@@ -86,6 +86,7 @@ func appDelegateReducer(
         SupportedAppStoreProducts.fromPlists(types: [.subscription, .psiCash])
     
     private var (lifetime, token) = Lifetime.make()
+    private var objcBridge: ObjCBridgeDelegate!
     private var store: Store<AppState, AppAction>!
     private var psiCashLib: PsiCash!
     private var environmentCleanup: (() -> Void)?
@@ -129,6 +130,8 @@ extension SwiftDelegate: SwiftBridgeDelegate {
     @objc func applicationDidFinishLaunching(
         _ application: UIApplication, objcBridge: ObjCBridgeDelegate
     ) {
+        self.objcBridge = objcBridge
+        
         self.psiCashLib = PsiCash.make(flags: Debugging)
         
         self.store = Store(
@@ -187,6 +190,23 @@ extension SwiftDelegate: SwiftBridgeDelegate {
             .skipRepeats()
             .startWithValues { [unowned objcBridge] in
                 objcBridge.onSubscriptionStatus(BridgedUserSubscription.from(state: $0))
+        }
+        
+        // Forwards subscription auth status to ObjCBridgeDelegate.
+        self.lifetime += self.store.$value.signalProducer
+            .map { appState in
+                SubscriptionBarView.SubscriptionBarState.make(
+                    authState: appState.subscriptionAuthState,
+                    subscriptionStatus: appState.subscription.status,
+                    tunnelStatus: appState.vpnState.value.providerVPNStatus.tunneled
+                )
+            }
+            .skipRepeats()
+            .startWithValues { [unowned objcBridge] newValue in
+                
+                objcBridge.onSubscriptionBarViewStatusUpdate(
+                    ObjcSubscriptionBarViewState(swiftState: newValue)
+                )
         }
         
         // Forwards VPN status changes to ObjCBridgeDelegate.
@@ -336,7 +356,22 @@ extension SwiftDelegate: SwiftBridgeDelegate {
         self.environmentCleanup?()
     }
     
-    @objc func applicationDidBecomeActive(_ application: UIApplication) {}
+    @objc func makeSubscriptionBarView() -> SubscriptionBarView {
+        SubscriptionBarView { [unowned objcBridge, store] state in
+            switch state.authState {
+            case .notSubscribed, .subscribedWithAuth:
+                objcBridge?.presentSubscriptionIAPViewController()
+            
+            case .failedRetry:
+                store?.send(.appReceipt(.localReceiptRefresh))
+        
+            case .pending:
+                if state.tunnelStatus == .notConnected {
+                    objcBridge?.startStopVPNWithInterstitial()
+                }
+            }
+        }
+    }
     
     @objc func createPsiCashViewController(
         _ initialTab: PsiCashViewController.Tabs

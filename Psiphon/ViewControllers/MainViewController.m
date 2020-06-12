@@ -40,7 +40,6 @@
 #import "RACSignal+Operations.h"
 #import "RACUnit.h"
 #import "RegionSelectionButton.h"
-#import "SubscriptionsBar.h"
 #import "UIColor+Additions.h"
 #import "UIFont+Additions.h"
 #import "UILabel+GetLabelHeight.h"
@@ -81,7 +80,7 @@ NSTimeInterval const MaxAdLoadingTime = 10.f;
     UILayoutGuide *viewWidthGuide;
     UILabel *statusLabel;
     UIButton *versionLabel;
-    SubscriptionsBar *subscriptionsBar;
+    SubscriptionBarView *subscriptionBarView;
     RegionSelectionButton *regionSelectionButton;
     VPNStartAndStopButton *startAndStopButton;
     
@@ -92,10 +91,6 @@ NSTimeInterval const MaxAdLoadingTime = 10.f;
     // Settings
     PsiphonSettingsViewController *appSettingsViewController;
     AnimatedUIButton *settingsButton;
-    
-    // Region Selection
-    UIView *bottomBar;
-    CAGradientLayer *bottomBarGradient;
 
     FeedbackManager *feedbackManager;
 
@@ -192,7 +187,6 @@ NSTimeInterval const MaxAdLoadingTime = 10.f;
     [self setupStatusLabel];
     [self setupRegionSelectionButton];
     [self setupSettingsButton];
-    [self setupBottomBar];
     [self setupSubscriptionsBar];
     [self setupPsiCashWidgetView];
 
@@ -205,8 +199,6 @@ NSTimeInterval const MaxAdLoadingTime = 10.f;
           if (strongSelf != nil) {
 
               VPNStatus s = (VPNStatus) [statusObject integerValue];
-
-
               [weakSelf updateUIConnectionState:s];
 
               // Notify SettingsViewController that the state has changed.
@@ -261,30 +253,45 @@ NSTimeInterval const MaxAdLoadingTime = 10.f;
     [self.compoundDisposable addDisposable:vpnStartStatusDisposable];
 
 
-    // Subscribes to AppDelegate subscription signal.
-    __block RACDisposable *disposable = [[AppObservables.shared.subscriptionStatus
-      deliverOnMainThread]
-      subscribeNext:^(BridgedUserSubscription *status) {
-          MainViewController *__strong strongSelf = weakSelf;
-          if (strongSelf != nil) {
+    // Subscribes to AppObservables.shared.subscriptionStatus signal.
+    {
+        __block RACDisposable *disposable = [AppObservables.shared.subscriptionStatus
+                                             subscribeNext:^(BridgedUserSubscription *status) {
+            MainViewController *__strong strongSelf = weakSelf;
+            if (strongSelf != nil) {
+                                
+                if (status.state == BridgedSubscriptionStateUnknown) {
+                    return;
+                }
 
-
-              if (status.state == BridgedSubscriptionStateUnknown) {
-                  return;
-              }
-
-              [strongSelf->subscriptionsBar subscriptionActive:(status.state == BridgedSubscriptionStateActive)];
-
-              BOOL showPsiCashUI = (status.state == BridgedSubscriptionStateInactive);
-              [strongSelf setPsiCashContentHidden:!showPsiCashUI];
-          }
-      } error:^(NSError *error) {
-          [weakSelf.compoundDisposable removeDisposable:disposable];
-      } completed:^{
-          [weakSelf.compoundDisposable removeDisposable:disposable];
-      }];
-
-    [self.compoundDisposable addDisposable:disposable];
+                BOOL showPsiCashUI = (status.state == BridgedSubscriptionStateInactive);
+                [strongSelf setPsiCashContentHidden:!showPsiCashUI];
+            }
+        } error:^(NSError *error) {
+            [weakSelf.compoundDisposable removeDisposable:disposable];
+        } completed:^{
+            [weakSelf.compoundDisposable removeDisposable:disposable];
+        }];
+        
+        [self.compoundDisposable addDisposable:disposable];
+    }
+    
+    // Subscribes to AppObservables.shared.subscriptionBarStatus signal.
+    {
+        __block RACDisposable *disposable = [AppObservables.shared.subscriptionBarStatus
+                                             subscribeNext: ^(ObjcSubscriptionBarViewState *state) {
+            MainViewController *__strong strongSelf = weakSelf;
+            if (strongSelf != nil) {
+                [strongSelf->subscriptionBarView objcBind: state];
+            }
+        } error:^(NSError *error) {
+            [weakSelf.compoundDisposable removeDisposable:disposable];
+        } completed:^{
+            [weakSelf.compoundDisposable removeDisposable:disposable];
+        }];
+        
+        [self.compoundDisposable addDisposable:disposable];
+    }
 
     // Subscribes to `AppDelegate.psiCashBalance` subject to receive PsiCash balance updates.
     {
@@ -351,12 +358,6 @@ NSTimeInterval const MaxAdLoadingTime = 10.f;
         [self openSettingsMenu];
         self.openSettingImmediatelyOnViewDidAppear = FALSE;
     }
-}
-
-- (void)viewDidLayoutSubviews {
-    [super viewDidLayoutSubviews];
-
-    bottomBarGradient.frame = bottomBar.bounds;
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -488,10 +489,6 @@ NSTimeInterval const MaxAdLoadingTime = 10.f;
     [self presentViewController:navController animated:YES completion:nil];
 }
 
-- (void)onSubscriptionTap {
-    [self openIAPViewController];
-}
-
 #if DEBUG
 - (void)onVersionLabelTap:(UIButton *)sender {
     DebugViewController *viewController = [[DebugViewController alloc] initWithCoder:nil];
@@ -594,8 +591,7 @@ NSTimeInterval const MaxAdLoadingTime = 10.f;
     statusLabel = [[UILabel alloc] init];
     regionSelectionButton = [[RegionSelectionButton alloc] init];
     regionSelectionButton.accessibilityIdentifier = @"regionSelectionButton"; // identifier for UI Tests
-    bottomBar = [[UIView alloc] init];
-    subscriptionsBar = [[SubscriptionsBar alloc] init];
+    subscriptionBarView = [SwiftDelegate.bridge makeSubscriptionBarView];
 
     // NOTE: some views overlap so the order they are added
     //       is important for user interaction.
@@ -611,8 +607,7 @@ NSTimeInterval const MaxAdLoadingTime = 10.f;
     [self.view addSubview:startAndStopButton];
     [self.view addSubview:statusLabel];
     [self.view addSubview:regionSelectionButton];
-    [self.view addSubview:bottomBar];
-    [self.view addSubview:subscriptionsBar];
+    [self.view addSubview:subscriptionBarView];
     [self.view addSubview:noConnectionBannerView];
 }
 
@@ -825,31 +820,6 @@ NSTimeInterval const MaxAdLoadingTime = 10.f;
     statusLabel.attributedText = mutableStr;
 }
 
-- (void)setupBottomBar {
-    bottomBar.translatesAutoresizingMaskIntoConstraints = NO;
-    bottomBar.backgroundColor = [UIColor clearColor];
-
-    UITapGestureRecognizer *tapRecognizer = [[UITapGestureRecognizer alloc]
-                                             initWithTarget:self action:@selector(onSubscriptionTap)];
-    tapRecognizer.numberOfTapsRequired = 1;
-    [bottomBar addGestureRecognizer:tapRecognizer];
-    
-    // Setup autolayout
-    [NSLayoutConstraint activateConstraints:@[
-      [bottomBar.topAnchor constraintEqualToAnchor:subscriptionsBar.topAnchor],
-      [bottomBar.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor],
-      [bottomBar.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor],
-      [bottomBar.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor]
-    ]];
-
-    bottomBarGradient = [CAGradientLayer layer];
-    bottomBarGradient.frame = bottomBar.bounds; // frame reset in viewDidLayoutSubviews
-    bottomBarGradient.colors = @[(id)UIColor.lightishBlue.CGColor,
-                                 (id)UIColor.lightRoyalBlueTwo.CGColor];
-
-    [bottomBar.layer insertSublayer:bottomBarGradient atIndex:0];
-}
-
 - (void)setupRegionSelectionButton {
     [regionSelectionButton addTarget:self action:@selector(onRegionSelectionButtonTap:) forControlEvents:UIControlEventTouchUpInside];
 
@@ -857,7 +827,7 @@ NSTimeInterval const MaxAdLoadingTime = 10.f;
 
     // Add constraints
     regionSelectionButton.translatesAutoresizingMaskIntoConstraints = NO;
-    NSLayoutConstraint *idealBottomSpacing = [regionSelectionButton.bottomAnchor constraintEqualToAnchor:bottomBar.topAnchor constant:-31.f];
+    NSLayoutConstraint *idealBottomSpacing = [regionSelectionButton.bottomAnchor constraintEqualToAnchor:subscriptionBarView.topAnchor constant:-31.f];
     [idealBottomSpacing setPriority:999];
 
     [NSLayoutConstraint activateConstraints:@[
@@ -899,19 +869,15 @@ NSTimeInterval const MaxAdLoadingTime = 10.f;
 }
 
 - (void)setupSubscriptionsBar {
-    [subscriptionsBar addTarget:self
-                         action:@selector(onSubscriptionTap)
-               forControlEvents:UIControlEventTouchUpInside];
-
     // Setup autolayout
-    subscriptionsBar.translatesAutoresizingMaskIntoConstraints = FALSE;
+    subscriptionBarView.translatesAutoresizingMaskIntoConstraints = FALSE;
 
     [NSLayoutConstraint activateConstraints:@[
-      [subscriptionsBar.centerXAnchor constraintEqualToAnchor:bottomBar.centerXAnchor],
-      [subscriptionsBar.centerYAnchor constraintEqualToAnchor:bottomBar.safeCenterYAnchor],
-      [subscriptionsBar.widthAnchor constraintEqualToAnchor:self.view.widthAnchor],
-      [subscriptionsBar.heightAnchor constraintGreaterThanOrEqualToConstant:100.0],
-      [subscriptionsBar.heightAnchor constraintLessThanOrEqualToAnchor:self.view.safeHeightAnchor
+        [subscriptionBarView.centerXAnchor constraintEqualToAnchor:self.view.centerXAnchor],
+      [subscriptionBarView.bottomAnchor constraintEqualToAnchor:self.view.safeBottomAnchor],
+      [subscriptionBarView.widthAnchor constraintEqualToAnchor:self.view.widthAnchor],
+      [subscriptionBarView.heightAnchor constraintGreaterThanOrEqualToConstant:100.0],
+      [subscriptionBarView.heightAnchor constraintLessThanOrEqualToAnchor:self.view.safeHeightAnchor
                                                   multiplier:0.13],
     ]];
 

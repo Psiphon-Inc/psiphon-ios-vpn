@@ -97,4 +97,14 @@
 
 + (UIColor * _Nonnull)duskColor;
 
++ (UIColor * _Nonnull)salmonColor;
+
++ (UIColor * _Nonnull)brightOrangeColor;
+
++ (UIColor * _Nonnull)lightBluishGreenColor;
+
++ (UIColor * _Nonnull)algaeGreenColor;
+
++ (UIColor * _Nonnull)greyishColor;
+
 @end
