@@ -54,7 +54,7 @@ import UIKit
     }
 
     required init?(coder: NSCoder) {
-        fatalErrorFeedbackLog("init(coder:) has not been implemented")
+        fatalError("init(coder:) has not been implemented")
     }
 
     override func setImage(_ image: UIImage?, for state: UIControl.State) {
@@ -81,7 +81,7 @@ import UIKit
         layer.insertSublayer(gradientLayer, at: 0)
     }
 
-    /// Subclasses should override this function when initializing and adding their own subivews and layers.
+    /// Subclasses should override this function when initializing and adding their own subviews and layers.
     /// This method is called as part of `GradientButton` init function.
     func initViewBeforeShadowAndGradient() {}
 

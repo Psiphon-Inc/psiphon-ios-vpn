@@ -19,38 +19,23 @@
 
 import Foundation
 import ReactiveSwift
+import AppStoreIAP
+import PsiApi
+import PsiCashClient
 
-enum PsiCashAction {
-    case buyPsiCashProduct(PsiCashPurchasableType)
-    case psiCashProductPurchaseResult(PsiCashPurchaseResult)
-    
-    case refreshPsiCashState
-    case refreshPsiCashStateResult(PsiCashRefreshResult)
-    
-    case showRewardedVideoAd
-    case rewardedVideoPresentation(RewardedVideoPresentation)
-    case rewardedVideoLoad(RewardedVideoLoad)
-    case connectToPsiphonTapped
-    case dismissedAlert(PsiCashAlertDismissAction)
-}
-
-enum PsiCashAlertDismissAction {
-    case rewardedVideo
-    case speedBoostAlreadyActive
-}
-
-struct PsiCashReducerState<T: TunnelProviderManager>: Equatable {
+struct PsiCashReducerState: Equatable {
     var psiCashBalance: PsiCashBalance
     var psiCash: PsiCashState
     let subscription: SubscriptionState
-    let tunnelProviderManager: T?
+    let tunnelConnection: TunnelConnection?
 }
 
 typealias PsiCashEnvironment = (
-    psiCashEffects: PsiCashEffect,
+    feedbackLogger: FeedbackLogger,
+    psiCashEffects: PsiCashEffects,
     sharedDB: PsiphonDataSharedDB,
-    userConfigs: UserDefaultsConfig,
-    notifier: Notifier,
+    psiCashPersistedValues: PsiCashPersistedValues,
+    notifier: PsiApi.Notifier,
     vpnActionStore: (VPNPublicAction) -> Effect<Never>,
     // TODO: Remove this dependency from reducer's environment. UI-related effects
     // unnecessarily complicate reducers.
@@ -58,12 +43,12 @@ typealias PsiCashEnvironment = (
     rewardedVideoAdBridgeDelegate: RewardedVideoAdBridgeDelegate
 )
 
-func psiCashReducer<T: TunnelProviderManager>(
-    state: inout PsiCashReducerState<T>, action: PsiCashAction, environment: PsiCashEnvironment
+func psiCashReducer(
+    state: inout PsiCashReducerState, action: PsiCashAction, environment: PsiCashEnvironment
 ) -> [Effect<PsiCashAction>] {
     switch action {
     case .buyPsiCashProduct(let purchasableType):
-        guard let tunnelProviderManager = state.tunnelProviderManager else {
+        guard let tunnelConnection = state.tunnelConnection else {
             return []
         }
         guard case .notSubscribed = state.subscription.status else {
@@ -73,40 +58,44 @@ func psiCashReducer<T: TunnelProviderManager>(
             return []
         }
         guard let purchasable = purchasableType.speedBoost else {
-            fatalErrorFeedbackLog("Expected a PsiCashPurchasable in '\(purchasableType)'")
+            environment.feedbackLogger.fatalError(
+                "Expected a PsiCashPurchasable in '\(purchasableType)'")
+            return []
         }
         state.psiCash.purchasing = .speedBoost(purchasable)
         return [
-            environment.psiCashEffects.purchaseProduct(purchasableType,
-                                                       tunnelProviderManager: tunnelProviderManager)
+            environment.psiCashEffects.purchaseProduct(purchasableType, tunnelConnection)
                 .map(PsiCashAction.psiCashProductPurchaseResult)
         ]
         
     case .psiCashProductPurchaseResult(let purchaseResult):
         guard case .speedBoost(_) = state.psiCash.purchasing else {
-            fatalErrorFeedbackLog("""
+            environment.feedbackLogger.fatalError("""
                 Expected '.speedBoost' state:'\(String(describing: state.psiCash.purchasing))'
                 """)
+            return []
         }
         guard purchaseResult.purchasable.speedBoost != nil else {
-            fatalErrorFeedbackLog("""
+            environment.feedbackLogger.fatalError("""
                 Expected '.speedBoost'; purchasable: '\(purchaseResult.purchasable)'
                 """)
+            return []
         }
         
         state.psiCash.libData = purchaseResult.refreshedLibData
         state.psiCashBalance = .refreshed(refreshedData: purchaseResult.refreshedLibData,
-                                          userConfigs: environment.userConfigs)
+                                          persisted: environment.psiCashPersistedValues)
         switch purchaseResult.result {
         case .success(let purchasedType):
             guard case .speedBoost(let purchasedProduct) = purchasedType else {
-                fatalErrorFeedbackLog("Expected '.speedBoost' purchased type")
+                environment.feedbackLogger.fatalError("Expected '.speedBoost' purchased type")
+                return []
             }
             state.psiCash.purchasing = .none
             return [
                 .fireAndForget {
-                    environment.sharedDB.appendNonSubscriptionAuthorization(
-                        purchasedProduct.transaction.authorization
+                    environment.sharedDB.appendNonSubscriptionEncodedAuthorization(
+                        purchasedProduct.transaction.authorization.rawData
                     )
                     environment.notifier.post(NotifierUpdatedNonSubscriptionAuths)
                 },
@@ -117,17 +106,11 @@ func psiCashReducer<T: TunnelProviderManager>(
             
         case .failure(let errorEvent):
             state.psiCash.purchasing = .error(errorEvent)
-            return [
-                .fireAndForget {
-                    PsiFeedbackLogger.error(withType: "PsiCash",
-                                            message: "psicash product purchase failed",
-                                            object: errorEvent)
-                }
-            ]
+            return [ environment.feedbackLogger.log(.error, errorEvent).mapNever() ]
         }
         
     case .refreshPsiCashState:
-        guard let tunnelProviderManager = state.tunnelProviderManager else {
+        guard let tunnelConnection = state.tunnelConnection else {
             return []
         }
         guard case .notSubscribed = state.subscription.status else {
@@ -138,8 +121,7 @@ func psiCashReducer<T: TunnelProviderManager>(
         }
         return [
             environment.psiCashEffects
-                .refreshState(andGetPricesFor: PsiCashTransactionClass.allCases,
-                              tunnelProviderManager: tunnelProviderManager)
+                .refreshState(PsiCashTransactionClass.allCases, tunnelConnection)
                 .map(PsiCashAction.refreshPsiCashStateResult)
         ]
         
@@ -148,7 +130,7 @@ func psiCashReducer<T: TunnelProviderManager>(
         if case .completed(.success(let refreshedLibData)) = result {
             state.psiCash.libData = refreshedLibData
             state.psiCashBalance = .refreshed(refreshedData: refreshedLibData,
-                                              userConfigs: environment.userConfigs)
+                                              persisted: environment.psiCashPersistedValues)
         }
         return []
         
@@ -157,7 +139,7 @@ func psiCashReducer<T: TunnelProviderManager>(
             return []
         }
         
-        switch state.tunnelProviderManager?.connectionStatus.tunneled {
+        switch state.tunnelConnection?.tunneled {
         case .connected:
             state.psiCash.rewardedVideo.combine(
                 loading: .failure(ErrorEvent(.noTunneledRewardedVideoAd))
@@ -185,9 +167,11 @@ func psiCashReducer<T: TunnelProviderManager>(
         
         if state.psiCash.rewardedVideo.rewardedAndDismissed {
             let rewardAmount = PsiCashHardCodedValues.videoAdRewardAmount
-            state.psiCashBalance.waitingForExpectedIncrease(withAddedReward: rewardAmount,
-                                                            reason: .watchedRewardedVideo,
-                                                            userConfigs: environment.userConfigs)
+            state.psiCashBalance.waitingForExpectedIncrease(
+                withAddedReward: rewardAmount,
+                reason: .watchedRewardedVideo,
+                persisted: environment.psiCashPersistedValues
+            )
             return [Effect { .refreshPsiCashState }]
         } else {
             return []

@@ -7,39 +7,28 @@ ENV['COCOAPODS_DISABLE_STATS'] = 'true'
 use_modular_headers!
 
 target 'Psiphon' do
-  # Comment the next line if you're not using Swift and don't want to use dynamic frameworks
-  #use_frameworks!
-
   # Pods for Psiphon
-  pod "InAppSettingsKit", :git => "https://github.com/Psiphon-Inc/InAppSettingsKit.git", :commit => '598c498'
+  pod "InAppSettingsKit", :git => "https://github.com/Psiphon-Inc/InAppSettingsKit.git", :commit => '8bd203c'
   #pod "InAppSettingsKit", :path => "../InAppSettingsKit"
   #pod "PsiphonClientCommonLibrary", :path => "../psiphon-ios-client-common-library"
-  pod 'PsiphonClientCommonLibrary', :git => "https://github.com/Psiphon-Inc/psiphon-ios-client-common-library.git", :commit => 'fae1d2e'
+  pod 'PsiphonClientCommonLibrary', :git => "https://github.com/Psiphon-Inc/psiphon-ios-client-common-library.git", :commit => '33e39f8'
 
   # Swift dependencies
-  pod 'ReactiveSwift', '~> 6.2'
-  pod 'ReactiveCocoa', '~> 10.1'
   pod 'ReactiveObjC', :git => "https://github.com/Psiphon-Inc/ReactiveObjC.git", :commit => '8bbf9dd'
-  pod 'PromisesSwift', '~> 1.2'
-  pod 'Google-Mobile-Ads-SDK', '~> 7.59'
   pod 'PersonalizedAdConsent', '~> 1.0'  # Google Mobile Ads Consent SDK
   pod 'MBProgressHUD', '~> 1.1.0'
-  pod 'SVProgressHUD'
+  pod 'SVProgressHUD', '~> 2.2.5'
+  pod 'EFCountingLabel', '~> 5.1.1'
 end
 
 target 'PsiphonVPN' do
-  # Comment the next line if you're not using Swift and don't want to use dynamic frameworks
-  #use_frameworks!
-
-  pod 'ReactiveObjC', :git => "https://github.com/Psiphon-Inc/ReactiveObjC.git", :commit => '8bbf9dd'
-
 end
 
 post_install do |installer|
   installer.pods_project.targets.each do |target|
     target.build_configurations.each do |config|
       config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '10.2'
+      config.build_settings['ENABLE_BITCODE'] = 'NO'
     end
   end
 end
-

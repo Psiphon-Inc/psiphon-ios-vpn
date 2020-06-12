@@ -23,7 +23,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface SubscriptionStatusView : UIView
 
-- (void)subscriptionActive:(BOOL)subscriptionActive;
+- (void)setTitle:(NSString *_Nonnull)title;
+
+- (void)setSubtitle:(NSString *_Nonnull)subtitle;
 
 @end
 

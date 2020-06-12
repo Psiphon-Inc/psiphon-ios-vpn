@@ -23,6 +23,7 @@
 
 // Network Extension options
 #define EXTENSION_OPTION_START_FROM_CONTAINER @"startFromContainer"
+#define EXTENSION_OPTION_SUBSCRIPTION_CHECK_SPONSOR_ID @"startWithSubscriptionCheckSponsorID"
 #define EXTENSION_OPTION_TRUE @"true"
 
 // Network Extension queries

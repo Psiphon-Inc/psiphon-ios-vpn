@@ -19,13 +19,16 @@
 
 import Foundation
 import Promises
+import PsiApi
+import AppStoreIAP
+import PsiCashClient
 
 // MARK: Bridge Protocols
 
 /// Interface for AppDelegate functionality implemented in Swift and called from ObjC.
 @objc protocol RewardedVideoAdBridgeDelegate {
     func adPresentationStatus(_ status: AdPresentation)
-    func adLoadStatus(_ status: AdLoadStatus, error: SystemError?)
+    func adLoadStatus(_ status: AdLoadStatus, error: NSError?)
 }
 
 /// ObjC-Swift interface. Functionality implemented in ObjC and called from Swift.
@@ -43,16 +46,22 @@ import Promises
 
     @objc func onSubscriptionStatus(_ status: BridgedUserSubscription)
     
+    @objc func onSubscriptionBarViewStatusUpdate(_ status: ObjcSubscriptionBarViewState)
+    
     @objc func onVPNStatusDidChange(_ status: VPNStatus)
     
     @objc func onVPNStartStopStateDidChange(_ status: VPNStartStopStatus)
     
     @objc func onVPNStateSyncError(_ userErrorMessage: String)
+    
+    @objc func onReachabilityStatusDidChange(_ previousStats: ReachabilityStatus)
 
     @objc func dismiss(screen: DismissibleScreen, completion: (() -> Void)?)
 
     @objc func presentUntunneledRewardedVideoAd(customData: CustomData,
                                                 delegate: RewardedVideoAdBridgeDelegate)
+    
+    @objc func presentSubscriptionIAPViewController()
 }
 
 /// Interface for AppDelegate functionality implemented in Swift and called from ObjC.
@@ -64,18 +73,21 @@ import Promises
     @objc func applicationDidFinishLaunching(_ application: UIApplication,
                                              objcBridge: ObjCBridgeDelegate)
     @objc func applicationWillEnterForeground(_ application: UIApplication)
+    @objc func applicationDidEnterBackground(_ application: UIApplication)
     @objc func applicationDidBecomeActive(_ application: UIApplication)
     @objc func applicationWillTerminate(_ application: UIApplication)
     
     // -
     
-    @objc func createPsiCashViewController(
+    @objc func makeSubscriptionBarView() -> SubscriptionBarView
+    
+    @objc func makePsiCashViewController(
         _ initialTab: PsiCashViewController.Tabs
     ) -> UIViewController?
     @objc func getCustomRewardData(_ callback: @escaping (String?) -> Void)
     @objc func refreshAppStoreReceipt() -> Promise<Error?>.ObjCPromise<NSError>
     @objc func buyAppStoreSubscriptionProduct(
-        _ product: SKProduct
+        _ skProduct: SKProduct
     ) -> Promise<ObjCIAPResult>.ObjCPromise<ObjCIAPResult>
     @objc func onAdPresentationStatusChange(_ presenting: Bool)
     @objc func getAppStoreSubscriptionProductIDs() -> Set<String>
@@ -95,6 +107,7 @@ import Promises
 
 // MARK: Bridged Types
 
+// TODO: Log the fatalError calls
 @objc final class SwitchedVPNStartStopIntent: NSObject {
     
     let switchedIntent: TunnelStartStopIntent
@@ -105,7 +118,7 @@ import Promises
         switch switchedIntent {
         case .start(transition: .none): return true
         case .stop: return false
-        default: fatalErrorFeedbackLog("Unexpected tunnel intent value '\(switchedIntent)'")
+        default: fatalError("Unexpected tunnel intent value '\(switchedIntent)'")
         }
     }
     
@@ -121,7 +134,7 @@ import Promises
         subscriptionStatus: SubscriptionStatus
     ) -> Self {
         guard case .completed(_) = state.providerSyncResult else {
-            fatalErrorFeedbackLog("expected no pending sync with tunnel provider")
+            fatalError("expected no pending sync with tunnel provider")
         }
         
         let userSubscribed: Bool
@@ -131,19 +144,20 @@ import Promises
         case .notSubscribed:
             userSubscribed = false
         case .unknown:
-            fatalErrorFeedbackLog("expected subscription status to not be unknown")
+            fatalError("expected subscription status to not be unknown")
+        }
+
+        let newIntent: TunnelStartStopIntent
+        if state.vpnStatus.providerRunning {
+            newIntent = .stop
+        } else {
+            newIntent = .start(transition: .none)
         }
         
-        switch state.tunnelIntent {
-        case .start(transition: _):
-            return .init(switchedIntent: .stop,
-                         vpnConfigInstalled: state.loadState.vpnConfigurationInstalled,
-                         userSubscribed: userSubscribed)
-        case .stop, .none:
-            return .init(switchedIntent: .start(transition: .none),
-                         vpnConfigInstalled: state.loadState.vpnConfigurationInstalled,
-                         userSubscribed: userSubscribed)
-        }
+        return .init(switchedIntent: newIntent,
+                     vpnConfigInstalled: state.loadState.vpnConfigurationInstalled,
+                     userSubscribed: userSubscribed)
+    
     }
     
 }
@@ -155,6 +169,7 @@ import Promises
     case startFinished
     case failedUserPermissionDenied
     case failedOtherReason
+    case internetNotReachable
     
     static func from(startStopState: VPNStartStopStateType) -> Self {
         switch startStopState {
@@ -163,10 +178,15 @@ import Promises
             case .completed(.success(.startPsiphonTunnel)):
                 return .startFinished
             case .completed(.failure(let errorEvent)):
-                if errorEvent.error.configurationReadWriteFailedPermissionDenied {
-                    return .failedUserPermissionDenied
-                } else {
-                    return .failedOtherReason
+                switch errorEvent.error {
+                case .neVPNError(let neVPNError):
+                    if neVPNError.configurationReadWriteFailedPermissionDenied {
+                        return .failedUserPermissionDenied
+                    } else {
+                        return .failedOtherReason
+                    }
+                case .internetNotReachable:
+                    return .internetNotReachable
                 }
             default:
                 return .none
@@ -212,20 +232,18 @@ import Promises
 @objc final class BridgedUserSubscription: NSObject {
     @objc let state: BridgedSubscriptionState
     @objc let latestExpiry: Date?
-    @objc let productId: String?
     @objc let hasBeenInIntroPeriod: Bool
 
-    init(_ state: BridgedSubscriptionState, _ data: SubscriptionData?) {
+    init(_ state: BridgedSubscriptionState, _ subscription: SubscriptionIAPPurchase?) {
         self.state = state
-        self.latestExpiry = data?.latestExpiry
-        self.productId = data?.productId
-        self.hasBeenInIntroPeriod = data?.hasBeenInIntroPeriod ?? false
+        self.latestExpiry = subscription?.expires
+        self.hasBeenInIntroPeriod = subscription?.hasBeenInIntroOfferPeriod ?? false
     }
 
     static func from(state: SubscriptionStatus) -> BridgedUserSubscription {
         switch state {
-        case .subscribed(let data):
-            return .init(.active, data)
+        case .subscribed(let purchase):
+            return .init(.active, purchase)
         case .notSubscribed:
             return .init(.inactive, .none)
         case .unknown:
@@ -241,21 +259,5 @@ import Promises
 
     init(swiftState state: PsiCashBalanceView.BindingType) {
         self.state = state
-    }
-}
-
-// IAP result
-@objc final class ObjCIAPResult: NSObject {
-    @objc let transaction: SKPaymentTransaction?
-    @objc let error: Error?
-
-    init(transaction: SKPaymentTransaction?, error: Error?) {
-        self.transaction = transaction
-        self.error = error
-    }
-
-    static func from(iapResult: IAPResult) -> ObjCIAPResult {
-        return ObjCIAPResult(transaction: iapResult.transaction,
-                             error: iapResult.result.projectError())
     }
 }

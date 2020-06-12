@@ -56,9 +56,7 @@
 #import "AppObservables.h"
 #import <PsiphonTunnel/PsiphonTunnel.h>
 
-PsiFeedbackLogType const LandingPageLogType = @"LandingPage";
 PsiFeedbackLogType const RewardedVideoLogType = @"RewardedVideo";
-
 
 @interface AppDelegate () <NotifierObserver>
 
@@ -153,6 +151,7 @@ willFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
 
     [[UIApplication sharedApplication] ignoreSnapshotOnNextApplicationLaunch];
+    [SwiftDelegate.bridge applicationDidEnterBackground:application];
     [[Notifier sharedInstance] post:NotifierAppEnteredBackground];
 }
 
@@ -191,25 +190,16 @@ typedef NS_ENUM(NSInteger, VPNIntent) {
             VPNIntent vpnIntentValue;
             
             if (newIntent.intendToStart) {
-                // If the new intent is to start the VPN, first checks for internet connectivity.
-                // If there is internet connectivity, tunnel can be started without ads
-                // if the user is subscribed, if if there the VPN config is not installed.
-                // Otherwise tunnel should be started after interstitial ad has been displayed.
                 
-                Reachability *reachability = [Reachability reachabilityForInternetConnection];
-                if ([reachability currentReachabilityStatus] == NotReachable) {
-                    vpnIntentValue = VPNIntentNoInternetAlert;
-                } else {
-                    if (newIntent.vpnConfigInstalled) {
-                        if (newIntent.userSubscribed || !showAd) {
-                            vpnIntentValue = VPNIntentStartPsiphonTunnelWithoutAds;
-                        } else {
-                            vpnIntentValue = VPNIntentStartPsiphonTunnelWithAds;
-                        }
-                    } else {
-                        // VPN Config is not installed. Skip ads.
+                if (newIntent.vpnConfigInstalled) {
+                    if (newIntent.userSubscribed || !showAd) {
                         vpnIntentValue = VPNIntentStartPsiphonTunnelWithoutAds;
+                    } else {
+                        vpnIntentValue = VPNIntentStartPsiphonTunnelWithAds;
                     }
+                } else {
+                    // VPN Config is not installed. Skip ads.
+                    vpnIntentValue = VPNIntentStartPsiphonTunnelWithoutAds;
                 }
             } else {
                 // The new intent is to stop the VPN.
@@ -237,13 +227,8 @@ typedef NS_ENUM(NSInteger, VPNIntent) {
             return [RACSignal return:value];
         }
     }] doNext:^(RACTwoTuple<NSNumber*, SwitchedVPNStartStopIntent*> *value) {
-        VPNIntent vpnIntent = (VPNIntent)[value.first integerValue];
         dispatch_async_main(^{
             [SwiftDelegate.bridge sendNewVPNIntent:value.second];
-
-            if (vpnIntent == VPNIntentNoInternetAlert) {
-                // TODO: Show the no internet alert.
-            }
         });
     }] deliverOnMainThread];
 }
@@ -390,6 +375,10 @@ typedef NS_ENUM(NSInteger, VPNIntent) {
     [AppObservables.shared.subscriptionStatus sendNext:status];
 }
 
+- (void)onSubscriptionBarViewStatusUpdate:(ObjcSubscriptionBarViewState *)status {
+    [AppObservables.shared.subscriptionBarStatus sendNext: status];
+}
+
 - (void)onVPNStatusDidChange:(NEVPNStatus)status {
     [AppObservables.shared.vpnStatus sendNext:@(status)];
 }
@@ -417,6 +406,10 @@ typedef NS_ENUM(NSInteger, VPNIntent) {
 
 - (void)onVPNStartStopStateDidChange:(VPNStartStopStatus)status {
     [AppObservables.shared.vpnStartStopStatus sendNext:@(status)];
+}
+
+- (void)onReachabilityStatusDidChange:(ReachabilityStatus)status {
+    [AppObservables.shared.reachabilityStatus sendNext:@(status)];
 }
 
 - (void)dismissWithScreen:(enum DismissibleScreen)screen
@@ -561,6 +554,18 @@ typedef NS_ENUM(NSInteger, VPNIntent) {
             strongSelf->rewardedVideoAdDisposable = nil;
         }
     }];
+}
+
+- (void)presentSubscriptionIAPViewController {
+    IAPViewController* iapViewController = [[IAPViewController alloc] init];
+    iapViewController.openedFromSettings = FALSE;
+    
+    UINavigationController* navCtrl = [[UINavigationController alloc]
+                                       initWithRootViewController:iapViewController];
+    
+    [[AppDelegate getTopMostViewController] presentViewController:navCtrl
+                                                         animated:TRUE
+                                                       completion:nil];
 }
 
 @end

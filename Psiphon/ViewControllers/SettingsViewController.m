@@ -75,7 +75,6 @@ NSString * const SettingsResetAdConsentCellSpecifierKey = @"settingsResetAdConse
         SettingsViewController *__strong strongSelf = weakSelf;
         if (strongSelf) {
             strongSelf.hasActiveSubscription = (status.state == BridgedSubscriptionStateActive);
-            [strongSelf updateSubscriptionCell];
             [strongSelf updateHiddenKeys];
         }
       } error:^(NSError *error) {
@@ -131,25 +130,6 @@ NSString * const SettingsResetAdConsentCellSpecifierKey = @"settingsResetAdConse
 }
 
 #pragma mark - UI update methods
-
-- (void)updateSubscriptionCell {
-    NSString *subscriptionCellTitle;
-    if (self.hasActiveSubscription) {
-        subscriptionCellTitle = NSLocalizedStringWithDefaultValue(@"SETTINGS_SUBSCRIPTION_ACTIVE",
-          nil,
-          [NSBundle mainBundle],
-          @"Subscriptions",
-          @"Subscriptions item title in the app settings when user has an active subscription. Clicking this item opens subscriptions view");
-    } else {
-        subscriptionCellTitle = NSLocalizedStringWithDefaultValue(@"SETTINGS_SUBSCRIPTION_NOT_ACTIVE",
-          nil,
-          [NSBundle mainBundle],
-          @"Go premium!",
-          @"Subscriptions item title in the app settings when user does not have an active subscription. Clicking this item opens subscriptions view. If “Premium” doesn't easily translate, please choose a term that conveys “Pro” or “Extra” or “Better” or “Elite”.");
-    }
-
-    [subscriptionTableViewCell.textLabel setText:subscriptionCellTitle];
-}
 
 - (void)updateReinstallVPNProfileCell {
     if (reinstallVPNProfileCell) {
@@ -209,7 +189,7 @@ NSString * const SettingsResetAdConsentCellSpecifierKey = @"settingsResetAdConse
         cell = [super tableView:tableView cellForSpecifier:specifier];
         [cell setAccessoryType:UITableViewCellAccessoryDisclosureIndicator];
         subscriptionTableViewCell = cell;
-        [self updateSubscriptionCell];
+        [subscriptionTableViewCell.textLabel setText:[UserStrings Subscription]];
 
     } else if ([specifier.key isEqualToString:SettingsReinstallVPNConfigurationKey]) {
 
@@ -240,7 +220,7 @@ NSString * const SettingsResetAdConsentCellSpecifierKey = @"settingsResetAdConse
 
 - (void)openPsiCashViewController {
     UIViewController *psiCashViewController = [SwiftDelegate.bridge
-                                               createPsiCashViewController:TabsAddPsiCash];
+                                               makePsiCashViewController:TabsAddPsiCash];
     [self presentViewController:psiCashViewController animated:YES completion:nil];
 }
 

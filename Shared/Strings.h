@@ -53,12 +53,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (NSString *)operationFailedAlertTitle;
 
-#pragma mark - Subscriptions
-
-+ (NSString *)manageSubscriptionButtonTitle;
-
-+ (NSString *)subscribeButtonTitle;
-
 #pragma mark - Misc
 
 + (NSString *)connectViaTitle;

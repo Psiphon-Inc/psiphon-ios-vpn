@@ -19,7 +19,7 @@
 
 import UIKit
 
-// MARK: UIControl Swift Brdige
+// MARK: UIControl Swift Bridge
 
 @objc class EventHandler: NSObject {
 
@@ -44,7 +44,7 @@ class SwiftUIButton: UIButton {
     }
 
     required init?(coder: NSCoder) {
-        fatalErrorFeedbackLog("init(coder:) has not been implemented")
+        fatalError("init(coder:) has not been implemented")
     }
 
     private var eventHandler: EventHandler!

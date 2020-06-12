@@ -18,7 +18,6 @@
  */
 
 #import <Foundation/Foundation.h>
-#import <PsiphonTunnel/PsiphonTunnel.h>
 #import "MainViewController.h"
 #import "AdManager.h"
 #import "AppInfo.h"
@@ -41,7 +40,6 @@
 #import "RACSignal+Operations.h"
 #import "RACUnit.h"
 #import "RegionSelectionButton.h"
-#import "SubscriptionsBar.h"
 #import "UIColor+Additions.h"
 #import "UIFont+Additions.h"
 #import "UILabel+GetLabelHeight.h"
@@ -82,7 +80,11 @@ NSTimeInterval const MaxAdLoadingTime = 10.f;
     UILayoutGuide *viewWidthGuide;
     UILabel *statusLabel;
     UIButton *versionLabel;
-    SubscriptionsBar *subscriptionsBar;
+    
+    UIView *bottomBarBackground;
+    CAGradientLayer *bottomBarBackgroundGradient;
+    SubscriptionBarView *subscriptionBarView;
+    
     RegionSelectionButton *regionSelectionButton;
     VPNStartAndStopButton *startAndStopButton;
     
@@ -93,10 +95,6 @@ NSTimeInterval const MaxAdLoadingTime = 10.f;
     // Settings
     PsiphonSettingsViewController *appSettingsViewController;
     AnimatedUIButton *settingsButton;
-    
-    // Region Selection
-    UIView *bottomBar;
-    CAGradientLayer *bottomBarGradient;
 
     FeedbackManager *feedbackManager;
 
@@ -104,6 +102,7 @@ NSTimeInterval const MaxAdLoadingTime = 10.f;
     // Replaces the PsiCash UI when the user is subscribed
     UIImageView *psiphonLargeLogo;
     UIImageView *psiphonTitle;
+    NoConnectionBannerView *noConnectionBannerView;
 
     // PsiCash
     PsiCashWidgetView *psiCashWidget;
@@ -187,11 +186,12 @@ NSTimeInterval const MaxAdLoadingTime = 10.f;
     [self setupVersionLabel];
     [self setupPsiphonLogoView];
     [self setupPsiphonTitle];
+    [self setupNoConnectionBannerView];
     [self setupStartAndStopButton];
     [self setupStatusLabel];
     [self setupRegionSelectionButton];
     [self setupSettingsButton];
-    [self setupBottomBar];
+    [self setupBottomBarBackground];
     [self setupSubscriptionsBar];
     [self setupPsiCashWidgetView];
 
@@ -204,8 +204,6 @@ NSTimeInterval const MaxAdLoadingTime = 10.f;
           if (strongSelf != nil) {
 
               VPNStatus s = (VPNStatus) [statusObject integerValue];
-
-
               [weakSelf updateUIConnectionState:s];
 
               // Notify SettingsViewController that the state has changed.
@@ -236,13 +234,23 @@ NSTimeInterval const MaxAdLoadingTime = 10.f;
                   UIAlertController *alert = [AlertDialogs vpnPermissionDeniedAlert];
                   [alert presentFromTopController];
 
+              } else if (startStatus == VPNStartStopStatusInternetNotReachable) {
+                  
+                  // Alert the user that tunnel start failed due to no internet access.
+                  [UIAlertController
+                   presentSimpleAlertWithTitle:[UserStrings No_internet_alert_title]
+                   message:[UserStrings No_internet_alert_body]
+                   preferredStyle:UIAlertControllerStyleAlert
+                   okHandler:nil];
+                  
               } else if (startStatus == VPNStartStopStatusFailedOtherReason) {
 
                   // Alert the user that the VPN failed to start, and that they should try again.
-                  [UIAlertController presentSimpleAlertWithTitle:NSLocalizedStringWithDefaultValue(@"VPN_START_FAIL_TITLE", nil, [NSBundle mainBundle], @"Unable to start", @"Alert dialog title indicating to the user that Psiphon was unable to start (MainViewController)")
-                                                         message:NSLocalizedStringWithDefaultValue(@"VPN_START_FAIL_MESSAGE", nil, [NSBundle mainBundle], @"An error occurred while starting Psiphon. Please try again. If this problem persists, try reinstalling the Psiphon app.", @"Alert dialog message informing the user that an error occurred while starting Psiphon (Do not translate 'Psiphon'). The user should try again, and if the problem persists, they should try reinstalling the app.")
-                                                  preferredStyle:UIAlertControllerStyleAlert
-                                                       okHandler:nil];
+                  [UIAlertController
+                   presentSimpleAlertWithTitle:[UserStrings Unable_to_start_alert_title]
+                   message:[UserStrings Error_while_start_psiphon_alert_body]
+                   preferredStyle:UIAlertControllerStyleAlert
+                   okHandler:nil];
               }
           }
       }];
@@ -250,30 +258,46 @@ NSTimeInterval const MaxAdLoadingTime = 10.f;
     [self.compoundDisposable addDisposable:vpnStartStatusDisposable];
 
 
-    // Subscribes to AppDelegate subscription signal.
-    __block RACDisposable *disposable = [[AppObservables.shared.subscriptionStatus
-      deliverOnMainThread]
-      subscribeNext:^(BridgedUserSubscription *status) {
-          MainViewController *__strong strongSelf = weakSelf;
-          if (strongSelf != nil) {
+    // Subscribes to AppObservables.shared.subscriptionStatus signal.
+    {
+        __block RACDisposable *disposable = [AppObservables.shared.subscriptionStatus
+                                             subscribeNext:^(BridgedUserSubscription *status) {
+            MainViewController *__strong strongSelf = weakSelf;
+            if (strongSelf != nil) {
+                                
+                if (status.state == BridgedSubscriptionStateUnknown) {
+                    return;
+                }
 
-
-              if (status.state == BridgedSubscriptionStateUnknown) {
-                  return;
-              }
-
-              [strongSelf->subscriptionsBar subscriptionActive:(status.state == BridgedSubscriptionStateActive)];
-
-              BOOL showPsiCashUI = (status.state == BridgedSubscriptionStateInactive);
-              [strongSelf setPsiCashContentHidden:!showPsiCashUI];
-          }
-      } error:^(NSError *error) {
-          [weakSelf.compoundDisposable removeDisposable:disposable];
-      } completed:^{
-          [weakSelf.compoundDisposable removeDisposable:disposable];
-      }];
-
-    [self.compoundDisposable addDisposable:disposable];
+                BOOL showPsiCashUI = (status.state == BridgedSubscriptionStateInactive);
+                [strongSelf setPsiCashContentHidden:!showPsiCashUI];
+            }
+        } error:^(NSError *error) {
+            [weakSelf.compoundDisposable removeDisposable:disposable];
+        } completed:^{
+            [weakSelf.compoundDisposable removeDisposable:disposable];
+        }];
+        
+        [self.compoundDisposable addDisposable:disposable];
+    }
+    
+    // Subscribes to AppObservables.shared.subscriptionBarStatus signal.
+    {
+        __block RACDisposable *disposable = [AppObservables.shared.subscriptionBarStatus
+                                             subscribeNext: ^(ObjcSubscriptionBarViewState *state) {
+            MainViewController *__strong strongSelf = weakSelf;
+            if (strongSelf != nil) {
+                strongSelf->bottomBarBackgroundGradient.colors = state.backgroundGradientColors;
+                [strongSelf->subscriptionBarView objcBind:state];
+            }
+        } error:^(NSError *error) {
+            [weakSelf.compoundDisposable removeDisposable:disposable];
+        } completed:^{
+            [weakSelf.compoundDisposable removeDisposable:disposable];
+        }];
+        
+        [self.compoundDisposable addDisposable:disposable];
+    }
 
     // Subscribes to `AppDelegate.psiCashBalance` subject to receive PsiCash balance updates.
     {
@@ -286,14 +310,30 @@ NSTimeInterval const MaxAdLoadingTime = 10.f;
         }]];
     }
 
-    // Subscribes to `AppDelegate.speedBoostExpiry` subject to update `psiCashWidget` with the
-    // latest expiry time.
+    // Subscribes to `AppObservable.shared.speedBoostExpiry` subject
+    // to update `psiCashWidget` with the latest expiry time.
     {
         [self.compoundDisposable addDisposable:[AppObservables.shared.speedBoostExpiry
                                                 subscribeNext:^(NSDate * _Nullable expiry) {
             MainViewController *__strong strongSelf = weakSelf;
             if (strongSelf) {
                 [strongSelf->psiCashWidget.speedBoostButton setExpiryTime:expiry];
+            }
+        }]];
+    }
+
+    // Observes reachability status.
+    {
+        [self.compoundDisposable addDisposable:
+         [AppObservables.shared.reachabilityStatus subscribeNext:^(NSNumber * _Nullable statusObj) {
+            MainViewController *__strong strongSelf = weakSelf;
+            if (strongSelf) {
+                ReachabilityStatus networkStatus = (ReachabilityStatus)[statusObj integerValue];
+                if (networkStatus == ReachabilityStatusNotReachable) {
+                    [strongSelf->noConnectionBannerView setHidden: FALSE];
+                } else {
+                    [strongSelf->noConnectionBannerView setHidden: TRUE];
+                }
             }
         }]];
     }
@@ -326,12 +366,6 @@ NSTimeInterval const MaxAdLoadingTime = 10.f;
     }
 }
 
-- (void)viewDidLayoutSubviews {
-    [super viewDidLayoutSubviews];
-
-    bottomBarGradient.frame = bottomBar.bounds;
-}
-
 - (void)viewWillAppear:(BOOL)animated {
     LOG_DEBUG();
     [super viewWillAppear:animated];
@@ -358,6 +392,11 @@ NSTimeInterval const MaxAdLoadingTime = 10.f;
     [self setStartButtonSizeConstraints:size];
     
     [super viewWillTransitionToSize:size withTransitionCoordinator:coordinator];
+}
+
+- (void)viewDidLayoutSubviews {
+    [super viewDidLayoutSubviews];
+    bottomBarBackgroundGradient.frame = bottomBarBackground.bounds;
 }
 
 #pragma mark - Public properties
@@ -461,10 +500,6 @@ NSTimeInterval const MaxAdLoadingTime = 10.f;
     [self presentViewController:navController animated:YES completion:nil];
 }
 
-- (void)onSubscriptionTap {
-    [self openIAPViewController];
-}
-
 #if DEBUG
 - (void)onVersionLabelTap:(UIButton *)sender {
     DebugViewController *viewController = [[DebugViewController alloc] initWithCoder:nil];
@@ -561,13 +596,14 @@ NSTimeInterval const MaxAdLoadingTime = 10.f;
     settingsButton = [[AnimatedUIButton alloc] init];
     psiphonLargeLogo = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"PsiphonLogoWhite"]];
     psiphonTitle = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"PsiphonTitle"]];
+    noConnectionBannerView = [[NoConnectionBannerView alloc] init];
     psiCashWidget = [[PsiCashWidgetView alloc] initWithFrame:CGRectZero];
     startAndStopButton = [VPNStartAndStopButton buttonWithType:UIButtonTypeCustom];
     statusLabel = [[UILabel alloc] init];
     regionSelectionButton = [[RegionSelectionButton alloc] init];
     regionSelectionButton.accessibilityIdentifier = @"regionSelectionButton"; // identifier for UI Tests
-    bottomBar = [[UIView alloc] init];
-    subscriptionsBar = [[SubscriptionsBar alloc] init];
+    bottomBarBackground = [[UIView alloc] init];
+    subscriptionBarView = [SwiftDelegate.bridge makeSubscriptionBarView];
 
     // NOTE: some views overlap so the order they are added
     //       is important for user interaction.
@@ -583,8 +619,9 @@ NSTimeInterval const MaxAdLoadingTime = 10.f;
     [self.view addSubview:startAndStopButton];
     [self.view addSubview:statusLabel];
     [self.view addSubview:regionSelectionButton];
-    [self.view addSubview:bottomBar];
-    [self.view addSubview:subscriptionsBar];
+    [self.view addSubview:bottomBarBackground];
+    [self.view addSubview:subscriptionBarView];
+    [self.view addSubview:noConnectionBannerView];
 }
 
 - (void)setupClouds {
@@ -796,31 +833,6 @@ NSTimeInterval const MaxAdLoadingTime = 10.f;
     statusLabel.attributedText = mutableStr;
 }
 
-- (void)setupBottomBar {
-    bottomBar.translatesAutoresizingMaskIntoConstraints = NO;
-    bottomBar.backgroundColor = [UIColor clearColor];
-
-    UITapGestureRecognizer *tapRecognizer = [[UITapGestureRecognizer alloc]
-                                             initWithTarget:self action:@selector(onSubscriptionTap)];
-    tapRecognizer.numberOfTapsRequired = 1;
-    [bottomBar addGestureRecognizer:tapRecognizer];
-    
-    // Setup autolayout
-    [NSLayoutConstraint activateConstraints:@[
-      [bottomBar.topAnchor constraintEqualToAnchor:subscriptionsBar.topAnchor],
-      [bottomBar.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor],
-      [bottomBar.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor],
-      [bottomBar.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor]
-    ]];
-
-    bottomBarGradient = [CAGradientLayer layer];
-    bottomBarGradient.frame = bottomBar.bounds; // frame reset in viewDidLayoutSubviews
-    bottomBarGradient.colors = @[(id)UIColor.lightishBlue.CGColor,
-                                 (id)UIColor.lightRoyalBlueTwo.CGColor];
-
-    [bottomBar.layer insertSublayer:bottomBarGradient atIndex:0];
-}
-
 - (void)setupRegionSelectionButton {
     [regionSelectionButton addTarget:self action:@selector(onRegionSelectionButtonTap:) forControlEvents:UIControlEventTouchUpInside];
 
@@ -828,7 +840,7 @@ NSTimeInterval const MaxAdLoadingTime = 10.f;
 
     // Add constraints
     regionSelectionButton.translatesAutoresizingMaskIntoConstraints = NO;
-    NSLayoutConstraint *idealBottomSpacing = [regionSelectionButton.bottomAnchor constraintEqualToAnchor:bottomBar.topAnchor constant:-31.f];
+    NSLayoutConstraint *idealBottomSpacing = [regionSelectionButton.bottomAnchor constraintEqualToAnchor:bottomBarBackground.topAnchor constant:-31.f];
     [idealBottomSpacing setPriority:999];
 
     [NSLayoutConstraint activateConstraints:@[
@@ -869,21 +881,40 @@ NSTimeInterval const MaxAdLoadingTime = 10.f;
     ]];
 }
 
-- (void)setupSubscriptionsBar {
-    [subscriptionsBar addTarget:self
-                         action:@selector(onSubscriptionTap)
-               forControlEvents:UIControlEventTouchUpInside];
-
+- (void)setupBottomBarBackground {
+    bottomBarBackground.translatesAutoresizingMaskIntoConstraints = NO;
+    bottomBarBackground.backgroundColor = [UIColor clearColor];
+    
     // Setup autolayout
-    subscriptionsBar.translatesAutoresizingMaskIntoConstraints = FALSE;
-
     [NSLayoutConstraint activateConstraints:@[
-      [subscriptionsBar.centerXAnchor constraintEqualToAnchor:bottomBar.centerXAnchor],
-      [subscriptionsBar.centerYAnchor constraintEqualToAnchor:bottomBar.safeCenterYAnchor],
-      [subscriptionsBar.widthAnchor constraintEqualToAnchor:self.view.widthAnchor],
-      [subscriptionsBar.heightAnchor constraintGreaterThanOrEqualToConstant:100.0],
-      [subscriptionsBar.heightAnchor constraintLessThanOrEqualToAnchor:self.view.safeHeightAnchor
-                                                  multiplier:0.13],
+      [bottomBarBackground.topAnchor constraintEqualToAnchor:subscriptionBarView.topAnchor],
+      [bottomBarBackground.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor],
+      [bottomBarBackground.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor],
+      [bottomBarBackground.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor]
+    ]];
+
+    bottomBarBackgroundGradient = [CAGradientLayer layer];
+    bottomBarBackgroundGradient.frame = bottomBarBackground.bounds; // frame reset in viewDidLayoutSubviews
+
+    [bottomBarBackground.layer insertSublayer:bottomBarBackgroundGradient atIndex:0];
+}
+
+- (void)setupSubscriptionsBar {
+    // Setup autolayout
+    subscriptionBarView.translatesAutoresizingMaskIntoConstraints = FALSE;
+
+    NSLayoutConstraint *maxHeightConstraint = [subscriptionBarView.heightAnchor
+                                               constraintLessThanOrEqualToAnchor:self.view.safeHeightAnchor
+                                               multiplier:0.14];
+    
+    maxHeightConstraint.priority = UILayoutPriorityDefaultHigh;
+    maxHeightConstraint.active = TRUE;
+    
+    [NSLayoutConstraint activateConstraints:@[
+        [subscriptionBarView.centerXAnchor constraintEqualToAnchor:bottomBarBackground.centerXAnchor],
+        [subscriptionBarView.centerYAnchor constraintEqualToAnchor:bottomBarBackground.safeCenterYAnchor],
+        [subscriptionBarView.widthAnchor constraintEqualToAnchor:self.view.widthAnchor],
+        [subscriptionBarView.heightAnchor constraintGreaterThanOrEqualToConstant:90.0]
     ]];
 
 }
@@ -1004,13 +1035,13 @@ NSTimeInterval const MaxAdLoadingTime = 10.f;
 
 - (void)addPsiCashButtonTapped {
     UIViewController *psiCashViewController = [SwiftDelegate.bridge
-                                               createPsiCashViewController:TabsAddPsiCash];
+                                               makePsiCashViewController:TabsAddPsiCash];
     [self presentViewController:psiCashViewController animated:YES completion:nil];
 }
 
 - (void)speedBoostButtonTapped {
     UIViewController *psiCashViewController = [SwiftDelegate.bridge
-                                               createPsiCashViewController:TabsSpeedBoost];
+                                               makePsiCashViewController:TabsSpeedBoost];
     [self presentViewController:psiCashViewController animated:YES completion:nil];
 }
 
@@ -1059,6 +1090,18 @@ NSTimeInterval const MaxAdLoadingTime = 10.f;
             constant:topPadding + 20]
         ]];
     }
+}
+
+- (void)setupNoConnectionBannerView {
+    noConnectionBannerView.translatesAutoresizingMaskIntoConstraints = NO;
+    
+    [NSLayoutConstraint activateConstraints:@[
+        [noConnectionBannerView.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor],
+        [noConnectionBannerView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor],
+        [noConnectionBannerView.topAnchor constraintEqualToAnchor:self.view.topAnchor],
+        [noConnectionBannerView.bottomAnchor constraintEqualToAnchor:psiphonTitle.bottomAnchor]
+    ]];
+    
 }
 
 - (void)setupPsiCashWidgetView {

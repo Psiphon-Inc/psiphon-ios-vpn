@@ -18,12 +18,13 @@
  */
 
 import UIKit
+import Utilities
 
 struct PsiCashPurchasingViewBuilder: ViewBuilder {
 
     let message = UserStrings.Purchasing_psiCash()
 
-    func build(_ container: UIView?) -> StrictBindableViewable<Unit, UIView> {
+    func build(_ container: UIView?) -> StrictBindableViewable<Utilities.Unit, UIView> {
         let background = UIView(frame: .zero)
         let stackView = UIStackView(frame: .zero)
         stackView.axis = .vertical
@@ -53,7 +54,7 @@ struct PsiCashPurchasingViewBuilder: ViewBuilder {
             $0.matchParentConstraints(top: 25, leading: 25, trailing: -25, bottom: -25)
         }
 
-        return .init(viewable: background) { _ -> ((Unit) -> Void) in
+        return .init(viewable: background) { _ -> ((Utilities.Unit) -> Void) in
             return { _ in }
         }
     }

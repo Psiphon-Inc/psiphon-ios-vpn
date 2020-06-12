@@ -26,7 +26,7 @@
 #include "timestamp.h"
 
 int
-timestamp_compare(const timestamp_t *t1, const timestamp_t *t2) {
+dup_timestamp_compare(const dup_timestamp_t *t1, const dup_timestamp_t *t2) {
     if (t1->sec < t2->sec)
         return -1;
     if (t1->sec > t2->sec)

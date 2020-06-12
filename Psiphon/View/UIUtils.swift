@@ -28,6 +28,7 @@ struct AppStyle {
 }
 
 struct Styling {
+    var animationDuration: TimeInterval = 0.1
     var borderWidth: CGFloat = 5.0
     var cornerRadius: CGFloat = 8.0
     var padding: CGFloat = 15.0
@@ -79,15 +80,15 @@ enum Loading<Value: Equatable>: Equatable {
 
 extension UILabel {
 
-    static func make(
+    static func make<Label: UILabel>(
         text: String = "",
         fontSize: FontSize = .normal,
         typeface: AvenirFont = .demiBold,
         color: UIColor = .white,
         numberOfLines: Int = 1,
-        alignment: NSTextAlignment = .natural) -> UILabel {
+        alignment: NSTextAlignment = .natural) -> Label {
 
-        let v = UILabel(frame: .zero)
+        let v = Label(frame: .zero)
         v.backgroundColor = .clear
         v.adjustsFontSizeToFitWidth = true
         v.minimumScaleFactor = 0.6
@@ -141,7 +142,7 @@ extension UIImageView {
 
 extension UITableViewCell {
     /// Returns true if the cells `contentView` has any subviews.
-    /// Indiciating that the cell has some content.
+    /// Indicating that the cell has some content.
     var hasContent: Bool {
         return contentView.subviews.count > 0
     }
@@ -188,7 +189,7 @@ func addShadow(toLayer layer: CALayer?) {
     }
 
     guard !(layer is CATransformLayer) else {
-        fatalErrorFeedbackLog("Cannot add shadow to CATransformLayer")
+        fatalError("Cannot add shadow to CATransformLayer")
     }
 
     layer.shadowColor = UIColor.black.cgColor
@@ -217,7 +218,7 @@ func makeGradientBorderLayer(colors: [CGColor], width: CGFloat = 2.0)
 
 func setBackgroundGradient(for view: UIView) {
     guard view.bounds.size != CGSize.zero else {
-        preconditionFailureFeedbackLog("view bounds not set")
+        fatalError("view bounds not set")
     }
 
     let backgroundGradient = CAGradientLayer()
@@ -240,8 +241,8 @@ enum Anchor {
     case bottom(Float = 0)
     case centerX(Float = 0)
     case centerY(Float = 0)
-    case width(Float = 0)
-    case height(Float = 0)
+    case width(const: Float = 0, multiplier: Float = 0)
+    case height(const: Float = 0, multiplier: Float = 0)
 }
 
 protocol Anchorable {
@@ -303,13 +304,15 @@ extension Anchorable {
                 constraints.append(
                     self.centerYAnchor.constraint(equalTo: anchorable.centerYAnchor,
                                                   constant: CGFloat(const)))
-            case .width(let const):
+            case let .width(const: const, multiplier: multiplier):
                 constraints.append(
                     self.widthAnchor.constraint(equalTo: anchorable.widthAnchor,
+                                                multiplier: CGFloat(multiplier),
                                                 constant: CGFloat(const)))
-            case .height(let const):
+            case let .height(const: const, multiplier: multiplier):
                 constraints.append(
                     self.heightAnchor.constraint(equalTo: anchorable.heightAnchor,
+                                                 multiplier: CGFloat(multiplier),
                                                  constant: CGFloat(const)))
             }
         }
@@ -339,7 +342,7 @@ extension UIView {
 
     func constraintToParent(_ anchors: Anchor...) -> [NSLayoutConstraint] {
         guard let parent = self.superview else {
-            fatalErrorFeedbackLog("'constraintToParent' requires the view to have a parent view")
+            fatalError("'constraintToParent' requires the view to have a parent view")
         }
         return constraint(to: parent, anchors)
     }
@@ -391,7 +394,7 @@ extension NSLayoutConstraint {
 
     func priority(higherThan constraint: NSLayoutConstraint) -> NSLayoutConstraint {
         guard constraint.priority < UILayoutPriority.required else {
-            fatalErrorFeedbackLog("Priority cannot be higher than 'required'")
+            fatalError("Priority cannot be higher than 'required'")
         }
         self.priority = constraint.priority + 1
         return self
@@ -399,7 +402,7 @@ extension NSLayoutConstraint {
 
     func priority(lowerThan constraint: NSLayoutConstraint) -> NSLayoutConstraint {
         guard constraint.priority.rawValue > 0 else {
-            fatalErrorFeedbackLog("Priority cannot be lower than 0")
+            fatalError("Priority cannot be lower than 0")
         }
         self.priority = constraint.priority - 1
         return self
@@ -445,7 +448,7 @@ final class CurrencyFormatter: WrappedNumberFormatter {
     }
 
     required init?(coder: NSCoder) {
-        fatalErrorFeedbackLog("init(coder:) has not been implemented")
+        fatalError("init(coder:) has not been implemented")
     }
 
 }
@@ -460,7 +463,7 @@ final class PsiCashAmountFormatter: WrappedNumberFormatter {
     }
 
     required init?(coder: NSCoder) {
-        fatalErrorFeedbackLog("init(coder:) has not been implemented")
+        fatalError("init(coder:) has not been implemented")
     }
 
 }
@@ -498,12 +501,12 @@ protocol ViewBuilder {
     /// This value may or may not be nil, depending on whether the `container` is being re-used.
     ///
     /// - A `MutableBindableViewable` should add it's views to the passed in `container`.
-    /// In this case the passed in `container` will alwayb be non-nil.
+    /// In this case the passed in `container` will always be non-nil.
     func build(_ container: UIView?) -> BuildType
 }
 
 /// A type that wraps a `UIView` object.
-/// - Note:`UIView` itslef conforms to Viewable.
+/// - Note:`UIView` itself conforms to Viewable.
 protocol ViewWrapper {
     var view: UIView { get }
 }
@@ -530,7 +533,7 @@ final class StrictBindableViewable<BindingType: Equatable, WrappedView: ViewWrap
         binding(newValue)
     }
 
-    /// Nil is passed to `builder`s `build`  function, as this ViewBuilder type doesn't allow mutating the cotainer.
+    /// Nil is passed to `builder`s `build`  function, as this ViewBuilder type doesn't allow mutating the container.
     /// TODO: This nil passing shows that this is not a good abstraction.
     static func build<Builder: ViewBuilder>(
         with builder: Builder, addTo container: UIView

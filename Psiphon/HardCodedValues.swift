@@ -16,47 +16,12 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 *
 */
-
 import Foundation
-
-struct VPNHardCodedValues {
-    
-    /// Time interval during which a response to the messent sent to the tunnel provider is expected.
-    /// After which the send message Effect should timeout.
-    static let providerMessageSendTimeout: TimeInterval = 1.0  // 1 second
-    
-    /// Time interval to wait for VPN status and tunnel intent mismatch to be resolved
-    /// before an alert is shown to the user.
-    static let vpnStatusAndTunnelIntentMismatchAlertDelay: TimeInterval = 5.0  // 5 seconds
-    
-}
+import PsiCashClient
 
 struct PsiCashHardCodedValues {
     static let videoAdRewardAmount = PsiCashAmount(nanoPsi: Int64(35e9))
     static let videoAdRewardTitle = "35"
     /// Amount of time to wait for PsiCash to have an earner token for modifying .
     static let getEarnerTokenTimeout: DispatchTimeInterval = .seconds(5)
-}
-
-struct SubscriptionHardCodedValues {
-    /// Timer leeway.
-    static let leeway: DispatchTimeInterval = .seconds(10)
-
-    /// Minimum time interval in seconds before the subscription expires
-    /// that will trigger a forced subscription check in the network extension.
-    static let notifierMinSubDuration: TimeInterval = 60.0  // 60 seconds
-    
-    /// Minimum time left of a subscription to still be considered active.
-    static let subscriptionUIMinTime: TimeInterval = 1.0  // 1 second
-    
-    /// Minimum amount of time left on a subscription to do a subscription check.
-    static let subscriptionCheckMinTime: TimeInterval = 60.0  // 60 seconds
-    
-    /// Diff tolerance between timer's expired value and the subscription expiry value.
-    /// Current value is 1 second.
-    static let subscriptionTimerDiffTolerance: TimeInterval = 1.0
-    
-    init() {
-        precondition(Self.subscriptionCheckMinTime > Self.subscriptionUIMinTime)
-    }
 }

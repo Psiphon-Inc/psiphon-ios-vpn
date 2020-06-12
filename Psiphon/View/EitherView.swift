@@ -19,6 +19,7 @@
 
 import UIKit
 import ReactiveSwift
+import Utilities
 
 struct EitherView<A: ViewBuilder, B: ViewBuilder>: ViewBuilder {
     typealias BindingType = Either<A.BuildType.BindingType, B.BuildType.BindingType>
@@ -47,7 +48,7 @@ struct EitherView<A: ViewBuilder, B: ViewBuilder>: ViewBuilder {
 
     func build(_ container: UIView?) -> MutableBindableViewable<BindingType, EitherViewable> {
         guard let container = container else {
-            fatalErrorFeedbackLog("EitherView build `container` not passed in")
+            fatalError("EitherView build `container` not passed in")
         }
         return .init(viewable: .none) { viewable -> ((BindingType) -> EitherViewable?) in
             return { newValue in
