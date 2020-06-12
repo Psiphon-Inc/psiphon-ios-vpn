@@ -319,11 +319,13 @@ extension SwiftDelegate: SwiftBridgeDelegate {
 
     }
     
+    @objc func applicationDidBecomeActive(_ application: UIApplication) {
+        self.sharedDB.setAppForegroundState(true)
+    }
+    
     @objc func applicationWillEnterForeground(_ application: UIApplication) {
         self.store.send(vpnAction: .syncWithProvider(reason: .appEnteredForeground))
         self.store.send(.psiCash(.refreshPsiCashState))
-        
-        self.sharedDB.setAppForegroundState(true)
     }
     
     @objc func applicationDidEnterBackground(_ application: UIApplication) {
