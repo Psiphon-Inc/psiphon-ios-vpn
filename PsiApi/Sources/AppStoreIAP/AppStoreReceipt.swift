@@ -54,7 +54,7 @@ public struct ProductID: TypedIdentifier {
     }
 }
 
-public struct ReceiptData: Equatable {
+public struct ReceiptData: Hashable {
     /// Subscription in-app purchases within the receipt that have not expired at the time of `readDate`.
     public let subscriptionInAppPurchases: Set<SubscriptionIAPPurchase>
     /// Consumables in-app purchases within the receipt.
@@ -78,6 +78,10 @@ public struct ReceiptData: Equatable {
     
     public static func == (lhs: Self, rhs: Self) -> Bool {
         lhs.data == rhs.data
+    }
+    
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(data)
     }
     
 }
