@@ -179,21 +179,24 @@ final class SubscriptionAuthStateTest : XCTestCase {
              purchase: SubscriptionIAPPurchase,
              env: SubscriptionAuthStateReducerEnvironment) in
 
-            let updatedPurchase = SubscriptionIAPPurchase(productID: purchase.productID,
-                                                         transactionID: purchase.transactionID,
-                                                         originalTransactionID: response.originalTransactionID,
-                                                         purchaseDate: purchase.purchaseDate,
-                                                         expires: purchase.expires,
-                                                         isInIntroOfferPeriod: purchase.isInIntroOfferPeriod,
-                                                         hasBeenInIntroOfferPeriod: purchase.hasBeenInIntroOfferPeriod)
+            let updatedPurchase = SubscriptionIAPPurchase(
+                productID: purchase.productID,
+                transactionID: purchase.transactionID,
+                originalTransactionID: response.originalTransactionID,
+                webOrderLineItemID: response.webOrderLineItemID,
+                purchaseDate: purchase.purchaseDate,
+                expires: purchase.expires,
+                isInIntroOfferPeriod: purchase.isInIntroOfferPeriod,
+                hasBeenInIntroOfferPeriod: purchase.hasBeenInIntroOfferPeriod
+            )
 
             var authState = SubscriptionAuthState()
             authState.purchasesAuthState = .some([
-                response.originalTransactionID:
+                response.webOrderLineItemID:
                     SubscriptionPurchaseAuthState(purchase: updatedPurchase,
                                                   signedAuthorization: .notRequested)
             ])
-            authState.transactionsPendingAuthRequest = [response.originalTransactionID]
+            authState.transactionsPendingAuthRequest = [response.webOrderLineItemID]
 
 
             let state = SubscriptionReducerState(subscription: authState,
@@ -209,7 +212,8 @@ final class SubscriptionAuthStateTest : XCTestCase {
                                                               env: env)
 
             var expectedNewState = state
-            expectedNewState.subscription.transactionsPendingAuthRequest.remove(updatedPurchase.originalTransactionID)
+            expectedNewState.subscription.transactionsPendingAuthRequest
+                .remove(updatedPurchase.webOrderLineItemID)
 
             switch response.errorStatus {
             case .noError:
@@ -222,24 +226,24 @@ final class SubscriptionAuthStateTest : XCTestCase {
                     let log: LogMessage = "expected 'signed_authorization' in response '\(response)'"
                     let err = ErrorEvent(ErrorRepr(repr:String(describing:log)),
                                          date: response.requestDate)
-                    expectedNewState.subscription.purchasesAuthState?[updatedPurchase.originalTransactionID] =
+                    expectedNewState.subscription.purchasesAuthState?[updatedPurchase.webOrderLineItemID] =
                                            SubscriptionPurchaseAuthState(purchase: updatedPurchase,
                                                                          signedAuthorization: .requestError(err))
                 }
 
                 if let signedAuth = response.signedAuthorization {
-                    expectedNewState.subscription.purchasesAuthState?[updatedPurchase.originalTransactionID] =
+                    expectedNewState.subscription.purchasesAuthState?[updatedPurchase.webOrderLineItemID] =
                         SubscriptionPurchaseAuthState(purchase: updatedPurchase,
                         signedAuthorization: .authorization(signedAuth))
                 }
 
             case .transactionExpired:
-                expectedNewState.subscription.purchasesAuthState?[updatedPurchase.originalTransactionID] =
+                expectedNewState.subscription.purchasesAuthState?[updatedPurchase.webOrderLineItemID] =
                     SubscriptionPurchaseAuthState(purchase: updatedPurchase,
                                                   signedAuthorization: .requestRejected(.transactionExpired))
 
             case .transactionCancelled:
-                expectedNewState.subscription.purchasesAuthState?[updatedPurchase.originalTransactionID] =
+                expectedNewState.subscription.purchasesAuthState?[updatedPurchase.webOrderLineItemID] =
                     SubscriptionPurchaseAuthState(purchase: updatedPurchase,
                                                   signedAuthorization: .requestRejected(.transactionCancelled))
             }
@@ -251,43 +255,52 @@ final class SubscriptionAuthStateTest : XCTestCase {
     /// Test which covers when requesting an authorization for a purchase fails.
     func testAuthorizationRequestCompletedWithFailure () {
         property("Authorization request failed") <- forAll {
-            (response: SubscriptionValidationResponse.ResponseError,
+            (responseError: SubscriptionValidationResponse.ResponseError,
              purchase: SubscriptionIAPPurchase,
              env: SubscriptionAuthStateReducerEnvironment) in
 
-
-
+            // Arrange
+            let fixedDate = Date()
+            
             var authState = SubscriptionAuthState()
             authState.purchasesAuthState = .some([
-                purchase.originalTransactionID:
+                purchase.webOrderLineItemID:
                     SubscriptionPurchaseAuthState(purchase: purchase,
                                                   signedAuthorization: .notRequested)
             ])
-            authState.transactionsPendingAuthRequest = [purchase.originalTransactionID] // otherwise fatal error
+            authState.transactionsPendingAuthRequest = [purchase.webOrderLineItemID] // otherwise fatal error
 
 
             let state = SubscriptionReducerState(subscription: authState,
                                                  receiptData: nil)
+            
+            var expectedNewState = state
+            expectedNewState.subscription.transactionsPendingAuthRequest
+                .remove(purchase.webOrderLineItemID)
+
+            if SubscriptionValidationResponse.ResponseError.badRequest == responseError {
+                expectedNewState.subscription.purchasesAuthState?[purchase.webOrderLineItemID] =
+                    SubscriptionPurchaseAuthState(purchase: purchase,
+                                                  signedAuthorization: .requestRejected(.badRequestError))
+            } else {
+                expectedNewState.subscription.purchasesAuthState?[purchase.webOrderLineItemID] =
+                    SubscriptionPurchaseAuthState(purchase: purchase,
+                                                  signedAuthorization: .requestError(ErrorEvent(responseError, date: fixedDate
+                                                  ).eraseToRepr()))
+            }
 
             // if we emit .failure then expect to see txn marked with bad req (non-200 response)
             let action: SubscriptionAuthStateAction =
-                ._authorizationRequestResult(result: .completed(.failure(.init(response))),
+                ._authorizationRequestResult(result: .completed(.failure(ErrorEvent(responseError, date: fixedDate))),
                                              forPurchase: purchase)
-
+            
+            // Act
             let output = SubscriptionAuthStateTest.runReducer(effectsTimeout: 0.1,
                                                               state: state,
                                                               action: action,
                                                               env: env)
 
-            var expectedNewState = state
-            expectedNewState.subscription.transactionsPendingAuthRequest.remove(purchase.originalTransactionID)
-
-            if SubscriptionValidationResponse.ResponseError.badRequest == response {
-                expectedNewState.subscription.purchasesAuthState?[purchase.originalTransactionID] =
-                    SubscriptionPurchaseAuthState(purchase: purchase,
-                                                  signedAuthorization: .requestRejected(.badRequestError))
-            }
-
+            // Assert
             return output.state ==== expectedNewState
         }
     }
@@ -317,7 +330,7 @@ final class SubscriptionAuthStateTest : XCTestCase {
             var inputAuthState = SubscriptionAuthState()
             inputAuthState.purchasesAuthState = .some([:])
             for purchaseWithAuth in purchasesWithAuth {
-                inputAuthState.purchasesAuthState?[purchaseWithAuth.purchase.originalTransactionID] =
+                inputAuthState.purchasesAuthState?[purchaseWithAuth.purchase.webOrderLineItemID] =
                     SubscriptionPurchaseAuthState(purchase: purchaseWithAuth.purchase,
                                                   signedAuthorization: .authorization(purchaseWithAuth.signedData))
             }
@@ -421,7 +434,7 @@ final class SubscriptionAuthStateTest : XCTestCase {
                 // Mark the purchase as `.notRequested`.
                 var authState = SubscriptionAuthState()
                 authState.purchasesAuthState = .some([
-                    purchase.originalTransactionID:
+                    purchase.webOrderLineItemID:
                         SubscriptionPurchaseAuthState(purchase: purchase,
                                                       signedAuthorization: .notRequested)
                 ])
@@ -465,7 +478,8 @@ final class SubscriptionAuthStateTest : XCTestCase {
 
                 // Expect the state to have the given purchase as pending auth request.
                 var expectedNewState = state
-                expectedNewState.subscription.transactionsPendingAuthRequest.insert(purchase.originalTransactionID)
+                expectedNewState.subscription.transactionsPendingAuthRequest
+                    .insert(purchase.webOrderLineItemID)
 
                 return output.state ==== expectedNewState
             }

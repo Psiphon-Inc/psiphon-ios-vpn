@@ -159,7 +159,8 @@ extension AppState {
                 pendingEffectCompletion: self.vpnState.pendingEffectCompletion,
                 value: VPNProviderManagerReducerState (
                     vpnState: self.vpnState.value,
-                    subscriptionTransactionsPendingAuthorization: self.subscriptionAuthState .transactionsPendingAuthRequest
+                    subscriptionTransactionsPendingAuthorization:
+                    self.subscriptionAuthState .transactionsPendingAuthRequest
                 )
             )
         }
