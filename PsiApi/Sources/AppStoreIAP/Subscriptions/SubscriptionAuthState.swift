@@ -333,11 +333,12 @@ public func subscriptionAuthStateReducer(
         // Creates retriable authorization request.
 
         let req = PurchaseVerifierServer.subscription(
-         requestBody: SubscriptionValidationRequest(
-             originalTransactionID: purchaseWithLatestExpiry.purchase.originalTransactionID,
-             productID: purchaseWithLatestExpiry.purchase.productID,
-             receipt: receiptData
-         ),
+            requestBody: SubscriptionValidationRequest(
+                originalTransactionID: purchaseWithLatestExpiry.purchase.originalTransactionID,
+                webOrderLineItemID: purchaseWithLatestExpiry.purchase.webOrderLineItemID,
+                productID: purchaseWithLatestExpiry.purchase.productID,
+                receipt: receiptData
+            ),
          clientMetaData: environment.clientMetaData
         )
 
