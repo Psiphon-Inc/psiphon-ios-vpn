@@ -48,12 +48,20 @@ extension IAPError.StoreKitError {
 public struct IAPPurchasing: Hashable {
     public typealias PurchasingState = PendingValue<Payment?, ErrorEvent<IAPError>>
     
+    public enum TransactionUniqueness: Equatable {
+        case unique(IAPPurchasing?, UnfinishedConsumableTransaction?)
+        case nonUnique
+        
+        var iapPurchasing: IAPPurchasing? {
+            guard case let .unique(a, _) = self else { return nil }
+            return a
+        }
+    }
+    
     public let productType: AppStoreProductType
     public let productID: ProductID
     public let purchasingState: PurchasingState
-    
-    public var resultPromise: Promise<ObjCIAPResult>?
-    
+        
     /// True if purchase has completed, false if pending.
     var completed: Bool {
         switch purchasingState {
@@ -62,21 +70,73 @@ public struct IAPPurchasing: Hashable {
         }
     }
     
-    public init(
+    init(
         productType: AppStoreProductType,
         productID: ProductID,
-        purchasingState: PurchasingState,
-        resultPromise: Promise<ObjCIAPResult>? = nil
+        purchasingState: PurchasingState
     ) {
         self.productType = productType
         self.productID = productID
         self.purchasingState = purchasingState
-        self.resultPromise = resultPromise
+    }
+ 
+    /// Creates `IAPPurchasing` value given updated transaction.
+    /// Returns `nil` if the transaction has completed successfully, and hence no longer in a purchasing state.
+    public static func makeGiven(
+        productType: AppStoreProductType,
+        transaction tx: PaymentTransaction,
+        existingConsumableTransaction: (PaymentTransaction) -> Bool?,
+        getCurrentTime: () -> Date
+        ) -> Result<TransactionUniqueness, FatalError> {
+        switch tx.transactionState() {
+        case .pending(_):
+            let iapPurchasing = IAPPurchasing(productType: productType,
+                                              productID: tx.productID(),
+                                              purchasingState: .pending(tx.payment()))
+            return .success(.unique(iapPurchasing, nil))
+            
+        case let .completed(.failure(error)):
+            let iapPurchasing = IAPPurchasing(productType: productType,
+                                              productID: tx.productID(),
+                                              purchasingState: .completed(ErrorEvent(
+                                                .storeKitError(error),
+                                                date: getCurrentTime())))
+            
+            return .success(.unique(iapPurchasing, nil))
+            
+        case .completed(.success(_)):
+            switch productType {
+            case .subscription:
+                return .success(.unique(nil, nil))
+                
+            case .psiCash:
+                switch existingConsumableTransaction(tx) {
+                case .none:
+                    let unfinishedTx = UnfinishedConsumableTransaction(
+                        transaction: tx,
+                        verificationState: .notRequested
+                    )
+                    
+                    return .success(.unique(nil, unfinishedTx))
+
+                case .some(false):
+                    // Unexpected duplicate transaction.
+                    return .success(.nonUnique)
+                    
+                case .some(true):
+                    return .failure(FatalError("""
+                        found two completed but unverified consumable purchases: \
+                        new transaction id: '\(tx.transactionID())'
+                        """))
+                }
+            }
+        }
     }
     
 }
 
-public struct UnverifiedPsiCashTransactionState: Equatable {
+/// Represents  a consumable transaction has not been finished pending verification by the purchase-verifier server.
+public struct UnfinishedConsumableTransaction: Equatable {
     
     public enum VerificationRequestState: Equatable {
         case notRequested
@@ -101,21 +161,23 @@ public struct UnverifiedPsiCashTransactionState: Equatable {
 public struct IAPState: Equatable {
     
     /// PsiCash consumable transaction pending server verification.
-    public var unverifiedPsiCashTx: UnverifiedPsiCashTransactionState?
+    public var unfinishedPsiCashTx: UnfinishedConsumableTransaction?
     
     /// Contains products currently being purchased.
     public var purchasing: [AppStoreProductType: IAPPurchasing]
     
+    public var objcSubscriptionPromise: Promise<ObjCIAPResult>? = nil
+    
     public init() {
         self.purchasing = [:]
-        self.unverifiedPsiCashTx = nil
+        self.unfinishedPsiCashTx = nil
     }
     
     init(
-        unverifiedPsiCashTx: UnverifiedPsiCashTransactionState?,
+        unverifiedPsiCashTx: UnfinishedConsumableTransaction?,
         purchasing: [AppStoreProductType: IAPPurchasing]
     ) {
-        self.unverifiedPsiCashTx = unverifiedPsiCashTx
+        self.unfinishedPsiCashTx = unverifiedPsiCashTx
         self.purchasing = purchasing
     }
 }

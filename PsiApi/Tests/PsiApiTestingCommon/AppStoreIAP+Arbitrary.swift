@@ -242,7 +242,9 @@ extension PaymentTransaction: Arbitrary {
             let transactionID: TransactionID = c.generate()
             let productID: ProductID = c.generate()
             let transactionState: TransactionState = c.generate()
-            let payment: Payment = c.generate()
+            let payment: Payment = c.generate(using:
+                Gen.pure(productID).map({Payment.init(productID: $0)})
+            )
             
             return PaymentTransaction(
                 transactionID: { transactionID },
@@ -256,20 +258,20 @@ extension PaymentTransaction: Arbitrary {
     }
 }
 
-extension UnverifiedPsiCashTransactionState.VerificationRequestState: Arbitrary {
-    public static var arbitrary: Gen<UnverifiedPsiCashTransactionState.VerificationRequestState> {
+extension UnfinishedConsumableTransaction.VerificationRequestState: Arbitrary {
+    public static var arbitrary: Gen<UnfinishedConsumableTransaction.VerificationRequestState> {
         Gen.one(of: [
             // Should cover all cases
             Gen.pure(.notRequested),
             Gen.pure(.pendingResponse),
             ErrorEvent<ErrorRepr>.arbitrary
-                .map(UnverifiedPsiCashTransactionState.VerificationRequestState.requestError),
+                .map(UnfinishedConsumableTransaction.VerificationRequestState.requestError),
         ])
     }
 }
 
-extension UnverifiedPsiCashTransactionState: Arbitrary {
-    public static var arbitrary: Gen<UnverifiedPsiCashTransactionState> {
+extension UnfinishedConsumableTransaction: Arbitrary {
+    public static var arbitrary: Gen<UnfinishedConsumableTransaction> {
         Gen.zip(PaymentTransaction.arbitrary, VerificationRequestState.arbitrary)
             .suchThat({ (paymentTransaction, _) -> Bool in
                 if case .completed(.success(_)) = paymentTransaction.transactionState() {
@@ -278,7 +280,7 @@ extension UnverifiedPsiCashTransactionState: Arbitrary {
                 return false
             }).map {
                 guard let value =
-                    UnverifiedPsiCashTransactionState(transaction: $0, verificationState: $1) else {
+                    UnfinishedConsumableTransaction(transaction: $0, verificationState: $1) else {
                         XCTFatal()
                 }
                 return value
@@ -385,7 +387,19 @@ extension IAPState: Arbitrary {
     public static var arbitrary: Gen<IAPState> {
         Gen.compose { c in
             IAPState(unverifiedPsiCashTx: c.generate(),
-                     purchasing: c.generate())
+                     purchasing: c.generate(using:
+                        [AppStoreProductType: IAPPurchasing].arbitrary
+                            .suchThat({ dict -> Bool in
+                                // The productType of the given key's value should
+                                // match the key.
+                                for key in dict.keys {
+                                    if dict[key]?.productType != key {
+                                        return false
+                                    }
+                                }
+                                return true
+                            })
+            ))
         }
     }
 }
@@ -499,7 +513,7 @@ extension IAPReducerState: Arbitrary {
     static let arbitraryWithPendingVerificationPurchaseState = Gen<IAPReducerState>.compose { c in
         IAPReducerState(
             iap: IAPState(
-                unverifiedPsiCashTx: c.generate(using:UnverifiedPsiCashTransactionState.arbitrary),
+                unverifiedPsiCashTx: c.generate(using:UnfinishedConsumableTransaction.arbitrary),
                 purchasing: c.generate()
             ),
             psiCashBalance: c.generate(),
@@ -524,14 +538,6 @@ extension IAPReducerState: Arbitrary {
         )
     }
     
-}
-
-extension AddedPayment: Arbitrary {
-    public static var arbitrary: Gen<AddedPayment> {
-        Gen.compose { c in
-            AddedPayment(c.generate(), c.generate())
-        }
-    }
 }
 
 extension PsiCashValidationResponse.ResponseError: Arbitrary {

@@ -44,10 +44,9 @@ extension PaymentQueue {
             }
         },
         addPayment: { product in
-            Effect { () -> AddedPayment in
+            .fireAndForget {
                 let skPayment = SKPayment(product: product.skProductRef!)
                 SKPaymentQueue.default().add(skPayment)
-                return AddedPayment(product, Payment.from(skPayment: skPayment))
             }
         },
         addObserver: { observer in
