@@ -149,7 +149,7 @@ struct VPNProviderManagerState<T: TunnelProviderManager>: Equatable {
 
 struct VPNProviderManagerReducerState<T: TunnelProviderManager>: Equatable {
     var vpnState: VPNProviderManagerState<T>
-    let subscriptionTransactionsPendingAuthorization: Set<OriginalTransactionID>
+    let subscriptionTransactionsPendingAuthorization: Set<WebOrderLineItemID>
 }
 
 typealias VPNReducerEnvironment<T: TunnelProviderManager> = (

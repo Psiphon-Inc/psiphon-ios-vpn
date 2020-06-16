@@ -132,10 +132,10 @@ public struct SubscriptionAuthState: Equatable {
 
     public init() {}
     
-    public typealias PurchaseAuthStateDict = [OriginalTransactionID: SubscriptionPurchaseAuthState]
+    public typealias PurchaseAuthStateDict = [WebOrderLineItemID: SubscriptionPurchaseAuthState]
 
     /// Set of transactions that either have a pending authorization request (either in-flight or pending tunnel connected).
-    public var transactionsPendingAuthRequest = Set<OriginalTransactionID>()
+    public var transactionsPendingAuthRequest = Set<WebOrderLineItemID>()
     
     /// `nil` represents that subscription auths have not been restored from previously stored value.
     /// This value is in  sync with stored value in  `PsiphonDataSharedDBContainer`
@@ -322,7 +322,7 @@ public func subscriptionAuthStateReducer(
         
         // Adds transaction ID to set of transaction IDs pending authorization request response.
         let (inserted, _) = state.subscription.transactionsPendingAuthRequest.insert(
-            purchaseWithLatestExpiry.purchase.originalTransactionID
+            purchaseWithLatestExpiry.purchase.webOrderLineItemID
         )
         
         // Guards that the an authorization request is not already made given the transaction ID.
@@ -333,10 +333,12 @@ public func subscriptionAuthStateReducer(
         // Creates retriable authorization request.
 
         let req = PurchaseVerifierServer.subscription(
-         requestBody: SubscriptionValidationRequest(
-             originalTransactionID: purchaseWithLatestExpiry.purchase.originalTransactionID,
-             receipt: receiptData
-         ),
+            requestBody: SubscriptionValidationRequest(
+                originalTransactionID: purchaseWithLatestExpiry.purchase.originalTransactionID,
+                webOrderLineItemID: purchaseWithLatestExpiry.purchase.webOrderLineItemID,
+                productID: purchaseWithLatestExpiry.purchase.productID,
+                receipt: receiptData
+            ),
          clientMetaData: environment.clientMetaData
         )
 
@@ -367,20 +369,20 @@ public func subscriptionAuthStateReducer(
                 )
             },
             environment.feedbackLogger.log(.info, """
-                initiated auth request for original transaction ID \
-                \(purchaseWithLatestExpiry.purchase.originalTransactionID)
+                initiated auth request for webOrderLineItemID \
+                \(purchaseWithLatestExpiry.purchase.webOrderLineItemID)
                 """).mapNever()
         ]
         
     case let ._authorizationRequestResult(result: requestResult, forPurchase: purchase):
         guard
             state.subscription.transactionsPendingAuthRequest
-                .contains(purchase.originalTransactionID)
+                .contains(purchase.webOrderLineItemID)
             else {
                 return [
                     environment.feedbackLogger.log(.warn, """
                         'state.subscription.transactionsPendingAuthRequest' does not contains \
-                        purchase with original transaction ID: '\(purchase.originalTransactionID)'
+                        purchase with webOrderLineItemID: '\(purchase.webOrderLineItemID)'
                         """).mapNever()
                 ]
         }
@@ -389,18 +391,18 @@ public func subscriptionAuthStateReducer(
             fatalError()
         }
         
-        guard purchasesAuthState.contains(originalTransactionID: purchase.originalTransactionID)
+        guard purchasesAuthState.contains(webOrderLineItemID: purchase.webOrderLineItemID)
             else {
                 
                 // Removes the transaction from set of transactions pending auth request,
                 // as this transaction is no longer valid (since it is not part of the state).
                 state.subscription.transactionsPendingAuthRequest
-                    .remove(purchase.originalTransactionID)
+                    .remove(purchase.webOrderLineItemID)
                 
                 return [
                     environment.feedbackLogger.log(.warn, """
                         'state.subscription.purchaseAuthStates' does not contain purchase
-                        with original transaction ID: '\(purchase.originalTransactionID)'
+                        with webOrderLineItemID: '\(purchase.webOrderLineItemID)'
                         """).mapNever()
                 ]
         }
@@ -428,11 +430,11 @@ public func subscriptionAuthStateReducer(
             )
             
             // Authorization request for this purchase is no longer pending.
-            state.subscription.transactionsPendingAuthRequest.remove(purchase.originalTransactionID)
+            state.subscription.transactionsPendingAuthRequest.remove(purchase.webOrderLineItemID)
             
             let stateUpdateEffect = state.subscription.setAuthorizationState(
                 newValue: .requestError(errorEvent.eraseToRepr()),
-                forOriginalTransactionID: purchase.originalTransactionID,
+                forWebOrderLineItemID: purchase.webOrderLineItemID,
                 environment: environment
             )
             
@@ -446,24 +448,24 @@ public func subscriptionAuthStateReducer(
             // Authorization request completed with a response from purchase verifier server.
             
             // Authorization request for this purchase is no longer pending.
-            state.subscription.transactionsPendingAuthRequest.remove(purchase.originalTransactionID)
+            state.subscription.transactionsPendingAuthRequest.remove(purchase.webOrderLineItemID)
             
             switch subscriptionValidationResult {
                 
             case .success(let okResponse):
                 // 200-OK response from the purchase verifier server.
-                guard okResponse.originalTransactionID == purchase.originalTransactionID else {
+                guard okResponse.webOrderLineItemID == purchase.webOrderLineItemID else {
                     let log: LogMessage =
                         """
-                        sever transaction ID '\(okResponse.originalTransactionID)' did not match \
-                        expected transaction ID '\(purchase.originalTransactionID)'
+                        sever webOrderLineItemID '\(okResponse.webOrderLineItemID)' did not match \
+                        expected webOrderLineItemID '\(purchase.webOrderLineItemID)'
                         """
                     let err = ErrorEvent(ErrorRepr(repr:String(describing:log)),
                                          date: okResponse.requestDate)
                     return [
                         state.subscription.setAuthorizationState(
                             newValue: .requestError(err),
-                            forOriginalTransactionID: purchase.originalTransactionID,
+                            forWebOrderLineItemID: purchase.webOrderLineItemID,
                             environment: environment
                         ).mapNever(),
                         environment.feedbackLogger.log(.error, log).mapNever()
@@ -479,7 +481,7 @@ public func subscriptionAuthStateReducer(
                         return [
                             state.subscription.setAuthorizationState(
                                 newValue: .requestError(err),
-                                forOriginalTransactionID: purchase.originalTransactionID,
+                                forWebOrderLineItemID: purchase.webOrderLineItemID,
                                 environment: environment
                             ).mapNever(),
                             environment.feedbackLogger.log(.error, log).mapNever()
@@ -488,7 +490,7 @@ public func subscriptionAuthStateReducer(
                     
                     let stateUpdateEffect = state.subscription.setAuthorizationState(
                         newValue: .authorization(signedAuthorization),
-                        forOriginalTransactionID: okResponse.originalTransactionID,
+                        forWebOrderLineItemID: okResponse.webOrderLineItemID,
                         environment: environment
                     )
                     
@@ -505,7 +507,7 @@ public func subscriptionAuthStateReducer(
                 case .transactionExpired:
                     let stateUpdateEffect = state.subscription.setAuthorizationState(
                         newValue: .requestRejected(.transactionExpired),
-                        forOriginalTransactionID: okResponse.originalTransactionID,
+                        forWebOrderLineItemID: okResponse.webOrderLineItemID,
                         environment: environment
                     )
                     
@@ -520,7 +522,7 @@ public func subscriptionAuthStateReducer(
                 case .transactionCancelled:
                     let stateUpdateEffect = state.subscription.setAuthorizationState(
                         newValue: .requestRejected(.transactionCancelled),
-                        forOriginalTransactionID: okResponse.originalTransactionID,
+                        forWebOrderLineItemID: okResponse.webOrderLineItemID,
                         environment: environment
                     )
                     
@@ -538,13 +540,16 @@ public func subscriptionAuthStateReducer(
                 var effects = [Effect<SubscriptionAuthStateAction>]()
                 
                 effects.append(
-                    environment.feedbackLogger.log(.error, "authorization request failed '\(failureEvent)'").mapNever()
+                    environment.feedbackLogger.log(.error, """
+                        authorization request failed for webOrderLineItemID \
+                        '\(purchase.webOrderLineItemID)': error: '\(failureEvent)'
+                        """).mapNever()
                 )
                 
                 if case .badRequest = failureEvent.error {
                     let stateUpdateEffect = state.subscription.setAuthorizationState(
                         newValue: .requestRejected(.badRequestError),
-                        forOriginalTransactionID: purchase.originalTransactionID,
+                        forWebOrderLineItemID: purchase.webOrderLineItemID,
                         environment: environment
                     )
                     
@@ -553,7 +558,7 @@ public func subscriptionAuthStateReducer(
                 } else {
                     let stateUpdateEffect = state.subscription.setAuthorizationState(
                         newValue: .requestError(failureEvent.eraseToRepr()),
-                        forOriginalTransactionID: purchase.originalTransactionID,
+                        forWebOrderLineItemID: purchase.webOrderLineItemID,
                         environment: environment
                     )
                     
@@ -580,7 +585,7 @@ extension SubscriptionStatus {
     
 }
 
-extension Dictionary where Key == OriginalTransactionID, Value == SubscriptionPurchaseAuthState {
+extension Dictionary where Key == WebOrderLineItemID, Value == SubscriptionPurchaseAuthState {
     
     func updateAuthorizationState(
         givenRejectedAuthIDs rejectedAuthIDs: Set<AuthorizationID>
@@ -636,27 +641,27 @@ extension Dictionary where Key == OriginalTransactionID, Value == SubscriptionPu
     /// - Precondition: Each element `updatedPurchases` must have unique transaction ID.
     func merge(withUpdatedPurchases updatedPurchases: Set<SubscriptionIAPPurchase>) -> Self {
         
-        // updatedPurchases with latest expiry, hashed by OriginalTransactionID.
+        // updatedPurchases with latest expiry, hashed by WebOrderLineItemID.
         let altUpdatedPurchases = Set(updatedPurchases.sortedByExpiry().reversed().map {
-            HashableView($0, \.originalTransactionID)
+            HashableView($0, \.webOrderLineItemID)
         })
 
-        let updatedPurchasesDict = [OriginalTransactionID: SubscriptionIAPPurchase](
+        let updatedPurchasesDict = [WebOrderLineItemID: SubscriptionIAPPurchase](
             uniqueKeysWithValues: altUpdatedPurchases.map {
-                ($0.value.originalTransactionID, $0.value)
+                ($0.value.webOrderLineItemID, $0.value)
             }
         )
         return updatedPurchasesDict.mapValues {
             SubscriptionPurchaseAuthState(
                 purchase: $0,
-                signedAuthorization: self[$0.originalTransactionID]?.signedAuthorization ?? .notRequested
+                signedAuthorization: self[$0.webOrderLineItemID]?.signedAuthorization ?? .notRequested
             )
         }
     }
     
-    func contains(originalTransactionID: OriginalTransactionID) -> Bool {
+    func contains(webOrderLineItemID: WebOrderLineItemID) -> Bool {
         self.contains { (key, _) -> Bool in
-            key == originalTransactionID
+            key == webOrderLineItemID
         }
     }
     
@@ -695,19 +700,19 @@ extension SubscriptionAuthState {
     
     mutating func setAuthorizationState(
         newValue: SubscriptionPurchaseAuthState.AuthorizationState,
-        forOriginalTransactionID originalTransactionID: OriginalTransactionID,
+        forWebOrderLineItemID webOrderLineItemID: WebOrderLineItemID,
         environment: SubscriptionAuthStateReducerEnvironment
     ) -> Effect<Never> {
         guard var purchasesAuthState = self.purchasesAuthState else {
             fatalError()
         }
         
-        guard var currentValue = purchasesAuthState.removeValue(forKey: originalTransactionID) else{
-            fatalError("expected original transaction ID '\(originalTransactionID)'")
+        guard var currentValue = purchasesAuthState.removeValue(forKey: webOrderLineItemID) else{
+            fatalError("expected webOrderLineItemID '\(webOrderLineItemID)'")
         }
         
         currentValue.signedAuthorization = newValue
-        purchasesAuthState[originalTransactionID] = currentValue
+        purchasesAuthState[webOrderLineItemID] = currentValue
         return setPurchasesAuthState(newValue: purchasesAuthState, environment: environment)
     }
     
@@ -773,7 +778,7 @@ fileprivate enum StoredSubscriptionPurchasesAuthState {
     
     typealias StoredDataType = SubscriptionAuthState.PurchaseAuthStateDict
     
-    /// Returned effect emits stored data with type `[OriginalTransactionID, SubscriptionPurchaseAuthState]`.
+    /// Returned effect emits stored data with type `[WebOrderLineItemID, SubscriptionPurchaseAuthState]`.
     /// If there is no stored data, returns an empty dictionary.
     static func getValue(
         sharedDB: SharedDBContainer

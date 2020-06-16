@@ -63,16 +63,16 @@ extension PaymentQueue {
     
     static func mock(
         transactions: Gen<[PaymentTransaction]>? = nil,
-        addPayment: ((AppStoreProduct) -> AddedPayment)? = nil,
+        addPayment: ((AppStoreProduct) -> Effect<Never>)? = nil,
         finishTransaction: ((PaymentTransaction) -> Effect<Never>)? = nil
     ) -> PaymentQueue {
         return PaymentQueue(
             transactions: { () -> Effect<[PaymentTransaction]> in
                 Effect(value: returnGeneratedOrFail(transactions))
             },
-            addPayment: { product -> Effect<AddedPayment> in
+            addPayment: { product -> Effect<Never> in
                 guard let addPayment = addPayment else { XCTFatal() }
-                return Effect(value: addPayment(product))
+                return addPayment(product)
             },
             addObserver: { _ -> Effect<Never> in
                 return .empty

@@ -36,10 +36,11 @@ NSInteger const ReceiptASN1TypeBundleIdentifier = 2;
 NSInteger const ReceiptASN1TypeInAppPurchaseReceipt = 17;
 NSInteger const ReceiptASN1TypeProductIdentifier = 1702;
 NSInteger const ReceiptASN1TypeTransactionID = 1703;
-NSInteger const ReceiptASN1TypePurchaeDate =  1704;
+NSInteger const ReceiptASN1TypePurchaseDate =  1704;
 NSInteger const ReceiptASN1TypeOriginalTransactionID = 1705;
 NSInteger const ReceiptASN1TypeSubscriptionExpirationDate = 1708;
 NSInteger const ReceiptASN1TypeIsInIntroOfferPeriod = 1719;
+NSInteger const ReceiptASN1TypeWebOrderLineItemID = 1711;
 NSInteger const ReceiptASN1TypeCancellationDate = 1712;
 
 static NSString* ASN1ReadUTF8String(const uint8_t *bytes, long length) {
@@ -186,6 +187,11 @@ static long ASN1ReadInteger(const uint8_t *bytes, long length) {
 - (instancetype)initWithASN1Data:(NSData *_Nonnull)asn1Data {
     self = [super init];
     if (self) {
+        // Initializes subscription-only fields to nil.
+        self->_webOrderLineItemID = nil;
+        self->_expiresDate = nil;
+        self->_cancellationDate = nil;
+        
         [AppStoreParsedReceiptData enumerateReceiptAttributes:(const uint8_t*)asn1Data.bytes
                                                  length:asn1Data.length
                                              usingBlock:^(NSData *data, long type)
@@ -202,7 +208,7 @@ static long ASN1ReadInteger(const uint8_t *bytes, long length) {
                 case ReceiptASN1TypeOriginalTransactionID:
                     self->_originalTransactionID = ASN1ReadUTF8String(p, length);
                     break;
-                case ReceiptASN1TypePurchaeDate: {
+                case ReceiptASN1TypePurchaseDate: {
                     NSString *string = ASN1ReadIA5SString(p, length);
                     self->_purchaseDate = [NSDate fromRFC3339String:string];
                     break;
@@ -217,9 +223,16 @@ static long ASN1ReadInteger(const uint8_t *bytes, long length) {
                     self->_cancellationDate = [NSDate fromRFC3339String:string];
                     break;
                 }
+                case ReceiptASN1TypeWebOrderLineItemID: {
+                    long webOrderLineItemID = ASN1ReadInteger(p, length);
+                    self->_webOrderLineItemID = [NSString stringWithFormat:@"%ld",
+                                                 webOrderLineItemID];
+                    break;
+                }
                 case ReceiptASN1TypeIsInIntroOfferPeriod: {
                     long is_in_intro_period = ASN1ReadInteger(p, length);
-                    self->_isInIntroPeriod = [[NSNumber numberWithLong: is_in_intro_period] boolValue];
+                    self->_isInIntroPeriod = [[NSNumber numberWithLong: is_in_intro_period]
+                                              boolValue];
                     break;
                 }
             }

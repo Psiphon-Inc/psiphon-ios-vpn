@@ -84,6 +84,8 @@ extension ReceiptData {
                     transactionID: TransactionID(rawValue: parsedIAP.transactionID)!,
                     originalTransactionID: OriginalTransactionID(rawValue:
                         parsedIAP.originalTransactionID)!,
+                    webOrderLineItemID: WebOrderLineItemID(rawValue:
+                        parsedIAP.webOrderLineItemID!)!,
                     purchaseDate: parsedIAP.purchaseDate,
                     expires: parsedIAP.expiresDate!,
                     isInIntroOfferPeriod: parsedIAP.isInIntroPeriod,
