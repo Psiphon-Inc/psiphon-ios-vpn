@@ -153,6 +153,7 @@ extension SubscriptionValidationResponse.SuccessResult: Arbitrary {
             SubscriptionValidationResponse.SuccessResult(
                 requestDate: c.generate(),
                 originalTransactionID: c.generate(),
+                webOrderLineItemID: c.generate(),
                 signedAuthorization: c.generate(),
                 errorStatus: c.generate(),
                 errorDescription: c.generate())
