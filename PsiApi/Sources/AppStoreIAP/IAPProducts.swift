@@ -285,10 +285,6 @@ extension PaymentTransaction.TransactionState {
     /// `shouldFinishTransactionImmediately` determines whether or not to
     /// call `finishTransaction(_:)` on an App Store IAP before any deliverables are delivered
     /// based on current transaction state and the provided `productType`.
-    ///
-    /// If returns `false` for a successful transaction, then the transaction should
-    /// Otherwise, for the given transaction, deliverables should be delivered to the user
-    /// and then transaction
     public func shouldFinishTransactionImmediately(
         productType: AppStoreProductType
     ) -> FinishAppStoreTransaction {
