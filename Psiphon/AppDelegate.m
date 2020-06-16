@@ -169,13 +169,6 @@ willFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
 
 #pragma mark - VPN start stop
 
-typedef NS_ENUM(NSInteger, VPNIntent) {
-    VPNIntentStartPsiphonTunnelWithoutAds,
-    VPNIntentStartPsiphonTunnelWithAds,
-    VPNIntentStopVPN,
-    VPNIntentNoInternetAlert,
-};
-
 // Emitted NSNumber is of type VPNIntent.
 - (RACSignal<RACTwoTuple<NSNumber*, SwitchedVPNStartStopIntent*> *> *)startOrStopVPNSignalWithAd:(BOOL)showAd {
     
@@ -187,34 +180,21 @@ typedef NS_ENUM(NSInteger, VPNIntent) {
                             format:@"expected non-nil SwitchedVPNStartStopIntent value"];
             }
             
-            VPNIntent vpnIntentValue;
-            
-            if (newIntent.intendToStart) {
-                
-                if (newIntent.vpnConfigInstalled) {
-                    if (newIntent.userSubscribed || !showAd) {
-                        vpnIntentValue = VPNIntentStartPsiphonTunnelWithoutAds;
-                    } else {
-                        vpnIntentValue = VPNIntentStartPsiphonTunnelWithAds;
-                    }
-                } else {
-                    // VPN Config is not installed. Skip ads.
-                    vpnIntentValue = VPNIntentStartPsiphonTunnelWithoutAds;
+            // Mutates `newIntent` startButtonAction value if `showAd` is FALSE.
+            if (newIntent.startButtonAction == StartButtonActionStartTunnelWithAds) {
+                if (!showAd) {
+                    [newIntent forceNoAds];
                 }
-            } else {
-                // The new intent is to stop the VPN.
-                vpnIntentValue = VPNIntentStopVPN;
             }
             
-            [subscriber sendNext:[RACTwoTuple pack:@(vpnIntentValue) :newIntent]];
+            [subscriber sendNext:newIntent];
             [subscriber sendCompleted];
             return nil;
         }];
         
         return nil;
-    }] flattenMap:^RACSignal<RACTwoTuple *> *(RACTwoTuple<NSNumber*, SwitchedVPNStartStopIntent*> *value) {
-        VPNIntent vpnIntent = (VPNIntent)[value.first integerValue];
-        if (vpnIntent == VPNIntentStartPsiphonTunnelWithAds) {
+    }] flattenMap:^RACSignal<SwitchedVPNStartStopIntent *> *(SwitchedVPNStartStopIntent *value) {
+        if (value.startButtonAction == StartButtonActionStartTunnelWithAds) {
             // Start tunnel after ad presentation signal completes.
             // We always want to start the tunnel after the presentation signal
             // is completed, no matter if it presented an ad or it failed.
@@ -226,9 +206,9 @@ typedef NS_ENUM(NSInteger, VPNIntent) {
         } else {
             return [RACSignal return:value];
         }
-    }] doNext:^(RACTwoTuple<NSNumber*, SwitchedVPNStartStopIntent*> *value) {
+    }] doNext:^(SwitchedVPNStartStopIntent *value) {
         dispatch_async_main(^{
-            [SwiftDelegate.bridge sendNewVPNIntent:value.second];
+            [SwiftDelegate.bridge sendNewVPNIntent:value];
         });
     }] deliverOnMainThread];
 }

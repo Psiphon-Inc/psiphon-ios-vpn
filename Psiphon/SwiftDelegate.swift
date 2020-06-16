@@ -482,10 +482,18 @@ extension SwiftDelegate: SwiftBridgeDelegate {
                 }
                 .take(first: 1)
         
-        syncedVPNState.zip(with: subscription)
+        let activeSpeedBoost: SignalProducer<PurchasedExpirableProduct<SpeedBoostProduct>?, Never> =
+            self.store.$value.signalProducer
+                .map(\.psiCash.activeSpeedBoost)
+                .take(first: 1)
+        
+        syncedVPNState.zip(with: subscription).zip(with: activeSpeedBoost)
             .map {
-                SwitchedVPNStartStopIntent.make(fromProviderManagerState: $0.0,
-                                                subscriptionStatus: $0.1)
+                SwitchedVPNStartStopIntent.make(
+                    fromProviderManagerState: $0.0.0,
+                    subscriptionStatus: $0.0.1,
+                    currentActiveSpeedBoost: $0.1
+                )
             }.startWithValues { newIntentValue in
                 promise.fulfill(newIntentValue)
             }

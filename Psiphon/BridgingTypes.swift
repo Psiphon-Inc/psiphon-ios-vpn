@@ -107,32 +107,37 @@ import PsiCashClient
 
 // MARK: Bridged Types
 
+@objc enum StartButtonAction: Int {
+    case startTunnelWithoutAds
+    case startTunnelWithAds
+    case stopVPN
+}
+
 // TODO: Log the fatalError calls
 @objc final class SwitchedVPNStartStopIntent: NSObject {
     
     let switchedIntent: TunnelStartStopIntent
-    @objc let vpnConfigInstalled: Bool
-    @objc let userSubscribed: Bool
+    @objc var startButtonAction: StartButtonAction
     
-    @objc var intendToStart: Bool {
-        switch switchedIntent {
-        case .start(transition: .none): return true
-        case .stop: return false
-        default: fatalError("Unexpected tunnel intent value '\(switchedIntent)'")
-        }
+    private init(
+        switchedIntent: TunnelStartStopIntent,
+        startButtonAction: StartButtonAction
+    ) {
+        self.switchedIntent = switchedIntent
+        self.startButtonAction = startButtonAction
     }
     
-    private init(switchedIntent: TunnelStartStopIntent, vpnConfigInstalled: Bool,
-                 userSubscribed: Bool) {
-        self.switchedIntent = switchedIntent
-        self.vpnConfigInstalled = vpnConfigInstalled
-        self.userSubscribed = userSubscribed
+    @objc func forceNoAds() {
+        if case .startTunnelWithAds = startButtonAction {
+            startButtonAction = .startTunnelWithoutAds
+        }
     }
     
     static func make<T: TunnelProviderManager>(
         fromProviderManagerState state: VPNProviderManagerState<T>,
-        subscriptionStatus: SubscriptionStatus
-    ) -> Self {
+        subscriptionStatus: SubscriptionStatus,
+        currentActiveSpeedBoost: PurchasedExpirableProduct<SpeedBoostProduct>?
+    ) -> SwitchedVPNStartStopIntent {
         guard case .completed(_) = state.providerSyncResult else {
             fatalError("expected no pending sync with tunnel provider")
         }
@@ -147,17 +152,39 @@ import PsiCashClient
             fatalError("expected subscription status to not be unknown")
         }
 
+        let intendToStart: Bool
         let newIntent: TunnelStartStopIntent
         if state.vpnStatus.providerRunning {
             newIntent = .stop
+            intendToStart = false
         } else {
             newIntent = .start(transition: .none)
+            intendToStart = true
         }
         
-        return .init(switchedIntent: newIntent,
-                     vpnConfigInstalled: state.loadState.vpnConfigurationInstalled,
-                     userSubscribed: userSubscribed)
-    
+        let startButtonAction: StartButtonAction
+        if (intendToStart) {
+            if (state.loadState.vpnConfigurationInstalled) {
+                // If user is subscribed, or there currently is an active speed boost,
+                // then start tunnel without ads.
+                if (userSubscribed || currentActiveSpeedBoost != nil) {
+                    startButtonAction = .startTunnelWithoutAds
+                } else {
+                    startButtonAction = .startTunnelWithAds
+                }
+            } else {
+                // VPN Config is not installed. Skip ads.
+                startButtonAction = .startTunnelWithoutAds
+            }
+        } else {
+            // The intent is to stop the VPN.
+            startButtonAction = .stopVPN
+        }
+        
+        return SwitchedVPNStartStopIntent(
+            switchedIntent: newIntent,
+            startButtonAction: startButtonAction
+        )
     }
     
 }
