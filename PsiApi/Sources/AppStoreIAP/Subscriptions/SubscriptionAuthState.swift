@@ -335,6 +335,7 @@ public func subscriptionAuthStateReducer(
         let req = PurchaseVerifierServer.subscription(
          requestBody: SubscriptionValidationRequest(
              originalTransactionID: purchaseWithLatestExpiry.purchase.originalTransactionID,
+             productID: purchaseWithLatestExpiry.purchase.productID,
              receipt: receiptData
          ),
          clientMetaData: environment.clientMetaData
