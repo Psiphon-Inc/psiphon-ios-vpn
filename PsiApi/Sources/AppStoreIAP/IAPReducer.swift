@@ -435,10 +435,14 @@ public func iapReducer(
             if case .completed(_) = tx.transactionState(), case .subscription = productType {
                 let maybeError = state.iap.purchasing[productType]?.purchasingState.completed
                 
-                fulfillAll(promises: state.iap.objcSubscriptionPromises,
-                           with: ObjCIAPResult(transaction: tx.skPaymentTransaction()!, error: maybeError))
+                if state.iap.objcSubscriptionPromises.count > 0 {
+                    fulfillAll(promises: state.iap.objcSubscriptionPromises,
+                               with: ObjCIAPResult(transaction: tx.skPaymentTransaction()!,
+                                                   error: maybeError))
+                    
+                    state.iap.objcSubscriptionPromises = []
+                }
                 
-                state.iap.objcSubscriptionPromises = []
             }
             
             // Adds effect to finish current transaction `tx`.
