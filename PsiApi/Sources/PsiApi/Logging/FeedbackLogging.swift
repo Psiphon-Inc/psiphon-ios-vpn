@@ -73,7 +73,7 @@ final class ArrayFeedbackLogHandler: FeedbackLogHandler {
 }
 
 public struct LogMessage: ExpressibleByStringLiteral, ExpressibleByStringInterpolation,
-Equatable, CustomStringConvertible, CustomStringFeedbackDescription, FeedbackDescription {
+Equatable, CustomStringConvertible, CustomStringFeedbackDescription, FeedbackDescription, Hashable {
     public typealias StringLiteralType = String
     
     private var value: String

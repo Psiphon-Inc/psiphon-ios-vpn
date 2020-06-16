@@ -24,7 +24,11 @@ import Utilities
 public typealias HashableError = Error & Hashable
 
 public struct FatalError: HashableError {
-    let message: String
+    public let message: LogMessage
+    
+    public init(_ message: LogMessage) {
+        self.message = message
+    }
 }
 
 /// String representation of a type-erased error.
