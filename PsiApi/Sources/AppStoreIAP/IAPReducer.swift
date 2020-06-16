@@ -169,18 +169,8 @@ public func iapReducer(
             
         case .subscription:
             if let promise = maybeObjcSubscriptionPromise {
-                if state.iap.objcSubscriptionPromise == nil {
-                    state.iap.objcSubscriptionPromise = promise
-                } else {
-                    // As a temporary limitation, only one purchase can be initiated
-                    // from ObjC code.
-                    return [
-                        environment.feedbackLogger.log(
-                            .warn, "an ObjC subscription purchase already exists").mapNever()
-                    ]
-                }
+                state.iap.objcSubscriptionPromises.append(promise)
             }
-            
         }
         
         state.iap.purchasing[product.type] = IAPPurchasing(
@@ -438,15 +428,17 @@ public func iapReducer(
                 return []
             }
             
-            // Fulfills pending purchase promise (if any) for a complete subscription transaction.
+            // Fulfills all pending purchase promise (if any)
+            // for a complete subscription transaction.
             // precondition: `state.iap.purchasing[productType]` should be updated
             //               before the objcPromise is resolved.
             if case .completed(_) = tx.transactionState(), case .subscription = productType {
                 let maybeError = state.iap.purchasing[productType]?.purchasingState.completed
                 
-                state.iap.objcSubscriptionPromise?.fulfill(
-                    ObjCIAPResult(transaction: tx.skPaymentTransaction()!, error: maybeError)
-                )
+                fulfillAll(promises: state.iap.objcSubscriptionPromises,
+                           with: ObjCIAPResult(transaction: tx.skPaymentTransaction()!, error: maybeError))
+                
+                state.iap.objcSubscriptionPromises = []
             }
             
             // Adds effect to finish current transaction `tx`.

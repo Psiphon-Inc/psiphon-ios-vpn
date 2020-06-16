@@ -166,7 +166,7 @@ public struct IAPState: Equatable {
     /// Contains products currently being purchased.
     public var purchasing: [AppStoreProductType: IAPPurchasing]
     
-    public var objcSubscriptionPromise: Promise<ObjCIAPResult>? = nil
+    public var objcSubscriptionPromises = [Promise<ObjCIAPResult>]()
     
     public init() {
         self.purchasing = [:]
