@@ -442,13 +442,26 @@ NSTimeInterval const MaxAdLoadingTime = 10.f;
         return status.state != BridgedSubscriptionStateUnknown;
       }]
       take:1];
+    
+    RACSignal<NSNumber *> *isCurrentlySpeedBoosted = [RACSignal createSignal:^RACDisposable * _Nullable(id<RACSubscriber>  _Nonnull subscriber) {
+        [SwiftDelegate.bridge isCurrentlySpeedBoostedWithCompletionHandler:^(BOOL activeSpeedBoost) {
+            [subscriber sendNext: [NSNumber numberWithBool:activeSpeedBoost]];
+            [subscriber sendCompleted];
+        }];
+        return nil;
+    }];
 
     // Returned signal emits RACUnit and completes immediately after all loading operations
     // are done.
-    return [subscriptionLoadingSignal flattenMap:^RACSignal *(BridgedUserSubscription *status) {
+    return [[subscriptionLoadingSignal zipWith:isCurrentlySpeedBoosted]
+            flattenMap:^RACSignal *(NSArray *value) {
+        
+        BridgedUserSubscription *status = (BridgedUserSubscription *)value[0];
+        BOOL currentlySpeedBoosted = [((NSNumber *)value[1]) boolValue];
+        
         BOOL subscribed = (status.state == BridgedSubscriptionStateActive);
 
-        if (subscribed) {
+        if (subscribed || currentlySpeedBoosted) {
             // User is subscribed, dismiss the loading screen immediately.
             return [RACSignal return:RACUnit.defaultUnit];
         } else {
