@@ -23,20 +23,25 @@ import PsiApi
 
 public struct SubscriptionValidationRequest: Codable {
     public let originalTransactionID: OriginalTransactionID
+    public let webOrderLineItemID: WebOrderLineItemID
     public let productID: ProductID
-    let receiptData: String
+    public let receiptData: String
     
     public init(
         originalTransactionID: OriginalTransactionID,
+        webOrderLineItemID: WebOrderLineItemID,
         productID: ProductID,
-        receipt: ReceiptData) {
+        receipt: ReceiptData
+    ) {
         self.originalTransactionID = originalTransactionID
+        self.webOrderLineItemID = webOrderLineItemID
         self.productID = productID
         self.receiptData = receipt.data.base64EncodedString()
     }
     
     private enum CodingKeys: String, CodingKey {
         case originalTransactionID = "original_transaction_id"
+        case webOrderLineItemID = "web_order_line_item_id"
         case productID = "product_id"
         case receiptData = "receipt_data"
     }
