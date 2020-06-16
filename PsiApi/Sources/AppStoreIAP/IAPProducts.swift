@@ -271,4 +271,48 @@ extension PaymentTransaction.TransactionState {
         }
     }
     
+    /// Represents whether for a given App Store transaction, `finishTransaction(_:)`
+    /// should be called on the transaction.
+    public enum FinishAppStoreTransaction: Equatable {
+        /// It's an error to call `finishTransaction(_:)` on the transaction given it's current state.
+        case nop
+        /// `finishTransaction(_:)` should be called immediately.
+        case immediately
+        /// `finishTransaction(_:)` should be called after all the deliverables are delivered.
+        case afterDeliverablesDelivered
+    }
+    
+    /// `shouldFinishTransactionImmediately` determines whether or not to
+    /// call `finishTransaction(_:)` on an App Store IAP before any deliverables are delivered
+    /// based on current transaction state and the provided `productType`.
+    ///
+    /// If returns `false` for a successful transaction, then the transaction should
+    /// Otherwise, for the given transaction, deliverables should be delivered to the user
+    /// and then transaction
+    public func shouldFinishTransactionImmediately(
+        productType: AppStoreProductType
+    ) -> FinishAppStoreTransaction {
+        switch self {
+        case .pending(_):
+            return .nop
+            
+        case .completed(.failure(_)):
+            return .immediately
+            
+        case .completed(.success(_)):
+            switch productType {
+            case .psiCash:
+                // PsiCash purchases are consumables. The receipt may
+                // no longer contain the transaction after it is finished.
+                return .afterDeliverablesDelivered
+            case .subscription:
+                // Subscription purchases are auto-renewable subscriptions.
+                // The transaction can be finished either right after it has
+                // completed, or like the case of `PsiCash` consumable purchase
+                // can be finished after all the deliverables have been delivered.
+                return .immediately
+            }
+        }
+    }
+    
 }
