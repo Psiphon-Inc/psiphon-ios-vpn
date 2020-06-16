@@ -251,12 +251,13 @@ final class SubscriptionAuthStateTest : XCTestCase {
     /// Test which covers when requesting an authorization for a purchase fails.
     func testAuthorizationRequestCompletedWithFailure () {
         property("Authorization request failed") <- forAll {
-            (response: SubscriptionValidationResponse.ResponseError,
+            (responseError: SubscriptionValidationResponse.ResponseError,
              purchase: SubscriptionIAPPurchase,
              env: SubscriptionAuthStateReducerEnvironment) in
 
-
-
+            // Arrange
+            let fixedDate = Date()
+            
             var authState = SubscriptionAuthState()
             authState.purchasesAuthState = .some([
                 purchase.originalTransactionID:
@@ -268,26 +269,34 @@ final class SubscriptionAuthStateTest : XCTestCase {
 
             let state = SubscriptionReducerState(subscription: authState,
                                                  receiptData: nil)
+            
+            var expectedNewState = state
+            expectedNewState.subscription.transactionsPendingAuthRequest
+                .remove(purchase.originalTransactionID)
+
+            if SubscriptionValidationResponse.ResponseError.badRequest == responseError {
+                expectedNewState.subscription.purchasesAuthState?[purchase.originalTransactionID] =
+                    SubscriptionPurchaseAuthState(purchase: purchase,
+                                                  signedAuthorization: .requestRejected(.badRequestError))
+            } else {
+                expectedNewState.subscription.purchasesAuthState?[purchase.originalTransactionID] =
+                    SubscriptionPurchaseAuthState(purchase: purchase,
+                                                  signedAuthorization: .requestError(ErrorEvent(responseError, date: fixedDate
+                                                  ).eraseToRepr()))
+            }
 
             // if we emit .failure then expect to see txn marked with bad req (non-200 response)
             let action: SubscriptionAuthStateAction =
-                ._authorizationRequestResult(result: .completed(.failure(.init(response))),
+                ._authorizationRequestResult(result: .completed(.failure(ErrorEvent(responseError, date: fixedDate))),
                                              forPurchase: purchase)
-
+            
+            // Act
             let output = SubscriptionAuthStateTest.runReducer(effectsTimeout: 0.1,
                                                               state: state,
                                                               action: action,
                                                               env: env)
 
-            var expectedNewState = state
-            expectedNewState.subscription.transactionsPendingAuthRequest.remove(purchase.originalTransactionID)
-
-            if SubscriptionValidationResponse.ResponseError.badRequest == response {
-                expectedNewState.subscription.purchasesAuthState?[purchase.originalTransactionID] =
-                    SubscriptionPurchaseAuthState(purchase: purchase,
-                                                  signedAuthorization: .requestRejected(.badRequestError))
-            }
-
+            // Assert
             return output.state ==== expectedNewState
         }
     }
