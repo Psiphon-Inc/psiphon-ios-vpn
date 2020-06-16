@@ -467,7 +467,7 @@ extension SwiftDelegate: SwiftBridgeDelegate {
             }
             .take(first: 1)
             .startWithValues { psiCashState in
-                // Calls completionHandler with `true` if currently Speed Boosted.
+                // Calls completionHandler with `true` if has an active Speed Boost.
                 completionHandler(psiCashState.activeSpeedBoost != nil)
         }
         
