@@ -166,7 +166,7 @@ import PsiCashClient
         let startButtonAction: StartButtonAction
         if (intendToStart) {
             if (state.loadState.vpnConfigurationInstalled) {
-                // If user is subscribed, or there currently is an active speed boost,
+                // If user is subscribed, or there currently is an active Speed Boost,
                 // then start tunnel without ads.
                 if (userSubscribed || currentActiveSpeedBoost != nil) {
                     startButtonAction = .startTunnelWithoutAds

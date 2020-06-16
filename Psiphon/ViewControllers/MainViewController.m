@@ -462,7 +462,8 @@ NSTimeInterval const MaxAdLoadingTime = 10.f;
         BOOL subscribed = (status.state == BridgedSubscriptionStateActive);
 
         if (subscribed || currentlySpeedBoosted) {
-            // User is subscribed, dismiss the loading screen immediately.
+            // User is subscribed or is has an active Speed Boost,
+            // dismisses the loading screen immediately.
             return [RACSignal return:RACUnit.defaultUnit];
         } else {
             // User is not subscribed, wait for the adsLoadingSignal.
