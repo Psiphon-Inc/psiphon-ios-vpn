@@ -459,6 +459,20 @@ extension SwiftDelegate: SwiftBridgeDelegate {
         }
     }
     
+    @objc func isCurrentlySpeedBoosted(completionHandler: @escaping (Bool) -> Void) {
+        self.store.$value.signalProducer
+            .map(\.psiCash)
+            .filter{ psiCashState in
+                psiCashState.libLoaded
+            }
+            .take(first: 1)
+            .startWithValues { psiCashState in
+                // Calls completionHandler with `true` if currently Speed Boosted.
+                completionHandler(psiCashState.activeSpeedBoost != nil)
+        }
+        
+    }
+    
     @objc func switchVPNStartStopIntent()
         -> Promise<SwitchedVPNStartStopIntent>.ObjCPromise<SwitchedVPNStartStopIntent>
     {

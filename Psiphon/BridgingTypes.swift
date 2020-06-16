@@ -92,6 +92,7 @@ import PsiCashClient
     @objc func onAdPresentationStatusChange(_ presenting: Bool)
     @objc func getAppStoreSubscriptionProductIDs() -> Set<String>
     @objc func getAppStateFeedbackEntry(completionHandler: @escaping (String) -> Void)
+    @objc func isCurrentlySpeedBoosted(completionHandler: @escaping (Bool) -> Void)
     
     // VPN
     
