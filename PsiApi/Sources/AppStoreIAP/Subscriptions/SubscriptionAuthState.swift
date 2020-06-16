@@ -538,7 +538,10 @@ public func subscriptionAuthStateReducer(
                 var effects = [Effect<SubscriptionAuthStateAction>]()
                 
                 effects.append(
-                    environment.feedbackLogger.log(.error, "authorization request failed '\(failureEvent)'").mapNever()
+                    environment.feedbackLogger.log(.error, """
+                        authorization request failed for original transaction id \
+                        '\(purchase.originalTransactionID)': error: '\(failureEvent)'
+                        """).mapNever()
                 )
                 
                 if case .badRequest = failureEvent.error {
