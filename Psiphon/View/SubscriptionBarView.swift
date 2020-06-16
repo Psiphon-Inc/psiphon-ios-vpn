@@ -207,12 +207,12 @@ extension SubscriptionBarView.SubscriptionBarState {
                 return .init(tunnelStatus: tunnelStatus, authState: .notSubscribed)
             }
             
-            let originalTxID = subscriptionPurchase.originalTransactionID
-            guard let purchaseState = purchasesAuthState[originalTxID] else {
+            let webOrderID = subscriptionPurchase.webOrderLineItemID
+            guard let purchaseState = purchasesAuthState[webOrderID] else {
                 return .init(tunnelStatus: tunnelStatus, authState: .notSubscribed)
             }
             
-            if authState.transactionsPendingAuthRequest.contains(originalTxID) {
+            if authState.transactionsPendingAuthRequest.contains(webOrderID) {
                 return .init(tunnelStatus: tunnelStatus, authState: .pending)
             } else {
                 

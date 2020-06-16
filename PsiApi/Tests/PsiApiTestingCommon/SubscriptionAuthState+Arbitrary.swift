@@ -130,7 +130,8 @@ extension SubscriptionAuthState: Arbitrary {
             if authStates.count > 0 {
                 subAuthState.purchasesAuthState = [:]
                 for purchaseAuthState in authStates {
-                    subAuthState.purchasesAuthState![purchaseAuthState.purchase.originalTransactionID] = purchaseAuthState
+                    let webOrderLineItemID = purchaseAuthState.purchase.webOrderLineItemID
+                    subAuthState.purchasesAuthState![webOrderLineItemID] = purchaseAuthState
                 }
             }
 

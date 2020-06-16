@@ -228,6 +228,15 @@ extension OriginalTransactionID: Arbitrary {
     }
 }
 
+extension WebOrderLineItemID: Arbitrary {
+    public static var arbitrary: Gen<WebOrderLineItemID> {
+        Int.arbitrary.resize(999_999_999).map {
+            WebOrderLineItemID.init(rawValue: String(abs($0)))!
+        }
+    }
+}
+
+
 extension Payment: Arbitrary {
     public static var arbitrary: Gen<Payment> {
         Gen.compose { c in
@@ -631,6 +640,7 @@ extension SubscriptionIAPPurchase: Arbitrary {
                 productID: c.generate(),
                 transactionID: c.generate(),
                 originalTransactionID: c.generate(),
+                webOrderLineItemID: c.generate(),
                 purchaseDate: c.generate(),
                 expires: c.generate(),
                 isInIntroOfferPeriod: c.generate(),

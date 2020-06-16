@@ -61,6 +61,7 @@ public struct SubscriptionValidationResponse: RetriableHTTPResponse {
     public struct SuccessResult: Equatable, Codable {
         let requestDate: Date
         public let originalTransactionID: OriginalTransactionID
+        public let webOrderLineItemID: WebOrderLineItemID
         public let signedAuthorization: PsiApi.SignedData<SignedAuthorization>?
         public let errorStatus: ErrorStatus
         public let errorDescription: String
@@ -75,17 +76,23 @@ public struct SubscriptionValidationResponse: RetriableHTTPResponse {
         private enum CodingKeys: String, CodingKey {
             case requestDate = "request_date"
             case originalTransactionID = "original_transaction_id"
+            case webOrderLineItemID = "web_order_line_item_id"
             case signedAuthorization = "signed_authorization"
             case errorStatus = "error_status"
             case errorDescription = "error_description"
         }
 
-        public init(requestDate: Date, originalTransactionID: OriginalTransactionID,
-                    signedAuthorization: PsiApi.SignedData<SignedAuthorization>?,
-                    errorStatus: ErrorStatus, errorDescription: String) {
-
+        public init(
+            requestDate: Date,
+            originalTransactionID: OriginalTransactionID,
+            webOrderLineItemID: WebOrderLineItemID,
+            signedAuthorization: PsiApi.SignedData<SignedAuthorization>?,
+            errorStatus: ErrorStatus,
+            errorDescription: String
+        ) {
             self.requestDate = requestDate
             self.originalTransactionID = originalTransactionID
+            self.webOrderLineItemID = webOrderLineItemID
             self.signedAuthorization = signedAuthorization
             self.errorStatus = errorStatus
             self.errorDescription = errorDescription
@@ -96,6 +103,8 @@ public struct SubscriptionValidationResponse: RetriableHTTPResponse {
             requestDate = try values.decode(Date.self, forKey: .requestDate)
             originalTransactionID = try values.decode(OriginalTransactionID.self,
                                                       forKey: .originalTransactionID)
+            webOrderLineItemID = try values.decode(WebOrderLineItemID.self,
+                                                   forKey: .webOrderLineItemID)
             errorStatus = try values.decode(ErrorStatus.self, forKey: .errorStatus)
             errorDescription = try values.decode(String.self, forKey: .errorDescription)
             
