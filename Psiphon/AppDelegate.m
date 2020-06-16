@@ -182,7 +182,7 @@ willFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
             
             // Mutates `newIntent` startButtonAction value if `showAd` is FALSE.
             if (newIntent.startButtonAction == StartButtonActionStartTunnelWithAds) {
-                if (!showAd) {
+                if (showAd == FALSE) {
                     [newIntent forceNoAds];
                 }
             }
