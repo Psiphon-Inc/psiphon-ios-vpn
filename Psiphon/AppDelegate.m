@@ -109,7 +109,8 @@ willFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // Initializes PsiphonClientCommonLibrary.
     [PsiphonClientCommonLibraryHelpers initializeDefaultsForPlistsFromRoot:@"Root.inApp"];
 
-    return YES;
+    return [SwiftDelegate.bridge applicationWillFinishLaunching:application
+                                                  launchOptions:launchOptions];
 }
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
