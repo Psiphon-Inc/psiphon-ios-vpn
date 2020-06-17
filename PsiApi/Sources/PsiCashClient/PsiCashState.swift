@@ -209,14 +209,14 @@ public struct PsiCashBalance: Equatable {
         case purchasedPsiCash
     }
     
-    public var pendingExpectedBalanceIncrease: BalanceIncreaseExpectationReason?
+    public private(set) var pendingExpectedBalanceIncrease: BalanceIncreaseExpectationReason?
     
     /// Balance with expected reward amount added.
     /// - Note: This value is either equal to `PsiCashLibData.balance`, or higher if there is expected reward amount.
-    public var optimisticBalance: PsiCashAmount
+    public private(set) var optimisticBalance: PsiCashAmount
     
     /// PsiCash balance as of last PsiCash refresh state.
-    public var lastRefreshBalance: PsiCashAmount
+    public private(set) var lastRefreshBalance: PsiCashAmount
     
     public init(pendingExpectedBalanceIncrease: BalanceIncreaseExpectationReason?,
          optimisticBalance: PsiCashAmount,

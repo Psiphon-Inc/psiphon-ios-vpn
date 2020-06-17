@@ -242,7 +242,7 @@ extension AppState {
     
     var psiCashViewController: PsiCashViewControllerState {
         PsiCashViewControllerState(
-            psiCashBalance: self.psiCashBalance,
+            balanceState: self.balanceState,
             psiCash: self.psiCash,
             iap: self.iapState,
             subscription: self.subscription,
@@ -252,8 +252,8 @@ extension AppState {
     
     var balanceState: BalanceState {
         BalanceState(
-            psiCashState: self.psiCash,
-            balance: self.psiCashBalance
+            pendingPsiCashRefresh: self.psiCash.pendingPsiCashRefresh,
+            psiCashBalance: self.psiCashBalance
         )
     }
 }
