@@ -20,5 +20,5 @@
 #import <Foundation/Foundation.h>
 
 @interface EmbeddedServerEntries : NSObject
-+ (NSArray*)egressRegionsFromFile:(NSString*)filePath;
++ (nonnull NSArray<NSString*>*)egressRegionsFromFile:(NSString*)filePath;
 @end

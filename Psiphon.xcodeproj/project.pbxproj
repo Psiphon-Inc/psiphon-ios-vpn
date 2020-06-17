@@ -201,6 +201,7 @@
 		CE4E9BC21BBEECFC0060FF8B /* PsiphonVPN.entitlements in Resources */ = {isa = PBXBuildFile; fileRef = CE4E9BC11BBEECFC0060FF8B /* PsiphonVPN.entitlements */; };
 		CE6C3F6A24366AE1007A17F0 /* ClientMetadata.m in Sources */ = {isa = PBXBuildFile; fileRef = CE6C3F6924366AE1007A17F0 /* ClientMetadata.m */; };
 		CE7B76431F54881F00EA44BD /* PsiphonTunnel.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 66094F781E8067520069EC4E /* PsiphonTunnel.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		CEA1B787249AAA13006D9853 /* EmbeddedServerEntriesTest.m in Sources */ = {isa = PBXBuildFile; fileRef = CEA1B786249AAA13006D9853 /* EmbeddedServerEntriesTest.m */; };
 		CEBA9C112481A5C80097D700 /* Notifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEBA9C102481A5C80097D700 /* Notifier.swift */; };
 		CEBA9C132481AA9F0097D700 /* SharedDB.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEBA9C122481AA9F0097D700 /* SharedDB.swift */; };
 		CEED7835247703DD002D9D55 /* AppReceiptReducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEED7834247703DD002D9D55 /* AppReceiptReducer.swift */; };
@@ -260,6 +261,13 @@
 			proxyType = 1;
 			remoteGlobalIDString = CE26FCA21BBDC85900B83375;
 			remoteInfo = PsiphonVPN;
+		};
+		CEA1B77D249AA9A0006D9853 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = CE26FC821BBDC7B700B83375 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = CE26FC891BBDC7B800B83375;
+			remoteInfo = Psiphon;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -506,6 +514,7 @@
 		7498D20B47C34B9D33BE95E4 /* Pods-PsiApi-Testing-TestingTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PsiApi-Testing-TestingTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-PsiApi-Testing-TestingTests/Pods-PsiApi-Testing-TestingTests.debug.xcconfig"; sourceTree = "<group>"; };
 		78C6298EAA632CD41F06795D /* Pods-Utilities.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Utilities.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Utilities/Pods-Utilities.debug.xcconfig"; sourceTree = "<group>"; };
 		8167C01B4242F1B0217731A9 /* Pods-PsiApi-Testing.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PsiApi-Testing.debug.xcconfig"; path = "Pods/Target Support Files/Pods-PsiApi-Testing/Pods-PsiApi-Testing.debug.xcconfig"; sourceTree = "<group>"; };
+		836B78D735F8B947A373FB00 /* Pods-Psiphon-PsiphonTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Psiphon-PsiphonTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-Psiphon-PsiphonTests/Pods-Psiphon-PsiphonTests.release.xcconfig"; sourceTree = "<group>"; };
 		8422B782F6ACED7897FCAC25 /* libPods-PsiApi-PsiApiTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-PsiApi-PsiApiTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		894580B71199444DBB2C3FA2 /* Pods-Psiphon-Testing.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Psiphon-Testing.release.xcconfig"; path = "Pods/Target Support Files/Pods-Psiphon-Testing/Pods-Psiphon-Testing.release.xcconfig"; sourceTree = "<group>"; };
 		8D14CCB4BB61E10B351D20DC /* Pods-Psiphon-PsiApi.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Psiphon-PsiApi.release.xcconfig"; path = "Pods/Target Support Files/Pods-Psiphon-PsiApi/Pods-Psiphon-PsiApi.release.xcconfig"; sourceTree = "<group>"; };
@@ -647,7 +656,6 @@
 		A8408F08BFF80A05CF46C00A /* RoyalSkyButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RoyalSkyButton.m; sourceTree = "<group>"; };
 		A8408F6123BCC98725932A59 /* VPNStartAndStopButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VPNStartAndStopButton.m; sourceTree = "<group>"; };
 		A8408FA077C517546DF6033C /* WhiteSkyButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WhiteSkyButton.m; sourceTree = "<group>"; };
-		AB870335F4C2AA3297D49236 /* libPods-PsiphonTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-PsiphonTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		AC42AE4003B8FEF4D7B8E863 /* Pods-Psiphon-Testing-TestingTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Psiphon-Testing-TestingTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Psiphon-Testing-TestingTests/Pods-Psiphon-Testing-TestingTests.debug.xcconfig"; sourceTree = "<group>"; };
 		AC50BC070A94E760D3F894F7 /* Pods-Utilities.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Utilities.release.xcconfig"; path = "Pods/Target Support Files/Pods-Utilities/Pods-Utilities.release.xcconfig"; sourceTree = "<group>"; };
 		AF86192758FCD49D1549C59F /* Pods-Psiphon-Utilities-UtilitiesTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Psiphon-Utilities-UtilitiesTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Psiphon-Utilities-UtilitiesTests/Pods-Psiphon-Utilities-UtilitiesTests.debug.xcconfig"; sourceTree = "<group>"; };
@@ -655,6 +663,7 @@
 		B46335F9F4EC10D8EC032F92 /* Pods-PsiApi-Psiphon.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PsiApi-Psiphon.debug.xcconfig"; path = "Pods/Target Support Files/Pods-PsiApi-Psiphon/Pods-PsiApi-Psiphon.debug.xcconfig"; sourceTree = "<group>"; };
 		B52267F44F3BB11D4A7CD820 /* Pods-PsiApi-Testing-Utilities-UtilitiesTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PsiApi-Testing-Utilities-UtilitiesTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-PsiApi-Testing-Utilities-UtilitiesTests/Pods-PsiApi-Testing-Utilities-UtilitiesTests.debug.xcconfig"; sourceTree = "<group>"; };
 		B5AC8D28B1AFC18A9DACA282 /* libPods-Testing-TestingTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Testing-TestingTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		BB07747B8DB3415288C426A9 /* Pods-Psiphon-PsiphonTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Psiphon-PsiphonTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Psiphon-PsiphonTests/Pods-Psiphon-PsiphonTests.debug.xcconfig"; sourceTree = "<group>"; };
 		BE85E028F71260A6BD3E48A0 /* Pods-Psiphon-Utilities-UtilitiesTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Psiphon-Utilities-UtilitiesTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-Psiphon-Utilities-UtilitiesTests/Pods-Psiphon-Utilities-UtilitiesTests.release.xcconfig"; sourceTree = "<group>"; };
 		C9BDA0C779D86E722D8B8DB2 /* Pods-Utilities-UtilitiesTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Utilities-UtilitiesTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-Utilities-UtilitiesTests/Pods-Utilities-UtilitiesTests.release.xcconfig"; sourceTree = "<group>"; };
 		CA0750CFBD1D93988672EBF5 /* libPods-Psiphon.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Psiphon.a"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -669,13 +678,17 @@
 		CE50A25724699CD80047D3FE /* it */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = it; path = Strings/it.lproj/Localizable.strings; sourceTree = "<group>"; };
 		CE6C3F6824366AE1007A17F0 /* ClientMetadata.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ClientMetadata.h; sourceTree = "<group>"; };
 		CE6C3F6924366AE1007A17F0 /* ClientMetadata.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ClientMetadata.m; sourceTree = "<group>"; };
+		CEA1B778249AA9A0006D9853 /* PsiphonTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PsiphonTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		CEA1B786249AAA13006D9853 /* EmbeddedServerEntriesTest.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = EmbeddedServerEntriesTest.m; sourceTree = "<group>"; };
 		CEBA9C102481A5C80097D700 /* Notifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Notifier.swift; sourceTree = "<group>"; };
 		CEBA9C122481AA9F0097D700 /* SharedDB.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedDB.swift; sourceTree = "<group>"; };
+		CEE5765E249AA01D00744C38 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		CEED7834247703DD002D9D55 /* AppReceiptReducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppReceiptReducer.swift; sourceTree = "<group>"; };
 		CF62E51A6A76190276A6FF94 /* Pods-PsiApi-Utilities.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PsiApi-Utilities.debug.xcconfig"; path = "Pods/Target Support Files/Pods-PsiApi-Utilities/Pods-PsiApi-Utilities.debug.xcconfig"; sourceTree = "<group>"; };
 		E4619DE60D098E874B40B6F6 /* Pods-PsiApi-Psiphon.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PsiApi-Psiphon.release.xcconfig"; path = "Pods/Target Support Files/Pods-PsiApi-Psiphon/Pods-PsiApi-Psiphon.release.xcconfig"; sourceTree = "<group>"; };
 		E61DE98A991FFAF35BA880D9 /* Pods-PsiApi-Testing-Utilities-UtilitiesTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PsiApi-Testing-Utilities-UtilitiesTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-PsiApi-Testing-Utilities-UtilitiesTests/Pods-PsiApi-Testing-Utilities-UtilitiesTests.release.xcconfig"; sourceTree = "<group>"; };
 		EDB109A2FBFB32D821FF121D /* Pods-Psiphon.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Psiphon.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Psiphon/Pods-Psiphon.debug.xcconfig"; sourceTree = "<group>"; };
+		EE41ADB8BC0EA8DDC6F697E6 /* libPods-Psiphon-PsiphonTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Psiphon-PsiphonTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		EF639C2D1F8FCE2A009D6B42 /* PsiFeedbackLogger.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PsiFeedbackLogger.h; sourceTree = "<group>"; };
 		EF639C2E1F8FCE2A009D6B42 /* PsiFeedbackLogger.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PsiFeedbackLogger.m; sourceTree = "<group>"; };
 		EF652CD01F352212002AFB48 /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
@@ -755,6 +768,13 @@
 				668AF9BF1E92CBD3008CAAAA /* NetworkExtension.framework in Frameworks */,
 				66094F7A1E8067520069EC4E /* PsiphonTunnel.framework in Frameworks */,
 				CB0CFCFF11CEECCAA1A2C8BF /* libPods-PsiphonVPN.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CEA1B775249AA9A0006D9853 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1060,7 +1080,6 @@
 				440D75BD1F59E041005C603B /* StoreKit.framework */,
 				668AF9BE1E92CBD3008CAAAA /* NetworkExtension.framework */,
 				A44F0D2E7AB9F499D75A1AC4 /* libPods-PsiphonVPN.a */,
-				AB870335F4C2AA3297D49236 /* libPods-PsiphonTests.a */,
 				548DC13880329CCB9E0CD4B2 /* libPods-PsiApi.a */,
 				8422B782F6ACED7897FCAC25 /* libPods-PsiApi-PsiApiTests.a */,
 				CA0750CFBD1D93988672EBF5 /* libPods-Psiphon.a */,
@@ -1068,6 +1087,7 @@
 				B5AC8D28B1AFC18A9DACA282 /* libPods-Testing-TestingTests.a */,
 				6EFA35869537D7B410191321 /* libPods-Utilities.a */,
 				0285C1D0D4B4D2A707D6FDEF /* libPods-Utilities-UtilitiesTests.a */,
+				EE41ADB8BC0EA8DDC6F697E6 /* libPods-Psiphon-PsiphonTests.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -1143,6 +1163,7 @@
 				4E0DCB101F28458100495781 /* Shared */,
 				CE26FC8C1BBDC7B800B83375 /* Psiphon */,
 				CE26FCA41BBDC85900B83375 /* PsiphonVPN */,
+				CEE5765B249AA01D00744C38 /* PsiphonTests */,
 				4E0D88221FA06B2400ADB61E /* PsiphonUITests */,
 				CE26FC8B1BBDC7B800B83375 /* Products */,
 				668AF9B81E92CB60008CAAAA /* Frameworks */,
@@ -1156,6 +1177,7 @@
 				CE26FC8A1BBDC7B800B83375 /* Psiphon.app */,
 				CE26FCA31BBDC85900B83375 /* PsiphonVPN.appex */,
 				4E0D88211FA06B2400ADB61E /* PsiphonUITests.xctest */,
+				CEA1B778249AA9A0006D9853 /* PsiphonTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1236,6 +1258,15 @@
 				9BFEC1C9F506CE1DF07306D2 /* NEBridge.h */,
 			);
 			path = PsiphonVPN;
+			sourceTree = "<group>";
+		};
+		CEE5765B249AA01D00744C38 /* PsiphonTests */ = {
+			isa = PBXGroup;
+			children = (
+				CEE5765E249AA01D00744C38 /* Info.plist */,
+				CEA1B786249AAA13006D9853 /* EmbeddedServerEntriesTest.m */,
+			);
+			path = PsiphonTests;
 			sourceTree = "<group>";
 		};
 		CEED78232476F9BF002D9D55 /* Subscriptions */ = {
@@ -1395,6 +1426,8 @@
 				9876294EDE951EF39C9F97BE /* Pods-PsiApi-Testing-Utilities.release.xcconfig */,
 				B52267F44F3BB11D4A7CD820 /* Pods-PsiApi-Testing-Utilities-UtilitiesTests.debug.xcconfig */,
 				E61DE98A991FFAF35BA880D9 /* Pods-PsiApi-Testing-Utilities-UtilitiesTests.release.xcconfig */,
+				BB07747B8DB3415288C426A9 /* Pods-Psiphon-PsiphonTests.debug.xcconfig */,
+				836B78D735F8B947A373FB00 /* Pods-Psiphon-PsiphonTests.release.xcconfig */,
 			);
 			name = Pods;
 			sourceTree = "<group>";
@@ -1465,6 +1498,24 @@
 			productReference = CE26FCA31BBDC85900B83375 /* PsiphonVPN.appex */;
 			productType = "com.apple.product-type.app-extension";
 		};
+		CEA1B777249AA9A0006D9853 /* PsiphonTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = CEA1B77F249AA9A0006D9853 /* Build configuration list for PBXNativeTarget "PsiphonTests" */;
+			buildPhases = (
+				CEA1B774249AA9A0006D9853 /* Sources */,
+				CEA1B775249AA9A0006D9853 /* Frameworks */,
+				CEA1B776249AA9A0006D9853 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				CEA1B77E249AA9A0006D9853 /* PBXTargetDependency */,
+			);
+			name = PsiphonTests;
+			productName = PsiphonTests;
+			productReference = CEA1B778249AA9A0006D9853 /* PsiphonTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -1516,6 +1567,10 @@
 							};
 						};
 					};
+					CEA1B777249AA9A0006D9853 = {
+						CreatedOnToolsVersion = 11.5;
+						TestTargetID = CE26FC891BBDC7B800B83375;
+					};
 				};
 			};
 			buildConfigurationList = CE26FC851BBDC7B700B83375 /* Build configuration list for PBXProject "Psiphon" */;
@@ -1562,14 +1617,13 @@
 				it,
 			);
 			mainGroup = CE26FC811BBDC7B700B83375;
-			packageReferences = (
-			);
 			productRefGroup = CE26FC8B1BBDC7B800B83375 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
 				CE26FC891BBDC7B800B83375 /* Psiphon */,
 				CE26FCA21BBDC85900B83375 /* PsiphonVPN */,
+				CEA1B777249AA9A0006D9853 /* PsiphonTests */,
 				4E0D88201FA06B2400ADB61E /* PsiphonUITests */,
 			);
 		};
@@ -1611,6 +1665,13 @@
 				EF6C1F531F59E46500709554 /* embedded_server_entries in Resources */,
 				EF743FCB1F99549000AC89A2 /* subscriptionProductIds.plist in Resources */,
 				9BFECF65871BB6B522C33F1E /* UserDefaults.h in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CEA1B776249AA9A0006D9853 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1916,6 +1977,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		CEA1B774249AA9A0006D9853 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CEA1B787249AAA13006D9853 /* EmbeddedServerEntriesTest.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -1928,6 +1997,11 @@
 			isa = PBXTargetDependency;
 			target = CE26FCA21BBDC85900B83375 /* PsiphonVPN */;
 			targetProxy = CE26FCAA1BBDC85900B83375 /* PBXContainerItemProxy */;
+		};
+		CEA1B77E249AA9A0006D9853 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = CE26FC891BBDC7B800B83375 /* Psiphon */;
+			targetProxy = CEA1B77D249AA9A0006D9853 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -2297,6 +2371,73 @@
 			};
 			name = Release;
 		};
+		CEA1B780249AA9A0006D9853 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = "";
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				INFOPLIST_FILE = PsiphonTests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.1;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = ca.psiphon.PsiphonTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*]" = "";
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Psiphon.app/Psiphon";
+			};
+			name = Debug;
+		};
+		CEA1B781249AA9A0006D9853 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = "";
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				INFOPLIST_FILE = PsiphonTests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.1;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = ca.psiphon.PsiphonTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*]" = "";
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Psiphon.app/Psiphon";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -2332,6 +2473,15 @@
 			buildConfigurations = (
 				CE26FCAE1BBDC85900B83375 /* Debug */,
 				CE26FCAF1BBDC85900B83375 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		CEA1B77F249AA9A0006D9853 /* Build configuration list for PBXNativeTarget "PsiphonTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CEA1B780249AA9A0006D9853 /* Debug */,
+				CEA1B781249AA9A0006D9853 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

@@ -37,7 +37,7 @@
     fp = fopen([filePath UTF8String], "r");
     if (fp == NULL) {
         [PsiFeedbackLogger error:@"Error failed to open embedded server entry file at path (%@).", filePath];
-        return nil;
+        return [egressRegions array];
     }
 
     errno = 0;
