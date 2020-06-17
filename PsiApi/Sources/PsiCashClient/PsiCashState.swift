@@ -30,6 +30,8 @@ public struct PsiCashState: Equatable {
     public var rewardedVideo: RewardedVideoState
     public var libData: PsiCashLibData
     public var pendingPsiCashRefresh: PendingPsiCashRefresh
+    /// True if PsiCashLibData has been loaded from persisted value.
+    public var libLoaded: Bool
 }
 
 extension PsiCashState {
@@ -39,10 +41,12 @@ extension PsiCashState {
         rewardedVideo = .init()
         libData = .init()
         pendingPsiCashRefresh = .completed(.success(.unit))
+        libLoaded = false
     }
     
     public mutating func appDidLaunch(_ libData: PsiCashLibData) {
         self.libData = libData
+        self.libLoaded = true
     }
     
     // Returns the first Speed Boost product that has not expired.
