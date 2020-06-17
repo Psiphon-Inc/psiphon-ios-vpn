@@ -367,6 +367,39 @@ extension SwiftDelegate: SwiftBridgeDelegate {
     @objc func applicationWillTerminate(_ application: UIApplication) {
         self.environmentCleanup?()
     }
+
+    @objc func application(_ application: UIApplication,
+                           continue userActivity: NSUserActivity,
+                           restorationHandler: @escaping ([Any]?) -> Void) -> Bool {
+
+        guard
+            userActivity.activityType == NSUserActivityTypeBrowsingWeb,
+            let incomingURL = userActivity.webpageURL else {
+
+           return false
+        }
+
+        if  incomingURL.scheme == .some("https") &&
+            incomingURL.host == .some("mobile.psi.cash") &&
+            incomingURL.path == "/ios" {
+
+            let topMostViewController = AppDelegate.getTopMostViewController()
+
+            if let psiCashViewController = topMostViewController as? PsiCashViewController {
+                if psiCashViewController.activeTab != .addPsiCash {
+                    psiCashViewController.activeTab = .addPsiCash
+                }
+            } else if let psiCashViewController = makePsiCashViewController(.addPsiCash) {
+                AppDelegate.getTopMostViewController().present(psiCashViewController,
+                                                               animated: true,
+                                                               completion: .none)
+            }
+
+            return true
+        }
+
+        return false
+    }
     
     @objc func makeSubscriptionBarView() -> SubscriptionBarView {
         SubscriptionBarView { [unowned objcBridge, store] state in
