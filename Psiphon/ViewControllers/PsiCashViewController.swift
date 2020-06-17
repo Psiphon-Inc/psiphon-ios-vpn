@@ -111,6 +111,9 @@ final class PsiCashViewController: UIViewController {
     private let productRequestStore: Store<Utilities.Unit, ProductRequestAction>
 
     // VC-specific UI state
+
+    /// Active view in the view controller.
+    /// - Warning: Must only be set from the main thread.
     @State var activeTab: Tabs
     private var navigation: Screen = .mainScreen
 
