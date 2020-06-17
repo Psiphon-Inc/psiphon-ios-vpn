@@ -19,8 +19,6 @@
 
 #import <XCTest/XCTest.h>
 #import "EmbeddedServerEntries.h"
-#import "PsiphonConfigReader.h"
-#import "SharedConstants.h"
 
 @interface EmbeddedServerEntriesTest : XCTestCase
 
@@ -41,13 +39,22 @@
 }
 
 - (void)testEgressRegionsFromNonExistantFile {
-    NSArray *embeddedEgressRegions = [EmbeddedServerEntries egressRegionsFromFile:@"non_existant_file"];
+    NSError *e;
+    NSSet *embeddedEgressRegions =
+        [EmbeddedServerEntries egressRegionsFromFile:@"non_existant_file" error:&e];
+    XCTAssertNotNil(e);
+    XCTAssertEqual(e.code, EmbeddedServerEntriesErrorFileError);
     XCTAssertNotNil(embeddedEgressRegions);
     XCTAssertTrue([embeddedEgressRegions count] == 0);
 }
 
 - (void)testEgressRegionsFromWrongFile {
-    NSArray *embeddedEgressRegions = [EmbeddedServerEntries egressRegionsFromFile:PsiphonConfigReader.psiphonConfigPath];
+    NSError *e;
+    NSSet *embeddedEgressRegions =
+        [EmbeddedServerEntries egressRegionsFromFile:[EmbeddedServerEntriesTest createFileWithRandomData]
+                                               error:&e];
+    XCTAssertNotNil(e);
+    XCTAssertEqual(e.code, EmbeddedServerEntriesErrorDecodingError);
     XCTAssertNotNil(embeddedEgressRegions);
     XCTAssertTrue([embeddedEgressRegions count] == 0);
 }
@@ -55,9 +62,38 @@
 #pragma mark - Helpers
 
 - (void)egressRegionsFromFile {
-    NSArray *embeddedEgressRegions = [EmbeddedServerEntries egressRegionsFromFile:PsiphonConfigReader.embeddedServerEntriesPath];
+    NSError *e;
+    NSSet *embeddedEgressRegions =
+        [EmbeddedServerEntries egressRegionsFromFile:[EmbeddedServerEntriesTest embeddedServerEntriesPath]
+                                               error:&e];
+    XCTAssertNil(e);
     XCTAssertNotNil(embeddedEgressRegions);
     XCTAssertTrue([embeddedEgressRegions count] > 0);
+}
+
++ (NSString*)embeddedServerEntriesPath {
+    NSBundle *testBundle = [NSBundle bundleForClass:[self class]];
+    return [[testBundle resourcePath] stringByAppendingPathComponent:@"embedded_server_entries"];
+}
+
++ (NSString*)createFileWithRandomData {
+    NSBundle *testBundle = [NSBundle bundleForClass:[self class]];
+    NSString *newFilePath =
+        [[testBundle resourcePath] stringByAppendingPathComponent:@"invalid_embedded_server_entries"];
+
+    [[NSFileManager defaultManager] createFileAtPath:newFilePath
+                                            contents:[EmbeddedServerEntriesTest randomData] attributes:nil];
+    return newFilePath;
+}
+
++ (NSData*)randomData {
+    int capacity = 1048576; // 1 MB
+    NSMutableData *data = [NSMutableData dataWithCapacity:capacity];
+    for (int i = 0; i < capacity/4; i++) {
+        u_int32_t randomBits = arc4random();
+        [data appendBytes:(void*)&randomBits length:4];
+    }
+    return data;
 }
 
 @end

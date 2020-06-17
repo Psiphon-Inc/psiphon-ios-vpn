@@ -202,6 +202,10 @@
 		CE6C3F6A24366AE1007A17F0 /* ClientMetadata.m in Sources */ = {isa = PBXBuildFile; fileRef = CE6C3F6924366AE1007A17F0 /* ClientMetadata.m */; };
 		CE7B76431F54881F00EA44BD /* PsiphonTunnel.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 66094F781E8067520069EC4E /* PsiphonTunnel.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		CEA1B787249AAA13006D9853 /* EmbeddedServerEntriesTest.m in Sources */ = {isa = PBXBuildFile; fileRef = CEA1B786249AAA13006D9853 /* EmbeddedServerEntriesTest.m */; };
+		CEA1B788249AB144006D9853 /* EmbeddedServerEntries.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E5263BF207292920021FEF5 /* EmbeddedServerEntries.m */; };
+		CEA1B789249AB229006D9853 /* EmbeddedServerEntriesHelpers.c in Sources */ = {isa = PBXBuildFile; fileRef = 4E5263B6207290360021FEF5 /* EmbeddedServerEntriesHelpers.c */; };
+		CEA1B78A249AB3EF006D9853 /* NSError+Convenience.m in Sources */ = {isa = PBXBuildFile; fileRef = EF90D79A204F22C900228A63 /* NSError+Convenience.m */; };
+		CEA1B78B249AB959006D9853 /* embedded_server_entries in Resources */ = {isa = PBXBuildFile; fileRef = EF6C1F501F59E46500709554 /* embedded_server_entries */; };
 		CEBA9C112481A5C80097D700 /* Notifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEBA9C102481A5C80097D700 /* Notifier.swift */; };
 		CEBA9C132481AA9F0097D700 /* SharedDB.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEBA9C122481AA9F0097D700 /* SharedDB.swift */; };
 		CEED7835247703DD002D9D55 /* AppReceiptReducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEED7834247703DD002D9D55 /* AppReceiptReducer.swift */; };
@@ -1569,7 +1573,6 @@
 					};
 					CEA1B777249AA9A0006D9853 = {
 						CreatedOnToolsVersion = 11.5;
-						TestTargetID = CE26FC891BBDC7B800B83375;
 					};
 				};
 			};
@@ -1672,6 +1675,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CEA1B78B249AB959006D9853 /* embedded_server_entries in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1982,6 +1986,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				CEA1B787249AAA13006D9853 /* EmbeddedServerEntriesTest.m in Sources */,
+				CEA1B789249AB229006D9853 /* EmbeddedServerEntriesHelpers.c in Sources */,
+				CEA1B788249AB144006D9853 /* EmbeddedServerEntries.m in Sources */,
+				CEA1B78A249AB3EF006D9853 /* NSError+Convenience.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2375,7 +2382,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
-				BUNDLE_LOADER = "$(TEST_HOST)";
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
@@ -2401,7 +2407,6 @@
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				"PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*]" = "";
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Psiphon.app/Psiphon";
 			};
 			name = Debug;
 		};
@@ -2409,7 +2414,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
-				BUNDLE_LOADER = "$(TEST_HOST)";
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
@@ -2434,7 +2438,6 @@
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				"PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*]" = "";
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Psiphon.app/Psiphon";
 			};
 			name = Release;
 		};

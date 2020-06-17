@@ -19,15 +19,19 @@
 
 #import "EmbeddedServerEntries.h"
 #import "EmbeddedServerEntriesHelpers.h"
-#import "Logging.h"
-#import "PsiFeedbackLogger.h"
+#import "NSError+Convenience.h"
 
 #define kEmbeddedServerEntryRegionJsonKey @"region"
 
+NSErrorDomain _Nonnull const EmbeddedServerEntriesErrorDomain = @"EmbeddedServerEntriesErrorDomain";
+
 @implementation EmbeddedServerEntries
 
-+ (NSArray*)egressRegionsFromFile:(NSString*)filePath {
-    NSMutableOrderedSet *egressRegions = [[NSMutableOrderedSet alloc] init];
++ (NSSet*)egressRegionsFromFile:(NSString*)filePath error:(NSError * _Nullable *)outError {
+
+    *outError = nil;
+
+    NSMutableSet *egressRegions = [[NSMutableSet alloc] init];
 
     FILE * fp;
     char * line = NULL;
@@ -36,8 +40,10 @@
 
     fp = fopen([filePath UTF8String], "r");
     if (fp == NULL) {
-        [PsiFeedbackLogger error:@"Error failed to open embedded server entry file at path (%@).", filePath];
-        return [egressRegions array];
+        *outError = [EmbeddedServerEntries
+                     fileError:@"Error failed to open embedded server entry file at path (%@).",
+                     filePath];
+        return egressRegions;
     }
 
     errno = 0;
@@ -52,13 +58,20 @@
         errno = 0;
         char *decoded = hex_decode(line);
         if (decoded == NULL) {
-            [PsiFeedbackLogger error:@"Error failed to hex decode line (%lu) in embedded server entries file at path (#%@): %s.", line_number, filePath, strerror(errno)];
+            *outError = [EmbeddedServerEntries
+                         decodingError:@"Error failed to hex decode line (%lu) in embedded server entries file at path (#%@): %s.",
+                         line_number,
+                         filePath,
+                         strerror(errno)];
             break;
         }
 
         char *json = server_entry_json(decoded);
         if (json == NULL) {
-            [PsiFeedbackLogger error:@"Error failed to find server entry in hex decoded line (#%lu) in embedded server entries file at path (%@).", line_number, filePath];
+            *outError = [EmbeddedServerEntries
+                         decodingError:@"Error failed to find server entry in hex decoded line (#%lu) in embedded server entries file at path (%@).",
+                         line_number,
+                         filePath];
             free(decoded);
             break;
         }
@@ -66,25 +79,36 @@
         NSData *jsonData = [NSData dataWithBytes:json length:strlen(json)];
         free(decoded);
         if (jsonData == nil) {
-            [PsiFeedbackLogger error:@"Error failed to convert embedded server entry json data from line (#%lu) to NSData.", line_number];
+            *outError = [EmbeddedServerEntries
+                         decodingError:@"Error failed to convert embedded server entry json data from line (#%lu) to NSData.",
+                         line_number];
             break;
         }
 
         NSError *error = nil;
         NSDictionary *jsonObject = [NSJSONSerialization JSONObjectWithData:jsonData options:kNilOptions error:&error];
         if (error != nil) {
-            [PsiFeedbackLogger error:@"Error failed to serialize json object from decoded server entry on line (#%lu): %@.", line_number, error];
+            *outError = [EmbeddedServerEntries
+                         decodingError:@"Error failed to serialize json object from decoded server entry on line (#%lu): %@.",
+                         line_number,
+                         error];
             break;
         }
 
         id regionObject = jsonObject[kEmbeddedServerEntryRegionJsonKey];
         if (regionObject == nil) {
-            [PsiFeedbackLogger error:@"Error failed to find region key (%@) in embedded server entry json on line (#%lu).", kEmbeddedServerEntryRegionJsonKey, line_number];
+            *outError = [EmbeddedServerEntries
+                         decodingError:@"Error failed to find region key (%@) in embedded server entry json on line (#%lu).",
+                         kEmbeddedServerEntryRegionJsonKey,
+                         line_number];
             break;
         } else if ([regionObject isKindOfClass:[NSString class]]) {
             [egressRegions addObject:(NSString*)regionObject];
         } else {
-            [PsiFeedbackLogger error:@"Error region in embedded server entry on line (#%lu) is not NSString but %@.", line_number, [regionObject class]];
+            *outError = [EmbeddedServerEntries
+                         decodingError:@"Error region in embedded server entry on line (#%lu) is not NSString but %@.",
+                         line_number,
+                         [regionObject class]];
             break;
         }
 
@@ -92,20 +116,56 @@
     }
 
     if (nread == -1 && errno != 0 && ferror(fp) != 0) {
-        [PsiFeedbackLogger error:@"Error reading embedded server entries file at path (%@): %s.", filePath, strerror(errno)];
+        *outError = [EmbeddedServerEntries
+                     fileError:@"Error reading embedded server entries file at path (%@): %s.",
+                     filePath,
+                     strerror(errno)];
     }
 
     errno = 0;
     int ret = fclose(fp);
     if (ret != 0) {
-        [PsiFeedbackLogger error:@"Error closing file stream for embedded server entries file at path (%@): %s.", filePath, strerror(errno)];
+        *outError = [EmbeddedServerEntries
+                     fileError:@"Error closing file stream for embedded server entries file at path (%@): %s.",
+                     filePath,
+                     strerror(errno)];
     }
 
     if (line != NULL) {
         free(line);
     }
 
-    return [egressRegions array];
+    return egressRegions;
+}
+
+#pragma mark - Error constructors
+
++ (nonnull NSError *)fileError:(NSString*)format, ... {
+    va_list args;
+    va_start(args, format);
+    NSString *localizedDescription = [[NSString alloc] initWithFormat:format arguments:args];
+    va_end(args);
+
+    return [EmbeddedServerEntries errorWithCode:EmbeddedServerEntriesErrorFileError
+                           localizedDescription:localizedDescription];
+}
+
++ (nonnull NSError *)decodingError:(NSString*)format, ... {
+    va_list args;
+    va_start(args, format);
+    NSString *localizedDescription = [[NSString alloc] initWithFormat:format arguments:args];
+    va_end(args);
+
+    return [EmbeddedServerEntries errorWithCode:EmbeddedServerEntriesErrorDecodingError
+                           localizedDescription:localizedDescription];
+}
+
++ (nonnull NSError *)errorWithCode:(EmbeddedServerEntriesErrorDomainErrorCode)errorCode
+              localizedDescription:(NSString*)localizedDescription{
+
+    return [NSError errorWithDomain:EmbeddedServerEntriesErrorDomain
+                               code:errorCode
+            andLocalizedDescription:localizedDescription];
 }
 
 @end
