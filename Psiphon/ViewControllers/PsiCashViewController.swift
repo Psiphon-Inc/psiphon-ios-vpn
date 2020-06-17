@@ -28,7 +28,7 @@ import AppStoreIAP
 import PsiCashClient
 
 struct PsiCashViewControllerState: Equatable {
-    let psiCashBalance: PsiCashBalance
+    let psiCashBalanceViewModel: PsiCashBalanceViewModel
     let psiCash: PsiCashState
     let iap: IAPState
     let subscription: SubscriptionState
@@ -288,10 +288,7 @@ final class PsiCashViewController: UIViewController {
                     // User is subscribed. Only shows the PsiCash balance.
                     self.balanceView.isHidden = false
                     self.tabControl.isHidden = true
-                    self.balanceView.bind(
-                        BalanceState(psiCashState: observed.state.psiCash,
-                                     balance: observed.state.psiCashBalance)
-                    )
+                    self.balanceView.bind(observed.state.psiCashBalanceViewModel)
                     self.containerBindable.bind(
                         .left(.right(.right(.right(.right(.userSubscribed)))))
                     )
@@ -299,10 +296,7 @@ final class PsiCashViewController: UIViewController {
                 case .notSubscribed:
                     self.balanceView.isHidden = false
                     self.tabControl.isHidden = false
-                    self.balanceView.bind(
-                        BalanceState(psiCashState: observed.state.psiCash,
-                                     balance: observed.state.psiCashBalance)
-                    )
+                    self.balanceView.bind(observed.state.psiCashBalanceViewModel)
 
                     // Updates active tab UI
                     switch observed.activeTab {

@@ -78,6 +78,7 @@ public struct IAPEnvironment {
     var psiCashEffects: PsiCashEffects
     var clientMetaData: ClientMetaData
     var paymentQueue: PaymentQueue
+    var psiCashPersistedValues: PsiCashPersistedValues
     var isSupportedProduct: (ProductID) -> AppStoreProductType?
     var psiCashStore: (PsiCashAction) -> Effect<Never>
     var appReceiptStore: (ReceiptStateAction) -> Effect<Never>
@@ -91,6 +92,7 @@ public struct IAPEnvironment {
         psiCashEffects: PsiCashEffects,
         clientMetaData: ClientMetaData,
         paymentQueue: PaymentQueue,
+        psiCashPersistedValues: PsiCashPersistedValues,
         isSupportedProduct: @escaping (ProductID) -> AppStoreProductType?,
         psiCashStore: @escaping (PsiCashAction) -> Effect<Never>,
         appReceiptStore: @escaping (ReceiptStateAction) -> Effect<Never>,
@@ -103,6 +105,7 @@ public struct IAPEnvironment {
         self.psiCashEffects = psiCashEffects
         self.clientMetaData = clientMetaData
         self.paymentQueue = paymentQueue
+        self.psiCashPersistedValues = psiCashPersistedValues
         self.isSupportedProduct = isSupportedProduct
         self.psiCashStore = psiCashStore
         self.appReceiptStore = appReceiptStore
@@ -412,6 +415,11 @@ public func iapReducer(
                 
                 if let unfinishedTx = maybeUnfinishedConsumableTx {
                     state.iap.unfinishedPsiCashTx = unfinishedTx
+                    state.psiCashBalance.waitingForExpectedIncrease(
+                        withAddedReward: .zero,
+                        reason: .purchasedPsiCash,
+                        persisted: environment.psiCashPersistedValues
+                    )
                 }
                 
             case .success(.nonUnique):
