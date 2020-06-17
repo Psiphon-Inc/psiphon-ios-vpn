@@ -43,6 +43,18 @@ public struct OriginalTransactionID: TypedIdentifier {
     }
 }
 
+/// Represents App Store in-app purchase `web_order_line_item_id` that uniquely identifies
+/// subscription purchases.
+public struct WebOrderLineItemID: TypedIdentifier {
+    public var rawValue: String { value }
+    
+    private let value: String
+    
+    public init?(rawValue: String) {
+        self.value = rawValue
+    }
+}
+
 /// Represents App Store in-app purchase product identifier.
 public struct ProductID: TypedIdentifier {
     public var rawValue: String { value }
@@ -54,7 +66,7 @@ public struct ProductID: TypedIdentifier {
     }
 }
 
-public struct ReceiptData: Equatable {
+public struct ReceiptData: Hashable {
     /// Subscription in-app purchases within the receipt that have not expired at the time of `readDate`.
     public let subscriptionInAppPurchases: Set<SubscriptionIAPPurchase>
     /// Consumables in-app purchases within the receipt.
@@ -78,6 +90,10 @@ public struct ReceiptData: Equatable {
     
     public static func == (lhs: Self, rhs: Self) -> Bool {
         lhs.data == rhs.data
+    }
+    
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(data)
     }
     
 }
@@ -116,6 +132,12 @@ public struct SubscriptionIAPPurchase: Hashable, Codable {
     /// - JSON Field Name: `original_transaction_id`
     public let originalTransactionID: OriginalTransactionID
     
+    /// The primary key for identifying subscription purchases.
+    /// - Note: ASN.1 Field value is INTEGER, however it is parsed as a string.
+    /// - ASN.1 Field Type: 1711
+    /// - JSON Field Name: `web_order_line_item_id`
+    public let webOrderLineItemID: WebOrderLineItemID
+    
     /// In an auto-renewable subscription receipt, the purchase date is the
     /// date when the subscription was either purchased or renewed (with or without a lapse).
     /// For an automatic renewal that occurs on the expiration date of the current period,
@@ -143,6 +165,7 @@ public struct SubscriptionIAPPurchase: Hashable, Codable {
         productID: ProductID,
         transactionID: TransactionID,
         originalTransactionID: OriginalTransactionID,
+        webOrderLineItemID: WebOrderLineItemID,
         purchaseDate: Date,
         expires: Date,
         isInIntroOfferPeriod: Bool,
@@ -151,6 +174,7 @@ public struct SubscriptionIAPPurchase: Hashable, Codable {
         self.productID = productID
         self.transactionID = transactionID
         self.originalTransactionID = originalTransactionID
+        self.webOrderLineItemID = webOrderLineItemID
         self.purchaseDate = purchaseDate
         self.expires = expires
         self.isInIntroOfferPeriod = isInIntroOfferPeriod

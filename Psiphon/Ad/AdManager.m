@@ -54,8 +54,14 @@ PsiFeedbackLogType const AdManagerLogType = @"AdManager";
 NSString * const GoogleAdMobAppID = @"ca-app-pub-1072041961750291~2085686375";
 NSString * const AdMobPublisherID = @"pub-1072041961750291";
 
+#if DEBUG
+// Demo ad unit Ids: https://developers.google.com/admob/ios/test-ads
+NSString * const UntunneledAdMobInterstitialAdUnitID = @"ca-app-pub-3940256099942544/4411468910";
+NSString * const UntunneledAdMobRewardedVideoAdUnitID = @"ca-app-pub-3940256099942544/1712485313";
+#else
 NSString * const UntunneledAdMobInterstitialAdUnitID = @"ca-app-pub-1072041961750291/8751062454";
 NSString * const UntunneledAdMobRewardedVideoAdUnitID = @"ca-app-pub-1072041961750291/8356247142";
+#endif
 
 // AdControllerTag values must be unique.
 AdControllerTag const AdControllerTagAdMobUntunneledInterstitial = @"AdMobUntunneledInterstitial";
