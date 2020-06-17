@@ -342,6 +342,7 @@ final class SubscriptionStateTest: XCTestCase {
             productID: ProductID(rawValue: "com.test.subscription1")!,
             transactionID: TransactionID(rawValue: UUID().uuidString)!,
             originalTransactionID: OriginalTransactionID(rawValue: "12345678")!,
+            webOrderLineItemID: WebOrderLineItemID(rawValue: "100012345678")!,
             purchaseDate: purchaseDate,
             expires: expires,
             isInIntroOfferPeriod: false,

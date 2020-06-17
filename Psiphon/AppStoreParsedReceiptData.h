@@ -39,6 +39,15 @@
 @property (nonatomic, strong, readonly) NSDate *_Nonnull purchaseDate;
 
 /**
+ The Web Order Line Item ID for subscription.
+ 
+ This value is a unique ID that identifies purchase events across devices, including subscription renewal purchase events.
+ 
+ - Note: ASN.1 Field value is INTEGER, however it is parsed as a string.
+ */
+@property (nonatomic, strong, readonly) NSString *_Nullable webOrderLineItemID;
+
+/**
  The expiration date for the subscription.
  
  Only present for auto-renewable subscription receipts.
