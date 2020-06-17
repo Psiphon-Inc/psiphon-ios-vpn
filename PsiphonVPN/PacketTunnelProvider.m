@@ -288,6 +288,7 @@ withSponsorID:(NSString *_Nonnull *)sponsorID {
 
     [[Notifier sharedInstance] registerObserver:self callbackQueue:dispatch_get_main_queue()];
 
+    self.storedAuthorizations = [[StoredAuthorizations alloc] initWithPersistedValues];
     self.cachedSponsorIDs = [PsiphonConfigReader fromConfigFile].sponsorIds;
 
     [PsiFeedbackLogger infoWithType:PacketTunnelProviderLogType
