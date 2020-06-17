@@ -23,8 +23,14 @@ import PsiCashClient
 import EFCountingLabel
 import PsiCashClient
 
+struct PsiCashBalanceViewModel: Equatable {
+    /// `true` if PsiCash state has been restored from the PsiCash library.
+    let psiCashLibLoaded: Bool
+    let balanceState: BalanceState
+}
+
 @objc final class PsiCashBalanceView: UIView, Bindable {
-    typealias BindingType = BalanceState
+    typealias BindingType = PsiCashBalanceViewModel
 
     private typealias IconType = EitherView<ImageViewBuilder, EitherView<Spinner, ButtonBuilder>>
 
@@ -119,6 +125,9 @@ import PsiCashClient
     }
 
     private func setAmount(_ newAmount: PsiCashAmount?) {
+        guard newAmount != currentAmount else {
+            return
+        }
         defer {
             currentAmount = newAmount
         }
@@ -140,9 +149,12 @@ import PsiCashClient
     }
 
     func bind(_ newValue: BindingType) {
+        guard newValue.psiCashLibLoaded else {
+            return
+        }
         let iconValue: IconType.BuildType.BindingType
-        switch (newValue.pendingPsiCashRefresh,
-                newValue.psiCashBalance.pendingExpectedBalanceIncrease) {
+        switch (newValue.balanceState.pendingPsiCashRefresh,
+                newValue.balanceState.psiCashBalance.pendingExpectedBalanceIncrease) {
         case (.pending, _):
             iconValue = .right(.left(true))  // Spinner
         case (.completed(_), .purchasedPsiCash):
@@ -151,7 +163,7 @@ import PsiCashClient
              (.completed(_), .watchedRewardedVideo):
             iconValue = .left(.unit)  // Coin icon
         }
-        self.setAmount(newValue.psiCashBalance.optimisticBalance)
+        self.setAmount(newValue.balanceState.psiCashBalance.optimisticBalance)
         self.iconBindable.bind(iconValue)
     }
 

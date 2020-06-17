@@ -127,6 +127,15 @@ extension SwiftDelegate: SwiftBridgeDelegate {
         return SwiftDelegate.instance
     }
     
+    @objc func applicationWillFinishLaunching(
+        _ application: UIApplication,
+        launchOptions: [UIApplication.LaunchOptionsKey : Any]?
+    ) -> Bool {
+        // Updates appForegroundState that is shared with the extension.
+        self.sharedDB.setAppForegroundState(true)
+        return true
+    }
+    
     @objc func applicationDidFinishLaunching(
         _ application: UIApplication, objcBridge: ObjCBridgeDelegate
     ) {
@@ -178,10 +187,10 @@ extension SwiftDelegate: SwiftBridgeDelegate {
         
         // Forwards `PsiCashState` updates to ObjCBridgeDelegate.
         self.lifetime += self.store.$value.signalProducer
-            .map(\.balanceState)
+            .map(\.psiCashBalanceViewModel)
             .skipRepeats()
-            .startWithValues { [unowned objcBridge] balanceViewModel in
-                objcBridge.onPsiCashBalanceUpdate(.init(swiftState: balanceViewModel))
+            .startWithValues { [unowned objcBridge] viewModel in
+                objcBridge.onPsiCashBalanceUpdate(.init(swiftState: viewModel))
         }
         
         // Forwards `SubscriptionStatus` updates to ObjCBridgeDelegate.
@@ -341,11 +350,12 @@ extension SwiftDelegate: SwiftBridgeDelegate {
 
     }
     
-    @objc func applicationDidBecomeActive(_ application: UIApplication) {
-        self.sharedDB.setAppForegroundState(true)
-    }
+    @objc func applicationDidBecomeActive(_ application: UIApplication) {}
     
     @objc func applicationWillEnterForeground(_ application: UIApplication) {
+        // Updates appForegroundState shared with the extension before
+        // syncing with it through the `.syncWithProvider` message.
+        self.sharedDB.setAppForegroundState(true)
         self.store.send(vpnAction: .syncWithProvider(reason: .appEnteredForeground))
         self.store.send(.psiCash(.refreshPsiCashState))
     }
