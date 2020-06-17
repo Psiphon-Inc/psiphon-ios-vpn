@@ -1,11 +1,14 @@
 /* Accept button title */
 "ACCEPT_BUTTON_TITLE" = "קבל";
 
+/*[UNTRANSLATED] After a user successfully purchases a subscription, it needs to be activated. A label with this title is presented to the user indicating the the subscription is in the process of getting activated. Include the ellipses or equivalent symbol if it makes sense in the translated language. */
+"ACTIVATE_SUBSCRIPTION_BUTTON_TITILE" = "Activating...";
+
 /* Title of the section in the subscription dialog that shows currently active subscription information. */
 "ACTIVE_SUBSCRIPTION_SECTION_TITLE" = "אתה רשום כמנוי!";
 
-/*[UNTRANSLATED] Button title to add to user's PsiCash balance. PsiCash is a type of credit. Do not translate or transliterate 'PsiCash'. */
-"ADD_PSICASH" = "Add PsiCash";
+/* Button title to add to user's PsiCash balance. PsiCash is a type of credit. Do not translate or transliterate 'PsiCash'. */
+"ADD_PSICASH" = "הוסף PsiCash";
 
 /* Alert dialog body when requested operation by the user failed. */
 "ALERT_BODY_OPERATION_FAILED" = "פעולה נכשלה, אנא נסה שוב.";
@@ -16,38 +19,35 @@
 /* Title of the button which takes the user to the previous screen. Text should be short and one word when possible. */
 "BACK_BUTTON" = "הקודם";
 
-/* Alert message informing user that the device clock needs to be updated with current time */
-"BAD_CLOCK_ALERT_MESSAGE" = "גילינו שהזמן במכשיר שלך אינו מסונכרן עם אזור הזמן שלך. אנא עדכן את הגדרות השעון שלך והפעל מחדש את היישום";
-
-/* Alert message informing user that subscription receipt can not be verified */
-"BAD_RECEIPT_ALERT_MESSAGE" = "קבלת המינוי שלך אינה יכול להיות מוודאת, אנא רענן אותה ונסה שוב.";
-
 /* Title of button on alert view which shows the progress of the user's buy request. Hitting this button dismisses the alert and the buy request continues processing in the background. */
 "BUY_REQUEST_PROGRESS_ALERT_DISMISS_BUTTON_TITLE" = "שחרר";
 
 /* Buy subscription dialog footer text explaining where the user can cancel an active subscription */
-"BUY_SUBSCRIPTIONS_FOOTER_CANCEL_INSTRUCTIONS_TEXT" = "אתה יכול לבטל מינוי פעיל בהגדרות חשבון של iTunes שלך.";
+"BUY_SUBSCRIPTIONS_FOOTER_CANCEL_INSTRUCTIONS_TEXT" = "אתה יכול לבטל מינוי פעיל בהגדרות חשבון iTunes שלך.";
 
-/*[UNTRANSLATED] Buy subscription dialog footer text */
-"BUY_SUBSCRIPTIONS_FOOTER_TEXT" = "A subscription is auto-renewable which means that once purchased it will be automatically renewed until you cancel it 24 hours prior to the end of the current period.\n\nYour iTunes Account will be charged for renewal within 24-hours prior to the end of the current period with the cost of the subscription.";
+/* Buy subscription dialog footer text */
+"BUY_SUBSCRIPTIONS_FOOTER_TEXT" = "מינוי מתחדש אוטומטית מה שאומר שברגע שהוא נרכש הוא יחודש באופן אוטומטי עד שתבטל אותו 24 שעות קודם אל סוף התקופה הנוכחית.\n\nחשבון iTunes שלך יחוייב עבור חידוש בתוך 24 שעות קודם אל סוף התקופה הנוכחית בעלות של המינוי.";
 
 /* Title for a button that cancels an action. This should be generic enough to make sense whenever a cancel button is used. */
 "CANCEL_BUTTON_TITLE" = "בטל";
 
-/*[UNTRANSLATED] Alert message informing user that their subscription has expired or that they're not a subscriber, therefore Psiphon can only be started from the Psiphon app. DO NOT translate 'Psiphon'. */
-"CANNOT_START_TUNNEL_DUE_TO_SUBSCRIPTION" = "You don't have an active subscription.\nSince you're not a subscriber or your subscription has expired, Psiphon can only be started from the Psiphon app.\n\nPlease open the Psiphon app to start.";
+/* Alert message informing user that their subscription has expired or that they're not a subscriber, therefore Psiphon can only be started from the Psiphon app. DO NOT translate 'Psiphon'. */
+"CANNOT_START_TUNNEL_DUE_TO_SUBSCRIPTION" = "אין לך מינוי פעיל.\nהואיל ואינך מנוי או שהמינוי שלך פג, Psiphon יכול להיות מותחל מהיישום Psiphon.\n\nאנא פתח את היישום Psiphon כדי להתחיל.";
 
 /*[UNTRANSLATED] Main text in the 'Upstream Proxy Error' dialog box. This is shown when the user has directly altered these settings, and those settings are (probably) erroneous. DO NOT translate 'Psiphon'. */
 "CHECK_UPSTREAM_PROXY_SETTING" = "You have configured Psiphon to use an upstream proxy.\nHowever, we seem to be unable to connect to a Psiphon server through that proxy.\nPlease fix the settings and try again.";
 
-/*[UNTRANSLATED] Text shown to the user telling them to connect to 'Psiphon', to finish their unfinished transaction. Do not translate or transliterate 'Psiphon'. */
-"CONNECT_TO_FINISH_PSICASH_TRANSACTION" = "Please connect to Psiphon to finish your transaction";
+/* Action button title, that when pressed connects the user to Psiphon network. */
+"CONNECT_BUTTON_TITLE" = "התחבר";
 
-/*[UNTRANSLATED] Button title that lets the user to connect to the Psiphon network. Do not translate or transliterate 'Psiphon' */
-"CONNECT_TO_PSIPHON" = "Connect to Psiphon";
+/* Text shown to the user telling them to connect to 'Psiphon', to finish their unfinished transaction. Do not translate or transliterate 'Psiphon'. */
+"CONNECT_TO_FINISH_PSICASH_TRANSACTION" = "אנא התחבר אל Psiphon כדי לסיים את העסקה שלך";
 
-/*[UNTRANSLATED] User must connect to 'Psiphon' in order to use 'Speed Boost' product. Do not translate or transliterate 'Psiphon'. Do not transliterate 'Speed Boost'. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
-"CONNECT_TO_USE_SPEED_BOOST" = "Connect to Psiphon to use Speed Boost";
+/* Button title that lets the user to connect to the Psiphon network. Do not translate or transliterate 'Psiphon' */
+"CONNECT_TO_PSIPHON" = "התחבר אל Psiphon";
+
+/* User must connect to 'Psiphon' in order to use 'Speed Boost' product. Do not translate or transliterate 'Psiphon'. Do not transliterate 'Speed Boost'. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
+"CONNECT_TO_USE_SPEED_BOOST" = "התחבר אל Psiphon כדי להשתמש בתמריץ מהירות";
 
 /* Title for screen that allows user to select their desired server region. Use all capital letters in the translation only if it makes sense. */
 "CONNECT_VIA" = "התחבר דרך";
@@ -61,6 +61,9 @@
 /* Decline button title */
 "DECLINE_BUTTON_TITLE" = "סרב";
 
+/* Text next to the button indicating to the user that the rewarded video advertisement is only available when they are not connected to Psiphon. Do not translate or transliterate 'PsiCash'. Do not translate or transliterate 'Psiphon'. */
+"DISCONNECT_TO_WATCH_AND_EARN_PSICASH" = "אתה חייב להתנתק מן Psiphon כדי לצפות בסרטון ולהרוויח PsiCash";
+
 /* Dismiss button title. Dismisses pop-up alert when the user clicks on the button */
 "DISMISS_BUTTON_TITLE" = "שחרר";
 
@@ -73,8 +76,14 @@
 /* Error alert title */
 "ERROR_TITLE" = "שגיאה";
 
-/*[UNTRANSLATED] Message shown when something fails to load */
-"FAILED_TO_LOAD" = "Failed to load";
+/*[UNTRANSLATED] No comment provided by engineer. */
+"EXTENSION_EXPIRED_SUBSCRIPTION_ALERT" = "Your Psiphon subscription has expired.\n\n Please open Psiphon app to renew your subscription.";
+
+/* Message shown when something fails to load */
+"FAILED_TO_LOAD" = "נכשל לטעון";
+
+/*[UNTRANSLATED] Message shown when verification of a product already purchased fails. */
+"FAILED_TO_VERIFY_PSICASH_IAP_PURCHASE" = "Failed to verify purchase";
 
 /* Alert dialog message indicating to the user that the app has failed to upload their feedback and that they should try again.  */
 "FEEDBACK_UPLOAD_FAILED_MESSAGE" = "שגיאה  התרחשה בעת העלאת המשוב שלך. אנא נסה שוב. המשוב שלך עוזר לנו לשפר את רשת Psiphon.";
@@ -86,7 +95,7 @@
 "FEEDBACK_UPLOAD_IN_PROGRESS_BACKGROUND_BUTTON_TITLE" = "רקע";
 
 /* Alert dialog title indicating to the user that their feedback is being encrypted and securely uploaded to Psiphon's servers. */
-"FEEDBACK_UPLOAD_IN_PROGRESS_MESSAGE" = "שולח משוב...";
+"FEEDBACK_UPLOAD_IN_PROGRESS_MESSAGE" = "שולח משוב…";
 
 /* Alert dialog message thanking the user for helping improve the Psiphon network by submitting their feedback. */
 "FEEDBACK_UPLOAD_SUCCESSFUL_MESSAGE" = "תודה על עזרה בשיפור Psiphon!";
@@ -97,29 +106,32 @@
 /* Button title for a product that is free. There is no cost or payment associated. */
 "FREE_PSICASH_COIN" = "חינמי";
 
-/*[UNTRANSLATED] Generic alert shown when purchase of a product fails. */
-"GENERIC_PURCHASE_FAILED" = "Purchase Failed";
+/* Generic alert shown when purchase of a product fails. */
+"GENERIC_PURCHASE_FAILED" = "רכישה נכשלה";
 
-/*[UNTRANSLATED] User does not have sufficient 'PsiCash' balance. PsiCash is a type of credit. Do not translate or transliterate 'PsiCash'. */
-"INSUFFICIENT_PSICASH_BALANCE" = "Insufficient PsiCash balance";
+/* User does not have sufficient 'PsiCash' balance. PsiCash is a type of credit. Do not translate or transliterate 'PsiCash'. */
+"INSUFFICIENT_PSICASH_BALANCE" = "מאזן PsiCash בלתי מספיק";
 
 /* External link to the license page. Please update this with the correct language specific link (if available) e.g. https://psiphon.ca/fr/license.html for french. */
 "LICENSE_PAGE_URL" = "https://psiphon.ca/he/license.html";
 
 /* Text displayed while app loads */
-"LOADING" = "טוען...";
+"LOADING" = "טוען…";
 
 /* Button title that takes user to the next page */
 "NEXT_PAGE_BUTTON_TITLE" = "הבא";
 
-/*[UNTRANSLATED] Subscriptions view text that is visible when the list of subscriptions is not available */
-"NO_PRODUCTS_TEXT_2" = "Could not retrieve subscriptions from the App Store. Please try again later.";
+/* Alert title informing user there is no internet connection */
+"NO_INTERNET" = "אין חיבור אינטרנט";
+
+/*[UNTRANSLATED] Message shown to the user when there is no internet connect. */
+"NO_INTERNET_CONNECTION_TITLE" = "No internet connection";
+
+/* Subscriptions view text that is visible when the list of subscriptions is not available */
+"NO_PRODUCTS_TEXT_2" = "לא היה ניתן לאחזר מינויים מחנות היישומים. אנא נסה שוב מאוחר יותר.";
 
 /* Alert OK Button */
 "OK_BUTTON" = "אישור";
-
-/* Onboarding text for install VPN configuration. (Do not translate 'Psiphon'). */
-"ONBARDING_VPN_INSTALL_GUIDE_TEXT" = "תצטרך להתיר אל Psiphon להוסיף תצורות VPN על מנת להתחבר.";
 
 /* Onboarding screen text. (Do not translate 'Psiphon'). */
 "ONBOARDING_BEYOND_BORDERS_BODY_2" = "Psiphon מחבר אותך אל התוכן שאתה רוצה, לא משנה איפה אתה.";
@@ -133,16 +145,19 @@
 /* Onboarding header */
 "ONBOARDING_GETTING_STARTED_HEADER" = "מתחילים";
 
+/* Onboarding text for install VPN configuration. (Do not translate 'Psiphon'). */
+"ONBOARDING_VPN_INSTALL_GUIDE_TEXT" = "תצטרך להתיר אל Psiphon להוסיף תצורות VPN על מנת להתחבר.";
+
 /* Alert message informing the user they should open the app to finish connecting to the VPN. DO NOT translate 'Psiphon'. */
 "OPEN_PSIPHON_APP" = "אנא פתח את יישום Psiphon כדי לסיים להתחבר.";
 
 /* Alert dialog title indicating to the user that Psiphon needs their permission */
 "PERMISSION_REQUIRED_ALERT__TITLE" = "הרשאה דרושה";
 
-/*[UNTRANSLATED] Subtitle shown when the current operation failed, asking the user to try again at a later time. */
-"PLEASE_TRY_AGAIN_LATER" = "Please try again later.";
+/* Subtitle shown when the current operation failed, asking the user to try again at a later time. */
+"PLEASE_TRY_AGAIN_LATER" = "אנא נסה שוב מאוחר יותר.";
 
-/* Alert message when the user declined privacy policy. They will not be able ot use the app until the user accepts the privacy policy (Do not translate 'Psiphon') */
+/* Alert message when the user declined privacy policy. They will not be able to use the app until the user accepts the privacy policy (Do not translate 'Psiphon') */
 "PRIVACY_POLICY_DECLINED_ALERT_BODY" = "אתה חייב לקבל את מדיניות הפרטיות שלנו לפני שתמשיך להשתמש ב־Psiphon.";
 
 /* External link to the privacy policy page. Please update this with the correct language specific link (if available) e.g. https://psiphon.ca/fr/privacy.html for french. */
@@ -178,8 +193,8 @@
 /* Sub-heading in the 'User VPN Data' section of the Privacy Policy page. The section describes why it's important for users to consider what a VPN does with their traffic data. */
 "PrivacyInformationCollectedVpndataWhycareSubhead" = "למה צריך להיות לך אכפת?";
 
-/*[UNTRANSLATED] Bullet list text under 'Why does Psiphon need these statistics?' subsection of the 'User VPN Data' section of the Privacy page. */
-"PrivacyInformationCollectedVpndataWhydoespsiphonneedPara1Item1" = "Estimate future costs: The huge amount of user data we transfer each month is a major factor in our costs. It is vital for us to see and understand usage fluctuations.";
+/* Bullet list text under 'Why does Psiphon need these statistics?' subsection of the 'User VPN Data' section of the Privacy page. */
+"PrivacyInformationCollectedVpndataWhydoespsiphonneedPara1Item1" = "עלויות עתידיות משוערות: הכמות הענקית של נתוני משתמש שאנחנו מעבירים כל חודש היא גורם עיקרי בעלויות שלנו. זה חיוני בשבילנו לראות ולהבין תנודות שימוש.";
 
 /*[UNTRANSLATED] Bullet list text under 'Why does Psiphon need these statistics?' subsection of the 'User VPN Data' section of the Privacy page. */
 "PrivacyInformationCollectedVpndataWhydoespsiphonneedPara1Item2" = "Optimize for traffic types: Video streaming has different network requirements than web browsing does, which is different than chat, which is different than voice, and so on. Statistics about the number of bytes transferred for some major media providers helps us to understand how to provide the best experience to our users.";
@@ -199,44 +214,47 @@
 /* page title for the Privacy Policy page */
 "PrivacyTitle" = "מדיניות פרטיות";
 
-/*[UNTRANSLATED] Message shown when products available for purchase could not be retrieved. */
-"PRODUCT_LIST_COULD_NOT_BE_RETRIEVED" = "Product list could not be retrieved";
+/* Message shown when products available for purchase could not be retrieved. */
+"PRODUCT_LIST_COULD_NOT_BE_RETRIEVED" = "רשימת מוצרים לא הייתה ניתנת לאחזור";
 
-/*[UNTRANSLATED] PsiCash is a type of credit. Do not translate or transliterate 'PsiCash'. Text shown next to the user's PsiCash balance (a numerical value). Keep colon if appropriate. */
-"PSICASH_BALANCE" = "PsiCash Balance:";
+/* PsiCash is a type of credit. Do not translate or transliterate 'PsiCash'. Text shown next to the user's PsiCash balance (a numerical value). Keep colon if appropriate. */
+"PSICASH_BALANCE" = "מאזן PsiCash:";
 
-/*[UNTRANSLATED] User's PsiCash balance is not up to date. PsiCash is a type of credit. Do not translate or transliterate 'Psiphon'. Do not translate or transliterate 'PsiCash'. Text is shown on an alert pop up title */
-"PSICASH_BALANCE_OUT_OF_DATE_ALERT_BODY" = "Connect to Psiphon to update your PsiCash balance.";
+/* User's PsiCash balance is not up to date. PsiCash is a type of credit. Do not translate or transliterate 'Psiphon'. Do not translate or transliterate 'PsiCash'. Text is shown on an alert pop up title */
+"PSICASH_BALANCE_OUT_OF_DATE_ALERT_BODY" = "התחבר אל Psiphon כדי לעדכן את מאזן PsiCash שלך.";
 
-/*[UNTRANSLATED] User's PsiCash balance is not up to date. PsiCash is a type of credit. Do not translate or transliterate 'PsiCash'. Text is shown on an alert pop up title */
-"PSICASH_BALANCE_OUT_OF_DATE_ALERT_TITLE" = "PsiCash Balance Out of Date";
+/* User's PsiCash balance is not up to date. PsiCash is a type of credit. Do not translate or transliterate 'PsiCash'. Text is shown on an alert pop up title */
+"PSICASH_BALANCE_OUT_OF_DATE_ALERT_TITLE" = "מאזן PsiCash אינו מעודכן";
 
-/*[UNTRANSLATED] PsiCash in-app purchase disclaimer that appears on the bottom of the screen where users can buy different amounts of PsiCash from the PlayStore.  Do not translate or transliterate terms PsiCash */
-"PSICASH_PURCHASE_SCREEN_NOTICE" = "IMPORTANT: Your PsiCash will not be preserved if you uninstall Psiphon.";
+/* PsiCash in-app purchase disclaimer that appears on the bottom of the screen where users can buy different amounts of PsiCash from the PlayStore.  Do not translate or transliterate terms PsiCash */
+"PSICASH_PURCHASE_SCREEN_NOTICE" = "חשוב: PsiCash שלך לא יישמר אם תסיר את Psiphon.";
 
-/*[UNTRANSLATED] An error that signifies a state where the user has made a 'PsiCash' purchase, but extra action is needed from the user to finish the transaction. Do not translate or transliterate 'PsiCash'. */
-"PSICASH_TRANSACTION_PENDING" = "Transaction Pending";
+/* An error that signifies a state where the user has made a 'PsiCash' purchase, but extra action is needed from the user to finish the transaction. Do not translate or transliterate 'PsiCash'. */
+"PSICASH_TRANSACTION_PENDING" = "עסקה ממתינה";
 
-/*[UNTRANSLATED] PsiCash currently unavailable. PsiCash is a type of credit. Do not translate or transliterate 'PsiCash'. */
-"PSICASH_UNAVAILABLE" = "PsiCash Unavailable";
+/* PsiCash currently unavailable. PsiCash is a type of credit. Do not translate or transliterate 'PsiCash'. */
+"PSICASH_UNAVAILABLE" = "PsiCash בלתי זמין";
 
-/*[UNTRANSLATED] 'PsiCash' features are unavailable while the app the connecting to 'Psiphon'. PsiCash is a type of credit. Do not translate or transliterate 'Psiphon'. Do not translate or transliterate 'PsiCash' */
-"PSICASH_UNAVAILABLE_WHILE_CONNECTING" = "PsiCash is unavailable while connecting to Psiphon";
+/* 'PsiCash' features are unavailable while the app the connecting to 'Psiphon'. PsiCash is a type of credit. Do not translate or transliterate 'Psiphon'. Do not translate or transliterate 'PsiCash' */
+"PSICASH_UNAVAILABLE_WHILE_CONNECTING" = "PsiCash אינו זמין בעת התחברות אל Psiphon";
 
-/*[UNTRANSLATED] 'PsiCash' features are unavailable while the user has a subscription. Do not translate or transliterate 'PsiCash' */
-"PSICASH_UNAVAILABLE_WHILE_SUBSCRIBED" = "PsiCash is unavailable while subscribed";
+/* 'PsiCash' features are unavailable while the app the is disconnecting from 'Psiphon'. PsiCash is a type of credit. Do not translate or transliterate 'Psiphon'. Do not translate or transliterate 'PsiCash' */
+"PSICASH_UNAVAILABLE_WHILE_DISCONNECTING" = "PsiCash אינו זמין בעת התנתקות מן Psiphon";
 
-/*[UNTRANSLATED] Message when the user has made a purchase, and paid successfully, however the transaction is not complete yet and is pending verification */
-"PSICASH_WAIT_TRANSACTION_VERIFIED" = "Please wait while your transaction is being verified";
+/* 'PsiCash' features are unavailable while the user has a subscription. Do not translate or transliterate 'PsiCash' */
+"PSICASH_UNAVAILABLE_WHILE_SUBSCRIBED" = "PsiCash אינו זמין בעת שאתה רשום כמנוי";
 
-/*[UNTRANSLATED] Shown when user is not connected to Psiphon network. Do not translate or transliterate 'Psiphon' */
-"PSIPHON_IS_NOT_CONNECTED" = "Psiphon is not connected";
+/* Message when the user has made a purchase, and paid successfully, however the transaction is not complete yet and is pending verification */
+"PSICASH_WAIT_TRANSACTION_VERIFIED" = "אנא המתן בזמן שהעסקה שלך מוודאת";
 
-/*[UNTRANSLATED] Shown when the user is purchasing PsiCash. PsiCash is a type of credit. Do not translate or transliterate 'PsiCash'. Including ellipses '…' if appropriate. */
-"PURCHASING_PSICASH" = "Purchasing PsiCash…";
+/* Shown when user is not connected to Psiphon network. Do not translate or transliterate 'Psiphon' */
+"PSIPHON_IS_NOT_CONNECTED" = "Psiphon אינו מחובר";
 
-/*[UNTRANSLATED] Purchasing 'Speed Boost' product. Including ellipses '…' if appropriate. Do not transliterate 'Speed Boost'. 'Speed Boost' is a product that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
-"PURCHASING_SPEED_BOOST" = "Purchasing Speed Boost…";
+/* Shown when the user is purchasing PsiCash. PsiCash is a type of credit. Do not translate or transliterate 'PsiCash'. Including ellipses '…' if appropriate. */
+"PURCHASING_PSICASH" = "רוכש PsiCash…";
+
+/* Purchasing 'Speed Boost' product. Including ellipses '…' if appropriate. Do not transliterate 'Speed Boost'. 'Speed Boost' is a product that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
+"PURCHASING_SPEED_BOOST" = "רוכש תמריץ מהירות…";
 
 /* Description text above a list of scenarios where the user should try refreshing their app receipt to restore an existing subscription */
 "REFRESH_APP_RECEIPT_BUTTON_DESCRIPTION_LIST_HEADER" = "רענן את קבלת היישום שלך כאשר:";
@@ -256,8 +274,11 @@
 /* Title of button which triggers an attempt to restore the user's existing subscription */
 "RESTORE_SUBSCRIPTION_BUTTON_TITLE" = "שחזר את המינוי שלי";
 
-/*[UNTRANSLATED] Shown in a pop-up alert if user's rewarded video ad failed to load. */
-"REWARDED_VIDEO_LOAD_FAILED" = "Failed to load rewarded video. Please try again later.";
+/* Action button title, that when pressed retries the recently failed operation. */
+"RETRY_BUTTON_TITLE" = "נסה שוב";
+
+/* Shown in a pop-up alert if user's rewarded video ad failed to load. */
+"REWARDED_VIDEO_LOAD_FAILED" = "נכשל בטעינת סרטון תגמול. אנא נסה שוב מאוחר יותר.";
 
 /* Title for screen that allows user to select language. Use all capital letters in the translation only if it makes sense. */
 "SELECT_LANG" = "בחר שפה";
@@ -274,29 +295,26 @@
 /* Subscriptions item title in the app settings when user has an active subscription. Clicking this item opens subscriptions view */
 "SETTINGS_SUBSCRIPTION_ACTIVE" = "מינויים";
 
-/* Subscriptions item title in the app settings when user does not have an active subscription. Clicking this item opens subscriptions view. If “Premium” doesn't easily translate, please choose a term that conveys “Pro” or “Extra” or “Better” or “Elite”. */
-"SETTINGS_SUBSCRIPTION_NOT_ACTIVE" = "עבור לפרימיום!";
-
 /* Do not transliterate 'Speed Boost'. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
 "SPEED_BOOST" = "תמריץ מהירות";
 
 /* Do not transliterate 'Speed Boost'. 'Speed Boost' is a product that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
 "SPEED_BOOST_ACTIVE" = "תמריץ מהירות פעיל";
 
-/*[UNTRANSLATED] '%@' is going to be replace by a timer (e.g. '02:12'). Place the exact string '%@' at the appropriate place. This string is shown when the user's 'Speed Boost' is active. Do not transliterate 'Speed Boost'. 'Speed Boost' is a product that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
-"SPEED_BOOST_IS_ACTIVE" = "Speed Boost Active %@";
+/* '%@' is going to be replace by a timer (e.g. '02:12'). Place the exact string '%@' at the appropriate place. This string is shown when the user's 'Speed Boost' is active. Do not transliterate 'Speed Boost'. 'Speed Boost' is a product that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
+"SPEED_BOOST_IS_ACTIVE" = "תמריץ מהירות פעיל %@";
 
-/*[UNTRANSLATED] 'Speed Boost' product is currently unavailable. Do not transliterate 'Speed Boost'. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
-"SPEED_BOOST_UNAVAILABLE" = "Speed Boost Unavailable";
+/* 'Speed Boost' product is currently unavailable. Do not transliterate 'Speed Boost'. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
+"SPEED_BOOST_UNAVAILABLE" = "תמריץ מהירות בלתי זמין";
 
-/*[UNTRANSLATED] Do not transliterate 'Speed Boost'. 'Speed Boost' is a product that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
-"SPEED_BOOST_YOU_ALREADY_HAVE" = "You already have Speed Boost";
+/* Do not transliterate 'Speed Boost'. 'Speed Boost' is a product that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
+"SPEED_BOOST_YOU_ALREADY_HAVE" = "יש לך כבר תמריץ מהירות";
 
-/*[UNTRANSLATED] Footer text beside button that opens paid subscriptions manager UI. At this point the user is not subscribed. Please keep this text concise as the width of the text box is restricted in size. */
-"SUBSCRIPTION_BAR_FOOTER_TEXT_NOT_SUBSCRIBED_2" = "Remove ads • Max speed";
+/* Footer text beside button that opens paid subscriptions manager UI. At this point the user is not subscribed. Please keep this text concise as the width of the text box is restricted in size. */
+"SUBSCRIPTION_BAR_FOOTER_TEXT_NOT_SUBSCRIBED_2" = "הסר פרסומות • מהירות מרבית";
 
-/* Footer text beside button that opens paid subscriptions manager UI. At this point the user is subscribed. If “Premium” doesn't easily translate, please choose a term that conveys “Pro” or “Extra” or “Better” or “Elite”. Please keep this text concise as the width of the text box is restricted in size. */
-"SUBSCRIPTION_BAR_FOOTER_TEXT_SUBSCRIBED" = "פרימיום - מהירות מירבית";
+/*[UNTRANSLATED] Footer text beside button that opens paid subscriptions manager UI. At this point the user is subscribed. If “Premium” doesn't easily translate, please choose a term that conveys “Pro” or “Extra” or “Better” or “Elite”. Please keep this text concise as the width of the text box is restricted in size. */
+"SUBSCRIPTION_BAR_FOOTER_TEXT_SUBSCRIBED_V2" = "Premium • Max Speed";
 
 /* Header text beside button that opens paid subscriptions manager UI. At this point the user is not subscribed. If “Premium” doesn't easily translate, please choose a term that conveys “Pro” or “Extra” or “Better” or “Elite”. Please keep this text concise as the width of the text box is restricted in size. */
 "SUBSCRIPTION_BAR_HEADER_TEXT_NOT_SUBSCRIBED" = "השג פרימיום";
@@ -304,17 +322,29 @@
 /* Header text beside button that opens paid subscriptions manager UI. At this point the user is subscribed. Please keep this text concise as the width of the text box is restricted in size. */
 "SUBSCRIPTION_BAR_HEADER_TEXT_SUBSCRIBED" = "מינוי";
 
+/*[UNTRANSLATED] After a user successfully purchases a subscription, it needs to be activated. This title is displayed on the main screen indicating that the subscription is pending activation. */
+"SUBSCRIPTION_BAR_HEADER_TEXT_SUBSCRIPTION_PENDING" = "SUBSCRIPTION PENDING";
+
+/*[UNTRANSLATED] After a user successfully purchases a subscription, it needs to be activated. Label with this text displayed on the main screen, indicating that the user needs to connect to Psiphon in order to activate the subscription. */
+"SUBSCRIPTION_CONNECT_TO_ACTIVATE" = "Connect to activate";
+
+/*[UNTRANSLATED] After a user successfully purchases a subscription, it needs to be activated. Label with this text is displayed on the main screen, indicating that activation of user's subscription failed. */
+"SUBSCRIPTION_FAILED_TO_ACTIVATE" = "Failed to activate";
+
+/*[UNTRANSLATED] After a user successfully purchases a subscription, it needs to be activated. Label with this text is displayed on the main screen, indicating to the user that the subscription is in the process of getting activated */
+"SUBSCRIPTION_PLEASE_WAIT_WHILE_ACTIVATING" = "Please wait while activating";
+
 /* Title of the dialog for available in-app paid subscriptions */
 "SUBSCRIPTIONS" = "מינויים";
 
 /* Label on a button which, when pressed, opens a screen where the user can manage their currently active subscription. */
 "SUBSCRIPTIONS_MANAGE_SUBSCRIPTION_BUTTON" = "נהל";
 
-/*[UNTRANSLATED] Subtitle of the banner on the subscriptions page informing the user that the subscriptions require no commitment, and can be cancelled anytime */
-"SUBSCRIPTIONS_PAGE_BANNER_SUBTITLE" = "No commitment, cancel anytime.";
+/* Subtitle of the banner on the subscriptions page informing the user that the subscriptions require no commitment, and can be cancelled anytime */
+"SUBSCRIPTIONS_PAGE_BANNER_SUBTITLE" = "ללא התחייבות, בטל בכל זמן.";
 
-/*[UNTRANSLATED] Title of the banner on the subscriptions page advertising that subscriptions enable no ads and maximum speed. */
-"SUBSCRIPTIONS_PAGE_BANNER_TITLE_2" = "No ads and maximum speed.";
+/* Title of the banner on the subscriptions page advertising that subscriptions enable no ads and maximum speed. */
+"SUBSCRIPTIONS_PAGE_BANNER_TITLE_2" = "בלי פרסומות ועם מהירות מרבית.";
 
 /* Title of the button on the subscriptions page which takes the user of of the app to iTunes where they can view detailed information about their subscription */
 "SUBSCRIPTIONS_PAGE_MANAGE_SUBSCRIPTION_BUTTON" = "נהל את המינוי שלך";
@@ -331,8 +361,11 @@
 /* Title of button on subscriptions page which opens Psiphon's terms of use webpage */
 "SUBSCRIPTIONS_TERMS_OF_USE_BUTTON_TEXT" = "תנאיי שימוש";
 
-/*[UNTRANSLATED] Button title shown when something fails to load. Asks the user to tap the button to retry the operation */
-"TAP_TO_RETRY" = "Tap to Retry";
+/* Button title shown when something fails to load. Asks the user to tap the button to retry the operation */
+"TAP_TO_RETRY" = "הקש כדי לנסות שוב";
+
+/*[UNTRANSLATED] Alert message informing user to turn on their cellular data or wifi to connect to the internet */
+"TURN_ON_DATE" = "Please turn on cellular data or use Wi-Fi.";
 
 /* Alert dialog message informing the user that an error occurred while starting Psiphon (Do not translate 'Psiphon'). The user should try again, and if the problem persists, they should try reinstalling the app. */
 "VPN_START_FAIL_MESSAGE" = "שגיאה  התרחשה בעת התחלת Psiphon. אנא נסה שוב. אם הבעיה נמשכת, נסה להתקין מחדש את יישום Psiphon.";
@@ -340,11 +373,11 @@
 /* Alert dialog message informing the user that an error occurred while starting Psiphon because they selected an egress region that is no longer available (Do not translate 'Psiphon'). The user has been automatically switched to to 'Fastest Country', but they can also open the Psiphon app to choose another country. Note: the backslash before each quotation mark should be left as is for formatting. */
 "VPN_START_FAIL_REGION_INVALID_MESSAGE_2" = "האזור שבחרת אינו זמין עוד. הוחלפת באופן אוטומטי אל \"המדינה המהירה ביותר\".\n\n אתה גם יכול לבחור אזור חדש מתוך יישום Psiphon.";
 
-/* Alert dialog title indicating to the user that Psiphon was unable to start (MainViewController) */
+/* Alert dialog title indicating to the user that Psiphon was unable to start */
 "VPN_START_FAIL_TITLE" = "לא היה ניתן להתחיל";
 
 /* ('Privacy Policy' should be the same translation as privacy policy button VPN_START_PRIVACY_POLICY_BUTTON), (Do not translate 'VPN profile'), (Do not translate 'Psiphon') */
-"VPN_START_PERMISSION_DENIED_MESSAGE" = "Psiphon צריך את הרשאתך כדי להתקין פרופיל VPN על מנת להתחבר.\n\nPsiphon מחוייב להגנת הפרטיות של המשתמשים שלנו. אתה יכול לסקור את מדיניות הפרטיות שלנו ע\"י הקשה על \"מדיניות פרטיות\".";
+"VPN_START_PERMISSION_DENIED_MESSAGE" = "Psiphon צריך את הרשאתך כדי להתקין פרופיל VPN על מנת להתחבר.\n\nPsiphon מחוייב להגנת הפרטיות של המשתמשים שלנו. אתה יכול לסקור את מדיניות הפרטיות שלנו ע״י הקשה על \"מדיניות פרטיות\".";
 
 /* Button label taking user's to our Privacy Policy page */
 "VPN_START_PRIVACY_POLICY_BUTTON" = "מדיניות פרטיות";
@@ -370,9 +403,9 @@
 /* Status when the VPN is restarting. */
 "VPN_STATUS_RESTARTING" = "מפעיל מחדש";
 
-/*[UNTRANSLATED] Error message when something was wrong with the VPN. Asks the user that if the error persists, try tapping the 'Reinstall VPN Profile' button in the settings menu. 'Reinstall VPN Profile' translation has key SETTINGS_REINSTALL_VPN_CONFIGURATION_CELL_TITLE */
-"VPN_SYNC_FAILED_REINSTALL_CONFIG" = "If this error persists, please try 'Reinstall VPN Profile'.";
+/* Error message when something was wrong with the VPN. Asks the user that if the error persists, try tapping the 'Reinstall VPN Profile' button in the settings menu. 'Reinstall VPN Profile' translation has key SETTINGS_REINSTALL_VPN_CONFIGURATION_CELL_TITLE */
+"VPN_SYNC_FAILED_REINSTALL_CONFIG" = "אם השגיאה הזאת נמשכת, אנא נסה ללחוץ על 'התקן מחדש פרופיל VPN'.";
 
-/*[UNTRANSLATED] Button subtitle informing the user that if pressed a rewarded video ad will be displayed and they will earn credit. */
-"WATCH_REWARDED_VIDEO_AND_EARN" = "Watch Video and Earn";
+/* Button subtitle informing the user that if pressed a rewarded video ad will be displayed and they will earn credit. */
+"WATCH_REWARDED_VIDEO_AND_EARN" = "צפה בסרטון והרווח";
 
