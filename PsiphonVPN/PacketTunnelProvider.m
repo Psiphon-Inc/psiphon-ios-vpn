@@ -421,8 +421,10 @@ withSponsorID:(NSString *_Nonnull *)sponsorID {
 
         LOG_DEBUG(@"container signaled VPN to start");
 
-        self.waitForContainerStartVPNCommand = FALSE;
-        [self tryStartVPN];
+        if ([self.sharedDB getAppForegroundState] == TRUE) {
+            self.waitForContainerStartVPNCommand = FALSE;
+            [self tryStartVPN];
+        }
 
     } else if ([NotifierAppEnteredBackground isEqualToString:message]) {
 

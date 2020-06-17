@@ -70,6 +70,11 @@ import PsiCashClient
     
     // UIApplicationDelegate callbacks
     
+    @objc func applicationWillFinishLaunching(
+        _ application: UIApplication,
+        launchOptions: [UIApplication.LaunchOptionsKey : Any]?
+    ) -> Bool
+    
     @objc func applicationDidFinishLaunching(_ application: UIApplication,
                                              objcBridge: ObjCBridgeDelegate)
     @objc func applicationWillEnterForeground(_ application: UIApplication)
