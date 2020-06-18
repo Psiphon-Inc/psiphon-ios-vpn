@@ -81,7 +81,7 @@ if __name__ == "__main__":
     version = call_with_output(["agvtool","what-version","-terse"])
 
     # commit version changes
-    call(["git","add","Psiphon.xcodeproj/project.pbxproj","Psiphon/Info.plist","PsiphonUITests/Info.plist","PsiphonVPN/Info.plist"])
+    call(["git","add","Psiphon.xcodeproj/project.pbxproj","Psiphon/Info.plist","PsiphonTests/Info.plist","PsiphonUITests/Info.plist","PsiphonVPN/Info.plist"])
     call(["git","commit","-m","TestFlight version {}; Release version {}".format(version,short_version)])
 
     # cherry pick commit from active branch to versioning branch
