@@ -420,12 +420,19 @@ public func iapReducer(
                         reason: .purchasedPsiCash,
                         persisted: environment.psiCashPersistedValues
                     )
+                    
+                    effects.append(
+                        environment.feedbackLogger.log(.info, """
+                            new IAP transaction: transaction ID: '\(tx.transactionID().rawValue)': \
+                            product ID: '\(tx.productID().rawValue)'
+                            """).mapNever()
+                    )
                 }
                 
             case .success(.nonUnique):
                 // There is already an existing unfinished consumable transaction.
                 effects.append(
-                    environment.feedbackLogger.log(.warn,"""
+                    environment.feedbackLogger.log(.warn, """
                         unexpected duplicate transaction with id '\(tx.transactionID())'
                         """).mapNever()
                 )
