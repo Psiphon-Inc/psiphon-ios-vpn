@@ -28,7 +28,7 @@ import AppStoreIAP
 import PsiCashClient
 
 struct PsiCashViewControllerState: Equatable {
-    let psiCashBalance: PsiCashBalance
+    let psiCashBalanceViewModel: PsiCashBalanceViewModel
     let psiCash: PsiCashState
     let iap: IAPState
     let subscription: SubscriptionState
@@ -111,7 +111,10 @@ final class PsiCashViewController: UIViewController {
     private let productRequestStore: Store<Utilities.Unit, ProductRequestAction>
 
     // VC-specific UI state
-    @State private var activeTab: Tabs
+
+    /// Active view in the view controller.
+    /// - Warning: Must only be set from the main thread.
+    @State var activeTab: Tabs
     private var navigation: Screen = .mainScreen
 
     /// Set of presented error alerts.
@@ -288,10 +291,7 @@ final class PsiCashViewController: UIViewController {
                     // User is subscribed. Only shows the PsiCash balance.
                     self.balanceView.isHidden = false
                     self.tabControl.isHidden = true
-                    self.balanceView.bind(
-                        BalanceState(psiCashState: observed.state.psiCash,
-                                     balance: observed.state.psiCashBalance)
-                    )
+                    self.balanceView.bind(observed.state.psiCashBalanceViewModel)
                     self.containerBindable.bind(
                         .left(.right(.right(.right(.right(.userSubscribed)))))
                     )
@@ -299,10 +299,7 @@ final class PsiCashViewController: UIViewController {
                 case .notSubscribed:
                     self.balanceView.isHidden = false
                     self.tabControl.isHidden = false
-                    self.balanceView.bind(
-                        BalanceState(psiCashState: observed.state.psiCash,
-                                     balance: observed.state.psiCashBalance)
-                    )
+                    self.balanceView.bind(observed.state.psiCashBalanceViewModel)
 
                     // Updates active tab UI
                     switch observed.activeTab {

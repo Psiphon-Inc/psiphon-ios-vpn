@@ -93,6 +93,13 @@ PsiFeedbackLogType const RewardedVideoLogType = @"RewardedVideo";
 
 # pragma mark - Lifecycle methods
 
+-  (BOOL)application:(UIApplication *)application
+continueUserActivity:(NSUserActivity *)userActivity
+  restorationHandler:(void (^)(NSArray<id<UIUserActivityRestoring>> * _Nullable))restorationHandler {
+
+    return [SwiftDelegate.bridge application:application continue:userActivity restorationHandler:restorationHandler];
+}
+
 - (BOOL)application:(UIApplication *)application
 willFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
 
@@ -109,7 +116,8 @@ willFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // Initializes PsiphonClientCommonLibrary.
     [PsiphonClientCommonLibraryHelpers initializeDefaultsForPlistsFromRoot:@"Root.inApp"];
 
-    return YES;
+    return [SwiftDelegate.bridge applicationWillFinishLaunching:application
+                                                  launchOptions:launchOptions];
 }
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
@@ -261,12 +269,20 @@ willFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
  */
 - (void)updateAvailableEgressRegionsOnFirstRunOfAppVersion {
     NSString *embeddedServerEntriesPath = PsiphonConfigReader.embeddedServerEntriesPath;
-    NSArray *embeddedEgressRegions = [EmbeddedServerEntries egressRegionsFromFile:embeddedServerEntriesPath];
+    NSError *e;
+    NSSet<NSString*> *embeddedEgressRegions = [EmbeddedServerEntries egressRegionsFromFile:embeddedServerEntriesPath
+                                                                                     error:&e];
 
-    LOG_DEBUG("Available embedded egress regions: %@.", embeddedEgressRegions);
+    // Note: server entries may have been decoded before the error occured and
+    // they will be present in the result.
+    if (e != nil) {
+        [PsiFeedbackLogger error:e message:@"Error decoding embedded server entries"];
+    }
 
-    if ([embeddedEgressRegions count] > 0) {
-        [[[ContainerDB alloc] init] setEmbeddedEgressRegions:embeddedEgressRegions];
+    if (embeddedEgressRegions != nil && [embeddedEgressRegions count] > 0) {
+        LOG_DEBUG("Available embedded egress regions: %@.", embeddedEgressRegions);
+        ContainerDB *containerDB = [[ContainerDB alloc] init];
+        [containerDB setEmbeddedEgressRegions:[NSArray arrayWithArray:[embeddedEgressRegions allObjects]]];
     } else {
         [PsiFeedbackLogger error:@"Error no egress regions found in %@.", embeddedServerEntriesPath];
     }

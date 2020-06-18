@@ -248,6 +248,17 @@ PsiFeedbackLogType const FeedbackInternalLogType = @"FeedbackLoggerInternal";
 
 }
 
++ (void)error:(NSError*)error message:(NSString*)message {
+
+    NSDictionary *data = [PsiFeedbackLogger generateDictionaryWithSource:ErrorNoticeType message:message error:error];
+    [[PsiFeedbackLogger sharedInstance] writeData:data noticeType:ErrorNoticeType];
+
+#if DEBUG
+    NSLog(@"<ERROR> %@", data);
+#endif
+
+}
+
 + (void)errorWithType:(PsiFeedbackLogType)sourceType message:(NSString *)message {
     NSDictionary *data = @{sourceType : message};
     [[PsiFeedbackLogger sharedInstance] writeData:data noticeType:ErrorNoticeType];

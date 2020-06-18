@@ -77,6 +77,16 @@
                ReferencedContainer = "container:Utilities">
             </BuildableReference>
          </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "CEE57659249AA01D00744C38"
+               BuildableName = "PsiphonTests.xctest"
+               BlueprintName = "PsiphonTests"
+               ReferencedContainer = "container:Psiphon.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
    </TestAction>
    <LaunchAction
