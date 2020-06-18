@@ -47,11 +47,6 @@ struct AppState: Equatable {
 struct BalanceState: Equatable {
     let pendingPsiCashRefresh: PendingPsiCashRefresh
     let psiCashBalance: PsiCashBalance
-    
-    init(psiCashState: PsiCashState, balance: PsiCashBalance) {
-        self.pendingPsiCashRefresh = psiCashState.pendingPsiCashRefresh
-        self.psiCashBalance = balance
-    }
 }
  
 // MARK: AppAction
@@ -262,6 +257,7 @@ fileprivate func toIAPReducerEnvironment(env: AppEnvironment) -> IAPEnvironment 
         psiCashEffects: env.psiCashEffects,
         clientMetaData: env.clientMetaData,
         paymentQueue: env.paymentQueue,
+        psiCashPersistedValues: env.userConfigs,
         isSupportedProduct: env.supportedAppStoreProducts.isSupportedProduct(_:),
         psiCashStore: env.psiCashStore,
         appReceiptStore: env.appReceiptStore,

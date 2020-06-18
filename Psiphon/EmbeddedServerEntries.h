@@ -19,6 +19,24 @@
 
 #import <Foundation/Foundation.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
+FOUNDATION_EXPORT NSErrorDomain const EmbeddedServerEntriesErrorDomain;
+
+typedef NS_ERROR_ENUM(EmbeddedServerEntriesErrorDomain, EmbeddedServerEntriesErrorDomainErrorCode) {
+    EmbeddedServerEntriesErrorFileError = 1,
+    EmbeddedServerEntriesErrorDecodingError = 2
+};
+
 @interface EmbeddedServerEntries : NSObject
-+ (NSArray*)egressRegionsFromFile:(NSString*)filePath;
+
+/// Decode embedded server entries file and return set of all egress regions available in the decoded entries.
+/// @param filePath Path to embedded server entries file.
+/// @param outError Non-nil if an error occurs. If some server entries were successfully decoded before the error occured, then they
+/// will still be returned.
+/// @return Set of all egress regions with a corresponding server entry.
++ (NSSet*)egressRegionsFromFile:(NSString*)filePath error:(NSError * _Nullable *)outError;
+
 @end
+
+NS_ASSUME_NONNULL_END

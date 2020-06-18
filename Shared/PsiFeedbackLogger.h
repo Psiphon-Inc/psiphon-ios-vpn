@@ -54,6 +54,8 @@ typedef NSString * PsiFeedbackLogType;
 
 + (void)error:(NSString *)format, ... NS_FORMAT_FUNCTION(1,2);
 
++ (void)error:(NSError*)error message:(NSString*)message;
+
 + (void)errorWithType:(PsiFeedbackLogType)sourceType message:(NSString *)message;
 
 + (void)errorWithType:(PsiFeedbackLogType)sourceType format:(NSString *)format, ... NS_FORMAT_FUNCTION(2,3);
