@@ -385,9 +385,28 @@ extension SwiftDelegate: SwiftBridgeDelegate {
 
             let topMostViewController = AppDelegate.getTopMostViewController()
 
-            if let psiCashViewController = topMostViewController as? PsiCashViewController {
-                if psiCashViewController.activeTab != .addPsiCash {
+            /// Walk up the presenting stack and return the first `PsiCashViewController` found.
+            func findPsiCashViewController(vc: UIViewController) -> PsiCashViewController? {
+                if let psiCashViewController = vc as? PsiCashViewController {
+                    return .some(psiCashViewController)
+                }
+                if let parent = vc.presentingViewController {
+                    return findPsiCashViewController(vc: parent)
+                }
+                return .none
+            }
+
+            // Ensure the PsiCash view controller is the top most view controller and
+            // that it is displaying the buy PsiCash tab.
+            if let psiCashViewController = findPsiCashViewController(vc: topMostViewController) {
+                if psiCashViewController == topMostViewController {
                     psiCashViewController.activeTab = .addPsiCash
+                } else if let presented = psiCashViewController.presentedViewController {
+                    // Dismiss any presented view controllers so the top most view controller is
+                    // the PsiCash view controller.
+                    presented.dismiss(animated: true) {
+                        psiCashViewController.activeTab = .addPsiCash
+                    }
                 }
             } else if let psiCashViewController = makePsiCashViewController(.addPsiCash) {
                 AppDelegate.getTopMostViewController().present(psiCashViewController,
