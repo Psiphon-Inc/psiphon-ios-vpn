@@ -423,8 +423,7 @@ public func iapReducer(
                 }
                 
             case .success(.nonUnique):
-                // Transaction has the same identifier as the current
-                // unverified psicash IAP transaction.
+                // There is already an existing unfinished consumable transaction.
                 effects.append(
                     environment.feedbackLogger.log(.warn,"""
                         unexpected duplicate transaction with id '\(tx.transactionID())'
