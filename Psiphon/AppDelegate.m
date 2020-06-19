@@ -93,13 +93,6 @@ PsiFeedbackLogType const RewardedVideoLogType = @"RewardedVideo";
 
 # pragma mark - Lifecycle methods
 
--  (BOOL)application:(UIApplication *)application
-continueUserActivity:(NSUserActivity *)userActivity
-  restorationHandler:(void (^)(NSArray<id<UIUserActivityRestoring>> * _Nullable))restorationHandler {
-
-    return [SwiftDelegate.bridge application:application continue:userActivity restorationHandler:restorationHandler];
-}
-
 - (BOOL)application:(UIApplication *)application
 willFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
 
