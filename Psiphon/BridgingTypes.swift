@@ -81,9 +81,6 @@ import PsiCashClient
     @objc func applicationDidEnterBackground(_ application: UIApplication)
     @objc func applicationDidBecomeActive(_ application: UIApplication)
     @objc func applicationWillTerminate(_ application: UIApplication)
-    @objc func application(_ application: UIApplication,
-                           continue userActivity: NSUserActivity,
-                           restorationHandler: @escaping ([Any]?) -> Void) -> Bool
     
     // -
     
